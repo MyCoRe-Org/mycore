@@ -58,30 +58,47 @@ public class MCRTileServlet extends HttpServlet {
             LOGGER.debug("Starting MCRTileServlet: " + req.getPathInfo());
         final TileInfo tileInfo = getTileInfo(req.getPathInfo());
         File iviewFile = getTileFile(tileInfo);
-        ZipFile zipFile = new ZipFile(iviewFile);
-        ZipEntry ze = zipFile.getEntry(tileInfo.tile);
-        if (ze != null) {
-            resp.setHeader("Cache-Control", "max-age=" + MAX_AGE);
-            if (tileInfo.tile.endsWith("xml"))
-                resp.setContentType("text/xml");
-            else
-                resp.setContentType("image/jpeg");
-            if (LOGGER.isDebugEnabled())
-                LOGGER.debug("Extracting " + ze.getName() + " size " + ze.getSize());
-            //size of a tile or imageinfo.xml file is always smaller than Integer.MAX_VALUE
-            resp.setContentLength((int) ze.getSize());
-            ServletOutputStream out = resp.getOutputStream();
-            InputStream zin = zipFile.getInputStream(ze);
-            try {
-                MCRUtils.copyStream(zin, out);
-            } finally {
-                zin.close();
-                out.close();
-            }
-        } else {
+        if (!iviewFile.exists()) {
+            LOGGER.warn("File does not exist: " + iviewFile.getAbsolutePath());
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
         }
-        LOGGER.debug("Ending MCRTileServlet");
+        try {
+            ZipFile zipFile = new ZipFile(iviewFile);
+            ZipEntry ze = zipFile.getEntry(tileInfo.tile);
+            if (ze != null) {
+                resp.setHeader("Cache-Control", "max-age=" + MAX_AGE);
+                if (tileInfo.tile.endsWith("xml"))
+                    resp.setContentType("text/xml");
+                else
+                    resp.setContentType("image/jpeg");
+                if (LOGGER.isDebugEnabled())
+                    LOGGER.debug("Extracting " + ze.getName() + " size " + ze.getSize());
+                //size of a tile or imageinfo.xml file is always smaller than Integer.MAX_VALUE
+                resp.setContentLength((int) ze.getSize());
+                ServletOutputStream out = resp.getOutputStream();
+                InputStream zin = zipFile.getInputStream(ze);
+                try {
+                    MCRUtils.copyStream(zin, out);
+                } finally {
+                    zin.close();
+                    out.close();
+                }
+            } else {
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
+            LOGGER.debug("Ending MCRTileServlet");
+        } catch (Exception e) {
+            LOGGER.warn("Error while processing IView2 file", e);
+            if (e instanceof RuntimeException)
+                throw (RuntimeException) e;
+            if (e instanceof IOException)
+                throw (IOException) e;
+            if (e instanceof ServletException)
+                throw (ServletException) e;
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
