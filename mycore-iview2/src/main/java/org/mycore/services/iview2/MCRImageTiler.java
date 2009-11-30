@@ -13,11 +13,14 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
 
 public class MCRImageTiler implements Runnable, Closeable {
     private static final SessionFactory sessionFactory = MCRHIBConnection.instance().getSessionFactory();
+
+    private static final String CONFIG_PREFIX = "MCR.Module-iview2.";
 
     private static MCRImageTiler instance = null;
 
@@ -53,58 +56,65 @@ public class MCRImageTiler implements Runnable, Closeable {
 
     public void run() {
         Thread.currentThread().setName("TileMaster");
-        tilingServe = Executors.newFixedThreadPool(Integer.parseInt(MCRIview2Props.getProperty("TilingThreads")), new ThreadFactory() {
-            AtomicInteger tNum = new AtomicInteger();
-
-            ThreadGroup tg = new ThreadGroup("MCR slave tiling thread group");
-
-            public Thread newThread(Runnable r) {
-                Thread t = new Thread(tg, r, "TileSlave#" + tNum.incrementAndGet());
-                return t;
+        boolean activated = MCRConfiguration.instance().getBoolean(CONFIG_PREFIX + "activated", false);
+        if (!activated) {
+            while (true) {
+                Thread.yield();
             }
-        });
+        } else {
+            tilingServe = Executors.newFixedThreadPool(Integer.parseInt(MCRIview2Props.getProperty("TilingThreads")), new ThreadFactory() {
+                AtomicInteger tNum = new AtomicInteger();
 
-        LOGGER.info("TilingMaster is started");
-        while (true) {
-            runLock.lock();
-            try {
-                if (!running)
-                    break;
-                Session session = sessionFactory.getCurrentSession();
-                Transaction transaction = session.beginTransaction();
-                MCRTileJob job = null;
+                ThreadGroup tg = new ThreadGroup("MCR slave tiling thread group");
+
+                public Thread newThread(Runnable r) {
+                    Thread t = new Thread(tg, r, "TileSlave#" + tNum.incrementAndGet());
+                    return t;
+                }
+            });
+
+            LOGGER.info("TilingMaster is started");
+            while (true) {
+                runLock.lock();
                 try {
-                    job = tq.poll();
-                    transaction.commit();
-                } catch (HibernateException e) {
-                    LOGGER.error("Error while getting next tiling job.", e);
-                    if (transaction != null) {
-                        transaction.rollback();
+                    if (!running)
+                        break;
+                    Session session = sessionFactory.getCurrentSession();
+                    Transaction transaction = session.beginTransaction();
+                    MCRTileJob job = null;
+                    try {
+                        job = tq.poll();
+                        transaction.commit();
+                    } catch (HibernateException e) {
+                        LOGGER.error("Error while getting next tiling job.", e);
+                        if (transaction != null) {
+                            transaction.rollback();
+                        }
+                    } finally {
+                        session.close();
+                    }
+                    if (job != null && !tilingServe.isShutdown()) {
+                        LOGGER.info("Creating:" + job.getPath());
+                        tilingServe.execute(new MCRTilingAction(job));
+                    } else {
+                        try {
+                            synchronized (tq) {
+                                if (running) {
+                                    LOGGER.debug("No Picture in TilingQueue going to sleep");
+                                    //fixes a race conditioned deadlock situation
+                                    //do not wait longer than 60 sec. for a new MCRTileJob
+                                    tq.wait(60000);
+                                }
+                            }
+                        } catch (InterruptedException e) {
+                            LOGGER.error("Image Tiling thread was interrupted.", e);
+                        }
                     }
                 } finally {
-                    session.close();
+                    runLock.unlock();
                 }
-                if (job != null && !tilingServe.isShutdown()) {
-                    LOGGER.info("Creating:" + job.getPath());
-                    tilingServe.execute(new MCRTilingAction(job));
-                } else {
-                    try {
-                        synchronized (tq) {
-                            if (running) {
-                                LOGGER.debug("No Picture in TilingQueue going to sleep");
-                                //fixes a race conditioned deadlock situation
-                                //do not wait longer than 60 sec. for a new MCRTileJob
-                                tq.wait(60000);
-                            }
-                        }
-                    } catch (InterruptedException e) {
-                        LOGGER.error("Image Tiling thread was interrupted.", e);
-                    }
-                }
-            } finally {
-                runLock.unlock();
-            }
-        } // while(running)
+            } // while(running)
+        }
     }
 
     public void prepareClose() {
