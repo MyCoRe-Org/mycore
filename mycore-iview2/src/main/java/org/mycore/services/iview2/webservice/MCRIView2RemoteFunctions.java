@@ -71,16 +71,17 @@ public class MCRIView2RemoteFunctions {
         Transaction transaction = session.beginTransaction();
         try {
             MCRTileJob mcrTileJob = TILE_QUEUE.poll();
-            transaction.commit();
-            if (mcrTileJob == null)
-                return null;
             String derID = mcrTileJob.getDerivate();
             String derPath = mcrTileJob.getPath();
             String imagePath = MCRIView2Tools.getFilePath(derID, derPath);
+            transaction.commit();
+            if (mcrTileJob == null){
+                return new MCRIView2RemoteJob();
+            }
             return new MCRIView2RemoteJob(derID, derPath, imagePath);
         } catch (HibernateException e) {
             LOGGER.error("Error while getting next tiling job.", e);
-            if (transaction != null) {
+            if (transaction != null && transaction.isActive()) {
                 transaction.rollback();
             }
             throw e;
