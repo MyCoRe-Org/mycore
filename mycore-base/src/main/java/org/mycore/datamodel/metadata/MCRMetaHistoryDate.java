@@ -51,7 +51,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     protected static Logger LOGGER = Logger.getLogger(MCRMetaHistoryDate.class.getName());
 
     /** The maximal length of 'text' */
-    public static final int MCRHISTORYDATE_MAX_TEXT = 256;
+    public static final int MCRHISTORYDATE_MAX_TEXT = 512;
 
     // Data of this class
     private ArrayList<MCRMetaHistoryDateText> texts;
