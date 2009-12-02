@@ -165,7 +165,7 @@ class MCRSharedLuceneIndexContext {
             long start = System.currentTimeMillis();
             context.LOGGER.debug("Warming up IndexSearcher for index " + context.ID);
             List<MCRFieldDef> fieldDefs = MCRFieldDef.getFieldDefs(context.getIndex());
-            HashSet<String> fieldNames=new HashSet<String>();
+            HashSet<String> fieldNames = new HashSet<String>();
             @SuppressWarnings("unchecked")
             Collection<String> fldNames = newSearcher.getIndexReader().getFieldNames(IndexReader.FieldOption.ALL);
             fieldNames.addAll(fldNames);
@@ -175,11 +175,14 @@ class MCRSharedLuceneIndexContext {
                 if (fieldDef.isSortable()) {
                     Query query;
                     if (MCRLuceneSearcher.isTokenized(fieldDef)) {
-                        query = new TermQuery(new Term(fieldDef.getName() + MCRLuceneSearcher.getSortableSuffix()));
-                    }
-                    query = new TermQuery(new Term(fieldDef.getName()));
+                        String sortableFieldName = fieldDef.getName() + MCRLuceneSearcher.getSortableSuffix();
+                        if (!fieldNames.contains(sortableFieldName))
+                            continue;
+                        query = new TermQuery(new Term(sortableFieldName));
+                    } else
+                        query = new TermQuery(new Term(fieldDef.getName()));
                     Sort sortFields = MCRLuceneSearcher.buildSortFields(Collections.nCopies(1, new MCRSortBy(fieldDef, true)));
-                    if (context.LOGGER.isDebugEnabled()){
+                    if (context.LOGGER.isDebugEnabled()) {
                         for (SortField sortField : sortFields.getSort()) {
                             String name = (SortField.FIELD_SCORE == sortField ? "score" : sortField.getField());
                             context.LOGGER.debug("Sort by: " + name + (sortField.getReverse() ? " descending" : " accending"));
