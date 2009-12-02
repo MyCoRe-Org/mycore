@@ -43,7 +43,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         return instance;
     }
 
-    public MCRTileJob poll() {
+    public synchronized MCRTileJob poll() {
         if (!running)
             return null;
         MCRTileJob job = getElement();
