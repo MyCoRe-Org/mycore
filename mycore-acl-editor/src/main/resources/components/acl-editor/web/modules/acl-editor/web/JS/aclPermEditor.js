@@ -112,26 +112,26 @@ function initAclEditPermBox(){
     
     if (permBoxElem){
     var tables = permBoxElem.getElementsByTagName("table");
-    
+
     for (i=0; i < tables.length; i++){
         var className;
         if(document.all)
             className = tables[i].getAttributeNode("class").value;
         else
             className = tables[i].getAttribute("class");
-            
+
         var currentTable = tables[i];
         if (className == "aclPermTable"){
-            
+
             var currentID = currentTable.id;
             var checkBoxID = 'checkBox$' + currentID;
             var currentCheckBox = document.getElementById(checkBoxID);
-            
+
             if (currentCheckBox){
             currentCheckBox.onclick = setPermAsDeleted;
             permBox.delPermsCheckboxes = permBox.delPermsCheckboxes.concat(currentCheckBox);
             }
-            
+
             var selectID = 'select$' + currentID;
             var currentSelectBox = document.getElementById(selectID);
             if(currentSelectBox)
@@ -173,7 +173,7 @@ function setPermAsDeleted(event){
             newInput.setAttribute("type", "hidden");
             newInput.name = deleted + node.value;
             newInput.id = deleted + node.value;
-    
+
             permBoxForm.appendChild(newInput);
         } else if (node.checked == false){
             var nodeMarkedAsDeleted = document.getElementById(deleted + node.value);

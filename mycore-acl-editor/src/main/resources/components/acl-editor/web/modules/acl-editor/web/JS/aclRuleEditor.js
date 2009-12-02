@@ -87,7 +87,7 @@ function initRuleTable(table){
     var buttonId = "RuleFieldButton$" + table.id;
     var targetId = "RuleField$" + table.id;
     var checkBoxId = "CheckBox$" + table.id;
-    var ruleInUseId = "RuleInUse$" + table.id;
+    var ruleDisabledId = "RuleDisabled$" + table.id;
     var ruleDescId = "RuleDesc$" + table.id;
     var ruleStringId = "RuleString$" + table.id;
     var button = new Object();
@@ -110,9 +110,9 @@ function initRuleTable(table){
     // making the hover info message for rules 
     // wich can not be set as deleted
     var ruleInUse;
-    if (ruleInUse = document.getElementById(ruleInUseId)){
-        ruleInUse.onmouseover = displRuleInUseMsg;
-        ruleInUse.onmouseout = removeRuleInUseMsg;
+    if (ruleInUse = document.getElementById(ruleDisabledId)){
+        ruleInUse.onmouseover = displayHoverMsg;
+        ruleInUse.onmouseout = removeHoverMsg;
     }
     
     // init the "+"-button
@@ -322,7 +322,7 @@ function setAllRulesAsDeleted(event){
 /*
  * Display info message for rules which can not be set as deleted
  */
-function displRuleInUseMsg(event){
+function displayHoverMsg(event){
     var msgWindowId = this.getAttribute("msgID");
     var msgWindow = document.getElementById(msgWindowId);
     
@@ -390,7 +390,7 @@ function displRuleInUseMsg(event){
         this.msgWindow = msgWindow;
 }
 
-function removeRuleInUseMsg(event){
+function removeHoverMsg(event){
     this.msgWindow.style.display = "none";
     //this.msgWindow.removeChild(this.msgWindow.debug);
 }

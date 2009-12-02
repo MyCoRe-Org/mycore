@@ -1,16 +1,17 @@
 package org.mycore.services.acl;
 
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.Criterion;
 import org.mycore.access.mcrimpl.MCRAccessControlSystem;
 import org.mycore.access.mcrimpl.MCRAccessRule;
 import org.mycore.access.mcrimpl.MCRAccessStore;
@@ -20,152 +21,189 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRACCESS;
 import org.mycore.backend.hibernate.tables.MCRACCESSRULE;
 import org.mycore.common.MCRCache;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRSessionMgr;
+import org.mycore.services.acl.filter.MCRAclCriterionFilter;
 
+/**
+ * 
+ * 
+ * @author Huu Chi Vu
+ * @author Matthias Eichner
+ */
 public class MCRACLHIBAccess {
-    String uid = MCRSessionMgr.getCurrentSession().getCurrentUserID();
 
     private static Logger LOGGER = Logger.getLogger(MCRACLHIBAccess.class);
 
-    public List getAccess() {
-        return MCRHIBConnection.instance().getSession().createCriteria(MCRACCESS.class).list();
-    }
 
-    public List getAccessPermission(String objidFilter, String acpoolFilter) {
-        return getAccessPermission(objidFilter, acpoolFilter, null);
-    }
-
-    public List getAccessPermission(String objidFilter, String acpoolFilter, String ridFilter) {
+    /**
+     * Returns a list of <code>MCRACCESS</code> rule mappings. The list is filterd by all
+     * <code>MCRAclCriterionFilter</code> classes which are defined in the
+     * <i>MCR.ACL.Editor.ruleMappingFilter</i> properties.
+     * 
+     * @param request the incoming http request - needed for filters
+     * @return a list of <code>MCRACCESS</code> instances
+     */
+    @SuppressWarnings("unchecked")
+    public List<MCRACCESS> getRuleMappingList(HttpServletRequest request) {
         Criteria query = MCRHIBConnection.instance().getSession().createCriteria(MCRACCESS.class);
-
-        if (objidFilter != null && !objidFilter.equals("")) {
-            LOGGER.info("OBJID Filter: " + objidFilter + "\t" + objidFilter.replaceAll("\\*", "%"));
-            query = query.add(Restrictions.like("key.objid", objidFilter.replaceAll("\\*", "%")));
-        }
-
-        if (acpoolFilter != null && !acpoolFilter.equals("")) {
-            LOGGER.info("ACPOOL Filter: " + acpoolFilter + "\t" + acpoolFilter.replaceAll("\\*", "%"));
-            query = query.add(Restrictions.like("key.acpool", acpoolFilter.replaceAll("\\*", "%")));
-        }
-
-        if (ridFilter != null && !ridFilter.equals("")) {
-            LOGGER.info("RID Filter: " + ridFilter);
-            query = query.add(Restrictions.like("rule.rid", ridFilter.replaceAll("\\*", "%")));
-        }
-
-        query.addOrder(Order.asc("key.objid"));
-        query.addOrder(Order.asc("key.acpool"));
-
+        filterQuery(query, request, "MCR.ACL.Editor.ruleMappingFilter");
         return query.list();
     }
 
-    public List getAccessRule() {
+    /**
+     * Returns a list of <code>MCRACCESSRULE</code> rules. The list is filterd by all
+     * <code>MCRAclCriterionFilter</code> classes which are defined in the
+     * <i>MCR.ACL.Editor.ruleFilter</i> properties.
+     * 
+     * @param request the incoming http request - needed for filters
+     * @return a list of <code>MCRACCESSRULE</code> instances
+     */
+    @SuppressWarnings("unchecked")
+    public List<MCRACCESSRULE> getRuleList(HttpServletRequest request) {
         Criteria query = MCRHIBConnection.instance().getSession().createCriteria(MCRACCESSRULE.class);
-        List list = query.list();
-
-        return list;
+        filterQuery(query, request, "MCR.ACL.Editor.ruleFilter");
+        return query.list();
     }
 
-    public void savePermChanges(Map diffMap) {
+    /**
+     * This method filters a hibernate criteria. The filter classes (instances of
+     * <code>MCRAclCriterionFilter</code>) are loaded by reflection.
+     * They are selected from the properties with the help of the filterPrefix.
+     * 
+     * @param query the query to filter
+     * @param request the incoming http request - needed for filters
+     * @param filterPrefix selects the code>MCRAclCriterionFilter</code> classes
+     */
+    public void filterQuery(Criteria query, HttpServletRequest request, String filterPrefix) {
+        Properties filters = MCRConfiguration.instance().getProperties(filterPrefix);
+        for(Object filterClass : filters.values()) {
+            try {
+                Class<?> c = Class.forName(filterClass.toString());
+                Object o = c.newInstance();
+                if(o instanceof MCRAclCriterionFilter) {
+                    Criterion criterion = ((MCRAclCriterionFilter)o).filter(request);
+                    if(criterion != null)
+                        query.add(criterion);
+                } else
+                    LOGGER.warn("'" + c.getCanonicalName() + "' doesnt implements MCRAclCriterionFilter. Check the " +
+                                filterPrefix + ".xxx filters.");
+            } catch(Exception exc) {
+                LOGGER.error("while loading acl filter '" + filterClass + "'!", exc);
+            }
+        }
+    }
+
+    /**
+     * Saves all rule mapping changes to the <code>MCRAccesStore</code>. That includes
+     * update-, save- and delete operations on <code>MCRRuleMapping</code> objects.
+     * These are set in the diffMap. The key is the operation and the value a list of
+     * the rule mappings.
+     * 
+     * @param diffMap map with changes
+     */
+    public void saveRuleMappingChanges(Map<MCRAclAction, List<MCRRuleMapping>> diffMap) {
         MCRAccessStore accessStore = MCRAccessStore.getInstance();
 
-        List updateList = (List) diffMap.get("update");
-        List saveList = (List) diffMap.get("save");
-        List deleteList = (List) diffMap.get("delete");
+        List<MCRRuleMapping> updateList = diffMap.get(MCRAclAction.update);
+        List<MCRRuleMapping> saveList = diffMap.get(MCRAclAction.save);
+        List<MCRRuleMapping> deleteList = diffMap.get(MCRAclAction.delete);
 
         if (updateList != null) {
-            for (Iterator it = updateList.iterator(); it.hasNext();) {
-                MCRRuleMapping accDef = (MCRRuleMapping) it.next();
-                
+            for (MCRRuleMapping accDef : updateList) {
                 String rid = accDef.getRuleId();
-                if (rid == null || rid.trim().length() <= 0){
+                if (rid == null || rid.trim().length() <= 0)
                     throw new MCRException("The rule ID should not be null, empty or just spaces");
-                }
-                
+
                 String acpool = accDef.getPool();
-                if (acpool == null || acpool.trim().length() <= 0){
+                if (acpool == null || acpool.trim().length() <= 0)
                     throw new MCRException("The AcPool ID should not be null, empty or just spaces");
-                }
-                
+
                 String objid = accDef.getObjId();
-                if (objid == null || objid.trim().length() <= 0){
+                if (objid == null || objid.trim().length() <= 0)
                     throw new MCRException("The object ID should not be null, empty or just spaces");
-                }
-                
+
                 accessStore.updateAccessDefinition(accDef);
             }
         }
 
-        if (saveList != null) {
-            for (Iterator it = saveList.iterator(); it.hasNext();) {
-                MCRRuleMapping next = (MCRRuleMapping) it.next();
-                accessStore.createAccessDefinition(next);
-            }
-        }
+        if (saveList != null)
+            for (MCRRuleMapping accDef : saveList)
+                accessStore.createAccessDefinition(accDef);
 
-        if (deleteList != null) {
-            for (Iterator it = deleteList.iterator(); it.hasNext();) {
-                accessStore.deleteAccessDefinition((MCRRuleMapping) it.next());
-            }
-        }
+        if (deleteList != null)
+            for (MCRRuleMapping accDef : deleteList)
+                accessStore.deleteAccessDefinition(accDef);
     }
 
-    public void saveRuleChanges(Map diffMap) {
+    /**
+     * Saves all rule changes to the <code>MCRRuleStore</code>. That includes
+     * update-, save- and delete operations on <code>MCRACCESSRULE</code> objects.
+     * These are set in the diffMap. The key is the operation and the value a list of
+     * rules.
+     * 
+     * @param diffMap map with changes
+     */
+    public void saveRuleChanges(Map<MCRAclAction, List<MCRACCESSRULE>> diffMap) {
         MCRRuleStore ruleStore = MCRRuleStore.getInstance();
         MCRCache cache = MCRAccessControlSystem.getCache();
 
-        List updateList = (List) diffMap.get("update");
-        List saveList = (List) diffMap.get("save");
-        List deleteList = (List) diffMap.get("delete");
+        List<MCRACCESSRULE> updateList = diffMap.get(MCRAclAction.update);
+        List<MCRACCESSRULE> saveList = diffMap.get(MCRAclAction.save);
+        List<MCRACCESSRULE> deleteList = diffMap.get(MCRAclAction.delete);
 
         if (updateList != null)
-            for (Iterator it = updateList.iterator(); it.hasNext();) {
-                MCRACCESSRULE rule = (MCRACCESSRULE) it.next();
+            for (MCRACCESSRULE rule : updateList) {
                 String rid = rule.getRid();
                 String ruleString = rule.getRule();
                 String desc = rule.getDescription();
+                String creator = rule.getCreator();
                 StringBuffer debugMSG = new StringBuffer("Update: ");
                 debugMSG.append(rid).append(" - ");
                 debugMSG.append(ruleString).append(" - ");
                 debugMSG.append(desc);
 
                 LOGGER.debug(debugMSG.toString());
-                MCRAccessRule accessRule = new MCRAccessRule(rid, uid, new Date(), ruleString, desc);
+                MCRAccessRule accessRule = new MCRAccessRule(rid, creator, new Date(), ruleString, desc);
                 ruleStore.updateRule(accessRule);
                 cache.put(rid, accessRule);
             }
 
         if (saveList != null)
-            for (Iterator it = saveList.iterator(); it.hasNext();) {
-                MCRACCESSRULE rule = (MCRACCESSRULE) it.next();
+            for (MCRACCESSRULE rule : saveList) {
                 String rid = rule.getRid();
                 String ruleString = rule.getRule();
                 String desc = rule.getDescription();
-                MCRAccessRule accessRule = new MCRAccessRule(rid, uid, new Date(), ruleString, desc);
+                String creator = rule.getCreator();
+                MCRAccessRule accessRule = new MCRAccessRule(rid, creator, new Date(), ruleString, desc);
 
                 ruleStore.createRule(accessRule);
                 cache.put(rid, accessRule); // upadte cache
             }
 
         if (deleteList != null)
-            for (Iterator it = deleteList.iterator(); it.hasNext();) {
-                String rid = (String) it.next();
-
-                if (ruleIsInUse(rid).isEmpty()) {
+            for (MCRACCESSRULE rule : deleteList) {
+                String rid = rule.getRid();
+                if (!isRuleInUse(rid)) {
                     ruleStore.deleteRule(rid);
                     cache.remove(rid);
                     LOGGER.debug("Rule " + rid + " deleted!");
-                } else {
+                } else
                     LOGGER.debug("Rule " + rid + " is in use, don't deleted!");
-                }
             }
-
     }
 
-    public List ruleIsInUse(String ruleid) {
+    /**
+     * Checks if a rule mappings uses the rule.
+     * 
+     * @param ruleid the rule id to check
+     * @return true if the rule is used, otherwise false
+     */
+    public boolean isRuleInUse(String ruleid) {
         Session session = MCRHIBConnection.instance().getSession();
         Query query = session.createQuery("from MCRACCESS as accdef where accdef.rule.rid = '" + ruleid + "'");
-        return query.list();
+        if(query.list().isEmpty())
+            return false;
+        return true;
     }
 }

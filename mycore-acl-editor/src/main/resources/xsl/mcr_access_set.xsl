@@ -15,6 +15,7 @@
     <xsl:variable name="aclClickButtonsJS" select="concat($WebApplicationBaseURL,'modules/acl-editor/web/JS/aclClickButtons.js')" />
     <xsl:variable name="labelObjID" select="concat(i18n:translate('component.acl-editor.label.objID'),':')" />
     <xsl:variable name="labelPermission" select="concat(i18n:translate('component.acl-editor.label.permission'),':')" />
+    <xsl:variable name="labelCreator" select="concat(i18n:translate('component.acl-editor.label.creator'),':')" />
     <xsl:variable name="labelRule" select="concat(i18n:translate('component.acl-editor.label.rule'),':')" />
     <xsl:template match="/mcr_access_set">
         <xsl:variable name="ruleItems" select="document(concat($dataRequest, '&amp;action=getRuleAsItems'))" />
@@ -112,7 +113,7 @@
                                 <xsl:choose>
                                     <xsl:when test="count(./mcr_access)>0">
                                         <xsl:for-each select="mcr_access[(position()>=$toc.pos.verif) and ($toc.pos.verif+$toc.pageSize>position())]">
-                                            <xsl:variable name="aclPermTableID" select="concat(OBJID,'$',ACPOOL)" />
+                                            <xsl:variable name="aclPermTableID" select="concat(OBJID,'$',ACPOOL,'$',CREATOR)" />
                                             <table id="{$aclPermTableID}" class="aclPermTable">
                                                 <xsl:choose>
                                                     <xsl:when test="not(../@cmd = $edit)">
@@ -133,7 +134,7 @@
                                                                         </td>
                                                                         <td>
                                                                             <input id="{concat('checkBox$',$aclPermTableID)}" class="checkBox" type="checkbox"
-                                                                                value="{concat(OBJID,'$',ACPOOL)}" />
+                                                                                value="{concat(OBJID,'$',ACPOOL,'$',CREATOR)}" />
                                                                         </td>
                                                                     </tr>
                                                                 </table>
@@ -145,6 +146,15 @@
                                                             </td>
                                                             <td class="value" id="ACPOOL">
                                                                 <xsl:value-of select="ACPOOL" />
+                                                            </td>
+                                                            <td></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="label">
+                                                                <xsl:value-of select="$labelCreator" />
+                                                            </td>
+                                                            <td class="value" id="CREATOR">
+                                                                <xsl:value-of select="CREATOR" />
                                                             </td>
                                                             <td></td>
                                                         </tr>
@@ -242,7 +252,7 @@
                             <xsl:value-of select="ACPOOL" />
                             " wirklich loeschen?
                             <br />
-                            <input type="hidden" name="{concat('deleted$',OBJID,'$',ACPOOL)}" value="{concat('deleted$',OBJID,'$',ACPOOL)}" />
+                            <input type="hidden" name="{concat('deleted$',OBJID,'$',ACPOOL,'$',CREATOR)}" value="{concat('deleted$',OBJID,'$',ACPOOL,'$',CREATOR)}" />
                             <input type="submit" value="Loeschen" />
                             <input type="button" value="Nicht loeschen" onclick="history.back()" />
                         </xsl:for-each>

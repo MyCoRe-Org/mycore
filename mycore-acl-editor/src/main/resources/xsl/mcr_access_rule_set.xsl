@@ -9,6 +9,7 @@
     <xsl:variable name="labelRule" select="concat(i18n:translate('component.acl-editor.label.rule'),':')" />
     <xsl:variable name="labelRuleId" select="concat(i18n:translate('component.acl-editor.label.ruleID'),':')" />
     <xsl:variable name="labelDelete" select="concat(i18n:translate('component.acl-editor.label.delete'),':')" />
+    <xsl:variable name="labelCreator" select="concat(i18n:translate('component.acl-editor.label.creator'),':')" />
     <xsl:variable name="inUseInfoMsg" select="i18n:translate('component.acl-editor.msg.delInfo')" />
     <xsl:variable name="inUseInfoMsgID" select="'aclInUseInfoMsg'" />
     <xsl:variable name="aclRuleEditorJS" select="concat($WebApplicationBaseURL,'modules/acl-editor/web/JS/aclRuleEditor.js')" />
@@ -104,78 +105,17 @@
                         <form id="aclEditRuleBoxForm" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
                             action="{concat($dataRequest, '&amp;action=submitRule')}" method="post" accept-charset="UTF-8">
                             <input type="hidden" name="redir" value="{concat($aclEditorURL,$currentEditor)}" />
-                            <xsl:for-each select="mcr_access_rule">
-                                <xsl:variable name="ruleFieldID" select="concat('RuleField$',RID)" />
-                                <xsl:variable name="ruleFieldButtonID" select="concat('RuleFieldButton$',RID)" />
-                                <xsl:variable name="checkBoxID" select="concat('CheckBox$',RID)" />
-                                <xsl:variable name="ruleInUseID" select="concat('RuleInUse$',RID)" />
-                                <table class="aclRuleTable" id="{RID}">
-                                    <tr name="rule_line" id="{concat('Rule$',RID)}">
-                                        <td class="buttonCol">
-                                            <!-- Button for details -->
-                                            <div class="detailsSwitch clickButtonOut" id="{$ruleFieldButtonID}">+</div>
-                                        </td>
-                                        <td>
-                                            <xsl:value-of select="$labelRuleId" />
-                                        </td>
-                                        <td class="ruleID">
-                                            <xsl:value-of select="RID" />
-                                        </td>
-
-                                        <!-- Delete checkbox -->
-                                        <xsl:choose>
-                                            <xsl:when test="inUse = 'true'">
-                                                <td id="{$ruleInUseID}" class="delInactiv" hoverMsg="{$inUseInfoMsg}" msgID="{$inUseInfoMsgID}">
-                                                    <table>
-                                                        <tr>
-                                                            <td>
-                                                                <xsl:value-of select="$labelDelete" />
-                                                            </td>
-                                                            <td>
-                                                                <input class="checkBox" type="checkbox" disabled="disabled" name="delete_rule" value="{RID}" />
-                                                            </td>
-                                                        </tr>
-                                                    </table>
-                                                </td>
-                                            </xsl:when>
-                                            <xsl:when test="inUse = 'false'">
-                                                <td class="delActiv">
-                                                    <table>
-                                                        <tr>
-                                                            <td>
-                                                                <xsl:value-of select="$labelDelete" />
-                                                            </td>
-                                                            <td>
-                                                                <input id="{$checkBoxID}" class="checkBox" type="checkbox" name="delete_rule" value="{RID}" />
-                                                            </td>
-                                                        </tr>
-                                                    </table>
-                                                </td>
-                                            </xsl:when>
-                                        </xsl:choose>
-                                    </tr>
-                                    <tr>
-                                        <td class="buttonCol"></td>
-                                        <td class="label">
-                                            <xsl:value-of select="$labelDescription" />
-                                        </td>
-                                        <td>
-                                            <input class="input" id="{concat('RuleDesc$',RID)}" name="{concat('RuleDesc$',RID)}" value="{DESCRIPTION}" />
-                                        </td>
-                                    </tr>
-                                    <tr class="ruleField" id="{$ruleFieldID}">
-                                        <td class="buttonCol"></td>
-                                        <td class="label">
-                                            <xsl:value-of select="$labelRule" />
-                                        </td>
-                                        <td>
-                                            <textarea class="textarea" id="{concat('RuleString$',RID)}" name="{concat('Rule$',RID)}">
-                                                <xsl:value-of select="RULE" />
-                                            </textarea>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </xsl:for-each>
+                              <xsl:for-each select="mcr_access_rule">
+                                <xsl:sort select="@editable"/>
+                                <xsl:choose>
+                                  <xsl:when test="@editable = 'false'">
+                                    <xsl:call-template name="printNotEditableRuleBox" />
+                                  </xsl:when>
+                                  <xsl:otherwise>
+                                    <xsl:call-template name="printRuleBox" />
+                                  </xsl:otherwise>
+                                </xsl:choose>                              
+                              </xsl:for-each>
                             <input class="button" type="submit" value="{i18n:translate('component.acl-editor.button.saveChg')}" />
                         </form>
                     </div>
@@ -185,5 +125,152 @@
                 </div>
             </div><!-- End aclRuleEditor -->
         </div>
+    </xsl:template>
+
+    <!-- ************************************************ -->
+    <!-- prints the editable rule box                     -->
+    <!-- ************************************************ -->
+    <xsl:template name="printRuleBox">
+      <xsl:variable name="ruleFieldID" select="concat('RuleField$',RID)" />
+      <xsl:variable name="ruleFieldButtonID" select="concat('RuleFieldButton$',RID)" />
+      <xsl:variable name="checkBoxID" select="concat('CheckBox$',RID)" />
+      <xsl:variable name="ruleDisabledID" select="concat('RuleDisabled$',RID)" />
+      <input type="hidden" name="{concat(RID,'$CREATOR')}" value="{CREATOR}" />
+    
+      <table class="aclRuleTable" id="{RID}">
+        <colgroup>
+          <col width="5%"></col>
+          <col width="15%"></col>
+          <col width="*"></col>
+          <col width="5%"></col>
+        </colgroup>
+        <tr name="rule_line" id="{concat('Rule$',RID)}">
+          <td class="buttonCol">
+            <!-- Button for details -->
+            <div class="detailsSwitch clickButtonOut" id="{$ruleFieldButtonID}">+</div>
+          </td>
+          <td class="label">
+            <xsl:value-of select="$labelRuleId" />
+          </td>
+          <td class="ruleID">
+            <xsl:value-of select="RID" />
+          </td>
+    
+          <!-- Delete checkbox -->
+          <xsl:choose>
+            <xsl:when test="inUse = 'true'">
+              <td id="{$ruleDisabledID}" class="delInactiv" hoverMsg="{$inUseInfoMsg}" msgID="{$inUseInfoMsgID}">
+                <table>
+                  <tr>
+                    <td>
+                      <xsl:value-of select="$labelDelete" />
+                    </td>
+                    <td>
+                      <input class="checkBox" type="checkbox" disabled="disabled" name="delete_rule" value="{RID}" />
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </xsl:when>
+            <xsl:otherwise>
+              <td class="delActiv">
+                <table>
+                  <tr>
+                    <td>
+                      <xsl:value-of select="$labelDelete" />
+                    </td>
+                    <td>
+                      <input id="{$checkBoxID}" class="checkBox" type="checkbox" name="delete_rule" value="{RID}" />
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </xsl:otherwise>
+          </xsl:choose>
+        </tr>
+        <tr>
+          <td class="buttonCol"></td>
+          <td class="label">
+            <xsl:value-of select="$labelCreator" />
+          </td>
+          <td class="label">
+            <xsl:value-of select="CREATOR" />
+          </td>
+        </tr>
+        <tr>
+          <td class="buttonCol"></td>
+          <td class="label">
+            <xsl:value-of select="$labelDescription" />
+          </td>
+          <td>
+            <input class="input" id="{concat('RuleDesc$',RID)}" name="{concat('RuleDesc$',RID)}" value="{DESCRIPTION}" />
+          </td>
+        </tr>
+        <tr class="ruleField" id="{$ruleFieldID}">
+          <td class="buttonCol"></td>
+          <td class="label">
+            <xsl:value-of select="$labelRule" />
+          </td>
+          <td>
+            <textarea class="textarea" id="{concat('RuleString$',RID)}" name="{concat('Rule$',RID)}">
+              <xsl:value-of select="RULE" />
+            </textarea>
+          </td>
+        </tr>
+      </table>
+    </xsl:template>
+
+    <!-- ************************************************ -->
+    <!-- prints the disabled rule box                     -->
+    <!-- ************************************************ -->
+    <xsl:template name="printNotEditableRuleBox">
+      <table class="aclRuleTable">
+        <colgroup>
+          <col width="5%"></col>
+          <col width="15%"></col>
+          <col width="*"></col>
+          <col width="5%"></col>
+        </colgroup>
+        <tr name="rule_line">
+          <td class="buttonCol"></td>
+          <td class="label">
+            <xsl:value-of select="$labelRuleId" />
+          </td>
+          <td class="ruleID">
+            <xsl:value-of select="RID" />
+          </td>
+          <td class="delInactiv"></td>
+        </tr>
+        <tr>
+          <td class="buttonCol"></td>
+          <td class="label">
+            <xsl:value-of select="$labelCreator" />
+          </td>
+          <td class="label">
+            <xsl:value-of select="CREATOR" />
+          </td>
+          <td class="delInactiv"></td>
+        </tr>
+        <tr>
+          <td class="buttonCol"></td>
+          <td class="label">
+            <xsl:value-of select="$labelDescription" />
+          </td>
+          <td>
+            <xsl:value-of select="DESCRIPTION" />
+          </td>
+          <td class="delInactiv"></td>
+        </tr>
+        <tr>
+          <td class="buttonCol"></td>
+          <td class="label">
+            <xsl:value-of select="$labelRule" />
+          </td>
+          <td>
+            <xsl:value-of select="RULE" />
+          </td>
+          <td class="delInactiv"></td>
+        </tr>
+      </table>
     </xsl:template>
 </xsl:stylesheet>

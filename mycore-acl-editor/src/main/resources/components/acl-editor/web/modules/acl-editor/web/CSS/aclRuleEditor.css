@@ -40,11 +40,9 @@ form {
 }
 
 .aclRuleTable .buttonCol{
-	width: 2%;
 }
 
 .aclRuleTable .label{
-	width: 10%;
 }
 
 .aclRuleTable .input{
@@ -82,7 +80,7 @@ form {
 }
 
 .aclRuleTable .delInactiv, .aclRuleTable .delActiv{
-	width: 5%;
+
 }
 
 .aclRuleEditorlabel {
