@@ -43,14 +43,14 @@ public class MCRTextResolverTest extends MCRTestCase {
         assertEquals(1, resolver.getUnresolvedVariables().size());
         assertEquals(4, resolver.getUsedVariables().size());
         assertEquals(7, resolver.getNotUsedVariables().size());
-        assertEquals(false, resolver.isCompletlyResolved());
+        assertEquals(false, resolver.isCompletelyResolved());
 
         resolver.resolveNext("{f3}, {f6}");
         assertEquals(4, resolver.getResolvedVariables().size());
         assertEquals(1, resolver.getUnresolvedVariables().size());
         assertEquals(5, resolver.getUsedVariables().size());
         assertEquals(6, resolver.getNotUsedVariables().size());
-        assertEquals(false, resolver.isCompletlyResolved());
+        assertEquals(false, resolver.isCompletelyResolved());
         
     }
 

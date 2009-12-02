@@ -23,13 +23,14 @@ import org.mycore.common.xml.MCRURIResolver.MCRResolver;
  * method.
  * </p><p>
  * The dynamic comes into play by the variables that can be defined for the
- * uri. In general they are set directly behind the uri prefix. For example:<br/>
- * 'uriprefix:value1:value2:value3...' or<br/>
- * 'uriprefix:varname1=varvalue1:varname2=varvalue2:varname3=varname3...'
- * </p>
+ * uri. In general they are set directly behind the uri prefix. For example:
+ * <pre>
+ * uriprefix:value1:value2:value3... or
+ * uriprefix:varname1=varvalue1:varname2=varvalue2:varname3=varname3...
+ * </pre>
  * In the xml file you can use these variables with curly brackets '{}'.
  * For more informations about the syntax see
- * <code>MCRUtils.resolveVariablesFromString()</code>. Heres only a short example
+ * <code>MCRTextResolver</code>. Heres only a short example
  * what is possible:
  * <p>
  * <p>myURIResolver:classId=class_000_1:levels=-1:axis=children</p>
@@ -43,7 +44,7 @@ import org.mycore.common.xml.MCRURIResolver.MCRResolver;
  * </code>
  * </p>
  * 
- * @see MCRUtils#resolveVariablesFromString(String, Hashtable)
+ * @see MCRTextResolver
  * @author Matthias Eichner
  */
 public abstract class MCRDynamicURIResolver implements MCRResolver {

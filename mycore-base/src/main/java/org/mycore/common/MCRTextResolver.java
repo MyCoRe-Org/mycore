@@ -86,19 +86,19 @@ public class MCRTextResolver {
     }
 
     /**
-     * Returns a new term in dependence of c. If no term is defined
+     * Returns a new term in dependence of the . If no term is defined
      * null is returned.
      * 
      * @param c character to check the dependency
      * @return a term or null if no one found
      */
-    private Term getTerm(char c) {
+    private Term getTerm(String text, int pos) {
         Term term = null;
-        if(c == '{')
+        if(text.startsWith(Variable.START_ENCLOSING_STRING, pos))
             term = new Variable();
-        else if(c == '[')
+        else if(text.startsWith(Condition.START_ENCLOSING_STRING, pos))
             term = new Condition();
-        else if(c == '\\')
+        else if(text.startsWith(EscapeCharacter.START_ENCLOSING_STRING, pos))
             term = new EscapeCharacter();
         return term;
     }
@@ -146,7 +146,7 @@ public class MCRTextResolver {
      * Returns a hashtable of variables that are used in the last <code>
      * resolve</code> and all last <code>resolveNext</code> calls.
      * This contains also variables that are not in the original
-     * variables table. The value stringof these variables is empty ("").
+     * variables table. The value string of these variables is empty ("").
      * 
      * @return a hashtable of all variables that are used
      */
@@ -184,13 +184,13 @@ public class MCRTextResolver {
      * @return true if the text doesnt contains unresolved
      * variables, otherwise false
      */
-    public boolean isCompletlyResolved() {
+    public boolean isCompletelyResolved() {
         return (unresolvedVariables.size() == 0) ? true : false;
     }
 
     /**
-     * A term is a defined part in a text. In general, a term is defined by brackets.
-     * But this is not required. Here some example terms:
+     * A term is a defined part in a text. In general, a term is defined by brackets,
+     * but this is not required. Here are some example terms:
      * <ul>
      * <li>Variable: {term1}</li>
      * <li>Condition: [term2]</li>
@@ -230,18 +230,22 @@ public class MCRTextResolver {
          */
         public String resolve(String text, int startPosition) {
             for (position = startPosition; position < text.length(); position++) {
-                char c = text.charAt(position);
-                Term internalTerm = getTerm(c);
+                Term internalTerm = getTerm(text, position);
                 if(internalTerm != null) {
-                    internalTerm.resolve(text, ++position);
+                    position += internalTerm.getStartEnclosingString().length();
+                    internalTerm.resolve(text, position);
                     if(internalTerm.resolved == false)
                         resolved = false;
                     position = internalTerm.position;
                     termBuffer.append(internalTerm.getValue());
                 } else {
-                    boolean complete = resolveInternal(c);
-                    if(complete)
+                    boolean complete = resolveInternal(text, position);
+                    if(complete) {
+                        int endEnclosingSize = getEndEnclosingString().length();
+                        if(endEnclosingSize > 1)
+                            position += endEnclosingSize - 1;
                         break;
+                    }
                 }
             }
             return getValue();
@@ -251,12 +255,12 @@ public class MCRTextResolver {
          * Does term specific resolving for the current character.
          * 
          * @param c the current character from text
-         * @return true if the end character is reached, otherwise false
+         * @return true if the end string is reached, otherwise false
          */
-        protected abstract boolean resolveInternal(char c);
+        protected abstract boolean resolveInternal(String text, int pos);
 
         /**
-         * Returns the value of the term. Overwritte this if you
+         * Returns the value of the term. Overwrite this if you
          * dont want to get the default termBuffer content as value.
          * 
          * @return the value of the term
@@ -264,6 +268,9 @@ public class MCRTextResolver {
         public String getValue() {
             return termBuffer.toString();
         }
+
+        public abstract String getStartEnclosingString();
+        public abstract String getEndEnclosingString();
     }
 
     /**
@@ -273,6 +280,9 @@ public class MCRTextResolver {
      * valueBuffer.
      */
     private class Variable extends Term {
+        public static final String START_ENCLOSING_STRING = "{";
+        public static final String END_ENCLOSING_STRING = "}";
+
         /**
          * A variable doesnt return the termBuffer, but
          * this valueBuffer.
@@ -285,8 +295,8 @@ public class MCRTextResolver {
         }
 
         @Override
-        public boolean resolveInternal(char c) {
-            if(c == '}') {
+        public boolean resolveInternal(String text, int pos) {
+            if(text.startsWith(END_ENCLOSING_STRING, pos)) {
                 // get the value from the variables table
                 String value = variablesTable.get(termBuffer.toString());
                 if (value != null) {
@@ -303,13 +313,22 @@ public class MCRTextResolver {
                 }
                 return true;
             }
-            termBuffer.append(c);
+            termBuffer.append(text.charAt(pos));
             return false;
         }
 
         @Override
         public String getValue() {
             return valueBuffer.toString();
+        }
+
+        @Override
+        public String getStartEnclosingString() {
+            return START_ENCLOSING_STRING;
+        }
+        @Override
+        public String getEndEnclosingString() {
+            return END_ENCLOSING_STRING;
         }
     }
 
@@ -321,11 +340,14 @@ public class MCRTextResolver {
      * content in the squared brackets are ignored.
      */
     private class Condition extends Term {
+        public static final String START_ENCLOSING_STRING = "[";
+        public static final String END_ENCLOSING_STRING = "]";
+        
         @Override
-        protected boolean resolveInternal(char c) {
-            if(c == ']')
+        protected boolean resolveInternal(String text, int pos) {
+            if(text.startsWith(END_ENCLOSING_STRING, pos))
                 return true;
-            termBuffer.append(c);
+            termBuffer.append(text.charAt(pos));
             return false;
         }
 
@@ -335,6 +357,14 @@ public class MCRTextResolver {
                 return super.getValue();
             return "";
         }
+        @Override
+        public String getStartEnclosingString() {
+            return START_ENCLOSING_STRING;
+        }
+        @Override
+        public String getEndEnclosingString() {
+            return END_ENCLOSING_STRING;
+        }
     }
 
     /**
@@ -342,8 +372,10 @@ public class MCRTextResolver {
      * first character after the escape char is add to the term.
      */
     private class EscapeCharacter extends Term {
+        public static final String START_ENCLOSING_STRING = "\\";
+
         @Override
-        public boolean resolveInternal(char c) {
+        public boolean resolveInternal(String text, int pos) {
             return true;
         }
         @Override
@@ -353,17 +385,33 @@ public class MCRTextResolver {
             termBuffer.append(c);
             return termBuffer.toString();
         }
+        @Override
+        public String getStartEnclosingString() {
+            return START_ENCLOSING_STRING;
+        }
+        @Override
+        public String getEndEnclosingString() {
+            return "";
+        }
     }
 
     /**
-     * A simple text, every character is add to the term (expect its
+     * A simple text, every character is added to the term (except its
      * a special one).
      */
     private class Text extends Term {
         @Override
-        public boolean resolveInternal(char c) {
-            termBuffer.append(c);
+        public boolean resolveInternal(String text, int pos) {
+            termBuffer.append(text.charAt(pos));
             return false;
+        }
+        @Override
+        public String getStartEnclosingString() {
+            return "";
+        }
+        @Override
+        public String getEndEnclosingString() {
+            return "";
         }
     }
 }
