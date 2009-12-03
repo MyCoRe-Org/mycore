@@ -51,7 +51,7 @@ import org.mycore.services.iview2.MCRTilingQueue;
  * @author Thomas Scheffler (yagee)
  *
  */
-@WebService(targetNamespace = "http://mycore.org/services/iview/remoteClient")
+@WebService(targetNamespace = "http://mycore.org/services/iview2/remoteClient")
 @SOAPBinding(style=Style.RPC)
 public class MCRIView2RemoteFunctions {
     private static MCRTilingQueue TILE_QUEUE = MCRTilingQueue.getInstance();
