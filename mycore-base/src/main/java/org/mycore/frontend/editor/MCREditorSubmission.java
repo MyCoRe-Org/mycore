@@ -29,6 +29,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.apache.commons.fileupload.FileItem;
@@ -113,7 +114,7 @@ public class MCREditorSubmission {
         String varpath = parms.getParameter("subselect.varpath");
         boolean merge = "true".equals(parms.getParameter("subselect.merge"));
 
-        Hashtable<String, String> table = new Hashtable<String, String>();
+        LinkedHashMap<String, String> table = new LinkedHashMap<String, String>();
 
         for (int i = 0; i < children.size(); i++) {
             Element var = (Element) (children.get(i));
