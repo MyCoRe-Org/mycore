@@ -26,13 +26,16 @@ package org.mycore.datamodel.ifs2;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.vfs.Selectors;
 import org.apache.commons.vfs.VFS;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTestCase;
 
@@ -207,17 +210,17 @@ public class MCRFileStoreTest extends MCRTestCase {
 
     public void testRepairMetadata() throws Exception {
         MCRFileCollection col = store.create();
-        String xml1 = MCRContent.readFrom(col.getMetadata()).asString();
+        Document xml1 = MCRContent.readFrom(col.getMetadata()).asXML();
         col.repairMetadata();
-        String xml2 = MCRContent.readFrom(col.getMetadata()).asString();
-        assertEquals(xml1, xml2);
+        Document xml2 = MCRContent.readFrom(col.getMetadata()).asXML();
+        assertTrue(equals(xml1, xml2));
 
         MCRDirectory dir = col.createDir("foo");
-        xml1 = MCRContent.readFrom(col.getMetadata()).asString();
-        assertFalse(xml2.equals(xml1));
+        xml1 = MCRContent.readFrom(col.getMetadata()).asXML();
+        assertFalse(equals(xml1, xml2));
         dir.delete();
-        xml1 = MCRContent.readFrom(col.getMetadata()).asString();
-        assertEquals(xml2, xml1);
+        xml1 = MCRContent.readFrom(col.getMetadata()).asXML();
+        assertTrue(equals(xml1, xml2));
 
         MCRDirectory dir2 = col.createDir("dir");
         MCRFile file1 = col.createFile("test1.txt");
@@ -227,28 +230,61 @@ public class MCRFileStoreTest extends MCRTestCase {
         MCRFile file3 = col.createFile("test2.txt");
         file3.setContent(MCRContent.readFrom("Test 2"));
         file3.setLabel("de", "Die Testdatei");
-        xml2 = MCRContent.readFrom(col.getMetadata()).asString();
+        xml2 = MCRContent.readFrom(col.getMetadata()).asXML();
 
         col.repairMetadata();
-        xml1 = MCRContent.readFrom(col.getMetadata()).asString();
-        assertEquals(xml2, xml1);
+        xml1 = MCRContent.readFrom(col.getMetadata()).asXML();
+        assertTrue(equals(xml1, xml2));
 
         file3.clearLabels();
-        xml2 = MCRContent.readFrom(col.getMetadata()).asString();
+        xml2 = MCRContent.readFrom(col.getMetadata()).asXML();
         String path = col.fo.getName().getPath();
         System.out.println(path);
         new File(path, "mcrdata.xml").delete();
         col = store.retrieve(col.getID());
-        xml1 = MCRContent.readFrom(col.getMetadata()).asString();
-        assertEquals(xml2, xml1);
+        xml1 = MCRContent.readFrom(col.getMetadata()).asXML();
+        assertTrue(equals(xml1, xml2));
 
         new File(path, "test1.txt").delete();
         File tmp = new File(path, "test3.txt");
         tmp.createNewFile();
         MCRContent.readFrom("Hallo Welt!").sendTo(tmp);
         col.repairMetadata();
-        xml1 = MCRContent.readFrom(col.getMetadata()).asString();
-        assertFalse(xml1.contains("name=\"test1.txt\""));
-        assertTrue(xml1.contains("name=\"test3.txt\""));
+        String xml3 = MCRContent.readFrom(col.getMetadata()).asString();
+        assertFalse(xml3.contains("name=\"test1.txt\""));
+        assertTrue(xml3.contains("name=\"test3.txt\""));
+    }
+    
+    private boolean equals(Document a, Document b) throws Exception {
+        sortChildren(a.getRootElement());
+        sortChildren(b.getRootElement());
+        String sa = MCRContent.readFrom(a).asString();
+        String sb = MCRContent.readFrom(b).asString();
+        return sa.equals(sb);
+    }
+
+    private void sortChildren(Element parent) throws Exception {
+        List children = parent.getChildren();
+        if ((children == null) || (children.size() == 0))
+            return;
+
+        ArrayList<Element> copy = new ArrayList<Element>();
+        copy.addAll(children);
+
+        Collections.sort(copy, new Comparator() {
+            public int compare(Object a, Object b) {
+                Element ea = (Element) a;
+                Element eb = (Element) b;
+                String sa = ea.getName() + "/" + ea.getAttributeValue("name");
+                String sb = eb.getName() + "/" + eb.getAttributeValue("name");
+                return sa.compareTo(sb);
+            }
+        });
+
+        parent.removeContent();
+        parent.addContent(copy);
+
+        for (Element child : copy)
+            sortChildren(child);
     }
 }
