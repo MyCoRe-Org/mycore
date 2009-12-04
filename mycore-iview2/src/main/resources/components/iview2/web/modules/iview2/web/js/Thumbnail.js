@@ -537,7 +537,10 @@ function openChapter(major, viewID){
 		} else if ($("chapter1"+viewID).style.visibility == "visible" && Iview[viewID].overviewActive) {
 			// do nothing for Overview
 		} else if ($("chapter1"+viewID).style.visibility == "visible") {
-			blendings.slide("chapter1"+viewID,new Array(toFloat(getStyle($("chapter1"+viewID+"In"), "left")) - toFloat(getStyle($("chapter1"+viewID+"In"), "right")), toFloat(getStyle($("chapter1"+viewID+"In"), "top")), toFloat(getStyle($("chapter1"+viewID+"Out"), "left")) - toFloat(getStyle($("chapter1"+viewID+"Out"), "right")), toFloat(getStyle($("chapter1"+viewID+"Out"), "top"))),60,10,0,new Array("chapter1"+viewID+":out"), "", "$('chapter1'+'"+viewID+"').style.visibility = 'hidden'");
+			//blendings.slide("chapter1"+viewID,new Array(toFloat(getStyle($("chapter1"+viewID+"In"), "left")) - toFloat(getStyle($("chapter1"+viewID+"In"), "right")), toFloat(getStyle($("chapter1"+viewID+"In"), "top")), toFloat(getStyle($("chapter1"+viewID+"Out"), "left")) - toFloat(getStyle($("chapter1"+viewID+"Out"), "right")), toFloat(getStyle($("chapter1"+viewID+"Out"), "top"))),60,10,0,new Array("chapter1"+viewID+":out"), "", "$('chapter1'+'"+viewID+"').style.visibility = 'hidden'");
+			// chapter soll sofort weg sein, nicht erst noch blenden, bspw. wenn vom Vollbild zurück ins normale
+			$("chapter1"+viewID).style.visibility = 'hidden';
+			$("chapter1"+viewID).style.top = getStyle($("chapter1"+viewID+"Out"), "top");
 		}
 		// last possible case (bool=false & vis=hidden) only for major
 	}
@@ -766,7 +769,6 @@ function cleanBook(viewID) {
 function loading(viewID) {
 	Iview[viewID].chapterActive = false;
 	Iview[viewID].overviewActive = false;
-	Iview[viewID].maximized = false;
 	//TODO gucken ob vars evtl wo anders geladen werden
 	splitHeader(viewID);
 	

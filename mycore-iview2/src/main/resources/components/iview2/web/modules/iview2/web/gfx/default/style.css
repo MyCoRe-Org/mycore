@@ -147,7 +147,8 @@
 	position: relative;
 	left: 0px;
 	top: 0px;
-	background-color: #c0c1c3;
+	background-image: url('scaled/header/horizontal.png');
+	background-repeat: repeatx;
 	width: 100%;
 	height: 44px;
 	border: 1px solid #000000;
@@ -212,7 +213,7 @@
 	background-repeat: no-repeat;
 	background-position: -420px -0px;
 	height:24px;
-	width:22px;
+	width:24px;
 	left:970px;
 	z-index: 50;
 	cursor: pointer;
@@ -261,7 +262,7 @@
 	background-repeat: no-repeat;
 	background-position: -60px -0px;
 	height: 24px;
-	width: 15px;
+	width: 24px;
 	left: 0px;
 	/*z-index: 32;*/
 	cursor: pointer;
@@ -273,8 +274,8 @@
 	background-repeat: no-repeat;
 	background-position: -90px -0px;
 	height: 24px;
-	width: 15px;
-	left: 320px;
+	width: 24px;
+	left: 310px;
 	z-index: 50;
 }
 
@@ -286,7 +287,7 @@
 	background-repeat: no-repeat;
 	background-position: -120px -0px;
 	height: 24px;
-	width: 15px;
+	width: 24px;
 	left: 0px;
 	z-index: 50;
 	cursor: pointer;
@@ -298,7 +299,7 @@
 	background-repeat: no-repeat;
 	background-position: -150px -0px;
 	height: 24px;
-	width: 15px;
+	width: 24px;
 	left: 470px;
 	z-index: 50;
 }
@@ -325,7 +326,7 @@
 	background-repeat: no-repeat;
 	background-position: -60px -0px;
 	height: 24px;
-	width: 15px;
+	width: 24px;
 	left: 0px;
 	z-index: 32;
 	cursor: pointer;
@@ -337,7 +338,7 @@
 	background-repeat: no-repeat;
 	background-position: -90px -0px;
 	height: 24px;
-	width: 15px;
+	width: 24px;
 	left: 0px;
 	z-index: 50;
 	visibility:hidden;
@@ -351,7 +352,7 @@
 	background-repeat: no-repeat;
 	background-position: -120px -0px;
 	height: 24px;
-	width: 15px;
+	width: 24px;
 	left: 0px;
 	z-index: 50;
 	cursor: pointer;
@@ -363,7 +364,7 @@
 	background-repeat: no-repeat;
 	background-position: -150px -0px;
 	height: 24px;
-	width: 15px;
+	width: 24px;
 	right:0px;
 	left:auto;
 	z-index: 50;
@@ -456,8 +457,8 @@
 	background-repeat: no-repeat;
 	background-position: -360px -0px;
 	height: 24px;
-	width: 22px;
-	left: 218px;
+	width: 24px;
+	left: 220px;
 	z-index: 50;
 	cursor: pointer;
 }
@@ -468,8 +469,8 @@
 	background-repeat: no-repeat;
 	background-position: -390px -0px;
 	height: 24px;
-	width: 22px;
-	left: 262px;
+	width: 24px;
+	left: 264px;
 	z-index: 50;
 	cursor: pointer;
 }
@@ -482,7 +483,7 @@
 	position: absolute;
 	top: 10px;
 	height: 24px;
-	width: 20px;
+	width: 24px;
 	right: 10px;
 	margin: 0px;
 	padding: 0px;
@@ -623,7 +624,7 @@
 	top: 0px;
 	right: 0px;
 	height: 24px;
-	width: 22px;
+	width: 24px;
 	margin: 0px;
 	padding: 0px;
 	border: 0px;
@@ -638,7 +639,7 @@
 	top: 10px;
 	left: 30px;
 	height: 24px;
-	width: 22px;
+	width: 24px;
 	margin: 0px;
 	padding: 0px;
 	border: 0px;
@@ -652,7 +653,7 @@
 	top: 0px;
 	right: 0px;
 	height: 24px;
-	width: 22px;
+	width: 24px;
 	margin: 0px;
 	padding: 0px;
 	border: 0px;
@@ -667,7 +668,7 @@
 	top: 10px;
 	left: 74px;
 	height: 24px;
-	width: 22px;
+	width: 24px;
 	margin: 0px;
 	padding: 0px;
 	border: 0px;
@@ -685,7 +686,7 @@
 	background-repeat: no-repeat;
 	background-position: -300px -0px;
  	height: 24px;
- 	width: 22px;
+ 	width: 24px;
  	left: 120px;
  	z-index: 50;
  	cursor: pointer;
@@ -697,7 +698,7 @@
 	background-repeat: no-repeat;
 	background-position: -330px -0px;
  	height: 24px;
- 	width: 22px;
+ 	width: 24px;
  	left: 164px;
  	z-index: 50;
  	cursor: pointer;
@@ -1024,8 +1025,8 @@
 .chapter1 .pageImageSymbol {
 	position: relative;
 	top: 3px;
-	height: 10px;
-	width: 10px;
+	height: 11px;
+	width: 11px;
 	background-image: url('image.png');
 	background-repeat: no-repeat;
 	background-position: -1170px -0px;
@@ -1034,8 +1035,8 @@
 .chapter1 .chapterImageSymbolMinus {
 	position: relative;
 	top: 3px;
-	height: 10px;
-	width: 10px;
+	height: 11px;
+	width: 11px;
 	background-image: url('image.png');
 	background-repeat: no-repeat;
 	background-position: -1140px -0px;
@@ -1044,8 +1045,8 @@
 .chapter1 .chapterImageSymbolPlus {
 	position: relative;
 	top: 3px;
-	height: 10px;
-	width: 10px;
+	height: 11px;
+	width: 11px;
 	background-image: url('image.png');
 	background-repeat: no-repeat;
 	background-position: -1110px -0px;
