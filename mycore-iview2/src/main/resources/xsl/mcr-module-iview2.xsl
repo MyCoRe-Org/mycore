@@ -186,6 +186,45 @@
   </xsl:template>
   <xsl:template name="iview2.init">
     <xsl:param name="groupID" />
+    <xsl:param name="prefix"/>
+    <xsl:param name="tilesize" select="'256'" />
+    <xsl:param name="maximized" select="'false'" />
+    <xsl:param name="zoomWidth" select="'false'" />
+    <xsl:param name="zoomScreen" select="'false'" />
+    <xsl:param name="blendEffects" select="'true'" />
+    <xsl:param name="chapHover" select="'true'" />
+    <xsl:param name="chapHoverDelay" select="'100'" />
+    <xsl:param name="chapHoverStep" select="'10'" />
+    <script type="text/javascript">
+    <!-- Philipp möchte verbessern -->
+      <xsl:text>var prefix='</xsl:text>
+      <xsl:value-of select="$prefix" />
+      <xsl:text>';</xsl:text>
+      <xsl:text>var tilesize='</xsl:text>
+      <xsl:value-of select="$tilesize" />
+      <xsl:text>';</xsl:text>
+      <xsl:text>var maximized=</xsl:text>
+      <xsl:value-of select="$maximized" />
+      <xsl:text>;</xsl:text>
+      <xsl:text>var zoomWidth=</xsl:text>
+      <xsl:value-of select="$zoomWidth" />
+      <xsl:text>;</xsl:text>
+      <xsl:text>var zoomScreen='</xsl:text>
+      <xsl:value-of select="$zoomScreen" />
+      <xsl:text>';</xsl:text>
+      <xsl:text>var blendEffects=</xsl:text>
+      <xsl:value-of select="$blendEffects" />
+      <xsl:text>;</xsl:text>
+      <xsl:text>var chapHover=</xsl:text>
+      <xsl:value-of select="$chapHover" />
+      <xsl:text>;</xsl:text>
+      <xsl:text>var chapHoverDelay='</xsl:text>
+      <xsl:value-of select="$chapHoverDelay" />
+      <xsl:text>';</xsl:text>
+      <xsl:text>var chapHoverStep='</xsl:text>
+      <xsl:value-of select="$chapHoverStep" />
+      <xsl:text>';</xsl:text>
+    </script>
     <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/ManageEvents.js" />
     <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/EventUtils.js" />
     <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/PanoJS.js" />
@@ -214,10 +253,12 @@
     <!--PageInput-->
     <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/pageForm.js" />
     <!--PageForm-->
+    <!-- params out of config.xml -->
     <script type="text/javascript">function startViewer(viewID) {
       if (Iview[viewID].started) return;
       Iview[viewID].started = true;
-      window.setTimeout("loading('"+viewID+"')", 1000);
+      //TODO: vorher 1000, jetz sporadischer Fehler: StyleFolderUri not found
+      window.setTimeout("loading('"+viewID+"')", 100);
       }
       function addIviewProperty(viewID, propertyName, val) {
       if (typeof (Iview) == "undefined") eval("Iview = new Object()");
@@ -230,15 +271,29 @@
   </xsl:template>
   <xsl:template name="iview2.start">
     <xsl:param name="groupID" />
-    <xsl:param name="style" select="'red'" />
+    <xsl:param name="style" select="'default'" />
+    <!-- params out of config.xml -->
+    <xsl:param name="styleFolderUri" select="'gfx/'" />
+    <xsl:param name="pagenumber" select="'1'" />
+    <xsl:param name="mets_uri" select="'../../images/Pics/Mets.xml'" />
     <script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/init.js" onreadystatechange="startViewer('{$groupID}')"
       onload="startViewer('{$groupID}')" />
 
     <link id="cssSheet{$groupID}" rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}/modules/iview2/web/gfx/{$style}/style.css" />
     <!-- Initfunktionen -->
     <script type="text/javascript">
+    <!-- Philipp möchte verbessern -->
       <xsl:text>var styleName='</xsl:text>
       <xsl:value-of select="$style" />
+      <xsl:text>';</xsl:text>
+      <xsl:text>var styleFolderUri='</xsl:text>
+      <xsl:value-of select="$styleFolderUri" />
+      <xsl:text>';</xsl:text>
+      <xsl:text>var pagenumber='</xsl:text>
+      <xsl:value-of select="$pagenumber" />
+      <xsl:text>';</xsl:text>
+      <xsl:text>var mets_uri='</xsl:text>
+      <xsl:value-of select="$mets_uri" />
       <xsl:text>';</xsl:text>
     </script>
   </xsl:template>
