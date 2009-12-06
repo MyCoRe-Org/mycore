@@ -111,7 +111,7 @@ public class MCRIndexBrowserServlet extends MCRServlet {
         return new MCRIndexBrowserIncomingData(search, mode, searchclass, fromTo, init);
     }
 
-    private String getMode(HttpServletRequest request) {
+    protected String getMode(HttpServletRequest request) {
         if (request.getParameter("mode") != null && !request.getParameter("mode").trim().equals("")) {
             return request.getParameter("mode").toLowerCase().trim();
         } else

@@ -73,11 +73,7 @@ class MCRSharedLuceneIndexContext {
         this.indexDir = indexDir;
         this.ID = ID;
         this.index = MCRConfiguration.instance().getString("MCR.Searcher." + ID + "." + "Index");
-        this.executorService = new ScheduledThreadPoolExecutor(1, new ThreadFactory() {
-            public Thread newThread(Runnable r) {
-                return new Thread("Index." + index + ".Refresher");
-            }
-        });
+        this.executorService = new ScheduledThreadPoolExecutor(1);
         RefreshIndexSearcher refreshIndexSearcher = new RefreshIndexSearcher(this);
         refreshIndexSearcher.run();
     }
