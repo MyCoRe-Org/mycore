@@ -40,7 +40,7 @@ public class MCRIView2Tools {
     private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
     private static String SUPPORTED_CONTENT_TYPE = CONFIG.getString("MCR.Module-iview2.SupportedContentTypes", "");
-    
+
     private static File TILE_DIR = new File(MCRIview2Props.getProperty("DirectoryForTiles"));
 
     /**
@@ -61,6 +61,10 @@ public class MCRIView2Tools {
                 return mainFile.getAbsolutePath();
         }
         return "";
+    }
+
+    public static boolean hasMETSFile(String derivateID) {
+        return (getMCRFile(derivateID, "/mets.xml") != null);
     }
 
     public static File getFile(String derivateID, String absolutePath) {

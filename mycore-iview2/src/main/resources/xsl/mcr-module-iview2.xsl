@@ -1,5 +1,5 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink"
-  xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:mcrxml="xalan://org.mycore.common.xml.MCRXMLFunctions" version="1.0"
+  xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:mcrxml="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:mcriview="xalan://org.mycore.services.iview2.MCRIView2Tools" version="1.0"
   exclude-result-prefixes="xlink i18n mcrxml">
   <xsl:param name="MCR.Module-iview2.BaseURL" />
   <xsl:param name="WebApplicationBaseURL" />
@@ -11,8 +11,6 @@
     <xsl:param name="cutOut" select="'true'" />
     <xsl:param name="overview" select="'true'" />
     
-    <xsl:variable name="derivxml" select="concat('ifs:/',@xlink:href)" />
-    <xsl:variable name="details" select="document($derivxml)" />
     <script type="text/javascript">
       var baseUris='["'+'<xsl:value-of select="$MCR.Module-iview2.BaseURL"/>'.split(',').join('","')+'"]';
       addIviewProperty('<xsl:value-of select="$groupID" />', 'useZoomBar',<xsl:value-of select="$zoomBar" />);
@@ -21,14 +19,7 @@
       addIviewProperty('<xsl:value-of select="$groupID" />', 'useOverview',<xsl:value-of select="$overview" />);
       addIviewProperty('<xsl:value-of select="$groupID" />', 'baseUri', baseUris);
       addIviewProperty('<xsl:value-of select="$groupID" />', 'webappBaseUri', '"<xsl:value-of select="$WebApplicationBaseURL"/>"');
-      <xsl:choose>
-        <xsl:when test="$details/mcr_directory/children/child/name[text()='mets.xml']">
-          addIviewProperty('<xsl:value-of select="$groupID" />', 'hasMets', true);
-        </xsl:when>
-        <xsl:otherwise>
-          addIviewProperty('<xsl:value-of select="$groupID" />', 'hasMets', false);
-        </xsl:otherwise>
-      </xsl:choose>
+      addIviewProperty('<xsl:value-of select="$groupID" />', 'hasMets', <xsl:value-of select="mcriview:hasMETSFile($groupID)"/>);
     </script>
     <div id="viewerContainer{$groupID}" class="viewerContainer min">
       <div id="blackBlank{$groupID}" class="blackBlank">
