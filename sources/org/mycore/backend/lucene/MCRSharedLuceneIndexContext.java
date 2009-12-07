@@ -28,9 +28,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.apache.lucene.index.CorruptIndexException;
@@ -63,18 +63,24 @@ class MCRSharedLuceneIndexContext {
 
     String ID;
 
-    Logger LOGGER = Logger.getLogger(MCRSharedLuceneIndexContext.class);
+    private static Logger LOGGER = Logger.getLogger(MCRSharedLuceneIndexContext.class);
 
-    ScheduledThreadPoolExecutor executorService;
+    final ExecutorService executorService;
 
-    private String index;
+    private final String index;
+
+    private final RefreshIndexSearcher refreshIndexSearcher;
 
     public MCRSharedLuceneIndexContext(Directory indexDir, String ID) throws CorruptIndexException, IOException {
         this.indexDir = indexDir;
         this.ID = ID;
         this.index = MCRConfiguration.instance().getString("MCR.Searcher." + ID + "." + "Index");
-        this.executorService = new ScheduledThreadPoolExecutor(1);
-        RefreshIndexSearcher refreshIndexSearcher = new RefreshIndexSearcher(this);
+        this.executorService = Executors.newFixedThreadPool(1, new ThreadFactory() {
+            public Thread newThread(Runnable r) {
+                return new Thread(r, "Index." + index + ".Refresher");
+            }
+        });
+        refreshIndexSearcher = new RefreshIndexSearcher(this);
         refreshIndexSearcher.run();
     }
 
@@ -109,6 +115,10 @@ class MCRSharedLuceneIndexContext {
         return index;
     }
 
+    public void triggerRefresh() {
+        this.executorService.submit(this.refreshIndexSearcher);
+    }
+
     /**
      * refreshes IndexSearcher if needed with a warm up for optimal query performance.
      * @author Thomas Scheffler (yagee)
@@ -117,20 +127,15 @@ class MCRSharedLuceneIndexContext {
     private static class RefreshIndexSearcher implements Runnable {
         private MCRSharedLuceneIndexContext context;
 
+        private static Logger LOGGER = Logger.getLogger(MCRSharedLuceneIndexContext.class);
+
         public RefreshIndexSearcher(MCRSharedLuceneIndexContext context) {
             this.context = context;
         }
 
         public void run() {
             try {
-                Long start = System.currentTimeMillis();
                 initReaderIfNeeded();
-                Long end = System.currentTimeMillis();
-                long nextCheck = Math.max((end - start), 60 * 1000);
-                if (context.LOGGER.isDebugEnabled()) {
-                    context.LOGGER.debug("Scheduling next index refresh in " + nextCheck + " ms.");
-                }
-                context.executorService.schedule(this, nextCheck, TimeUnit.MILLISECONDS);
             } catch (Exception e) {
                 throw new MCRException("Error while opening Lucene index.", e);
             }
@@ -145,7 +150,7 @@ class MCRSharedLuceneIndexContext {
                 if (!context.reader.isCurrent()) {
                     IndexReader newReader = context.reader.reopen();
                     if (newReader != context.reader) {
-                        context.LOGGER.info("new Searcher for index: " + context.index);
+                        LOGGER.info("new Searcher for index: " + context.index);
                         IndexSearcher newSearcher = new IndexSearcher(newReader);
                         warmUpSearcher(newSearcher);
                         context.reader.close();
@@ -159,7 +164,7 @@ class MCRSharedLuceneIndexContext {
 
         private void warmUpSearcher(IndexSearcher newSearcher) throws IOException {
             long start = System.currentTimeMillis();
-            context.LOGGER.debug("Warming up IndexSearcher for index " + context.ID);
+            LOGGER.debug("Warming up IndexSearcher for index " + context.ID);
             List<MCRFieldDef> fieldDefs = MCRFieldDef.getFieldDefs(context.getIndex());
             HashSet<String> fieldNames = new HashSet<String>();
             @SuppressWarnings("unchecked")
@@ -178,10 +183,10 @@ class MCRSharedLuceneIndexContext {
                     } else
                         query = new TermQuery(new Term(fieldDef.getName()));
                     Sort sortFields = MCRLuceneSearcher.buildSortFields(Collections.nCopies(1, new MCRSortBy(fieldDef, true)));
-                    if (context.LOGGER.isDebugEnabled()) {
+                    if (LOGGER.isDebugEnabled()) {
                         for (SortField sortField : sortFields.getSort()) {
                             String name = (SortField.FIELD_SCORE == sortField ? "score" : sortField.getField());
-                            context.LOGGER.debug("Sort by: " + name + (sortField.getReverse() ? " descending" : " accending"));
+                            LOGGER.info("Sort by: " + name + (sortField.getReverse() ? " descending" : " accending"));
                         }
                     }
                     newSearcher.search(query, null, newSearcher.maxDoc(), sortFields);
@@ -190,8 +195,8 @@ class MCRSharedLuceneIndexContext {
                     newSearcher.search(query, new NoOpCollector());
                 }
             }
-            if (context.LOGGER.isDebugEnabled()) {
-                context.LOGGER.debug("Warming up IndexSearcher " + context.ID + " took " + (System.currentTimeMillis() - start) + " ms.");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Warming up IndexSearcher " + context.ID + " took " + (System.currentTimeMillis() - start) + " ms.");
             }
         }
     }

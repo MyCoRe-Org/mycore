@@ -70,12 +70,15 @@ class MCRIndexWriteExecutor extends ThreadPoolExecutor {
         }
     };
 
-    public MCRIndexWriteExecutor(BlockingQueue<Runnable> workQueue, FSDirectory indexDir) {
+    private MCRSharedLuceneIndexContext luceneContext;
+
+    public MCRIndexWriteExecutor(BlockingQueue<Runnable> workQueue, FSDirectory indexDir, MCRSharedLuceneIndexContext luceneContext) {
         // single thread mode
         super(1, 1, 0, TimeUnit.SECONDS, workQueue);
         this.indexDir = indexDir;
         modifierClosed = true;
         firstJob = true;
+        this.luceneContext = luceneContext;
         closeModifierEarly = MCRConfiguration.instance().getBoolean("MCR.Lucene.closeModifierEarly", false);
         maxIndexWriteActions = MCRConfiguration.instance().getInt("MCR.Lucene.maxIndexWriteActions", 500);
     }
@@ -150,6 +153,7 @@ class MCRIndexWriteExecutor extends ThreadPoolExecutor {
             if (indexWriter != null) {
                 LOGGER.debug("Writing Lucene index changes to disk.");
                 indexWriter.close();
+                luceneContext.triggerRefresh();
             }
         } catch (IOException e) {
             LOGGER.warn("Error while closing IndexWriter.", e);

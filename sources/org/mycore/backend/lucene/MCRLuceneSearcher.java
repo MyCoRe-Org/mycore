@@ -152,7 +152,12 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         IndexWriter.setDefaultWriteLockTimeout(writeLockTimeout);
 
         try {
-            modifyExecutor = new MCRIndexWriteExecutor(new LinkedBlockingQueue<Runnable>(), indexDir);
+            sharedIndexContext = new MCRSharedLuceneIndexContext(FSDirectory.getDirectory(IndexDir), ID);
+        } catch (IOException e) {
+            throw new MCRException("Cannot initialize IndexReader.", e);
+        }
+        try {
+            modifyExecutor = new MCRIndexWriteExecutor(new LinkedBlockingQueue<Runnable>(), indexDir, sharedIndexContext);
         } catch (Exception e) {
             throw new MCRException("Cannot start IndexWriter thread.", e);
         }
@@ -167,11 +172,6 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
                 addableFields.add(fd);
         }
         MCRShutdownHandler.getInstance().addCloseable(this);
-        try {
-            sharedIndexContext = new MCRSharedLuceneIndexContext(FSDirectory.getDirectory(IndexDir), ID);
-        } catch (IOException e) {
-            throw new MCRException("Cannot initialize IndexReader.", e);
-        }
     }
 
     private void deleteLuceneLockFile() {
@@ -495,6 +495,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         try {
             IndexWriter writer = new IndexWriter(indexDir, analyzer, true, MaxFieldLength.LIMITED);
             writer.close();
+            sharedIndexContext.triggerRefresh();
         } catch (IOException e) {
             LOGGER.error(e.getClass().getName() + ": " + e.getMessage());
             LOGGER.error(MCRException.getStackTraceAsString(e));
