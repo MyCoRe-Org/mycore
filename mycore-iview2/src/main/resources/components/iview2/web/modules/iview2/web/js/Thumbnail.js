@@ -1,5 +1,3 @@
-//var page = null;//holds the Page XML
-
 var blendings = new blendWorks();
 var focus = null;//holds the element which is focused
 
@@ -687,7 +685,6 @@ function importOverview(viewID) {
 	Iview[viewID].overview1 = new overview("overview1"+viewID, "viewerContainer"+viewID, "");
 	var overview1 = Iview[viewID].overview1;
 	overview1.setViewID(viewID);
-	//overview1.setBook(Iview[viewID].book);
 	//TODO wird hier lediglich Referenz gespeichert? Wenn ja ok ansonsten evtl unnötigen Kram entfernen und nur die Seiteninfos speichern
 	overview1.setBook(Iview[viewID].buchDaten)
 	overview1.setBaseUri(Iview[viewID].baseUri);
@@ -751,18 +748,6 @@ function splitHeader(viewID) {
 }
 
 /*
-@description removes all Entries within the Directory Listing which don't represent any Image
-*/
-function cleanBook(viewID) {
-	var childs = Iview[viewID].book.getElementsByTagName("child");
-	for (var i = 0; i < childs.length; i++) {
-		if (!getInnerText(childs.item(i).childNodes[3]).toLowerCase().match(/(jpg|jpeg|png|bmp|gif|tiff|tif)/)) {
-			childs.item(i).parentNode.removeChild(childs.item(i));
-		}
-	}
-}
-
-/*
 @description is calling to the load-event of the window; serve for the further registration of events likewise as initioator for various objects
 @param e Daten vom Load Event
 */
@@ -774,11 +759,6 @@ function loading(viewID) {
 	
 	style = styleFolderUri + styleName + "/";
 	loadVars("../modules/iview2/web/" + style + "design.xml");//Laden der Informationen je nach entsprechendem Design
-	// load and process XML-data
-	//Iview[viewID].book_uri = "../images/Pics/" + viewID + "/";
-	//Iview[viewID].book = loadXML(Iview[viewID].webappBaseUri + "servlets/MCRFileNodeServlet/" + viewID + "/", "xml");
-
-	//cleanBook(viewID);
 	//retrieves the mets File depending on the fact if it's exists or it request a simple one
 	var mets_uri = Iview[viewID].webappBaseUri + "servlets/" + ((Iview[viewID].hasMets)? "MCRFileNodeServlet/": "MCRDirectoryXMLServlet/") + viewID + ((Iview[viewID].hasMets)? "/mets.xml":"");
 	Iview[viewID].buchDaten = (Iview[viewID].hasMets)? loadXML(mets_uri):loadXML(mets_uri, "mets");
@@ -863,11 +843,12 @@ function loading(viewID) {
 	} else {
 		ManageEvents.addEventListener(window, 'resize', function() { reinitializeGraphic(viewID);}, false);
 	}
-	
+	//TODO permaLink funzt nicht ganz, Zoomlevel wird durch to Screen überschrieben
 	// surface muss als Blank geladen werden, damit Ebene gefüllt und es im Vordergrund des Viewers liegt
 	// hauptsächlich wegen IE notwendig
 	getElementsByClassName("surface","viewer"+viewID,"div")[0].style.backgroundImage = "url("+Iview[viewID].webappBaseUri+"modules/iview2/web/gfx/blank.gif"+")";
 	// PermaLink Handling
+	
 	if (window.location.search.get("tosize") == "width") {
 		pictureWidth(viewID);
 	} else if (window.location.search.get("tosize") == "screen") {
@@ -878,5 +859,4 @@ function loading(viewID) {
 	if (window.location.search.get("maximized") == "true") {
 		maximizeHandler(viewID);
 	}
-	//ManageEvents.addEventListener($("viewer"+viewID), 'mousedown', function() { maximizeHandler(viewID);}, false);
 }
