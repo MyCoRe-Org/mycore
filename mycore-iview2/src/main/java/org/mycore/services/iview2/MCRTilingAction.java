@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
