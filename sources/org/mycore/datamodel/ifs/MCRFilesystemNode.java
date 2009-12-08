@@ -498,4 +498,25 @@ public abstract class MCRFilesystemNode {
 
         return sb.toString();
     }
+
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (!(obj instanceof MCRFilesystemNode))
+            return false;
+        MCRFilesystemNode other = (MCRFilesystemNode) obj;
+        if (other.ID == null)
+            return super.equals(obj);
+        else
+            return other.ID.equals(this.ID);
+    }
+
+    public int hashCode() {
+        if (ID != null)
+            return ID.hashCode();
+        else
+            return super.hashCode();
+    }
+    
+    
 }

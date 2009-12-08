@@ -172,7 +172,7 @@ public class MCRDirectory extends MCRFilesystemNode {
             }
 
             if (children != null) {
-                children.remove(child.getID());
+                children.remove(child);
             }
         }
 
