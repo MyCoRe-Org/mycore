@@ -40,7 +40,7 @@ public class MCRTilingAction implements Runnable {
             }
             session.update(image);
             transaction.commit();
-        } catch (HibernateException e) {
+        } catch (Exception e) {
             LOGGER.error("Error while getting next tiling job.", e);
             if (transaction != null) {
                 transaction.rollback();
