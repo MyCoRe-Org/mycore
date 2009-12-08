@@ -41,6 +41,7 @@ import org.apache.lucene.analysis.de.GermanAnalyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriter.MaxFieldLength;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.util.Version;
 import org.mycore.common.MCRConfiguration;
 
 class MCRIndexWriteExecutor extends ThreadPoolExecutor {
@@ -164,10 +165,10 @@ class MCRIndexWriteExecutor extends ThreadPoolExecutor {
 
     private static IndexWriter getLuceneWriter(FSDirectory indexDir, boolean first) throws Exception {
         IndexWriter modifier;
-        Analyzer analyzer = new GermanAnalyzer();
+        Analyzer analyzer = new GermanAnalyzer(Version.LUCENE_CURRENT);
         boolean create = false;
         // check if indexDir is empty before creating a new index
-        if (first && (indexDir.list().length == 0)) {
+        if (first && (indexDir.listAll().length == 0)) {
             LOGGER.info("No Entries in Directory, initialize: " + indexDir);
             create = true;
         }

@@ -53,6 +53,7 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
+import org.apache.lucene.util.Version;
 import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
@@ -83,7 +84,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
 
     private static TextFilterPluginManager PLUGIN_MANAGER = null;
 
-    static Analyzer analyzer = new PerFieldAnalyzerWrapper(new GermanAnalyzer());
+    static Analyzer analyzer = new PerFieldAnalyzerWrapper(new GermanAnalyzer(Version.LUCENE_CURRENT));
 
     File IndexDir;
 

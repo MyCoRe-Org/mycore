@@ -45,6 +45,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TermRangeQuery;
 import org.apache.lucene.search.WildcardQuery;
+import org.apache.lucene.util.Version;
 import org.jdom.Element;
 import org.mycore.common.MCRNormalizer;
 import org.mycore.common.MCRUtils;
@@ -105,12 +106,12 @@ public class MCRBuildLuceneQuery {
                 if ("name".equals(fieldtype)) {
                     fieldtype = "text";
                 }
-                
-                if("index".equals(fieldtype)){
-                	fieldtype="identifier";
-                	value = MCRNormalizer.normalizeString(value, true);
+
+                if ("index".equals(fieldtype)) {
+                    fieldtype = "identifier";
+                    value = MCRNormalizer.normalizeString(value, true);
                 }
-                
+
                 x = handleCondition(field, operator, value, fieldtype, reqf, analyzer);
             }
 
@@ -239,7 +240,7 @@ public class MCRBuildLuceneQuery {
         } else if ("text".equals(fieldtype) && "lucene".equals(operator)) // value
         // contains query for lucene, use query parser
         {
-            QueryParser qp = new QueryParser(field, analyzer);
+            QueryParser qp = new QueryParser(Version.LUCENE_CURRENT, field, analyzer);
             Query query = qp.parse(fixQuery(value));
 
             LOGGER.debug("Lucene query: " + query.toString());
