@@ -39,7 +39,8 @@ public interface MCRCategLinkService {
      * 
      * @param category
      *            a subtree rooted at a MCRCategory for which links should be counted
-     * @return true if the classification is used
+     *            or <code>null</code> if a list of used classID is requested
+     * @return a Map of either MCRCategoryIDs of a classification or root MCRCategoryIDs
      */
     public abstract Map<MCRCategoryID, Boolean> hasLinks(MCRCategory category);
     
