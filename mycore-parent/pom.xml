@@ -54,7 +54,7 @@
     <java.target.version>1.6</java.target.version>
     <uniqueVersion>false</uniqueVersion>
     <hibernate.version>3.3.2.GA</hibernate.version>
-    <lucene.version>2.9.0</lucene.version>
+    <lucene.version>3.0.0</lucene.version>
   </properties>
   <distributionManagement>
     <!-- use the following if you're not using a snapshot version. -->
@@ -133,9 +133,8 @@
               <link>http://java.sun.com/xml/jaxp/dist/1.1/docs/api/</link>
               <link>http://www.jdom.org/docs/apidocs</link>
               <link>http://logging.apache.org/log4j/docs/api/</link>
-              <link>http://jakarta.apache.org/lucene/docs/api/</link>
               <link>http://www.hibernate.org/hib_docs/v3/api/</link>
-              <link>http://lucene.apache.org/java/2_9_0/api/all/</link>
+              <link>http://lucene.apache.org/java/3_0_0/api/all/</link>
             </links>
           </configuration>
         </plugin>
@@ -253,6 +252,13 @@
       <url>http://www.mycore.de/maven2</url>
       <snapshots>
         <enabled>true</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>maven central</id>
+      <url>http://repo1.maven.org/maven2/</url>
+      <snapshots>
+        <enabled>false</enabled>
       </snapshots>
     </repository>
     <repository>
