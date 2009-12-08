@@ -34,6 +34,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
@@ -191,8 +192,12 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         categCache.put(categID, categ);
         return categ;
     }
-    
+
     public Map<MCRCategoryID, Boolean> hasLinks(MCRCategory category) {
+        if(category == null) {
+            return hasLinksForClassification(category);
+        }
+        
         MCRCategoryImpl rootImpl = (MCRCategoryImpl) MCRCategoryDAOFactory.getInstance().getCategory(category.getRoot().getId(), -1);
         if (rootImpl == null) {
             //Category does not exist, so it has no links
@@ -203,7 +208,41 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         storeHasLinkValues(boolMap, linkedInternalIds, rootImpl);
         return boolMap;
     }
-    
+
+    private Map<MCRCategoryID, Boolean> hasLinksForClassification(MCRCategory category) {
+        HashMap<MCRCategoryID, Boolean> boolMap = new HashMap<MCRCategoryID, Boolean>() {
+            @Override
+            public Boolean get(Object key) {
+                Boolean haslink = super.get(key);
+                return haslink == null ? false : haslink;
+            }
+        };
+
+        Session session = MCRHIBConnection.instance().getSession();
+        String queryString = "select distinct node.classid from MCRCATEGORY as node, MCRCATEGORYLINK as link where node.internalid=link.category";
+        SQLQuery sqlQueryHasLink = session.createSQLQuery(queryString);
+        List<String> categList = sqlQueryHasLink.list();
+
+        for (String rootID : categList) {
+            MCRCategoryID categoryID = MCRCategoryID.rootID(rootID);
+            boolMap.put(categoryID, true);
+        }
+
+        return boolMap;
+    }
+
+    private MCRCategoryID createID(Object[] rootID_ID_Array) {
+        MCRCategoryID categoryID;
+        String classID = (String) rootID_ID_Array[0];
+        String categID = (String) rootID_ID_Array[1];
+        if (categID == null) {
+            categoryID = MCRCategoryID.rootID(classID);
+        } else {
+            categoryID = new MCRCategoryID(classID, categID);
+        }
+        return categoryID;
+    }
+
     private Map<MCRCategoryID, Boolean> getNoLinksMap(MCRCategory category) {
         HashMap<MCRCategoryID, Boolean> boolMap = new HashMap<MCRCategoryID, Boolean>();
         for (MCRCategoryID categID : getAllCategIDs(category)) {
