@@ -448,4 +448,8 @@ public final class MCRObjectID {
     public int hashCode() {
         return getId().hashCode();
     }
+    
+    public static boolean isValid(String id) {
+        return new MCRObjectID().setID(id);
+    }
 }
