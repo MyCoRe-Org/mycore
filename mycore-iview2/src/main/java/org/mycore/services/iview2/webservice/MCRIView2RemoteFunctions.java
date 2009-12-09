@@ -66,18 +66,19 @@ public class MCRIView2RemoteFunctions {
      */
     @WebMethod(operationName = "next-tile-job")
     @WebResult(name = "tile-job")
-    public MCRIView2RemoteJob getNextTileParameters() {
+    public synchronized MCRIView2RemoteJob getNextTileParameters() {
         Session session = sessionFactory.getCurrentSession();
         Transaction transaction = session.beginTransaction();
         try {
             MCRTileJob mcrTileJob = TILE_QUEUE.poll();
+            if (mcrTileJob == null){
+                transaction.commit();
+                return new MCRIView2RemoteJob();
+            }
             String derID = mcrTileJob.getDerivate();
             String derPath = mcrTileJob.getPath();
             String imagePath = MCRIView2Tools.getFilePath(derID, derPath);
             transaction.commit();
-            if (mcrTileJob == null){
-                return new MCRIView2RemoteJob();
-            }
             return new MCRIView2RemoteJob(derID, derPath, imagePath);
         } catch (HibernateException e) {
             LOGGER.error("Error while getting next tiling job.", e);
