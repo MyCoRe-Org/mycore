@@ -69,7 +69,6 @@ class RowCreator_NoLines implements RowCreator {
         List<MCRCategory> children = category.getChildren();
         for (MCRCategory mcrCategory : children) {
             MCRCategoryID categoryID = mcrCategory.getId();
-            LOGGER.info("linkmap: " + linkMap);
             Boolean hasLinksValue = linkMap.get(categoryID);
             boolean hasLinks = hasLinksValue == null ? false : hasLinksValue;
             boolean hasChildren = mcrCategory.hasChildren();
