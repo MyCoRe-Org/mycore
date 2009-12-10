@@ -60,6 +60,8 @@ class MCRSharedLuceneIndexContext {
     IndexReader reader;
 
     IndexSearcher searcher;
+    
+    Collection<String> fieldNames;
 
     String ID;
 
@@ -98,6 +100,10 @@ class MCRSharedLuceneIndexContext {
 
     public boolean isValid(IndexSearcher searcher) {
         return this.searcher == searcher;
+    }
+    
+    public boolean hasField(String fieldName) {
+        return fieldNames.contains(fieldName);
     }
 
     public void close() {
@@ -195,6 +201,7 @@ class MCRSharedLuceneIndexContext {
                     newSearcher.search(query, new NoOpCollector());
                 }
             }
+            context.fieldNames=fieldNames;
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Warming up IndexSearcher " + context.ID + " took " + (System.currentTimeMillis() - start) + " ms.");
             }

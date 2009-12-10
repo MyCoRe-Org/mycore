@@ -3,9 +3,11 @@ package org.mycore.backend.lucene;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.lucene.index.CorruptIndexException;
@@ -82,7 +84,27 @@ class MCRLuceneResults extends MCRResults {
 
     private void reQuery() throws IOException {
         checkIndexSearcher();
-        TopFieldDocCollector collector = new TopFieldDocCollector(sharedIndexContext.getReader(), sortFields, maxResults);
+        List<SortField> sortFieldList = new ArrayList<SortField>(Arrays.asList(sortFields.getSort()));
+        Iterator<SortField> sortIt = sortFieldList.iterator();
+        while (sortIt.hasNext()) {
+            SortField sortField = sortIt.next();
+            if (sortField==SortField.FIELD_DOC||sortField==SortField.FIELD_SCORE)
+                continue;
+            if (!sharedIndexContext.hasField(sortField.getField())) {
+                LOGGER.warn("Cannot sort by field: " + sortField.getField());
+                sortIt.remove();
+            }
+        }
+        TopFieldDocCollector collector;
+        if (sortFieldList.size() == sortFields.getSort().length) {
+            collector = new TopFieldDocCollector(sharedIndexContext.getReader(), sortFields, maxResults);
+        } else {
+            //not all sortFields are in Index;
+            if (sortFieldList.isEmpty())
+                sortFieldList.add(SortField.FIELD_DOC);
+            Sort newSortFields = new Sort(sortFieldList.toArray(new SortField[0]));
+            collector = new TopFieldDocCollector(sharedIndexContext.getReader(), newSortFields, maxResults);
+        }
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Query: " + query);
         indexSearcher.search(query, collector);
