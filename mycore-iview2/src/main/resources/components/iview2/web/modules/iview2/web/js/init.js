@@ -292,7 +292,7 @@ function reinitializeGraphic(viewID) {
 		Iview[viewID].overview1.resize();
 		// Aktualisierung nur wenn Overview geoeffnet ist, sonst erst beim Oeffnen
 		if (Iview[viewID].overviewActive) {
-			Iview[viewID].overview1.actualize(pagenumber);
+			Iview[viewID].overview1.actualize(Iview[viewID].pagenumber);
 		}
 		// Anpassung des Black-Blank (zum Faden)
 		$("blackBlank"+viewID).style.height = $("viewerContainer"+viewID).offsetHeight + "px";

@@ -173,36 +173,6 @@ String.prototype.get = function(p){
 @description tests if a given Array of Browsertypes match the used browser
 @param Array with the Names of the Browsers or some parts of the useragent which shall be looked up
 @return boolean true if within the supplied array the current browser was named or false if it wasn't
-*//*
-function isBrowser(browsers) {
-	var testBrowser = function (browser) {
-		browser = browser.toLowerCase();
-		if ((window.opera && browser == "opera")
-		|| (window.attachEvent && !window.opera && browser == "ie")
-		|| (window.addEventListener && !window.attachEvent && browser == "firefox")
-		|| (navigator.userAgent.indexOf("Safari") != -1 && browser == "safari")
-		|| (navigator.userAgent.indexOf(browser) != -1)
-		) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-	if (!browsers.sort) {
-		return testBrowser(browsers);
-	} else {
-		var result= false;
-		for (var i = 0; i < browsers.length; i++) {
-			result = (testBrowser(browsers[i]) == true)? true: result;
-		}
-		return result;
-	}
-}*/
-/*
-@description tests if a given Array of Browsertypes match the used browser
-@param Array with the Names of the Browsers or some parts of the useragent which shall be looked up
-@return boolean true if within the supplied array the current browser was named or false if it wasn't
-NOTE: >8x times faster than the old one
 */
 var theBrowser = "";
 function getBrowser(browser) {
@@ -390,6 +360,24 @@ function colorToRGBArray(color) {
 		blue = parseInt(color[2]);
 	}
 	return new Array (red, green, blue);
+}
+
+/*
+@description loops through the given Array and searches for the Element with
+ the given Name and Value and returns it, if more Elements match the criteria
+ only the first found is returned, if none is found Null is returned
+@param values the Array where the Item is located in
+@param name the Name of the Property which is used for search
+@oaram value the Value of the Property to match the Element
+@result the Element which matched the criteria first, or null if none was found
+ */
+function findInArrayElement(values, name, value) {
+	for (var i = 0; i < values.length; i++) {
+		if (values[i][name] == value) {
+			return values[i];
+		}
+	}
+	return null;
 }
 
 /*

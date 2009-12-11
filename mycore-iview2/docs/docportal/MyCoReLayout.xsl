@@ -295,6 +295,7 @@
                             <xsl:call-template name="iview2.start">
                               <xsl:with-param name="groupID" select="$deriv" />
                               <xsl:with-param name="style" select="'default'" />
+                              <xsl:with-param name="startFile" select="document(concat('notnull:mcrobject:',$deriv))/mycorederivate/derivate/internals/internal/@maindoc"/>
                             </xsl:call-template>
                           </xsl:when>
                         </xsl:choose>

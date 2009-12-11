@@ -33,16 +33,8 @@ function loadPageData(getPage, absolute, viewID) {
 	return nodeProps(Iview[viewID].buchDaten, "mets:file", getPage, absolute);
 }
 
-function findMETSEntry(values, name, value) {
-	for (var i = 0; i < values.length; i++) {
-		if (values[i][name] == value) {
-			return values[i];
-		}
-	}
-}
-
 /*
-@description reads out the ausmasze.xml, set the correct zoomvalues and loads the page
+@description reads out the imageinfo.xml, set the correct zoomvalues and loads the page
 */
 //TODO Loadpagedata in loadpage integrieren
 function loadPage(pageData, viewID) {
@@ -53,8 +45,8 @@ function loadPage(pageData, viewID) {
 	}*/
 	// Preload wird zu spät verkleinert
 	$("preload"+viewID).style.visibility = "hidden";
-	//console.log(findMETSEntry(pageData,"LOCTYPE", "URL").href);
-	var imageProperties = loadXML(Iview[viewID].baseUri[0]+"/"+viewID+"/"+findMETSEntry(pageData,"LOCTYPE", "URL").href+"/imageinfo.xml", "xml");
+	//console.log(findInArrayElement(pageData,"LOCTYPE", "URL").href);
+	var imageProperties = loadXML(Iview[viewID].baseUri[0]+"/"+viewID+"/"+findInArrayElement(pageData, "LOCTYPE", "URL").href/*findInArrayElement(pageData,"LOCTYPE", "URL").href*/+"/imageinfo.xml", "xml");
 	var values = nodeAttributes(imageProperties.getElementsByTagName("imageinfo")[0]);
 	
 	Iview[viewID].tiles = parseInt(values['tiles']);
@@ -94,7 +86,7 @@ function loadPage(pageData, viewID) {
 		// zoomLevel 0 ist erstes Level
 		Iview[viewID].zoomInit = Math.ceil((Iview[viewID].zoomMax + 1) / 2) - 1;
 	}
-	Iview[viewID].prefix  = findMETSEntry(pageData,"LOCTYPE", "URL").href;
+	Iview[viewID].prefix  = findInArrayElement(pageData, "LOCTYPE", "URL").href;//findMETSEntry(pageData,"LOCTYPE", "URL").href;
 	$("preload"+viewID).style.width = Iview[viewID].bildBreite / Math.pow(2, Iview[viewID].zoomMax - Iview[viewID].zoomInit) + "px";
 	$("preload"+viewID).style.height = Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - Iview[viewID].zoomInit) + "px";
 	if (viewerBean == null) {
@@ -489,7 +481,7 @@ function hideURL(element) {
 function generateURL(viewID) {
 	var url = window.location.href.substring(0, ((window.location.href.indexOf("?") != -1)? window.location.href.indexOf(window.location.search): window.location.href.length))+ "?";
 	//url += "book="+book_uri;
-	url += "&page="+Iview[viewID].pagenumber;
+	url += "&page="+Iview[viewID].prefix;
 	url += "&zoom="+Iview[viewID].viewerBean.zoomLevel;
 	url += "&x="+Iview[viewID].viewerBean.x;
 	url += "&y="+Iview[viewID].viewerBean.y;
@@ -748,31 +740,39 @@ function splitHeader(viewID) {
 }
 
 /*
+@description After Loading the first Page this function is called to gain the currently displayed PageNumber so all other
+ Elements are initialized correctly as well
+ */
+function getPageNumberFromPic(viewID) {
+	var files = Iview[viewID].buchDaten.getElementsByTagName(namespaceCheck("mets:file"));
+	for (var i = 0; i < files.length;i++) {
+		if (files[i].attributes.getNamedItem("ID").value == Iview[viewID].prefix) {
+			var nodes = files[i].childNodes;
+			for (var j = 0; j < nodes.length; j++) {
+				if (nodes[j].attributes.getNamedItem("LOCTYPE").value == "OTHER" && nodes[j].attributes.getNamedItem("OTHERLOCTYPE").value.toLowerCase() == "pagenumber") {
+					Iview[viewID].pagenumber = parseInt(nodes[j].attributes.getNamedItem(namespaceCheck("xlink:href")).value)+1;
+					break;
+				}
+			}
+		}
+	}
+}
+/*
 @description is calling to the load-event of the window; serve for the further registration of events likewise as initioator for various objects
 @param e Daten vom Load Event
 */
 function loading(viewID) {
 	Iview[viewID].chapterActive = false;
 	Iview[viewID].overviewActive = false;
-	//TODO gucken ob vars evtl wo anders geladen werden
+	//Create new Header Elements as specified within caller xsl
 	splitHeader(viewID);
 	
 	style = styleFolderUri + styleName + "/";
+	//TODO gucken ob vars evtl wo anders geladen werden
 	loadVars("../modules/iview2/web/" + style + "design.xml");//Laden der Informationen je nach entsprechendem Design
 	//retrieves the mets File depending on the fact if it's exists or it request a simple one
-	var mets_uri = Iview[viewID].webappBaseUri + "servlets/" + ((Iview[viewID].hasMets)? "MCRFileNodeServlet/": "MCRDirectoryXMLServlet/") + viewID + ((Iview[viewID].hasMets)? "/mets.xml":"");
-	Iview[viewID].buchDaten = (Iview[viewID].hasMets)? loadXML(mets_uri):loadXML(mets_uri, "mets");
-	Iview[viewID].amountPages = getPageCount(Iview[viewID].buchDaten);
 
 	blendings.useEffects(blendEffects);
-
-	// process URL-attributes
-	// pagenumber is only overwritten if some value is available
-	if (!isNaN(parseInt(window.location.search.get("page")))) {
-		Iview[viewID].pagenumber = parseInt(window.location.search.get("page"));
-	} else {
-		Iview[viewID].pagenumber = 1;
-	}
 
 	// ScrollBars
 	// horizontally
@@ -793,6 +793,29 @@ function loading(viewID) {
 	// register to scroll into the viewer
 	ManageEvents.addEventListener($("viewer"+viewID), 'mouseScroll', function(e) { viewerScroll(returnDelta(e), viewID); e = getEvent(e); preventDefault(e);}, false);
 	
+	// damit viewer über scrollBarX endet, fortan in reinitialize
+	$("viewer"+viewID).style.width = $("viewerContainer"+viewID).offsetWidth - Iview[viewID].scrollBarY.my.self.offsetWidth  + "px";
+	$("viewer"+viewID).style.height = $("viewerContainer"+viewID).offsetHeight - Iview[viewID].scrollBarX.my.self.offsetHeight  + "px";
+
+	if (Iview[viewID].useCutOut) {
+		importCutOut(viewID);
+	}
+
+	// Load Page
+	if (window.location.search.get("page") != "") {
+		//TODO may be incomplete: Prevent Remote File Inclusion, but never Ever drop
+		Iview[viewID].startFile = window.location.search.get("page").replace(/(:|\.\.|&#35|&#46|&#58|&#38|&#35|&amp)/,"§"); 
+	}
+	loadPage([{"LOCTYPE":"URL","href":Iview[viewID].startFile}],viewID);
+	Iview[viewID].loaded = true;
+	
+	var mets_uri = Iview[viewID].webappBaseUri + "servlets/" + ((Iview[viewID].hasMets)? "MCRFileNodeServlet/": "MCRDirectoryXMLServlet/") + viewID + ((Iview[viewID].hasMets)? "/mets.xml":"");
+	Iview[viewID].buchDaten = (Iview[viewID].hasMets)? loadXML(mets_uri):loadXML(mets_uri, "mets");
+	Iview[viewID].amountPages = getPageCount(Iview[viewID].buchDaten);
+	
+	getPageNumberFromPic(viewID);
+	
+	// additional loadings - preloads
 	//Edge-Element
 	//TODO: müsste beim import des CutOut entsprechend gesetzt werden, oder ähnlich
 	//createAbsoluteObject("div", "dampEmpty"+viewID, "viewer"+viewID);
@@ -809,9 +832,7 @@ function loading(viewID) {
 	if (Iview[viewID].useZoomBar) {
 		importZoomBar(viewID);
 	}
-	if (Iview[viewID].useCutOut) {
-		importCutOut(viewID);
-	}
+
 
 	if (Iview[viewID].useChapter) {
 		importChapter(viewID);
@@ -821,21 +842,15 @@ function loading(viewID) {
 			//if (classIsUsed("BSE_chapterOpener")) doForEachInClass("BSE_chapterOpener" ,".style.display = 'block';");
 		//}
 	}
-
-	// damit viewer über scrollBarX endet, fortan in reinitialize
-	$("viewer"+viewID).style.width = $("viewerContainer"+viewID).offsetWidth - Iview[viewID].scrollBarY.my.self.offsetWidth  + "px";
-	$("viewer"+viewID).style.height = $("viewerContainer"+viewID).offsetHeight - Iview[viewID].scrollBarX.my.self.offsetHeight  + "px";
-
-	// Load Page
-	navigatePage(Iview[viewID].pagenumber, viewID);
-	Iview[viewID].loaded = true;
-
-	// additional loadings - preloads
+	
 	if (Iview[viewID].useOverview) {
 		importOverview(viewID);
 		// actually be changed manually in CSS
 		if (classIsUsed("BSE_openThumbs")) doForEachInClass("BSE_openThumbs", ".style.display = 'block';", viewID);
 	}
+	
+	//The currently not correct used Pagenumber is set to correct value
+	navigatePage(Iview[viewID].pagenumber,viewID,false);
 	
 	// Resize-Events registrieren
 	if (isBrowser("IE")) {

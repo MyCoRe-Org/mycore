@@ -1,6 +1,8 @@
 /*
 @description checks if the requested page is in Bounds, if so all needed steps to show the controls for this page correctly will be applied(forward/backward buttons, correct textbox value aso.)
 @param page the new Page which shall be displayed, will be checked if it's in bounds
+@param viewID
+@param arguments[2] if this one is set the loadPage Function will not be executed so no needless PageChange is called
 */
 function navigatePage(pNum, viewID) {
 	Iview[viewID].pagenumber = checkLastNextControls(pNum, viewID);
@@ -11,7 +13,9 @@ function navigatePage(pNum, viewID) {
 	if (classIsUsed("BSE_pageForm1")) {
 		Iview[viewID].pageFormObj.actualize(Iview[viewID].pagenumber);
 	}
-	loadPage(loadPageData(Iview[viewID].pagenumber - 1, true, viewID), viewID);
+	if (arguments.length == 2) {
+		loadPage(loadPageData(Iview[viewID].pagenumber - 1, true, viewID), viewID);
+	}
 	updateModuls(viewID);
 }
 

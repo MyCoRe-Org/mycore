@@ -1,4 +1,16 @@
 /*
+@description checks if the browser supports Namespaces within getElementsByTagName, if not the namespace will be parsed out
+@param name the Namespace name which needs to be checked
+@return the name, depending on the browser cleaned from Namespace information
+ */
+function namespaceCheck(name) {
+	if (isBrowser(["Opera", "Firefox/2", "Safari", "Mozilla/5"]) && nodeName.indexOf(":") != -1) {
+		return name.substring(name.indexOf(":")+1,name.length);
+	}
+	return name;
+}
+
+/*
 @description Generates from a URL the XML Object loads it's contents and returns it afterwards
 @param file string which holds the URL to the XML File which shall be loaded
 @return the XML Object
@@ -40,7 +52,7 @@ function loadXML(file) {
 @return  Associated(By Nodename) array with connected values
 */
 function nodeProps(xmlfile, nodeName, getNode, absolute) {
-	nodeName = (isBrowser(["Opera","Firefox/2", "Safari"]) && nodeName.indexOf(":") != -1)? nodeName.substring(nodeName.indexOf(":")+1):nodeName; 
+	nodeName = namespaceCheck(nodeName); 
 	var child_nodes = xmlfile.getElementsByTagName(nodeName);
 	var Node = (absolute == true)? parseInt(getNode) : (pagenumber-1)+parseInt(getNode);
 	var values = new Array();
@@ -91,13 +103,9 @@ function nodeAttributes(node) {
 @return  List of all Nodes with the given NodeName
 */
 function getNodes(xmlfile, nodeName/*, getNode, absolute*/) {
-	if (isBrowser(["Opera", "Firefox/2", "Safari"]) && nodeName.indexOf(":") != -1) {
-		nodeName = nodeName.substring(nodeName.indexOf(":")+1);
-	}
-
-	var nodes = xmlfile.getElementsByTagName(nodeName);
+	var nodes = xmlfile.getElementsByTagName(namespaceCheck(nodeName));
 	var nodeList = new Array();
-	for ( i = 0; i < nodes.length; i++) {//TODO gegenstück für IE basteln
+	for ( i = 0; i < nodes.length; i++) {
 		try {
 			nodeList[i] = document.importNode(nodes.item(i), true);
 		} catch (e) {
@@ -112,11 +120,7 @@ function getNodes(xmlfile, nodeName/*, getNode, absolute*/) {
 }
 
 function getPageCount(res) {
-	var nodeName = "mets:file";
-	if (isBrowser(["Opera", "Firefox/2", "Safari", "Mozilla/5"]) && nodeName.indexOf(":") != -1) {
-		nodeName = "file";
-	}
-	return res.getElementsByTagName(nodeName).length;
+	return res.getElementsByTagName(namespaceCheck("mets:file")).length;
 }
 
 function loadVars(filename) {

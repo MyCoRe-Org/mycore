@@ -266,7 +266,8 @@
     <!-- params out of config.xml -->
     <xsl:param name="styleFolderUri" select="'gfx/'" />
     <xsl:param name="pagenumber" select="'1'" />
-    <xsl:param name="mets_uri" select="'../../images/Pics/Mets.xml'" />
+    <xsl:param name="mets_uri" />
+    <xsl:param name="startFile" />
     <script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/init.js" onreadystatechange="startViewer('{$groupID}')"
       onload="startViewer('{$groupID}')" />
 
@@ -286,6 +287,7 @@
       <xsl:text>var mets_uri='</xsl:text>
       <xsl:value-of select="$mets_uri" />
       <xsl:text>';</xsl:text>
+      addIviewProperty('<xsl:value-of select="$groupID" />', 'startFile', "'<xsl:value-of select="$startFile" />'");
     </script>
   </xsl:template>
   <xsl:template name="iview2.getZoomBar">
