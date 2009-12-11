@@ -223,7 +223,6 @@ function overview(newId, parent, identer) {
 		   (numberOfPages <= (amountHeight * amountWidth) && currentFirstRow == 0) ) {*/
 			loadImages(currentFirstRow);
 		//}				
-		
 		// shift scrollbar to the actually start-line
 		if (useScrollBar) {
 			scrollOverview.setValue(currentFirstRow);
@@ -245,12 +244,11 @@ function overview(newId, parent, identer) {
 
 				//get back previously hidden div's
 				$("divBox" + viewID +((i * (amountWidth)) + j)).style.display = "block";
-
+				
 				//load needed Previews
 				if ((((i + currentFirstRow) * amountWidth) + j) < numberOfPages) {
 					loadSingleImage(i, j);
 				}
-
 				// last line who contains pages
 				if ((i + currentFirstRow) >= (Math.floor((numberOfPages) / amountWidth))) {
 					// page not existing???
@@ -277,7 +275,7 @@ function overview(newId, parent, identer) {
 	@description preloads the preview-image
 	*/
 	function loadSingleImage(i, j) {
-		var pageName = findMETSEntry(nodeProps(book, "mets:file", (((i + currentFirstRow) * amountWidth) + j), true), "LOCTYPE", "URL").href;
+		var pageName = findInArrayElement(nodeProps(book, "mets:file", (((i + currentFirstRow) * amountWidth) + j), true), "LOCTYPE", "URL").href;
 
 		var source = Iview[viewID].viewerBean.tileUrlProvider.assembleUrl(0, 0, 0, pageName);
 		var preview = $("previewDiv" + viewID +((i * amountWidth) + j));

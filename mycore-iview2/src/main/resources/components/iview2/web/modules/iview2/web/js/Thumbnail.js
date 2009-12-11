@@ -149,10 +149,8 @@ function loadPage(pageData, viewID) {
 function openOverview(viewID) {
 	if (!Iview[viewID].overviewActive) {
 		Iview[viewID].overviewActive = !Iview[viewID].overviewActive;
-		
 		// update overview
 		Iview[viewID].overview1.actualize(Iview[viewID].pagenumber);
-
 		/*var doBefore = "setOpacity($('blackBlank"+viewID+"'),0); $('blackBlank"+viewID+"').style.display ='block'";
 		var doBetween = "$('overview1"+viewID+"').style.visibility ='visible'; $('viewer"+viewID+"').style.visibility = 'hidden';";
 		var doAfter = "$('blackBlank"+viewID+"').style.display ='none'";
@@ -858,7 +856,6 @@ function loading(viewID) {
 	} else {
 		ManageEvents.addEventListener(window, 'resize', function() { reinitializeGraphic(viewID);}, false);
 	}
-	//TODO permaLink funzt nicht ganz, Zoomlevel wird durch to Screen überschrieben
 	// surface muss als Blank geladen werden, damit Ebene gefüllt und es im Vordergrund des Viewers liegt
 	// hauptsächlich wegen IE notwendig
 	getElementsByClassName("surface","viewer"+viewID,"div")[0].style.backgroundImage = "url("+Iview[viewID].webappBaseUri+"modules/iview2/web/gfx/blank.gif"+")";
@@ -868,7 +865,7 @@ function loading(viewID) {
 		pictureWidth(viewID);
 	} else if (window.location.search.get("tosize") == "screen") {
 		pictureScreen(viewID);
-	} else {
+	} else if (isNaN(parseInt(window.location.search.get("zoom")))){
 		pictureScreen(viewID);
 	}
 	if (window.location.search.get("maximized") == "true") {

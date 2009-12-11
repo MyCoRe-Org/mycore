@@ -307,7 +307,6 @@ function blendWorks() {
 	@description return the Opacity of given Object
 	@param obj Object which Opacity shall be retrieved
 	@return float of the opacity of obj
-	//TODO: Korrektes Auslesen f�r IE, pr�fen
 	*/
 	function getOpacity(obj) {
 		if (typeof obj != "object") {
