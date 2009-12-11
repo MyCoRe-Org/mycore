@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
+import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConfiguration;
@@ -52,7 +53,7 @@ import org.mycore.services.fieldquery.MCRResults;
 /**
  * This class builds a google sitemap containing links to all documents and store them to the webapps directory. This can be configured with property variable MCR.GoogleSitemap.Directory. The web.xml file should contain a mapping to /sitemap.xml See http://www.google.com/webmasters/sitemaps/docs/en/protocol.html
  * 
- * @author Frank Lützenkirchen
+ * @author Frank Luetzenkirchen
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
  * @author Stefan Freitag (sasf)
@@ -71,27 +72,15 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
 
         MCRCommand com = null;
 
-        com = new MCRCommand("build mets files", "org.mycore.frontend.cli.MCRMetsModsCommands.buildMets", "Create the mets.xml file in the derivate directory.");
-        command.add(com);
-        
         com = new MCRCommand("build mets files for type {0}","org.mycore.frontend.cli.MCRMetsModsCommands.buildMetsForType String","Create the mets.xml file in the derivate directory of given type.");
         command.add(com);
-        
-        com = new MCRCommand("remove mets files","org.mycore.frontend.cli.MCRMetsModsCommands.removeMets","Remove all mets files.");
-        command.add(com);
-        
-        com = new MCRCommand("remove mets files from zoomify","org.mycore.frontend.cli.MCRMetsModsCommands.removeMetsByZoomify","Remove all mets files in zoomify derivate directorys.");
-        command.add(com);
-        
+             
         com = new MCRCommand("build mets files for Derivat {0}","org.mycore.frontend.cli.MCRMetsModsCommands.buildMetsForMCRDerivateID String","Create the mets.xml file in the derivate directory of the given derivate.");
         command.add(com);
         
         com = new MCRCommand("build mets files for Object {0}","org.mycore.frontend.cli.MCRMetsModsCommands.buildMetsForMCRObjectID String","Create the mets.xml file for all dfg-derivate's of the given object.");
         command.add(com);
-
-        com = new MCRCommand("remove mets files for type {0}","org.mycore.frontend.cli.MCRMetsModsCommands.removeMetsForType String","Remove all mets files for given type.");
-        command.add(com);
-        
+       
         com = new MCRCommand("check mets files for type {0} with exclude label {1}","org.mycore.frontend.cli.MCRMetsModsCommands.checkMetsForType String String","Check mets files for given type.");
         command.add(com);
         
@@ -109,6 +98,22 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         
         com = new MCRCommand("check mets files","org.mycore.frontend.cli.MCRMetsModsCommands.checkMets","Check the mets.xml file.");
         command.add(com);
+      
+        com = new MCRCommand("remove mets files from zoomify","org.mycore.frontend.cli.MCRMetsModsCommands.removeMetsByZoomify","Remove all mets files in zoomify derivate directorys.");
+        command.add(com);
+ 
+        com = new MCRCommand("remove mets files","org.mycore.frontend.cli.MCRMetsModsCommands.removeMets","Remove all mets files.");
+        command.add(com);
+        
+        com = new MCRCommand("remove mets files from zoomify","org.mycore.frontend.cli.MCRMetsModsCommands.removeMetsByZoomify","Remove all mets files in zoomify derivate directorys.");
+        command.add(com);
+ 
+        com = new MCRCommand("remove mets files","org.mycore.frontend.cli.MCRMetsModsCommands.removeMets","Remove all mets files.");
+        command.add(com);
+       
+        com = new MCRCommand("build mets files", "org.mycore.frontend.cli.MCRMetsModsCommands.buildMets", "Create the mets.xml file in the derivate directory.");
+        command.add(com);
+       
     }
 
     
@@ -155,7 +160,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
     public static final void removeMets() throws Exception {
         LOGGER.debug("Remove METS file start.");
         final long start = System.currentTimeMillis();
-        List<String> derlist = MCRXMLTableManager.instance().listIDsOfType("derivate");
+        List<String> derlist = MCRXMLTableManager.instance().retrieveAllIDs("derivate");
         for (String der : derlist) {
             MCRDirectory difs = MCRDirectory.getRootDirectory(der);
             if (difs != null) {
@@ -177,7 +182,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
     public static final void removeMetsByZoomify() throws Exception {
         LOGGER.debug("Remove METS file from zoomify derivates start.");
         final long start = System.currentTimeMillis();
-        List<String> derlist = MCRXMLTableManager.instance().listIDsOfType("derivate");
+        List<String> derlist = MCRXMLTableManager.instance().retrieveAllIDs("derivate");
         for (String der : derlist) {
             MCRDirectory difs = MCRDirectory.getRootDirectory(der);
             if (difs != null) {
@@ -422,7 +427,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         LOGGER.debug("Build METS file start.");
         final long start = System.currentTimeMillis();
         // get all derivates
-        List<String> derlist = MCRXMLTableManager.instance().listIDsOfType("derivate");
+        List<String> derlist = MCRXMLTableManager.instance().retrieveAllIDs("derivate");
         for (String der : derlist) {
             // get metadata MCRObjectID
             MCRDerivate derxml = new MCRDerivate();
@@ -454,7 +459,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         LOGGER.debug("Build METS file start.");
         final long start = System.currentTimeMillis();
         // get all derivates
-        List<String> derlist = MCRXMLTableManager.instance().listIDsOfType("derivate");
+        List<String> derlist = MCRXMLTableManager.instance().retrieveAllIDs("derivate");
         for (String der : derlist) {
             // get metadata MCRObjectID
             MCRDerivate derxml = new MCRDerivate();
