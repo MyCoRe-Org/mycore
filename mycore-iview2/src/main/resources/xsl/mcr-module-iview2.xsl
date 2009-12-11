@@ -191,30 +191,30 @@
       <xsl:text>var prefix='</xsl:text>
       <xsl:value-of select="$prefix" />
       <xsl:text>';</xsl:text>
-      <xsl:text>var tilesize='</xsl:text>
+      <xsl:text>var tilesize=</xsl:text>
       <xsl:value-of select="$tilesize" />
-      <xsl:text>';</xsl:text>
+      <xsl:text>;</xsl:text>
       <xsl:text>var maximized=</xsl:text>
       <xsl:value-of select="$maximized" />
       <xsl:text>;</xsl:text>
       <xsl:text>var zoomWidth=</xsl:text>
       <xsl:value-of select="$zoomWidth" />
       <xsl:text>;</xsl:text>
-      <xsl:text>var zoomScreen='</xsl:text>
+      <xsl:text>var zoomScreen=</xsl:text>
       <xsl:value-of select="$zoomScreen" />
-      <xsl:text>';</xsl:text>
+      <xsl:text>;</xsl:text>
       <xsl:text>var blendEffects=</xsl:text>
       <xsl:value-of select="$blendEffects" />
       <xsl:text>;</xsl:text>
       <xsl:text>var chapHover=</xsl:text>
       <xsl:value-of select="$chapHover" />
       <xsl:text>;</xsl:text>
-      <xsl:text>var chapHoverDelay='</xsl:text>
+      <xsl:text>var chapHoverDelay=</xsl:text>
       <xsl:value-of select="$chapHoverDelay" />
-      <xsl:text>';</xsl:text>
-      <xsl:text>var chapHoverStep='</xsl:text>
+      <xsl:text>;</xsl:text>
+      <xsl:text>var chapHoverStep=</xsl:text>
       <xsl:value-of select="$chapHoverStep" />
-      <xsl:text>';</xsl:text>
+      <xsl:text>;</xsl:text>
     </script>
     <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/ManageEvents.js" />
     <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/EventUtils.js" />
