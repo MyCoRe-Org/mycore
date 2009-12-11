@@ -767,7 +767,7 @@ function loading(viewID) {
 	
 	style = styleFolderUri + styleName + "/";
 	//TODO gucken ob vars evtl wo anders geladen werden
-	loadVars("../modules/iview2/web/" + style + "design.xml");//Laden der Informationen je nach entsprechendem Design
+	//loadVars("../modules/iview2/web/" + style + "design.xml");//Laden der Informationen je nach entsprechendem Design
 	//retrieves the mets File depending on the fact if it's exists or it request a simple one
 
 	blendings.useEffects(blendEffects);

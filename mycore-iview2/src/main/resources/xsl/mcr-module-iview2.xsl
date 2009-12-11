@@ -179,13 +179,30 @@
     <xsl:param name="groupID" />
     <xsl:param name="prefix"/>
     <xsl:param name="tilesize" select="'256'" />
+    
+    <!-- startUp settings -->
     <xsl:param name="maximized" select="'false'" />
     <xsl:param name="zoomWidth" select="'false'" />
     <xsl:param name="zoomScreen" select="'false'" />
+    
+    <!-- design settings -->
     <xsl:param name="blendEffects" select="'true'" />
+    
+    <!-- chapter settings -->
     <xsl:param name="chapHover" select="'true'" />
     <xsl:param name="chapHoverDelay" select="'100'" />
     <xsl:param name="chapHoverStep" select="'10'" />
+    <xsl:param name="chapterEmbedded" select="'false'" />
+    <xsl:param name="chapDynResize" select="'false'" />
+    <xsl:param name="chapResizeMul" select="'1'" />
+    <xsl:param name="chapResizeAdd" select="'0'" />
+    <xsl:param name="chapColorCur" select="'#85a6bc'" />
+    <xsl:param name="chapColorNot" select="'#fcfeff'" />
+    <xsl:param name="chapColorHov" select="'#e2e6e9'" />
+	
+    <!-- thumbnail settings -->
+    <xsl:param name="DampInViewer" select="'true'" />
+    
     <script type="text/javascript">
     <!-- Philipp möchte verbessern -->
       <xsl:text>var prefix='</xsl:text>
@@ -214,6 +231,28 @@
       <xsl:text>;</xsl:text>
       <xsl:text>var chapHoverStep=</xsl:text>
       <xsl:value-of select="$chapHoverStep" />
+      <xsl:text>;</xsl:text>
+      <xsl:text>var chapterEmbedded=</xsl:text>
+      <xsl:value-of select="$chapterEmbedded" />
+      <xsl:text>;</xsl:text>
+      <xsl:text>var chapDynResize=</xsl:text>
+      <xsl:value-of select="$chapDynResize" />
+      <xsl:text>;</xsl:text>
+      <xsl:text>var chapResizeMul=</xsl:text>
+      <xsl:value-of select="$chapResizeMul" />
+      <xsl:text>;</xsl:text>
+      <xsl:text>var chapResizeAdd=</xsl:text>
+      <xsl:value-of select="$chapResizeAdd" />
+      <xsl:text>;</xsl:text>
+      <xsl:text>var chapColor=['</xsl:text>
+      <xsl:value-of select="$chapColorCur" />
+      <xsl:text>','</xsl:text>
+      <xsl:value-of select="$chapColorNot" />
+      <xsl:text>','</xsl:text>
+      <xsl:value-of select="$chapColorHov" />
+      <xsl:text>'];</xsl:text>
+      <xsl:text>var DampInViewer=</xsl:text>
+      <xsl:value-of select="$DampInViewer" />
       <xsl:text>;</xsl:text>
     </script>
     <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/ManageEvents.js" />
