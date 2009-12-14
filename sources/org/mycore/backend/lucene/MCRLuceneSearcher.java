@@ -41,6 +41,7 @@ import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.analysis.de.GermanAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.IndexWriter.MaxFieldLength;
@@ -410,6 +411,8 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
             String type = field.getField().getDataType();
             String content = field.getValue();
             MCRFile mcrfile = field.getFile();
+            //only addabel or sortable field need to be stored in index
+            Store storeField = (field.getField().isAddable() || field.getField().isSortable()) ? Field.Store.YES : Field.Store.NO;
 
             if (null != mcrfile) {
                 if (PLUGIN_MANAGER == null) {
@@ -446,17 +449,15 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
                 }
 
                 if (type.equals("identifier")) {
-                    doc.add(new Field(name, content, Field.Store.YES, Field.Index.NOT_ANALYZED));
+                    doc.add(new Field(name, content, storeField, Field.Index.NOT_ANALYZED));
                 }
                 if (type.equals("index")) {
-                    doc.add(new Field(name, MCRNormalizer.normalizeString(content, true), Field.Store.YES, Field.Index.NOT_ANALYZED));
+                    doc.add(new Field(name, MCRNormalizer.normalizeString(content, true), storeField, Field.Index.NOT_ANALYZED));
                 }
-                if (type.equals("Text") || type.equals("name") || (type.equals("text") && field.getField().isSortable())) {
-                    doc.add(new Field(name, content, Field.Store.YES, Field.Index.ANALYZED));
+                if (type.equals("Text") || type.equals("name") || type.equals("text")) {
+                    doc.add(new Field(name, content, storeField, Field.Index.ANALYZED));
                     if (field.getField().isSortable())
-                        doc.add(new Field(name + getSortableSuffix(), content, Field.Store.YES, Field.Index.NOT_ANALYZED));
-                } else if (type.equals("text")) {
-                    doc.add(new Field(name, content, Field.Store.NO, Field.Index.ANALYZED));
+                        doc.add(new Field(name + getSortableSuffix(), content, Field.Store.NO, Field.Index.NOT_ANALYZED));
                 }
             }
         }
