@@ -144,10 +144,13 @@ public class MCRSearchServlet extends MCRServlet
         if (element.getName().startsWith("condition")) {
             element.setName("condition");
 
+            String field = element.getAttributeValue("field");
+            MCRFieldDef fd = MCRFieldDef.getDef(field);
+            String defaultOperator = MCRFieldType.getDefaultOperator(fd.getDataType());
+            String operator = element.getAttributeValue("operator", defaultOperator);
+
             List<Element> values = element.getChildren("value");
             if ((values != null) && (values.size() > 0)) {
-                String field = element.getAttributeValue("field");
-                String operator = element.getAttributeValue("operator");
                 element.removeAttribute("field");
                 element.setAttribute("operator", "or");
                 element.setName("boolean");
