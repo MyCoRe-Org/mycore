@@ -148,7 +148,8 @@ public class MCRSearchServlet extends MCRServlet
             MCRFieldDef fd = MCRFieldDef.getDef(field);
             String defaultOperator = MCRFieldType.getDefaultOperator(fd.getDataType());
             String operator = element.getAttributeValue("operator", defaultOperator);
-
+            element.setAttribute("operator",operator);
+            
             List<Element> values = element.getChildren("value");
             if ((values != null) && (values.size() > 0)) {
                 element.removeAttribute("field");
