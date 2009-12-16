@@ -211,7 +211,13 @@ public final class MCRGoogleSitemapCommon {
 
     private Element buildURLElement(DateTimeFormatter formatter, MCRObjectIDDate objectIDDate) {
         String mcrID = objectIDDate.getId();
-        DateTime dt = new DateTime(objectIDDate.getLastModified().getTime());
+        
+        DateTime dt;
+        if (objectIDDate.getLastModified() != null)
+            dt = new DateTime(objectIDDate.getLastModified().getTime());
+        else
+            dt = new DateTime();
+        
         StringBuffer sb = new StringBuffer(1024);
         sb.append(baseurl).append(objectPath).append(mcrID);
         if ((style != null) && (style.trim().length() > 0)) {
