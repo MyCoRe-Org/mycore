@@ -5,6 +5,7 @@
 @param arguments[2] if this one is set the loadPage Function will not be executed so no needless PageChange is called
 */
 function navigatePage(pNum, viewID) {
+	notifyListenerNavigate(pNum, viewID);
 	Iview[viewID].pagenumber = checkLastNextControls(pNum, viewID);
 	if (classIsUsed("BSE_pageInput1")) {
 		Iview[viewID].pageInputObj.actualize(Iview[viewID].pagenumber);

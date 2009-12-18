@@ -1,6 +1,34 @@
 var blendings = new blendWorks();
 var focus = null;//holds the element which is focused
 
+var listener = []; // array who holds informations about the listeners (?)
+NAVIGATE = 0;
+
+function addListener(type, theListener) {
+	if (!listener[type]) {
+		listener[type] = [];
+	}
+	listener[type].push(theListener);
+}
+
+function dropListener(type, theListener) {
+	for (var i = 0; i < listener[type].length; i++) {
+		console.log(listener[type][i] == theListener);
+		if (listener[type][i] == theListener) {
+			listener[type].splice(i,1);
+		}
+	}
+}
+
+function notifyListenerNavigate(value, viewID) {
+	if (!listener[NAVIGATE]) {
+		return;
+	}
+	for(var i = 0; i < listener[NAVIGATE].length; i++) {
+		listener[NAVIGATE][i].navi(value,viewID);
+	}
+};
+
 /*
 @description set focus to the given element
 */
@@ -747,8 +775,9 @@ function getPageNumberFromPic(viewID) {
 		if (files[i].attributes.getNamedItem("ID").value == Iview[viewID].prefix) {
 			var nodes = files[i].childNodes;
 			for (var j = 0; j < nodes.length; j++) {
-				if (nodes[j].attributes.getNamedItem("LOCTYPE").value == "OTHER" && nodes[j].attributes.getNamedItem("OTHERLOCTYPE").value.toLowerCase() == "pagenumber") {
-					Iview[viewID].pagenumber = parseInt(nodes[j].attributes.getNamedItem(namespaceCheck("xlink:href")).value)+1;
+				if (nodes[j].attributes.getNamedItem("LOCTYPE").value.toLowerCase() == "other" && nodes[j].attributes.getNamedItem("OTHERLOCTYPE") != null && nodes[j].attributes.getNamedItem("OTHERLOCTYPE").value.toLowerCase() == "pagenumber") {
+					var ref = isBrowser(["Opera","Firefox/2"])? "href":"xlink:href";
+					Iview[viewID].pagenumber = parseInt(nodes[j].attributes.getNamedItem(ref).value)+1;
 					break;
 				}
 			}
