@@ -365,7 +365,8 @@ function colorToRGBArray(color) {
 /*
 @description loops through the given Array and searches for the Element with
  the given Name and Value and returns it, if more Elements match the criteria
- only the first found is returned, if none is found Null is returned
+ only the first found is returned, if none is found Null is returned.
+ The Function works with Arrays of Objects and with HTML-Nodes
 @param values the Array where the Item is located in
 @param name the Name of the Property which is used for search
 @oaram value the Value of the Property to match the Element
@@ -373,8 +374,14 @@ function colorToRGBArray(color) {
  */
 function findInArrayElement(values, name, value) {
 	for (var i = 0; i < values.length; i++) {
-		if (values[i][name] == value) {
-			return values[i];
+		if (values[i].attributes) {
+			if (values[i].attributes.getNamedItem(name).value == value) {
+				return values[i];
+			}
+		} else {
+			if (values[i][name] == value) {
+				return values[i];
+			}
 		}
 	}
 	return null;

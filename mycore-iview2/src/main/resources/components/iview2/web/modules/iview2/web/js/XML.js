@@ -4,7 +4,7 @@
 @return the name, depending on the browser cleaned from Namespace information
  */
 function namespaceCheck(name) {
-	if (isBrowser(["Opera", "Firefox/2", "Safari", "Mozilla/5"]) && nodeName.indexOf(":") != -1) {
+	if (isBrowser(["Opera", "Firefox/2", "Safari", "Mozilla/5"]) && name.indexOf(":") != -1) {
 		return name.substring(name.indexOf(":")+1,name.length);
 	}
 	return name;
