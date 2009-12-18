@@ -788,8 +788,13 @@ function loading(viewID) {
 	scrollBarY.setParent("viewerContainer"+viewID);
 
 	// Additional Events
+	// move and down auf viewer
+	ManageEvents.addEventListener($("viewerContainer"+viewID), 'mouseMove', Iview[viewID].scrollBarX.mouseMove, false);
+	ManageEvents.addEventListener($("viewerContainer"+viewID), 'mouseUp', Iview[viewID].scrollBarX.mouseUp, false);
+	ManageEvents.addEventListener($("viewerContainer"+viewID), 'mouseMove', Iview[viewID].scrollBarY.mouseMove, false);
+	ManageEvents.addEventListener($("viewerContainer"+viewID), 'mouseUp', Iview[viewID].scrollBarY.mouseUp, false);
 	// register to scroll into the viewer
-	ManageEvents.addEventListener($("viewer"+viewID), 'mouseScroll', function(e) { viewerScroll(returnDelta(e), viewID); e = getEvent(e); preventDefault(e);}, false);
+	ManageEvents.addEventListener($("viewer"+viewID), 'mouseScroll', function(e) { e = getEvent(e); preventDefault(e); viewerScroll(returnDelta(e), viewID);}, false);
 	
 	// damit viewer über scrollBarX endet, fortan in reinitialize
 	$("viewer"+viewID).style.width = $("viewerContainer"+viewID).offsetWidth - Iview[viewID].scrollBarY.my.self.offsetWidth  + "px";

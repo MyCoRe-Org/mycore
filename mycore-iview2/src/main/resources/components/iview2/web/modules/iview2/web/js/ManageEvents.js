@@ -11,6 +11,7 @@ function ManageEvents() {
 }
 
 ManageEvents.addEventListener = function(target, type, callback, captures) {
+	type = type.toLowerCase();
 	// Eine Wrapper Funktion, die unseren Event-Handler aufruft. Und zwar erstens im richtigen Scope,
 	// n�mlich den des Elements, und zweitens mit unserem vereinheitlichten Event-Objekt.
 	var wrapper = function(ev) {
@@ -20,7 +21,7 @@ ManageEvents.addEventListener = function(target, type, callback, captures) {
 	// True, wenn das Event erfolgreich registriert wurde.
 	var result = false;
 
-	switch (type.toLowerCase()) {//Browser behave on some kinds of events totally different therefore its needed to find it out and take action correctly
+	switch (type) {//Browser behave on some kinds of events totally different therefore its needed to find it out and take action correctly
 		case "mousescroll":
 			if (isBrowser(["IE", "Opera", "Safari"])) {
 				//window.onmousewheel = target.onmousewheel = callback;
