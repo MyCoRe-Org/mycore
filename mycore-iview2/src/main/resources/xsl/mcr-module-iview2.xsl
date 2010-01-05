@@ -10,6 +10,7 @@
     <xsl:param name="chapter" select="'true'" />
     <xsl:param name="cutOut" select="'true'" />
     <xsl:param name="overview" select="'true'" />
+    <xsl:param name="style" />
     
     <script type="text/javascript">
       var baseUris='["'+'<xsl:value-of select="$MCR.Module-iview2.BaseURL"/>'.split(',').join('","')+'"]';
@@ -22,6 +23,11 @@
       addIviewProperty('<xsl:value-of select="$groupID" />', 'hasMets', <xsl:value-of select="mcriview:hasMETSFile($groupID)"/>);
     </script>
     <div id="viewerContainer{$groupID}" class="viewerContainer min">
+      <xsl:if test="string-length($style) &gt; 0">
+        <xsl:attribute name="style">
+          <xsl:value-of select="$style"/>
+        </xsl:attribute>
+      </xsl:if>
       <div id="blackBlank{$groupID}" class="blackBlank">
       </div>
       <div id="viewer{$groupID}" class="viewer min" onmousedown="return false;">
