@@ -161,8 +161,8 @@ function overview(newId, parent, identer) {
 		}
 
 		// register additional Events
-		ManageEvents.addEventListener($(id), 'mousemove', scrollOverview.mouseMove, false);
-		ManageEvents.addEventListener($(id), 'mouseup', scrollOverview.mouseUp, false);
+		ManageEvents.addEventListener(document, 'mousemove', scrollOverview.mouseMove, false);
+		ManageEvents.addEventListener(document, 'mouseup', scrollOverview.mouseUp, false);
 		// default mouseScroll event von Scrollbar entfernen, da sonst doppelt registriert
 		ManageEvents.removeEventListener(getElementsByClassName("empty","scrollOV"+viewID,"div")[0], 'mouseScroll', scrollOverview.scroll, false);
 		ManageEvents.addEventListener($(id), 'mouseScroll', scrollOverview.scroll, false);

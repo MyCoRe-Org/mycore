@@ -72,7 +72,6 @@ function loadPage(pageData, viewID) {
 	}*/
 	// Preload wird zu spät verkleinert
 	$("preload"+viewID).style.visibility = "hidden";
-	//console.log(findInArrayElement(pageData,"LOCTYPE", "URL").href);
 	var imageProperties = loadXML(Iview[viewID].baseUri[0]+"/"+viewID+"/"+findInArrayElement(pageData, "LOCTYPE", "URL").href/*findInArrayElement(pageData,"LOCTYPE", "URL").href*/+"/imageinfo.xml", "xml");
 	var values = nodeAttributes(imageProperties.getElementsByTagName("imageinfo")[0]);
 	
@@ -668,8 +667,8 @@ function importCutOut(viewID) {
 				 'y' : (Iview[viewID].ausschnitt.getHeight()/2 + Iview[viewID].ausschnitt.getPosition().y)*Math.pow(2, Iview[viewID].viewerBean.zoomLevel)*Iview[viewID].zoomScale
 				}, true);});
 	// Additional Events
-	ManageEvents.addEventListener(document.getElementsByTagName("body")[0], 'mouseup', ausschnitt.mouseUp, false);
-	ManageEvents.addEventListener(/*$("viewer"+viewID)*/$(Iview[viewID].ausschnittParent), 'mousemove', ausschnitt.mouseMove, false);
+	ManageEvents.addEventListener(document, 'mouseup', ausschnitt.mouseUp, false);
+	ManageEvents.addEventListener(document/*$(Iview[viewID].ausschnittParent)*/, 'mousemove', ausschnitt.mouseMove, false);
 	// wird in Klasse für cutOut bzw. in loading für viewer gemacht
 	// ManageEvents.addEventListener($("viewer"+viewID), 'mouseScroll', ausschnitt.scroll, false);
 }
@@ -826,10 +825,11 @@ function loading(viewID) {
 
 	// Additional Events
 	// move and down auf viewer
-	ManageEvents.addEventListener($("viewerContainer"+viewID), 'mouseMove', Iview[viewID].scrollBarX.mouseMove, false);
-	ManageEvents.addEventListener($("viewerContainer"+viewID), 'mouseUp', Iview[viewID].scrollBarX.mouseUp, false);
-	ManageEvents.addEventListener($("viewerContainer"+viewID), 'mouseMove', Iview[viewID].scrollBarY.mouseMove, false);
-	ManageEvents.addEventListener($("viewerContainer"+viewID), 'mouseUp', Iview[viewID].scrollBarY.mouseUp, false);
+	//TODO in Scrollbar verschieben der registrierung für MouseMove und Up?
+	ManageEvents.addEventListener(document, 'mouseMove', Iview[viewID].scrollBarX.mouseMove, false);
+	ManageEvents.addEventListener(document, 'mouseUp', Iview[viewID].scrollBarX.mouseUp, false);
+	ManageEvents.addEventListener(document, 'mouseMove', Iview[viewID].scrollBarY.mouseMove, false);
+	ManageEvents.addEventListener(document, 'mouseUp', Iview[viewID].scrollBarY.mouseUp, false);
 	// register to scroll into the viewer
 	ManageEvents.addEventListener($("viewer"+viewID), 'mouseScroll', function(e) { e = getEvent(e); preventDefault(e); viewerScroll(returnDelta(e), viewID);}, false);
 	

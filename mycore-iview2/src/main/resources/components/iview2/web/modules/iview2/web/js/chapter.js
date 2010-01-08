@@ -609,10 +609,12 @@ function chapter(newId, parent) {
 		scrollY.addListener(scrollBar.LIST_MOVE, new function() { this.moved = function(vector) {my.firstElement.style.top = -my.scrollBarY.getValue()+ "px";}});
 		scrollY.setParent(id);
 		scrollY.setSize(main.style.height);
-		
+		//TODO immer noch die letzte Seite mit drin stehen lassen als Orientierung
+		scrollY.setJumpStep(parseInt(my.content.clientHeight));
+
 		//EventRegistrations
-		ManageEvents.addEventListener(main, 'mousemove', scrollY.mouseMove, false);
-		ManageEvents.addEventListener(main, 'mouseup', scrollY.mouseUp, false);
+		ManageEvents.addEventListener(document, 'mousemove', scrollY.mouseMove, false);
+		ManageEvents.addEventListener(document, 'mouseup', scrollY.mouseUp, false);
 		ManageEvents.removeEventListener(getElementsByClassName("empty","scrollChap"+viewID,"div")[0], 'mouseScroll', scrollY.scroll, false);
 		ManageEvents.addEventListener(main, 'mouseScroll', function(e) { e = getEvent(e); scrollY.scroll(e); e.cancelBubble = true;}, false);
 		

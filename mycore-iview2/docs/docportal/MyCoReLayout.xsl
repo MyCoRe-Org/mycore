@@ -252,7 +252,6 @@
               <tr>
                 <td valign="top" align="left">
                   <!-- MCR IView2 ..start -->
-                  <!--<xsl:if test="$jai.available">-->
                     <tr>
                       <td class="metanone" colspan="8">
                         <xsl:variable name="supportedMainFile">
@@ -296,13 +295,12 @@
                             <xsl:call-template name="iview2.start">
                               <xsl:with-param name="groupID" select="$deriv" />
                               <xsl:with-param name="style" select="'default'" />
-                              <xsl:with-param name="startFile" select="document(concat('notnull:mcrobject:',$deriv))/mycorederivate/derivate/internals/internal/@maindoc"/>
+                              <xsl:with-param name="startFile" select="$supportedMainFile"/>
                             </xsl:call-template>
                           </xsl:when>
                         </xsl:choose>
                       </td>
                     </tr>
-                  <!--</xsl:if>-->
                   <!-- MCR IView2 ..end -->
                 </td>
               </tr>
