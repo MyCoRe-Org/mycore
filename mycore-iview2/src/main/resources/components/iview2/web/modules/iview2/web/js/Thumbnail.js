@@ -13,7 +13,6 @@ function addListener(type, theListener) {
 
 function dropListener(type, theListener) {
 	for (var i = 0; i < listener[type].length; i++) {
-		console.log(listener[type][i] == theListener);
 		if (listener[type][i] == theListener) {
 			listener[type].splice(i,1);
 		}
@@ -566,11 +565,16 @@ function openChapter(major, viewID){
 @description marks the correct picture in the chapterview and set zoombar to the correct zommlevel
 */
 function updateModuls(viewID) {
+	var viewerBean = Iview[viewID].viewerBean;
+	
 	// align/fit scrollbars
 	handleZoomScrollbars(viewID);
 	handleResizeScrollbars(viewID);
-	
-	var viewerBean = Iview[viewID].viewerBean;
+
+	// Actualize forward & backward Buttons
+	getElementsByClassName("BSE_forwardBehind "+viewID, "viewerContainer"+viewID, "div")[0].style.top = ((((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - 1)) * Iview[viewID].zoomScale) - toInt(getStyle(getElementsByClassName("BSE_forwardBehind "+viewID, "viewerContainer"+viewID, "div")[0],"height"))) / 2) + "px";
+	getElementsByClassName("BSE_backwardBehind "+viewID, "viewerContainer"+viewID, "div")[0].style.top = ((((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - 1)) * Iview[viewID].zoomScale) - toInt(getStyle(getElementsByClassName("BSE_backwardBehind "+viewID, "viewerContainer"+viewID, "div")[0],"height"))) / 2) + "px";
+
 	// Actualize Chapter
 	if (Iview[viewID].useChapter) {
 		Iview[viewID].chapter1.changePage(Iview[viewID].pagenumber);
@@ -791,6 +795,10 @@ function getPageNumberFromPic(viewID) {
 function loading(viewID) {
 	Iview[viewID].chapterActive = false;
 	Iview[viewID].overviewActive = false;
+	
+	Iview[viewID].startHeight = toInt($("viewerContainer"+viewID).style.height);
+	Iview[viewID].startWidth = toInt($("viewerContainer"+viewID).style.width);
+	
 	//Create new Header Elements as specified within caller xsl
 	splitHeader(viewID);
 	
@@ -825,9 +833,9 @@ function loading(viewID) {
 	// register to scroll into the viewer
 	ManageEvents.addEventListener($("viewer"+viewID), 'mouseScroll', function(e) { e = getEvent(e); preventDefault(e); viewerScroll(returnDelta(e), viewID);}, false);
 	
-	// damit viewer über scrollBarX endet, fortan in reinitialize
-	$("viewer"+viewID).style.width = $("viewerContainer"+viewID).offsetWidth - Iview[viewID].scrollBarY.my.self.offsetWidth  + "px";
-	$("viewer"+viewID).style.height = $("viewerContainer"+viewID).offsetHeight - Iview[viewID].scrollBarX.my.self.offsetHeight  + "px";
+	// damit viewer ueber scrollBarX endet, fortan in reinitialize
+	$("viewer"+viewID).style.width = Iview[viewID].startWidth - ((getStyle(Iview[viewID].scrollBarX.my.self,"visibility") == "visible")? Iview[viewID].scrollBarX.my.self.offsetWidth : 0)  + "px";
+	$("viewer"+viewID).style.height = Iview[viewID].startHeight - ((getStyle(Iview[viewID].scrollBarY.my.self,"visibility") == "visible")? Iview[viewID].scrollBarY.my.self.offsetHeight : 0)  + "px";
 
 	if (Iview[viewID].useCutOut) {
 		importCutOut(viewID);
@@ -907,4 +915,9 @@ function loading(viewID) {
 	if (window.location.search.get("maximized") == "true") {
 		maximizeHandler(viewID);
 	}
+	
+	// nochmals notwendig, da Scale erst hier verf�gbar f�r erstes Bild
+	// Actualize forward & backward Buttons
+	getElementsByClassName("BSE_forwardBehind "+viewID, "viewerContainer"+viewID, "div")[0].style.top = ((((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - 1)) * Iview[viewID].zoomScale) - toInt(getStyle(getElementsByClassName("BSE_forwardBehind "+viewID, "viewerContainer"+viewID, "div")[0],"height"))) / 2) + "px";
+	getElementsByClassName("BSE_backwardBehind "+viewID, "viewerContainer"+viewID, "div")[0].style.top = ((((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - 1)) * Iview[viewID].zoomScale) - toInt(getStyle(getElementsByClassName("BSE_backwardBehind "+viewID, "viewerContainer"+viewID, "div")[0],"height"))) / 2) + "px";
 }

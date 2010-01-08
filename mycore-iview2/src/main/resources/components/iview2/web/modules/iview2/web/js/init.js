@@ -269,23 +269,44 @@ function reinitializeGraphic(viewID) {
 	// --> eventuell sogar rausschieben falls sinnvoll - moeglich
 	viewerBean = Iview[viewID].viewerBean;
 	if (viewerBean == null) return;
+		
+	var curHeight = 0;
+	var curWidth = 0;
+	if (window.innerWidth) {
+		curWidth = window.innerWidth;
+		curHeight = window.innerHeight;
+	}
+	else {
+		curWidth = (document.compatMode == 'CSS1Compat' ? document.documentElement.clientWidth : document.body.clientWidth);
+		curHeight = (document.compatMode == 'CSS1Compat' ? document.documentElement.clientHeight : document.body.clientHeight);
+	}
 
 	// damit volle Höhe gewährleistet werden kann, height: 100% nicht verwendbar
 	if (Iview[viewID].maximized == true) {
-		$("viewerContainer"+viewID).style.height = document.body.clientHeight - $("viewerContainer"+viewID).offsetTop + "px";
-		//$("viewer"+viewID).style.height = document.body.clientHeight - $("viewer"+viewID).parentNode.offsetTop - Iview[viewID].scrollBarX.my.self.offsetHeight  + "px";
-		
+		$("viewerContainer"+viewID).style.height = curHeight - $("viewerContainer"+viewID).offsetTop + "px";
+		$("viewer"+viewID).style.height = curHeight - $("viewer"+viewID).parentNode.offsetTop - Iview[viewID].scrollBarX.my.self.offsetHeight  + "px";
+		$("viewerContainer"+viewID).style.width = curWidth + "px";
+		$("viewer"+viewID).style.width = curWidth - Iview[viewID].scrollBarY.my.self.offsetWidth  + "px";
 	} else {
-		// Wert wieder aus CSS entnehmen
-		$("viewerContainer"+viewID).style.height = "";
-		//$("viewer"+viewID).style.height = "";
+		// Wert wieder herstellen
+		$("viewerContainer"+viewID).style.height = Iview[viewID].startHeight + "px";
+		$("viewer"+viewID).style.height = Iview[viewID].startHeight - ((getStyle(Iview[viewID].scrollBarY.my.self,"visibility") == "visible")? Iview[viewID].scrollBarY.my.self.offsetHeight : 0)  + "px";
+		$("viewerContainer"+viewID).style.width = Iview[viewID].startHeight + "px";
+		$("viewer"+viewID).style.width = Iview[viewID].startWidth - ((getStyle(Iview[viewID].scrollBarX.my.self,"visibility") == "visible")? Iview[viewID].scrollBarX.my.self.offsetWidth : 0)  + "px";
 	}
-	$("viewer"+viewID).style.height = $("viewerContainer"+viewID).offsetHeight - Iview[viewID].scrollBarX.my.self.offsetHeight  + "px";
-	$("viewer"+viewID).style.width = $("viewerContainer"+viewID).offsetWidth - Iview[viewID].scrollBarY.my.self.offsetWidth  + "px";
 	
 	viewerBean.width = $("viewer"+viewID).offsetWidth;
 	viewerBean.height = $("viewer"+viewID).offsetHeight;
 	viewerBean.resize();
+	
+	// den Modus beibehalten & aktualisieren
+	if(Iview[viewID].zoomScreen){
+		Iview[viewID].zoomScreen = !Iview[viewID].zoomScreen;	
+		pictureScreen(viewID);
+	} else if(Iview[viewID].zoomWidth){
+		Iview[viewID].zoomWidth = !Iview[viewID].zoomWidth;
+		pictureWidth(viewID);
+	}
 	
 	if (Iview[viewID].useOverview) {
 		Iview[viewID].overview1.resize();
@@ -311,12 +332,18 @@ function reinitializeGraphic(viewID) {
 		if (0 > newWidth) newWidth = 0;
 		Iview[viewID].chapter1.setSize(newWidth, newHeight);
 	}
+
+	// Actualize forward & backward Buttons
+	getElementsByClassName("BSE_forwardBehind "+viewID, "viewerContainer"+viewID, "div")[0].style.top = ((((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - 1)) * Iview[viewID].zoomScale) - toInt(getStyle(getElementsByClassName("BSE_forwardBehind "+viewID, "viewerContainer"+viewID, "div")[0],"height"))) / 2) + "px";
+	getElementsByClassName("BSE_backwardBehind "+viewID, "viewerContainer"+viewID, "div")[0].style.top = ((((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - 1)) * Iview[viewID].zoomScale) - toInt(getStyle(getElementsByClassName("BSE_backwardBehind "+viewID, "viewerContainer"+viewID, "div")[0],"height"))) / 2) + "px";
+		
 }
 
 // uses the callback format GSIV.{className}Handler
 function maximizeHandler(viewID) {
 	if (Iview[viewID].maximized) {
 		Iview[viewID].maximized = false;
+		
 		/*if (document.compatMode == "CSS1Compat") {
 			document.documentElement.style.overflow="auto";
 		} else {
@@ -333,6 +360,7 @@ function maximizeHandler(viewID) {
 		//$("buttonSurface"+viewID).className = "buttonSurface min";
 		//TODO nur auf Surfaces für bestimmen Viewer Anwenden
 		if (classIsUsed("buttonSurface")) doForEachInClass("buttonSurface", ".className = 'buttonSurface min';");
+		
 		if (Iview[viewID].useChapter) {
 			openChapter(false, viewID);
 		}
@@ -347,6 +375,7 @@ function maximizeHandler(viewID) {
 		}
 	} else {
 		Iview[viewID].maximized = true;
+		
 		/*if (document.compatMode == "CSS1Compat") {
 			document.documentElement.style.overflow="hidden";
 		} else {
@@ -354,11 +383,11 @@ function maximizeHandler(viewID) {
 		}*/
 		if (classIsUsed("BSE_fullView")) doForEachInClass("BSE_fullView", ".style.display = 'none';", viewID);
 		if (classIsUsed("BSE_normalView")) doForEachInClass("BSE_normalView", ".style.display = 'block';", viewID);
-		
+				
 		document.body.style.overflow="hidden";
 		document.body.style.visibility = "hidden";
 
-		// class-Wechsel löst im IE resize aus
+		// class-Wechsel loesst im IE resize aus
 		$("viewerContainer"+viewID).className = "viewerContainer max";
 
 		doForEachInClass("buttonSurface", ".className = 'buttonSurface max';");
@@ -400,14 +429,7 @@ function maximizeHandler(viewID) {
 		reinitializeGraphic(viewID);
 	}
 
-	// beim Wechsel zw. Vollbild und Normal aktuelle ZoomMethode beibehalten
-	if(Iview[viewID].zoomScreen){
-		Iview[viewID].zoomScreen = !Iview[viewID].zoomScreen;	
-		pictureScreen(viewID);
-	} else if(Iview[viewID].zoomWidth){
-		Iview[viewID].zoomWidth = !Iview[viewID].zoomWidth;
-		pictureWidth(viewID);
-	}
+
 	//TODO maximized noch nötig, wegen viewerBean.maximized?
 	//Iview[viewID].maximized = !Iview[viewID].maximized;
 }

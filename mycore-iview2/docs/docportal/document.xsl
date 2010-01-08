@@ -371,6 +371,7 @@
                               <xsl:with-param name="chapter" select="'true'" />
                               <xsl:with-param name="cutOut" select="'true'" />
                               <xsl:with-param name="overview" select="'true'" />
+                              <xsl:with-param name="style" select="'width:256px; height:256px;'"/>
                             </xsl:call-template>
                             <xsl:call-template name="iview2.start">
                               <xsl:with-param name="groupID" select="$deriv" />

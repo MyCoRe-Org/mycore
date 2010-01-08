@@ -20,10 +20,9 @@
 	z-index:5;
 }
 
-
 .viewerContainer {
 	position:relative;
-	width:100%;
+	/*width:100%;*/
 	left: 0px;
 	z-index: 10;
 	visibility:visible;
@@ -35,7 +34,7 @@
 }
 .viewerContainer.min {
 	position: relative;
-	height: 500px;
+	/*height: 500px;*/
 	top: 0px;
 }
 .viewerContainer.min .scrollH, .viewerContainer.min .scrollV {
@@ -148,7 +147,7 @@
 	left: 0px;
 	top: 0px;
 	background-image: url('scaled/header/horizontal.png');
-	background-repeat: repeatx;
+	background-repeat: repeat-x;
 	width: 100%;
 	height: 44px;
 	border: 1px solid #000000;
@@ -333,7 +332,6 @@
 }
 .viewerContainer .BSE_backwardBehind {
 	position: absolute;
-	top: 250px;
 	background-image: url('image.png');
 	background-repeat: no-repeat;
 	background-position: -90px -0px;
@@ -359,7 +357,6 @@
 }
 .viewerContainer .BSE_forwardBehind {
 	position: absolute;
-	top: 250px;
 	background-image: url('image.png');
 	background-repeat: no-repeat;
 	background-position: -150px -0px;
