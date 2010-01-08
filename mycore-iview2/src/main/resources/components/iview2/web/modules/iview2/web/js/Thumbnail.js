@@ -838,6 +838,8 @@ function loading(viewID) {
 		//TODO may be incomplete: Prevent Remote File Inclusion, but never Ever drop
 		Iview[viewID].startFile = window.location.search.get("page").replace(/(:|\.\.|&#35|&#46|&#58|&#38|&#35|&amp)/,"§"); 
 	}
+	//remove leading '/'
+	Iview[viewID].startFile = Iview[viewID].startFile.replace(/^\/*/,"");
 	loadPage([{"LOCTYPE":"URL","href":Iview[viewID].startFile}],viewID);
 	Iview[viewID].loaded = true;
 	
