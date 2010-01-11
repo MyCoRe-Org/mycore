@@ -26,6 +26,7 @@ public class MCRImportMapperManager {
         mapperTable.put("parent", MCRImportParentMapper.class);
         mapperTable.put("classification", MCRImportClassificationMapper.class);
         mapperTable.put("derivate", MCRImportDerivateMapper.class);
+        mapperTable.put("multidata", MCRImportMultiDataMapper.class);
     }
 
     /**

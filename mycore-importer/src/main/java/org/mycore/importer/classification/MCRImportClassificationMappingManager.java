@@ -84,6 +84,11 @@ public class MCRImportClassificationMappingManager {
      */
     protected void buildClassificationMapDocumentList(File parentDirectory, List<Document> documentList) {
         File[] files = parentDirectory.listFiles();
+        if(files == null) {
+            LOGGER.warn("There are no classification files in the classification mapping folder '" + parentDirectory.getAbsolutePath() + "'. " +
+                        "Add these files or turn 'createClassificationMapping' in the config file off.");
+            return;
+        }
         for(File file : files) {
             if(file.isDirectory())
                 buildClassificationMapDocumentList(file, documentList);

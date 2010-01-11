@@ -58,19 +58,20 @@ public class MCRImportRecord {
     }
 
     /**
-     * Returns a field from the field list selected
+     * Returns a list of fields from the field list selected
      * by the given field id. If no field with the
-     * given id was found, null will be returned.
+     * given id was found, a empty list is returned.
      * 
      * @param fieldId the field id which identifies the field
-     * @return a field from the field list.
+     * @return a list of fields which have the fieldId
      */
-    public MCRImportField getFieldById(String fieldId) {
+    public List<MCRImportField> getFieldsById(String fieldId) {
+        List<MCRImportField> fieldList = new ArrayList<MCRImportField>();
         for(MCRImportField field : fields) {
             if(field.getId().equals(fieldId))
-                return field;
+                fieldList.add(field);
         }
-        return null;
+        return fieldList;
     }
 
     @Override

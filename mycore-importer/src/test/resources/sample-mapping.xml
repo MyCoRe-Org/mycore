@@ -18,7 +18,19 @@
         </resolvers>
 
         <mcrobjects>
-        
+          <mcrobject name="record" datamodel="sample-dm2.xml">
+            <map fields="id" type="id"></map>
+            <map fields="text" type="multidata" to="metaText">
+              <text value="{text}" />
+            </map>
+            <map fields="date" to="date" />
+            <map fields="link_href, link_label" to="link">
+              <attributes>
+                <attribute name="href" namespace="xlink" value="{link_href}" />
+                <attribute name="label" namespace="xlink" value="{link_label}" />
+              </attributes>            
+            </map>
+          </mcrobject>
         </mcrobjects>
         
    </mapping>

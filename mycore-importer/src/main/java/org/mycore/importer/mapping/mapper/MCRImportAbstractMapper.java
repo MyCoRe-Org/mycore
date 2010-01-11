@@ -52,9 +52,7 @@ public abstract class MCRImportAbstractMapper implements MCRImportMapper {
         fieldsValue = fieldsValue.replace(" ", "");
         String[] fieldArray = fieldsValue.split(",");
         for(String fieldId : fieldArray) {
-            MCRImportField field = record.getFieldById(fieldId);
-            if(field != null)
-                fieldList.add(field);
+            fieldList.addAll(record.getFieldsById(fieldId));
         }
         return fieldList;
     }

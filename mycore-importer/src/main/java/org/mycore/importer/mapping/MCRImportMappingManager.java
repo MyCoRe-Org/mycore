@@ -319,11 +319,15 @@ public class MCRImportMappingManager {
      * @param subFolderName the path where the xml file will be saved
      */
     public void saveImportObject(MCRImportObject importObject, String subFolderName) {
+        String id = importObject.getId();
+        if(id == null || id.equals("")) {
+            LOGGER.error("No id defined for an object of datamodel '" + importObject.getDatamodel().getPath() + "'!");
+            return;
+        }
         Element ioElement = importObject.createXML();
         String savePath = config.getSaveToPath() + subFolderName + "/";
 
         // save the new mapped object
-        String id = importObject.getId();
         try {
             File folder = new File(savePath + "/");
             if(!folder.exists())
@@ -377,7 +381,7 @@ public class MCRImportMappingManager {
         Element mappedObject = getMappedObject(record.getName());
 
         if(mappedObject == null) {
-            LOGGER.warn("Couldnt find match for mapping of mcrobject " + record.getName());
+            LOGGER.warn("Couldnt find match for mapping of mcrobject '" + record.getName() + "'!");
             return null;
         }
         // path to the datamodel
