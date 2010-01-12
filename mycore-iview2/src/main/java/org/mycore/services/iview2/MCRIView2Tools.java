@@ -91,6 +91,11 @@ public class MCRIView2Tools {
     public static boolean isFileSupported(MCRFile file) {
         return SUPPORTED_CONTENT_TYPE.indexOf(file.getContentTypeID()) > -1;
     }
+    
+    public static boolean isTiled(MCRFile file) {
+        File tiledFile = MCRImage.getTiledFile(getTileDir(), file.getOwnerID(), file.getAbsolutePath());
+        return tiledFile.exists();
+    }
 
     static File getFile(MCRFile image) {
         String storageID = image.getStorageID();
