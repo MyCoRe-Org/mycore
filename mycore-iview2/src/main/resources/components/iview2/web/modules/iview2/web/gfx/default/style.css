@@ -1282,12 +1282,11 @@
 	background-color: #E2E6E9;
 }
 #previewImage {	
-	width: 150px;
-	height: 120px;
+	width: 180px;
+	height: 160px;
 }
 .overview .infoDiv {
-	width: 100px;
-	height: 20px;
+	width: 196px;
 	bottom: 9px;
 
 	border-top-style: solid;
@@ -1295,10 +1294,10 @@
 	border-left-style: solid;
 	border-right-style: solid;
 
-	border-top-width: 1px;
-	border-bottom-width: 1px;
-	border-left-width: 1px;
-	border-right-width: 1px;
+	border-top-width: 0px;
+	border-bottom-width: 0px;
+	border-left-width: 0px;
+	border-right-width: 0px;
 
 	border-top-color: #000000;
 	border-bottom-color: #000000;
@@ -1309,8 +1308,8 @@
 	vertical-align: middle;
 
 	font-weight: bold;
-	color: #ffffff;
-	background-color: #3A596D;
+	color: #3A596D;
+	background-color: transparent;
 	overflow:hidden;
 }
 
