@@ -48,7 +48,7 @@ public class MCRTileServlet extends HttpServlet {
 
     private static final long serialVersionUID = 3805114872438336791L;
 
-    private final static int MAX_AGE = 60 * 60 * 24 * 365; // one year
+    final static int MAX_AGE = 60 * 60 * 24 * 365; // one year
 
     private final static Logger LOGGER = Logger.getLogger(MCRTileServlet.class);
 

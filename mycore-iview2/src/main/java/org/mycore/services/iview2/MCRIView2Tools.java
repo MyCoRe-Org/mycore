@@ -23,8 +23,21 @@
 
 package org.mycore.services.iview2;
 
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Iterator;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
+
+import org.apache.log4j.Logger;
+import org.jdom.JDOMException;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -42,6 +55,8 @@ public class MCRIView2Tools {
     private static String SUPPORTED_CONTENT_TYPE = CONFIG.getString("MCR.Module-iview2.SupportedContentTypes", "");
 
     private static File TILE_DIR = new File(MCRIview2Props.getProperty("DirectoryForTiles"));
+
+    private static Logger LOGGER = Logger.getLogger(MCRIView2Tools.class);
 
     /**
      * @return directory for tiles
@@ -91,10 +106,61 @@ public class MCRIView2Tools {
     public static boolean isFileSupported(MCRFile file) {
         return SUPPORTED_CONTENT_TYPE.indexOf(file.getContentTypeID()) > -1;
     }
-    
+
     public static boolean isTiled(MCRFile file) {
         File tiledFile = MCRImage.getTiledFile(getTileDir(), file.getOwnerID(), file.getAbsolutePath());
         return tiledFile.exists();
+    }
+
+    public static BufferedImage getZoomLevel(File iviewFile, int zoomLevel) throws IOException, JDOMException {
+        MCRTiledPictureProps imageProps = MCRTiledPictureProps.getInstance(iviewFile);
+        if (zoomLevel < 0 || zoomLevel > imageProps.zoomlevel) {
+            throw new IndexOutOfBoundsException("Zoom level " + zoomLevel + " is not in range 0 - " + imageProps.zoomlevel);
+        }
+        ZipFile iviewImage = new ZipFile(iviewFile);
+        try {
+            if (zoomLevel == 0) {
+                return readTile(iviewImage, 0, 0, 0);
+            }
+            double zoomFactor = Math.pow(2, (imageProps.zoomlevel - zoomLevel));
+            int maxX = (int) Math.ceil((imageProps.width / zoomFactor) / MCRImage.TILE_SIZE);
+            int maxY = (int) Math.ceil((imageProps.height / zoomFactor) / MCRImage.TILE_SIZE);
+            LOGGER.info("Image size:" + imageProps.width + "x" + imageProps.height + ", tiles:" + maxX + "x" + maxY);
+            BufferedImage sampleTile = readTile(iviewImage, zoomLevel, maxX - 1, 0);
+            int xDim = ((maxX - 1) * MCRImage.TILE_SIZE + sampleTile.getWidth());
+            int yDim = ((maxY - 1) * MCRImage.TILE_SIZE + readTile(iviewImage, zoomLevel, 0, maxY - 1).getHeight());
+            BufferedImage resultImage = new BufferedImage(xDim, yDim, sampleTile.getType());
+            Graphics graphics = resultImage.getGraphics();
+            for (int x = 0; x < maxX; x++) {
+                for (int y = 0; y < maxY; y++) {
+                    BufferedImage tile = readTile(iviewImage, zoomLevel, x, y);
+                    graphics.drawImage(tile, x * MCRImage.TILE_SIZE, y * MCRImage.TILE_SIZE, null);
+                }
+            }
+            return resultImage;
+        } finally {
+            iviewImage.close();
+        }
+    }
+
+    private static BufferedImage readTile(ZipFile iviewImage, int zoomLevel, int x, int y) throws IOException {
+        String tileName = zoomLevel + "/" + y + "/" + x + ".jpg";
+        ZipEntry tile = iviewImage.getEntry(tileName);
+        if (tile != null) {
+            InputStream zin = iviewImage.getInputStream(tile);
+            try {
+                ImageInputStream iis = ImageIO.createImageInputStream(zin);
+                Iterator<ImageReader> readers = ImageIO.getImageReaders(iis);
+                ImageReader reader = readers.next();
+                reader.setInput(iis, false);
+                return reader.read(0);
+            } finally {
+                zin.close();
+            }
+        } else {
+            LOGGER.warn("Did not find " + tileName + " in " + iviewImage.getName());
+            return null;
+        }
     }
 
     static File getFile(MCRFile image) {
