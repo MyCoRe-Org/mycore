@@ -92,7 +92,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
      * reserved URI characters should not be in uploaded filenames
      * see RFC3986, Section 2.2
      */
-    static Pattern genDelims = Pattern.compile("[^:/?#\\[\\]@]*");
+    static Pattern genDelims = Pattern.compile("[^:?#\\[\\]@]*");
 
     static Pattern subDelims = Pattern.compile("[^!$&'()*+,;=]*");
 
