@@ -42,7 +42,7 @@ public class MCRImportFieldValueResolver {
      * @param incomingString the string which have to be resolved.
      */
     public String resolveFields(String incomingString) {
-        return variableResolver.resolveNext(incomingString);
+        return variableResolver.resolve(incomingString);
     }
 
     /**
