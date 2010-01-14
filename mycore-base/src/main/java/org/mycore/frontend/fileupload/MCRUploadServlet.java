@@ -39,6 +39,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -86,6 +87,14 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
     static MCRCache sessionIDs = new MCRCache(100, "UploadServlet Upload sessions");
 
     final static int bufferSize = 65536; // 64 KByte
+    
+    /*
+     * reserved URI characters should not be in uploaded filenames
+     * see RFC3986, Section 2.2
+     */
+    static Pattern genDelims = Pattern.compile("[^:/?#\\[\\]@]*");
+
+    static Pattern subDelims = Pattern.compile("[^!$&'()*+,;=]*");
 
     public synchronized void init() throws ServletException {
         super.init();
@@ -272,6 +281,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             final String path = req.getParameter("path");
 
             LOGGER.info("UploadServlet uploading " + path);
+            checkPathName(path);
 
             String uploadId = req.getParameter("uploadId");
             String md5 = req.getParameter("md5");
@@ -359,9 +369,28 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
                 LOGGER.debug("UploadServlet skipping ZIP entry " + path + ", is a directory");
                 continue;
             }
-
+            checkPathName(path);
             LOGGER.info("UploadServlet unpacking ZIP entry " + path);
             handler.receiveFile(path, zis, 0, null);
+        }
+    }
+
+    /**
+     * checks if path contains reserved URI characters.
+     * 
+     * There are some characters that are maybe allowed in file names but are reserved in URIs.
+     * @see <a href="http://tools.ietf.org/html/rfc3986#section-2.2">RFC3986, Section 2.2</a>
+     * @param path complete path name
+     * @throws MCRException if path contains 'gen-delims' or 'sub-delims'
+     */
+    protected static void checkPathName(String path) throws MCRException{
+        if (!genDelims.matcher(path).matches()) {
+            String delims = "\":\" / \"/\" / \"?\" / \"#\" / \"[\" / \"]\" / \"@\"";
+            throw new MCRException("Path name " + path + " contains reserved characters from gen-delims: " + delims);
+        }
+        if (!subDelims.matcher(path).matches()) {
+            String delims = "\"!\" / \"$\" / \"&\" / \"'\" / \"(\" / \")\" / \"*\" / \"+\" / \",\" / \";\" / \"=\"";
+            throw new MCRException("Path name " + path + " contains reserved characters from sub-delims: " + delims);
         }
     }
 
