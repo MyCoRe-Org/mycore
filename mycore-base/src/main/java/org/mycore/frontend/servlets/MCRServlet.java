@@ -291,7 +291,7 @@ public class MCRServlet extends HttpServlet {
     }
 
     private Exception processThinkPhase(MCRServletJob job) {
-        MCRSession session=MCRSessionMgr.getCurrentSession();
+        MCRSession session = MCRSessionMgr.getCurrentSession();
         try {
             if (getProperty(job.getRequest(), INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
                 // current Servlet not called via RequestDispatcher
@@ -325,7 +325,7 @@ public class MCRServlet extends HttpServlet {
     }
 
     private void processRenderingPhase(MCRServletJob job, Exception thinkException) throws Exception {
-        MCRSession session=MCRSessionMgr.getCurrentSession();
+        MCRSession session = MCRSessionMgr.getCurrentSession();
         if (getProperty(job.getRequest(), INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
             // current Servlet not called via RequestDispatcher
             session.beginTransaction();
@@ -368,30 +368,16 @@ public class MCRServlet extends HttpServlet {
     protected void handleException(Exception ex) {
         try {
             reportException(ex);
-
-            if (ex instanceof MCRException) {
-                ex = ((MCRException) ex).getException();
-
-                if (ex != null) {
-                    handleException(ex);
-                }
-            }
         } catch (Exception ignored) {
         }
     }
 
     /** Reports an exception to the log */
     protected void reportException(Exception ex) throws Exception {
-        String msg = ((ex.getMessage() == null) ? "" : ex.getMessage());
-        String type = ex.getClass().getName();
         String cname = this.getClass().getName();
         String servlet = cname.substring(cname.lastIndexOf(".") + 1);
-        String trace = MCRException.getStackTraceAsString(ex);
 
-        LOGGER.warn("Exception caught in : " + servlet);
-        LOGGER.warn("Exception type      : " + type);
-        LOGGER.warn("Exception message   : " + msg);
-        LOGGER.debug(trace);
+        LOGGER.warn("Exception caught in : " + servlet, ex);
     }
 
     protected void generateErrorPage(HttpServletRequest request, HttpServletResponse response, int error, String msg, Exception ex,
@@ -508,7 +494,8 @@ public class MCRServlet extends HttpServlet {
         if (ENABLE_BROWSER_CACHE) {
             // we can cache every (local) request
             long lastModified = (MCRSessionMgr.getCurrentSession().getLoginTime() > MCRConfiguration.instance().getSystemLastModified()) ? MCRSessionMgr
-                    .getCurrentSession().getLoginTime() : MCRConfiguration.instance().getSystemLastModified();
+                    .getCurrentSession().getLoginTime()
+                    : MCRConfiguration.instance().getSystemLastModified();
             LOGGER.info("LastModified: " + lastModified);
             return lastModified;
         }
