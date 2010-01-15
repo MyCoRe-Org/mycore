@@ -47,7 +47,7 @@ function getEvent(e) {
  @return Array of Objects which matched the search Conditions
  */
 function getElementsByClassName(searchClass, node, tag) {
-	if (document.getElementsByClassName) {
+	if (document.body.getElementsByClassName) {
 		if (typeof arguments[1] == "undefined" || node == null )
 			node = document;
 		var nodes = $(node).getElementsByClassName(searchClass);
@@ -120,6 +120,7 @@ function doForEachInClass(className, perform) {
 @param id the Id or the object itself which we want to access
 @return object which was requested
 */
+/*
 function $(id) {
 	if (typeof id == "object") {
 		return id;
@@ -127,7 +128,7 @@ function $(id) {
 		return document.getElementById(id);
 	}
 }
-
+*/
 /*
 @description converts a given String into an integer, but further doesn't give NAN for String was undefined and other cases
 @param value which shall be converted into an integer
