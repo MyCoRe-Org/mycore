@@ -26,6 +26,8 @@ package org.mycore.frontend.iview2;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -36,6 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRUtils;
 import org.mycore.services.iview2.MCRIView2Tools;
 import org.mycore.services.iview2.MCRImage;
@@ -54,9 +57,7 @@ public class MCRTileServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Starting MCRTileServlet: " + req.getPathInfo());
-        final TileInfo tileInfo = getTileInfo(req.getPathInfo());
+        final TileInfo tileInfo = getTileInfo(getPathInfo(req));
         File iviewFile = getTileFile(tileInfo);
         if (!iviewFile.exists()) {
             LOGGER.warn("File does not exist: " + iviewFile.getAbsolutePath());
@@ -68,6 +69,7 @@ public class MCRTileServlet extends HttpServlet {
             ZipEntry ze = zipFile.getEntry(tileInfo.tile);
             if (ze != null) {
                 resp.setHeader("Cache-Control", "max-age=" + MAX_AGE);
+                resp.setDateHeader("Last-Modified", iviewFile.lastModified());
                 if (tileInfo.tile.endsWith("xml"))
                     resp.setContentType("text/xml");
                 else
@@ -103,11 +105,22 @@ public class MCRTileServlet extends HttpServlet {
 
     @Override
     protected long getLastModified(HttpServletRequest req) {
-        final TileInfo tileInfo = getTileInfo(req.getPathInfo());
+        final TileInfo tileInfo = getTileInfo(getPathInfo(req));
         return getTileFile(tileInfo).lastModified();
     }
 
-    private static TileInfo getTileInfo(String pathInfo) {
+    /**
+     * returns PathInfo from request including ";"
+     * @param request
+     * @return
+     */
+    private String getPathInfo(HttpServletRequest request) {
+        return request.getPathInfo();
+    }
+
+    static TileInfo getTileInfo(String pathInfo) {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting MCRTileServlet: " + pathInfo);
         if (pathInfo.startsWith("/"))
             pathInfo = pathInfo.substring(1);
         final String derivate = pathInfo.substring(0, pathInfo.indexOf('/'));
@@ -138,7 +151,7 @@ public class MCRTileServlet extends HttpServlet {
         return MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), tileInfo.derivate, tileInfo.imagePath);
     }
 
-    private static class TileInfo {
+    static class TileInfo {
         String derivate, imagePath, tile;
 
         public TileInfo(String derivate, String imagePath, String tile) {

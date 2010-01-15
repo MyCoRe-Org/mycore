@@ -27,6 +27,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -100,6 +101,10 @@ public class MCRTileCombineServlet extends MCRServlet {
                 if (combinedImage != null) {
                     job.getResponse().setHeader("Cache-Control", "max-age=" + MCRTileServlet.MAX_AGE);
                     job.getResponse().setContentType("image/jpeg");
+                    job.getResponse().setDateHeader("Last-Modified", iviewFile.lastModified());
+                    Date expires = new Date(System.currentTimeMillis() + MCRTileServlet.MAX_AGE * 1000);
+                    LOGGER.info("Last-Modified: " + new Date(iviewFile.lastModified()) + ", expire on: " + expires);
+                    job.getResponse().setDateHeader("Expires", expires.getTime());
                     ServletOutputStream sout = job.getResponse().getOutputStream();
                     try {
                         ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(sout);
