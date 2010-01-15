@@ -26,6 +26,7 @@ package org.mycore.frontend.iview2;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.ZipFile;
 
 import javax.xml.ws.Endpoint;
 
@@ -42,6 +43,7 @@ import org.mycore.services.iview2.MCRImage;
 import org.mycore.services.iview2.MCRImageTiler;
 import org.mycore.services.iview2.MCRIview2Props;
 import org.mycore.services.iview2.MCRTileJob;
+import org.mycore.services.iview2.MCRTiledPictureProps;
 import org.mycore.services.iview2.MCRTilingQueue;
 import org.mycore.services.iview2.webservice.MCRIView2RemoteFunctions;
 
@@ -65,6 +67,12 @@ public class MCRIView2Commands extends MCRAbstractCommands {
                 "tiles all images of derivate {0} with a supported image type as main document"));
         command.add(new MCRCommand("tile image {0} {1}", CMD_CLASS + "tileImage String String",
                 "tiles a specific file identified by its derivate {0} and absolute path {1}"));
+        command.add(new MCRCommand("check tiles of all derivates", CMD_CLASS + "checkAll",
+        "checks if all images have valid iview2 files and start tiling if not"));
+        command.add(new MCRCommand("check tiles of derivate {0}", CMD_CLASS + "checkTilesOfDerivate String",
+        "checks if all images of derivate {0} with a supported image type as main document have valid iview2 files and start tiling if not "));
+        command.add(new MCRCommand("check tiles of image {0} {1}", CMD_CLASS + "checkImage String String",
+        "checks if tiles a specific file identified by its derivate {0} and absolute path {1} are valid or generates new one"));
         command.add(new MCRCommand("delete all tiles", CMD_CLASS + "deleteAllTiles", "removes all tiles of all derivates"));
         command.add(new MCRCommand("delete tiles of derivate {0}", CMD_CLASS + "deleteDerivateTiles String",
                 "removes tiles of a specific file identified by its absolute path {0}"));
@@ -76,15 +84,35 @@ public class MCRIView2Commands extends MCRAbstractCommands {
     }
 
     public static List<String> tileAll() {
+        String command = "tile images";
+        return forAllDerivates(command);
+    }
+
+    public static List<String> checkAll() {
+        String command = "check tiles";
+        return forAllDerivates(command);
+    }
+    
+    private static List<String> forAllDerivates(String command) {
         List<String> ids = MCRXMLTableManager.instance().listIDsOfType("derivate");
         List<String> cmds = new ArrayList<String>(ids.size());
         for (String id : ids) {
-            cmds.add("tile images of derivate " + id);
+            cmds.add(command + " of derivate " + id);
         }
         return cmds;
     }
 
     public static List<String> tileDerivate(String derivateID) {
+        String command = "tile image";
+        return forAllImages(derivateID, command);
+    }
+
+    public static List<String> checkTilesOfDerivate(String derivateID) {
+        String command = "check tiles of image";
+        return forAllImages(derivateID, command);
+    }
+    
+    private static List<String> forAllImages(String derivateID, String command) {
         if (!MCRIView2Tools.isDerivateSupported(derivateID)) {
             LOGGER.info("Skipping tiling of derivate " + derivateID + " as it's main file is not supported by IView2.");
             return null;
@@ -99,11 +127,51 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         derivate = (MCRDirectory) node;
 
         List<MCRFile> supportedFiles = getSupportedFiles(derivate);
-        String baseCmd = "tile image " + derivateID + " ";
+        String baseCmd = command + " " + derivateID + " ";
         for (MCRFile image : supportedFiles) {
             returns.add(baseCmd + image.getAbsolutePath());
         }
         return returns;
+    }
+
+    public static void checkImage(String derivate, String absoluteImagePath) {
+        File iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, absoluteImagePath);
+        //file checks
+        if (!iviewFile.exists()) {
+            LOGGER.warn("IView2 file does not exist: " + iviewFile.getAbsolutePath());
+            tileImage(derivate, absoluteImagePath);
+            return;
+        }
+        MCRTiledPictureProps props;
+        try {
+            props = MCRTiledPictureProps.getInstance(iviewFile);
+        } catch (Exception e) {
+            LOGGER.warn("Error while reding image metadata. Recreating tiles.", e);
+            tileImage(derivate, absoluteImagePath);
+            return;
+        }
+        ZipFile iviewImage;
+        try {
+            iviewImage = new ZipFile(iviewFile);
+        } catch (Exception e) {
+            LOGGER.warn("Error while reading Iview2 file: " + iviewFile.getAbsolutePath(),e);
+            tileImage(derivate, absoluteImagePath);
+            return;
+        }
+        //structure and metadata checks
+        int tilesCount = iviewImage.size() - 1; //one for metadata
+        if (props.getCountTiles()!=tilesCount){
+            LOGGER.warn("Metadata tile count does not match stored tile count: " + iviewFile.getAbsolutePath());
+            tileImage(derivate, absoluteImagePath);
+            return;
+        }
+        int x = props.getWidth();
+        int y = props.getHeight();
+        if (MCRImage.getTileCount(x, y)!=tilesCount){
+            LOGGER.warn("Calculated tile count does not match stored tile count: " + iviewFile.getAbsolutePath());
+            tileImage(derivate, absoluteImagePath);
+            return;
+        }
     }
 
     public static void tileImage(String derivate, String absoluteImagePath) {
@@ -152,9 +220,16 @@ public class MCRIView2Commands extends MCRAbstractCommands {
 
     public static void deleteImageTiles(String derivate, String absoluteImagePath) {
         File tileFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, absoluteImagePath);
-        tileFile.delete();
+        deleteFileAndEmptyDirectories(tileFile);
         int removed = TILE_QUEUE.remove(derivate, absoluteImagePath);
         LOGGER.info("removed tiles from " + removed + " images");
+    }
+
+    private static void deleteFileAndEmptyDirectories(File file) {
+        File parent = file.getParentFile();
+        file.delete();
+        if (parent.list().length == 0)
+            deleteFileAndEmptyDirectories(parent);
     }
 
     private static boolean deleteDirectory(File path) {
