@@ -70,8 +70,8 @@ function loadPage(pageData, viewID) {
 /*	if (Iview[viewID].useCutOut) {
 		$("ausschnitt"+viewID).style.visibility = "hidden";
 	}*/
-	// Preload wird zu spät verkleinert
-	$("preload"+viewID).style.visibility = "hidden";
+	// Preload wird zu spät verkleinert (bei Problemen wieder entkommentieren
+	//$("preload"+viewID).style.visibility = "hidden";
 	var imageProperties = loadXML(Iview[viewID].baseUri[0]+"/"+viewID+"/"+findInArrayElement(pageData, "LOCTYPE", "URL").href/*findInArrayElement(pageData,"LOCTYPE", "URL").href*/+"/imageinfo.xml", "xml");
 	var values = nodeAttributes(imageProperties.getElementsByTagName("imageinfo")[0]);
 	
@@ -163,7 +163,7 @@ function loadPage(pageData, viewID) {
 	preload.src = viewerBean.tileUrlProvider.assembleUrl(0,0,0);
 	
 	$("preload"+viewID).appendChild(preload);
-	$("preload"+viewID).style.visibility = "visible";
+	//$("preload"+viewID).style.visibility = "visible";
 	if (Iview[viewID].useCutOut) {
 		Iview[viewID].ausschnitt.setSRC(viewerBean.tileUrlProvider.assembleUrl(0,0,0));
 	}

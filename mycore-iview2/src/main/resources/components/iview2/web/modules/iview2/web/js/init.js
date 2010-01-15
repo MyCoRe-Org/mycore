@@ -424,10 +424,11 @@ function maximizeHandler(viewID) {
 		};
 	}
 
-	// IE löst resize bereits bei bei den Class-Wechsel (sicherlich wegen position rel <-> fix)
-	if (!(isBrowser("IE"))) {
+// IE löst resize bereits bei bei den Class-Wechsel (sicherlich wegen position rel <-> fix)
+	//IE führt die zwar so irgendwie mehrfach aus... aber ohne die auch nicht...muss man wohl mit leben
+//	if (!(isBrowser("IE"))) {
 		reinitializeGraphic(viewID);
-	}
+//	}
 
 
 	//TODO maximized noch nötig, wegen viewerBean.maximized?
