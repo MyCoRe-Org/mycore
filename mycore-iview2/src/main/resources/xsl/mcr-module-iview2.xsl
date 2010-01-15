@@ -333,7 +333,7 @@
       <xsl:text>';</xsl:text>
       <xsl:text>var mets_uri='</xsl:text>
       <xsl:value-of select="$mets_uri" />
-      <xsl:text>';</xsl:text>
+      <xsl:text>';styleFolderUri=styleFolderUri;</xsl:text>
       addIviewProperty('<xsl:value-of select="$groupID" />', 'startFile', "'<xsl:value-of select="$startFile" />'");
     </script>
   </xsl:template>
