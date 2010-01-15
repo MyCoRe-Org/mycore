@@ -113,13 +113,20 @@ function loadPage(pageData, viewID) {
 		Iview[viewID].zoomInit = Math.ceil((Iview[viewID].zoomMax + 1) / 2) - 1;
 	}
 	Iview[viewID].prefix  = findInArrayElement(pageData, "LOCTYPE", "URL").href;//findMETSEntry(pageData,"LOCTYPE", "URL").href;
+	
 	$("preload"+viewID).style.width = Iview[viewID].bildBreite / Math.pow(2, Iview[viewID].zoomMax - Iview[viewID].zoomInit) + "px";
 	$("preload"+viewID).style.height = Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - Iview[viewID].zoomInit) + "px";
+	$("preload"+viewID).removeChild($("preloadImg"+viewID));
+	var preload = new Image();
+	preload.id = "preloadImg" + viewID;
+	$("preload"+viewID).appendChild(preload);
+
 	if (viewerBean == null) {
 		initializeGraphic(viewID);
 		viewerBean = Iview[viewID].viewerBean;
 		viewerBean.addViewerZoomedListener(new listenerZoom(viewID));
 		viewerBean.addViewerMovedListener(new listenerMove(viewID));
+		preload.src = viewerBean.tileUrlProvider.assembleUrl(0,0,0);
 	} else {
 		// prevents that (max) Zoomlevel will be reached which doesn't exists
 		if (Iview[viewID].initialZoom < Iview[viewID].zoomMax) {
@@ -128,6 +135,7 @@ function loadPage(pageData, viewID) {
 			Iview[viewID].zoomInit = Iview[viewID].zoomMax;
 		}
 		viewerBean.tileUrlProvider.prefix = Iview[viewID].prefix;
+		preload.src = viewerBean.tileUrlProvider.assembleUrl(0,0,0);
 		viewerBean.resize();
 	}
 	// moves viewer to zoomLevel zoomInit
@@ -155,14 +163,8 @@ function loadPage(pageData, viewID) {
 	var initX = toFloat(window.location.search.get("x"));;
 	var initY = toFloat(window.location.search.get("y"));
 	viewerBean.positionTiles ({'x' : initX, 'y' : initY}, true);
-	$("preload"+viewID).removeChild($("preloadImg"+viewID));
-	var preload = new Image();
 	preload.style.width = "100%";
 	preload.style.height = "100%";
-	preload.id = "preloadImg" + viewID;
-	preload.src = viewerBean.tileUrlProvider.assembleUrl(0,0,0);
-	
-	$("preload"+viewID).appendChild(preload);
 	//$("preload"+viewID).style.visibility = "visible";
 	if (Iview[viewID].useCutOut) {
 		Iview[viewID].ausschnitt.setSRC(viewerBean.tileUrlProvider.assembleUrl(0,0,0));
