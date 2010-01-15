@@ -867,6 +867,27 @@ function loading(viewID) {
 	Iview[viewID].startFile = Iview[viewID].startFile.replace(/^\/*/,"");
 	loadPage([{"LOCTYPE":"URL","href":Iview[viewID].startFile}],viewID);
 	Iview[viewID].loaded = true;
+
+	// surface muss als Blank geladen werden, damit Ebene gefüllt und es im Vordergrund des Viewers liegt
+	// hauptsächlich wegen IE notwendig
+	getElementsByClassName("surface","viewer"+viewID,"div")[0].style.backgroundImage = "url("+Iview[viewID].webappBaseUri+"modules/iview2/web/gfx/blank.gif"+")";
+	// PermaLink Handling
+	
+	if (window.location.search.get("tosize") == "width") {
+		pictureWidth(viewID);
+	} else if (window.location.search.get("tosize") == "screen") {
+		pictureScreen(viewID);
+	} else if (isNaN(parseInt(window.location.search.get("zoom")))){
+		pictureScreen(viewID);
+	}
+	if (window.location.search.get("maximized") == "true") {
+		maximizeHandler(viewID);
+	}
+	
+	// nochmals notwendig, da Scale erst hier verf�gbar f�r erstes Bild
+	// Actualize forward & backward Buttons
+	getElementsByClassName("BSE_forwardBehind "+viewID, "viewerContainer"+viewID, "div")[0].style.top = ((((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - 1)) * Iview[viewID].zoomScale) - toInt(getStyle(getElementsByClassName("BSE_forwardBehind "+viewID, "viewerContainer"+viewID, "div")[0],"height"))) / 2) + "px";
+	getElementsByClassName("BSE_backwardBehind "+viewID, "viewerContainer"+viewID, "div")[0].style.top = ((((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - 1)) * Iview[viewID].zoomScale) - toInt(getStyle(getElementsByClassName("BSE_backwardBehind "+viewID, "viewerContainer"+viewID, "div")[0],"height"))) / 2) + "px";
 	
 	var mets_uri = Iview[viewID].webappBaseUri + "servlets/" + ((Iview[viewID].hasMets)? "MCRFileNodeServlet/": "MCRDirectoryXMLServlet/") + viewID + ((Iview[viewID].hasMets)? "/mets.xml":"");
 	Iview[viewID].buchDaten = (Iview[viewID].hasMets)? loadXML(mets_uri):loadXML(mets_uri, "mets");
@@ -917,24 +938,4 @@ function loading(viewID) {
 	} else {
 		ManageEvents.addEventListener(window, 'resize', function() { reinitializeGraphic(viewID);}, false);
 	}
-	// surface muss als Blank geladen werden, damit Ebene gefüllt und es im Vordergrund des Viewers liegt
-	// hauptsächlich wegen IE notwendig
-	getElementsByClassName("surface","viewer"+viewID,"div")[0].style.backgroundImage = "url("+Iview[viewID].webappBaseUri+"modules/iview2/web/gfx/blank.gif"+")";
-	// PermaLink Handling
-	
-	if (window.location.search.get("tosize") == "width") {
-		pictureWidth(viewID);
-	} else if (window.location.search.get("tosize") == "screen") {
-		pictureScreen(viewID);
-	} else if (isNaN(parseInt(window.location.search.get("zoom")))){
-		pictureScreen(viewID);
-	}
-	if (window.location.search.get("maximized") == "true") {
-		maximizeHandler(viewID);
-	}
-	
-	// nochmals notwendig, da Scale erst hier verf�gbar f�r erstes Bild
-	// Actualize forward & backward Buttons
-	getElementsByClassName("BSE_forwardBehind "+viewID, "viewerContainer"+viewID, "div")[0].style.top = ((((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - 1)) * Iview[viewID].zoomScale) - toInt(getStyle(getElementsByClassName("BSE_forwardBehind "+viewID, "viewerContainer"+viewID, "div")[0],"height"))) / 2) + "px";
-	getElementsByClassName("BSE_backwardBehind "+viewID, "viewerContainer"+viewID, "div")[0].style.top = ((((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - 1)) * Iview[viewID].zoomScale) - toInt(getStyle(getElementsByClassName("BSE_backwardBehind "+viewID, "viewerContainer"+viewID, "div")[0],"height"))) / 2) + "px";
 }

@@ -268,7 +268,7 @@
 }
 .buttonSurface .BSE_backwardBehind {
 	position: absolute;
-	top: -30px;
+	top: 10px;
 	background-image: url('image.png');
 	background-repeat: no-repeat;
 	background-position: -90px -0px;
@@ -293,7 +293,7 @@
 }
 .buttonSurface .BSE_forwardBehind {
 	position: absolute;
-	top: -30px;
+	top: 10px;
 	background-image: url('image.png');
 	background-repeat: no-repeat;
 	background-position: -150px -0px;

@@ -1,6 +1,5 @@
 //TODO einbauen das Scrollbar minimale Größe hat, damit man sie noch benutzen kann
 //TODO einbauen das Stepper wie normale ScrollBar sich bewegt und dann einrastet beim loslassen
-//TODO automatisch das Intervall löschen sobald der Balken am Ende angekommen ist 
 function scrollBar(newId) {
 //Constants
 	scrollBar.STARTCL = "start";
@@ -84,6 +83,18 @@ function scrollBar(newId) {
 	this.mouseMove = null;
 	this.scroll = null;
 
+	function addInterval(intervalFunc, time) {
+		if (interval != null) {
+			dropInterval();
+			console.log("Dropped",interval);
+		}
+		interval = setInterval(intervalFunc,time);
+	}
+	
+	function dropInterval() {
+		clearInterval(interval);
+		interval = null;
+	}
 	/*
 	@description creates a new fully featured ScrollBar
 	@param horizontal boolean which defines if the scrollbar is used as horizontal one or vertical
@@ -158,6 +169,7 @@ function scrollBar(newId) {
 						move = Math.abs(move + curValue);
 						curValue = 0;
 						bar.style.left = margin + scrollBar.UNIT;
+						dropInterval();
 					} else {
 						bar.style.left= Math.round(curValue * areaRatio) + margin + scrollBar.UNIT;
 					}
@@ -167,6 +179,7 @@ function scrollBar(newId) {
 						move = Math.abs(move + curValue);
 						curValue = 0;
 						bar.style.top = margin + scrollBar.UNIT;
+						dropInterval();
 					} else {
 						bar.style.top = Math.round(curValue * areaRatio) + margin + scrollBar.UNIT;
 					}
@@ -187,19 +200,21 @@ function scrollBar(newId) {
 				//move = Math.round(move / areaRatio);
 				curValue += move;
 				if (!horz) {
-					if (curValue > maxValue) {
+					if (curValue >= maxValue) {
 						move = curValue - maxValue;
 						curValue = maxValue;
 						bar.style.top = bar.parentNode.offsetHeight - bar.offsetHeight - margin + scrollBar.UNIT;
+						dropInterval();
 					} else {
 						bar.style.top = Math.round(curValue * areaRatio) + margin + scrollBar.UNIT;
 					}
 					notifyListenerMove({'x': 0, 'y': move});
 				} else {
-					if (curValue > maxValue) {
+					if (curValue >= maxValue) {
 						move = curValue - maxValue;
 						curValue = maxValue;
 						bar.style.left = bar.parentNode.offsetWidth - bar.offsetWidth - margin + scrollBar.UNIT;
+						dropInterval();
 					} else {
 						bar.style.left = Math.round(curValue * areaRatio) + margin + scrollBar.UNIT;
 					}
@@ -234,20 +249,20 @@ function scrollBar(newId) {
 
 			if (before) {
 				if (((parseInt(bar.style.left) - jump) <= layerX) && horz) {
-					clearInterval(interval);
+					dropInterval();
 					moveUp(parseInt(bar.style.left)  - layerX);
 				} else if ((parseInt(bar.style.top) - jump <= layerY) && !horz) {
-					clearInterval(interval);
+					dropInterval();
 					moveUp(parseInt(bar.style.top) - layerY);
 				} else {
 					moveUp(jumpStep);
 				}
 			} else {
 				if (((parseInt(bar.style.left) + bar.offsetWidth + jump) >= layerX) && horz) {
-					clearInterval(interval);
+					dropInterval();
 					moveDown(layerX - parseInt(bar.style.left) - bar.offsetWidth);
 				} else if (((parseInt(bar.style.top) + bar.offsetHeight + jump) >= layerY) && !horz) {
-					clearInterval(interval);
+					dropInterval();
 					moveDown(layerY - parseInt(bar.style.top) - bar.offsetHeight);
 				} else {
 					moveDown(jumpStep);
@@ -260,6 +275,8 @@ function scrollBar(newId) {
 		@param e Event which holds the current Event
 		*/
 		function upLeftMouseDown(e) {
+			mouseDown = true;
+			dropInterval();
 			moveUp();
 			window.setTimeout(function() { delayUpLeft();},scrollDelay);
 			return false;
@@ -269,7 +286,10 @@ function scrollBar(newId) {
 		 @description starts the autoscrolling when the mouse is kept pressed
 		 */
 		function delayUpLeft() {
-			interval = setInterval(function() { moveUp();}, timeInt);
+			if (mouseDown) {
+				addInterval(function() { moveUp();}, timeInt);
+			}
+			//interval = setInterval(function() { moveUp();}, timeInt);
 		}
 
 		/*
@@ -277,14 +297,15 @@ function scrollBar(newId) {
 		@param e event which holds the current MouseEvent
 		*/
 		function upLeftMouseUp(e) {
+			dropInterval();
 			mouseDown = false;
-			clearInterval(interval);
 		}
 		/*
 		@description Starts the Drag&Drop of the Button by saving the initial Position of the Bar related to the mouse Position
 		@param e event which holds the Event happening Position
 		*/
 		function divMouseDown(e) {
+			dropInterval();
 			e = getEvent(e);
 			mouseDown = true;
 			oldPos = {'x': e.clientX, 'y': e.clientY};
@@ -298,10 +319,10 @@ function scrollBar(newId) {
 		@param e event which holds the mouseUp Event
 		*/
 		function divMouseUp(e) {
+			dropInterval();
 			e = getEvent(e);
 			mouseDown = false;
 			outOfBar = false;
-			clearInterval(interval);
 		}
 
 		/*
@@ -399,6 +420,7 @@ function scrollBar(newId) {
 		@param e event which holds the MouseClick Position
 		*/
 		function dbgMouseDown(e) {
+			dropInterval();
 			e = getEvent(e);
 			mouseDown = true;
 			outOfBar = true;
@@ -408,15 +430,17 @@ function scrollBar(newId) {
 				|| (((parseInt(bar.style.left) + bar.offsetWidth) < layerX) && horz)) {
 				stopUnderMouse(e, false);
 				var ev = {'layerX': layerX, 'layerY': layerY};
-				if (!noRepeat) {
-					interval = setInterval(function() { stopUnderMouse(ev, false);}, timeInt);
+				if (!noRepeat && mouseDown) {
+					addInterval(function() { stopUnderMouse(ev, false);}, timeInt);
+					//interval = setInterval(function() { stopUnderMouse(ev, false);}, timeInt);
 				}
 			} else if (((layerY < parseInt(bar.style.top)) && !horz) 
 				|| ((layerX < parseInt(bar.style.left)) && horz)) {
 				stopUnderMouse(e, true);
 				var ev = {'layerX': layerX, 'layerY': layerY};
-				if (!noRepeat) {
-					interval = setInterval(function() { stopUnderMouse(ev, true);}, timeInt);
+				if (!noRepeat && mouseDown) {
+					addInterval(function() { stopUnderMouse(ev, true);}, timeInt);
+					//interval = setInterval(function() { stopUnderMouse(ev, true);}, timeInt);
 				}
 			}
 			e.cancelBubble = true;
@@ -430,7 +454,7 @@ function scrollBar(newId) {
 		function dbgMouseUp(e) {
 			mouseDown = false;
 			outOfBar = false;
-			clearInterval(interval);
+			dropInterval();
 		}
 
 		/*
@@ -452,6 +476,8 @@ function scrollBar(newId) {
 		@param e Event which holds the current Event
 		*/
 		function downRightMouseDown(e) {
+			mouseDown = true;
+			dropInterval();
 			moveDown();
 			window.setTimeout(function() {delayDownRight()},scrollDelay);
 			return false;
@@ -461,7 +487,10 @@ function scrollBar(newId) {
 		 @description starts the autoscrolling when the mouse is kept pressed
 		 */
 		function delayDownRight() {
-			interval = setInterval(function() { moveDown();}, timeInt);
+			if (mouseDown) {
+				addInterval(function() { moveDown();}, timeInt);
+			}
+			//interval = setInterval(function() { moveDown();}, timeInt);
 		}
 		
 		/*
@@ -469,7 +498,8 @@ function scrollBar(newId) {
 		@param e event which happened
 		*/
 		function downRightMouseUp(e) {
-			clearInterval(interval);
+			dropInterval();
+			mouseDown = false;
 		}
 	//Start Init Function creation of the Div Structure and registering all needed Events so that the Scrollbar is fully functional
 		horz = horizontal;

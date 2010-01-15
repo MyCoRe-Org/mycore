@@ -610,7 +610,8 @@ function chapter(newId, parent) {
 		scrollY.setParent(id);
 		scrollY.setSize(main.style.height);
 		//TODO immer noch die letzte Seite mit drin stehen lassen als Orientierung
-		scrollY.setJumpStep(parseInt(my.content.clientHeight));
+		//console.log();
+		scrollY.setJumpStep(parseInt(my.content.clientHeight)-my.content.firstChild.firstChild.clientHeight);
 
 		//EventRegistrations
 		ManageEvents.addEventListener(document, 'mousemove', scrollY.mouseMove, false);
