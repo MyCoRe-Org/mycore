@@ -319,6 +319,8 @@ function switchDisplayMode(screenZoom, stateBool, viewID) {
 			}
 		}
 		viewerBean.init();//TODO not working here
+		// zoomIn-Button einblenden, da min ein "groesseres" ZoomLevel existiert, von dem aus runterskaliert wurde
+		if (classIsUsed("BSE_zoomIn")) doForEachInClass("BSE_zoomIn", ".style.display = 'block';", viewID);
 	} else {
 		Iview[viewID].zoomScale = 1;
 		viewerBean.tileSize = /*Iview[viewID].*/tilesize;
@@ -422,6 +424,7 @@ function listenerZoom(viewID) {
 	this.viewerZoomed = function (zoomEvent) {
 		var viewID = this.viewID;
 		var viewerBean = Iview[viewID].viewerBean;
+		
 		// handle special Modes, needs to close
 		if (Iview[viewID].zoomWidth) {
 			pictureWidth(viewID, true);
@@ -786,6 +789,20 @@ function getPageNumberFromPic(viewID) {
 			}
 		}
 	}
+}
+// direction: true = in, false = out
+function zoomViewer(viewID, direction) {
+	if (direction) {
+		// gesetzt den Fall, es wird vom obersten Level weiter gezoomt (falls Screen oder Width aktiv waren)
+		if (Iview[viewID].viewerBean.zoomLevel == Iview[viewID].zoomMax) {
+			Iview[viewID].viewerBean.zoom(0);
+		} else {
+			Iview[viewID].viewerBean.zoom(1);
+		}
+	} else {
+		Iview[viewID].viewerBean.zoom(-1);
+	}
+	if(Iview[viewID].useZoomBar) {Iview[viewID].zoomBar.moveBarToLevel(Iview[viewID].viewerBean.zoomLevel)};
 }
 /*
 @description is calling to the load-event of the window; serve for the further registration of events likewise as initioator for various objects

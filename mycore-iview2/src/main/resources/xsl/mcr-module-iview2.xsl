@@ -95,8 +95,9 @@
         <xsl:when test="$zoomIn = 'true'">
           <div class="BSE_zoomInBehind {$groupID}">
             <div class="BSE_zoomIn {$groupID}"
-              onclick="Iview['{$groupID}'].viewerBean.zoom(1); if(Iview['{$groupID}'].useZoomBar) Iview['{$groupID}'].zoomBar.moveBarToLevel(Iview['{$groupID}'].viewerBean.zoomLevel);"
+              onclick="zoomViewer('{$groupID}', true);"
               title="{i18n:translate('component.iview2.zoomIn')}">
+              <!-- onclick="Iview['{$groupID}'].viewerBean.zoom(1); if(Iview['{$groupID}'].useZoomBar) Iview['{$groupID}'].zoomBar.moveBarToLevel(Iview['{$groupID}'].viewerBean.zoomLevel);"-->
             </div>
           </div>
         </xsl:when>
@@ -105,8 +106,9 @@
         <xsl:when test="$zoomOut = 'true'">
           <div class="BSE_zoomOutBehind {$groupID}">
             <div class="BSE_zoomOut {$groupID}"
-              onclick="Iview['{$groupID}'].viewerBean.zoom(-1); if(Iview['{$groupID}'].useZoomBar) Iview['{$groupID}'].zoomBar.moveBarToLevel(Iview['{$groupID}'].viewerBean.zoomLevel);"
+              onclick="zoomViewer('{$groupID}', false);"
               title="{i18n:translate('component.iview2.zoomOut')}">
+              <!-- onclick="Iview['{$groupID}'].viewerBean.zoom(-1); if(Iview['{$groupID}'].useZoomBar) Iview['{$groupID}'].zoomBar.moveBarToLevel(Iview['{$groupID}'].viewerBean.zoomLevel);"-->
             </div>
           </div>
         </xsl:when>
