@@ -47,7 +47,7 @@ function pageForm(newId, parent, identer) {
 	function init() {
 		if (arguments[0]) amountForms = arguments[0];
 	
-		main = document.createElement("form");
+		var main = document.createElement("form");
 		main.id = id + amountForms;
 		main.className = identer + amountForms;
 		$(parent).appendChild(main);
@@ -55,7 +55,7 @@ function pageForm(newId, parent, identer) {
 		pEl = document.createElement("p");
 		main.appendChild(pEl);
 		
-		selection = document.createElement("select");
+		var selection = document.createElement("select");
 		selection.className = identer + "Select" + amountForms;;
 		selection.size = "1";
 		selection.style.fontFamily = "arial";
@@ -83,7 +83,7 @@ function pageForm(newId, parent, identer) {
 					option.className = identer + "Option2";
 				}*/
 				option.value = i;
-				// TODO: eine Variable in XML die römische Ziffern ein bzw ausschaltet
+				// TODO: eine Variable in XML die rï¿½mische Ziffern ein bzw ausschaltet
 				if (false) {
 					option.innerHTML = arabToRoem(i) + "  /  " + arabToRoem(numberOfPages);
 				} else {
