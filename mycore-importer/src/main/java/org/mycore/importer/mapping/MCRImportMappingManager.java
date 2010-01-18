@@ -32,7 +32,7 @@ import org.mycore.importer.mapping.resolver.uri.MCRImportURIResolverMananger;
 
 /**
  * This singleton class manages and distributes all tasks associated with the
- * import mapping.
+ * import mapping!
  * 
  * @author Matthias Eichner
  */
