@@ -993,11 +993,9 @@
 	bottom: 10px;
 	left: 10px; /* gewisser Abstand besteht in jedem Fall (resultiert aus .chapter1 .chapter) */
 	right: 50px;
-/*
-	font-size: 19px;
-	line-height: 22px;
-	font-family: Times;
-*/
+	font-size: 14px;
+	/*line-height: 15px;*/
+	/*font-family: verdana, sans-serif;*/
 	cursor: pointer;
 	overflow: hidden;
 }
@@ -1021,7 +1019,7 @@
 /* Entry Symbols */
 .chapter1 .pageImageSymbol {
 	position: relative;
-	top: 3px;
+	top: 5px;
 	height: 11px;
 	width: 11px;
 	background-image: url('image.png');
@@ -1031,7 +1029,7 @@
 }
 .chapter1 .chapterImageSymbolMinus {
 	position: relative;
-	top: 3px;
+	top: 5px;
 	height: 11px;
 	width: 11px;
 	background-image: url('image.png');
@@ -1041,7 +1039,7 @@
 }
 .chapter1 .chapterImageSymbolPlus {
 	position: relative;
-	top: 3px;
+	top: 5px;
 	height: 11px;
 	width: 11px;
 	background-image: url('image.png');

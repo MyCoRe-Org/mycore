@@ -316,10 +316,13 @@ function copyArray(array) {
 @description cut one sign after the next of a textline in the chapter until the correct width is reached
 */
 function getTextWidth(txt, font, size) {
-	var tmpBox = document.createElement("tmpBox");
+	var tmpBox = document.createElement("span");
 	tmpBox.id = "tmpBox";
+	//tmpBox.style.display = "inline";
+	// Groesse soll sich am Textinhalt orientieren, keine ungewolten Zeilenumbrueche
+	tmpBox.style.whiteSpace = "pre";
 	tmpBox.style.fontFamily = "'"+font+"'";
-	tmpBox.style.fontSize = parseInt(size) + "px";
+	tmpBox.style.fontSize = toInt(size) + "px";
 	tmpBox.innerHTML = txt;
 	document.getElementsByTagName("body")[0].appendChild(tmpBox);
 	var returnValue = tmpBox.offsetWidth;
