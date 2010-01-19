@@ -322,6 +322,10 @@ function switchDisplayMode(screenZoom, stateBool, viewID) {
 		viewerBean.init();//TODO not working here
 		// zoomIn-Button einblenden, da min ein "groesseres" ZoomLevel existiert, von dem aus runterskaliert wurde
 		if (classIsUsed("BSE_zoomIn")) doForEachInClass("BSE_zoomIn", ".style.display = 'block';", viewID);
+		
+		if (getElementsByClassName("buttonSurface min", $("viewerContainer"+viewID), "div")[0]) {
+			getElementsByClassName("buttonSurface min", $("viewerContainer"+viewID), "div")[0].style.width = $("preload"+viewID).offsetWidth + "px";
+		}
 	} else {
 		Iview[viewID].zoomScale = 1;
 		viewerBean.tileSize = /*Iview[viewID].*/tilesize;
