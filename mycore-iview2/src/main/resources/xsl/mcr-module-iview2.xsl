@@ -332,7 +332,7 @@
       //window.setTimeout("loading('"+viewID+"')", 100);
       loading(viewID);
       }
-      window.onload = function() { startViewer('<xsl:value-of select="$groupID"/>');};
+      ManageEvents.addEventListener(window, 'load', function() { startViewer('<xsl:value-of select="$groupID"/>');}, false);
     </script>
   </xsl:template>
   <xsl:template name="iview2.getZoomBar">
