@@ -352,6 +352,9 @@ function maximizeHandler(viewID) {
 		if (classIsUsed("BSE_fullView")) doForEachInClass("BSE_fullView", ".style.display = 'block';", viewID);
 		if (classIsUsed("BSE_normalView")) doForEachInClass("BSE_normalView", ".style.display = 'none';", viewID);
 		
+		// wegen IE7 zusätzlich
+		document.documentElement.style.overflow="";
+		
 		document.body.style.overflow="";
 		document.body.style.visibility = "visible";
 
@@ -383,7 +386,10 @@ function maximizeHandler(viewID) {
 		}*/
 		if (classIsUsed("BSE_fullView")) doForEachInClass("BSE_fullView", ".style.display = 'none';", viewID);
 		if (classIsUsed("BSE_normalView")) doForEachInClass("BSE_normalView", ".style.display = 'block';", viewID);
-				
+		
+		// wegen IE7 zusätzlich
+		document.documentElement.style.overflow="hidden";
+		
 		document.body.style.overflow="hidden";
 		document.body.style.visibility = "hidden";
 
