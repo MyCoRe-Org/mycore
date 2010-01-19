@@ -263,41 +263,39 @@
       <xsl:value-of select="$DampInViewer" />
       <xsl:text>;</xsl:text>
     </script>
-    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/ManageEvents.js" />
-    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/EventUtils.js" />
-    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/PanoJS.js" />
+    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/ManageEvents.js" />
+    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/EventUtils.js" />
+    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/PanoJS.js" />
     <!-- Viewer -->
-    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/XML.js" />
+    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/XML.js" />
     <!--XML Funktionen-->
-    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/Utils.js" />
+    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/Utils.js" />
     <!--Allgemeine Util Funktionen-->
-    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/navigation.js" />
+    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/navigation.js" />
     <!--Navigation Functions-->
-    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/scrollBars.js" />
+    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/scrollBars.js" />
     <!--Scrollbar Klasse-->
-    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/blendWorks.js" />
+    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/blendWorks.js" />
     <!--Blend Funktionen-->
-    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/cutOut.js" />
+    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/cutOut.js" />
     <!--Ausschnittbildchen Klasse-->
-    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/chapter.js" />
+    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/chapter.js" />
     <!--Chapter Klasse-->
-    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/overview.js" />
+    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/overview.js" />
     <!--Overview Klasse-->
-    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/Thumbnail.js" />
+    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/Thumbnail.js" />
     <!--Hauptdatei-->
-    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/zoomBar.js" />
+    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/zoomBar.js" />
     <!--ZoomBar-->
-    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/pageInput.js" />
+    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/pageInput.js" />
     <!--PageInput-->
-    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/pageForm.js" />
+    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/pageForm.js" />
     <!--PageForm-->
-    <!-- params out of config.xml -->
-    <script type="text/javascript">function startViewer(viewID) {
-      if (Iview[viewID].started) return;
-      Iview[viewID].started = true;
-      //TODO: vorher 1000, jetz sporadischer Fehler: StyleFolderUri not found
-      window.setTimeout("loading('"+viewID+"')", 100);
-      }
+    <script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/init.js"/>
+    <!-- Init Funktionen -->
+    <script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/prototype.js"/>
+    <!-- Prototype Framework -->
+    <script type="text/javascript">
       function addIviewProperty(viewID, propertyName, val) {
       if (typeof (Iview) == "undefined") eval("Iview = new Object()");
       if (typeof (Iview[viewID]) == "undefined") {
@@ -312,29 +310,29 @@
     <xsl:param name="style" select="'default'" />
     <!-- params out of config.xml -->
     <xsl:param name="styleFolderUri" select="'gfx/'" />
-    <xsl:param name="pagenumber" select="'1'" />
+    <xsl:param name="pagenumber" select="'1'" /><!-- TODO sollte entfernt werden da startFile Aufgabe übernimmt -->
     <xsl:param name="mets_uri" />
     <xsl:param name="startFile" />
-    <script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/init.js" onreadystatechange="startViewer('{$groupID}')"
-      onload="startViewer('{$groupID}')" />
+
 
     <link id="cssSheet{$groupID}" rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}/modules/iview2/web/gfx/{$style}/style.css" />
     <!-- Initfunktionen -->
     <script type="text/javascript">
     <!-- Philipp möchte verbessern -->
-      <xsl:text>var styleName='</xsl:text>
-      <xsl:value-of select="$style" />
-      <xsl:text>';</xsl:text>
-      <xsl:text>var styleFolderUri='</xsl:text>
-      <xsl:value-of select="$styleFolderUri" />
-      <xsl:text>';</xsl:text>
-      <xsl:text>var pagenumber='</xsl:text>
-      <xsl:value-of select="$pagenumber" />
-      <xsl:text>';</xsl:text>
-      <xsl:text>var mets_uri='</xsl:text>
-      <xsl:value-of select="$mets_uri" />
-      <xsl:text>';styleFolderUri=styleFolderUri;</xsl:text>
+      var styleName='<xsl:value-of select="$style" />';
+      var styleFolderUri='<xsl:value-of select="$styleFolderUri" />';
+      var pagenumber='<xsl:value-of select="$pagenumber" />';
+      var mets_uri='<xsl:value-of select="$mets_uri" />';
       addIviewProperty('<xsl:value-of select="$groupID" />', 'startFile', "'<xsl:value-of select="$startFile" />'");
+      
+      function startViewer(viewID) {
+      if (Iview[viewID].started) return;
+      Iview[viewID].started = true;
+      //TODO: vorher 1000, jetz sporadischer Fehler: StyleFolderUri not found
+      //window.setTimeout("loading('"+viewID+"')", 100);
+      loading(viewID);
+      }
+      window.onload = function() { startViewer('<xsl:value-of select="$groupID"/>');};
     </script>
   </xsl:template>
   <xsl:template name="iview2.getZoomBar">

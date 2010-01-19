@@ -116,20 +116,6 @@ function doForEachInClass(className, perform) {
 }
 
 /*
-@description returns the object of a given String/Object, Object is then directly accessable by $(foobar).MyFunction
-@param id the Id or the object itself which we want to access
-@return object which was requested
-*/
-/*
-function $(id) {
-	if (typeof id == "object") {
-		return id;
-	} else {
-		return document.getElementById(id);
-	}
-}
-*/
-/*
 @description converts a given String into an integer, but further doesn't give NAN for String was undefined and other cases
 @param value which shall be converted into an integer
 @return integer of parsed string, 0 if var was undefined

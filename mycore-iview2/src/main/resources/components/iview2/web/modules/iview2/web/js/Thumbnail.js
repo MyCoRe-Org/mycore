@@ -170,7 +170,6 @@ function loadPage(pageData, viewID) {
 		Iview[viewID].ausschnitt.setSRC(viewerBean.tileUrlProvider.assembleUrl(0,0,0));
 	}
 }
-
 /*
 @description blend in the overview an creates it by the first call
 */
@@ -891,8 +890,20 @@ function loading(viewID) {
 	getElementsByClassName("BSE_forwardBehind "+viewID, "viewerContainer"+viewID, "div")[0].style.top = ((((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - 1)) * Iview[viewID].zoomScale) - toInt(getStyle(getElementsByClassName("BSE_forwardBehind "+viewID, "viewerContainer"+viewID, "div")[0],"height"))) / 2) + "px";
 	getElementsByClassName("BSE_backwardBehind "+viewID, "viewerContainer"+viewID, "div")[0].style.top = ((((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - 1)) * Iview[viewID].zoomScale) - toInt(getStyle(getElementsByClassName("BSE_backwardBehind "+viewID, "viewerContainer"+viewID, "div")[0],"height"))) / 2) + "px";
 	
-	var mets_uri = Iview[viewID].webappBaseUri + "servlets/" + ((Iview[viewID].hasMets)? "MCRFileNodeServlet/": "MCRDirectoryXMLServlet/") + viewID + ((Iview[viewID].hasMets)? "/mets.xml":"");
-	Iview[viewID].buchDaten = (Iview[viewID].hasMets)? loadXML(mets_uri):loadXML(mets_uri, "mets");
+	var mets_uri = Iview[viewID].webappBaseUri + "servlets/" + ((Iview[viewID].hasMets)? "MCRFileNodeServlet/": "MCRDirectoryXMLServlet/") + viewID + ((Iview[viewID].hasMets)? "/mets.xml":"?XSL.Style=mets");
+	new Ajax.Request(mets_uri, {
+		method: 'get',
+  		onSuccess: function(response) {processMETS(response.responseXML,viewID)},
+  		onException: function() {alert("Error Occured while Loading METS file");}
+	});
+}
+
+/*
+ @description process the loaded mets and do all final configurations like setting the pagenumber, generating Chapter and so on
+ @param metsDoc Document which holds in METS/MODS structure all needed informations to generate an chapter and overview of of the supplied data
+ */
+function processMETS(metsDoc, viewID) {
+	Iview[viewID].buchDaten = metsDoc;//(Iview[viewID].hasMets)? loadXML(mets_uri):loadXML(mets_uri, "mets");
 	Iview[viewID].amountPages = getPageCount(Iview[viewID].buchDaten);
 	
 	getPageNumberFromPic(viewID);
