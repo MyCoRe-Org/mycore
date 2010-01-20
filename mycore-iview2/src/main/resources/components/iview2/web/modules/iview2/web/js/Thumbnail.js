@@ -160,7 +160,7 @@ function loadPage(pageData, viewID) {
 	// damit das alte zoomBack bei Modi-Austritt nicht verwendet wird
 	Iview[viewID].zoomBack = Iview[viewID].zoomInit;
 	
-	var initX = toFloat(window.location.search.get("x"));;
+	var initX = toFloat(window.location.search.get("x"));
 	var initY = toFloat(window.location.search.get("y"));
 	viewerBean.positionTiles ({'x' : initX, 'y' : initY}, true);
 	preload.style.width = "100%";
@@ -536,11 +536,15 @@ function openChapter(major, viewID){
 		//alert(warnings[0])
 		return;
 	}
+	var chapter=$("chapter1"+viewID);
+	if (chapter == null){
+		return;
+	}
 	//TODO Positionierung klappt bei WebKit nicht, da die irgendwie CSS nicht einlesen durch Chapter einbau in Viewer kÃƒÂ¶nnte das behoben werden
 	if (major) {
 		// für major (Button) always reaction
-		if ($("chapter1"+viewID).style.visibility == "hidden") {
-			$("chapter1"+viewID).style.visibility = "visible";
+		if (chapter.style.visibility == "hidden") {
+			chapter.style.visibility = "visible";
 			Iview[viewID].chapter1.showCurrentPageCenter(Iview[viewID].pagenumber);
 			blendings.slide("chapter1"+viewID, new Array(getStyle("chapter1"+viewID,"left"),0,getStyle("chapter1"+viewID,"left"),($("chapter1" + viewID).offsetHeight)),5,5,0,new Array(), "");
 			Iview[viewID].chapterActive = true;
@@ -550,19 +554,19 @@ function openChapter(major, viewID){
 		}
 	} else {
 		// nur dann einblenden, wenn es durch Modus ausgeblendet wurde
-		if (Iview[viewID].chapterActive && !Iview[viewID].overviewActive && Iview[viewID].maximized && $("chapter1"+viewID).style.visibility == "hidden") {
-			$("chapter1"+viewID).style.visibility = "visible";
+		if (Iview[viewID].chapterActive && !Iview[viewID].overviewActive && Iview[viewID].maximized && chapter.style.visibility == "hidden") {
+			chapter.style.visibility = "visible";
 			Iview[viewID].chapter1.showCurrentPageCenter(Iview[viewID].pagenumber);
 			blendings.slide("chapter1"+viewID,new Array(toFloat(getStyle($("chapter1"+viewID+"Out"), "left")) - toFloat(getStyle($("chapter1"+viewID+"Out"), "right")), toFloat(getStyle($("chapter1"+viewID+"Out"),"top")), toFloat(getStyle($("chapter1"+viewID+"In"), "left")) - toFloat(getStyle($("chapter1"+viewID+"In"), "right")), toFloat(getStyle($("chapter1"+viewID+"In"), "top"))),5,5,0,new Array("chapter1"+viewID+":in"));
-		} else if (Iview[viewID].chapterActive && !Iview[viewID].overviewActive && Iview[viewID].maximized && $("chapter1"+viewID).style.visibility == "visible") {
+		} else if (Iview[viewID].chapterActive && !Iview[viewID].overviewActive && Iview[viewID].maximized && chapter.style.visibility == "visible") {
 			// nothing to do
-		} else if ($("chapter1"+viewID).style.visibility == "visible" && Iview[viewID].overviewActive) {
+		} else if (chapter.style.visibility == "visible" && Iview[viewID].overviewActive) {
 			// do nothing for Overview
-		} else if ($("chapter1"+viewID).style.visibility == "visible") {
+		} else if (chapter.style.visibility == "visible") {
 			//blendings.slide("chapter1"+viewID,new Array(toFloat(getStyle($("chapter1"+viewID+"In"), "left")) - toFloat(getStyle($("chapter1"+viewID+"In"), "right")), toFloat(getStyle($("chapter1"+viewID+"In"), "top")), toFloat(getStyle($("chapter1"+viewID+"Out"), "left")) - toFloat(getStyle($("chapter1"+viewID+"Out"), "right")), toFloat(getStyle($("chapter1"+viewID+"Out"), "top"))),60,10,0,new Array("chapter1"+viewID+":out"), "", "$('chapter1'+'"+viewID+"').style.visibility = 'hidden'");
 			// chapter soll sofort weg sein, nicht erst noch blenden, bspw. wenn vom Vollbild zurück ins normale
-			$("chapter1"+viewID).style.visibility = 'hidden';
-			$("chapter1"+viewID).style.top = getStyle($("chapter1"+viewID+"Out"), "top");
+			chapter.style.visibility = 'hidden';
+			chapter.style.top = getStyle($("chapter1"+viewID+"Out"), "top");
 		}
 		// last possible case (bool=false & vis=hidden) only for major
 	}
@@ -583,7 +587,7 @@ function updateModuls(viewID) {
 	getElementsByClassName("BSE_backwardBehind "+viewID, "viewerContainer"+viewID, "div")[0].style.top = ((((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - 1)) * Iview[viewID].zoomScale) - toInt(getStyle(getElementsByClassName("BSE_backwardBehind "+viewID, "viewerContainer"+viewID, "div")[0],"height"))) / 2) + "px";
 
 	// Actualize Chapter
-	if (Iview[viewID].useChapter) {
+	if (Iview[viewID].useChapter && typeof(Iview[viewID].chapter1)!=="undefined") {
 		Iview[viewID].chapter1.changePage(Iview[viewID].pagenumber);
 		//Iview[viewID].chapter1.posScroll(viewID);
 	}
@@ -900,6 +904,26 @@ function loading(viewID) {
   		onSuccess: function(response) {processMETS(response.responseXML,viewID)},
   		onException: function() {alert("Error Occured while Loading METS file");}
 	});
+	
+	if (Iview[viewID].useOverview) {
+		importOverview(viewID);
+		// actually be changed manually in CSS
+		if (classIsUsed("BSE_openThumbs")) doForEachInClass("BSE_openThumbs", ".style.display = 'block';", viewID);
+	}
+	
+	// Resize-Events registrieren
+	if (isBrowser("IE")) {
+		$("viewer"+viewID).parentNode.onresize = function() {reinitializeGraphic(viewID)};
+	} else {
+		ManageEvents.addEventListener(window, 'resize', function() { reinitializeGraphic(viewID);}, false);
+	}
+	
+	if (Iview[viewID].useZoomBar) {
+		importZoomBar(viewID);
+	}
+	
+	updateModuls(viewID);
+	
 }
 
 /*
@@ -925,11 +949,6 @@ function processMETS(metsDoc, viewID) {
 	if (classIsUsed("BSE_pageForm1")) {
 		Iview[viewID].pageFormObj.fill(Iview[viewID].amountPages);
 	}
-	
-	if (Iview[viewID].useZoomBar) {
-		importZoomBar(viewID);
-	}
-
 
 	if (Iview[viewID].useChapter) {
 		importChapter(viewID);
@@ -939,20 +958,6 @@ function processMETS(metsDoc, viewID) {
 			//if (classIsUsed("BSE_chapterOpener")) doForEachInClass("BSE_chapterOpener" ,".style.display = 'block';");
 		//}
 	}
-	
-	if (Iview[viewID].useOverview) {
-		importOverview(viewID);
-		// actually be changed manually in CSS
-		if (classIsUsed("BSE_openThumbs")) doForEachInClass("BSE_openThumbs", ".style.display = 'block';", viewID);
-	}
-	
 	//The currently not correct used Pagenumber is set to correct value
 	navigatePage(Iview[viewID].pagenumber,viewID,false);
-	
-	// Resize-Events registrieren
-	if (isBrowser("IE")) {
-		$("viewer"+viewID).parentNode.onresize = function() {reinitializeGraphic(viewID)};
-	} else {
-		ManageEvents.addEventListener(window, 'resize', function() { reinitializeGraphic(viewID);}, false);
-	}
 }
