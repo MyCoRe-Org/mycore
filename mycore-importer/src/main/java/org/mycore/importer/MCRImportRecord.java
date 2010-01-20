@@ -49,6 +49,15 @@ public class MCRImportRecord {
     }
 
     /**
+     * Removes a field from the record.
+     * 
+     * @param field the field to remove
+     */
+    public void removeField(MCRImportField field) {
+        fields.remove(field);
+    }
+
+    /**
      * Returns all fields in a list of this record.
      * 
      * @return a list of fields
@@ -58,11 +67,26 @@ public class MCRImportRecord {
     }
 
     /**
+     * Returns the first field from the field list selected
+     * by the given field id. If no field is found null is
+     * returned.
+     * 
+     * @param fieldId identifier of the field
+     * @return first <code>MCRImportField<code> or null if nothing found
+     */
+    public MCRImportField getFieldById(String fieldId) {
+        List<MCRImportField> fieldList = getFieldsById(fieldId);
+        if(fieldList.isEmpty())
+            return null;
+        return fieldList.get(0);
+    }
+
+    /**
      * Returns a list of fields from the field list selected
      * by the given field id. If no field with the
      * given id was found, a empty list is returned.
      * 
-     * @param fieldId the field id which identifies the field
+     * @param fieldId identifier of the field
      * @return a list of fields which have the fieldId
      */
     public List<MCRImportField> getFieldsById(String fieldId) {
@@ -76,9 +100,9 @@ public class MCRImportRecord {
 
     @Override
     public String toString() {
-        String returnString = name + ": ";
+        String returnString = name + ": (";
         for(MCRImportField f : fields)
-            returnString += f.toString() + ";";
-        return returnString;
+            returnString += f.toString() + "; ";
+        return returnString + ")";
     }
 }

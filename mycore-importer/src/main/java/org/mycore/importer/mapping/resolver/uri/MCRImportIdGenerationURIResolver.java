@@ -15,7 +15,7 @@ public class MCRImportIdGenerationURIResolver implements MCRImportURIResolver {
     private Hashtable<String, Integer> idCounterTable = new Hashtable<String, Integer>();    
 
     public String resolve(String uri, String oldValue) {
-        String key = uri.substring(uri.indexOf(":"));
+        String key = uri.substring(uri.indexOf(":") + 1);
         
         Integer currentCount = idCounterTable.get(key);
         if(currentCount == null)

@@ -6,7 +6,7 @@ import org.apache.log4j.Logger;
 import org.mycore.importer.mapping.resolver.metadata.MCRImportBooleanResolver;
 import org.mycore.importer.mapping.resolver.metadata.MCRImportClassificationResolver;
 import org.mycore.importer.mapping.resolver.metadata.MCRImportDerivateLinkResolver;
-import org.mycore.importer.mapping.resolver.metadata.MCRImportISODataResolver;
+import org.mycore.importer.mapping.resolver.metadata.MCRImportISODateResolver;
 import org.mycore.importer.mapping.resolver.metadata.MCRImportLinkIDResolver;
 import org.mycore.importer.mapping.resolver.metadata.MCRImportLinkResolver;
 import org.mycore.importer.mapping.resolver.metadata.MCRImportMetaXMLResolver;
@@ -53,7 +53,7 @@ public class MCRImportMetadataResolverManager {
         resolverList.add( new ResolverData<MCRImportTextResolver>("text", "MCRMetaLangText", MCRImportTextResolver.class) );
         resolverList.add( new ResolverData<MCRImportBooleanResolver>("boolean", "MCRMetaBoolean", MCRImportBooleanResolver.class) );
         resolverList.add( new ResolverData<MCRImportClassificationResolver>("classification", "MCRMetaClassification", MCRImportClassificationResolver.class) );
-        resolverList.add( new ResolverData<MCRImportISODataResolver>("date", "MCRMetaISO8601Date", MCRImportISODataResolver.class) );
+        resolverList.add( new ResolverData<MCRImportISODateResolver>("date", "MCRMetaISO8601Date", MCRImportISODateResolver.class) );
         resolverList.add( new ResolverData<MCRImportLinkIDResolver>("link", "MCRMetaLinkID", MCRImportLinkIDResolver.class) );
         resolverList.add( new ResolverData<MCRImportLinkResolver>("href", "MCRMetaLink", MCRImportLinkResolver.class) );
         resolverList.add( new ResolverData<MCRImportDerivateLinkResolver>("derlink", "MCRMetaDerivateLink", MCRImportDerivateLinkResolver.class) );

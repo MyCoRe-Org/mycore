@@ -48,7 +48,7 @@ public abstract class MCRImportAbstractMapper implements MCRImportMapper {
         ArrayList<MCRImportField> fieldList = new ArrayList<MCRImportField>();
         String fieldsValue = map.getAttributeValue("fields");
         if(fieldsValue == null)
-            return null;
+            return fieldList;
         fieldsValue = fieldsValue.replace(" ", "");
         String[] fieldArray = fieldsValue.split(",");
         for(String fieldId : fieldArray) {

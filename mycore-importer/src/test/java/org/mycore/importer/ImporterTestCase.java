@@ -24,7 +24,7 @@ public class ImporterTestCase extends MCRTestCase {
         MCRImportDatamodelManager dmm = new MCRImportDatamodelManager("src/test/resources", metadataResolverManager);
         MCRImportDatamodel dm1 = dmm.addDatamodel("sample-dm1.xml");
         MCRImportDatamodel dm2 = dmm.addDatamodel("sample-dm2.xml");
-
+        
         // datamodel 1 tests
         assertEquals("MCRMetaLangText", dm1.getClassname("metaText"));
         assertEquals("MCRMetaXML", dm1.getClassname("metaXML"));
@@ -126,6 +126,15 @@ public class ImporterTestCase extends MCRTestCase {
         assertEquals("2001-10-23", importObject.getMetadata("date").getChilds().get(0).getText());
         MCRImportMappingManager.getInstance().saveImportObject(importObject, "xml");
         assertEquals(true, new File("save/xml/000001.xml").exists());
+
+        record = new MCRImportRecord("record");
+        record.addField(new MCRImportField("text", "DM1 and ID tests!"));
+        assertEquals(true, MCRImportMappingManager.getInstance().init(new File("src/test/resources/sample-mapping2.xml")));
+        importObject = MCRImportMappingManager.getInstance().mapAndSaveRecord(record);
+        // automatic generated id
+        assertEquals("record_0", importObject.getId());
+        assertEquals("DM1 and ID tests!", importObject.getLabel());
+        assertEquals("Sample: DM1 and ID tests!", importObject.getMetadata("metaText").getChilds().get(0).getText());
     }
 
 }

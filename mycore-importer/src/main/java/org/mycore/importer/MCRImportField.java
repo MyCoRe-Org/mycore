@@ -31,6 +31,6 @@ public class MCRImportField {
 
     @Override
     public String toString() {
-        return "(" + id + ": " + value + ")";
+        return id + ": " + value;
     }
 }

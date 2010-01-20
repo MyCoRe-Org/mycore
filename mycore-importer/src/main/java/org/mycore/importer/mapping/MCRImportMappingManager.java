@@ -27,12 +27,21 @@ import org.mycore.importer.mapping.mapper.MCRImportMapper;
 import org.mycore.importer.mapping.mapper.MCRImportMapperManager;
 import org.mycore.importer.mapping.processing.MCRImportMappingProcessor;
 import org.mycore.importer.mapping.processing.MCRImportMappingProcessorBuilder;
+import org.mycore.importer.mapping.resolver.uri.MCRImportIdGenerationURIResolver;
 import org.mycore.importer.mapping.resolver.uri.MCRImportURIResolver;
-import org.mycore.importer.mapping.resolver.uri.MCRImportURIResolverMananger;
+import org.mycore.importer.mapping.resolver.uri.MCRImportURIResolverManager;
 
 /**
+ * <p>
  * This singleton class manages and distributes all tasks associated with the
- * import mapping!
+ * import mapping. Before the mapping can start, you have to call the init method
+ * to set the xml import configuration file.
+ * </p>
+ * <p>
+ * To start the mapping call <code>startMapping(..)</code>. This will map all records
+ * and derivates to the <i>saveToPath</i> (defined in the mapping file). If you have
+ * derivates, its important to set them before calling <code>startMapping(..)</code>.
+ * The method to do this is <code>setDerivateList(..)</code>.
  * 
  * @author Matthias Eichner
  */
@@ -61,15 +70,12 @@ public class MCRImportMappingManager {
 
     private MCRImportMapperManager mapperManager;
     private MCRImportMetadataResolverManager metadataResolverManager;
-    private MCRImportURIResolverMananger uriResolverManager;
+    private MCRImportURIResolverManager uriResolverManager;
     private MCRImportDatamodelManager datamodelManager;
     private MCRImportClassificationMappingManager classificationManager;
     private MCRImportDerivateFileManager derivateFileManager;
 
-    private MCRImportMappingManager()  {
-        this.outputter = new XMLOutputter(Format.getPrettyFormat());
-        this.listenerList = new ArrayList<MCRImportStatusListener>();
-    }
+    private MCRImportMappingManager()  {}
 
     /**
      * Initialize the singleton instance with the xml import
@@ -82,6 +88,9 @@ public class MCRImportMappingManager {
      */
     @SuppressWarnings("unchecked")
     public boolean init(File file) throws IOException, JDOMException {
+        this.outputter = new XMLOutputter(Format.getPrettyFormat());
+        this.listenerList = new ArrayList<MCRImportStatusListener>();
+
         Element rootElement = getRootElement(file);
         // load the configuration part of the mapping file
         config = new MCRImportConfig(rootElement);
@@ -148,7 +157,7 @@ public class MCRImportMappingManager {
 
     @SuppressWarnings("unchecked")
     private void preloadUriResolvers(Element mappingElement) {
-        uriResolverManager = new MCRImportURIResolverMananger();
+        uriResolverManager = new MCRImportURIResolverManager();
 
         // load resolver
         Element resolversElement = mappingElement.getChild("resolvers");
@@ -253,16 +262,85 @@ public class MCRImportMappingManager {
      * 
      * @param record record which have to be mapped and saved
      */
-    public void mapAndSaveRecord(MCRImportRecord record) {
+    public MCRImportObject mapAndSaveRecord(MCRImportRecord record) {
         // do the mapping
         MCRImportObject importObject = createMCRObject(record);
         // save the new import object
         if(importObject != null) {
+            // test if the mcrobject has an id
+            boolean idGeneration = isIdGenerationActivated(record.getName());
+            if(idGeneration) {
+                createDynamicIdForImportObject(importObject, record);
+            }
+            if (importObject.getId() == null || importObject.getId().equals("")) {
+                StringBuffer errorString = new StringBuffer();
+                errorString.append("No id defined for import object created by record ");
+                errorString.append(record).append("!");
+                if(idGeneration)
+                    errorString.append(" For unknown reasons, the MCRImportMappingManager could'nt generate an Id.");
+                LOGGER.error(errorString);
+                return null;
+            }
+            // save it
             saveImportObject(importObject, record.getName());
             StringBuffer buf = new StringBuffer();
             buf.append(record.getName()).append(": ").append(importObject.getId());
             fireRecordMapped(buf.toString());
         }
+        return importObject;
+    }
+    
+    /**
+     * This method checks if the id for a record is created by the
+     * importer or from the mapping file. If the mcrobject element
+     * contains an id-mapper (type attribute equals "id"), this
+     * method returns false.
+     * 
+     * @param recordName the name of the record
+     * @return true if the id is generated automatic by the importer,
+     * otherwise false
+     */
+    @SuppressWarnings("unchecked")
+    private boolean isIdGenerationActivated(String recordName) {
+        Element mappingElement = getMappingElement(recordName);
+        List<Element> idMapList = mappingElement.getContent(new ElementFilter() {
+            private static final long serialVersionUID = 1L;
+            @Override
+            public boolean matches(Object obj) {
+                boolean isElement = super.matches(obj);
+                if (!isElement)
+                    return false;
+                Element e = (Element) obj;
+                if(!e.getName().equals("map"))
+                    return false;
+                if (!e.getAttributeValue("type").equals("id"))
+                    return false;
+                return true;
+            }
+        });
+        // is there an id mapping element in the mapping file?
+        if(idMapList.size() > 0) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * This method creates a dynamic id for an import object based on the
+     * <code>MCRImportIdGenerationURIResolver</code>. 
+     * 
+     * @see MCRImportIdGenerationURIResolver
+     * @param importObject where to set the generated id
+     * @param record
+     */
+    private void createDynamicIdForImportObject(MCRImportObject importObject, MCRImportRecord record) {
+        String rN = record.getName();
+        // set the new id by map
+        Element idGenMapElement = new Element("map");
+        idGenMapElement.setAttribute("type", "id");
+        idGenMapElement.setAttribute("value", new StringBuffer(rN).append("_").toString());
+        idGenMapElement.setAttribute("resolver", new StringBuffer("idGen:").append(rN).toString());
+        mapIt(importObject, record, idGenMapElement);
     }
 
     /**
@@ -365,7 +443,7 @@ public class MCRImportMappingManager {
             fireDerivateSaved(buf.toString());
         } catch(Exception e) {
             LOGGER.error(e);
-        } 
+        }
     }
 
     /**
@@ -378,7 +456,7 @@ public class MCRImportMappingManager {
      */
     public MCRImportObject createMCRObject(MCRImportRecord record) {
         // get the right jdom mcrobject element from the mapping file
-        Element mappedObject = getMappedObject(record.getName());
+        Element mappedObject = getMappingElement(record.getName());
 
         if(mappedObject == null) {
             LOGGER.warn("Couldnt find match for mapping of mcrobject '" + record.getName() + "'!");
@@ -423,7 +501,7 @@ public class MCRImportMappingManager {
      * @param objectName the name of the mcrobject element
      * @return a mcrobject element
      */
-    protected Element getMappedObject(String objectName) {
+    protected Element getMappingElement(String objectName) {
         for(Element mcrObjectElement : mcrObjectList) {
             if(objectName.equals(mcrObjectElement.getAttributeValue("name")))
                 return mcrObjectElement;
@@ -496,7 +574,7 @@ public class MCRImportMappingManager {
      * 
      * @return the uri resolver manager
      */
-    public MCRImportURIResolverMananger getURIResolverManager() {
+    public MCRImportURIResolverManager getURIResolverManager() {
         return uriResolverManager;
     }
 

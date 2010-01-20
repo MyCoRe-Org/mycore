@@ -19,10 +19,10 @@ public interface MCRImportMappingProcessor {
      * @param record the uparsed record
      */
     public void preProcessing(MCRImportObject mcrObject, MCRImportRecord record);
-    
+
     /**
      * Do a postprocessing for the given parameters. At this time the import object
-     * is succesfully filled with the data from the record.
+     * is successfully filled with the data from the record.
      * 
      * @param mcrObject the complete mcrimport object
      * @param record the parsed record

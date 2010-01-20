@@ -12,9 +12,9 @@ import org.apache.log4j.Logger;
  * 
  * @author Matthias Eichner
  */
-public class MCRImportURIResolverMananger {
+public class MCRImportURIResolverManager {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRImportURIResolverMananger.class);
+    private static final Logger LOGGER = Logger.getLogger(MCRImportURIResolverManager.class);
     
     /**
      * Table of all uris. The key is the prefix and the value
@@ -29,7 +29,7 @@ public class MCRImportURIResolverMananger {
      * <code>MCRImportMappingManager.getInstance().getURIResolverManager()</code>.
      * So it is in general not necessary, to create a second instance of this class.
      */
-    public MCRImportURIResolverMananger() {
+    public MCRImportURIResolverManager() {
         supportedSchemes = new Hashtable<String, MCRImportURIResolver>();
         init();
     }

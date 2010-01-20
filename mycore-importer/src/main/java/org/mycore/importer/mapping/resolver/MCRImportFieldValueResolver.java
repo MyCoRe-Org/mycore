@@ -14,8 +14,10 @@ import org.mycore.importer.MCRImportField;
  * which contains field variables. At the constructor a list of all possible
  * fields has to be set. Only these fields could be resolved. If a field
  * is used it will be added to the usedFields list. To resolving a string
- * a valid syntax is required.
+ * a valid syntax is required (see <code>MCRTextResolver</code>).
+ * </p>
  * 
+ * @see MCRTextResolver
  * @author Matthias Eichner
  */
 public class MCRImportFieldValueResolver {

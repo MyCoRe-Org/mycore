@@ -1,6 +1,6 @@
 package org.mycore.importer.mapping.resolver.metadata;
 
-public class MCRImportISODataResolver extends MCRImportAbstractMetadataResolver {
+public class MCRImportISODateResolver extends MCRImportAbstractMetadataResolver {
 
     @Override
     protected boolean isValid() {
