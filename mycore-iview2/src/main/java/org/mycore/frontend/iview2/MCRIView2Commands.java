@@ -228,7 +228,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
     private static void deleteFileAndEmptyDirectories(File file) {
         File parent = file.getParentFile();
         file.delete();
-        if (parent.list().length == 0)
+        if (parent!=null && parent.list().length == 0)
             deleteFileAndEmptyDirectories(parent);
     }
 
