@@ -76,7 +76,7 @@ public class MCRDirectoryXML {
     /**
      * Sends the contents of an MCRDirectory as XML data to the client
      */
-    protected Document getDirectoryXML(MCRDirectory dir){
+    protected Document getDirectoryXML(MCRDirectory dir, boolean withAdditionalData) {
         LOGGER.info("MCRDirectoryXML: start listing of directory " + dir.getName());
 
         Element root = new Element("mcr_directory");
@@ -90,7 +90,8 @@ public class MCRDirectoryXML {
         addString(root, "size", String.valueOf(dir.getSize()));
 
         String label = dir.getLabel();
-        if( label != null ) addString(root, "label", label );
+        if (label != null)
+            addString(root, "label", label);
 
         Element numChildren = new Element("numChildren");
         root.addContent(numChildren);
@@ -118,10 +119,11 @@ public class MCRDirectoryXML {
             nodes.addContent(node);
 
             addString(node, "name", children[i].getName());
-            
+
             label = children[i].getLabel();
-            if( label != null ) addString(node, "label", label );
-            
+            if (label != null)
+                addString(node, "label", label);
+
             addString(node, "size", String.valueOf(children[i].getSize()));
             addDate(node, "lastModified", children[i].getLastModified());
 
@@ -142,12 +144,14 @@ public class MCRDirectoryXML {
             } else {
                 node.setAttribute("type", "directory");
             }
-            
-            try {
-              Document additional = children[i].getAllAdditionalData();
-              if( additional != null )
-                node.addContent( additional.detachRootElement() );
-            } catch(Exception ignored) {}
+
+            if (withAdditionalData)
+                try {
+                    Document additional = children[i].getAllAdditionalData();
+                    if (additional != null)
+                        node.addContent(additional.detachRootElement());
+                } catch (Exception ignored) {
+                }
         }
 
         LOGGER.info("MCRDirectoryXML: end listing of directory " + dir.getName());
@@ -207,11 +211,7 @@ public class MCRDirectoryXML {
     /**
      * Handles the HTTP request
      */
-    public Document getDirectory(String requestPath, String hostAlias) {
-
-        hostAlias = "local"; //TODO remove hostAlias
-
-        LOGGER.debug("MCRFileNodeServlet : host = " + hostAlias);
+    public Document getDirectory(String requestPath, boolean withAdditionalData) {
         LOGGER.info("MCRDirectoryResolver: request path = " + requestPath);
 
         if (requestPath == null) {
@@ -263,7 +263,7 @@ public class MCRDirectoryXML {
 
         if (path.length() == 0) {
             // only owner ID submitted
-            return getDirectoryXML((MCRDirectory) root);
+            return getDirectoryXML((MCRDirectory) root, withAdditionalData);
         }
 
         MCRDirectory dir = (MCRDirectory) root;
@@ -280,7 +280,7 @@ public class MCRDirectoryXML {
 
             return getErrorDocument(msg);
         } else {
-            return getDirectoryXML((MCRDirectory) node);
+            return getDirectoryXML((MCRDirectory) node, withAdditionalData);
         }
     }
 
