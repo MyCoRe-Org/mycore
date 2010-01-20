@@ -774,13 +774,11 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
             String path = uri.substring(uri.indexOf(":") + 1);
 
-            String hosts = null;
             int i = path.indexOf("?host");
             if (i > 0) {
-                hosts = path.substring(i + 1 + 6);// "?host=".length()
                 path = path.substring(0, i);
             }
-            return MCRDirectoryXML.getInstance().getDirectory(path, hosts).getRootElement();
+            return MCRDirectoryXML.getInstance().getDirectory(path, false).getRootElement();
         }
 
     }

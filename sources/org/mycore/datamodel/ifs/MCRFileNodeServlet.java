@@ -145,7 +145,7 @@ public class MCRFileNodeServlet extends MCRServlet {
         String ownerID = getOwnerID(request);
         // local node to be retrieved
         MCRFilesystemNode root;
-
+        LOGGER.info("Loading root node");
         try {
             root = MCRFilesystemNode.getRootNode(ownerID);
         } catch (org.mycore.common.MCRPersistenceException e) {
@@ -153,6 +153,7 @@ public class MCRFileNodeServlet extends MCRServlet {
             LOGGER.error("MCRFileNodeServlet: Error while getting root node!", e);
             root = null;
         }
+        LOGGER.info("Done loading root node");
 
         if (root == null) {
             String msg = "Error: No root node found for owner ID " + ownerID;
@@ -181,7 +182,9 @@ public class MCRFileNodeServlet extends MCRServlet {
             path.deleteCharAt(path.length() - 1);
         }
         MCRDirectory dir = (MCRDirectory) root;
+        LOGGER.info("get Path: "+path.toString());
         MCRFilesystemNode node = dir.getChildByPath(path.toString());
+        LOGGER.info("Done get Path: "+path.toString());
 
         if (node == null) {
             String msg = "Error: No such file or directory " + path;
@@ -192,7 +195,9 @@ public class MCRFileNodeServlet extends MCRServlet {
             sendFile(job, (MCRFile) node);
             return;
         } else {
+            LOGGER.info("send directory: "+path.toString());
             sendDirectory(request, response, (MCRDirectory) node);
+            LOGGER.info("done send directory: "+path.toString());
             return;
         }
     }
@@ -259,7 +264,7 @@ public class MCRFileNodeServlet extends MCRServlet {
      */
     private void sendDirectory(HttpServletRequest req, HttpServletResponse res, MCRDirectory dir) throws IOException {
         LOGGER.info("MCRFileNodeServlet: Sending listing of directory " + dir.getName());
-        Document jdom = MCRDirectoryXML.getInstance().getDirectoryXML(dir);
+        Document jdom = MCRDirectoryXML.getInstance().getDirectoryXML(dir, false);
         layoutDirectory(req, res, jdom);
 
     }
