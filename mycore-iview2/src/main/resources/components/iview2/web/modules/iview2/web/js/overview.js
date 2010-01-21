@@ -278,6 +278,7 @@ function overview(newId, parent, identer) {
 		var pageName = findInArrayElement(nodeProps(book, "mets:file", (((i + currentFirstRow) * amountWidth) + j), true), "LOCTYPE", "URL").href;
 
 		var source = Iview[viewID].viewerBean.tileUrlProvider.assembleUrl(0, 0, 0, pageName);
+		console.log({"message":"loadSingleImage("+i+", "+j+")","source":source});
 		var preview = $("previewDiv" + viewID +((i * amountWidth) + j));
 		
 		// nicht sicher ob das so in allen Browsern funktioniert

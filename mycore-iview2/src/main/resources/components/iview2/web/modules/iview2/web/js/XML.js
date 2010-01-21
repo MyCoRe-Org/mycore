@@ -10,38 +10,6 @@ function namespaceCheck(name) {
 	return name;
 }
 
-/*
-@description Generates from a URL the XML Object loads it's contents and returns it afterwards
-@param file string which holds the URL to the XML File which shall be loaded
-@return the XML Object
-*/
-function loadXML(file) {
-	var xmlDoc;
-	if (typeof(arguments[1]) !="undefined") {
-		file += "?XSL.Style=" + arguments[1];
-	}
-	//file=file+"?XSL.Style=" + ((typeof(arguments[1]) !="undefined")? arguments[1]:"xml");
-	// code for IE 
-	if (window.ActiveXObject) {
-		xmlDoc=new ActiveXObject("Microsoft.XMLDOM");
-		xmlDoc.async = false;
-		xmlDoc.load(file);
-	}//code for Mozilla, Firefox, Opera, Safari, etc.
-	else if (window.XMLHttpRequest) {
-		xmlDoc = new XMLHttpRequest();
-		xmlDoc.open("GET",file, false);
-		xmlDoc.send(null);
-	}
-	try {//ANTI Memory Leak
-		if (window.ActiveXObject) {
-			return xmlDoc;
-		} else {
-			return xmlDoc.responseXML;
-		}
-	} finally {
-		xmlDoc = null;
-	}
-}
 //TODO renaming would be good, as the name of the function doesn't reflect the real intention of the function
 /*
 @description Gains the requested information from a given XML File.

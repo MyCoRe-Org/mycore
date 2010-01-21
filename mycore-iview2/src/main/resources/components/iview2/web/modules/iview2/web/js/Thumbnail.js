@@ -64,15 +64,34 @@ function loadPageData(getPage, absolute, viewID) {
 @description reads out the imageinfo.xml, set the correct zoomvalues and loads the page
 */
 //TODO Loadpagedata in loadpage integrieren
-function loadPage(pageData, viewID) {
-	// Elemente ausblenden, die sich mit neuer Seite größenmäßig ändern
-	// cutOut-Ausschnitt schiebt sich teilweise hinaus, wird bei zoom-Listener wieder visible
-/*	if (Iview[viewID].useCutOut) {
-		$("ausschnitt"+viewID).style.visibility = "hidden";
-	}*/
-	// Preload wird zu spät verkleinert (bei Problemen wieder entkommentieren
-	//$("preload"+viewID).style.visibility = "hidden";
-	var imageProperties = loadXML(Iview[viewID].baseUri[0]+"/"+viewID+"/"+findInArrayElement(pageData, "LOCTYPE", "URL").href/*findInArrayElement(pageData,"LOCTYPE", "URL").href*/+"/imageinfo.xml", "xml");
+function loadPage(viewID, callback) {
+	var pageData;
+	if (typeof(Iview[viewID].buchDaten)=='undefined'){
+		pageData=[{"LOCTYPE":"URL","href":Iview[viewID].startFile}];
+	} else {
+		pageData=loadPageData(Iview[viewID].pagenumber - 1, true, viewID);
+	}
+	Iview[viewID].prefix  = findInArrayElement(pageData, "LOCTYPE", "URL").href;
+	
+	var imagePropertiesURL=Iview[viewID].baseUri[0]+"/"+viewID+"/"+findInArrayElement(pageData, "LOCTYPE", "URL").href+"/imageinfo.xml";
+	new Ajax.Request(imagePropertiesURL, {
+		method: 'get',
+  		onSuccess: function(response) {processImageProperties(response.responseXML,viewID)},
+  		onException: function(requester, exception) {alert("Error occured while loading image properties:\n"+exception);},
+  		onComplete: function() {callBack(callback)},
+	});
+}
+
+function callBack(func){
+	if (func == null)
+		return;
+	if (typeof(func)=='function')
+		func();
+	else
+		alert("Is not a function:\n"+func);
+}
+
+function processImageProperties(imageProperties, viewID){
 	var values = nodeAttributes(imageProperties.getElementsByTagName("imageinfo")[0]);
 	
 	Iview[viewID].tiles = parseInt(values['tiles']);
@@ -112,8 +131,6 @@ function loadPage(pageData, viewID) {
 		// zoomLevel 0 ist erstes Level
 		Iview[viewID].zoomInit = Math.ceil((Iview[viewID].zoomMax + 1) / 2) - 1;
 	}
-	Iview[viewID].prefix  = findInArrayElement(pageData, "LOCTYPE", "URL").href;//findMETSEntry(pageData,"LOCTYPE", "URL").href;
-	
 	$("preload"+viewID).style.width = Iview[viewID].bildBreite / Math.pow(2, Iview[viewID].zoomMax - Iview[viewID].zoomInit) + "px";
 	$("preload"+viewID).style.height = Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - Iview[viewID].zoomInit) + "px";
 	$("preload"+viewID).removeChild($("preloadImg"+viewID));
@@ -159,7 +176,6 @@ function loadPage(pageData, viewID) {
 	
 	// damit das alte zoomBack bei Modi-Austritt nicht verwendet wird
 	Iview[viewID].zoomBack = Iview[viewID].zoomInit;
-	
 	var initX = toFloat(window.location.search.get("x"));
 	var initY = toFloat(window.location.search.get("y"));
 	viewerBean.positionTiles ({'x' : initX, 'y' : initY}, true);
@@ -169,6 +185,7 @@ function loadPage(pageData, viewID) {
 	if (Iview[viewID].useCutOut) {
 		Iview[viewID].ausschnitt.setSRC(viewerBean.tileUrlProvider.assembleUrl(0,0,0));
 	}
+	updateModuls(viewID);
 }
 /*
 @description blend in the overview an creates it by the first call
@@ -297,6 +314,12 @@ function calculateZoomProp(level, totalSize, viewerSize, scrollBarSize, viewID) 
 */
 function switchDisplayMode(screenZoom, stateBool, viewID) {
 	var viewerBean = Iview[viewID].viewerBean;
+	if (typeof(viewerBean)=='undefined'){
+		console.log("undefined property viewerBean");
+		console.log(Iview[viewID]);
+		console.trace();
+		return;
+	}
 	if (screenZoom) {
 		Iview[viewID].zoomWidth = false;
 	} else {
@@ -874,7 +897,11 @@ function loading(viewID) {
 	}
 	//remove leading '/'
 	Iview[viewID].startFile = Iview[viewID].startFile.replace(/^\/*/,"");
-	loadPage([{"LOCTYPE":"URL","href":Iview[viewID].startFile}],viewID);
+//	loadPage([{"LOCTYPE":"URL","href":Iview[viewID].startFile}],viewID);
+	loadPage(viewID, function(){startFileLoaded(viewID)});
+}
+
+function startFileLoaded(viewID){
 	Iview[viewID].loaded = true;
 
 	// surface muss als Blank geladen werden, damit Ebene gefüllt und es im Vordergrund des Viewers liegt
@@ -905,12 +932,6 @@ function loading(viewID) {
   		onException: function() {alert("Error Occured while Loading METS file");}
 	});
 	
-	if (Iview[viewID].useOverview) {
-		importOverview(viewID);
-		// actually be changed manually in CSS
-		if (classIsUsed("BSE_openThumbs")) doForEachInClass("BSE_openThumbs", ".style.display = 'block';", viewID);
-	}
-	
 	// Resize-Events registrieren
 	if (isBrowser("IE")) {
 		$("viewer"+viewID).parentNode.onresize = function() {reinitializeGraphic(viewID)};
@@ -931,7 +952,7 @@ function loading(viewID) {
  @param metsDoc Document which holds in METS/MODS structure all needed informations to generate an chapter and overview of of the supplied data
  */
 function processMETS(metsDoc, viewID) {
-	Iview[viewID].buchDaten = metsDoc;//(Iview[viewID].hasMets)? loadXML(mets_uri):loadXML(mets_uri, "mets");
+	Iview[viewID].buchDaten = metsDoc;
 	Iview[viewID].amountPages = getPageCount(Iview[viewID].buchDaten);
 	
 	getPageNumberFromPic(viewID);
@@ -960,4 +981,10 @@ function processMETS(metsDoc, viewID) {
 	}
 	//The currently not correct used Pagenumber is set to correct value
 	navigatePage(Iview[viewID].pagenumber,viewID,false);
+	
+	if (Iview[viewID].useOverview) {
+		importOverview(viewID);
+		// actually be changed manually in CSS
+		if (classIsUsed("BSE_openThumbs")) doForEachInClass("BSE_openThumbs", ".style.display = 'block';", viewID);
+	}
 }

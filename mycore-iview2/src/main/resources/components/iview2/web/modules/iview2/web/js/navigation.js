@@ -15,9 +15,9 @@ function navigatePage(pNum, viewID) {
 		Iview[viewID].pageFormObj.actualize(Iview[viewID].pagenumber);
 	}
 	if (arguments.length == 2) {
-		loadPage(loadPageData(Iview[viewID].pagenumber - 1, true, viewID), viewID);
-	}
-	updateModuls(viewID);
+		loadPage(viewID);
+	} else
+		updateModuls(viewID);
 }
 
 /*
