@@ -444,7 +444,9 @@ public class MCRConfiguration {
      * property with the given name.
      * 
      * @param name
-     *            the non-null and non-empty name of the configuration property
+     *            the non-null and non-empty qualified name of the configuration property
+     * @param defaultname
+     *            the qualified class name
      * @return the value of the configuration property as a String, or null
      * @throws MCRConfigurationException
      *             if the property is not set or the class can not be loaded or
