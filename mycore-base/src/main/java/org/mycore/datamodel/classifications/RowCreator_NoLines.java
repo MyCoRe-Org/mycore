@@ -37,7 +37,7 @@ class RowCreator_NoLines implements RowCreator {
     private Map<MCRCategoryID, String> folderStatus = new HashMap<MCRCategoryID, String>();
 
     private final Logger LOGGER = Logger.getLogger(RowCreator_NoLines.class);
-    
+
     public RowCreator_NoLines() {
         this(MCRClassificationPoolFactory.getInstance(), MCRConfiguration.instance());
     }
@@ -61,7 +61,7 @@ class RowCreator_NoLines implements RowCreator {
         stopWatch.start();
         Map<MCRCategoryID, Boolean> linkMap = classificationPool.hasLinks(classif);
         stopWatch.stop();
-        LOGGER.info("haslinks time: " + stopWatch.getTime());
+        LOGGER.info("haslinks time for " + classif.getId() + ": " + stopWatch.getTime());
         createRowsForCategory(lang, xNavtree, classif, linkMap);
     }
 
@@ -69,8 +69,8 @@ class RowCreator_NoLines implements RowCreator {
         List<MCRCategory> children = category.getChildren();
         for (MCRCategory mcrCategory : children) {
             MCRCategoryID categoryID = mcrCategory.getId();
-
-            boolean hasLinks = linkMap.get(mcrCategory.getId());
+            Boolean hasLinksValue = linkMap.get(categoryID);
+            boolean hasLinks = hasLinksValue == null ? false : hasLinksValue;
             boolean hasChildren = mcrCategory.hasChildren();
 
             if (emptyLeafs.endsWith("no") && !hasLinks) {
@@ -105,7 +105,7 @@ class RowCreator_NoLines implements RowCreator {
         xCol1.setAttribute("childpos", position);
 
         MCRCategoryID categoryID = mcrCategory.getId();
-        
+
         if (hasChildren) {
             xCol1.setAttribute("plusminusbase", categoryID.getID());
         }
@@ -142,10 +142,10 @@ class RowCreator_NoLines implements RowCreator {
     private Element createColumn2(String lang, MCRCategory mcrCategory, boolean hasLinks) {
         Element xCol2 = new Element("col");
         MCRLabel label = mcrCategory.getLabel(lang);
-        if(label == null){
+        if (label == null) {
             label = mcrCategory.getCurrentLabel();
         }
-        
+
         String catid = mcrCategory.getId().getID();
 
         xCol2.setAttribute("searchbase", createSearchUri(catid));
@@ -173,7 +173,7 @@ class RowCreator_NoLines implements RowCreator {
 
         MCRCategory parent = classificationPool.getClassificationAsPojo(classif.getId(), true);
         MCRCategory cat = MCRCategoryTools.findCategory(parent, categID);
-        if(cat == null) {
+        if (cat == null) {
             return;
         }
 
@@ -209,12 +209,10 @@ class RowCreator_NoLines implements RowCreator {
         return search;
     }
 
-    @Override
     public MCRCategory getClassification() {
         return classif;
     }
 
-    @Override
     public void setCommented(boolean commented) {
         this.commented = commented;
     }
@@ -223,17 +221,14 @@ class RowCreator_NoLines implements RowCreator {
         return commented;
     }
 
-    @Override
     public void setBrowserClass(String browserClass) {
         this.browserClass = browserClass;
     }
 
-    @Override
     public void setUri(String uri) {
         this.uri = uri;
     }
 
-    @Override
     public void setView(String view) {
         this.view = view;
     }
