@@ -19,7 +19,7 @@ public class MCRDirectoryXMLServlet extends MCRServlet {
         LOGGER.info(job.getRequest().getPathInfo());
         //    	String[] data = job.getRequest().getPathInfo().split("/");
         MCRDirectoryXML dirXML = MCRDirectoryXML.getInstance();
-        Document doc = dirXML.getDirectory(job.getRequest().getPathInfo(), null);
+        Document doc = dirXML.getDirectory(job.getRequest().getPathInfo(), false);
         MCRLayoutService.instance().doLayout(job.getRequest(), job.getResponse(), doc);
     }
 
