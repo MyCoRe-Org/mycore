@@ -26,8 +26,6 @@ package org.mycore.frontend.iview2;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -38,7 +36,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRUtils;
 import org.mycore.services.iview2.MCRIView2Tools;
 import org.mycore.services.iview2.MCRImage;
