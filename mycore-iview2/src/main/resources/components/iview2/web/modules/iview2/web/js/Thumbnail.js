@@ -314,7 +314,7 @@ function calculateZoomProp(level, totalSize, viewerSize, scrollBarSize, viewID) 
 */
 function switchDisplayMode(screenZoom, stateBool, viewID) {
 	var viewerBean = Iview[viewID].viewerBean;
-	if (typeof(viewerBean)=='undefined'){
+	if (typeof(viewerBean)=='undefined' && typeof(console)!='undefined'){
 		console.log("undefined property viewerBean");
 		console.log(Iview[viewID]);
 		console.trace();
@@ -551,6 +551,31 @@ function generateURL(viewID) {
 	return url;
 }
 
+function openChapterAndInitialize(major, viewID, button){
+	var chapter=$("chapter1"+viewID);
+	if (chapter == null){
+			//background-image:url(image.png);
+			//background-position:-390px 0;
+			var oldClassName=button.className;
+			button.className+=" loading";
+			var start=new Date().getTime();
+			setTimeout(function(){
+				importChapter(viewID);
+				var end=new Date().getTime() - start;
+				var chapter=$("chapter1"+viewID);
+				button.className=oldClassName;
+				if (typeof(console)!='undefined'){
+					var msg="import chapters took "+end+"ms"
+					console.log(msg);
+				}
+				openChapter(major, viewID);
+			}, 50);
+			return;
+	} else {
+		openChapter(major, viewID);
+	}
+}
+
 /*
 @description open and close the chapterview
 */
@@ -732,6 +757,7 @@ function importChapter(viewID) {
 	chapter1.addListener(chapter.PAGE_NUMBER, new function() { this.change = function(value) {
 		navigatePage(value, viewID);
 	}});
+	updateModuls(viewID);
 }
 
 /*
@@ -971,14 +997,6 @@ function processMETS(metsDoc, viewID) {
 		Iview[viewID].pageFormObj.fill(Iview[viewID].amountPages);
 	}
 
-	if (Iview[viewID].useChapter) {
-		importChapter(viewID);
-
-		//if (!chapterEmbedded) {
-			// actually be changed manually in CSS
-			//if (classIsUsed("BSE_chapterOpener")) doForEachInClass("BSE_chapterOpener" ,".style.display = 'block';");
-		//}
-	}
 	//The currently not correct used Pagenumber is set to correct value
 	navigatePage(Iview[viewID].pagenumber,viewID,false);
 	

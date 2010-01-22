@@ -308,7 +308,7 @@ function reinitializeGraphic(viewID) {
 		pictureWidth(viewID);
 	}
 	
-	if (Iview[viewID].useOverview) {
+	if (Iview[viewID].useOverview && typeof(Iview[viewID].overview1)!='undefined') {
 		Iview[viewID].overview1.resize();
 		// Aktualisierung nur wenn Overview geoeffnet ist, sonst erst beim Oeffnen
 		if (Iview[viewID].overviewActive) {
@@ -352,7 +352,7 @@ function maximizeHandler(viewID) {
 		if (classIsUsed("BSE_fullView")) doForEachInClass("BSE_fullView", ".style.display = 'block';", viewID);
 		if (classIsUsed("BSE_normalView")) doForEachInClass("BSE_normalView", ".style.display = 'none';", viewID);
 		
-		// wegen IE7 zusätzlich
+		// wegen IE7 zusï¿½tzlich
 		document.documentElement.style.overflow="";
 		
 		document.body.style.overflow="";
@@ -363,10 +363,6 @@ function maximizeHandler(viewID) {
 		//$("buttonSurface"+viewID).className = "buttonSurface min";
 		//TODO nur auf Surfaces fÃ¼r bestimmen Viewer Anwenden
 		if (classIsUsed("buttonSurface")) doForEachInClass("buttonSurface", ".className = 'buttonSurface min';");
-		
-		if (Iview[viewID].useChapter) {
-			openChapter(false, viewID);
-		}
 		
 		PanoJS.mousePressedHandler = function(e) {
 			maximizeHandler(viewID);
@@ -387,7 +383,7 @@ function maximizeHandler(viewID) {
 		if (classIsUsed("BSE_fullView")) doForEachInClass("BSE_fullView", ".style.display = 'none';", viewID);
 		if (classIsUsed("BSE_normalView")) doForEachInClass("BSE_normalView", ".style.display = 'block';", viewID);
 		
-		// wegen IE7 zusätzlich
+		// wegen IE7 zusï¿½tzlich
 		document.documentElement.style.overflow="hidden";
 		
 		document.body.style.overflow="hidden";
@@ -398,10 +394,6 @@ function maximizeHandler(viewID) {
 
 		doForEachInClass("buttonSurface", ".className = 'buttonSurface max';");
 //		$("buttonSurface"+viewID).className ="buttonSurface max";
-		
-		if (Iview[viewID].useChapter) {
-			openChapter(false, viewID);
-		}
 		
 		PanoJS.mousePressedHandler = function(e) {
 			e = e ? e : window.event;

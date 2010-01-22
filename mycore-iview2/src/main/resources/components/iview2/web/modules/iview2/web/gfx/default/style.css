@@ -473,6 +473,10 @@
 	cursor: pointer;
 }
 
+.buttonSurface.max .loading {
+	background-image: url('ajax-loader.gif');
+	background-position: 50% 50%;
+}	
 
 /* Navigation Elements */
 /* Vollbild-Button */

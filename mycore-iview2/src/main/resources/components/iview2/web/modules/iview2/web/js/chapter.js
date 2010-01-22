@@ -283,12 +283,10 @@ function chapter(newId, parent) {
 				for (var i = 0; i < curNodes.length; i++) {
 					if (curNodes.item(i).tagName) {
 						structure[i] = new Object();
-						if (down == true) {
+						if (down) {
 							structure[i] = getStructure(curNodes.item(i), TOC, false);
-						} else if (!down) {
+						} else {
 							structure[i] = getStructure(curNodes.item(i), TOC);
-						}
-						if (!down) {
 							for (var ii = 0; ii < chapter.attributes.length; ii++) {
 								structure[chapter.attributes.item(ii).nodeName] = chapter.attributes.item(ii).value;
 							}
@@ -618,7 +616,6 @@ function chapter(newId, parent) {
 		ManageEvents.addEventListener(document, 'mouseup', scrollY.mouseUp, false);
 		ManageEvents.removeEventListener(getElementsByClassName("empty","scrollChap"+viewID,"div")[0], 'mouseScroll', scrollY.scroll, false);
 		ManageEvents.addEventListener(main, 'mouseScroll', function(e) { e = getEvent(e); scrollY.scroll(e); e.cancelBubble = true;}, false);
-		
 	}
 
 	/*
