@@ -1,6 +1,8 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mets="http://www.loc.gov/METS/" xmlns:xalan="http://xml.apache.org/xalan" version="1.0">
   <xsl:output method="xml" encoding="utf-8" />
   <xsl:param name="MCR.Module-iview2.SupportedContentTypes" />
+  <xsl:variable name="lower">abcdefghijklmnopqrstuvwxyz</xsl:variable>
+  <xsl:variable name="upper">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
 
   <xsl:template match="/mcr_directory">
     <mets:mets xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -52,7 +54,7 @@
         </xsl:call-template>
       </xsl:variable>
       <xsl:choose>
-        <xsl:when test="contains($MCR.Module-iview2.SupportedContentTypes, $fileType)">
+        <xsl:when test="contains($MCR.Module-iview2.SupportedContentTypes, translate($fileType,$upper,$lower))">
           <xsl:element name="mets:div" namespace="http://www.loc.gov/METS/">
             <xsl:attribute name="TYPE">page</xsl:attribute>
             <xsl:attribute name="DMDID">
