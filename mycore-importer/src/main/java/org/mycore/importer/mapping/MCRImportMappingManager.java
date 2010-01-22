@@ -161,8 +161,10 @@ public class MCRImportMappingManager {
 
         // load resolver
         Element resolversElement = mappingElement.getChild("resolvers");
-        if(resolversElement == null)
+        if(resolversElement == null) {
+            LOGGER.info("No resolvers element defined.");
             return;
+        }
         List<Element> resolverList = resolversElement.getContent(new ElementFilter());
 
         for(Element resolver : resolverList) {
@@ -313,7 +315,8 @@ public class MCRImportMappingManager {
                 Element e = (Element) obj;
                 if(!e.getName().equals("map"))
                     return false;
-                if (!e.getAttributeValue("type").equals("id"))
+                if (e.getAttributeValue("type") == null ||
+                    !e.getAttributeValue("type").equals("id"))
                     return false;
                 return true;
             }
