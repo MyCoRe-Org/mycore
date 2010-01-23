@@ -14,10 +14,12 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.mycore.common.MCRUsageException;
+import org.mycore.common.MCRPersistenceException;
 
 /**
  * Represents a stored file or directory node with its metadata and content.
@@ -426,7 +428,13 @@ public abstract class MCRFilesystemNode {
         MCRFile dataFile = MCRFile.getRootFile(this.ID);
         if (dataFile == null)
             return;
-        Document doc = dataFile.getContentAsJDOM();
+	Document doc;
+	try {
+            doc = dataFile.getContentAsJDOM();
+        } catch (MCRPersistenceException e) {
+            Logger.getLogger(MCRFilesystemNode.class).warn("Could not read additional data of " + this, e);
+            return;
+        }
         Element child = doc.getRootElement().getChild(dataName);
         if (child != null)
             child.detach();
