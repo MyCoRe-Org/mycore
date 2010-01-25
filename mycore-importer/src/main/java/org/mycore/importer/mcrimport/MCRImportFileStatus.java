@@ -1,5 +1,13 @@
 package org.mycore.importer.mcrimport;
 
+/**
+ * This is a data holder class for the linkage between import- and
+ * mycore objects. It holds information about the import id, the
+ * mycore id, the type (MCRObject or MCRDerivate) and a path to the
+ * import xml file.
+ *
+ * @author Matthias Eichner
+ */
 public class MCRImportFileStatus {
 
     private String importId;

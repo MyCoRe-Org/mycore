@@ -1,8 +1,8 @@
 package org.mycore.importer.mcrimport;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -32,7 +32,7 @@ import org.mycore.importer.event.MCRImportStatusListener;
  * This class does the import to mycore. Ids assigned by
  * the mapping manager will be replaced by valid mycore ids. If
  * classification mapping is activated the corresponding values
- * are also replaced.
+ * are also replaced. To start the import call <code>startImport</code>
  */
 public class MCRImportImporter {
 
@@ -50,9 +50,20 @@ public class MCRImportImporter {
 
     protected MCRImportDerivateFileManager derivateFileManager;
 
-    public MCRImportImporter(File file) throws IOException, JDOMException {
+    /**
+     * Creates a new instance of a MyCoRe importer. The constructor reads the config part
+     * of the mapping file and initializes all important variables. To start the import
+     * call <code>startImport()</code>.
+     * 
+     * @param mappingFile the xml mapping file
+     * @throws IOException
+     * @throws JDOMException
+     */
+    public MCRImportImporter(File mappingFile) throws IOException, JDOMException {
+        if(!mappingFile.exists())
+            throw new FileNotFoundException(mappingFile.getAbsolutePath());
         this.builder = new SAXBuilder();
-        Element rootElement = getRootElement(file);
+        Element rootElement = getRootElement(mappingFile);
         // get the config from the import xml file
         this.config = new MCRImportConfig(rootElement);
         // create the classification manager
@@ -73,7 +84,7 @@ public class MCRImportImporter {
         }
 
         // loads the derivate file manager
-        derivateFileManager = new MCRImportDerivateFileManager(new File(config.getSaveToPath() + "derivates/"), false);
+        this.derivateFileManager = new MCRImportDerivateFileManager(new File(config.getSaveToPath() + "derivates/"), false);
         // create the listener list
         this.listenerList = new ArrayList<MCRImportStatusListener>();
 
@@ -82,6 +93,14 @@ public class MCRImportImporter {
         buildIdTable(mainDirectory);
     }
 
+    /**
+     * Returns the root element of a xml file.
+     * 
+     * @param file xml file
+     * @return
+     * @throws IOException
+     * @throws JDOMException
+     */
     private Element getRootElement(File file) throws IOException, JDOMException {
         // load the mapping xml file document
         Document document = builder.build(file);
@@ -152,8 +171,8 @@ public class MCRImportImporter {
     }
 
     /**
-     * Imports a mycore object xml file to mycore by its path. All internal imports
-     * ids and classifiaction mapping values (if enabled) are resolved.
+     * Imports a mycore object xml file to mycore by its path. All internal import
+     * ids and classification mapping values (if enabled) are resolved.
      * 
      * @param filePath the path of the xml file which should be imported
      * @throws IOException
@@ -169,15 +188,16 @@ public class MCRImportImporter {
             mapClassificationValues(doc);
 
         // use the xsi:noNamespaceSchemaLocation to get the type
-        String type = doc.getRootElement().getAttributeValue("noNamespaceSchemaLocation", MCRConstants.XSI_NAMESPACE);
-        if(type == null) {
+        String schemaLocation = doc.getRootElement().getAttributeValue("noNamespaceSchemaLocation", MCRConstants.XSI_NAMESPACE);
+        if(schemaLocation == null) {
             LOGGER.error("Couldnt get object type because there is no xsi:noNamespaceSchemaLocation defined for object " + doc.getBaseURI());
             return null;
         }
-        type = type.substring(0, type.indexOf('.'));
+        // remove 'datamodel-' and '.xsd' to get a valid object type (e.g. author)
+        String objectType = schemaLocation.substring(schemaLocation.indexOf("-") + 1, schemaLocation.lastIndexOf('.'));
         // create the next id
         MCRObjectID mcrObjId = new MCRObjectID();
-        mcrObjId.setNextFreeId(config.getProjectName() + "_" + type);
+        mcrObjId.setNextFreeId(config.getProjectName() + "_" + objectType);
         // set the new id in the xml document
         doc.getRootElement().setAttribute("ID", mcrObjId.getId());
         // create a new mycore object
@@ -194,6 +214,18 @@ public class MCRImportImporter {
         return mcrObjId.getId();
     }
 
+    /**
+     * This method imports a derivate in mycore from a xml file. All internal links
+     * are resolved. If the derivate is successfully imported a status event is
+     * fired.
+     * 
+     * @param filePath the file to the derivate
+     * @return the mcrId of the successfully imported derivate
+     * @throws IOException
+     * @throws JDOMException
+     * @throws MCRActiveLinkException
+     * @throws URISyntaxException
+     */
     protected String importMCRDerivateByFile(String filePath) throws IOException, JDOMException, MCRActiveLinkException, URISyntaxException {
         Document doc = builder.build(filePath);
         // resolve links
@@ -205,7 +237,6 @@ public class MCRImportImporter {
         doc.getRootElement().setAttribute("ID", mcrDerivateId.getId());
         // create the derivate
         MCRDerivate derivate = new MCRDerivate();
-        // TODO: setFromJDOM überall verfügbar machen !!!T
         derivate.setFromJDOM(doc);
         // set a flag that this object was imported
         derivate.getService().addFlag("imported");
@@ -217,10 +248,18 @@ public class MCRImportImporter {
         return mcrDerivateId.getId();
     }
 
-    protected void importInternalDerivateFiles(MCRImportFileStatus fs) {
-        List<String> pathList = derivateFileManager.getPathListOfDerivate(fs.getImportId());
+    /**
+     * This method does the file (jpg, tiff, pdf...) upload for the importer.
+     * It uses the <code>addFiles</code> method from <code>MCRFileImportExport</code>
+     * utility class.
+     * 
+     * @see MCRFileImportExport#addFiles(File, String)
+     * @param fileStatus file status of the current mycore derivate
+     */
+    protected void importInternalDerivateFiles(MCRImportFileStatus fileStatus) {
+        List<String> pathList = derivateFileManager.getPathListOfDerivate(fileStatus.getImportId());
         for(String path : pathList) {
-            MCRFileImportExport.addFiles(new File(path), fs.getMycoreId());
+            MCRFileImportExport.addFiles(new File(path), fileStatus.getMycoreId());
 //            MCRFileImportExport.importFiles(new File(path), fs.getMycoreId());
         }
     }

@@ -99,9 +99,11 @@ public class MCRImportObject {
     }
 
     public String getSchemaLocation() {
+        
         int indexOfFS = datamodel.getPath().lastIndexOf("/") + 1;
         int indexOfPoint = datamodel.getPath().lastIndexOf(".");
-        return datamodel.getPath().substring(indexOfFS, indexOfPoint) + ".xsd";        
+        String objectType = datamodel.getPath().substring(indexOfFS, indexOfPoint);
+        return new StringBuffer("datamodel-").append(objectType).append(".xsd").toString();
     }
 
     public String getLabel() {
