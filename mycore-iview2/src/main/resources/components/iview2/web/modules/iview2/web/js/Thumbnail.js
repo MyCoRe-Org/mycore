@@ -78,7 +78,7 @@ function loadPage(viewID, callback) {
 		method: 'get',
   		onSuccess: function(response) {processImageProperties(response.responseXML,viewID)},
   		onException: function(requester, exception) {alert("Error occured while loading image properties:\n"+exception);},
-  		onComplete: function() {callBack(callback)},
+  		onComplete: function() {callBack(callback)}
 	});
 }
 
