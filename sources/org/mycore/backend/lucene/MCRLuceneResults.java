@@ -11,7 +11,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Sort;
@@ -49,8 +48,6 @@ class MCRLuceneResults extends MCRResults {
 
     private MCRSharedLuceneIndexContext sharedIndexContext;
 
-    private IndexSearcher indexSearcher;
-
     private static Logger LOGGER = Logger.getLogger(MCRLuceneResults.class);
 
     public MCRLuceneResults(MCRSharedLuceneIndexContext sharedIndexContext, Collection<MCRFieldDef> addableFields, Sort sortFields,
@@ -72,18 +69,7 @@ class MCRLuceneResults extends MCRResults {
         setSorted(true);
     }
 
-    private void checkIndexSearcher() {
-        if (sharedIndexContext.isValid(indexSearcher))
-            return;
-        try {
-            indexSearcher = sharedIndexContext.getSearcher();
-        } catch (Exception e) {
-            throw new MCRException("Error while getting IndexSearcher.", e);
-        }
-    }
-
     private void reQuery() throws IOException {
-        checkIndexSearcher();
         List<SortField> sortFieldList = new ArrayList<SortField>(Arrays.asList(sortFields.getSort()));
         Iterator<SortField> sortIt = sortFieldList.iterator();
         while (sortIt.hasNext()) {
@@ -107,7 +93,7 @@ class MCRLuceneResults extends MCRResults {
         }
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Query: " + query);
-        indexSearcher.search(query, collector);
+        sharedIndexContext.getSearcher().search(query, collector);
         //Lucene 2.4.1 has a bug: be sure to call collector.topDocs() just once
         //see http://issues.apache.org/jira/browse/LUCENE-942
         topDocs = (TopFieldDocs) collector.topDocs();
@@ -133,9 +119,8 @@ class MCRLuceneResults extends MCRResults {
     @Override
     protected MCRHit getHit(String key) {
         if (!loadComplete) {
-            checkIndexSearcher();
             for (int i = 0; i < getNumHits(); i++)
-                inititializeTopDoc(i, indexSearcher);
+                inititializeTopDoc(i);
         }
         return super.getHit(key);
     }
@@ -147,18 +132,18 @@ class MCRLuceneResults extends MCRResults {
         }
         MCRHit hit = super.getHit(i);
         if (hit == null) {
-            inititializeTopDoc(i, indexSearcher);
+            inititializeTopDoc(i);
             hit = super.getHit(i);
         }
         return hit;
     }
 
-    private boolean inititializeTopDoc(int i, IndexSearcher indexSearcher) {
+    private boolean inititializeTopDoc(int i) {
         boolean reQuery = false;
         //initialize
         MCRHit hit;
         try {
-            hit = getMCRHit(topDocs.scoreDocs[i], indexSearcher);
+            hit = getMCRHit(topDocs.scoreDocs[i]);
         } catch (Exception e) {
             if (topDocs.scoreDocs.length <= i) {
                 throw new MCRException("TopDocs is not initialized.", e);
@@ -166,7 +151,7 @@ class MCRLuceneResults extends MCRResults {
             LOGGER.warn("Error while fetching Lucene document: " + topDocs.scoreDocs[i].doc + "\nRequery Lucene index.", e);
             try {
                 reQuery();
-                hit = getMCRHit(topDocs.scoreDocs[i], indexSearcher);
+                hit = getMCRHit(topDocs.scoreDocs[i]);
                 reQuery = true;
             } catch (IOException ioe) {
                 throw new MCRException("Error while requerying Lucene index.", ioe);
@@ -185,8 +170,8 @@ class MCRLuceneResults extends MCRResults {
         return reQuery;
     }
 
-    private MCRHit getMCRHit(ScoreDoc scoreDoc, IndexSearcher indexSearcher) throws CorruptIndexException, IOException {
-        org.apache.lucene.document.Document doc = indexSearcher.doc(scoreDoc.doc);
+    private MCRHit getMCRHit(ScoreDoc scoreDoc) throws CorruptIndexException, IOException {
+        org.apache.lucene.document.Document doc = sharedIndexContext.getSearcher().doc(scoreDoc.doc);
 
         String id = doc.get("returnid");
         MCRHit hit = new MCRHit(id);
