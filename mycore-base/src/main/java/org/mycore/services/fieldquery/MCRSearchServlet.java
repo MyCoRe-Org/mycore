@@ -31,6 +31,7 @@ import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -144,7 +145,7 @@ public class MCRSearchServlet extends MCRServlet
         if (element.getName().startsWith("condition")) {
             element.setName("condition");
 
-            String field = element.getAttributeValue("field");
+            String field = new StringTokenizer(element.getAttributeValue("field"), " -,").nextToken();
             MCRFieldDef fd = MCRFieldDef.getDef(field);
             String defaultOperator = MCRFieldType.getDefaultOperator(fd.getDataType());
             String operator = element.getAttributeValue("operator", defaultOperator);
