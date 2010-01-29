@@ -20,6 +20,11 @@
   <servlet-class>org.mycore.frontend.iview2.MCRTileCombineServlet</servlet-class>
 </servlet>
 
+<servlet>
+  <servlet-name>MCRThumbnailServlet</servlet-name>
+  <servlet-class>org.mycore.frontend.iview2.MCRThumbnailServlet</servlet-class>
+</servlet>
+
 <servlet-mapping>
   <servlet-name>MCRDirectoryXMLServlet</servlet-name>
   <url-pattern>/servlets/MCRDirectoryXMLServlet/*</url-pattern>
@@ -33,4 +38,9 @@
 <servlet-mapping>
   <servlet-name>MCRTileCombineServlet</servlet-name>
   <url-pattern>/servlets/MCRTileCombineServlet/*</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+  <servlet-name>MCRThumbnailServlet</servlet-name>
+  <url-pattern>/servlets/MCRThumbnailServlet/*</url-pattern>
 </servlet-mapping>

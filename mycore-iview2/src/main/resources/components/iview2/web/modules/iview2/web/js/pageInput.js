@@ -70,7 +70,7 @@ function pageInput(newId, parent, identer) {
 		var main = document.createElement("form");
 		main.id = id + amountInputs;
 		main.className = identer + amountInputs;
-		$(parent).appendChild(main);
+		document.getElementById(parent).appendChild(main);
 		
 		var input = document.createElement("textarea");
 		input.className = "input";

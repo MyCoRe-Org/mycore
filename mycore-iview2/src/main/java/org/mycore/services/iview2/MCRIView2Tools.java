@@ -78,10 +78,6 @@ public class MCRIView2Tools {
         return "";
     }
 
-    public static boolean hasMETSFile(String derivateID) {
-        return (getMCRFile(derivateID, "/mets.xml") != null);
-    }
-
     public static File getFile(String derivateID, String absolutePath) {
         MCRFile mcrFile = getMCRFile(derivateID, absolutePath);
         return getFile(mcrFile);
@@ -92,7 +88,7 @@ public class MCRIView2Tools {
         return mcrFile.getStorageID();
     }
 
-    static MCRFile getMCRFile(String derivateID, String absolutePath) {
+    public static MCRFile getMCRFile(String derivateID, String absolutePath) {
         MCRDirectory root = (MCRDirectory) MCRFilesystemNode.getRootNode(derivateID);
         // get main file
         MCRFile mainFile = (MCRFile) root.getChildByPath(absolutePath);
@@ -113,14 +109,14 @@ public class MCRIView2Tools {
     }
 
     public static BufferedImage getZoomLevel(File iviewFile, int zoomLevel) throws IOException, JDOMException {
-        MCRTiledPictureProps imageProps = MCRTiledPictureProps.getInstance(iviewFile);
-        if (zoomLevel < 0 || zoomLevel > imageProps.zoomlevel) {
-            throw new IndexOutOfBoundsException("Zoom level " + zoomLevel + " is not in range 0 - " + imageProps.zoomlevel);
-        }
         ZipFile iviewImage = new ZipFile(iviewFile);
         try {
             if (zoomLevel == 0) {
                 return readTile(iviewImage, 0, 0, 0);
+            }
+            MCRTiledPictureProps imageProps = MCRTiledPictureProps.getInstance(iviewFile);
+            if (zoomLevel < 0 || zoomLevel > imageProps.zoomlevel) {
+                throw new IndexOutOfBoundsException("Zoom level " + zoomLevel + " is not in range 0 - " + imageProps.zoomlevel);
             }
             double zoomFactor = Math.pow(2, (imageProps.zoomlevel - zoomLevel));
             int maxX = (int) Math.ceil((imageProps.width / zoomFactor) / MCRImage.TILE_SIZE);

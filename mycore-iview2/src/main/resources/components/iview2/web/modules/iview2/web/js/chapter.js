@@ -154,12 +154,7 @@ function chapter(newId, parent) {
 		if (structItem == null ) {
 			alert("Error 1:No Mets File found");
 		} else {
-			structItem = getStructure(getFirstNodeByTagName(structItem.childNodes, "mets:div"), $(id).firstChild, true);
-			/*if (!window.attachEvent || window.opera) {
-				structItem = getStructure(structItem.childNodes.item(1),$(id).firstChild, true);
-			} else {
-				structItem = getStructure(structItem.childNodes.item(0),$(id).firstChild, true);
-			}*/
+			structItem = getStructure(getFirstNodeByTagName(structItem.childNodes, "mets:div"), document.getElementById(id).firstChild, true);
 		}
 	}
 
@@ -179,7 +174,7 @@ function chapter(newId, parent) {
 		}
 
 		// check out a free place
-		if (my.self.firstChild.offsetHeight < $(id+"_content").offsetHeight) {
+		if (my.self.firstChild.offsetHeight < document.getElementById(id+"_content").offsetHeight) {
 			my.self.firstChild.style.top = 0 + "px";
 		}
 
@@ -330,7 +325,7 @@ function chapter(newId, parent) {
 				    parseInt(left) +
 				    parseInt(paddingLeft);
 
-		var distanceCur = parseInt($(id+"_content").style.width) - ((counter - 1) * distanceDifference) - parseInt(right);
+		var distanceCur = parseInt(document.getElementById(id+"_content").style.width) - ((counter - 1) * distanceDifference) - parseInt(right);
 		// otherwise Opera doesn't gets the symbolwidth --> is blended out in displayOutAllEntries
 		TOC.style.display = "block";
 		if (TOC.TYPE != "page") {
@@ -405,7 +400,7 @@ function chapter(newId, parent) {
 	function openCurPageEntry() {
 		// would close everything else
 		// displayOutAllEntries ($(id+"_content").firstChild, 1, 1);
-		var startPoint = $(id+"Pagenumber"+pageNumber).parentNode;
+		var startPoint = document.getElementById(id+"Pagenumber"+pageNumber).parentNode;
 		while (true) {
 			if (startPoint.parentNode.id == id+"_content") {
 				break;
@@ -428,16 +423,17 @@ function chapter(newId, parent) {
 	*/
 	function highlightCurrentPage() {
 		// stop hover by continue counting the session
-		$(id+"Pagenumber"+pageNumber).parentNode.HOVER_SESSION = 
-			parseInt($(id+"Pagenumber"+pageNumber).parentNode.HOVER_SESSION) + 1;
-		$(id+"Pagenumber"+pageNumber).parentNode.style.backgroundColor = "";
+		var pageEl=document.getElementById(id+"Pagenumber"+pageNumber);
+		pageEl.parentNode.HOVER_SESSION = 
+			parseInt(pageEl.parentNode.HOVER_SESSION) + 1;
+		pageEl.parentNode.style.backgroundColor = "";
 
 		// at start / after reload still "0"
 		if (lastHighlighted > 0) {
-			$(id+"Pagenumber"+lastHighlighted).parentNode.className = "chapter";
+			document.getElementById(id+"Pagenumber"+lastHighlighted).parentNode.className = "chapter";
 		}
 		lastHighlighted = pageNumber;
-		$(id+"Pagenumber"+pageNumber).parentNode.className = "chapter highlight";
+		pageEl.parentNode.className = "chapter highlight";
 	}
 
 	/*
@@ -459,7 +455,7 @@ function chapter(newId, parent) {
 			}
 			// if the entry who should be hover isn't changed by highlight
 			if (currentPageId.substring((id+"Pagenumber").length,currentPageId.length) != pageNumber) {
-				var obj = $(currentPageId).parentNode;
+				var obj = document.getElementById(currentPageId).parentNode;
 				if (hoverNow) {
 					obj.style.backgroundColor = '';
 					obj.className = "chapter hover";
@@ -546,7 +542,7 @@ function chapter(newId, parent) {
 		var main = document.createElement("div");
 		main.id = id;
 		main.className = identer;
-		$(parent).appendChild(main);
+		document.getElementById(parent).appendChild(main);
 
 		// decide if In/Out-Place
 		//chapterBool = chapterEmbedded;
@@ -622,8 +618,9 @@ function chapter(newId, parent) {
 	@description set width and height of the chapter 
 	*/
 	function setSize(width, height) {
-		if (width != null) $(id).style.width = width + "px";
-		if (height != null) $(id).style.height = height + "px";
+		var el=document.getElementById(id);
+		if (width != null) el.style.width = width + "px";
+		if (height != null) el.style.height = height + "px";
 		if (pageNumber != null) showCurrentPageCenter(pageNumber);
 		notifyListenerResize(this);
 		//my.scrollBarX.setSize(my.content.style.width);
@@ -661,9 +658,11 @@ function chapter(newId, parent) {
 	*/
 	function showCurrentPageCenter(currentPage) {
 		// the entries doesn't fit into the placeholder
-		if ($(id+"_content").firstChild.offsetHeight > $(id+"_content").offsetHeight) {
+		var contentEl=document.getElementById(id+"_content");
+		if (contentEl.firstChild.offsetHeight > contentEl.offsetHeight) {
 			// calculate distance from the current page to the top edge of the chapter
-			var startPoint = $(id+"Pagenumber"+currentPage);
+			var curPage = document.getElementById(id+"Pagenumber"+currentPage);
+			var startPoint = curPage;
 			var curDistance = 0;
 
 			//enough anyway, because the heighest distance / offsetTop is "0"
@@ -672,27 +671,27 @@ function chapter(newId, parent) {
 				startPoint = startPoint.parentNode;
 			}
 
-			curDistance = curDistance + parseInt($(id+"_content").firstChild.style.top) - (($(id+"_content").offsetHeight - 
-					$(id+"Pagenumber"+currentPage).offsetHeight) / 2);
+			curDistance = curDistance + parseInt(contentEl.firstChild.style.top) - ((contentEl.offsetHeight - 
+					curPage.offsetHeight) / 2);
 
-			$(id+"_content").firstChild.style.top = parseInt($(id+"_content").firstChild.style.top) - curDistance + "px";
+			contentEl.firstChild.style.top = parseInt(contentEl.firstChild.style.top) - curDistance + "px";
 
 			// so that not too much is moved (beyond the empty fields)
 
 			// bottom
-			if (-parseInt($(id+"_content").firstChild.style.top) + $(id+"_content").offsetHeight > 
-					$(id+"_content").firstChild.offsetHeight) {
-				$(id+"_content").firstChild.style.top = - ($(id+"_content").firstChild.offsetHeight - $(id+"_content").offsetHeight)
+			if (-parseInt(contentEl.firstChild.style.top) + contentEl.offsetHeight > 
+					contentEl.firstChild.offsetHeight) {
+				contentEl.firstChild.style.top = - (contentEl.firstChild.offsetHeight - contentEl.offsetHeight)
 									+ "px";
 			}
 
 			// top
-			if (parseInt($(id+"_content").firstChild.style.top) > 0) {
-				$(id+"_content").firstChild.style.top = 0 + "px";
+			if (parseInt(contentEl.firstChild.style.top) > 0) {
+				contentEl.firstChild.style.top = 0 + "px";
 			}
 		} else {
 			// wenn nach sortierung alles zusammen reinpasst, oben orientieren
-			$(id+"_content").firstChild.style.top = 0 + "px";
+			contentEl.firstChild.style.top = 0 + "px";
 		}
 	}
 
@@ -742,7 +741,7 @@ function chapter(newId, parent) {
 	}
 
 	function chapterSort() {
-		displayOutAllEntries($(id+"_content").firstChild, 0);
+		displayOutAllEntries(document.getElementById(id+"_content").firstChild, 0);
 		changePage(pageNumber);
 	}
 }

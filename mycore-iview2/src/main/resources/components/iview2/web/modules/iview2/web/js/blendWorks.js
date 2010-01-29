@@ -50,40 +50,42 @@ function blendWorks() {
 		if (typeof (objList) == "string") {
 			var totalX = toFloat(vector[2]) - toFloat(vector[0]);
 			var totalY = toFloat(vector[3]) - toFloat(vector[1]);
+			var obj=document.getElementById(objList);
 			if (effects) {
 				var stepX = totalX / steps;
 				var stepY = totalY / steps;
 				var interval = null;
 
 				if (one==0) {
-					if ($(objList).style.left == "")
-						$(objList).style.left = toFloat(vector[0]) + "px";
+					if (obj.style.left == "")
+						obj.style.left = toFloat(vector[0]) + "px";
 				} else {
-					if ($(objList).style.right == "")
-						$(objList).style.right = toFloat(vector[0]) + "px";
+					if (obj.style.right == "")
+						obj.style.right = toFloat(vector[0]) + "px";
 				}
 				if (two==0) {
-					if ($(objList).style.top == "")
-						$(objList).style.top = toFloat(vector[1]) + "px";
+					if (obj.style.top == "")
+						obj.style.top = toFloat(vector[1]) + "px";
 				} else {
-					if ($(objList).style.bottom == "")
-						$(objList).style.bottom = toFloat(vector[1]) + "px";
+					if (obj.style.bottom == "")
+						obj.style.bottom = toFloat(vector[1]) + "px";
 				}
 				
 				var slider = function() {
 					if (one==0) {
-						$(objList).style.left = toFloat($(objList).style.left) + stepX + "px";
+						obj.style.left = toFloat(obj.style.left) + stepX + "px";
 					} else {
-						$(objList).style.right = toFloat($(objList).style.right) + stepX + "px";
+						obj.style.right = toFloat(obj.style.right) + stepX + "px";
 					}
 					if (two==0) {
-						$(objList).style.top = toFloat($(objList).style.top) + stepY + "px";
+						obj.style.top = toFloat(obj.style.top) + stepY + "px";
 					} else {
-						$(objList).style.bottom = toFloat($(objList).style.bottom) + stepY + "px";
+						obj.style.bottom = toFloat(obj.style.bottom) + stepY + "px";
 					}
 					if (fadings != null) {
 						for (var i = 0; i < fadings.length; i++) {
-							setOpacity($(fadings[i]), getOpacity($(fadings[i])) + fadeList[i]);
+							var fadObj=document.getElementById(fadings[i]);
+							setOpacity(fadObj, getOpacity(fadObj) + fadeList[i]);
 						}
 					}
 					steps--;
@@ -95,25 +97,25 @@ function blendWorks() {
 				}
 				makeFadeList(fadings, steps);
 				interval = setInterval(function() { slider();}, time);
-			} else {
+			} else { // effects
 				if (one==0) {
-					$(objList).style.left = toFloat(vector[2]) + "px";
+					obj.style.left = toFloat(vector[2]) + "px";
 				} else {
-					$(objList).style.right = toFloat(vector[2]) + "px";
+					obj.style.right = toFloat(vector[2]) + "px";
 				}
 				if (two==0) {
-					$(objList).style.top = toFloat(vector[3]) + "px";
+					obj.style.top = toFloat(vector[3]) + "px";
 				} else {
-					$(objList).style.bottom = toFloat(vector[3]) + "px";
+					obj.style.bottom = toFloat(vector[3]) + "px";
 				}
 				if (fadings[0].substring(fadings[0].indexOf(":")+1, fadings[0].length) == "in") {
-					setOpacity($(objList), 100);
+					setOpacity(obj, 100);
 					//$(objList).style.display = "block";
-					$(objList).style.visibility = "visible";
+					obj.style.visibility = "visible";
 				} else {
-					setOpacity($(objList), 0);
+					setOpacity(jQuery(objList), 0);
 //					$(objList).style.display = "none";
-					$(objList).style.visibility = "hidden";
+					obj.style.visibility = "hidden";
 				}
 			}
 		}
@@ -127,7 +129,7 @@ function blendWorks() {
 	function makeFadeList(fadings, steps) {
 		if (fadeList.length == 0 && fadings != null) {
 			for (var i = 0; i < fadings.length; i++) {
-				var opacity = getOpacity($(fadings[i].substring(0,fadings[i].indexOf(":"))));
+				var opacity = getOpacity(document.getElementById(fadings[i].substring(0,fadings[i].indexOf(":"))));
 				if (parseInt(opacity) == 0) {
 					opacity = 100;
 				}
@@ -150,18 +152,20 @@ function blendWorks() {
 		var allDone = true;
 		var opacity = null;
 		if (typeof (objList) == "string" || objList.nodeType) {
-			opacity = getOpacity($(objList));
+			var obj=document.getElementById(objList);
+			opacity = getOpacity(obj);
 			if ((opacity + step > 0 && inFade == false) || (opacity + step < 100 && inFade == true)) {
 				allDone = false;
 			}
-			setOpacity($(objList), opacity + step);
+			setOpacity(obj, opacity + step);
 		} else {
 			for (var i = 0; i < objList.length; i++) {
-				opacity = getOpacity($(objList[i]));
+				var obj=document.getElementById(objList[i]);
+				opacity = getOpacity(obj);
 				if ((opacity + step > 0 && inFade == false) || (opacity + step < 100 && inFade == true)) {
 					allDone = false;
 				}
-				setOpacity($(objList[i]), opacity + step);
+				setOpacity(obj, opacity + step);
 			}
 		}
 		return allDone;
@@ -197,10 +201,10 @@ function blendWorks() {
 		} else {
 			//If Fade Effects are disabled just set Opacity to zero and execute the attached do After code
 			if (typeof (objList) == "string" || objList.nodeType) {
-				setOpacity($(objList), 0);
+				setOpacity(document.getElementById(objList), 0);
 			} else {
 				for (var i = 0; i < objList.length; i++) {
-					setOpacity($(objList[i]), 0);
+					setOpacity(document.getElementById(objList[i]), 0);
 				}
 			}
 			if (typeof arguments[3] != "undefined") {
@@ -239,10 +243,10 @@ function blendWorks() {
 			}
 		} else {
 			if (typeof (objList) == "string" || objList.nodeType) {
-				setOpacity($(objList), 100);
+				setOpacity(document.getElementById(objList), 100);
 			} else {
 				for (var i = 0; i < objList.length; i++) {
-					setOpacity($(objList[i]), 100);
+					setOpacity(document.getElementById(objList[i]), 100);
 				}
 			}
 			if (typeof arguments[3] != "undefined") {

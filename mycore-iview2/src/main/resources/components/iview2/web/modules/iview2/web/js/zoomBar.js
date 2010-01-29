@@ -78,7 +78,7 @@ function zoomBar(newId, parent, identer) {
 		var main = document.createElement("div");
 		main.id = id;
 		main.className = "zoomBar" + identer;
-		$(parent).appendChild(main);
+		document.getElementById(parent).appendChild(main);
 
 		var startBehind = document.createElement("div");
 		startBehind.className = "startBehind";
@@ -194,9 +194,10 @@ function zoomBar(newId, parent, identer) {
 	function getScaleHeight() {
 		var tmpDiv = document.createElement("div");
 		tmpDiv.className = "scaleLine";
-		$(id).appendChild(tmpDiv);
+		var el=document.getElementById(id);
+		el.appendChild(tmpDiv);
 		var x = parseInt(getElementsByClassName("scaleLine",id,"div")[0].offsetHeight);
-		$(id).removeChild(tmpDiv);
+		el.removeChild(tmpDiv);
 		return x;
 	}
 	
@@ -206,9 +207,10 @@ function zoomBar(newId, parent, identer) {
 	function getScaleWidth() {
 		var tmpDiv = document.createElement("div");
 		tmpDiv.className = "scaleLine";
-		$(id).appendChild(tmpDiv);
+		var el=document.getElementById(id);
+		el.appendChild(tmpDiv);
 		var x = parseInt(getElementsByClassName("scaleLine",id,"div")[0].offsetWidth);
-		$(id).removeChild(tmpDiv);
+		el.removeChild(tmpDiv);
 		return x;
 	}
 

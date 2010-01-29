@@ -151,8 +151,9 @@ function initializeGraphic(viewID) {
 			/*verschieben des Preload bildes damit man eine grobe Vorschau sieht von dem was kommt
 			  wird nur ausgeführt wenn Seite geladen ist, da ansonsten die Eigenschaften noch nicht vorhanden sind*/
 			if(Iview[viewID].loaded) {
-				$('preload'+viewID).style.left = (this.x + motion.x) + "px";
-				$('preload'+viewID).style.top = (this.y + motion.y) + "px";
+				var preLoadEl=document.getElementById('preload'+viewID);
+				preLoadEl.style.left = (this.x + motion.x) + "px";
+				preLoadEl.style.top = (this.y + motion.y) + "px";
 			}
 			for (var c = 0; c < this.tiles.length; c++) {
 				for (var r = 0; r < this.tiles[c].length; r++) {
@@ -282,21 +283,23 @@ function reinitializeGraphic(viewID) {
 	}
 
 	// damit volle Höhe gewährleistet werden kann, height: 100% nicht verwendbar
+	var viewerContainer=document.getElementById("viewerContainer"+viewID);
+	var viewer=document.getElementById("viewer"+viewID);
 	if (Iview[viewID].maximized == true) {
-		$("viewerContainer"+viewID).style.height = curHeight - $("viewerContainer"+viewID).offsetTop + "px";
-		$("viewer"+viewID).style.height = curHeight - $("viewer"+viewID).parentNode.offsetTop - Iview[viewID].scrollBarX.my.self.offsetHeight  + "px";
-		$("viewerContainer"+viewID).style.width = curWidth + "px";
-		$("viewer"+viewID).style.width = curWidth - Iview[viewID].scrollBarY.my.self.offsetWidth  + "px";
+		viewerContainer.style.height = curHeight - viewerContainer.offsetTop + "px";
+		viewer.style.height = curHeight - viewer.parentNode.offsetTop - Iview[viewID].scrollBarX.my.self.offsetHeight  + "px";
+		viewerContainer.style.width = curWidth + "px";
+		viewer.style.width = curWidth - Iview[viewID].scrollBarY.my.self.offsetWidth  + "px";
 	} else {
 		// Wert wieder herstellen
-		$("viewerContainer"+viewID).style.height = Iview[viewID].startHeight + "px";
-		$("viewer"+viewID).style.height = Iview[viewID].startHeight - ((getStyle(Iview[viewID].scrollBarY.my.self,"visibility") == "visible")? Iview[viewID].scrollBarY.my.self.offsetHeight : 0)  + "px";
-		$("viewerContainer"+viewID).style.width = Iview[viewID].startHeight + "px";
-		$("viewer"+viewID).style.width = Iview[viewID].startWidth - ((getStyle(Iview[viewID].scrollBarX.my.self,"visibility") == "visible")? Iview[viewID].scrollBarX.my.self.offsetWidth : 0)  + "px";
+		viewerContainer.style.height = Iview[viewID].startHeight + "px";
+		viewer.style.height = Iview[viewID].startHeight - ((getStyle(Iview[viewID].scrollBarY.my.self,"visibility") == "visible")? Iview[viewID].scrollBarY.my.self.offsetHeight : 0)  + "px";
+		viewerContainer.style.width = Iview[viewID].startHeight + "px";
+		viewer.style.width = Iview[viewID].startWidth - ((getStyle(Iview[viewID].scrollBarX.my.self,"visibility") == "visible")? Iview[viewID].scrollBarX.my.self.offsetWidth : 0)  + "px";
 	}
 	
-	viewerBean.width = $("viewer"+viewID).offsetWidth;
-	viewerBean.height = $("viewer"+viewID).offsetHeight;
+	viewerBean.width = viewer.offsetWidth;
+	viewerBean.height = viewer.offsetHeight;
 	viewerBean.resize();
 	
 	// den Modus beibehalten & aktualisieren
@@ -315,7 +318,7 @@ function reinitializeGraphic(viewID) {
 			Iview[viewID].overview1.actualize(Iview[viewID].pagenumber);
 		}
 		// Anpassung des Black-Blank (zum Faden)
-		$("blackBlank"+viewID).style.height = $("viewerContainer"+viewID).offsetHeight + "px";
+		document.getElementById("blackBlank"+viewID).style.height = viewerContainer.offsetHeight + "px";
 	}
 	
 	handleResizeScrollbars(viewID);
@@ -359,7 +362,7 @@ function maximizeHandler(viewID) {
 		document.body.style.visibility = "visible";
 
 		// class-Wechsel löst im IE resize aus
-		$("viewerContainer"+viewID).className = "viewerContainer min";
+		document.getElementById("viewerContainer"+viewID).className = "viewerContainer min";
 		//$("buttonSurface"+viewID).className = "buttonSurface min";
 		//TODO nur auf Surfaces für bestimmen Viewer Anwenden
 		if (classIsUsed("buttonSurface")) doForEachInClass("buttonSurface", ".className = 'buttonSurface min';");
@@ -390,7 +393,7 @@ function maximizeHandler(viewID) {
 		document.body.style.visibility = "hidden";
 
 		// class-Wechsel loesst im IE resize aus
-		$("viewerContainer"+viewID).className = "viewerContainer max";
+		document.getElementById("viewerContainer"+viewID).className = "viewerContainer max";
 
 		doForEachInClass("buttonSurface", ".className = 'buttonSurface max';");
 //		$("buttonSurface"+viewID).className ="buttonSurface max";

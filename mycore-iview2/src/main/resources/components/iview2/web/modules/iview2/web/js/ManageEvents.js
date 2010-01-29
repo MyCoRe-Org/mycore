@@ -23,35 +23,18 @@ ManageEvents.addEventListener = function(target, type, callback, captures) {
 
 	switch (type) {//Browser behave on some kinds of events totally different therefore its needed to find it out and take action correctly
 		case "mousescroll":
-			if (isBrowser(["IE", "Opera", "Safari"])) {
-				//window.onmousewheel = target.onmousewheel = callback;
-				if (window.attachEvent) {
-					target.attachEvent("onmousewheel", wrapper, captures);
-				} else {
-					target.addEventListener("mousewheel", wrapper, captures);
-				}
-			} else {
-				target.addEventListener("DOMMouseScroll", wrapper, captures);
-			}
+			jQuery(target).bind("mousewheel", wrapper);
+			jQuery(target).bind("DOMMouseScroll", wrapper);
 			result = true;
 		break;
 		default://all Events which are just different in the function name to apply
-			if (target.addEventListener) {
-				// W3C standard
-				target.addEventListener(type, wrapper, false);
-			} else if (target.attachEvent) {
-				// newer IE
-				target.attachEvent("on" + (type == "DOMMouseScroll" ? "mousewheel" : type), wrapper);
-			} else {
-				// IE 5 Mac and some others
-				target['on'+type] = callback;
-			}
+			jQuery(target).bind(type, wrapper);
 			result = true;
 		break;
 	}
 	
-	// Falls das Event erfolgreicht registriert wurde, m�ssen wir es noch hier registrieren,
-	// um das Event auch wieder an Hand seiner Original Funktion entfernen zu k�nnen.
+	// Falls das Event erfolgreicht registriert wurde, müssen wir es noch hier registrieren,
+	// um das Event auch wieder an Hand seiner Original Funktion entfernen zu können.
 	if (result)	{
 		ManageEvents_Events[ManageEvents_Events.length] = [target, type, callback, wrapper];
 	}

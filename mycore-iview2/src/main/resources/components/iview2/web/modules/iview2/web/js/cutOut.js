@@ -64,7 +64,7 @@ function cutOut() {
 		complete.appendChild(ausschnitt);
 		var thumb = new Image();
 		complete.appendChild(thumb);
-		$(parent).appendChild(complete);
+		document.getElementById(parent).appendChild(complete);
 		var damp = document.createElement("div");
 		damp.id = idD;
 		damp.className = "damp" + identer;
@@ -74,7 +74,7 @@ function cutOut() {
 		show.className = "show";
 		damp.appendChild(hide);
 		damp.appendChild(show);
-		$(parentD).appendChild(damp);
+		document.getElementById(parentD).appendChild(damp);
 
 		ManageEvents.addEventListener(complete, "mouseScroll", mouseScroll, false);
 		ManageEvents.addEventListener(complete, "dblclick", dblClick, false);
@@ -309,12 +309,12 @@ function cutOut() {
 	*/
 	function damper(e) {
 		if (dampered) {
-			blendings.fadeOut(my.self.id,5, 100, "$('"+my.self.id+"').style.visibility = 'hidden';");
+			blendings.fadeOut(my.self.id,5, 100, "document.getElementById('"+my.self.id+"').style.visibility = 'hidden';");
 			my.damp.getElementsByTagName("div")[0].style.display = "none";
 			my.damp.getElementsByTagName("div")[1].style.display = "block"; 
 			my.damp.title = "Ausklappen";
 		} else {
-			blendings.fadeIn(my.self.id,5,100, '', "$('"+my.self.id+"').style.visibility = 'visible';");
+			blendings.fadeIn(my.self.id,5,100, '', "document.getElementById('"+my.self.id+"').style.visibility = 'visible';");
 			my.damp.getElementsByTagName("div")[0].style.display = "block";
 			my.damp.getElementsByTagName("div")[1].style.display = "none"; 
 			my.damp.title = "Einklappen";

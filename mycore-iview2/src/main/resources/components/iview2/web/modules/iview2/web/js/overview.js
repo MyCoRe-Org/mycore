@@ -58,8 +58,9 @@ function overview(newId, parent, identer) {
 	*/
 	function createContainers() {
 		//calculate the number of horizontal and vertical div-boxes
-		amountWidth = Math.floor((parseInt($(id).offsetWidth) - scrollBarWidth) / divSizeWidth);
-		amountHeight = Math.floor(parseInt($(id).offsetHeight) / divSizeHeight);
+		var el=document.getElementById(id);
+		amountWidth = Math.floor((parseInt(el.offsetWidth) - scrollBarWidth) / divSizeWidth);
+		amountHeight = Math.floor(parseInt(el.offsetHeight) / divSizeHeight);
 
 		// create target Div's
 		for (var i = 0; i < amountHeight; i++) {
@@ -78,24 +79,25 @@ function overview(newId, parent, identer) {
 	*/
 	function prepareContainer(i,j) {
 		// CSS
-		$("divBox").style.borderTopStyle = getStyle("divBox","border-top-style");
-		$("divBox").style.borderBottomStyle = getStyle("divBox","border-bottom-style");
-		$("divBox").style.borderLeftStyle = getStyle("divBox","border-left-style");
-		$("divBox").style.borderRightStyle = getStyle("divBox","border-right-style");
+		var divBox=jQuery("#divBox");
+		divBox.css("border-top-style", divBox.css("border-top-style"));
+		divBox.css("border-bottom-style", divBox.css("border-bottom-style"));
+		divBox.css("borderLeftStyle", divBox.css("border-left-style"));
+		divBox.css("borderRightStyle", divBox.css("border-right-style"));
 
-		$("divBox").style.borderTopWidth = getStyle("divBox","border-top-width");
-		$("divBox").style.borderBottomWidth = getStyle("divBox","border-bottom-width");
-		$("divBox").style.borderLeftWidth = getStyle("divBox","border-left-width");
-		$("divBox").style.borderRightWidth = getStyle("divBox","border-right-width");
+		divBox.css("borderTopWidth", divBox.css("border-top-width"));
+		divBox.css("borderBottomWidth", divBox.css("border-bottom-width"));
+		divBox.css("borderLeftWidth", divBox.css("border-left-width"));
+		divBox.css("borderRightWidth", divBox.css("border-right-width"));
 
-		$("divBox").style.borderTopColor = getStyle("divBox","border-top-color");
-		$("divBox").style.borderBottomColor = getStyle("divBox","border-bottom-color");
-		$("divBox").style.borderLeftColor = getStyle("divBox","border-left-color");
-		$("divBox").style.borderRightColor = getStyle("divBox","border-right-color");
+		divBox.css("borderTopColor", divBox.css("border-top-color"));
+		divBox.css("borderBottomColor", divBox.css("border-bottom-color"));
+		divBox.css("borderLeftColor", divBox.css("border-left-color"));
+		divBox.css("borderRightColor", divBox.css("border-right-color"));
 
-		$("divBox").style.backgroundColor = getStyle("divBox","background-color");
+		divBox.css("backgroundColor", divBox.css("background-color"));
 
-		$("divBox").id = "divBox" + viewID +((i * amountWidth) + j);
+		divBox.attr("id", "divBox" + viewID +((i * amountWidth) + j));
 	}
 
 	/*
@@ -105,13 +107,13 @@ function overview(newId, parent, identer) {
 
 		//prepare info-div
 		createAbsoluteObject("div", "infoDiv", targetDiv);
-		
-		$("infoDiv").style.left = ((divSizeWidth - parseInt($("infoDiv").offsetWidth)) / 2) + "px";
-		$("infoDiv").id="infoDiv" + viewID +((i * amountWidth) + j);
+		var infoDiv=document.getElementById("infoDiv");
+		infoDiv.style.left = ((divSizeWidth - parseInt(document.getElementById("infoDiv").offsetWidth)) / 2) + "px";
+		infoDiv.id="infoDiv" + viewID +((i * amountWidth) + j);
 
 		//prepare preview-image
 		createAbsoluteObject("img", "previewDiv" + viewID +((i * amountWidth) + j), targetDiv);
-		$("previewDiv" + viewID +((i * amountWidth) + j)).style.cursor = 'pointer';
+		document.getElementById("previewDiv" + viewID +((i * amountWidth) + j)).style.cursor = 'pointer';
 
 	}
 
@@ -119,17 +121,18 @@ function overview(newId, parent, identer) {
 	@description positioned the container and the div-boxes to the correct position
 	*/
 	function posOverviewContainers() {
-
-		var distanceLeft = (((parseInt($(id).offsetWidth)- scrollBarWidth) - (amountWidth * divSizeWidth)) / 2);
-		var distanceTop = ((parseInt($(id).offsetHeight) - (amountHeight * divSizeHeight)) / 2);
-
+		var el=document.getElementById(id);
+		var distanceLeft = (((parseInt(el.offsetWidth)- scrollBarWidth) - (amountWidth * divSizeWidth)) / 2);
+		var distanceTop = ((parseInt(el.offsetHeight) - (amountHeight * divSizeHeight)) / 2);
+		var divBox;
 		// position target Div's
 		for (var i = 0; i < amountHeight; i++) {
 			for (var j = 0; j < amountWidth; j++) {
-				$("divBox" + viewID +((i * amountWidth) + j)).style.height = divSizeHeight + "px";
-				$("divBox" + viewID +((i * amountWidth) + j)).style.width = divSizeWidth + "px";
-				$("divBox" + viewID +((i * amountWidth) + j)).style.left = (distanceLeft + (j * divSizeWidth)) + "px";
-				$("divBox" + viewID +((i * amountWidth) + j)).style.top = (distanceTop + (i * divSizeHeight)) + "px";
+				divBox=document.getElementById("divBox" + viewID +((i * amountWidth) + j));
+				divBox.style.height = divSizeHeight + "px";
+				divBox.style.width = divSizeWidth + "px";
+				divBox.style.left = (distanceLeft + (j * divSizeWidth)) + "px";
+				divBox.style.top = (distanceTop + (i * divSizeHeight)) + "px";
 			}
 		}
 	}
@@ -152,8 +155,9 @@ function overview(newId, parent, identer) {
 				}
 			};
 		});
+		var el=document.getElementById(id);
 		scrollOverview.setParent(id);
-		scrollOverview.setSize($(id).offsetHeight);
+		scrollOverview.setSize(el.offsetHeight);
 		scrollOverview.setStepper(true);
 		// IE specific, remove absolute Value
 		if(window.attachEvent && !window.opera) {
@@ -165,7 +169,7 @@ function overview(newId, parent, identer) {
 		ManageEvents.addEventListener(document, 'mouseup', scrollOverview.mouseUp, false);
 		// default mouseScroll event von Scrollbar entfernen, da sonst doppelt registriert
 		ManageEvents.removeEventListener(getElementsByClassName("empty","scrollOV"+viewID,"div")[0], 'mouseScroll', scrollOverview.scroll, false);
-		ManageEvents.addEventListener($(id), 'mouseScroll', scrollOverview.scroll, false);
+		ManageEvents.addEventListener(el, 'mouseScroll', scrollOverview.scroll, false);
 	}
 
 	/*
@@ -178,7 +182,7 @@ function overview(newId, parent, identer) {
 		main.className = "overview" + identer;
 		// Browser-Drag&Drop deaktiveren
 		main.onmousedown = function(){return false;}; //so that browser-drag-&-drop disabled
-		$(parent).appendChild(main);
+		document.getElementById(parent).appendChild(main);
 		
 		// define divSize	
 		tmp = getCssProps("divBox", "", id, ["width", "border-left-width", "border-right-width", "height", "border-top-width", "border-bottom-width"], "parseInt")
@@ -238,12 +242,13 @@ function overview(newId, parent, identer) {
 		
 		//currentcurrentFirstRow = currentFirstRow;
 		
+		var divBox;
 		// proceed line wise
 		for (var i = 0; i < amountHeight; i++) {
 			for (var j = 0; j < amountWidth; j++) {
-
+				divBox=document.getElementById("divBox" + viewID +((i * (amountWidth)) + j));
 				//get back previously hidden div's
-				$("divBox" + viewID +((i * (amountWidth)) + j)).style.display = "block";
+				divBox.style.display = "block";
 				
 				//load needed Previews
 				if ((((i + currentFirstRow) * amountWidth) + j) < numberOfPages) {
@@ -253,7 +258,7 @@ function overview(newId, parent, identer) {
 				if ((i + currentFirstRow) >= (Math.floor((numberOfPages) / amountWidth))) {
 					// page not existing???
 					if ((((currentFirstRow + i) * amountWidth)+j) > (numberOfPages - 1)) {
-						$("divBox" + viewID +((i * (amountWidth)) + j)).style.display = "none";
+						divBox.style.display = "none";
 						if (i <= amountHeight) {
 							delFrom = i + 1;
 						}
@@ -265,7 +270,7 @@ function overview(newId, parent, identer) {
 		if (delFrom < amountHeight) {
 			for (var i = delFrom; i < amountHeight; i++) {
 				for (var j = 0; j < amountWidth; j++) {
-					$("divBox" + viewID +((i * (amountWidth)) + j)).style.display = "none";
+					document.getElementById("divBox" + viewID +((i * (amountWidth)) + j)).style.display = "none";
 				}
 			}
 		}
@@ -278,13 +283,13 @@ function overview(newId, parent, identer) {
 		var pageName = findInArrayElement(nodeProps(book, "mets:file", (((i + currentFirstRow) * amountWidth) + j), true), "LOCTYPE", "URL").href;
 
 		var source = Iview[viewID].viewerBean.tileUrlProvider.assembleUrl(0, 0, 0, pageName);
-		var preview = $("previewDiv" + viewID +((i * amountWidth) + j));
+		var preview = document.getElementById("previewDiv" + viewID +((i * amountWidth) + j));
 		
 		// nicht sicher ob das so in allen Browsern funktioniert
 		// linking the previews with the viewer, only if this wasen't done in past
 		//if (!(ManageEvents.findEvents($("previewDiv" + viewID +((i * amountWidth) + j)),"click",""))) {
 			//ManageEvents.addEventListener($("previewDiv" + viewID +((i * amountWidth) + j)), 'click', function(e) {notifyListenerClick((((i + currentFirstRow) * amountWidth) + j) + 1);}, true);
-			$("previewDiv" + viewID +((i * amountWidth) + j)).onclick =  function(e) {notifyListenerClick((((i + currentFirstRow) * amountWidth) + j) + 1);};
+			preview.onclick =  function(e) {notifyListenerClick((((i + currentFirstRow) * amountWidth) + j) + 1);};
 		//}
 		
 		// original Values needs, because Img will scale automatic in each Props
@@ -293,8 +298,9 @@ function overview(newId, parent, identer) {
 		origImage.src = source;
 		
 		// fill Info div
-		$("infoDiv" + viewID +((i * amountWidth) + j)).innerHTML = pageName;
-		$("infoDiv" + viewID +((i * amountWidth) + j)).title = pageName;
+		var infoDiv=document.getElementById("infoDiv" + viewID +((i * amountWidth) + j));
+		infoDiv.innerHTML = pageName;
+		infoDiv.title = pageName;
 		// page 0 doesn't exist
 		
 		// nett anzuschaun ist es auch, wenn source bereits vor onload des origImage gesetzt wird, da die Bilder dann sichtbar zusammenschrumpfen
@@ -348,7 +354,7 @@ function overview(newId, parent, identer) {
 		}
 		// center previews horz & vert
 		// (infoDivs sind alle gleich groß)
-		preview.style.top = ((parseInt($("infoDiv" + viewID + "0").offsetTop) - 
+		preview.style.top = ((parseInt(document.getElementById("infoDiv" + viewID + "0").offsetTop) - 
 						parseInt(preview.style.height)) / 2) + "px";
 		preview.style.left = ((divSizeWidth - preview.offsetWidth) / 2) + "px";
 	}
@@ -368,15 +374,16 @@ function overview(newId, parent, identer) {
 	@description clears the overview
 	*/
 	function clearOverview() {
-		var isVisible = $(id).style.visibility;
-		var myParent = $(id).parentNode;
-		myParent.removeChild($(id));
+		var el=document.getElementById(id);
+		var isVisible = el.style.visibility;
+		var myParent = el.parentNode;
+		myParent.removeChild(el);
 		var resetOverview = document.createElement("div");
 		resetOverview.id = id;
 		resetOverview.className = "overview" + identer;
 		resetOverview.onmousedown = function(){return false;}; //so that browser-drag-&-drop remains disabled after resize
 		myParent.appendChild(resetOverview);
-		$(id).style.visibility = isVisible;
+		el.style.visibility = isVisible;
 	}
 
 	function getAmountHeight() {

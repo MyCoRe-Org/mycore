@@ -50,7 +50,11 @@ function pageForm(newId, parent, identer) {
 		var main = document.createElement("form");
 		main.id = id + amountForms;
 		main.className = identer + amountForms;
-		$(parent).appendChild(main);
+		if (typeof(parent.appendChild)=="undefined"){
+			console.trace();
+			return;
+		}
+		parent.appendChild(main);
 		
 		pEl = document.createElement("p");
 		main.appendChild(pEl);

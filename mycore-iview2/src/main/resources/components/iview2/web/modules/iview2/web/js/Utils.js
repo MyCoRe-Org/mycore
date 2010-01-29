@@ -47,39 +47,28 @@ function getEvent(e) {
  @return Array of Objects which matched the search Conditions
  */
 function getElementsByClassName(searchClass, node, tag) {
-	if (document.body.getElementsByClassName) {
-		if (typeof arguments[1] == "undefined" || node == null )
-			node = document;
-		var nodes = $(node).getElementsByClassName(searchClass);
-		if (typeof arguments[2] != "undefined" || tag != null) {
-			var tagNode = new Array;
-			var count = 0;
-			for (var i = 0; i < nodes.length; i++) {
-				if (nodes[i].nodeName.toLowerCase() == tag.toLowerCase()) {
-					tagNode[count++] = nodes[i];
-				}
-			}
-			return tagNode;//Return all Nodes with the given Tag and Class
-		} else {
-			return nodes;//Simply return all Found nodes which are childs of the Starting Node
+	if (node!=null)
+		node=document.getElementById(node);
+	//Fast JS 1.6 Implementation
+	if (typeof(Array.filter)!="undefined" && typeof(document.getElementsByClassName)!="undefined"){
+		var searchRoot=document;
+		if (node!=null){
+			searchRoot=node;
 		}
-	} else {
-		var classElements = new Array();
-		if (typeof arguments[1] == "undefined" || node == null )
-			node = document;
-		if (typeof arguments[2] == "undefined" || tag == null )
-			tag = '*';
-		var els = $(node).getElementsByTagName(tag);
-		var elsLen = els.length;
-		var pattern = new RegExp("(^|\\s)"+searchClass+"(\\s|$)");
-		for (i = 0, j = 0; i < elsLen; i++) {
-			if ( pattern.test(els[i].className) ) {
-				classElements[j] = els[i];
-				j++;
-			}
+		if (tag!=null){
+			tag=tag.toLowerCase();
+			return Array.filter(searchRoot.getElementsByClassName(searchClass), function(elem){
+				console.log("nodeName: "+elem.nodeName);
+				return elem.nodeName.toLowerCase() == tag; 
+			});
 		}
-		return classElements;
+		return searchRoot.getElementsByClassName(searchClass);
 	}
+	var selector=(tag!=null?tag:"")+"."+searchClass;
+	if (node!=null){
+		return jQuery(node).find(selector);
+	}
+	return jQuery(selector);
 }
 
 /*
@@ -228,21 +217,7 @@ function returnDelta(e, prevent) {
 */
 function getStyle(el,styleProp)
 {
-	var x = $(el);
-	//If the Browser is IE or Opera it's needed remove the - within the Property Identifier, so they can correctly gain these values
-	if (isBrowser(['IE', 'Opera']) && styleProp.indexOf("-") != -1) {
-		var parts = styleProp.split("-");
-		styleProp = parts[0];
-		for (var i = 1; i < parts.length; i++) {
-			styleProp = styleProp + parts[i].charAt(0).toUpperCase() + parts[i].substr(1);
-		}
-	}
-	if (x.currentStyle) {
-		var y = x.currentStyle[styleProp];//For IE
-	} else if (window.getComputedStyle) {
-		var y = document.defaultView.getComputedStyle(x,null).getPropertyValue(styleProp);
-	}
-	return y;
+	return jQuery(el).css(styleProp);
 }
 
 /*
@@ -268,7 +243,8 @@ function getCssProps(id, classType, parentId, properties) {
 	var tmpDiv = document.createElement("div");
 	tmpDiv.id = id;
 	tmpDiv.className = classType;
-	$(parentId).appendChild(tmpDiv);
+	var parent=document.getElementById(parentId);
+	parent.appendChild(tmpDiv);
 	
 	var value = new Array();
 	for (i = 0; i < properties.length; i++) {
@@ -278,7 +254,7 @@ function getCssProps(id, classType, parentId, properties) {
 			value[i] = getStyle(tmpDiv, properties[i]);
 		}
 	}
-	$(parentId).removeChild(tmpDiv);
+	parent.removeChild(tmpDiv);
 	return value;
 }
 
@@ -291,7 +267,9 @@ function createAbsoluteObject(object, id, target) {
 	newObject.id = id;
 	newObject.className = id;
 	newObject.style.position = "absolute";
-	$(target).appendChild(newObject);
+	if (document.getElementById(target)==null)
+		console.trace();
+	document.getElementById(target).appendChild(newObject);
 }
 
 function copyArray(array) {

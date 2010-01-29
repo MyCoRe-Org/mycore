@@ -507,7 +507,7 @@ function scrollBar(newId) {
 		complete.id = id;
 		complete.className = identer+((horz)? "H":"V");//new
 		if (parent != "")
-			$(parent).appendChild(complete);
+			document.getElementById(parent).appendChild(complete);
 
 	//Start Up/Left
 		var buttonUL = document.createElement("div");
@@ -845,7 +845,7 @@ function scrollBar(newId) {
 	*/
 	function setParent(name) {
 		parent = name;
-		$(name).appendChild(this.my.self);
+		document.getElementById(name).appendChild(this.my.self);
 		//getOffset();
 	}
 //EVENT LISTENER Functions

@@ -1,6 +1,6 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink"
-  xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:mcrxml="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:mcriview="xalan://org.mycore.services.iview2.MCRIView2Tools" version="1.0"
-  exclude-result-prefixes="xlink i18n mcrxml">
+  xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:mcrxml="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:iview2="xalan://org.mycore.frontend.iview2.MCRIView2XSLFunctions" version="1.0"
+  exclude-result-prefixes="xlink i18n mcrxml iview2">
   <xsl:param name="MCR.Module-iview2.BaseURL" />
   <xsl:param name="WebApplicationBaseURL" />
   <xsl:output method="html" indent="yes" encoding="UTF-8" media-type="text/html" />
@@ -20,7 +20,7 @@
       addIviewProperty('<xsl:value-of select="$groupID" />', 'useOverview',<xsl:value-of select="$overview" />);
       addIviewProperty('<xsl:value-of select="$groupID" />', 'baseUri', baseUris);
       addIviewProperty('<xsl:value-of select="$groupID" />', 'webappBaseUri', '"<xsl:value-of select="$WebApplicationBaseURL"/>"');
-      addIviewProperty('<xsl:value-of select="$groupID" />', 'hasMets', <xsl:value-of select="mcriview:hasMETSFile($groupID)"/>);
+      addIviewProperty('<xsl:value-of select="$groupID" />', 'hasMets', <xsl:value-of select="iview2:hasMETSFile($groupID)"/>);
     </script>
     <div id="viewerContainer{$groupID}" class="viewerContainer min">
       <xsl:if test="string-length($style) &gt; 0">
@@ -168,7 +168,7 @@
       <xsl:choose>
         <xsl:when test="$inputPage = 'true'">
           <script>
-            importPageInput('<xsl:value-of select="$groupID" />', $("buttonSurface<xsl:value-of select="$groupID" />"));
+            importPageInput('<xsl:value-of select="$groupID" />', document.getElementById("buttonSurface<xsl:value-of select="$groupID" />"));
           </script>
         </xsl:when>
       </xsl:choose>
@@ -176,7 +176,7 @@
       <xsl:choose>
         <xsl:when test="$formPage = 'true'">
           <script>   
-            importPageForm('<xsl:value-of select="$groupID" />', $("buttonSurface<xsl:value-of select="$groupID" />"));
+            importPageForm('<xsl:value-of select="$groupID" />', document.getElementById("buttonSurface<xsl:value-of select="$groupID" />"));
           </script>
         </xsl:when>
       </xsl:choose>
@@ -293,7 +293,7 @@
     <!--PageForm-->
     <script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/init.js"/>
     <!-- Init Funktionen -->
-    <script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/prototype.js"/>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.0/jquery.min.js"/>
     <!-- Prototype Framework -->
     <script type="text/javascript">
       function addIviewProperty(viewID, propertyName, val) {
@@ -412,5 +412,12 @@
         </script>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
+  <xsl:template name="iview2.getImageElement">
+    <xsl:param name="derivate" />
+    <xsl:param name="imagePath" />
+    <xsl:param name="style" select="''" />
+    <xsl:param name="class" select="''" />
+    <img src="{concat($WebApplicationBaseURL,'servlets/MCRThumbnailServlet/',$derivate,$imagePath)}" style="{$style}" class="{$class}"/>
   </xsl:template>
 </xsl:stylesheet>

@@ -74,11 +74,11 @@ function loadPage(viewID, callback) {
 	Iview[viewID].prefix  = findInArrayElement(pageData, "LOCTYPE", "URL").href;
 	
 	var imagePropertiesURL=Iview[viewID].baseUri[0]+"/"+viewID+"/"+findInArrayElement(pageData, "LOCTYPE", "URL").href+"/imageinfo.xml";
-	new Ajax.Request(imagePropertiesURL, {
-		method: 'get',
-  		onSuccess: function(response) {processImageProperties(response.responseXML,viewID)},
-  		onException: function(requester, exception) {alert("Error occured while loading image properties:\n"+exception);},
-  		onComplete: function() {callBack(callback)}
+	jQuery.ajax({
+		url: imagePropertiesURL,
+  		success: function(response) {processImageProperties(response,viewID)},
+  		error: function(request, status, exception) {alert("Error occured while loading image properties:\n"+exception);},
+  		complete: function() {callBack(callback)}
 	});
 }
 
@@ -131,12 +131,13 @@ function processImageProperties(imageProperties, viewID){
 		// zoomLevel 0 ist erstes Level
 		Iview[viewID].zoomInit = Math.ceil((Iview[viewID].zoomMax + 1) / 2) - 1;
 	}
-	$("preload"+viewID).style.width = Iview[viewID].bildBreite / Math.pow(2, Iview[viewID].zoomMax - Iview[viewID].zoomInit) + "px";
-	$("preload"+viewID).style.height = Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - Iview[viewID].zoomInit) + "px";
-	$("preload"+viewID).removeChild($("preloadImg"+viewID));
+	var preLoadEl=document.getElementById("preload"+viewID);
+	preLoadEl.style.width = Iview[viewID].bildBreite / Math.pow(2, Iview[viewID].zoomMax - Iview[viewID].zoomInit) + "px";
+	preLoadEl.style.height = Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - Iview[viewID].zoomInit) + "px";
+	preLoadEl.removeChild(document.getElementById("preloadImg"+viewID));
 	var preload = new Image();
 	preload.id = "preloadImg" + viewID;
-	$("preload"+viewID).appendChild(preload);
+	preLoadEl.appendChild(preload);
 
 	if (viewerBean == null) {
 		initializeGraphic(viewID);
@@ -195,34 +196,20 @@ function openOverview(viewID) {
 		Iview[viewID].overviewActive = !Iview[viewID].overviewActive;
 		// update overview
 		Iview[viewID].overview1.actualize(Iview[viewID].pagenumber);
-		/*var doBefore = "setOpacity($('blackBlank"+viewID+"'),0); $('blackBlank"+viewID+"').style.display ='block'";
-		var doBetween = "$('overview1"+viewID+"').style.visibility ='visible'; $('viewer"+viewID+"').style.visibility = 'hidden';";
-		var doAfter = "$('blackBlank"+viewID+"').style.display ='none'";
-		*/
 
 		// im VollBild Header mit ausblenden
-		//if (Iview[viewID].maximized) doBetween = doBetween + "$('viewer"+viewID+"').parentNode.style.top = '0px'";
-
-		$('overview1'+viewID).style.top = - ($("viewerContainer" + viewID).offsetHeight) + "px";
-		$('overview1'+viewID).style.visibility = 'visible';
-		blendings.slide("overview1"+viewID, new Array(0,- ($("viewerContainer" + viewID).offsetHeight),0,0),5,5,0,new Array(), "", "");
-		
-		//blendings.blend(['blackBlank'+viewID], ['blackBlank'+viewID], 7, 100, doAfter, doBetween, doBefore);
+		var overview=document.getElementById("overview1"+viewID);
+		var viewerContainer=document.getElementById("viewerContainer"+viewID);
+		overview.style.top = - (viewerContainer.offsetHeight) + "px";
+		overview.style.visibility = 'visible';
+		blendings.slide("overview1"+viewID, new Array(0,- (viewerContainer.offsetHeight),0,0),5,5,0,new Array(), "", "");
 
 		openChapter(false, viewID);
 	} else {
 		Iview[viewID].overviewActive = !Iview[viewID].overviewActive;
 		
-		/*var doBefore = "setOpacity($('blackBlank"+viewID+"'),0); $('blackBlank"+viewID+"').style.display ='block';";
-		var doBetween = "$('overview1"+viewID+"').style.visibility ='hidden'; $('viewer"+viewID+"').style.visibility = 'visible'; navigatePage("+Iview[viewID].pagenumber+",'"+viewID+"');";
-		var doAfter = "$('blackBlank"+viewID+"').style.display = 'none';";
-		*/
-		
 		// im VollBild Header wieder mit einblenden
-		//if (Iview[viewID].maximized) doBetween = doBetween + "$('viewer"+viewID+"').parentNode.style.top = ''";
-	
-		blendings.slide("overview1"+viewID, new Array(0,0,0,- ($("viewerContainer" + viewID).offsetHeight)),5,5,0,new Array(), "", "$('overview1'+'"+viewID+"').style.visibility = 'hidden'");	
-		//blendings.blend(['blackBlank'+viewID],  ['blackBlank'+viewID], 7, 100, doAfter, doBetween, doBefore);
+		blendings.slide("overview1"+viewID, new Array(0,0,0,- (document.getElementById("viewerContainer" + viewID).offsetHeight)),5,5,0,new Array(), "", "document.getElementById('overview1'+'"+viewID+"').style.visibility = 'hidden'");	
 	
 		openChapter(false, viewID);
 	}
@@ -328,9 +315,10 @@ function switchDisplayMode(screenZoom, stateBool, viewID) {
 	stateBool = (stateBool)? false: true;
 	viewerBean.clear();
 	removeScaling(viewID);
+	var preload = document.getElementById("preload"+viewID);
 	if (stateBool) {
 		for (var i = 0; i <= Iview[viewID].zoomMax; i++) {
-			if(Iview[viewID].bildBreite/viewerBean.width > Iview[viewID].bildHoehe/$("viewer"+viewID).offsetHeight || (stateBool && !screenZoom)){
+			if(Iview[viewID].bildBreite/viewerBean.width > Iview[viewID].bildHoehe/document.getElementById("viewer"+viewID).offsetHeight || (stateBool && !screenZoom)){
 			//Width > Height Or ZoomWidth is true
 				//Siehe TODO oben
 				if (calculateZoomProp(i, Iview[viewID].bildBreite, viewerBean.width, /*toInt(getStyle("scrollV"+viewID, "width"))*/0, viewID)) {
@@ -346,8 +334,8 @@ function switchDisplayMode(screenZoom, stateBool, viewID) {
 		// zoomIn-Button einblenden, da min ein "groesseres" ZoomLevel existiert, von dem aus runterskaliert wurde
 		if (classIsUsed("BSE_zoomIn")) doForEachInClass("BSE_zoomIn", ".style.display = 'block';", viewID);
 		
-		if (getElementsByClassName("buttonSurface min", $("viewerContainer"+viewID), "div")[0]) {
-			getElementsByClassName("buttonSurface min", $("viewerContainer"+viewID), "div")[0].style.width = $("preload"+viewID).offsetWidth + "px";
+		if (getElementsByClassName("buttonSurface min", document.getElementById("viewerContainer"+viewID), "div")[0]) {
+			getElementsByClassName("buttonSurface min", document.getElementById("viewerContainer"+viewID), "div")[0].style.width = preload.offsetWidth + "px";
 		}
 	} else {
 		Iview[viewID].zoomScale = 1;
@@ -361,10 +349,10 @@ function switchDisplayMode(screenZoom, stateBool, viewID) {
 		}
 	}
 
-	Iview[viewID].scrollBarX.setValue(-parseInt($("preload"+viewID).offsetLeft));
-	Iview[viewID].scrollBarY.setValue(-parseInt($("preload"+viewID).offsetTop));
+	Iview[viewID].scrollBarX.setValue(-parseInt(preload.offsetLeft));
+	Iview[viewID].scrollBarY.setValue(-parseInt(preload.offsetTop));
 	//TODO zu machen?
-	if (Iview[viewID].useCutOut) Iview[viewID].ausschnitt.setPosition({'x':$("preload"+viewID).offsetLeft, 'y':$("preload"+viewID).offsetTop});
+	if (Iview[viewID].useCutOut) Iview[viewID].ausschnitt.setPosition({'x':preload.offsetLeft, 'y':preload.offsetTop});
 	return stateBool;
 }
 /*
@@ -410,12 +398,13 @@ function handleZoomScrollbars(viewID) {
 	// current position
 	scrollBarX.setValue(-viewerBean.x);
 	// length of the bar
-	scrollBarX.setLength((viewerBean.width - ((Iview[viewID].useCutOut && DampInViewer)? toFloat(getStyle($("damp"+viewID), "width")):0))/ (curBreite/viewerBean.width));	
+	var damp=document.getElementById("damp"+viewID);
+	scrollBarX.setLength((viewerBean.width - ((Iview[viewID].useCutOut && DampInViewer)? toFloat(getStyle(damp, "width")):0))/ (curBreite/viewerBean.width));	
 	
 	// vertically
 	scrollBarY.setMaxValue(curHoehe - viewerBean.height);
 	scrollBarY.setValue(-viewerBean.y);
-	scrollBarY.setLength((viewerBean.height - ((Iview[viewID].useCutOut && DampInViewer)? toFloat(getStyle($("damp"+viewID), "height")):0))/ (curHoehe/viewerBean.height));
+	scrollBarY.setLength((viewerBean.height - ((Iview[viewID].useCutOut && DampInViewer)? toFloat(getStyle(damp, "height")):0))/ (curHoehe/viewerBean.height));
 }
 
 /*
@@ -460,9 +449,9 @@ function listenerZoom(viewID) {
 		if (Iview[viewID].zoomScreen) {
 			pictureScreen(viewID, true);
 		}
-	
-		$("preload"+viewID).style.width = (Iview[viewID].bildBreite / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale +  "px";
-		$("preload"+viewID).style.height = (Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale + "px";
+		var perLoadEl=document.getElementById("preload"+viewID);
+		perLoadEl.style.width = (Iview[viewID].bildBreite / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale +  "px";
+		perLoadEl.style.height = (Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale + "px";
 	
 		handleZoomScrollbars(viewID);
 
@@ -501,8 +490,9 @@ function listenerMove(viewID) {
 		}
 		// block is only executed if the function not by scrollbar is calling, otherwise there are ugly interference
 		if (!Iview[viewID].scroller) {
-			Iview[viewID].scrollBarX.setValue(-parseInt($("preload"+viewID).offsetLeft));
-			Iview[viewID].scrollBarY.setValue(-parseInt($("preload"+viewID).offsetTop));
+			var preload=document.getElementById("preload"+viewID);
+			Iview[viewID].scrollBarX.setValue(-parseInt(preload.offsetLeft));
+			Iview[viewID].scrollBarY.setValue(-parseInt(preload.offsetTop));
 		}
 	}
 }
@@ -552,7 +542,7 @@ function generateURL(viewID) {
 }
 
 function openChapterAndInitialize(major, viewID, button){
-	var chapter=$("chapter1"+viewID);
+	var chapter=document.getElementById("chapter1"+viewID);
 	if (chapter == null){
 			//background-image:url(image.png);
 			//background-position:-390px 0;
@@ -562,7 +552,7 @@ function openChapterAndInitialize(major, viewID, button){
 			setTimeout(function(){
 				importChapter(viewID);
 				var end=new Date().getTime() - start;
-				var chapter=$("chapter1"+viewID);
+				var chapter=document.getElementById("chapter1"+viewID);
 				button.className=oldClassName;
 				if (typeof(console)!='undefined'){
 					var msg="import chapters took "+end+"ms"
@@ -584,7 +574,7 @@ function openChapter(major, viewID){
 		//alert(warnings[0])
 		return;
 	}
-	var chapter=$("chapter1"+viewID);
+	var chapter=document.getElementById("chapter1"+viewID);
 	if (chapter == null){
 		return;
 	}
@@ -594,10 +584,10 @@ function openChapter(major, viewID){
 		if (chapter.style.visibility == "hidden") {
 			chapter.style.visibility = "visible";
 			Iview[viewID].chapter1.showCurrentPageCenter(Iview[viewID].pagenumber);
-			blendings.slide("chapter1"+viewID, new Array(getStyle("chapter1"+viewID,"left"),0,getStyle("chapter1"+viewID,"left"),($("chapter1" + viewID).offsetHeight)),5,5,0,new Array(), "");
+			blendings.slide("chapter1"+viewID, new Array(getStyle("chapter1"+viewID,"left"),0,getStyle("chapter1"+viewID,"left"),(chapter.offsetHeight)),5,5,0,new Array(), "");
 			Iview[viewID].chapterActive = true;
 		} else {
-			blendings.slide("chapter1"+viewID, new Array(getStyle("chapter1"+viewID,"left"),0,getStyle("chapter1"+viewID,"left"),- ($("chapter1" + viewID).offsetHeight)),5,5,0,new Array(), "",  "$('chapter1"+viewID+"').style.visibility = 'hidden';");
+			blendings.slide("chapter1"+viewID, new Array(getStyle("chapter1"+viewID,"left"),0,getStyle("chapter1"+viewID,"left"),- (chapter.offsetHeight)),5,5,0,new Array(), "",  "document.getElementById('chapter1"+viewID+"').style.visibility = 'hidden';");
 			Iview[viewID].chapterActive = false;
 		}
 	} else {
@@ -605,7 +595,9 @@ function openChapter(major, viewID){
 		if (Iview[viewID].chapterActive && !Iview[viewID].overviewActive && Iview[viewID].maximized && chapter.style.visibility == "hidden") {
 			chapter.style.visibility = "visible";
 			Iview[viewID].chapter1.showCurrentPageCenter(Iview[viewID].pagenumber);
-			blendings.slide("chapter1"+viewID,new Array(toFloat(getStyle($("chapter1"+viewID+"Out"), "left")) - toFloat(getStyle($("chapter1"+viewID+"Out"), "right")), toFloat(getStyle($("chapter1"+viewID+"Out"),"top")), toFloat(getStyle($("chapter1"+viewID+"In"), "left")) - toFloat(getStyle($("chapter1"+viewID+"In"), "right")), toFloat(getStyle($("chapter1"+viewID+"In"), "top"))),5,5,0,new Array("chapter1"+viewID+":in"));
+			var chapterOut=document.getElementById("chapter1"+viewID+"Out");
+			var chapterOut=document.getElementById("chapter1"+viewID+"In");
+			blendings.slide("chapter1"+viewID,new Array(toFloat(getStyle(chapterOut, "left")) - toFloat(getStyle(chapterOut, "right")), toFloat(getStyle(chapterOut,"top")), toFloat(getStyle(chapterIn, "left")) - toFloat(getStyle(chapterIn, "right")), toFloat(getStyle(chapterIn, "top"))),5,5,0,new Array("chapter1"+viewID+":in"));
 		} else if (Iview[viewID].chapterActive && !Iview[viewID].overviewActive && Iview[viewID].maximized && chapter.style.visibility == "visible") {
 			// nothing to do
 		} else if (chapter.style.visibility == "visible" && Iview[viewID].overviewActive) {
@@ -614,7 +606,7 @@ function openChapter(major, viewID){
 			//blendings.slide("chapter1"+viewID,new Array(toFloat(getStyle($("chapter1"+viewID+"In"), "left")) - toFloat(getStyle($("chapter1"+viewID+"In"), "right")), toFloat(getStyle($("chapter1"+viewID+"In"), "top")), toFloat(getStyle($("chapter1"+viewID+"Out"), "left")) - toFloat(getStyle($("chapter1"+viewID+"Out"), "right")), toFloat(getStyle($("chapter1"+viewID+"Out"), "top"))),60,10,0,new Array("chapter1"+viewID+":out"), "", "$('chapter1'+'"+viewID+"').style.visibility = 'hidden'");
 			// chapter soll sofort weg sein, nicht erst noch blenden, bspw. wenn vom Vollbild zurück ins normale
 			chapter.style.visibility = 'hidden';
-			chapter.style.top = getStyle($("chapter1"+viewID+"Out"), "top");
+			chapter.style.top = getStyle(document.getElementById("chapter1"+viewID+"Out")("chapter1"+viewID+"Out"), "top");
 		}
 		// last possible case (bool=false & vis=hidden) only for major
 	}
@@ -681,7 +673,7 @@ function changeCss() {
 */
 function importZoomBar(viewID) {
 	// ZoomBar
-	Iview[viewID].zoomBar = new zoomBar("zoomBar"+viewID, $(Iview[viewID].zoomBarParent), "");
+	Iview[viewID].zoomBar = new zoomBar("zoomBar"+viewID, document.getElementById(Iview[viewID].zoomBarParent), "");
 	var zoombar = Iview[viewID].zoomBar;
 	
 	zoombar.init(Iview[viewID].zoomBarHorz/*, Iview[viewID].useZoomBar*/);
@@ -694,8 +686,8 @@ function importZoomBar(viewID) {
 		Iview[viewID].zoomScreen = screen;
 	}});
 	// additional Events
-	ManageEvents.addEventListener($("viewer"+viewID), 'mouseup', zoombar.mouseUpZoombar, false);
-	ManageEvents.addEventListener($("viewer"+viewID), 'mousemove', zoombar.mouseMoveZoombar, false);
+	ManageEvents.addEventListener(document.getElementById("viewer"+viewID), 'mouseup', zoombar.mouseUpZoombar, false);
+	ManageEvents.addEventListener(document.getElementById("viewer"+viewID), 'mousemove', zoombar.mouseMoveZoombar, false);
 }
 
 /*
@@ -752,7 +744,7 @@ function importChapter(viewID) {
 		chapter1.setSize(null, chapter1.my.self.parentNode.offsetHeight * chapResizeMul + chapResizeAdd);
 	}
 	chapter1.useEffects(chapHover);
-	chapter1.displayOutAllEntries($("chapter1"+viewID+"_content").firstChild, 0);
+	chapter1.displayOutAllEntries(document.getElementById("chapter1"+viewID+"_content").firstChild, 0);
 	// Additional Listener
 	chapter1.addListener(chapter.PAGE_NUMBER, new function() { this.change = function(value) {
 		navigatePage(value, viewID);
@@ -779,7 +771,7 @@ function importOverview(viewID) {
 			navigatePage(value, viewID);
 		}});
 	// should blend in via effect
-	$("overview1"+viewID).style.visibility = "hidden";
+	document.getElementById("overview1"+viewID).style.visibility = "hidden";
 }
 
 function importPageInput(viewID, parentID) {
@@ -825,7 +817,7 @@ function splitHeader(viewID) {
 	for (var i = 0; i < createElements.length;i++) {
 		element = document.createElement("div");
 		element.className = createElements[i];
-		$("header"+viewID).appendChild(element);
+		document.getElementById("header"+viewID).appendChild(element);
 	}
 }
 
@@ -870,8 +862,8 @@ function loading(viewID) {
 	Iview[viewID].chapterActive = false;
 	Iview[viewID].overviewActive = false;
 	
-	Iview[viewID].startHeight = toInt($("viewerContainer"+viewID).style.height);
-	Iview[viewID].startWidth = toInt($("viewerContainer"+viewID).style.width);
+	Iview[viewID].startHeight = toInt(jQuery("#viewerContainer"+viewID).css("height"));
+	Iview[viewID].startWidth = toInt(jQuery("#viewerContainer"+viewID).css("width"));
 	
 	//Create new Header Elements as specified within caller xsl
 	splitHeader(viewID);
@@ -906,11 +898,11 @@ function loading(viewID) {
 	ManageEvents.addEventListener(document, 'mouseMove', Iview[viewID].scrollBarY.mouseMove, false);
 	ManageEvents.addEventListener(document, 'mouseUp', Iview[viewID].scrollBarY.mouseUp, false);
 	// register to scroll into the viewer
-	ManageEvents.addEventListener($("viewer"+viewID), 'mouseScroll', function(e) { e = getEvent(e); preventDefault(e); viewerScroll(returnDelta(e), viewID);}, false);
+	ManageEvents.addEventListener(document.getElementById("viewer"+viewID), 'mouseScroll', function(e) { e = getEvent(e); preventDefault(e); viewerScroll(returnDelta(e), viewID);}, false);
 	
 	// damit viewer ueber scrollBarX endet, fortan in reinitialize
-	$("viewer"+viewID).style.width = Iview[viewID].startWidth - ((getStyle(Iview[viewID].scrollBarX.my.self,"visibility") == "visible")? Iview[viewID].scrollBarX.my.self.offsetWidth : 0)  + "px";
-	$("viewer"+viewID).style.height = Iview[viewID].startHeight - ((getStyle(Iview[viewID].scrollBarY.my.self,"visibility") == "visible")? Iview[viewID].scrollBarY.my.self.offsetHeight : 0)  + "px";
+	document.getElementById("viewer"+viewID).style.width = Iview[viewID].startWidth - ((getStyle(Iview[viewID].scrollBarX.my.self,"visibility") == "visible")? Iview[viewID].scrollBarX.my.self.offsetWidth : 0)  + "px";
+	document.getElementById("viewer"+viewID).style.height = Iview[viewID].startHeight - ((getStyle(Iview[viewID].scrollBarY.my.self,"visibility") == "visible")? Iview[viewID].scrollBarY.my.self.offsetHeight : 0)  + "px";
 
 	if (Iview[viewID].useCutOut) {
 		importCutOut(viewID);
@@ -951,16 +943,16 @@ function startFileLoaded(viewID){
 	getElementsByClassName("BSE_forwardBehind "+viewID, "viewerContainer"+viewID, "div")[0].style.top = ((((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - 1)) * Iview[viewID].zoomScale) - toInt(getStyle(getElementsByClassName("BSE_forwardBehind "+viewID, "viewerContainer"+viewID, "div")[0],"height"))) / 2) + "px";
 	getElementsByClassName("BSE_backwardBehind "+viewID, "viewerContainer"+viewID, "div")[0].style.top = ((((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - 1)) * Iview[viewID].zoomScale) - toInt(getStyle(getElementsByClassName("BSE_backwardBehind "+viewID, "viewerContainer"+viewID, "div")[0],"height"))) / 2) + "px";
 	
-	var mets_uri = Iview[viewID].webappBaseUri + "servlets/" + ((Iview[viewID].hasMets)? "MCRFileNodeServlet/": "MCRDirectoryXMLServlet/") + viewID + ((Iview[viewID].hasMets)? "/mets.xml":"?XSL.Style=mets");
-	new Ajax.Request(mets_uri, {
-		method: 'get',
-  		onSuccess: function(response) {processMETS(response.responseXML,viewID)},
-  		onException: function() {alert("Error Occured while Loading METS file");}
+	var metsURI = Iview[viewID].webappBaseUri + "servlets/" + ((Iview[viewID].hasMets)? "MCRFileNodeServlet/": "MCRDirectoryXMLServlet/") + viewID + ((Iview[viewID].hasMets)? "/mets.xml":"?XSL.Style=mets");
+	jQuery.ajax({
+		url: metsURI,
+  		success: function(response) {processMETS(response,viewID)},
+  		error: function(request, status, exception) {alert("Error Occured while Loading METS file:\n"+exception);}
 	});
 	
 	// Resize-Events registrieren
 	if (isBrowser("IE")) {
-		$("viewer"+viewID).parentNode.onresize = function() {reinitializeGraphic(viewID)};
+		document.getElementById("viewer"+viewID).parentNode.onresize = function() {reinitializeGraphic(viewID)};
 	} else {
 		ManageEvents.addEventListener(window, 'resize', function() { reinitializeGraphic(viewID);}, false);
 	}
