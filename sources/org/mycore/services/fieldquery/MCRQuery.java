@@ -83,6 +83,15 @@ public class MCRQuery {
     public MCRCondition getCondition() {
         return cond;
     }
+    
+    /**
+     * Returns the query condition
+     * 
+     * @return the query condition
+     */
+    public void setCondition(MCRCondition cond) {
+        this.cond = cond;
+    }
 
     /**
      * Returns the maximum number of results the query should return
