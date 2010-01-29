@@ -86,7 +86,6 @@ function scrollBar(newId) {
 	function addInterval(intervalFunc, time) {
 		if (interval != null) {
 			dropInterval();
-			console.log("Dropped",interval);
 		}
 		interval = setInterval(intervalFunc,time);
 	}
@@ -275,7 +274,9 @@ function scrollBar(newId) {
 		@param e Event which holds the current Event
 		*/
 		function upLeftMouseDown(e) {
+			if (mouseDown) return;
 			mouseDown = true;
+			outOfBar = true;
 			dropInterval();
 			moveUp();
 			window.setTimeout(function() { delayUpLeft();},scrollDelay);
@@ -289,7 +290,6 @@ function scrollBar(newId) {
 			if (mouseDown) {
 				addInterval(function() { moveUp();}, timeInt);
 			}
-			//interval = setInterval(function() { moveUp();}, timeInt);
 		}
 
 		/*
@@ -299,12 +299,14 @@ function scrollBar(newId) {
 		function upLeftMouseUp(e) {
 			dropInterval();
 			mouseDown = false;
+			outOfBar = false;
 		}
 		/*
 		@description Starts the Drag&Drop of the Button by saving the initial Position of the Bar related to the mouse Position
 		@param e event which holds the Event happening Position
 		*/
 		function divMouseDown(e) {
+			if (mouseDown) return;
 			dropInterval();
 			e = getEvent(e);
 			mouseDown = true;
@@ -420,6 +422,7 @@ function scrollBar(newId) {
 		@param e event which holds the MouseClick Position
 		*/
 		function dbgMouseDown(e) {
+			if (mouseDown) return;
 			dropInterval();
 			e = getEvent(e);
 			mouseDown = true;
@@ -432,7 +435,6 @@ function scrollBar(newId) {
 				var ev = {'layerX': layerX, 'layerY': layerY};
 				if (!noRepeat && mouseDown) {
 					addInterval(function() { stopUnderMouse(ev, false);}, timeInt);
-					//interval = setInterval(function() { stopUnderMouse(ev, false);}, timeInt);
 				}
 			} else if (((layerY < parseInt(bar.style.top)) && !horz) 
 				|| ((layerX < parseInt(bar.style.left)) && horz)) {
@@ -440,7 +442,6 @@ function scrollBar(newId) {
 				var ev = {'layerX': layerX, 'layerY': layerY};
 				if (!noRepeat && mouseDown) {
 					addInterval(function() { stopUnderMouse(ev, true);}, timeInt);
-					//interval = setInterval(function() { stopUnderMouse(ev, true);}, timeInt);
 				}
 			}
 			e.cancelBubble = true;
@@ -476,7 +477,9 @@ function scrollBar(newId) {
 		@param e Event which holds the current Event
 		*/
 		function downRightMouseDown(e) {
+			if (mouseDown) return;
 			mouseDown = true;
+			outOfBar = true;
 			dropInterval();
 			moveDown();
 			window.setTimeout(function() {delayDownRight()},scrollDelay);
@@ -490,7 +493,6 @@ function scrollBar(newId) {
 			if (mouseDown) {
 				addInterval(function() { moveDown();}, timeInt);
 			}
-			//interval = setInterval(function() { moveDown();}, timeInt);
 		}
 		
 		/*
@@ -500,6 +502,7 @@ function scrollBar(newId) {
 		function downRightMouseUp(e) {
 			dropInterval();
 			mouseDown = false;
+			outOfBar = false;
 		}
 	//Start Init Function creation of the Div Structure and registering all needed Events so that the Scrollbar is fully functional
 		horz = horizontal;

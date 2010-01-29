@@ -154,7 +154,9 @@ function chapter(newId, parent) {
 		if (structItem == null ) {
 			alert("Error 1:No Mets File found");
 		} else {
-			structItem = getStructure(getFirstNodeByTagName(structItem.childNodes, "mets:div"), document.getElementById(id).firstChild, true);
+			var curChapter = document.createElement("div");
+			structItem = getStructure(getFirstNodeByTagName(structItem.childNodes, "mets:div"), curChapter, true);
+			return curChapter;
 		}
 	}
 
@@ -163,8 +165,8 @@ function chapter(newId, parent) {
 	*/
 	function clickChap(e) {
 		e = getEvent(e);
-		var element = (typeof(arguments[1]) != "undefined")? arguments[1]: this;
 
+		var element = (typeof(arguments[1]) != "undefined")? arguments[1]: this;
 		element.expanded = !element.expanded;
 		element.getElementsByTagName("div").item(0).childNodes.item(0).className =(element.expanded)? "chapterImageSymbolMinus":"chapterImageSymbolPlus";
 		for (var i = 0; i < element.childNodes.length; i++) {
@@ -184,7 +186,6 @@ function chapter(newId, parent) {
 			notifyListenerClick(element);
 			posScroll();
 		}
-
 		return false;
 	}
 	
@@ -303,7 +304,7 @@ function chapter(newId, parent) {
 		// determine the "number" of the indented levels of the chapterentries
 		var findMainParent = TOC;
 		var counter = 0;
-		while (findMainParent.id != id) {
+		while (findMainParent != null/*findMainParent.id != id*/) {
 			counter = counter + 1;
 			findMainParent = findMainParent.parentNode;
 		}
@@ -552,11 +553,22 @@ function chapter(newId, parent) {
 		main.style.top = getStyle(id,"top");
 		main.style.visibility = getStyle(id,"visibility");
 
+
 		var content = document.createElement("div");
 		content.id = id+"_content";
 		content.className = identer + "_content";
-		main.appendChild(content);
+		content.style.right = getStyle(id+"_content","right");
+		content.style.left = getStyle(id+"_content","left");
+//TODO IE/Opera hat hier mit Angaben derart width:100% Probleme und spinnt total rum. Berechnung klappt also irgendwie nicht richtig
+		content.style.width = parseInt(main.style.width) - parseInt(content.style.left) -
+						     parseInt(content.style.right) + "px";
 
+		
+		main.appendChild(content);
+		content.appendChild(loadContent().firstChild);
+		// have to initialize so that the current page can be centered & needed to work in IE
+		content.firstChild.style.top = "0px";
+		
 		var chapSort = document.createElement("div");
 		chapSort.id = id+"_chapSort";
 		chapSort.className = identer + "_chapSort";
@@ -570,18 +582,6 @@ function chapter(newId, parent) {
 		main.style.width = getStyle(id,"width");
 		main.style.zIndex = getStyle(id,"z-index");
 		
-		// load intervals of chapter-content
-		content.style.right = getStyle(id+"_content","right");
-		content.style.left = getStyle(id+"_content","left");
-//TODO IE/Opera hat hier mit Angaben derart width:100% Probleme und spinnt total rum. Berechnung klappt also irgendwie nicht richtig
-		content.style.width = parseInt(main.style.width) - parseInt(content.style.left) -
-						     parseInt(content.style.right) + "px";
-
-		loadContent();
-
-		// have to initialize so that the current page can be centered & needed to work in IE
-		content.firstChild.style.top = "0px";
-
 		// create Elements to hold chapter Class Props
 		var chapIn = document.createElement("div");
 		chapIn.id = id+"In";
@@ -595,7 +595,7 @@ function chapter(newId, parent) {
 		
 		//var scrollX = new scrollBar("scrollChap"+viewID, "scrollChap");
 		var scrollY = new scrollBar("scrollChap"+viewID, "scrollChap");
-		
+
 		my = {'self': main, 'content':content, 'firstElement': content.firstChild, /*'scrollBarX': scrollX,*/ 'scrollBarY':scrollY};
 		this.my = my;
 		//var scrollBarChapter = Iview[viewID].scrollBarChapter;
