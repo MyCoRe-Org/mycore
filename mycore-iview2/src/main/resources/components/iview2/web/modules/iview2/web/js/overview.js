@@ -374,16 +374,17 @@ function overview(newId, parent, identer) {
 	@description clears the overview
 	*/
 	function clearOverview() {
-		var el=document.getElementById(id);
-		var isVisible = el.style.visibility;
-		var myParent = el.parentNode;
-		myParent.removeChild(el);
+		var curOverview=document.getElementById(id);
+		var isVisible = curOverview.style.visibility;
+		var myParent = curOverview.parentNode;
+		myParent.removeChild(curOverview);
+		
 		var resetOverview = document.createElement("div");
 		resetOverview.id = id;
 		resetOverview.className = "overview" + identer;
 		resetOverview.onmousedown = function(){return false;}; //so that browser-drag-&-drop remains disabled after resize
 		myParent.appendChild(resetOverview);
-		el.style.visibility = isVisible;
+		resetOverview.style.visibility = isVisible;
 	}
 
 	function getAmountHeight() {
