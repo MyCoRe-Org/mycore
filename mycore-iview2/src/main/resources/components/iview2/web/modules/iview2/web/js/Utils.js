@@ -47,7 +47,7 @@ function getEvent(e) {
  @return Array of Objects which matched the search Conditions
  */
 function getElementsByClassName(searchClass, node, tag) {
-	if (node!=null)
+	if (node!=null && typeof(node)!="object")
 		node=document.getElementById(node);
 	//Fast JS 1.6 Implementation
 	if (typeof(Array.filter)!="undefined" && typeof(document.getElementsByClassName)!="undefined"){
@@ -58,7 +58,7 @@ function getElementsByClassName(searchClass, node, tag) {
 		if (tag!=null){
 			tag=tag.toLowerCase();
 			return Array.filter(searchRoot.getElementsByClassName(searchClass), function(elem){
-				console.log("nodeName: "+elem.nodeName);
+				//console.log("nodeName: "+elem.nodeName);
 				return elem.nodeName.toLowerCase() == tag; 
 			});
 		}
@@ -267,8 +267,8 @@ function createAbsoluteObject(object, id, target) {
 	newObject.id = id;
 	newObject.className = id;
 	newObject.style.position = "absolute";
-	if (document.getElementById(target)==null)
-		console.trace();
+	//if (document.getElementById(target)==null)
+		//console.trace();
 	document.getElementById(target).appendChild(newObject);
 }
 
