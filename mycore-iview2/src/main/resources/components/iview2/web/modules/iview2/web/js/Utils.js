@@ -46,30 +46,81 @@ function getEvent(e) {
  which are child's of the given Node
  @return Array of Objects which matched the search Conditions
  */
-function getElementsByClassName(searchClass, node, tag) {
-	if (node!=null && typeof(node)!="object")
-		node=document.getElementById(node);
-	//Fast JS 1.6 Implementation
-	if (typeof(Array.filter)!="undefined" && typeof(document.getElementsByClassName)!="undefined"){
-		var searchRoot=document;
-		if (node!=null){
-			searchRoot=node;
-		}
-		if (tag!=null){
-			tag=tag.toLowerCase();
-			return Array.filter(searchRoot.getElementsByClassName(searchClass), function(elem){
-				//console.log("nodeName: "+elem.nodeName);
-				return elem.nodeName.toLowerCase() == tag; 
-			});
-		}
-		return searchRoot.getElementsByClassName(searchClass);
+var getElementsByClassName = function (searchClass, node, tag){
+	if (Array.filter && document.getElementsByClassName){
+		// Fast JS 1.6 Implementation
+		getElementsByClassName = function (searchClass, node, tag) {
+			if (node!=null && typeof(node)!="object")
+				node=document.getElementById(node);
+			node = node || document;
+			if (tag!=null){
+				tag=tag.toUpperCase();
+				return Array.filter(node.getElementsByClassName(searchClass), function(elem){
+					return elem.nodeName == tag; 
+				});
+			}
+			return node.getElementsByClassName(searchClass);
+		};
+	} else if (document.evaluate) {                                                                                                                                                                   
+        getElementsByClassName = function (searchClass, node, tag){                                                                                                                               
+        	if (node!=null && typeof(node)!="object")
+        		node=document.getElementById(node);
+        	node = node || document;
+            tag = tag || "*";                                                                                                                                                               
+            var classes = searchClass.split(" "),                                                                                                                                             
+                    classesToCheck = "",                                                                                                                                                    
+                    xhtmlNamespace = "http://www.w3.org/1999/xhtml",                                                                                                                        
+                    namespaceResolver = (document.documentElement.namespaceURI === xhtmlNamespace)? xhtmlNamespace : null,                                                                  
+                    returnElements = [],                                                                                                                                                    
+                    elements,                                                                                                                                                               
+                    node;                                                                                                                                                                   
+            for(var j=0, jl=classes.length; j<jl; j+=1){                                                                                                                                    
+                    classesToCheck += "[contains(concat(' ', @class, ' '), ' " + classes[j] + " ')]";                                                                                       
+            }                                                                                                                                                                               
+            try     {                                                                                                                                                                       
+                    elements = document.evaluate(".//" + tag + classesToCheck, node, namespaceResolver, 0, null);
+            }
+            catch (e) {
+                    elements = document.evaluate(".//" + tag + classesToCheck, node, null, 0, null);
+            }
+            while ((node = elements.iterateNext())) {
+                    returnElements.push(node);
+            }
+            return returnElements;
+        };
+	} else {
+        getElementsByClassName = function (searchClass, node, tag) {
+        	if (node!=null && typeof(node)!="object")
+        		node=document.getElementById(node);
+        	node = node || document;
+            tag = tag || "*";
+            var classes = searchClass.split(" "),
+                    classesToCheck = [],
+                    elements = (tag === "*" && node.all)? node.all : node.getElementsByTagName(tag),
+                    current,
+                    returnElements = [],
+                    match;
+            for(var k=0, kl=classes.length; k<kl; k+=1){
+                    classesToCheck.push(new RegExp("(^|\\s)" + classes[k] + "(\\s|$)"));
+            }
+            for(var l=0, ll=elements.length; l<ll; l+=1){
+                    current = elements[l];
+                    match = false;
+                    for(var m=0, ml=classesToCheck.length; m<ml; m+=1){
+                            match = classesToCheck[m].test(current.className);
+                            if (!match) {
+                                    break;
+                            }
+                    }
+                    if (match) {
+                            returnElements.push(current);
+                    }
+            }
+            return returnElements;
+        };
 	}
-	var selector=(tag!=null?tag:"")+"."+searchClass;
-	if (node!=null){
-		return jQuery(node).find(selector);
-	}
-	return jQuery(selector);
-}
+	return getElementsByClassName(searchClass, node, tag);
+};
 
 /*
 @decription proofs if the supplied ClassName has currently any object connected with it. If so it returns true, else false
