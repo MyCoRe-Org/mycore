@@ -315,8 +315,15 @@ function chapter(newId, parent) {
 		if (paddingLeft == null) {
 			paddingLeft = getStyle("chapter","border-left-width");
 		}
+		var tmpBox = document.createElement("span");
+		tmpBox.id = "tmpBox";
+		tmpBox.style.whiteSpace = "pre";
+		tmpBox.appendChild(document.createTextNode(""));
+		tmpBox.style.fontFamily = "'"+getStyle(id+"_content","font-family")+"'";
+		tmpBox.style.fontSize = parseInt(getStyle(id+"_content","font-size")) + "px";
+		document.getElementsByTagName("body")[0].appendChild(tmpBox);
 		if (pointsWidth == null) {
-			pointsWidth = getTextWidth("...", getStyle(id+"_content","font-family"), parseInt(getStyle(id+"_content","font-size")));
+			pointsWidth = getTextWidth(tmpBox, "...");
 		}
 
 		var left = getStyle('chapter','left');
@@ -347,21 +354,19 @@ function chapter(newId, parent) {
 
 		// cut the caption of the entry if it's to long until it fits
 
-		var curTxt = TOC.firstChild.innerHTML.substring(TOC.firstChild.innerHTML.lastIndexOf('>') + 1, TOC.firstChild.innerHTML.length);
+		var curTxt = TOC.firstChild.lastChild.data;
 
 		if (isBrowser("IE")) {
 			distanceCur = distanceCur - parseInt(paddingLeft) - parseInt(borderLeftWidth);
 		}
 		
-		if (getTextWidth(curTxt, getStyle(id+"_content", "font-family"), getStyle(id+"_content", "font-size")) > 
-			distanceCur + pointsWidth) {
+		if (getTextWidth(tmpBox, curTxt) > distanceCur + pointsWidth) {
 				
 			// now the current Txt will cut with the help of the largest letter "A"
-			curTxt = curTxt.substring(0, Math.floor(distanceCur / getTextWidth("A", getStyle(id+"_content", "font-family"), getStyle(id+"_content", "font-size"))));
-			TOC.firstChild.innerHTML =  TOC.firstChild.innerHTML.substring(0, TOC.firstChild.innerHTML.lastIndexOf('>') + 1) +
-				/*cutTxtToWidth(*/curTxt/*, getStyle(id+"_content", "font-family"), getStyle(id+"_content", "font-size"), distanceCur)*/ +
-				"...";
+			curTxt = curTxt.substring(0, Math.floor(distanceCur / getTextWidth(tmpBox, "A")));
+			TOC.firstChild.lastChild.data =  curTxt+"...";
 		}
+		document.getElementsByTagName("body")[0].removeChild(tmpBox);
 	}
 
 	function moveToPageByDMDID(DMDID) {

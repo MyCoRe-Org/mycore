@@ -332,26 +332,16 @@ function copyArray(array) {
 /*
 @description cut one sign after the next of a textline in the chapter until the correct width is reached
 */
-function getTextWidth(txt, font, size) {
-	var tmpBox = document.createElement("span");
-	tmpBox.id = "tmpBox";
-	//tmpBox.style.display = "inline";
-	// Groesse soll sich am Textinhalt orientieren, keine ungewolten Zeilenumbrueche
-	tmpBox.style.whiteSpace = "pre";
-	tmpBox.style.fontFamily = "'"+font+"'";
-	tmpBox.style.fontSize = toInt(size) + "px";
-	tmpBox.innerHTML = txt;
-	document.getElementsByTagName("body")[0].appendChild(tmpBox);
-	var returnValue = tmpBox.offsetWidth;
-	document.getElementsByTagName("body")[0].removeChild(tmpBox);
-	return returnValue;		
+function getTextWidth(tmpBox,txt) {
+	tmpBox.firstChild.data = txt;
+	return tmpBox.offsetWidth;
 }
 
 /*
 @description cut Text to width
 */
-function cutTxtToWidth(txt, font, size, width) {
-	while (getTextWidth(txt, font, size) > width && txt != "") {
+function cutTxtToWidth(tmpBox, txt, width) {
+	while (getTextWidth(tmpBox, txt) > width && txt != "") {
 		//txt != "" da substring kein Fehler wirft bei Negativen Indizes
 		txt = txt.substring(0,txt.length - 1);
 		// if last sign == space, remove, because spaces are not a part of the offsetwidth
