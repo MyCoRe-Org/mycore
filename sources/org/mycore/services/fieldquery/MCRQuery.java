@@ -85,9 +85,8 @@ public class MCRQuery {
     }
     
     /**
-     * Returns the query condition
+     * Set the query condition
      * 
-     * @return the query condition
      */
     public void setCondition(MCRCondition cond) {
         this.cond = cond;
