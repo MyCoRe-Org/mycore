@@ -217,6 +217,8 @@ function returnDelta(e, prevent) {
 */
 function getStyle(el,styleProp)
 {
+	if (typeof(el)!="object")
+		el = document.getElementById(el);
 	return jQuery(el).css(styleProp);
 }
 
