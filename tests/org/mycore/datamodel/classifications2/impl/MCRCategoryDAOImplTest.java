@@ -27,6 +27,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -261,6 +262,29 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         europe.getChildren().remove(0);
         category.getChildren().remove(0);
         category.getChildren().add(germany);
+        DAO.replaceCategory(category);
+        startNewTransaction();
+        MCRCategory rootNode = getRootCategoryFromSession();
+        assertEquals("Category count does not match.", countNodes(category), countNodes(rootNode));
+        assertEquals("Label count does not match.", category.getChildren().get(0).getLabels().size(), rootNode.getChildren().get(0)
+                .getLabels().size());
+    }
+
+    /**
+     * tests top category child to new parent
+     * 
+     * @throws URISyntaxException
+     */
+    public void testReplaceCategoryNewParent() {
+        addWorldClassification();
+        MCRCategory europe = category.getChildren().get(0);
+        MCRCategoryImpl test=new MCRCategoryImpl();
+        test.setId(new MCRCategoryID(category.getId().getRootID(), "test"));
+        test.setLabels(new ArrayList<MCRLabel>());
+        test.getLabels().add(new MCRLabel("de", "JUnit testcase", null));
+        category.getChildren().add(test);
+        category.getChildren().remove(0);
+        test.getChildren().add(europe);
         DAO.replaceCategory(category);
         startNewTransaction();
         MCRCategory rootNode = getRootCategoryFromSession();

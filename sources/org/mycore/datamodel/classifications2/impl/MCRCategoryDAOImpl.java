@@ -393,7 +393,8 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
          * 
          * set internalID for the new rootCategory
          */
-        session.evict(oldCategory);
+        for (MCRCategory category:oldMap.values())
+            session.evict(category);
         for (MCRCategoryImpl category : newMap.values()) {
             MCRCategoryImpl oldValue = oldMap.get(category.getId());
             if (oldValue != null) {
@@ -417,13 +418,11 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             parent.getChildren().set(oldCategory.getPositionInParent(), newCategoryImpl);
         }
         // delete removed categories
-        boolean flushBeforeUpdate = false;
         for (MCRCategoryImpl category : oldMap.values()) {
             if (!newMap.containsKey(category.getId())) {
                 LOGGER.info("Deleting category :" + category.getId());
                 category.detachFromParent();
                 session.delete(category);
-                flushBeforeUpdate = true;
             }
         }
         // update shifted categories (JUnit testCase testReplaceCategoryShiftCase)
@@ -433,13 +432,9 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
                 if (!oldParents.get(category.getId()).equals(category.getParent().getId())) {
                     LOGGER.info("updating new parent for " + category.getId());
                     session.update(category);
-                    flushBeforeUpdate = true;
                 }
             }
         }
-        // important to flush here as positionInParent could collide with deleted categories
-        if (flushBeforeUpdate)
-            session.flush();
         session.saveOrUpdate(newCategoryImpl);
         updateTimeStamp();
     }
