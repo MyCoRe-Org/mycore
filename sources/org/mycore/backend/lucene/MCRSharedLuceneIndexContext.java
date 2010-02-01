@@ -163,6 +163,7 @@ class MCRSharedLuceneIndexContext {
                         context.searcher.close();
                         context.reader = newReader;
                         context.searcher = newSearcher;
+                        LOGGER.info("new Searcher for index: " + context.index + " initialized.");
                     }
                 }
             }
