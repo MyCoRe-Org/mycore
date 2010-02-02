@@ -15,7 +15,7 @@ ManageEvents.addEventListener = function(target, type, callback, captures) {
 	// Eine Wrapper Funktion, die unseren Event-Handler aufruft. Und zwar erstens im richtigen Scope,
 	// n�mlich den des Elements, und zweitens mit unserem vereinheitlichten Event-Objekt.
 	var wrapper = function(ev) {
-		callback.call(target, ev);
+		return callback.call(target, ev);
 	};
 		
 	// True, wenn das Event erfolgreich registriert wurde.

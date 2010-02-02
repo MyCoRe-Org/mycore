@@ -616,7 +616,7 @@ function chapter(newId, parent) {
 		ManageEvents.addEventListener(document, 'mousemove', scrollY.mouseMove, false);
 		ManageEvents.addEventListener(document, 'mouseup', scrollY.mouseUp, false);
 		ManageEvents.removeEventListener(getElementsByClassName("empty","scrollChap"+viewID,"div")[0], 'mouseScroll', scrollY.scroll, false);
-		ManageEvents.addEventListener(main, 'mouseScroll', function(e) { e = getEvent(e); scrollY.scroll(e); e.cancelBubble = true;}, false);
+		ManageEvents.addEventListener(main, 'mouseScroll', function(e) { e = getEvent(e); scrollY.scroll(e); e.cancelBubble = true; return false}, false);
 	}
 
 	/*

@@ -355,6 +355,11 @@ function maximizeHandler(viewID) {
 		} else {
 			document.body.style.overflow="auto";
 		}*/
+		//close Overview when going to minimized mode 
+		if (Iview[viewID].useOverview && Iview[viewID].overviewActive) {
+			openOverview(viewID);
+		}
+
 		if (classIsUsed("BSE_fullView")) doForEachInClass("BSE_fullView", ".style.display = 'block';", viewID);
 		if (classIsUsed("BSE_normalView")) doForEachInClass("BSE_normalView", ".style.display = 'none';", viewID);
 		
