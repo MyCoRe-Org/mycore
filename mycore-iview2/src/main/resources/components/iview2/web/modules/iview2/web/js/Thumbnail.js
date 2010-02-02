@@ -998,3 +998,13 @@ function processMETS(metsDoc, viewID) {
 		if (classIsUsed("BSE_openThumbs")) doForEachInClass("BSE_openThumbs", ".style.display = 'block';", viewID);
 	}
 }
+
+/* now handled in XSL, because if there is no Iview, then there is no "openViewer"-funtion
+function openViewer(viewID, imagePath) {
+		if (Iview[viewID]) {
+			maximizeHandler(viewID)
+		} else {
+			alert("url");
+		}
+}
+*/
