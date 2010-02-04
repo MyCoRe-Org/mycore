@@ -861,6 +861,12 @@ function zoomViewer(viewID, direction) {
 function loading(viewID) {
 	Iview[viewID].chapterActive = false;
 	Iview[viewID].overviewActive = false;
+	var cssSheet=document.getElementById("cssSheet"+viewID);
+	if (cssSheet!=null){
+		//Opera fix: link css style to head to fix maximizeHandler()
+		cssSheet.parentNode.removeChild(cssSheet);
+		document.getElementsByTagName("head")[0].appendChild(cssSheet);
+	}
 	
 	Iview[viewID].startHeight = toInt(jQuery("#viewerContainer"+viewID).css("height"));
 	Iview[viewID].startWidth = toInt(jQuery("#viewerContainer"+viewID).css("width"));
