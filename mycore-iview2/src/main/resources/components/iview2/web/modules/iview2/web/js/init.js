@@ -95,9 +95,30 @@ function initializeGraphic(viewID) {
 	// opera triggers the onload twice
 	var iviewTileUrlProvider = new PanoJS.TileUrlProvider(Iview[viewID].baseUri, Iview[viewID].prefix, 'jpg');
 	iviewTileUrlProvider.derivate = viewID;
+	iviewTileUrlProvider.imageHashes = [];
+	/*
+	 * calculate simple image name hash value to spread request over different servers
+	 * but allow browser cache to be used by allways return the same value for a given name 
+	 */
+	iviewTileUrlProvider.getImageHash = function(image){
+		if (iviewTileUrlProvider.imageHashes[image]){
+			return iviewTileUrlProvider.imageHashes[image];
+		}
+		var hash=0;
+		var pos=image.lastIndexOf(".");
+		if (pos < 0)
+			pos=image.length;
+		for (var i=0;i<pos;i++){
+			hash += 3 * hash + (image.charCodeAt(i)-48);
+		}
+		iviewTileUrlProvider.imageHashes[image]=hash;
+		console.log(image+": "+String(hash));
+		return hash;
+	}
 	iviewTileUrlProvider.assembleUrl = function(xIndex, yIndex, zoom, image){
-	    return this.baseUri[(xIndex+yIndex) % this.baseUri.length] + '/'+ this.derivate+'/' + 
-	        ((image == null)? this.prefix : image) + '/' + zoom + '/' + yIndex + '/' + xIndex + '.' + this.extension +
+		image=(image == null)? this.prefix : image;
+	    return this.baseUri[(iviewTileUrlProvider.getImageHash(image)+xIndex+yIndex) % this.baseUri.length] + '/'+ this.derivate+'/' + 
+	        image + '/' + zoom + '/' + yIndex + '/' + xIndex + '.' + this.extension +
 	        (PanoJS.REVISION_FLAG ? '?r=' + PanoJS.REVISION_FLAG : '');
 	};
 	if (Iview[viewID].viewerBean == null) {
@@ -347,7 +368,7 @@ function maximizeHandler(viewID) {
 	if (Iview[viewID].maximized) {
 		Iview[viewID].maximized = false;
 		
-		// viewer wieder einhängen
+		// viewer wieder einhï¿½ngen
 		Iview[viewID].VIEWER = document.body.firstChild;
 		
 		// Dokumenteninhalt loeschen
@@ -383,7 +404,6 @@ function maximizeHandler(viewID) {
 		document.documentElement.style.overflow="";
 		
 		document.body.style.overflow="";
-		document.body.style.visibility = "visible";
 
 		// class-Wechsel lÃ¶st im IE resize aus
 		document.getElementById("viewerContainer"+viewID).className = "viewerContainer min";
@@ -418,11 +438,6 @@ function maximizeHandler(viewID) {
 		// Viewer hinzufuegen
 		document.body.appendChild(Iview[viewID].VIEWER);
 		
-		/*if (document.compatMode == "CSS1Compat") {
-			document.documentElement.style.overflow="hidden";
-		} else {
-			document.body.style.overflow="hidden";
-		}*/
 		if (classIsUsed("BSE_fullView")) doForEachInClass("BSE_fullView", ".style.display = 'none';", viewID);
 		if (classIsUsed("BSE_normalView")) doForEachInClass("BSE_normalView", ".style.display = 'block';", viewID);
 		
@@ -430,13 +445,11 @@ function maximizeHandler(viewID) {
 		document.documentElement.style.overflow="hidden";
 		
 		document.body.style.overflow="hidden";
-		document.body.style.visibility = "hidden";
 
 		// class-Wechsel loesst im IE resize aus
 		document.getElementById("viewerContainer"+viewID).className = "viewerContainer max";
 
 		doForEachInClass("buttonSurface", ".className = 'buttonSurface max';");
-//		$("buttonSurface"+viewID).className ="buttonSurface max";
 		
 		PanoJS.mousePressedHandler = function(e) {
 			e = e ? e : window.event;
