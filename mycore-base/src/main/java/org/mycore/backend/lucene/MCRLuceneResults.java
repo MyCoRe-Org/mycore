@@ -82,7 +82,7 @@ class MCRLuceneResults extends MCRResults {
 
     private void reQuery() throws IOException {
         checkIndexSearcher();
-        TopFieldCollector collector = TopFieldCollector.create(sortFields, maxResults, false, false, false, false);
+        TopFieldCollector collector = TopFieldCollector.create(sortFields, maxResults, false, true, false, false);
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Query: " + query);
         indexSearcher.search(query, collector);
