@@ -112,7 +112,6 @@ function initializeGraphic(viewID) {
 			hash += 3 * hash + (image.charCodeAt(i)-48);
 		}
 		iviewTileUrlProvider.imageHashes[image]=hash;
-		console.log(image+": "+String(hash));
 		return hash;
 	}
 	iviewTileUrlProvider.assembleUrl = function(xIndex, yIndex, zoom, image){
@@ -205,10 +204,21 @@ function initializeGraphic(viewID) {
 		if (!useBlankImage) {
 			var left = tile.xIndex < 0;
 			var high = tile.yIndex < 0;
-			var right = tile.xIndex >= Math.pow(2, this.zoomLevel);
-			var low = tile.yIndex >= Math.pow(2, this.zoomLevel);
-			if (high || left || low || right) {
-				useBlankImage = true;
+			if (left || high) {
+				useBlankImage=true;
+			} else {
+				//modification to original PanonJS code
+				var iView=Iview[this.viewID];
+				var currentWidth = Math.floor(iView.bildBreite / Math.pow(2, iView.zoomMax - this.zoomLevel));
+				var xTileCount = Math.ceil( currentWidth / iView.tilesize);
+				var currentHeight = Math.floor(iView.bildHoehe / Math.pow(2, iView.zoomMax - this.zoomLevel));
+				var yTileCount = Math.ceil( currentHeight / iView.tilesize);
+				var right = tile.xIndex >= xTileCount; //index starts at 0
+				var low = tile.yIndex >= yTileCount;
+				if (low || right) {
+					useBlankImage = true;
+				}
+				//modification ends
 			}
 		}
 
@@ -277,9 +287,8 @@ function initializeGraphic(viewID) {
 		}
 //additions	
 		isloaded(tileImg, this.viewID);
-		var viewID = this.viewID;
 		//changes all not available Tiles to the blank one, so that no ugly Image not Found Pics popup.
-		tileImg.onerror = function () {this.src = Iview[viewID].viewerBean.cache['blank'].src; return true;};
+		tileImg.onerror = function () {this.src = Iview[this.viewID].viewerBean.cache['blank'].src; return true;};
 //endadd
 	}
 		Iview[viewID].viewerBean.init();
