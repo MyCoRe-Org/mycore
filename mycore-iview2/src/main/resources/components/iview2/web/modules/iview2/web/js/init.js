@@ -375,6 +375,10 @@ function reinitializeGraphic(viewID) {
 // uses the callback format GSIV.{className}Handler
 function maximizeHandler(viewID) {
 	if (Iview[viewID].maximized) {
+		if (window.location.search.get("jumpback") == "true"){
+			history.back();
+			return;
+		}
 		Iview[viewID].maximized = false;
 		
 		// viewer wieder einh�ngen
