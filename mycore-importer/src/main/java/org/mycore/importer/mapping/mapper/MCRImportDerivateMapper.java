@@ -29,6 +29,10 @@ public class MCRImportDerivateMapper extends MCRImportAbstractMapper {
 
     @Override
     public void map(MCRImportObject importObject, MCRImportRecord record, Element map) {
+        if(!MCRImportMappingManager.getInstance().getConfig().isUseDerivates()) {
+            LOGGER.warn("Try to map derivates, but use derivates is set to false in configuration.");
+            return;
+        }
         super.map(importObject, record, map);
 
         // get the correct value from the derivateId-attribute
@@ -37,7 +41,8 @@ public class MCRImportDerivateMapper extends MCRImportAbstractMapper {
         MCRImportFieldValueResolver fieldValueResolver = new MCRImportFieldValueResolver(getFields());
         derivateId = fieldValueResolver.resolveFields(derivateId);
 
-        if(derivateId == null || derivateId.equals("")) {
+        if(fieldValueResolver.isCompletelyResolved() || derivateId == null || derivateId.equals("")) {
+            LOGGER.debug("Couldnt resolve derivate id " + derivateId);
             return;
         }
 
@@ -45,8 +50,16 @@ public class MCRImportDerivateMapper extends MCRImportAbstractMapper {
         List<MCRImportDerivate> derivateList = MCRImportMappingManager.getInstance().getDerivateList();
         MCRImportDerivate derivate = getDerivateById(derivateId, derivateList);
 
+        if(derivate == null) {
+            LOGGER.error("Couldnt find derivate id '" + derivateId + "' in the MCRImportDerivate list!" +
+                         " Check if you call 'setDerivateList' in the MCRImportMappingManager!");
+            return;
+        }
+
         // add the current object to the linkmeta list
         derivate.addLinkedObjectId(importObject.getId());
+        LOGGER.debug("Successfully linked mcr object '" + importObject.getId() +
+                     "' to derivate '" + derivate.getDerivateId() + "'!");
     }
 
     private MCRImportDerivate getDerivateById(String id, List<MCRImportDerivate> derivateList) {

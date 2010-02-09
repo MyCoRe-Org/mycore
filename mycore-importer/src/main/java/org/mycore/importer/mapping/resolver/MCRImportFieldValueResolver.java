@@ -48,6 +48,17 @@ public class MCRImportFieldValueResolver {
     }
 
     /**
+     * Checks if all fields in the last incoming string are
+     * fully resolved.
+     * 
+     * @return true if the string is successfully parsed and all
+     * fields are resolved, otherwise false
+     */
+    public boolean isCompletelyResolved() {
+        return variableResolver.isCompletelyResolved();
+    }
+    
+    /**
      * Returns a list of all fields which are not used.
      * 
      * @return a list of not used fields
