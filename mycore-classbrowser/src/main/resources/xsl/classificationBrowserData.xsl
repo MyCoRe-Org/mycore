@@ -42,7 +42,7 @@
           <p class="cbDescription"><xsl:value-of select="description" /></p>
         </xsl:if>
         <xsl:if test="@children = 'true'">
-          <div id="cbChildren_{$id}" class="cbHidden" />
+          <div id="cbChildren_{$id}" class="cbHidden"><!-- WebKit bugfix: no empty divs please --><xsl:comment/></div>
         </xsl:if>
       </li>
     </xsl:for-each>
