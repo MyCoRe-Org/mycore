@@ -2,7 +2,6 @@ package org.mycore.importer;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
-import org.mycore.importer.mapping.MCRImportObject;
 
 /**
  * This class is an xml abstraction of the config part from the

@@ -74,13 +74,13 @@ public class MCRImportMetadata {
     public boolean isHeritable() {
         return heritable;
     }
-    public void setHeritable(boolean heritable) {
+    public void setHeritable(Boolean heritable) {
         this.heritable = heritable;
     }
     public boolean isNotinherit() {
         return notinherit;
     }
-    public void setNotinherit(boolean notinherit) {
+    public void setNotinherit(Boolean notinherit) {
         this.notinherit = notinherit;
     }
     public void addAttributeMap(Map<String, String> attributeMap) {

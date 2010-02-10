@@ -41,7 +41,7 @@ public class MCRImportDerivateMapper extends MCRImportAbstractMapper {
         MCRImportFieldValueResolver fieldValueResolver = new MCRImportFieldValueResolver(getFields());
         derivateId = fieldValueResolver.resolveFields(derivateId);
 
-        if(fieldValueResolver.isCompletelyResolved() || derivateId == null || derivateId.equals("")) {
+        if(!fieldValueResolver.isCompletelyResolved() || derivateId == null || derivateId.equals("")) {
             LOGGER.debug("Couldnt resolve derivate id " + derivateId);
             return;
         }

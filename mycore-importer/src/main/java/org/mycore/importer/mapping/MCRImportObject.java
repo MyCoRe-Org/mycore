@@ -156,7 +156,8 @@ public class MCRImportObject {
         MCRImportMetadata metadata = metadataTable.get(tag);
         if(metadata == null) {
             metadata = createMetadata(tag);
-            metadataTable.put(tag, metadata);
+            if(metadata != null)
+                metadataTable.put(tag, metadata);
         }
 
         // add child
@@ -171,7 +172,11 @@ public class MCRImportObject {
             Boolean notInherit = datamodel.isNotinherit(metadataName);
             Boolean heritable = datamodel.isHeritable(metadataName);
             String tag = datamodel.getEnclosingName(metadataName);
-
+            if(className == null || tag == null) {
+                LOGGER.error("Cannot create metadata element '" + metadataName + "'! Because the class name " + 
+                             " (e.g. 'classification') or the enclosing name (e.g. 'def.title') is null.");
+                return null;
+            }
             // create the metadata object
             MCRImportMetadata metaData = new MCRImportMetadata(tag);
             metaData.setClassName(className);

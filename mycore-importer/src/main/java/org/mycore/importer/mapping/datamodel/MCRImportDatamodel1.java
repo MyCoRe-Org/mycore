@@ -16,27 +16,39 @@ public class MCRImportDatamodel1 extends MCRImportAbstractDatamodel {
         super(datamodel, metadataResolverManager);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.mycore.importer.mapping.datamodel.MCRImportDatamodel#getEnclosingName(java.lang.String)
+     */
     public String getEnclosingName(String metadataName) {
         Element metadataChild = findMetadataChild(metadataName);
+        if(metadataChild == null)
+            return null;
         return metadataChild.getParentElement().getAttributeValue("name");
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.mycore.importer.mapping.datamodel.MCRImportDatamodel#getClassname(java.lang.String)
+     */
     public String getClassname(String metadataName) {
         Element metadataChild = findMetadataChild(metadataName);
+        if(metadataChild == null)
+            return null;
         return metadataChild.getAttributeValue("class");
     }
 
     /**
-     * Datamodel1 doesnt support not inherit, so null
-     * will be returned
+     * Datamodel1 doesnt support not inherit, so null is returned.
+     * This is equal to dm2 'ignore'.
      */
     public Boolean isNotinherit(String metadataName) {
         return null;
     }
 
     /**
-     * Datamodel1 doesnt support not Heritable, so null
-     * will be returned
+     * Datamodel1 doesnt support not Heritable, so null is returned.
+     * This is equal to dm2 'ignore'.
      */
     public Boolean isHeritable(String metadataName) {
         return null;
@@ -44,21 +56,10 @@ public class MCRImportDatamodel1 extends MCRImportAbstractDatamodel {
 
     public String getClassName(String metadataName) {
         Element metadataElement = findMetadataChild(metadataName);
-        if(metadataElement == null) {
-            LOGGER.error("Couldnt find metadata definition " + metadataName + " in datamodel " + datamodel.getBaseURI());
+        if(metadataElement == null)
             return null;
-        }
         return metadataElement.getAttributeValue("class");
     }
-
-//    protected boolean isCached(String metadataName) {
-//        Element cachedMetadaElement = getCachedMetadataList();
-//        if( metadataName != null && !metadataName.equals("") &&
-//            cachedMetadaElement != null &&
-//            metadataName.equals(getCachedMetadataList().getAttribute("name")))
-//            return true;
-//        return false;
-//    }
 
     @SuppressWarnings("unchecked")
     protected Element findMetadataChild(String metadataName) {
@@ -79,6 +80,8 @@ public class MCRImportDatamodel1 extends MCRImportAbstractDatamodel {
                 return metadataChildElement;
             }
         }
+        LOGGER.error("Couldnt find metadata element '" + metadataName + "' in " + 
+                datamodel.getBaseURI() + "!");
         return null;
     }
 
