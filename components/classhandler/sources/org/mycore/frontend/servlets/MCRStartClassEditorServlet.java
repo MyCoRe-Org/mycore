@@ -235,9 +235,10 @@ public class MCRStartClassEditorServlet extends MCRServlet {
 
                 if (cnt == 0) { // deleted, no more references
                     setResponsePage(job, ReturnStatus.success, path + "&clid=" + clid);
+                } else {
+                    // not delete cause references exist
+                    setResponsePage(job, ReturnStatus.fail, getBaseURL() + iderrorpage);
                 }
-                // not delete cause references exist
-                setResponsePage(job, ReturnStatus.fail, getBaseURL() + iderrorpage);
             }
             return;
         }
