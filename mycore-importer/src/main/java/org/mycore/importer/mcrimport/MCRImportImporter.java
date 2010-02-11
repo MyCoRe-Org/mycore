@@ -50,6 +50,12 @@ public class MCRImportImporter {
 
     protected MCRImportDerivateFileManager derivateFileManager;
 
+    // import status variables  
+    protected int recursiveDepth;
+    protected long objectCount;
+    protected long currentObject;
+    protected ArrayList<String> errorObjectList;
+
     /**
      * Creates a new instance of a MyCoRe importer. The constructor reads the config part
      * of the mapping file and initializes all important variables. To start the import
@@ -79,7 +85,7 @@ public class MCRImportImporter {
                     LOGGER.error(" " + emptyImportValue);
             }
             LOGGER.error(   "Before the import can start, all mycore values have to be set or" +
-            		        "the classifcation mapping needs to be disabled!");
+            		        " the classifcation mapping needs to be disabled!");
             return;
         }
 
@@ -87,6 +93,11 @@ public class MCRImportImporter {
         this.derivateFileManager = new MCRImportDerivateFileManager(new File(config.getSaveToPath() + "derivates/"), false);
         // create the listener list
         this.listenerList = new ArrayList<MCRImportStatusListener>();
+        
+        // some info variables
+        this.recursiveDepth = 0;
+        this.currentObject = 0;
+        this.errorObjectList = new ArrayList<String>();
 
         // build the id table
         File mainDirectory = new File(config.getSaveToPath());
@@ -150,23 +161,83 @@ public class MCRImportImporter {
      * will be passed through and every entry will be imported.
      */
     public void startImport() {
+        // print start informations
+        objectCount = idTable.size();
+        LOGGER.info("************************************");
+        LOGGER.info("*         START IMPORT");
+        LOGGER.info("*-----------------------------------");
+        LOGGER.info("* " + objectCount + " objects to import");
+        LOGGER.info("************************************");
+
+        long startTime = System.currentTimeMillis();
         for(MCRImportFileStatus fs : idTable.values()) {
             // object is already imported to mycore
             if(fs.isImported())
                 continue;
-            try {
-                if(fs.getType().equals(MCRImportFileType.MCROBJECT)) {
-                    String mcrId = importMCRObjectByFile(fs.getFilePath());
-                    fs.setMycoreId(mcrId);
-                }else if(fs.getType().equals(MCRImportFileType.MCRDERIVATE)) {
-                    String mcrId = importMCRDerivateByFile(fs.getFilePath());
-                    fs.setMycoreId(mcrId);
-                    if(config.isImportFilesToMycore())
-                        importInternalDerivateFiles(fs);
-                }
-            } catch(Exception e) {
-                LOGGER.error(e);
+            importObjectById(fs.getImportId());                
+        }
+
+        // print end informations
+        long importDuration = System.currentTimeMillis() - startTime;
+        long importDurationInMinutes = (importDuration / 1000) / 60;
+        LOGGER.info("*************************************************");
+        LOGGER.info("*               IMPORT FINISHED");
+        LOGGER.info("*------------------------------------------------");
+        LOGGER.info("* Import finished in " + importDurationInMinutes + " minutes!");
+        LOGGER.info("* " + (objectCount - errorObjectList.size()) + " of " + objectCount + " objects successfully imported");
+        if(errorObjectList.size() > 0) {
+            LOGGER.info("* The following objects causes errors:");
+            for(String errorObject : errorObjectList) {
+                LOGGER.info("*  - " + errorObject);
             }
+        }
+        LOGGER.info("*************************************************");        
+    }
+
+    /**
+     * Imports an object by its import id. If no object with this
+     * id was found an error occur. 
+     * 
+     * @param importId id to get the right xml file to import
+     * @throws IOException
+     * @throws JDOMException
+     * @throws MCRActiveLinkException
+     */
+    protected void importObjectById(String importId) {
+        try {
+            // print status informations
+            currentObject++;
+            StringBuffer whitespaces = new StringBuffer();
+            for(int i = 0; i < recursiveDepth; i++)
+                whitespaces.append(" ");
+            StringBuffer importStatus = new StringBuffer(String.valueOf(currentObject));
+            importStatus.append("/").append(String.valueOf(objectCount));
+            StringBuffer statusBuffer = new StringBuffer(whitespaces).append("(").append(importStatus).append(") ");
+            LOGGER.info(statusBuffer.toString() + "Try to import " + importId);
+    
+            // check if import id exists
+            MCRImportFileStatus fs = idTable.get(importId);
+            if(fs == null) {
+                LOGGER.error("there is no object with the id '" + importId + "' defined!");
+                return;
+            }
+            String mcrId = null;
+            // import mycore objects and derivates
+            if(fs.getType().equals(MCRImportFileType.MCROBJECT))
+                mcrId = importMCRObjectByFile(fs.getFilePath());
+            else if(fs.getType().equals(MCRImportFileType.MCRDERIVATE))
+                mcrId = importMCRDerivateByFile(fs.getFilePath());
+            // set the new mycore id
+            fs.setMycoreId(mcrId);
+            // import derivate files (*.png, *.flv ...)
+            if( fs.getType().equals(MCRImportFileType.MCRDERIVATE) &&
+                    config.isImportFilesToMycore())
+                importInternalDerivateFiles(fs);
+            // print successfully imported status infos
+            LOGGER.info(statusBuffer.toString() + "Object successfully imported " + importId + " - " + fs.getMycoreId());
+        } catch(Exception e) {
+            errorObjectList.add(importId);
+            LOGGER.error(e);
         }
     }
 
@@ -265,29 +336,6 @@ public class MCRImportImporter {
     }
 
     /**
-     * Imports an object by its import id. If no object with this
-     * id was found an error occour. 
-     * 
-     * @param importId id to get the right xml file to import
-     * @throws IOException
-     * @throws JDOMException
-     * @throws MCRActiveLinkException
-     */
-    protected void importObjectById(String importId) throws IOException, JDOMException, MCRActiveLinkException, URISyntaxException {
-        MCRImportFileStatus fs = idTable.get(importId);
-        if(fs == null) {
-            LOGGER.error("there is no object with the id " + importId + " defined!");
-            return;
-        }
-        String mcrId = null;
-        if(fs.getType().equals(MCRImportFileType.MCROBJECT))
-            mcrId = importMCRObjectByFile(fs.getFilePath());
-        else if(fs.getType().equals(MCRImportFileType.MCRDERIVATE))
-            mcrId = importMCRDerivateByFile(fs.getFilePath());
-        fs.setMycoreId(mcrId);           
-    }
-
-    /**
      * Parses the document to resolve all links. Each linked object
      * will be directly imported to receive the correct mycore id. This
      * id is then set at the href attribute.
@@ -298,7 +346,7 @@ public class MCRImportImporter {
      * @throws MCRActiveLinkException
      */
     @SuppressWarnings("unchecked")
-    protected void resolveLinks(Document doc) throws IOException, JDOMException, MCRActiveLinkException, URISyntaxException { 
+    protected void resolveLinks(Document doc) { 
         Iterator<Element> it = doc.getRootElement().getDescendants(new LinkIdFilter());
         while(it.hasNext()) {
             Element linkElement = it.next();
@@ -311,9 +359,12 @@ public class MCRImportImporter {
                 continue;
             }
             // if null -> the linked object is currently not imported -> do it
-            if(fs.getMycoreId() == null)
+            if(fs.getMycoreId() == null) {
+                recursiveDepth++;
                 importObjectById(linkId);
-            
+                recursiveDepth--;
+            }
+
             // set the new mycoreId
             if(fs.getMycoreId() != null) {
                 linkElement.setAttribute("href", fs.getMycoreId(), MCRConstants.XLINK_NAMESPACE);
