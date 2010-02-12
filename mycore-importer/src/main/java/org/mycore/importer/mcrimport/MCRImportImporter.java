@@ -2,11 +2,13 @@ package org.mycore.importer.mcrimport;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -15,11 +17,11 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.filter.Filter;
 import org.jdom.input.SAXBuilder;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRException;
 import org.mycore.datamodel.common.MCRActiveLinkException;
-import org.mycore.datamodel.ifs.MCRFileImportExport;
-import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.importer.MCRImportConfig;
 import org.mycore.importer.classification.MCRImportClassificationMap;
@@ -37,6 +39,14 @@ import org.mycore.importer.event.MCRImportStatusListener;
 public class MCRImportImporter {
 
     private static final Logger LOGGER = Logger.getLogger(MCRImportImporter.class);
+    
+    private static final String TEMP_DIR = "_temp";
+
+    private static final String LOAD_OBJECT_COMMAND = "load object from file ";
+    
+    private static final String LOAD_DERIVATE_COMMAND = "load derivate from file ";
+    
+    private static final String IMPORT_FILE_COMMAND = "import file of derivate ";
 
     private MCRImportConfig config;
 
@@ -50,10 +60,19 @@ public class MCRImportImporter {
 
     protected MCRImportDerivateFileManager derivateFileManager;
 
+    /**
+     * Contains all commands in the correct order.
+     */
+    protected LinkedList<String> commandList;
+
     // import status variables  
     protected long objectCount;
     protected long currentObject;
     protected ArrayList<String> errorObjectList;
+
+    public LinkedList<String> getCommandList() {
+        return commandList;
+    }
 
     /**
      * Creates a new instance of a MyCoRe importer. The constructor reads the config part
@@ -71,6 +90,10 @@ public class MCRImportImporter {
         Element rootElement = getRootElement(mappingFile);
         // get the config from the import xml file
         this.config = new MCRImportConfig(rootElement);
+        File mainDirectory = new File(config.getSaveToPath());
+        if(!mainDirectory.exists())
+            throw new FileNotFoundException(mainDirectory.getAbsolutePath());
+
         // create the classification manager
         this.classManager = new MCRImportClassificationMappingManager(new File(config.getSaveToPath() + "classification/"));
         if(this.classManager.getClassificationMapList().isEmpty())
@@ -78,23 +101,23 @@ public class MCRImportImporter {
                         " in the import directory exists and all files ends with '.xml'.");
 
         if(!classManager.isCompletelyFilled()) {
-            LOGGER.error("The following classification mapping keys are not set:");
+            StringBuffer error = new StringBuffer("The following classification mapping keys are not set:\n");
             for(MCRImportClassificationMap map : classManager.getClassificationMapList()) {
                 for(String emptyImportValue : map.getEmptyImportValues())
-                    LOGGER.error(" " + emptyImportValue);
+                    error.append(" " + emptyImportValue + "\n");
             }
-            LOGGER.error(   "Before the import can start, all mycore values have to be set or" +
-            		        " the classifcation mapping needs to be disabled!");
-            return;
+            error.append("Before the import can start, all mycore values have to be set or" +
+            		     " the classifcation mapping needs to be disabled!");
+            throw new MCRException(error.toString());
         }
 
         // loads the derivate file manager
         this.derivateFileManager = new MCRImportDerivateFileManager(new File(config.getSaveToPath() + "derivates/"), false);
         // create the listener list
         this.listenerList = new ArrayList<MCRImportStatusListener>();
+        this.commandList = new LinkedList<String>();
 
         // build the id table
-        File mainDirectory = new File(config.getSaveToPath());
         buildIdTable(mainDirectory);
     }
 
@@ -154,31 +177,30 @@ public class MCRImportImporter {
      * This method starts the import. The whole id table
      * will be passed through and every entry will be imported.
      */
-    public void startImport() {
+    public void generateMyCoReFiles() {
         // some info variables
         this.currentObject = 0;
         this.errorObjectList = new ArrayList<String>();
 
         // print start informations
         objectCount = idTable.size();
-        LOGGER.info("START IMPORT");
+        LOGGER.info("Start with generating MyCoRe xml files!");
         LOGGER.info(objectCount + " objects to import");
 
         long startTime = System.currentTimeMillis();
         for(MCRImportFileStatus fs : idTable.values()) {
-            // object is already imported to mycore
-            if(fs.isImported())
+            // object is saved on disk with resolved links etc.
+            if(fs.isSavedInTempDirectory())
                 continue;
-            importObjectById(fs.getImportId());                
+            generateMyCoReXmlFileById(fs.getImportId());                
         }
 
         // print end informations
-        long importDuration = System.currentTimeMillis() - startTime;
-        long importDurationInMinutes = (importDuration / 1000) / 60;
-
-        LOGGER.info("IMPORT FINISHED");
-        LOGGER.info("Import finished in " + importDurationInMinutes + " minutes");
-        LOGGER.info(objectCount - errorObjectList.size() + " of " + objectCount + " objects successfully imported");
+        long duration = System.currentTimeMillis() - startTime;
+        long durationInMinutes = (duration / 1000) / 60;
+        LOGGER.info("MyCoRe files successfully generated");
+        LOGGER.info("Finished in " + durationInMinutes + " minutes");
+        LOGGER.info(objectCount - errorObjectList.size() + " of " + objectCount + " objects successfully generated");
         if(errorObjectList.size() > 0) {
             StringBuffer errorLog = new StringBuffer("The following objects causes errors\n");
             for(String errorObject : errorObjectList) {
@@ -197,38 +219,65 @@ public class MCRImportImporter {
      * @throws JDOMException
      * @throws MCRActiveLinkException
      */
-    protected void importObjectById(String importId) {
+    protected void generateMyCoReXmlFileById(String importId) {
         try {
             // print status informations
             currentObject++;
             StringBuffer importStatus = new StringBuffer(String.valueOf(currentObject));
             importStatus.append("/").append(String.valueOf(objectCount));
             StringBuffer statusBuffer = new StringBuffer("(").append(importStatus).append(") ");
-            LOGGER.info(statusBuffer.toString() + "Try to import " + importId);
-    
+            LOGGER.info(statusBuffer.toString() + "Try to generate " + importId);
+
             // check if import id exists
             MCRImportFileStatus fs = idTable.get(importId);
             if(fs == null) {
                 LOGGER.error("there is no object with the id '" + importId + "' defined!");
                 return;
             }
-            String mcrId = null;
-            // import mycore objects and derivates
-            if(fs.getType().equals(MCRImportFileType.MCROBJECT))
-                mcrId = importMCRObjectByFile(fs.getFilePath());
-            else if(fs.getType().equals(MCRImportFileType.MCRDERIVATE))
-                mcrId = importMCRDerivateByFile(fs.getFilePath());
-            // set the new mycore id
-            fs.setMycoreId(mcrId);
+
+            MCRImportFileType type = fs.getType();
+            Document mcrDocument = null;
+            StringBuffer loadCommand = null;
+            // create the xml files
+            if(type.equals(MCRImportFileType.MCROBJECT)) {
+                mcrDocument = createMCRObjectXml(fs);
+                loadCommand = new StringBuffer(LOAD_OBJECT_COMMAND);
+            } else if(type.equals(MCRImportFileType.MCRDERIVATE)) {
+                mcrDocument = createMCRDerivateXml(fs);
+                loadCommand = new StringBuffer(LOAD_DERIVATE_COMMAND);
+            }
+
+            // save xml file to temp dir
+            File mcrFile = saveDocumentToTemp(fs, mcrDocument);
+            fs.setSavedInTempDirectory(true);
+            String mcrId = fs.getMycoreId().getId();
+
+            // fire events
+            if(type.equals(MCRImportFileType.MCROBJECT))
+                fireMCRObjectGenerated(mcrId);
+            else if(type.equals(MCRImportFileType.MCRDERIVATE))
+                fireMCRDerivateGenerated(mcrId);
+
+            // add load command to the command list
+            loadCommand.append(mcrFile.getAbsolutePath());
+            commandList.add(loadCommand.toString());
+
             // import derivate files (*.png, *.flv ...)
             if( fs.getType().equals(MCRImportFileType.MCRDERIVATE) &&
-                    config.isImportFilesToMycore())
-                importInternalDerivateFiles(fs);
+                    config.isImportFilesToMycore()) {
+                StringBuffer cPart1 = new StringBuffer(IMPORT_FILE_COMMAND);
+                cPart1.append(mcrId).append(" ");
+                List<String> pathList = derivateFileManager.getPathListOfDerivate(importId);
+                for(String path : pathList) {
+                    StringBuffer command = new StringBuffer(cPart1);
+                    command.append(cPart1).append(path);
+                }
+            }
             // print successfully imported status infos
-            LOGGER.info(statusBuffer.toString() + "Object successfully imported " + importId + " - " + fs.getMycoreId());
+            LOGGER.info(statusBuffer.toString() + "Object successfully generated " + importId + " - " + mcrId);
         } catch(Exception e) {
             errorObjectList.add(importId);
-            LOGGER.error("Error while importing object with import id '" + importId + "'!", e);
+            LOGGER.error("Error while generating object with import id '" + importId + "'!", e);
         }
     }
 
@@ -241,8 +290,8 @@ public class MCRImportImporter {
      * @throws JDOMException
      * @throws MCRActiveLinkException
      */
-    protected String importMCRObjectByFile(String filePath) throws IOException, JDOMException, MCRActiveLinkException, URISyntaxException {
-        Document doc = builder.build(filePath);
+    protected Document createMCRObjectXml(MCRImportFileStatus fs) throws IOException, JDOMException, MCRActiveLinkException, URISyntaxException {
+        Document doc = builder.build(fs.getImportObjectPath());
         // resolve links
         resolveLinks(doc);
         // map classification values
@@ -258,22 +307,13 @@ public class MCRImportImporter {
         // remove 'datamodel-' and '.xsd' to get a valid object type (e.g. author)
         String objectType = schemaLocation.substring(schemaLocation.indexOf("-") + 1, schemaLocation.lastIndexOf('.'));
         // create the next id
-        MCRObjectID mcrObjId = new MCRObjectID();
-        mcrObjId.setNextFreeId(config.getProjectName() + "_" + objectType);
+        StringBuffer baseBuf = new StringBuffer(config.getProjectName()).append("_").append(objectType);
+        MCRObjectID mcrObjId = getNextFreeId(baseBuf.toString());
         // set the new id in the xml document
         doc.getRootElement().setAttribute("ID", mcrObjId.getId());
-        // create a new mycore object
-        MCRObject mcrObject = new MCRObject();
-        // set the xml part
-        mcrObject.setFromJDOM(doc);
-        // set a flag that this object was imported
-        mcrObject.getService().addFlag("imported");
-        // save it to the database
-        mcrObject.createInDatastore();
-
-        fireMCRObjectImported(mcrObjId.getId());
-
-        return mcrObjId.getId();
+        // set the new mycore id
+        fs.setMycoreId(mcrObjId);
+        return doc;
     }
 
     /**
@@ -288,42 +328,57 @@ public class MCRImportImporter {
      * @throws MCRActiveLinkException
      * @throws URISyntaxException
      */
-    protected String importMCRDerivateByFile(String filePath) throws IOException, JDOMException, MCRActiveLinkException, URISyntaxException {
-        Document doc = builder.build(filePath);
+    protected Document createMCRDerivateXml(MCRImportFileStatus fs) throws IOException, JDOMException, MCRActiveLinkException, URISyntaxException {
+        Document doc = builder.build(fs.getImportObjectPath());
         // resolve links
         resolveLinks(doc);
         // create the next id
-        MCRObjectID mcrDerivateId = new MCRObjectID();
-        mcrDerivateId.setNextFreeId(config.getProjectName() + "_derivate");
+        StringBuffer baseBuf = new StringBuffer(config.getProjectName()).append("_derivate");
+        MCRObjectID mcrDerivateId = getNextFreeId(baseBuf.toString());
         // set the new id in the xml document
         doc.getRootElement().setAttribute("ID", mcrDerivateId.getId());
-        // create the derivate
-        MCRDerivate derivate = new MCRDerivate();
-        derivate.setFromJDOM(doc);
-        // set a flag that this object was imported
-        derivate.getService().addFlag("imported");
-        // save it to the database
-        derivate.createInDatastore();
-
-        fireMCRDerivateImported(mcrDerivateId.getId());
-
-        return mcrDerivateId.getId();
+        fs.setMycoreId(mcrDerivateId);
+        return doc;
     }
 
     /**
-     * This method does the file (jpg, tiff, pdf...) upload for the importer.
-     * It uses the <code>addFiles</code> method from <code>MCRFileImportExport</code>
-     * utility class.
+     * Returns a new mycore object id depending on the base.
      * 
-     * @see MCRFileImportExport#addFiles(File, String)
-     * @param fileStatus file status of the current mycore derivate
+     * @param base the base string (e.g. DocPortal_author);
+     * @return a new mcr object id
      */
-    protected void importInternalDerivateFiles(MCRImportFileStatus fileStatus) {
-        List<String> pathList = derivateFileManager.getPathListOfDerivate(fileStatus.getImportId());
-        for(String path : pathList) {
-            MCRFileImportExport.addFiles(new File(path), fileStatus.getMycoreId());
-//            MCRFileImportExport.importFiles(new File(path), fs.getMycoreId());
-        }
+    protected MCRObjectID getNextFreeId(String base) {
+        MCRObjectID mcrObjId = new MCRObjectID();
+        mcrObjId.setNextFreeId(base);
+        return mcrObjId;
+    }
+
+    /**
+     * Saves a xml document to the temp directory.
+     * 
+     * @param fs contains general object informations
+     * @param documentToSave the xml document
+     * @return the saved file
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    protected File saveDocumentToTemp(MCRImportFileStatus fs, Document documentToSave) throws FileNotFoundException, IOException {
+        File saveToFile = getMCRXmlFile(fs.getMycoreId());
+        XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
+        FileOutputStream output = new FileOutputStream(saveToFile);
+        outputter.output(documentToSave, output);
+        return saveToFile;
+    }
+
+    public File getMCRXmlFile(MCRObjectID mcrId) {
+        File tempFolder = new File(config.getSaveToPath(), TEMP_DIR);
+        if(!tempFolder.exists())
+            tempFolder.mkdir();
+        File subfolder = new File(tempFolder, mcrId.getTypeId());
+        if(!subfolder.exists())
+            subfolder.mkdir();
+        StringBuffer fileName = new StringBuffer(mcrId.getId()).append(".xml");
+        return new File(subfolder, fileName.toString());
     }
 
     /**
@@ -351,11 +406,11 @@ public class MCRImportImporter {
             }
             // if null -> the linked object is currently not imported -> do it
             if(fs.getMycoreId() == null)
-                importObjectById(linkId);
+                generateMyCoReXmlFileById(linkId);
 
             // set the new mycoreId
             if(fs.getMycoreId() != null) {
-                linkElement.setAttribute("href", fs.getMycoreId(), MCRConstants.XLINK_NAMESPACE);
+                linkElement.setAttribute("href", fs.getMycoreId().toString(), MCRConstants.XLINK_NAMESPACE);
             } else {
                 LOGGER.error("Couldnt resolve reference for link " + linkId + " in " + doc.getBaseURI());
                 continue;
@@ -413,30 +468,30 @@ public class MCRImportImporter {
 
     /**
      * Sends all registerd listeners that a mycore object is
-     * successfully imported in the system.
+     * successfully generated in temp directory.
      * 
      * @param record the record which is mapped
      */
-    private void fireMCRObjectImported(String mcrId) {
+    private void fireMCRObjectGenerated(String mcrId) {
         for(MCRImportStatusListener l : listenerList) {
             MCRImportStatusEvent e = new MCRImportStatusEvent(this, mcrId);
-            l.objectImported(e);
+            l.objectGenerated(e);
         }
     }
 
     /**
      * Sends all registerd listeners that a mycore object is
-     * successfully imported in the system.
+     * successfully generated in temp directory.
      * 
      * @param record the record which is mapped
      */
-    private void fireMCRDerivateImported(String derId) {
+    private void fireMCRDerivateGenerated(String derId) {
         for(MCRImportStatusListener l : listenerList) {
             MCRImportStatusEvent e = new MCRImportStatusEvent(this, derId);
-            l.derivateImported(e);
+            l.derivateGenerated(e);
         }
     }
-    
+
     /**
      * Internal filter class which returns only true
      * if the element is a xlink. 

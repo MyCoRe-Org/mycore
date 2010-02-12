@@ -6,7 +6,9 @@ import java.util.List;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRTestCase;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.importer.mapping.MCRImportMappingManager;
 import org.mycore.importer.mapping.MCRImportMetadataResolverManager;
 import org.mycore.importer.mapping.MCRImportObject;
@@ -16,6 +18,7 @@ import org.mycore.importer.mapping.datamodel.MCRImportDatamodelManager;
 import org.mycore.importer.mapping.mapper.MCRImportMapper;
 import org.mycore.importer.mapping.mapper.MCRImportMapperManager;
 import org.mycore.importer.mapping.resolver.metadata.MCRImportMetadataResolver;
+import org.mycore.importer.mcrimport.MCRImportImporter;
 
 public class ImporterTestCase extends MCRTestCase {
 
@@ -24,7 +27,7 @@ public class ImporterTestCase extends MCRTestCase {
         MCRImportDatamodelManager dmm = new MCRImportDatamodelManager("src/test/resources", metadataResolverManager);
         MCRImportDatamodel dm1 = dmm.addDatamodel("sample-dm1.xml");
         MCRImportDatamodel dm2 = dmm.addDatamodel("sample-dm2.xml");
-        
+
         // datamodel 1 tests
         assertEquals("MCRMetaLangText", dm1.getClassname("metaText"));
         assertEquals("MCRMetaXML", dm1.getClassname("metaXML"));
@@ -91,7 +94,7 @@ public class ImporterTestCase extends MCRTestCase {
         MCRImportConfig config = new MCRImportConfig(doc.getRootElement());
 
         assertEquals("sample", config.getProjectName());
-        assertEquals("save/", config.getSaveToPath());
+        assertEquals("save/mapping/", config.getSaveToPath());
         assertEquals(true, config.isCreateClassificationMapping());
         assertEquals(true, config.isUseDerivates());
         assertEquals(true, config.isCreateInImportDir());
@@ -125,7 +128,7 @@ public class ImporterTestCase extends MCRTestCase {
         assertEquals(2, importObject.getMetadata("metaText").getChilds().size());
         assertEquals("2001-10-23", importObject.getMetadata("date").getChilds().get(0).getText());
         MCRImportMappingManager.getInstance().saveImportObject(importObject, "xml");
-        assertEquals(true, new File("save/xml/000001.xml").exists());
+        assertEquals(true, new File("save/mapping/xml/000001.xml").exists());
 
         record = new MCRImportRecord("record");
         record.addField(new MCRImportField("text", "DM1 and ID tests!"));
@@ -135,6 +138,52 @@ public class ImporterTestCase extends MCRTestCase {
         assertEquals("record_0", importObject.getId());
         assertEquals("DM1 and ID tests!", importObject.getLabel());
         assertEquals("Sample: DM1 and ID tests!", importObject.getMetadata("metaText").getChilds().get(0).getText());
+
+        deleteDir(new File("save"));
     }
 
+    private boolean deleteDir(File dir) {
+        if (dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i=0; i<children.length; i++) {
+                boolean success = deleteDir(new File(dir, children[i]));
+                if (!success) {
+                    return false;
+                }
+            }
+        }
+        // The directory is now empty so delete it
+        return dir.delete();
+    }
+
+    public void testImport() throws Exception {
+        File mappingFile = new File("src/test/resources/sample-mapping2.xml");
+        MCRConfiguration.instance().set("MCR.Metadata.Type.sample-dm1", true);
+        MCRConfiguration.instance().set("MCR.Metadata.Type.sample-dm2", true);
+
+        // do mapping
+        assertEquals(true, MCRImportMappingManager.getInstance().init(new File("src/test/resources/sample-mapping2.xml")));
+        MCRImportRecord record = new MCRImportRecord("record");
+        record.addField(new MCRImportField("text", "import test"));
+        MCRImportMappingManager.getInstance().mapAndSaveRecord(record);
+        record = new MCRImportRecord("record");
+        record.addField(new MCRImportField("text", "import test2"));
+        MCRImportMappingManager.getInstance().mapAndSaveRecord(record);
+
+        // do import
+        MCRImportImporter im = new MCRImportImporter(mappingFile) {
+            private int count = 1;
+            @Override
+            protected MCRObjectID getNextFreeId(String base) {
+                MCRObjectID objId = new MCRObjectID(base + "_" + count++);
+                return objId;
+            }
+        };
+        im.generateMyCoReFiles();
+        List<String> commandList = im.getCommandList();
+        assertEquals(2, commandList.size());
+
+        // delete save dir
+        deleteDir(new File("save"));
+    }
 }

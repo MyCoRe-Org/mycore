@@ -1,5 +1,7 @@
 package org.mycore.importer.mcrimport;
 
+import org.mycore.datamodel.metadata.MCRObjectID;
+
 /**
  * This is a data holder class for the linkage between import- and
  * mycore objects. It holds information about the import id, the
@@ -11,37 +13,39 @@ package org.mycore.importer.mcrimport;
 public class MCRImportFileStatus {
 
     private String importId;
-    private String mycoreId;
+    private MCRObjectID mycoreId;
+    private boolean savedInTempDirectory;
     
     private MCRImportFileType type;
 
-    private String filePath;
+    private String importObjectPath;
 
-    public MCRImportFileStatus(String importId, String filePath, MCRImportFileType type) {
+    public MCRImportFileStatus(String importId, String importObjectPath, MCRImportFileType type) {
         this.importId = importId;
-        this.filePath = filePath;
+        this.importObjectPath = importObjectPath;
         this.type = type;
+        this.mycoreId = null;
     }
 
-    public void setMycoreId(String mycoreId) {
+    public void setMycoreId(MCRObjectID mycoreId) {
         this.mycoreId = mycoreId;
     }
-    public String getFilePath() {
-        return filePath;
+    public String getImportObjectPath() {
+        return importObjectPath;
     }
     public String getImportId() {
         return importId;
     }
-    public String getMycoreId() {
+    public MCRObjectID getMycoreId() {
         return mycoreId;
     }
     public MCRImportFileType getType() {
         return type;
     }
-
-    public boolean isImported() {
-        if(mycoreId != null && !mycoreId.equals(""))
-            return true;
-        return false;
+    public void setSavedInTempDirectory(boolean savedInTempDirectory) {
+        this.savedInTempDirectory = savedInTempDirectory;
+    }
+    public boolean isSavedInTempDirectory() {
+        return savedInTempDirectory;
     }
 }

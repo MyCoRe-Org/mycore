@@ -28,21 +28,23 @@ public interface MCRImportStatusListener extends EventListener {
     public void derivateSaved(MCRImportStatusEvent e);
 
     /**
-     * Informs the listener that a mycore object is imported.
-     * The listener can then invoke <code>MCRImportStatusEvent</code>
-     * methods to obtain information about the event.
+     * Informs the listener that a mycore object is generated in the
+     * temp directory. The listener can then invoke
+     * <code>MCRImportStatusEvent</code> methods to obtain information
+     * about the event.
      * 
      * @param e event that describes the change
      */
-    public void objectImported(MCRImportStatusEvent e);
+    public void objectGenerated(MCRImportStatusEvent e);
 
     /**
-     * Informs the listener that a derivate is imported.
-     * The listener can then invoke <code>MCRImportStatusEvent</code>
-     * methods to obtain information about the event.
+     * Informs the listener that a derivate is generated in the
+     * temp directory. The listener can then invoke
+     * <code>MCRImportStatusEvent</code> methods to obtain information
+     * about the event.
      * 
      * @param e event that describes the change
      */
-    public void derivateImported(MCRImportStatusEvent e);
+    public void derivateGenerated(MCRImportStatusEvent e);
 
 }

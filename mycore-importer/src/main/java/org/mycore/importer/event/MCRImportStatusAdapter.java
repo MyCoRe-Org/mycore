@@ -9,11 +9,11 @@ package org.mycore.importer.event;
  */
 public class MCRImportStatusAdapter implements MCRImportStatusListener {
 
-    public void derivateImported(MCRImportStatusEvent e) {}
+    public void derivateGenerated(MCRImportStatusEvent e) {}
 
     public void derivateSaved(MCRImportStatusEvent e) {}
 
-    public void objectImported(MCRImportStatusEvent e) {}
+    public void objectGenerated(MCRImportStatusEvent e) {}
 
     public void recordMapped(MCRImportStatusEvent e) {}
 

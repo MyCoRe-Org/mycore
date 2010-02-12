@@ -3,7 +3,7 @@
     <config>
         <projectName>sample2</projectName>
         <datamodelPath>src/test/resources/</datamodelPath>
-        <saveToPath>save/</saveToPath>
+        <saveToPath>save/mapping2/</saveToPath>
         <createClassificationMapping>false</createClassificationMapping>
     </config>
 
