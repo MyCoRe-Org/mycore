@@ -829,7 +829,7 @@ function getPageNumberFromPic(viewID) {
 	var files = Iview[viewID].buchDaten.getElementsByTagName(namespaceCheck("mets:file"));
 	for (var i = 0; i < files.length;i++) {
 		if (files[i].attributes.getNamedItem("ID").value == Iview[viewID].prefix) {
-			var nodes = files[i].childNodes;
+			var nodes = files[i].getElementsByTagName(namespaceCheck("mets:FLocat"));
 			for (var j = 0; j < nodes.length; j++) {
 				if (nodes[j].attributes.getNamedItem("LOCTYPE").value.toLowerCase() == "other" && nodes[j].attributes.getNamedItem("OTHERLOCTYPE") != null && nodes[j].attributes.getNamedItem("OTHERLOCTYPE").value.toLowerCase() == "pagenumber") {
 					var ref = isBrowser(["Opera","Firefox/2"])? "href":"xlink:href";
