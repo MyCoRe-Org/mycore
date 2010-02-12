@@ -51,7 +51,6 @@ public class MCRImportImporter {
     protected MCRImportDerivateFileManager derivateFileManager;
 
     // import status variables  
-    protected int recursiveDepth;
     protected long objectCount;
     protected long currentObject;
     protected ArrayList<String> errorObjectList;
@@ -93,11 +92,6 @@ public class MCRImportImporter {
         this.derivateFileManager = new MCRImportDerivateFileManager(new File(config.getSaveToPath() + "derivates/"), false);
         // create the listener list
         this.listenerList = new ArrayList<MCRImportStatusListener>();
-        
-        // some info variables
-        this.recursiveDepth = 0;
-        this.currentObject = 0;
-        this.errorObjectList = new ArrayList<String>();
 
         // build the id table
         File mainDirectory = new File(config.getSaveToPath());
@@ -161,13 +155,14 @@ public class MCRImportImporter {
      * will be passed through and every entry will be imported.
      */
     public void startImport() {
+        // some info variables
+        this.currentObject = 0;
+        this.errorObjectList = new ArrayList<String>();
+
         // print start informations
         objectCount = idTable.size();
-        LOGGER.info("************************************");
-        LOGGER.info("*         START IMPORT");
-        LOGGER.info("*-----------------------------------");
-        LOGGER.info("* " + objectCount + " objects to import");
-        LOGGER.info("************************************");
+        LOGGER.info("START IMPORT");
+        LOGGER.info(objectCount + " objects to import");
 
         long startTime = System.currentTimeMillis();
         for(MCRImportFileStatus fs : idTable.values()) {
@@ -180,18 +175,17 @@ public class MCRImportImporter {
         // print end informations
         long importDuration = System.currentTimeMillis() - startTime;
         long importDurationInMinutes = (importDuration / 1000) / 60;
-        LOGGER.info("*************************************************");
-        LOGGER.info("*               IMPORT FINISHED");
-        LOGGER.info("*------------------------------------------------");
-        LOGGER.info("* Import finished in " + importDurationInMinutes + " minutes!");
-        LOGGER.info("* " + (objectCount - errorObjectList.size()) + " of " + objectCount + " objects successfully imported");
+
+        LOGGER.info("IMPORT FINISHED");
+        LOGGER.info("Import finished in " + importDurationInMinutes + " minutes");
+        LOGGER.info(objectCount - errorObjectList.size() + " of " + objectCount + " objects successfully imported");
         if(errorObjectList.size() > 0) {
-            LOGGER.info("* The following objects causes errors:");
+            StringBuffer errorLog = new StringBuffer("The following objects causes errors\n");
             for(String errorObject : errorObjectList) {
-                LOGGER.info("*  - " + errorObject);
+                errorLog.append(" " + errorObject + "\n");
             }
+            LOGGER.info(errorLog.toString());
         }
-        LOGGER.info("*************************************************");        
     }
 
     /**
@@ -207,12 +201,9 @@ public class MCRImportImporter {
         try {
             // print status informations
             currentObject++;
-            StringBuffer whitespaces = new StringBuffer();
-            for(int i = 0; i < recursiveDepth; i++)
-                whitespaces.append(" ");
             StringBuffer importStatus = new StringBuffer(String.valueOf(currentObject));
             importStatus.append("/").append(String.valueOf(objectCount));
-            StringBuffer statusBuffer = new StringBuffer(whitespaces).append("(").append(importStatus).append(") ");
+            StringBuffer statusBuffer = new StringBuffer("(").append(importStatus).append(") ");
             LOGGER.info(statusBuffer.toString() + "Try to import " + importId);
     
             // check if import id exists
@@ -237,7 +228,7 @@ public class MCRImportImporter {
             LOGGER.info(statusBuffer.toString() + "Object successfully imported " + importId + " - " + fs.getMycoreId());
         } catch(Exception e) {
             errorObjectList.add(importId);
-            LOGGER.error(e);
+            LOGGER.error("Error while importing object with import id '" + importId + "'!", e);
         }
     }
 
@@ -359,11 +350,8 @@ public class MCRImportImporter {
                 continue;
             }
             // if null -> the linked object is currently not imported -> do it
-            if(fs.getMycoreId() == null) {
-                recursiveDepth++;
+            if(fs.getMycoreId() == null)
                 importObjectById(linkId);
-                recursiveDepth--;
-            }
 
             // set the new mycoreId
             if(fs.getMycoreId() != null) {
