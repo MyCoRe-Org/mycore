@@ -72,7 +72,7 @@ public class MCRIView2Tools {
         // verify support
         if (nameOfMainFile != null && !nameOfMainFile.equals("")) {
             MCRFile mainFile = getMCRFile(derivateID, nameOfMainFile);
-            if (isFileSupported(mainFile))
+            if (mainFile != null && isFileSupported(mainFile))
                 return mainFile.getAbsolutePath();
         }
         return "";
