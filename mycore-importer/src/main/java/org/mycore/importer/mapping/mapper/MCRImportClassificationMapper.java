@@ -23,6 +23,11 @@ public class MCRImportClassificationMapper extends MCRImportMetadataMapper {
         // do the default metadata mapping
         super.map(importObject, record, map);
 
+        // classification mapping explicit disabled?
+        String useClassificationMapping = map.getAttributeValue("useClassificationMapping");
+        if(useClassificationMapping == null || !useClassificationMapping.equals("true"))
+            return;
+
         String to = map.getAttributeValue("to");
         MCRImportMetadata metadata = importObject.getMetadata(to);
         if(metadata == null)

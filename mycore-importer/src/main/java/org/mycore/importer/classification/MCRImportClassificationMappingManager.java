@@ -25,6 +25,7 @@ import org.jdom.output.XMLOutputter;
  * and reading classification entries and saving the whole classification maps
  * back to the file system.
  * 
+ * @see MCRImportClassificationMap
  * @author Matthias Eichner
  */
 public class MCRImportClassificationMappingManager {

@@ -3,8 +3,6 @@ package org.mycore.importer.classification;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
 
 import org.jdom.Element;
 
