@@ -551,6 +551,10 @@ function openChapterAndInitialize(major, viewID, button){
 			var start=new Date().getTime();
 			setTimeout(function(){
 				importChapter(viewID);
+				jQuery(Iview[viewID].chapter1.my.content).find(".chapter").each(function(index,element){
+					Iview[viewID].chapter1.toggleChapter(element);
+				});
+				updateModuls(viewID);
 				var end=new Date().getTime() - start;
 				var chapter=document.getElementById("chapter1"+viewID);
 				button.className=oldClassName;
@@ -744,12 +748,11 @@ function importChapter(viewID) {
 		chapter1.setSize(null, chapter1.my.self.parentNode.offsetHeight * chapResizeMul + chapResizeAdd);
 	}
 	chapter1.useEffects(chapHover);
-	chapter1.displayOutAllEntries(document.getElementById("chapter1"+viewID+"_content").firstChild, 0);
+	//chapter1.displayOutAllEntries(document.getElementById("chapter1"+viewID+"_content").firstChild, 0);
 	// Additional Listener
 	chapter1.addListener(chapter.PAGE_NUMBER, new function() { this.change = function(value) {
 		navigatePage(value, viewID);
 	}});
-	updateModuls(viewID);
 }
 
 /*

@@ -36,6 +36,7 @@ function chapter(newId, parent) {
 	//this.setLoadPageDataFunction = setLoadPageDataFunction;
 	this.setViewID = setViewID;
 	this.setBookData = setBookData;
+	this.toggleChapter = toggleChapter;
 
 	/*
 	@description sets the ID which is needed for multiple Viewers on a page so that they different components are connected properly together
@@ -159,6 +160,20 @@ function chapter(newId, parent) {
 			return curChapter;
 		}
 	}
+	
+	function toggleChapter(element){
+		element.expanded = !element.expanded;
+		element.getElementsByTagName("div").item(0).childNodes.item(0).className =(element.expanded)? "chapterImageSymbolMinus":"chapterImageSymbolPlus";
+		for (var i = 0; i < element.childNodes.length; i++) {
+			if ((element.childNodes.item(i).className == "chapter") || (element.childNodes.item(i).className == "chapter highlight") || (element.childNodes.item(i).className == "chapter hover")) {
+				element.childNodes.item(i).style.display = (element.expanded)? "block":"none";
+			}
+		}
+		// check out a free place
+		if (my.self.firstChild.offsetHeight < document.getElementById(id+"_content").offsetHeight) {
+			my.self.firstChild.style.top = 0 + "px";
+		}
+	}
 
 	/*
 	@description Realizes to Open and Close Chapter Entries
@@ -167,18 +182,7 @@ function chapter(newId, parent) {
 		e = getEvent(e);
 
 		var element = (typeof(arguments[1]) != "undefined")? arguments[1]: this;
-		element.expanded = !element.expanded;
-		element.getElementsByTagName("div").item(0).childNodes.item(0).className =(element.expanded)? "chapterImageSymbolMinus":"chapterImageSymbolPlus";
-		for (var i = 0; i < element.childNodes.length; i++) {
-			if ((element.childNodes.item(i).className == "chapter") || (element.childNodes.item(i).className == "chapter highlight") || (element.childNodes.item(i).className == "chapter hover")) {
-				element.childNodes.item(i).style.display = (element.expanded)? "block":"none";
-			}
-		}
-
-		// check out a free place
-		if (my.self.firstChild.offsetHeight < document.getElementById(id+"_content").offsetHeight) {
-			my.self.firstChild.style.top = 0 + "px";
-		}
+		toggleChapter(element);
 
 		// because of additional calling without event
 		if (e) {
