@@ -7,16 +7,19 @@ import java.util.Map;
 
 /**
  * <p>
- * This class parses and resolves strings which contains variables.
- * The constructor takes a hashtable with all possible variables. Only these could be
- * resolved. The algorithm has been optimized so that each character is touched only once.
+ * This class parses and resolve strings which contains variables and
+ * MyCoRe properties. To add variables call <code>addVariable</code>.
+ * To disable MyCoRe property resolving call <code>setUseMCRProperties(false)</code>.
+ * </p><p>
+ * The algorithm has been optimized so that each character is touched only once.
  * </p><p>
  * To resolve a string a valid syntax is required:
  * </p><p>
- * <b>{}:</b> Use curly brackets to set variables. For example "{var1}" 
+ * <b>{}:</b> Use curly brackets for variables or properties. For example "{var1}"
+ * or "{MCR.basedir}" 
  * </p><p>
  * <b>[]:</b> Use squared brackets to define a condition. All data which
- * is set in squared brackes is only used if the internal variables are
+ * is set in squared brackets is only used if the internal variables are
  * not null and not empty. For example "[hello {lastName}]" is only resolved
  * if the value of "lastName" is not null and not empty. Otherwise the whole
  * content in the squared brackets are ignored.
@@ -27,29 +30,82 @@ import java.util.Map;
  * Sample:</br>
  * "Lastname: {lastName}[, Firstname: {firstName}]"<br/>
  * </p>
+ * 
  * @author Matthias Eichner
  */
 public class MCRTextResolver {
 
+    /**
+     * If MyCoRe properties are resolved. For example {MCR.basedir}.
+     * By default this is true.
+     */
+    protected boolean useMCRProperties;
+
+    /**
+     * This hash table contains all variables that can be resolved.
+     */
     protected Hashtable<String, String> variablesTable;
 
     protected Hashtable<String, String> resolvedVariables;
     protected List<String> unresolvedVariables;
 
     /**
-     * Creates a new variables resolver.
+     * Creates a new text resolver. To add variables call
+     * <code>addVariable</code>, otherwise only MyCoRe property
+     * resolving is possible.
+     */
+    public MCRTextResolver() {
+        this(new Hashtable<String, String>());
+    }
+
+    /**
+     * Creates a new text resolver with a hash table of variables.
      * 
-     * @param variablesTable a hashtable of variables
+     * @param variablesTable a hash table of variables
      */
     public MCRTextResolver(Hashtable<String, String> variablesTable) {
         this.variablesTable = variablesTable;
         this.resolvedVariables = new Hashtable<String, String>();
         this.unresolvedVariables = new ArrayList<String>();
+        this.useMCRProperties = true;
+    }
+
+    /**
+     * Adds a new variable to the resolver. This overwrites a
+     * existing variable with the same name.
+     * 
+     * @param name name of the variable
+     * @param value value of the variable
+     * @return the previous value of the specified name, or null
+     * if it did not have one
+     */
+    public String addVariable(String name, String value) {
+        return this.variablesTable.put(name, value);
+    }
+
+    /**
+     * Removes a variable from the resolver. This method does
+     * nothing if no variable with the name exists.
+     * 
+     * @return the value of the removed variable, or null if
+     * no variable with the name exists
+     */
+    public String removeVariable(String name) {
+        return this.variablesTable.remove(name);
+    }
+
+    /**
+     * Checks if a variable with the specified name exists.
+     * 
+     * @return true if a variable exists, otherwise false
+     */
+    public boolean containsVariable(String name) {
+        return this.variablesTable.containsKey(name);
     }
 
     /**
      * This method resolves all variables in the text.
-     * The synatax is described at the head of the class.
+     * The syntax is described at the head of the class.
      * 
      * @param text the string where the variables have to be
      * resolved
@@ -64,7 +120,7 @@ public class MCRTextResolver {
     /**
      * This method resolves all variables in the text. In difference to the
      * <code>resolve(String text)</code> the <i>resolvedVariables</i>- and
-     * the <i>unresolvedVariables</i> lists are not cleard.
+     * the <i>unresolvedVariables</i> lists are not cleared.
      * 
      * @param text the text to resolve
      * @return the resolved string
@@ -77,7 +133,7 @@ public class MCRTextResolver {
      * Resolves a text and returns it as <code>Text</code> object.
      * 
      * @param text the text to resolve
-     * @return an instanceof <code>Text</code>
+     * @return an instance of <code>Text</code>
      */
     private Text resolveText(String text) {
         Text textResolver = new Text();
@@ -114,16 +170,16 @@ public class MCRTextResolver {
     }
 
     /**
-     * Returns a hashtable of all variables.
+     * Returns a hash table of all variables.
      * 
-     * @return a hashtable of all variablse.
+     * @return a hash table of all variables.
      */
     public Hashtable<String, String> getVariables() {
         return variablesTable;
     }
 
     /**
-     * Returns a list of all variables which couldnt be resolved.
+     * Returns a list of all variables which couldn't be resolved.
      * 
      * @return a list of unresolved variables
      */
@@ -132,23 +188,23 @@ public class MCRTextResolver {
     }
 
     /**
-     * Returns a hashtable of all variables which are succesfully
+     * Returns a hash table of all variables which are successfully
      * resolved. This includes only variables the incoming string
      * contains.
      * 
-     * @return a hashtable of resolved variables.
+     * @return a hash table of resolved variables.
      */
     public Hashtable<String, String> getResolvedVariables() {
         return resolvedVariables;
     }
 
     /**
-     * Returns a hashtable of variables that are used in the last <code>
+     * Returns a hash table of variables that are used in the last <code>
      * resolve</code> and all last <code>resolveNext</code> calls.
      * This contains also variables that are not in the original
      * variables table. The value string of these variables is empty ("").
      * 
-     * @return a hashtable of all variables that are used
+     * @return a hash table of all variables that are used
      */
     public Hashtable<String, String> getUsedVariables() {
         Hashtable<String, String> usedVars = new Hashtable<String, String>();
@@ -160,11 +216,11 @@ public class MCRTextResolver {
     }
 
     /**
-     * Returns a hashtable of variables which are not used. Not used means
+     * Returns a hash table of variables which are not used. Not used means
      * that in the last <code>resolve</code> and <code>resolveNext</code>
-     * calls the variable doesnt occour.
+     * calls the variable doesn't occur.
      * 
-     * @return a hashtable of not used fields
+     * @return a hash table of not used fields
      */
     public Hashtable<String, String> getNotUsedVariables() {
         Hashtable<String, String> usedVariables = getUsedVariables();
@@ -181,11 +237,30 @@ public class MCRTextResolver {
      * Checks if the resolved text contains unresolved
      * variables.
      * 
-     * @return true if the text doesnt contains unresolved
+     * @return true if the text doesn't contains unresolved
      * variables, otherwise false
      */
     public boolean isCompletelyResolved() {
         return (unresolvedVariables.size() == 0) ? true : false;
+    }
+
+    /**
+     * Checks if MyCoRe properties are resolved if they are found. For example
+     * {MCR.basedir}.
+     * 
+     * @return true if MyCoRe properties are resolved, otherwise false
+     */
+    public boolean useMCRProperties() {
+        return useMCRProperties;
+    }
+
+    /**
+     * Enables or disables MyCoRe property resolving.
+     * 
+     * @param useMCRProperties
+     */
+    public void setUseMCRProperties(boolean useMCRProperties) {
+        this.useMCRProperties = useMCRProperties;
     }
 
     /**
@@ -261,7 +336,7 @@ public class MCRTextResolver {
 
         /**
          * Returns the value of the term. Overwrite this if you
-         * dont want to get the default termBuffer content as value.
+         * don't want to get the default termBuffer content as value.
          * 
          * @return the value of the term
          */
@@ -274,7 +349,7 @@ public class MCRTextResolver {
     }
 
     /**
-     * A variable is sourrounded by curly brackets. It supports recursive
+     * A variable is surrounded by curly brackets. It supports recursive
      * resolving for the content of the variable. The name of the variable
      * is set by the termBuffer and the value is equal the content of the
      * valueBuffer.
@@ -284,7 +359,7 @@ public class MCRTextResolver {
         public static final String END_ENCLOSING_STRING = "}";
 
         /**
-         * A variable doesnt return the termBuffer, but
+         * A variable doesn't return the termBuffer, but
          * this valueBuffer.
          */
         private StringBuffer valueBuffer;
@@ -299,18 +374,23 @@ public class MCRTextResolver {
             if(text.startsWith(END_ENCLOSING_STRING, pos)) {
                 // get the value from the variables table
                 String value = variablesTable.get(termBuffer.toString());
-                if (value != null) {
-                    // resolve the content of the variable recursive
-                    // to resolve all other internal variables, condition etc.
-                    Text recursiveResolvedText = resolveText(value);
-                    resolved = recursiveResolvedText.resolved;
-                    // set the value of the variable
-                    valueBuffer.append(recursiveResolvedText.getValue());
-                    resolvedVariables.put(termBuffer.toString(), valueBuffer.toString());
-                } else {
-                    unresolvedVariables.add(termBuffer.toString());
-                    resolved = false;
+                if(value == null) {
+                    // variable is not in the list but maybe its a mycore property
+                    if(useMCRProperties)
+                        value = MCRConfiguration.instance().getString(termBuffer.toString(), null);
+                    if(value == null) {
+                        unresolvedVariables.add(termBuffer.toString());
+                        resolved = false;
+                        return true;
+                    }
                 }
+                // resolve the content of the variable recursive
+                // to resolve all other internal variables, condition etc.
+                Text recursiveResolvedText = resolveText(value);
+                resolved = recursiveResolvedText.resolved;
+                // set the value of the variable
+                valueBuffer.append(recursiveResolvedText.getValue());
+                resolvedVariables.put(termBuffer.toString(), valueBuffer.toString());
                 return true;
             }
             termBuffer.append(text.charAt(pos));
@@ -333,8 +413,8 @@ public class MCRTextResolver {
     }
 
     /**
-     * A condition is defined by squared bracktes. All data which
-     * is set in these brackes is only used if the internal variables are
+     * A condition is defined by squared brackets. All data which
+     * is set in these brackets is only used if the internal variables are
      * not null and not empty. For example "[hello {lastName}]" is only resolved
      * if the value of "lastName" is not null and not empty. Otherwise the whole
      * content in the squared brackets are ignored.
