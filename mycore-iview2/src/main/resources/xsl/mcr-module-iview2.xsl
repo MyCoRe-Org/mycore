@@ -293,7 +293,7 @@
     <!--PageForm-->
     <script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/init.js"/>
     <!-- Init Funktionen -->
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.0/jquery.min.js"/>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"/>
     <!-- Prototype Framework -->
     <script type="text/javascript">
       function addIviewProperty(viewID, propertyName, val) {
