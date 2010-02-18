@@ -142,7 +142,7 @@ function chapter(newId, parent) {
 	/*
 	@description read out the logical structure of the book
 	*/
-	function loadContent() {
+	function loadContent(parent) {
 		//Auslesen der logischen Strukturierung des Buches
 		var Liste = getNodes(bookData, "mets:structMap",i, true);
 		var structItem = null;//hält das Objekt mit den logischen Strukturinfos
@@ -155,9 +155,8 @@ function chapter(newId, parent) {
 		if (structItem == null ) {
 			alert("Error 1:No Mets File found");
 		} else {
-			var curChapter = document.createElement("div");
-			structItem = getStructure(getFirstNodeByTagName(structItem.childNodes, "mets:div"), curChapter, true);
-			return curChapter;
+			structItem = getStructure(getFirstNodeByTagName(structItem.childNodes, "mets:div"), parent, true);
+			return parent.firstChild;
 		}
 	}
 	
@@ -304,7 +303,6 @@ function chapter(newId, parent) {
 	@description cut the name of the Enty until it fits
 	*/
 	function checkChapterEntry(TOC) {
-
 		// determine the "number" of the indented levels of the chapterentries
 		var findMainParent = TOC;
 		var counter = 0;
@@ -549,69 +547,63 @@ function chapter(newId, parent) {
 	@description initialize chapter
 	*/
 	function init(identer) {
-		var main = document.createElement("div");
-		main.id = id;
-		main.className = identer;
-		document.getElementById(parent).appendChild(main);
+		var main = jQuery("<div>")
+			.attr("id",id)
+			.addClass(identer)
+			.appendTo(document.getElementById(parent));
 
-		// decide if In/Out-Place
-		//chapterBool = chapterEmbedded;
-		
 		// are needed later, therefore they have to be read by hand
-		main.style.height = getStyle(id,"height");
-		main.style.top = getStyle(id,"top");
-		main.style.visibility = getStyle(id,"visibility");
+		main.css({
+			height: main.css("height"),
+			top: main.css("top"),
+			visibility: main.css("visibility"),
+			width: main.css("width"),
+			zIndex: main.css("z-index")
+		});
 
-
-		var content = document.createElement("div");
-		content.id = id+"_content";
-		content.className = identer + "_content";
-		content.style.right = getStyle(id+"_content","right");
-		content.style.left = getStyle(id+"_content","left");
-//TODO IE/Opera hat hier mit Angaben derart width:100% Probleme und spinnt total rum. Berechnung klappt also irgendwie nicht richtig
-		content.style.width = parseInt(main.style.width) - parseInt(content.style.left) -
-						     parseInt(content.style.right) + "px";
-
+		var content = jQuery("<div>")
+			.attr("id",id+"_content")
+			.addClass(identer + "_content")
+			.appendTo(main);
+		content.css({
+			right: content.css("right"),
+			left: content.css("left"),
+			//TODO IE/Opera hat hier mit Angaben derart width:100% Probleme und spinnt total rum. Berechnung klappt also irgendwie nicht richtig
+			width: toInt(main.css("width")) - toInt(content.css("left")) - toInt(content.css("right")) + "px"
+		});
 		
-		main.appendChild(content);
-		content.appendChild(loadContent().firstChild);
 		// have to initialize so that the current page can be centered & needed to work in IE
-		content.firstChild.style.top = "0px";
+		content.append(jQuery(loadContent(content[0])).css("top","0px"));
 		
-		var chapSort = document.createElement("div");
-		chapSort.id = id+"_chapSort";
-		chapSort.className = identer + "_chapSort";
-		//chapSort.onclick = function() {chapterSort();};
-		ManageEvents.addEventListener(chapSort, 'click', function() {chapterSort();}, false);
-		main.appendChild(chapSort);
+		var chapSort = jQuery("<div>")
+			.attr("id",id+"_chapSort")
+			.addClass(identer + "_chapSort")
+			.appendTo(main)
+			.click(chapterSort);
 
 		// to determine content-width
-
-		// Main Chapter Div
-		main.style.width = getStyle(id,"width");
-		main.style.zIndex = getStyle(id,"z-index");
 		
 		// create Elements to hold chapter Class Props
-		var chapIn = document.createElement("div");
-		chapIn.id = id+"In";
-		chapIn.className = identer +"InPlace";
-		main.appendChild(chapIn);
+		var chapIn = jQuery("<div>")
+			.attr("id",id+"In")
+			.addClass(identer +"InPlace")
+			.appendTo(main);
 
-		var chapOut = document.createElement("div");
-		chapOut.id = id+"Out";
-		chapOut.className = identer +"OutPlace";
-		main.appendChild(chapOut);
+		var chapOut = jQuery("<div>")
+		.attr("id",id+"Out")
+		.addClass(identer +"OutPlace")
+		.appendTo(main);
 		
 		//var scrollX = new scrollBar("scrollChap"+viewID, "scrollChap");
 		var scrollY = new scrollBar("scrollChap"+viewID, "scrollChap");
 
-		my = {'self': main, 'content':content, 'firstElement': content.firstChild, /*'scrollBarX': scrollX,*/ 'scrollBarY':scrollY};
+		my = {'self': main[0], 'content':content[0], 'firstElement': content[0].firstChild, /*'scrollBarX': scrollX,*/ 'scrollBarY':scrollY};
 		this.my = my;
 		//var scrollBarChapter = Iview[viewID].scrollBarChapter;
 		scrollY.init(false);
 		scrollY.addListener(scrollBar.LIST_MOVE, new function() { this.moved = function(vector) {my.firstElement.style.top = -my.scrollBarY.getValue()+ "px";}});
 		scrollY.setParent(id);
-		scrollY.setSize(main.style.height);
+		scrollY.setSize(main.css("height"));
 		//TODO immer noch die letzte Seite mit drin stehen lassen als Orientierung
 		//console.log();
 		scrollY.setJumpStep(parseInt(my.content.clientHeight)-my.content.firstChild.firstChild.clientHeight);
