@@ -252,15 +252,15 @@ public class MCRImportImporter {
             fs.setSavedInTempDirectory(true);
             String mcrId = fs.getMycoreId().getId();
 
+            // add load command to the command list
+            loadCommand.append(mcrFile.getAbsolutePath());
+            commandList.add(loadCommand.toString());
+
             // fire events
             if(type.equals(MCRImportFileType.MCROBJECT))
                 fireMCRObjectGenerated(mcrId);
             else if(type.equals(MCRImportFileType.MCRDERIVATE))
                 fireMCRDerivateGenerated(mcrId);
-
-            // add load command to the command list
-            loadCommand.append(mcrFile.getAbsolutePath());
-            commandList.add(loadCommand.toString());
 
             // import derivate files (*.png, *.flv ...)
             if( fs.getType().equals(MCRImportFileType.MCRDERIVATE) &&
