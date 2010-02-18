@@ -2,7 +2,7 @@
 <import>
     <config>
         <projectName>sample</projectName>
-        <datamodelPath>src/test/resources/</datamodelPath>
+        <datamodelPath>{MCR.basedir}/test/resources/</datamodelPath>
         <saveToPath>save/mapping/</saveToPath>
         <createClassificationMapping>true</createClassificationMapping>
         <derivates use="true">

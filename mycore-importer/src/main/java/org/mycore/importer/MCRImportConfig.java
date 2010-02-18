@@ -2,10 +2,11 @@ package org.mycore.importer;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
+import org.mycore.common.MCRTextResolver;
 
 /**
  * This class is an xml abstraction of the config part from the
- * pica-import file. It contains the project name, the datamodel
+ * import file. It contains the project name, the datamodel
  * path, the path where the mapped files will be saved, if
  * classification mapping is enabled and if derivates are created. 
  * 
@@ -14,16 +15,18 @@ import org.jdom.Element;
 public class MCRImportConfig {
 
     private static final Logger LOGGER = Logger.getLogger(MCRImportConfig.class);
-    
+
     private String projectName;
     private String saveToPath;
     private String datamodelPath;
     private boolean createClassificationMapping;
-    
+
     private boolean useDerivates;
     private boolean createInImportDir;
     private boolean importToMycore;
     private boolean importFilesToMycore;
+
+    private MCRTextResolver textResolver;
 
     /**
      * Reads the config part of the mapping file.
@@ -31,19 +34,21 @@ public class MCRImportConfig {
      * @param rootElement
      */
     public MCRImportConfig(Element rootElement) {
+        textResolver = new MCRTextResolver();
+
         Element configElement = rootElement.getChild("config");
 
         // project name
-        projectName = configElement.getChildText("projectName");
+        projectName = resolve(configElement.getChildText("projectName"));
         // get the datamodel path
-        datamodelPath = configElement.getChildText("datamodelPath");
+        datamodelPath = resolve(configElement.getChildText("datamodelPath"));
         // save to path
-        saveToPath = configElement.getChildText("saveToPath");
+        saveToPath = resolve(configElement.getChildText("saveToPath"));
         // create a automatically classification mapping, default is true
         createClassificationMapping = true;
         String classString = configElement.getChildText("createClassificationMapping");
         if(classString != null && !classString.equals(""))
-            createClassificationMapping = Boolean.valueOf(classString); 
+            createClassificationMapping = Boolean.valueOf(resolve(classString)); 
 
         // derivate config part
         useDerivates = false;
@@ -54,21 +59,27 @@ public class MCRImportConfig {
         if(derivatesElement != null) {
             String helpString = derivatesElement.getAttributeValue("use");
             if(helpString != null && !helpString.equals(""))
-                useDerivates = Boolean.valueOf(helpString);
-    
+                useDerivates = Boolean.valueOf(resolve(helpString));
+
             if(useDerivates == true) {
                 helpString = derivatesElement.getChildText("createInImportDir");
                 if(helpString != null && !helpString.equals(""))
-                    createInImportDir = Boolean.valueOf(helpString);
+                    createInImportDir = Boolean.valueOf(resolve(helpString));
                 helpString = derivatesElement.getChildText("importToMycore");
                 if(helpString != null && !helpString.equals(""))
-                    importToMycore = Boolean.valueOf(helpString);
+                    importToMycore = Boolean.valueOf(resolve(helpString));
                 helpString = derivatesElement.getChildText("importFilesToMycore");
                 if(helpString != null && !helpString.equals(""))
-                    importFilesToMycore = Boolean.valueOf(helpString);
+                    importFilesToMycore = Boolean.valueOf(resolve(helpString));
             }
         }
         printConfigInfo();
+    }
+
+    private String resolve(String toResolve) {
+        if(toResolve == null)
+            return null;
+        return textResolver.resolve(toResolve);
     }
 
     public void printConfigInfo() {

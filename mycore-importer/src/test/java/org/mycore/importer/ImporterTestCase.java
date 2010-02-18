@@ -89,10 +89,12 @@ public class ImporterTestCase extends MCRTestCase {
     }
 
     public void testConfig() throws Exception {
+        MCRConfiguration.instance().set("MCR.basedir", "src");
         SAXBuilder builder = new SAXBuilder();
         Document doc = builder.build(new File("src/test/resources/sample-mapping.xml"));
         MCRImportConfig config = new MCRImportConfig(doc.getRootElement());
 
+        assertEquals("src/test/resources/", config.getDatamodelPath());
         assertEquals("sample", config.getProjectName());
         assertEquals("save/mapping/", config.getSaveToPath());
         assertEquals(true, config.isCreateClassificationMapping());
