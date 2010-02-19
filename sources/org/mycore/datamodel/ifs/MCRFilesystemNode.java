@@ -10,16 +10,25 @@
 package org.mycore.datamodel.ifs;
 
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
+
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectInstance;
+import javax.management.ReflectionException;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
-import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.MCRUsageException;
+import org.mycore.services.mbeans.MCRJMXBridge;
 
 /**
  * Represents a stored file or directory node with its metadata and content.
@@ -112,6 +121,12 @@ public abstract class MCRFilesystemNode {
     }
 
     protected void storeNew() {
+        storeNode();
+    }
+
+    // moved out from storeNew() for reuse, delete may be overidden 
+    // in subclasses
+    private void storeNode() {
         manager.storeNode(this);
 
         if (hasParent()) {
@@ -120,6 +135,12 @@ public abstract class MCRFilesystemNode {
     }
 
     public void delete() {
+        deleteNode();
+    }
+
+    // moved out from delete() for reuse, delete may be overidden 
+    // in subclasses
+    private void deleteNode() {
         this.removeAllAdditionalData();
         manager.deleteNode(ID);
 
@@ -135,6 +156,33 @@ public abstract class MCRFilesystemNode {
         this.lastModified = null;
         this.parentID = null;
         this.deleted = true;
+    }
+
+    public void move(MCRDirectory dest) {
+        this.ownerID = dest.getOwnerID();
+        this.parentID = dest.getID();
+        manager.storeNode(this);
+        clearCache();
+    }
+
+    private void clearCache() {
+        try {
+            ObjectInstance mcrCacheMBean = MCRJMXBridge.getMBean("MCRCache", "IFS FileSystemNodes");
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            mbs.invoke(mcrCacheMBean.getObjectName(), "clear", null, null);
+        } catch (MalformedObjectNameException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InstanceNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (ReflectionException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (MBeanException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     /*
@@ -428,8 +476,8 @@ public abstract class MCRFilesystemNode {
         MCRFile dataFile = MCRFile.getRootFile(this.ID);
         if (dataFile == null)
             return;
-	Document doc;
-	try {
+        Document doc;
+        try {
             doc = dataFile.getContentAsJDOM();
         } catch (MCRPersistenceException e) {
             Logger.getLogger(MCRFilesystemNode.class).warn("Could not read additional data of " + this, e);
@@ -525,6 +573,5 @@ public abstract class MCRFilesystemNode {
         else
             return super.hashCode();
     }
-    
-    
+
 }
