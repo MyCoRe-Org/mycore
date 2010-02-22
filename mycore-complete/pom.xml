@@ -250,7 +250,7 @@
     </dependency>
     <dependency>
       <groupId>net.sf.ehcache</groupId>
-      <artifactId>ehcache</artifactId>
+      <artifactId>ehcache-core</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.xmlgraphics</groupId>
@@ -347,12 +347,8 @@
       <artifactId>metadata-extractor</artifactId>
     </dependency>
     <dependency>
-      <groupId>pdfbox</groupId>
+      <groupId>org.apache.pdfbox</groupId>
       <artifactId>pdfbox</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.xerces</groupId>
-      <artifactId>serializer</artifactId>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>

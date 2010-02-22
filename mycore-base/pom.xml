@@ -207,10 +207,10 @@
       <groupId>xalan</groupId>
       <artifactId>xalan</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.apache.xerces</groupId>
-      <artifactId>serializer</artifactId>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>org.apache.xerces</groupId>-->
+<!--      <artifactId>serializer</artifactId>-->
+<!--    </dependency>-->
     <dependency>
       <groupId>commons-fileupload</groupId>
       <artifactId>commons-fileupload</artifactId>
@@ -224,7 +224,7 @@
       <artifactId>jid3lib</artifactId>
     </dependency>
     <dependency>
-      <groupId>pdfbox</groupId>
+      <groupId>org.apache.pdfbox</groupId>
       <artifactId>pdfbox</artifactId>
     </dependency>
     <dependency>
@@ -269,7 +269,7 @@
     </dependency>
     <dependency>
       <groupId>net.sf.ehcache</groupId>
-      <artifactId>ehcache</artifactId>
+      <artifactId>ehcache-core</artifactId>
     </dependency>
     <dependency>
       <groupId>org.hibernate</groupId>

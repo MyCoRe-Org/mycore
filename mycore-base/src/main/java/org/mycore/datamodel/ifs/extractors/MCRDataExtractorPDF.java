@@ -28,10 +28,10 @@ import java.util.Calendar;
 
 import org.jdom.Element;
 import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
-import org.pdfbox.pdmodel.PDDocument;
-import org.pdfbox.pdmodel.PDDocumentInformation;
-import org.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
-import org.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDDocumentInformation;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
 
 /**
  * Extracts metadata from PDF files using the PDFBox library. The number of
