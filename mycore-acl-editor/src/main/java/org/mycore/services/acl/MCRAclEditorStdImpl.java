@@ -16,8 +16,6 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.bouncycastle.ocsp.Req;
 import org.jdom.Content;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -33,7 +31,6 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.services.acl.filter.MCRAclObjIdFilter;
 import org.mycore.services.acl.filter.MCRAclPermissionFilter;
-import org.mycore.user.MCRUserMgr;
 
 import com.ibm.icu.util.StringTokenizer;
 
