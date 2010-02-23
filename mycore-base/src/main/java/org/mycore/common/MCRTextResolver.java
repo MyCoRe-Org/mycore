@@ -39,7 +39,7 @@ public class MCRTextResolver {
      * If MyCoRe properties are resolved. For example {MCR.basedir}.
      * By default this is true.
      */
-    protected boolean useMCRProperties;
+    private static boolean useMCRProperties = true;
 
     /**
      * This hash table contains all variables that can be resolved.
@@ -67,7 +67,6 @@ public class MCRTextResolver {
         this.variablesTable = variablesTable;
         this.resolvedVariables = new Hashtable<String, String>();
         this.unresolvedVariables = new ArrayList<String>();
-        this.useMCRProperties = true;
     }
 
     /**
@@ -250,7 +249,7 @@ public class MCRTextResolver {
      * 
      * @return true if MyCoRe properties are resolved, otherwise false
      */
-    public boolean useMCRProperties() {
+    public static boolean useMCRProperties() {
         return useMCRProperties;
     }
 
@@ -259,8 +258,8 @@ public class MCRTextResolver {
      * 
      * @param useMCRProperties
      */
-    public void setUseMCRProperties(boolean useMCRProperties) {
-        this.useMCRProperties = useMCRProperties;
+    public static void setUseMCRProperties(boolean value) {
+        useMCRProperties = value;
     }
 
     /**
