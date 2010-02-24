@@ -65,7 +65,7 @@ public class MCRTextResolverTest extends MCRTestCase {
         assertEquals("propValue1 - v1 - propValue2", resolver.resolve("{prop1} - {f1} - {prop2}"));
         assertEquals("test: propValue1", resolver.resolve("[test: {prop1}]"));
         assertEquals("", resolver.resolve("[test: {prop3}]"));
-        resolver.setUseMCRProperties(false);
+        MCRTextResolver.setUseMCRProperties(false);
         assertEquals("", resolver.resolve("[test: {prop1}]"));
     }
     
