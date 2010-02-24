@@ -79,6 +79,9 @@
           <configuration>
             <target>${java.target.version}</target>
             <source>${java.target.version}</source>
+	    <optimize>true</optimize>
+	    <showDeprecation>true</showDeprecation>
+	    <showWarnings>true</showWarnings>
           </configuration>
         </plugin>
         <!-- Generate aggregate Javadocs -->
