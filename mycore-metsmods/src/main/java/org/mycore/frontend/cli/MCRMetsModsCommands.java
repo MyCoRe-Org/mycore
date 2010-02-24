@@ -71,261 +71,104 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
 
         MCRCommand com = null;
 
-        com = new MCRCommand("build mets files for type {0}","org.mycore.frontend.cli.MCRMetsModsCommands.buildMetsForType String","Create the mets.xml file in the derivate directory of given type.");
+        com = new MCRCommand("build mets files for type {0}", "org.mycore.frontend.cli.MCRMetsModsCommands.buildMetsForType String",
+                        "Create the mets.xml file in the derivate directory of given type.");
         command.add(com);
-             
-        com = new MCRCommand("build mets files for Derivat {0}","org.mycore.frontend.cli.MCRMetsModsCommands.buildMetsForMCRDerivateID String","Create the mets.xml file in the derivate directory of the given derivate.");
+
+        com = new MCRCommand("build mets files for Object {0}", "org.mycore.frontend.cli.MCRMetsModsCommands.buildMetsForMCRObjectID String",
+                        "Create the mets.xml file for all dfg-derivate's of the given object.");
         command.add(com);
-        
-        com = new MCRCommand("build mets files for Object {0}","org.mycore.frontend.cli.MCRMetsModsCommands.buildMetsForMCRObjectID String","Create the mets.xml file for all dfg-derivate's of the given object.");
+
+        com = new MCRCommand("build mets files for Derivate {0}", "org.mycore.frontend.cli.MCRMetsModsCommands.buildMetsForMCRDerivateID String",
+                        "Create the mets.xml file in the derivate directory of the given derivate.");
         command.add(com);
-       
-        com = new MCRCommand("check mets files for type {0} with exclude label {1}","org.mycore.frontend.cli.MCRMetsModsCommands.checkMetsForType String String","Check mets files for given type.");
-        command.add(com);
-        
-        com = new MCRCommand("check mets files for type {0}","org.mycore.frontend.cli.MCRMetsModsCommands.checkMetsForType String","Check mets files for given type.");
-        command.add(com);
-        
-        com = new MCRCommand("check mets files for Object {0} with exclude label {1}","org.mycore.frontend.cli.MCRMetsModsCommands.checkMetsForMCRObjectID String String","Check mets files for given object.");
-        command.add(com);
-        
-        com = new MCRCommand("check mets files for Object {0}","org.mycore.frontend.cli.MCRMetsModsCommands.checkMetsForMCRObjectID String","Check mets files for given object.");
-        command.add(com);
-       
-        com = new MCRCommand("check mets files for Derivat {0}","org.mycore.frontend.cli.MCRMetsModsCommands.checkMetsForMCRDerivateID String","Check mets files for given derivat.");
-        command.add(com);
-        
-        com = new MCRCommand("check mets files","org.mycore.frontend.cli.MCRMetsModsCommands.checkMets","Check the mets.xml file.");
-        command.add(com);
-      
-        com = new MCRCommand("remove mets files from zoomify","org.mycore.frontend.cli.MCRMetsModsCommands.removeMetsByZoomify","Remove all mets files in zoomify derivate directorys.");
-        command.add(com);
- 
-        com = new MCRCommand("remove mets files","org.mycore.frontend.cli.MCRMetsModsCommands.removeMets","Remove all mets files.");
-        command.add(com);
-        
-        com = new MCRCommand("remove mets files from zoomify","org.mycore.frontend.cli.MCRMetsModsCommands.removeMetsByZoomify","Remove all mets files in zoomify derivate directorys.");
-        command.add(com);
- 
-        com = new MCRCommand("remove mets files","org.mycore.frontend.cli.MCRMetsModsCommands.removeMets","Remove all mets files.");
-        command.add(com);
-       
+
         com = new MCRCommand("build mets files", "org.mycore.frontend.cli.MCRMetsModsCommands.buildMets", "Create the mets.xml file in the derivate directory.");
         command.add(com);
-       
+
+        com = new MCRCommand("check mets files for type {0} with exclude label {1}",
+                        "org.mycore.frontend.cli.MCRMetsModsCommands.checkMetsForType String String", "Check mets files for given type.");
+        command.add(com);
+
+        com = new MCRCommand("check mets files for type {0}", "org.mycore.frontend.cli.MCRMetsModsCommands.checkMetsForType String",
+                        "Check mets files for given type.");
+        command.add(com);
+
+        com = new MCRCommand("check mets files for Object {0} with exclude label {1}",
+                        "org.mycore.frontend.cli.MCRMetsModsCommands.checkMetsForMCRObjectID String String", "Check mets files for given object.");
+        command.add(com);
+
+        com = new MCRCommand("check mets files for Object {0}", "org.mycore.frontend.cli.MCRMetsModsCommands.checkMetsForMCRObjectID String",
+                        "Check mets files for given object.");
+        command.add(com);
+
+        com = new MCRCommand("check mets files for Derivate {0}", "org.mycore.frontend.cli.MCRMetsModsCommands.checkMetsForMCRDerivateID String",
+                        "Check mets files for given derivate.");
+        command.add(com);
+
+        com = new MCRCommand("check mets files", "org.mycore.frontend.cli.MCRMetsModsCommands.checkMets", "Check the mets.xml file.");
+        command.add(com);
+
+        com = new MCRCommand("remove mets files from zoomify", "org.mycore.frontend.cli.MCRMetsModsCommands.removeMetsByZoomify",
+                        "Remove all mets files in zoomify derivate directorys.");
+        command.add(com);
+
+        com = new MCRCommand("remove mets files", "org.mycore.frontend.cli.MCRMetsModsCommands.removeMets", "Remove all mets files.");
+        command.add(com);
+
     }
 
-    
-    public static final void removeMetsForType(String type) {
-        LOGGER.debug("Remove METS file for "+type+" start.");
+    /*
+     * The command look for derivates with images and build mets.xml files if it not exist for all MCRObjects of the given type.
+     * 
+     * @param type the data type of the MCRObjectIDs
+     */
+    public static final void buildMetsForType(String type) {
+        LOGGER.info("Build METS file for type " + type + " start.");
         final long start = System.currentTimeMillis();
-        
+        // get all MCRObjectIDs for the type
         MCRQueryCondition fromcond = new MCRQueryCondition(MCRFieldDef.getDef("objectType"), "=", type);
         MCRQuery fromquery = new MCRQuery(fromcond);
         MCRResults fromresult = MCRQueryManager.search(fromquery);
         Iterator<MCRHit> fromiter = fromresult.iterator();
-        
-        while(fromiter.hasNext())
-        {
+        while (fromiter.hasNext()) {
+            // build for a MCRObjectID
             MCRHit fromhit = fromiter.next();
             String fromid = fromhit.getID();
-                
-            MCRObject fromobj = new MCRObject();
-            fromobj.receiveFromDatastore(fromid);
-
-            for(int i=0;i<fromobj.getStructure().getDerivateSize();i++)
-            {
-                MCRObjectID mcrderid = fromobj.getStructure().getDerivate(i).getXLinkHrefID();
-                MCRDerivate mcrder = new MCRDerivate();
-                MCRDirectory derdir = mcrder.receiveDirectoryFromIFS(mcrderid.toString());
-                if(derdir.getChild("mets.xml")!=null)
-                {
-                    LOGGER.info("Removing mets.xml from Derivate "+mcrderid+" linked with Object "+fromid);
-                    derdir.getChild("mets.xml").delete();
-                }
-                
-            }
- 
-        }
-         
-        LOGGER.debug("Remove METS file for "+type+" request took " + (System.currentTimeMillis() - start) + "ms.");
-    }
-    
-    /**
-     * Remove mets.xml files from all derivates.
-     * 
-     * @throws Exception
-     */
-    public static final void removeMets() throws Exception {
-        LOGGER.debug("Remove METS file start.");
-        final long start = System.currentTimeMillis();
-        List<String> derlist = MCRXMLTableManager.instance().listIDsOfType("derivate");
-        for (String der : derlist) {
-            MCRDirectory difs = MCRDirectory.getRootDirectory(der);
-            if (difs != null) {
-                MCRFilesystemNode mets = difs.getChild("mets.xml");
-                if (mets != null) {
-                    LOGGER.info("Mets file found on "+der);
-                    mets.delete();
-                }
-            }
-        }
-        LOGGER.debug("Remove METS file request took " + (System.currentTimeMillis() - start) + "ms.");
-    }
-    
-    /**
-     * Remove mets.xml files from all derivates typed by zoomify.
-     * 
-     * @throws Exception
-     */
-    public static final void removeMetsByZoomify() throws Exception {
-        LOGGER.debug("Remove METS file from zoomify derivates start.");
-        final long start = System.currentTimeMillis();
-        List<String> derlist = MCRXMLTableManager.instance().listIDsOfType("derivate");
-        for (String der : derlist) {
-            MCRDirectory difs = MCRDirectory.getRootDirectory(der);
-            if (difs != null) {
-                MCRFilesystemNode mets = difs.getChild("mets.xml");
-                                              
-                    MCRFilesystemNode l[] = difs.getChildren();
-                    
-                    boolean zipfound = false;
-                    for(int i=0;i<l.length;i++)
-                        if(l[i].getName().contains(".zip")) {zipfound=true;break;}
-                
-                if (mets != null && zipfound) {
-                    LOGGER.info("Mets file found on "+der);
-                    mets.delete();
-                }
-            }
-        }
-        LOGGER.debug("Remove METS file from zoomify derivates request took " + (System.currentTimeMillis() - start) + "ms.");
-    }
-    
-    public static final void buildMetsForType(String type)
-    {
-        LOGGER.debug("Build METS file for type "+type+" start.");
-        final long start = System.currentTimeMillis();
-
-        MCRQueryCondition fromcond = new MCRQueryCondition(MCRFieldDef.getDef("objectType"), "=", type);
-        MCRQuery fromquery = new MCRQuery(fromcond);
-        MCRResults fromresult = MCRQueryManager.search(fromquery);
-        Iterator<MCRHit> fromiter = fromresult.iterator();
-        
-        while(fromiter.hasNext())
-        {
-            MCRHit fromhit = fromiter.next();
-            String fromid = fromhit.getID();
-                
             buildMetsForMCRObjectID(fromid);
- 
-        }
 
-        LOGGER.debug("Build METS file for type "+type+" request took " + (System.currentTimeMillis() - start) + "ms.");
+        }
+        LOGGER.debug("Build METS file for type " + type + " took " + (System.currentTimeMillis() - start) + "ms.");
     }
-    
-    public static final void checkMetsForType(String type)
-    {
-        checkMetsForType(type,null);   
-    }
-    
-    public static final void checkMetsForType(String type, String exclude)
-    {
-        LOGGER.debug("Check METS file for type "+type+" start.");
-        final long start = System.currentTimeMillis();
 
-        MCRQueryCondition fromcond = new MCRQueryCondition(MCRFieldDef.getDef("objectType"), "=", type);
-        MCRQuery fromquery = new MCRQuery(fromcond);
-        MCRResults fromresult = MCRQueryManager.search(fromquery);
-        Iterator<MCRHit> fromiter = fromresult.iterator();
-       
-        while(fromiter.hasNext())
-        {
-            MCRHit fromhit = fromiter.next();
-            String fromid = fromhit.getID();
-            
-            if(exclude==null) checkMetsForMCRObjectID(fromid, null);
-            else {
-                StringTokenizer excluder = new StringTokenizer(exclude,",");
-                while(excluder.hasMoreTokens())
-                {
-                    checkMetsForMCRObjectID(fromid,excluder.nextToken());
-                }
-                
-            }
- 
-        }
-        
-        
-        LOGGER.debug("Check METS file for type "+type+" request took " + (System.currentTimeMillis() - start) + "ms.");
-    }
-    
-    public static final void checkMetsForMCRObjectID(String id)
-    {
-        checkMetsForMCRObjectID(id, null);
-    }
-        
-    public static final void checkMetsForMCRObjectID(String id, String excludelabel)
-    {
-        LOGGER.debug("Check METS file start.");
-        final long start = System.currentTimeMillis();
-        
-        MCRObject mcrobj = new MCRObject();
-        mcrobj.receiveFromDatastore(id);
-        for(int i=0;i<mcrobj.getStructure().getDerivateSize();i++)
-        {
-           MCRMetaLinkID mcrder = mcrobj.getStructure().getDerivate(i);
-           LOGGER.debug("found derivate "+ mcrder.getXLinkTitle());
-           String label = mcrder.getXLinkLabel();
-           
-               if(excludelabel==null) checkMetsForMCRDerivateID(mcrder.getXLinkHrefID().toString());
-               else {
-                   if(!label.contains(excludelabel))
-                       checkMetsForMCRDerivateID(mcrder.getXLinkHrefID().toString());
-               }
-        }
-        
-        LOGGER.debug("Check METS file request took " + (System.currentTimeMillis() - start) + "ms.");
-    }
-    
-    public static final void checkMetsForMCRDerivateID(String id)
-    {
-        LOGGER.debug("Check METS file start.");
-        final long start = System.currentTimeMillis();
-        
-        MCRDirectory difs = MCRDirectory.getRootDirectory(id);
-        if (difs != null) {
-            MCRFilesystemNode mets = difs.getChild("mets.xml");
-            if (mets == null) {
-                LOGGER.info("No mets.xml file was found for "+id+".");
-            }
-        }
-        
-        LOGGER.debug("Check METS file request took " + (System.currentTimeMillis() - start) + "ms.");
-    }
-    
-    public static final void buildMetsForMCRObjectID(String MCRID)
-    {
-        LOGGER.debug("Build METS file start.");
+    /*
+     * The command look for derivates with images and build mets.xml files if it not exist for a given MCRObject.
+     * 
+     * @param MCRID the MCRObjectID to check and build
+     */
+    public static final void buildMetsForMCRObjectID(String MCRID) {
+        LOGGER.info("Build METS file for ID " + MCRID + " start.");
         final long start = System.currentTimeMillis();
         MCRObject mcrobj = new MCRObject();
         mcrobj.receiveFromDatastore(MCRID);
-        for(int i=0;i<mcrobj.getStructure().getDerivateSize();i++)
-        {
-           MCRMetaLinkID mcrder = mcrobj.getStructure().getDerivate(i);
-           LOGGER.debug("found derivate "+ mcrder.getXLinkTitle());
-           String label = mcrder.getXLinkLabel();
-           if(label.contains("dfg")) 
-               buildMetsForMCRDerivateID(mcrder.getXLinkHrefID().toString());
+        for (int i = 0; i < mcrobj.getStructure().getDerivateSize(); i++) {
+            MCRMetaLinkID mcrder = mcrobj.getStructure().getDerivate(i);
+            LOGGER.debug("For ID " + MCRID + " found derivate " + mcrder.getXLinkHref());
+            String label = mcrder.getXLinkLabel();
+            if (label.contains("dfg"))
+                buildMetsForMCRDerivateID(mcrder.getXLinkHrefID().toString());
         }
-        LOGGER.debug("Build METS file request took " + (System.currentTimeMillis() - start) + "ms.");
+        LOGGER.debug("Build METS file for ID " + MCRID + " took " + (System.currentTimeMillis() - start) + "ms.");
     }
-    
-    public static final void buildMetsForMCRDerivateID(String MCRID)
-    {
-        String baseurl = MCRConfiguration.instance().getString("MCR.baseurl", "http://127.0.0.1:8080");
 
-        LOGGER.debug("Build METS file start.");
+    /*
+     * The command build a mets.xml file for a given MCRDerivate if it does not exist and the derivate contains images.
+     * 
+     * @param MCRID the MCRObjectID
+     */
+    public static final void buildMetsForMCRDerivateID(String MCRID) {
+        String baseurl = MCRConfiguration.instance().getString("MCR.baseurl", "http://127.0.0.1:8080");
+        LOGGER.info("Build METS file for ID " + MCRID + "  start.");
         final long start = System.currentTimeMillis();
         MCRDerivate derxml = new MCRDerivate();
         derxml.receiveFromDatastore(MCRID);
@@ -334,7 +177,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         if (difs != null) {
             MCRFilesystemNode mets = difs.getChild("mets.xml");
             if (mets == null) {
-                LOGGER.info("No mets.xml file was found for "+MCRID+".");
+                LOGGER.debug("No mets.xml file was found for " + MCRID + ".");
                 MCRFilesystemNode[] fsnode = difs.getChildren();
                 boolean checkimage = false;
                 for (int i = 0; i < fsnode.length; i++) {
@@ -345,14 +188,10 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
                         break;
                     }
                 }
-                
                 if (checkimage) {
-                    
-                    LOGGER.info("Build mets.xml for derivate "+MCRID+" with MyCoRe-Object-ID: "+docid);
-                    
+                    LOGGER.debug("Start create mets.xml");
                     ArrayList<String> pic_list = new ArrayList<String>();
                     addPicturesToList(difs, pic_list);
-
                     String project = docid.getProjectId();
                     MCRConfiguration CONFIG = MCRConfiguration.instance();
                     // owner
@@ -380,174 +219,238 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
                     if (presentationURL.trim().length() == 0) {
                         presentationURL = CONFIG.getString("MCR.Component.MetsMods.presentationURL", "");
                     }
-
                     MCRMetsModsUtil mmu = new MCRMetsModsUtil();
-
                     Element new_mets = mmu.init_mets(MCRID);
                     Element amdSec = mmu.init_amdSec(MCRID, owner, ownerLogo, ownerSiteURL, referenceURL, presentationURL);
-
                     new_mets.addContent(amdSec);
-
                     Element mets2 = mmu.createMetsElement(pic_list, new_mets, baseurl + "servlets/MCRFileNodeServlet");
-
                     XMLOutputter xmlout = new XMLOutputter();
                     String full_mets = xmlout.outputString(mets2);
-
                     // save the builded file to IFS
                     try {
-                        LOGGER.debug("storing new mets file...");
+                        LOGGER.debug("Storing new mets.xml file");
                         // startTransaction();
                         MCRFile file = new MCRFile("mets.xml", difs);
                         // commitTransaction();
                         ByteArrayInputStream bais = new ByteArrayInputStream(full_mets.getBytes());
                         long sizeDiff = file.setContentFrom(bais, false);
-                       
+
                         file.storeContentChange(sizeDiff);
-                      
-
+                        LOGGER.info("mets.xml for derivate " + MCRID + " with MyCoRe-Object-ID: " + docid + " was build.");
                     } catch (Exception e) {
-                        LOGGER.error("Error while storing new mets file...", e);
+                        LOGGER.error("Error while storing new mets.xml file in MCRDerivate " + MCRID, e);
                     }
-                    
-                    
                 }
             }
+        } else {
+            LOGGER.info("mets.xml exist");
         }
-        
-        
-        LOGGER.debug("Build METS file request took " + (System.currentTimeMillis() - start) + "ms.");
-    }
-    
-    public static final void checkMets() throws Exception {
-        
-        // check time
-        LOGGER.debug("Build METS file start.");
-        final long start = System.currentTimeMillis();
-        // get all derivates
-        List<String> derlist = MCRXMLTableManager.instance().listIDsOfType("derivate");
-        for (String der : derlist) {
-            // get metadata MCRObjectID
-            MCRDerivate derxml = new MCRDerivate();
-            derxml.receiveFromDatastore(der);
-            // receive the IFS informations
-            MCRDirectory difs = MCRDirectory.getRootDirectory(der);
-            if (difs != null) {
-                MCRFilesystemNode mets = difs.getChild("mets.xml");
-                if (mets == null) {
-                    LOGGER.info("No mets.xml file was found for "+der+".");
-                }
-            }
-        }
-
-        // check time
-        LOGGER.debug("Build METS file request took " + (System.currentTimeMillis() - start) + "ms.");
+        LOGGER.debug("Build METS file for ID " + MCRID + " took " + (System.currentTimeMillis() - start) + "ms.");
     }
 
-    
     /**
-     * The build mets.xml files in the derivates if they does not exist and the content are images.
+     * The command build mets.xml files in the derivates if it does not exist and the content are images.
      */
     public static final void buildMets() throws Exception {
-        
-        String baseurl = MCRConfiguration.instance().getString("MCR.baseurl", "http://127.0.0.1:8080");
-        
         // check time
-        LOGGER.debug("Build METS file start.");
+        LOGGER.debug("Build all METS files start.");
         final long start = System.currentTimeMillis();
         // get all derivates
         List<String> derlist = MCRXMLTableManager.instance().listIDsOfType("derivate");
         for (String der : derlist) {
-            // get metadata MCRObjectID
-            MCRDerivate derxml = new MCRDerivate();
-            derxml.receiveFromDatastore(der);
-            MCRObjectID docid = derxml.getDerivate().getMetaLink().getXLinkHrefID();
-            // receive the IFS informations
+            buildMetsForMCRDerivateID(der);
+        }
+        LOGGER.debug("Build all METS files took " + (System.currentTimeMillis() - start) + "ms.");
+    }
+    
+    public static final void checkMetsForType(String type) {
+        checkMetsForType(type, null);
+    }
+
+    public static final void checkMetsForType(String type, String exclude) {
+        LOGGER.debug("Check METS file for type " + type + " start.");
+        final long start = System.currentTimeMillis();
+
+        MCRQueryCondition fromcond = new MCRQueryCondition(MCRFieldDef.getDef("objectType"), "=", type);
+        MCRQuery fromquery = new MCRQuery(fromcond);
+        MCRResults fromresult = MCRQueryManager.search(fromquery);
+        Iterator<MCRHit> fromiter = fromresult.iterator();
+
+        while (fromiter.hasNext()) {
+            MCRHit fromhit = fromiter.next();
+            String fromid = fromhit.getID();
+
+            if (exclude == null)
+                checkMetsForMCRObjectID(fromid, null);
+            else {
+                StringTokenizer excluder = new StringTokenizer(exclude, ",");
+                while (excluder.hasMoreTokens()) {
+                    checkMetsForMCRObjectID(fromid, excluder.nextToken());
+                }
+
+            }
+
+        }
+
+        LOGGER.debug("Check METS file for type " + type + " request took " + (System.currentTimeMillis() - start) + "ms.");
+    }
+
+    /**
+     * The command check a object for a given ID for mets.xml.
+     * 
+     * @param MCRID the MCRObjectID
+     */
+    public static final void checkMetsForMCRObjectID(String MCRID) {
+        checkMetsForMCRObjectID(MCRID, null);
+    }
+
+    /**
+     * The command check a derivate for a given ID for mets.xml.
+     * 
+     * @param MCRID the MCRObjectID
+     * @param excludelabel the label to exclude dataset of the derivate refernce in the object
+     */
+    public static final void checkMetsForMCRObjectID(String MCRID, String excludelabel) {
+        LOGGER.info("Check METS file for ID " + MCRID + " start.");
+        final long start = System.currentTimeMillis();
+
+        MCRObject mcrobj = new MCRObject();
+        mcrobj.receiveFromDatastore(MCRID);
+        for (int i = 0; i < mcrobj.getStructure().getDerivateSize(); i++) {
+            MCRMetaLinkID mcrder = mcrobj.getStructure().getDerivate(i);
+            LOGGER.debug("found derivate " + mcrder.getXLinkTitle());
+            String label = mcrder.getXLinkLabel();
+
+            if (excludelabel == null)
+                checkMetsForMCRDerivateID(mcrder.getXLinkHrefID().toString());
+            else {
+                if (!label.contains(excludelabel))
+                    checkMetsForMCRDerivateID(mcrder.getXLinkHrefID().toString());
+            }
+        }
+        LOGGER.debug("Check METS file request took " + (System.currentTimeMillis() - start) + "ms.");
+    }
+
+    /**
+     * The command check a derivate for a given ID for mets.xml.
+     * 
+     * @param MCRID the MCRObjectID
+     */
+    public static final void checkMetsForMCRDerivateID(String MCRID) {
+        LOGGER.info("Check METS file for ID " + MCRID + "  start.");
+        final long start = System.currentTimeMillis();
+        MCRDirectory difs = MCRDirectory.getRootDirectory(MCRID);
+        if (difs != null) {
+            MCRFilesystemNode mets = difs.getChild("mets.xml");
+            if (mets == null) {
+                LOGGER.info("No mets.xml file was found.");
+            } else {
+                LOGGER.info("mets.xml exist.");
+            }
+        }
+        LOGGER.debug("Check METS file took " + (System.currentTimeMillis() - start) + "ms.");
+    }
+
+    /**
+     * The command check mets.xml files in the derivates.
+     */
+    public static final void checkMets() throws Exception {
+        // check time
+        LOGGER.debug("Check METS file start.");
+        final long start = System.currentTimeMillis();
+        // get all derivates
+        List<String> derlist = MCRXMLTableManager.instance().listIDsOfType("derivate");
+        for (String der : derlist) {
+            checkMetsForMCRDerivateID(der);
+        }
+        // check time
+        LOGGER.debug("Check METS file took " + (System.currentTimeMillis() - start) + "ms.");
+    }
+
+    public static final void removeMetsForType(String type) {
+        LOGGER.debug("Remove METS file for " + type + " start.");
+        final long start = System.currentTimeMillis();
+
+        MCRQueryCondition fromcond = new MCRQueryCondition(MCRFieldDef.getDef("objectType"), "=", type);
+        MCRQuery fromquery = new MCRQuery(fromcond);
+        MCRResults fromresult = MCRQueryManager.search(fromquery);
+        Iterator<MCRHit> fromiter = fromresult.iterator();
+
+        while (fromiter.hasNext()) {
+            MCRHit fromhit = fromiter.next();
+            String fromid = fromhit.getID();
+
+            MCRObject fromobj = new MCRObject();
+            fromobj.receiveFromDatastore(fromid);
+
+            for (int i = 0; i < fromobj.getStructure().getDerivateSize(); i++) {
+                MCRObjectID mcrderid = fromobj.getStructure().getDerivate(i).getXLinkHrefID();
+                MCRDerivate mcrder = new MCRDerivate();
+                MCRDirectory derdir = mcrder.receiveDirectoryFromIFS(mcrderid.toString());
+                if (derdir.getChild("mets.xml") != null) {
+                    LOGGER.info("Removing mets.xml from Derivate " + mcrderid + " linked with Object " + fromid);
+                    derdir.getChild("mets.xml").delete();
+                }
+
+            }
+
+        }
+
+        LOGGER.debug("Remove METS file for " + type + " request took " + (System.currentTimeMillis() - start) + "ms.");
+    }
+
+    /**
+     * Remove mets.xml files from all derivates.
+     * 
+     * @throws Exception
+     */
+    public static final void removeMets() throws Exception {
+        LOGGER.debug("Remove METS file start.");
+        final long start = System.currentTimeMillis();
+        List<String> derlist = MCRXMLTableManager.instance().listIDsOfType("derivate");
+        for (String der : derlist) {
             MCRDirectory difs = MCRDirectory.getRootDirectory(der);
             if (difs != null) {
                 MCRFilesystemNode mets = difs.getChild("mets.xml");
-                if (mets == null) {
-                    LOGGER.info("No mets.xml file was found for "+der+".");
-                    MCRFilesystemNode[] fsnode = difs.getChildren();
-                    boolean checkimage = false;
-                    for (int i = 0; i < fsnode.length; i++) {
-                        if (fsnode[i].getName().endsWith(".jpg")) {
-                            checkimage = true;
-                        } else {
-                            checkimage = false;
-                            break;
-                        }
-                    }
-                    if (checkimage) {
-                        
-                        LOGGER.info("Build mets.xml for derivate "+der+" with MyCoRe-Object-ID: "+docid);
-                        
-                        ArrayList<String> pic_list = new ArrayList<String>();
-                        addPicturesToList(difs, pic_list);
-
-                        String project = docid.getProjectId();
-                        MCRConfiguration CONFIG = MCRConfiguration.instance();
-                        // owner
-                        String owner = CONFIG.getString("MCR.Component.MetsMods." + project + ".owner", "");
-                        if (owner.trim().length() == 0) {
-                            owner = CONFIG.getString("MCR.Component.MetsMods.owner", "");
-                        }
-                        // logo
-                        String ownerLogo = CONFIG.getString("MCR.Component.MetsMods." + project + ".ownerLogo", "");
-                        if (ownerLogo.trim().length() == 0) {
-                            ownerLogo = CONFIG.getString("MCR.Component.MetsMods.ownerLogo", "");
-                        }
-                        // site url
-                        String ownerSiteURL = CONFIG.getString("MCR.Component.MetsMods." + project + ".ownerSiteURL", "");
-                        if (ownerSiteURL.trim().length() == 0) {
-                            ownerSiteURL = CONFIG.getString("MCR.Component.MetsMods.ownerSiteURL", "");
-                        }
-                        // reference url
-                        String referenceURL = CONFIG.getString("MCR.Component.MetsMods." + project + ".referenceURL", "");
-                        if (referenceURL.trim().length() == 0) {
-                            referenceURL = CONFIG.getString("MCR.Component.MetsMods.referenceURL", "");
-                        }
-                        // presentation url
-                        String presentationURL = CONFIG.getString("MCR.Component.MetsMods." + project + ".presentationURL", "");
-                        if (presentationURL.trim().length() == 0) {
-                            presentationURL = CONFIG.getString("MCR.Component.MetsMods.presentationURL", "");
-                        }
-
-                        MCRMetsModsUtil mmu = new MCRMetsModsUtil();
-
-                        Element new_mets = mmu.init_mets(der);
-                        Element amdSec = mmu.init_amdSec(der, owner, ownerLogo, ownerSiteURL, referenceURL, presentationURL);
-
-                        new_mets.addContent(amdSec);
-
-                        Element mets2 = mmu.createMetsElement(pic_list, new_mets, baseurl + "servlets/MCRFileNodeServlet");
-
-                        XMLOutputter xmlout = new XMLOutputter();
-                        String full_mets = xmlout.outputString(mets2);
-
-                        // save the builded file to IFS
-                        try {
-                            LOGGER.debug("storing new mets file...");
-                            // startTransaction();
-                            MCRFile file = new MCRFile("mets.xml", difs);
-                            // commitTransaction();
-                            ByteArrayInputStream bais = new ByteArrayInputStream(full_mets.getBytes());
-                            long sizeDiff = file.setContentFrom(bais, false);
-                           
-                            file.storeContentChange(sizeDiff);
-                          
-
-                        } catch (Exception e) {
-                            LOGGER.error("Error while storing new mets file...", e);
-                        }
-                        
-                        
-                    }
+                if (mets != null) {
+                    LOGGER.info("Mets file found on " + der);
+                    mets.delete();
                 }
             }
         }
+        LOGGER.debug("Remove METS file request took " + (System.currentTimeMillis() - start) + "ms.");
+    }
 
-        // check time
-        LOGGER.debug("Build METS file request took " + (System.currentTimeMillis() - start) + "ms.");
+    /**
+     * Remove mets.xml files from all derivates typed by zoomify.
+     * 
+     * @throws Exception
+     */
+    public static final void removeMetsByZoomify() throws Exception {
+        LOGGER.debug("Remove METS file from zoomify derivates start.");
+        final long start = System.currentTimeMillis();
+        List<String> derlist = MCRXMLTableManager.instance().listIDsOfType("derivate");
+        for (String der : derlist) {
+            MCRDirectory difs = MCRDirectory.getRootDirectory(der);
+            if (difs != null) {
+                MCRFilesystemNode mets = difs.getChild("mets.xml");
+
+                MCRFilesystemNode l[] = difs.getChildren();
+
+                boolean zipfound = false;
+                for (int i = 0; i < l.length; i++)
+                    if (l[i].getName().contains(".zip")) {
+                        zipfound = true;
+                        break;
+                    }
+
+                if (mets != null && zipfound) {
+                    LOGGER.info("Mets file found on " + der);
+                    mets.delete();
+                }
+            }
+        }
+        LOGGER.debug("Remove METS file from zoomify derivates request took " + (System.currentTimeMillis() - start) + "ms.");
     }
 
     private static void addPicturesToList(MCRDirectory dir, ArrayList<String> list) {

@@ -32,7 +32,6 @@ import java.util.StringTokenizer;
 
 import org.mycore.access.MCRAccessManager;
 import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -56,12 +55,23 @@ import org.jdom.output.XMLOutputter;
 
 public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
 
-    private static String metsfile = MCRConfiguration.instance().getString("MCR.MetsMots.ConfigFile", "mets.xml");
+    private static final long serialVersionUID = -6409340238736582208L;
+
+    private static String metsfile = CONFIG.getString("MCR.MetsMots.ConfigFile", "mets.xml");
+    private static String allowed = CONFIG.getString("MCR.Component.MetsMods.allowed", "");
+    private static String defaultowner = CONFIG.getString("MCR.Component.MetsMods.owner", "");
+    private static String defaultlogo = CONFIG.getString("MCR.Component.MetsMods.ownerLogo", "");
+    private static String defaultownerSiteURL = CONFIG.getString("MCR.Component.MetsMods.ownerSiteURL", "");
+    private static String defaultreferenceURL = CONFIG.getString("MCR.Component.MetsMods.referenceURL", "");
+    private static String defaultpresentationURL = CONFIG.getString("MCR.Component.MetsMods.presentationURL", "");
+    private static String activated = CONFIG.getString("MCR.Component.MetsMods.activated", "");
 
     private Transaction tx;
 
     /**
-     * public void doGetPost(MCRServletJob job) throws Exception { job.getResponse().getWriter().print("<html><head></head><body><h1>Klappt (2)!</h1></body></html>"); }
+     * public void doGetPost(MCRServletJob job) throws Exception {
+     * job.getResponse().getWriter().print("<html><head></head><body><h1>Klappt
+     * (2)!</h1></body></html>"); }
      **/
 
     private void addPicturesToList(MCRDirectory dir, ArrayList<String> list) {
@@ -70,8 +80,17 @@ public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
                 dir = (MCRDirectory) dir.getChildren()[i];
                 addPicturesToList(dir, list);
             } catch (Exception ClassCastException) {
-                if (!list.contains(dir.getPath() + "/" + ((MCRFile) dir.getChildren()[i]).getName()))
-                    list.add(dir.getPath() + "/" + ((MCRFile) dir.getChildren()[i]).getName());
+                String str = dir.getPath() + "/" + ((MCRFile) dir.getChildren()[i]).getName();
+                if (!list.contains(str))
+                    if (allowed.contains(",")) {
+                        StringTokenizer st1 = new StringTokenizer(allowed, ",");
+                        while (st1.hasMoreTokens())
+                            if (searchForAllowed(dir, st1.nextToken())) {
+                                list.add(str);
+                                break;
+                            }
+                    } else if (searchForAllowed(dir, allowed))
+                        list.add(str);
             }
         }
     }
@@ -87,21 +106,21 @@ public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
         }
     }
 
-    private boolean searchForDisallowed(MCRDirectory dir, String disallowed) {
-        if (disallowed.compareTo("") == 0)
+    private boolean searchForAllowed(MCRDirectory dir, String allowed) {
+        if (allowed.compareTo("") == 0)
             return false;
 
         MCRFilesystemNode liste[] = dir.getChildren();
 
         for (int i = 0; i < liste.length; i++)
-            if (liste[i].getName().contains(disallowed))
+            if (liste[i].getName().contains(allowed))
                 return true;
         return false;
     }
 
     public void seditmets(MCRServletJob job, CommonData cd) throws IOException {
 
-        boolean dawasfound = false;
+        boolean awasfound = false;
 
         if (!MCRAccessManager.checkPermission(cd.myremcrid.getId(), "writedb")) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
@@ -126,17 +145,15 @@ public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
         try {
             ArrayList<String> pic_list = new ArrayList<String>();
             addPicturesToList(dir, pic_list);
-            // possible code point for adding routine handling generate a mets-file in directorys with zip-files.
-            MCRConfiguration CONFIG = MCRConfiguration.instance();
-
-            String disallowed = CONFIG.getString("MCR.Component.MetsMods.disallowed", "");
-            if (disallowed.contains(",")) {
-                StringTokenizer st1 = new StringTokenizer(disallowed, ",");
+            // possible code point for adding routine handling generate a
+            // mets-file in directorys with zip-files.
+            if (allowed.contains(",")) {
+                StringTokenizer st1 = new StringTokenizer(allowed, ",");
                 while (st1.hasMoreTokens())
-                    if (searchForDisallowed(dir, st1.nextToken()))
-                        dawasfound = true;
-            } else if (searchForDisallowed(dir, disallowed))
-                dawasfound = true;
+                    if (searchForAllowed(dir, st1.nextToken()))
+                        awasfound = true;
+            } else if (searchForAllowed(dir, allowed))
+                awasfound = true;
             if (searchForMets(dir) == false) {
                 // build the mets.file
                 String project = cd.myremcrid.getProjectId();
@@ -144,27 +161,27 @@ public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
                 // owner
                 String owner = CONFIG.getString("MCR.Component.MetsMods." + project + ".owner", "");
                 if (owner.trim().length() == 0) {
-                    owner = CONFIG.getString("MCR.Component.MetsMods.owner", "");
+                    owner = defaultowner;
                 }
                 // logo
                 String ownerLogo = CONFIG.getString("MCR.Component.MetsMods." + project + ".ownerLogo", "");
                 if (ownerLogo.trim().length() == 0) {
-                    ownerLogo = CONFIG.getString("MCR.Component.MetsMods.ownerLogo", "");
+                    ownerLogo = defaultlogo;
                 }
                 // site url
                 String ownerSiteURL = CONFIG.getString("MCR.Component.MetsMods." + project + ".ownerSiteURL", "");
                 if (ownerSiteURL.trim().length() == 0) {
-                    ownerSiteURL = CONFIG.getString("MCR.Component.MetsMods.ownerSiteURL", "");
+                    ownerSiteURL = defaultownerSiteURL;
                 }
                 // reference url
                 String referenceURL = CONFIG.getString("MCR.Component.MetsMods." + project + ".referenceURL", "");
                 if (referenceURL.trim().length() == 0) {
-                    referenceURL = CONFIG.getString("MCR.Component.MetsMods.referenceURL", "");
+                    referenceURL = defaultreferenceURL;
                 }
                 // presentation url
                 String presentationURL = CONFIG.getString("MCR.Component.MetsMods." + project + ".presentationURL", "");
                 if (presentationURL.trim().length() == 0) {
-                    presentationURL = CONFIG.getString("MCR.Component.MetsMods.presentationURL", "");
+                    presentationURL = defaultpresentationURL;
                 }
 
                 MCRMetsModsUtil mmu = new MCRMetsModsUtil();
@@ -178,9 +195,9 @@ public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
                 Collections.sort(pic_list);
 
                 Element mets2;
-                if (CONFIG.getString("MCR.Component.MetsMods.activated", "").contains("CONTENTIDS"))
+                if (activated.contains("CONTENTIDS"))
                     mets2 = mmu.createMetsElement(pic_list, mets, getBaseURL() + "servlets/MCRFileNodeServlet", getBaseURL() + "receive/"
-                                    + cd.myremcrid.getId());
+                            + cd.myremcrid.getId());
                 else
                     mets2 = mmu.createMetsElement(pic_list, mets, getBaseURL() + "servlets/MCRFileNodeServlet");
 
@@ -189,7 +206,7 @@ public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
 
                 // save the builded file to IFS
                 try {
-                    if (!dawasfound) {
+                    if (awasfound) {
                         LOGGER.debug("storing new mets file...");
                         // startTransaction();
                         MCRFile file = new MCRFile("mets.xml", dir);
@@ -234,11 +251,10 @@ public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
         params.put("step", cd.mystep);
         params.put("remcrid", cd.myremcrid.getId());
         String base = getBaseURL() + cd.myfile;
-        if (dawasfound)
+        if (awasfound)
             job.getResponse().sendRedirect(
-                            job.getResponse().encodeRedirectURL(
-                                            buildRedirectURL(getBaseURL() + "servlets/MCRFileNodeServlet/" + cd.mysemcrid.getId() + "/?hosts=local",
-                                                            new Properties())));
+                    job.getResponse().encodeRedirectURL(
+                            buildRedirectURL(getBaseURL() + "servlets/MCRFileNodeServlet/" + cd.mysemcrid.getId() + "/?hosts=local", new Properties())));
         else
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
 
