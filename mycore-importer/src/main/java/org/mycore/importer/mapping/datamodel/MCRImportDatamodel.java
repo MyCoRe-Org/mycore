@@ -1,5 +1,9 @@
 package org.mycore.importer.mapping.datamodel;
 
+import java.util.List;
+
+import org.jdom.Element;
+
 public interface MCRImportDatamodel {
 
     /**
@@ -56,5 +60,22 @@ public interface MCRImportDatamodel {
      * @return path to datamodel
      */
     public String getPath();
+
+    /**
+     * Checks if the minOccurs value of a meta data element is > 0.
+     * If so, true is returned, otherwise false.
+     * 
+     * @param metdataName name of the meta data element
+     * @return true if meta data element is required (minOccurs > 0)
+     */
+    public boolean isRequired(String metdataName);
+
+    /**
+     * Returns a list of all meta data elements which are defined
+     * in this datamodel.
+     * 
+     * @return list of meta data elements
+     */
+    public List<String> getMetadataNames();
 
 }

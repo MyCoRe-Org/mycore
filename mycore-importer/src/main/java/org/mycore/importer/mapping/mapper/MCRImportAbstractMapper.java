@@ -103,7 +103,7 @@ public abstract class MCRImportAbstractMapper implements MCRImportMapper {
         MCRImportMetadataResolverManager mrm = MCRImportMappingManager.getInstance().getMetadataResolverManager();
 
         if(dm instanceof MCRImportDatamodel1) {
-            String className = ((MCRImportDatamodel1)dm).getClassName(metadataName);
+            String className = dm.getClassname(metadataName);
             type = mrm.getTypeByClassName(className);
         } else if(dm instanceof MCRImportDatamodel2) {
             type = ((MCRImportDatamodel2)dm).getType(metadataName);

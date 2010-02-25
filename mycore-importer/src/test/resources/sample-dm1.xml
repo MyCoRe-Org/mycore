@@ -7,7 +7,7 @@
             <mcrmetaxml name="metaText" class="MCRMetaLangText" minOccurs='1' maxOccurs='1' length="1024" />
         </element>
 
-        <element name="def.metaXML" minOccurs='0' maxOccurs='1'>
+        <element name="def.metaXML" maxOccurs='1'>
             <mcrmetaxml name="metaXML" class="MCRMetaXML" minOccurs='1' maxOccurs='unbounded' length="256" />
         </element>
 

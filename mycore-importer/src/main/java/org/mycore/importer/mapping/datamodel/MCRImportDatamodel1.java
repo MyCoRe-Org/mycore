@@ -1,5 +1,6 @@
 package org.mycore.importer.mapping.datamodel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -54,11 +55,26 @@ public class MCRImportDatamodel1 extends MCRImportAbstractDatamodel {
         return null;
     }
 
-    public String getClassName(String metadataName) {
+    /*
+     * (non-Javadoc)
+     * @see org.mycore.importer.mapping.datamodel.MCRImportDatamodel#isRequired(java.lang.String)
+     */
+    public boolean isRequired(String metadataName) {
         Element metadataElement = findMetadataChild(metadataName);
         if(metadataElement == null)
-            return null;
-        return metadataElement.getAttributeValue("class");
+            return false;
+        String minOccurs = metadataElement.getParentElement().getAttributeValue("minOccurs");
+        // by default minOccur is 1 -> required
+        if(minOccurs == null)
+            return true;
+        try {
+            int iMinOccurs = Integer.valueOf(minOccurs);
+            return iMinOccurs > 0 ? true : false;
+        } catch(NumberFormatException nfe) {
+            LOGGER.error("The minOccurs value in the metadata element '" + metadataName + "' in datamodel '" +
+                    datamodel.getBaseURI() + "' is invalid (not a number)!");
+        }
+        return false;
     }
 
     @SuppressWarnings("unchecked")
@@ -83,6 +99,19 @@ public class MCRImportDatamodel1 extends MCRImportAbstractDatamodel {
         LOGGER.error("Couldnt find metadata element '" + metadataName + "' in " + 
                 datamodel.getBaseURI() + "!");
         return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<String> getMetadataNames() {
+        List<String> nameList = new ArrayList<String>();
+        Element rootElement = datamodel.getRootElement();
+        Element metadata = rootElement.getChild("metadata");
+        for(Element e : (List<Element>)metadata.getContent(new ElementFilter("element"))) {
+            // the metadataName is defined in the child of a metadataElement
+            Element metadataChildElement = (Element) e.getContent(new ElementFilter()).get(0);
+            nameList.add(metadataChildElement.getAttributeValue("name"));
+        }
+        return nameList;
     }
 
 }

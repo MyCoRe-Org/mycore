@@ -261,7 +261,7 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
 
     /**
      * Resolves the text tag. For example:</br>
-     * &lt;text value="{field1}" resolve="mapping:genderMapping" /&gt;
+     * &lt;text value="{field1}" resolver="mapping:genderMapping" /&gt;
      * 
      * @param fromElement
      * @param saveToElement

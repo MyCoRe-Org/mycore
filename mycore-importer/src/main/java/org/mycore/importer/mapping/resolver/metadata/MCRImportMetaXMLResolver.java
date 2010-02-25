@@ -1,6 +1,5 @@
 package org.mycore.importer.mapping.resolver.metadata;
 
-
 public class MCRImportMetaXMLResolver extends MCRImportAbstractMetadataResolver {
 
     protected boolean isValid() {

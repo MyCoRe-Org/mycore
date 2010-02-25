@@ -49,8 +49,11 @@ public class ImportFieldTestCase extends MCRTestCase {
         assertEquals("value1", resolver.resolveFields("{x_{num}[_{add}]}"));
         assertEquals("value2", resolver.resolveFields("{x_{num}[_{add2}]}"));
 
+        assertEquals(0, resolver.getNotUsedFields().size());
+        resolver = new MCRImportFieldValueResolver(fieldList);
         resolver.resolveFields("{f1}, {f6}, {add}, {notInFieldList}");
         // contains f1, f6, f3 and add
         assertEquals(6, resolver.getNotUsedFields().size());
+        
     }
 }

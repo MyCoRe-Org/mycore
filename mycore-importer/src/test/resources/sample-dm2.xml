@@ -4,7 +4,7 @@
 
     <element name="metaText" type="text" style="small" minOccurs="1" notinherit="ignore" heritable="ignore" />
     
-    <element name="metaXML" type="xml" style="dontknow" minOccurs="1" maxOccurs="unbounded" notinherit="ignore" heritable="ignore">
+    <element name="metaXML" type="xml" style="dontknow" maxOccurs="unbounded" notinherit="ignore" heritable="ignore">
       <xs:choice>
         <xs:sequence>
           <xs:element name="lastName" type="xs:string" minOccurs="0"/>

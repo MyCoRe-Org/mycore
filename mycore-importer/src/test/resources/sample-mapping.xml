@@ -28,10 +28,20 @@
               <attributes>
                 <attribute name="href" namespace="xlink" value="{link_href}" />
                 <attribute name="label" namespace="xlink" value="{link_label}" />
-              </attributes>            
+              </attributes>
+            </map>
+            <map fields="last, first" to="metaXML">
+	          <children>
+	  		    <child tag="lastName">
+                  <text value="{last}" />
+                </child>
+	  			<child tag="firstName">
+                  <text value="{first}" />
+                </child>
+              </children>
             </map>
           </mcrobject>
         </mcrobjects>
-        
+
    </mapping>
 </import>

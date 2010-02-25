@@ -11,9 +11,18 @@ import org.mycore.common.MCRConstants;
 import org.mycore.importer.mapping.datamodel.MCRImportDatamodel;
 
 /**
- * The import object is an abstraction of the mycore object.
- * It has an id, a label, a parent, a list of childs and a
- * list of metadata abstractions. 
+ * <p>
+ * The import object is an abstraction of the </code>MCRObject</code>.
+ * It has an id, a label, a parent, a list of children and a
+ * list of meta data elements.
+ * </p><p>
+ * A <code>MCRImportObject</code> always depends on a
+ * <code>MCRImportDatamodel<code>. This is necessary for adding meta data
+ * elements, for the schema location and for general validation of the
+ * object.
+ * </p>
+ * For further processing call <code>createXML</code> to create a jdom
+ * element of this object.
  * 
  * @author Matthias Eichner
  */
@@ -21,7 +30,13 @@ public class MCRImportObject {
 
     private static final Logger LOGGER = Logger.getLogger(MCRImportObject.class);
 
+    /**
+     * Import id of the object.
+     */
     protected String id;
+    /**
+     * Label of the object.
+     */
     protected String label;
     protected MCRImportDatamodel datamodel;
 
@@ -37,6 +52,11 @@ public class MCRImportObject {
         this.serviceElement = new Element("service");
     }
 
+    /**
+    * This method creates a XML stream for all object data.
+    *
+    * @return the root element of the mycore object
+    */
     public Element createXML() {
         Element mcrObjectElement = new Element("mycoreobject");
         // some attributes
@@ -79,48 +99,90 @@ public class MCRImportObject {
         }
         // service element
         mcrObjectElement.addContent(serviceElement);
+
         return mcrObjectElement;
     }
 
+    /**
+     * Returns the id of the import object.
+     * 
+     * @return the import id
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Sets the import id of this object.
+     * 
+     * @param id new id
+     */
     public void setId(String id) {
         this.id = id;
     }
 
-    public void setDatamodel(MCRImportDatamodel datamodel) {
-        this.datamodel = datamodel;
-    }
-
+    /**
+     * Returns the used data model.
+     * 
+     * @return data model
+     */
     public MCRImportDatamodel getDatamodel() {
         return datamodel;
     }
 
-    public String getSchemaLocation() {
-        
-        int indexOfFS = datamodel.getPath().lastIndexOf("/") + 1;
-        int indexOfPoint = datamodel.getPath().lastIndexOf(".");
-        String objectType = datamodel.getPath().substring(indexOfFS, indexOfPoint);
-        return new StringBuffer("datamodel-").append(objectType).append(".xsd").toString();
-    }
-
+    /**
+     * Returns the label of the import object.
+     * 
+     * @return label
+     */
     public String getLabel() {
         return label;
     }
 
+    /**
+     * Sets a new label.
+     * 
+     * @param label new label
+     */
     public void setLabel(String label) {
         this.label = label;
     }
 
+    /**
+     * Returns the parent element of this import object.
+     * 
+     * @return parent element
+     */
     public Element getParent() {
         return parentElement;
     }
 
+    /**
+     * Sets a new parent element for the object.<p>
+     * e.g.: 
+     * &lt;parent inherited="0" xlink:type="locator" xlink:href="import_id"/&gt;
+     * </p>
+     * 
+     * @param parent the new parent element
+     */
     public void setParent(Element parent) {
+        if(!parent.getName().equals("parent")) {
+            LOGGER.error("Parent element tag has to be 'parent' and not '" + parent.getName() + "'!");
+            return;
+        }
         this.parentElement = parent;
     }
+
+    /**
+     * Sets a new service element.<p>
+     * e.g.:</br>
+     * &lt;service&gt;</br>
+     * &nbsp;&nbsp;...</br>
+     * &lt;/service&gt;
+     * </p>
+     *
+     * @param serviceElement the new service element
+     */
     public void setServiceElement(Element serviceElement) {
         if(!serviceElement.getName().equals("service")) {
             LOGGER.error("Service element tag has to be 'service' and not '" + serviceElement.getName() + "'!");
@@ -128,18 +190,42 @@ public class MCRImportObject {
         }
         this.serviceElement = serviceElement;
     }
+    
+    /**
+     * Returns the service element.
+     * 
+     * @return service element
+     */
     public Element getServiceElement() {
         return serviceElement;
     }
-    
+
+    /**
+     * Returns a list of all derivates which are set in this import object.
+     * 
+     * @return list of derivates
+     */
     public List<Element> getDerivateList() {
         return derivateList;
     }
 
+    /**
+     * Returns a list of all meta data elements.
+     * 
+     * @return a list of <code>MCRImportMetadata</code>
+     */
     public Collection<MCRImportMetadata> getMetadataList() {
         return metadataTable.values();
     }
 
+    /**
+     * <p>Adds a new derivate to the object. The name of the element has
+     * to be "derobject".</p><p>
+     * e.g.: &lt;derobject xlink:type="locator" xlink:href="import_derivate_id" xlink:label="label"&gt;
+     * </p>
+     * 
+     * @param derivateElement a new derivate element
+     */
     public void addDerivate(Element derivateElement) {
         if(!derivateElement.getName().equals("derobject")) {
             LOGGER.error("Derivate element tag has to be 'derobject' and not '" + derivateElement.getName() + "'!");
@@ -148,6 +234,14 @@ public class MCRImportObject {
         derivateList.add(derivateElement);
     }
 
+    /**
+     * <p>Adds a new meta data element.</p><p>e.g.: 
+     * &lt;title xml:lang="de" form="plain"&gt;Sample title&lt;/title&gt;
+     * </p>
+     * 
+     * @param metadataChild
+     * @return
+     */
     public MCRImportMetadata addMetadataChild(Element metadataChild) {
         String tag = metadataChild.getName();
         // Compare the tag with the metadata table.
@@ -159,12 +253,43 @@ public class MCRImportObject {
             if(metadata != null)
                 metadataTable.put(tag, metadata);
         }
-
         // add child
         metadata.addChild(metadataChild);
         return metadata;
     }
 
+    /**
+     * Returns a <code>MCRImportMetadata</code> object from the internal
+     * metadata table. If no metadata with the specified name is found,
+     * null is returned.
+     * 
+     * @param metadataName name of the metadata element
+     * @return instance of <code>MCRImportMetadata</code>
+     */
+    public MCRImportMetadata getMetadata(String metadataName) {
+        return metadataTable.get(metadataName);
+    }
+
+    /**
+     * Returns the schema location. e.g.: "datamodel-author.xsd"
+     * 
+     * @return schema location of the data model
+     */
+    protected String getSchemaLocation() {
+        int indexOfFS = datamodel.getPath().lastIndexOf("/") + 1;
+        int indexOfPoint = datamodel.getPath().lastIndexOf(".");
+        String objectType = datamodel.getPath().substring(indexOfFS, indexOfPoint);
+        return new StringBuffer("datamodel-").append(objectType).append(".xsd").toString();
+    }
+
+    /**
+     * This method creates a enclosing meta data object in dependence of the
+     * metadataName. This method is only called once for each meta data 
+     * element.
+     * 
+     * @param metadataName name of the metadata
+     * @return a new instance of <code>MCRImportMetadata</code>
+     */
     protected MCRImportMetadata createMetadata(String metadataName) {
         try {
             // receive the enclosingName, classname, heritable and notinherit from the datamodel
@@ -191,7 +316,34 @@ public class MCRImportObject {
         return null;
     }
 
-    public MCRImportMetadata getMetadata(String metadataName) {
-        return metadataTable.get(metadataName);
+    /**
+     * Checks if the import object is valid. Currently it checks only if
+     * required metadata elements are missing (minOccurs > 0).
+     * 
+     * @param mcrObjectElement
+     * @return true if the import object is valid, otherwise false
+     */
+    public boolean isValid() {
+        StringBuffer requiredMsg = new StringBuffer();
+        // checks if all required metadata elements are set
+        List<String> metadataNameList = datamodel.getMetadataNames();
+        for(String name : metadataNameList) {
+            if(datamodel.isRequired(name)) {
+                MCRImportMetadata md = metadataTable.get(name);
+                if(md == null) {
+                    String enclosingName = datamodel.getEnclosingName(name);
+                    requiredMsg.append("-").append(enclosingName).append("\n");
+                }
+            }
+        }
+        if(requiredMsg.length() > 0) {
+            StringBuffer errorMsg = new StringBuffer();
+            errorMsg.append("(").append(id).append(") ");
+            errorMsg.append("The following required metadata elements are missing:\n");
+            errorMsg.append(requiredMsg);
+            LOGGER.error(errorMsg.toString());
+            return false;
+        }
+        return true;
     }
 }

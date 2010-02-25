@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRTestCase;
@@ -38,6 +39,13 @@ public class ImporterTestCase extends MCRTestCase {
         assertEquals("def.metaXML", dm1.getEnclosingName("metaXML"));
         assertEquals("dates", dm1.getEnclosingName("date"));
         assertEquals("def.link", dm1.getEnclosingName("link"));
+        
+        assertEquals(true, dm1.isRequired("metaText"));
+        assertEquals(true, dm1.isRequired("metaXML"));
+        assertEquals(false, dm1.isRequired("date"));
+        assertEquals(false, dm1.isRequired("link"));
+        
+        assertEquals(4, dm1.getMetadataNames().size());
 
         // datamodel 2 tests
         assertEquals("MCRMetaLangText", dm2.getClassname("metaText"));
@@ -54,6 +62,13 @@ public class ImporterTestCase extends MCRTestCase {
         assertEquals("xml", ((MCRImportDatamodel2)dm2).getType("metaXML"));
         assertEquals("date", ((MCRImportDatamodel2)dm2).getType("date"));
         assertEquals("link", ((MCRImportDatamodel2)dm2).getType("link"));
+
+        assertEquals(true, dm2.isRequired("metaText"));
+        assertEquals(true, dm2.isRequired("metaXML"));
+        assertEquals(false, dm2.isRequired("date"));
+        assertEquals(false, dm2.isRequired("link"));
+
+        assertEquals(4, dm2.getMetadataNames().size());
     }
 
     public void testMapperManager() throws Exception {
@@ -113,7 +128,7 @@ public class ImporterTestCase extends MCRTestCase {
 
         MCRImportField linkHrefField = new MCRImportField("link_href", "HrefOfLink");
         MCRImportField linkLabelField = new MCRImportField("link_label", "Ein Link");
-
+        
         MCRImportRecord record = new MCRImportRecord("record");
         record.addField(id);
         record.addField(textField1);
@@ -121,14 +136,25 @@ public class ImporterTestCase extends MCRTestCase {
         record.addField(dateField);
         record.addField(linkHrefField);
         record.addField(linkLabelField);
+        record.addField(new MCRImportField("last", "Mustermann"));
+        record.addField(new MCRImportField("first", "Max"));
 
-        assertEquals(6, record.getFields().size());
+        assertEquals(8, record.getFields().size());
         assertEquals(true, MCRImportMappingManager.getInstance().init(new File("src/test/resources/sample-mapping.xml")));
         MCRImportObject importObject = MCRImportMappingManager.getInstance().createMCRObject(record);
         assertEquals("000001", importObject.getId());
         assertEquals("MCRMetaLangText", importObject.getMetadata("metaText").getClassName());
         assertEquals(2, importObject.getMetadata("metaText").getChilds().size());
         assertEquals("2001-10-23", importObject.getMetadata("date").getChilds().get(0).getText());
+
+        Element metaXML = importObject.getMetadata("metaXML").getChilds().get(0);
+        assertEquals("metaXML", metaXML.getName());
+        assertEquals(2,  metaXML.getContent().size());
+        Element lastName = (Element)metaXML.getContent(new ElementFilter("lastName")).get(0);
+        Element firstName = (Element)metaXML.getContent(new ElementFilter("firstName")).get(0);
+        assertEquals("Mustermann", lastName.getText());
+        assertEquals("Max", firstName.getText());
+
         MCRImportMappingManager.getInstance().saveImportObject(importObject, "xml");
         assertEquals(true, new File("save/mapping/xml/000001.xml").exists());
 
@@ -144,14 +170,26 @@ public class ImporterTestCase extends MCRTestCase {
         deleteDir(new File("save"));
     }
 
+    public void testValid() throws Exception {
+        MCRImportMappingManager.getInstance().init(new File("src/test/resources/sample-mapping.xml"));
+        MCRImportRecord record = new MCRImportRecord("record");
+        record.addField(new MCRImportField("id", "000001"));
+        record.addField(new MCRImportField("text", "sample text"));
+        MCRImportObject importObject = MCRImportMappingManager.getInstance().createMCRObject(record);
+        assertEquals(false, importObject.isValid());
+        record.addField(new MCRImportField("last", "Mustermann"));
+        record.addField(new MCRImportField("first", "Max"));
+        importObject = MCRImportMappingManager.getInstance().createMCRObject(record);
+        assertEquals(true, importObject.isValid());
+    }
+
     private boolean deleteDir(File dir) {
         if (dir.isDirectory()) {
             String[] children = dir.list();
             for (int i=0; i<children.length; i++) {
                 boolean success = deleteDir(new File(dir, children[i]));
-                if (!success) {
+                if (!success)
                     return false;
-                }
             }
         }
         // The directory is now empty so delete it
