@@ -10,6 +10,7 @@ import org.jdom.input.SAXBuilder;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRTestCase;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.importer.classification.MCRImportClassificationMappingManager;
 import org.mycore.importer.mapping.MCRImportMappingManager;
 import org.mycore.importer.mapping.MCRImportMetadataResolverManager;
 import org.mycore.importer.mapping.MCRImportObject;
@@ -52,6 +53,7 @@ public class ImporterTestCase extends MCRTestCase {
         assertEquals("MCRMetaXML", dm2.getClassname("metaXML"));
         assertEquals("MCRMetaISO8601Date", dm2.getClassname("date"));
         assertEquals("MCRMetaLinkID", dm2.getClassname("link"));
+        assertEquals("MCRMetaClassification", dm2.getClassname("class"));
 
         assertEquals("def.metaText", dm2.getEnclosingName("metaText"));
         assertEquals("def.metaXML", dm2.getEnclosingName("metaXML"));
@@ -62,13 +64,15 @@ public class ImporterTestCase extends MCRTestCase {
         assertEquals("xml", ((MCRImportDatamodel2)dm2).getType("metaXML"));
         assertEquals("date", ((MCRImportDatamodel2)dm2).getType("date"));
         assertEquals("link", ((MCRImportDatamodel2)dm2).getType("link"));
+        assertEquals("classification", ((MCRImportDatamodel2)dm2).getType("class"));
 
         assertEquals(true, dm2.isRequired("metaText"));
         assertEquals(true, dm2.isRequired("metaXML"));
         assertEquals(false, dm2.isRequired("date"));
         assertEquals(false, dm2.isRequired("link"));
+        assertEquals(false, dm2.isRequired("class"));
 
-        assertEquals(4, dm2.getMetadataNames().size());
+        assertEquals(5, dm2.getMetadataNames().size());
     }
 
     public void testMapperManager() throws Exception {
@@ -120,33 +124,28 @@ public class ImporterTestCase extends MCRTestCase {
     }
     
     public void testFieldsAndRecords() throws Exception {
-        MCRImportField id = new MCRImportField("id", "000001");
-
-        MCRImportField textField1 = new MCRImportField("text", "Beispiel Text");
-        MCRImportField textField2 = new MCRImportField("text", "und noch ein Text");
-        MCRImportField dateField = new MCRImportField("date", "2001-10-23");
-
-        MCRImportField linkHrefField = new MCRImportField("link_href", "HrefOfLink");
-        MCRImportField linkLabelField = new MCRImportField("link_label", "Ein Link");
-        
+        // create a new record
         MCRImportRecord record = new MCRImportRecord("record");
-        record.addField(id);
-        record.addField(textField1);
-        record.addField(textField2);
-        record.addField(dateField);
-        record.addField(linkHrefField);
-        record.addField(linkLabelField);
+        record.addField(new MCRImportField("id", "000001"));
+        record.addField(new MCRImportField("text", "Beispiel Text"));
+        record.addField(new MCRImportField("text", "und noch ein Text"));
+        record.addField(new MCRImportField("date", "2001-10-23"));
+        record.addField(new MCRImportField("link_href", "HrefOfLink"));
+        record.addField(new MCRImportField("link_label", "Ein Link"));
         record.addField(new MCRImportField("last", "Mustermann"));
         record.addField(new MCRImportField("first", "Max"));
-
         assertEquals(8, record.getFields().size());
+        
+        // init mapping manager and create a new import object
         assertEquals(true, MCRImportMappingManager.getInstance().init(new File("src/test/resources/sample-mapping.xml")));
         MCRImportObject importObject = MCRImportMappingManager.getInstance().createMCRObject(record);
+        // test id, text and date
         assertEquals("000001", importObject.getId());
         assertEquals("MCRMetaLangText", importObject.getMetadata("metaText").getClassName());
         assertEquals(2, importObject.getMetadata("metaText").getChilds().size());
         assertEquals("2001-10-23", importObject.getMetadata("date").getChilds().get(0).getText());
 
+        // test metaxml
         Element metaXML = importObject.getMetadata("metaXML").getChilds().get(0);
         assertEquals("metaXML", metaXML.getName());
         assertEquals(2,  metaXML.getContent().size());
@@ -155,14 +154,15 @@ public class ImporterTestCase extends MCRTestCase {
         assertEquals("Mustermann", lastName.getText());
         assertEquals("Max", firstName.getText());
 
+        // save the import object to disk and check if the file exists
         MCRImportMappingManager.getInstance().saveImportObject(importObject, "xml");
         assertEquals(true, new File("save/mapping/xml/000001.xml").exists());
 
+        // test id generation, label and text
         record = new MCRImportRecord("record");
         record.addField(new MCRImportField("text", "DM1 and ID tests!"));
         assertEquals(true, MCRImportMappingManager.getInstance().init(new File("src/test/resources/sample-mapping2.xml")));
         importObject = MCRImportMappingManager.getInstance().mapAndSaveRecord(record);
-        // automatic generated id
         assertEquals("record_0", importObject.getId());
         assertEquals("DM1 and ID tests!", importObject.getLabel());
         assertEquals("Sample: DM1 and ID tests!", importObject.getMetadata("metaText").getChilds().get(0).getText());
@@ -170,6 +170,42 @@ public class ImporterTestCase extends MCRTestCase {
         deleteDir(new File("save"));
     }
 
+    public void testClassification() throws Exception  {
+        MCRImportRecord record = new MCRImportRecord("record");
+        record.addField(new MCRImportField("id", "id"));
+        record.addField(new MCRImportField("categ", "category 1"));
+        MCRImportMappingManager.getInstance().init(new File("src/test/resources/sample-mapping.xml"));
+        MCRImportObject importObject = MCRImportMappingManager.getInstance().createMCRObject(record);
+
+        // test import object
+        Element classification = importObject.getMetadata("class").getChilds().get(0);
+        assertEquals("class", classification.getName());
+        assertEquals("Sample_00001", classification.getAttributeValue("classid"));
+        assertEquals("category 1", classification.getAttributeValue("categid"));
+
+        // test classification mapping
+        MCRImportClassificationMappingManager cMM = MCRImportMappingManager.getInstance().getClassificationMappingManager();
+        cMM.addImportValue("Sample_00001", "category 2");
+        assertEquals(true, cMM.containsImportValue("Sample_00001", "category 1"));
+        assertEquals(true, cMM.containsImportValue("Sample_00001", "category 2"));
+        cMM.setMyCoReValue("Sample_00001", "category 1", "mycore value 1");
+        assertEquals("mycore value 1", cMM.getMyCoReValue("Sample_00001", "category 1"));
+        cMM.saveAllClassificationMaps();
+        File classMappingFile = new File("save/mapping/classification/Sample_00001.xml");
+        assertEquals(true, classMappingFile.exists());
+        SAXBuilder builder = new SAXBuilder();
+        Element rootMappingElement = builder.build(classMappingFile).getRootElement();
+        assertEquals("classificationMapping", rootMappingElement.getName());
+        assertEquals("Sample_00001", rootMappingElement.getAttributeValue("id"));
+
+        // reload mapping file
+        cMM.init();
+        assertEquals("mycore value 1", cMM.getMyCoReValue("Sample_00001", "category 1"));
+        assertEquals("", cMM.getMyCoReValue("Sample_00001", "category 2"));
+        deleteDir(new File("save"));
+    }
+    
+    
     public void testValid() throws Exception {
         MCRImportMappingManager.getInstance().init(new File("src/test/resources/sample-mapping.xml"));
         MCRImportRecord record = new MCRImportRecord("record");

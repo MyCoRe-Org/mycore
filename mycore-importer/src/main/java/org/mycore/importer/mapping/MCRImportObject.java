@@ -324,6 +324,14 @@ public class MCRImportObject {
      * @return true if the import object is valid, otherwise false
      */
     public boolean isValid() {
+        boolean valid = true;
+        StringBuffer errorMsg = new StringBuffer();
+        errorMsg.append("(").append(id).append(") The following errors occur:\n");
+        // is id set?
+        if(id == null || id.equals("")) {
+            errorMsg.append("Id is missing\n");
+            valid = false;
+        }
         StringBuffer requiredMsg = new StringBuffer();
         // checks if all required metadata elements are set
         List<String> metadataNameList = datamodel.getMetadataNames();
@@ -331,19 +339,19 @@ public class MCRImportObject {
             if(datamodel.isRequired(name)) {
                 MCRImportMetadata md = metadataTable.get(name);
                 if(md == null) {
+                    valid = false;
                     String enclosingName = datamodel.getEnclosingName(name);
                     requiredMsg.append("-").append(enclosingName).append("\n");
                 }
             }
         }
-        if(requiredMsg.length() > 0) {
-            StringBuffer errorMsg = new StringBuffer();
-            errorMsg.append("(").append(id).append(") ");
-            errorMsg.append("The following required metadata elements are missing:\n");
-            errorMsg.append(requiredMsg);
+        if(!valid) {
+            if(requiredMsg.length() > 0) {
+                errorMsg.append("Required metadata elements are missing:\n");
+                errorMsg.append(requiredMsg);
+            }
             LOGGER.error(errorMsg.toString());
-            return false;
         }
-        return true;
+        return valid;
     }
 }

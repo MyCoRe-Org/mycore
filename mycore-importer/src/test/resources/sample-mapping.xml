@@ -19,17 +19,26 @@
 
         <mcrobjects>
           <mcrobject name="record" datamodel="sample-dm2.xml">
+          	<!-- test type id -->
             <map fields="id" type="id"></map>
+
+            <!-- test type multidata -->
             <map fields="text" type="multidata" to="metaText">
               <text value="{text}" />
             </map>
+
+            <!-- test simple date -->
             <map fields="date" to="date" />
+            
+            <!-- test attributes -->
             <map fields="link_href, link_label" to="link">
               <attributes>
                 <attribute name="href" namespace="xlink" value="{link_href}" />
                 <attribute name="label" namespace="xlink" value="{link_label}" />
               </attributes>
             </map>
+            
+            <!-- test metaXML -->
             <map fields="last, first" to="metaXML">
 	          <children>
 	  		    <child tag="lastName">
@@ -39,6 +48,14 @@
                   <text value="{first}" />
                 </child>
               </children>
+            </map>
+
+            <!-- test classification -->
+            <map fields="categ" to="class">
+			  <attributes>
+			    <attribute name="classid" value="Sample_00001" />
+			    <attribute name="categid" value="{categ}" />
+			  </attributes>
             </map>
           </mcrobject>
         </mcrobjects>

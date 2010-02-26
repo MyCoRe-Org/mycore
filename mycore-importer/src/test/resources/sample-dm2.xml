@@ -21,5 +21,10 @@
     <element name="date" type="date" style="small" minOccurs="0" notinherit="ignore" heritable="ignore" enclosingName="dates" />
 
     <element name="link" type="link" style="small" minOccurs="0" maxOccurs="unbounded" />
+
+    <element name="class" type="classification" minOccurs="0" maxOccurs="unbounded" style="select">
+      <classification id="Sample_00001" />
+    </element>
+
   </metadata>
 </objecttype>

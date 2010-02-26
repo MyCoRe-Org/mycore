@@ -1,5 +1,6 @@
 package org.mycore.importer.mapping.mapper;
 
+import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.mycore.importer.MCRImportRecord;
 import org.mycore.importer.mapping.MCRImportMappingManager;
@@ -13,6 +14,8 @@ import org.mycore.importer.mapping.resolver.MCRImportFieldValueResolver;
  */
 public class MCRImportIdMapper extends MCRImportAbstractMapper {
 
+    private static final Logger LOGGER = Logger.getLogger(MCRImportIdMapper.class);
+    
     protected MCRImportFieldValueResolver fieldResolver;
 
     public String getType() {
@@ -29,9 +32,12 @@ public class MCRImportIdMapper extends MCRImportAbstractMapper {
         String id = map.getAttributeValue("value");
         if(id != null)
             id = fieldResolver.resolveFields(id);
-        else
+        else if(fieldResolver.getNotUsedFields().size() > 0)
             id = fieldResolver.getNotUsedFields().get(0).getValue();
-
+        else {
+            LOGGER.error("Id mapping failed for " + record);
+            return;
+        }
         // resolver
         String uri = map.getAttributeValue("resolver");
         if(uri != null && !uri.equals("")) {

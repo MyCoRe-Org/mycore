@@ -25,7 +25,7 @@ public class MCRImportClassificationMapper extends MCRImportMetadataMapper {
 
         // classification mapping explicit disabled?
         String useClassificationMapping = map.getAttributeValue("useClassificationMapping");
-        if(useClassificationMapping == null || !useClassificationMapping.equals("true"))
+        if(useClassificationMapping != null && useClassificationMapping.equals("false"))
             return;
 
         String to = map.getAttributeValue("to");

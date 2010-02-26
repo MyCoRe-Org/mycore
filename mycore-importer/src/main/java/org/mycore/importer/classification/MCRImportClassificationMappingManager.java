@@ -42,7 +42,6 @@ public class MCRImportClassificationMappingManager {
         if(!mappingDirectory.isDirectory())
             LOGGER.error(mappingDirectory + " is not a directory");
         classMappingDir = mappingDirectory;
-        classificationMapTable = new Hashtable<String, MCRImportClassificationMap>();
         init();
         
     }
@@ -57,6 +56,7 @@ public class MCRImportClassificationMappingManager {
      */
     @SuppressWarnings("unchecked")
     public void init() {
+        this.classificationMapTable = new Hashtable<String, MCRImportClassificationMap>();
         List<Document> mappingDocuments = new ArrayList<Document>();
         buildClassificationMapDocumentList(classMappingDir, mappingDocuments);
 
@@ -178,12 +178,25 @@ public class MCRImportClassificationMappingManager {
      * Adds the import value to the classification map. The mycore value
      * will be null. If no classification map was found in the table a
      * new one will be generated. If the import value was already set,
-     * this method overwrittes the old one.
+     * this method overwrites the old one.
      * 
      * @param classId the classification id where to set the import value
      * @param importValue the value which have to be set
      */
     public void setImportValue(String classId, String importValue) {
+        setMyCoReValue(classId, importValue, null);
+    }
+
+    /**
+     * Adds the import and the mycore value to the classification map. If no
+     * classification map was found, a new one will be generated. This method
+     * would overwrite an existing mapping entry with the same importValue.
+     * 
+     * @param classId classification id where to set the entry
+     * @param importValue import value of the category
+     * @param newMyCoReValue value to set
+     */
+    public void setMyCoReValue(String classId, String importValue, String newMyCoReValue) {
         MCRImportClassificationMap map = classificationMapTable.get(classId);
         if(map == null) {
             map = new MCRImportClassificationMap(classId);
@@ -192,7 +205,7 @@ public class MCRImportClassificationMappingManager {
         if(map.getTable().contains(importValue)) {
             map.removePair(importValue);
         }
-        map.addPair(importValue, null);
+        map.addPair(importValue, newMyCoReValue);
     }
 
     /**
@@ -221,13 +234,19 @@ public class MCRImportClassificationMappingManager {
         FileOutputStream output = new FileOutputStream(classMappingDir.getAbsoluteFile() + "/" + classId + ".xml");
         outputter.output(new Document(rootElement), output);
     }
-    
+
     /**
      * Saves the whole classification mapping table to the file system.
      * The folder is set by the init method and the file name for each
      * classification map is the classId.
      */
     public void saveAllClassificationMaps() {
+        if(!classMappingDir.exists())
+            if(!classMappingDir.mkdirs()) {
+                LOGGER.error("Couldnt create the classification mapping directory '"
+                        + classMappingDir.getAbsolutePath() + "'!");
+                return;
+            }
         for(String classId : classificationMapTable.keySet()) {
             try {
                 saveClassificationMap(classId);
