@@ -367,6 +367,7 @@ public class MCRImportImporter {
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
         FileOutputStream output = new FileOutputStream(saveToFile);
         outputter.output(documentToSave, output);
+        output.close();
         return saveToFile;
     }
 
