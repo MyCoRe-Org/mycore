@@ -21,6 +21,7 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.importer.MCRImportConfig;
@@ -40,7 +41,7 @@ public class MCRImportImporter {
 
     private static final Logger LOGGER = Logger.getLogger(MCRImportImporter.class);
     
-    private static final String TEMP_DIR = "_temp";
+    private static File TEMP_DIR;
 
     private static final String LOAD_OBJECT_COMMAND = "load object from file ";
     
@@ -93,6 +94,12 @@ public class MCRImportImporter {
         File mainDirectory = new File(config.getSaveToPath());
         if(!mainDirectory.exists())
             throw new FileNotFoundException(mainDirectory.getAbsolutePath());
+
+        // delete the temp directory from previous imports and create it again
+        TEMP_DIR = new File(config.getSaveToPath(), "_temp");
+        LOGGER.info("delete '_temp' directory");
+        MCRUtils.deleteDirectory(TEMP_DIR);
+        TEMP_DIR.mkdirs();
 
         // create the classification manager
         this.classManager = new MCRImportClassificationMappingManager(new File(config.getSaveToPath() + "classification/"));
@@ -295,8 +302,7 @@ public class MCRImportImporter {
         // resolve links
         resolveLinks(doc);
         // map classification values
-        if(config.isCreateClassificationMapping())
-            mapClassificationValues(doc);
+        mapClassificationValues(doc);
 
         // use the xsi:noNamespaceSchemaLocation to get the type
         String schemaLocation = doc.getRootElement().getAttributeValue("noNamespaceSchemaLocation", MCRConstants.XSI_NAMESPACE);
@@ -372,10 +378,7 @@ public class MCRImportImporter {
     }
 
     public File getMCRXmlFile(MCRObjectID mcrId) {
-        File tempFolder = new File(config.getSaveToPath(), TEMP_DIR);
-        if(!tempFolder.exists())
-            tempFolder.mkdir();
-        File subfolder = new File(tempFolder, mcrId.getTypeId());
+        File subfolder = new File(TEMP_DIR, mcrId.getTypeId());
         if(!subfolder.exists())
             subfolder.mkdir();
         StringBuffer fileName = new StringBuffer(mcrId.getId()).append(".xml");

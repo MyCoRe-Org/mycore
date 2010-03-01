@@ -9,6 +9,7 @@ import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRTestCase;
+import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.importer.classification.MCRImportClassificationMappingManager;
 import org.mycore.importer.mapping.MCRImportMappingManager;
@@ -167,7 +168,7 @@ public class ImporterTestCase extends MCRTestCase {
         assertEquals("DM1 and ID tests!", importObject.getLabel());
         assertEquals("Sample: DM1 and ID tests!", importObject.getMetadata("metaText").getChilds().get(0).getText());
 
-        deleteDir(new File("save"));
+        MCRUtils.deleteDirectory(new File("save"));
     }
 
     public void testClassification() throws Exception  {
@@ -202,7 +203,7 @@ public class ImporterTestCase extends MCRTestCase {
         cMM.init();
         assertEquals("mycore value 1", cMM.getMyCoReValue("Sample_00001", "category 1"));
         assertEquals("", cMM.getMyCoReValue("Sample_00001", "category 2"));
-        deleteDir(new File("save"));
+        MCRUtils.deleteDirectory(new File("save"));
     }
     
     
@@ -217,19 +218,6 @@ public class ImporterTestCase extends MCRTestCase {
         record.addField(new MCRImportField("first", "Max"));
         importObject = MCRImportMappingManager.getInstance().createMCRObject(record);
         assertEquals(true, importObject.isValid());
-    }
-
-    private boolean deleteDir(File dir) {
-        if (dir.isDirectory()) {
-            String[] children = dir.list();
-            for (int i=0; i<children.length; i++) {
-                boolean success = deleteDir(new File(dir, children[i]));
-                if (!success)
-                    return false;
-            }
-        }
-        // The directory is now empty so delete it
-        return dir.delete();
     }
 
     public void testImport() throws Exception {
@@ -260,6 +248,6 @@ public class ImporterTestCase extends MCRTestCase {
         assertEquals(2, commandList.size());
 
         // delete save dir
-        deleteDir(new File("save"));
+        MCRUtils.deleteDirectory(new File("save"));
     }
 }

@@ -184,7 +184,7 @@ public class MCRImportDerivate {
         derivateElement.addContent(internalsElement);
 
         Element internalElement = new Element("internal");
-//        internalElement.setAttribute("sourcepath", derivateId);
+        internalElement.setAttribute("sourcepath", derivateId);
         String rootFileImage = rootFile;
         if(rootFileImage.contains("/"))
             rootFileImage = rootFileImage.substring(rootFileImage.lastIndexOf("/")+1, rootFileImage.length());
