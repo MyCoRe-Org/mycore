@@ -15,6 +15,22 @@
     similar repositories. On MyCoRe-based applications use a common core, which are typically required for such applications functionality
     as metadata management, search, OAI interface, an image viewer module.</description>
   <url>http://www.mycore.org/generated</url>
+  <ciManagement>
+    <system>hudson</system>
+    <url>http://www.mycore.org/hudson/job/MyCoRe/</url>
+    <notifiers>
+      <notifier>
+        <type>mail</type>
+        <configuration>
+          <recipients>mycore-developer@lists.sourceforge.net</recipients>
+        </configuration>
+        <sendOnError>true</sendOnError>
+        <sendOnFailure>true</sendOnFailure>
+        <sendOnSuccess>true</sendOnSuccess>
+        <sendOnWarning>true</sendOnWarning>
+      </notifier>
+    </notifiers>
+  </ciManagement>
   <issueManagement>
     <system>SourceForge</system>
     <url>https://sourceforge.net/tracker/?group_id=92005&amp;atid=599192</url>
@@ -92,9 +108,17 @@
         <!-- Generate aggregate Javadocs -->
         <plugin>
           <artifactId>maven-javadoc-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>aggregate</id>
+              <goals>
+                <goal>aggregate</goal>
+              </goals>
+              <phase>site</phase>
+            </execution>
+          </executions>
           <configuration>
             <source>${java.target.version}</source>
-            <aggregate>true</aggregate>
             <groups>
               <group>
                 <title>MyCoRe Datamodel</title>
@@ -156,7 +180,7 @@
         </plugin>
         <plugin>
           <artifactId>maven-site-plugin</artifactId>
-          <version>2.1</version>
+          <version>2.0.1</version>
         </plugin>
         <plugin>
           <artifactId>maven-project-info-reports-plugin</artifactId>
@@ -170,18 +194,6 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
           <version>2.5</version>
-<!--          <dependencies>-->
-<!--            <dependency>-->
-<!--              <groupId>org.mycore</groupId>-->
-<!--              <artifactId>build-tools</artifactId>-->
-<!--              <version>1.0</version>-->
-<!--            </dependency>-->
-<!--            <dependency>-->
-<!--              <groupId>org.codehaus.plexus</groupId>-->
-<!--              <artifactId>plexus-resources</artifactId>-->
-<!--              <version>1.0-alpha-7</version>-->
-<!--            </dependency>-->
-<!--          </dependencies>-->
         </plugin>
       </plugins>
     </pluginManagement>
@@ -214,6 +226,26 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+        </configuration>
+        <reportSets>
+          <reportSet>
+            <id>non-aggregate</id>
+            <configuration>
+            </configuration>
+            <reports>
+              <report>javadoc</report>
+            </reports>
+          </reportSet>
+          <reportSet>
+            <id>aggregate</id>
+            <configuration>
+            </configuration>
+            <reports>
+              <report>aggregate</report>
+            </reports>
+          </reportSet>
+        </reportSets>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
