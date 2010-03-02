@@ -14,7 +14,7 @@
   <description>MyCoRe is a system for the development of document and publication servers, applications, archives, collections of images or
     similar repositories. On MyCoRe-based applications use a common core, which are typically required for such applications functionality
     as metadata management, search, OAI interface, an image viewer module.</description>
-  <url>http://www.mycore.org</url>
+  <url>http://www.mycore.org/generated</url>
   <issueManagement>
     <system>SourceForge</system>
     <url>https://sourceforge.net/tracker/?group_id=92005&amp;atid=599192</url>
@@ -69,6 +69,11 @@
       <name>MyCoRe Headquarters</name>
       <url>scp://server.mycore.de/mcr/mycore.de/maven2</url>
     </snapshotRepository>
+    <!-- mycore site -->
+    <site>
+      <id>MyCoRe HQ</id>
+      <url>scp://server.mycore.de/mcr/mycore.de/generated</url>
+    </site>
   </distributionManagement>
   <build>
     <pluginManagement>
@@ -151,7 +156,7 @@
         </plugin>
         <plugin>
           <artifactId>maven-site-plugin</artifactId>
-          <version>2.0.1</version>
+          <version>2.1</version>
         </plugin>
         <plugin>
           <artifactId>maven-project-info-reports-plugin</artifactId>
@@ -160,6 +165,23 @@
         <plugin>
           <artifactId>maven-shade-plugin</artifactId>
           <version>1.3.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>2.5</version>
+<!--          <dependencies>-->
+<!--            <dependency>-->
+<!--              <groupId>org.mycore</groupId>-->
+<!--              <artifactId>build-tools</artifactId>-->
+<!--              <version>1.0</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--              <groupId>org.codehaus.plexus</groupId>-->
+<!--              <artifactId>plexus-resources</artifactId>-->
+<!--              <version>1.0-alpha-7</version>-->
+<!--            </dependency>-->
+<!--          </dependencies>-->
         </plugin>
       </plugins>
     </pluginManagement>
@@ -180,6 +202,13 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <configuration>
+          <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jxr-plugin</artifactId>
       </plugin>
       <plugin>
@@ -193,6 +222,12 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>2.5</version>
+        <configuration>
+<!--          <configLocation>/home/thosch/workspace/mycore/build-tools/src/main/resources/org/mycore/checkstyle.xml</configLocation>-->
+<!--          <configLocation>org/mycore/checkstyle.xml</configLocation>-->
+<!--          <headerLocation>http://www.gnu.org/licenses/gpl-3.0.txt</headerLocation>-->
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
