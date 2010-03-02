@@ -16,23 +16,21 @@
     <developerConnection>scm:svn:https://server.mycore.de/svn/mycore</developerConnection>
     <url>http://www.mycore.de/viewvc/viewvc.cgi/mycore/</url>
   </scm>
-  <build>
+  <reporting>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>aggregate</id>
-            <goals>
-              <goal>aggregate</goal>
-            </goals>
-            <phase>site</phase>
-          </execution>
-        </executions>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>aggregate</report>
+            </reports>
+          </reportSet>
+        </reportSets>
       </plugin>
     </plugins>
-  </build>
+  </reporting>
   <modules>
     <module>mycore-parent</module>
     <module>mycore-base</module>
