@@ -94,20 +94,42 @@
   <build>
     <pluginManagement>
       <plugins>
+        <plugin>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>2.5</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>2.4</version>
+        </plugin>
         <!-- Use Java 1.6 everywhere -->
         <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
+          <version>2.1</version>
           <configuration>
             <target>${java.target.version}</target>
             <source>${java.target.version}</source>
-	    <optimize>true</optimize>
-	    <showDeprecation>true</showDeprecation>
-	    <showWarnings>true</showWarnings>
+            <optimize>true</optimize>
+            <showDeprecation>true</showDeprecation>
+            <showWarnings>true</showWarnings>
           </configuration>
+        </plugin>
+        <plugin>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>2.5</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>2.3</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>2.3</version>
         </plugin>
         <!-- Generate aggregate Javadocs -->
         <plugin>
           <artifactId>maven-javadoc-plugin</artifactId>
+          <version>2.6.1</version>
           <executions>
             <execution>
               <id>aggregate</id>
@@ -160,7 +182,7 @@
               </tag>
             </tags>
             <links>
-              <link>http://java.sun.com/j2se/1.5.0/docs/api/</link>
+              <link>http://java.sun.com/javase/6/docs/api/</link>
               <link>http://tomcat.apache.org/tomcat-5.5-doc/servletapi/</link>
               <link>http://java.sun.com/xml/jaxp/dist/1.1/docs/api/</link>
               <link>http://www.jdom.org/docs/apidocs</link>
@@ -171,29 +193,51 @@
           </configuration>
         </plugin>
         <plugin>
-          <artifactId>maven-clean-plugin</artifactId>
-          <version>2.3</version>
+          <artifactId>maven-jxr-plugin</artifactId>
+          <version>2.1</version>
         </plugin>
         <plugin>
-          <artifactId>maven-install-plugin</artifactId>
-          <version>2.3</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-site-plugin</artifactId>
-          <version>2.0.1</version>
+          <artifactId>maven-pmd-plugin</artifactId>
+          <version>2.4</version>
         </plugin>
         <plugin>
           <artifactId>maven-project-info-reports-plugin</artifactId>
           <version>2.1.2</version>
         </plugin>
         <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>2.4.2</version>
+        </plugin>
+        <plugin>
           <artifactId>maven-shade-plugin</artifactId>
           <version>1.3.1</version>
         </plugin>
         <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-checkstyle-plugin</artifactId>
+          <artifactId>maven-site-plugin</artifactId>
+          <!-- do not update to 2.1 http://jira.codehaus.org/browse/MSITE-456 -->
+          <version>2.0.1</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>2.1.1</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
           <version>2.5</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-surefire-report-plugin</artifactId>
+          <version>2.4.3</version>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>findbugs-maven-plugin</artifactId>
+          <version>2.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>buildnumber-maven-plugin</artifactId>
+          <version>1.0-beta-4</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -213,48 +257,22 @@
   <reporting>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
         <configuration>
           <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
         </configuration>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jxr-plugin</artifactId>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <configuration>
-        </configuration>
-        <reportSets>
-          <reportSet>
-            <id>non-aggregate</id>
-            <configuration>
-            </configuration>
-            <reports>
-              <report>javadoc</report>
-            </reports>
-          </reportSet>
-          <reportSet>
-            <id>aggregate</id>
-            <configuration>
-            </configuration>
-            <reports>
-              <report>aggregate</report>
-            </reports>
-          </reportSet>
-        </reportSets>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-report-plugin</artifactId>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>2.5</version>
         <configuration>
 <!--          <configLocation>/home/thosch/workspace/mycore/build-tools/src/main/resources/org/mycore/checkstyle.xml</configLocation>-->
 <!--          <configLocation>org/mycore/checkstyle.xml</configLocation>-->
@@ -262,7 +280,6 @@
         </configuration>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
         <configuration>
           <targetJdk>${java.target.version}</targetJdk>
