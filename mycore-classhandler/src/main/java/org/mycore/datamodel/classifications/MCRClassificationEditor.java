@@ -43,7 +43,6 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.classifications.ClassificationUserTableFactory.ClassificationUserTable;
-import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
@@ -468,7 +467,7 @@ public class MCRClassificationEditor {
     public final int deleteCategoryInClassification(String clid, String categid) {
         try {
             LOGGER.debug("Start delete in classification " + clid + " the category: " + categid);
-            int cnt = 0;
+            int cnt = 1;
 
             MCRCategory classif = getClassificationPool().getClassificationAsPojo(MCRCategoryID.rootID(clid), true);
             MCRCategoryID id = new MCRCategoryID(clid, categid);
@@ -477,13 +476,13 @@ public class MCRClassificationEditor {
 
             if (parent != null) {
                 Map<MCRCategoryID, Boolean> linkMap = getClassificationPool().hasLinks(categToDelete);
-                if (linkMap.isEmpty()) {
+                if (!linkMap.get(categToDelete.getId()).booleanValue()) {
                     parent.getChildren().remove(categToDelete);
                     getClassificationPool().updateClassification(classif);
                     String sessionID = MCRSessionMgr.getCurrentSession().getID();
                     addClassUser(classif.getId(), sessionID);
-                    cnt = linkMap.size();
                     LOGGER.info("Classif: " + classif.getId().getRootID());
+                    cnt = 0;
                 }
             } else {
                 LOGGER.warn("Category " + categid + " in classification: " + clid + " not found! - nothing todo");

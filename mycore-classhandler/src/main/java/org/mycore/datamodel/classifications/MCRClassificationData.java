@@ -1,6 +1,6 @@
 /*
  * $RCSfile: MCRClassificationBrowserData.java,v $
- * $Revision$ $Date$
+ * $Revision: 16296 $ $Date: 2009-12-09 17:16:29 +0100 (Mi, 09 Dez 2009) $
  *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -48,7 +47,7 @@ import org.mycore.datamodel.classifications2.MCRLabel;
  * MCRClassificationBrowserData instance per browser session to store and update
  * the category lines to be displayed.
  * 
- * @author Anja Schaar
+ * @author Anja Schaar, Huu Chi Vu
  * 
  */
 public class MCRClassificationData {
@@ -112,60 +111,63 @@ public class MCRClassificationData {
 
     private MCRClassificationPool classificationPool;
 
-    private MCRPermissionTool permissionTool;
-
     MCRClassificationData(final String u, final String mode, final String actclid, final String actEditorCategid,
-            MCRClassificationPool classificationPool, MCRPermissionTool permissionTool,
-            RowCreator rowCreator) throws Exception {
-        this.classificationPool = classificationPool;
-        this.permissionTool = permissionTool;
-        this.config = MCRConfiguration.instance();
-        this.rowsCreator = rowCreator;
-        init(u, mode, actclid, actEditorCategid);
+            MCRClassificationPool classificationPool, RowCreator rowCreator) throws Exception {
+        initHelper(classificationPool, rowCreator);
+        setFromConfig(u, mode, actclid, actEditorCategid);
     }
 
-    public MCRClassificationData(final String u, final String mode, final String actclid, final String actEditorCategid)
+    private void initHelper(MCRClassificationPool classificationPool, RowCreator rowCreator) {
+        setClassificationPool(classificationPool);
+        setConfig(MCRConfiguration.instance());
+        setRowsCreator(rowCreator);
+    }
+
+    public MCRClassificationData(final String uri, final String mode, final String actclid, final String actEditorCategid)
             throws Exception {
-        this(u, mode, actclid, actEditorCategid, MCRClassificationPoolFactory.getInstance(), new MCRPermissionToolImpl(), new RowCreator_NoLines());
+        MCRClassificationPool classificationPool = MCRClassificationPoolFactory.getInstance();
+        RowCreator rowCreator = new RowCreator_NoLines();
+        initHelper(classificationPool, rowCreator);
+        setFromConfig(uri, mode, actclid, actEditorCategid);
     }
 
-    private void init(final String u, final String mode, final String actclid, final String actEditorCategid) throws Exception {
-        uri = u;
-        LOGGER.debug(" incomming Path " + uri);
+    private void setFromConfig(final String uri, final String mode, final String actclid, final String actEditorCategid) throws Exception {
+        setUri(uri);
+        LOGGER.debug(" incomming Path " + getUri());
 
-        final String[] uriParts = uri.split("/"); // mySplit();
+        final String[] uriParts = getUri().split("/"); // mySplit();
         LOGGER.info(" Start");
         final String browserClass = (uriParts.length <= 1 ? "default" : uriParts[1]);
 
         LOGGER.debug(" PathParts - classification " + browserClass);
         LOGGER.debug(" Number of PathParts =" + uriParts.length);
 
-        String classifID = config.getString("MCR.ClassificationBrowser." + browserClass + ".Classification", actclid);
-        String defaultPageName = config.getString("MCR.ClassificationBrowser.default.EmbeddingPage");
-        pageName = config.getString("MCR.ClassificationBrowser." + browserClass + ".EmbeddingPage", defaultPageName);
+        String classifID = getConfig().getString("MCR.ClassificationBrowser." + browserClass + ".Classification", actclid);
+        String defaultPageName = getConfig().getString("MCR.ClassificationBrowser.default.EmbeddingPage");
+        pageName = getConfig().getString("MCR.ClassificationBrowser." + browserClass + ".EmbeddingPage", defaultPageName);
 
-        String defaultXSLStyle = config.getString("MCR.ClassificationBrowser.default.Style");
-        xslStyle = config.getString("MCR.ClassificationBrowser." + browserClass + ".Style", defaultXSLStyle);
+        String defaultXSLStyle = getConfig().getString("MCR.ClassificationBrowser.default.Style");
+        xslStyle = getConfig().getString("MCR.ClassificationBrowser." + browserClass + ".Style", defaultXSLStyle);
 
-        String defaultSearchField = config.getString("MCR.ClassificationBrowser.default.searchField");
-        searchField = config.getString("MCR.ClassificationBrowser." + browserClass + ".searchField", defaultSearchField);
+        String defaultSearchField = getConfig().getString("MCR.ClassificationBrowser.default.searchField");
+        searchField = getConfig().getString("MCR.ClassificationBrowser." + browserClass + ".searchField", defaultSearchField);
 
-        String defaultEmptyLeafs = config.getString("MCR.ClassificationBrowser.default.EmptyLeafs");
-        emptyLeafs = config.getString("MCR.ClassificationBrowser." + browserClass + ".EmptyLeafs", defaultEmptyLeafs);
+        String defaultEmptyLeafs = getConfig().getString("MCR.ClassificationBrowser.default.EmptyLeafs");
+        emptyLeafs = getConfig().getString("MCR.ClassificationBrowser." + browserClass + ".EmptyLeafs", defaultEmptyLeafs);
 
-        String defaultView = config.getString("MCR.ClassificationBrowser.default.View");
-        view = config.getString("MCR.ClassificationBrowser." + browserClass + ".View", defaultView);
+        String defaultView = getConfig().getString("MCR.ClassificationBrowser.default.View");
+        view = getConfig().getString("MCR.ClassificationBrowser." + browserClass + ".View", defaultView);
 
         setObjectTypes(browserClass);
 
-        sort = config.getBoolean("MCR.ClassificationBrowser." + browserClass + ".Sort", false);
-        restriction = config.getString("MCR.ClassificationBrowser." + browserClass + ".Restriction", null);
+        sort = getConfig().getBoolean("MCR.ClassificationBrowser." + browserClass + ".Sort", false);
+        restriction = getConfig().getString("MCR.ClassificationBrowser." + browserClass + ".Restriction", null);
 
         startPath = browserClass;
 
         if ("edit".equals(mode)) {
-            pageName = config.getString("MCR.classeditor.EmbeddingPage");
-            xslStyle = config.getString("MCR.classeditor.Style");
+            pageName = getConfig().getString("MCR.classeditor.EmbeddingPage");
+            xslStyle = getConfig().getString("MCR.classeditor.Style");
             sort = false;
             view = "tree";
 
@@ -185,10 +187,10 @@ public class MCRClassificationData {
         MCRCategoryID id = MCRCategoryID.rootID(classifID);
         setClassification(id);
 
-        rowsCreator.setBrowserClass(browserClass);
-        rowsCreator.setUri(uri);
-        rowsCreator.setView(view);
-        rowsCreator.setCommented(comments);
+        getRowsCreator().setBrowserClass(browserClass);
+        getRowsCreator().setUri(getUri());
+        getRowsCreator().setView(view);
+        getRowsCreator().setCommented(comments);
         setActualPath(actEditorCategid);
 
         if (LOGGER.isDebugEnabled()) {
@@ -205,14 +207,18 @@ public class MCRClassificationData {
         }
     }
 
+    private void setUri(String uri) {
+        this.uri = uri;
+    }
+
     private void setObjectTypes(final String browserClass) {
         LOGGER.debug("setObjectTypes(" + browserClass + ")");
         try {
             // NOTE: read *.Doctype for compatiblity reasons
-            objectType = config.getString("MCR.ClassificationBrowser." + browserClass + ".Objecttype", config.getString(
+            objectType = getConfig().getString("MCR.ClassificationBrowser." + browserClass + ".Objecttype", getConfig().getString(
                     "MCR.ClassificationBrowser." + browserClass + ".Doctype", null));
         } catch (final org.mycore.common.MCRConfigurationException noDoctype) {
-            objectType = config.getString("MCR.ClassificationBrowser.default.ObjectType", config
+            objectType = getConfig().getString("MCR.ClassificationBrowser.default.ObjectType", getConfig()
                     .getString("MCR.ClassificationBrowser.default.Doctype"));
         }
 
@@ -242,7 +248,7 @@ public class MCRClassificationData {
     }
 
     public MCRCategory getClassification() {
-        return rowsCreator.getClassification();
+        return getRowsCreator().getClassification();
     }
 
     @SuppressWarnings("unchecked")
@@ -260,7 +266,7 @@ public class MCRClassificationData {
     }
 
     private void setClassification(final MCRCategoryID classifID) throws Exception {
-        rowsCreator.setClassification(classifID);
+        getRowsCreator().setClassification(classifID);
     }
 
     private void clearPath(final String[] uriParts) throws Exception {
@@ -351,7 +357,7 @@ public class MCRClassificationData {
 
             setDoneFlag(classID, cli);
 
-            String browserClass = config.getString("MCR.classeditor." + classif.getId().getRootID(), "default");
+            String browserClass = getConfig().getString("MCR.classeditor." + classif.getId().getRootID(), "default");
             cli.setAttribute("browserClass", browserClass);
             setObjectTypes(browserClass);
             xNavtree.addContent(cli);
@@ -384,13 +390,16 @@ public class MCRClassificationData {
         String userCanEditValue = "false";
         String userCanDeleteValue = "false";
 
-        if (!getClassificationPool().isEdited(classID)) {
+        boolean edited = getClassificationPool().isEdited(classID);
+        if (!edited) {
             editedValue = "false";
-            if (MCRAccessManager.checkPermission(classID.getRootID(), "writedb")) {
+            String rootID = classID.getRootID();
+            boolean checkPermission = MCRAccessManager.checkPermission(rootID, "writedb");
+            if (checkPermission) {
                 userCanEditValue = "true";
             }
 
-            final boolean mayDelete = MCRAccessManager.checkPermission(classID.getRootID(), "deletedb");
+            final boolean mayDelete = MCRAccessManager.checkPermission(rootID, "deletedb");
             if (mayDelete) {
                 userCanDeleteValue = "true";
                 LOGGER.debug("counting linked objects");
@@ -471,11 +480,7 @@ public class MCRClassificationData {
 
         LOGGER.debug("process tree lines: build xml tree");
 
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-        rowsCreator.createRows(lang, xNavtree);
-        stopWatch.stop();
-        LOGGER.info("create rows time: " + stopWatch.getTime());
+        getRowsCreator().createRows(lang, xNavtree);
 
         LOGGER.debug("Building XML document");
 
@@ -528,9 +533,9 @@ public class MCRClassificationData {
         String deletedbPerm = "true";
 
         if (getClassificationPool().isEdited(getClassification().getId()) == false) {
-            createClassificationPerm = String.valueOf(permissionTool.checkPermission("create-classification"));
-            writedbPerm = String.valueOf(permissionTool.checkPermission(rootID, "writedb"));
-            deletedbPerm = String.valueOf(permissionTool.checkPermission(rootID, "deletedb"));
+            createClassificationPerm = String.valueOf(MCRAccessManager.checkPermission("create-classification"));
+            writedbPerm = String.valueOf(MCRAccessManager.checkPermission(rootID, "writedb"));
+            deletedbPerm = String.valueOf(MCRAccessManager.checkPermission(rootID, "deletedb"));
         }
 
         xDocument.addContent(createElement("userCanCreate", createClassificationPerm));
@@ -565,7 +570,7 @@ public class MCRClassificationData {
     }
 
     public void update(final String categID) throws Exception {
-        rowsCreator.update(categID);
+        getRowsCreator().update(categID);
     }
 
     /**
@@ -672,5 +677,25 @@ public class MCRClassificationData {
      */
     private MCRClassificationPool getClassificationPool() {
         return classificationPool;
+    }
+
+    private void setClassificationPool(MCRClassificationPool classificationPool) {
+        this.classificationPool = classificationPool;
+    }
+
+    private void setConfig(MCRConfiguration config) {
+        this.config = config;
+    }
+
+    private MCRConfiguration getConfig() {
+        return config;
+    }
+
+    private void setRowsCreator(RowCreator rowsCreator) {
+        this.rowsCreator = rowsCreator;
+    }
+
+    private RowCreator getRowsCreator() {
+        return rowsCreator;
     }
 }
