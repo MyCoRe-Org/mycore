@@ -334,7 +334,7 @@
       </snapshots>
     </pluginRepository>
     <pluginRepository>
-      <id>MyCoRe HQ</id>
+      <id>MyCoRe HQ Snapshots</id>
       <url>http://www.mycore.de/artifactory/mycore-snapshots</url>
       <releases>
         <enabled>false</enabled>
@@ -353,7 +353,7 @@
       </snapshots>
     </repository>
     <repository>
-      <id>MyCoRe HQ</id>
+      <id>MyCoRe HQ Snapshots</id>
       <url>http://www.mycore.de/artifactory/mycore-snapshots</url>
       <releases>
         <enabled>false</enabled>
