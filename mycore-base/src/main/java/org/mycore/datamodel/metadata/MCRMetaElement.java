@@ -398,8 +398,8 @@ public class MCRMetaElement {
         }
 
         elm.setAttribute("class", classname);
-        elm.setAttribute("heritable", new Boolean(heritable).toString());
-        elm.setAttribute("notinherit", new Boolean(notinherit).toString());
+        elm.setAttribute("heritable", String.valueOf(heritable));
+        elm.setAttribute("notinherit", String.valueOf(notinherit));
 
         for (int i = 0; i < list.size(); i++) {
             if (!flag) {
