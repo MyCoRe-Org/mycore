@@ -255,15 +255,19 @@
       </plugin>
       <plugin>
         <artifactId>maven-jxr-plugin</artifactId>
+        <version>2.1</version>
       </plugin>
       <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.6.1</version>
       </plugin>
       <plugin>
         <artifactId>maven-surefire-report-plugin</artifactId>
+        <version>2.4.3</version>
       </plugin>
       <plugin>
         <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>2.5</version>
         <configuration>
 <!--          <configLocation>/home/thosch/workspace/mycore/build-tools/src/main/resources/org/mycore/checkstyle.xml</configLocation>-->
 <!--          <configLocation>org/mycore/checkstyle.xml</configLocation>-->
@@ -272,6 +276,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-pmd-plugin</artifactId>
+        <version>2.4</version>
         <configuration>
           <targetJdk>${java.target.version}</targetJdk>
         </configuration>
@@ -279,6 +284,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>findbugs-maven-plugin</artifactId>
+<!--        <version>2.1</version>-->
         <configuration>
           <xmlOutput>true</xmlOutput>
           <findbugsXmlOutput>true</findbugsXmlOutput>
