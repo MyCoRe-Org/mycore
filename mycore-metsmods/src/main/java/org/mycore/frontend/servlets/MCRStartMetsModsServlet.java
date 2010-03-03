@@ -42,7 +42,7 @@ import org.mycore.frontend.fileupload.MCRSWFUploadHandlerIFS;
 import org.mycore.frontend.metsmods.MCRMetsModsUtil;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.hibernate.Transaction;
-import org.jdom.*;
+import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 

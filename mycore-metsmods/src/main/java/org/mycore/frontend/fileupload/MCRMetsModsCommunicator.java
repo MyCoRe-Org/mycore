@@ -239,6 +239,7 @@ public class MCRMetsModsCommunicator {
         try {
             connection = new URL(url).openConnection();
         } catch (MalformedURLException ignored) {
+            return null;
         } // will never happen if base URL is ok
 
         connection.setDoInput(true);

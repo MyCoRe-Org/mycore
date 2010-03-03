@@ -189,14 +189,6 @@ public class MCRMetsModsApplet extends JApplet {
         }
     }
 
-    private void showPictureList(ArrayList<MCRMetsModsPicture> picturelist) {
-        System.out.println("-------------------------------------------------------");
-        for (int i = 0; i < picturelist.size(); i++) {
-            MCRMetsModsPicture mmpic = (MCRMetsModsPicture) picturelist.get(i);
-            mmpic.show();
-        }
-    }
-
     private String closeMETS(String mets_url, ArrayList<MCRMetsModsPicture> picturelist) {
         try {
             URL url = new URL(mets_url);

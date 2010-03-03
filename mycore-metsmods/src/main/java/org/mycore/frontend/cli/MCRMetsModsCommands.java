@@ -263,11 +263,11 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         LOGGER.debug("Build all METS files took " + (System.currentTimeMillis() - start) + "ms.");
     }
     
-    public static final void checkMetsForType(String type) {
+    public static void checkMetsForType(String type) {
         checkMetsForType(type, null);
     }
 
-    public static final void checkMetsForType(String type, String exclude) {
+    public static void checkMetsForType(String type, String exclude) {
         LOGGER.debug("Check METS file for type " + type + " start.");
         final long start = System.currentTimeMillis();
 
@@ -300,7 +300,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
      * 
      * @param MCRID the MCRObjectID
      */
-    public static final void checkMetsForMCRObjectID(String MCRID) {
+    public static void checkMetsForMCRObjectID(String MCRID) {
         checkMetsForMCRObjectID(MCRID, null);
     }
 
@@ -310,7 +310,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
      * @param MCRID the MCRObjectID
      * @param excludelabel the label to exclude dataset of the derivate refernce in the object
      */
-    public static final void checkMetsForMCRObjectID(String MCRID, String excludelabel) {
+    public static void checkMetsForMCRObjectID(String MCRID, String excludelabel) {
         LOGGER.info("Check METS file for ID " + MCRID + " start.");
         final long start = System.currentTimeMillis();
 
@@ -336,7 +336,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
      * 
      * @param MCRID the MCRObjectID
      */
-    public static final void checkMetsForMCRDerivateID(String MCRID) {
+    public static void checkMetsForMCRDerivateID(String MCRID) {
         LOGGER.info("Check METS file for ID " + MCRID + "  start.");
         final long start = System.currentTimeMillis();
         MCRDirectory difs = MCRDirectory.getRootDirectory(MCRID);
@@ -354,7 +354,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
     /**
      * The command check mets.xml files in the derivates.
      */
-    public static final void checkMets() throws Exception {
+    public static void checkMets() throws Exception {
         // check time
         LOGGER.debug("Check METS file start.");
         final long start = System.currentTimeMillis();
@@ -367,7 +367,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         LOGGER.debug("Check METS file took " + (System.currentTimeMillis() - start) + "ms.");
     }
 
-    public static final void removeMetsForType(String type) {
+    public static void removeMetsForType(String type) {
         LOGGER.debug("Remove METS file for " + type + " start.");
         final long start = System.currentTimeMillis();
 
@@ -404,7 +404,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
      * 
      * @throws Exception
      */
-    public static final void removeMets() throws Exception {
+    public static void removeMets() throws Exception {
         LOGGER.debug("Remove METS file start.");
         final long start = System.currentTimeMillis();
         List<String> derlist = MCRXMLTableManager.instance().listIDsOfType("derivate");
@@ -426,7 +426,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
      * 
      * @throws Exception
      */
-    public static final void removeMetsByZoomify() throws Exception {
+    public static void removeMetsByZoomify() throws Exception {
         LOGGER.debug("Remove METS file from zoomify derivates start.");
         final long start = System.currentTimeMillis();
         List<String> derlist = MCRXMLTableManager.instance().listIDsOfType("derivate");
