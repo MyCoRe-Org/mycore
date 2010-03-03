@@ -269,9 +269,9 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <version>2.5</version>
         <configuration>
-<!--          <configLocation>/home/thosch/workspace/mycore/build-tools/src/main/resources/org/mycore/checkstyle.xml</configLocation>-->
-<!--          <configLocation>org/mycore/checkstyle.xml</configLocation>-->
-<!--          <headerLocation>http://www.gnu.org/licenses/gpl-3.0.txt</headerLocation>-->
+          <!--          <configLocation>/home/thosch/workspace/mycore/build-tools/src/main/resources/org/mycore/checkstyle.xml</configLocation>-->
+          <!--          <configLocation>org/mycore/checkstyle.xml</configLocation>-->
+          <!--          <headerLocation>http://www.gnu.org/licenses/gpl-3.0.txt</headerLocation>-->
         </configuration>
       </plugin>
       <plugin>
@@ -284,7 +284,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>findbugs-maven-plugin</artifactId>
-<!--        <version>2.1</version>-->
+        <!--        <version>2.1</version>-->
         <configuration>
           <xmlOutput>true</xmlOutput>
           <findbugsXmlOutput>true</findbugsXmlOutput>
@@ -328,7 +328,17 @@
   <pluginRepositories>
     <pluginRepository>
       <id>MyCoRe HQ</id>
-      <url>http://www.mycore.de/maven2</url>
+      <url>http://www.mycore.de/artifactory/mycore-releases</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </pluginRepository>
+    <pluginRepository>
+      <id>MyCoRe HQ</id>
+      <url>http://www.mycore.de/artifactory/mycore-snapshots</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
       <snapshots>
         <enabled>true</enabled>
       </snapshots>
@@ -337,44 +347,19 @@
   <repositories>
     <repository>
       <id>MyCoRe HQ</id>
-      <url>http://www.mycore.de/maven2</url>
+      <url>http://www.mycore.de/artifactory/mycore-releases</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>MyCoRe HQ</id>
+      <url>http://www.mycore.de/artifactory/mycore-snapshots</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
       <snapshots>
         <enabled>true</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>maven central</id>
-      <url>http://repo1.maven.org/maven2/</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>jboss</id>
-      <url>http://repository.jboss.com/maven2</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>dev.java.net</id>
-      <url>http://download.java.net/maven/2/</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>internet2</id>
-      <url>http://shibboleth.internet2.edu/downloads/maven2/</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>geo-solutions</id>
-      <url>http://mvn.geo-solutions.it/</url>
-      <snapshots>
-        <enabled>false</enabled>
       </snapshots>
     </repository>
   </repositories>
@@ -480,10 +465,10 @@
             <groupId>com.sun.jmx</groupId>
             <artifactId>jmxri</artifactId>
           </exclusion>
-    	  <exclusion>
-    	    <groupId>javax.jms</groupId>
-    	    <artifactId>jms</artifactId>
-    	  </exclusion>
+          <exclusion>
+            <groupId>javax.jms</groupId>
+            <artifactId>jms</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
