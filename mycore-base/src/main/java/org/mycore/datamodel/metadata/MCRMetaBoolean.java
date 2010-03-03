@@ -194,7 +194,7 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
      * @return the value as String
      */
     public final String getValueToString() {
-        return (new Boolean(value).toString());
+        return String.valueOf(value);
     }
 
     /**

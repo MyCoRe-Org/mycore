@@ -556,7 +556,7 @@ public class MCRInputValidator {
         argTypes[0] = String.class;
         Object[] args = new Object[1];
         args[0] = value;
-        Object result = new Boolean(false);
+        Object result = Boolean.FALSE;
         try {
             Method m = Class.forName(clazz).getMethod(method, argTypes);
             result = m.invoke(null, args);
@@ -590,7 +590,7 @@ public class MCRInputValidator {
         Object[] args = new Object[2];
         args[0] = value1;
         args[1] = value2;
-        Object result = new Boolean(false);
+        Object result = Boolean.FALSE;
         try {
             Method m = Class.forName(clazz).getMethod(method, argTypes);
             result = m.invoke(null, args);
@@ -620,7 +620,7 @@ public class MCRInputValidator {
         argTypes[0] = Element.class;
         Object[] args = new Object[1];
         args[0] = elem;
-        Object result = new Boolean(false);
+        Object result = Boolean.FALSE;
         try {
             Method m = Class.forName(clazz).getMethod(method, argTypes);
             result = m.invoke(null, args);
