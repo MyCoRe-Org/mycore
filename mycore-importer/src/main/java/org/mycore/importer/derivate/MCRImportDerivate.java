@@ -1,11 +1,14 @@
 package org.mycore.importer.derivate;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.mycore.common.MCRConstants;
-import org.mycore.importer.mapping.MCRImportMappingManager;
 
 /**
  * This class is the import abstraction of a mycore derivate.
@@ -30,45 +33,52 @@ public class MCRImportDerivate {
     /**
      * The root file is the entry point when the derivate is viewed.
      */
-    private String rootFile;
+    private String mainDoc;
 
     /**
-     * A list of all file paths of this derivate
+     * A set of all file to upload
      */
-    private ArrayList<String> fileList;
+    private HashSet<String> fileSet;
 
     /**
-     * A list of all linked internal MCRObject-IDs.
+     * The linked object
      */
-    private ArrayList<String> linkedObjectIds;
+    private String linkmeta;
 
     /**
      * Creates a new instance of a importer derivate.
      */
     public MCRImportDerivate(String derivateId) {
         this.derivateId = derivateId;
-        this.fileList = new ArrayList<String>();
-        this.linkedObjectIds = new ArrayList<String>();
+        this.fileSet = new HashSet<String>();
     }
 
     /**
-     * Sets the root file.
+     * Sets the main document of the derivate. In general this is only
+     * the name of the file (e.g. mypic.png), but the method can also
+     * handle paths. If a path is set which is not in the file list, it
+     * is added to.
      * 
-     * @param rootFile the new root document
+     * @param mainDoc the new main file
      */
-    public void setRootFile(String rootFile) {
-        this.rootFile = rootFile;
-        if(!fileList.contains(rootFile))
-            fileList.add(rootFile);
+    public void setMainDocument(String mainDoc) {
+        File mainDocFile = new File(mainDoc);
+        if(mainDocFile.exists()) {
+            if(!fileSet.contains(mainDocFile.getAbsolutePath()))
+                fileSet.add(mainDocFile.getAbsolutePath());
+            this.mainDoc = mainDocFile.getName();
+        } else
+            this.mainDoc = mainDoc;
     }
 
     /**
-     * Returns the root file.
+     * Returns the main document of the derivate. This is only
+     * the name of the file and not a path.
      *  
-     * @return the path to the root file
+     * @return main document
      */
-    public String getRootFile() {
-        return rootFile;
+    public String getMainDocument() {
+        return mainDoc;
     }
 
     /**
@@ -91,35 +101,41 @@ public class MCRImportDerivate {
     
     /**
      * Adds a new file to the derivate. Is it the first one,
-     * then set it as root.
+     * then set it as the new main document.
      * 
      * @param filePath the path of the file
      */
     public void addFile(String filePath) {
-        if(fileList.size() == 0)
-            rootFile = filePath;
-        fileList.add(filePath);
+        File file = new File(filePath);
+        if(file.exists()) {
+            if(fileSet.isEmpty())
+                setMainDocument(file.getAbsolutePath());
+            fileSet.add(file.getAbsolutePath());
+        } else
+            LOGGER.warn("'" + filePath + "' does not exist!");
     }
 
     /**
-     * Removes a file from the derivate. If the removed one was the root,
-     * the file at index 0 is set as new root.
+     * Removes a file from the derivate. If the removed one was the main document,
+     * the next file is set as main document.
      * 
      * @param filePath file which have to be removed
      */
     public void removeFile(String filePath) {
-        fileList.remove(filePath);
-        if(filePath.equals(rootFile) && fileList.size() > 0)
-            rootFile = fileList.get(0);
+        File file = new File(filePath);
+        fileSet.remove(file.getAbsolutePath());
+        String fileName = file.getName();
+        if(fileName.equals(mainDoc) && !fileSet.isEmpty())
+            setMainDocument(fileSet.iterator().next());
     }
 
     /**
-     * Returns a list of all files the derivate contains.
+     * Returns a set of all files the derivate contains.
      * 
      * @return a list of files
      */
-    public ArrayList<String> getFileList() {
-        return fileList;
+    public HashSet<String> getFileSet() {
+        return fileSet;
     }
 
     /**
@@ -132,67 +148,65 @@ public class MCRImportDerivate {
     }
 
     /**
-     * Adds a new linked object id to the object id list. This id is import
-     * internal, so its not necessary that is something like DocPortal_author_xxx.
+     * Sets the object which is linked to this derivate.
      * 
-     * @param objectId a new object id
+     * @param objectId the new object id
      */
-    public void addLinkedObjectId(String objectId) {
-        linkedObjectIds.add(objectId);
+    public void setLinkedObject(String objectId) {
+        this.linkmeta = objectId;
     }
 
     /**
-     * Returns the linked object list.
+     * Returns the id of the object which is linked with this derivate.
      * 
-     * @return a list of all mcrobjects which are linked to the derivate. 
+     * @return import id of the linked object 
      */
-    public ArrayList<String> getLinkedObjectIds() {
-        return linkedObjectIds;
+    public String getLinkedObjectId() {
+        return this.linkmeta;
     }
-    
-    
-    public Element createXML() {
-        if(linkedObjectIds.isEmpty())
-            LOGGER.warn("MCRDerivate " + derivateId + " has no linked objects!");
 
-        Element rootElement = new Element("mycorederivate");
-        rootElement.addNamespaceDeclaration(MCRConstants.XSI_NAMESPACE);
-        rootElement.addNamespaceDeclaration(MCRConstants.XLINK_NAMESPACE);
-        rootElement.setAttribute("noNamespaceSchemaLocation", "datamodel-derivate.xsd", MCRConstants.XSI_NAMESPACE);
-        rootElement.setAttribute("ID", derivateId);
+    /**
+     * Creates a import derivate xml element.
+     * 
+     * @return a new mcrImportDerivate element
+     */
+    public Element createXML() {
+        if(linkmeta == null || linkmeta.equals(""))
+            LOGGER.warn("MCRImportDerivate '" + derivateId + "' has no linked object!");
+        if(fileSet.isEmpty())
+            LOGGER.warn("MCRImportDerivate '" + derivateId + "' has no files to upload!");
+
+        // create root element with id and label
+        Element rootElement = new Element("mcrImportDerivate");
+        rootElement.setAttribute("importId", derivateId);
         if(label == null || label.equals(""))
             label = derivateId;
         rootElement.setAttribute("label", label);
 
-        Element derivateElement = new Element("derivate");
-        rootElement.addContent(derivateElement);
-
-        // linked objects
+        // linked object
         Element linkmetasElement = new Element("linkmetas");
         linkmetasElement.setAttribute("class", "MCRMetaLinkID");
-        for(String id : linkedObjectIds) {
+        if(linkmeta != null) {
             Element linkmetaElement = new Element("linkmeta");
             linkmetaElement.setAttribute("type", "locator", MCRConstants.XLINK_NAMESPACE);
-            linkmetaElement.setAttribute("href", id, MCRConstants.XLINK_NAMESPACE);
+            linkmetaElement.setAttribute("href", linkmeta, MCRConstants.XLINK_NAMESPACE);
             linkmetasElement.addContent(linkmetaElement);
         }
-        derivateElement.addContent(linkmetasElement);
+        rootElement.addContent(linkmetasElement);
 
-        // internals
-        Element internalsElement = new Element("internals");
-        internalsElement.setAttribute("class", "MCRMetaIFS");
-        derivateElement.addContent(internalsElement);
-
-        Element internalElement = new Element("internal");
-        internalElement.setAttribute("sourcepath", derivateId);
-        String rootFileImage = rootFile;
-        if(rootFileImage.contains("/"))
-            rootFileImage = rootFileImage.substring(rootFileImage.lastIndexOf("/")+1, rootFileImage.length());
-        internalElement.setAttribute("maindoc", rootFileImage);
-        internalsElement.addContent(internalElement);
-
-        // add empty service element to root
-        rootElement.addContent(new Element("service"));
+        // files - mainDoc & file list 
+        Element filesElement = new Element("files");
+        if(mainDoc != null && !mainDoc.equals(""))
+            filesElement.setAttribute("mainDoc", mainDoc);
+        else
+            LOGGER.warn("MCRImportDerivate '" + derivateId + "' hasn't a main document!");
+        Iterator<String> fileIterator = fileSet.iterator();
+        while (fileIterator.hasNext()) {
+            Element fileElement = new Element("file");
+            fileElement.setText(fileIterator.next());
+            filesElement.addContent(fileElement);
+        }
+        rootElement.addContent(filesElement);
 
         return rootElement;
     }

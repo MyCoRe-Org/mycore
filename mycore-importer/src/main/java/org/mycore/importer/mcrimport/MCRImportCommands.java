@@ -1,9 +1,17 @@
 package org.mycore.importer.mcrimport;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.jdom.Element;
+import org.jdom.input.SAXBuilder;
+import org.mycore.common.MCRConstants;
 import org.mycore.datamodel.ifs.MCRFileImportExport;
+import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetaIFS;
+import org.mycore.datamodel.metadata.MCRMetaLinkID;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRCommand;
 
@@ -14,9 +22,12 @@ public class MCRImportCommands extends MCRAbstractCommands {
 
         MCRCommand importFromMappingFile = new MCRCommand("import from mapping file {0}", "org.mycore.importer.mcrimport.MCRImportCommands.startImport String", "");
         command.add(importFromMappingFile);
-        
-        MCRCommand importInternalDerivateFile = new MCRCommand("import file of derivate {0} {1}", "org.mycore.importer.mcrimport.MCRImportCommands.importInternalDerivateFile String String", "");
-        command.add(importInternalDerivateFile);
+
+        MCRCommand importDerivate = new MCRCommand("internal import derivate {0} and upload files {1}", "org.mycore.importer.mcrimport.MCRImportCommands.importDerivate String String", "");
+        command.add(importDerivate);
+
+        MCRCommand uploadFile = new MCRCommand("internal upload file {0} for derivate {1}", "org.mycore.importer.mcrimport.MCRImportCommands.uploadFile String String", "");
+        command.add(uploadFile);
     }
 
     public static List<String> startImport(String file) throws Exception {
@@ -27,14 +38,78 @@ public class MCRImportCommands extends MCRAbstractCommands {
     }
 
     /**
+     * This method imports a derivate to mycore.
+     * 
+     * @param pathToDerivate path to the import derivate
+     * @param uploadFiles if true, all internal files will be uploaded
+     */
+    @SuppressWarnings("unchecked")
+    public static List<String> importDerivate(String pathToDerivate, String uploadFiles) throws Exception {
+        // load the xml document
+        SAXBuilder builder = new SAXBuilder();
+        Element rootElement = builder.build(new File(pathToDerivate)).getRootElement();
+        
+        // create a new derivate and set id and label
+        MCRDerivate derivate = new MCRDerivate();
+        String id = rootElement.getAttributeValue("ID");
+        String label = rootElement.getAttributeValue("label");
+        derivate.setId(new MCRObjectID(id));
+        derivate.setLabel(label);
+
+        // set the schema
+        String schema = CONFIG.getString("MCR.Metadata.Config.derivate", "datamodel-derivate.xml").replaceAll(".xml", ".xsd");
+        derivate.setSchema(schema);
+
+        // set the linked object
+        MCRMetaLinkID linkId = new MCRMetaLinkID();
+        linkId.setSubTag("linkmeta");
+        Element linkmetasElement = rootElement.getChild("linkmetas");
+        Element linkmetaElement = linkmetasElement.getChild("linkmeta");
+        String href = linkmetaElement.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE); 
+        linkId.setReference(href, null, null);
+        derivate.getDerivate().setLinkMeta(linkId);
+
+        // set default meta ifs internal
+        Element filesElement = rootElement.getChild("files");
+        String mainDoc = null;
+        if(filesElement != null)
+            mainDoc = filesElement.getAttributeValue("mainDoc");
+        MCRMetaIFS ifs = new MCRMetaIFS();
+        ifs.setSubTag("internal");
+        ifs.setSourcePath(null);
+        ifs.setMainDoc(mainDoc);
+        derivate.getDerivate().setInternals(ifs);
+
+        // create in db
+        derivate.createInDatastore();
+
+        // if upload files active? if true return a list of upload commands
+        List<String> commandList = new ArrayList<String>();
+        
+        if(Boolean.valueOf(uploadFiles) && filesElement != null) {
+            for(Element fileElement : (List<Element>)filesElement.getChildren("file")) {
+                String path = fileElement.getText();
+                StringBuffer command = new StringBuffer("internal upload file ");
+                command.append(path);
+                command.append(" for derivate ");
+                command.append(id);
+                commandList.add(command.toString());
+            }
+        }
+        return commandList;
+    }
+
+    /**
      * This method does the file (jpg, tiff, pdf...) upload for the importer.
      * It uses the <code>addFiles</code> method from <code>MCRFileImportExport</code>
      * utility class.
      * 
      * @see MCRFileImportExport#addFiles(File, String)
-     * @param derivateId file status of the current mycore derivate
+     * @param path could be a directory or a file which is uploaded
+     * @param derivateId where the files are attached
+     * @throws Exception
      */
-    protected void importInternalDerivateFile(String derivateId, String path) {
+    public static void uploadFile(String path, String derivateId) throws Exception {
         MCRFileImportExport.addFiles(new File(path), derivateId);
     }
 

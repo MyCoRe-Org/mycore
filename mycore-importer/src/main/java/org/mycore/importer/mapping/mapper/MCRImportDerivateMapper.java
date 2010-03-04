@@ -57,7 +57,7 @@ public class MCRImportDerivateMapper extends MCRImportAbstractMapper {
         }
 
         // add the current object to the linkmeta list
-        derivate.addLinkedObjectId(importObject.getId());
+        derivate.setLinkedObject(importObject.getId());
         LOGGER.debug("Successfully linked mcr object '" + importObject.getId() +
                      "' to derivate '" + derivate.getDerivateId() + "'!");
     }

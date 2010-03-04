@@ -18,7 +18,6 @@ import org.mycore.importer.MCRImportConfig;
 import org.mycore.importer.MCRImportRecord;
 import org.mycore.importer.classification.MCRImportClassificationMappingManager;
 import org.mycore.importer.derivate.MCRImportDerivate;
-import org.mycore.importer.derivate.MCRImportDerivateFileManager;
 import org.mycore.importer.event.MCRImportStatusEvent;
 import org.mycore.importer.event.MCRImportStatusListener;
 import org.mycore.importer.mapping.datamodel.MCRImportDatamodel;
@@ -78,7 +77,6 @@ public class MCRImportMappingManager {
     private MCRImportURIResolverManager uriResolverManager;
     private MCRImportDatamodelManager datamodelManager;
     private MCRImportClassificationMappingManager classificationManager;
-    private MCRImportDerivateFileManager derivateFileManager;
 
     private MCRImportMappingManager()  {}
 
@@ -126,8 +124,6 @@ public class MCRImportMappingManager {
         // create the classification manager
         if(config.isCreateClassificationMapping())
             classificationManager = new MCRImportClassificationMappingManager(new File(config.getSaveToPath() + "classification/"));
-        if(config.isUseDerivates())
-            derivateFileManager = new MCRImportDerivateFileManager(new File(config.getSaveToPath() + "derivates/"), true);
         // preload all uri resolvers from the mapping element
         preloadUriResolvers(mappingElement);
         // preloads the datamodel files which are stated in the mcrobject elements
@@ -255,16 +251,9 @@ public class MCRImportMappingManager {
             classificationManager.saveAllClassificationMaps();
 
         // derivates
-        if(derivateList != null && config.isUseDerivates() && config.isCreateInImportDir()) {
-            for(MCRImportDerivate derivate : derivateList) {
+        if(derivateList != null && config.isUseDerivates() && config.isCreateInImportDir())
+            for(MCRImportDerivate derivate : derivateList)
                 saveDerivate(derivate);
-            }
-            try {
-                derivateFileManager.save();
-            } catch(IOException ioExc) {
-                LOGGER.error(ioExc);
-            }
-        }
 
         // print error list
         if(errorList.size() > 0) {
@@ -459,12 +448,9 @@ public class MCRImportMappingManager {
             FileOutputStream output = new FileOutputStream(folder.getAbsolutePath() + "/" + derivate.getDerivateId() + ".xml");
             outputter.output(new Document(derivateElement), output);
             output.close();
-            // save the files with the derivate manager 
-            derivateFileManager.addDerivateFileLinking(derivate);
             // inform all listeners that a derivate is saved
             StringBuffer buf = new StringBuffer();
             buf.append("derivate: ").append(derivate.getDerivateId());
-            fireRecordMapped(buf.toString());
             fireDerivateSaved(buf.toString());
         } catch(Exception e) {
             LOGGER.error(e);
@@ -620,16 +606,7 @@ public class MCRImportMappingManager {
     public MCRImportClassificationMappingManager getClassificationMappingManager() {
         return classificationManager;
     }
-    
-    /**
-     * Returns the derivate file manager.
-     * 
-     * @return the derivate file manager
-     */
-    public MCRImportDerivateFileManager getDerivateFileManager() {
-        return derivateFileManager;
-    }
-    
+
     /**
      * Returns the configuration instance of this mapping mananager.
      * 

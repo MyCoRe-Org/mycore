@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -27,7 +26,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.importer.MCRImportConfig;
 import org.mycore.importer.classification.MCRImportClassificationMap;
 import org.mycore.importer.classification.MCRImportClassificationMappingManager;
-import org.mycore.importer.derivate.MCRImportDerivateFileManager;
 import org.mycore.importer.event.MCRImportStatusEvent;
 import org.mycore.importer.event.MCRImportStatusListener;
 
@@ -45,9 +43,7 @@ public class MCRImportImporter {
 
     private static final String LOAD_OBJECT_COMMAND = "load object from file ";
     
-    private static final String LOAD_DERIVATE_COMMAND = "load derivate from file ";
-    
-    private static final String IMPORT_FILE_COMMAND = "import file of derivate ";
+    private static final String LOAD_DERIVATE_COMMAND = "internal import derivate ";
 
     private MCRImportConfig config;
 
@@ -58,8 +54,6 @@ public class MCRImportImporter {
     protected ArrayList<MCRImportStatusListener> listenerList;
 
     protected MCRImportClassificationMappingManager classManager;
-
-    protected MCRImportDerivateFileManager derivateFileManager;
 
     /**
      * Contains all commands in the correct order.
@@ -118,8 +112,6 @@ public class MCRImportImporter {
             throw new MCRException(error.toString());
         }
 
-        // loads the derivate file manager
-        this.derivateFileManager = new MCRImportDerivateFileManager(new File(config.getSaveToPath() + "derivates/"), false);
         // create the listener list
         this.listenerList = new ArrayList<MCRImportStatusListener>();
         this.commandList = new LinkedList<String>();
@@ -169,9 +161,9 @@ public class MCRImportImporter {
                     if(importId == null || importId.equals(""))
                         continue;
                     idTable.put(importId, new MCRImportFileStatus(importId, file.getAbsolutePath(), MCRImportFileType.MCROBJECT));
-                } else if(config.isUseDerivates() && config.isImportToMycore() && rE.getName().equals("mycorederivate")) {
+                } else if(config.isUseDerivates() && config.isImportToMycore() && rE.getName().equals("mcrImportDerivate")) {
                     // derivate objects
-                    String importId = rE.getAttributeValue("ID");
+                    String importId = rE.getAttributeValue("importId");
                     if(importId == null || importId.equals(""))
                         continue;
                     idTable.put(importId, new MCRImportFileStatus(importId, file.getAbsolutePath(), MCRImportFileType.MCRDERIVATE));
@@ -261,6 +253,10 @@ public class MCRImportImporter {
 
             // add load command to the command list
             loadCommand.append(mcrFile.getAbsolutePath());
+            if(type.equals(MCRImportFileType.MCRDERIVATE)) {
+                loadCommand.append(" and upload files ");
+                loadCommand.append(config.isImportFilesToMycore());
+            }
             commandList.add(loadCommand.toString());
 
             // fire events
@@ -269,17 +265,6 @@ public class MCRImportImporter {
             else if(type.equals(MCRImportFileType.MCRDERIVATE))
                 fireMCRDerivateGenerated(mcrId);
 
-            // import derivate files (*.png, *.flv ...)
-            if( fs.getType().equals(MCRImportFileType.MCRDERIVATE) &&
-                    config.isImportFilesToMycore()) {
-                StringBuffer cPart1 = new StringBuffer(IMPORT_FILE_COMMAND);
-                cPart1.append(mcrId).append(" ");
-                List<String> pathList = derivateFileManager.getPathListOfDerivate(importId);
-                for(String path : pathList) {
-                    StringBuffer command = new StringBuffer(cPart1);
-                    command.append(cPart1).append(path);
-                }
-            }
             // print successfully imported status infos
             LOGGER.info(statusBuffer.toString() + "Object successfully generated " + importId + " - " + mcrId);
         } catch(Exception e) {
