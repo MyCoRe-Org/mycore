@@ -42,11 +42,11 @@ public class MCRTextResolver {
     private static boolean useMCRProperties = true;
 
     /**
-     * This hash table contains all variables that can be resolved.
+     * This map contains all variables that can be resolved.
      */
-    protected Hashtable<String, String> variablesTable;
+    protected Map<String, String> variablesTable;
 
-    protected Hashtable<String, String> resolvedVariables;
+    protected Map<String, String> resolvedVariables;
     protected List<String> unresolvedVariables;
 
     /**
@@ -59,11 +59,11 @@ public class MCRTextResolver {
     }
 
     /**
-     * Creates a new text resolver with a hash table of variables.
+     * Creates a new text resolver with a map of variables.
      * 
      * @param variablesTable a hash table of variables
      */
-    public MCRTextResolver(Hashtable<String, String> variablesTable) {
+    public MCRTextResolver(Map<String, String> variablesTable) {
         this.variablesTable = variablesTable;
         this.resolvedVariables = new Hashtable<String, String>();
         this.unresolvedVariables = new ArrayList<String>();
@@ -169,31 +169,31 @@ public class MCRTextResolver {
     }
 
     /**
-     * Returns a hash table of all variables.
+     * Returns a <code>Map</code> of all variables.
      * 
-     * @return a hash table of all variables.
+     * @return a <code>Map</code> of all variables.
      */
-    public Hashtable<String, String> getVariables() {
+    public Map<String, String> getVariables() {
         return variablesTable;
     }
 
     /**
-     * Returns a list of all variables which couldn't be resolved.
+     * Returns a <code>List</code> of all variables which couldn't be resolved.
      * 
-     * @return a list of unresolved variables
+     * @return a <code>List</code> of unresolved variables
      */
     public List<String> getUnresolvedVariables() {
         return unresolvedVariables;
     }
 
     /**
-     * Returns a hash table of all variables which are successfully
+     * Returns a <code>Map</code> of all variables which are successfully
      * resolved. This includes only variables the incoming string
      * contains.
      * 
-     * @return a hash table of resolved variables.
+     * @return a <code>Map</code> of resolved variables.
      */
-    public Hashtable<String, String> getResolvedVariables() {
+    public Map<String, String> getResolvedVariables() {
         return resolvedVariables;
     }
 
@@ -244,7 +244,7 @@ public class MCRTextResolver {
     }
 
     /**
-     * Checks if MyCoRe properties are resolved if they are found. For example
+     * Checks if MyCoRe properties are resolved if they found. For example
      * {MCR.basedir}.
      * 
      * @return true if MyCoRe properties are resolved, otherwise false
@@ -254,7 +254,7 @@ public class MCRTextResolver {
     }
 
     /**
-     * Enables or disables MyCoRe property resolving.
+     * Enable or disable MyCoRe property resolving.
      * 
      * @param useMCRProperties
      */
