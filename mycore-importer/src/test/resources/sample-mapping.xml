@@ -57,6 +57,9 @@
 			    <attribute name="categid" value="{categ}" />
 			  </attributes>
             </map>
+
+            <!-- test derivate -->
+          	<map fields="derivId" derivateId="{derivId}" type="derivate" />
           </mcrobject>
         </mcrobjects>
 

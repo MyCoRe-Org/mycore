@@ -178,6 +178,7 @@ public class MCRImportDerivate {
 
         // create root element with id and label
         Element rootElement = new Element("mcrImportDerivate");
+        rootElement.addNamespaceDeclaration(MCRConstants.XLINK_NAMESPACE);
         rootElement.setAttribute("importId", derivateId);
         if(label == null || label.equals(""))
             label = derivateId;

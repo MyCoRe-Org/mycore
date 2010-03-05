@@ -13,17 +13,29 @@ import org.mycore.importer.mapping.resolver.metadata.MCRImportAbstractMetadataRe
 import org.mycore.importer.mapping.resolver.metadata.MCRImportMetadataResolver;
 
 /**
- * The multidata mapper is capable of mapping fields which have the
- * same id. For example:
- * <ul>
- * <li>text, "Sample text with the id 'text'"</li>
- * <li>text, "another sample text with the id 'text'"</li>
- * </ul>
+ * The multidata mapper is capable of mapping <code>MCRImportFields</code> in a
+ * <code>MCRImportRecord</code> which have the same id. For example:
+ * <table cellspacing="3" cellpadding="3" border="1" rules="groups">
+ *   <thead>
+ *    <tr align="left">
+ *      <th width="40px">Id</th>
+ *      <th width="150px">Value</th>
+ *    </tr>
+ *  </thead>
+ *  <tr align="left">
+ *    <td>text</td>
+ *    <td>Sample text</td>
+ *  </tr>
+ *  <tr align="left">
+ *    <td>text</td>
+ *    <td>another sample text</td>
+ *  </tr>
+ * </table>
  * Is mapped to:
  * <p>
  * &lt;def.metaText class="MCRMetaLangText"&gt;</br>
- *   &nbsp;&nbsp;&lt;metaText xml:lang="de" form="plain">Sample text with the id 'text'&lt;/metaText&gt;</br>
- *   &nbsp;&nbsp;&lt;metaText xml:lang="de" form="plain">another sample text with the id 'text'&lt;/metaText&gt;</br>
+ *   &nbsp;&nbsp;&lt;metaText xml:lang="de" form="plain">Sample text&lt;/metaText&gt;</br>
+ *   &nbsp;&nbsp;&lt;metaText xml:lang="de" form="plain">another sample text&lt;/metaText&gt;</br>
  * &lt;/def.metaText&gt;
  * </p>
  * <p>

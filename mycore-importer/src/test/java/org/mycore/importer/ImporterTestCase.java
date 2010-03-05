@@ -1,17 +1,22 @@
 package org.mycore.importer;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.Text;
 import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
+import org.jdom.xpath.XPath;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.importer.classification.MCRImportClassificationMappingManager;
+import org.mycore.importer.derivate.MCRImportDerivate;
 import org.mycore.importer.mapping.MCRImportMappingManager;
 import org.mycore.importer.mapping.MCRImportMetadataResolverManager;
 import org.mycore.importer.mapping.MCRImportObject;
@@ -205,8 +210,56 @@ public class ImporterTestCase extends MCRTestCase {
         assertEquals("", cMM.getMyCoReValue("Sample_00001", "category 2"));
         MCRUtils.deleteDirectory(new File("save"));
     }
-    
-    
+
+    public void testDerivate() throws Exception {
+        MCRImportDerivate der1 = new MCRImportDerivate("0");
+        MCRImportDerivate der2 = new MCRImportDerivate("1");
+        der1.setLabel("test label");
+        der1.addFile("src/test/resources/pic1.jpg");
+        der1.addFile("src/test/resources/pic2.jpg");
+        der2.addFile("src/test/resources/pic2.jpg");
+
+        assertEquals("pic1.jpg", der1.getMainDocument());
+        assertEquals("pic2.jpg", der2.getMainDocument());
+        assertEquals(2, der1.getFileSet().size());
+        assertEquals(1, der2.getFileSet().size());
+
+        MCRImportMappingManager mm = MCRImportMappingManager.getInstance();
+        mm.init(new File("src/test/resources/sample-mapping.xml"));
+        MCRImportRecord record = new MCRImportRecord("record");
+        record.addField(new MCRImportField("id", "recordId_1"));
+        record.addField(new MCRImportField("derivId", "0"));
+        record.addField(new MCRImportField("derivId", "1"));
+
+        // create derivate- and recordlist
+        List<MCRImportDerivate> derivateList = new ArrayList<MCRImportDerivate>();
+        derivateList.add(der1);
+        derivateList.add(der2);
+        mm.setDerivateList(derivateList);
+        List<MCRImportRecord> recordList = new ArrayList<MCRImportRecord>();
+        recordList.add(record);
+        // start mapping
+        mm.startMapping(recordList);
+
+        // test generated derivate files
+        SAXBuilder builder = new SAXBuilder();
+        Element der1Element = builder.build("save/mapping/derivates/0.xml").getRootElement();
+        assertEquals("0", der1Element.getAttributeValue("importId"));
+        assertEquals("test label", der1Element.getAttributeValue("label"));
+        assertEquals("recordId_1", ((Attribute)XPath.selectSingleNode(der1Element, "linkmetas/linkmeta/@xlink:href")).getValue());
+        assertEquals("pic1.jpg" ,((Attribute)XPath.selectSingleNode(der1Element, "files/@mainDoc")).getValue());
+        String filePath = ((Text)XPath.selectSingleNode(der1Element, "files/file/text()")).getValue();
+        File file = new File(filePath);
+        assertEquals(true, file.exists());
+        assertEquals("pic1.jpg", file.getName());
+        filePath = ((Text)XPath.selectSingleNode(der1Element, "files/file[last()]/text()")).getValue();
+        file = new File(filePath);
+        assertEquals(true, file.exists());
+        assertEquals("pic2.jpg", file.getName());
+        
+        MCRUtils.deleteDirectory(new File("save"));
+    }
+
     public void testValid() throws Exception {
         MCRImportMappingManager.getInstance().init(new File("src/test/resources/sample-mapping.xml"));
         MCRImportRecord record = new MCRImportRecord("record");
@@ -246,6 +299,9 @@ public class ImporterTestCase extends MCRTestCase {
         im.generateMyCoReFiles();
         List<String> commandList = im.getCommandList();
         assertEquals(2, commandList.size());
+        File tempFolder = new File("save/mapping2/_temp/sample-dm1");
+        assertEquals(true, tempFolder.exists());
+        assertEquals(2, tempFolder.listFiles().length);
 
         // delete save dir
         MCRUtils.deleteDirectory(new File("save"));

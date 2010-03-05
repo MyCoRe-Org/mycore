@@ -1,9 +1,11 @@
 package org.mycore.importer.mapping.mapper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
+import org.mycore.importer.MCRImportField;
 import org.mycore.importer.MCRImportRecord;
 import org.mycore.importer.derivate.MCRImportDerivate;
 import org.mycore.importer.mapping.MCRImportMappingManager;
@@ -36,30 +38,36 @@ public class MCRImportDerivateMapper extends MCRImportAbstractMapper {
         super.map(importObject, record, map);
 
         // get the correct value from the derivateId-attribute
-        String derivateId = map.getAttributeValue("derivateId");
+        String valueText = map.getAttributeValue("derivateId");
 
-        MCRImportFieldValueResolver fieldValueResolver = new MCRImportFieldValueResolver(getFields());
-        derivateId = fieldValueResolver.resolveFields(derivateId);
-
-        if(!fieldValueResolver.isCompletelyResolved() || derivateId == null || derivateId.equals("")) {
-            LOGGER.debug("Couldnt resolve derivate id " + derivateId);
-            return;
-        }
-
-        // find the derivate
         List<MCRImportDerivate> derivateList = MCRImportMappingManager.getInstance().getDerivateList();
-        MCRImportDerivate derivate = getDerivateById(derivateId, derivateList);
 
-        if(derivate == null) {
-            LOGGER.error("Couldnt find derivate id '" + derivateId + "' in the MCRImportDerivate list!" +
-                         " Check if you call 'setDerivateList' in the MCRImportMappingManager!");
-            return;
+        // go through all fields to support multi derivate linking
+        for(MCRImportField field : fields) {
+            List<MCRImportField> singleFieldList = new ArrayList<MCRImportField>();
+            singleFieldList.add(field);
+            MCRImportFieldValueResolver fieldValueResolver = new MCRImportFieldValueResolver(singleFieldList);
+            String derivateId = fieldValueResolver.resolveFields(valueText);    
+
+            if(!fieldValueResolver.isCompletelyResolved() || derivateId == null || derivateId.equals("")) {
+                LOGGER.debug("Couldnt resolve derivate id " + derivateId);
+                return;
+            }
+
+            // find the derivate
+            MCRImportDerivate derivate = getDerivateById(derivateId, derivateList);
+
+            if(derivate == null) {
+                LOGGER.error("Couldnt find derivate id '" + derivateId + "' in the MCRImportDerivate list!" +
+                             " Check if you call 'setDerivateList' in the MCRImportMappingManager!");
+                return;
+            }
+
+            // add the current object to the linkmeta list
+            derivate.setLinkedObject(importObject.getId());
+            LOGGER.debug("Successfully linked mcr object '" + importObject.getId() +
+                         "' to derivate '" + derivate.getDerivateId() + "'!");
         }
-
-        // add the current object to the linkmeta list
-        derivate.setLinkedObject(importObject.getId());
-        LOGGER.debug("Successfully linked mcr object '" + importObject.getId() +
-                     "' to derivate '" + derivate.getDerivateId() + "'!");
     }
 
     private MCRImportDerivate getDerivateById(String id, List<MCRImportDerivate> derivateList) {
