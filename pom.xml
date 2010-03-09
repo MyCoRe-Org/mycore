@@ -8,7 +8,7 @@
     <version>2.0.90-SNAPSHOT</version>
     <relativePath>mycore-parent/pom.xml</relativePath>
   </parent>
-  <artifactId>mycore</artifactId>
+  <artifactId>mycore-multi</artifactId>
   <packaging>pom</packaging>
   <name>MyCoRe</name>
   <scm>
@@ -96,6 +96,7 @@
     <module>mycore-importer</module>
     <module>mycore-indexing</module>
     <module>mycore-iview</module>
+    <module>mycore-iview2</module>
     <module>mycore-metsmods</module>
     <module>mycore-migration20-21</module>
     <module>mycore-session-listing</module>
