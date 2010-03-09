@@ -1,6 +1,11 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <artifactId>mycore</artifactId>
+    <groupId>org.mycore</groupId>
+    <version>1</version>
+  </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.mycore</groupId>
   <artifactId>mycore-parent</artifactId>
@@ -31,102 +36,20 @@
       </notifier>
     </notifiers>
   </ciManagement>
-  <issueManagement>
-    <system>SourceForge</system>
-    <url>https://sourceforge.net/tracker/?group_id=92005&amp;atid=599192</url>
-  </issueManagement>
-  <inceptionYear>2001</inceptionYear>
-  <mailingLists>
-    <mailingList>
-      <name>mycore-developer</name>
-      <subscribe>https://lists.sourceforge.net/mailman/listinfo/mycore-developer</subscribe>
-      <unsubscribe>https://lists.sourceforge.net/mailman/listinfo/mycore-developer</unsubscribe>
-      <post>mycore-developer@lists.sourceforge.net</post>
-      <archive>https://sourceforge.net/mailarchive/forum.php?forum_name=mycore-developer</archive>
-    </mailingList>
-    <mailingList>
-      <name>mycore-user</name>
-      <subscribe>https://lists.sourceforge.net/mailman/listinfo/mycore-user</subscribe>
-      <unsubscribe>https://lists.sourceforge.net/mailman/listinfo/mycore-user</unsubscribe>
-      <post>mycore-user@lists.sourceforge.net</post>
-      <archive>https://sourceforge.net/mailarchive/forum.php?forum_name=mycore-user</archive>
-    </mailingList>
-  </mailingLists>
-  <licenses>
-    <license>
-      <name>GPL</name>
-      <url>http://www.gnu.org/licenses/gpl-2.0.txt</url>
-      <comments>v2 or higher</comments>
-    </license>
-  </licenses>
   <scm>
     <connection>scm:svn:http://server.mycore.de/svn/mycore</connection>
     <developerConnection>scm:svn:https://server.mycore.de/svn/mycore</developerConnection>
     <url>http://www.mycore.de/viewvc/viewvc.cgi/mycore/</url>
   </scm>
   <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <java.target.version>1.6</java.target.version>
     <uniqueVersion>false</uniqueVersion>
     <hibernate.version>3.3.2.GA</hibernate.version>
     <lucene.version>3.0.0</lucene.version>
   </properties>
-  <distributionManagement>
-    <!-- use the following if you're not using a snapshot version. -->
-    <repository>
-      <id>MyCoRe HQ</id>
-      <name>MyCoRe Headquarters</name>
-      <url>scp://server.mycore.de/mcr/mycore.de/maven2</url>
-    </repository>
-    <!-- use the following if you ARE using a snapshot version. -->
-    <snapshotRepository>
-      <id>MyCoRe HQ</id>
-      <name>MyCoRe Headquarters</name>
-      <url>scp://server.mycore.de/mcr/mycore.de/maven2</url>
-    </snapshotRepository>
-    <!-- mycore site -->
-    <site>
-      <id>MyCoRe HQ</id>
-      <url>scp://server.mycore.de/mcr/mycore.de/generated</url>
-    </site>
-  </distributionManagement>
   <build>
     <pluginManagement>
       <plugins>
-        <plugin>
-          <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>2.5</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-clean-plugin</artifactId>
-          <version>2.4</version>
-        </plugin>
-        <!-- Use Java 1.6 everywhere -->
-        <plugin>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>2.1</version>
-          <configuration>
-            <target>${java.target.version}</target>
-            <source>${java.target.version}</source>
-            <optimize>true</optimize>
-            <showDeprecation>true</showDeprecation>
-            <showWarnings>true</showWarnings>
-          </configuration>
-        </plugin>
-        <plugin>
-          <artifactId>maven-deploy-plugin</artifactId>
-          <version>2.5</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-install-plugin</artifactId>
-          <version>2.3</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-jar-plugin</artifactId>
-          <version>2.3</version>
-        </plugin>
-        <!-- Generate aggregate Javadocs -->
         <plugin>
           <artifactId>maven-javadoc-plugin</artifactId>
           <version>2.6.1</version>
@@ -183,186 +106,9 @@
             </links>
           </configuration>
         </plugin>
-        <plugin>
-          <artifactId>maven-jxr-plugin</artifactId>
-          <version>2.1</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-pmd-plugin</artifactId>
-          <version>2.4</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-project-info-reports-plugin</artifactId>
-          <version>2.1.2</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-resources-plugin</artifactId>
-          <version>2.4.2</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-shade-plugin</artifactId>
-          <version>1.3.1</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-site-plugin</artifactId>
-          <!-- do not update to 2.1 http://jira.codehaus.org/browse/MSITE-456 -->
-          <version>2.0.1</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-source-plugin</artifactId>
-          <version>2.1.1</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.5</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-surefire-report-plugin</artifactId>
-          <version>2.4.3</version>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>findbugs-maven-plugin</artifactId>
-          <version>2.1</version>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>buildnumber-maven-plugin</artifactId>
-          <version>1.0-beta-4</version>
-        </plugin>
       </plugins>
     </pluginManagement>
-    <plugins>
-      <!-- JCR-988: IDE plugins -->
-      <plugin>
-        <!-- http://maven.apache.org/plugins/maven-idea-plugin/ -->
-        <artifactId>maven-idea-plugin</artifactId>
-        <version>2.2</version>
-        <configuration>
-          <downloadSources>true</downloadSources>
-          <jdkLevel>${java.target.version}</jdkLevel>
-        </configuration>
-      </plugin>
-    </plugins>
   </build>
-  <reporting>
-    <plugins>
-      <plugin>
-        <artifactId>maven-project-info-reports-plugin</artifactId>
-        <configuration>
-          <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-jxr-plugin</artifactId>
-        <version>2.1</version>
-      </plugin>
-      <plugin>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.6.1</version>
-      </plugin>
-      <plugin>
-        <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>2.4.3</version>
-      </plugin>
-      <plugin>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>2.5</version>
-        <configuration>
-          <!--          <configLocation>/home/thosch/workspace/mycore/build-tools/src/main/resources/org/mycore/checkstyle.xml</configLocation>-->
-          <!--          <configLocation>org/mycore/checkstyle.xml</configLocation>-->
-          <!--          <headerLocation>http://www.gnu.org/licenses/gpl-3.0.txt</headerLocation>-->
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-pmd-plugin</artifactId>
-        <version>2.4</version>
-        <configuration>
-          <targetJdk>${java.target.version}</targetJdk>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>findbugs-maven-plugin</artifactId>
-        <!--        <version>2.1</version>-->
-        <configuration>
-          <xmlOutput>true</xmlOutput>
-          <findbugsXmlOutput>true</findbugsXmlOutput>
-        </configuration>
-      </plugin>
-    </plugins>
-  </reporting>
-  <profiles>
-    <profile>
-      <id>release</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>attach-sources</id>
-                <goals>
-                  <goal>jar</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>attach-javadocs</id>
-                <goals>
-                  <goal>jar</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
-  <pluginRepositories>
-    <pluginRepository>
-      <id>MyCoRe HQ</id>
-      <url>http://www.mycore.de/artifactory/mycore-releases</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </pluginRepository>
-    <pluginRepository>
-      <id>MyCoRe HQ Snapshots</id>
-      <url>http://www.mycore.de/artifactory/mycore-snapshots</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </pluginRepository>
-  </pluginRepositories>
-  <repositories>
-    <repository>
-      <id>MyCoRe HQ</id>
-      <url>http://www.mycore.de/artifactory/mycore-releases</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>MyCoRe HQ Snapshots</id>
-      <url>http://www.mycore.de/artifactory/mycore-snapshots</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
   <dependencyManagement>
     <dependencies>
       <dependency>
