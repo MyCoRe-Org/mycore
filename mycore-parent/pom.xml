@@ -41,6 +41,25 @@
     <developerConnection>scm:svn:https://server.mycore.de/svn/mycore</developerConnection>
     <url>http://www.mycore.de/viewvc/viewvc.cgi/mycore/</url>
   </scm>
+   <repositories>
+    <repository>
+      <id>MyCoRe HQ</id>
+      <url>http://www.mycore.de/artifactory/mycore-releases</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>MyCoRe HQ Snapshots</id>
+      <url>http://www.mycore.de/artifactory/mycore-snapshots</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
   <properties>
     <java.target.version>1.6</java.target.version>
     <uniqueVersion>false</uniqueVersion>
