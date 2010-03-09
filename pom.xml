@@ -11,6 +11,14 @@
   <artifactId>mycore-multi</artifactId>
   <packaging>pom</packaging>
   <name>MyCoRe</name>
+  <url>http://www.mycore.org/generated/${project.version}</url>
+  <distributionManagement>
+    <site>
+      <id>MyCoRe HQ</id>
+      <name>MyCoRe HQ-sites</name>
+      <url>scp://server.mycore.de/mcr/mycore.de/generated/${project.version}</url>
+    </site>
+  </distributionManagement>
   <scm>
     <connection>scm:svn:http://server.mycore.de/svn/mycore</connection>
     <developerConnection>scm:svn:https://server.mycore.de/svn/mycore</developerConnection>

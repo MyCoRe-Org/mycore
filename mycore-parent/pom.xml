@@ -19,7 +19,14 @@
   <description>MyCoRe is a system for the development of document and publication servers, applications, archives, collections of images or
     similar repositories. On MyCoRe-based applications use a common core, which are typically required for such applications functionality
     as metadata management, search, OAI interface, an image viewer module.</description>
-  <url>http://www.mycore.org/generated</url>
+  <url>http://www.mycore.org/generated/${project.version}</url>
+  <distributionManagement>
+    <site>
+      <id>MyCoRe HQ</id>
+      <name>MyCoRe HQ-sites</name>
+      <url>scp://server.mycore.de/mcr/mycore.de/generated/${project.version}</url>
+    </site>
+  </distributionManagement>
   <ciManagement>
     <system>hudson</system>
     <url>http://www.mycore.org/hudson/job/MyCoRe/</url>
