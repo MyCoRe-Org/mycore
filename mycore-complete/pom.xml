@@ -11,23 +11,47 @@
   <artifactId>mycore-complete</artifactId>
   <name>MyCoRe Complete JAR package</name>
   <description>jar packaging of MyCoRe containing mycore-base and all components</description>
-  <licenses>
-    <license>
-      <name>GPL</name>
-      <url>http://www.gnu.org/licenses/gpl-2.0.txt</url>
-      <comments>v2 or higher</comments>
-    </license>
-  </licenses>
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>src-dependencies</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <!-- use copy-dependencies instead if you don't want to explode the sources -->
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <configuration>
+              <classifier>sources</classifier>
+              <includeGroupIds>org.mycore</includeGroupIds>
+              <failOnMissingClassifierArtifact>false</failOnMissingClassifierArtifact>
+              <outputDirectory>${project.build.directory}/generated-sources/dependency</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <artifactId>maven-clean-plugin</artifactId>
         <executions>
           <execution>
-            <phase>initialize</phase>
+            <phase>prepare-package</phase>
             <goals>
               <goal>clean</goal>
             </goals>
+            <configuration>
+              <excludeDefaultDirectories>true</excludeDefaultDirectories>
+              <filesets>
+                <fileset>
+                  <directory>${project.build.directory}</directory>
+                  <includes>
+                    <include>**/*.jar</include>
+                  </includes>
+                </fileset>
+              </filesets>
+            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -42,6 +66,7 @@
             </goals>
             <configuration>
               <createDependencyReducedPom>false</createDependencyReducedPom>
+              <createSourcesJar>true</createSourcesJar>
               <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
               <promoteTransitiveDependencies>true</promoteTransitiveDependencies>
               <createDependencyReducedPom>true</createDependencyReducedPom>
@@ -63,8 +88,74 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <sourcepath>${project.build.directory}/generated-sources/dependency</sourcepath>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
+  <reporting>
+    <plugins>
+      <plugin>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <sourcepath>${project.build.directory}/generated-sources/dependency</sourcepath>
+          <source>${java.target.version}</source>
+          <groups>
+            <group>
+              <title>MyCoRe Datamodel</title>
+              <packages>org.mycore.datamodel*</packages>
+            </group>
+            <group>
+              <title>MyCoRe Persistence Backend Implementations</title>
+              <packages>org.mycore.backend*</packages>
+            </group>
+            <group>
+              <title>MyCoRe User Interface Frontend</title>
+              <packages>org.mycore.frontend*</packages>
+            </group>
+            <group>
+              <title>MyCoRe Common Functionality</title>
+              <packages>org.mycore.common*</packages>
+            </group>
+            <group>
+              <title>MyCoRe Services</title>
+              <packages>org.mycore.services*</packages>
+            </group>
+            <group>
+              <title>MyCoRe User and Group Management</title>
+              <packages>org.mycore.user*</packages>
+            </group>
+          </groups>
+          <tags>
+            <tag>
+              <name>hibernate.property</name>
+              <placement>X</placement>
+            </tag>
+            <tag>
+              <name>goal</name>
+              <placement>a</placement>
+            </tag>
+            <tag>
+              <name>phase</name>
+              <placement>a</placement>
+            </tag>
+          </tags>
+          <links>
+            <link>http://java.sun.com/javase/6/docs/api/</link>
+            <link>http://tomcat.apache.org/tomcat-5.5-doc/servletapi/</link>
+            <link>http://java.sun.com/xml/jaxp/dist/1.1/docs/api/</link>
+            <link>http://www.jdom.org/docs/apidocs</link>
+            <link>http://logging.apache.org/log4j/docs/api/</link>
+            <link>http://www.hibernate.org/hib_docs/v3/api/</link>
+            <link>http://lucene.apache.org/java/3_0_0/api/all/</link>
+          </links>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
   <dependencies>
     <dependency>
       <groupId>ant-contrib</groupId>
@@ -182,4 +273,3 @@
     </dependency>
   </dependencies>
 </project>
-

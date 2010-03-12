@@ -136,6 +136,19 @@
     </pluginManagement>
     <plugins>
       <plugin>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>jar-no-fork</goal>
+              <goal>test-jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <!--
         The tutorial on http://maven.apache.org/plugins/maven-checkstyle-plugin/examples/multi-module-config.html
         does not work. Manually extracting the checkstyle.xml file from build-tools with maven-antrun-plugin. 
