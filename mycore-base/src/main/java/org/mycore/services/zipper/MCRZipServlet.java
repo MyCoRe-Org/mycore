@@ -94,6 +94,7 @@ public class MCRZipServlet extends MCRServlet {
      * Initializes the servlet and reads the transforming stylesheet from the
      * configuration.
      */
+    @Override
     public void init() throws MCRConfigurationException, ServletException {
         super.init();
         xmltable = MCRXMLTableManager.instance();
@@ -103,6 +104,7 @@ public class MCRZipServlet extends MCRServlet {
     /**
      * Handles the HTTP request
      */
+    @Override
     public void doGetPost(MCRServletJob job) throws IOException {
         HttpServletRequest req = job.getRequest();
         HttpServletResponse res = job.getResponse();
@@ -195,11 +197,11 @@ public class MCRZipServlet extends MCRServlet {
         MCRFilesystemNode[] nodeArray;
         nodeArray = directory.getChildren();
 
-        for (int i = 0; i < nodeArray.length; i++) {
-            if (nodeArray[i] instanceof MCRFile) {
-                sendZipped((MCRFile) nodeArray[i], out);
+        for (MCRFilesystemNode element : nodeArray) {
+            if (element instanceof MCRFile) {
+                sendZipped((MCRFile) element, out);
             } else {
-                sendZipped((MCRDirectory) nodeArray[i], out);
+                sendZipped((MCRDirectory) element, out);
             }
         }
     }
@@ -262,7 +264,7 @@ public class MCRZipServlet extends MCRServlet {
             return;
         }
         // root is a directory
-        if ((dirpath == null) || (dirpath.equals(""))) {
+        if (dirpath == null || dirpath.equals("")) {
             sendZipped((MCRDirectory) root, out);
             LOGGER.debug("directory " + root.getName() + " zipped");
 
@@ -336,7 +338,7 @@ public class MCRZipServlet extends MCRServlet {
      * 
      */
     protected ZipOutputStream buildZipOutputStream(HttpServletResponse res, String id, String dirpath) throws IOException {
-        String filename = ((dirpath == null) || dirpath.equals("")) ? (id + ".zip") : (id + "-" + dirpath.replaceAll("/", "-") + ".zip");
+        String filename = dirpath == null || dirpath.equals("") ? id + ".zip" : id + "-" + dirpath.replaceAll("/", "-") + ".zip";
         res.setContentType("multipart/x-zip");
         res.addHeader("Content-Disposition", "atachment; filename=\"" + filename + "\"");
 

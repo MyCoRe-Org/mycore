@@ -91,6 +91,7 @@ public class MCRGROUPADMINSPK implements Serializable {
         this.userid = userid;
     }
 
+    @Override
     public boolean equals(Object other) {
         if (!(other instanceof MCRGROUPADMINSPK)) {
             return false;
@@ -98,9 +99,11 @@ public class MCRGROUPADMINSPK implements Serializable {
 
         MCRGROUPADMINSPK castother = (MCRGROUPADMINSPK) other;
 
-        return new EqualsBuilder().append(this.getGid(), castother.getGid()).append(this.getUserid(), castother.getUserid()).append(this.getGroupid(), castother.getGroupid()).isEquals();
+        return new EqualsBuilder().append(getGid(), castother.getGid()).append(getUserid(), castother.getUserid()).append(getGroupid(),
+                castother.getGroupid()).isEquals();
     }
 
+    @Override
     public int hashCode() {
         return new HashCodeBuilder().append(getGid()).append(getUserid()).append(getGroupid()).toHashCode();
     }

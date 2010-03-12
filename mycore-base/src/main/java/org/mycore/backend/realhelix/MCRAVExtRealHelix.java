@@ -60,6 +60,7 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender {
     public MCRAVExtRealHelix() {
     }
 
+    @Override
     public void init(MCRFileReader file) throws MCRPersistenceException {
         super.init(file);
 
@@ -86,7 +87,7 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender {
                 frameRate = Math.max(frameRate, value);
             }
 
-            mediaType = (frameRate > 0);
+            mediaType = frameRate > 0;
 
             StringTokenizer st2 = new StringTokenizer(sDuration, ":.");
             durationMinutes = Integer.parseInt(st2.nextToken());
@@ -104,13 +105,14 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender {
             StringTokenizer st3 = new StringTokenizer(sSize, ",");
             StringBuffer sb = new StringBuffer();
 
-            while (st3.hasMoreTokens())
+            while (st3.hasMoreTokens()) {
                 sb.append(st3.nextToken());
+            }
 
             size = Long.parseLong(sb.toString());
 
-            durationHours = (durationMinutes / 60);
-            durationMinutes = durationMinutes - (durationHours * 60);
+            durationHours = durationMinutes / 60;
+            durationMinutes = durationMinutes - durationHours * 60;
 
             if (sType.indexOf("MPEG Layer 3") >= 0) {
                 contentTypeID = "mp3";
@@ -152,6 +154,7 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender {
         }
     }
 
+    @Override
     public void getPlayerStarterTo(OutputStream out, String startPos, String stopPos) throws MCRPersistenceException {
         if (basePlayerStarter == null || basePlayerStarter.length() < 8) {
             String msg = "Temporary Failure. Could not start streaming of file: " + file.getPath();
@@ -162,7 +165,7 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender {
             StringBuffer cgi = new StringBuffer(basePlayerStarter);
             cgi.append(file.getStorageID());
 
-            if ((startPos != null) || (stopPos != null)) {
+            if (startPos != null || stopPos != null) {
                 cgi.append("?");
             }
 
@@ -170,7 +173,7 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender {
                 cgi.append("start=").append(startPos);
             }
 
-            if ((startPos != null) && (stopPos != null)) {
+            if (startPos != null && stopPos != null) {
                 cgi.append("&");
             }
 

@@ -12,11 +12,11 @@ public class MCRResultsTest extends MCRTestCase {
         MCRResults res2 = results.get(1);
         MCRResults res3 = results.get(2);
 
-        MCRResults newRes = MCRResults.intersect(new MCRResults[] {res1, res2});
+        MCRResults newRes = MCRResults.intersect(new MCRResults[] { res1, res2 });
         assertEquals(2, newRes.getNumHits()); // 1 3
-        newRes = MCRResults.intersect(new MCRResults[] {newRes, res3});
+        newRes = MCRResults.intersect(new MCRResults[] { newRes, res3 });
         assertEquals(1, newRes.getNumHits()); // 1
-        newRes = MCRResults.intersect(new MCRResults[] {res2, res3});
+        newRes = MCRResults.intersect(new MCRResults[] { res2, res3 });
         assertEquals(2, newRes.getNumHits()); // 1 7
     }
 
@@ -26,11 +26,11 @@ public class MCRResultsTest extends MCRTestCase {
         MCRResults res2 = results.get(1);
         MCRResults res3 = results.get(2);
 
-        MCRResults newRes = MCRResults.union(new MCRResults[] {res1, res2});
+        MCRResults newRes = MCRResults.union(new MCRResults[] { res1, res2 });
         assertEquals(5, newRes.getNumHits()); // 0 1 2 3 7
-        newRes = MCRResults.union(new MCRResults[] {newRes, res3});
+        newRes = MCRResults.union(new MCRResults[] { newRes, res3 });
         assertEquals(8, newRes.getNumHits()); // all
-        newRes = MCRResults.union(new MCRResults[] {res2, res3});
+        newRes = MCRResults.union(new MCRResults[] { res2, res3 });
         assertEquals(6, newRes.getNumHits()); // 1 3 4 5 6 7
     }
 

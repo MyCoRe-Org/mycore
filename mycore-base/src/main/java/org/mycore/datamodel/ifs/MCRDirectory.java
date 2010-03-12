@@ -91,14 +91,14 @@ public class MCRDirectory extends MCRFilesystemNode {
     /**
      * Internal constructor, do not use on your own.
      */
-    MCRDirectory(String ID, String parentID, String ownerID, String name, String label, long size, GregorianCalendar date, int numchdd, int numchdf,
-            int numchtd, int numchtf) {
+    MCRDirectory(String ID, String parentID, String ownerID, String name, String label, long size, GregorianCalendar date, int numchdd,
+            int numchdf, int numchtd, int numchtf) {
         super(ID, parentID, ownerID, name, label, size, date);
 
-        this.numChildDirsHere = numchdd;
-        this.numChildFilesHere = numchdf;
-        this.numChildFilesTotal = numchtf;
-        this.numChildDirsTotal = numchtd;
+        numChildDirsHere = numchdd;
+        numChildFilesHere = numchdf;
+        numChildFilesTotal = numchtf;
+        numChildDirsTotal = numchtd;
     }
 
     /**
@@ -109,7 +109,7 @@ public class MCRDirectory extends MCRFilesystemNode {
      * @return the MCRDirectory with the given ID, or null if no such directory exists
      */
     public static MCRDirectory getDirectory(String ID) {
-        return (MCRDirectory) (MCRFilesystemNode.getNode(ID));
+        return (MCRDirectory) MCRFilesystemNode.getNode(ID);
     }
 
     /**
@@ -120,7 +120,7 @@ public class MCRDirectory extends MCRFilesystemNode {
      * @return the root MCRDirectory stored for that owner ID, or null if no such directory exists
      */
     public static MCRDirectory getRootDirectory(String ownerID) {
-        return (MCRDirectory) (MCRFilesystemNode.getRootNode(ownerID));
+        return (MCRDirectory) MCRFilesystemNode.getRootNode(ownerID);
     }
 
     /**
@@ -130,11 +130,11 @@ public class MCRDirectory extends MCRFilesystemNode {
      *            the new child
      */
     protected void addChild(MCRFilesystemNode child) {
-        if (child.parentID.equals(this.ID)) {
+        if (child.parentID.equals(ID)) {
             if (child instanceof MCRFile) {
-                this.numChildFilesHere++;
+                numChildFilesHere++;
             } else {
-                this.numChildDirsHere++;
+                numChildDirsHere++;
             }
 
             if (children != null) {
@@ -143,12 +143,12 @@ public class MCRDirectory extends MCRFilesystemNode {
         }
 
         if (child instanceof MCRFile) {
-            this.numChildFilesTotal++;
+            numChildFilesTotal++;
         } else {
-            this.numChildDirsTotal++;
+            numChildDirsTotal++;
         }
 
-        this.lastModified = new GregorianCalendar();
+        lastModified = new GregorianCalendar();
 
         manager.storeNode(this);
 
@@ -164,11 +164,11 @@ public class MCRDirectory extends MCRFilesystemNode {
      *            the child to be removed from this directory
      */
     protected void removeChild(MCRFilesystemNode child) {
-        if (child.parentID.equals(this.ID)) {
+        if (child.parentID.equals(ID)) {
             if (child instanceof MCRFile) {
-                this.numChildFilesHere--;
+                numChildFilesHere--;
             } else {
-                this.numChildDirsHere--;
+                numChildDirsHere--;
             }
 
             if (children != null) {
@@ -177,12 +177,12 @@ public class MCRDirectory extends MCRFilesystemNode {
         }
 
         if (child instanceof MCRFile) {
-            this.numChildFilesTotal--;
+            numChildFilesTotal--;
         } else {
-            this.numChildDirsTotal--;
+            numChildDirsTotal--;
         }
 
-        this.lastModified = new GregorianCalendar();
+        lastModified = new GregorianCalendar();
 
         manager.storeNode(this);
 
@@ -237,7 +237,7 @@ public class MCRDirectory extends MCRFilesystemNode {
 
         MCRFilesystemNode child = getChild(name);
 
-        return (child != null);
+        return child != null;
     }
 
     /**
@@ -267,7 +267,7 @@ public class MCRDirectory extends MCRFilesystemNode {
         if (name.equals(".")) {
             return this;
         } else if (name.equals("..")) {
-            return (hasParent() ? getParent() : null);
+            return hasParent() ? getParent() : null;
         } else {
             return manager.retrieveChild(ID, name);
         }
@@ -297,7 +297,7 @@ public class MCRDirectory extends MCRFilesystemNode {
         }
 
         int index = path.indexOf("/");
-        int end = ((index == -1) ? path.length() : index);
+        int end = index == -1 ? path.length() : index;
         String name = path.substring(0, end);
 
         MCRFilesystemNode child = getChild(name);
@@ -325,7 +325,7 @@ public class MCRDirectory extends MCRFilesystemNode {
     public boolean hasChildren() {
         ensureNotDeleted();
 
-        return (getNumChildren(NODES, HERE) > 0);
+        return getNumChildren(NODES, HERE) > 0;
     }
 
     /** Constant for choosing file nodes * */
@@ -359,21 +359,21 @@ public class MCRDirectory extends MCRFilesystemNode {
 
         if ((where & TOTAL) > 0) {
             if (nodetype == FILES) {
-                return this.numChildFilesTotal;
+                return numChildFilesTotal;
             } else if (nodetype == DIRECTORIES) {
-                return this.numChildDirsTotal;
-            } else if (nodetype == (DIRECTORIES + FILES)) {
-                return this.numChildDirsTotal + this.numChildFilesTotal;
+                return numChildDirsTotal;
+            } else if (nodetype == DIRECTORIES + FILES) {
+                return numChildDirsTotal + numChildFilesTotal;
             } else {
                 return 0;
             }
         }
         if (nodetype == FILES) {
-            return this.numChildFilesHere;
+            return numChildFilesHere;
         } else if (nodetype == DIRECTORIES) {
-            return this.numChildDirsHere;
-        } else if (nodetype == (DIRECTORIES + FILES)) {
-            return this.numChildDirsHere + this.numChildFilesHere;
+            return numChildDirsHere;
+        } else if (nodetype == DIRECTORIES + FILES) {
+            return numChildDirsHere + numChildFilesHere;
         } else {
             return 0;
         }
@@ -383,8 +383,8 @@ public class MCRDirectory extends MCRFilesystemNode {
      * Internal method that is called when the size of a child node has changed, to update the total size of the parent directory.
      */
     protected void sizeOfChildChanged(long sizeDiff) {
-        this.size += sizeDiff;
-        this.lastModified = new GregorianCalendar();
+        size += sizeDiff;
+        lastModified = new GregorianCalendar();
 
         manager.storeNode(this);
 
@@ -397,7 +397,7 @@ public class MCRDirectory extends MCRFilesystemNode {
      * Updates the date of last modification to the current date and time, without changing anything else.
      */
     protected void touch() {
-        this.lastModified = new GregorianCalendar();
+        lastModified = new GregorianCalendar();
         manager.storeNode(this);
 
         if (hasParent()) {
@@ -408,19 +408,21 @@ public class MCRDirectory extends MCRFilesystemNode {
     /**
      * Deletes this directory and its content stored in the system
      */
+    @Override
     public void delete() throws MCRPersistenceException {
         ensureNotDeleted();
 
-        for (int i = getNumChildren(NODES, HERE) - 1; i >= 0; i--)
+        for (int i = getNumChildren(NODES, HERE) - 1; i >= 0; i--) {
             getChild(i).delete();
+        }
 
         super.delete();
 
-        this.children = null;
-        this.numChildDirsHere = 0;
-        this.numChildDirsTotal = 0;
-        this.numChildFilesHere = 0;
-        this.numChildFilesTotal = 0;
+        children = null;
+        numChildDirsHere = 0;
+        numChildDirsTotal = 0;
+        numChildFilesHere = 0;
+        numChildFilesTotal = 0;
     }
 
     /** Sorts children by filename, case insensitive * */
@@ -457,12 +459,12 @@ public class MCRDirectory extends MCRFilesystemNode {
     protected void collectMD5Lines(List list) {
         MCRFilesystemNode[] nodes = getChildren();
 
-        for (int i = 0; i < nodes.length; i++) {
-            if (nodes[i] instanceof MCRDirectory) {
-                MCRDirectory dir = (MCRDirectory) (nodes[i]);
+        for (MCRFilesystemNode node : nodes) {
+            if (node instanceof MCRDirectory) {
+                MCRDirectory dir = (MCRDirectory) node;
                 dir.collectMD5Lines(list);
             } else {
-                MCRFile file = (MCRFile) (nodes[i]);
+                MCRFile file = (MCRFile) node;
                 String line = file.getMD5() + " " + file.getSize();
                 list.add(line);
             }
@@ -485,8 +487,9 @@ public class MCRDirectory extends MCRFilesystemNode {
 
         StringBuffer sb = new StringBuffer();
 
-        for (int i = 0; i < list.size(); i++)
+        for (int i = 0; i < list.size(); i++) {
             sb.append(list.get(i)).append('\n');
+        }
 
         String s = sb.toString();
 
@@ -497,13 +500,14 @@ public class MCRDirectory extends MCRFilesystemNode {
         }
     }
 
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append(super.toString());
-        sb.append("NumChildDirectoriesHere  = ").append(this.numChildDirsHere);
-        sb.append("NumChildFilesHere        = ").append(this.numChildFilesHere);
-        sb.append("NumChildDirectoriesTotal = ").append(this.numChildDirsTotal);
-        sb.append("NumChildFilesTotal       = ").append(this.numChildFilesTotal);
+        sb.append("NumChildDirectoriesHere  = ").append(numChildDirsHere);
+        sb.append("NumChildFilesHere        = ").append(numChildFilesHere);
+        sb.append("NumChildDirectoriesTotal = ").append(numChildDirsTotal);
+        sb.append("NumChildFilesTotal       = ").append(numChildFilesTotal);
 
         return sb.toString();
     }

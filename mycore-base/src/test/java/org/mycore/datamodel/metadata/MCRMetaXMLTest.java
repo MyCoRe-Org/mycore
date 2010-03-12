@@ -34,7 +34,6 @@ import org.jdom.Namespace;
 import org.jdom.Text;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.xml.MCRXMLHelper;
@@ -49,9 +48,10 @@ import org.mycore.common.xml.MCRXMLHelper;
 public class MCRMetaXMLTest extends MCRTestCase {
     private static Logger LOGGER;
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();//org.mycore.datamodel.metadata.MCRMetaXML
-        if (setProperty("log4j.logger.org.mycore.datamodel.metadata","INFO", false)){
+        if (setProperty("log4j.logger.org.mycore.datamodel.metadata", "INFO", false)) {
             //DEBUG will print a Stacktrace if we test for errors, but that's O.K.
             MCRConfiguration.instance().configureLogging();
         }
@@ -60,13 +60,14 @@ public class MCRMetaXMLTest extends MCRTestCase {
         }
     }
 
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
     }
 
     public void testXMLRoundrip() {
         MCRMetaXML mXml = new MCRMetaXML("metadata", "def.heading", "complete", 0);
-        Element imported=new Element("heading");
+        Element imported = new Element("heading");
         imported.setAttribute("lang", MCRMetaDefault.DEFAULT_LANGUAGE, Namespace.XML_NAMESPACE);
         imported.setAttribute("inherited", "0");
         imported.setAttribute("type", "complete");
@@ -74,7 +75,7 @@ public class MCRMetaXMLTest extends MCRTestCase {
         imported.addContent(new Element("span").setText("JUnit"));
         imported.addContent(new Text("test"));
         mXml.setFromDOM(imported);
-        Element exported=mXml.createXML();
+        Element exported = mXml.createXML();
         if (LOGGER.isDebugEnabled()) {
             XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
             StringWriter sw = new StringWriter();

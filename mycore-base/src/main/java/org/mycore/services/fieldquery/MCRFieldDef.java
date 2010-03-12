@@ -23,7 +23,6 @@
 package org.mycore.services.fieldquery;
 
 import java.util.ArrayList;
-
 import java.util.Hashtable;
 import java.util.List;
 
@@ -31,9 +30,9 @@ import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.output.XMLOutputter;
+import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.xml.MCRURIResolver;
 
 /**
@@ -49,11 +48,9 @@ public class MCRFieldDef {
 
     private static Hashtable<String, MCRFieldDef> fieldTable = new Hashtable<String, MCRFieldDef>();
 
-    public final static Namespace xalanns = Namespace.getNamespace("xalan",
-            "http://xml.apache.org/xalan");
+    public final static Namespace xalanns = Namespace.getNamespace("xalan", "http://xml.apache.org/xalan");
 
-    public final static Namespace extns = Namespace.getNamespace("ext",
-            "xalan://org.mycore.services.fieldquery.MCRData2Fields");
+    public final static Namespace extns = Namespace.getNamespace("ext", "xalan://org.mycore.services.fieldquery.MCRData2Fields");
 
     private final static String configFile = "searchfields.xml";
 
@@ -73,8 +70,9 @@ public class MCRFieldDef {
             @SuppressWarnings("unchecked")
             List<Element> fields = index.getChildren("field", MCRConstants.MCR_NAMESPACE);
 
-            for (int j = 0; j < fields.size(); j++)
+            for (int j = 0; j < fields.size(); j++) {
                 new MCRFieldDef(id, fields.get(j));
+            }
         }
     }
 
@@ -124,12 +122,12 @@ public class MCRFieldDef {
 
     public MCRFieldDef(String index, Element def) {
         this.index = index;
-        this.name = def.getAttributeValue("name");
-        this.dataType = def.getAttributeValue("type").intern();
-        this.sortable = "true".equals(def.getAttributeValue("sortable"));
-        this.objects = def.getAttributeValue("objects", (String) null);
-        this.source = def.getAttributeValue("source");
-        this.addable = "true".equals(def.getAttributeValue("addable"));
+        name = def.getAttributeValue("name");
+        dataType = def.getAttributeValue("type").intern();
+        sortable = "true".equals(def.getAttributeValue("sortable"));
+        objects = def.getAttributeValue("objects", (String) null);
+        source = def.getAttributeValue("source");
+        addable = "true".equals(def.getAttributeValue("addable"));
 
         if (!fieldTable.contains(name)) {
             fieldTable.put(name, this);
@@ -164,8 +162,9 @@ public class MCRFieldDef {
     public static List<MCRFieldDef> getFieldDefs(String index) {
         List<MCRFieldDef> fields = new ArrayList<MCRFieldDef>();
         for (MCRFieldDef field : fieldTable.values()) {
-            if (field.index.equals(index))
+            if (field.index.equals(index)) {
                 fields.add(field);
+            }
         }
         return fields;
     }
@@ -227,12 +226,13 @@ public class MCRFieldDef {
      *            the type of object
      */
     public boolean isUsedForObjectType(String objectType) {
-        if (objects == null)
+        if (objects == null) {
             return true;
+        }
 
         String a = " " + objects + " ";
         String b = " " + objectType + " ";
-        return (a.indexOf(b) >= 0);
+        return a.indexOf(b) >= 0;
     }
 
     /**
@@ -317,10 +317,11 @@ public class MCRFieldDef {
 
     /** Returns a stylesheet to build values for this field from XML source data */
     Element getXSL() {
-        if (xsl == null)
+        if (xsl == null) {
             return null;
-        else
-            return (Element) (xsl.clone());
+        } else {
+            return (Element) xsl.clone();
+        }
     }
 
     /**
@@ -329,7 +330,7 @@ public class MCRFieldDef {
      */
     private void buildForEachXSL(Element fieldDef) {
         String xpath = fieldDef.getAttributeValue("xpath");
-        if ((xpath == null) || (xpath.trim().length() == 0)) {
+        if (xpath == null || xpath.trim().length() == 0) {
             return;
         }
 
@@ -343,21 +344,24 @@ public class MCRFieldDef {
         // <xsl:for-each select="{@xpath}">
         Element forEach1 = new Element("for-each", MCRConstants.XSL_NAMESPACE);
         forEach1.setAttribute("select", xpath);
-        if (xsl == null)
+        if (xsl == null) {
             xsl = forEach1;
-        else
+        } else {
             xsl.addContent(forEach1);
+        }
 
         Element current = fieldDef;
         while (true) {
             @SuppressWarnings("unchecked")
             List<Namespace> namespaces = current.getAdditionalNamespaces();
-            for (Namespace ns : namespaces)
+            for (Namespace ns : namespaces) {
                 xsl.addNamespaceDeclaration(ns);
-            if (current.isRootElement())
+            }
+            if (current.isRootElement()) {
                 break;
-            else
+            } else {
                 current = current.getParentElement();
+            }
         }
 
         if (MCRFieldDef.OBJECT_CATEGORY.equals(fieldDef.getAttributeValue("source"))) {

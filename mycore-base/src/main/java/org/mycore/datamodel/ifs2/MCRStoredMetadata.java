@@ -67,8 +67,9 @@ public class MCRStoredMetadata {
      *            the XML to save to a new file
      */
     void create(MCRContent xml) throws Exception {
-        if (store.shouldForceXML())
+        if (store.shouldForceXML()) {
             xml = xml.ensureXML();
+        }
         fo.createFile();
         xml.sendTo(fo);
     }
@@ -84,8 +85,9 @@ public class MCRStoredMetadata {
             String msg = "You can not update a deleted data object";
             throw new MCRUsageException(msg);
         }
-        if (store.shouldForceXML())
+        if (store.shouldForceXML()) {
             xml = xml.ensureXML();
+        }
         xml.sendTo(fo);
     }
 
@@ -133,8 +135,9 @@ public class MCRStoredMetadata {
      *            the date this metadata document was last modified
      */
     public void setLastModified(Date date) throws Exception {
-        if (!isDeleted())
+        if (!isDeleted()) {
             fo.getContent().setLastModifiedTime(date.getTime());
+        }
     }
 
     /**
@@ -144,14 +147,15 @@ public class MCRStoredMetadata {
      * @throws Exception
      */
     public void delete() throws Exception {
-        if (!isDeleted())
+        if (!isDeleted()) {
             store.delete(fo);
+        }
     }
 
     /**
      * Returns true if this object is deleted
      */
     public boolean isDeleted() throws Exception {
-        return (!fo.exists());
+        return !fo.exists();
     }
 }

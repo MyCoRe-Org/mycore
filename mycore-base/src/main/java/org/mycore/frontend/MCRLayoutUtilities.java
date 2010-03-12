@@ -38,10 +38,10 @@ public class MCRLayoutUtilities {
     private static Document NAVI;
 
     private static final String NAV_LOC_DEFAULT = MCRConfiguration.instance().getString("MCR.basedir")
-                    + "build/webapps/config/navigation.xml".replace('/', File.separatorChar);
+            + "build/webapps/config/navigation.xml".replace('/', File.separatorChar);
 
     private static final File NAVFILE = new File(MCRConfiguration.instance().getString("MCR.navigationFile", NAV_LOC_DEFAULT).replace('/',
-                    File.separatorChar));
+            File.separatorChar));
 
     private static final boolean ACCESS_CONTROLL_ON = MCRConfiguration.instance().getBoolean("MCR.Website.ReadAccessVerification", true);
 
@@ -63,11 +63,12 @@ public class MCRLayoutUtilities {
         if (ACCESS_CONTROLL_ON) {
             long startTime = System.currentTimeMillis();
             boolean access = getAccess(webpageID, "read", ALL2BLOCKER_TRUE, blockerWebpageID);
-            LOGGER.debug("checked read access for webpageID= " + webpageID + " (with blockerWebpageID =" + blockerWebpageID + ") => " + access + ": took "
-                            + getDuration(startTime) + " msec.");
+            LOGGER.debug("checked read access for webpageID= " + webpageID + " (with blockerWebpageID =" + blockerWebpageID + ") => "
+                    + access + ": took " + getDuration(startTime) + " msec.");
             return access;
-        } else
+        } else {
             return true;
+        }
     }
 
     /**
@@ -83,10 +84,12 @@ public class MCRLayoutUtilities {
         if (ACCESS_CONTROLL_ON) {
             long startTime = System.currentTimeMillis();
             boolean access = getAccess(webpageID, "read", ALLTRUE);
-            LOGGER.debug("checked read access for webpageID= " + webpageID + " => " + access + ": took " + getDuration(startTime) + " msec.");
+            LOGGER.debug("checked read access for webpageID= " + webpageID + " => " + access + ": took " + getDuration(startTime)
+                    + " msec.");
             return access;
-        } else
+        } else {
             return true;
+        }
     }
 
     /**
@@ -121,10 +124,11 @@ public class MCRLayoutUtilities {
                 e.printStackTrace();
             }
             if (labelEl != null) {
-                if (label.equals(""))
+                if (label.equals("")) {
                     label = labelEl.getTextTrim();
-                else
+                } else {
                     label = labelEl.getTextTrim() + " > " + label;
+                }
             }
         }
         return label;
@@ -199,8 +203,9 @@ public class MCRLayoutUtilities {
      * @return Element
      */
     private static Element getItem(String webpageID) {
-        if (!naviCacheValid())
+        if (!naviCacheValid()) {
             itemStore.clear();
+        }
         Element item = itemStore.get(webpageID);
         if (item == null) {
             XPath xpath;
@@ -226,8 +231,9 @@ public class MCRLayoutUtilities {
      */
     public static boolean itemAccess(String permission, Element item, boolean access) {
         String objID = getWebpageACLID(item);
-        if (MCRAccessManager.hasRule(objID, permission))
+        if (MCRAccessManager.hasRule(objID, permission)) {
             access = MCRAccessManager.checkPermission(objID, permission);
+        }
         return access;
     }
 
@@ -245,8 +251,9 @@ public class MCRLayoutUtilities {
     public static boolean itemAccess(String permission, Element item, boolean access, MCRUser user) {
         MCRAccessInterface am = MCRAccessManager.getAccessImpl();
         String objID = getWebpageACLID(item);
-        if (am.hasRule(objID, permission))
+        if (am.hasRule(objID, permission)) {
             access = am.checkPermission(objID, permission, user);
+        }
         return access;
     }
 
@@ -256,10 +263,11 @@ public class MCRLayoutUtilities {
      * @return true if valid, false if note
      */
     private static boolean naviCacheValid() {
-        if (CACHE_INITTIME < NAVFILE.lastModified())
+        if (CACHE_INITTIME < NAVFILE.lastModified()) {
             return false;
-        else
+        } else {
             return true;
+        }
     }
 
     private static String getWebpageACLID(Element item) {
@@ -295,7 +303,7 @@ public class MCRLayoutUtilities {
     }
 
     public static long getDuration(long startTime) {
-        return (System.currentTimeMillis() - startTime);
+        return System.currentTimeMillis() - startTime;
     }
 
     public static String getOBJIDPREFIX_WEBPAGE() {
@@ -310,19 +318,21 @@ public class MCRLayoutUtilities {
     public static String getRuleID(String permission, String webpageID) {
         MCRAccessStore as = MCRAccessStore.getInstance();
         String ruleID = as.getRuleID(getWebpageACLID(webpageID), permission);
-        if (ruleID != null)
+        if (ruleID != null) {
             return ruleID;
-        else
+        } else {
             return "";
+        }
     }
 
     public static String getRuleDescr(String permission, String webpageID) {
         MCRAccessInterface am = MCRAccessManager.getAccessImpl();
         String ruleDes = am.getRuleDescription(getWebpageACLID(webpageID), permission);
-        if (ruleDes != null)
+        if (ruleDes != null) {
             return ruleDes;
-        else
+        } else {
             return "";
+        }
     }
 
     public static String getPermission2ReadWebpage() {
@@ -331,7 +341,7 @@ public class MCRLayoutUtilities {
 
     public static String getLastValidPageID() {
         String page = (String) MCRSessionMgr.getCurrentSession().get("lastPageID");
-        return (page == null ? "" : page);
+        return page == null ? "" : page;
     }
 
     public static String setLastValidPageID(String pageID) {

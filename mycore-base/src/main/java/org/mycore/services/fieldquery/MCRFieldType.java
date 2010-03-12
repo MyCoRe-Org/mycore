@@ -25,8 +25,8 @@ package org.mycore.services.fieldquery;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Properties;
 import java.util.List;
+import java.util.Properties;
 
 import org.jdom.Element;
 import org.mycore.common.MCRConstants;
@@ -51,14 +51,15 @@ public class MCRFieldType {
      */
     static {
         Element fieldtypes = MCRURIResolver.instance().resolve("resource:fieldtypes.xml");
-        for (Element type : (List<Element>) (fieldtypes.getChildren("type", MCRConstants.MCR_NAMESPACE))) {
+        for (Element type : (List<Element>) fieldtypes.getChildren("type", MCRConstants.MCR_NAMESPACE)) {
             String name = type.getAttributeValue("name");
             String def = type.getAttributeValue("default");
             defOps.setProperty(name, def);
 
             List<String> operators = new ArrayList<String>();
-            for (Element oper : (List<Element>) (type.getChildren("operator", MCRConstants.MCR_NAMESPACE)))
+            for (Element oper : (List<Element>) type.getChildren("operator", MCRConstants.MCR_NAMESPACE)) {
                 operators.add(oper.getAttributeValue("token"));
+            }
             allOps.put(name, operators);
         }
     }
@@ -83,8 +84,9 @@ public class MCRFieldType {
      * @return
      */
     public static boolean isValidOperatorForType(String fieldType, String operator) {
-        if (!isValidType(fieldType))
+        if (!isValidType(fieldType)) {
             return false;
+        }
         List operators = allOps.get(fieldType);
         return operators.contains(operator);
     }

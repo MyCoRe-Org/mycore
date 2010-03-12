@@ -29,7 +29,7 @@ public class MCRACCESS {
     private MCRACCESSPK key;
 
     private MCRACCESSRULE rule;
-    
+
     private String creator;
 
     private Timestamp creationdate;
@@ -42,14 +42,14 @@ public class MCRACCESS {
     }
 
     public MCRACCESS(MCRACCESSRULE rule, String acpool, String objid, String creator, Timestamp creationdate) {
-        this.key = new MCRACCESSPK(acpool, objid);
+        key = new MCRACCESSPK(acpool, objid);
         this.rule = rule;
         this.creator = creator;
         this.creationdate = creationdate;
     }
 
     public MCRACCESSPK getKey() {
-        return this.key;
+        return key;
     }
 
     public void setKey(MCRACCESSPK key) {

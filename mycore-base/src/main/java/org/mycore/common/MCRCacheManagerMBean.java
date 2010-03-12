@@ -24,25 +24,25 @@
 package org.mycore.common;
 
 public interface MCRCacheManagerMBean {
-    
+
     public int getSize();
-    
+
     public long getRequests();
-    
+
     public long getHits();
-    
+
     public int getCapacity();
-    
+
     public void setCapacity(int size);
-    
+
     public double getHitRate();
-    
+
     public double getFillRate();
-    
+
     public String getLeastRecentlyUsedElement();
-    
+
     public String getMostRecentlyUsedElement();
-    
+
     public void clear();
 
 }

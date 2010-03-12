@@ -51,6 +51,7 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
      * 
      * @see org.mycore.common.MCRHibTestCase#setUp()
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         if (ACCESS_STORE == null) {
@@ -87,6 +88,7 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
      * 
      * @see org.mycore.common.MCRHibTestCase#tearDown()
      */
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
     }
@@ -181,7 +183,6 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
      * Test method for
      * {@link org.mycore.backend.hibernate.MCRHIBAccessStore#getMappedObjectId(java.lang.String)}.
      */
-    @SuppressWarnings("unchecked")
     public void testGetMappedObjectId() {
         final String objID = "test";
         final String permission = "maytest";
@@ -196,7 +197,6 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
      * Test method for
      * {@link org.mycore.backend.hibernate.MCRHIBAccessStore#getPoolsForObject(java.lang.String)}.
      */
-    @SuppressWarnings("unchecked")
     public void testGetPoolsForObject() {
         final String objID = "test";
         final String permission = "maytest";
@@ -211,7 +211,6 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
      * Test method for
      * {@link org.mycore.backend.hibernate.MCRHIBAccessStore#getDatabasePools()}.
      */
-    @SuppressWarnings("unchecked")
     public void testGetDatabasePools() {
         final String objID = "test";
         final String permission = "maytest";

@@ -27,8 +27,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
 
 /**
  * This class implements all methode for handling one document service data. The
@@ -76,13 +76,13 @@ public class MCRObjectService {
     public MCRObjectService() {
         lang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "en");
         dates = new ArrayList<MCRMetaISO8601Date>();
-        
-        Date curTime=new Date();
-        
-        MCRMetaISO8601Date d = new MCRMetaISO8601Date("service", "servdate","createdate",0);
+
+        Date curTime = new Date();
+
+        MCRMetaISO8601Date d = new MCRMetaISO8601Date("service", "servdate", "createdate", 0);
         d.setDate(curTime);
         dates.add(d);
-        d = new MCRMetaISO8601Date("service", "servdate","modifydate",0);
+        d = new MCRMetaISO8601Date("service", "servdate", "modifydate", 0);
         d.setDate(curTime);
         dates.add(d);
 
@@ -117,7 +117,7 @@ public class MCRObjectService {
                 MCRMetaISO8601Date date = new MCRMetaISO8601Date();
                 date.setDataPart(service_element.getName());
                 date.setFromDOM(date_element);
-                
+
                 setDate(date);
             }
         }
@@ -181,14 +181,14 @@ public class MCRObjectService {
      */
     public final Date getDate(String type) {
         MCRMetaISO8601Date isoDate = getISO8601Date(type);
-        if(isoDate == null){
+        if (isoDate == null) {
             return null;
         }
         return isoDate.getDate();
     }
-    
-    private final MCRMetaISO8601Date getISO8601Date(String type){
-        if ((type == null) || (type.length() == 0)) {
+
+    private final MCRMetaISO8601Date getISO8601Date(String type) {
+        if (type == null || type.length() == 0) {
             return null;
         }
 
@@ -216,7 +216,7 @@ public class MCRObjectService {
      *            the type of the date
      */
     public final void setDate(String type) {
-        setDate(type,new Date());
+        setDate(type, new Date());
     }
 
     /**
@@ -229,7 +229,7 @@ public class MCRObjectService {
      *            set time to this Calendar
      */
     public final void setDate(String type, Date date) {
-        MCRMetaISO8601Date d=getISO8601Date(type); //search date in ArrayList
+        MCRMetaISO8601Date d = getISO8601Date(type); //search date in ArrayList
         if (d == null) {
             d = new MCRMetaISO8601Date("service", "servdate", type, 0);
             d.setDate(date);
@@ -247,7 +247,7 @@ public class MCRObjectService {
      *            set time to this Calendar
      */
     private final void setDate(MCRMetaISO8601Date date) {
-        MCRMetaISO8601Date d=getISO8601Date(date.getType()); //search date in ArrayList
+        MCRMetaISO8601Date d = getISO8601Date(date.getType()); //search date in ArrayList
 
         if (d == null) {
             dates.add(date);
@@ -263,7 +263,7 @@ public class MCRObjectService {
      *            the new flag as string
      */
     public final void addFlag(String value) {
-        if ((value == null) || ((value = value.trim()).length() == 0)) {
+        if (value == null || (value = value.trim()).length() == 0) {
             return;
         }
 
@@ -280,13 +280,15 @@ public class MCRObjectService {
      *              the new flag value as string
      */
     public final void addFlag(String type, String value) {
-        if ((value == null) || ((value = value.trim()).length() == 0))
+        if (value == null || (value = value.trim()).length() == 0) {
             return;
-        if((type == null) || ((type = type.trim()).length() == 0))
+        }
+        if (type == null || (type = type.trim()).length() == 0) {
             type = null;
+        }
 
         MCRMetaLangText flag = new MCRMetaLangText("service", "servflag", null, type, 0, null, value);
-        flags.add(flag);        
+        flags.add(flag);
     }
 
     /**
@@ -313,9 +315,10 @@ public class MCRObjectService {
      */
     protected final ArrayList<MCRMetaLangText> getFlagsAsMCRMetaLangText(String type) {
         ArrayList<MCRMetaLangText> flagList = new ArrayList<MCRMetaLangText>();
-        for(MCRMetaLangText metaLangText : flags) {
-            if(metaLangText.getType() != null && metaLangText.getType().equals(type))
+        for (MCRMetaLangText metaLangText : flags) {
+            if (metaLangText.getType() != null && metaLangText.getType().equals(type)) {
                 flagList.add(metaLangText);
+            }
         }
         return flagList;
     }
@@ -330,7 +333,7 @@ public class MCRObjectService {
     public final ArrayList<String> getFlags(String type) {
         ArrayList<String> flagList = new ArrayList<String>();
         ArrayList<MCRMetaLangText> internalList = getFlagsAsMCRMetaLangText(type);
-        for(MCRMetaLangText metaLangText : internalList) {
+        for (MCRMetaLangText metaLangText : internalList) {
             flagList.add(metaLangText.getText());
         }
         return flagList;
@@ -353,7 +356,7 @@ public class MCRObjectService {
      * @return a flag string
      */
     public final String getFlag(int index) throws IndexOutOfBoundsException {
-        if ((index < 0) || (index > flags.size())) {
+        if (index < 0 || index > flags.size()) {
             throw new IndexOutOfBoundsException("Index error in getFlag.");
         }
         return flags.get(index).getText();
@@ -367,10 +370,10 @@ public class MCRObjectService {
      * @return a flag type
      */
     public final String getFlagType(int index) throws IndexOutOfBoundsException {
-        if ((index < 0) || (index > flags.size())) {
+        if (index < 0 || index > flags.size()) {
             throw new IndexOutOfBoundsException("Index error in getFlagType.");
         }
-        return flags.get(index).getType();       
+        return flags.get(index).getType();
     }
 
     /**
@@ -381,7 +384,7 @@ public class MCRObjectService {
      * @return true if the flag was found in the list
      */
     public final boolean isFlagSet(String value) {
-        if ((value == null) || ((value = value.trim()).length() == 0)) {
+        if (value == null || (value = value.trim()).length() == 0) {
             return false;
         }
 
@@ -403,8 +406,9 @@ public class MCRObjectService {
      */
     public final boolean isFlagTypeSet(String type) {
         ArrayList<MCRMetaLangText> internalList = getFlagsAsMCRMetaLangText(type);
-        if(internalList.size() > 0)
+        if (internalList.size() > 0) {
             return true;
+        }
         return false;
     }
 
@@ -417,13 +421,13 @@ public class MCRObjectService {
      *                throw this exception, if the index is false
      */
     public final void removeFlag(int index) throws IndexOutOfBoundsException {
-        if ((index < 0) || (index > flags.size())) {
+        if (index < 0 || index > flags.size()) {
             throw new IndexOutOfBoundsException("Index error in removeFlag.");
         }
 
         flags.remove(index);
     }
-    
+
     /**
      * This method removes all flags of the specified type from
      * the flag list.
@@ -447,10 +451,10 @@ public class MCRObjectService {
      *                throw this exception, if the index is false
      */
     public final void replaceFlag(int index, String value) throws IndexOutOfBoundsException {
-        if ((index < 0) || (index > flags.size())) {
+        if (index < 0 || index > flags.size()) {
             throw new IndexOutOfBoundsException("Index error in replaceFlag.");
         }
-        if ((value == null) || ((value = value.trim()).length() == 0)) {
+        if (value == null || (value = value.trim()).length() == 0) {
             return;
         }
         MCRMetaLangText oldFlag = flags.get(index);
@@ -469,10 +473,10 @@ public class MCRObjectService {
      *                throw this exception, if the index is false
      */
     public final void replaceFlagType(int index, String value) throws IndexOutOfBoundsException {
-        if ((index < 0) || (index > flags.size())) {
+        if (index < 0 || index > flags.size()) {
             throw new IndexOutOfBoundsException("Index error in replaceFlag.");
         }
-        if ((value == null) || ((value = value.trim()).length() == 0)) {
+        if (value == null || (value = value.trim()).length() == 0) {
             return;
         }
         MCRMetaLangText oldFlag = flags.get(index);
@@ -492,7 +496,7 @@ public class MCRObjectService {
         if (condition == null) {
             return;
         }
-        if ((permission == null) || ((permission = permission.trim()).length() == 0)) {
+        if (permission == null || (permission = permission.trim()).length() == 0) {
             return;
         }
         if (getRuleIndex(permission) == -1) {
@@ -517,8 +521,9 @@ public class MCRObjectService {
      */
     public final int getRuleIndex(String permission) {
         int ret = -1;
-        if ((permission == null) || (permission.trim().length() == 0))
+        if (permission == null || permission.trim().length() == 0) {
             return ret;
+        }
         for (int i = 0; i < rules.size(); i++) {
             if (rules.get(i).getPermission().equals(permission)) {
                 ret = i;
@@ -536,7 +541,7 @@ public class MCRObjectService {
      * @return a the MCRMetaAccessRule instance
      */
     public final MCRMetaAccessRule getRule(int index) throws IndexOutOfBoundsException {
-        if ((index < 0) || (index > rules.size())) {
+        if (index < 0 || index > rules.size()) {
             throw new IndexOutOfBoundsException("Index error in getRule.");
         }
         return rules.get(index);
@@ -551,7 +556,7 @@ public class MCRObjectService {
      * @return a rule permission string
      */
     public final String getRulePermission(int index) throws IndexOutOfBoundsException {
-        if ((index < 0) || (index > rules.size())) {
+        if (index < 0 || index > rules.size()) {
             throw new IndexOutOfBoundsException("Index error in getRulePermission.");
         }
         return rules.get(index).getPermission();
@@ -566,7 +571,7 @@ public class MCRObjectService {
      *                throw this exception, if the index is false
      */
     public final void removeRule(int index) throws IndexOutOfBoundsException {
-        if ((index < 0) || (index > rules.size())) {
+        if (index < 0 || index > rules.size()) {
             throw new IndexOutOfBoundsException("Index error in removeRule.");
         }
         rules.remove(index);
@@ -653,7 +658,7 @@ public class MCRObjectService {
      * @return the index number or -1 if the value was not found
      */
     public final int getFlagIndex(String value) {
-        if ((value == null) || ((value = value.trim()).length() == 0)) {
+        if (value == null || (value = value.trim()).length() == 0) {
             return -1;
         }
         for (int i = 0; i < flags.size(); i++) {

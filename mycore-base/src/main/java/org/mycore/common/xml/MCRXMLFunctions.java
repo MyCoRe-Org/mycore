@@ -30,10 +30,6 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
-
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -88,7 +84,8 @@ public class MCRXMLFunctions {
      * @return QueryServlet-Link
      */
     public static String getQueryServlet(String hostAlias) {
-        return getBaseLink(hostAlias).append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(QUERY_SUFFIX).toString())).toString();
+        return getBaseLink(hostAlias).append(
+                CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(QUERY_SUFFIX).toString())).toString();
     }
 
     /**
@@ -99,13 +96,14 @@ public class MCRXMLFunctions {
      * @return FileNodeServlet-Link
      */
     public static String getIFSServlet(String hostAlias) {
-        return getBaseLink(hostAlias).append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(IFS_SUFFIX).toString())).toString();
+        return getBaseLink(hostAlias).append(
+                CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(IFS_SUFFIX).toString())).toString();
     }
 
     public static StringBuffer getBaseLink(String hostAlias) {
         StringBuffer returns = new StringBuffer();
-        returns.append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(PROTOCOLL_SUFFIX).toString(), "http")).append("://").append(
-                CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(HOST_SUFFIX).toString()));
+        returns.append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(PROTOCOLL_SUFFIX).toString(), "http"))
+                .append("://").append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(HOST_SUFFIX).toString()));
         String port = CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(PORT_SUFFIX).toString(), DEFAULT_PORT);
         if (!port.equals(DEFAULT_PORT)) {
             returns.append(":").append(port);
@@ -120,16 +118,16 @@ public class MCRXMLFunctions {
     public static String formatISODate(String isoDate, String isoFormat, String simpleFormat, String iso639Language) throws ParseException {
         if (LOGGER.isDebugEnabled()) {
             StringBuffer sb = new StringBuffer("isoDate=");
-            sb.append(isoDate).append(", simpleFormat=").append(simpleFormat).append(", isoFormat=").append(isoFormat).append(", iso649Language=").append(
-                    iso639Language);
+            sb.append(isoDate).append(", simpleFormat=").append(simpleFormat).append(", isoFormat=").append(isoFormat).append(
+                    ", iso649Language=").append(iso639Language);
             LOGGER.debug(sb.toString());
         }
         Locale locale = new Locale(iso639Language);
         MCRMetaISO8601Date mcrdate = new MCRMetaISO8601Date();
         mcrdate.setFormat(isoFormat);
         mcrdate.setDate(isoDate);
-        String formatted=mcrdate.format(simpleFormat, locale);
-        return (formatted == null) ? "?" + isoDate + "?" : formatted;
+        String formatted = mcrdate.format(simpleFormat, locale);
+        return formatted == null ? "?" + isoDate + "?" : formatted;
     }
 
     public static String getISODate(String simpleDate, String simpleFormat, String isoFormat) throws ParseException {
@@ -138,7 +136,7 @@ public class MCRXMLFunctions {
             date = new Date(Long.parseLong(simpleDate));
         } else {
             SimpleDateFormat df = new SimpleDateFormat(simpleFormat);
-            df.setTimeZone(TimeZone.getTimeZone("UTC")); 
+            df.setTimeZone(TimeZone.getTimeZone("UTC"));
             // or else testcase
             // "1964-02-24" would
             // result "1964-02-23"
@@ -169,7 +167,7 @@ public class MCRXMLFunctions {
         }
         return result.getNumHits();
     }
-    
+
     /**
      * @return true if the given object has an urn assigned, false otherwise
      * */
@@ -184,7 +182,7 @@ public class MCRXMLFunctions {
             return false;
         }
     }
-    
+
     /**
      * @return true if the given object is allowed for urn assignment
      * */
@@ -212,14 +210,14 @@ public class MCRXMLFunctions {
      *         objects, <code>false</code> otherwise
      */
     private static boolean isAllowedObject(String givenType) {
-        if (givenType == null)
+        if (givenType == null) {
             return false;
+        }
 
         String propertyName = "URN.Enabled.Objects";
         String propertyValue = MCRConfiguration.instance().getString(propertyName);
         if (propertyValue == null || propertyValue.length() == 0) {
-            LOGGER.warn("URN assignment disabled as the property \"" + propertyName
-                    + "\" is not set");
+            LOGGER.warn("URN assignment disabled as the property \"" + propertyName + "\" is not set");
             return false;
         }
 
@@ -229,18 +227,18 @@ public class MCRXMLFunctions {
                 return true;
             }
         }
-        LOGGER.warn("URN assignment disabled as the object type " + givenType
-                + " is not in the list of allowed objects. See property \"" + propertyName + "\"");
+        LOGGER.warn("URN assignment disabled as the object type " + givenType + " is not in the list of allowed objects. See property \""
+                + propertyName + "\"");
         return false;
     }
-    
-    public static boolean classAvailable(String className){
+
+    public static boolean classAvailable(String className) {
         try {
             Class.forName(className);
-            LOGGER.debug("found class: "+className);
+            LOGGER.debug("found class: " + className);
             return true;
         } catch (ClassNotFoundException e) {
-            LOGGER.debug("did not found class: "+className);
+            LOGGER.debug("did not found class: " + className);
             return false;
         }
     }

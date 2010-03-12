@@ -43,10 +43,13 @@ public class MCROrCondition extends MCRSetCondition {
         addChild(secondchild);
     }
 
+    @Override
     public boolean evaluate(Object o) {
-        for (MCRCondition child : children)
-            if (child.evaluate(o))
+        for (MCRCondition child : children) {
+            if (child.evaluate(o)) {
                 return true;
+            }
+        }
         return false;
     }
 }

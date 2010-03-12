@@ -93,8 +93,9 @@ public class MCRDefaultQueryEngine extends MCRBaseClass implements MCRQueryEngin
      */
     private void sortResults(MCRQuery query, final MCRResults results) {
         List<MCRSortBy> sortBy = query.getSortBy();
-        if ((results.getNumHits() == 0) || results.isSorted() || sortBy.isEmpty())
+        if (results.getNumHits() == 0 || results.isSorted() || sortBy.isEmpty()) {
             return;
+        }
 
         // Iterator over all MCRHits that have no sort data set
         Iterator<MCRHit> hitIterator = new Iterator<MCRHit>() {
@@ -107,16 +108,19 @@ public class MCRDefaultQueryEngine extends MCRBaseClass implements MCRQueryEngin
             }
 
             public boolean hasNext() {
-                for (; i < max; i++)
-                    if (!results.getHit(i).hasSortData())
+                for (; i < max; i++) {
+                    if (!results.getHit(i).hasSortData()) {
                         return true;
+                    }
+                }
 
                 return false;
             }
 
             public MCRHit next() {
-                if (!hasNext())
+                if (!hasNext()) {
                     throw new NoSuchElementException();
+                }
 
                 return results.getHit(i++);
             }
@@ -139,18 +143,20 @@ public class MCRDefaultQueryEngine extends MCRBaseClass implements MCRQueryEngin
      * If the fields come from multiple indexes, the constant mixed is returned.
      */
     private String getIndex(MCRCondition cond) {
-        if (cond instanceof MCRQueryCondition)
+        if (cond instanceof MCRQueryCondition) {
             return ((MCRQueryCondition) cond).getField().getIndex();
-        else if (cond instanceof MCRNotCondition)
+        } else if (cond instanceof MCRNotCondition) {
             return getIndex(((MCRNotCondition) cond).getChild());
+        }
 
         List<MCRCondition> children = ((MCRSetCondition) cond).getChildren();
 
         String index = getIndex(children.get(0));
         for (int i = 1; i < children.size(); i++) {
             String other = getIndex(children.get(i));
-            if (!index.equals(other))
+            if (!index.equals(other)) {
                 return mixed; // mixed indexes here!
+            }
         }
         return index;
     }
@@ -167,9 +173,11 @@ public class MCRDefaultQueryEngine extends MCRBaseClass implements MCRQueryEngin
             MCRSearcher searcher = MCRSearcherFactory.getSearcherForIndex(index);
             // Filter sort criteria only for those fields of the same index
             List<MCRSortBy> sortByCopy = new ArrayList<MCRSortBy>();
-            for (MCRSortBy sb : sortBy)
-                if (sb.getField().getIndex().equals(index))
+            for (MCRSortBy sb : sortBy) {
+                if (sb.getField().getIndex().equals(index)) {
                     sortByCopy.add(sb);
+                }
+            }
             return searcher.search(cond, maxResults, sortByCopy, addSortData);
         } else if (cond instanceof MCRSetCondition) {
             return buildCombinedResults((MCRSetCondition) cond, sortBy, false);
@@ -181,7 +189,7 @@ public class MCRDefaultQueryEngine extends MCRBaseClass implements MCRQueryEngin
 
     /** Split query into subqueries for each index, recombine results */
     private MCRResults buildCombinedResults(MCRSetCondition cond, List<MCRSortBy> sortBy, boolean not) {
-        boolean and = (cond instanceof MCRAndCondition);
+        boolean and = cond instanceof MCRAndCondition;
         HashMap<String, List<MCRCondition>> table = groupConditionsByIndex(cond);
         List<MCRResults> results = new LinkedList<MCRResults>();
 
@@ -191,18 +199,21 @@ public class MCRDefaultQueryEngine extends MCRBaseClass implements MCRQueryEngin
             if (!index.equals(mixed)) {
                 MCRCondition subCond = buildSubCondition(conditions, and, not);
                 results.add(buildResults(subCond, 0, sortBy, true));
-            } else
+            } else {
                 for (MCRCondition subCond : conditions) {
-                    if (not)
+                    if (not) {
                         subCond = new MCRNotCondition(subCond);
+                    }
                     results.add(buildResults(subCond, 0, sortBy, true));
                 }
+            }
         }
 
-        if (and)
+        if (and) {
             return MCRResults.intersect(results.toArray(new MCRResults[0]));
-        else
+        } else {
             return MCRResults.union(results.toArray(new MCRResults[0]));
+        }
     }
 
     /**
@@ -228,14 +239,16 @@ public class MCRDefaultQueryEngine extends MCRBaseClass implements MCRQueryEngin
     /** Builds a new condition for all fields from one single index */
     private MCRCondition buildSubCondition(List<MCRCondition> conditions, boolean and, boolean not) {
         MCRCondition subCond;
-        if (conditions.size() == 1)
+        if (conditions.size() == 1) {
             subCond = conditions.get(0);
-        else if (and)
+        } else if (and) {
             subCond = new MCRAndCondition().addAll(conditions);
-        else
+        } else {
             subCond = new MCROrCondition().addAll(conditions);
-        if (not)
+        }
+        if (not) {
             subCond = new MCRNotCondition(subCond);
+        }
         return subCond;
     }
 }

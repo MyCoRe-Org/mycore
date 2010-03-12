@@ -32,7 +32,6 @@ import java.util.List;
 
 import org.hibernate.criterion.Projections;
 import org.jdom.Document;
-
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRHibTestCase;
 import org.mycore.common.xml.MCRXMLHelper;

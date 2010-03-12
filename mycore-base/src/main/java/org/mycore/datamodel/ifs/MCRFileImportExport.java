@@ -161,8 +161,8 @@ public class MCRFileImportExport {
             File[] files = local.listFiles();
 
             // For each local child node
-            for (int i = 0; i < files.length; i++) {
-                local = files[i];
+            for (File file : files) {
+                local = file;
                 name = local.getName();
 
                 MCRDirectory internalDir = dir;
@@ -213,9 +213,9 @@ public class MCRFileImportExport {
 
         MCRFilesystemNode[] children = dir.getChildren();
 
-        for (int i = 0; i < children.length; i++) {
-            if (children[i] instanceof MCRFile) {
-                MCRFile internalFile = (MCRFile) (children[i]);
+        for (MCRFilesystemNode element : children) {
+            if (element instanceof MCRFile) {
+                MCRFile internalFile = (MCRFile) element;
                 String name = internalFile.getName();
 
                 File localFile = new File(local, name);
@@ -226,7 +226,7 @@ public class MCRFileImportExport {
                     throw new MCRException("Can't get file content.", ex);
                 }
             } else {
-                MCRDirectory internalDir = (MCRDirectory) (children[i]);
+                MCRDirectory internalDir = (MCRDirectory) element;
                 String name = internalDir.getName();
 
                 File localDir = new File(local, name);

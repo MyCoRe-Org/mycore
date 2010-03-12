@@ -34,7 +34,7 @@ import org.mycore.common.MCRCache;
  * @version $Revision$ $Date$
  */
 public class MCRUploadHandlerManager {
-    protected static MCRCache handlers = new MCRCache(100,"UploadHandlerManager UploadHandlers");
+    protected static MCRCache handlers = new MCRCache(100, "UploadHandlerManager UploadHandlers");
 
     private static Logger logger = Logger.getLogger(MCRUploadHandlerManager.class);
 
@@ -46,7 +46,7 @@ public class MCRUploadHandlerManager {
     public static MCRUploadHandler getHandler(String uploadID) {
         long yesterday = System.currentTimeMillis() - 86400000;
 
-        return (MCRUploadHandler) (handlers.getIfUpToDate(uploadID, yesterday));
+        return (MCRUploadHandler) handlers.getIfUpToDate(uploadID, yesterday);
     }
 
     public static void unregister(String uploadID) {

@@ -79,8 +79,8 @@ public class MCRMetaClassification extends MCRMetaDefault {
      * @exception MCRException if the set_subtag value, the set_classid value or
      * the set_categid are null, empty, too long or not a MCRObjectID
      */
-    public MCRMetaClassification(String set_datapart, String set_subtag, int set_inherted, String set_type, String set_classid, String set_categid)
-            throws MCRException {
+    public MCRMetaClassification(String set_datapart, String set_subtag, int set_inherted, String set_type, String set_classid,
+            String set_categid) throws MCRException {
         super(set_datapart, set_subtag, "en", set_type, set_inherted);
         setValue(set_classid, set_categid);
     }
@@ -115,11 +115,11 @@ public class MCRMetaClassification extends MCRMetaDefault {
      *                empty, too long or not a MCRObjectID
      */
     public final void setValue(String set_classid, String set_categid) throws MCRException {
-        if ((set_classid == null) || ((set_classid = set_classid.trim()).length() == 0)) {
+        if (set_classid == null || (set_classid = set_classid.trim()).length() == 0) {
             throw new MCRException("The classid is empty.");
         }
 
-        if ((set_categid == null) || ((set_categid = set_categid.trim()).length() == 0)) {
+        if (set_categid == null || (set_categid = set_categid.trim()).length() == 0) {
             throw new MCRException("The categid is empty.");
         }
 
@@ -145,6 +145,7 @@ public class MCRMetaClassification extends MCRMetaDefault {
      *                if the set_classid value or the set_categid are null,
      *                empty, too long or not a MCRObjectID
      */
+    @Override
     public void setFromDOM(org.jdom.Element element) throws MCRException {
         super.setFromDOM(element);
 
@@ -161,6 +162,7 @@ public class MCRMetaClassification extends MCRMetaDefault {
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML MCRClassification part
      */
+    @Override
     public org.jdom.Element createXML() throws MCRException {
         if (!isValid()) {
             throw new MCRException("The content of MCRMetaClassification in subtag " + subtag + " is not valid.");
@@ -168,7 +170,7 @@ public class MCRMetaClassification extends MCRMetaDefault {
 
         org.jdom.Element elm = new org.jdom.Element(subtag);
 
-        if ((type != null) && ((type = type.trim()).length() != 0)) {
+        if (type != null && (type = type.trim()).length() != 0) {
             elm.setAttribute("type", type);
         }
 
@@ -189,6 +191,7 @@ public class MCRMetaClassification extends MCRMetaDefault {
      * 
      * @return a boolean value
      */
+    @Override
     public boolean isValid() {
         if (!super.isValid()) {
             return false;
@@ -199,6 +202,7 @@ public class MCRMetaClassification extends MCRMetaDefault {
     /**
      * This method make a clone of this class.
      */
+    @Override
     public Object clone() {
         return new MCRMetaClassification(datapart, subtag, inherited, type, classid, categid);
     }
@@ -206,6 +210,7 @@ public class MCRMetaClassification extends MCRMetaDefault {
     /**
      * This method put debug data to the logger (for the debug mode).
      */
+    @Override
     public void debug() {
         super.debugDefault();
         LOGGER.debug("ClassID            = " + classid);

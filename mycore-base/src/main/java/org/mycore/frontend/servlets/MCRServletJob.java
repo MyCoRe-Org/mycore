@@ -28,10 +28,6 @@ import java.net.InetAddress;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.hibernate.Transaction;
-
-import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 
 /**
@@ -48,8 +44,6 @@ public class MCRServletJob {
 
     /** The HttpServletResponse object */
     private HttpServletResponse theResponse = null;
-
-    private Transaction transaction = null;
 
     /**
      * The constructor takes the given objects and stores them in private
@@ -82,7 +76,7 @@ public class MCRServletJob {
             String serverIP = InetAddress.getByName(serverName).getHostAddress();
             String remoteIP = MCRServlet.getRemoteAddr(theRequest);
 
-            return (remoteIP.equals(serverIP) || remoteIP.equals("127.0.0.1"));
+            return remoteIP.equals(serverIP) || remoteIP.equals("127.0.0.1");
         } catch (Exception ex) {
             String msg = "Exception while testing if http request was from local host";
             throw new MCRConfigurationException(msg, ex);

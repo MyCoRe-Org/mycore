@@ -48,15 +48,14 @@ import org.hibernate.HibernateException;
 import org.hibernate.ReplicationMode;
 import org.hibernate.Session;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
-
 import org.mycore.backend.hibernate.tables.MCRACCESS;
 import org.mycore.backend.hibernate.tables.MCRACCESSRULE;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRCommand;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.AttributesImpl;
 
 /**
  * This class provides a set of commands for the org.mycore.access package which
@@ -93,16 +92,18 @@ public class MCRHIBCtrlCommands extends MCRAbstractCommands {
         com = new MCRCommand("import acl rules from file {0}", "org.mycore.backend.hibernate.MCRHIBCtrlCommands.importAccessRules String",
                 "Imports all ACL rules from a given file.");
         command.add(com);
-        com = new MCRCommand("export acl mappings to file {0}", "org.mycore.backend.hibernate.MCRHIBCtrlCommands.exportAccessMappings String",
-                "Exports all ACL mappings to a given file.");
+        com = new MCRCommand("export acl mappings to file {0}",
+                "org.mycore.backend.hibernate.MCRHIBCtrlCommands.exportAccessMappings String", "Exports all ACL mappings to a given file.");
         command.add(com);
-        com = new MCRCommand("import acl mappings from file {0}", "org.mycore.backend.hibernate.MCRHIBCtrlCommands.importAccessMappings String",
+        com = new MCRCommand("import acl mappings from file {0}",
+                "org.mycore.backend.hibernate.MCRHIBCtrlCommands.importAccessMappings String",
                 "Imports all ACL mappings from a given file.");
         command.add(com);
         com = new MCRCommand("export entity {0} to file {1}", "org.mycore.backend.hibernate.MCRHIBCtrlCommands.exportEntity String String",
                 "Exports an entity (fully qualified class name) to a given file.");
         command.add(com);
-        com = new MCRCommand("import entity {0} from file {1}", "org.mycore.backend.hibernate.MCRHIBCtrlCommands.importEntity String String",
+        com = new MCRCommand("import entity {0} from file {1}",
+                "org.mycore.backend.hibernate.MCRHIBCtrlCommands.importEntity String String",
                 "Imports an entity (fully qualified class name) from a given file.");
         command.add(com);
     }
@@ -149,8 +150,8 @@ public class MCRHIBCtrlCommands extends MCRAbstractCommands {
     }
 
     @SuppressWarnings("unchecked")
-    private static void exportFile(String file, String rootTag, Class persistedClass) throws FileNotFoundException, UnsupportedEncodingException, IOException,
-            SAXException {
+    private static void exportFile(String file, String rootTag, Class persistedClass) throws FileNotFoundException,
+            UnsupportedEncodingException, IOException, SAXException {
         File exportFile = new File(file);
         if (exportFile.exists() && exportFile.isDirectory()) {
             throw new MCRException(exportFile.getAbsolutePath() + " is a directory.");

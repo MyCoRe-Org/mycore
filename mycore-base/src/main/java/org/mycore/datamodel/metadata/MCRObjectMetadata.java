@@ -128,14 +128,16 @@ public class MCRObjectMetadata {
         int counter = 0;
         while (elements.hasNext()) {
             MCRMetaElement me = elements.next();
-            if (me.getHeritable())
+            if (me.getHeritable()) {
                 me.removeInheritedObject();
+            }
             //remove meta element if empty (else isValid() will fail)
             if (me.size() == 0) {
                 elements.remove();
                 tag_names.remove(counter);
-            } else
+            } else {
                 counter++;
+            }
         }
     }
 
@@ -188,7 +190,7 @@ public class MCRObjectMetadata {
      * @return the MCRMetaElement for the tag
      */
     public final MCRMetaElement getMetadataElement(String tag) {
-        if ((tag == null) || ((tag = tag.trim()).length() == 0)) {
+        if (tag == null || (tag = tag.trim()).length() == 0) {
             return null;
         }
 
@@ -212,7 +214,7 @@ public class MCRObjectMetadata {
      * @return the MCRMetaElement for the index
      */
     public final MCRMetaElement getMetadataElement(int index) {
-        if ((index < 0) || (index > meta_list.size())) {
+        if (index < 0 || index > meta_list.size()) {
             return null;
         }
 
@@ -234,7 +236,7 @@ public class MCRObjectMetadata {
             return false;
         }
 
-        if ((tag == null) || ((tag = tag.trim()).length() == 0)) {
+        if (tag == null || (tag = tag.trim()).length() == 0) {
             return false;
         }
 
@@ -266,7 +268,7 @@ public class MCRObjectMetadata {
      * @return true if set was succesful, otherwise false
      */
     public final MCRMetaElement removeMetadataElement(String tag) {
-        if ((tag == null) || ((tag = tag.trim()).length() == 0)) {
+        if (tag == null || (tag = tag.trim()).length() == 0) {
             return null;
         }
 
@@ -289,7 +291,7 @@ public class MCRObjectMetadata {
      * @return true if set was succesful, otherwise false
      */
     public final MCRMetaElement removeMetadataElement(int index) {
-        if ((index < 0) || (index > size())) {
+        if (index < 0 || index > size()) {
             return null;
         }
 
@@ -310,7 +312,7 @@ public class MCRObjectMetadata {
     public final void setFromDOM(org.jdom.Element element) throws MCRException {
         String temp_lang = element.getAttributeValue("lang");
 
-        if ((temp_lang != null) && ((temp_lang = temp_lang.trim()).length() != 0)) {
+        if (temp_lang != null && (temp_lang = temp_lang.trim()).length() != 0) {
             default_lang = temp_lang;
         }
 
@@ -322,7 +324,7 @@ public class MCRObjectMetadata {
             org.jdom.Element subtag = (org.jdom.Element) elements_list.get(i);
             temp_tag = subtag.getName();
 
-            if ((temp_tag == null) || ((temp_tag = temp_tag.trim()).length() == 0)) {
+            if (temp_tag == null || (temp_tag = temp_tag.trim()).length() == 0) {
                 throw new MCRException("MCRObjectMetadata : The tag is null or empty.");
             }
 

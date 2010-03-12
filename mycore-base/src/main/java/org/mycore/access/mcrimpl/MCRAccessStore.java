@@ -74,9 +74,11 @@ public abstract class MCRAccessStore {
 
     final protected static String sqlDateformat = "yyyy-MM-dd HH:mm:ss";
 
-    final protected static String SQLAccessCtrlRule = MCRConfiguration.instance().getString("MCR.Persistence.Access.Store.Table.Rule", "MCRACCESSRULE");
+    final protected static String SQLAccessCtrlRule = MCRConfiguration.instance().getString("MCR.Persistence.Access.Store.Table.Rule",
+            "MCRACCESSRULE");
 
-    final protected static String SQLAccessCtrlMapping = MCRConfiguration.instance().getString("MCR.Persistence.Access.Store.Table.Map", "MCRACCESS");
+    final protected static String SQLAccessCtrlMapping = MCRConfiguration.instance().getString("MCR.Persistence.Access.Store.Table.Map",
+            "MCRACCESS");
 
     final protected static String AccessPools = MCRConfiguration.instance().getString("MCR.AccessPools", "read,write,delete");
 
@@ -125,8 +127,9 @@ public abstract class MCRAccessStore {
 
             if (MCRConfiguration.instance().getBoolean("MCR.Metadata.Type." + type)) {
                 elements = MCRXMLTableManager.instance().listIDsOfType(type);
-            } else
+            } else {
                 return Collections.emptySet();
+            }
 
             for (String element : elements) {
                 def = new MCRAccessDefinition();

@@ -71,6 +71,7 @@ public class MCRDataExtractorMP3 extends MCRDataExtractor {
         p.put("yearReleased", "getYearReleased");
     }
 
+    @Override
     protected String getSupportedContentTypeIDs() {
         return "mp3";
     }
@@ -98,6 +99,7 @@ public class MCRDataExtractorMP3 extends MCRDataExtractor {
         return newID;
     }
 
+    @Override
     protected void extractData(Element container, InputStream in) throws Exception {
         File f = File.createTempFile(buildTempID(), "mp3");
         OutputStream out = new BufferedOutputStream(new FileOutputStream(f));
@@ -110,18 +112,21 @@ public class MCRDataExtractorMP3 extends MCRDataExtractor {
         addDataValue(container, "frequency", String.valueOf(mp3.getFrequency()));
 
         try {
-            if (mp3.hasID3v1Tag())
+            if (mp3.hasID3v1Tag()) {
                 extractTagData(container, "ID3v1", mp3.getID3v1Tag());
+            }
         } catch (Exception ignored) {
         }
         try {
-            if (mp3.hasID3v2Tag())
+            if (mp3.hasID3v2Tag()) {
                 extractTagData(container, "ID3v2", mp3.getID3v2Tag());
+            }
         } catch (Exception ignored) {
         }
         try {
-            if (mp3.hasLyrics3Tag())
+            if (mp3.hasLyrics3Tag()) {
                 extractTagData(container, "Lyrics3", mp3.getLyrics3Tag());
+            }
         } catch (Exception ignored) {
         }
 
@@ -138,19 +143,20 @@ public class MCRDataExtractorMP3 extends MCRDataExtractor {
         Element parent = new Element(parentName);
 
         for (Enumeration keys = p.keys(); keys.hasMoreElements();) {
-            String key = (String) (keys.nextElement());
+            String key = (String) keys.nextElement();
             String method = p.getProperty(key);
             try {
-                Method m = tag.getClass().getMethod(method, new Class[]{});
-                String value = (String) (m.invoke(tag, new Object[]{}));
+                Method m = tag.getClass().getMethod(method, new Class[] {});
+                String value = (String) m.invoke(tag, new Object[] {});
                 addDataValue(parent, key, value);
             } catch (Exception ex) {
                 continue;
             }
         }
 
-        if (parent.getChildren().size() > 0)
+        if (parent.getChildren().size() > 0) {
             root.addContent(parent);
+        }
     }
 
     /**

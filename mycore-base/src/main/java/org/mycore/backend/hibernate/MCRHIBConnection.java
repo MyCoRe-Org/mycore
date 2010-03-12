@@ -214,8 +214,9 @@ public class MCRHIBConnection implements Closeable {
     }
 
     public void close() {
-        if (SESSION_FACTORY == null)
+        if (SESSION_FACTORY == null) {
             return;
+        }
         LOGGER.debug("Closing hibernate sessions.");
         Statistics stats = SESSION_FACTORY.getStatistics();
         if (stats.isStatisticsEnabled()) {

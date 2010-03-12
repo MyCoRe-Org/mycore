@@ -1,6 +1,5 @@
 package org.mycore.frontend.indexbrowser.lucene;
 
-
 /**
  * Contains all incoming data from the web browser.
  *
@@ -9,11 +8,17 @@ package org.mycore.frontend.indexbrowser.lucene;
 public class MCRIndexBrowserIncomingData {
 
     private String searchclass;
+
     private int from = 0;
+
     private int to = Integer.MAX_VALUE - 10;
+
     private StringBuffer path;
+
     private String search;
+
     private String mode;
+
     private boolean init;
 
     public MCRIndexBrowserIncomingData(String search, String mode, String searchclass, String fromTo, String init) {
@@ -24,8 +29,8 @@ public class MCRIndexBrowserIncomingData {
         this.search = search;
         this.mode = mode;
         this.searchclass = searchclass;
-        this.path = new StringBuffer(this.searchclass);
-        this.path.append("/");
+        path = new StringBuffer(this.searchclass);
+        path.append("/");
         if (fromTo != null && fromTo.length() > 0) {
             String from = fromTo.substring(0, fromTo.indexOf("-"));
             String to = fromTo.substring(fromTo.indexOf("-") + 1);
@@ -37,30 +42,36 @@ public class MCRIndexBrowserIncomingData {
     }
 
     private void updatePath() {
-        path.append(this.from);
+        path.append(from);
         path.append("-");
-        path.append(this.to);
+        path.append(to);
         path.append("/");
     }
-    
+
     public String getSearchclass() {
         return searchclass;
     }
+
     public int getFrom() {
         return from;
     }
+
     public int getTo() {
         return to;
     }
+
     public String getPath() {
         return path.toString();
     }
+
     public String getSearch() {
         return search;
     }
+
     public String getMode() {
         return mode;
     }
+
     public boolean isInit() {
         return init;
     }

@@ -33,7 +33,6 @@ import org.apache.axis.constants.Style;
 import org.apache.axis.constants.Use;
 import org.apache.axis.description.OperationDesc;
 import org.apache.axis.description.ParameterDesc;
-
 import org.jdom.Document;
 import org.jdom.input.DOMBuilder;
 
@@ -61,7 +60,8 @@ public class MCRQueryClientWebService extends MCRQueryClientBase {
         // Build doQuery operation description
         operation = new OperationDesc();
         operation.setName("MCRDoQuery");
-        operation.addParameter(new ParameterDesc(new QName("", "in0"), ParameterDesc.IN, new QName("http://xml.apache.org/xml-soap", "Document"), org.w3c.dom.Document.class, false, false));
+        operation.addParameter(new ParameterDesc(new QName("", "in0"), ParameterDesc.IN, new QName("http://xml.apache.org/xml-soap",
+                "Document"), org.w3c.dom.Document.class, false, false));
         operation.setReturnType(new QName(xmlsoap, "Document"));
         operation.setReturnClass(org.w3c.dom.Document.class);
         operation.setReturnQName(new QName("", "MCRDoQueryReturn"));
@@ -81,32 +81,35 @@ public class MCRQueryClientWebService extends MCRQueryClientBase {
      * 
      * @param xmlhost an entry of a remote host from hosts.xml
      */
+    @Override
     public void init(org.jdom.Element xmlhost) {
         alias = xmlhost.getAttributeValue("alias");
-        if ((alias == null) || ((alias = alias.trim()).length() == 0)) {
+        if (alias == null || (alias = alias.trim()).length() == 0) {
             alias = "remote";
             LOGGER.warn("The alias attribute for the host is null or empty, remote was set.");
         }
         url = xmlhost.getAttributeValue("url");
-        if ((url == null) || ((url = url.trim()).length() == 0)) {
+        if (url == null || (url = url.trim()).length() == 0) {
             url = "http://localhost:8291/";
             LOGGER.warn("The url attribute for the host is null or empty, http://localhost:8291/ was set.");
         }
         access = xmlhost.getAttributeValue("access");
-        if ((access == null) || ((access = access.trim()).length() == 0)) {
+        if (access == null || (access = access.trim()).length() == 0) {
             alias = "webservice";
             LOGGER.warn("The access attribute for the host is null or empty, webservice was set.");
         }
         servicepath = xmlhost.getAttributeValue("servicepath");
-        if ((servicepath == null) || ((servicepath = servicepath.trim()).length() == 0)) {
+        if (servicepath == null || (servicepath = servicepath.trim()).length() == 0) {
             alias = "services/MCRWebService";
             LOGGER.warn("The servicepath attribute for the host is null or empty, services/MCRWebService was set.");
         }
         StringBuffer sb = new StringBuffer(256);
-        sb.append("Host ").append(alias).append(" with access mode ").append(access).append(" uses host url ").append(url).append(servicepath);
+        sb.append("Host ").append(alias).append(" with access mode ").append(access).append(" uses host url ").append(url).append(
+                servicepath);
         LOGGER.debug(sb.toString());
-        if (!url.endsWith("/"))
+        if (!url.endsWith("/")) {
             url = url + "/";
+        }
         endpoint = url + servicepath;
     }
 
@@ -118,16 +121,17 @@ public class MCRQueryClientWebService extends MCRQueryClientBase {
      * @param results
      *            the result list to add the hits to
      */
+    @Override
     public void search(org.w3c.dom.Document inDoc, MCRResults results) {
         try {
             // Build webservice call
-            Call call = (Call) (service.createCall());
+            Call call = (Call) service.createCall();
             call.setTargetEndpointAddress(new URL(endpoint));
             call.setOperation(operation);
             call.setOperationName("MCRDoQuery");
 
             // Call webservice
-            org.w3c.dom.Document outDoc = (org.w3c.dom.Document) (call.invoke(new Object[] { inDoc }));
+            org.w3c.dom.Document outDoc = (org.w3c.dom.Document) call.invoke(new Object[] { inDoc });
             LOGGER.info("Received remote query results, processing XML now");
 
             // Process xml response
@@ -138,7 +142,7 @@ public class MCRQueryClientWebService extends MCRQueryClientBase {
         } catch (Exception ex) {
             String msg = "Exception while querying remote host " + alias;
             LOGGER.error(msg, ex);
-            results.setHostConnection(alias, msg+ " : "+ex.getLocalizedMessage());
+            results.setHostConnection(alias, msg + " : " + ex.getLocalizedMessage());
         }
     }
 
@@ -151,15 +155,16 @@ public class MCRQueryClientWebService extends MCRQueryClientBase {
      *            the ID of the object to retrieve
      * @return the object document
      */
+    @Override
     public org.w3c.dom.Document doRetrieveObject(String ID) {
         try {
             // Build webservice call
-            Call call = (Call) (service.createCall());
+            Call call = (Call) service.createCall();
             call.setTargetEndpointAddress(new URL(endpoint));
             call.setOperation(operation);
             call.setOperationName("MCRDoRetrieveObject");
             // Call webservice
-            org.w3c.dom.Document outDoc = (org.w3c.dom.Document) (call.invoke(new Object[] { ID }));
+            org.w3c.dom.Document outDoc = (org.w3c.dom.Document) call.invoke(new Object[] { ID });
             LOGGER.info("Received remote Object: " + ID);
 
             return outDoc;
@@ -186,12 +191,14 @@ public class MCRQueryClientWebService extends MCRQueryClientBase {
      *            editor['['formatAlias']']|metadata
      * @return the classification document
      */
+    @Override
     public org.w3c.dom.Document doRetrieveClassification(String level, String type, String classID, String categID, String format) {
         StringBuffer ID = new StringBuffer(256);
-        ID.append("level=").append(level).append(":type=").append(type).append(":classId=").append(classID).append(":categId=").append(categID);
+        ID.append("level=").append(level).append(":type=").append(type).append(":classId=").append(classID).append(":categId=").append(
+                categID);
         try {
             // Build webservice call
-            Call call = (Call) (service.createCall());
+            Call call = (Call) service.createCall();
             call.setTargetEndpointAddress(new URL(endpoint));
             call.setOperation(operation);
             call.setOperationName("MCRDoRetrieveClassification");
@@ -203,7 +210,7 @@ public class MCRQueryClientWebService extends MCRQueryClientBase {
             call.addParameter("format", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
             call.setReturnType(new QName("http://xml.apache.org/xml-soap", "Document"));
             // Call webservice
-            org.w3c.dom.Document outDoc = (org.w3c.dom.Document) (call.invoke(new Object[] { level, type, classID, categID, format }));
+            org.w3c.dom.Document outDoc = (org.w3c.dom.Document) call.invoke(new Object[] { level, type, classID, categID, format });
             LOGGER.info("Received remote Object: " + ID.toString());
 
             return outDoc;
@@ -227,12 +234,13 @@ public class MCRQueryClientWebService extends MCRQueryClientBase {
      *            the type of the link
      * @return the mcr:result document
      */
+    @Override
     public org.w3c.dom.Document doRetrieveLinks(String from, String to, String type) {
         StringBuffer ID = new StringBuffer(256);
         ID.append("from=").append(from).append(":to=").append(to).append(":type=").append(type);
         try {
             // Build webservice call
-            Call call = (Call) (service.createCall());
+            Call call = (Call) service.createCall();
             call.setTargetEndpointAddress(new URL(endpoint));
             call.setOperation(operation);
             call.setOperationName("MCRDoRetrieveLinks");
@@ -242,7 +250,7 @@ public class MCRQueryClientWebService extends MCRQueryClientBase {
             call.addParameter("type", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
             call.setReturnType(new QName("http://xml.apache.org/xml-soap", "Document"));
             // Call webservice
-            org.w3c.dom.Document outDoc = (org.w3c.dom.Document) (call.invoke(new Object[] { from, to, type }));
+            org.w3c.dom.Document outDoc = (org.w3c.dom.Document) call.invoke(new Object[] { from, to, type });
             LOGGER.info("Received remote Object: " + ID.toString());
 
             return outDoc;

@@ -60,15 +60,18 @@ public class MCRFileTest extends MCRTestCase {
         store = MCRFileStore.getStore("TEST");
     }
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
-        if (store == null)
+        if (store == null) {
             createStore();
-        else
+        } else {
             VFS.getManager().resolveFile(store.getBaseDir()).createFolder();
+        }
         col = store.create();
     }
 
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
         VFS.getManager().resolveFile(store.getBaseDir()).delete(Selectors.SELECT_ALL);
@@ -101,7 +104,7 @@ public class MCRFileTest extends MCRTestCase {
         file.setContent(MCRContent.readFrom(content));
         assertFalse(MCRFile.MD5_OF_EMPTY_FILE.equals(file.getMD5()));
         MCRFileCollection col2 = store.retrieve(col.getID());
-        MCRFile child = (MCRFile) (col2.getChild("foo.txt"));
+        MCRFile child = (MCRFile) col2.getChild("foo.txt");
         assertEquals(file.getMD5(), child.getMD5());
     }
 
@@ -151,7 +154,7 @@ public class MCRFileTest extends MCRTestCase {
         RandomAccessContent rac = file.getRandomAccessContent();
         rac.skipBytes(6);
         InputStream in = rac.getInputStream();
-        char c = (char) (in.read());
+        char c = (char) in.read();
         assertEquals('W', c);
         in.close();
         rac.close();
@@ -175,7 +178,7 @@ public class MCRFileTest extends MCRTestCase {
         assertEquals(2, file.getLabels().size());
         assertEquals("english", file.getLabel("en"));
         MCRFileCollection col2 = store.retrieve(col.getID());
-        MCRFile child = (MCRFile) (col2.getChild("foo.txt"));
+        MCRFile child = (MCRFile) col2.getChild("foo.txt");
         assertEquals(2, child.getLabels().size());
         file.clearLabels();
         assertTrue(file.getLabels().isEmpty());

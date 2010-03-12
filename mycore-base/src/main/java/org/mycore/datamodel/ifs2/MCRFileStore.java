@@ -48,7 +48,7 @@ public class MCRFileStore extends MCRStore {
      * @return the store with that ID
      */
     public static MCRFileStore getStore(String type) {
-        return (MCRFileStore) (MCRStore.getStore(type));
+        return (MCRFileStore) MCRStore.getStore(type);
     }
 
     /**
@@ -90,10 +90,11 @@ public class MCRFileStore extends MCRStore {
      */
     public MCRFileCollection retrieve(int id) throws Exception {
         FileObject fo = getSlot(id);
-        if (!fo.exists())
+        if (!fo.exists()) {
             return null;
-        else
+        } else {
             return new MCRFileCollection(this, id);
+        }
     }
 
     /**
@@ -102,7 +103,8 @@ public class MCRFileStore extends MCRStore {
      * @throws Exception
      */
     public void repairAllMetadata() throws Exception {
-        for (Iterator<Integer> e = listIDs(MCRStore.ASCENDING); e.hasNext();)
+        for (Iterator<Integer> e = listIDs(MCRStore.ASCENDING); e.hasNext();) {
             retrieve(e.next()).repairMetadata();
+        }
     }
 }

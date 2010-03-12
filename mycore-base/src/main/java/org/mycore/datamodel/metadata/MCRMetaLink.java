@@ -124,7 +124,7 @@ public class MCRMetaLink extends MCRMetaDefault {
     public void setReference(String set_href, String set_label, String set_title) throws MCRException {
         linktype = "locator";
 
-        if ((set_href == null) || ((set_href = set_href.trim()).length() == 0)) {
+        if (set_href == null || (set_href = set_href.trim()).length() == 0) {
             throw new MCRException("The href value is null or empty.");
         }
 
@@ -158,12 +158,12 @@ public class MCRMetaLink extends MCRMetaDefault {
     public void setBiLink(String set_from, String set_to, String set_title) throws MCRException {
         linktype = "arc";
 
-        if ((set_from == null) || ((set_from = set_from.trim()).length() == 0)) {
+        if (set_from == null || (set_from = set_from.trim()).length() == 0) {
             throw new MCRException("The from value is null or empty.");
         }
         from = set_from.trim();
 
-        if ((set_to == null) || ((set_to = set_to.trim()).length() == 0)) {
+        if (set_to == null || (set_to = set_to.trim()).length() == 0) {
             throw new MCRException("The to value is null or empty.");
         }
         to = set_to.trim();
@@ -209,8 +209,9 @@ public class MCRMetaLink extends MCRMetaDefault {
      *            the xlink:label
      */
     public final void setXLinkLabel(String label) {
-        if (label != null)
+        if (label != null) {
             this.label = label;
+        }
     }
 
     /**
@@ -229,8 +230,9 @@ public class MCRMetaLink extends MCRMetaDefault {
      *            the xlink:title
      */
     public final void setXLinkTitle(String title) {
-        if (title != null)
+        if (title != null) {
             this.title = title;
+        }
     }
 
     /**
@@ -268,13 +270,13 @@ public class MCRMetaLink extends MCRMetaDefault {
      */
     public final boolean compare(MCRMetaLink input) {
         if (linktype.equals("locator")) {
-            if ((linktype.equals(input.getXLinkType())) && (href.equals(input.getXLinkHref()))) {
+            if (linktype.equals(input.getXLinkType()) && href.equals(input.getXLinkHref())) {
                 return true;
             }
         }
 
         if (linktype.equals("arc")) {
-            if ((linktype.equals(input.getXLinkType())) && (from.equals(input.getXLinkFrom())) && (to.equals(input.getXLinkTo()))) {
+            if (linktype.equals(input.getXLinkType()) && from.equals(input.getXLinkFrom()) && to.equals(input.getXLinkTo())) {
                 return true;
             }
         }
@@ -290,13 +292,14 @@ public class MCRMetaLink extends MCRMetaDefault {
      * @exception MCRException
      *                if the xlink:type is not locator or arc or if href or from and to are null or empty
      */
+    @Override
     public void setFromDOM(org.jdom.Element element) throws MCRException {
         super.setFromDOM(element);
 
         String temp = element.getAttributeValue("type", XLINK_NAMESPACE);
 
-        if ((temp != null) && ((temp = temp.trim()).length() != 0)) {
-            if ((temp.equals("locator")) || (temp.equals("arc"))) {
+        if (temp != null && (temp = temp.trim()).length() != 0) {
+            if (temp.equals("locator") || temp.equals("arc")) {
                 linktype = temp;
             } else {
                 linktype = null;
@@ -327,6 +330,7 @@ public class MCRMetaLink extends MCRMetaDefault {
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML MCRMetaLink part
      */
+    @Override
     public org.jdom.Element createXML() throws MCRException {
         if (!isValid()) {
             debug();
@@ -335,7 +339,7 @@ public class MCRMetaLink extends MCRMetaDefault {
 
         org.jdom.Element elm = new org.jdom.Element(subtag);
         elm.setAttribute("inherited", Integer.toString(inherited));
-        if ((type != null) && ((type = type.trim()).length() != 0)) {
+        if (type != null && (type = type.trim()).length() != 0) {
             elm.setAttribute("type", type);
         }
         elm.setAttribute("type", linktype, XLINK_NAMESPACE);
@@ -343,18 +347,18 @@ public class MCRMetaLink extends MCRMetaDefault {
         if (linktype.equals("locator")) {
             elm.setAttribute("href", href, XLINK_NAMESPACE);
 
-            if ((label != null) && ((label = label.trim()).length() != 0)) {
+            if (label != null && (label = label.trim()).length() != 0) {
                 elm.setAttribute("label", label, XLINK_NAMESPACE);
             }
 
-            if ((title != null) && ((title = title.trim()).length() != 0)) {
+            if (title != null && (title = title.trim()).length() != 0) {
                 elm.setAttribute("title", title, XLINK_NAMESPACE);
             }
         } else {
             elm.setAttribute("from", from, XLINK_NAMESPACE);
             elm.setAttribute("to", to, XLINK_NAMESPACE);
 
-            if ((title != null) && ((title = title.trim()).length() != 0)) {
+            if (title != null && (title = title.trim()).length() != 0) {
                 elm.setAttribute("title", title, XLINK_NAMESPACE);
             }
         }
@@ -373,6 +377,7 @@ public class MCRMetaLink extends MCRMetaDefault {
      * 
      * @return a boolean value
      */
+    @Override
     public boolean isValid() {
         if (!super.isValid()) {
             return false;
@@ -382,7 +387,7 @@ public class MCRMetaLink extends MCRMetaDefault {
             return false;
         }
 
-        if ((!linktype.equals("locator")) && (!linktype.equals("arc"))) {
+        if (!linktype.equals("locator") && !linktype.equals("arc")) {
             return false;
         }
 
@@ -408,6 +413,7 @@ public class MCRMetaLink extends MCRMetaDefault {
     /**
      * This method make a clone of this class.
      */
+    @Override
     public final Object clone() {
         MCRMetaLink out = new MCRMetaLink(datapart, subtag, lang, inherited);
         out.linktype = linktype;
@@ -423,6 +429,7 @@ public class MCRMetaLink extends MCRMetaDefault {
     /**
      * This method put debug data to the logger (for the debug mode).
      */
+    @Override
     public final void debug() {
         super.debugDefault();
         LOGGER.debug("Link Type          = " + linktype);

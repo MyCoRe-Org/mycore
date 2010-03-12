@@ -31,7 +31,10 @@ public class MCRObjectServletTest extends MCRTestCase {
      * Test method for 'org.mycore.frontend.servlets.MCRObjectServlet.getEditorIDFromSearch(String)'
      */
     public void testGetEditorIDFromSearch() {
-        assertEquals("-kykj45qltoitena2ebp9",MCRObjectServlet.getEditorIDFromSearch("http://localhost/docportal/servlets/MCRSearchServlet;jsessionid=D7D4E55A02E93E4FC424A09B493C20BC?mode=results&id=-kykj45qltoitena2ebp9&numPerPage=10"));
+        assertEquals(
+                "-kykj45qltoitena2ebp9",
+                MCRObjectServlet
+                        .getEditorIDFromSearch("http://localhost/docportal/servlets/MCRSearchServlet;jsessionid=D7D4E55A02E93E4FC424A09B493C20BC?mode=results&id=-kykj45qltoitena2ebp9&numPerPage=10"));
     }
 
 }

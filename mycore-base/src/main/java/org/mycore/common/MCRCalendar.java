@@ -25,6 +25,8 @@ package org.mycore.common;
 
 import java.util.Locale;
 
+import org.apache.log4j.Logger;
+
 import com.ibm.icu.text.SimpleDateFormat;
 import com.ibm.icu.util.BuddhistCalendar;
 import com.ibm.icu.util.Calendar;
@@ -34,9 +36,6 @@ import com.ibm.icu.util.GregorianCalendar;
 import com.ibm.icu.util.HebrewCalendar;
 import com.ibm.icu.util.IslamicCalendar;
 import com.ibm.icu.util.JapaneseCalendar;
-
-import org.apache.log4j.Logger;
-import org.mycore.common.MCRException;
 
 /**
  * This class implements all methods for handling calendars in MyCoRe objects
@@ -86,10 +85,12 @@ public class MCRCalendar {
     public static int MAX_JULIAN_DAY_NUMBER = 3182057;
 
     /** all available calendars of ICU */
-    public static String CALENDARS_ICU[] = { TAG_BUDDHIST, TAG_CHINESE, TAG_COPTIC, TAG_ETHIOPIC, TAG_GREGORIAN, TAG_HEBREW, TAG_ISLAMIC, TAG_ISLAMIC_CIVIL, TAG_JAPANESE };
+    public static String CALENDARS_ICU[] = { TAG_BUDDHIST, TAG_CHINESE, TAG_COPTIC, TAG_ETHIOPIC, TAG_GREGORIAN, TAG_HEBREW, TAG_ISLAMIC,
+            TAG_ISLAMIC_CIVIL, TAG_JAPANESE };
 
     /** convert following calendars from input to gregorian */
-    public static String CALENDARS_INPUT[] = { TAG_GREGORIAN, TAG_JULIAN, TAG_ISLAMIC, TAG_BUDDHIST, TAG_COPTIC, TAG_ETHIOPIC, TAG_PERSIC, TAG_JAPANESE, TAG_ARMENIAN, TAG_EGYPTIAN };
+    public static String CALENDARS_INPUT[] = { TAG_GREGORIAN, TAG_JULIAN, TAG_ISLAMIC, TAG_BUDDHIST, TAG_COPTIC, TAG_ETHIOPIC, TAG_PERSIC,
+            TAG_JAPANESE, TAG_ARMENIAN, TAG_EGYPTIAN };
 
     /**
      * This method convert a ancient date to a GregorianCalendar value. For
@@ -135,8 +136,7 @@ public class MCRCalendar {
         // check input
         String calstrtmp = checkCalendarName(calstr);
         Calendar cal = checkHistoryDate(datestr, last, calstrtmp);
-        
-        
+
         GregorianCalendar gcal = new GregorianCalendar();
         int year = 0;
         int mon = 0;
@@ -144,7 +144,9 @@ public class MCRCalendar {
         int area = 0;
 
         try {
-            if (cal instanceof GregorianCalendar && (calstrtmp.equals(TAG_GREGORIAN) || calstrtmp.equals(TAG_JULIAN) || calstrtmp.equals(TAG_PERSIC) || calstrtmp.equals(TAG_ARMENIAN) || calstrtmp.equals(TAG_EGYPTIAN))) {
+            if (cal instanceof GregorianCalendar
+                    && (calstrtmp.equals(TAG_GREGORIAN) || calstrtmp.equals(TAG_JULIAN) || calstrtmp.equals(TAG_PERSIC)
+                            || calstrtmp.equals(TAG_ARMENIAN) || calstrtmp.equals(TAG_EGYPTIAN))) {
                 gcal = (GregorianCalendar) cal;
             } else if (cal instanceof IslamicCalendar) {
                 gcal.setTime(cal.getTime());
@@ -154,14 +156,15 @@ public class MCRCalendar {
                 day = gcal.get(Calendar.DATE);
                 area = gcal.get(Calendar.ERA);
 
-                if ((10000 * year + 100 * mon + day) <= (15821004)) {
+                if (10000 * year + 100 * mon + day <= 15821004) {
                     // Change Julian to Gregorian
                     int TD = 0;
                     int jh;
-                    if (year % 100 == 0 && mon <= 2)
+                    if (year % 100 == 0 && mon <= 2) {
                         jh = (year - 1) / 100;
-                    else
+                    } else {
                         jh = year / 100;
+                    }
                     int a = jh / 4;
                     int b = jh % 4;
                     TD = 3 * a + b - 2;
@@ -178,8 +181,9 @@ public class MCRCalendar {
                             gcal.set(year, mon - 1, day + TD);
                             TD = 0;
                         }
-                    } else
+                    } else {
                         TD = -TD - 4; // BC
+                    }
                     gcal.add(Calendar.DATE, TD);
                 }
             } else if (cal instanceof CopticCalendar && calstrtmp.equals(TAG_COPTIC)) {
@@ -188,14 +192,15 @@ public class MCRCalendar {
                 mon = gcal.get(Calendar.MONTH) + 1;
                 day = gcal.get(Calendar.DATE);
                 area = gcal.get(Calendar.ERA);
-                if ((10000 * year + 100 * mon + day) <= (15821004)) {
+                if (10000 * year + 100 * mon + day <= 15821004) {
                     // Change julian to gregorian
                     int TD = 0;
                     int jh;
-                    if (year % 100 == 0 && mon <= 2)
+                    if (year % 100 == 0 && mon <= 2) {
                         jh = (year - 1) / 100;
-                    else
+                    } else {
                         jh = year / 100;
+                    }
                     int a = jh / 4;
                     int b = jh % 4;
                     TD = 3 * a + b - 2;
@@ -212,8 +217,9 @@ public class MCRCalendar {
                             gcal.set(year, mon - 1, day + TD);
                             TD = 0;
                         }
-                    } else
+                    } else {
                         TD = -TD - 4; // BC
+                    }
                     gcal.add(Calendar.DATE, TD);
                 }
             } else if (cal instanceof EthiopicCalendar && calstrtmp.equals(TAG_ETHIOPIC)) {
@@ -222,14 +228,15 @@ public class MCRCalendar {
                 mon = gcal.get(Calendar.MONTH) + 1;
                 day = gcal.get(Calendar.DATE);
                 area = gcal.get(Calendar.ERA);
-                if ((10000 * year + 100 * mon + day) <= (15821004)) {
+                if (10000 * year + 100 * mon + day <= 15821004) {
                     // Change julian to gregorian
                     int TD = 0;
                     int jh;
-                    if (year % 100 == 0 && mon <= 2)
+                    if (year % 100 == 0 && mon <= 2) {
                         jh = (year - 1) / 100;
-                    else
+                    } else {
                         jh = year / 100;
+                    }
                     int a = jh / 4;
                     int b = jh % 4;
                     TD = 3 * a + b - 2;
@@ -246,8 +253,9 @@ public class MCRCalendar {
                             gcal.set(year, mon - 1, day + TD);
                             TD = 0;
                         }
-                    } else
+                    } else {
                         TD = -TD - 4; // BC
+                    }
                     gcal.add(Calendar.DATE, TD);
                 }
             } else if (cal instanceof BuddhistCalendar && calstrtmp.equals(TAG_BUDDHIST)) {
@@ -261,14 +269,15 @@ public class MCRCalendar {
                 year = gcal.get(Calendar.YEAR);
                 mon = gcal.get(Calendar.MONTH) + 1;
                 day = gcal.get(Calendar.DATE);
-                if ((10000 * year + 100 * mon + day) <= (15821004)) {
+                if (10000 * year + 100 * mon + day <= 15821004) {
                     // 
                     int TD = 0;
                     int jh;
-                    if (year % 100 == 0 && mon <= 2)
+                    if (year % 100 == 0 && mon <= 2) {
                         jh = (year - 1) / 100;
-                    else
+                    } else {
                         jh = year / 100;
+                    }
                     int a = jh / 4;
                     int b = jh % 4;
                     TD = 3 * a + b - 2;
@@ -314,8 +323,9 @@ public class MCRCalendar {
     public static final boolean testHistoryDate(String datestr, boolean last, String calstr) {
         try {
             Calendar cal = checkHistoryDate(datestr, last, calstr);
-            if (cal == null)
+            if (cal == null) {
                 return false;
+            }
             return true;
         } catch (MCRException ex) {
             return false;
@@ -334,11 +344,11 @@ public class MCRCalendar {
      *                MCRException if parsing has an error
      */
     private static final String checkCalendarName(String calstr) {
-        if ((calstr == null) || (calstr.trim().length() == 0)) {
+        if (calstr == null || calstr.trim().length() == 0) {
             throw new MCRException("The calendar name is null or empty.");
         }
-        for (int i = 0; i < CALENDARS_INPUT.length; i++) {
-            if (CALENDARS_INPUT[i].equals(calstr)) {
+        for (String element : CALENDARS_INPUT) {
+            if (element.equals(calstr)) {
                 return calstr;
             }
         }
@@ -368,7 +378,7 @@ public class MCRCalendar {
         Calendar out = null;
         // check datestr String
         LOGGER.debug("Input checkHistoryDate " + datestr + "  " + calstr + "  " + Boolean.toString(last));
-        if ((datestr == null) || (datestr.trim().length() == 0)) {
+        if (datestr == null || datestr.trim().length() == 0) {
             throw new MCRException("The ancient date string is null or empty");
         }
         // Check calendar string
@@ -495,8 +505,8 @@ public class MCRCalendar {
                 }
             }
             datestr = datestr.substring(start, ende).trim();
-            
-           // german or ISO?
+
+            // german or ISO?
             start = 0;
             boolean iso = false;
             String token = ".";
@@ -570,7 +580,9 @@ public class MCRCalendar {
             }
 
             // Test of the daily
-            if (((mon == 0 || mon == 2 || mon == 4 || mon == 6 || mon == 7 || mon == 9 || mon == 11) && day > 31) || ((mon == 3 || mon == 5 || mon == 8 || mon == 10) && day > 30) || (mon == 1 && day > 29 && year % 4 == 0) || (mon == 1 && day > 28 && year % 4 > 0) || day < 1) {
+            if ((mon == 0 || mon == 2 || mon == 4 || mon == 6 || mon == 7 || mon == 9 || mon == 11) && day > 31
+                    || (mon == 3 || mon == 5 || mon == 8 || mon == 10) && day > 30 || mon == 1 && day > 29 && year % 4 == 0 || mon == 1
+                    && day > 28 && year % 4 > 0 || day < 1) {
                 throw new MCRException("The day of the date is inadmissible.");
             }
             // set AD/BC
@@ -707,10 +719,11 @@ public class MCRCalendar {
                     }
                     // Change Julian to Gregorian
                     int jh;
-                    if (year % 100 == 0 && mon <= 2)
+                    if (year % 100 == 0 && mon <= 2) {
                         jh = (year - 1) / 100;
-                    else
+                    } else {
                         jh = year / 100;
+                    }
                     int a = jh / 4;
                     int b = jh % 4;
                     TD = 3 * a + b - 2;
@@ -774,7 +787,9 @@ public class MCRCalendar {
             }
 
             // Test of the daily
-            if (((mon == 0 || mon == 2 || mon == 4 || mon == 6 || mon == 7 || mon == 9 || mon == 11) && day > 31) || ((mon == 3 || mon == 5 || mon == 8 || mon == 10) && day > 30) || (mon == 1 && day > 29 && year % 4 == 0) || (mon == 1 && day > 28 && year % 4 > 0) || day < 1) {
+            if ((mon == 0 || mon == 2 || mon == 4 || mon == 6 || mon == 7 || mon == 9 || mon == 11) && day > 31
+                    || (mon == 3 || mon == 5 || mon == 8 || mon == 10) && day > 30 || mon == 1 && day > 29 && year % 4 == 0 || mon == 1
+                    && day > 28 && year % 4 > 0 || day < 1) {
                 throw new MCRException("The day of the date is inadmissible.");
             }
             // set AD/BC
@@ -915,10 +930,12 @@ public class MCRCalendar {
                     }
 
                     if (last) {
-                        if (mon % 2 == 0)
+                        if (mon % 2 == 0) {
                             day = 30;
-                        if (mon % 2 == 1)
+                        }
+                        if (mon % 2 == 1) {
                             day = 29;
+                        }
 
                     } else {
                         day = 1;
@@ -936,13 +953,16 @@ public class MCRCalendar {
                 }
             }
             // test of the monthly
-            if (mon > 11 || mon < 0)
+            if (mon > 11 || mon < 0) {
                 throw new MCRException("The month of the date is inadmissible.");
+            }
             // Test of the daily
-            if (day > 30 || (mon % 2 == 1 && mon < 11 && day > 29) || (day < 1))
+            if (day > 30 || mon % 2 == 1 && mon < 11 && day > 29 || day < 1) {
                 throw new MCRException("The day of the date is inadmissible.");
-            if (bh)
+            }
+            if (bh) {
                 year = -year + 1; // if before Hidschra
+            }
             IslamicCalendar ical = new IslamicCalendar();
             ical.set(year, mon, day);
             ical.add(Calendar.DATE, 0); // Calendar correction
@@ -1169,13 +1189,16 @@ public class MCRCalendar {
                 }
             }
             // test of the monthly
-            if (mon > 12 || mon < 0)
+            if (mon > 12 || mon < 0) {
                 throw new MCRException("The month of the date is inadmissible.");
+            }
             // Test of the daily
-            if (day > 30 || (day < 1) || (day > 6 && mon == 12))
+            if (day > 30 || day < 1 || day > 6 && mon == 12) {
                 throw new MCRException("The day of the date is inadmissible.");
-            if (bm)
+            }
+            if (bm) {
                 year = -year + 1; // if before Matyrium
+            }
             CopticCalendar ccal = new CopticCalendar();
             ccal.set(year, mon, day);
 
@@ -1280,21 +1303,24 @@ public class MCRCalendar {
                 }
             }
 
-            if (syear.substring(0, 1).equals("H"))
+            if (syear.substring(0, 1).equals("H")) {
                 era = 235;
-            else if (syear.substring(0, 1).equals("S"))
+            } else if (syear.substring(0, 1).equals("S")) {
                 era = 234;
-            else if (syear.substring(0, 1).equals("T"))
+            } else if (syear.substring(0, 1).equals("T")) {
                 era = 233;
-            else if (syear.substring(0, 1).equals("M"))
+            } else if (syear.substring(0, 1).equals("M")) {
                 era = 232;
+            }
             year = Integer.parseInt(syear.substring(1).trim());
             // test of the monthly
-            if (mon > 12 || mon < 0)
+            if (mon > 12 || mon < 0) {
                 throw new MCRException("The month of the date is inadmissible.");
+            }
             // Test of the daily
-            if (day > 30 || (day < 1) || (day > 6 && mon == 12))
+            if (day > 30 || day < 1 || day > 6 && mon == 12) {
                 throw new MCRException("The day of the date is inadmissible.");
+            }
 
             JapaneseCalendar jcal = new JapaneseCalendar();
             // GregorianCalendar jcal = new GregorianCalendar();
@@ -1418,13 +1444,16 @@ public class MCRCalendar {
                 }
             }
             // test of the monthly
-            if (mon > 12 || mon < 0)
+            if (mon > 12 || mon < 0) {
                 throw new MCRException("The month of the date is inadmissible.");
+            }
             // Test of the daily
-            if (day > 30 || (day < 1) || (day > 6 && mon == 12))
+            if (day > 30 || day < 1 || day > 6 && mon == 12) {
                 throw new MCRException("The day of the date is inadmissible.");
-            if (bc)
+            }
+            if (bc) {
                 year = -year + 1; // if before Christi
+            }
             EthiopicCalendar ecal = new EthiopicCalendar();
             ecal.set(year, mon, day);
 
@@ -1555,11 +1584,14 @@ public class MCRCalendar {
             }
 
             // Test of the daily
-            if (((mon == 0 || mon == 2 || mon == 4 || mon == 6 || mon == 7 || mon == 9 || mon == 11) && day > 31) || ((mon == 3 || mon == 5 || mon == 8 || mon == 10) && day > 30) || (mon == 1 && day > 29 && year % 4 == 0) || (mon == 1 && day > 28 && year % 4 > 0) || day < 1) {
+            if ((mon == 0 || mon == 2 || mon == 4 || mon == 6 || mon == 7 || mon == 9 || mon == 11) && day > 31
+                    || (mon == 3 || mon == 5 || mon == 8 || mon == 10) && day > 30 || mon == 1 && day > 29 && year % 4 == 0 || mon == 1
+                    && day > 28 && year % 4 > 0 || day < 1) {
                 throw new MCRException("The day of the date is inadmissible.");
             }
-            if (bb)
+            if (bb) {
                 year = -year + 1; // if before Buddha
+            }
 
             if (year == 2125 && mon == 9 && day >= 5 && day < 15) {
                 day = 15;
@@ -1674,36 +1706,48 @@ public class MCRCalendar {
                 }
             }
             int njahr = 0;
-            if (bb)
+            if (bb) {
                 year = -year + 1;
+            }
             njahr = year + 621;
 
             GregorianCalendar newdate = new GregorianCalendar();
             newdate.set(njahr, 2, 20); // yearly beginning to 20.3.
             // beginning of the month (day to year)
             int begday = 0;
-            if (mon == 1)
+            if (mon == 1) {
                 begday = 31;
-            if (mon == 2)
+            }
+            if (mon == 2) {
                 begday = 62;
-            if (mon == 3)
+            }
+            if (mon == 3) {
                 begday = 93;
-            if (mon == 4)
+            }
+            if (mon == 4) {
                 begday = 124;
-            if (mon == 5)
+            }
+            if (mon == 5) {
                 begday = 155;
-            if (mon == 6)
+            }
+            if (mon == 6) {
                 begday = 186;
-            if (mon == 7)
+            }
+            if (mon == 7) {
                 begday = 216;
-            if (mon == 8)
+            }
+            if (mon == 8) {
                 begday = 246;
-            if (mon == 9)
+            }
+            if (mon == 9) {
                 begday = 276;
-            if (mon == 10)
+            }
+            if (mon == 10) {
                 begday = 306;
-            if (mon == 11)
+            }
+            if (mon == 11) {
                 begday = 336;
+            }
             begday += day - 1;
 
             int jh = njahr / 100; // century
@@ -1813,10 +1857,12 @@ public class MCRCalendar {
                     }
 
                     if (last) {
-                        if (mon <= 12)
+                        if (mon <= 12) {
                             day = 30;
-                        if (mon == 13)
+                        }
+                        if (mon == 13) {
                             day = 5;
+                        }
                     } else {
                         mon = 1;
                         day = 1;
@@ -1834,34 +1880,37 @@ public class MCRCalendar {
                 }
             }
             // test of the monthly
-            if (mon > 13 || mon < 1)
+            if (mon > 13 || mon < 1) {
                 throw new MCRException("The month of the date is inadmissible.");
+            }
             // Test of the daily
-            if (day > 30 || (day < 1) || (day > 5 && mon == 13))
+            if (day > 30 || day < 1 || day > 5 && mon == 13) {
                 throw new MCRException("The day of the date is inadmissible.");
+            }
             int difyear;
             int difday;
             int jhd = 1600;
             int ndifday = 0;
-            if (ba)
+            if (ba) {
                 year = -year + 1;
+            }
             GregorianCalendar ecal = new GregorianCalendar();
-            if ((year * 10000 + mon * 100 + day) >= 10311214) {// Jahr >
+            if (year * 10000 + mon * 100 + day >= 10311214) {// Jahr >
                 // 14.12.1031
                 difyear = year - 1031;
-                difday = (difyear * 365) + (mon - 1) * 30 + day - 344;
+                difday = difyear * 365 + (mon - 1) * 30 + day - 344;
                 ecal.set(1582, 9, 15);
                 ecal.add(Calendar.DATE, difday);
             }
-            if ((year * 10000 + mon * 100 + day) < 10311214 && (year * 10000 + mon * 100 + day) > 10311204) { // 
+            if (year * 10000 + mon * 100 + day < 10311214 && year * 10000 + mon * 100 + day > 10311204) { // 
                 ecal.set(1582, 9, 15);
             }
-            if ((year * 10000 + mon * 100 + day) <= 10311204) {// Jahr <
+            if (year * 10000 + mon * 100 + day <= 10311204) {// Jahr <
                 // 5.10.1592
                 ecal.set(1582, 9, 15);
                 difyear = year - 1031;
                 int daysyear = 36525;
-                difday = (difyear * 365) + (mon - 1) * 30 + day - 334;
+                difday = difyear * 365 + (mon - 1) * 30 + day - 334;
 
                 if (difday <= -30168) {
                     ndifday = ndifday - 30168;
@@ -1871,8 +1920,9 @@ public class MCRCalendar {
                         if (difday < -daysyear) { // 36525
                             ndifday = ndifday - daysyear;
                             jhd = jhd - 100;
-                            if (jhd == 0)
+                            if (jhd == 0) {
                                 jhd = -1;
+                            }
                             if (jhd == -1) {
                                 jhd = 0;
                             } else {
@@ -1986,10 +2036,12 @@ public class MCRCalendar {
                     }
 
                     if (last) {
-                        if (mon <= 12)
+                        if (mon <= 12) {
                             day = 30;
-                        if (mon == 13)
+                        }
+                        if (mon == 13) {
                             day = 5;
+                        }
                     } else {
                         mon = 1;
                         day = 1;
@@ -2007,35 +2059,38 @@ public class MCRCalendar {
                 }
             }
             // test of the monthly
-            if (mon > 13 || mon < 1)
+            if (mon > 13 || mon < 1) {
                 throw new MCRException("The month of the date is inadmissible.");
+            }
             // Test of the daily
-            if (day > 30 || (day < 1) || (day > 5 && mon == 13))
+            if (day > 30 || day < 1 || day > 5 && mon == 13) {
                 throw new MCRException("The day of the date is inadmissible.");
+            }
             int difyear;
             int difday;
             int jhd = 1600;
             int ndifday = 0;
-            if (ba)
+            if (ba) {
                 year = -year + 1;
+            }
             GregorianCalendar ecal = new GregorianCalendar();
-            if ((year * 10000 + mon * 100 + day) >= 23310314) {// Jahr >
+            if (year * 10000 + mon * 100 + day >= 23310314) {// Jahr >
                 // 15.10.1592
                 difyear = year - 2331;
-                difday = (difyear * 365) + (mon - 1) * 30 + day - 74;
+                difday = difyear * 365 + (mon - 1) * 30 + day - 74;
                 ecal.set(1582, 9, 15);
                 ecal.add(Calendar.DATE, difday);
             }
 
-            if ((year * 10000 + mon * 100 + day) < 23310314 && (year * 10000 + mon * 100 + day) >= 23310304) { // 
+            if (year * 10000 + mon * 100 + day < 23310314 && year * 10000 + mon * 100 + day >= 23310304) { // 
                 ecal.set(1582, 9, 15);
             }
-            if ((year * 10000 + mon * 100 + day) < 23310304) {// Jahr <
+            if (year * 10000 + mon * 100 + day < 23310304) {// Jahr <
                 // 5.10.1592
                 ecal.set(1582, 9, 15);
                 difyear = year - 2331;
                 int daysyear = 36525;
-                difday = (difyear * 365) + ((mon - 1) * 30 + day) - 64;
+                difday = difyear * 365 + (mon - 1) * 30 + day - 64;
 
                 if (difday <= -30168) {
                     ndifday = ndifday - 30168;
@@ -2045,8 +2100,9 @@ public class MCRCalendar {
                         if (difday < -daysyear) { // days of 100 years 36525
                             ndifday = ndifday - daysyear;
                             jhd = jhd - 100;
-                            if (jhd == 0)
+                            if (jhd == 0) {
                                 jhd = -1;
+                            }
                             if (jhd == -1) {
                                 jhd = 0;
                             }
@@ -2109,14 +2165,14 @@ public class MCRCalendar {
      *         G is set. If the date is wrong an empty string will be returned.
      */
     public static final String getDateToFormattedString(Calendar date, String format) {
-        if ((date == null) || (format == null) || (format.trim().length() == 0)) {
+        if (date == null || format == null || format.trim().length() == 0) {
             return "";
         }
         SimpleDateFormat formatter = null;
         try {
-            formatter = new SimpleDateFormat(format, (new Locale("en")));
+            formatter = new SimpleDateFormat(format, new Locale("en"));
         } catch (Exception e) {
-            formatter = new SimpleDateFormat("dd.MM.yyyy G", (new Locale("en")));
+            formatter = new SimpleDateFormat("dd.MM.yyyy G", new Locale("en"));
         }
         try {
             formatter.setCalendar(date);

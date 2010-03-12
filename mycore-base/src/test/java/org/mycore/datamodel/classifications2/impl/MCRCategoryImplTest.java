@@ -49,6 +49,7 @@ public class MCRCategoryImplTest extends MCRTestCase {
     /* (non-Javadoc)
      * @see org.mycore.common.MCRTestCase#setUp()
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
     }

@@ -27,8 +27,6 @@ package org.mycore.common;
 import com.ibm.icu.util.Calendar;
 import com.ibm.icu.util.GregorianCalendar;
 
-import org.mycore.common.MCRTestCase;
-
 /**
  * This class is a JUnit test case for org.mycore.common.MCRCalendar.
  * 
@@ -38,10 +36,12 @@ import org.mycore.common.MCRTestCase;
  */
 public class MCRCalendarTest extends MCRTestCase {
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
     }
 
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
     }
@@ -78,48 +78,48 @@ public class MCRCalendarTest extends MCRTestCase {
         /* common check * */
         // all entries are empty
         try {
-            cal = (GregorianCalendar) MCRCalendar.getGregorianHistoryDate(null, false, null);
+            cal = MCRCalendar.getGregorianHistoryDate(null, false, null);
         } catch (MCRException e) {
-            cal = (GregorianCalendar) new GregorianCalendar();
+            cal = new GregorianCalendar();
         }
         dstring = MCRCalendar.getDateToFormattedString(cal);
         assertEquals("Date is not the current date.", cstring, dstring);
         // 0A.01.0001 BC (wrong gregorian)
         try {
-            cal = (GregorianCalendar) MCRCalendar.getGregorianHistoryDate("-0A.01.0001", false, MCRCalendar.TAG_GREGORIAN);
+            cal = MCRCalendar.getGregorianHistoryDate("-0A.01.0001", false, MCRCalendar.TAG_GREGORIAN);
         } catch (MCRException e) {
-            cal = (GregorianCalendar) new GregorianCalendar();
+            cal = new GregorianCalendar();
         }
         dstring = MCRCalendar.getDateToFormattedString(cal);
         assertEquals("gregorian", cstring, dstring);
 
         /* gregorian check */
         // 1 (gregorian)
-        cal = (GregorianCalendar) MCRCalendar.getGregorianHistoryDate("1", false, MCRCalendar.TAG_GREGORIAN);
+        cal = MCRCalendar.getGregorianHistoryDate("1", false, MCRCalendar.TAG_GREGORIAN);
         dstring = MCRCalendar.getDateToFormattedString(cal);
         assertEquals("gregorian", "01.01.0001 AD", dstring);
         // 1.1 (gregorian)
-        cal = (GregorianCalendar) MCRCalendar.getGregorianHistoryDate("1.1", true, MCRCalendar.TAG_GREGORIAN);
+        cal = MCRCalendar.getGregorianHistoryDate("1.1", true, MCRCalendar.TAG_GREGORIAN);
         dstring = MCRCalendar.getDateToFormattedString(cal);
         assertEquals("gregorian", "31.01.0001 AD", dstring);
         // 1.1.1 (gregorian)
-        cal = (GregorianCalendar) MCRCalendar.getGregorianHistoryDate("1.1.1", false, MCRCalendar.TAG_GREGORIAN);
+        cal = MCRCalendar.getGregorianHistoryDate("1.1.1", false, MCRCalendar.TAG_GREGORIAN);
         dstring = MCRCalendar.getDateToFormattedString(cal);
         assertEquals("gregorian", "01.01.0001 AD", dstring);
         // 1.1.1 QU(gregorian)
         try {
-            cal = (GregorianCalendar) MCRCalendar.getGregorianHistoryDate("1.1.1 QU", false, MCRCalendar.TAG_GREGORIAN);
+            cal = MCRCalendar.getGregorianHistoryDate("1.1.1 QU", false, MCRCalendar.TAG_GREGORIAN);
         } catch (MCRException e) {
-            cal = (GregorianCalendar) new GregorianCalendar();
+            cal = new GregorianCalendar();
         }
         dstring = MCRCalendar.getDateToFormattedString(cal);
         assertEquals("gregorian", cstring, dstring);
         // 01.01.0001 BC (gregorian)
-        cal = (GregorianCalendar) MCRCalendar.getGregorianHistoryDate("01.01.0001 bc", false, MCRCalendar.TAG_GREGORIAN);
+        cal = MCRCalendar.getGregorianHistoryDate("01.01.0001 bc", false, MCRCalendar.TAG_GREGORIAN);
         dstring = MCRCalendar.getDateToFormattedString(cal);
         assertEquals("gregorian", "01.01.0001 BC", dstring);
         // 01.01.0001 BC (gregorian)
-        cal = (GregorianCalendar) MCRCalendar.getGregorianHistoryDate("01.01.0001 v. Chr", false, MCRCalendar.TAG_GREGORIAN);
+        cal = MCRCalendar.getGregorianHistoryDate("01.01.0001 v. Chr", false, MCRCalendar.TAG_GREGORIAN);
         dstring = MCRCalendar.getDateToFormattedString(cal);
         assertEquals("gregorian", "01.01.0001 BC", dstring);
         // 01.01.0001 AD (gregorian)
@@ -205,50 +205,50 @@ public class MCRCalendarTest extends MCRTestCase {
         dstring = MCRCalendar.getDateToFormattedString(cal);
         assertEquals("julian", "26.10.1582 AD", dstring);
     }
-    
+
     /*
      * Test method for 'org.mycore.datamodel.metadata.MCRCalendar.getJulianDay(GregorianCalendar)'
      */
     public void testGetJulianDay() {
         GregorianCalendar greg;
         // 24.03.0005 BC (julianisch)
-        greg = new GregorianCalendar(5,2,24);
+        greg = new GregorianCalendar(5, 2, 24);
         greg.set(GregorianCalendar.ERA, GregorianCalendar.BC);
         int result = MCRCalendar.getJulianDayNumber(greg);
-        assertEquals("Julian date 24.03.0005 BC is not 1719680.",1719680,result);
+        assertEquals("Julian date 24.03.0005 BC is not 1719680.", 1719680, result);
         // 31.12.1 BC (julianisch)
-        greg = new GregorianCalendar(1,11,31);
+        greg = new GregorianCalendar(1, 11, 31);
         greg.set(GregorianCalendar.ERA, GregorianCalendar.BC);
         result = MCRCalendar.getJulianDayNumber(greg);
-        assertEquals("Date 31.12.0001 BC is not 1721423.",1721423,result);
+        assertEquals("Date 31.12.0001 BC is not 1721423.", 1721423, result);
         // 1.1.1 AD (julianisch)
-        greg = new GregorianCalendar(1,0,1);
+        greg = new GregorianCalendar(1, 0, 1);
         greg.set(GregorianCalendar.ERA, GregorianCalendar.AD);
         result = MCRCalendar.getJulianDayNumber(greg);
-        assertEquals("Date 01.01.0001 is not 1721424.",1721424,result);
+        assertEquals("Date 01.01.0001 is not 1721424.", 1721424, result);
         // 27.01.333 AD (julianisch)
-        result = MCRCalendar.getJulianDayNumber(new GregorianCalendar(333,0,27));
-        assertEquals("Date 27.01.0333 AD is not 1842713.",1842713,result);
+        result = MCRCalendar.getJulianDayNumber(new GregorianCalendar(333, 0, 27));
+        assertEquals("Date 27.01.0333 AD is not 1842713.", 1842713, result);
         // 04.10.1582 AD (julianisch)
-        result = MCRCalendar.getJulianDayNumber(new GregorianCalendar(1582,9,4));
-        assertEquals("Date 04.10.1582 AD is not 2299160.",2299160,result);
+        result = MCRCalendar.getJulianDayNumber(new GregorianCalendar(1582, 9, 4));
+        assertEquals("Date 04.10.1582 AD is not 2299160.", 2299160, result);
         // 15.10.1582 AD (gregorianisch)
-        result = MCRCalendar.getJulianDayNumber(new GregorianCalendar(1582,9,15));
-        assertEquals("Date 15.10.1582 AD is not 2299161.",2299161,result);
+        result = MCRCalendar.getJulianDayNumber(new GregorianCalendar(1582, 9, 15));
+        assertEquals("Date 15.10.1582 AD is not 2299161.", 2299161, result);
         // 01.01.2000 AD (gregorianisch)
-        result = MCRCalendar.getJulianDayNumber(new GregorianCalendar(2000,0,1));
-        assertEquals("Date 01.01.2000 AD is not 2451545.",2451545,result);     
+        result = MCRCalendar.getJulianDayNumber(new GregorianCalendar(2000, 0, 1));
+        assertEquals("Date 01.01.2000 AD is not 2451545.", 2451545, result);
         // 29.02.2003 AD (gregorianisch)
-        result = MCRCalendar.getJulianDayNumber(new GregorianCalendar(2003,1,29));
-        assertEquals("Date 29.02.2003 AD is not 2452700.",2452700,result);     
+        result = MCRCalendar.getJulianDayNumber(new GregorianCalendar(2003, 1, 29));
+        assertEquals("Date 29.02.2003 AD is not 2452700.", 2452700, result);
         // 01.03.2003 AD (gregorianisch)
-        result = MCRCalendar.getJulianDayNumber(new GregorianCalendar(2003,2,1));
-        assertEquals("Date 01.03.2003 AD is not 2452700.",2452700,result);     
+        result = MCRCalendar.getJulianDayNumber(new GregorianCalendar(2003, 2, 1));
+        assertEquals("Date 01.03.2003 AD is not 2452700.", 2452700, result);
         // 28.02.2003 AD (gregorianisch)
-        result = MCRCalendar.getJulianDayNumber(new GregorianCalendar(2003,1,28));
-        assertEquals("Date 28.02.2003 AD is not 2452699.",2452699,result);     
+        result = MCRCalendar.getJulianDayNumber(new GregorianCalendar(2003, 1, 28));
+        assertEquals("Date 28.02.2003 AD is not 2452699.", 2452699, result);
         // 01.03.2003 AD (gregorianisch)
-        result = MCRCalendar.getJulianDayNumber(new GregorianCalendar(2003,2,0));
-        assertEquals("Date 00.03.2003 AD is not 2452699.",2452699,result);             
+        result = MCRCalendar.getJulianDayNumber(new GregorianCalendar(2003, 2, 0));
+        assertEquals("Date 00.03.2003 AD is not 2452699.", 2452699, result);
     }
 }

@@ -64,8 +64,8 @@ public class MCRACCESSPK implements Serializable {
     public int hashCode() {
         final int PRIME = 31;
         int result = 1;
-        result = PRIME * result + ((acpool == null) ? 0 : acpool.hashCode());
-        result = PRIME * result + ((objid == null) ? 0 : objid.hashCode());
+        result = PRIME * result + (acpool == null ? 0 : acpool.hashCode());
+        result = PRIME * result + (objid == null ? 0 : objid.hashCode());
         return result;
     }
 
@@ -74,23 +74,30 @@ public class MCRACCESSPK implements Serializable {
      */
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         final MCRACCESSPK other = (MCRACCESSPK) obj;
         if (acpool == null) {
-            if (other.acpool != null)
+            if (other.acpool != null) {
                 return false;
-        } else if (!acpool.equals(other.acpool))
+            }
+        } else if (!acpool.equals(other.acpool)) {
             return false;
+        }
         if (objid == null) {
-            if (other.objid != null)
+            if (other.objid != null) {
                 return false;
-        } else if (!objid.equals(other.objid))
+            }
+        } else if (!objid.equals(other.objid)) {
             return false;
+        }
         return true;
     }
 

@@ -67,9 +67,10 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
      * @return the store for this metadata type
      */
     public static MCRVersioningMetadataStore getStore(String type) {
-        return (MCRVersioningMetadataStore) (MCRStore.getStore(type));
+        return (MCRVersioningMetadataStore) MCRStore.getStore(type);
     }
 
+    @Override
     protected void init(String type) {
         super.init(type);
 
@@ -115,12 +116,14 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
         return repURL;
     }
 
+    @Override
     public MCRVersionedMetadata create(MCRContent xml, int id) throws Exception {
-        return (MCRVersionedMetadata) (super.create(xml, id));
+        return (MCRVersionedMetadata) super.create(xml, id);
     }
 
+    @Override
     public MCRVersionedMetadata create(MCRContent xml) throws Exception {
-        return (MCRVersionedMetadata) (super.create(xml));
+        return (MCRVersionedMetadata) super.create(xml);
     }
 
     /**
@@ -133,26 +136,31 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
      * @return the metadata stored under that ID, or null when there is no such
      *         metadata object
      */
+    @Override
     public MCRVersionedMetadata retrieve(int id) throws Exception {
-        if (exists(id))
-            return (MCRVersionedMetadata) (super.retrieve(id));
-        else
+        if (exists(id)) {
+            return (MCRVersionedMetadata) super.retrieve(id);
+        } else {
             return new MCRVersionedMetadata(this, getSlot(id), id);
+        }
     }
 
     /**
      * Updates all stored metadata to the latest revision in SVN
      */
     public void updateAll() throws Exception {
-        for (Iterator<Integer> ids = listIDs(true); ids.hasNext();)
+        for (Iterator<Integer> ids = listIDs(true); ids.hasNext();) {
             retrieve(ids.next()).update();
+        }
     }
 
+    @Override
     public void delete(int id) throws Exception {
         MCRVersionedMetadata vm = retrieve(id);
         vm.delete();
     }
 
+    @Override
     protected MCRVersionedMetadata buildMetadataObject(FileObject fo, int id) {
         return new MCRVersionedMetadata(this, fo, id);
     }

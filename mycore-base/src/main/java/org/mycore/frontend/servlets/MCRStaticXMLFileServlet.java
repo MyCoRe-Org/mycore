@@ -36,7 +36,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
-
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
@@ -61,6 +60,7 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
 
     protected final static HashMap<String, String> docTypesMap = new HashMap<String, String>();
 
+    @Override
     public void doGetPost(MCRServletJob job) throws java.io.IOException, MCRException, SAXParseException {
         final HttpServletRequest request = job.getRequest();
         final HttpServletResponse response = job.getResponse();
@@ -98,8 +98,9 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
         // Parse list of document types that may contain editor elements
         if (docTypesMap.isEmpty()) {
             StringTokenizer st = new StringTokenizer(docTypesIncludingEditors, ", ");
-            while (st.hasMoreTokens())
+            while (st.hasMoreTokens()) {
                 docTypesMap.put(st.nextToken(), null);
+            }
         }
 
         // For defined document types like static webpages, replace editor elements with complete editor definition
@@ -107,7 +108,8 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
             Document xml = MCRXMLHelper.parseURI(file.toURI(), false);
             MCREditorServlet.replaceEditorElements(request, file.toURI().toURL().toString(), xml);
             getLayoutService().doLayout(request, response, xml);
-        } else
+        } else {
             getLayoutService().doLayout(request, response, file);
+        }
     }
 }

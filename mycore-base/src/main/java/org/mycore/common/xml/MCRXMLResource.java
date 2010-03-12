@@ -64,8 +64,9 @@ public class MCRXMLResource {
      * @return singleton instance
      */
     public synchronized static MCRXMLResource instance() {
-        if (instance == null)
+        if (instance == null) {
             instance = new MCRXMLResource();
+        }
         return instance;
     }
 
@@ -110,8 +111,9 @@ public class MCRXMLResource {
      */
     public Document getResource(String name, ClassLoader classLoader) throws IOException, JDOMException {
         URLConnection con = getResourceURLConnection(name, classLoader);
-        if (con == null)
+        if (con == null) {
             return null;
+        }
         try {
             LOGGER.debug(name + " last modified: " + con.getLastModified());
             CacheEntry entry = (CacheEntry) resourceCache.getIfUpToDate(name, con.getLastModified());
@@ -145,8 +147,9 @@ public class MCRXMLResource {
     public byte[] getRawResource(String name, ClassLoader classLoader) throws IOException {
         ByteArrayOutputStream baos;
         URLConnection con = getResourceURLConnection(name, classLoader);
-        if (con == null)
+        if (con == null) {
             return null;
+        }
         baos = new ByteArrayOutputStream();
         InputStream in = new BufferedInputStream(con.getInputStream());
         try {
@@ -162,8 +165,9 @@ public class MCRXMLResource {
         LOGGER.debug("Reading xml from classpath resource " + name);
         URL url = classLoader.getResource(name);
         LOGGER.debug("Resource URL:" + url);
-        if (url == null)
+        if (url == null) {
             return null;
+        }
         URLConnection con = url.openConnection();
         return con;
     }
@@ -201,8 +205,9 @@ public class MCRXMLResource {
     }
 
     private void closeURLConnection(URLConnection con) throws IOException {
-        if (con == null)
+        if (con == null) {
             return;
+        }
         con.getInputStream().close();
     }
 }

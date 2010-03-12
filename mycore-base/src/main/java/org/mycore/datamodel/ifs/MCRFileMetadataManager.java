@@ -84,7 +84,7 @@ public class MCRFileMetadataManager {
 
         // The cache size for the MCRFilesystemNode cache
         int size = config.getInt("MCR.IFS.FileMetadataStore.CacheSize", 500);
-        cache = new MCRCache(size,"IFS FileSystemNodes");
+        cache = new MCRCache(size, "IFS FileSystemNodes");
     }
 
     /**
@@ -118,8 +118,9 @@ public class MCRFileMetadataManager {
 
             long sum = Integer.parseInt(st.nextToken());
 
-            while (st.hasMoreTokens())
+            while (st.hasMoreTokens()) {
                 sum = (sum << 8) + Integer.parseInt(st.nextToken());
+            }
 
             String address = Long.toString(sum, 36);
             address = "000000" + address;
@@ -163,8 +164,8 @@ public class MCRFileMetadataManager {
      *         exists.
      */
     MCRFilesystemNode retrieveNode(String ID) throws MCRPersistenceException {
-        MCRFilesystemNode n = (MCRFilesystemNode) (cache.get(ID));
-        return ((n != null) ? n : store.retrieveNode(ID));
+        MCRFilesystemNode n = (MCRFilesystemNode) cache.get(ID);
+        return n != null ? n : store.retrieveNode(ID);
     }
 
     /**
@@ -180,7 +181,7 @@ public class MCRFileMetadataManager {
     MCRFilesystemNode retrieveRootNode(String ownerID) throws MCRPersistenceException {
         String ID = store.retrieveRootNodeID(ownerID);
 
-        return ((ID == null) ? null : retrieveNode(ID));
+        return ID == null ? null : retrieveNode(ID);
     }
 
     /**
@@ -202,8 +203,10 @@ public class MCRFileMetadataManager {
      * raw data that is retrieved from the persistent store, or uses the
      * existing copy in the MCRCache instance.
      */
-    public MCRFilesystemNode buildNode(String type, String ID, String parentID, String ownerID, String name, String label, long size, GregorianCalendar date, String storeID, String storageID, String fctID, String md5, int numchdd, int numchdf, int numchtd, int numchtf) throws MCRPersistenceException {
-        MCRFilesystemNode n = (MCRFilesystemNode) (cache.get(ID));
+    public MCRFilesystemNode buildNode(String type, String ID, String parentID, String ownerID, String name, String label, long size,
+            GregorianCalendar date, String storeID, String storageID, String fctID, String md5, int numchdd, int numchdf, int numchtd,
+            int numchtf) throws MCRPersistenceException {
+        MCRFilesystemNode n = (MCRFilesystemNode) cache.get(ID);
 
         if (n != null) {
             return n;

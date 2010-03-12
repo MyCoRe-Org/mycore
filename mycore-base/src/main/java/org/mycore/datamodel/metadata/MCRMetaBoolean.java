@@ -23,7 +23,6 @@
 
 package org.mycore.datamodel.metadata;
 
-import org.jdom.Namespace;
 import org.mycore.common.MCRException;
 
 /**
@@ -71,9 +70,10 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
      * @param set_value        the boolean value (true or false) as string
      * @exception MCRException if the set_subtag value is null or empty
      */
-    public MCRMetaBoolean(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted, String set_value) throws MCRException {
+    public MCRMetaBoolean(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted, String set_value)
+            throws MCRException {
         super(set_datapart, set_subtag, "en", set_type, set_inherted);
-        LOGGER.debug("default_lang ("+default_lang+") will never used."); //FIXME: use default_lang or remove it
+        LOGGER.debug("default_lang (" + default_lang + ") will never used."); //FIXME: use default_lang or remove it
 
         if (set_value != null) {
             set_value = set_value.toLowerCase().trim();
@@ -123,9 +123,10 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
      * @param set_value        the boolean value (true or false)
      * @exception MCRException if the set_subtag value is null or empty
      */
-    public MCRMetaBoolean(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted, boolean set_value) throws MCRException {
+    public MCRMetaBoolean(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted, boolean set_value)
+            throws MCRException {
         super(set_datapart, set_subtag, "en", set_type, set_inherted);
-        LOGGER.debug("default_lang ("+default_lang+") will never used."); //FIXME: use default_lang or remove it
+        LOGGER.debug("default_lang (" + default_lang + ") will never used."); //FIXME: use default_lang or remove it
         value = set_value;
     }
 
@@ -204,10 +205,11 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
      * @param element
      *            a relevant JDOM element for the metadata
      */
+    @Override
     public final void setFromDOM(org.jdom.Element element) {
         super.setFromDOM(element);
 
-        String temp_value = (element.getText()).trim();
+        String temp_value = element.getText().trim();
 
         if (temp_value == null) {
             value = false;
@@ -226,16 +228,17 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML MCRBoolean part
      */
+    @Override
     public final org.jdom.Element createXML() throws MCRException {
         if (!isValid()) {
             throw new MCRException("The content of MCRMetaBoolean is not valid.");
         }
 
         org.jdom.Element elm = new org.jdom.Element(subtag);
-//        elm.setAttribute("lang", lang, Namespace.XML_NAMESPACE);
+        //        elm.setAttribute("lang", lang, Namespace.XML_NAMESPACE);
         elm.setAttribute("inherited", Integer.toString(inherited));
 
-        if ((type != null) && ((type = type.trim()).length() != 0)) {
+        if (type != null && (type = type.trim()).length() != 0) {
             elm.setAttribute("type", type);
         }
 
@@ -254,6 +257,7 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
      * 
      * @return a boolean value
      */
+    @Override
     public final boolean isValid() {
         if (!super.isValid()) {
             return false;
@@ -265,6 +269,7 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
     /**
      * This method make a clone of this class.
      */
+    @Override
     public final Object clone() {
         return new MCRMetaBoolean(datapart, subtag, lang, type, inherited, value);
     }
@@ -272,6 +277,7 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
     /**
      * This method put debug data to the logger (for the debug mode).
      */
+    @Override
     public final void debug() {
         super.debugDefault();
         LOGGER.debug("Value              = " + Boolean.toString(value));

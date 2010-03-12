@@ -19,7 +19,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 public class MCRDerivateLinkServlet extends MCRServlet {
 
     private static final long serialVersionUID = 1L;
- 
+
     protected static String derivateLinkErrorPage = "error_derivatelink.xml";
 
     @Override
@@ -29,26 +29,27 @@ public class MCRDerivateLinkServlet extends MCRServlet {
         String webpage = pMap.get("subselect.webpage")[0];
         String mcrId = getSubParameterValueOfBrowserAddressParameter(webpage, "mcrid");
         String parentId = getSubParameterValueOfBrowserAddressParameter(webpage, "parentID");
-        
+
         // create a new root element
         Element rootElement = new Element("derivateLinks-parentList");
 
         MCRObjectID objId = new MCRObjectID(mcrId);
-        if(MCRObject.existInDatastore(objId)) {
+        if (MCRObject.existInDatastore(objId)) {
             /* mcr object exists in datastore -> add all parent with their
              * derivates to the jdom tree */
             addParentsToElement(rootElement, objId);
-        } else if(parentId != null && MCRObject.existInDatastore(parentId)) {
+        } else if (parentId != null && MCRObject.existInDatastore(parentId)) {
             /* mcr object doesnt exists in datastore -> use the parent id
              * to create the content */
             Element firstParent = getMyCoReObjectElement(new MCRObjectID(parentId));
-            if(firstParent != null)
+            if (firstParent != null) {
                 rootElement.addContent(firstParent);
+            }
             addParentsToElement(rootElement, new MCRObjectID(parentId));
         }
 
         // check if root element has content -> if not, show an error page
-        if(rootElement.getContentSize() == 0) {
+        if (rootElement.getContentSize() == 0) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + derivateLinkErrorPage));
             return;
         }
@@ -71,10 +72,11 @@ public class MCRDerivateLinkServlet extends MCRServlet {
      */
     private void addParentsToElement(Element toElement, MCRObjectID objId) {
         MCRObjectID pId = objId;
-        while((pId = getParentId(pId)) != null) {
+        while ((pId = getParentId(pId)) != null) {
             Element parentElement = getMyCoReObjectElement(pId);
-            if(parentElement != null)
+            if (parentElement != null) {
                 toElement.addContent(parentElement);
+            }
         }
     }
 
@@ -99,8 +101,9 @@ public class MCRDerivateLinkServlet extends MCRServlet {
      */
     private Element getMyCoReObjectElement(MCRObjectID objectId) {
         Collection<String> derivates = MCRLinkTableManager.instance().getDestinationOf(objectId, "derivate");
-        if(derivates.size() <= 0)
+        if (derivates.size() <= 0) {
             return null;
+        }
         Element objElement = new Element("mycoreobject");
         objElement.setAttribute("id", objectId.getId());
         for (String derivate : derivates) {
@@ -125,8 +128,9 @@ public class MCRDerivateLinkServlet extends MCRServlet {
         if (index != -1) {
             int startIndex = index + subParameter.length() + 1;
             int endIndex = browserAddressParameter.indexOf("&", index + 1);
-            if(endIndex == -1)
+            if (endIndex == -1) {
                 endIndex = browserAddressParameter.length();
+            }
             value = browserAddressParameter.substring(startIndex, endIndex);
         }
         return value;

@@ -35,13 +35,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
 import org.jdom.Document;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.common.MCRXMLTableManager;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.services.fieldquery.MCRCachedQueryData;
 import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRQueryClient;
@@ -74,6 +73,7 @@ public class MCRObjectServlet extends MCRServlet {
      * 
      * @see javax.servlet.GenericServlet#init()
      */
+    @Override
     public void init() throws ServletException {
         super.init();
         TM = MCRXMLTableManager.instance();
@@ -86,11 +86,12 @@ public class MCRObjectServlet extends MCRServlet {
      * @param job
      *            the MCRServletJob instance
      */
+    @Override
     public void doGetPost(MCRServletJob job) throws Exception {
         try {
             String host = getObjectHost(job);
             String id = getObjectID(job.getRequest());
-            if ((id == null) || (id.length() == 0)) {
+            if (id == null || id.length() == 0) {
                 return; // request failed;
             }
             String editorID = getEditorID(job.getRequest());
@@ -98,11 +99,13 @@ public class MCRObjectServlet extends MCRServlet {
 
             if (host == MCRHit.LOCAL) {
                 final Document localObject = requestLocalObject(job);
-                if (localObject == null)
+                if (localObject == null) {
                     return;
+                }
                 getLayoutService().doLayout(job.getRequest(), job.getResponse(), localObject);
-            } else
+            } else {
                 getLayoutService().doLayout(job.getRequest(), job.getResponse(), requestRemoteObject(job));
+            }
         } catch (MCRException e) {
             generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     "Error while retrieving MCRObject with ID: " + getObjectID(job.getRequest()), e, false);
@@ -112,7 +115,7 @@ public class MCRObjectServlet extends MCRServlet {
 
     private String getObjectHost(MCRServletJob job) {
         String remoteHost = job.getRequest().getParameter("host");
-        if ((remoteHost == null) || (remoteHost.length() == 0)) {
+        if (remoteHost == null || remoteHost.length() == 0) {
             remoteHost = MCRHit.LOCAL;
         }
         return remoteHost;
@@ -165,15 +168,15 @@ public class MCRObjectServlet extends MCRServlet {
                     // hit allocated
                     // search for next and previous object readable by user
                     for (int j = i - 1; j >= 0; j--) {
-                        if ((results.getHit(j).getHost() != MCRHit.LOCAL)
-                                || (MCRAccessManager.checkPermission(results.getHit(j).getID(), "read"))) {
+                        if (results.getHit(j).getHost() != MCRHit.LOCAL
+                                || MCRAccessManager.checkPermission(results.getHit(j).getID(), "read")) {
                             previousObject = results.getHit(j);
                             break;
                         }
                     }
                     for (int j = i + 1; j < numHits; j++) {
-                        if ((results.getHit(j).getHost() != MCRHit.LOCAL)
-                                || (MCRAccessManager.checkPermission(results.getHit(j).getID(), "read"))) {
+                        if (results.getHit(j).getHost() != MCRHit.LOCAL
+                                || MCRAccessManager.checkPermission(results.getHit(j).getID(), "read")) {
                             nextObject = results.getHit(j);
                             break;
                         }
@@ -277,7 +280,7 @@ public class MCRObjectServlet extends MCRServlet {
             return null;
         }
         Object o = h.get(objectID);
-        return (o == null) ? null : o.toString();
+        return o == null ? null : o.toString();
     }
 
     protected final static void storeEditorID(String objectID, String editorID) {

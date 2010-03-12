@@ -92,7 +92,7 @@ abstract class MCRUserObject {
      *            Timestamp to set the creation date
      */
     public final void setCreationDate(Timestamp time) {
-            creationDate = time;
+        creationDate = time;
     }
 
     /**
@@ -100,7 +100,7 @@ abstract class MCRUserObject {
      * called.
      */
     public final void setCreationDate() {
-            creationDate = new Timestamp(new GregorianCalendar().getTime().getTime());
+        creationDate = new Timestamp(new GregorianCalendar().getTime().getTime());
     }
 
     /**
@@ -111,7 +111,7 @@ abstract class MCRUserObject {
      *            Timestamp to set the modified date
      */
     public final void setModifiedDate(Timestamp time) {
-            modifiedDate = time;
+        modifiedDate = time;
     }
 
     /**
@@ -119,7 +119,7 @@ abstract class MCRUserObject {
      * called.
      */
     public final void setModifiedDate() {
-            modifiedDate = new Timestamp(new GregorianCalendar().getTime().getTime());
+        modifiedDate = new Timestamp(new GregorianCalendar().getTime().getTime());
     }
 
     /**
@@ -129,7 +129,7 @@ abstract class MCRUserObject {
      *            the creator of a user or group
      */
     public final void setCreator(String creator) {
-            this.creator = trim(creator);
+        this.creator = trim(creator);
     }
 
     /**
@@ -162,7 +162,7 @@ abstract class MCRUserObject {
     public final String getDescription() {
         return description;
     }
-    
+
     public final void setDescription(String value) {
         description = value;
     }
@@ -194,7 +194,7 @@ abstract class MCRUserObject {
      * whitespace from non-null strings.
      */
     protected final static String trim(String s) {
-        return (s != null) ? s.trim() : "";
+        return s != null ? s.trim() : "";
     }
 
     /**
@@ -202,7 +202,7 @@ abstract class MCRUserObject {
      * whitespace from non-null strings.
      */
     protected final static String trim(String s, int len) {
-        String sn = (s != null) ? s.trim() : "";
+        String sn = s != null ? s.trim() : "";
 
         if (sn.length() > len) {
             logger.warn("The string \'" + sn + "\' is too long (max. " + Integer.toString(len) + ").");
@@ -221,7 +221,7 @@ abstract class MCRUserObject {
      * @return returns true if all required fields have been provided
      */
     abstract public boolean isValid();
-    
+
     /**
      * This method sends debug data to the logger (for the debug mode).
      */
@@ -237,6 +237,7 @@ abstract class MCRUserObject {
      * This method is only used for providing error messages in the access
      * control component and should be removed later.
      */
+    @Override
     public String toString() {
         return ID;
     }

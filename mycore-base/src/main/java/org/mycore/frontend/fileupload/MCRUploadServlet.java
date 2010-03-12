@@ -87,7 +87,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
     static MCRCache sessionIDs = new MCRCache(100, "UploadServlet Upload sessions");
 
     final static int bufferSize = 65536; // 64 KByte
-    
+
     /*
      * reserved URI characters should not be in uploaded filenames
      * see RFC3986, Section 2.2
@@ -96,11 +96,13 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 
     static Pattern subDelims = Pattern.compile("[^!$&'()*+,;=]*");
 
+    @Override
     public synchronized void init() throws ServletException {
         super.init();
 
-        if (server != null)
+        if (server != null) {
             return; // already inited?
+        }
 
         try {
             //query property directly (not via getBaseURL()), saves a stalled MCRSession
@@ -129,6 +131,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
         }
     }
 
+    @Override
     public void finalize() throws Throwable {
         try {
             if (server != null) {
@@ -163,11 +166,12 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             LOGGER.debug("Received md5      = " + md5);
 
             // Remember current MCRSession for upload
-            String sessionID = (String) (sessionIDs.get(uploadId));
+            String sessionID = (String) sessionIDs.get(uploadId);
             if (sessionID != null) {
                 MCRSession session = MCRSessionMgr.getSession(sessionID);
-                if (session != null)
+                if (session != null) {
                     MCRSessionMgr.setCurrentSession(session);
+                }
             }
             //start transaction after MCRSession is initialized
             long numBytesStored = MCRUploadHandlerManager.getHandler(uploadId).receiveFile(path, zis, length, md5);
@@ -216,6 +220,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
         }
     }
 
+    @Override
     public void doGetPost(MCRServletJob job) throws Exception {
         try {
             invokeMethod(job);
@@ -230,8 +235,8 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
         HttpServletRequest req = job.getRequest();
         HttpServletResponse res = job.getResponse();
 
-        MCREditorSubmission sub = (MCREditorSubmission) (req.getAttribute("MCREditorSubmission"));
-        MCRRequestParameters parms = (sub == null ? new MCRRequestParameters(req) : sub.getParameters());
+        MCREditorSubmission sub = (MCREditorSubmission) req.getAttribute("MCREditorSubmission");
+        MCRRequestParameters parms = sub == null ? new MCRRequestParameters(req) : sub.getParameters();
 
         String method = parms.getParameter("method");
 
@@ -319,7 +324,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             Element uploads = sub.getXML().getRootElement();
             List paths = uploads.getChildren("path");
 
-            if ((paths != null) && (paths.size() >= 0)) {
+            if (paths != null && paths.size() >= 0) {
                 int numFiles = paths.size();
                 LOGGER.info("UploadHandler uploading " + numFiles + " file(s)");
                 handler.startUpload(numFiles);
@@ -329,14 +334,15 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
                     FileItem item = sub.getFile(paths.get(i));
 
                     InputStream in = item.getInputStream();
-                    String path = ((Element) (paths.get(i))).getTextTrim();
+                    String path = ((Element) paths.get(i)).getTextTrim();
                     path = getFileName(path);
 
                     LOGGER.info("UploadServlet uploading " + path);
                     if (path.toLowerCase().endsWith(".zip")) {
                         uploadZipFile(handler, in);
-                    } else
+                    } else {
                         handler.receiveFile(path, in, 0, null);
+                    }
                 }
                 session.beginTransaction();
 
@@ -360,10 +366,12 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 
             // Convert absolute paths to relative paths:
             int pos = path.indexOf(":");
-            if (pos >= 0)
+            if (pos >= 0) {
                 path = path.substring(pos + 1);
-            while (path.startsWith("\\") || path.startsWith("/"))
+            }
+            while (path.startsWith("\\") || path.startsWith("/")) {
                 path = path.substring(1);
+            }
 
             if (entry.isDirectory()) {
                 LOGGER.debug("UploadServlet skipping ZIP entry " + path + ", is a directory");
@@ -383,7 +391,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
      * @param path complete path name
      * @throws MCRException if path contains 'gen-delims' or 'sub-delims'
      */
-    protected static void checkPathName(String path) throws MCRException{
+    protected static void checkPathName(String path) throws MCRException {
         if (!genDelims.matcher(path).matches()) {
             String delims = "\":\" / \"/\" / \"?\" / \"#\" / \"[\" / \"]\" / \"@\"";
             throw new MCRException("Path name " + path + " contains reserved characters from gen-delims: " + delims);
@@ -440,7 +448,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             dos.writeUTF(entry.getValue().getClass().getName());
 
             if (entry.getValue().getClass() == Integer.class) {
-                dos.writeInt(((Integer) (entry.getValue())).intValue());
+                dos.writeInt(((Integer) entry.getValue()).intValue());
             } else {
                 dos.writeUTF(entry.getValue().toString());
             }

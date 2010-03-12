@@ -80,6 +80,7 @@ public class MCRUploadApplet extends JApplet {
 
     private static final File DRIVE_C = new File("C:\\");
 
+    @Override
     public void init() {
         uploadId = getParameter("uploadId");
         targetURL = getParameter("url");
@@ -99,7 +100,7 @@ public class MCRUploadApplet extends JApplet {
         System.out.println("Background color: " + bg.toString());
         setBackground(bg);
         setLocale();
-        System.out.println("Last working directory: " + ((lastDirectory == null) ? null : lastDirectory.getAbsolutePath()));
+        System.out.println("Last working directory: " + (lastDirectory == null ? null : lastDirectory.getAbsolutePath()));
 
         chooserButton = new JButton(translateI18N("MCRUploadApplet.select"));
         chooserButton.addActionListener(new ActionListener() {
@@ -110,6 +111,7 @@ public class MCRUploadApplet extends JApplet {
 
         locationField = new JTextField(30);
         locationField.addKeyListener(new KeyAdapter() {
+            @Override
             public void keyTyped(KeyEvent e) {
                 locationButton.setEnabled(locationField.getText().length() > 0);
             }
@@ -128,21 +130,24 @@ public class MCRUploadApplet extends JApplet {
         locationChooser.setMultiSelectionEnabled(selectMultiple);
 
         // Add a file filter to accept only files with certain extensions
-        if ((acceptFileTypes != null) && (acceptFileTypes.trim().length() > 0) && (!"*".equals(acceptFileTypes.trim()))) {
+        if (acceptFileTypes != null && acceptFileTypes.trim().length() > 0 && !"*".equals(acceptFileTypes.trim())) {
             locationChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
             locationChooser.setFileFilter(new FileFilter() {
                 Set accepted = new HashSet();
 
+                @Override
                 public boolean accept(File f) {
                     if (accepted.isEmpty()) {
                         StringTokenizer st = new StringTokenizer(acceptFileTypes, " ,;");
-                        while (st.hasMoreTokens())
+                        while (st.hasMoreTokens()) {
                             accepted.add(st.nextToken());
+                        }
                     }
                     String[] ext = f.getName().split("\\.");
                     return accepted.contains(ext[ext.length - 1]);
                 }
 
+                @Override
                 public String getDescription() {
                     return acceptFileTypes;
                 }
@@ -219,6 +224,7 @@ public class MCRUploadApplet extends JApplet {
         locationField.setEnabled(false);
 
         Thread th = new Thread() {
+            @Override
             public void run() {
                 MCRUploadCommunicator comm = new MCRUploadCommunicator(peerURL, uploadId, MCRUploadApplet.this);
                 comm.uploadFiles(selectedFiles);
@@ -230,7 +236,7 @@ public class MCRUploadApplet extends JApplet {
     void returnToURL() {
         try {
             URL url = new URL(targetURL);
-            AppletContext context = this.getAppletContext();
+            AppletContext context = getAppletContext();
             context.showDocument(url);
         } catch (Exception exc) {
             System.out.println("Unable to return to URL " + targetURL);
@@ -280,7 +286,7 @@ public class MCRUploadApplet extends JApplet {
 
     private String addSessionInfo(String url, String sessionId) {
 
-        if ((url == null) || (sessionId == null)) {
+        if (url == null || sessionId == null) {
             return url;
         }
         String path = url;

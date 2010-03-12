@@ -33,7 +33,7 @@ import java.util.Map;
  * @version $Revision$ $Date$
  */
 public interface MCRLinkTableInterface {
-    
+
     /**
      * The method create a new item in the datastore.
      * 

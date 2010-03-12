@@ -54,9 +54,9 @@ public class MCRLINKHREFPK implements Serializable {
      *            the type of the link
      */
     public MCRLINKHREFPK(String from, String to, String type) {
-        this.mcrfrom = from;
-        this.mcrto = to;
-        this.mcrtype = type;
+        mcrfrom = from;
+        mcrto = to;
+        mcrtype = type;
     }
 
     /**
@@ -128,6 +128,7 @@ public class MCRLINKHREFPK implements Serializable {
      * 
      * @return Returns true if the object is equal.
      */
+    @Override
     public boolean equals(Object other) {
         if (!(other instanceof MCRLINKHREFPK)) {
             return false;
@@ -135,8 +136,8 @@ public class MCRLINKHREFPK implements Serializable {
 
         MCRLINKHREFPK castother = (MCRLINKHREFPK) other;
 
-        return new EqualsBuilder().append(this.getMcrfrom(), castother.getMcrfrom()).append(this.getMcrto(), castother.getMcrto()).append(this.getMcrtype(),
-                castother.getMcrtype()).isEquals();
+        return new EqualsBuilder().append(getMcrfrom(), castother.getMcrfrom()).append(getMcrto(), castother.getMcrto()).append(
+                getMcrtype(), castother.getMcrtype()).isEquals();
     }
 
     /**
@@ -145,6 +146,7 @@ public class MCRLINKHREFPK implements Serializable {
      * 
      * @return Returns the hash code.
      */
+    @Override
     public int hashCode() {
         return new HashCodeBuilder().append(getMcrfrom()).append(getMcrto()).append(getMcrtype()).toHashCode();
     }

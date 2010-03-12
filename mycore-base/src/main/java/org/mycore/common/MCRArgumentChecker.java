@@ -40,6 +40,7 @@ package org.mycore.common;
  * 
  * @deprecated
  */
+@Deprecated
 public abstract class MCRArgumentChecker {
     /**
      * Ensures that a given boolean expression is true, or throws an

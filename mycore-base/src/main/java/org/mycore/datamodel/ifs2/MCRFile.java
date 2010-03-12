@@ -79,6 +79,7 @@ public class MCRFile extends MCRStoredNode {
      * Returns a MCRVirtualNode contained in this file as a child. A file that
      * is a container, like zip or tar, may contain other files as children.
      */
+    @Override
     protected MCRVirtualNode buildChildNode(FileObject fo) throws Exception {
         return new MCRVirtualNode(this, fo);
     }
@@ -100,9 +101,9 @@ public class MCRFile extends MCRStoredNode {
      *         have an extension
      */
     public String getExtension() {
-        String name = this.getName();
+        String name = getName();
         int pos = name.lastIndexOf(".");
-        return (pos == -1 ? "" : name.substring(pos + 1));
+        return pos == -1 ? "" : name.substring(pos + 1);
     }
 
     /**
@@ -128,15 +129,17 @@ public class MCRFile extends MCRStoredNode {
      * @return the file in the local filesystem representing this file
      */
     public File getLocalFile() throws Exception {
-        if (fo instanceof LocalFile)
+        if (fo instanceof LocalFile) {
             return new File(fo.getURL().getPath());
-        else
+        } else {
             return null;
+        }
     }
 
     /**
      * Repairs additional metadata of this file and all its children
      */
+    @Override
     void repairMetadata() throws Exception {
         data.setName("file");
         data.setAttribute("name", getName());

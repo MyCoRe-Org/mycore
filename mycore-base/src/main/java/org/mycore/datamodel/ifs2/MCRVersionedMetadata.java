@@ -80,6 +80,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         // TODO: set revision of existing data at retrieve()
     }
 
+    @Override
     public MCRVersioningMetadataStore getStore() {
         return (MCRVersioningMetadataStore) store;
     }
@@ -91,6 +92,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
      * @param xml
      *            the metadata document to store
      */
+    @Override
     void create(MCRContent xml) throws Exception {
         super.create(xml);
         commit("create");
@@ -103,10 +105,11 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
      * @param xml
      *            the new version of the document metadata
      */
+    @Override
     public void update(MCRContent xml) throws Exception {
-        if (isDeleted())
+        if (isDeleted()) {
             create(xml);
-        else {
+        } else {
             super.update(xml);
             commit("update");
         }
@@ -118,9 +121,11 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         // Check which paths already exist in SVN
         String[] paths = store.getSlotPaths(id);
         int existing = paths.length - 1;
-        for (; existing >= 0; existing--)
-            if (!repository.checkPath(paths[existing], -1).equals(SVNNodeKind.NONE))
+        for (; existing >= 0; existing--) {
+            if (!repository.checkPath(paths[existing], -1).equals(SVNNodeKind.NONE)) {
                 break;
+            }
+        }
 
         existing += 1;
 
@@ -138,10 +143,11 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
 
         // Commit file changes
         String filePath = paths[paths.length - 1];
-        if (existing < paths.length)
+        if (existing < paths.length) {
             editor.addFile(filePath, null, -1);
-        else
+        } else {
             editor.openFile(filePath, -1);
+        }
 
         editor.applyTextDelta(filePath, null);
         SVNDeltaGenerator deltaGenerator = new SVNDeltaGenerator();
@@ -150,15 +156,16 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         String checksum = deltaGenerator.sendDelta(filePath, in, editor, true);
         in.close();
 
-        if (store.shouldForceXML())
+        if (store.shouldForceXML()) {
             editor.changeFileProperty(filePath, SVNProperty.MIME_TYPE, SVNPropertyValue.create("text/xml"));
+        }
 
         editor.closeFile(filePath, checksum);
         editor.closeDir(); // root
 
         // Commit to SVN
         SVNCommitInfo info = editor.closeEdit();
-        this.revision = info.getNewRevision();
+        revision = info.getNewRevision();
         LOGGER.info("SVN commit of " + mode + " finished, new revision " + revision);
 
         setLastModified(info.getDate());
@@ -168,6 +175,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
      * Deletes this metadata object in the SVN repository, and in the local
      * store.
      */
+    @Override
     public void delete() throws Exception {
         if (isDeleted()) {
             String msg = "You can not delete already deleted data: " + id;
@@ -183,7 +191,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
 
         // Commit to SVN
         SVNCommitInfo info = editor.closeEdit();
-        this.revision = info.getNewRevision();
+        revision = info.getNewRevision();
         LOGGER.info("SVN commit of delete finished, new revision " + revision);
 
         store.delete(fo);
@@ -212,12 +220,12 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         SVNRepository repository = getStore().getRepository();
         String path = store.getSlotPath(id);
 
-        String dir = (path.contains("/") ? path.substring(0, path.lastIndexOf('/')) : "");
-        Collection<SVNLogEntry> entries = (Collection<SVNLogEntry>) (repository.log(new String[] { dir }, null, 0, -1, true, true));
+        String dir = path.contains("/") ? path.substring(0, path.lastIndexOf('/')) : "";
+        Collection<SVNLogEntry> entries = repository.log(new String[] { dir }, null, 0, -1, true, true);
 
         path = "/" + path;
         for (SVNLogEntry entry : entries) {
-            Map<String, SVNLogEntryPath> paths = (Map<String, SVNLogEntryPath>)(entry.getChangedPaths());
+            Map<String, SVNLogEntryPath> paths = entry.getChangedPaths();
             if (paths.containsKey(path)) {
                 char type = paths.get(path).getType();
                 versions.add(new MCRMetadataVersion(this, entry, type));
@@ -245,6 +253,6 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
     public boolean isUpToDate() throws Exception {
         SVNRepository repository = getStore().getRepository();
         SVNDirEntry entry = repository.info(store.getSlotPath(id), -1);
-        return (entry.getRevision() <= revision);
+        return entry.getRevision() <= revision;
     }
 }

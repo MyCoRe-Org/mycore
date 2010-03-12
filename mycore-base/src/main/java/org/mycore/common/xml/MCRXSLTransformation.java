@@ -24,7 +24,6 @@
 package org.mycore.common.xml;
 
 import java.io.File;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collections;
 import java.util.HashMap;
@@ -88,10 +87,10 @@ public class MCRXSLTransformation {
     private static Logger LOGGER = Logger.getLogger(MCRXSLTransformation.class);
 
     private static SAXTransformerFactory saxFactory = null;
-    
+
     private static TransformerFactory factory = TransformerFactory.newInstance();
-    
-    private static final Map emptyParameters=Collections.unmodifiableMap(new HashMap(0,1));
+
+    private static final Map emptyParameters = Collections.unmodifiableMap(new HashMap(0, 1));
 
     private static MCRXSLTransformation singleton = null;
 
@@ -208,7 +207,7 @@ public class MCRXSLTransformation {
      * @param parameters
      */
     public static void setParameters(TransformerHandler handler, Map parameters) {
-        setParameters(handler.getTransformer(),parameters);
+        setParameters(handler.getTransformer(), parameters);
     }
 
     /**
@@ -254,7 +253,7 @@ public class MCRXSLTransformation {
      * @return Document The new document or null, if an exception was thrown.
      */
     public static org.jdom.Document transform(org.jdom.Document in, String stylesheet) {
-        return transform(in,stylesheet,emptyParameters);
+        return transform(in, stylesheet, emptyParameters);
     }
 
     /**
@@ -271,8 +270,9 @@ public class MCRXSLTransformation {
      * @return Document The new document or null, if an exception was thrown.
      */
     public static org.jdom.Document transform(org.jdom.Document in, String stylesheet, Map parameters) {
-        return transform(in,new StreamSource(new File(stylesheet)),parameters);
+        return transform(in, new StreamSource(new File(stylesheet)), parameters);
     }
+
     /**
      * Method transform. Transforms a JDOM-Document <i>in </i> with a given
      * <i>stylesheet </i> to a new document.
@@ -289,10 +289,10 @@ public class MCRXSLTransformation {
     public static org.jdom.Document transform(org.jdom.Document in, Source stylesheet, Map parameters) {
         try {
             Transformer transformer = factory.newTransformer(stylesheet);
-            setParameters(transformer,parameters);
+            setParameters(transformer, parameters);
             return transform(in, transformer);
         } catch (TransformerException e) {
-            LOGGER.fatal(e.getMessage(),e);
+            LOGGER.fatal(e.getMessage(), e);
             return null;
         }
     }

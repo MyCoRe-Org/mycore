@@ -9,18 +9,19 @@ import java.nio.charset.Charset;
 
 import org.jdom.Document;
 import org.jdom.Element;
-
 import org.mycore.common.MCRTestCase;
 
 public class MCRXSLTransformationTest extends MCRTestCase {
-    
+
     MCRXSLTransformation tr;
+
     File stylesheet;
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
-        tr=MCRXSLTransformation.getInstance();
-        stylesheet=File.createTempFile("test",".xsl");
+        tr = MCRXSLTransformation.getInstance();
+        stylesheet = File.createTempFile("test", ".xsl");
         initStylesheet();
     }
 
@@ -28,9 +29,9 @@ public class MCRXSLTransformationTest extends MCRTestCase {
      * @throws FileNotFoundException
      */
     private void initStylesheet() throws FileNotFoundException {
-        FileOutputStream fout=new FileOutputStream(stylesheet);
-        OutputStreamWriter outw=new OutputStreamWriter(fout,Charset.forName("UTF-8"));
-        PrintWriter out=new PrintWriter(outw);
+        FileOutputStream fout = new FileOutputStream(stylesheet);
+        OutputStreamWriter outw = new OutputStreamWriter(fout, Charset.forName("UTF-8"));
+        PrintWriter out = new PrintWriter(outw);
         out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         out.println("<xsl:stylesheet version=\"1.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\">");
         out.println("<xsl:template match='@*|node()'>");
@@ -42,15 +43,15 @@ public class MCRXSLTransformationTest extends MCRTestCase {
         out.close();
     }
 
-    
-    public void testtransform(){
-        Element root=new Element("root");
-        Document in=new Document(root);
-        root.addContent(new Element("child").setAttribute("hasChildren","no"));
-        Document out=MCRXSLTransformation.transform(in,stylesheet.getAbsolutePath());
-        assertTrue("Input not the same as Output",MCRXMLHelper.deepEqual(in,out));
+    public void testtransform() {
+        Element root = new Element("root");
+        Document in = new Document(root);
+        root.addContent(new Element("child").setAttribute("hasChildren", "no"));
+        Document out = MCRXSLTransformation.transform(in, stylesheet.getAbsolutePath());
+        assertTrue("Input not the same as Output", MCRXMLHelper.deepEqual(in, out));
     }
-    
+
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
         stylesheet.delete();

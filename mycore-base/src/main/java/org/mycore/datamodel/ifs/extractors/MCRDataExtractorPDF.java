@@ -26,12 +26,12 @@ package org.mycore.datamodel.ifs.extractors;
 import java.io.InputStream;
 import java.util.Calendar;
 
-import org.jdom.Element;
-import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
+import org.jdom.Element;
+import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
 
 /**
  * Extracts metadata from PDF files using the PDFBox library. The number of
@@ -44,10 +44,12 @@ import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlin
  */
 public class MCRDataExtractorPDF extends MCRDataExtractor {
 
+    @Override
     protected String getSupportedContentTypeIDs() {
         return "jpeg";
     }
 
+    @Override
     protected void extractData(Element container, InputStream in) throws Exception {
         PDDocument pdf = PDDocument.load(in);
 
@@ -79,8 +81,9 @@ public class MCRDataExtractorPDF extends MCRDataExtractor {
         PDDocumentOutline root = pdf.getDocumentCatalog().getDocumentOutline();
         Element outline = new Element("outline");
         addOutlineItems(outline, root.getFirstChild());
-        if (outline.getChildren().size() > 0)
+        if (outline.getChildren().size() > 0) {
             container.addContent(outline);
+        }
 
         pdf.close();
     }

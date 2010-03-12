@@ -60,6 +60,7 @@ public class MCRLinkServlet extends MCRServlet {
      * 
      * @see javax.servlet.GenericServlet#init()
      */
+    @Override
     public void init() throws ServletException {
         super.init();
         LM = MCRLinkTableManager.instance();
@@ -75,6 +76,7 @@ public class MCRLinkServlet extends MCRServlet {
      * @param job
      *            the MCRServletJob instance
      */
+    @Override
     public void doGetPost(MCRServletJob job) throws Exception {
         String from = "";
         String to = "";
@@ -82,20 +84,22 @@ public class MCRLinkServlet extends MCRServlet {
         String host = "";
         try {
             host = job.getRequest().getParameter("host");
-            if ((host == null) || (host.length() == 0)) {
+            if (host == null || host.length() == 0) {
                 host = MCRHit.LOCAL;
             }
             type = job.getRequest().getParameter("type");
-            if ((type == null) || (type.length() == 0)) {
+            if (type == null || type.length() == 0) {
                 type = MCRLinkTableManager.ENTRY_TYPE_REFERENCE;
             }
             from = job.getRequest().getParameter("from");
-            if (from == null)
+            if (from == null) {
                 from = "";
+            }
             to = job.getRequest().getParameter("to");
-            if (to == null)
+            if (to == null) {
                 to = "";
-            if ((from.length() == 0) && (to.length() == 0)) {
+            }
+            if (from.length() == 0 && to.length() == 0) {
                 return; // request failed;
             }
             LOGGER.debug("Input parameter : type=" + type + "   from=" + from + "   to=" + to + "   host=" + host);
@@ -104,7 +108,7 @@ public class MCRLinkServlet extends MCRServlet {
                 MCRResults results = new MCRResults();
                 Collection<String> links = Collections.emptyList();
                 // Look for links
-                if ((from != null) && (from.length() != 0)) {
+                if (from != null && from.length() != 0) {
                     links = LM.getDestinationOf(from, type);
                 } else {
                     links = LM.getSourceOf(to, type);
@@ -121,8 +125,8 @@ public class MCRLinkServlet extends MCRServlet {
                 LOGGER.warn("Remote host access is not supported, use the WebService access!");
             }
         } catch (MCRException e) {
-            generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while retrieving link for ID: " + from
-                    + " - " + to + " - " + type, e, false);
+            generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    "Error while retrieving link for ID: " + from + " - " + to + " - " + type, e, false);
             return;
         }
     }

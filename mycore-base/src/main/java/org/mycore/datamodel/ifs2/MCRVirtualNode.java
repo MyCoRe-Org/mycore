@@ -48,6 +48,7 @@ public class MCRVirtualNode extends MCRNode {
     /**
      * Returns a virtual node that is a child of this virtual node.
      */
+    @Override
     protected MCRVirtualNode buildChildNode(FileObject fo) throws Exception {
         return new MCRVirtualNode(this, fo);
     }

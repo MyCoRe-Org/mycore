@@ -146,7 +146,7 @@ public class MCRObjectStructure {
         int n = children.size();
 
         for (i = 0; i < n; ++i) {
-            if (((MCRMetaLinkID) children.get(i)).getXLinkHref().equals(child.getXLinkHref())) {
+            if ((children.get(i)).getXLinkHref().equals(child.getXLinkHref())) {
                 return false;
             }
         }
@@ -179,7 +179,7 @@ public class MCRObjectStructure {
         int n = children.size();
 
         for (i = 0; i < n; ++i) {
-            if (((MCRMetaLinkID) children.get(i)).getXLinkHref().equals(href)) {
+            if ((children.get(i)).getXLinkHref().equals(href)) {
                 return false;
             }
         }
@@ -205,7 +205,7 @@ public class MCRObjectStructure {
         int n = children.size();
 
         for (i = 0; i < n; ++i) {
-            if (((MCRMetaLinkID) children.get(i)).getXLinkHrefID().equals(href)) {
+            if ((children.get(i)).getXLinkHrefID().equals(href)) {
                 children.remove(i);
 
                 return true;
@@ -232,7 +232,7 @@ public class MCRObjectStructure {
      * @return MCRMetaLink the corresponding link
      */
     public final MCRMetaLinkID getChild(int index) {
-        return (MCRMetaLinkID) children.get(index);
+        return children.get(index);
     }
 
     /**
@@ -241,7 +241,7 @@ public class MCRObjectStructure {
      * @return the child MCRObjectID.
      */
     public final MCRObjectID getChildID(int index) {
-        return ((MCRMetaLinkID) children.get(index)).getXLinkHrefID();
+        return (children.get(index)).getXLinkHrefID();
     }
 
     /**
@@ -257,7 +257,7 @@ public class MCRObjectStructure {
         if (MCRDerivate.existInDatastore(href)) {
             derivates.add(add_derivate);
         } else {
-            logger.warn("Can't find derivate "+href.getId()+" ,ignored.");
+            logger.warn("Can't find derivate " + href.getId() + " ,ignored.");
         }
     }
 
@@ -278,11 +278,11 @@ public class MCRObjectStructure {
      * @return the derivate as MCRMetaLinkID or null
      */
     public final MCRMetaLinkID getDerivate(int index) throws IndexOutOfBoundsException {
-        if ((index < 0) || (index > derivates.size())) {
+        if (index < 0 || index > derivates.size()) {
             throw new IndexOutOfBoundsException("Index error in getDerivate().");
         }
 
-        return (MCRMetaLinkID) derivates.get(index);
+        return derivates.get(index);
     }
 
     /**
@@ -295,7 +295,7 @@ public class MCRObjectStructure {
      *                throw this exception, if the index is false
      */
     public final void removeDerivate(int index) throws IndexOutOfBoundsException {
-        if ((index < 0) || (index > derivates.size())) {
+        if (index < 0 || index > derivates.size()) {
             throw new IndexOutOfBoundsException("Index error in removeDerivate().");
         }
 
@@ -428,15 +428,15 @@ public class MCRObjectStructure {
         }
 
         for (int i = 0; i < derivates.size(); ++i) {
-            if (!((MCRMetaLinkID) derivates.get(i)).isValid()) {
+            if (!(derivates.get(i)).isValid()) {
                 return false;
             }
 
-            if (!((MCRMetaLinkID) derivates.get(i)).getXLinkType().equals("locator")) {
+            if (!(derivates.get(i)).getXLinkType().equals("locator")) {
                 return false;
             }
 
-            if (!((MCRMetaLinkID) derivates.get(i)).getXLinkHrefID().getTypeId().toLowerCase().equals("derivate")) {
+            if (!(derivates.get(i)).getXLinkHrefID().getTypeId().toLowerCase().equals("derivate")) {
                 return false;
             }
         }

@@ -74,13 +74,17 @@ public class PdfPlugin implements TextFilterPlugin {
             }
         }
 
-        if ((p2t_info == null) && !pdftotext()) {
-            throw new FilterPluginInstantiationException(new StringBuffer("The execution of \"pdftotext\" failed.").append("Maybe it's not installed or in your search path!\n").append("To use this Plugin you have to install XPdf").append("http://www.foolabs.com/xpdf/) and ensure ").append("the pdftotext binary is in your search path.\n").append(
-                    "Another reason maybe that you are using a version that").append(" is not compatible with this Plugin:\n").append(getName()).append(" v").append(MAJOR).append('.').append(MINOR).toString());
+        if (p2t_info == null && !pdftotext()) {
+            throw new FilterPluginInstantiationException(new StringBuffer("The execution of \"pdftotext\" failed.").append(
+                    "Maybe it's not installed or in your search path!\n").append("To use this Plugin you have to install XPdf").append(
+                    "http://www.foolabs.com/xpdf/) and ensure ").append("the pdftotext binary is in your search path.\n").append(
+                    "Another reason maybe that you are using a version that").append(" is not compatible with this Plugin:\n").append(
+                    getName()).append(" v").append(MAJOR).append('.').append(MINOR).toString());
         }
 
         if (info == null) {
-            info = new StringBuffer("This filter uses XPDF for transformation.").append("\nSource code is available on http://www.foolabs.com/xpdf/").append("\nCurrently using: ").append(p2t_info).toString();
+            info = new StringBuffer("This filter uses XPDF for transformation.").append(
+                    "\nSource code is available on http://www.foolabs.com/xpdf/").append("\nCurrently using: ").append(p2t_info).toString();
         }
     }
 
@@ -121,14 +125,16 @@ public class PdfPlugin implements TextFilterPlugin {
         } catch (IOException e) {
             if (e.getMessage().indexOf("not found") > 0) {
                 //NOTE: It is a ugly pain to parse a error message, but at worst we throw the wrong error message
-                throw new FilterPluginInstantiationException(new StringBuffer(testcommand[0]).append(" is not installed or in search path!\n").append("To use this Plugin you have to install XPdf").append("http://www.foolabs.com/xpdf/) and ensure ").append("the pdftotext binary is in your search path.").toString(), e);
+                throw new FilterPluginInstantiationException(new StringBuffer(testcommand[0]).append(
+                        " is not installed or in search path!\n").append("To use this Plugin you have to install XPdf").append(
+                        "http://www.foolabs.com/xpdf/) and ensure ").append("the pdftotext binary is in your search path.").toString(), e);
             }
             throw new FilterPluginInstantiationException("Error while excuting " + testcommand, e);
         } catch (InterruptedException e) {
             throw new FilterPluginInstantiationException("Error while excuting " + testcommand, e);
         }
 
-        return (rc == 99);
+        return rc == 99;
     }
 
     private boolean pdftotext(File pdffile, File txtfile) {
@@ -139,8 +145,8 @@ public class PdfPlugin implements TextFilterPlugin {
         try {
             StringBuffer sb = new StringBuffer();
 
-            for (int i = 0; i < testcommand.length; i++) {
-                sb.append(testcommand[i]).append(' ');
+            for (String element : testcommand) {
+                sb.append(element).append(' ');
             }
 
             System.err.println(sb);
@@ -163,7 +169,7 @@ public class PdfPlugin implements TextFilterPlugin {
             throw new MCRConfigurationException("Error while excuting " + testcommand, e);
         }
 
-        return (rc == 00);
+        return rc == 00;
     }
 
     /*

@@ -105,8 +105,8 @@ public class MCREditorOutValidator {
      * @throws JDOMException 
      */
     public MCREditorOutValidator(Document jdom_in, MCRObjectID id) throws JDOMException, IOException {
-        this.errorlog = new ArrayList<String>();
-        this.input = jdom_in;
+        errorlog = new ArrayList<String>();
+        input = jdom_in;
         this.id = id;
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("XML before validation:\n" + new String(MCRUtils.getByteArray(input)));
@@ -231,7 +231,7 @@ public class MCREditorOutValidator {
 
     public static String checkMetaObjectWithLangNotEmpty(Element datasubtag, Class<? extends MCRMetaInterface> metaClass) {
         String text = datasubtag.getTextTrim();
-        if ((text == null) || (text.length() == 0)) {
+        if (text == null || text.length() == 0) {
             return "Element " + datasubtag.getName() + " has no text.";
         }
         return checkMetaObjectWithLang(datasubtag, metaClass);
@@ -303,7 +303,7 @@ public class MCREditorOutValidator {
             for (int i = 0; i < children.size(); i++) {
                 Element child = children.get(i);
                 String text = child.getTextTrim();
-                if ((text == null) || (text.length() == 0)) {
+                if (text == null || text.length() == 0) {
                     datasubtag.removeContent(child);
                     i--;
                     continue;
@@ -313,8 +313,9 @@ public class MCREditorOutValidator {
                     LOGGER.warn("namespace add for xml:lang attribute in " + datasubtag.getName());
                 }
             }
-            if (children.size() == 0)
+            if (children.size() == 0) {
                 return "history date is empty";
+            }
             return checkMetaObjectWithLang(datasubtag, MCRMetaHistoryDate.class);
         }
     }
@@ -331,8 +332,9 @@ public class MCREditorOutValidator {
 
     static class MCRMetaAdressCheck implements MCREditorMetadataValidator {
         public String checkDataSubTag(Element datasubtag) {
-            if (datasubtag.getChildren().size() == 0)
+            if (datasubtag.getChildren().size() == 0) {
                 return "adress is empty";
+            }
             return checkMetaObjectWithLang(datasubtag, MCRMetaAddress.class);
         }
     }
@@ -352,7 +354,7 @@ public class MCREditorOutValidator {
         root.setAttribute("noNamespaceSchemaLocation", mcr_schema, XSI_NAMESPACE);
         // check the label
         String label = root.getAttributeValue("label");
-        if ((label == null) || ((label = label.trim()).length() == 0)) {
+        if (label == null || (label = label.trim()).length() == 0) {
             root.setAttribute("label", id.getId());
         }
         // remove the path elements from the incoming
@@ -428,11 +430,12 @@ public class MCREditorOutValidator {
             checkMetaTags(datatag);
         }
         Collection<String> li = MCRAccessManager.getPermissionsForID(id.getId());
-        if ((li != null) && !li.isEmpty()) {
+        if (li != null && !li.isEmpty()) {
             hasacls = true;
         }
-        if (service.getChild("servacls") == null && !hasacls)
+        if (service.getChild("servacls") == null && !hasacls) {
             setDefaultObjectACLs(service);
+        }
     }
 
     /**
@@ -488,8 +491,9 @@ public class MCREditorOutValidator {
                         continue;
                     }
                     String value = firstcond.getAttributeValue("value");
-                    if (value == null)
+                    if (value == null) {
                         continue;
+                    }
                     if (value.equals("$CurrentUser")) {
                         String thisuser = MCRSessionMgr.getCurrentSession().getCurrentUserID();
                         firstcond.setAttribute("value", thisuser);
@@ -528,7 +532,7 @@ public class MCREditorOutValidator {
         Iterator<Element> metaIt = metadatalist.iterator();
 
         while (metaIt.hasNext()) {
-            Element datatag = (Element) metaIt.next();
+            Element datatag = metaIt.next();
             if (!checkMetaTags(datatag)) {
                 // e.g. datatag is empty
                 LOGGER.debug("Removing element :" + datatag.getName());
@@ -546,7 +550,7 @@ public class MCREditorOutValidator {
         Iterator<Element> structIt = structurelist.iterator();
 
         while (structIt.hasNext()) {
-            Element datatag = (Element) structIt.next();
+            Element datatag = structIt.next();
             if (!checkMetaTags(datatag)) {
                 // e.g. datatag is empty
                 structIt.remove();
@@ -567,7 +571,7 @@ public class MCREditorOutValidator {
             return;
         }
         try {
-            org.jdom.Document xml = (SAX_BUILDER).build(aclxml);
+            org.jdom.Document xml = SAX_BUILDER.build(aclxml);
             org.jdom.Element acls = xml.getRootElement().getChild("servacls");
             if (acls != null) {
                 service.addContent(acls.detach());

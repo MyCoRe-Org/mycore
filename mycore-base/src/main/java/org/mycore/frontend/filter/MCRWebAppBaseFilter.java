@@ -51,7 +51,7 @@ public class MCRWebAppBaseFilter implements Filter {
             } else {
                 webappBase.append(request.getServerName());
                 int port = request.getServerPort();
-                if (!(port == 80 || (request.isSecure() && port == 443))) {
+                if (!(port == 80 || request.isSecure() && port == 443)) {
                     webappBase.append(':').append(port);
                 }
             }

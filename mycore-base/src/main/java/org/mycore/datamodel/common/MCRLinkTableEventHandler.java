@@ -61,6 +61,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
      * @param obj
      *            the MCRObject that caused the event
      */
+    @Override
     protected final void handleObjectCreated(MCREvent evt, MCRObject obj) {
         MCRObjectID mcr_id = obj.getId();
         // set new entries
@@ -84,7 +85,8 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
                     continue;
                 }
                 if (inf instanceof MCRMetaLinkID) {
-                    mcr_linktable.addReferenceLink(mcr_id.toString(), ((MCRMetaLink) inf).getXLinkHref(), MCRLinkTableManager.ENTRY_TYPE_REFERENCE, "");
+                    mcr_linktable.addReferenceLink(mcr_id.toString(), ((MCRMetaLink) inf).getXLinkHref(),
+                            MCRLinkTableManager.ENTRY_TYPE_REFERENCE, "");
                     continue;
                 }
             }
@@ -124,7 +126,8 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
                     if (exists) {
                         continue;
                     }
-                    MCRActiveLinkException activeLink = new MCRActiveLinkException("Failure while adding link!. Destination does not exist.");
+                    MCRActiveLinkException activeLink = new MCRActiveLinkException(
+                            "Failure while adding link!. Destination does not exist.");
                     String destination = classID + "##" + categID;
                     activeLink.addLink(mcr_id.toString(), destination);
                     // throw activeLink;
@@ -135,7 +138,8 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
                     if (!MCRXMLTableManager.instance().exists(new MCRObjectID(destination))) {
                         continue;
                     }
-                    MCRActiveLinkException activeLink = new MCRActiveLinkException("Failure while adding link!. Destination does not exist.");
+                    MCRActiveLinkException activeLink = new MCRActiveLinkException(
+                            "Failure while adding link!. Destination does not exist.");
                     activeLink.addLink(mcr_id.toString(), destination);
                     // throw activeLink;
                     // TODO: should trigger undo-Event
@@ -153,6 +157,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
      * @param obj
      *            the MCRObject that caused the event
      */
+    @Override
     protected final void handleObjectUpdated(MCREvent evt, MCRObject obj) {
         handleObjectRepaired(evt, obj);
     }
@@ -166,6 +171,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
      * @param obj
      *            the MCRObject that caused the event
      */
+    @Override
     protected final void handleObjectDeleted(MCREvent evt, MCRObject obj) {
         deleteOldLinks(obj.getId());
     }
@@ -179,6 +185,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
      * @param obj
      *            the MCRObject that caused the event
      */
+    @Override
     protected final void handleObjectRepaired(MCREvent evt, MCRObject obj) {
         handleObjectDeleted(evt, obj);
         handleObjectCreated(evt, obj);

@@ -40,6 +40,7 @@ public class MCRNotCondition implements MCRCondition {
         return child;
     }
 
+    @Override
     public String toString() {
         return "not (" + child + ")";
     }
@@ -49,8 +50,8 @@ public class MCRNotCondition implements MCRCondition {
     }
 
     public Element toXML() {
-    	Element not = new Element("boolean");
-    	not.setAttribute("operator", "not");    	
+        Element not = new Element("boolean");
+        not.setAttribute("operator", "not");
         not.addContent(child.toXML());
         return not;
     }

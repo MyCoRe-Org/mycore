@@ -51,8 +51,9 @@ import org.apache.log4j.Logger;
 public class MCRURIResolverFilter implements Filter {
     private static final Logger LOGGER = Logger.getLogger(MCRURIResolver.class);
 
-    static ThreadLocal<List> uriList = new ThreadLocal<List>() {
-        protected List initialValue() {
+    static ThreadLocal<List<String>> uriList = new ThreadLocal<List<String>>() {
+        @Override
+        protected List<String> initialValue() {
             return new MyLinkedList();
         }
     };
@@ -90,7 +91,7 @@ public class MCRURIResolverFilter implements Filter {
              * ServletOutputStream.print(String). So we must encode it ourself
              * to byte arrays.
              */
-            if (!uriList.get().isEmpty() && (origOutput.length() > 0)
+            if (!uriList.get().isEmpty() && origOutput.length() > 0
                     && (-1 != response.getContentType().indexOf("text/html") || -1 != response.getContentType().indexOf("text/xml"))) {
                 int pos = getInsertPosition(origOutput);
                 out.write(origOutput.substring(0, pos).getBytes(characterEncoding));
@@ -147,13 +148,14 @@ public class MCRURIResolverFilter implements Filter {
      * 
      * @author Thomas Scheffler (yagee)
      */
-    private static class MyLinkedList extends LinkedList {
+    private static class MyLinkedList extends LinkedList<String> {
 
         private static final long serialVersionUID = -2602420461572432380L;
 
+        @Override
         public String toString() {
             StringBuffer buf = new StringBuffer("The following includes where resolved by MCRURIResolver:\n\n");
-            for (Iterator it = this.iterator(); it.hasNext();) {
+            for (Iterator<String> it = iterator(); it.hasNext();) {
                 Object obj = it.next();
                 buf.append(obj.toString());
                 buf.append('\n');
@@ -172,6 +174,7 @@ public class MCRURIResolverFilter implements Filter {
     private static class MyResponseWrapper extends HttpServletResponseWrapper {
         private ByteArrayOutputStream output;
 
+        @Override
         public String toString() {
             try {
                 return output.toString(getCharacterEncoding());
@@ -193,14 +196,17 @@ public class MCRURIResolverFilter implements Filter {
             output = new ByteArrayOutputStream(16 * 1024);
         }
 
+        @Override
         public PrintWriter getWriter() {
             return new PrintWriter(output);
         }
 
+        @Override
         public ServletOutputStream getOutputStream() throws IOException {
             return new MyServletOutputStream();
         }
 
+        @Override
         public String getCharacterEncoding() {
             final String encoding = super.getCharacterEncoding();
             LOGGER.debug("Character Encoding: " + encoding);
@@ -209,10 +215,12 @@ public class MCRURIResolverFilter implements Filter {
 
         private class MyServletOutputStream extends ServletOutputStream {
 
+            @Override
             public void print(String arg0) throws IOException {
                 output.write(arg0.getBytes(getResponse().getCharacterEncoding()));
             }
 
+            @Override
             public void write(int b) throws IOException {
                 output.write(b);
             }

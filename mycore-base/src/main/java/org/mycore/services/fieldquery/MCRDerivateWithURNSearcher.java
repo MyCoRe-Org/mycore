@@ -25,8 +25,7 @@ public class MCRDerivateWithURNSearcher extends MCRSearcher {
      * bool.MCRCondition, int, java.util.List, boolean)
      */
     @Override
-    public MCRResults search(MCRCondition condition, int maxResults, List<MCRSortBy> sortBy,
-            boolean addSortData) {
+    public MCRResults search(MCRCondition condition, int maxResults, List<MCRSortBy> sortBy, boolean addSortData) {
 
         String value = null;
         if (condition instanceof MCRQueryCondition) {
@@ -38,15 +37,11 @@ public class MCRDerivateWithURNSearcher extends MCRSearcher {
 
         if (value != null && value.equalsIgnoreCase("false")) {
             /* all objects without urn */
-            resultList = conn
-                    .getSession()
-                    .createSQLQuery(
-                            "SELECT MCRID FROM MCRXMLTABLE WHERE MCRID NOT IN (SELECT DISTINCT urn.MCRID FROM MCRURN urn)")
-                    .list();
+            resultList = conn.getSession().createSQLQuery(
+                    "SELECT MCRID FROM MCRXMLTABLE WHERE MCRID NOT IN (SELECT DISTINCT urn.MCRID FROM MCRURN urn)").list();
         } else {
             /* all objects with urn */
-            resultList = conn.getSession().createSQLQuery(
-                    "SELECT DISTINCT mcrid FROM MCRURN ORDER BY 1 ASC").list();
+            resultList = conn.getSession().createSQLQuery("SELECT DISTINCT mcrid FROM MCRURN ORDER BY 1 ASC").list();
         }
 
         MCRResults toReturn = new MCRResults();

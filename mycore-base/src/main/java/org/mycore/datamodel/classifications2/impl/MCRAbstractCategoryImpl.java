@@ -61,8 +61,9 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
 
     public MCRAbstractCategoryImpl() {
         super();
-        if (defaultLang == null)
+        if (defaultLang == null) {
             defaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "en");
+        }
     }
 
     public List<MCRCategory> getChildren() {
@@ -71,7 +72,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         if (children == null) {
             childrenPresent = false;
             childrenLock.readLock().unlock();
-            setChildren(MCRCategoryDAOFactory.getInstance().getChildren(this.id));
+            setChildren(MCRCategoryDAOFactory.getInstance().getChildren(id));
         }
         if (childrenPresent) {
             childrenLock.readLock().unlock();
@@ -90,10 +91,11 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
     }
 
     public MCRCategory getRoot() {
-        if (getId().isRootID())
+        if (getId().isRootID()) {
             return this;
-        if (this.root == null && getParent() != null) {
-            this.root = getParent().getRoot();
+        }
+        if (root == null && getParent() != null) {
+            root = getParent().getRoot();
         }
         return root;
     }
@@ -106,12 +108,12 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         childrenLock.readLock().lock();
         try {
             if (children != null) {
-                return (children.size() == 0) ? false : true;
+                return children.size() == 0 ? false : true;
             }
         } finally {
             childrenLock.readLock().unlock();
         }
-        return MCRCategoryDAOFactory.getInstance().hasChildren(this.id);
+        return MCRCategoryDAOFactory.getInstance().hasChildren(id);
     }
 
     public final boolean isCategory() {
@@ -149,27 +151,30 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
      * 
      */
     void detachFromParent() {
-        if (this.parent != null) {
+        if (parent != null) {
             // remove this from current parent
-            this.parent.getChildren().remove(this);
-            this.parent = null;
+            parent.getChildren().remove(this);
+            parent = null;
         }
     }
 
     public MCRLabel getCurrentLabel() {
         MCRLabel label = getLabel(MCRSessionMgr.getCurrentSession().getCurrentLanguage());
-        if (label != null)
+        if (label != null) {
             return label;
+        }
         label = getLabel(defaultLang);
-        if (label != null)
+        if (label != null) {
             return label;
+        }
         return labels.iterator().next();
     }
 
     public MCRLabel getLabel(String lang) {
         for (MCRLabel label : labels) {
-            if (label.getLang().equals(lang))
+            if (label.getLang().equals(lang)) {
                 return label;
+            }
         }
         return null;
     }

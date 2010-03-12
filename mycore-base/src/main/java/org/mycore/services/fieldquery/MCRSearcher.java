@@ -14,14 +14,13 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandler;
 import org.mycore.common.events.MCREventHandlerBase;
-import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.common.MCRLinkTableManager;
+import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.parsers.bool.MCRCondition;
 
@@ -56,8 +55,8 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
      */
     public void init(String ID) {
         this.ID = ID;
-        this.prefix = "MCR.Searcher." + ID + ".";
-        this.index = MCRConfiguration.instance().getString(prefix + "Index");
+        prefix = "MCR.Searcher." + ID + ".";
+        index = MCRConfiguration.instance().getString(prefix + "Index");
     }
 
     /**
@@ -78,17 +77,20 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
 
     public String getReturnID(MCRFile file) {
         // Maybe fieldquery is used in application without link table manager
-        if (MCRConfiguration.instance().getString("MCR.Persistence.LinkTable.Store.Class", null) == null)
+        if (MCRConfiguration.instance().getString("MCR.Persistence.LinkTable.Store.Class", null) == null) {
             return file.getID();
+        }
 
         String ownerID = file.getOwnerID();
         String returnID = (String) RETURN_ID_CACHE.get(ownerID);
-        if (returnID != null)
+        if (returnID != null) {
             return returnID;
+        }
 
         Collection<String> list = MCRLinkTableManager.instance().getSourceOf(ownerID, MCRLinkTableManager.ENTRY_TYPE_DERIVATE);
-        if ((list == null) || (list.isEmpty()))
+        if (list == null || list.isEmpty()) {
             return file.getID();
+        }
 
         // Return ID of MCRObject this MCRFile belongs to
         returnID = list.iterator().next();
@@ -96,6 +98,7 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
         return returnID;
     }
 
+    @Override
     protected void handleFileCreated(MCREvent evt, MCRFile file) {
         String entryID = file.getID();
         String returnID = getReturnID(file);
@@ -103,6 +106,7 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
         addToIndex(entryID, returnID, fields);
     }
 
+    @Override
     protected void handleFileUpdated(MCREvent evt, MCRFile file) {
         String entryID = file.getID();
         String returnID = getReturnID(file);
@@ -111,21 +115,25 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
         addToIndex(entryID, returnID, fields);
     }
 
+    @Override
     protected void handleFileDeleted(MCREvent evt, MCRFile file) {
         String entryID = file.getID();
         removeFromIndex(entryID);
     }
 
+    @Override
     protected void handleFileRepaired(MCREvent evt, MCRFile file) {
         handleFileUpdated(evt, file);
     }
 
+    @Override
     protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
         String entryID = obj.getId().getId();
         List<MCRFieldValue> fields = MCRData2Fields.buildFields(obj, index);
         addToIndex(entryID, entryID, fields);
     }
 
+    @Override
     protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
         String entryID = obj.getId().getId();
         List<MCRFieldValue> fields = MCRData2Fields.buildFields(obj, index);
@@ -133,19 +141,23 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
         addToIndex(entryID, entryID, fields);
     }
 
+    @Override
     protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
         String entryID = obj.getId().getId();
         removeFromIndex(entryID);
     }
 
+    @Override
     protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
         handleObjectCreated(evt, obj);
     }
 
+    @Override
     protected void undoObjectCreated(MCREvent evt, MCRObject obj) {
         handleObjectDeleted(evt, obj);
     }
 
+    @Override
     protected void undoObjectDeleted(MCREvent evt, MCRObject obj) {
         handleObjectCreated(evt, obj);
     }

@@ -35,7 +35,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
-
 import org.mycore.common.MCRSessionMgr;
 
 /**
@@ -187,7 +186,7 @@ public class MCRTranslation {
             }
             a.add(buf.toString());
         }
-        return (String[]) a.toArray(new String[a.size()]);
+        return a.toArray(new String[a.size()]);
     }
 
     static boolean isArray(String masked) {
@@ -196,10 +195,11 @@ public class MCRTranslation {
             int pos = m.start();
             int count = 0;
             for (int i = pos - 1; i > 0; i--) {
-                if (masked.charAt(i) == '\\')
+                if (masked.charAt(i) == '\\') {
                     count++;
-                else
+                } else {
                     break;
+                }
             }
             if (count % 2 == 0) {
                 return true;

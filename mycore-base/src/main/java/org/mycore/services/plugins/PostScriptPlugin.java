@@ -73,13 +73,18 @@ public class PostScriptPlugin implements TextFilterPlugin {
             }
         }
 
-        if ((p2t_info == null) && !ps2ascii()) {
-            throw new FilterPluginInstantiationException(new StringBuffer("The execution of \"p2ascii\" failed.").append("Maybe it's not installed or in your search path!\n").append("To use this Plugin you have to install GhostScript(").append("http://www.cs.wisc.edu/~ghost/) and ensure ").append("the ps2ascii binary is in your search path.\n").append(
-                    "Another reason maybe that you are using a version that").append(" is not compatible with this Plugin:\n").append(getName()).append(" v").append(MAJOR).append('.').append(MINOR).toString());
+        if (p2t_info == null && !ps2ascii()) {
+            throw new FilterPluginInstantiationException(new StringBuffer("The execution of \"p2ascii\" failed.").append(
+                    "Maybe it's not installed or in your search path!\n").append("To use this Plugin you have to install GhostScript(")
+                    .append("http://www.cs.wisc.edu/~ghost/) and ensure ").append("the ps2ascii binary is in your search path.\n").append(
+                            "Another reason maybe that you are using a version that").append(" is not compatible with this Plugin:\n")
+                    .append(getName()).append(" v").append(MAJOR).append('.').append(MINOR).toString());
         }
 
         if (info == null) {
-            info = new StringBuffer("This filter uses GhostScript for transformation.").append("\nSource code is available on http://www.cs.wisc.edu/~ghost/").append("\nCurrently using: ").append(p2t_info).toString();
+            info = new StringBuffer("This filter uses GhostScript for transformation.").append(
+                    "\nSource code is available on http://www.cs.wisc.edu/~ghost/").append("\nCurrently using: ").append(p2t_info)
+                    .toString();
         }
     }
 
@@ -119,14 +124,16 @@ public class PostScriptPlugin implements TextFilterPlugin {
             p2t_info = infofetch.deleteCharAt(infofetch.length() - 2).toString();
         } catch (IOException e) {
             if (e.getMessage().indexOf("not found") > 0) {
-                throw new FilterPluginInstantiationException(new StringBuffer(testcommand[0]).append(" is not installed or in search path!\n").append("To use this Plugin you have to install GhostScript(").append("http://www.cs.wisc.edu/~ghost/) and ensure ").append("the ps2ascii binary is in your search path.").toString(), e);
+                throw new FilterPluginInstantiationException(new StringBuffer(testcommand[0]).append(
+                        " is not installed or in search path!\n").append("To use this Plugin you have to install GhostScript(").append(
+                        "http://www.cs.wisc.edu/~ghost/) and ensure ").append("the ps2ascii binary is in your search path.").toString(), e);
             }
             throw new FilterPluginInstantiationException("Error while excuting " + testcommand, e);
         } catch (InterruptedException e) {
             throw new FilterPluginInstantiationException("Error while excuting " + testcommand, e);
         }
 
-        return (rc == 0);
+        return rc == 0;
     }
 
     private boolean ps2ascii(File psfile, StringBuffer result) {
@@ -158,7 +165,7 @@ public class PostScriptPlugin implements TextFilterPlugin {
             throw new MCRConfigurationException("Error while excuting " + testcommand, e);
         }
 
-        return (rc == 00);
+        return rc == 00;
     }
 
     /*
@@ -227,6 +234,7 @@ public class PostScriptPlugin implements TextFilterPlugin {
          * 
          * @see java.io.Reader#close()
          */
+        @Override
         public void close() {
         }
 
@@ -235,12 +243,13 @@ public class PostScriptPlugin implements TextFilterPlugin {
          * 
          * @see java.io.Reader#read(char[], int, int)
          */
+        @Override
         public int read(char[] cbuf, int off, int len) {
             if (pos == buf.length()) {
                 return -1;
             }
             int start = pos + off;
-            int charsRead = (buf.length() < (start + len)) ? (buf.length() - start) : len;
+            int charsRead = buf.length() < start + len ? buf.length() - start : len;
             int end = start + charsRead;
             buf.getChars(start, end, cbuf, 0);
             pos = end;

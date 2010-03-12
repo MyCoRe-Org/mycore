@@ -39,13 +39,14 @@ public class MCRTrueCondition implements MCRCondition {
         return true;
     }
 
+    @Override
     public String toString() {
         return "true";
     }
 
     public Element toXML() {
-    	Element cond = new Element("boolean");
-    	cond.setAttribute("operator", "true");
+        Element cond = new Element("boolean");
+        cond.setAttribute("operator", "true");
         return cond;
     }
 

@@ -84,13 +84,15 @@ public abstract class MCRNode {
      * @throws Exception
      */
     public String getPath() throws Exception {
-        if (parent != null)
-            if (parent.parent == null)
+        if (parent != null) {
+            if (parent.parent == null) {
                 return "/" + getName();
-            else
+            } else {
                 return parent.getPath() + "/" + getName();
-        else
+            }
+        } else {
             return "/";
+        }
     }
 
     /**
@@ -136,10 +138,11 @@ public abstract class MCRNode {
      * @return the file size in bytes
      */
     public long getSize() throws Exception {
-        if (isFile())
+        if (isFile()) {
             return fo.getContent().getSize();
-        else
+        } else {
             return 0;
+        }
     }
 
     /**
@@ -150,10 +153,11 @@ public abstract class MCRNode {
      */
     public Date getLastModified() throws Exception {
         FileContent content = fo.getContent();
-        if (content != null)
+        if (content != null) {
             return new Date(content.getLastModifiedTime());
-        else
+        } else {
             return null;
+        }
     }
 
     /**
@@ -175,17 +179,19 @@ public abstract class MCRNode {
      * @return the father of this node's children in VFS
      */
     private FileObject getFather() throws Exception {
-        if (isDirectory())
+        if (isDirectory()) {
             return fo;
-        else if (getSize() == 0)
+        } else if (getSize() == 0) {
             return null;
-        else if (VFS.getManager().canCreateFileSystem(fo)) {
+        } else if (VFS.getManager().canCreateFileSystem(fo)) {
             FileObject father = fo;
-            while (VFS.getManager().canCreateFileSystem(father))
+            while (VFS.getManager().canCreateFileSystem(father)) {
                 father = VFS.getManager().createFileSystem(father);
+            }
             return father;
-        } else
+        } else {
             return null;
+        }
     }
 
     /**
@@ -195,10 +201,11 @@ public abstract class MCRNode {
      */
     public int getNumChildren() throws Exception {
         FileObject father = getFather();
-        if (father == null)
+        if (father == null) {
             return 0;
-        else
+        } else {
             return father.getChildren().length;
+        }
     }
 
     /**
@@ -212,11 +219,12 @@ public abstract class MCRNode {
         FileObject father = getFather();
         if (father != null) {
             FileObject[] childFos = father.getChildren();
-            for (int i = 0; i < childFos.length; i++) {
-                String name = childFos[i].getName().getBaseName();
+            for (FileObject childFo : childFos) {
+                String name = childFo.getName().getBaseName();
                 MCRNode child = getChild(name);
-                if (child != null)
+                if (child != null) {
                     children.add(child);
+                }
             }
         }
         return children;
@@ -242,7 +250,7 @@ public abstract class MCRNode {
      */
     public MCRNode getChild(String name) throws Exception {
         FileObject father = getFather();
-        return (father == null ? null : buildChildNode(getFather().getChild(name)));
+        return father == null ? null : buildChildNode(getFather().getChild(name));
     }
 
     /**
@@ -262,14 +270,15 @@ public abstract class MCRNode {
     public MCRNode getNodeByPath(String path) throws Exception {
         MCRNode current = path.startsWith("/") ? getRoot() : this;
         StringTokenizer st = new StringTokenizer(path, "/");
-        while (st.hasMoreTokens() && (current != null)) {
+        while (st.hasMoreTokens() && current != null) {
             String name = st.nextToken();
-            if (name.equals("."))
+            if (name.equals(".")) {
                 continue;
-            else if (name.equals(".."))
+            } else if (name.equals("..")) {
                 current = current.getParent();
-            else
+            } else {
                 current = current.getChild(name);
+            }
         }
         return current;
     }
@@ -281,7 +290,7 @@ public abstract class MCRNode {
      * @return the content of the file
      */
     public MCRContent getContent() throws Exception {
-        return (isFile() ? MCRContent.readFrom(fo) : null);
+        return isFile() ? MCRContent.readFrom(fo) : null;
     }
 
     /**
@@ -292,6 +301,6 @@ public abstract class MCRNode {
      * @return the content of this file, for random access
      */
     public RandomAccessContent getRandomAccessContent() throws Exception {
-        return (isFile() ? fo.getContent().getRandomAccessContent(RandomAccessMode.READ) : null);
+        return isFile() ? fo.getContent().getRandomAccessContent(RandomAccessMode.READ) : null;
     }
 }

@@ -79,7 +79,7 @@ public class MCRFileNodeServlet extends MCRServlet {
             MCRFilesystemNode root = MCRFilesystemNode.getRootNode(ownerID);
             int pos = ownerID.length() + 1;
             StringBuffer path = new StringBuffer(request.getPathInfo().substring(pos));
-            if ((path.charAt(path.length() - 1) == '/') && path.length() > 1) {
+            if (path.charAt(path.length() - 1) == '/' && path.length() > 1) {
                 path.deleteCharAt(path.length() - 1);
             }
             MCRFilesystemNode node = ((MCRDirectory) root).getChildByPath(path.toString());
@@ -88,8 +88,9 @@ public class MCRFileNodeServlet extends MCRServlet {
             LOGGER.debug("getLastModified returned: " + lastModified);
             return lastModified;
         } catch (RuntimeException e) {
-            if (tx != null && tx.isActive())
+            if (tx != null && tx.isActive()) {
                 tx.rollback();
+            }
             // any error would let us return -1 here
             LOGGER.info("Error while getting last modified date.", e);
             return -1;
@@ -110,6 +111,7 @@ public class MCRFileNodeServlet extends MCRServlet {
     /**
      * Handles the HTTP request
      */
+    @Override
     public void doGetPost(MCRServletJob job) throws IOException {
         HttpServletRequest request = job.getRequest();
         HttpServletResponse response = job.getResponse();
@@ -126,7 +128,8 @@ public class MCRFileNodeServlet extends MCRServlet {
         if (requestPath == null) {
             String msg = "Error: HTTP request path is null";
             LOGGER.error(msg);
-            errorPage(request, response, HttpServletResponse.SC_BAD_REQUEST, msg, new MCRException("No path was given in the request"), false);
+            errorPage(request, response, HttpServletResponse.SC_BAD_REQUEST, msg, new MCRException("No path was given in the request"),
+                    false);
 
             return false;
         }
@@ -177,7 +180,7 @@ public class MCRFileNodeServlet extends MCRServlet {
         // root node is a directory
         int pos = ownerID.length() + 1;
         StringBuffer path = new StringBuffer(request.getPathInfo().substring(pos));
-        if ((path.charAt(path.length() - 1) == '/') && path.length() > 1) {
+        if (path.charAt(path.length() - 1) == '/' && path.length() > 1) {
             path.deleteCharAt(path.length() - 1);
         }
         MCRDirectory dir = (MCRDirectory) root;
@@ -201,7 +204,7 @@ public class MCRFileNodeServlet extends MCRServlet {
         String pI = request.getPathInfo();
         StringBuffer ownerID = new StringBuffer(request.getPathInfo().length());
         boolean running = true;
-        for (int i = (pI.charAt(0) == '/') ? 1 : 0; (i < pI.length() && running); i++) {
+        for (int i = pI.charAt(0) == '/' ? 1 : 0; i < pI.length() && running; i++) {
             switch (pI.charAt(i)) {
             case '/':
                 running = false;
@@ -245,7 +248,7 @@ public class MCRFileNodeServlet extends MCRServlet {
         } else // Send contents of ordinary file
         {
             res.setContentType(file.getContentType().getMimeType());
-            res.setContentLength((int) (file.getSize()));
+            res.setContentLength((int) file.getSize());
             // no transaction needed to copy long streams over slow connections
             MCRSessionMgr.getCurrentSession().commitTransaction();
             OutputStream out = new BufferedOutputStream(res.getOutputStream());
@@ -287,7 +290,8 @@ public class MCRFileNodeServlet extends MCRServlet {
      * @author A.Schaar
      * @see its overwritten in jspdocportal
      */
-    protected void errorPage(HttpServletRequest req, HttpServletResponse res, int error, String msg, Exception ex, boolean xmlstyle) throws IOException {
+    protected void errorPage(HttpServletRequest req, HttpServletResponse res, int error, String msg, Exception ex, boolean xmlstyle)
+            throws IOException {
         generateErrorPage(req, res, error, msg, ex, xmlstyle);
     }
 }

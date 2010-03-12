@@ -65,16 +65,18 @@ public class MCRVersioningMetadataStoreTest extends MCRTestCase {
         store = MCRVersioningMetadataStore.getStore("TEST");
     }
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
-        if (store == null)
+        if (store == null) {
             createStore();
-        else {
+        } else {
             VFS.getManager().resolveFile(store.getBaseDir()).createFolder();
             SVNRepositoryFactory.createLocalRepository(new File(store.getRepositoryURL().getPath()), true, false);
         }
     }
 
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
         VFS.getManager().resolveFile(store.getBaseDir()).delete(Selectors.SELECT_ALL);
@@ -250,20 +252,22 @@ public class MCRVersioningMetadataStoreTest extends MCRTestCase {
         Document xml = new Document(new Element("root"));
         LOGGER.info("Storing 10 XML documents in store:");
         long time = System.currentTimeMillis();
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 10; i++) {
             store.create(MCRContent.readFrom(xml));
+        }
         LOGGER.info("Time: " + (System.currentTimeMillis() - time) + " ms");
 
         time = System.currentTimeMillis();
         xml = new Document(new Element("update"));
         LOGGER.info("Updating 10 XML documents in store:");
-        for (Iterator<Integer> ids = store.listIDs(MCRMetadataStore.ASCENDING); ids.hasNext();)
+        for (Iterator<Integer> ids = store.listIDs(MCRStore.ASCENDING); ids.hasNext();) {
             store.retrieve(ids.next()).update(MCRContent.readFrom(xml));
+        }
         LOGGER.info("Time: " + (System.currentTimeMillis() - time) + " ms");
 
         time = System.currentTimeMillis();
         LOGGER.info("Deleting 10 XML documents from store:");
-        for (Iterator<Integer> ids = store.listIDs(MCRMetadataStore.ASCENDING); ids.hasNext();) {
+        for (Iterator<Integer> ids = store.listIDs(MCRStore.ASCENDING); ids.hasNext();) {
             ids.next();
             ids.remove();
         }

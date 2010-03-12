@@ -45,9 +45,9 @@ public class MCRSQLStatement {
 
     protected Properties conditions;
 
-    protected Vector columns;
+    protected Vector<String> columns;
 
-    protected List sqlColumns;
+    protected List<MCRSQLColumn> sqlColumns;
 
     protected String tableName;
 
@@ -67,10 +67,10 @@ public class MCRSQLStatement {
 
     public MCRSQLStatement(String tableName) {
         this.tableName = tableName;
-        this.values = new Properties();
-        this.conditions = new Properties();
-        this.columns = new Vector();
-        this.sqlColumns = new LinkedList();
+        values = new Properties();
+        conditions = new Properties();
+        columns = new Vector<String>();
+        sqlColumns = new LinkedList<MCRSQLColumn>();
     }
 
     public final MCRSQLStatement setValue(String columnName, String columnValue) {
@@ -113,7 +113,7 @@ public class MCRSQLStatement {
     protected final String getSQLValue(String key) {
         String value = values.getProperty(key);
 
-        return ((value == NULL) ? "NULL" : ("'" + value + "'"));
+        return value == NULL ? "NULL" : "'" + value + "'";
     }
 
     protected final String condition() {
@@ -123,10 +123,10 @@ public class MCRSQLStatement {
 
         StringBuffer sql = new StringBuffer(" WHERE ");
 
-        Enumeration keys = conditions.keys();
+        Enumeration<Object> keys = conditions.keys();
 
         while (keys.hasMoreElements()) {
-            String key = (String) (keys.nextElement());
+            String key = keys.nextElement().toString();
             String value = conditions.getProperty(key);
 
             sql.append(key).append(" ");
@@ -156,10 +156,10 @@ public class MCRSQLStatement {
         StringBuffer columnList = new StringBuffer();
         StringBuffer valueList = new StringBuffer();
 
-        Enumeration keys = values.keys();
+        Enumeration<Object> keys = values.keys();
 
         while (keys.hasMoreElements()) {
-            String column = (String) (keys.nextElement());
+            String column = keys.nextElement().toString();
             String value = getSQLValue(column);
 
             columnList.append(" ").append(column);
@@ -188,14 +188,15 @@ public class MCRSQLStatement {
         StringBuffer valueList = new StringBuffer();
 
         for (int i = 0; i < sqlColumns.size(); i++) {
-            MCRSQLColumn col = (MCRSQLColumn) sqlColumns.get(i);
+            MCRSQLColumn col = sqlColumns.get(i);
             String column = col.getName();
             String value = col.getValue();
 
-            if ((value != null) && (value != "null")) {
+            if (value != null && value != "null") {
                 if (col.getType().toLowerCase().equals("string")) {
                     value = "'" + value + "'";
-                } else if (col.getType().toLowerCase().equals("date") || col.getType().toLowerCase().equals("time") || col.getType().toLowerCase().equals("timestamp")) {
+                } else if (col.getType().toLowerCase().equals("date") || col.getType().toLowerCase().equals("time")
+                        || col.getType().toLowerCase().equals("timestamp")) {
                     // date
                     value = "'" + value + "'";
                 } else if (col.getType().toLowerCase().equals("integer")) {
@@ -224,7 +225,7 @@ public class MCRSQLStatement {
                 columnList.append(" ").append("`" + column + "`");
                 valueList.append(" ").append(value);
 
-                if (i < (sqlColumns.size() - 1)) {
+                if (i < sqlColumns.size() - 1) {
                     columnList.append(",");
                     valueList.append(",");
                 }
@@ -241,10 +242,10 @@ public class MCRSQLStatement {
         StringBuffer statement = new StringBuffer("UPDATE ");
         statement.append(tableName).append(" SET");
 
-        Enumeration keys = values.keys();
+        Enumeration<Object> keys = values.keys();
 
         while (keys.hasMoreElements()) {
-            String key = (String) (keys.nextElement());
+            String key = keys.nextElement().toString();
             String value = getSQLValue(key);
 
             statement.append(" ").append(key).append(" =");
@@ -267,7 +268,7 @@ public class MCRSQLStatement {
         for (int i = 0; i < columns.size(); i++) {
             statement.append(" ").append(columns.elementAt(i));
 
-            if (i < (columns.size() - 1)) {
+            if (i < columns.size() - 1) {
                 statement.append(",");
             }
         }
@@ -284,7 +285,7 @@ public class MCRSQLStatement {
         for (int i = 0; i < columns.size(); i++) {
             statement.append(" ").append(columns.elementAt(i));
 
-            if (i < (columns.size() - 1)) {
+            if (i < columns.size() - 1) {
                 statement.append(",");
             }
         }
@@ -322,7 +323,7 @@ public class MCRSQLStatement {
      * @return value with masked '
      */
     private final String mask(String value) {
-        if (value.indexOf(MASK_WHAT) >= 0){
+        if (value.indexOf(MASK_WHAT) >= 0) {
             return MCRUtils.replaceString(value, MASK_WHAT, MASK_WITH);
         }
         return value;

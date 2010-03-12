@@ -82,25 +82,30 @@ public abstract class MCRDataExtractor extends MCREventHandlerBase {
         return xout.outputString(data);
     }
 
+    @Override
     protected void handleFileCreated(MCREvent evt, MCRFile file) {
         String supported = " " + getSupportedContentTypeIDs() + " ";
-        if (supported.indexOf(" " + file.getContentTypeID() + " ") == -1)
+        if (supported.indexOf(" " + file.getContentTypeID() + " ") == -1) {
             return;
+        }
 
         try {
             InputStream in = new BufferedInputStream(file.getContentAsInputStream());
             String name = getClass().getName();
             Element data = new Element(name.substring(name.lastIndexOf('.') + 1));
             extractData(data, in);
-            if (LOGGER.isDebugEnabled())
+            if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(outputData(data));
-            if (data.getChildren().size() > 0)
+            }
+            if (data.getChildren().size() > 0) {
                 file.setAdditionalData(data);
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
+    @Override
     protected void handleFileUpdated(MCREvent evt, MCRFile file) {
         handleFileCreated(evt, file);
     }
@@ -133,13 +138,16 @@ public abstract class MCRDataExtractor extends MCREventHandlerBase {
      * null or empty.
      */
     protected void addDataValue(Element parent, String name, String value) {
-        if (value == null)
+        if (value == null) {
             return;
+        }
         value = value.trim();
-        if (value.length() == 0)
+        if (value.length() == 0) {
             return;
-        if (value.equals("0") || value.equals("0.0"))
+        }
+        if (value.equals("0") || value.equals("0.0")) {
             return;
+        }
         parent.addContent(new Element(name).setText(value));
     }
 }

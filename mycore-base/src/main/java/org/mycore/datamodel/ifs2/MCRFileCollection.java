@@ -68,9 +68,9 @@ public class MCRFileCollection extends MCRDirectory {
         super(null, store.getSlot(id), new Element("collection"));
         this.store = store;
         this.id = id;
-        if (fo.exists())
+        if (fo.exists()) {
             readAdditionalData();
-        else {
+        } else {
             fo.createFolder();
             new Document(data);
             saveAdditionalData();
@@ -83,7 +83,7 @@ public class MCRFileCollection extends MCRDirectory {
         FileObject src = VFS.getManager().resolveFile(fo, dataFile);
         if (!src.exists()) {
             LOGGER.warn("Metadata file is missing, repairing metadata...");
-            this.data = new Element("collection");
+            data = new Element("collection");
             new Document(data);
             repairMetadata();
         }
@@ -99,6 +99,7 @@ public class MCRFileCollection extends MCRDirectory {
      * Throws a exception, because a file collection's name is always the empty
      * string and therefore can not be renamed.
      */
+    @Override
     public void renameTo(String name) {
         throw new UnsupportedOperationException("File collections can not be renamed");
     }
@@ -127,21 +128,26 @@ public class MCRFileCollection extends MCRDirectory {
      * 
      * @return this
      */
+    @Override
     public MCRFileCollection getRoot() {
         return this;
     }
 
+    @Override
     public int getNumChildren() throws Exception {
         return super.getNumChildren() - 1;
     }
 
+    @Override
     public MCRNode getChild(String name) throws Exception {
-        if (dataFile.equals(name))
+        if (dataFile.equals(name)) {
             return null;
-        else
+        } else {
             return super.getChild(name);
+        }
     }
 
+    @Override
     public String getName() {
         return "";
     }
@@ -150,6 +156,7 @@ public class MCRFileCollection extends MCRDirectory {
      * Repairs additional metadata stored for all files and directories in this
      * collection
      */
+    @Override
     public void repairMetadata() throws Exception {
         super.repairMetadata();
         data.setName("collection");

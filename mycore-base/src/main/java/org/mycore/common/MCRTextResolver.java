@@ -47,6 +47,7 @@ public class MCRTextResolver {
     protected Map<String, String> variablesTable;
 
     protected Map<String, String> resolvedVariables;
+
     protected List<String> unresolvedVariables;
 
     /**
@@ -65,8 +66,8 @@ public class MCRTextResolver {
      */
     public MCRTextResolver(Map<String, String> variablesTable) {
         this.variablesTable = variablesTable;
-        this.resolvedVariables = new Hashtable<String, String>();
-        this.unresolvedVariables = new ArrayList<String>();
+        resolvedVariables = new Hashtable<String, String>();
+        unresolvedVariables = new ArrayList<String>();
     }
 
     /**
@@ -79,7 +80,7 @@ public class MCRTextResolver {
      * if it did not have one
      */
     public String addVariable(String name, String value) {
-        return this.variablesTable.put(name, value);
+        return variablesTable.put(name, value);
     }
 
     /**
@@ -90,7 +91,7 @@ public class MCRTextResolver {
      * no variable with the name exists
      */
     public String removeVariable(String name) {
-        return this.variablesTable.remove(name);
+        return variablesTable.remove(name);
     }
 
     /**
@@ -99,7 +100,7 @@ public class MCRTextResolver {
      * @return true if a variable exists, otherwise false
      */
     public boolean containsVariable(String name) {
-        return this.variablesTable.containsKey(name);
+        return variablesTable.containsKey(name);
     }
 
     /**
@@ -111,8 +112,8 @@ public class MCRTextResolver {
      * @return the resolved string
      */
     public String resolve(String text) {
-        this.resolvedVariables = new Hashtable<String, String>();
-        this.unresolvedVariables = new ArrayList<String>();
+        resolvedVariables = new Hashtable<String, String>();
+        unresolvedVariables = new ArrayList<String>();
         return resolveText(text).getValue();
     }
 
@@ -149,12 +150,13 @@ public class MCRTextResolver {
      */
     private Term getTerm(String text, int pos) {
         Term term = null;
-        if(text.startsWith(Variable.START_ENCLOSING_STRING, pos))
+        if (text.startsWith(Variable.START_ENCLOSING_STRING, pos)) {
             term = new Variable();
-        else if(text.startsWith(Condition.START_ENCLOSING_STRING, pos))
+        } else if (text.startsWith(Condition.START_ENCLOSING_STRING, pos)) {
             term = new Condition();
-        else if(text.startsWith(EscapeCharacter.START_ENCLOSING_STRING, pos))
+        } else if (text.startsWith(EscapeCharacter.START_ENCLOSING_STRING, pos)) {
             term = new EscapeCharacter();
+        }
         return term;
     }
 
@@ -208,7 +210,7 @@ public class MCRTextResolver {
     public Hashtable<String, String> getUsedVariables() {
         Hashtable<String, String> usedVars = new Hashtable<String, String>();
         usedVars.putAll(resolvedVariables);
-        for(String varName : unresolvedVariables) {
+        for (String varName : unresolvedVariables) {
             usedVars.put(varName, "");
         }
         return usedVars;
@@ -224,8 +226,8 @@ public class MCRTextResolver {
     public Hashtable<String, String> getNotUsedVariables() {
         Hashtable<String, String> usedVariables = getUsedVariables();
         Hashtable<String, String> notUsedVariables = new Hashtable<String, String>();
-        for(Map.Entry<String, String> entry : variablesTable.entrySet()) {
-            if(!usedVariables.containsKey(entry.getKey())) {
+        for (Map.Entry<String, String> entry : variablesTable.entrySet()) {
+            if (!usedVariables.containsKey(entry.getKey())) {
                 notUsedVariables.put(entry.getKey(), entry.getValue());
             }
         }
@@ -240,7 +242,7 @@ public class MCRTextResolver {
      * variables, otherwise false
      */
     public boolean isCompletelyResolved() {
-        return (unresolvedVariables.size() == 0) ? true : false;
+        return unresolvedVariables.size() == 0 ? true : false;
     }
 
     /**
@@ -278,20 +280,22 @@ public class MCRTextResolver {
          * The string buffer within the term. For example: {<b>var</b>}. 
          */
         protected StringBuffer termBuffer;
+
         /**
          * If the term is successfully resolved. By default this
          * is true.
          */
         protected boolean resolved;
+
         /**
          * The current character position in the term.
          */
         protected int position;
 
         public Term() {
-            this.termBuffer = new StringBuffer();
-            this.resolved = true;
-            this.position = 0;
+            termBuffer = new StringBuffer();
+            resolved = true;
+            position = 0;
         }
 
         /**
@@ -305,19 +309,21 @@ public class MCRTextResolver {
         public String resolve(String text, int startPosition) {
             for (position = startPosition; position < text.length(); position++) {
                 Term internalTerm = getTerm(text, position);
-                if(internalTerm != null) {
+                if (internalTerm != null) {
                     position += internalTerm.getStartEnclosingString().length();
                     internalTerm.resolve(text, position);
-                    if(internalTerm.resolved == false)
+                    if (internalTerm.resolved == false) {
                         resolved = false;
+                    }
                     position = internalTerm.position;
                     termBuffer.append(internalTerm.getValue());
                 } else {
                     boolean complete = resolveInternal(text, position);
-                    if(complete) {
+                    if (complete) {
                         int endEnclosingSize = getEndEnclosingString().length();
-                        if(endEnclosingSize > 1)
+                        if (endEnclosingSize > 1) {
                             position += endEnclosingSize - 1;
+                        }
                         break;
                     }
                 }
@@ -344,6 +350,7 @@ public class MCRTextResolver {
         }
 
         public abstract String getStartEnclosingString();
+
         public abstract String getEndEnclosingString();
     }
 
@@ -355,6 +362,7 @@ public class MCRTextResolver {
      */
     private class Variable extends Term {
         public static final String START_ENCLOSING_STRING = "{";
+
         public static final String END_ENCLOSING_STRING = "}";
 
         /**
@@ -370,14 +378,15 @@ public class MCRTextResolver {
 
         @Override
         public boolean resolveInternal(String text, int pos) {
-            if(text.startsWith(END_ENCLOSING_STRING, pos)) {
+            if (text.startsWith(END_ENCLOSING_STRING, pos)) {
                 // get the value from the variables table
                 String value = variablesTable.get(termBuffer.toString());
-                if(value == null) {
+                if (value == null) {
                     // variable is not in the list but maybe its a mycore property
-                    if(useMCRProperties)
+                    if (useMCRProperties) {
                         value = MCRConfiguration.instance().getString(termBuffer.toString(), null);
-                    if(value == null) {
+                    }
+                    if (value == null) {
                         unresolvedVariables.add(termBuffer.toString());
                         resolved = false;
                         return true;
@@ -405,6 +414,7 @@ public class MCRTextResolver {
         public String getStartEnclosingString() {
             return START_ENCLOSING_STRING;
         }
+
         @Override
         public String getEndEnclosingString() {
             return END_ENCLOSING_STRING;
@@ -420,26 +430,31 @@ public class MCRTextResolver {
      */
     private class Condition extends Term {
         public static final String START_ENCLOSING_STRING = "[";
+
         public static final String END_ENCLOSING_STRING = "]";
-        
+
         @Override
         protected boolean resolveInternal(String text, int pos) {
-            if(text.startsWith(END_ENCLOSING_STRING, pos))
+            if (text.startsWith(END_ENCLOSING_STRING, pos)) {
                 return true;
+            }
             termBuffer.append(text.charAt(pos));
             return false;
         }
 
         @Override
         public String getValue() {
-            if(resolved)
+            if (resolved) {
                 return super.getValue();
+            }
             return "";
         }
+
         @Override
         public String getStartEnclosingString() {
             return START_ENCLOSING_STRING;
         }
+
         @Override
         public String getEndEnclosingString() {
             return END_ENCLOSING_STRING;
@@ -457,17 +472,20 @@ public class MCRTextResolver {
         public boolean resolveInternal(String text, int pos) {
             return true;
         }
+
         @Override
         public String resolve(String text, int startPos) {
-            this.position = startPos;
+            position = startPos;
             char c = text.charAt(position);
             termBuffer.append(c);
             return termBuffer.toString();
         }
+
         @Override
         public String getStartEnclosingString() {
             return START_ENCLOSING_STRING;
         }
+
         @Override
         public String getEndEnclosingString() {
             return "";
@@ -484,10 +502,12 @@ public class MCRTextResolver {
             termBuffer.append(text.charAt(pos));
             return false;
         }
+
         @Override
         public String getStartEnclosingString() {
             return "";
         }
+
         @Override
         public String getEndEnclosingString() {
             return "";

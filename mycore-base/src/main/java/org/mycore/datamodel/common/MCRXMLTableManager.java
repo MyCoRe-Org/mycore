@@ -77,14 +77,15 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRXMLTableManager {
-    
+
     /** The singleton */
     private static MCRXMLTableManager SINGLETON;
 
     /** Returns the singleton */
     public static synchronized MCRXMLTableManager instance() {
-        if (SINGLETON == null)
+        if (SINGLETON == null) {
             SINGLETON = new MCRXMLTableManager();
+        }
         return SINGLETON;
     }
 
@@ -97,14 +98,14 @@ public class MCRXMLTableManager {
         defaultClass = config.getString("MCR.Metadata.Store.DefaultClass", "org.mycore.datamodel.ifs2.MCRVersioningMetadataStore");
 
         String pattern = config.getString("MCR.Metadata.ObjectID.NumberPattern", "0000000000");
-        defaultLayout = (pattern.length() - 4) + "-2-2";
+        defaultLayout = pattern.length() - 4 + "-2-2";
 
         String base = config.getString("MCR.Metadata.Store.BaseDir");
         baseDir = new File(base);
         checkDir(baseDir, "base");
 
         svnBase = config.getString("MCR.Metadata.Store.SVNBase", null);
-        if ((svnBase != null) && (svnBase.startsWith("file:///"))) {
+        if (svnBase != null && svnBase.startsWith("file:///")) {
             try {
                 svnDir = new File(new URI(svnBase));
             } catch (URISyntaxException ex) {
@@ -201,22 +202,26 @@ public class MCRXMLTableManager {
                     config.set(prefix + "SVNRepositoryURL", svnBase + "/" + project + "/" + type);
 
                     File projectDir = new File(svnDir, project);
-                    if (!projectDir.exists())
+                    if (!projectDir.exists()) {
                         projectDir.mkdirs();
+                    }
                 }
             }
 
             String slotLayout = config.getString(prefix + "SlotLayout", null);
-            if (slotLayout == null)
+            if (slotLayout == null) {
                 config.set(prefix + "SlotLayout", defaultLayout);
+            }
 
             File projectDir = new File(baseDir, project);
-            if (!projectDir.exists())
+            if (!projectDir.exists()) {
                 projectDir.mkdir();
+            }
 
             File typeDir = new File(projectDir, type);
-            if (!typeDir.exists())
+            if (!typeDir.exists()) {
                 typeDir.mkdir();
+            }
 
             config.set(prefix + "BaseDir", typeDir.getAbsolutePath());
         }
@@ -253,8 +258,9 @@ public class MCRXMLTableManager {
         try {
             return create(mcrid, MCRContent.readFrom(xml), lastModified);
         } catch (Exception ex) {
-            if (ex instanceof MCRException)
+            if (ex instanceof MCRException) {
                 throw (MCRException) ex;
+            }
             String msg = "Exception while storing XML metadata of mcrobject " + mcrid.getId();
             throw new MCRPersistenceException(msg, ex);
         }
@@ -272,8 +278,9 @@ public class MCRXMLTableManager {
         try {
             return create(mcrid, MCRContent.readFrom(xml), lastModified);
         } catch (Exception ex) {
-            if (ex instanceof MCRException)
+            if (ex instanceof MCRException) {
                 throw (MCRException) ex;
+            }
             String msg = "Exception while storing XML metadata of mcrobject " + mcrid.getId();
             throw new MCRPersistenceException(msg, ex);
         }
@@ -294,8 +301,9 @@ public class MCRXMLTableManager {
             MCRConfiguration.instance().systemModified();
             return sm;
         } catch (Exception ex) {
-            if (ex instanceof MCRException)
+            if (ex instanceof MCRException) {
                 throw (MCRException) ex;
+            }
             String msg = "Exception while storing XML metadata of mcrobject " + mcrid.getId();
             throw new MCRPersistenceException(msg, ex);
         }
@@ -307,11 +315,13 @@ public class MCRXMLTableManager {
 
     public void delete(MCRObjectID mcrid) {
         try {
-            if (exists(mcrid))
+            if (exists(mcrid)) {
                 getStore(mcrid).delete(mcrid.getNumberAsInteger());
+            }
         } catch (Exception ex) {
-            if (ex instanceof MCRException)
+            if (ex instanceof MCRException) {
                 throw (MCRException) ex;
+            }
             String msg = "Exception while deleting XML metadata of mcrobject " + mcrid.getId();
             throw new MCRPersistenceException(msg, ex);
         }
@@ -330,8 +340,9 @@ public class MCRXMLTableManager {
         try {
             return update(mcrid, MCRContent.readFrom(xml), lastModified);
         } catch (Exception ex) {
-            if (ex instanceof MCRException)
+            if (ex instanceof MCRException) {
                 throw (MCRException) ex;
+            }
             String msg = "Exception while updating XML metadata of mcrobject " + mcrid.getId();
             throw new MCRPersistenceException(msg, ex);
         }
@@ -349,8 +360,9 @@ public class MCRXMLTableManager {
         try {
             return update(mcrid, MCRContent.readFrom(xml), lastModified);
         } catch (Exception ex) {
-            if (ex instanceof MCRException)
+            if (ex instanceof MCRException) {
                 throw (MCRException) ex;
+            }
             String msg = "Exception while updating XML metadata of mcrobject " + mcrid.getId();
             throw new MCRPersistenceException(msg, ex);
         }
@@ -377,8 +389,9 @@ public class MCRXMLTableManager {
             MCRConfiguration.instance().systemModified();
             return sm;
         } catch (Exception ex) {
-            if (ex instanceof MCRException)
+            if (ex instanceof MCRException) {
                 throw (MCRException) ex;
+            }
             String msg = "Exception while updating XML metadata of mcrobject " + mcrid.getId();
             throw new MCRPersistenceException(msg, ex);
         }
@@ -393,8 +406,9 @@ public class MCRXMLTableManager {
         try {
             return retrieveStoredMetadata(mcrid).getMetadata().asXML();
         } catch (Exception ex) {
-            if (ex instanceof MCRException)
+            if (ex instanceof MCRException) {
                 throw (MCRException) ex;
+            }
             String msg = "Exception while retrieving XML metadata of mcrobject " + mcrid.getId();
             throw new MCRPersistenceException(msg, ex);
         }
@@ -409,8 +423,9 @@ public class MCRXMLTableManager {
         try {
             return retrieveStoredMetadata(mcrid).getMetadata().asByteArray();
         } catch (Exception ex) {
-            if (ex instanceof MCRException)
+            if (ex instanceof MCRException) {
                 throw (MCRException) ex;
+            }
             String msg = "Exception while retrieving XML metadata of mcrobject " + mcrid.getId();
             throw new MCRPersistenceException(msg, ex);
         }
@@ -425,8 +440,9 @@ public class MCRXMLTableManager {
         try {
             return getStore(mcrid).retrieve(mcrid.getNumberAsInteger());
         } catch (Exception ex) {
-            if (ex instanceof MCRException)
+            if (ex instanceof MCRException) {
                 throw (MCRException) ex;
+            }
             String msg = "Exception while retrieving XML metadata of mcrobject " + mcrid.getId();
             throw new MCRPersistenceException(msg, ex);
         }
@@ -455,8 +471,9 @@ public class MCRXMLTableManager {
         try {
             return getStore(mcrid).exists(mcrid.getNumberAsInteger());
         } catch (Exception ex) {
-            if (ex instanceof MCRException)
+            if (ex instanceof MCRException) {
                 throw (MCRException) ex;
+            }
             String msg = "Exception while checking existence of mcrobject " + mcrid.getId();
             throw new MCRPersistenceException(msg, ex);
         }
@@ -489,8 +506,9 @@ public class MCRXMLTableManager {
         for (File fProject : baseDir.listFiles()) {
             String project = fProject.getName();
             for (File fType : fProject.listFiles()) {
-                if (!type.equals(fType.getName()))
+                if (!type.equals(fType.getName())) {
                     continue;
+                }
                 String base = project + "_" + type;
                 list.addAll(listIDsForBase(base));
             }

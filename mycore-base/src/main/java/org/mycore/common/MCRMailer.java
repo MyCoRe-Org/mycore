@@ -203,22 +203,25 @@ public class MCRMailer {
         List<Element> rptList = email.getChildren("replyTo");
         List<String> replyTo = new ArrayList<String>();
 
-        for (Element reply : rptList)
+        for (Element reply : rptList) {
             replyTo.add(reply.getTextTrim());
+        }
 
         @SuppressWarnings("unchecked")
         List<Element> toList = email.getChildren("to");
         List<String> to = new ArrayList<String>();
 
-        for (Element toElement : toList)
+        for (Element toElement : toList) {
             to.add(toElement.getTextTrim());
+        }
 
         @SuppressWarnings("unchecked")
         List<Element> bccList = email.getChildren("bcc");
         List<String> bcc = new ArrayList<String>();
 
-        for (Element bccElement : bccList)
+        for (Element bccElement : bccList) {
             bcc.add(bccElement.getTextTrim());
+        }
 
         String subject = email.getChildTextTrim("subject");
         String body = email.getChildTextTrim("body");
@@ -227,8 +230,9 @@ public class MCRMailer {
         List<Element> partsList = email.getChildren("part");
         List<String> parts = new ArrayList<String>();
 
-        for (Element partsElement : partsList)
+        for (Element partsElement : partsList) {
             parts.add(partsElement.getTextTrim());
+        }
 
         send(from, replyTo, to, bcc, subject, body, parts);
     }
@@ -266,12 +270,14 @@ public class MCRMailer {
             throw new MCRException(sb.toString());
         }
         try {
-            if (numTries > 0)
+            if (numTries > 0) {
                 trySending(from, replyTo, to, bcc, subject, body, parts);
+            }
         } catch (Exception ex) {
             logger.info("Sending email failed: ", ex);
-            if (numTries < 2)
+            if (numTries < 2) {
                 return;
+            }
 
             Thread t = new Thread(new Runnable() {
                 public void run() {
@@ -308,24 +314,27 @@ public class MCRMailer {
         if (replyTo != null) {
             InternetAddress[] adrs = new InternetAddress[replyTo.size()];
 
-            for (int i = 0; i < replyTo.size(); i++)
-                adrs[i] = buildAddress((replyTo.get(i)));
+            for (int i = 0; i < replyTo.size(); i++) {
+                adrs[i] = buildAddress(replyTo.get(i));
+            }
 
             msg.setReplyTo(adrs);
         }
 
-        for (int i = 0; i < to.size(); i++)
+        for (int i = 0; i < to.size(); i++) {
             msg.addRecipient(Message.RecipientType.TO, buildAddress(to.get(i)));
+        }
 
         if (bcc != null) {
-            for (int i = 0; i < bcc.size(); i++)
+            for (int i = 0; i < bcc.size(); i++) {
                 msg.addRecipient(Message.RecipientType.BCC, buildAddress(bcc.get(i)));
+            }
         }
 
         msg.setSentDate(new Date());
         msg.setSubject(subject, encoding);
 
-        if ((parts == null) || (parts.size() == 0)) {
+        if (parts == null || parts.size() == 0) {
             msg.setText(body, encoding);
         } else {
             // Create the message part
@@ -345,10 +354,11 @@ public class MCRMailer {
                 messagePart.setDataHandler(new DataHandler(source));
 
                 String fileName = url.getPath();
-                if (fileName.contains("\\"))
+                if (fileName.contains("\\")) {
                     fileName = fileName.substring(fileName.lastIndexOf("\\") + 1);
-                else if (fileName.contains("/"))
+                } else if (fileName.contains("/")) {
                     fileName = fileName.substring(fileName.lastIndexOf("/") + 1);
+                }
                 messagePart.setFileName(fileName);
 
                 multipart.addBodyPart(messagePart);
@@ -376,10 +386,12 @@ public class MCRMailer {
         String addr = s.substring(s.lastIndexOf("<") + 1, s.length() - 1).trim();
 
         // Name must be quoted if it contains umlauts or special characters
-        if (!name.startsWith("\""))
+        if (!name.startsWith("\"")) {
             name = "\"" + name;
-        if (!name.endsWith("\""))
+        }
+        if (!name.endsWith("\"")) {
             name = name + "\"";
+        }
 
         return new InternetAddress(addr, name);
     }

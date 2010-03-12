@@ -77,7 +77,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     }
 
     public Map<MCRCategoryID, Number> countLinksForType(MCRCategory parent, String type, boolean childrenOnly) {
-        boolean restrictedByType = (type != null);
+        boolean restrictedByType = type != null;
         String queryName;
         if (childrenOnly) {
             queryName = restrictedByType ? ".NumberByTypePerChildOfParentID" : ".NumberPerChildOfParentID";
@@ -171,8 +171,9 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         Session session = HIB_CONNECTION_INSTANCE.getSession();
         for (MCRCategoryID categID : categories) {
             final MCRCategoryImpl category = getMCRCategory(session, categID);
-            if (category == null)
+            if (category == null) {
                 throw new MCRPersistenceException("Could not link to unknown category " + categID);
+            }
             MCRCategoryLink link = new MCRCategoryLink(category, objectReference);
             LOGGER.debug("Adding Link from " + link.getCategory().getId() + "(" + link.getCategory().getInternalID() + ") to "
                     + objectReference.getObjectID());
@@ -183,8 +184,9 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     private static MCRCategoryImpl getMCRCategory(Session session, MCRCategoryID categID) {
         MCRCategoryImpl categ = (MCRCategoryImpl) categCache.getIfUpToDate(categID, DAO.getLastModified());
-        if (categ != null)
+        if (categ != null) {
             return categ;
+        }
         categ = MCRCategoryDAOImpl.getByNaturalID(session, categID);
         if (categ == null) {
             return null;
@@ -194,10 +196,10 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     }
 
     public Map<MCRCategoryID, Boolean> hasLinks(MCRCategory category) {
-        if(category == null) {
+        if (category == null) {
             return hasLinksForClassification(category);
         }
-        
+
         MCRCategoryImpl rootImpl = (MCRCategoryImpl) MCRCategoryDAOFactory.getInstance().getCategory(category.getRoot().getId(), -1);
         if (rootImpl == null) {
             //Category does not exist, so it has no links
@@ -229,18 +231,6 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         }
 
         return boolMap;
-    }
-
-    private MCRCategoryID createID(Object[] rootID_ID_Array) {
-        MCRCategoryID categoryID;
-        String classID = (String) rootID_ID_Array[0];
-        String categID = (String) rootID_ID_Array[1];
-        if (categID == null) {
-            categoryID = MCRCategoryID.rootID(classID);
-        } else {
-            categoryID = new MCRCategoryID(classID, categID);
-        }
-        return categoryID;
     }
 
     private Map<MCRCategoryID, Boolean> getNoLinksMap(MCRCategory category) {

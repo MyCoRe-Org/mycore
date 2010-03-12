@@ -44,7 +44,7 @@ public class MCRShutdownThread extends Thread {
     private static final MCRShutdownThread SINGLETON = new MCRShutdownThread();
 
     private MCRShutdownThread() {
-        this.setName("MCR-exit");
+        setName("MCR-exit");
         LOGGER.info("adding MyCoRe ShutdownHook");
         Runtime.getRuntime().addShutdownHook(this);
     }
@@ -53,8 +53,11 @@ public class MCRShutdownThread extends Thread {
         return SINGLETON;
     }
 
+    @Override
     public void run() {
-    	MCRShutdownHandler sh =MCRShutdownHandler.getInstance(); 
-        if(sh!=null) sh.shutDown();
+        MCRShutdownHandler sh = MCRShutdownHandler.getInstance();
+        if (sh != null) {
+            sh.shutDown();
+        }
     }
 }

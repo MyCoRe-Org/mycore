@@ -47,7 +47,7 @@
                 <mkdir dir="${target.applet.classes}" />
                 <javac destdir="${target.applet.classes}" includes="org/mycore/frontend/fileupload/**"
                   excludes="org/mycore/frontend/fileupload/*Handler* org/mycore/frontend/fileupload/*Servlet*" classpathref="compile.classpath"
-                  debug="true" optimize="true" target="1.4" source="1.4" encoding="ISO-8859-15" fork="yes" deprecation="off">
+                  debug="true" optimize="true" target="1.5" source="1.5" encoding="UTF-8" fork="yes" deprecation="off">
                   <src>
                     <path refid="sources.path" />
                   </src>

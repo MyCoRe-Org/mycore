@@ -169,16 +169,19 @@ public class MCRXMLHelper {
      * @return the String with all illegal characters removed
      */
     public static String removeIllegalChars(String text) {
-        if ((text == null) || (text.trim().length() == 0))
+        if (text == null || text.trim().length() == 0) {
             return text;
-        if (org.jdom.Verifier.checkCharacterData(text) == null)
+        }
+        if (org.jdom.Verifier.checkCharacterData(text) == null) {
             return text;
+        }
 
         // It seems we have to filter out invalid XML characters...
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < text.length(); i++) {
-            if (Verifier.isXMLCharacter(text.charAt(i)))
+            if (Verifier.isXMLCharacter(text.charAt(i))) {
                 sb.append(text.charAt(i));
+            }
         }
         return sb.toString();
     }
@@ -221,8 +224,8 @@ public class MCRXMLHelper {
         }
 
         public static boolean equivalent(DocType d1, DocType d2) {
-            return (((d1.getPublicID() == d2.getPublicID()) || d1.getPublicID().equals(d2.getPublicID())) && ((d1.getSystemID() == d2
-                    .getSystemID()) || d1.getSystemID().equals(d2.getSystemID())));
+            return (d1.getPublicID() == d2.getPublicID() || d1.getPublicID().equals(d2.getPublicID()))
+                    && (d1.getSystemID() == d2.getSystemID() || d1.getSystemID().equals(d2.getSystemID()));
         }
 
         public static boolean equivalent(Comment c1, Comment c2) {
@@ -271,18 +274,12 @@ public class MCRXMLHelper {
             return equivalentContent(d1.getDescendants(), d2.getDescendants());
         }
 
-        @SuppressWarnings("unchecked")
-        public static boolean equivalentContent(Element e1, Element e2) {
-            // XXX short circuit if content size1 != content size2
-            return equivalentContent(e1.getDescendants(), e2.getDescendants());
-        }
-
         public static boolean equivalentContent(Iterator<Content> i1, Iterator<Content> i2) {
             boolean result = true;
             while (result && i1.hasNext() && i2.hasNext()) {
                 Object o1 = i1.next();
                 Object o2 = i2.next();
-                if ((o1 instanceof Element) && (o2 instanceof Element)) {
+                if (o1 instanceof Element && o2 instanceof Element) {
                     result = equivalent((Element) o1, (Element) o2);
                     // XXX Hmm, this should work and avoid much recursion
                     // if we can guarentee i1, i2 are instances of
@@ -290,13 +287,13 @@ public class MCRXMLHelper {
                     //
                     // result = equivalentName((Element) o1, (Element) o2) &&
                     // equivalentAttributes((Element) o1, (Element) o2);
-                } else if ((o1 instanceof Text) && (o2 instanceof Text)) {
+                } else if (o1 instanceof Text && o2 instanceof Text) {
                     result = equivalent((Text) o1, (Text) o2);
-                } else if ((o1 instanceof Comment) && (o2 instanceof Comment)) {
+                } else if (o1 instanceof Comment && o2 instanceof Comment) {
                     result = equivalent((Comment) o1, (Comment) o2);
-                } else if ((o1 instanceof ProcessingInstruction) && (o2 instanceof ProcessingInstruction)) {
+                } else if (o1 instanceof ProcessingInstruction && o2 instanceof ProcessingInstruction) {
                     result = equivalent((ProcessingInstruction) o1, (ProcessingInstruction) o2);
-                } else if ((o1 instanceof DocType) && (o2 instanceof DocType)) {
+                } else if (o1 instanceof DocType && o2 instanceof DocType) {
                     result = equivalent((DocType) o1, (DocType) o2);
                 } else {
                     result = false;
@@ -312,7 +309,7 @@ public class MCRXMLHelper {
             Namespace ns2 = e2.getNamespace();
             String localName2 = e2.getName();
 
-            return (ns1.equals(ns2)) && (localName1.equals(localName2));
+            return ns1.equals(ns2) && localName1.equals(localName2);
         }
 
         public static boolean equivalentName(Attribute a1, Attribute a2) {
@@ -322,7 +319,7 @@ public class MCRXMLHelper {
             Namespace ns2 = a2.getNamespace();
             String localName2 = a2.getName();
 
-            return (ns1.equals(ns2)) && (localName1.equals(localName2));
+            return ns1.equals(ns2) && localName1.equals(localName2);
         }
     }
 }

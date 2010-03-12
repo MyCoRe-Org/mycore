@@ -33,7 +33,6 @@ import org.apache.log4j.Logger;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Query;
 import org.hibernate.Session;
-
 import org.mycore.backend.hibernate.tables.MCRLINKHREF;
 import org.mycore.backend.hibernate.tables.MCRLINKHREFPK;
 import org.mycore.common.MCRPersistenceException;
@@ -74,16 +73,16 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
      *            a string with the link ID MCRATTR
      */
     public final void create(String from, String to, String type, String attr) {
-        if ((from == null) || ((from = from.trim()).length() == 0)) {
+        if (from == null || (from = from.trim()).length() == 0) {
             throw new MCRPersistenceException("The from value is null or empty.");
         }
-        if ((to == null) || ((to = to.trim()).length() == 0)) {
+        if (to == null || (to = to.trim()).length() == 0) {
             throw new MCRPersistenceException("The to value is null or empty.");
         }
-        if ((type == null) || ((type = type.trim()).length() == 0)) {
+        if (type == null || (type = type.trim()).length() == 0) {
             throw new MCRPersistenceException("The type value is null or empty.");
         }
-        if ((attr == null) || ((attr = attr.trim()).length() == 0)) {
+        if (attr == null || (attr = attr.trim()).length() == 0) {
             attr = "";
         }
 
@@ -119,15 +118,15 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
      *            a string with the link ID MCRTYPE
      */
     public final void delete(String from, String to, String type) {
-        if ((from == null) || ((from = from.trim()).length() == 0)) {
+        if (from == null || (from = from.trim()).length() == 0) {
             throw new MCRPersistenceException("The from value is null or empty.");
         }
         StringBuffer sb = new StringBuffer();
         sb.append("from ").append(classname).append(" where MCRFROM = '").append(from).append("'");
-        if ((to != null) && ((to = to.trim()).length() > 0)) {
+        if (to != null && (to = to.trim()).length() > 0) {
             sb.append(" and MCRTO = '").append(to).append("'");
         }
-        if ((type != null) && ((type = type.trim()).length() > 0)) {
+        if (type != null && (type = type.trim()).length() > 0) {
             sb.append(" and MCRTYPE = '").append(type).append("'");
         }
         LOGGER.debug("Deleting " + from + " from database MCRLINKHREF");
@@ -158,13 +157,13 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         StringBuffer qBf = new StringBuffer(1024);
         qBf.append("select count(key.mcrfrom) from ").append(classname).append(" where MCRTO like ").append('\'').append(to).append('\'');
 
-        if ((type != null) && (type.length() != 0)) {
+        if (type != null && type.length() != 0) {
             qBf.append(" and MCRTYPE = \'").append(type).append('\'');
         }
-        if ((restriction != null) && (restriction.length() != 0)) {
+        if (restriction != null && restriction.length() != 0) {
             qBf.append(" and MCRTO like \'").append(restriction).append('\'');
         }
-        if ((fromtype != null) && (fromtype.length() != 0)) {
+        if (fromtype != null && fromtype.length() != 0) {
             qBf.append(" and MCRFROM like \'%_").append(fromtype).append("_%\'");
         }
 
@@ -195,7 +194,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         LOGGER.debug("HQL-Statement: " + query);
         Iterator<Object[]> results = session.createQuery(query).list().iterator();
         while (results.hasNext()) {
-            Object[] row = (Object[]) results.next();
+            Object[] row = results.next();
             map.put((String) row[1], (Number) row[0]);
         }
         return map;
@@ -217,7 +216,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         Session session = getSession();
         StringBuffer querySB = new StringBuffer("select key.mcrfrom from ").append(classname).append(" where MCRTO='").append(to).append(
                 "'");
-        if ((type != null) && (type.trim().length() > 0)) {
+        if (type != null && type.trim().length() > 0) {
             querySB.append(" and MCRTYPE = '").append(type).append("'");
         }
         String query = querySB.toString();
@@ -241,7 +240,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         Session session = getSession();
         StringBuffer querySB = new StringBuffer("select key.mcrto from ").append(classname).append(" where MCRFROM='").append(source)
                 .append("'");
-        if ((type != null) && (type.trim().length() != 0)) {
+        if (type != null && type.trim().length() != 0) {
             querySB.append(" and MCRTYPE = '").append(type).append("'");
         }
         String query = querySB.toString();

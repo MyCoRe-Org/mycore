@@ -18,8 +18,7 @@ public class MCRDerivateSearcher extends MCRDerivateWithURNSearcher {
     protected static Logger LOGGER = Logger.getLogger(MCRDerivateSearcher.class);
 
     @Override
-    public MCRResults search(MCRCondition condition, int maxResults, List<MCRSortBy> sortBy,
-            boolean addSortData) {
+    public MCRResults search(MCRCondition condition, int maxResults, List<MCRSortBy> sortBy, boolean addSortData) {
         MCRResults toReturn = new MCRResults();
         try {
             String query = "select a.mcrid from mcrxmltable a where a.mcrtype = 'derivate' and a.mcrid in (select mcrid from mcrurn) and modified ";
@@ -27,8 +26,7 @@ public class MCRDerivateSearcher extends MCRDerivateWithURNSearcher {
             String[] tokens = condition.toString().split(" ");
             if (tokens != null && tokens.length >= 4) {
                 String op = tokens[1];
-                String val = tokens[2].replaceAll("\"", "'") + " "
-                        + tokens[3].replaceAll("\"", "'");
+                String val = tokens[2].replaceAll("\"", "'") + " " + tokens[3].replaceAll("\"", "'");
                 query += op + val;
 
                 MCRHIBConnection conn = MCRHIBConnection.instance();
@@ -42,8 +40,7 @@ public class MCRDerivateSearcher extends MCRDerivateWithURNSearcher {
                 LOGGER.warn("The query with condition " + condition.toString() + " is invalid");
             }
         } catch (Exception ex) {
-            LOGGER.error("The query part " + condition.toString()
-                    + " was invalid, thus returning an empty result", ex);
+            LOGGER.error("The query part " + condition.toString() + " was invalid, thus returning an empty result", ex);
         }
         /* maybe empty, if errors occured */
         return toReturn;

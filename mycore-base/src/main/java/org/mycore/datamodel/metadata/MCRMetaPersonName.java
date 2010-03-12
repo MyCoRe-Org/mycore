@@ -92,7 +92,9 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
      * @param set_prefix      the prefix title
      * @exception MCRException if the parameter values are invalid
      */
-    public MCRMetaPersonName(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted, String set_firstname, String set_callname, String set_surname, String set_fullname, String set_academic, String set_peerage, String set_prefix) throws MCRException {
+    public MCRMetaPersonName(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted,
+            String set_firstname, String set_callname, String set_surname, String set_fullname, String set_academic, String set_peerage,
+            String set_prefix) throws MCRException {
         super(set_datapart, set_subtag, default_lang, set_type, set_inherted);
         firstname = "";
         callname = "";
@@ -122,8 +124,10 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
      * @param set_prefix
      *            the prefix title
      */
-    public final void set(String set_firstname, String set_callname, String set_surname, String set_fullname, String set_academic, String set_peerage, String set_prefix) {
-        if ((set_firstname == null) || (set_callname == null) || (set_surname == null) || (set_fullname == null) || (set_academic == null) || (set_peerage == null) || (set_prefix == null)) {
+    public final void set(String set_firstname, String set_callname, String set_surname, String set_fullname, String set_academic,
+            String set_peerage, String set_prefix) {
+        if (set_firstname == null || set_callname == null || set_surname == null || set_fullname == null || set_academic == null
+                || set_peerage == null || set_prefix == null) {
             throw new MCRException("One or more parameter(s) are null.");
         }
 
@@ -206,6 +210,7 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
      * @param element
      *            a relevant JDOM element for the metadata
      */
+    @Override
     public final void setFromDOM(org.jdom.Element element) {
         super.setFromDOM(element);
         firstname = element.getChildTextTrim("firstname");
@@ -259,6 +264,7 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML MCRMetaPersonName part
      */
+    @Override
     public final org.jdom.Element createXML() throws MCRException {
         if (!isValid()) {
             debug();
@@ -269,7 +275,7 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
         elm.setAttribute("lang", lang, Namespace.XML_NAMESPACE);
         elm.setAttribute("inherited", Integer.toString(inherited));
 
-        if ((type != null) && ((type = type.trim()).length() != 0)) {
+        if (type != null && (type = type.trim()).length() != 0) {
             elm.setAttribute("type", type);
         }
 
@@ -315,6 +321,7 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
      * 
      * @return a boolean value
      */
+    @Override
     public final boolean isValid() {
         if ((firstname = firstname.trim()).length() == 0) {
             firstname = callname;
@@ -324,13 +331,14 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
             callname = firstname;
         }
 
-        if (((firstname = firstname.trim()).length() == 0) && ((surname = surname.trim()).length() == 0)) {
+        if ((firstname = firstname.trim()).length() == 0 && (surname = surname.trim()).length() == 0) {
             return false;
         }
 
         if ((fullname = fullname.trim()).length() == 0) {
             StringBuffer sb = new StringBuffer(128);
-            sb.append(academic).append(' ').append(peerage).append(' ').append(firstname).append(' ').append(prefix).append(' ').append(surname);
+            sb.append(academic).append(' ').append(peerage).append(' ').append(firstname).append(' ').append(prefix).append(' ').append(
+                    surname);
             fullname = sb.toString();
         }
 
@@ -340,13 +348,16 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
     /**
      * This method make a clone of this class.
      */
+    @Override
     public final Object clone() {
-        return new MCRMetaPersonName(datapart, subtag, lang, type, inherited, firstname, callname, surname, fullname, academic, peerage, prefix);
+        return new MCRMetaPersonName(datapart, subtag, lang, type, inherited, firstname, callname, surname, fullname, academic, peerage,
+                prefix);
     }
 
     /**
      * This method put debug data to the logger (for the debug mode).
      */
+    @Override
     public final void debug() {
         super.debugDefault();
         LOGGER.debug("Firstname          = " + firstname);

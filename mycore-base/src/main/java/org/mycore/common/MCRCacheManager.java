@@ -31,13 +31,12 @@ package org.mycore.common;
  * @jmx.mbean
  */
 public class MCRCacheManager implements MCRCacheManagerMBean {
-    
+
     private final MCRCache cache;
-    
-    public MCRCacheManager(final MCRCache cache){
-        this.cache=cache;
+
+    public MCRCacheManager(final MCRCache cache) {
+        this.cache = cache;
     }
-    
 
     public int getCapacity() {
         return cache.capacity;
@@ -62,6 +61,7 @@ public class MCRCacheManager implements MCRCacheManagerMBean {
     public int getSize() {
         return cache.size;
     }
+
     /**
      * @jmx.managed-operation
      */
@@ -69,18 +69,15 @@ public class MCRCacheManager implements MCRCacheManagerMBean {
         cache.setCapacity(capacity);
     }
 
-
     public void clear() {
-        int capacity=getCapacity();
+        int capacity = getCapacity();
         cache.clear();
         setCapacity(capacity);
     }
 
-
     public String getLeastRecentlyUsedElement() {
         return cache.lru.key.toString();
     }
-
 
     public String getMostRecentlyUsedElement() {
         return cache.mru.key.toString();

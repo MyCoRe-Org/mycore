@@ -47,7 +47,7 @@ public class MCRSQLColumn {
     }
 
     public void setType(String value) {
-        this.type = value;
+        type = value;
     }
 
     public String getName() {
@@ -55,7 +55,7 @@ public class MCRSQLColumn {
     }
 
     public void setName(String value) {
-        this.name = value;
+        name = value;
     }
 
     public String getValue() {

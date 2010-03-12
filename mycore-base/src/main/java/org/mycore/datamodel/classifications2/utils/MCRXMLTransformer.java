@@ -23,19 +23,18 @@
  **/
 package org.mycore.datamodel.classifications2.utils;
 
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
-
-import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
@@ -65,11 +64,12 @@ public class MCRXMLTransformer {
         category.setChildren(new ArrayList<MCRCategory>());
         category.setParent(parent);
         category.setLabels(getLabel(e.getChildren("label")));
-        category.setLevel(parent.getLevel()+1);
+        category.setLevel(parent.getLevel() + 1);
         if (e.getChild("url") != null) {
             final String uri = e.getChild("url").getAttributeValue("href", XLINK_NAMESPACE);
-            if (uri != null)
+            if (uri != null) {
                 category.setURI(new URI(uri));
+            }
         }
         buildChildCategories(classID, e.getChildren("category"), category);
         return category;

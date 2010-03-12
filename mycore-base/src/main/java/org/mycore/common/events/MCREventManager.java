@@ -81,14 +81,15 @@ public class MCREventManager {
         }
 
         List<String> names = new ArrayList<String>(props.size());
-        for (Object name : props.keySet())
+        for (Object name : props.keySet()) {
             names.add(name.toString());
+        }
         Collections.sort(names);
 
         List<MCREventHandler> instances = null;
 
         for (int i = 0; i < names.size(); i++) {
-            String name = (String) (names.get(i));
+            String name = names.get(i);
 
             StringTokenizer st = new StringTokenizer(name, ".");
             st.nextToken();
@@ -150,13 +151,14 @@ public class MCREventManager {
      *            the order in which the event handlers are called
      */
     public void handleEvent(MCREvent evt, boolean direction) {
-        List<MCREventHandler> list = (handlers.get(evt.getObjectType()));
-        if (list == null)
+        List<MCREventHandler> list = handlers.get(evt.getObjectType());
+        if (list == null) {
             return;
+        }
 
-        int first = (direction ? 0 : list.size() - 1);
-        int last = (direction ? list.size() - 1 : 0);
-        int step = (direction ? 1 : -1);
+        int first = direction ? 0 : list.size() - 1;
+        int last = direction ? list.size() - 1 : 0;
+        int step = direction ? 1 : -1;
         int undoPos = first;
 
         for (int i = first; i != last + step; i += step) {
@@ -177,7 +179,7 @@ public class MCREventManager {
 
         // Rollback by calling undo of successfull handlers
         for (int i = undoPos - step; i != first - step; i -= step) {
-            MCREventHandler eh = (MCREventHandler) (list.get(i));
+            MCREventHandler eh = list.get(i);
             logger.debug("EventManager " + evt.getObjectType() + " " + evt.getEventType() + " calling undo of handler "
                     + eh.getClass().getName());
 

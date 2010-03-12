@@ -27,7 +27,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
-
 import org.mycore.access.MCRAccessManager;
 
 /**
@@ -69,7 +68,7 @@ public class MCRObjectTypeStrategy implements MCRAccessCheckStrategy {
 
     private static String getObjectType(String id) {
         Matcher m = TYPE_PATTERN.matcher(id);
-        if (m.find() && (m.groupCount() == 1)) {
+        if (m.find() && m.groupCount() == 1) {
             return m.group(1);
         }
         return "";

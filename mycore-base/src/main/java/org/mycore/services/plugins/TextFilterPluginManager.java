@@ -23,18 +23,14 @@
 
 package org.mycore.services.plugins;
 
-import java.io.File;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Properties;
-import java.util.Enumeration;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
@@ -92,38 +88,36 @@ public class TextFilterPluginManager {
         if (props == null) {
             return;
         }
-        
+
         TextFilterPlugin filter = null;
         MCRFileContentType ct;
-        
+
         Enumeration e = props.propertyNames();
-        while (e.hasMoreElements())
-        {
-          String propertyName = (String) e.nextElement();
-          try
-          {
-            Object o = config.getInstanceOf(propertyName);
-            if (null != o)
-            {
-              filter = (TextFilterPlugin)o;
-              LOGGER.info(new StringBuffer(propertyName + "Loading TextFilterPlugin: ").append(filter.getName()).append(" v:").append(filter.getMajorNumber()).append('.').append(filter.getMinorNumber()).toString());
-              for (Iterator CtIterator = filter.getSupportedContentTypes().iterator(); CtIterator.hasNext();) {
-                // Add MIME Type filters to the basket
-                ct = (MCRFileContentType) CtIterator.next();
+        while (e.hasMoreElements()) {
+            String propertyName = (String) e.nextElement();
+            try {
+                Object o = config.getInstanceOf(propertyName);
+                if (null != o) {
+                    filter = (TextFilterPlugin) o;
+                    LOGGER.info(new StringBuffer(propertyName + "Loading TextFilterPlugin: ").append(filter.getName()).append(" v:")
+                            .append(filter.getMajorNumber()).append('.').append(filter.getMinorNumber()).toString());
+                    for (Iterator CtIterator = filter.getSupportedContentTypes().iterator(); CtIterator.hasNext();) {
+                        // Add MIME Type filters to the basket
+                        ct = (MCRFileContentType) CtIterator.next();
 
-                if (ct != null) {
-                    CONTENT_TYPE_PLUGIN_BAG.put(ct, filter);
+                        if (ct != null) {
+                            CONTENT_TYPE_PLUGIN_BAG.put(ct, filter);
+                        }
+                    }
+
+                    PLUGINS.put(filter.getClass().getName(), filter);
+                } else {
+                    LOGGER.info("TextFilterPlugin not available: " + propertyName + " with property: " + props.getProperty(propertyName));
                 }
+            } catch (Exception e1) {
+                LOGGER.info(e1.toString());
             }
 
-            PLUGINS.put(filter.getClass().getName(), filter);
-            }
-            else LOGGER.info("TextFilterPlugin not available: "+ propertyName + " with property: " + props.getProperty(propertyName));
-          } catch (Exception e1)
-          {
-            LOGGER.info(e1.toString());
-          }
-       
         }
     }
 
@@ -163,7 +157,7 @@ public class TextFilterPluginManager {
      * @return corresponding TextFilterPlugin or null if MIME is emtpy or null
      */
     public TextFilterPlugin getPlugin(MCRFileContentType ct) {
-        return (ct == null) ? null : (TextFilterPlugin) CONTENT_TYPE_PLUGIN_BAG.get(ct);
+        return ct == null ? null : (TextFilterPlugin) CONTENT_TYPE_PLUGIN_BAG.get(ct);
     }
 
     /**
@@ -174,7 +168,7 @@ public class TextFilterPluginManager {
      * @return true if content type is supported, else false
      */
     public boolean isSupported(MCRFileContentType ct) {
-        return (ct == null) ? false : CONTENT_TYPE_PLUGIN_BAG.containsKey(ct);
+        return ct == null ? false : CONTENT_TYPE_PLUGIN_BAG.containsKey(ct);
     }
 
     /**

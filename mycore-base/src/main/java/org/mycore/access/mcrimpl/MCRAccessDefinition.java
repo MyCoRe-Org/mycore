@@ -29,35 +29,36 @@ import java.util.HashMap;
  * @author Arne Seifert
  */
 public class MCRAccessDefinition {
-    
+
     private String objid;
+
     private HashMap<String, String> pools = new HashMap<String, String>();
-    
-    public MCRAccessDefinition(){
+
+    public MCRAccessDefinition() {
         pools.clear();
     }
-    
-    public String getObjID(){
+
+    public String getObjID() {
         return objid;
     }
-    
-    public void setObjID(String value){
+
+    public void setObjID(String value) {
         objid = value;
     }
-    
-    public HashMap<String, String> getPool(){
+
+    public HashMap<String, String> getPool() {
         return pools;
     }
-    
-    public void setPool(HashMap<String, String> pool){
+
+    public void setPool(HashMap<String, String> pool) {
         pools = pool;
     }
-    
-    public void addPool(String poolname, String ruleid){
+
+    public void addPool(String poolname, String ruleid) {
         pools.put(poolname, ruleid);
     }
-    
-    public void clearPools(){
+
+    public void clearPools() {
         pools.clear();
     }
 }

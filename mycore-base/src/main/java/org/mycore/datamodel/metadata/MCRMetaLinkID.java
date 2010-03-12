@@ -84,6 +84,7 @@ final public class MCRMetaLinkID extends MCRMetaLink {
      * @exception MCRException
      *                if the set_href value is null, empty or not a MCRObjectID
      */
+    @Override
     public final void setReference(String set_href, String set_label, String set_title) throws MCRException {
         try {
             MCRObjectID hrefid = new MCRObjectID(set_href);
@@ -126,6 +127,7 @@ final public class MCRMetaLinkID extends MCRMetaLink {
      * @exception MCRException
      *                if the from or to element is not a MCRObjectId
      */
+    @Override
     public final void setBiLink(String set_from, String set_to, String set_title) throws MCRException {
         try {
             MCRObjectID fromid = new MCRObjectID(set_from);
@@ -151,7 +153,7 @@ final public class MCRMetaLinkID extends MCRMetaLink {
      *                if the from or to element is not a MCRObjectId
      */
     public final void setBiLink(MCRObjectID set_from, MCRObjectID set_to, String set_title) throws MCRException {
-        if ((set_from == null) || (set_to == null)) {
+        if (set_from == null || set_to == null) {
             throw new MCRException("The from/to value is null.");
         }
 
@@ -195,6 +197,7 @@ final public class MCRMetaLinkID extends MCRMetaLink {
      *                if the xlink:type is not locator or arc or if href or from
      *                and to are not a MCRObjectID
      */
+    @Override
     public final void setFromDOM(org.jdom.Element element) {
         super.setFromDOM(element);
 

@@ -48,8 +48,9 @@ public class MCRIndexBrowserConfig {
         ArrayList<String> list = new ArrayList<String>();
         if (myfields != null) {
             StringTokenizer st = new StringTokenizer(myfields, ",");
-            while(st.hasMoreTokens())
+            while (st.hasMoreTokens()) {
                 list.add(st.nextToken());
+            }
         }
         return list;
     }

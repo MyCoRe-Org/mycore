@@ -59,9 +59,9 @@ public class MCRQueryClient {
         ALL_HOSTS = new ArrayList<String>();
         List children = hosts.getChildren();
         for (int i = 0; i < children.size(); i++) {
-            Element host = (Element) (children.get(i));
+            Element host = (Element) children.get(i);
             String classname = host.getAttributeValue("class");
-            if ((classname == null) || ((classname = classname.trim()).length() == 0)) {
+            if (classname == null || (classname = classname.trim()).length() == 0) {
                 classname = "org.mycore.services.fieldquery.MCRQueryClientWebService";
                 LOGGER.warn("The class attribute for the host is null or empty, MCRQueryClientWebService was set.");
             }
@@ -69,15 +69,15 @@ public class MCRQueryClient {
             try {
                 qi = (MCRQueryClientInterface) Class.forName(classname).newInstance();
             } catch (ClassNotFoundException e) {
-                throw new MCRException(classname + " ClassNotFoundException",e);
+                throw new MCRException(classname + " ClassNotFoundException", e);
             } catch (IllegalAccessException e) {
-                throw new MCRException(classname + " IllegalAccessException",e);
+                throw new MCRException(classname + " IllegalAccessException", e);
             } catch (InstantiationException e) {
-                throw new MCRException(classname + " InstantiationException",e);
+                throw new MCRException(classname + " InstantiationException", e);
             }
             qi.init(host);
             String alias = qi.getAlias();
-            LOGGER.debug("Host " + alias + " uses class "+classname);
+            LOGGER.debug("Host " + alias + " uses class " + classname);
             accessclass.put(alias, qi);
             ALL_HOSTS.add(alias);
         }
@@ -92,12 +92,14 @@ public class MCRQueryClient {
      */
     static void search(MCRQuery query, MCRResults results) {
         List hosts = query.getHosts();
-        if (hosts.isEmpty())
+        if (hosts.isEmpty()) {
             return;
+        }
         query.setHosts(null);
 
-        if (!query.getSortBy().isEmpty())
+        if (!query.getSortBy().isEmpty()) {
             query.setMaxResults(0);
+        }
 
         Document xml = query.buildXML();
         org.w3c.dom.Document inDoc = null;
@@ -109,7 +111,7 @@ public class MCRQueryClient {
         }
 
         for (int i = 0; i < hosts.size(); i++) {
-            String alias = (String) (hosts.get(i));
+            String alias = (String) hosts.get(i);
             MCRQueryClient.search(alias, inDoc, results);
         }
 
@@ -129,7 +131,7 @@ public class MCRQueryClient {
         }
         LOGGER.info("Starting remote query at host " + hostAlias);
         MCRQueryClientInterface qi = (MCRQueryClientInterface) accessclass.get(hostAlias);
-        qi.search(inDoc,results);
+        qi.search(inDoc, results);
     }
 
     /**
@@ -161,16 +163,17 @@ public class MCRQueryClient {
      *             of retrieved classification, valid values are: editor['['formatAlias']']|metadata
      * @return the classification document
      */
-    public static org.w3c.dom.Document doRetrieveClassification(String hostAlias, String level, String type, String classID, String categID, String format) {
+    public static org.w3c.dom.Document doRetrieveClassification(String hostAlias, String level, String type, String classID,
+            String categID, String format) {
         if (!accessclass.containsKey(hostAlias)) {
             String msg = "No configuration for host " + hostAlias;
             throw new MCRConfigurationException(msg);
         }
         LOGGER.info("Starting remote retrieval at host " + hostAlias);
         MCRQueryClientInterface qi = (MCRQueryClientInterface) accessclass.get(hostAlias);
-        return qi.doRetrieveClassification(level,type,classID,categID,format);
+        return qi.doRetrieveClassification(level, type, classID, categID, format);
     }
-    
+
     /**
      * Retrieves an link from remote host using the WebService.
      * 
@@ -191,7 +194,7 @@ public class MCRQueryClient {
         }
         LOGGER.info("Starting remote retrieval at host " + hostAlias);
         MCRQueryClientInterface qi = (MCRQueryClientInterface) accessclass.get(hostAlias);
-        return qi.doRetrieveLinks(from,to,type);
+        return qi.doRetrieveLinks(from, to, type);
     }
-    
+
 }

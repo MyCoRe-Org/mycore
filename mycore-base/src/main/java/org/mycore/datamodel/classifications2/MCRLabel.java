@@ -67,8 +67,9 @@ public class MCRLabel implements Cloneable, Serializable {
     }
 
     public String getDescription() {
-        if (description == null)
+        if (description == null) {
             return "";
+        }
         return description;
     }
 
@@ -107,8 +108,8 @@ public class MCRLabel implements Cloneable, Serializable {
         final int PRIME = 31;
         int result = 1;
         result = PRIME * result + getDescription().hashCode();
-        result = PRIME * result + ((lang == null) ? 0 : lang.hashCode());
-        result = PRIME * result + ((text == null) ? 0 : text.hashCode());
+        result = PRIME * result + (lang == null ? 0 : lang.hashCode());
+        result = PRIME * result + (text == null ? 0 : text.hashCode());
         return result;
     }
 
@@ -119,25 +120,33 @@ public class MCRLabel implements Cloneable, Serializable {
      */
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         final MCRLabel other = (MCRLabel) obj;
         if (lang == null) {
-            if (other.lang != null)
+            if (other.lang != null) {
                 return false;
-        } else if (!lang.equals(other.lang))
+            }
+        } else if (!lang.equals(other.lang)) {
             return false;
+        }
         if (text == null) {
-            if (other.text != null)
+            if (other.text != null) {
                 return false;
-        } else if (!text.equals(other.text))
+            }
+        } else if (!text.equals(other.text)) {
             return false;
-        if (!getDescription().equals(other.getDescription()))
+        }
+        if (!getDescription().equals(other.getDescription())) {
             return false;
+        }
         return true;
     }
 

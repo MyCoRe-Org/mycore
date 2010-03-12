@@ -32,7 +32,7 @@ import org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl;
  * @since 2.0
  */
 public class MCRCategLinkServiceFactory {
-    private static MCRCategLinkService instance=new MCRCategLinkServiceImpl();
+    private static MCRCategLinkService instance = new MCRCategLinkServiceImpl();
 
     /**
      * Returns an instance of a MCRCategoryDAO implementator.

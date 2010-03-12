@@ -57,7 +57,7 @@ class MCRLuceneResults extends MCRResults {
         this.addableFields = addableFields;
         this.sharedIndexContext = sharedIndexContext;
         this.sortFields = sortFields;
-        this.query = luceneQuery;
+        query = luceneQuery;
         this.maxResults = maxResults;
         reQuery();
     }
@@ -71,8 +71,9 @@ class MCRLuceneResults extends MCRResults {
     }
 
     private void checkIndexSearcher() {
-        if (sharedIndexContext.isValid(indexSearcher))
+        if (sharedIndexContext.isValid(indexSearcher)) {
             return;
+        }
         try {
             indexSearcher = sharedIndexContext.getSearcher();
         } catch (Exception e) {
@@ -83,8 +84,9 @@ class MCRLuceneResults extends MCRResults {
     private void reQuery() throws IOException {
         checkIndexSearcher();
         TopFieldCollector collector = TopFieldCollector.create(sortFields, maxResults, false, true, false, false);
-        if (LOGGER.isDebugEnabled())
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Query: " + query);
+        }
         indexSearcher.search(query, collector);
         //Lucene 2.4.1 has a bug: be sure to call collector.topDocs() just once
         //see http://issues.apache.org/jira/browse/LUCENE-942
@@ -112,8 +114,9 @@ class MCRLuceneResults extends MCRResults {
     protected MCRHit getHit(String key) {
         if (!loadComplete) {
             checkIndexSearcher();
-            for (int i = 0; i < getNumHits(); i++)
+            for (int i = 0; i < getNumHits(); i++) {
                 inititializeTopDoc(i, indexSearcher);
+            }
         }
         return super.getHit(key);
     }
@@ -156,10 +159,11 @@ class MCRLuceneResults extends MCRResults {
             loadComplete = true;
         }
         MCRHit oldHit = super.map.get(hit.getKey());
-        if (oldHit != null)
+        if (oldHit != null) {
             oldHit.merge(hit);
-        else
+        } else {
             super.map.put(hit.getKey(), hit);
+        }
         return reQuery;
     }
 
@@ -185,16 +189,18 @@ class MCRLuceneResults extends MCRResults {
     private static void addSortDataToHit(org.apache.lucene.document.Document doc, MCRHit hit, String score, SortField[] sortFields) {
         for (SortField sortField : sortFields) {
             if (SortField.FIELD_SCORE == sortField || sortField.getField() == null) {
-                if (score != null)
+                if (score != null) {
                     hit.addSortData(new MCRFieldValue(MCRFieldDef.getDef("score"), score));
+                }
             } else {
                 String fieldName = sortField.getField();
-                if (fieldName.endsWith(MCRLuceneSearcher.getSortableSuffix()))
+                if (fieldName.endsWith(MCRLuceneSearcher.getSortableSuffix())) {
                     fieldName = fieldName.substring(0, fieldName.length() - MCRLuceneSearcher.getSortableSuffix().length());
+                }
 
                 String values[] = doc.getValues(fieldName);
-                for (int i = 0; i < values.length; i++) {
-                    MCRFieldValue fv = new MCRFieldValue(MCRFieldDef.getDef(fieldName), values[i]);
+                for (String value : values) {
+                    MCRFieldValue fv = new MCRFieldValue(MCRFieldDef.getDef(fieldName), value);
                     hit.addSortData(fv);
                 }
             }
@@ -208,11 +214,12 @@ class MCRLuceneResults extends MCRResults {
 
     @Override
     public void cutResults(int maxResults) {
-        while ((hits.size() > maxResults) && (maxResults > 0)) {
+        while (hits.size() > maxResults && maxResults > 0) {
             MCRHit hit = hits.remove(hits.size() - 1);
             topDocs.totalHits--;
-            if (hit != null)
+            if (hit != null) {
                 map.remove(hit.getKey());
+            }
         }
     }
 

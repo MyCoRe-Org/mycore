@@ -87,7 +87,7 @@ public class MCRSLNPAuthenticator {
 
             for (int i = 0; i < 20; i++) {
                 String line = br.readLine();
-                if ((line == null) || line.startsWith("510") || line.startsWith("250")) {
+                if (line == null || line.startsWith("510") || line.startsWith("250")) {
                     break;
                 }
                 if (line.startsWith(pinPattern)) {
@@ -99,11 +99,12 @@ public class MCRSLNPAuthenticator {
             String msg = "Exception while communicating with SLNP Server";
             throw new MCRException(msg, ex);
         } finally {
-            if (socket != null)
+            if (socket != null) {
                 try {
                     socket.close();
                 } catch (Exception ignored) {
                 }
+            }
         }
         return authenticated;
     }

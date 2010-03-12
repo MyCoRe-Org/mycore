@@ -29,18 +29,19 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 public class MCRIndexBrowserXmlGenerator {
 
     protected static Logger LOGGER = Logger.getLogger(MCRIndexBrowserXmlGenerator.class);
-    
+
     protected static final String defaultlang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "de");
 
     protected Element page;
 
     protected MCRIndexBrowserIncomingData browseData;
-    
+
     protected MCRIndexBrowserConfig indexConfig;
-    
+
     protected List<MCRIndexBrowserEntry> resultList;
-    
-    public MCRIndexBrowserXmlGenerator(List<MCRIndexBrowserEntry> resultList, MCRIndexBrowserIncomingData browseData, MCRIndexBrowserConfig indexConfig) {
+
+    public MCRIndexBrowserXmlGenerator(List<MCRIndexBrowserEntry> resultList, MCRIndexBrowserIncomingData browseData,
+            MCRIndexBrowserConfig indexConfig) {
         this.browseData = browseData;
         this.indexConfig = indexConfig;
         this.resultList = resultList;
@@ -69,15 +70,16 @@ public class MCRIndexBrowserXmlGenerator {
                 v.setAttribute("pos", String.valueOf(i));
 
                 List<String> sortValues = entry.getSortValues();
-                
+
                 v.addContent(new Element("sort").addContent(sortValues.get(0)));
                 String idx = sortValues.get(0);
-                if(sortValues.size() > 1)
+                if (sortValues.size() > 1) {
                     idx = sortValues.get(1);
+                }
                 v.addContent(new Element("idx").addContent(idx));
                 v.addContent(new Element("id").addContent(entry.getObjectId()));
 
-                for(int index = 0; index < indexConfig.getOutputList().size(); index++) {
+                for (int index = 0; index < indexConfig.getOutputList().size(); index++) {
                     Element col = new Element("col");
                     col.setAttribute("name", indexConfig.getOutputList().get(index));
                     col.addContent(entry.getOutputValue(index));
@@ -92,17 +94,17 @@ public class MCRIndexBrowserXmlGenerator {
             List<MyRangeDelim> delims = new Vector<MyRangeDelim>();
 
             int index = from;
-            do {  
+            do {
                 MCRIndexBrowserEntry firstEntry = resultList.get(index);
                 delims.add(new MyRangeDelim(index, firstEntry.getSortValue(0)));
                 index += stepSize;
                 String secondValue = "";
-                if(index >= to) {
+                if (index >= to) {
                     index = to - 1;
                 }
                 secondValue = resultList.get(index).getSortValue(0);
                 delims.add(new MyRangeDelim(index, secondValue));
-            } while((++index) < to);
+            } while (++index < to);
             buildPrefixDifference(delims);
             buildXML(resultsElement, delims);
         }
@@ -118,10 +120,11 @@ public class MCRIndexBrowserXmlGenerator {
     private int calculateStepSize(int numSelectedRows, int maxPerPage) {
         for (int i = 1;; i++) {
             double dNum = numSelectedRows;
-            double dI = 1.0 / ((double) i);
+            double dI = 1.0 / i;
             double root = Math.pow(dNum, dI);
-            if (root <= maxPerPage)
-                return (int) (Math.floor(dNum / root));
+            if (root <= maxPerPage) {
+                return (int) Math.floor(dNum / root);
+            }
         }
     }
 
@@ -205,7 +208,7 @@ public class MCRIndexBrowserXmlGenerator {
                     while (it.hasNext()) {
                         Element el = (Element) it.next();
                         String lang = el.getAttributeValue("lang", org.jdom.Namespace.XML_NAMESPACE);
-                        if ((lang != null) && (lang.equals(currentlang))) {
+                        if (lang != null && lang.equals(currentlang)) {
                             if (attribute != el.getAttributeValue("type")) {
                                 if (value.length() > 0) {
                                     value += " - ";
@@ -215,7 +218,7 @@ public class MCRIndexBrowserXmlGenerator {
                             }
                             counter++;
                         }
-                        if ((lang != null) && (lang.equals(currentlang))) {
+                        if (lang != null && lang.equals(currentlang)) {
                             hasdefault = true;
                         }
                     }
@@ -227,7 +230,7 @@ public class MCRIndexBrowserXmlGenerator {
                             while (it.hasNext()) {
                                 Element el = (Element) it.next();
                                 String lang = el.getAttributeValue("lang", org.jdom.Namespace.XML_NAMESPACE);
-                                if ((lang != null) && (lang.equals(defaultlang))) {
+                                if (lang != null && lang.equals(defaultlang)) {
                                     if (attribute != el.getAttributeValue("type")) {
                                         if (value.length() > 0) {
                                             value += " - ";
@@ -295,17 +298,17 @@ public class MCRIndexBrowserXmlGenerator {
      */
     protected void buildPrefixDifference(List<MyRangeDelim> delims) {
         for (int i = 0; i < delims.size(); i++) {
-            MyRangeDelim curr = (delims.get(i));
-            MyRangeDelim prev = (delims.get(Math.max(0, i - 1)));
-            MyRangeDelim next = (delims.get(Math.min(i + 1, delims.size() - 1)));
+            MyRangeDelim curr = delims.get(i);
+            MyRangeDelim prev = delims.get(Math.max(0, i - 1));
+            MyRangeDelim next = delims.get(Math.min(i + 1, delims.size() - 1));
 
             String vCurr = curr.value;
-            String vPrev = (i > 0 ? prev.value : "");
-            String vNext = (i < delims.size() - 1 ? next.value : "");
+            String vPrev = i > 0 ? prev.value : "";
+            String vNext = i < delims.size() - 1 ? next.value : "";
 
             String a = buildPrefixDifference(vCurr, vPrev);
             String b = buildPrefixDifference(vCurr, vNext);
-            curr.diff = (a.length() > b.length() ? a : b);
+            curr.diff = a.length() > b.length() ? a : b;
         }
     }
 
@@ -316,19 +319,22 @@ public class MCRIndexBrowserXmlGenerator {
      * @return the prefix which is equal in both string
      */
     protected String buildPrefixDifference(String a, String b) {
-        if (a.equals(b))
+        if (a.equals(b)) {
             return a;
+        }
 
         StringBuffer pdiff = new StringBuffer();
 
         for (int i = 0; i < Math.min(a.length(), b.length()); i++) {
             pdiff.append(a.charAt(i));
-            if (a.charAt(i) != b.charAt(i))
+            if (a.charAt(i) != b.charAt(i)) {
                 break;
+            }
         }
 
-        if ((a.length() > b.length()) && (b.equals(pdiff.toString())))
+        if (a.length() > b.length() && b.equals(pdiff.toString())) {
             pdiff.append(a.charAt(pdiff.length()));
+        }
 
         return pdiff.toString();
     }
@@ -340,8 +346,8 @@ public class MCRIndexBrowserXmlGenerator {
      */
     protected void buildXML(Element results, List<MyRangeDelim> delims) {
         for (int i = 0; i < delims.size(); i += 2) {
-            MyRangeDelim start = (delims.get(i));
-            MyRangeDelim end = (delims.get(i + 1));
+            MyRangeDelim start = delims.get(i);
+            MyRangeDelim end = delims.get(i + 1);
 
             Element range = new Element("range");
             results.addContent(range);
@@ -378,4 +384,3 @@ public class MCRIndexBrowserXmlGenerator {
     }
 
 }
-

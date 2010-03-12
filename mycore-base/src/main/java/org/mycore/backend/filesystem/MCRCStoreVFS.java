@@ -34,7 +34,6 @@ import org.apache.commons.vfs.FileSystemOptions;
 import org.apache.commons.vfs.VFS;
 import org.apache.commons.vfs.provider.sftp.SftpFileSystemConfigBuilder;
 import org.apache.log4j.Logger;
-
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
@@ -79,13 +78,14 @@ public class MCRCStoreVFS extends MCRContentStore {
 
     private static final Logger LOGGER = Logger.getLogger(MCRCStoreVFS.class);
 
+    @Override
     protected String doStoreContent(MCRFileReader file, MCRContentInputStream source) throws Exception {
         StringBuffer storageId = new StringBuffer();
 
         String[] slots = buildSlotPath();
         // Recursively create directory name
-        for (int i = 0; i < slots.length; i++) {
-            storageId.append(slots[i]).append("/");
+        for (String slot : slots) {
+            storageId.append(slot).append("/");
         }
 
         String fileId = buildNextID(file);
@@ -100,21 +100,24 @@ public class MCRCStoreVFS extends MCRContentStore {
         return storageId.toString();
     }
 
+    @Override
     protected void doDeleteContent(String storageId) throws Exception {
         FileObject targetObject = fsManager.resolveFile(getBase(), storageId);
-        LOGGER.debug("Delete fired on: "+targetObject);
-        LOGGER.debug("targetObject.class = "+targetObject.getClass().getName());
-        if (targetObject.delete()){
-            LOGGER.debug("Delete of "+targetObject+" was successful.");
+        LOGGER.debug("Delete fired on: " + targetObject);
+        LOGGER.debug("targetObject.class = " + targetObject.getClass().getName());
+        if (targetObject.delete()) {
+            LOGGER.debug("Delete of " + targetObject + " was successful.");
         } else {
-            LOGGER.warn("Delete of "+targetObject+" was NOT successful (w/o errors given).");
+            LOGGER.warn("Delete of " + targetObject + " was NOT successful (w/o errors given).");
         }
     }
 
+    @Override
     protected void doRetrieveContent(MCRFileReader file, OutputStream target) throws Exception {
         MCRUtils.copyStream(doRetrieveContent(file), target);
     }
 
+    @Override
     protected InputStream doRetrieveContent(MCRFileReader file) throws Exception {
         FileObject targetObject = fsManager.resolveFile(getBase(), file.getStorageID());
         FileContent targetContent = targetObject.getContent();
@@ -125,6 +128,7 @@ public class MCRCStoreVFS extends MCRContentStore {
         return fsManager.resolveFile(uri, opts);
     }
 
+    @Override
     public void init(String storeId) {
         super.init(storeId);
 

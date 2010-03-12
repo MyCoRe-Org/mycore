@@ -39,8 +39,8 @@ public class MCRLINKHREF {
      * The constructor of the class MCRLINKHREF
      */
     public MCRLINKHREF() {
-        this.key = new MCRLINKHREFPK();
-        this.attr = "";
+        key = new MCRLINKHREFPK();
+        attr = "";
     }
 
     /**
@@ -57,12 +57,13 @@ public class MCRLINKHREF {
      *            class)
      */
     public MCRLINKHREF(String from, String to, String type, String attr) {
-        this.key = new MCRLINKHREFPK();
+        key = new MCRLINKHREFPK();
         key.setMcrfrom(from);
         key.setMcrto(to);
         key.setMcrtype(type);
-        if (attr != null)
+        if (attr != null) {
             this.attr = attr;
+        }
     }
 
     /**
@@ -144,6 +145,7 @@ public class MCRLINKHREF {
     public void setMcrtype(String mcrtype) {
         key.setMcrtype(mcrtype);
     }
+
     /**
      * Get the attribute value.
      * 
@@ -151,7 +153,7 @@ public class MCRLINKHREF {
      * @hibernate.property column="MCRATTR" not-null="true" update="true"
      */
     public String getMcrattr() {
-        return this.attr;
+        return attr;
     }
 
     /**
@@ -161,7 +163,9 @@ public class MCRLINKHREF {
      *            the attr value as a string
      */
     public void setMcrattr(String mcrattr) {
-        if (mcrattr == null) return;
-        this.attr = mcrattr;
+        if (mcrattr == null) {
+            return;
+        }
+        attr = mcrattr;
     }
 }

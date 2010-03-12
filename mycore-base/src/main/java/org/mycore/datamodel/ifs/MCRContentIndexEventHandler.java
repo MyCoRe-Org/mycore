@@ -48,6 +48,7 @@ public class MCRContentIndexEventHandler extends MCREventHandlerBase {
      * @param der
      *            the MCRDerivate that caused the event
      */
+    @Override
     protected void handleDerivateRepaired(MCREvent evt, MCRDerivate der) {
         MCRDirectory rootifs = MCRDirectory.getRootDirectory(der.getId().getId());
         doForChildren(rootifs);
@@ -62,13 +63,13 @@ public class MCRContentIndexEventHandler extends MCREventHandlerBase {
     private final void doForChildren(MCRFilesystemNode thisnode) {
         if (thisnode instanceof MCRDirectory) {
             MCRFilesystemNode[] childnodes = ((MCRDirectory) thisnode).getChildren();
-            for (int i = 0; i < childnodes.length; i++) {
-                doForChildren(childnodes[i]);
+            for (MCRFilesystemNode childnode : childnodes) {
+                doForChildren(childnode);
             }
         } else {
             // handle events
             MCREvent evt = new MCREvent(MCREvent.FILE_TYPE, MCREvent.REPAIR_EVENT);
-            evt.put("file", (MCRFile)thisnode);
+            evt.put("file", thisnode);
             MCREventManager.instance().handleEvent(evt);
             String fn = ((MCRFile) thisnode).getAbsolutePath();
             logger.debug("repair file " + fn);

@@ -46,6 +46,7 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      * @param obj
      *            the MCRObject that caused the event
      */
+    @Override
     protected final void handleObjectCreated(MCREvent evt, MCRObject obj) {
         mcr_xmltable.create(obj.getId(), obj.createXML(), obj.getService().getDate("modifydate"));
     }
@@ -59,8 +60,9 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      * @param obj
      *            the MCRObject that caused the event
      */
+    @Override
     protected final void handleObjectUpdated(MCREvent evt, MCRObject obj) {
-        mcr_xmltable.update(obj.getId(), obj.createXML(), obj.getService().getDate("modifydate") );
+        mcr_xmltable.update(obj.getId(), obj.createXML(), obj.getService().getDate("modifydate"));
     }
 
     /**
@@ -72,6 +74,7 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      * @param obj
      *            the MCRObject that caused the event
      */
+    @Override
     protected final void handleObjectDeleted(MCREvent evt, MCRObject obj) {
         mcr_xmltable.delete(obj.getId());
     }
@@ -84,6 +87,7 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      * @param der
      *            the MCRDerivate that caused the event
      */
+    @Override
     protected final void handleDerivateCreated(MCREvent evt, MCRDerivate der) {
         mcr_xmltable.create(der.getId(), der.createXML(), der.getService().getDate("modifydate"));
     }
@@ -97,8 +101,9 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      * @param der
      *            the MCRObject that caused the event
      */
+    @Override
     protected final void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
-        mcr_xmltable.update(der.getId(), der.createXML(), der.getService().getDate("modifydate") );
+        mcr_xmltable.update(der.getId(), der.createXML(), der.getService().getDate("modifydate"));
     }
 
     /**
@@ -110,6 +115,7 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      * @param der
      *            the MCRObject that caused the event
      */
+    @Override
     protected final void handleDerivateDeleted(MCREvent evt, MCRDerivate der) {
         mcr_xmltable.delete(der.getId());
     }

@@ -25,8 +25,13 @@
 package org.mycore.user.authentication;
 
 import java.util.Properties;
-import javax.mail.*;
-import org.mycore.common.*;
+
+import javax.mail.AuthenticationFailedException;
+import javax.mail.Session;
+import javax.mail.Store;
+
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConfigurationException;
 
 /**
  * Authenticates a user by checking the password against a

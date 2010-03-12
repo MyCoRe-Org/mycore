@@ -58,14 +58,17 @@ public class MCRMetadataStoreTest extends MCRTestCase {
         store = MCRMetadataStore.getStore("TEST");
     }
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
-        if (store == null)
+        if (store == null) {
             createStore();
-        else
+        } else {
             VFS.getManager().resolveFile(store.getBaseDir()).createFolder();
+        }
     }
 
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
         VFS.getManager().resolveFile(store.getBaseDir()).delete(Selectors.SELECT_ALL);
@@ -167,8 +170,9 @@ public class MCRMetadataStoreTest extends MCRTestCase {
 
     public void testListIDs() throws Exception {
         Iterator<Integer> IDs = store.listIDs(true);
-        while (IDs.hasNext())
+        while (IDs.hasNext()) {
             store.delete(IDs.next());
+        }
         assertFalse(store.exists(1));
         assertFalse(store.listIDs(true).hasNext());
         assertFalse(store.listIDs(false).hasNext());
@@ -180,8 +184,9 @@ public class MCRMetadataStoreTest extends MCRTestCase {
         IDs = store.listIDs(true);
         while (IDs.hasNext()) {
             int id = IDs.next();
-            if (!l1.isEmpty())
+            if (!l1.isEmpty()) {
                 assertTrue(id > l1.get(l1.size() - 1));
+            }
             l1.add(id);
         }
         assertTrue(l1.size() == 3);
@@ -189,8 +194,9 @@ public class MCRMetadataStoreTest extends MCRTestCase {
         IDs = store.listIDs(false);
         while (IDs.hasNext()) {
             int id = IDs.next();
-            if (!l2.isEmpty())
+            if (!l2.isEmpty()) {
                 assertTrue(id < l2.get(l2.size() - 1));
+            }
             l2.add(id);
         }
         assertTrue(l2.size() == 3);
@@ -202,40 +208,46 @@ public class MCRMetadataStoreTest extends MCRTestCase {
         Document xml = new Document(new Element("root"));
         LOGGER.info("Storing 1.000 XML documents in store:");
         long time = System.currentTimeMillis();
-        for (int i = 0; i < 1000; i++)
+        for (int i = 0; i < 1000; i++) {
             store.create(MCRContent.readFrom(xml));
+        }
         LOGGER.info("Time: " + (System.currentTimeMillis() - time) + " ms");
 
         LOGGER.info("getLastModified of 1.000 XML documents from store:");
         time = System.currentTimeMillis();
-        for (Iterator<Integer> ids = store.listIDs(MCRMetadataStore.ASCENDING); ids.hasNext();)
+        for (Iterator<Integer> ids = store.listIDs(MCRStore.ASCENDING); ids.hasNext();) {
             store.retrieve(ids.next()).getLastModified();
+        }
         LOGGER.info("Time: " + (System.currentTimeMillis() - time) + " ms");
 
         time = System.currentTimeMillis();
         LOGGER.info("Retrieving 1.000 XML documents from store:");
-        for (Iterator<Integer> ids = store.listIDs(MCRMetadataStore.ASCENDING); ids.hasNext();)
+        for (Iterator<Integer> ids = store.listIDs(MCRStore.ASCENDING); ids.hasNext();) {
             xml = store.retrieve(ids.next()).getMetadata().asXML();
+        }
         LOGGER.info("Time: " + (System.currentTimeMillis() - time) + " ms");
 
         time = System.currentTimeMillis();
         xml = new Document(new Element("update"));
         LOGGER.info("Updating 1.000 XML documents in store:");
-        for (Iterator<Integer> ids = store.listIDs(MCRMetadataStore.ASCENDING); ids.hasNext();)
+        for (Iterator<Integer> ids = store.listIDs(MCRStore.ASCENDING); ids.hasNext();) {
             store.retrieve(ids.next()).update(MCRContent.readFrom(xml));
+        }
         LOGGER.info("Time: " + (System.currentTimeMillis() - time) + " ms");
 
         time = System.currentTimeMillis();
         LOGGER.info("Listing 1.000 IDs in descending order:");
         Iterator<Integer> IDs = store.listIDs(MCRStore.DESCENDING);
-        while (IDs.hasNext())
+        while (IDs.hasNext()) {
             IDs.next();
+        }
         LOGGER.info("Time: " + (System.currentTimeMillis() - time) + " ms");
 
         time = System.currentTimeMillis();
         LOGGER.info("Deleting 1.000 XML documents from store:");
-        for (Iterator<Integer> ids = store.listIDs(MCRMetadataStore.ASCENDING); ids.hasNext();)
+        for (Iterator<Integer> ids = store.listIDs(MCRStore.ASCENDING); ids.hasNext();) {
             store.delete(ids.next());
+        }
         LOGGER.info("Time: " + (System.currentTimeMillis() - time) + " ms");
     }
 }

@@ -47,18 +47,19 @@ class MCRIPClause implements MCRCondition {
 
     public boolean evaluate(Object o) {
         MCRAccessData data = (MCRAccessData) o;
-        return (data.getIp()!= null)&&(this.ip.contains(data.getIp()));
+        return data.getIp() != null && ip.contains(data.getIp());
     }
 
+    @Override
     public String toString() {
         return "ip " + ip.toString() + " ";
     }
 
     public Element toXML() {
-    	Element cond = new Element("condition");
-    	cond.setAttribute("field", "ip");
-    	cond.setAttribute("operator", "=");
-    	cond.setAttribute("value", ip.toString());
+        Element cond = new Element("condition");
+        cond.setAttribute("field", "ip");
+        cond.setAttribute("operator", "=");
+        cond.setAttribute("value", ip.toString());
         return cond;
     }
 
@@ -68,7 +69,7 @@ class MCRIPClause implements MCRCondition {
         return el;
     }
 
-    public void accept(MCRConditionVisitor visitor) { 
-    	visitor.visitType(info());
+    public void accept(MCRConditionVisitor visitor) {
+        visitor.visitType(info());
     }
 };

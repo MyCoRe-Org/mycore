@@ -2,18 +2,13 @@ package org.mycore.frontend.fileupload;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileFilter;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 public class MCRRemoteFile extends File {
     /**
@@ -22,14 +17,15 @@ public class MCRRemoteFile extends File {
     private static final long serialVersionUID = 1L;
 
     private String remoteServletURL;
+
     private String path;
 
     File f;
 
     public MCRRemoteFile(String url, String pathname) {
         super("");
-        this.remoteServletURL = url;
-        this.path = pathname;
+        remoteServletURL = url;
+        path = pathname;
 
     }
 
@@ -45,8 +41,9 @@ public class MCRRemoteFile extends File {
             connection.setUseCaches(false);
             BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
-            while ((inputLine = in.readLine()) != null)
+            while ((inputLine = in.readLine()) != null) {
                 strBuffer.append(inputLine);
+            }
             in.close();
 
         } catch (MalformedURLException e) {
@@ -72,15 +69,6 @@ public class MCRRemoteFile extends File {
             strBuffer.append(symb + key + "=" + value);
         }
         return strBuffer.toString();
-    }
-
-    private boolean remoteCheck(String remoteMethod) {
-        HashMap paramMap = new HashMap();
-        paramMap.put("pathname", path);
-        paramMap.put("method", remoteMethod);
-
-        boolean remoteCheck = Boolean.parseBoolean(callServlet(paramMap));
-        return remoteCheck;
     }
 
     /*public boolean canExecute() {

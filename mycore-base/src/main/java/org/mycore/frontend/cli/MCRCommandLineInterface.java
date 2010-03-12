@@ -38,7 +38,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Transaction;
-
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
@@ -102,18 +101,24 @@ public class MCRCommandLineInterface {
                 "Execute the commands listed in the text file {0}."));
         knownCommands.add(new MCRCommand("help {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.showCommandsHelp String",
                 "Show the help text for the commands beginning with {0}."));
-        knownCommands.add(new MCRCommand("help", "org.mycore.frontend.cli.MCRCommandLineInterface.listKnownCommands", "List all possible commands."));
-        knownCommands.add(new MCRCommand("exit", "org.mycore.frontend.cli.MCRCommandLineInterface.exit", "Stop and exit the commandline tool."));
-        knownCommands.add(new MCRCommand("quit", "org.mycore.frontend.cli.MCRCommandLineInterface.exit", "Stop and exit the commandline tool."));
+        knownCommands.add(new MCRCommand("help", "org.mycore.frontend.cli.MCRCommandLineInterface.listKnownCommands",
+                "List all possible commands."));
+        knownCommands.add(new MCRCommand("exit", "org.mycore.frontend.cli.MCRCommandLineInterface.exit",
+                "Stop and exit the commandline tool."));
+        knownCommands.add(new MCRCommand("quit", "org.mycore.frontend.cli.MCRCommandLineInterface.exit",
+                "Stop and exit the commandline tool."));
         knownCommands.add(new MCRCommand("! {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.executeShellCommand String",
                 "Execute the shell command {0}, for example '! ls' or '! cmd /c dir'"));
-        knownCommands.add(new MCRCommand("show file {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.show String", "Show contents of local file {0}"));
-        knownCommands.add(new MCRCommand("change to user {0} with {1}", "org.mycore.frontend.cli.MCRCommandLineInterface.changeToUser String String",
+        knownCommands.add(new MCRCommand("show file {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.show String",
+                "Show contents of local file {0}"));
+        knownCommands.add(new MCRCommand("change to user {0} with {1}",
+                "org.mycore.frontend.cli.MCRCommandLineInterface.changeToUser String String",
                 "Change the user {0} with the given password in {1}."));
         knownCommands.add(new MCRCommand("login {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.login String",
                 "Start the login dialog for the user {0}."));
         knownCommands.add(new MCRCommand("whoami", "org.mycore.frontend.cli.MCRCommandLineInterface.whoami", "Print the current user."));
-        knownCommands.add(new MCRCommand("show command statistics", "org.mycore.frontend.cli.MCRCommandLineInterface.showCommandStatistics",
+        knownCommands.add(new MCRCommand("show command statistics",
+                "org.mycore.frontend.cli.MCRCommandLineInterface.showCommandStatistics",
                 "Show statistics on number of commands processed and execution time needed per command"));
         knownCommands.add(new MCRCommand("cancel on error", "org.mycore.frontend.cli.MCRCommandLineInterface.cancelOnError",
                 "Cancel execution of further commands in case of error"));
@@ -178,14 +183,16 @@ public class MCRCommandLineInterface {
             interactiveMode = false;
 
             StringBuffer sb = new StringBuffer();
-            for (int i = 0; i < args.length; i++)
-                sb.append(args[i]).append(" ");
+            for (String arg : args) {
+                sb.append(arg).append(" ");
+            }
             String line = sb.toString().trim();
             String[] cmds = line.split(";;");
             for (String cmd : cmds) {
                 cmd = cmd.trim();
-                if (cmd.length() > 0)
+                if (cmd.length() > 0) {
                     commandQueue.add(cmd);
+                }
             }
         }
 
@@ -197,20 +204,22 @@ public class MCRCommandLineInterface {
                 if (interactiveMode) {
                     command = readCommandFromPrompt();
                 } else {
-                    if (firstCommand != null && config.getBoolean("MCR.CLI.SaveRuntimeStatistics", false))
+                    if (firstCommand != null && config.getBoolean("MCR.CLI.SaveRuntimeStatistics", false)) {
                         try {
                             saveMillis(firstCommand);
                         } catch (IOException e) {
                             // TODO Auto-generated catch block
                             e.printStackTrace();
                         }
+                    }
                     exit();
                     // break;
                 }
             } else {
                 command = (String) commandQueue.firstElement();
-                if (firstCommand == null)
+                if (firstCommand == null) {
                     firstCommand = command;
+                }
                 commandQueue.removeElementAt(0);
                 System.out.println(system + "> " + command);
             }
@@ -267,7 +276,7 @@ public class MCRCommandLineInterface {
                     end = System.currentTimeMillis();
                     invokedCommand = currentCommand.showSyntax();
 
-                    long sum = (timeNeeded.containsKey(invokedCommand) ? timeNeeded.get(invokedCommand) : 0L);
+                    long sum = timeNeeded.containsKey(invokedCommand) ? timeNeeded.get(invokedCommand) : 0L;
                     sum += end - start;
                     timeNeeded.put(invokedCommand, sum);
 
@@ -278,8 +287,9 @@ public class MCRCommandLineInterface {
                     if (commandsReturned.size() > 0) {
                         System.out.println(system + " Queueing " + commandsReturned.size() + " commands to process");
 
-                        for (int i = 0; i < commandsReturned.size(); i++)
+                        for (int i = 0; i < commandsReturned.size(); i++) {
                             commandQueue.insertElementAt(commandsReturned.get(i), i);
+                        }
                     }
 
                     break;
@@ -290,10 +300,11 @@ public class MCRCommandLineInterface {
                 System.out.printf("%s Command processed (%d ms)\n", system, (end - start));
                 addMillis(end - start);
             } else {
-                if (interactiveMode)
+                if (interactiveMode) {
                     System.out.printf("%s Command not understood. Enter 'help' to get a list of commands.\n", system);
-                else
+                } else {
                     throw new MCRUsageException("Command not understood: " + command);
+                }
             }
         } catch (Exception ex) {
             showException(ex);
@@ -307,8 +318,9 @@ public class MCRCommandLineInterface {
                 saveFailedCommand(command);
             } else {
                 saveQueue(command);
-                if (!interactiveMode)
+                if (!interactiveMode) {
                     System.exit(1);
+                }
             }
         } finally {
             tx = MCRHIBConnection.instance().getSession().beginTransaction();
@@ -327,7 +339,7 @@ public class MCRCommandLineInterface {
             int num = numInvocations.get(key);
 
             System.out.println(key);
-            System.out.println("  total: " + tn + " ms, average: " + (tn / num) + " ms, " + num + " invocations.");
+            System.out.println("  total: " + tn + " ms, average: " + tn / num + " ms, " + num + " invocations.");
         }
         System.out.println();
     }
@@ -336,10 +348,11 @@ public class MCRCommandLineInterface {
         System.out.println(system);
         System.out.println(system + " The following command failed: ");
         System.out.println(system + " " + lastCommand);
-        if (!commandQueue.isEmpty())
+        if (!commandQueue.isEmpty()) {
             System.out.printf("%s There are %s other commands still unprocessed.\n", system, commandQueue.size());
-        else if (interactiveMode)
+        } else if (interactiveMode) {
             return;
+        }
         commandQueue.add(0, lastCommand);
         saveCommandQueueToFile(commandQueue, "unprocessed-commands.txt");
     }
@@ -349,8 +362,9 @@ public class MCRCommandLineInterface {
 
         try {
             PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(fname)));
-            for (String command : queue)
+            for (String command : queue) {
                 pw.println(command);
+            }
             pw.close();
         } catch (IOException ex) {
             showException(ex);
@@ -361,8 +375,9 @@ public class MCRCommandLineInterface {
         System.out.println(system);
         System.out.println(system + " The following command failed: ");
         System.out.println(system + " " + lastCommand);
-        if (!commandQueue.isEmpty())
+        if (!commandQueue.isEmpty()) {
             System.out.printf("%s There are %s other commands still unprocessed.\n", system, commandQueue.size());
+        }
         failedCommands.add(lastCommand);
     }
 
@@ -385,8 +400,9 @@ public class MCRCommandLineInterface {
         System.out.println();
         String line;
         int i = 1;
-        while ((line = br.readLine()) != null)
+        while ((line = br.readLine()) != null) {
             System.out.printf("%04d: %s\n", i++, line);
+        }
         br.close();
         System.out.println();
     }
@@ -416,7 +432,8 @@ public class MCRCommandLineInterface {
         if (ex instanceof MCRActiveLinkException) {
             MCRActiveLinkException activeLinks = (MCRActiveLinkException) ex;
             StringBuffer msgBuf = new StringBuffer(system);
-            msgBuf.append(" There are links active preventing the commit of work, see error message for details. The following links where affected:");
+            msgBuf
+                    .append(" There are links active preventing the commit of work, see error message for details. The following links where affected:");
             Map links = activeLinks.getActiveLinks();
             Iterator destIt = links.keySet().iterator();
             String curDest;
@@ -435,15 +452,17 @@ public class MCRCommandLineInterface {
         }
 
         String trace = MCRException.getStackTraceAsString(ex);
-        if (logger.isDebugEnabled())
+        if (logger.isDebugEnabled()) {
             logger.debug(trace);
-        else
+        } else {
             System.out.println(trace);
+        }
 
         if (ex instanceof MCRActiveLinkException) {
             MCRActiveLinkException activeLinks = (MCRActiveLinkException) ex;
             StringBuffer msgBuf = new StringBuffer();
-            msgBuf.append("\nThere are links active preventing the commit of work, see error message for details. The following links where affected:");
+            msgBuf
+                    .append("\nThere are links active preventing the commit of work, see error message for details. The following links where affected:");
             Map links = activeLinks.getActiveLinks();
             Iterator destIt = links.keySet().iterator();
             String curDest;
@@ -487,7 +506,7 @@ public class MCRCommandLineInterface {
         while ((line = reader.readLine()) != null) {
             line = line.trim();
 
-            if (line.startsWith("#") || (line.length() == 0)) {
+            if (line.startsWith("#") || line.length() == 0) {
                 continue;
             }
             list.add(line);
@@ -574,10 +593,11 @@ public class MCRCommandLineInterface {
                 System.out.println(system + " The new user ID is " + session.getCurrentUserID());
             } else {
                 String msg = "Wrong password, no changes of user ID in session context!";
-                if (logger.isDebugEnabled())
+                if (logger.isDebugEnabled()) {
                     logger.debug(msg);
-                else
+                } else {
                     System.out.println(system + " " + msg);
+                }
             }
         }
     }
@@ -608,8 +628,9 @@ public class MCRCommandLineInterface {
     }
 
     private static boolean userExists(String user) {
-        if (MCRUserMgr.instance().existUser(user))
+        if (MCRUserMgr.instance().existUser(user)) {
             return true;
+        }
         System.out.println(system + " User does not exists: " + user);
         return false;
     }

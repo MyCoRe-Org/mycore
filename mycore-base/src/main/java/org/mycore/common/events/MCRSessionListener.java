@@ -30,7 +30,7 @@ package org.mycore.common.events;
  * @since 2.0
  */
 public interface MCRSessionListener {
-    
+
     public void sessionEvent(MCRSessionEvent event);
 
 }

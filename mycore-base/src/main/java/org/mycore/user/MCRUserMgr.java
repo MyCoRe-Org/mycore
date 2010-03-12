@@ -227,7 +227,7 @@ public class MCRUserMgr {
             throw new MCRException("The user component is locked. At the moment write access is denied.");
         }
         // Check the permissions
-        if ((!MCRAccessManager.checkPermission("create-group"))) {
+        if (!MCRAccessManager.checkPermission("create-group")) {
             throw new MCRException("The current user does not have the permission to create a group!");
         }
         createGroupInternal(group);
@@ -735,7 +735,7 @@ public class MCRUserMgr {
             throw new MCRException("The provided group object is null.");
         }
 
-        if ((creator == null) || ((creator = creator.trim()).length() == 0)) {
+        if (creator == null || (creator = creator.trim()).length() == 0) {
             throw new MCRException("The value for creator is null or empty.");
         }
 
@@ -776,7 +776,7 @@ public class MCRUserMgr {
             throw new MCRException("The provided user object is null.");
         }
 
-        if ((creator == null) || ((creator = creator.trim()).length() == 0)) {
+        if (creator == null || (creator = creator.trim()).length() == 0) {
             throw new MCRException("The value for creator is null or empty.");
         }
 
@@ -916,7 +916,7 @@ public class MCRUserMgr {
 
         String sessionUser = mcrSession.getCurrentUserID();
 
-        return (sessionUser.equals(user.getID())) ? true : false;
+        return sessionUser.equals(user.getID()) ? true : false;
     }
 
     /**
@@ -949,10 +949,10 @@ public class MCRUserMgr {
                 String salt = loginUser.getPassword().substring(0, 3);
                 String newCrypt = MCRCrypt.crypt(salt, passwd);
 
-                return (loginUser.getPassword().equals(newCrypt));
+                return loginUser.getPassword().equals(newCrypt);
             }
 
-            return (loginUser.getPassword().equals(passwd));
+            return loginUser.getPassword().equals(passwd);
         }
 
         throw new MCRException("Login denied. User is disabled.");
@@ -1136,10 +1136,11 @@ public class MCRUserMgr {
         }
 
         this.locked = locked;
-        if (locked)
+        if (locked) {
             LOGGER.info("Write access to the user component persistent database now is denied.");
-        else
+        } else {
             LOGGER.info("Write access to the user component persistent database now is allowed.");
+        }
     }
 
     /**
@@ -1152,11 +1153,11 @@ public class MCRUserMgr {
      */
     public final void setPassword(String userID, String password) throws MCRException {
         // check for empty strings
-        if ((userID == null) || ((userID = userID.trim()).length() == 0)) {
+        if (userID == null || (userID = userID.trim()).length() == 0) {
             throw new MCRException("The userID is null or empty!");
         }
 
-        if ((password == null) || ((password = password.trim()).length() == 0)) {
+        if (password == null || (password = password.trim()).length() == 0) {
             throw new MCRException("The password is null or empty!");
         }
 
@@ -1352,10 +1353,10 @@ public class MCRUserMgr {
             if (!updUser.getPrimaryGroupID().equals(oldUser.getPrimaryGroupID())) {
                 MCRGroup primGroup = retrieveGroup(oldUser.getPrimaryGroupID());
                 primGroup.removeMemberUserID(oldUser.getID());
-                this.updateGroup(primGroup);
+                updateGroup(primGroup);
                 primGroup = retrieveGroup(updUser.getPrimaryGroupID());
                 primGroup.addMemberUserID(updUser.getID());
-                this.updateGroup(primGroup);
+                updateGroup(primGroup);
             }
 
             // Some values are taken from the old version, they cannot be
@@ -1404,7 +1405,7 @@ public class MCRUserMgr {
 
             if (!mcrUserStore.existsGroup(gid)) {
                 StringBuffer msg = new StringBuffer("You tried to update ");
-                msg.append((updUser instanceof MCRUser) ? "user '" : "group '").append(ID).append("' with the unknown group '").append(gid)
+                msg.append(updUser instanceof MCRUser ? "user '" : "group '").append(ID).append("' with the unknown group '").append(gid)
                         .append("'.");
                 throw new MCRException(msg.toString());
             }
@@ -1416,7 +1417,7 @@ public class MCRUserMgr {
 
             if (!oldUser.getGroupIDs().contains(updGroup.getID())) {
                 updGroup.addMemberUserID(ID);
-                this.updateGroup(updGroup);
+                updateGroup(updGroup);
             }
         }
 
@@ -1427,7 +1428,7 @@ public class MCRUserMgr {
             if (!updUser.getGroupIDs().contains(updGroup.getID())) {
                 // The object is no longer member of this group
                 updGroup.removeMemberUserID(ID);
-                this.updateGroup(updGroup);
+                updateGroup(updGroup);
             }
         }
     }
@@ -1478,8 +1479,9 @@ public class MCRUserMgr {
      * @return true if the group exists, else return false
      */
     public final boolean existGroup(String group) {
-        if (group == null)
+        if (group == null) {
             return false;
+        }
         return mcrUserStore.existsGroup(group);
     }
 
@@ -1491,8 +1493,9 @@ public class MCRUserMgr {
      * @return true if the user exists, else return false
      */
     public final boolean existUser(String user) {
-        if (user == null)
+        if (user == null) {
             return false;
+        }
         return mcrUserStore.existsUser(user);
     }
 }

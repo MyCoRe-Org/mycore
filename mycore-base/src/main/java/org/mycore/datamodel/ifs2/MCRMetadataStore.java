@@ -49,7 +49,7 @@ public class MCRMetadataStore extends MCRStore {
      * Override with MCR.IFS2.Store.<ObjectType>.ForceXML=true|false
      */
     protected boolean forceXML = true;
-    
+
     /**
      * Returns the store for the given metadata object type
      * 
@@ -58,7 +58,7 @@ public class MCRMetadataStore extends MCRStore {
      * @return the store for this metadata type
      */
     public static MCRMetadataStore getStore(String type) {
-        return (MCRMetadataStore) (MCRStore.getStore(type));
+        return (MCRMetadataStore) MCRStore.getStore(type);
     }
 
     /**
@@ -67,13 +67,14 @@ public class MCRMetadataStore extends MCRStore {
      * @param type
      *            the document type that is stored in this store
      */
+    @Override
     protected void init(String type) {
         super.init(type);
-        this.prefix = type + "_";
-        this.suffix = ".xml";
-        this.forceXML = MCRConfiguration.instance().getBoolean("MCR.IFS2.Store." + type + ".ForceXML", true);
+        prefix = type + "_";
+        suffix = ".xml";
+        forceXML = MCRConfiguration.instance().getBoolean("MCR.IFS2.Store." + type + ".ForceXML", true);
     }
-    
+
     protected boolean shouldForceXML() {
         return forceXML;
     }
@@ -121,10 +122,11 @@ public class MCRMetadataStore extends MCRStore {
      */
     public MCRStoredMetadata retrieve(int id) throws Exception {
         FileObject fo = getSlot(id);
-        if (!fo.exists())
+        if (!fo.exists()) {
             return null;
-        else
+        } else {
             return buildMetadataObject(fo, id);
+        }
     }
 
     /**

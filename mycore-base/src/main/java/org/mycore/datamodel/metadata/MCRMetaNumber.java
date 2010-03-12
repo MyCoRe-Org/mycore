@@ -91,7 +91,8 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      * @exception MCRException if the set_subtag value is null or empty or if
      *   the number string is not in a number format
      */
-    public MCRMetaNumber(String set_datapart, String set_subtag, String default_lang, int set_inherted, String set_dimension, String set_measurement, String set_number) throws MCRException {
+    public MCRMetaNumber(String set_datapart, String set_subtag, String default_lang, int set_inherted, String set_dimension,
+            String set_measurement, String set_number) throws MCRException {
         super(set_datapart, set_subtag, default_lang, "", set_inherted);
         set_number = set_number.trim();
         number = 0.;
@@ -102,7 +103,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
             }
 
             String new_number = set_number.replace(',', '.');
-            number = (new Double(new_number)).doubleValue();
+            number = new Double(new_number).doubleValue();
         } catch (NumberFormatException e) {
             throw new MCRException("The format of a number is false.");
         }
@@ -150,7 +151,8 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      * @param set_number       the number value
      * @exception MCRException if the set_subtag value is null or empty
      */
-    public MCRMetaNumber(String set_datapart, String set_subtag, String default_lang, int set_inherted, String set_dimension, String set_measurement, double set_number) throws MCRException {
+    public MCRMetaNumber(String set_datapart, String set_subtag, String default_lang, int set_inherted, String set_dimension,
+            String set_measurement, double set_number) throws MCRException {
         super(set_datapart, set_subtag, default_lang, "", set_inherted);
         number = set_number;
         dimension = "";
@@ -231,7 +233,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
                 throw new MCRException("The format of a number is false.");
             }
 
-            number = (new Double(sset_number)).doubleValue();
+            number = new Double(sset_number).doubleValue();
         } catch (NumberFormatException e) {
             throw new MCRException("The format of a number is false.");
         }
@@ -280,7 +282,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      * @return the number String
      */
     public final String getNumberToString() {
-        return (new Double(number)).toString();
+        return new Double(number).toString();
     }
 
     /**
@@ -290,6 +292,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      * @param element
      *            a relevant JDOM element for the metadata
      */
+    @Override
     public final void setFromDOM(org.jdom.Element element) {
         super.setFromDOM(element);
 
@@ -300,7 +303,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
         if (attr != null) {
             String temp_meas = attr.getValue();
 
-            if ((temp_meas != null) && ((temp_meas = temp_meas.trim()).length() != 0)) {
+            if (temp_meas != null && (temp_meas = temp_meas.trim()).length() != 0) {
                 measurement = temp_meas;
             }
 
@@ -315,7 +318,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
         if (attr != null) {
             String temp_dim = attr.getValue();
 
-            if ((temp_dim != null) && ((temp_dim = temp_dim.trim()).length() != 0)) {
+            if (temp_dim != null && (temp_dim = temp_dim.trim()).length() != 0) {
                 dimension = temp_dim;
             }
 
@@ -324,7 +327,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
             }
         }
 
-        String temp_value = (element.getText()).trim();
+        String temp_value = element.getText().trim();
 
         if (temp_value == null) {
             number = 0.;
@@ -343,6 +346,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML MCRNumber part
      */
+    @Override
     public final org.jdom.Element createXML() throws MCRException {
         if (!isValid()) {
             throw new MCRException("The content of MCRMetaNumber is not valid.");
@@ -352,15 +356,15 @@ final public class MCRMetaNumber extends MCRMetaDefault {
         elm.setAttribute("lang", lang, Namespace.XML_NAMESPACE);
         elm.setAttribute("inherited", Integer.toString(inherited));
 
-        if ((type != null) && ((type = type.trim()).length() != 0)) {
+        if (type != null && (type = type.trim()).length() != 0) {
             elm.setAttribute("type", type);
         }
 
-        if ((dimension != null) && ((dimension = dimension.trim()).length() != 0)) {
+        if (dimension != null && (dimension = dimension.trim()).length() != 0) {
             elm.setAttribute("dimension", dimension);
         }
 
-        if ((measurement != null) && ((measurement = measurement.trim()).length() != 0)) {
+        if (measurement != null && (measurement = measurement.trim()).length() != 0) {
             elm.setAttribute("measurement", measurement);
         }
 
@@ -379,6 +383,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      * 
      * @return a boolean value
      */
+    @Override
     public final boolean isValid() {
         if (!super.isValid()) {
             return false;
@@ -390,6 +395,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
     /**
      * This method make a clone of this class.
      */
+    @Override
     public final Object clone() {
         return new MCRMetaNumber(datapart, subtag, lang, inherited, dimension, measurement, number);
     }
@@ -397,6 +403,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
     /**
      * This method put debug data to the logger (for the debug mode).
      */
+    @Override
     public final void debug() {
         super.debugDefault();
         LOGGER.debug("Measurement        = " + measurement);

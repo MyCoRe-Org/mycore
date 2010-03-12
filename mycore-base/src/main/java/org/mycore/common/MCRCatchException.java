@@ -84,6 +84,7 @@ public class MCRCatchException extends Exception {
      * 
      * @return a String representation of this exception and all its properties
      */
+    @Override
     public synchronized String toString() {
         // Use counter to prevent a recursion between getStackTrace() and
         // toString()

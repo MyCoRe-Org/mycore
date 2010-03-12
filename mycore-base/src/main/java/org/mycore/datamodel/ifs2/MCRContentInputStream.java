@@ -88,11 +88,12 @@ public class MCRContentInputStream extends FilterInputStream {
         this.in = bis;
     }
 
+    @Override
     public int read() throws IOException {
         int b;
 
         // if current position is in header buffer, return value from there
-        if ((header.length > 0) && (length < header.length)) {
+        if (header.length > 0 && length < header.length) {
             b = header[(int) length];
             length++;
         } else {
@@ -105,9 +106,10 @@ public class MCRContentInputStream extends FilterInputStream {
         return b;
     }
 
+    @Override
     public int read(byte[] buf, int off, int len) throws IOException {
         // if current position is in header buffer, return bytes from there
-        if ((header.length > 0) && (length < header.length)) {
+        if (header.length > 0 && length < header.length) {
             int numAvail = header.length - (int) length;
             len = Math.min(len, numAvail);
             System.arraycopy(header, (int) length, buf, off, len);
@@ -169,8 +171,8 @@ public class MCRContentInputStream extends FilterInputStream {
         byte[] bytes = digest.digest();
         StringBuffer sb = new StringBuffer();
 
-        for (int i = 0; i < bytes.length; i++) {
-            String sValue = "0" + Integer.toHexString(bytes[i]);
+        for (byte b : bytes) {
+            String sValue = "0" + Integer.toHexString(b);
             sb.append(sValue.substring(sValue.length() - 2));
         }
 

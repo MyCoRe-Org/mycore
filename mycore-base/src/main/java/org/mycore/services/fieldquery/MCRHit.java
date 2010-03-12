@@ -73,7 +73,7 @@ public class MCRHit {
     private List<MCRFieldValue> sortData = new ArrayList<MCRFieldValue>();
 
     /** Map from field to field value, used for sorting */
-    private Map<MCRFieldDef,String> sortValues = new HashMap<MCRFieldDef,String>();
+    private Map<MCRFieldDef, String> sortValues = new HashMap<MCRFieldDef, String>();
 
     /**
      * Creates a new result hit with the given object ID
@@ -83,7 +83,7 @@ public class MCRHit {
      */
     public MCRHit(String id) {
         this.id = id;
-        this.key = id + "@" + LOCAL;
+        key = id + "@" + LOCAL;
     }
 
     /**
@@ -96,8 +96,8 @@ public class MCRHit {
      */
     private MCRHit(String id, String hostAlias) {
         this.id = id;
-        this.host = hostAlias;
-        this.key = id + "@" + hostAlias;
+        host = hostAlias;
+        key = id + "@" + hostAlias;
     }
 
     /**
@@ -173,7 +173,7 @@ public class MCRHit {
 
     public List<MCRFieldValue> getMetaData() {
         return metaData;
-    }    
+    }
 
     /**
      * Compares this hit with another hit by comparing the value of the given
@@ -190,13 +190,13 @@ public class MCRHit {
      * @see MCRResults#sortBy(List)
      */
     int compareTo(MCRFieldDef field, MCRHit other) {
-        String va = this.sortValues.get(field);
+        String va = sortValues.get(field);
         String vb = other.sortValues.get(field);
 
-        if ((va == null) || (va.trim().length() == 0)) {
-            return (((vb == null) || (vb.trim().length() == 0)) ? 0 : (-1));
-        } else if ((vb == null) || (vb.trim().length() == 0)) {
-            return (((va == null) || (va.trim().length() == 0)) ? 0 : 1);
+        if (va == null || va.trim().length() == 0) {
+            return vb == null || vb.trim().length() == 0 ? 0 : -1;
+        } else if (vb == null || vb.trim().length() == 0) {
+            return va == null || va.trim().length() == 0 ? 0 : 1;
         } else if ("decimal".equals(field.getDataType())) {
             return (int) Math.signum(Double.parseDouble(va) - Double.parseDouble(vb));
         } else if ("integer".equals(field.getDataType())) {
@@ -216,16 +216,17 @@ public class MCRHit {
      */
     public void merge(MCRHit other) {
         // Copy other hit sort data
-        if (this.sortData.isEmpty() && !other.sortData.isEmpty()) {
-            this.sortData.addAll(other.sortData);
-            this.sortValues.putAll(other.sortValues);
+        if (sortData.isEmpty() && !other.sortData.isEmpty()) {
+            sortData.addAll(other.sortData);
+            sortValues.putAll(other.sortValues);
         }
 
         // Copy other hit meta data
         if (other.metaData.size() > 0) {
-        	if (this.metaData.size() > 0)
-                this.metaData.add(null); // used as a delimiter
-            this.metaData.addAll(other.metaData);
+            if (metaData.size() > 0) {
+                metaData.add(null); // used as a delimiter
+            }
+            metaData.addAll(other.metaData);
         }
     }
 
@@ -237,8 +238,8 @@ public class MCRHit {
      */
     public Element buildXML() {
         Element eHit = new Element("hit", MCRConstants.MCR_NAMESPACE);
-        eHit.setAttribute("id", this.id);
-        eHit.setAttribute("host", this.host);
+        eHit.setAttribute("id", id);
+        eHit.setAttribute("host", host);
 
         if (!sortData.isEmpty()) {
             Element eSort = new Element("sortData", MCRConstants.MCR_NAMESPACE);
@@ -255,15 +256,17 @@ public class MCRHit {
 
         for (int i = 0; i < metaData.size(); i++) {
             MCRFieldValue fv = metaData.get(i);
-            if ((i == 0) || (fv == null)) {
-                if ((eMeta != null) && (count == 0))
+            if (i == 0 || fv == null) {
+                if (eMeta != null && count == 0) {
                     continue;
+                }
 
                 eMeta = new Element("metaData", MCRConstants.MCR_NAMESPACE);
                 eHit.addContent(eMeta);
                 count = 0;
-                if (i > 0)
+                if (i > 0) {
                     continue;
+                }
             }
 
             eMeta.addContent(fv.buildXML());
@@ -284,8 +287,9 @@ public class MCRHit {
      */
     static MCRHit parseXML(Element xml, String hostAlias) {
         String id = xml.getAttributeValue("id", "");
-        if (id.length() == 0)
+        if (id.length() == 0) {
             throw new MCRException("MCRHit id attribute is empty");
+        }
 
         MCRHit hit = new MCRHit(id, hostAlias);
 
@@ -293,22 +297,23 @@ public class MCRHit {
         if (eSort != null) {
             List children = eSort.getChildren();
             for (Iterator it = children.iterator(); it.hasNext();) {
-                Element child = (Element) (it.next());
+                Element child = (Element) it.next();
                 hit.addSortData(MCRFieldValue.parseXML(child));
             }
         }
 
         List metaList = xml.getChildren("metaData");
         for (Iterator itm = metaList.iterator(); itm.hasNext();) {
-            Element md = (Element) (itm.next());
+            Element md = (Element) itm.next();
             List children = md.getChildren();
 
             for (Iterator it = children.iterator(); it.hasNext();) {
-                Element child = (Element) (it.next());
+                Element child = (Element) it.next();
                 hit.addMetaData(MCRFieldValue.parseXML(child));
             }
-            if (itm.hasNext())
+            if (itm.hasNext()) {
                 hit.metaData.add(null);
+            }
         }
 
         return hit;
@@ -319,6 +324,7 @@ public class MCRHit {
      * 
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("---- MCRHit ----");
@@ -326,10 +332,11 @@ public class MCRHit {
         sb.append("\nHost     = ").append(host);
         for (int i = 0; i < metaData.size(); i++) {
             sb.append("\nMetaData[" + i + "] = ");
-            if (metaData.get(i) == null)
+            if (metaData.get(i) == null) {
                 sb.append("-----");
-            else
+            } else {
                 sb.append(metaData.get(i));
+            }
         }
         for (int i = 0; i < sortData.size(); i++) {
             sb.append("\nSortData[" + i + "] = ").append(sortData.get(i));

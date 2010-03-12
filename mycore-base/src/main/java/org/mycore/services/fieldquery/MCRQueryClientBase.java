@@ -118,7 +118,7 @@ public class MCRQueryClientBase implements MCRQueryClientInterface {
     public org.w3c.dom.Document doRetrieveClassification(String level, String type, String classID, String categID, String format) {
         return null;
     }
-    
+
     /**
      * Retrieves an link from remote host using the WebService.
      * 
@@ -133,6 +133,6 @@ public class MCRQueryClientBase implements MCRQueryClientInterface {
      * @return the mcr:result document
      */
     public org.w3c.dom.Document doRetrieveLinks(String from, String to, String type) {
-        return null;        
+        return null;
     }
 }

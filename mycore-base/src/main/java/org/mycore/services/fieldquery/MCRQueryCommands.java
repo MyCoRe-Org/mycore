@@ -60,9 +60,14 @@ public class MCRQueryCommands implements MCRExternalCommandInterface {
      */
     public ArrayList<MCRCommand> getPossibleCommands() {
         ArrayList<MCRCommand> commands = new ArrayList<MCRCommand>();
-        commands.add(new MCRCommand("run query from file {0}", "org.mycore.services.fieldquery.MCRQueryCommands.runQueryFromFile String", "Runs a query that is specified as XML in the given file"));
-        commands.add(new MCRCommand("run local query {0}", "org.mycore.services.fieldquery.MCRQueryCommands.runLocalQueryFromString String", "Runs a query specified as String on the local host"));
-        commands.add(new MCRCommand("run distributed query {0}", "org.mycore.services.fieldquery.MCRQueryCommands.runAllQueryFromString String", "Runs a query specified as String on the local host and all remote hosts"));
+        commands.add(new MCRCommand("run query from file {0}", "org.mycore.services.fieldquery.MCRQueryCommands.runQueryFromFile String",
+                "Runs a query that is specified as XML in the given file"));
+        commands.add(new MCRCommand("run local query {0}",
+                "org.mycore.services.fieldquery.MCRQueryCommands.runLocalQueryFromString String",
+                "Runs a query specified as String on the local host"));
+        commands.add(new MCRCommand("run distributed query {0}",
+                "org.mycore.services.fieldquery.MCRQueryCommands.runAllQueryFromString String",
+                "Runs a query specified as String on the local host and all remote hosts"));
         return commands;
     }
 
@@ -99,7 +104,7 @@ public class MCRQueryCommands implements MCRExternalCommandInterface {
      *            the string with the query condition
      */
     public static void runLocalQueryFromString(String querystring) {
-        MCRCondition cond = (new MCRQueryParser()).parse(querystring);
+        MCRCondition cond = new MCRQueryParser().parse(querystring);
         MCRQuery query = new MCRQuery(cond);
         MCRResults results = MCRQueryManager.search(query);
         buildOutput(results);
@@ -113,9 +118,9 @@ public class MCRQueryCommands implements MCRExternalCommandInterface {
      *            the string with the query condition
      */
     public static void runAllQueryFromString(String querystring) {
-        MCRCondition cond = (new MCRQueryParser()).parse(querystring);
+        MCRCondition cond = new MCRQueryParser().parse(querystring);
         MCRQuery query = new MCRQuery(cond);
-        query.setHosts( MCRQueryClient.ALL_HOSTS );
+        query.setHosts(MCRQueryClient.ALL_HOSTS);
         MCRResults results = MCRQueryManager.search(query);
         buildOutput(results);
     }
@@ -135,7 +140,7 @@ public class MCRQueryCommands implements MCRExternalCommandInterface {
             TransformerFactory transfakt = TransformerFactory.newInstance();
             Transformer trans = transfakt.newTransformer(source);
             StreamResult sr = new StreamResult(System.out);
-            trans.transform(new JDOMSource((new org.jdom.Document(results.buildXML()))), sr);
+            trans.transform(new JDOMSource(new org.jdom.Document(results.buildXML())), sr);
         } catch (Exception ex) {
             Logger LOGGER = Logger.getLogger(MCRQueryCommands.class);
             LOGGER.error("Error while tranforming query result XML using XSLT");

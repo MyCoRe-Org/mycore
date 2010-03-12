@@ -36,7 +36,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-
 import org.mycore.common.MCRConfiguration;
 
 /**
@@ -54,7 +53,8 @@ public class MCRUserAgentFilter implements Filter {
     private static final Logger LOGGER = Logger.getLogger(MCRUserAgentFilter.class);
 
     public void init(FilterConfig arg0) throws ServletException {
-        String agentRegEx = MCRConfiguration.instance().getString("MCR.Filter.UserAgent", "(bot|spider|crawler|mercator|slurp|seek|nagios)");
+        String agentRegEx = MCRConfiguration.instance()
+                .getString("MCR.Filter.UserAgent", "(bot|spider|crawler|mercator|slurp|seek|nagios)");
         agentPattern = Pattern.compile(agentRegEx);
     }
 

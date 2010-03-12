@@ -40,10 +40,11 @@ class MCRGroupClause implements MCRCondition {
     private MCRGroup group;
 
     private String groupname;
+
     private boolean not;
 
     MCRGroupClause(String group, boolean not) {
-        this.groupname = group;
+        groupname = group;
         this.group = new MCRGroup(group);
         this.not = not;
     }
@@ -51,20 +52,21 @@ class MCRGroupClause implements MCRCondition {
     public boolean evaluate(Object o) {
         MCRAccessData data = (MCRAccessData) o;
         if (data.getUser() != null) {
-            return data.getUser().isMemberOf(group) ^ this.not;
+            return data.getUser().isMemberOf(group) ^ not;
         }
-        return MCRUserFacade.isUserInGroup(group.getID()) ^ this.not;
+        return MCRUserFacade.isUserInGroup(group.getID()) ^ not;
     }
 
+    @Override
     public String toString() {
-        return "group"+ (this.not?" != ":" = ") + groupname + " ";
+        return "group" + (not ? " != " : " = ") + groupname + " ";
     }
 
     public Element toXML() {
-    	Element cond = new Element("condition");
-    	cond.setAttribute("field", "group");
-    	cond.setAttribute("operator", (this.not? "!=": "="));
-    	cond.setAttribute("value", groupname);
+        Element cond = new Element("condition");
+        cond.setAttribute("field", "group");
+        cond.setAttribute("operator", (not ? "!=" : "="));
+        cond.setAttribute("value", groupname);
         return cond;
     }
 
@@ -74,7 +76,7 @@ class MCRGroupClause implements MCRCondition {
         return el;
     }
 
-    public void accept(MCRConditionVisitor visitor) { 
-    	visitor.visitType(info());
+    public void accept(MCRConditionVisitor visitor) {
+        visitor.visitType(info());
     }
 };

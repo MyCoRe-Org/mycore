@@ -89,9 +89,9 @@ public class MCRMetadataVersion {
      */
     MCRMetadataVersion(MCRVersionedMetadata vm, SVNLogEntry logEntry, char type) {
         this.vm = vm;
-        this.revision = logEntry.getRevision();
-        this.user = logEntry.getAuthor();
-        this.date = logEntry.getDate();
+        revision = logEntry.getRevision();
+        user = logEntry.getAuthor();
+        date = logEntry.getDate();
         this.type = type;
     }
 

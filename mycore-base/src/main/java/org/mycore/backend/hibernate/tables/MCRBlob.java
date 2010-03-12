@@ -30,7 +30,6 @@ import java.sql.Blob;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
-
 import org.mycore.common.MCRException;
 
 public class MCRBlob implements java.sql.Blob {
@@ -41,7 +40,7 @@ public class MCRBlob implements java.sql.Blob {
     }
 
     public InputStream getBinaryStream() {
-        return new java.io.ByteArrayInputStream(this.data);
+        return new java.io.ByteArrayInputStream(data);
     }
 
     public OutputStream setBinaryStream(long l) {
@@ -61,17 +60,20 @@ public class MCRBlob implements java.sql.Blob {
     }
 
     public byte[] getBytes(long pos, int length) throws SQLException {
-        if (pos < 1)
+        if (pos < 1) {
             throw new SQLException("The ordinal position is less than 1: " + pos);
-        if (pos > Integer.MAX_VALUE)
+        }
+        if (pos > Integer.MAX_VALUE) {
             throw new ArrayIndexOutOfBoundsException("Ordinal position grater than " + Integer.MAX_VALUE + " is not supported:" + pos);
-        if (length < 0)
+        }
+        if (length < 0) {
             throw new SQLException("The number of consecutive bytes to be copied must be 0 or greater: " + length);
+        }
         // first byte is position 1 according to java.sql API, but position 0 in
         // array
         int arrayPos = (int) (pos - 1);
-        if ((arrayPos + length) > data.length) {
-            length = (int) (data.length - arrayPos);
+        if (arrayPos + length > data.length) {
+            length = data.length - arrayPos;
         }
 
         byte[] result = new byte[length];
@@ -81,16 +83,18 @@ public class MCRBlob implements java.sql.Blob {
     }
 
     public long length() {
-        return this.data.length;
+        return data.length;
     }
 
     // Determines the byte position at which the specified byte pattern begins
     // within the BLOB value that this Blob object represents.
     public long position(byte[] pattern, long start) throws SQLException {
-        if (start < 1)
+        if (start < 1) {
             throw new SQLException("The start position is less than 1: " + start);
-        if (start > Integer.MAX_VALUE)
+        }
+        if (start > Integer.MAX_VALUE) {
             throw new ArrayIndexOutOfBoundsException("Start position grater than " + Integer.MAX_VALUE + " is not supported:" + start);
+        }
         int arrayPos;
         // first byte is position 1 according to java.sql API, but position 0 in
         // array
@@ -98,7 +102,7 @@ public class MCRBlob implements java.sql.Blob {
             int s;
             int len = data.length - arrayPos;
 
-            if (pattern.length > (data.length - arrayPos)) {
+            if (pattern.length > data.length - arrayPos) {
                 break searchloop;
             }
 
@@ -140,15 +144,20 @@ public class MCRBlob implements java.sql.Blob {
     }
 
     public InputStream getBinaryStream(long pos, long length) throws SQLException {
-        if (pos < 1)
+        if (pos < 1) {
             throw new SQLException("The ordinal position is less than 1: " + pos);
-        if (pos > data.length)
-            throw new ArrayIndexOutOfBoundsException("Ordinal position is greater than the number of bytes (" + data.length + ") in the Blob: " + length);
-        if (length < 0)
+        }
+        if (pos > data.length) {
+            throw new ArrayIndexOutOfBoundsException("Ordinal position is greater than the number of bytes (" + data.length
+                    + ") in the Blob: " + length);
+        }
+        if (length < 0) {
             throw new SQLException("The number of consecutive bytes to be copied must be 0 or greater: " + length);
-        if ((pos + length) > data.length)
-            throw new SQLException("The ordinal position(" + pos + ") + the length(" + length + ") in bytes are greater than the number of bytes ("
-                    + data.length + ") in the Blob.");
+        }
+        if (pos + length > data.length) {
+            throw new SQLException("The ordinal position(" + pos + ") + the length(" + length
+                    + ") in bytes are greater than the number of bytes (" + data.length + ") in the Blob.");
+        }
         // first byte is position 1 according to java.sql API, but position 0 in
         // array
         return new ByteArrayInputStream(data, (int) pos - 1, (int) length);

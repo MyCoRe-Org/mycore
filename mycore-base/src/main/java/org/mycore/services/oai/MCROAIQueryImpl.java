@@ -111,13 +111,12 @@ public class MCROAIQueryImpl implements MCROAIQuery {
      */
     public List<String[]> listSets(String instance) {
         String[] classifications = MCROAIProvider.getConfigBean(instance).getClassificationIDs();
-        if(classifications.length==0){
-        	return null;
+        if (classifications.length == 0) {
+            return null;
         }
         List<String[]> list = new ArrayList<String[]>();
-        for (int i = 0; i < classifications.length; i++) {
-            MCRCategory cl = MCRCategoryDAOFactory.getInstance().getCategory(
-                    MCRCategoryID.rootID(classifications[i]), -1);
+        for (String classification : classifications) {
+            MCRCategory cl = MCRCategoryDAOFactory.getInstance().getCategory(MCRCategoryID.rootID(classification), -1);
             if (cl != null) {
                 list.addAll(addXDINI(cl.getChildren()));
             }
@@ -127,12 +126,12 @@ public class MCROAIQueryImpl implements MCROAIQuery {
 
     private List<String[]> addXDINI(List<MCRCategory> categories) {
         ArrayList<String[]> ar = new ArrayList<String[]>();
-        if (categories == null)
+        if (categories == null) {
             return ar;
+        }
         for (int i = 0; i < categories.size(); i++) {
             MCRCategory category = categories.get(i);
-            Collection<org.mycore.datamodel.classifications2.MCRLabel> labels = category
-                    .getLabels();
+            Collection<org.mycore.datamodel.classifications2.MCRLabel> labels = category.getLabels();
             for (MCRLabel label : labels) {
                 if ("x-dini".equals(label.getLang())) {
                     String[] set = new String[3];
@@ -164,8 +163,7 @@ public class MCROAIQueryImpl implements MCROAIQuery {
      *         identifier, a datestamp (modification date) and a string with a
      *         blank separated list of categories the element is classified in
      */
-    public List<String> listIdentifiers(String[] set, String[] from, String[] until,
-            String metadataPrefix, String instance) {
+    public List<String> listIdentifiers(String[] set, String[] from, String[] until, String metadataPrefix, String instance) {
         return listRecordsOrIdentifiers(set, from, until, metadataPrefix, instance, false);
     }
 
@@ -235,18 +233,15 @@ public class MCROAIQueryImpl implements MCROAIQuery {
      *         identifier, a datestamp (modification date) and a string with a
      *         blank separated list of categories the element is classified in
      */
-    public List<String> listRecords(String[] set, String[] from, String[] until,
-            String metadataPrefix, String instance) {
+    public List<String> listRecords(String[] set, String[] from, String[] until, String metadataPrefix, String instance) {
         return listRecordsOrIdentifiers(set, from, until, metadataPrefix, instance, true);
     }
 
-    private List<String> listRecordsOrIdentifiers(String[] set, String[] from, String[] until,
-            String metadataPrefix, String instance, boolean listRecords) {
+    private List<String> listRecordsOrIdentifiers(String[] set, String[] from, String[] until, String metadataPrefix, String instance,
+            boolean listRecords) {
         List<String> list = new ArrayList<String>();
 
-        if (hasMore()
-                && ((listRecords == lastQuery.equals("listRecords")) || (!listRecords == lastQuery
-                        .equals("listIdentifiers")))) {
+        if (hasMore() && (listRecords == lastQuery.equals("listRecords") || !listRecords == lastQuery.equals("listIdentifiers"))) {
             for (int i = deliveredResults; i < Math.min(maxReturns + deliveredResults, numResults); i++) {
                 list.add(resultArray.get(i));
             }
@@ -260,12 +255,13 @@ public class MCROAIQueryImpl implements MCROAIQuery {
         MCRAndCondition cAnd = new MCRAndCondition();
 
         String restriction = MCROAIProvider.getConfigBean(instance).getQueryRestriction();
-        if (restriction != null)
+        if (restriction != null) {
             try {
                 cAnd.addChild(new MCRQueryParser().parse(restriction));
             } catch (MCRException mcrx) {
                 logger.warn("Error in adding OAI restriction: " + restriction, mcrx);
             }
+        }
 
         List<String> searchFields = MCROAIProvider.getConfigBean(instance).getSearchFields();
 
@@ -282,7 +278,7 @@ public class MCROAIQueryImpl implements MCROAIQuery {
                 }
             }
         }
-        if ((cOr.getChildren() != null) && (cOr.getChildren().size() > 0)) {
+        if (cOr.getChildren() != null && cOr.getChildren().size() > 0) {
             cAnd.addChild(cOr);
         }
 
@@ -296,7 +292,7 @@ public class MCROAIQueryImpl implements MCROAIQuery {
 
         MCRFieldDef fileDateModified = MCRFieldDef.getDef("derivateModificationDate");
 
-        if (from != null && fileDateModified!=null) {
+        if (from != null && fileDateModified != null) {
             String date = getTimeStamp(from[0]);
             dateFrom.addChild(new MCRQueryCondition(fileDateModified, ">=", date));
         }
@@ -381,25 +377,21 @@ public class MCROAIQueryImpl implements MCROAIQuery {
     }
 
     @SuppressWarnings("unchecked")
-    private void generateQueryForDiniLabels(MCROrCondition cOr, String searchField, String set,
-            String instance) {
+    private void generateQueryForDiniLabels(MCROrCondition cOr, String searchField, String set, String instance) {
         // expected searchfields: "format", "type", "subject"
         // mapping to DINI sets: "doc-type", "pub-type", "ddc"
         MCRFieldDef field = MCRFieldDef.getDef(searchField);
 
-        String[] classification = MCROAIProvider.getConfigBean(instance)
-                .getClassificationIDsForSearchField(searchField);
+        String[] classification = MCROAIProvider.getConfigBean(instance).getClassificationIDsForSearchField(searchField);
 
-        for (int i = 0; i < classification.length; i++) {
+        for (String element : classification) {
             // TODO: maybe query this directly from backend
-            MCRCategory cl = MCRCategoryDAOFactory.getInstance().getCategory(
-                    MCRCategoryID.rootID(classification[i]), -1);
+            MCRCategory cl = MCRCategoryDAOFactory.getInstance().getCategory(MCRCategoryID.rootID(element), -1);
             org.jdom.Document jDomDoc = MCRCategoryTransformer.getMetaDataDocument(cl, false);
             try {
                 // could be improved: return only <label> under a <categegory>
                 // but //category/label[..] does not work here
-                XPath xpathExpr = XPath.newInstance("//label[@xml:lang='x-dini' and @text='" + set
-                        + "']/..//@ID");
+                XPath xpathExpr = XPath.newInstance("//label[@xml:lang='x-dini' and @text='" + set + "']/..//@ID");
                 List<Attribute> resultList = xpathExpr.selectNodes(jDomDoc);
                 for (Attribute id : resultList) {
                     cOr.addChild(new MCRQueryCondition(field, "like", id.getValue()));

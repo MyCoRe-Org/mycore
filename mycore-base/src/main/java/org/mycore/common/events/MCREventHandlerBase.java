@@ -49,7 +49,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     public void doHandleEvent(MCREvent evt) {
 
         if (evt.getObjectType().equals(MCREvent.OBJECT_TYPE)) {
-            MCRObject obj = (MCRObject) (evt.get("object"));
+            MCRObject obj = (MCRObject) evt.get("object");
             if (obj != null) {
                 logger.debug(getClass().getName() + " handling " + obj.getId().getId() + " " + evt.getEventType());
                 if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
@@ -70,7 +70,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
         }
 
         if (evt.getObjectType().equals(MCREvent.DERIVATE_TYPE)) {
-            MCRDerivate der = (MCRDerivate) (evt.get("derivate"));
+            MCRDerivate der = (MCRDerivate) evt.get("derivate");
             if (der != null) {
                 logger.debug(getClass().getName() + " handling " + der.getId().getId() + " " + evt.getEventType());
                 if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
@@ -91,9 +91,10 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
         }
 
         if (evt.getObjectType().equals(MCREvent.FILE_TYPE)) {
-            MCRFile file = (MCRFile) (evt.get("file"));
+            MCRFile file = (MCRFile) evt.get("file");
             if (file != null) {
-                logger.debug(getClass().getName() + " handling " + file.getOwnerID() + "/" + file.getAbsolutePath() + " " + evt.getEventType());
+                logger.debug(getClass().getName() + " handling " + file.getOwnerID() + "/" + file.getAbsolutePath() + " "
+                        + evt.getEventType());
                 if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
                     handleFileCreated(evt, file);
                 } else if (evt.getEventType().equals(MCREvent.UPDATE_EVENT)) {
@@ -112,7 +113,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
         }
 
         if (evt.getObjectType().equals(MCREvent.CLASS_TYPE)) {
-            MCRCategory cl = (MCRCategory) (evt.get("class"));
+            MCRCategory cl = (MCRCategory) evt.get("class");
             if (cl != null) {
                 logger.debug(getClass().getName() + " handling " + cl.getId() + " " + evt.getEventType());
                 if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
@@ -121,7 +122,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                     handleClassificationUpdated(evt, cl);
                 } else if (evt.getEventType().equals(MCREvent.DELETE_EVENT)) {
                     handleClassificationDeleted(evt, cl);
-               } else if (evt.getEventType().equals(MCREvent.REPAIR_EVENT)) {
+                } else if (evt.getEventType().equals(MCREvent.REPAIR_EVENT)) {
                     handleClassificationRepaired(evt, cl);
                 } else {
                     logger.warn("Can't find method for a classification data handler for event type " + evt.getEventType());
@@ -144,7 +145,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     public void undoHandleEvent(MCREvent evt) {
 
         if (evt.getObjectType().equals(MCREvent.OBJECT_TYPE)) {
-            MCRObject obj = (MCRObject) (evt.get("object"));
+            MCRObject obj = (MCRObject) evt.get("object");
             if (obj != null) {
                 logger.debug(getClass().getName() + " handling " + obj.getId().getId() + " " + evt.getEventType());
                 if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
@@ -165,7 +166,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
         }
 
         if (evt.getObjectType().equals(MCREvent.DERIVATE_TYPE)) {
-            MCRDerivate der = (MCRDerivate) (evt.get("derivate"));
+            MCRDerivate der = (MCRDerivate) evt.get("derivate");
             if (der != null) {
                 logger.debug(getClass().getName() + " handling " + der.getId().getId() + evt.getEventType());
                 if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
@@ -186,9 +187,10 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
         }
 
         if (evt.getObjectType().equals(MCREvent.FILE_TYPE)) {
-            MCRFile file = (MCRFile) (evt.get("file"));
+            MCRFile file = (MCRFile) evt.get("file");
             if (file != null) {
-                logger.debug(getClass().getName() + " handling " + file.getOwnerID() + "/" + file.getAbsolutePath() + " " + evt.getEventType());
+                logger.debug(getClass().getName() + " handling " + file.getOwnerID() + "/" + file.getAbsolutePath() + " "
+                        + evt.getEventType());
                 if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
                     undoFileCreated(evt, file);
                 } else if (evt.getEventType().equals(MCREvent.UPDATE_EVENT)) {
@@ -205,9 +207,9 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
             logger.warn("Can't find method for " + MCREvent.FILE_TYPE + " for event type " + evt.getEventType());
             return;
         }
-        
+
         if (evt.getObjectType().equals(MCREvent.CLASS_TYPE)) {
-            MCRCategory obj = (MCRCategory) (evt.get("class"));
+            MCRCategory obj = (MCRCategory) evt.get("class");
             if (obj != null) {
                 logger.debug(getClass().getName() + " handling " + obj.getId() + " " + evt.getEventType());
                 if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
@@ -231,7 +233,8 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
 
     /** This method does nothing. It is very useful for debugging events. */
     public void doNothing(MCREvent evt, Object obj) {
-        logger.debug(getClass().getName() + " does nothing on " + evt.getEventType() + " " + evt.getObjectType() + " " + obj.getClass().getName());
+        logger.debug(getClass().getName() + " does nothing on " + evt.getEventType() + " " + evt.getObjectType() + " "
+                + obj.getClass().getName());
     }
 
     /**
@@ -269,7 +272,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      * @param obj
      *            the MCRClassification that caused the event
      */
-    protected void handleClassificationDeleted(MCREvent evt,  MCRCategory obj) {
+    protected void handleClassificationDeleted(MCREvent evt, MCRCategory obj) {
         doNothing(evt, obj);
     }
 

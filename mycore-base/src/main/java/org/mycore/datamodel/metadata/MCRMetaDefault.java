@@ -24,7 +24,6 @@
 package org.mycore.datamodel.metadata;
 
 import org.apache.log4j.Logger;
-
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 
@@ -47,7 +46,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
     // common data
     protected static final String NL = System.getProperties().getProperty("line.separator");
 
-    protected static final String DEFAULT_LANGUAGE = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang","en");
+    protected static final String DEFAULT_LANGUAGE = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "en");
 
     protected static final String DEFAULT_DATAPART = "metadata";
 
@@ -94,7 +93,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
     public MCRMetaDefault(String default_lang) {
         lang = DEFAULT_LANGUAGE;
 
-        if ((default_lang != null) && ((default_lang = default_lang.trim()).length() != 0)) {
+        if (default_lang != null && (default_lang = default_lang.trim()).length() != 0) {
             lang = default_lang;
         }
 
@@ -122,19 +121,20 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      *                         else = 0.
      * @exception MCRException if the set_subtag value is null or empty
      */
-    public MCRMetaDefault(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherited) throws MCRException {
+    public MCRMetaDefault(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherited)
+            throws MCRException {
         lang = DEFAULT_LANGUAGE;
         subtag = "";
         type = "";
         setInherited(set_inherited);
 
-        if ((set_subtag == null) || ((set_subtag = set_subtag.trim()).length() == 0)) {
+        if (set_subtag == null || (set_subtag = set_subtag.trim()).length() == 0) {
             throw new MCRException("The set_subtag is null or empty.");
         }
 
         subtag = set_subtag;
 
-        if ((default_lang != null) && ((default_lang = default_lang.trim()).length() != 0)) {
+        if (default_lang != null && (default_lang = default_lang.trim()).length() != 0) {
             lang = default_lang;
         }
 
@@ -142,7 +142,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
             type = set_type;
         }
 
-        if ((set_datapart != null) && ((set_datapart = set_datapart.trim()).length() != 0)) {
+        if (set_datapart != null && (set_datapart = set_datapart.trim()).length() != 0) {
             datapart = set_datapart;
         }
     }
@@ -186,7 +186,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      *            the default language
      */
     public final void setLang(String default_lang) {
-        if ((default_lang == null) || ((default_lang = default_lang.trim()).length() == 0)) {
+        if (default_lang == null || (default_lang = default_lang.trim()).length() == 0) {
             lang = DEFAULT_LANGUAGE;
         } else {
             lang = default_lang;
@@ -203,7 +203,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      *                if the set_subtag value is null or empty
      */
     public final void setSubTag(String set_subtag) throws MCRException {
-        if ((set_subtag == null) || ((set_subtag = set_subtag.trim()).length() == 0)) {
+        if (set_subtag == null || (set_subtag = set_subtag.trim()).length() == 0) {
             throw new MCRException("The set_subtag is null or empty.");
         }
 
@@ -233,7 +233,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      *            the data part name
      */
     public final void setDataPart(String set_datapart) {
-        if ((set_datapart == null) || ((set_datapart = set_datapart.trim()).length() == 0)) {
+        if (set_datapart == null || (set_datapart = set_datapart.trim()).length() == 0) {
             datapart = DEFAULT_DATAPART;
         } else {
             datapart = set_datapart;
@@ -310,7 +310,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
 
         String temp_subtag = element.getName();
 
-        if ((temp_subtag == null) || ((temp_subtag = temp_subtag.trim()).length() == 0)) {
+        if (temp_subtag == null || (temp_subtag = temp_subtag.trim()).length() == 0) {
             throw new MCRException("The subtag is null or empty.");
         }
 
@@ -318,19 +318,19 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
 
         String temp_lang = element.getAttributeValue("lang", org.jdom.Namespace.XML_NAMESPACE);
 
-        if ((temp_lang != null) && ((temp_lang = temp_lang.trim()).length() != 0)) {
+        if (temp_lang != null && (temp_lang = temp_lang.trim()).length() != 0) {
             lang = temp_lang;
         }
 
         String temp_type = element.getAttributeValue("type");
 
-        if ((temp_type != null) && ((temp_type = temp_type.trim()).length() != 0)) {
+        if (temp_type != null && (temp_type = temp_type.trim()).length() != 0) {
             type = temp_type;
         }
 
         String temp_herit = element.getAttributeValue("inherited");
 
-        if ((temp_herit != null) && ((temp_herit = temp_herit.trim()).length() != 0)) {
+        if (temp_herit != null && (temp_herit = temp_herit.trim()).length() != 0) {
             try {
                 inherited = Integer.parseInt(temp_herit);
             } catch (NumberFormatException e) {
@@ -361,8 +361,8 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      * @return a boolean value
      */
     public boolean isValid() {
-        if ((subtag == null) || ((subtag = subtag.trim()).length() == 0)) {
-            LOGGER.warn("Error while checking subtag: "+subtag);
+        if (subtag == null || (subtag = subtag.trim()).length() == 0) {
+            LOGGER.warn("Error while checking subtag: " + subtag);
             return false;
         }
         return true;
@@ -375,7 +375,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
         debugDefault();
         LOGGER.debug(" ");
     }
-    
+
     /**
      * This method put common debug data to the logger (for the debug mode).
      */
@@ -386,6 +386,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
         LOGGER.debug("DataPart           = " + datapart);
         LOGGER.debug("Inhreited          = " + String.valueOf(inherited));
     }
-    
+
+    @Override
     public abstract Object clone();
 }

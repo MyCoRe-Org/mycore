@@ -30,8 +30,6 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.ibm.icu.util.GregorianCalendar;
-
 import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.mycore.common.MCRCalendar;
@@ -43,6 +41,8 @@ import org.mycore.parsers.bool.MCRNotCondition;
 import org.mycore.parsers.bool.MCROrCondition;
 import org.mycore.parsers.bool.MCRParseException;
 import org.mycore.parsers.bool.MCRSetCondition;
+
+import com.ibm.icu.util.GregorianCalendar;
 
 /**
  * Parses query conditions for use in MCRSearcher.
@@ -62,11 +62,13 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
      *            the 'condition' element
      * @return the parsed MCRQueryCondition object
      */
+    @Override
     protected MCRCondition parseSimpleCondition(Element e) throws MCRParseException {
         String name = e.getName();
 
-        if (!name.equals("condition"))
+        if (!name.equals("condition")) {
             throw new MCRParseException("Not a valid <" + name + ">");
+        }
 
         String field = e.getAttributeValue("field");
         String opera = e.getAttributeValue("operator");
@@ -87,15 +89,14 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
      * @return
      */
     private MCRCondition buildConditions(String field, String oper, String value) {
-        if (field.contains(",")) 
-        { // Multiple fields in one condition, combine with OR
+        if (field.contains(",")) { // Multiple fields in one condition, combine with OR
             StringTokenizer st = new StringTokenizer(field, ", ");
             MCROrCondition oc = new MCROrCondition();
-            while (st.hasMoreTokens())
+            while (st.hasMoreTokens()) {
                 oc.addChild(buildConditions(st.nextToken(), oper, value));
+            }
             return oc;
-        } else if (field.contains("-")) 
-        { // date and MCRMetaHistoryDate condition von-bis
+        } else if (field.contains("-")) { // date and MCRMetaHistoryDate condition von-bis
             StringTokenizer st = new StringTokenizer(field, "- ");
             String fieldFrom = st.nextToken();
             String fieldTo = st.nextToken();
@@ -103,15 +104,17 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
                 // von-bis = x --> (von <= x) AND (bis >= x)
                 MCRAndCondition ac = new MCRAndCondition();
                 ac.addChild(buildCondition(fieldFrom, "<=", value, true));
-                ac.addChild(buildCondition(fieldTo, ">=", value, true ));
+                ac.addChild(buildCondition(fieldTo, ">=", value, true));
                 return ac;
-            } else if (oper.contains("<"))
+            } else if (oper.contains("<")) {
                 return buildCondition(fieldFrom, oper, value, true);
-            else
+            } else {
                 // oper.contains( ">" )
                 return buildCondition(fieldTo, oper, value, true);
-        } else
+            }
+        } else {
             return buildCondition(field, oper, value, false);
+        }
     }
 
     /**
@@ -129,23 +132,26 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
      */
     private MCRQueryCondition buildCondition(String field, String oper, String value, boolean vonbis) {
         MCRFieldDef def = MCRFieldDef.getDef(field);
-        if (def == null)
+        if (def == null) {
             throw new MCRParseException("Field not defined: <" + field + ">");
+        }
         String datatype = def.getDataType();
-        if (!"date".equals(datatype) && vonbis)
-          value = normalizeHistoryDate(oper,value);
+        if (!"date".equals(datatype) && vonbis) {
+            value = normalizeHistoryDate(oper, value);
+        }
         LOGGER.debug(value);
-        if ("date".equals(datatype) && "TODAY".equals(value))
-          value = getToday();
+        if ("date".equals(datatype) && "TODAY".equals(value)) {
+            value = getToday();
+        }
         return new MCRQueryCondition(def, oper, value);
     }
-    
-    private String getToday()  {
-       GregorianCalendar cal = new GregorianCalendar();
-       int year = cal.get(Calendar.YEAR);
-       int month = cal.get(Calendar.MONTH) + 1;
-       int day = cal.get(Calendar.DAY_OF_MONTH);
-       return String.valueOf(day) + "." + String.valueOf(month) + "." + String.valueOf(year);
+
+    private String getToday() {
+        GregorianCalendar cal = new GregorianCalendar();
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH) + 1;
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+        return String.valueOf(day) + "." + String.valueOf(month) + "." + String.valueOf(year);
     }
 
     /** Pattern for MCRQueryConditions expressed as String */
@@ -159,11 +165,13 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
      *            the condition as a String
      * @return the parsed MCRQueryCondition object
      */
+    @Override
     protected MCRCondition parseSimpleCondition(String s) throws MCRParseException {
         Matcher m = pattern.matcher(s);
 
-        if (!m.find())
+        if (!m.find()) {
             throw new MCRParseException("Not a valid condition: " + s);
+        }
 
         String field = m.group(1);
         String operator = m.group(2);
@@ -176,11 +184,13 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
         return buildConditions(field, operator, value);
     }
 
+    @Override
     public MCRCondition parse(Element condition) throws MCRParseException {
         MCRCondition cond = super.parse(condition);
         return normalizeCondition(cond);
     }
 
+    @Override
     public MCRCondition parse(String s) throws MCRParseException {
         MCRCondition cond = super.parse(s);
         return normalizeCondition(cond);
@@ -196,39 +206,41 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
      * by '...' or wildcard search with * or ?.
      */
     static MCRCondition normalizeCondition(MCRCondition cond) {
-        if (cond == null) return null;
-        else if (cond instanceof MCRSetCondition) {
+        if (cond == null) {
+            return null;
+        } else if (cond instanceof MCRSetCondition) {
             MCRSetCondition sc = (MCRSetCondition) cond;
             List<MCRCondition> children = sc.getChildren();
-            sc = ( sc instanceof MCRAndCondition ? new MCRAndCondition() : new MCROrCondition() );  
-            for (MCRCondition child : children )
-            {    
-              child = normalizeCondition(child);
-              if( child == null ) 
-                continue; // Remove empty child conditions
-              else if ( (child instanceof MCRSetCondition) && sc.getOperator().equals( ((MCRSetCondition)child).getOperator() ) ) 
-              {
-                // Replace (a AND (b AND c)) with (a AND b AND c), same for OR
-                sc.addAll(((MCRSetCondition)child).getChildren());
-              }
-              else sc.addChild( child ); 
+            sc = sc instanceof MCRAndCondition ? new MCRAndCondition() : new MCROrCondition();
+            for (MCRCondition child : children) {
+                child = normalizeCondition(child);
+                if (child == null) {
+                    continue; // Remove empty child conditions
+                } else if (child instanceof MCRSetCondition && sc.getOperator().equals(((MCRSetCondition) child).getOperator())) {
+                    // Replace (a AND (b AND c)) with (a AND b AND c), same for OR
+                    sc.addAll(((MCRSetCondition) child).getChildren());
+                } else {
+                    sc.addChild(child);
+                }
             }
             children = sc.getChildren();
-            if (children.size() == 0)
-              return null; // Completely remove empty AND condition
-            else if( children.size() == 1 )
-              return children.get(0); // Replace AND with just one child
-            else 
-              return sc;  
+            if (children.size() == 0) {
+                return null; // Completely remove empty AND condition
+            } else if (children.size() == 1) {
+                return children.get(0); // Replace AND with just one child
+            } else {
+                return sc;
+            }
         } else if (cond instanceof MCRNotCondition) {
             MCRNotCondition nc = (MCRNotCondition) cond;
-            MCRCondition child = normalizeCondition( nc.getChild() ); 
-            if(child == null )
-              return null; // Remove empty NOT
-            else if( child instanceof MCRNotCondition ) // Replace NOT(NOT(x)) with x
-              return normalizeCondition( ((MCRNotCondition)child).getChild() );
-            else 
-              return new MCRNotCondition(child);
+            MCRCondition child = normalizeCondition(nc.getChild());
+            if (child == null) {
+                return null; // Remove empty NOT
+            } else if (child instanceof MCRNotCondition) {
+                return normalizeCondition(((MCRNotCondition) child).getChild());
+            } else {
+                return new MCRNotCondition(child);
+            }
         } else if (cond instanceof MCRQueryCondition) {
             MCRQueryCondition qc = (MCRQueryCondition) cond;
 
@@ -245,8 +257,9 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
                 }
             }
 
-            if (!qc.getOperator().equals("contains"))
+            if (!qc.getOperator().equals("contains")) {
                 return qc;
+            }
 
             // Normalize value when contains operator is used
             List<String> values = new ArrayList<String>();
@@ -255,7 +268,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
             StringTokenizer st = new StringTokenizer(qc.getValue(), " ");
             while (st.hasMoreTokens()) {
                 String value = st.nextToken();
-                if ((phrase != null)) // we are within phrase
+                if (phrase != null) // we are within phrase
                 {
                     if (value.endsWith("'")) // end of phrase
                     {
@@ -282,45 +295,51 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
                     } else {
                         phrase = value;
                     }
-                } else
+                } else {
                     values.add(value);
+                }
             }
 
             MCRAndCondition ac = new MCRAndCondition();
             for (int i = 0; i < values.size(); i++) {
                 String value = values.get(i);
-                if (value.startsWith("'")) // phrase
+                if (value.startsWith("'")) {
                     ac.addChild(new MCRQueryCondition(qc.getField(), "phrase", value.substring(1, value.length() - 1)));
-                else if (value.startsWith("-'")) // NOT phrase
-                    ac.addChild( new MCRNotCondition(new MCRQueryCondition(qc.getField(), "phrase", value.substring(2, value.length() - 1))));
-                else if ((value.indexOf("*") >= 0) || (value.indexOf("?") >= 0)) // like
+                } else if (value.startsWith("-'")) {
+                    ac
+                            .addChild(new MCRNotCondition(new MCRQueryCondition(qc.getField(), "phrase", value.substring(2,
+                                    value.length() - 1))));
+                } else if (value.indexOf("*") >= 0 || value.indexOf("?") >= 0) {
                     ac.addChild(new MCRQueryCondition(qc.getField(), "like", value));
-                else if (value.startsWith("-")) // -word means "NOT word"
+                } else if (value.startsWith("-")) // -word means "NOT word"
                 {
                     MCRCondition subCond = new MCRQueryCondition(qc.getField(), "contains", value.substring(1));
                     ac.addChild(new MCRNotCondition(subCond));
-                } else
+                } else {
                     ac.addChild(new MCRQueryCondition(qc.getField(), "contains", value));
+                }
             }
 
-            if (values.size() == 1)
-                return (MCRCondition) (ac.getChildren().get(0));
-            else
+            if (values.size() == 1) {
+                return ac.getChildren().get(0);
+            } else {
                 return ac;
-        } else
+            }
+        } else {
             return cond;
+        }
     }
 
     /** Used for input validation in editor search form */
     public static boolean validateQueryExpression(String query) {
         try {
             MCRCondition cond = new MCRQueryParser().parse(query);
-            return (cond != null);
+            return cond != null;
         } catch (Throwable t) {
             return false;
         }
     }
-    
+
     /**
      * Normalizes MCRMetaHistoryDate values used in a query. If the
      * date is incomplete (for example, only the year given), it depends
@@ -333,14 +352,18 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
      */
     private static String normalizeHistoryDate(String operator, String date) {
         GregorianCalendar cal = null;
-        if (operator.equals(">"))
+        if (operator.equals(">")) {
             cal = MCRCalendar.getGregorianHistoryDate(date, true);
-        if (operator.equals("<"))
+        }
+        if (operator.equals("<")) {
             cal = MCRCalendar.getGregorianHistoryDate(date, false);
-        if (operator.equals(">="))
+        }
+        if (operator.equals(">=")) {
             cal = MCRCalendar.getGregorianHistoryDate(date, false);
-        if (operator.equals("<="))
+        }
+        if (operator.equals("<=")) {
             cal = MCRCalendar.getGregorianHistoryDate(date, true);
+        }
         return String.valueOf(MCRCalendar.getJulianDayNumber(cal));
     }
 }

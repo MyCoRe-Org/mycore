@@ -42,7 +42,7 @@ public interface MCRCategLinkService {
      * @return true if the classification is used
      */
     public abstract Map<MCRCategoryID, Boolean> hasLinks(MCRCategory category);
-    
+
     /**
      * Checks if the category with the given id is liked with an object
      * 

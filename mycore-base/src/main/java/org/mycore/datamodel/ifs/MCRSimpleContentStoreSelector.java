@@ -63,14 +63,14 @@ public class MCRSimpleContentStoreSelector implements MCRContentStoreSelector {
         storeIDs = new String[stores.size() + 1];
 
         for (int i = 0; i < stores.size(); i++) {
-            Element store = (Element) (stores.get(i));
+            Element store = (Element) stores.get(i);
             String storeID = store.getAttributeValue("ID");
             storeIDs[i] = storeID;
 
             List types = store.getChildren();
 
             for (int j = 0; j < types.size(); j++) {
-                Element type = (Element) (types.get(j));
+                Element type = (Element) types.get(j);
                 String typeID = type.getTextTrim();
 
                 table.put(typeID, storeID);
@@ -93,7 +93,7 @@ public class MCRSimpleContentStoreSelector implements MCRContentStoreSelector {
 
     private String getStore(String typeID) {
         if (table.containsKey(typeID)) {
-            return (String) (table.get(typeID));
+            return (String) table.get(typeID);
         }
         return defaultID;
     }

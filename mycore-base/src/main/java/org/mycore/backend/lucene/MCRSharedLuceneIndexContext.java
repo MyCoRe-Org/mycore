@@ -48,7 +48,7 @@ class MCRSharedLuceneIndexContext {
     public MCRSharedLuceneIndexContext(Directory indexDir, String ID) throws CorruptIndexException, IOException {
         this.indexDir = indexDir;
         this.ID = ID;
-        this.indexLock = new ReentrantReadWriteLock();
+        indexLock = new ReentrantReadWriteLock();
         initReaderIfNeeded();
     }
 
@@ -106,10 +106,12 @@ class MCRSharedLuceneIndexContext {
 
     public void close() {
         try {
-            if (null != reader)
+            if (null != reader) {
                 reader.close();
-            if (null != searcher)
+            }
+            if (null != searcher) {
                 searcher.close();
+            }
         } catch (IOException e1) {
             LOGGER.warn("Error while closing indexreader " + toString(), e1);
         }

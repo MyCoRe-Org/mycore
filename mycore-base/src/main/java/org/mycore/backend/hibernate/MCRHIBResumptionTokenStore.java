@@ -84,17 +84,19 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore {
         try {
             timeout_h = config.getInt(STR_OAI_RESUMPTIONTOKEN_TIMEOUT);
         } catch (MCRConfigurationException mcrx) {
-            logger.error("Die Property '" + STR_OAI_RESUMPTIONTOKEN_TIMEOUT + "' ist nicht konfiguriert. Resumption Tokens werden nicht unterstuetzt.");
+            logger.error("Die Property '" + STR_OAI_RESUMPTIONTOKEN_TIMEOUT
+                    + "' ist nicht konfiguriert. Resumption Tokens werden nicht unterstuetzt.");
             return;
         } catch (NumberFormatException nfx) {
             timeout_h = 72;
         }
-        long outdateTime = new Date().getTime() - (timeout_h * 60 * 60 * 1000);
+        long outdateTime = new Date().getTime() - timeout_h * 60 * 60 * 1000;
 
         Session session = MCRHIBConnection.instance().getSession();
         ;
 
-        List<MCRRESUMPTIONTOKEN> delList = session.createCriteria(MCRRESUMPTIONTOKEN.class).add(Restrictions.le("created", new Date(outdateTime))).list();
+        List<MCRRESUMPTIONTOKEN> delList = session.createCriteria(MCRRESUMPTIONTOKEN.class).add(
+                Restrictions.le("created", new Date(outdateTime))).list();
         for (MCRRESUMPTIONTOKEN token : delList) {
             session.delete(token);
         }
@@ -121,7 +123,7 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore {
 
         byte[] byteHitBlob = resumptionToken.getHitByteArray();
 
-        String[] arHitBlob = (new String(byteHitBlob)).split(sepOAIHIT);
+        String[] arHitBlob = new String(byteHitBlob).split(sepOAIHIT);
 
         MCRObject object = new MCRObject();
         List<String[]> resultList = new ArrayList<String[]>();
@@ -144,10 +146,10 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore {
             } else {
                 String[] specArray = arHitBlob[i].split(sepSpec);
                 spec = specArray[0];
-                if ((specArray[1] != null) && (specArray[1].length() > 0)) {
+                if (specArray[1] != null && specArray[1].length() > 0) {
                     specName = specArray[1];
                 }
-                if ((specArray[2] != null) && (specArray[2].length() > 0)) {
+                if (specArray[2] != null && specArray[2].length() > 0) {
                     specDescription = specArray[2];
                 }
             }
@@ -171,8 +173,8 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore {
      */
     public String getPrefix(String token) {
         Session session = MCRHIBConnection.instance().getSession();
-        String prefix = (String) session.createQuery("select prefix from " + "MCRRESUMPTIONTOKEN " + "where resumptionTokenID like '" + token + "'")
-                .uniqueResult();
+        String prefix = (String) session.createQuery(
+                "select prefix from " + "MCRRESUMPTIONTOKEN " + "where resumptionTokenID like '" + token + "'").uniqueResult();
         return prefix;
     }
 
@@ -192,16 +194,17 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore {
         String sepOAIHIT = config.getString(STR_OAI_SEPARATOR_OAIHIT, ";");
         String sepSpec = config.getString(STR_OAI_SEPARATOR_SPEC, "###");
         StringBuffer sbHitBlob = new StringBuffer("");
-        for (Object result:resultList) {
+        for (Object result : resultList) {
             if (!prefix.equals("set")) {
                 sbHitBlob.append((String) result);
                 sbHitBlob.append(sepOAIHIT);
             } else {
                 String[] arSpec = (String[]) result;
                 String spec = arSpec[0];
-                String specName = (arSpec[1] != null) ? arSpec[1] : "";
-                String specDescription = (arSpec[2] != null) ? arSpec[2] : "";
-                sbHitBlob.append(spec).append(sepSpec).append(specName).append(sepSpec).append(specDescription).append(sepSpec).append("dummyForSplit");
+                String specName = arSpec[1] != null ? arSpec[1] : "";
+                String specDescription = arSpec[2] != null ? arSpec[2] : "";
+                sbHitBlob.append(spec).append(sepSpec).append(specName).append(sepSpec).append(specDescription).append(sepSpec).append(
+                        "dummyForSplit");
                 sbHitBlob.append(sepOAIHIT);
             }
         }

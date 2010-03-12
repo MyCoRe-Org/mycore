@@ -31,16 +31,16 @@ public class MCRTranslationTest extends MCRTestCase {
      * Test method for 'org.mycore.services.i18n.MCRTranslation.getStringArray(String)'
      */
     public void testGetStringArray() {
-        assertEquals(0,MCRTranslation.getStringArray(null).length);
-        assertEquals(1,MCRTranslation.getStringArray("test").length);
-        assertEquals(2,MCRTranslation.getStringArray("string1;string2").length);
-        assertEquals("string1",MCRTranslation.getStringArray("string1;string2")[0]);
-        assertEquals(2,MCRTranslation.getStringArray("string1\\;;string2").length);
-        assertEquals("string1;",MCRTranslation.getStringArray("string1\\;;string2")[0]);
-        assertEquals("string1\\",MCRTranslation.getStringArray("string1\\\\;string2")[0]);
+        assertEquals(0, MCRTranslation.getStringArray(null).length);
+        assertEquals(1, MCRTranslation.getStringArray("test").length);
+        assertEquals(2, MCRTranslation.getStringArray("string1;string2").length);
+        assertEquals("string1", MCRTranslation.getStringArray("string1;string2")[0]);
+        assertEquals(2, MCRTranslation.getStringArray("string1\\;;string2").length);
+        assertEquals("string1;", MCRTranslation.getStringArray("string1\\;;string2")[0]);
+        assertEquals("string1\\", MCRTranslation.getStringArray("string1\\\\;string2")[0]);
     }
 
-    public void testGetDeprecatedMessageKeys(){
+    public void testGetDeprecatedMessageKeys() {
         assertEquals("Depreacted I18N keys do not work", "This is a JUnit Test.", MCRTranslation.translate("oldLabel"));
     }
 

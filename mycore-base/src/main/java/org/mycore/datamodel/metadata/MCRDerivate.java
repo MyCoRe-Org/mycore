@@ -106,7 +106,7 @@ final public class MCRDerivate extends MCRBase {
         }
 
         mcr_version = jdom_element_root.getAttributeValue("version");
-        if ((mcr_version == null) || ((mcr_version = mcr_version.trim()).length() == 0)) {
+        if (mcr_version == null || (mcr_version = mcr_version.trim()).length() == 0) {
             setVersion();
         }
 
@@ -145,6 +145,7 @@ final public class MCRDerivate extends MCRBase {
      * @exception MCRException
      *                general Exception of MyCoRe
      */
+    @Override
     public final void setFromURI(URI uri) throws MCRException {
         try {
             jdom_document = MCRXMLHelper.parseURI(uri);
@@ -164,6 +165,7 @@ final public class MCRDerivate extends MCRBase {
      * @exception MCRException
      *                general Exception of MyCoRe
      */
+    @Override
     public final void setFromXML(byte[] xml, boolean valid) throws MCRException {
         try {
             jdom_document = MCRXMLHelper.parseXML(xml, false);
@@ -193,6 +195,7 @@ final public class MCRDerivate extends MCRBase {
      *                if the content of this class is not valid
      * @return a JDOM Document with the XML data of the object as byte array
      */
+    @Override
     public final org.jdom.Document createXML() throws MCRException {
         if (!isValid()) {
             throw new MCRException("The content is not valid.");
@@ -218,6 +221,7 @@ final public class MCRDerivate extends MCRBase {
      * @exception MCRPersistenceException
      *                if a persistence problem is occured
      */
+    @Override
     public final void createInDatastore() throws MCRPersistenceException {
         // exist the derivate?
         if (existInDatastore(mcr_id.getId())) {
@@ -251,7 +255,7 @@ final public class MCRDerivate extends MCRBase {
         MCRMetaLinkID der = new MCRMetaLinkID();
         der.setReference(mcr_id.getId(), mcr_label, "");
         der.setSubTag("derobject");
-        byte[] backup = MCRXMLTableManager.instance().retrieveBLOB( meta.getXLinkHrefID() );
+        byte[] backup = MCRXMLTableManager.instance().retrieveBLOB(meta.getXLinkHrefID());
 
         try {
             MCRObject obj = new MCRObject();
@@ -323,6 +327,7 @@ final public class MCRDerivate extends MCRBase {
      * @exception MCRPersistenceException
      *                if a persistence problem is occured
      */
+    @Override
     public final void deleteFromDatastore(String id) throws MCRPersistenceException {
         // get the derivate
         try {
@@ -411,6 +416,7 @@ final public class MCRDerivate extends MCRBase {
      * @exception MCRPersistenceException
      *                if a persistence problem is occured
      */
+    @Override
     public final void receiveFromDatastore(String id) throws MCRPersistenceException {
         receiveFromDatastore(new MCRObjectID(id));
     }
@@ -487,6 +493,7 @@ final public class MCRDerivate extends MCRBase {
      * @exception MCRPersistenceException
      *                if a persistence problem is occured
      */
+    @Override
     public final void updateInDatastore() throws MCRPersistenceException {
         // get the old Item
         MCRDerivate old = new MCRDerivate();
@@ -510,7 +517,7 @@ final public class MCRDerivate extends MCRBase {
         }
 
         // update to IFS
-        if ((getDerivate().getInternals() != null) && (getDerivate().getInternals().getSourcePath() != null)) {
+        if (getDerivate().getInternals() != null && getDerivate().getInternals().getSourcePath() != null) {
             File f = new File(getDerivate().getInternals().getSourcePath());
 
             if (!f.exists()) {
@@ -566,6 +573,7 @@ final public class MCRDerivate extends MCRBase {
      * @param id
      *            the MCRObjectID as string
      */
+    @Override
     public final void repairPersitenceDatastore(String id) throws MCRPersistenceException {
         repairPersitenceDatastore(new MCRObjectID(id));
     }
@@ -576,6 +584,7 @@ final public class MCRDerivate extends MCRBase {
      * @param id
      *            the MCRObjectID
      */
+    @Override
     public final void repairPersitenceDatastore(MCRObjectID id) throws MCRPersistenceException {
         receiveFromDatastore(id);
         // handle events
@@ -594,6 +603,7 @@ final public class MCRDerivate extends MCRBase {
         LOGGER.debug("");
     }
 
+    @Override
     public boolean isValid() {
         if (!super.isValid()) {
             LOGGER.warn("MCRBase.isValid() == false;");

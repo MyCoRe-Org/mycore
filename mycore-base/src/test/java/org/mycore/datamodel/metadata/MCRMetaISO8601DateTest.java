@@ -33,7 +33,6 @@ import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.joda.time.format.DateTimeFormatter;
-
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRTestCase;
 
@@ -47,9 +46,10 @@ import org.mycore.common.MCRTestCase;
 public class MCRMetaISO8601DateTest extends MCRTestCase {
     private static Logger LOGGER;
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();//org.mycore.datamodel.metadata.MCRMetaISO8601Date
-        if (setProperty("log4j.logger.org.mycore.datamodel.metadata.MCRMetaISO8601Date","INFO", false)){
+        if (setProperty("log4j.logger.org.mycore.datamodel.metadata.MCRMetaISO8601Date", "INFO", false)) {
             //DEBUG will print a Stacktrace if we test for errors, but that's O.K.
             MCRConfiguration.instance().configureLogging();
         }
@@ -58,6 +58,7 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
         }
     }
 
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
     }
@@ -65,26 +66,26 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
     public void testFormatChooser() {
         // test year
         String duration = "-16";
-        assertEquals(duration + " test failed", getFormat(MCRMetaISO8601Date.FormatChooser.YEAR_FORMAT), getFormat(MCRMetaISO8601Date.FormatChooser
-                .getFormatter(duration, null)));
+        assertEquals(duration + " test failed", getFormat(MCRMetaISO8601Date.FormatChooser.YEAR_FORMAT),
+                getFormat(MCRMetaISO8601Date.FormatChooser.getFormatter(duration, null)));
         duration = "2006";
-        assertEquals(duration + " test failed", getFormat(MCRMetaISO8601Date.FormatChooser.YEAR_FORMAT), getFormat(MCRMetaISO8601Date.FormatChooser
-                .getFormatter(duration, null)));
+        assertEquals(duration + " test failed", getFormat(MCRMetaISO8601Date.FormatChooser.YEAR_FORMAT),
+                getFormat(MCRMetaISO8601Date.FormatChooser.getFormatter(duration, null)));
         // test year-month
         duration = "2006-01";
-        assertEquals(duration + " test failed", getFormat(MCRMetaISO8601Date.FormatChooser.YEAR_MONTH_FORMAT), getFormat(MCRMetaISO8601Date.FormatChooser
-                .getFormatter(duration, null)));
+        assertEquals(duration + " test failed", getFormat(MCRMetaISO8601Date.FormatChooser.YEAR_MONTH_FORMAT),
+                getFormat(MCRMetaISO8601Date.FormatChooser.getFormatter(duration, null)));
         // test complete
         duration = "2006-01-18";
-        assertEquals(duration + " test failed", getFormat(MCRMetaISO8601Date.FormatChooser.COMPLETE_FORMAT), getFormat(MCRMetaISO8601Date.FormatChooser
-                .getFormatter(duration, null)));
+        assertEquals(duration + " test failed", getFormat(MCRMetaISO8601Date.FormatChooser.COMPLETE_FORMAT),
+                getFormat(MCRMetaISO8601Date.FormatChooser.getFormatter(duration, null)));
         // test complete with hour and minutes
         duration = "2006-01-18T11:08Z";
-        assertEquals(duration + " test failed", getFormat(MCRMetaISO8601Date.FormatChooser.COMPLETE_HH_MM_FORMAT), getFormat(MCRMetaISO8601Date.FormatChooser
-                .getFormatter(duration, null)));
+        assertEquals(duration + " test failed", getFormat(MCRMetaISO8601Date.FormatChooser.COMPLETE_HH_MM_FORMAT),
+                getFormat(MCRMetaISO8601Date.FormatChooser.getFormatter(duration, null)));
         duration = "2006-01-18T11:08+02:00";
-        assertEquals(duration + " test failed", getFormat(MCRMetaISO8601Date.FormatChooser.COMPLETE_HH_MM_FORMAT), getFormat(MCRMetaISO8601Date.FormatChooser
-                .getFormatter(duration, null)));
+        assertEquals(duration + " test failed", getFormat(MCRMetaISO8601Date.FormatChooser.COMPLETE_HH_MM_FORMAT),
+                getFormat(MCRMetaISO8601Date.FormatChooser.getFormatter(duration, null)));
         // test complete with hour, minutes and seconds
         duration = "2006-01-18T11:08:20Z";
         assertEquals(duration + " test failed", getFormat(MCRMetaISO8601Date.FormatChooser.COMPLETE_HH_MM_SS_FORMAT),
@@ -133,7 +134,7 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
         LOGGER.debug(timeString);
         ts.setDate(timeString);
         assertNull("Date is not null", ts.getDate());
-        ts.setFormat((String)null); // check auto format determination
+        ts.setFormat((String) null); // check auto format determination
         ts.setDate(timeString);
         assertNotNull("Date is null", ts.getDate());
         // check if shorter format declarations fail if String is longer
@@ -143,19 +144,19 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
         assertNull("Date is not null", ts.getDate());
         LOGGER.debug(ts.getISOString());
         timeString = "01.12.1986";
-        ts.setFormat((String)null);
+        ts.setFormat((String) null);
         ts.setDate(timeString);
         assertNull("Date is not null", ts.getDate());
-        setProperty("MCR.Metadata.SimpleDateFormat.StrictParsing","false",true);
-        setProperty("MCR.Metadata.SimpleDateFormat.Locales","de_DE,en_US",true);
-        ts.setFormat((String)null);
+        setProperty("MCR.Metadata.SimpleDateFormat.StrictParsing", "false", true);
+        setProperty("MCR.Metadata.SimpleDateFormat.Locales", "de_DE,en_US", true);
+        ts.setFormat((String) null);
         ts.setDate(timeString);
         LOGGER.debug(ts.getISOString());
         timeString = "12/01/1986";
         ts.setDate(timeString);
         LOGGER.debug(ts.getISOString());
         //assertNotNull("Date is null", ts.getDate());
-        setProperty("MCR.Metadata.SimpleDateFormat.StrictParsing","true",true);
+        setProperty("MCR.Metadata.SimpleDateFormat.StrictParsing", "true", true);
     }
 
     /*
@@ -215,20 +216,22 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
         assertNull("Date should be null", ts.getDate());
         assertEquals("Format should be set by jdom", MCRMetaISO8601Date.IsoFormat.COMPLETE_HH_MM, ts.getFormat());
     }
-    
+
     private String getFormat(DateTimeFormatter df) {
-        if ((df == null) || (df == MCRMetaISO8601Date.FormatChooser.COMPLETE_HH_MM_SS_SSS_FORMAT)
-                || (df == MCRMetaISO8601Date.FormatChooser.UTC_COMPLETE_HH_MM_SS_SSS_FORMAT)) {
+        if (df == null || df == MCRMetaISO8601Date.FormatChooser.COMPLETE_HH_MM_SS_SSS_FORMAT
+                || df == MCRMetaISO8601Date.FormatChooser.UTC_COMPLETE_HH_MM_SS_SSS_FORMAT) {
             return MCRMetaISO8601Date.IsoFormat.COMPLETE_HH_MM_SS_SSS.toString();
-        } else if (df == MCRMetaISO8601Date.FormatChooser.COMPLETE_HH_MM_SS_FORMAT || (df == MCRMetaISO8601Date.FormatChooser.UTC_COMPLETE_HH_MM_SS_FORMAT)) {
+        } else if (df == MCRMetaISO8601Date.FormatChooser.COMPLETE_HH_MM_SS_FORMAT
+                || df == MCRMetaISO8601Date.FormatChooser.UTC_COMPLETE_HH_MM_SS_FORMAT) {
             return MCRMetaISO8601Date.IsoFormat.COMPLETE_HH_MM_SS.toString();
-        } else if (df == MCRMetaISO8601Date.FormatChooser.COMPLETE_HH_MM_FORMAT || (df == MCRMetaISO8601Date.FormatChooser.UTC_COMPLETE_HH_MM_FORMAT)) {
+        } else if (df == MCRMetaISO8601Date.FormatChooser.COMPLETE_HH_MM_FORMAT
+                || df == MCRMetaISO8601Date.FormatChooser.UTC_COMPLETE_HH_MM_FORMAT) {
             return MCRMetaISO8601Date.IsoFormat.COMPLETE_HH_MM.toString();
-        } else if (df == MCRMetaISO8601Date.FormatChooser.COMPLETE_FORMAT || (df == MCRMetaISO8601Date.FormatChooser.UTC_COMPLETE_FORMAT)) {
+        } else if (df == MCRMetaISO8601Date.FormatChooser.COMPLETE_FORMAT || df == MCRMetaISO8601Date.FormatChooser.UTC_COMPLETE_FORMAT) {
             return MCRMetaISO8601Date.IsoFormat.COMPLETE.toString();
-        } else if (df == MCRMetaISO8601Date.FormatChooser.YEAR_MONTH_FORMAT || (df == MCRMetaISO8601Date.FormatChooser.UTC_YEAR_MONTH_FORMAT)) {
+        } else if (df == MCRMetaISO8601Date.FormatChooser.YEAR_MONTH_FORMAT || df == MCRMetaISO8601Date.FormatChooser.UTC_YEAR_MONTH_FORMAT) {
             return MCRMetaISO8601Date.IsoFormat.YEAR_MONTH.toString();
-        } else if (df == MCRMetaISO8601Date.FormatChooser.YEAR_FORMAT || (df == MCRMetaISO8601Date.FormatChooser.UTC_YEAR_FORMAT)) {
+        } else if (df == MCRMetaISO8601Date.FormatChooser.YEAR_FORMAT || df == MCRMetaISO8601Date.FormatChooser.UTC_YEAR_FORMAT) {
             return MCRMetaISO8601Date.IsoFormat.YEAR.toString();
         } else {
             return MCRMetaISO8601Date.IsoFormat.COMPLETE_HH_MM_SS_SSS.toString();

@@ -54,10 +54,11 @@ public abstract class MCRUploadHandler {
 
     /** Creates a new upload handler and registers it at the handler manager * */
     protected MCRUploadHandler() {
-        if(MCRWebsiteWriteProtection.isActive())
+        if (MCRWebsiteWriteProtection.isActive()) {
             throw new MCRException("System is currently in read-only mode");
+        }
 
-        this.uploadID = Long.toString(System.currentTimeMillis(), 36);
+        uploadID = Long.toString(System.currentTimeMillis(), 36);
         MCRUploadHandlerManager.register(this);
     }
 
@@ -148,9 +149,8 @@ public abstract class MCRUploadHandler {
      * 
      * @throws Exception
      */
-    public void cancelUpload() throws Exception
-    {
-      finishUpload();
+    public void cancelUpload() throws Exception {
+        finishUpload();
     }
 
     /**
@@ -159,6 +159,6 @@ public abstract class MCRUploadHandler {
      * UploadHandlerManager.
      */
     public void unregister() {
-        MCRUploadHandlerManager.unregister(this.uploadID);
+        MCRUploadHandlerManager.unregister(uploadID);
     }
 }

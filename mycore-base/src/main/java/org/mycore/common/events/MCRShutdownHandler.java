@@ -31,7 +31,6 @@ import java.util.Set;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
 
@@ -68,6 +67,7 @@ public class MCRShutdownHandler {
          * access to close cleanly this method can be used to be ahead of database outtake.
          */
         public void prepareClose();
+
         /**
          * cleanly closes this object that implements <code>Closeable</code>.
          * 
@@ -82,7 +82,7 @@ public class MCRShutdownHandler {
     private static Logger LOGGER = Logger.getLogger(MCRShutdownHandler.class);
 
     private static final Set<Closeable> requests = Collections.synchronizedSet(new HashSet<Closeable>());
-    
+
     private static final String system = MCRConfiguration.instance().getString("MCR.CommandLineInterface.SystemName", "MyCoRe") + ":";
 
     private static boolean shuttingDown = false;
@@ -109,17 +109,17 @@ public class MCRShutdownHandler {
     }
 
     public void removeCloseable(MCRShutdownHandler.Closeable c) {
-        if (!shuttingDown)
+        if (!shuttingDown) {
             requests.remove(c);
+        }
     }
 
     void shutDown() {
-        System.out.println(system+" Shutting down system, please wait...\n");
+        System.out.println(system + " Shutting down system, please wait...\n");
         LOGGER.debug("requests: " + requests.toString());
         synchronized (requests) {
             shuttingDown = true;
-            for (Iterator<Closeable> it = requests.iterator(); it.hasNext();) {
-                MCRShutdownHandler.Closeable c = it.next();
+            for (Closeable c : requests) {
                 c.prepareClose();
             }
             for (Iterator<Closeable> it = requests.iterator(); it.hasNext();) {
@@ -129,7 +129,7 @@ public class MCRShutdownHandler {
                 it.remove();
             }
         }
-        System.out.println(system+" closing any remaining MCRSession instances, please wait...\n");
+        System.out.println(system + " closing any remaining MCRSession instances, please wait...\n");
         MCRSessionMgr.close();
         System.out.println(system + " Goodbye, and remember: \"Alles wird gut.\"\n");
         LogManager.shutdown();

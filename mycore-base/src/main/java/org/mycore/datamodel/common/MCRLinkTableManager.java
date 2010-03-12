@@ -105,7 +105,8 @@ public class MCRLinkTableManager {
      *         warning to the logger.
      */
     private final boolean checkType(String type) {
-        if (type.equals(ENTRY_TYPE_CHILD) || type.equals(ENTRY_TYPE_DERIVATE) || type.equals(ENTRY_TYPE_PARENT) || type.equals(ENTRY_TYPE_REFERENCE)) {
+        if (type.equals(ENTRY_TYPE_CHILD) || type.equals(ENTRY_TYPE_DERIVATE) || type.equals(ENTRY_TYPE_PARENT)
+                || type.equals(ENTRY_TYPE_REFERENCE)) {
             return true;
         }
         logger.warn("The value " + type + " is not a defined type for the link table.");
@@ -141,17 +142,17 @@ public class MCRLinkTableManager {
      *            the optional attribute of the reference as String
      */
     public void addReferenceLink(String from, String to, String type, String attr) {
-        if ((from == null) || ((from = from.trim()).length() == 0)) {
+        if (from == null || (from = from.trim()).length() == 0) {
             logger.warn("The from value of a reference link is false, the link was not added to the link table");
             return;
         }
 
-        if ((to == null) || ((to = to.trim()).length() == 0)) {
+        if (to == null || (to = to.trim()).length() == 0) {
             logger.warn("The to value of a reference link is false, the link was not added to the link table");
             return;
         }
 
-        if ((type == null) || ((type = type.trim()).length() == 0)) {
+        if (type == null || (type = type.trim()).length() == 0) {
             logger.warn("The type value of a reference link is false, the link was not added to the link table");
             return;
         }
@@ -160,8 +161,8 @@ public class MCRLinkTableManager {
             attr = "";
         }
 
-        StringBuffer sb = new StringBuffer().append("Link in table ").append(type).append(" add for ").append(from).append("<-->").append(to).append(" with ")
-                .append(type).append(" and ").append(attr);
+        StringBuffer sb = new StringBuffer().append("Link in table ").append(type).append(" add for ").append(from).append("<-->").append(
+                to).append(" with ").append(type).append(" and ").append(attr);
         logger.debug(sb.toString());
 
         try {
@@ -191,7 +192,7 @@ public class MCRLinkTableManager {
      *            the source of the reference as String
      */
     public void deleteReferenceLink(String from) {
-        if ((from == null) || ((from = from.trim()).length() == 0)) {
+        if (from == null || (from = from.trim()).length() == 0) {
             logger.warn("The from value of a reference link is false, the link was " + "not deleted from the link table");
             return;
         }
@@ -202,7 +203,8 @@ public class MCRLinkTableManager {
             if (logger.isDebugEnabled()) {
                 e.printStackTrace();
             }
-            logger.warn("An error occured while deleting a dataset from the" + from + " reference link table, deleting could be not succesful.");
+            logger.warn("An error occured while deleting a dataset from the" + from
+                    + " reference link table, deleting could be not succesful.");
         }
     }
 
@@ -217,7 +219,7 @@ public class MCRLinkTableManager {
      *            the type of the reference as String
      */
     public void deleteReferenceLink(String from, String to, String type) {
-        if ((from == null) || ((from = from.trim()).length() == 0)) {
+        if (from == null || (from = from.trim()).length() == 0) {
             logger.warn("The from value of a reference link is false, the link was " + "not deleted from the link table");
             return;
         }
@@ -248,7 +250,7 @@ public class MCRLinkTableManager {
      * @return the number of references
      */
     public int countReferenceLinkTo(String to) {
-        if ((to == null) || ((to = to.trim()).length() == 0)) {
+        if (to == null || (to = to.trim()).length() == 0) {
             logger.warn("The to value of a reference link is false, the link was " + "not added to the link table");
 
             return 0;
@@ -273,13 +275,13 @@ public class MCRLinkTableManager {
      * @return the number of references
      */
     public int countReferenceLinkTo(String to, String[] types, String restriction) {
-        if ((to == null) || ((to = to.trim()).length() == 0)) {
+        if (to == null || (to = to.trim()).length() == 0) {
             logger.warn("The to value of a reference link is false, the link was " + "not added to the link table");
             return 0;
         }
 
         try {
-            if (((types != null) && (types.length > 0))) {
+            if (types != null && types.length > 0) {
                 String mydoctype = "";
                 int cnt = 0;
                 int idt = 0;
@@ -345,7 +347,7 @@ public class MCRLinkTableManager {
      * @return List of Strings (Source-IDs)
      */
     public Collection<String> getSourceOf(String to) {
-        if ((to == null) || (to.length() == 0)) {
+        if (to == null || to.length() == 0) {
             logger.warn("The to value of a reference link is false, the link was not found in the link table");
             return Collections.emptyList();
         }
@@ -383,11 +385,11 @@ public class MCRLinkTableManager {
      * @return List of Strings (Source-IDs)
      */
     public Collection<String> getSourceOf(String to, String type) {
-        if ((to == null) || (to.length() == 0)) {
+        if (to == null || to.length() == 0) {
             logger.warn("The to value of a reference link is false, the link was not found in the link table");
             return Collections.emptyList();
         }
-        if ((type == null) || (type.length() == 0)) {
+        if (type == null || type.length() == 0) {
             logger.warn("The type value of a reference link is false, the link was not found in the link table");
             return Collections.emptyList();
         }
@@ -412,7 +414,7 @@ public class MCRLinkTableManager {
      * @return a list of ID's
      */
     public Collection<String> getSourceOf(String[] to, String type) {
-        if ((to == null) || (to.length == 0)) {
+        if (to == null || to.length == 0) {
             logger.warn("The to value of a reference link is false, the link was not found in the link table");
             return Collections.emptyList();
         }
@@ -454,11 +456,11 @@ public class MCRLinkTableManager {
      * @return List of Strings (Destination-IDs)
      */
     public Collection<String> getDestinationOf(String from, String type) {
-        if ((from == null) || (from.length() == 0)) {
+        if (from == null || from.length() == 0) {
             logger.warn("The to value of a reference link is false, the link was not found in the link table");
             return Collections.emptyList();
         }
-        if ((type == null) || (type.length() == 0)) {
+        if (type == null || type.length() == 0) {
             logger.warn("The type value of a reference link is false, the link was not found in the link table");
             return Collections.emptyList();
         }

@@ -61,7 +61,7 @@ public class MCRFileContentTypeFactory {
         MCRConfiguration config = MCRConfiguration.instance();
 
         Object obj = config.getInstanceOf("MCR.IFS.FileContentTypes.DetectorClass");
-        detector = (MCRFileContentTypeDetector) (obj);
+        detector = (MCRFileContentTypeDetector) obj;
 
         String file = config.getString("MCR.IFS.FileContentTypes.DefinitionFile");
 
@@ -70,7 +70,7 @@ public class MCRFileContentTypeFactory {
 
         for (int i = 0; i < types.size(); i++) {
             // Build file content type from XML element
-            Element xType = (Element) (types.get(i));
+            Element xType = (Element) types.get(i);
             String ID = xType.getAttributeValue("ID");
             String label = xType.getChildTextTrim("label");
             String url = xType.getChildTextTrim("url");
@@ -106,7 +106,7 @@ public class MCRFileContentTypeFactory {
         MCRArgumentChecker.ensureNotEmpty(ID, "ID");
 
         if (typesTable.containsKey(ID)) {
-            return (MCRFileContentType) (typesTable.get(ID));
+            return (MCRFileContentType) typesTable.get(ID);
         }
         String msg = "There is no file content type with ID = " + ID + " configured";
         throw new MCRConfigurationException(msg);
@@ -154,6 +154,6 @@ public class MCRFileContentTypeFactory {
 
         MCRFileContentType type = detector.detectType(filename.trim(), header);
 
-        return ((type == null) ? defaultType : type);
+        return type == null ? defaultType : type;
     }
 }

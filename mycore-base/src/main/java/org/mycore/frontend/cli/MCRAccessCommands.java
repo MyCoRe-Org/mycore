@@ -196,8 +196,9 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         for (Element mcrpermission : listelm) {
             String permissionName = mcrpermission.getAttributeValue("name").trim();
             String ruleDescription = mcrpermission.getAttributeValue("ruledescription");
-            if (ruleDescription == null)
+            if (ruleDescription == null) {
                 ruleDescription = "";
+            }
             Element rule = (Element) mcrpermission.getChild("condition").clone();
             AI.addRule(permissionName, rule, ruleDescription);
         }
@@ -247,8 +248,9 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         for (String permission : permissions) {
             noPermissionsDefined = false;
             String description = AI.getRuleDescription(permission);
-            if (description.equals(""))
+            if (description.equals("")) {
                 description = "No description";
+            }
             org.jdom.Element rule = AI.getRule(permission);
             LOGGER.info("       " + permission);
             LOGGER.info("           " + description);
@@ -257,8 +259,9 @@ public class MCRAccessCommands extends MCRAbstractCommands {
                 LOGGER.info("           " + o.outputString(rule));
             }
         }
-        if (noPermissionsDefined)
+        if (noPermissionsDefined) {
             LOGGER.warn("No permissions defined");
+        }
         LOGGER.info("");
     }
 
@@ -348,11 +351,13 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    public static void permissionUpdateForID(String permission, String id, String strFileRule, String description) throws MCRException, SAXParseException {
+    public static void permissionUpdateForID(String permission, String id, String strFileRule, String description) throws MCRException,
+            SAXParseException {
         MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
         Element rule = getRuleFromFile(strFileRule);
-        if (rule == null)
+        if (rule == null) {
             return;
+        }
         AI.addRule(id, permission, rule, description);
         return;
     }
@@ -390,11 +395,13 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    public static void permissionUpdateForSelected(String permission, String strFileRule, String description) throws MCRException, SAXParseException {
+    public static void permissionUpdateForSelected(String permission, String strFileRule, String description) throws MCRException,
+            SAXParseException {
         MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
         Element rule = getRuleFromFile(strFileRule);
-        if (rule == null)
+        if (rule == null) {
             return;
+        }
         for (String id : MCRObjectCommands.getSelectedObjectIDs()) {
             AI.addRule(id, permission, rule, description);
         }

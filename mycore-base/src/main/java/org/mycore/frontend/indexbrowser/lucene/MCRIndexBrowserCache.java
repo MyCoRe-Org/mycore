@@ -20,19 +20,21 @@ public class MCRIndexBrowserCache {
     protected static Logger LOGGER = Logger.getLogger(MCRIndexBrowserCache.class);
 
     private static Hashtable<String, MCRCache> TYPE_CACHE_TABLE = new Hashtable<String, MCRCache>();
+
     private static ReentrantReadWriteLock TYPE_CACHE_TABLE_LOCK = new ReentrantReadWriteLock();
 
     /**
      * Add a new list of index browser entries to the cache.
      * @param listToCache a list to cache
      */
-    public static void addToCache(String cacheKey,String index, List<MCRIndexBrowserEntry> listToCache) {
-        if(cacheKey == null || index == null || listToCache == null)
+    public static void addToCache(String cacheKey, String index, List<MCRIndexBrowserEntry> listToCache) {
+        if (cacheKey == null || index == null || listToCache == null) {
             return;
+        }
 
         // adds a new mcr cache to the hash table
         MCRCache mcrCache = null;
-        if(!isInHashtable(index)) {
+        if (!isInHashtable(index)) {
             mcrCache = addIndexCacheToHashtable(index);
         } else {
             mcrCache = getIndexCache(index);
@@ -46,13 +48,15 @@ public class MCRIndexBrowserCache {
      * @param index the key of the entry.
      */
     protected static MCRCache addIndexCacheToHashtable(String index) {
-        if (index == null)
+        if (index == null) {
             throw new MCRException("Could not determine index: " + index);
+        }
         MCRCache cache = null;
         try {
             TYPE_CACHE_TABLE_LOCK.writeLock().lock();
-            if (!TYPE_CACHE_TABLE.containsKey(index))
+            if (!TYPE_CACHE_TABLE.containsKey(index)) {
                 TYPE_CACHE_TABLE.put(index, cache = new MCRCache(1000, "IndexBrowser,objectType=" + index.replace(",", "_")));
+            }
         } finally {
             TYPE_CACHE_TABLE_LOCK.writeLock().unlock();
         }
@@ -64,8 +68,9 @@ public class MCRIndexBrowserCache {
      * @param objectType the object type which has to be removed
      */
     public static void deleteIndexCacheFromHashtable(String objectType) {
-        if (objectType == null)
+        if (objectType == null) {
             return;
+        }
         TYPE_CACHE_TABLE_LOCK.writeLock().lock();
         TYPE_CACHE_TABLE.remove(objectType);
         TYPE_CACHE_TABLE_LOCK.writeLock().unlock();
@@ -77,14 +82,15 @@ public class MCRIndexBrowserCache {
      */
     public static List<MCRIndexBrowserEntry> getFromCache(String cacheKey, String index) {
         // if the list is not cached, return null
-        if(!isCached(cacheKey, index))
+        if (!isCached(cacheKey, index)) {
             return null;
+        }
 
         // get the mcr cache from the hash table
         MCRCache mcrCache = getIndexCache(index);
         // get the cached list from the mcr cache
         @SuppressWarnings("unchecked")
-        List<MCRIndexBrowserEntry> cachedList = ((List<MCRIndexBrowserEntry>)mcrCache.get(cacheKey));
+        List<MCRIndexBrowserEntry> cachedList = (List<MCRIndexBrowserEntry>) mcrCache.get(cacheKey);
         // return the list
         return cachedList;
     }
@@ -114,8 +120,9 @@ public class MCRIndexBrowserCache {
         try {
             TYPE_CACHE_TABLE_LOCK.readLock().lock();
             MCRCache mcrCache = TYPE_CACHE_TABLE.get(index);
-            if (mcrCache != null && mcrCache.get(cacheKey) != null)
+            if (mcrCache != null && mcrCache.get(cacheKey) != null) {
                 return true;
+            }
             return false;
         } finally {
             TYPE_CACHE_TABLE_LOCK.readLock().unlock();

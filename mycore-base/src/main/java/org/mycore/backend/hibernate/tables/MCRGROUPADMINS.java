@@ -27,11 +27,11 @@ public class MCRGROUPADMINS {
     private MCRGROUPADMINSPK key;
 
     public MCRGROUPADMINS() {
-        this.key = new MCRGROUPADMINSPK();
+        key = new MCRGROUPADMINSPK();
     }
 
     public MCRGROUPADMINS(MCRGROUPS gid, MCRUSERS userid, MCRGROUPS groupid) {
-        this.key = new MCRGROUPADMINSPK(gid, userid, groupid);
+        key = new MCRGROUPADMINSPK(gid, userid, groupid);
     }
 
     /**

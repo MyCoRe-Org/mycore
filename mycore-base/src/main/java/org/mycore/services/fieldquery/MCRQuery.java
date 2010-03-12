@@ -72,7 +72,7 @@ public class MCRQuery {
     public MCRQuery(MCRCondition cond, List<MCRSortBy> sortBy, int maxResults) {
         this.cond = MCRQueryParser.normalizeCondition(cond);
         this.setSortBy(sortBy);
-        this.setMaxResults(maxResults);
+        setMaxResults(maxResults);
     }
 
     /**
@@ -101,9 +101,11 @@ public class MCRQuery {
      *            the maximum number of results
      */
     public void setMaxResults(int maxResults) {
-        if(maxResults < 0) maxResults = 0;
+        if (maxResults < 0) {
+            maxResults = 0;
+        }
         this.maxResults = maxResults;
-        this.doc = null;
+        doc = null;
     }
 
     /**
@@ -122,10 +124,11 @@ public class MCRQuery {
      *            a list of MCRSortBy objects, may be empty
      */
     public void setSortBy(List<MCRSortBy> sortBy) {
-        if (sortBy == null)
+        if (sortBy == null) {
             sortBy = new ArrayList<MCRSortBy>();
+        }
         this.sortBy = sortBy;
-        this.doc = null;
+        doc = null;
     }
 
     /**
@@ -136,9 +139,10 @@ public class MCRQuery {
      */
     public void setSortBy(MCRSortBy sortBy) {
         this.sortBy = new ArrayList<MCRSortBy>();
-        if (sortBy != null)
+        if (sortBy != null) {
             this.sortBy.add(sortBy);
-        this.doc = null;
+        }
+        doc = null;
     }
 
     /**
@@ -158,10 +162,11 @@ public class MCRQuery {
      *            a list of host alias Strings, may be empty
      */
     public void setHosts(List<String> hosts) {
-        if (hosts == null)
+        if (hosts == null) {
             hosts = new ArrayList<String>();
+        }
         this.hosts = hosts;
-        this.doc = null;
+        doc = null;
     }
 
     /**
@@ -174,7 +179,7 @@ public class MCRQuery {
             Element query = new Element("query");
             query.setAttribute("maxResults", String.valueOf(maxResults));
 
-            if ((sortBy != null) && (sortBy.size() > 0)) {
+            if (sortBy != null && sortBy.size() > 0) {
                 Element sortByElem = new Element("sortBy");
                 query.addContent(sortByElem);
                 for (int i = 0; i < sortBy.size(); i++) {
@@ -207,7 +212,7 @@ public class MCRQuery {
         Element conditions = xml.getChild("conditions");
         MCRQuery query = null;
         if (conditions.getAttributeValue("format", "xml").equals("xml")) {
-            Element condElem = (Element) (conditions.getChildren().get(0));
+            Element condElem = (Element) conditions.getChildren().get(0);
             query = new MCRQuery(new MCRQueryParser().parse(condElem));
         } else {
             String queryString = conditions.getTextTrim();
@@ -215,8 +220,9 @@ public class MCRQuery {
         }
 
         String max = xml.getAttributeValue("maxResults", "");
-        if (max.length() > 0)
+        if (max.length() > 0) {
             query.setMaxResults(Integer.parseInt(max));
+        }
 
         List<MCRSortBy> sortBy = null;
         Element sortByElem = xml.getChild("sortBy");
@@ -226,29 +232,30 @@ public class MCRQuery {
             sortBy = new ArrayList<MCRSortBy>(children.size());
 
             for (int i = 0; i < children.size(); i++) {
-                Element sortByChild = (org.jdom.Element) (children.get(i));
+                Element sortByChild = (org.jdom.Element) children.get(i);
                 String name = sortByChild.getAttributeValue("name");
                 String ad = sortByChild.getAttributeValue("order");
 
                 MCRFieldDef fd = MCRFieldDef.getDef(name);
-                boolean direction = ("ascending".equals(ad) ? MCRSortBy.ASCENDING : MCRSortBy.DESCENDING);
+                boolean direction = "ascending".equals(ad) ? MCRSortBy.ASCENDING : MCRSortBy.DESCENDING;
                 sortBy.add(new MCRSortBy(fd, direction));
             }
         }
-        if (sortBy != null)
+        if (sortBy != null) {
             query.setSortBy(sortBy);
+        }
 
         // List of remote hosts to query
         List<String> hostAliases = new ArrayList<String>();
         Element hostsElem = xml.getChild("hosts");
         if (hostsElem != null) {
             String target = hostsElem.getAttributeValue("target", "local");
-            if ("all".equals(target)) // query all hosts
+            if ("all".equals(target)) {
                 hostAliases = MCRQueryClient.ALL_HOSTS;
-            else if ("selected".equals(target)) {
+            } else if ("selected".equals(target)) {
                 List list = hostsElem.getChildren();
                 for (int i = 0; i < list.size(); i++) {
-                    Element host = (Element) (list.get(i));
+                    Element host = (Element) list.get(i);
                     hostAliases.add(host.getTextTrim());
                 }
             }

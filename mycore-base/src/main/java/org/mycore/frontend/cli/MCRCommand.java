@@ -70,11 +70,12 @@ public class MCRCommand {
 
     /** The help text String */
     protected String help;
-    
+
     /**
      * use this to overwrite this class.
      */
-    protected MCRCommand(){};
+    protected MCRCommand() {
+    };
 
     /**
      * Creates a new MCRCommand.
@@ -111,15 +112,15 @@ public class MCRCommand {
                 parameterTypes[i] = String.class;
                 f = null;
             } else {
-                throw new MCRConfigurationException("Error while parsing command definitions for command line interface:\n" + "Unsupported argument type '"
-                        + token + "' in command " + methodSignature);
+                throw new MCRConfigurationException("Error while parsing command definitions for command line interface:\n"
+                        + "Unsupported argument type '" + token + "' in command " + methodSignature);
             }
 
             messageFormat.setFormat(i, f);
         }
 
         int pos = format.indexOf("{");
-        suffix = ((pos == -1) ? format : format.substring(0, pos));
+        suffix = pos == -1 ? format : format.substring(0, pos);
 
         if (helpText != null) {
             help = helpText;
@@ -222,13 +223,14 @@ public class MCRCommand {
      * @throws NoSuchMethodException
      *             when the method specified does not exist
      */
-    public List<String> invoke(String input) throws IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException {
+    public List<String> invoke(String input) throws IllegalAccessException, InvocationTargetException, ClassNotFoundException,
+            NoSuchMethodException {
         return invoke(input, MCRCommand.class.getClassLoader());
     }
 
     @SuppressWarnings("unchecked")
-    public List<String> invoke(String input, ClassLoader classLoader) throws IllegalAccessException, InvocationTargetException, ClassNotFoundException,
-            NoSuchMethodException {
+    public List<String> invoke(String input, ClassLoader classLoader) throws IllegalAccessException, InvocationTargetException,
+            ClassNotFoundException, NoSuchMethodException {
         if (!input.startsWith(suffix)) {
             return null;
         }
@@ -240,10 +242,11 @@ public class MCRCommand {
         }
 
         Object result = getMethod(classLoader).invoke(null, buildInvocationParameters(commandParameters));
-        if ((result instanceof List) && (!((List) result).isEmpty()) && (((List) result).get(0) instanceof String))
+        if (result instanceof List && !((List) result).isEmpty() && ((List) result).get(0) instanceof String) {
             return (List<String>) result;
-        else
+        } else {
             return new ArrayList<String>();
+        }
     }
 
     /**

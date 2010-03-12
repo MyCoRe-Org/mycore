@@ -35,7 +35,6 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.xml.MCRXMLHelper;
@@ -181,7 +180,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         // If CONFIGuration parameter defines that we use password encryption:
         // encrypt!
         String useCrypt = CONFIG.getString("MCR.Users.UsePasswordEncryption", "false");
-        boolean useEncryption = (useCrypt.trim().equals("true")) ? true : false;
+        boolean useEncryption = useCrypt.trim().equals("true") ? true : false;
 
         if (useEncryption) {
             String cryptPwd = MCRCrypt.crypt(spasswd);
@@ -582,7 +581,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      */
     public static final void createUserFromFile(String filename) {
         String useCrypt = CONFIG.getString("MCR.Users.UsePasswordEncryption", "false");
-        boolean useEncryption = (useCrypt.trim().equals("true")) ? true : false;
+        boolean useEncryption = useCrypt.trim().equals("true") ? true : false;
         createUserFromFile(filename, useEncryption);
     }
 
@@ -719,7 +718,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      */
     public static final void updateUserFromFile(String filename) {
         String useCrypt = CONFIG.getString("MCR.Users.UsePasswordEncryption", "false");
-        boolean useEncryption = (useCrypt.trim().equals("true")) ? true : false;
+        boolean useEncryption = useCrypt.trim().equals("true") ? true : false;
         updateUserFromFile(filename, useEncryption);
     }
 

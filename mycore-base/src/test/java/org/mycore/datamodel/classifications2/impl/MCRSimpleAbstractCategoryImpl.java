@@ -11,11 +11,14 @@ import org.mycore.datamodel.classifications2.MCRLabel;
 
 final class MCRSimpleAbstractCategoryImpl extends MCRAbstractCategoryImpl {
     {
-        labels=new ArrayList<MCRLabel>();
+        labels = new ArrayList<MCRLabel>();
     }
 
     @Override
-    protected void setChildren(List<MCRCategory> children) {}
+    protected void setChildren(List<MCRCategory> children) {
+    }
 
-    public int getLevel() {return 0;}
+    public int getLevel() {
+        return 0;
+    }
 }

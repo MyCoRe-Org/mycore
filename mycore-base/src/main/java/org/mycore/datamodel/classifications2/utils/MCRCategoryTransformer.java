@@ -171,7 +171,7 @@ public class MCRCategoryTransformer {
         static Element getElement(MCRCategory category, Map<MCRCategoryID, Number> countMap) {
             Element ce = new Element("category");
             ce.setAttribute("ID", category.getId().getID());
-            Number number = (countMap == null) ? null : countMap.get(category.getId());
+            Number number = countMap == null ? null : countMap.get(category.getId());
             if (number != null) {
                 ce.setAttribute("counter", Integer.toString(number.intValue()));
             }
@@ -235,9 +235,9 @@ public class MCRCategoryTransformer {
              * expression string like document
              */
             if (countMatcher.find()) {
-                if (countMatcher.group(1) == null)
+                if (countMatcher.group(1) == null) {
                     countMap = MCRCategLinkServiceFactory.getInstance().countLinks(cl, false);
-                else {
+                } else {
                     // group(2) contains objectType
                     String objectType = countMatcher.group(2);
                     countMap = MCRCategLinkServiceFactory.getInstance().countLinksForType(cl, objectType, false);
@@ -263,8 +263,9 @@ public class MCRCategoryTransformer {
         }
 
         void addChildren(Element parent, MCRCategory category) {
-            if ((!emptyLeaves) && (!linkedMap.get(category.getId()).booleanValue()))
+            if (!emptyLeaves && !linkedMap.get(category.getId()).booleanValue()) {
                 return;
+            }
 
             Element ce = new Element("item");
             ce.setAttribute("value", category.getId().getID());
@@ -281,17 +282,17 @@ public class MCRCategoryTransformer {
         void addLabel(Element item, MCRLabel label, MCRCategory cat) {
             Element le = new Element("label");
             item.addContent(le);
-            if ((label.getLang() != null) && (label.getLang().length() > 0)) {
+            if (label.getLang() != null && label.getLang().length() > 0) {
                 le.setAttribute("lang", label.getLang(), XML_NAMESPACE);
             }
 
-            String labtext = (label.getText() != null ? label.getText() : "");
-            String labdesc = (label.getDescription() != null ? label.getDescription() : "");
+            String labtext = label.getText() != null ? label.getText() : "";
+            String labdesc = label.getDescription() != null ? label.getDescription() : "";
 
             String text = TEXT_PATTERN.matcher(labelFormat).replaceAll(labtext);
             text = ID_PATTERN.matcher(text).replaceAll(cat.getId().getID());
             text = DESCR_PATTERN.matcher(text).replaceAll(labdesc);
-            int num = (countMap == null ? -1 : countMap.get(cat.getId()).intValue());
+            int num = countMap == null ? -1 : countMap.get(cat.getId()).intValue();
             if (num >= 0) {
                 text = COUNT_PATTERN.matcher(text).replaceAll(String.valueOf(num));
             }
@@ -315,11 +316,11 @@ public class MCRCategoryTransformer {
         private void sort(List<Element> list, Comparator<Element> c) {
             Element[] a = list.toArray(new Element[list.size()]);
             Arrays.sort(a, c);
-            for (int i = 0; i < a.length; i++) {
-                a[i].detach();
+            for (Element element : a) {
+                element.detach();
             }
-            for (int i = 0; i < a.length; i++) {
-                list.add(a[i]);
+            for (Element element : a) {
+                list.add(element);
             }
         }
     }

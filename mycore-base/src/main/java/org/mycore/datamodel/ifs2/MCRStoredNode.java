@@ -126,11 +126,12 @@ public abstract class MCRStoredNode extends MCRNode {
      */
     public void setLabel(String lang, String label) throws Exception {
         Element found = null;
-        for (Element child : (List<Element>) (data.getChildren("label")))
+        for (Element child : (List<Element>) data.getChildren("label")) {
             if (lang.equals(child.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
                 found = child;
                 break;
             }
+        }
 
         if (found == null) {
             found = new Element("label").setAttribute("lang", lang, Namespace.XML_NAMESPACE);
@@ -154,8 +155,9 @@ public abstract class MCRStoredNode extends MCRNode {
      */
     public Map<String, String> getLabels() {
         Map<String, String> labels = new TreeMap<String, String>();
-        for (Element label : (List<Element>) (data.getChildren("label")))
+        for (Element label : (List<Element>) data.getChildren("label")) {
             labels.put(label.getAttributeValue("lang", Namespace.XML_NAMESPACE), label.getText());
+        }
         return labels;
     }
 
@@ -167,9 +169,11 @@ public abstract class MCRStoredNode extends MCRNode {
      * @return the label, or null if there is no label for that language
      */
     public String getLabel(String lang) {
-        for (Element label : (List<Element>) (data.getChildren("label")))
-            if (lang.equals(label.getAttributeValue("lang", Namespace.XML_NAMESPACE)))
+        for (Element label : (List<Element>) data.getChildren("label")) {
+            if (lang.equals(label.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
                 return label.getText();
+            }
+        }
         return null;
     }
 
@@ -182,13 +186,15 @@ public abstract class MCRStoredNode extends MCRNode {
     public String getCurrentLabel() {
         String currentLang = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
         String label = getLabel(currentLang);
-        if (label != null)
+        if (label != null) {
             return label;
+        }
 
         String defaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "en");
         label = getLabel(defaultLang);
-        if (label != null)
+        if (label != null) {
             return label;
+        }
 
         return data.getChildText("label");
     }

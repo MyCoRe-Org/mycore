@@ -59,7 +59,7 @@ public class MCRURNPK implements Serializable {
      *            The document ID to set.
      */
     public void setMcrid(String id) {
-        this.mcrid = id;
+        mcrid = id;
     }
 
     /**
@@ -78,7 +78,7 @@ public class MCRURNPK implements Serializable {
      *            The URN to set.
      */
     public void setMcrurn(String urn) {
-        this.mcrurn = urn;
+        mcrurn = urn;
     }
 
     /**
@@ -87,6 +87,7 @@ public class MCRURNPK implements Serializable {
      * 
      * @return Returns true if the object is equal.
      */
+    @Override
     public boolean equals(Object other) {
         if (!(other instanceof MCRURNPK)) {
             return false;
@@ -94,7 +95,7 @@ public class MCRURNPK implements Serializable {
 
         MCRURNPK castother = (MCRURNPK) other;
 
-        return new EqualsBuilder().append(this.getMcrid(), castother.getMcrid()).append(this.getMcrurn(), castother.getMcrurn()).isEquals();
+        return new EqualsBuilder().append(getMcrid(), castother.getMcrid()).append(getMcrurn(), castother.getMcrurn()).isEquals();
     }
 
     /**
@@ -103,6 +104,7 @@ public class MCRURNPK implements Serializable {
      * 
      * @return Returns the hash code.
      */
+    @Override
     public int hashCode() {
         return new HashCodeBuilder().append(getMcrid()).append(getMcrurn()).toHashCode();
     }

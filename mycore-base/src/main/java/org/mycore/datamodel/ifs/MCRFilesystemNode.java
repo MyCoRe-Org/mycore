@@ -88,12 +88,12 @@ public abstract class MCRFilesystemNode {
             throw new MCRUsageException("owner ID is an empty String or null");
         }
 
-        this.ID = manager.createNodeID();
+        ID = manager.createNodeID();
         this.parentID = parentID;
         this.ownerID = ownerID;
-        this.size = 0;
-        this.lastModified = new GregorianCalendar();
-        this.label = null;
+        size = 0;
+        lastModified = new GregorianCalendar();
+        label = null;
         checkName(name, doExistCheck);
         this.name = name;
     }
@@ -105,8 +105,8 @@ public abstract class MCRFilesystemNode {
         this.name = name;
         this.label = label;
         this.size = size;
-        this.lastModified = date;
-        this.deleted = false;
+        lastModified = date;
+        deleted = false;
     }
 
     protected void storeNew() {
@@ -118,21 +118,21 @@ public abstract class MCRFilesystemNode {
     }
 
     public void delete() {
-        this.removeAllAdditionalData();
+        removeAllAdditionalData();
         manager.deleteNode(ID);
 
         if (parentID != null) {
             getParent().removeChild(this);
         }
 
-        this.ID = null;
-        this.ownerID = null;
-        this.name = null;
-        this.label = null;
-        this.size = 0;
-        this.lastModified = null;
-        this.parentID = null;
-        this.deleted = true;
+        ID = null;
+        ownerID = null;
+        name = null;
+        label = null;
+        size = 0;
+        lastModified = null;
+        parentID = null;
+        deleted = true;
     }
 
     /*
@@ -158,13 +158,15 @@ public abstract class MCRFilesystemNode {
      */
     protected void checkName(String name, boolean doExistCheck) {
 
-        if (name == null)
+        if (name == null) {
             throw new MCRUsageException(name + " is null.");
+        }
 
-        boolean error = (name.indexOf("/") + name.indexOf("\\")) != -2;
+        boolean error = name.indexOf("/") + name.indexOf("\\") != -2;
         String errorMsg = "Filesystem node name must not contain '\' or '/' characters: " + name;
-        if (error)
+        if (error) {
             throw new MCRUsageException(errorMsg);
+        }
 
         if (hasParent() && doExistCheck) {
             boolean exists = getParent().hasChild(name);
@@ -207,7 +209,7 @@ public abstract class MCRFilesystemNode {
     public boolean hasParent() {
         ensureNotDeleted();
 
-        return (parentID != null);
+        return parentID != null;
     }
 
     public MCRDirectory getRootDirectory() {
@@ -240,7 +242,7 @@ public abstract class MCRFilesystemNode {
 
         checkName(name, true);
         this.name = name;
-        this.lastModified = new GregorianCalendar();
+        lastModified = new GregorianCalendar();
 
         manager.storeNode(this);
 
@@ -269,7 +271,7 @@ public abstract class MCRFilesystemNode {
     public void setLabel(String label) {
         ensureNotDeleted();
 
-        if ((label != null) && (label.trim().length() == 0)) {
+        if (label != null && label.trim().length() == 0) {
             label = null;
         }
 
@@ -278,7 +280,7 @@ public abstract class MCRFilesystemNode {
         }
 
         this.label = label;
-        this.lastModified = new GregorianCalendar();
+        lastModified = new GregorianCalendar();
 
         manager.storeNode(this);
 
@@ -351,14 +353,14 @@ public abstract class MCRFilesystemNode {
         String sizeText;
         double sizeValue;
 
-        if (bytes >= (1024 * 1024)) // >= 1 MB
+        if (bytes >= 1024 * 1024) // >= 1 MB
         {
             sizeUnit = "MB";
-            sizeValue = (double) (Math.round(bytes / 10485.76)) / 100;
-        } else if (bytes >= (5 * 1024)) // >= 5 KB
+            sizeValue = (double) Math.round(bytes / 10485.76) / 100;
+        } else if (bytes >= 5 * 1024) // >= 5 KB
         {
             sizeUnit = "KB";
-            sizeValue = (double) (Math.round(bytes / 102.4)) / 10;
+            sizeValue = (double) Math.round(bytes / 102.4) / 10;
         } else // < 5 KB
         {
             sizeUnit = "Byte";
@@ -396,19 +398,21 @@ public abstract class MCRFilesystemNode {
      *             if the XML data can not be parsed
      */
     public void setAdditionalData(Element data) throws IOException, JDOMException {
-        MCRFile dataFile = MCRFile.getRootFile(this.ID);
+        MCRFile dataFile = MCRFile.getRootFile(ID);
         Document doc;
         if (dataFile == null) {
             String name = "MCRFilesystemNode.additionalData";
-            dataFile = new MCRFile(name, this.ID);
+            dataFile = new MCRFile(name, ID);
             doc = new Document(new Element("additionalData"));
-        } else
+        } else {
             doc = dataFile.getContentAsJDOM();
+        }
 
         Element child = doc.getRootElement().getChild(data.getName());
-        if (child != null)
+        if (child != null) {
             child.detach();
-        doc.getRootElement().addContent((Element) (data.clone()));
+        }
+        doc.getRootElement().addContent((Element) data.clone());
         dataFile.setContentFrom(doc);
     }
 
@@ -423,26 +427,30 @@ public abstract class MCRFilesystemNode {
      *             if the XML data can not be parsed
      */
     public void removeAdditionalData(String dataName) throws IOException, JDOMException {
-        MCRFile dataFile = MCRFile.getRootFile(this.ID);
-        if (dataFile == null)
+        MCRFile dataFile = MCRFile.getRootFile(ID);
+        if (dataFile == null) {
             return;
+        }
         Document doc = dataFile.getContentAsJDOM();
         Element child = doc.getRootElement().getChild(dataName);
-        if (child != null)
+        if (child != null) {
             child.detach();
-        if (doc.getRootElement().getChildren().size() == 0)
+        }
+        if (doc.getRootElement().getChildren().size() == 0) {
             dataFile.delete();
-        else
+        } else {
             dataFile.setContentFrom(doc);
+        }
     }
 
     /**
      * Removes all additional XML data stored for this node, if any.
      */
     public void removeAllAdditionalData() {
-        MCRFile dataFile = MCRFile.getRootFile(this.ID);
-        if (dataFile != null)
+        MCRFile dataFile = MCRFile.getRootFile(ID);
+        if (dataFile != null) {
             dataFile.delete();
+        }
     }
 
     /**
@@ -457,9 +465,10 @@ public abstract class MCRFilesystemNode {
      *             if the XML data can not be parsed
      */
     public Element getAdditionalData(String dataName) throws IOException, JDOMException {
-        MCRFile dataFile = MCRFile.getRootFile(this.ID);
-        if ((dataFile == null) || (dataFile.getSize() == 0))
+        MCRFile dataFile = MCRFile.getRootFile(ID);
+        if (dataFile == null || dataFile.getSize() == 0) {
             return null;
+        }
         Document doc = dataFile.getContentAsJDOM();
         return doc.getRootElement().getChild(dataName);
     }
@@ -474,49 +483,56 @@ public abstract class MCRFilesystemNode {
      *             if the XML data can not be parsed
      */
     public Document getAllAdditionalData() throws IOException, JDOMException {
-        MCRFile dataFile = MCRFile.getRootFile(this.ID);
-        if ((dataFile == null) || (dataFile.getSize() == 0))
+        MCRFile dataFile = MCRFile.getRootFile(ID);
+        if (dataFile == null || dataFile.getSize() == 0) {
             return null;
-        else
+        } else {
             return dataFile.getContentAsJDOM();
+        }
     }
 
     protected static DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSS");
 
+    @Override
     public String toString() {
         String date = formatter.format(lastModified.getTime());
 
         StringBuffer sb = new StringBuffer();
-        sb.append("ID          = ").append(this.ID).append("\n");
-        sb.append("Name        = ").append(this.name).append("\n");
-        sb.append("Label       = ").append(this.label).append("\n");
+        sb.append("ID          = ").append(ID).append("\n");
+        sb.append("Name        = ").append(name).append("\n");
+        sb.append("Label       = ").append(label).append("\n");
         sb.append("Type        = ").append(this.getClass().getName()).append("\n");
-        sb.append("ParentID    = ").append(this.parentID).append("\n");
-        sb.append("OwnerID     = ").append(this.ownerID).append("\n");
-        sb.append("Size        = ").append(this.size).append("\n");
+        sb.append("ParentID    = ").append(parentID).append("\n");
+        sb.append("OwnerID     = ").append(ownerID).append("\n");
+        sb.append("Size        = ").append(size).append("\n");
         sb.append("Modified    = ").append(date).append("\n");
 
         return sb.toString();
     }
 
+    @Override
     public boolean equals(Object obj) {
-        if (obj == null)
+        if (obj == null) {
             return false;
-        if (!(obj instanceof MCRFilesystemNode))
+        }
+        if (!(obj instanceof MCRFilesystemNode)) {
             return false;
+        }
         MCRFilesystemNode other = (MCRFilesystemNode) obj;
-        if (other.ID == null)
+        if (other.ID == null) {
             return super.equals(obj);
-        else
-            return other.ID.equals(this.ID);
+        } else {
+            return other.ID.equals(ID);
+        }
     }
 
+    @Override
     public int hashCode() {
-        if (ID != null)
+        if (ID != null) {
             return ID.hashCode();
-        else
+        } else {
             return super.hashCode();
+        }
     }
-    
-    
+
 }

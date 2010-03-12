@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRUtils;
 
@@ -46,7 +45,7 @@ public class MCRFSMapperServlet extends MCRServlet {
     @Override
     protected void doGet(MCRServletJob job) throws Exception {
         File requestFile = getFile(job.getRequest());
-        LOGGER.info("Requesting file: "+requestFile);
+        LOGGER.info("Requesting file: " + requestFile);
         final HttpServletResponse response = job.getResponse();
         if (requestFile == null) {
             response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, "URI invalid: " + job.getRequest().getRequestURI());
@@ -60,13 +59,13 @@ public class MCRFSMapperServlet extends MCRServlet {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "File is directory: " + requestFile.getAbsolutePath());
             return;
         }
-        
-        if (requestFile.getName().endsWith(".xml")){
+
+        if (requestFile.getName().endsWith(".xml")) {
             //special handling for XML files
             MCRStaticXMLFileServlet.processFile(job.getRequest(), response, requestFile);
             return;
         }
-        
+
         //process all non-xml files
         final long fileSize = requestFile.length();
         final String mimeType = getServletContext().getMimeType(requestFile.getName());
@@ -103,7 +102,7 @@ public class MCRFSMapperServlet extends MCRServlet {
         }
         if (relativePath.contains("..")) {
             // don't allow outbreak to access system files;
-            LOGGER.warn("Possible attempt to read system files! Requested file: "+relativePath);
+            LOGGER.warn("Possible attempt to read system files! Requested file: " + relativePath);
             return null;
         }
         final String basePath = CONFIG.getString("MCR.FSMap." + servletPath, getServletContext().getRealPath(""));

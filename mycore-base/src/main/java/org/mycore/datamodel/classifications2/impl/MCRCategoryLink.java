@@ -69,30 +69,37 @@ class MCRCategoryLink {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((category == null) ? 0 : category.hashCode());
-        result = prime * result + ((objectReference == null) ? 0 : objectReference.hashCode());
+        result = prime * result + (category == null ? 0 : category.hashCode());
+        result = prime * result + (objectReference == null ? 0 : objectReference.hashCode());
         return result;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (!(obj instanceof MCRCategoryLink))
+        }
+        if (!(obj instanceof MCRCategoryLink)) {
             return false;
+        }
         final MCRCategoryLink other = (MCRCategoryLink) obj;
         if (category == null) {
-            if (other.category != null)
+            if (other.category != null) {
                 return false;
-        } else if (!category.equals(other.category))
+            }
+        } else if (!category.equals(other.category)) {
             return false;
+        }
         if (objectReference == null) {
-            if (other.objectReference != null)
+            if (other.objectReference != null) {
                 return false;
-        } else if (!objectReference.equals(other.objectReference))
+            }
+        } else if (!objectReference.equals(other.objectReference)) {
             return false;
+        }
         return true;
     }
 

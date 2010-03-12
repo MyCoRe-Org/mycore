@@ -29,10 +29,9 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
-import org.mycore.user.MCRUser;
-
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRParseException;
+import org.mycore.user.MCRUser;
 
 public class MCRAccessRule {
     String id = "";
@@ -57,12 +56,12 @@ public class MCRAccessRule {
         this.description = description;
 
         if (this.rule != null) {
-            this.parsedRule = parser.parse(this.rule);
+            parsedRule = parser.parse(this.rule);
         }
     }
 
     public boolean checkAccess(MCRUser user, Date date, MCRIPAddress ip) {
-        if (this.parsedRule == null) {
+        if (parsedRule == null) {
             if (user.getID().equals(MCRAccessControlSystem.superuserID)) {
                 Logger.getLogger(MCRAccessRule.class).debug("No rule defined, grant access to super user.");
                 return true;
@@ -74,13 +73,13 @@ public class MCRAccessRule {
         Logger.getLogger(this.getClass()).debug("new MCRAccessData done.");
 
         Logger.getLogger(this.getClass()).debug("evaluate MCRAccessData");
-        boolean returns = this.parsedRule.evaluate(data);
+        boolean returns = parsedRule.evaluate(data);
         Logger.getLogger(this.getClass()).debug("evaluate MCRAccessData done.");
         return returns;
     }
 
     public MCRCondition getRule() {
-        return this.parsedRule;
+        return parsedRule;
     }
 
     /**
@@ -133,12 +132,12 @@ public class MCRAccessRule {
 
     public Element getRuleElement() {
         Element el = new Element("mcraccessrule");
-        el.addContent(new Element("id").setText(this.id));
-        el.addContent(new Element("creator").setText(this.id));
+        el.addContent(new Element("id").setText(id));
+        el.addContent(new Element("creator").setText(id));
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        el.addContent(new Element("creationdate").setText(df.format(this.creationTime)));
-        el.addContent(new Element("rule").setText(this.rule));
-        el.addContent(new Element("description").setText("" + this.description));
+        el.addContent(new Element("creationdate").setText(df.format(creationTime)));
+        el.addContent(new Element("rule").setText(rule));
+        el.addContent(new Element("description").setText("" + description));
         return el;
     }
 }

@@ -97,10 +97,10 @@ public class MCRNormalizer {
     private static boolean useRuleFirst = config.getBoolean("MCR.Metadata.Normalize.UseRuleFirst", false);
 
     static {
-        if ((setRule != null) && (setRule.trim().length() != 0)) {
+        if (setRule != null && setRule.trim().length() != 0) {
             rules = setRule;
         } else {
-            if ((addRule != null) && (addRule.trim().length() != 0)) {
+            if (addRule != null && addRule.trim().length() != 0) {
                 rules = rules + " " + addRule;
             }
 
@@ -175,8 +175,8 @@ public class MCRNormalizer {
                     "\u0303" };// &amp;#771; (0xcc 0x83 = 204 131)
             // COMBINING TILDE
 
-            for (int i = 0; i < dia.length; i++) {
-                temp = MCRUtils.replaceString(temp, dia[i], "");
+            for (String element : dia) {
+                temp = MCRUtils.replaceString(temp, element, "");
             }
         }
 
@@ -188,17 +188,20 @@ public class MCRNormalizer {
     }
 
     public static final String normalizeString(String in, boolean reallyNormalize) {
-        if ((in == null) || (in.trim().length() == 0))
+        if (in == null || in.trim().length() == 0) {
             return "";
+        }
 
-        if (!reallyNormalize)
+        if (!reallyNormalize) {
             return in;
+        }
 
         // in = in.toLowerCase(Locale.GERMANY).trim();
         in = in.toLowerCase().trim();
 
-        for (int i = 0; i < patterns.length; i++)
+        for (int i = 0; i < patterns.length; i++) {
             in = patterns[i].matcher(in).replaceAll(replace[i]);
+        }
 
         return in;
     }

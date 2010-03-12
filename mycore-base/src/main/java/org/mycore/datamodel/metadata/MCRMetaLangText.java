@@ -72,7 +72,8 @@ public class MCRMetaLangText extends MCRMetaDefault {
      * @param set_text         the text string
      * @exception MCRException if the set_subtag value is null or empty
      */
-    public MCRMetaLangText(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted, String set_form, String set_text) throws MCRException {
+    public MCRMetaLangText(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted, String set_form,
+            String set_text) throws MCRException {
         super(set_datapart, set_subtag, default_lang, set_type, set_inherted);
         text = "";
 
@@ -162,6 +163,7 @@ public class MCRMetaLangText extends MCRMetaDefault {
      * @param element
      *            a relevant JDOM element for the metadata
      */
+    @Override
     public void setFromDOM(org.jdom.Element element) {
         super.setFromDOM(element);
 
@@ -190,6 +192,7 @@ public class MCRMetaLangText extends MCRMetaDefault {
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML MCRMetaLangText part
      */
+    @Override
     public org.jdom.Element createXML() throws MCRException {
         if (!isValid()) {
             debug();
@@ -200,11 +203,11 @@ public class MCRMetaLangText extends MCRMetaDefault {
         elm.setAttribute("lang", lang, Namespace.XML_NAMESPACE);
         elm.setAttribute("inherited", Integer.toString(inherited));
 
-        if ((form != null) && ((form = form.trim()).length() != 0)) {
+        if (form != null && (form = form.trim()).length() != 0) {
             elm.setAttribute("form", form);
         }
 
-        if ((type != null) && ((type = type.trim()).length() != 0)) {
+        if (type != null && (type = type.trim()).length() != 0) {
             elm.setAttribute("type", type);
         }
 
@@ -224,16 +227,17 @@ public class MCRMetaLangText extends MCRMetaDefault {
      * 
      * @return a boolean value
      */
+    @Override
     public boolean isValid() {
         if (!super.isValid()) {
             return false;
         }
 
-        if ((text == null) || ((text = text.trim()).length() == 0)) {
+        if (text == null || (text = text.trim()).length() == 0) {
             return false;
         }
 
-        if ((form == null) || ((form = form.trim()).length() == 0)) {
+        if (form == null || (form = form.trim()).length() == 0) {
             form = "plain";
         }
 
@@ -243,6 +247,7 @@ public class MCRMetaLangText extends MCRMetaDefault {
     /**
      * This method make a clone of this class.
      */
+    @Override
     public Object clone() {
         return new MCRMetaLangText(datapart, subtag, lang, type, inherited, form, text);
     }
@@ -250,6 +255,7 @@ public class MCRMetaLangText extends MCRMetaDefault {
     /**
      * This method put debug data to the logger (for the debug mode).
      */
+    @Override
     public final void debug() {
         super.debugDefault();
         LOGGER.debug("Format             = " + form);

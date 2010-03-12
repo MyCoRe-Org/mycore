@@ -84,9 +84,11 @@ public class MCRDirectory extends MCRStoredNode {
     }
 
     private Element getChildData(String name) {
-        for (Element child : (List<Element>) (data.getChildren()))
-            if (name.equals(child.getAttributeValue("name")))
+        for (Element child : (List<Element>) data.getChildren()) {
+            if (name.equals(child.getAttributeValue("name"))) {
                 return child;
+            }
+        }
 
         Element childData = new Element("node");
         childData.setAttribute("name", name);
@@ -101,29 +103,35 @@ public class MCRDirectory extends MCRStoredNode {
      * 
      * @return an MCRFile or MCRDirectory child
      */
+    @Override
     protected MCRStoredNode buildChildNode(FileObject fo) throws Exception {
-        if (fo == null)
+        if (fo == null) {
             return null;
+        }
 
         Element childData = getChildData(fo.getName().getBaseName());
-        if (fo.getType().equals(FileType.FILE))
+        if (fo.getType().equals(FileType.FILE)) {
             return new MCRFile(this, fo, childData);
-        else
+        } else {
             return new MCRDirectory(this, fo, childData);
+        }
     }
 
     /**
      * Repairs additional metadata of this directory and all its children
      */
+    @Override
     void repairMetadata() throws Exception {
         data.setName("dir");
         data.setAttribute("name", getName());
 
-        for (Element childEntry : (List<Element>) (data.getChildren()))
+        for (Element childEntry : (List<Element>) data.getChildren()) {
             childEntry.setName("node");
+        }
 
-        for (MCRNode child : getChildren())
+        for (MCRNode child : getChildren()) {
             ((MCRStoredNode) child).repairMetadata();
+        }
 
         data.removeChildren("node");
     }

@@ -28,23 +28,21 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
-
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.common.MCRActiveLinkException;
+import org.mycore.datamodel.common.MCRXMLTableManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.common.MCRXMLTableManager;
-
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRFieldValue;
+import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRQueryManager;
 import org.mycore.services.fieldquery.MCRQueryParser;
-import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSearcher;
 import org.mycore.services.fieldquery.MCRSearcherFactory;
@@ -240,7 +238,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
                 throw new MCRException("The from-to-interval is false.");
             }
 
-            for (int i = from_i; i < (to_i + 1); i++) {
+            for (int i = from_i; i < to_i + 1; i++) {
                 now.setNumber(i);
                 if (MCRObject.existInDatastore(now)) {
                     delete(now.getId());
@@ -299,9 +297,11 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         }
 
         List<String> cmds = new ArrayList<String>();
-        for (String file : list)
-            if (file.endsWith(".xml") && (!file.contains("derivate")))
+        for (String file : list) {
+            if (file.endsWith(".xml") && !file.contains("derivate")) {
                 cmds.add((update ? "update" : "load") + " object from file " + new File(dir, file).getAbsolutePath());
+            }
+        }
 
         return cmds;
     }
@@ -330,7 +330,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    public static final boolean loadFromFile(String file, boolean importMode) throws MCRActiveLinkException, MCRException, SAXParseException {
+    public static final boolean loadFromFile(String file, boolean importMode) throws MCRActiveLinkException, MCRException,
+            SAXParseException {
         return processFromFile(new File(file), false, importMode);
     }
 
@@ -358,7 +359,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    public static final boolean updateFromFile(String file, boolean importMode) throws MCRActiveLinkException, MCRException, SAXParseException {
+    public static final boolean updateFromFile(String file, boolean importMode) throws MCRActiveLinkException, MCRException,
+            SAXParseException {
         return processFromFile(new File(file), true, importMode);
     }
 
@@ -375,7 +377,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    private static final boolean processFromFile(File file, boolean update, boolean importMode) throws MCRActiveLinkException, MCRException, SAXParseException {
+    private static final boolean processFromFile(File file, boolean update, boolean importMode) throws MCRActiveLinkException,
+            MCRException, SAXParseException {
         if (!file.getName().endsWith(".xml")) {
             LOGGER.warn(file + " ignored, does not end with *.xml");
             return false;
@@ -488,7 +491,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         int k = 0;
         try {
             Transformer trans = getTransformer(style);
-            for (int i = fid.getNumberAsInteger(); i < (tid.getNumberAsInteger() + 1); i++) {
+            for (int i = fid.getNumberAsInteger(); i < tid.getNumberAsInteger() + 1; i++) {
                 nid.setNumber(i);
                 if (!MCRObject.existInDatastore(nid)) {
                     continue;
@@ -548,7 +551,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     private static final Transformer getTransformer(String style) throws TransformerFactoryConfigurationError,
             TransformerConfigurationException {
         String xslfile = DEFAULT_TRANSFORMER;
-        if ((style != null) && (style.trim().length() != 0)) {
+        if (style != null && style.trim().length() != 0) {
             xslfile = style + "-object.xsl";
         }
         Transformer trans = translist.get(xslfile);
@@ -772,7 +775,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     public static final void selectObjectsWithQuery(String querystring) {
         LOGGER.info("Build Resultset with query " + querystring);
 
-        MCRCondition cond = (new MCRQueryParser()).parse(querystring);
+        MCRCondition cond = new MCRQueryParser().parse(querystring);
         MCRQuery query = new MCRQuery(cond);
         final MCRResults results = MCRQueryManager.search(query);
         ArrayList<String> ids = new ArrayList<String>(results.getNumHits());
@@ -892,7 +895,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
         for (String stid : ar) {
             String querystring = "id = " + stid;
-            MCRCondition cond = (new MCRQueryParser()).parse(querystring);
+            MCRCondition cond = new MCRQueryParser().parse(querystring);
             MCRQuery query = new MCRQuery(cond);
             MCRResults results = MCRQueryManager.search(query);
             if (1 != results.getNumHits()) {

@@ -29,26 +29,25 @@ package org.mycore.user.authentication;
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
-public interface MCRAuthenticator
-{
-  /** 
-   * Initializes this instance. Each MCRAuthenticator instance
-   * must have a unique ID that determines the class and the configuration
-   * properties of that instance. All configuration properties of this instance
-   * have the common prefix MCR.UserAuthenticator.[ID].* 
-   * 
-   * @param ID the unique ID of this MCRAuthenticator instance
-   */  
-  public void init(String ID);
+public interface MCRAuthenticator {
+    /** 
+     * Initializes this instance. Each MCRAuthenticator instance
+     * must have a unique ID that determines the class and the configuration
+     * properties of that instance. All configuration properties of this instance
+     * have the common prefix MCR.UserAuthenticator.[ID].* 
+     * 
+     * @param ID the unique ID of this MCRAuthenticator instance
+     */
+    public void init(String ID);
 
-  /**
-   * Authenticates a user by checking a given password for that user.
-   * The mechanism used for checking this depends on the implementation
-   * that is used, for example LDAP, IMAP, SLNP, JAAS, ...
-   * 
-   * @param username the username
-   * @param password the password
-   * @return true, if the password is correct, false otherwise
-   */
-  public boolean authenticate(String username, String password);
+    /**
+     * Authenticates a user by checking a given password for that user.
+     * The mechanism used for checking this depends on the implementation
+     * that is used, for example LDAP, IMAP, SLNP, JAAS, ...
+     * 
+     * @param username the username
+     * @param password the password
+     * @return true, if the password is correct, false otherwise
+     */
+    public boolean authenticate(String username, String password);
 }

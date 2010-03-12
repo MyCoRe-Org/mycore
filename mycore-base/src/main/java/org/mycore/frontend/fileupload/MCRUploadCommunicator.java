@@ -76,7 +76,7 @@ public class MCRUploadCommunicator {
 
     public MCRUploadCommunicator(String url, String uploadId, MCRUploadApplet applet) {
         this.url = url;
-        this.uid = uploadId;
+        uid = uploadId;
         this.applet = applet;
     }
 
@@ -115,8 +115,9 @@ public class MCRUploadCommunicator {
     protected long countTotalBytes(Vector files) {
         long total = 0;
 
-        for (int i = 0; i < files.size(); i++)
+        for (int i = 0; i < files.size(); i++) {
             total += ((File) files.get(i)).length();
+        }
 
         return total;
     }
@@ -127,17 +128,19 @@ public class MCRUploadCommunicator {
         }
 
         for (int i = 0; i < list[0].size(); i++) {
-            if (upm.isCanceled())
+            if (upm.isCanceled()) {
                 return;
+            }
 
-            File file = (File) (list[0].get(i));
-            String path = (String) (list[1].get(i));
+            File file = (File) list[0].get(i);
+            String path = (String) list[1].get(i);
             upm.startFile(file.getName(), file.length());
 
             uploadFile(path, file);
 
-            if (!upm.isCanceled())
+            if (!upm.isCanceled()) {
                 upm.endFile();
+            }
         }
     }
 
@@ -147,19 +150,20 @@ public class MCRUploadCommunicator {
         String md5 = buildMD5String(file);
         System.out.println("MD5 checksum is " + md5);
 
-        if (upm.isCanceled())
+        if (upm.isCanceled()) {
             return;
+        }
 
         // TODO: Refactor method names in communication
         Hashtable request = new Hashtable();
         request.put("md5", md5);
         request.put("method", "uploadFile");
         request.put("path", path);
-        request.put("length", String.valueOf(file.length()) );
-        
+        request.put("length", String.valueOf(file.length()));
+
         System.out.println("Sending filename to server: " + path);
 
-        String reply = (String) (send(request));
+        String reply = (String) send(request);
         System.out.println("Received reply from server.");
 
         if ("skip file".equals(reply)) {
@@ -174,21 +178,22 @@ public class MCRUploadCommunicator {
 
         System.out.println("Trying to create client socket...");
 
-        if (upm.isCanceled())
+        if (upm.isCanceled()) {
             return;
+        }
 
         Socket socket = new Socket(host, port);
-        socket.setReceiveBufferSize(Math.max(socket.getReceiveBufferSize(),bufferSize));
-        socket.setSendBufferSize(Math.max(socket.getSendBufferSize(),bufferSize));
-        
+        socket.setReceiveBufferSize(Math.max(socket.getReceiveBufferSize(), bufferSize));
+        socket.setSendBufferSize(Math.max(socket.getSendBufferSize(), bufferSize));
+
         System.out.println("Socket created, connected to server.");
-        System.out.println("Socket send buffer size is " + socket.getSendBufferSize() );
+        System.out.println("Socket send buffer size is " + socket.getSendBufferSize());
 
         ZipOutputStream zos = new ZipOutputStream(socket.getOutputStream());
         DataInputStream din = new DataInputStream(socket.getInputStream());
 
         // Large files like video already are compressed somehow
-        zos.setLevel(Deflater.NO_COMPRESSION); 
+        zos.setLevel(Deflater.NO_COMPRESSION);
 
         ZipEntry ze = new ZipEntry(java.net.URLEncoder.encode(path, "UTF-8"));
         StringBuffer extra = new StringBuffer();
@@ -202,41 +207,42 @@ public class MCRUploadCommunicator {
 
         System.out.println("Starting to send file content...");
 
-        InputStream source = new BufferedInputStream(new FileInputStream(file),buffer.length);
+        InputStream source = new BufferedInputStream(new FileInputStream(file), buffer.length);
 
         long lastPing = System.currentTimeMillis();
         while ((num = source.read(buffer)) != -1) {
-            if (upm.isCanceled())
+            if (upm.isCanceled()) {
                 break;
+            }
             zos.write(buffer, 0, num);
             sended += num;
             upm.progressFile(num);
-            
+
             // Send a "ping" to MCRUploadServlet so that server keeps HTTP Session alive
-            if( ( System.currentTimeMillis() - lastPing ) > 10000 )
-            {
-              lastPing = System.currentTimeMillis();
-              Hashtable ping = new Hashtable();
-              ping.put("method", "ping");
-              System.out.println( "Sending ping to servlet..." );
-              String pong = (String)( send(ping) );
-              System.out.println( "Server responded with " + pong );
+            if (System.currentTimeMillis() - lastPing > 10000) {
+                lastPing = System.currentTimeMillis();
+                Hashtable ping = new Hashtable();
+                ping.put("method", "ping");
+                System.out.println("Sending ping to servlet...");
+                String pong = (String) send(ping);
+                System.out.println("Server responded with " + pong);
             }
         }
 
         zos.closeEntry();
         zos.flush();
-        System.out.println("Releasing file: "+file);
+        System.out.println("Releasing file: " + file);
         source.close();
         System.out.println("Finished sending file content.");
 
         long numBytesStored = din.readLong();
-        System.out.println("Server reports that " + numBytesStored + " bytes have been stored." );
+        System.out.println("Server reports that " + numBytesStored + " bytes have been stored.");
 
         socket.close();
 
-        if (upm.isCanceled())
+        if (upm.isCanceled()) {
             return;
+        }
 
         System.out.println("Socket closed, file transfer successfully completed.");
     }
@@ -252,12 +258,12 @@ public class MCRUploadCommunicator {
         list[0] = new Vector();
         list[1] = new Vector();
 
-        if ((null == selectedFiles) || (0 == selectedFiles.length)) {
+        if (null == selectedFiles || 0 == selectedFiles.length) {
             return list;
         }
 
-        for (int i = 0; i < selectedFiles.length; i++) {
-            File f = selectedFiles[i];
+        for (File selectedFile : selectedFiles) {
+            File f = selectedFile;
 
             if (!f.exists()) {
                 throw new FileNotFoundException("Datei oder Verzeichnis " + f.getPath() + " nicht gefunden!");
@@ -278,20 +284,20 @@ public class MCRUploadCommunicator {
                 baseStack.push(f.getName() + "/");
 
                 while (!dirStack.empty()) {
-                    File dir = (File) (dirStack.pop());
-                    String base = (String) (baseStack.pop());
+                    File dir = (File) dirStack.pop();
+                    String base = (String) baseStack.pop();
 
                     String[] files = dir.list();
 
-                    for (int j = 0; j < files.length; j++) {
-                        f = new File(dir, files[j]);
+                    for (String file : files) {
+                        f = new File(dir, file);
 
                         if (f.isFile()) {
                             list[0].addElement(f);
-                            list[1].addElement(base + files[j]);
+                            list[1].addElement(base + file);
                         } else {
                             dirStack.push(f);
-                            baseStack.push(base + files[j] + "/");
+                            baseStack.push(base + file + "/");
                         }
                     }
                 }
@@ -398,9 +404,9 @@ public class MCRUploadCommunicator {
         }
 
         if (mime.equals("upload/exception")) {
-            String clname = (String) (response.get("clname"));
-            String message = (String) (response.get("message"));
-            String strace = (String) (response.get("strace"));
+            String clname = (String) response.get("clname");
+            String message = (String) response.get("message");
+            String strace = (String) response.get("strace");
             throw new MCRUploadException(clname, message, strace);
         }
 
@@ -417,16 +423,17 @@ public class MCRUploadCommunicator {
 
         byte[] buffer = new byte[bufferSize];
 
-        while (in.read(buffer, 0, buffer.length) != -1)
+        while (in.read(buffer, 0, buffer.length) != -1) {
             ;
+        }
 
         in.close();
 
         byte[] bytes = digest.digest();
         StringBuffer sb = new StringBuffer();
 
-        for (int i = 0; i < bytes.length; i++) {
-            String sValue = "0" + Integer.toHexString(bytes[i]);
+        for (byte b : bytes) {
+            String sValue = "0" + Integer.toHexString(b);
             sb.append(sValue.substring(sValue.length() - 2));
         }
 

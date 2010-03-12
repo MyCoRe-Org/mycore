@@ -70,6 +70,7 @@ public class MCRException extends RuntimeException {
      * @return the exception thrown by an underlying system
      * @deprecated use {@link Throwable#getCause()}
      */
+    @Deprecated
     public Exception getException() {
         return (Exception) getCause();
     }
@@ -113,6 +114,7 @@ public class MCRException extends RuntimeException {
      * 
      * @return a String representation of this exception and all its properties
      */
+    @Override
     public String toString() {
         // Use counter to prevent a recursion between getStackTrace() and
         // toString()

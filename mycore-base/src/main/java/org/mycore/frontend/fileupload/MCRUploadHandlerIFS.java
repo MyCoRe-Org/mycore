@@ -78,8 +78,8 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     }
 
     protected void init(String docId, String derId) {
-        this.derID = derId;
-        this.docID = docId;
+        derID = derId;
+        docID = docId;
         if (derId != null && MCRDerivate.existInDatastore(derId)) {
             LOGGER.debug("Derivate allready exists: " + derId);
             newDerivate = false;
@@ -91,6 +91,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     /**
      * Start Upload for MyCoRe
      */
+    @Override
     public void startUpload(int numFiles) throws Exception {
         if (derivate == null) {
             if (derID == null) {
@@ -122,6 +123,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
      * @return true transfer file false don't send file
      * 
      */
+    @Override
     public boolean acceptFile(String path, String checksum, long length) throws Exception {
         MCRFilesystemNode child = rootDir.getChildByPath(path);
         if (!(child instanceof MCRFile)) {
@@ -131,6 +133,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
         return !checksum.equals(file.getMD5());
     }
 
+    @Override
     public synchronized long receiveFile(String path, InputStream in, long length, String md5) throws Exception {
         try {
             LOGGER.debug("adding file: " + path);
@@ -143,9 +146,9 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
             commitTransaction();
 
             long myLength = file.getSize();
-            if (myLength >= length)
+            if (myLength >= length) {
                 return myLength;
-            else {
+            } else {
                 file.delete(); // Incomplete file transfer, user canceled upload
                 return 0;
             }
@@ -164,6 +167,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
      * Finish upload, store derivate
      * 
      */
+    @Override
     public void finishUpload() throws Exception {
         // existing files
         if (!rootDir.hasChildren()) {
@@ -219,7 +223,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
             String child = tok.nextToken();
             if (parent.hasChild(child)) {
                 MCRFilesystemNode childNode = parent.getChild(child);
-                if ((childNode instanceof MCRFile) && !tok.hasMoreTokens()) {
+                if (childNode instanceof MCRFile && !tok.hasMoreTokens()) {
                     return (MCRFile) childNode;
                 } else if (childNode instanceof MCRDirectory) {
                     parent = (MCRDirectory) childNode;
@@ -256,9 +260,10 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
             if (children[0] instanceof MCRDirectory) {
                 parent = (MCRDirectory) children[0];
             }
-            for (int i = 0; i < children.length; i++) {
-                if (children[i] instanceof MCRFile)
-                    return children[i].getAbsolutePath().substring(1);
+            for (MCRFilesystemNode element : children) {
+                if (element instanceof MCRFile) {
+                    return element.getAbsolutePath().substring(1);
+                }
             }
         }
         return "";
@@ -276,10 +281,11 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
 
     protected void startTransaction() {
         LOGGER.debug("Starting transaction");
-        if (tx == null || !tx.isActive())
+        if (tx == null || !tx.isActive()) {
             tx = MCRHIBConnection.instance().getSession().beginTransaction();
-        else
+        } else {
             throw new MCRException("Transaction already started");
+        }
     }
 
     protected void commitTransaction() {
@@ -287,8 +293,9 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
         if (tx != null) {
             tx.commit();
             tx = null;
-        } else
+        } else {
             throw new NullPointerException("Cannot commit transaction");
+        }
     }
 
     protected void rollbackTransaction() {
@@ -296,8 +303,9 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
         if (tx != null) {
             tx.rollback();
             tx = null;
-        } else
+        } else {
             throw new NullPointerException("Cannot rollback transaction");
+        }
     }
 
 }

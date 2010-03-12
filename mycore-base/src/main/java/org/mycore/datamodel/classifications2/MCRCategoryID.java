@@ -76,8 +76,8 @@ public class MCRCategoryID implements Serializable {
     public int hashCode() {
         final int PRIME = 31;
         int result = 1;
-        result = PRIME * result + ((ID == null || ID.length() == 0) ? 0 : ID.hashCode());
-        result = PRIME * result + ((rootID == null) ? 0 : rootID.hashCode());
+        result = PRIME * result + (ID == null || ID.length() == 0 ? 0 : ID.hashCode());
+        result = PRIME * result + (rootID == null ? 0 : rootID.hashCode());
         return result;
     }
 
@@ -88,23 +88,30 @@ public class MCRCategoryID implements Serializable {
      */
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         final MCRCategoryID other = (MCRCategoryID) obj;
         if (ID == null) {
-            if (other.ID != null && other.ID.length() > 0)
+            if (other.ID != null && other.ID.length() > 0) {
                 return false;
-        } else if (!ID.equals(other.ID) && (ID.length() > 0 || (other.ID != null && other.ID.length() >= 0)))
+            }
+        } else if (!ID.equals(other.ID) && (ID.length() > 0 || other.ID != null && other.ID.length() >= 0)) {
             return false;
+        }
         if (rootID == null) {
-            if (other.rootID != null)
+            if (other.rootID != null) {
                 return false;
-        } else if (!rootID.equals(other.rootID))
+            }
+        } else if (!rootID.equals(other.rootID)) {
             return false;
+        }
         return true;
     }
 
@@ -145,9 +152,10 @@ public class MCRCategoryID implements Serializable {
      */
     @Override
     public String toString() {
-        if (ID == null || ID.length() == 0)
+        if (ID == null || ID.length() == 0) {
             return rootID;
-        StringBuilder str = new StringBuilder(this.rootID).append(':').append(ID);
+        }
+        StringBuilder str = new StringBuilder(rootID).append(':').append(ID);
         return str.toString();
     }
 

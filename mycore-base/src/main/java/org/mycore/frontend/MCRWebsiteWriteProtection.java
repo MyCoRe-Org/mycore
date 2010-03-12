@@ -13,7 +13,6 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.DOMOutputter;
 import org.jdom.output.XMLOutputter;
-
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
 
@@ -40,12 +39,14 @@ public final class MCRWebsiteWriteProtection {
     public final static boolean isActive() {
         // if superuser is online, return false
         String superUser = MCR_CONFIG.getString("MCR.Users.Superuser.UserName");
-        if (MCRSessionMgr.getCurrentSession().getCurrentUserID().equals(superUser))
+        if (MCRSessionMgr.getCurrentSession().getCurrentUserID().equals(superUser)) {
             return false;
+        }
         // init, if impossible return false
         Element config = getConfiguration();
-        if (config == null)
+        if (config == null) {
             return false;
+        }
         // return value contained in config
         String protection = config.getChildTextTrim("protectionEnabled");
         return Boolean.valueOf(protection);
@@ -53,9 +54,9 @@ public final class MCRWebsiteWriteProtection {
 
     public final static org.w3c.dom.Document getMessage() throws JDOMException, IOException {
         Element config = getConfiguration();
-        if (config == null)
+        if (config == null) {
             return new DOMOutputter().output(new Document());
-        else {
+        } else {
             Element messageElem = config.getChild("message");
             Document message = new Document((Element) messageElem.clone());
             return new DOMOutputter().output(message);
@@ -65,16 +66,16 @@ public final class MCRWebsiteWriteProtection {
     private final static Element getConfiguration() {
         // try to get file
         File configFolder = new File(CONFIG_FOLDER_PATH);
-        if (!configFolder.exists())
+        if (!configFolder.exists()) {
             configFolder.mkdir();
+        }
         // file exist?, return it's content
         if (CONFIG_FILE.exists()) {
             Element config = null;
             // try to get from cache
-            if (cacheValid())
+            if (cacheValid()) {
                 config = CONFIG_CACHE;
-            // parse it
-            else {
+            } else {
                 SAXBuilder builder = new SAXBuilder();
                 try {
                     config = builder.build(CONFIG_FILE).getRootElement();
@@ -151,7 +152,8 @@ public final class MCRWebsiteWriteProtection {
         setConfiguration(config);
     }
 
-    public final static boolean printInfoPageIfNoAccess(HttpServletRequest request, HttpServletResponse response, String baseURL) throws IOException {
+    public final static boolean printInfoPageIfNoAccess(HttpServletRequest request, HttpServletResponse response, String baseURL)
+            throws IOException {
         if (MCRWebsiteWriteProtection.isActive()) {
             response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
             String pageURL = baseURL + MCR_CONFIG.getString("MCR.WriteProtectionWebsite.ErrorPage");
@@ -167,10 +169,11 @@ public final class MCRWebsiteWriteProtection {
      * @return true if valid, false if note
      */
     private final static boolean cacheValid() {
-        if ((CONFIG_CACHE == null) || (CONFIG_CACHE_INITTIME < CONFIG_FILE.lastModified()))
+        if (CONFIG_CACHE == null || CONFIG_CACHE_INITTIME < CONFIG_FILE.lastModified()) {
             return false;
-        else
+        } else {
             return true;
+        }
     }
 
 }

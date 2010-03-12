@@ -76,7 +76,8 @@ final public class MCRMetaInstitutionName extends MCRMetaDefault {
      * @param set_property       the property title
      * @exception MCRException if the parameter values are invalid
      */
-    public MCRMetaInstitutionName(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted, String set_fullname, String set_nickname, String set_property) throws MCRException {
+    public MCRMetaInstitutionName(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted,
+            String set_fullname, String set_nickname, String set_property) throws MCRException {
         super(set_datapart, set_subtag, default_lang, set_type, set_inherted);
         fullname = "";
         nickname = "";
@@ -95,7 +96,7 @@ final public class MCRMetaInstitutionName extends MCRMetaDefault {
      *            the property title
      */
     public final void set(String set_fullname, String set_nickname, String set_property) {
-        if ((set_fullname == null) || (set_nickname == null) || (set_property == null)) {
+        if (set_fullname == null || set_nickname == null || set_property == null) {
             throw new MCRException("One parameter is null.");
         }
 
@@ -138,6 +139,7 @@ final public class MCRMetaInstitutionName extends MCRMetaDefault {
      * @param element
      *            a relevant DOM element for the metadata
      */
+    @Override
     public final void setFromDOM(org.jdom.Element element) {
         super.setFromDOM(element);
         fullname = element.getChildTextTrim("fullname");
@@ -167,6 +169,7 @@ final public class MCRMetaInstitutionName extends MCRMetaDefault {
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML MCRMetaInstitutionName part
      */
+    @Override
     public final org.jdom.Element createXML() throws MCRException {
         if (!isValid()) {
             throw new MCRException("The content of MCRMetaInstitutionName is not valid.");
@@ -176,7 +179,7 @@ final public class MCRMetaInstitutionName extends MCRMetaDefault {
         elm.setAttribute("lang", lang, Namespace.XML_NAMESPACE);
         elm.setAttribute("inherited", Integer.toString(inherited));
 
-        if ((type != null) && ((type = type.trim()).length() != 0)) {
+        if (type != null && (type = type.trim()).length() != 0) {
             elm.setAttribute("type", type);
         }
 
@@ -205,6 +208,7 @@ final public class MCRMetaInstitutionName extends MCRMetaDefault {
      * 
      * @return a boolean value
      */
+    @Override
     public final boolean isValid() {
         if ((fullname = fullname.trim()).length() == 0) {
             return false;
@@ -216,6 +220,7 @@ final public class MCRMetaInstitutionName extends MCRMetaDefault {
     /**
      * This method make a clone of this class.
      */
+    @Override
     public final Object clone() {
         return new MCRMetaInstitutionName(datapart, subtag, lang, type, inherited, fullname, nickname, property);
     }

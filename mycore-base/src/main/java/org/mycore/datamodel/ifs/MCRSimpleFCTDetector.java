@@ -90,7 +90,7 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
             List extensions = xRules.getChildren("extension");
 
             for (int i = 0; i < extensions.size(); i++) {
-                Element elem = (Element) (extensions.get(i));
+                Element elem = (Element) extensions.get(i);
 
                 double score = elem.getAttribute("score").getDoubleValue();
                 String ext = elem.getTextTrim();
@@ -101,7 +101,7 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
             List patterns = xRules.getChildren("pattern");
 
             for (int i = 0; i < patterns.size(); i++) {
-                Element elem = (Element) (patterns.get(i));
+                Element elem = (Element) patterns.get(i);
 
                 double score = elem.getAttribute("score").getDoubleValue();
                 int offset = elem.getAttribute("offset").getIntValue();
@@ -110,24 +110,24 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
 
                 rules.addElement(new MCRPatternRule(pattern, format, offset, score));
             }
-            
+
             List doctypes = xRules.getChildren("doctype");
 
             for (int i = 0; i < doctypes.size(); i++) {
-                Element elem = (Element) (doctypes.get(i));
+                Element elem = (Element) doctypes.get(i);
 
-                double score   = elem.getAttribute("score").getDoubleValue();
+                double score = elem.getAttribute("score").getDoubleValue();
                 String doctype = elem.getTextTrim();
 
                 rules.addElement(new MCRDoctypeRule(doctype, score));
             }
-            
+
             List strings = xRules.getChildren("string");
 
             for (int i = 0; i < strings.size(); i++) {
-                Element elem = (Element) (strings.get(i));
+                Element elem = (Element) strings.get(i);
 
-                double score  = elem.getAttribute("score").getDoubleValue();
+                double score = elem.getAttribute("score").getDoubleValue();
                 String string = elem.getTextTrim();
 
                 rules.addElement(new MCRStringRule(string, score));
@@ -142,14 +142,14 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
         double maxScore = 0.0;
         MCRFileContentType detected = null;
 
-        for (int i = 0; (i < typesList.size()) && (maxScore < 1.0); i++) {
-            MCRFileContentType type = (MCRFileContentType) (typesList.get(i));
-            Vector rules = (Vector) (rulesTable.get(type));
+        for (int i = 0; i < typesList.size() && maxScore < 1.0; i++) {
+            MCRFileContentType type = (MCRFileContentType) typesList.get(i);
+            Vector rules = (Vector) rulesTable.get(type);
 
             double score = 0.0;
 
-            for (int j = 0; (j < rules.size()) && (score < 1.0); j++) {
-                MCRDetectionRule rule = (MCRDetectionRule) (rules.elementAt(j));
+            for (int j = 0; j < rules.size() && score < 1.0; j++) {
+                MCRDetectionRule rule = (MCRDetectionRule) rules.elementAt(j);
                 score += rule.getScore(filename, header);
                 score = Math.min(1.0, score);
             }
@@ -212,6 +212,7 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
             this.extension = extension.toLowerCase();
         }
 
+        @Override
         double getScore(String filename, byte[] header) {
             if (filename.toLowerCase().endsWith(extension)) {
                 return score;
@@ -256,14 +257,15 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
 
                 for (int i = 0; i < pattern.length(); i += 2) {
                     String hex = pattern.substring(i, i + 2).toLowerCase();
-                    this.pattern[i / 2] = (byte) (Integer.parseInt(hex, 16));
+                    this.pattern[i / 2] = (byte) Integer.parseInt(hex, 16);
                 }
             } else if (format.equals("bytes")) {
                 StringTokenizer st = new StringTokenizer(pattern, " ,:;\t");
                 this.pattern = new byte[st.countTokens()];
 
-                for (int i = 0; st.hasMoreTokens(); i++)
-                    this.pattern[i] = (byte) (Integer.parseInt(st.nextToken(), 10));
+                for (int i = 0; st.hasMoreTokens(); i++) {
+                    this.pattern[i] = (byte) Integer.parseInt(st.nextToken(), 10);
+                }
             } else {
                 String msg = "Unsupported pattern format in content type detection rule: " + format;
                 throw new MCRConfigurationException(msg);
@@ -272,13 +274,15 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
             this.offset = offset;
         }
 
+        @Override
         double getScore(String filename, byte[] header) {
-            boolean matches = (header.length >= (pattern.length + offset));
+            boolean matches = header.length >= pattern.length + offset;
 
-            for (int i = 0; matches && (i < pattern.length); i++)
-                matches = (header[offset + i] == pattern[i]);
+            for (int i = 0; matches && i < pattern.length; i++) {
+                matches = header[offset + i] == pattern[i];
+            }
 
-            return (matches ? score : 0);
+            return matches ? score : 0;
         }
     }
 
@@ -301,20 +305,21 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
             this.doctype = doctype;
         }
 
+        @Override
         double getScore(String filename, byte[] header) {
-        try {
-            String type = MCRUtils.parseDocumentType(new ByteArrayInputStream(header));
+            try {
+                String type = MCRUtils.parseDocumentType(new ByteArrayInputStream(header));
 
-            if (type.equals(doctype)) {
-                return score;
+                if (type.equals(doctype)) {
+                    return score;
+                }
+                return 0;
+            } catch (Exception exc) {
+                return 0;
             }
-            return 0;
-        } catch (Exception exc) {
-            return 0;
-        }
         }
     }
-    
+
     /** A rule that decides based on a String at any position in the head of the file */
     class MCRStringRule extends MCRDetectionRule {
         protected String string;
@@ -333,16 +338,16 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
             this.string = string;
         }
 
+        @Override
         double getScore(String filename, byte[] header) {
-          String head = new String(header);
-          if (-1 != head.indexOf(string)) {
-            return score;
-          }
-          return 0;
+            String head = new String(header);
+            if (-1 != head.indexOf(string)) {
+                return score;
+            }
+            return 0;
         }
     }
-    
-    
+
     /**
      * Copy from MCRLayoutServlet, messages changed from MCRLayoutServlet to
      * MCRSimpleFCTDetector Try to detect doctype of xml data
@@ -366,21 +371,10 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
         final String forcedInterrupt = "mcr.forced.interrupt";
 
         DefaultHandler handler = new DefaultHandler() {
+            @Override
             public void startElement(String uri, String localName, String qName, Attributes attributes) {
                 logger.debug("MCRSimpleFCTDetector detected root element = " + qName);
                 detected.setProperty("docType", qName);
-                throw new MCRException(forcedInterrupt);
-            }
-
-            // We would need SAX 2.0 to be able to do this, for later use:
-            public void startDTD(String name, String publicId, String systemId) {
-                if (logger.isDebugEnabled()){
-                    logger.debug(new StringBuffer(1024)
-                            .append("MCRSimpleFCTDetector detected DOCTYPE declaration = ").append(name)
-                            .append(" publicId = ").append(publicId)
-                            .append(" systemId = ").append(systemId).toString());
-                }
-                detected.setProperty("docType", name);
                 throw new MCRException(forcedInterrupt);
             }
         };

@@ -42,7 +42,7 @@ import org.mycore.common.MCRConfigurationException;
  */
 public class MCRSearcherFactory {
     /** Hashtable SearcherID to MCRSearcher instance */
-    protected static Hashtable<String,MCRSearcher> table = new Hashtable<String,MCRSearcher>();
+    protected static Hashtable<String, MCRSearcher> table = new Hashtable<String, MCRSearcher>();
 
     /** The logger */
     private static final Logger LOGGER = Logger.getLogger(MCRSearcherFactory.class);
@@ -65,7 +65,7 @@ public class MCRSearcherFactory {
                 LOGGER.debug("Reading searcher implementation for ID " + searcherID + ": " + searcherClass);
 
                 Object obj = MCRConfiguration.instance().getSingleInstanceOf(searcherClass);
-                MCRSearcher s = (MCRSearcher) (obj);
+                MCRSearcher s = (MCRSearcher) obj;
                 s.init(searcherID);
 
                 table.put(searcherID, s);
@@ -94,7 +94,7 @@ public class MCRSearcherFactory {
         Properties props = MCRConfiguration.instance().getProperties(prefix);
         Enumeration names = props.keys();
         while (names.hasMoreElements()) {
-            String name = (String) (names.nextElement());
+            String name = (String) names.nextElement();
             if (name.endsWith(suffix) && MCRConfiguration.instance().getString(name).equals(indexID)) {
                 String searcherID = name.substring(prefix.length(), name.indexOf(suffix));
                 return getSearcher(searcherID);

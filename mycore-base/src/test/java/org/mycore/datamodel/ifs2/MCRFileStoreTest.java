@@ -35,7 +35,6 @@ import org.apache.commons.vfs.Selectors;
 import org.apache.commons.vfs.VFS;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTestCase;
 
@@ -59,14 +58,17 @@ public class MCRFileStoreTest extends MCRTestCase {
         store = MCRFileStore.getStore("TEST");
     }
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
-        if (store == null)
+        if (store == null) {
             createStore();
-        else
+        } else {
             VFS.getManager().resolveFile(store.getBaseDir()).createFolder();
+        }
     }
 
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
         VFS.getManager().resolveFile(store.getBaseDir()).delete(Selectors.SELECT_ALL);
@@ -128,8 +130,9 @@ public class MCRFileStoreTest extends MCRTestCase {
 
     public void testListIDs() throws Exception {
         Iterator<Integer> IDs = store.listIDs(true);
-        while (IDs.hasNext())
+        while (IDs.hasNext()) {
             store.delete(IDs.next());
+        }
         assertFalse(store.exists(1));
         assertFalse(store.listIDs(true).hasNext());
         assertFalse(store.listIDs(false).hasNext());
@@ -140,8 +143,9 @@ public class MCRFileStoreTest extends MCRTestCase {
         IDs = store.listIDs(true);
         while (IDs.hasNext()) {
             int id = IDs.next();
-            if (!l1.isEmpty())
+            if (!l1.isEmpty()) {
                 assertTrue(id > l1.get(l1.size() - 1));
+            }
             l1.add(id);
         }
         assertTrue(l1.size() == 3);
@@ -149,8 +153,9 @@ public class MCRFileStoreTest extends MCRTestCase {
         IDs = store.listIDs(false);
         while (IDs.hasNext()) {
             int id = IDs.next();
-            if (!l2.isEmpty())
+            if (!l2.isEmpty()) {
                 assertTrue(id < l2.get(l2.size() - 1));
+            }
             l2.add(id);
         }
         assertTrue(l2.size() == 3);
@@ -186,7 +191,7 @@ public class MCRFileStoreTest extends MCRTestCase {
         assertTrue(modified.before(col.getLastModified()));
         byte[] content = "Hello World!".getBytes("UTF-8");
         dir.createFile("readme.txt").setContent(MCRContent.readFrom(content));
-        MCRFile child = (MCRFile) (dir.getChild("readme.txt"));
+        MCRFile child = (MCRFile) dir.getChild("readme.txt");
         assertNotNull(child);
         assertEquals(content.length, child.getSize());
     }
@@ -254,7 +259,7 @@ public class MCRFileStoreTest extends MCRTestCase {
         assertFalse(xml3.contains("name=\"test1.txt\""));
         assertTrue(xml3.contains("name=\"test3.txt\""));
     }
-    
+
     private boolean equals(Document a, Document b) throws Exception {
         sortChildren(a.getRootElement());
         sortChildren(b.getRootElement());
@@ -264,19 +269,19 @@ public class MCRFileStoreTest extends MCRTestCase {
     }
 
     private void sortChildren(Element parent) throws Exception {
-        List children = parent.getChildren();
-        if ((children == null) || (children.size() == 0))
+        @SuppressWarnings("unchecked")
+        List<Element> children = parent.getChildren();
+        if (children == null || children.size() == 0) {
             return;
+        }
 
         ArrayList<Element> copy = new ArrayList<Element>();
         copy.addAll(children);
 
-        Collections.sort(copy, new Comparator() {
-            public int compare(Object a, Object b) {
-                Element ea = (Element) a;
-                Element eb = (Element) b;
-                String sa = ea.getName() + "/" + ea.getAttributeValue("name");
-                String sb = eb.getName() + "/" + eb.getAttributeValue("name");
+        Collections.sort(copy, new Comparator<Element>() {
+            public int compare(Element a, Element b) {
+                String sa = a.getName() + "/" + a.getAttributeValue("name");
+                String sb = b.getName() + "/" + b.getAttributeValue("name");
                 return sa.compareTo(sb);
             }
         });
@@ -284,7 +289,8 @@ public class MCRFileStoreTest extends MCRTestCase {
         parent.removeContent();
         parent.addContent(copy);
 
-        for (Element child : copy)
+        for (Element child : copy) {
             sortChildren(child);
+        }
     }
 }

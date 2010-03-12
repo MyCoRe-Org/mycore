@@ -90,8 +90,9 @@ public class MCRDirectoryXML {
         addString(root, "size", String.valueOf(dir.getSize()));
 
         String label = dir.getLabel();
-        if (label != null)
+        if (label != null) {
             addString(root, "label", label);
+        }
 
         Element numChildren = new Element("numChildren");
         root.addContent(numChildren);
@@ -113,24 +114,25 @@ public class MCRDirectoryXML {
 
         MCRFilesystemNode[] children = dir.getChildren();
 
-        for (int i = 0; i < children.length; i++) {
+        for (MCRFilesystemNode element : children) {
             Element node = new Element("child");
-            node.setAttribute("ID", children[i].getID());
+            node.setAttribute("ID", element.getID());
             nodes.addContent(node);
 
-            addString(node, "name", children[i].getName());
+            addString(node, "name", element.getName());
 
-            label = children[i].getLabel();
-            if (label != null)
+            label = element.getLabel();
+            if (label != null) {
                 addString(node, "label", label);
+            }
 
-            addString(node, "size", String.valueOf(children[i].getSize()));
-            addDate(node, "lastModified", children[i].getLastModified());
+            addString(node, "size", String.valueOf(element.getSize()));
+            addDate(node, "lastModified", element.getLastModified());
 
-            if (children[i] instanceof MCRFile) {
+            if (element instanceof MCRFile) {
                 node.setAttribute("type", "file");
 
-                MCRFile file = (MCRFile) (children[i]);
+                MCRFile file = (MCRFile) element;
                 addString(node, "contentType", file.getContentTypeID());
                 addString(node, "md5", file.getMD5());
 
@@ -145,13 +147,15 @@ public class MCRDirectoryXML {
                 node.setAttribute("type", "directory");
             }
 
-            if (withAdditionalData)
+            if (withAdditionalData) {
                 try {
-                    Document additional = children[i].getAllAdditionalData();
-                    if (additional != null)
+                    Document additional = element.getAllAdditionalData();
+                    if (additional != null) {
                         node.addContent(additional.detachRootElement());
+                    }
                 } catch (Exception ignored) {
                 }
+            }
         }
 
         LOGGER.info("MCRDirectoryXML: end listing of directory " + dir.getName());
@@ -173,7 +177,7 @@ public class MCRDirectoryXML {
     }
 
     private void addString(Element parent, String itemName, String content) {
-        if ((content == null) || (content.trim().length() == 0)) {
+        if (content == null || content.trim().length() == 0) {
             return;
         }
 
@@ -300,8 +304,9 @@ public class MCRDirectoryXML {
 
         StringTokenizer st = new StringTokenizer(hostconf, ", ");
 
-        while (st.hasMoreTokens())
+        while (st.hasMoreTokens()) {
             remoteAliasList.add(st.nextToken());
+        }
     }
 
     /**

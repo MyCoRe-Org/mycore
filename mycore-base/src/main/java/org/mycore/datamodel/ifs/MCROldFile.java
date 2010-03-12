@@ -45,8 +45,9 @@ import org.mycore.common.events.MCREventManager;
  * @version $Revision$ $Date$
  * @deprecated use MCRFile
  */
+@Deprecated
 public class MCROldFile implements MCRFileReader {
-    
+
     /** The ID of the store that holds this file's content */
     protected String storeID;
 
@@ -75,7 +76,7 @@ public class MCROldFile implements MCRFileReader {
     protected MCRAudioVideoExtender avExtender;
 
     public final static String oldFileEvent = "MCROldFile";
-    
+
     /**
      * Creates a new empty, unstored MCROldFile instance.
      */
@@ -89,7 +90,7 @@ public class MCROldFile implements MCRFileReader {
         md5 = "d41d8cd98f00b204e9800998ecf8427e";
         lastModified = new GregorianCalendar();
 
-        fireEvent( MCREvent.CREATE_EVENT );
+        fireEvent(MCREvent.CREATE_EVENT);
     }
 
     /**
@@ -100,7 +101,7 @@ public class MCROldFile implements MCRFileReader {
      */
     public void setOwnerID(String ID) {
         MCRArgumentChecker.ensureNotEmpty(ID, "ID");
-        this.ownerID = ID;
+        ownerID = ID;
     }
 
     /**
@@ -137,7 +138,7 @@ public class MCROldFile implements MCRFileReader {
     public String getFileName() {
         int pos = path.lastIndexOf(File.separator);
 
-        return ((pos == -1) ? path : path.substring(pos + 1));
+        return pos == -1 ? path : path.substring(pos + 1);
     }
 
     /**
@@ -146,7 +147,7 @@ public class MCROldFile implements MCRFileReader {
     public String getDirectory() {
         int pos = path.lastIndexOf(File.separator);
 
-        return ((pos == -1) ? "" : path.substring(0, pos));
+        return pos == -1 ? "" : path.substring(0, pos);
     }
 
     /**
@@ -160,7 +161,7 @@ public class MCROldFile implements MCRFileReader {
 
         int pos = path.lastIndexOf(".");
 
-        return ((pos == -1) ? "" : path.substring(pos + 1));
+        return pos == -1 ? "" : path.substring(pos + 1);
     }
 
     /**
@@ -193,14 +194,14 @@ public class MCROldFile implements MCRFileReader {
         String sizeText;
         double sizeValue;
 
-        if (bytes >= (1024 * 1024)) // >= 1 MB
+        if (bytes >= 1024 * 1024) // >= 1 MB
         {
             sizeUnit = "MB";
-            sizeValue = (double) (Math.round(bytes / 10485.76)) / 100;
-        } else if (bytes >= (5 * 1024)) // >= 5 KB
+            sizeValue = (double) Math.round(bytes / 10485.76) / 100;
+        } else if (bytes >= 5 * 1024) // >= 5 KB
         {
             sizeUnit = "KB";
-            sizeValue = (double) (Math.round(bytes / 102.4)) / 10;
+            sizeValue = (double) Math.round(bytes / 102.4) / 10;
         } else // < 5 KB
         {
             sizeUnit = "Byte";
@@ -236,7 +237,7 @@ public class MCROldFile implements MCRFileReader {
      */
     public void setLastModified(GregorianCalendar date) {
         MCRArgumentChecker.ensureNotNull(date, "date");
-        this.lastModified = date;
+        lastModified = date;
     }
 
     /**
@@ -252,7 +253,7 @@ public class MCROldFile implements MCRFileReader {
      */
     public void setStoreID(String ID) {
         MCRArgumentChecker.ensureNotNull(ID, "ID");
-        this.storeID = ID.trim();
+        storeID = ID.trim();
     }
 
     /**
@@ -269,7 +270,7 @@ public class MCROldFile implements MCRFileReader {
      */
     public void setStorageID(String ID) {
         MCRArgumentChecker.ensureNotNull(ID, "ID");
-        this.storageID = ID.trim();
+        storageID = ID.trim();
     }
 
     /**
@@ -295,7 +296,7 @@ public class MCROldFile implements MCRFileReader {
      * stores it in the ContentStore given
      */
     public void setContentFrom(MCRContentInputStream source, MCRContentStore store) throws MCRPersistenceException {
-    	if (source.getHeader().length == 0) {
+        if (source.getHeader().length == 0) {
             storageID = "";
             storeID = "";
         } else {
@@ -303,11 +304,10 @@ public class MCROldFile implements MCRFileReader {
             storeID = store.getID();
         }
 
-        
         size = source.getLength();
         md5 = source.getMD5String();
-        
-        fireEvent( MCREvent.UPDATE_EVENT );
+
+        fireEvent(MCREvent.UPDATE_EVENT);
     }
 
     /**
@@ -317,8 +317,8 @@ public class MCROldFile implements MCRFileReader {
         if (storageID.length() != 0) {
             getContentStore().deleteContent(storageID);
         }
-        
-        fireEvent( MCREvent.DELETE_EVENT );
+
+        fireEvent(MCREvent.DELETE_EVENT);
 
         storageID = "";
         storeID = "";
@@ -327,12 +327,11 @@ public class MCROldFile implements MCRFileReader {
         size = 0;
         lastModified = new GregorianCalendar();
     }
-    
-    private void fireEvent( String type )
-    {
-      MCREvent event = new MCREvent(oldFileEvent, type);
-      event.put("file", this);
-      MCREventManager.instance().handleEvent(event);
+
+    private void fireEvent(String type) {
+        MCREvent event = new MCREvent(oldFileEvent, type);
+        event.put("file", this);
+        MCREventManager.instance().handleEvent(event);
     }
 
     /**
@@ -396,7 +395,7 @@ public class MCROldFile implements MCRFileReader {
      * and stored in a ContentStore that supports this
      */
     public MCRAudioVideoExtender getAudioVideoExtender() {
-        if (hasAudioVideoExtender() && (avExtender == null)) {
+        if (hasAudioVideoExtender() && avExtender == null) {
             avExtender = MCRContentStoreFactory.buildExtender(this);
         }
 
@@ -408,7 +407,7 @@ public class MCROldFile implements MCRFileReader {
      */
     public void setContentTypeID(String ID) {
         MCRArgumentChecker.ensureNotEmpty(ID, "content type ID");
-        this.contentTypeID = ID;
+        contentTypeID = ID;
     }
 
     /**
@@ -423,10 +422,10 @@ public class MCROldFile implements MCRFileReader {
      * implemented for MCROldFile class.
      */
     public MCRFileContentType getContentType() {
-//        throw new UnsupportedOperationException("Not implemented for MCROldFile");
-      return MCRFileContentTypeFactory.getType(contentTypeID);
-  }
-    
+        //        throw new UnsupportedOperationException("Not implemented for MCROldFile");
+        return MCRFileContentTypeFactory.getType(contentTypeID);
+    }
+
     /**
      * Gets an InputStream to read the content of this file from the underlying
      * store. It is important that you close() the stream when you are finished
@@ -438,11 +437,12 @@ public class MCROldFile implements MCRFileReader {
     public InputStream getContentAsInputStream() throws IOException {
         return getContentStore().retrieveContent(this);
     }
-    
-    public org.jdom.Document getContentAsJDOM() throws MCRPersistenceException, IOException, org.jdom.JDOMException {
-      return new org.jdom.input.SAXBuilder().build(getContentAsInputStream());
-  }
 
-  public void repairSearch()
-  { fireEvent( MCREvent.UPDATE_EVENT ); }
+    public org.jdom.Document getContentAsJDOM() throws MCRPersistenceException, IOException, org.jdom.JDOMException {
+        return new org.jdom.input.SAXBuilder().build(getContentAsInputStream());
+    }
+
+    public void repairSearch() {
+        fireEvent(MCREvent.UPDATE_EVENT);
+    }
 }

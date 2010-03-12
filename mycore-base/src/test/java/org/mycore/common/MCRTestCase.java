@@ -18,6 +18,7 @@ public class MCRTestCase extends TestCase {
      * 
      * @see MCRConfiguration#getProperties()
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         if (System.getProperties().getProperty("MCR.Configuration.File") == null) {
@@ -26,10 +27,11 @@ public class MCRTestCase extends TestCase {
         }
         CONFIG = MCRConfiguration.instance();
         boolean setProperty = false;
-        if (isDebugEnabled())
+        if (isDebugEnabled()) {
             setProperty = setProperty("log4j.rootLogger", "DEBUG, stdout", false) ? true : setProperty;
-        else
+        } else {
             setProperty = setProperty("log4j.rootLogger", "INFO, stdout", false) ? true : setProperty;
+        }
         setProperty = setProperty("log4j.appender.stdout", "org.apache.log4j.ConsoleAppender", false) ? true : setProperty;
         setProperty = setProperty("log4j.appender.stdout.layout", "org.apache.log4j.PatternLayout", false) ? true : setProperty;
         setProperty = setProperty("log4j.appender.stdout.layout.ConversionPattern", "%-5p %m%n", false) ? true : setProperty;
@@ -38,6 +40,7 @@ public class MCRTestCase extends TestCase {
         }
     }
 
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
         if (properties != null) {
@@ -47,7 +50,7 @@ public class MCRTestCase extends TestCase {
 
     protected boolean setProperty(String key, String value, boolean overwrite) {
         String propValue = CONFIG.getProperties().getProperty(key);
-        if ((propValue == null) || (overwrite == true)) {
+        if (propValue == null || overwrite == true) {
             CONFIG.getProperties().setProperty(key, value);
             return true;
         }

@@ -36,21 +36,24 @@ import org.xml.sax.SAXParseException;
  *
  */
 public class MCRParserXercesTest extends MCRTestCase {
-    
-    private URI xmlResource=null;
-    private URI xmlResourceInvalid=null;
-    private MCRParserXerces parser=null;
+
+    private URI xmlResource = null;
+
+    private URI xmlResourceInvalid = null;
+
+    private MCRParserXerces parser = null;
 
     /* (non-Javadoc)
      * @see org.mycore.common.MCRTestCase#setUp()
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         super.setProperty("MCR.XMLParser.ValidateSchema", "true", false);
-        boolean setProperty=super.setProperty("log4j.logger.org.mycore.common.xml.MCRParserXerces", "FATAL", false);
-        xmlResource=MCRParserXercesTest.class.getResource("/MCRParserXercesTest-valid.xml").toURI();
-        xmlResourceInvalid=MCRParserXercesTest.class.getResource("/MCRParserXercesTest-invalid.xml").toURI();
-        parser=new MCRParserXerces();
+        boolean setProperty = super.setProperty("log4j.logger.org.mycore.common.xml.MCRParserXerces", "FATAL", false);
+        xmlResource = MCRParserXercesTest.class.getResource("/MCRParserXercesTest-valid.xml").toURI();
+        xmlResourceInvalid = MCRParserXercesTest.class.getResource("/MCRParserXercesTest-invalid.xml").toURI();
+        parser = new MCRParserXerces();
         if (setProperty) {
             MCRConfiguration.instance().configureLogging();
         }

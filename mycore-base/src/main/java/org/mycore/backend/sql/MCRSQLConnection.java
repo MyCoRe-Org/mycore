@@ -79,7 +79,7 @@ public class MCRSQLConnection {
 
     void use() {
         long age = System.currentTimeMillis() - lastUse;
-        if ((numUsages > MCRSQLConnectionPool.maxUsages) || (age > MCRSQLConnectionPool.maxAge)) {
+        if (numUsages > MCRSQLConnectionPool.maxUsages || age > MCRSQLConnectionPool.maxAge) {
             closeJDBCConnection();
             buildJDBCConnection();
             numUsages = 0;
@@ -92,8 +92,9 @@ public class MCRSQLConnection {
         LOGGER.debug("MCRSQLConnection: Building connection to JDBC datastore " + MCRSQLConnectionPool.url);
 
         try {
-            if ((MCRSQLConnectionPool.userID != null) && (MCRSQLConnectionPool.userID.trim().length() > 0)) {
-                connection = DriverManager.getConnection(MCRSQLConnectionPool.url, MCRSQLConnectionPool.userID, MCRSQLConnectionPool.password);
+            if (MCRSQLConnectionPool.userID != null && MCRSQLConnectionPool.userID.trim().length() > 0) {
+                connection = DriverManager.getConnection(MCRSQLConnectionPool.url, MCRSQLConnectionPool.userID,
+                        MCRSQLConnectionPool.password);
             } else {
                 connection = DriverManager.getConnection(MCRSQLConnectionPool.url);
             }
@@ -131,6 +132,7 @@ public class MCRSQLConnection {
         }
     }
 
+    @Override
     public void finalize() {
         closeJDBCConnection();
     }
@@ -213,7 +215,7 @@ public class MCRSQLConnection {
         String query = "SELECT count(*) FROM " + condition;
         String count = getSingleValue(query);
 
-        return ((count == null) ? 0 : Integer.parseInt(count));
+        return count == null ? 0 : Integer.parseInt(count);
     }
 
     /**
@@ -226,7 +228,7 @@ public class MCRSQLConnection {
      * @return true, if there are any rows matching this condition
      */
     public boolean exists(String condition) throws MCRPersistenceException {
-        return (countRows(condition) > 0);
+        return countRows(condition) > 0;
     }
 
     /**

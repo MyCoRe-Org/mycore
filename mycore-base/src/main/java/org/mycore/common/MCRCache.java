@@ -75,7 +75,7 @@ public class MCRCache {
     protected MCRCacheEntry lru;
 
     /** A hashtable for looking up a cached object by a given key */
-    protected Hashtable<Object,MCRCacheEntry> index = new Hashtable<Object,MCRCacheEntry>();
+    protected Hashtable<Object, MCRCacheEntry> index = new Hashtable<Object, MCRCacheEntry>();
 
     /** The number of requests to get an object from this cache */
     protected long gets = 0;
@@ -88,12 +88,13 @@ public class MCRCache {
 
     /** The maximum number of objects that the cache can hold */
     protected int capacity;
-    
+
     /** Tch type string for the MCRCacheJMXBridge */
     protected String type;
-    
+
     /** The constructor */
-    private MCRCache(){};
+    private MCRCache() {
+    };
 
     /**
      * Creates a new cache with a given capacity.
@@ -104,7 +105,7 @@ public class MCRCache {
      */
     public MCRCache(int capacity, String type) {
         setCapacity(capacity);
-        this.type=type;
+        this.type = type;
         Object mbean = new MCRCacheManager(this);
         MCRJMXBridge.register(mbean, "MCRCache", type);
     }
@@ -172,7 +173,7 @@ public class MCRCache {
             return;
         }
 
-        MCRCacheEntry removed = (MCRCacheEntry) (index.get(key));
+        MCRCacheEntry removed = index.get(key);
 
         if (removed == lru) {
             lru = removed.after;
@@ -216,7 +217,7 @@ public class MCRCache {
 
         hits++;
 
-        MCRCacheEntry found = (MCRCacheEntry) (index.get(key));
+        MCRCacheEntry found = index.get(key);
 
         if (found != mru) {
             found.after.before = found.before;
@@ -256,7 +257,7 @@ public class MCRCache {
             return null;
         }
 
-        MCRCacheEntry found = (MCRCacheEntry) (index.get(key));
+        MCRCacheEntry found = index.get(key);
 
         if (found.time >= time) {
             return value;
@@ -300,8 +301,9 @@ public class MCRCache {
             throw new MCRUsageException("The cache capacity must be >= 0.");
         }
 
-        while (size > capacity)
+        while (size > capacity) {
             remove(lru.key);
+        }
 
         this.capacity = capacity;
     }
@@ -312,7 +314,7 @@ public class MCRCache {
      * @return true if this cache is full
      */
     public synchronized boolean isFull() {
-        return (size == capacity);
+        return size == capacity;
     }
 
     /**
@@ -321,7 +323,7 @@ public class MCRCache {
      * @return true if this cache is empty
      */
     public synchronized boolean isEmpty() {
-        return (size == 0);
+        return size == 0;
     }
 
     /**
@@ -331,7 +333,7 @@ public class MCRCache {
      * @return the fill rate of this cache as double value
      */
     public synchronized double getFillRate() {
-        return ((capacity == 0) ? 1.0 : ((double) size / (double) capacity));
+        return capacity == 0 ? 1.0 : (double) size / (double) capacity;
     }
 
     /**
@@ -342,14 +344,14 @@ public class MCRCache {
      * @return the hit rate of this cache as double value
      */
     public synchronized double getHitRate() {
-        return ((gets == 0) ? 1.0 : ((double) hits / (double) gets));
+        return gets == 0 ? 1.0 : (double) hits / (double) gets;
     }
 
     /**
      * Clears the cache by removing all entries from the cache
      */
     public synchronized void clear() {
-        index = new Hashtable<Object,MCRCacheEntry>();
+        index = new Hashtable<Object, MCRCacheEntry>();
         size = 0;
         mru = lru = null;
     }
@@ -358,6 +360,7 @@ public class MCRCache {
      * Returns a String containing information about cache capacity, size,
      * current fill rate and hit rate. Useful for testing and debugging.
      */
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("Cache capacity:  ").append(capacity).append("\n");
@@ -386,17 +389,16 @@ public class MCRCache {
         cache.get("c");
         System.out.println(cache);
     }
-    
+
     public void close() {
-        MCRJMXBridge.unregister("MCRCache", this.type);
+        MCRJMXBridge.unregister("MCRCache", type);
         clear();
     }
-    
-    
+
     /**
      * Returns an iterable list of keys to the cached objects. 
      */
-    public List<Object> keys(){
-    	return Collections.list(index.keys());
+    public List<Object> keys() {
+        return Collections.list(index.keys());
     }
 }

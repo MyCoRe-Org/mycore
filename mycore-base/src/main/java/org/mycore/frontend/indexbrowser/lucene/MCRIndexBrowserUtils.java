@@ -35,7 +35,7 @@ import org.jdom.Element;
  * 
  * @author Anja Schaar, Andreas Trappe, Matthias Eichner, Robert Stephan
  */
-public class MCRIndexBrowserUtils{
+public class MCRIndexBrowserUtils {
 
     private static final long serialVersionUID = 4963472470316616461L;
 
@@ -47,13 +47,12 @@ public class MCRIndexBrowserUtils{
      * Creates a xml document with the results of the index browser.
      * @return 
      */
-    public static Document createResultListDocument(MCRIndexBrowserIncomingData incomingBrowserData,
-            MCRIndexBrowserConfig config) {
+    public static Document createResultListDocument(MCRIndexBrowserIncomingData incomingBrowserData, MCRIndexBrowserConfig config) {
         List<MCRIndexBrowserEntry> resultList = null;
         String index = config.getIndex();
 
         String cacheKey = getCacheKey(index, incomingBrowserData);
-        if(MCRIndexBrowserCache.isCached(cacheKey, index)) {
+        if (MCRIndexBrowserCache.isCached(cacheKey, index)) {
             resultList = MCRIndexBrowserCache.getFromCache(cacheKey, index);
         } else {
             MCRIndexBrowserSearcher searcher = new MCRIndexBrowserSearcher(incomingBrowserData, config);
@@ -71,14 +70,17 @@ public class MCRIndexBrowserUtils{
      */
     protected static String getCacheKey(String index, MCRIndexBrowserIncomingData browseData) {
         StringBuffer key = new StringBuffer("");
-        if(index != null)
+        if (index != null) {
             key.append(index);
+        }
         key.append("#");
-        if(browseData.getSearch() != null)
+        if (browseData.getSearch() != null) {
             key.append(browseData.getSearch());
+        }
         key.append("#");
-        if(browseData.getMode() != null)
+        if (browseData.getMode() != null) {
             key.append(browseData.getMode());
+        }
         return key.toString();
     }
 
@@ -105,8 +107,9 @@ public class MCRIndexBrowserUtils{
     private static String getMode(HttpServletRequest request) {
         if (request.getParameter("mode") != null && !request.getParameter("mode").trim().equals("")) {
             return request.getParameter("mode").toLowerCase().trim();
-        } else
+        } else {
             return "prefix";
+        }
     }
 
 }

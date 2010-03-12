@@ -39,6 +39,7 @@ import org.mycore.parsers.bool.MCRConditionVisitor;
  */
 class MCRDateAfterClause implements MCRCondition {
     private Date date;
+
     private static DateFormat dateformat = new SimpleDateFormat("dd.MM.yyyy");
 
     MCRDateAfterClause(Date date) {
@@ -48,18 +49,19 @@ class MCRDateAfterClause implements MCRCondition {
     public boolean evaluate(Object o) {
         MCRAccessData data = (MCRAccessData) o;
 
-        return data.getDate().after(this.date);
+        return data.getDate().after(date);
     }
 
+    @Override
     public String toString() {
         return "date > " + dateformat.format(date) + " ";
     }
 
     public Element toXML() {
-    	Element cond = new Element("condition");
-    	cond.setAttribute("field", "date");
-    	cond.setAttribute("operator", ">");
-    	cond.setAttribute("value", dateformat.format(date));
+        Element cond = new Element("condition");
+        cond.setAttribute("field", "date");
+        cond.setAttribute("operator", ">");
+        cond.setAttribute("value", dateformat.format(date));
         return cond;
     }
 
@@ -70,6 +72,6 @@ class MCRDateAfterClause implements MCRCondition {
     }
 
     public void accept(MCRConditionVisitor visitor) {
-    	visitor.visitType(info());
+        visitor.visitType(info());
     }
 };

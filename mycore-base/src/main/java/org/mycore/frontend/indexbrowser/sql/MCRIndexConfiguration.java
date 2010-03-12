@@ -48,7 +48,7 @@ class MCRIndexConfiguration {
     String style;
 
     int maxPerPage;
-    
+
     boolean normalizeSearch;
 
     MCRIndexConfiguration(String ID) {
@@ -68,14 +68,15 @@ class MCRIndexConfiguration {
     }
 
     void buildFieldList(String fields) {
-        if ((fields == null) || (fields.trim().length() == 0)) {
+        if (fields == null || fields.trim().length() == 0) {
             extraFields = new String[0];
         }
 
         StringTokenizer st = new StringTokenizer(fields, " ,");
         extraFields = new String[st.countTokens()];
 
-        for (int i = 0; i < extraFields.length; i++)
+        for (int i = 0; i < extraFields.length; i++) {
             extraFields[i] = st.nextToken();
+        }
     }
 }

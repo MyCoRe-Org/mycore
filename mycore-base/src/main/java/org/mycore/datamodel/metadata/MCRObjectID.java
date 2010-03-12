@@ -134,19 +134,20 @@ public final class MCRObjectID {
     public synchronized void setNextFreeId(String base_id) throws MCRException {
         setNextFreeId(base_id, 0);
     }
-    
+
     public synchronized void setNextFreeId(String base_id, int maxInWorkflow) throws MCRException {
         // check the base_id
         mcr_valid_id = false;
 
-        if( ! setID( base_id + "_1" ) ) {
-            throw new MCRException("Error in project base string:" + base_id );
+        if (!setID(base_id + "_1")) {
+            throw new MCRException("Error in project base string:" + base_id);
         }
 
         int last = Math.max(getLastID(base_id).getNumberAsInteger(), maxInWorkflow) + 1;
         int rest = last % number_distance;
-        if (rest != 0)
+        if (rest != 0) {
             last += number_distance - rest;
+        }
         lastnumber.put(base_id, last);
         setID(base_id + "_" + String.valueOf(last));
     }
@@ -289,7 +290,8 @@ public final class MCRObjectID {
         }
 
         if (mcr_id == null) {
-            mcr_id = new StringBuffer(MAX_LENGTH).append(mcr_project_id).append('_').append(mcr_type_id).append('_').append(number_format.format(mcr_number)).toString();
+            mcr_id = new StringBuffer(MAX_LENGTH).append(mcr_project_id).append('_').append(mcr_type_id).append('_').append(
+                    number_format.format(mcr_number)).toString();
         }
 
         return mcr_id;
@@ -331,7 +333,7 @@ public final class MCRObjectID {
     public final boolean setID(String id) {
         mcr_valid_id = false;
 
-        if ((id == null) || ((id = id.trim()).length() == 0)) {
+        if (id == null || (id = id.trim()).length() == 0) {
             return false;
         }
 
@@ -421,7 +423,7 @@ public final class MCRObjectID {
      * @return true if all parts are equal, else return false.
      */
     public boolean equals(MCRObjectID in) {
-        return (mcr_project_id.equals(in.mcr_project_id) && (mcr_type_id.equals(in.mcr_type_id)) && (mcr_number == in.mcr_number));
+        return mcr_project_id.equals(in.mcr_project_id) && mcr_type_id.equals(in.mcr_type_id) && mcr_number == in.mcr_number;
     }
 
     /**
@@ -433,6 +435,7 @@ public final class MCRObjectID {
      * @return true if all parts are equal, else return false.
      * @see java.lang.Object#equals(Object)
      */
+    @Override
     public boolean equals(Object in) {
         if (!(in instanceof MCRObjectID)) {
             return false;
@@ -444,6 +447,7 @@ public final class MCRObjectID {
      * @see #getId()
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString() {
         return getId();
     }
@@ -454,6 +458,7 @@ public final class MCRObjectID {
      * @see #getId()
      * @see java.lang.Object#hashCode()
      */
+    @Override
     public int hashCode() {
         return getId().hashCode();
     }

@@ -24,7 +24,6 @@
 package org.mycore.backend.lucene;
 
 import java.io.StringReader;
-
 import java.text.ParseException;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -76,8 +75,9 @@ public class MCRBuildLuceneQuery {
         for (int i = 0; i < f.size(); i++) {
             org.jdom.Element xEle = f.get(i);
             String name = xEle.getName();
-            if ("boolean".equals(name))
+            if ("boolean".equals(name)) {
                 name = xEle.getAttributeValue("operator").toLowerCase();
+            }
             Query x = null;
 
             boolean reqfn = reqf;
@@ -122,12 +122,13 @@ public class MCRBuildLuceneQuery {
 
                 BooleanClause.Occur occur = BooleanClause.Occur.MUST;
 
-                if (reqfn && !prof)
+                if (reqfn && !prof) {
                     ;
-                else if (!reqfn && !prof)
+                } else if (!reqfn && !prof) {
                     occur = BooleanClause.Occur.SHOULD;
-                else if (!reqfn && prof)
+                } else if (!reqfn && prof) {
                     occur = BooleanClause.Occur.MUST_NOT;
+                }
                 BooleanClause bq = new BooleanClause(x, occur);
                 r.add(bq);
             }
@@ -147,25 +148,27 @@ public class MCRBuildLuceneQuery {
             TokenStream ts = analyzer.tokenStream(field, new StringReader(value));
 
             while (ts.incrementToken()) {
-                TermAttribute ta = (TermAttribute) ts.getAttribute(TermAttribute.class);
+                TermAttribute ta = ts.getAttribute(TermAttribute.class);
                 te = new Term(field, ta.term());
 
-                if ((null != tq) && (null == bq)) // not first token
+                if (null != tq && null == bq) // not first token
                 {
                     bq = new BooleanQuery();
-                    if (reqf)
+                    if (reqf) {
                         bq.add(tq, BooleanClause.Occur.MUST);
-                    else
+                    } else {
                         bq.add(tq, BooleanClause.Occur.SHOULD);
+                    }
                 }
 
                 tq = new TermQuery(te);
 
                 if (null != bq) {
-                    if (reqf)
+                    if (reqf) {
                         bq.add(tq, BooleanClause.Occur.MUST);
-                    else
+                    } else {
                         bq.add(tq, BooleanClause.Occur.SHOULD);
+                    }
                 }
             }
 
@@ -178,7 +181,7 @@ public class MCRBuildLuceneQuery {
 
             String help = value.endsWith("*") ? value.substring(0, value.length() - 1) : value;
 
-            if ((-1 != help.indexOf("*")) || (-1 != help.indexOf("?"))) {
+            if (-1 != help.indexOf("*") || -1 != help.indexOf("?")) {
                 LOGGER.debug("WILDCARD");
 
                 te = new Term(field, value);
@@ -193,7 +196,7 @@ public class MCRBuildLuceneQuery {
             TokenStream ts = analyzer.tokenStream(field, new StringReader(value));
 
             while (ts.incrementToken()) {
-                TermAttribute ta = (TermAttribute) ts.getAttribute(TermAttribute.class);
+                TermAttribute ta = ts.getAttribute(TermAttribute.class);
                 te = new Term(field, ta.term());
                 pq.add(te);
             }
@@ -215,10 +218,10 @@ public class MCRBuildLuceneQuery {
             TokenStream ts = analyzer.tokenStream(field, new StringReader(value));
             ts.incrementToken();
 
-            TermAttribute ta = (TermAttribute) ts.getAttribute(TermAttribute.class);
+            TermAttribute ta = ts.getAttribute(TermAttribute.class);
             lower = ta.term();
             if (ts.incrementToken()) {
-                ta = (TermAttribute) ts.getAttribute(TermAttribute.class);
+                ta = ts.getAttribute(TermAttribute.class);
                 upper = ta.term();
             }
 
@@ -269,7 +272,7 @@ public class MCRBuildLuceneQuery {
         while (_tokenizer.hasMoreTokens()) {
             String _token = _tokenizer.nextToken();
 
-            if ((!"NOT".equals(_token) && !"AND".equals(_token) && !"OR".equals(_token) && !"TO".equals(_token)) || _inString) {
+            if (!"NOT".equals(_token) && !"AND".equals(_token) && !"OR".equals(_token) && !"TO".equals(_token) || _inString) {
                 _fixedQuery.append(_token.toLowerCase());
             } else {
                 _fixedQuery.append(_token);
@@ -278,7 +281,7 @@ public class MCRBuildLuceneQuery {
             int _nbQuotes = count(_token, "\""); // Count the "
             int _nbEscapedQuotes = count(_token, "\\\""); // Count the \"
 
-            if (((_nbQuotes - _nbEscapedQuotes) % 2) != 0) {
+            if ((_nbQuotes - _nbEscapedQuotes) % 2 != 0) {
                 // there is an odd number of string delimiters
                 _inString = !_inString;
             }

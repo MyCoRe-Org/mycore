@@ -126,33 +126,34 @@ public class MCRUploadProgressMonitor extends JDialog {
         int height = 300;
 
         this.applet = applet;
-        this.canceled = false;
-        this.finished = false;
-        this.filename = "";
-        this.lbFilename = new JLabel(" ");
-        this.sizeFile = 0;
-        this.bytesFile = 0;
-        this.lbBytesFile = new JLabel(" ");
-        this.pbFile = new JProgressBar(0, 1000);
+        canceled = false;
+        finished = false;
+        filename = "";
+        lbFilename = new JLabel(" ");
+        sizeFile = 0;
+        bytesFile = 0;
+        lbBytesFile = new JLabel(" ");
+        pbFile = new JProgressBar(0, 1000);
         this.numFiles = numFiles;
-        this.fileCount = 0;
-        this.lbNumFiles = new JLabel(" ");
+        fileCount = 0;
+        lbNumFiles = new JLabel(" ");
         this.sizeTotal = sizeTotal;
-        this.bytesTotal = 0;
-        this.lbBytesTotal = new JLabel(" ");
-        this.pbTotal = new JProgressBar(0, 1000);
-        this.startTime = System.currentTimeMillis();
-        this.lbThroughput = new JLabel(" ");
-        this.lbTime = new JLabel(" ");
-        this.button = new JButton("Abbrechen");
+        bytesTotal = 0;
+        lbBytesTotal = new JLabel(" ");
+        pbTotal = new JProgressBar(0, 1000);
+        startTime = System.currentTimeMillis();
+        lbThroughput = new JLabel(" ");
+        lbTime = new JLabel(" ");
+        button = new JButton("Abbrechen");
 
         button.setEnabled(true);
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                if (finished)
+                if (finished) {
                     MCRUploadProgressMonitor.this.close();
-                else
+                } else {
                     MCRUploadProgressMonitor.this.cancel();
+                }
             }
         });
 
@@ -176,7 +177,7 @@ public class MCRUploadProgressMonitor extends JDialog {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.insets = new Insets(0, (width / 2) - 10, 0, (width / 2) - 10);
+        gbc.insets = new Insets(0, width / 2 - 10, 0, width / 2 - 10);
 
         JLabel dummy = new JLabel("");
         gbl.setConstraints(dummy, gbc);
@@ -249,25 +250,27 @@ public class MCRUploadProgressMonitor extends JDialog {
         Thread updater = new Thread(new Runnable() {
             public void run() {
 
-                while (MCRUploadProgressMonitor.this.lastUpdate == 0) {
+                while (lastUpdate == 0) {
                     try {
                         Thread.sleep(1500);
                     } catch (InterruptedException ex) {
                     }
                 }
 
-                while (!(MCRUploadProgressMonitor.this.finished || MCRUploadProgressMonitor.this.canceled)) {
+                while (!(finished || canceled)) {
                     try {
                         Thread.sleep(500);
                     } catch (InterruptedException ex) {
                     }
 
-                    if (MCRUploadProgressMonitor.this.finished || MCRUploadProgressMonitor.this.canceled)
+                    if (finished || canceled) {
                         return;
+                    }
 
                     long now = System.currentTimeMillis();
-                    if (now - MCRUploadProgressMonitor.this.lastUpdate > 900)
+                    if (now - lastUpdate > 900) {
                         MCRUploadProgressMonitor.this.update();
+                    }
                 }
             }
         });
@@ -287,8 +290,9 @@ public class MCRUploadProgressMonitor extends JDialog {
         setVisible(false);
         dispose();
 
-        if (applet != null)
+        if (applet != null) {
             applet.returnToURL();
+        }
     }
 
     protected DecimalFormat df = new DecimalFormat("00");
@@ -299,14 +303,14 @@ public class MCRUploadProgressMonitor extends JDialog {
         }
 
         int min = sec / 60;
-        sec = sec - (min * 60);
+        sec = sec - min * 60;
 
         if (min < 60) {
             return min + ":" + df.format(sec) + " Min.";
         }
 
         int hh = min / 60;
-        min = min - (hh * 60);
+        min = min - hh * 60;
 
         return hh + ":" + df.format(min) + ":" + df.format(sec) + " Std.";
     }
@@ -317,17 +321,17 @@ public class MCRUploadProgressMonitor extends JDialog {
         }
 
         long kb = bytes / 1024L;
-        bytes = bytes - (kb * 1024L);
+        bytes = bytes - kb * 1024L;
 
-        long nk = Math.round((bytes / 1024d) * 100d);
+        long nk = Math.round(bytes / 1024d * 100d);
 
         if (kb < 1024) {
             return kb + "," + df.format(nk) + " KB";
         }
 
         long mb = kb / 1024L;
-        kb = kb - (mb * 1024L);
-        nk = Math.round((kb / 1024d) * 100d);
+        kb = kb - mb * 1024L;
+        nk = Math.round(kb / 1024d * 100d);
 
         return mb + "," + df.format(nk) + " MB";
     }
@@ -336,7 +340,7 @@ public class MCRUploadProgressMonitor extends JDialog {
         final int permilleFile;
 
         if (sizeFile > 0) {
-            permilleFile = (int) (((double) bytesFile / (double) sizeFile) * 1000);
+            permilleFile = (int) ((double) bytesFile / (double) sizeFile * 1000);
         } else {
             permilleFile = 0;
         }
@@ -344,7 +348,7 @@ public class MCRUploadProgressMonitor extends JDialog {
         final int permilleTotal;
 
         if (sizeTotal > 0) {
-            permilleTotal = (int) (((double) bytesTotal / (double) sizeTotal) * 1000);
+            permilleTotal = (int) ((double) bytesTotal / (double) sizeTotal * 1000);
         } else {
             permilleTotal = 0;
         }
@@ -352,12 +356,13 @@ public class MCRUploadProgressMonitor extends JDialog {
         final String sFile = formatSize(bytesFile) + " von " + formatSize(sizeFile) + " übertragen";
 
         lastUpdate = System.currentTimeMillis();
-        long now = (endTime > 0 ? endTime : lastUpdate);
+        long now = endTime > 0 ? endTime : lastUpdate;
         final int sec = Math.max((int) (now - startTime) / 1000, 1);
 
         long bytesPerMilli = 1;
-        if (now > startTime)
+        if (now > startTime) {
             bytesPerMilli = Math.max(1, bytesTotal / (now - startTime));
+        }
         int rest = (int) ((sizeTotal - bytesTotal) / bytesPerMilli / 1000);
 
         int throughput = Math.round(bytesTotal / sec);
@@ -496,6 +501,7 @@ public class MCRUploadProgressMonitor extends JDialog {
         button.setEnabled(true);
 
         addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(WindowEvent e) {
                 MCRUploadProgressMonitor.this.close();
             }
@@ -522,39 +528,46 @@ public class MCRUploadProgressMonitor extends JDialog {
         int numFiles = files.length;
         long sizeTotal = 0;
 
-        for (int i = 0; i < numFiles; i++)
+        for (int i = 0; i < numFiles; i++) {
             sizeTotal += files[i].length();
+        }
 
         MCRUploadProgressMonitor upm = new MCRUploadProgressMonitor(numFiles, sizeTotal, null);
 
         for (int i = 0; i < numFiles; i++) {
-            if (upm.isCanceled())
+            if (upm.isCanceled()) {
                 break;
+            }
             upm.startFile(files[i].getName(), files[i].length());
 
             FileInputStream fin = new FileInputStream(files[i]);
             byte[] buffer = new byte[65536];
             long num = 0;
 
-            if (upm.isCanceled())
+            if (upm.isCanceled()) {
                 break;
+            }
             while ((num = fin.read(buffer, 0, buffer.length)) != -1) {
                 // Simulate a read error and the following cancel() invocation
                 // if( i == 2 ) { upm.cancel( new java.io.IOException( "Simulierter Lesefehler" ) ); return; }
 
-                if (upm.isCanceled())
+                if (upm.isCanceled()) {
                     break;
+                }
                 upm.progressFile(num);
                 Thread.sleep(300); // Simulate network transfer time
-                if (upm.isCanceled())
+                if (upm.isCanceled()) {
                     break;
+                }
             }
 
-            if (!upm.isCanceled())
+            if (!upm.isCanceled()) {
                 upm.endFile();
+            }
         }
 
-        if (!upm.isCanceled())
+        if (!upm.isCanceled()) {
             upm.finish();
+        }
     }
 }

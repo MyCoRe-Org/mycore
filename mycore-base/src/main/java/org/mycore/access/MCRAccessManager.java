@@ -41,8 +41,8 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  */
 public class MCRAccessManager {
 
-    private static final MCRAccessInterface ACCESS_IMPL = (MCRAccessInterface) MCRConfiguration.instance().getSingleInstanceOf("MCR.Access.Class",
-            MCRAccessBaseImpl.class.getName());
+    private static final MCRAccessInterface ACCESS_IMPL = (MCRAccessInterface) MCRConfiguration.instance().getSingleInstanceOf(
+            "MCR.Access.Class", MCRAccessBaseImpl.class.getName());
 
     private static final MCRAccessCheckStrategy ACCESS_STRATEGY = (MCRAccessCheckStrategy) MCRConfiguration.instance().getInstanceOf(
             "MCR.Access.Strategy.Class", MCRObjectIDStrategy.class.getName());

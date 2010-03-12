@@ -1,13 +1,8 @@
 package org.mycore.frontend.fileupload;
 
 import java.io.File;
-import java.io.FileFilter;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,10 +19,11 @@ public class MCRRemoteFileServlet extends MCRServlet {
 
     private File f;
 
+    @Override
     public void doGetPost(MCRServletJob job) throws Exception {
         HttpServletRequest request = job.getRequest();
         HttpServletResponse response = job.getResponse();
-        String mode = request.getParameter("method");
+        request.getParameter("method");
         String pathname = request.getParameter("pathname");
 
         if (pathname != null && !pathname.equals("")) {
@@ -55,8 +51,9 @@ public class MCRRemoteFileServlet extends MCRServlet {
                 boolean canExecute = f.canExecute();
                 output(response, String.valueOf(canExecute));
             }*/
-        } else
+        } else {
             output(response, "Error!");
+        }
     }
 
     private void output(HttpServletResponse response, String string) throws IOException {

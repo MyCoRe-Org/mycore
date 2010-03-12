@@ -76,8 +76,10 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
 
     public MCRSearcherCommands() {
         super();
-        command.add(new MCRCommand("rebuild metadata index", "org.mycore.frontend.cli.MCRSearcherCommands.repairMetaIndex", "Repairs metadata index"));
-        command.add(new MCRCommand("rebuild content index", "org.mycore.frontend.cli.MCRSearcherCommands.repairContentIndex", "Repairs metadata index"));
+        command.add(new MCRCommand("rebuild metadata index", "org.mycore.frontend.cli.MCRSearcherCommands.repairMetaIndex",
+                "Repairs metadata index"));
+        command.add(new MCRCommand("rebuild content index", "org.mycore.frontend.cli.MCRSearcherCommands.repairContentIndex",
+                "Repairs metadata index"));
     }
 
     /**
@@ -90,8 +92,9 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
         List<String> indexes = getIndexes();
         List<String> metaSearcher = new ArrayList<String>(1);
         for (String index : indexes) {
-            if (isIndexType(index, INDEX_TYPE_METADATA))
+            if (isIndexType(index, INDEX_TYPE_METADATA)) {
                 metaSearcher.add(index);
+            }
         }
         for (String searcherID : metaSearcher) {
             MCRSearcher searcher = MCRSearcherFactory.getSearcher(searcherID);
@@ -100,7 +103,7 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
             searcher.notifySearcher("insert");
             //TODO: Code needs to be made fast again after IFS2 Metastore is matured
             MCRXMLTableManager mcrxmlTableManager = MCRXMLTableManager.instance();
-            for(String id:mcrxmlTableManager.listIDs()) {
+            for (String id : mcrxmlTableManager.listIDs()) {
                 MCRObjectID mcrid = new MCRObjectID(id);
                 addMetaToIndex(mcrid, mcrxmlTableManager.retrieveBLOB(mcrid), false, searcher);
             }
@@ -119,8 +122,9 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
         List<String> indexes = getIndexes();
         List<String> contentSearcher = new ArrayList<String>(1);
         for (String index : indexes) {
-            if (isIndexType(index, INDEX_TYPE_CONTENT))
+            if (isIndexType(index, INDEX_TYPE_CONTENT)) {
                 contentSearcher.add(index);
+            }
         }
         for (String searcherID : contentSearcher) {
             MCRSearcher searcher = MCRSearcherFactory.getSearcher(searcherID);
@@ -136,9 +140,9 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
                 MCRFSNODES node = (MCRFSNODES) results.get(0);
                 GregorianCalendar greg = new GregorianCalendar();
                 greg.setTime(node.getDate());
-                MCRFile file = (MCRFile) MCRFileMetadataManager.instance().buildNode(node.getType(), node.getId(), node.getPid(), node.getOwner(),
-                        node.getName(), node.getLabel(), node.getSize(), greg, node.getStoreid(), node.getStorageid(), node.getFctid(), node.getMd5(),
-                        node.getNumchdd(), node.getNumchdf(), node.getNumchtd(), node.getNumchtf());
+                MCRFile file = (MCRFile) MCRFileMetadataManager.instance().buildNode(node.getType(), node.getId(), node.getPid(),
+                        node.getOwner(), node.getName(), node.getLabel(), node.getSize(), greg, node.getStoreid(), node.getStorageid(),
+                        node.getFctid(), node.getMd5(), node.getNumchdd(), node.getNumchdf(), node.getNumchtd(), node.getNumchtf());
                 addFileToIndex(file, false, searcher);
                 session.evict(node);
             }
@@ -164,13 +168,14 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
         final String indexKey = MCRConfiguration.instance().getString(SEARCHER_PROPERTY_START + index + SEARCHER_INDEX_SUFFIX);
         for (Object indexElement : searchFields.getRootElement().getChildren("index", MCRConstants.MCR_NAMESPACE)) {
             final Element indexE = (Element) indexElement;
-            if (indexE.getAttributeValue("id").equals(indexKey))
+            if (indexE.getAttributeValue("id").equals(indexKey)) {
                 for (Object fieldElement : indexE.getChildren("field", MCRConstants.MCR_NAMESPACE)) {
                     String source = ((Element) fieldElement).getAttributeValue("source");
                     if (source != null && source.startsWith(type)) {
                         return true;
                     }
                 }
+            }
         }
         return false;
     }
@@ -178,8 +183,9 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
     private static void addMetaToIndex(MCRObjectID id, byte[] xml, boolean update, MCRSearcher searcher) {
         List<MCRFieldValue> fields = MCRData2Fields.buildFields(xml, searcher.getIndex(), MCRFieldDef.OBJECT_METADATA
                 + MCRFieldDef.OBJECT_CATEGORY, id.getTypeId());
-        if (update)
+        if (update) {
             searcher.removeFromIndex(id.getId());
+        }
         searcher.addToIndex(id.getId(), id.getId(), fields);
     }
 
@@ -187,8 +193,9 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
         List<MCRFieldValue> fields = MCRData2Fields.buildFields(file, searcher.getIndex());
         String entryID = file.getID();
         String returnID = searcher.getReturnID(file);
-        if (update)
+        if (update) {
             searcher.removeFromIndex(entryID);
+        }
         searcher.addToIndex(entryID, returnID, fields);
     }
 }

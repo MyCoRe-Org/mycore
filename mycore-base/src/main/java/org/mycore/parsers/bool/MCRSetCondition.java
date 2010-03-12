@@ -65,20 +65,23 @@ public abstract class MCRSetCondition implements MCRCondition {
         return children;
     }
 
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < children.size(); i++) {
             sb.append("(").append(children.get(i)).append(")");
-            if (i < (children.size() - 1))
+            if (i < children.size() - 1) {
                 sb.append(' ').append(operator.toUpperCase()).append(' ');
+            }
         }
         return sb.toString();
     }
 
     public Element toXML() {
         Element cond = new Element("boolean").setAttribute("operator", operator);
-        for (MCRCondition child : children)
+        for (MCRCondition child : children) {
             cond.addContent(child.toXML());
+        }
         return cond;
     }
 
@@ -91,8 +94,9 @@ public abstract class MCRSetCondition implements MCRCondition {
 
     public void accept(MCRConditionVisitor visitor) {
         visitor.visitType(info());
-        for (MCRCondition child : children)
+        for (MCRCondition child : children) {
             child.accept(visitor);
+        }
     }
 
     public abstract boolean evaluate(Object o);

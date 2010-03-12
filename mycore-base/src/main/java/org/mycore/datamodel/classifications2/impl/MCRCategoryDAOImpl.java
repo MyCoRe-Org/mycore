@@ -35,12 +35,12 @@ import org.hibernate.Criteria;
 import org.hibernate.FlushMode;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Subqueries;
-
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
@@ -85,7 +85,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             leftStart = parent.getLeft() + 1;
         }
         LOGGER.debug("Calculating LEFT,RIGHT and LEVEL attributes...");
-        final MCRCategoryImpl wrapCategory = MCRCategoryImpl.wrapCategory(category, parent, (parent == null) ? category.getRoot() : parent
+        final MCRCategoryImpl wrapCategory = MCRCategoryImpl.wrapCategory(category, parent, parent == null ? category.getRoot() : parent
                 .getRoot());
         wrapCategory.calculateLeftRightAndLevel(leftStart, levelStart);
         // always add +1 for the current node
@@ -150,7 +150,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         q.setString("lang", lang);
         q.setString("text", text);
         q.setCacheable(true);
-        return (List<MCRCategory>) q.list();
+        return q.list();
     }
 
     @SuppressWarnings("unchecked")
@@ -161,16 +161,18 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         if (id.isRootID()) {
             q = getHibConnection().getNamedQuery(
                     CATEGRORY_CLASS.getName() + (fetchAllChildren ? ".prefetchClassQuery" : ".prefetchClassLevelQuery"));
-            if (!fetchAllChildren)
+            if (!fetchAllChildren) {
                 q.setInteger("endlevel", childLevel);
+            }
             q.setString("classID", id.getRootID());
         } else {
             //normal category
             MCRCategoryImpl category = getByNaturalID(session, id);
             q = getHibConnection().getNamedQuery(
                     CATEGRORY_CLASS.getName() + (fetchAllChildren ? ".prefetchCategQuery" : ".prefetchCategLevelQuery"));
-            if (!fetchAllChildren)
+            if (!fetchAllChildren) {
                 q.setInteger("endlevel", category.getLevel() + childLevel);
+            }
             q.setString("classID", id.getRootID());
             q.setInteger("left", category.getLeft());
             q.setInteger("right", category.getRight());
@@ -197,9 +199,9 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             Criteria c = session.createCriteria(CATEGRORY_CLASS).add(
                     Subqueries.propertyEq("parent", DetachedCriteria.forClass(CATEGRORY_CLASS).setProjection(
                             Projections.property("internalID")).add(getCategoryCriterion(cid))));
-            c.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+            c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
             c.setCacheable(true);
-            return (List<MCRCategory>) c.list();
+            return c.list();
         } finally {
             session.setFlushMode(fm);
         }
@@ -331,21 +333,22 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
                 LOGGER.debug("Category '" + id + "' is moved left.");
             }
         }
-        if (movedToRight)
+        if (movedToRight) {
             updateMoveRight(connection, oldParent, newParent, left, right, index, oldIndex);
-        else
+        } else {
             updateMoveLeft(connection, oldParent, newParent, left, right, index, oldIndex);
+        }
         // use newParent.left+1 if no left sibling else leftSibling.right+1
-        int leftStart = (index == 0) ? (getLeftRightValues(newParent.getId())[0] + 1) : (getLeftRightValues(newParent.getChildren().get(
-                index - 1).getId())[1] + 1);
+        int leftStart = index == 0 ? getLeftRightValues(newParent.getId())[0] + 1 : getLeftRightValues(newParent.getChildren().get(
+                index - 1).getId())[1] + 1;
         // update Left, Right and Level values
         subTree.calculateLeftRightAndLevel(leftStart, newParent.getLevel() + 1);
         // only update oldParent if newParent is not its ancestor
-        boolean updateOldParent = (oldParent.getLeft() < newParent.getLeft() || oldParent.getRight() > newParent.getRight()) ? true : false;
+        boolean updateOldParent = oldParent.getLeft() < newParent.getLeft() || oldParent.getRight() > newParent.getRight() ? true : false;
         // only update newParent if newParent!=oldParent and
         // oldParent is not its ancestor
-        boolean updateNewParent = (!oldParent.getId().equals(newParent.getId()) && (newParent.getLeft() < oldParent.getLeft() || newParent
-                .getRight() > oldParent.getRight())) ? true : false;
+        boolean updateNewParent = !oldParent.getId().equals(newParent.getId())
+                && (newParent.getLeft() < oldParent.getLeft() || newParent.getRight() > oldParent.getRight()) ? true : false;
         if (updateOldParent) {
             LOGGER.debug("Updating old parent " + oldParent.getId());
             session.update(oldParent);
@@ -382,8 +385,9 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         // new Map with all Categories referenced by ID
         Map<MCRCategoryID, MCRCategoryID> oldParents = new HashMap<MCRCategoryID, MCRCategoryID>();
         for (MCRCategory category : oldMap.values()) {
-            if (category.isCategory())
+            if (category.isCategory()) {
                 oldParents.put(category.getId(), category.getParent().getId());
+            }
         }
         Map<MCRCategoryID, MCRCategoryImpl> newMap = new HashMap<MCRCategoryID, MCRCategoryImpl>();
         fillIDMap(newMap, newCategoryImpl);
@@ -438,8 +442,9 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             }
         }
         // important to flush here as positionInParent could collide with deleted categories
-        if (flushBeforeUpdate)
+        if (flushBeforeUpdate) {
             session.flush();
+        }
         session.saveOrUpdate(newCategoryImpl);
         updateTimeStamp();
     }
@@ -490,10 +495,9 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         int oldParentLevel = oldParent.getLevel();
         if (newParent == oldParent) {
             LOGGER.debug("oldParent is newParent");
-            return (newIndex > oldIndex);
+            return newIndex > oldIndex;
         }
-        if (newParentLevel < oldParentLevel
-                && !((oldParent.getLeft() < newParent.getLeft() || oldParent.getRight() > newParent.getRight()))) {
+        if (newParentLevel < oldParentLevel && !(oldParent.getLeft() < newParent.getLeft() || oldParent.getRight() > newParent.getRight())) {
             // newParent is ancestor of oldParent
             MCRCategory node = oldParent;
             while (!node.getParent().getId().equals(newParent.getId())) {
@@ -507,7 +511,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             // old ancestor axis is right from new index
             return false;
         } else if (newParentLevel > oldParentLevel
-                && !((newParent.getLeft() < oldParent.getLeft() || newParent.getRight() > oldParent.getRight()))) {
+                && !(newParent.getLeft() < oldParent.getLeft() || newParent.getRight() > oldParent.getRight())) {
             MCRCategory node = newParent;
             while (!node.getParent().getId().equals(oldParent.getId())) {
                 // walk ancestor axis up while node not direct child of newParent
@@ -525,7 +529,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
          * newParent.
          */
         LOGGER.debug("oldParent and newParent are on the same level in the tree");
-        return (newParent.getLeft() > oldParent.getLeft());
+        return newParent.getLeft() > oldParent.getLeft();
     }
 
     private static Criterion getCategoryCriterion(MCRCategoryID id) {
@@ -545,11 +549,12 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
                 //check if currentCat is child of currentParent
                 if (currentParent.getLevel() + 1 < currentCat.getLevel()) {
                     currentParent = (MCRCategoryImpl) currentParent.getChildren().get(currentParent.getChildren().size() - 1);
-                } else
+                } else {
                     while (currentParent.getLevel() >= currentCat.getLevel()) {
                         //we have to go some levels up
                         currentParent = (MCRCategoryImpl) currentParent.getParent();
                     } //got parent of currentCat as currentParent
+                }
                 currentParent.getChildren().add(currentCat);
             }
         }
@@ -563,7 +568,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         MCRCategoryImpl newCateg = new MCRCategoryImpl();
         int childAmount;
         try {
-            childAmount = (level != 0) ? category.getChildren().size() : 0;
+            childAmount = level != 0 ? category.getChildren().size() : 0;
         } catch (RuntimeException e) {
             LOGGER.error("Cannot get children size for category: " + category.getId(), e);
             throw e;
@@ -582,7 +587,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         }
         if (childAmount > 0) {
             for (MCRCategory child : category.getChildren()) {
-                newCateg.getChildren().add(copyDeep((MCRCategoryImpl) child, level - 1));
+                newCateg.getChildren().add(copyDeep(child, level - 1));
             }
         }
         return newCateg;
@@ -637,8 +642,9 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             Iterator<MCRLabel> labels = previousVersion.getLabels().iterator();
             while (labels.hasNext()) {
                 // remove labels that are not present in new version
-                if (category.getLabel(labels.next().getLang()) == null)
+                if (category.getLabel(labels.next().getLang()) == null) {
                     labels.remove();
+                }
             }
             previousVersion.setURI(category.getURI());
         } else {
@@ -756,7 +762,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         if (newParent == oldParent) {
             MCRCategoryImpl leftSiblingOrParent = indexedNode.getLeftSiblingOrParent();
             int newLeft = leftSiblingOrParent.getLeft();
-            int newRight = (leftSiblingOrParent == newParent) ? newLeft + 1 : leftSiblingOrParent.getRight();
+            int newRight = leftSiblingOrParent == newParent ? newLeft + 1 : leftSiblingOrParent.getRight();
             updateLeftRightValueMax(connection, newParent.getRootID(), newLeft, left, newRight, right, increment);
             connection.getSession().refresh(newParent);
         } else {

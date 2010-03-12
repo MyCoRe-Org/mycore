@@ -1,7 +1,5 @@
 package org.mycore.backend.hibernate;
 
-import java.sql.Timestamp;
-
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRHibTestCase;
 import org.mycore.frontend.cli.MCRUserCommands;
@@ -10,6 +8,7 @@ import org.mycore.user.MCRUser;
 
 public class MCRHIBUserStoreTest extends MCRHibTestCase {
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         setProperty("MCR.Users.Superuser.UserName", "adminUser", true);
@@ -38,7 +37,7 @@ public class MCRHIBUserStoreTest extends MCRHibTestCase {
     }
 
     public void testCreateGroup() {
-        MCRGroup group=new MCRGroup("testGroup");
+        MCRGroup group = new MCRGroup("testGroup");
         MCRHIBUserStore userStore = new MCRHIBUserStore();
         userStore.createGroup(group);
         startNewTransaction();
@@ -46,7 +45,7 @@ public class MCRHIBUserStoreTest extends MCRHibTestCase {
     }
 
     public void testUpdateGroup() throws MCRException, Exception {
-        MCRGroup group=new MCRGroup("testGroup");
+        MCRGroup group = new MCRGroup("testGroup");
         MCRHIBUserStore userStore = new MCRHIBUserStore();
         userStore.createGroup(group);
         MCRUser user = new MCRUser("test", "testPwd");

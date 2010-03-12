@@ -249,7 +249,6 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         return null;
     }
 
-    @SuppressWarnings("unchecked")
     private void addDebugInfo(String href, String base) {
         MCRURIResolverFilter.uriList.get().add(href + " from " + base);
     }
@@ -294,13 +293,13 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
     private String getFileName(String path) {
         int posA = path.lastIndexOf("/");
         int posB = path.lastIndexOf("\\");
-        int pos = ((posA == -1) ? posB : posA);
+        int pos = posA == -1 ? posB : posA;
 
-        return ((pos == -1) ? path : path.substring(pos + 1));
+        return pos == -1 ? path : path.substring(pos + 1);
     }
 
     private InputStream getCachedResource(String classResource) throws IOException {
-        byte[] bytes = (byte[]) (bytesCache.get(classResource));
+        byte[] bytes = (byte[]) bytesCache.get(classResource);
 
         if (bytes == null) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -606,8 +605,8 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
         private String toEncoded(String url, String sessionId) {
 
-            if ((url == null) || (sessionId == null)) {
-                return (url);
+            if (url == null || sessionId == null) {
+                return url;
             }
             String path = url;
             String query = "";
@@ -620,7 +619,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             sb.append(";jsessionid=");
             sb.append(sessionId);
             sb.append(query);
-            return (sb.toString());
+            return sb.toString();
 
         }
     }
@@ -754,7 +753,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
             Object value = MCRSessionMgr.getCurrentSession().get(key);
 
-            return (Element) (((Element) value).clone());
+            return (Element) ((Element) value).clone();
         }
 
     }
@@ -916,24 +915,26 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
             String levelS = pst.nextToken();
             pst.nextToken(); // :
-            int levels = ("all".equals(levelS) ? -1 : Integer.parseInt(levelS));
+            int levels = "all".equals(levelS) ? -1 : Integer.parseInt(levelS);
 
             String axis;
             String token = pst.nextToken();
             pst.nextToken(); // :
-            boolean emptyLeaves = (!("noEmptyLeaves".equals(token)));
+            boolean emptyLeaves = !"noEmptyLeaves".equals(token);
             if (!emptyLeaves) {
                 axis = pst.nextToken();
                 pst.nextToken(); // :
-            } else
+            } else {
                 axis = token;
+            }
 
             String classID = pst.nextToken();
             StringBuffer categID = new StringBuffer();
             if (pst.hasMoreTokens()) {
                 pst.nextToken(); // :
-                while (pst.hasMoreTokens())
+                while (pst.hasMoreTokens()) {
                     categID.append(pst.nextToken());
+                }
             }
 
             String categ;
@@ -973,7 +974,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                     returns = MCRCategoryTransformer.getEditorItems(cl, labelFormat, sort, emptyLeaves);
                 }
             } else if (format.equals("metadata")) {
-                returns = (Element) (MCRCategoryTransformer.getMetaDataDocument(cl, false).getRootElement().detach());
+                returns = (Element) MCRCategoryTransformer.getMetaDataDocument(cl, false).getRootElement().detach();
             } else {
                 LOGGER.error("Unknown target format given. URI: " + uri);
                 throw new IllegalArgumentException("Invalid target format (" + format + ") in uri for retrieval of classification: " + uri);
@@ -984,7 +985,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
         private static String getLabelFormat(String editorString) {
             Matcher m = EDITORFORMAT_PATTERN.matcher(editorString);
-            if ((m.find()) && (m.groupCount() == 3)) {
+            if (m.find() && m.groupCount() == 3) {
                 String formatDef = m.group(2);
                 return MCRConfiguration.instance().getString(FORMAT_CONFIG_PREFIX + formatDef);
             }
@@ -1047,8 +1048,9 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
         private static String getMaxResults(Hashtable<String, String> params) {
             String maxResults = params.get(MAXRESULTS_PARAM);
-            if (maxResults != null && !maxResults.equals(""))
+            if (maxResults != null && !maxResults.equals("")) {
                 return maxResults;
+            }
             return "0";
         }
 
@@ -1106,15 +1108,16 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             String target = uri.substring(uri.indexOf(":") + 1);
             // fixes exceptions if suburi is empty like "mcrobject:"
             String subUri = target.substring(target.indexOf(":") + 1);
-            if (subUri.length() == 0)
+            if (subUri.length() == 0) {
                 return new Element("null");
+            }
             // end fix
             LOGGER.debug("Ensuring xml is not null: " + target);
             try {
                 Element result = MCRURIResolver.instance().resolve(target);
-                if (result != null)
+                if (result != null) {
                     return result;
-                else {
+                } else {
                     LOGGER.debug("MCRNotNullResolver returning empty xml");
                     return new Element("null");
                 }
@@ -1144,8 +1147,9 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             String target = help.substring(help.indexOf(":") + 1);
 
             String subUri = target.substring(target.indexOf(":") + 1);
-            if (subUri.length() == 0)
+            if (subUri.length() == 0) {
                 return new Element("null");
+            }
 
             try {
                 Hashtable<String, String> params = null;
@@ -1159,8 +1163,9 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                 Element result = MCRURIResolver.instance().resolve(target);
                 if (result != null) {
                     Document doc = result.getDocument();
-                    if (doc == null)
+                    if (doc == null) {
                         doc = new Document(result);
+                    }
                     Document xx = MCRLayoutService.instance().doLayout(doc, "xsl/" + stylesheet + ".xsl", params);
                     if (!xx.hasRootElement()) {
                         LOGGER.info("MCRXslStyleResolver no root element after transformation ");
@@ -1255,7 +1260,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             for (Map.Entry<String, String> entry : params.entrySet()) {
                 constructElement(root, entry.getKey(), entry.getValue());
             }
-            if ((root == defaultRoot) && (root.getChildren().size() > 1)) {
+            if (root == defaultRoot && root.getChildren().size() > 1) {
                 LOGGER.warn("More than 1 root node defined, returning first");
                 return (Element) ((Element) root.getChildren().get(0)).detach();
             }
@@ -1280,12 +1285,14 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         }
 
         private static void constructElement(Element current, String xpath, String value) {
-            StringTokenizer st = new StringTokenizer(xpath,"/");
+            StringTokenizer st = new StringTokenizer(xpath, "/");
             String name = null;
             while (st.hasMoreTokens()) {
                 name = st.nextToken();
-                if( name.startsWith("@")) break;
-                
+                if (name.startsWith("@")) {
+                    break;
+                }
+
                 String localName = getLocalName(name);
                 Namespace namespace = getNamespace(name);
 
@@ -1306,20 +1313,22 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                 current.setText(value);
             }
         }
-        
+
         private static Namespace getNamespace(String name) {
-            if (!name.contains(":"))
+            if (!name.contains(":")) {
                 return Namespace.NO_NAMESPACE;
+            }
             String prefix = name.split(":")[0];
             Namespace ns = MCRConstants.getStandardNamespace(prefix);
-            return (ns == null ? Namespace.NO_NAMESPACE : ns);
+            return ns == null ? Namespace.NO_NAMESPACE : ns;
         }
-        
+
         private static String getLocalName(String name) {
-            if (!name.contains(":"))
+            if (!name.contains(":")) {
                 return name;
-            else
+            } else {
                 return name.split(":")[1];
+            }
         }
     }
 }

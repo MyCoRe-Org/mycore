@@ -54,6 +54,7 @@ public class MCRURNResolver extends MCRServlet {
 
     protected String documentURL;
 
+    @Override
     public void init() throws ServletException {
         super.init();
         String base = "MCR.URN.Resolver.";
@@ -61,6 +62,7 @@ public class MCRURNResolver extends MCRServlet {
         documentURL = MCRConfiguration.instance().getString(base + "DocumentURL");
     }
 
+    @Override
     public void doGetPost(MCRServletJob job) throws Exception {
         HttpServletRequest req = job.getRequest();
         HttpServletResponse res = job.getResponse();
@@ -70,8 +72,9 @@ public class MCRURNResolver extends MCRServlet {
 
         String urn = param;
 
-        if ((urn == null) && (path != null))
+        if (urn == null && path != null) {
             urn = path.substring(1).trim();
+        }
 
         if (urn == null) {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -82,9 +85,10 @@ public class MCRURNResolver extends MCRServlet {
 
         String docID = MCRURNManager.getDocumentIDforURN(urn);
 
-        if (docID == null)
+        if (docID == null) {
             res.sendRedirect(masterURL + urn);
-        else
+        } else {
             res.sendRedirect(documentURL + docID);
+        }
     }
 }

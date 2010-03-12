@@ -68,10 +68,11 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
             readrule = (Element) MCRXMLHelper.parseXML(strReadRule, false).getRootElement().detach();
             editrule = (Element) MCRXMLHelper.parseXML(strEditRule, false).getRootElement().detach();
         } catch (Exception e) {
-            if (e instanceof RuntimeException)
+            if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
-            else
+            } else {
                 throw new ExceptionInInitializerError(e);
+            }
         }
     }
 
@@ -84,6 +85,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
      * @param obj
      *            the MCRObject that caused the event
      */
+    @Override
     protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
         handleBaseCreated(obj, MCRConfiguration.instance().getBoolean("MCR.Access.AddObjectDefaultRule", true));
     }
@@ -97,6 +99,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
      * @param obj
      *            the MCRObject that caused the event
      */
+    @Override
     protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
         handleBaseUpdated(obj, MCRConfiguration.instance().getBoolean("MCR.Access.AddObjectDefaultRule", true));
     }
@@ -110,6 +113,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
      * @param obj
      *            the MCRObject that caused the event
      */
+    @Override
     protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
         handleBaseDeleted(obj);
     }
@@ -123,6 +127,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
      * @param obj
      *            the MCRObject that caused the event
      */
+    @Override
     protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
         // Do nothing
     }
@@ -136,6 +141,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
      * @param der
      *            the MCRDerivate that caused the event
      */
+    @Override
     protected void handleDerivateCreated(MCREvent evt, MCRDerivate der) {
         handleBaseCreated(der, MCRConfiguration.instance().getBoolean("MCR.Access.AddDerivateDefaultRule", true));
     }
@@ -149,6 +155,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
      * @param der
      *            the MCRDerivate that caused the event
      */
+    @Override
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
         handleBaseUpdated(der, MCRConfiguration.instance().getBoolean("MCR.Access.AddDerivateDefaultRule", true));
     }
@@ -162,6 +169,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
      * @param der
      *            the MCRDerivate that caused the event
      */
+    @Override
     protected void handleDerivateDeleted(MCREvent evt, MCRDerivate der) {
         handleBaseDeleted(der);
     }
@@ -175,6 +183,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
      * @param der
      *            the MCRDerivate that caused the event
      */
+    @Override
     protected void handleDerivateRepaired(MCREvent evt, MCRDerivate der) {
         // Do nothing
     }
@@ -190,7 +199,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
             aclsize = li.size();
         }
         int rulesize = base.getService().getRulesSize();
-        if ((rulesize == 0) && (aclsize == 0) && addDefaultRules) {
+        if (rulesize == 0 && aclsize == 0 && addDefaultRules) {
             setDefaultPermissions(base.getId().getId(), true);
             LOGGER.warn("The ACL conditions for this object are empty!");
         }
@@ -221,7 +230,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
             aclsize = li.size();
         }
         int rulesize = base.getService().getRulesSize();
-        if ((rulesize == 0) && (aclsize == 0) && addDefaultRules) {
+        if (rulesize == 0 && aclsize == 0 && addDefaultRules) {
             setDefaultPermissions(base.getId().getId(), false);
             LOGGER.warn("The ACL conditions for this object was empty!");
         }
@@ -272,16 +281,18 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
                 if (savedPermissions != null && savedPermissions.contains(permission)) {
                     if (overwrite) {
                         MCRAccessManager.removeRule(id, permission);
-                        if (permission.startsWith("read"))
+                        if (permission.startsWith("read")) {
                             MCRAccessManager.addRule(id, permission, readrule, "");
-                        else
+                        } else {
                             MCRAccessManager.addRule(id, permission, editrule, "");
+                        }
                     }
                 } else {
-                    if (permission.startsWith("read"))
+                    if (permission.startsWith("read")) {
                         MCRAccessManager.addRule(id, permission, readrule, "");
-                    else
+                    } else {
                         MCRAccessManager.addRule(id, permission, editrule, "");
+                    }
                 }
             }
         }

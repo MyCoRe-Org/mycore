@@ -37,7 +37,7 @@ public class MCRSortBy {
     /** Sort this field in descending order */
     public final static boolean DESCENDING = false;
 
-    /** The field to sort by */ 
+    /** The field to sort by */
     private MCRFieldDef field;
 
     /** Sort order of this field */

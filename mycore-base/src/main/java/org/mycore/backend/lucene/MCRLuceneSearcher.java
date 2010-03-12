@@ -111,14 +111,16 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         return SORTABLE_SUFFIX;
     }
 
+    @Override
     public void init(String ID) {
         super.init(ID);
 
         MCRConfiguration config = MCRConfiguration.instance();
         IndexDir = new File(config.getString(prefix + "IndexDir"));
         LOGGER.info(prefix + "indexDir: " + IndexDir);
-        if (!IndexDir.exists())
+        if (!IndexDir.exists()) {
             IndexDir.mkdirs();
+        }
         if (!IndexDir.isDirectory()) {
             String msg = IndexDir + " is not a directory!";
             throw new MCRConfigurationException(msg);
@@ -159,8 +161,9 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
             if ("name".equals(fd.getDataType())) {
                 ((PerFieldAnalyzerWrapper) analyzer).addAnalyzer(fd.getName(), simpleAnalyzer);
             }
-            if (fd.isAddable())
+            if (fd.isAddable()) {
                 addableFields.add(fd);
+            }
         }
         MCRShutdownHandler.getInstance().addCloseable(this);
         try {
@@ -184,6 +187,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         }
     }
 
+    @Override
     public void removeFromIndex(String entryID) {
         LOGGER.info("MCRLuceneSearcher removing indexed data of " + entryID);
 
@@ -215,6 +219,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
      * As opposed to {@link MCRSearcher} the returned MCRResult is read only.
      * @see MCRSearcher#search(MCRCondition, int, List, boolean)
      */
+    @Override
     public MCRResults search(MCRCondition condition, int maxResults, List<MCRSortBy> sortBy, boolean addSortData) {
         try {
             List<Element> f = new ArrayList<Element>();
@@ -237,8 +242,9 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
      * @return result set
      */
     private MCRResults getLuceneHits(Query luceneQuery, int maxResults, List<MCRSortBy> sortBy, boolean addSortData) throws Exception {
-        if (maxResults <= 0)
+        if (maxResults <= 0) {
             maxResults = 1000000;
+        }
 
         long start = System.currentTimeMillis();
         final Sort sortFields = buildSortFields(sortBy);
@@ -255,9 +261,9 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         ArrayList<SortField> sortList = new ArrayList<SortField>(sortBy.size());
         for (MCRSortBy sortByElement : sortBy) {
             SortField sortField;
-            if (sortByElement.getField().getName().equals("score"))
+            if (sortByElement.getField().getName().equals("score")) {
                 sortField = SortField.FIELD_SCORE;
-            else {
+            } else {
                 String name = sortByElement.getField().getName();
                 //TODO: use dataType to get FieldType (how to handle dates here?)
                 int fieldType = getFieldType(sortByElement.getField());
@@ -270,7 +276,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         }
         if (LOGGER.isDebugEnabled()) {
             for (SortField sortField : sortList) {
-                String name = (SortField.FIELD_SCORE == sortField ? "score" : sortField.getField());
+                String name = SortField.FIELD_SCORE == sortField ? "score" : sortField.getField();
                 LOGGER.debug("Sort by: " + name + (sortField.getReverse() ? " descending" : " accending"));
             }
         }
@@ -318,8 +324,8 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
                         field += getSortableSuffix();
                     }
                     String values[] = doc.getValues(field);
-                    for (int i = 0; i < values.length; i++) {
-                        MCRFieldValue fv = new MCRFieldValue(fds, values[i]);
+                    for (String value : values) {
+                        MCRFieldValue fv = new MCRFieldValue(fds, value);
                         hit.addSortData(fv);
                     }
                 }
@@ -327,10 +333,11 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         }
     }
 
+    @Override
     public void addToIndex(String entryID, String returnID, List<MCRFieldValue> fields) {
         LOGGER.info("MCRLuceneSearcher indexing data of " + entryID);
 
-        if ((fields == null) || (fields.size() == 0)) {
+        if (fields == null || fields.size() == 0) {
             return;
         }
 
@@ -388,7 +395,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         Document doc = new Document();
 
         for (int i = 0; i < fields.size(); i++) {
-            MCRFieldValue field = (MCRFieldValue) (fields.get(i));
+            MCRFieldValue field = fields.get(i);
             String name = field.getField().getName();
             String type = field.getField().getDataType();
             String content = field.getValue();
@@ -432,10 +439,11 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
                 if (type.equals("index")) {
                     doc.add(new Field(name, MCRNormalizer.normalizeString(content, true), Field.Store.YES, Field.Index.NOT_ANALYZED));
                 }
-                if (type.equals("Text") || type.equals("name") || (type.equals("text") && field.getField().isSortable())) {
+                if (type.equals("Text") || type.equals("name") || type.equals("text") && field.getField().isSortable()) {
                     doc.add(new Field(name, content, Field.Store.YES, Field.Index.ANALYZED));
-                    if (field.getField().isSortable())
+                    if (field.getField().isSortable()) {
                         doc.add(new Field(name + getSortableSuffix(), content, Field.Store.YES, Field.Index.NOT_ANALYZED));
+                    }
                 } else if (type.equals("text")) {
                     doc.add(new Field(name, content, Field.Store.NO, Field.Index.ANALYZED));
                 }
@@ -447,11 +455,13 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
 
     private boolean isTokenized(MCRFieldDef fieldDef) {
         String type = fieldDef.getDataType();
-        if (type.equals("Text") || type.equals("name") || type.equals("text"))
+        if (type.equals("Text") || type.equals("name") || type.equals("text")) {
             return true;
+        }
         return false;
     }
 
+    @Override
     public void addSortData(Iterator<MCRHit> hits, List<MCRSortBy> sortBy) {
         try {
             while (hits.hasNext()) {
@@ -472,6 +482,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         }
     }
 
+    @Override
     public void clearIndex() {
         try {
             IndexWriter writer = new IndexWriter(indexDir, analyzer, true, MaxFieldLength.LIMITED);
@@ -482,6 +493,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         }
     }
 
+    @Override
     public void clearIndex(String fieldname, String value) {
         try {
             deleteLuceneDocument(fieldname, value);
@@ -491,6 +503,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         }
     }
 
+    @Override
     public void notifySearcher(String mode) {
         LOGGER.info("mode: " + mode);
 
@@ -509,8 +522,9 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         } else if ("optimize".equals(mode)) {
             MCRIndexWriterAction modifyAction = MCRIndexWriterAction.optimizeAction(modifyExecutor);
             modifyIndex(modifyAction);
-        } else if (!"finish".equals(mode))
+        } else if (!"finish".equals(mode)) {
             LOGGER.error("invalid mode " + mode);
+        }
     }
 
     private void handleRamDir() {
@@ -545,6 +559,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         LOGGER.info("Processed " + modifyExecutor.getCompletedTaskCount() + " modification requests.");
     }
 
+    @Override
     public String toString() {
         return getClass().getSimpleName() + ":" + ID;
     }

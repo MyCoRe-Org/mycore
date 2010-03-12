@@ -79,6 +79,7 @@ public class MCRGROUPMEMBERSPK implements Serializable {
         this.userid = userid;
     }
 
+    @Override
     public boolean equals(Object other) {
         if (!(other instanceof MCRGROUPMEMBERSPK)) {
             return false;
@@ -86,9 +87,10 @@ public class MCRGROUPMEMBERSPK implements Serializable {
 
         MCRGROUPMEMBERSPK castother = (MCRGROUPMEMBERSPK) other;
 
-        return new EqualsBuilder().append(this.getGid(), castother.getGid()).append(this.getUserid(), castother.getUserid()).isEquals();
+        return new EqualsBuilder().append(getGid(), castother.getGid()).append(getUserid(), castother.getUserid()).isEquals();
     }
 
+    @Override
     public int hashCode() {
         return new HashCodeBuilder().append(getGid()).append(getUserid()).toHashCode();
     }

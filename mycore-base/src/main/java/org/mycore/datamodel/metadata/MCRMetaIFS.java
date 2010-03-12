@@ -74,7 +74,7 @@ final public class MCRMetaIFS extends MCRMetaDefault {
      */
     public MCRMetaIFS(String set_datapart, String set_subtag, String default_lang, String set_sourcepath) throws MCRException {
         super(set_datapart, set_subtag, "en", "", 0);
-        LOGGER.debug("default_lang ("+default_lang+") will never used."); //FIXME: use default_lang or remove it
+        LOGGER.debug("default_lang (" + default_lang + ") will never used."); //FIXME: use default_lang or remove it
         setSourcePath(set_sourcepath);
         maindoc = "";
         ifsid = "";
@@ -154,6 +154,7 @@ final public class MCRMetaIFS extends MCRMetaDefault {
      * @exception MCRException
      *                if the set_sourcepath value is null or empty
      */
+    @Override
     public final void setFromDOM(org.jdom.Element element) throws MCRException {
         super.setFromDOM(element);
         setSourcePath(element.getAttributeValue("sourcepath"));
@@ -169,13 +170,14 @@ final public class MCRMetaIFS extends MCRMetaDefault {
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML MCRClassification part
      */
+    @Override
     public final org.jdom.Element createXML() throws MCRException {
         if (!isValid()) {
             throw new MCRException("The content is not valid.");
         }
 
         org.jdom.Element elm = new org.jdom.Element(subtag);
-        if (sourcepath!=null){
+        if (sourcepath != null) {
             elm.setAttribute("sourcepath", sourcepath);
         }
         elm.setAttribute("maindoc", maindoc);
@@ -194,12 +196,13 @@ final public class MCRMetaIFS extends MCRMetaDefault {
      * 
      * @return a boolean value
      */
+    @Override
     public final boolean isValid() {
         if (!super.isValid()) {
             return false;
         }
 
-        if ((sourcepath != null) && ((sourcepath = sourcepath.trim()).length() == 0)) {
+        if (sourcepath != null && (sourcepath = sourcepath.trim()).length() == 0) {
             return false;
         }
 
@@ -209,6 +212,7 @@ final public class MCRMetaIFS extends MCRMetaDefault {
     /**
      * This method make a NOT clone of this class. It is an empty method.
      */
+    @Override
     public final Object clone() {
         return null;
     }

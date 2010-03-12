@@ -65,7 +65,9 @@ public class PlainTextPlugin implements TextFilterPlugin {
         }
 
         if (info == null) {
-            info = new StringBuffer("This filter just forwards a plain text Inputstream\n").append("it's just to demonstrate the functionality of the mycore\n").append("TextFilterPlugins. Use this as a basis for your own and more\n").append("complex FilterPlugins.").toString();
+            info = new StringBuffer("This filter just forwards a plain text Inputstream\n").append(
+                    "it's just to demonstrate the functionality of the mycore\n").append(
+                    "TextFilterPlugins. Use this as a basis for your own and more\n").append("complex FilterPlugins.").toString();
         }
     }
 

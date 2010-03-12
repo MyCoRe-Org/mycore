@@ -55,8 +55,9 @@ class MCRBrowseRequest {
         path = new StringBuffer(index);
         path.append("/");
 
-        while (st.countTokens() > 1)
+        while (st.countTokens() > 1) {
             addRange(st.nextToken(), st.nextToken());
+        }
 
         search = req.getParameter("search");
         mode = req.getParameter("mode");

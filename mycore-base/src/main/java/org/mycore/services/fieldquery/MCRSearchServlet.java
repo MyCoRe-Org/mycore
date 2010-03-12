@@ -24,7 +24,6 @@
 package org.mycore.services.fieldquery;
 
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -67,8 +66,7 @@ import org.mycore.parsers.bool.MCRSetCondition;
  * @author Frank Lützenkirchen
  * @author Harald Richter
  */
-public class MCRSearchServlet extends MCRServlet 
-{
+public class MCRSearchServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = Logger.getLogger(MCRSearchServlet.class);
@@ -76,6 +74,7 @@ public class MCRSearchServlet extends MCRServlet
     /** Default search field */
     private String defaultSearchField;
 
+    @Override
     public void init() throws ServletException {
         super.init();
         MCRConfiguration config = MCRConfiguration.instance();
@@ -107,17 +106,22 @@ public class MCRSearchServlet extends MCRServlet
         MCRAndCondition condition = new MCRAndCondition();
 
         for (Enumeration names = req.getParameterNames(); names.hasMoreElements();) {
-            String name = (String) (names.nextElement());
-            if (name.endsWith(".operator"))
+            String name = (String) names.nextElement();
+            if (name.endsWith(".operator")) {
                 continue;
-            if (name.contains(".sortField"))
+            }
+            if (name.contains(".sortField")) {
                 continue;
-            if (name.equals("maxResults"))
+            }
+            if (name.equals("maxResults")) {
                 continue;
-            if (name.equals("numPerPage"))
+            }
+            if (name.equals("numPerPage")) {
                 continue;
-            if (name.equals("mask"))
+            }
+            if (name.equals("mask")) {
                 continue;
+            }
 
             MCRFieldDef field = MCRFieldDef.getDef(name);
             String defaultOperator = MCRFieldType.getDefaultOperator(field.getDataType());
@@ -130,8 +134,9 @@ public class MCRSearchServlet extends MCRServlet
                 parent = new MCROrCondition();
                 condition.addChild(parent);
             }
-            for (String value : values)
+            for (String value : values) {
                 parent.addChild(new MCRQueryCondition(field, operator, value));
+            }
         }
 
         return new MCRQuery(MCRQueryParser.normalizeCondition(condition));
@@ -149,10 +154,10 @@ public class MCRSearchServlet extends MCRServlet
             MCRFieldDef fd = MCRFieldDef.getDef(field);
             String defaultOperator = MCRFieldType.getDefaultOperator(fd.getDataType());
             String operator = element.getAttributeValue("operator", defaultOperator);
-            element.setAttribute("operator",operator);
-            
+            element.setAttribute("operator", operator);
+
             List<Element> values = element.getChildren("value");
-            if ((values != null) && (values.size() > 0)) {
+            if (values != null && values.size() > 0) {
                 element.removeAttribute("field");
                 element.setAttribute("operator", "or");
                 element.setName("boolean");
@@ -166,12 +171,14 @@ public class MCRSearchServlet extends MCRServlet
             }
         } else if (element.getName().startsWith("boolean")) {
             element.setName("boolean");
-            for (Object child : element.getChildren())
-                if (child instanceof Element)
+            for (Object child : element.getChildren()) {
+                if (child instanceof Element) {
                     renameElements((Element) child);
+                }
+            }
         }
     }
-  
+
     /**
      * Build MCRQuery from editor XML input
      */
@@ -179,52 +186,59 @@ public class MCRSearchServlet extends MCRServlet
         Element conditions = root.getChild("conditions");
 
         if (conditions.getAttributeValue("format", "xml").equals("xml")) {
-            Element condition = (Element) (conditions.getChildren().get(0));
+            Element condition = (Element) conditions.getChildren().get(0);
             renameElements(condition);
 
             // Remove conditions without values
             List<Element> empty = new ArrayList<Element>();
             for (Iterator it = conditions.getDescendants(new ElementFilter("condition")); it.hasNext();) {
                 Element cond = (Element) it.next();
-                if (cond.getAttribute("value") == null)
+                if (cond.getAttribute("value") == null) {
                     empty.add(cond);
+                }
             }
 
             // Remove empty sort conditions
             Element sortBy = root.getChild("sortBy");
             if (sortBy != null) {
-                for (Element field : (List<Element>) (sortBy.getChildren("field")))
-                    if (field.getAttributeValue("name", "").length() == 0)
+                for (Element field : (List<Element>) sortBy.getChildren("field")) {
+                    if (field.getAttributeValue("name", "").length() == 0) {
                         empty.add(field);
+                    }
+                }
             }
 
-            for (int i = empty.size() - 1; i >= 0; i--)
+            for (int i = empty.size() - 1; i >= 0; i--) {
                 empty.get(i).detach();
+            }
 
-            if ((sortBy != null) && (sortBy.getChildren().size() == 0))
+            if (sortBy != null && sortBy.getChildren().size() == 0) {
                 sortBy.detach();
+            }
         }
 
         return MCRQuery.parseXML(root.getDocument());
     }
-    
+
     private String getReqParameter(HttpServletRequest req, String name, String defaultValue) {
         String value = req.getParameter(name);
-        if ((value == null) || (value.trim().length() == 0))
+        if (value == null || value.trim().length() == 0) {
             return defaultValue;
-        else
+        } else {
             return value.trim();
+        }
     }
-  
+
     private Document setQueryOptions(MCRQuery query, HttpServletRequest req) {
         String maxResults = getReqParameter(req, "maxResults", "0");
         query.setMaxResults(Integer.parseInt(maxResults));
 
         List<String> sortFields = new ArrayList<String>();
         for (Enumeration names = req.getParameterNames(); names.hasMoreElements();) {
-            String name = (String) (names.nextElement());
-            if (name.contains(".sortField"))
+            String name = (String) names.nextElement();
+            if (name.contains(".sortField")) {
                 sortFields.add(name);
+            }
         }
 
         if (sortFields.size() > 0) {
@@ -253,31 +267,32 @@ public class MCRSearchServlet extends MCRServlet
         return xml;
     }
 
+    @Override
     public void doGetPost(MCRServletJob job) throws IOException {
         HttpServletRequest request = job.getRequest();
         HttpServletResponse response = job.getResponse();
 
         String mode = job.getRequest().getParameter("mode");
-        if ("results".equals(mode))
+        if ("results".equals(mode)) {
             showResults(request, response);
-        else if ("load".equals(mode))
+        } else if ("load".equals(mode)) {
             loadQuery(request, response);
-        else
+        } else {
             doQuery(request, response);
+        }
     }
-    
+
     /**
      * Returns a query that was previously submitted, to reload it into the
      * editor search mask. Usage: MCRSearchServlet?mode=load&id=XXXXX
      */
     protected void loadQuery(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String id = request.getParameter( "id" );
-        MCRCachedQueryData qd = MCRCachedQueryData.getData( id );
-        if( qd == null )
-        {
-          throw new MCRException( "Result list is not in cache any more, please re-run query" );
+        String id = request.getParameter("id");
+        MCRCachedQueryData qd = MCRCachedQueryData.getData(id);
+        if (qd == null) {
+            throw new MCRException("Result list is not in cache any more, please re-run query");
         }
-        getLayoutService().sendXML(request, response, qd.getInput() );   
+        getLayoutService().sendXML(request, response, qd.getInput());
     }
 
     /**
@@ -293,41 +308,47 @@ public class MCRSearchServlet extends MCRServlet
             doQuery(request, response);
             return;
         }
-        
+
         MCRResults results = qd.getResults();
 
         // Number of hits per page
         String snpp = request.getParameter("numPerPage");
-        if (snpp == null)
+        if (snpp == null) {
             snpp = "0";
+        }
         int npp = Integer.parseInt(snpp);
-        if (npp > results.getNumHits())
+        if (npp > results.getNumHits()) {
             npp = 0;
+        }
 
         // Current page number
         String spage = request.getParameter("page");
-        if (spage == null)
+        if (spage == null) {
             spage = "1";
+        }
         int page = Integer.parseInt(spage);
-        
+
         // Total number of pages
         int numHits = Math.max(1, results.getNumHits());
         int numPages = 1;
-        if (npp > 0)
-            numPages = (int) (Math.ceil((double) numHits / (double) npp));
+        if (npp > 0) {
+            numPages = (int) Math.ceil((double) numHits / (double) npp);
+        }
 
-        if (npp == 0)
+        if (npp == 0) {
             page = 1;
-        else if (page > numPages)
+        } else if (page > numPages) {
             page = numPages;
-        else if (page < 1)
+        } else if (page < 1) {
             page = 1;
+        }
 
         // Number of first and last hit to be shown
         int first = (page - 1) * npp;
         int last = results.getNumHits() - 1;
-        if (npp > 0)
+        if (npp > 0) {
             last = Math.min(results.getNumHits(), first + npp) - 1;
+        }
 
         // Build result hits as XML document
         Element xml = results.buildXML(first, last);
@@ -358,7 +379,7 @@ public class MCRSearchServlet extends MCRServlet
      */
     protected void doQuery(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        MCREditorSubmission sub = (MCREditorSubmission) (request.getAttribute("MCREditorSubmission"));
+        MCREditorSubmission sub = (MCREditorSubmission) request.getAttribute("MCREditorSubmission");
         String searchString = getReqParameter(request, "search", null);
         String queryString = getReqParameter(request, "query", null);
 
@@ -366,15 +387,16 @@ public class MCRSearchServlet extends MCRServlet
         MCRQuery query;
 
         if (sub != null) {
-            input = (Document) (sub.getXML().clone());
+            input = (Document) sub.getXML().clone();
             query = buildFormQuery(sub.getXML().getRootElement());
         } else {
-            if (queryString != null)
+            if (queryString != null) {
                 query = buildComplexQuery(queryString);
-            else if (searchString != null)
+            } else if (searchString != null) {
                 query = buildDefaultQuery(searchString);
-            else
+            } else {
                 query = buildNameValueQuery(request);
+            }
 
             input = setQueryOptions(query, request);
         }
@@ -386,7 +408,7 @@ public class MCRSearchServlet extends MCRServlet
         }
 
         MCRCachedQueryData qd = MCRCachedQueryData.cache(query, input);
-        sendRedirect(request,response,qd,input);
+        sendRedirect(request, response, qd, input);
     }
 
     /**      
@@ -396,16 +418,16 @@ public class MCRSearchServlet extends MCRServlet
      * @author Frank Lützenkirchen
      *   
      * @see its overwritten in jspdocportal     
-     */     
+     */
     protected void sendRedirect(HttpServletRequest req, HttpServletResponse res, MCRCachedQueryData qd, Document query) throws IOException {
-        
+
         // Redirect browser to first results page   
-        StringBuffer sb = new StringBuffer();   
+        StringBuffer sb = new StringBuffer();
         sb.append("MCRSearchServlet?mode=results&id=").append(qd.getResults().getID());
 
         String numPerPage = query.getRootElement().getAttributeValue("numPerPage", "0");
         sb.append("&numPerPage=").append(numPerPage);
-        
+
         String mask = query.getRootElement().getAttributeValue("mask", "-");
         sb.append("&mask=").append(mask);
 
@@ -416,28 +438,29 @@ public class MCRSearchServlet extends MCRServlet
         sb.append("&maxResults=").append(maxResults);
 
         List<MCRSortBy> list = qd.getQuery().getSortBy();
-        if( list != null ) for( int i = 0; i < list.size(); i++ )
-        {
-          MCRSortBy sortBy = list.get(i);
-          sb.append( "&" ).append( sortBy.getField().getName() );
-          sb.append( ".sortField." ).append( i + 1 );
-          sb.append( "=" ).append( sortBy.getSortOrder() == MCRSortBy.ASCENDING ? "ascending" : "descending" );
+        if (list != null) {
+            for (int i = 0; i < list.size(); i++) {
+                MCRSortBy sortBy = list.get(i);
+                sb.append("&").append(sortBy.getField().getName());
+                sb.append(".sortField.").append(i + 1);
+                sb.append("=").append(sortBy.getSortOrder() == MCRSortBy.ASCENDING ? "ascending" : "descending");
+            }
         }
-        
-        String style = req.getParameter("XSL.Style");   
-        if ((style != null) && (style.trim().length() != 0)){   
-            sb.append("&XSL.Style=").append(style);     
+
+        String style = req.getParameter("XSL.Style");
+        if (style != null && style.trim().length() != 0) {
+            sb.append("&XSL.Style=").append(style);
         }
-        
-        res.sendRedirect(res.encodeRedirectURL(sb.toString()));     
+
+        res.sendRedirect(res.encodeRedirectURL(sb.toString()));
     }
-    
-   /**
-     * Forwards the document to the output
-     * 
-     * @author A.Schaar
-     * @see its overwritten in jspdocportal
-     */
+
+    /**
+      * Forwards the document to the output
+      * 
+      * @author A.Schaar
+      * @see its overwritten in jspdocportal
+      */
     protected void sendToLayout(HttpServletRequest req, HttpServletResponse res, Document jdom) throws IOException {
         getLayoutService().doLayout(req, res, jdom);
     }

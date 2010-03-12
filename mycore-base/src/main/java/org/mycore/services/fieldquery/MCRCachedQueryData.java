@@ -27,7 +27,6 @@ import org.jdom.Document;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.parsers.bool.MCRCondition;
 
 /**
  * Manages a cache that contains the data of the most recently used queries.
@@ -37,87 +36,84 @@ import org.mycore.parsers.bool.MCRCondition;
  * 
  * @author Frank Lützenkirchen
  */
-public class MCRCachedQueryData
-{
-  /** A cache that contains the data of the most recently used queries */
-  protected static MCRCache cache;
-  
-  static
-  { 
-    int cacheSize = MCRConfiguration.instance().getInt( "MCR.SearchServlet.CacheSize", 50 );
-    cache = new MCRCache( cacheSize, "SearchServlet query data cache" ); 
-  }
-  
-  private final static String LAST_QUERY_IN_SESSION = "LastQuery";
-  
-  public static MCRCachedQueryData getData(String id) {
+public class MCRCachedQueryData {
+    /** A cache that contains the data of the most recently used queries */
+    protected static MCRCache cache;
+
+    static {
+        int cacheSize = MCRConfiguration.instance().getInt("MCR.SearchServlet.CacheSize", 50);
+        cache = new MCRCache(cacheSize, "SearchServlet query data cache");
+    }
+
+    private final static String LAST_QUERY_IN_SESSION = "LastQuery";
+
+    public static MCRCachedQueryData getData(String id) {
         // The n most recently used queries are in a global cache
-        MCRCachedQueryData data = (MCRCachedQueryData) (cache.get(id));
+        MCRCachedQueryData data = (MCRCachedQueryData) cache.get(id);
         if (data == null) {
             // Additionally, the last query of a single session is always there
-            data = (MCRCachedQueryData) (MCRSessionMgr.getCurrentSession().get(LAST_QUERY_IN_SESSION));
+            data = (MCRCachedQueryData) MCRSessionMgr.getCurrentSession().get(LAST_QUERY_IN_SESSION);
             // May be the last query in session is the one we are looking for
-            if ((data != null) && (data.getResults().getID().equals(id)))
+            if (data != null && data.getResults().getID().equals(id)) {
                 return data;
+            }
         }
         return data; // May be null, if no cached query data found
-    }        
-  
-  /** The query as XML, for later reloading into search mask editor form */
-  private Document input; 
-  
-  /** The result list */
-  private MCRResults results;
-  
-  /** The normalized query */
-  private MCRQuery query;
-  
-  /** The page last displayed */
-  private int page;
-  
-  private int numPerPage;
-  
-  public static MCRCachedQueryData cache(MCRQuery query, Document input) {
-    MCRResults results = MCRQueryManager.search(query);
-    MCRCachedQueryData data = new MCRCachedQueryData(results, input, query);
-    cache.put( results.getID(), data );
-    MCRSessionMgr.getCurrentSession().put( LAST_QUERY_IN_SESSION, data );
-    return data;
-  }
-  
-  private MCRCachedQueryData( MCRResults results, Document input, MCRQuery query )
-  {
-    this.results = results;
-    this.input = input;
-    this.query = query;
-  }
-  
-  public MCRQuery getQuery()
-  { return query; }
+    }
 
-  public int getNumPerPage()
-  { return numPerPage; }
+    /** The query as XML, for later reloading into search mask editor form */
+    private Document input;
 
-  public void setNumPerPage( int numPerPage )
-  {
-    this.numPerPage = numPerPage;
-  }
+    /** The result list */
+    private MCRResults results;
 
-  public int getPage()
-  {
-    return page;
-  }
+    /** The normalized query */
+    private MCRQuery query;
 
-  public void setPage( int page )
-  {
-    this.page = page;
-  }
+    /** The page last displayed */
+    private int page;
 
-  public Document getInput()
-  {
-    return input;
-  }
-  
-  public MCRResults getResults()
-  { return results; }
+    private int numPerPage;
+
+    public static MCRCachedQueryData cache(MCRQuery query, Document input) {
+        MCRResults results = MCRQueryManager.search(query);
+        MCRCachedQueryData data = new MCRCachedQueryData(results, input, query);
+        cache.put(results.getID(), data);
+        MCRSessionMgr.getCurrentSession().put(LAST_QUERY_IN_SESSION, data);
+        return data;
+    }
+
+    private MCRCachedQueryData(MCRResults results, Document input, MCRQuery query) {
+        this.results = results;
+        this.input = input;
+        this.query = query;
+    }
+
+    public MCRQuery getQuery() {
+        return query;
+    }
+
+    public int getNumPerPage() {
+        return numPerPage;
+    }
+
+    public void setNumPerPage(int numPerPage) {
+        this.numPerPage = numPerPage;
+    }
+
+    public int getPage() {
+        return page;
+    }
+
+    public void setPage(int page) {
+        this.page = page;
+    }
+
+    public Document getInput() {
+        return input;
+    }
+
+    public MCRResults getResults() {
+        return results;
+    }
 }

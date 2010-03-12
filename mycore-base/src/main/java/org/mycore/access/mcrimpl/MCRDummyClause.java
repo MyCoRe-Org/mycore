@@ -45,6 +45,7 @@ class MCRDummyClause implements MCRCondition {
         return false;
     }
 
+    @Override
     public String toString() {
         return "\"" + s + "\"";
     }

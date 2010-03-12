@@ -71,6 +71,7 @@ public class MCRSession implements Cloneable {
     AtomicInteger concurrentAccess;
 
     ThreadLocal<AtomicInteger> currentThreadCount = new ThreadLocal<AtomicInteger>() {
+        @Override
         public AtomicInteger initialValue() {
             return new AtomicInteger();
         }
@@ -140,8 +141,9 @@ public class MCRSession implements Cloneable {
 
         long sum = Integer.parseInt(st.nextToken());
 
-        while (st.hasMoreTokens())
+        while (st.hasMoreTokens()) {
             sum = (sum << 8) + Integer.parseInt(st.nextToken());
+        }
 
         String address = Long.toString(sum, 36);
         address = "000000" + address;
@@ -177,13 +179,13 @@ public class MCRSession implements Cloneable {
      * This method is thread safe.
      */
     public List<Map.Entry<Object, Object>> getMapEntries() {
-        if (this.mapChanged) {
-            this.mapChanged = false;
+        if (mapChanged) {
+            mapChanged = false;
             final Set<Entry<Object, Object>> entrySet = Collections.unmodifiableMap(map).entrySet();
             final Map.Entry<Object, Object>[] entryArray = entrySet.toArray(emptyEntryArray);
-            this.mapEntries = Collections.unmodifiableList(Arrays.asList(entryArray));
+            mapEntries = Collections.unmodifiableList(Arrays.asList(entryArray));
         }
-        return this.mapEntries;
+        return mapEntries;
     }
 
     /** returns the current user ID */
@@ -218,12 +220,12 @@ public class MCRSession implements Cloneable {
 
     /** sets the current user fullname */
     public final void setCurrentUserName(String userName) {
-        this.FullName = userName;
+        FullName = userName;
     }
 
     /** sets the current document ID */
     public final void setCurrentDocumentID(String DocumentID) {
-        this.CurrentDocumentID = DocumentID;
+        CurrentDocumentID = DocumentID;
     }
 
     /** Write data to the logger for debugging purposes */
@@ -267,12 +269,13 @@ public class MCRSession implements Cloneable {
     /** Set the ip to the given IP */
     public final void setCurrentIP(String newip) {
         java.util.StringTokenizer st = new java.util.StringTokenizer(newip, ".");
-        if (st.countTokens() != 4)
+        if (st.countTokens() != 4) {
             return;
+        }
         try {
             while (st.hasMoreTokens()) {
                 int i = Integer.parseInt(st.nextToken());
-                if ((i < 0) || (i > 255)) {
+                if (i < 0 || i > 255) {
                     return;
                 }
             }
@@ -280,7 +283,7 @@ public class MCRSession implements Cloneable {
             LOGGER.debug("Exception while parsing new ip " + newip + " using old value.", e);
             return;
         }
-        this.ip = newip;
+        ip = newip;
     }
 
     public final long getLoginTime() {
@@ -295,9 +298,10 @@ public class MCRSession implements Cloneable {
         LOGGER.debug("Clearing local map.");
         map.clear();
         mapEntries = null;
-        this.sessionID = null;
+        sessionID = null;
     }
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("MCRSession[");
@@ -385,18 +389,21 @@ public class MCRSession implements Cloneable {
 
     public Principal getUserPrincipal() {
         MCRServletJob job = (MCRServletJob) get("MCRServletJob");
-        if (job == null)
+        if (job == null) {
             return null;
+        }
         return job.getRequest().getUserPrincipal();
     }
 
     public boolean isPrincipalInRole(String role) {
         Principal p = getUserPrincipal();
-        if (p == null)
+        if (p == null) {
             return false;
+        }
         MCRServletJob job = (MCRServletJob) get("MCRServletJob");
-        if (job == null)
+        if (job == null) {
             return false;
+        }
         return job.getRequest().isUserInRole(role);
     }
 
@@ -404,8 +411,9 @@ public class MCRSession implements Cloneable {
      * starts a new database transaction.
      */
     public void beginTransaction() {
-        if (dataBaseAccess)
+        if (dataBaseAccess) {
             transaction.set(MCRHIBConnection.instance().getSession().beginTransaction());
+        }
     }
 
     /**

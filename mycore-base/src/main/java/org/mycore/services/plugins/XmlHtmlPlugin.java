@@ -36,7 +36,6 @@ import org.jdom.Comment;
 import org.jdom.Element;
 import org.jdom.Text;
 import org.jdom.input.SAXBuilder;
-import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.ifs.MCRFileContentType;
 import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
@@ -136,7 +135,7 @@ public class XmlHtmlPlugin implements TextFilterPlugin {
                 return getText(builder.build(input)); // file.getContentAsJDOM()
             } else if (ct.getID().equals("html")) {
                 org.jdom.Document xml = tidy(input);
-                return (xml == null ? "" : getText(xml));
+                return xml == null ? "" : getText(xml);
             } else {
                 return null;
             }
@@ -150,10 +149,11 @@ public class XmlHtmlPlugin implements TextFilterPlugin {
     /** Converts HTML string to XML to be able to extract text nodes * */
     public static String getFullText(String html) {
         org.jdom.Document xml = tidy(new ByteArrayInputStream(html.getBytes()));
-        if (xml == null)
+        if (xml == null) {
             return null;
-        else
+        } else {
             return getText(xml);
+        }
     }
 
     /** Converts HTML files to XML to be able to extract text nodes * */
@@ -195,14 +195,14 @@ public class XmlHtmlPlugin implements TextFilterPlugin {
     private static String getText(org.jdom.Document xml) {
         StringBuffer buffer = new StringBuffer();
         xml2txt(buffer, xml.getContent());
-        LOGGER.debug("------ after xml2txt ------" );
+        LOGGER.debug("------ after xml2txt ------");
         LOGGER.debug(buffer.toString());
         return buffer.toString();
     }
 
     /** Extracts text of text nodes and comment nodes from xml files * */
     private static void xml2txt(StringBuffer buffer, List content) {
-        for (int i = 0; (content != null) && (i < content.size()); i++) {
+        for (int i = 0; content != null && i < content.size(); i++) {
             Object obj = content.get(i);
 
             if (obj instanceof Element) {

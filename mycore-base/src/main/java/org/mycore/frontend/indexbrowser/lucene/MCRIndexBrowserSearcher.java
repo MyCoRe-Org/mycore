@@ -34,9 +34,11 @@ public class MCRIndexBrowserSearcher {
     protected static Logger LOGGER = Logger.getLogger(MCRIndexBrowserSearcher.class);
 
     protected MCRIndexBrowserIncomingData browseData;
+
     protected MCRIndexBrowserConfig indexConfig;
 
     protected MCRQuery query;
+
     protected MCRResults results;
 
     protected List<MCRIndexBrowserEntry> hitList;
@@ -70,7 +72,7 @@ public class MCRIndexBrowserSearcher {
         MCRCondition cond = buildCondition();
         List<MCRSortBy> sortCriteria = buildSortCriteria();
         MCRQuery query = new MCRQuery(cond, sortCriteria, 0);
-        if(LOGGER.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             XMLOutputter out = new XMLOutputter(org.jdom.output.Format.getPrettyFormat());
             LOGGER.debug("Query: \n" + out.outputString(query.buildXML()));
         }
@@ -111,7 +113,8 @@ public class MCRIndexBrowserSearcher {
                 cAnd.addChild(new MCRQueryCondition(fieldtype, "=", indexConfig.getIndex()));
             } else {
                 fieldtype = MCRFieldDef.getDef("objectType");
-                cAnd.addChild(new MCRQueryCondition(fieldtype, "=", indexConfig.getIndex().substring(ilen + 1, indexConfig.getIndex().length())));
+                cAnd.addChild(new MCRQueryCondition(fieldtype, "=", indexConfig.getIndex().substring(ilen + 1,
+                        indexConfig.getIndex().length())));
                 fieldproject = MCRFieldDef.getDef("objectProject");
                 cAnd.addChild(new MCRQueryCondition(fieldproject, "=", indexConfig.getIndex().substring(0, ilen)));
             }
@@ -119,9 +122,13 @@ public class MCRIndexBrowserSearcher {
         if (browseData.getSearch() != null && browseData.getSearch().length() > 0) {
             MCRFieldDef field = MCRFieldDef.getDef(indexConfig.getBrowseField());
             String value = browseData.getSearch();
-            if (browseData != null && browseData.getMode() != null && browseData.getMode().equalsIgnoreCase("contains")){
-            	if(!value.startsWith("\\*")){value="*"+value;}
-            	if(!value.endsWith("\\*")){value=value+"*";}
+            if (browseData != null && browseData.getMode() != null && browseData.getMode().equalsIgnoreCase("contains")) {
+                if (!value.startsWith("\\*")) {
+                    value = "*" + value;
+                }
+                if (!value.endsWith("\\*")) {
+                    value = value + "*";
+                }
             }
             String operator = getOperator();
             cAnd.addChild(new MCRQueryCondition(field, operator, value));
@@ -139,10 +146,11 @@ public class MCRIndexBrowserSearcher {
 
         for (String sortFieldValue : indexConfig.getSortFields()) {
             MCRFieldDef field = MCRFieldDef.getDef(sortFieldValue);
-            if (null != field)
+            if (null != field) {
                 sortCriteria.add(new MCRSortBy(field, order));
-            else
+            } else {
                 LOGGER.error("MCRFieldDef not available: " + sortFieldValue);
+            }
         }
         return sortCriteria;
     }
@@ -170,7 +178,7 @@ public class MCRIndexBrowserSearcher {
                 sortData.add(0, value);
             }
             Iterator<MCRFieldValue> it = sortData.iterator();
-            while(it.hasNext()) {
+            while (it.hasNext()) {
                 entry.addSortValue(it.next().getValue());
             }
             entry.setObjectId(hit.getID());
@@ -189,14 +197,15 @@ public class MCRIndexBrowserSearcher {
      * 
      */
     protected String getOperator() {
-        if (browseData != null && browseData.getMode() != null && browseData.getMode().equalsIgnoreCase("equals"))
+        if (browseData != null && browseData.getMode() != null && browseData.getMode().equalsIgnoreCase("equals")) {
             return "=";
-        else if (browseData != null && browseData.getMode() != null && browseData.getMode().equalsIgnoreCase("prefix"))
+        } else if (browseData != null && browseData.getMode() != null && browseData.getMode().equalsIgnoreCase("prefix")) {
             return "like";
-        else if (browseData != null && browseData.getMode() != null && browseData.getMode().equalsIgnoreCase("contains"))
+        } else if (browseData != null && browseData.getMode() != null && browseData.getMode().equalsIgnoreCase("contains")) {
             return "like";
-        else
+        } else {
             return "like";
+        }
     }
 
     /**
@@ -206,5 +215,5 @@ public class MCRIndexBrowserSearcher {
     public List<MCRIndexBrowserEntry> getResultList() {
         return hitList;
     }
-    
+
 }

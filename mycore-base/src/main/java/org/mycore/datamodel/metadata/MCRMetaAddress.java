@@ -88,7 +88,9 @@ final public class MCRMetaAddress extends MCRMetaDefault {
      * @param set_number      the number string
      * @exception MCRException if the parameter values are invalid
      */
-    public MCRMetaAddress(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted, String set_country, String set_state, String set_zipcode, String set_city, String set_street, String set_number) throws MCRException {
+    public MCRMetaAddress(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted,
+            String set_country, String set_state, String set_zipcode, String set_city, String set_street, String set_number)
+            throws MCRException {
         super(set_datapart, set_subtag, default_lang, set_type, set_inherted);
         country = "";
         state = "";
@@ -139,7 +141,7 @@ final public class MCRMetaAddress extends MCRMetaDefault {
      *            the number string
      */
     public final void set(String set_country, String set_state, String set_zipcode, String set_city, String set_street, String set_number) {
-        if ((set_country == null) || (set_state == null) || (set_zipcode == null) || (set_city == null) || (set_street == null) || (set_number == null)) {
+        if (set_country == null || set_state == null || set_zipcode == null || set_city == null || set_street == null || set_number == null) {
             throw new MCRException("One parameter is null.");
         }
 
@@ -212,6 +214,7 @@ final public class MCRMetaAddress extends MCRMetaDefault {
      * @param element
      *            a relevant JDOM element for the metadata
      */
+    @Override
     public final void setFromDOM(org.jdom.Element element) {
         super.setFromDOM(element);
         country = element.getChildTextTrim("country");
@@ -259,6 +262,7 @@ final public class MCRMetaAddress extends MCRMetaDefault {
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML MCRMetaAddress part
      */
+    @Override
     public final org.jdom.Element createXML() throws MCRException {
         if (!isValid()) {
             throw new MCRException("The content of MCRMetaAddress is not valid.");
@@ -268,7 +272,7 @@ final public class MCRMetaAddress extends MCRMetaDefault {
         elm.setAttribute("lang", lang, Namespace.XML_NAMESPACE);
         elm.setAttribute("inherited", Integer.toString(inherited));
 
-        if ((type != null) && ((type = type.trim()).length() != 0)) {
+        if (type != null && (type = type.trim()).length() != 0) {
             elm.setAttribute("type", type);
         }
 
@@ -314,8 +318,10 @@ final public class MCRMetaAddress extends MCRMetaDefault {
      * 
      * @return a boolean value
      */
+    @Override
     public final boolean isValid() {
-        if (((country = country.trim()).length() == 0) && ((state = state.trim()).length() == 0) && ((zipcode = zipcode.trim()).length() == 0) && ((city = city.trim()).length() == 0) && ((street = street.trim()).length() == 0) && ((number = number.trim()).length() == 0)) {
+        if ((country = country.trim()).length() == 0 && (state = state.trim()).length() == 0 && (zipcode = zipcode.trim()).length() == 0
+                && (city = city.trim()).length() == 0 && (street = street.trim()).length() == 0 && (number = number.trim()).length() == 0) {
             return false;
         }
 
@@ -325,13 +331,15 @@ final public class MCRMetaAddress extends MCRMetaDefault {
     /**
      * This method make a clone of this class.
      */
+    @Override
     public Object clone() {
         return new MCRMetaAddress(datapart, subtag, DEFAULT_LANGUAGE, type, inherited, country, state, zipcode, city, street, number);
     }
-    
+
     /**
      * This method put debug data to the logger (for the debug mode).
      */
+    @Override
     public final void debug() {
         super.debugDefault();
         LOGGER.debug("Country            = " + country);

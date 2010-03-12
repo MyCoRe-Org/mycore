@@ -44,7 +44,8 @@ public class MCRIndexBrowserServlet extends MCRServlet {
     protected MCRIndexBrowserIncomingData incomingBrowserData;
 
     protected MCRIndexBrowserConfig config;
-    
+
+    @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
         @SuppressWarnings("unchecked")
         Enumeration<String> ee = job.getRequest().getParameterNames();
@@ -59,7 +60,7 @@ public class MCRIndexBrowserServlet extends MCRServlet {
         Document pageContent = null;
         // if init is true, then create an empty document, otherwise create
         // the result list
-        if(!incomingBrowserData.isInit()) {
+        if (!incomingBrowserData.isInit()) {
             pageContent = createResultListDocument();
         } else {
             pageContent = createEmptyDocument();
@@ -88,6 +89,6 @@ public class MCRIndexBrowserServlet extends MCRServlet {
     }
 
     protected MCRIndexBrowserIncomingData getIncomingBrowserData(HttpServletRequest request) {
-        return  MCRIndexBrowserUtils.getIncomingBrowserData(request);
+        return MCRIndexBrowserUtils.getIncomingBrowserData(request);
     }
 }

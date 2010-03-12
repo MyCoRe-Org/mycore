@@ -37,7 +37,7 @@ public interface MCRURNStore {
 
     /** Assigns the given urn to the given derivate ID */
     public void assignURN(String urn, String derivate, String path, String filename);
-    
+
     /**
      * Retrieves the URN that is assigned to the given document ID
      * 
@@ -56,13 +56,13 @@ public interface MCRURNStore {
      * Removes the urn (and assigned document ID) from the persistent store
      */
     public void removeURN(String urn);
-    
+
     /**
      * Removes the urn (and assigned document ID) from the persistent store by the 
      * given object id
      */
     public void removeURNByObjectID(String objID);
-    
+
     /**Checks wether an object or derivate has an urn assigned*/
     public boolean hasURNAssigned(String objId);
 }

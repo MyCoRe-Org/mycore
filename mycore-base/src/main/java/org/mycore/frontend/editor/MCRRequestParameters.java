@@ -33,7 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.fileupload.DiskFileUpload;
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUpload;
+import org.apache.commons.fileupload.FileUploadBase;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
@@ -69,11 +69,13 @@ public class MCRRequestParameters {
         maxSize = config.getLong(prefix + "FileUpload.MaxSize", 5000000);
         tmpPath = config.getString(prefix + "FileUpload.TempStoragePath");
         File tmp = new File(tmpPath);
-        if (!tmp.isDirectory()) { tmp.mkdir(); }
+        if (!tmp.isDirectory()) {
+            tmp.mkdir();
+        }
     }
 
     public MCRRequestParameters(HttpServletRequest req) {
-        if (FileUpload.isMultipartContent(req)) {
+        if (FileUploadBase.isMultipartContent(req)) {
             DiskFileUpload parser = new DiskFileUpload();
             parser.setHeaderEncoding("UTF-8");
             parser.setSizeThreshold(threshold);
@@ -90,7 +92,7 @@ public class MCRRequestParameters {
             }
 
             for (int i = 0; i < items.size(); i++) {
-                FileItem item = (FileItem) (items.get(i));
+                FileItem item = (FileItem) items.get(i);
 
                 String name = item.getFieldName();
                 String value = null;
@@ -105,7 +107,7 @@ public class MCRRequestParameters {
                     value = item.getName();
                 }
 
-                if ((value != null) && (value.trim().length() > 0) && (!files.containsKey(name))) {
+                if (value != null && value.trim().length() > 0 && !files.containsKey(name)) {
                     if (!item.isFormField()) {
                         files.put(name, item);
                     }
@@ -117,10 +119,10 @@ public class MCRRequestParameters {
             }
         } else {
             for (Enumeration e = req.getParameterNames(); e.hasMoreElements();) {
-                String name = (String) (e.nextElement());
+                String name = (String) e.nextElement();
                 String[] values = req.getParameterValues(name);
 
-                if ((values != null) && (values.length > 0)) {
+                if (values != null && values.length > 0) {
                     parameters.put(name, values);
                 }
             }
@@ -134,17 +136,17 @@ public class MCRRequestParameters {
     public String getParameter(String name) {
         String[] values = getParameterValues(name);
 
-        if ((values == null) || (values.length == 0)) {
+        if (values == null || values.length == 0) {
             return null;
         }
         return values[0];
     }
 
     public String[] getParameterValues(String name) {
-        return (String[]) (parameters.get(name));
+        return (String[]) parameters.get(name);
     }
 
     public FileItem getFileItem(String name) {
-        return (FileItem) (files.get(name));
+        return (FileItem) files.get(name);
     }
 }

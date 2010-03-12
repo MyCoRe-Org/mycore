@@ -47,6 +47,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
      * (non-Javadoc)
      * @see org.mycore.common.MCRHibTestCase#setUp()
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         if (SERVICE == null) {
@@ -73,6 +74,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
      * (non-Javadoc)
      * @see org.mycore.common.MCRHibTestCase#tearDown()
      */
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
     }
@@ -153,8 +155,9 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
 
     private String getType(String objectID) {
         for (MCRCategoryLink link : testLinks) {
-            if (link.getObjectReference().getObjectID().equals(objectID))
+            if (link.getObjectReference().getObjectID().equals(objectID)) {
                 return link.getObjectReference().getType();
+            }
         }
         return null;
     }
@@ -170,7 +173,8 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         LOGGER.debug(map);
         assertEquals("Returned amount of MCRCategoryIDs does not match.", getAllCategIDs(category).size(), map.size());
         assertEquals("Count of Europe links does not match.", 8, map.get(category.getChildren().get(0).getId()).intValue());
-        assertEquals("Count of Germany links does not match.", 5, map.get(category.getChildren().get(0).getChildren().get(0).getId()).intValue());
+        assertEquals("Count of Germany links does not match.", 5, map.get(category.getChildren().get(0).getChildren().get(0).getId())
+                .intValue());
         map = SERVICE.countLinks(category, true);
         assertEquals("Count of Europe links does not match.", 8, map.get(category.getChildren().get(0).getId()).intValue());
     }

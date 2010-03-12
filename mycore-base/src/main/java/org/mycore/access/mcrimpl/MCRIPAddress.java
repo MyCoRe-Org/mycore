@@ -67,42 +67,46 @@ public class MCRIPAddress {
     public void init(InetAddress address) {
         int t;
         this.address = address.getAddress();
-        this.mask = new byte[this.address.length];
+        mask = new byte[this.address.length];
 
-        for (t = 0; t < this.address.length; t++)
-            this.mask[t] = (byte) 255;
+        for (t = 0; t < this.address.length; t++) {
+            mask[t] = (byte) 255;
+        }
     }
 
     boolean contains(MCRIPAddress other) {
         int t;
 
-        if (this.address.length != other.address.length) {
+        if (address.length != other.address.length) {
             throw new IllegalStateException("can't map IPv6 to IPv4 and vice versa");
         }
 
         for (t = 0; t < address.length; t++) {
-            if ((this.address[t] & this.mask[t]) != (other.address[t] & this.mask[t])) {
+            if ((address[t] & mask[t]) != (other.address[t] & mask[t])) {
                 return false;
             }
         }
 
         return true;
     }
-    
-    public String toString(){
+
+    @Override
+    public String toString() {
         StringBuffer sb = new StringBuffer("");
-        for (int i=0; i<address.length; i++){
-        	if(i > 0) 
-        		sb.append(".");
-        	sb.append((address[i]&255));
+        for (int i = 0; i < address.length; i++) {
+            if (i > 0) {
+                sb.append(".");
+            }
+            sb.append((address[i] & 255));
         }
         sb.append("/");
-        for (int i=0; i<mask.length; i++){
-        	if(i > 0) 
-        		sb.append(".");
-        	sb.append((mask[i]&255));
-        }        
+        for (int i = 0; i < mask.length; i++) {
+            if (i > 0) {
+                sb.append(".");
+            }
+            sb.append((mask[i] & 255));
+        }
         return sb.toString();
-        
+
     }
 }

@@ -207,7 +207,7 @@ public interface MCRCategoryDAO {
      *            to be set or updated
      */
     public abstract void setLabel(MCRCategoryID id, MCRLabel label);
-    
+
     /**
      * allows to determine when the last change was made to the categories.
      * @return either the last change time or the init time of the DAO class

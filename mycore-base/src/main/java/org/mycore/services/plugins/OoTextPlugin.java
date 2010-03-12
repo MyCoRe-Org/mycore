@@ -23,7 +23,6 @@
 
 package org.mycore.services.plugins;
 
-
 /**
  * @author Thomas Scheffler (yagee)
  * 
@@ -48,6 +47,7 @@ public class OoTextPlugin extends OpenOfficeBasePlugin {
      * 
      * @see org.mycore.services.plugins.TextFilterPlugin#getName()
      */
+    @Override
     public String getName() {
         return "Yagee's amazing OpenOffice.org Text Filter";
     }
@@ -57,6 +57,7 @@ public class OoTextPlugin extends OpenOfficeBasePlugin {
      * 
      * @see org.mycore.services.plugins.TextFilterPlugin#getInfo()
      */
+    @Override
     public String getInfo() {
         return "This filter extracts the text out of a OpenOffice.org Text Document";
     }
@@ -64,6 +65,7 @@ public class OoTextPlugin extends OpenOfficeBasePlugin {
     /**
      * @see org.mycore.services.plugins.TextFilterPlugin#getMajorNumber()
      */
+    @Override
     public int getMajorNumber() {
         return MAJOR;
     }
@@ -71,14 +73,17 @@ public class OoTextPlugin extends OpenOfficeBasePlugin {
     /**
      * @see org.mycore.services.plugins.TextFilterPlugin#getMinorNumber()
      */
+    @Override
     public int getMinorNumber() {
         return MINOR;
     }
 
+    @Override
     String getTextNameSpace() {
         return "http://openoffice.org/2000/text";
     }
 
+    @Override
     String getDocumentName() {
         return "OpenOffice.org Text Document";
     }

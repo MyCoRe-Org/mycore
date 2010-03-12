@@ -129,8 +129,9 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
         } catch (Exception e) {
             throw new MCRException(msg + uri, e);
         }
-        if (inputSource == null)
+        if (inputSource == null) {
             throw new MCRException("Could not get " + uri);
+        }
         return parse(inputSource, validate);
     }
 
@@ -224,13 +225,14 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
      * @throws SAXParseException 
      */
     private Document parse(InputSource source, boolean validate) throws SAXParseException {
-        SAXBuilder builder = (validate ? this.builderValid : this.builder);
+        SAXBuilder builder = validate ? builderValid : this.builder;
 
         try {
             return builder.build(source);
         } catch (Exception ex) {
-            if (ex instanceof SAXParseException)
-                throw (SAXParseException)ex;
+            if (ex instanceof SAXParseException) {
+                throw (SAXParseException) ex;
+            }
             throw new MCRException(msg, ex);
         }
     }

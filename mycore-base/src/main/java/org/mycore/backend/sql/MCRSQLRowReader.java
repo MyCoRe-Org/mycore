@@ -84,7 +84,7 @@ public class MCRSQLRowReader {
         try {
             String value = rs.getString(index);
 
-            return (rs.wasNull() ? null : value);
+            return rs.wasNull() ? null : value;
         } catch (SQLException ex) {
             throw new MCRPersistenceException("Could not get value from JDBC result set", ex);
         }
@@ -119,7 +119,7 @@ public class MCRSQLRowReader {
         try {
             String value = rs.getString(columnName);
 
-            return (rs.wasNull() ? null : value);
+            return rs.wasNull() ? null : value;
         } catch (SQLException ex) {
             throw new MCRPersistenceException("Could not get value from JDBC result set", ex);
         }
@@ -154,7 +154,7 @@ public class MCRSQLRowReader {
         try {
             int value = rs.getInt(index);
 
-            return (rs.wasNull() ? Integer.MIN_VALUE : value);
+            return rs.wasNull() ? Integer.MIN_VALUE : value;
         } catch (SQLException ex) {
             throw new MCRPersistenceException("Could not get value from JDBC result set", ex);
         }
@@ -164,7 +164,7 @@ public class MCRSQLRowReader {
         try {
             long value = rs.getLong(index);
 
-            return (rs.wasNull() ? Long.MIN_VALUE : value);
+            return rs.wasNull() ? Long.MIN_VALUE : value;
         } catch (SQLException ex) {
             throw new MCRPersistenceException("Could not get value from JDBC result set", ex);
         }
@@ -182,7 +182,7 @@ public class MCRSQLRowReader {
         try {
             int value = rs.getInt(columnName);
 
-            return (rs.wasNull() ? Integer.MIN_VALUE : value);
+            return rs.wasNull() ? Integer.MIN_VALUE : value;
         } catch (SQLException ex) {
             throw new MCRPersistenceException("Could not get value from JDBC result set", ex);
         }
@@ -192,7 +192,7 @@ public class MCRSQLRowReader {
         try {
             long value = rs.getLong(columnName);
 
-            return (rs.wasNull() ? Long.MIN_VALUE : value);
+            return rs.wasNull() ? Long.MIN_VALUE : value;
         } catch (SQLException ex) {
             throw new MCRPersistenceException("Could not get value from JDBC result set", ex);
         }
@@ -212,6 +212,7 @@ public class MCRSQLRowReader {
         }
     }
 
+    @Override
     public void finalize() throws Throwable {
         close();
     }

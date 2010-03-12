@@ -59,7 +59,7 @@ import org.mycore.common.MCRConfiguration;
  * @author Frank Lützenkirchen
  */
 public class MCRNISSBuilderDateCounter implements MCRNISSBuilder {
-    
+
     private String lastDate;
 
     private String lastNISS;
@@ -78,25 +78,28 @@ public class MCRNISSBuilderDateCounter implements MCRNISSBuilder {
 
         int pos1 = pattern.indexOf("0");
         int pos2 = pattern.indexOf("#");
-        if ((pos1 >= 0) || (pos2 >= 0)) {
+        if (pos1 >= 0 || pos2 >= 0) {
             int pos;
 
-            if (pos1 == -1)
+            if (pos1 == -1) {
                 pos = pos2;
-            else if (pos2 == -1)
+            } else if (pos2 == -1) {
                 pos = pos1;
-            else
+            } else {
                 pos = Math.min(pos1, pos2);
+            }
 
             patternDate = pattern.substring(0, pos);
             patternCounter = pattern.substring(pos);
         }
 
-        if (patternDate.length() > 0)
+        if (patternDate.length() > 0) {
             fmtDate = new SimpleDateFormat(patternDate);
+        }
 
-        if (patternCounter.length() > 0)
+        if (patternCounter.length() > 0) {
             fmtCount = new DecimalFormat(patternCounter);
+        }
     }
 
     public synchronized String buildNISS() {

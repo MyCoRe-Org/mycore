@@ -41,7 +41,7 @@ public class MCRSessionEvent {
     private Type type;
 
     private MCRSession session;
-    
+
     private int concurrentAccessors;
 
     public MCRSessionEvent(MCRSession session, Type type, int concurrentAccessors) {
@@ -71,8 +71,9 @@ public class MCRSessionEvent {
         return type;
     }
 
+    @Override
     public String toString() {
-        StringBuilder sb=new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         sb.append("MCRSessionEvent['");
         sb.append(getSession());
         sb.append("',");

@@ -41,7 +41,6 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLHelper;
@@ -69,16 +68,37 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     public static final String DEFAULT_TRANSFORMER = "save-classification.xsl";
 
     public MCRClassification2Commands() {
-        command.add(new MCRCommand("load classification from file {0}", "org.mycore.frontend.cli.MCRClassification2Commands.loadFromFile String", "The command add a new classification form file {0} to the system."));
-        command.add(new MCRCommand("update classification from file {0}", "org.mycore.frontend.cli.MCRClassification2Commands.updateFromFile String", "The command add a new classification form file {0} to the system."));
-        command.add(new MCRCommand("delete classification {0}", "org.mycore.frontend.cli.MCRClassification2Commands.delete String", "The command remove the classification with MCRObjectID {0} from the system."));
-        command.add(new MCRCommand("load all classifications from directory {0}", "org.mycore.frontend.cli.MCRClassification2Commands.loadFromDirectory String", "The command add all classifications in the directory {0} to the system."));
-        command.add(new MCRCommand("update all classifications from directory {0}", "org.mycore.frontend.cli.MCRClassification2Commands.updateFromDirectory String", "The command update all classifications in the directory {0} to the system."));
-        command.add(new MCRCommand("export classification {0} to {1} with {2}", "org.mycore.frontend.cli.MCRClassification2Commands.export String String String", "The command store the classification with MCRObjectID {0} to the file named {1} with the stylesheet {2}-object.xsl. For {2} save is the default.."));
-        command.add(new MCRCommand("export all classifications to {0} with {1}", "org.mycore.frontend.cli.MCRClassification2Commands.exportAll String String", "The command store all classifications to the directory with name {0} with the stylesheet {1}-object.xsl. For {1} save is the default."));
-        command.add(new MCRCommand("count classification children of {0}", "org.mycore.frontend.cli.MCRClassification2Commands.countChildren String", "The command remove the classification with MCRObjectID {0} from the system."));
-        command.add(new MCRCommand("list classification {0}", "org.mycore.frontend.cli.MCRClassification2Commands.listClassification String", "The command list the classification with MCRObjectID {0}."));
-        command.add(new MCRCommand("list all classifications", "org.mycore.frontend.cli.MCRClassification2Commands.listAllClassifications", "The command list all classification stored in the database."));
+        command.add(new MCRCommand("load classification from file {0}",
+                "org.mycore.frontend.cli.MCRClassification2Commands.loadFromFile String",
+                "The command add a new classification form file {0} to the system."));
+        command.add(new MCRCommand("update classification from file {0}",
+                "org.mycore.frontend.cli.MCRClassification2Commands.updateFromFile String",
+                "The command add a new classification form file {0} to the system."));
+        command.add(new MCRCommand("delete classification {0}", "org.mycore.frontend.cli.MCRClassification2Commands.delete String",
+                "The command remove the classification with MCRObjectID {0} from the system."));
+        command.add(new MCRCommand("load all classifications from directory {0}",
+                "org.mycore.frontend.cli.MCRClassification2Commands.loadFromDirectory String",
+                "The command add all classifications in the directory {0} to the system."));
+        command.add(new MCRCommand("update all classifications from directory {0}",
+                "org.mycore.frontend.cli.MCRClassification2Commands.updateFromDirectory String",
+                "The command update all classifications in the directory {0} to the system."));
+        command
+                .add(new MCRCommand(
+                        "export classification {0} to {1} with {2}",
+                        "org.mycore.frontend.cli.MCRClassification2Commands.export String String String",
+                        "The command store the classification with MCRObjectID {0} to the file named {1} with the stylesheet {2}-object.xsl. For {2} save is the default.."));
+        command
+                .add(new MCRCommand("export all classifications to {0} with {1}",
+                        "org.mycore.frontend.cli.MCRClassification2Commands.exportAll String String",
+                        "The command store all classifications to the directory with name {0} with the stylesheet {1}-object.xsl. For {1} save is the default."));
+        command.add(new MCRCommand("count classification children of {0}",
+                "org.mycore.frontend.cli.MCRClassification2Commands.countChildren String",
+                "The command remove the classification with MCRObjectID {0} from the system."));
+        command.add(new MCRCommand("list classification {0}",
+                "org.mycore.frontend.cli.MCRClassification2Commands.listClassification String",
+                "The command list the classification with MCRObjectID {0}."));
+        command.add(new MCRCommand("list all classifications", "org.mycore.frontend.cli.MCRClassification2Commands.listAllClassifications",
+                "The command list all classification stored in the database."));
     }
 
     /**
@@ -191,9 +211,11 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         }
 
         List<String> cmds = new ArrayList<String>();
-        for (String file : list)
-            if (file.endsWith(".xml"))
+        for (String file : list) {
+            if (file.endsWith(".xml")) {
                 cmds.add((update ? "update" : "load") + " classification from file " + new File(dir, file).getAbsolutePath());
+            }
+        }
 
         return cmds;
     }
@@ -257,9 +279,10 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * @throws TransformerFactoryConfigurationError
      * @throws TransformerConfigurationException
      */
-    private static final Transformer getTransformer(String style) throws TransformerFactoryConfigurationError, TransformerConfigurationException {
+    private static final Transformer getTransformer(String style) throws TransformerFactoryConfigurationError,
+            TransformerConfigurationException {
         String xslfile = DEFAULT_TRANSFORMER;
-        if ((style != null) && (style.trim().length() != 0)) {
+        if (style != null && style.trim().length() != 0) {
             xslfile = style + "-classification.xsl";
         }
         Transformer trans = null;

@@ -36,6 +36,7 @@ import org.mycore.user.MCRUserFacade;
  */
 class MCRUserClause implements MCRCondition {
     private String user;
+
     private boolean not;
 
     MCRUserClause(String user, boolean not) {
@@ -44,18 +45,19 @@ class MCRUserClause implements MCRCondition {
     }
 
     public boolean evaluate(Object o) {
-        return this.user.equals(MCRUserFacade.getCurrentUser()) ^ this.not;
+        return user.equals(MCRUserFacade.getCurrentUser()) ^ not;
     }
 
+    @Override
     public String toString() {
-        return "user" + (this.not? " != ": " = ") + user + " ";
+        return "user" + (not ? " != " : " = ") + user + " ";
     }
 
     public Element toXML() {
-    	Element cond = new Element("condition");
-    	cond.setAttribute("field", "user");
-    	cond.setAttribute("operator", (this.not? "!=": "="));
-    	cond.setAttribute("value", user);
+        Element cond = new Element("condition");
+        cond.setAttribute("field", "user");
+        cond.setAttribute("operator", (not ? "!=" : "="));
+        cond.setAttribute("value", user);
         return cond;
     }
 
@@ -65,7 +67,7 @@ class MCRUserClause implements MCRCondition {
         return el;
     }
 
-    public void accept(MCRConditionVisitor visitor) { 
-    	visitor.visitType(info());
+    public void accept(MCRConditionVisitor visitor) {
+        visitor.visitType(info());
     }
 };

@@ -1,8 +1,9 @@
 package org.mycore.backend.hibernate.tables;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.sql.Blob;
+import java.util.Date;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -51,7 +52,7 @@ public class MCRRESUMPTIONTOKEN implements Serializable {
     }
 
     public String getResumptionTokenID() {
-        return this.resumptionTokenID;
+        return resumptionTokenID;
     }
 
     public void setResumptionTokenID(String resumptionTokenID) {
@@ -59,7 +60,7 @@ public class MCRRESUMPTIONTOKEN implements Serializable {
     }
 
     public String getPrefix() {
-        return this.prefix;
+        return prefix;
     }
 
     public void setPrefix(String prefix) {
@@ -67,7 +68,7 @@ public class MCRRESUMPTIONTOKEN implements Serializable {
     }
 
     public long getCompleteSize() {
-        return this.completeSize;
+        return completeSize;
     }
 
     public void setCompleteSize(long completeSize) {
@@ -75,7 +76,7 @@ public class MCRRESUMPTIONTOKEN implements Serializable {
     }
 
     public Date getCreated() {
-        return this.created;
+        return created;
     }
 
     public void setCreated(Date created) {
@@ -83,7 +84,7 @@ public class MCRRESUMPTIONTOKEN implements Serializable {
     }
 
     public String getInstance() {
-        return this.instance;
+        return instance;
     }
 
     public void setInstance(String instance) {
@@ -91,38 +92,38 @@ public class MCRRESUMPTIONTOKEN implements Serializable {
     }
 
     public Blob getHitBlob() {
-        return this.hitBlob;
+        return hitBlob;
     }
 
     public void setHitBlob(Blob hitBlob) {
         this.hitBlob = hitBlob;
     }
-    public byte[] getHitByteArray(){
-       return MCRBlob.getBytes(this.hitBlob);
+
+    public byte[] getHitByteArray() {
+        return MCRBlob.getBytes(hitBlob);
     }
 
     public void setHitByteArray(byte[] hitByte) {
-       this.hitBlob = new MCRBlob(hitByte);
+        hitBlob = new MCRBlob(hitByte);
     }
 
+    @Override
     public String toString() {
-        return new ToStringBuilder(this)
-            .append("resumptionTokenID", getResumptionTokenID())
-            .toString();
+        return new ToStringBuilder(this).append("resumptionTokenID", getResumptionTokenID()).toString();
     }
 
+    @Override
     public boolean equals(Object other) {
-        if ( !(other instanceof MCRRESUMPTIONTOKEN) ) return false;
+        if (!(other instanceof MCRRESUMPTIONTOKEN)) {
+            return false;
+        }
         MCRRESUMPTIONTOKEN castOther = (MCRRESUMPTIONTOKEN) other;
-        return new EqualsBuilder()
-            .append(this.getResumptionTokenID(), castOther.getResumptionTokenID())
-            .isEquals();
+        return new EqualsBuilder().append(getResumptionTokenID(), castOther.getResumptionTokenID()).isEquals();
     }
 
+    @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(getResumptionTokenID())
-            .toHashCode();
+        return new HashCodeBuilder().append(getResumptionTokenID()).toHashCode();
     }
 
 }

@@ -30,39 +30,38 @@ import java.util.List;
 
 import org.jdom.Element;
 import org.jdom.Namespace;
-
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 
 public class MCREditorItemComparator implements Comparator<Element> {
-    
-    public static final MCREditorItemComparator CURRENT_LANG_TEXT_ORDER=new MCREditorItemComparator();
+
+    public static final MCREditorItemComparator CURRENT_LANG_TEXT_ORDER = new MCREditorItemComparator();
 
     private MCREditorItemComparator() {
         super();
     }
 
     public int compare(Element o1, Element o2) {
-        if (!((o1.getName().equals("item"))&&(o2.getName().equals("item")))){
+        if (!(o1.getName().equals("item") && o2.getName().equals("item"))) {
             //NO Editor Items
             return 0;
         }
-        return String.CASE_INSENSITIVE_ORDER.compare(getCurrentLangLabel(o1),getCurrentLangLabel(o2));
+        return String.CASE_INSENSITIVE_ORDER.compare(getCurrentLangLabel(o1), getCurrentLangLabel(o2));
     }
-    
+
     @SuppressWarnings("unchecked")
-    private static String getCurrentLangLabel(Element item){
-        MCRSession session=MCRSessionMgr.getCurrentSession();
-        String currentLang=session.getCurrentLanguage();
-        List<Element> labels=item.getChildren("label");
-        Iterator<Element> it=labels.iterator();
-        while (it.hasNext()){
-            Element label=it.next();
-            if (label.getAttributeValue("lang",Namespace.XML_NAMESPACE).equals(currentLang)){
+    private static String getCurrentLangLabel(Element item) {
+        MCRSession session = MCRSessionMgr.getCurrentSession();
+        String currentLang = session.getCurrentLanguage();
+        List<Element> labels = item.getChildren("label");
+        Iterator<Element> it = labels.iterator();
+        while (it.hasNext()) {
+            Element label = it.next();
+            if (label.getAttributeValue("lang", Namespace.XML_NAMESPACE).equals(currentLang)) {
                 return label.getText();
             }
         }
-        if (labels.size()>0){
+        if (labels.size() > 0) {
             //fallback to first label if currentLang label is not found
             return labels.get(0).getText();
         }

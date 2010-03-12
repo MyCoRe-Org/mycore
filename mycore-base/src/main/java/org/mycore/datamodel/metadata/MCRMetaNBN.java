@@ -116,10 +116,11 @@ public class MCRMetaNBN extends MCRMetaDefault {
      * @param element
      *            a relevant JDOM element for the metadata
      */
+    @Override
     public void setFromDOM(org.jdom.Element element) {
         super.setFromDOM(element);
 
-        String temp_nbn = (element.getText()).trim();
+        String temp_nbn = element.getText().trim();
 
         if (temp_nbn == null) {
             temp_nbn = "";
@@ -136,6 +137,7 @@ public class MCRMetaNBN extends MCRMetaDefault {
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML MCRMetaLangText part
      */
+    @Override
     public org.jdom.Element createXML() throws MCRException {
         if (!isValid()) {
             debug();
@@ -146,7 +148,7 @@ public class MCRMetaNBN extends MCRMetaDefault {
         elm.setAttribute("lang", lang, Namespace.XML_NAMESPACE);
         elm.setAttribute("inherited", Integer.toString(inherited));
 
-        if ((type != null) && ((type = type.trim()).length() != 0)) {
+        if (type != null && (type = type.trim()).length() != 0) {
             elm.setAttribute("type", type);
         }
 
@@ -166,12 +168,13 @@ public class MCRMetaNBN extends MCRMetaDefault {
      * 
      * @return a boolean value
      */
+    @Override
     public boolean isValid() {
         if (!super.isValid()) {
             return false;
         }
 
-        if ((nbn == null) || ((nbn = nbn.trim()).length() == 0)) {
+        if (nbn == null || (nbn = nbn.trim()).length() == 0) {
             return false;
         }
 
@@ -181,6 +184,7 @@ public class MCRMetaNBN extends MCRMetaDefault {
     /**
      * This method make a clone of this class.
      */
+    @Override
     public Object clone() {
         return new MCRMetaNBN(datapart, subtag, inherited, nbn);
     }
@@ -188,6 +192,7 @@ public class MCRMetaNBN extends MCRMetaDefault {
     /**
      * This method put debug data to the logger (for the debug mode).
      */
+    @Override
     public final void debug() {
         super.debugDefault();
         LOGGER.debug("NBN                = " + nbn);

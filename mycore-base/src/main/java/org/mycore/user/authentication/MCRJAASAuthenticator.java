@@ -24,9 +24,13 @@
 
 package org.mycore.user.authentication;
 
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
+import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
-import javax.security.auth.callback.*;
 
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
@@ -50,11 +54,11 @@ import org.mycore.common.MCRConfigurationException;
 public class MCRJAASAuthenticator {
 
     private String contextID;
-    
+
     public void init(String ID) {
-      MCRConfiguration config = MCRConfiguration.instance();
-      String prefix = "MCR.UserAuthenticator." + ID + ".";
-      contextID = config.getString(prefix + "LoginContextID", "MCRJAASAuthenticator");
+        MCRConfiguration config = MCRConfiguration.instance();
+        String prefix = "MCR.UserAuthenticator." + ID + ".";
+        contextID = config.getString(prefix + "LoginContextID", "MCRJAASAuthenticator");
     }
 
     public boolean authenticate(final String username, final String password) {
@@ -62,15 +66,15 @@ public class MCRJAASAuthenticator {
         try {
             ctx = new LoginContext(contextID, new CallbackHandler() {
                 public void handle(Callback callbacks[]) throws UnsupportedCallbackException {
-                    for (int i = 0; i < callbacks.length; i++) {
-                        if (callbacks[i] instanceof NameCallback) {
+                    for (Callback callback : callbacks) {
+                        if (callback instanceof NameCallback) {
                             NameCallback nc = (NameCallback) callbacks[0];
                             nc.setName(username);
-                        } else if (callbacks[i] instanceof PasswordCallback) {
-                            PasswordCallback pc = (PasswordCallback) callbacks[i];
+                        } else if (callback instanceof PasswordCallback) {
+                            PasswordCallback pc = (PasswordCallback) callback;
                             pc.setPassword(password.toCharArray());
                         } else {
-                            throw new UnsupportedCallbackException(callbacks[i]);
+                            throw new UnsupportedCallbackException(callback);
                         }
                     }
                 }

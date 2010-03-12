@@ -127,10 +127,11 @@ public class MCRMetaISBN extends MCRMetaDefault {
      * @param element
      *            a relevant JDOM element for the metadata
      */
+    @Override
     public void setFromDOM(org.jdom.Element element) {
         super.setFromDOM(element);
 
-        String temp_isbn = (element.getText()).trim();
+        String temp_isbn = element.getText().trim();
 
         if (temp_isbn == null) {
             temp_isbn = "";
@@ -147,6 +148,7 @@ public class MCRMetaISBN extends MCRMetaDefault {
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML MCRMetaLangText part
      */
+    @Override
     public org.jdom.Element createXML() throws MCRException {
         if (!isValid()) {
             debug();
@@ -157,7 +159,7 @@ public class MCRMetaISBN extends MCRMetaDefault {
         elm.setAttribute("lang", lang, Namespace.XML_NAMESPACE);
         elm.setAttribute("inherited", Integer.toString(inherited));
 
-        if ((type != null) && ((type = type.trim()).length() != 0)) {
+        if (type != null && (type = type.trim()).length() != 0) {
             elm.setAttribute("type", type);
         }
 
@@ -177,12 +179,13 @@ public class MCRMetaISBN extends MCRMetaDefault {
      * 
      * @return a boolean value
      */
+    @Override
     public boolean isValid() {
         if (!super.isValid()) {
             return false;
         }
 
-        if ((isbn == null) || invalid || (isbn.length() == 0) || ((sum2 % 11) > 0)) {
+        if (isbn == null || invalid || isbn.length() == 0 || sum2 % 11 > 0) {
             return false;
         }
 
@@ -197,8 +200,8 @@ public class MCRMetaISBN extends MCRMetaDefault {
         if (isbn != null) {
             char[] nums = isbn.toCharArray();
 
-            for (int i = 0; i < nums.length; i++) {
-                switch (nums[i]) {
+            for (char num : nums) {
+                switch (num) {
                 case 'X':
                     sum1++;
 
@@ -247,6 +250,7 @@ public class MCRMetaISBN extends MCRMetaDefault {
     /**
      * This method make a clone of this class.
      */
+    @Override
     public Object clone() {
         return new MCRMetaISBN(datapart, subtag, inherited, isbn);
     }
@@ -254,6 +258,7 @@ public class MCRMetaISBN extends MCRMetaDefault {
     /**
      * This method put debug data to the logger (for the debug mode).
      */
+    @Override
     public final void debug() {
         super.debugDefault();
         LOGGER.debug("ISBN               = " + isbn);

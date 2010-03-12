@@ -33,7 +33,6 @@ import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
-
 import org.mycore.access.mcrimpl.MCRAccessRule;
 import org.mycore.access.mcrimpl.MCRRuleStore;
 import org.mycore.backend.hibernate.tables.MCRACCESSRULE;
@@ -57,6 +56,7 @@ public class MCRHIBRuleStore extends MCRRuleStore {
      * @param rule
      *            as MCRAccessRule
      */
+    @Override
     public void createRule(MCRAccessRule rule) {
 
         if (!existsRule(rule.getId())) {
@@ -80,6 +80,7 @@ public class MCRHIBRuleStore extends MCRRuleStore {
      * with given data
      * 
      */
+    @Override
     @SuppressWarnings("unchecked")
     public Collection<String> retrieveRuleIDs(String ruleExpression, String description) {
         ArrayList<String> ret = new ArrayList<String>();
@@ -96,6 +97,7 @@ public class MCRHIBRuleStore extends MCRRuleStore {
      * Method updates accessrule by given rule. internal: get rule object from session
      * set values, update via session
      */
+    @Override
     public void updateRule(MCRAccessRule rule) {
         Session session = MCRHIBConnection.instance().getSession();
         MCRACCESSRULE hibrule = (MCRACCESSRULE) session.get(MCRACCESSRULE.class, rule.getId());
@@ -110,6 +112,7 @@ public class MCRHIBRuleStore extends MCRRuleStore {
     /**
      * Method deletes accessrule for given ruleid
      */
+    @Override
     public void deleteRule(String ruleid) {
         Session session = MCRHIBConnection.instance().getSession();
         session.createQuery("delete MCRACCESSRULE where RID = '" + ruleid + "'").executeUpdate();
@@ -122,6 +125,7 @@ public class MCRHIBRuleStore extends MCRRuleStore {
      *            as string
      * @return MCRAccessRule object with database values or null
      */
+    @Override
     public MCRAccessRule retrieveRule(String ruleid) {
         return getRule(ruleid);
     }
@@ -144,12 +148,14 @@ public class MCRHIBRuleStore extends MCRRuleStore {
      *            as string
      * @return MCRAccessRule
      */
+    @Override
     public MCRAccessRule getRule(String ruleid) {
         init();
 
         Session session = MCRHIBConnection.instance().getSession();
         MCRAccessRule rule = null;
-        MCRACCESSRULE hibrule = (MCRACCESSRULE) session.createCriteria(MCRACCESSRULE.class).add(Restrictions.eq("rid", ruleid)).uniqueResult();
+        MCRACCESSRULE hibrule = (MCRACCESSRULE) session.createCriteria(MCRACCESSRULE.class).add(Restrictions.eq("rid", ruleid))
+                .uniqueResult();
         logger.debug("Getting MCRACCESSRULE done");
 
         if (hibrule != null) {
@@ -161,6 +167,7 @@ public class MCRHIBRuleStore extends MCRRuleStore {
         return rule;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public Collection<String> retrieveAllIDs() {
         init();
@@ -182,6 +189,7 @@ public class MCRHIBRuleStore extends MCRRuleStore {
      * @return boolean value
      * @throws MCRException
      */
+    @Override
     @SuppressWarnings("unchecked")
     public boolean existsRule(String ruleid) throws MCRException {
 
@@ -193,21 +201,23 @@ public class MCRHIBRuleStore extends MCRRuleStore {
         return false;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public int getNextFreeRuleID(String prefix) {
         int ret = 1;
         Session session = MCRHIBConnection.instance().getSession();
         List<String> l = session.createQuery("select max(rid) from MCRACCESSRULE where rid like '" + prefix + "%'").list();
         if (l.size() > 0) {
-            String max = (String) l.get(0);
+            String max = l.get(0);
             if (max == null) {
                 ret = 1;
             } else {
                 int lastNumber = Integer.parseInt(max.substring(prefix.length()));
                 ret = lastNumber + 1;
             }
-        } else
+        } else {
             return 1;
+        }
         return ret;
     }
 }

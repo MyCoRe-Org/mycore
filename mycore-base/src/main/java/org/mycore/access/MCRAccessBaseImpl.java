@@ -47,7 +47,8 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
 
     private static MCRAccessInterface SINGLETON;
 
-    final protected static String AccessPermissions = MCRConfiguration.instance().getString("MCR.Access.AccessPermissions", "read,write,delete");
+    final protected static String AccessPermissions = MCRConfiguration.instance().getString("MCR.Access.AccessPermissions",
+            "read,write,delete");
 
     /** the logger */
     protected static Logger LOGGER = Logger.getLogger(MCRAccessBaseImpl.class.getName());
@@ -154,9 +155,10 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      *      java.lang.String, MCRUser)
      */
     public boolean checkPermission(String id, String permission, MCRUser user) {
-        LOGGER.debug("Execute MCRAccessBaseImpl checkPermission for ID " + id + " for permission " + permission + " for user" + user.getID());
+        LOGGER.debug("Execute MCRAccessBaseImpl checkPermission for ID " + id + " for permission " + permission + " for user"
+                + user.getID());
         return true;
-    }    
+    }
 
     /*
      * (non-Javadoc)
@@ -167,7 +169,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
         LOGGER.debug("Execute MCRAccessBaseImpl checkPermission for permission " + permission);
         return true;
     }
-    
+
     /*
      * (non-Javadoc)
      * 
@@ -176,16 +178,16 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
     public boolean checkPermission(String permission, MCRUser user) {
         LOGGER.debug("Execute MCRAccessBaseImpl checkPermission for permission " + permission + " for user " + user.getID());
         return true;
-    }    
-    
+    }
+
     /*
      * (non-Javadoc)
      * 
      * @see org.mycore.access.MCRAccessInterface#checkPermission(java.lang.String, java.lang.String, org.jdom.Document)
-     */    
-	public boolean checkPermission(Element rule) {
-		return true;
-	}    
+     */
+    public boolean checkPermission(Element rule) {
+        return true;
+    }
 
     /*
      * (non-Javadoc)
@@ -210,20 +212,20 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * (non-Javadoc)
      * 
      * @see org.mycore.access.MCRAccessInterface#getRuleDescription(java.lang.String)
-     */    
-	public String getRuleDescription(String permission) {
-		return "";
-	}
+     */
+    public String getRuleDescription(String permission) {
+        return "";
+    }
 
     /*
      * (non-Javadoc)
      * 
      * @see org.mycore.access.MCRAccessInterface#getRuleDescription(java.lang.String, java.lang.String)
-     */	
-	public String getRuleDescription(String id, String permission) {
-		return "";
-	}    
-    
+     */
+    public String getRuleDescription(String id, String permission) {
+        return "";
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -232,7 +234,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
     public Collection<String> getPermissionsForID(String objid) {
         return Collections.emptySet();
     }
-    
+
     /*
      * (non-Javadoc)
      * 
@@ -240,7 +242,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      */
     public Collection<String> getPermissions() {
         return Collections.emptySet();
-    }    
+    }
 
     /**
      * checks wether a rule with the id and permission is defined. It's the same
@@ -253,7 +255,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * @see #getRule(String, String)
      */
     public boolean hasRule(String id, String permission) {
-        return (getRule(id, permission) != null);
+        return getRule(id, permission) != null;
     }
 
     /**
@@ -266,18 +268,18 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * @see #getRule(String, String)
      */
     public boolean hasRule(String id) {
-        return (getPermissionsForID(id).size() > 0);
+        return getPermissionsForID(id).size() > 0;
     }
-    
+
     /**
      * just returns the String of Access Permissions configured in
      * property "MCR.AccessPermissions"
      * 
      * @return the permissions as List
      */
-    public Collection<String> getAccessPermissionsFromConfiguration(){
-    	String[] permissions = AccessPermissions.split(",");
-    	return Arrays.asList(permissions);
+    public Collection<String> getAccessPermissionsFromConfiguration() {
+        String[] permissions = AccessPermissions.split(",");
+        return Arrays.asList(permissions);
     }
 
     /*
@@ -291,12 +293,12 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
 
     public void createRule(String rule, String creator, String description) {
         LOGGER.debug("Execute MCRAccessBaseImpl createRule with rule " + rule + " \n and description " + description);
-        
+
     }
 
     public void createRule(Element rule, String creator, String description) {
         // TODO Auto-generated method stub
-        
+
     }
 
     public String getNormalizedRuleString(Element rule) {

@@ -28,7 +28,6 @@ import java.util.List;
 
 import org.jdom.Content;
 import org.jdom.Namespace;
-
 import org.mycore.common.MCRException;
 
 /**
@@ -51,12 +50,10 @@ public class MCRMetaXML extends MCRMetaDefault {
     public MCRMetaXML() {
         super();
     }
-    
+
     public MCRMetaXML(String set_datapart, String set_subtag, String set_type, int set_inherited) throws MCRException {
         super(set_datapart, set_subtag, null, set_type, set_inherited);
     }
-
-
 
     /**
      * This method read the XML input stream part from a DOM part for the
@@ -65,11 +62,12 @@ public class MCRMetaXML extends MCRMetaDefault {
      * @param element
      *            a relevant JDOM element for the metadata
      */
+    @Override
     @SuppressWarnings("unchecked")
     public void setFromDOM(org.jdom.Element element) {
         super.setFromDOM(element);
-        
-        this.content=element.cloneContent();
+
+        content = element.cloneContent();
     }
 
     /**
@@ -80,6 +78,7 @@ public class MCRMetaXML extends MCRMetaDefault {
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML MCRMetaLangText part
      */
+    @Override
     public org.jdom.Element createXML() throws MCRException {
         if (!isValid()) {
             debug();
@@ -90,20 +89,20 @@ public class MCRMetaXML extends MCRMetaDefault {
         elm.setAttribute("lang", lang, Namespace.XML_NAMESPACE);
         elm.setAttribute("inherited", Integer.toString(inherited));
 
-        if ((type != null) && ((type = type.trim()).length() != 0)) {
+        if (type != null && (type = type.trim()).length() != 0) {
             elm.setAttribute("type", type);
         }
-        List<Content> addedContent=new ArrayList<Content>(this.content.size());
-        cloneListContent(addedContent, this.content);
+        List<Content> addedContent = new ArrayList<Content>(content.size());
+        cloneListContent(addedContent, content);
         elm.addContent(addedContent);
 
         return elm;
     }
-    
-    private static void cloneListContent(List<Content> dest, List<Content> source){
+
+    private static void cloneListContent(List<Content> dest, List<Content> source) {
         dest.clear();
-        for (Content c:source){
-            dest.add((Content)c.clone());
+        for (Content c : source) {
+            dest.add((Content) c.clone());
         }
     }
 
@@ -118,6 +117,7 @@ public class MCRMetaXML extends MCRMetaDefault {
      * 
      * @return a boolean value
      */
+    @Override
     public boolean isValid() {
         if (!super.isValid()) {
             return false;
@@ -133,6 +133,7 @@ public class MCRMetaXML extends MCRMetaDefault {
     /**
      * This method make a clone of this class.
      */
+    @Override
     public Object clone() {
         MCRMetaXML out = new MCRMetaXML();
         out.setFromDOM(createXML());
@@ -142,6 +143,7 @@ public class MCRMetaXML extends MCRMetaDefault {
     /**
      * This method put debug data to the logger (for the debug mode).
      */
+    @Override
     public void debug() {
         super.debugDefault();
         LOGGER.debug("Number of contents  = \n" + content.size());

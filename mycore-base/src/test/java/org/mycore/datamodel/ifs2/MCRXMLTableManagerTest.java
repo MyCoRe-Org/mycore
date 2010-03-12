@@ -1,7 +1,6 @@
 package org.mycore.datamodel.ifs2;
 
 import java.io.File;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
@@ -28,7 +27,7 @@ public class MCRXMLTableManagerTest extends MCRTestCase {
     private static MCRXMLTableManager store;
 
     private static File baseDirectory;
-    
+
     private static File svnDirectory;
 
     private class XMLInfo {
@@ -49,47 +48,50 @@ public class MCRXMLTableManagerTest extends MCRTestCase {
 
     private static final SAXBuilder SAX_BUILDER = new SAXBuilder(false);
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
 
         setProperty("MCR.Metadata.Type.document", "true", true);
         setProperty("MCR.Metadata.ObjectID.NumberPattern", "00000000", true);
-        
-        MyCoRe_document_00000001 = new XMLInfo("MyCoRe_document_00000001", "<object id=\"MyCoRe_document_00000001\"/>".getBytes("UTF-8"), new Date());
-        MyCoRe_document_00000001_new = new XMLInfo("MyCoRe_document_00000001", "<object id=\"MyCoRe_document_00000001\" update=\"true\"/>".getBytes("UTF-8"), new Date());
+
+        MyCoRe_document_00000001 = new XMLInfo("MyCoRe_document_00000001", "<object id=\"MyCoRe_document_00000001\"/>".getBytes("UTF-8"),
+                new Date());
+        MyCoRe_document_00000001_new = new XMLInfo("MyCoRe_document_00000001", "<object id=\"MyCoRe_document_00000001\" update=\"true\"/>"
+                .getBytes("UTF-8"), new Date());
         MCR_document_00000001 = new XMLInfo("MCR_document_00000001", "<object id=\"MCR_document_00000001\"/>".getBytes("UTF-8"), new Date());
-        
-        if( store == null )
-        {
-          baseDirectory = File.createTempFile("base", "");
-          baseDirectory.delete();
-          setProperty("MCR.Metadata.Store.BaseDir", baseDirectory.getAbsolutePath(), true);
 
-          svnDirectory = File.createTempFile("svn", "");
-          svnDirectory.delete();
-          String uri = "file:///" + svnDirectory.getAbsolutePath().replace( '\\', '/' );
-          setProperty("MCR.Metadata.Store.SVNBase", uri, true);
+        if (store == null) {
+            baseDirectory = File.createTempFile("base", "");
+            baseDirectory.delete();
+            setProperty("MCR.Metadata.Store.BaseDir", baseDirectory.getAbsolutePath(), true);
 
-          store = MCRXMLTableManager.instance();
+            svnDirectory = File.createTempFile("svn", "");
+            svnDirectory.delete();
+            String uri = "file:///" + svnDirectory.getAbsolutePath().replace('\\', '/');
+            setProperty("MCR.Metadata.Store.SVNBase", uri, true);
+
+            store = MCRXMLTableManager.instance();
         }
     }
 
+    @Override
     protected void tearDown() throws Exception {
-      for( File projectDir : baseDirectory.listFiles() )
-        for( File typeDir : projectDir.listFiles() )
-        {
-          VFS.getManager().resolveFile(typeDir.getAbsolutePath()).delete(Selectors.SELECT_ALL);
-          typeDir.mkdir();
+        for (File projectDir : baseDirectory.listFiles()) {
+            for (File typeDir : projectDir.listFiles()) {
+                VFS.getManager().resolveFile(typeDir.getAbsolutePath()).delete(Selectors.SELECT_ALL);
+                typeDir.mkdir();
+            }
         }
-      for( File projectDir : svnDirectory.listFiles() )
-        for( File typeDir : projectDir.listFiles() )
-        {
-          VFS.getManager().resolveFile(typeDir.getAbsolutePath()).delete(Selectors.SELECT_ALL);
-          typeDir.mkdir();
-          SVNRepositoryFactory.createLocalRepository(typeDir, true, false);
+        for (File projectDir : svnDirectory.listFiles()) {
+            for (File typeDir : projectDir.listFiles()) {
+                VFS.getManager().resolveFile(typeDir.getAbsolutePath()).delete(Selectors.SELECT_ALL);
+                typeDir.mkdir();
+                SVNRepositoryFactory.createLocalRepository(typeDir, true, false);
+            }
         }
 
-      super.tearDown();
+        super.tearDown();
     }
 
     static Document getDocument(InputStream in) throws JDOMException, IOException {
@@ -124,7 +126,9 @@ public class MCRXMLTableManagerTest extends MCRTestCase {
     }
 
     public void testRetrieve() throws JDOMException, IOException {
-        store.create(MyCoRe_document_00000001.id, MCRContent.readFrom(MyCoRe_document_00000001.blob), MyCoRe_document_00000001.lastModified);
+        store
+                .create(MyCoRe_document_00000001.id, MCRContent.readFrom(MyCoRe_document_00000001.blob),
+                        MyCoRe_document_00000001.lastModified);
         Document doc = store.retrieveXML(MyCoRe_document_00000001.id);
         assertEquals("Stored document ID do not match:", MyCoRe_document_00000001.id.getId(), doc.getRootElement().getAttributeValue("id"));
         try {
@@ -141,8 +145,9 @@ public class MCRXMLTableManagerTest extends MCRTestCase {
     public void testGetHighestStoredID() {
         Method[] methods = store.getClass().getMethods();
         for (Method method : methods) {
-            if (method.getName().equals("getHighestStoredID") && method.getParameterTypes().length == 0)
+            if (method.getName().equals("getHighestStoredID") && method.getParameterTypes().length == 0) {
                 fail("org.mycore.datamodel.ifs2.MCRObjectMetadataStoreIFS2.getHighestStoredID() does not respect ProjectID");
+            }
         }
     }
 

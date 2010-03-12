@@ -73,6 +73,7 @@ public class MCRBlockingInputStream extends BufferedInputStream {
      *         reached yet, this is always the same as the number of bytes
      *         requested in the 'len' parameter.
      */
+    @Override
     public int read(byte[] buf, int off, int len) throws IOException {
         int total = 0;
         int num = 0;
@@ -93,6 +94,6 @@ public class MCRBlockingInputStream extends BufferedInputStream {
             len -= num;
         }
 
-        return ((total == 0) ? num : total);
+        return total == 0 ? num : total;
     }
 }

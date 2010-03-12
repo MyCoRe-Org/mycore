@@ -121,7 +121,7 @@ public class MCRResults implements Iterable<MCRHit> {
      * @return the hit at this position, or null if position is out of bounds
      */
     public MCRHit getHit(int i) {
-        if ((i >= 0) && (i < hits.size())) {
+        if (i >= 0 && i < hits.size()) {
             return hits.get(i);
         }
         return null;
@@ -154,7 +154,7 @@ public class MCRResults implements Iterable<MCRHit> {
      *            the number of results to be left
      */
     public void cutResults(int maxResults) {
-        while ((hits.size() > maxResults) && (maxResults > 0)) {
+        while (hits.size() > maxResults && maxResults > 0) {
             MCRHit hit = hits.remove(hits.size() - 1);
             map.remove(hit.getKey());
         }
@@ -187,16 +187,17 @@ public class MCRResults implements Iterable<MCRHit> {
      *            a List of MCRSortBy objects
      */
     public void sortBy(final List<MCRSortBy> sortByList) {
-        Collections.sort(this.hits, new Comparator<MCRHit>() {
+        Collections.sort(hits, new Comparator<MCRHit>() {
             public int compare(MCRHit a, MCRHit b) {
                 int result = 0;
 
-                for (int i = 0; (result == 0) && (i < sortByList.size()); i++) {
+                for (int i = 0; result == 0 && i < sortByList.size(); i++) {
                     MCRSortBy sortBy = sortByList.get(i);
-                    if (sortBy.getSortOrder() == MCRSortBy.ASCENDING)
-                      result = a.compareTo(sortBy.getField(), b);
-                    else
-                      result = b.compareTo(sortBy.getField(), a);
+                    if (sortBy.getSortOrder() == MCRSortBy.ASCENDING) {
+                        result = a.compareTo(sortBy.getField(), b);
+                    } else {
+                        result = b.compareTo(sortBy.getField(), a);
+                    }
                 }
 
                 return result;
@@ -225,8 +226,9 @@ public class MCRResults implements Iterable<MCRHit> {
             Element connection = new Element("hostconnection", MCRConstants.MCR_NAMESPACE);
             connection.setAttribute("host", entry.getKey());
             String msg = entry.getValue();
-            if (msg == null)
+            if (msg == null) {
                 msg = "";
+            }
             connection.setAttribute("message", msg);
             if (msg.length() == 0) {
                 connection.setAttribute("connection", "true");
@@ -236,8 +238,9 @@ public class MCRResults implements Iterable<MCRHit> {
             results.addContent(connection);
         }
 
-        for (int i = min; i <= max; i++)
+        for (int i = min; i <= max; i++) {
             results.addContent(getHit(i).buildXML());
+        }
 
         return results;
     }
@@ -263,13 +266,12 @@ public class MCRResults implements Iterable<MCRHit> {
      */
     protected int merge(Document doc, String hostAlias) {
         Element xml = doc.getRootElement();
-        int numHitsBefore = this.getNumHits();
+        int numHitsBefore = getNumHits();
         int numRemoteHits = Integer.parseInt(xml.getAttributeValue("numHits"));
 
         @SuppressWarnings("unchecked")
         List<Element> connectionList = xml.getChildren("hostconnection", MCRConstants.MCR_NAMESPACE);
-        for (Iterator<Element> it = connectionList.iterator(); it.hasNext();) {
-            Element connectionElement = it.next();
+        for (Element connectionElement : connectionList) {
             String conKey = connectionElement.getAttributeValue("host");
             String conValue = connectionElement.getAttributeValue("message");
             hostconnection.put(conKey, conValue);
@@ -278,21 +280,22 @@ public class MCRResults implements Iterable<MCRHit> {
         @SuppressWarnings("unchecked")
         List<Element> hitList = xml.getChildren("hit", MCRConstants.MCR_NAMESPACE);
         hits.ensureCapacity(numHitsBefore + numRemoteHits);
-        for (Iterator<Element> it = hitList.iterator(); it.hasNext();) {
-            Element hitElement = it.next();
+        for (Element hitElement : hitList) {
             MCRHit hit = MCRHit.parseXML(hitElement, hostAlias);
             hits.add(hit);
             map.put(hit.getKey(), hit);
         }
-        return this.getNumHits() - numHitsBefore;
+        return getNumHits() - numHitsBefore;
     }
 
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("---- MCRResults ----");
-        sb.append("\nNumHits = ").append(this.getNumHits());
-        for (int i = 0; i < hits.size(); i++)
+        sb.append("\nNumHits = ").append(getNumHits());
+        for (int i = 0; i < hits.size(); i++) {
             sb.append(hits.get(i));
+        }
         return sb.toString();
     }
 
@@ -328,8 +331,9 @@ public class MCRResults implements Iterable<MCRHit> {
                 }
                 hit.merge(otherHit);
             }
-            if (complete)
+            if (complete) {
                 totalResult.addHit(hit);
+            }
         }
         return totalResult;
     }
@@ -344,8 +348,9 @@ public class MCRResults implements Iterable<MCRHit> {
     public static MCRResults union(MCRResults... others) {
         MCRResults totalResult = new MCRResults();
         for (MCRResults other : others) {
-            for (MCRHit hit : other)
+            for (MCRHit hit : other) {
                 totalResult.addHit(hit);
+            }
         }
         return totalResult;
     }
@@ -363,8 +368,9 @@ public class MCRResults implements Iterable<MCRHit> {
      *            the exception message of the connection or an empty string
      */
     public void setHostConnection(String host, String msg) {
-        if (msg == null)
+        if (msg == null) {
             msg = "";
+        }
         hostconnection.put(host, msg);
     }
 

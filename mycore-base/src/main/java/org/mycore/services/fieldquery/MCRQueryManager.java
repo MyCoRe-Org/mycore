@@ -23,24 +23,7 @@
 
 package org.mycore.services.fieldquery;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-
-import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRUsageException;
-import org.mycore.parsers.bool.MCRAndCondition;
-import org.mycore.parsers.bool.MCRCondition;
-import org.mycore.parsers.bool.MCRFalseCondition;
-import org.mycore.parsers.bool.MCRNotCondition;
-import org.mycore.parsers.bool.MCROrCondition;
-import org.mycore.parsers.bool.MCRSetCondition;
-import org.mycore.parsers.bool.MCRTrueCondition;
 
 /**
  * Executes queries on all configured searchers and returns query results.
@@ -48,9 +31,9 @@ import org.mycore.parsers.bool.MCRTrueCondition;
  * @author Frank Lützenkirchen, Huu Chi Vu
  */
 public class MCRQueryManager {
-    private static MCRQueryEngine queryEngine = (MCRQueryEngine) MCRConfiguration.instance().getInstanceOf("MCR.Query.Engine", "org.mycore.services.fieldquery.MCRDefaultQueryEngine");
-    
-    
+    private static MCRQueryEngine queryEngine = (MCRQueryEngine) MCRConfiguration.instance().getInstanceOf("MCR.Query.Engine",
+            "org.mycore.services.fieldquery.MCRDefaultQueryEngine");
+
     /**
      * Executes a query and returns the query results. If the query contains
      * fields from different indexes or should span across multiple hosts, the

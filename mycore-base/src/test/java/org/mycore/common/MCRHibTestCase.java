@@ -28,7 +28,6 @@ import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
-
 import org.mycore.backend.hibernate.MCRHIBConnection;
 
 /**

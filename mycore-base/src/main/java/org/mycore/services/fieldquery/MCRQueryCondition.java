@@ -35,17 +35,18 @@ import org.mycore.parsers.bool.MCRParseException;
  * @author Frank Lützenkirchen
  */
 public class MCRQueryCondition extends MCRFieldValue implements MCRCondition {
-    
+
     /** The comparison operator used in this condition */
     private String operator;
 
     /** Creates a new simple query condition */
     public MCRQueryCondition(MCRFieldDef field, String operator, String value) {
-        super( field, value );
-        
-        if (!MCRFieldType.isValidOperatorForType(field.getDataType(), operator))
+        super(field, value);
+
+        if (!MCRFieldType.isValidOperatorForType(field.getDataType(), operator)) {
             throw new MCRParseException("Search operator <" + operator + "> not allowed for field <" + field.getName() + ">");
-        
+        }
+
         this.operator = operator;
     }
 
@@ -54,6 +55,7 @@ public class MCRQueryCondition extends MCRFieldValue implements MCRCondition {
         return operator;
     }
 
+    @Override
     public String toString() {
         return getField().getName() + " " + operator + " \"" + getValue() + "\"";
     }

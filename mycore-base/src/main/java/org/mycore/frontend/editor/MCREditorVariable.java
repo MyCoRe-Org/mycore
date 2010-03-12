@@ -95,7 +95,7 @@ public class MCREditorVariable implements Comparable {
     }
 
     public boolean isAttribute() {
-        return (attributeName != null);
+        return attributeName != null;
     }
 
     public String getAttributeName() {
@@ -114,14 +114,14 @@ public class MCREditorVariable implements Comparable {
         for (StringTokenizer st = new StringTokenizer(path, "/"); st.hasMoreTokens();) {
             String token = st.nextToken();
 
-            if ((!st.hasMoreTokens()) && (token.startsWith("@"))) {
+            if (!st.hasMoreTokens() && token.startsWith("@")) {
                 attributeName = token.substring(1);
             } else {
                 elements.add(token);
             }
         }
 
-        pathElements = (String[]) (elements.toArray(new String[0]));
+        pathElements = (String[]) elements.toArray(new String[0]);
     }
 
     void setSortNr(String sortNr) {
@@ -133,7 +133,7 @@ public class MCREditorVariable implements Comparable {
             sb.append(sortFormatter.format(number));
         }
 
-        this.sortPattern = sb.toString();
+        sortPattern = sb.toString();
     }
 
     private static DecimalFormat sortFormatter = new DecimalFormat("0000");
@@ -141,9 +141,9 @@ public class MCREditorVariable implements Comparable {
     public int compareTo(Object o) {
         MCREditorVariable other = (MCREditorVariable) o;
 
-        int length = Math.min(other.sortPattern.length(), this.sortPattern.length());
+        int length = Math.min(other.sortPattern.length(), sortPattern.length());
         String spo = other.sortPattern.substring(0, length);
-        String spt = this.sortPattern.substring(0, length);
+        String spt = sortPattern.substring(0, length);
 
         return spt.compareTo(spo);
     }

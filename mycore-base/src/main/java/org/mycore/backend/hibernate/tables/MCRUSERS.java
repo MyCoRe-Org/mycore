@@ -27,7 +27,7 @@ import java.sql.Timestamp;
 
 public class MCRUSERS {
     private int numid;
-    
+
     private String uid;
 
     private String creator;
@@ -82,8 +82,8 @@ public class MCRUSERS {
     }
 
     public MCRUSERS(int numid, String uid) {
-        this.numid=numid;
-        this.uid=uid;
+        this.numid = numid;
+        this.uid = uid;
     }
 
     /**
@@ -94,7 +94,7 @@ public class MCRUSERS {
     }
 
     public void setNumid(int numid) {
-        this.numid=numid;
+        this.numid = numid;
     }
 
     /**
@@ -105,7 +105,7 @@ public class MCRUSERS {
     }
 
     public void setUid(String uid) {
-        this.uid=uid;
+        this.uid = uid;
     }
 
     /**

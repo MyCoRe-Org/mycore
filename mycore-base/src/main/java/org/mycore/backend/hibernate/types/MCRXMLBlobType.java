@@ -36,7 +36,6 @@ import org.hibernate.engine.Mapping;
 import org.hibernate.engine.SessionFactoryImplementor;
 import org.hibernate.lob.BlobImpl;
 import org.hibernate.type.BlobType;
-
 import org.mycore.common.MCRException;
 
 public class MCRXMLBlobType extends BlobType {

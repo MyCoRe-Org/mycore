@@ -80,8 +80,8 @@ abstract class OpenOfficeBasePlugin implements TextFilterPlugin {
                     " CLASSPATH. Please ensure that a jar file ").append(" containing the class ").append(SAXparser).append(
                     " is listed in a CLASSPATH before running your").append(" brandnew MyCoRe(tm)-Application.\n").append(
                     " I as a developer of cause know that Xerces is").append(" bundled with every MyCoRe(tm) release and thus").append(
-                    " you will never read this message.\n").append(" But just in case, I thought it is a good idea to").append(" implement this message here.")
-                    .toString());
+                    " you will never read this message.\n").append(" But just in case, I thought it is a good idea to").append(
+                    " implement this message here.").toString());
         }
     }
 
@@ -117,13 +117,13 @@ abstract class OpenOfficeBasePlugin implements TextFilterPlugin {
     public Reader transform(MCRFileContentType ct, InputStream input) throws FilterPluginTransformException {
         if (getSupportedContentTypes().contains(ct)) {
             try {
-                System.out.println("Reading "+getDocumentName());
+                System.out.println("Reading " + getDocumentName());
 
                 return getTextReader(getXMLStream(input));
             } catch (SAXException e) {
-                throw new FilterPluginTransformException("Error while parsing "+getDocumentName(), e);
+                throw new FilterPluginTransformException("Error while parsing " + getDocumentName(), e);
             } catch (IOException e) {
-                throw new FilterPluginTransformException("Error while parsing "+getDocumentName(), e);
+                throw new FilterPluginTransformException("Error while parsing " + getDocumentName(), e);
             }
         }
         throw new FilterPluginTransformException("ContentType " + ct + " is not supported by " + getName() + "!");
@@ -150,11 +150,11 @@ abstract class OpenOfficeBasePlugin implements TextFilterPlugin {
             }
         }
 
-        if ((ze == null) || !ze.getName().equals("content.xml")) {
+        if (ze == null || !ze.getName().equals("content.xml")) {
             throw new FilterPluginTransformException("No content.xml was found in OpenOffice.org document!");
         }
 
-        int chunkSize = (ze.getSize() < 0) ? DEF_BYTE_SZ : (int) ze.getSize();
+        int chunkSize = ze.getSize() < 0 ? DEF_BYTE_SZ : (int) ze.getSize();
         ByteArrayOutputStream bos = new ByteArrayOutputStream(chunkSize);
         BufferedOutputStream out = new BufferedOutputStream(bos);
         byte[] ba = new byte[chunkSize];
@@ -164,9 +164,9 @@ abstract class OpenOfficeBasePlugin implements TextFilterPlugin {
 
             if (bytesRead > 0) {
                 out.write(ba, 0 /* offset in ba */, bytesRead /*
-                                                                 * bytes to
-                                                                 * write
-                                                                 */);
+                                                                  * bytes to
+                                                                  * write
+                                                                  */);
             } else {
                 break; // hit eof
             }
@@ -180,7 +180,7 @@ abstract class OpenOfficeBasePlugin implements TextFilterPlugin {
     private Reader getTextReader(InputStream xml) throws IOException, SAXException {
         XMLReader reader = XMLReaderFactory.createXMLReader(SAXparser);
         StringBuilder buf = new StringBuilder();
-        reader.setContentHandler(new TextHandler(buf,getTextNameSpace()));
+        reader.setContentHandler(new TextHandler(buf, getTextNameSpace()));
 
         InputSource inp = new InputSource(xml);
         reader.setEntityResolver(OooResolver);
@@ -188,8 +188,9 @@ abstract class OpenOfficeBasePlugin implements TextFilterPlugin {
 
         return new StringBuilderReader(buf);
     }
-    
+
     abstract String getTextNameSpace();
+
     abstract String getDocumentName();
 
     private static class StringBuilderReader extends Reader {
@@ -207,6 +208,7 @@ abstract class OpenOfficeBasePlugin implements TextFilterPlugin {
          * 
          * @see java.io.Reader#close()
          */
+        @Override
         public void close() {
         }
 
@@ -215,12 +217,13 @@ abstract class OpenOfficeBasePlugin implements TextFilterPlugin {
          * 
          * @see java.io.Reader#read(char[], int, int)
          */
+        @Override
         public int read(char[] cbuf, int off, int len) {
             if (pos == buf.length()) {
                 return -1;
             }
             int start = pos + off;
-            int charsRead = (buf.length() < (start + len)) ? (buf.length() - start) : len;
+            int charsRead = buf.length() < start + len ? buf.length() - start : len;
             int end = start + charsRead;
             buf.getChars(start, end, cbuf, 0);
             pos = end;
@@ -235,10 +238,10 @@ abstract class OpenOfficeBasePlugin implements TextFilterPlugin {
         private final StringBuilder buf;
 
         private boolean textElement = false;
-        
-        TextHandler(StringBuilder buf,String textNameSpace) {
+
+        TextHandler(StringBuilder buf, String textNameSpace) {
             this.buf = buf;
-            this.textNS= textNameSpace;
+            textNS = textNameSpace;
         }
 
         /*
@@ -246,6 +249,7 @@ abstract class OpenOfficeBasePlugin implements TextFilterPlugin {
          * 
          * @see org.xml.sax.ContentHandler#characters(char[], int, int)
          */
+        @Override
         public void characters(char[] ch, int start, int length) {
             if (textElement) {
                 // write text to the stream
@@ -259,6 +263,7 @@ abstract class OpenOfficeBasePlugin implements TextFilterPlugin {
          * @see org.xml.sax.ContentHandler#startElement(java.lang.String,
          *      java.lang.String, java.lang.String, org.xml.sax.Attributes)
          */
+        @Override
         public void startElement(String uri, String localName, String qName, Attributes attributes) {
             // using internal optimized Strings of Xerces-J
             if (uri == textNS) {

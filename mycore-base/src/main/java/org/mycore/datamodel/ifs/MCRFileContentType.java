@@ -73,7 +73,7 @@ public class MCRFileContentType {
      * @return the unique ID of this file content type
      */
     public String getID() {
-        return this.ID;
+        return ID;
     }
 
     /**
@@ -83,7 +83,7 @@ public class MCRFileContentType {
      * 
      */
     public String getLabel() {
-        return this.label;
+        return label;
     }
 
     /**
@@ -94,7 +94,7 @@ public class MCRFileContentType {
      * @return the MIME type used to deliver this file type to a client browser
      */
     public String getMimeType() {
-        return ((mimeType != null) ? mimeType : "application/octet-stream");
+        return mimeType != null ? mimeType : "application/octet-stream";
     }
 
     /**
@@ -104,15 +104,16 @@ public class MCRFileContentType {
      * @return the URL of additional information, or null
      */
     public String getURL() {
-        return this.url;
+        return url;
     }
 
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        sb.append("ID    = ").append(this.getID()).append("\n");
-        sb.append("label = ").append(this.getLabel()).append("\n");
-        sb.append("mime  = ").append(this.getMimeType()).append("\n");
-        sb.append("url   = ").append(this.getURL());
+        sb.append("ID    = ").append(getID()).append("\n");
+        sb.append("label = ").append(getLabel()).append("\n");
+        sb.append("mime  = ").append(getMimeType()).append("\n");
+        sb.append("url   = ").append(getURL());
 
         return sb.toString();
     }

@@ -136,7 +136,7 @@ public class MCRURNManager {
 
         for (int i = 0; i < digits.length(); i++) {
             digit = Long.parseLong(digits.substring(i, i + 1));
-            sum += (digit * (i + 1));
+            sum += digit * (i + 1);
         }
 
         String quotient = String.valueOf(sum / digit);
@@ -176,10 +176,10 @@ public class MCRURNManager {
     public static synchronized String buildURN(String configID) {
         String base = "MCR.URN.SubNamespace." + configID + ".";
 
-        MCRNISSBuilder builder = (MCRNISSBuilder) (builders.get(configID));
+        MCRNISSBuilder builder = (MCRNISSBuilder) builders.get(configID);
         if (builder == null) {
             Object obj = MCRConfiguration.instance().getSingleInstanceOf(base + "NISSBuilder");
-            builder = (MCRNISSBuilder) (obj);
+            builder = (MCRNISSBuilder) obj;
             builder.init(configID);
             builders.put(configID, builder);
         }
@@ -193,7 +193,7 @@ public class MCRURNManager {
      * correct.
      */
     public static boolean isValid(String urn) {
-        if ((urn == null) || (urn.length() < 14) || (!urn.startsWith("urn:nbn:")) || (!urn.toLowerCase().equals(urn))) {
+        if (urn == null || urn.length() < 14 || !urn.startsWith("urn:nbn:") || !urn.toLowerCase().equals(urn)) {
             return false;
         } else {
             String start = urn.substring(0, urn.length() - 1);
@@ -215,10 +215,10 @@ public class MCRURNManager {
     /**
      * @return true if the given object has an urn assigned
      * */
-    public static boolean hasURNAssigned(String objId){
+    public static boolean hasURNAssigned(String objId) {
         return store.hasURNAssigned(objId);
     }
-    
+
     /** 
      * Assigns the given urn to the given derivate ID 
      * @param urn 
@@ -233,7 +233,7 @@ public class MCRURNManager {
     public static void assignURN(String urn, String derivateID, String path, String filename) {
         store.assignURN(urn, derivateID, path, filename);
     }
-    
+
     /**
      * Retrieves the URN that is assigned to the given document ID
      * 
@@ -258,14 +258,14 @@ public class MCRURNManager {
     public static void removeURN(String urn) {
         store.removeURN(urn);
     }
-    
+
     /**
      * Removes the urn (and assigned document ID) from the persistent store
      */
     public static void removeURNByObjectID(String objID) {
         store.removeURNByObjectID(objID);
     }
-    
+
     /**
      * Create and Assign a new URN to the given Document
      * Ensure that new created URNs do not allready exist in URN store
@@ -273,14 +273,13 @@ public class MCRURNManager {
      * @param configID - the configurationID of the URN Builder 
      * @return the URN
      */
-    public static synchronized String buildAndAssignURN(String documentID, String configID){
-        String urn=null;
-        do{
-        	urn = buildURN(configID);
-        }
-        while(isAssigned(urn));	
-        
-    	assignURN(urn, documentID);
+    public static synchronized String buildAndAssignURN(String documentID, String configID) {
+        String urn = null;
+        do {
+            urn = buildURN(configID);
+        } while (isAssigned(urn));
+
+        assignURN(urn, documentID);
         return urn;
     }
 }

@@ -89,7 +89,7 @@ public class MCRContentStoreFactory {
                 LOGGER.debug("getting StoreClass: " + storeClass);
 
                 Object obj = MCRConfiguration.instance().getInstanceOf(storeClass);
-                MCRContentStore s = (MCRContentStore) (obj);
+                MCRContentStore s = (MCRContentStore) obj;
                 s.init(storeID);
                 STORES.put(storeID, s);
 
@@ -99,7 +99,7 @@ public class MCRContentStoreFactory {
             }
         }
 
-        return (MCRContentStore) (STORES.get(storeID));
+        return (MCRContentStore) STORES.get(storeID);
     }
 
     /**
@@ -165,7 +165,7 @@ public class MCRContentStoreFactory {
             }
         }
 
-        return (Class) (EXTENDER_CLASSES.get(storeID));
+        return (Class) EXTENDER_CLASSES.get(storeID);
     }
 
     /**
@@ -183,7 +183,7 @@ public class MCRContentStoreFactory {
      *             be loaded
      */
     static boolean providesAudioVideoExtender(String storeID) {
-        return (getExtenderClass(storeID) != null);
+        return getExtenderClass(storeID) != null;
     }
 
     /**

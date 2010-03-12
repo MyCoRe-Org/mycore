@@ -34,7 +34,8 @@ import org.mycore.common.MCRConfiguration;
 public class MCRCategoryDAOFactory {
 
     private static final String STANDARD_DAO = "org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl";
-    private static MCRCategoryDAO instance=(MCRCategoryDAO) MCRConfiguration.instance().getInstanceOf("MCR.Category.DAO", STANDARD_DAO);
+
+    private static MCRCategoryDAO instance = (MCRCategoryDAO) MCRConfiguration.instance().getInstanceOf("MCR.Category.DAO", STANDARD_DAO);
 
     /**
      * Returns an instance of a MCRCategoryDAO implementator.

@@ -177,7 +177,6 @@ public interface MCRUserStore {
      */
     public void updateGroup(MCRGroup group) throws MCRException;
 
-
     /**
      * This method updates a MyCoRe user object in the persistent datastore.
      * 

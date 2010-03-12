@@ -128,7 +128,7 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
         Session session = getSession();
         if (ownerID.equals("imgCache")) {
             //TODO: use projection to retrieve ID
-            StringBuffer sb = (new StringBuffer("from MCRFSNODES where OWNER = '")).append(ownerID).append("' and PID is NULL");
+            StringBuffer sb = new StringBuffer("from MCRFSNODES where OWNER = '").append(ownerID).append("' and PID is NULL");
             List<MCRFSNODES> l = session.createQuery(sb.toString()).list();
             if (l.size() < 1) {
                 logger.warn("There is no fsnode with OWNER = " + ownerID);
@@ -136,7 +136,7 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
             }
             return l.get(0).getId();
         } else {
-            StringBuffer sb = (new StringBuffer("select id from MCRFSNODES where OWNER = '")).append(ownerID).append("' and PID is NULL");
+            StringBuffer sb = new StringBuffer("select id from MCRFSNODES where OWNER = '").append(ownerID).append("' and PID is NULL");
             String nodeID = (String) session.createQuery(sb.toString()).uniqueResult();
             if (nodeID == null) {
                 logger.warn("There is no fsnode with OWNER = " + ownerID);
@@ -197,8 +197,8 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
         GregorianCalendar greg = new GregorianCalendar();
         greg.setTime(node.getDate());
 
-        return MCRFileMetadataManager.instance().buildNode(node.getType(), node.getId(), node.getPid(), node.getOwner(), node.getName(), node.getLabel(),
-                node.getSize(), greg, node.getStoreid(), node.getStorageid(), node.getFctid(), node.getMd5(), node.getNumchdd(), node.getNumchdf(),
-                node.getNumchtd(), node.getNumchtf());
+        return MCRFileMetadataManager.instance().buildNode(node.getType(), node.getId(), node.getPid(), node.getOwner(), node.getName(),
+                node.getLabel(), node.getSize(), greg, node.getStoreid(), node.getStorageid(), node.getFctid(), node.getMd5(),
+                node.getNumchdd(), node.getNumchdf(), node.getNumchtd(), node.getNumchtf());
     }
 }

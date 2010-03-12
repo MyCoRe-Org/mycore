@@ -48,10 +48,12 @@ public class MCRDataExtractorJPEG extends MCRDataExtractor {
     /** The logger */
     private final static Logger LOGGER = Logger.getLogger(MCRDataExtractorJPEG.class);
 
+    @Override
     protected String getSupportedContentTypeIDs() {
         return "jpeg";
     }
 
+    @Override
     protected void extractData(Element container, InputStream in) throws JpegProcessingException {
         Metadata metadata = JpegMetadataReader.readMetadata(in);
         Iterator directories = metadata.getDirectoryIterator();
@@ -69,8 +71,9 @@ public class MCRDataExtractorJPEG extends MCRDataExtractor {
             Element xDirectory = new Element("directory");
             xData.addContent(xDirectory);
             String dirName = directory.getName();
-            if (dirName != null)
+            if (dirName != null) {
                 xDirectory.setAttribute("name", dirName);
+            }
             Iterator tags = directory.getTagIterator();
             while (tags.hasNext()) {
                 Tag tag = (Tag) tags.next();

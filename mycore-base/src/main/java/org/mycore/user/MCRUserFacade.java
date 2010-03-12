@@ -33,8 +33,9 @@ public class MCRUserFacade {
     public static String getCurrentUser() {
         if (MCRConfiguration.instance().getBoolean("MCR.User.UseWebServer", false)) {
             Principal p = MCRSessionMgr.getCurrentSession().getUserPrincipal();
-            if (p != null)
+            if (p != null) {
                 return p.getName();
+            }
         }
         return MCRSessionMgr.getCurrentSession().getCurrentUserID();
     }
@@ -42,8 +43,9 @@ public class MCRUserFacade {
     public static boolean isUserInGroup(String role) {
         if (MCRConfiguration.instance().getBoolean("MCR.User.UseWebServer", false)) {
             Principal p = MCRSessionMgr.getCurrentSession().getUserPrincipal();
-            if (p != null)
+            if (p != null) {
                 return MCRSessionMgr.getCurrentSession().isPrincipalInRole(role);
+            }
         }
         return MCRUserMgr.instance().getCurrentUser().isMemberOf(new MCRGroup(role));
     }

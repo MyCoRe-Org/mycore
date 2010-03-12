@@ -67,6 +67,7 @@ public class MCRSessionMgr {
      * @see ThreadLocal
      */
     private static ThreadLocal<MCRSession> theThreadLocalSession = new ThreadLocal<MCRSession>() {
+        @Override
         public MCRSession initialValue() {
             return new MCRSession();
         }

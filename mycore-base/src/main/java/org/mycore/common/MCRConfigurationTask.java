@@ -29,19 +29,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -89,6 +84,7 @@ public class MCRConfigurationTask extends Task {
      * @throws BuildException
      *             if an error occurs
      */
+    @Override
     public void execute() throws BuildException {
         checkPreConditions();
         if (action != null && (action.equals("addInclude") || action.equals("removeInclude"))) {
@@ -124,8 +120,9 @@ public class MCRConfigurationTask extends Task {
 
     private Properties getProperties(File pFile) throws FileNotFoundException, IOException {
         Properties returns = new Properties();
-        if (pFile.exists())
+        if (pFile.exists()) {
             returns.load(new FileInputStream(pFile));
+        }
         return returns;
     }
 
@@ -134,19 +131,19 @@ public class MCRConfigurationTask extends Task {
      */
     private void checkPreConditions() throws BuildException {
         setIncludePattern(key);
-        if (action == null && (mergeFile == null)) {
+        if (action == null && mergeFile == null) {
             throw new BuildException("Must specify 'action' attribute");
         }
         if (propertyFile == null) {
             throw new BuildException("Must specify 'propertyfile' attribute");
         }
-        if (value == null && (mergeFile == null)) {
+        if (value == null && mergeFile == null) {
             throw new BuildException("Must specify 'value' attribute");
         }
-        if ((mergeFile == null) && ((action == null) || (!action.equals("addInclude") && !action.equals("removeInclude")))) {
+        if (mergeFile == null && (action == null || !action.equals("addInclude") && !action.equals("removeInclude"))) {
             throw new BuildException("action must be either 'addInclude' or 'removeInclude'");
         }
-        if (!propertyFile.exists() && (mergeFile == null)) {
+        if (!propertyFile.exists() && mergeFile == null) {
             throw new BuildException(new FileNotFoundException(propertyFile + " does not exists."));
         }
         if (mergeFile != null && !mergeFile.exists()) {
@@ -173,20 +170,21 @@ public class MCRConfigurationTask extends Task {
      */
     private void addInclude() {
         if (valuePresent) {
-            handleOutput(new StringBuffer("Not changing ").append(propertyFile.getName()).append(": '").append(value).append("' already included.").toString());
+            handleOutput(new StringBuffer("Not changing ").append(propertyFile.getName()).append(": '").append(value).append(
+                    "' already included.").toString());
             return;
         }
         fileChanged = true;
         String prop = propLines.get(lineNumber).toString();
         String newProp = prop;
-        if(prop.charAt(prop.length() - 1) != '=') {
+        if (prop.charAt(prop.length() - 1) != '=') {
             newProp += ",";
         }
         newProp += value;
         propLines.remove(lineNumber);
         propLines.add(lineNumber, newProp);
-        handleOutput(new StringBuffer(propertyFile.getName()).append(':').append(lineNumber).append(" added '").append(value).append("' to ").append(getKey())
-                .toString());
+        handleOutput(new StringBuffer(propertyFile.getName()).append(':').append(lineNumber).append(" added '").append(value).append(
+                "' to ").append(getKey()).toString());
     }
 
     /**
@@ -194,15 +192,16 @@ public class MCRConfigurationTask extends Task {
      */
     private void removeInclude() {
         if (!valuePresent) {
-            handleOutput(new StringBuffer("Not changing ").append(propertyFile.getName()).append(": '").append(value).append("' not present.").toString());
+            handleOutput(new StringBuffer("Not changing ").append(propertyFile.getName()).append(": '").append(value).append(
+                    "' not present.").toString());
             return;
         }
         fileChanged = true;
         String newProp = propLines.get(lineNumber).toString().replaceAll("," + value, "");
         propLines.remove(lineNumber);
         propLines.add(lineNumber, newProp);
-        handleOutput(new StringBuffer(propertyFile.getName()).append(':').append(lineNumber).append(" removed '").append(value).append("' from ").append(
-                getKey()).toString());
+        handleOutput(new StringBuffer(propertyFile.getName()).append(':').append(lineNumber).append(" removed '").append(value).append(
+                "' from ").append(getKey()).toString());
     }
 
     /*
@@ -212,8 +211,8 @@ public class MCRConfigurationTask extends Task {
         BufferedWriter writer = null;
         try {
             writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(propertyFile), PROPERTY_CHARSET));
-            for (Iterator it = propLines.iterator(); it.hasNext();) {
-                writer.write(it.next().toString());
+            for (Object element : propLines) {
+                writer.write(element.toString());
                 writer.newLine();
             }
         } catch (IOException e) {
@@ -243,7 +242,7 @@ public class MCRConfigurationTask extends Task {
             for (String line = reader.readLine(); line != null; line = reader.readLine()) {
                 // add each line of the property file to the array list
                 propLines.add(line);
-                if ((lineNumber < 0) && includePattern.matcher(line).find()) {
+                if (lineNumber < 0 && includePattern.matcher(line).find()) {
                     // found the MCR.Configuration.Include line
                     lineNumber = i;
                     if (line.indexOf(value) > 0) {
@@ -325,10 +324,11 @@ public class MCRConfigurationTask extends Task {
     }
 
     public String getKey() {
-        if (key == null)
+        if (key == null) {
             return MCR_CONFIGURATION_INCLUDE_DEFAULT;
-        else
+        } else {
             return key;
+        }
     }
 
     public void setKey(String key) {
@@ -336,10 +336,11 @@ public class MCRConfigurationTask extends Task {
     }
 
     public void setIncludePattern(String key) {
-        if (key == null)
-            this.includePattern = Pattern.compile(MCR_CONFIGURATION_INCLUDE_DEFAULT);
-        else
-            this.includePattern = Pattern.compile(key);
+        if (key == null) {
+            includePattern = Pattern.compile(MCR_CONFIGURATION_INCLUDE_DEFAULT);
+        } else {
+            includePattern = Pattern.compile(key);
+        }
     }
 
     private static class AlphabeticallyPropertyOutputter {
@@ -391,12 +392,13 @@ public class MCRConfigurationTask extends Task {
             while (current < len) {
                 char c = comments.charAt(current);
                 if (c > '\u00ff' || c == '\n' || c == '\r') {
-                    if (last != current)
+                    if (last != current) {
                         bw.write(comments.substring(last, current));
+                    }
                     if (c > '\u00ff') {
-                        uu[2] = toHex((c >> 12) & 0xf);
-                        uu[3] = toHex((c >> 8) & 0xf);
-                        uu[4] = toHex((c >> 4) & 0xf);
+                        uu[2] = toHex(c >> 12 & 0xf);
+                        uu[3] = toHex(c >> 8 & 0xf);
+                        uu[4] = toHex(c >> 4 & 0xf);
                         uu[5] = toHex(c & 0xf);
                         bw.write(new String(uu));
                     } else {
@@ -404,15 +406,17 @@ public class MCRConfigurationTask extends Task {
                         if (c == '\r' && current != len - 1 && comments.charAt(current + 1) == '\n') {
                             current++;
                         }
-                        if (current == len - 1 || (comments.charAt(current + 1) != '#' && comments.charAt(current + 1) != '!'))
+                        if (current == len - 1 || comments.charAt(current + 1) != '#' && comments.charAt(current + 1) != '!') {
                             bw.write("#");
+                        }
                     }
                     last = current + 1;
                 }
                 current++;
             }
-            if (last != current)
+            if (last != current) {
                 bw.write(comments.substring(last, current));
+            }
             bw.newLine();
         }
 
@@ -432,7 +436,7 @@ public class MCRConfigurationTask extends Task {
                 char aChar = theString.charAt(x);
                 // Handle common case first, selecting largest block that
                 // avoids the specials below
-                if ((aChar > 61) && (aChar < 127)) {
+                if (aChar > 61 && aChar < 127) {
                     if (aChar == '\\') {
                         outBuffer.append('\\');
                         outBuffer.append('\\');
@@ -443,8 +447,9 @@ public class MCRConfigurationTask extends Task {
                 }
                 switch (aChar) {
                 case ' ':
-                    if (x == 0 || escapeSpace)
+                    if (x == 0 || escapeSpace) {
                         outBuffer.append('\\');
+                    }
                     outBuffer.append(' ');
                     break;
                 case '\t':
@@ -471,12 +476,12 @@ public class MCRConfigurationTask extends Task {
                     outBuffer.append(aChar);
                     break;
                 default:
-                    if (((aChar < 0x0020) || (aChar > 0x007e)) & escapeUnicode) {
+                    if ((aChar < 0x0020 || aChar > 0x007e) & escapeUnicode) {
                         outBuffer.append('\\');
                         outBuffer.append('u');
-                        outBuffer.append(toHex((aChar >> 12) & 0xF));
-                        outBuffer.append(toHex((aChar >> 8) & 0xF));
-                        outBuffer.append(toHex((aChar >> 4) & 0xF));
+                        outBuffer.append(toHex(aChar >> 12 & 0xF));
+                        outBuffer.append(toHex(aChar >> 8 & 0xF));
+                        outBuffer.append(toHex(aChar >> 4 & 0xF));
                         outBuffer.append(toHex(aChar & 0xF));
                     } else {
                         outBuffer.append(aChar);

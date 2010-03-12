@@ -15,13 +15,13 @@ import java.util.List;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public interface MCROAIResumptionTokenStore {
-    
+
     public List<String[]> getResumptionTokenHits(String resumptionTokenID, int requestedSize, int maxResults);
-    
+
     public void createResumptionToken(String id, String prefix, String instance, List<?> resultList);
-    
+
     public String getPrefix(String token);
-    
+
     public void deleteOutdatedTokens();
 
 }

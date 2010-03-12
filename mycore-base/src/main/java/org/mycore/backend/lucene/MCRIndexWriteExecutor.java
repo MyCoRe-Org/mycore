@@ -86,11 +86,12 @@ class MCRIndexWriteExecutor extends ThreadPoolExecutor {
         super.afterExecute(r, t);
         //allow to close the IndexWriter
         writeAccess.get().unlock();
-        if (firstJob)
+        if (firstJob) {
             firstJob = false;
-        if (closeModifierEarly || this.getCompletedTaskCount() % maxIndexWriteActions == 0)
+        }
+        if (closeModifierEarly || getCompletedTaskCount() % maxIndexWriteActions == 0) {
             closeIndexWriter();
-        else {
+        } else {
             cancelDelayedIndexCloser();
             try {
                 delayedFuture = scheduler.schedule(delayedCloser, 2, TimeUnit.SECONDS);
@@ -106,8 +107,9 @@ class MCRIndexWriteExecutor extends ThreadPoolExecutor {
         //do not close IndexWriter while IndexWriterActions is processed
         writeAccess.get().lock();
         cancelDelayedIndexCloser();
-        if (modifierClosed)
+        if (modifierClosed) {
             openIndexWriter();
+        }
         super.beforeExecute(t, r);
     }
 
@@ -133,8 +135,9 @@ class MCRIndexWriteExecutor extends ThreadPoolExecutor {
     private synchronized void openIndexWriter() {
         try {
             LOGGER.debug("Opening Lucene index for writing.");
-            if (indexWriter == null)
+            if (indexWriter == null) {
                 indexWriter = getLuceneWriter(indexDir, firstJob);
+            }
         } catch (Exception e) {
             LOGGER.warn("Error while reopening IndexWriter.", e);
         } finally {
@@ -168,7 +171,7 @@ class MCRIndexWriteExecutor extends ThreadPoolExecutor {
         Analyzer analyzer = new GermanAnalyzer(Version.LUCENE_CURRENT);
         boolean create = false;
         // check if indexDir is empty before creating a new index
-        if (first && (indexDir.listAll().length == 0)) {
+        if (first && indexDir.listAll().length == 0) {
             LOGGER.info("No Entries in Directory, initialize: " + indexDir);
             create = true;
         }

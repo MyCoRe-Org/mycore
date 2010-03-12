@@ -64,7 +64,7 @@ public class MCRSQLConnectionPool {
 
     /** The maximum age a connection can be before it is reconnected */
     static long maxAge;
-    
+
     static String url;
 
     static String userID;
@@ -72,7 +72,7 @@ public class MCRSQLConnectionPool {
     static String password;
 
     /** The logger */
-    private static Logger LOGGER = Logger.getLogger( MCRSQLConnectionPool.class );
+    private static Logger LOGGER = Logger.getLogger(MCRSQLConnectionPool.class);
 
     /**
      * Returns the connection pool singleton.
@@ -103,17 +103,21 @@ public class MCRSQLConnectionPool {
         LOGGER.debug("Reading database configuration from hibernate.cfg.xml");
         try {
             Element cfg = MCRURIResolver.instance().resolve("resource:hibernate.cfg.xml");
+            @SuppressWarnings("unchecked")
             List<Element> properties = cfg.getChild("session-factory").getChildren("property");
             for (Element property : properties) {
                 String name = property.getAttributeValue("name");
-                if ("connection.driver_class".equals(name))
+                if ("connection.driver_class".equals(name)) {
                     driver = property.getTextNormalize();
-                else if ("connection.url".equals(name))
+                } else if ("connection.url".equals(name)) {
                     url = property.getTextNormalize();
-                if ("connection.username".equals(name))
+                }
+                if ("connection.username".equals(name)) {
                     userID = property.getTextNormalize();
-                if ("connection.password".equals(name))
+                }
+                if ("connection.password".equals(name)) {
                     password = property.getTextNormalize();
+                }
             }
         } catch (Exception ex) {
             // Read deprecated configuration values
@@ -143,7 +147,7 @@ public class MCRSQLConnectionPool {
         int initNumConnections = config.getInt("MCR.Persistence.SQL.Connections.Init", maxNumConnections);
         maxUsages = config.getInt("MCR.Persistence.SQL.Database.Connections.MaxUsages", 1000);
         maxAge = config.getLong("MCR.Persistence.SQL.Database.Connections.MaxAge", 3600 * 1000); // 1
-                                                                                                    // hour
+        // hour
 
         // Build the initial number of JDBC connections
         for (int i = 0; i < initNumConnections; i++) {
@@ -177,7 +181,7 @@ public class MCRSQLConnectionPool {
                 } catch (InterruptedException ignored) {
                 }
                 timeWaited = System.currentTimeMillis() - startTime;
-            } while ((usedConnections.size() == maxNumConnections) && (timeWaited <= maxWaitTime));
+            } while (usedConnections.size() == maxNumConnections && timeWaited <= maxWaitTime);
 
             LOGGER.debug("waited " + timeWaited + " ms for database connection");
             if (usedConnections.size() == maxNumConnections) {
@@ -189,10 +193,10 @@ public class MCRSQLConnectionPool {
         MCRSQLConnection connection;
 
         // Do we have to build a connection or is there already one?
-        if (freeConnections.isEmpty())
+        if (freeConnections.isEmpty()) {
             connection = new MCRSQLConnection();
-        else {
-            connection = (MCRSQLConnection) (freeConnections.firstElement());
+        } else {
+            connection = freeConnections.firstElement();
             freeConnections.removeElement(connection);
         }
 
@@ -231,13 +235,16 @@ public class MCRSQLConnectionPool {
     /**
      * Finalizer, closes all connections in this connection pool
      */
+    @Override
     public void finalize() {
         try {
-            for (int i = 0; i < usedConnections.size(); i++)
-                ((Connection) (usedConnections.elementAt(i))).close();
+            for (int i = 0; i < usedConnections.size(); i++) {
+                ((Connection) usedConnections.elementAt(i)).close();
+            }
 
-            for (int i = 0; i < freeConnections.size(); i++)
-                ((Connection) (freeConnections.elementAt(i))).close();
+            for (int i = 0; i < freeConnections.size(); i++) {
+                ((Connection) freeConnections.elementAt(i)).close();
+            }
         } catch (Exception ignored) {
         }
     }

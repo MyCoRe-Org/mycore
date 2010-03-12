@@ -133,7 +133,9 @@ public class MCRUserContact {
     /**
      * Constructor. All address and contact attributes are passed as Strings
      */
-    public MCRUserContact(String salutation, String firstname, String lastname, String street, String city, String postalcode, String country, String state, String institution, String faculty, String department, String institute, String telephone, String fax, String email, String cellphone) {
+    public MCRUserContact(String salutation, String firstname, String lastname, String street, String city, String postalcode,
+            String country, String state, String institution, String faculty, String department, String institute, String telephone,
+            String fax, String email, String cellphone) {
         init();
         this.salutation = MCRUserObject.trim(salutation, salutation_len);
         this.firstname = MCRUserObject.trim(firstname, firstname_len);
@@ -153,8 +155,10 @@ public class MCRUserContact {
         this.cellphone = MCRUserObject.trim(cellphone, cellphone_len);
     }
 
+    @Override
     public Object clone() {
-        return new MCRUserContact(this.salutation, this.firstname, this.lastname, this.street, this.city, this.postalcode, this.country, this.state, this.institution, this.faculty, this.department, this.institute, this.telephone, this.fax, this.email, this.cellphone);
+        return new MCRUserContact(salutation, firstname, lastname, street, city, postalcode, country, state, institution, faculty,
+                department, institute, telephone, fax, email, cellphone);
     }
 
     /**
@@ -180,22 +184,22 @@ public class MCRUserContact {
             return;
         }
 
-        this.salutation = MCRUserObject.trim(elm.getChildTextTrim("contact.salutation"), salutation_len);
-        this.firstname = MCRUserObject.trim(elm.getChildTextTrim("contact.firstname"), firstname_len);
-        this.lastname = MCRUserObject.trim(elm.getChildTextTrim("contact.lastname"), lastname_len);
-        this.street = MCRUserObject.trim(elm.getChildTextTrim("contact.street"), street_len);
-        this.city = MCRUserObject.trim(elm.getChildTextTrim("contact.city"), city_len);
-        this.postalcode = MCRUserObject.trim(elm.getChildTextTrim("contact.postalcode"), postalcode_len);
-        this.country = MCRUserObject.trim(elm.getChildTextTrim("contact.country"), country_len);
-        this.state = MCRUserObject.trim(elm.getChildTextTrim("contact.state"), state_len);
-        this.institution = MCRUserObject.trim(elm.getChildTextTrim("contact.institution"), institution_len);
-        this.faculty = MCRUserObject.trim(elm.getChildTextTrim("contact.faculty"), faculty_len);
-        this.department = MCRUserObject.trim(elm.getChildTextTrim("contact.department"), department_len);
-        this.institute = MCRUserObject.trim(elm.getChildTextTrim("contact.institute"), institute_len);
-        this.telephone = MCRUserObject.trim(elm.getChildTextTrim("contact.telephone"), telephone_len);
-        this.fax = MCRUserObject.trim(elm.getChildTextTrim("contact.fax"), fax_len);
-        this.email = MCRUserObject.trim(elm.getChildTextTrim("contact.email"), email_len);
-        this.cellphone = MCRUserObject.trim(elm.getChildTextTrim("contact.cellphone"), cellphone_len);
+        salutation = MCRUserObject.trim(elm.getChildTextTrim("contact.salutation"), salutation_len);
+        firstname = MCRUserObject.trim(elm.getChildTextTrim("contact.firstname"), firstname_len);
+        lastname = MCRUserObject.trim(elm.getChildTextTrim("contact.lastname"), lastname_len);
+        street = MCRUserObject.trim(elm.getChildTextTrim("contact.street"), street_len);
+        city = MCRUserObject.trim(elm.getChildTextTrim("contact.city"), city_len);
+        postalcode = MCRUserObject.trim(elm.getChildTextTrim("contact.postalcode"), postalcode_len);
+        country = MCRUserObject.trim(elm.getChildTextTrim("contact.country"), country_len);
+        state = MCRUserObject.trim(elm.getChildTextTrim("contact.state"), state_len);
+        institution = MCRUserObject.trim(elm.getChildTextTrim("contact.institution"), institution_len);
+        faculty = MCRUserObject.trim(elm.getChildTextTrim("contact.faculty"), faculty_len);
+        department = MCRUserObject.trim(elm.getChildTextTrim("contact.department"), department_len);
+        institute = MCRUserObject.trim(elm.getChildTextTrim("contact.institute"), institute_len);
+        telephone = MCRUserObject.trim(elm.getChildTextTrim("contact.telephone"), telephone_len);
+        fax = MCRUserObject.trim(elm.getChildTextTrim("contact.fax"), fax_len);
+        email = MCRUserObject.trim(elm.getChildTextTrim("contact.email"), email_len);
+        cellphone = MCRUserObject.trim(elm.getChildTextTrim("contact.cellphone"), cellphone_len);
     }
 
     /**
@@ -288,67 +292,67 @@ public class MCRUserContact {
     }
 
     public final void setSalutation(String v) {
-        this.salutation = v;
+        salutation = v;
     }
 
     public final void setFirstName(String v) {
-        this.firstname = v;
+        firstname = v;
     }
 
     public final void setLastName(String v) {
-        this.lastname = v;
+        lastname = v;
     }
 
     public final void setStreet(String v) {
-        this.street = v;
+        street = v;
     }
 
     public final void setCity(String v) {
-        this.city = v;
+        city = v;
     }
 
     public final void setPostalCode(String v) {
-        this.postalcode = v;
+        postalcode = v;
     }
 
     public final void setCountry(String v) {
-        this.country = v;
+        country = v;
     }
 
     public final void setState(String v) {
-        this.state = v;
+        state = v;
     }
 
     public final void setInstitution(String v) {
-        this.institution = v;
+        institution = v;
     }
 
     public final void setFaculty(String v) {
-        this.faculty = v;
+        faculty = v;
     }
 
     public final void setDepartment(String v) {
-        this.department = v;
+        department = v;
     }
 
     public final void setInstitute(String v) {
-        this.institute = v;
+        institute = v;
     }
 
     public final void setTelephone(String v) {
-        this.telephone = v;
+        telephone = v;
     }
 
     public final void setFax(String v) {
-        this.fax = v;
+        fax = v;
     }
 
     public final void setEmail(String v) {
-        this.email = v;
+        email = v;
     }
 
     public final void setCellphone(String v) {
-        this.cellphone = v;
+        cellphone = v;
     }
 
     /**
@@ -378,7 +382,9 @@ public class MCRUserContact {
         org.jdom.Element Cellphone = new org.jdom.Element("contact.cellphone").setText(cellphone);
 
         // Aggregate address element
-        address.addContent(Salutation).addContent(Firstname).addContent(Lastname).addContent(Street).addContent(City).addContent(Postalcode).addContent(Country).addContent(State).addContent(Institution).addContent(Faculty).addContent(Department).addContent(Institute).addContent(Telephone).addContent(Fax).addContent(Email).addContent(Cellphone);
+        address.addContent(Salutation).addContent(Firstname).addContent(Lastname).addContent(Street).addContent(City)
+                .addContent(Postalcode).addContent(Country).addContent(State).addContent(Institution).addContent(Faculty).addContent(
+                        Department).addContent(Institute).addContent(Telephone).addContent(Fax).addContent(Email).addContent(Cellphone);
 
         return address;
     }
@@ -405,58 +411,54 @@ public class MCRUserContact {
         logger.debug("Cellphone       : " + cellphone);
     }
 
+    @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof MCRUserContact)){
+        if (!(obj instanceof MCRUserContact)) {
             return false;
         }
-        MCRUserContact uc=(MCRUserContact)obj;
-        if (this==uc){
+        MCRUserContact uc = (MCRUserContact) obj;
+        if (this == uc) {
             return true;
         }
-        if (this.hashCode()!=this.hashCode()){
+        if (hashCode() != hashCode()) {
             //acording to the hashCode() contract
             return false;
         }
         return fastEquals(uc);
     }
-    
-    private boolean fastEquals(MCRUserContact uc){
-        return ((this.cellphone==uc.cellphone) &&
-                ((this.city==uc.city) || (this.city.equals(uc.city))) && 
-                ((this.country==uc.country) || (this.country.equals(uc.country))) && 
-                ((this.department==uc.department) || (this.department.equals(uc.department))) && 
-                ((this.email==uc.email) || (this.email.equals(uc.email))) && 
-                ((this.faculty==uc.faculty) || (this.faculty.equals(uc.faculty))) && 
-                ((this.fax==uc.fax) || (this.fax.equals(uc.fax))) && 
-                ((this.firstname==uc.firstname) || (this.firstname.equals(uc.firstname))) && 
-                ((this.institute==uc.institute) || (this.institute.equals(uc.institute))) && 
-                ((this.institution==uc.institution) || (this.institution.equals(uc.institution))) && 
-                ((this.lastname==uc.lastname) || (this.lastname.equals(uc.lastname))) && 
-                ((this.postalcode==uc.postalcode) || (this.postalcode.equals(uc.postalcode))) && 
-                ((this.salutation==uc.salutation) || (this.salutation.equals(uc.salutation))) && 
-                ((this.state==uc.state) || (this.state.equals(uc.state))) && 
-                ((this.street==uc.street) || (this.street.equals(uc.street))) && 
-                ((this.telephone==uc.telephone) || (this.telephone.equals(uc.telephone)))
-               );
+
+    private boolean fastEquals(MCRUserContact uc) {
+        return cellphone == uc.cellphone && (city == uc.city || city.equals(uc.city))
+                && (country == uc.country || country.equals(uc.country))
+                && (department == uc.department || department.equals(uc.department)) && (email == uc.email || email.equals(uc.email))
+                && (faculty == uc.faculty || faculty.equals(uc.faculty)) && (fax == uc.fax || fax.equals(uc.fax))
+                && (firstname == uc.firstname || firstname.equals(uc.firstname))
+                && (institute == uc.institute || institute.equals(uc.institute))
+                && (institution == uc.institution || institution.equals(uc.institution))
+                && (lastname == uc.lastname || lastname.equals(uc.lastname))
+                && (postalcode == uc.postalcode || postalcode.equals(uc.postalcode))
+                && (salutation == uc.salutation || salutation.equals(uc.salutation)) && (state == uc.state || state.equals(uc.state))
+                && (street == uc.street || street.equals(uc.street)) && (telephone == uc.telephone || telephone.equals(uc.telephone));
     }
 
+    @Override
     public int hashCode() {
-        int result=17;
-        result = 37*result+this.cellphone.hashCode();
-        result = 37*result+this.city.hashCode();
-        result = 37*result+this.department.hashCode();
-        result = 37*result+this.email.hashCode();
-        result = 37*result+this.faculty.hashCode();
-        result = 37*result+this.fax.hashCode();
-        result = 37*result+this.firstname.hashCode();
-        result = 37*result+this.institute.hashCode();
-        result = 37*result+this.institution.hashCode();
-        result = 37*result+this.lastname.hashCode();
-        result = 37*result+this.postalcode.hashCode();
-        result = 37*result+this.salutation.hashCode();
-        result = 37*result+this.state.hashCode();
-        result = 37*result+this.street.hashCode();
-        result = 37*result+this.telephone.hashCode();
+        int result = 17;
+        result = 37 * result + cellphone.hashCode();
+        result = 37 * result + city.hashCode();
+        result = 37 * result + department.hashCode();
+        result = 37 * result + email.hashCode();
+        result = 37 * result + faculty.hashCode();
+        result = 37 * result + fax.hashCode();
+        result = 37 * result + firstname.hashCode();
+        result = 37 * result + institute.hashCode();
+        result = 37 * result + institution.hashCode();
+        result = 37 * result + lastname.hashCode();
+        result = 37 * result + postalcode.hashCode();
+        result = 37 * result + salutation.hashCode();
+        result = 37 * result + state.hashCode();
+        result = 37 * result + street.hashCode();
+        result = 37 * result + telephone.hashCode();
         return result;
     }
 }

@@ -71,8 +71,8 @@ public abstract class MCRContentStore {
      */
     public void init(String storeID) {
         this.storeID = storeID;
-        this.prefix = "MCR.IFS.ContentStore." + storeID + ".";
-        this.slotDirDepth = MCRConfiguration.instance().getInt(prefix + "SlotDirDepth", 2);
+        prefix = "MCR.IFS.ContentStore." + storeID + ".";
+        slotDirDepth = MCRConfiguration.instance().getInt(prefix + "SlotDirDepth", 2);
     }
 
     /**
@@ -166,6 +166,7 @@ public abstract class MCRContentStore {
      * @deprecated
      *        use doRetrieveContent(MCRFileReader file) instead
      */
+    @Deprecated
     public void retrieveContent(MCRFileReader file, OutputStream target) throws MCRException {
         InputStream in = null;
         try {
@@ -193,6 +194,7 @@ public abstract class MCRContentStore {
      * @deprecated 
      *          use doRetrieveContent(MCRFileReader file) instead
      */
+    @Deprecated
     protected abstract void doRetrieveContent(MCRFileReader file, OutputStream target) throws Exception;
 
     /**
@@ -259,7 +261,7 @@ public abstract class MCRContentStore {
             ts = formatter.format(new Date());
         } while (ts.equals(lastTimestamp));
 
-        return (lastTimestamp = ts);
+        return lastTimestamp = ts;
     }
 
     /**
@@ -282,8 +284,9 @@ public abstract class MCRContentStore {
 
         for (int i = 0; i < slotDirDepth; i++) {
             String slot = String.valueOf(random.nextInt(100));
-            if (slot.length() < 2)
+            if (slot.length() < 2) {
                 slot = "0" + slot;
+            }
             slots[i] = slot;
         }
 

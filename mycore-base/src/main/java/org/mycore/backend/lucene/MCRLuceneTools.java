@@ -82,9 +82,10 @@ public class MCRLuceneTools {
 
         TokenStream ts = analyzer.tokenStream(null, new StringReader(value));
         while (ts.incrementToken()) {
-            TermAttribute ta=(TermAttribute) ts.getAttribute(TermAttribute.class);
-            if (sb.length() > 0)
+            TermAttribute ta = ts.getAttribute(TermAttribute.class);
+            if (sb.length() > 0) {
                 sb.append(" ");
+            }
             sb.append(ta.termBuffer());
         }
 

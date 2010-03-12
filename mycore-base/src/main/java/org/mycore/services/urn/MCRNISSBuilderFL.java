@@ -47,9 +47,9 @@ public class MCRNISSBuilderFL implements MCRNISSBuilder {
         int hh = now.get(Calendar.HOUR_OF_DAY);
         int mm = now.get(Calendar.MINUTE);
         int ss = now.get(Calendar.SECOND);
-        int sss = 99999 - ((hh * 3600) + (mm * 60) + ss);
+        int sss = 99999 - (hh * 3600 + mm * 60 + ss);
 
-        String DDDDD = String.valueOf((yyy * 366) + ddd);
+        String DDDDD = String.valueOf(yyy * 366 + ddd);
 
         StringBuffer buffer = new StringBuffer();
         buffer.append(DDDDD.charAt(4));

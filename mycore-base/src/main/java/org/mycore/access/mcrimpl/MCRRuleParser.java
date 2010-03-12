@@ -45,7 +45,7 @@ class MCRRuleParser extends MCRBooleanClauseParser {
             long time = dateformat.parse(s).getTime();
 
             if (dayafter) {
-                time += (1000 * 60 * 60 * 24);
+                time += 1000 * 60 * 60 * 24;
             }
 
             return new Date(time);
@@ -54,10 +54,11 @@ class MCRRuleParser extends MCRBooleanClauseParser {
         }
     }
 
+    @Override
     protected MCRCondition parseSimpleCondition(Element e) throws MCRParseException {
         String name = e.getName();
         if (name.equals("boolean")) {
-        	return super.parseSimpleCondition(e);
+            return super.parseSimpleCondition(e);
         } else if (name.equals("condition")) {
             String field = e.getAttributeValue("field").toLowerCase().trim();
             String operator = e.getAttributeValue("operator").trim();
@@ -65,32 +66,32 @@ class MCRRuleParser extends MCRBooleanClauseParser {
             boolean not = "!=".equals(operator);
 
             if (field.equals("group")) {
-            	return new MCRGroupClause(value, not);
+                return new MCRGroupClause(value, not);
             } else if (field.equals("user")) {
-            	return new MCRUserClause(value, not);
-            }else if (field.equals("ip")) {
-            	return new MCRIPClause(value);
-            }else if (field.equals("date")) {
-            	if(operator.equals("<")) {
-            		return new MCRDateBeforeClause(parseDate(value, false));
-            	}else if(operator.equals("<=")) {
-            		return new MCRDateBeforeClause(parseDate(value, true));
-            	}else if(operator.equals(">")) {
-            		return new MCRDateAfterClause(parseDate(value, true));
-            	}else if(operator.equals(">=")) {
-            		return new MCRDateAfterClause(parseDate(value, false));
-            	}
-            	else {
-            		throw new MCRParseException("Not a valid operator <" + operator + ">");
-            	}
-            }else {
-            	throw new MCRParseException("Not a valid condition field <" + field + ">");
+                return new MCRUserClause(value, not);
+            } else if (field.equals("ip")) {
+                return new MCRIPClause(value);
+            } else if (field.equals("date")) {
+                if (operator.equals("<")) {
+                    return new MCRDateBeforeClause(parseDate(value, false));
+                } else if (operator.equals("<=")) {
+                    return new MCRDateBeforeClause(parseDate(value, true));
+                } else if (operator.equals(">")) {
+                    return new MCRDateAfterClause(parseDate(value, true));
+                } else if (operator.equals(">=")) {
+                    return new MCRDateAfterClause(parseDate(value, false));
+                } else {
+                    throw new MCRParseException("Not a valid operator <" + operator + ">");
+                }
+            } else {
+                throw new MCRParseException("Not a valid condition field <" + field + ">");
             }
-        }else{
+        } else {
             throw new MCRParseException("Not a valid name <" + name + ">");
-        }  	
+        }
     }
 
+    @Override
     protected MCRCondition parseSimpleCondition(String s) throws MCRParseException {
         /* handle specific rules */
         if (s.equalsIgnoreCase("false")) {
@@ -105,18 +106,22 @@ class MCRRuleParser extends MCRBooleanClauseParser {
             s = s.substring(5).trim();
             if (s.startsWith("!=")) {
                 return new MCRGroupClause(s.substring(2).trim(), true);
-            } else if(s.startsWith("=")) {
+            } else if (s.startsWith("=")) {
                 return new MCRGroupClause(s.substring(1).trim(), false);
-            } else throw new MCRParseException("syntax error: " + s);
+            } else {
+                throw new MCRParseException("syntax error: " + s);
+            }
         }
 
         if (s.startsWith("user")) {
             s = s.substring(4).trim();
             if (s.startsWith("!=")) {
                 return new MCRUserClause(s.substring(2).trim(), true);
-            } else if(s.startsWith("=")) {
+            } else if (s.startsWith("=")) {
                 return new MCRUserClause(s.substring(1).trim(), false);
-            } else throw new MCRParseException("syntax error: " + s);
+            } else {
+                throw new MCRParseException("syntax error: " + s);
+            }
         }
 
         if (s.startsWith("ip ")) {
@@ -133,7 +138,9 @@ class MCRRuleParser extends MCRBooleanClauseParser {
                 return new MCRDateAfterClause(parseDate(s.substring(1).trim(), true));
             } else if (s.startsWith("<")) {
                 return new MCRDateBeforeClause(parseDate(s.substring(1).trim(), false));
-            } else throw new MCRParseException("syntax error: " + s);
+            } else {
+                throw new MCRParseException("syntax error: " + s);
+            }
         }
 
         throw new MCRParseException("syntax error: " + s);

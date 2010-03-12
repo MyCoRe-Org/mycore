@@ -170,10 +170,11 @@ public class MCRContent {
      * Ensures that content is XML
      */
     public MCRContent ensureXML() throws Exception {
-        if (isXML)
+        if (isXML) {
             return this;
-        else
+        } else {
             return MCRContent.readFrom(asXML());
+        }
     }
 
     /**
@@ -193,8 +194,9 @@ public class MCRContent {
      * @return the content input stream
      */
     public MCRContentInputStream getContentInputStream() {
-        if (!(in instanceof MCRContentInputStream))
+        if (!(in instanceof MCRContentInputStream)) {
             in = new MCRContentInputStream(in);
+        }
         return (MCRContentInputStream) in;
     }
 
@@ -283,10 +285,11 @@ public class MCRContent {
      * used once.
      */
     protected void checkConsumed() {
-        if (consumed)
+        if (consumed) {
             throw new MCRUsageException("MCRContent is already consumed, can only be used once");
-        else
+        } else {
             consumed = true;
+        }
     }
 
     /**
@@ -299,8 +302,9 @@ public class MCRContent {
     public MCRContent[] makeCopies(int numCopies) throws IOException {
         MCRContent[] copies = new MCRContent[numCopies];
         byte[] bytes = asByteArray();
-        for (int i = 0; i < numCopies; i++)
+        for (int i = 0; i < numCopies; i++) {
             copies[i] = MCRContent.readFrom(bytes);
+        }
         return copies;
     }
 }

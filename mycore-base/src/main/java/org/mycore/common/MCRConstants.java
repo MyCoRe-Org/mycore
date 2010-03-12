@@ -27,7 +27,6 @@ package org.mycore.common;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
@@ -48,37 +47,44 @@ import org.jdom.Namespace;
 public final class MCRConstants {
     /** MyCoRe version */
     public final static String VERSION = "2.0";
-    
+
     /** The URL of the XLink */
     private final static String XLINK_URL = "http://www.w3.org/1999/xlink";
+
     public final static Namespace XLINK_NAMESPACE = Namespace.getNamespace("xlink", XLINK_URL);
 
     /** The URL of the XSI */
     private final static String XSI_URL = "http://www.w3.org/2001/XMLSchema-instance";
+
     public final static Namespace XSI_NAMESPACE = Namespace.getNamespace("xsi", XSI_URL);
 
     /** The URL of the XSL */
     private final static String XSL_URL = "http://www.w3.org/1999/XSL/Transform";
+
     public final static Namespace XSL_NAMESPACE = Namespace.getNamespace("xsl", XSL_URL);
-    
+
     /** The URL of the METS */
     private final static String METS_URL = "http://www.loc.gov/METS/";
+
     public final static Namespace METS_NAMESPACE = Namespace.getNamespace("mets", METS_URL);
-    
+
     /** The URL of the DV */
     private final static String DV_URL = "http://dfg-viewer.de/";
+
     public final static Namespace DV_NAMESPACE = Namespace.getNamespace("dv", DV_URL);
-    
+
     /** The URL of the MODS */
     private final static String MODS_URL = "http://www.loc.gov/mods/v3";
+
     public final static Namespace MODS_NAMESPACE = Namespace.getNamespace("mods", MODS_URL);
-    
+
     /** The URL of the MCR */
     private final static String MCR_URL = "http://www.mycore.org/";
+
     public final static Namespace MCR_NAMESPACE = Namespace.getNamespace("mcr", MCR_URL);
 
     private final static List<Namespace> namespaces;
-    
+
     private final static HashMap<String, Namespace> namespacesByPrefix;
 
     static {
@@ -99,10 +105,10 @@ public final class MCRConstants {
         namespacesByPrefix.put("dv", DV_NAMESPACE);
         namespacesByPrefix.put("mods", MODS_NAMESPACE);
         namespacesByPrefix.put("mcr", MCR_NAMESPACE);
-        
+
         Properties p = MCRConfiguration.instance().getProperties("MCR.Namespace");
-        for (Iterator it = p.keySet().iterator(); it.hasNext();) {
-            String prefix = (String) it.next();
+        for (Object element : p.keySet()) {
+            String prefix = (String) element;
             String uri = p.getProperty(prefix);
             prefix = prefix.substring(prefix.lastIndexOf(".") + 1);
             Namespace ns = Namespace.getNamespace(prefix, uri);
@@ -119,24 +125,23 @@ public final class MCRConstants {
     public static List<Namespace> getStandardNamespaces() {
         return namespaces;
     }
-    
+
     /**
      * Returns the namespace with the given standard prefix.
      * Additional namespaces can be configured using properties like
      * MCR.Namespace.<prefix>=<uri>
      */
-    public static Namespace getStandardNamespace( String prefix ){ 
+    public static Namespace getStandardNamespace(String prefix) {
         return namespacesByPrefix.get(prefix);
     }
-    
+
     /** The default encoding */
     public final static String DEFAULT_ENCODING = "UTF-8";
 
     /** The date format for the supported languages * */
-    public static DateFormat[] DATE_FORMAT = {
-        DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault()), // x-...
-        DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.GERMAN), // de,ch,au
-        DateFormat.getDateInstance(DateFormat.SHORT, Locale.UK), // ar,en-UK
-        DateFormat.getDateInstance(DateFormat.SHORT, Locale.US), // en-US
+    public static DateFormat[] DATE_FORMAT = { DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault()), // x-...
+            DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.GERMAN), // de,ch,au
+            DateFormat.getDateInstance(DateFormat.SHORT, Locale.UK), // ar,en-UK
+            DateFormat.getDateInstance(DateFormat.SHORT, Locale.US), // en-US
     };
 }

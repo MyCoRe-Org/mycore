@@ -111,15 +111,15 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     /**
      * Internal constructor, do not use on your own.
      */
-    MCRFile(String ID, String parentID, String ownerID, String name, String label, long size, GregorianCalendar date, String storeID, String storageID,
-            String fctID, String md5) {
+    MCRFile(String ID, String parentID, String ownerID, String name, String label, long size, GregorianCalendar date, String storeID,
+            String storageID, String fctID, String md5) {
         super(ID, parentID, ownerID, name, label, size, date);
 
         this.storageID = storageID;
         this.storeID = storeID;
-        this.contentTypeID = fctID;
+        contentTypeID = fctID;
         this.md5 = md5;
-        this.isNew = false;
+        isNew = false;
     }
 
     /**
@@ -130,7 +130,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
      * @return the MCRFile with the given ID, or null if no such file exists
      */
     public static MCRFile getFile(String ID) {
-        return (MCRFile) (MCRFilesystemNode.getNode(ID));
+        return (MCRFile) MCRFilesystemNode.getNode(ID);
     }
 
     /**
@@ -141,7 +141,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
      * @return the root MCRFile stored for that owner ID, or null if no such file exists
      */
     public static MCRFile getRootFile(String ownerID) {
-        return (MCRFile) (MCRFilesystemNode.getRootNode(ownerID));
+        return (MCRFile) MCRFilesystemNode.getRootNode(ownerID);
     }
 
     /**
@@ -170,7 +170,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
 
         int pos = name.lastIndexOf(".");
 
-        return ((pos == -1) ? "" : name.substring(pos + 1));
+        return pos == -1 ? "" : name.substring(pos + 1);
     }
 
     /**
@@ -308,9 +308,9 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     public long setContentFrom(InputStream source, boolean storeContentChange) throws MCRPersistenceException {
         ensureNotDeleted();
 
-        String old_md5 = this.md5;
-        long old_size = this.size;
-        String old_storageID = this.storageID;
+        String old_md5 = md5;
+        long old_size = size;
+        String old_storageID = storageID;
         MCRContentStore old_store = getContentStore();
 
         initContentFields();
@@ -318,7 +318,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         MCRContentInputStream cis = new MCRContentInputStream(source);
         byte[] header = cis.getHeader();
 
-        contentTypeID = MCRFileContentTypeFactory.detectType(this.getName(), header).getID();
+        contentTypeID = MCRFileContentTypeFactory.detectType(getName(), header).getID();
 
         if (header.length > 0) // Do not store empty file content
         {
@@ -335,24 +335,27 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
             old_store.deleteContent(old_storageID);
         }
 
-        boolean changed = ((size != old_size) || (!md5.equals(old_md5)));
+        boolean changed = size != old_size || !md5.equals(old_md5);
 
         if (changed) {
             lastModified = new GregorianCalendar();
-            if(storeContentChange) storeContentChange(size - old_size);
+            if (storeContentChange) {
+                storeContentChange(size - old_size);
+            }
         }
-        
+
         return size - old_size;
     }
 
     public void storeContentChange(long sizeDiff) {
         manager.storeNode(this);
 
-        if (hasParent())
+        if (hasParent()) {
             getParent().sizeOfChildChanged(sizeDiff);
+        }
 
         // If file content has changed, call event handlers to index content
-        String type = (isNew ? MCREvent.CREATE_EVENT : MCREvent.UPDATE_EVENT);
+        String type = isNew ? MCREvent.CREATE_EVENT : MCREvent.UPDATE_EVENT;
         MCREvent event = new MCREvent(MCREvent.FILE_TYPE, type);
         event.put("file", this);
         MCREventManager.instance().handleEvent(event);
@@ -365,6 +368,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
      * calling this method, the file object is deleted and invalid and can not
      * be used any more.
      */
+    @Override
     public void delete() throws MCRPersistenceException {
         ensureNotDeleted();
 
@@ -383,11 +387,11 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
 
         super.delete();
 
-        this.contentTypeID = null;
-        this.md5 = null;
-        this.storageID = null;
-        this.storeID = null;
-        this.avExtender = null;
+        contentTypeID = null;
+        md5 = null;
+        storageID = null;
+        storeID = null;
+        avExtender = null;
     }
 
     /**
@@ -418,7 +422,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
 
             String md5_new = MCRContentInputStream.getMD5String(digest);
 
-            if (!this.md5.equals(md5_new)) {
+            if (!md5.equals(md5_new)) {
                 String msg = "MD5 Checksum failure while retrieving file content for file " + ID;
                 throw new MCRPersistenceException(msg);
             }
@@ -494,7 +498,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     public MCRAudioVideoExtender getAudioVideoExtender() {
         ensureNotDeleted();
 
-        if (hasAudioVideoExtender() && (avExtender == null)) {
+        if (hasAudioVideoExtender() && avExtender == null) {
             avExtender = MCRContentStoreFactory.buildExtender(this);
         }
 
@@ -519,13 +523,14 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         return MCRFileContentTypeFactory.getType(contentTypeID);
     }
 
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append(super.toString());
-        sb.append("ContentType = ").append(this.contentTypeID).append("\n");
-        sb.append("MD5         = ").append(this.md5).append("\n");
-        sb.append("StoreID     = ").append(this.storeID).append("\n");
-        sb.append("StorageID   = ").append(this.storageID);
+        sb.append("ContentType = ").append(contentTypeID).append("\n");
+        sb.append("MD5         = ").append(md5).append("\n");
+        sb.append("StoreID     = ").append(storeID).append("\n");
+        sb.append("StorageID   = ").append(storageID);
 
         return sb.toString();
     }
@@ -536,25 +541,25 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
      */
     public Document createXML() {
         Element root = new Element("file");
-        root.setAttribute("id", this.getID());
-        root.setAttribute("owner", this.getOwnerID());
-        root.setAttribute("name", this.getName());
-        root.setAttribute("path", this.getAbsolutePath());
-        root.setAttribute("size", Long.toString(this.getSize()));
-        root.setAttribute("extension", this.getExtension());
-        root.setAttribute("contentTypeID", this.getContentTypeID());
-        root.setAttribute("contentType", this.getContentType().getLabel());
+        root.setAttribute("id", getID());
+        root.setAttribute("owner", getOwnerID());
+        root.setAttribute("name", getName());
+        root.setAttribute("path", getAbsolutePath());
+        root.setAttribute("size", Long.toString(getSize()));
+        root.setAttribute("extension", getExtension());
+        root.setAttribute("contentTypeID", getContentTypeID());
+        root.setAttribute("contentType", getContentType().getLabel());
 
         MCRMetaISO8601Date iDate = new MCRMetaISO8601Date();
-        iDate.setDate(this.getLastModified().getTime());
+        iDate.setDate(getLastModified().getTime());
         root.setAttribute("modified", iDate.getISOString());
 
-        if (this.hasAudioVideoExtender()) {
-            MCRAudioVideoExtender ext = this.getAudioVideoExtender();
+        if (hasAudioVideoExtender()) {
+            MCRAudioVideoExtender ext = getAudioVideoExtender();
             root.setAttribute("bitRate", String.valueOf(ext.getBitRate()));
             root.setAttribute("frameRate", String.valueOf(ext.getFrameRate()));
             root.setAttribute("duration", ext.getDurationTimecode());
-            root.setAttribute("mediaType", ((ext.getMediaType() == MCRAudioVideoExtender.AUDIO) ? "audio" : "video"));
+            root.setAttribute("mediaType", (ext.getMediaType() == MCRAudioVideoExtender.AUDIO ? "audio" : "video"));
         }
 
         return new Document(root);

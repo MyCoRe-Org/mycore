@@ -47,11 +47,11 @@ public abstract class MCRRuleStore {
     public abstract MCRAccessRule getRule(String ruleid);
 
     public abstract boolean existsRule(String ruleid);
-    
+
     public abstract Collection<String> retrieveAllIDs();
-    
+
     public abstract Collection<String> retrieveRuleIDs(String ruleExpression, String description);
-    
+
     public abstract int getNextFreeRuleID(String prefix);
 
     public abstract MCRAccessRule retrieveRule(String ruleid);
@@ -60,14 +60,16 @@ public abstract class MCRRuleStore {
 
     final protected static String sqlDateformat = "yyyy-MM-dd HH:mm:ss";
 
-    final protected static String ruletablename = MCRConfiguration.instance().getString("MCR.Persistence.Access.Store.Table.Rule", "MCRACCESSRULE");
+    final protected static String ruletablename = MCRConfiguration.instance().getString("MCR.Persistence.Access.Store.Table.Rule",
+            "MCRACCESSRULE");
 
     static private MCRRuleStore implementation;
 
     public static MCRRuleStore getInstance() {
         try {
             if (implementation == null) {
-                implementation = (MCRRuleStore) MCRConfiguration.instance().getSingleInstanceOf("MCR.Persistence.Rule.Store_Class", "org.mycore.backend.hibernate.MCRHIBRuleStore");
+                implementation = (MCRRuleStore) MCRConfiguration.instance().getSingleInstanceOf("MCR.Persistence.Rule.Store_Class",
+                        "org.mycore.backend.hibernate.MCRHIBRuleStore");
             }
         } catch (Exception e) {
             logger.error(e);

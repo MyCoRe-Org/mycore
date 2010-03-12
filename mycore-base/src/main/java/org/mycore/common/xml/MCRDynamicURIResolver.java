@@ -12,7 +12,6 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
-import org.mycore.common.MCRUtils;
 import org.mycore.common.MCRTextResolver;
 import org.mycore.common.xml.MCRURIResolver.MCRResolver;
 
@@ -58,9 +57,9 @@ public abstract class MCRDynamicURIResolver implements MCRResolver {
     protected long lastModified;
 
     public MCRDynamicURIResolver() {
-        this.lastModified = 0;
-        this.cachedElement = null;
-        this.xmlFile = null;
+        lastModified = 0;
+        cachedElement = null;
+        xmlFile = null;
     }
 
     /**
@@ -71,13 +70,15 @@ public abstract class MCRDynamicURIResolver implements MCRResolver {
      */
     public void setXmlFile(File xmlFile) {
         this.xmlFile = xmlFile;
-        if(!xmlFile.exists())
+        if (!xmlFile.exists()) {
             LOGGER.error(new FileNotFoundException());
+        }
     }
 
     public Element resolveElement(String uri) throws Exception {
-        if(xmlFile == null)
+        if (xmlFile == null) {
             throw new NullPointerException("No xml file set in '" + this.getClass().getName() + "'!");
+        }
 
         Element rootElement = getRootElement();
         Hashtable<String, String> variablesMap = createVariablesMap(uri);
@@ -86,20 +87,20 @@ public abstract class MCRDynamicURIResolver implements MCRResolver {
     }
 
     protected Element getRootElement() {
-        if(cachedElement == null || xmlFile.lastModified() > lastModified) {
+        if (cachedElement == null || xmlFile.lastModified() > lastModified) {
             try {
                 SAXBuilder builder = new SAXBuilder();
                 Document doc = builder.build(xmlFile);
                 cachedElement = doc.getRootElement();
                 lastModified = System.currentTimeMillis();
-            } catch(Exception exc) {
+            } catch (Exception exc) {
                 LOGGER.error("Error while parsing " + xmlFile + "!", exc);
                 return null;
             }
         }
         // clone it for further replacements
         // TODO: whats faster? cloning or building it new from file
-        return (Element)cachedElement.clone();
+        return (Element) cachedElement.clone();
     }
 
     /**
@@ -121,9 +122,9 @@ public abstract class MCRDynamicURIResolver implements MCRResolver {
         Hashtable<String, String> variablesMap = new Hashtable<String, String>();
         String uriValue = uri.substring(uri.indexOf(':') + 1);
         String[] variablesArr = uriValue.split(":");
-        for(int i = 0; i < variablesArr.length; i++) {
+        for (int i = 0; i < variablesArr.length; i++) {
             int equalsSignIndex = variablesArr[i].indexOf("=");
-            if(equalsSignIndex == -1) {
+            if (equalsSignIndex == -1) {
                 String varName = String.valueOf(i + 1);
                 String varValue = variablesArr[i];
                 variablesMap.put(varName, varValue);
@@ -147,18 +148,20 @@ public abstract class MCRDynamicURIResolver implements MCRResolver {
     protected void resolveVariablesFromElement(Element startElement, Hashtable<String, String> variablesMap) {
         Iterator<Element> it = startElement.getDescendants(new ElementFilter());
         MCRTextResolver varResolver = new MCRTextResolver(variablesMap);
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             Element element = it.next();
             // text
             String text = element.getText();
-            if(text != null && !text.equals("") && text.contains("{"))
+            if (text != null && !text.equals("") && text.contains("{")) {
                 element.setText(varResolver.resolve(text));
+            }
 
             // attributes
-            for(Attribute attrib : (List<Attribute>)element.getAttributes()) {
+            for (Attribute attrib : (List<Attribute>) element.getAttributes()) {
                 String attribValue = attrib.getValue();
-                if(attribValue.contains("{"))
+                if (attribValue.contains("{")) {
                     attrib.setValue(varResolver.resolve(attribValue));
+                }
             }
         }
     }

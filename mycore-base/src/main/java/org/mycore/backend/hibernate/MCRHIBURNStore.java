@@ -27,7 +27,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
-
 import org.mycore.backend.hibernate.tables.MCRURN;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.services.urn.MCRURNStore;
@@ -62,10 +61,10 @@ public class MCRHIBURNStore implements MCRURNStore {
      *                the method arguments are not correct
      */
     public synchronized final void create(String urn, String id) throws MCRPersistenceException {
-        if (urn == null || (urn.length() == 0)) {
+        if (urn == null || urn.length() == 0) {
             throw new MCRPersistenceException("The URN is null.");
         }
-        if (id == null || (id.length() == 0)) {
+        if (id == null || id.length() == 0) {
             throw new MCRPersistenceException("The MCRObjectID is null.");
         }
 
@@ -88,13 +87,13 @@ public class MCRHIBURNStore implements MCRURNStore {
      *                the method arguments are not correct
      */
     public synchronized final void create(String urn, String id, String path, String filename) throws MCRPersistenceException {
-        if (urn == null || (urn.length() == 0)) {
+        if (urn == null || urn.length() == 0) {
             throw new MCRPersistenceException("The URN is null.");
         }
-        if (id == null || (id.length() == 0)) {
+        if (id == null || id.length() == 0) {
             throw new MCRPersistenceException("The MCRObjectID is null.");
         }
-        if (path == null || (path.length() == 0)) {
+        if (path == null || path.length() == 0) {
             throw new MCRPersistenceException("The Path is null.");
         }
 
@@ -144,7 +143,7 @@ public class MCRHIBURNStore implements MCRURNStore {
      *                the method argument is not correct
      */
     public synchronized final void delete(String urn) throws MCRPersistenceException {
-        if (urn == null || (urn.length() == 0)) {
+        if (urn == null || urn.length() == 0) {
             throw new MCRPersistenceException("The URN is null.");
         }
 
@@ -165,7 +164,7 @@ public class MCRHIBURNStore implements MCRURNStore {
      *                the method argument is not correct
      */
     public synchronized final void deleteByObjectID(String objID) throws MCRPersistenceException {
-        if (objID == null || (objID.length() == 0)) {
+        if (objID == null || objID.length() == 0) {
             throw new MCRPersistenceException("The object id is null.");
         }
 
@@ -198,16 +197,18 @@ public class MCRHIBURNStore implements MCRURNStore {
      */
     @SuppressWarnings("unchecked")
     public final String getURNforDocument(String id) throws MCRPersistenceException {
-        if (id == null || (id.length() == 0)) {
+        if (id == null || id.length() == 0) {
             return null;
         }
 
         Session session = getSession();
-        StringBuffer querySB = new StringBuffer("select key.mcrurn from ").append(classname).append(" where key.mcrid='").append(id).append("'");
+        StringBuffer querySB = new StringBuffer("select key.mcrurn from ").append(classname).append(" where key.mcrid='").append(id)
+                .append("'");
         logger.debug("HQL-Statement: " + querySB.toString());
         List<String> returns = session.createQuery(querySB.toString()).list();
-        if (returns.size() != 1)
+        if (returns.size() != 1) {
             return null;
+        }
         return returns.get(0);
     }
 
@@ -233,16 +234,18 @@ public class MCRHIBURNStore implements MCRURNStore {
      */
     @SuppressWarnings("unchecked")
     public final String getDocumentIDforURN(String urn) throws MCRPersistenceException {
-        if (urn == null || (urn.length() == 0)) {
+        if (urn == null || urn.length() == 0) {
             return null;
         }
 
         Session session = getSession();
-        StringBuffer querySB = new StringBuffer("select key.mcrid from ").append(classname).append(" where key.mcrurn='").append(urn).append("'");
+        StringBuffer querySB = new StringBuffer("select key.mcrid from ").append(classname).append(" where key.mcrurn='").append(urn)
+                .append("'");
         logger.debug("HQL-Statement: " + querySB.toString());
         List<String> returns = session.createQuery(querySB.toString()).list();
-        if (returns.size() != 1)
+        if (returns.size() != 1) {
             return null;
+        }
         return returns.get(0);
     }
 
@@ -255,12 +258,13 @@ public class MCRHIBURNStore implements MCRURNStore {
      */
     @SuppressWarnings("unchecked")
     public final boolean hasURNAssigned(String id) throws MCRPersistenceException {
-        if (id == null || (id.length() == 0)) {
+        if (id == null || id.length() == 0) {
             return false;
         }
 
         Session session = getSession();
-        StringBuffer querySB = new StringBuffer("select key.mcrurn from ").append(classname).append(" where key.mcrid='").append(id).append("'");
+        StringBuffer querySB = new StringBuffer("select key.mcrurn from ").append(classname).append(" where key.mcrid='").append(id)
+                .append("'");
         logger.debug("HQL-Statement: " + querySB.toString());
         List<String> returns = session.createQuery(querySB.toString()).list();
         if (returns == null || returns.isEmpty()) {
@@ -277,12 +281,13 @@ public class MCRHIBURNStore implements MCRURNStore {
     @SuppressWarnings("unchecked")
     public final boolean exist(String urn) {
         boolean exists = false;
-        if (urn == null || (urn.length() == 0)) {
+        if (urn == null || urn.length() == 0) {
             return exists;
         }
 
         Session session = getSession();
-        StringBuffer query = new StringBuffer("select key.mcrid from ").append(classname).append(" where key.mcrurn = '").append(urn).append("'");
+        StringBuffer query = new StringBuffer("select key.mcrid from ").append(classname).append(" where key.mcrurn = '").append(urn)
+                .append("'");
         List<String> l = session.createQuery(query.toString()).list();
         if (!l.isEmpty()) {
             exists = true;

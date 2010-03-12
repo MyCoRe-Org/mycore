@@ -33,7 +33,6 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
-
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
@@ -60,8 +59,8 @@ public class MCRJMXBridge implements Closeable {
         }
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         try {
-        	if (mbs.isRegistered(name)){
-            	unregister(type, component);
+            if (mbs.isRegistered(name)) {
+                unregister(type, component);
             }
             mbs.registerMBean(mbean, name);
             ONAME_LIST.add(new WeakReference<ObjectName>(name));
@@ -81,8 +80,9 @@ public class MCRJMXBridge implements Closeable {
         }
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         try {
-            if (mbs.isRegistered(name))
+            if (mbs.isRegistered(name)) {
                 mbs.unregisterMBean(name);
+            }
             // As WeakReference does not overwrite Object.equals():
             for (WeakReference<ObjectName> wr : ONAME_LIST) {
                 if (wr.get().equals(name)) {

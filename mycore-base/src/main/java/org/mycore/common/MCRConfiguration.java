@@ -40,7 +40,6 @@ import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-
 import org.mycore.services.plugins.FilterPluginInstantiationException;
 
 /**
@@ -144,7 +143,7 @@ public class MCRConfiguration {
 
         if (name != null) {
             try {
-                singleton = (MCRConfiguration) (Class.forName(name).newInstance());
+                singleton = (MCRConfiguration) Class.forName(name).newInstance();
             } catch (Exception exc) {
                 throw new MCRConfigurationException("Could not create MCR.Configuration.Class singleton \"" + name + "\"", exc);
             }
@@ -241,7 +240,7 @@ public class MCRConfiguration {
 
         Enumeration names = System.getProperties().propertyNames();
         while (names.hasMoreElements()) {
-            String name = (String) (names.nextElement());
+            String name = (String) names.nextElement();
             if (name.startsWith("MCR.")) {
                 String value = System.getProperty(name);
                 if (value != null) {
@@ -268,18 +267,20 @@ public class MCRConfiguration {
             found = false;
             Enumeration keys = properties.keys();
             while (keys.hasMoreElements()) {
-                String key = (String) (keys.nextElement());
+                String key = (String) keys.nextElement();
                 String value = properties.getProperty(key, "");
                 int pos1 = value.indexOf("%");
                 if (pos1 >= 0) {
                     int pos2 = value.indexOf("%", pos1 + 1);
-                    if (pos2 == -1)
+                    if (pos2 == -1) {
                         continue;
+                    }
 
                     String ref = value.substring(pos1 + 1, pos2);
                     String refValue = properties.getProperty(ref, null);
-                    if (refValue == null)
+                    if (refValue == null) {
                         continue;
+                    }
 
                     found = true;
                     value = value.substring(0, pos1) + refValue + value.substring(pos2 + 1);
@@ -298,8 +299,9 @@ public class MCRConfiguration {
      */
     private void substituteDeprecatedProperties() {
         InputStream in = this.getClass().getResourceAsStream("/deprecated.properties");
-        if (in == null)
+        if (in == null) {
             return;
+        }
         try {
             depr.load(in);
             in.close();
@@ -309,13 +311,14 @@ public class MCRConfiguration {
 
         Enumeration names = depr.keys();
         while (names.hasMoreElements()) {
-            String deprecatedName = (String) (names.nextElement());
+            String deprecatedName = (String) names.nextElement();
             if (properties.containsKey(deprecatedName)) {
                 String newName = depr.getProperty(deprecatedName);
                 String msg = "DEPRECATED: User should rename property " + deprecatedName + " to " + newName;
                 Logger.getLogger(this.getClass()).warn(msg);
-                if (!properties.containsKey(newName))
+                if (!properties.containsKey(newName)) {
                     properties.put(newName, properties.get(deprecatedName));
+                }
             }
         }
     }
@@ -366,8 +369,9 @@ public class MCRConfiguration {
             StringTokenizer st = new StringTokenizer(include, ", ");
             set("MCR.Configuration.Include", null);
 
-            while (st.hasMoreTokens())
+            while (st.hasMoreTokens()) {
                 loadFromFile(st.nextToken());
+            }
         }
     }
 
@@ -393,7 +397,7 @@ public class MCRConfiguration {
         Enumeration names = this.properties.propertyNames();
 
         while (names.hasMoreElements()) {
-            String name = (String) (names.nextElement());
+            String name = (String) names.nextElement();
 
             if (name.startsWith(startsWith)) {
                 String value = this.properties.getProperty(name);
@@ -409,15 +413,16 @@ public class MCRConfiguration {
      */
     public synchronized void configureLogging() {
         Properties prop = new Properties();
-        Enumeration names = this.properties.propertyNames();
+        Enumeration names = properties.propertyNames();
         boolean reconfigure = false;
         java.util.List<String> warn = new java.util.ArrayList<String>();
 
         while (names.hasMoreElements()) {
-            String name = (String) (names.nextElement());
-            if (!name.contains("log4j"))
+            String name = (String) names.nextElement();
+            if (!name.contains("log4j")) {
                 continue;
-            String value = this.properties.getProperty(name);
+            }
+            String value = properties.getProperty(name);
             if (name.startsWith("MCR.log4j")) {
                 warn.add(name);
                 name = name.substring(4);
@@ -457,7 +462,7 @@ public class MCRConfiguration {
         if (classname == null) {
             throw new MCRConfigurationException("Configuration property missing: " + name);
         }
-        
+
         Logger.getLogger(this.getClass()).debug("Loading Class: " + classname);
 
         Class cl;
@@ -473,16 +478,16 @@ public class MCRConfiguration {
             try {
                 o = cl.newInstance();
             } catch (Exception e) {
-                if (e instanceof FilterPluginInstantiationException)
+                if (e instanceof FilterPluginInstantiationException) {
                     Logger.getLogger(this.getClass()).info(e.toString());
+                }
                 // check for singleton
                 Method[] querymethods = cl.getMethods();
 
-                for (int i = 0; i < querymethods.length; i++) {
-                    if (querymethods[i].getName().toLowerCase().equals("instance")
-                            || querymethods[i].getName().toLowerCase().equals("getinstance")) {
+                for (Method querymethod : querymethods) {
+                    if (querymethod.getName().toLowerCase().equals("instance") || querymethod.getName().toLowerCase().equals("getinstance")) {
                         Object[] ob = new Object[0];
-                        o = querymethods[i].invoke(cl, ob);
+                        o = querymethod.invoke(cl, ob);
 
                         break;
                     }
@@ -503,8 +508,8 @@ public class MCRConfiguration {
                 t.printStackTrace();
                 throw new MCRConfigurationException(msg, (Exception) t);
             } else {
-                msg += (" because of: " + t.getMessage());
-                msg += ("\n" + MCRException.getStackTraceAsString(t));
+                msg += " because of: " + t.getMessage();
+                msg += "\n" + MCRException.getStackTraceAsString(t);
                 throw new MCRConfigurationException(msg);
             }
         }
@@ -606,10 +611,11 @@ public class MCRConfiguration {
         }
 
         String value = properties.getProperty(name);
-        if ((value == null) && depr.containsKey(name))
+        if (value == null && depr.containsKey(name)) {
             value = properties.getProperty(depr.getProperty(name));
+        }
 
-        return (value == null ? defaultValue : value.trim());
+        return value == null ? defaultValue : value.trim();
     }
 
     /**
@@ -651,7 +657,7 @@ public class MCRConfiguration {
     public int getInt(String name, int defaultValue) throws NumberFormatException {
         String value = getString(name, null);
 
-        return ((value == null) ? defaultValue : Integer.parseInt(value));
+        return value == null ? defaultValue : Integer.parseInt(value);
     }
 
     /**
@@ -690,7 +696,7 @@ public class MCRConfiguration {
     public long getLong(String name, long defaultValue) throws NumberFormatException {
         String value = getString(name, null);
 
-        return ((value == null) ? defaultValue : Long.parseLong(value));
+        return value == null ? defaultValue : Long.parseLong(value);
     }
 
     /**
@@ -729,7 +735,7 @@ public class MCRConfiguration {
     public float getFloat(String name, float defaultValue) throws NumberFormatException {
         String value = getString(name, null);
 
-        return ((value == null) ? defaultValue : Float.parseFloat(value));
+        return value == null ? defaultValue : Float.parseFloat(value);
     }
 
     /**
@@ -768,7 +774,7 @@ public class MCRConfiguration {
     public double getDouble(String name, double defaultValue) throws NumberFormatException {
         String value = getString(name, null);
 
-        return ((value == null) ? defaultValue : Double.parseDouble(value));
+        return value == null ? defaultValue : Double.parseDouble(value);
     }
 
     /**
@@ -804,7 +810,7 @@ public class MCRConfiguration {
     public boolean getBoolean(String name, boolean defaultValue) {
         String value = getString(name, null);
 
-        return ((value == null) ? defaultValue : "true".equals(value.trim()));
+        return value == null ? defaultValue : "true".equals(value.trim());
     }
 
     /**
@@ -948,6 +954,7 @@ public class MCRConfiguration {
      * 
      * @return a String containing the configuration properties currently set
      */
+    @Override
     public String toString() {
         return properties.toString();
     }

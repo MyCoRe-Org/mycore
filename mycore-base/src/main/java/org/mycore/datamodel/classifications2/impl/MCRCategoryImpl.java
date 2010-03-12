@@ -30,7 +30,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.collection.PersistentList;
-
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -67,12 +66,15 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
         return level;
     }
 
+    @Override
     public boolean hasChildren() {
         //if children is initialized and has objects use it and don't depend on db values
-        if (this.children != null && this.children.size() > 0)
+        if (children != null && children.size() > 0) {
             return true;
-        if (right != left)
-            return (right - left) > 1;
+        }
+        if (right != left) {
+            return right - left > 1;
+        }
         return super.hasChildren();
     }
 
@@ -80,7 +82,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
     * @return the positionInParent
     */
     public int getPositionInParent() {
-        LOGGER.debug("getposition called for " + getId() + " with: " + this.positionInParent);
+        LOGGER.debug("getposition called for " + getId() + " with: " + positionInParent);
         if (parent == null) {
             LOGGER.debug("getposition called with no parent set.");
             return positionInParent;
@@ -102,8 +104,9 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
     private int getPositionInParentByID() {
         int position = 0;
         for (MCRCategory sibling : parent.getChildren()) {
-            if (sibling.getId().equals(getId()))
+            if (sibling.getId().equals(getId())) {
                 return position;
+            }
             position++;
         }
         if (LOGGER.isDebugEnabled()) {
@@ -129,13 +132,14 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
      * @param children
      *            the children to set
      */
+    @Override
     public void setChildren(List<MCRCategory> children) {
         LOGGER.debug("Set children called for " + getId() + "list'" + children.getClass().getName() + "': " + children);
         childrenLock.writeLock().lock();
         if (children instanceof PersistentList) {
             this.children = children;
         } else {
-            MCRCategoryChildList newChildren = new MCRCategoryChildList(this.root, this);
+            MCRCategoryChildList newChildren = new MCRCategoryChildList(root, this);
             newChildren.addAll(children);
             this.children = newChildren;
         }
@@ -205,8 +209,9 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
             catImpl = (MCRCategoryImpl) category;
             // don't use setParent() as it call add() from ChildList
             catImpl.parent = parent;
-            if (root == null)
+            if (root == null) {
                 root = catImpl;
+            }
             catImpl.setRoot(root);
             if (parent != null) {
                 catImpl.level = parent.getLevel() + 1;
@@ -227,8 +232,9 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
         catImpl.setId(category.getId());
         catImpl.labels = category.getLabels();
         catImpl.parent = parent;
-        if (root == null)
+        if (root == null) {
             root = catImpl;
+        }
         catImpl.setRoot(root);
         catImpl.level = parent.getLevel() + 1;
         catImpl.children = new ArrayList<MCRCategory>(category.getChildren().size());
@@ -322,18 +328,18 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
     }
 
     public void setRootID(String rootID) {
-        if (this.getId() == null)
+        if (getId() == null) {
             setId(MCRCategoryID.rootID(rootID));
-        else if (!this.getId().getRootID().equals(rootID)) {
-            setId(new MCRCategoryID(rootID, this.getId().getID()));
+        } else if (!getId().getRootID().equals(rootID)) {
+            setId(new MCRCategoryID(rootID, getId().getID()));
         }
     }
 
     public void setCategID(String categID) {
-        if (this.getId() == null)
+        if (getId() == null) {
             setId(new MCRCategoryID(null, categID));
-        else if (!this.getId().getID().equals(categID)) {
-            setId(new MCRCategoryID(this.getId().getRootID(), categID));
+        } else if (!getId().getID().equals(categID)) {
+            setId(new MCRCategoryID(getId().getRootID(), categID));
         }
     }
 

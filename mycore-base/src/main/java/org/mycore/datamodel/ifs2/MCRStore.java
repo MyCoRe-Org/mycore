@@ -88,7 +88,7 @@ public abstract class MCRStore {
      */
     protected static MCRStore getStore(String ID) {
         if (!stores.containsKey(ID)) {
-            MCRStore store = (MCRStore) (MCRConfiguration.instance().getInstanceOf("MCR.IFS2.Store." + ID + ".Class"));
+            MCRStore store = (MCRStore) MCRConfiguration.instance().getInstanceOf("MCR.IFS2.Store." + ID + ".Class");
             store.init(ID);
         }
         return stores.get(ID);
@@ -127,7 +127,7 @@ public abstract class MCRStore {
         String baseDir = config.getString(cfg + "BaseDir");
         String slotLayout = config.getString(cfg + "SlotLayout");
 
-        this.idLength = 0;
+        idLength = 0;
 
         StringTokenizer st = new StringTokenizer(slotLayout, "-");
         slotLength = new int[st.countTokens() - 1];
@@ -275,16 +275,17 @@ public abstract class MCRStore {
      */
     public synchronized int getNextFreeID() {
         lastID = Math.max(getHighestStoredID(), lastID);
-        lastID += (lastID > 0 ? offset : 1);
+        lastID += lastID > 0 ? offset : 1;
         offset = 1;
         return lastID;
     }
-    
+
     public synchronized int getHighestStoredID() {
         int found = 0;
         String max = findMaxID(dir, 0);
-        if (max != null)
+        if (max != null) {
             found = slot2id(max);
+        }
         return found;
     }
 
@@ -314,21 +315,25 @@ public abstract class MCRStore {
     private String findMaxID(File dir, int depth) {
         String[] children = dir.list();
 
-        if ((children == null) || (children.length == 0))
+        if (children == null || children.length == 0) {
             return null;
+        }
 
         Arrays.sort(children);
 
-        if (depth == slotLength.length)
+        if (depth == slotLength.length) {
             return children[children.length - 1];
+        }
 
         for (int i = children.length - 1; i >= 0; i--) {
             File child = new File(dir, children[i]);
-            if (!child.isDirectory())
+            if (!child.isDirectory()) {
                 continue;
+            }
             String found = findMaxID(child, depth + 1);
-            if (found != null)
+            if (found != null) {
                 return found;
+            }
         }
         return null;
     }
@@ -401,21 +406,24 @@ public abstract class MCRStore {
              */
             private void addChildren(File dir) {
                 String[] children = dir.list();
-                if ((children == null) || (children.length == 0))
+                if (children == null || children.length == 0) {
                     return;
+                }
 
                 Arrays.sort(children);
-                for (int i = 0; i < children.length; i++)
+                for (int i = 0; i < children.length; i++) {
                     files.add((order ? i : 0), new File(dir, children[i]));
+                }
             }
 
             public boolean hasNext() {
-                return (nextID > 0);
+                return nextID > 0;
             }
 
             public Integer next() {
-                if (nextID < 1)
+                if (nextID < 1) {
                     throw new NoSuchElementException();
+                }
 
                 lastID = nextID;
                 nextID = findNextID();
@@ -423,8 +431,9 @@ public abstract class MCRStore {
             }
 
             public void remove() {
-                if (lastID == 0)
+                if (lastID == 0) {
                     throw new IllegalStateException();
+                }
                 try {
                     MCRStore.this.delete(lastID);
                 } catch (Exception ex) {
@@ -439,12 +448,14 @@ public abstract class MCRStore {
              * @return the next ID, or 0 if there is no other ID any more
              */
             private int findNextID() {
-                if (files.isEmpty())
+                if (files.isEmpty()) {
                     return 0;
+                }
 
                 File first = files.remove(0);
-                if (first.getName().length() == idLength + prefix.length() + suffix.length())
+                if (first.getName().length() == idLength + prefix.length() + suffix.length()) {
                     return MCRStore.this.slot2id(first.getName());
+                }
 
                 addChildren(first);
                 return findNextID();
@@ -475,8 +486,9 @@ public abstract class MCRStore {
         FileObject base = VFS.getManager().resolveFile(dir.getAbsolutePath());
         while (!parent.equals(base)) {
             FileObject[] children = parent.getChildren();
-            if (children.length > 0)
+            if (children.length > 0) {
                 break;
+            }
             fo = parent;
             parent = fo.getParent();
             fo.delete();

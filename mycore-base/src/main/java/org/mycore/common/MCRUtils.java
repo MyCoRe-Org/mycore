@@ -42,7 +42,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Properties;
@@ -84,8 +83,9 @@ public class MCRUtils {
 
     // Language lists
     private static ArrayList<String> langlist = new ArrayList<String>();
+
     private static ArrayList<String> countrylist = new ArrayList<String>();
-    
+
     /**
      * Load two static arrays for fast search of ISO-639/ISO-3166 strings.
      */
@@ -95,14 +95,14 @@ public class MCRUtils {
         langlist.add("id");
         countrylist.add("ID");
         // add codes from locale
-        for ( Locale l : Locale.getAvailableLocales()) {
+        for (Locale l : Locale.getAvailableLocales()) {
             sb = new StringBuffer(l.getLanguage());
             langlist.add(sb.toString());
             sb.append('-').append(l.getCountry());
             countrylist.add(sb.toString());
         }
     }
-    
+
     /**
      * This method check the language string base on RFC 1766 to the supported
      * languages in mycore.
@@ -112,12 +112,18 @@ public class MCRUtils {
      * @return true if the language was supported, otherwise false
      */
     public static final boolean isSupportedLang(String lang) {
-        if ((lang == null) || ((lang = lang.trim()).length() == 0)) {
+        if (lang == null || (lang = lang.trim()).length() == 0) {
             return false;
         }
-        if (lang.startsWith("x-")) { return true; }
-        if (langlist.contains(lang)) { return true; }
-        if (countrylist.contains(lang)) { return true; }
+        if (lang.startsWith("x-")) {
+            return true;
+        }
+        if (langlist.contains(lang)) {
+            return true;
+        }
+        if (countrylist.contains(lang)) {
+            return true;
+        }
         return false;
     }
 
@@ -130,7 +136,7 @@ public class MCRUtils {
      * @return the ISO output or null
      */
     public static final String covertDateToISO(String indate) {
-        if ((indate == null) || ((indate = indate.trim()).length() == 0)) {
+        if (indate == null || (indate = indate.trim()).length() == 0) {
             return null;
         }
 
@@ -146,8 +152,7 @@ public class MCRUtils {
         }
 
         if (!test) {
-            for (int i = 0; i < DATE_FORMAT.length; i++) {
-                DateFormat df = DATE_FORMAT[i];
+            for (DateFormat df : DATE_FORMAT) {
                 df.setLenient(false);
 
                 try {
@@ -180,7 +185,7 @@ public class MCRUtils {
      * @return the GregorianCalendar or null
      */
     public static final GregorianCalendar covertDateToGregorianCalendar(String indate) {
-        if ((indate == null) || ((indate = indate.trim()).length() == 0)) {
+        if (indate == null || (indate = indate.trim()).length() == 0) {
             return null;
         }
 
@@ -213,9 +218,7 @@ public class MCRUtils {
         }
 
         if (!test) {
-            for (int i = 0; i < DATE_FORMAT.length; i++) {
-                DateFormat df = DATE_FORMAT[i];
-
+            for (DateFormat df : DATE_FORMAT) {
                 try {
                     calendar.setTime(df.parse(indate.substring(start, indate.length())));
 
@@ -332,8 +335,9 @@ public class MCRUtils {
     public static final String[] getStringArray(Object[] objects) {
         String[] returns = new String[objects.length];
 
-        for (int i = 0; i < objects.length; i++)
+        for (int i = 0; i < objects.length; i++) {
             returns[i] = objects[i].toString();
+        }
 
         return returns;
     }
@@ -351,8 +355,9 @@ public class MCRUtils {
     public static final String[] getStringArray(Object[] objects, int maxitems) {
         String[] returns = new String[maxitems];
 
-        for (int i = 0; i < maxitems; i++)
+        for (int i = 0; i < maxitems; i++) {
             returns[i] = objects[i].toString();
+        }
 
         return returns;
     }
@@ -372,7 +377,7 @@ public class MCRUtils {
         if (source == null) {
             throw new MCRException("InputStream source is null.");
         }
-        
+
         try {
             // R E A D / W R I T E by chunks
             int chunkSize = 63 * 1024;
@@ -393,10 +398,10 @@ public class MCRUtils {
                 if (bytesRead > 0) {
                     if (target != null) {
                         target.write(ba, 0 /* offset in ba */, bytesRead /*
-                                                                             * bytes
-                                                                             * to
-                                                                             * write
-                                                                             */);
+                                                                              * bytes
+                                                                              * to
+                                                                              * write
+                                                                              */);
                     }
                 } else {
                     break; // hit eof
@@ -430,7 +435,7 @@ public class MCRUtils {
         if (source == null) {
             throw new MCRException("Reader source is null.");
         }
-        
+
         try {
             // R E A D / W R I T E by chunks
             int chunkSize = 63 * 1024;
@@ -451,10 +456,10 @@ public class MCRUtils {
                 if (charsRead > 0) {
                     if (target != null) {
                         target.write(ca, 0 /* offset in ba */, charsRead /*
-                                                                             * bytes
-                                                                             * to
-                                                                             * write
-                                                                             */);
+                                                                              * bytes
+                                                                              * to
+                                                                              * write
+                                                                              */);
                     }
                 } else {
                     break; // hit eof
@@ -553,7 +558,7 @@ public class MCRUtils {
         ArrayList<T> arrayout = new ArrayList<T>();
         int i = 0;
 
-        for (Iterator<? extends T> it = arrayin.iterator(); it.hasNext() && (i < maxitems); i++) {
+        for (Iterator<? extends T> it = arrayin.iterator(); it.hasNext() && i < maxitems; i++) {
             arrayout.add(it.next());
         }
         return arrayout;
@@ -684,7 +689,7 @@ public class MCRUtils {
      *            the File instance
      */
     public static final void writeElementToFile(Element elm, File xml) {
-        writeJDOMToFile((new Document()).addContent(elm), xml);
+        writeJDOMToFile(new Document().addContent(elm), xml);
     }
 
     /**
@@ -705,7 +710,7 @@ public class MCRUtils {
             if (LOGGER.isDebugEnabled()) {
                 ioe.printStackTrace();
             } else {
-                LOGGER.error("Can't write org.jdom.Document to file "+xml.getName()+".");
+                LOGGER.error("Can't write org.jdom.Document to file " + xml.getName() + ".");
             }
         }
     }
@@ -718,7 +723,7 @@ public class MCRUtils {
      *            the JDOM Document
      */
     public static final void writeElementToSysout(Element elm) {
-        writeJDOMToSysout((new Document()).addContent(elm));
+        writeJDOMToSysout(new Document().addContent(elm));
     }
 
     /**
@@ -754,13 +759,13 @@ public class MCRUtils {
         ArrayList<String> out = new ArrayList<String>();
         File[] stage = basedir.listFiles();
 
-        for (int i = 0; i < stage.length; i++) {
-            if (stage[i].isFile()) {
-                out.add(stage[i].getName());
+        for (File element : stage) {
+            if (element.isFile()) {
+                out.add(element.getName());
             }
 
-            if (stage[i].isDirectory()) {
-                out.addAll(getAllFileNames(stage[i], stage[i].getName() + SLASH));
+            if (element.isDirectory()) {
+                out.addAll(getAllFileNames(element, element.getName() + SLASH));
             }
         }
 
@@ -781,13 +786,13 @@ public class MCRUtils {
         ArrayList<String> out = new ArrayList<String>();
         File[] stage = basedir.listFiles();
 
-        for (int i = 0; i < stage.length; i++) {
-            if (stage[i].isFile()) {
-                out.add(path + stage[i].getName());
+        for (File element : stage) {
+            if (element.isFile()) {
+                out.add(path + element.getName());
             }
 
-            if (stage[i].isDirectory()) {
-                out.addAll(getAllFileNames(stage[i], path + stage[i].getName() + SLASH));
+            if (element.isDirectory()) {
+                out.addAll(getAllFileNames(element, path + element.getName() + SLASH));
             }
         }
 
@@ -806,10 +811,10 @@ public class MCRUtils {
         ArrayList<String> out = new ArrayList<String>();
         File[] stage = basedir.listFiles();
 
-        for (int i = 0; i < stage.length; i++) {
-            if (stage[i].isDirectory()) {
-                out.add(stage[i].getName());
-                out.addAll(getAllDirectoryNames(stage[i], stage[i].getName() + SLASH));
+        for (File element : stage) {
+            if (element.isDirectory()) {
+                out.add(element.getName());
+                out.addAll(getAllDirectoryNames(element, element.getName() + SLASH));
             }
         }
 
@@ -830,16 +835,16 @@ public class MCRUtils {
         ArrayList<String> out = new ArrayList<String>();
         File[] stage = basedir.listFiles();
 
-        for (int i = 0; i < stage.length; i++) {
-            if (stage[i].isDirectory()) {
-                out.add(path + stage[i].getName());
-                out.addAll(getAllDirectoryNames(stage[i], path + stage[i].getName() + SLASH));
+        for (File element : stage) {
+            if (element.isDirectory()) {
+                out.add(path + element.getName());
+                out.addAll(getAllDirectoryNames(element, path + element.getName() + SLASH));
             }
         }
 
         return out;
     }
-    
+
     /**
      * This method deletes a directory and all its content.
      *
@@ -851,10 +856,11 @@ public class MCRUtils {
     public static boolean deleteDirectory(File dir) {
         if (dir.isDirectory()) {
             String[] children = dir.list();
-            for (int i=0; i<children.length; i++) {
-                boolean success = deleteDirectory(new File(dir, children[i]));
-                if (!success)
+            for (String element : children) {
+                boolean success = deleteDirectory(new File(dir, element));
+                if (!success) {
                     return false;
+                }
             }
         }
         // The directory is now empty so delete it
@@ -864,8 +870,8 @@ public class MCRUtils {
     public static String arrayToString(Object[] objArray, String seperator) {
         StringBuffer buf = new StringBuffer();
 
-        for (int i = 0; i < objArray.length; i++) {
-            buf.append(objArray[i]).append(seperator);
+        for (Object element : objArray) {
+            buf.append(element).append(seperator);
         }
 
         if (objArray.length > 0) {
@@ -889,18 +895,10 @@ public class MCRUtils {
         final String forcedInterrupt = "mcr.forced.interrupt";
 
         DefaultHandler handler = new DefaultHandler() {
+            @Override
             public void startElement(String uri, String localName, String qName, Attributes attributes) {
                 LOGGER.debug("MCRLayoutService detected root element = " + qName);
                 detected.setProperty("docType", qName);
-                throw new MCRException(forcedInterrupt);
-            }
-
-            // We would need SAX 2.0 to be able to do this, for later use:
-            public void startDTD(String name, String publicId, String systemId) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug(new StringBuffer(1024).append("MCRUtils detected DOCTYPE declaration = ").append(name).append(" publicId = ").append(publicId).append(" systemId = ").append(systemId).toString());
-                }
-                detected.setProperty("docType", name);
                 throw new MCRException(forcedInterrupt);
             }
         };

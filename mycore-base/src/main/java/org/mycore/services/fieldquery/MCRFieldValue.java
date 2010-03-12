@@ -24,7 +24,6 @@
 package org.mycore.services.fieldquery;
 
 import org.jdom.Element;
-import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRNormalizer;
@@ -64,8 +63,9 @@ public class MCRFieldValue {
      *            the value of the field, as a String
      */
     public MCRFieldValue(MCRFieldDef field, String value) {
-        if (field == null)
+        if (field == null) {
             throw new NullPointerException("MCRFieldDef cannot be null.");
+        }
         this.field = field;
         setValue(value);
     }
@@ -80,8 +80,9 @@ public class MCRFieldValue {
      *            when indexing data
      */
     MCRFieldValue(MCRFieldDef field, MCRFile file) {
-        if (field == null)
+        if (field == null) {
             throw new NullPointerException("MCRFieldDef cannot be null.");
+        }
         this.field = field;
         this.file = file;
     }
@@ -98,12 +99,12 @@ public class MCRFieldValue {
      * @param value the value, whicht will be normalized
      */
     public void setValue(String value) {
-        if (field.getDataType().equals("text") || field.getDataType().equals("name")){
+        if (field.getDataType().equals("text") || field.getDataType().equals("name")) {
             this.value = MCRNormalizer.normalizeString(value);
             return;
         }
-        if (field.getDataType().equals("decimal")){
-            this.value = value.replace(',','.');
+        if (field.getDataType().equals("decimal")) {
+            this.value = value.replace(',', '.');
             return;
         }
         this.value = value;
@@ -156,15 +157,18 @@ public class MCRFieldValue {
         String name = xml.getAttributeValue("name", "");
         String value = xml.getText();
 
-        if (name.length() == 0)
+        if (name.length() == 0) {
             throw new MCRException("Field value attribute 'name' is empty");
-        if (value.length() == 0)
+        }
+        if (value.length() == 0) {
             throw new MCRException("Field value is empty");
+        }
 
         return new MCRFieldValue(MCRFieldDef.getDef(name), value);
     }
 
+    @Override
     public String toString() {
-        return this.field.getName() + " = " + this.value;
+        return field.getName() + " = " + value;
     }
 }

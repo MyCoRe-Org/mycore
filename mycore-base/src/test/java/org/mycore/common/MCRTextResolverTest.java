@@ -68,7 +68,7 @@ public class MCRTextResolverTest extends MCRTestCase {
         MCRTextResolver.setUseMCRProperties(false);
         assertEquals("", resolver.resolve("[test: {prop1}]"));
     }
-    
+
     public void testAddRemove() throws Exception {
         Hashtable<String, String> variablesTable = new Hashtable<String, String>();
         variablesTable.put("f1", "v1");

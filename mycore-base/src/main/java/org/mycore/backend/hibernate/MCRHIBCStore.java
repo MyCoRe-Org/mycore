@@ -29,7 +29,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
-
 import org.mycore.backend.hibernate.tables.MCRCSTORE;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
@@ -43,6 +42,7 @@ public class MCRHIBCStore extends MCRContentStore {
     // logger
     static Logger logger = Logger.getLogger(MCRHIBCStore.class.getName());
 
+    @Override
     public void init(String storeID) {
         super.init(storeID);
 
@@ -62,6 +62,7 @@ public class MCRHIBCStore extends MCRContentStore {
         return 1;
     }
 
+    @Override
     protected synchronized String doStoreContent(MCRFileReader file, MCRContentInputStream source) throws Exception {
         int ID = getNextFreeID();
         String storageID = String.valueOf(ID);
@@ -76,6 +77,7 @@ public class MCRHIBCStore extends MCRContentStore {
         return storageID;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     protected synchronized void doDeleteContent(String ID) throws Exception {
         int storageID = Integer.valueOf(ID).intValue();
@@ -87,6 +89,7 @@ public class MCRHIBCStore extends MCRContentStore {
         }
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     protected void doRetrieveContent(MCRFileReader file, OutputStream target) throws Exception {
         int storageID = Integer.valueOf(file.getStorageID()).intValue();
@@ -97,11 +100,12 @@ public class MCRHIBCStore extends MCRContentStore {
             throw new MCRException("No such content: " + storageID);
         }
 
-        MCRCSTORE st = (MCRCSTORE) l.get(0);
+        MCRCSTORE st = l.get(0);
         byte[] c = st.getContentBytes();
         target.write(c);
     }
 
+    @Override
     protected InputStream doRetrieveContent(MCRFileReader file) throws Exception {
         int storageID = Integer.valueOf(file.getStorageID()).intValue();
         Session session = MCRHIBConnection.instance().getSession();

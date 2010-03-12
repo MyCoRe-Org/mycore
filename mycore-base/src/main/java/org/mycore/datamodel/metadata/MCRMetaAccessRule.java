@@ -23,7 +23,6 @@
 
 package org.mycore.datamodel.metadata;
 
-import org.jdom.Namespace;
 import org.mycore.common.MCRException;
 
 /**
@@ -72,18 +71,19 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
      * @param set_condition    the JDOM Element included the condition tree
      * @exception MCRException if the set_subtag value or set_condition is null or empty
      */
-    public MCRMetaAccessRule(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted, String set_permission, org.jdom.Element set_condition) throws MCRException {
+    public MCRMetaAccessRule(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted,
+            String set_permission, org.jdom.Element set_condition) throws MCRException {
         super(set_datapart, set_subtag, default_lang, set_type, set_inherted);
         permission = set_permission;
-        if ((permission == null) || ((permission = permission.trim()).length() == 0)) {
+        if (permission == null || (permission = permission.trim()).length() == 0) {
             permission = "read";
         } else {
             permission = permission.trim().toLowerCase();
         }
-        if ((set_condition == null) || (!set_condition.getName().equals("condition"))) {
+        if (set_condition == null || !set_condition.getName().equals("condition")) {
             throw new MCRException("The condition Element of MCRMetaAccessRule is null.");
         }
-        condition = (org.jdom.Element)set_condition.clone();
+        condition = (org.jdom.Element) set_condition.clone();
         condition.detach();
     }
 
@@ -100,12 +100,12 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
         setLang("en");
         setType("");
         permission = set_permission;
-        if ((permission == null) || ((permission = permission.trim()).length() == 0)) {
+        if (permission == null || (permission = permission.trim()).length() == 0) {
             permission = "read";
         } else {
             permission = permission.trim().toLowerCase();
         }
-        if ((set_condition == null) || (!set_condition.getName().equals("condition"))) {
+        if (set_condition == null || !set_condition.getName().equals("condition")) {
             throw new MCRException("The condition Element of MCRMetaAccessRule is null.");
         }
         condition = set_condition;
@@ -121,10 +121,10 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
      *                if the set_condition is null or empty
      */
     public final void setCondition(org.jdom.Element set_condition) throws MCRException {
-        if ((set_condition == null) || (!set_condition.getName().equals("condition"))) {
+        if (set_condition == null || !set_condition.getName().equals("condition")) {
             throw new MCRException("The condition Element of MCRMetaAccessRule is null.");
         }
-        condition = (org.jdom.Element)set_condition.clone();
+        condition = (org.jdom.Element) set_condition.clone();
         condition.detach();
     }
 
@@ -136,7 +136,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
      */
     public final void setPermission(String set_permission) {
         permission = set_permission;
-        if ((permission == null) || ((permission = permission.trim()).length() == 0)) {
+        if (permission == null || (permission = permission.trim()).length() == 0) {
             permission = "read";
         } else {
             permission = permission.trim().toLowerCase();
@@ -168,6 +168,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
      * @param element
      *            a relevant JDOM element for the metadata
      */
+    @Override
     public void setFromDOM(org.jdom.Element element) {
         super.setFromDOM(element);
 
@@ -175,7 +176,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
         if (temp_condition == null) {
             throw new MCRException("The condition Element of MCRMetaAccessRule is null.");
         }
-        condition = (org.jdom.Element)temp_condition.clone();
+        condition = (org.jdom.Element) temp_condition.clone();
         condition.detach();
 
         String temp_permission = element.getAttributeValue("permission");
@@ -193,6 +194,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML MCRMetaAccessRule part
      */
+    @Override
     public org.jdom.Element createXML() throws MCRException {
         if (!isValid()) {
             debug();
@@ -200,10 +202,10 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
         }
         org.jdom.Element elm = new org.jdom.Element(subtag);
         elm.setAttribute("inherited", Integer.toString(inherited));
-        if ((permission != null) && ((permission = permission.trim()).length() != 0)) {
+        if (permission != null && (permission = permission.trim()).length() != 0) {
             elm.setAttribute("permission", permission);
         }
-        if ((type != null) && ((type = type.trim()).length() != 0)) {
+        if (type != null && (type = type.trim()).length() != 0) {
             elm.setAttribute("type", type);
         }
         condition.detach();
@@ -222,6 +224,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
      * 
      * @return a boolean value
      */
+    @Override
     public boolean isValid() {
         if (!super.isValid()) {
             return false;
@@ -229,7 +232,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
         if (condition == null) {
             return false;
         }
-        if ((permission == null) || ((permission = permission.trim()).length() == 0)) {
+        if (permission == null || (permission = permission.trim()).length() == 0) {
             return false;
         }
         return true;
@@ -238,6 +241,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
     /**
      * This method make a clone of this class.
      */
+    @Override
     public Object clone() {
         return new MCRMetaAccessRule(datapart, subtag, lang, type, inherited, permission, condition);
     }
@@ -245,6 +249,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
     /**
      * This method put debug data to the logger (for the debug mode).
      */
+    @Override
     public final void debug() {
         super.debugDefault();
         LOGGER.debug("Permission         = " + permission);

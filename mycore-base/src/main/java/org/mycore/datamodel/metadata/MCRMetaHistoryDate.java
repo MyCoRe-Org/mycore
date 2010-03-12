@@ -28,12 +28,11 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
+import org.mycore.common.MCRCalendar;
+import org.mycore.common.MCRException;
 
 import com.ibm.icu.util.Calendar;
 import com.ibm.icu.util.GregorianCalendar;
-
-import org.mycore.common.MCRCalendar;
-import org.mycore.common.MCRException;
 
 /**
  * This class implements all methods for handling with the MCRMetaHistoryDate
@@ -100,7 +99,8 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * @param set_inherted    a value >= 0
      * @exception MCRException if the parameter values are invalid
      */
-    public MCRMetaHistoryDate(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted) throws MCRException {
+    public MCRMetaHistoryDate(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted)
+            throws MCRException {
         super(set_datapart, set_subtag, default_lang, set_type, set_inherted);
         texts = new ArrayList<MCRMetaHistoryDateText>();
         calendar = MCRCalendar.CALENDARS_INPUT[0];
@@ -182,8 +182,9 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * @return an instance of MCRMetaHistoryDateTexts or null
      */
     public final MCRMetaHistoryDateText getText(String set_lang) {
-        if (set_lang == null)
+        if (set_lang == null) {
             return null;
+        }
         for (int i = 0; i < texts.size(); i++) {
             if (texts.get(i).getLang().equals(set_lang)) {
                 return texts.get(i);
@@ -201,7 +202,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * @return an instance of MCRMetaHistoryDateTexts or null
      */
     public final MCRMetaHistoryDateText getText(int index) {
-        if ((index >= 0) && (index < texts.size())) {
+        if (index >= 0 && index < texts.size()) {
             return texts.get(index);
         }
         return null;
@@ -213,7 +214,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * @return an ArrayList of MCRMetaHistoryDateTexts instances
      */
     public final ArrayList<MCRMetaHistoryDateText> getTexts() {
-        return this.texts;
+        return texts;
     }
 
     /**
@@ -237,8 +238,8 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
             LOGGER.warn("The calendar field of MCRMeataHistoryDate is set to default " + MCRCalendar.TAG_GREGORIAN + ".");
             return;
         }
-        for (int i = 0; i < MCRCalendar.CALENDARS_INPUT.length; i++) {
-            if (MCRCalendar.CALENDARS_INPUT[i].equals(calstr)) {
+        for (String element : MCRCalendar.CALENDARS_INPUT) {
+            if (element.equals(calstr)) {
                 calendar = calstr;
                 return;
             }
@@ -266,8 +267,8 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      */
     public final void setDefaultVon() {
         ivon = MCRCalendar.MIN_JULIAN_DAY_NUMBER;
-        von = (Calendar) new GregorianCalendar();
-        von.set(GregorianCalendar.JULIAN_DAY, MCRCalendar.MIN_JULIAN_DAY_NUMBER);
+        von = new GregorianCalendar();
+        von.set(Calendar.JULIAN_DAY, MCRCalendar.MIN_JULIAN_DAY_NUMBER);
     }
 
     /**
@@ -275,8 +276,8 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      */
     public final void setDefaultBis() {
         ibis = MCRCalendar.MAX_JULIAN_DAY_NUMBER;
-        bis = (Calendar) new GregorianCalendar();
-        bis.set(GregorianCalendar.JULIAN_DAY, MCRCalendar.MAX_JULIAN_DAY_NUMBER);
+        bis = new GregorianCalendar();
+        bis.set(Calendar.JULIAN_DAY, MCRCalendar.MAX_JULIAN_DAY_NUMBER);
     }
 
     /**
@@ -291,7 +292,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
             LOGGER.warn("The calendar to set 'von' is null, default is set.");
             return;
         }
-        ivon = set_date.get(GregorianCalendar.JULIAN_DAY);
+        ivon = set_date.get(Calendar.JULIAN_DAY);
         von = set_date;
 
     }
@@ -327,7 +328,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
             LOGGER.warn("The calendar to set 'bis' is null, default is set.");
             return;
         }
-        ibis = set_date.get(GregorianCalendar.JULIAN_DAY);
+        ibis = set_date.get(Calendar.JULIAN_DAY);
         bis = set_date;
     }
 
@@ -356,13 +357,15 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * @return the text String of the default language or an empty String
      * @deprecated
      */
+    @Deprecated
     public final String getText() {
         if (texts.size() > 0) {
             MCRMetaHistoryDateText h = getText(lang);
-            if (h != null)
+            if (h != null) {
                 return h.getText();
-            else
+            } else {
                 return "";
+            }
         }
         return "";
     }
@@ -437,6 +440,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * @param element
      *            a relevant JDOM element for the metadata
      */
+    @Override
     @SuppressWarnings("unchecked")
     public void setFromDOM(org.jdom.Element element) {
         super.setFromDOM(element);
@@ -446,7 +450,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         String textn;
         Iterator<org.jdom.Element> textchild = element.getChildren("text").iterator();
         while (textchild.hasNext()) {
-            Element elmt = (Element) textchild.next();
+            Element elmt = textchild.next();
             textn = elmt.getText();
             langn = elmt.getAttributeValue("lang", org.jdom.Namespace.XML_NAMESPACE);
             if (langn != null) {
@@ -468,6 +472,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML MCRMetaHistoryDate part
      */
+    @Override
     public org.jdom.Element createXML() throws MCRException {
         if (!isValid()) {
             debug();
@@ -479,11 +484,11 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         elm.setAttribute("inherited", Integer.toString(inherited));
         for (int i = 0; i < texts.size(); i++) {
             org.jdom.Element elmt = new org.jdom.Element("text");
-            elmt.addContent((String) texts.get(i).getText());
+            elmt.addContent(texts.get(i).getText());
             elmt.setAttribute("lang", texts.get(i).getLang(), org.jdom.Namespace.XML_NAMESPACE);
             elm.addContent(elmt);
         }
-        if ((type != null) && ((type = type.trim()).length() != 0)) {
+        if (type != null && (type = type.trim()).length() != 0) {
             elm.setAttribute("type", type);
         }
         if ((calendar = calendar.trim()).length() != 0) {
@@ -513,6 +518,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * 
      * @return a boolean value
      */
+    @Override
     public boolean isValid() {
         for (int i = 0; i < texts.size(); i++) {
             MCRMetaHistoryDateText textitem = texts.get(i);
@@ -521,9 +527,10 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
                 i--;
             }
         }
-        if (texts.size() == 0)
+        if (texts.size() == 0) {
             return false;
-        if ((von == null) || (bis == null) || (calendar == null)) {
+        }
+        if (von == null || bis == null || calendar == null) {
             return false;
         }
         if (ibis < ivon) {
@@ -538,6 +545,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     /**
      * This method make a clone of this class.
      */
+    @Override
     public Object clone() {
         MCRMetaHistoryDate out = new MCRMetaHistoryDate(datapart, subtag, lang, type, inherited);
         for (int i = 0; i < texts.size(); i++) {
@@ -553,6 +561,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     /**
      * This method put debug data to the logger (for the debug mode).
      */
+    @Override
     public void debug() {
         super.debugDefault();
         for (int i = 0; i < texts.size(); i++) {
@@ -582,8 +591,8 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         private String lang;
 
         public MCRMetaHistoryDateText() {
-            this.datetext = "";
-            this.lang = DEFAULT_LANGUAGE;
+            datetext = "";
+            lang = DEFAULT_LANGUAGE;
         }
 
         public MCRMetaHistoryDateText(String datetext, String lang) {
@@ -598,7 +607,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
          */
 
         public String getText() {
-            return this.datetext;
+            return datetext;
         }
 
         /**
@@ -621,7 +630,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
          * @return the lang
          */
         public String getLang() {
-            return this.lang;
+            return lang;
         }
 
         /**
@@ -632,19 +641,21 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
          */
         public void setLang(String set_lang) {
             if (set_lang == null) {
-                this.lang = DEFAULT_LANGUAGE;
+                lang = DEFAULT_LANGUAGE;
             } else {
-                this.lang = set_lang;
+                lang = set_lang;
             }
         }
-        
+
         /**
          * This mehtod validate the content. If lang and text are not empty, it return true otherwise it return false.
          * 
          * @return true if the content is valid.
          */
         public boolean isValid() {
-            if ((this.lang.length() == 0) || (this.datetext.length() == 0)) return false;
+            if (lang.length() == 0 || datetext.length() == 0) {
+                return false;
+            }
             return true;
         }
 

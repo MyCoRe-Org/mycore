@@ -127,7 +127,7 @@ public abstract class MCRAudioVideoExtender {
      * @return the streaming bitrate formatted as a String
      */
     public String getBitRateFormatted() {
-        if (bitRate > (1024 * 1024)) {
+        if (bitRate > 1024 * 1024) {
             double b = Math.round(bitRate / 10485.76) / 100.0;
             return new DecimalFormat("##0.##").format(b) + " MBit";
         }
@@ -171,7 +171,7 @@ public abstract class MCRAudioVideoExtender {
      * @return true, if this asset is an audio asset.
      */
     public boolean isAudio() {
-        return (mediaType == AUDIO);
+        return mediaType == AUDIO;
     }
 
     /**
@@ -180,7 +180,7 @@ public abstract class MCRAudioVideoExtender {
      * @return true, if this asset is a video asset.
      */
     public boolean isVideo() {
-        return (mediaType == VIDEO);
+        return mediaType == VIDEO;
     }
 
     /**
@@ -331,6 +331,7 @@ public abstract class MCRAudioVideoExtender {
      * 
      * @return a String containing useful information about this extender's data
      */
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("Media Type      : ");

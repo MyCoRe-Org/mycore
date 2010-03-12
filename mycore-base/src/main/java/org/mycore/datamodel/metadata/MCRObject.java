@@ -146,7 +146,7 @@ final public class MCRObject extends MCRBase {
         }
 
         mcr_version = jdom_element_root.getAttributeValue("version");
-        if ((mcr_version == null) || ((mcr_version = mcr_version.trim()).length() == 0)) {
+        if (mcr_version == null || (mcr_version = mcr_version.trim()).length() == 0) {
             setVersion();
         }
 
@@ -189,6 +189,7 @@ final public class MCRObject extends MCRBase {
      *                general Exception of MyCoRe
      * @throws SAXParseException 
      */
+    @Override
     public final void setFromURI(URI uri) throws MCRException, SAXParseException {
         setFromJDOM(MCRXMLHelper.parseURI(uri));
     }
@@ -203,6 +204,7 @@ final public class MCRObject extends MCRBase {
      *                general Exception of MyCoRe
      * @throws SAXParseException 
      */
+    @Override
     public final void setFromXML(byte[] xml, boolean valid) throws MCRException, SAXParseException {
         setFromJDOM(MCRXMLHelper.parseXML(xml, valid));
     }
@@ -234,7 +236,7 @@ final public class MCRObject extends MCRBase {
             return false;
         }
 
-        if ((tag == null) || ((tag = tag.trim()).length() == 0)) {
+        if (tag == null || (tag = tag.trim()).length() == 0) {
             return false;
         }
 
@@ -260,6 +262,7 @@ final public class MCRObject extends MCRBase {
      *                if the content of this class is not valid
      * @return a JDOM Document with the XML data of the object as byte array
      */
+    @Override
     public final org.jdom.Document createXML() throws MCRException {
         if (!isValid()) {
             throw new MCRException("The content is not valid.");
@@ -287,6 +290,7 @@ final public class MCRObject extends MCRBase {
      *                if a persistence problem is occured
      * @throws MCRActiveLinkException
      */
+    @Override
     public final void createInDatastore() throws MCRPersistenceException, MCRActiveLinkException {
         // exist the object?
         if (existInDatastore(mcr_id.getId())) {
@@ -369,8 +373,9 @@ final public class MCRObject extends MCRBase {
                 checklink = true;
             }
         }
-        if (checklink)
+        if (checklink) {
             return;
+        }
         // add link
         if (!importMode) {
             mcr_service.setDate("modifydate");
@@ -412,6 +417,7 @@ final public class MCRObject extends MCRBase {
      *                if a persistence problem is occured
      * @throws MCRActiveLinkException
      */
+    @Override
     public final void deleteFromDatastore(String id) throws MCRPersistenceException, MCRActiveLinkException {
         mcr_id = new MCRObjectID(id);
         deleteFromDatastore();
@@ -534,6 +540,7 @@ final public class MCRObject extends MCRBase {
      * @exception MCRPersistenceException
      *                if a persistence problem is occured
      */
+    @Override
     public final void receiveFromDatastore(String id) throws MCRPersistenceException {
         receiveFromDatastore(new MCRObjectID(id));
     }
@@ -576,7 +583,7 @@ final public class MCRObject extends MCRBase {
      *                if a persistence problem is occured
      */
     public static final byte[] receiveXMLFromDatastore(MCRObjectID id) throws MCRPersistenceException {
-        return MCRXMLTableManager.instance().retrieveBLOB( id );
+        return MCRXMLTableManager.instance().retrieveBLOB(id);
     }
 
     /**
@@ -604,7 +611,7 @@ final public class MCRObject extends MCRBase {
      *                if a persistence problem is occured
      */
     public final org.jdom.Document receiveJDOMFromDatastore(MCRObjectID id) throws MCRPersistenceException {
-        return MCRXMLTableManager.instance().retrieveXML( id );
+        return MCRXMLTableManager.instance().retrieveXML(id);
     }
 
     /**
@@ -616,6 +623,7 @@ final public class MCRObject extends MCRBase {
      *             if object is created (no real update) and references to it's
      *             id already exist
      */
+    @Override
     public final void updateInDatastore() throws MCRPersistenceException, MCRActiveLinkException {
         // get the old Item
         MCRObject old = new MCRObject();
@@ -639,7 +647,7 @@ final public class MCRObject extends MCRBase {
         // set the parent from the original and this update
         boolean setparent = false;
 
-        if ((old.mcr_struct.getParent() != null) && (mcr_struct.getParent() != null)) {
+        if (old.mcr_struct.getParent() != null && mcr_struct.getParent() != null) {
             String oldparent = old.mcr_struct.getParent().getXLinkHref();
             String newparent = mcr_struct.getParent().getXLinkHref();
 
@@ -661,7 +669,7 @@ final public class MCRObject extends MCRBase {
             }
         }
 
-        if ((old.mcr_struct.getParent() != null) && (mcr_struct.getParent() == null)) {
+        if (old.mcr_struct.getParent() != null && mcr_struct.getParent() == null) {
             String oldparent = old.mcr_struct.getParent().getXLinkHref();
 
             // remove child from the old parent
@@ -680,7 +688,7 @@ final public class MCRObject extends MCRBase {
             }
         }
 
-        if ((old.mcr_struct.getParent() == null) && (mcr_struct.getParent() != null)) {
+        if (old.mcr_struct.getParent() == null && mcr_struct.getParent() != null) {
             setparent = true;
         }
 
@@ -858,6 +866,7 @@ final public class MCRObject extends MCRBase {
      * @param id
      *            the MCRObjectID as string
      */
+    @Override
     public final void repairPersitenceDatastore(String id) throws MCRPersistenceException {
         repairPersitenceDatastore(new MCRObjectID(id));
     }
@@ -869,6 +878,7 @@ final public class MCRObject extends MCRBase {
      * @param id
      *            the MCRObjectID
      */
+    @Override
     public final void repairPersitenceDatastore(MCRObjectID id) throws MCRPersistenceException {
         // receive metadata for ID
         receiveFromDatastore(id);

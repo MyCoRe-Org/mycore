@@ -27,15 +27,15 @@ public class MCRGROUPMEMBERS {
     private MCRGROUPMEMBERSPK key;
 
     public MCRGROUPMEMBERS() {
-        this.key = new MCRGROUPMEMBERSPK();
+        key = new MCRGROUPMEMBERSPK();
     }
 
     public MCRGROUPMEMBERS(MCRGROUPS gid, MCRUSERS userid, String groupid) {
-        this.key = new MCRGROUPMEMBERSPK(gid, userid);
+        key = new MCRGROUPMEMBERSPK(gid, userid);
     }
 
     public MCRGROUPMEMBERS(long id) {
-        this.key = new MCRGROUPMEMBERSPK(id);
+        key = new MCRGROUPMEMBERSPK(id);
     }
 
     /**

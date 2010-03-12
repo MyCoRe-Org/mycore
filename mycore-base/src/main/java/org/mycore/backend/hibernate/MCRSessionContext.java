@@ -28,7 +28,6 @@ import org.hibernate.Session;
 import org.hibernate.context.CurrentSessionContext;
 import org.hibernate.context.ThreadLocalSessionContext;
 import org.hibernate.engine.SessionFactoryImplementor;
-
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.events.MCRSessionEvent;
@@ -55,6 +54,7 @@ public class MCRSessionContext extends ThreadLocalSessionContext implements MCRS
     private static final Logger LOGGER = Logger.getLogger(MCRSessionContext.class);
 
     ThreadLocal<Boolean> firstThread = new ThreadLocal<Boolean>() {
+        @Override
         protected Boolean initialValue() {
             return Boolean.FALSE;
         }
@@ -160,9 +160,11 @@ public class MCRSessionContext extends ThreadLocalSessionContext implements MCRS
         return new CleanupSynch(factory) {
             private static final long serialVersionUID = -7894370437708819993L;
 
+            @Override
             public void afterCompletion(int arg0) {
             }
 
+            @Override
             public void beforeCompletion() {
             }
         };

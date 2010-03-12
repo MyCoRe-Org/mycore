@@ -90,8 +90,9 @@ class MCRIndexWriterAction implements Runnable {
                 addDocument();
             } else if (optimize) {
                 optimizeIndex();
-            } else
+            } else {
                 addDirectory();
+            }
         } catch (Exception e) {
             LOGGER.error("Error while writing Lucene Index ", e);
         }
@@ -122,11 +123,14 @@ class MCRIndexWriterAction implements Runnable {
         LOGGER.info("Adding done.");
     }
 
+    @Override
     public String toString() {
-        if (doc != null)
+        if (doc != null) {
             return doc.toString();
-        if (deleteTerm != null)
+        }
+        if (deleteTerm != null) {
             return deleteTerm.toString();
+        }
         return "empty IndexWriterAction";
     }
 }

@@ -34,7 +34,6 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
-
 import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.access.mcrimpl.MCRRuleMapping;
 import org.mycore.backend.hibernate.tables.MCRACCESS;
@@ -54,6 +53,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
         createTables();
     }
 
+    @Override
     public String getRuleID(String objID, String ACPool) {
 
         Session session = MCRHIBConnection.instance().getSession();
@@ -62,6 +62,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
         return (String) c.uniqueResult();
     }
 
+    @Override
     public void createTables() {
         try {
             // update schema -> first time create table
@@ -77,6 +78,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
      * @param rulemapping
      *            with values
      */
+    @Override
     public void createAccessDefinition(MCRRuleMapping rulemapping) {
 
         if (!existAccessDefinition(rulemapping.getPool(), rulemapping.getObjId())) {
@@ -114,6 +116,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
         return false;
     }
 
+    @Override
     public boolean existsRule(String objid, String pool) {
         Session session = MCRHIBConnection.instance().getSession();
 
@@ -141,6 +144,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
      * @param rulemapping
      *            rule to be deleted
      */
+    @Override
     public void deleteAccessDefinition(MCRRuleMapping rulemapping) {
 
         Session session = MCRHIBConnection.instance().getSession();
@@ -152,6 +156,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
     /**
      * update AccessDefinition in db for given MCRAccessData
      */
+    @Override
     public void updateAccessDefinition(MCRRuleMapping rulemapping) {
         Session session = MCRHIBConnection.instance().getSession();
         MCRACCESSRULE accessRule = getAccessRule(rulemapping.getRuleId());
@@ -177,12 +182,13 @@ public class MCRHIBAccessStore extends MCRAccessStore {
      *            objectid of MCRObject
      * @return MCRAccessData
      */
+    @Override
     public MCRRuleMapping getAccessDefinition(String pool, String objid) {
 
         Session session = MCRHIBConnection.instance().getSession();
         MCRRuleMapping rulemapping = new MCRRuleMapping();
-        MCRACCESS data = ((MCRACCESS) session.createCriteria(MCRACCESS.class).add(Restrictions.eq("key", new MCRACCESSPK(pool, objid)))
-                .list().get(0));
+        MCRACCESS data = (MCRACCESS) session.createCriteria(MCRACCESS.class).add(Restrictions.eq("key", new MCRACCESSPK(pool, objid)))
+                .list().get(0);
         if (data != null) {
             rulemapping.setCreationdate(data.getCreationdate());
             rulemapping.setCreator(data.getCreator());
@@ -194,6 +200,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
         return rulemapping;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public ArrayList<String> getMappedObjectId(String pool) {
 
@@ -202,12 +209,13 @@ public class MCRHIBAccessStore extends MCRAccessStore {
 
         List<MCRACCESS> l = session.createQuery("from MCRACCESS where ACPOOL = '" + pool + "'").list();
         for (int i = 0; i < l.size(); i++) {
-            ret.add(((MCRACCESS) l.get(i)).getKey().getObjid());
+            ret.add((l.get(i)).getKey().getObjid());
         }
 
         return ret;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public ArrayList<String> getPoolsForObject(String objid) {
 
@@ -215,13 +223,14 @@ public class MCRHIBAccessStore extends MCRAccessStore {
         ArrayList<String> ret = new ArrayList<String>();
         List<MCRACCESS> l = session.createQuery("from MCRACCESS where OBJID = '" + objid + "'").list();
         for (int i = 0; i < l.size(); i++) {
-            MCRACCESS access = (MCRACCESS) l.get(i);
+            MCRACCESS access = l.get(i);
             ret.add(access.getKey().getAcpool());
         }
 
         return ret;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public ArrayList<String> getDatabasePools() {
 
@@ -229,13 +238,14 @@ public class MCRHIBAccessStore extends MCRAccessStore {
         Session session = MCRHIBConnection.instance().getSession();
         List<MCRACCESS> l = session.createCriteria(MCRACCESS.class).list();
         for (int i = 0; i < l.size(); i++) {
-            if (!ret.contains(((MCRACCESS) l.get(i)).getKey().getAcpool())) {
-                ret.add(((MCRACCESS) l.get(i)).getKey().getAcpool());
+            if (!ret.contains((l.get(i)).getKey().getAcpool())) {
+                ret.add((l.get(i)).getKey().getAcpool());
             }
         }
         return ret;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public List getDistinctStringIDs() {
         List<String> ret;

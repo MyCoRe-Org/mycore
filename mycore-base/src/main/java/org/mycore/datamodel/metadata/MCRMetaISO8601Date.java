@@ -44,7 +44,6 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
-
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 
@@ -109,21 +108,28 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
         }
 
         public static IsoFormat getFormat(String format) {
-            if (format == null)
+            if (format == null) {
                 return null;
+            }
             String fmt = format.intern();
-            if (fmt == F_YEAR)
+            if (fmt == F_YEAR) {
                 return YEAR;
-            if (fmt == F_YEAR_MONTH)
+            }
+            if (fmt == F_YEAR_MONTH) {
                 return YEAR_MONTH;
-            if (fmt == F_COMPLETE)
+            }
+            if (fmt == F_COMPLETE) {
                 return COMPLETE;
-            if (fmt == F_COMPLETE_HH_MM)
+            }
+            if (fmt == F_COMPLETE_HH_MM) {
                 return COMPLETE_HH_MM;
-            if (fmt == F_COMPLETE_HH_MM_SS)
+            }
+            if (fmt == F_COMPLETE_HH_MM_SS) {
                 return COMPLETE_HH_MM_SS;
-            if (fmt == F_COMPLETE_HH_MM_SS_SSS)
+            }
+            if (fmt == F_COMPLETE_HH_MM_SS_SSS) {
                 return COMPLETE_HH_MM_SS_SSS;
+            }
             // never reached
             return null;
         }
@@ -159,6 +165,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
      * 
      * @see org.mycore.datamodel.metadata.MCRMetaDefault#createXML()
      */
+    @Override
     public Element createXML() throws MCRException {
         if (!changed) {
             return (Element) export.clone();
@@ -169,10 +176,10 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
         }
         export = new org.jdom.Element(subtag, DEFAULT_NAMESPACE);
         export.setAttribute("inherited", Integer.toString(inherited));
-        if (!(this.isoFormat == null || this.isoFormat == IsoFormat.COMPLETE_HH_MM_SS_SSS)) {
-            export.setAttribute("format", this.isoFormat.toString());
+        if (!(isoFormat == null || isoFormat == IsoFormat.COMPLETE_HH_MM_SS_SSS)) {
+            export.setAttribute("format", isoFormat.toString());
         }
-        if ((type != null) && ((type = type.trim()).length() != 0)) {
+        if (type != null && (type = type.trim()).length() != 0) {
             export.setAttribute("type", type);
         }
         export.setText(getISOString());
@@ -185,11 +192,12 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
      * 
      * @see org.mycore.datamodel.metadata.MCRMetaDefault#setFromDOM(org.jdom.Element)
      */
+    @Override
     public void setFromDOM(org.jdom.Element element) {
         super.setFromDOM(element);
         setFormat(element.getAttributeValue("format"));
         setDate(element.getTextTrim());
-        this.export = (Element) element.clone();
+        export = (Element) element.clone();
     }
 
     /**
@@ -267,7 +275,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
      * @return a new Date instance of the time set in this element
      */
     public final Date getDate() {
-        return (dt == null) ? null : (Date) dt.toDate().clone();
+        return dt == null ? null : (Date) dt.toDate().clone();
     }
 
     /**
@@ -299,7 +307,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
     }
 
     private DateTime getDateTime(String timeString) {
-        dateTimeFormatter = FormatChooser.getFormatter(timeString, this.isoFormat);
+        dateTimeFormatter = FormatChooser.getFormatter(timeString, isoFormat);
         return dateTimeFormatter.parseDateTime(timeString);
     }
 
@@ -309,7 +317,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
      * @return date in ISO 8601 format, or null if date is unset.
      */
     public final String getISOString() {
-        return (dt == null) ? null : dateTimeFormatter.print(this.dt);
+        return dt == null ? null : dateTimeFormatter.print(dt);
     }
 
     /**
@@ -349,9 +357,10 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
      */
     public String format(String format, Locale locale) {
         DateTimeFormatter df = DateTimeFormat.forPattern(format);
-        if (locale != null)
+        if (locale != null) {
             df = df.withLocale(locale);
-        return (this.dt == null) ? null : df.print(this.dt);
+        }
+        return dt == null ? null : df.print(dt);
     }
 
     /**
@@ -365,21 +374,22 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
      * 
      */
     public IsoFormat getFormat() {
-        return this.isoFormat;
+        return isoFormat;
     }
 
     /**
      * This method put debug data to the logger (for the debug mode).
      */
+    @Override
     public void debug() {
         LOGGER.debug("Start Class : MCRMetaISO8601Date");
         super.debugDefault();
-        LOGGER.debug("Date=" + ((dt == null) ? null : dateTimeFormatter.print(dt)));
-        LOGGER.debug("Format=" + this.isoFormat);
+        LOGGER.debug("Date=" + (dt == null ? null : dateTimeFormatter.print(dt)));
+        LOGGER.debug("Format=" + isoFormat);
         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
         StringWriter sw = new StringWriter();
         try {
-            xout.output(this.export, sw);
+            xout.output(export, sw);
             LOGGER.debug("JDOM=" + sw.toString());
         } catch (IOException e) {
             //ignore
@@ -393,6 +403,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
      * 
      * @see java.lang.Object#clone()
      */
+    @Override
     public Object clone() {
         MCRMetaISO8601Date out = new MCRMetaISO8601Date();
         out.setFromDOM((Element) createXML().clone());
@@ -412,6 +423,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
      * @return false, if any test fails and the instance should not be used for
      *         persistence purposes
      */
+    @Override
     public boolean isValid() {
         if (!valid || !super.isValid()) {
             return false;
@@ -480,8 +492,8 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
             DateTimeFormatter df;
             if (isoFormat != null) {
                 df = getFormatterForFormat(isoFormat);
-            } else if ((isoString != null) && (isoString.length() != 0)) {
-                String normalized = (isoString.charAt(0) == '-') ? isoString.substring(1) : isoString;
+            } else if (isoString != null && isoString.length() != 0) {
+                String normalized = isoString.charAt(0) == '-' ? isoString.substring(1) : isoString;
                 df = getFormatterForDuration(normalized);
             } else {
                 df = COMPLETE_HH_MM_SS_SSS_FORMAT;
@@ -519,8 +531,9 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
             case 3:
                 return USE_UTC ? UTC_YEAR_FORMAT : YEAR_FORMAT;
             case 4:
-                if (isoString.indexOf('-') == -1)
+                if (isoString.indexOf('-') == -1) {
                     return USE_UTC ? UTC_YEAR_FORMAT : YEAR_FORMAT;
+                }
             case 5:
             case 6:
             case 7:
