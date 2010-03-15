@@ -123,8 +123,7 @@ public class MCRClassificationData {
         setRowsCreator(rowCreator);
     }
 
-    public MCRClassificationData(final String uri, final String mode, final String actclid, final String actEditorCategid)
-            throws Exception {
+    public MCRClassificationData(final String uri, final String mode, final String actclid, final String actEditorCategid) throws Exception {
         MCRClassificationPool classificationPool = MCRClassificationPoolFactory.getInstance();
         RowCreator rowCreator = new RowCreator_NoLines();
         initHelper(classificationPool, rowCreator);
@@ -215,11 +214,11 @@ public class MCRClassificationData {
         LOGGER.debug("setObjectTypes(" + browserClass + ")");
         try {
             // NOTE: read *.Doctype for compatiblity reasons
-            objectType = getConfig().getString("MCR.ClassificationBrowser." + browserClass + ".Objecttype", getConfig().getString(
-                    "MCR.ClassificationBrowser." + browserClass + ".Doctype", null));
+            objectType = getConfig().getString("MCR.ClassificationBrowser." + browserClass + ".Objecttype",
+                    getConfig().getString("MCR.ClassificationBrowser." + browserClass + ".Doctype", null));
         } catch (final org.mycore.common.MCRConfigurationException noDoctype) {
-            objectType = getConfig().getString("MCR.ClassificationBrowser.default.ObjectType", getConfig()
-                    .getString("MCR.ClassificationBrowser.default.Doctype"));
+            objectType = getConfig().getString("MCR.ClassificationBrowser.default.ObjectType",
+                    getConfig().getString("MCR.ClassificationBrowser.default.Doctype"));
         }
 
         if (objectType != null) {
@@ -345,7 +344,7 @@ public class MCRClassificationData {
 
         LOGGER.debug("query classification links");
         Map<MCRCategoryID, Boolean> linkMap = getClassificationPool().hasLinks(null);
-        
+
         for (MCRCategoryID classID : getClassificationPool().getAllIDs()) {
             MCRCategory classif = getClassificationPool().getClassificationAsPojo(classID, false);
             LOGGER.debug("get classification " + classID);
@@ -372,7 +371,7 @@ public class MCRClassificationData {
         String rootID = classID.getRootID();
         String sessionID = MCRSessionMgr.getCurrentSession().getID();
         String classUser = ClassificationUserTableFactory.getInstance().getSession(rootID);
-        
+
         if (classUser != null && !classUser.equals(sessionID)) {
             MCRSession oldsession = MCRSessionMgr.getSession(classUser);
             if (null != oldsession) {
@@ -417,9 +416,7 @@ public class MCRClassificationData {
     private static Element getBrowseElement(MCRCategory classif) {
         Element ce = new Element("classification");
         ce.setAttribute("ID", classif.getId().getRootID());
-        for (MCRLabel label : classif.getLabels()) {
-            ce.addContent(createLabelElement(label));
-        }
+        ce.addContent(createLabelElement(classif.getCurrentLabel()));
         return ce;
     }
 
@@ -545,7 +542,7 @@ public class MCRClassificationData {
 
     private Element createSessionTag(String rootID) {
         String classUser = ClassificationUserTableFactory.getInstance().getSession(rootID);
-        
+
         if (classUser == null) {
             classUser = "";
         }
