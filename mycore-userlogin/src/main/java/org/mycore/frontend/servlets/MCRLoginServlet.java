@@ -96,7 +96,6 @@ public class MCRLoginServlet extends MCRServlet {
         LOGGER.debug("SessionID: " + mcrSession.getID());
         LOGGER.debug("CurrentID: " + mcrSession.getCurrentUserID());
         LOGGER.debug("UID :      " + uid);
-        LOGGER.debug("PWD :      " + pwd);
         LOGGER.debug("URL :      " + backto_url);
 
         // Do not change login, just redirect to given url:
