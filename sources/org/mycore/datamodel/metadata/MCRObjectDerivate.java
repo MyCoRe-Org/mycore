@@ -331,7 +331,7 @@ public class MCRObjectDerivate {
             }
 
             for (int i = 0; i < files.size(); i++) {
-                fileset.addContent(files.get(i));
+                fileset.addContent(((Element)files.get(i).clone()).detach());
             }
             elm.addContent(fileset);
         }
