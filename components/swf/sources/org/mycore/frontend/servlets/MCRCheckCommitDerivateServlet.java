@@ -39,6 +39,8 @@ import org.mycore.common.MCRMailer;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetaLinkID;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.editor.MCREditorSubmission;
 
@@ -115,6 +117,30 @@ public class MCRCheckCommitDerivateServlet extends MCRCheckBase {
 
             // update data
             der.updateXMLInDatastore();
+            String label = der.getLabel();
+            String href = der.getDerivate().getMetaLink().getXLinkHref();
+            MCRObject obj = new MCRObject();
+            obj.receiveFromDatastore(href);
+            int size = obj.getStructure().getDerivateSize();
+            boolean isset = false;
+            for (int i = 0; i < size; i++) {
+                MCRMetaLinkID link = obj.getStructure().getDerivate(i);
+                if (link.getXLinkHref().equals(der.getId().getId())) {
+                    String oldlabel = link.getXLinkLabel();
+                    if ((oldlabel != null) && (!oldlabel.trim().equals(label))) {
+                        obj.getStructure().getDerivate(i).setXLinkLabel(label);
+                        isset = true;
+                    }
+                    break;
+                }
+            }
+            // update mycoreobject
+            if (isset) {
+                obj.updateThisInDatastore();
+                LOGGER.info("Synchronized " + der.getId().getId());
+            }
+
+            // go back
             okay = true;
             url = getNextURL(objID, okay);
             sendMail(derID);
