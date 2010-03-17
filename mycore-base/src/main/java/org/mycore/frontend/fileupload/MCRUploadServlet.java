@@ -96,9 +96,12 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 
     static Pattern subDelims = Pattern.compile("[^!$&'()*+,;=]*");
 
+    static boolean doRun = true;
+    
     @Override
     public synchronized void init() throws ServletException {
         super.init();
+        doRun = true;                                        
 
         if (server != null) {
             return; // already inited?
@@ -132,16 +135,17 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
     }
 
     @Override
-    public void finalize() throws Throwable {
-        try {
+    public void destroy() {
+        try {              
             if (server != null) {
-                server.close();
-            }
+                server.close();  
+                doRun = false;   
+            }                    
         } catch (Exception ignored) {
-        }
-
-        super.finalize();
-    }
+            LOGGER.warn("Exception while destroy() in MCRUploadServlet !!!");
+        }                                                                    
+        super.destroy();                                                     
+    }                                                                        
 
     public void handleUpload(Socket socket) {
         LOGGER.info("Client applet connected to socket now.");
@@ -199,7 +203,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
     public void run() {
         LOGGER.debug("Server socket thread startet.");
 
-        while (true) {
+        while (doRun) {
             LOGGER.debug("Listening on " + serverIP + ":" + serverPort + " for incoming data...");
 
             try {
