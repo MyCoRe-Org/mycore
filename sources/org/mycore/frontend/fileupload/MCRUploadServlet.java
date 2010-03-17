@@ -67,7 +67,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * applet. The content of the uploaded files are handled by a MCRUploadHandler
  * subclass.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @author Harald Richter
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
@@ -96,8 +96,11 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 
     static Pattern subDelims = Pattern.compile("[^!$&'()*+,;=]*");
 
+    static boolean doRun = true;
+    
     public synchronized void init() throws ServletException {
         super.init();
+        doRun = true;
 
         if (server != null)
             return; // already inited?
@@ -129,15 +132,16 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
         }
     }
 
-    public void finalize() throws Throwable {
+    public void destroy() {
         try {
             if (server != null) {
                 server.close();
+                doRun = false;
             }
         } catch (Exception ignored) {
+            System.out.println("Exception while destroy() in MCRUploadServlet");
         }
-
-        super.finalize();
+        super.destroy();
     }
 
     public void handleUpload(Socket socket) {
@@ -195,7 +199,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
     public void run() {
         LOGGER.debug("Server socket thread startet.");
 
-        while (true) {
+        while (doRun) {
             LOGGER.debug("Listening on " + serverIP + ":" + serverPort + " for incoming data...");
 
             try {
