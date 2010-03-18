@@ -49,6 +49,7 @@
   <index id="urn">
     <!-- field for retrieving all objects where the derivates have urn -->
     <field name="objectsWithURN" type="boolean" />
+    <field name="objectURN" source="objectMetadata" type="text"/>
   </index>
   
   <index id="derivate">
