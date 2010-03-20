@@ -83,7 +83,7 @@
         <xs:element ref="service" minOccurs="0" />
       </xs:all>
       <xs:attribute name="ID" use="required" type="xs:NCName" />
-      <xs:attribute name="label" type="xs:NCName" />
+      <xs:attribute name="label" type="xs:string" />
       <xs:attribute name="version" type="xs:string" />
     </xs:complexType>
   </xs:element>

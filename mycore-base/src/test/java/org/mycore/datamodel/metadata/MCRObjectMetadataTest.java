@@ -22,19 +22,34 @@
  */
 package org.mycore.datamodel.metadata;
 
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.Date;
+
+import org.jdom.Document;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRTestCase;
+import org.mycore.common.xml.MCRXMLHelper;
+import org.xml.sax.SAXParseException;
 
 /**
  * @author Thomas Scheffler
  *
  */
 public class MCRObjectMetadataTest extends MCRTestCase {
+    private static final String TEST_OBJECT_RESOURCE_NAME = "/mcr_test_01.xml";
+    private Document testObjectDocument;
+    private MCRObjectMetadata testMetadata;
 
     /* (non-Javadoc)
      * @see org.mycore.common.MCRTestCase#setUp()
      */
     protected void setUp() throws Exception {
         super.setUp();
+        setProperty("MCR.Metadata.DefaultLang", "de", true);
+        testObjectDocument = loadResourceDocument(TEST_OBJECT_RESOURCE_NAME);
+        testMetadata = new MCRObjectMetadata();
+        testMetadata.setFromDOM(testObjectDocument.getRootElement().getChild("metadata"));
     }
 
     /* (non-Javadoc)
@@ -48,49 +63,65 @@ public class MCRObjectMetadataTest extends MCRTestCase {
      * Test method for {@link org.mycore.datamodel.metadata.MCRObjectMetadata#size()}.
      */
     public void testSize() {
-        fail("Not yet implemented"); // TODO
+        assertEquals("Expected just one metadata entry", 1, testMetadata.size());
     }
 
     /**
      * Test method for {@link org.mycore.datamodel.metadata.MCRObjectMetadata#getMetadataTagName(int)}.
      */
     public void testGetMetadataTagName() {
-        fail("Not yet implemented"); // TODO
+        assertEquals("Metadata tag is not 'def.textfield'", "def.textfield", testMetadata.getMetadataTagName(0));
     }
 
     /**
      * Test method for {@link org.mycore.datamodel.metadata.MCRObjectMetadata#getHeritableMetadata()}.
      */
     public void testGetHeritableMetadata() {
-        fail("Not yet implemented"); // TODO
+        assertEquals("Did not find any heritable metadata", 1, testMetadata.getHeritableMetadata().size());
     }
 
     /**
      * Test method for {@link org.mycore.datamodel.metadata.MCRObjectMetadata#removeInheritedMetadata()}.
      */
     public void testRemoveInheritedMetadata() {
-        fail("Not yet implemented"); // TODO
+        testMetadata.removeInheritedMetadata();
+        assertEquals("Did not expect removal of any metadata", 1, testMetadata.size());
     }
 
     /**
      * Test method for {@link org.mycore.datamodel.metadata.MCRObjectMetadata#appendMetadata(org.mycore.datamodel.metadata.MCRObjectMetadata)}.
      */
     public void testAppendMetadata() {
-        fail("Not yet implemented"); // TODO
+        MCRObjectMetadata meta2 = getDateObjectMetadata();
+        testMetadata.appendMetadata(meta2);
+        assertEquals("Expected 2 metadates", 2, testMetadata.size());
+    }
+
+    private MCRObjectMetadata getDateObjectMetadata() {
+        MCRObjectMetadata meta2 = new MCRObjectMetadata();
+        MCRMetaISO8601Date date = new MCRMetaISO8601Date("def.datefield", "datefield", "test", 0);
+        date.setDate(new Date());
+        MCRMetaElement el2 = new MCRMetaElement();
+        el2.addMetaObject(date);
+        el2.setClassName(MCRMetaISO8601Date.class.getSimpleName());
+        el2.setHeritable(true);
+        el2.setTag(date.datapart);
+        meta2.setMetadataElement(el2, date.datapart);
+        return meta2;
     }
 
     /**
      * Test method for {@link org.mycore.datamodel.metadata.MCRObjectMetadata#getMetadataElement(java.lang.String)}.
      */
     public void testGetMetadataElementString() {
-        fail("Not yet implemented"); // TODO
+        assertEquals("did not get correct MCRMetaElement instance", testMetadata.getMetadataElement(0), testMetadata.getMetadataElement("def.textfield"));
     }
 
     /**
      * Test method for {@link org.mycore.datamodel.metadata.MCRObjectMetadata#getMetadataElement(int)}.
      */
     public void testGetMetadataElementInt() {
-        fail("Not yet implemented"); // TODO
+        assertEquals("did not get correct MCRMetaElement instance", testMetadata.getMetadataElement("def.textfield"), testMetadata.getMetadataElement(0));
     }
 
     /**
@@ -115,13 +146,6 @@ public class MCRObjectMetadataTest extends MCRTestCase {
     }
 
     /**
-     * Test method for {@link org.mycore.datamodel.metadata.MCRObjectMetadata#setFromDOM(org.jdom.Element)}.
-     */
-    public void testSetFromDOM() {
-        fail("Not yet implemented"); // TODO
-    }
-
-    /**
      * Test method for {@link org.mycore.datamodel.metadata.MCRObjectMetadata#createXML()}.
      */
     public void testCreateXML() {
@@ -135,4 +159,9 @@ public class MCRObjectMetadataTest extends MCRTestCase {
         fail("Not yet implemented"); // TODO
     }
 
+    private static Document loadResourceDocument(String resource) throws URISyntaxException, MCRException, SAXParseException {
+        URL mcrTestUrl = MCRObjectMetadataTest.class.getResource(resource);
+        Document xml = MCRXMLHelper.parseURI(mcrTestUrl.toURI(), true);
+        return xml;
+    }
 }

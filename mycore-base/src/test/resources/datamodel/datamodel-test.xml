@@ -4,7 +4,7 @@
     <child type="test" />
   </children>
   <metadata>
-    <element name="textfield" type="text" minOccurs="0" maxOccurs="unbounded" style="small" notinherit="ignore" heritable="ignore" />
+    <element name="textfield" type="text" minOccurs="1" maxOccurs="unbounded" style="small" notinherit="ignore" heritable="ignore" />
     <element name="datefield" type="date" minOccurs="0" maxOccurs="unbounded" style="small" notinherit="ignore" heritable="ignore" />
   </metadata>
 </objecttype>
