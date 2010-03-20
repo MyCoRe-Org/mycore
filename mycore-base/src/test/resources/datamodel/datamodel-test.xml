@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objecttype xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="test" isParent="true" isChild="true" hasDerivates="false" xsi:noNamespaceSchemaLocation="datamodel.xsd">
+  <children>
+    <child type="test" />
+  </children>
+  <metadata>
+    <element name="textfield" type="text" minOccurs="0" maxOccurs="unbounded" style="small" notinherit="ignore" heritable="ignore" />
+    <element name="datefield" type="date" minOccurs="0" maxOccurs="unbounded" style="small" notinherit="ignore" heritable="ignore" />
+  </metadata>
+</objecttype>
+

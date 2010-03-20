@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:mcr="http://www.mycore.org/XMLSchema">
+  <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="xlinks-2001.xsd" />
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml-2001.xsd" />
+  <xs:include schemaLocation="MCRCondition.xsd" />
+
+  <!-- predefined attribute groups -->
+
+  <xs:attributeGroup name="supportedXlinks">
+    <xs:attribute ref="xlink:href" use="required" />
+    <xs:attribute ref="xlink:title" />
+    <xs:attribute ref="xlink:type" use="required" fixed="locator" />
+    <xs:attribute ref="xlink:label" />
+  </xs:attributeGroup>
+  <xs:simpleType name="mycoreDate">
+    <xs:union memberTypes="xs:date xs:gYear xs:gYearMonth xs:dateTime" />
+  </xs:simpleType>
+  <xs:simpleType name="mycoreNumber">
+    <xs:union memberTypes="xs:decimal xs:float xs:double" />
+  </xs:simpleType>
+  <xs:attributeGroup name="baseMetaAttributes">
+    <xs:attribute ref="xml:lang" use="optional" />
+  </xs:attributeGroup>
+  <xs:attributeGroup name="notInherited">
+    <xs:attribute name="inherited" type="xs:integer" fixed="0" use="optional" />
+  </xs:attributeGroup>
+  <xs:attributeGroup name="noInheritance">
+    <xs:attribute name="heritable" type="xs:boolean" fixed="false" />
+    <xs:attribute name="notinherit" type="xs:boolean" fixed="true" />
+  </xs:attributeGroup>
+  <xs:attributeGroup name="structureInheritance">
+    <xs:attribute name="heritable" type="xs:boolean" fixed="false" use="optional"/>
+    <xs:attribute name="notinherit" type="xs:boolean" fixed="true" use="optional"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="MCRMetaLangText">
+    <xs:attribute ref="xml:lang" use="optional" />
+    <xs:attribute name="form" fixed="plain" type="xs:string" />
+  </xs:attributeGroup>
+  <xs:attributeGroup name="MCRMetaClassification">
+    <xs:attribute name="categid" use="required" type="xs:normalizedString" />
+    <xs:attribute name="classid" use="required" type="xs:NCName" />
+  </xs:attributeGroup>
+  <xs:attributeGroup name="MCRMetaLinkID">
+    <xs:attributeGroup ref="supportedXlinks" />
+  </xs:attributeGroup>
+  <xs:attributeGroup name="MCRMetaLink">
+    <xs:attributeGroup ref="supportedXlinks" />
+  </xs:attributeGroup>
+  <xs:attributeGroup name="MCRMetaDerivateLink">
+    <xs:attributeGroup ref="supportedXlinks" />
+  </xs:attributeGroup>
+  <xs:attributeGroup name="MCRMetaXML">
+    <xs:attributeGroup ref="baseMetaAttributes" />
+  </xs:attributeGroup>
+  <xs:attributeGroup name="MCRMetaBoolean">
+    <xs:attributeGroup ref="baseMetaAttributes" />
+  </xs:attributeGroup>
+  <xs:attributeGroup name="MCRMetaISO8601Date">
+    <xs:attribute name="format">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="YYYY" />
+          <xs:enumeration value="YYYY-MM" />
+          <xs:enumeration value="YYYY-MM-DD" />
+          <xs:enumeration value="YYYY-MM-DDThh:mmTZD" />
+          <xs:enumeration value="YYYY-MM-DDThh:mm:ssTZD" />
+          <xs:enumeration value="YYYY-MM-DDThh:mm:ss.sTZD" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+
+  <!--
+    this is how a mycore object looks like: <structure> has to be defined elsewhere <metadata> has to be defined
+    elsewhere <service> is defined below
+  -->
+  <xs:element name="mycoreobject">
+    <xs:complexType>
+      <xs:all>
+        <xs:element ref="structure" minOccurs="0" />
+        <xs:element ref="metadata" />
+        <xs:element ref="service" minOccurs="0" />
+      </xs:all>
+      <xs:attribute name="ID" use="required" type="xs:NCName" />
+      <xs:attribute name="label" type="xs:NCName" />
+      <xs:attribute name="version" type="xs:string" />
+    </xs:complexType>
+  </xs:element>
+
+  <!-- hierachical objects: parent and children -->
+  <xs:element name="parents">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="parent" />
+      </xs:sequence>
+      <xs:attribute name="class" use="required" type="xs:string" fixed="MCRMetaLinkID" />
+      <xs:attributeGroup ref="structureInheritance" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="parent">
+    <xs:complexType>
+      <xs:attribute name="inherited" use="optional" type="xs:integer" fixed="0" />
+      <xs:attributeGroup ref="supportedXlinks" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="children">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="child" />
+      </xs:sequence>
+      <xs:attribute name="class" use="required" type="xs:string" fixed="MCRMetaLinkID" />
+      <xs:attributeGroup ref="structureInheritance" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="child">
+    <xs:complexType>
+      <xs:attribute name="inherited" use="optional" type="xs:integer" fixed="0" />
+      <xs:attributeGroup ref="supportedXlinks" />
+    </xs:complexType>
+  </xs:element>
+
+  <!-- This is how derivates are integrated -->
+  <xs:element name="derobjects">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="derobject" />
+      </xs:sequence>
+      <xs:attribute name="class" use="required" type="xs:string" fixed="MCRMetaLinkID" />
+      <xs:attributeGroup ref="structureInheritance" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="derobject">
+    <xs:complexType>
+      <xs:attribute name="inherited" use="required" type="xs:integer" fixed="0" />
+      <xs:attributeGroup ref="supportedXlinks" />
+    </xs:complexType>
+  </xs:element>
+
+  <!-- The service part which currently contains dates-->
+  <xs:element name="service">
+    <xs:complexType>
+      <xs:all>
+        <xs:element ref="servdates" minOccurs="0" />
+        <xs:element ref="servacls" minOccurs="0" />
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="servdates">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="servdate" />
+      </xs:sequence>
+      <xs:attribute name="class" use="required" type="xs:string" fixed="MCRMetaISO8601Date" />
+      <xs:attributeGroup ref="structureInheritance" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="servdate">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="mycoreDate">
+          <xs:attribute name="inherited" use="required" type="xs:integer" fixed="0" />
+          <xs:attribute name="type" use="required">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="createdate" />
+                <xs:enumeration value="modifydate" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="servacls">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="servacl" />
+      </xs:sequence>
+      <xs:attribute name="class" use="required" type="xs:string" fixed="MCRMetaAccessRule" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="servacl">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="condition" />
+      </xs:sequence>
+      <xs:attribute name="permission" use="required" type="xs:string" />
+      <xs:attributeGroup ref="notInherited" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
