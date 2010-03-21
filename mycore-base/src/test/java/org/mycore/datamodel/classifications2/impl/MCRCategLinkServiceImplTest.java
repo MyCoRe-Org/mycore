@@ -8,6 +8,9 @@
  **/
 package org.mycore.datamodel.classifications2.impl;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImplTest.DAO;
 import static org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImplTest.WORLD_CLASS_RESOURCE_NAME;
 
@@ -22,6 +25,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
+import org.junit.Before;
+import org.junit.Test;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRHibTestCase;
 import org.mycore.common.xml.MCRXMLHelper;
@@ -48,7 +53,8 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
      * @see org.mycore.common.MCRHibTestCase#setUp()
      */
     @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         super.setUp();
         if (SERVICE == null) {
             SERVICE = new MCRCategLinkServiceImpl();
@@ -70,64 +76,57 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         testLinks.add(new MCRCategoryLink(uk, northSeaReference));
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.mycore.common.MCRHibTestCase#tearDown()
-     */
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-
     /**
      * Test method for
      * {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#setLinks(org.mycore.datamodel.classifications2.MCRObjectReference, java.util.Collection)}
      * .
      */
-    public void testSetLinks() {
+    @Test
+    public void setLinks() {
         addTestLinks();
         startNewTransaction();
-        assertEquals("Link count does not match.", testLinks.size(), sessionFactory.getCurrentSession().createCriteria(
-                MCRCategoryLink.class).list().size());
+        assertEquals("Link count does not match.", testLinks.size(), sessionFactory.getCurrentSession().createCriteria(MCRCategoryLink.class).list().size());
     }
 
     /**
      * Test method for {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#deleteLink(java.lang.String)}.
      */
-    public void testDeleteLink() {
+    @Test
+    public void deleteLink() {
         addTestLinks();
         startNewTransaction();
         SERVICE.deleteLink("London");
-        assertEquals("Link count does not match.", testLinks.size() - 1, sessionFactory.getCurrentSession().createCriteria(
-                MCRCategoryLink.class).list().size());
+        assertEquals("Link count does not match.", testLinks.size() - 1, sessionFactory.getCurrentSession().createCriteria(MCRCategoryLink.class).list().size());
     }
 
     /**
      * Test method for {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#deleteLinks(java.util.Collection)}.
      */
-    public void testDeleteLinks() {
+    @Test
+    public void deleteLinks() {
         addTestLinks();
         startNewTransaction();
         SERVICE.deleteLinks(Arrays.asList("London", "England"));
-        assertEquals("Link count does not match.", testLinks.size() - 2, sessionFactory.getCurrentSession().createCriteria(
-                MCRCategoryLink.class).list().size());
+        assertEquals("Link count does not match.", testLinks.size() - 2, sessionFactory.getCurrentSession().createCriteria(MCRCategoryLink.class).list().size());
     }
 
     /**
      * Test method for {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#getLinksFromObject(java.lang.String)}.
      */
-    public void testGetLinksFromObject() {
+    @Test
+    public void getLinksFromObject() {
         addTestLinks();
         startNewTransaction();
         MCRCategoryLink link = testLinks.iterator().next();
-        assertTrue("Did not find category: " + link.getCategory().getId(), SERVICE.getLinksFromObject(
-                link.getObjectReference().getObjectID()).contains(link.getCategory().getId()));
+        assertTrue("Did not find category: " + link.getCategory().getId(), SERVICE.getLinksFromObject(link.getObjectReference().getObjectID()).contains(
+                link.getCategory().getId()));
     }
 
     /**
      * Test method for {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#getLinksFromCategory(MCRCategoryID)}.
      */
-    public void testGetLinksFromCategory() {
+    @Test
+    public void getLinksFromCategory() {
         addTestLinks();
         startNewTransaction();
         MCRCategoryLink link = testLinks.iterator().next();
@@ -138,7 +137,8 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
     /**
      * Test method for {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#getLinksFromCategoryForType(MCRCategoryID, String)}.
      */
-    public void testGetLinksFromCategoryForType() {
+    @Test
+    public void getLinksFromCategoryForType() {
         addTestLinks();
         startNewTransaction();
         MCRCategoryLink link = testLinks.iterator().next();
@@ -165,7 +165,8 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
     /**
      * Test method for {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#countLinks(java.util.Collection)}.
      */
-    public void testCountLinks() {
+    @Test
+    public void countLinks() {
         addTestLinks();
         startNewTransaction();
         Map<MCRCategoryID, Number> map = SERVICE.countLinks(category, false);
@@ -173,8 +174,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         LOGGER.debug(map);
         assertEquals("Returned amount of MCRCategoryIDs does not match.", getAllCategIDs(category).size(), map.size());
         assertEquals("Count of Europe links does not match.", 8, map.get(category.getChildren().get(0).getId()).intValue());
-        assertEquals("Count of Germany links does not match.", 5, map.get(category.getChildren().get(0).getChildren().get(0).getId())
-                .intValue());
+        assertEquals("Count of Germany links does not match.", 5, map.get(category.getChildren().get(0).getChildren().get(0).getId()).intValue());
         map = SERVICE.countLinks(category, true);
         assertEquals("Count of Europe links does not match.", 8, map.get(category.getChildren().get(0).getId()).intValue());
     }
@@ -182,7 +182,8 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
     /**
      * Test method for {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#countLinksForType(Collection, String)}.
      */
-    public void testCountLinksForType() {
+    @Test
+    public void countLinksForType() {
         addTestLinks();
         startNewTransaction();
         Map<MCRCategoryID, Number> map = SERVICE.countLinksForType(category, "city", false);
@@ -192,7 +193,8 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         assertEquals("Count of Europe links does not match.", 2, map.get(category.getChildren().get(0).getId()).intValue());
     }
 
-    public void testHasLinks() {
+    @Test
+    public void hasLinks() {
         MCRCategoryImpl germany = (MCRCategoryImpl) category.getChildren().get(0).getChildren().get(0);
         assertFalse("Classification should not be in use", SERVICE.hasLinks(category).get(category.getId()).booleanValue());
         assertFalse("Category should not be in use", SERVICE.hasLinks(germany).get(germany.getId()).booleanValue());

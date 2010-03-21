@@ -24,6 +24,8 @@
 
 package org.mycore.datamodel.metadata;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.io.StringWriter;
 
@@ -34,6 +36,8 @@ import org.jdom.Namespace;
 import org.jdom.Text;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.junit.Before;
+import org.junit.Test;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.xml.MCRXMLHelper;
@@ -49,7 +53,8 @@ public class MCRMetaXMLTest extends MCRTestCase {
     private static Logger LOGGER;
 
     @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         super.setUp();//org.mycore.datamodel.metadata.MCRMetaXML
         if (setProperty("log4j.logger.org.mycore.datamodel.metadata", "INFO", false)) {
             //DEBUG will print a Stacktrace if we test for errors, but that's O.K.
@@ -60,12 +65,8 @@ public class MCRMetaXMLTest extends MCRTestCase {
         }
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-
-    public void testXMLRoundrip() {
+    @Test
+    public void xmlRoundrip() {
         MCRMetaXML mXml = new MCRMetaXML("metadata", "def.heading", "complete", 0);
         Element imported = new Element("heading");
         imported.setAttribute("lang", MCRMetaDefault.DEFAULT_LANGUAGE, Namespace.XML_NAMESPACE);

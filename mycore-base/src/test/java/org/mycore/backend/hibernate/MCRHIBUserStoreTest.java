@@ -1,15 +1,19 @@
 package org.mycore.backend.hibernate;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRHibTestCase;
 import org.mycore.frontend.cli.MCRUserCommands;
 import org.mycore.user.MCRGroup;
 import org.mycore.user.MCRUser;
+import static org.junit.Assert.*;
 
 public class MCRHIBUserStoreTest extends MCRHibTestCase {
 
     @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         super.setUp();
         setProperty("MCR.Users.Superuser.UserName", "adminUser", true);
         setProperty("MCR.Users.Superuser.GroupName", "adminGroup", true);
@@ -17,7 +21,8 @@ public class MCRHIBUserStoreTest extends MCRHibTestCase {
         MCRUserCommands.initSuperuser();
     }
 
-    public void testCreateUser() throws MCRException, Exception {
+    @Test
+    public void createUser() throws MCRException, Exception {
         MCRUser user = new MCRUser("test", "testPwd");
         MCRHIBUserStore userStore = new MCRHIBUserStore();
         userStore.createUser(user);
@@ -25,7 +30,8 @@ public class MCRHIBUserStoreTest extends MCRHibTestCase {
         assertNotNull("User was not stored." + user, userStore.retrieveUser(user.getID()));
     }
 
-    public void testUpdateUser() throws MCRException, Exception {
+    @Test
+    public void updateUser() throws MCRException, Exception {
         MCRUser user = new MCRUser("test", "testPwd");
         MCRHIBUserStore userStore = new MCRHIBUserStore();
         userStore.createUser(user);
@@ -36,7 +42,8 @@ public class MCRHIBUserStoreTest extends MCRHibTestCase {
         assertNotNull("User description was not updated" + user.getDescription(), userStore.retrieveUser(user.getID()).getDescription());
     }
 
-    public void testCreateGroup() {
+    @Test
+    public void createGroup() {
         MCRGroup group = new MCRGroup("testGroup");
         MCRHIBUserStore userStore = new MCRHIBUserStore();
         userStore.createGroup(group);
@@ -44,7 +51,8 @@ public class MCRHIBUserStoreTest extends MCRHibTestCase {
         assertNotNull("User was not stored." + group, userStore.retrieveGroup(group.getID()));
     }
 
-    public void testUpdateGroup() throws MCRException, Exception {
+    @Test
+    public void updateGroup() throws MCRException, Exception {
         MCRGroup group = new MCRGroup("testGroup");
         MCRHIBUserStore userStore = new MCRHIBUserStore();
         userStore.createGroup(group);

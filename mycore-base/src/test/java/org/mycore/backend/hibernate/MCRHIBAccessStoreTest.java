@@ -23,10 +23,18 @@
 
 package org.mycore.backend.hibernate;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.mycore.access.mcrimpl.MCRRuleMapping;
 import org.mycore.backend.hibernate.tables.MCRACCESS;
 import org.mycore.backend.hibernate.tables.MCRACCESSPK;
@@ -52,7 +60,8 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
      * @see org.mycore.common.MCRHibTestCase#setUp()
      */
     @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         super.setUp();
         if (ACCESS_STORE == null) {
             ACCESS_STORE = new MCRHIBAccessStore();
@@ -83,21 +92,12 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
         return rule;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mycore.common.MCRHibTestCase#tearDown()
-     */
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-
     /**
      * Test method for
      * {@link org.mycore.backend.hibernate.MCRHIBAccessStore#createAccessDefinition(org.mycore.access.mcrimpl.MCRRuleMapping)}.
      */
-    public void testCreateAccessDefinition() {
+    @Test
+    public void createAccessDefinition() {
         final String objID = "test";
         final String permission = "maytest";
         addRuleMapping(objID, permission, TRUE_RULE.getRid());
@@ -120,7 +120,8 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
      * Test method for
      * {@link org.mycore.backend.hibernate.MCRHIBAccessStore#getRuleID(String, String)}.
      */
-    public void testGetRuleID() {
+    @Test
+    public void getRuleID() {
         final String objID = "test";
         final String permission = "maytest";
         addRuleMapping(objID, permission, TRUE_RULE.getRid());
@@ -135,7 +136,8 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
      * Test method for
      * {@link org.mycore.backend.hibernate.MCRHIBAccessStore#deleteAccessDefinition(org.mycore.access.mcrimpl.MCRRuleMapping)}.
      */
-    public void testDeleteAccessDefinition() {
+    @Test
+    public void deleteAccessDefinition() {
         final String objID = "test";
         final String permission = "maytest";
         MCRRuleMapping ruleMapping = addRuleMapping(objID, permission, TRUE_RULE.getRid());
@@ -149,7 +151,8 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
      * Test method for
      * {@link org.mycore.backend.hibernate.MCRHIBAccessStore#updateAccessDefinition(org.mycore.access.mcrimpl.MCRRuleMapping)}.
      */
-    public void testUpdateAccessDefinition() {
+    @Test
+    public void updateAccessDefinition() {
         final String objID = "test";
         final String permission = "maytest";
         MCRRuleMapping ruleMapping = addRuleMapping(objID, permission, TRUE_RULE.getRid());
@@ -165,7 +168,8 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
      * Test method for
      * {@link org.mycore.backend.hibernate.MCRHIBAccessStore#getAccessDefinition(java.lang.String, java.lang.String)}.
      */
-    public void testGetAccessDefinition() {
+    @Test
+    public void getAccessDefinition() {
         final String objID = "test";
         final String permission = "maytest";
         MCRRuleMapping ruleMapping = addRuleMapping(objID, permission, TRUE_RULE.getRid());
@@ -183,7 +187,8 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
      * Test method for
      * {@link org.mycore.backend.hibernate.MCRHIBAccessStore#getMappedObjectId(java.lang.String)}.
      */
-    public void testGetMappedObjectId() {
+    @Test
+    public void getMappedObjectId() {
         final String objID = "test";
         final String permission = "maytest";
         addRuleMapping(objID, permission, TRUE_RULE.getRid());
@@ -197,7 +202,8 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
      * Test method for
      * {@link org.mycore.backend.hibernate.MCRHIBAccessStore#getPoolsForObject(java.lang.String)}.
      */
-    public void testGetPoolsForObject() {
+    @Test
+    public void getPoolsForObject() {
         final String objID = "test";
         final String permission = "maytest";
         addRuleMapping(objID, permission, TRUE_RULE.getRid());
@@ -211,7 +217,8 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
      * Test method for
      * {@link org.mycore.backend.hibernate.MCRHIBAccessStore#getDatabasePools()}.
      */
-    public void testGetDatabasePools() {
+    @Test
+    public void getDatabasePools() {
         final String objID = "test";
         final String permission = "maytest";
         addRuleMapping(objID, permission, TRUE_RULE.getRid());
@@ -225,7 +232,8 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
      * Test method for
      * {@link org.mycore.backend.hibernate.MCRHIBAccessStore#existsRule(java.lang.String, java.lang.String)}.
      */
-    public void testExistsRule() {
+    @Test
+    public void existsRule() {
         final String objID = "test";
         final String permission = "maytest";
         assertFalse(ACCESS_STORE.existsRule(objID, permission));
@@ -239,7 +247,8 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
      * {@link org.mycore.backend.hibernate.MCRHIBAccessStore#getDistinctStringIDs()}.
      */
     @SuppressWarnings("unchecked")
-    public void testGetDistinctStringIDs() {
+    @Test
+    public void getDistinctStringIDs() {
         final String objID = "test";
         final String permission = "maytest";
         final String permission2 = "maytesttoo";

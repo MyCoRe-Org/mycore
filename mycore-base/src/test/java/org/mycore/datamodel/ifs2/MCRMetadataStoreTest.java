@@ -23,6 +23,12 @@
 
 package org.mycore.datamodel.ifs2;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,6 +40,9 @@ import org.apache.commons.vfs.VFS;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 
 /**
@@ -45,13 +54,13 @@ public class MCRMetadataStoreTest extends MCRTestCase {
 
     private static Logger LOGGER = Logger.getLogger(MCRMetadataStoreTest.class);
 
-    private static MCRMetadataStore store;
+    protected static MCRMetadataStore store;
 
     protected void createStore() throws Exception {
         File temp = File.createTempFile("base", "");
         String path = temp.getAbsolutePath();
         temp.delete();
-
+    
         setProperty("MCR.IFS2.Store.TEST.Class", "org.mycore.datamodel.ifs2.MCRMetadataStore", true);
         setProperty("MCR.IFS2.Store.TEST.BaseDir", path, true);
         setProperty("MCR.IFS2.Store.TEST.SlotLayout", "4-2-2", true);
@@ -59,7 +68,8 @@ public class MCRMetadataStoreTest extends MCRTestCase {
     }
 
     @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         super.setUp();
         if (store == null) {
             createStore();
@@ -69,12 +79,14 @@ public class MCRMetadataStoreTest extends MCRTestCase {
     }
 
     @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         super.tearDown();
         VFS.getManager().resolveFile(store.getBaseDir()).delete(Selectors.SELECT_ALL);
     }
 
-    public void testCreateDocument() throws Exception {
+    @Test
+    public void createDocument() throws Exception {
         Document xml1 = new Document(new Element("root"));
         MCRStoredMetadata sm = store.create(MCRContent.readFrom(xml1));
         assertNotNull(sm);
@@ -87,7 +99,8 @@ public class MCRMetadataStoreTest extends MCRTestCase {
         assertTrue(id2 > id1);
     }
 
-    public void testCreateDocumentInt() throws Exception {
+    @Test
+    public void createDocumentInt() throws Exception {
         int id = store.getNextFreeID();
         assertTrue(id > 0);
         Document xml1 = new Document(new Element("root"));
@@ -100,7 +113,8 @@ public class MCRMetadataStoreTest extends MCRTestCase {
         assertEquals(MCRContent.readFrom(xml1).asString(), xml3.asString());
     }
 
-    public void testDelete() throws Exception {
+    @Test
+    public void delete() throws Exception {
         Document xml1 = new Document(new Element("root"));
         int id = store.create(MCRContent.readFrom(xml1)).getID();
         assertTrue(store.exists(id));
@@ -109,7 +123,8 @@ public class MCRMetadataStoreTest extends MCRTestCase {
         assertNull(store.retrieve(id));
     }
 
-    public void testUpdate() throws Exception {
+    @Test
+    public void update() throws Exception {
         Document xml1 = new Document(new Element("root"));
         MCRStoredMetadata sm = store.create(MCRContent.readFrom(xml1));
         Document xml2 = new Document(new Element("update"));
@@ -118,7 +133,8 @@ public class MCRMetadataStoreTest extends MCRTestCase {
         assertEquals(MCRContent.readFrom(xml2).asString(), xml3.asString());
     }
 
-    public void testRetrieve() throws Exception {
+    @Test
+    public void retrieve() throws Exception {
         Document xml1 = new Document(new Element("root"));
         int id = store.create(MCRContent.readFrom(xml1)).getID();
         MCRStoredMetadata sm1 = store.retrieve(id);
@@ -126,8 +142,8 @@ public class MCRMetadataStoreTest extends MCRTestCase {
         assertEquals(MCRContent.readFrom(xml1).asString(), xml2.asString());
     }
 
-    @SuppressWarnings("deprecation")
-    public void testLastModified() throws Exception {
+    @Test
+    public void lastModified() throws Exception {
         Document xml1 = new Document(new Element("root"));
         Date date1 = new Date();
         synchronized (this) {
@@ -142,13 +158,15 @@ public class MCRMetadataStoreTest extends MCRTestCase {
         Document xml2 = new Document(new Element("root"));
         sm.update(MCRContent.readFrom(xml2));
         assertTrue(sm.getLastModified().after(date2));
+        @SuppressWarnings("deprecation")
         Date date = new Date(109, 1, 1);
         sm.setLastModified(date);
         sm = store.retrieve(sm.getID());
         assertEquals(date, sm.getLastModified());
     }
 
-    public void testExists() throws Exception {
+    @Test
+    public void exists() throws Exception {
         int id = store.getNextFreeID();
         assertFalse(store.exists(id));
         Document xml1 = new Document(new Element("root"));
@@ -158,7 +176,8 @@ public class MCRMetadataStoreTest extends MCRTestCase {
         assertFalse(store.exists(id));
     }
 
-    public void testGetNextFreeID() throws Exception {
+    @Test
+    public void getNextFreeID() throws Exception {
         int id1 = store.getNextFreeID();
         assertTrue(id1 >= 0);
         assertFalse(store.exists(id1));
@@ -168,7 +187,8 @@ public class MCRMetadataStoreTest extends MCRTestCase {
         assertTrue(store.getNextFreeID() > id2);
     }
 
-    public void testListIDs() throws Exception {
+    @Test
+    public void listIDs() throws Exception {
         Iterator<Integer> IDs = store.listIDs(true);
         while (IDs.hasNext()) {
             store.delete(IDs.next());
@@ -204,7 +224,8 @@ public class MCRMetadataStoreTest extends MCRTestCase {
         assertEquals(l1, l2);
     }
 
-    public void testPerformance() throws Exception {
+    @Test
+    public void performance() throws Exception {
         Document xml = new Document(new Element("root"));
         LOGGER.info("Storing 1.000 XML documents in store:");
         long time = System.currentTimeMillis();

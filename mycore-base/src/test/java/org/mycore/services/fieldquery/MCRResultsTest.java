@@ -1,12 +1,16 @@
 package org.mycore.services.fieldquery;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 
+import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 
 public class MCRResultsTest extends MCRTestCase {
 
-    public void testIntersect() throws Exception {
+    @Test
+    public void intersect() throws Exception {
         ArrayList<MCRResults> results = createSampleResults();
         MCRResults res1 = results.get(0);
         MCRResults res2 = results.get(1);
@@ -20,7 +24,8 @@ public class MCRResultsTest extends MCRTestCase {
         assertEquals(2, newRes.getNumHits()); // 1 7
     }
 
-    public void testUnion() throws Exception {
+    @Test
+    public void union() throws Exception {
         ArrayList<MCRResults> results = createSampleResults();
         MCRResults res1 = results.get(0);
         MCRResults res2 = results.get(1);

@@ -24,6 +24,10 @@
 
 package org.mycore.datamodel.metadata;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Date;
@@ -33,6 +37,8 @@ import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.joda.time.format.DateTimeFormatter;
+import org.junit.Before;
+import org.junit.Test;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRTestCase;
 
@@ -47,7 +53,8 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
     private static Logger LOGGER;
 
     @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         super.setUp();//org.mycore.datamodel.metadata.MCRMetaISO8601Date
         if (setProperty("log4j.logger.org.mycore.datamodel.metadata.MCRMetaISO8601Date", "INFO", false)) {
             //DEBUG will print a Stacktrace if we test for errors, but that's O.K.
@@ -58,34 +65,30 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
         }
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-
-    public void testFormatChooser() {
+    @Test
+    public void formatChooser() {
         // test year
         String duration = "-16";
-        assertEquals(duration + " test failed", getFormat(MCRMetaISO8601Date.FormatChooser.YEAR_FORMAT),
-                getFormat(MCRMetaISO8601Date.FormatChooser.getFormatter(duration, null)));
+        assertEquals(duration + " test failed", getFormat(MCRMetaISO8601Date.FormatChooser.YEAR_FORMAT), getFormat(MCRMetaISO8601Date.FormatChooser
+                .getFormatter(duration, null)));
         duration = "2006";
-        assertEquals(duration + " test failed", getFormat(MCRMetaISO8601Date.FormatChooser.YEAR_FORMAT),
-                getFormat(MCRMetaISO8601Date.FormatChooser.getFormatter(duration, null)));
+        assertEquals(duration + " test failed", getFormat(MCRMetaISO8601Date.FormatChooser.YEAR_FORMAT), getFormat(MCRMetaISO8601Date.FormatChooser
+                .getFormatter(duration, null)));
         // test year-month
         duration = "2006-01";
-        assertEquals(duration + " test failed", getFormat(MCRMetaISO8601Date.FormatChooser.YEAR_MONTH_FORMAT),
-                getFormat(MCRMetaISO8601Date.FormatChooser.getFormatter(duration, null)));
+        assertEquals(duration + " test failed", getFormat(MCRMetaISO8601Date.FormatChooser.YEAR_MONTH_FORMAT), getFormat(MCRMetaISO8601Date.FormatChooser
+                .getFormatter(duration, null)));
         // test complete
         duration = "2006-01-18";
-        assertEquals(duration + " test failed", getFormat(MCRMetaISO8601Date.FormatChooser.COMPLETE_FORMAT),
-                getFormat(MCRMetaISO8601Date.FormatChooser.getFormatter(duration, null)));
+        assertEquals(duration + " test failed", getFormat(MCRMetaISO8601Date.FormatChooser.COMPLETE_FORMAT), getFormat(MCRMetaISO8601Date.FormatChooser
+                .getFormatter(duration, null)));
         // test complete with hour and minutes
         duration = "2006-01-18T11:08Z";
-        assertEquals(duration + " test failed", getFormat(MCRMetaISO8601Date.FormatChooser.COMPLETE_HH_MM_FORMAT),
-                getFormat(MCRMetaISO8601Date.FormatChooser.getFormatter(duration, null)));
+        assertEquals(duration + " test failed", getFormat(MCRMetaISO8601Date.FormatChooser.COMPLETE_HH_MM_FORMAT), getFormat(MCRMetaISO8601Date.FormatChooser
+                .getFormatter(duration, null)));
         duration = "2006-01-18T11:08+02:00";
-        assertEquals(duration + " test failed", getFormat(MCRMetaISO8601Date.FormatChooser.COMPLETE_HH_MM_FORMAT),
-                getFormat(MCRMetaISO8601Date.FormatChooser.getFormatter(duration, null)));
+        assertEquals(duration + " test failed", getFormat(MCRMetaISO8601Date.FormatChooser.COMPLETE_HH_MM_FORMAT), getFormat(MCRMetaISO8601Date.FormatChooser
+                .getFormatter(duration, null)));
         // test complete with hour, minutes and seconds
         duration = "2006-01-18T11:08:20Z";
         assertEquals(duration + " test failed", getFormat(MCRMetaISO8601Date.FormatChooser.COMPLETE_HH_MM_SS_FORMAT),
@@ -118,7 +121,8 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
      * Test method for
      * 'org.mycore.datamodel.metadata.MCRMetaTimestamp.getSecond()'
      */
-    public void testsetDate() {
+    @Test
+    public void setDate() {
         MCRMetaISO8601Date ts = new MCRMetaISO8601Date();
         String timeString = "1997-07-16T19:20:30.452300+01:00";
         LOGGER.debug(timeString);
@@ -163,7 +167,8 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
      * Test method for
      * 'org.mycore.datamodel.metadata.MCRMetaTimestamp.getSecond()'
      */
-    public void testcreateXML() {
+    @Test
+    public void createXML() {
         MCRMetaISO8601Date ts = new MCRMetaISO8601Date("service", "servdate", "createdate", 0);
         String timeString = "1997-07-16T19:20:30.452300+01:00";
         ts.setDate(timeString);
@@ -181,14 +186,16 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
         }
     }
 
-    public void testgetFormat() {
+    @Test
+    public void getFormat() {
         MCRMetaISO8601Date ts = new MCRMetaISO8601Date();
         assertNull("Format used is not Null", ts.getFormat());
         ts.setFormat(MCRMetaISO8601Date.IsoFormat.COMPLETE);
         assertEquals("Set format differs from get format", MCRMetaISO8601Date.IsoFormat.COMPLETE, ts.getFormat());
     }
 
-    public void testgetDate() {
+    @Test
+    public void getDate() {
         MCRMetaISO8601Date ts = new MCRMetaISO8601Date();
         assertNull("Date is not Null", ts.getDate());
         Date dt = new Date();
@@ -197,7 +204,8 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
         assertEquals("Set date differs from get date", dt, ts.getDate());
     }
 
-    public void testgetISOString() {
+    @Test
+    public void getISOString() {
         MCRMetaISO8601Date ts = new MCRMetaISO8601Date();
         assertNull("Date is not Null", ts.getISOString());
         Date dt = new Date();
@@ -205,7 +213,8 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
         assertNotNull("Date is Null", ts.getISOString());
     }
 
-    public void testsetFromDOM() {
+    @Test
+    public void setFromDOM() {
         MCRMetaISO8601Date ts = new MCRMetaISO8601Date();
         Element datum = new Element("datum");
         datum.setAttribute("inherited", "0").setText("2006-01-23");
@@ -221,11 +230,9 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
         if (df == null || df == MCRMetaISO8601Date.FormatChooser.COMPLETE_HH_MM_SS_SSS_FORMAT
                 || df == MCRMetaISO8601Date.FormatChooser.UTC_COMPLETE_HH_MM_SS_SSS_FORMAT) {
             return MCRMetaISO8601Date.IsoFormat.COMPLETE_HH_MM_SS_SSS.toString();
-        } else if (df == MCRMetaISO8601Date.FormatChooser.COMPLETE_HH_MM_SS_FORMAT
-                || df == MCRMetaISO8601Date.FormatChooser.UTC_COMPLETE_HH_MM_SS_FORMAT) {
+        } else if (df == MCRMetaISO8601Date.FormatChooser.COMPLETE_HH_MM_SS_FORMAT || df == MCRMetaISO8601Date.FormatChooser.UTC_COMPLETE_HH_MM_SS_FORMAT) {
             return MCRMetaISO8601Date.IsoFormat.COMPLETE_HH_MM_SS.toString();
-        } else if (df == MCRMetaISO8601Date.FormatChooser.COMPLETE_HH_MM_FORMAT
-                || df == MCRMetaISO8601Date.FormatChooser.UTC_COMPLETE_HH_MM_FORMAT) {
+        } else if (df == MCRMetaISO8601Date.FormatChooser.COMPLETE_HH_MM_FORMAT || df == MCRMetaISO8601Date.FormatChooser.UTC_COMPLETE_HH_MM_FORMAT) {
             return MCRMetaISO8601Date.IsoFormat.COMPLETE_HH_MM.toString();
         } else if (df == MCRMetaISO8601Date.FormatChooser.COMPLETE_FORMAT || df == MCRMetaISO8601Date.FormatChooser.UTC_COMPLETE_FORMAT) {
             return MCRMetaISO8601Date.IsoFormat.COMPLETE.toString();

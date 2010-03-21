@@ -23,6 +23,9 @@
  **/
 package org.mycore.services.i18n;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 
 public class MCRTranslationTest extends MCRTestCase {
@@ -30,7 +33,8 @@ public class MCRTranslationTest extends MCRTestCase {
     /*
      * Test method for 'org.mycore.services.i18n.MCRTranslation.getStringArray(String)'
      */
-    public void testGetStringArray() {
+    @Test
+    public void getStringArray() {
         assertEquals(0, MCRTranslation.getStringArray(null).length);
         assertEquals(1, MCRTranslation.getStringArray("test").length);
         assertEquals(2, MCRTranslation.getStringArray("string1;string2").length);
@@ -40,7 +44,8 @@ public class MCRTranslationTest extends MCRTestCase {
         assertEquals("string1\\", MCRTranslation.getStringArray("string1\\\\;string2")[0]);
     }
 
-    public void testGetDeprecatedMessageKeys() {
+    @Test
+    public void getDeprecatedMessageKeys() {
         assertEquals("Depreacted I18N keys do not work", "This is a JUnit Test.", MCRTranslation.translate("oldLabel"));
     }
 

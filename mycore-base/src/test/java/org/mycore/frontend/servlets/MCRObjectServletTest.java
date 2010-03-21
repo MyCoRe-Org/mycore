@@ -23,6 +23,9 @@
  **/
 package org.mycore.frontend.servlets;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 
 public class MCRObjectServletTest extends MCRTestCase {
@@ -30,6 +33,7 @@ public class MCRObjectServletTest extends MCRTestCase {
     /*
      * Test method for 'org.mycore.frontend.servlets.MCRObjectServlet.getEditorIDFromSearch(String)'
      */
+    @Test
     public void testGetEditorIDFromSearch() {
         assertEquals(
                 "-kykj45qltoitena2ebp9",

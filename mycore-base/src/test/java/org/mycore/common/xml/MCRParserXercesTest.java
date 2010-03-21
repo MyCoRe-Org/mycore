@@ -23,8 +23,12 @@
  **/
 package org.mycore.common.xml;
 
+import static org.junit.Assert.fail;
+
 import java.net.URI;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRTestCase;
 import org.xml.sax.SAXParseException;
@@ -47,7 +51,8 @@ public class MCRParserXercesTest extends MCRTestCase {
      * @see org.mycore.common.MCRTestCase#setUp()
      */
     @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         super.setUp();
         super.setProperty("MCR.XMLParser.ValidateSchema", "true", false);
         boolean setProperty = super.setProperty("log4j.logger.org.mycore.common.xml.MCRParserXerces", "FATAL", false);
@@ -63,7 +68,8 @@ public class MCRParserXercesTest extends MCRTestCase {
      * Test method for {@link org.mycore.common.xml.MCRParserXerces#parseURI(java.lang.String, boolean)}.
      * @throws SAXParseException 
      */
-    public void testParseURIStringBoolean() throws SAXParseException {
+    @Test
+    public void parseURIStringBoolean() throws SAXParseException {
         try {
             parser.parseURI(xmlResourceInvalid, true);
             fail("MCRParserXerces accepts invalid XML content when validation is requested");

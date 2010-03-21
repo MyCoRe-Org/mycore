@@ -24,6 +24,10 @@
 
 package org.mycore.common;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
 import com.ibm.icu.util.Calendar;
 import com.ibm.icu.util.GregorianCalendar;
 
@@ -36,20 +40,11 @@ import com.ibm.icu.util.GregorianCalendar;
  */
 public class MCRCalendarTest extends MCRTestCase {
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-
     /*
      * Test method for 'org.mycore.datamodel.metadata.MCRCalendar.getDateToFormattedString()'
      */
-    public void testGetDateToFormattedString() {
+    @Test
+    public void getDateToFormattedString() {
         GregorianCalendar defaultcal = new GregorianCalendar();
         defaultcal.set(1964, 1, 24);
         String dstring;
@@ -71,7 +66,8 @@ public class MCRCalendarTest extends MCRTestCase {
     /*
      * Test method for 'org.mycore.datamodel.metadata.MCRCalendar.getGregorianHistoryDate(String, boolean, String)'
      */
-    public void testGetGregorianHistoryDate() {
+    @Test
+    public void getGregorianHistoryDate() {
         String cstring, dstring;
         cstring = MCRCalendar.getDateToFormattedString(new GregorianCalendar());
         Calendar cal;
@@ -209,7 +205,8 @@ public class MCRCalendarTest extends MCRTestCase {
     /*
      * Test method for 'org.mycore.datamodel.metadata.MCRCalendar.getJulianDay(GregorianCalendar)'
      */
-    public void testGetJulianDay() {
+    @Test
+    public void getJulianDay() {
         GregorianCalendar greg;
         // 24.03.0005 BC (julianisch)
         greg = new GregorianCalendar(5, 2, 24);

@@ -23,10 +23,14 @@
 
 package org.mycore.frontend.fileupload;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.junit.Test;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRTestCase;
 
@@ -36,7 +40,8 @@ import org.mycore.common.MCRTestCase;
  */
 public class MCRUploadServletTest extends MCRTestCase {
 
-    public void testCheckPathName() {
+    @Test
+    public void checkPathName() {
         String prefix = "junit";
         String suffix = "test.file";
         String[] genDelims = new String[] { ":", "?", "#", "[", "]", "@" };

@@ -1,5 +1,9 @@
 package org.mycore.datamodel.classifications2.impl;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Before;
+import org.junit.Test;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTestCase;
@@ -9,12 +13,14 @@ import org.mycore.datamodel.classifications2.MCRLabel;
 public class MCRAbstractCategoryImplTest extends MCRTestCase {
 
     @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         super.setUp();
         setProperty("MCR.Metadata.DefaultLang", "de", true);
     }
 
-    public void testGetCurrentLabel() {
+    @Test
+    public void getCurrentLabel() {
         MCRCategory cat = new MCRSimpleAbstractCategoryImpl();
         MCRLabel label1 = new MCRLabel("de", "german", null);
         MCRLabel label2 = new MCRLabel("fr", "french", null);

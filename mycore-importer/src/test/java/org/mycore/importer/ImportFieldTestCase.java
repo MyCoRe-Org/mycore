@@ -1,14 +1,17 @@
 package org.mycore.importer;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.importer.mapping.resolver.MCRImportFieldValueResolver;
-
 public class ImportFieldTestCase extends MCRTestCase {
 
-    public void testResolver() throws Exception {
+    @Test
+    public void resolver() throws Exception {
         List<MCRImportField> fieldList = new ArrayList<MCRImportField>();
         MCRImportField field1 = new MCRImportField("f1", "v1");
         MCRImportField field2 = new MCRImportField("f2", "v2");

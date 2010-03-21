@@ -1,11 +1,21 @@
 package org.mycore.datamodel.ifs2;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.vfs.Selectors;
 import org.apache.commons.vfs.VFS;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTestCase;
 
@@ -32,7 +42,8 @@ public class MCRDirectoryTest extends MCRTestCase {
     }
 
     @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         super.setUp();
         if (store == null) {
             createStore();
@@ -43,12 +54,14 @@ public class MCRDirectoryTest extends MCRTestCase {
     }
 
     @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         super.tearDown();
         VFS.getManager().resolveFile(store.getBaseDir()).delete(Selectors.SELECT_ALL);
     }
 
-    public void testName() throws Exception {
+    @Test
+    public void name() throws Exception {
         MCRDirectory dir = col.createDir("foo");
         Date created = dir.getLastModified();
         assertEquals("foo", dir.getName());
@@ -61,20 +74,23 @@ public class MCRDirectoryTest extends MCRTestCase {
     }
 
     @SuppressWarnings("deprecation")
-    public void testSetLastModified() throws Exception {
+    @Test
+    public void setLastModified() throws Exception {
         MCRDirectory dir = col.createDir("foo");
         Date other = new Date(109, 1, 1);
         dir.setLastModified(other);
         assertEquals(other, dir.getLastModified());
     }
 
-    public void testType() throws Exception {
+    @Test
+    public void type() throws Exception {
         MCRDirectory dir = col.createDir("foo");
         assertFalse(dir.isFile());
         assertTrue(dir.isDirectory());
     }
 
-    public void testLabels() throws Exception {
+    @Test
+    public void labels() throws Exception {
         MCRDirectory dir = col.createDir("foo");
         assertTrue(dir.getLabels().isEmpty());
         assertNull(dir.getCurrentLabel());
@@ -92,12 +108,14 @@ public class MCRDirectoryTest extends MCRTestCase {
         assertTrue(dir.getLabels().isEmpty());
     }
 
-    public void testGetSize() throws Exception {
+    @Test
+    public void getSize() throws Exception {
         MCRDirectory dir = col.createDir("foo");
         assertEquals(0, dir.getSize());
     }
 
-    public void testChildren() throws Exception {
+    @Test
+    public void children() throws Exception {
         MCRDirectory parent = col.createDir("foo");
         assertFalse(parent.hasChildren());
         assertEquals(0, parent.getNumChildren());
@@ -128,7 +146,8 @@ public class MCRDirectoryTest extends MCRTestCase {
         assertTrue("bar readme.txt".contains(children.get(1).getName()));
     }
 
-    public void testPath() throws Exception {
+    @Test
+    public void path() throws Exception {
         assertEquals("/", col.getPath());
         MCRDirectory parent = col.createDir("dir");
         assertEquals("/dir", parent.getPath());
@@ -138,7 +157,8 @@ public class MCRDirectoryTest extends MCRTestCase {
         assertEquals("/dir/subdir/readme.txt", file.getPath());
     }
 
-    public void testNavigationUpwards() throws Exception {
+    @Test
+    public void navigationUpwards() throws Exception {
         assertEquals(col, col.getRoot());
         assertNull(col.getParent());
         MCRDirectory dir = col.createDir("dir");
@@ -152,7 +172,8 @@ public class MCRDirectoryTest extends MCRTestCase {
         assertEquals(subdir, file.getParent());
     }
 
-    public void testGetNodeByPath() throws Exception {
+    @Test
+    public void getNodeByPath() throws Exception {
         MCRNode node = col.getNodeByPath("/");
         assertSame(node, col);
         node = col.getNodeByPath(".");
@@ -183,7 +204,8 @@ public class MCRDirectoryTest extends MCRTestCase {
         assertEquals("subdir", node.getName());
     }
 
-    public void testDelete() throws Exception {
+    @Test
+    public void delete() throws Exception {
         MCRDirectory dir = col.createDir("dir");
         MCRDirectory subdir = dir.createDir("subdir");
         subdir.createFile("readme.txt");

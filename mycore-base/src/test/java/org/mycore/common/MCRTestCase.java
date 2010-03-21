@@ -2,9 +2,10 @@ package org.mycore.common;
 
 import java.io.File;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
 
-public class MCRTestCase extends TestCase {
+public class MCRTestCase {
     File properties = null;
 
     static MCRConfiguration CONFIG;
@@ -18,9 +19,8 @@ public class MCRTestCase extends TestCase {
      * 
      * @see MCRConfiguration#getProperties()
      */
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
         if (System.getProperties().getProperty("MCR.Configuration.File") == null) {
             properties = File.createTempFile("test", ".properties");
             System.getProperties().setProperty("MCR.Configuration.File", properties.getAbsolutePath());
@@ -40,9 +40,8 @@ public class MCRTestCase extends TestCase {
         }
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    @After
+    public void tearDown() throws Exception {
         if (properties != null) {
             properties.delete();
         }

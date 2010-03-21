@@ -1,10 +1,15 @@
 package org.mycore.common;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Hashtable;
+
+import org.junit.Test;
 
 public class MCRTextResolverTest extends MCRTestCase {
 
-    public void testVariables() throws Exception {
+    @Test
+    public void variables() throws Exception {
         Hashtable<String, String> variablesTable = new Hashtable<String, String>();
         variablesTable.put("f1", "v1");
         variablesTable.put("f2", "v2");
@@ -53,7 +58,8 @@ public class MCRTextResolverTest extends MCRTestCase {
         assertEquals(false, resolver.isCompletelyResolved());
     }
 
-    public void testProperties() throws Exception {
+    @Test
+    public void properties() throws Exception {
         MCRConfiguration.instance().set("prop1", "propValue1");
         MCRConfiguration.instance().set("prop2", "propValue2");
 
@@ -69,7 +75,8 @@ public class MCRTextResolverTest extends MCRTestCase {
         assertEquals("", resolver.resolve("[test: {prop1}]"));
     }
 
-    public void testAddRemove() throws Exception {
+    @Test
+    public void addRemove() throws Exception {
         Hashtable<String, String> variablesTable = new Hashtable<String, String>();
         variablesTable.put("f1", "v1");
         variablesTable.put("f2", "v2");

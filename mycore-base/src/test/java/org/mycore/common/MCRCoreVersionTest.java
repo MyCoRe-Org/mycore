@@ -23,6 +23,10 @@
 
 package org.mycore.common;
 
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+
 /**
  * @author Thomas Scheffler (yagee)
  *
@@ -32,14 +36,16 @@ public class MCRCoreVersionTest extends MCRTestCase {
     /**
      * Test method for {@link org.mycore.common.MCRCoreVersion#getVersion()}.
      */
-    public void testGetVersion() {
+    @Test
+    public void getVersion() {
         assertTrue("Length of Version String is zero.", MCRCoreVersion.getVersion().length() > 0);
     }
 
     /**
      * Test method for {@link org.mycore.common.MCRCoreVersion#getRevision()}.
      */
-    public void testGetRevision() {
+    @Test
+    public void getRevision() {
         assertTrue("Resvision is not a natural number.", MCRCoreVersion.getRevision() > 0);
     }
 

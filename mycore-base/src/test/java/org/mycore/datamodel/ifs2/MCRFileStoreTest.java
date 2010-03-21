@@ -23,6 +23,12 @@
 
 package org.mycore.datamodel.ifs2;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,6 +41,9 @@ import org.apache.commons.vfs.Selectors;
 import org.apache.commons.vfs.VFS;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTestCase;
 
@@ -59,7 +68,8 @@ public class MCRFileStoreTest extends MCRTestCase {
     }
 
     @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         super.setUp();
         if (store == null) {
             createStore();
@@ -69,18 +79,21 @@ public class MCRFileStoreTest extends MCRTestCase {
     }
 
     @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         super.tearDown();
         VFS.getManager().resolveFile(store.getBaseDir()).delete(Selectors.SELECT_ALL);
     }
 
-    public void testCreate() throws Exception {
+    @Test
+    public void create() throws Exception {
         MCRFileCollection col = store.create();
         assertNotNull(col);
         assertTrue(col.getID() > 0);
     }
 
-    public void testCreateInt() throws Exception {
+    @Test
+    public void createInt() throws Exception {
         int id1 = store.getNextFreeID();
         MCRFileCollection col1 = store.create(id1);
         assertNotNull(col1);
@@ -92,7 +105,8 @@ public class MCRFileStoreTest extends MCRTestCase {
         assertTrue(store.exists(id1 + 1));
     }
 
-    public void testDelete() throws Exception {
+    @Test
+    public void delete() throws Exception {
         MCRFileCollection col = store.create();
         assertTrue(store.exists(col.getID()));
         store.delete(col.getID());
@@ -101,7 +115,8 @@ public class MCRFileStoreTest extends MCRTestCase {
         assertNull(col2);
     }
 
-    public void testRetrieve() throws Exception {
+    @Test
+    public void retrieve() throws Exception {
         MCRFileCollection col1 = store.create();
         MCRFileCollection col2 = store.retrieve(col1.getID());
         assertNotNull(col2);
@@ -111,14 +126,16 @@ public class MCRFileStoreTest extends MCRTestCase {
         assertNull(col3);
     }
 
-    public void testExists() throws Exception {
+    @Test
+    public void exists() throws Exception {
         int id = store.getNextFreeID();
         assertFalse(store.exists(id));
         store.create(id);
         assertTrue(store.exists(id));
     }
 
-    public void testGetNextFreeID() throws Exception {
+    @Test
+    public void getNextFreeID() throws Exception {
         int id1 = store.getNextFreeID();
         assertTrue(id1 >= 0);
         assertFalse(store.exists(id1));
@@ -128,7 +145,8 @@ public class MCRFileStoreTest extends MCRTestCase {
         assertTrue(id3 > id2);
     }
 
-    public void testListIDs() throws Exception {
+    @Test
+    public void listIDs() throws Exception {
         Iterator<Integer> IDs = store.listIDs(true);
         while (IDs.hasNext()) {
             store.delete(IDs.next());
@@ -163,7 +181,8 @@ public class MCRFileStoreTest extends MCRTestCase {
         assertEquals(l1, l2);
     }
 
-    public void testBasicFunctionality() throws Exception {
+    @Test
+    public void basicFunctionality() throws Exception {
         Date first = new Date();
         synchronized (this) {
             wait(1000);
@@ -196,7 +215,8 @@ public class MCRFileStoreTest extends MCRTestCase {
         assertEquals(content.length, child.getSize());
     }
 
-    public void testLabels() throws Exception {
+    @Test
+    public void labels() throws Exception {
         MCRFileCollection col = store.create();
         assertTrue(col.getLabels().isEmpty());
         assertNull(col.getCurrentLabel());
@@ -213,7 +233,8 @@ public class MCRFileStoreTest extends MCRTestCase {
         assertTrue(col.getLabels().isEmpty());
     }
 
-    public void testRepairMetadata() throws Exception {
+    @Test
+    public void repairMetadata() throws Exception {
         MCRFileCollection col = store.create();
         Document xml1 = MCRContent.readFrom(col.getMetadata()).asXML();
         col.repairMetadata();

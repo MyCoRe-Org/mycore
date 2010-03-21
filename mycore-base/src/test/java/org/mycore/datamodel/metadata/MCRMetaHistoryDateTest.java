@@ -24,6 +24,10 @@
 
 package org.mycore.datamodel.metadata;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Ignore;
+import org.junit.Test;
 import org.mycore.common.MCRCalendar;
 import org.mycore.common.MCRTestCase;
 
@@ -38,19 +42,11 @@ import com.ibm.icu.util.GregorianCalendar;
  */
 public class MCRMetaHistoryDateTest extends MCRTestCase {
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-
     /*
      * Test method for 'org.mycore.datamodel.metadata.MCRMetaHistoryDate.setFromDOM(Element)'
      */
+    @Test
+    @Ignore("not implemented")
     public void testSetFromDOM() {
 
     }
@@ -58,6 +54,8 @@ public class MCRMetaHistoryDateTest extends MCRTestCase {
     /*
      * Test method for 'org.mycore.datamodel.metadata.MCRMetaHistoryDate.createXML()'
      */
+    @Test
+    @Ignore("not implemented")
     public void testCreateXML() {
 
     }
@@ -65,7 +63,8 @@ public class MCRMetaHistoryDateTest extends MCRTestCase {
     /*
      * Test method for 'org.mycore.datamodel.metadata.MCRMetaHistoryDate.setVonDate(GregorianCalendar)'
      */
-    public void testSetVonDateGregorianCalendar() {
+    @Test
+    public void setVonDateGregorianCalendar() {
         MCRMetaHistoryDate hd = new MCRMetaHistoryDate();
         hd.setVonDate(new GregorianCalendar(1964, 1, 24));
         assertEquals("Von value is not 24.02.1964 AD", "24.02.1964 AD", hd.getVonToGregorianString());
@@ -74,7 +73,8 @@ public class MCRMetaHistoryDateTest extends MCRTestCase {
     /*
      * Test method for 'org.mycore.datamodel.metadata.MCRMetaHistoryDate.setVonDate(String)'
      */
-    public void testSetVonDateString() {
+    @Test
+    public void setVonDateString() {
         MCRMetaHistoryDate hd = new MCRMetaHistoryDate();
         hd.setVonDate("24.02.1964", MCRCalendar.TAG_GREGORIAN);
         assertEquals("Von value is not 24.02.1964 AD", "24.02.1964 AD", hd.getVonToGregorianString());
@@ -83,7 +83,8 @@ public class MCRMetaHistoryDateTest extends MCRTestCase {
     /*
      * Test method for 'org.mycore.datamodel.metadata.MCRMetaHistoryDate.setBisDate(GregorianCalendar)'
      */
-    public void testSetBisDateGregorianCalendar() {
+    @Test
+    public void setBisDateGregorianCalendar() {
         MCRMetaHistoryDate hd = new MCRMetaHistoryDate();
         hd.setBisDate(new GregorianCalendar(1964, 1, 24));
         assertEquals("Bis value is not 24.02.1964 AD", "24.02.1964 AD", hd.getBisToGregorianString());
@@ -92,7 +93,8 @@ public class MCRMetaHistoryDateTest extends MCRTestCase {
     /*
      * Test method for 'org.mycore.datamodel.metadata.MCRMetaHistoryDate.setBisDate(String)'
      */
-    public void testSetBisDateString() {
+    @Test
+    public void setBisDateString() {
         MCRMetaHistoryDate hd = new MCRMetaHistoryDate();
         hd.setBisDate("24.02.1964", MCRCalendar.TAG_GREGORIAN);
         assertEquals("Bis value is not 24.02.1964 AD", "24.02.1964 AD", hd.getBisToGregorianString());
@@ -101,7 +103,8 @@ public class MCRMetaHistoryDateTest extends MCRTestCase {
     /*
      * Test method for 'org.mycore.datamodel.metadata.MCRMetaHistoryDate.debug()'
      */
-    public void testDebug() {
+    @Test
+    public void debug() {
         MCRMetaHistoryDate hd = new MCRMetaHistoryDate();
         hd.setVonDate("05.10.1582", MCRCalendar.TAG_GREGORIAN);
         hd.setBisDate("15.10.1582", MCRCalendar.TAG_GREGORIAN);

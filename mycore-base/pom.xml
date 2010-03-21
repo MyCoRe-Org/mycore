@@ -138,6 +138,7 @@
           <excludes>
             <exclude>**/MCRTestCase.java</exclude>
             <exclude>**/MCRHibTestCase.java</exclude>
+            <exclude>**/*$*</exclude>
           </excludes>
           <property>
             <name>known.issues</name>

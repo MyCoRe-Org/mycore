@@ -1,8 +1,13 @@
 package org.mycore.datamodel.metadata;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.util.Date;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.mycore.common.MCRHibTestCase;
 import org.mycore.datamodel.common.MCRXMLTableManager;
 
@@ -12,7 +17,8 @@ public class MCRObjectIDTest extends MCRHibTestCase {
     private static File storeBaseDir;
 
     @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         super.setUp();
         storeBaseDir = File.createTempFile(MCRObjectIDTest.class.getSimpleName(), null);
         storeBaseDir.delete();
@@ -22,7 +28,8 @@ public class MCRObjectIDTest extends MCRHibTestCase {
     }
 
     @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         super.tearDown();
         recursiveDelete(storeBaseDir);
     }
@@ -47,7 +54,8 @@ public class MCRObjectIDTest extends MCRHibTestCase {
         return fileOrDir.delete();
     }
 
-    public void testSetNextFreeIdString() {
+    @Test
+    public void setNextFreeIdString() {
         MCRObjectID id1 = new MCRObjectID();
         id1.setNextFreeId(BASE_ID);
         assertEquals("First id should be int 1", 1, id1.getNumberAsInteger());

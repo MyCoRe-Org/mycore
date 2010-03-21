@@ -23,12 +23,15 @@
  */
 package org.mycore.datamodel.classifications2.impl;
 
+import static org.junit.Assert.assertEquals;
+
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
 import org.jdom.Document;
+import org.junit.Test;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.xml.MCRXMLHelper;
@@ -46,18 +49,11 @@ public class MCRCategoryImplTest extends MCRTestCase {
 
     private MCRCategoryImpl category;
 
-    /* (non-Javadoc)
-     * @see org.mycore.common.MCRTestCase#setUp()
-     */
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
     /**
      * Test method for {@link org.mycore.datamodel.classifications2.impl.MCRCategoryImpl#calculateLeftRightAndLevel(int, int)}.
      */
-    public void testCalculateLeftRightAndLevel() {
+    @Test
+    public void calculateLeftRightAndLevel() {
         MCRCategoryImpl rootNode = buildNode(MCRCategoryID.rootID("co1"));
         final int leftStart = 1;
         final int levelStart = 0;
@@ -77,21 +73,21 @@ public class MCRCategoryImplTest extends MCRTestCase {
         assertEquals(2, co4.getLevel());
     }
 
-    public void testGetLeftSiblingOrOfAncestor() throws URISyntaxException, MCRException, SAXParseException {
+    @Test
+    public void getLeftSiblingOrOfAncestor() throws URISyntaxException, MCRException, SAXParseException {
         loadWorldClassification();
         MCRCategory europe = category.getChildren().get(0);
         MCRCategoryImpl asia = (MCRCategoryImpl) category.getChildren().get(1);
         MCRCategoryImpl germany = (MCRCategoryImpl) europe.getChildren().get(0);
         assertEquals("Did not get Europe as left sibling of Asia", europe.getId(), asia.getLeftSiblingOrOfAncestor().getId());
-        assertEquals("Did not get World as left sibling or ancestor of Germany", category.getId(), germany.getLeftSiblingOrOfAncestor()
-                .getId());
+        assertEquals("Did not get World as left sibling or ancestor of Germany", category.getId(), germany.getLeftSiblingOrOfAncestor().getId());
         MCRCategoryImpl america = buildNode(new MCRCategoryID(category.getRootID(), "America"));
         category.getChildren().add(0, america);
-        assertEquals("Did not get America as left sibling or ancestor of Germany", america.getId(), germany.getLeftSiblingOrOfAncestor()
-                .getId());
+        assertEquals("Did not get America as left sibling or ancestor of Germany", america.getId(), germany.getLeftSiblingOrOfAncestor().getId());
     }
 
-    public void testGetLeftSiblingOrParent() throws URISyntaxException, MCRException, SAXParseException {
+    @Test
+    public void getLeftSiblingOrParent() throws URISyntaxException, MCRException, SAXParseException {
         loadWorldClassification();
         MCRCategory europe = category.getChildren().get(0);
         MCRCategoryImpl asia = (MCRCategoryImpl) category.getChildren().get(1);
@@ -100,7 +96,8 @@ public class MCRCategoryImplTest extends MCRTestCase {
         assertEquals("Did not get Europa as left sibling or ancestor of Germany", europe.getId(), germany.getLeftSiblingOrParent().getId());
     }
 
-    public void testGetRightSiblingOrOfAncestor() throws URISyntaxException, MCRException, SAXParseException {
+    @Test
+    public void getRightSiblingOrOfAncestor() throws URISyntaxException, MCRException, SAXParseException {
         loadWorldClassification();
         MCRCategoryImpl europe = (MCRCategoryImpl) category.getChildren().get(0);
         MCRCategoryImpl asia = (MCRCategoryImpl) category.getChildren().get(1);
@@ -110,7 +107,8 @@ public class MCRCategoryImplTest extends MCRTestCase {
         assertEquals("Did not get World as right sibling or ancestor of Asia", category.getId(), asia.getRightSiblingOrOfAncestor().getId());
     }
 
-    public void testGetRightSiblingOrParent() throws URISyntaxException, MCRException, SAXParseException {
+    @Test
+    public void getRightSiblingOrParent() throws URISyntaxException, MCRException, SAXParseException {
         loadWorldClassification();
         MCRCategoryImpl europe = (MCRCategoryImpl) category.getChildren().get(0);
         MCRCategoryImpl asia = (MCRCategoryImpl) category.getChildren().get(1);

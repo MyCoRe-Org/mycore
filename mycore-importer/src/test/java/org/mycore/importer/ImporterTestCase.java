@@ -1,5 +1,8 @@
 package org.mycore.importer;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +14,7 @@ import org.jdom.Text;
 import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
 import org.jdom.xpath.XPath;
+import org.junit.Test;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.MCRUtils;
@@ -27,10 +31,10 @@ import org.mycore.importer.mapping.mapper.MCRImportMapper;
 import org.mycore.importer.mapping.mapper.MCRImportMapperManager;
 import org.mycore.importer.mapping.resolver.metadata.MCRImportMetadataResolver;
 import org.mycore.importer.mcrimport.MCRImportImporter;
-
 public class ImporterTestCase extends MCRTestCase {
 
-    public void testDatamodel() throws Exception {
+    @Test
+    public void datamodel() throws Exception {
         MCRImportMetadataResolverManager metadataResolverManager = new MCRImportMetadataResolverManager();
         MCRImportDatamodelManager dmm = new MCRImportDatamodelManager("src/test/resources", metadataResolverManager);
         MCRImportDatamodel dm1 = dmm.addDatamodel("sample-dm1.xml");
@@ -81,21 +85,17 @@ public class ImporterTestCase extends MCRTestCase {
         assertEquals(5, dm2.getMetadataNames().size());
     }
 
-    public void testMapperManager() throws Exception {
+    @Test
+    public void mapperManager() throws Exception {
         MCRImportMapperManager mm = new MCRImportMapperManager();
         mm.addMapper("testMapper", TestMapper.class);
         MCRImportMapper mapper = mm.createMapperInstance("testMapper");
         assertNotNull(mapper);
         assertEquals("testMapper", mapper.getType());
     }
-    public static class TestMapper implements MCRImportMapper {
-        public String getType() {
-            return "testMapper";
-        }
-        public void map(MCRImportObject importObject, MCRImportRecord record, Element map) {}
-    }
-
-    public void testMetadataResolver() throws Exception {
+    
+    @Test
+    public void metadataResolver() throws Exception {
         MCRImportMetadataResolverManager metadataResolverManager = new MCRImportMetadataResolverManager();
         metadataResolverManager.addToResolverTable("testMetadata", "MCRTestMetadata", TestMetadataResolver.class);
         assertEquals(metadataResolverManager.getClassNameByType("testMetadata"), "MCRTestMetadata");
@@ -106,14 +106,9 @@ public class ImporterTestCase extends MCRTestCase {
         metadataResolver.resolve(null, null, saveToElement);
         assertEquals("1", saveToElement.getAttributeValue("test"));
     }
-    public static class TestMetadataResolver implements MCRImportMetadataResolver {
-        public boolean resolve(Element map, List<MCRImportField> fieldList, Element saveToElement) {
-            saveToElement.setAttribute("test", "1");
-            return true;
-        }
-    }
-
-    public void testConfig() throws Exception {
+    
+    @Test
+    public void config() throws Exception {
         MCRConfiguration.instance().set("MCR.basedir", "src");
         SAXBuilder builder = new SAXBuilder();
         Document doc = builder.build(new File("src/test/resources/sample-mapping.xml"));
@@ -129,7 +124,8 @@ public class ImporterTestCase extends MCRTestCase {
         assertEquals(true, config.isImportFilesToMycore());
     }
     
-    public void testFieldsAndRecords() throws Exception {
+    @Test
+    public void fieldsAndRecords() throws Exception {
         // create a new record
         MCRImportRecord record = new MCRImportRecord("record");
         record.addField(new MCRImportField("id", "000001"));
@@ -176,7 +172,8 @@ public class ImporterTestCase extends MCRTestCase {
         MCRUtils.deleteDirectory(new File("save"));
     }
 
-    public void testClassification() throws Exception  {
+    @Test
+    public void classification() throws Exception  {
         MCRImportRecord record = new MCRImportRecord("record");
         record.addField(new MCRImportField("id", "id"));
         record.addField(new MCRImportField("categ", "category 1"));
@@ -211,7 +208,8 @@ public class ImporterTestCase extends MCRTestCase {
         MCRUtils.deleteDirectory(new File("save"));
     }
 
-    public void testDerivate() throws Exception {
+    @Test
+    public void derivate() throws Exception {
         MCRImportDerivate der1 = new MCRImportDerivate("0");
         MCRImportDerivate der2 = new MCRImportDerivate("1");
         der1.setLabel("test label");
@@ -260,7 +258,8 @@ public class ImporterTestCase extends MCRTestCase {
         MCRUtils.deleteDirectory(new File("save"));
     }
 
-    public void testValid() throws Exception {
+    @Test
+    public void valid() throws Exception {
         MCRImportMappingManager.getInstance().init(new File("src/test/resources/sample-mapping.xml"));
         MCRImportRecord record = new MCRImportRecord("record");
         record.addField(new MCRImportField("id", "000001"));
@@ -273,7 +272,8 @@ public class ImporterTestCase extends MCRTestCase {
         assertEquals(true, importObject.isValid());
     }
 
-    public void testImport() throws Exception {
+    @Test
+    public void importTest() throws Exception {
         File mappingFile = new File("src/test/resources/sample-mapping2.xml");
         MCRConfiguration.instance().set("MCR.Metadata.Type.sample-dm1", true);
         MCRConfiguration.instance().set("MCR.Metadata.Type.sample-dm2", true);
@@ -305,5 +305,19 @@ public class ImporterTestCase extends MCRTestCase {
 
         // delete save dir
         MCRUtils.deleteDirectory(new File("save"));
+    }
+    
+    public static class TestMapper implements MCRImportMapper {
+        public String getType() {
+            return "testMapper";
+        }
+        public void map(MCRImportObject importObject, MCRImportRecord record, Element map) {}
+    }
+    
+    public static class TestMetadataResolver implements MCRImportMetadataResolver {
+        public boolean resolve(Element map, List<MCRImportField> fieldList, Element saveToElement) {
+            saveToElement.setAttribute("test", "1");
+            return true;
+        }
     }
 }

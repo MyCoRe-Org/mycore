@@ -1,5 +1,7 @@
 package org.mycore.common.xml;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -9,6 +11,9 @@ import java.nio.charset.Charset;
 
 import org.jdom.Document;
 import org.jdom.Element;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 
 public class MCRXSLTransformationTest extends MCRTestCase {
@@ -17,12 +22,20 @@ public class MCRXSLTransformationTest extends MCRTestCase {
 
     File stylesheet;
 
+    @Before
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
         super.setUp();
         tr = MCRXSLTransformation.getInstance();
         stylesheet = File.createTempFile("test", ".xsl");
         initStylesheet();
+    }
+
+    @Override
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
+        stylesheet.delete();
     }
 
     /**
@@ -43,17 +56,12 @@ public class MCRXSLTransformationTest extends MCRTestCase {
         out.close();
     }
 
-    public void testtransform() {
+    @Test
+    public void transform() {
         Element root = new Element("root");
         Document in = new Document(root);
         root.addContent(new Element("child").setAttribute("hasChildren", "no"));
         Document out = MCRXSLTransformation.transform(in, stylesheet.getAbsolutePath());
         assertTrue("Input not the same as Output", MCRXMLHelper.deepEqual(in, out));
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-        stylesheet.delete();
     }
 }
