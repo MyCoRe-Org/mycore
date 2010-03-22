@@ -14,6 +14,7 @@ import org.jdom.Text;
 import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
 import org.jdom.xpath.XPath;
+import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRTestCase;
@@ -33,6 +34,14 @@ import org.mycore.importer.mapping.resolver.metadata.MCRImportMetadataResolver;
 import org.mycore.importer.mcrimport.MCRImportImporter;
 public class ImporterTestCase extends MCRTestCase {
 
+
+    @Before
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        setProperty("MCR.basedir", "src", true);
+    }
+    
     @Test
     public void datamodel() throws Exception {
         MCRImportMetadataResolverManager metadataResolverManager = new MCRImportMetadataResolverManager();
