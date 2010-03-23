@@ -20,9 +20,9 @@
     </site>
   </distributionManagement>
   <scm>
-    <connection>scm:svn:http://server.mycore.de/svn/mycore</connection>
-    <developerConnection>scm:svn:https://server.mycore.de/svn/mycore</developerConnection>
-    <url>http://www.mycore.de/viewvc/viewvc.cgi/mycore/</url>
+    <connection>scm:svn:http://server.mycore.de/svn/mycore/trunk</connection>
+    <developerConnection>scm:svn:https://server.mycore.de/svn/mycore/trunk</developerConnection>
+    <url>http://www.mycore.de/viewvc/viewvc.cgi/mycore/trunk</url>
   </scm>
   <reporting>
     <plugins>
