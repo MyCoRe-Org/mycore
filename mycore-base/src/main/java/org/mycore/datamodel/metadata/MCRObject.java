@@ -37,6 +37,8 @@ import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRXMLTableManager;
@@ -905,5 +907,39 @@ final public class MCRObject extends MCRBase {
         LOGGER.debug("MCRObject Schema : " + mcr_schema);
         LOGGER.debug("");
         mcr_metadata.debug();
+    }
+
+    public void checkLinkTargets() {
+        for (int i = 0; i < getMetadata().size(); i++) {
+            MCRMetaElement elm = getMetadata().getMetadataElement(i);
+            for (int j = 0; j < elm.size(); j++) {
+                MCRMetaInterface inf = elm.getElement(j);
+                if (inf instanceof MCRMetaClassification) {
+                    String classID = ((MCRMetaClassification) inf).getClassId();
+                    String categID = ((MCRMetaClassification) inf).getCategId();
+                    boolean exists = MCRCategoryDAOFactory.getInstance().exist(new MCRCategoryID(classID, categID));
+                    if (exists) {
+                        continue;
+                    }
+                    MCRActiveLinkException activeLink = new MCRActiveLinkException(
+                            "Failure while adding link!. Destination does not exist.");
+                    String destination = classID + "##" + categID;
+                    activeLink.addLink(getId().toString(), destination);
+                    // throw activeLink;
+                    // TODO: should trigger undo-Event
+                }
+                if (inf instanceof MCRMetaLinkID) {
+                    String destination = ((MCRMetaLinkID) inf).getXLinkHref();
+                    if (!MCRXMLTableManager.instance().exists(new MCRObjectID(destination))) {
+                        continue;
+                    }
+                    MCRActiveLinkException activeLink = new MCRActiveLinkException(
+                            "Failure while adding link!. Destination does not exist.");
+                    activeLink.addLink(getId().toString(), destination);
+                    // throw activeLink;
+                    // TODO: should trigger undo-Event
+                }
+            }
+        }
     }
 }

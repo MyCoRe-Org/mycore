@@ -213,6 +213,8 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     private Map<MCRCategoryID, Boolean> hasLinksForClassification(MCRCategory category) {
         HashMap<MCRCategoryID, Boolean> boolMap = new HashMap<MCRCategoryID, Boolean>() {
+            private static final long serialVersionUID = 1L;
+
             @Override
             public Boolean get(Object key) {
                 Boolean haslink = super.get(key);
@@ -223,6 +225,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         Session session = MCRHIBConnection.instance().getSession();
         String queryString = "select distinct node.classid from MCRCATEGORY as node, MCRCATEGORYLINK as link where node.internalid=link.category";
         SQLQuery sqlQueryHasLink = session.createSQLQuery(queryString);
+        @SuppressWarnings("unchecked")
         List<String> categList = sqlQueryHasLink.list();
 
         for (String rootID : categList) {

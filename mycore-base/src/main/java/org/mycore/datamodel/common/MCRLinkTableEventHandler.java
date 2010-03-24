@@ -29,7 +29,6 @@ import java.util.HashSet;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRObjectReference;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
@@ -68,10 +67,6 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
         MCRObjectMetadata meta = obj.getMetadata();
         MCRMetaElement elm = null;
         MCRMetaInterface inf = null;
-        if (false) {
-            // TODO: add undo events
-            checkLinkTargets(obj);
-        }
         //use Set for category collection to remove duplicates if there are any
         Collection<MCRCategoryID> categories = new HashSet<MCRCategoryID>();
         for (int i = 0; i < meta.size(); i++) {
@@ -108,44 +103,6 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
     private void deleteOldLinks(MCRObjectID mcr_id) {
         mcr_linktable.deleteReferenceLink(mcr_id);
         MCRCategLinkServiceFactory.getInstance().deleteLink(mcr_id.getId());
-    }
-
-    private void checkLinkTargets(MCRObject obj) {
-        MCRObjectID mcr_id = obj.getId();
-        MCRObjectMetadata meta = obj.getMetadata();
-        MCRMetaElement elm;
-        MCRMetaInterface inf;
-        for (int i = 0; i < meta.size(); i++) {
-            elm = meta.getMetadataElement(i);
-            for (int j = 0; j < elm.size(); j++) {
-                inf = elm.getElement(j);
-                if (inf instanceof MCRMetaClassification) {
-                    String classID = ((MCRMetaClassification) inf).getClassId();
-                    String categID = ((MCRMetaClassification) inf).getCategId();
-                    boolean exists = MCRCategoryDAOFactory.getInstance().exist(new MCRCategoryID(classID, categID));
-                    if (exists) {
-                        continue;
-                    }
-                    MCRActiveLinkException activeLink = new MCRActiveLinkException(
-                            "Failure while adding link!. Destination does not exist.");
-                    String destination = classID + "##" + categID;
-                    activeLink.addLink(mcr_id.toString(), destination);
-                    // throw activeLink;
-                    // TODO: should trigger undo-Event
-                }
-                if (inf instanceof MCRMetaLinkID) {
-                    String destination = ((MCRMetaLinkID) inf).getXLinkHref();
-                    if (!MCRXMLTableManager.instance().exists(new MCRObjectID(destination))) {
-                        continue;
-                    }
-                    MCRActiveLinkException activeLink = new MCRActiveLinkException(
-                            "Failure while adding link!. Destination does not exist.");
-                    activeLink.addLink(mcr_id.toString(), destination);
-                    // throw activeLink;
-                    // TODO: should trigger undo-Event
-                }
-            }
-        }
     }
 
     /**
