@@ -25,8 +25,62 @@ public class MCRDerivateWithURNSearcher extends MCRSearcher {
      * bool.MCRCondition, int, java.util.List, boolean)
      */
     @Override
-    public MCRResults search(MCRCondition condition, int maxResults, List<MCRSortBy> sortBy, boolean addSortData) {
+    public MCRResults search(MCRCondition condition, int maxResults, List<MCRSortBy> sortBy,
+            boolean addSortData) {
+        if (!(condition instanceof MCRQueryCondition)) {
+            LOGGER.warn("Retrieved of type " + condition.getClass() + " but only type"
+                    + MCRQueryCondition.class.getName() + " is currently supported.");
+            return new MCRResults();
+        }
 
+        String fieldName = ((MCRQueryCondition) condition).getField().getName();
+
+        if (fieldName.equals("objectURN")) {
+            return handleObjectsURN(condition);
+        }
+
+        if (fieldName.equals("objectsWithURN")) {
+            return handleObjectsWithURN(condition);
+        }
+        return new MCRResults();
+    }
+
+    @SuppressWarnings("unchecked")
+    private MCRResults handleObjectsURN(MCRCondition condition) {
+        String value = null;
+        if (condition instanceof MCRQueryCondition) {
+            value = ((MCRQueryCondition) condition).getValue();
+        }
+        List<String> resultList = null;
+
+        MCRHIBConnection conn = MCRHIBConnection.instance();
+
+        if (value == null) {
+            return new MCRResults();
+        }
+        /*
+         * get objects matching the given urn (only non derivates)
+         */
+        resultList = conn
+                .getSession()
+                .createSQLQuery(
+                        "SELECT DISTINCT A.mcrid FROM MCRXMLTABLE A,MCRLINKHREF B "
+                                + "WHERE (A.mcrid = B.mcrfrom and B.mcrto in (SELECT U.mcrid FROM MCRURN U where U.mcrurn = '"
+                                + value
+                                + "')) OR (A.mcrid in (SELECT I.mcrid FROM MCRURN I WHERE I.mcrurn = '"
+                                + value + "') AND NOT (A.mcrtype='derivate'))").list();
+
+        MCRResults toReturn = new MCRResults();
+        for (String entry : resultList) {
+            MCRHit aHit = new MCRHit(entry);
+            toReturn.addHit(aHit);
+        }
+
+        return toReturn;
+    }
+
+    @SuppressWarnings("unchecked")
+    private MCRResults handleObjectsWithURN(MCRCondition condition) {
         String value = null;
         if (condition instanceof MCRQueryCondition) {
             value = ((MCRQueryCondition) condition).getValue();
@@ -37,11 +91,15 @@ public class MCRDerivateWithURNSearcher extends MCRSearcher {
 
         if (value != null && value.equalsIgnoreCase("false")) {
             /* all objects without urn */
-            resultList = conn.getSession().createSQLQuery(
-                    "SELECT MCRID FROM MCRXMLTABLE WHERE MCRID NOT IN (SELECT DISTINCT urn.MCRID FROM MCRURN urn)").list();
+            resultList = conn
+                    .getSession()
+                    .createSQLQuery(
+                            "SELECT MCRID FROM MCRXMLTABLE WHERE MCRID NOT IN (SELECT DISTINCT urn.MCRID FROM MCRURN urn)")
+                    .list();
         } else {
             /* all objects with urn */
-            resultList = conn.getSession().createSQLQuery("SELECT DISTINCT mcrid FROM MCRURN ORDER BY 1 ASC").list();
+            resultList = conn.getSession().createSQLQuery(
+                    "SELECT DISTINCT mcrid FROM MCRURN ORDER BY 1 ASC").list();
         }
 
         MCRResults toReturn = new MCRResults();
