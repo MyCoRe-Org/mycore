@@ -724,10 +724,12 @@ function importCutOut(viewID) {
 @description calls the corresponding functions to create the chapter
 */
 function importChapter(viewID) {
-	var chapModel = new iview.chapter.Model();
+	Iview[viewID].chapModelProvider = new iview.chapter.ModelProvider(Iview[viewID].buchDaten);
 	var chapView = new iview.chapter.View();
+	
+	Iview[viewID].chapter = new iview.chapter.Controller(Iview[viewID].chapModelProvider, chapView);
 	//Create Listener which changes after a Page click all needed informations within Viewer
-	chapModel.onevent.attach(function() {
+	Iview[viewID].chapModelProvider.createModel().onevent.attach(function() {
 		if (Iview[viewID].chapterReaction) {
 			Iview[viewID].chapterReaction = false;
 			return;
@@ -737,9 +739,6 @@ function importChapter(viewID) {
 		getPageNumberFromPic(viewID);
 		navigatePage(Iview[viewID].pagenumber, viewID);
 	});
-		
-	Iview[viewID].chapter = new iview.chapter.Controller(chapModel, chapView, Iview[viewID].buchDaten);
-	Iview[viewID].chapter.createModel();
 	Iview[viewID].chapter.createView("#viewerContainer"+viewID);
 	Iview[viewID].chapterReaction = false;
 }
