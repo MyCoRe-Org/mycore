@@ -1,5 +1,3 @@
-//loadVars("../modules/iview2/web/config.xml");
-
 function initializeGraphic(viewID) {
 	Iview[viewID].zoomScale = 1;//init for the Zoomscale is changed within CalculateZoomProp
 	Iview[viewID].loaded = false;//indicates if the window is finally loaded
@@ -291,14 +289,19 @@ function initializeGraphic(viewID) {
 		tileImg.onerror = function () {this.src = Iview[this.viewID].viewerBean.cache['blank'].src; return true;};
 //endadd
 	}
+//		alert("ViewerInit davor");
 		Iview[viewID].viewerBean.init();
+		//Newer Opera/Safari Versions need somehow something from reinitGraphics to show the viewer on Startup
+		if (navigator.userAgent.match(/Opera(.*)?Version\/10\.[0-9]*/i) || isBrowser(["Safari"])) {
+			reinitializeGraphic(viewID);
+		}
 	}
 }
 
 function reinitializeGraphic(viewID) {
 	// TODO: attention on the runtime, if to slow, then the viewer will be shown shortly
 	// --> eventuell sogar rausschieben falls sinnvoll - moeglich
-	viewerBean = Iview[viewID].viewerBean;
+	var viewerBean = Iview[viewID].viewerBean;
 	if (viewerBean == null) return;
 		
 	var curHeight = 0;
@@ -358,18 +361,9 @@ function reinitializeGraphic(viewID) {
 		Iview[viewID].ausschnitt.updatePos((- (viewerBean.x / Math.pow(2, viewerBean.zoomLevel))*Iview[viewID].zoomScale), (- (viewerBean.y / Math.pow(2, viewerBean.zoomLevel))*Iview[viewID].zoomScale));
 	}
 	
-	if (Iview[viewID].useChapter && chapDynResize) {
-		var newHeight = Iview[viewID].chapter1.my.self.parentNode.offsetHeight * chapResizeMul + chapResizeAdd;
-		var newWidth = Iview[viewID].chapter1.my.self.parentNode.offsetWidth * chapResizeMul + chapResizeAdd;
-		if (0 > newHeight) newHeight = 0;
-		if (0 > newWidth) newWidth = 0;
-		Iview[viewID].chapter1.setSize(newWidth, newHeight);
-	}
-
 	// Actualize forward & backward Buttons
 	getElementsByClassName("BSE_forwardBehind "+viewID, "viewerContainer"+viewID, "div")[0].style.top = ((((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - 1)) * Iview[viewID].zoomScale) - toInt(getStyle(getElementsByClassName("BSE_forwardBehind "+viewID, "viewerContainer"+viewID, "div")[0],"height"))) / 2) + "px";
 	getElementsByClassName("BSE_backwardBehind "+viewID, "viewerContainer"+viewID, "div")[0].style.top = ((((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - 1)) * Iview[viewID].zoomScale) - toInt(getStyle(getElementsByClassName("BSE_backwardBehind "+viewID, "viewerContainer"+viewID, "div")[0],"height"))) / 2) + "px";
-		
 }
 
 // uses the callback format GSIV.{className}Handler
@@ -491,13 +485,10 @@ function maximizeHandler(viewID) {
 		};
 	}
 
-// IE löst resize bereits bei bei den Class-Wechsel (sicherlich wegen position rel <-> fix)
+// IE löst resize bereits bei den Class-Wechsel (sicherlich wegen position rel <-> fix)
 	//IE führt die zwar so irgendwie mehrfach aus... aber ohne die auch nicht...muss man wohl mit leben
 //	if (!(isBrowser("IE"))) {
 		reinitializeGraphic(viewID);
 //	}
 
-
-	//TODO maximized noch nötig, wegen viewerBean.maximized?
-	//Iview[viewID].maximized = !Iview[viewID].maximized;
 }

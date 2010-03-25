@@ -36,7 +36,7 @@
         </mets:fileGrp>
       </mets:fileSec>
       <mets:structMap TYPE="LOGICAL">
-        <mets:div type="list" LABEL="Liste">
+        <mets:div TYPE="list" LABEL="Liste">
           <xsl:copy-of select="$structuremap" />
         </mets:div>
       </mets:structMap>

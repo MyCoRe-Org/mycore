@@ -1,748 +1,486 @@
-function chapter(newId, parent) {
-	var id = newId;//Chapter-ID
-	var effects = false; // indicator if effects are used or not
-	var pageNumber = null; // holds the current pagenumber
-	var lastHighlighted = 0; // holds the number of the previous highlighted pagenumber
-	var listener = []; // array who holds informations about the listeners (?)
-	var pageIdCounter = 0; // counts the number of pages to give every page an ID which is the paganumber
-	//var loadPageFunction = null;// string who holds the name of the function which loads the new page
-	//var loadPageDataFunction = null;// string who holds the name of the function which procure book-informations
-	var paddingLeft = null;// is responsible for the width of the chapter1_content-box
-	var borderLeftWidth = null;// is responsible for the width of the chapter1_content-box
-	var pointsWidth = null;// is responsible for the width of the chapter1_content-box
-	var my = null;// chapter-object
-	var bookData = null;//holds all needed Information about the book which shall be displayed
-	var viewID = "";//holds the viewID the viewer is connected to
-	var bgColors = [];
+var iview = iview || {};
+iview.chapter = iview.chapter || {};
+/*
+ * @package iview.chapter
+ * @description Modeldata for internal METS Representation 
+ */
 
-	chapter.PAGE_NUMBER = 0;
-	chapter.ITEM_CLICK = 1;
-	chapter.RESIZE = 2;
+/*
+ * @name 		Model
+ * @proto		Object
+ * @description
+ */
+iview.chapter.Model = function(element) {
+	this._selected = null;
+	this._entries = [];
+	this.onevent = new iview.Event(this);
+	this._hashList = [];
+};
 
-//Function declarations:
-	this.init = init;
-	this.useEffects = useEffects;
-	this.hasEffects = hasEffects;
-	this.setSize = setSize;
-	this.changePage = changePage;
-	this.showCurrentPageCenter = showCurrentPageCenter;
-	this.displayOutAllEntries = displayOutAllEntries;
-	//this.pressEachChapterEntries = pressEachChapterEntries;
-	this.addListener = addListener;
-	this.dropListener = dropListener;
-	this.getHeight = getHeight;
-	this.my = null;
-	//this.setLoadPageFunction = setLoadPageFunction;
-	//this.setLoadPageDataFunction = setLoadPageDataFunction;
-	this.setViewID = setViewID;
-	this.setBookData = setBookData;
-	this.toggleChapter = toggleChapter;
-
-	/*
-	@description sets the ID which is needed for multiple Viewers on a page so that they different components are connected properly together
-	@param id the ID of the Viewer the class is connected to
-	*/
-	function setViewID(id) {
-		viewID = id;
+( function() {
+	
+	function getEntries() {
+		return this._entries;
+	}
+	
+	function addPage(element) {
+		var page = new iview.chapter.METSPage(element.label, element.dmdid, this)
+		this._entries.push(page);
+		addHash(page);		
 	}
 
+	function addBranch(element) {
+		var firstElement = new iview.chapter.METSChapter(element.label, this);
+		this._entries.push(firstElement);
+		return firstElement;
+	}
+	
+	function setSelected(dmdid) {
+		var newSelected = getHash(dmdid, this);
+		if (newSelected != null) {
+			var oldSelected = (this._selected != null)? this._selected.getID(): null;
+			this._selected = newSelected;
+			this.onevent.notify({"type" : 'selected', "old": oldSelected, "new": newSelected.getID()});
+		}
+	}
+	
 	/*
-	 @description sets the BookData, which is a XML file Object in METS/MODS specification.
-	 This is used to generate the Chapter with all it's entries, chapters and the structure 
-	 @param data the BookData which is used for this chapter
+	 * @description to easily add entries of subchapter to the global Hashlist give childs Hashlist
 	 */
-	function setBookData(data) {
-		bookData = data;
+	function getContainer() {
+		return this;
 	}
+	
+	function addHash(entry) {
+		if (getHash(entry.getID(), this) != null) {
+			alert("Entry with this ID already exists. Element will not be added to List");
+			return;
+		}
+		this._hashList[entry.getID()] = entry;
+	}
+	
+	function getHash(hash, that) {
+		//check if Object with this hash is available
+		return (typeof that._hashList[hash] === "undefined")? null:that._hashList[hash];
+	}
+	
+	iview.chapter.Model.prototype.getEntries = getEntries;
+	iview.chapter.Model.prototype.addPage = addPage;
+	iview.chapter.Model.prototype.addBranch = addBranch;
+	iview.chapter.Model.prototype.getContainer = getContainer;
+	iview.chapter.Model.prototype.addHash = addHash;
+	iview.chapter.Model.prototype.setSelected = setSelected;
+})();
 
-	/*function setLoadPageFunction(func) {
-		loadPageFunction = func;
-	}*/
+/*
+ * @name 		METSEntry
+ * @proto		Object
+ * @description
+ */
+iview.chapter.METSEntry = function(labl) {
+	this._chapter = false;
+	this._parent = null;
+};
 
-	/*function setLoadPageDataFunction(func) {
-		loadPageDataFunction = func;
-	}*/
+iview.chapter.METSEntry.prototype = {
+	isChapter: function() {
+		return this._chapter;
+	},
+	
+	setLabel: function(labl) {
+		this._label = labl;
+	},
+		
+	getLabel: function() {
+		return this._label;
+	},
+	
+	getParent: function() {
+		return this._parent;
+	}
+};
 
+/*
+ * @name 		METSPage
+ * @proto 		iview.chapter.METSEntry
+ * @description
+ */
+iview.chapter.METSPage = function(labl, id, parent) {
+	var caption = labl || id;
+	this._label = labl || "";
+	this._id = id || "";
+	this._parent = parent;
+}; iview.chapter.METSPage.prototype = new iview.chapter.METSEntry;
+
+( function() {
+	function setID(id) {
+		this._id = id;
+	}
+		
+	function getID() {
+		return this._id;
+	}
+	
+	iview.chapter.METSPage.prototype.setID = setID;
+	iview.chapter.METSPage.prototype.getID = getID;
+})();
+
+/*
+ * @name		METSChapter
+ * @proto		iview.chapter.METSEntry
+ * @description	
+ */
+iview.chapter.METSChapter = function(entry, parent) {
+	this._chapter = true;
+	this._entries = [];
+	this._entry = new iview.chapter.METSPage(entry, "", this);
+	this._parent = parent;
+	//Set the root Element so we're able to add it elements to the global Hashlist
+	this._container = parent.getContainer();
+}; iview.chapter.METSChapter.prototype = new iview.chapter.METSEntry;
+
+( function() {
+
+//	function addEntries(elements) {
+//		if (!(typeof elements === undefined)) {
+//			var that = this;
+//			if (jQuery.isArray(elements)) {
+//				jQuery.each(elements, function(index, element) { that._entries.push(element)});
+//			} else {
+//				addEntry(element);
+//			}
+//		}
+//	}	
+
+	function addPage(element) {
+		var page = new iview.chapter.METSPage(element.label, element.dmdid, this);
+		this._entries.push(page);
+		this._container.addHash(page);
+	}
+	
+	function addBranch(element) {
+		var branch = new iview.chapter.METSChapter(element.label, this);
+		this._entries.push(branch);
+		return branch;	
+	}
+	
+	function getEntries() {
+		return jQuery.extend( {}, this._entries);
+	}
+	
+	function getInfo() {
+		return jQuery.extend( {}, this._entry);
+	}
+	
+	function setInfo(element) {
+		this._entry = element;
+	}
+	
+	function reset() {
+		this._entries = [];
+		this._entry = null;
+	}
+	
+	function getLabel() {
+		return this._entry.getLabel();
+	}
+	
+	function setLabel(labl) {
+		this._entry.setLabel(labl);	
+	}
+	
+	function getContainer() {
+		return this._container;
+	}
+	
+//	iview.METSChapter.prototype.addEntries = addEntries;
+	iview.chapter.METSChapter.prototype.addPage = addPage;
+	iview.chapter.METSChapter.prototype.addBranch = addBranch;
+	iview.chapter.METSChapter.prototype.getEntries = getEntries;
+	iview.chapter.METSChapter.prototype.getInfo = getInfo;
+	iview.chapter.METSChapter.prototype.reset = reset;
+	iview.chapter.METSChapter.prototype.getLabel = getLabel;
+	iview.chapter.METSChapter.prototype.setLabel = setLabel;
+	iview.chapter.METSChapter.prototype.getContainer = getContainer;
+})();
+
+/********************************************************
+ ********************************************************
+ ********************************************************/
+/*
+ * @package iview
+ * @description View to Display Data as jQuery Tree
+ */
+iview.chapter.View = function() {
+	this._treeData;//Stores the Treedata to display(the jsTree Model) 
+	this._visible = false;
+	this._tree = jQuery.tree.create();//The jsTree
+	this._selected = null;//stores the currently selected page and enables reset if Chapters will be selected
+	this.onevent = new iview.Event(this);//One Event to rule them all
+	this.notifyOthers = true;//onselect Event was caused by Controller calls, so don't handle them
+	this.dealEvent = true;//onselect Event was caused by Selection-changes within source code, so don't handle them as well
+	this._parent = null;//where will the tree be connected to
+};
+
+( function() {
+	
 	/*
-	@description defines if the Chapter is used with Effects or not and if so, all needed Values are read from the CSS file
- 	@param value boolean which defines if effects are used (true) or not (false)
+	 * @description creates the basic background Datastructure to Display the Data as jQuery Tree
 	 */
-	function useEffects(value) {
-		effects = (value == true)? true: false;
-		if (effects) {
-			//IE&Opera return Colorvalue as Hex, so conversion is needed
-			bgColors[0] = colorToRGBArray(getCssProps("", "highlight", id, ["background-color"])[0]);
-			bgColors[1] = colorToRGBArray(getCssProps("", "chapter", id, ["background-color"])[0]);
-			bgColors[2] = colorToRGBArray(getCssProps("", "hover", id, ["background-color"])[0]);
-		}
-	}
-
-	function hasEffects() {
-		return effects;
-	}
-
-	/*
-	@description add Listeners to the listener-array
-	*/
-	function addListener(type, theListener) {
-		if (!listener[type]) {
-			listener[type] = [];
-		}
-		listener[type].push(theListener);
-	}
-
-	/*
-	@description removes Listeners from the listener-array
-	*/
-	function dropListener(type, theListener) {
-		for (var i = 0; i < listener[type].length; i++) {
-			if (listener[type][i] == theListener) {
-				listener[type].splice(i,1);
-			}
-		}
-	}
-
-	/*
-	@description notifoes all Listeners within the corresponding Abot the Change
-	 and give them the corresponding id
-	*/
-	function notifyListenerChange(value) {
-		if (!listener[chapter.PAGE_NUMBER]) {
-			return;
-		}
-		for(var i = 0; i < listener[chapter.PAGE_NUMBER].length; i++) {
-			listener[chapter.PAGE_NUMBER][i].change(value);
-		}
-	}
-
-	/*
-	@description notifies all Listeners that a given Item was clicked so that they can react
-	*/
-	function notifyListenerClick(item) {
-		if (!listener[chapter.ITEM_CLICK]) {
-			return;
-		}
-		for (var i = 0; i < listener[chapter.ITEM_CLICK].length; i++) {
-			listener[chapter.ITEM_CLICK][i].clicked(item);
-		}
-	}
-
-	/*
-	@description notifies all Listeners that a ChapterResize occurred
-	*/
-	function notifyListenerResize() {
-		if (!listener[chapter.RESIZE]) {
-			return;
-		}
-		for (var i = 0; i < listener[chapter.RESIZE].length; i++) {
-			listener[chapter.RESIZE][i].resized();
-		}
-	}
-	
-	/*
-	@description read out the logical structure of the book
-	*/
-	function loadContent(parent) {
-		//Auslesen der logischen Strukturierung des Buches
-		var Liste = getNodes(bookData, "mets:structMap",i, true);
-		var structItem = null;//hält das Objekt mit den logischen Strukturinfos
-		for (var i = 0; i < Liste.length; i++) {
-			if (Liste[i].attributes.getNamedItem("TYPE").value.toLowerCase() == "logical") {
-				structItem = Liste[i];
-			}
-		}
-
-		if (structItem == null ) {
-			alert("Error 1:No Mets File found");
-		} else {
-			structItem = getStructure(getFirstNodeByTagName(structItem.childNodes, "mets:div"), parent, true);
-			return parent.firstChild;
-		}
-	}
-	
-	function toggleChapter(element){
-		element.expanded = !element.expanded;
-		element.getElementsByTagName("div").item(0).childNodes.item(0).className =(element.expanded)? "chapterImageSymbolMinus":"chapterImageSymbolPlus";
-		for (var i = 0; i < element.childNodes.length; i++) {
-			if ((element.childNodes.item(i).className == "chapter") || (element.childNodes.item(i).className == "chapter highlight") || (element.childNodes.item(i).className == "chapter hover")) {
-				element.childNodes.item(i).style.display = (element.expanded)? "block":"none";
-			}
-		}
-		// check out a free place
-		if (my.self.firstChild.offsetHeight < document.getElementById(id+"_content").offsetHeight) {
-			my.self.firstChild.style.top = 0 + "px";
-		}
-	}
-
-	/*
-	@description Realizes to Open and Close Chapter Entries
-	*/
-	function clickChap(e) {
-		e = getEvent(e);
-
-		var element = (typeof(arguments[1]) != "undefined")? arguments[1]: this;
-		toggleChapter(element);
-
-		// because of additional calling without event
-		if (e) {
-			e.cancelBubble = true;
-			notifyListenerClick(element);
-			posScroll();
-		}
-		return false;
-	}
-	
-	/*
-	@description realizes that by clicking an Entry we're switching to the given Image
-	*/
-	function clickPage(e) {
-		e = getEvent(e);
-		moveToPageByDMDID((typeof(arguments[1]) != "undefined")? arguments[1].DMDID:this.DMDID);
-		e.cancelBubble = true;
-		return false;
-	}
-	/*
-	@description creates the structure of the chapter and his functions
-	*/
-	//TODO TOC.id = "chapter" muss raus, die Werte Einlesen später, irgendwie anders. Aktuell mehrere Tags mit gleicher ID
-	function getStructure(chapter, parent, down) {
-		var curNodes = chapter.childNodes;
-		var structure = new Object();
-		var TOC = document.createElement("div");
-		TOC.className = "chapter";
-		TOC.id = "chapter";
-//		TOC.onclick = tocOnclick;
-
-		if (down == true || down == false) {
-			if (down == true) {
-				TOC.expanded = true;
-			}
-		}
-		for (var i = 0; i < chapter.attributes.length; i++) {
-			TOC[chapter.attributes.item(i).nodeName] = chapter.attributes.item(i).value;
-		}
-		parent.appendChild(TOC);
-
-		if (curNodes.length == 0) {
-			ManageEvents.addEventListener(TOC, 'click', clickPage, false);
-			var values = new Object();
-			var Page = document.createElement("div");
-
-			for (var i = 0; i < chapter.attributes.length; i++) {
-				Page[chapter.attributes.item(i).nodeName] = chapter.attributes.item(i).value;
-				values[chapter.attributes.item(i).nodeName] = chapter.attributes.item(i).value;
-			}
-
-			// makes a nice symbol in front of every pagename
-			var pageImage = document.createElement("div");
-			pageImage.className = "pageImageSymbol";
-			Page.appendChild(pageImage);
-
-			if (Page.LABEL) {
-				Page.innerHTML = Page.innerHTML + Page.LABEL;
-				Page.title = Page.LABEL;
-			} else {
-				Page.innerHTML = Page.innerHTML + Page.DMDID;
-				Page.title = Page.DMDID;
-			}
-
-			// to highlight the current page or their centering
-			pageIdCounter = pageIdCounter + 1;
-			Page.id = id+"Pagenumber"+pageIdCounter;
-
-			TOC.appendChild(Page);
-
-			TOC["HOVER_SESSION"] = 0;
-
-			// damit der Click auf kompletter Breite für die einzelnen Seiten abgefangen wird
-//			TOC.onclick = movetoOnclick;
-			//so that the click on the full width of the individual page will be catched
-			checkChapterEntry(TOC);
-
-			ManageEvents.addEventListener(TOC, 'mouseover', function(e){hoverCurrentPage(e, true);}, false);
-			ManageEvents.addEventListener(TOC, 'mouseout', function(e){hoverCurrentPage(e, false);}, false);
-
-			return values;
-		} else {
-			ManageEvents.addEventListener(TOC, 'click', clickChap, false);
-			var span = document.createElement("div");
-
-			var chapterImage = document.createElement("div");
-			chapterImage.className = "chapterImageSymbolPlus";
-			span.appendChild(chapterImage);
-			span.innerHTML = span.innerHTML + TOC.LABEL;
-			span.title = TOC.LABEL;
-			span.style.color ="#000000";
-			TOC.appendChild(span);
-
-			// cut the name of the Entry until it fits
-			checkChapterEntry(TOC);
-
-			try {
-				for (var i = 0; i < curNodes.length; i++) {
-					if (curNodes.item(i).tagName) {
-						structure[i] = new Object();
-						if (down) {
-							structure[i] = getStructure(curNodes.item(i), TOC, false);
-						} else {
-							structure[i] = getStructure(curNodes.item(i), TOC);
-							for (var ii = 0; ii < chapter.attributes.length; ii++) {
-								structure[chapter.attributes.item(ii).nodeName] = chapter.attributes.item(ii).value;
-							}
-						}
-					}
+	function initTree() {
+		var that = this;
+		this._treeData = {
+			"data": {
+				"type": 'json',
+				"opts": {
+					"static": []
+				}				
+			},
+			"types": {
+				"default": {
+					"draggable": false
 				}
-			} catch (e) {
-				alertError("Some Problem occured while loading Chapter", 113, e);
-			}
-		}
-		return TOC;
-	}
-
-	/*
-	@description cut the name of the Enty until it fits
-	*/
-	function checkChapterEntry(TOC) {
-		// determine the "number" of the indented levels of the chapterentries
-		var findMainParent = TOC;
-		var counter = 0;
-		while (findMainParent != null/*findMainParent.id != id*/) {
-			counter = counter + 1;
-			findMainParent = findMainParent.parentNode;
-		}
-
-		if (borderLeftWidth == null) {
-			borderLeftWidth = getStyle("chapter","padding-left");
-		}
-		if (paddingLeft == null) {
-			paddingLeft = getStyle("chapter","border-left-width");
-		}
-		var tmpBox = document.createElement("span");
-		tmpBox.id = "tmpBox";
-		tmpBox.style.whiteSpace = "pre";
-		tmpBox.appendChild(document.createTextNode(""));
-		tmpBox.style.fontFamily = "'"+getStyle(id+"_content","font-family")+"'";
-		tmpBox.style.fontSize = parseInt(getStyle(id+"_content","font-size")) + "px";
-		document.getElementsByTagName("body")[0].appendChild(tmpBox);
-		if (pointsWidth == null) {
-			pointsWidth = getTextWidth(tmpBox, "...");
-		}
-
-		var left = getStyle('chapter','left');
-		var right = getStyle('chapter','right'); //right distance from the end of the text to the Content-Div
-
-		var distanceDifference = parseInt(borderLeftWidth) +
-				    parseInt(left) +
-				    parseInt(paddingLeft);
-
-		var distanceCur = parseInt(document.getElementById(id+"_content").style.width) - ((counter - 1) * distanceDifference) - parseInt(right);
-		// otherwise Opera doesn't gets the symbolwidth --> is blended out in displayOutAllEntries
-		TOC.style.display = "block";
-		if (TOC.TYPE != "page") {
-			// must be set otherwiese you will get a contradiction
-			TOC.expanded = true;
-			TOC.firstChild.firstChild.className = "chapterImageSymbolMinus";
-		}
-		if (TOC.TYPE == "page") {
-			TOC.style.width = distanceCur + "px";
-			distanceCur = distanceCur - pointsWidth - TOC.firstChild.firstChild.offsetWidth - 1;
-		} else {
-			TOC.style.width = distanceCur + parseInt(right) + "px";
-			TOC.firstChild.style.width = distanceCur + parseInt(right) + "px";
-			distanceCur = distanceCur - pointsWidth - TOC.firstChild.firstChild.offsetWidth - 1;
-		}
-
-		//-1 as tolerance, otherwise you will get unsightly shifts in Opera
-
-		// cut the caption of the entry if it's to long until it fits
-
-		var curTxt = TOC.firstChild.lastChild.data;
-
-		if (isBrowser("IE")) {
-			distanceCur = distanceCur - parseInt(paddingLeft) - parseInt(borderLeftWidth);
-		}
-		
-		if (getTextWidth(tmpBox, curTxt) > distanceCur + pointsWidth) {
-				
-			// now the current Txt will cut with the help of the largest letter "A"
-			curTxt = curTxt.substring(0, Math.floor(distanceCur / getTextWidth(tmpBox, "A")));
-			TOC.firstChild.lastChild.data =  curTxt+"...";
-		}
-		document.getElementsByTagName("body")[0].removeChild(tmpBox);
-	}
-
-	function moveToPageByDMDID(DMDID) {
-		var nodes = getNodes(bookData, "mets:file",0,true);
-		for (var i= 0; i < nodes.length; i++) {
-			if (nodes[i].attributes.getNamedItem("ID").nodeValue == DMDID) {
-				var tempnode = getNodes(nodes[i], "mets:FLocat", 0, true);
-				if (isBrowser("Safari")) {
-					//search directly in the directory so that isn't created a new object everytime
-					tempnode = bookData.getElementsByTagName("file")[i].getElementsByTagName("FLocat");
-				}
-				for (var ii = 0; ii < tempnode.length; ii++) {
-					if (tempnode[ii].attributes && tempnode[ii].attributes.getNamedItem("LOCTYPE").nodeValue =="OTHER") {
-						try {
-				
-							//eval(loadPageFunction+"("+loadPageDataFunction+"(parseInt(tempnode[ii].attributes.getNamedItem((!window.opera ? 'xlink:href':'href')).nodeValue), true,'"+viewID+"'), '"+viewID+"');");
-							// updated pagecounter in the header |||page 0 doesn't exists --> page 1
-							pageNumber = parseInt(tempnode[ii].attributes.getNamedItem((!window.opera ? "xlink:href":"href")).nodeValue) + 1;
-							highlightCurrentPage(pageNumber);
-							notifyListenerChange(pageNumber);
-
-							// would also center by direct selection via chapter
-							//showCurrentPageCenter(pageNumber);
-						} catch (e) {
-							alertError("Error by Moving to Page by clicking Chapter entry", 134, e);
-						}
-						return;
-					}
-				}
-			}
-		}
-	}
-
-	/*
-	@description opens the current "list" in the chapter (for the first page)
-	*/
-	function openCurPageEntry() {
-		// would close everything else
-		// displayOutAllEntries ($(id+"_content").firstChild, 1, 1);
-		var startPoint = document.getElementById(id+"Pagenumber"+pageNumber).parentNode;
-		while (true) {
-			if (startPoint.parentNode.id == id+"_content") {
-				break;
-			} else {
-				if (startPoint.style.display != "block") {
-					clickChap([], startPoint.parentNode);
-					/*if (window.attachEvent && !window.opera) {
-						startPoint.parentNode.click();
+			},
+			"ui": {
+					"selected_parent_close": false
+			},
+			"callback": {
+				"onselect": function(node, tree) {
+					//To prevent endless loop check if the event is caused by some resets(chapter Selections)
+					//or as result of some external call
+					if (!that.dealEvent) { that.dealEvent = true; return;}
+					if (!that.notifyOthers) { that.notifyOthers = true; return;}
+					
+					var chapter = (jQuery(node).attr("dmdid") === undefined)? true:false;
+					
+					//add endless loop Prevention
+					that.dealEvent = false;
+					//Deselect the User clicked Element and lets see what the Model reports us(if it does)
+					if (that._selected != null) {
+						//if something was previously selected switch back to it
+						that._tree.select_branch(that._selected);
 					} else {
-						startPoint.parentNode.onclick();
-					}*/
-				}
-				startPoint = startPoint.parentNode;
-			}
-		}
-	}
-
-	/*
-	@description highlights the current page in the chapter
-	*/
-	function highlightCurrentPage() {
-		// stop hover by continue counting the session
-		var pageEl=document.getElementById(id+"Pagenumber"+pageNumber);
-		pageEl.parentNode.HOVER_SESSION = 
-			parseInt(pageEl.parentNode.HOVER_SESSION) + 1;
-		pageEl.parentNode.style.backgroundColor = "";
-
-		// at start / after reload still "0"
-		if (lastHighlighted > 0) {
-			document.getElementById(id+"Pagenumber"+lastHighlighted).parentNode.className = "chapter";
-		}
-		lastHighlighted = pageNumber;
-		pageEl.parentNode.className = "chapter highlight";
-	}
-
-	/*
-	@description determine which field should be highlighted by which color
-	*/
-	function hoverCurrentPage(e, hoverNow) {
-		// seems to be not available from beginning, at least there was an error
-		if (e.target || e.srcElement) {
-			var element = (e.srcElement)? e.srcElement:e.target;
-			// Cursor over Page symbol
-			if (element.parentNode.id.lastIndexOf(id+"Pagenumber") != -1) {
-				var currentPageId = element.parentNode.id;
-			// Cursor over field
-			} else if (element.firstChild.id.lastIndexOf(id+"Pagenumber") != -1) {
-				var currentPageId = element.firstChild.id;
-			// Cursor over text or fieldcontent
-			} else {
-				var currentPageId = element.id;
-			}
-			// if the entry who should be hover isn't changed by highlight
-			if (currentPageId.substring((id+"Pagenumber").length,currentPageId.length) != pageNumber) {
-				var obj = document.getElementById(currentPageId).parentNode;
-				if (hoverNow) {
-					obj.style.backgroundColor = '';
-					obj.className = "chapter hover";
-					// start new session (continue counting)
-					obj.HOVER_SESSION = parseInt(obj.HOVER_SESSION) + 1;
-				} else {
-					if (effects) {
-						changeColor(obj, copyArray(bgColors[2]), copyArray(bgColors[1]),
-								parseInt(obj.HOVER_SESSION), chapHoverStep, chapHoverDelay, "obj.style.backgroundColor = ''; obj.className = 'chapter';");
-					} else {
-						obj.className = "chapter";
+						//nothing was selected before, simply deselect the selection
+						that._tree.deselect_branch(node);
 					}
+					//If that element isn't selected already and is no chapter notify all Listeners about the User interaction
+					if (that._selected != node && !chapter) {
+						that.onevent.notify({"type":'selected', 
+							"old":jQuery(that._selected).attr("dmdid"), 
+							"new":jQuery(node).attr("dmdid")});
+					}
+					
 				}
-			} 
-		}
-	}
-
-	/*
-	@description changes the backgroundcolor of an chapter-textline by hover with mouse
-	*/
-	function changeColor(obj, startColor, targetColor, session, step, delay, doAfter) {
-
-		if (parseInt(obj.HOVER_SESSION) == session) {
-
-			if (!(startColor[0] == targetColor[0] && startColor[1] == targetColor[1] && startColor[2] == targetColor[2])) {
-
-				if (startColor[0] < targetColor[0]) {
-					startColor[0] = startColor[0] + step;
-					if (startColor[0] > targetColor[0]) startColor[0] = targetColor[0];
-				} else if (startColor[0] > targetColor[0]) {
-					startColor[0] = startColor[0] - step;
-					if (startColor[0] < targetColor[0]) startColor[0] = targetColor[0];
-				}
-
-				if (startColor[1] < targetColor[1]) {
-					startColor[1] = startColor[1] + step;
-					if (startColor[1] > targetColor[1]) startColor[1] = targetColor[1];
-				} else if (startColor[1] > targetColor[1]) {
-					startColor[1] = startColor[1] - step;
-					if (startColor[1] < targetColor[1]) startColor[1] = targetColor[1];
-				}
-
-				if (startColor[2] < targetColor[2]) {
-					startColor[2] = startColor[2] + step;
-					if (startColor[2] > targetColor[2]) startColor[2] = targetColor[2];
-				} else if (startColor[2] > targetColor[2]) {
-					startColor[2] = startColor[2] - step;
-					if (startColor[2] < targetColor[2]) startColor[2] = targetColor[2];
-				}
-
-				obj.style.backgroundColor = "rgb("+startColor[0]+","+startColor[1]+","+startColor[2]+")";
-
-				setTimeout(function() {changeColor(obj, startColor, targetColor, session, step, delay, doAfter);}, delay);
-			} else {
-				eval(doAfter);
 			}
+		};
+	};
+
+	/*
+	 * @description adds a new branch to the supplied parentNode(mostly a branch itself), as childNode
+	 * @param branch Object which will be added to the Tree at the supplied parentNode
+	 * @param parentNode Object where the branch will be added as childNode
+	 * @return returns the just added Branch so that the User can work further on it
+	 * (to add there itself new Child Entries, or whatever)
+	 */
+	function addBranch(branch, parentNode) {
+		var currentBranch = { "data": branch.label, "children": []};
+		if (parentNode == this._treeData) {
+			parentNode.data.opts["static"].push(currentBranch);
+		} else {
+			parentNode.children.push(currentBranch);
 		}
+		return currentBranch;
 	}
-
+	
 	/*
-	@description positions all Scrollbars depending to the given value
-	*/
-	function posScroll() {
-		if (my == null) return;
-		//var scrollBarX = my.scrollBarX;
-		var scrollBarY = my.scrollBarY;
-		
-		/*scrollBarX.setMaxValue(Math.max(0, getWidth() - my.content.offsetWidth));
-		var ratio = my.content.firstChild.offsetWidth / my.content.offsetWidth;
-		scrollBarX.setLength(scrollBarX.my.space.offsetWidth / ratio);
-		scrollBarX.setValue(-my.firstElement.offsetLeft);*/
-		
-		scrollBarY.setMaxValue(Math.max(0, getHeight() - my.content.offsetHeight));
-		//ratio = my.firstElement.offsetHeight / my.self.offsetHeight;
-		ratio = my.firstElement.offsetHeight / my.content.offsetHeight;
-		scrollBarY.setLength(scrollBarY.my.space.offsetHeight / ratio);
-		scrollBarY.setValue(-my.firstElement.offsetTop);
+	 * @description adds a simple page to the supplied parentNode as childNode
+	 * @param page Object which will be added to the Tree at the supplied parentNode
+	 * @param parentNode Object where the page will be added as childNode
+	 */
+	function addPage(page, parentNode) {
+		parentNode.children.push({"data":page.label, "attributes": { "dmdid": page.dmdid}});
 	}
-
+	
 	/*
-	@description initialize chapter
-	*/
-	function init(identer) {
-		var main = jQuery("<div>")
-			.attr("id",id)
-			.addClass(identer)
-			.appendTo(document.getElementById(parent));
+	 * @description adds the View to it's parent and creates the HTML Structure to display the Tree.
+	 *  Therefore makes it reachable for the user
+	 */
+	function addTree(parent) {
+		var that = this;
 
-		// are needed later, therefore they have to be read by hand
-		main.css({
-			height: main.css("height"),
-			top: main.css("top"),
-			visibility: main.css("visibility"),
-			width: main.css("width"),
-			zIndex: main.css("z-index")
+		//set some Style depending Properties so that the view can work properly;		
+		var chapter = jQuery('<div>').addClass("chapter").appendTo(parent);
+		//Adding the Content area which holds the Tree
+		var content = jQuery('<div>').addClass("content").css("overflow", "scroll").appendTo(chapter);
+		this._parent = jQuery(chapter);
+		this._tree.init(content,this._treeData);
+		
+		//Add the collapse button and the functionality behind it
+		jQuery('<div>').addClass("chapSort").appendTo(chapter).click(function(){
+			that._tree.close_all();
+			that.selectNode(jQuery(that._selected).attr("dmdid"))
 		});
 
-		var content = jQuery("<div>")
-			.attr("id",id+"_content")
-			.addClass(identer + "_content")
-			.appendTo(main);
-		content.css({
-			right: content.css("right"),
-			left: content.css("left"),
-			//TODO IE/Opera hat hier mit Angaben derart width:100% Probleme und spinnt total rum. Berechnung klappt also irgendwie nicht richtig
-			width: toInt(main.css("width")) - toInt(content.css("left")) - toInt(content.css("right")) + "px"
+		//Add Mousescroll Capability to the View
+		ManageEvents.addEventListener(this._parent[0],'mouseScroll', function(e) {
+			that._parent[0].scrollTop = that._parent[0].scrollTop - returnDelta(e).y*4;
 		});
-		
-		// have to initialize so that the current page can be centered & needed to work in IE
-		content.append(jQuery(loadContent(content[0])).css("top","0px"));
-		
-		var chapSort = jQuery("<div>")
-			.attr("id",id+"_chapSort")
-			.addClass(identer + "_chapSort")
-			.appendTo(main)
-			.click(chapterSort);
-
-		// to determine content-width
-		
-		// create Elements to hold chapter Class Props
-		var chapIn = jQuery("<div>")
-			.attr("id",id+"In")
-			.addClass(identer +"InPlace")
-			.appendTo(main);
-
-		var chapOut = jQuery("<div>")
-		.attr("id",id+"Out")
-		.addClass(identer +"OutPlace")
-		.appendTo(main);
-		
-		//var scrollX = new scrollBar("scrollChap"+viewID, "scrollChap");
-		var scrollY = new scrollBar("scrollChap"+viewID, "scrollChap");
-
-		my = {'self': main[0], 'content':content[0], 'firstElement': content[0].firstChild, /*'scrollBarX': scrollX,*/ 'scrollBarY':scrollY};
-		this.my = my;
-		//var scrollBarChapter = Iview[viewID].scrollBarChapter;
-		scrollY.init(false);
-		scrollY.addListener(scrollBar.LIST_MOVE, new function() { this.moved = function(vector) {my.firstElement.style.top = -my.scrollBarY.getValue()+ "px";}});
-		scrollY.setParent(id);
-		scrollY.setSize(main.css("height"));
-		//TODO immer noch die letzte Seite mit drin stehen lassen als Orientierung
-		//console.log();
-		scrollY.setJumpStep(parseInt(my.content.clientHeight)-my.content.firstChild.firstChild.clientHeight);
-
-		//EventRegistrations
-		ManageEvents.addEventListener(document, 'mousemove', scrollY.mouseMove, false);
-		ManageEvents.addEventListener(document, 'mouseup', scrollY.mouseUp, false);
-		ManageEvents.removeEventListener(getElementsByClassName("empty","scrollChap"+viewID,"div")[0], 'mouseScroll', scrollY.scroll, false);
-		ManageEvents.addEventListener(main, 'mouseScroll', function(e) { e = getEvent(e); scrollY.scroll(e); e.cancelBubble = true; return false}, false);
 	}
-
-	/*
-	@description set width and height of the chapter 
-	*/
-	function setSize(width, height) {
-		var el=document.getElementById(id);
-		if (width != null) el.style.width = width + "px";
-		if (height != null) el.style.height = height + "px";
-		if (pageNumber != null) showCurrentPageCenter(pageNumber);
-		notifyListenerResize(this);
-		//my.scrollBarX.setSize(my.content.style.width);
-		my.scrollBarY.setSize(my.self.style.height);
-		posScroll();
-	}
-
-	/*
-	@description gets the height of the first Child from chapter-content
-	*/
-	function getHeight() {
-		return my.content.firstChild.offsetHeight;
-	}
-
-	/*
-	@description gets the height of the first Child from chapter-content
-	*/
-	function getWidth() {
-		return my.content.firstChild.offsetWidth;
-	}
-
-	/*
-	@description calls needed functions if the page is changing
-	*/
-	function changePage(currentPage) {
-		pageNumber = currentPage;
-		openCurPageEntry();
-		showCurrentPageCenter(pageNumber);
-		posScroll();
-		highlightCurrentPage();
-	}
-
-	/*
-	@description pushes the current page to the center of the chapter-content
-	*/
-	function showCurrentPageCenter(currentPage) {
-		// the entries doesn't fit into the placeholder
-		var contentEl=document.getElementById(id+"_content");
-		if (contentEl.firstChild.offsetHeight > contentEl.offsetHeight) {
-			// calculate distance from the current page to the top edge of the chapter
-			var curPage = document.getElementById(id+"Pagenumber"+currentPage);
-			var startPoint = curPage;
-			var curDistance = 0;
-
-			//enough anyway, because the heighest distance / offsetTop is "0"
-			while (startPoint.parentNode.parentNode.id != id+"_content") {
-				curDistance = curDistance + startPoint.parentNode.offsetTop;
-				startPoint = startPoint.parentNode;
-			}
-
-			curDistance = curDistance + parseInt(contentEl.firstChild.style.top) - ((contentEl.offsetHeight - 
-					curPage.offsetHeight) / 2);
-
-			contentEl.firstChild.style.top = parseInt(contentEl.firstChild.style.top) - curDistance + "px";
-
-			// so that not too much is moved (beyond the empty fields)
-
-			// bottom
-			if (-parseInt(contentEl.firstChild.style.top) + contentEl.offsetHeight > 
-					contentEl.firstChild.offsetHeight) {
-				contentEl.firstChild.style.top = - (contentEl.firstChild.offsetHeight - contentEl.offsetHeight)
-									+ "px";
-			}
-
-			// top
-			if (parseInt(contentEl.firstChild.style.top) > 0) {
-				contentEl.firstChild.style.top = 0 + "px";
-			}
-		} else {
-			// wenn nach sortierung alles zusammen reinpasst, oben orientieren
-			contentEl.firstChild.style.top = 0 + "px";
-		}
-	}
-
-	// currently not used (maybe later)
-	/*function pressEachChapterEntries(startPoint, layers) {
-		pressEach(startPoint, 0, layers);
-	}*/
-
-	/*
-	@description 
-	*/
-	/*function pressEach(startPoint, index, lastClickedLayer) {
-		// recursively, clicks all chapterentries from the plane firstLayer
-		// edit planes (1-...) from top to bottom ||| "1" because zeroth child concerns the chapterhead
-		for (window["index"+index] = 1; window["index"+index] < startPoint.childNodes.length; window["index"+index]++) {
-			if (startPoint.childNodes[window["index"+index]].TYPE == "chapter") {
-				pressEach(startPoint.childNodes[window["index"+index]], index+1, lastClickedLayer);
-				if (index >= lastClickedLayer) {
-					//startPoint.childNodes[window["index"+index]].onclick();
-					clickChap([],startPoint.childNodes[window["index"+index]]);
-				}
-			}
-		}
-	}*/
-
 	
-	function displayOutAllEntries(startPoint, layers) {
-		displayOut(startPoint, 0, layers);
-	}
-
 	/*
-	@description recursively, closes all entries from the layer lastShownLayer
-	*/
-	function displayOut(startPoint, index, lastShownLayer) {
-		// recursively, clicks all chapterentries from the plane lastShownLayer
-		// edit planes (1-...) from top to bottom ||| "1" because zeroth child concerns the chapterhead
-		for (window["index"+index] = 1; window["index"+index] < startPoint.childNodes.length; window["index"+index]++) {
-			if ((startPoint.childNodes[window["index"+index]].TYPE == "chapter") && 
-				(startPoint.childNodes[window["index"+index]].expanded == true)) {
+	 * @description makes the View visible depending on the given boolean value, if no value is given
+	 *  the View will switch in the opposite mode than it's currently
+	 * @param bool Boolean which holds the state into which the View shall switch
+	 */
+	function visible(bool) {
+		//if nothing is given simply switch between the states
+		if (typeof bool === "undefined")
+			bool = !this._visible;
+		if (bool === true) {
+			this._visible = true;
+			this._parent.slideDown();
+		} else {
+			this._visible = false;
+			this._parent.slideUp();
+		}
+	}
+	
+	/*
+	 * @description Returns the internal TreeData representation, which is/was used to build-up the Tree
+	 * @return the internal TreeData which is used to build the Tree
+	 */
+	function getTree() {
+		return this._treeData;
+	}
+	
+	/*
+	 * @description Finds within the tree, the given Entry with matching nodeID and tells
+	 *  jsTree to select it and to collapse everything except the path from the root Node
+	 *  to the newly selected Entry
+	 * @param nodeID the ID of the Entry which is the new selected entry, and therefore needs to be showed within the View
+	 */
+	function selectNode(nodeID) {
+		//Avoid cycling as the Tree would notify its listeners itself which could call him again...
+		this.notifyOthers = false;
+		var that = this;
+		//Find the node we're searching for
+		var res = this._parent.find('li.leaf').filter(function(index, element) {return $(element).attr("dmdid") == nodeID});
+		//Select all Returned entries(should be only one, else something within the METS Document
+		//or the Model is wrong..
+		jQuery.each(res, function(index, element) {that._tree.select_branch(element); that._selected = element});
+	}
+	
+	iview.chapter.View.prototype.visible = visible;
+	iview.chapter.View.prototype.getTree = getTree;
+	iview.chapter.View.prototype.addTree = addTree;
+	iview.chapter.View.prototype.addBranch = addBranch;
+	iview.chapter.View.prototype.addPage = addPage;
+	iview.chapter.View.prototype.initTree = initTree;
+	iview.chapter.View.prototype.selectNode = selectNode;
+})();
 
-				displayOut(startPoint.childNodes[window["index"+index]], index+1, lastShownLayer);
-				if (index >= lastShownLayer) {
-					clickChap([],startPoint.childNodes[window["index"+index]]);
-				}
+/********************************************************
+ ********************************************************
+ ********************************************************/
+/*
+ * @package iview.chapter.Controller
+ * @description Controller to Read in METS XML Documents and parsing them into internal representation
+ */
+iview.chapter.Controller = function(model, view, metsDoc) {
+	this._model = model || null;
+	this._view = view  || null;
+	this._metsDoc = metsDoc || null;
+	var that = this;
+	
+	this._model.onevent.attach(function(sender, args) { that._view.selectNode(args["new"]);});
+	this._view.onevent.attach(function(sender, args) { that._model.setSelected(args["new"]);});
+};
+
+( function() {
+	
+	/*
+	 * @description Iterate through the current Nodes childs and add them to the model. If some of these childs 
+	 *  contain it's own childs, getStructure is recursively executed for these as well 
+	 * @param metsNode the current Node which childs are added, if a branch is detected getStructure is called
+	 *  to iterate these branched entries
+	 * @param parentEntry Optional the Parent Node where to add the current entries within the parent 
+	 */
+	function generateModelFromMets(metsNode, parentEntry) {
+		var childNodes = metsNode.childNodes;
+		var label;
+		for (var i = 0; i < childNodes.length; i++) {
+			var child = childNodes[i];
+			var type = $(child).attr("TYPE").toLowerCase();
+			if (type != "page") {
+				//If we're on a branch, move the branch down and add all Elements at the current Position within it's parent
+				generateModelFromMets(child, parentEntry.addBranch({'label':$(child).attr("LABEL")}));			
+			} else {
+				//Just an ordinary Entry so add it to the current Level
+				label = ($(child).attr("LABEL") === undefined)? $(child).attr("DMDID"):$(child).attr("LABEL");
+				parentEntry.addPage({'label':label,'dmdid': $(child).attr("DMDID")});
 			}
 		}
 	}
 
-	function chapterSort() {
-		displayOutAllEntries(document.getElementById(id+"_content").firstChild, 0);
-		changePage(pageNumber);
+	/*
+	 *@description Starts the Reading Process of the METS file
+	 */	
+	function createModel() {
+		//As the Mets file can contain multiple structMap Tags find the one we're using
+		var structures = getNodes(this._metsDoc, "mets:structMap");
+		for (var i = 0; i < structures.length; i++) {
+			if ($(structures[i]).attr("TYPE").toLowerCase() == "logical") {
+				generateModelFromMets(structures[i], this._model);//Correct one found, start reading of Document
+				return;
+			}
+			alert("No Matching Structure Info was delivered with the given XML Document.")
+		}
 	}
-}
+	
+	/*
+	 * @description adds the given Element(a model Entry) to the View, if the supplied Element is a Branch, a new Branch within the view is created
+	 *  for all childs of the branch, buildTree is called recursively to add these Elements as well. If the Element is just an ordinary Page it' 
+	 *  added to View as Page
+	 * @param element Model Object which shall be added
+	 * @param parentElement View Object where element will be added to
+	 * @param view View where the element will be added to parentElement  
+	 */
+	function buildTree(element, parentElement, view) {
+		if (element.isChapter()) {
+			parentElement = view.addBranch({"label": element._entry.getLabel()}, parentElement);
+			jQuery.each(element.getEntries(), function(index, node) { buildTree(node, parentElement, view)});
+		} else {
+			view.addPage({"label": element.getLabel(), "dmdid": element.getID()}, parentElement);
+		}
+	}
+	
+	/*
+	 * @description this function is called to create and show(depending on the View) the controller connected Model to the User.
+	 */
+	function createView(parentID) {
+		var entries = this._model.getEntries();
+		var that = this;
+		//initialize tree structure
+		this._view.initTree();
+		//start creation Process for top Level Entries within List
+		jQuery.each(entries, function(index, entry){ buildTree(entry, that._view.getTree(), that._view)});
+		this._view.addTree(parentID);
+	}
+	
+	function showView(bool) {
+		this._view.visible(bool);
+	}
+	
+	/*
+	 * @description Starts the Reading Process of the given XML document, at the end the model is filled with all Data which the XML contained
+	 * @param document the XML Document which contains the METS Data which is read  
+	 */
+	function setDocument(metsDoc) {
+		this._metsDoc = metsDoc;	
+	}
+	
+	iview.chapter.Controller.prototype.createModel = createModel;
+	iview.chapter.Controller.prototype.setDocument = setDocument;
+	iview.chapter.Controller.prototype.createView = createView;
+	iview.chapter.Controller.prototype.showView = showView;
+})();

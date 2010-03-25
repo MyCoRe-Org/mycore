@@ -263,10 +263,14 @@
       <xsl:value-of select="$DampInViewer" />
       <xsl:text>;</xsl:text>
     </script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"/>
+    <!-- JQuery Framework -->
     <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/ManageEvents.js" />
     <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/EventUtils.js" />
     <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/PanoJS.js" />
     <!-- Viewer -->
+    <script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/Event.js"/>
+    <!-- Event Registration utility -->
     <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/XML.js" />
     <!--XML Funktionen-->
     <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/Utils.js" />
@@ -279,6 +283,8 @@
     <!--Blend Funktionen-->
     <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/cutOut.js" />
     <!--Ausschnittbildchen Klasse-->
+    <script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/jquery.tree/jquery.tree.min.js"/>
+    <!-- JQuery Tree Plugin -->
     <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/chapter.js" />
     <!--Chapter Klasse-->
     <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/overview.js" />
@@ -293,8 +299,6 @@
     <!--PageForm-->
     <script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/init.js"/>
     <!-- Init Funktionen -->
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"/>
-    <!-- Prototype Framework -->
     <script type="text/javascript">
       function addIviewProperty(viewID, propertyName, val) {
       if (typeof (Iview) == "undefined") eval("Iview = new Object()");

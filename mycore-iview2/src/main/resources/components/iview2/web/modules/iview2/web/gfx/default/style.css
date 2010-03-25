@@ -1,3 +1,36 @@
+/* LOCKED */
+.tree-default .locked li a { color:gray; }
+/* DOTS */
+.tree-default ul { background-position:6px 1px; background-repeat:repeat-y; background-image:url(data:image/gif;base64,R0lGODlhAgACAIAAAB4dGf///yH5BAEAAAEALAAAAAACAAIAAAICRF4AOw==); _background-image:url("dot_for_ie.gif"); *background-image:url("dot_for_ie.gif"); }
+.tree-default li { background-position:-64px -16px; background-repeat:no-repeat; background-image:url("jstree.png"); }
+/* NO DOTS */
+.tree-default .no_dots, .tree-default .no_dots ul { background:transparent; }
+.tree-default .no_dots li.leaf { background-image:none; background-color:transparent; }
+/* OPEN or CLOSED */
+.tree-default li.open { background:url("jstree.png") -32px -48px no-repeat; }
+.tree-default li.closed, #jstree-dragged.tree-default li li.open { background:url("jstree.png") -48px -32px no-repeat; }
+#jstree-marker { background-image:url("jstree.png"); }
+/* DEFAULT, HOVER, CLICKED, LOADING STATES */
+.tree-default li a, .tree-default li span { border-radius:3px; -moz-border-radius:3px; -webkit-border-radius:3px; }
+.tree-default li a:hover, .tree-default li a.hover, .tree-default li span { background: #e7f4f9; border:1px solid #d8f0fa; padding:0px 3px 0px 3px; }
+.tree-default li a.clicked, .tree-default li a.clicked:hover, .tree-default li span.clicked { background: #beebff; border:1px solid #99defd; padding:0px 3px 0px 3px; }
+/* ICONS */
+.tree-default ins { background-image:url("jstree.png"); background-position:0 0; background-repeat:no-repeat; }
+.tree-default ul li a.loading ins { background-image:url("throbber.gif") !important; background-position:0 0 !important; } /* UL is added to make selector stronger */
+.tree-default li a ins.forbidden { background-position:-16px -16px; }
+.tree-default .locked li a ins { background-position:0 -48px; }
+.tree-default li span ins { background-position:-16px 0; }
+.tree-default li.leaf ins { background:url("jstree.png") -16px -50px no-repeat;}
+#jstree-dragged.tree-default ins { background:url("jstree.png") -16px -32px no-repeat; }
+#jstree-dragged.tree-default ins.forbidden { background:url("jstree.png") -16px -16px no-repeat; }
+
+/* CONTEXT MENU */
+.tree-default-context a ins { background-image:url("jstree.png"); background-repeat:no-repeat; background-position:-64px -64px; }
+.tree-default-context a ins.create { background-position:0 -16px; }
+.tree-default-context a ins.rename { background-position:-16px 0px; }
+.tree-default-context a ins.remove { background-position:0 -32px; }
+
+
 /* Description for z-Index:
 	<10 outside the viewer (example: chapter -> 5);
 	10 - main viewerContainer
@@ -11,14 +44,7 @@
 	60 - MODUL: overview, is alone in foreground
 */
 
-/* Main Container to embedd in mycore */
-/* chapter above */
-.chapterContainer {
-	height:200px;
-	width:100%;
-	margin-bottom:5px;
-	z-index:5;
-}
+/* Main Container to embed in mycore */
 
 .viewerContainer {
 	position:relative;
@@ -965,104 +991,33 @@
 
 /* Chapter Overview */
 /* Main Div*/
-.chapter1 {
+.viewerContainer.max .chapter {
+	visibility:visible;
+}
+
+.viewerContainer.min .chapter {
+	visibility:hidden;
+}
+.chapter {
 	position: relative;
-	background-color: #efefef;
-	top: -200px;
 	left: 260px;
 	width: 400px;
 	height: 200px; /* also dynamic - setSize (design.xml) */
-	overflow: hidden;
+	display:none;
 	text-align:left;
 	font-weight:normal;
-	visibility: hidden;
 	z-index: 50;
 	opacity: 0.85;
-
 }
 
-.chapter1 .chapter1InPlace {
-	top: 0px;
-	left: 260px;
-}
-
-.chapter1 .chapter1OutPlace {
-	top: -200px;
-	left: 260px;
-}
-
-/* Content */
-.chapter1_content {
-	position: absolute;
-	top: 10px;
-	bottom: 10px;
-	left: 10px; /* gewisser Abstand besteht in jedem Fall (resultiert aus .chapter1 .chapter) */
-	right: 50px;
-	font-size: 14px;
-	/*line-height: 15px;*/
-	/*font-family: verdana, sans-serif;*/
-	cursor: pointer;
-	overflow: hidden;
-}
-
-/* Entries */
-.chapter1 .chapter {
-	position: relative;
-	display: none;
-	border-left: 1px solid #cccccc;
-	left: 10px;
-	right: 10px; /* Abstand zwischen Textende und dem rechten Rand des Content Div's ||| auch fuer Highlight ||| kein wirklicher Abstand nach rechts*/
-/*	z-index: 40;*/
-	background-color:#efefef;
-	overflow:hidden;
-	/*width:auto;*/
-	white-space:nowrap;
-	padding-left:3px;
-	color:#000000;
-}
-
-/* Entry Symbols */
-.chapter1 .pageImageSymbol {
-	position: relative;
-	top: 5px;
-	height: 11px;
-	width: 11px;
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -1170px -0px;
-	float: left;
-}
-.chapter1 .chapterImageSymbolMinus {
-	position: relative;
-	top: 5px;
-	height: 11px;
-	width: 11px;
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -1140px -0px;
-	float: left;
-}
-.chapter1 .chapterImageSymbolPlus {
-	position: relative;
-	top: 5px;
-	height: 11px;
-	width: 11px;
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -1110px -0px;
-	float: left;
-}
-
-/* hover & highlight */
-.chapter1 .hover {
-	background-color: #E2E6E9;
-}
-.chapter1 .highlight{
-	background-color: #85a6bc;
+ .content {
+ 	background-color: #efefef;
+ 	width:100%;
+ 	height:100%;
 }
 
 /* chapter Sort Button */
-.chapter1_chapSort {
+.chapter .chapSort {
 	position: absolute;
 	right: 29px;
 	top: 10px;
@@ -1072,179 +1027,6 @@
 	background-repeat: no-repeat;
 	background-position: -1080px -0px;
 	cursor: pointer;
-}
-
-/* Chapter Scrollbar Y */
-/*Main Container*/
-.scrollChapV {
-	position: absolute;
-	right:0px;
-	top:0px;
-	width:15px;
-}
-
-/* Up / Down - Buttons */
-.scrollChapV .start {
-	height:15px;
-	width:15px;
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -930px -0px;
-}
-.scrollChapV .end {
-	height:15px;
-	width:15px;
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -900px -0px;
-}
-
-/* ScrollArea Main */
-.scrollChapV .empty {
-	position:relative;
-	width:16px;
-}
-
-/* ScrollArea Single Parts */
-.scrollChapV .spaceStart {
-	height:0px;
-	width:0px;
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -1050px -0px;
-}
-.scrollChapV .eVertical {
-	position:relative;
-	background-image: url('scaled/chapter/eVertical.png');
-	background-repeat:repeat-y;
-	padding:0px;
-	margin:0px;
- 	height:100%;
- 	width:15px;
-	vertical-align: top;
-}
-.scrollChapV .spaceEnd {
-	height:0px;
-	width:0px;
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -1020px -0px;
-}
-
-/* ScrollBar Main */
-.scrollChapVBar {
-	position:absolute;
-}
-
-/* ScrollBar Single Parts */
-.scrollChapVBar .barStart {
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -990px -0px;
-	position:relative;
-	height: 2px;
-	margin: 0px;
-	padding: 0px;
-}
-.scrollChapVBar .vertical {
-	position:relative;
-	background-image: url('scaled/chapter/vertical.png');
-	background-repeat:repeat-y;
-	height:100%;
-	width: 15px;
-	margin: 0px;
-	padding: 0px;
-}
-.scrollChapVBar .barEnd {
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -960px -0px;
-	position:relative;
-	height: 2px;
-	margin: 0px;
-	padding: 0px;
-}
-
-/* Chapter Scrollbar Y */
-/*Main Container*/
-.scrollChapH {
-	position: absolute;
-	left:10px;
-	bottom:0px;
-	height:15px;
-}
-
-/* Up / Down - Buttons */
-.scrollChapH .start {
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -540px -0px;
-	width:15px;
-	height:15px;
-}
-.scrollChapH .end {
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -570px -0px;
-	width:15px;
-	height:15px;
-}
-
-/* Scroll Area */
-.scrollChapH .empty { /* Main Container */
-	position:relative;
-	height:15px;
-}
-.scrollChapH .spaceStart {
-}
-.scrollChapH .eHorizontal {
-	background-repeat:repeat-x;
-	background-image: url('scaled/scrollbars/eHorizontal.png');
-	position:relative;
-	padding:0px;
-	margin:0px;
-	width:100%;
-	height: 15px;
-}
-.scrollChapH .spaceEnd {
-}
-.scrollChapHBar { /* contains ScrollBar */
-	position:absolute;
-}
-
-/* ScrollBar */
-.scrollChapHBar .barStart {
-	/*background-repeat:repeat-y;*/
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -660px -0px;
-	position:relative;
-	float: left;
-	width: 2px;
-	height: 15px;
-	margin: 0px;
-	padding: 0px;
-}
-.scrollChapHBar .horizontal {
-	background-repeat:repeat-x;
-	background-image: url('scaled/scrollbars/horizontal.png');
-	position:relative;
-	float: left;
-	left:100%;
-	height:15px;
-	padding:0px;
-	margin:0px;
-}
-.scrollChapHBar .barEnd {
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -690px -0px;
-	position:relative;
-	float: left;
-	width: 2px;
-	height: 15px;
-	margin: 0px;
-	padding: 0px;
 }
 
 /* Page Overview */

@@ -72,7 +72,6 @@ function loadPage(viewID, callback) {
 		pageData=loadPageData(Iview[viewID].pagenumber - 1, true, viewID);
 	}
 	Iview[viewID].prefix  = findInArrayElement(pageData, "LOCTYPE", "URL").href;
-	
 	var imagePropertiesURL=Iview[viewID].baseUri[0]+"/"+viewID+"/"+findInArrayElement(pageData, "LOCTYPE", "URL").href+"/imageinfo.xml";
 	jQuery.ajax({
 		url: imagePropertiesURL,
@@ -542,29 +541,24 @@ function generateURL(viewID) {
 }
 
 function openChapterAndInitialize(major, viewID, button){
-	var chapter=document.getElementById("chapter1"+viewID);
-	if (chapter == null){
-			//background-image:url(image.png);
-			//background-position:-390px 0;
-			var oldClassName=button.className;
-			button.className+=" loading";
-			var start=new Date().getTime();
-			setTimeout(function(){
-				importChapter(viewID);
-				jQuery(Iview[viewID].chapter1.my.content).find(".chapter").each(function(index,element){
-					Iview[viewID].chapter1.toggleChapter(element);
-				});
-				updateModuls(viewID);
-				var end=new Date().getTime() - start;
-				var chapter=document.getElementById("chapter1"+viewID);
-				button.className=oldClassName;
-				if (typeof(console)!='undefined'){
-					var msg="import chapters took "+end+"ms"
-					console.log(msg);
-				}
-				openChapter(major, viewID);
-			}, 50);
-			return;
+	if (typeof Iview[viewID].chapter === 'undefined'){
+		//background-image:url(image.png);
+		//background-position:-390px 0;
+		var oldClassName=button.className;
+		button.className+=" loading";
+		var start=new Date().getTime();
+		setTimeout(function(){
+			importChapter(viewID);
+			updateModuls(viewID);
+			var end=new Date().getTime() - start;
+			button.className=oldClassName;
+			if (typeof(console)!='undefined'){
+				var msg="import chapters took "+end+"ms"
+				console.log(msg);
+			}
+			openChapter(major, viewID);
+		}, 50);
+		return;
 	} else {
 		openChapter(major, viewID);
 	}
@@ -578,24 +572,19 @@ function openChapter(major, viewID){
 		//alert(warnings[0])
 		return;
 	}
-	var chapter=document.getElementById("chapter1"+viewID);
-	if (chapter == null){
-		return;
-	}
+
 	//TODO Positionierung klappt bei WebKit nicht, da die irgendwie CSS nicht einlesen durch Chapter einbau in Viewer kÃƒÂ¶nnte das behoben werden
 	if (major) {
 		// für major (Button) always reaction
-		if (chapter.style.visibility == "hidden") {
-			chapter.style.visibility = "visible";
-			Iview[viewID].chapter1.showCurrentPageCenter(Iview[viewID].pagenumber);
-			blendings.slide("chapter1"+viewID, new Array(getStyle("chapter1"+viewID,"left"),0,getStyle("chapter1"+viewID,"left"),(chapter.offsetHeight)),5,5,0,new Array(), "");
+		if (!Iview[viewID].chapterActive) {//ADDED
 			Iview[viewID].chapterActive = true;
+			Iview[viewID].chapter.showView(Iview[viewID].chapterActive);//ADDED
 		} else {
-			blendings.slide("chapter1"+viewID, new Array(getStyle("chapter1"+viewID,"left"),0,getStyle("chapter1"+viewID,"left"),- (chapter.offsetHeight)),5,5,0,new Array(), "",  "document.getElementById('chapter1"+viewID+"').style.visibility = 'hidden';");
 			Iview[viewID].chapterActive = false;
+			Iview[viewID].chapter.showView(Iview[viewID].chapterActive);//ADDED
 		}
 	} else {
-		// nur dann einblenden, wenn es durch Modus ausgeblendet wurde
+/*		// nur dann einblenden, wenn es durch Modus ausgeblendet wurde
 		if (Iview[viewID].chapterActive && !Iview[viewID].overviewActive && Iview[viewID].maximized && chapter.style.visibility == "hidden") {
 			chapter.style.visibility = "visible";
 			Iview[viewID].chapter1.showCurrentPageCenter(Iview[viewID].pagenumber);
@@ -613,6 +602,7 @@ function openChapter(major, viewID){
 			chapter.style.top = getStyle(document.getElementById("chapter1"+viewID+"Out"), "top");
 		}
 		// last possible case (bool=false & vis=hidden) only for major
+		*/
 	}
 }
 
@@ -621,7 +611,6 @@ function openChapter(major, viewID){
 */
 function updateModuls(viewID) {
 	var viewerBean = Iview[viewID].viewerBean;
-	
 	// align/fit scrollbars
 	handleZoomScrollbars(viewID);
 	handleResizeScrollbars(viewID);
@@ -629,13 +618,15 @@ function updateModuls(viewID) {
 	// Actualize forward & backward Buttons
 	getElementsByClassName("BSE_forwardBehind "+viewID, "viewerContainer"+viewID, "div")[0].style.top = ((((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - 1)) * Iview[viewID].zoomScale) - toInt(getStyle(getElementsByClassName("BSE_forwardBehind "+viewID, "viewerContainer"+viewID, "div")[0],"height"))) / 2) + "px";
 	getElementsByClassName("BSE_backwardBehind "+viewID, "viewerContainer"+viewID, "div")[0].style.top = ((((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - 1)) * Iview[viewID].zoomScale) - toInt(getStyle(getElementsByClassName("BSE_backwardBehind "+viewID, "viewerContainer"+viewID, "div")[0],"height"))) / 2) + "px";
-
-	// Actualize Chapter
-	if (Iview[viewID].useChapter && typeof(Iview[viewID].chapter1)!=="undefined") {
-		Iview[viewID].chapter1.changePage(Iview[viewID].pagenumber);
-		//Iview[viewID].chapter1.posScroll(viewID);
-	}
 	
+	// Actualize Chapter
+	if (Iview[viewID].useChapter && !(typeof Iview[viewID].chapter === "undefined")) {
+		//prevent endless loop
+		Iview[viewID].chapterReaction = true;
+		Iview[viewID].chapter._model.setSelected(Iview[viewID].prefix);
+
+	}
+
 	// Actualize zoomBar
 	if (Iview[viewID].useZoomBar) {
 		Iview[viewID].zoomBar.setAmountLevel(Iview[viewID].zoomMax + 1);
@@ -733,26 +724,24 @@ function importCutOut(viewID) {
 @description calls the corresponding functions to create the chapter
 */
 function importChapter(viewID) {
-	// Chapter
-	Iview[viewID].chapter1 = new chapter("chapter1"+viewID, Iview[viewID].chapterParent);
-	var chapter1 = Iview[viewID].chapter1;
-	
-	chapter1.setViewID(viewID);
-	chapter1.setBookData(Iview[viewID].buchDaten);
-	chapter1.init("chapter1");
-	
-	// needed by IE
-	//TODO: muss wieder rein, wenn slide auch ohne fade geht
-	// blendings.setOpacity($("chapter1"+viewID),100);
-	if (chapDynResize) {
-		chapter1.setSize(null, chapter1.my.self.parentNode.offsetHeight * chapResizeMul + chapResizeAdd);
-	}
-	chapter1.useEffects(chapHover);
-	//chapter1.displayOutAllEntries(document.getElementById("chapter1"+viewID+"_content").firstChild, 0);
-	// Additional Listener
-	chapter1.addListener(chapter.PAGE_NUMBER, new function() { this.change = function(value) {
-		navigatePage(value, viewID);
-	}});
+	var chapModel = new iview.chapter.Model();
+	var chapView = new iview.chapter.View();
+	//Create Listener which changes after a Page click all needed informations within Viewer
+	chapModel.onevent.attach(function() {
+		if (Iview[viewID].chapterReaction) {
+			Iview[viewID].chapterReaction = false;
+			return;
+		}
+		Iview[viewID].chapterReaction = true;
+		Iview[viewID].prefix = arguments[1]["new"];
+		getPageNumberFromPic(viewID);
+		navigatePage(Iview[viewID].pagenumber, viewID);
+	});
+		
+	Iview[viewID].chapter = new iview.chapter.Controller(chapModel, chapView, Iview[viewID].buchDaten);
+	Iview[viewID].chapter.createModel();
+	Iview[viewID].chapter.createView("#viewerContainer"+viewID);
+	Iview[viewID].chapterReaction = false;
 }
 
 /*
@@ -878,8 +867,6 @@ function loading(viewID) {
 	splitHeader(viewID);
 	
 	style = styleFolderUri + styleName + "/";
-	//TODO gucken ob vars evtl wo anders geladen werden
-	//loadVars("../modules/iview2/web/" + style + "design.xml");//Laden der Informationen je nach entsprechendem Design
 	//retrieves the mets File depending on the fact if it's exists or it request a simple one
 
 	blendings.useEffects(blendEffects);
