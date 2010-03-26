@@ -44,9 +44,9 @@
     </notifiers>
   </ciManagement>
   <scm>
-    <connection>scm:svn:http://server.mycore.de/svn/mycore/trunk/</connection>
-    <developerConnection>scm:svn:https://server.mycore.de/svn/mycore/trunk/</developerConnection>
-    <url>http://www.mycore.de/viewvc/viewvc.cgi/mycore/trunk/</url>
+    <connection>scm:svn:http://server.mycore.de/svn/mycore/trunk/${project.artifactId}</connection>
+    <developerConnection>scm:svn:https://server.mycore.de/svn/mycore/trunk/${project.artifactId}</developerConnection>
+    <url>http://www.mycore.de/viewvc/viewvc.cgi/mycore/trunk/${project.artifactId}</url>
   </scm>
   <repositories>
     <repository>
@@ -150,9 +150,9 @@
       </plugin>
       <plugin>
         <!--
-        The tutorial on http://maven.apache.org/plugins/maven-checkstyle-plugin/examples/multi-module-config.html
-        does not work. Manually extracting the checkstyle.xml file from build-tools with maven-antrun-plugin. 
-         -->
+          The tutorial on http://maven.apache.org/plugins/maven-checkstyle-plugin/examples/multi-module-config.html does not work. Manually
+          extracting the checkstyle.xml file from build-tools with maven-antrun-plugin.
+        -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
@@ -196,6 +196,10 @@
         <configuration>
           <configLocation>${project.build.directory}/checkstyle-configuration.xml</configLocation>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>net.sf</groupId>
+        <artifactId>stat-scm</artifactId>
       </plugin>
     </plugins>
   </reporting>
@@ -571,4 +575,305 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+  <developers>
+    <!-- Essen -->
+    <developer>
+      <id>mcrfluet</id>
+      <name>Frank Lützenkirchen</name>
+      <organization>Universität Duisburg-Essen, Universitätsbibliothek</organization>
+      <email>luetzenkirchen (at) ub.uni-duisburg-essen.de</email>
+      <organizationUrl>http://www.uni-due.de/ub/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrkpont</id>
+      <name>Kerstin Ponten</name>
+      <organization>Universität Duisburg-Essen, Universitätsbibliothek</organization>
+      <email>ponten (at) ub.uni-duisburg-essen.de</email>
+      <organizationUrl>http://www.uni-due.de/ub/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>tester</role>
+        <role>Assistent to Coordination Office</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrhrich</id>
+      <name>Harald Richter</name>
+      <organization>Universität Duisburg-Essen, Universitätsbibliothek</organization>
+      <email>richter (at) ub.uni-duisburg-essen.de</email>
+      <organizationUrl>http://www.uni-due.de/ub/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <!-- Freiburg -->
+    <developer>
+      <id>mcrddege</id>
+      <name>Dr. Detlev Degenhardt</name>
+      <organization>Albert-Ludwigs-Universität Freiburg, Rechenzentrum</organization>
+      <email>detlev.degenhardt (at) rz.uni-freiburg.de</email>
+      <organizationUrl>http://portal.uni-freiburg.de/rz</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <!-- Hamburg -->
+    <developer>
+      <id>mcrkrebs</id>
+      <name>Kathleen Krebs</name>
+      <organization>Universität Hamburg, Informatik, Verteilte Systeme und Informationssysteme</organization>
+      <email>kkrebs (at) informatik.uni-hamburg.de</email>
+      <organizationUrl>http://www.informatik.uni-hamburg.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>coordination</role>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrwoelt</id>
+      <name>Dr. Wiebke Oeltjen</name>
+      <email>wiebke.oeltjen (at) rrz.uni-hamburg.de</email>
+      <timezone>+1</timezone>
+      <organization>Universität Hamburg, Regionales Rechenzentrum</organization>
+      <organizationUrl>http://www.rrz.uni-hamburg.de/</organizationUrl>
+      <roles>
+        <role>Head of Coordination Office</role>
+        <role>tester</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrhruem</id>
+      <name>Hinnerk Ruemenapf</name>
+      <email>hinnerk.ruemenapf (at) rrz.uni-hamburg.de</email>
+      <timezone>+1</timezone>
+      <organization>Universität Hamburg, Regionales Rechenzentrum</organization>
+      <organizationUrl>http://www.rrz.uni-hamburg.de/</organizationUrl>
+      <roles>
+        <role>programmer</role>
+      </roles>
+    </developer>
+    <!-- Jena -->
+    <developer>
+      <id>mcrbremi</id>
+      <name>Michael Brendel</name>
+      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
+      <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>programmer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrmeich</id>
+      <name>Matthias Eichner</name>
+      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
+      <email>matthias.eichner (at) uni-jena.de</email>
+      <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrmhegn</id>
+      <name>Mathias Hegner</name>
+      <organization>Friedrich-Schiller-Universität Jena, Universitätsrechenzentrum</organization>
+      <organizationUrl>http://www.urz.uni-jena.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrheinz</id>
+      <name>Philipp Heinze</name>
+      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
+      <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>programmer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrsherm</id>
+      <name>Silvio Hermann</name>
+      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
+      <email>s.hermann (at) uni-jena.de</email>
+      <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrckoch</id>
+      <name>Christoph Koch</name>
+      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
+      <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>programmer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrkuhnt</id>
+      <name>Nicky Kuhnt</name>
+      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
+      <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>programmer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrkynas</id>
+      <name>Clemens Kynast</name>
+      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
+      <email>clemens.kynast (at) uni-jena.de</email>
+      <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>programmer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrradic</id>
+      <name>Radi Radichev</name>
+      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
+      <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>programmer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrtchef</id>
+      <name>Thomas Scheffler</name>
+      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
+      <email>thomas.scheffler (at) uni-jena.de</email>
+      <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcratrap</id>
+      <name>Andreas Trappe</name>
+      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
+      <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrvuchi</id>
+      <name>Hu Chi Vu</name>
+      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
+      <email>chi (at) thulb.uni-jena.de</email>
+      <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <!-- Leipzig -->
+    <developer>
+      <id>mcrjkupf</id>
+      <name>Jens Kupferschmidt</name>
+      <email>kupferschmidt (at) rz.uni-leipzig.de</email>
+      <organization>Universität Leipzig, Universitätsrechenzentrum</organization>
+      <organizationUrl>http://wwwurz.uni-leipzig.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>developer</role>
+        <role>architect</role>
+      </roles>
+    </developer>
+    <!-- München -->
+    <developer>
+      <id>mcrhhelm</id>
+      <name>Heiko Helmbrecht</name>
+      <organization>TU München, Universitätsbibliothek</organization>
+      <organizationUrl>http://www.ub.tum.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrkramm</id>
+      <name>Matthias Kramm</name>
+      <organization>TU München, Universitätsbibliothek</organization>
+      <organizationUrl>http://www.ub.tum.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcraseif</id>
+      <name>Arne Seifert</name>
+      <organization>TU München, Universitätsbibliothek</organization>
+      <organizationUrl>http://www.ub.tum.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <!-- Münster -->
+    <developer>
+      <id>mcrwgres</id>
+      <name>Werner Greßhoff</name>
+      <organization>Westfälische Wilhelms-Universität Münster, Universitäts- und Landesbibliothek</organization>
+      <organizationUrl>http://www.ulb.uni-muenster.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrbsuse</id>
+      <name>Benno Süselbeck</name>
+      <organization>Westfälische Wilhelms-Universität Münster, Universitäts- und Landesbibliothek</organization>
+      <organizationUrl>http://www.ulb.uni-muenster.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <!-- Rostock -->
+    <developer>
+      <id>mcrsteph</id>
+      <name>Robert Stephan</name>
+      <organization>Universität Rostock, Universitätsbibliothek</organization>
+      <email>robert.stephan (at) uni-rostock.de</email>
+      <organizationUrl>http://www.ub.uni-rostock.de/ub/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrascha</id>
+      <name>Anja Schaar</name>
+      <organization>Universität Rostock, Universitätsbibliothek</organization>
+      <organizationUrl>http://www.ub.uni-rostock.de/ub/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+  </developers>
 </project>
