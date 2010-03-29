@@ -34,6 +34,7 @@ import java.util.zip.ZipFile;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
 import javax.imageio.stream.ImageOutputStream;
@@ -55,7 +56,14 @@ import org.mycore.services.iview2.MCRImage;
 public class MCRTileCombineServlet extends MCRServlet {
     private static final long serialVersionUID = 7924934677622546958L;
 
-    private ImageWriter imageWriter;
+    private ThreadLocal<ImageWriter> imageWriter = new ThreadLocal<ImageWriter>() {
+
+        @Override
+        protected ImageWriter initialValue() {
+            return ImageIO.getImageWritersBySuffix("jpeg").next();
+        }
+
+    };
 
     private JPEGImageWriteParam imageWriteParam;
 
@@ -66,21 +74,21 @@ public class MCRTileCombineServlet extends MCRServlet {
         super.init();
         imageWriteParam = new JPEGImageWriteParam(Locale.getDefault());
         try {
-            imageWriteParam.setProgressiveMode(JPEGImageWriteParam.MODE_DEFAULT);
+            imageWriteParam.setProgressiveMode(ImageWriteParam.MODE_DEFAULT);
         } catch (UnsupportedOperationException e) {
             LOGGER.warn("Your JPEG encoder does not support progressive JPEGs.");
         }
-        imageWriteParam.setCompressionMode(JPEGImageWriteParam.MODE_EXPLICIT);
+        imageWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
         imageWriteParam.setCompressionQuality(0.75f);
-        imageWriter = ImageIO.getImageWritersBySuffix("jpeg").next();
     }
 
     @Override
     protected void render(MCRServletJob job, Exception ex) throws Exception {
         try {
             String pathInfo = job.getRequest().getPathInfo();
-            if (pathInfo.startsWith("/"))
+            if (pathInfo.startsWith("/")) {
                 pathInfo = pathInfo.substring(1);
+            }
             final String zoomAlias = pathInfo.substring(0, pathInfo.indexOf('/'));
             pathInfo = pathInfo.substring(zoomAlias.length() + 1);
             final String derivate = pathInfo.substring(0, pathInfo.indexOf('/'));
@@ -89,10 +97,12 @@ public class MCRTileCombineServlet extends MCRServlet {
             File iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, imagePath);
             LOGGER.info("IView2 file: " + iviewFile.getAbsolutePath());
             int zoomLevel = 0;
-            if (zoomAlias.equals("MID"))
+            if (zoomAlias.equals("MID")) {
                 zoomLevel = 2;
-            if (zoomAlias.equals("MAX"))
+            }
+            if (zoomAlias.equals("MAX")) {
                 zoomLevel = 3;
+            }
             if (zoomLevel == 0) {
                 sendThumbnail(iviewFile, job.getResponse());
                 return;
@@ -109,12 +119,12 @@ public class MCRTileCombineServlet extends MCRServlet {
                     try {
                         ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(sout);
                         try {
-                            imageWriter.setOutput(imageOutputStream);
+                            imageWriter.get().setOutput(imageOutputStream);
                             //tile = addWatermark(scaleBufferedImage(tile));        
                             IIOImage iioImage = new IIOImage(combinedImage, null, null);
-                            imageWriter.write(null, iioImage, imageWriteParam);
+                            imageWriter.get().write(null, iioImage, imageWriteParam);
                         } finally {
-                            imageWriter.reset();
+                            imageWriter.get().reset();
                             imageOutputStream.close();
                         }
                     } finally {
