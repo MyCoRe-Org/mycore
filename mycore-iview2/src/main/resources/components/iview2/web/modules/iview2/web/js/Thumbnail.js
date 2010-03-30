@@ -782,7 +782,7 @@ function importPageInput(viewID, parentID) {
 }
 
 function importPageForm(viewID, parentID) {
-	if (!classIsUsed("BSE_pageForm1")) {
+	//if (!classIsUsed("BSE_pageForm1")) {
 		Iview[viewID].pageFormObj = new pageForm("BSE_pageForm"+viewID, parentID, "BSE_pageForm");
 		var pageFormObj = Iview[viewID].pageFormObj;
 		pageFormObj.setViewID(viewID);
@@ -792,9 +792,9 @@ function importPageForm(viewID, parentID) {
 	    		navigatePage(value, viewID);
 			}
 		});
-	} else {
+	/*} else {
 		Iview[viewID].pageFormObj.initNext();
-	}
+	}*/
 }
 
 /*

@@ -1,3 +1,5 @@
+var viewid;
+
 function initializeGraphic(viewID) {
 	Iview[viewID].zoomScale = 1;//init for the Zoomscale is changed within CalculateZoomProp
 	Iview[viewID].loaded = false;//indicates if the window is finally loaded
@@ -22,10 +24,7 @@ function initializeGraphic(viewID) {
 		// NOTE: MANDATORY! must return false so event does not propagate to well!
 		return false;
 	};*/
-	// Funktionalität erst im Vollbild, vorher Wechsel dorthin
-	PanoJS.mousePressedHandler = function(e) {
-			maximizeHandler(viewID);
-	}
+	
 	// Listener muessen benachrichtigt werden und Richtung korrekt gesetzt
 	PanoJS.keyboardMoveHandler = function(e) {
 		e = e ? e : window.event;
@@ -78,8 +77,9 @@ function initializeGraphic(viewID) {
 			} else
 			if ((e.DOM_VK_ESCAPE && e.keyCode == e.DOM_VK_ESCAPE) || e.keyCode == 27){
 				//ESC key pressed, e.DOM_VK_ESCAPE is undefined in Apple Safari
-				if (Iview[viewer.viewID].maximized)
+				if (Iview[viewer.viewID].maximized){
 					maximizeHandler(viewer.viewID);
+				}
 				eventHandled=true;
 			}
 		}
@@ -170,6 +170,9 @@ function initializeGraphic(viewID) {
 			  wird nur ausgeführt wenn Seite geladen ist, da ansonsten die Eigenschaften noch nicht vorhanden sind*/
 			if(Iview[viewID].loaded) {
 				var preLoadEl=document.getElementById('preload'+viewID);
+				//folgende beide IF-Anweisungen für IE
+				if(isNaN(this.x)) this.x = 0; 
+				if(isNaN(this.y)) this.y = 0;
 				preLoadEl.style.left = (this.x + motion.x) + "px";
 				preLoadEl.style.top = (this.y + motion.y) + "px";
 			}
@@ -286,7 +289,8 @@ function initializeGraphic(viewID) {
 //additions	
 		isloaded(tileImg, this.viewID);
 		//changes all not available Tiles to the blank one, so that no ugly Image not Found Pics popup.
-		tileImg.onerror = function () {this.src = Iview[this.viewID].viewerBean.cache['blank'].src; return true;};
+		//tileImg.onerror = function () {this.src = Iview[this.viewID].viewerBean.cache['blank'].src; return true;};
+		tileImg.onerror = function () {this.src = Iview[viewID].viewerBean.cache['blank'].src; return true;};
 //endadd
 	}
 //		alert("ViewerInit davor");
@@ -296,6 +300,11 @@ function initializeGraphic(viewID) {
 			reinitializeGraphic(viewID);
 		}
 	}
+	
+	PanoJS.mousePressedHandler = function(e) {
+			maximizeHandler(viewID);
+	}
+	
 }
 
 function reinitializeGraphic(viewID) {
@@ -391,9 +400,10 @@ function maximizeHandler(viewID) {
 		}
 		
 		// aktuellen Viewer hinzufuegen
-		document.getElementById("viewerParent").appendChild(Iview[viewID].VIEWER);
-		document.getElementById("viewerParent").id = null;
-		
+		//document.getElementById("viewerParent").appendChild(Iview[viewID].VIEWER);
+		//document.getElementById("viewerParent").id = null;
+		document.getElementById("viewerParent").insertBefore(Iview[viewID].VIEWER, currentPos);
+				
 		/*if (document.compatMode == "CSS1Compat") {
 			document.documentElement.style.overflow="auto";
 		} else {
@@ -432,8 +442,9 @@ function maximizeHandler(viewID) {
 		// Dokumenteninhalt sichern
 		Iview[viewID].DOCUMENT = new Array();
 		Iview[viewID].VIEWER = document.getElementById("viewerContainer"+viewID).parentNode.parentNode.parentNode.parentNode;
+		currentPos = Iview[viewID].VIEWER.nextSibling;
 		document.getElementById("viewerContainer"+viewID).parentNode.parentNode.parentNode.parentNode.parentNode.id = "viewerParent";
-		
+				
 		// Dokumenteninhalt loeschen
 		var index = 0;
 		while (document.body.firstChild) {

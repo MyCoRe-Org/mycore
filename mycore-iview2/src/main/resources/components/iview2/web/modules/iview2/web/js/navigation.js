@@ -4,6 +4,7 @@
 @param viewID
 @param arguments[2] if this one is set the loadPage Function will not be executed so no needless PageChange is called
 */
+
 function navigatePage(pNum, viewID) {
 	notifyListenerNavigate(pNum, viewID);
 	Iview[viewID].pagenumber = checkLastNextControls(pNum, viewID);
@@ -18,6 +19,10 @@ function navigatePage(pNum, viewID) {
 		loadPage(viewID);
 	} else
 		updateModuls(viewID);
+	
+	PanoJS.mousePressedHandler = function(e) {
+			maximizeHandler(viewID);
+	}/**/
 }
 
 /*
