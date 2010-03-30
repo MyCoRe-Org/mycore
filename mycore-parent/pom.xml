@@ -4,7 +4,7 @@
   <parent>
     <artifactId>mycore</artifactId>
     <groupId>org.mycore</groupId>
-    <version>3</version>
+    <version>4</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.mycore</groupId>
@@ -177,6 +177,28 @@
               </tasks>
             </configuration>
           </execution>
+          <execution>
+            <id>unpack-checkstyle-config</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <tasks>
+                <unjar dest="target">
+                  <patternset>
+                    <include name="org/mycore/checkstyle.xml" />
+                  </patternset>
+                  <first>
+                    <path refid="maven.plugin.classpath" />
+                  </first>
+                  <filtermapper>
+                    <replacestring from="org/mycore/checkstyle.xml" to="checkstyle-configuration.xml" />
+                  </filtermapper>
+                </unjar>
+              </tasks>
+            </configuration>
+          </execution>
         </executions>
         <dependencies>
           <!-- specify build-tools as first plugin dependency so unpacking (see above) goes a bit faster -->
@@ -186,6 +208,47 @@
             <version>1.0</version>
           </dependency>
         </dependencies>
+      </plugin>
+      <plugin>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>verify</phase>
+            <goals>
+              <goal>checkstyle</goal>
+            </goals>
+            <configuration>
+              <configLocation>${project.build.directory}/checkstyle-configuration.xml</configLocation>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-pmd-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>verify</phase>
+            <goals>
+              <goal>pmd</goal>
+              <goal>cpd</goal>
+            </goals>
+            <configuration>
+              <targetJdk>${java.target.version}</targetJdk>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>findbugs-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>verify</phase>
+            <goals>
+              <goal>findbugs</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
