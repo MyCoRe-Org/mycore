@@ -36,6 +36,7 @@ import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
+import org.jdom.Content;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -120,8 +121,8 @@ public class MCRData2Fields {
                 if (source.indexOf(fieldDef.getSource()) == -1) {
                     continue;
                 }
-                Element fragment = fieldDef.getXSL();
-                if (fragment != null) {
+                List<Content> fragment = fieldDef.getXSL();
+                if ((fragment != null) && (fragment.size() > 0)) {
                     fv.addContent(fragment);
                 }
             }

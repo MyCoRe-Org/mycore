@@ -27,6 +27,7 @@ import java.util.Hashtable;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.jdom.Content;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.output.XMLOutputter;
@@ -128,13 +129,13 @@ public class MCRFieldDef {
         objects = def.getAttributeValue("objects", (String) null);
         source = def.getAttributeValue("source");
         addable = "true".equals(def.getAttributeValue("addable"));
-
+        
         if (!fieldTable.contains(name)) {
             fieldTable.put(name, this);
         } else {
             throw new MCRException("Field \"" + name + "\" is defined repeatedly.");
         }
-        buildForEachXSL(def);
+        buildXSL(def);
     }
 
     /**
@@ -313,14 +314,17 @@ public class MCRFieldDef {
      * The stylesheet fragment to build values for this field from XML source
      * data
      */
-    private Element xsl;
+    private List<Content> xsl = new ArrayList<Content>();
 
     /** Returns a stylesheet to build values for this field from XML source data */
-    Element getXSL() {
+    List<Content> getXSL() {
         if (xsl == null) {
             return null;
         } else {
-            return (Element) xsl.clone();
+            List<Content> copy = new ArrayList<Content>();
+            for (Content content : xsl)
+                copy.add((Content) (content.clone()));
+            return copy;
         }
     }
 
@@ -328,62 +332,62 @@ public class MCRFieldDef {
      * Builds the stylesheet fragment to build values for this field from XML
      * source data
      */
-    private void buildForEachXSL(Element fieldDef) {
+    private void buildXSL(Element fieldDef) {
+        if (fieldDef.getContent().size() > 0)
+            xsl.addAll(fieldDef.cloneContent());
+
         String xpath = fieldDef.getAttributeValue("xpath");
-        if (xpath == null || xpath.trim().length() == 0) {
-            return;
+        if (xpath != null && xpath.trim().length() > 0) {
+            // <xsl:value-of select="{@value}" />
+            String valueExpr = fieldDef.getAttributeValue("value", "text()");
+            Element valueOf = new Element("value-of", MCRConstants.XSL_NAMESPACE);
+            valueOf.setAttribute("select", valueExpr);
+
+            // <name>value</name>
+            Element fieldValue = new Element(getName(), MCRConstants.MCR_NAMESPACE);
+            fieldValue.addContent(valueOf);
+
+            // <xsl:for-each select="{@xpath}">
+            Element forEach = new Element("for-each", MCRConstants.XSL_NAMESPACE);
+            forEach.setAttribute("select", xpath);
+            xsl.add(forEach);
+
+            Element current = fieldDef;
+            while (true) {
+                @SuppressWarnings("unchecked")
+                List<Namespace> namespaces = current.getAdditionalNamespaces();
+                for (Namespace ns : namespaces) {
+                    forEach.addNamespaceDeclaration(ns);
+                }
+                if (current.isRootElement()) {
+                    break;
+                } else {
+                    current = current.getParentElement();
+                }
+            }
+
+            if (MCRFieldDef.OBJECT_CATEGORY.equals(fieldDef.getAttributeValue("source"))) {
+                // current(): <format classid="DocPortal_class_00000006"
+                // categid="FORMAT0002"/>
+                // URI: classification:metadata:levels:parents:{class}:{categ}
+                Element forEach2 = new Element("for-each", MCRConstants.XSL_NAMESPACE);
+                forEach.addContent(forEach2);
+                String uri = "document(concat('classification:metadata:0:parents:',current()/@classid,':',current()/@categid))//category";
+                forEach2.setAttribute("select", uri);
+                forEach = forEach2;
+            }
+
+            forEach.addContent(fieldValue);
         }
 
         // <xsl:if test="contains(@objects,$objecType)">
-        if (objects != null) {
+        if ((objects != null) && (!xsl.isEmpty())) {
             Element xif = new Element("if", MCRConstants.XSL_NAMESPACE);
-            xif.setAttribute("test", "contains('" + objects.trim() + "',$objectType)");
-            xsl = xif;
+            xif.setAttribute("test", "contains(' " + objects.trim() + " ',concat(' ',$objectType,' '))");
+            xif.addContent(xsl);
+            xsl.clear();
+            xsl.add(xif);
         }
-
-        // <xsl:for-each select="{@xpath}">
-        Element forEach1 = new Element("for-each", MCRConstants.XSL_NAMESPACE);
-        forEach1.setAttribute("select", xpath);
-        if (xsl == null) {
-            xsl = forEach1;
-        } else {
-            xsl.addContent(forEach1);
-        }
-
-        Element current = fieldDef;
-        while (true) {
-            @SuppressWarnings("unchecked")
-            List<Namespace> namespaces = current.getAdditionalNamespaces();
-            for (Namespace ns : namespaces) {
-                xsl.addNamespaceDeclaration(ns);
-            }
-            if (current.isRootElement()) {
-                break;
-            } else {
-                current = current.getParentElement();
-            }
-        }
-
-        if (MCRFieldDef.OBJECT_CATEGORY.equals(fieldDef.getAttributeValue("source"))) {
-            // current(): <format classid="DocPortal_class_00000006"
-            // categid="FORMAT0002"/>
-            // URI: classification:metadata:levels:parents:{class}:{categ}
-            Element forEach2 = new Element("for-each", MCRConstants.XSL_NAMESPACE);
-            forEach1.addContent(forEach2);
-            String uri = "document(concat('classification:metadata:0:parents:',current()/@classid,':',current()/@categid))//category";
-            forEach2.setAttribute("select", uri);
-            forEach1 = forEach2;
-        }
-
-        // <name>value</name>
-        Element fieldValue = new Element(getName());
-        forEach1.addContent(fieldValue);
-
-        // <xsl:value-of select="{@value}" />
-        String valueExpr = fieldDef.getAttributeValue("value");
-        Element valueOf = new Element("value-of", MCRConstants.XSL_NAMESPACE);
-        valueOf.setAttribute("select", valueExpr);
-        fieldValue.addContent(valueOf);
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("---------- XSL for search field \"" + name + "\" ----------");
