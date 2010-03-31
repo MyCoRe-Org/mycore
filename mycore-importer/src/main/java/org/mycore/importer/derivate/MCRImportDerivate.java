@@ -2,9 +2,11 @@ package org.mycore.importer.derivate;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
@@ -201,10 +203,12 @@ public class MCRImportDerivate {
             filesElement.setAttribute("mainDoc", mainDoc);
         else
             LOGGER.warn("MCRImportDerivate '" + derivateId + "' hasn't a main document!");
-        Iterator<String> fileIterator = fileSet.iterator();
-        while (fileIterator.hasNext()) {
+        List<String> fileList = new ArrayList<String>();
+        fileList.addAll(fileSet);
+        Collections.sort(fileList);
+        for (String filePath : fileList) {
             Element fileElement = new Element("file");
-            fileElement.setText(fileIterator.next());
+            fileElement.setText(filePath);
             filesElement.addContent(fileElement);
         }
         rootElement.addContent(filesElement);
