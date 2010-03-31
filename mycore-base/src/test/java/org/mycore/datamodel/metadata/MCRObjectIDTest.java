@@ -5,6 +5,8 @@ import static org.junit.Assert.assertEquals;
 import java.io.File;
 import java.util.Date;
 
+import org.jdom.Document;
+import org.jdom.Element;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,6 +17,7 @@ public class MCRObjectIDTest extends MCRHibTestCase {
     private static final String BASE_ID = "MyCoRe_test";
 
     private static File storeBaseDir;
+    private static File svnBaseDir;
 
     @Override
     @Before
@@ -25,6 +28,11 @@ public class MCRObjectIDTest extends MCRHibTestCase {
         storeBaseDir.mkdir();
         setProperty("MCR.Metadata.Type.test", Boolean.TRUE.toString(), true);
         setProperty("MCR.Metadata.Store.BaseDir", storeBaseDir.getAbsolutePath(), true);
+        svnBaseDir = File.createTempFile(MCRObjectIDTest.class.getSimpleName()+"_svn", null);
+        svnBaseDir.delete();
+        svnBaseDir.mkdir();
+        String url = "file:///" + svnBaseDir.getAbsolutePath().replace('\\', '/');
+        setProperty("MCR.Metadata.Store.SVNBase", url, true);
     }
 
     @Override
@@ -32,6 +40,7 @@ public class MCRObjectIDTest extends MCRHibTestCase {
     public void tearDown() throws Exception {
         super.tearDown();
         recursiveDelete(storeBaseDir);
+        recursiveDelete(svnBaseDir);
     }
 
     /**
@@ -62,7 +71,7 @@ public class MCRObjectIDTest extends MCRHibTestCase {
         MCRObjectID id2 = new MCRObjectID();
         id2.setNextFreeId(BASE_ID);
         assertEquals("Second id should be int 2", 2, id2.getNumberAsInteger());
-        MCRXMLTableManager.instance().create(id2, new byte[] { 'A' }, new Date());
+        MCRXMLTableManager.instance().create(id2, new Document(new Element("test")), new Date());
         MCRObjectID id3 = new MCRObjectID();
         id3.setNextFreeId(BASE_ID);
         assertEquals("Second id should be int 3", 3, id3.getNumberAsInteger());
