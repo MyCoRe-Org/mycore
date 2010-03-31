@@ -255,7 +255,7 @@ public class ImporterTestCase extends MCRTestCase {
         assertEquals("test label", der1Element.getAttributeValue("label"));
         assertEquals("recordId_1", ((Attribute)XPath.selectSingleNode(der1Element, "linkmetas/linkmeta/@xlink:href")).getValue());
         assertEquals("pic1.jpg" ,((Attribute)XPath.selectSingleNode(der1Element, "files/@mainDoc")).getValue());
-        String filePath = ((Text)XPath.selectSingleNode(der1Element, "files/file/text()")).getValue();
+        String filePath = ((Text)XPath.selectSingleNode(der1Element, "files/file[1]/text()")).getValue();
         File file = new File(filePath);
         assertEquals(true, file.exists());
         assertEquals("pic1.jpg", file.getName());
