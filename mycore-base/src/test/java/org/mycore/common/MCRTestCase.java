@@ -1,6 +1,7 @@
 package org.mycore.common;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.junit.After;
 import org.junit.Before;
@@ -21,11 +22,9 @@ public class MCRTestCase {
      */
     @Before
     public void setUp() throws Exception {
-        if (System.getProperties().getProperty("MCR.Configuration.File") == null) {
-            properties = File.createTempFile("test", ".properties");
-            System.getProperties().setProperty("MCR.Configuration.File", properties.getAbsolutePath());
-        }
-        CONFIG = MCRConfiguration.instance();
+        
+    	initProperties ();
+    	CONFIG = MCRConfiguration.instance();
         boolean setProperty = false;
         if (isDebugEnabled()) {
             setProperty = setProperty("log4j.rootLogger", "DEBUG, stdout", false) ? true : setProperty;
@@ -47,6 +46,14 @@ public class MCRTestCase {
         }
     }
 
+    protected void initProperties () 
+    	throws IOException {
+    	if (System.getProperties().getProperty("MCR.Configuration.File") == null) {
+            properties = File.createTempFile("test", ".properties");
+            System.getProperties().setProperty("MCR.Configuration.File", properties.getAbsolutePath());
+        }//if
+    }//InitProperties
+    
     protected boolean setProperty(String key, String value, boolean overwrite) {
         String propValue = CONFIG.getProperties().getProperty(key);
         if (propValue == null || overwrite == true) {
