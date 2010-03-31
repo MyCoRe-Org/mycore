@@ -46,6 +46,12 @@ public class MCRTestCase {
         }
     }
 
+    /**
+     * Creates a temporary properties file if the system variable MCR.Configuration.File
+     * is not set.
+     * @throws IOException Thrown if the creation of the temporary properties file failed.
+     * @author Marcel Heusinger <marcel.heusinger[at]uni-due.de>
+     */
     protected void initProperties () 
     	throws IOException {
     	if (System.getProperties().getProperty("MCR.Configuration.File") == null) {
