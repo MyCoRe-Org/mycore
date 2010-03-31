@@ -95,8 +95,6 @@ public class MCRXMLTableManager {
     protected MCRXMLTableManager() {
         MCRConfiguration config = MCRConfiguration.instance();
 
-        defaultClass = config.getString("MCR.Metadata.Store.DefaultClass", "org.mycore.datamodel.ifs2.MCRVersioningMetadataStore");
-
         String pattern = config.getString("MCR.Metadata.ObjectID.NumberPattern", "0000000000");
         defaultLayout = pattern.length() - 4 + "-2-2";
 
@@ -104,15 +102,18 @@ public class MCRXMLTableManager {
         baseDir = new File(base);
         checkDir(baseDir, "base");
 
-        svnBase = config.getString("MCR.Metadata.Store.SVNBase", null);
-        if (svnBase != null && svnBase.startsWith("file:///")) {
-            try {
-                svnDir = new File(new URI(svnBase));
-            } catch (URISyntaxException ex) {
-                String msg = "Syntax error in MCR.Metadata.Store.SVNBase property: " + svnBase;
-                throw new MCRConfigurationException(msg, ex);
+        defaultClass = config.getString("MCR.Metadata.Store.DefaultClass", "org.mycore.datamodel.ifs2.MCRVersioningMetadataStore");
+        if ("org.mycore.datamodel.ifs2.MCRVersioningMetadataStore".equals(defaultClass)) {
+            svnBase = config.getString("MCR.Metadata.Store.SVNBase");
+            if (svnBase.startsWith("file:///")) {
+                try {
+                    svnDir = new File(new URI(svnBase));
+                } catch (URISyntaxException ex) {
+                    String msg = "Syntax error in MCR.Metadata.Store.SVNBase property: " + svnBase;
+                    throw new MCRConfigurationException(msg, ex);
+                }
+                checkDir(svnDir, "svn");
             }
-            checkDir(svnDir, "svn");
         }
     }
 
