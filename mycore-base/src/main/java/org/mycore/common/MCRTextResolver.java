@@ -1,9 +1,14 @@
 package org.mycore.common;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+
+import org.apache.log4j.Logger;
 
 /**
  * <p>
@@ -35,6 +40,64 @@ import java.util.Map;
  */
 public class MCRTextResolver {
 
+    private static final Logger LOGGER = Logger.getLogger(MCRTextResolver.class);
+
+    private static Map<String, Class<? extends Term>> termList;
+
+    /**
+     * Creates the term list for the text resolver and adds
+     * the default terms.
+     */
+    static {
+        termList = new Hashtable<String, Class<? extends Term>>();
+        try {
+            registerTerm(Variable.class);
+            registerTerm(Condition.class);
+            registerTerm(EscapeCharacter.class);
+        } catch(Exception exc) {
+            LOGGER.error(exc);
+        }
+    }
+
+    /**
+     * Register a new term. The resolver invokes the term via reflection.
+     * 
+     * @param termClass the term class to register. 
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     */
+    public static void registerTerm(Class<? extends Term> termClass) throws NoSuchMethodException, InvocationTargetException,
+            IllegalAccessException, InstantiationException {
+        Constructor<? extends Term> c = termClass.getConstructor(MCRTextResolver.class);
+        termList.put(c.newInstance(new MCRTextResolver()).getStartEnclosingString(), termClass);
+    }
+
+    /**
+     * Unregister a term.
+     * 
+     * @param termClass this class is unregistered
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     */
+    public static void unregisterTerm(Class<? extends Term> termClass) throws NoSuchMethodException, InvocationTargetException,
+            InstantiationException, IllegalAccessException {
+        Constructor<? extends Term> c = termClass.getConstructor(MCRTextResolver.class);
+        termList.remove(c.newInstance(new MCRTextResolver()).getStartEnclosingString());
+    }
+
+    /**
+     * Defines how deep the text is resolved.
+     * <li><b>Deep</b> - everything is resolved</li>
+     * <li><b>NoVariables</b> - the value of variables is not being resolved</li>
+     */
+    public enum ResolveDepth {
+        Deep, NoVariables
+    }
+
     /**
      * If MyCoRe properties are resolved. For example {MCR.basedir}.
      * By default this is true.
@@ -50,24 +113,36 @@ public class MCRTextResolver {
 
     protected List<String> unresolvedVariables;
 
+    protected ResolveDepth resolveDepth;
+
     /**
      * Creates a new text resolver. To add variables call
      * <code>addVariable</code>, otherwise only MyCoRe property
      * resolving is possible.
      */
     public MCRTextResolver() {
-        this(new Hashtable<String, String>());
+        this(new Hashtable<String, String>(), ResolveDepth.Deep);
+    }
+
+    public MCRTextResolver(Map<String, String> variablesTable) {
+        this(variablesTable, ResolveDepth.Deep);
+    }
+
+    public MCRTextResolver(ResolveDepth depth) {
+        this(new Hashtable<String, String>(), depth);
     }
 
     /**
      * Creates a new text resolver with a map of variables.
      * 
      * @param variablesTable a hash table of variables
+     * @param depth how deep the text is resolved
      */
-    public MCRTextResolver(Map<String, String> variablesTable) {
+    public MCRTextResolver(Map<String, String> variablesTable, ResolveDepth depth) {
         this.variablesTable = variablesTable;
-        resolvedVariables = new Hashtable<String, String>();
-        unresolvedVariables = new ArrayList<String>();
+        this.resolvedVariables = new Hashtable<String, String>();
+        this.unresolvedVariables = new ArrayList<String>();
+        this.resolveDepth = depth;
     }
 
     /**
@@ -101,6 +176,24 @@ public class MCRTextResolver {
      */
     public boolean containsVariable(String name) {
         return variablesTable.containsKey(name);
+    }
+
+    /**
+     * Sets the resolve depth.
+     * 
+     * @param resolveDepth defines how deep the text is resolved.
+     */
+    public void setResolveDepth(ResolveDepth resolveDepth) {
+        this.resolveDepth = resolveDepth;
+    }
+
+    /**
+     * Returns the current resolve depth.
+     * 
+     * @return resolve depth enumeration
+     */
+    public ResolveDepth getResolveDepth() {
+        return resolveDepth;
     }
 
     /**
@@ -142,22 +235,24 @@ public class MCRTextResolver {
     }
 
     /**
-     * Returns a new term in dependence of the . If no term is defined
-     * null is returned.
+     * Returns a new term in dependence of the current character (position of the text).
+     * If no term is defined null is returned.
      * 
      * @param c character to check the dependency
      * @return a term or null if no one found
      */
     private Term getTerm(String text, int pos) {
-        Term term = null;
-        if (text.startsWith(Variable.START_ENCLOSING_STRING, pos)) {
-            term = new Variable();
-        } else if (text.startsWith(Condition.START_ENCLOSING_STRING, pos)) {
-            term = new Condition();
-        } else if (text.startsWith(EscapeCharacter.START_ENCLOSING_STRING, pos)) {
-            term = new EscapeCharacter();
+        for(Entry<String, Class<? extends Term>> termEntry : termList.entrySet()) {
+            if(text.startsWith(termEntry.getKey(), pos)) {
+                try {
+                    Constructor<? extends Term> c = termEntry.getValue().getConstructor(MCRTextResolver.class);
+                    return  c.newInstance(this);
+                } catch(Exception exc) {
+                    LOGGER.error(exc);
+                }
+            }
         }
-        return term;
+        return null;
     }
 
     /**
@@ -273,9 +368,12 @@ public class MCRTextResolver {
      * <li>EscapeChar: \[</li>
      * </ul>
      * 
+     * You can write your own terms and add them to the text resolver. A sample is
+     * shown in the <code>MCRTextResolverTest</code> class.
+     * 
      * @author Matthias Eichner
      */
-    private abstract class Term {
+    public abstract class Term {
         /**
          * The string buffer within the term. For example: {<b>var</b>}. 
          */
@@ -349,8 +447,23 @@ public class MCRTextResolver {
             return termBuffer.toString();
         }
 
+        /**
+         * Implement this to define the start enclosing string for
+         * your term. The resolver searches in the text for this
+         * string, if found, the text is processed by your term.
+         * 
+         * @return the start enclosing string
+         */
         public abstract String getStartEnclosingString();
 
+        /**
+         * Implement this to define the end enclosing string for
+         * your term. You have to check manual in the
+         * <code>resolveInternal</code> method if the end of  
+         * your term is reached.
+         * 
+         * @return the end enclosing string
+         */
         public abstract String getEndEnclosingString();
     }
 
@@ -394,10 +507,13 @@ public class MCRTextResolver {
                 }
                 // resolve the content of the variable recursive
                 // to resolve all other internal variables, condition etc.
-                Text recursiveResolvedText = resolveText(value);
-                resolved = recursiveResolvedText.resolved;
+                if(resolveDepth != ResolveDepth.NoVariables) {
+                    Text recursiveResolvedText = resolveText(value);
+                    resolved = recursiveResolvedText.resolved;
+                    value = recursiveResolvedText.getValue();
+                }
                 // set the value of the variable
-                valueBuffer.append(recursiveResolvedText.getValue());
+                valueBuffer.append(value);
                 resolvedVariables.put(termBuffer.toString(), valueBuffer.toString());
                 return true;
             }
@@ -429,13 +545,14 @@ public class MCRTextResolver {
      * content in the squared brackets are ignored.
      */
     private class Condition extends Term {
-        public static final String START_ENCLOSING_STRING = "[";
 
-        public static final String END_ENCLOSING_STRING = "]";
+        public Condition() {
+            super();
+        }
 
         @Override
         protected boolean resolveInternal(String text, int pos) {
-            if (text.startsWith(END_ENCLOSING_STRING, pos)) {
+            if (text.startsWith(getEndEnclosingString(), pos)) {
                 return true;
             }
             termBuffer.append(text.charAt(pos));
@@ -452,12 +569,12 @@ public class MCRTextResolver {
 
         @Override
         public String getStartEnclosingString() {
-            return START_ENCLOSING_STRING;
+            return "[";
         }
 
         @Override
         public String getEndEnclosingString() {
-            return END_ENCLOSING_STRING;
+            return "]";
         }
     }
 
@@ -466,8 +583,10 @@ public class MCRTextResolver {
      * first character after the escape char is add to the term.
      */
     private class EscapeCharacter extends Term {
-        public static final String START_ENCLOSING_STRING = "\\";
 
+        public EscapeCharacter() {
+            super();
+        }
         @Override
         public boolean resolveInternal(String text, int pos) {
             return true;
@@ -483,7 +602,7 @@ public class MCRTextResolver {
 
         @Override
         public String getStartEnclosingString() {
-            return START_ENCLOSING_STRING;
+            return "\\";
         }
 
         @Override
@@ -497,6 +616,9 @@ public class MCRTextResolver {
      * a special one).
      */
     private class Text extends Term {
+        public Text() {
+            super();
+        }
         @Override
         public boolean resolveInternal(String text, int pos) {
             termBuffer.append(text.charAt(pos));

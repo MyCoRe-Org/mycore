@@ -5,6 +5,8 @@ import static org.junit.Assert.assertEquals;
 import java.util.Hashtable;
 
 import org.junit.Test;
+import org.mycore.common.MCRTextResolver.ResolveDepth;
+import org.mycore.common.MCRTextResolver.Term;
 
 public class MCRTextResolverTest extends MCRTestCase {
 
@@ -89,5 +91,55 @@ public class MCRTextResolverTest extends MCRTestCase {
         assertEquals("v1, v4", resolver.resolve("[{f1}][, {f2}][, {f3}][, {f4}]"));
         assertEquals(true, resolver.containsVariable("f1"));
         assertEquals(false, resolver.containsVariable("f2"));
+    }
+
+    @Test
+    public void resolveDepth() throws Exception {
+        MCRTextResolver resolver = new MCRTextResolver(ResolveDepth.Deep);
+        resolver.addVariable("var1", "test1 & [{var2}]");
+        resolver.addVariable("var2", "test2");
+        assertEquals("test1 & test2", resolver.resolve("{var1}"));
+        resolver.setResolveDepth(ResolveDepth.NoVariables);
+        assertEquals("test1 & [{var2}]", resolver.resolve("{var1}"));
+        assertEquals(ResolveDepth.NoVariables, resolver.getResolveDepth());
+    }
+
+    @Test
+    public void terms() throws Exception {
+        MCRTextResolver.registerTerm(UppercaseTerm.class);
+        MCRTextResolver resolver = new MCRTextResolver();
+        resolver.addVariable("var1", "test");
+        assertEquals("Das ist ein TEST.", resolver.resolveNext("Das ist ein${ {var1}}$."));
+        MCRTextResolver.unregisterTerm(UppercaseTerm.class);
+        assertEquals("Das ist ein$$.", resolver.resolveNext("Das ist ein${ {var1}}$."));
+    }
+
+    private static class UppercaseTerm extends Term {
+
+        public UppercaseTerm(MCRTextResolver resolver) {
+            resolver.super();
+        }
+
+        @Override
+        public String getEndEnclosingString() {
+            return "}$";
+        }
+
+        @Override
+        public String getStartEnclosingString() {
+            return "${";
+        }
+
+        @Override
+        protected boolean resolveInternal(String text, int pos) {
+            if (text.startsWith(getEndEnclosingString(), pos)) {
+                String value = termBuffer.toString().toUpperCase();
+                termBuffer = new StringBuffer(value);
+                return true;
+            }
+            char c = text.charAt(pos);
+            termBuffer.append(c);
+            return false;
+        }
     }
 }
