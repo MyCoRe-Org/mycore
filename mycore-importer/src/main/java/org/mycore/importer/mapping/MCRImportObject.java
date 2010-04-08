@@ -350,7 +350,7 @@ public class MCRImportObject {
                 errorMsg.append("Required metadata elements are missing:\n");
                 errorMsg.append(requiredMsg);
             }
-            LOGGER.error(errorMsg.toString());
+            LOGGER.warn(errorMsg.toString());
         }
         return valid;
     }

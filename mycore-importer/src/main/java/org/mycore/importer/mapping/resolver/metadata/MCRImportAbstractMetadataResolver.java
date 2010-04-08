@@ -250,8 +250,10 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
                 textBuffer.append(field.getValue());
             }
             if(textBuffer.length() > 0) {
-                Text text = new Text(textBuffer.toString());
-                saveToElement.addContent(text);
+                // do text resolving
+                String text = resolveValue(textBuffer.toString(), null);
+                // add text to element
+                saveToElement.addContent(new Text(text));
             }
             return;
         }

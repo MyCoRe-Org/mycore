@@ -32,7 +32,7 @@ public class MCRImportMetadataResolverManager {
      * by a type, a classname, and class object of
      * <code>MCRImportMetadataResolver</code>.
      */
-    private ArrayList<ResolverData<?>> resolverList;
+    private ArrayList<ResolverData<? extends MCRImportMetadataResolver>> resolverList;
 
     /**
      * Creates a new instance to handle metadata resolvers. For each import is only
@@ -49,7 +49,7 @@ public class MCRImportMetadataResolverManager {
      * Adds all default metadata resolvers to the resolver list.
      */
     private void addDefaultResolver() {
-        resolverList = new ArrayList<ResolverData<?>>();
+        resolverList = new ArrayList<ResolverData<? extends MCRImportMetadataResolver>>();
         resolverList.add( new ResolverData<MCRImportTextResolver>("text", "MCRMetaLangText", MCRImportTextResolver.class) );
         resolverList.add( new ResolverData<MCRImportBooleanResolver>("boolean", "MCRMetaBoolean", MCRImportBooleanResolver.class) );
         resolverList.add( new ResolverData<MCRImportClassificationResolver>("classification", "MCRMetaClassification", MCRImportClassificationResolver.class) );
@@ -69,7 +69,7 @@ public class MCRImportMetadataResolverManager {
      * @param resolverClass the real java implementation of the resolver
      */
     @SuppressWarnings("unchecked")
-    public void addToResolverTable(String type, String className, Class<?> resolverClass) {
+    public void addToResolverTable(String type, String className, Class<? extends MCRImportMetadataResolver> resolverClass) {
         resolverList.add( new ResolverData(type, className, resolverClass) );
     }
 

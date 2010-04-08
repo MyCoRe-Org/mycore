@@ -38,12 +38,11 @@ public class MCRImportClassificationMappingManager {
 
     public MCRImportClassificationMappingManager(File mappingDirectory) {
         if(!mappingDirectory.exists())
-            mappingDirectory.mkdir();
+            mappingDirectory.mkdirs();
         if(!mappingDirectory.isDirectory())
-            LOGGER.error(mappingDirectory + " is not a directory");
+            LOGGER.warn(mappingDirectory + " is not a directory");
         classMappingDir = mappingDirectory;
         init();
-        
     }
 
     /**

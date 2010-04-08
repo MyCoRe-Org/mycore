@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.mycore.common.MCRTextResolver;
+import org.mycore.common.MCRTextResolver.ResolveDepth;
 import org.mycore.importer.MCRImportField;
 
 /**
@@ -35,7 +36,7 @@ public class MCRImportFieldValueResolver {
         for(MCRImportField field : fieldList) {
             variablesTable.put(field.getId(), field.getValue());
         }
-        variableResolver = new MCRTextResolver(variablesTable);
+        variableResolver = new MCRTextResolver(variablesTable, ResolveDepth.NoVariables);
     }
 
     /**

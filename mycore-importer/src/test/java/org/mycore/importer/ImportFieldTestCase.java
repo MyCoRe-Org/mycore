@@ -17,8 +17,6 @@ public class ImportFieldTestCase extends MCRTestCase {
         MCRImportField field2 = new MCRImportField("f2", "v2");
         MCRImportField field3 = new MCRImportField("f3", "v3");
         MCRImportField field4 = new MCRImportField("f4", "v4 - {f1}");
-        MCRImportField field5 = new MCRImportField("f5", "[{f1}[_{e1}]]");
-        MCRImportField field6 = new MCRImportField("f6", "[[[[{f3}]]]]");
 
         MCRImportField fieldNum = new MCRImportField("num", "10");
         MCRImportField fieldAdd = new MCRImportField("add", "5");
@@ -29,8 +27,6 @@ public class ImportFieldTestCase extends MCRTestCase {
         fieldList.add(field2);
         fieldList.add(field3);
         fieldList.add(field4);
-        fieldList.add(field5);
-        fieldList.add(field6);
 
         fieldList.add(fieldNum);
         fieldList.add(fieldAdd);
@@ -41,11 +37,8 @@ public class ImportFieldTestCase extends MCRTestCase {
 
         assertEquals("v1", resolver.resolveFields("{f1}"));
         assertEquals("v2 & v3", resolver.resolveFields("{f2} & {f3}"));
-        assertEquals("v4 - v1", resolver.resolveFields("{f4}"));
-
+        assertEquals("v4 - {f1}", resolver.resolveFields("{f4}"));
         assertEquals("v1_v2", resolver.resolveFields("{f1}[_{f2}][_{e1}]"));
-        assertEquals("", resolver.resolveFields("{f5}"));
-        assertEquals("v3", resolver.resolveFields("{f6}"));
 
         assertEquals("[{v1}] \\", resolver.resolveFields("\\[\\{{f1}\\}\\] \\\\"));
 
@@ -54,9 +47,9 @@ public class ImportFieldTestCase extends MCRTestCase {
 
         assertEquals(0, resolver.getNotUsedFields().size());
         resolver = new MCRImportFieldValueResolver(fieldList);
-        resolver.resolveFields("{f1}, {f6}, {add}, {notInFieldList}");
-        // contains f1, f6, f3 and add
+        resolver.resolveFields("{f1}, {add}, {notInFieldList}");
+        // contains f2, f3, f4, num, x_10_5, x_10
         assertEquals(6, resolver.getNotUsedFields().size());
-        
+
     }
 }
