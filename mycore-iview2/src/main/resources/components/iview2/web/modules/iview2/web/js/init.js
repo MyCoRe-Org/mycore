@@ -489,8 +489,8 @@ function maximizeHandler(viewID) {
 				self.resetSlideMotion();
 				self.recenter(coords);
 			}
-			if (viewerBean.zoomLevel < viewerBean.maxZoomLevel) {
-				viewerBean.zoom(1);
+			if (self.zoomLevel < self.maxZoomLevel) {
+				self.zoom(1);
 				if (Iview[viewID].useZoomBar) Iview[viewID].zoomBar.moveBarToLevel(Iview[viewID].viewerBean.zoomLevel);
 			}
 		};

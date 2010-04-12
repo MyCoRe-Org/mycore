@@ -70,7 +70,7 @@ function nodeAttributes(node) {
 @param absolute depending on this Value the getNode will be interpreted as absolute or relative value to the current curpage
 @return  List of all Nodes with the given NodeName
 */
-function getNodes(xmlfile, nodeName/*, getNode, absolute*/) {
+function getNodes(xmlfile, nodeName) {
 	var nodes = xmlfile.getElementsByTagName(namespaceCheck(nodeName));
 	var nodeList = new Array();
 	for ( i = 0; i < nodes.length; i++) {
@@ -89,15 +89,6 @@ function getNodes(xmlfile, nodeName/*, getNode, absolute*/) {
 
 function getPageCount(res) {
 	return res.getElementsByTagName(namespaceCheck("mets:file")).length;
-}
-
-function loadVars(filename) {
-	var file = loadXML(filename);
-	var nodeList = getNodes(file, "var");
-	for (var i = 0; i < nodeList.length; i++) {
-		var name = nodeList[i].attributes.getNamedItem("name").value;
-		window.eval(nodeList[i].attributes.getNamedItem("name").value + " = " + checkType(nodeList[i])+"");
-	}
 }
 
 /*

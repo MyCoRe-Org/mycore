@@ -351,7 +351,9 @@ iview.chapter.View = function() {
 		var chapter = jQuery('<div>').addClass("chapter").appendTo(parent);
 		//Adding the Content area which holds the Tree
 		var content = jQuery('<div>').addClass("content").css("overflow", "auto").appendTo(chapter);
-		this._parent = jQuery(chapter);
+		this._parent = jQuery(chapter)
+			.mousewheel(function(event, delta) {//Add Mousescroll Capability to the View
+				that._parent[0].scrollTop = that._parent[0].scrollTop - delta*4;});
 		this._tree.init(content,this._treeData);
 		
 		//Add the collapse button and the functionality behind it
@@ -360,10 +362,6 @@ iview.chapter.View = function() {
 			that.selectNode(jQuery(that._selected).attr("dmdid"))
 		});
 
-		//Add Mousescroll Capability to the View
-		ManageEvents.addEventListener(this._parent[0],'mouseScroll', function(e) {
-			that._parent[0].scrollTop = that._parent[0].scrollTop - returnDelta(e).y*4;
-		});
 	}
 	
 	/*
@@ -403,7 +401,7 @@ iview.chapter.View = function() {
 		this.notifyOthers = false;
 		var that = this;
 		//Find the node we're searching for
-		var res = this._parent.find('li.leaf').filter(function(index, element) {return $(element).attr("dmdid") == nodeID});
+		var res = this._parent.find('li.leaf').filter(function(index, element) {return jQuery(element).attr("dmdid") == nodeID});
 		//Select all Returned entries(should be only one, else something within the METS Document
 		//or the Model is wrong..
 		jQuery.each(res, function(index, element) {that._tree.select_branch(element); that._selected = element});
@@ -503,18 +501,19 @@ iview.chapter.ModelProvider = function(metsDoc) {
 	 * @param parentEntry Optional the Parent Node where to add the current entries within the parent 
 	 */
 	function generateModelFromMets(metsNode, parentEntry) {
-		var childNodes = metsNode.childNodes;
+		//Filter all Entries which are no Elementnodes, as they're no "data"
+		var childNodes = jQuery(metsNode.childNodes).filter(function() {return this.nodeType == 1});
 		var label;
 		for (var i = 0; i < childNodes.length; i++) {
 			var child = childNodes[i];
-			var type = $(child).attr("TYPE").toLowerCase();
+			var type = jQuery(child).attr("TYPE").toLowerCase();
 			if (type != "page") {
 				//If we're on a branch, move the branch down and add all Elements at the current Position within it's parent
-				generateModelFromMets(child, parentEntry.addBranch({'label':$(child).attr("LABEL")}));			
+				generateModelFromMets(child, parentEntry.addBranch({'label':jQuery(child).attr("LABEL")}));			
 			} else {
 				//Just an ordinary Entry so add it to the current Level
-				label = ($(child).attr("LABEL") === undefined)? $(child).attr("DMDID"):$(child).attr("LABEL");
-				parentEntry.addPage({'label':label,'dmdid': $(child).attr("DMDID")});
+				label = (jQuery(child).attr("LABEL") === undefined)? jQuery(child).attr("DMDID"):jQuery(child).attr("LABEL");
+				parentEntry.addPage({'label':label,'dmdid': jQuery(child).attr("DMDID")});
 			}
 		}
 	}
@@ -528,7 +527,7 @@ iview.chapter.ModelProvider = function(metsDoc) {
 			//As the Mets file can contain multiple structMap Tags find the one we're using
 			var structures = getNodes(this._metsDoc, "mets:structMap");
 			for (var i = 0; i < structures.length; i++) {
-				if ($(structures[i]).attr("TYPE").toLowerCase() == "logical") {
+				if (jQuery(structures[i]).attr("TYPE").toLowerCase() == "logical") {
 					generateModelFromMets(structures[i], this._model);//Correct one found, start reading of Document
 					break;
 				}

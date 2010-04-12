@@ -265,6 +265,8 @@
     </script>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"/>
     <!-- JQuery Framework -->
+    <script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/jquery.mousewheel.min.js" />
+    <!-- JQuery Mousewheel support -->
     <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/ManageEvents.js" />
     <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/EventUtils.js" />
     <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/PanoJS.js" />
