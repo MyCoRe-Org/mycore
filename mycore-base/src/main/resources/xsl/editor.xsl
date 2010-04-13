@@ -310,13 +310,13 @@
   </xsl:variable>
  
   <td>
-    <a class="editorAnchor" name="rep{translate($var.new,'/@[]','____')}" />
     <xsl:for-each select="$rep">  
       <xsl:call-template name="cell">
         <xsl:with-param name="var"   select="$var.new" />
         <xsl:with-param name="pos"   select="$pos.new" />
       </xsl:call-template>
     </xsl:for-each>
+    <a class="editorAnchor" name="rep{translate($var.new,'/@[]','____')}" />
   </td>
 </xsl:template>
 
