@@ -64,7 +64,14 @@ public class MCRImportMetadata {
     public List<Element> getChilds() {
         return childList;
     }
-
+    /**
+     * Returns the tag of the metadata element
+     * 
+     * @return tag of the element
+     */
+    public String getTag() {
+        return tag;
+    }
     public String getClassName() {
         return className;
     }

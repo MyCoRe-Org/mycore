@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -66,6 +68,12 @@ public class MCRImportMappingManager {
     private List<MCRImportDerivate> derivateList;
 
     /**
+     * Contains all <code>MCRImportMappingProcessor</code> instances which
+     * are important for the current import process.
+     */
+    private Map<String, MCRImportMappingProcessor> processorMap;
+
+    /**
      * A list with all import ids where errors occur.
      */
     private List<String> errorList;
@@ -111,6 +119,9 @@ public class MCRImportMappingManager {
             return false;
         }
         this.mcrObjectList = mcrobjectsElement.getContent(new ElementFilter("mcrobject"));
+
+        // create the processor map as hash table
+        processorMap = new Hashtable<String, MCRImportMappingProcessor>();
 
         // create error object list
         this.errorList = new ArrayList<String>();
@@ -480,29 +491,44 @@ public class MCRImportMappingManager {
         // create the MCRImportObject instance
         MCRImportObject mcrObject = new MCRImportObject(dm);
 
+        // get the mapping processor
+        MCRImportMappingProcessor mappingProcessor = null;
+        String processorClassName = mappedObject.getAttributeValue("processor");
+        if(processorClassName != null)
+            mappingProcessor = getMappingProcessor(processorClassName);
+
         // preprocessing
-        String preProcessingClass = mappedObject.getAttributeValue("preprocessing");
-        if(preProcessingClass != null) {
-            MCRImportMappingProcessor processor = MCRImportMappingProcessorBuilder.createProcessorInstance(preProcessingClass);
-            if(processor != null)
-                processor.preProcessing(mcrObject, record);
-        }
+        if(mappingProcessor != null)
+            mappingProcessor.preProcessing(mcrObject, record);
 
         // go through every map element and map the containing fields
         @SuppressWarnings("unchecked")
         List<Element> fieldMappings = mappedObject.getContent(new ElementFilter("map"));
-        for(Element map : fieldMappings) {
+        for(Element map : fieldMappings)
             mapIt(mcrObject, record, map);
-        }
 
         // postprocessing
-        String postProcessingClass = mappedObject.getAttributeValue("postprocessing");
-        if(postProcessingClass != null) {
-            MCRImportMappingProcessor processor = MCRImportMappingProcessorBuilder.createProcessorInstance(postProcessingClass);
-            if(processor != null)
-                processor.postProcessing(mcrObject, record);
-        }
+        if(mappingProcessor != null)
+            mappingProcessor.postProcessing(mcrObject, record);
+
         return mcrObject;
+    }
+
+    /**
+     * Returns the <code>MCRImportMappingProcessor</code> instance for the className.
+     * The instances are stored in the <code>processorMap</code>. If no instance was found
+     * a new one is created and added to the map.
+     * 
+     * @param className the class name of the processor
+     * @return instance of <code>MCRImportMappingProcessor</code>
+     */
+    private MCRImportMappingProcessor getMappingProcessor(String className) {
+        MCRImportMappingProcessor processor = processorMap.get(className);
+        if(processor == null) {
+            processor = MCRImportMappingProcessorBuilder.createProcessorInstance(className);
+            processorMap.put(className, processor);
+        }
+        return processor;
     }
 
     /**
@@ -615,7 +641,7 @@ public class MCRImportMappingManager {
     public MCRImportConfig getConfig() {
         return config;
     }
-    
+
     /**
      * Returns a list with all import ids where the mapping causes error(s).
      * 

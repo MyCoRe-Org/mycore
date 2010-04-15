@@ -24,9 +24,10 @@ public class MCRImportMetadataMapper extends MCRImportAbstractMapper {
             Element metadataChild = new Element(map.getAttributeValue("to"));
             if(resolver.resolve(map, fields, metadataChild)) {
                 MCRImportMetadata metadataObject = importObject.addMetadataChild(metadataChild);
+                // resolve enclosing attributes
                 if(resolver instanceof MCRImportAbstractMetadataResolver) {
-                    Hashtable<String, String> parentAttributes = ((MCRImportAbstractMetadataResolver)resolver).getParentAttributes();
-                    metadataObject.addAttributeMap(parentAttributes);
+                    Hashtable<String, String> enclosingAttributes = ((MCRImportAbstractMetadataResolver)resolver).getEnclosingAttributes();
+                    metadataObject.addAttributeMap(enclosingAttributes);
                 }
             }
         }

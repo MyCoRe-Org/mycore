@@ -59,8 +59,8 @@ public class MCRImportMultiDataMapper extends MCRImportAbstractMapper {
             if(metadataResolver.resolve(map, internalFieldList, metadataChild)) {
                 MCRImportMetadata metadataObject = importObject.addMetadataChild(metadataChild);
                 if(metadataResolver instanceof MCRImportAbstractMetadataResolver) {
-                    Hashtable<String, String> parentAttributes = ((MCRImportAbstractMetadataResolver)metadataResolver).getParentAttributes();
-                    metadataObject.addAttributeMap(parentAttributes);
+                    Hashtable<String, String> enclosingAttributes = ((MCRImportAbstractMetadataResolver)metadataResolver).getEnclosingAttributes();
+                    metadataObject.addAttributeMap(enclosingAttributes);
                 }
             }
         }

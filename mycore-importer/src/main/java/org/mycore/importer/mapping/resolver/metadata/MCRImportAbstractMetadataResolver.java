@@ -3,6 +3,7 @@ package org.mycore.importer.mapping.resolver.metadata;
 import java.util.Hashtable;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -22,10 +23,12 @@ import org.mycore.importer.mapping.resolver.MCRImportFieldValueResolver;
  */
 public abstract class MCRImportAbstractMetadataResolver implements MCRImportMetadataResolver {
 
+    private static final Logger LOGGER = Logger.getLogger(MCRImportAbstractMetadataResolver.class);
+
     protected Element map;
     protected MCRImportFieldValueResolver fieldResolver;
 
-    protected Hashtable<String, String> parentAttributes;
+    protected Hashtable<String, String> enclosingAttributes;
 
     /**
      * The return element.
@@ -40,9 +43,9 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
         this.map = map;
         this.fieldResolver = new MCRImportFieldValueResolver(fieldList);
         this.saveToElement = saveToElement;
-        this.parentAttributes = new Hashtable<String, String>();
-        // parent attributes
-        resolveParentAttributes(map);
+        this.enclosingAttributes = new Hashtable<String, String>();
+        // enclosing attributes
+        resolveEnclosingAttributes(map);
         // attributes
         if(hasAttributes());
             resolveAttributes(map, saveToElement);
@@ -103,29 +106,29 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
     }
 
     /**
-     * Returns all attributes from the sourrounding metadata element.
+     * Returns all attributes from the surrounding metadata element.
      * 
-     * @return a hastable of all attributes
+     * @return a hash table of all attributes
      */
-    public Hashtable<String, String> getParentAttributes() {
-        return parentAttributes;
+    public Hashtable<String, String> getEnclosingAttributes() {
+        return enclosingAttributes;
     }
 
     /**
-     * Resolves the attributes of the surrounding metadata element. That could
+     * Resolves the attributes of the enclosing metadata element. That could
      * be something like:
      * <p>
      * &lt;names class="MCRMetaXML" <b>form="plain"</b>&gt;
      * ...
      * &lt;/names&gt;
      * </p>
-     * To define a parent attribute in your mapping file use the 'parentAttributes'-
+     * To define a parent attribute in your mapping file use the 'enclosingAttributes'-
      * and the 'attribute'-element. For example:
      * <p>
      * &lt;map fields="vorname,nachname" to="names"&gt;</br>
-     * <b>&nbsp;&nbsp;&lt;parentAttributes&gt</br>
+     * <b>&nbsp;&nbsp;&lt;enclosingAttributes&gt</br>
      * &nbsp;&nbsp;&nbsp;&nbsp;&lt;attribute name="form" value="plain" /&gt;</br>
-     * &nbsp;&nbsp;&lt;/parentAttributes&gt</b></br>
+     * &nbsp;&nbsp;&lt;/enclosingAttributes&gt</b></br>
      * &nbsp;&nbsp;&lt;text value="{nachname}, {vorname}" /&gt;</br>
      * &lt;/map&gt;
      * </p>
@@ -133,15 +136,21 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
      * @param fromElement the source element where the attribute mapping informations are set
      */
     @SuppressWarnings("unchecked")
-    public void resolveParentAttributes(Element fromElement) {
-        Element parentAttributesElement = fromElement.getChild("parentAttributes");
-        if(parentAttributesElement == null)
-            return;
-        List<Element> attributes = parentAttributesElement.getChildren("attribute");
+    public void resolveEnclosingAttributes(Element fromElement) {
+        Element enclosingAttributesElement = fromElement.getChild("enclosingAttributes");
+        if(enclosingAttributesElement == null) {
+            // try old parent
+            enclosingAttributesElement = fromElement.getChild("parentAttributes");
+            if(enclosingAttributesElement == null)
+                return;
+            else
+                LOGGER.warn("The use of parentAttributes is deprecated. Use enclosingAttributes instead.");
+        }
+        List<Element> attributes = enclosingAttributesElement.getChildren("attribute");
         for(Element attributeElement : attributes) {
             Attribute attr = resolveAttribute(attributeElement);
             if(attr != null)
-                parentAttributes.put(attr.getName(), attr.getValue());
+                enclosingAttributes.put(attr.getName(), attr.getValue());
         }
     }
 

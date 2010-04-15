@@ -13,8 +13,7 @@ import org.mycore.importer.mapping.datamodel.MCRImportDatamodel;
 /**
  * <p>
  * The import object is an abstraction of the </code>MCRObject</code>.
- * It has an id, a label, a parent, a list of children and a
- * list of meta data elements.
+ * It has an id, a label, a parent and a list of meta data elements.
  * </p><p>
  * A <code>MCRImportObject</code> always depends on a
  * <code>MCRImportDatamodel<code>. This is necessary for adding meta data
@@ -239,8 +238,8 @@ public class MCRImportObject {
      * &lt;title xml:lang="de" form="plain"&gt;Sample title&lt;/title&gt;
      * </p>
      * 
-     * @param metadataChild
-     * @return
+     * @param metadataChild the child to add
+     * @return the added <code>MCRImportMetadata</code>
      */
     public MCRImportMetadata addMetadataChild(Element metadataChild) {
         String tag = metadataChild.getName();
@@ -259,11 +258,23 @@ public class MCRImportObject {
     }
 
     /**
+     * Adds a new <code>MCRImportMetadata</code> element to the object.
+     * If a metadata object with the same tag already exists its overwritten.
+     * 
+     * @param metadata the metadata to add
+     * @return the previous <code>MCRImportMetadata</code> of the specified key in this hashtable,
+     * or null if it did not have one 
+     */
+    public MCRImportMetadata addImportMetadata(MCRImportMetadata metadata) {
+        return metadataTable.put(metadata.getTag(), metadata);
+    }
+
+    /**
      * Returns a <code>MCRImportMetadata</code> object from the internal
      * metadata table. If no metadata with the specified name is found,
      * null is returned.
      * 
-     * @param metadataName name of the metadata element
+     * @param metadataName name of the metadata element (e.g. title not def.title!)
      * @return instance of <code>MCRImportMetadata</code>
      */
     public MCRImportMetadata getMetadata(String metadataName) {
