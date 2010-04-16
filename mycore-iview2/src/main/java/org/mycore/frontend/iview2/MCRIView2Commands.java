@@ -161,7 +161,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         }
         //structure and metadata checks
         int tilesCount = iviewImage.size() - 1; //one for metadata
-        if (props.getCountTiles() != tilesCount) {
+        if (props.getTilesCount() != tilesCount) {
             LOGGER.warn("Metadata tile count does not match stored tile count: " + iviewFile.getAbsolutePath());
             tileImage(derivate, absoluteImagePath);
             return;

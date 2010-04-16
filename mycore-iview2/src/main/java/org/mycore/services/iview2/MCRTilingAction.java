@@ -32,7 +32,7 @@ public class MCRTilingAction implements Runnable {
                 image.setStatus(MCRJobState.FIN);
                 image.setHeight(picProps.height);
                 image.setWidth(picProps.width);
-                image.setTiles(picProps.countTiles);
+                image.setTiles(picProps.tilesCount);
                 image.setZoomLevel(picProps.zoomlevel);
             } catch (IOException e) {
                 LOGGER.error("IOException occured while tiling a queued picture", e);
