@@ -108,15 +108,10 @@ iview.chapter.Model = function(element) {
  * @description
  */
 iview.chapter.METSEntry = function(labl) {
-	this._chapter = false;
 	this._parent = null;
 };
 
 iview.chapter.METSEntry.prototype = {
-	isChapter: function() {
-		return this._chapter;
-	},
-	
 	setLabel: function(labl) {
 		this._label = labl;
 	},
@@ -150,9 +145,19 @@ iview.chapter.METSPage = function(labl, id, parent) {
 	function getID() {
 		return this._id;
 	}
+
+	function setLabel(labl) {
+		this._label = labl;
+	}
+		
+	function getLabel() {
+		return this._label;
+	}
 	
 	iview.chapter.METSPage.prototype.setID = setID;
 	iview.chapter.METSPage.prototype.getID = getID;
+	iview.chapter.METSPage.prototype.getLabel = getLabel;
+	iview.chapter.METSPage.prototype.setLabel = setLabel;
 })();
 
 /*
@@ -251,7 +256,7 @@ iview.chapter.METSChapter = function(entry, parent) {
  * @description View to Display Data as jQuery Tree
  */
 iview.chapter.View = function() {
-	this._treeData;//Stores the Treedata to display(the jsTree Model) 
+	this._treeData;//Stores the Treedata to display(the jsTree Model)
 	this._visible = false;
 	this._tree = jQuery.tree.create();//The jsTree
 	this._selected = null;//stores the currently selected page and enables reset if Chapters will be selected
@@ -361,7 +366,6 @@ iview.chapter.View = function() {
 			that._tree.close_all();
 			that.selectNode(jQuery(that._selected).attr("dmdid"))
 		});
-
 	}
 	
 	/*
@@ -445,7 +449,7 @@ iview.chapter.Controller = function(modelProvider, view, metsDoc) {
 	 * @param view View where the element will be added to parentElement  
 	 */
 	function buildTree(element, parentElement, view) {
-		if (element.isChapter()) {
+		if (element instanceof iview.chapter.METSChapter) {
 			parentElement = view.addBranch({"label": element._entry.getLabel()}, parentElement);
 			jQuery.each(element.getEntries(), function(index, node) { buildTree(node, parentElement, view)});
 		} else {
