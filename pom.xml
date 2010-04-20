@@ -3,15 +3,22 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
+    <artifactId>mycore</artifactId>
     <groupId>org.mycore</groupId>
-    <artifactId>mycore-parent</artifactId>
-    <version>2.0.90-SNAPSHOT</version>
-    <relativePath>mycore-parent/pom.xml</relativePath>
+    <version>4</version>
   </parent>
-  <artifactId>mycore-multi</artifactId>
+  <groupId>org.mycore</groupId>
+  <artifactId>mycore-parent</artifactId>
   <packaging>pom</packaging>
-  <name>MyCoRe</name>
-  <url>http://www.mycore.org/generated/${project.version}</url>
+  <version>2.0.90-SNAPSHOT</version>
+  <name>MyCoRe Parent POM</name>
+  <!--
+    Keep the description on a single line. Otherwise Maven might generate a corrupted MANIFEST.MF (see
+    http://jira.codehaus.org/browse/MJAR-4)
+  -->
+  <description>MyCoRe is a system for the development of document and publication servers, applications, archives, collections of images or
+    similar repositories. On MyCoRe-based applications use a common core, which are typically required for such applications functionality
+    as metadata management, search, OAI interface, an image viewer module.</description>
   <distributionManagement>
     <site>
       <id>MyCoRe HQ</id>
@@ -19,11 +26,231 @@
       <url>scp://server.mycore.de/mcr/mycore.de/generated/${project.version}</url>
     </site>
   </distributionManagement>
+  <ciManagement>
+    <system>hudson</system>
+    <url>http://www.mycore.org/hudson/job/MyCoRe/</url>
+    <notifiers>
+      <notifier>
+        <type>mail</type>
+        <configuration>
+          <recipients>mycore-developer@lists.sourceforge.net</recipients>
+        </configuration>
+        <sendOnError>true</sendOnError>
+        <sendOnFailure>true</sendOnFailure>
+        <sendOnSuccess>true</sendOnSuccess>
+        <sendOnWarning>true</sendOnWarning>
+      </notifier>
+    </notifiers>
+  </ciManagement>
   <scm>
     <connection>scm:svn:http://server.mycore.de/svn/mycore/trunk</connection>
     <developerConnection>scm:svn:https://server.mycore.de/svn/mycore/trunk</developerConnection>
     <url>http://www.mycore.de/viewvc/viewvc.cgi/mycore/trunk</url>
   </scm>
+  <repositories>
+    <repository>
+      <id>MyCoRe HQ</id>
+      <url>http://www.mycore.de/artifactory/mycore-releases</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>MyCoRe HQ Snapshots</id>
+      <url>http://www.mycore.de/artifactory/mycore-snapshots</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+  <properties>
+    <java.target.version>1.6</java.target.version>
+    <uniqueVersion>false</uniqueVersion>
+    <hibernate.version>3.3.2.GA</hibernate.version>
+    <lucene.version>3.0.1</lucene.version>
+  </properties>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>2.6.1</version>
+          <configuration>
+            <source>${java.target.version}</source>
+            <groups>
+              <group>
+                <title>MyCoRe Datamodel</title>
+                <packages>org.mycore.datamodel*</packages>
+              </group>
+              <group>
+                <title>MyCoRe Persistence Backend Implementations</title>
+                <packages>org.mycore.backend*</packages>
+              </group>
+              <group>
+                <title>MyCoRe User Interface Frontend</title>
+                <packages>org.mycore.frontend*</packages>
+              </group>
+              <group>
+                <title>MyCoRe Common Functionality</title>
+                <packages>org.mycore.common*</packages>
+              </group>
+              <group>
+                <title>MyCoRe Services</title>
+                <packages>org.mycore.services*</packages>
+              </group>
+              <group>
+                <title>MyCoRe User and Group Management</title>
+                <packages>org.mycore.user*</packages>
+              </group>
+            </groups>
+            <tags>
+              <tag>
+                <name>hibernate.property</name>
+                <placement>X</placement>
+              </tag>
+              <tag>
+                <name>goal</name>
+                <placement>a</placement>
+              </tag>
+              <tag>
+                <name>phase</name>
+                <placement>a</placement>
+              </tag>
+            </tags>
+            <links>
+              <link>http://java.sun.com/javase/6/docs/api/</link>
+              <link>http://tomcat.apache.org/tomcat-5.5-doc/servletapi/</link>
+              <link>http://java.sun.com/xml/jaxp/dist/1.1/docs/api/</link>
+              <link>http://www.jdom.org/docs/apidocs</link>
+              <link>http://logging.apache.org/log4j/docs/api/</link>
+              <link>http://www.hibernate.org/hib_docs/v3/api/</link>
+              <link>http://lucene.apache.org/java/3_0_0/api/all/</link>
+            </links>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      <plugin>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>jar-no-fork</goal>
+              <goal>test-jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <!--
+          The tutorial on http://maven.apache.org/plugins/maven-checkstyle-plugin/examples/multi-module-config.html does not work. Manually
+          extracting the checkstyle.xml file from build-tools with maven-antrun-plugin.
+        -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>pre-site</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <tasks>
+                <unjar dest="target">
+                  <patternset>
+                    <include name="org/mycore/checkstyle.xml" />
+                  </patternset>
+                  <first>
+                    <path refid="maven.plugin.classpath" />
+                  </first>
+                  <filtermapper>
+                    <replacestring from="org/mycore/checkstyle.xml" to="checkstyle-configuration.xml" />
+                  </filtermapper>
+                </unjar>
+              </tasks>
+            </configuration>
+          </execution>
+          <execution>
+            <id>unpack-checkstyle-config</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <tasks>
+                <unjar dest="target">
+                  <patternset>
+                    <include name="org/mycore/checkstyle.xml" />
+                  </patternset>
+                  <first>
+                    <path refid="maven.plugin.classpath" />
+                  </first>
+                  <filtermapper>
+                    <replacestring from="org/mycore/checkstyle.xml" to="checkstyle-configuration.xml" />
+                  </filtermapper>
+                </unjar>
+              </tasks>
+            </configuration>
+          </execution>
+        </executions>
+        <dependencies>
+          <!-- specify build-tools as first plugin dependency so unpacking (see above) goes a bit faster -->
+          <dependency>
+            <groupId>org.mycore</groupId>
+            <artifactId>build-tools</artifactId>
+            <version>1.1</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+      <plugin>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>verify</phase>
+            <goals>
+              <goal>checkstyle</goal>
+            </goals>
+            <configuration>
+              <configLocation>${project.build.directory}/checkstyle-configuration.xml</configLocation>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-pmd-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>verify</phase>
+            <goals>
+              <goal>pmd</goal>
+              <goal>cpd</goal>
+            </goals>
+            <configuration>
+              <targetJdk>${java.target.version}</targetJdk>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>findbugs-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>verify</phase>
+            <goals>
+              <goal>findbugs</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
   <reporting>
     <plugins>
       <plugin>
@@ -89,10 +316,688 @@
           </reportSet>
         </reportSets>
       </plugin>
+      <plugin>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <configLocation>${project.build.directory}/checkstyle-configuration.xml</configLocation>
+        </configuration>
+      </plugin>
     </plugins>
   </reporting>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.mycore.iview2</groupId>
+        <artifactId>image-tiler</artifactId>
+        <version>1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.8.1</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.jdom</groupId>
+        <artifactId>jdom</artifactId>
+        <version>1.1</version>
+        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>jaxen</groupId>
+        <artifactId>jaxen</artifactId>
+        <version>1.1.1</version>
+        <scope>runtime</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>jdom</groupId>
+            <artifactId>jdom</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>xom</groupId>
+            <artifactId>xom</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>commons-vfs</groupId>
+        <artifactId>commons-vfs</artifactId>
+        <version>1.0</version>
+        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <!-- required for commons-vfs -->
+        <groupId>com.jcraft</groupId>
+        <artifactId>jsch</artifactId>
+        <version>0.1.41</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>jtidy-r8</artifactId>
+        <version>21122004</version>
+        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>1.4</version>
+        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.axis</groupId>
+        <artifactId>axis</artifactId>
+        <version>1.4</version>
+        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>com.sun.media</groupId>
+        <artifactId>jai-codec</artifactId>
+        <version>1.1.3</version>
+        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>javax.media</groupId>
+        <artifactId>jai-core</artifactId>
+        <version>1.1.3</version>
+        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>javax.media</groupId>
+        <artifactId>jai_imageio</artifactId>
+        <version>1.1</version>
+        <exclusions>
+          <exclusion>
+            <groupId>javax.media</groupId>
+            <artifactId>jai_core</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>1.2.15</version>
+        <optional>false</optional>
+        <exclusions>
+          <exclusion>
+            <groupId>com.sun.jdmk</groupId>
+            <artifactId>jmxtools</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.sun.jmx</groupId>
+            <artifactId>jmxri</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>javax.jms</groupId>
+            <artifactId>jms</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>dom4j</groupId>
+        <artifactId>dom4j</artifactId>
+        <version>1.6.1</version>
+        <optional>false</optional>
+        <exclusions>
+          <exclusion>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>commons-lang</groupId>
+        <artifactId>commons-lang</artifactId>
+        <version>2.5</version>
+        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.lucene</groupId>
+        <artifactId>lucene-core</artifactId>
+        <version>${lucene.version}</version>
+        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.lucene</groupId>
+        <artifactId>lucene-analyzers</artifactId>
+        <version>${lucene.version}</version>
+        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.lucene</groupId>
+        <artifactId>lucene-queries</artifactId>
+        <version>${lucene.version}</version>
+        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>xerces</groupId>
+        <artifactId>xercesImpl</artifactId>
+        <version>2.9.1</version>
+        <optional>false</optional>
+        <exclusions>
+          <exclusion>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>com.ibm.icu</groupId>
+        <artifactId>icu4j</artifactId>
+        <version>4.0.1</version>
+        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>javax.mail</groupId>
+        <artifactId>mail</artifactId>
+        <version>1.4.2</version>
+        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>javax.activation</groupId>
+        <artifactId>activation</artifactId>
+        <version>1.1.1</version>
+        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>xalan</groupId>
+        <artifactId>xalan</artifactId>
+        <version>2.7.0</version>
+        <optional>false</optional>
+        <exclusions>
+          <exclusion>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>commons-fileupload</groupId>
+        <artifactId>commons-fileupload</artifactId>
+        <version>1.2.1</version>
+        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>com.drewnoakes</groupId>
+        <artifactId>metadata-extractor</artifactId>
+        <version>2.4.0-beta1</version>
+        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>net.sf.javamusictag</groupId>
+        <artifactId>jid3lib</artifactId>
+        <version>0.5.4</version>
+        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.pdfbox</groupId>
+        <artifactId>pdfbox</artifactId>
+        <version>1.0.0</version>
+        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>org.tmatesoft.svnkit</groupId>
+        <artifactId>svnkit</artifactId>
+        <version>1.3.2</version>
+        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>net.java.dev.jna</groupId>
+        <artifactId>jna</artifactId>
+        <version>3.2.4</version>
+        <optional>true</optional>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>joda-time</groupId>
+        <artifactId>joda-time</artifactId>
+        <version>1.6</version>
+        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>axis</groupId>
+        <artifactId>axis-jaxrpc</artifactId>
+        <version>1.4</version>
+        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.xmlgraphics</groupId>
+        <artifactId>fop</artifactId>
+        <version>0.95-1</version>
+        <optional>false</optional>
+        <exclusions>
+          <exclusion>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis-ext</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.textmining</groupId>
+        <artifactId>tm-extractors</artifactId>
+        <version>0.4</version>
+        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.ws.security</groupId>
+        <artifactId>wss4j</artifactId>
+        <version>1.5.7</version>
+        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>net.sf.json-lib</groupId>
+        <artifactId>json-lib</artifactId>
+        <version>2.2.3</version>
+        <classifier>jdk15</classifier>
+        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>servlet-api</artifactId>
+        <version>2.4</version>
+        <scope>provided</scope>
+        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.avalon.framework</groupId>
+        <artifactId>avalon-framework-impl</artifactId>
+        <version>4.3.1</version>
+        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-core</artifactId>
+        <version>${hibernate.version}</version>
+        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.ant</groupId>
+        <artifactId>ant</artifactId>
+        <version>1.8.0</version>
+        <scope>provided</scope>
+        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>org.hsqldb</groupId>
+        <artifactId>hsqldb</artifactId>
+        <version>1.8.0.10</version>
+        <scope>test</scope>
+        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>net.sf.ehcache</groupId>
+        <artifactId>ehcache-core</artifactId>
+        <version>2.0.0</version>
+        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-jmx</artifactId>
+        <version>${hibernate.version}</version>
+        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+        <version>1.5.8</version>
+        <scope>runtime</scope>
+        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>javassist</groupId>
+        <artifactId>javassist</artifactId>
+        <version>3.11.0.GA</version>
+        <scope>runtime</scope>
+        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>ant-contrib</groupId>
+        <artifactId>ant-contrib</artifactId>
+        <version>1.0b3</version>
+        <optional>true</optional>
+        <exclusions>
+          <exclusion>
+            <groupId>ant</groupId>
+            <artifactId>ant</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>commons-discovery</groupId>
+        <artifactId>commons-discovery</artifactId>
+        <version>0.4</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>wsdl4j</groupId>
+        <artifactId>wsdl4j</artifactId>
+        <version>1.6.2</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.axis</groupId>
+        <artifactId>axis-saaj</artifactId>
+        <version>1.4</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.axis</groupId>
+        <artifactId>axis-ant</artifactId>
+        <scope>runtime</scope>
+        <version>1.4</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <developers>
+    <!-- Essen -->
+    <developer>
+      <id>mcrfluet</id>
+      <name>Frank Lützenkirchen</name>
+      <organization>Universität Duisburg-Essen, Universitätsbibliothek</organization>
+      <email>luetzenkirchen (at) ub.uni-duisburg-essen.de</email>
+      <organizationUrl>http://www.uni-due.de/ub/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrkpont</id>
+      <name>Kerstin Ponten</name>
+      <organization>Universität Duisburg-Essen, Universitätsbibliothek</organization>
+      <email>ponten (at) ub.uni-duisburg-essen.de</email>
+      <organizationUrl>http://www.uni-due.de/ub/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>tester</role>
+        <role>Assistent to Coordination Office</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrhrich</id>
+      <name>Harald Richter</name>
+      <organization>Universität Duisburg-Essen, Universitätsbibliothek</organization>
+      <email>richter (at) ub.uni-duisburg-essen.de</email>
+      <organizationUrl>http://www.uni-due.de/ub/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <!-- Freiburg -->
+    <developer>
+      <id>mcrddege</id>
+      <name>Dr. Detlev Degenhardt</name>
+      <organization>Albert-Ludwigs-Universität Freiburg, Rechenzentrum</organization>
+      <email>detlev.degenhardt (at) rz.uni-freiburg.de</email>
+      <organizationUrl>http://portal.uni-freiburg.de/rz</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <!-- Hamburg -->
+    <developer>
+      <id>mcrkrebs</id>
+      <name>Kathleen Krebs</name>
+      <organization>Universität Hamburg, Informatik, Verteilte Systeme und Informationssysteme</organization>
+      <email>kkrebs (at) informatik.uni-hamburg.de</email>
+      <organizationUrl>http://www.informatik.uni-hamburg.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>coordination</role>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrwoelt</id>
+      <name>Dr. Wiebke Oeltjen</name>
+      <email>wiebke.oeltjen (at) rrz.uni-hamburg.de</email>
+      <timezone>+1</timezone>
+      <organization>Universität Hamburg, Regionales Rechenzentrum</organization>
+      <organizationUrl>http://www.rrz.uni-hamburg.de/</organizationUrl>
+      <roles>
+        <role>Head of Coordination Office</role>
+        <role>tester</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrhruem</id>
+      <name>Hinnerk Ruemenapf</name>
+      <email>hinnerk.ruemenapf (at) rrz.uni-hamburg.de</email>
+      <timezone>+1</timezone>
+      <organization>Universität Hamburg, Regionales Rechenzentrum</organization>
+      <organizationUrl>http://www.rrz.uni-hamburg.de/</organizationUrl>
+      <roles>
+        <role>programmer</role>
+      </roles>
+    </developer>
+    <!-- Jena -->
+    <developer>
+      <id>mcrbremi</id>
+      <name>Michael Brendel</name>
+      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
+      <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>programmer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrmeich</id>
+      <name>Matthias Eichner</name>
+      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
+      <email>matthias.eichner (at) uni-jena.de</email>
+      <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrmhegn</id>
+      <name>Mathias Hegner</name>
+      <organization>Friedrich-Schiller-Universität Jena, Universitätsrechenzentrum</organization>
+      <organizationUrl>http://www.urz.uni-jena.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrheinz</id>
+      <name>Philipp Heinze</name>
+      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
+      <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>programmer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrsherm</id>
+      <name>Silvio Hermann</name>
+      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
+      <email>s.hermann (at) uni-jena.de</email>
+      <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrckoch</id>
+      <name>Christoph Koch</name>
+      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
+      <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>programmer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrkuhnt</id>
+      <name>Nicky Kuhnt</name>
+      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
+      <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>programmer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrkynas</id>
+      <name>Clemens Kynast</name>
+      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
+      <email>clemens.kynast (at) uni-jena.de</email>
+      <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>programmer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrradic</id>
+      <name>Radi Radichev</name>
+      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
+      <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>programmer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrtchef</id>
+      <name>Thomas Scheffler</name>
+      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
+      <email>thomas.scheffler (at) uni-jena.de</email>
+      <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcratrap</id>
+      <name>Andreas Trappe</name>
+      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
+      <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrvuchi</id>
+      <name>Hu Chi Vu</name>
+      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
+      <email>chi (at) thulb.uni-jena.de</email>
+      <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <!-- Leipzig -->
+    <developer>
+      <id>mcrjkupf</id>
+      <name>Jens Kupferschmidt</name>
+      <email>kupferschmidt (at) rz.uni-leipzig.de</email>
+      <organization>Universität Leipzig, Universitätsrechenzentrum</organization>
+      <organizationUrl>http://wwwurz.uni-leipzig.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>developer</role>
+        <role>architect</role>
+      </roles>
+    </developer>
+    <!-- München -->
+    <developer>
+      <id>mcrhhelm</id>
+      <name>Heiko Helmbrecht</name>
+      <organization>TU München, Universitätsbibliothek</organization>
+      <organizationUrl>http://www.ub.tum.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrkramm</id>
+      <name>Matthias Kramm</name>
+      <organization>TU München, Universitätsbibliothek</organization>
+      <organizationUrl>http://www.ub.tum.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcraseif</id>
+      <name>Arne Seifert</name>
+      <organization>TU München, Universitätsbibliothek</organization>
+      <organizationUrl>http://www.ub.tum.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <!-- Münster -->
+    <developer>
+      <id>mcrwgres</id>
+      <name>Werner Greßhoff</name>
+      <organization>Westfälische Wilhelms-Universität Münster, Universitäts- und Landesbibliothek</organization>
+      <organizationUrl>http://www.ulb.uni-muenster.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrbsuse</id>
+      <name>Benno Süselbeck</name>
+      <organization>Westfälische Wilhelms-Universität Münster, Universitäts- und Landesbibliothek</organization>
+      <organizationUrl>http://www.ulb.uni-muenster.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <!-- Rostock -->
+    <developer>
+      <id>mcrsteph</id>
+      <name>Robert Stephan</name>
+      <organization>Universität Rostock, Universitätsbibliothek</organization>
+      <email>robert.stephan (at) uni-rostock.de</email>
+      <organizationUrl>http://www.ub.uni-rostock.de/ub/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrascha</id>
+      <name>Anja Schaar</name>
+      <organization>Universität Rostock, Universitätsbibliothek</organization>
+      <organizationUrl>http://www.ub.uni-rostock.de/ub/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+  </developers>
   <modules>
-    <module>mycore-parent</module>
     <module>mycore-base</module>
     <module>mycore-acl-editor</module>
     <module>mycore-broadcasting</module>
