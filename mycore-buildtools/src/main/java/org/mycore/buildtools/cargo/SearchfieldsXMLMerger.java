@@ -164,7 +164,7 @@ public class SearchfieldsXMLMerger implements MergeProcessor {
 					mergeFields(eBaseIndex, baseFields.get(name), eDeltaField, fieldMode);
 				}
 				else{
-					if(!MODE_MERGE.equals(fieldMode) || MODE_REPLACE.equals(fieldMode)){
+					if(MODE_MERGE.equals(fieldMode) || MODE_REPLACE.equals(fieldMode)){
 						Element e = (Element)eDeltaField.clone();
 						e.removeAttribute("buildaction");
 						eBaseIndex.addContent(e);
