@@ -638,11 +638,11 @@ function updateModuls(viewID) {
 /*
 @description handles if the scrollbar was moved up or down and calls the functions to load the corresponding tiles and movement
 */
-function viewerScroll(delta, viewID) {
-	Iview[viewID].viewerBean.positionTiles({'x': delta.x*PanoJS.MOVE_THROTTLE,
-											'y': delta.y*PanoJS.MOVE_THROTTLE}, true);
-	Iview[viewID].viewerBean.notifyViewerMoved({'x': delta.x*PanoJS.MOVE_THROTTLE,
-												'y': delta.y*PanoJS.MOVE_THROTTLE});
+function viewerScroll(viewID, deltaX, deltaY) {
+	Iview[viewID].viewerBean.positionTiles({'x': -deltaX*PanoJS.MOVE_THROTTLE,
+											'y': deltaY*PanoJS.MOVE_THROTTLE}, true);
+	Iview[viewID].viewerBean.notifyViewerMoved({'x': -deltaX*PanoJS.MOVE_THROTTLE,
+												'y': deltaY*PanoJS.MOVE_THROTTLE});
 }
 
 /*
@@ -893,7 +893,10 @@ function loading(viewID) {
 	ManageEvents.addEventListener(document, 'mouseMove', Iview[viewID].scrollBarY.mouseMove, false);
 	ManageEvents.addEventListener(document, 'mouseUp', Iview[viewID].scrollBarY.mouseUp, false);
 	// register to scroll into the viewer
-	ManageEvents.addEventListener(document.getElementById("viewer"+viewID), 'mouseScroll', function(e) { e = getEvent(e); preventDefault(e); viewerScroll(returnDelta(e), viewID);}, false);
+	jQuery(document.getElementById("viewer"+viewID)).mousewheel(function(event, /*ignored*/ delta, deltaX, deltaY){
+		viewerScroll(viewID, deltaX, deltaY);
+	});
+//	ManageEvents.addEventListener(document.getElementById("viewer"+viewID), 'mouseScroll', function(e) { e = getEvent(e); preventDefault(e); viewerScroll(returnDelta(e), viewID);}, false);
 	
 	// damit viewer ueber scrollBarX endet, fortan in reinitialize
 	document.getElementById("viewer"+viewID).style.width = Iview[viewID].startWidth - ((getStyle(Iview[viewID].scrollBarX.my.self,"visibility") == "visible")? Iview[viewID].scrollBarX.my.self.offsetWidth : 0)  + "px";
