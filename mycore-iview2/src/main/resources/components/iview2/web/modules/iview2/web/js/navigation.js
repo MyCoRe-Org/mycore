@@ -20,7 +20,7 @@ function navigatePage(pNum, viewID) {
 	} else
 		updateModuls(viewID);
 	
-	PanoJS.mousePressedHandler = function(e) {
+	/*PanoJS.mousePressedHandler = function(e) {
 			maximizeHandler(viewID);
 	}/**/
 }
