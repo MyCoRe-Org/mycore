@@ -24,8 +24,11 @@
 package org.mycore.frontend.iview2;
 
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -39,10 +42,12 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.jdom.JDOMException;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.services.iview2.MCRIView2Tools;
 import org.mycore.services.iview2.MCRImage;
+import org.mycore.services.iview2.MCRTiledPictureProps;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -53,22 +58,22 @@ public class MCRThumbnailServlet extends MCRServlet {
 
     private ImageWriteParam imageWriteParam;
 
-    private ConcurrentLinkedQueue<ImageWriter> imageWriters=new ConcurrentLinkedQueue<ImageWriter>();
+    private ConcurrentLinkedQueue<ImageWriter> imageWriters = new ConcurrentLinkedQueue<ImageWriter>();
 
     private static Logger LOGGER = Logger.getLogger(MCRThumbnailServlet.class);
+    
+    private static final int THUMBNAIL_SIZE = 256;
 
     @Override
     public void init() throws ServletException {
         super.init();
-        imageWriters=new ConcurrentLinkedQueue<ImageWriter>();
+        imageWriters = new ConcurrentLinkedQueue<ImageWriter>();
         imageWriteParam = ImageIO.getImageWritersBySuffix("png").next().getDefaultWriteParam();
         try {
             imageWriteParam.setProgressiveMode(ImageWriteParam.MODE_DEFAULT);
         } catch (UnsupportedOperationException e) {
             LOGGER.warn("Your PNG encoder does not support progressive PNGs.");
         }
-//        imageWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-//        imageWriteParam.setCompressionQuality(0.75f);
     }
 
     @Override
@@ -82,9 +87,9 @@ public class MCRThumbnailServlet extends MCRServlet {
             LOGGER.info("derivate: " + derivate + ", image: " + imagePath);
             File iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, imagePath);
             LOGGER.info("IView2 file: " + iviewFile.getAbsolutePath());
-            BufferedImage thumbnail=MCRIView2Tools.getZoomLevel(iviewFile, 0);
+            BufferedImage thumbnail = getThumbnail(iviewFile);
             if (thumbnail != null) {
-                thumbnail=centerThumbnail(thumbnail);
+                thumbnail = centerThumbnail(thumbnail);
                 job.getResponse().setHeader("Cache-Control", "max-age=" + MCRTileServlet.MAX_AGE);
                 job.getResponse().setContentType("image/png");
                 job.getResponse().setDateHeader("Last-Modified", iviewFile.lastModified());
@@ -94,7 +99,7 @@ public class MCRThumbnailServlet extends MCRServlet {
                 ServletOutputStream sout = job.getResponse().getOutputStream();
                 try {
                     ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(sout);
-                    ImageWriter imageWriter=getImageWriter();
+                    ImageWriter imageWriter = getImageWriter();
                     try {
                         imageWriter.setOutput(imageOutputStream);
                         //tile = addWatermark(scaleBufferedImage(tile));        
@@ -116,23 +121,45 @@ public class MCRThumbnailServlet extends MCRServlet {
             LOGGER.info("Finished sending " + job.getRequest().getPathInfo());
         }
     }
-    
-    private ImageWriter getImageWriter(){
-        ImageWriter imageWriter=imageWriters.poll();
-        if (imageWriter==null){
-            imageWriter=ImageIO.getImageWritersBySuffix("png").next();
+
+    private BufferedImage getThumbnail(File iviewFile) throws IOException, JDOMException {
+        MCRTiledPictureProps props = MCRTiledPictureProps.getInstance(iviewFile);
+        if (props.getZoomlevel() == 0)
+            return MCRIView2Tools.getZoomLevel(iviewFile, 0);
+        //get next bigger zoomLevel and scale image to THUMBNAIL_SIZE
+        BufferedImage level1Image = MCRIView2Tools.getZoomLevel(iviewFile, 1);
+        final double width = level1Image.getWidth();
+        final double height = level1Image.getHeight();
+        final int newWidth = width < height ? (int) Math.ceil(THUMBNAIL_SIZE * width / height) : THUMBNAIL_SIZE;
+        final int newHeight = width < height ? THUMBNAIL_SIZE : (int) Math.ceil(THUMBNAIL_SIZE * height / width);
+        int imageType = level1Image.getType();
+        if (imageType == BufferedImage.TYPE_CUSTOM) {
+            imageType = BufferedImage.TYPE_INT_RGB;
+        }
+        final BufferedImage bicubic = new BufferedImage(newWidth, newHeight, imageType);
+        final Graphics2D bg = bicubic.createGraphics();
+        bg.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        bg.scale(newWidth / width, newHeight / height);
+        bg.drawImage(level1Image, 0, 0, null);
+        bg.dispose();
+        return bicubic;
+    }
+
+    private ImageWriter getImageWriter() {
+        ImageWriter imageWriter = imageWriters.poll();
+        if (imageWriter == null) {
+            imageWriter = ImageIO.getImageWritersBySuffix("png").next();
         }
         return imageWriter;
     }
 
     private BufferedImage centerThumbnail(BufferedImage thumbnail) {
-        BufferedImage centered=new BufferedImage(MCRImage.getTileSize(), MCRImage.getTileSize(), BufferedImage.TYPE_INT_ARGB);
+        BufferedImage centered = new BufferedImage(MCRImage.getTileSize(), MCRImage.getTileSize(), BufferedImage.TYPE_INT_ARGB);
         Graphics graphics = centered.getGraphics();
-        int x = (MCRImage.getTileSize()-thumbnail.getWidth())/2;
-        int y = (MCRImage.getTileSize()-thumbnail.getHeight())/2;
+        int x = (MCRImage.getTileSize() - thumbnail.getWidth()) / 2;
+        int y = (MCRImage.getTileSize() - thumbnail.getHeight()) / 2;
         graphics.drawImage(thumbnail, x, y, null);
         return centered;
     }
-
 
 }
