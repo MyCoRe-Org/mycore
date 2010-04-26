@@ -23,6 +23,7 @@
 
 package org.mycore.frontend.iview2;
 
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -69,6 +70,8 @@ public class MCRTileCombineServlet extends MCRServlet {
 
     private static Logger LOGGER = Logger.getLogger(MCRTileCombineServlet.class);
 
+    private MCRFooterInterface footerImpl = null;
+
     @Override
     public void init() throws ServletException {
         super.init();
@@ -80,6 +83,14 @@ public class MCRTileCombineServlet extends MCRServlet {
         }
         imageWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
         imageWriteParam.setCompressionQuality(0.75f);
+        String footerClassName = getInitParameter(MCRFooterInterface.class.getName());
+        if (footerClassName != null) {
+            try {
+                footerImpl = (MCRFooterInterface) Class.forName(footerClassName).newInstance();
+            } catch (Exception e) {
+                throw new ServletException("Could not initialize MCRFooterInterface", e);
+            }
+        }
     }
 
     @Override
@@ -109,6 +120,10 @@ public class MCRTileCombineServlet extends MCRServlet {
             } else {
                 BufferedImage combinedImage = MCRIView2Tools.getZoomLevel(iviewFile, zoomLevel);
                 if (combinedImage != null) {
+                    if (footerImpl!=null){
+                        BufferedImage footer = footerImpl.getFooter(combinedImage.getWidth(), derivate, imagePath);
+                        combinedImage=attachFooter(combinedImage, footer);
+                    }
                     job.getResponse().setHeader("Cache-Control", "max-age=" + MCRTileServlet.MAX_AGE);
                     job.getResponse().setContentType("image/jpeg");
                     job.getResponse().setDateHeader("Last-Modified", iviewFile.lastModified());
@@ -120,7 +135,6 @@ public class MCRTileCombineServlet extends MCRServlet {
                         ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(sout);
                         try {
                             imageWriter.get().setOutput(imageOutputStream);
-                            //tile = addWatermark(scaleBufferedImage(tile));        
                             IIOImage iioImage = new IIOImage(combinedImage, null, null);
                             imageWriter.get().write(null, iioImage, imageWriteParam);
                         } finally {
@@ -137,6 +151,18 @@ public class MCRTileCombineServlet extends MCRServlet {
             }
         } finally {
             LOGGER.info("Finished sending " + job.getRequest().getPathInfo());
+        }
+    }
+
+    private static BufferedImage attachFooter(BufferedImage combinedImage, BufferedImage footer) {
+        BufferedImage resultImage=new BufferedImage(combinedImage.getWidth(), combinedImage.getHeight()+footer.getHeight(), combinedImage.getType());
+        Graphics2D graphics=resultImage.createGraphics();
+        try{
+            graphics.drawImage(combinedImage, 0, 0, null);
+            graphics.drawImage(footer, 0, combinedImage.getHeight(), null);
+            return resultImage;
+        }finally {
+            graphics.dispose();
         }
     }
 
