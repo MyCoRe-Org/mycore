@@ -1,3 +1,4 @@
+//TODO rewrite so das lokale Position auf min&maxWerte abgebildet wird
 function cutOut() {
 	cutOut.ONLOAD = 0;
 	cutOut.SCROLL = 1;
@@ -82,7 +83,6 @@ function cutOut() {
 		ManageEvents.addEventListener(complete, "mouseup", mouseUp, false);
 		ManageEvents.addEventListener(complete, "mousemove", mouseMove, false);
 		ManageEvents.addEventListener(damp, "mousedown", damper, false);
-		//TODO: wird aber glaub nicht mehr benötigt
 		
 		// Browser-Drag&Drop deaktiveren
 		complete.onmousedown = function() { return false;};
@@ -283,7 +283,6 @@ function cutOut() {
 	@param e Eventdata which occured
 	*/
 	function mouseUp(e) {
-
 		if (mouseIsDown && e.button < 2) {
 			if(isBrowser(["IE"])){//IE
 				var positionX = curx + (e.clientX - ausschnittPosX);

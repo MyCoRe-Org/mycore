@@ -1,6 +1,6 @@
 var blendings = new blendWorks();
 var focus = null;//holds the element which is focused
-
+//TODO Preload größe anhand der von den Kacheln bestimmen
 var listener = []; // array who holds informations about the listeners (?)
 NAVIGATE = 0;
 
@@ -56,7 +56,6 @@ function resetFocus(){
 @param absolute inicator if the value shold be handled absolute or relative
 */
 function loadPageData(getPage, absolute, viewID) {
-	//return nodeProps(Iview[viewID].book, "child", getPage, absolute);
 	return nodeProps(Iview[viewID].buchDaten, "mets:file", getPage, absolute);
 }
 
@@ -348,8 +347,8 @@ function switchDisplayMode(screenZoom, stateBool, viewID) {
 		}
 	}
 
-	Iview[viewID].scrollBarX.setValue(-parseInt(preload.offsetLeft));
-	Iview[viewID].scrollBarY.setValue(-parseInt(preload.offsetTop));
+	Iview[viewID].barX.setCurValue(-parseInt(preload.offsetLeft));
+	Iview[viewID].barY.setCurValue(-parseInt(preload.offsetTop));
 	//TODO zu machen?
 	if (Iview[viewID].useCutOut) Iview[viewID].ausschnitt.setPosition({'x':preload.offsetLeft, 'y':preload.offsetTop});
 	return stateBool;
@@ -385,25 +384,26 @@ function scrollMove(valueX, valueY, viewID) {
 */
 function handleZoomScrollbars(viewID) {
 	var viewerBean = Iview[viewID].viewerBean;
-	var scrollBarX = Iview[viewID].scrollBarX;
-	var scrollBarY = Iview[viewID].scrollBarY;
+	var barX = Iview[viewID].barX;
+	var barY = Iview[viewID].barY;
 	// determine the current imagesize
 	var curBreite = (Iview[viewID].bildBreite / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale;
 	var curHoehe = (Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale;
 
-	// horizontally
+	// horizontal
 	// max scaling
-	scrollBarX.setMaxValue(curBreite - viewerBean.width);
+	var xmaxVal = curBreite - viewerBean.width;
+	barX.setMaxValue((xmaxVal < 0)? 0:xmaxVal);
 	// current position
-	scrollBarX.setValue(-viewerBean.x);
+	barX.setCurValue(-viewerBean.x);
 	// length of the bar
 	var damp=document.getElementById("damp"+viewID);
-	scrollBarX.setLength((viewerBean.width - ((Iview[viewID].useCutOut && DampInViewer)? toFloat(getStyle(damp, "width")):0))/ (curBreite/viewerBean.width));	
-	
-	// vertically
-	scrollBarY.setMaxValue(curHoehe - viewerBean.height);
-	scrollBarY.setValue(-viewerBean.y);
-	scrollBarY.setLength((viewerBean.height - ((Iview[viewID].useCutOut && DampInViewer)? toFloat(getStyle(damp, "height")):0))/ (curHoehe/viewerBean.height));
+	barX.setProportion(viewerBean.width/curBreite);
+	// vertical
+	var ymaxVal = curHoehe - viewerBean.height;
+	barY.setMaxValue((ymaxVal < 0)? 0:ymaxVal);
+	barY.setCurValue(-viewerBean.y);
+	barY.setProportion(viewerBean.height/curHoehe);
 }
 
 /*
@@ -411,24 +411,24 @@ function handleZoomScrollbars(viewID) {
 */
 function handleResizeScrollbars(viewID) {
 	var viewerBean = Iview[viewID].viewerBean;
-	scrollBarX = Iview[viewID].scrollBarX;
-	scrollBarY = Iview[viewID].scrollBarY;
+	var barX = Iview[viewID].barX;
+	var barY = Iview[viewID].barY;
 	// determine the current imagesize
 	var curBreite = (Iview[viewID].bildBreite / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale;
 	var curHoehe = (Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale;
 
-	// vertically
+	// vertical
 	// max scaling
-	scrollBarY.setMaxValue(curHoehe - viewerBean.height);
+	barY.setMaxValue(curHoehe - viewerBean.height);
 	// size of the scrollbar
-	scrollBarY.setSize(viewerBean.height);
+	barY.setSize(viewerBean.height);
 	// length of the bar
-	scrollBarY.setLength((viewerBean.height /*- ((Iview[viewID].useCutOut && DampInViewer)? toFloat(getStyle($("damp"+viewID), "height")):0)*/)/ (curHoehe/viewerBean.height));
+	barY.setProportion(viewerBean.height/curHoehe);
 	
-	// horizontally
-	scrollBarX.setMaxValue(curBreite - viewerBean.width);
-	scrollBarX.setSize(viewerBean.width);
-	scrollBarX.setLength((viewerBean.width /*- ((Iview[viewID].useCutOut && DampInViewer)? toFloat(getStyle($("damp"+viewID), "width")):0)*/)/ (curBreite/viewerBean.width));	
+	// horizontal
+	barX.setMaxValue(curBreite - viewerBean.width);
+	barX.setSize(viewerBean.width);
+	barX.setProportion(viewerBean.width/curBreite)
 }
 
 /*
@@ -487,12 +487,12 @@ function listenerMove(viewID) {
 		if (Iview[viewID].useCutOut) {
 			Iview[viewID].ausschnitt.setPosition({'x':newX, 'y':newY});
 		}
-		// block is only executed if the function not by scrollbar is calling, otherwise there are ugly interference
-		if (!Iview[viewID].scroller) {
-			var preload=document.getElementById("preload"+viewID);
-			Iview[viewID].scrollBarX.setValue(-parseInt(preload.offsetLeft));
-			Iview[viewID].scrollBarY.setValue(-parseInt(preload.offsetTop));
-		}
+		// set Roller that no circles are created, and we end in an endless loop
+		Iview[viewID].roller = true;
+		var preload=document.getElementById("preload"+viewID);
+		Iview[viewID].barX.setCurValue(-parseInt(preload.offsetLeft));
+		Iview[viewID].barY.setCurValue(-parseInt(preload.offsetTop));
+		Iview[viewID].roller = false;
 	}
 }
 
@@ -524,7 +524,6 @@ function hideURL(element) {
 */
 function generateURL(viewID) {
 	var url = window.location.href.substring(0, ((window.location.href.indexOf("?") != -1)? window.location.href.indexOf(window.location.search): window.location.href.length))+ "?";
-	//url += "book="+book_uri;
 	url += "&page="+Iview[viewID].prefix;
 	url += "&zoom="+Iview[viewID].viewerBean.zoomLevel;
 	url += "&x="+Iview[viewID].viewerBean.x;
@@ -542,8 +541,6 @@ function generateURL(viewID) {
 
 function openChapterAndInitialize(major, viewID, button){
 	if (typeof Iview[viewID].chapter === 'undefined'){
-		//background-image:url(image.png);
-		//background-position:-390px 0;
 		var oldClassName=button.className;
 		button.className+=" loading";
 		var start=new Date().getTime();
@@ -638,11 +635,11 @@ function updateModuls(viewID) {
 /*
 @description handles if the scrollbar was moved up or down and calls the functions to load the corresponding tiles and movement
 */
-function viewerScroll(viewID, deltaX, deltaY) {
-	Iview[viewID].viewerBean.positionTiles({'x': -deltaX*PanoJS.MOVE_THROTTLE,
-											'y': deltaY*PanoJS.MOVE_THROTTLE}, true);
-	Iview[viewID].viewerBean.notifyViewerMoved({'x': -deltaX*PanoJS.MOVE_THROTTLE,
-												'y': deltaY*PanoJS.MOVE_THROTTLE});
+function viewerScroll(delta, viewID) {
+	Iview[viewID].viewerBean.positionTiles({'x': delta.x*PanoJS.MOVE_THROTTLE,
+											'y': delta.y*PanoJS.MOVE_THROTTLE}, true);
+	Iview[viewID].viewerBean.notifyViewerMoved({'x': delta.x*PanoJS.MOVE_THROTTLE,
+												'y': delta.y*PanoJS.MOVE_THROTTLE});
 }
 
 /*
@@ -708,14 +705,15 @@ function importCutOut(viewID) {
 			 'y' : ((vector.y)*Math.pow(2, Iview[viewID].viewerBean.zoomLevel))*Iview[viewID].zoomScale
 		}, true);});
 	// calculate the position on the image and center new, according to the middle of the cutout and the zoomlevel
-	ausschnitt.addListener(cutOut.MOUSE_UP, function(vector, viewID) {	
+	ausschnitt.addListener(cutOut.MOUSE_UP, function(vector, viewID) {
 				Iview[viewID].viewerBean.recenter(
 				{'x' : (Iview[viewID].ausschnitt.getWidth()/2 + Iview[viewID].ausschnitt.getPosition().x)*Math.pow(2, Iview[viewID].viewerBean.zoomLevel)*Iview[viewID].zoomScale,
 				 'y' : (Iview[viewID].ausschnitt.getHeight()/2 + Iview[viewID].ausschnitt.getPosition().y)*Math.pow(2, Iview[viewID].viewerBean.zoomLevel)*Iview[viewID].zoomScale
-				}, true);});
+				}, true);
+				});
 	// Additional Events
 	ManageEvents.addEventListener(document, 'mouseup', ausschnitt.mouseUp, false);
-	ManageEvents.addEventListener(document/*$(Iview[viewID].ausschnittParent)*/, 'mousemove', ausschnitt.mouseMove, false);
+	ManageEvents.addEventListener(document, 'mousemove', ausschnitt.mouseMove, false);
 	// wird in Klasse für cutOut bzw. in loading für viewer gemacht
 	// ManageEvents.addEventListener($("viewer"+viewID), 'mouseScroll', ausschnitt.scroll, false);
 }
@@ -728,6 +726,7 @@ function importChapter(viewID) {
 	var chapView = new iview.chapter.View();
 	
 	Iview[viewID].chapter = new iview.chapter.Controller(Iview[viewID].chapModelProvider, chapView);
+	
 	//Create Listener which changes after a Page click all needed informations within Viewer
 	Iview[viewID].chapModelProvider.createModel().onevent.attach(function() {
 		if (Iview[viewID].chapterReaction) {
@@ -850,6 +849,7 @@ function zoomViewer(viewID, direction) {
 @param e Daten vom Load Event
 */
 function loading(viewID) {
+	//TODO Viewer nimmt wieder 100% des ViewerContainers eins....muss behoben werden
 	Iview[viewID].chapterActive = false;
 	Iview[viewID].overviewActive = false;
 	var cssSheet=document.getElementById("cssSheet"+viewID);
@@ -871,37 +871,32 @@ function loading(viewID) {
 	blendings.useEffects(blendEffects);
 
 	// ScrollBars
-	// horizontally
-
-	Iview[viewID].scrollBarX = new scrollBar("scrollH"+viewID, "scroll");
-	var scrollBarX = Iview[viewID].scrollBarX;
-	scrollBarX.init(true);
-	scrollBarX.addListener(scrollBar.LIST_MOVE, new function() { this.moved = function(vector) { scrollMove(-vector.x, -vector.y, viewID);}});
-	scrollBarX.setParent("viewerContainer"+viewID);
-	// vertically
-	Iview[viewID].scrollBarY = new scrollBar("scrollV"+viewID, "scroll");
-	var scrollBarY = Iview[viewID].scrollBarY;
-	scrollBarY.init(false);
-	scrollBarY.addListener(scrollBar.LIST_MOVE, new function() { this.moved = function(vector) { scrollMove(-vector.x, -vector.y, viewID);}});
-	scrollBarY.setParent("viewerContainer"+viewID);
+	// horizontal
+	Iview[viewID].barX = new iview.scrollbar.Controller();
+	var barX = Iview[viewID].barX;
+	barX.createView({ 'direction':'horizontal', 'id':'scrollH'+viewID,'parent':'#viewerContainer'+viewID, 'mainClass':'scroll'});
+	barX._model.onevent.attach(function(sender, args) {
+		if (args.type == "curVal" && !Iview[viewID].roller) {
+			scrollMove(- (args["new"]-args["old"]), 0, viewID);
+		}
+	});
+	// vertical
+	Iview[viewID].barY = new iview.scrollbar.Controller();
+	var barY = Iview[viewID].barY;
+	barY.createView({ 'direction':'vertical', 'id':'scrollV'+viewID,'parent':'#viewerContainer'+viewID, 'mainClass':'scroll'});
+	barY._model.onevent.attach(function(sender, args) {
+		if (args.type == "curVal" && !Iview[viewID].roller) {
+			scrollMove( 0, -(args["new"]-args["old"]), viewID);
+		}
+	});
 
 	// Additional Events
-	// move and down auf viewer
-	//TODO in Scrollbar verschieben der registrierung für MouseMove und Up?
-	ManageEvents.addEventListener(document, 'mouseMove', Iview[viewID].scrollBarX.mouseMove, false);
-	ManageEvents.addEventListener(document, 'mouseUp', Iview[viewID].scrollBarX.mouseUp, false);
-	ManageEvents.addEventListener(document, 'mouseMove', Iview[viewID].scrollBarY.mouseMove, false);
-	ManageEvents.addEventListener(document, 'mouseUp', Iview[viewID].scrollBarY.mouseUp, false);
 	// register to scroll into the viewer
-	jQuery(document.getElementById("viewer"+viewID)).mousewheel(function(event, /*ignored*/ delta, deltaX, deltaY){
-		viewerScroll(viewID, deltaX, deltaY);
-	});
-//	ManageEvents.addEventListener(document.getElementById("viewer"+viewID), 'mouseScroll', function(e) { e = getEvent(e); preventDefault(e); viewerScroll(returnDelta(e), viewID);}, false);
+	ManageEvents.addEventListener(document.getElementById("viewer"+viewID), 'mouseScroll', function(e) { e = getEvent(e); preventDefault(e); viewerScroll(returnDelta(e), viewID);}, false);
 	
 	// damit viewer ueber scrollBarX endet, fortan in reinitialize
-	document.getElementById("viewer"+viewID).style.width = Iview[viewID].startWidth - ((getStyle(Iview[viewID].scrollBarX.my.self,"visibility") == "visible")? Iview[viewID].scrollBarX.my.self.offsetWidth : 0)  + "px";
-	document.getElementById("viewer"+viewID).style.height = Iview[viewID].startHeight - ((getStyle(Iview[viewID].scrollBarY.my.self,"visibility") == "visible")? Iview[viewID].scrollBarY.my.self.offsetHeight : 0)  + "px";
-
+	document.getElementById("viewer"+viewID).style.width = Iview[viewID].startWidth - ((Iview[viewID].barX.my.self.css("visibility") == "visible")? Iview[viewID].barX.my.self.css("offsetWidth") : 0)  + "px";
+	document.getElementById("viewer"+viewID).style.height = Iview[viewID].startHeight - ((Iview[viewID].barY.my.self.css("visibility") == "visible")? Iview[viewID].barY.my.self.css("offsetHeight") : 0)  + "px";
 	if (Iview[viewID].useCutOut) {
 		importCutOut(viewID);
 	}
@@ -913,7 +908,6 @@ function loading(viewID) {
 	}
 	//remove leading '/'
 	Iview[viewID].startFile = Iview[viewID].startFile.replace(/^\/*/,"");
-//	loadPage([{"LOCTYPE":"URL","href":Iview[viewID].startFile}],viewID);
 	loadPage(viewID, function(){startFileLoaded(viewID)});
 }
 
@@ -996,13 +990,3 @@ function processMETS(metsDoc, viewID) {
 		if (classIsUsed("BSE_openThumbs")) doForEachInClass("BSE_openThumbs", ".style.display = 'block';", viewID);
 	}
 }
-
-/* now handled in XSL, because if there is no Iview, then there is no "openViewer"-funtion
-function openViewer(viewID, imagePath) {
-		if (Iview[viewID]) {
-			maximizeHandler(viewID)
-		} else {
-			alert("url");
-		}
-}
-*/

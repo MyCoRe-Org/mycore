@@ -165,7 +165,6 @@ function initializeGraphic(viewID) {
 				this.y = 0;
 				motion.y = 0;
 			}
-			this.positionTilesOrig(motion, reset);
 			/*verschieben des Preload bildes damit man eine grobe Vorschau sieht von dem was kommt
 			  wird nur ausgeführt wenn Seite geladen ist, da ansonsten die Eigenschaften noch nicht vorhanden sind*/
 			if(Iview[viewID].loaded) {
@@ -176,6 +175,9 @@ function initializeGraphic(viewID) {
 				preLoadEl.style.left = (this.x + motion.x) + "px";
 				preLoadEl.style.top = (this.y + motion.y) + "px";
 			}
+			
+			this.positionTilesOrig(motion, reset);
+			
 			for (var c = 0; c < this.tiles.length; c++) {
 				for (var r = 0; r < this.tiles[c].length; r++) {
 					var tile = this.tiles[c][r];
@@ -329,15 +331,15 @@ function reinitializeGraphic(viewID) {
 	var viewer=document.getElementById("viewer"+viewID);
 	if (Iview[viewID].maximized == true) {
 		viewerContainer.style.height = curHeight - viewerContainer.offsetTop + "px";
-		viewer.style.height = curHeight - viewer.parentNode.offsetTop - Iview[viewID].scrollBarX.my.self.offsetHeight  + "px";
+		viewer.style.height = curHeight - viewer.parentNode.offsetTop - Iview[viewID].barX.my.self[0].offsetHeight  + "px";
 		viewerContainer.style.width = curWidth + "px";
-		viewer.style.width = curWidth - Iview[viewID].scrollBarY.my.self.offsetWidth  + "px";
+		viewer.style.width = curWidth - Iview[viewID].barY.my.self[0].offsetWidth  + "px";
 	} else {
 		// Wert wieder herstellen
 		viewerContainer.style.height = Iview[viewID].startHeight + "px";
-		viewer.style.height = Iview[viewID].startHeight - ((getStyle(Iview[viewID].scrollBarY.my.self,"visibility") == "visible")? Iview[viewID].scrollBarY.my.self.offsetHeight : 0)  + "px";
+		viewer.style.height = Iview[viewID].startHeight - ((Iview[viewID].barY.my.self.css("visibility") == "visible")? Iview[viewID].barY.my.self[0].offsetHeight : 0)  + "px";
 		viewerContainer.style.width = Iview[viewID].startHeight + "px";
-		viewer.style.width = Iview[viewID].startWidth - ((getStyle(Iview[viewID].scrollBarX.my.self,"visibility") == "visible")? Iview[viewID].scrollBarX.my.self.offsetWidth : 0)  + "px";
+		viewer.style.width = Iview[viewID].startWidth - ((Iview[viewID].barX.my.self.css("visibility") == "visible")? Iview[viewID].scrollBarX.my.self[0].offsetWidth : 0)  + "px";
 	}
 	
 	viewerBean.width = viewer.offsetWidth;

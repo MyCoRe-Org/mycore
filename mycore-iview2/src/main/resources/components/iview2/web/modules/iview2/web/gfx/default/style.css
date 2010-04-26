@@ -30,6 +30,201 @@
 .tree-default-context a ins.rename { background-position:-16px 0px; }
 .tree-default-context a ins.remove { background-position:0 -32px; }
 
+/* ScrollBar Horizontal */
+.scrollH {
+	position: absolute;
+	height:15px;
+	width: 100%;
+	bottom: 0px;
+	left: 0px;
+	z-index:50;
+}
+
+/* Start & End - Buttons */
+.scrollH .start {
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -540px -0px;
+	width:15px;
+	height:15px;
+}
+.scrollH .end {
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -570px -0px;
+	width:15px;
+	height:15px;
+}
+
+/* Scroll Area */
+.scrollH .empty { /* Main Container */
+	position:relative;
+	height:15px;
+}
+.scrollH .emptyStart {
+}
+.scrollH .empty {
+	background-repeat:repeat-x;
+	background-image: url('scaled/scrollbars/eHorizontal.png');
+	position:relative;
+	padding:0px;
+	margin:0px;
+	width:100%;
+	height: 15px;
+}
+.scrollH .space {
+	width:10px;
+}
+.scrollH .emptyEnd {
+}
+.scrollH { /* contains ScrollBar */
+	position:absolute;
+}
+
+/* ScrollBar */
+.scrollH .bar {
+	width:30px;
+}
+.scrollH .bar .start {
+	/*background-repeat:repeat-y;*/
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -660px -0px;
+	position:relative;
+	float: left;
+	width: 2px;
+	height: 15px;
+	margin: 0px;
+	padding: 0px;
+}
+.scrollH .bar .scroll {
+	background-repeat:repeat-x;
+	background-image: url('scaled/scrollbars/horizontal.png');
+	position:relative;
+	float: left;
+	left:100%;
+	height:15px;
+	padding:0px;
+	margin:0px;
+}
+.scrollH .bar .end {
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -690px -0px;
+	position:relative;
+	float: left;
+	width: 2px;
+	height: 15px;
+	margin: 0px;
+	padding: 0px;
+}
+
+/* ScrollBar Vertical */
+.scrollV {
+	position: absolute;
+	width:15px;
+	height: 100%;
+	right: 0px;
+	top: 0px;
+	z-index:50;
+}
+
+/* Start & End - Buttons */
+.scrollV .start {
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -510px -0px;
+	width:15px;
+	height:15px;
+}
+.scrollV .end {
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -480px -0px;
+	width:15px;
+	height:15px;
+}
+
+/* Scroll Area */
+.scrollV .empty { /* Main Container */
+	position:relative;
+	width:15px;
+}
+.scrollV .emptyStart {
+}
+.scrollV .empty {
+	background-repeat:repeat-y;
+	background-image: url('scaled/scrollbars/eVertical.png');
+	position:relative;
+	padding:0px;
+	margin:0px;
+	height:100%;
+	width: 15px;
+}
+.scrollV .space {
+	height:10px;
+}
+.scrollV .emptyEnd {
+}
+.scrollV { /* contains ScrollBar */
+	position:absolute;
+}
+
+/* ScrollBar */
+.scrollV .bar {
+	height:30px;
+	top:0px;
+}
+.scrollV .bar .start {
+	/*background-repeat:repeat-y;*/
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -600px -0px;
+	position:relative;
+	/*float: left;*/
+	height: 2px;
+	width: 15px;
+	margin: 0px;
+	padding: 0px;
+}
+.scrollV .bar .scroll {
+	background-repeat:repeat-y;
+	background-image: url('scaled/scrollbars/vertical.png');
+	position:relative;
+	/*float: left;*/
+	top:100%;
+	width:15px;
+	padding:0px;
+	margin:0px;
+}
+.scrollV .bar .end {
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -630px -0px;
+	position:relative;
+	/*float: left;*/
+	height: 2px;
+	width: 15px;
+	margin: 0px;
+	padding: 0px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* Description for z-Index:
 	<10 outside the viewer (example: chapter -> 5);
@@ -805,95 +1000,11 @@
 	margin: 0px;
 }
 
-/* ScrollBar Horizontal */
-
-/* Main Container */
-.scrollH {
-	position: absolute;
-	height:15px;
-	width: 100%;
-	bottom: 0px;
-	left: 0px;
-	z-index:50;
-}
-
-/* Start & End - Buttons */
-.scrollH .start {
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -540px -0px;
-	width:15px;
-	height:15px;
-}
-.scrollH .end {
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -570px -0px;
-	width:15px;
-	height:15px;
-}
-
-/* Scroll Area */
-.scrollH .empty { /* Main Container */
-	position:relative;
-	height:15px;
-}
-.scrollH .spaceStart {
-}
-.scrollH .eHorizontal {
-	background-repeat:repeat-x;
-	background-image: url('scaled/scrollbars/eHorizontal.png');
-	position:relative;
-	padding:0px;
-	margin:0px;
-	width:100%;
-	height: 15px;
-}
-.scrollH .spaceEnd {
-}
-.scrollHBar { /* contains ScrollBar */
-	position:absolute;
-}
-
-/* ScrollBar */
-.scrollHBar .barStart {
-	/*background-repeat:repeat-y;*/
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -660px -0px;
-	position:relative;
-	float: left;
-	width: 2px;
-	height: 15px;
-	margin: 0px;
-	padding: 0px;
-}
-.scrollHBar .horizontal {
-	background-repeat:repeat-x;
-	background-image: url('scaled/scrollbars/horizontal.png');
-	position:relative;
-	float: left;
-	left:100%;
-	height:15px;
-	padding:0px;
-	margin:0px;
-}
-.scrollHBar .barEnd {
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -690px -0px;
-	position:relative;
-	float: left;
-	width: 2px;
-	height: 15px;
-	margin: 0px;
-	padding: 0px;
-}
 
 
 /* ScrollBar Vertical */
 /* Main Container */
-.scrollV, .scrollOVV {
+.scrollOVV {
 	width: 15px;
 	height: 100%;
 	position: absolute;
@@ -906,14 +1017,14 @@
 }
 
 /* Start & End - Buttons */
-.scrollV .start, .scrollOVV .start {
+.scrollOVV .start {
 	background-image: url('image.png');
 	background-repeat: no-repeat;
 	background-position: -510px -0px;
 	width:15px;
 	height:15px;
 }
-.scrollV .end, .scrollOVV .end {
+.scrollOVV .end {
 	background-image: url('image.png');
 	background-repeat: no-repeat;
 	background-position: -480px -0px;
@@ -922,16 +1033,12 @@
 }
 
 /* Scroll Area */
-.scrollV .empty, .scrollOVV .empty {
+.scrollOVV .empty {
 	position:relative;
 	width:15px;
 }
-.scrollV .spaceStart {
-	background-color:#000000;
-	width:0px;
-	height:0px;
-}
-.scrollV .eVertical, .scrollOVV .empty {
+
+.scrollOVV .empty {
 	position:relative;
 	background-repeat:repeat-y;
 	background-image: url('scaled/scrollbars/eVertical.png');
@@ -941,17 +1048,17 @@
  	width:15px;
 	vertical-align: top;
 }
-.scrollV .spaceEnd, .scrollOVV .spaceEnd {
+.scrollOVV .spaceEnd {
 	background-color:#000000;
 	width:0px;
 	height:0px;
 }
-.scrollVBar, .scrollOVVBar {  /* contains ScrollBar */
+.scrollOVVBar {  /* contains ScrollBar */
 	position:absolute;
 }
 
 /* ScrollBar */
-.scrollVBar .barStart, .scrollOVVBar .barStart {
+.scrollOVVBar .barStart {
 	background-image: url('image.png');
 	background-repeat: no-repeat;
 	background-position: -600px -0px;
@@ -961,7 +1068,7 @@
 	margin: 0px;
 	padding: 0px;
 }
-.scrollVBar .vertical, .scrollOVVBar .vertical {
+.scrollOVVBar .vertical {
 	background-repeat:repeat-y;
 	background-image: url('scaled/scrollbars/vertical.png');
 	position:relative;
@@ -970,7 +1077,7 @@
 	margin: 0px;
 	padding: 0px;
 }
-.scrollVBar .barEnd, .scrollOVVBar .barEnd {
+.scrollOVVBar .barEnd {
 	background-image: url('image.png');
 	background-repeat: no-repeat;
 	background-position: -630px -0px;

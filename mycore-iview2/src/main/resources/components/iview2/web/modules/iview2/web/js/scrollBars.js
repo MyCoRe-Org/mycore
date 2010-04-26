@@ -1,5 +1,659 @@
 //TODO einbauen das Scrollbar minimale Größe hat, damit man sie noch benutzen kann
-//TODO einbauen das Stepper wie normale ScrollBar sich bewegt und dann einrastet beim loslassen
+
+var iview = iview || {};
+iview.scrollbar = iview.scrollbar || {};
+/*
+ * @package 	iview.scrollbar
+ * @description
+ */
+/*
+ * @name 		Model
+ * @proto		Object
+ * @description Modeldata for internal Scrollbar Representation
+ */
+iview.scrollbar.Model = function() {
+	this._maxVal;//Max Value the Scrollbar can reach
+	this._curVal = 0;//Current Value the scrollbar is positioned
+	this._size;//Size of the Scrollbar complete
+	this._proportion;//holds the proportion in percent from whole scrollbar area and the slider within
+	this.onevent = new iview.Event(this);//One Event to rule them all
+}
+
+iview.scrollbar.Model.prototype = {
+	
+	/* GETTER/SETTER
+	 * @description set/get the total size of the Scrollbar
+	 * @param value integer which holds the new size of the scrollbar, the value is converted to an absolute value
+	 * @return integer the currently set width
+	 */
+	setSize: function(value) {
+		value = Math.abs(toInt(value));
+		//only raise the Event if a change happened
+		if (this._size != value) {
+			var oldVal = this._size;
+			this._size = value;
+			//Notify all listeners that a change happened
+			this.onevent.notify({ 'type': 'size', 'old': oldVal, 'new': value });
+		}
+	},
+	
+	getSize: function() {
+		return this._size;
+	},
+	
+	/* GETTER/SETTER
+	 * @description set/get the proportion between scrollbarspace and the bar within the space
+	 * @param value float which holds the proportion, the value is converted to an absolute value
+	 * @return float which represents the current scrollbar space/bar proportion
+	 */
+	setProportion: function(value) {
+		value = Math.abs(toFloat(value));
+		//only raise Event if a change happened
+		if (this._proportion != value) {
+			var oldVal = this._proportion;
+			this._proportion = value;
+			this.onevent.notify({ 'type': 'proportion', 'old': oldVal, 'new':value });
+		}
+	},
+	
+	getProportion: function() {
+		return this._proportion;	
+	},
+	
+	/* GETTER/SETTER
+	 * @description set/get the current maxValue of the scrollbar, this means the Value the scrollbar
+	 *  returns when it reached the right/bottom most position, if the value is negative zero will be used instead
+	 * @param value integer which holds the new maxValue for the scrollbar
+	 * @return integer the currently set maxValue
+	 */
+	setMaxVal: function(value) {
+		value = toInt(value);
+		if (value < 0) value = 0;
+		//only raise the Event if a change happened
+		if (this._maxVal != value) {
+			var oldVal = this._maxVal;
+			this._maxVal = value;
+			//Notify all listeners that a change happened
+			this.onevent.notify({ 'type': 'maxVal', 'old': oldVal, 'new': value });
+		}
+	},
+	
+	getMaxVal: function() {
+		return this._maxVal;
+	},
+	
+	/* GETTER/SETTER
+	 * @description set/get the current Value(position) where the bar start(left/right end) is positioned
+	 * @param value integer which holds the new current Value, if the value is negative zero will be used instead
+	 * @return integer the currently set Value
+	 */
+	setCurVal: function(value) {
+		value = toInt(value);
+		if (value < 0) value = 0;
+		if (value > this._maxVal) value = this._maxVal;
+		//only raise Event if a change happened
+		if (this._curVal != value) {
+			var oldVal = this._curVal;
+			this._curVal = value;
+			//Notify all listeners that a change happened
+			this.onevent.notify({ 'type': 'curVal', 'old':oldVal, 'new':value });
+		}
+	},
+	
+	getCurVal: function() {
+		return this._curVal;
+	},
+	
+	/*
+	 * @description in contrast to setCurValue this function doesn't treat the given
+	 *  value to change the curValue absolute, rather than to change it relative to the current Value
+	 * @param value integer which represents the change to apply
+	 */
+	changeCurVal: function(value) {
+		value = toInt(value);
+		var oldVal = this._curVal;
+		this._curVal = this._curVal + value;
+		if (this._curVal < 0) this._curVal = 0;
+		if (this._curVal > this._maxVal) this._curVal = this._maxVal;
+		//only raise Event if a change happened
+		if (oldVal != this._curVal)
+			this.onevent.notify({'type': 'curVal', 'old': oldVal, 'new': this._curVal});
+	}
+}
+/********************************************************
+ ********************************************************
+ ********************************************************/
+/*
+ * @name 		Model
+ * @proto		Object
+ * @description View to represent Model 
+ */
+iview.scrollbar.View = function(args) {
+	this.my;//holds all further needed Object References
+	this._direction;//Is the scrollbar Horizontal or vertical
+	this._mainClass = args.mainClass || "";
+	this._customClass = args.customClass || "";
+	this._size = 0;
+	
+	this._mouseDown = false;
+	this._outOfBar = false;
+	this._pixelPerUnit = 1;	
+	this._maxVal = 1;
+
+	this._proportion = 1;
+	this._curVal = 0;
+	this._oldPos;
+	this._moveTo;//If pressing into the empty area this is the var where the position is stored
+	this._before;//holds if the mouse is pressed behind or before the scrollbar
+	this._interval = null;//holds the currently running interval
+
+	this.onevent = new iview.Event(this);
+};
+
+( function() {
+	
+	/*
+	 * @description sets the currently active interval, if an old interval is found it's replaced with the new one
+	 * @param that Object as the function is just an "Class" one and not connected to an instance we need to handle
+	 *  over the instance from which is called to work properly
+	 * @param intervalFunc function which is set to be called by the Intervaltime time
+	 * @param time integer time in miliseconds which lays between two calls to the function call 
+	 */
+	function addInterval(that, intervalFunc, time) {
+		if (that._interval != null) {
+			dropInterval(that);
+		}
+		that._interval = setInterval(intervalFunc,time);
+	}
+
+	/*
+	 * @description drops (if one is set) the currently executed interval and the connected function
+	 * @param that Object as the function is just an "Class" one and not connected to an instance we need to handle
+	 *  over the instance from which is called to work properly
+	 */	
+	function dropInterval(that) {
+		clearInterval(that._interval);
+		that._interval = null;
+	}
+
+	/*
+	 * @description after the initial mouseClick some time lays between the starting of the periodic
+	 *  "recall" of the mouseClick on the button while the mouse is still pressed over the button
+	 * @param that Object as the function is just an "Class" one and not connected to an instance we need to handle
+	 *  over the instance from which is called to work properly
+	 * @param isIncrease boolean which holds if the current value shall be increased or decreased
+	 */
+	function delayMouseClick(that, isIncrease) {
+		if (that._mouseDown) {
+			addInterval(that, function() { notifyClick(that, isIncrease);}, that._intervalTime);
+		}
+	}
+	
+	/*
+	 * @description after the initial mouseClick some time lays between the starting of the periodic
+	 *  "recall" of the mouseClick on the space while the mouse is still pressed
+	 * @param that Object as the function is just an "Class" one and not connected to an instance we need to handle
+	 *  over the instance from which is called to work properly
+	 * @param isIncrease boolean which holds if the current value shall be increased or decreased
+	 */
+	function delaySpaceClick(that, before) {
+		if (that._mouseDown) {
+			addInterval(that, function() { stopUnderMouse(that);}, that._intervalTime);
+		}
+	}
+	
+	/*
+	 * @description set the value by which the curValue is changed as soon as the Mouse is pressed on a button
+	 * @param value integer defines the change which is applied as soon as a button is pressed,
+	 *  value is converted to absolute value
+	 */
+	function setStepByClick(value) {
+		this._stepByClick = Math.abs(toInt(value));
+	}
+	
+	/*
+	 * @description set the value by which the curValue is changed as soon as the mouse is pressed
+	 *  within the space of the scrollbar
+	 * @param value integer defines the change which is applied as soon as the mouse is pressed
+	 *  within the space of the scrollbar
+	 */
+	function setJumpStep(value) {
+		this._jumpStep = Math.abs(toInt(value));
+	}
+
+	/*
+	 * @description set the time which lays between the initial click of on a button and the
+	 *  periodic recall of the movement while the mouse is kept pressed
+	 * @param value integer defines the time in miliseconds which lays between the initial click and
+	 *  the periodic recall
+	 */	
+	function setScrollDelay(value) {
+		this._scrollDelay = Math.abs(toInt(value));
+	}
+	
+	/*
+	 * @description set the time which lays between the initial click within space and the
+	 *  periodic recall of the movement while the mouse is kept pressed
+	 * @param value integer defines the time in miliseconds which lays between the initial click and
+	 *  the periodic recall
+	 */	
+	function setSpaceDelay(value) {
+		this._spaceDelay = Math.abs(toInt(value));
+	}
+	
+	/*
+	 * @description set the time in which all intervals are runned
+	 * @param value integer the interval time which is used for all intervals which are set within the scrollbar
+	 */
+	function setIntervalTime(value) {
+		this._intervalTime = Math.abs(toInt(value));
+	}
+
+	/*
+	 * @description handles the initial Click when the mouse is pressed within the space. After calling the first
+	 *  time stopUnderMouse it calls the delay Function so that an automatic movement can be applied
+	 * @param that Object as the function is just an "Class" one and not connected to an instance we need to handle
+	 *  over the instance from which is called to work properly
+	 * @param e event of the mousepress which raised this event
+	 */
+	function dbgMouseDown(that, e) {
+		if (that._mouseDown) return;
+		that._mouseDown = true;
+		that._outOfBar = true;
+		//find out if the mouse is pressed before or after the bar so that the movement can be adjusted on it
+		if (that._direction) {
+			that._moveTo = e.layerX || e.offsetX;
+			that._before = (toInt(that.my.bar.css("left")) > (e.layerX || e.offsetX))? true:false;
+		} else {
+			that._moveTo = e.layerY || e.offsetY;
+			that._before = (toInt(that.my.bar.css("top")) > (e.layerY || e.offsetY))? true:false;
+		}
+		//set the initial movement
+		stopUnderMouse(that);
+		//add an reoccuring event after an inital delay
+		window.setTimeout(function() { delaySpaceClick(that);}, that._spaceDelay);
+	}
+	
+	/*
+	 * @description handles the MouseUp within the space area and sets needed variables to the corresponding
+	 *  values to set the scrollbar in the correct new state
+	 * @param that Object as the function is just an "Class" one and not connected to an instance we need to handle
+	 *  over the instance from which is called to work properly
+	 */
+	function dbgMouseUp(that) {
+		that._mouseDown = false;
+		that._outOfBar = false;
+	}
+	
+	/*
+	 * @description removes all previously registered intervals and stores the position of the mousepress to handle
+	 *  the mouse movement in other events correctly
+	 * @param that Object as the function is just an "Class" one and not connected to an instance we need to handle
+	 *  over the instance from which is called to work properly
+	 * @param e event of the mousepress which raised this event
+	 */
+	function divMouseDown(that, e) {
+		if (that._mouseDown) return;
+		dropInterval(that);
+		that._mouseDown = true;
+		//Store the position where the event happened to be able to position the scrollbar later on the occured position changes
+		that._oldPos = { 'x': e.clientX, 'y': e.clientY};
+		e.cancelBubble = true;
+		return false;
+	}
+	
+	/*
+	 * @description handles the MouseUp within the bar and sets needed variables to the corresponding
+	 *  values to set the scrollbar in the correct new state
+	 * @param that Object as the function is just an "Class" one and not connected to an instance we need to handle
+	 *  over the instance from which is called to work properly
+	 */
+	function divMouseUp(that) {
+		dropInterval(that);
+		that._mouseDown = false;
+		that._outOfBar = false;
+	}
+
+	/*
+	* @description if Drag&Drop is initialized it continously moves the bar so under the mouse that
+	*  the MouseDown Position of Bar relative to Mouse is restored, similiar it places the Stepper
+	* @param that Object as the function is just an "Class" one and not connected to an instance we need to handle
+	 *  over the instance from which is called to work properly
+	* @param e event of the Current MouseMove with the Position of the mouse
+	*/
+	function divMouseMove(that, e) {
+		if (!that._mouseDown || that._outOfBar) return;
+		var value = null;
+		var vector = null;
+		//store the movement vector
+		if (that._direction) {
+			vector = e.clientX - that._oldPos.x;
+		} else {
+			vector = e.clientY - that._oldPos.y;
+		}
+		//notify all listeners of the event
+		that.onevent.notify({'type':'mouseMove','change':vector/that._pixelPerUnit});
+		//and store as new old position the current one
+		that._oldPos = {'x': e.clientX, 'y': e.clientY};
+		e.cancelBubble = true;
+	}
+	
+	/*
+	 * @description handles the MouseDown event on the scrollbar buttons, this includes removing all previously
+	 *  run intervals as well as raising a first value change and adding an reoccuring event which is called
+	 *  after an initial delay regulary as long as the mouse is kept pressed
+	 * @param that Object as the function is just an "Class" one and not connected to an instance we need to handle
+	 *  over the instance from which is called to work properly
+	 * @param downRight boolean which tells if the button which caused the event was the downRight one which is
+	 *  represented by true, if it was the upLeft one the value is false
+	 */
+	function buttonMouseDown(that, downRight) {
+		downRight = (downRight == true)? true:false;
+		if (that._mouseDown) return;
+		that._mouseDown = true;
+		that._outOfBar = true;
+		dropInterval(that);
+		notifyClick(that, downRight);
+		window.setTimeout(function() { delayMouseClick(that, downRight);}, that._scrollDelay);
+		return false;
+	}
+	
+	/*
+	 * @description handles the MouseUp within the button and sets needed variables to the corresponding
+	 *  values to set the scrollbar in the correct new state
+	 * @param that Object as the function is just an "Class" one and not connected to an instance we need to handle
+	 *  over the instance from which is called to work properly
+	 */
+	function buttonMouseUp(that) {
+		dropInterval(that);
+		that._mouseDown = false;
+		that._outOfBar = false;
+	}
+	
+	/*
+	 * @description adds the scrollbar to the given parent
+	 * @param parent DOM element to which the scrollbar is added
+	 */
+	function addTo(parent) {
+		jQuery(this.my.self).appendTo(parent);
+	}
+	
+	/*
+	 * @description adapts the scrollbar to the new full size, so the space and bar sizes are adapted to fulfill
+	 *  the new size and to look nicely
+	 * @param that Object as the function is just an "Class" one and not connected to an instance we need to handle
+	 *  over the instance from which is called to work properly
+	 */
+	function applySize(that) {
+		var my = that.my;
+		var size = that._size;
+		if (that._direction) {
+			my.self.css("width", size + "px");
+			my.space.css("width", Math.abs(size - toInt(my.bUL.css("width")) - toInt(my.bDR.css("width"))) + "px");
+			my.space.children("[class='space']").css("width", Math.abs(toInt(my.space.css("width")) - toInt(my.space.children('[class="start"]').css("width")) - toInt(my.space.children("[class='end']").css("width"))) + "px");
+			if (toInt(my.bar.css("width")) > toInt(my.space.css("width")) || that._maxVal == 0) {
+				my.bar.css("width", my.space.css("width"));
+			}
+			my.bar.children("[class='scroll']").css("width", Math.abs(toInt(my.bar.css("width")) - toInt(my.bar.children("[class='start']").css("width")) - toInt(my.bar.children("[class='end']").css("width"))) + "px");
+		} else {
+			my.self.css("height", size + "px");
+			my.space.css("height", Math.abs(size - toInt(my.bUL.css("height")) - toInt(my.bDR.css("height"))) + "px");
+			my.space.children("[class='space']").css("height", Math.abs(toInt(my.space.css("height")) - toInt(my.space.children('[class="start"]').css("height")) - toInt(my.space.children("[class='end']").css("height"))) + "px");
+			if (toInt(my.bar.css("height")) > toInt(my.space.css("height")) || that._maxVal == 0) {
+				my.bar.css("height", my.space.css("height"));
+			}
+			my.bar.children("[class='scroll']").css("height", Math.abs(toInt(my.bar.css("height")) - toInt(my.bar.children("[class='start']").css("height")) - toInt(my.bar.children("[class='end']").css("height"))) + "px");
+		}
+	}
+	
+	/*
+	 * @description creates the scrollbar by creating all needed DOM Elements and setting some important
+	 *  css values so the scrollbar can work correctly; connects all view functions to the related events
+	 *  and objects
+	 * @param direction (horizontal|vertical) tells if the bar will be vertical or horizontal
+	 */
+	function createView(direction) {
+		var that = this;
+		this._direction = (direction == "horizontal")? true:false;
+		var complete = jQuery("<div>")
+			.addClass(this._mainClass +((this._direction)? "H":"V"));
+			
+		//Add additional Class to override the overall scrollbar setting
+		if (this._customClass != "") {
+			complete.addClass(this._customClass +((this._direction)? "H":"V"));
+		}
+			
+	//Start Up/Left
+		var buttonUL = jQuery("<div>")
+			.addClass("start")
+			.mousedown(function() { return false;})
+			.mousedown(function() { buttonMouseDown(that, false);})
+			.appendTo(complete);
+			
+		var wholeSpace = jQuery("<div>")
+			.addClass("empty")
+			.mousedown(function(e) { dbgMouseDown(that, e); return false;})
+			.mouseup(function() { dbgMouseUp(that); return false;})
+			.mousewheel(function(e, delta) {
+				that.onevent.notify({'type':'mouseWheel', 'change':2*-delta/that._pixelPerUnit}); 
+				return false;})
+			.appendTo(complete);
+
+		var spaceStart = jQuery("<div>")
+			.addClass("emptyStart")
+			.appendTo(wholeSpace);
+			
+		var space = jQuery("<div>")
+			.addClass("space")
+			.appendTo(wholeSpace);
+		
+		var spaceEnd = jQuery("<div>")
+			.addClass("emptyEnd")
+			.appendTo(wholeSpace);
+		
+		var barScroll = jQuery("<div>")
+			.addClass("bar")
+			.mousedown(function(e) { divMouseDown(that, e); return false;})
+			.mouseup(divMouseUp)
+			.mousemove(function(e) { divMouseMove(that, e); return false;})
+			.css("position", "absolute")
+			.appendTo(wholeSpace);
+		
+		var barStart = jQuery("<div>")
+			.addClass("start")
+			.appendTo(barScroll);
+		
+		var scroll = jQuery("<div>")
+			.addClass("scroll")
+			.appendTo(barScroll);
+		
+		var barEnd = jQuery("<div>")
+			.addClass("end")
+			.appendTo(barScroll);
+		
+		var buttonDR = jQuery("<div>")
+			.addClass("end")
+			.mousedown(function() { return false;})
+			.mousedown(function() { buttonMouseDown(that, true);})
+			.appendTo(complete);
+		jQuery(document)
+			.mouseup(function() { buttonMouseUp(that);})
+			.mousemove(function(e) { divMouseMove(that, e); return false;});
+			
+		if (this._direction) {
+			wholeSpace.css("cssFloat", "left");
+			space.css("cssFloat", "left");
+			buttonUL.css("cssFloat", "left");
+			buttonDR.css("cssFloat", "left");
+			scroll.css("left", "0px");
+		} else {
+			scroll.css("top", "0px");
+		}
+		
+		this.my = { 'self': complete, 'bUL': buttonUL, 'bDR': buttonDR, 'bar': barScroll, 'space': wholeSpace};
+		applySize(this);
+	}
+	
+	/*
+	 * @description is called to adapt the view/scrollbar to display the changed values correctly to the user
+	 * @param args object which holds the type and value of the property which changed so that the view
+	 *  can be adapted to represent the new values correctly
+	 */
+	function adaptView(args/*, that*/) {
+		var my = this.my;
+		var direction = (this._direction)? "width":"height";
+		switch (args.type) {
+			case "curVal":
+				this._curVal = args.value;
+				break;
+			case "proportion":
+				//Set the new bar width
+				this._proportion = args.value;
+				break;
+			case "maxVal":
+				this._maxVal = args.value;
+				break;
+			case "size":
+				this._size = args.value;
+				applySize(this);
+				break;
+			default:
+				if (console) {
+					console.log("Got:"+args.type+" as argument type, don't know what to do with it");
+				}
+		}
+		//calculate the bar size
+		my.bar.css(direction ,this._proportion*toFloat(my.space.css(direction)) + "px");
+		//calculate the pixelPerUnit rate to set the positioning of the bar correctly
+		this._pixelPerUnit = Math.abs((toInt(my.space.css(direction))-toInt(my.bar.css(direction)))/this._maxVal);
+		//IE throws as usual Errors if some value isn't in the expected range, so a 0 within maxVal gets him mad
+		if (this._maxVal != 0) {
+			my.bar.css((direction == "width")? "left":"top",this._curVal*this._pixelPerUnit + "px");
+		}
+		applySize(this);
+	}
+
+	/*
+	 * @description is called to notify all listeners about an occured Value change caused by an click, depending
+	 *  on the isIncrease boolean you can tell if the current value is increased or decreased
+	 * @param that Object as the function is just an "Class" one and not connected to an instance we need to handle
+	 *  over the instance from which is called to work properly
+	 * @param isIncrease boolean which tells if the curValue will be increased or decreased
+	 */
+	function notifyClick(that, isIncrease) {
+		that.onevent.notify({'type':'mouseClick', 'change':(isIncrease === true)? that._stepByClick: -that._stepByClick});
+	}
+
+	/*
+	 * @description when the mouse is pressed within the space of the bar this function is called, which checks if
+	 *  the bar is already under the mouse and stops the reoccuring process if that is the case. Else it will
+	 *  notify all listeners about the happened changes
+	 * @param that Object as the function is just an "Class" one and not connected to an instance we need to handle
+	 *  over the instance from which is called to work properly
+	 */
+	function stopUnderMouse(that) {
+		//if the mouse is released while this function is called remove all set Intervals to represent this fact
+		if (!that._mouseDown) {
+			dropInterval(that);
+			return;
+		}
+		//calculate the movement which has to take place and if the scrollbar is already under the mouse stop the interval		
+		var curVal = (that._direction)? toInt(that.my.bar.css("left")): toInt(that.my.bar.css("top"));
+		var barLength = (that._direction)? toInt(that.my.bar.css("width")): toInt(that.my.bar.css("height"));
+		if ((that._before && (that._moveTo >= curVal)) || (!that._before && (that._moveTo <= curVal + barLength))) {
+			dropInterval(that)
+			that._mouseDown = false;
+			return;
+		}
+		//Notify all Listeners about the occured change, prepare the Event Object depending on the direction
+		if (that._direction) {
+			that.onevent.notify({'type': 'mouseClick', 'change':((that._before)?-that._jumpStep:that._jumpStep)});
+		} else {
+			that.onevent.notify({'type': 'mouseClick', 'change':((that._before)?-that._jumpStep:that._jumpStep)});
+		}
+	}
+	
+	iview.scrollbar.View.prototype.createView = createView;
+	iview.scrollbar.View.prototype.addTo = addTo;
+	iview.scrollbar.View.prototype.adaptView = adaptView;
+	iview.scrollbar.View.prototype.setStepByClick = setStepByClick;
+	iview.scrollbar.View.prototype.setJumpStep = setJumpStep;
+	iview.scrollbar.View.prototype.setScrollDelay = setScrollDelay; 
+	iview.scrollbar.View.prototype.setSpaceDelay = setSpaceDelay;
+	iview.scrollbar.View.prototype.setIntervalTime = setIntervalTime;
+})();
+
+/********************************************************
+ ********************************************************
+ ********************************************************/
+/*
+ * @name 		Model
+ * @proto		Object
+ * @description Controller for Scrollbars
+ */
+iview.scrollbar.Controller = function() {
+	this._model = new iview.scrollbar.Model();
+	this._view;
+}
+
+iview.scrollbar.Controller.prototype = {
+	
+	setSize: function(value) {
+		this._model.setSize(value);
+	},
+	
+	setMaxValue: function(value) {
+		this._model.setMaxVal(value);
+	},
+	
+	getMaxValue: function() {
+		return this._model.getMaxVal();
+	},
+	
+	setCurValue: function(value) {
+		this._model.setCurVal(value);
+	},
+	
+	getCurValue: function() {
+		return this._model.getCurVal();
+	},
+	
+	setProportion: function(value) {
+		this._model.setProportion(value);
+	},
+	
+	getProportion: function() {
+		return this._model.getProportion();
+	},
+	
+	/*
+	 * @description creates the scrollbar with the given Settings and some predefined settings as
+	 *  scrollamount and initial delays
+	 * @param args Object which contains for example the main and custom CSS Class for the scrollbar,
+	 *  as well as the direction and id of the scrollbar
+	 */
+	createView: function(args) {
+		var that = this;
+		this._view = new iview.scrollbar.View({'mainClass': args.mainClass || "", 'customClass': args.customClass || ""});
+		this._model.onevent.attach(function(sender, args) {
+			 that._view.adaptView({'type':args.type,'value':args["new"]});
+		});
+		this._view.onevent.attach(function(sender, args) {
+			if (args.type == "mouseClick" || args.type == "mouseMove" || args.type == "mouseWheel") {
+				that._model.changeCurVal(args.change);
+			}
+		});
+		this._view.createView(args.direction, args.id);
+		this._view.addTo(args.parent);
+		this._view.setStepByClick(5);
+		this._view.setJumpStep(20);
+		this._view.setScrollDelay(150);//initial delay after which the interval is started which automatically resumes scrolling unless a mouseup event is registered 
+		this._view.setSpaceDelay(150);
+		this._view.setIntervalTime(100);//period with which the scroll is automaticall resumed
+		this.my = this._view.my;
+	}
+}
+
 function scrollBar(newId) {
 //Constants
 	scrollBar.STARTCL = "start";
