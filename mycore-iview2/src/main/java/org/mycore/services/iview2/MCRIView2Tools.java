@@ -110,6 +110,7 @@ public class MCRIView2Tools {
 
     public static BufferedImage getZoomLevel(File iviewFile, int zoomLevel) throws IOException, JDOMException {
         ZipFile iviewImage = new ZipFile(iviewFile);
+        Graphics graphics = null;
         try {
             if (zoomLevel == 0) {
                 return readTile(iviewImage, 0, 0, 0);
@@ -126,7 +127,7 @@ public class MCRIView2Tools {
             int xDim = ((maxX - 1) * MCRImage.TILE_SIZE + sampleTile.getWidth());
             int yDim = ((maxY - 1) * MCRImage.TILE_SIZE + readTile(iviewImage, zoomLevel, 0, maxY - 1).getHeight());
             BufferedImage resultImage = new BufferedImage(xDim, yDim, sampleTile.getType());
-            Graphics graphics = resultImage.getGraphics();
+            graphics = resultImage.getGraphics();
             for (int x = 0; x < maxX; x++) {
                 for (int y = 0; y < maxY; y++) {
                     BufferedImage tile = readTile(iviewImage, zoomLevel, x, y);
@@ -136,6 +137,8 @@ public class MCRIView2Tools {
             return resultImage;
         } finally {
             iviewImage.close();
+            if (graphics != null)
+                graphics.dispose();
         }
     }
 
