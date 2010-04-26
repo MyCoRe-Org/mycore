@@ -114,15 +114,15 @@ public class MCRTileCombineServlet extends MCRServlet {
             if (zoomAlias.equals("MAX")) {
                 zoomLevel = 3;
             }
-            if (zoomLevel == 0) {
+            if (zoomLevel == 0 && footerImpl == null) {
                 sendThumbnail(iviewFile, job.getResponse());
                 return;
             } else {
                 BufferedImage combinedImage = MCRIView2Tools.getZoomLevel(iviewFile, zoomLevel);
                 if (combinedImage != null) {
-                    if (footerImpl!=null){
+                    if (footerImpl != null) {
                         BufferedImage footer = footerImpl.getFooter(combinedImage.getWidth(), derivate, imagePath);
-                        combinedImage=attachFooter(combinedImage, footer);
+                        combinedImage = attachFooter(combinedImage, footer);
                     }
                     job.getResponse().setHeader("Cache-Control", "max-age=" + MCRTileServlet.MAX_AGE);
                     job.getResponse().setContentType("image/jpeg");
@@ -155,13 +155,13 @@ public class MCRTileCombineServlet extends MCRServlet {
     }
 
     private static BufferedImage attachFooter(BufferedImage combinedImage, BufferedImage footer) {
-        BufferedImage resultImage=new BufferedImage(combinedImage.getWidth(), combinedImage.getHeight()+footer.getHeight(), combinedImage.getType());
-        Graphics2D graphics=resultImage.createGraphics();
-        try{
+        BufferedImage resultImage = new BufferedImage(combinedImage.getWidth(), combinedImage.getHeight() + footer.getHeight(), combinedImage.getType());
+        Graphics2D graphics = resultImage.createGraphics();
+        try {
             graphics.drawImage(combinedImage, 0, 0, null);
             graphics.drawImage(footer, 0, combinedImage.getHeight(), null);
             return resultImage;
-        }finally {
+        } finally {
             graphics.dispose();
         }
     }
