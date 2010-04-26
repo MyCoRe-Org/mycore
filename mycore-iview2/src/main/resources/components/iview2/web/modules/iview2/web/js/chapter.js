@@ -262,7 +262,6 @@ iview.chapter.View = function() {
 	this._selected = null;//stores the currently selected page and enables reset if Chapters will be selected
 	this.onevent = new iview.Event(this);//One Event to rule them all
 	this.notifyOthers = true;//onselect Event was caused by Controller calls, so don't handle them
-	this.dealEvent = true;//onselect Event was caused by Selection-changes within source code, so don't handle them as well
 	this._parent = null;//where will the tree be connected to
 };
 
@@ -292,23 +291,13 @@ iview.chapter.View = function() {
 				"onselect": function(node, tree) {
 					//To prevent endless loop check if the event is caused by some resets(chapter Selections)
 					//or as result of some external call
-					if (!that.dealEvent) { that.dealEvent = true; return;}
 					if (!that.notifyOthers) { that.notifyOthers = true; return;}
 					
 					var chapter = (jQuery(node).attr("dmdid") === undefined)? true:false;
 					
-					//add endless loop Prevention
-					that.dealEvent = false;
-					//Deselect the User clicked Element and lets see what the Model reports us(if it does)
-					if (that._selected != null) {
-						//if something was previously selected switch back to it
-						that._tree.select_branch(that._selected);
-					} else {
-						//nothing was selected before, simply deselect the selection
-						that._tree.deselect_branch(node);
-					}
 					//If that element isn't selected already and is no chapter notify all Listeners about the User interaction
 					if (that._selected != node && !chapter) {
+						that._selected = node;
 						that.onevent.notify({"type":'selected', 
 							"old":jQuery(that._selected).attr("dmdid"), 
 							"new":jQuery(node).attr("dmdid")});
@@ -411,6 +400,15 @@ iview.chapter.View = function() {
 		jQuery.each(res, function(index, element) {that._tree.select_branch(element); that._selected = element});
 	}
 	
+	/*
+	 * @description returns the currently selected entry within this view, if nothing is selected an empty String is returned
+	 * @return returns the dmdid of the currently selected entry, if no entry is selected an empty String is returned 
+	 */
+	function getSelected() {
+		if (this._selected == null) return "";
+		return jQuery(this._selected).attr("dmdid");
+	}
+	
 	iview.chapter.View.prototype.visible = visible;
 	iview.chapter.View.prototype.getTree = getTree;
 	iview.chapter.View.prototype.addTree = addTree;
@@ -418,6 +416,7 @@ iview.chapter.View = function() {
 	iview.chapter.View.prototype.addPage = addPage;
 	iview.chapter.View.prototype.initTree = initTree;
 	iview.chapter.View.prototype.selectNode = selectNode;
+	iview.chapter.View.prototype.getSelected = getSelected; 
 })();
 
 /********************************************************
@@ -433,7 +432,9 @@ iview.chapter.Controller = function(modelProvider, view, metsDoc) {
 	this._view = view  || null;
 	var that = this;
 	
-	this._model.onevent.attach(function(sender, args) { if (args.type == 'selected') that._view.selectNode(args["new"]);});
+	this._model.onevent.attach(function(sender, args) {
+		if (args.type == 'selected' && that._view.getSelected() != args["new"]) that._view.selectNode(args["new"]);
+	});
 	this._view.onevent.attach(function(sender, args) { if (args.type == 'selected') that._model.setSelected(args["new"]);});
 };
 
