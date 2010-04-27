@@ -214,7 +214,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
     }
 
     public void doLayout(HttpServletRequest req, HttpServletResponse res, org.w3c.dom.Document dom) throws IOException {
-        String docType = (dom.getDoctype() == null ? dom.getDocumentElement().getTagName() : dom.getDoctype().getName());
+        String docType = (dom.getDoctype() == null ? dom.getDocumentElement().getLocalName() : dom.getDoctype().getName());
         Properties parameters = buildXSLParameters(req);
         String resourceName = getResourceName(req, parameters, docType);
         if (resourceName == null)
@@ -226,6 +226,11 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
     public void doLayout(HttpServletRequest req, HttpServletResponse res, InputStream is) throws IOException {
         MCRContentInputStream cis = new MCRContentInputStream(is);
         String docType = MCRUtils.parseDocumentType(new ByteArrayInputStream(cis.getHeader()));
+        int pos=docType.indexOf(':')+1;
+        if (pos>0){
+            //filter namespace prefix
+            docType=docType.substring(pos);
+        }
 
         Properties parameters = buildXSLParameters(req);
         String resourceName = getResourceName(req, parameters, docType);
