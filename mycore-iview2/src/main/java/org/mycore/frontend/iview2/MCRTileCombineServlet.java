@@ -113,6 +113,9 @@ public class MCRTileCombineServlet extends MCRServlet {
             job.getRequest().setAttribute(THUMBNAIL_KEY, iviewFile);
             LOGGER.info("IView2 file: " + iviewFile.getAbsolutePath());
             int zoomLevel = 0;
+            if (zoomAlias.equals("MIN")) {
+                zoomLevel = 1;
+            }
             if (zoomAlias.equals("MID")) {
                 zoomLevel = 2;
             }
