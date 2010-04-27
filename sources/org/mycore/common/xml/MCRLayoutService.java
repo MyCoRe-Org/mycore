@@ -98,8 +98,7 @@ import org.xml.sax.SAXException;
 public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
 
     /** A cache of already compiled stylesheets */
-    private static MCRCache STYLESHEETS_CACHE = new MCRCache(MCRConfiguration.instance().getInt("MCR.LayoutService.XSLCacheSize", 100),
-            "XSLT Stylesheets");
+    private static MCRCache STYLESHEETS_CACHE = new MCRCache(MCRConfiguration.instance().getInt("MCR.LayoutService.XSLCacheSize", 100), "XSLT Stylesheets");
 
     private static MCRXMLResource XML_RESOURCE = MCRXMLResource.instance();
 
@@ -226,10 +225,10 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
     public void doLayout(HttpServletRequest req, HttpServletResponse res, InputStream is) throws IOException {
         MCRContentInputStream cis = new MCRContentInputStream(is);
         String docType = MCRUtils.parseDocumentType(new ByteArrayInputStream(cis.getHeader()));
-        int pos=docType.indexOf(':')+1;
-        if (pos>0){
+        int pos = docType.indexOf(':') + 1;
+        if (pos > 0) {
             //filter namespace prefix
-            docType=docType.substring(pos);
+            docType = docType.substring(pos);
         }
 
         Properties parameters = buildXSLParameters(req);
@@ -268,8 +267,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         return out.getDocument();
     }
 
-    private void transform(HttpServletResponse res, Source sourceXML, String docType, Properties parameters, Templates stylesheet)
-            throws IOException {
+    private void transform(HttpServletResponse res, Source sourceXML, String docType, Properties parameters, Templates stylesheet) throws IOException {
         Transformer transformer = buildTransformer(stylesheet);
         setXSLParameters(transformer, parameters);
 
@@ -289,8 +287,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         }
     }
 
-    private void transform(HttpServletResponse res, Source sourceXML, String docType, Properties parameters, String resourceName)
-            throws IOException {
+    private void transform(HttpServletResponse res, Source sourceXML, String docType, Properties parameters, String resourceName) throws IOException {
         Templates stylesheet = buildCompiledStylesheet(resourceName);
         transform(res, sourceXML, docType, parameters, stylesheet);
     }
@@ -451,8 +448,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
     private Templates buildCompiledStylesheet(String resource) {
         Templates stylesheet = null;
         try {
-            stylesheet = (Templates) (STYLESHEETS_CACHE.getIfUpToDate(resource, XML_RESOURCE.getLastModified(resource, this.getClass()
-                    .getClassLoader())));
+            stylesheet = (Templates) (STYLESHEETS_CACHE.getIfUpToDate(resource, XML_RESOURCE.getLastModified(resource, this.getClass().getClassLoader())));
         } catch (IOException e) {
             LOGGER.warn("Could not determine last modified date of resource " + resource);
         }
@@ -569,8 +565,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
      * @param response
      *            the response object to send the result to
      */
-    private void transform(Source xml, Templates xsl, Transformer transformer, HttpServletResponse response) throws IOException,
-            MCRException {
+    private void transform(Source xml, Templates xsl, Transformer transformer, HttpServletResponse response) throws IOException, MCRException {
 
         // Set content type from "<xsl:output media-type = "...">
         // Set char encoding from "<xsl:output encoding = "...">
@@ -689,8 +684,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
      * mode.
      */
     public void selected(SelectionEvent ev) {
-        String log = "Selection <xsl:" + ev.m_styleNode.getTagName() + " " + ev.m_attributeName + "=\"" + ev.m_xpath.getPatternString()
-                + "\">";
+        String log = "Selection <xsl:" + ev.m_styleNode.getTagName() + " " + ev.m_attributeName + "=\"" + ev.m_xpath.getPatternString() + "\">";
         LOGGER.debug(log);
         try {
             if ("true".equals(ev.m_processor.getParameter("DEBUG")))
