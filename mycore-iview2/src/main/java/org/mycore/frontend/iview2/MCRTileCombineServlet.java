@@ -72,6 +72,10 @@ public class MCRTileCombineServlet extends MCRServlet {
 
     private MCRFooterInterface footerImpl = null;
 
+    private static final String IMAGE_KEY = MCRTileCombineServlet.class.getName() + ".image";
+
+    private static final String THUMBNAIL_KEY = MCRTileCombineServlet.class.getName() + ".thumb";
+
     @Override
     public void init() throws ServletException {
         super.init();
@@ -94,7 +98,7 @@ public class MCRTileCombineServlet extends MCRServlet {
     }
 
     @Override
-    protected void render(MCRServletJob job, Exception ex) throws Exception {
+    protected void think(MCRServletJob job) throws Exception {
         try {
             String pathInfo = job.getRequest().getPathInfo();
             if (pathInfo.startsWith("/")) {
@@ -106,6 +110,7 @@ public class MCRTileCombineServlet extends MCRServlet {
             String imagePath = pathInfo.substring(derivate.length());
             LOGGER.info("Zoom-Level: " + zoomAlias + ", derivate: " + derivate + ", image: " + imagePath);
             File iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, imagePath);
+            job.getRequest().setAttribute(THUMBNAIL_KEY, iviewFile);
             LOGGER.info("IView2 file: " + iviewFile.getAbsolutePath());
             int zoomLevel = 0;
             if (zoomAlias.equals("MID")) {
@@ -115,7 +120,7 @@ public class MCRTileCombineServlet extends MCRServlet {
                 zoomLevel = 3;
             }
             if (zoomLevel == 0 && footerImpl == null) {
-                sendThumbnail(iviewFile, job.getResponse());
+                //we're done, sendThumbnail is called in render phase
                 return;
             } else {
                 BufferedImage combinedImage = MCRIView2Tools.getZoomLevel(iviewFile, zoomLevel);
@@ -124,26 +129,7 @@ public class MCRTileCombineServlet extends MCRServlet {
                         BufferedImage footer = footerImpl.getFooter(combinedImage.getWidth(), derivate, imagePath);
                         combinedImage = attachFooter(combinedImage, footer);
                     }
-                    job.getResponse().setHeader("Cache-Control", "max-age=" + MCRTileServlet.MAX_AGE);
-                    job.getResponse().setContentType("image/jpeg");
-                    job.getResponse().setDateHeader("Last-Modified", iviewFile.lastModified());
-                    Date expires = new Date(System.currentTimeMillis() + MCRTileServlet.MAX_AGE * 1000);
-                    LOGGER.info("Last-Modified: " + new Date(iviewFile.lastModified()) + ", expire on: " + expires);
-                    job.getResponse().setDateHeader("Expires", expires.getTime());
-                    ServletOutputStream sout = job.getResponse().getOutputStream();
-                    try {
-                        ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(sout);
-                        try {
-                            imageWriter.get().setOutput(imageOutputStream);
-                            IIOImage iioImage = new IIOImage(combinedImage, null, null);
-                            imageWriter.get().write(null, iioImage, imageWriteParam);
-                        } finally {
-                            imageWriter.get().reset();
-                            imageOutputStream.close();
-                        }
-                    } finally {
-                        sout.close();
-                    }
+                    job.getRequest().setAttribute(IMAGE_KEY, combinedImage);
                 } else {
                     job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
                     return;
@@ -151,6 +137,45 @@ public class MCRTileCombineServlet extends MCRServlet {
             }
         } finally {
             LOGGER.info("Finished sending " + job.getRequest().getPathInfo());
+        }
+    }
+
+    @Override
+    protected void render(MCRServletJob job, Exception ex) throws Exception {
+        if (job.getResponse().isCommitted()) {
+            return;
+        }
+        if (ex != null) {
+            generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while aquiring image", ex, false);
+            return;
+        }
+        //check for thumnail
+        File iviewFile = (File) job.getRequest().getAttribute(THUMBNAIL_KEY);
+        BufferedImage combinedImage = (BufferedImage) job.getRequest().getAttribute(IMAGE_KEY);
+        if (iviewFile != null && combinedImage == null) {
+            sendThumbnail(iviewFile, job.getResponse());
+            return;
+        }
+        //send combined image
+        job.getResponse().setHeader("Cache-Control", "max-age=" + MCRTileServlet.MAX_AGE);
+        job.getResponse().setContentType("image/jpeg");
+        job.getResponse().setDateHeader("Last-Modified", iviewFile.lastModified());
+        Date expires = new Date(System.currentTimeMillis() + MCRTileServlet.MAX_AGE * 1000);
+        LOGGER.info("Last-Modified: " + new Date(iviewFile.lastModified()) + ", expire on: " + expires);
+        job.getResponse().setDateHeader("Expires", expires.getTime());
+        ServletOutputStream sout = job.getResponse().getOutputStream();
+        try {
+            ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(sout);
+            try {
+                imageWriter.get().setOutput(imageOutputStream);
+                IIOImage iioImage = new IIOImage(combinedImage, null, null);
+                imageWriter.get().write(null, iioImage, imageWriteParam);
+            } finally {
+                imageWriter.get().reset();
+                imageOutputStream.close();
+            }
+        } finally {
+            sout.close();
         }
     }
 
