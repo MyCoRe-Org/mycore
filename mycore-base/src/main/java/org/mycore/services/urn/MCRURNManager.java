@@ -242,6 +242,15 @@ public class MCRURNManager {
     public static String getURNforDocument(String documentID) {
         return store.getURNforDocument(documentID);
     }
+    
+    /**
+     * @param derivateId
+     * @param fileName
+     * @return the URN for the given file if any
+     */
+    public static String getURNForFile(String derivateId, String fileName) {
+        return store.getURNForFile(derivateId, fileName);
+    }
 
     /**
      * Retrieves the document ID that is assigned to the given urn
