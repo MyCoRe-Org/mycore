@@ -202,7 +202,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
     public final synchronized int getHighestStoredID(String project, String type) throws MCRPersistenceException {
 
         Session session = getSession();
-        List<?> l = session.createQuery("select max(key.id) from " + classname + " where MCRID like '" + project + "_" + type + "_%'").list();
+        List<?> l = session.createQuery("select max(key.id) from " + classname + " where MCRID like '" + project + "\\_" + type + "\\_%' ESCAPE '\\'").list();
         if (l.size() == 0 || l.get(0) == null)
             return 0;
         else {
@@ -279,7 +279,8 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
 
     public List<MCRObjectIDDate> listObjectDates(String type) {
         Session session = getSession();
-        Criteria criteria = session.createCriteria(MCRXMLTABLE.class).add(Restrictions.eq("type", type)).setProjection(Projections.projectionList().add(Projections.property("key.id")).add(Projections.property("lastModified")));
+        Criteria criteria = session.createCriteria(MCRXMLTABLE.class).add(Restrictions.eq("type", type)).setProjection(
+            Projections.projectionList().add(Projections.property("key.id")).add(Projections.property("lastModified")));
         List<?> result = criteria.list();
         return new MCRObjectIDDateList(result);
     }
