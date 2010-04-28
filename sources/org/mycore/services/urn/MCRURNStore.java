@@ -37,13 +37,20 @@ public interface MCRURNStore {
 
     /** Assigns the given urn to the given derivate ID */
     public void assignURN(String urn, String derivate, String path, String filename);
-    
+
     /**
      * Retrieves the URN that is assigned to the given document ID
      * 
      * @return the urn, or null if no urn is assigned to this ID
      */
     public String getURNforDocument(String documentID);
+
+    /**
+     * Retrieves the URN that is assigned to the given file
+     * 
+     * @return the URN for the given file within the given derivate
+     */
+    public String getURNForFile(String derivateId, String fileName);
 
     /**
      * Retrieves the document ID that is assigned to the given urn
@@ -56,13 +63,13 @@ public interface MCRURNStore {
      * Removes the urn (and assigned document ID) from the persistent store
      */
     public void removeURN(String urn);
-    
+
     /**
-     * Removes the urn (and assigned document ID) from the persistent store by the 
-     * given object id
+     * Removes the urn (and assigned document ID) from the persistent store by
+     * the given object id
      */
     public void removeURNByObjectID(String objID);
-    
-    /**Checks wether an object or derivate has an urn assigned*/
+
+    /** Checks wether an object or derivate has an urn assigned */
     public boolean hasURNAssigned(String objId);
 }

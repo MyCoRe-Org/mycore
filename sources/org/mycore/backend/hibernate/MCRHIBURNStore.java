@@ -87,7 +87,8 @@ public class MCRHIBURNStore implements MCRURNStore {
      * @exception MCRPersistenceException
      *                the method arguments are not correct
      */
-    public synchronized final void create(String urn, String id, String path, String filename) throws MCRPersistenceException {
+    public synchronized final void create(String urn, String id, String path, String filename)
+            throws MCRPersistenceException {
         if (urn == null || (urn.length() == 0)) {
             throw new MCRPersistenceException("The URN is null.");
         }
@@ -149,7 +150,8 @@ public class MCRHIBURNStore implements MCRURNStore {
         }
 
         StringBuffer sb = new StringBuffer();
-        sb.append("delete from ").append(classname).append(" where MCRURN = '").append(urn).append("'");
+        sb.append("delete from ").append(classname).append(" where MCRURN = '").append(urn).append(
+                "'");
 
         Session session = getSession();
         int deleted = session.createQuery(sb.toString()).executeUpdate();
@@ -160,7 +162,7 @@ public class MCRHIBURNStore implements MCRURNStore {
      * The method remove a item for the URN from the datastore.
      * 
      * @param objID
-     *            an object id 
+     *            an object id
      * @exception MCRPersistenceException
      *                the method argument is not correct
      */
@@ -170,7 +172,8 @@ public class MCRHIBURNStore implements MCRURNStore {
         }
 
         StringBuffer sb = new StringBuffer();
-        sb.append("delete from ").append(classname).append(" where MCRID = '").append(objID).append("'");
+        sb.append("delete from ").append(classname).append(" where MCRID = '").append(objID)
+                .append("'");
 
         Session session = getSession();
         int deleted = session.createQuery(sb.toString()).executeUpdate();
@@ -203,7 +206,8 @@ public class MCRHIBURNStore implements MCRURNStore {
         }
 
         Session session = getSession();
-        StringBuffer querySB = new StringBuffer("select key.mcrurn from ").append(classname).append(" where key.mcrid='").append(id).append("'");
+        StringBuffer querySB = new StringBuffer("select key.mcrurn from ").append(classname)
+                .append(" where key.mcrid='").append(id).append("'");
         logger.debug("HQL-Statement: " + querySB.toString());
         List<String> returns = session.createQuery(querySB.toString()).list();
         if (returns.size() != 1)
@@ -212,8 +216,8 @@ public class MCRHIBURNStore implements MCRURNStore {
     }
 
     /**
-     * Removes the urn (and assigned document ID) from the persistent store by the given 
-     * object id
+     * Removes the urn (and assigned document ID) from the persistent store by
+     * the given object id
      * 
      * @param urn
      *            a URN
@@ -238,7 +242,8 @@ public class MCRHIBURNStore implements MCRURNStore {
         }
 
         Session session = getSession();
-        StringBuffer querySB = new StringBuffer("select key.mcrid from ").append(classname).append(" where key.mcrurn='").append(urn).append("'");
+        StringBuffer querySB = new StringBuffer("select key.mcrid from ").append(classname).append(
+                " where key.mcrurn='").append(urn).append("'");
         logger.debug("HQL-Statement: " + querySB.toString());
         List<String> returns = session.createQuery(querySB.toString()).list();
         if (returns.size() != 1)
@@ -260,7 +265,8 @@ public class MCRHIBURNStore implements MCRURNStore {
         }
 
         Session session = getSession();
-        StringBuffer querySB = new StringBuffer("select key.mcrurn from ").append(classname).append(" where key.mcrid='").append(id).append("'");
+        StringBuffer querySB = new StringBuffer("select key.mcrurn from ").append(classname)
+                .append(" where key.mcrid='").append(id).append("'");
         logger.debug("HQL-Statement: " + querySB.toString());
         List<String> returns = session.createQuery(querySB.toString()).list();
         if (returns == null || returns.isEmpty()) {
@@ -282,7 +288,8 @@ public class MCRHIBURNStore implements MCRURNStore {
         }
 
         Session session = getSession();
-        StringBuffer query = new StringBuffer("select key.mcrid from ").append(classname).append(" where key.mcrurn = '").append(urn).append("'");
+        StringBuffer query = new StringBuffer("select key.mcrid from ").append(classname).append(
+                " where key.mcrurn = '").append(urn).append("'");
         List<String> l = session.createQuery(query.toString()).list();
         if (!l.isEmpty()) {
             exists = true;
@@ -299,6 +306,37 @@ public class MCRHIBURNStore implements MCRURNStore {
      */
     public boolean isAssigned(String urn) {
         return exist(urn);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mycore.services.urn.MCRURNStore#getURNForFile(java.lang.String,
+     * java.lang.String)
+     */
+    public String getURNForFile(String derivateId, String fileName) {
+        if (derivateId == null || fileName == null) {
+            return null;
+        }
+
+        Session session = getSession();
+        StringBuffer querySB = new StringBuffer();
+        querySB.append("select key.mcrurn from ");
+        querySB.append(classname).append(" where key.mcrid='");
+        querySB.append(derivateId).append("'");
+        querySB.append(" and filename='").append(fileName).append("'");
+        logger.debug("HQL-Statement: " + querySB.toString());
+        List<String> returns = session.createQuery(querySB.toString()).list();
+        if (returns.isEmpty()) {
+            return null;
+        }
+        if (returns.size() != 1) {
+            logger.warn("There are more than just one urn for file \"" + fileName
+                    + "\" in derivate \"" + derivateId + "\"");
+        }
+        String urn = returns.get(0);
+
+        return urn;
     }
 
 }
