@@ -142,7 +142,7 @@ public class MCRDefaultQueryEngine extends MCRBaseClass implements MCRQueryEngin
      * Returns the ID of the index of all fields referenced in this condition.
      * If the fields come from multiple indexes, the constant mixed is returned.
      */
-    private String getIndex(MCRCondition cond) {
+    protected String getIndex(MCRCondition cond) {
         if (cond instanceof MCRQueryCondition) {
             return ((MCRQueryCondition) cond).getField().getIndex();
         } else if (cond instanceof MCRNotCondition) {

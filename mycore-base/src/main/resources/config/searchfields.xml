@@ -48,13 +48,13 @@
   
   <index id="urn">
     <!-- field for retrieving all objects where the derivates have urn -->
-    <field name="objectsWithURN" type="boolean" />
+    <field name="objectsWithURN" source="objectMetadata" type="boolean" />
     <field name="objectURN" source="objectMetadata" type="text"/>
   </index>
-  
+
   <index id="derivate">
     <!-- field for for quering the modification date of an derivate in the database -->
-    <field name="derivateModificationDate" type="timestamp" />
+    <field name="derivateModificationDate" source="derivateMetadata" type="timestamp" />
   </index>
 
 </searchfields>
