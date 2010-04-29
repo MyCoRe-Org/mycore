@@ -243,7 +243,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                 LOGGER.debug("Trying to resolve " + href + " from resource " + resourceName);
                 return new JDOMSource(SUPPORTED_SCHEMES.get("resource").resolveElement(resourceName));
             } catch (Exception e) {
-                LOGGER.error("could not find Stylesheet " + href + " in resource " + resourceName);
+                LOGGER.error("Error while parsing stylesheet from resource " + resourceName, e);
             }
         }
         return null;
