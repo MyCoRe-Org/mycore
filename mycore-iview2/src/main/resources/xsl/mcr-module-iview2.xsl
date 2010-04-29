@@ -3,6 +3,7 @@
   exclude-result-prefixes="xlink i18n mcrxml iview2">
   <xsl:param name="MCR.Module-iview2.BaseURL" />
   <xsl:param name="WebApplicationBaseURL" />
+  <xsl:param name="ServletsBaseURL" />
   <xsl:output method="html" indent="yes" encoding="UTF-8" media-type="text/html" />
   <xsl:template name="iview2.getViewer" mode="iview2">
     <xsl:param name="groupID" />
@@ -13,7 +14,17 @@
     <xsl:param name="style" />
     
     <script type="text/javascript">
-      var baseUris='["'+'<xsl:value-of select="$MCR.Module-iview2.BaseURL"/>'.split(',').join('","')+'"]';
+      <xsl:variable name="baseUris">
+        <xsl:choose>
+          <xsl:when test="string-length($MCR.Module-iview2.BaseURL)&lt;10">
+            <xsl:value-of select="concat($ServletsBaseURL,'MCRTileServlet')" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$MCR.Module-iview2.BaseURL" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      var baseUris='["'+'<xsl:value-of select="$baseUris"/>'.split(',').join('","')+'"]';
       addIviewProperty('<xsl:value-of select="$groupID" />', 'useZoomBar',<xsl:value-of select="$zoomBar" />);
       addIviewProperty('<xsl:value-of select="$groupID" />', 'useChapter',<xsl:value-of select="$chapter" />);
       addIviewProperty('<xsl:value-of select="$groupID" />', 'useCutOut',<xsl:value-of select="$cutOut" />);
