@@ -477,19 +477,24 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
                 MCRException mex = (MCRException) exc;
                 msg.append("\n").append(mex.getMessage());
                 exc = mex.getException();
-            } else if (exc instanceof TransformerException) {
+            }
+            if (exc instanceof WrappedRuntimeException) {
+                exc = ((WrappedRuntimeException) exc).getException();
+            }
+            if (exc instanceof TransformerException) {
                 TransformerException tex = (TransformerException) exc;
                 msg.append("\n").append(tex.getMessage());
                 SourceLocator sl = tex.getLocator();
                 if (sl != null)
                     msg.append(" at line ").append(sl.getLineNumber()).append(" column ").append(sl.getColumnNumber());
-
+                if (tex.getCause() instanceof MCRException) {
+                    reportCompileError(resource, (Exception) tex.getCause());
+                    return;
+                }
                 if (tex.getCause() instanceof Exception)
                     exc = (Exception) (tex.getCause());
                 else
                     exc = null;
-            } else if (exc instanceof WrappedRuntimeException) {
-                exc = ((WrappedRuntimeException) exc).getException();
             } else {
                 msg.append("\n").append(exc.getMessage());
                 if (exc.getCause() instanceof Exception)
@@ -499,7 +504,6 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
             }
         }
 
-        LOGGER.error(msg);
         throw new MCRConfigurationException(msg.toString(), exc);
     }
 
