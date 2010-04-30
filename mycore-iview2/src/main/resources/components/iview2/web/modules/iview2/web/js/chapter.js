@@ -369,6 +369,9 @@ iview.chapter.View = function() {
 		if (bool === true) {
 			this._visible = true;
 			this._parent.slideDown();
+			//if the node isn't within the current Viewport it's not displayed as the previous selectBranch 
+			//wasn't able to position the entry within the viewport. because the viewport didn't existed at that time
+			this.selectNode(jQuery(this._selected).attr("dmdid"));
 		} else {
 			this._visible = false;
 			this._parent.slideUp();
@@ -475,16 +478,30 @@ iview.chapter.Controller = function(modelProvider, view, metsDoc) {
 	}
 	
 	/*
-	 * @description tells the View to change it's display mode to the supplied boolean value. Where true stands
-	 *  for visible/show and false for invisible/hidden
-	 * @param bool boolean which represents the state the view shall change it's display mode to
+	 * @description tells the view to show up
 	 */
-	function showView(bool) {
-		this._view.visible(bool);
+	function showView() {
+		this._view.visible(true);
+	}
+	
+	/*
+	 * @description tells the view to hide itself
+	 */	
+	function hideView() {
+		this._view.visible(false);
+	}
+
+	/*
+	 * @description tells the View to change it's display mode to the currently opposite mode
+	 */	
+	function toggleView() {
+		this._view.visible();
 	}
 	
 	iview.chapter.Controller.prototype.createView = createView;
 	iview.chapter.Controller.prototype.showView = showView;
+	iview.chapter.Controller.prototype.hideView = hideView;
+	iview.chapter.Controller.prototype.toggleView = toggleView;
 })();
 
 /*

@@ -573,12 +573,12 @@ function openChapter(major, viewID){
 	//TODO Positionierung klappt bei WebKit nicht, da die irgendwie CSS nicht einlesen durch Chapter einbau in Viewer kÃƒÂ¶nnte das behoben werden
 	if (major) {
 		// für major (Button) always reaction
-		if (!Iview[viewID].chapterActive) {//ADDED
+		if (!Iview[viewID].chapterActive) {
 			Iview[viewID].chapterActive = true;
-			Iview[viewID].chapter.showView(Iview[viewID].chapterActive);//ADDED
+			Iview[viewID].chapter.showView();
 		} else {
 			Iview[viewID].chapterActive = false;
-			Iview[viewID].chapter.showView(Iview[viewID].chapterActive);//ADDED
+			Iview[viewID].chapter.hideView();
 		}
 	} else {
 /*		// nur dann einblenden, wenn es durch Modus ausgeblendet wurde
