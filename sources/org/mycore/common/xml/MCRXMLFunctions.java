@@ -26,14 +26,20 @@ package org.mycore.common.xml;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.apache.log4j.Logger;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
+import org.apache.log4j.Logger;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
+import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.hibernate.tables.MCRURN;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
 import org.mycore.parsers.bool.MCRCondition;
@@ -42,6 +48,9 @@ import org.mycore.services.fieldquery.MCRQueryManager;
 import org.mycore.services.fieldquery.MCRQueryParser;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.urn.MCRURNManager;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -66,6 +75,17 @@ public class MCRXMLFunctions {
     private static final String DEFAULT_PORT = "80";
 
     private static final Logger LOGGER = Logger.getLogger(MCRXMLFunctions.class);
+
+    private static final DocumentBuilder DOC_BUILDER;
+    static {
+        DocumentBuilder documentBuilder = null;
+        try {
+            documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            LOGGER.error("Could not instantiate DocumentBuilder. Not all functions will be available.", e);
+        }
+        DOC_BUILDER = documentBuilder;
+    }
 
     /**
      * returns the given String trimmed
@@ -104,7 +124,7 @@ public class MCRXMLFunctions {
     public static StringBuffer getBaseLink(String hostAlias) {
         StringBuffer returns = new StringBuffer();
         returns.append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(PROTOCOLL_SUFFIX).toString(), "http")).append("://").append(
-                CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(HOST_SUFFIX).toString()));
+            CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(HOST_SUFFIX).toString()));
         String port = CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(PORT_SUFFIX).toString(), DEFAULT_PORT);
         if (!port.equals(DEFAULT_PORT)) {
             returns.append(":").append(port);
@@ -120,14 +140,14 @@ public class MCRXMLFunctions {
         if (LOGGER.isDebugEnabled()) {
             StringBuffer sb = new StringBuffer("isoDate=");
             sb.append(isoDate).append(", simpleFormat=").append(simpleFormat).append(", isoFormat=").append(isoFormat).append(", iso649Language=").append(
-                    iso639Language);
+                iso639Language);
             LOGGER.debug(sb.toString());
         }
         Locale locale = new Locale(iso639Language);
         MCRMetaISO8601Date mcrdate = new MCRMetaISO8601Date();
         mcrdate.setFormat(isoFormat);
         mcrdate.setDate(isoDate);
-        String formatted=mcrdate.format(simpleFormat, locale);
+        String formatted = mcrdate.format(simpleFormat, locale);
         return (formatted == null) ? "?" + isoDate + "?" : formatted;
     }
 
@@ -137,7 +157,7 @@ public class MCRXMLFunctions {
             date = new Date(Long.parseLong(simpleDate));
         } else {
             SimpleDateFormat df = new SimpleDateFormat(simpleFormat);
-            df.setTimeZone(TimeZone.getTimeZone("UTC")); 
+            df.setTimeZone(TimeZone.getTimeZone("UTC"));
             // or else testcase
             // "1964-02-24" would
             // result "1964-02-23"
@@ -168,7 +188,7 @@ public class MCRXMLFunctions {
         }
         return result.getNumHits();
     }
-    
+
     /**
      * @return true if the given object has an urn assigned, false otherwise
      * */
@@ -183,14 +203,48 @@ public class MCRXMLFunctions {
             return false;
         }
     }
-    
-    public static boolean classAvailable(String className){
+
+    /**
+     * returns the URN for <code>mcrid</code> and children if <code>mcrid</code> is a derivate.
+     * @param mcrid MCRObjectID of object or derivate
+     * @return list of mcrid|file to urn mappings
+     */
+    public static NodeList getURNsForMCRID(String mcrid) {
+        Session session = MCRHIBConnection.instance().getSession();
+        Criteria criteria = session.createCriteria(MCRURN.class);
+        criteria.add(Restrictions.eq("key.mcrid", mcrid));
+        Document document = DOC_BUILDER.newDocument();
+        Element rootElement = document.createElement("urn");
+        document.appendChild(rootElement);
+        @SuppressWarnings("unchecked")
+        List<MCRURN> results = criteria.list();
+        for (MCRURN result : results) {
+            String path = result.getPath().trim();
+            if (path.length() > 0 && path.charAt(0) == '/') {
+                path = path.substring(1);
+            }
+            path += result.getFilename().trim();
+            if (path.length() > 0) {
+                Element file = document.createElement("file");
+                file.setAttribute("urn", result.getKey().getMcrurn());
+                file.setAttribute("name", path);
+                rootElement.appendChild(file);
+            } else {
+                rootElement.setAttribute("mcrid", result.getKey().getMcrid());
+                rootElement.setAttribute("urn", result.getKey().getMcrurn());
+            }
+            session.evict(result);
+        }
+        return rootElement.getChildNodes();
+    }
+
+    public static boolean classAvailable(String className) {
         try {
             Class.forName(className);
-            LOGGER.debug("found class: "+className);
+            LOGGER.debug("found class: " + className);
             return true;
         } catch (ClassNotFoundException e) {
-            LOGGER.debug("did not found class: "+className);
+            LOGGER.debug("did not found class: " + className);
             return false;
         }
     }
