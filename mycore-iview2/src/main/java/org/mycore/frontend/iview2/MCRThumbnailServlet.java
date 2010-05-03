@@ -61,8 +61,8 @@ public class MCRThumbnailServlet extends MCRServlet {
     private ConcurrentLinkedQueue<ImageWriter> imageWriters = new ConcurrentLinkedQueue<ImageWriter>();
 
     private static Logger LOGGER = Logger.getLogger(MCRThumbnailServlet.class);
-    
-    private static final int THUMBNAIL_SIZE = 256;
+
+    private int thumbnailSize = MCRImage.getTileSize();
 
     @Override
     public void init() throws ServletException {
@@ -74,6 +74,11 @@ public class MCRThumbnailServlet extends MCRServlet {
         } catch (UnsupportedOperationException e) {
             LOGGER.warn("Your PNG encoder does not support progressive PNGs.");
         }
+        String thSize = getInitParameter("thumbnailSize");
+        if (thSize != null) {
+            thumbnailSize = Integer.parseInt(thSize);
+        }
+        LOGGER.info(getServletName() + ": setting thumbnail size to " + thumbnailSize);
     }
 
     @Override
@@ -130,8 +135,8 @@ public class MCRThumbnailServlet extends MCRServlet {
         BufferedImage level1Image = MCRIView2Tools.getZoomLevel(iviewFile, 1);
         final double width = level1Image.getWidth();
         final double height = level1Image.getHeight();
-        final int newWidth = width < height ? (int) Math.ceil(THUMBNAIL_SIZE * width / height) : THUMBNAIL_SIZE;
-        final int newHeight = width < height ? THUMBNAIL_SIZE : (int) Math.ceil(THUMBNAIL_SIZE * height / width);
+        final int newWidth = width < height ? (int) Math.ceil(thumbnailSize * width / height) : thumbnailSize;
+        final int newHeight = width < height ? thumbnailSize : (int) Math.ceil(thumbnailSize * height / width);
         int imageType = level1Image.getType();
         if (imageType == BufferedImage.TYPE_CUSTOM) {
             imageType = BufferedImage.TYPE_INT_RGB;
@@ -154,10 +159,10 @@ public class MCRThumbnailServlet extends MCRServlet {
     }
 
     private BufferedImage centerThumbnail(BufferedImage thumbnail) {
-        BufferedImage centered = new BufferedImage(MCRImage.getTileSize(), MCRImage.getTileSize(), BufferedImage.TYPE_INT_ARGB);
+        BufferedImage centered = new BufferedImage(thumbnailSize, thumbnailSize, BufferedImage.TYPE_INT_ARGB);
         Graphics graphics = centered.getGraphics();
-        int x = (MCRImage.getTileSize() - thumbnail.getWidth()) / 2;
-        int y = (MCRImage.getTileSize() - thumbnail.getHeight()) / 2;
+        int x = (thumbnailSize - thumbnail.getWidth()) / 2;
+        int y = (thumbnailSize - thumbnail.getHeight()) / 2;
         graphics.drawImage(thumbnail, x, y, null);
         return centered;
     }
