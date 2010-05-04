@@ -294,7 +294,14 @@ public class MCROAIQueryImpl implements MCROAIQuery {
             dateFrom.addChild(new MCRQueryCondition(field, ">=", date));
         }
 
-        MCRFieldDef fileDateModified = MCRFieldDef.getDef("derivateModificationDate");
+        MCRFieldDef fileDateModified = null;
+        try{
+        	fileDateModified = MCRFieldDef.getDef("derivateModificationDate");
+        }
+        catch(MCRConfigurationException e){
+        	//search field "derivateModificationDate" was not defined
+        	//fileDateModified will be null
+        }
        
         if (from != null && fileDateModified!=null) {
             String date = getTimeStamp(from[0]);
