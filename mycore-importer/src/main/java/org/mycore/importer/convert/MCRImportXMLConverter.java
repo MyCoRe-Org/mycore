@@ -58,7 +58,7 @@ public class MCRImportXMLConverter implements MCRImportRecordConverter<Document>
         String base = getElementBase(e);
 
         // add text
-        if(e.getText() != null) {
+        if(e.getText() != null && !e.getText().equals("")) {
             StringBuffer textId = new StringBuffer(base);
             textId.delete(textId.length() - 1, textId.length());
             MCRImportField textField = new MCRImportField(textId.toString(), e.getText());
