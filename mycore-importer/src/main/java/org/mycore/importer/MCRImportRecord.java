@@ -68,7 +68,7 @@ public class MCRImportRecord {
 
     /**
      * Returns the first field from the field list selected
-     * by the given field id. If no field is found null is
+     * by the given field id. If no field is found, null is
      * returned.
      * 
      * @param fieldId identifier of the field
@@ -79,6 +79,21 @@ public class MCRImportRecord {
         if(fieldList.isEmpty())
             return null;
         return fieldList.get(0);
+    }
+
+    /**
+     * Returns the value of the first field from the field list
+     * selected by the field id. If no field is found, null is
+     * returned.
+     * 
+     * @param fieldId identifier of the field
+     * @return value of the field or null if nothing found
+     */
+    public String getFieldValue(String fieldId) {
+        MCRImportField field = getFieldById(fieldId);
+        if(field != null)
+            return field.getValue();
+        return null;
     }
 
     /**
