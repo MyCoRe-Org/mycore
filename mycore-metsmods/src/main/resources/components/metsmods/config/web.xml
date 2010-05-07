@@ -13,6 +13,11 @@
   <servlet-class>org.mycore.frontend.servlets.MCRStartMetsModsServlet</servlet-class>
 </servlet>
 
+<servlet>
+  <servlet-name>MCRMETSServlet</servlet-name>
+  <servlet-class>org.mycore.frontend.servlets.MCRMETSServlet</servlet-class>
+</servlet>
+
 <servlet-mapping>
   <servlet-name>MCRDFGViewerServlet</servlet-name>
   <url-pattern>/servlets/MCRDFGViewerServlet</url-pattern>
@@ -21,4 +26,9 @@
 <servlet-mapping>
   <servlet-name>MCRStartMetsModsServlet</servlet-name>
   <url-pattern>/servlets/MCRStartMetsModsServlet</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+  <servlet-name>MCRMETSServlet</servlet-name>
+  <url-pattern>/servlets/MCRMETSServlet/*</url-pattern>
 </servlet-mapping>
