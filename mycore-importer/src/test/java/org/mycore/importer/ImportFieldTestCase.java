@@ -50,6 +50,31 @@ public class ImportFieldTestCase extends MCRTestCase {
         resolver.resolveFields("{f1}, {add}, {notInFieldList}");
         // contains f2, f3, f4, num, x_10_5, x_10
         assertEquals(6, resolver.getNotUsedFields().size());
+    }
 
+    @Test
+    public void subFields() throws Exception {
+        // create test fields
+        MCRImportField p1 = new MCRImportField("p", "parent 1");
+        MCRImportField p2 = new MCRImportField("p", "parent 2");
+        MCRImportField c1 = new MCRImportField("c1", "child 1");
+        MCRImportField c2 = new MCRImportField("c1", "child 2");
+        MCRImportField c3 = new MCRImportField("c2", "child 3");
+
+        // create structure
+        p1.addField(c1);
+        p2.addField(c2);
+        p2.addField(c3);
+
+        // do tests
+        List<MCRImportField> fieldList = new ArrayList<MCRImportField>();
+        fieldList.add(p1);
+        MCRImportFieldValueResolver resolver = new MCRImportFieldValueResolver(fieldList);
+        assertEquals("child 1", resolver.resolveFields("{p.c1}"));
+        fieldList.remove(p1);
+        fieldList.add(p2);
+        resolver = new MCRImportFieldValueResolver(fieldList);
+        assertEquals("child 2", resolver.resolveFields("{p.c1}"));
+        assertEquals("child 3", resolver.resolveFields("{p.c2}"));
     }
 }

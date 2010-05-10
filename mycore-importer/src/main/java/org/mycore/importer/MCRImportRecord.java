@@ -107,8 +107,9 @@ public class MCRImportRecord {
     public List<MCRImportField> getFieldsById(String fieldId) {
         List<MCRImportField> fieldList = new ArrayList<MCRImportField>();
         for(MCRImportField field : fields) {
-            if(field.getId().equals(fieldId))
-                fieldList.add(field);
+            List<MCRImportField> matchedFields = field.getFields(fieldId);
+            if(!matchedFields.isEmpty())
+                fieldList.addAll(matchedFields);
         }
         return fieldList;
     }

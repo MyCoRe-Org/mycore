@@ -24,6 +24,8 @@ import org.mycore.importer.MCRImportRecordConverter;
  */
 public class MCRImportXMLConverter implements MCRImportRecordConverter<Document> {
 
+    private String SEPARATOR = "/";
+
     private String name;
 
     /**
@@ -41,9 +43,8 @@ public class MCRImportXMLConverter implements MCRImportRecordConverter<Document>
     @Override
     public MCRImportRecord convert(Document toConvert) {
         MCRImportRecord record = new MCRImportRecord(this.name);
-        Iterator<Element> it = toConvert.getDescendants(new ElementFilter());
-        while(it.hasNext())
-            addFields(record, it.next());
+        MCRImportField rootField = convertElement(null, toConvert.getRootElement());
+        record.addField(rootField);
         return record;
     }
 
@@ -54,68 +55,54 @@ public class MCRImportXMLConverter implements MCRImportRecordConverter<Document>
      * @param record where the fields are added
      * @param e element to parse
      */
-    private void addFields(MCRImportRecord record, Element e) {
-        String base = getElementBase(e);
+    @SuppressWarnings("unchecked")
+    private MCRImportField convertElement(MCRImportField parentField, Element e) {
+        MCRImportField field = new MCRImportField(e.getQualifiedName(), null, SEPARATOR);
 
         // add text
-        if(e.getText() != null && !e.getText().equals("")) {
-            StringBuffer textId = new StringBuffer(base);
-            textId.delete(textId.length() - 1, textId.length());
-            MCRImportField textField = new MCRImportField(textId.toString(), e.getText());
-            record.addField(textField);
-        }
+        if(e.getText() != null && !e.getText().equals(""))
+            field.setValue(e.getText());
 
-        // add attributes
+        // add attributes as subfields
         for(Attribute a : (List<Attribute>)e.getAttributes()) {
-            StringBuffer attrId = new StringBuffer(base);
-            attrId.append("@");
+            StringBuffer attrId = new StringBuffer("@");
             String nsPrefix = a.getNamespacePrefix();
             if(nsPrefix != null && !nsPrefix.equals(""))
                 attrId.append(nsPrefix).append(":");
             attrId.append(a.getName());
             MCRImportField attrField = new MCRImportField(attrId.toString(), a.getValue());
-            record.addField(attrField);
+            field.addField(attrField);
         }
 
         // add namespaces
-        addNamespace(record, base, e.getNamespace());       
+        addNamespace(field, e.getNamespace());       
         for(Namespace ns : (List<Namespace>)e.getAdditionalNamespaces())
-            addNamespace(record, base, ns);
+            addNamespace(field, ns);
+
+        if(parentField != null && !field.isEmpty())
+            parentField.addField(field);
+
+        // go recursive through all children
+        for(Element childElement : (List<Element>)e.getChildren())
+            convertElement(field, childElement);
+
+        return field;
     }
 
     /**
-     * Adds a namespace field to the record.
+     * Adds a namespace field to the baseField.
      * 
-     * @param record where to add the namespace field
-     * @param base
+     * @param baseField where to add
      * @param ns namespace to add as field
      */
-    private void addNamespace(MCRImportRecord record, String base, Namespace ns) {
+    private void addNamespace(MCRImportField baseField, Namespace ns) {
         if(ns.getURI() == null || ns.getURI().equals(""))
             return;
-        StringBuffer nsId = new StringBuffer(base);
-        nsId.append("@xmlns");
+        StringBuffer nsId = new StringBuffer("@xmlns");
         if(ns.getPrefix() != null && !ns.getPrefix().equals(""))
             nsId.append(":").append(ns.getPrefix());
         MCRImportField nsField = new MCRImportField(nsId.toString(), ns.getURI());
-        record.addField(nsField);
+        baseField.addField(nsField);
     }
 
-    /**
-     * <p>Returns a string in dependence of the hierarchy of the element.
-     * The elements are separated a slash. E.g.:</p>
-     * root/parent1/parent2/element/
-     * 
-     * @param e the element where the get the hierarchy as string
-     * @return
-     */
-    private String getElementBase(Element e) {
-        StringBuffer base = new StringBuffer();
-        while(e != null) {
-            base.insert(0, "/");
-            base.insert(0, e.getQualifiedName());
-            e = e.getParentElement();
-        }
-        return base.toString();
-    }
 }

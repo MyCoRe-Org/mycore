@@ -23,7 +23,7 @@ import org.mycore.importer.MCRImportField;
  */
 public class MCRImportFieldValueResolver {
 
-    private MCRTextResolver variableResolver;
+    private MCRTextResolver textResolver;
 
     /**
      * Create a new field value resolver with a list of all fields which
@@ -32,20 +32,33 @@ public class MCRImportFieldValueResolver {
      * @param fieldList a list of fields which can be resolved
      */
     public MCRImportFieldValueResolver(List<MCRImportField> fieldList) {
-        Hashtable<String, String> variablesTable = new Hashtable<String, String>();
+        Hashtable<String, String> varTable = new Hashtable<String, String>();
         for(MCRImportField field : fieldList) {
-            variablesTable.put(field.getId(), field.getValue());
+            if(field.getValue() != null)
+                varTable.put(field.getId(), field.getValue());
+            parseSubFields(field, varTable, field.getId());
         }
-        variableResolver = new MCRTextResolver(variablesTable, ResolveDepth.NoVariables);
+        textResolver = new MCRTextResolver(varTable, ResolveDepth.NoVariables);
     }
 
+    private void parseSubFields(MCRImportField parentField, Map<String, String> varTable, String base) {
+        for(MCRImportField childField : parentField.getSubFieldList()) {
+            StringBuffer id = new StringBuffer(base);
+            id.append(parentField.getSeperator());
+            id.append(childField.getId());
+            if(childField.getValue() != null)
+                varTable.put(id.toString(), childField.getValue());
+            parseSubFields(childField, varTable, id.toString());
+        }
+    }
+    
     /**
      * This method resolves field identifiers at an incoming string.
      * 
      * @param incomingString the string which have to be resolved.
      */
     public String resolveFields(String incomingString) {
-        return variableResolver.resolveNext(incomingString);
+        return textResolver.resolveNext(incomingString);
     }
 
     /**
@@ -56,7 +69,7 @@ public class MCRImportFieldValueResolver {
      * fields are resolved, otherwise false
      */
     public boolean isCompletelyResolved() {
-        return variableResolver.isCompletelyResolved();
+        return textResolver.isCompletelyResolved();
     }
     
     /**
@@ -66,7 +79,7 @@ public class MCRImportFieldValueResolver {
      */
     public List<MCRImportField> getNotUsedFields() {
         List<MCRImportField> notUsedFields = new ArrayList<MCRImportField>();
-        for(Map.Entry<String, String> entry : variableResolver.getNotUsedVariables().entrySet()) {
+        for(Map.Entry<String, String> entry : textResolver.getNotUsedVariables().entrySet()) {
             notUsedFields.add(new MCRImportField(entry.getKey(), entry.getValue()));
         }
         return notUsedFields;
