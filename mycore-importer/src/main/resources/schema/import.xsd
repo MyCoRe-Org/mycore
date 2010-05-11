@@ -20,11 +20,11 @@
         <xs:element name="createClassificationMapping" minOccurs="0" type="xs:boolean" />
         <xs:element name="derivates" minOccurs="0">
           <xs:complexType>
-            <xs:sequence>
+            <xs:all>
               <xs:element name="createInImportDir" minOccurs="0" type="xs:boolean" />
               <xs:element name="importToMycore" minOccurs="0" type="xs:boolean" />
               <xs:element name="importFilesToMycore" minOccurs="0" type="xs:boolean" />
-            </xs:sequence>
+            </xs:all>
             <xs:attribute name="use" type="xs:boolean" default="true" />
           </xs:complexType>
         </xs:element>
@@ -70,13 +70,13 @@
 
   <xs:element name="map">
     <xs:complexType>
-      <xs:sequence>
+      <xs:all>
         <xs:element ref="text" minOccurs="0" />
         <xs:element ref="attributes" minOccurs="0" />
         <xs:element ref="enclosingAttributes" minOccurs="0" />
         <xs:element ref="children" minOccurs="0" />
         <xs:element ref="conditions" minOccurs="0" />
-      </xs:sequence>
+      </xs:all>
       <xs:attribute name="fields" type="xs:string" />
       <xs:attribute name="type" default="metadata" type="xs:string" />
       <xs:attribute name="value" type="xs:string" />
@@ -131,11 +131,11 @@
 
   <xs:element name="child">
     <xs:complexType>
-      <xs:sequence>
+      <xs:all>
         <xs:element ref="text" minOccurs="0" />
         <xs:element ref="attributes" minOccurs="0" />
         <xs:element ref="children" minOccurs="0" />
-      </xs:sequence>
+      </xs:all>
       <xs:attribute name="tag" type="xs:string" use="required" />
       <xs:attribute name="condition" type="xs:string" />
     </xs:complexType>
