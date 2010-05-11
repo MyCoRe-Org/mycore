@@ -165,7 +165,6 @@
                 <copy todir="${project.build.directory}" flatten="true">
     			  <javaresource name="org/mycore/checkstyle.xml" classpathref="maven.plugin.classpath"/>
  			    </copy>
- 			    <move file="${project.build.directory}/checkstyle.xml" tofile="${project.build.directory}/checkstyle-configuration.xml" />
  			  </tasks>
             </configuration>
           </execution>
@@ -179,8 +178,7 @@
               <tasks>
                 <copy todir="${project.build.directory}" flatten="true">
     			  <javaresource name="org/mycore/checkstyle.xml" classpathref="maven.plugin.classpath"/>
- 			    </copy>
- 			    <move file="${project.build.directory}/checkstyle.xml" tofile="${project.build.directory}/checkstyle-configuration.xml" />
+                </copy>
  			  </tasks>
             </configuration>
           </execution>
@@ -195,7 +193,7 @@
           <dependency>
             <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
-            <version>1.8.0</version>
+            <version>1.7.1</version>
           </dependency>          
         </dependencies>
       </plugin>
@@ -208,7 +206,7 @@
               <goal>checkstyle</goal>
             </goals>
             <configuration>
-              <configLocation>${project.build.directory}/checkstyle-configuration.xml</configLocation>
+              <configLocation>${project.build.directory}/checkstyle.xml</configLocation>
             </configuration>
           </execution>
         </executions>
@@ -310,7 +308,7 @@
       <plugin>
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
-          <configLocation>${project.build.directory}/checkstyle-configuration.xml</configLocation>
+          <configLocation>${project.build.directory}/checkstyle.xml</configLocation>
         </configuration>
       </plugin>
     </plugins>
