@@ -330,8 +330,10 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
             StringBuffer textBuffer = new StringBuffer();
             // go through the not used list
             for(MCRImportField field : fieldResolver.getNotUsedFields()) {
-                // add every field value to the text
-                textBuffer.append(field.getValue());
+                // add every field to the text
+                textBuffer.append("[{");
+                textBuffer.append(field.getId());
+                textBuffer.append("}]");
             }
             if(textBuffer.length() > 0) {
                 // do text resolving
