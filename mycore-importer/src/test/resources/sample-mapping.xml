@@ -58,6 +58,19 @@
 			  </attributes>
             </map>
 
+            <!-- test condition -->
+            <map fields="field,condition" to="metaText">
+              <conditions>
+                <condition format="xml">
+                  <condition value1="{condition}" operator="=" value2="5"/>
+                </condition>
+                <condition name="conditionWithName" format="xml">
+                  <condition value1="{condition}" operator=">" value2="3" />
+                </condition>
+              </conditions>
+              <text value="{field}" condition="conditionWithName"/>
+            </map>
+
             <!-- test derivate -->
           	<map fields="derivId" derivateId="{derivId}" type="derivate" />
           </mcrobject>

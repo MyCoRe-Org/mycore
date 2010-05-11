@@ -12,7 +12,9 @@ import org.jdom.filter.ElementFilter;
 import org.mycore.common.MCRConstants;
 import org.mycore.importer.MCRImportField;
 import org.mycore.importer.mapping.MCRImportMappingManager;
+import org.mycore.importer.mapping.condition.MCRImportParser;
 import org.mycore.importer.mapping.resolver.MCRImportFieldValueResolver;
+import org.mycore.parsers.bool.MCRCondition;
 
 /**
  * The abstract metadate resolver is the default implementation of a metadata resolver.
@@ -30,6 +32,10 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
 
     protected Hashtable<String, String> enclosingAttributes;
 
+    protected MCRImportParser conditionParser;
+
+    protected Hashtable<String, MCRCondition> conditionMap;
+
     /**
      * The return element.
      */
@@ -44,6 +50,14 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
         this.fieldResolver = new MCRImportFieldValueResolver(fieldList);
         this.saveToElement = saveToElement;
         this.enclosingAttributes = new Hashtable<String, String>();
+        this.conditionParser = new MCRImportParser();
+        this.conditionMap = new Hashtable<String, MCRCondition>();
+        // resolve conditions
+        resolveConditions(map);
+        // check default condition
+        if(this.conditionMap.containsKey("_default"))
+            if(!checkCondition("_default"))
+                return false;
         // enclosing attributes
         resolveEnclosingAttributes(map);
         // attributes
@@ -57,9 +71,7 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
         // text
         if(hasText())
             resolveMainText();
-        if(!isValid())
-            return false;
-        return true;
+        return isValid();
     }
 
     /**
@@ -115,6 +127,61 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
     }
 
     /**
+     * Returns all conditions.
+     * 
+     * @return
+     */
+    public Hashtable<String, MCRCondition> getConditions() {
+        return conditionMap;
+    }
+
+    /**
+     * This method parses the conditions element and resolves all
+     * containing conditions. The conditions are added to conditionMap.
+     */
+    @SuppressWarnings("unchecked")
+    protected void resolveConditions(Element parentElement) {
+        Element conditionsElement = parentElement.getChild("conditions");
+        if(conditionsElement == null)
+            return;
+        for(Element conditionElement : (List<Element>)conditionsElement.getChildren("condition")) {
+            // get condition name
+            String name = conditionElement.getAttributeValue("name");
+            if(name == null)
+                name = "_default";
+            // get format
+            String format = conditionElement.getAttributeValue("format");
+            if(format.equals("xml")) {
+                if(conditionElement.getChildren().size() <= 0)
+                    continue;
+                Element conditionContent = (Element)conditionElement.getChildren().get(0);
+                MCRCondition condition = conditionParser.parse(conditionContent);
+                this.conditionMap.put(name, condition);
+            } else {
+                LOGGER.warn("Unknown format '"+ format + "' in condition element. " +
+                            "<condition format=\"xml\"> instead.");
+                continue;
+            }
+        }
+    }
+
+    protected boolean checkCondition(String conditionName) {
+        MCRCondition cond = this.conditionMap.get(conditionName);
+        if(cond == null) {
+            LOGGER.warn("Unknown condition '" + conditionName + "'!");
+            return false;
+        }
+        return cond.evaluate(this.fieldResolver);
+    }
+
+    protected boolean checkCondition(Element elementToCheck) {
+        String conditionName = elementToCheck.getAttributeValue("condition");
+        if(conditionName != null)
+            return checkCondition(conditionName);
+        return true;
+    }
+
+    /**
      * Resolves the attributes of the enclosing metadata element. That could
      * be something like:
      * <p>
@@ -136,7 +203,8 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
      * @param fromElement the source element where the attribute mapping informations are set
      */
     @SuppressWarnings("unchecked")
-    public void resolveEnclosingAttributes(Element fromElement) {
+    protected void resolveEnclosingAttributes(Element fromElement) {
+        // get the enclosing attributes element
         Element enclosingAttributesElement = fromElement.getChild("enclosingAttributes");
         if(enclosingAttributesElement == null) {
             // try old parent
@@ -146,6 +214,10 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
             else
                 LOGGER.warn("The use of parentAttributes is deprecated. Use enclosingAttributes instead.");
         }
+        // check condition
+        if(!checkCondition(enclosingAttributesElement))
+            return;
+        // set enclosing attributes
         List<Element> attributes = enclosingAttributesElement.getChildren("attribute");
         for(Element attributeElement : attributes) {
             Attribute attr = resolveAttribute(attributeElement);
@@ -162,7 +234,7 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
      * @param saveToElement where to save the resolved attributes
      */
     @SuppressWarnings("unchecked")
-    public void resolveAttributes(Element fromElement, Element saveToElement) {
+    protected void resolveAttributes(Element fromElement, Element saveToElement) {
         Element attributesElement = fromElement.getChild("attributes");
         if(attributesElement == null)
             return;
@@ -175,7 +247,10 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
         }
     }
 
-    public Attribute resolveAttribute(Element attributeElement) {
+    protected Attribute resolveAttribute(Element attributeElement) {
+        // check condition
+        if(!checkCondition(attributeElement))
+            return null;
         String name = attributeElement.getAttributeValue("name");
         String value = attributeElement.getAttributeValue("value");
         String namespace = attributeElement.getAttributeValue("namespace");
@@ -229,7 +304,7 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
      * @param uri
      * @return a new parsed and resolved string
      */
-    public String resolveValue(String oldValue, String uri) {
+    protected String resolveValue(String oldValue, String uri) {
         String resolvedValue = fieldResolver.resolveFields(oldValue);
 
         // is a resolver defined?
@@ -277,8 +352,11 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
      * @param fromElement
      * @param saveToElement
      */
-    public void resolveText(Element fromElement, Element saveToElement) {
+    protected void resolveText(Element fromElement, Element saveToElement) {
         Element textElement = fromElement.getChild("text");
+        // check condition
+        if(!checkCondition(textElement))
+            return;
         // parse the text element
         String value = textElement.getAttributeValue("value");
         String uri = textElement.getAttributeValue("resolver");
@@ -299,13 +377,15 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
      * @param saveToElement the element where the new created children are saved
      */
     @SuppressWarnings("unchecked")
-    public void resolveChildren(Element fromElement, Element saveToElement) {
+    protected void resolveChildren(Element fromElement, Element saveToElement) {
         Element childsElement = fromElement.getChild("children");
         if(childsElement == null)
             return;
 
         List<Element> children = childsElement.getChildren("child");
         for(Element mapChild : children) {
+            if(!checkCondition(mapChild))
+                return;
             // create a new child element for each child in the list
             String tag = mapChild.getAttributeValue("tag");
             Element metadataChild = new Element(tag);

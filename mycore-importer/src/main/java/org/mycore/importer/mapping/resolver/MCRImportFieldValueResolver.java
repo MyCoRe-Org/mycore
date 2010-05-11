@@ -58,6 +58,8 @@ public class MCRImportFieldValueResolver {
      * @param incomingString the string which have to be resolved.
      */
     public String resolveFields(String incomingString) {
+        if(incomingString == null)
+            throw new NullPointerException();
         return textResolver.resolveNext(incomingString);
     }
 

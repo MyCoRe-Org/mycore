@@ -75,6 +75,7 @@
         <xs:element ref="attributes" minOccurs="0" />
         <xs:element ref="enclosingAttributes" minOccurs="0" />
         <xs:element ref="children" minOccurs="0" />
+        <xs:element ref="conditions" minOccurs="0" />
       </xs:sequence>
       <xs:attribute name="fields" type="xs:string" />
       <xs:attribute name="type" default="metadata" type="xs:string" />
@@ -90,6 +91,7 @@
     <xs:complexType>
       <xs:attribute name="value" type="xs:string" />
       <xs:attribute name="resolver" type="xs:string" />
+      <xs:attribute name="condition" type="xs:string" />
     </xs:complexType>
   </xs:element>
 
@@ -115,6 +117,7 @@
       <xs:attribute name="value" type="xs:string" />
       <xs:attribute name="resolver" type="xs:string" />
       <xs:attribute name="namespace" type="xs:string" />
+      <xs:attribute name="condition" type="xs:string" />
     </xs:complexType>
   </xs:element>
 
@@ -134,6 +137,12 @@
         <xs:element ref="children" minOccurs="0" />
       </xs:sequence>
       <xs:attribute name="tag" type="xs:string" use="required" />
+      <xs:attribute name="condition" type="xs:string" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="conditions">
+    <xs:complexType>
     </xs:complexType>
   </xs:element>
 
