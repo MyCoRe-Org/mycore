@@ -34,9 +34,10 @@ public class MCRImportFieldValueResolver {
     public MCRImportFieldValueResolver(List<MCRImportField> fieldList) {
         Hashtable<String, String> varTable = new Hashtable<String, String>();
         for(MCRImportField field : fieldList) {
+            String baseId = field.getBaseId();
             if(field.getValue() != null)
-                varTable.put(field.getId(), field.getValue());
-            parseSubFields(field, varTable, field.getId());
+                varTable.put(baseId, field.getValue());
+            parseSubFields(field, varTable, baseId);
         }
         textResolver = new MCRTextResolver(varTable, ResolveDepth.NoVariables);
     }

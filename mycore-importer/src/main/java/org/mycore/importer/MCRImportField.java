@@ -17,6 +17,7 @@ public class MCRImportField {
     
     private String id;
     private String value;
+    private MCRImportField parent;
     private List<MCRImportField> subFieldList;
 
     private String seperator;
@@ -28,6 +29,7 @@ public class MCRImportField {
     public MCRImportField(String id, String value, String separator) throws InvalidIdException {
         this.id = id;
         this.value = value;
+        this.parent = null;
         this.subFieldList = new ArrayList<MCRImportField>();
         this.seperator = separator;
         validateId();
@@ -36,12 +38,22 @@ public class MCRImportField {
     public String getId() {
         return id;
     }
+    public String getBaseId() {
+        StringBuffer baseId = new StringBuffer(this.id);
+        MCRImportField parent = this.parent;
+        while(parent != null) {
+            baseId.insert(0, parent.getSeperator());
+            baseId.insert(0, parent.getId());
+            parent = parent.getParent();
+        }
+        return baseId.toString();
+    }
     public void setId(String id) throws InvalidIdException {
         this.id = id;
         validateId();
     }
     public String getValue() {
-        return value;
+        return this.value;
     }
     public void setValue(String value) {
         this.value = value;
@@ -52,21 +64,32 @@ public class MCRImportField {
      * 
      * @param subField the field to add
      */
-    public void addField(MCRImportField subField) {
-        this.subFieldList.add(subField);
+    public boolean addField(MCRImportField subField) {
+        if( subField == null || this.equals(subField) || this.subFieldList.contains(subField))
+            return false;
+        if(subField.getParent() != null)
+            subField.getParent().removeField(subField);
+        subField.parent = this;
+        return this.subFieldList.add(subField);
     }
-    public void removeField(MCRImportField subField) {
-        this.subFieldList.remove(subField);
+    public boolean removeField(MCRImportField subField) {
+        if(subField == null || !this.subFieldList.contains(subField))
+            return false;
+        subField.parent = null;
+        return this.subFieldList.remove(subField);
     }
     public List<MCRImportField> getSubFieldList() {
-        return subFieldList;
+        return this.subFieldList;
+    }
+    public MCRImportField getParent() {
+        return this.parent;
     }
 
     public void setSeperator(String seperator) {
         this.seperator = seperator;
     }
     public String getSeperator() {
-        return seperator;
+        return this.seperator;
     }
 
     /**
