@@ -260,7 +260,7 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
         String resolvedName = fieldResolver.resolveFields(name);
         String resolvedValue = resolveValue(value, uri);
 
-        if(resolvedValue == null)
+        if(resolvedValue == null || resolvedValue.equals(""))
             return null;
         // namespace
         if(namespace == null || namespace.equals(""))

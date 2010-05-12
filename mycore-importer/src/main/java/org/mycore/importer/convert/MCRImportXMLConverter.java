@@ -1,13 +1,11 @@
 package org.mycore.importer.convert;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
-import org.jdom.filter.ElementFilter;
 import org.mycore.importer.MCRImportField;
 import org.mycore.importer.MCRImportRecord;
 import org.mycore.importer.MCRImportRecordConverter;
@@ -79,12 +77,12 @@ public class MCRImportXMLConverter implements MCRImportRecordConverter<Document>
         for(Namespace ns : (List<Namespace>)e.getAdditionalNamespaces())
             addNamespace(field, ns);
 
-        if(parentField != null && !field.isEmpty())
-            parentField.addField(field);
-
         // go recursive through all children
         for(Element childElement : (List<Element>)e.getChildren())
             convertElement(field, childElement);
+
+        if(parentField != null && !field.isEmpty())
+            parentField.addField(field);
 
         return field;
     }

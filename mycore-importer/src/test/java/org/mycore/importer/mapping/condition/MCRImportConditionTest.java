@@ -1,9 +1,8 @@
 package org.mycore.importer.mapping.condition;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
@@ -32,6 +31,9 @@ public class MCRImportConditionTest extends MCRTestCase {
         // equals
         MCRImportCondition cond = new MCRImportCondition("v1", "=", "{f1}");
         assertEquals(true, cond.evaluate(res));
+        // not equal to
+        cond = new MCRImportCondition("v1", "!=", "{f1}");
+        assertEquals(false, cond.evaluate(res));
         // contains
         cond = new MCRImportCondition("test v1 test", "contains", "{f1}");
         assertEquals(true, cond.evaluate(res));

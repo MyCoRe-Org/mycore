@@ -34,6 +34,8 @@ public class MCRImportCondition implements MCRCondition {
     private boolean compare(String v1, String v2) {
         if(this.operator.equals("=")) {
             return v1.equals(v2);
+        } else if(this.operator.equals("!=")) {
+            return !v1.equals(v2);
         } else if(this.operator.equals("contains")) {
             return v1.contains(v2);
         } else if(this.operator.matches(">|<|>=|<=")) {
