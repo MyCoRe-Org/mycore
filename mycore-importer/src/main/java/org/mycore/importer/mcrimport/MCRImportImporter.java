@@ -22,6 +22,8 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.common.MCRActiveLinkException;
+import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.importer.MCRImportConfig;
 import org.mycore.importer.classification.MCRImportClassificationMap;
@@ -389,8 +391,10 @@ public class MCRImportImporter {
             // try to get the mycore id from the hashtable
             MCRImportFileStatus fs = idTable.get(linkId);
             if(fs == null) {
-                LOGGER.error(   "Invalid id " + linkId + " found in file " + doc.getBaseURI() + 
-                                " at element " + linkElement.getName() + linkElement.getAttributes());
+                // print error only if its not a internal mycore id
+                if(!MCRObject.existInDatastore(linkId) && !MCRDerivate.existInDatastore(linkId))
+                    LOGGER.error(   "Invalid id " + linkId + " found in file " + doc.getBaseURI() + 
+                                    " at element " + linkElement.getName() + linkElement.getAttributes());
                 continue;
             }
             // if null -> the linked object is currently not imported -> do it
