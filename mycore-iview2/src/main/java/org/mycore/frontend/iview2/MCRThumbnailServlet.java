@@ -30,6 +30,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.imageio.IIOImage;
@@ -79,6 +80,15 @@ public class MCRThumbnailServlet extends MCRServlet {
             thumbnailSize = Integer.parseInt(thSize);
         }
         LOGGER.info(getServletName() + ": setting thumbnail size to " + thumbnailSize);
+    }
+
+    @Override
+    public void destroy() {
+        Iterator<ImageWriter> writers = imageWriters.iterator();
+        while (writers.hasNext()) {
+            writers.next().dispose();
+        }
+        super.destroy();
     }
 
     @Override

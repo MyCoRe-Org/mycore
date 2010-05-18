@@ -28,7 +28,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Iterator;
+import java.text.MessageFormat;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -111,9 +111,10 @@ public class MCRIView2Tools {
     public static BufferedImage getZoomLevel(File iviewFile, int zoomLevel) throws IOException, JDOMException {
         ZipFile iviewImage = new ZipFile(iviewFile);
         Graphics graphics = null;
+        ImageReader reader = getTileImageReader();
         try {
             if (zoomLevel == 0) {
-                return readTile(iviewImage, 0, 0, 0);
+                return readTile(iviewImage, reader, 0, 0, 0);
             }
             MCRTiledPictureProps imageProps = MCRTiledPictureProps.getInstance(iviewFile);
             if (zoomLevel < 0 || zoomLevel > imageProps.zoomlevel) {
@@ -122,15 +123,15 @@ public class MCRIView2Tools {
             double zoomFactor = Math.pow(2, (imageProps.zoomlevel - zoomLevel));
             int maxX = (int) Math.ceil((imageProps.width / zoomFactor) / MCRImage.TILE_SIZE);
             int maxY = (int) Math.ceil((imageProps.height / zoomFactor) / MCRImage.TILE_SIZE);
-            LOGGER.info("Image size:" + imageProps.width + "x" + imageProps.height + ", tiles:" + maxX + "x" + maxY);
-            BufferedImage sampleTile = readTile(iviewImage, zoomLevel, maxX - 1, 0);
+            LOGGER.info(MessageFormat.format("Image size:{0}x{1}, tiles:{2}x{3}", imageProps.width, imageProps.height, maxX, maxY));
+            BufferedImage sampleTile = readTile(iviewImage, reader, zoomLevel, maxX - 1, 0);
             int xDim = ((maxX - 1) * MCRImage.TILE_SIZE + sampleTile.getWidth());
-            int yDim = ((maxY - 1) * MCRImage.TILE_SIZE + readTile(iviewImage, zoomLevel, 0, maxY - 1).getHeight());
+            int yDim = ((maxY - 1) * MCRImage.TILE_SIZE + readTile(iviewImage, reader, zoomLevel, 0, maxY - 1).getHeight());
             BufferedImage resultImage = new BufferedImage(xDim, yDim, sampleTile.getType());
             graphics = resultImage.getGraphics();
             for (int x = 0; x < maxX; x++) {
                 for (int y = 0; y < maxY; y++) {
-                    BufferedImage tile = readTile(iviewImage, zoomLevel, x, y);
+                    BufferedImage tile = readTile(iviewImage, reader, zoomLevel, x, y);
                     graphics.drawImage(tile, x * MCRImage.TILE_SIZE, y * MCRImage.TILE_SIZE, null);
                 }
             }
@@ -139,20 +140,26 @@ public class MCRIView2Tools {
             iviewImage.close();
             if (graphics != null)
                 graphics.dispose();
+            reader.dispose();
         }
     }
 
-    private static BufferedImage readTile(ZipFile iviewImage, int zoomLevel, int x, int y) throws IOException {
-        String tileName = zoomLevel + "/" + y + "/" + x + ".jpg";
+    private static ImageReader getTileImageReader() {
+        return ImageIO.getImageReadersByMIMEType("image/jpeg").next();
+    }
+
+    private static BufferedImage readTile(ZipFile iviewImage, ImageReader imageReader, int zoomLevel, int x, int y) throws IOException {
+        String tileName = MessageFormat.format("{0}/{1}/{2}.jpg", zoomLevel, y, x);
         ZipEntry tile = iviewImage.getEntry(tileName);
         if (tile != null) {
             InputStream zin = iviewImage.getInputStream(tile);
             try {
                 ImageInputStream iis = ImageIO.createImageInputStream(zin);
-                Iterator<ImageReader> readers = ImageIO.getImageReaders(iis);
-                ImageReader reader = readers.next();
-                reader.setInput(iis, false);
-                return reader.read(0);
+                imageReader.setInput(iis, false);
+                BufferedImage image = imageReader.read(0);
+                imageReader.reset();
+                iis.close();
+                return image;
             } finally {
                 zin.close();
             }
