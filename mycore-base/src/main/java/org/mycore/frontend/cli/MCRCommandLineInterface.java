@@ -28,6 +28,7 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -441,7 +442,7 @@ public class MCRCommandLineInterface {
             while (destIt.hasNext()) {
                 count++;
                 curDest = destIt.next().toString();
-                List sources = (List) links.get(curDest);
+                Collection sources = (Collection) links.get(curDest);
                 Iterator sourceIt = sources.iterator();
                 while (sourceIt.hasNext()) {
                     msgBuf.append("\n\t").append(count).append(".) ").append(sourceIt.next().toString()).append("==>").append(curDest);
@@ -469,7 +470,7 @@ public class MCRCommandLineInterface {
             while (destIt.hasNext()) {
                 curDest = destIt.next().toString();
                 logger.debug("Current Destination: " + curDest);
-                List sources = (List) links.get(curDest);
+                Collection sources = (Collection) links.get(curDest);
                 Iterator sourceIt = sources.iterator();
                 while (sourceIt.hasNext()) {
                     msgBuf.append('\n').append(sourceIt.next().toString()).append("==>").append(curDest);
