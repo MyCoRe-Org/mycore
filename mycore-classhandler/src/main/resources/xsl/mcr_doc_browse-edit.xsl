@@ -18,6 +18,7 @@
 
   <!-- The main template -->
   <xsl:template match="classificationBrowser">
+    <xsl:comment>Start - classificationBrowser (mcr_doc_browse-edit.xsl)</xsl:comment>
     <xsl:variable name="startPath" select="startPath" />
     <xsl:variable name="TrueFalse" select="showComments" />
     <div id="classificationBrowser">
@@ -30,6 +31,7 @@
       <!-- display list of classifications -->
       <xsl:apply-templates select="classificationlist" />
     </div>
+    <xsl:comment>End - classificationBrowser (mcr_doc_browse-edit.xsl)</xsl:comment>
   </xsl:template>
   <xsl:template match="navigationtree">
     <xsl:variable name="classifID" select="@classifID" />
@@ -66,7 +68,7 @@
           <table cellspacing="1" cellpadding="2" style="margin: 3% 10px 3% 2%;">
 
             <xsl:for-each select="row">
-
+            
               <xsl:variable name="trStyle">
                 <xsl:choose>
                   <xsl:when test="$actcateg = col[2]/@lineID">
@@ -111,6 +113,7 @@
                     <td class="{$trStyle}" width="25">&#160;&#160;&#160;</td>
                     <xsl:apply-templates select="." mode="editButtons">
                       <xsl:with-param name="cellStyle" select="$trStyle" />
+                      <xsl:with-param name="lineId" select="col[2]/@lineID"/>
                     </xsl:apply-templates>
 
                   </tr>
@@ -278,6 +281,7 @@
                           </a>
                         </td>
                       </xsl:if>
+                      
                       <td width="25" valign="top">
                         <form action="{$WebApplicationBaseURL}servlets/MCRStartClassEditorServlet{$HttpSession}" method="get">
                           <input type="hidden" name="todo" value='modify-classification' />
@@ -611,11 +615,12 @@
     <xsl:param name="imageTitle" />
     <xsl:param name="notEmpty" select="true()" />
     <xsl:param name="width" select="23" />
+    <xsl:param name="lineId"/>
     <xsl:variable name="imgEmpty" select="concat($WebApplicationBaseURL, 'images/emtyDot1Pix.gif')" />
     <td width="{$width}">
       <xsl:choose>
         <xsl:when test="$notEmpty = true()">
-          <form action="{$WebApplicationBaseURL}servlets/MCRStartClassEditorServlet{$HttpSession}" method="get">
+          <form id="{$lineId}" action="{$WebApplicationBaseURL}servlets/MCRStartClassEditorServlet{$HttpSession}" method="get">
             <input type="hidden" name="todo" value="{$todo}" />
             <input type="hidden" name="todo2" value="{$todo2}" />
             <input type="hidden" name="path" value="{$path}" />
@@ -633,6 +638,7 @@
 
   <xsl:template match="row" mode="editButtons">
     <xsl:param name="cellStyle" />
+    <xsl:param name="lineId" select="isNotSet"/>
     <xsl:variable name="childpos" select="col[1]/@childpos" />
     <td class="{$cellStyle}">
       <xsl:choose>
@@ -651,17 +657,20 @@
                   <xsl:with-param name="todo" select="'create-category'" />
                   <xsl:with-param name="image" select="concat($WebApplicationBaseURL, 'images/classnew.gif')" />
                   <xsl:with-param name="imageTitle" select="i18n:translate('component.classhandler.browse.newUnderCatInsert')" />
+                  <xsl:with-param name="lineId" select="concat('create-category-',$lineId)"/>
                 </xsl:apply-templates>
                 <xsl:apply-templates select="." mode="editButton">
                   <xsl:with-param name="todo" select="'modify-category'" />
                   <xsl:with-param name="image" select="concat($WebApplicationBaseURL, 'images/classedit.gif')" />
                   <xsl:with-param name="imageTitle" select="i18n:translate('component.classhandler.browse.editCat')" />
+                  <xsl:with-param name="lineId" select="concat('modify-category-',$lineId)"/>
                 </xsl:apply-templates>
                 <xsl:apply-templates select="." mode="editButton">
                   <xsl:with-param name="todo" select="'delete-category'" />
                   <xsl:with-param name="image" select="concat($WebApplicationBaseURL, 'images/classdelete.gif')" />
                   <xsl:with-param name="imageTitle" select="i18n:translate('component.classhandler.browse.deleteCat')" />
                   <xsl:with-param name="notEmpty" select="(col[2]/@hasLinks = 'false') and (../../userCanEdit = 'true')" />
+                  <xsl:with-param name="lineId" select="concat('delete-category-',$lineId)"/>
                 </xsl:apply-templates>
                 <xsl:apply-templates select="." mode="editButton">
                   <xsl:with-param name="todo" select="'up-category'" />
@@ -669,6 +678,7 @@
                   <xsl:with-param name="imageTitle" select="i18n:translate('component.classhandler.browse.moveUp')" />
                   <xsl:with-param name="notEmpty" select="$childpos = 'last' or $childpos = 'middle'" />
                   <xsl:with-param name="width" select="16" />
+                  <xsl:with-param name="lineId" select="concat('up-category-',$lineId)"/>
                 </xsl:apply-templates>
                 <xsl:apply-templates select="." mode="editButton">
                   <xsl:with-param name="todo" select="'down-category'" />
@@ -676,6 +686,7 @@
                   <xsl:with-param name="imageTitle" select="i18n:translate('component.classhandler.browse.moveDown')" />
                   <xsl:with-param name="notEmpty" select="$childpos = 'first' or $childpos = 'middle'" />
                   <xsl:with-param name="width" select="16" />
+                  <xsl:with-param name="lineId" select="concat('down-category-',$lineId)"/>
                 </xsl:apply-templates>
                 <xsl:apply-templates select="." mode="editButton">
                   <xsl:with-param name="todo" select="'left-category'" />
@@ -683,6 +694,7 @@
                   <xsl:with-param name="imageTitle" select="i18n:translate('component.classhandler.browse.moveLeft')" />
                   <xsl:with-param name="notEmpty" select="col[1]/@lineLevel > 1" />
                   <xsl:with-param name="width" select="16" />
+                  <xsl:with-param name="lineId" select="concat('left-category-',$lineId)"/>
                 </xsl:apply-templates>
                 <xsl:apply-templates select="." mode="editButton">
                   <xsl:with-param name="todo" select="'right-category'" />
@@ -690,6 +702,7 @@
                   <xsl:with-param name="imageTitle" select="i18n:translate('component.classhandler.browse.moveRight')" />
                   <xsl:with-param name="notEmpty" select="$childpos = 'last' or $childpos = 'middle'" />
                   <xsl:with-param name="width" select="16" />
+                  <xsl:with-param name="lineId" select="concat('right-category-',$lineId)"/>
                 </xsl:apply-templates>
               </tr>
             </table>
