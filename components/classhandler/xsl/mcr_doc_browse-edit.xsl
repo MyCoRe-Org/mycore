@@ -620,13 +620,13 @@
     <td width="{$width}">
       <xsl:choose>
         <xsl:when test="$notEmpty = true()">
-          <form id="{$lineId}" action="{$WebApplicationBaseURL}servlets/MCRStartClassEditorServlet{$HttpSession}" method="get">
+          <form id="{$lineId}" name="{$lineId}" action="{$WebApplicationBaseURL}servlets/MCRStartClassEditorServlet{$HttpSession}" method="get">
             <input type="hidden" name="todo" value="{$todo}" />
             <input type="hidden" name="todo2" value="{$todo2}" />
             <input type="hidden" name="path" value="{$path}" />
             <input type="hidden" name="clid" value="{../@classifID}" />
             <input type="hidden" name="categid" value="{col[2]/@lineID}" />
-            <input type="image" src="{$image}" title="{$imageTitle}" />
+            <input id="{$lineId}-submit" type="image" src="{$image}" title="{$imageTitle}" />
           </form>
         </xsl:when>
         <xsl:otherwise>
