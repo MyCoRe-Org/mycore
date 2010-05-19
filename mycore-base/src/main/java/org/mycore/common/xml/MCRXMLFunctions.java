@@ -26,10 +26,20 @@ package org.mycore.common.xml;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.log4j.Logger;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
+import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.hibernate.tables.MCRURN;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -39,6 +49,9 @@ import org.mycore.services.fieldquery.MCRQueryManager;
 import org.mycore.services.fieldquery.MCRQueryParser;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.urn.MCRURNManager;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -64,6 +77,17 @@ public class MCRXMLFunctions {
 
     private static final Logger LOGGER = Logger.getLogger(MCRXMLFunctions.class);
 
+    private static final DocumentBuilder DOC_BUILDER;
+    static {
+        DocumentBuilder documentBuilder = null;
+        try {
+            documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            LOGGER.error("Could not instantiate DocumentBuilder. Not all functions will be available.", e);
+        }
+        DOC_BUILDER = documentBuilder;
+    }
+
     /**
      * returns the given String trimmed
      * 
@@ -84,8 +108,7 @@ public class MCRXMLFunctions {
      * @return QueryServlet-Link
      */
     public static String getQueryServlet(String hostAlias) {
-        return getBaseLink(hostAlias).append(
-                CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(QUERY_SUFFIX).toString())).toString();
+        return getBaseLink(hostAlias).append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(QUERY_SUFFIX).toString())).toString();
     }
 
     /**
@@ -96,14 +119,13 @@ public class MCRXMLFunctions {
      * @return FileNodeServlet-Link
      */
     public static String getIFSServlet(String hostAlias) {
-        return getBaseLink(hostAlias).append(
-                CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(IFS_SUFFIX).toString())).toString();
+        return getBaseLink(hostAlias).append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(IFS_SUFFIX).toString())).toString();
     }
 
     public static StringBuffer getBaseLink(String hostAlias) {
         StringBuffer returns = new StringBuffer();
-        returns.append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(PROTOCOLL_SUFFIX).toString(), "http"))
-                .append("://").append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(HOST_SUFFIX).toString()));
+        returns.append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(PROTOCOLL_SUFFIX).toString(), "http")).append("://").append(
+            CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(HOST_SUFFIX).toString()));
         String port = CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(PORT_SUFFIX).toString(), DEFAULT_PORT);
         if (!port.equals(DEFAULT_PORT)) {
             returns.append(":").append(port);
@@ -118,8 +140,8 @@ public class MCRXMLFunctions {
     public static String formatISODate(String isoDate, String isoFormat, String simpleFormat, String iso639Language) throws ParseException {
         if (LOGGER.isDebugEnabled()) {
             StringBuffer sb = new StringBuffer("isoDate=");
-            sb.append(isoDate).append(", simpleFormat=").append(simpleFormat).append(", isoFormat=").append(isoFormat).append(
-                    ", iso649Language=").append(iso639Language);
+            sb.append(isoDate).append(", simpleFormat=").append(simpleFormat).append(", isoFormat=").append(isoFormat).append(", iso649Language=").append(
+                iso639Language);
             LOGGER.debug(sb.toString());
         }
         Locale locale = new Locale(iso639Language);
@@ -227,9 +249,43 @@ public class MCRXMLFunctions {
                 return true;
             }
         }
-        LOGGER.warn("URN assignment disabled as the object type " + givenType + " is not in the list of allowed objects. See property \""
-                + propertyName + "\"");
+        LOGGER
+            .warn("URN assignment disabled as the object type " + givenType + " is not in the list of allowed objects. See property \"" + propertyName + "\"");
         return false;
+    }
+
+    /**
+     * returns the URN for <code>mcrid</code> and children if <code>mcrid</code> is a derivate.
+     * @param mcrid MCRObjectID of object or derivate
+     * @return list of mcrid|file to urn mappings
+     */
+    public static NodeList getURNsForMCRID(String mcrid) {
+        Session session = MCRHIBConnection.instance().getSession();
+        Criteria criteria = session.createCriteria(MCRURN.class);
+        criteria.add(Restrictions.eq("key.mcrid", mcrid));
+        Document document = DOC_BUILDER.newDocument();
+        Element rootElement = document.createElement("urn");
+        document.appendChild(rootElement);
+        @SuppressWarnings("unchecked")
+        List<MCRURN> results = criteria.list();
+        for (MCRURN result : results) {
+            String path = result.getPath().trim();
+            if (path.length() > 0 && path.charAt(0) == '/') {
+                path = path.substring(1);
+            }
+            path += result.getFilename().trim();
+            if (path.length() > 0) {
+                Element file = document.createElement("file");
+                file.setAttribute("urn", result.getKey().getMcrurn());
+                file.setAttribute("name", path);
+                rootElement.appendChild(file);
+            } else {
+                rootElement.setAttribute("mcrid", result.getKey().getMcrid());
+                rootElement.setAttribute("urn", result.getKey().getMcrurn());
+            }
+            session.evict(result);
+        }
+        return rootElement.getChildNodes();
     }
 
     public static boolean classAvailable(String className) {
