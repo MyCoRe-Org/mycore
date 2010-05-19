@@ -9,7 +9,7 @@
   <groupId>org.mycore</groupId>
   <artifactId>mycore-parent</artifactId>
   <packaging>pom</packaging>
-  <version>2.0.90</version>
+  <version>2.0.91-SNAPSHOT</version>
   <name>MyCoRe Parent POM</name>
   <!--
     Keep the description on a single line. Otherwise Maven might generate a corrupted MANIFEST.MF (see
@@ -42,9 +42,9 @@
     </notifiers>
   </ciManagement>
   <scm>
-    <connection>scm:svn:http://server.mycore.de/svn/mycore/tags/mycore-2.0.90</connection>
-    <developerConnection>scm:svn:https://server.mycore.de/svn/mycore/tags/mycore-2.0.90</developerConnection>
-    <url>http://www.mycore.de/viewvc/viewvc.cgi/mycore/tags/mycore-2.0.90</url>
+    <connection>scm:svn:http://server.mycore.de/svn/mycore/trunk</connection>
+    <developerConnection>scm:svn:https://server.mycore.de/svn/mycore/trunk</developerConnection>
+    <url>http://www.mycore.de/viewvc/viewvc.cgi/mycore/trunk</url>
   </scm>
   <repositories>
     <repository>
