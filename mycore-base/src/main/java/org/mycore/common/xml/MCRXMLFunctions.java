@@ -23,6 +23,8 @@
 
 package org.mycore.common.xml;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -297,5 +299,20 @@ public class MCRXMLFunctions {
             LOGGER.debug("did not found class: " + className);
             return false;
         }
+    }
+    
+    /**
+     * Encodes the given url so that one can safely embed that string in a part of an URI
+     * @param source
+     * @return the encoded source
+     */
+    public static String encodeURL(String source, String encoding){
+        String result = null;
+        try {
+            result = URLEncoder.encode(source, encoding);
+        } catch (UnsupportedEncodingException e) {
+            LOGGER.error(e);
+        }
+        return result;
     }
 }
