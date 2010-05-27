@@ -15,9 +15,9 @@
     Keep the description on a single line. Otherwise Maven might generate a corrupted MANIFEST.MF (see
     http://jira.codehaus.org/browse/MJAR-4)
   -->
-  <description>MyCoRe is a system for the development of document and publication servers, applications, archives, collections of images or
-    similar repositories. On MyCoRe-based applications use a common core, which are typically required for such applications functionality
-    as metadata management, search, OAI interface, an image viewer module.</description>
+  <description>MyCoRe is a system for the development of institutional content repositories, publication servers, image collections, archives, or
+    similar repositories. Applications based on MyCoRe use a common core, which provides the functionality typically required for such applications,
+    for example metadata management, querying, OAI harvesting interface, or an image viewer module.</description>
   <distributionManagement>
     <site>
       <id>MyCoRe HQ</id>
