@@ -20,6 +20,7 @@ function namespaceCheck(name) {
 @return  Associated(By Nodename) array with connected values
 */
 function nodeProps(xmlfile, nodeName, getNode, absolute) {
+	console.log("Wie oft werden die Buchdaten ausgelesen?");
 	nodeName = namespaceCheck(nodeName); 
 	var child_nodes = xmlfile.getElementsByTagName(nodeName);
 	var Node = (absolute == true)? parseInt(getNode) : (pagenumber-1)+parseInt(getNode);

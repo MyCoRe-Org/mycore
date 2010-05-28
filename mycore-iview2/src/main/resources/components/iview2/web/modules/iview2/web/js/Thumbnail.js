@@ -1,4 +1,5 @@
 var blendings = new blendWorks();
+var length = null;
 var focus = null;//holds the element which is focused
 //TODO Preload größe anhand der von den Kacheln bestimmen
 var listener = []; // array who holds informations about the listeners (?)
@@ -316,7 +317,9 @@ function switchDisplayMode(screenZoom, stateBool, viewID) {
 	var preload = document.getElementById("preload"+viewID);
 	if (stateBool) {
 		for (var i = 0; i <= Iview[viewID].zoomMax; i++) {
-			if(Iview[viewID].bildBreite/viewerBean.width > Iview[viewID].bildHoehe/document.getElementById("viewer"+viewID).offsetHeight || (stateBool && !screenZoom)){
+			var pre = "viewer";
+			length = pre.length;
+			if(Iview[viewID].bildBreite/viewerBean.width > Iview[viewID].bildHoehe/document.getElementById(pre+viewID).offsetHeight || (stateBool && !screenZoom)){
 			//Width > Height Or ZoomWidth is true
 				//Siehe TODO oben
 				if (calculateZoomProp(i, Iview[viewID].bildBreite, viewerBean.width, /*toInt(getStyle("scrollV"+viewID, "width"))*/0, viewID)) {

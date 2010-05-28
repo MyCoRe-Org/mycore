@@ -18,11 +18,8 @@ function navigatePage(pNum, viewID) {
 	if (arguments.length == 2) {
 		loadPage(viewID);
 	} else
-		updateModuls(viewID);
-	
-	/*PanoJS.mousePressedHandler = function(e) {
-			maximizeHandler(viewID);
-	}/**/
+		updateModuls(viewID);	
+
 }
 
 /*

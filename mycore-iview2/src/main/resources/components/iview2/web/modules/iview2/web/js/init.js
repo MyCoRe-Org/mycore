@@ -304,7 +304,7 @@ function initializeGraphic(viewID) {
 	}
 	
 	PanoJS.mousePressedHandler = function(e) {
-			maximizeHandler(viewID);
+			maximizeHandler(this.parentNode.id.substring(length,this.parentNode.id.length));
 	}
 	
 }
@@ -431,7 +431,7 @@ function maximizeHandler(viewID) {
 		if (classIsUsed("buttonSurface")) doForEachInClass("buttonSurface", ".className = 'buttonSurface min';");
 		
 		PanoJS.mousePressedHandler = function(e) {
-			maximizeHandler(viewID);
+			maximizeHandler(this.parentNode.id.substring(length,this.parentNode.id.length));
 		};
 		PanoJS.doubleClickHandler = function(e) {
 		};
