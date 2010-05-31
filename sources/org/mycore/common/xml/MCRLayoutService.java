@@ -119,8 +119,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
     private MCRLayoutService() {
         // System.setProperty("javax.xml.transform.TransformerFactory",
         // "org.apache.xalan.xsltc.trax.TransformerFactoryImpl");
-        System.setProperty("javax.xml.transform.TransformerFactory", "org.apache.xalan.processor.TransformerFactoryImpl");
-        TransformerFactory tf = TransformerFactory.newInstance();
+        TransformerFactory tf = TransformerFactory.newInstance("org.apache.xalan.processor.TransformerFactoryImpl",this.getClass().getClassLoader());
         LOGGER.info("Transformerfactory: " + tf.getClass().getName());
 
         if (!tf.getFeature(SAXTransformerFactory.FEATURE)) {
