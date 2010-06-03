@@ -82,18 +82,15 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         command.add(new MCRCommand("update all classifications from directory {0}",
                 "org.mycore.frontend.cli.MCRClassification2Commands.updateFromDirectory String",
                 "The command update all classifications in the directory {0} to the system."));
-        command
-                .add(new MCRCommand(
-                        "export classification {0} to {1} with {2}",
-                        "org.mycore.frontend.cli.MCRClassification2Commands.export String String String",
-                        "The command store the classification with MCRObjectID {0} to the file named {1} with the stylesheet {2}-object.xsl. For {2} save is the default.."));
-        command
-                .add(new MCRCommand("export all classifications to {0} with {1}",
-                        "org.mycore.frontend.cli.MCRClassification2Commands.exportAll String String",
-                        "The command store all classifications to the directory with name {0} with the stylesheet {1}-object.xsl. For {1} save is the default."));
+        command.add(new MCRCommand("export classification {0} to {1} with {2}",
+                "org.mycore.frontend.cli.MCRClassification2Commands.export String String String",
+                "The command store the classification with MCRObjectID {0} to the file named {1} with the stylesheet {2}-object.xsl. For {2} save is the default.."));
+        command.add(new MCRCommand("export all classifications to {0} with {1}",
+                "org.mycore.frontend.cli.MCRClassification2Commands.exportAll String String",
+                "The command store all classifications to the directory with name {0} with the stylesheet {1}-object.xsl. For {1} save is the default."));
         command.add(new MCRCommand("count classification children of {0}",
                 "org.mycore.frontend.cli.MCRClassification2Commands.countChildren String",
-                "The command remove the classification with MCRObjectID {0} from the system."));
+                "The command count the categoies of the classification with MCRObjectID {0} in the system."));
         command.add(new MCRCommand("list classification {0}",
                 "org.mycore.frontend.cli.MCRClassification2Commands.listClassification String",
                 "The command list the classification with MCRObjectID {0}."));
