@@ -759,8 +759,12 @@
     </xsl:choose>
   </xsl:variable>
   
+  <xsl:variable name="htmlId">
+    <xsl:value-of select="translate(translate($var,'@','_'),'/','_')"/>
+  </xsl:variable>
+  
   <xsl:if test="local-name() = 'textfield'">
-    <input tabindex="1" type="text" size="{@width}" name="{$var}" value="{$value}">
+    <input id="{concat('htmlId_',$htmlId)}" tabindex="1" type="text" size="{@width}" name="{$var}" value="{$value}">
       <xsl:copy-of select="@maxlength" />
       <xsl:call-template name="editor.set.css" />
     </input>
