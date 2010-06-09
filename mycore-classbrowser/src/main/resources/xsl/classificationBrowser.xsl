@@ -45,7 +45,9 @@
       <script type="text/javascript">
         /* &lt;![CDATA[ */
         
-        function update(elementID,categID) {
+        var openCategs=[];
+        
+        function update(elementID,categID, f) {
           jQuery(document.getElementById(elementID)).load('<xsl:value-of select="concat($ServletsBaseURL,'ClassificationBrowser')" />', 
           { 
             "XSL.template" : '<xsl:value-of select="$template" />',
@@ -63,7 +65,7 @@
             adddescription : '<xsl:value-of select="@adddescription" />',
             style          : '<xsl:value-of select="@style" />',
             webpage        : '<xsl:value-of select="substring-after($RequestURL,$WebApplicationBaseURL)" />'
-          } );      
+          }, f );      
         }
        
         function toogle(categID, closedImageURL, openImageURL) {
@@ -78,6 +80,9 @@
             }
             children.className='cbHidden';
             children.innerHTML = '';
+            openCategs=jQuery.grep(openCategs,function(value){
+              return value != categID;
+            });
           }
           else {
             button.value = '-';
@@ -86,7 +91,20 @@
             }
             children.className='cbVisible';
             update( childrenID, categID );
-          } 
+            openCategs.push(categID);
+          }
+          if (console) 
+            console.log(openCategs);
+        }
+        
+        function loadState() {
+          var pos=window.location.href.indexOf("#open");
+          if (pos>0){
+            var openTree=jQuery.parseJSON(unescape(window.location.href.substring(pos+5,window.location.href.length)));
+            jQuery.each(openTree, function(index, value){
+              jQuery('#cbButton_<xsl:value-of select="@classification" />_' + value).click();
+            });
+          }
         }
   
         /* ]]&gt; */
@@ -95,7 +113,7 @@
       <xsl:variable name="id" select="generate-id(.)" />
       <div id="{$id}" class="cbVisible">
         <script type="text/javascript">
-          update('<xsl:value-of select="$id" />','<xsl:value-of select="@category" />');
+          update('<xsl:value-of select="$id" />','<xsl:value-of select="@category" />', loadState);
         </script>
       </div>
     </div>
