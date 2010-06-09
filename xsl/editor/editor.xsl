@@ -310,13 +310,13 @@
   </xsl:variable>
  
   <td>
+    <a class="editorAnchor" name="rep{translate($var.new,'/@[]','____')}" />
     <xsl:for-each select="$rep">  
       <xsl:call-template name="cell">
         <xsl:with-param name="var"   select="$var.new" />
         <xsl:with-param name="pos"   select="$pos.new" />
       </xsl:call-template>
     </xsl:for-each>
-    <a class="editorAnchor" name="rep{translate($var.new,'/@[]','____')}" />
   </td>
 </xsl:template>
 
@@ -759,12 +759,8 @@
     </xsl:choose>
   </xsl:variable>
   
-  <xsl:variable name="htmlId">
-    <xsl:value-of select="translate(translate($var,'@','_'),'/','_')"/>
-  </xsl:variable>
-  
   <xsl:if test="local-name() = 'textfield'">
-    <input id="{concat('htmlId_',$htmlId)}" tabindex="1" type="text" size="{@width}" name="{$var}" value="{$value}">
+    <input tabindex="1" type="text" size="{@width}" name="{$var}" value="{$value}">
       <xsl:copy-of select="@maxlength" />
       <xsl:call-template name="editor.set.css" />
     </input>
