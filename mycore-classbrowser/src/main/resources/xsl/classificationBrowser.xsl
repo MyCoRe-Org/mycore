@@ -24,79 +24,80 @@
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-<xsl:param name="WebApplicationBaseURL" />
-<xsl:param name="ServletsBaseURL" />
-<xsl:param name="RequestURL" />
-
-<xsl:template match="classificationbrowser">
-  <div>
-    <xsl:attribute name="class">
-      <xsl:choose>
-        <xsl:when test="string-length(@class) &gt; 0">
-          <xsl:value-of select="@class" />
-        </xsl:when>
-        <xsl:otherwise>classificationBrowser</xsl:otherwise>
-      </xsl:choose>
-    </xsl:attribute>
-    
-    <script type="text/javascript" src="{$WebApplicationBaseURL}javascript/prototype.js"></script>
-    <script language="JavaScript">
-      /* &lt;![CDATA[ */
+  <xsl:param name="WebApplicationBaseURL" />
+  <xsl:param name="ServletsBaseURL" />
+  <xsl:param name="RequestURL" />
+  
+  <xsl:template match="classificationbrowser">
+    <div>
+      <xsl:attribute name="class">
+        <xsl:choose>
+          <xsl:when test="string-length(@class) &gt; 0">
+            <xsl:value-of select="@class" />
+          </xsl:when>
+          <xsl:otherwise>classificationBrowser</xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
       
-      function update(elementID,categID) {
-        new Ajax.Updater( elementID, '<xsl:value-of select="concat($ServletsBaseURL,'ClassificationBrowser')" />', 
-        { parameters: { 
-          "XSL.template" : '<xsl:value-of select="$template" />',
-          classification : '<xsl:value-of select="@classification" />',
-          category       : categID,
-          sortby         : '<xsl:value-of select="@sortby" />',
-          objecttype     : '<xsl:value-of select="@objecttype" />',
-          field          : '<xsl:value-of select="@field" />',
-          parameters     : '<xsl:value-of select="@parameters" />',
-          restriction    : '<xsl:value-of select="@restriction" />',
-          countresults   : '<xsl:value-of select="@countresults" />',
-          countlinks     : '<xsl:value-of select="@countlinks" />',
-          emptyleaves    : '<xsl:value-of select="@emptyleaves" />',
-          adduri         : '<xsl:value-of select="@adduri" />',
-          adddescription : '<xsl:value-of select="@adddescription" />',
-          style          : '<xsl:value-of select="@style" />',
-          webpage        : '<xsl:value-of select="substring-after($RequestURL,$WebApplicationBaseURL)" />'
-        } } );      
-      }
-     
-      function toogle(categID, closedImageURL, openImageURL) {
-        var childrenID = 'cbChildren_<xsl:value-of select="@classification" />_' + categID;
-        var button = document.getElementById( 'cbButton_<xsl:value-of select="@classification" />_' + categID );
-        var children = document.getElementById( childrenID );
+      <!-- jQuery -->
+      <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+      <script type="text/javascript">google.load("jquery", "1");</script>
+      <script type="text/javascript">
+        /* &lt;![CDATA[ */
         
-        if( button.value == '-' ) {
-          button.value = '+';
-          if (button.type == 'image' &amp;&amp; closedImageURL.length > 0){
-            button.src=closedImageURL;
-          }
-          children.className='cbHidden';
-          children.innerHTML = '';
+        function update(elementID,categID) {
+          jQuery(document.getElementById(elementID)).load('<xsl:value-of select="concat($ServletsBaseURL,'ClassificationBrowser')" />', 
+          { 
+            "XSL.template" : '<xsl:value-of select="$template" />',
+            classification : '<xsl:value-of select="@classification" />',
+            category       : categID,
+            sortby         : '<xsl:value-of select="@sortby" />',
+            objecttype     : '<xsl:value-of select="@objecttype" />',
+            field          : '<xsl:value-of select="@field" />',
+            parameters     : '<xsl:value-of select="@parameters" />',
+            restriction    : '<xsl:value-of select="@restriction" />',
+            countresults   : '<xsl:value-of select="@countresults" />',
+            countlinks     : '<xsl:value-of select="@countlinks" />',
+            emptyleaves    : '<xsl:value-of select="@emptyleaves" />',
+            adduri         : '<xsl:value-of select="@adduri" />',
+            adddescription : '<xsl:value-of select="@adddescription" />',
+            style          : '<xsl:value-of select="@style" />',
+            webpage        : '<xsl:value-of select="substring-after($RequestURL,$WebApplicationBaseURL)" />'
+          } );      
         }
-        else {
-          button.value = '-';
-          if (button.type == 'image' &amp;&amp; openImageURL.length > 0){
-            button.src=openImageURL;
+       
+        function toogle(categID, closedImageURL, openImageURL) {
+          var childrenID = 'cbChildren_<xsl:value-of select="@classification" />_' + categID;
+          var button = document.getElementById( 'cbButton_<xsl:value-of select="@classification" />_' + categID );
+          var children = document.getElementById( childrenID );
+          
+          if( button.value == '-' ) {
+            button.value = '+';
+            if (button.type == 'image' &amp;&amp; closedImageURL.length > 0){
+              button.src=closedImageURL;
+            }
+            children.className='cbHidden';
+            children.innerHTML = '';
           }
-          children.className='cbVisible';
-          update( childrenID, categID );
-        } 
-      }
-
-      /* ]]&gt; */
-    </script>
-    
-    <xsl:variable name="id" select="generate-id(.)" />
-    <div id="{$id}" class="cbVisible">
-      <script language="JavaScript">
-        update('<xsl:value-of select="$id" />','<xsl:value-of select="@category" />');
+          else {
+            button.value = '-';
+            if (button.type == 'image' &amp;&amp; openImageURL.length > 0){
+              button.src=openImageURL;
+            }
+            children.className='cbVisible';
+            update( childrenID, categID );
+          } 
+        }
+  
+        /* ]]&gt; */
       </script>
+      
+      <xsl:variable name="id" select="generate-id(.)" />
+      <div id="{$id}" class="cbVisible">
+        <script type="text/javascript">
+          update('<xsl:value-of select="$id" />','<xsl:value-of select="@category" />');
+        </script>
+      </div>
     </div>
-  </div>
-</xsl:template>
-
+  </xsl:template>
 </xsl:stylesheet>
