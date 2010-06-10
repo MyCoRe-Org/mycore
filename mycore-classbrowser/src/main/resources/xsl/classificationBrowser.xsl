@@ -93,8 +93,13 @@
             update( childrenID, categID );
             openCategs.push(categID);
           }
-          if (console) 
-            console.log(openCategs);
+          var state=(openCategs.length>0)? "#open"+escape('["'+openCategs.join('","')+'"]') :"#open[]";
+          var pos=window.location.href.indexOf("#open");
+          if (pos>0){
+            window.location.href=window.location.href.substring(0,pos)+state;
+          } else {
+            window.location.href+=state;
+          }          
         }
         
         function loadState() {
