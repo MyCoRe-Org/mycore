@@ -60,6 +60,8 @@ public class MCRBooleanClauseParser {
         return s;
     }
 
+//---------------------------------------------
+	
     public MCRCondition parse(Element condition) {
         if (condition == null) {
             return defaultRule();
@@ -103,6 +105,8 @@ public class MCRBooleanClauseParser {
         return parseSimpleCondition(condition);
     }
 
+//---------------------------------------------
+
     public MCRCondition parse(String s) throws MCRParseException {
         s = s.replaceAll("\t", " ").replaceAll("\n", " ").replaceAll("\r", " ");
 
@@ -113,6 +117,8 @@ public class MCRBooleanClauseParser {
         return parse(s, null);
     }
 
+//---------------------------------------------
+	
     private MCRCondition parse(String s, List l) throws MCRParseException {
         if (l == null) {
             l = new ArrayList();
@@ -122,25 +128,28 @@ public class MCRBooleanClauseParser {
         if (s.equals("()")) {
             s = "(true)";
         }
-
-        /* replace all bracket expressions with $n */
-        while (true) {
+        
+        while (true) {                                            // replace all bracket expressions with $n
             /* remove outer brackets () */
             while (s.charAt(0) == '(' && s.charAt(s.length() - 1) == ')' && s.substring(1, s.length() - 1).indexOf('(') < 0
                     && s.substring(1, s.length() - 1).indexOf(')') < 0) {
                 s = s.substring(1, s.length() - 1).trim();
             }
 
-            Matcher m = bracket.matcher(s);
-
+            Matcher m = bracket.matcher(s);                      // find bracket pairs
             if (m.find()) {
-                String clause = m.group();
+                String clause = m.group();                       // replace bracket pair with token
                 s = s.substring(0, m.start()) + "@<" + l.size() + ">@" + s.substring(m.end());
                 l.add(extendClauses(clause, l));
             } else {
                 break;
             }
         }
+	
+		// after replacing bracket pairs check for unmatched parenthis
+		if (  (s.indexOf('(') >= 0) ^ (s.indexOf(')') >= 0) ) {  // missing opening or closing bracket?
+			throw new MCRParseException("Syntax error: missing bracket in \"" + s + "\"");
+		}
 
         /* handle OR */
         Matcher m = or.matcher(s);
@@ -188,15 +197,17 @@ public class MCRBooleanClauseParser {
 
             return new MCRNotCondition(inverse);
         }
-
-        s = extendClauses(s, l);
-        if (s.indexOf('(') >= 0) {
+		
+        s = extendClauses(s, l);                                 // expands tokens with previously analysed expressions
+        if ( (s.indexOf('(') >= 0) && (s.indexOf(')') >= 0) ) {  // recusion ONLY if parenthis (can) match
             return parse(s, l);
         } else {
             return parseSimpleCondition(s);
         }
     }
 
+//---------------------------------------------
+	
     protected MCRCondition parseSimpleCondition(String s) throws MCRParseException {
         /* handle specific rules */
         s = s.toLowerCase();
@@ -212,6 +223,8 @@ public class MCRBooleanClauseParser {
         // l));
     }
 
+//---------------------------------------------
+	
     protected MCRCondition parseSimpleCondition(Element e) throws MCRParseException {
         // <boolean operator="true|false" />
         String name = e.getAttributeValue("operator").toLowerCase();
@@ -227,18 +240,51 @@ public class MCRBooleanClauseParser {
         throw new MCRParseException("syntax error: <" + name + ">");
     }
 
+//---------------------------------------------
+
     protected MCRCondition defaultRule() {
         return new MCRTrueCondition();
     }
 
+//---------------------------------------------
+
     public static void main(String[] args) {
         MCRBooleanClauseParser p = new MCRBooleanClauseParser();
+		
+		System.out.println("-------------");
+		System.out.println("Positive test cases");
+		System.out.println("1--");
         System.out.println(p.parse("true or false or true").toString());
+		System.out.println("2--");
         System.out.println(p.parse("(true) or (false) or (true)").toString());
+		System.out.println("3--");
         System.out.println(p.parse("true and false and true").toString());
+		System.out.println("4--");
         System.out.println(p.parse("true or false and true").toString());
+		System.out.println("5--");
         System.out.println(p.parse("true or true or (true or true)").toString());
+		System.out.println("6--");
         System.out.println(p.parse("((true))").toString());
+		System.out.println("7--");
         System.out.println(p.parse("(true ) or  ( ((false) or (true)))").toString());
+		
+		System.out.println("-------------");
+		System.out.println("Negative test cases");
+		System.out.println("1==");
+        try {System.out.println(p.parse("(true or false or true").toString());}catch (MCRParseException e) { System.out.println(e.getMessage()); }
+		System.out.println("2==");
+        try {System.out.println(p.parse("(true) or false) or (true)").toString());}catch (MCRParseException e) { System.out.println(e.getMessage()); }
+		System.out.println("3==");
+        try {System.out.println(p.parse("true and (false and true").toString());}catch (MCRParseException e) { System.out.println(e.getMessage()); }
+		System.out.println("4==");
+        try {System.out.println(p.parse("((((true or false))))) and true)").toString());}catch (MCRParseException e) { System.out.println(e.getMessage()); }
+		System.out.println("5==");
+        try {System.out.println(p.parse("true or true or (true or true))))").toString());}catch (MCRParseException e) { System.out.println(e.getMessage()); }
+		System.out.println("6==");
+        try {System.out.println(p.parse("((true)").toString());}catch (MCRParseException e) { System.out.println(e.getMessage()); }
+		System.out.println("7==");
+        try {System.out.println(p.parse("(true ) or  ( ((false) or (true))").toString());}catch (MCRParseException e) { System.out.println(e.getMessage()); }
+		System.out.println("8==");
+        try {System.out.println(p.parse("(true ) or  ((((((((( ((false) or (true))").toString());}catch (MCRParseException e) { System.out.println(e.getMessage()); }
     }
 }
