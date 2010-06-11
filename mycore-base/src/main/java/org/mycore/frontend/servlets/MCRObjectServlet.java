@@ -106,13 +106,15 @@ public class MCRObjectServlet extends MCRServlet {
             } else {
                 getLayoutService().doLayout(job.getRequest(), job.getResponse(), requestRemoteObject(job));
             }
-        } catch (MCRException e) {
+        } catch (MCRException e) {                                 // Shouldn't this be 404 "NOT FOUND"?
             generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     "Error while retrieving MCRObject with ID: " + getObjectID(job.getRequest()), e, false);
             return;
         }
     }
 
+//---------------------------------------------------------------------
+	
     private String getObjectHost(MCRServletJob job) {
         String remoteHost = job.getRequest().getParameter("host");
         if (remoteHost == null || remoteHost.length() == 0) {
@@ -121,17 +123,29 @@ public class MCRObjectServlet extends MCRServlet {
         return remoteHost;
     }
 
+//---------------------------------------------------------------------
+
     private org.w3c.dom.Document requestRemoteObject(MCRServletJob job) {
         String id = getObjectID(job.getRequest());
         String host = getProperty(job.getRequest(), "host");
         return MCRQueryClient.doRetrieveObject(host, id);
     }
+	
+//---------------------------------------------------------------------
 
     private Document requestLocalObject(MCRServletJob job) throws IOException {
         String id = getObjectID(job.getRequest());
-        MCRObjectID mcrid = new MCRObjectID(id);
 
-        if (!MCRAccessManager.checkPermission(mcrid, "read")) {
+		MCRObjectID mcrid = null;
+		try {
+			mcrid = new MCRObjectID(id);			             // create Object with given ID, only ID syntax check performed
+		} catch (MCRException e) {                               // handle exception: invalid ID syntax, set HTTP error 400 "Invalid request"
+            generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_BAD_REQUEST,
+                    "Error: invalid MCRObject-ID '" + id + "'", e, false);
+            return null;                                         // sorry, no object to return
+        }
+
+        if (!MCRAccessManager.checkPermission(mcrid, "read")) {  // check read permission for ID
             StringBuffer msg = new StringBuffer(1024);
             msg.append("Access denied reading MCRObject with ID: ").append(mcrid.getId());
             msg.append(".\nCurrent User: ").append(MCRSessionMgr.getCurrentSession().getCurrentUserID());
@@ -142,6 +156,8 @@ public class MCRObjectServlet extends MCRServlet {
 
         return TM.retrieveXML(mcrid);
     }
+	
+//---------------------------------------------------------------------
 
     private void setBrowseParameters(MCRServletJob job, String mcrid, String host, String editorID) {
         if (host != MCRHit.LOCAL) {
