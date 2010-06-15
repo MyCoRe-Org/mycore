@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
@@ -78,7 +77,9 @@ public class MCRMetaElement {
      * for the element was set to <b>en </b>.
      */
     public MCRMetaElement() {
-        this(DEFAULT_LANGUAGE, CONFIG.getString("MCR.MetaElement.defaults.class", ""), "", CONFIG.getBoolean("MCR.MetaElement.defaults.heritable", DEFAULT_HERITABLE), CONFIG.getBoolean("MCR.MetaElement.defaults.notinherit", DEFAULT_NOT_INHERIT), new ArrayList<MCRMetaInterface>());
+        this(DEFAULT_LANGUAGE, CONFIG.getString("MCR.MetaElement.defaults.class", ""), "", CONFIG.getBoolean(
+                "MCR.MetaElement.defaults.heritable", DEFAULT_HERITABLE), CONFIG.getBoolean("MCR.MetaElement.defaults.notinherit",
+                DEFAULT_NOT_INHERIT), new ArrayList<MCRMetaInterface>());
     }
 
     /**
@@ -90,7 +91,9 @@ public class MCRMetaElement {
      *            the default language
      */
     public MCRMetaElement(String default_lang) {
-        this(default_lang, CONFIG.getString("MCR.MetaElement.defaults.class", ""), "", CONFIG.getBoolean("MCR.MetaElement.defaults.heritable", DEFAULT_HERITABLE), CONFIG.getBoolean("MCR.MetaElement.defaults.notinherit", DEFAULT_NOT_INHERIT), new ArrayList<MCRMetaInterface>());
+        this(default_lang, CONFIG.getString("MCR.MetaElement.defaults.class", ""), "", CONFIG.getBoolean(
+                "MCR.MetaElement.defaults.heritable", DEFAULT_HERITABLE), CONFIG.getBoolean("MCR.MetaElement.defaults.notinherit",
+                DEFAULT_NOT_INHERIT), new ArrayList<MCRMetaInterface>());
     }
 
     /**
@@ -111,7 +114,8 @@ public class MCRMetaElement {
      * @param set_list
      *            a list of MCRMeta... data lines to add in this element
      */
-    public MCRMetaElement(String set_lang, String set_classname, String set_tag, boolean set_heritable, boolean set_notinherit, ArrayList<MCRMetaInterface> set_list) {
+    public MCRMetaElement(String set_lang, String set_classname, String set_tag, boolean set_heritable, boolean set_notinherit,
+            ArrayList<MCRMetaInterface> set_list) {
         if ((set_lang != null) && ((set_lang = set_lang.trim()).length() != 0)) {
             lang = set_lang;
         }
@@ -141,7 +145,7 @@ public class MCRMetaElement {
     }
 
     /**
-     * This methode return the instance of an element from the list with index
+     * This method returns the instance of an element from the list with index
      * i.
      * 
      * @return the instance of an element, if index is out of range return null
@@ -152,6 +156,25 @@ public class MCRMetaElement {
         }
 
         return (MCRMetaInterface) list.get(index);
+    }
+
+    /**
+     * This method returns the instance of an element from the list with the given 
+     * name
+     * 
+     * @return the instance of the element with the given name or null if there is no such element
+     * */
+    public final MCRMetaInterface getElementByName(String name) {
+        if (name == null || name.length() == 0) {
+            return null;
+        }
+
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getSubTag().equals(name)) {
+                return list.get(i);
+            }
+        }
+        return null;
     }
 
     /**
@@ -476,7 +499,7 @@ public class MCRMetaElement {
         LOGGER.debug("NotInherit         = " + String.valueOf(notinherit));
         LOGGER.debug("Elements           = " + String.valueOf(list.size()));
         LOGGER.debug(" ");
-        for (int i=0;i<list.size();i++) {
+        for (int i = 0; i < list.size(); i++) {
             list.get(i).debug();
         }
     }
