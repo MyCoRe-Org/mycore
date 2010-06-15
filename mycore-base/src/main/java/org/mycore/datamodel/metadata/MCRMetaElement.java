@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
+import org.mycore.datamodel.metadata.MCRMetaInterface;
 
 /**
  * This class is designed to to have a basic class for all metadata. The class
@@ -145,17 +146,36 @@ public class MCRMetaElement {
     }
 
     /**
-     * This methode return the instance of an element from the list with index
+     * This method returns the instance of an element from the list with index
      * i.
      * 
      * @return the instance of an element, if index is out of range return null
      */
     public final MCRMetaInterface getElement(int index) {
-        if (index < 0 || index > list.size()) {
+        if ((index < 0) || (index > list.size())) {
             return null;
         }
 
-        return list.get(index);
+        return (MCRMetaInterface) list.get(index);
+    }
+
+    /**
+     * This method returns the instance of an element from the list with the given 
+     * name
+     * 
+     * @return the instance of the element with the given name or null if there is no such element
+     * */
+    public final MCRMetaInterface getElementByName(String name) {
+        if (name == null || name.length() == 0) {
+            return null;
+        }
+
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getSubTag().equals(name)) {
+                return list.get(i);
+            }
+        }
+        return null;
     }
 
     /**
