@@ -5,8 +5,8 @@
   <xsl:output method="xml" encoding="UTF-8" indent="yes" xalan:indent-amount="2" />
 
   <xsl:template match="/">
-    <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" elementFormDefault="qualified"
-      xmlns:xlink="http://www.w3.org/1999/xlink">
+    <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      elementFormDefault="qualified" xmlns:xlink="http://www.w3.org/1999/xlink">
       <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="xlinks-2001.xsd" />
       <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml-2001.xsd" />
       <xs:include schemaLocation="mcrcommon-datamodel.xsd" />
@@ -62,7 +62,14 @@
     <xsl:param name="class" />
     <xs:element>
       <xsl:attribute name="name">
-        <xsl:value-of select="concat('def.',@name)" />
+        <xsl:choose>
+          <xsl:when test="@wrapper">
+            <xsl:value-of select="@wrapper" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="concat('def.',@name)" />
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:attribute>
       <xs:complexType>
         <xs:sequence>

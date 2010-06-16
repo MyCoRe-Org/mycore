@@ -57,6 +57,7 @@
       </xs:choice>
       <xs:attributeGroup ref="occurs" />
       <xs:attribute name="name" use="required" type="xs:NCName" />
+      <xs:attribute name="wrapper" type="xs:NCName" />
       <xs:attribute name="style" use="required" type="xs:NCName" />
       <xs:attribute name="type" use="required" type="xs:NCName" />
     </xs:complexType>
