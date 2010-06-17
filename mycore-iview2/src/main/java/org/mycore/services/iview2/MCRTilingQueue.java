@@ -226,6 +226,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
             StalledJobScheduler.awaitTermination(60, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             LOGGER.info("Could not wait for 60 seconds...");
+            StalledJobScheduler.shutdownNow();
         }
     }
 

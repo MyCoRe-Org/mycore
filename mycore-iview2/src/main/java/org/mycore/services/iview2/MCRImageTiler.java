@@ -137,6 +137,7 @@ public class MCRImageTiler implements Runnable, Closeable {
                     }
             } // while(running)
         }
+        LOGGER.info("Tiling thread finished");
     }
 
     public void prepareClose() {

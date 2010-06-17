@@ -28,6 +28,7 @@ import javax.servlet.ServletContextListener;
 
 import org.apache.log4j.Logger;
 import org.mycore.services.iview2.MCRImageTiler;
+import org.mycore.services.iview2.MCRTilingQueue;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -41,6 +42,15 @@ public class MCRIView2ServletContextListener implements ServletContextListener {
      * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
      */
     public void contextDestroyed(ServletContextEvent sce) {
+        while(tilingThread.isAlive()){
+            MCRImageTiler.getInstance().prepareClose();
+            MCRTilingQueue.getInstance().prepareClose();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                LOGGER.error(Thread.currentThread().getName()+" thread was interrupted.", e);
+            }
+        }
     }
 
     /* (non-Javadoc)
