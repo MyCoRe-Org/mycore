@@ -39,6 +39,7 @@ import javax.imageio.stream.ImageInputStream;
 import org.apache.log4j.Logger;
 import org.jdom.JDOMException;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
@@ -90,6 +91,8 @@ public class MCRIView2Tools {
 
     public static MCRFile getMCRFile(String derivateID, String absolutePath) {
         MCRDirectory root = (MCRDirectory) MCRFilesystemNode.getRootNode(derivateID);
+        if (root == null)
+            throw new MCRPersistenceException("Could not get root node of derivate " + derivateID);
         // get main file
         MCRFile mainFile = (MCRFile) root.getChildByPath(absolutePath);
         return mainFile;
