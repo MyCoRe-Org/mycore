@@ -3,6 +3,7 @@
   xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0">
 
   <xsl:output method="xml" encoding="UTF-8" indent="yes" xalan:indent-amount="2" />
+  <xsl:include href="datamodel2ext.xsl"/>
 
   <xsl:template match="/">
     <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
