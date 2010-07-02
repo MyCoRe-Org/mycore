@@ -648,16 +648,17 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
          */
         public Element resolveElement(String uri) throws FileNotFoundException, JDOMException, IOException, URISyntaxException {
             URI fileURI = new URI(uri);
-            File file = new File(fileURI);
+            String path = fileURI.getPath();
+            File file = new File(path);
             LOGGER.debug("Reading xml from file " + file.getAbsolutePath());
-            Element fromCache = (Element) fileCache.getIfUpToDate(fileURI.toString(), file.lastModified());
+            Element fromCache = (Element) fileCache.getIfUpToDate(file.getAbsolutePath(), file.lastModified());
 
             if (fromCache != null) {
                 return fromCache;
             }
 
             Element parsed = MCRURIResolver.instance().parseStream(new FileInputStream(file));
-            fileCache.put(fileURI.toString(), parsed);
+            fileCache.put(file.getAbsolutePath(), parsed);
 
             return parsed;
         }
