@@ -90,14 +90,14 @@ class MCRIndexWriteExecutor extends ThreadPoolExecutor {
             firstJob = false;
         }
         if (closeModifierEarly || getCompletedTaskCount() % maxIndexWriteActions == 0) {
-            closeIndexWriter();
+            clopenIndexWriter(true);
         } else {
             cancelDelayedIndexCloser();
             try {
                 delayedFuture = scheduler.schedule(delayedCloser, 2, TimeUnit.SECONDS);
             } catch (RejectedExecutionException e) {
                 LOGGER.warn("Cannot schedule delayed IndexWriter closer. Closing IndexWriter now.");
-                closeIndexWriter();
+                clopenIndexWriter(true);
             }
         }
     }
@@ -108,7 +108,7 @@ class MCRIndexWriteExecutor extends ThreadPoolExecutor {
         writeAccess.get().lock();
         cancelDelayedIndexCloser();
         if (modifierClosed) {
-            openIndexWriter();
+            clopenIndexWriter(false);
         }
         super.beforeExecute(t, r);
     }
@@ -128,8 +128,15 @@ class MCRIndexWriteExecutor extends ThreadPoolExecutor {
         } catch (InterruptedException e) {
             LOGGER.warn("Error while closing DelayedIndexWriterCloser", e);
         }
-        closeIndexWriter();
         super.shutdown();
+        clopenIndexWriter(true);
+    }
+
+    synchronized void clopenIndexWriter(boolean close) {
+        if (close)
+            closeIndexWriter();
+        else
+            openIndexWriter();
     }
 
     private void openIndexWriter() {
@@ -145,7 +152,7 @@ class MCRIndexWriteExecutor extends ThreadPoolExecutor {
         }
     }
 
-    synchronized void closeIndexWriter() {
+    private void closeIndexWriter() {
         //TODO: check if indexWriter.commit() is sufficient here
         Lock writerLock = IndexCloserLock.writeLock();
         try {
@@ -168,7 +175,7 @@ class MCRIndexWriteExecutor extends ThreadPoolExecutor {
 
     private static IndexWriter getLuceneWriter(FSDirectory indexDir, boolean first) throws Exception {
         IndexWriter modifier;
-        Analyzer analyzer = new GermanAnalyzer(Version.LUCENE_CURRENT);
+        Analyzer analyzer = new GermanAnalyzer(Version.LUCENE_30);
         boolean create = false;
         // check if indexDir is empty before creating a new index
         if (first && indexDir.listAll().length == 0) {
@@ -187,7 +194,7 @@ class MCRIndexWriteExecutor extends ThreadPoolExecutor {
 
     @Override
     protected void finalize() {
-        closeIndexWriter();
+        clopenIndexWriter(true);
         super.finalize();
     }
 
