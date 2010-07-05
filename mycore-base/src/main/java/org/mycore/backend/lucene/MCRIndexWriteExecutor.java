@@ -132,7 +132,7 @@ class MCRIndexWriteExecutor extends ThreadPoolExecutor {
         super.shutdown();
     }
 
-    private synchronized void openIndexWriter() {
+    private void openIndexWriter() {
         try {
             LOGGER.debug("Opening Lucene index for writing.");
             if (indexWriter == null) {
