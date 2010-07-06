@@ -230,7 +230,7 @@ public class MCRAccessManager {
             accessAllowed = checkPermission(l.iterator().next(), "read") && checkPermission(derID, "read");
         } else {
             accessAllowed = checkPermission(derID, "read");
-            Logger.getLogger("MCRAccessManager.class").warn("no mcrobject could be found for derivate: " + derID);
+            LOGGER.warn("no mcrobject could be found for derivate: " + derID);
         }
         return accessAllowed;
     }
