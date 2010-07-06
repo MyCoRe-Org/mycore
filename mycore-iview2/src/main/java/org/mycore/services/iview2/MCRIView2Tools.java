@@ -67,14 +67,18 @@ public class MCRIView2Tools {
     }
 
     public static String getSupportedMainFile(String derivateID) {
-        MCRDerivate deriv = new MCRDerivate();
-        deriv.receiveFromDatastore(derivateID);
-        String nameOfMainFile = deriv.getDerivate().getInternals().getMainDoc();
-        // verify support
-        if (nameOfMainFile != null && !nameOfMainFile.equals("")) {
-            MCRFile mainFile = getMCRFile(derivateID, nameOfMainFile);
-            if (mainFile != null && isFileSupported(mainFile))
-                return mainFile.getAbsolutePath();
+        try {
+            MCRDerivate deriv = new MCRDerivate();
+            deriv.receiveFromDatastore(derivateID);
+            String nameOfMainFile = deriv.getDerivate().getInternals().getMainDoc();
+            // verify support
+            if (nameOfMainFile != null && !nameOfMainFile.equals("")) {
+                MCRFile mainFile = getMCRFile(derivateID, nameOfMainFile);
+                if (mainFile != null && isFileSupported(mainFile))
+                    return mainFile.getAbsolutePath();
+            }
+        } catch (Exception e) {
+            LOGGER.warn("Could not get main file of derivate.", e);
         }
         return "";
     }
