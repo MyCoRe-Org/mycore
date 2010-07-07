@@ -98,18 +98,16 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 
     static boolean doRun = true;
     
-    @Override
-    public synchronized void init() throws ServletException {
-        super.init();
-        doRun = true;                                        
-
+    private synchronized void initServer(String baseURL) throws ServletException {
         if (server != null) {
             return; // already inited?
         }
 
+        doRun = true;                                        
+
         try {
             //query property directly (not via getBaseURL()), saves a stalled MCRSession
-            String host = new java.net.URL(MCRConfiguration.instance().getString("MCR.baseurl")).getHost();
+            String host = new java.net.URL(baseURL).getHost();
             String defIP = InetAddress.getByName(host).getHostAddress();
             int defPort = 22471; // my birthday is the default upload port
             serverIP = MCRConfiguration.instance().getString("MCR.FileUpload.IP", defIP);
@@ -227,6 +225,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
     @Override
     public void doGetPost(MCRServletJob job) throws Exception {
         try {
+            initServer(MCRServlet.getBaseURL());
             invokeMethod(job);
         } catch (Exception ex) {
             LOGGER.error("Error while handling FileUpload", ex);
