@@ -36,6 +36,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.http.HttpSession;
 
@@ -175,7 +176,7 @@ class MCRWebCLIContainer {
             this.commands = new LinkedList<String>();
             this.session = session;
             this.hsession = hsession;
-            this.logs = new ConcurrentLinkedQueue<LoggingEvent>();
+            this.logs = new MaxConcurentLinkedQueue<LoggingEvent>(1000);
             this.logGrabber = new Log4JGrabber();
         }
 
@@ -330,5 +331,37 @@ class MCRWebCLIContainer {
         public boolean requiresLayout() {
             return false;
         }
+    }
+
+    private static class MaxConcurentLinkedQueue<E> extends ConcurrentLinkedQueue<E> {
+
+        private static final long serialVersionUID = 705154376017755038L;
+
+        AtomicInteger size;
+
+        int maxSize;
+
+        public MaxConcurentLinkedQueue(int maxSize) {
+            super();
+            this.size = new AtomicInteger();
+            this.maxSize = maxSize;
+        }
+
+        @Override
+        public boolean add(E e) {
+            boolean value = super.add(e);
+            size.incrementAndGet();
+            while (size.get() > maxSize) {
+                poll();
+            }
+            return value;
+        }
+
+        @Override
+        public E poll() {
+            size.decrementAndGet();
+            return super.poll();
+        }
+
     }
 }
