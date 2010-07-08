@@ -23,6 +23,10 @@ public class MCRMigrationCommands21 extends MCRAbstractCommands {
         com = new MCRCommand("migrate xmltable", "org.mycore.services.migration.MCRMigrationCommands21.migrateXMLTable",
                 "The command migrates all entries from MCRXMLTable to IFS2.");
         command.add(com);
+        com = new MCRCommand("convert datamodel1 to datamodel2 from file {0}",
+            "org.mycore.frontend.cli.command.MCRDatamodelToDatamodel2Command.convert String",
+            "converts a datamodel 1 file to a new datamodel 2 one");
+        command.add(com);
     }
 
     public static void migrateXMLTable() {
