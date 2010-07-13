@@ -54,7 +54,7 @@ import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaElement;
 import org.mycore.datamodel.metadata.MCRMetaInterface;
-import org.mycore.datamodel.metadata.MCRMetaNBN;
+import org.mycore.datamodel.metadata.MCRMetaLangText;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
@@ -395,24 +395,24 @@ public class MCRStartEditorServlet extends MCRServlet {
         if (cd.mytype.equals("document") || cd.mytype.equals("disshab")) {
             MCRObject obj = new MCRObject();
             obj.receiveFromDatastore(cd.mysemcrid);
-            MCRMetaElement elm = obj.getMetadataElement("nbns");
+            MCRMetaElement elm = obj.getMetadataElement("urns");
             if (elm == null) {
-                String urn = MCRURNManager.buildURN("UBL");
-                MCRMetaNBN nbn = new MCRMetaNBN("metadata", "nbn", 0, urn);
+            	String urnString = MCRURNManager.buildURN("UBL");
+                MCRMetaLangText urn = new MCRMetaLangText("metadata", "urn", "de", "urn_new", 0, null, urnString);
                 ArrayList<MCRMetaInterface> list = new ArrayList<MCRMetaInterface>();
-                elm = new MCRMetaElement("de", "MCRMetaNBN", "nbns", true, false, list);
-                elm.addMetaObject(nbn);
-                obj.getMetadata().setMetadataElement(elm, "nbns");
+                elm = new MCRMetaElement("de", "MCRMetaLangText", "urns", true, false, list);
+                elm.addMetaObject(urn);
+                obj.getMetadata().setMetadataElement(elm, "urns");
                 try {
                     obj.updateInDatastore();
-                    MCRURNManager.assignURN(urn, obj.getId().toString());
+                    MCRURNManager.assignURN(urnString, obj.getId().toString());
                 } catch (MCRActiveLinkException e) {
-                    LOGGER.warn("Can't store NBN for " + cd.mysemcrid);
+                    LOGGER.warn("Can't store URN for " + cd.mysemcrid);
                     e.printStackTrace();
                 }
-                LOGGER.info("Add the NBN " + urn);
+                LOGGER.info("Add the URN " + urn);
             } else {
-                LOGGER.warn("The NBN already exists for " + cd.mysemcrid);
+                LOGGER.warn("The URN already exists for " + cd.mysemcrid);
             }
 
         }
