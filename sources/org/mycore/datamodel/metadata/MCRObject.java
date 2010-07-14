@@ -430,7 +430,8 @@ final public class MCRObject extends MCRBase {
         Collection<String> sources = MCRLinkTableManager.instance().getSourceOf(mcr_id);
         LOGGER.debug("Sources size:" + sources.size());
         if (sources.size() > 0) {
-            MCRActiveLinkException activeLinks = new MCRActiveLinkException(new StringBuffer("Error while deleting object ").append(mcr_id.toString()).append(
+            MCRActiveLinkException activeLinks = new MCRActiveLinkException(new StringBuffer("Error while deleting object ").append(
+                    mcr_id.toString()).append(
                     ". This object is still referenced by other objects and can not be removed until all links are released.").toString());
             for (String curSource : sources) {
                 activeLinks.addLink(curSource, mcr_id.toString());
@@ -892,5 +893,13 @@ final public class MCRObject extends MCRBase {
         LOGGER.debug("MCRObject Schema : " + mcr_schema);
         LOGGER.debug("");
         mcr_metadata.debug();
+    }
+
+    /* (non-Javadoc)
+     * @see org.mycore.datamodel.metadata.MCRBase#isValid()
+     */
+    @Override
+    public boolean isValid() {
+        return super.isValid() && getMetadata().isValid() && getStructure().isValid() && getService().isValid();
     }
 }
