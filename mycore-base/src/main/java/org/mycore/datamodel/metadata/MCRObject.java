@@ -908,6 +908,14 @@ final public class MCRObject extends MCRBase {
         LOGGER.debug("");
         mcr_metadata.debug();
     }
+    
+    /* (non-Javadoc)
+     * @see org.mycore.datamodel.metadata.MCRBase#isValid()
+     */
+    @Override
+    public boolean isValid() {
+        return super.isValid() && getMetadata().isValid() && getStructure().isValid() && getService().isValid();
+    }
 
     public void checkLinkTargets() {
         for (int i = 0; i < getMetadata().size(); i++) {
