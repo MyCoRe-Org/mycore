@@ -168,8 +168,8 @@ public class MCREventManager {
             try {
                 eh.doHandleEvent(evt);
             } catch (Exception ex) {
-                logger.info("Exception caught while calling event handler", ex);
-                logger.info("Trying rollback by calling undo method of event handlers");
+                logger.error("Exception caught while calling event handler", ex);
+                logger.error("Trying rollback by calling undo method of event handlers");
 
                 undoPos = i;
 
@@ -186,7 +186,7 @@ public class MCREventManager {
             try {
                 eh.undoHandleEvent(evt);
             } catch (Exception ex) {
-                logger.info("Exception caught while calling undo of event handler", ex);
+                logger.error("Exception caught while calling undo of event handler", ex);
             }
         }
     }
