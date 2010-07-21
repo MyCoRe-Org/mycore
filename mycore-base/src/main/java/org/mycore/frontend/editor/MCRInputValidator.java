@@ -144,6 +144,7 @@ public class MCRInputValidator {
     }
 
     public boolean validateXSLCondition(Element input, String condition) {
+        if( input == null ) return true;
         Document xml = new Document((Element) input.clone());
         return validateXSLCondition(xml, condition);
     }
