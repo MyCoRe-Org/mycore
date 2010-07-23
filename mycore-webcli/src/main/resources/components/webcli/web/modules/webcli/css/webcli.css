@@ -1,17 +1,17 @@
-@import "http://o.aolcdn.com/dojo/1.3/dijit/themes/tundra/tundra.css";
-@import "http://o.aolcdn.com/dojo/1.3/dojo/resources/dojo.css"
+@import "http://ajax.googleapis.com/ajax/libs/dojo/1.5/dijit/themes/claro/claro.css";
+@import "http://ajax.googleapis.com/ajax/libs/dojo/1.5/dojo/resources/dojo.css"
 html, body {
 	width: 100%;
 	height: 100%;
 }
 
-.tundra .webcliEditorIcon {
+.webcliEditorIcon {
     background-image: url('../images/webcli.gif'); /* editor icons sprite image */
     background-repeat: no-repeat;
     width: 18px;
     height: 18px;
     text-align: center;
 }
-.tundra .webcliEditorIconPause { background-position: 0px; }
-.tundra .webcliEditorIconStop { background-position: -18px; }
-.tundra .webcliEditorIconPlay { background-position: -36px; }
+.webcliEditorIconPause { background-position: 0px; }
+.webcliEditorIconStop { background-position: -18px; }
+.webcliEditorIconPlay { background-position: -36px; }

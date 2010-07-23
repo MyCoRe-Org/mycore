@@ -273,7 +273,7 @@ var webcli={
 		"handleSlider"			:	function(/*String*/ id, value){
 			element = dojo.byId(id);
 			element.value = value;
-			label = dojo.byId(id+".label").getElementsByTagName("div")[0].getElementsByTagName("span")[0];
+			label = dojo.byId(id+".label").getElementsByTagName("div")[0].getElementsByTagName("div")[0];
 			if (id == 'logHistorySize') {
 				label.firstChild.nodeValue = document.createTextNode(dojox.string.sprintf("%d\u00A0lines",value)).nodeValue;
 			} else {
@@ -356,7 +356,7 @@ var webcli={
 				curSize--;
 			}
 			if (webcli.logs.autoScroll==true){
-				logElement.scrollTop = logElement.scrollHeight - logElement.offsetHeight + 100;
+				logElement.parentNode.scrollTop = logElement.parentNode.scrollHeight - logElement.parentNode.offsetHeight + 100;
 			}
 		},
 		"refreshHandler"	:	null,
