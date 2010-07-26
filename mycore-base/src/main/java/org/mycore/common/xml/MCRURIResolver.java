@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -97,7 +96,7 @@ import org.xml.sax.InputSource;
  * declarations can read XML files from resource, webapp, file, session, http or
  * https, query, or mcrobject URIs.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank L\u00FCtzenkirchen
  * @author Thomas Scheffler (yagee)
  */
 public final class MCRURIResolver implements javax.xml.transform.URIResolver, EntityResolver {
@@ -166,7 +165,6 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         supportedSchemes.put("mcrfile", new MCRMCRFileResolver());
         supportedSchemes.put("mcrobject", new MCRObjectResolver());
         supportedSchemes.put("mcrws", new MCRWSResolver());
-        supportedSchemes.put("http", new MCRHttpResolver());
         supportedSchemes.put("request", new MCRRequestResolver());
         supportedSchemes.put("session", new MCRSessionResolver());
         supportedSchemes.put("access", new MCRACLResolver());
@@ -232,7 +230,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                 throw new TransformerException("Error while resolving: " + href, e);
             }
         }
-        LOGGER.warn("URI scheme not supported :" + scheme);
+        LOGGER.warn("URI scheme '" + scheme + ":' not supported, will try default resolver" );
         return null;
     }
 
@@ -549,34 +547,9 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
     }
 
-    private static class MCRHttpResolver implements MCRResolver {
-
-        /**
-         * Reads XML from a http or https URL.
-         * 
-         * @param url
-         *            the URL of the xml document
-         * @return the root element of the xml document
-         * @throws IOException
-         * @throws JDOMException
-         * @throws MalformedURLException
-         */
-        public Element resolveElement(String url) throws MalformedURLException, JDOMException, IOException {
-            LOGGER.debug("Reading xml from url " + url);
-
-            return MCRURIResolver.instance().parseStream(new URL(url).openStream());
-        }
-
-    }
-
     private static class MCRRequestResolver implements MCRResolver {
-        MCRResolver fallback;
 
-        public MCRRequestResolver() {
-            fallback = new MCRHttpResolver();
-        }
-
-        /**
+      /**
          * Reads XML from a HTTP request to this web application.
          * 
          * @param uri
@@ -600,7 +573,8 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                 finalURL = toEncoded(url.toString(), httpSessionID.toString());
             }
 
-            return fallback.resolveElement(finalURL);
+            InputStream is = new URL(finalURL).openStream();
+            return MCRURIResolver.instance().parseStream( is );
         }
 
         private String toEncoded(String url, String sessionId) {
