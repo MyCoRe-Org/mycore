@@ -27,7 +27,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -40,9 +39,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.StringTokenizer;
-import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,6 +49,7 @@ import javax.servlet.ServletContext;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -65,7 +65,6 @@ import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
@@ -164,21 +163,21 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         HashMap<String, URIResolver> supportedSchemes = new HashMap<String, URIResolver>(10 + extResolverMapping.size(), 1);
         // don't let interal mapping be overwritten
         supportedSchemes.putAll(extResolverMapping);
-        supportedSchemes.put("webapp", getURIResolver(new MCRWebAppResolver()));
-        supportedSchemes.put("file", getURIResolver(new MCRFileResolver()));
+        supportedSchemes.put("webapp", new MCRWebAppResolver());
+        supportedSchemes.put("file", new MCRFileResolver());
         supportedSchemes.put("ifs", getURIResolver(new MCRIFSResolver()));
-        supportedSchemes.put("mcrfile", getURIResolver(new MCRMCRFileResolver()));
+        supportedSchemes.put("mcrfile", new MCRMCRFileResolver());
         supportedSchemes.put("mcrobject", getURIResolver(new MCRObjectResolver()));
         supportedSchemes.put("mcrws", getURIResolver(new MCRWSResolver()));
         supportedSchemes.put("request", getURIResolver(new MCRRequestResolver()));
         supportedSchemes.put("session", getURIResolver(new MCRSessionResolver()));
         supportedSchemes.put("access", getURIResolver(new MCRACLResolver()));
         supportedSchemes.put("resource", getURIResolver(new MCRResourceResolver()));
-        supportedSchemes.put("localclass", getURIResolver(new MCRLocalClassResolver()));
+        supportedSchemes.put("localclass", new MCRLocalClassResolver());
         supportedSchemes.put("classification", getURIResolver(new MCRClassificationResolver()));
         supportedSchemes.put("query", getURIResolver(new MCRQueryResolver()));
         supportedSchemes.put("buildxml", getURIResolver(new MCRBuildXMLResolver()));
-        supportedSchemes.put("notnull", getURIResolver(new MCRNotNullResolver()));
+        supportedSchemes.put("notnull", new MCRNotNullResolver());
         supportedSchemes.put("xslStyle", getURIResolver(new MCRXslStyleResolver()));
         supportedSchemes.put("xslInclude", getURIResolver(new MCRXslIncludeResolver()));
         return supportedSchemes;
@@ -213,6 +212,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
      * @param mcrResolver a MCRResolver instance
      * @return a URIResolver adapter with mcrResolver as backend
      * @deprecated please implement {@link URIResolver} in your resolver classes
+     * @since 2.0.91
      */
     public static URIResolver getURIResolver(final MCRResolver mcrResolver) {
         return new URIResolver() {
@@ -651,7 +651,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         }
     }
 
-    private static class MCRFileResolver implements MCRResolver {
+    private static class MCRFileResolver implements URIResolver {
 
         /**
          * A cache of parsed XML files *
@@ -660,58 +660,59 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
         private static MCRCache fileCache = new MCRCache(cacheSize, "URIResolver Files");
 
-        /**
-         * Reads XML from a file URL.
-         * 
-         * @param uri
-         *            the URL of the file in the format file://path/to/file
-         * @return the root element of the xml document
-         * @throws IOException
-         * @throws JDOMException
-         * @throws FileNotFoundException
-         * @throws URISyntaxException
-         */
-        public Element resolveElement(String uri) throws FileNotFoundException, JDOMException, IOException, URISyntaxException {
-            URI fileURI = new URI(uri);
+        @Override
+        public Source resolve(String href, String base) throws TransformerException {
+            if (!href.endsWith(".xml")) {
+                //use standard URIResolver for that
+                return null;
+            }
+            URI fileURI;
+            try {
+                fileURI = new URI(base != null ? base + href : href);
+            } catch (URISyntaxException e) {
+                throw new TransformerException(e);
+            }
             String path = fileURI.getPath();
             File file = new File(path);
             LOGGER.debug("Reading xml from file " + file.getAbsolutePath());
             Element fromCache = (Element) fileCache.getIfUpToDate(file.getAbsolutePath(), file.lastModified());
 
             if (fromCache != null) {
-                return fromCache;
+                return new JDOMSource(fromCache);
             }
 
-            Element parsed = MCRURIResolver.instance().parseStream(new FileInputStream(file));
+            Element parsed;
+            try {
+                parsed = MCRURIResolver.instance().parseStream(new FileInputStream(file));
+            } catch (Exception e) {
+                throw new TransformerException(e);
+            }
             fileCache.put(file.getAbsolutePath(), parsed);
 
-            return parsed;
+            return new JDOMSource(parsed);
         }
 
     }
 
-    private static class MCRWebAppResolver implements MCRResolver {
-        MCRResolver fallback;
+    /**
+     * Reads XML from a static file within the web application.
+     *  the URI in the format request:path/to/servlet
+     */
+    private static class MCRWebAppResolver implements URIResolver {
+        URIResolver fallback;
 
         public MCRWebAppResolver() {
             fallback = new MCRFileResolver();
         }
 
-        /**
-         * Reads XML from a static file within the web application.
-         * 
-         * @param uri
-         *            the URI in the format request:path/to/servlet
-         * @return the root element of the xml document
-         * @throws Exception
-         */
-        public Element resolveElement(String uri) throws Exception {
-            String path = uri.substring(uri.indexOf(":") + 1);
+        @Override
+        public Source resolve(String href, String base) throws TransformerException {
+            String path = href.substring(href.indexOf(":") + 1);
             LOGGER.debug("Reading xml from webapp " + path);
             File f = new File(context.getRealPath(path));
-            uri = f.toURI().toString();
+            href = f.toURI().toString();
 
-            return fallback.resolveElement(uri);
+            return fallback.resolve(href, base);
         }
     }
 
@@ -737,27 +738,36 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
     }
 
-    private static class MCRLocalClassResolver implements MCRResolver {
+    /**
+     * Delivers a jdom Element created by any local class that implements
+     * MCRResolver (deprecated) or URIResolver interface.
+     *            the class name of the file in the format
+     *            localclass:org.mycore.ClassName?mode=getAll
+     */
+    private static class MCRLocalClassResolver implements URIResolver {
 
-        /**
-         * Delivers a jdom Element created by any local class that implements
-         * MCRResolver
-         * 
-         * @param uri
-         *            the class name of the file in the format
-         *            localclass:org.mycore.ClassName?mode=getAll
-         * 
-         * @return the root element of the XML document
-         * @throws Exception
-         */
-        public Element resolveElement(String uri) throws Exception {
-            String classname = uri.substring(uri.indexOf(":") + 1, uri.indexOf("?"));
+        @Override
+        public Source resolve(String href, String base) throws TransformerException {
+            String classname = href.substring(href.indexOf(":") + 1, href.indexOf("?"));
             Class<?> cl = null;
             Logger.getLogger(this.getClass()).debug("Loading Class: " + classname);
-            cl = Class.forName(classname);
-            Object o = cl.newInstance();
+            Object o;
+            try {
+                cl = Class.forName(classname);
+                o = cl.newInstance();
+            } catch (Exception e) {
+                throw new TransformerException(e);
+            }
+            if (o instanceof URIResolver) {
+                URIResolver resolver = (URIResolver) o;
+                return resolver.resolve(href, base);
+            }
             MCRResolver resolver = (MCRResolver) o;
-            return resolver.resolveElement(uri);
+            try {
+                return new JDOMSource(resolver.resolveElement(href));
+            } catch (Exception e) {
+                throw new TransformerException(e);
+            }
         }
 
     }
@@ -809,21 +819,19 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
     }
 
-    private static class MCRMCRFileResolver implements MCRResolver {
-        public Element resolveElement(String uri) throws IOException, JDOMException {
-            LOGGER.debug("Reading xml from MCRFile " + uri);
+    private static class MCRMCRFileResolver implements URIResolver {
+        @Override
+        public Source resolve(String href, String base) throws TransformerException {
+            LOGGER.debug("Reading xml from MCRFile " + href);
 
-            String id = uri.substring(uri.indexOf(":") + 1);
-
-            Element ele = null;
+            String id = href.substring(href.indexOf(":") + 1);
 
             try {
-                ele = MCRFile.getFile(id).getContentAsJDOM().detachRootElement();
-            } catch (MCRPersistenceException e) {
-                LOGGER.error("Cannot resolve MCRFile with id " + id);
+                return new StreamSource(MCRFile.getFile(id).getContentAsInputStream());
+            } catch (Exception e) {
+                throw new TransformerException(e);
             }
 
-            return ele;
         }
 
     }
@@ -1115,30 +1123,31 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
      * 
      * Usage: notnull:<anyMyCoReURI>
      */
-    private static class MCRNotNullResolver implements MCRResolver {
+    private static class MCRNotNullResolver implements URIResolver {
 
-        public Element resolveElement(String uri) {
-            String target = uri.substring(uri.indexOf(":") + 1);
+        @Override
+        public Source resolve(String href, String base) throws TransformerException {
+            String target = href.substring(href.indexOf(":") + 1);
             // fixes exceptions if suburi is empty like "mcrobject:"
             String subUri = target.substring(target.indexOf(":") + 1);
             if (subUri.length() == 0) {
-                return new Element("null");
+                return new JDOMSource(new Element("null"));
             }
             // end fix
             LOGGER.debug("Ensuring xml is not null: " + target);
             try {
-                Element result = MCRURIResolver.instance().resolve(target);
+                Source result = MCRURIResolver.instance().resolve(target, base);
                 if (result != null) {
                     return result;
                 } else {
                     LOGGER.debug("MCRNotNullResolver returning empty xml");
-                    return new Element("null");
+                    return new JDOMSource(new Element("null"));
                 }
             } catch (Exception ex) {
                 LOGGER.info("MCRNotNullResolver caught exception: " + ex.getLocalizedMessage());
                 LOGGER.debug(ex.getStackTrace());
                 LOGGER.debug("MCRNotNullResolver returning empty xml");
-                return new Element("null");
+                return new JDOMSource(new Element("null"));
             }
         }
     }
