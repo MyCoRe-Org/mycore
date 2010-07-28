@@ -272,7 +272,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         if (href.endsWith(".xsl")) {
             final String resourceName = "xsl/" + href;
             LOGGER.debug("Trying to resolve " + href + " from resource " + resourceName);
-            return SUPPORTED_SCHEMES.get("resource").resolve(resourceName, null);
+            return SUPPORTED_SCHEMES.get("resource").resolve(href, null);
         }
         return null;
     }
@@ -482,15 +482,12 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                     String scheme = entry.getKey().toString();
                     scheme = scheme.substring(scheme.lastIndexOf('.') + 1);
                     LOGGER.info("Adding Resolver " + entry.getValue().toString() + " for URI scheme " + scheme);
-                    Class<?> cl = Class.forName(entry.getValue().toString());
-                    for (Class<?> iface : cl.getInterfaces()) {
-                        if (URIResolver.class.getCanonicalName().equals(iface.getCanonicalName())) {
-                            map.put(scheme, (URIResolver) cl.newInstance());
-                        }
-                    }
-                    if (!map.containsKey(scheme)) {
+                    Object newInstance = MCRConfiguration.instance().getInstanceOf(entry.getKey().toString());
+                    if (newInstance instanceof URIResolver) {
+                        map.put(scheme, (URIResolver) newInstance);
+                    } else {
                         //add adapter for backward compatibility
-                        map.put(scheme, MCRURIResolver.getURIResolver((MCRResolver) cl.newInstance()));
+                        map.put(scheme, MCRURIResolver.getURIResolver((MCRResolver) newInstance));
                     }
                 } catch (Exception e) {
                     LOGGER.error("Cannot instantiate " + entry.getValue() + " for URI scheme " + entry.getKey());
