@@ -132,16 +132,29 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         factory.setURIResolver(MCRURIResolver.instance());
         factory.setErrorListener(new ErrorListener() {
             public void error(TransformerException ex) {
-                throw new MCRException("Error in transformer factory", ex);
+                throw new WrappedRuntimeException(getRealException(ex));
             }
 
             public void fatalError(TransformerException ex) {
-                throw new MCRException("Fatal error in transformer factory", ex);
+                throw new WrappedRuntimeException(getRealException(ex));
             }
 
             public void warning(TransformerException ex) {
                 LOGGER.warn(ex.getMessageAndLocation());
             }
+
+            private Exception getRealException(TransformerException tex) {
+                if (tex.getException() != null) {
+                    Throwable cause = tex.getException();
+                    while (cause instanceof WrappedRuntimeException) {
+                        cause = ((WrappedRuntimeException) cause).getException();
+                    }
+                    if (cause instanceof TransformerException)
+                        return getRealException((TransformerException) cause);
+                }
+                return tex;
+            }
+
         });
 
         fopFactory = FopFactory.newInstance();
@@ -483,42 +496,52 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         StringBuffer msg = new StringBuffer("Error compiling XSL stylesheet ");
         msg.append(resource);
 
-        while (exc != null) {
-            if (exc instanceof MCRException) {
-                MCRException mex = (MCRException) exc;
-                msg.append("\n").append(mex.getMessage());
-                exc = (Exception) mex.getCause();
-            }
-            if (exc instanceof WrappedRuntimeException) {
-                exc = ((WrappedRuntimeException) exc).getException();
-            }
-            if (exc instanceof TransformerException) {
-                TransformerException tex = (TransformerException) exc;
-                msg.append("\n").append(tex.getMessage());
-                SourceLocator sl = tex.getLocator();
-                if (sl != null) {
-                    msg.append(" at line ").append(sl.getLineNumber()).append(" column ").append(sl.getColumnNumber());
-                }
-                if (tex.getCause() instanceof MCRException) {
-                    reportCompileError(resource, (Exception) tex.getCause());
-                    return;
-                }
-                if (tex.getCause() instanceof Exception) {
-                    exc = (Exception) tex.getCause();
-                } else {
-                    exc = null;
-                }
-            } else {
-                msg.append("\n").append(exc.getMessage());
-                if (exc.getCause() instanceof Exception) {
-                    exc = (Exception) exc.getCause();
-                } else {
-                    exc = null;
-                }
+        Exception cause = exc;
+        while (cause instanceof WrappedRuntimeException) {
+            cause = ((WrappedRuntimeException) cause).getException();
+        }
+        if (cause instanceof TransformerException)
+            cause = getRealException((TransformerException) cause);
+        else if (cause instanceof MCRException)
+            cause = getRealException((MCRException) cause);
+
+        if (cause instanceof TransformerException) {
+            TransformerException tex = (TransformerException) cause;
+            msg.append("\n").append(tex.getMessage());
+            SourceLocator sl = tex.getLocator();
+            if (sl != null) {
+                msg.append(" at line ").append(sl.getLineNumber()).append(" column ").append(sl.getColumnNumber());
             }
         }
+        throw new MCRConfigurationException(msg.toString(), cause);
+    }
 
-        throw new MCRConfigurationException(msg.toString(), exc);
+    private Exception getRealException(TransformerException exc) {
+        if (exc.getException() != null) {
+            Throwable cause = exc.getException();
+            while (cause instanceof WrappedRuntimeException) {
+                cause = ((WrappedRuntimeException) cause).getException();
+            }
+            if (cause instanceof TransformerException)
+                return getRealException((TransformerException) cause);
+            if (cause instanceof MCRException)
+                return getRealException((MCRException) cause);
+        }
+        return exc;
+    }
+
+    private Exception getRealException(MCRException exc) {
+        if (exc.getCause() != null) {
+            Throwable cause = exc.getCause();
+            while (cause instanceof WrappedRuntimeException) {
+                cause = ((WrappedRuntimeException) cause).getException();
+            }
+            if (cause instanceof TransformerException)
+                return getRealException((TransformerException) cause);
+            if (cause instanceof MCRException)
+                return getRealException((MCRException) cause);
+        }
+        return exc;
     }
 
     /**
