@@ -130,11 +130,11 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         String externalClassName = MCRConfiguration.instance().getString(CONFIG_PREFIX + "ExternalResolver.Class", null);
         final MCRResolverProvider emptyResolver = new MCRResolverProvider() {
             public Map<String, MCRResolver> getResolverMapping() {
-                return Collections.emptyMap();
+                return new HashMap<String, MCRResolver>();
             }
 
             public Map<String, URIResolver> getURIResolverMapping() {
-                return Collections.emptyMap();
+                return new HashMap<String, URIResolver>();
             }
         };
         if (externalClassName == null) {
@@ -474,7 +474,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         public Map<String, URIResolver> getURIResolverMapping() {
             Properties props = MCRConfiguration.instance().getProperties(CONFIG_PREFIX + "ModuleResolver.");
             if (props.isEmpty()) {
-                return Collections.emptyMap();
+                return new HashMap<String, URIResolver>();
             }
             Map<String, URIResolver> map = new HashMap<String, URIResolver>();
             for (Entry<Object, Object> entry : props.entrySet()) {
