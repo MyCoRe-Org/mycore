@@ -49,6 +49,7 @@ import java.util.regex.Pattern;
 import javax.servlet.ServletContext;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.URIResolver;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -102,7 +103,7 @@ import org.xml.sax.InputSource;
 public final class MCRURIResolver implements javax.xml.transform.URIResolver, EntityResolver {
     private static final Logger LOGGER = Logger.getLogger(MCRURIResolver.class);
 
-    private static Map<String, MCRResolver> SUPPORTED_SCHEMES;
+    private static Map<String, URIResolver> SUPPORTED_SCHEMES;
 
     private static final String CONFIG_PREFIX = "MCR.URIResolver.";
 
@@ -130,7 +131,11 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         String externalClassName = MCRConfiguration.instance().getString(CONFIG_PREFIX + "ExternalResolver.Class", null);
         final MCRResolverProvider emptyResolver = new MCRResolverProvider() {
             public Map<String, MCRResolver> getResolverMapping() {
-                return new HashMap<String, MCRResolver>();
+                return Collections.emptyMap();
+            }
+
+            public Map<String, URIResolver> getURIResolverMapping() {
+                return Collections.emptyMap();
             }
         };
         if (externalClassName == null) {
@@ -152,30 +157,30 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         }
     }
 
-    private HashMap<String, MCRResolver> getResolverMapping() {
-        final Map<String, MCRResolver> extResolverMapping = EXT_RESOLVER.getResolverMapping();
-        extResolverMapping.putAll(new MCRModuleResolverProvider().getResolverMapping());
+    private HashMap<String, URIResolver> getResolverMapping() {
+        final Map<String, URIResolver> extResolverMapping = EXT_RESOLVER.getURIResolverMapping();
+        extResolverMapping.putAll(new MCRModuleResolverProvider().getURIResolverMapping());
         // set Map to final size with loadfactor: full
-        HashMap<String, MCRResolver> supportedSchemes = new HashMap<String, MCRResolver>(10 + extResolverMapping.size(), 1);
+        HashMap<String, URIResolver> supportedSchemes = new HashMap<String, URIResolver>(10 + extResolverMapping.size(), 1);
         // don't let interal mapping be overwritten
         supportedSchemes.putAll(extResolverMapping);
-        supportedSchemes.put("webapp", new MCRWebAppResolver());
-        supportedSchemes.put("file", new MCRFileResolver());
-        supportedSchemes.put("ifs", new MCRIFSResolver());
-        supportedSchemes.put("mcrfile", new MCRMCRFileResolver());
-        supportedSchemes.put("mcrobject", new MCRObjectResolver());
-        supportedSchemes.put("mcrws", new MCRWSResolver());
-        supportedSchemes.put("request", new MCRRequestResolver());
-        supportedSchemes.put("session", new MCRSessionResolver());
-        supportedSchemes.put("access", new MCRACLResolver());
-        supportedSchemes.put("resource", new MCRResourceResolver());
-        supportedSchemes.put("localclass", new MCRLocalClassResolver());
-        supportedSchemes.put("classification", new MCRClassificationResolver());
-        supportedSchemes.put("query", new MCRQueryResolver());
-        supportedSchemes.put("buildxml", new MCRBuildXMLResolver());
-        supportedSchemes.put("notnull", new MCRNotNullResolver());
-        supportedSchemes.put("xslStyle", new MCRXslStyleResolver());
-        supportedSchemes.put("xslInclude", new MCRXslIncludeResolver());
+        supportedSchemes.put("webapp", getURIResolver(new MCRWebAppResolver()));
+        supportedSchemes.put("file", getURIResolver(new MCRFileResolver()));
+        supportedSchemes.put("ifs", getURIResolver(new MCRIFSResolver()));
+        supportedSchemes.put("mcrfile", getURIResolver(new MCRMCRFileResolver()));
+        supportedSchemes.put("mcrobject", getURIResolver(new MCRObjectResolver()));
+        supportedSchemes.put("mcrws", getURIResolver(new MCRWSResolver()));
+        supportedSchemes.put("request", getURIResolver(new MCRRequestResolver()));
+        supportedSchemes.put("session", getURIResolver(new MCRSessionResolver()));
+        supportedSchemes.put("access", getURIResolver(new MCRACLResolver()));
+        supportedSchemes.put("resource", getURIResolver(new MCRResourceResolver()));
+        supportedSchemes.put("localclass", getURIResolver(new MCRLocalClassResolver()));
+        supportedSchemes.put("classification", getURIResolver(new MCRClassificationResolver()));
+        supportedSchemes.put("query", getURIResolver(new MCRQueryResolver()));
+        supportedSchemes.put("buildxml", getURIResolver(new MCRBuildXMLResolver()));
+        supportedSchemes.put("notnull", getURIResolver(new MCRNotNullResolver()));
+        supportedSchemes.put("xslStyle", getURIResolver(new MCRXslStyleResolver()));
+        supportedSchemes.put("xslInclude", getURIResolver(new MCRXslIncludeResolver()));
         return supportedSchemes;
     }
 
@@ -201,6 +206,39 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
     }
 
     /**
+     * Compatibility method to convert a {@link MCRResolver} into a {@link URIResolver}.
+     * 
+     * You may use this in a transition phase for your convenience.
+     * It actually just wraps the {@link Element} returned by {@link MCRResolver#resolveElement(String)} in a {@link JDOMSource}.
+     * @param mcrResolver a MCRResolver instance
+     * @return a URIResolver adapter with mcrResolver as backend
+     * @deprecated please implement {@link URIResolver} in your resolver classes
+     */
+    public static URIResolver getURIResolver(final MCRResolver mcrResolver) {
+        return new URIResolver() {
+            public Source resolve(String href, String base) throws TransformerException {
+                try {
+                    return new JDOMSource(mcrResolver.resolveElement(href));
+                } catch (Exception e) {
+                    throw new TransformerException("Error while resolving: " + href, e);
+                }
+            }
+        };
+    }
+
+    private static Hashtable<String, String> getParameterMap(String key) {
+        String[] param;
+        StringTokenizer tok = new StringTokenizer(key, "&");
+        Hashtable<String, String> params = new Hashtable<String, String>();
+
+        while (tok.hasMoreTokens()) {
+            param = tok.nextToken().split("=");
+            params.put(param[0], param[1]);
+        }
+        return params;
+    }
+
+    /**
      * URI Resolver that resolves XSL document() or xsl:include calls.
      * 
      * @see javax.xml.transform.URIResolver
@@ -222,27 +260,19 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
         String scheme = getScheme(href);
 
-        if (SUPPORTED_SCHEMES.containsKey(scheme)) {
-            try {
-                return new JDOMSource(resolveURI(href));
-            } catch (Exception e) {
-                LOGGER.error("Error while resolving: " + href, e);
-                throw new TransformerException("Error while resolving: " + href, e);
-            }
+        URIResolver uriResolver = SUPPORTED_SCHEMES.get(scheme);
+        if (uriResolver != null) {
+            return uriResolver.resolve(href, base);
         }
-        LOGGER.warn("URI scheme '" + scheme + ":' not supported, will try default resolver" );
+        LOGGER.warn("URI scheme '" + scheme + ":' not supported, will try default resolver");
         return null;
     }
 
-    private Source tryResolveXSL(String href) {
+    private Source tryResolveXSL(String href) throws TransformerException {
         if (href.endsWith(".xsl")) {
             final String resourceName = "xsl/" + href;
-            try {
-                LOGGER.debug("Trying to resolve " + href + " from resource " + resourceName);
-                return new JDOMSource(SUPPORTED_SCHEMES.get("resource").resolveElement(resourceName));
-            } catch (Exception e) {
-                LOGGER.error("Error while parsing stylesheet from resource " + resourceName, e);
-            }
+            LOGGER.debug("Trying to resolve " + href + " from resource " + resourceName);
+            return SUPPORTED_SCHEMES.get("resource").resolve(resourceName, null);
         }
         return null;
     }
@@ -335,16 +365,15 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
              * rethrow Exception as RuntimException TODO: need to refactor this
              * and declare throw in method signature
              */
-            return resolveURI(uri);
+            Source source = resolve(uri, null);
+            if (source instanceof JDOMSource) {
+                JDOMSource jdomSource = (JDOMSource) source;
+                return (Element) jdomSource.getNodes().get(0);
+            }
         } catch (Exception e) {
             throw new MCRException("Error while resolving: " + uri, e);
         }
-    }
-
-    private Element resolveURI(String uri) throws Exception {
-        LOGGER.debug("Reading xml from uri " + uri);
-        String scheme = getScheme(uri);
-        return getResolver(scheme).resolveElement(uri);
+        throw new MCRException("Could not get JDOM Element from URI :" + uri);
     }
 
     /**
@@ -358,7 +387,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         return new StringTokenizer(uri, ":").nextToken();
     }
 
-    MCRResolver getResolver(String scheme) {
+    URIResolver getResolver(String scheme) {
         if (SUPPORTED_SCHEMES.containsKey(scheme)) {
             return SUPPORTED_SCHEMES.get(scheme);
         }
@@ -387,6 +416,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
      * Resolver interface. use this to implement custom URI schemes.
      * 
      * @author Thomas Scheffler (yagee)
+     * @deprecated use {@link URIResolver} instead
      */
     public static interface MCRResolver {
         /**
@@ -419,26 +449,49 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
          * 
          * @see MCRResolver
          * @return a Map of Resolver mappings
+         * @deprecated since 2.1 use {@link #getURIResolverMapping()}
          */
         public Map<String, MCRResolver> getResolverMapping();
+
+        /**
+         * provides a Map of URIResolver mappings.
+         * 
+         * Key is the scheme, e.g. <code>http</code>, where value is an implementation
+         * of {@link URIResolver}.
+         * 
+         * @see URIResolver
+         * @return a Map of URIResolver mappings
+         */
+        public Map<String, URIResolver> getURIResolverMapping();
     }
 
     private static class MCRModuleResolverProvider implements MCRResolverProvider {
 
-        @SuppressWarnings("unchecked")
         public Map<String, MCRResolver> getResolverMapping() {
+            throw new UnsupportedOperationException("use getURIResolverMapping()");
+        }
+
+        public Map<String, URIResolver> getURIResolverMapping() {
             Properties props = MCRConfiguration.instance().getProperties(CONFIG_PREFIX + "ModuleResolver.");
             if (props.isEmpty()) {
-                return Collections.EMPTY_MAP;
+                return Collections.emptyMap();
             }
-            Map<String, MCRResolver> map = new HashMap<String, MCRResolver>();
-            for (Entry entry : props.entrySet()) {
+            Map<String, URIResolver> map = new HashMap<String, URIResolver>();
+            for (Entry<Object, Object> entry : props.entrySet()) {
                 try {
                     String scheme = entry.getKey().toString();
                     scheme = scheme.substring(scheme.lastIndexOf('.') + 1);
                     LOGGER.info("Adding Resolver " + entry.getValue().toString() + " for URI scheme " + scheme);
-                    Class cl = Class.forName(entry.getValue().toString());
-                    map.put(scheme, (MCRResolver) cl.newInstance());
+                    Class<?> cl = Class.forName(entry.getValue().toString());
+                    for (Class<?> iface : cl.getInterfaces()) {
+                        if (URIResolver.class.getCanonicalName().equals(iface.getCanonicalName())) {
+                            map.put(scheme, (URIResolver) cl.newInstance());
+                        }
+                    }
+                    if (!map.containsKey(scheme)) {
+                        //add adapter for backward compatibility
+                        map.put(scheme, MCRURIResolver.getURIResolver((MCRResolver) cl.newInstance()));
+                    }
                 } catch (Exception e) {
                     LOGGER.error("Cannot instantiate " + entry.getValue() + " for URI scheme " + entry.getKey());
                     throw new MCRException("Cannot instantiate " + entry.getValue() + " for URI scheme " + entry.getKey(), e);
@@ -549,14 +602,14 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
     private static class MCRRequestResolver implements MCRResolver {
 
-      /**
-         * Reads XML from a HTTP request to this web application.
-         * 
-         * @param uri
-         *            the URI in the format request:path/to/servlet
-         * @return the root element of the xml document
-         * @throws Exception
-         */
+        /**
+           * Reads XML from a HTTP request to this web application.
+           * 
+           * @param uri
+           *            the URI in the format request:path/to/servlet
+           * @return the root element of the xml document
+           * @throws Exception
+           */
         public Element resolveElement(String uri) throws Exception {
             String path = uri.substring(uri.indexOf(":") + 1);
             LOGGER.debug("Reading xml from request " + path);
@@ -574,7 +627,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             }
 
             InputStream is = new URL(finalURL).openStream();
-            return MCRURIResolver.instance().parseStream( is );
+            return MCRURIResolver.instance().parseStream(is);
         }
 
         private String toEncoded(String url, String sessionId) {
@@ -838,8 +891,8 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
         private static final String SORT_CONFIG_PREFIX = CONFIG_PREFIX + "Classification.Sort.";
 
-        private static MCRCache categoryCache = new MCRCache(MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Classification.CacheSize",
-                1000), "URIResolver categories");
+        private static MCRCache categoryCache = new MCRCache(MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Classification.CacheSize", 1000),
+            "URIResolver categories");
 
         private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
@@ -929,8 +982,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             } else if (axis.equals("parents")) {
                 if (categ.length() == 0) {
                     LOGGER.error("Cannot resolve parent axis without a CategID. URI: " + uri);
-                    throw new IllegalArgumentException(
-                            "Invalid format (categID is required in mode 'parents') of uri for retrieval of classification: " + uri);
+                    throw new IllegalArgumentException("Invalid format (categID is required in mode 'parents') of uri for retrieval of classification: " + uri);
                 }
                 cl = DAO.getRootCategory(new MCRCategoryID(classID, categ), levels);
             }
@@ -1054,20 +1106,6 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             return input;
         }
 
-    }
-
-    private static Hashtable<String, String> getParameterMap(String key) {
-        StringTokenizer tok = new StringTokenizer(key, "&");
-        Hashtable<String, String> params = new Hashtable<String, String>();
-
-        while (tok.hasMoreTokens()) {
-            String param = tok.nextToken();
-            int equalsSignIndex = param.indexOf('=');
-            String paramKey = param.substring(0, equalsSignIndex);
-            String paramValue = param.substring(equalsSignIndex + 1);
-            params.put(paramKey, paramValue);
-        }
-        return params;
     }
 
     /**
