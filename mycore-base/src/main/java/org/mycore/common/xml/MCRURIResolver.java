@@ -272,7 +272,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         if (href.endsWith(".xsl")) {
             final String resourceName = "xsl/" + href;
             LOGGER.debug("Trying to resolve " + href + " from resource " + resourceName);
-            return SUPPORTED_SCHEMES.get("resource").resolve(href, null);
+            return SUPPORTED_SCHEMES.get("resource").resolve(resourceName, null);
         }
         return null;
     }
