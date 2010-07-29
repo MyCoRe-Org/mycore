@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -265,8 +266,18 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         if (uriResolver != null) {
             return uriResolver.resolve(href, base);
         }
-        LOGGER.warn("URI scheme '" + scheme + ":' not supported, will try default resolver");
-        return null;
+        else { // try to handle as URL, use default resolver for file:// and http:// 
+            InputStream in;
+            try {
+                in = new URL(href).openStream();
+            } catch (MalformedURLException ex) {
+                LOGGER.warn("URI scheme '" + scheme + ":' not supported, will try default resolver");
+                return null;
+            } catch (IOException ex) {
+                throw new TransformerException(href, ex);
+            }
+            return new StreamSource(in);
+        }
     }
 
     private Source tryResolveXSL(String href) throws TransformerException {
@@ -361,34 +372,47 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         if (LOGGER.isDebugEnabled()) {
             addDebugInfo(uri, "JAVA method invocation");
         }
+
+        /**
+         * rethrow Exception as RuntimException 
+         * TODO: need to refactor this and declare throw in method signature
+         */
+        
+        Source source = null;
         try {
-            /**
-             * rethrow Exception as RuntimException TODO: need to refactor this
-             * and declare throw in method signature
-             */
-            Source source = resolve(uri, null);
-            if (source instanceof JDOMSource) {
-                JDOMSource jdomSource = (JDOMSource) source;
-
-                Document xml = jdomSource.getDocument();
-                if (xml != null)
-                    return xml.getRootElement();
-
-                for (Object node : jdomSource.getNodes()) {
-                    if (node instanceof Element)
-                        return (Element) node;
-                    else if (node instanceof Document)
-                        return ((Document) node).getRootElement();
-                }
-            } else if (source != null) {
-                InputSource iSrc = SAXSource.sourceToInputSource(source);
-                Document xml = new SAXBuilder().build(iSrc);
-                return xml.getRootElement();
-            }
-        } catch (Exception e) {
-            throw new MCRException("Error while resolving " + uri, e);
+            source = resolve(uri, null);
+        } catch (TransformerException ex) {
+            throw new MCRException("Error while resolving " + uri, ex);
         }
-        throw new MCRException("Could not get JDOM Element from URI " + uri);
+
+        if (source == null)
+            throw new MCRException("Could not get JDOM Element from URI " + uri);
+
+        else
+            try {
+                if (source instanceof JDOMSource) {
+                    JDOMSource jdomSource = (JDOMSource) source;
+
+                    Document xml = jdomSource.getDocument();
+                    if (xml != null)
+                        return xml.getRootElement();
+
+                    for (Object node : jdomSource.getNodes()) {
+                        if (node instanceof Element)
+                            return (Element) node;
+                        else if (node instanceof Document)
+                            return ((Document) node).getRootElement();
+                    }
+                } else {
+                    InputSource iSrc = SAXSource.sourceToInputSource(source);
+                    Document xml = new SAXBuilder().build(iSrc);
+                    return xml.getRootElement();
+                }
+
+            } catch (Exception e) {
+                throw new MCRException("Error while resolving " + uri, e);
+            }
+        throw new MCRException("Nothing found resolving " + uri);
     }
 
     /**
