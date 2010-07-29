@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Collections;
@@ -263,16 +262,9 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         if (uriResolver != null) {
             return uriResolver.resolve(href, base);
         } else { // try to handle as URL, use default resolver for file:// and http:// 
-            InputStream in;
-            try {
-                in = new URL(href).openStream();
-            } catch (MalformedURLException ex) {
-                LOGGER.warn("URI scheme '" + scheme + ":' not supported, will try default resolver");
-                return null;
-            } catch (IOException ex) {
-                throw new TransformerException(href, ex);
-            }
-            return new StreamSource(in);
+            StreamSource streamSource = new StreamSource();
+            streamSource.setSystemId(href);
+            return streamSource;
         }
     }
 
@@ -712,12 +704,15 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         @Override
         public Source resolve(String href, String base) throws TransformerException {
             String path = href.substring(href.indexOf(":") + 1);
-            InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(path);
-            if (inputStream != null)
-                return new StreamSource(inputStream);
+            URL resource = this.getClass().getClassLoader().getResource(path);
+            if (resource != null) {
+                StreamSource streamSource = new StreamSource();
+                //setting systemID here is crucial for good XSL error messages
+                streamSource.setSystemId(resource.toString());
+                return streamSource;
+            }
             return null;
         }
-
     }
 
     /**
