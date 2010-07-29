@@ -38,6 +38,7 @@ import java.net.URLDecoder;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -49,6 +50,7 @@ import javax.servlet.ServletContext;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
+import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
@@ -368,12 +370,26 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             Source source = resolve(uri, null);
             if (source instanceof JDOMSource) {
                 JDOMSource jdomSource = (JDOMSource) source;
-                return (Element) jdomSource.getNodes().get(0);
+
+                Document xml = jdomSource.getDocument();
+                if (xml != null)
+                    return xml.getRootElement();
+
+                for (Object node : jdomSource.getNodes()) {
+                    if (node instanceof Element)
+                        return (Element) node;
+                    else if (node instanceof Document)
+                        return ((Document) node).getRootElement();
+                }
+            } else if (source != null) {
+                InputSource iSrc = SAXSource.sourceToInputSource(source);
+                Document xml = new SAXBuilder().build(iSrc);
+                return xml.getRootElement();
             }
         } catch (Exception e) {
-            throw new MCRException("Error while resolving: " + uri, e);
+            throw new MCRException("Error while resolving " + uri, e);
         }
-        throw new MCRException("Could not get JDOM Element from URI :" + uri);
+        throw new MCRException("Could not get JDOM Element from URI " + uri);
     }
 
     /**
@@ -693,7 +709,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
     /**
      * Reads XML from a static file within the web application.
-     *  the URI in the format request:path/to/servlet
+     *  the URI in the format webapp:path/to/servlet
      */
     private static class MCRWebAppResolver implements URIResolver {
         URIResolver fallback;
@@ -706,10 +722,12 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         public Source resolve(String href, String base) throws TransformerException {
             String path = href.substring(href.indexOf(":") + 1);
             LOGGER.debug("Reading xml from webapp " + path);
-            File f = new File(context.getRealPath(path));
-            href = f.toURI().toString();
-
-            return fallback.resolve(href, base);
+            try {
+              File f = new File(context.getRealPath(path));
+              return new StreamSource( new FileInputStream( f ) );
+            } catch( Exception ex ) {
+              throw new TransformerException( ex );
+            }
         }
     }
 
