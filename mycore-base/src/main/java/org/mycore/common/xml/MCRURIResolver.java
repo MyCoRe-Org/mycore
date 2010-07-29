@@ -32,14 +32,11 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -174,7 +171,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         supportedSchemes.put("request", getURIResolver(new MCRRequestResolver()));
         supportedSchemes.put("session", getURIResolver(new MCRSessionResolver()));
         supportedSchemes.put("access", getURIResolver(new MCRACLResolver()));
-        supportedSchemes.put("resource", getURIResolver(new MCRResourceResolver()));
+        supportedSchemes.put("resource", new MCRResourceResolver());
         supportedSchemes.put("localclass", new MCRLocalClassResolver());
         supportedSchemes.put("classification", getURIResolver(new MCRClassificationResolver()));
         supportedSchemes.put("query", getURIResolver(new MCRQueryResolver()));
@@ -265,8 +262,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         URIResolver uriResolver = SUPPORTED_SCHEMES.get(scheme);
         if (uriResolver != null) {
             return uriResolver.resolve(href, base);
-        }
-        else { // try to handle as URL, use default resolver for file:// and http:// 
+        } else { // try to handle as URL, use default resolver for file:// and http:// 
             InputStream in;
             try {
                 in = new URL(href).openStream();
@@ -377,7 +373,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
          * rethrow Exception as RuntimException 
          * TODO: need to refactor this and declare throw in method signature
          */
-        
+
         Source source = null;
         try {
             source = resolve(uri, null);
@@ -698,32 +694,28 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             String path = href.substring(href.indexOf(":") + 1);
             LOGGER.debug("Reading xml from webapp " + path);
             try {
-              File f = new File(context.getRealPath(path));
-              return new StreamSource( new FileInputStream( f ) );
-            } catch( Exception ex ) {
-              throw new TransformerException( ex );
+                File f = new File(context.getRealPath(path));
+                return new StreamSource(new FileInputStream(f));
+            } catch (Exception ex) {
+                throw new TransformerException(ex);
             }
         }
     }
 
-    private static class MCRResourceResolver implements MCRResolver {
+    /**
+     * Reads XML from the CLASSPATH of the application.
+     *            the location of the file in the format
+     *            resource:path/to/file
+     */
+    private static class MCRResourceResolver implements URIResolver {
 
-        static MCRXMLResource CACHE = MCRXMLResource.instance();
-
-        /**
-         * Reads XML from the CLASSPATH of the application.
-         * 
-         * @param uri
-         *            the location of the file in the format
-         *            resource:path/to/file
-         * @return the root element of the XML document
-         * @throws IOException
-         * @throws JDOMException
-         */
-        public Element resolveElement(String uri) throws JDOMException, IOException {
-            String path = uri.substring(uri.indexOf(":") + 1);
-            Element parsed = CACHE.getResource(path).getRootElement();
-            return parsed;
+        @Override
+        public Source resolve(String href, String base) throws TransformerException {
+            String path = href.substring(href.indexOf(":") + 1);
+            InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(path);
+            if (inputStream != null)
+                return new StreamSource(inputStream);
+            return null;
         }
 
     }
@@ -881,7 +873,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
     }
 
-    protected static class MCRClassificationResolver implements MCRResolver {
+    private static class MCRClassificationResolver implements MCRResolver {
 
         private static final Pattern EDITORFORMAT_PATTERN = Pattern.compile("(\\[)([^\\]]*)(\\])");
 
