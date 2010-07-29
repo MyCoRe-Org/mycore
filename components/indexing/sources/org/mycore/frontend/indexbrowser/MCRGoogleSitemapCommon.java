@@ -59,14 +59,13 @@ public final class MCRGoogleSitemapCommon {
     /** The google namespace */
     private static final Namespace ns = Namespace.getNamespace("http://www.google.com/schemas/sitemap/0.84");
 
-    /** The application basedir */
-    private static final String basedir = MCRConfiguration.instance().getString("MCR.basedir", "");
-
     /** The base URL */
     private String baseurl = MCRConfiguration.instance().getString("MCR.baseurl", "");
 
+    private static final String webappBaseDir = MCRConfiguration.instance().getString("MCR.WebApplication.basedir");
+
     /** The webapps directory path from configuration */
-    private static final String cdir = MCRConfiguration.instance().getString("MCR.GoogleSitemap.Directory", "");
+    private static final String cdir = MCRConfiguration.instance().getString("MCR.GoogleSitemap.Directory", webappBaseDir);
 
     /** The types to build sitemaps */
     private static final String[] types = MCRConfiguration.instance().getString("MCR.GoogleSitemap.Types", "document").split(",");
@@ -88,9 +87,6 @@ public final class MCRGoogleSitemapCommon {
 
     /** number format for parts */
     private static DecimalFormat number_format = new DecimalFormat("0000");
-
-    /** the slash */
-    private static final String SLASH = System.getProperty("file.separator");
 
     /** local data */
     private List<MCRObjectIDDate> objidlist = null;
@@ -137,19 +133,14 @@ public final class MCRGoogleSitemapCommon {
      * @return a path to sitemap_google.xml
      */
     protected final String getFileName(int number, boolean withpath) {
-        StringBuffer sb = new StringBuffer(128);
         String fn = "sitemap_google.xml";
         if (number > 1) {
             fn = "sitemap_google_" + number_format.format(number - 1) + ".xml";
         }
         if (!withpath)
             return fn;
-        if ((cdir == null) || (cdir.trim().length() == 0)) {
-            sb.append(basedir).append(SLASH).append("build").append(SLASH).append("webapps").append(SLASH).append(fn);
-        } else {
-            sb.append(cdir).append(SLASH).append(fn);
-        }
-        return sb.toString();
+
+        return new File(cdir, fn).getAbsolutePath();
     }
 
     /**
@@ -245,13 +236,7 @@ public final class MCRGoogleSitemapCommon {
      * This method remove all sitemap files from the webapps directory.
      */
     protected final void removeSitemapFiles() {
-        StringBuffer sb = new StringBuffer(128);
-        if ((cdir == null) || (cdir.trim().length() == 0)) {
-            sb.append(basedir).append(SLASH).append("build").append(SLASH).append("webapps");
-        } else {
-            sb.append(cdir);
-        }
-        File dir = new File(sb.toString());
+        File dir = new File(cdir);
         File[] li = dir.listFiles();
         if (li != null) {
             for (File fi : li) {
