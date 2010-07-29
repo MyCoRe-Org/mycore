@@ -166,7 +166,6 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         // don't let interal mapping be overwritten
         supportedSchemes.putAll(extResolverMapping);
         supportedSchemes.put("webapp", new MCRWebAppResolver());
-        supportedSchemes.put("file", new MCRFileResolver());
         supportedSchemes.put("ifs", getURIResolver(new MCRIFSResolver()));
         supportedSchemes.put("mcrfile", new MCRMCRFileResolver());
         supportedSchemes.put("mcrobject", getURIResolver(new MCRObjectResolver()));
@@ -664,59 +663,11 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         }
     }
 
-    private static class MCRFileResolver implements URIResolver {
-
-        /**
-         * A cache of parsed XML files *
-         */
-        final static int cacheSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "StaticFiles.CacheSize", 100);
-
-        private static MCRCache fileCache = new MCRCache(cacheSize, "URIResolver Files");
-
-        @Override
-        public Source resolve(String href, String base) throws TransformerException {
-            if (!href.endsWith(".xml")) {
-                //use standard URIResolver for that
-                return null;
-            }
-            URI fileURI;
-            try {
-                fileURI = new URI(base != null ? base + href : href);
-            } catch (URISyntaxException e) {
-                throw new TransformerException(e);
-            }
-            String path = fileURI.getPath();
-            File file = new File(path);
-            LOGGER.debug("Reading xml from file " + file.getAbsolutePath());
-            Element fromCache = (Element) fileCache.getIfUpToDate(file.getAbsolutePath(), file.lastModified());
-
-            if (fromCache != null) {
-                return new JDOMSource(fromCache);
-            }
-
-            Element parsed;
-            try {
-                parsed = MCRURIResolver.instance().parseStream(new FileInputStream(file));
-            } catch (Exception e) {
-                throw new TransformerException(e);
-            }
-            fileCache.put(file.getAbsolutePath(), parsed);
-
-            return new JDOMSource(parsed);
-        }
-
-    }
-
     /**
      * Reads XML from a static file within the web application.
      *  the URI in the format webapp:path/to/servlet
      */
     private static class MCRWebAppResolver implements URIResolver {
-        URIResolver fallback;
-
-        public MCRWebAppResolver() {
-            fallback = new MCRFileResolver();
-        }
 
         @Override
         public Source resolve(String href, String base) throws TransformerException {
