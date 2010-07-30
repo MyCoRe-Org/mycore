@@ -93,11 +93,14 @@ public class MCRSQLConnection {
 
         try {
             if (MCRSQLConnectionPool.userID != null && MCRSQLConnectionPool.userID.trim().length() > 0) {
-                connection = DriverManager.getConnection(MCRSQLConnectionPool.url, MCRSQLConnectionPool.userID,
-                        MCRSQLConnectionPool.password);
+                connection = DriverManager.getConnection(MCRSQLConnectionPool.url, MCRSQLConnectionPool.userID, MCRSQLConnectionPool.password);
             } else {
                 connection = DriverManager.getConnection(MCRSQLConnectionPool.url);
             }
+
+            connection.setAutoCommit(true);
+            connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
+            
         } catch (Exception exc) {
             throw new MCRPersistenceException("Could not build JDBC connection to " + MCRSQLConnectionPool.url, exc);
         }
