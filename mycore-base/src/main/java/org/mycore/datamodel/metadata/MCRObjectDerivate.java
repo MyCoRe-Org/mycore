@@ -52,9 +52,10 @@ public class MCRObjectDerivate {
     private ArrayList<MCRMetaLangText> titles = null;
 
     private ArrayList<Element> files;
-    
+
     private String derivateURN;
 
+    private boolean display;
 
     /**
      * This is the constructor of the MCRObjectDerivate class. All data are set
@@ -66,6 +67,7 @@ public class MCRObjectDerivate {
         internals = null;
         titles = new ArrayList<MCRMetaLangText>();
         files = new ArrayList();
+        display = true;
     }
 
     /**
@@ -77,8 +79,7 @@ public class MCRObjectDerivate {
      */
     public final void setFromDOM(org.jdom.Element derivate_element) {
         // Link to Metadata part
-        org.jdom.Element linkmeta_element = derivate_element.getChild("linkmetas").getChild(
-                "linkmeta");
+        org.jdom.Element linkmeta_element = derivate_element.getChild("linkmetas").getChild("linkmeta");
         MCRMetaLinkID link = new MCRMetaLinkID();
         link.setDataPart("linkmeta");
         link.setFromDOM(linkmeta_element);
@@ -158,6 +159,11 @@ public class MCRObjectDerivate {
                 this.files.add(file);
             }
         }
+
+        String displayVal = derivate_element.getAttributeValue("display");
+        if (displayVal != null && displayVal.length() > 3) {
+            this.display = Boolean.valueOf(displayVal);
+        }
     }
 
     /**
@@ -222,8 +228,7 @@ public class MCRObjectDerivate {
      */
     public final MCRMetaLink getExternal(int index) throws IndexOutOfBoundsException {
         if ((index < 0) || (index > externals.size())) {
-            throw new IndexOutOfBoundsException("Index error in getExternal("
-                    + Integer.toString(index) + ").");
+            throw new IndexOutOfBoundsException("Index error in getExternal(" + Integer.toString(index) + ").");
         }
 
         return externals.get(index);
@@ -245,8 +250,7 @@ public class MCRObjectDerivate {
      */
     public final MCRMetaLangText getTitle(int index) throws IndexOutOfBoundsException {
         if ((index < 0) || (index > titles.size())) {
-            throw new IndexOutOfBoundsException("Index error in getTitle("
-                    + Integer.toString(index) + ").");
+            throw new IndexOutOfBoundsException("Index error in getTitle(" + Integer.toString(index) + ").");
         }
 
         return titles.get(index);
@@ -288,6 +292,7 @@ public class MCRObjectDerivate {
         }
 
         org.jdom.Element elm = new org.jdom.Element("derivate");
+        elm.setAttribute("display", String.valueOf(display));
 
         org.jdom.Element linkmetas = new org.jdom.Element("linkmetas");
         linkmetas.setAttribute("class", "MCRMetaLinkID");
@@ -331,7 +336,7 @@ public class MCRObjectDerivate {
             }
 
             for (int i = 0; i < files.size(); i++) {
-                fileset.addContent(((Element)files.get(i).clone()).detach());
+                fileset.addContent(((Element) files.get(i).clone()).detach());
             }
             elm.addContent(fileset);
         }
