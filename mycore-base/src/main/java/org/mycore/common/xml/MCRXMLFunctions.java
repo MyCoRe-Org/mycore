@@ -43,6 +43,7 @@ import org.hibernate.criterion.Restrictions;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRURN;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.parsers.bool.MCRCondition;
@@ -314,5 +315,21 @@ public class MCRXMLFunctions {
             LOGGER.error(e);
         }
         return result;
+    }
+    
+    public static boolean isDisplayedEnabledDerivate(String derivateId) {
+        if (derivateId == null || derivateId.length() < 1) {
+            return false;
+        }
+        MCRDerivate der = new MCRDerivate();
+        der.receiveFromDatastore(derivateId);
+
+        org.jdom.Element derivateElem = der.getDerivate().createXML();
+        String display = derivateElem.getAttributeValue("display");
+        if (display == null) {
+            display = "true";
+        }
+
+        return Boolean.valueOf(display);
     }
 }
