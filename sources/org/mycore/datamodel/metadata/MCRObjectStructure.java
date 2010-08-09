@@ -257,7 +257,7 @@ public class MCRObjectStructure {
         if (MCRDerivate.existInDatastore(href)) {
             derivates.add(add_derivate);
         } else {
-            logger.warn("Can't find derivate "+href.getId()+" ,ignored.");
+            logger.warn("Can't find derivate " + href.getId() + " ,ignored.");
         }
     }
 
@@ -300,6 +300,21 @@ public class MCRObjectStructure {
         }
 
         derivates.remove(index);
+    }
+
+    /**
+     * Removes the derivate with the given derivate id from the structure
+     * 
+     * @param derivateId the id of the derivate 
+     * */
+    public void removeDerivate(String derivateId) {
+        for (int i = 0; i < derivates.size(); i++) {
+            MCRMetaLinkID id = derivates.get(i);
+            if (id.getXLinkHref().equals(derivateId)) {
+                derivates.remove(i);
+                return;
+            }
+        }
     }
 
     /**
