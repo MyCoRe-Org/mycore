@@ -29,6 +29,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
+import org.mycore.datamodel.metadata.MCRMetaLinkID;
 
 /**
  * This class implements code for the inheritance of metadata of linked objects
@@ -302,6 +303,21 @@ public class MCRObjectStructure {
         derivates.remove(index);
     }
 
+    /**
+     * Removes the derivate with the given derivate id from the structure
+     * 
+     * @param derivateId the id of the derivate 
+     * */
+    public void removeDerivate(String derivateId) {
+        for (int i = 0; i < derivates.size(); i++) {
+            MCRMetaLinkID id = derivates.get(i);
+            if (id.getXLinkHref().equals(derivateId)) {
+                derivates.remove(i);
+                return;
+            }
+        }
+    }
+    
     /**
      * While the preceding methods dealt with the structure's copy in memory
      * only, the following three will affect the operations to or from datastore
