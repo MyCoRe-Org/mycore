@@ -15,7 +15,7 @@ import org.mycore.datamodel.metadata.MCRObject;
  *
  */
 public class MCRDeleteObjectEventHandler extends MCREventHandlerBase {
-    private static Logger LOGGER = Logger.getLogger(MCRURNEventHandler.class);
+    private static Logger LOGGER = Logger.getLogger(MCRDeleteObjectEventHandler.class);
 
     /**
      * This method handle all calls for EventHandler for the event types
