@@ -4,7 +4,7 @@
 <hibernate-mapping package="org.mycore.backend.hibernate.tables">
   <class name="MCRDELETEDITEMS" table="MCRDELETEDITEMS">
     <composite-id class="MCRDELETEDITEMSPK" name="key">
-      <key-property name="identifier" type="string" column="IDENTIFIER" length="1024" />
+      <key-property name="identifier" type="string" column="IDENTIFIER" length="128" />
       <key-property name="dateDeleted" type="timestamp" column="DATE_DELETED" />
     </composite-id>
     <property name="userid"/>
