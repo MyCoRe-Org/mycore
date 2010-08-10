@@ -24,8 +24,8 @@
 package org.mycore.datamodel.classifications2;
 
 import java.net.URI;
-import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -82,7 +82,7 @@ public interface MCRCategory {
     /**
      * @return the labels
      */
-    public abstract Collection<MCRLabel> getLabels();
+    public abstract Set<MCRLabel> getLabels();
 
     /**
      * @return the label in the current language (if available), default language (if available) or any other language  

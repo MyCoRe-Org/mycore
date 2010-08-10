@@ -27,13 +27,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
 import org.hibernate.criterion.Projections;
 import org.jdom.Document;
-
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRHibTestCase;
 import org.mycore.common.xml.MCRXMLHelper;
@@ -280,7 +278,7 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         MCRCategory europe = category.getChildren().get(0);
         MCRCategoryImpl test=new MCRCategoryImpl();
         test.setId(new MCRCategoryID(category.getId().getRootID(), "test"));
-        test.setLabels(new ArrayList<MCRLabel>());
+        test.setLabels(new HashSet<MCRLabel>());
         test.getLabels().add(new MCRLabel("de", "JUnit testcase", null));
         category.getChildren().add(test);
         category.getChildren().remove(0);

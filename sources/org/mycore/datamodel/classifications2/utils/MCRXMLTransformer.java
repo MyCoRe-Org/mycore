@@ -23,19 +23,18 @@
  **/
 package org.mycore.datamodel.classifications2.utils;
 
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
-
-import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
@@ -85,8 +84,8 @@ public class MCRXMLTransformer {
     }
 
     @SuppressWarnings("unchecked")
-    private static Collection<MCRLabel> getLabel(List elements) {
-        Collection<MCRLabel> labels = new HashSet<MCRLabel>(elements.size(), 1l);
+    private static Set<MCRLabel> getLabel(List elements) {
+        Set<MCRLabel> labels = new HashSet<MCRLabel>(elements.size(), 1l);
         for (Object o : elements) {
             Element e = (Element) o;
             String lang = e.getAttributeValue("lang", Namespace.XML_NAMESPACE);
