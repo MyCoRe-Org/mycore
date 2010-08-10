@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.hibernate.collection.PersistentList;
@@ -150,7 +151,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
      * @param labels
      *            the labels to set
      */
-    public void setLabels(Collection<MCRLabel> labels) {
+    public void setLabels(Set<MCRLabel> labels) {
         this.labels = labels;
     }
 

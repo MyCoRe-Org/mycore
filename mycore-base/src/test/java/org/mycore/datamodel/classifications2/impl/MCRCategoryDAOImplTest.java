@@ -287,6 +287,29 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         assertEquals("Label count does not match.", category.getChildren().get(0).getLabels().size(), rootNode.getChildren().get(0).getLabels().size());
     }
 
+    /**
+     * tests top category child to new parent
+     * 
+     * @throws URISyntaxException
+     */
+    public void testReplaceCategoryNewParent() {
+        addWorldClassification();
+        MCRCategory europe = category.getChildren().get(0);
+        MCRCategoryImpl test=new MCRCategoryImpl();
+        test.setId(new MCRCategoryID(category.getId().getRootID(), "test"));
+        test.setLabels(new HashSet<MCRLabel>());
+        test.getLabels().add(new MCRLabel("de", "JUnit testcase", null));
+        category.getChildren().add(test);
+        category.getChildren().remove(0);
+        test.getChildren().add(europe);
+        DAO.replaceCategory(category);
+        startNewTransaction();
+        MCRCategory rootNode = getRootCategoryFromSession();
+        assertEquals("Category count does not match.", countNodes(category), countNodes(rootNode));
+        assertEquals("Label count does not match.", category.getChildren().get(0).getLabels().size(), rootNode.getChildren().get(0)
+                .getLabels().size());
+    }
+
     private MCRCategoryImpl getRootCategoryFromSession() {
         return (MCRCategoryImpl) sessionFactory.getCurrentSession().get(MCRCategoryImpl.class, ((MCRCategoryImpl) category).getInternalID());
     }

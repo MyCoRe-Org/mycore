@@ -24,8 +24,8 @@
 package org.mycore.datamodel.classifications2.impl;
 
 import java.net.URI;
-import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.mycore.common.MCRConfiguration;
@@ -51,7 +51,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
 
     private URI URI;
 
-    protected Collection<MCRLabel> labels;
+    protected Set<MCRLabel> labels;
 
     protected List<MCRCategory> children;
 
@@ -86,7 +86,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         return id;
     }
 
-    public Collection<MCRLabel> getLabels() {
+    public Set<MCRLabel> getLabels() {
         return labels;
     }
 
