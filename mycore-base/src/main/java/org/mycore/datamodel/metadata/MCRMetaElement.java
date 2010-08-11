@@ -403,7 +403,7 @@ public class MCRMetaElement {
     public final org.jdom.Element createXML(boolean flag) throws MCRException {
         if (!isValid()) {
             debug();
-            throw new MCRException("MCRMetaElement : The content is not valid.");
+            throw new MCRException("MCRMetaElement : The content is not valid: Tag=" + this.tag);
         }
 
         org.jdom.Element elm = new org.jdom.Element(tag);
