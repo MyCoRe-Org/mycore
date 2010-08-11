@@ -200,7 +200,13 @@ public class MCRAccessCommands extends MCRAbstractCommands {
                 ruleDescription = "";
             }
             Element rule = (Element) mcrpermission.getChild("condition").clone();
-            AI.addRule(permissionName, rule, ruleDescription);
+            String objectid = mcrpermission.getAttributeValue("objectid");
+            if(objectid==null){
+            	AI.addRule(permissionName, rule, ruleDescription);
+            }
+            else{
+            	AI.addRule(objectid, permissionName, rule, ruleDescription);
+            }
         }
     }
 
