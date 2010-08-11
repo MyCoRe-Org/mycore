@@ -93,13 +93,23 @@
             update( childrenID, categID );
             openCategs.push(categID);
           }
+          window.location.href=addState(window.location.href);
+        }
+        
+        function addState(url){
           var state=(openCategs.length>0)? "#open"+escape('["'+openCategs.join('","')+'"]') :"#open[]";
-          var pos=window.location.href.indexOf("#open");
+          var pos=url.indexOf("#open");
           if (pos>0){
-            window.location.href=window.location.href.substring(0,pos)+state;
+            return url.substring(0,pos)+state;
           } else {
-            window.location.href+=state;
+            return url+=state;
           }          
+        }
+        
+        function startSearch(baseURL, query, mask, parameters){
+          mask=escape(addState(unescape(mask)));
+          window.location.href=baseURL+"?query="+query+"&amp;mask="+mask+"&amp;"+parameters;
+          return false;
         }
         
         function loadState() {
