@@ -21,11 +21,10 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
-
 public class URNAdder {
 
     private static final Logger LOGGER = Logger.getLogger(URNAdder.class);
-	
+
     /** This methods adds a URN to the metadata of a cbu mycore object */
     public boolean addURN(String objectId) throws Exception {
         // checking access right
@@ -72,18 +71,18 @@ public class URNAdder {
         return true;
     }
 
-	/** This methods adds a URN to the derivates mycore object and to all files within this derivate */
+    /** This methods adds a URN to the derivates mycore object and to all files within this derivate */
     public boolean addURNToDerivates(String derivateId) throws Exception {
         //checking access right
         if (!MCRAccessManager.checkPermission(derivateId, "writedb")) {
-        	LOGGER.warn("Permission denied");
+            LOGGER.warn("Permission denied");
             return false;
         }
         MCRDerivate derivate = new MCRDerivate();
         derivate.receiveFromDatastore(derivateId);
 
         if (!parentIsAllowedObject(derivate)) {
-        	LOGGER.warn("Parent permission denied");
+            LOGGER.warn("Parent permission denied");
             return false;
         }
         /* Generating base urn for the derivate */
@@ -147,7 +146,7 @@ public class URNAdder {
         }
         return true;
     }
-    
+
     /**
      * Checks whether it is allowed to add URN to derivates.
      * 
@@ -188,10 +187,10 @@ public class URNAdder {
             }
         }
         LOGGER.warn("URN assignment failed as the object type " + givenType + " is not in the list of allowed objects. See property \""
-                + propertyName + "\"");
+                + propertyName + "\" URN.Enabled.Objects=" + propertyValue);
         return false;
     }
-    
+
     /**
      * @return
      * @throws Exception
@@ -204,7 +203,7 @@ public class URNAdder {
         IURNProvider provider = c.newInstance();
         return provider;
     }
-    
+
     /**
      * @param m
      *            the source from which the path-filename pairs should be
@@ -224,7 +223,6 @@ public class URNAdder {
             }
         }
     }
-    
 
     /** Adds a file element to the fileset element */
     private void addToFilesetElement(Element fileset, URN urn, Pair<String, MCRFile> currentFile) throws Exception {
@@ -236,7 +234,7 @@ public class URNAdder {
         fileElement.addContent(urnElement);
         fileset.addContent(fileElement);
     }
-    
+
     /**
      *@param file
      * @return the path of the given file, the path terminates with an
@@ -246,7 +244,7 @@ public class URNAdder {
         int index = p.lastIndexOf("/");
         return p.substring(0, index + 1);
     }
-    
+
     /**
      * Deletes the entries in the database. to be called if the changing of the
      * derivate metadata xml failes
@@ -289,5 +287,4 @@ public class URNAdder {
         objDer.setFromDOM(dom);
     }
 
-	
 }
