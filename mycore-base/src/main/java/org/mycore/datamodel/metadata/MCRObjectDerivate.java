@@ -371,4 +371,19 @@ public class MCRObjectDerivate {
 
         return true;
     }
+
+    /**
+     * @return <code>true</code> if the display attribute is set to true, <code>false</code> otherwise 
+     */
+    public boolean isDisplayEnabled() {
+        return display;
+    }
+
+    /**
+     * Sets the display attribute of the derivate object
+     * @param display pass <code>true</code> if you want to have the derivate displayed or <code>false</code> if not  
+     */
+    public void setDisplayEnabled(boolean display) {
+        this.display = display;
+    }
 }
