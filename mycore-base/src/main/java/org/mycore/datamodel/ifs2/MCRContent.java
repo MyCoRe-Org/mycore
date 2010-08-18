@@ -35,7 +35,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 
 import org.apache.commons.vfs.FileObject;
-import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.VFS;
 import org.jdom.Document;
 import org.jdom.JDOMException;
@@ -110,7 +109,7 @@ public class MCRContent {
      * @param fo
      *            the file object to read content from
      */
-    public static MCRContent readFrom(FileObject fo) throws FileSystemException {
+    public static MCRContent readFrom(FileObject fo) throws IOException {
         return readFrom(fo.getContent().getInputStream());
     }
 
@@ -131,7 +130,7 @@ public class MCRContent {
      * @param xml
      *            the XML document to read in as content
      */
-    public static MCRContent readFrom(Document xml) throws Exception {
+    public static MCRContent readFrom(Document xml) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         XMLOutputter xout = new XMLOutputter();
         xout.setFormat(Format.getPrettyFormat().setEncoding("UTF-8").setIndent("  "));
@@ -162,14 +161,14 @@ public class MCRContent {
      * @param url
      *            the url to read content from
      */
-    public static MCRContent readFrom(URL url) throws FileSystemException {
+    public static MCRContent readFrom(URL url) throws IOException {
         return readFrom(VFS.getManager().resolveFile(url.toExternalForm()));
     }
 
     /**
      * Ensures that content is XML
      */
-    public MCRContent ensureXML() throws Exception {
+    public MCRContent ensureXML() throws IOException, JDOMException {
         if (isXML) {
             return this;
         } else {
@@ -230,7 +229,7 @@ public class MCRContent {
      * @param target
      *            the file to write the content to
      */
-    public void sendTo(FileObject target) throws IOException, FileSystemException {
+    public void sendTo(FileObject target) throws IOException {
         OutputStream out = target.getContent().getOutputStream();
         sendTo(out);
         out.close();

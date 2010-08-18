@@ -1,5 +1,6 @@
 package org.mycore.datamodel;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -25,7 +26,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 public class MCRMigratingXMLStore extends MCRVersioningMetadataStore {
 
     @Override
-    public MCRVersionedMetadata retrieve(int id) throws Exception {
+    public MCRVersionedMetadata retrieve(int id) throws IOException {
         MCRVersionedMetadata versionedMetadata = super.retrieve(id);
         if (versionedMetadata == null || versionedMetadata.isDeleted()) {
             migrateObject(getID() + "_" + id);
@@ -35,7 +36,7 @@ public class MCRMigratingXMLStore extends MCRVersioningMetadataStore {
     }
 
     @Override
-    public boolean exists(int id) throws Exception {
+    public boolean exists(int id) throws IOException {
         if (super.exists(id))
             return true;
         migrateObject(getID() + "_" + id);

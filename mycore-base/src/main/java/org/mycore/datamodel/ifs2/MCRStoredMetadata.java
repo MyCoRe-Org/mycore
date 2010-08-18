@@ -23,9 +23,11 @@
 
 package org.mycore.datamodel.ifs2;
 
+import java.io.IOException;
 import java.util.Date;
 
 import org.apache.commons.vfs.FileObject;
+import org.jdom.JDOMException;
 import org.mycore.common.MCRUsageException;
 
 /**
@@ -65,8 +67,9 @@ public class MCRStoredMetadata {
      * 
      * @param xml
      *            the XML to save to a new file
+     * @throws JDOMException if content is not XML and corresponding {@link MCRMetadataStore} forces MCRContent to be XML 
      */
-    void create(MCRContent xml) throws Exception {
+    void create(MCRContent xml) throws IOException, JDOMException {
         if (store.shouldForceXML()) {
             xml = xml.ensureXML();
         }
@@ -79,8 +82,9 @@ public class MCRStoredMetadata {
      * 
      * @param xml
      *            the XML document to be stored
+     * @throws JDOMException if content is not XML and corresponding {@link MCRMetadataStore} forces MCRContent to be XML 
      */
-    public void update(MCRContent xml) throws Exception {
+    public void update(MCRContent xml) throws IOException, JDOMException {
         if (isDeleted()) {
             String msg = "You can not update a deleted data object";
             throw new MCRUsageException(msg);
@@ -96,7 +100,7 @@ public class MCRStoredMetadata {
      * 
      * @return the stored XML document
      */
-    public MCRContent getMetadata() throws Exception {
+    public MCRContent getMetadata() throws IOException {
         return MCRContent.readFrom(fo);
     }
 
@@ -122,8 +126,9 @@ public class MCRStoredMetadata {
      * Returns the date this metadata document was last modified
      * 
      * @return the date this metadata document was last modified
+     * @throws IOException 
      */
-    public Date getLastModified() throws Exception {
+    public Date getLastModified() throws IOException {
         long time = fo.getContent().getLastModifiedTime();
         return new Date(time);
     }
@@ -134,7 +139,7 @@ public class MCRStoredMetadata {
      * @param date
      *            the date this metadata document was last modified
      */
-    public void setLastModified(Date date) throws Exception {
+    public void setLastModified(Date date) throws IOException {
         if (!isDeleted()) {
             fo.getContent().setLastModifiedTime(date.getTime());
         }
@@ -146,7 +151,7 @@ public class MCRStoredMetadata {
      * 
      * @throws Exception
      */
-    public void delete() throws Exception {
+    public void delete() throws IOException {
         if (!isDeleted()) {
             store.delete(fo);
         }
@@ -155,7 +160,7 @@ public class MCRStoredMetadata {
     /**
      * Returns true if this object is deleted
      */
-    public boolean isDeleted() throws Exception {
+    public boolean isDeleted() throws IOException {
         return !fo.exists();
     }
 }

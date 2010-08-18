@@ -24,10 +24,10 @@
 package org.mycore.frontend.indexbrowser;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -40,10 +40,9 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRException;
-import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.common.MCRXMLTableManager;
+import org.mycore.datamodel.ifs2.MCRObjectIDFileSystemDate;
 import org.mycore.datamodel.ifs2.MCRStoredMetadata;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
@@ -116,15 +115,16 @@ public final class MCRGoogleSitemapCommon {
      * 
      * @return the number of files, one for a singel sitemap_google.xml file, more than
      *         one for the index and all parts.
+     * @throws IOException 
      */
-    protected final int checkSitemapFile() {
+    protected final int checkSitemapFile() throws IOException {
         int number = 0;
         for (String type : types) {
             List<String> ids = tm.listIDsOfType( type );
             for( String id : ids )
             {
               MCRStoredMetadata sm = tm.retrieveStoredMetadata( new MCRObjectID( id ) );
-              objidlist.add( new MCRObjectIDDateImpl( sm, id ) );
+              objidlist.add( new MCRObjectIDFileSystemDate( sm, id ) );
             }
         }
         number = objidlist.size() / numberOfURLs;
@@ -263,28 +263,4 @@ public final class MCRGoogleSitemapCommon {
             }
         }
     }
-}
-
-class MCRObjectIDDateImpl implements MCRObjectIDDate
-{
-  private Date date;
-  private String id;
-  
-  MCRObjectIDDateImpl( MCRStoredMetadata sm, String id )
-  {
-    try{ this.date = sm.getLastModified(); }
-    catch( Exception ex )
-    {
-      if( ex instanceof MCRException ) throw (MCRException)ex;
-      String msg = "Exception reading date last modified of " + id;
-      throw new MCRPersistenceException( msg, ex );
-    }
-    this.id = id;
-  }
-  
-  public Date getLastModified()
-  { return date; }
-  
-  public String getId()
-  { return id; }
 }

@@ -24,10 +24,12 @@
 package org.mycore.datamodel.ifs2;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Iterator;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.log4j.Logger;
+import org.jdom.JDOMException;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRSessionMgr;
@@ -95,8 +97,9 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
      * 
      * @return the SVN repository used to manage metadata versions in this
      *         store.
+     * @throws SVNException 
      */
-    SVNRepository getRepository() throws Exception {
+    SVNRepository getRepository() throws SVNException {
         SVNRepository repository = SVNRepositoryFactory.create(repURL);
         String user = MCRSessionMgr.getCurrentSession().getCurrentUserID();
         SVNAuthentication[] auth = new SVNAuthentication[] { new SVNUserNameAuthentication(user, false) };
@@ -112,12 +115,12 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
      * @return the URL of the SVN repository used to manage metadata versions in
      *         this store.
      */
-    SVNURL getRepositoryURL() throws Exception {
+    SVNURL getRepositoryURL() {
         return repURL;
     }
 
     @Override
-    public MCRVersionedMetadata create(MCRContent xml, int id) throws Exception {
+    public MCRVersionedMetadata create(MCRContent xml, int id) throws IOException, JDOMException {
         return (MCRVersionedMetadata) super.create(xml, id);
     }
 
@@ -137,7 +140,7 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
      *         metadata object
      */
     @Override
-    public MCRVersionedMetadata retrieve(int id) throws Exception {
+    public MCRVersionedMetadata retrieve(int id) throws IOException {
         if (exists(id)) {
             return (MCRVersionedMetadata) super.retrieve(id);
         } else {
@@ -155,7 +158,7 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
     }
 
     @Override
-    public void delete(int id) throws Exception {
+    public void delete(int id) throws IOException {
         MCRVersionedMetadata vm = retrieve(id);
         vm.delete();
     }

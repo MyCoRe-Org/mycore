@@ -24,6 +24,7 @@
 package org.mycore.datamodel.common;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.datamodel.ifs2.MCRMetadataStore;
+import org.mycore.datamodel.ifs2.MCRObjectIDFileSystemDate;
 import org.mycore.datamodel.ifs2.MCRStore;
 import org.mycore.datamodel.ifs2.MCRStoredMetadata;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -531,6 +533,38 @@ public class MCRXMLTableManager {
             }
         }
         return list;
+    }
+
+    /**
+     * lists objects and their last modified date. 
+     * @param type type of object
+     * @return
+     */
+    public List<MCRObjectIDDate> listObjectDates() throws IOException {
+        return getObjectDateList(this.listIDs());
+    }
+
+    /**
+     * lists objects of the specified <code>type</code> and their last modified date. 
+     * @param type type of object
+     * @return
+     */
+    public List<MCRObjectIDDate> listObjectDates(String type) throws IOException {
+        return getObjectDateList(this.listIDsOfType(type));
+    }
+
+    /**
+     * @param ids MCRObject ids
+     * @return
+     * @throws IOException thrown by {@link MCRObjectIDFileSystemDate}
+     */
+    private List<MCRObjectIDDate> getObjectDateList(List<String> ids) throws IOException {
+        List<MCRObjectIDDate> objidlist = new ArrayList<MCRObjectIDDate>(ids.size());
+        for (String id : ids) {
+            MCRStoredMetadata sm = this.retrieveStoredMetadata(new MCRObjectID(id));
+            objidlist.add(new MCRObjectIDFileSystemDate(sm, id));
+        }
+        return objidlist;
     }
 
     /**

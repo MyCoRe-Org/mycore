@@ -24,6 +24,7 @@
 package org.mycore.datamodel.ifs2;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -193,7 +194,7 @@ public abstract class MCRStore {
      *            the ID of the data
      * @return the file object storing that data
      */
-    FileObject getSlot(int ID) throws Exception {
+    FileObject getSlot(int ID) throws IOException {
         return VFS.getManager().resolveFile(dir, getSlotPath(ID));
     }
 
@@ -244,7 +245,7 @@ public abstract class MCRStore {
      *            the ID of the data
      * @return true, if data for the given ID is existing in the store.
      */
-    public boolean exists(int id) throws Exception {
+    public boolean exists(int id) throws IOException {
         return getSlot(id).exists();
     }
 
@@ -469,7 +470,7 @@ public abstract class MCRStore {
      * @param id
      *            the ID of the document to be deleted
      */
-    public void delete(int id) throws Exception {
+    public void delete(int id) throws IOException {
         delete(getSlot(id));
     }
 
@@ -479,7 +480,7 @@ public abstract class MCRStore {
      * @param fo
      *            the file object to be deleted
      */
-    void delete(FileObject fo) throws Exception {
+    void delete(FileObject fo) throws IOException {
         FileObject parent = fo.getParent();
         fo.delete(Selectors.SELECT_ALL);
 

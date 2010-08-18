@@ -24,6 +24,7 @@
 package org.mycore.datamodel.ifs2;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,9 +33,11 @@ import java.util.Map;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.log4j.Logger;
+import org.jdom.JDOMException;
 import org.mycore.common.MCRUsageException;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNDirEntry;
+import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNLogEntryPath;
 import org.tmatesoft.svn.core.SVNNodeKind;
@@ -91,9 +94,10 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
      * 
      * @param xml
      *            the metadata document to store
+     * @throws JDOMException thrown by {@link MCRStoredMetadata#create(MCRContent)}
      */
     @Override
-    void create(MCRContent xml) throws Exception {
+    void create(MCRContent xml) throws IOException, JDOMException {
         super.create(xml);
         commit("create");
     }
@@ -104,9 +108,10 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
      * 
      * @param xml
      *            the new version of the document metadata
+     * @throws JDOMException thrown by {@link MCRStoredMetadata#create(MCRContent)}
      */
     @Override
-    public void update(MCRContent xml) throws Exception {
+    public void update(MCRContent xml) throws IOException, JDOMException {
         if (isDeleted()) {
             create(xml);
         } else {
@@ -115,56 +120,61 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         }
     }
 
-    void commit(String mode) throws Exception {
-        SVNRepository repository = getStore().getRepository();
-
-        // Check which paths already exist in SVN
-        String[] paths = store.getSlotPaths(id);
-        int existing = paths.length - 1;
-        for (; existing >= 0; existing--) {
-            if (!repository.checkPath(paths[existing], -1).equals(SVNNodeKind.NONE)) {
-                break;
-            }
-        }
-
-        existing += 1;
-
-        // Start commit editor
-        String commitMsg = mode + "d metadata object " + store.getID() + "_" + id + " in store";
-        ISVNEditor editor = repository.getCommitEditor(commitMsg, null);
-        editor.openRoot(-1);
-
-        // Create directories in SVN that do not exist yet
-        for (int i = existing; i < paths.length - 1; i++) {
-            LOGGER.debug("SVN create directory " + paths[i]);
-            editor.addDir(paths[i], null, -1);
-            editor.closeDir();
-        }
-
-        // Commit file changes
-        String filePath = paths[paths.length - 1];
-        if (existing < paths.length) {
-            editor.addFile(filePath, null, -1);
-        } else {
-            editor.openFile(filePath, -1);
-        }
-
-        editor.applyTextDelta(filePath, null);
-        SVNDeltaGenerator deltaGenerator = new SVNDeltaGenerator();
-
-        InputStream in = fo.getContent().getInputStream();
-        String checksum = deltaGenerator.sendDelta(filePath, in, editor, true);
-        in.close();
-
-        if (store.shouldForceXML()) {
-            editor.changeFileProperty(filePath, SVNProperty.MIME_TYPE, SVNPropertyValue.create("text/xml"));
-        }
-
-        editor.closeFile(filePath, checksum);
-        editor.closeDir(); // root
-
+    void commit(String mode) throws IOException {
         // Commit to SVN
-        SVNCommitInfo info = editor.closeEdit();
+        SVNCommitInfo info;
+        try {
+            SVNRepository repository = getStore().getRepository();
+
+            // Check which paths already exist in SVN
+            String[] paths = store.getSlotPaths(id);
+            int existing = paths.length - 1;
+            for (; existing >= 0; existing--) {
+                if (!repository.checkPath(paths[existing], -1).equals(SVNNodeKind.NONE)) {
+                    break;
+                }
+            }
+
+            existing += 1;
+
+            // Start commit editor
+            String commitMsg = mode + "d metadata object " + store.getID() + "_" + id + " in store";
+            ISVNEditor editor = repository.getCommitEditor(commitMsg, null);
+            editor.openRoot(-1);
+
+            // Create directories in SVN that do not exist yet
+            for (int i = existing; i < paths.length - 1; i++) {
+                LOGGER.debug("SVN create directory " + paths[i]);
+                editor.addDir(paths[i], null, -1);
+                editor.closeDir();
+            }
+
+            // Commit file changes
+            String filePath = paths[paths.length - 1];
+            if (existing < paths.length) {
+                editor.addFile(filePath, null, -1);
+            } else {
+                editor.openFile(filePath, -1);
+            }
+
+            editor.applyTextDelta(filePath, null);
+            SVNDeltaGenerator deltaGenerator = new SVNDeltaGenerator();
+
+            InputStream in = fo.getContent().getInputStream();
+            String checksum = deltaGenerator.sendDelta(filePath, in, editor, true);
+            in.close();
+
+            if (store.shouldForceXML()) {
+                editor.changeFileProperty(filePath, SVNProperty.MIME_TYPE, SVNPropertyValue.create("text/xml"));
+            }
+
+            editor.closeFile(filePath, checksum);
+            editor.closeDir(); // root
+
+            info = editor.closeEdit();
+        } catch (SVNException e) {
+            throw new IOException(e);
+        }
         revision = info.getNewRevision();
         LOGGER.info("SVN commit of " + mode + " finished, new revision " + revision);
 
@@ -176,21 +186,26 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
      * store.
      */
     @Override
-    public void delete() throws Exception {
+    public void delete() throws IOException {
         if (isDeleted()) {
             String msg = "You can not delete already deleted data: " + id;
             throw new MCRUsageException(msg);
         }
         String commitMsg = "Deleted metadata object " + store.getID() + "_" + id + " in store";
 
-        SVNRepository repository = getStore().getRepository();
-        ISVNEditor editor = repository.getCommitEditor(commitMsg, null);
-        editor.openRoot(-1);
-        editor.deleteEntry(store.getSlotPath(id), -1);
-        editor.closeDir();
-
         // Commit to SVN
-        SVNCommitInfo info = editor.closeEdit();
+        SVNCommitInfo info;
+        try {
+            SVNRepository repository = getStore().getRepository();
+            ISVNEditor editor = repository.getCommitEditor(commitMsg, null);
+            editor.openRoot(-1);
+            editor.deleteEntry(store.getSlotPath(id), -1);
+            editor.closeDir();
+
+            info = editor.closeEdit();
+        } catch (SVNException e) {
+            throw new IOException(e);
+        }
         revision = info.getNewRevision();
         LOGGER.info("SVN commit of delete finished, new revision " + revision);
 
@@ -221,10 +236,12 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         String path = store.getSlotPath(id);
 
         String dir = path.contains("/") ? path.substring(0, path.lastIndexOf('/')) : "";
+        @SuppressWarnings("unchecked")
         Collection<SVNLogEntry> entries = repository.log(new String[] { dir }, null, 0, -1, true, true);
 
         path = "/" + path;
         for (SVNLogEntry entry : entries) {
+            @SuppressWarnings("unchecked")
             Map<String, SVNLogEntryPath> paths = entry.getChangedPaths();
             if (paths.containsKey(path)) {
                 char type = paths.get(path).getType();
@@ -250,9 +267,14 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
      * 
      * @return true, if the local version in store is the latest version
      */
-    public boolean isUpToDate() throws Exception {
-        SVNRepository repository = getStore().getRepository();
-        SVNDirEntry entry = repository.info(store.getSlotPath(id), -1);
+    public boolean isUpToDate() throws IOException {
+        SVNDirEntry entry;
+        try {
+            SVNRepository repository = getStore().getRepository();
+            entry = repository.info(store.getSlotPath(id), -1);
+        } catch (SVNException e) {
+            throw new IOException(e);
+        }
         return entry.getRevision() <= revision;
     }
 }
