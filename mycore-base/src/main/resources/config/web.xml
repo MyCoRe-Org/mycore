@@ -211,6 +211,26 @@
     <servlet-name>MCRDerivateLinkServlet</servlet-name>
     <url-pattern>/servlets/MCRDerivateLinkServlet</url-pattern>
   </servlet-mapping>
+  
+  <servlet id="MCRAddURNToObjectServlet">
+    <servlet-name>MCRAddURNToObjectServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRAddURNToObjectServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>MCRAddURNToObjectServlet</servlet-name>
+    <url-pattern>/servlets/MCRAddURNToObjectServlet</url-pattern>
+  </servlet-mapping>
+  
+  <servlet id="MCRDisplayHideDerivateServlet">
+    <servlet-name>MCRDisplayHideDerivateServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRDisplayHideDerivateServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>MCRDisplayHideDerivateServlet</servlet-name>
+    <url-pattern>/servlets/MCRDisplayHideDerivateServlet</url-pattern>
+  </servlet-mapping>
 
   <!-- **************************************************************** -->
   <!-- General configuration                                            -->
