@@ -31,7 +31,8 @@
       addIviewProperty('<xsl:value-of select="$groupID" />', 'useOverview',<xsl:value-of select="$overview" />);
       addIviewProperty('<xsl:value-of select="$groupID" />', 'baseUri', baseUris);
       addIviewProperty('<xsl:value-of select="$groupID" />', 'webappBaseUri', '"<xsl:value-of select="$WebApplicationBaseURL"/>"');
-      addIviewProperty('<xsl:value-of select="$groupID" />', 'hasMets', <xsl:value-of select="iview2:hasMETSFile($groupID)"/>);
+<!--      addIviewProperty('<xsl:value-of select="$groupID" />', 'hasMets', <xsl:value-of select="iview2:hasMETSFile($groupID)"/>);-->
+      addIviewProperty('<xsl:value-of select="$groupID" />', 'hasMets', false);
     </script>
     <div id="viewerContainer{$groupID}" class="viewerContainer min">
       <xsl:if test="string-length($style) &gt; 0">
