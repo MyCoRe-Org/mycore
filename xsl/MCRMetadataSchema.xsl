@@ -39,7 +39,9 @@
           <xsd:element name="mycorederivate" type="MCRDerivate"/>
           <xsd:complexType name="MCRDerivate">
             <xsd:sequence>
-              <xsd:element name="derivate" type="MCRObjectDerivate" minOccurs='1' maxOccurs='1'/>
+              <xsd:element name="derivate" type="MCRObjectDerivate" minOccurs='1' maxOccurs='1'>
+                <xsd:attribute name="display" type="xsd:string" use="optional"/>
+              </xsd:element>
               <xsd:element name="service" type="MCRObjectService" minOccurs='1' maxOccurs='1'/>
             </xsd:sequence>
             <xsd:attribute name="ID" type="xsd:string" use="required"/>
