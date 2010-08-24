@@ -332,4 +332,52 @@ public class MCRXMLFunctions {
 
         return Boolean.valueOf(display);
     }
+    
+    /**
+     * @return true if the given object is allowed for urn assignment
+     * */
+    public static boolean isAllowedObjectForURNAssignment(String objId) {
+        if (objId == null) {
+            return false;
+        }
+        try {
+            MCRObjectID obj = new MCRObjectID(objId);
+            String type = obj.getTypeId();
+            return isAllowedObject(type);
+
+        } catch (Exception ex) {
+            LOGGER.error("Error while checking object " + objId + " is allowed for urn assignment");
+            return false;
+        }
+    }
+
+    /**
+     * Reads the property "URN.Enabled.Objects".
+     * 
+     * @param givenType
+     *            the type of the mycore object to check
+     * @return <code>true</code> if the given type is in the list of allowed
+     *         objects, <code>false</code> otherwise
+     */
+    private static boolean isAllowedObject(String givenType) {
+        if (givenType == null)
+            return false;
+
+        String propertyName = "URN.Enabled.Objects";
+        String propertyValue = MCRConfiguration.instance().getString(propertyName, null);
+        if (propertyValue == null || propertyValue.length() == 0) {
+            LOGGER.info("URN assignment disabled as the property \"" + propertyName + "\" is not set");
+            return false;
+        }
+
+        String[] allowedTypes = propertyValue.split(",");
+        for (String current : allowedTypes) {
+            if (current.trim().equals(givenType.trim())) {
+                return true;
+            }
+        }
+        LOGGER.info("URN assignment disabled as the object type " + givenType + " is not in the list of allowed objects. See property \""
+                + propertyName + "\"");
+        return false;
+    }
 }
