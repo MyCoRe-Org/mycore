@@ -45,6 +45,8 @@ import org.mycore.backend.hibernate.tables.MCRURN;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
+import org.mycore.datamodel.metadata.MCRMetaLinkID;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRQuery;
@@ -285,7 +287,7 @@ public class MCRXMLFunctions {
 
         return Boolean.valueOf(display);
     }
-    
+
     /**
      * @return true if the given object is allowed for urn assignment
      * */
@@ -331,6 +333,26 @@ public class MCRXMLFunctions {
         }
         LOGGER.info("URN assignment disabled as the object type " + givenType + " is not in the list of allowed objects. See property \""
                 + propertyName + "\"");
+        return false;
+    }
+
+    /**
+     * @param objectId the id of the derivate owner
+     * @return <code>true</code> if the derivate owner has a least one derivate with the display attribute set to true, <code>false</code> otherwise
+     * 
+     * */
+    public static boolean hasDisplayableDerivates(String objectId) throws Exception {
+        MCRObject obj = new MCRObject();
+        obj.receiveFromDatastore(objectId);
+        List<MCRMetaLinkID> links = obj.getStructure().getDerivates();
+
+        for (MCRMetaLinkID aLink : links) {
+            MCRDerivate derivate = new MCRDerivate();
+            derivate.receiveFromDatastore(aLink.toString());
+            if (derivate.getDerivate().isDisplayEnabled()) {
+                return true;
+            }
+        }
         return false;
     }
 }
