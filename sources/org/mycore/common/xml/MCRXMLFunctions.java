@@ -348,7 +348,7 @@ public class MCRXMLFunctions {
 
         for (MCRMetaLinkID aLink : links) {
             MCRDerivate derivate = new MCRDerivate();
-            derivate.receiveFromDatastore(aLink.toString());
+            derivate.receiveFromDatastore(aLink.getXLinkHref());
             if (derivate.getDerivate().isDisplayEnabled()) {
                 return true;
             }
