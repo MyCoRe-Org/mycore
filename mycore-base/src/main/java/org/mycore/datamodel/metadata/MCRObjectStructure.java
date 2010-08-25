@@ -317,7 +317,14 @@ public class MCRObjectStructure {
             }
         }
     }
-    
+
+    /** 
+     * @return a list with all related derivate ids encapsulated within a {@link MCRMetaLinkID}
+     * */
+    public List<MCRMetaLinkID> getDerivates() {
+        return this.derivates;
+    }
+
     /**
      * While the preceding methods dealt with the structure's copy in memory
      * only, the following three will affect the operations to or from datastore
