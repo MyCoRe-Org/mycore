@@ -301,7 +301,7 @@ public class MCRCategoryTransformer {
 
         @SuppressWarnings("unchecked")
         private void sortItems(List<Element> items) {
-            sort(items, MCREditorItemComparator.CURRENT_LANG_TEXT_ORDER);
+            sort(items, MCREditorItemComparator.getCurrentLangComperator());
             Iterator<Element> it = items.iterator();
             while (it.hasNext()) {
                 Element item = it.next();
