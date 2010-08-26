@@ -36,19 +36,22 @@ import org.mycore.services.iview2.MCRTilingQueue;
  */
 public class MCRIView2ServletContextListener implements ServletContextListener {
     private static Logger LOGGER = Logger.getLogger(MCRIView2ServletContextListener.class);
+
     private Thread tilingThread;
 
     /* (non-Javadoc)
      * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
      */
     public void contextDestroyed(ServletContextEvent sce) {
-        while(tilingThread.isAlive()){
+        while (tilingThread.isAlive()) {
             MCRImageTiler.getInstance().prepareClose();
-            MCRTilingQueue.getInstance().prepareClose();
+            MCRTilingQueue tilingQueue = MCRTilingQueue.getInstance();
+            if (tilingQueue != null)
+                tilingQueue.prepareClose();
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                LOGGER.error(Thread.currentThread().getName()+" thread was interrupted.", e);
+                LOGGER.error(Thread.currentThread().getName() + " thread was interrupted.", e);
             }
         }
     }
