@@ -1,14 +1,14 @@
 /**
  * 
  */
-package org.mycore.common.events;
+package org.mycore.datamodel.metadata;
 
 import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.mycore.backend.hibernate.MCRDeletedItemManager;
-import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.common.events.MCREvent;
+import org.mycore.common.events.MCREventHandlerBase;
 
 /**
  * @author shermann
