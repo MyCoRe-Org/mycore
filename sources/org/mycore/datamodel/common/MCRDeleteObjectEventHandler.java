@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.mycore.datamodel.metadata;
+package org.mycore.datamodel.common;
 
 import java.util.Date;
 
@@ -9,6 +9,8 @@ import org.apache.log4j.Logger;
 import org.mycore.backend.hibernate.MCRDeletedItemManager;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
+import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRObject;
 
 /**
  * @author shermann
