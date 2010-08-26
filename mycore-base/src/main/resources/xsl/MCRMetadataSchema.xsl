@@ -120,7 +120,6 @@
   <xsl:template match="/configuration/derivate">
     
     <xsd:complexType name="MCRObjectDerivate">
-      <xsd:attribute name="display" type="xsd:boolean" use="optional"/>
       <xsd:all>
         <xsl:for-each select="element">
           <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
@@ -134,6 +133,7 @@
         
         <xsl:value-of select="$newline"/>
       </xsd:all>
+      <xsd:attribute name="display" type="xsd:boolean" use="optional"/>
       <xsd:attribute ref="xml:lang"/>
     </xsd:complexType>
     
