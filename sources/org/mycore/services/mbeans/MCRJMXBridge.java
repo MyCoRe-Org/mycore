@@ -87,7 +87,7 @@ public class MCRJMXBridge implements Closeable {
                 mbs.unregisterMBean(name);
             // As WeakReference does not overwrite Object.equals():
             for (WeakReference<ObjectName> wr : ONAME_LIST) {
-                if (wr.get().equals(name)) {
+                if (name.equals(wr.get())) {
                     ONAME_LIST.remove(wr);
                     break;
                 }
@@ -99,8 +99,8 @@ public class MCRJMXBridge implements Closeable {
     }
 
     private static ObjectName getObjectName(String type, String component) throws MalformedObjectNameException {
-        return new ObjectName(MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe-Application").replace(':', ' ') + ":type="
-                + type + ",component=" + component);
+        return new ObjectName(MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe-Application").replace(':', ' ') + ":type=" + type
+            + ",component=" + component);
     }
 
     public void close() {
