@@ -43,8 +43,8 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.Term;
 import org.apache.lucene.index.IndexWriter.MaxFieldLength;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
@@ -282,6 +282,11 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
             sortFields.setSort(SortField.FIELD_DOC);
         }
         MCRLuceneResults results = new MCRLuceneResults(sharedIndexContext, addableFields, sortFields, luceneQuery, maxResults);
+        //cannot sort with "score" as the SortField is created on the fly for that search
+        for (SortField field : sortFields.getSort()) {
+            if (field == SortField.FIELD_SCORE)
+                results.setSorted(false);
+        }
         LOGGER.info("Number of Objects found: " + results.getNumHits() + " Time for Search: " + (System.currentTimeMillis() - start));
         return results;
     }
@@ -422,8 +427,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
                 if (PLUGIN_MANAGER.isSupported(mcrfile.getContentType())) {
                     LOGGER.debug("####### Index MCRFile: " + mcrfile.getPath());
 
-                    BufferedReader in = new BufferedReader(PLUGIN_MANAGER.transform(mcrfile.getContentType(), mcrfile
-                            .getContentAsInputStream()));
+                    BufferedReader in = new BufferedReader(PLUGIN_MANAGER.transform(mcrfile.getContentType(), mcrfile.getContentAsInputStream()));
                     String s;
                     StringBuffer text = new StringBuffer();
                     while ((s = in.readLine()) != null) {
