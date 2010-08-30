@@ -66,6 +66,16 @@ public class MCRSessionListingServlet extends MCRServlet {
             sessionXML.addContent(new Element("createTime").setText(Long.toString(session.getCreateTime())));
             sessionXML.addContent(new Element("lastAccessTime").setText(Long.toString(session.getLastAccessedTime())));
             sessionXML.addContent(new Element("loginTime").setText(Long.toString(session.getLoginTime())));
+            Element cst = new Element("constructingStackTrace");
+            sessionXML.addContent(cst);
+            for (StackTraceElement se : session.getConstructingStackTrace()) {
+                Element e = new Element("e");
+                e.setAttribute("c", se.getClassName());
+                e.setAttribute("f", se.getFileName());
+                e.setAttribute("m", se.getMethodName());
+                e.setAttribute("l", Long.toString(se.getLineNumber()));
+                cst.addContent(e);
+            }
             sessionsXML.addContent(sessionXML);
         }
         return new Document(sessionsXML);
