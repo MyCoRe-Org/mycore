@@ -100,6 +100,8 @@ public class MCRSession implements Cloneable {
 
     private ThreadLocal<Transaction> transaction = new ThreadLocal<Transaction>();
 
+    private StackTraceElement[] constructingStackTrace;
+
     /**
      * The constructor of a MCRSession. As default the user ID is set to the
      * value of the property variable named 'MCR.Users.Guestuser.UserName'.
@@ -120,7 +122,9 @@ public class MCRSession implements Cloneable {
         LOGGER.debug("MCRSession created " + sessionID);
         setLoginTime();
         createTime = loginTime;
-
+        Throwable t = new Throwable();
+        t.fillInStackTrace();
+        constructingStackTrace = t.getStackTrace();
     }
 
     public final void setLoginTime() {
@@ -440,6 +444,10 @@ public class MCRSession implements Cloneable {
      */
     public boolean isTransactionActive() {
         return dataBaseAccess && transaction.get() != null && transaction.get().isActive();
+    }
+
+    public StackTraceElement[] getConstructingStackTrace() {
+        return constructingStackTrace;
     }
 
 }
