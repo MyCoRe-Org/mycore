@@ -42,6 +42,7 @@ import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.ifs2.MCRObjectIDFileSystemDate;
 import org.mycore.datamodel.ifs2.MCRStore;
 import org.mycore.datamodel.ifs2.MCRStoredMetadata;
+import org.mycore.datamodel.ifs2.MCRVersioningMetadataStore;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
@@ -105,7 +106,13 @@ public class MCRXMLTableManager {
         checkDir(baseDir, "base");
 
         defaultClass = config.getString("MCR.Metadata.Store.DefaultClass", "org.mycore.datamodel.ifs2.MCRVersioningMetadataStore");
-        if ("org.mycore.datamodel.ifs2.MCRVersioningMetadataStore".equals(defaultClass)) {
+        Class<?> impl;
+        try {
+            impl = Class.forName(defaultClass);
+        } catch (ClassNotFoundException e) {
+            throw new MCRException("Could not load default class " + defaultClass);
+        }
+        if (MCRVersioningMetadataStore.class.isAssignableFrom(impl)) {
             svnBase = config.getString("MCR.Metadata.Store.SVNBase");
             if (svnBase.startsWith("file:///")) {
                 try {
@@ -183,6 +190,7 @@ public class MCRXMLTableManager {
      * 
      * @param project the project, e.g. DocPortal
      * @param type the object type, e.g. document
+     * @throws ClassNotFoundException 
      */
     private synchronized MCRMetadataStore getStore(String project, String type) {
         String prefix = "MCR.IFS2.Store." + project + "_" + type + ".";
@@ -198,8 +206,13 @@ public class MCRXMLTableManager {
                 config.set(prefix + "Class", defaultClass);
                 clazz = defaultClass;
             }
-
-            if (clazz.equals("org.mycore.datamodel.ifs2.MCRVersioningMetadataStore")) {
+            Class<?> impl;
+            try {
+                impl = Class.forName(clazz);
+            } catch (ClassNotFoundException e) {
+                throw new MCRException("Could not load class " + clazz + " for " + project + "_" + type);
+            }
+            if (MCRVersioningMetadataStore.class.isAssignableFrom(impl)) {
                 String svnURL = config.getString(prefix + "SVNRepositoryURL", null);
                 if (svnURL == null) {
                     config.set(prefix + "SVNRepositoryURL", svnBase + "/" + project + "/" + type);
