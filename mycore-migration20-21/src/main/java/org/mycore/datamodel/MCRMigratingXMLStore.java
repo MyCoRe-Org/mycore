@@ -6,10 +6,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.StatelessSession;
-import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRXMLTABLE;
@@ -24,12 +23,13 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  *
  */
 public class MCRMigratingXMLStore extends MCRVersioningMetadataStore {
+    private static Logger LOGGER = Logger.getLogger(MCRMigratingXMLStore.class);
 
     @Override
     public MCRVersionedMetadata retrieve(int id) throws IOException {
         MCRVersionedMetadata versionedMetadata = super.retrieve(id);
         if (versionedMetadata == null || versionedMetadata.isDeleted()) {
-            migrateObject(getID() + "_" + id);
+            migrateObject(id);
             versionedMetadata = super.retrieve(id);
         }
         return versionedMetadata;
@@ -39,7 +39,7 @@ public class MCRMigratingXMLStore extends MCRVersioningMetadataStore {
     public boolean exists(int id) throws IOException {
         if (super.exists(id))
             return true;
-        migrateObject(getID() + "_" + id);
+        migrateObject(id);
         return super.exists(id);
     }
 
@@ -83,32 +83,26 @@ public class MCRMigratingXMLStore extends MCRVersioningMetadataStore {
         }
     }
 
-    private static void migrateObject(String id) {
-        StatelessSession session = MCRHIBConnection.instance().getSessionFactory().openStatelessSession();
-        Transaction tx = session.beginTransaction();
+    private void migrateObject(int id) throws IOException {
+        MCRObjectID mcrId = new MCRObjectID(getID() + "_" + id);
+        Session session = MCRHIBConnection.instance().getSession();
         MCRXMLTableManager manager = MCRXMLTableManager.instance();
-        try {
-            Criteria criteria = session.createCriteria(MCRXMLTABLE.class).add(Restrictions.eq("key.id", id));
-            @SuppressWarnings("unchecked")
-            List<MCRXMLTABLE> results = criteria.list();
-            for (MCRXMLTABLE xmlentry : results) {
-                MCRObjectID mcrId = new MCRObjectID(xmlentry.getId());
-                Date lastModified = xmlentry.getLastModified();
-                byte[] xmlByteArray = xmlentry.getXmlByteArray();
-                if (manager.exists(mcrId)) {
-                    LOGGER.warn(xmlentry.getId() + " allready exists in IFS2 - skipping.");
-                    continue;
-                }
-                LOGGER.info("Migrating " + xmlentry.getId() + " to IFS2.");
-                manager.create(mcrId, xmlByteArray, lastModified);
+        Criteria criteria = session.createCriteria(MCRXMLTABLE.class).add(Restrictions.eq("key.id", mcrId.toString()));
+        @SuppressWarnings("unchecked")
+        List<MCRXMLTABLE> results = criteria.list();
+        for (MCRXMLTABLE xmlentry : results) {
+            Date lastModified = xmlentry.getLastModified();
+            byte[] xmlByteArray = xmlentry.getXmlByteArray();
+            if (super.exists(id)) {
+                LOGGER.warn(xmlentry.getId() + " allready exists in IFS2 - skipping.");
+                continue;
             }
-            tx.commit();
-        } catch (Exception e) {
-            LOGGER.error("Could not migrate...", e);
-            if (tx.isActive())
-                tx.rollback();
-        } finally {
-            session.close();
+            LOGGER.info("Migrating " + xmlentry.getId() + " to IFS2.");
+            manager.create(mcrId, xmlByteArray, lastModified);
+            session.evict(xmlentry);
+        }
+        if (results.size() == 0) {
+            LOGGER.warn("Requested object could not be found in MCRXMLTable: " + mcrId);
         }
     }
 
