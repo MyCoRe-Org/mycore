@@ -1177,8 +1177,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                     return new Element("null");
                 }
             } catch (Exception ex) {
-                LOGGER.info("MCRXslStyleResolver caught exception: " + ex.getLocalizedMessage());
-                LOGGER.debug(ex.getStackTrace());
+                LOGGER.info("MCRXslStyleResolver caught exception: " + ex.getLocalizedMessage(), ex);
                 LOGGER.debug("MCRXslStyleResolver returning empty xml");
                 return new Element("null");
             }
