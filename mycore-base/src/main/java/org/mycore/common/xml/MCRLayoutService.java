@@ -69,7 +69,7 @@ import org.apache.xalan.trace.TraceManager;
 import org.apache.xalan.trace.TracerEvent;
 import org.apache.xml.utils.WrappedRuntimeException;
 import org.jdom.Document;
-import org.jdom.transform.JDOMResult;
+import org.jdom.input.SAXBuilder;
 import org.jdom.transform.JDOMSource;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
@@ -281,9 +281,16 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
             }
         }
         setXSLParameters(transformer, parameters);
-        JDOMResult out = new JDOMResult();
+        //temporarily workaround as JDOMResult does not work with xsl:output
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        StreamResult out = new StreamResult(byteArrayOutputStream);
         transformer.transform(new JDOMSource(doc), out);
-        return out.getDocument();
+        SAXBuilder builder = new SAXBuilder();
+        builder.setValidation(false);
+        builder.setEntityResolver(MCRURIResolver.instance());
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+        Document document = builder.build(byteArrayInputStream);
+        return document;
     }
 
     private void transform(HttpServletResponse res, Source sourceXML, String docType, Properties parameters, Templates stylesheet) throws IOException {
