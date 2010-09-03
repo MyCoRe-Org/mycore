@@ -41,6 +41,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
 
 import javax.servlet.http.HttpSession;
 
@@ -84,7 +85,13 @@ class MCRWebCLIContainer {
 
     private static final Logger LOGGER = Logger.getLogger(MCRWebCLIContainer.class);
 
-    private static final ExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+    private static final ExecutorService executor = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
+
+        @Override
+        public Thread newThread(Runnable r) {
+            return new Thread(r, "WebCLI");
+        }
+    });
 
     /**
      * Will instantiate this container with a list of supported commands.
@@ -170,10 +177,9 @@ class MCRWebCLIContainer {
             knownCommands = new TreeMap<String, List<MCRCommand>>();
             ArrayList<MCRCommand> basicCommands = new ArrayList<MCRCommand>();
             basicCommands.add(new MCRCommand("process {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.readCommandsFile String",
-                    "Execute the commands listed in the text file {0}."));
-            basicCommands.add(new MCRCommand("show command statistics",
-                    "org.mycore.frontend.cli.MCRCommandLineInterface.showCommandStatistics",
-                    "Show statistics on number of commands processed and execution time needed per command"));
+                "Execute the commands listed in the text file {0}."));
+            basicCommands.add(new MCRCommand("show command statistics", "org.mycore.frontend.cli.MCRCommandLineInterface.showCommandStatistics",
+                "Show statistics on number of commands processed and execution time needed per command"));
             basicCommands.add(new MCRAddCommands());
             LOGGER.warn("known commands:" + knownCommands);
             knownCommands.put("Basic commands", basicCommands);
@@ -303,8 +309,8 @@ class MCRWebCLIContainer {
             return true;
         }
 
-        private List<String> runCommand(String command, List<MCRCommand> commandList) throws IllegalAccessException,
-                InvocationTargetException, ClassNotFoundException, NoSuchMethodException {
+        private List<String> runCommand(String command, List<MCRCommand> commandList) throws IllegalAccessException, InvocationTargetException,
+            ClassNotFoundException, NoSuchMethodException {
             List<String> commandsReturned = null;
             for (MCRCommand currentCommand : commandList) {
                 commandsReturned = currentCommand.invoke(command, this.getClass().getClassLoader());
