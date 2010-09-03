@@ -49,6 +49,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.SAXTransformerFactory;
@@ -69,7 +70,6 @@ import org.apache.xalan.trace.TraceManager;
 import org.apache.xalan.trace.TracerEvent;
 import org.apache.xml.utils.WrappedRuntimeException;
 import org.jdom.Document;
-import org.jdom.input.SAXBuilder;
 import org.jdom.transform.JDOMSource;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
@@ -264,7 +264,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         fis.close();
     }
 
-    public Document doLayout(Document doc, String stylesheetName, Hashtable<String, String> params) throws Exception {
+    public Source doLayout(Document doc, String stylesheetName, Hashtable<String, String> params) throws Exception {
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         MCRServletJob job = (MCRServletJob) mcrSession.get("MCRServletJob");
         Templates stylesheet = buildCompiledStylesheet(stylesheetName);
@@ -281,16 +281,10 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
             }
         }
         setXSLParameters(transformer, parameters);
+        DOMResult out=new DOMResult();
         //temporarily workaround as JDOMResult does not work with xsl:output
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        StreamResult out = new StreamResult(byteArrayOutputStream);
         transformer.transform(new JDOMSource(doc), out);
-        SAXBuilder builder = new SAXBuilder();
-        builder.setValidation(false);
-        builder.setEntityResolver(MCRURIResolver.instance());
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-        Document document = builder.build(byteArrayInputStream);
-        return document;
+        return new DOMSource(out.getNode());
     }
 
     private void transform(HttpServletResponse res, Source sourceXML, String docType, Properties parameters, Templates stylesheet) throws IOException {

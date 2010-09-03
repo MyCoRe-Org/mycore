@@ -47,6 +47,7 @@ import javax.servlet.ServletContext;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 
@@ -82,6 +83,7 @@ import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRQueryClient;
 import org.mycore.services.fieldquery.MCRQueryManager;
 import org.mycore.services.fieldquery.MCRResults;
+import org.w3c.dom.Node;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 
@@ -176,7 +178,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         supportedSchemes.put("query", getURIResolver(new MCRQueryResolver()));
         supportedSchemes.put("buildxml", getURIResolver(new MCRBuildXMLResolver()));
         supportedSchemes.put("notnull", new MCRNotNullResolver());
-        supportedSchemes.put("xslStyle", getURIResolver(new MCRXslStyleResolver()));
+        supportedSchemes.put("xslStyle", new MCRXslStyleResolver());
         supportedSchemes.put("xslInclude", getURIResolver(new MCRXslIncludeResolver()));
         return supportedSchemes;
     }
@@ -391,6 +393,10 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                         else if (node instanceof Document)
                             return ((Document) node).getRootElement();
                     }
+                } else if (source instanceof DOMSource) {
+                    Node node = ((DOMSource) source).getNode();
+                    Document xml = new DOMBuilder().build((org.w3c.dom.Document) node);
+                    return xml.getRootElement();
                 } else {
                     InputSource iSrc = SAXSource.sourceToInputSource(source);
                     Document xml = new SAXBuilder().build(iSrc);
@@ -1138,16 +1144,17 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
      * To <stylesheet> is extension .xsl added. File is searched in classpath.
      * 
      */
-    private static class MCRXslStyleResolver implements MCRResolver {
+    private static class MCRXslStyleResolver implements URIResolver {
 
-        public Element resolveElement(String uri) {
-            String help = uri.substring(uri.indexOf(":") + 1);
+        @Override
+        public Source resolve(String href, String base) throws TransformerException {
+            String help = href.substring(href.indexOf(":") + 1);
             String stylesheet = new StringTokenizer(help, ":").nextToken();
             String target = help.substring(help.indexOf(":") + 1);
 
             String subUri = target.substring(target.indexOf(":") + 1);
             if (subUri.length() == 0) {
-                return new Element("null");
+                return new JDOMSource(new Element("null"));
             }
 
             try {
@@ -1165,21 +1172,21 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                     if (doc == null) {
                         doc = new Document(result);
                     }
-                    Document xx = MCRLayoutService.instance().doLayout(doc, "xsl/" + stylesheet + ".xsl", params);
-                    if (!xx.hasRootElement()) {
+                    Source xx = MCRLayoutService.instance().doLayout(doc, "xsl/" + stylesheet + ".xsl", params);
+                    if (xx == null) {
                         LOGGER.info("MCRXslStyleResolver no root element after transformation ");
-                        return new Element("null");
+                        return new JDOMSource(new Element("null"));
                     }
-                    LOGGER.debug("MCRXslStyleResolver root element after transformation is " + xx.getRootElement().getName());
-                    return xx.getRootElement();
+                    LOGGER.debug("MCRXslStyleResolver root element after transformation is " + xx.getSystemId());
+                    return xx;
                 } else {
                     LOGGER.debug("MCRXslStyleResolver returning empty xml");
-                    return new Element("null");
+                    return new JDOMSource(new Element("null"));
                 }
             } catch (Exception ex) {
                 LOGGER.info("MCRXslStyleResolver caught exception: " + ex.getLocalizedMessage(), ex);
                 LOGGER.debug("MCRXslStyleResolver returning empty xml");
-                return new Element("null");
+                return new JDOMSource(new Element("null"));
             }
         }
     }
