@@ -264,7 +264,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         fis.close();
     }
 
-    public Source doLayout(Document doc, String stylesheetName, Hashtable<String, String> params) throws Exception {
+    public DOMSource doLayout(Document doc, String stylesheetName, Hashtable<String, String> params) throws Exception {
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         MCRServletJob job = (MCRServletJob) mcrSession.get("MCRServletJob");
         Templates stylesheet = buildCompiledStylesheet(stylesheetName);
