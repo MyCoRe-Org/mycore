@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>mycore</artifactId>
@@ -11,20 +12,10 @@
   <packaging>pom</packaging>
   <version>2.0.91-SNAPSHOT</version>
   <name>MyCoRe Parent POM</name>
-  <!--
-    Keep the description on a single line. Otherwise Maven might generate a corrupted MANIFEST.MF (see
-    http://jira.codehaus.org/browse/MJAR-4)
-  -->
+  <!-- Keep the description on a single line. Otherwise Maven might generate a corrupted MANIFEST.MF (see http://jira.codehaus.org/browse/MJAR-4) -->
   <description>MyCoRe is a system for the development of institutional content repositories, publication servers, image collections, archives, or
     similar repositories. Applications based on MyCoRe use a common core, which provides the functionality typically required for such applications,
     for example metadata management, querying, OAI harvesting interface, or an image viewer module.</description>
-  <distributionManagement>
-    <site>
-      <id>MyCoRe HQ</id>
-      <name>MyCoRe HQ-sites</name>
-      <url>scp://server.mycore.de/mcr/mycore.de/generated/${project.version}</url>
-    </site>
-  </distributionManagement>
   <ciManagement>
     <system>hudson</system>
     <url>http://www.mycore.org/hudson/job/MyCoRe/</url>
@@ -46,6 +37,75 @@
     <developerConnection>scm:svn:https://server.mycore.de/svn/mycore/trunk</developerConnection>
     <url>http://www.mycore.de/viewvc/viewvc.cgi/mycore/trunk</url>
   </scm>
+  <profiles>
+    <profile>
+      <id>development</id>
+      <activation>
+        <property>
+          <name>env</name>
+          <value>dev</value>
+        </property>
+      </activation>
+    </profile>
+    <profile>
+      <id>deployment</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-checkstyle-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>verify</phase>
+                <goals>
+                  <goal>checkstyle</goal>
+                </goals>
+                <configuration>
+                  <configLocation>${project.build.directory}/checkstyle.xml</configLocation>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <artifactId>maven-pmd-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>verify</phase>
+                <goals>
+                  <goal>pmd</goal>
+                  <goal>cpd</goal>
+                </goals>
+                <configuration>
+                  <targetJdk>${java.target.version}</targetJdk>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>findbugs-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>verify</phase>
+                <goals>
+                  <goal>findbugs</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+      <distributionManagement>
+        <site>
+          <id>MyCoRe HQ</id>
+          <name>MyCoRe HQ-sites</name>
+          <url>scp://server.mycore.de/mcr/mycore.de/generated/${project.version}</url>
+        </site>
+      </distributionManagement>
+    </profile>
+  </profiles>
   <repositories>
     <repository>
       <id>MyCoRe HQ</id>
@@ -148,14 +208,12 @@
         </executions>
       </plugin>
       <plugin>
-        <!--
-          The tutorial on http://maven.apache.org/plugins/maven-checkstyle-plugin/examples/multi-module-config.html does not work. Manually
-          extracting the checkstyle.xml file from build-tools with maven-antrun-plugin.
-        -->
+        <!-- The tutorial on http://maven.apache.org/plugins/maven-checkstyle-plugin/examples/multi-module-config.html does not work. Manually 
+          extracting the checkstyle.xml file from build-tools with maven-antrun-plugin. -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
-        <execution>
+          <execution>
             <phase>pre-site</phase>
             <goals>
               <goal>run</goal>
@@ -163,9 +221,9 @@
             <configuration>
               <tasks>
                 <copy todir="${project.build.directory}" flatten="true">
-    			  <javaresource name="org/mycore/checkstyle.xml" classpathref="maven.plugin.classpath" />
- 			    </copy>
- 			  </tasks>
+                  <javaresource name="org/mycore/checkstyle.xml" classpathref="maven.plugin.classpath" />
+                </copy>
+              </tasks>
             </configuration>
           </execution>
           <execution>
@@ -177,9 +235,9 @@
             <configuration>
               <tasks>
                 <copy todir="${project.build.directory}" flatten="true">
-    			  <javaresource name="org/mycore/checkstyle.xml" classpathref="maven.plugin.classpath" />
+                  <javaresource name="org/mycore/checkstyle.xml" classpathref="maven.plugin.classpath" />
                 </copy>
- 			  </tasks>
+              </tasks>
             </configuration>
           </execution>
         </executions>
@@ -194,49 +252,8 @@
             <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
             <version>1.7.1</version>
-          </dependency>          
+          </dependency>
         </dependencies>
-      </plugin>
-      <plugin>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>verify</phase>
-            <goals>
-              <goal>checkstyle</goal>
-            </goals>
-            <configuration>
-              <configLocation>${project.build.directory}/checkstyle.xml</configLocation>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <artifactId>maven-pmd-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>verify</phase>
-            <goals>
-              <goal>pmd</goal>
-              <goal>cpd</goal>
-            </goals>
-            <configuration>
-              <targetJdk>${java.target.version}</targetJdk>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>findbugs-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>verify</phase>
-            <goals>
-              <goal>findbugs</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
