@@ -3,9 +3,11 @@
  */
 package org.mycore.frontend.servlets;
 
+import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.services.urn.URNAdder;
+import org.mycore.services.urn.MCRURNManager;
+import org.mycore.services.urn.MCRURNAdder;
 
 /**
  * Class is responsible for adding urns to the metadata of a mycore object
@@ -13,6 +15,8 @@ import org.mycore.services.urn.URNAdder;
  * @author shermann
  */
 public class MCRAddURNToObjectServlet extends MCRServlet {
+    private static final Logger LOGGER = Logger.getLogger(MCRAddURNToObjectServlet.class);
+
     /***/
     private static final long serialVersionUID = 1L;
 
@@ -27,27 +31,42 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
         String object = job.getRequest().getParameter("object");
+        String target = job.getRequest().getParameter("target");
 
         if (object == null) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + MCRIDERRORPAGE));
             return;
         }
 
-        URNAdder urn = new URNAdder();
-        String id = job.getRequest().getParameter("object");
+        MCRURNAdder urn = new MCRURNAdder();
 
-        if (object.indexOf("_derivate_") != -1) {
-            if (!urn.addURNToDerivates(id)) {
+        if (target != null && target.equals("file")) {
+            LOGGER.info("Adding URN to single file");
+            String path = job.getRequest().getParameter("path");
+            String fileId = job.getRequest().getParameter("fileId");
+            if (path == null || fileId == null) {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + USERERRORPAGE));
                 return;
             }
+            urn.addURNToSingleFile(object, path, fileId);
         } else {
-            if (!urn.addURN(id)) {
-                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + USERERRORPAGE));
-                return;
+            if (!MCRURNManager.hasURNAssigned(object)) {
+                if (object.indexOf("_derivate_") != -1) {
+                    LOGGER.info("Adding URN to all files in derivate " + object);
+                    if (!urn.addURNToDerivates(object)) {
+                        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + USERERRORPAGE));
+                        return;
+                    }
+                } else {
+                    if (!urn.addURN(object)) {
+                        LOGGER.info("Adding URN to metadata of object " + object);
+                        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + USERERRORPAGE));
+                        return;
+                    }
+                }
             }
         }
-        returnToMetadataView(job, id);
+        returnToMetadataView(job, object);
     }
 
     /** Returns to the metadata view this servlet was called from */
