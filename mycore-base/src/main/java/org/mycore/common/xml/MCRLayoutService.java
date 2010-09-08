@@ -644,7 +644,11 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         }
 
         OutputStream sos = response.getOutputStream();
-        sos.write(out.toByteArray());
+        try {
+            sos.write(out.toByteArray());
+        } catch (IOException ex) {
+            LOGGER.warn("Exception writing response to client: " + ex.getMessage());
+        }
         sos.close();
     }
 
