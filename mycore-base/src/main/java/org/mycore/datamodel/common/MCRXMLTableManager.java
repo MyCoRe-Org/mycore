@@ -192,30 +192,41 @@ public class MCRXMLTableManager {
      * @param type the object type, e.g. document
      * @throws ClassNotFoundException 
      */
-    private synchronized MCRMetadataStore getStore(String project, String type) {
+    public MCRMetadataStore getStore(String project, String type) {
         String prefix = "MCR.IFS2.Store." + project + "_" + type + ".";
-        MCRConfiguration config = MCRConfiguration.instance();
 
-        String forceXML = config.getString(prefix + "ForceXML", null);
-        if (forceXML == null) // store not configured yet
+        String forceXML = MCRConfiguration.instance().getString(prefix + "ForceXML", null);
+        if (forceXML == null) {
+            synchronized (this) {
+                forceXML = MCRConfiguration.instance().getString(prefix + "ForceXML", null);
+                if (forceXML == null) {
+                    setupStore(project, type, prefix);
+                }
+            }
+        }
+
+        return MCRMetadataStore.getStore(project + "_" + type);
+    }
+
+    private void setupStore(String project, String objectType, String configPrefix) {
         {
-            config.set(prefix + "ForceXML", true);
+            MCRConfiguration config = MCRConfiguration.instance();
 
-            String clazz = config.getString(prefix + "Class", null);
+            String clazz = config.getString(configPrefix + "Class", null);
             if (clazz == null) {
-                config.set(prefix + "Class", defaultClass);
+                config.set(configPrefix + "Class", defaultClass);
                 clazz = defaultClass;
             }
             Class<?> impl;
             try {
                 impl = Class.forName(clazz);
             } catch (ClassNotFoundException e) {
-                throw new MCRException("Could not load class " + clazz + " for " + project + "_" + type);
+                throw new MCRException("Could not load class " + clazz + " for " + project + "_" + objectType);
             }
             if (MCRVersioningMetadataStore.class.isAssignableFrom(impl)) {
-                String svnURL = config.getString(prefix + "SVNRepositoryURL", null);
+                String svnURL = config.getString(configPrefix + "SVNRepositoryURL", null);
                 if (svnURL == null) {
-                    config.set(prefix + "SVNRepositoryURL", svnBase + "/" + project + "/" + type);
+                    config.set(configPrefix + "SVNRepositoryURL", svnBase + "/" + project + "/" + objectType);
 
                     File projectDir = new File(svnDir, project);
                     if (!projectDir.exists()) {
@@ -224,9 +235,9 @@ public class MCRXMLTableManager {
                 }
             }
 
-            String slotLayout = config.getString(prefix + "SlotLayout", null);
+            String slotLayout = config.getString(configPrefix + "SlotLayout", null);
             if (slotLayout == null) {
-                config.set(prefix + "SlotLayout", defaultLayout);
+                config.set(configPrefix + "SlotLayout", defaultLayout);
             }
 
             File projectDir = new File(baseDir, project);
@@ -234,15 +245,14 @@ public class MCRXMLTableManager {
                 projectDir.mkdir();
             }
 
-            File typeDir = new File(projectDir, type);
+            File typeDir = new File(projectDir, objectType);
             if (!typeDir.exists()) {
                 typeDir.mkdir();
             }
 
-            config.set(prefix + "BaseDir", typeDir.getAbsolutePath());
+            config.set(configPrefix + "BaseDir", typeDir.getAbsolutePath());
+            config.set(configPrefix + "ForceXML", true);
         }
-
-        return MCRMetadataStore.getStore(project + "_" + type);
     }
 
     /**
@@ -250,7 +260,7 @@ public class MCRXMLTableManager {
      * 
      * @param base the MCRObjectID base, e.g. DocPortal_document
      */
-    private MCRMetadataStore getStore(String base) {
+    public MCRMetadataStore getStore(String base) {
         String[] split = base.split("_");
         return getStore(split[0], split[1]);
     }
@@ -258,7 +268,7 @@ public class MCRXMLTableManager {
     /**
      * Returns IFS2 MCRMetadataStore used to store metadata of the given MCRObjectID
      */
-    private MCRMetadataStore getStore(MCRObjectID mcrid) {
+    public MCRMetadataStore getStore(MCRObjectID mcrid) {
         return getStore(mcrid.getProjectId(), mcrid.getTypeId());
     }
 
