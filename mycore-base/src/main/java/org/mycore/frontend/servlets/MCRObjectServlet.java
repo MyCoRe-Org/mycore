@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,10 +37,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
+import org.jdom.JDOMException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.common.MCRXMLTableManager;
+import org.mycore.datamodel.ifs2.MCRMetadataStore;
+import org.mycore.datamodel.ifs2.MCRMetadataVersion;
+import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
+import org.mycore.datamodel.ifs2.MCRVersioningMetadataStore;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.services.fieldquery.MCRCachedQueryData;
 import org.mycore.services.fieldquery.MCRHit;
@@ -67,6 +73,10 @@ public class MCRObjectServlet extends MCRServlet {
     private static final Pattern SEARCH_ID_PATTERN = Pattern.compile("[\\?&]id=([^&]+)");
 
     private static final String EDITOR_ID_TABLE_KEY = "MCRObjectServlet.editorIds";
+
+    private static final int REV_LATEST = -1;
+
+    private static final int REV_CURRENT = 0;
 
     /**
      * The initalization of the servlet.
@@ -96,9 +106,19 @@ public class MCRObjectServlet extends MCRServlet {
             }
             String editorID = getEditorID(job.getRequest());
             setBrowseParameters(job, id, host, editorID);
+            String revision = getProperty(job.getRequest(), "r");
+            long rev = REV_CURRENT;
+            if (revision != null) {
+                rev = Long.parseLong(revision);
+            }
 
             if (host == MCRHit.LOCAL) {
-                final Document localObject = requestLocalObject(job);
+                Document localObject;
+                if (rev == REV_CURRENT) {
+                    localObject = requestLocalObject(job);
+                } else {
+                    localObject = requestVersionedObject(job, rev);
+                }
                 if (localObject == null) {
                     return;
                 }
@@ -106,15 +126,13 @@ public class MCRObjectServlet extends MCRServlet {
             } else {
                 getLayoutService().doLayout(job.getRequest(), job.getResponse(), requestRemoteObject(job));
             }
-        } catch (MCRException e) {                                 // Shouldn't this be 404 "NOT FOUND"?
-            generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Error while retrieving MCRObject with ID: " + getObjectID(job.getRequest()), e, false);
+        } catch (MCRException e) { // Shouldn't this be 404 "NOT FOUND"?
+            generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while retrieving MCRObject with ID: "
+                + getObjectID(job.getRequest()), e, false);
             return;
         }
     }
 
-//---------------------------------------------------------------------
-	
     private String getObjectHost(MCRServletJob job) {
         String remoteHost = job.getRequest().getParameter("host");
         if (remoteHost == null || remoteHost.length() == 0) {
@@ -123,29 +141,35 @@ public class MCRObjectServlet extends MCRServlet {
         return remoteHost;
     }
 
-//---------------------------------------------------------------------
+    //---------------------------------------------------------------------
 
     private org.w3c.dom.Document requestRemoteObject(MCRServletJob job) {
         String id = getObjectID(job.getRequest());
         String host = getProperty(job.getRequest(), "host");
         return MCRQueryClient.doRetrieveObject(host, id);
     }
-	
-//---------------------------------------------------------------------
+
+    //---------------------------------------------------------------------
 
     private Document requestLocalObject(MCRServletJob job) throws IOException {
+        MCRObjectID mcrid = getMCRObjectID(job);
+        if (mcrid == null)
+            return null;
+        return TM.retrieveXML(mcrid);
+    }
+
+    private MCRObjectID getMCRObjectID(MCRServletJob job) throws IOException {
         String id = getObjectID(job.getRequest());
 
-		MCRObjectID mcrid = null;
-		try {
-			mcrid = new MCRObjectID(id);			             // create Object with given ID, only ID syntax check performed
-		} catch (MCRException e) {                               // handle exception: invalid ID syntax, set HTTP error 400 "Invalid request"
-            generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_BAD_REQUEST,
-                    "Error: invalid MCRObject-ID '" + id + "'", e, false);
-            return null;                                         // sorry, no object to return
+        MCRObjectID mcrid = null;
+        try {
+            mcrid = new MCRObjectID(id); // create Object with given ID, only ID syntax check performed
+        } catch (MCRException e) { // handle exception: invalid ID syntax, set HTTP error 400 "Invalid request"
+            generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_BAD_REQUEST, "Error: invalid MCRObject-ID '" + id + "'", e, false);
+            return null; // sorry, no object to return
         }
 
-        if (!MCRAccessManager.checkPermission(mcrid, "read")) {  // check read permission for ID
+        if (!MCRAccessManager.checkPermission(mcrid, "read")) { // check read permission for ID
             StringBuffer msg = new StringBuffer(1024);
             msg.append("Access denied reading MCRObject with ID: ").append(mcrid.getId());
             msg.append(".\nCurrent User: ").append(MCRSessionMgr.getCurrentSession().getCurrentUserID());
@@ -153,11 +177,38 @@ public class MCRObjectServlet extends MCRServlet {
             generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_FORBIDDEN, msg.toString(), null, false);
             return null;
         }
-
-        return TM.retrieveXML(mcrid);
+        return mcrid;
     }
-	
-//---------------------------------------------------------------------
+
+    private Document requestVersionedObject(MCRServletJob job, long rev) throws JDOMException, Exception {
+        MCRObjectID mcrid = getMCRObjectID(job);
+        if (mcrid == null)
+            return null;
+        MCRMetadataStore metadataStore = TM.getStore(mcrid);
+        if (metadataStore instanceof MCRVersioningMetadataStore) {
+            MCRVersioningMetadataStore verStore = (MCRVersioningMetadataStore) metadataStore;
+            MCRVersionedMetadata versionedMetadata = verStore.retrieve(mcrid.getNumberAsInteger());
+            List<MCRMetadataVersion> versions = versionedMetadata.listVersions();
+            if (rev == REV_LATEST && versions.size() > 0) {
+                //request latest available revision
+                MCRMetadataVersion lastVersion = versions.get(versions.size() - 1);
+                if (lastVersion.getType() == MCRMetadataVersion.DELETED) {
+                    lastVersion = versions.get(versions.size() - 2);
+                }
+                return lastVersion.retrieve().asXML();
+            }
+            for (MCRMetadataVersion version : versions) {
+                //request specific revision
+                if (version.getRevision() == rev) {
+                    return version.retrieve().asXML();
+                }
+            }
+            generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_NOT_FOUND, "Revision not found: " + rev, null, false);
+            return null;
+        }
+        generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_BAD_REQUEST, "No versions available for " + mcrid, null, false);
+        return null;
+    }
 
     private void setBrowseParameters(MCRServletJob job, String mcrid, String host, String editorID) {
         if (host != MCRHit.LOCAL) {
@@ -184,15 +235,13 @@ public class MCRObjectServlet extends MCRServlet {
                     // hit allocated
                     // search for next and previous object readable by user
                     for (int j = i - 1; j >= 0; j--) {
-                        if (results.getHit(j).getHost() != MCRHit.LOCAL
-                                || MCRAccessManager.checkPermission(results.getHit(j).getID(), "read")) {
+                        if (results.getHit(j).getHost() != MCRHit.LOCAL || MCRAccessManager.checkPermission(results.getHit(j).getID(), "read")) {
                             previousObject = results.getHit(j);
                             break;
                         }
                     }
                     for (int j = i + 1; j < numHits; j++) {
-                        if (results.getHit(j).getHost() != MCRHit.LOCAL
-                                || MCRAccessManager.checkPermission(results.getHit(j).getID(), "read")) {
+                        if (results.getHit(j).getHost() != MCRHit.LOCAL || MCRAccessManager.checkPermission(results.getHit(j).getID(), "read")) {
                             nextObject = results.getHit(j);
                             break;
                         }
