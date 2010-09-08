@@ -104,6 +104,79 @@
           <url>scp://server.mycore.de/mcr/mycore.de/generated/${project.version}</url>
         </site>
       </distributionManagement>
+      <reporting>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <configuration>
+              <source>${java.target.version}</source>
+              <groups>
+                <group>
+                  <title>MyCoRe Datamodel</title>
+                  <packages>org.mycore.datamodel*</packages>
+                </group>
+                <group>
+                  <title>MyCoRe Persistence Backend Implementations</title>
+                  <packages>org.mycore.backend*</packages>
+                </group>
+                <group>
+                  <title>MyCoRe User Interface Frontend</title>
+                  <packages>org.mycore.frontend*</packages>
+                </group>
+                <group>
+                  <title>MyCoRe Common Functionality</title>
+                  <packages>org.mycore.common*</packages>
+                </group>
+                <group>
+                  <title>MyCoRe Services</title>
+                  <packages>org.mycore.services*</packages>
+                </group>
+                <group>
+                  <title>MyCoRe User and Group Management</title>
+                  <packages>org.mycore.user*</packages>
+                </group>
+              </groups>
+              <tags>
+                <tag>
+                  <name>hibernate.property</name>
+                  <placement>X</placement>
+                </tag>
+                <tag>
+                  <name>goal</name>
+                  <placement>a</placement>
+                </tag>
+                <tag>
+                  <name>phase</name>
+                  <placement>a</placement>
+                </tag>
+              </tags>
+              <links>
+                <link>http://java.sun.com/javase/6/docs/api/</link>
+                <link>http://tomcat.apache.org/tomcat-5.5-doc/servletapi/</link>
+                <link>http://java.sun.com/xml/jaxp/dist/1.1/docs/api/</link>
+                <link>http://www.jdom.org/docs/apidocs</link>
+                <link>http://logging.apache.org/log4j/docs/api/</link>
+                <link>http://www.hibernate.org/hib_docs/v3/api/</link>
+                <link>http://lucene.apache.org/java/3_0_0/api/all/</link>
+              </links>
+            </configuration>
+            <reportSets>
+              <reportSet>
+                <reports>
+                  <report>aggregate</report>
+                </reports>
+              </reportSet>
+            </reportSets>
+          </plugin>
+          <plugin>
+            <artifactId>maven-checkstyle-plugin</artifactId>
+            <configuration>
+              <configLocation>${project.build.directory}/checkstyle.xml</configLocation>
+            </configuration>
+          </plugin>
+        </plugins>
+      </reporting>
     </profile>
   </profiles>
   <repositories>
@@ -257,79 +330,6 @@
       </plugin>
     </plugins>
   </build>
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <configuration>
-          <source>${java.target.version}</source>
-          <groups>
-            <group>
-              <title>MyCoRe Datamodel</title>
-              <packages>org.mycore.datamodel*</packages>
-            </group>
-            <group>
-              <title>MyCoRe Persistence Backend Implementations</title>
-              <packages>org.mycore.backend*</packages>
-            </group>
-            <group>
-              <title>MyCoRe User Interface Frontend</title>
-              <packages>org.mycore.frontend*</packages>
-            </group>
-            <group>
-              <title>MyCoRe Common Functionality</title>
-              <packages>org.mycore.common*</packages>
-            </group>
-            <group>
-              <title>MyCoRe Services</title>
-              <packages>org.mycore.services*</packages>
-            </group>
-            <group>
-              <title>MyCoRe User and Group Management</title>
-              <packages>org.mycore.user*</packages>
-            </group>
-          </groups>
-          <tags>
-            <tag>
-              <name>hibernate.property</name>
-              <placement>X</placement>
-            </tag>
-            <tag>
-              <name>goal</name>
-              <placement>a</placement>
-            </tag>
-            <tag>
-              <name>phase</name>
-              <placement>a</placement>
-            </tag>
-          </tags>
-          <links>
-            <link>http://java.sun.com/javase/6/docs/api/</link>
-            <link>http://tomcat.apache.org/tomcat-5.5-doc/servletapi/</link>
-            <link>http://java.sun.com/xml/jaxp/dist/1.1/docs/api/</link>
-            <link>http://www.jdom.org/docs/apidocs</link>
-            <link>http://logging.apache.org/log4j/docs/api/</link>
-            <link>http://www.hibernate.org/hib_docs/v3/api/</link>
-            <link>http://lucene.apache.org/java/3_0_0/api/all/</link>
-          </links>
-        </configuration>
-        <reportSets>
-          <reportSet>
-            <reports>
-              <report>aggregate</report>
-            </reports>
-          </reportSet>
-        </reportSets>
-      </plugin>
-      <plugin>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <configLocation>${project.build.directory}/checkstyle.xml</configLocation>
-        </configuration>
-      </plugin>
-    </plugins>
-  </reporting>
   <dependencyManagement>
     <dependencies>
       <dependency>
