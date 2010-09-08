@@ -37,6 +37,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.Selectors;
 import org.apache.commons.vfs.VFS;
 import org.jdom.Document;
@@ -264,16 +265,15 @@ public class MCRFileStoreTest extends MCRTestCase {
 
         file3.clearLabels();
         xml2 = MCRContent.readFrom(col.getMetadata()).asXML();
-        String path = col.fo.getName().getPath();
-        System.out.println(path);
-        new File(path, "mcrdata.xml").delete();
+
+        col.fo.getChild("mcrdata.xml").delete();
         col = store.retrieve(col.getID());
         xml1 = MCRContent.readFrom(col.getMetadata()).asXML();
         assertTrue(equals(xml1, xml2));
 
-        new File(path, "test1.txt").delete();
-        File tmp = new File(path, "test3.txt");
-        tmp.createNewFile();
+        col.fo.getChild("test1.txt").delete();
+        FileObject tmp = col.fo.resolveFile("test3.txt");
+        tmp.createFile();
         MCRContent.readFrom("Hallo Welt!").sendTo(tmp);
         col.repairMetadata();
         String xml3 = MCRContent.readFrom(col.getMetadata()).asString();
