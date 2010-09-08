@@ -36,6 +36,7 @@ import java.net.URLDecoder;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -77,6 +78,11 @@ import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.common.MCRXMLTableManager;
 import org.mycore.datamodel.ifs.MCRDirectoryXML;
 import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.datamodel.ifs2.MCRMetadataStore;
+import org.mycore.datamodel.ifs2.MCRMetadataVersion;
+import org.mycore.datamodel.ifs2.MCRStoredMetadata;
+import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
+import org.mycore.datamodel.ifs2.MCRVersioningMetadataStore;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.services.fieldquery.MCRQuery;
@@ -180,6 +186,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         supportedSchemes.put("notnull", new MCRNotNullResolver());
         supportedSchemes.put("xslStyle", new MCRXslStyleResolver());
         supportedSchemes.put("xslInclude", getURIResolver(new MCRXslIncludeResolver()));
+        supportedSchemes.put("versioninfo", new MCRVersionInfoResolver());
         return supportedSchemes;
     }
 
@@ -1334,6 +1341,51 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             } else {
                 return name.split(":")[1];
             }
+        }
+    }
+
+    private static class MCRVersionInfoResolver implements URIResolver {
+
+        @Override
+        public Source resolve(String href, String base) throws TransformerException {
+            String id = href.substring(href.indexOf(":") + 1);
+            LOGGER.debug("Reading version info of MCRObject with ID " + id);
+            String[] idParts = id.split("_");
+            int intID = Integer.parseInt(idParts[2]);
+            MCRMetadataStore metadataStore = MCRXMLTableManager.instance().getStore(idParts[0], idParts[1]);
+            try {
+                if (metadataStore instanceof MCRVersioningMetadataStore) {
+                    MCRVersioningMetadataStore vms = (MCRVersioningMetadataStore) metadataStore;
+                    MCRVersionedMetadata versionedMetadata = vms.retrieve(intID);
+                    List<MCRMetadataVersion> versions = versionedMetadata.listVersions();
+                    return getSource(versions);
+                } else {
+                    return getSource(metadataStore.retrieve(intID));
+                }
+            } catch (Exception e) {
+                throw new TransformerException(e);
+            }
+        }
+
+        private Source getSource(MCRStoredMetadata retrieve) throws IOException {
+            Element e = new Element("versions");
+            Element v = new Element("version");
+            e.addContent(v);
+            v.setAttribute("date", MCRXMLFunctions.getISODate(retrieve.getLastModified(), null));
+            return new JDOMSource(e);
+        }
+
+        private Source getSource(List<MCRMetadataVersion> versions) {
+            Element e = new Element("versions");
+            for (MCRMetadataVersion version : versions) {
+                Element v = new Element("version");
+                v.setAttribute("user", version.getUser());
+                v.setAttribute("date", MCRXMLFunctions.getISODate(version.getDate(), null));
+                v.setAttribute("r", Long.toString(version.getRevision()));
+                v.setAttribute("action", Character.toString(version.getType()));
+                e.addContent(v);
+            }
+            return new JDOMSource(e);
         }
     }
 }

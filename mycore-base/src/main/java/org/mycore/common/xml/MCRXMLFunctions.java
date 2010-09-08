@@ -169,6 +169,10 @@ public class MCRXMLFunctions {
             // result "1964-02-23"
             date = df.parse(simpleDate);
         }
+        return getISODate(date, isoFormat);
+    }
+
+    public static String getISODate(Date date, String isoFormat) {
         MCRMetaISO8601Date mcrdate = new MCRMetaISO8601Date();
         mcrdate.setDate(date);
         mcrdate.setFormat(isoFormat);

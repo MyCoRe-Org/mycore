@@ -229,8 +229,9 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
      * repository
      * 
      * @return all stored versions of this metadata object
+     * @throws SVNException 
      */
-    public List<MCRMetadataVersion> listVersions() throws Exception {
+    public List<MCRMetadataVersion> listVersions() throws SVNException {
         List<MCRMetadataVersion> versions = new ArrayList<MCRMetadataVersion>();
         SVNRepository repository = getStore().getRepository();
         String path = store.getSlotPath(id);
