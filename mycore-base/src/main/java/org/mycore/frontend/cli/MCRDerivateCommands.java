@@ -35,7 +35,7 @@ import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRURIResolver;
-import org.mycore.datamodel.common.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRFileImportExport;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
@@ -133,7 +133,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * deletes all MCRDerivate from the datastore.
      */
     public static List<String> deleteAllDerivates() {
-        List<String> ids = MCRXMLTableManager.instance().listIDsOfType("derivate");
+        List<String> ids = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
         List<String> cmds = new ArrayList<String>(ids.size());
         for (String id : ids) {
             cmds.add("delete derivate " + id);
@@ -449,7 +449,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             throw new MCRException(dirname + " is not a dirctory.");
         }
 
-        List<String> ids = MCRXMLTableManager.instance().listIDsOfType("derivate");
+        List<String> ids = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
         List<String> cmds = new ArrayList<String>(ids.size());
         for (String id : ids) {
             cmds.add(new StringBuilder("export derivate ").append(id).append(" to directory ").append(dirname).append(" with ").append(style).toString());
@@ -556,7 +556,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      */
     public static List<String> repairDerivateSearch() {
         LOGGER.info("Start the repair for type derivate.");
-        List<String> ids = MCRXMLTableManager.instance().listIDsOfType("derivate");
+        List<String> ids = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
         if (ids.size() == 0) {
             LOGGER.warn("No ID's was found for type derivate.");
             return Collections.emptyList();
@@ -599,7 +599,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      */
     public static List<String> synchronizeAllDerivates() {
         LOGGER.info("Start the synchronization for derivates.");
-        List<String> ids = MCRXMLTableManager.instance().listIDsOfType("derivate");
+        List<String> ids = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
         if (ids.size() == 0) {
             LOGGER.warn("No ID's was found for type derivate.");
             return Collections.emptyList();

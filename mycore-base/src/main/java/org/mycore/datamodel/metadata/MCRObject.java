@@ -41,7 +41,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRLinkTableManager;
-import org.mycore.datamodel.common.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -530,7 +530,7 @@ final public class MCRObject extends MCRBase {
      *                if a persistence problem is occured
      */
     public final static boolean existInDatastore(MCRObjectID id) throws MCRPersistenceException {
-        return MCRXMLTableManager.instance().exists(id);
+        return MCRXMLMetadataManager.instance().exists(id);
     }
 
     /**
@@ -557,7 +557,7 @@ final public class MCRObject extends MCRBase {
      *                if a persistence problem is occured
      */
     public final void receiveFromDatastore(MCRObjectID id) throws MCRPersistenceException {
-        setFromJDOM(MCRXMLTableManager.instance().retrieveXML(id));
+        setFromJDOM(MCRXMLMetadataManager.instance().retrieveXML(id));
     }
 
     /**
@@ -585,7 +585,7 @@ final public class MCRObject extends MCRBase {
      *                if a persistence problem is occured
      */
     public static final byte[] receiveXMLFromDatastore(MCRObjectID id) throws MCRPersistenceException {
-        return MCRXMLTableManager.instance().retrieveBLOB(id);
+        return MCRXMLMetadataManager.instance().retrieveBLOB(id);
     }
 
     /**
@@ -613,7 +613,7 @@ final public class MCRObject extends MCRBase {
      *                if a persistence problem is occured
      */
     public final org.jdom.Document receiveJDOMFromDatastore(MCRObjectID id) throws MCRPersistenceException {
-        return MCRXMLTableManager.instance().retrieveXML(id);
+        return MCRXMLMetadataManager.instance().retrieveXML(id);
     }
 
     /**
@@ -938,7 +938,7 @@ final public class MCRObject extends MCRBase {
                 }
                 if (inf instanceof MCRMetaLinkID) {
                     String destination = ((MCRMetaLinkID) inf).getXLinkHref();
-                    if (!MCRXMLTableManager.instance().exists(new MCRObjectID(destination))) {
+                    if (!MCRXMLMetadataManager.instance().exists(new MCRObjectID(destination))) {
                         continue;
                     }
                     MCRActiveLinkException activeLink = new MCRActiveLinkException(

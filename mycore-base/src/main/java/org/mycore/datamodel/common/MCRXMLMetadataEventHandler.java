@@ -34,12 +34,12 @@ import org.mycore.datamodel.metadata.MCRObject;
  * 
  * @author Jens Kupferschmidt
  */
-public class MCRXMLTableEventHandler extends MCREventHandlerBase {
+public class MCRXMLMetadataEventHandler extends MCREventHandlerBase {
 
-    static MCRXMLTableManager mcr_xmltable = MCRXMLTableManager.instance();
+    static MCRXMLMetadataManager metaDataManager = MCRXMLMetadataManager.instance();
 
     /**
-     * This method add the data to SQL table of XML data via MCRXMLTableManager.
+     * This method add the data to SQL table of XML data via MCRXMLMetadataManager.
      * 
      * @param evt
      *            the event that occured
@@ -48,12 +48,12 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      */
     @Override
     protected final void handleObjectCreated(MCREvent evt, MCRObject obj) {
-        mcr_xmltable.create(obj.getId(), obj.createXML(), obj.getService().getDate("modifydate"));
+        metaDataManager.create(obj.getId(), obj.createXML(), obj.getService().getDate("modifydate"));
     }
 
     /**
      * This method update the data to SQL table of XML data via
-     * MCRXMLTableManager.
+     * MCRXMLMetadataManager.
      * 
      * @param evt
      *            the event that occured
@@ -62,12 +62,12 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      */
     @Override
     protected final void handleObjectUpdated(MCREvent evt, MCRObject obj) {
-        mcr_xmltable.update(obj.getId(), obj.createXML(), obj.getService().getDate("modifydate"));
+        metaDataManager.update(obj.getId(), obj.createXML(), obj.getService().getDate("modifydate"));
     }
 
     /**
      * This method delete the XML data from SQL table data via
-     * MCRXMLTableManager.
+     * MCRXMLMetadataManager.
      * 
      * @param evt
      *            the event that occured
@@ -76,11 +76,11 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      */
     @Override
     protected final void handleObjectDeleted(MCREvent evt, MCRObject obj) {
-        mcr_xmltable.delete(obj.getId());
+        metaDataManager.delete(obj.getId());
     }
 
     /**
-     * This method add the data to SQL table of XML data via MCRXMLTableManager.
+     * This method add the data to SQL table of XML data via MCRXMLMetadataManager.
      * 
      * @param evt
      *            the event that occured
@@ -89,12 +89,12 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      */
     @Override
     protected final void handleDerivateCreated(MCREvent evt, MCRDerivate der) {
-        mcr_xmltable.create(der.getId(), der.createXML(), der.getService().getDate("modifydate"));
+        metaDataManager.create(der.getId(), der.createXML(), der.getService().getDate("modifydate"));
     }
 
     /**
      * This method update the data to SQL table of XML data via
-     * MCRXMLTableManager.
+     * MCRXMLMetadataManager.
      * 
      * @param evt
      *            the event that occured
@@ -103,12 +103,12 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      */
     @Override
     protected final void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
-        mcr_xmltable.update(der.getId(), der.createXML(), der.getService().getDate("modifydate"));
+        metaDataManager.update(der.getId(), der.createXML(), der.getService().getDate("modifydate"));
     }
 
     /**
      * This method delete the XML data from SQL table data via
-     * MCRXMLTableManager.
+     * MCRXMLMetadataManager.
      * 
      * @param evt
      *            the event that occured
@@ -117,7 +117,7 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      */
     @Override
     protected final void handleDerivateDeleted(MCREvent evt, MCRDerivate der) {
-        mcr_xmltable.delete(der.getId());
+        metaDataManager.delete(der.getId());
     }
 
 }

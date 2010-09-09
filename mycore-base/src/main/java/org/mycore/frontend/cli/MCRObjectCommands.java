@@ -33,7 +33,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.common.MCRActiveLinkException;
-import org.mycore.datamodel.common.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.parsers.bool.MCRCondition;
@@ -182,7 +182,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the type of the MCRObjects that should be deleted
      */
     public static final List<String> deleteAllObjects(String type) throws MCRActiveLinkException {
-        final List<String> objectIds = MCRXMLTableManager.instance().listIDsOfType(type);
+        final List<String> objectIds = MCRXMLMetadataManager.instance().listIDsOfType(type);
         List<String> cmds = new ArrayList<String>(objectIds.size());
         for (String id : objectIds) {
             cmds.add("delete object " + id);
@@ -511,7 +511,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             LOGGER.error(dirname + " is not a dirctory.");
             return Collections.emptyList();
         }
-        List<String> objectIds = MCRXMLTableManager.instance().listIDsOfType(type);
+        List<String> objectIds = MCRXMLMetadataManager.instance().listIDsOfType(type);
         List<String> cmds = new ArrayList<String>(objectIds.size());
         for (String id : objectIds) {
             cmds.add(new StringBuilder("export object from ")
@@ -688,7 +688,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             LOGGER.error("The type " + type + " was not found.");
             return Collections.emptyList();
         }
-        List<String> ar = (List<String>) MCRXMLTableManager.instance().listIDsOfType(type);
+        List<String> ar = (List<String>) MCRXMLMetadataManager.instance().listIDsOfType(type);
         if (ar.size() == 0) {
             LOGGER.warn("No ID's was found for type " + type + ".");
             return Collections.emptyList();
@@ -878,7 +878,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             LOGGER.error("The type " + type + " was not found.");
             return;
         }
-        List<String> ar = (List<String>) MCRXMLTableManager.instance().listIDsOfType(type);
+        List<String> ar = (List<String>) MCRXMLMetadataManager.instance().listIDsOfType(type);
         if (ar.size() == 0) {
             LOGGER.warn("No ID's was found for type " + type + ".");
             return;

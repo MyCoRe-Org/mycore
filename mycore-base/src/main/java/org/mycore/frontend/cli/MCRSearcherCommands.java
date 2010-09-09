@@ -45,7 +45,7 @@ import org.mycore.backend.hibernate.tables.MCRFSNODES;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.xml.MCRXMLResource;
-import org.mycore.datamodel.common.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFileMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -102,7 +102,7 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
             searcher.clearIndex();
             searcher.notifySearcher("insert");
             //TODO: Code needs to be made fast again after IFS2 Metastore is matured
-            MCRXMLTableManager mcrxmlTableManager = MCRXMLTableManager.instance();
+            MCRXMLMetadataManager mcrxmlTableManager = MCRXMLMetadataManager.instance();
             for (String id : mcrxmlTableManager.listIDs()) {
                 MCRObjectID mcrid = new MCRObjectID(id);
                 addMetaToIndex(mcrid, mcrxmlTableManager.retrieveBLOB(mcrid), false, searcher);

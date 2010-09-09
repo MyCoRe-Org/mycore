@@ -32,7 +32,7 @@ import javax.xml.ws.Endpoint;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
-import org.mycore.datamodel.common.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
@@ -95,7 +95,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
     }
 
     private static List<String> forAllDerivates(String command) {
-        List<String> ids = MCRXMLTableManager.instance().listIDsOfType("derivate");
+        List<String> ids = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
         List<String> cmds = new ArrayList<String>(ids.size());
         for (String id : ids) {
             cmds.add(command + " of derivate " + id);

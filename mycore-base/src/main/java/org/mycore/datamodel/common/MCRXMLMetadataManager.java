@@ -79,15 +79,15 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
  */
-public class MCRXMLTableManager {
+public class MCRXMLMetadataManager {
 
     /** The singleton */
-    private static MCRXMLTableManager SINGLETON;
+    private static MCRXMLMetadataManager SINGLETON;
 
     /** Returns the singleton */
-    public static synchronized MCRXMLTableManager instance() {
+    public static synchronized MCRXMLMetadataManager instance() {
         if (SINGLETON == null) {
-            SINGLETON = new MCRXMLTableManager();
+            SINGLETON = new MCRXMLMetadataManager();
         }
         return SINGLETON;
     }
@@ -95,7 +95,7 @@ public class MCRXMLTableManager {
     /**
      * Reads configuration properties, checks and creates base directories and builds the singleton
      */
-    protected MCRXMLTableManager() {
+    protected MCRXMLMetadataManager() {
         MCRConfiguration config = MCRConfiguration.instance();
 
         String pattern = config.getString("MCR.Metadata.ObjectID.NumberPattern", "0000000000");
@@ -209,50 +209,48 @@ public class MCRXMLTableManager {
     }
 
     private void setupStore(String project, String objectType, String configPrefix) {
-        {
-            MCRConfiguration config = MCRConfiguration.instance();
+        MCRConfiguration config = MCRConfiguration.instance();
 
-            String clazz = config.getString(configPrefix + "Class", null);
-            if (clazz == null) {
-                config.set(configPrefix + "Class", defaultClass);
-                clazz = defaultClass;
-            }
-            Class<?> impl;
-            try {
-                impl = Class.forName(clazz);
-            } catch (ClassNotFoundException e) {
-                throw new MCRException("Could not load class " + clazz + " for " + project + "_" + objectType);
-            }
-            if (MCRVersioningMetadataStore.class.isAssignableFrom(impl)) {
-                String svnURL = config.getString(configPrefix + "SVNRepositoryURL", null);
-                if (svnURL == null) {
-                    config.set(configPrefix + "SVNRepositoryURL", svnBase + "/" + project + "/" + objectType);
+        String clazz = config.getString(configPrefix + "Class", null);
+        if (clazz == null) {
+            config.set(configPrefix + "Class", defaultClass);
+            clazz = defaultClass;
+        }
+        Class<?> impl;
+        try {
+            impl = Class.forName(clazz);
+        } catch (ClassNotFoundException e) {
+            throw new MCRException("Could not load class " + clazz + " for " + project + "_" + objectType);
+        }
+        if (MCRVersioningMetadataStore.class.isAssignableFrom(impl)) {
+            String svnURL = config.getString(configPrefix + "SVNRepositoryURL", null);
+            if (svnURL == null) {
+                config.set(configPrefix + "SVNRepositoryURL", svnBase + "/" + project + "/" + objectType);
 
-                    File projectDir = new File(svnDir, project);
-                    if (!projectDir.exists()) {
-                        projectDir.mkdirs();
-                    }
+                File projectDir = new File(svnDir, project);
+                if (!projectDir.exists()) {
+                    projectDir.mkdirs();
                 }
             }
-
-            String slotLayout = config.getString(configPrefix + "SlotLayout", null);
-            if (slotLayout == null) {
-                config.set(configPrefix + "SlotLayout", defaultLayout);
-            }
-
-            File projectDir = new File(baseDir, project);
-            if (!projectDir.exists()) {
-                projectDir.mkdir();
-            }
-
-            File typeDir = new File(projectDir, objectType);
-            if (!typeDir.exists()) {
-                typeDir.mkdir();
-            }
-
-            config.set(configPrefix + "BaseDir", typeDir.getAbsolutePath());
-            config.set(configPrefix + "ForceXML", true);
         }
+
+        String slotLayout = config.getString(configPrefix + "SlotLayout", null);
+        if (slotLayout == null) {
+            config.set(configPrefix + "SlotLayout", defaultLayout);
+        }
+
+        File projectDir = new File(baseDir, project);
+        if (!projectDir.exists()) {
+            projectDir.mkdir();
+        }
+
+        File typeDir = new File(projectDir, objectType);
+        if (!typeDir.exists()) {
+            typeDir.mkdir();
+        }
+
+        config.set(configPrefix + "BaseDir", typeDir.getAbsolutePath());
+        config.set(configPrefix + "ForceXML", true);
     }
 
     /**

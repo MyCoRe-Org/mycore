@@ -1,4 +1,4 @@
-package org.mycore.datamodel.ifs2;
+package org.mycore.datamodel.common;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -22,7 +22,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
-import org.mycore.datamodel.common.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 
@@ -30,9 +31,9 @@ import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
  * @author Thomas Scheffler (yagee)
  * @author Frank Lützenkirchen
  */
-public class MCRXMLTableManagerTest extends MCRTestCase {
+public class MCRXMLMetadataManagerTest extends MCRTestCase {
 
-    private static MCRXMLTableManager store;
+    private static MCRXMLMetadataManager store;
 
     private static File baseDirectory;
 
@@ -65,7 +66,7 @@ public class MCRXMLTableManagerTest extends MCRTestCase {
             String uri = "file:///" + svnDirectory.getAbsolutePath().replace('\\', '/');
             setProperty("MCR.Metadata.Store.SVNBase", uri, true);
 
-            store = MCRXMLTableManager.instance();
+            store = MCRXMLMetadataManager.instance();
         }
     }
 

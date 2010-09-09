@@ -41,7 +41,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.common.MCRObjectIDDate;
-import org.mycore.datamodel.common.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs2.MCRObjectIDFileSystemDate;
 import org.mycore.datamodel.ifs2.MCRStoredMetadata;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -87,7 +87,7 @@ public final class MCRGoogleSitemapCommon {
     private static int numberOfURLs = MCRConfiguration.instance().getInt("MCR.GoogleSitemap.NumberOfURLs", 50000);
 
     /** The XML table API */
-    private static final MCRXMLTableManager tm = MCRXMLTableManager.instance();
+    private static final MCRXMLMetadataManager tm = MCRXMLMetadataManager.instance();
 
     /** number format for parts */
     private static DecimalFormat number_format = new DecimalFormat("0000");

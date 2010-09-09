@@ -12,7 +12,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRXMLTABLE;
-import org.mycore.datamodel.common.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
 import org.mycore.datamodel.ifs2.MCRVersioningMetadataStore;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -86,7 +86,7 @@ public class MCRMigratingXMLStore extends MCRVersioningMetadataStore {
     private void migrateObject(int id) throws IOException {
         MCRObjectID mcrId = new MCRObjectID(getID() + "_" + id);
         Session session = MCRHIBConnection.instance().getSession();
-        MCRXMLTableManager manager = MCRXMLTableManager.instance();
+        MCRXMLMetadataManager manager = MCRXMLMetadataManager.instance();
         Criteria criteria = session.createCriteria(MCRXMLTABLE.class).add(Restrictions.eq("key.id", mcrId.toString()));
         @SuppressWarnings("unchecked")
         List<MCRXMLTABLE> results = criteria.list();

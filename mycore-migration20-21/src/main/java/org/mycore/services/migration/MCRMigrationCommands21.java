@@ -8,7 +8,7 @@ import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRXMLTABLE;
-import org.mycore.datamodel.common.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRCommand;
@@ -29,7 +29,7 @@ public class MCRMigrationCommands21 extends MCRAbstractCommands {
 
     public static void migrateXMLTable() {
         Session session = MCRHIBConnection.instance().getSession();
-        MCRXMLTableManager manager = MCRXMLTableManager.instance();
+        MCRXMLMetadataManager manager = MCRXMLMetadataManager.instance();
         ScrollableResults xmlentries = session.createCriteria(MCRXMLTABLE.class).scroll(ScrollMode.FORWARD_ONLY);
         while (xmlentries.next()) {
             MCRXMLTABLE xmlentry = (MCRXMLTABLE) xmlentries.get(0);

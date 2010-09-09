@@ -28,7 +28,7 @@ import java.util.HashMap;
 
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
-import org.mycore.datamodel.common.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
 
 /**
  * This class holds all informations and methods to handle the MyCoRe Object ID.
@@ -117,7 +117,7 @@ public final class MCRObjectID {
     public static MCRObjectID getLastID(String base_id) {
         String[] idParts = getIDParts(base_id);
         int last = lastnumber.containsKey(base_id) ? lastnumber.get(base_id) : 0;
-        int stored = MCRXMLTableManager.instance().getHighestStoredID(idParts[0], idParts[1]);
+        int stored = MCRXMLMetadataManager.instance().getHighestStoredID(idParts[0], idParts[1]);
         return new MCRObjectID(base_id + "_" + String.valueOf(Math.max(last, stored)));
     }
 

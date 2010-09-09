@@ -36,7 +36,7 @@ import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.common.xml.MCRXMLHelper;
-import org.mycore.datamodel.common.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFileImportExport;
 
@@ -232,7 +232,7 @@ final public class MCRDerivate extends MCRBase {
             throw new MCRPersistenceException("The derivate " + mcr_id.toString() + " is not valid.");
         }
         String objid = mcr_derivate.getMetaLink().getXLinkHref();
-        if (!MCRXMLTableManager.instance().exists(new MCRObjectID(objid))) {
+        if (!MCRXMLMetadataManager.instance().exists(new MCRObjectID(objid))) {
             throw new MCRPersistenceException("The derivate " + mcr_id.toString() + " can't find metadata object " + objid + ", nothing done.");
         }
 
@@ -255,7 +255,7 @@ final public class MCRDerivate extends MCRBase {
         MCRMetaLinkID der = new MCRMetaLinkID();
         der.setReference(mcr_id.toString(), mcr_label, "");
         der.setSubTag("derobject");
-        byte[] backup = MCRXMLTableManager.instance().retrieveBLOB(meta.getXLinkHrefID());
+        byte[] backup = MCRXMLMetadataManager.instance().retrieveBLOB(meta.getXLinkHrefID());
 
         try {
             MCRObject obj = new MCRObject();
@@ -404,7 +404,7 @@ final public class MCRDerivate extends MCRBase {
      *                if a persistence problem is occured
      */
     public final static boolean existInDatastore(MCRObjectID id) throws MCRPersistenceException {
-        return MCRXMLTableManager.instance().exists(id);
+        return MCRXMLMetadataManager.instance().exists(id);
     }
 
     /**
@@ -460,7 +460,7 @@ final public class MCRDerivate extends MCRBase {
      *                if a persistence problem is occured
      */
     public static final byte[] receiveXMLFromDatastore(MCRObjectID id) throws MCRPersistenceException {
-        return MCRXMLTableManager.instance().retrieveBLOB(id);
+        return MCRXMLMetadataManager.instance().retrieveBLOB(id);
     }
 
     /**

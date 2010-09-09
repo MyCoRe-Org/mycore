@@ -54,7 +54,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.common.xml.MCRXMLResource;
 import org.mycore.common.xml.MCRXSLTransformation;
-import org.mycore.datamodel.common.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
@@ -86,7 +86,7 @@ public class MCRZipServlet extends MCRServlet {
 
     private static String accessErrorPage = MCRConfiguration.instance().getString("MCR.Access.Page.Error");
 
-    protected MCRXMLTableManager xmltable = null;
+    protected MCRXMLMetadataManager xmltable = null;
 
     protected String stylesheet;
 
@@ -97,7 +97,7 @@ public class MCRZipServlet extends MCRServlet {
     @Override
     public void init() throws MCRConfigurationException, ServletException {
         super.init();
-        xmltable = MCRXMLTableManager.instance();
+        xmltable = MCRXMLMetadataManager.instance();
         stylesheet = MCRConfiguration.instance().getString("MCR.zip.metadata.transformer");
     }
 

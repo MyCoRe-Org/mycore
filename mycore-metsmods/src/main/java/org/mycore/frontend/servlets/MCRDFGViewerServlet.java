@@ -40,7 +40,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.datamodel.common.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
@@ -61,7 +61,7 @@ public class MCRDFGViewerServlet extends MCRStartEditorServlet {
     private static Logger LOGGER = Logger.getLogger(MCRDFGViewerServlet.class.getName());
 
     /** The XML table API */
-    static final MCRXMLTableManager tm = MCRXMLTableManager.instance();
+    static final MCRXMLMetadataManager tm = MCRXMLMetadataManager.instance();
 
     private static String metsfile = MCRConfiguration.instance().getString("MCR.MetsMots.MetsFile", "mets.xml");
 

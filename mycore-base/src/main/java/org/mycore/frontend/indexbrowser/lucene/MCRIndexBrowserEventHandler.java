@@ -57,7 +57,7 @@ public class MCRIndexBrowserEventHandler extends MCREventHandlerBase {
 
     /**
      * This method update the data to SQL table of XML data via
-     * MCRXMLTableManager.
+     * MCRXMLMetadataManager.
      * 
      * @param evt
      *            the event that occured
@@ -71,7 +71,7 @@ public class MCRIndexBrowserEventHandler extends MCREventHandlerBase {
 
     /**
      * This method delete the XML data from SQL table data via
-     * MCRXMLTableManager.
+     * MCRXMLMetadataManager.
      * 
      * @param evt
      *            the event that occured

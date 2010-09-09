@@ -19,7 +19,7 @@ import org.jdom.Text;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
-import org.mycore.datamodel.common.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRFieldDef;
@@ -89,7 +89,7 @@ public abstract class MCRRedundancyAbstractMapGenerator {
         // use the xpath values as compare string
         List<XPath> xpathList = typeData.getXPathCompareList();
         if(xpathList != null && xpathList.size() > 0) {
-            Document doc = MCRXMLTableManager.instance().retrieveXML(new MCRObjectID(mcrHit.getID()));
+            Document doc = MCRXMLMetadataManager.instance().retrieveXML(new MCRObjectID(mcrHit.getID()));
             for(int i = 0; i < xpathList.size(); i++) {
                 try {
                     Object o = xpathList.get(i).selectSingleNode(doc);

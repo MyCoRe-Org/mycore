@@ -11,7 +11,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRHibTestCase;
-import org.mycore.datamodel.common.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
 
 public class MCRObjectIDTest extends MCRHibTestCase {
     private static final String BASE_ID = "MyCoRe_test";
@@ -69,7 +69,7 @@ public class MCRObjectIDTest extends MCRHibTestCase {
         assertEquals("First id should be int 1", 1, id1.getNumberAsInteger());
         MCRObjectID id2 = MCRObjectID.getNextFreeId(BASE_ID);
         assertEquals("Second id should be int 2", 2, id2.getNumberAsInteger());
-        MCRXMLTableManager.instance().create(id2, new Document(new Element("test")), new Date());
+        MCRXMLMetadataManager.instance().create(id2, new Document(new Element("test")), new Date());
         MCRObjectID id3 = MCRObjectID.getNextFreeId(BASE_ID);
         assertEquals("Second id should be int 3", 3, id3.getNumberAsInteger());
     }

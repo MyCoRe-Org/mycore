@@ -31,7 +31,7 @@ import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.datamodel.common.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
 
 /**
  * The purpose of this interface is to make the choice of the persistence layer
@@ -126,7 +126,7 @@ public abstract class MCRAccessStore {
             MCRAccessDefinition def = null;
 
             if (MCRConfiguration.instance().getBoolean("MCR.Metadata.Type." + type)) {
-                elements = MCRXMLTableManager.instance().listIDsOfType(type);
+                elements = MCRXMLMetadataManager.instance().listIDsOfType(type);
             } else {
                 return Collections.emptySet();
             }

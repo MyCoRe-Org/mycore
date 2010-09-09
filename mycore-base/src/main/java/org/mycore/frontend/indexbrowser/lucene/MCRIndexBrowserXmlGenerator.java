@@ -16,7 +16,7 @@ import org.jdom.xpath.XPath;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.datamodel.common.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
@@ -155,7 +155,7 @@ public class MCRIndexBrowserXmlGenerator {
             for (int i = from; i < to; i++) {
                 MCRIndexBrowserEntry entry = resultList.get(i);
                 String id = entry.getObjectId();
-                Document jdomDoc = MCRXMLTableManager.instance().retrieveXML(new MCRObjectID(id));
+                Document jdomDoc = MCRXMLMetadataManager.instance().retrieveXML(new MCRObjectID(id));
                 // outputfields came only from metadataobject
                 setListeElm(jdomDoc, indexConfig.getOutputList(), entry);
             }

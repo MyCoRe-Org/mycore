@@ -75,7 +75,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
-import org.mycore.datamodel.common.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRDirectoryXML;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs2.MCRMetadataStore;
@@ -552,7 +552,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             LOGGER.debug("Reading MCRObject with ID " + id);
 
             MCRObjectID mcrid = new MCRObjectID(id);
-            Document doc = MCRXMLTableManager.instance().retrieveXML(mcrid);
+            Document doc = MCRXMLMetadataManager.instance().retrieveXML(mcrid);
 
             LOGGER.debug("end resolving " + uri);
             return doc.getRootElement();
@@ -1022,7 +1022,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         }
 
         private static long getSystemLastModified() {
-            long xmlLastModified = MCRXMLTableManager.instance().getLastModified();
+            long xmlLastModified = MCRXMLMetadataManager.instance().getLastModified();
             long classLastModified = DAO.getLastModified();
             return Math.max(xmlLastModified, classLastModified);
         }
@@ -1352,7 +1352,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             LOGGER.debug("Reading version info of MCRObject with ID " + id);
             String[] idParts = id.split("_");
             int intID = Integer.parseInt(idParts[2]);
-            MCRMetadataStore metadataStore = MCRXMLTableManager.instance().getStore(idParts[0], idParts[1]);
+            MCRMetadataStore metadataStore = MCRXMLMetadataManager.instance().getStore(idParts[0], idParts[1]);
             try {
                 if (metadataStore instanceof MCRVersioningMetadataStore) {
                     MCRVersioningMetadataStore vms = (MCRVersioningMetadataStore) metadataStore;

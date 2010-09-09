@@ -41,7 +41,7 @@ import org.jdom.JDOMException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.datamodel.common.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
@@ -68,7 +68,7 @@ public class MCRObjectServlet extends MCRServlet {
 
     private static Logger LOGGER = Logger.getLogger(MCRObjectServlet.class);
 
-    private static MCRXMLTableManager TM = null;
+    private static MCRXMLMetadataManager TM = null;
 
     private static final Pattern SEARCH_ID_PATTERN = Pattern.compile("[\\?&]id=([^&]+)");
 
@@ -86,7 +86,7 @@ public class MCRObjectServlet extends MCRServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-        TM = MCRXMLTableManager.instance();
+        TM = MCRXMLMetadataManager.instance();
     }
 
     /**

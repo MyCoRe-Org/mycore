@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.datamodel.common.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
@@ -63,7 +63,7 @@ public class MCRParentRuleStrategy implements MCRAccessCheckStrategy {
     }
 
     private static String getParentID(String objectID) {
-        Document parentDoc = MCRXMLTableManager.instance().retrieveXML(new MCRObjectID(objectID));
+        Document parentDoc = MCRXMLMetadataManager.instance().retrieveXML(new MCRObjectID(objectID));
         final Element parentElement = parentDoc.getRootElement().getChild("structure").getChild("parents");
         if (parentElement != null) {
             return parentElement.getChild("parent").getAttributeValue("href", XLINK_NAMESPACE);

@@ -33,7 +33,7 @@ import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.datamodel.common.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
@@ -256,7 +256,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         LOGGER.debug("Build all METS files start.");
         final long start = System.currentTimeMillis();
         // get all derivates
-        List<String> derlist = MCRXMLTableManager.instance().listIDsOfType("derivate");
+        List<String> derlist = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
         for (String der : derlist) {
             buildMetsForMCRDerivateID(der);
         }
@@ -359,7 +359,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         LOGGER.debug("Check METS file start.");
         final long start = System.currentTimeMillis();
         // get all derivates
-        List<String> derlist = MCRXMLTableManager.instance().listIDsOfType("derivate");
+        List<String> derlist = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
         for (String der : derlist) {
             checkMetsForMCRDerivateID(der);
         }
@@ -407,7 +407,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
     public static void removeMets() throws Exception {
         LOGGER.debug("Remove METS file start.");
         final long start = System.currentTimeMillis();
-        List<String> derlist = MCRXMLTableManager.instance().listIDsOfType("derivate");
+        List<String> derlist = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
         for (String der : derlist) {
             MCRDirectory difs = MCRDirectory.getRootDirectory(der);
             if (difs != null) {
@@ -429,7 +429,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
     public static void removeMetsByZoomify() throws Exception {
         LOGGER.debug("Remove METS file from zoomify derivates start.");
         final long start = System.currentTimeMillis();
-        List<String> derlist = MCRXMLTableManager.instance().listIDsOfType("derivate");
+        List<String> derlist = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
         for (String der : derlist) {
             MCRDirectory difs = MCRDirectory.getRootDirectory(der);
             if (difs != null) {
