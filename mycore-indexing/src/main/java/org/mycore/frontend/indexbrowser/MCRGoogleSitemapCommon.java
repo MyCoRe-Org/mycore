@@ -120,11 +120,11 @@ public final class MCRGoogleSitemapCommon {
     protected final int checkSitemapFile() throws IOException {
         int number = 0;
         for (String type : types) {
-            List<String> ids = tm.listIDsOfType( type );
-            for( String id : ids )
-            {
-              MCRStoredMetadata sm = tm.retrieveStoredMetadata( new MCRObjectID( id ) );
-              objidlist.add( new MCRObjectIDFileSystemDate( sm, id ) );
+            List<String> ids = tm.listIDsOfType(type);
+            for (String id : ids) {
+                MCRObjectID mcrid = new MCRObjectID(id);
+                MCRStoredMetadata sm = tm.getStore(mcrid).retrieve(mcrid.getNumberAsInteger());
+                objidlist.add(new MCRObjectIDFileSystemDate(sm, id));
             }
         }
         number = objidlist.size() / numberOfURLs;
@@ -202,13 +202,13 @@ public final class MCRGoogleSitemapCommon {
 
     private Element buildURLElement(DateTimeFormatter formatter, MCRObjectIDDate objectIDDate) {
         String mcrID = objectIDDate.getId();
-        
+
         DateTime dt;
         if (objectIDDate.getLastModified() != null)
             dt = new DateTime(objectIDDate.getLastModified().getTime());
         else
             dt = new DateTime();
-        
+
         StringBuffer sb = new StringBuffer(1024);
         sb.append(baseurl).append(objectPath).append(mcrID);
         if ((style != null) && (style.trim().length() > 0)) {

@@ -78,13 +78,13 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     }
 
     protected void init(String docId, String derId) {
-        derID = derId;
+        MCRObjectID derOID = new MCRObjectID(derId);
+        derID = derOID.toString();
         docID = docId;
         if (derId != null && MCRDerivate.existInDatastore(derId)) {
             LOGGER.debug("Derivate allready exists: " + derId);
             newDerivate = false;
-            derivate = new MCRDerivate();
-            derivate.receiveFromDatastore(derId);
+            derivate = MCRDerivate.createFromDatastore(derOID);
         }
     }
 
@@ -171,7 +171,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     public void finishUpload() throws Exception {
         // existing files
         if (!rootDir.hasChildren()) {
-            derivate.deleteFromDatastore(derivate.getId().toString());
+            MCRDerivate.deleteFromDatastore(derivate.getId());
             LOGGER.warn("No file were uploaded, delete entry in database for " + derivate.getId().toString() + " and return.");
             return;
         }

@@ -68,8 +68,7 @@ public class MCRCheckCommitACLServlet extends MCRCheckACLBase {
                 return sb.toString();
             }
             if (ID.getTypeId().equals("derivate")) {
-                MCRDerivate der = new MCRDerivate();
-                der.receiveFromDatastore(ID);
+                MCRDerivate der = MCRDerivate.createFromDatastore(ID);
                 String parent = der.getDerivate().getMetaLink().getXLinkHref();
                 sb.append("receive/").append(parent);
                 return sb.toString();

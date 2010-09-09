@@ -12,6 +12,7 @@ import org.jdom.Element;
 import org.jdom.xpath.XPath;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * @author shermann
@@ -36,26 +37,22 @@ public class MCRDisplayHideDerivateServlet extends MCRServlet {
             return;
         }
         LOGGER.info("Toggling display attribute of " + derivate);
-        toggleDisplay(derivate);
+        MCRDerivate obj = MCRDerivate.createFromDatastore(new MCRObjectID(derivate));
+        toggleDisplay(obj);
 
-        String url = getBaseURL() + "receive/" + getParentHref(derivate);
+        String url = getBaseURL() + "receive/" + getParentHref(obj);
         job.getResponse().encodeRedirectURL(url);
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(url));
     }
 
-    private String getParentHref(String derivate) {
-        MCRDerivate obj = new MCRDerivate();
-        obj.receiveFromDatastore(derivate);
+    private String getParentHref(MCRDerivate obj) {
         return obj.getDerivate().getMetaLink().getXLinkHref();
     }
 
     /** 
      * Toggles the display attribute value of the derivate element. 
      * */
-    private void toggleDisplay(String derivateId) throws Exception {
-        MCRDerivate derObj = new MCRDerivate();
-        derObj.receiveFromDatastore(derivateId);
-
+    private void toggleDisplay(MCRDerivate derObj) throws Exception {
         Document xml = derObj.createXML();
         XPath xp = XPath.newInstance("mycorederivate/derivate");
         Element derivateNode = (Element) xp.selectSingleNode(xml);
@@ -73,10 +70,9 @@ public class MCRDisplayHideDerivateServlet extends MCRServlet {
             String oldVal = displayAttr.getValue();
             String newVal = oldVal.equals(String.valueOf(true)) ? String.valueOf(false) : String.valueOf(true);
             displayAttr.setValue(newVal);
-            LOGGER.info("Setting display attribute of derivate with id " + derivateId + " to " + newVal);
+            LOGGER.info("Setting display attribute of derivate with id " + derObj.getId() + " to " + newVal);
         }
-
-        derObj.setFromJDOM(xml);
-        derObj.updateXMLInDatastore();
+        MCRDerivate updated = new MCRDerivate(xml);
+        updated.updateXMLInDatastore();
     }
 }

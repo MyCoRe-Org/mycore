@@ -34,13 +34,16 @@ import org.jdom.Element;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRFileImportExport;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.xml.sax.SAXParseException;
 
 /**
  * Provides static methods that implement commands for the MyCoRe command line interface.
@@ -146,11 +149,13 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * 
      * @param ID
      *            the ID of the MCRDerivate that should be deleted
+     * @throws MCRActiveLinkException 
+     * @throws MCRPersistenceException 
      */
-    public static void delete(String ID) {
-        MCRDerivate mycore_obj = new MCRDerivate();
-        mycore_obj.deleteFromDatastore(ID);
-        LOGGER.info(mycore_obj.getId().toString() + " deleted.");
+    public static void delete(String ID) throws MCRPersistenceException, MCRActiveLinkException {
+        MCRObjectID objectID = new MCRObjectID(ID);
+        MCRDerivate.deleteFromDatastore(objectID);
+        LOGGER.info(objectID + " deleted.");
     }
 
     /**
@@ -160,8 +165,10 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the start ID for deleting the MCRDerivate
      * @param IDto
      *            the stop ID for deleting the MCRDerivate
+     * @throws MCRActiveLinkException 
+     * @throws MCRPersistenceException 
      */
-    public static void delete(String IDfrom, String IDto) {
+    public static void delete(String IDfrom, String IDto) throws MCRPersistenceException, MCRActiveLinkException {
         int from_i = 0;
         int to_i = 0;
 
@@ -248,8 +255,9 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * 
      * @param file
      *            the location of the xml file
+     * @throws SAXParseException 
      */
-    public static boolean loadFromFile(String file) {
+    public static boolean loadFromFile(String file) throws SAXParseException {
         return loadFromFile(file, true);
     }
 
@@ -260,8 +268,9 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the location of the xml file
      * @param importMode
      *            if true, servdates are taken from xml file
+     * @throws SAXParseException 
      */
-    public static boolean loadFromFile(String file, boolean importMode) {
+    public static boolean loadFromFile(String file, boolean importMode) throws SAXParseException {
         return processFromFile(new File(file), false, importMode);
     }
 
@@ -270,8 +279,9 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * 
      * @param file
      *            the location of the xml file
+     * @throws SAXParseException 
      */
-    public static boolean updateFromFile(String file) {
+    public static boolean updateFromFile(String file) throws SAXParseException {
         return updateFromFile(file, true);
     }
 
@@ -282,8 +292,9 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the location of the xml file
      * @param importMode
      *            if true, servdates are taken from xml file
+     * @throws SAXParseException 
      */
-    public static boolean updateFromFile(String file, boolean importMode) {
+    public static boolean updateFromFile(String file, boolean importMode) throws SAXParseException {
         return processFromFile(new File(file), true, importMode);
     }
 
@@ -296,8 +307,9 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            if true, object will be updated, else object is created
      * @param importMode
      *            if true, servdates are taken from xml file
+     * @throws SAXParseException 
      */
-    private static boolean processFromFile(File file, boolean update, boolean importMode) {
+    private static boolean processFromFile(File file, boolean update, boolean importMode) throws SAXParseException {
         if (!file.getName().endsWith(".xml")) {
             LOGGER.warn(file + " ignored, does not end with *.xml");
             return false;
@@ -310,9 +322,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
         LOGGER.info("Reading file " + file + " ...");
 
-        MCRDerivate mycore_obj = new MCRDerivate();
+        MCRDerivate mycore_obj = new MCRDerivate(file.toURI());
         mycore_obj.setImportMode(importMode);
-        mycore_obj.setFromURI(file.toURI());
 
         // Replace relative path with absolute path of files
         if (mycore_obj.getDerivate().getInternals() != null) {
@@ -468,32 +479,32 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      */
     private static void exportDerivate(File dir, Transformer trans, String nid) throws FileNotFoundException, TransformerException, IOException {
         // store the XML file
-        MCRDerivate obj = new MCRDerivate();
         Document xml = null;
+        MCRDerivate obj;
 
         try {
-            obj.receiveFromDatastore(nid.toString());
+            obj = MCRDerivate.createFromDatastore(new MCRObjectID(nid));
             String path = obj.getDerivate().getInternals().getSourcePath();
             // reset from the absolute to relative path, for later reload
             LOGGER.info("Old Internal Path ====>" + path);
-            obj.getDerivate().getInternals().setSourcePath(nid.toString());
-            LOGGER.info("New Internal Path ====>" + nid.toString());
+            obj.getDerivate().getInternals().setSourcePath(nid);
+            LOGGER.info("New Internal Path ====>" + nid);
             // add ACL's
-            Collection<String> l = ACCESS_IMPL.getPermissionsForID(nid.toString());
+            Collection<String> l = ACCESS_IMPL.getPermissionsForID(nid);
             for (String permission : l) {
-                Element rule = ACCESS_IMPL.getRule(nid.toString(), permission);
+                Element rule = ACCESS_IMPL.getRule(nid, permission);
                 obj.getService().addRule(permission, rule);
             }
             // build JDOM
             xml = obj.createXML();
 
         } catch (MCRException ex) {
-            LOGGER.warn("Could not read " + nid.toString() + ", continue with next ID");
+            LOGGER.warn("Could not read " + nid + ", continue with next ID");
             return;
         }
-        File xmlOutput = new File(dir, nid.toString() + ".xml");
+        File xmlOutput = new File(dir, nid + ".xml");
         FileOutputStream out = new FileOutputStream(xmlOutput);
-        dir = new File(dir, nid.toString());
+        dir = new File(dir, nid);
 
         if (trans != null) {
             trans.setParameter("dirname", dir.getPath());
@@ -505,7 +516,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             out.close();
         }
 
-        LOGGER.info("Object " + nid.toString() + " stored under " + xmlOutput + ".");
+        LOGGER.info("Object " + nid + " stored under " + xmlOutput + ".");
 
         // store the derivate file under dirname
         try {
@@ -514,14 +525,14 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
                 dir.mkdir();
             }
 
-            MCRFileImportExport.exportFiles(obj.receiveDirectoryFromIFS(nid.toString()), dir);
+            MCRFileImportExport.exportFiles(obj.receiveDirectoryFromIFS(nid), dir);
         } catch (MCRException ex) {
             LOGGER.error(ex.getMessage());
             LOGGER.error("Exception while store to object in " + dir.getAbsolutePath());
             return;
         }
 
-        LOGGER.info("Derivate " + nid.toString() + " saved under " + dir.toString() + " and " + xmlOutput.toString() + ".");
+        LOGGER.info("Derivate " + nid + " saved under " + dir.toString() + " and " + xmlOutput.toString() + ".");
     }
 
     /**
@@ -588,8 +599,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             return;
         }
 
-        MCRDerivate der = new MCRDerivate();
-        der.repairPersitenceDatastore(mid);
+        MCRDerivate der = MCRDerivate.createFromDatastore(mid);
+        der.repairPersitenceDatastore();
         LOGGER.info("Repaired " + mid.toString());
         LOGGER.info(" ");
     }
@@ -627,12 +638,10 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         }
 
         // set mycoreobject
-        MCRDerivate der = new MCRDerivate();
-        der.receiveFromDatastore(mid);
+        MCRDerivate der = MCRDerivate.createFromDatastore(mid);
         String label = der.getLabel();
         String href = der.getDerivate().getMetaLink().getXLinkHref();
-        MCRObject obj = new MCRObject();
-        obj.receiveFromDatastore(href);
+        MCRObject obj = MCRObject.createFromDatastore(new MCRObjectID(href));
         int size = obj.getStructure().getDerivateSize();
         boolean isset = false;
         for (int i = 0; i < size; i++) {

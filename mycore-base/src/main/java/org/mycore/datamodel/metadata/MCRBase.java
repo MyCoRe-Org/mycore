@@ -28,11 +28,13 @@ import static org.mycore.common.MCRConstants.DEFAULT_ENCODING;
 import java.net.URI;
 
 import org.apache.log4j.Logger;
+import org.jdom.Document;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.xml.sax.SAXParseException;
 
@@ -109,6 +111,28 @@ public abstract class MCRBase {
         // Service class
         mcr_service = new MCRObjectService();
     }
+    
+    public MCRBase(URI uri) throws SAXParseException{
+        this();
+        setFromURI(uri);
+    }
+
+    public MCRBase(byte[] bytes, boolean valid) throws SAXParseException{
+        this();
+        setFromXML(bytes, valid);
+    }
+
+    public MCRBase(Document doc) throws SAXParseException{
+        this();
+        setFromJDOM(doc);
+    }
+
+    protected void setFromJDOM(Document doc) {
+        jdom_document = doc;
+        setUp();
+    }
+    
+    protected abstract void setUp();
 
     /**
      * This methode return the object id. If this is not set, null was returned.
@@ -159,8 +183,8 @@ public abstract class MCRBase {
     }
 
     /**
-     * This methode read the XML input stream from an URI into a temporary DOM
-     * and check it with XSchema file.
+     * This method read the XML input stream from an URI to build up the
+     * MyCoRe-Object.
      * 
      * @param uri
      *            an URI
@@ -168,11 +192,13 @@ public abstract class MCRBase {
      *                general Exception of MyCoRe
      * @throws SAXParseException 
      */
-    public abstract void setFromURI(URI uri) throws MCRException, SAXParseException;
+    public final void setFromURI(URI uri) throws MCRException, SAXParseException {
+        setFromJDOM(MCRXMLHelper.parseURI(uri));
+    }
 
     /**
-     * This methode read the XML input stream from a byte array into JDOM and
-     * check it with XSchema file.
+     * This method read the XML input stream from a byte array to build up the
+     * MyCoRe-Object.
      * 
      * @param xml
      *            a XML string
@@ -180,7 +206,9 @@ public abstract class MCRBase {
      *                general Exception of MyCoRe
      * @throws SAXParseException 
      */
-    public abstract void setFromXML(byte[] xml, boolean valid) throws MCRException, SAXParseException;
+    public final void setFromXML(byte[] xml, boolean valid) throws MCRException, SAXParseException {
+        setFromJDOM(MCRXMLHelper.parseXML(xml, valid));
+    }
 
     /**
      * This methode set the object ID.
@@ -268,18 +296,7 @@ public abstract class MCRBase {
      *                if a persistence problem is occured
      * @throws MCRActiveLinkException
      */
-    public abstract void deleteFromDatastore(String id) throws MCRPersistenceException, MCRActiveLinkException;
-
-    /**
-     * The methode receive the object for the given MCRObjectID and stored it in
-     * this MCRObject.
-     * 
-     * @param id
-     *            the object ID
-     * @exception MCRPersistenceException
-     *                if a persistence problem is occured
-     */
-    public abstract void receiveFromDatastore(String id) throws MCRPersistenceException;
+    public abstract void deleteFromDatastore() throws MCRPersistenceException, MCRActiveLinkException;
 
     /**
      * The methode update the object in the data store.
@@ -296,15 +313,7 @@ public abstract class MCRBase {
      * @param id
      *            the MCRObjectID as String
      */
-    public abstract void repairPersitenceDatastore(String id) throws MCRPersistenceException;
-
-    /**
-     * The method repair search index.
-     * 
-     * @param id
-     *            the MCRObjectID
-     */
-    public abstract void repairPersitenceDatastore(MCRObjectID id) throws MCRPersistenceException;
+    public abstract void repairPersitenceDatastore() throws MCRPersistenceException;
 
     /**
      * This method check the validation of the content of this class. The method

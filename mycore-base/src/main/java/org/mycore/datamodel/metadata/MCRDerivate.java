@@ -35,10 +35,11 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
-import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFileImportExport;
+import org.xml.sax.SAXParseException;
 
 /**
  * This class implements all methode for handling one derivate object. Methodes
@@ -74,6 +75,31 @@ final public class MCRDerivate extends MCRBase {
     }
 
     /**
+     * @param bytes
+     * @param valid
+     * @throws SAXParseException
+     */
+    public MCRDerivate(byte[] bytes, boolean valid) throws SAXParseException {
+        super(bytes, valid);
+    }
+
+    /**
+     * @param doc
+     * @throws SAXParseException
+     */
+    public MCRDerivate(Document doc) throws SAXParseException {
+        super(doc);
+    }
+
+    /**
+     * @param uri
+     * @throws SAXParseException
+     */
+    public MCRDerivate(URI uri) throws SAXParseException {
+        super(uri);
+    }
+
+    /**
      * This methode return the instance of the MCRObjectDerivate class. If this
      * was not found, null was returned.
      * 
@@ -91,7 +117,7 @@ final public class MCRDerivate extends MCRBase {
      * @exception MCRException
      *                general Exception of MyCoRe
      */
-    private final void set() throws MCRException {
+    protected final void setUp() throws MCRException {
         if (jdom_document == null) {
             throw new MCRException("The JDOM document is null or empty.");
         }
@@ -121,59 +147,6 @@ final public class MCRDerivate extends MCRBase {
         // get the service data of the object
         jdom_element = jdom_element_root.getChild("service");
         mcr_service.setFromDOM(jdom_element);
-    }
-
-    /**
-     * This methode gets a JDOM-Document to build up the Derivate-Object.
-     * 
-     * @param doc
-     *            an JDOM Object
-     * @exception MCRException
-     *                general Exception of MyCoRe
-     */
-    public final void setFromJDOM(Document doc) throws MCRException {
-        jdom_document = doc;
-        set();
-    }
-
-    /**
-     * This methode read the XML input stream from an URI into a temporary DOM
-     * and check it with XSchema file.
-     * 
-     * @param uri
-     *            an URI
-     * @exception MCRException
-     *                general Exception of MyCoRe
-     */
-    @Override
-    public final void setFromURI(URI uri) throws MCRException {
-        try {
-            jdom_document = MCRXMLHelper.parseURI(uri);
-        } catch (Exception e) {
-            throw new MCRException(e.getMessage());
-        }
-
-        set();
-    }
-
-    /**
-     * This methode read the XML input stream from a byte array into JDOM and
-     * check it with XSchema file.
-     * 
-     * @param xml
-     *            a XML string
-     * @exception MCRException
-     *                general Exception of MyCoRe
-     */
-    @Override
-    public final void setFromXML(byte[] xml, boolean valid) throws MCRException {
-        try {
-            jdom_document = MCRXMLHelper.parseXML(xml, false);
-        } catch (Exception e) {
-            throw new MCRException(e.getMessage());
-        }
-
-        set();
     }
 
     /**
@@ -258,9 +231,8 @@ final public class MCRDerivate extends MCRBase {
         byte[] backup = MCRXMLMetadataManager.instance().retrieveBLOB(meta.getXLinkHrefID());
 
         try {
-            MCRObject obj = new MCRObject();
             LOGGER.debug("adding Derivate in data store");
-            obj.addDerivateInDatastore(meta.getXLinkHref(), der);
+            MCRObject.addDerivateInDatastore(meta.getXLinkHref(), der);
         } catch (Exception e) {
             restoreMCRObject(backup);
             // throw final exception
@@ -313,50 +285,16 @@ final public class MCRDerivate extends MCRBase {
         }
     }
 
-    /**
-     * The methode delete the object in the data store. The order of delete
-     * steps is:<br />
-     * <ul>
-     * <li>remove link in object metadata</li>
-     * <li>remove all files from IFS</li>
-     * <li>remive itself</li>
-     * </ul>
-     * 
-     * @param id
-     *            the object ID
-     * @exception MCRPersistenceException
-     *                if a persistence problem is occured
-     */
     @Override
-    public final void deleteFromDatastore(String id) throws MCRPersistenceException {
-        // get the derivate
-        try {
-            mcr_id = new MCRObjectID(id);
-        } catch (MCRException e) {
-            throw new MCRPersistenceException("ID error in deleteFromDatastore for " + id + ".", e);
-        }
-
-        // receive derivate
-        boolean receivetest = false;
-        try {
-            receiveFromDatastore(mcr_id);
-            LOGGER.info("Dataset for MCRDerivate " + mcr_id.toString() + " was received.");
-            receivetest = true;
-        } catch (MCRPersistenceException e) {
-            LOGGER.warn("Error while delete MCRDerivate, can't receive data for " + mcr_id.toString() + ".");
-        }
-
+    public void deleteFromDatastore() throws MCRPersistenceException, MCRActiveLinkException {
         // remove link
-        if (receivetest) {
-            String meta = "?";
-            try {
-                meta = getDerivate().getMetaLink().getXLinkHref();
-                MCRObject obj = new MCRObject();
-                obj.removeDerivateInDatastore(meta, mcr_id.toString());
-                LOGGER.info("Link in MCRObject " + meta + " to MCRDerivate " + mcr_id.toString() + " is deleted.");
-            } catch (Exception e) {
-                LOGGER.warn("Can't delete link for MCRDerivate " + mcr_id.toString() + " from MCRObject " + meta + ". Error ignored.");
-            }
+        String meta = null;
+        try {
+            meta = getDerivate().getMetaLink().getXLinkHref();
+            MCRObject.removeDerivateInDatastore(meta, mcr_id.toString());
+            LOGGER.info("Link in MCRObject " + meta + " to MCRDerivate " + mcr_id.toString() + " is deleted.");
+        } catch (Exception e) {
+            LOGGER.warn("Can't delete link for MCRDerivate " + mcr_id.toString() + " from MCRObject " + meta + ". Error ignored.");
         }
 
         // delete data from IFS
@@ -374,11 +312,29 @@ final public class MCRDerivate extends MCRBase {
         }
 
         // handle events
-        if (receivetest) {
-            MCREvent evt = new MCREvent(MCREvent.DERIVATE_TYPE, MCREvent.DELETE_EVENT);
-            evt.put("derivate", this);
-            MCREventManager.instance().handleEvent(evt);
-        }
+        MCREvent evt = new MCREvent(MCREvent.DERIVATE_TYPE, MCREvent.DELETE_EVENT);
+        evt.put("derivate", this);
+        MCREventManager.instance().handleEvent(evt);
+    }
+
+    /**
+     * The methode delete the object in the data store. The order of delete
+     * steps is:<br />
+     * <ul>
+     * <li>remove link in object metadata</li>
+     * <li>remove all files from IFS</li>
+     * <li>remive itself</li>
+     * </ul>
+     * 
+     * @param id
+     *            the object ID
+     * @exception MCRPersistenceException
+     *                if a persistence problem is occured
+     * @throws MCRActiveLinkException 
+     */
+    public static final void deleteFromDatastore(MCRObjectID id) throws MCRPersistenceException, MCRActiveLinkException {
+        MCRDerivate derivate=MCRDerivate.createFromDatastore(id);
+        derivate.deleteFromDatastore();
     }
 
     /**
@@ -416,51 +372,10 @@ final public class MCRDerivate extends MCRBase {
      * @exception MCRPersistenceException
      *                if a persistence problem is occured
      */
-    @Override
-    public final void receiveFromDatastore(String id) throws MCRPersistenceException {
-        receiveFromDatastore(new MCRObjectID(id));
-    }
-
-    /**
-     * The methode receive the derivate for the given MCRObjectID and stored it
-     * in this MCRDerivate
-     * 
-     * @param id
-     *            the derivate ID
-     * @exception MCRPersistenceException
-     *                if a persistence problem is occured
-     */
-    public final void receiveFromDatastore(MCRObjectID id) throws MCRPersistenceException {
-        byte xml[] = receiveXMLFromDatastore(id);
-        setFromXML(xml, false);
-    }
-
-    /**
-     * The methode receive the derivate for the given MCRObjectID and returned
-     * it as XML stream.
-     * 
-     * @param id
-     *            the derivate ID
-     * @return the XML stream of the object as string
-     * @exception MCRPersistenceException
-     *                if a persistence problem is occured
-     */
-    public static final byte[] receiveXMLFromDatastore(String id) throws MCRPersistenceException {
-        return receiveXMLFromDatastore(new MCRObjectID(id));
-    }
-
-    /**
-     * The methode receive the derivate for the given MCRObjectID and returned
-     * it as XML stream.
-     * 
-     * @param id
-     *            the derivate ID
-     * @return the XML stream of the object as string
-     * @exception MCRPersistenceException
-     *                if a persistence problem is occured
-     */
-    public static final byte[] receiveXMLFromDatastore(MCRObjectID id) throws MCRPersistenceException {
-        return MCRXMLMetadataManager.instance().retrieveBLOB(id);
+    public static final MCRDerivate createFromDatastore(MCRObjectID id) throws MCRPersistenceException {
+        MCRDerivate derivate = new MCRDerivate();
+        derivate.setFromJDOM(MCRXMLMetadataManager.instance().retrieveXML(id));
+        return derivate;
     }
 
     /**
@@ -499,19 +414,17 @@ final public class MCRDerivate extends MCRBase {
         MCRDerivate old = new MCRDerivate();
 
         try {
-            old.receiveFromDatastore(mcr_id.toString());
+            old = MCRDerivate.createFromDatastore(mcr_id);
         } catch (Exception e) {
             createInDatastore();
             return;
         }
 
         // remove the old link to metadata
-        MCRObject obj;
         String meta_id = "";
         try {
             meta_id = old.getDerivate().getMetaLink().getXLinkHref();
-            obj = new MCRObject();
-            obj.removeDerivateInDatastore(meta_id, mcr_id.toString());
+            MCRObject.removeDerivateInDatastore(meta_id, mcr_id.toString());
         } catch (MCRException e) {
             System.out.println(e.getMessage());
         }
@@ -521,8 +434,7 @@ final public class MCRDerivate extends MCRBase {
             File f = new File(getDerivate().getInternals().getSourcePath());
 
             if (!f.exists()) {
-                throw new MCRPersistenceException("The File or Directory " + getDerivate().getInternals().getSourcePath()
-                        + " was not found.");
+                throw new MCRPersistenceException("The File or Directory " + getDerivate().getInternals().getSourcePath() + " was not found.");
             }
 
             try {
@@ -545,8 +457,7 @@ final public class MCRDerivate extends MCRBase {
             MCRMetaLinkID der = new MCRMetaLinkID();
             der.setReference(mcr_id.toString(), mcr_label, "");
             der.setSubTag("derobject");
-            obj = new MCRObject();
-            obj.addDerivateInDatastore(meta, der);
+            MCRObject.addDerivateInDatastore(meta, der);
         } catch (MCRException e) {
             throw new MCRPersistenceException("The MCRObject " + meta + " was not found.");
         }
@@ -571,22 +482,10 @@ final public class MCRDerivate extends MCRBase {
      * The method updates the indexer of content.
      * 
      * @param id
-     *            the MCRObjectID as string
-     */
-    @Override
-    public final void repairPersitenceDatastore(String id) throws MCRPersistenceException {
-        repairPersitenceDatastore(new MCRObjectID(id));
-    }
-
-    /**
-     * The method updates the indexer of content.
-     * 
-     * @param id
      *            the MCRObjectID
      */
     @Override
-    public final void repairPersitenceDatastore(MCRObjectID id) throws MCRPersistenceException {
-        receiveFromDatastore(id);
+    public final void repairPersitenceDatastore() throws MCRPersistenceException {
         // handle events
         MCREvent evt = new MCREvent(MCREvent.DERIVATE_TYPE, MCREvent.REPAIR_EVENT);
         evt.put("derivate", this);
@@ -615,4 +514,5 @@ final public class MCRDerivate extends MCRBase {
         }
         return true;
     }
+
 }

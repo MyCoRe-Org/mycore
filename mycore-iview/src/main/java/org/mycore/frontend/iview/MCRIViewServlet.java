@@ -43,6 +43,7 @@ import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.services.imaging.MCRImgCacheCommands;
@@ -896,8 +897,7 @@ public class MCRIViewServlet extends MCRServlet {
         if (request.getParameter("type").equals("support")) {
             // get name main file
             String derivID = st.nextToken();
-            MCRDerivate deriv = new MCRDerivate();
-            deriv.receiveFromDatastore(derivID);
+            MCRDerivate deriv = MCRDerivate.createFromDatastore(new MCRObjectID(derivID));
             String nameOfMainFile = deriv.getDerivate().getInternals().getMainDoc();
             // verify support
             if (nameOfMainFile != null && !nameOfMainFile.equals("")) {

@@ -44,6 +44,7 @@ import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCROrCondition;
 import org.mycore.services.fieldquery.MCRFieldDef;
@@ -187,17 +188,18 @@ public class MCROAIQueryImpl implements MCROAIQuery {
         List<Object> list = new ArrayList<Object>();
 
         MCRBase object = null;
+        
+        MCRObjectID mcrID=new MCRObjectID(id);
 
         if (id.indexOf("derivate") != -1) {
-            object = new MCRDerivate();
+            object = MCRDerivate.createFromDatastore(mcrID);
         } else {
-            object = new MCRObject();
+            object = MCRObject.createFromDatastore(mcrID);
         }
 
         String repositoryId = null;
         try {
             repositoryId = MCROAIProvider.getConfigBean(instance).getRepositoryIdentifier();
-            object.receiveFromDatastore(id);
         } catch (MCRConfigurationException mcrx) {
             return null;
         } catch (MCRException e) {

@@ -478,14 +478,15 @@ public class MCRSimpleWorkflowManager {
      * 
      * @param ID
      *            the MCRObjectID as String of the derivate object
+     * @throws SAXParseException 
      */
-    public final boolean commitDerivateObject(MCRObjectID ID) {
+    public final boolean commitDerivateObject(MCRObjectID ID) throws SAXParseException {
         String fn = getDirectoryPath(ID.getBase()) + File.separator + ID.toString() + ".xml";
 
         return loadDerivate(ID.toString(), fn);
     }
 
-    private boolean loadDerivate(String ID, String filename) {
+    private boolean loadDerivate(String ID, String filename) throws SAXParseException {
         if (MCRDerivate.existInDatastore(ID)) {
             MCRDerivateCommands.updateFromFile(filename, false);
         } else {

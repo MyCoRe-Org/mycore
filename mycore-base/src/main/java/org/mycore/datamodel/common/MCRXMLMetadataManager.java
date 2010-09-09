@@ -460,7 +460,7 @@ public class MCRXMLMetadataManager {
      * 
      * @param mcrid the MCRObjectID 
      */
-    public MCRStoredMetadata retrieveStoredMetadata(MCRObjectID mcrid) {
+    private MCRStoredMetadata retrieveStoredMetadata(MCRObjectID mcrid) {
         try {
             return getStore(mcrid).retrieve(mcrid.getNumberAsInteger());
         } catch (Exception ex) {

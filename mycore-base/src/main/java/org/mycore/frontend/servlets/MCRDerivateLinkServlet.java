@@ -87,8 +87,7 @@ public class MCRDerivateLinkServlet extends MCRServlet {
      * @return the parent id
      */
     private MCRObjectID getParentId(MCRObjectID objectId) {
-        MCRObject obj = new MCRObject();
-        obj.receiveFromDatastore(objectId);
+        MCRObject obj = MCRObject.createFromDatastore(objectId);
         return obj.getStructure().getParentID();
     }
 

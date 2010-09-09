@@ -10,6 +10,7 @@ import org.mycore.common.events.MCREvent;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.parsers.bool.MCRCondition;
 
 /**
@@ -69,8 +70,7 @@ public class MCRDerivateWithURNSearcher extends MCRSearcher {
             if (aHit.getID().indexOf("_derivate_") == -1) {
                 toReturn.addHit(aHit);
             } else {
-                MCRDerivate der = new MCRDerivate();
-                der.receiveFromDatastore(aHit.getID());
+                MCRDerivate der = MCRDerivate.createFromDatastore(new MCRObjectID(aHit.getID()));
                 String parentId = der.getDerivate().getMetaLink().getXLinkHref();
                 MCRHit hit = new MCRHit(parentId);
                 toReturn.addHit(hit);

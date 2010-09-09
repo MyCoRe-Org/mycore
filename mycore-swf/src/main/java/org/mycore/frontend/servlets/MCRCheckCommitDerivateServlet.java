@@ -119,8 +119,7 @@ public class MCRCheckCommitDerivateServlet extends MCRCheckBase {
             der.updateXMLInDatastore();
             String label = der.getLabel();
             String href = der.getDerivate().getMetaLink().getXLinkHref();
-            MCRObject obj = new MCRObject();
-            obj.receiveFromDatastore(href);
+            MCRObject obj = MCRObject.createFromDatastore(new MCRObjectID(href));
             int size = obj.getStructure().getDerivateSize();
             boolean isset = false;
             for (int i = 0; i < size; i++) {

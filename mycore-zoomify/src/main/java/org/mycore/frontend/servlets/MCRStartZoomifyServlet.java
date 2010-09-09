@@ -103,8 +103,7 @@ public class MCRStartZoomifyServlet extends MCRStartEditorServlet{
 		MCRDirectory mcrdir = MCRDirectory.getRootDirectory(cd.mytfmcrid.toString());
 		String basedir = mcrdir.getName();
 				 
-		MCRObject obj = new MCRObject();
-		obj.receiveFromDatastore(cd.myremcrid);
+		MCRObject obj = MCRObject.createFromDatastore(cd.myremcrid);
 		MCRConfiguration CONFIG = MCRConfiguration.instance();
 		String type = obj.getId().getTypeId();
 		String idname = CONFIG.getString("MCR.Component.Zoomify."+type+".identifier");

@@ -149,8 +149,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
     public static final void buildMetsForMCRObjectID(String MCRID) {
         LOGGER.info("Build METS file for ID " + MCRID + " start.");
         final long start = System.currentTimeMillis();
-        MCRObject mcrobj = new MCRObject();
-        mcrobj.receiveFromDatastore(MCRID);
+        MCRObject mcrobj = MCRObject.createFromDatastore(new MCRObjectID(MCRID));
         for (int i = 0; i < mcrobj.getStructure().getDerivateSize(); i++) {
             MCRMetaLinkID mcrder = mcrobj.getStructure().getDerivate(i);
             LOGGER.debug("For ID " + MCRID + " found derivate " + mcrder.getXLinkHref());
@@ -170,8 +169,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         String baseurl = MCRConfiguration.instance().getString("MCR.baseurl", "http://127.0.0.1:8080");
         LOGGER.info("Build METS file for ID " + MCRID + "  start.");
         final long start = System.currentTimeMillis();
-        MCRDerivate derxml = new MCRDerivate();
-        derxml.receiveFromDatastore(MCRID);
+        MCRDerivate derxml = MCRDerivate.createFromDatastore(new MCRObjectID(MCRID));
         MCRObjectID docid = derxml.getDerivate().getMetaLink().getXLinkHrefID();
         MCRDirectory difs = MCRDirectory.getRootDirectory(MCRID);
         if (difs != null) {
@@ -314,8 +312,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         LOGGER.info("Check METS file for ID " + MCRID + " start.");
         final long start = System.currentTimeMillis();
 
-        MCRObject mcrobj = new MCRObject();
-        mcrobj.receiveFromDatastore(MCRID);
+        MCRObject mcrobj = MCRObject.createFromDatastore(new MCRObjectID(MCRID));
         for (int i = 0; i < mcrobj.getStructure().getDerivateSize(); i++) {
             MCRMetaLinkID mcrder = mcrobj.getStructure().getDerivate(i);
             LOGGER.debug("found derivate " + mcrder.getXLinkTitle());
@@ -380,8 +377,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
             MCRHit fromhit = fromiter.next();
             String fromid = fromhit.getID();
 
-            MCRObject fromobj = new MCRObject();
-            fromobj.receiveFromDatastore(fromid);
+            MCRObject fromobj = MCRObject.createFromDatastore(new MCRObjectID(fromid));
 
             for (int i = 0; i < fromobj.getStructure().getDerivateSize(); i++) {
                 MCRObjectID mcrderid = fromobj.getStructure().getDerivate(i).getXLinkHrefID();

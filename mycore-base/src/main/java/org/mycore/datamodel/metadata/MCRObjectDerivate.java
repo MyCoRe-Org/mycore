@@ -177,23 +177,6 @@ public class MCRObjectDerivate {
      */
 
     /**
-     * This method get a single link from the linkmeta list as a
-     * MCRMetaLinkMCRObject.
-     * 
-     * @exception IndexOutOfBoundsException
-     *                throw this exception, if the index is false
-     * @deprecated
-     * @see #getMetaLink()
-     * @return a metadata link as MCRMetaLinkID
-     */
-    /**
-     * public final MCRMetaLinkID getLinkMeta(int index) throws
-     * IndexOutOfBoundsException { if ((index != 0)) { throw new
-     * IndexOutOfBoundsException("Index error in getLinkMeta."); } return
-     * getMetaLink(); }
-     */
-
-    /**
      * returns link to the MCRObject.
      * 
      * @return a metadata link as MCRMetaLinkID

@@ -35,9 +35,9 @@ public class MCRURNAdder {
             return false;
         }
 
-        if (isAllowedObject((new MCRObjectID(objectId)).getTypeId())) {
-            MCRObject obj = new MCRObject();
-            obj.receiveFromDatastore(objectId);
+        MCRObjectID id = new MCRObjectID(objectId);
+        if (isAllowedObject(id.getTypeId())) {
+            MCRObject obj = MCRObject.createFromDatastore(id);
             MCRMetaElement srcElement = obj.getMetadataElement("def.identifier");
             IURNProvider urnProvider = this.getURNProvider();
             URN myURN = urnProvider.generateURN();
@@ -80,8 +80,8 @@ public class MCRURNAdder {
             LOGGER.warn("Permission denied");
             return false;
         }
-        MCRDerivate derivate = new MCRDerivate();
-        derivate.receiveFromDatastore(derivateId);
+        MCRObjectID id = new MCRObjectID(derivateId);
+        MCRDerivate derivate = MCRDerivate.createFromDatastore(id);
 
         if (!parentIsAllowedObject(derivate)) {
             LOGGER.warn("Parent permission denied");
@@ -104,8 +104,8 @@ public class MCRURNAdder {
                 LOGGER.info("Assigning urn " + parentURN.toString() + " to " + derivate.getId().toString());
                 MCRURNManager.assignURN(parentURN.toString(), derivate.getId().toString(), " ", " ");
             } catch (Exception ex) {
-                LOGGER.error("Assigning base urn " + parentURN.toString() + parentURN.checksum() + " to derivate "
-                        + derivate.getId().toString() + " failed.", ex);
+                LOGGER.error("Assigning base urn " + parentURN.toString() + parentURN.checksum() + " to derivate " + derivate.getId().toString() + " failed.",
+                    ex);
                 return false;
             }
 
@@ -124,16 +124,17 @@ public class MCRURNAdder {
             for (int i = 0; i < pairs.size(); i++) {
                 Pair<String, MCRFile> current = pairs.get(i);
                 LOGGER.info("Assigning urn " + urnToSet[i] + urnToSet[i].checksum() + " to " + current.getLeftComponent()
-                        + current.getRightComponent().getName());
+                    + current.getRightComponent().getName());
                 /* save the urn in the database here */
                 try {
-                    MCRURNManager.assignURN(urnToSet[i].toString() + urnToSet[i].checksum(), derivate.getId().toString(), current
-                            .getLeftComponent(), current.getRightComponent().getName());
+                    MCRURNManager.assignURN(urnToSet[i].toString() + urnToSet[i].checksum(), derivate.getId().toString(), current.getLeftComponent(), current
+                        .getRightComponent()
+                        .getName());
                     /* updating the fileset element, with the current file and urn */
                     addToFilesetElement(fileset, urnToSet[i], current);
                 } catch (Exception ex) {
                     LOGGER.error("Assigning urn " + urnToSet[i] + urnToSet[i].checksum() + " to " + current.getLeftComponent()
-                            + current.getRightComponent().getName() + " failed.", ex);
+                        + current.getRightComponent().getName() + " failed.", ex);
                     fileset = null;
                 }
             }
@@ -158,8 +159,8 @@ public class MCRURNAdder {
             LOGGER.error("null not allowed as parameter. derivate=" + derivateId + ", path=" + path + ", fileId=" + fileId);
             return false;
         }
-        MCRDerivate derivate = new MCRDerivate();
-        derivate.receiveFromDatastore(derivateId);
+        MCRObjectID id = new MCRObjectID(derivateId);
+        MCRDerivate derivate = MCRDerivate.createFromDatastore(id);
 
         Document xml = derivate.createXML();
         XPath xp = XPath.newInstance("./mycorederivate/derivate/fileset");
@@ -188,8 +189,7 @@ public class MCRURNAdder {
         f.addContent(new Element("urn").setText(u[0].toString()));
         fs.addContent(f);
 
-        MCRDerivate update = new MCRDerivate();
-        update.setFromJDOM(xml);
+        MCRDerivate update = new MCRDerivate(xml);
         update.updateXMLInDatastore();
 
         return true;
@@ -203,9 +203,8 @@ public class MCRURNAdder {
      */
     private boolean parentIsAllowedObject(MCRDerivate derivate) {
         MCRMetaLink linkToParent = derivate.getDerivate().getMetaLink();
-        String parentID = linkToParent.getXLinkHref();
-        MCRObject obj = new MCRObject();
-        obj.receiveFromDatastore(parentID);
+        MCRObjectID parentID = new MCRObjectID(linkToParent.getXLinkHref());
+        MCRObject obj = MCRObject.createFromDatastore(parentID);
         return isAllowedObject(obj.getId().getTypeId());
     }
 
@@ -234,8 +233,7 @@ public class MCRURNAdder {
                 return true;
             }
         }
-        LOGGER.warn("URN assignment failed as the object type " + givenType + " is not in the list of allowed objects. See property \""
-                + propertyName + "\"");
+        LOGGER.warn("URN assignment failed as the object type " + givenType + " is not in the list of allowed objects. See property \"" + propertyName + "\"");
         return false;
     }
 
@@ -320,8 +318,7 @@ public class MCRURNAdder {
             //just update modified XML here, no new import of files pleaze
             derivate.updateXMLInDatastore();
         } catch (Exception ex) {
-            LOGGER.error("An exception occured while updating the object " + derivate.getId()
-                    + " in database. The adding of the fileset element failed.", ex);
+            LOGGER.error("An exception occured while updating the object " + derivate.getId() + " in database. The adding of the fileset element failed.", ex);
             handleError(derivate);
         }
     }

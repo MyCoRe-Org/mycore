@@ -386,8 +386,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         }
         // check type
         if (cd.mytype.equals("document") || cd.mytype.equals("disshab")) {
-            MCRObject obj = new MCRObject();
-            obj.receiveFromDatastore(cd.mysemcrid);
+            MCRObject obj = MCRObject.createFromDatastore(cd.mysemcrid);
             MCRMetaElement elm = obj.getMetadataElement("nbns");
             if (elm == null) {
                 String urn = MCRURNManager.buildURN("UBL");
@@ -433,10 +432,8 @@ public class MCRStartEditorServlet extends MCRServlet {
             return;
         }
 
-        MCRDerivate der = new MCRDerivate();
-
         try {
-            der.deleteFromDatastore(cd.mysemcrid.toString());
+            MCRDerivate.deleteFromDatastore(cd.mysemcrid);
             StringBuffer sb = new StringBuffer();
             sb.append("receive/").append(cd.myremcrid.toString());
             cd.myfile = sb.toString();
@@ -543,10 +540,8 @@ public class MCRStartEditorServlet extends MCRServlet {
             return;
         }
 
-        MCRObject obj = new MCRObject();
-
         try {
-            obj.deleteFromDatastore(cd.mytfmcrid.toString());
+            MCRObject.deleteFromDatastore(cd.mytfmcrid);
             cd.myfile = deletepage;
         } catch (Exception e) {
             if (LOGGER.isDebugEnabled()) {
@@ -827,8 +822,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             return;
         }
 
-        MCRDerivate der = new MCRDerivate();
-        der.receiveFromDatastore(cd.mysemcrid);
+        MCRDerivate der = MCRDerivate.createFromDatastore(cd.mysemcrid);
         der.getDerivate().getInternals().setMainDoc(cd.extparm);
 
         try {
@@ -1345,8 +1339,9 @@ public class MCRStartEditorServlet extends MCRServlet {
      * 
      * @param job
      *            the MCRServletJob instance
+     * @throws SAXParseException 
      */
-    public void wsetfile(MCRServletJob job, CommonData cd) throws IOException {
+    public void wsetfile(MCRServletJob job, CommonData cd) throws IOException, SAXParseException {
         org.jdom.Element rule = WFM.getRuleFromFile(cd.myremcrid, "writewf");
         if (rule != null && !AI.checkPermission(rule)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
@@ -1359,8 +1354,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         if (cd.extparm.startsWith("####main####")) {
             File impex = new File(WFM.getDirectoryPath(cd.myproject + "_" + cd.mytype), cd.mysemcrid + ".xml");
-            MCRDerivate der = new MCRDerivate();
-            der.setFromURI(impex.toURI());
+            MCRDerivate der = new MCRDerivate(impex.toURI());
             der.getDerivate().getInternals().setMainDoc(cd.extparm.substring(cd.mysemcrid.toString().length() + 1 + 12, cd.extparm.length()));
             byte[] outxml = MCRUtils.getByteArray(der.createXML());
             FileOutputStream out = new FileOutputStream(impex);

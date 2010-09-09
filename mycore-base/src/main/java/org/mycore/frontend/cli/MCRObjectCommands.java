@@ -197,13 +197,13 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the ID of the MCRObject that should be deleted
      */
     public static final void delete(String ID) throws MCRActiveLinkException {
-        MCRObject mycore_obj = new MCRObject();
+        MCRObjectID mcrId = new MCRObjectID(ID);
 
         try {
-            mycore_obj.deleteFromDatastore(ID);
-            LOGGER.info(mycore_obj.getId().toString() + " deleted.");
+            MCRObject.deleteFromDatastore(mcrId);
+            LOGGER.info(mcrId + " deleted.");
         } catch (MCRException ex) {
-            LOGGER.error("Can't delete " + mycore_obj.getId().toString() + ".", ex);
+            LOGGER.error("Can't delete " + mcrId + ".", ex);
         }
     }
 
@@ -473,7 +473,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         try {
             Transformer trans = getTransformer(style);
             for (int i = fid.getNumberAsInteger(); i < tid.getNumberAsInteger() + 1; i++) {
-                String id=MCRObjectID.formatID(fid.getProjectId(), fid.getTypeId(), i);
+                String id = MCRObjectID.formatID(fid.getProjectId(), fid.getTypeId(), i);
                 if (!MCRObject.existInDatastore(id)) {
                     continue;
                 }
@@ -599,7 +599,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         byte[] xml = null;
         try {
             // if object do'snt exist - no exception is catched!
-            xml = MCRObject.receiveXMLFromDatastore(nid.toString());
+            xml = MCRXMLMetadataManager.instance().retrieveBLOB(new MCRObjectID(nid));
         } catch (MCRException ex) {
             return false;
         }
@@ -724,8 +724,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
         removeFromIndex("id", id);
 
-        MCRObject obj = new MCRObject();
-        obj.repairPersitenceDatastore(mid);
+        MCRObject obj = MCRObject.createFromDatastore(mid);
+        obj.repairPersitenceDatastore();
         LOGGER.info("Repaired " + mid.toString());
     }
 

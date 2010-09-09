@@ -271,8 +271,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
 
             try {
                 workflow_in = MCRXMLHelper.parseURI(wf.toURI(), false);
-                MCRObject obj = new MCRObject();
-                obj.setFromJDOM(workflow_in);
+                MCRObject obj = new MCRObject(workflow_in);
                 MCRObjectService service = obj.getService();
                 int j = service.getRuleIndex("writewf");
                 if (j != -1) {
