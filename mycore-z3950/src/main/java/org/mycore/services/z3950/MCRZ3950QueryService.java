@@ -8,17 +8,16 @@ import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRUtils;
-import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.common.MCRXMLTableManager;
-import org.mycore.parsers.bool.MCRCondition;
-import org.mycore.services.fieldquery.MCRQueryManager;
-import org.mycore.services.fieldquery.MCRResults;
-
-import org.mycore.services.fieldquery.*;
-
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.parsers.bool.MCRCondition;
+import org.mycore.services.fieldquery.MCRHit;
+import org.mycore.services.fieldquery.MCRQuery;
+import org.mycore.services.fieldquery.MCRQueryManager;
+import org.mycore.services.fieldquery.MCRResults;
 /**
  * Diese Klasse ist eine Implementierung eines Suchservice fï¿½r die Z39.50-
  * Schnittstelle. Dabei werden nur Z39.50-Anfragen im Prefixformat
@@ -33,7 +32,7 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
     
     private static Logger logger = Logger.getLogger(MCRZ3950QueryService.class);
     
-    private static MCRXMLTableManager TM = MCRXMLTableManager.instance();
+    private static MCRXMLMetadataManager TM = MCRXMLMetadataManager.instance();
     
     // Die Z39.50-Anfrage als String
     private String query;
@@ -41,7 +40,7 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
     // Das Ergebnis der Suche
     private MCRResults mycoreResults;
     
-    // Wir geben immer nur ein Ergebnis zurï¿½ck, normalerweise das erste
+    // Wir geben immer nur ein Ergebnis zurück, normalerweise das erste
     private int index;
     
 

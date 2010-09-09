@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.common.MCRLinkTableManager;
-import org.mycore.datamodel.common.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRQuery;
@@ -48,7 +48,7 @@ import org.mycore.services.fieldquery.MCRResults;
 public class MCRWebService implements MCRWS {
     private static final Logger logger = Logger.getLogger(MCRWebService.class);
 
-    private static MCRXMLTableManager TM = MCRXMLTableManager.instance();
+    private static MCRXMLMetadataManager TM = MCRXMLMetadataManager.instance();
 
     /*
      * (non-Javadoc)

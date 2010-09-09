@@ -20,10 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
-import org.mycore.datamodel.common.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
@@ -76,8 +75,8 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
     }
 
     public static final List<String> createCache() {
-        MCRXMLTableManager xmlTableManager = MCRXMLTableManager.instance();
-        List<String> derivateList = xmlTableManager.listIDsOfType("derivate");
+        MCRXMLMetadataManager xmlMetadataManager = MCRXMLMetadataManager.instance();
+        List<String> derivateList = xmlMetadataManager.listIDsOfType("derivate");
         List<String> returns = new ArrayList<String>(derivateList.size());
         for (String derivateID : derivateList) {
             returns.add("create image cache for derivate " + derivateID);
@@ -86,8 +85,8 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
     }
 
     public static List<String> deleteCache() {
-        MCRXMLTableManager xmlTableManager = MCRXMLTableManager.instance();
-        List<String> derivateList = xmlTableManager.listIDsOfType("derivate");
+        MCRXMLMetadataManager xmlMetadataManager = MCRXMLMetadataManager.instance();
+        List<String> derivateList = xmlMetadataManager.listIDsOfType("derivate");
         List<String> returns = new ArrayList<String>(derivateList.size());
         for (String derivateID : derivateList) {
             returns.add("delete image cache for derivate " + derivateID);
