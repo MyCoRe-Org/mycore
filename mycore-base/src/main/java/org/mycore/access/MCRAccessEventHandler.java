@@ -193,14 +193,14 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
         long t1 = System.currentTimeMillis();
 
         // create
-        Collection<String> li = AI.getPermissionsForID(base.getId().getId());
+        Collection<String> li = AI.getPermissionsForID(base.getId().toString());
         int aclsize = 0;
         if (li != null) {
             aclsize = li.size();
         }
         int rulesize = base.getService().getRulesSize();
         if (rulesize == 0 && aclsize == 0 && addDefaultRules) {
-            setDefaultPermissions(base.getId().getId(), true);
+            setDefaultPermissions(base.getId().toString(), true);
             LOGGER.warn("The ACL conditions for this object are empty!");
         }
         while (0 < rulesize) {
@@ -224,14 +224,14 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
         long t1 = System.currentTimeMillis();
 
         // update
-        Collection<String> li = AI.getPermissionsForID(base.getId().getId());
+        Collection<String> li = AI.getPermissionsForID(base.getId().toString());
         int aclsize = 0;
         if (li != null) {
             aclsize = li.size();
         }
         int rulesize = base.getService().getRulesSize();
         if (rulesize == 0 && aclsize == 0 && addDefaultRules) {
-            setDefaultPermissions(base.getId().getId(), false);
+            setDefaultPermissions(base.getId().toString(), false);
             LOGGER.warn("The ACL conditions for this object was empty!");
         }
         if (aclsize == 0) {

@@ -69,7 +69,7 @@ public class MCRAccessManager {
      * @see MCRAccessInterface#addRule(String, String, org.jdom.Element, String)
      */
     public static void addRule(MCRObjectID id, String permission, org.jdom.Element rule, String description) throws MCRException {
-        getAccessImpl().addRule(id.getId(), permission, rule, description);
+        getAccessImpl().addRule(id.toString(), permission, rule, description);
     }
 
     /**
@@ -103,7 +103,7 @@ public class MCRAccessManager {
      * @see MCRAccessInterface#removeRule(String, String)
      */
     public static void removeRule(MCRObjectID id, String permission) throws MCRException {
-        getAccessImpl().removeRule(id.getId(), permission);
+        getAccessImpl().removeRule(id.toString(), permission);
     }
 
     /**
@@ -131,7 +131,7 @@ public class MCRAccessManager {
      * @see MCRAccessInterface#removeRule(String)
      */
     public static void removeAllRules(MCRObjectID id) throws MCRException {
-        getAccessImpl().removeAllRules(id.getId());
+        getAccessImpl().removeAllRules(id.toString());
     }
 
     /**
@@ -150,7 +150,7 @@ public class MCRAccessManager {
      * @see MCRAccessInterface#updateRule(String, String, Element, String)
      */
     public static void updateRule(MCRObjectID id, String permission, org.jdom.Element rule, String description) throws MCRException {
-        getAccessImpl().updateRule(id.getId(), permission, rule, description);
+        getAccessImpl().updateRule(id.toString(), permission, rule, description);
     }
 
     /**
@@ -184,7 +184,7 @@ public class MCRAccessManager {
      * @see MCRAccessInterface#checkPermission(String, String)
      */
     public static boolean checkPermission(MCRObjectID id, String permission) {
-        return checkPermission(id.getId(), permission);
+        return checkPermission(id.toString(), permission);
     }
 
     /**
@@ -256,7 +256,7 @@ public class MCRAccessManager {
      *         permissions
      */
     public static Collection<String> getPermissionsForID(MCRObjectID id) {
-        return getAccessImpl().getPermissionsForID(id.getId());
+        return getAccessImpl().getPermissionsForID(id.toString());
     }
 
     /**

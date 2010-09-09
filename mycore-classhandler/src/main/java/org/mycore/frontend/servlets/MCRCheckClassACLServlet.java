@@ -255,13 +255,13 @@ public class MCRCheckClassACLServlet extends MCRServlet {
      */
     public final boolean storeService(Element outelm, MCRServletJob job, MCRObjectID ID) {
         // check current state
-        Collection<String> li = MCRAccessManager.getPermissionsForID(ID.getId());
+        Collection<String> li = MCRAccessManager.getPermissionsForID(ID.toString());
         int aclsize = 0;
         if (li != null) {
             aclsize = li.size();
         }
         if (aclsize == 0) {
-            LOGGER.warn("They are no ACLs defined for classification " + ID.getId());
+            LOGGER.warn("They are no ACLs defined for classification " + ID.toString());
             return false;
         }
         // check incoming ACLs
@@ -274,23 +274,23 @@ public class MCRCheckClassACLServlet extends MCRServlet {
             e.printStackTrace();
         }
         if (rulesize == 0) {
-            LOGGER.warn("The new ACL conditions for classification" + ID.getId() + " are empty!");
+            LOGGER.warn("The new ACL conditions for classification" + ID.toString() + " are empty!");
         }
         while (0 < rulesize) {
             Element conditions = serv.getRule(0).getCondition();
             String permission = serv.getRule(0).getPermission();
             if (storedrules.indexOf(permission) != -1) {
                 if (li.contains(permission)) {
-                    MCRAccessManager.updateRule(ID.getId(), permission, conditions, "");
+                    MCRAccessManager.updateRule(ID.toString(), permission, conditions, "");
                 } else {
-                    MCRAccessManager.addRule(ID.getId(), permission, conditions, "");
+                    MCRAccessManager.addRule(ID.toString(), permission, conditions, "");
                 }
             }
             serv.removeRule(0);
             rulesize--;
         }
 
-        LOGGER.info("ACL of classification " + ID.getId() + " stored in the server.");
+        LOGGER.info("ACL of classification " + ID.toString() + " stored in the server.");
         return true;
     }
 
@@ -379,7 +379,7 @@ public class MCRCheckClassACLServlet extends MCRServlet {
                 Element input2 = new Element("input");
                 input2.setAttribute("name", "se_mcrid");
                 input2.setAttribute("type", "hidden");
-                input2.setAttribute("value", ID.getId());
+                input2.setAttribute("value", ID.toString());
                 form.addContent(input2);
 
                 Element input3 = new Element("input");

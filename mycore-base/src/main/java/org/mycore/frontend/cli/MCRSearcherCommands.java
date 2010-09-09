@@ -184,9 +184,9 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
         List<MCRFieldValue> fields = MCRData2Fields.buildFields(xml, searcher.getIndex(), MCRFieldDef.OBJECT_METADATA
                 + MCRFieldDef.OBJECT_CATEGORY, id.getTypeId());
         if (update) {
-            searcher.removeFromIndex(id.getId());
+            searcher.removeFromIndex(id.toString());
         }
-        searcher.addToIndex(id.getId(), id.getId(), fields);
+        searcher.addToIndex(id.toString(), id.toString(), fields);
     }
 
     private static void addFileToIndex(MCRFile file, boolean update, MCRSearcher searcher) {

@@ -275,7 +275,7 @@ final public class MCRObject extends MCRBase {
         elm.addNamespaceDeclaration(XSI_NAMESPACE);
         elm.addNamespaceDeclaration(XLINK_NAMESPACE);
         elm.setAttribute("noNamespaceSchemaLocation", mcr_schema, XSI_NAMESPACE);
-        elm.setAttribute("ID", mcr_id.getId());
+        elm.setAttribute("ID", mcr_id.toString());
         elm.setAttribute("label", mcr_label);
         elm.setAttribute("version", mcr_version);
         elm.addContent(mcr_struct.createXML());
@@ -295,8 +295,8 @@ final public class MCRObject extends MCRBase {
     @Override
     public final void createInDatastore() throws MCRPersistenceException, MCRActiveLinkException {
         // exist the object?
-        if (existInDatastore(mcr_id.getId())) {
-            throw new MCRPersistenceException("The object " + mcr_id.getId() + " allready exists, nothing done.");
+        if (existInDatastore(mcr_id.toString())) {
+            throw new MCRPersistenceException("The object " + mcr_id.toString() + " allready exists, nothing done.");
         }
 
         // create this object in datastore
@@ -312,7 +312,7 @@ final public class MCRObject extends MCRBase {
         MCRObject parent = null;
 
         if (parent_id != null) {
-            LOGGER.debug("Parent ID = " + parent_id.getId());
+            LOGGER.debug("Parent ID = " + parent_id.toString());
 
             try {
                 parent = new MCRObject();
@@ -487,7 +487,7 @@ final public class MCRObject extends MCRBase {
         MCRObjectID parent_id = mcr_struct.getParentID();
 
         if (parent_id != null) {
-            LOGGER.debug("Parent ID = " + parent_id.getId());
+            LOGGER.debug("Parent ID = " + parent_id.toString());
 
             try {
                 MCRObject parent = new MCRObject();
@@ -703,7 +703,7 @@ final public class MCRObject extends MCRBase {
         MCRObjectID parent_id = mcr_struct.getParentID();
 
         if (parent_id != null) {
-            LOGGER.debug("Parent ID = " + parent_id.getId());
+            LOGGER.debug("Parent ID = " + parent_id.toString());
 
             try {
                 MCRObject parent = new MCRObject();
@@ -820,7 +820,7 @@ final public class MCRObject extends MCRBase {
      *                if a persistence problem is occured
      */
     private final void updateMetadataInDatastore(MCRObjectID child_id) throws MCRPersistenceException {
-        LOGGER.debug("Update metadata from Child " + child_id.getId());
+        LOGGER.debug("Update metadata from Child " + child_id.toString());
 
         // get the XML Stream for the child_id
         receiveFromDatastore(child_id);
@@ -839,7 +839,7 @@ final public class MCRObject extends MCRBase {
         MCRObjectID parent_id = mcr_struct.getParentID();
 
         if (parent_id != null) {
-            LOGGER.debug("Parent ID = " + parent_id.getId());
+            LOGGER.debug("Parent ID = " + parent_id.toString());
 
             try {
                 MCRObject parent = new MCRObject();
@@ -902,7 +902,7 @@ final public class MCRObject extends MCRBase {
      * The method print all informations about this MCRObject.
      */
     public final void debug() {
-        LOGGER.debug("MCRObject ID : " + mcr_id.getId());
+        LOGGER.debug("MCRObject ID : " + mcr_id.toString());
         LOGGER.debug("MCRObject Label : " + mcr_label);
         LOGGER.debug("MCRObject Schema : " + mcr_schema);
         LOGGER.debug("");

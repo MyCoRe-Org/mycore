@@ -310,14 +310,10 @@ public class MCRStartClassEditorServlet extends MCRServlet {
 
             }
             if ("create-classification".equals(todo)) {
-                MCRObjectID cli = new MCRObjectID();
                 String idBase = MCRConfiguration.instance().getString("MCR.SWF.Project.ID", "DocPortal") + "_class";
-                cli.setNextFreeId(idBase);
+                MCRObjectID cli = MCRObjectID.getNextFreeId(idBase);
 
-                if (!cli.isValid()) {
-                    LOGGER.error("Create an unique CLID failed. " + cli.toString());
-                }
-                Element classRoot = new Element("mycoreclass").setAttribute("ID", cli.getId());
+                Element classRoot = new Element("mycoreclass").setAttribute("ID", cli.toString());
                 params.put("sourceUri", "session:" + sessionObjectID);
                 MCRSessionMgr.getCurrentSession().put(sessionObjectID, classRoot);
             }

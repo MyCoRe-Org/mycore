@@ -119,7 +119,7 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
         }
 
         if (!hasid) {
-            indoc.getRootElement().setAttribute("ID", ID.getId());
+            indoc.getRootElement().setAttribute("ID", ID.toString());
         }
 
         // check access
@@ -131,7 +131,7 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
         // Save the incoming to a file
         byte[] outxml = MCRUtils.getByteArray(indoc);
         File savedir = MCRSimpleWorkflowManager.instance().getDirectoryPath(ID.getBase());
-        File fullname = new File(savedir, ID.getId() + ".xml");
+        File fullname = new File(savedir, ID.toString() + ".xml");
         storeMetadata(outxml, job, ID, fullname.getAbsolutePath());
 
         // create a metadata object and prepare it
@@ -183,7 +183,7 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
             out.close();
         }
 
-        LOGGER.info("Object " + ID.getId() + " stored under " + fullname + ".");
+        LOGGER.info("Object " + ID.toString() + " stored under " + fullname + ".");
         return true;
     }
 

@@ -59,7 +59,7 @@ public class MCRSWFUploadHandlerIFS extends MCRUploadHandlerIFS {
     protected void init(String docId, String derId) {
         LOGGER.debug("MCRUploadHandlerMyCoRe DocID: " + docId + " DerId: " + derId);
         if (derId == null) {
-            derId = MCRSimpleWorkflowManager.instance().getNextDrivateID(new MCRObjectID(docId)).getId();
+            derId = MCRSimpleWorkflowManager.instance().getNextDrivateID(new MCRObjectID(docId)).toString();
         }
         super.init(docId, derId);
     }

@@ -32,7 +32,7 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
         if (evt.getObjectType().equals(MCREvent.OBJECT_TYPE)) {
             MCRObject obj = (MCRObject) (evt.get("object"));
             if (obj != null) {
-                logger.debug(getClass().getName() + " handling " + obj.getId().getId() + " "
+                logger.debug(getClass().getName() + " handling " + obj.getId().toString() + " "
                         + evt.getEventType());
                 if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
                     handleObjectCreated(evt, obj);
@@ -57,7 +57,7 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
         if (evt.getObjectType().equals(MCREvent.DERIVATE_TYPE)) {
             MCRDerivate der = (MCRDerivate) (evt.get("derivate"));
             if (der != null) {
-                logger.debug(getClass().getName() + " handling " + der.getId().getId() + " "
+                logger.debug(getClass().getName() + " handling " + der.getId().toString() + " "
                         + evt.getEventType());
                 if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
                     handleDerivateCreated(evt, der);

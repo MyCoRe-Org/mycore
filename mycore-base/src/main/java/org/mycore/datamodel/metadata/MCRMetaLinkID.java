@@ -88,7 +88,7 @@ final public class MCRMetaLinkID extends MCRMetaLink {
     public final void setReference(String set_href, String set_label, String set_title) throws MCRException {
         try {
             MCRObjectID hrefid = new MCRObjectID(set_href);
-            super.setReference(hrefid.getId(), set_label, set_title);
+            super.setReference(hrefid.toString(), set_label, set_title);
         } catch (Exception e) {
             throw new MCRException("The href value is not a MCRObjectID: " + set_href, e);
         }
@@ -111,7 +111,7 @@ final public class MCRMetaLinkID extends MCRMetaLink {
             throw new MCRException("The href value is null.");
         }
 
-        super.setReference(set_href.getId(), set_label, set_title);
+        super.setReference(set_href.toString(), set_label, set_title);
     }
 
     /**
@@ -132,7 +132,7 @@ final public class MCRMetaLinkID extends MCRMetaLink {
         try {
             MCRObjectID fromid = new MCRObjectID(set_from);
             MCRObjectID toid = new MCRObjectID(set_to);
-            super.setBiLink(fromid.getId(), toid.getId(), set_title);
+            super.setBiLink(fromid.toString(), toid.toString(), set_title);
         } catch (Exception e) {
             linktype = null;
             throw new MCRException("The from/to value is not a MCRObjectID.");
@@ -157,7 +157,7 @@ final public class MCRMetaLinkID extends MCRMetaLink {
             throw new MCRException("The from/to value is null.");
         }
 
-        super.setBiLink(set_from.getId(), set_to.getId(), set_title);
+        super.setBiLink(set_from.toString(), set_to.toString(), set_title);
     }
 
     /**
@@ -204,21 +204,21 @@ final public class MCRMetaLinkID extends MCRMetaLink {
         if (linktype.equals("locator")) {
             try {
                 MCRObjectID hrefid = new MCRObjectID(href);
-                href = hrefid.getId();
+                href = hrefid.toString();
             } catch (Exception e) {
                 throw new MCRException("The xlink:href is not a MCRObjectID.");
             }
         } else {
             try {
                 MCRObjectID fromid = new MCRObjectID(from);
-                from = fromid.getId();
+                from = fromid.toString();
             } catch (Exception e) {
                 throw new MCRException("The xlink:from is not a MCRObjectID.");
             }
 
             try {
                 MCRObjectID toid = new MCRObjectID(to);
-                to = toid.getId();
+                to = toid.toString();
             } catch (Exception e) {
                 throw new MCRException("The xlink:to is not a MCRObjectID.");
             }

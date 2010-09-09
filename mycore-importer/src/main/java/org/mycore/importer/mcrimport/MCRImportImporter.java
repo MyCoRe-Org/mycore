@@ -251,7 +251,7 @@ public class MCRImportImporter {
             // save xml file to temp dir
             File mcrFile = saveDocumentToTemp(fs, mcrDocument);
             fs.setSavedInTempDirectory(true);
-            String mcrId = fs.getMycoreId().getId();
+            String mcrId = fs.getMycoreId().toString();
 
             // add load command to the command list
             loadCommand.append(mcrFile.getAbsolutePath());
@@ -303,7 +303,7 @@ public class MCRImportImporter {
         StringBuffer baseBuf = new StringBuffer(config.getProjectName()).append("_").append(objectType);
         MCRObjectID mcrObjId = getNextFreeId(baseBuf.toString());
         // set the new id in the xml document
-        doc.getRootElement().setAttribute("ID", mcrObjId.getId());
+        doc.getRootElement().setAttribute("ID", mcrObjId.toString());
         // set the new mycore id
         fs.setMycoreId(mcrObjId);
         return doc;
@@ -329,7 +329,7 @@ public class MCRImportImporter {
         StringBuffer baseBuf = new StringBuffer(config.getProjectName()).append("_derivate");
         MCRObjectID mcrDerivateId = getNextFreeId(baseBuf.toString());
         // set the new id in the xml document
-        doc.getRootElement().setAttribute("ID", mcrDerivateId.getId());
+        doc.getRootElement().setAttribute("ID", mcrDerivateId.toString());
         fs.setMycoreId(mcrDerivateId);
         return doc;
     }
@@ -341,8 +341,7 @@ public class MCRImportImporter {
      * @return a new mcr object id
      */
     protected MCRObjectID getNextFreeId(String base) {
-        MCRObjectID mcrObjId = new MCRObjectID();
-        mcrObjId.setNextFreeId(base);
+        MCRObjectID mcrObjId = MCRObjectID.getNextFreeId(base);
         return mcrObjId;
     }
 
@@ -368,7 +367,7 @@ public class MCRImportImporter {
         File subfolder = new File(TEMP_DIR, mcrId.getTypeId());
         if(!subfolder.exists())
             subfolder.mkdir();
-        StringBuffer fileName = new StringBuffer(mcrId.getId()).append(".xml");
+        StringBuffer fileName = new StringBuffer(mcrId.toString()).append(".xml");
         return new File(subfolder, fileName.toString());
     }
 

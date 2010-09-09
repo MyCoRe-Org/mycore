@@ -105,7 +105,7 @@ public class MCRDerivateLinkServlet extends MCRServlet {
             return null;
         }
         Element objElement = new Element("mycoreobject");
-        objElement.setAttribute("id", objectId.getId());
+        objElement.setAttribute("id", objectId.toString());
         for (String derivate : derivates) {
             Element derElement = new Element("derivate");
             derElement.setAttribute("id", derivate);

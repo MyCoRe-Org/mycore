@@ -127,7 +127,7 @@ public class MCRXMLTableManagerTest extends MCRTestCase {
     public void retrieve() throws JDOMException, IOException {
         store.create(MyCoRe_document_00000001.id, MCRContent.readFrom(MyCoRe_document_00000001.blob), MyCoRe_document_00000001.lastModified);
         Document doc = store.retrieveXML(MyCoRe_document_00000001.id);
-        assertEquals("Stored document ID do not match:", MyCoRe_document_00000001.id.getId(), doc.getRootElement().getAttributeValue("id"));
+        assertEquals("Stored document ID do not match:", MyCoRe_document_00000001.id.toString(), doc.getRootElement().getAttributeValue("id"));
         try {
             doc = store.retrieveXML(MCR_document_00000001.id);
             if (doc != null) {
@@ -159,7 +159,7 @@ public class MCRXMLTableManagerTest extends MCRTestCase {
     public void retrieveAllIDs() {
         assertEquals("Store should not contain any objects.", 0, store.listIDs().size());
         store.create(MyCoRe_document_00000001.id, MyCoRe_document_00000001.blob, MyCoRe_document_00000001.lastModified);
-        assertTrue("Store does not contain object " + MyCoRe_document_00000001.id, store.listIDs().contains(MyCoRe_document_00000001.id.getId()));
+        assertTrue("Store does not contain object " + MyCoRe_document_00000001.id, store.listIDs().contains(MyCoRe_document_00000001.id.toString()));
     }
 
     private static class XMLInfo {

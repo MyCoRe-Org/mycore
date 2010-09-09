@@ -102,7 +102,6 @@ public abstract class MCRBase {
      *                a special exception for configuration data
      */
     public MCRBase() throws MCRException, MCRConfigurationException {
-        mcr_id = new MCRObjectID();
         mcr_label = "";
         mcr_version = MCRConstants.VERSION;
         mcr_schema = "";
@@ -190,9 +189,7 @@ public abstract class MCRBase {
      *            the object ID
      */
     public final void setId(MCRObjectID id) {
-        if (id.isValid()) {
-            mcr_id = id;
-        }
+        mcr_id = id;
     }
 
     /**
@@ -321,7 +318,7 @@ public abstract class MCRBase {
      * @return a boolean value
      */
     public boolean isValid() {
-        if (!mcr_id.isValid()) {
+        if (mcr_id == null) {
             return false;
         }
 

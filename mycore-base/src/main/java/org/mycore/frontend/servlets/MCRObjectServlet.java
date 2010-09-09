@@ -171,7 +171,7 @@ public class MCRObjectServlet extends MCRServlet {
 
         if (!MCRAccessManager.checkPermission(mcrid, "read")) { // check read permission for ID
             StringBuffer msg = new StringBuffer(1024);
-            msg.append("Access denied reading MCRObject with ID: ").append(mcrid.getId());
+            msg.append("Access denied reading MCRObject with ID: ").append(mcrid.toString());
             msg.append(".\nCurrent User: ").append(MCRSessionMgr.getCurrentSession().getCurrentUserID());
             msg.append("\nRemote IP: ").append(MCRSessionMgr.getCurrentSession().getCurrentIP());
             generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_FORBIDDEN, msg.toString(), null, false);

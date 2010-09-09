@@ -287,7 +287,7 @@ public class MCRXMLTableManager {
             if (ex instanceof MCRException) {
                 throw (MCRException) ex;
             }
-            String msg = "Exception while storing XML metadata of mcrobject " + mcrid.getId();
+            String msg = "Exception while storing XML metadata of mcrobject " + mcrid.toString();
             throw new MCRPersistenceException(msg, ex);
         }
     }
@@ -307,7 +307,7 @@ public class MCRXMLTableManager {
             if (ex instanceof MCRException) {
                 throw (MCRException) ex;
             }
-            String msg = "Exception while storing XML metadata of mcrobject " + mcrid.getId();
+            String msg = "Exception while storing XML metadata of mcrobject " + mcrid.toString();
             throw new MCRPersistenceException(msg, ex);
         }
     }
@@ -330,7 +330,7 @@ public class MCRXMLTableManager {
             if (ex instanceof MCRException) {
                 throw (MCRException) ex;
             }
-            String msg = "Exception while storing XML metadata of mcrobject " + mcrid.getId();
+            String msg = "Exception while storing XML metadata of mcrobject " + mcrid.toString();
             throw new MCRPersistenceException(msg, ex);
         }
     }
@@ -348,7 +348,7 @@ public class MCRXMLTableManager {
             if (ex instanceof MCRException) {
                 throw (MCRException) ex;
             }
-            String msg = "Exception while deleting XML metadata of mcrobject " + mcrid.getId();
+            String msg = "Exception while deleting XML metadata of mcrobject " + mcrid.toString();
             throw new MCRPersistenceException(msg, ex);
         }
         MCRConfiguration.instance().systemModified();
@@ -369,7 +369,7 @@ public class MCRXMLTableManager {
             if (ex instanceof MCRException) {
                 throw (MCRException) ex;
             }
-            String msg = "Exception while updating XML metadata of mcrobject " + mcrid.getId();
+            String msg = "Exception while updating XML metadata of mcrobject " + mcrid.toString();
             throw new MCRPersistenceException(msg, ex);
         }
     }
@@ -389,7 +389,7 @@ public class MCRXMLTableManager {
             if (ex instanceof MCRException) {
                 throw (MCRException) ex;
             }
-            String msg = "Exception while updating XML metadata of mcrobject " + mcrid.getId();
+            String msg = "Exception while updating XML metadata of mcrobject " + mcrid.toString();
             throw new MCRPersistenceException(msg, ex);
         }
     }
@@ -418,7 +418,7 @@ public class MCRXMLTableManager {
             if (ex instanceof MCRException) {
                 throw (MCRException) ex;
             }
-            String msg = "Exception while updating XML metadata of mcrobject " + mcrid.getId();
+            String msg = "Exception while updating XML metadata of mcrobject " + mcrid.toString();
             throw new MCRPersistenceException(msg, ex);
         }
     }
@@ -435,7 +435,7 @@ public class MCRXMLTableManager {
             if (ex instanceof MCRException) {
                 throw (MCRException) ex;
             }
-            String msg = "Exception while retrieving XML metadata of mcrobject " + mcrid.getId();
+            String msg = "Exception while retrieving XML metadata of mcrobject " + mcrid.toString();
             throw new MCRPersistenceException(msg, ex);
         }
     }
@@ -452,7 +452,7 @@ public class MCRXMLTableManager {
             if (ex instanceof MCRException) {
                 throw (MCRException) ex;
             }
-            String msg = "Exception while retrieving XML metadata of mcrobject " + mcrid.getId();
+            String msg = "Exception while retrieving XML metadata of mcrobject " + mcrid.toString();
             throw new MCRPersistenceException(msg, ex);
         }
     }
@@ -469,7 +469,7 @@ public class MCRXMLTableManager {
             if (ex instanceof MCRException) {
                 throw (MCRException) ex;
             }
-            String msg = "Exception while retrieving XML metadata of mcrobject " + mcrid.getId();
+            String msg = "Exception while retrieving XML metadata of mcrobject " + mcrid.toString();
             throw new MCRPersistenceException(msg, ex);
         }
     }
@@ -500,7 +500,7 @@ public class MCRXMLTableManager {
             if (ex instanceof MCRException) {
                 throw (MCRException) ex;
             }
-            String msg = "Exception while checking existence of mcrobject " + mcrid.getId();
+            String msg = "Exception while checking existence of mcrobject " + mcrid.toString();
             throw new MCRPersistenceException(msg, ex);
         }
     }
@@ -514,10 +514,9 @@ public class MCRXMLTableManager {
         MCRMetadataStore store = getStore(base);
         List<String> list = new ArrayList<String>();
         Iterator<Integer> it = store.listIDs(MCRStore.ASCENDING);
-        MCRObjectID oid = new MCRObjectID(base + "_1");
+        String[] idParts = MCRObjectID.getIDParts(base);
         while (it.hasNext()) {
-            oid.setNumber(it.next());
-            list.add(oid.getId());
+            list.add(MCRObjectID.formatID(idParts[0], idParts[1], it.next()));
         }
         return list;
     }

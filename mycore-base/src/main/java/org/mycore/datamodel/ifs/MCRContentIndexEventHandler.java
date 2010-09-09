@@ -50,7 +50,7 @@ public class MCRContentIndexEventHandler extends MCREventHandlerBase {
      */
     @Override
     protected void handleDerivateRepaired(MCREvent evt, MCRDerivate der) {
-        MCRDirectory rootifs = MCRDirectory.getRootDirectory(der.getId().getId());
+        MCRDirectory rootifs = MCRDirectory.getRootDirectory(der.getId().toString());
         doForChildren(rootifs);
     }
 

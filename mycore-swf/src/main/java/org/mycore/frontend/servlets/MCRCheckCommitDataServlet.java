@@ -75,7 +75,7 @@ public class MCRCheckCommitDataServlet extends MCRCheckDataBase {
             // then delete the data
             wfm.deleteMetadataObject(ID);
             // return all is ready
-            sb.append("receive/").append(ID.getId());
+            sb.append("receive/").append(ID.toString());
         } else {
             sb.append(pagedir).append(MCRConfiguration.instance().getString("MCR.SWF.PageErrorStore", "editor_error_store.xml"));
         }
@@ -99,7 +99,7 @@ public class MCRCheckCommitDataServlet extends MCRCheckDataBase {
         String appl = MCRConfiguration.instance().getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
         String subject = "Automatically generated message from " + appl;
         StringBuffer text = new StringBuffer();
-        text.append("An Object with type ").append(ID.getTypeId()).append(" and ID ").append(ID.getId()).append(
+        text.append("An Object with type ").append(ID.getTypeId()).append(" and ID ").append(ID.toString()).append(
                 " was stored in the system.");
         LOGGER.info(text.toString());
 
@@ -119,7 +119,7 @@ public class MCRCheckCommitDataServlet extends MCRCheckDataBase {
         if (MCRAccessManager.checkPermission(ID, "writedb")) {
             return true;
         }
-        Collection<String> col = MCRAccessManager.getPermissionsForID(ID.getId());
+        Collection<String> col = MCRAccessManager.getPermissionsForID(ID.toString());
         if (col == null || col.size() == 0) {
             if ((!MCRAccessManager.checkPermission("create-" + ID.getBase()))
                     && (!MCRAccessManager.checkPermission("create-" + ID.getTypeId()))) {

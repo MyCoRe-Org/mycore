@@ -126,7 +126,7 @@ public class MCRLinkTableManager {
      *            the optional attribute of the reference as String
      */
     public void addReferenceLink(MCRObjectID from, MCRObjectID to, String type, String attr) {
-        addReferenceLink(from.getId(), to.getId(), type, attr);
+        addReferenceLink(from.toString(), to.toString(), type, attr);
     }
 
     /**
@@ -182,7 +182,7 @@ public class MCRLinkTableManager {
      *            the source of the reference as MCRObjectID
      */
     public void deleteReferenceLink(MCRObjectID from) {
-        deleteReferenceLink(from.getId());
+        deleteReferenceLink(from.toString());
     }
 
     /**
@@ -239,7 +239,7 @@ public class MCRLinkTableManager {
      * @return the number of references
      */
     public int countReferenceLinkTo(MCRObjectID to) {
-        return countReferenceLinkTo(to.getId());
+        return countReferenceLinkTo(to.toString());
     }
 
     /**
@@ -336,7 +336,7 @@ public class MCRLinkTableManager {
      * @return List of Strings (Source-IDs)
      */
     public Collection<String> getSourceOf(MCRObjectID to) {
-        return getSourceOf(to.getId());
+        return getSourceOf(to.toString());
     }
 
     /**
@@ -371,7 +371,7 @@ public class MCRLinkTableManager {
      * @return List of Strings (Source-IDs)
      */
     public Collection<String> getSourceOf(MCRObjectID to, String type) {
-        return getSourceOf(to.getId(), type);
+        return getSourceOf(to.toString(), type);
     }
 
     /**
@@ -441,7 +441,7 @@ public class MCRLinkTableManager {
      * @return List of Strings (Source-IDs)
      */
     public Collection<String> getDestinationOf(MCRObjectID from, String type) {
-        return getDestinationOf(from.getId(), type);
+        return getDestinationOf(from.toString(), type);
     }
 
     /**

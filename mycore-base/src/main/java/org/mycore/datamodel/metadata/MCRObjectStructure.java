@@ -200,7 +200,7 @@ public class MCRObjectStructure {
      * @return boolean true, if successfully completed
      */
     public final boolean removeChild(MCRObjectID href) {
-        logger.debug("Remove child ID " + href.getId());
+        logger.debug("Remove child ID " + href.toString());
 
         int i;
         int n = children.size();
@@ -258,7 +258,7 @@ public class MCRObjectStructure {
         if (MCRDerivate.existInDatastore(href)) {
             derivates.add(add_derivate);
         } else {
-            logger.warn("Can't find derivate " + href.getId() + " ,ignored.");
+            logger.warn("Can't find derivate " + href.toString() + " ,ignored.");
         }
     }
 

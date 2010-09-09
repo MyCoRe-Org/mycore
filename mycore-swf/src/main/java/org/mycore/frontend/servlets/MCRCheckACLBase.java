@@ -334,7 +334,7 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
                 Element input2 = new Element("input");
                 input2.setAttribute("name", "se_mcrid");
                 input2.setAttribute("type", "hidden");
-                input2.setAttribute("value", ID.getId());
+                input2.setAttribute("value", ID.toString());
                 form.addContent(input2);
 
                 Element input3 = new Element("input");

@@ -58,12 +58,19 @@ public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
     private static final long serialVersionUID = -6409340238736582208L;
 
     private static String metsfile = CONFIG.getString("MCR.MetsMots.ConfigFile", "mets.xml");
+
     private static String allowed = CONFIG.getString("MCR.Component.MetsMods.allowed", "");
+
     private static String defaultowner = CONFIG.getString("MCR.Component.MetsMods.owner", "");
+
     private static String defaultlogo = CONFIG.getString("MCR.Component.MetsMods.ownerLogo", "");
+
     private static String defaultownerSiteURL = CONFIG.getString("MCR.Component.MetsMods.ownerSiteURL", "");
+
     private static String defaultreferenceURL = CONFIG.getString("MCR.Component.MetsMods.referenceURL", "");
+
     private static String defaultpresentationURL = CONFIG.getString("MCR.Component.MetsMods.presentationURL", "");
+
     private static String activated = CONFIG.getString("MCR.Component.MetsMods.activated", "");
 
     private Transaction tx;
@@ -122,11 +129,11 @@ public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
 
         boolean awasfound = false;
 
-        if (!MCRAccessManager.checkPermission(cd.myremcrid.getId(), "writedb")) {
+        if (!MCRAccessManager.checkPermission(cd.myremcrid.toString(), "writedb")) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
         }
-        if (!cd.mysemcrid.isValid()) {
+        if (cd.mysemcrid == null) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + mcriderrorpage));
             return;
         }
@@ -137,7 +144,7 @@ public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
             language = session.getCurrentLanguage();
         }
 
-        MCRFilesystemNode node = MCRFilesystemNode.getRootNode(cd.mysemcrid.getId());
+        MCRFilesystemNode node = MCRFilesystemNode.getRootNode(cd.mysemcrid.toString());
         MCRDirectory dir = (MCRDirectory) node;
 
         String mypath = dir.getName();
@@ -186,8 +193,8 @@ public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
 
                 MCRMetsModsUtil mmu = new MCRMetsModsUtil();
 
-                Element mets = mmu.init_mets(cd.mysemcrid.getId());
-                Element amdSec = mmu.init_amdSec(cd.mysemcrid.getId(), owner, ownerLogo, ownerSiteURL, referenceURL, presentationURL);
+                Element mets = mmu.init_mets(cd.mysemcrid.toString());
+                Element amdSec = mmu.init_amdSec(cd.mysemcrid.toString(), owner, ownerLogo, ownerSiteURL, referenceURL, presentationURL);
 
                 mets.addContent(amdSec);
 
@@ -196,8 +203,8 @@ public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
 
                 Element mets2;
                 if (activated.contains("CONTENTIDS"))
-                    mets2 = mmu.createMetsElement(pic_list, mets, getBaseURL() + "servlets/MCRFileNodeServlet", getBaseURL() + "receive/"
-                            + cd.myremcrid.getId());
+                    mets2 = mmu.createMetsElement(pic_list, mets, getBaseURL() + "servlets/MCRFileNodeServlet",
+                        getBaseURL() + "receive/" + cd.myremcrid.toString());
                 else
                     mets2 = mmu.createMetsElement(pic_list, mets, getBaseURL() + "servlets/MCRFileNodeServlet");
 
@@ -234,8 +241,8 @@ public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
             // e.printStackTrace();
         }
 
-        StringBuffer sb = new StringBuffer(getBaseURL()).append("receive/").append(cd.myremcrid.getId());
-        MCRSWFUploadHandlerIFS fuh = new MCRSWFUploadHandlerIFS(cd.myremcrid.getId(), cd.mysemcrid.getId(), sb.toString());
+        StringBuffer sb = new StringBuffer(getBaseURL()).append("receive/").append(cd.myremcrid.toString());
+        MCRSWFUploadHandlerIFS fuh = new MCRSWFUploadHandlerIFS(cd.myremcrid.toString(), cd.mysemcrid.toString(), sb.toString());
         String fuhid = fuh.getID();
 
         cd.myfile = pagedir + "metsmods_commit.xml";
@@ -246,15 +253,15 @@ public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
         params.put("XSL.target.param.2", "uploadId=" + fuhid);
         params.put("XSL.UploadPath", mypath + "/");
         params.put("XSL.language", language);
-        params.put("mcrid", cd.mysemcrid.getId());
+        params.put("mcrid", cd.mysemcrid.toString());
         params.put("type", cd.mytype);
         params.put("step", cd.mystep);
-        params.put("remcrid", cd.myremcrid.getId());
+        params.put("remcrid", cd.myremcrid.toString());
         String base = getBaseURL() + cd.myfile;
         if (awasfound)
             job.getResponse().sendRedirect(
-                    job.getResponse().encodeRedirectURL(
-                            buildRedirectURL(getBaseURL() + "servlets/MCRFileNodeServlet/" + cd.mysemcrid.getId() + "/?hosts=local", new Properties())));
+                job.getResponse().encodeRedirectURL(
+                    buildRedirectURL(getBaseURL() + "servlets/MCRFileNodeServlet/" + cd.mysemcrid.toString() + "/?hosts=local", new Properties())));
         else
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
 

@@ -74,7 +74,7 @@ public class MCRCheckCommitACLServlet extends MCRCheckACLBase {
                 sb.append("receive/").append(parent);
                 return sb.toString();
             }
-            sb.append("receive/").append(ID.getId());
+            sb.append("receive/").append(ID.toString());
         } else {
             sb.append(MCRConfiguration.instance().getString("MCR.SWF.PageDir", "")).append(MCRConfiguration.instance().getString("MCR.SWF.PageErrorStore", "editor_error_store.xml"));
         }
@@ -98,7 +98,7 @@ public class MCRCheckCommitACLServlet extends MCRCheckACLBase {
         String appl = MCRConfiguration.instance().getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
         String subject = "Automatically generated message from " + appl;
         StringBuffer text = new StringBuffer();
-        text.append("The ACL data of the MyCoRe object of type ").append(ID.getTypeId()).append(" with the ID ").append(ID.getId()).append(" was changed in the server.");
+        text.append("The ACL data of the MyCoRe object of type ").append(ID.getTypeId()).append(" with the ID ").append(ID.toString()).append(" was changed in the server.");
 
         try {
             MCRMailer.send(sender, addr, subject, text.toString(), false);
@@ -138,7 +138,7 @@ public class MCRCheckCommitACLServlet extends MCRCheckACLBase {
             rulesize--;
         }
 
-        LOGGER.info("Update ACLs for ID " + ID.getId() + "in server.");
+        LOGGER.info("Update ACLs for ID " + ID.toString() + "in server.");
         return true;
     }
     

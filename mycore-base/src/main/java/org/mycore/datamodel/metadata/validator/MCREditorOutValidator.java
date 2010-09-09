@@ -355,7 +355,7 @@ public class MCREditorOutValidator {
         // check the label
         String label = root.getAttributeValue("label");
         if (label == null || (label = label.trim()).length() == 0) {
-            root.setAttribute("label", id.getId());
+            root.setAttribute("label", id.toString());
         }
         // remove the path elements from the incoming
         org.jdom.Element pathes = root.getChild("pathes");
@@ -429,7 +429,7 @@ public class MCREditorOutValidator {
         for (Element datatag : servicelist) {
             checkMetaTags(datatag);
         }
-        Collection<String> li = MCRAccessManager.getPermissionsForID(id.getId());
+        Collection<String> li = MCRAccessManager.getPermissionsForID(id.toString());
         if (li != null && !li.isEmpty()) {
             hasacls = true;
         }

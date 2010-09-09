@@ -65,15 +65,12 @@ public class MCRObjectIDTest extends MCRHibTestCase {
 
     @Test
     public void setNextFreeIdString() {
-        MCRObjectID id1 = new MCRObjectID();
-        id1.setNextFreeId(BASE_ID);
+        MCRObjectID id1 = MCRObjectID.getNextFreeId(BASE_ID);
         assertEquals("First id should be int 1", 1, id1.getNumberAsInteger());
-        MCRObjectID id2 = new MCRObjectID();
-        id2.setNextFreeId(BASE_ID);
+        MCRObjectID id2 = MCRObjectID.getNextFreeId(BASE_ID);
         assertEquals("Second id should be int 2", 2, id2.getNumberAsInteger());
         MCRXMLTableManager.instance().create(id2, new Document(new Element("test")), new Date());
-        MCRObjectID id3 = new MCRObjectID();
-        id3.setNextFreeId(BASE_ID);
+        MCRObjectID id3 = MCRObjectID.getNextFreeId(BASE_ID);
         assertEquals("Second id should be int 3", 3, id3.getNumberAsInteger());
     }
 }

@@ -128,14 +128,14 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
 
     @Override
     protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
-        String entryID = obj.getId().getId();
+        String entryID = obj.getId().toString();
         List<MCRFieldValue> fields = MCRData2Fields.buildFields(obj, index);
         addToIndex(entryID, entryID, fields);
     }
 
     @Override
     protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
-        String entryID = obj.getId().getId();
+        String entryID = obj.getId().toString();
         List<MCRFieldValue> fields = MCRData2Fields.buildFields(obj, index);
         removeFromIndex(entryID);
         addToIndex(entryID, entryID, fields);
@@ -143,7 +143,7 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
 
     @Override
     protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
-        String entryID = obj.getId().getId();
+        String entryID = obj.getId().toString();
         removeFromIndex(entryID);
     }
 

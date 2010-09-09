@@ -125,7 +125,7 @@ public class MCRCheckCommitDerivateServlet extends MCRCheckBase {
             boolean isset = false;
             for (int i = 0; i < size; i++) {
                 MCRMetaLinkID link = obj.getStructure().getDerivate(i);
-                if (link.getXLinkHref().equals(der.getId().getId())) {
+                if (link.getXLinkHref().equals(der.getId().toString())) {
                     String oldlabel = link.getXLinkLabel();
                     if ((oldlabel != null) && (!oldlabel.trim().equals(label))) {
                         obj.getStructure().getDerivate(i).setXLinkLabel(label);
@@ -137,7 +137,7 @@ public class MCRCheckCommitDerivateServlet extends MCRCheckBase {
             // update mycoreobject
             if (isset) {
                 obj.updateThisInDatastore();
-                LOGGER.info("Synchronized " + der.getId().getId());
+                LOGGER.info("Synchronized " + der.getId().toString());
             }
 
             // go back
@@ -164,7 +164,7 @@ public class MCRCheckCommitDerivateServlet extends MCRCheckBase {
         StringBuffer sb = new StringBuffer();
         if (okay) {
             // return all is ready
-            sb.append("receive/").append(ID.getId());
+            sb.append("receive/").append(ID.toString());
         } else {
             sb.append(MCRConfiguration.instance().getString("MCR.SWF.PageDir", "")).append(MCRConfiguration.instance().getString("MCR.SWF.PageErrorStore", "editor_error_store.xml"));
         }
@@ -186,7 +186,7 @@ public class MCRCheckCommitDerivateServlet extends MCRCheckBase {
         String appl = MCRConfiguration.instance().getString("MCR.SWF.Mail.ApplicationID", "MyCoRe");
         String subject = "Automatically generated message from " + appl;
         StringBuffer text = new StringBuffer();
-        text.append("The title of the derivate with the ID ").append(ID.getId()).append(" was changed in the server.");
+        text.append("The title of the derivate with the ID ").append(ID.toString()).append(" was changed in the server.");
         LOGGER.info(text.toString());
         try {
             MCRMailer.send(sender, addr, subject, text.toString(), false);

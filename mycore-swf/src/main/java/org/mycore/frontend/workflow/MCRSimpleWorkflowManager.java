@@ -24,12 +24,10 @@
 // package
 package org.mycore.frontend.workflow;
 
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -44,11 +42,8 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.xpath.XPath;
-
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
-
-import static org.mycore.common.MCRConstants.*;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.common.MCRActiveLinkException;
@@ -61,7 +56,6 @@ import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.datamodel.metadata.validator.MCREditorOutValidator;
 import org.mycore.frontend.cli.MCRDerivateCommands;
 import org.mycore.frontend.cli.MCRObjectCommands;
-import org.mycore.frontend.servlets.MCRServlet;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -318,7 +312,7 @@ public class MCRSimpleWorkflowManager {
         String DID = linkmeta.getAttributeValue("href", XLINK_NAMESPACE);
         logger.debug("The linked object ID of derivate is " + DID);
 
-        if (!ID.getId().equals(DID)) {
+        if (!ID.toString().equals(DID)) {
             return false;
         }
         return true;
@@ -375,9 +369,9 @@ public class MCRSimpleWorkflowManager {
      *            the MCRObjectID of the derivate object as String
      */
     public final void deleteDerivateObject(MCRObjectID ID, MCRObjectID DID) {
-        logger.debug("Delete the derivate " + DID.getId());
+        logger.debug("Delete the derivate " + DID.toString());
         // remove the XML file
-        String fn = getDirectoryPath(ID.getBase()) + File.separator + DID.getId();
+        String fn = getDirectoryPath(ID.getBase()) + File.separator + DID.toString();
         try {
             File fi = new File(fn + ".xml");
 
@@ -469,7 +463,7 @@ public class MCRSimpleWorkflowManager {
             if (isDerivateOfObject(dername, ID)) {
                 fn = getDirectoryPath(ID.getBase()) + File.separator + dername;
 
-                if (!loadDerivate(ID.getId(), fn)) {
+                if (!loadDerivate(ID.toString(), fn)) {
                     return false;
                 }
             }
@@ -486,9 +480,9 @@ public class MCRSimpleWorkflowManager {
      *            the MCRObjectID as String of the derivate object
      */
     public final boolean commitDerivateObject(MCRObjectID ID) {
-        String fn = getDirectoryPath(ID.getBase()) + File.separator + ID.getId() + ".xml";
+        String fn = getDirectoryPath(ID.getBase()) + File.separator + ID.toString() + ".xml";
 
-        return loadDerivate(ID.getId(), fn);
+        return loadDerivate(ID.toString(), fn);
     }
 
     private boolean loadDerivate(String ID, String filename) {
@@ -541,8 +535,7 @@ public class MCRSimpleWorkflowManager {
         }
         int maxIDinWorkflow = Integer.parseInt(max.substring(max.lastIndexOf("_") + 1, max.length() - 4));
 
-        MCRObjectID mcridnext = new MCRObjectID();
-        mcridnext.setNextFreeId(myproject, maxIDinWorkflow);
+        MCRObjectID mcridnext = MCRObjectID.getNextFreeId(myproject, maxIDinWorkflow);
         return mcridnext;
     }
 
@@ -562,14 +555,14 @@ public class MCRSimpleWorkflowManager {
         // build the derivate XML file
         MCRDerivate der = new MCRDerivate();
         der.setId(DD);
-        der.setLabel("Dataobject from " + ID.getId());
+        der.setLabel("Dataobject from " + ID.toString());
         der.setSchema("datamodel-derivate.xsd");
 
         MCRMetaLinkID link = new MCRMetaLinkID("linkmetas", "linkmeta", "de", 0);
-        link.setReference(ID.getId(), "", "");
+        link.setReference(ID.toString(), "", "");
         der.getDerivate().setLinkMeta(link);
 
-        MCRMetaIFS internal = new MCRMetaIFS("internals", "internal", "de", DD.getId());
+        MCRMetaIFS internal = new MCRMetaIFS("internals", "internal", "de", DD.toString());
         internal.setMainDoc("");
         der.getDerivate().setInternals(internal);
 
@@ -594,7 +587,7 @@ public class MCRSimpleWorkflowManager {
      */
     public final org.jdom.Element getRuleFromFile(MCRObjectID mcrid, String permission) {
         // read data
-        String fn = getDirectoryPath(mcrid.getBase()) + File.separator + mcrid.getId() + ".xml";
+        String fn = getDirectoryPath(mcrid.getBase()) + File.separator + mcrid.toString() + ".xml";
         try {
             File fi = new File(fn);
             if (fi.isFile() && fi.canRead()) {
@@ -625,13 +618,13 @@ public class MCRSimpleWorkflowManager {
     public final String getWorkflowFile(ServletContext context, String pagedir, String base) {
         StringBuffer sb = new StringBuffer();
         sb.append(pagedir).append("editor_").append(base).append("_editor.xml");
-        if(!new File(context.getRealPath(sb.toString())).exists()) {
+        if (!new File(context.getRealPath(sb.toString())).exists()) {
             sb = new StringBuffer();
             int i = base.indexOf('_');
             sb.append(pagedir).append("editor_").append(base.substring(i + 1)).append("_editor.xml");
-            if(!new File(context.getRealPath(sb.toString())).exists())
+            if (!new File(context.getRealPath(sb.toString())).exists())
                 sb = new StringBuffer("");
         }
         return sb.toString();
-    } 
+    }
 }

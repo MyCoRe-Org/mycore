@@ -56,7 +56,7 @@ public class MCRStartZoomifyServlet extends MCRStartEditorServlet{
 	
 	private String getMetsFile(MCRObjectID mcrid)
 	{
-		MCRDirectory mcrwork = MCRDirectory.getRootDirectory(mcrid.getId());
+		MCRDirectory mcrwork = MCRDirectory.getRootDirectory(mcrid.toString());
 		for(int j=0;j<mcrwork.getChildren().length;j++)
 		{
 			String data = mcrwork.getChildren()[j].getName();
@@ -100,7 +100,7 @@ public class MCRStartZoomifyServlet extends MCRStartEditorServlet{
 		
 		cd.myfile = pagedir + "zoomify_commit.xml";
 		
-		MCRDirectory mcrdir = MCRDirectory.getRootDirectory(cd.mytfmcrid.getId());
+		MCRDirectory mcrdir = MCRDirectory.getRootDirectory(cd.mytfmcrid.toString());
 		String basedir = mcrdir.getName();
 				 
 		MCRObject obj = new MCRObject();
@@ -113,9 +113,9 @@ public class MCRStartZoomifyServlet extends MCRStartEditorServlet{
 		
 		String mcrname = langtext.getText();
 		
-			if(lastid.compareTo(cd.mytfmcrid.getId())!=0)
+			if(lastid.compareTo(cd.mytfmcrid.toString())!=0)
 			{
-				lastid = cd.mytfmcrid.getId();
+				lastid = cd.mytfmcrid.toString();
 				this.index = 0;
 			}
 		
@@ -152,17 +152,17 @@ public class MCRStartZoomifyServlet extends MCRStartEditorServlet{
 		Properties params = new Properties();
 	    params.put("XSL.ImagePath", "/"+basedir+"/"+directories.get(this.index));
 	    params.put("XSL.Orderlabel", orderlabels.get(this.index));
-	    params.put("XSL.mcrid", cd.mytfmcrid.getId());
-	    params.put("XSL.semcrid", cd.mysemcrid.getId());
-	    params.put("XSL.remcrid", cd.myremcrid.getId());
+	    params.put("XSL.mcrid", cd.mytfmcrid.toString());
+	    params.put("XSL.semcrid", cd.mysemcrid.toString());
+	    params.put("XSL.remcrid", cd.myremcrid.toString());
 	    params.put("XSL.index", String.valueOf(this.index+1));
 	    params.put("XSL.max", String.valueOf(this.directories.size()));
 	    params.put("XSL.label", mcrname);
-	    params.put("mcrid", cd.mytfmcrid.getId());
-	    params.put("semcrid", cd.mysemcrid.getId());
+	    params.put("mcrid", cd.mytfmcrid.toString());
+	    params.put("semcrid", cd.mysemcrid.toString());
 	    params.put("type", cd.mytype);
 	    params.put("step", cd.mystep);
-	    params.put("remcrid", cd.myremcrid.getId());
+	    params.put("remcrid", cd.myremcrid.toString());
 	    String base = getBaseURL() + cd.myfile;
 	    job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
 	}

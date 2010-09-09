@@ -23,12 +23,9 @@
 
 package org.mycore.datamodel.metadata;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.common.MCRXMLTableManager;
@@ -50,9 +47,7 @@ public final class MCRObjectID {
     public static final int MAX_LENGTH = 64;
 
     // configuration values
-    protected static MCRConfiguration CONFIG;
-
-    private static final Logger LOGGER = Logger.getLogger(MCRObjectID.class);
+    protected static MCRConfiguration CONFIG = MCRConfiguration.instance();;
 
     // counter for the next IDs per project base ID
     private static HashMap<String, Integer> lastnumber = new HashMap<String, Integer>();
@@ -66,29 +61,11 @@ public final class MCRObjectID {
 
     private int mcr_number = -1;
 
-    private boolean mcr_valid_id = false;
+    private static final int number_distance = CONFIG.getInt("MCR.Metadata.ObjectID.NumberDistance", 1);
 
-    private static int number_distance = 1;
+    private static final String number_pattern = CONFIG.getString("MCR.Metadata.ObjectID.NumberPattern", "0000000000");
 
-    private static String number_pattern = null;
-
-    private static DecimalFormat number_format = null;
-
-    /**
-     * Static method to load the configuration.
-     */
-    static {
-        CONFIG = MCRConfiguration.instance();
-        number_distance = CONFIG.getInt("MCR.Metadata.ObjectID.NumberDistance", 1);
-        number_pattern = CONFIG.getString("MCR.Metadata.ObjectID.NumberPattern", "0000000000");
-        number_format = new DecimalFormat(number_pattern);
-    }
-
-    /**
-     * The constructor for an empty MCRObjectId.
-     */
-    public MCRObjectID() {
-    }
+    private static final DecimalFormat number_format = new DecimalFormat(number_pattern);
 
     /**
      * The constructor for MCRObjectID from a given string.
@@ -97,113 +74,51 @@ public final class MCRObjectID {
      *                if the given string is not valid.
      */
     public MCRObjectID(String id) throws MCRException {
-        mcr_valid_id = false;
-
         if (!setID(id)) {
             throw new MCRException("The ID is not valid: " + id);
         }
-
-        mcr_valid_id = true;
     }
 
     /**
-     * The method set the MCRObjectID from a given base ID string. The number
-     * was computed from this methode. It is the next free number of an item in
-     * the database for the given project ID and type ID.
-     * 
-     * @exception MCRException
-     *                if the given string is not valid or can't connect to the
-     *                MCRXMLTableManager.
-     */
-    public void setNextFreeId() throws MCRException {
-        setNextFreeId(getBase());
-    }
-
-    /**
-     * The method set the MCRObjectID from a given base ID string. A base ID is
-     * <em>project_id</em>_<em>type_id</em>. The number was computed from
-     * this methode. It is the next free number of an item in the database for
+     * Returns a MCRObjectID from a given base ID string. A base ID is
+     * <em>project_id</em>_<em>type_id</em>. The number is computed by
+     * this method. It is the next free number of an item in the database for
      * the given project ID and type ID.
      * 
      * @param base_id
-     *            the basic ID
-     * @exception MCRException
-     *                if the given string is not valid or can't connect to the
-     *                MCRXMLTableManager.
+     *            <em>project_id</em>_<em>type_id</em>
      */
-    public synchronized void setNextFreeId(String base_id) throws MCRException {
-        setNextFreeId(base_id, 0);
+    public static synchronized MCRObjectID getNextFreeId(String base_id) {
+        return getNextFreeId(base_id, 0);
     }
 
-    public synchronized void setNextFreeId(String base_id, int maxInWorkflow) throws MCRException {
-        // check the base_id
-        mcr_valid_id = false;
-
-        if (!setID(base_id + "_1")) {
-            throw new MCRException("Error in project base string:" + base_id);
-        }
-
+    /**
+     * Returns a MCRObjectID from a given base ID string. Similar to {@link #getNextFreeId(String)}
+     * but the additional parameter acts as a lower limit for integer part of the ID.
+     * @param base_id
+     *  <em>project_id</em>_<em>type_id</em>
+     * @param maxInWorkflow
+     *  returned integer part of id will be at least <code>maxInWorkflow + 1</code>
+     * @return
+     */
+    public static synchronized MCRObjectID getNextFreeId(String base_id, int maxInWorkflow) {
         int last = Math.max(getLastID(base_id).getNumberAsInteger(), maxInWorkflow) + 1;
         int rest = last % number_distance;
         if (rest != 0) {
             last += number_distance - rest;
         }
         lastnumber.put(base_id, last);
-        setID(base_id + "_" + String.valueOf(last));
+        return new MCRObjectID(base_id + "_" + String.valueOf(last));
     }
 
     /**
      * Returns the last ID used or reserved for the given object base type.
      */
     public static MCRObjectID getLastID(String base_id) {
-        MCRObjectID oid = new MCRObjectID(base_id + "_1");
+        String[] idParts = getIDParts(base_id);
         int last = lastnumber.containsKey(base_id) ? lastnumber.get(base_id) : 0;
-        int stored = MCRXMLTableManager.instance().getHighestStoredID(oid.getProjectId(), oid.getTypeId());
-        oid.setNumber(Math.max(last, stored));
-        return oid;
-    }
-
-    /**
-     * This method set a new type in a existing MCRObjectID.
-     * 
-     * @param type
-     *            the new type
-     */
-    public final boolean setType(String type) {
-        if (type == null) {
-            return false;
-        }
-
-        String test = type.toLowerCase().intern();
-
-        if (!CONFIG.getBoolean("MCR.Metadata.Type." + test, false)) {
-            return false;
-        }
-
-        mcr_type_id = test;
-
-        return true;
-    }
-
-    /**
-     * This method set a new number in a existing MCRObjectID.
-     * 
-     * @param num
-     *            the new number
-     */
-    public final boolean setNumber(int num) {
-        if (!mcr_valid_id) {
-            return false;
-        }
-
-        if (num < 0) {
-            return false;
-        }
-
-        mcr_number = num;
-        mcr_id = null;
-
-        return true;
+        int stored = MCRXMLTableManager.instance().getHighestStoredID(idParts[0], idParts[1]);
+        return new MCRObjectID(base_id + "_" + String.valueOf(Math.max(last, stored)));
     }
 
     /**
@@ -213,10 +128,6 @@ public final class MCRObjectID {
      * @return the string of the project id
      */
     public final String getProjectId() {
-        if (!mcr_valid_id) {
-            return "";
-        }
-
         return mcr_project_id;
     }
 
@@ -227,10 +138,6 @@ public final class MCRObjectID {
      * @return the string of the type id
      */
     public final String getTypeId() {
-        if (!mcr_valid_id) {
-            return "";
-        }
-
         return mcr_type_id;
     }
 
@@ -241,10 +148,6 @@ public final class MCRObjectID {
      * @return the string of the number
      */
     public final String getNumberAsString() {
-        if (!mcr_valid_id) {
-            return "";
-        }
-
         return number_format.format(mcr_number);
     }
 
@@ -255,10 +158,6 @@ public final class MCRObjectID {
      * @return the number as integer
      */
     public final int getNumberAsInteger() {
-        if (!mcr_valid_id) {
-            return -1;
-        }
-
         return mcr_number;
     }
 
@@ -270,47 +169,29 @@ public final class MCRObjectID {
      * @return the string of the schema name
      */
     public String getBase() {
-        if (!mcr_valid_id) {
-            return "";
-        }
-
         return mcr_project_id + "_" + mcr_type_id;
     }
 
     /**
-     * This method get the ID string with <em>project_id</em>_
-     * <em>type_id</em>_<em>number</em>. If the ID is not valid, an empty
-     * string was returned.
-     * 
-     * @return the string of the schema name
+     * Normalizes to a object ID of form <em>project_id</em>_
+     * <em>type_id</em>_<em>number</em>, where number has leading zeros.
+     * @param projectID
+     * @param type
+     * @param number
+     * @return <em>project_id</em>_<em>type_id</em>_<em>number</em>
      */
-    public String getId() {
-        if (!mcr_valid_id) {
-            return "";
-        }
-
-        if (mcr_id == null) {
-            mcr_id = new StringBuffer(MAX_LENGTH).append(mcr_project_id).append('_').append(mcr_type_id).append('_').append(
-                    number_format.format(mcr_number)).toString();
-        }
-
-        return mcr_id;
+    public static String formatID(String projectID, String type, int number) {
+        return new StringBuilder(MAX_LENGTH).append(projectID).append('_').append(type.toLowerCase()).append('_').append(number_format.format(number)).toString();
     }
 
     /**
-     * This method return the validation value of a MCRObjectId. The MCRObjectID
-     * is valid if:
-     * <ul>
-     * <li>The syntax of the ID is <em>project_id</em>_<em>type_id</em>_
-     * <em>number</em> as <em>String_String_Integer</em>.
-     * <li>The ID is not longer as MAX_LENGTH.
-     * </ul>
-     * 
-     * @return the validation value, true if the MCRObjectId is correct,
-     *         otherwise return false
+     * Splits the submitted <code>id</code> in its parts.
+     * <code>MyCoRe_document_00000001</code> would be transformed in
+     * { "MyCoRe", "document", "00000001" }
+     * @param id either baseID or complete ID
      */
-    public boolean isValid() {
-        return mcr_valid_id;
+    public static String[] getIDParts(String id) {
+        return id.split("_");
     }
 
     /**
@@ -330,56 +211,35 @@ public final class MCRObjectID {
      * @return the validation value, true if the MCRObjectId is correct,
      *         otherwise return false
      */
-    public final boolean setID(String id) {
-        mcr_valid_id = false;
-
-        if (id == null || (id = id.trim()).length() == 0) {
+    private final boolean setID(String id) {
+        if (id == null) {
             return false;
         }
 
-        if (id.length() > MAX_LENGTH) {
+        String mcr_id = id.trim();
+
+        if (mcr_id.length() > MAX_LENGTH || mcr_id.length() == 0) {
             return false;
         }
 
-        String mcr_id;
+        String[] idParts = getIDParts(mcr_id);
 
-        try {
-            mcr_id = URLEncoder.encode(id, CONFIG.getString("MCR.Request.CharEncoding", "UTF-8"));
-        } catch (UnsupportedEncodingException e1) {
-            LOGGER.error("MCR.Request.CharEncoding property does not contain a valid encoding:", e1);
-
+        if (idParts.length != 3) {
             return false;
         }
 
-        if (!mcr_id.equals(id)) {
-            return false;
-        }
+        mcr_project_id = idParts[0].intern();
 
-        int len = mcr_id.length();
-        int i = mcr_id.indexOf("_");
+        mcr_type_id = idParts[1].toLowerCase().intern();
 
-        if (i == -1) {
-            return false;
-        }
-
-        mcr_project_id = mcr_id.substring(0, i).intern();
-
-        int j = mcr_id.indexOf("_", i + 1);
-
-        if (j == -1) {
-            return false;
-        }
-
-        mcr_type_id = mcr_id.substring(i + 1, j).toLowerCase().intern();
-
-        if (!CONFIG.getBoolean("MCR.Metadata.Type." + mcr_type_id.toLowerCase(), false)) {
+        if (!CONFIG.getBoolean("MCR.Metadata.Type." + mcr_type_id, false)) {
             return false;
         }
 
         mcr_number = -1;
 
         try {
-            mcr_number = Integer.parseInt(mcr_id.substring(j + 1, len));
+            mcr_number = Integer.parseInt(idParts[2]);
         } catch (NumberFormatException e) {
             return false;
         }
@@ -387,31 +247,9 @@ public final class MCRObjectID {
         if (mcr_number < 0) {
             return false;
         }
+        this.mcr_id = formatID(mcr_project_id, mcr_type_id, mcr_number);
 
-        this.mcr_id = null;
-        mcr_valid_id = true;
-
-        return mcr_valid_id;
-    }
-
-    /**
-     * This method checks the value of a MCRObjectId. The MCRObjectId is valid
-     * if:
-     * <ul>
-     * <li>The argument is not null.
-     * <li>The syntax of the ID is <em>project_id</em>_<em>type_id</em>_
-     * <em>number</em> as <em>String_String_Integer</em>.
-     * <li>The ID is not longer as MAX_LENGTH. >li> The ID has only characters,
-     * they must not encoded.
-     * </ul>
-     * 
-     * @param id
-     *            the MCRObjectId
-     * @throws MCRException
-     *             if ID is not valid
-     */
-    public static void isValidOrDie(String id) {
-        new MCRObjectID(id);
+        return true;
     }
 
     /**
@@ -423,7 +261,7 @@ public final class MCRObjectID {
      * @return true if all parts are equal, else return false.
      */
     public boolean equals(MCRObjectID in) {
-        return mcr_project_id.equals(in.mcr_project_id) && mcr_type_id.equals(in.mcr_type_id) && mcr_number == in.mcr_number;
+        return toString().equals(in.toString());
     }
 
     /**
@@ -444,22 +282,22 @@ public final class MCRObjectID {
     }
 
     /**
-     * @see #getId()
      * @see java.lang.Object#toString()
+     * @return {@link #formatID(String, String, int)} with {@link #getProjectId()}, {@link #getTypeId()}, {@link #getNumberAsInteger()}
      */
     @Override
     public String toString() {
-        return getId();
+        return mcr_id;
     }
 
     /**
-     * returns getId().hashCode()
+     * returns toString().hashCode()
      * 
-     * @see #getId()
+     * @see #toString()
      * @see java.lang.Object#hashCode()
      */
     @Override
     public int hashCode() {
-        return getId().hashCode();
+        return toString().hashCode();
     }
 }

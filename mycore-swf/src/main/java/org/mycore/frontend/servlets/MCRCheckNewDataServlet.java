@@ -84,7 +84,7 @@ public class MCRCheckNewDataServlet extends MCRCheckDataBase {
         String appl = MCRConfiguration.instance().getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
         String subject = "Automatically generated message from " + appl;
         StringBuffer text = new StringBuffer();
-        text.append("A new object with type ").append(ID.getTypeId()).append(" and ID ").append(ID.getId()).append(" was created in the workflow.");
+        text.append("A new object with type ").append(ID.getTypeId()).append(" and ID ").append(ID.toString()).append(" was created in the workflow.");
         LOGGER.info(text.toString());
 
         try {

@@ -117,7 +117,7 @@ public class MCRCheckEditDerivateServlet extends MCRCheckBase {
 
             // update data
             StringBuffer sb = new StringBuffer();
-            sb.append(WFM.getDirectoryPath(objID.getBase())).append(File.separator).append(derID.getId()).append(".xml");
+            sb.append(WFM.getDirectoryPath(objID.getBase())).append(File.separator).append(derID.toString()).append(".xml");
             MCRUtils.writeJDOMToFile(indoc, new File(sb.toString()));
             okay = true;
             url = getNextURL(objID, okay);
@@ -164,7 +164,7 @@ public class MCRCheckEditDerivateServlet extends MCRCheckBase {
         String appl = MCRConfiguration.instance().getString("MCR.SWF.Mail.ApplicationID", "MyCoRe");
         String subject = "Automatically generated message from " + appl;
         StringBuffer text = new StringBuffer();
-        text.append("The title of the derivate with the ID ").append(ID.getId()).append(" was changed in the workflow.");
+        text.append("The title of the derivate with the ID ").append(ID.toString()).append(" was changed in the workflow.");
         LOGGER.info(text.toString());
         try {
             MCRMailer.send(sender, addr, subject, text.toString(), false);

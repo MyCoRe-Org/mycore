@@ -101,11 +101,11 @@ public class MCRDFGViewerServlet extends MCRStartEditorServlet {
 
         // extracting mods information like title, id and date
         MCRMetsModsUtil mmu = new MCRMetsModsUtil();
-        Element mods = mmu.init_mods(cd.mysemcrid.getId(), title, display, place, date);
+        Element mods = mmu.init_mods(cd.mysemcrid.toString(), title, display, place, date);
 
         // now get the existing mets file
 
-        MCRFilesystemNode node = MCRFilesystemNode.getRootNode(cd.mysemcrid.getId());
+        MCRFilesystemNode node = MCRFilesystemNode.getRootNode(cd.mysemcrid.toString());
         MCRDirectory dir = (MCRDirectory) node;
         MCRFile mcrfile = (MCRFile) dir.getChild(metsfile);
 

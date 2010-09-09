@@ -32,7 +32,7 @@ public class MCRDeleteObjectEventHandler extends MCREventHandlerBase {
         if (evt.getObjectType().equals(MCREvent.OBJECT_TYPE)) {
             MCRObject obj = (MCRObject) (evt.get("object"));
             if (obj != null) {
-                LOGGER.debug(getClass().getName() + " handling " + obj.getId().getId() + " " + evt.getEventType());
+                LOGGER.debug(getClass().getName() + " handling " + obj.getId().toString() + " " + evt.getEventType());
                 if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
                     handleObjectCreated(evt, obj);
                 } else if (evt.getEventType().equals(MCREvent.UPDATE_EVENT)) {
@@ -54,7 +54,7 @@ public class MCRDeleteObjectEventHandler extends MCREventHandlerBase {
         if (evt.getObjectType().equals(MCREvent.DERIVATE_TYPE)) {
             MCRDerivate der = (MCRDerivate) (evt.get("derivate"));
             if (der != null) {
-                LOGGER.debug(getClass().getName() + " handling " + der.getId().getId() + " " + evt.getEventType());
+                LOGGER.debug(getClass().getName() + " handling " + der.getId().toString() + " " + evt.getEventType());
                 if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
                     handleDerivateCreated(evt, der);
                 } else if (evt.getEventType().equals(MCREvent.UPDATE_EVENT)) {
@@ -85,7 +85,7 @@ public class MCRDeleteObjectEventHandler extends MCREventHandlerBase {
     protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
         try {
             LOGGER.info("Saving deletion information for object " + obj.getId());
-            MCRDeletedItemManager.getInstance().addEntry(obj.getId().getId(), new Date());
+            MCRDeletedItemManager.getInstance().addEntry(obj.getId().toString(), new Date());
         } catch (Exception ex) {
             LOGGER.error(ex);
         }
