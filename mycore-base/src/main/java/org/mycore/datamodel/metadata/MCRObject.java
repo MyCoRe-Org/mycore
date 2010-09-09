@@ -319,7 +319,7 @@ final public class MCRObject extends MCRBase {
         if (parent_id != null) {
             try {
                 parent.getStructure().addChild(mcr_id, mcr_struct.getParent().getXLinkLabel(), mcr_label);
-                parent.updateThisInDatastore();
+                parent.fireUpdateEvent();
             } catch (Exception e) {
                 LOGGER.debug(MCRException.getStackTraceAsString(e));
                 LOGGER.error("Error while store child ID in parent object.");
@@ -367,7 +367,7 @@ final public class MCRObject extends MCRBase {
             object.mcr_service.setDate("modifydate");
         }
         object.mcr_struct.addDerivate(link);
-        object.updateThisInDatastore();
+        object.fireUpdateEvent();
     }
 
     /**
@@ -391,7 +391,7 @@ final public class MCRObject extends MCRBase {
                 object.mcr_struct.removeDerivate(i);
             }
         }
-        object.updateThisInDatastore();
+        object.fireUpdateEvent();
     }
 
     @Override
@@ -448,7 +448,7 @@ final public class MCRObject extends MCRBase {
             try {
                 MCRObject parent = MCRObject.createFromDatastore(parent_id);
                 parent.mcr_struct.removeChild(this.mcr_id);
-                parent.updateThisInDatastore();
+                parent.fireUpdateEvent();
             } catch (Exception e) {
                 LOGGER.debug(MCRException.getStackTraceAsString(e));
                 LOGGER.error("Error while delete child ID in parent object.");
@@ -587,7 +587,7 @@ final public class MCRObject extends MCRBase {
                 try {
                     MCRObject parent = MCRObject.createFromDatastore(oldparent);
                     parent.mcr_struct.removeChild(mcr_id);
-                    parent.updateThisInDatastore();
+                    parent.fireUpdateEvent();
                     setparent = true;
                 } catch (Exception e) {
                     LOGGER.debug(MCRException.getStackTraceAsString(e));
@@ -606,7 +606,7 @@ final public class MCRObject extends MCRBase {
             try {
                 MCRObject parent = MCRObject.createFromDatastore(oldparent);
                 parent.mcr_struct.removeChild(mcr_id);
-                parent.updateThisInDatastore();
+                parent.fireUpdateEvent();
                 setparent = true;
             } catch (Exception e) {
                 LOGGER.debug(MCRException.getStackTraceAsString(e));
@@ -649,14 +649,14 @@ final public class MCRObject extends MCRBase {
         }
 
         // update this dataset
-        updateThisInDatastore();
+        fireUpdateEvent();
 
         // check if the parent was new set and set them
         if (setparent) {
             try {
                 MCRObject parent = MCRObject.createFromDatastore(parent_id);
                 parent.getStructure().addChild(mcr_id, mcr_struct.getParent().getXLinkLabel(), mcr_label);
-                parent.updateThisInDatastore();
+                parent.fireUpdateEvent();
             } catch (Exception e) {
                 LOGGER.debug(MCRException.getStackTraceAsString(e));
                 LOGGER.error("Error while store child ID in parent object.");
@@ -717,7 +717,7 @@ final public class MCRObject extends MCRBase {
     /**
      * The method updates this object in the persistence layer.
      */
-    public final void updateThisInDatastore() throws MCRPersistenceException {
+    public final void fireUpdateEvent() throws MCRPersistenceException {
         if (!importMode || mcr_service.getDate("modifydate") == null) {
             mcr_service.setDate("modifydate");
         }
@@ -771,7 +771,7 @@ final public class MCRObject extends MCRBase {
         }
 
         // update this dataset
-        child.updateThisInDatastore();
+        child.fireUpdateEvent();
 
         // update all children
         for (int i = 0; i < child.mcr_struct.getChildSize(); i++) {
@@ -786,7 +786,7 @@ final public class MCRObject extends MCRBase {
      * @param id
      *            the MCRObjectID
      */
-    public final void repairPersitenceDatastore() throws MCRPersistenceException {
+    public final void fireRepairEvent() throws MCRPersistenceException {
         // check derivate link
         MCRMetaLinkID link = null;
         for (int i = 0; i < mcr_struct.getDerivateSize(); i++) {

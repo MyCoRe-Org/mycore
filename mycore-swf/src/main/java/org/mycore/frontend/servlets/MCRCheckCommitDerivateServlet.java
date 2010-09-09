@@ -135,7 +135,7 @@ public class MCRCheckCommitDerivateServlet extends MCRCheckBase {
             }
             // update mycoreobject
             if (isset) {
-                obj.updateThisInDatastore();
+                obj.fireUpdateEvent();
                 LOGGER.info("Synchronized " + der.getId().toString());
             }
 

@@ -600,7 +600,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         }
 
         MCRDerivate der = MCRDerivate.createFromDatastore(mid);
-        der.repairPersitenceDatastore();
+        der.fireRepairEvent();
         LOGGER.info("Repaired " + mid.toString());
         LOGGER.info(" ");
     }
@@ -657,7 +657,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         }
         // update mycoreobject
         if (isset) {
-            obj.updateThisInDatastore();
+            obj.fireUpdateEvent();
             LOGGER.info("Synchronized " + mid.toString());
         }
     }

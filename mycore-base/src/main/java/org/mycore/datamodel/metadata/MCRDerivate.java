@@ -485,7 +485,7 @@ final public class MCRDerivate extends MCRBase {
      *            the MCRObjectID
      */
     @Override
-    public final void repairPersitenceDatastore() throws MCRPersistenceException {
+    public final void fireRepairEvent() throws MCRPersistenceException {
         // handle events
         MCREvent evt = new MCREvent(MCREvent.DERIVATE_TYPE, MCREvent.REPAIR_EVENT);
         evt.put("derivate", this);

@@ -725,7 +725,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         removeFromIndex("id", id);
 
         MCRObject obj = MCRObject.createFromDatastore(mid);
-        obj.repairPersitenceDatastore();
+        obj.fireRepairEvent();
         LOGGER.info("Repaired " + mid.toString());
     }
 

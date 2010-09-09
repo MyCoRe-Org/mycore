@@ -313,7 +313,7 @@ public abstract class MCRBase {
      * @param id
      *            the MCRObjectID as String
      */
-    public abstract void repairPersitenceDatastore() throws MCRPersistenceException;
+    public abstract void fireRepairEvent() throws MCRPersistenceException;
 
     /**
      * This method check the validation of the content of this class. The method
