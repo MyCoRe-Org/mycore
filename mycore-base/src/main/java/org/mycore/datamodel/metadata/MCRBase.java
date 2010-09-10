@@ -66,7 +66,7 @@ public abstract class MCRBase {
 
     protected String mcr_schema = null;
 
-    protected MCRObjectService mcr_service = null;
+    protected final MCRObjectService mcr_service;
 
     // other
     protected static final String NL;
@@ -108,21 +108,6 @@ public abstract class MCRBase {
 
         // Service class
         mcr_service = new MCRObjectService();
-    }
-    
-    public MCRBase(URI uri) throws SAXParseException{
-        this();
-        setFromURI(uri);
-    }
-
-    public MCRBase(byte[] bytes, boolean valid) throws SAXParseException{
-        this();
-        setFromXML(bytes, valid);
-    }
-
-    public MCRBase(Document doc) {
-        this();
-        setFromJDOM(doc);
     }
 
     protected void setFromJDOM(Document doc) {
@@ -253,18 +238,6 @@ public abstract class MCRBase {
         }
 
         mcr_schema = schema.trim();
-    }
-
-    /**
-     * This methode set the object MCRObjectService.
-     * 
-     * @param service
-     *            the object MCRObjectService part
-     */
-    public final void setService(MCRObjectService service) {
-        if (service != null) {
-            mcr_service = service;
-        }
     }
 
     /**

@@ -37,7 +37,6 @@ import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRObjectService;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -121,9 +120,7 @@ public class MCRCheckEditACLServlet extends MCRCheckACLBase {
         File impex = new File(WFM.getDirectoryPath(ID.getBase()), ID.toString() + ".xml");
         MCRObject obj = new MCRObject();
         obj.setFromURI(impex.toURI());
-        MCRObjectService service = new MCRObjectService();
-        service.setFromDOM(outelm);
-        obj.setService(service);
+        obj.getService().setFromDOM(outelm);
 
         // Save the prepared MCRObject/MCRDerivate to a file
         FileOutputStream out = null;

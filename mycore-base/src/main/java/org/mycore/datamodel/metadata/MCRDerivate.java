@@ -50,7 +50,7 @@ final public class MCRDerivate extends MCRBase {
      */
 
     // the object content
-    private MCRObjectDerivate mcr_derivate = null;
+    private final MCRObjectDerivate mcr_derivate;
 
     /**
      * This is the constructor of the MCRDerivate class. It make an instance of
@@ -63,7 +63,6 @@ final public class MCRDerivate extends MCRBase {
      */
     public MCRDerivate() throws MCRException, MCRConfigurationException {
         super();
-
         // Derivate class
         mcr_derivate = new MCRObjectDerivate();
     }
@@ -74,7 +73,8 @@ final public class MCRDerivate extends MCRBase {
      * @throws SAXParseException
      */
     public MCRDerivate(byte[] bytes, boolean valid) throws SAXParseException {
-        super(bytes, valid);
+        this();
+        setFromXML(bytes, valid);
     }
 
     /**
@@ -82,7 +82,8 @@ final public class MCRDerivate extends MCRBase {
      * @throws SAXParseException
      */
     public MCRDerivate(Document doc) {
-        super(doc);
+        this();
+        setFromJDOM(doc);
     }
 
     /**
@@ -90,7 +91,8 @@ final public class MCRDerivate extends MCRBase {
      * @throws SAXParseException
      */
     public MCRDerivate(URI uri) throws SAXParseException {
-        super(uri);
+        this();
+        setFromURI(uri);
     }
 
     /**
@@ -141,18 +143,6 @@ final public class MCRDerivate extends MCRBase {
         // get the service data of the object
         jdom_element = jdom_element_root.getChild("service");
         mcr_service.setFromDOM(jdom_element);
-    }
-
-    /**
-     * This methode set the object MCRObjectDerivate.
-     * 
-     * @param derivate
-     *            the object MCRObjectDerivate part
-     */
-    public final void setDerivate(MCRObjectDerivate derivate) {
-        if (derivate != null) {
-            mcr_derivate = derivate;
-        }
     }
 
     /**

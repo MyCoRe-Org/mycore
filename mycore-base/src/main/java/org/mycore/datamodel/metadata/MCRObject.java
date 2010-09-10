@@ -51,9 +51,9 @@ import org.xml.sax.SAXParseException;
  */
 final public class MCRObject extends MCRBase {
     // the object content
-    private MCRObjectStructure mcr_struct = null;
+    private final MCRObjectStructure mcr_struct;
 
-    private MCRObjectMetadata mcr_metadata = null;
+    private final MCRObjectMetadata mcr_metadata;
 
     /**
      * This is the constructor of the MCRObject class. It creates an instance of
@@ -70,12 +70,8 @@ final public class MCRObject extends MCRBase {
      */
     public MCRObject() throws MCRException, MCRConfigurationException {
         super();
-
-        // Metadata class
-        mcr_metadata = new MCRObjectMetadata();
-
-        // Structure class
         mcr_struct = new MCRObjectStructure(LOGGER);
+        mcr_metadata = new MCRObjectMetadata();
     }
 
     /**
@@ -84,8 +80,8 @@ final public class MCRObject extends MCRBase {
      * @throws SAXParseException
      */
     public MCRObject(byte[] bytes, boolean valid) throws SAXParseException {
-        super(bytes, valid);
-        // TODO Auto-generated constructor stub
+        this();
+        setFromXML(bytes, valid);
     }
 
     /**
@@ -93,8 +89,8 @@ final public class MCRObject extends MCRBase {
      * @throws SAXParseException
      */
     public MCRObject(Document doc) {
-        super(doc);
-        // TODO Auto-generated constructor stub
+        this();
+        setFromJDOM(doc);
     }
 
     /**
@@ -102,8 +98,8 @@ final public class MCRObject extends MCRBase {
      * @throws SAXParseException
      */
     public MCRObject(URI uri) throws SAXParseException {
-        super(uri);
-        // TODO Auto-generated constructor stub
+        this();
+        setFromURI(uri);
     }
 
     /**
@@ -181,7 +177,6 @@ final public class MCRObject extends MCRBase {
         // get the structure data of the object
         org.jdom.Element jdom_element_root = jdom_document.getRootElement();
         org.jdom.Element jdom_element = jdom_element_root.getChild("structure");
-        mcr_struct = new MCRObjectStructure(LOGGER);
         mcr_struct.setFromDOM(jdom_element);
     }
 
@@ -189,7 +184,6 @@ final public class MCRObject extends MCRBase {
         // get the metadata of the object
         org.jdom.Element jdom_element_root = jdom_document.getRootElement();
         org.jdom.Element jdom_element = jdom_element_root.getChild("metadata");
-        mcr_metadata = new MCRObjectMetadata();
         mcr_metadata.setFromDOM(jdom_element);
     }
 
@@ -198,7 +192,6 @@ final public class MCRObject extends MCRBase {
         // get the service data of the object
         org.jdom.Element jdom_element_root = jdom_document.getRootElement();
         jdom_element = jdom_element_root.getChild("service");
-        mcr_service = new MCRObjectService();
         mcr_service.setFromDOM(jdom_element);
     }
 
@@ -221,18 +214,6 @@ final public class MCRObject extends MCRBase {
         }
 
         return mcr_metadata.setMetadataElement(obj, tag);
-    }
-
-    /**
-     * This methode set the object MCRObjectStructure.
-     * 
-     * @param structure
-     *            the object MCRObjectStructure part
-     */
-    public final void setStructure(MCRObjectStructure structure) {
-        if (structure != null) {
-            mcr_struct = structure;
-        }
     }
 
     /**

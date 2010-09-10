@@ -567,12 +567,10 @@ public class MCRSimpleWorkflowManager {
         MCRMetaIFS internal = new MCRMetaIFS("internals", "internal", "de", DD.toString());
         internal.setMainDoc("");
         der.getDerivate().setInternals(internal);
-
-        MCRObjectService service = new MCRObjectService();
-        org.jdom.Element elm = service.createXML();
+        
+        org.jdom.Element elm = der.getService().createXML();
         MCREditorOutValidator.setDefaultDerivateACLs(elm);
-        service.setFromDOM(elm);
-        der.setService(service);
+        der.getService().setFromDOM(elm);
 
         return der;
     }
