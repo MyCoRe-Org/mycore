@@ -76,7 +76,7 @@ public abstract class MCRBase {
     protected boolean importMode = false;
 
     // logger
-    static Logger LOGGER = Logger.getLogger(MCRBase.class.getPackage().getName());
+    private static final Logger LOGGER = Logger.getLogger(MCRBase.class);
 
     /**
      * Load static data for all MCRObjects

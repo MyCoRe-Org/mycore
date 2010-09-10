@@ -82,7 +82,7 @@ public final class MCRMetadataManager {
         }
 
         // handle events
-        MCRBase.LOGGER.debug("Handling derivate CREATE event");
+        LOGGER.debug("Handling derivate CREATE event");
         final MCREvent evt = new MCREvent(MCREvent.DERIVATE_TYPE, MCREvent.CREATE_EVENT);
         evt.put("derivate", mcrDerivate);
         MCREventManager.instance().handleEvent(evt);
@@ -95,7 +95,7 @@ public final class MCRMetadataManager {
         final byte[] backup = MCRXMLMetadataManager.instance().retrieveBLOB(meta.getXLinkHrefID());
 
         try {
-            MCRBase.LOGGER.debug("adding Derivate in data store");
+            LOGGER.debug("adding Derivate in data store");
             MCRMetadataManager.addDerivateInDatastore(meta.getXLinkHref(), der);
         } catch (final Exception e) {
             MCRMetadataManager.restore(mcrDerivate, backup);
@@ -114,7 +114,7 @@ public final class MCRMetadataManager {
                 if (f.exists()) {
                     MCRDirectory difs = null;
                     try {
-                        MCRBase.LOGGER.debug("Starting File-Import");
+                        LOGGER.debug("Starting File-Import");
                         difs = MCRFileImportExport.importFiles(f, mcrDerivate.getId().toString());
                         mcrDerivate.getDerivate().getInternals().setIFSID(difs.getID());
                     } catch (final Exception e) {
@@ -125,7 +125,7 @@ public final class MCRMetadataManager {
                         throw new MCRPersistenceException("Can't add derivate to the IFS", e);
                     }
                 } else {
-                    MCRBase.LOGGER.warn("Empty derivate, the File or Directory -->" + sourcepath + "<--  was not found.");
+                    LOGGER.warn("Empty derivate, the File or Directory -->" + sourcepath + "<--  was not found.");
                 }
             }
         }
@@ -159,14 +159,14 @@ public final class MCRMetadataManager {
         MCRObject parent = null;
 
         if (parent_id != null) {
-            MCRBase.LOGGER.debug("Parent ID = " + parent_id.toString());
+            LOGGER.debug("Parent ID = " + parent_id.toString());
 
             try {
                 parent = MCRMetadataManager.retrieveMCRObject(parent_id);
                 mcrObject.getMetadata().appendMetadata(parent.getMetadata().getHeritableMetadata());
             } catch (final Exception e) {
-                MCRBase.LOGGER.error(MCRException.getStackTraceAsString(e));
-                MCRBase.LOGGER.error("Error while merging metadata in this object.");
+                LOGGER.error(MCRException.getStackTraceAsString(e));
+                LOGGER.error("Error while merging metadata in this object.");
 
                 return;
             }
@@ -183,15 +183,15 @@ public final class MCRMetadataManager {
                 parent.getStructure().addChild(mcrObject.getId(), mcrObject.getStructure().getParent().getXLinkLabel(), mcrObject.getLabel());
                 MCRMetadataManager.fireUpdateEvent(parent);
             } catch (final Exception e) {
-                MCRBase.LOGGER.debug(MCRException.getStackTraceAsString(e));
-                MCRBase.LOGGER.error("Error while store child ID in parent object.");
+                LOGGER.debug(MCRException.getStackTraceAsString(e));
+                LOGGER.error("Error while store child ID in parent object.");
                 try {
                     MCRMetadataManager.delete(mcrObject);
-                    MCRBase.LOGGER.error("Child object was removed.");
+                    LOGGER.error("Child object was removed.");
                 } catch (final MCRActiveLinkException e1) {
                     // it shouldn't be possible to have allready links to this
                     // object
-                    MCRBase.LOGGER.error("Error while deleting child object.", e1);
+                    LOGGER.error("Error while deleting child object.", e1);
                 }
 
                 return;
@@ -211,22 +211,22 @@ public final class MCRMetadataManager {
         try {
             meta = mcrDerivate.getDerivate().getMetaLink().getXLinkHref();
             MCRMetadataManager.removeDerivateFromObject(new MCRObjectID(meta), mcrDerivate.getId());
-            MCRBase.LOGGER.info("Link in MCRObject " + meta + " to MCRDerivate " + mcrDerivate.getId() + " is deleted.");
+            LOGGER.info("Link in MCRObject " + meta + " to MCRDerivate " + mcrDerivate.getId() + " is deleted.");
         } catch (final Exception e) {
-            MCRBase.LOGGER.warn("Can't delete link for MCRDerivate " + mcrDerivate.getId() + " from MCRObject " + meta + ". Error ignored.");
+            LOGGER.warn("Can't delete link for MCRDerivate " + mcrDerivate.getId() + " from MCRObject " + meta + ". Error ignored.");
         }
 
         // delete data from IFS
         try {
             final MCRDirectory difs = MCRDirectory.getRootDirectory(mcrDerivate.getId().toString());
             difs.delete();
-            MCRBase.LOGGER.info("IFS entries for MCRDerivate " + mcrDerivate.getId().toString() + " are deleted.");
+            LOGGER.info("IFS entries for MCRDerivate " + mcrDerivate.getId().toString() + " are deleted.");
         } catch (final Exception e) {
             if (mcrDerivate.getDerivate().getInternals() != null) {
-                if (MCRBase.LOGGER.isDebugEnabled()) {
+                if (LOGGER.isDebugEnabled()) {
                     e.printStackTrace();
                 }
-                MCRBase.LOGGER.warn("Error while delete for ID " + mcrDerivate.getId().toString() + " from IFS with ID "
+                LOGGER.warn("Error while delete for ID " + mcrDerivate.getId().toString() + " from IFS with ID "
                     + mcrDerivate.getDerivate().getInternals().getIFSID());
             }
         }
@@ -250,7 +250,7 @@ public final class MCRMetadataManager {
 
         // check for active links
         final Collection<String> sources = MCRLinkTableManager.instance().getSourceOf(mcrObject.mcr_id);
-        MCRBase.LOGGER.debug("Sources size:" + sources.size());
+        LOGGER.debug("Sources size:" + sources.size());
         if (sources.size() > 0) {
             final MCRActiveLinkException activeLinks = new MCRActiveLinkException(new StringBuffer("Error while deleting object ")
                 .append(mcrObject.mcr_id.toString())
@@ -268,9 +268,9 @@ public final class MCRMetadataManager {
             try {
                 MCRMetadataManager.deleteMCRDerivate(derId);
             } catch (final Exception e) {
-                MCRBase.LOGGER.debug(MCRException.getStackTraceAsString(e));
-                MCRBase.LOGGER.error(e.getMessage());
-                MCRBase.LOGGER.error("Error while deleting derivate " + derId + ".");
+                LOGGER.debug(MCRException.getStackTraceAsString(e));
+                LOGGER.error(e.getMessage());
+                LOGGER.error("Error while deleting derivate " + derId + ".");
             }
         }
 
@@ -281,9 +281,9 @@ public final class MCRMetadataManager {
                 final MCRObjectID childID = new MCRObjectID(mcrObject.getStructure().getChild(i).getXLinkHref());
                 MCRMetadataManager.deleteMCRObject(childID);
             } catch (final MCRException e) {
-                MCRBase.LOGGER.debug(MCRException.getStackTraceAsString(e));
-                MCRBase.LOGGER.error(e.getMessage());
-                MCRBase.LOGGER.error("Error while deleting child.");
+                LOGGER.debug(MCRException.getStackTraceAsString(e));
+                LOGGER.error(e.getMessage());
+                LOGGER.error("Error while deleting child.");
             }
         }
 
@@ -291,16 +291,16 @@ public final class MCRMetadataManager {
         final MCRObjectID parent_id = mcrObject.getStructure().getParentID();
 
         if (parent_id != null) {
-            MCRBase.LOGGER.debug("Parent ID = " + parent_id.toString());
+            LOGGER.debug("Parent ID = " + parent_id.toString());
 
             try {
                 final MCRObject parent = MCRMetadataManager.retrieveMCRObject(parent_id);
                 parent.getStructure().removeChild(mcrObject.getId());
                 MCRMetadataManager.fireUpdateEvent(parent);
             } catch (final Exception e) {
-                MCRBase.LOGGER.debug(MCRException.getStackTraceAsString(e));
-                MCRBase.LOGGER.error("Error while delete child ID in parent object.");
-                MCRBase.LOGGER.warn("Attention, the parent " + parent_id + "is now inconsist.");
+                LOGGER.debug(MCRException.getStackTraceAsString(e));
+                LOGGER.error("Error while delete child ID in parent object.");
+                LOGGER.warn("Attention, the parent " + parent_id + "is now inconsist.");
             }
         }
 
@@ -375,7 +375,7 @@ public final class MCRMetadataManager {
         for (int i = 0; i < mcrObject.getStructure().getDerivateSize(); i++) {
             link = mcrObject.getStructure().getDerivate(i);
             if (!exists(new MCRObjectID(link.getXLinkHref()))) {
-                MCRBase.LOGGER.error("Can't find MCRDerivate " + link.getXLinkHref());
+                LOGGER.error("Can't find MCRDerivate " + link.getXLinkHref());
             }
         }
         // handle events
@@ -453,7 +453,7 @@ public final class MCRMetadataManager {
             meta_id = old.getDerivate().getMetaLink().getXLinkHref();
             MCRMetadataManager.removeDerivateFromObject(new MCRObjectID(meta_id), mcrDerivate.getId());
         } catch (final MCRException e) {
-            MCRBase.LOGGER.warn(e.getMessage(), e);
+            LOGGER.warn(e.getMessage(), e);
         }
 
         // update to IFS
@@ -528,7 +528,7 @@ public final class MCRMetadataManager {
 
             if (!newparent.equals(oldparent)) {
                 // remove child from the old parent
-                MCRBase.LOGGER.debug("Parent ID = " + oldparent);
+                LOGGER.debug("Parent ID = " + oldparent);
 
                 try {
                     final MCRObject parent = MCRMetadataManager.retrieveMCRObject(oldparent);
@@ -536,9 +536,9 @@ public final class MCRMetadataManager {
                     MCRMetadataManager.fireUpdateEvent(parent);
                     setparent = true;
                 } catch (final Exception e) {
-                    MCRBase.LOGGER.debug(MCRException.getStackTraceAsString(e));
-                    MCRBase.LOGGER.error("Error while delete child ID in parent object.");
-                    MCRBase.LOGGER.warn("Attention, the parent " + oldparent + "is now inconsist.");
+                    LOGGER.debug(MCRException.getStackTraceAsString(e));
+                    LOGGER.error("Error while delete child ID in parent object.");
+                    LOGGER.warn("Attention, the parent " + oldparent + "is now inconsist.");
                 }
             }
         }
@@ -547,7 +547,7 @@ public final class MCRMetadataManager {
             final MCRObjectID oldparent = new MCRObjectID(old.getStructure().getParent().getXLinkHref());
 
             // remove child from the old parent
-            MCRBase.LOGGER.debug("Parent ID = " + oldparent);
+            LOGGER.debug("Parent ID = " + oldparent);
 
             try {
                 final MCRObject parent = MCRMetadataManager.retrieveMCRObject(oldparent);
@@ -555,9 +555,9 @@ public final class MCRMetadataManager {
                 MCRMetadataManager.fireUpdateEvent(parent);
                 setparent = true;
             } catch (final Exception e) {
-                MCRBase.LOGGER.debug(MCRException.getStackTraceAsString(e));
-                MCRBase.LOGGER.error("Error while delete child ID in parent object.");
-                MCRBase.LOGGER.warn("Attention, the parent " + oldparent + "is now inconsist.");
+                LOGGER.debug(MCRException.getStackTraceAsString(e));
+                LOGGER.error("Error while delete child ID in parent object.");
+                LOGGER.warn("Attention, the parent " + oldparent + "is now inconsist.");
             }
         }
 
@@ -574,7 +574,7 @@ public final class MCRMetadataManager {
         final MCRObjectID parent_id = mcrObject.getStructure().getParentID();
 
         if (parent_id != null) {
-            MCRBase.LOGGER.debug("Parent ID = " + parent_id.toString());
+            LOGGER.debug("Parent ID = " + parent_id.toString());
 
             try {
                 final MCRObject parent = MCRMetadataManager.retrieveMCRObject(parent_id);
@@ -584,8 +584,8 @@ public final class MCRMetadataManager {
                 mcrObject.getMetadata().appendMetadata(parent.getMetadata().getHeritableMetadata());
 
             } catch (final Exception e) {
-                MCRBase.LOGGER.error(MCRException.getStackTraceAsString(e));
-                MCRBase.LOGGER.error("Error while merging metadata in this object.");
+                LOGGER.error(MCRException.getStackTraceAsString(e));
+                LOGGER.error("Error while merging metadata in this object.");
             }
         }
 
@@ -604,15 +604,15 @@ public final class MCRMetadataManager {
                 parent.getStructure().addChild(mcrObject.getId(), mcrObject.getStructure().getParent().getXLinkLabel(), mcrObject.getLabel());
                 MCRMetadataManager.fireUpdateEvent(parent);
             } catch (final Exception e) {
-                MCRBase.LOGGER.debug(MCRException.getStackTraceAsString(e));
-                MCRBase.LOGGER.error("Error while store child ID in parent object.");
+                LOGGER.debug(MCRException.getStackTraceAsString(e));
+                LOGGER.error("Error while store child ID in parent object.");
                 try {
                     MCRMetadataManager.delete(mcrObject);
-                    MCRBase.LOGGER.error("Child object was removed.");
+                    LOGGER.error("Child object was removed.");
                 } catch (final MCRActiveLinkException e1) {
                     // it shouldn't be possible to have allready links to this
                     // object
-                    MCRBase.LOGGER.error("Error while deleting child object.", e1);
+                    LOGGER.error("Error while deleting child object.", e1);
                 }
 
                 return;
@@ -729,7 +729,7 @@ public final class MCRMetadataManager {
             obj.setFromXML(backup, false);
             MCRMetadataManager.update(obj);
         } catch (final Exception e1) {
-            MCRBase.LOGGER.warn("Error while restoring " + obj.getId(), e1);
+            LOGGER.warn("Error while restoring " + obj.getId(), e1);
         } finally {
             // delete from the XML table
             // handle events

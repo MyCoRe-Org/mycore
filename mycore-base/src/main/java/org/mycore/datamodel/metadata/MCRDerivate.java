@@ -28,6 +28,7 @@ import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 import java.net.URI;
 
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
@@ -45,9 +46,7 @@ import org.xml.sax.SAXParseException;
  * @version $Revision$ $Date$
  */
 final public class MCRDerivate extends MCRBase {
-    /**
-     * constant value for the object id length
-     */
+    private static final Logger LOGGER = Logger.getLogger(MCRDerivate.class);
 
     // the object content
     private final MCRObjectDerivate mcr_derivate;

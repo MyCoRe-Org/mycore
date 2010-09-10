@@ -65,17 +65,16 @@ public class MCRObjectStructure {
 
     private ArrayList<MCRMetaLinkID> derivates = null;
 
-    private Logger logger = null;
+    private static final Logger logger = Logger.getLogger(MCRObjectStructure.class);
 
     /**
      * The constructor initializes NL (non-static, in order to enable different
      * NL's for different objects) and the link vectors the elements of which
      * are MCRMetaLink's.
      */
-    public MCRObjectStructure(Logger log) {
+    public MCRObjectStructure() {
         children = new ArrayList<MCRMetaLinkID>();
         derivates = new ArrayList<MCRMetaLinkID>();
-        logger = log;
     }
 
     /**

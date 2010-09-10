@@ -28,6 +28,7 @@ import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 import java.net.URI;
 
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
@@ -54,6 +55,7 @@ final public class MCRObject extends MCRBase {
     private final MCRObjectStructure mcr_struct;
 
     private final MCRObjectMetadata mcr_metadata;
+    private static final Logger LOGGER = Logger.getLogger(MCRObject.class);
 
     /**
      * This is the constructor of the MCRObject class. It creates an instance of
@@ -70,7 +72,7 @@ final public class MCRObject extends MCRBase {
      */
     public MCRObject() throws MCRException, MCRConfigurationException {
         super();
-        mcr_struct = new MCRObjectStructure(LOGGER);
+        mcr_struct = new MCRObjectStructure();
         mcr_metadata = new MCRObjectMetadata();
     }
 
