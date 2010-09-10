@@ -42,8 +42,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.metadata.MCRBase;
-import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCROrCondition;
@@ -96,7 +95,7 @@ public class MCROAIQueryImpl implements MCROAIQuery {
      * @return boolean
      */
     public boolean exists(String id) {
-        return MCRObject.existInDatastore(id);
+        return MCRMetadataManager.exists(new MCRObjectID(id));
     }
 
     /**
@@ -192,9 +191,9 @@ public class MCROAIQueryImpl implements MCROAIQuery {
         MCRObjectID mcrID=new MCRObjectID(id);
 
         if (id.indexOf("derivate") != -1) {
-            object = MCRDerivate.createFromDatastore(mcrID);
+            object = MCRMetadataManager.retrieveMCRDerivate(mcrID);
         } else {
-            object = MCRObject.createFromDatastore(mcrID);
+            object = MCRMetadataManager.retrieveMCRObject(mcrID);
         }
 
         String repositoryId = null;

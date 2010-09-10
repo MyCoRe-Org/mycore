@@ -41,6 +41,7 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRFileImportExport;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.xml.sax.SAXParseException;
@@ -154,7 +155,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      */
     public static void delete(String ID) throws MCRPersistenceException, MCRActiveLinkException {
         MCRObjectID objectID = new MCRObjectID(ID);
-        MCRDerivate.deleteFromDatastore(objectID);
+        MCRMetadataManager.deleteMCRDerivate(objectID);
         LOGGER.info(objectID + " deleted.");
     }
 
@@ -184,7 +185,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         for (int i = from_i; i < to_i + 1; i++) {
 
             String id = MCRObjectID.formatID(from.getProjectId(), from.getTypeId(), i);
-            if (MCRObject.existInDatastore(id)) {
+            if (MCRMetadataManager.exists(new MCRObjectID(id))) {
                 delete(id);
             }
         }
@@ -314,17 +315,17 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             LOGGER.warn(file + " ignored, does not end with *.xml");
             return false;
         }
-
+    
         if (!file.isFile()) {
             LOGGER.warn(file + " ignored, is not a file.");
             return false;
         }
-
+    
         LOGGER.info("Reading file " + file + " ...");
-
+    
         MCRDerivate mycore_obj = new MCRDerivate(file.toURI());
         mycore_obj.setImportMode(importMode);
-
+    
         // Replace relative path with absolute path of files
         if (mycore_obj.getDerivate().getInternals() != null) {
             String path = mycore_obj.getDerivate().getInternals().getSourcePath();
@@ -334,32 +335,32 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
                 path = mycore_obj.getId().toString().toLowerCase();
             }
             File sPath = new File(path);
-
+    
             if (!sPath.isAbsolute()) {
                 // only change path to absolute path when relative
                 String prefix = file.getParent();
-
+    
                 if (prefix != null) {
                     path = prefix + File.separator + path;
                 }
             }
-
+    
             mycore_obj.getDerivate().getInternals().setSourcePath(path);
             LOGGER.info("Source path --> " + path);
         }
-
+    
         LOGGER.info("Label --> " + mycore_obj.getLabel());
-
+    
         if (update) {
-            mycore_obj.updateInDatastore();
+            MCRMetadataManager.update(mycore_obj);
             LOGGER.info(mycore_obj.getId().toString() + " updated.");
             LOGGER.info("");
         } else {
-            mycore_obj.createInDatastore();
+            MCRMetadataManager.create(mycore_obj);
             LOGGER.info(mycore_obj.getId().toString() + " loaded.");
             LOGGER.info("");
         }
-
+    
         return true;
     }
 
@@ -483,7 +484,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         MCRDerivate obj;
 
         try {
-            obj = MCRDerivate.createFromDatastore(new MCRObjectID(nid));
+            obj = MCRMetadataManager.retrieveMCRDerivate(new MCRObjectID(nid));
             String path = obj.getDerivate().getInternals().getSourcePath();
             // reset from the absolute to relative path, for later reload
             LOGGER.info("Old Internal Path ====>" + path);
@@ -587,20 +588,20 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      */
     public static void repairDerivateSearchForID(String id) {
         LOGGER.info("Start the repair for the ID " + id);
-
+    
         MCRObjectID mid = null;
-
+    
         try {
             mid = new MCRObjectID(id);
         } catch (Exception e) {
             LOGGER.error("The String " + id + " is not a MCRObjectID.");
             LOGGER.error(" ");
-
+    
             return;
         }
-
-        MCRDerivate der = MCRDerivate.createFromDatastore(mid);
-        der.fireRepairEvent();
+    
+        MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(mid);
+        MCRMetadataManager.fireRepairEvent(der);
         LOGGER.info("Repaired " + mid.toString());
         LOGGER.info(" ");
     }
@@ -636,12 +637,12 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             LOGGER.error("The String " + id + " is not a MCRObjectID.");
             return;
         }
-
+    
         // set mycoreobject
-        MCRDerivate der = MCRDerivate.createFromDatastore(mid);
+        MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(mid);
         String label = der.getLabel();
         String href = der.getDerivate().getMetaLink().getXLinkHref();
-        MCRObject obj = MCRObject.createFromDatastore(new MCRObjectID(href));
+        MCRObject obj = MCRMetadataManager.retrieveMCRObject(new MCRObjectID(href));
         int size = obj.getStructure().getDerivateSize();
         boolean isset = false;
         for (int i = 0; i < size; i++) {
@@ -657,7 +658,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         }
         // update mycoreobject
         if (isset) {
-            obj.fireUpdateEvent();
+            MCRMetadataManager.fireUpdateEvent(obj);
             LOGGER.info("Synchronized " + mid.toString());
         }
     }

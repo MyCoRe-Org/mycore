@@ -34,6 +34,7 @@ import org.hibernate.criterion.Restrictions;
 import org.mycore.backend.hibernate.tables.MCRRESUMPTIONTOKEN;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.services.oai.MCROAIProvider;
@@ -137,7 +138,7 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore {
             String specName = "";
             if (!prefix.equals("set")) {
                 String objectId = arHitBlob[i];
-                MCRObject object=MCRObject.createFromDatastore(new MCRObjectID(objectId));
+                MCRObject object=MCRMetadataManager.retrieveMCRObject(new MCRObjectID(objectId));
                 String[] header = MCROAIProvider.getHeader(object, objectId, repositoryID, instance);
                 oaiID = header[0];
                 datestamp = header[1];

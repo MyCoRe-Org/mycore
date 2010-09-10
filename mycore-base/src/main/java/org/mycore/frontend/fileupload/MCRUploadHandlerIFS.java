@@ -40,6 +40,7 @@ import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
@@ -81,10 +82,10 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
         MCRObjectID derOID = new MCRObjectID(derId);
         derID = derOID.toString();
         docID = docId;
-        if (derId != null && MCRDerivate.existInDatastore(derId)) {
+        if (MCRMetadataManager.exists(derOID)) {
             LOGGER.debug("Derivate allready exists: " + derId);
             newDerivate = false;
-            derivate = MCRDerivate.createFromDatastore(derOID);
+            derivate = MCRMetadataManager.retrieveMCRDerivate(derOID);
         }
     }
 
@@ -104,7 +105,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
                 createNewDerivate(docID, new MCRObjectID(derID));
             }
             LOGGER.debug("Create new derivate with id: " + derivate.getId());
-            derivate.createInDatastore();
+            MCRMetadataManager.create(derivate);
         }
         rootDir = getRootDir(derivate.getId().toString());
     }
@@ -171,20 +172,20 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     public void finishUpload() throws Exception {
         // existing files
         if (!rootDir.hasChildren()) {
-            MCRDerivate.deleteFromDatastore(derivate.getId());
+            MCRMetadataManager.deleteMCRDerivate(derivate.getId());
             LOGGER.warn("No file were uploaded, delete entry in database for " + derivate.getId().toString() + " and return.");
             return;
         }
         String mainfile = getMainFilePath(rootDir);
         if (newDerivate) {
             derivate.getDerivate().getInternals().setMainDoc(mainfile);
-            derivate.updateXMLInDatastore();
+            MCRMetadataManager.updateMCRDerivateXML(derivate);
             setDefaultPermissions(derivate.getId());
         } else {
             String mf = derivate.getDerivate().getInternals().getMainDoc();
             if (mf.trim().length() == 0) {
                 derivate.getDerivate().getInternals().setMainDoc(mainfile);
-                derivate.updateXMLInDatastore();
+                MCRMetadataManager.updateMCRDerivateXML(derivate);
             }
         }
     }

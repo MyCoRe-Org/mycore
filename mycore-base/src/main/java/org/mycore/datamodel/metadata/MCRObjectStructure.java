@@ -255,7 +255,7 @@ public class MCRObjectStructure {
      */
     public final void addDerivate(MCRMetaLinkID add_derivate) {
         MCRObjectID href = add_derivate.getXLinkHrefID();
-        if (MCRDerivate.existInDatastore(href)) {
+        if (MCRMetadataManager.exists(href)) {
             derivates.add(add_derivate);
         } else {
             logger.warn("Can't find derivate " + href.toString() + " ,ignored.");

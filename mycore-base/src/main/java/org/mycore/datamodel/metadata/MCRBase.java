@@ -122,7 +122,7 @@ public abstract class MCRBase {
         setFromXML(bytes, valid);
     }
 
-    public MCRBase(Document doc) throws SAXParseException{
+    public MCRBase(Document doc) {
         this();
         setFromJDOM(doc);
     }
@@ -277,43 +277,6 @@ public abstract class MCRBase {
      * @return a JDOM Document with the XML data of the object as byte array
      */
     public abstract org.jdom.Document createXML() throws MCRException;
-
-    /**
-     * The methode create the object in the data store.
-     * 
-     * @exception MCRPersistenceException
-     *                if a persistence problem is occured
-     * @throws MCRActiveLinkException
-     */
-    public abstract void createInDatastore() throws MCRPersistenceException, MCRActiveLinkException;
-
-    /**
-     * The methode delete the object in the data store.
-     * 
-     * @param id
-     *            the object ID
-     * @exception MCRPersistenceException
-     *                if a persistence problem is occured
-     * @throws MCRActiveLinkException
-     */
-    public abstract void deleteFromDatastore() throws MCRPersistenceException, MCRActiveLinkException;
-
-    /**
-     * The methode update the object in the data store.
-     * 
-     * @exception MCRPersistenceException
-     *                if a persistence problem is occured
-     * @throws MCRActiveLinkException
-     */
-    public abstract void updateInDatastore() throws MCRPersistenceException, MCRActiveLinkException;
-
-    /**
-     * The method repair search index.
-     * 
-     * @param id
-     *            the MCRObjectID as String
-     */
-    public abstract void fireRepairEvent() throws MCRPersistenceException;
 
     /**
      * This method check the validation of the content of this class. The method

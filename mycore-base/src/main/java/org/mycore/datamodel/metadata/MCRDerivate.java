@@ -26,19 +26,13 @@ package org.mycore.datamodel.metadata;
 import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
-import java.io.File;
 import java.net.URI;
 
 import org.jdom.Document;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.events.MCREvent;
-import org.mycore.common.events.MCREventManager;
-import org.mycore.datamodel.common.MCRActiveLinkException;
-import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
-import org.mycore.datamodel.ifs.MCRFileImportExport;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -87,7 +81,7 @@ final public class MCRDerivate extends MCRBase {
      * @param doc
      * @throws SAXParseException
      */
-    public MCRDerivate(Document doc) throws SAXParseException {
+    public MCRDerivate(Document doc) {
         super(doc);
     }
 
@@ -189,196 +183,6 @@ final public class MCRDerivate extends MCRBase {
     }
 
     /**
-     * The methode create the object in the data store.
-     * 
-     * @exception MCRPersistenceException
-     *                if a persistence problem is occured
-     */
-    @Override
-    public final void createInDatastore() throws MCRPersistenceException {
-        // exist the derivate?
-        if (existInDatastore(mcr_id.toString())) {
-            throw new MCRPersistenceException("The derivate " + mcr_id.toString() + " allready exists, nothing done.");
-        }
-
-        if (!isValid()) {
-            throw new MCRPersistenceException("The derivate " + mcr_id.toString() + " is not valid.");
-        }
-        String objid = mcr_derivate.getMetaLink().getXLinkHref();
-        if (!MCRXMLMetadataManager.instance().exists(new MCRObjectID(objid))) {
-            throw new MCRPersistenceException("The derivate " + mcr_id.toString() + " can't find metadata object " + objid + ", nothing done.");
-        }
-
-        // prepare the derivate metadata and store under the XML table
-        if (mcr_service.getDate("createdate") == null || !importMode) {
-            mcr_service.setDate("createdate");
-        }
-        if (mcr_service.getDate("modifydate") == null || !importMode) {
-            mcr_service.setDate("modifydate");
-        }
-
-        // handle events
-        LOGGER.debug("Handling derivate CREATE event");
-        MCREvent evt = new MCREvent(MCREvent.DERIVATE_TYPE, MCREvent.CREATE_EVENT);
-        evt.put("derivate", this);
-        MCREventManager.instance().handleEvent(evt);
-
-        // add the link to metadata
-        MCRMetaLinkID meta = getDerivate().getMetaLink();
-        MCRMetaLinkID der = new MCRMetaLinkID();
-        der.setReference(mcr_id.toString(), mcr_label, "");
-        der.setSubTag("derobject");
-        byte[] backup = MCRXMLMetadataManager.instance().retrieveBLOB(meta.getXLinkHrefID());
-
-        try {
-            LOGGER.debug("adding Derivate in data store");
-            MCRObject.addDerivateInDatastore(meta.getXLinkHref(), der);
-        } catch (Exception e) {
-            restoreMCRObject(backup);
-            // throw final exception
-            throw new MCRPersistenceException("Error while creatlink to MCRObject " + meta.getXLinkHref() + ".", e);
-        }
-
-        // create data in IFS
-        if (getDerivate().getInternals() != null) {
-            if (getDerivate().getInternals().getSourcePath() == null) {
-                MCRDirectory difs = new MCRDirectory(mcr_id.toString(), mcr_id.toString());
-                getDerivate().getInternals().setIFSID(difs.getID());
-            } else {
-                String sourcepath = getDerivate().getInternals().getSourcePath();
-                File f = new File(sourcepath);
-                if (f.exists()) {
-                    MCRDirectory difs = null;
-                    try {
-                        LOGGER.debug("Starting File-Import");
-                        difs = MCRFileImportExport.importFiles(f, mcr_id.toString());
-                        getDerivate().getInternals().setIFSID(difs.getID());
-                    } catch (Exception e) {
-                        if (difs != null) {
-                            difs.delete();
-                        }
-                        restoreMCRObject(backup);
-                        throw new MCRPersistenceException("Can't add derivate to the IFS", e);
-                    }
-                } else {
-                    LOGGER.warn("Empty derivate, the File or Directory -->" + sourcepath + "<--  was not found.");
-                }
-            }
-        }
-    }
-
-    private void restoreMCRObject(byte[] backup) {
-        MCREvent evt;
-        // restore original instance of MCRObject
-        MCRObject obj = new MCRObject();
-        try {
-            obj.setFromXML(backup, false);
-            obj.updateInDatastore();
-        } catch (Exception e1) {
-            LOGGER.warn("Error while restoring " + obj.getId(), e1);
-        } finally {
-            // delete from the XML table
-            // handle events
-            evt = new MCREvent(MCREvent.DERIVATE_TYPE, MCREvent.DELETE_EVENT);
-            evt.put("derivate", this);
-            MCREventManager.instance().handleEvent(evt);
-        }
-    }
-
-    @Override
-    public void deleteFromDatastore() throws MCRPersistenceException, MCRActiveLinkException {
-        // remove link
-        String meta = null;
-        try {
-            meta = getDerivate().getMetaLink().getXLinkHref();
-            MCRObject.removeDerivateInDatastore(meta, mcr_id.toString());
-            LOGGER.info("Link in MCRObject " + meta + " to MCRDerivate " + mcr_id.toString() + " is deleted.");
-        } catch (Exception e) {
-            LOGGER.warn("Can't delete link for MCRDerivate " + mcr_id.toString() + " from MCRObject " + meta + ". Error ignored.");
-        }
-
-        // delete data from IFS
-        try {
-            MCRDirectory difs = MCRDirectory.getRootDirectory(mcr_id.toString());
-            difs.delete();
-            LOGGER.info("IFS entries for MCRDerivate " + mcr_id.toString() + " are deleted.");
-        } catch (Exception e) {
-            if (getDerivate().getInternals() != null) {
-                if (LOGGER.isDebugEnabled()) {
-                    e.printStackTrace();
-                }
-                LOGGER.warn("Error while delete for ID " + mcr_id.toString() + " from IFS with ID " + getDerivate().getInternals().getIFSID());
-            }
-        }
-
-        // handle events
-        MCREvent evt = new MCREvent(MCREvent.DERIVATE_TYPE, MCREvent.DELETE_EVENT);
-        evt.put("derivate", this);
-        MCREventManager.instance().handleEvent(evt);
-    }
-
-    /**
-     * The methode delete the object in the data store. The order of delete
-     * steps is:<br />
-     * <ul>
-     * <li>remove link in object metadata</li>
-     * <li>remove all files from IFS</li>
-     * <li>remive itself</li>
-     * </ul>
-     * 
-     * @param id
-     *            the object ID
-     * @exception MCRPersistenceException
-     *                if a persistence problem is occured
-     * @throws MCRActiveLinkException 
-     */
-    public static final void deleteFromDatastore(MCRObjectID id) throws MCRPersistenceException, MCRActiveLinkException {
-        MCRDerivate derivate=MCRDerivate.createFromDatastore(id);
-        derivate.deleteFromDatastore();
-    }
-
-    /**
-     * The methode return true if the derivate is in the data store, else return
-     * false.
-     * 
-     * @param id
-     *            the derivate ID
-     * @exception MCRPersistenceException
-     *                if a persistence problem is occured
-     */
-    public final static boolean existInDatastore(String id) throws MCRPersistenceException {
-        return existInDatastore(new MCRObjectID(id));
-    }
-
-    /**
-     * The methode return true if the derivate is in the data store, else return
-     * false.
-     * 
-     * @param id
-     *            the derivate ID
-     * @exception MCRPersistenceException
-     *                if a persistence problem is occured
-     */
-    public final static boolean existInDatastore(MCRObjectID id) throws MCRPersistenceException {
-        return MCRXMLMetadataManager.instance().exists(id);
-    }
-
-    /**
-     * The methode receive the derivate for the given MCRObjectID and stored it
-     * in this MCRDerivate
-     * 
-     * @param id
-     *            the derivate ID
-     * @exception MCRPersistenceException
-     *                if a persistence problem is occured
-     */
-    public static final MCRDerivate createFromDatastore(MCRObjectID id) throws MCRPersistenceException {
-        MCRDerivate derivate = new MCRDerivate();
-        derivate.setFromJDOM(MCRXMLMetadataManager.instance().retrieveXML(id));
-        return derivate;
-    }
-
-    /**
      * The methode receive the multimedia object(s) for the given MCRObjectID
      * and returned it as MCRDirectory.
      * 
@@ -400,96 +204,6 @@ final public class MCRDerivate extends MCRBase {
         }
 
         return difs;
-    }
-
-    /**
-     * The methode update the object in the data store.
-     * 
-     * @exception MCRPersistenceException
-     *                if a persistence problem is occured
-     */
-    @Override
-    public final void updateInDatastore() throws MCRPersistenceException {
-        // get the old Item
-        MCRDerivate old = new MCRDerivate();
-
-        try {
-            old = MCRDerivate.createFromDatastore(mcr_id);
-        } catch (Exception e) {
-            createInDatastore();
-            return;
-        }
-
-        // remove the old link to metadata
-        String meta_id = "";
-        try {
-            meta_id = old.getDerivate().getMetaLink().getXLinkHref();
-            MCRObject.removeDerivateInDatastore(meta_id, mcr_id.toString());
-        } catch (MCRException e) {
-            System.out.println(e.getMessage());
-        }
-
-        // update to IFS
-        if (getDerivate().getInternals() != null && getDerivate().getInternals().getSourcePath() != null) {
-            File f = new File(getDerivate().getInternals().getSourcePath());
-
-            if (!f.exists()) {
-                throw new MCRPersistenceException("The File or Directory " + getDerivate().getInternals().getSourcePath() + " was not found.");
-            }
-
-            try {
-                MCRDirectory difs = MCRDirectory.getRootDirectory(mcr_id.toString());
-                MCRFileImportExport.importFiles(f, difs);
-                getDerivate().getInternals().setIFSID(difs.getID());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        // update the derivate
-        mcr_service.setDate("createdate", old.getService().getDate("createdate"));
-        updateXMLInDatastore();
-
-        // add the link to metadata
-        String meta = "";
-        try {
-            meta = getDerivate().getMetaLink().getXLinkHref();
-            MCRMetaLinkID der = new MCRMetaLinkID();
-            der.setReference(mcr_id.toString(), mcr_label, "");
-            der.setSubTag("derobject");
-            MCRObject.addDerivateInDatastore(meta, der);
-        } catch (MCRException e) {
-            throw new MCRPersistenceException("The MCRObject " + meta + " was not found.");
-        }
-    }
-
-    /**
-     * The methode update only the XML part of the object in the data store.
-     * 
-     * @exception MCRPersistenceException
-     *                if a persistence problem is occured
-     */
-    public final void updateXMLInDatastore() throws MCRPersistenceException {
-        if (!importMode || mcr_service.getDate("modifydate") == null) {
-            mcr_service.setDate("modifydate");
-        }
-        MCREvent evt = new MCREvent(MCREvent.DERIVATE_TYPE, MCREvent.UPDATE_EVENT);
-        evt.put("derivate", this);
-        MCREventManager.instance().handleEvent(evt);
-    }
-
-    /**
-     * The method updates the indexer of content.
-     * 
-     * @param id
-     *            the MCRObjectID
-     */
-    @Override
-    public final void fireRepairEvent() throws MCRPersistenceException {
-        // handle events
-        MCREvent evt = new MCREvent(MCREvent.DERIVATE_TYPE, MCREvent.REPAIR_EVENT);
-        evt.put("derivate", this);
-        MCREventManager.instance().handleEvent(evt);
     }
 
     /**

@@ -19,6 +19,7 @@ import org.mycore.datamodel.metadata.MCRMetaElement;
 import org.mycore.datamodel.metadata.MCRMetaInterface;
 import org.mycore.datamodel.metadata.MCRMetaLangText;
 import org.mycore.datamodel.metadata.MCRMetaLink;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -37,7 +38,7 @@ public class MCRURNAdder {
 
         MCRObjectID id = new MCRObjectID(objectId);
         if (isAllowedObject(id.getTypeId())) {
-            MCRObject obj = MCRObject.createFromDatastore(id);
+            MCRObject obj = MCRMetadataManager.retrieveMCRObject(id);
             MCRMetaElement srcElement = obj.getMetadataElement("def.identifier");
             IURNProvider urnProvider = this.getURNProvider();
             URN myURN = urnProvider.generateURN();
@@ -57,7 +58,7 @@ public class MCRURNAdder {
             String objId = obj.getId().toString();
             try {
                 LOGGER.debug("Updating metadata of object " + objId + " with URN " + myURNString + ".");
-                obj.updateInDatastore();
+                MCRMetadataManager.update(obj);
             } catch (Exception ex) {
                 LOGGER.error("Updating metadata of object " + objId + " with URN " + myURNString + " failed.", ex);
                 return false;
@@ -81,7 +82,7 @@ public class MCRURNAdder {
             return false;
         }
         MCRObjectID id = new MCRObjectID(derivateId);
-        MCRDerivate derivate = MCRDerivate.createFromDatastore(id);
+        MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(id);
 
         if (!parentIsAllowedObject(derivate)) {
             LOGGER.warn("Parent permission denied");
@@ -160,7 +161,7 @@ public class MCRURNAdder {
             return false;
         }
         MCRObjectID id = new MCRObjectID(derivateId);
-        MCRDerivate derivate = MCRDerivate.createFromDatastore(id);
+        MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(id);
 
         Document xml = derivate.createXML();
         XPath xp = XPath.newInstance("./mycorederivate/derivate/fileset");
@@ -190,7 +191,7 @@ public class MCRURNAdder {
         fs.addContent(f);
 
         MCRDerivate update = new MCRDerivate(xml);
-        update.updateXMLInDatastore();
+        MCRMetadataManager.updateMCRDerivateXML(update);
 
         return true;
     }
@@ -204,7 +205,7 @@ public class MCRURNAdder {
     private boolean parentIsAllowedObject(MCRDerivate derivate) {
         MCRMetaLink linkToParent = derivate.getDerivate().getMetaLink();
         MCRObjectID parentID = new MCRObjectID(linkToParent.getXLinkHref());
-        MCRObject obj = MCRObject.createFromDatastore(parentID);
+        MCRObject obj = MCRMetadataManager.retrieveMCRObject(parentID);
         return isAllowedObject(obj.getId().getTypeId());
     }
 
@@ -316,7 +317,7 @@ public class MCRURNAdder {
 
         try {
             //just update modified XML here, no new import of files pleaze
-            derivate.updateXMLInDatastore();
+            MCRMetadataManager.updateMCRDerivateXML(derivate);
         } catch (Exception ex) {
             LOGGER.error("An exception occured while updating the object " + derivate.getId() + " in database. The adding of the fileset element failed.", ex);
             handleError(derivate);

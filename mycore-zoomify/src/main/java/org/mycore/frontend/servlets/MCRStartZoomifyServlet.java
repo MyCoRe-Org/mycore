@@ -31,6 +31,7 @@ import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRMetaElement;
 import org.mycore.datamodel.metadata.MCRMetaLangText;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.metsmods.MCRMetsModsPicture;
@@ -103,7 +104,7 @@ public class MCRStartZoomifyServlet extends MCRStartEditorServlet{
 		MCRDirectory mcrdir = MCRDirectory.getRootDirectory(cd.mytfmcrid.toString());
 		String basedir = mcrdir.getName();
 				 
-		MCRObject obj = MCRObject.createFromDatastore(cd.myremcrid);
+		MCRObject obj = MCRMetadataManager.retrieveMCRObject(cd.myremcrid);
 		MCRConfiguration CONFIG = MCRConfiguration.instance();
 		String type = obj.getId().getTypeId();
 		String idname = CONFIG.getString("MCR.Component.Zoomify."+type+".identifier");

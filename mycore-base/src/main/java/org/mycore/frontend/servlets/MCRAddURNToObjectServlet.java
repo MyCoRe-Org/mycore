@@ -6,6 +6,7 @@ package org.mycore.frontend.servlets;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.services.urn.MCRURNManager;
 import org.mycore.services.urn.MCRURNAdder;
@@ -76,7 +77,7 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
 
         /* object is a derivate */
         if (objectId.indexOf("_derivate_") != -1) {
-            MCRDerivate derivate = MCRDerivate.createFromDatastore(new MCRObjectID(objectId));
+            MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(new MCRObjectID(objectId));
             href = derivate.getDerivate().getMetaLink().getXLinkHref();
         }
         /* object is ordinary mcr object */

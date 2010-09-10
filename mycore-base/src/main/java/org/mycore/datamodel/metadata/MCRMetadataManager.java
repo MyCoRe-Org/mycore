@@ -1,0 +1,793 @@
+/*
+ * $Id$
+ * $Revision: 5697 $ $Date: 10.09.2010 $
+ *
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
+ *
+ * This program is free software; you can use it, redistribute it
+ * and / or modify it under the terms of the GNU General Public License
+ * (GPL) as published by the Free Software Foundation; either version 2
+ * of the License or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program, in a file called gpl.txt or license.txt.
+ * If not, write to the Free Software Foundation Inc.,
+ * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ */
+
+package org.mycore.datamodel.metadata;
+
+import java.io.File;
+import java.util.Collection;
+
+import org.apache.log4j.Logger;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.events.MCREvent;
+import org.mycore.common.events.MCREventManager;
+import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.datamodel.common.MCRActiveLinkException;
+import org.mycore.datamodel.common.MCRLinkTableManager;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.ifs.MCRDirectory;
+import org.mycore.datamodel.ifs.MCRFileImportExport;
+import org.xml.sax.SAXParseException;
+
+/**
+ * @author Thomas Scheffler (yagee)
+ *
+ */
+public final class MCRMetadataManager {
+
+    private static final Logger LOGGER = Logger.getLogger(MCRMetadataManager.class);
+
+    private MCRMetadataManager() {
+
+    }
+
+    /**
+     * The methode create the object in the data store.
+     * 
+     * @param mcrDerivate TODO
+     * @exception MCRPersistenceException
+     *                if a persistence problem is occured
+     */
+    public static final void create(final MCRDerivate mcrDerivate) throws MCRPersistenceException {
+        // exist the derivate?
+        if (exists(mcrDerivate.getId())) {
+            throw new MCRPersistenceException("The derivate " + mcrDerivate.getId() + " allready exists, nothing done.");
+        }
+
+        if (!mcrDerivate.isValid()) {
+            throw new MCRPersistenceException("The derivate " + mcrDerivate.getId() + " is not valid.");
+        }
+        final String objid = mcrDerivate.getDerivate().getMetaLink().getXLinkHref();
+        if (!MCRXMLMetadataManager.instance().exists(new MCRObjectID(objid))) {
+            throw new MCRPersistenceException("The derivate " + mcrDerivate.getId() + " can't find metadata object " + objid + ", nothing done.");
+        }
+
+        // prepare the derivate metadata and store under the XML table
+        if (mcrDerivate.getService().getDate("createdate") == null || !mcrDerivate.isImportMode()) {
+            mcrDerivate.getService().setDate("createdate");
+        }
+        if (mcrDerivate.getService().getDate("modifydate") == null || !mcrDerivate.isImportMode()) {
+            mcrDerivate.getService().setDate("modifydate");
+        }
+
+        // handle events
+        MCRBase.LOGGER.debug("Handling derivate CREATE event");
+        final MCREvent evt = new MCREvent(MCREvent.DERIVATE_TYPE, MCREvent.CREATE_EVENT);
+        evt.put("derivate", mcrDerivate);
+        MCREventManager.instance().handleEvent(evt);
+
+        // add the link to metadata
+        final MCRMetaLinkID meta = mcrDerivate.getDerivate().getMetaLink();
+        final MCRMetaLinkID der = new MCRMetaLinkID();
+        der.setReference(mcrDerivate.getId().toString(), mcrDerivate.getLabel(), "");
+        der.setSubTag("derobject");
+        final byte[] backup = MCRXMLMetadataManager.instance().retrieveBLOB(meta.getXLinkHrefID());
+
+        try {
+            MCRBase.LOGGER.debug("adding Derivate in data store");
+            MCRMetadataManager.addDerivateInDatastore(meta.getXLinkHref(), der);
+        } catch (final Exception e) {
+            MCRMetadataManager.restore(mcrDerivate, backup);
+            // throw final exception
+            throw new MCRPersistenceException("Error while creatlink to MCRObject " + meta.getXLinkHref() + ".", e);
+        }
+
+        // create data in IFS
+        if (mcrDerivate.getDerivate().getInternals() != null) {
+            if (mcrDerivate.getDerivate().getInternals().getSourcePath() == null) {
+                final MCRDirectory difs = new MCRDirectory(mcrDerivate.getId().toString(), mcrDerivate.getId().toString());
+                mcrDerivate.getDerivate().getInternals().setIFSID(difs.getID());
+            } else {
+                final String sourcepath = mcrDerivate.getDerivate().getInternals().getSourcePath();
+                final File f = new File(sourcepath);
+                if (f.exists()) {
+                    MCRDirectory difs = null;
+                    try {
+                        MCRBase.LOGGER.debug("Starting File-Import");
+                        difs = MCRFileImportExport.importFiles(f, mcrDerivate.getId().toString());
+                        mcrDerivate.getDerivate().getInternals().setIFSID(difs.getID());
+                    } catch (final Exception e) {
+                        if (difs != null) {
+                            difs.delete();
+                        }
+                        MCRMetadataManager.restore(mcrDerivate, backup);
+                        throw new MCRPersistenceException("Can't add derivate to the IFS", e);
+                    }
+                } else {
+                    MCRBase.LOGGER.warn("Empty derivate, the File or Directory -->" + sourcepath + "<--  was not found.");
+                }
+            }
+        }
+    }
+
+    /**
+     * The methode create the object in the data store.
+     * 
+     * @param mcrObject TODO
+     * @exception MCRPersistenceException
+     *                if a persistence problem is occured
+     * @throws MCRActiveLinkException
+     */
+    public static final void create(final MCRObject mcrObject) throws MCRPersistenceException, MCRActiveLinkException {
+        // exist the object?
+        if (MCRMetadataManager.exists(mcrObject.getId())) {
+            throw new MCRPersistenceException("The object " + mcrObject.getId() + " allready exists, nothing done.");
+        }
+
+        // create this object in datastore
+        if (mcrObject.getService().getDate("createdate") == null) {
+            mcrObject.getService().setDate("createdate");
+        }
+        if (mcrObject.getService().getDate("modifydate") == null) {
+            mcrObject.getService().setDate("modifydate");
+        }
+
+        // prepare this object with parent metadata
+        final MCRObjectID parent_id = mcrObject.getStructure().getParentID();
+        MCRObject parent = null;
+
+        if (parent_id != null) {
+            MCRBase.LOGGER.debug("Parent ID = " + parent_id.toString());
+
+            try {
+                parent = MCRMetadataManager.retrieveMCRObject(parent_id);
+                mcrObject.getMetadata().appendMetadata(parent.getMetadata().getHeritableMetadata());
+            } catch (final Exception e) {
+                MCRBase.LOGGER.error(MCRException.getStackTraceAsString(e));
+                MCRBase.LOGGER.error("Error while merging metadata in this object.");
+
+                return;
+            }
+        }
+
+        // handle events
+        final MCREvent evt = new MCREvent(MCREvent.OBJECT_TYPE, MCREvent.CREATE_EVENT);
+        evt.put("object", mcrObject);
+        MCREventManager.instance().handleEvent(evt);
+
+        // add the MCRObjectID to the child list in the parent object
+        if (parent_id != null) {
+            try {
+                parent.getStructure().addChild(mcrObject.getId(), mcrObject.getStructure().getParent().getXLinkLabel(), mcrObject.getLabel());
+                MCRMetadataManager.fireUpdateEvent(parent);
+            } catch (final Exception e) {
+                MCRBase.LOGGER.debug(MCRException.getStackTraceAsString(e));
+                MCRBase.LOGGER.error("Error while store child ID in parent object.");
+                try {
+                    MCRMetadataManager.delete(mcrObject);
+                    MCRBase.LOGGER.error("Child object was removed.");
+                } catch (final MCRActiveLinkException e1) {
+                    // it shouldn't be possible to have allready links to this
+                    // object
+                    MCRBase.LOGGER.error("Error while deleting child object.", e1);
+                }
+
+                return;
+            }
+        }
+    }
+
+    public static final void delete(final MCRDerivate mcrDerivate) throws MCRPersistenceException, MCRActiveLinkException {
+        // remove link
+        String meta = null;
+        try {
+            meta = mcrDerivate.getDerivate().getMetaLink().getXLinkHref();
+            MCRMetadataManager.removeDerivateFromObject(new MCRObjectID(meta), mcrDerivate.getId());
+            MCRBase.LOGGER.info("Link in MCRObject " + meta + " to MCRDerivate " + mcrDerivate.getId() + " is deleted.");
+        } catch (final Exception e) {
+            MCRBase.LOGGER.warn("Can't delete link for MCRDerivate " + mcrDerivate.getId() + " from MCRObject " + meta + ". Error ignored.");
+        }
+
+        // delete data from IFS
+        try {
+            final MCRDirectory difs = MCRDirectory.getRootDirectory(mcrDerivate.getId().toString());
+            difs.delete();
+            MCRBase.LOGGER.info("IFS entries for MCRDerivate " + mcrDerivate.getId().toString() + " are deleted.");
+        } catch (final Exception e) {
+            if (mcrDerivate.getDerivate().getInternals() != null) {
+                if (MCRBase.LOGGER.isDebugEnabled()) {
+                    e.printStackTrace();
+                }
+                MCRBase.LOGGER.warn("Error while delete for ID " + mcrDerivate.getId().toString() + " from IFS with ID "
+                    + mcrDerivate.getDerivate().getInternals().getIFSID());
+            }
+        }
+
+        // handle events
+        final MCREvent evt = new MCREvent(MCREvent.DERIVATE_TYPE, MCREvent.DELETE_EVENT);
+        evt.put("derivate", mcrDerivate);
+        MCREventManager.instance().handleEvent(evt);
+    }
+
+    public static void delete(final MCRObject mcrObject) throws MCRPersistenceException, MCRActiveLinkException {
+        if (mcrObject.getId() == null) {
+            throw new MCRPersistenceException("The MCRObjectID is null.");
+        }
+
+        // check for active links
+        final Collection<String> sources = MCRLinkTableManager.instance().getSourceOf(mcrObject.mcr_id);
+        MCRBase.LOGGER.debug("Sources size:" + sources.size());
+        if (sources.size() > 0) {
+            final MCRActiveLinkException activeLinks = new MCRActiveLinkException(new StringBuffer("Error while deleting object ")
+                .append(mcrObject.mcr_id.toString())
+                .append(". This object is still referenced by other objects and can not be removed until all links are released.")
+                .toString());
+            for (final String curSource : sources) {
+                activeLinks.addLink(curSource, mcrObject.mcr_id.toString());
+            }
+            throw activeLinks;
+        }
+
+        for (int i = 0; i < mcrObject.getStructure().getDerivateSize(); i++) {
+
+            final MCRObjectID derId = new MCRObjectID(mcrObject.getStructure().getDerivate(i).getXLinkHref());
+            try {
+                MCRMetadataManager.deleteMCRDerivate(derId);
+            } catch (final Exception e) {
+                MCRBase.LOGGER.debug(MCRException.getStackTraceAsString(e));
+                MCRBase.LOGGER.error(e.getMessage());
+                MCRBase.LOGGER.error("Error while deleting derivate " + derId + ".");
+            }
+        }
+
+        // remove all children
+        for (int i = 0; i < mcrObject.getStructure().getChildSize(); i++) {
+
+            try {
+                final MCRObjectID childID = new MCRObjectID(mcrObject.getStructure().getChild(i).getXLinkHref());
+                MCRMetadataManager.deleteMCRObject(childID);
+            } catch (final MCRException e) {
+                MCRBase.LOGGER.debug(MCRException.getStackTraceAsString(e));
+                MCRBase.LOGGER.error(e.getMessage());
+                MCRBase.LOGGER.error("Error while deleting child.");
+            }
+        }
+
+        // remove child from parent
+        final MCRObjectID parent_id = mcrObject.getStructure().getParentID();
+
+        if (parent_id != null) {
+            MCRBase.LOGGER.debug("Parent ID = " + parent_id.toString());
+
+            try {
+                final MCRObject parent = MCRMetadataManager.retrieveMCRObject(parent_id);
+                parent.getStructure().removeChild(mcrObject.getId());
+                MCRMetadataManager.fireUpdateEvent(parent);
+            } catch (final Exception e) {
+                MCRBase.LOGGER.debug(MCRException.getStackTraceAsString(e));
+                MCRBase.LOGGER.error("Error while delete child ID in parent object.");
+                MCRBase.LOGGER.warn("Attention, the parent " + parent_id + "is now inconsist.");
+            }
+        }
+
+        // handle events
+        final MCREvent evt = new MCREvent(MCREvent.OBJECT_TYPE, MCREvent.DELETE_EVENT);
+        evt.put("object", mcrObject);
+        MCREventManager.instance().handleEvent(evt, MCREventManager.BACKWARD);
+    }
+
+    /**
+     * The methode delete the object in the data store. The order of delete
+     * steps is:<br />
+     * <ul>
+     * <li>remove link in object metadata</li>
+     * <li>remove all files from IFS</li>
+     * <li>remive itself</li>
+     * </ul>
+     * 
+     * @param id
+     *            the object ID
+     * @exception MCRPersistenceException
+     *                if a persistence problem is occured
+     * @throws MCRActiveLinkException 
+     */
+    public static final void deleteMCRDerivate(final MCRObjectID id) throws MCRPersistenceException, MCRActiveLinkException {
+        final MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(id);
+        MCRMetadataManager.delete(derivate);
+    }
+
+    /**
+     * The methode delete the object from the data store.
+     * 
+     * @exception MCRPersistenceException
+     *                if a persistence problem is occured
+     * @throws MCRActiveLinkException
+     */
+    public static final void deleteMCRObject(final MCRObjectID id) throws MCRPersistenceException, MCRActiveLinkException {
+        final MCRObject object = retrieveMCRObject(id);
+        MCRMetadataManager.delete(object);
+    }
+
+    /**
+     * The methode return true if the object is in the data store, else return
+     * false.
+     * 
+     * @param id
+     *            the object ID
+     * @exception MCRPersistenceException
+     *                if a persistence problem is occured
+     */
+    public final static boolean exists(final MCRObjectID id) throws MCRPersistenceException {
+        return MCRXMLMetadataManager.instance().exists(id);
+    }
+
+    /**
+     * The method updates the indexer of content.
+     * @param id
+     *            the MCRObjectID
+     * @param mcrDerivate TODO
+     */
+    public static final void fireRepairEvent(final MCRDerivate mcrDerivate) throws MCRPersistenceException {
+        // handle events
+        final MCREvent evt = new MCREvent(MCREvent.DERIVATE_TYPE, MCREvent.REPAIR_EVENT);
+        evt.put("derivate", mcrDerivate);
+        MCREventManager.instance().handleEvent(evt);
+    }
+
+    /**
+     * The method updates the search index with the data from the XLM store.
+     * Also it check the derivate links of itself.
+     * @param id
+     *            the MCRObjectID
+     * @param mcrObject TODO
+     */
+    public static final void fireRepairEvent(final MCRObject mcrObject) throws MCRPersistenceException {
+        // check derivate link
+        MCRMetaLinkID link = null;
+        for (int i = 0; i < mcrObject.getStructure().getDerivateSize(); i++) {
+            link = mcrObject.getStructure().getDerivate(i);
+            if (!exists(new MCRObjectID(link.getXLinkHref()))) {
+                MCRBase.LOGGER.error("Can't find MCRDerivate " + link.getXLinkHref());
+            }
+        }
+        // handle events
+        final MCREvent evt = new MCREvent(MCREvent.OBJECT_TYPE, MCREvent.REPAIR_EVENT);
+        evt.put("object", mcrObject);
+        MCREventManager.instance().handleEvent(evt);
+    }
+
+    /**
+     * The method updates this object in the persistence layer.
+     * @param mcrObject TODO
+     */
+    public static final void fireUpdateEvent(final MCRObject mcrObject) throws MCRPersistenceException {
+        if (!mcrObject.isImportMode() || mcrObject.getService().getDate("modifydate") == null) {
+            mcrObject.getService().setDate("modifydate");
+        }
+        // remove ACL if it is set from data source
+        for (int i = 0; i < mcrObject.getService().getRulesSize(); i++) {
+            mcrObject.getService().removeRule(i);
+            i--;
+        }
+        // handle events
+        final MCREvent evt = new MCREvent(MCREvent.OBJECT_TYPE, MCREvent.UPDATE_EVENT);
+        evt.put("object", mcrObject);
+        MCREventManager.instance().handleEvent(evt);
+    }
+
+    /**
+     * The methode remove a derivate MCRMetaLinkID from the structure part and
+     * update the object with the ID in the data store.
+     * @param objectID TODO
+     * @param derivateID TODO
+     * @exception MCRPersistenceException
+     *                if a persistence problem is occured
+     */
+    public static final void removeDerivateFromObject(final MCRObjectID objectID, final MCRObjectID derivateID) throws MCRPersistenceException {
+        final MCRObject object = MCRMetadataManager.retrieveMCRObject(objectID);
+        object.getService().setDate("modifydate");
+        MCRMetaLinkID link = null;
+        for (int i = 0; i < object.getStructure().getDerivateSize(); i++) {
+            link = object.getStructure().getDerivate(i);
+            if (link.getXLinkHrefID().equals(derivateID)) {
+                object.getStructure().removeDerivate(i);
+            }
+        }
+        MCRMetadataManager.fireUpdateEvent(object);
+    }
+
+    /**
+     * The methode receive the derivate for the given MCRObjectID and stored it
+     * in this MCRDerivate
+     * 
+     * @param id
+     *            the derivate ID
+     * @exception MCRPersistenceException
+     *                if a persistence problem is occured
+     */
+    public static final MCRDerivate retrieveMCRDerivate(final MCRObjectID id) throws MCRPersistenceException {
+        final MCRDerivate derivate = new MCRDerivate(MCRXMLMetadataManager.instance().retrieveXML(id));
+        return derivate;
+    }
+
+    /**
+     * The methode receive the object for the given MCRObjectID and stored it in
+     * this MCRObject.
+     * 
+     * @param id
+     *            the object ID
+     * @exception MCRPersistenceException
+     *                if a persistence problem is occured
+     * @throws SAXParseException 
+     */
+    public static final MCRObject retrieveMCRObject(final MCRObjectID id) throws MCRPersistenceException {
+        return new MCRObject(MCRXMLMetadataManager.instance().retrieveXML(id));
+    }
+
+    /**
+     * The methode update the object in the data store.
+     * 
+     * @param mcrDerivate TODO
+     * @exception MCRPersistenceException
+     *                if a persistence problem is occured
+     */
+    public static final void update(final MCRDerivate mcrDerivate) throws MCRPersistenceException {
+        // get the old Item
+        MCRDerivate old = new MCRDerivate();
+
+        try {
+            old = MCRMetadataManager.retrieveMCRDerivate(mcrDerivate.getId());
+        } catch (final Exception e) {
+            MCRMetadataManager.create(mcrDerivate);
+            return;
+        }
+
+        // remove the old link to metadata
+        String meta_id = "";
+        try {
+            meta_id = old.getDerivate().getMetaLink().getXLinkHref();
+            MCRMetadataManager.removeDerivateFromObject(new MCRObjectID(meta_id), mcrDerivate.getId());
+        } catch (final MCRException e) {
+            MCRBase.LOGGER.warn(e.getMessage(), e);
+        }
+
+        // update to IFS
+        if (mcrDerivate.getDerivate().getInternals() != null && mcrDerivate.getDerivate().getInternals().getSourcePath() != null) {
+            final File f = new File(mcrDerivate.getDerivate().getInternals().getSourcePath());
+
+            if (!f.exists()) {
+                throw new MCRPersistenceException("The File or Directory " + mcrDerivate.getDerivate().getInternals().getSourcePath() + " was not found.");
+            }
+
+            try {
+                final MCRDirectory difs = MCRDirectory.getRootDirectory(mcrDerivate.getId().toString());
+                MCRFileImportExport.importFiles(f, difs);
+                mcrDerivate.getDerivate().getInternals().setIFSID(difs.getID());
+            } catch (final Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        // update the derivate
+        mcrDerivate.getService().setDate("createdate", old.getService().getDate("createdate"));
+        MCRMetadataManager.updateMCRDerivateXML(mcrDerivate);
+
+        // add the link to metadata
+        String meta = "";
+        try {
+            meta = mcrDerivate.getDerivate().getMetaLink().getXLinkHref();
+            final MCRMetaLinkID der = new MCRMetaLinkID();
+            der.setReference(mcrDerivate.getId().toString(), mcrDerivate.getLabel(), "");
+            der.setSubTag("derobject");
+            MCRMetadataManager.addDerivateInDatastore(meta, der);
+        } catch (final MCRException e) {
+            throw new MCRPersistenceException("The MCRObject " + meta + " was not found.");
+        }
+    }
+
+    /**
+     * The methode update the object in the data store.
+     * 
+     * @param mcrObject TODO
+     * @exception MCRPersistenceException
+     *                if a persistence problem is occured
+     * @throws MCRActiveLinkException
+     *             if object is created (no real update) and references to it's
+     *             id already exist
+     */
+    public static final void update(final MCRObject mcrObject) throws MCRPersistenceException, MCRActiveLinkException {
+        // get the old Item
+        MCRObject old = new MCRObject();
+
+        try {
+            old = MCRMetadataManager.retrieveMCRObject(mcrObject.getId());
+        } catch (final Exception pe) {
+            MCRMetadataManager.create(mcrObject);
+            return;
+        }
+
+        // clean the structure
+        mcrObject.getStructure().clearChildren();
+        mcrObject.getStructure().clearDerivate();
+
+        // set the derivate data in structure
+        for (int i = 0; i < old.getStructure().getDerivateSize(); i++) {
+            mcrObject.getStructure().addDerivate(old.getStructure().getDerivate(i));
+        }
+
+        // set the parent from the original and this update
+        boolean setparent = false;
+
+        if (old.getStructure().getParent() != null && mcrObject.getStructure().getParent() != null) {
+            final MCRObjectID oldparent = new MCRObjectID(old.getStructure().getParent().getXLinkHref());
+            final String newparent = mcrObject.getStructure().getParent().getXLinkHref();
+
+            if (!newparent.equals(oldparent)) {
+                // remove child from the old parent
+                MCRBase.LOGGER.debug("Parent ID = " + oldparent);
+
+                try {
+                    final MCRObject parent = MCRMetadataManager.retrieveMCRObject(oldparent);
+                    parent.getStructure().removeChild(mcrObject.getId());
+                    MCRMetadataManager.fireUpdateEvent(parent);
+                    setparent = true;
+                } catch (final Exception e) {
+                    MCRBase.LOGGER.debug(MCRException.getStackTraceAsString(e));
+                    MCRBase.LOGGER.error("Error while delete child ID in parent object.");
+                    MCRBase.LOGGER.warn("Attention, the parent " + oldparent + "is now inconsist.");
+                }
+            }
+        }
+
+        if (old.getStructure().getParent() != null && mcrObject.getStructure().getParent() == null) {
+            final MCRObjectID oldparent = new MCRObjectID(old.getStructure().getParent().getXLinkHref());
+
+            // remove child from the old parent
+            MCRBase.LOGGER.debug("Parent ID = " + oldparent);
+
+            try {
+                final MCRObject parent = MCRMetadataManager.retrieveMCRObject(oldparent);
+                parent.getStructure().removeChild(mcrObject.getId());
+                MCRMetadataManager.fireUpdateEvent(parent);
+                setparent = true;
+            } catch (final Exception e) {
+                MCRBase.LOGGER.debug(MCRException.getStackTraceAsString(e));
+                MCRBase.LOGGER.error("Error while delete child ID in parent object.");
+                MCRBase.LOGGER.warn("Attention, the parent " + oldparent + "is now inconsist.");
+            }
+        }
+
+        if (old.getStructure().getParent() == null && mcrObject.getStructure().getParent() != null) {
+            setparent = true;
+        }
+
+        // set the children from the original
+        for (int i = 0; i < old.getStructure().getChildSize(); i++) {
+            mcrObject.getStructure().addChild(old.getStructure().getChild(i));
+        }
+
+        // import all herited matadata from the parent
+        final MCRObjectID parent_id = mcrObject.getStructure().getParentID();
+
+        if (parent_id != null) {
+            MCRBase.LOGGER.debug("Parent ID = " + parent_id.toString());
+
+            try {
+                final MCRObject parent = MCRMetadataManager.retrieveMCRObject(parent_id);
+                // remove already embedded inherited tags
+                mcrObject.getMetadata().removeInheritedMetadata();
+                // insert heritable tags
+                mcrObject.getMetadata().appendMetadata(parent.getMetadata().getHeritableMetadata());
+
+            } catch (final Exception e) {
+                MCRBase.LOGGER.error(MCRException.getStackTraceAsString(e));
+                MCRBase.LOGGER.error("Error while merging metadata in this object.");
+            }
+        }
+
+        // if not imported via cli, createdate remains unchanged
+        if (!mcrObject.isImportMode() || mcrObject.getService().getDate("createdate") == null) {
+            mcrObject.getService().setDate("createdate", old.getService().getDate("createdate"));
+        }
+
+        // update this dataset
+        MCRMetadataManager.fireUpdateEvent(mcrObject);
+
+        // check if the parent was new set and set them
+        if (setparent) {
+            try {
+                final MCRObject parent = MCRMetadataManager.retrieveMCRObject(parent_id);
+                parent.getStructure().addChild(mcrObject.getId(), mcrObject.getStructure().getParent().getXLinkLabel(), mcrObject.getLabel());
+                MCRMetadataManager.fireUpdateEvent(parent);
+            } catch (final Exception e) {
+                MCRBase.LOGGER.debug(MCRException.getStackTraceAsString(e));
+                MCRBase.LOGGER.error("Error while store child ID in parent object.");
+                try {
+                    MCRMetadataManager.delete(mcrObject);
+                    MCRBase.LOGGER.error("Child object was removed.");
+                } catch (final MCRActiveLinkException e1) {
+                    // it shouldn't be possible to have allready links to this
+                    // object
+                    MCRBase.LOGGER.error("Error while deleting child object.", e1);
+                }
+
+                return;
+            }
+        }
+
+        // update all children
+        boolean updatechildren = false;
+        final MCRObjectMetadata md = mcrObject.getMetadata();
+        final MCRObjectMetadata mdold = old.getMetadata();
+        int numheritablemd = 0;
+        int numheritablemdold = 0;
+        for (int i = 0; i < md.size(); i++) {
+            final MCRMetaElement melm = md.getMetadataElement(i);
+            if (melm.getHeritable()) {
+                numheritablemd++;
+                try {
+                    final MCRMetaElement melmold = mdold.getMetadataElement(melm.getTag());
+                    final Element jelm = melm.createXML(false);
+                    final Element jelmold = melmold.createXML(false);
+                    if (!MCRXMLHelper.deepEqual(new Document(jelmold), new Document(jelm))) {
+                        updatechildren = true;
+                        break;
+                    }
+                } catch (final RuntimeException e) {
+                    updatechildren = true;
+                }
+            }
+        }
+        if (!updatechildren) {
+            for (int i = 0; i < mdold.size(); i++) {
+                final MCRMetaElement melmold = mdold.getMetadataElement(i);
+                if (melmold.getHeritable()) {
+                    numheritablemdold++;
+                }
+            }
+        }
+        if (numheritablemd != numheritablemdold) {
+            updatechildren = true;
+        }
+        if (updatechildren) {
+            for (int i = 0; i < mcrObject.getStructure().getChildSize(); i++) {
+                MCRMetadataManager.updateMetadataInDatastore(mcrObject.getStructure().getChild(i).getXLinkHrefID());
+            }
+        }
+    }
+
+    /**
+     * The methode update only the XML part of the object in the data store.
+     * @param mcrDerivate TODO
+     * @exception MCRPersistenceException
+     *                if a persistence problem is occured
+     */
+    public static final void updateMCRDerivateXML(final MCRDerivate mcrDerivate) throws MCRPersistenceException {
+        if (!mcrDerivate.isImportMode() || mcrDerivate.getService().getDate("modifydate") == null) {
+            mcrDerivate.getService().setDate("modifydate");
+        }
+        final MCREvent evt = new MCREvent(MCREvent.DERIVATE_TYPE, MCREvent.UPDATE_EVENT);
+        evt.put("derivate", mcrDerivate);
+        MCREventManager.instance().handleEvent(evt);
+    }
+
+    /**
+     * The methode add a derivate MCRMetaLinkID to the structure part and update
+     * the object with the ID in the data store.
+     * 
+     * @param id
+     *            the object ID
+     * @param link
+     *            a link to a derivate as MCRMetaLinkID
+     * @exception MCRPersistenceException
+     *                if a persistence problem is occured
+     */
+    private static final void addDerivateInDatastore(final String id, final MCRMetaLinkID link) throws MCRPersistenceException {
+        final MCRObject object = MCRMetadataManager.retrieveMCRObject(new MCRObjectID(id));
+        // don't put the same derivates twice in an object!
+        MCRMetaLinkID testlink = null;
+        boolean checklink = false;
+        for (int i = 0; i < object.getStructure().getDerivateSize(); i++) {
+            testlink = object.getStructure().getDerivate(i);
+            if (link.getXLinkHref().equals(testlink.getXLinkHref())) {
+                checklink = true;
+            }
+        }
+        if (checklink) {
+            return;
+        }
+        // add link
+        if (!object.isImportMode()) {
+            object.getService().setDate("modifydate");
+        }
+        object.getStructure().addDerivate(link);
+        MCRMetadataManager.fireUpdateEvent(object);
+    }
+
+    private static void restore(final MCRDerivate mcrDerivate, final byte[] backup) {
+        MCREvent evt;
+        // restore original instance of MCRObject
+        final MCRObject obj = new MCRObject();
+        try {
+            obj.setFromXML(backup, false);
+            MCRMetadataManager.update(obj);
+        } catch (final Exception e1) {
+            MCRBase.LOGGER.warn("Error while restoring " + obj.getId(), e1);
+        } finally {
+            // delete from the XML table
+            // handle events
+            evt = new MCREvent(MCREvent.DERIVATE_TYPE, MCREvent.DELETE_EVENT);
+            evt.put("derivate", mcrDerivate);
+            MCREventManager.instance().handleEvent(evt);
+        }
+    }
+
+    /**
+     * The method update the metadata of the stored dataset and replace the
+     * inherited data from the parent.
+     * 
+     * @param child_id
+     *            the MCRObjectID of the parent as string
+     * @exception MCRPersistenceException
+     *                if a persistence problem is occured
+     */
+    private static final void updateMetadataInDatastore(final MCRObjectID child_id) throws MCRPersistenceException {
+        LOGGER.debug("Update metadata from Child " + child_id.toString());
+        final MCRObject child = MCRMetadataManager.retrieveMCRObject(child_id);
+
+        // delete the old inherited data from all metadata elements
+        for (int i = 0; i < child.getMetadata().size(); i++) {
+            child.getMetadata().getMetadataElement(i).removeInheritedObject();
+
+            if (child.getMetadata().getMetadataElement(i).size() == 0) {
+                child.getMetadata().removeMetadataElement(i);
+                i--;
+            }
+        }
+
+        // import all herited matadata from the parent
+        final MCRObjectID parent_id = child.getStructure().getParentID();
+
+        if (parent_id != null) {
+            LOGGER.debug("Parent ID = " + parent_id.toString());
+
+            try {
+                final MCRObject parent = MCRMetadataManager.retrieveMCRObject(parent_id);
+                child.getMetadata().appendMetadata(parent.getMetadata().getHeritableMetadata());
+            } catch (final Exception e) {
+                LOGGER.error(MCRException.getStackTraceAsString(e));
+                LOGGER.error("Error while merging metadata in this object.");
+            }
+        }
+
+        // update this dataset
+        MCRMetadataManager.fireUpdateEvent(child);
+
+        // update all children
+        for (int i = 0; i < child.getStructure().getChildSize(); i++) {
+            MCRMetadataManager.updateMetadataInDatastore(child.getStructure().getChild(i).getXLinkHrefID());
+        }
+    }
+}

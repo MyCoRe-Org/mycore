@@ -44,6 +44,7 @@ import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
@@ -69,7 +70,7 @@ public class MCRIView2Tools {
 
     public static String getSupportedMainFile(String derivateID) {
         try {
-            MCRDerivate deriv = MCRDerivate.createFromDatastore(new MCRObjectID(derivateID));
+            MCRDerivate deriv = MCRMetadataManager.retrieveMCRDerivate(new MCRObjectID(derivateID));
             String nameOfMainFile = deriv.getDerivate().getInternals().getMainDoc();
             // verify support
             if (nameOfMainFile != null && !nameOfMainFile.equals("")) {

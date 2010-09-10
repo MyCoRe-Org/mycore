@@ -31,6 +31,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRMailer;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
 
@@ -68,7 +69,7 @@ public class MCRCheckCommitACLServlet extends MCRCheckACLBase {
                 return sb.toString();
             }
             if (ID.getTypeId().equals("derivate")) {
-                MCRDerivate der = MCRDerivate.createFromDatastore(ID);
+                MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(ID);
                 String parent = der.getDerivate().getMetaLink().getXLinkHref();
                 sb.append("receive/").append(parent);
                 return sb.toString();

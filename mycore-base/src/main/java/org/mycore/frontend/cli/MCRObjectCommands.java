@@ -34,6 +34,7 @@ import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.parsers.bool.MCRCondition;
@@ -200,7 +201,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         MCRObjectID mcrId = new MCRObjectID(ID);
 
         try {
-            MCRObject.deleteFromDatastore(mcrId);
+            MCRMetadataManager.deleteMCRObject(mcrId);
             LOGGER.info(mcrId + " deleted.");
         } catch (MCRException ex) {
             LOGGER.error("Can't delete " + mcrId + ".", ex);
@@ -231,7 +232,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
             for (int i = from_i; i < to_i + 1; i++) {
                 String id = MCRObjectID.formatID(from.getProjectId(), from.getTypeId(), i);
-                if (MCRObject.existInDatastore(id)) {
+                if (MCRMetadataManager.exists(new MCRObjectID(id))) {
                     delete(id);
                 }
             }
@@ -371,27 +372,27 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             LOGGER.warn(file + " ignored, does not end with *.xml");
             return false;
         }
-
+    
         if (!file.isFile()) {
             LOGGER.warn(file + " ignored, is not a file.");
             return false;
         }
-
+    
         LOGGER.info("Reading file " + file + " ...");
-
+    
         MCRObject mycore_obj = new MCRObject();
         mycore_obj.setImportMode(importMode);
         mycore_obj.setFromURI(file.toURI());
         LOGGER.debug("Label --> " + mycore_obj.getLabel());
-
+    
         if (update) {
-            mycore_obj.updateInDatastore();
+            MCRMetadataManager.update(mycore_obj);
             LOGGER.info(mycore_obj.getId().toString() + " updated.");
         } else {
-            mycore_obj.createInDatastore();
+            MCRMetadataManager.create(mycore_obj);
             LOGGER.info(mycore_obj.getId().toString() + " loaded.");
         }
-
+    
         return true;
     }
 
@@ -474,7 +475,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             Transformer trans = getTransformer(style);
             for (int i = fid.getNumberAsInteger(); i < tid.getNumberAsInteger() + 1; i++) {
                 String id = MCRObjectID.formatID(fid.getProjectId(), fid.getTypeId(), i);
-                if (!MCRObject.existInDatastore(id)) {
+                if (!MCRMetadataManager.exists(new MCRObjectID(id))) {
                     continue;
                 }
                 if (!exportMCRObject(dir, trans, id)) {
@@ -712,20 +713,20 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      */
     public static final void repairMetadataSearchForID(String id) {
         LOGGER.info("Start the repair for the ID " + id);
-
+    
         MCRObjectID mid = null;
-
+    
         try {
             mid = new MCRObjectID(id);
         } catch (Exception e) {
             LOGGER.error("The String " + id + " is not a MCRObjectID.");
             return;
         }
-
+    
         removeFromIndex("id", id);
-
-        MCRObject obj = MCRObject.createFromDatastore(mid);
-        obj.fireRepairEvent();
+    
+        MCRObject obj = MCRMetadataManager.retrieveMCRObject(mid);
+        MCRMetadataManager.fireRepairEvent(obj);
         LOGGER.info("Repaired " + mid.toString());
     }
 
@@ -850,7 +851,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         int notinstore = 0;
 
         for (String id : getSelectedObjectIDs()) {
-            if (MCRObject.existInDatastore(id)) {
+            if (MCRMetadataManager.exists(new MCRObjectID(id))) {
                 instore++;
             } else {
                 LOGGER.info("is not in store " + id + " delete from search index ...");

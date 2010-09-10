@@ -167,16 +167,6 @@ public class MCRObjectDerivate {
     }
 
     /**
-     * This method return the size of the linkmeta array.
-     * 
-     * @deprecated
-     * @see #getMetaLink()
-     */
-    /**
-     * public final int getLinkMetaSize() { return 0; }
-     */
-
-    /**
      * returns link to the MCRObject.
      * 
      * @return a metadata link as MCRMetaLinkID

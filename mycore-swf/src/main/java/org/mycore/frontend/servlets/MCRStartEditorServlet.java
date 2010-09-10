@@ -55,6 +55,7 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaElement;
 import org.mycore.datamodel.metadata.MCRMetaInterface;
 import org.mycore.datamodel.metadata.MCRMetaNBN;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
@@ -386,7 +387,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         }
         // check type
         if (cd.mytype.equals("document") || cd.mytype.equals("disshab")) {
-            MCRObject obj = MCRObject.createFromDatastore(cd.mysemcrid);
+            MCRObject obj = MCRMetadataManager.retrieveMCRObject(cd.mysemcrid);
             MCRMetaElement elm = obj.getMetadataElement("nbns");
             if (elm == null) {
                 String urn = MCRURNManager.buildURN("UBL");
@@ -396,7 +397,7 @@ public class MCRStartEditorServlet extends MCRServlet {
                 elm.addMetaObject(nbn);
                 obj.getMetadata().setMetadataElement(elm, "nbns");
                 try {
-                    obj.updateInDatastore();
+                    MCRMetadataManager.update(obj);
                     MCRURNManager.assignURN(urn, obj.getId().toString());
                 } catch (MCRActiveLinkException e) {
                     LOGGER.warn("Can't store NBN for " + cd.mysemcrid);
@@ -433,7 +434,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         }
 
         try {
-            MCRDerivate.deleteFromDatastore(cd.mysemcrid);
+            MCRMetadataManager.deleteMCRDerivate(cd.mysemcrid);
             StringBuffer sb = new StringBuffer();
             sb.append("receive/").append(cd.myremcrid.toString());
             cd.myfile = sb.toString();
@@ -541,7 +542,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         }
 
         try {
-            MCRObject.deleteFromDatastore(cd.mytfmcrid);
+            MCRMetadataManager.deleteMCRObject(cd.mytfmcrid);
             cd.myfile = deletepage;
         } catch (Exception e) {
             if (LOGGER.isDebugEnabled()) {
@@ -822,11 +823,11 @@ public class MCRStartEditorServlet extends MCRServlet {
             return;
         }
 
-        MCRDerivate der = MCRDerivate.createFromDatastore(cd.mysemcrid);
+        MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(cd.mysemcrid);
         der.getDerivate().getInternals().setMainDoc(cd.extparm);
 
         try {
-            der.updateXMLInDatastore();
+            MCRMetadataManager.updateMCRDerivateXML(der);
         } catch (MCRException ex) {
             LOGGER.error("Exception while store to derivate " + cd.mysemcrid);
         }

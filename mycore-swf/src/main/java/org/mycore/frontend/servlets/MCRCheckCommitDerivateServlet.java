@@ -40,6 +40,7 @@ import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.editor.MCREditorSubmission;
@@ -116,10 +117,10 @@ public class MCRCheckCommitDerivateServlet extends MCRCheckBase {
             }
 
             // update data
-            der.updateXMLInDatastore();
+            MCRMetadataManager.updateMCRDerivateXML(der);
             String label = der.getLabel();
             String href = der.getDerivate().getMetaLink().getXLinkHref();
-            MCRObject obj = MCRObject.createFromDatastore(new MCRObjectID(href));
+            MCRObject obj = MCRMetadataManager.retrieveMCRObject(new MCRObjectID(href));
             int size = obj.getStructure().getDerivateSize();
             boolean isset = false;
             for (int i = 0; i < size; i++) {
@@ -135,7 +136,7 @@ public class MCRCheckCommitDerivateServlet extends MCRCheckBase {
             }
             // update mycoreobject
             if (isset) {
-                obj.fireUpdateEvent();
+                MCRMetadataManager.fireUpdateEvent(obj);
                 LOGGER.info("Synchronized " + der.getId().toString());
             }
 

@@ -50,7 +50,7 @@ import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
-import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.datamodel.metadata.validator.MCREditorOutValidator;
@@ -442,7 +442,7 @@ public class MCRSimpleWorkflowManager {
         // commit metadata
         String fn = getDirectoryPath(ID.getBase()) + File.separator + ID + ".xml";
 
-        if (MCRObject.existInDatastore(ID)) {
+        if (MCRMetadataManager.exists(ID)) {
             MCRObjectCommands.updateFromFile(fn, false);
         } else {
             MCRObjectCommands.loadFromFile(fn, false);
@@ -450,7 +450,7 @@ public class MCRSimpleWorkflowManager {
 
         logger.info("The metadata objekt was " + fn + " loaded.");
         // commit derivates
-        if (!MCRObject.existInDatastore(ID)) {
+        if (!MCRMetadataManager.exists(ID)) {
             return false;
         }
 
@@ -487,13 +487,14 @@ public class MCRSimpleWorkflowManager {
     }
 
     private boolean loadDerivate(String ID, String filename) throws SAXParseException {
-        if (MCRDerivate.existInDatastore(ID)) {
+        final MCRObjectID objectID = new MCRObjectID(ID);
+        if (MCRMetadataManager.exists(objectID)) {
             MCRDerivateCommands.updateFromFile(filename, false);
         } else {
             MCRDerivateCommands.loadFromFile(filename, false);
         }
 
-        if (!MCRDerivate.existInDatastore(ID)) {
+        if (!MCRMetadataManager.exists(objectID)) {
             return false;
         }
 

@@ -6,6 +6,7 @@ import java.util.Map;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.mycore.datamodel.common.MCRLinkTableManager;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
@@ -34,11 +35,11 @@ public class MCRDerivateLinkServlet extends MCRServlet {
         Element rootElement = new Element("derivateLinks-parentList");
 
         MCRObjectID objId = new MCRObjectID(mcrId);
-        if (MCRObject.existInDatastore(objId)) {
+        if (MCRMetadataManager.exists(objId)) {
             /* mcr object exists in datastore -> add all parent with their
              * derivates to the jdom tree */
             addParentsToElement(rootElement, objId);
-        } else if (parentId != null && MCRObject.existInDatastore(parentId)) {
+        } else if (parentId != null && MCRMetadataManager.exists(new MCRObjectID(parentId))) {
             /* mcr object doesnt exists in datastore -> use the parent id
              * to create the content */
             Element firstParent = getMyCoReObjectElement(new MCRObjectID(parentId));
@@ -87,7 +88,7 @@ public class MCRDerivateLinkServlet extends MCRServlet {
      * @return the parent id
      */
     private MCRObjectID getParentId(MCRObjectID objectId) {
-        MCRObject obj = MCRObject.createFromDatastore(objectId);
+        MCRObject obj = MCRMetadataManager.retrieveMCRObject(objectId);
         return obj.getStructure().getParentID();
     }
 

@@ -11,6 +11,7 @@ import org.mycore.datamodel.ifs.MCRFileImportExport;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRCommand;
@@ -81,7 +82,7 @@ public class MCRImportCommands extends MCRAbstractCommands {
         derivate.getDerivate().setInternals(ifs);
 
         // create in db
-        derivate.createInDatastore();
+        MCRMetadataManager.create(derivate);
 
         // if upload files active? if true return a list of upload commands
         List<String> commandList = new ArrayList<String>();

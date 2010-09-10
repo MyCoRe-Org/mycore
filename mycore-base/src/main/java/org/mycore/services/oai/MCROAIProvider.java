@@ -66,9 +66,9 @@ import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.metadata.MCRBase;
-import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaElement;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -494,7 +494,7 @@ public class MCROAIProvider extends MCRServlet {
                         } else {
                             Element eRecord = new Element("record", ns);
                             eRecord.addContent(eHeader);
-                            MCRObject object = MCRObject.createFromDatastore(new MCRObjectID(identifier[3]));
+                            MCRObject object = MCRMetadataManager.retrieveMCRObject(new MCRObjectID(identifier[3]));
                             Element eMetadata = (Element) object.createXML().getRootElement().clone();
                             eRecord.addContent(eMetadata);
                             list.addContent(eRecord);
@@ -1060,9 +1060,9 @@ public class MCROAIProvider extends MCRServlet {
                         MCRBase object = null;
                         MCRObjectID id = new MCRObjectID(objectId);
                         if (objectId.indexOf("derivate") != -1) {
-                            object = MCRDerivate.createFromDatastore(id);
+                            object = MCRMetadataManager.retrieveMCRDerivate(id);
                         } else {
-                            object = MCRObject.createFromDatastore(id);
+                            object = MCRMetadataManager.retrieveMCRObject(id);
                         }
 
                         String[] array = getHeader(object, objectId, repositoryID, instance);
@@ -1371,9 +1371,9 @@ public class MCROAIProvider extends MCRServlet {
 
                         MCRBase object = null;
                         if (objectId.indexOf("derivate") != -1) {
-                            object = MCRDerivate.createFromDatastore(id);
+                            object = MCRMetadataManager.retrieveMCRDerivate(id);
                         } else {
-                            object = MCRObject.createFromDatastore(id);
+                            object = MCRMetadataManager.retrieveMCRObject(id);
                         }
 
                         String[] array = getHeader(object, objectId, repositoryID, instance);

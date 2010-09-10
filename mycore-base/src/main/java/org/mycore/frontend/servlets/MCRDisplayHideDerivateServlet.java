@@ -12,6 +12,7 @@ import org.jdom.Element;
 import org.jdom.xpath.XPath;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
@@ -37,7 +38,7 @@ public class MCRDisplayHideDerivateServlet extends MCRServlet {
             return;
         }
         LOGGER.info("Toggling display attribute of " + derivate);
-        MCRDerivate obj = MCRDerivate.createFromDatastore(new MCRObjectID(derivate));
+        MCRDerivate obj = MCRMetadataManager.retrieveMCRDerivate(new MCRObjectID(derivate));
         toggleDisplay(obj);
 
         String url = getBaseURL() + "receive/" + getParentHref(obj);
@@ -73,6 +74,6 @@ public class MCRDisplayHideDerivateServlet extends MCRServlet {
             LOGGER.info("Setting display attribute of derivate with id " + derObj.getId() + " to " + newVal);
         }
         MCRDerivate updated = new MCRDerivate(xml);
-        updated.updateXMLInDatastore();
+        MCRMetadataManager.updateMCRDerivateXML(updated);
     }
 }

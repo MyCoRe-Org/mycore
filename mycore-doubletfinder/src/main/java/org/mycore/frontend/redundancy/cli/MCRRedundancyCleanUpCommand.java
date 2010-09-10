@@ -18,6 +18,7 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.datamodel.common.MCRLinkTableManager;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.redundancy.MCRRedundancyUtil;
@@ -172,7 +173,7 @@ public class MCRRedundancyCleanUpCommand {
             return;
         }
 
-        MCRObject sourceMCRObject = MCRObject.createFromDatastore(new MCRObjectID(sourceId));
+        MCRObject sourceMCRObject = MCRMetadataManager.retrieveMCRObject(new MCRObjectID(sourceId));
 
         // ArrayList for equal elements
         ArrayList<Element> equalElements = new ArrayList<Element>();
@@ -196,7 +197,7 @@ public class MCRRedundancyCleanUpCommand {
             parent.removeContent(e);
         }
         sourceMCRObject = new MCRObject(doc);
-        sourceMCRObject.updateInDatastore();
+        MCRMetadataManager.update(sourceMCRObject);
         LOGGER.info("Links replaced of source " + sourceId + ": " + oldLink + " -> " + newLink);
     }
 

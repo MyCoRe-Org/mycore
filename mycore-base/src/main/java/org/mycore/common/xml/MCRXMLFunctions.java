@@ -46,6 +46,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.parsers.bool.MCRCondition;
@@ -282,7 +283,7 @@ public class MCRXMLFunctions {
     }
 
     public static boolean isDisplayedEnabledDerivate(String derivateId) {
-        MCRDerivate der = MCRDerivate.createFromDatastore(new MCRObjectID(derivateId));
+        MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(new MCRObjectID(derivateId));
 
         org.jdom.Element derivateElem = der.getDerivate().createXML();
         String display = derivateElem.getAttributeValue("display");
@@ -347,11 +348,11 @@ public class MCRXMLFunctions {
      * 
      * */
     public static boolean hasDisplayableDerivates(String objectId) throws Exception {
-        MCRObject obj = MCRObject.createFromDatastore(new MCRObjectID(objectId));
+        MCRObject obj = MCRMetadataManager.retrieveMCRObject(new MCRObjectID(objectId));
         List<MCRMetaLinkID> links = obj.getStructure().getDerivates();
 
         for (MCRMetaLinkID aLink : links) {
-            MCRDerivate derivate = MCRDerivate.createFromDatastore(new MCRObjectID(aLink.getXLinkHref()));
+            MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(new MCRObjectID(aLink.getXLinkHref()));
             if (derivate.getDerivate().isDisplayEnabled()) {
                 return true;
             }
