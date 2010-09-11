@@ -7,7 +7,7 @@
   </skin>
   <body>
     <menu ref="parent" />
-    <menu ref="modules" />
+    <menu ref="modules" inherit="top"/>
     <menu ref="reports" />
   </body>
 </project>
