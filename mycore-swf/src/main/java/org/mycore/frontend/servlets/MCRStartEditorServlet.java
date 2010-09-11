@@ -220,7 +220,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             } catch (Exception e) {
             }
         }
-        LOGGER.debug("MCRID (SE) = " + cd.mysemcrid.toString());
+        LOGGER.debug("MCRID (SE) = " + cd.mysemcrid);
 
         String base = getProperty(job.getRequest(), "base");
         if ((base != null) && (base.length() != 0)) {
@@ -262,7 +262,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             } catch (Exception e) {
             }
         }
-        LOGGER.debug("MCRID (RE) = " + cd.myremcrid.toString());
+        LOGGER.debug("MCRID (RE) = " + cd.myremcrid);
 
         // appending parameter
         cd.extparm = getProperty(job.getRequest(), "extparm");
