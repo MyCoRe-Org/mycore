@@ -100,7 +100,7 @@
         <site>
           <id>MyCoRe HQ</id>
           <name>MyCoRe HQ-sites</name>
-          <url>scp://server.mycore.de/mcr/mycore.de/generated/${project.version}</url>
+          <url>scp://server.mycore.de/mcr/mycore.de/generated/mycore-${project.version}</url>
         </site>
       </distributionManagement>
       <reporting>
