@@ -37,12 +37,11 @@ import org.mycore.datamodel.ifs.MCRDirectory;
 import org.xml.sax.SAXParseException;
 
 /**
- * This class implements all methode for handling one derivate object. Methodes
- * of this class can read the XML metadata by using a XML parser, manipulate the
- * data in the abstract persistence data store and return the XML stream to the
- * user application.
+ * This class holds all information of a derivate.
+ * For persistence operations see methods of {@link MCRMetadataManager}.
  * 
  * @author Jens Kupferschmidt
+ * @author Thomas Scheffler
  * @version $Revision$ $Date$
  */
 final public class MCRDerivate extends MCRBase {

@@ -39,15 +39,12 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.xml.sax.SAXParseException;
 
 /**
- * This class implements all methode for handling one metadata object. Methodes
- * of this class can read the XML metadata by using a XML parser, manipulate the
- * data in the abstract persistence data store and return the XML stream to the
- * user application. Additionally, this class provides the public user interface
- * for the linking of MCRObjects against other MCRObjects with metadata
- * inheritance.
- * 
+ * This class holds all information of a metadata object.
+ * For persistence operations see methods of {@link MCRMetadataManager}.
+ *  
  * @author Jens Kupferschmidt
  * @author Mathias Hegner
+ * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  */
 final public class MCRObject extends MCRBase {

@@ -41,7 +41,10 @@ import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFileImportExport;
 
 /**
+ * Delivers persistence operations for {@link MCRObject} and {@link MCRDerivate}.
+ * 
  * @author Thomas Scheffler (yagee)
+ * @since 2.0.92
  *
  */
 public final class MCRMetadataManager {
