@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.jdom.Namespace;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
@@ -44,18 +43,15 @@ import org.mycore.common.MCRUtils;
  * @version $Revision$ $Date$
  */
 public class MCRObjectMetadata {
-    // logger
-    static Logger LOGGER = Logger.getLogger(MCRMetaElement.class.getName());
-
     // common data
     private String default_lang = null;
 
     private boolean herited_xml = false;
 
     // metadata list
-    private ArrayList<MCRMetaElement> meta_list = null;
+    private final ArrayList<MCRMetaElement> meta_list;
 
-    private ArrayList<String> tag_names = null;
+    private final ArrayList<String> tag_names;
 
     /**
      * This is the constructor of the MCRObjectMetadata class. It set the

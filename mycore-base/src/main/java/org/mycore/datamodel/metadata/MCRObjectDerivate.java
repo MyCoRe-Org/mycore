@@ -43,15 +43,15 @@ public class MCRObjectDerivate {
     private static final Logger LOGGER = Logger.getLogger(MCRObjectDerivate.class);
 
     // derivate data
-    private MCRMetaLinkID linkmeta = null;
+    private MCRMetaLinkID linkmeta;
 
-    private ArrayList<MCRMetaLink> externals = null;
+    private final ArrayList<MCRMetaLink> externals;
 
-    private MCRMetaIFS internals = null;
+    private MCRMetaIFS internals;
 
-    private ArrayList<MCRMetaLangText> titles = null;
+    private final ArrayList<MCRMetaLangText> titles;
 
-    private ArrayList<Element> files;
+    private final ArrayList<Element> files;
 
     private String derivateURN;
 

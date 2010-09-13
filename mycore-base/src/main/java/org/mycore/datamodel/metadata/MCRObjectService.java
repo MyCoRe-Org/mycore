@@ -61,13 +61,13 @@ import org.mycore.common.MCRException;
  */
 public class MCRObjectService {
     // service data
-    private String lang = null;
+    private String lang;
 
-    private ArrayList<MCRMetaISO8601Date> dates = null;
+    private final ArrayList<MCRMetaISO8601Date> dates;
 
-    private ArrayList<MCRMetaAccessRule> rules = null;
+    private final ArrayList<MCRMetaAccessRule> rules;
 
-    private ArrayList<MCRMetaLangText> flags = null;
+    private final ArrayList<MCRMetaLangText> flags;
 
     /**
      * This is the constructor of the MCRObjectService class. All data are set

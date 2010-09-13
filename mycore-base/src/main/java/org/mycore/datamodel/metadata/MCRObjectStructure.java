@@ -59,13 +59,13 @@ import org.mycore.datamodel.metadata.MCRMetaLinkID;
  */
 public class MCRObjectStructure {
 
-    private MCRMetaLinkID parent = null;
+    private MCRMetaLinkID parent;
 
-    private ArrayList<MCRMetaLinkID> children = null;
+    private final ArrayList<MCRMetaLinkID> children;
 
-    private ArrayList<MCRMetaLinkID> derivates = null;
+    private final ArrayList<MCRMetaLinkID> derivates;
 
-    private static final Logger logger = Logger.getLogger(MCRObjectStructure.class);
+    private static final Logger LOGGER = Logger.getLogger(MCRObjectStructure.class);
 
     /**
      * The constructor initializes NL (non-static, in order to enable different
@@ -199,7 +199,7 @@ public class MCRObjectStructure {
      * @return boolean true, if successfully completed
      */
     public final boolean removeChild(MCRObjectID href) {
-        logger.debug("Remove child ID " + href.toString());
+        LOGGER.debug("Remove child ID " + href.toString());
 
         int i;
         int n = children.size();
@@ -257,7 +257,7 @@ public class MCRObjectStructure {
         if (MCRMetadataManager.exists(href)) {
             derivates.add(add_derivate);
         } else {
-            logger.warn("Can't find derivate " + href.toString() + " ,ignored.");
+            LOGGER.warn("Can't find derivate " + href.toString() + " ,ignored.");
         }
     }
 
