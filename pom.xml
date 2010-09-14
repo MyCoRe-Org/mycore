@@ -100,7 +100,8 @@
         <site>
           <id>MyCoRe HQ</id>
           <name>MyCoRe HQ-sites</name>
-          <url>scp://server.mycore.de/mcr/mycore.de/generated/mycore-${project.version}</url>
+<!--          <url>scp://server.mycore.de/mcr/mycore.de/generated/mycore-${project.version}</url>-->
+          <url>file:///home/thosch/test/generated/mycore-${project.version}</url>
         </site>
       </distributionManagement>
       <reporting>
@@ -160,13 +161,6 @@
                 <link>http://lucene.apache.org/java/3_0_0/api/all/</link>
               </links>
             </configuration>
-            <reportSets>
-              <reportSet>
-                <reports>
-                  <report>aggregate</report>
-                </reports>
-              </reportSet>
-            </reportSets>
           </plugin>
           <plugin>
             <artifactId>maven-checkstyle-plugin</artifactId>
