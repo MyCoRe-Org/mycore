@@ -283,7 +283,7 @@
       <artifactId>joda-time</artifactId>
     </dependency>
     <dependency>
-      <groupId>axis</groupId>
+      <groupId>org.apache.axis</groupId>
       <artifactId>axis-jaxrpc</artifactId>
     </dependency>
     <dependency>

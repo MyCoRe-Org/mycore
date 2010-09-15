@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>mycore-parent</artifactId>
@@ -110,6 +111,7 @@
             <artifactId>maven-javadoc-plugin</artifactId>
             <configuration>
               <source>${java.target.version}</source>
+              <detectOfflineLinks>false</detectOfflineLinks>
               <groups>
                 <group>
                   <title>MyCoRe Datamodel</title>
@@ -153,13 +155,31 @@
               <links>
                 <link>http://java.sun.com/javase/6/docs/api/</link>
                 <link>http://tomcat.apache.org/tomcat-5.5-doc/servletapi/</link>
-                <link>http://java.sun.com/xml/jaxp/dist/1.1/docs/api/</link>
                 <link>http://www.jdom.org/docs/apidocs</link>
                 <link>http://logging.apache.org/log4j/docs/api/</link>
-                <link>http://www.hibernate.org/hib_docs/v3/api/</link>
-                <link>http://lucene.apache.org/java/3_0_0/api/all/</link>
+                <link>http://docs.jboss.org/hibernate/stable/core/api/</link>
+                <link>http://lucene.apache.org/java/3_0_2/api/all/</link>
               </links>
             </configuration>
+            <reportSets>
+              <reportSet>
+                <id>default</id>
+                <configuration>
+                </configuration>
+                <reports>
+                  <report>javadoc</report>
+                  <report>test-javadoc</report>
+                </reports>
+              </reportSet>
+              <reportSet>
+                <id>aggregate</id>
+                <configuration>
+                </configuration>
+                <reports>
+                  <report>aggregate</report>
+                </reports>
+              </reportSet>
+            </reportSets>
           </plugin>
           <plugin>
             <artifactId>maven-checkstyle-plugin</artifactId>
@@ -557,7 +577,7 @@
         <optional>false</optional>
       </dependency>
       <dependency>
-        <groupId>axis</groupId>
+        <groupId>org.apache.axis</groupId>
         <artifactId>axis-jaxrpc</artifactId>
         <version>1.4</version>
         <optional>false</optional>
