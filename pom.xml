@@ -16,6 +16,14 @@
   <description>MyCoRe is a system for the development of institutional content repositories, publication servers, image collections, archives, or
     similar repositories. Applications based on MyCoRe use a common core, which provides the functionality typically required for such applications,
     for example metadata management, querying, OAI harvesting interface, or an image viewer module.</description>
+  <properties>
+    <java.target.version>1.6</java.target.version>
+    <uniqueVersion>false</uniqueVersion>
+    <!-- new versions don't work with DB2: http://opensource.atlassian.com/projects/hibernate/browse/HHH-5168 -->
+    <hibernate.version>3.3.2.GA</hibernate.version>
+    <lucene.version>3.0.2</lucene.version>
+    <changelog.since>2010-09-09</changelog.since>
+  </properties>
   <ciManagement>
     <system>hudson</system>
     <url>http://www.mycore.org/hudson/job/MyCoRe/</url>
@@ -107,11 +115,27 @@
       <reporting>
         <plugins>
           <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-changelog-plugin</artifactId>
+            <configuration>
+              <issueIDRegexPattern>\d{6,}</issueIDRegexPattern>
+              <issueLinkUrl>https://sourceforge.net/tracker/index.php?func=detail&amp;aid=%ISSUE%&amp;group_id=92005&amp;atid=599192</issueLinkUrl>
+              <type>date</type>
+              <dates>
+                <date implementation="java.lang.String">${changelog.since}</date>
+              </dates>
+              <dateFormat>yyyy-MM-dd</dateFormat>
+            </configuration>
+          </plugin>
+          <plugin>
+            <artifactId>maven-checkstyle-plugin</artifactId>
+            <configuration>
+              <configLocation>${project.build.directory}/checkstyle.xml</configLocation>
+            </configuration>
+          </plugin>
+          <plugin>
             <artifactId>maven-javadoc-plugin</artifactId>
             <configuration>
               <source>${java.target.version}</source>
-              <detectOfflineLinks>false</detectOfflineLinks>
               <groups>
                 <group>
                   <title>MyCoRe Datamodel</title>
@@ -181,12 +205,6 @@
               </reportSet>
             </reportSets>
           </plugin>
-          <plugin>
-            <artifactId>maven-checkstyle-plugin</artifactId>
-            <configuration>
-              <configLocation>${project.build.directory}/checkstyle.xml</configLocation>
-            </configuration>
-          </plugin>
         </plugins>
       </reporting>
     </profile>
@@ -210,13 +228,6 @@
       </snapshots>
     </repository>
   </repositories>
-  <properties>
-    <java.target.version>1.6</java.target.version>
-    <uniqueVersion>false</uniqueVersion>
-    <!-- new versions don't work with DB2: http://opensource.atlassian.com/projects/hibernate/browse/HHH-5168 -->
-    <hibernate.version>3.3.2.GA</hibernate.version>
-    <lucene.version>3.0.2</lucene.version>
-  </properties>
   <build>
     <pluginManagement>
       <plugins>
