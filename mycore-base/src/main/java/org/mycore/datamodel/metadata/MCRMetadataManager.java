@@ -99,7 +99,7 @@ public final class MCRMetadataManager {
 
         try {
             LOGGER.debug("adding Derivate in data store");
-            MCRMetadataManager.addDerivateInDatastore(meta.getXLinkHref(), der);
+            MCRMetadataManager.addDerivateToObject(new MCRObjectID(meta.getXLinkHref()), der);
         } catch (final Exception e) {
             MCRMetadataManager.restore(mcrDerivate, backup);
             // throw final exception
@@ -487,7 +487,7 @@ public final class MCRMetadataManager {
             final MCRMetaLinkID der = new MCRMetaLinkID();
             der.setReference(mcrDerivate.getId().toString(), mcrDerivate.getLabel(), "");
             der.setSubTag("derobject");
-            MCRMetadataManager.addDerivateInDatastore(meta, der);
+            MCRMetadataManager.addDerivateToObject(new MCRObjectID(meta), der);
         } catch (final MCRException e) {
             throw new MCRPersistenceException("The MCRObject " + meta + " was not found.");
         }
@@ -689,8 +689,8 @@ public final class MCRMetadataManager {
      * @exception MCRPersistenceException
      *                if a persistence problem is occurred
      */
-    private static final void addDerivateInDatastore(final String id, final MCRMetaLinkID link) throws MCRPersistenceException {
-        final MCRObject object = MCRMetadataManager.retrieveMCRObject(new MCRObjectID(id));
+    public static final void addDerivateToObject(final MCRObjectID id, final MCRMetaLinkID link) throws MCRPersistenceException {
+        final MCRObject object = MCRMetadataManager.retrieveMCRObject(id);
         // don't put the same derivates twice in an object!
         MCRMetaLinkID testlink = null;
         boolean checklink = false;
@@ -711,7 +711,7 @@ public final class MCRMetadataManager {
         MCRMetadataManager.fireUpdateEvent(object);
     }
 
-    private static final void removeDerivateFromObject(final MCRObjectID objectID, final MCRObjectID derivateID) throws MCRPersistenceException {
+    public static final void removeDerivateFromObject(final MCRObjectID objectID, final MCRObjectID derivateID) throws MCRPersistenceException {
         final MCRObject object = MCRMetadataManager.retrieveMCRObject(objectID);
         object.getService().setDate("modifydate");
         MCRMetaLinkID link = null;
