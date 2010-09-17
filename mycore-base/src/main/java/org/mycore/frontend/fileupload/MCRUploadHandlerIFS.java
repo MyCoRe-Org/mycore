@@ -79,9 +79,12 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     }
 
     protected void init(String docId, String derId) {
+        docID = docId;
+        if (derId == null) {
+            return;
+        }
         MCRObjectID derOID = new MCRObjectID(derId);
         derID = derOID.toString();
-        docID = docId;
         if (MCRMetadataManager.exists(derOID)) {
             LOGGER.debug("Derivate allready exists: " + derId);
             newDerivate = false;
