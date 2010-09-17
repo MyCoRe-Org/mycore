@@ -32,6 +32,7 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.xml.MCRLayoutService;
+import org.mycore.user.MCRUser;
 import org.mycore.user.MCRUserContact;
 import org.mycore.user.MCRUserMgr;
 
@@ -56,10 +57,12 @@ public class MCRSessionListingServlet extends MCRServlet {
         for (MCRSession session : sessions) {
             Element sessionXML = new Element("session");
             sessionXML.addContent(new Element("id").setText(session.getID()));
-            sessionXML.addContent(new Element("login").setText(session.getCurrentUserID()));
+            String currentUserID = session.getCurrentUserID();
+            sessionXML.addContent(new Element("login").setText(currentUserID));
             sessionXML.addContent(new Element("ip").setText(session.getCurrentIP()));
-            if (session.getCurrentUserID() != null) {
-                MCRUserContact userContacts = um.retrieveUser(session.getCurrentUserID()).getUserContact();
+            if (currentUserID != null) {
+                MCRUser user = um.retrieveUser(currentUserID);
+                MCRUserContact userContacts = user.getUserContact();
                 String userRealName = userContacts.getFirstName() + " " + userContacts.getLastName();
                 sessionXML.addContent(new Element("userRealName").setText(userRealName));
             }
@@ -76,7 +79,9 @@ public class MCRSessionListingServlet extends MCRServlet {
                 e.setAttribute("l", Long.toString(se.getLineNumber()));
                 cst.addContent(e);
             }
-            sessionsXML.addContent(sessionXML);
+            //if session still valid
+            if (session.getID()!=null)
+                sessionsXML.addContent(sessionXML);
         }
         return new Document(sessionsXML);
     }
