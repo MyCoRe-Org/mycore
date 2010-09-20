@@ -525,46 +525,23 @@ public final class MCRMetadataManager {
         // set the parent from the original and this update
         boolean setparent = false;
 
-        if (old.getStructure().getParent() != null && mcrObject.getStructure().getParent() != null) {
-            final MCRObjectID oldparent = new MCRObjectID(old.getStructure().getParent().getXLinkHref());
-            final String newparent = mcrObject.getStructure().getParent().getXLinkHref();
+        MCRObjectID oldParentID = old.getStructure().getParentID();
+        MCRObjectID newParentID = mcrObject.getStructure().getParentID();
 
-            if (!newparent.equals(oldparent)) {
-                // remove child from the old parent
-                LOGGER.debug("Parent ID = " + oldparent);
-
-                try {
-                    final MCRObject parent = MCRMetadataManager.retrieveMCRObject(oldparent);
-                    parent.getStructure().removeChild(mcrObject.getId());
-                    MCRMetadataManager.fireUpdateEvent(parent);
-                    setparent = true;
-                } catch (final Exception e) {
-                    LOGGER.debug(MCRException.getStackTraceAsString(e));
-                    LOGGER.error("Error while delete child ID in parent object.");
-                    LOGGER.warn("Attention, the parent " + oldparent + "is now inconsist.");
-                }
-            }
-        }
-
-        if (old.getStructure().getParent() != null && mcrObject.getStructure().getParent() == null) {
-            final MCRObjectID oldparent = new MCRObjectID(old.getStructure().getParent().getXLinkHref());
-
+        if (oldParentID != null && (newParentID == null || !newParentID.equals(oldParentID))) {
             // remove child from the old parent
-            LOGGER.debug("Parent ID = " + oldparent);
-
+            LOGGER.debug("Parent ID = " + oldParentID);
             try {
-                final MCRObject parent = MCRMetadataManager.retrieveMCRObject(oldparent);
+                final MCRObject parent = MCRMetadataManager.retrieveMCRObject(oldParentID);
                 parent.getStructure().removeChild(mcrObject.getId());
                 MCRMetadataManager.fireUpdateEvent(parent);
                 setparent = true;
             } catch (final Exception e) {
                 LOGGER.debug(MCRException.getStackTraceAsString(e));
                 LOGGER.error("Error while delete child ID in parent object.");
-                LOGGER.warn("Attention, the parent " + oldparent + "is now inconsist.");
+                LOGGER.warn("Attention, the parent " + oldParentID + "is now inconsist.");
             }
-        }
-
-        if (old.getStructure().getParent() == null && mcrObject.getStructure().getParent() != null) {
+        } else if (oldParentID == null && newParentID != null) {
             setparent = true;
         }
 
@@ -574,13 +551,12 @@ public final class MCRMetadataManager {
         }
 
         // import all herited matadata from the parent
-        final MCRObjectID parent_id = mcrObject.getStructure().getParentID();
 
-        if (parent_id != null) {
-            LOGGER.debug("Parent ID = " + parent_id.toString());
+        if (newParentID != null) {
+            LOGGER.debug("Parent ID = " + newParentID);
 
             try {
-                final MCRObject parent = MCRMetadataManager.retrieveMCRObject(parent_id);
+                final MCRObject parent = MCRMetadataManager.retrieveMCRObject(newParentID);
                 // remove already embedded inherited tags
                 mcrObject.getMetadata().removeInheritedMetadata();
                 // insert heritable tags
@@ -603,8 +579,8 @@ public final class MCRMetadataManager {
         // check if the parent was new set and set them
         if (setparent) {
             try {
-                final MCRObject parent = MCRMetadataManager.retrieveMCRObject(parent_id);
-                parent.getStructure().addChild(mcrObject.getId(), mcrObject.getStructure().getParent().getXLinkLabel(), mcrObject.getLabel());
+                final MCRObject parent = MCRMetadataManager.retrieveMCRObject(newParentID);
+                parent.getStructure().addChild(mcrObject.getId(), mcrObject.getLabel(), mcrObject.getLabel());
                 MCRMetadataManager.fireUpdateEvent(parent);
             } catch (final Exception e) {
                 LOGGER.debug(MCRException.getStackTraceAsString(e));
@@ -658,7 +634,7 @@ public final class MCRMetadataManager {
         }
         if (updatechildren) {
             for (int i = 0; i < mcrObject.getStructure().getChildSize(); i++) {
-                MCRMetadataManager.updateInheritedMetadata(mcrObject.getStructure().getChild(i).getXLinkHrefID());
+                MCRMetadataManager.updateInheritedMetadata(mcrObject.getStructure().getChildID(i));
             }
         }
     }
