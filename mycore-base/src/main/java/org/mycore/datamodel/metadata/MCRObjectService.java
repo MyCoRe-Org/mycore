@@ -75,10 +75,10 @@ public class MCRObjectService {
 
         Date curTime = new Date();
 
-        MCRMetaISO8601Date d = new MCRMetaISO8601Date("service", "servdate", "createdate", 0);
+        MCRMetaISO8601Date d = new MCRMetaISO8601Date("servdate", "createdate", 0);
         d.setDate(curTime);
         dates.add(d);
-        d = new MCRMetaISO8601Date("service", "servdate", "modifydate", 0);
+        d = new MCRMetaISO8601Date("servdate", "modifydate", 0);
         d.setDate(curTime);
         dates.add(d);
 
@@ -216,7 +216,7 @@ public class MCRObjectService {
     public final void setDate(String type, Date date) {
         MCRMetaISO8601Date d = getISO8601Date(type); //search date in ArrayList
         if (d == null) {
-            d = new MCRMetaISO8601Date("service", "servdate", type, 0);
+            d = new MCRMetaISO8601Date("servdate", type, 0);
             d.setDate(date);
             dates.add(d);
         } else {
@@ -252,7 +252,7 @@ public class MCRObjectService {
             return;
         }
 
-        MCRMetaLangText flag = new MCRMetaLangText("service", "servflag", null, null, 0, null, value);
+        MCRMetaLangText flag = new MCRMetaLangText("servflag", null, null, 0, null, value);
         flags.add(flag);
     }
 
@@ -272,7 +272,7 @@ public class MCRObjectService {
             type = null;
         }
 
-        MCRMetaLangText flag = new MCRMetaLangText("service", "servflag", null, type, 0, null, value);
+        MCRMetaLangText flag = new MCRMetaLangText("servflag", null, type, 0, null, value);
         flags.add(flag);
     }
 
@@ -443,7 +443,7 @@ public class MCRObjectService {
             return;
         }
         MCRMetaLangText oldFlag = flags.get(index);
-        MCRMetaLangText flag = new MCRMetaLangText("service", "servflag", null, oldFlag.getType(), 0, null, value);
+        MCRMetaLangText flag = new MCRMetaLangText("servflag", null, oldFlag.getType(), 0, null, value);
         flags.set(index, flag);
     }
 
@@ -465,7 +465,7 @@ public class MCRObjectService {
             return;
         }
         MCRMetaLangText oldFlag = flags.get(index);
-        MCRMetaLangText flag = new MCRMetaLangText("service", "servflag", null, value, 0, null, oldFlag.getText());
+        MCRMetaLangText flag = new MCRMetaLangText("servflag", null, value, 0, null, oldFlag.getText());
         flags.set(index, flag);
     }
 
@@ -485,7 +485,7 @@ public class MCRObjectService {
             return;
         }
         if (getRuleIndex(permission) == -1) {
-            MCRMetaAccessRule acl = new MCRMetaAccessRule("service", "servacl", null, null, 0, permission, condition);
+            MCRMetaAccessRule acl = new MCRMetaAccessRule("servacl", null, null, 0, permission, condition);
             rules.add(acl);
         }
     }

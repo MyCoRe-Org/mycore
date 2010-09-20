@@ -52,7 +52,7 @@ public class MCRURNAdder {
                 obj.getMetadata().setMetadataElement(srcElement);
             }
             // adding the urn
-            MCRMetaLangText urn = new MCRMetaLangText("def.identifier", "identifier", "de", "urn", 0, "", myURNString);
+            MCRMetaLangText urn = new MCRMetaLangText("identifier", "de", "urn", 0, "", myURNString);
             srcElement.addMetaObject(urn);
 
             String objId = obj.getId().toString();

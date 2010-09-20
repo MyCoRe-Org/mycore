@@ -60,19 +60,17 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
      * the value of <em>set_type<em>, if it is null, an empty string was set
      * to the type element. The condition element was set to the value of
      * <em>set_condition<em>, if it is null, an exception will be throwed.
-     *
-     * @param set_datapart     the global part of the elements like 'metadata'
-     *                         or 'service'
      * @param set_subtag       the name of the subtag
      * @param default_lang     the default language
      * @param set_type         the optional type string
      * @param set_inherted     a value >= 0
      * @param set_permission         the format string, if it is empty 'READ' will be set.
      * @param set_condition    the JDOM Element included the condition tree
+     *
      * @exception MCRException if the set_subtag value or set_condition is null or empty
      */
-    public MCRMetaAccessRule(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted,
-            String set_permission, org.jdom.Element set_condition) throws MCRException {
+    public MCRMetaAccessRule(String set_subtag, String default_lang, String set_type, int set_inherted, String set_permission,
+            org.jdom.Element set_condition) throws MCRException {
         super(set_subtag, default_lang, set_type, set_inherted);
         permission = set_permission;
         if (permission == null || (permission = permission.trim()).length() == 0) {
@@ -243,7 +241,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
      */
     @Override
     public Object clone() {
-        return new MCRMetaAccessRule(datapart, subtag, lang, type, inherited, permission, condition);
+        return new MCRMetaAccessRule(subtag, lang, type, inherited, permission, condition);
     }
 
     /**

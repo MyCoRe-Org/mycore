@@ -58,15 +58,13 @@ public class MCRMetaNBN extends MCRMetaDefault {
      * to the type element. The text element was set to the value of
      * <em>set_text<em>, if it is null, an empty string was set
      * to the text element.
-     *
-     * @param set_datapart     the global part of the elements like 'metadata'
-     *                         or 'service'
      * @param set_subtag       the name of the subtag
      * @param set_inherted     a value >= 0
      * @param set_nbn         the NBN string
+     *
      * @exception MCRException if the set_subtag value is null or empty
      */
-    public MCRMetaNBN(String set_datapart, String set_subtag, int set_inherted, String set_nbn) throws MCRException {
+    public MCRMetaNBN(String set_subtag, int set_inherted, String set_nbn) throws MCRException {
         super(set_subtag, "de", "", set_inherted);
         nbn = "";
 
@@ -186,7 +184,7 @@ public class MCRMetaNBN extends MCRMetaDefault {
      */
     @Override
     public Object clone() {
-        return new MCRMetaNBN(datapart, subtag, inherited, nbn);
+        return new MCRMetaNBN(subtag, inherited, nbn);
     }
 
     /**

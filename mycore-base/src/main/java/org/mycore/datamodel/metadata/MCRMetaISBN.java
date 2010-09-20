@@ -66,15 +66,13 @@ public class MCRMetaISBN extends MCRMetaDefault {
      * to the type element. The text element was set to the value of
      * <em>set_text<em>, if it is null, an empty string was set
      * to the text element.
-     *
-     * @param set_datapart     the global part of the elements like 'metadata'
-     *                         or 'service'
      * @param set_subtag       the name of the subtag
      * @param set_inherted     a value >= 0
      * @param set_isbn         the ISBN string
+     *
      * @exception MCRException if the set_subtag value is null or empty
      */
-    public MCRMetaISBN(String set_datapart, String set_subtag, int set_inherted, String set_isbn) throws MCRException {
+    public MCRMetaISBN(String set_subtag, int set_inherted, String set_isbn) throws MCRException {
         super(set_subtag, "de", "", set_inherted);
         isbn = "";
         invalid = true;
@@ -252,7 +250,7 @@ public class MCRMetaISBN extends MCRMetaDefault {
      */
     @Override
     public Object clone() {
-        return new MCRMetaISBN(datapart, subtag, inherited, isbn);
+        return new MCRMetaISBN(subtag, inherited, isbn);
     }
 
     /**

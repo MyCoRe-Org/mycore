@@ -87,19 +87,17 @@ public class MCRMetaLink extends MCRMetaDefault {
     /**
      * This is the constructor. <br>
      * The language element was set. If the value of <em>default_lang</em> is null, empty or false <b>en </b> was set. The subtag element was set to the value of <em>set_subtag<em>. If the value of <em>set_subtag</em> is null or empty an exception was throwed.
-     * 
-     * @param set_datapart
-     *            the global part of the elements like 'metadata' or 'service' or so
      * @param set_subtag
      *            the name of the subtag
      * @param default_lang
      *            the default language
      * @param set_inherted
      *            a value >= 0
+     * 
      * @exception MCRException
      *                if the set_datapart or set_subtag value is null or empty
      */
-    public MCRMetaLink(String set_datapart, String set_subtag, String default_lang, int set_inherted) throws MCRException {
+    public MCRMetaLink(String set_subtag, String default_lang, int set_inherted) throws MCRException {
         super(set_subtag, default_lang, "", set_inherted);
         href = "";
         label = "";
@@ -415,7 +413,7 @@ public class MCRMetaLink extends MCRMetaDefault {
      */
     @Override
     public final Object clone() {
-        MCRMetaLink out = new MCRMetaLink(datapart, subtag, lang, inherited);
+        MCRMetaLink out = new MCRMetaLink(subtag, lang, inherited);
         out.linktype = linktype;
         out.title = title;
         out.type = type;

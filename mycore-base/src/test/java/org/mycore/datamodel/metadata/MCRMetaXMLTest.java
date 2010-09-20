@@ -67,7 +67,7 @@ public class MCRMetaXMLTest extends MCRTestCase {
 
     @Test
     public void xmlRoundrip() {
-        MCRMetaXML mXml = new MCRMetaXML("metadata", "def.heading", "complete", 0);
+        MCRMetaXML mXml = new MCRMetaXML("def.heading", "complete", 0);
         Element imported = new Element("heading");
         imported.setAttribute("lang", MCRMetaDefault.DEFAULT_LANGUAGE, Namespace.XML_NAMESPACE);
         imported.setAttribute("inherited", "0");

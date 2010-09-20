@@ -61,16 +61,14 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
      * the value of <em>set_type<em>, if it is null, an empty string was set
      * to the type element. The boolean string <em>set_value<em>
      * was set to a boolean element, if it is null, false was set.
-     *
-     * @param set_datapart     the global part of the elements like 'metadata'
-     *                         or 'service'
      * @param set_subtag       the name of the subtag
      * @param set_type         the optional type string
      * @param set_inherted     a value >= 0
      * @param set_value        the boolean value (true or false) as string
+     *
      * @exception MCRException if the set_subtag value is null or empty
      */
-    public MCRMetaBoolean(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted, String set_value)
+    public MCRMetaBoolean(String set_subtag, String default_lang, String set_type, int set_inherted, String set_value)
             throws MCRException {
         super(set_subtag, "en", set_type, set_inherted);
         LOGGER.debug("default_lang (" + default_lang + ") will never used."); //FIXME: use default_lang or remove it
@@ -114,16 +112,14 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
      * the value of <em>set_type<em>, if it is null, an empty string was set
      * to the type element. The boolean string <em>set_value<em>
      * was set to a boolean element, if it is null, false was set.
-     *
-     * @param set_datapart     the global part of the elements like 'metadata'
-     *                         or 'service'
      * @param set_subtag       the name of the subtag
      * @param set_type         the optional type string
      * @param set_inherted     a value >= 0
      * @param set_value        the boolean value (true or false)
+     *
      * @exception MCRException if the set_subtag value is null or empty
      */
-    public MCRMetaBoolean(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted, boolean set_value)
+    public MCRMetaBoolean(String set_subtag, String default_lang, String set_type, int set_inherted, boolean set_value)
             throws MCRException {
         super(set_subtag, "en", set_type, set_inherted);
         LOGGER.debug("default_lang (" + default_lang + ") will never used."); //FIXME: use default_lang or remove it
@@ -271,7 +267,7 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
      */
     @Override
     public final Object clone() {
-        return new MCRMetaBoolean(datapart, subtag, lang, type, inherited, value);
+        return new MCRMetaBoolean(subtag, lang, type, inherited, value);
     }
 
     /**

@@ -68,19 +68,16 @@ public class MCRMetaClassification extends MCRMetaDefault {
      * The type element was set to an empty string.
      * the <em>set_classid</em> and the <em>categid</em> must be not null
      * or empty!
-     *
-     * @param set_datapart     the global part of the elements like 'metadata'
-     *                         or 'service'
      * @param set_subtag       the name of the subtag
      * @param set_inherted     a value >= 0
      * @param set_type         the type attribute
      * @param set_classid      the classification ID
      * @param set_categid      the category ID
+     *
      * @exception MCRException if the set_subtag value, the set_classid value or
      * the set_categid are null, empty, too long or not a MCRObjectID
      */
-    public MCRMetaClassification(String set_datapart, String set_subtag, int set_inherted, String set_type, String set_classid,
-            String set_categid) throws MCRException {
+    public MCRMetaClassification(String set_subtag, int set_inherted, String set_type, String set_classid, String set_categid) throws MCRException {
         super(set_subtag, "en", set_type, set_inherted);
         setValue(set_classid, set_categid);
     }
@@ -204,7 +201,7 @@ public class MCRMetaClassification extends MCRMetaDefault {
      */
     @Override
     public Object clone() {
-        return new MCRMetaClassification(datapart, subtag, inherited, type, classid, categid);
+        return new MCRMetaClassification(subtag, inherited, type, classid, categid);
     }
 
     /**

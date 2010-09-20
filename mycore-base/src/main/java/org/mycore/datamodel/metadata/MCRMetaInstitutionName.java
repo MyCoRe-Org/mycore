@@ -64,9 +64,6 @@ final public class MCRMetaInstitutionName extends MCRMetaDefault {
      * to the type element. The fullname, nickname  and property element
      * was set to the value of <em>set_...<em>, if they are null,
      * an empty string was set to this element.
-     *
-     * @param set_datapart    the global part of the elements like 'metadata'
-     *                        or 'service'
      * @param set_subtag      the name of the subtag
      * @param default_lang    the default language
      * @param set_type        the optional type string
@@ -74,10 +71,11 @@ final public class MCRMetaInstitutionName extends MCRMetaDefault {
      * @param set_fullname    the full name
      * @param set_nickname    the nickname
      * @param set_property       the property title
+     *
      * @exception MCRException if the parameter values are invalid
      */
-    public MCRMetaInstitutionName(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted,
-            String set_fullname, String set_nickname, String set_property) throws MCRException {
+    public MCRMetaInstitutionName(String set_subtag, String default_lang, String set_type, int set_inherted, String set_fullname,
+            String set_nickname, String set_property) throws MCRException {
         super(set_subtag, default_lang, set_type, set_inherted);
         fullname = "";
         nickname = "";
@@ -222,6 +220,6 @@ final public class MCRMetaInstitutionName extends MCRMetaDefault {
      */
     @Override
     public final Object clone() {
-        return new MCRMetaInstitutionName(datapart, subtag, lang, type, inherited, fullname, nickname, property);
+        return new MCRMetaInstitutionName(subtag, lang, type, inherited, fullname, nickname, property);
     }
 }

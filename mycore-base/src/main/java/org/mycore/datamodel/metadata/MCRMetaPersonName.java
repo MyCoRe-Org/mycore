@@ -76,9 +76,6 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
      * to the type element. The firstname, callname, surname, academic and
      * peerage element was set to the value of <em>set_...<em>, if they are null,
      * an empty string was set to this element.
-     *
-     * @param set_datapart     the global part of the elements like 'metadata'
-     *                         or 'service'
      * @param set_subtag      the name of the subtag
      * @param default_lang    the default language
      * @param set_type        the optional type string
@@ -90,11 +87,11 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
      * @param set_academic    the academic title
      * @param set_peerage     the peerage title
      * @param set_prefix      the prefix title
+     *
      * @exception MCRException if the parameter values are invalid
      */
-    public MCRMetaPersonName(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted,
-            String set_firstname, String set_callname, String set_surname, String set_fullname, String set_academic, String set_peerage,
-            String set_prefix) throws MCRException {
+    public MCRMetaPersonName(String set_subtag, String default_lang, String set_type, int set_inherted, String set_firstname,
+            String set_callname, String set_surname, String set_fullname, String set_academic, String set_peerage, String set_prefix) throws MCRException {
         super(set_subtag, default_lang, set_type, set_inherted);
         firstname = "";
         callname = "";
@@ -350,8 +347,7 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
      */
     @Override
     public final Object clone() {
-        return new MCRMetaPersonName(datapart, subtag, lang, type, inherited, firstname, callname, surname, fullname, academic, peerage,
-                prefix);
+        return new MCRMetaPersonName(subtag, lang, type, inherited, firstname, callname, surname, fullname, academic, peerage, prefix);
     }
 
     /**

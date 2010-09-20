@@ -560,11 +560,11 @@ public class MCRSimpleWorkflowManager {
         der.setLabel("Dataobject from " + ID.toString());
         der.setSchema("datamodel-derivate.xsd");
 
-        MCRMetaLinkID link = new MCRMetaLinkID("linkmetas", "linkmeta", "de", 0);
+        MCRMetaLinkID link = new MCRMetaLinkID("linkmeta", "de", 0);
         link.setReference(ID.toString(), "", "");
         der.getDerivate().setLinkMeta(link);
 
-        MCRMetaIFS internal = new MCRMetaIFS("internals", "internal", "de", DD.toString());
+        MCRMetaIFS internal = new MCRMetaIFS("internal", "de", DD.toString());
         internal.setMainDoc("");
         der.getDerivate().setInternals(internal);
         

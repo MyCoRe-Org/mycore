@@ -64,15 +64,13 @@ final public class MCRMetaIFS extends MCRMetaDefault {
      * value of <em>set_subtag</em> is null or empty an exception was throwed.
      * The type element was set empty.
      * The sourcepath must be NOT null or empty.
-     *
-     * @param set_datapart     the global part of the elements like 'metadata'
-     *                         or 'service'
      * @param set_subtag       the name of the subtag
      * @param set_sourcepath   the sourcepath attribute
+     *
      * @exception MCRException if the set_subtag value, the set_classid value or
      * the set_categid are null, empty, too long or not a MCRObjectID
      */
-    public MCRMetaIFS(String set_datapart, String set_subtag, String default_lang, String set_sourcepath) throws MCRException {
+    public MCRMetaIFS(String set_subtag, String default_lang, String set_sourcepath) throws MCRException {
         super(set_subtag, "en", "", 0);
         LOGGER.debug("default_lang (" + default_lang + ") will never used."); //FIXME: use default_lang or remove it
         setSourcePath(set_sourcepath);

@@ -79,20 +79,18 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      * to the measurement element.  The number string <em>set_number</em>
      * was set to the number element, if it is null or not a number, a
      * MCRException was thowed.
-     *
-     * @param set_datapart     the global part of the elements like 'metadata'
-     *                         or 'service'
      * @param set_subtag       the name of the subtag
      * @param default_lang     the default language
      * @param set_inherted     a value >= 0
      * @param set_dimension    the optional dimension string
      * @param set_measurement  the optional measurement string
      * @param set_number       the number string
+     *
      * @exception MCRException if the set_subtag value is null or empty or if
      *   the number string is not in a number format
      */
-    public MCRMetaNumber(String set_datapart, String set_subtag, String default_lang, int set_inherted, String set_dimension,
-            String set_measurement, String set_number) throws MCRException {
+    public MCRMetaNumber(String set_subtag, String default_lang, int set_inherted, String set_dimension, String set_measurement,
+            String set_number) throws MCRException {
         super(set_subtag, default_lang, "", set_inherted);
         set_number = set_number.trim();
         number = 0.;
@@ -140,19 +138,17 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      * <em>set_measurement<em>, if it is null, an empty string was set
      * to the measurement element.  The number <em>set_number</em>
      * was set to the number element.
-     *
-     * @param set_datapart     the global part of the elements like 'metadata'
-     *                         or 'service'
      * @param set_subtag       the name of the subtag
      * @param default_lang     the default language
      * @param set_inherted     a value >= 0
      * @param set_dimension    the optional dimension string
      * @param set_measurement  the optional measurement string
      * @param set_number       the number value
+     *
      * @exception MCRException if the set_subtag value is null or empty
      */
-    public MCRMetaNumber(String set_datapart, String set_subtag, String default_lang, int set_inherted, String set_dimension,
-            String set_measurement, double set_number) throws MCRException {
+    public MCRMetaNumber(String set_subtag, String default_lang, int set_inherted, String set_dimension, String set_measurement,
+            double set_number) throws MCRException {
         super(set_subtag, default_lang, "", set_inherted);
         number = set_number;
         dimension = "";
@@ -397,7 +393,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      */
     @Override
     public final Object clone() {
-        return new MCRMetaNumber(datapart, subtag, lang, inherited, dimension, measurement, number);
+        return new MCRMetaNumber(subtag, lang, inherited, dimension, measurement, number);
     }
 
     /**

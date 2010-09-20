@@ -105,7 +105,7 @@ public class MCRObjectMetadataTest extends MCRTestCase {
 
     private MCRObjectMetadata getDateObjectMetadata() {
         MCRObjectMetadata meta2 = new MCRObjectMetadata();
-        MCRMetaISO8601Date date = new MCRMetaISO8601Date("def.datefield", "datefield", "test", 0);
+        MCRMetaISO8601Date date = new MCRMetaISO8601Date("datefield", "test", 0);
         date.setDate(new Date());
         MCRMetaElement el2 = new MCRMetaElement();
         el2.addMetaObject(date);

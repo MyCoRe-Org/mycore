@@ -173,7 +173,7 @@ public class MCRObjectStructure {
     public final boolean addChild(MCRObjectID href, String label, String title) {
         MCRConfiguration mcr_conf = MCRConfiguration.instance();
         String lang = mcr_conf.getString("MCR.Metadata.DefaultLang");
-        MCRMetaLinkID link = new MCRMetaLinkID("structure", "child", lang, 0);
+        MCRMetaLinkID link = new MCRMetaLinkID("child", lang, 0);
         link.setReference(href, label, title);
 
         int i;

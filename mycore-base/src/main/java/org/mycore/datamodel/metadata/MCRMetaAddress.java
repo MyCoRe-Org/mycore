@@ -73,9 +73,6 @@ final public class MCRMetaAddress extends MCRMetaDefault {
      * to the type element. The country, state, zipcode, city, street and
      * number element was set to the value of <em>set_...<em>, if they are null,
      * an empty string was set to this element.
-     *
-     * @param set_datapart    the global part of the elements like 'metadata'
-     *                        or 'service'
      * @param set_subtag      the name of the subtag
      * @param default_lang    the default language
      * @param set_type        the optional type string
@@ -86,10 +83,11 @@ final public class MCRMetaAddress extends MCRMetaDefault {
      * @param set_city        the city name
      * @param set_street      the street name
      * @param set_number      the number string
+     *
      * @exception MCRException if the parameter values are invalid
      */
-    public MCRMetaAddress(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted,
-            String set_country, String set_state, String set_zipcode, String set_city, String set_street, String set_number)
+    public MCRMetaAddress(String set_subtag, String default_lang, String set_type, int set_inherted, String set_country,
+            String set_state, String set_zipcode, String set_city, String set_street, String set_number)
             throws MCRException {
         super(set_subtag, default_lang, set_type, set_inherted);
         country = "";
@@ -333,7 +331,7 @@ final public class MCRMetaAddress extends MCRMetaDefault {
      */
     @Override
     public Object clone() {
-        return new MCRMetaAddress(datapart, subtag, DEFAULT_LANGUAGE, type, inherited, country, state, zipcode, city, street, number);
+        return new MCRMetaAddress(subtag, DEFAULT_LANGUAGE, type, inherited, country, state, zipcode, city, street, number);
     }
 
     /**

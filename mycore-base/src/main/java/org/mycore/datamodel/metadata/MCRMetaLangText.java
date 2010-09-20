@@ -61,19 +61,16 @@ public class MCRMetaLangText extends MCRMetaDefault {
      * to the type element. The text element was set to the value of
      * <em>set_text<em>, if it is null, an empty string was set
      * to the text element.
-     *
-     * @param set_datapart     the global part of the elements like 'metadata'
-     *                         or 'service'
      * @param set_subtag       the name of the subtag
      * @param default_lang     the default language
      * @param set_type         the optional type string
      * @param set_inherted     a value >= 0
      * @param set_form         the format string, if it is empty 'plain' is set.
      * @param set_text         the text string
+     *
      * @exception MCRException if the set_subtag value is null or empty
      */
-    public MCRMetaLangText(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted, String set_form,
-            String set_text) throws MCRException {
+    public MCRMetaLangText(String set_subtag, String default_lang, String set_type, int set_inherted, String set_form, String set_text) throws MCRException {
         super(set_subtag, default_lang, set_type, set_inherted);
         text = "";
 
@@ -249,7 +246,7 @@ public class MCRMetaLangText extends MCRMetaDefault {
      */
     @Override
     public Object clone() {
-        return new MCRMetaLangText(datapart, subtag, lang, type, inherited, form, text);
+        return new MCRMetaLangText(subtag, lang, type, inherited, form, text);
     }
 
     /**

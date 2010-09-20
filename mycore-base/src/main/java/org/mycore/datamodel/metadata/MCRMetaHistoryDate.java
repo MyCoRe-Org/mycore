@@ -90,16 +90,14 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * to the type element.<br />
      * The text element is set to an empty string. The calendar is set to 'Gregorian Calendar'. The von value 
      * is set to MIN_JULIAN_DAY_NUMBER, the bis value is set to MAX_JULIAN_DAY_NUMBER;
-     *
-     * @param set_datapart     the global part of the elements like 'metadata'
-     *                         or 'service'
      * @param set_subtag      the name of the subtag
      * @param default_lang    the default language
      * @param set_type        the optional type string
      * @param set_inherted    a value >= 0
+     *
      * @exception MCRException if the parameter values are invalid
      */
-    public MCRMetaHistoryDate(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted)
+    public MCRMetaHistoryDate(String set_subtag, String default_lang, String set_type, int set_inherted)
             throws MCRException {
         super(set_subtag, default_lang, set_type, set_inherted);
         texts = new ArrayList<MCRMetaHistoryDateText>();
@@ -547,7 +545,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      */
     @Override
     public Object clone() {
-        MCRMetaHistoryDate out = new MCRMetaHistoryDate(datapart, subtag, lang, type, inherited);
+        MCRMetaHistoryDate out = new MCRMetaHistoryDate(subtag, lang, type, inherited);
         for (int i = 0; i < texts.size(); i++) {
             MCRMetaHistoryDateText h = texts.get(i);
             out.setText(h.getText(), h.getLang());
