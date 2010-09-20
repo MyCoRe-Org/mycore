@@ -102,16 +102,6 @@ final public class MCRObject extends MCRBase {
     }
 
     /**
-     * This methode return the object metadata element selected by tag. If this
-     * was not found, null was returned.
-     * 
-     * @return the metadata tag part as a object that extend MCRMetaElement
-     */
-    public final MCRMetaElement getMetadataElement(String tag) {
-        return mcr_metadata.getMetadataElement(tag);
-    }
-
-    /**
      * This method returns the instance of the MCRObjectMetadata class. If there
      * was no MCRObjectMetadata found, null will be returned.
      * 
@@ -192,27 +182,6 @@ final public class MCRObject extends MCRBase {
         org.jdom.Element jdom_element_root = jdom_document.getRootElement();
         jdom_element = jdom_element_root.getChild("service");
         mcr_service.setFromDOM(jdom_element);
-    }
-
-    /**
-     * This methode set the object metadata part named by a tag.
-     * 
-     * @param obj
-     *            the class object of a metadata part
-     * @param tag
-     *            the tag of a metadata part
-     * @return true if set was succesful, otherwise false
-     */
-    public final boolean setMetadataElement(MCRMetaElement obj, String tag) {
-        if (obj == null) {
-            return false;
-        }
-
-        if (tag == null || (tag = tag.trim()).length() == 0) {
-            return false;
-        }
-
-        return mcr_metadata.setMetadataElement(obj, tag);
     }
 
     /**

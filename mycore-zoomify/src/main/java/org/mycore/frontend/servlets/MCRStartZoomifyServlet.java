@@ -108,7 +108,7 @@ public class MCRStartZoomifyServlet extends MCRStartEditorServlet{
 		MCRConfiguration CONFIG = MCRConfiguration.instance();
 		String type = obj.getId().getTypeId();
 		String idname = CONFIG.getString("MCR.Component.Zoomify."+type+".identifier");
-		MCRMetaElement metas = obj.getMetadataElement(idname);
+		MCRMetaElement metas = obj.getMetadata().getMetadataElement(idname);
 		MCRMetaLangText langtext = (MCRMetaLangText)metas.getElement(0);
 		
 		String mcrname = langtext.getText();

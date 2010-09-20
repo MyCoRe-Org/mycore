@@ -24,9 +24,11 @@
 package org.mycore.datamodel.metadata;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
@@ -45,15 +47,15 @@ import org.mycore.datamodel.metadata.MCRMetaInterface;
  * @author Mathias Hegner
  * @version $Revision$ $Date$
  */
-public class MCRMetaElement {
+public class MCRMetaElement implements Iterable<MCRMetaInterface> {
     // common data
-    public final static String DEFAULT_LANGUAGE = "de";
-
-    public final static boolean DEFAULT_HERITABLE = false;
-
-    public final static boolean DEFAULT_NOT_INHERIT = false;
-
     protected final static MCRConfiguration CONFIG = MCRConfiguration.instance();
+
+    public final static String DEFAULT_LANGUAGE = CONFIG.getString("MCR.Metadata.DefaultLang", "de");;
+
+    public final static boolean DEFAULT_HERITABLE = CONFIG.getBoolean("MCR.MetaElement.defaults.heritable", false);
+
+    public final static boolean DEFAULT_NOT_INHERIT = CONFIG.getBoolean("MCR.MetaElement.defaults.notinherit", false);
 
     private String META_PACKAGE_NAME = "org.mycore.datamodel.metadata.";
 
@@ -63,7 +65,7 @@ public class MCRMetaElement {
     // MetaElement data
     private String lang = null;
 
-    private String classname = null;
+    private Class<? extends MCRMetaInterface> clazz = null;
 
     private String tag = null;
 
@@ -75,12 +77,10 @@ public class MCRMetaElement {
 
     /**
      * This is the constructor of the MCRMetaElement class. The default language
-     * for the element was set to <b>en </b>.
+     * for the element was set to <b>MCR.MetaElement.defaults.class</b>.
      */
     public MCRMetaElement() {
-        this(DEFAULT_LANGUAGE, CONFIG.getString("MCR.MetaElement.defaults.class", ""), "", CONFIG.getBoolean(
-                "MCR.MetaElement.defaults.heritable", DEFAULT_HERITABLE), CONFIG.getBoolean("MCR.MetaElement.defaults.notinherit",
-                DEFAULT_NOT_INHERIT), new ArrayList<MCRMetaInterface>());
+        this(DEFAULT_LANGUAGE);
     }
 
     /**
@@ -92,9 +92,7 @@ public class MCRMetaElement {
      *            the default language
      */
     public MCRMetaElement(String default_lang) {
-        this(default_lang, CONFIG.getString("MCR.MetaElement.defaults.class", ""), "", CONFIG.getBoolean(
-                "MCR.MetaElement.defaults.heritable", DEFAULT_HERITABLE), CONFIG.getBoolean("MCR.MetaElement.defaults.notinherit",
-                DEFAULT_NOT_INHERIT), new ArrayList<MCRMetaInterface>());
+        this(default_lang, null, "", DEFAULT_HERITABLE, DEFAULT_NOT_INHERIT, null);
     }
 
     /**
@@ -113,16 +111,13 @@ public class MCRMetaElement {
      *            set this flag to true if this element should not inherit from
      *            his parent object
      * @param set_list
-     *            a list of MCRMeta... data lines to add in this element
+     *            a list of MCRMeta... data lines to add in this element (can be null)
      */
-    public MCRMetaElement(String set_lang, String set_classname, String set_tag, boolean set_heritable, boolean set_notinherit,
-            ArrayList<MCRMetaInterface> set_list) {
-        if (set_lang != null && (set_lang = set_lang.trim()).length() != 0) {
-            lang = set_lang;
-        }
+    public MCRMetaElement(String set_lang, Class<? extends MCRMetaInterface> clazz, String set_tag, boolean set_heritable, boolean set_notinherit,
+        ArrayList<MCRMetaInterface> set_list) {
+        lang = set_lang;
 
-        classname = "";
-        setClassName(set_classname);
+        this.clazz = clazz;
         tag = "";
         setTag(set_tag);
         heritable = set_heritable;
@@ -142,7 +137,7 @@ public class MCRMetaElement {
      * @return the name of this metadata class as string
      */
     public final String getClassName() {
-        return classname;
+        return getClazz().getSimpleName();
     }
 
     /**
@@ -166,13 +161,9 @@ public class MCRMetaElement {
      * @return the instance of the element with the given name or null if there is no such element
      * */
     public final MCRMetaInterface getElementByName(String name) {
-        if (name == null || name.length() == 0) {
-            return null;
-        }
-
-        for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).getSubTag().equals(name)) {
-                return list.get(i);
+        for (MCRMetaInterface sub : this) {
+            if (sub.getSubTag().equals(name)) {
+                return sub;
             }
         }
         return null;
@@ -219,62 +210,10 @@ public class MCRMetaElement {
      * This methode set the heritable flag for the metadata class.
      * 
      * @param heritable
-     *            the heritable flag as string
-     */
-    public void setHeritable(String heritable) {
-        this.heritable = DEFAULT_HERITABLE;
-
-        if (heritable == null || (heritable = heritable.trim()).length() == 0) {
-            return;
-        }
-
-        if (heritable.toLowerCase().equals("true")) {
-            this.heritable = true;
-
-            return;
-        }
-
-        if (heritable.toLowerCase().equals("false")) {
-            this.heritable = false;
-
-            return;
-        }
-    }
-
-    /**
-     * This methode set the heritable flag for the metadata class.
-     * 
-     * @param heritable
      *            the heritable flag as boolean value
      */
     public void setHeritable(boolean heritable) {
         this.heritable = heritable;
-    }
-
-    /**
-     * This methode set the notinherit flag for the metadata class.
-     * 
-     * @param notinherit
-     *            the notinherit flag as string
-     */
-    public void setNotInherit(String notinherit) {
-        this.notinherit = DEFAULT_NOT_INHERIT;
-
-        if (notinherit == null || (notinherit = notinherit.trim()).length() == 0) {
-            return;
-        }
-
-        if (notinherit.toLowerCase().equals("true")) {
-            this.notinherit = true;
-
-            return;
-        }
-
-        if (notinherit.toLowerCase().equals("false")) {
-            this.notinherit = false;
-
-            return;
-        }
     }
 
     /**
@@ -302,17 +241,17 @@ public class MCRMetaElement {
     }
 
     /**
-     * This methode set the element class name for the metadata elements.
+     * This methode set the element class for the metadata elements.
      * 
-     * @param classname
-     *            the class name for the metadata elements
+     * @param clazz
+     *            the class for the metadata elements
      */
-    public final void setClassName(String classname) {
-        if (classname == null || (classname = classname.trim()).length() == 0) {
-            return;
-        }
+    public final void setClass(Class<? extends MCRMetaInterface> clazz) {
+        this.clazz = clazz;
+    }
 
-        this.classname = classname;
+    public Class<? extends MCRMetaInterface> getClazz() {
+        return clazz;
     }
 
     /**
@@ -359,34 +298,45 @@ public class MCRMetaElement {
      * @exception MCRException
      *                if the class can't loaded
      */
+    @SuppressWarnings("unchecked")
     public final void setFromDOM(org.jdom.Element element) throws MCRException {
+
+        String fullname;
+        Class<? extends MCRMetaInterface> forName;
+        try {
+            String classname = element.getAttributeValue("class");
+            fullname = META_PACKAGE_NAME + classname;
+            forName = (Class<? extends MCRMetaInterface>) Class.forName(fullname);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         tag = element.getName();
-        classname = element.getAttributeValue("class");
+        String heritable = element.getAttributeValue("heritable");
+        if (heritable != null)
+            setHeritable(Boolean.valueOf(heritable));
 
-        String fullname = META_PACKAGE_NAME + classname;
-        setHeritable(element.getAttributeValue("heritable"));
-        setNotInherit(element.getAttributeValue("notinherit"));
+        String notInherit = element.getAttributeValue("notinherit");
+        if (notInherit != null)
+            setNotInherit(Boolean.valueOf(notInherit));
 
-        List element_list = element.getChildren();
+        List<Element> element_list = element.getChildren();
         int len = element_list.size();
 
         for (int i = 0; i < len; i++) {
             org.jdom.Element subtag = (org.jdom.Element) element_list.get(i);
-            Object obj = new Object();
+            MCRMetaInterface obj;
 
             try {
-                obj = Class.forName(fullname).newInstance();
-                ((MCRMetaInterface) obj).setLang(lang);
-                ((MCRMetaInterface) obj).setFromDOM(subtag);
-            } catch (ClassNotFoundException e) {
-                throw new MCRException(fullname + " ClassNotFoundException");
+                obj = forName.newInstance();
+                obj.setLang(lang);
+                obj.setFromDOM(subtag);
             } catch (IllegalAccessException e) {
                 throw new MCRException(fullname + " IllegalAccessException");
             } catch (InstantiationException e) {
                 throw new MCRException(fullname + " InstantiationException");
             }
 
-            list.add((MCRMetaInterface) obj);
+            list.add(obj);
         }
     }
 
@@ -421,7 +371,7 @@ public class MCRMetaElement {
             return elm;
         }
 
-        elm.setAttribute("class", classname);
+        elm.setAttribute("class", getClassName());
         elm.setAttribute("heritable", String.valueOf(heritable));
         elm.setAttribute("notinherit", String.valueOf(notinherit));
 
@@ -452,7 +402,7 @@ public class MCRMetaElement {
      * @return a boolean value
      */
     public final boolean isValid() {
-        if (classname == null || (classname = classname.trim()).length() == 0) {
+        if (clazz == null || !clazz.getPackage().getName().equals(META_PACKAGE_NAME)) {
             return false;
         }
 
@@ -475,9 +425,9 @@ public class MCRMetaElement {
      * This method make a clone of this class.
      */
     @Override
-    public final Object clone() {
+    public final MCRMetaElement clone() {
         MCRMetaElement out = new MCRMetaElement(lang);
-        out.setClassName(classname);
+        out.setClass(getClazz());
         out.setTag(tag);
         out.setHeritable(heritable);
         out.setNotInherit(notinherit);
@@ -494,7 +444,7 @@ public class MCRMetaElement {
      * This method put debug data to the logger (for the debug mode).
      */
     public final void debug() {
-        LOGGER.debug("ClassName          = " + classname);
+        LOGGER.debug("ClassName          = " + getClassName());
         LOGGER.debug("Tag                = " + tag);
         LOGGER.debug("Language           = " + lang);
         LOGGER.debug("Heritable          = " + String.valueOf(heritable));
@@ -504,5 +454,10 @@ public class MCRMetaElement {
         for (int i = 0; i < list.size(); i++) {
             list.get(i).debug();
         }
+    }
+
+    @Override
+    public Iterator<MCRMetaInterface> iterator() {
+        return list.iterator();
     }
 }

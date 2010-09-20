@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.jdom.Element;
 import org.jdom.Namespace;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
@@ -42,7 +44,7 @@ import org.mycore.common.MCRUtils;
  * @author Mathias Hegner
  * @version $Revision$ $Date$
  */
-public class MCRObjectMetadata {
+public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
     // common data
     private String default_lang = null;
 
@@ -50,8 +52,6 @@ public class MCRObjectMetadata {
 
     // metadata list
     private final ArrayList<MCRMetaElement> meta_list;
-
-    private final ArrayList<String> tag_names;
 
     /**
      * This is the constructor of the MCRObjectMetadata class. It set the
@@ -65,7 +65,6 @@ public class MCRObjectMetadata {
         default_lang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang");
         herited_xml = MCRConfiguration.instance().getBoolean("MCR.Metadata.HeritedForXML", false);
         meta_list = new ArrayList<MCRMetaElement>();
-        tag_names = new ArrayList<String>();
     }
 
     /**
@@ -74,18 +73,7 @@ public class MCRObjectMetadata {
      * @return int number of tags and meta elements
      */
     public int size() {
-        return tag_names.size();
-    }
-
-    /**
-     * The method returns the tag name at a given index.
-     * 
-     * @param i
-     *            given index
-     * @return String the associated tag name
-     */
-    public final String getMetadataTagName(int i) {
-        return tag_names.get(i);
+        return meta_list.size();
     }
 
     /**
@@ -108,7 +96,7 @@ public class MCRObjectMetadata {
                     nme.getElement(j).incrementInherited();
                 }
 
-                heritMeta.setMetadataElement(nme, getMetadataTagName(i));
+                heritMeta.setMetadataElement(nme);
             }
         }
 
@@ -124,13 +112,10 @@ public class MCRObjectMetadata {
         int counter = 0;
         while (elements.hasNext()) {
             MCRMetaElement me = elements.next();
-            if (me.getHeritable()) {
-                me.removeInheritedObject();
-            }
+            me.removeInheritedObject();
             //remove meta element if empty (else isValid() will fail)
             if (me.size() == 0) {
                 elements.remove();
-                tag_names.remove(counter);
             } else {
                 counter++;
             }
@@ -145,17 +130,12 @@ public class MCRObjectMetadata {
      *            the MCRObjectMetadata, that should merged into this data set
      */
     public final void appendMetadata(MCRObjectMetadata input) {
-        MCRMetaElement newelm = null;
-        String newtag = "";
 
-        for (int i = 0; i < input.size(); i++) {
-            newelm = input.getMetadataElement(i);
-            newtag = newelm.getTag();
-
+        for (MCRMetaElement newelm:input) {
             int pos = -1;
 
             for (int j = 0; j < size(); j++) {
-                if (tag_names.get(j).equals(newtag)) {
+                if (meta_list.get(j).getTag().equals(newelm.getTag())) {
                     pos = j;
                 }
             }
@@ -170,7 +150,6 @@ public class MCRObjectMetadata {
                     }
                 }
             } else {
-                tag_names.add(newtag);
                 newelm.setNotInherit(false);
                 meta_list.add(newelm);
             }
@@ -186,18 +165,11 @@ public class MCRObjectMetadata {
      * @return the MCRMetaElement for the tag
      */
     public final MCRMetaElement getMetadataElement(String tag) {
-        if (tag == null || (tag = tag.trim()).length() == 0) {
-            return null;
-        }
-
-        int len = tag_names.size();
-
-        for (int i = 0; i < len; i++) {
-            if (tag_names.get(i).equals(tag)) {
-                return meta_list.get(i);
+        for (MCRMetaElement sub : this) {
+            if (sub.getTag().equals(tag)) {
+                return sub;
             }
         }
-
         return null;
     }
 
@@ -210,52 +182,27 @@ public class MCRObjectMetadata {
      * @return the MCRMetaElement for the index
      */
     public final MCRMetaElement getMetadataElement(int index) {
-        if (index < 0 || index > meta_list.size()) {
-            return null;
-        }
-
         return meta_list.get(index);
     }
 
     /**
-     * This methode set the given MCRMetaElement to the list. If the tag exists
+     * sets the given MCRMetaElement to the list. If the tag exists
      * the MCRMetaElement was replaced.
      * 
      * @param obj
      *            the MCRMetaElement object
-     * @param tag
-     *            the MCRMetaElement tag
      * @return true if set was succesful, otherwise false
      */
-    public final boolean setMetadataElement(MCRMetaElement obj, String tag) {
-        if (obj == null) {
-            return false;
-        }
+    public final void setMetadataElement(MCRMetaElement obj) {
+        MCRMetaElement old = getMetadataElement(obj.getTag());
 
-        if (tag == null || (tag = tag.trim()).length() == 0) {
-            return false;
-        }
-
-        int len = tag_names.size();
-        int fl = -1;
-
-        for (int i = 0; i < len; i++) {
-            if (tag_names.get(i).equals(tag)) {
-                fl = i;
-            }
-        }
-
-        if (fl == -1) {
+        if (old == null) {
             meta_list.add(obj);
-            tag_names.add(tag);
-
-            return true;
+            return;
         }
-
-        meta_list.remove(fl);
-        meta_list.add(obj);
-
-        return false;
+        int i = meta_list.indexOf(old);
+        meta_list.remove(i);
+        meta_list.add(i, obj);
     }
 
     /**
@@ -264,20 +211,12 @@ public class MCRObjectMetadata {
      * @return true if set was succesful, otherwise false
      */
     public final MCRMetaElement removeMetadataElement(String tag) {
-        if (tag == null || (tag = tag.trim()).length() == 0) {
-            return null;
+        MCRMetaElement old = getMetadataElement(tag);
+
+        if (old != null) {
+            meta_list.remove(old);
+            return old;
         }
-
-        int len = tag_names.size();
-
-        for (int i = 0; i < len; i++) {
-            if (tag_names.get(i).equals(tag)) {
-                tag_names.remove(i);
-
-                return meta_list.remove(i);
-            }
-        }
-
         return null;
     }
 
@@ -290,8 +229,6 @@ public class MCRObjectMetadata {
         if (index < 0 || index > size()) {
             return null;
         }
-
-        tag_names.remove(index);
 
         return meta_list.remove(index);
     }
@@ -312,22 +249,12 @@ public class MCRObjectMetadata {
             default_lang = temp_lang;
         }
 
-        List elements_list = element.getChildren();
-        int len = elements_list.size();
-        String temp_tag = "";
+        @SuppressWarnings("unchecked")
+        List<Element> elements_list = element.getChildren();
 
-        for (int i = 0; i < len; i++) {
-            org.jdom.Element subtag = (org.jdom.Element) elements_list.get(i);
-            temp_tag = subtag.getName();
-
-            if (temp_tag == null || (temp_tag = temp_tag.trim()).length() == 0) {
-                throw new MCRException("MCRObjectMetadata : The tag is null or empty.");
-            }
-
-            tag_names.add(temp_tag);
-
+        for (Element sub : elements_list) {
             MCRMetaElement obj = new MCRMetaElement(default_lang);
-            obj.setFromDOM(subtag);
+            obj.setFromDOM(sub);
             meta_list.add(obj);
         }
     }
@@ -344,13 +271,11 @@ public class MCRObjectMetadata {
             throw new MCRException("MCRObjectMetadata : The content is not valid.");
         }
 
-        org.jdom.Element elm = new org.jdom.Element("metadata");
+        Element elm = new Element("metadata");
         elm.setAttribute("lang", default_lang, Namespace.XML_NAMESPACE);
 
-        int len = meta_list.size();
-
-        for (int i = 0; i < len; i++) {
-            elm.addContent(meta_list.get(i).createXML(herited_xml));
+        for (MCRMetaElement e : this) {
+            elm.addContent(e.createXML(herited_xml));
         }
 
         return elm;
@@ -376,6 +301,12 @@ public class MCRObjectMetadata {
             return false;
         }
 
+        for (MCRMetaElement e : this) {
+            if (!e.isValid()) {
+                Logger.getLogger(MCRObjectMetadata.class).warn(e.getTag() + " is not valid.");
+                return false;
+            }
+        }
         return true;
     }
 
@@ -383,8 +314,13 @@ public class MCRObjectMetadata {
      * This method put debug data to the logger (for the debug mode).
      */
     public final void debug() {
-        for (int i = 0; i < tag_names.size(); i++) {
-            meta_list.get(i).debug();
+        for (MCRMetaElement sub : this) {
+            sub.debug();
         }
+    }
+
+    @Override
+    public Iterator<MCRMetaElement> iterator() {
+        return meta_list.iterator();
     }
 }

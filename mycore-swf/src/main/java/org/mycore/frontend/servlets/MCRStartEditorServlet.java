@@ -388,14 +388,14 @@ public class MCRStartEditorServlet extends MCRServlet {
         // check type
         if (cd.mytype.equals("document") || cd.mytype.equals("disshab")) {
             MCRObject obj = MCRMetadataManager.retrieveMCRObject(cd.mysemcrid);
-            MCRMetaElement elm = obj.getMetadataElement("nbns");
+            MCRMetaElement elm = obj.getMetadata().getMetadataElement("nbns");
             if (elm == null) {
                 String urn = MCRURNManager.buildURN("UBL");
                 MCRMetaNBN nbn = new MCRMetaNBN("metadata", "nbn", 0, urn);
                 ArrayList<MCRMetaInterface> list = new ArrayList<MCRMetaInterface>();
-                elm = new MCRMetaElement("de", "MCRMetaNBN", "nbns", true, false, list);
+                elm = new MCRMetaElement("de", MCRMetaNBN.class, "nbns", true, false, list);
                 elm.addMetaObject(nbn);
-                obj.getMetadata().setMetadataElement(elm, "nbns");
+                obj.getMetadata().setMetadataElement(elm);
                 try {
                     MCRMetadataManager.update(obj);
                     MCRURNManager.assignURN(urn, obj.getId().toString());

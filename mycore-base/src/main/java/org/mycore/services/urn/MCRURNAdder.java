@@ -39,7 +39,7 @@ public class MCRURNAdder {
         MCRObjectID id = new MCRObjectID(objectId);
         if (isAllowedObject(id.getTypeId())) {
             MCRObject obj = MCRMetadataManager.retrieveMCRObject(id);
-            MCRMetaElement srcElement = obj.getMetadataElement("def.identifier");
+            MCRMetaElement srcElement = obj.getMetadata().getMetadataElement("def.identifier");
             IURNProvider urnProvider = this.getURNProvider();
             URN myURN = urnProvider.generateURN();
             String myURNString = myURN.toString() + myURN.checksum();
@@ -48,8 +48,8 @@ public class MCRURNAdder {
             /* no ppn -> no def.identifier element, thus it has to be created */
             if (srcElement == null) {
                 ArrayList<MCRMetaInterface> list = new ArrayList<MCRMetaInterface>();
-                srcElement = new MCRMetaElement("de", "MCRMetaLangText", "def.identifier", false, true, list);
-                obj.getMetadata().setMetadataElement(srcElement, "def.identifier");
+                srcElement = new MCRMetaElement("de", MCRMetaLangText.class, "def.identifier", false, true, list);
+                obj.getMetadata().setMetadataElement(srcElement);
             }
             // adding the urn
             MCRMetaLangText urn = new MCRMetaLangText("def.identifier", "identifier", "de", "urn", 0, "", myURNString);

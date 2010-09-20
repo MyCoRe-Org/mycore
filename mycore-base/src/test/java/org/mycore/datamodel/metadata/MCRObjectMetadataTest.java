@@ -73,7 +73,7 @@ public class MCRObjectMetadataTest extends MCRTestCase {
      */
     @Test
     public void getMetadataTagName() {
-        assertEquals("Metadata tag is not 'def.textfield'", "def.textfield", testMetadata.getMetadataTagName(0));
+        assertEquals("Metadata tag is not 'def.textfield'", "def.textfield", testMetadata.getMetadataElement(0).getTag());
     }
 
     /**
@@ -109,10 +109,10 @@ public class MCRObjectMetadataTest extends MCRTestCase {
         date.setDate(new Date());
         MCRMetaElement el2 = new MCRMetaElement();
         el2.addMetaObject(date);
-        el2.setClassName(MCRMetaISO8601Date.class.getSimpleName());
+        el2.setClass(MCRMetaISO8601Date.class);
         el2.setHeritable(true);
         el2.setTag(date.datapart);
-        meta2.setMetadataElement(el2, date.datapart);
+        meta2.setMetadataElement(el2);
         return meta2;
     }
 
