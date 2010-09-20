@@ -26,6 +26,7 @@ package org.mycore.datamodel.metadata;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.jdom.Content;
 import org.jdom.Namespace;
 import org.mycore.common.MCRException;
@@ -42,6 +43,8 @@ import org.mycore.common.MCRException;
  */
 public class MCRMetaXML extends MCRMetaDefault {
     List<Content> content;
+    
+    private static final Logger LOGGER = Logger.getLogger(MCRMetaXML.class);
 
     /**
      * This is the constructor. <br>
@@ -124,6 +127,7 @@ public class MCRMetaXML extends MCRMetaDefault {
         }
 
         if (content == null) {
+            LOGGER.warn(getSubTag()+": content is null or empty");
             return false;
         }
 

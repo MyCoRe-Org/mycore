@@ -23,6 +23,7 @@
 
 package org.mycore.datamodel.metadata;
 
+import org.apache.log4j.Logger;
 import org.jdom.Namespace;
 import org.mycore.common.MCRException;
 
@@ -47,6 +48,8 @@ final public class MCRMetaAddress extends MCRMetaDefault {
     private String street;
 
     private String number;
+
+    private static final Logger LOGGER = Logger.getLogger(MCRMetaAddress.class);
 
     /**
      * This is the constructor. <br>
@@ -86,9 +89,8 @@ final public class MCRMetaAddress extends MCRMetaDefault {
      *
      * @exception MCRException if the parameter values are invalid
      */
-    public MCRMetaAddress(String set_subtag, String default_lang, String set_type, int set_inherted, String set_country,
-            String set_state, String set_zipcode, String set_city, String set_street, String set_number)
-            throws MCRException {
+    public MCRMetaAddress(String set_subtag, String default_lang, String set_type, int set_inherted, String set_country, String set_state, String set_zipcode,
+        String set_city, String set_street, String set_number) throws MCRException {
         super(set_subtag, default_lang, set_type, set_inherted);
         country = "";
         state = "";
@@ -318,8 +320,28 @@ final public class MCRMetaAddress extends MCRMetaDefault {
      */
     @Override
     public final boolean isValid() {
-        if ((country = country.trim()).length() == 0 && (state = state.trim()).length() == 0 && (zipcode = zipcode.trim()).length() == 0
-                && (city = city.trim()).length() == 0 && (street = street.trim()).length() == 0 && (number = number.trim()).length() == 0) {
+        if ((country = country.trim()).length() == 0) {
+            LOGGER.warn(getSubTag() + ": country is empty");
+            return false;
+        }
+        if ((state = state.trim()).length() == 0) {
+            LOGGER.warn(getSubTag() + ": state is empty");
+            return false;
+        }
+        if ((zipcode = zipcode.trim()).length() == 0) {
+            LOGGER.warn(getSubTag() + ": zipcode is empty");
+            return false;
+        }
+        if ((city = city.trim()).length() == 0) {
+            LOGGER.warn(getSubTag() + ": city is empty");
+            return false;
+        }
+        if ((street = street.trim()).length() == 0) {
+            LOGGER.warn(getSubTag() + ": street is empty");
+            return false;
+        }
+        if ((number = number.trim()).length() == 0) {
+            LOGGER.warn(getSubTag() + ": number is empty");
             return false;
         }
 

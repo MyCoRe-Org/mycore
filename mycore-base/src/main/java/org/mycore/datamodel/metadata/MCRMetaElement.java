@@ -31,8 +31,6 @@ import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRUtils;
-import org.mycore.datamodel.metadata.MCRMetaInterface;
 
 /**
  * This class is designed to to have a basic class for all metadata. The class
@@ -62,9 +60,6 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface> {
     // logger
     static Logger LOGGER = Logger.getLogger(MCRMetaElement.class.getName());
 
-    // MetaElement data
-    private String lang = null;
-
     private Class<? extends MCRMetaInterface> clazz = null;
 
     private String tag = null;
@@ -77,31 +72,14 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface> {
 
     /**
      * This is the constructor of the MCRMetaElement class. The default language
-     * for the element was set to <b>MCR.MetaElement.defaults.class</b>.
+     * for the element was set to <b>MCR.Metadata.DefaultLang</b>.
      */
     public MCRMetaElement() {
-        this(DEFAULT_LANGUAGE);
-    }
-
-    /**
-     * This is the constructor of the MCRMetaElement class. The default language
-     * for the element was set. If the default languge is empty or false <b>de
-     * </b> was set.
-     * 
-     * @param default_lang
-     *            the default language
-     */
-    public MCRMetaElement(String default_lang) {
-        this(default_lang, null, "", DEFAULT_HERITABLE, DEFAULT_NOT_INHERIT, null);
+        list = new ArrayList<MCRMetaInterface>();
     }
 
     /**
      * This is the constructor of the MCRMetaElement class.
-     * 
-     * @param set_lang
-     *            the default language
-     * @param set_classname
-     *            the name of the MCRMeta... class
      * @param set_tag
      *            the name of this tag
      * @param set_heritable
@@ -112,17 +90,16 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface> {
      *            his parent object
      * @param set_list
      *            a list of MCRMeta... data lines to add in this element (can be null)
+     * @param set_classname
+     *            the name of the MCRMeta... class
      */
-    public MCRMetaElement(String set_lang, Class<? extends MCRMetaInterface> clazz, String set_tag, boolean set_heritable, boolean set_notinherit,
+    public MCRMetaElement(Class<? extends MCRMetaInterface> clazz, String set_tag, boolean set_heritable, boolean set_notinherit,
         ArrayList<MCRMetaInterface> set_list) {
-        lang = set_lang;
-
+        this();
         this.clazz = clazz;
-        tag = "";
         setTag(set_tag);
         heritable = set_heritable;
         notinherit = set_notinherit;
-        list = new ArrayList<MCRMetaInterface>();
 
         if (set_list != null) {
             for (int i = 0; i < set_list.size(); i++) {
@@ -185,16 +162,6 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface> {
      */
     public final boolean getNotInherit() {
         return notinherit;
-    }
-
-    /**
-     * This methode return the default language of this metadata class as
-     * string.
-     * 
-     * @return the default language of this metadata class as string
-     */
-    public final String getLang() {
-        return lang;
     }
 
     /**
@@ -307,6 +274,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface> {
             String classname = element.getAttributeValue("class");
             fullname = META_PACKAGE_NAME + classname;
             forName = (Class<? extends MCRMetaInterface>) Class.forName(fullname);
+            setClass(forName);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -328,7 +296,6 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface> {
 
             try {
                 obj = forName.newInstance();
-                obj.setLang(lang);
                 obj.setFromDOM(subtag);
             } catch (IllegalAccessException e) {
                 throw new MCRException(fullname + " IllegalAccessException");
@@ -370,7 +337,6 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface> {
         if (j == 0 && !flag) {
             return elm;
         }
-
         elm.setAttribute("class", getClassName());
         elm.setAttribute("heritable", String.valueOf(heritable));
         elm.setAttribute("notinherit", String.valueOf(notinherit));
@@ -402,19 +368,23 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface> {
      * @return a boolean value
      */
     public final boolean isValid() {
-        if (clazz == null || !clazz.getPackage().getName().equals(META_PACKAGE_NAME)) {
+        if (tag == null || (tag = tag.trim()).length() == 0) {
+            LOGGER.warn("No tag name defined!");
+            return false;
+        }
+
+        if (clazz == null) {
+            LOGGER.warn(getTag() + ": @class is not defined");
+            return false;
+        }
+
+        if (!clazz.getPackage().getName().equals(META_PACKAGE_NAME.substring(0, META_PACKAGE_NAME.length() - 1))) {
+            LOGGER.warn(getTag() + ": package " + clazz.getPackage().getName() + " does not equal " + META_PACKAGE_NAME);
             return false;
         }
 
         if (list.size() == 0) {
-            return false;
-        }
-
-        if (tag == null || (tag = tag.trim()).length() == 0) {
-            return false;
-        }
-
-        if (!MCRUtils.isSupportedLang(lang)) {
+            LOGGER.warn(getTag() + ": does not contain any sub elements");
             return false;
         }
 
@@ -426,7 +396,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface> {
      */
     @Override
     public final MCRMetaElement clone() {
-        MCRMetaElement out = new MCRMetaElement(lang);
+        MCRMetaElement out = new MCRMetaElement();
         out.setClass(getClazz());
         out.setTag(tag);
         out.setHeritable(heritable);
@@ -446,7 +416,6 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface> {
     public final void debug() {
         LOGGER.debug("ClassName          = " + getClassName());
         LOGGER.debug("Tag                = " + tag);
-        LOGGER.debug("Language           = " + lang);
         LOGGER.debug("Heritable          = " + String.valueOf(heritable));
         LOGGER.debug("NotInherit         = " + String.valueOf(notinherit));
         LOGGER.debug("Elements           = " + String.valueOf(list.size()));

@@ -253,7 +253,7 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
         List<Element> elements_list = element.getChildren();
 
         for (Element sub : elements_list) {
-            MCRMetaElement obj = new MCRMetaElement(default_lang);
+            MCRMetaElement obj = new MCRMetaElement();
             obj.setFromDOM(sub);
             meta_list.add(obj);
         }

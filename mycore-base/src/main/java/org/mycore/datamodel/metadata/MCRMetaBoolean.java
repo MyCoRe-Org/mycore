@@ -23,6 +23,7 @@
 
 package org.mycore.datamodel.metadata;
 
+import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
 
 /**
@@ -42,6 +43,8 @@ import org.mycore.common.MCRException;
 final public class MCRMetaBoolean extends MCRMetaDefault {
     // MCRMetaBoolean data
     private boolean value;
+
+    private static final Logger LOGGER = Logger.getLogger(MCRMetaBoolean.class);
 
     /**
      * This is the constructor. <br>
@@ -68,8 +71,7 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
      *
      * @exception MCRException if the set_subtag value is null or empty
      */
-    public MCRMetaBoolean(String set_subtag, String default_lang, String set_type, int set_inherted, String set_value)
-            throws MCRException {
+    public MCRMetaBoolean(String set_subtag, String default_lang, String set_type, int set_inherted, String set_value) throws MCRException {
         super(set_subtag, "en", set_type, set_inherted);
         LOGGER.debug("default_lang (" + default_lang + ") will never used."); //FIXME: use default_lang or remove it
 
@@ -119,8 +121,7 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
      *
      * @exception MCRException if the set_subtag value is null or empty
      */
-    public MCRMetaBoolean(String set_subtag, String default_lang, String set_type, int set_inherted, boolean set_value)
-            throws MCRException {
+    public MCRMetaBoolean(String set_subtag, String default_lang, String set_type, int set_inherted, boolean set_value) throws MCRException {
         super(set_subtag, "en", set_type, set_inherted);
         LOGGER.debug("default_lang (" + default_lang + ") will never used."); //FIXME: use default_lang or remove it
         value = set_value;
@@ -241,25 +242,6 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
         elm.addContent(getValueToString());
 
         return elm;
-    }
-
-    /**
-     * This method check the validation of the content of this class. The method
-     * returns <em>true</em> if
-     * <ul>
-     * <li>the subtag is not null or empty
-     * </ul>
-     * otherwise the method return <em>false</em>
-     * 
-     * @return a boolean value
-     */
-    @Override
-    public final boolean isValid() {
-        if (!super.isValid()) {
-            return false;
-        }
-
-        return true;
     }
 
     /**

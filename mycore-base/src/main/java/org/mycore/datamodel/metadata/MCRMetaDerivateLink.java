@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.mycore.common.MCRException;
@@ -14,6 +15,8 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
 
     private static final String ANNOTATION = "annotation";
     private static final String ATTRIBUTE = "lang";
+    
+    private static final Logger LOGGER = Logger.getLogger(MCRMetaDerivateLink.class);
 
     private HashMap<String, String> map;
 
@@ -76,10 +79,13 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
 
     @Override
     public boolean isValid() {
-        if (getLinkedFile() == null) {
-            LOGGER.error("File not found: " + super.href);
+        if (!super.isValid()) {
             return false;
         }
-        return super.isValid();
+        if (getLinkedFile() == null) {
+            LOGGER.warn("File not found: " + super.href);
+            return false;
+        }
+        return true;
     }
 }

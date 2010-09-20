@@ -23,6 +23,7 @@
 
 package org.mycore.datamodel.metadata;
 
+import org.apache.log4j.Logger;
 import org.jdom.Namespace;
 import org.mycore.common.MCRException;
 
@@ -49,6 +50,8 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
     private String peerage;
 
     private String prefix;
+    
+    private static final Logger LOGGER = Logger.getLogger(MCRMetaPersonName.class);
 
     /**
      * This is the constructor. <br>
@@ -329,6 +332,7 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
         }
 
         if ((firstname = firstname.trim()).length() == 0 && (surname = surname.trim()).length() == 0) {
+            LOGGER.warn(getSubTag()+": firstname or surname is null or empty");
             return false;
         }
 

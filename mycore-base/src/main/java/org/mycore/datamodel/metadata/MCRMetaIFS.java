@@ -23,6 +23,7 @@
 
 package org.mycore.datamodel.metadata;
 
+import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
 
 /**
@@ -44,6 +45,8 @@ final public class MCRMetaIFS extends MCRMetaDefault {
     private String maindoc;
 
     private String ifsid;
+
+    private static final Logger LOGGER = Logger.getLogger(MCRMetaIFS.class);
 
     /**
      * This is the constructor. <br>
@@ -201,6 +204,7 @@ final public class MCRMetaIFS extends MCRMetaDefault {
         }
 
         if (sourcepath != null && (sourcepath = sourcepath.trim()).length() == 0) {
+            LOGGER.warn(getSubTag() + ": sourcepath is null or empty");
             return false;
         }
 

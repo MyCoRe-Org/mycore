@@ -23,6 +23,7 @@
 
 package org.mycore.datamodel.metadata;
 
+import org.apache.log4j.Logger;
 import org.jdom.Namespace;
 import org.mycore.common.MCRException;
 
@@ -39,6 +40,8 @@ public class MCRMetaLangText extends MCRMetaDefault {
     protected String text;
 
     protected String form;
+    
+    private static final Logger LOGGER = Logger.getLogger(MCRMetaLangText.class);
 
     /**
      * This is the constructor. <br>
@@ -231,6 +234,7 @@ public class MCRMetaLangText extends MCRMetaDefault {
         }
 
         if (text == null || (text = text.trim()).length() == 0) {
+            LOGGER.warn(getSubTag()+": text is null or empty");
             return false;
         }
 

@@ -97,8 +97,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      *
      * @exception MCRException if the parameter values are invalid
      */
-    public MCRMetaHistoryDate(String set_subtag, String default_lang, String set_type, int set_inherted)
-            throws MCRException {
+    public MCRMetaHistoryDate(String set_subtag, String default_lang, String set_type, int set_inherted) throws MCRException {
         super(set_subtag, default_lang, set_type, set_inherted);
         texts = new ArrayList<MCRMetaHistoryDateText>();
         calendar = MCRCalendar.CALENDARS_INPUT[0];
@@ -526,9 +525,11 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
             }
         }
         if (texts.size() == 0) {
+            LOGGER.warn(getSubTag() + ": no texts defined");
             return false;
         }
         if (von == null || bis == null || calendar == null) {
+            LOGGER.warn(getSubTag() + ": von,bis or calenda are null");
             return false;
         }
         if (ibis < ivon) {

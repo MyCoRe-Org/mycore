@@ -23,6 +23,7 @@
 
 package org.mycore.datamodel.metadata;
 
+import org.apache.log4j.Logger;
 import org.jdom.Namespace;
 import org.mycore.common.MCRException;
 
@@ -41,6 +42,8 @@ final public class MCRMetaInstitutionName extends MCRMetaDefault {
     private String nickname;
 
     private String property;
+
+    private static final Logger LOGGER = Logger.getLogger(MCRMetaInstitutionName.class);
 
     /**
      * This is the constructor. <br>
@@ -74,8 +77,8 @@ final public class MCRMetaInstitutionName extends MCRMetaDefault {
      *
      * @exception MCRException if the parameter values are invalid
      */
-    public MCRMetaInstitutionName(String set_subtag, String default_lang, String set_type, int set_inherted, String set_fullname,
-            String set_nickname, String set_property) throws MCRException {
+    public MCRMetaInstitutionName(String set_subtag, String default_lang, String set_type, int set_inherted, String set_fullname, String set_nickname,
+        String set_property) throws MCRException {
         super(set_subtag, default_lang, set_type, set_inherted);
         fullname = "";
         nickname = "";
@@ -208,7 +211,11 @@ final public class MCRMetaInstitutionName extends MCRMetaDefault {
      */
     @Override
     public final boolean isValid() {
+        if (!super.isValid()) {
+            return false;
+        }
         if ((fullname = fullname.trim()).length() == 0) {
+            LOGGER.warn(getSubTag() + ": sourcepath is null or empty");
             return false;
         }
 

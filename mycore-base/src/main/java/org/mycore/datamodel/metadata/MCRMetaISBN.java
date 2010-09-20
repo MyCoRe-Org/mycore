@@ -23,6 +23,7 @@
 
 package org.mycore.datamodel.metadata;
 
+import org.apache.log4j.Logger;
 import org.jdom.Namespace;
 import org.mycore.common.MCRException;
 
@@ -44,6 +45,8 @@ public class MCRMetaISBN extends MCRMetaDefault {
     protected int sum2;
 
     protected boolean invalid = false;
+
+    private static final Logger LOGGER = Logger.getLogger(MCRMetaISBN.class);
 
     /**
      * This is the constructor. <br>
@@ -184,6 +187,7 @@ public class MCRMetaISBN extends MCRMetaDefault {
         }
 
         if (isbn == null || invalid || isbn.length() == 0 || sum2 % 11 > 0) {
+            LOGGER.warn(getSubTag() + ": isbn is invalid: " + isbn);
             return false;
         }
 

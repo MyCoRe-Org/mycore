@@ -23,6 +23,7 @@
 
 package org.mycore.datamodel.metadata;
 
+import org.apache.log4j.Logger;
 import org.jdom.Namespace;
 import org.mycore.common.MCRException;
 
@@ -54,6 +55,8 @@ final public class MCRMetaNumber extends MCRMetaDefault {
     private String dimension;
 
     private String measurement;
+    
+    private static final Logger LOGGER = Logger.getLogger(MCRMetaNumber.class);
 
     /**
      * This is the constructor. <br>
@@ -367,25 +370,6 @@ final public class MCRMetaNumber extends MCRMetaDefault {
         elm.addContent(getNumberToString());
 
         return elm;
-    }
-
-    /**
-     * This method check the validation of the content of this class. The method
-     * returns <em>true</em> if
-     * <ul>
-     * <li>the subtag is not null or empty
-     * </ul>
-     * otherwise the method return <em>false</em>
-     * 
-     * @return a boolean value
-     */
-    @Override
-    public final boolean isValid() {
-        if (!super.isValid()) {
-            return false;
-        }
-
-        return true;
     }
 
     /**

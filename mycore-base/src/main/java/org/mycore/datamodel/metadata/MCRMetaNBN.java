@@ -23,6 +23,7 @@
 
 package org.mycore.datamodel.metadata;
 
+import org.apache.log4j.Logger;
 import org.jdom.Namespace;
 import org.mycore.common.MCRException;
 
@@ -37,6 +38,8 @@ import org.mycore.common.MCRException;
 public class MCRMetaNBN extends MCRMetaDefault {
     // MetaNBN data
     protected String nbn;
+    
+    private static final Logger LOGGER = Logger.getLogger(MCRMetaNBN.class);
 
     /**
      * This is the constructor. <br>
@@ -173,6 +176,7 @@ public class MCRMetaNBN extends MCRMetaDefault {
         }
 
         if (nbn == null || (nbn = nbn.trim()).length() == 0) {
+            LOGGER.warn(getSubTag()+": nbn is null or empty");
             return false;
         }
 

@@ -48,7 +48,7 @@ public class MCRURNAdder {
             /* no ppn -> no def.identifier element, thus it has to be created */
             if (srcElement == null) {
                 ArrayList<MCRMetaInterface> list = new ArrayList<MCRMetaInterface>();
-                srcElement = new MCRMetaElement("de", MCRMetaLangText.class, "def.identifier", false, true, list);
+                srcElement = new MCRMetaElement(MCRMetaLangText.class, "def.identifier", false, true, list);
                 obj.getMetadata().setMetadataElement(srcElement);
             }
             // adding the urn

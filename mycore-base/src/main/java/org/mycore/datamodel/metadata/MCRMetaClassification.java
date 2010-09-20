@@ -23,6 +23,7 @@
 
 package org.mycore.datamodel.metadata;
 
+import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
 
 /**
@@ -43,6 +44,8 @@ public class MCRMetaClassification extends MCRMetaDefault {
     public static final int MAX_CLASSID_LENGTH = MCRObjectID.MAX_LENGTH;
 
     public static final int MAX_CATEGID_LENGTH = 128;
+
+    private static final Logger LOGGER = Logger.getLogger(MCRMetaClassification.class);
 
     // MCRMetaClassification data
     protected String classid;
@@ -193,7 +196,15 @@ public class MCRMetaClassification extends MCRMetaDefault {
         if (!super.isValid()) {
             return false;
         }
-        return classid != null && classid.length() > 0 && categid != null && categid.length() > 0;
+        if (classid != null && classid.length() > 0) {
+            LOGGER.warn(getSubTag() + ": classid is null or empty");
+            return false;
+        }
+        if (categid != null && categid.length() > 0) {
+            LOGGER.warn(getSubTag() + ": categid is null or empty");
+            return false;
+        }
+        return true;
     }
 
     /**

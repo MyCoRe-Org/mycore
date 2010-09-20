@@ -26,6 +26,7 @@ package org.mycore.datamodel.metadata;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRUtils;
 
 /**
  * This class implements any methods for handling the basic data for all
@@ -53,7 +54,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
     protected static final int DEFAULT_INHERITED = 0;
 
     // logger
-    static Logger LOGGER = Logger.getLogger(MCRMetaDefault.class.getName());
+    private static Logger LOGGER = Logger.getLogger(MCRMetaDefault.class);
 
     // MetaLangText data
     protected String subtag;
@@ -334,7 +335,15 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      */
     public boolean isValid() {
         if (subtag == null || (subtag = subtag.trim()).length() == 0) {
-            LOGGER.warn("Error while checking subtag: " + subtag);
+            LOGGER.warn("No tag name defined!");
+            return false;
+        }
+        if (getLang()!=null && !MCRUtils.isSupportedLang(getLang())){
+            LOGGER.warn(getSubTag()+": language is not supported: "+getLang());
+            return false;
+        }
+        if (getInherited()<0){
+            LOGGER.warn(getSubTag()+": inherited can not be smaller than '0': "+getInherited());
             return false;
         }
         return true;

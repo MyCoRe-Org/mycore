@@ -425,8 +425,11 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
      */
     @Override
     public boolean isValid() {
-        if (!valid || !super.isValid()) {
+        if (!super.isValid()) {
             return false;
+        }
+        if (!valid) {
+            LOGGER.warn(getSubTag() + ": date is invalid");
         }
         return true;
     }
@@ -463,8 +466,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
 
         protected final static DateTimeFormatter UTC_COMPLETE_HH_MM_FORMAT = ISODateTimeFormat.dateHourMinute().withZone(DateTimeZone.UTC);
 
-        protected final static DateTimeFormatter UTC_COMPLETE_HH_MM_SS_FORMAT = ISODateTimeFormat.dateTimeNoMillis().withZone(
-                DateTimeZone.UTC);
+        protected final static DateTimeFormatter UTC_COMPLETE_HH_MM_SS_FORMAT = ISODateTimeFormat.dateTimeNoMillis().withZone(DateTimeZone.UTC);
 
         protected final static DateTimeFormatter UTC_COMPLETE_HH_MM_SS_SSS_FORMAT = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC);
 

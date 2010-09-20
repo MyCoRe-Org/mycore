@@ -44,7 +44,9 @@ import org.xml.sax.SAXParseException;
  */
 public class MCRObjectMetadataTest extends MCRTestCase {
     private static final String TEST_OBJECT_RESOURCE_NAME = "/mcr_test_01.xml";
+
     private Document testObjectDocument;
+
     private MCRObjectMetadata testMetadata;
 
     /* (non-Javadoc)
@@ -91,6 +93,30 @@ public class MCRObjectMetadataTest extends MCRTestCase {
     public void removeInheritedMetadata() {
         testMetadata.removeInheritedMetadata();
         assertEquals("Did not expect removal of any metadata", 1, testMetadata.size());
+        testMetadata.setMetadataElement(getInheritedMetadata());
+        testMetadata.removeInheritedMetadata();
+        assertEquals("Did not expect removal of any metadata element", 2, testMetadata.size());
+        MCRMetaElement defJunit = testMetadata.getMetadataElement("def.junit");
+        assertEquals("Not all inherited metadata was removed", 1, defJunit.size());
+        defJunit = getInheritedMetadata();
+        for (MCRMetaInterface i : defJunit) {
+            if (i.getInherited() == 0)
+                i.setInherited(1);
+        }
+        testMetadata.setMetadataElement(defJunit);
+        testMetadata.removeInheritedMetadata();
+        assertEquals("Did expect removal of \"def.junit\" metadata element", 1, testMetadata.size());
+    }
+
+    private MCRMetaElement getInheritedMetadata() {
+        MCRMetaElement defJunit = new MCRMetaElement(MCRMetaLangText.class, "def.junit", true, false, null);
+        MCRMetaLangText test1 = new MCRMetaLangText("junit", "de", null, 0, null, "Test 1");
+        MCRMetaLangText test2 = new MCRMetaLangText("junit", "de", null, 1, null, "Test 2");
+        MCRMetaLangText test3 = new MCRMetaLangText("junit", "de", null, 1, null, "Test 3");
+        defJunit.addMetaObject(test1);
+        defJunit.addMetaObject(test2);
+        defJunit.addMetaObject(test3);
+        return defJunit;
     }
 
     /**

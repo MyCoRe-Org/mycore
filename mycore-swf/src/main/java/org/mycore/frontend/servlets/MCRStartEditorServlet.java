@@ -393,7 +393,7 @@ public class MCRStartEditorServlet extends MCRServlet {
                 String urn = MCRURNManager.buildURN("UBL");
                 MCRMetaNBN nbn = new MCRMetaNBN("nbn", 0, urn);
                 ArrayList<MCRMetaInterface> list = new ArrayList<MCRMetaInterface>();
-                elm = new MCRMetaElement("de", MCRMetaNBN.class, "nbns", true, false, list);
+                elm = new MCRMetaElement(MCRMetaNBN.class, "nbns", true, false, list);
                 elm.addMetaObject(nbn);
                 obj.getMetadata().setMetadataElement(elm);
                 try {

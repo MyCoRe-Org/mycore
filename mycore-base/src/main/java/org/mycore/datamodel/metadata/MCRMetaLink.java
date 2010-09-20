@@ -25,6 +25,7 @@ package org.mycore.datamodel.metadata;
 
 import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 
+import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
 
 /**
@@ -69,6 +70,8 @@ public class MCRMetaLink extends MCRMetaDefault {
     protected String from;
 
     protected String to;
+
+    private static final Logger LOGGER = Logger.getLogger(MCRMetaLink.class);
 
     /**
      * This is the constructor. <br>
@@ -382,25 +385,30 @@ public class MCRMetaLink extends MCRMetaDefault {
         }
 
         if (linktype == null) {
+            LOGGER.warn(getSubTag() + ": linktype is null");
             return false;
         }
 
         if (!linktype.equals("locator") && !linktype.equals("arc")) {
+            LOGGER.warn(getSubTag() + ": linktype is unsupported: " + linktype);
             return false;
         }
 
         if (linktype.equals("arc")) {
             if (from.equals("")) {
+                LOGGER.warn(getSubTag()+": from is null or empty");
                 return false;
             }
 
             if (to.equals("")) {
+                LOGGER.warn(getSubTag()+": to is null or empty");
                 return false;
             }
         }
 
         if (linktype.equals("locator")) {
             if (href.equals("")) {
+                LOGGER.warn(getSubTag()+": href is null or empty");
                 return false;
             }
         }

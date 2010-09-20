@@ -23,6 +23,7 @@
 
 package org.mycore.datamodel.metadata;
 
+import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
 
 /**
@@ -38,6 +39,8 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
     protected org.jdom.Element condition;
 
     protected String permission;
+
+    private static final Logger LOGGER = Logger.getLogger(MCRMetaAccessRule.class);
 
     /**
      * This is the constructor. <br>
@@ -69,8 +72,8 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
      *
      * @exception MCRException if the set_subtag value or set_condition is null or empty
      */
-    public MCRMetaAccessRule(String set_subtag, String default_lang, String set_type, int set_inherted, String set_permission,
-            org.jdom.Element set_condition) throws MCRException {
+    public MCRMetaAccessRule(String set_subtag, String default_lang, String set_type, int set_inherted, String set_permission, org.jdom.Element set_condition)
+        throws MCRException {
         super(set_subtag, default_lang, set_type, set_inherted);
         permission = set_permission;
         if (permission == null || (permission = permission.trim()).length() == 0) {
@@ -228,9 +231,11 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
             return false;
         }
         if (condition == null) {
+            LOGGER.warn(getSubTag() + ": condition is null");
             return false;
         }
         if (permission == null || (permission = permission.trim()).length() == 0) {
+            LOGGER.warn(getSubTag() + ": permission is null or empty");
             return false;
         }
         return true;
