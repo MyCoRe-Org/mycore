@@ -101,7 +101,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      */
     public MCRMetaHistoryDate(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted)
             throws MCRException {
-        super(set_datapart, set_subtag, default_lang, set_type, set_inherted);
+        super(set_subtag, default_lang, set_type, set_inherted);
         texts = new ArrayList<MCRMetaHistoryDateText>();
         calendar = MCRCalendar.CALENDARS_INPUT[0];
         setDefaultVon();

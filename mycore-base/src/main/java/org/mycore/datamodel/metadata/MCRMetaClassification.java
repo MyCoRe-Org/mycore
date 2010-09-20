@@ -81,7 +81,7 @@ public class MCRMetaClassification extends MCRMetaDefault {
      */
     public MCRMetaClassification(String set_datapart, String set_subtag, int set_inherted, String set_type, String set_classid,
             String set_categid) throws MCRException {
-        super(set_datapart, set_subtag, "en", set_type, set_inherted);
+        super(set_subtag, "en", set_type, set_inherted);
         setValue(set_classid, set_categid);
     }
 

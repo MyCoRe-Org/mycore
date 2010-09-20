@@ -73,7 +73,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
      */
     public MCRMetaAccessRule(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted,
             String set_permission, org.jdom.Element set_condition) throws MCRException {
-        super(set_datapart, set_subtag, default_lang, set_type, set_inherted);
+        super(set_subtag, default_lang, set_type, set_inherted);
         permission = set_permission;
         if (permission == null || (permission = permission.trim()).length() == 0) {
             permission = "read";

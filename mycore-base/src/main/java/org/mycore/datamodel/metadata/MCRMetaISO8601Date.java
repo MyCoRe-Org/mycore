@@ -154,10 +154,10 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
     /**
      * same as superImplentation but sets lang attribute to "null"
      * 
-     * @see MCRMetaDefault#MCRMetaDefault(String, String, String, String, int)
+     * @see MCRMetaDefault#MCRMetaDefault(String, String, String, int)
      */
     public MCRMetaISO8601Date(String set_datapart, String set_subtag, String set_type, int set_inherted) {
-        super(set_datapart, set_subtag, null, set_type, set_inherted);
+        super(set_subtag, null, set_type, set_inherted);
     }
 
     /*

@@ -95,7 +95,7 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
     public MCRMetaPersonName(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted,
             String set_firstname, String set_callname, String set_surname, String set_fullname, String set_academic, String set_peerage,
             String set_prefix) throws MCRException {
-        super(set_datapart, set_subtag, default_lang, set_type, set_inherted);
+        super(set_subtag, default_lang, set_type, set_inherted);
         firstname = "";
         callname = "";
         surname = "";

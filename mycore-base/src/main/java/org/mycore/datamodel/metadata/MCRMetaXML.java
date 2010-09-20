@@ -52,7 +52,7 @@ public class MCRMetaXML extends MCRMetaDefault {
     }
 
     public MCRMetaXML(String set_datapart, String set_subtag, String set_type, int set_inherited) throws MCRException {
-        super(set_datapart, set_subtag, null, set_type, set_inherited);
+        super(set_subtag, null, set_type, set_inherited);
     }
 
     /**

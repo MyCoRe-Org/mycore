@@ -74,7 +74,7 @@ public class MCRMetaLangText extends MCRMetaDefault {
      */
     public MCRMetaLangText(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted, String set_form,
             String set_text) throws MCRException {
-        super(set_datapart, set_subtag, default_lang, set_type, set_inherted);
+        super(set_subtag, default_lang, set_type, set_inherted);
         text = "";
 
         if (set_text != null) {

@@ -78,7 +78,7 @@ final public class MCRMetaInstitutionName extends MCRMetaDefault {
      */
     public MCRMetaInstitutionName(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted,
             String set_fullname, String set_nickname, String set_property) throws MCRException {
-        super(set_datapart, set_subtag, default_lang, set_type, set_inherted);
+        super(set_subtag, default_lang, set_type, set_inherted);
         fullname = "";
         nickname = "";
         property = "";

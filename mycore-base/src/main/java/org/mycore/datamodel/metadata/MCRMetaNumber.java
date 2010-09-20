@@ -93,7 +93,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      */
     public MCRMetaNumber(String set_datapart, String set_subtag, String default_lang, int set_inherted, String set_dimension,
             String set_measurement, String set_number) throws MCRException {
-        super(set_datapart, set_subtag, default_lang, "", set_inherted);
+        super(set_subtag, default_lang, "", set_inherted);
         set_number = set_number.trim();
         number = 0.;
 
@@ -153,7 +153,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      */
     public MCRMetaNumber(String set_datapart, String set_subtag, String default_lang, int set_inherted, String set_dimension,
             String set_measurement, double set_number) throws MCRException {
-        super(set_datapart, set_subtag, default_lang, "", set_inherted);
+        super(set_subtag, default_lang, "", set_inherted);
         number = set_number;
         dimension = "";
 

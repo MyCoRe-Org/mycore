@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.mycore.common.MCRConfiguration;
+import org.jdom.Element;
 import org.mycore.common.MCRException;
 
 /**
@@ -60,9 +60,6 @@ import org.mycore.common.MCRException;
  * @version $Revision$ $Date$
  */
 public class MCRObjectService {
-    // service data
-    private String lang;
-
     private final ArrayList<MCRMetaISO8601Date> dates;
 
     private final ArrayList<MCRMetaAccessRule> rules;
@@ -74,7 +71,6 @@ public class MCRObjectService {
      * to null.
      */
     public MCRObjectService() {
-        lang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "en");
         dates = new ArrayList<MCRMetaISO8601Date>();
 
         Date curTime = new Date();
@@ -94,69 +90,58 @@ public class MCRObjectService {
      * This method read the XML input stream part from a DOM part for the
      * structure data of the document.
      * 
-     * @param service_element
+     * @param service
      *            a list of relevant DOM elements for the metadata
      */
-    public final void setFromDOM(org.jdom.Element service_element) {
+    public final void setFromDOM(Element service) {
         // Date part
-        org.jdom.Element dates_element = service_element.getChild("servdates");
+        org.jdom.Element dates_element = service.getChild("servdates");
         dates.clear();
 
         if (dates_element != null) {
-            List date_element_list = dates_element.getChildren();
-            int date_len = date_element_list.size();
+            @SuppressWarnings("unchecked")
+            List<Element> dateList = dates_element.getChildren();
 
-            for (int i = 0; i < date_len; i++) {
-                org.jdom.Element date_element = (org.jdom.Element) date_element_list.get(i);
-                String date_element_name = date_element.getName();
+            for (Element dateElement:dateList) {
+                String date_element_name = dateElement.getName();
 
                 if (!date_element_name.equals("servdate")) {
                     continue;
                 }
 
                 MCRMetaISO8601Date date = new MCRMetaISO8601Date();
-                date.setDataPart(service_element.getName());
-                date.setFromDOM(date_element);
+                date.setFromDOM(dateElement);
 
                 setDate(date);
             }
         }
 
         // Rule part
-        org.jdom.Element rules_element = service_element.getChild("servacls");
-        if (rules_element != null) {
-            List rule_element_list = rules_element.getChildren();
-            int rule_len = rule_element_list.size();
-            for (int i = 0; i < rule_len; i++) {
-                org.jdom.Element rule_element = (org.jdom.Element) rule_element_list.get(i);
-                String rule_element_name = rule_element.getName();
-                if (!rule_element_name.equals("servacl")) {
+        Element servacls = service.getChild("servacls");
+        if (servacls != null) {
+            @SuppressWarnings("unchecked")
+            List<Element> ruleList = servacls.getChildren();
+            for (Element ruleElement:ruleList) {
+                if (!ruleElement.getName().equals("servacl")) {
                     continue;
                 }
                 MCRMetaAccessRule user = new MCRMetaAccessRule();
-                user.setLang(lang);
-                user.setDataPart("service");
-                user.setFromDOM(rule_element);
+                user.setFromDOM(ruleElement);
                 rules.add(user);
             }
         }
 
         // Flag part
-        org.jdom.Element flags_element = service_element.getChild("servflags");
-        if (flags_element != null) {
-            List flag_element_list = flags_element.getChildren();
-            int flag_len = flag_element_list.size();
-            for (int i = 0; i < flag_len; i++) {
-                org.jdom.Element flag_element = (org.jdom.Element) flag_element_list.get(i);
-                String flag_element_name = flag_element.getName();
-
-                if (!flag_element_name.equals("servflag")) {
+        org.jdom.Element flagsElement = service.getChild("servflags");
+        if (flagsElement != null) {
+            @SuppressWarnings("unchecked")
+            List<Element> flagList = flagsElement.getChildren();
+            for (Element flagElement:flagList) {
+                if (!flagElement.getName().equals("servflag")) {
                     continue;
                 }
                 MCRMetaLangText flag = new MCRMetaLangText();
-                flag.setLang(lang);
-                flag.setDataPart("service");
-                flag.setFromDOM(flag_element);
+                flag.setFromDOM(flagElement);
                 flags.add(flag);
             }
         }

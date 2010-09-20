@@ -91,7 +91,7 @@ final public class MCRMetaAddress extends MCRMetaDefault {
     public MCRMetaAddress(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted,
             String set_country, String set_state, String set_zipcode, String set_city, String set_street, String set_number)
             throws MCRException {
-        super(set_datapart, set_subtag, default_lang, set_type, set_inherted);
+        super(set_subtag, default_lang, set_type, set_inherted);
         country = "";
         state = "";
         zipcode = "";

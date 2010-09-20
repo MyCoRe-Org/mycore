@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
@@ -333,50 +334,42 @@ public class MCRObjectStructure {
      * @param element
      *            the structure node list
      */
-    public final void setFromDOM(org.jdom.Element element) {
+    public final void setFromDOM(Element element) {
         children.clear();
 
-        org.jdom.Element struct_element = element.getChild("children");
+        Element subElement = element.getChild("children");
 
-        if (struct_element != null) {
-            List struct_links_list = struct_element.getChildren();
+        if (subElement != null) {
+            @SuppressWarnings("unchecked")
+            List<Element> childList = subElement.getChildren();
 
-            for (int i = 0; i < struct_links_list.size(); i++) {
-                org.jdom.Element link_element = (org.jdom.Element) struct_links_list.get(i);
+            for (Element linkElement : childList) {
                 MCRMetaLinkID link = new MCRMetaLinkID();
-                link.setDataPart("structure");
-                link.setFromDOM(link_element);
+                link.setFromDOM(linkElement);
                 children.add(link);
             }
         }
 
         // Stricture parent part
         parent = null;
-        struct_element = element.getChild("parents");
+        subElement = element.getChild("parents");
 
-        if (struct_element != null) {
-            List struct_links_list = struct_element.getChildren();
-
-            for (int i = 0; i < struct_links_list.size(); i++) {
-                org.jdom.Element link_element = (org.jdom.Element) struct_links_list.get(i);
-                parent = new MCRMetaLinkID();
-                parent.setDataPart("structure");
-                parent.setFromDOM(link_element);
-            }
+        if (subElement != null) {
+            parent = new MCRMetaLinkID();
+            parent.setFromDOM(subElement.getChild("parent"));
         }
 
         // Structure derivate part
         derivates.clear();
-        struct_element = element.getChild("derobjects");
+        subElement = element.getChild("derobjects");
 
-        if (struct_element != null) {
-            List struct_links_list = struct_element.getChildren();
+        if (subElement != null) {
+            @SuppressWarnings("unchecked")
+            List<Element> derobjectList = subElement.getChildren();
 
-            for (int i = 0; i < struct_links_list.size(); i++) {
-                org.jdom.Element der_element = (org.jdom.Element) struct_links_list.get(i);
+            for (Element derElement:derobjectList) {
                 MCRMetaLinkID der = new MCRMetaLinkID();
-                der.setDataPart("structure");
-                der.setFromDOM(der_element);
+                der.setFromDOM(derElement);
                 addDerivate(der);
             }
         }

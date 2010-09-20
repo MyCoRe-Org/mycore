@@ -67,7 +67,7 @@ public class MCRMetaNBN extends MCRMetaDefault {
      * @exception MCRException if the set_subtag value is null or empty
      */
     public MCRMetaNBN(String set_datapart, String set_subtag, int set_inherted, String set_nbn) throws MCRException {
-        super(set_datapart, set_subtag, "de", "", set_inherted);
+        super(set_subtag, "de", "", set_inherted);
         nbn = "";
 
         if (set_nbn != null) {

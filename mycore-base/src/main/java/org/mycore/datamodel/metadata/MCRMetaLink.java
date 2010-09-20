@@ -100,7 +100,7 @@ public class MCRMetaLink extends MCRMetaDefault {
      *                if the set_datapart or set_subtag value is null or empty
      */
     public MCRMetaLink(String set_datapart, String set_subtag, String default_lang, int set_inherted) throws MCRException {
-        super(set_datapart, set_subtag, default_lang, "", set_inherted);
+        super(set_subtag, default_lang, "", set_inherted);
         href = "";
         label = "";
         title = "";

@@ -66,7 +66,7 @@ public class MCRObjectDerivate {
         externals = new ArrayList<MCRMetaLink>();
         internals = null;
         titles = new ArrayList<MCRMetaLangText>();
-        files = new ArrayList();
+        files = new ArrayList<Element>();
         display = true;
     }
 
@@ -74,54 +74,48 @@ public class MCRObjectDerivate {
      * This methode read the XML input stream part from a DOM part for the
      * structure data of the document.
      * 
-     * @param derivate_element
+     * @param derivate
      *            a list of relevant DOM elements for the derivate
      */
-    public final void setFromDOM(org.jdom.Element derivate_element) {
+    public final void setFromDOM(org.jdom.Element derivate) {
         // Link to Metadata part
-        org.jdom.Element linkmeta_element = derivate_element.getChild("linkmetas").getChild("linkmeta");
+        org.jdom.Element linkmeta_element = derivate.getChild("linkmetas").getChild("linkmeta");
         MCRMetaLinkID link = new MCRMetaLinkID();
-        link.setDataPart("linkmeta");
         link.setFromDOM(linkmeta_element);
         linkmeta = link;
 
         // External part
-        org.jdom.Element externals_element = derivate_element.getChild("externals");
+        org.jdom.Element externalsElement = derivate.getChild("externals");
         externals.clear();
-        if (externals_element != null) {
-            List external_element_list = externals_element.getChildren();
-            int external_len = external_element_list.size();
-            for (int i = 0; i < external_len; i++) {
-                org.jdom.Element external_element = (org.jdom.Element) external_element_list.get(i);
+        if (externalsElement != null) {
+            @SuppressWarnings("unchecked")
+            List<Element> externalList = externalsElement.getChildren();
+            for (Element externalElement : externalList) {
                 MCRMetaLink eLink = new MCRMetaLink();
-                eLink.setDataPart("external");
-                eLink.setFromDOM(external_element);
+                eLink.setFromDOM(externalElement);
                 externals.add(eLink);
             }
         }
 
         // Internal part
-        org.jdom.Element internals_element = derivate_element.getChild("internals");
+        org.jdom.Element internals_element = derivate.getChild("internals");
         if (internals_element != null) {
             org.jdom.Element internal_element = internals_element.getChild("internal");
             if (internal_element != null) {
                 internals = new MCRMetaIFS();
-                internals.setDataPart("internal");
                 internals.setFromDOM(internal_element);
             }
         }
 
         // Title part
-        org.jdom.Element titles_element = derivate_element.getChild("titles");
+        org.jdom.Element titlesElement = derivate.getChild("titles");
         titles.clear();
-        if (titles_element != null) {
-            List title_element_list = titles_element.getChildren();
-            int title_len = title_element_list.size();
-            for (int i = 0; i < title_len; i++) {
-                org.jdom.Element title_element = (org.jdom.Element) title_element_list.get(i);
+        if (titlesElement != null) {
+            @SuppressWarnings("unchecked")
+            List<Element> titleList = titlesElement.getChildren();
+            for (Element titleElement:titleList) {
                 MCRMetaLangText text = new MCRMetaLangText();
-                text.setDataPart("title");
-                text.setFromDOM(title_element);
+                text.setFromDOM(titleElement);
                 if (text.isValid()) {
                     titles.add(text);
                 }
@@ -129,12 +123,13 @@ public class MCRObjectDerivate {
         }
 
         // fileset part
-        Element filesetElements = derivate_element.getChild("fileset");
+        Element filesetElements = derivate.getChild("fileset");
         if (filesetElements != null) {
             String mainURN = filesetElements.getAttributeValue("urn");
             if (mainURN != null) {
                 this.derivateURN = mainURN;
             }
+            @SuppressWarnings("unchecked")
             List<Element> filesInList = filesetElements.getChildren();
             for (int i = 0; i < filesInList.size(); i++) {
                 Element currentFromList = filesInList.get(i);
@@ -160,7 +155,7 @@ public class MCRObjectDerivate {
             }
         }
 
-        String displayVal = derivate_element.getAttributeValue("display");
+        String displayVal = derivate.getAttributeValue("display");
         if (displayVal != null && displayVal.length() > 3) {
             this.display = Boolean.valueOf(displayVal);
         }

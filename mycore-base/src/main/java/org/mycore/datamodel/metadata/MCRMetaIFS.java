@@ -73,7 +73,7 @@ final public class MCRMetaIFS extends MCRMetaDefault {
      * the set_categid are null, empty, too long or not a MCRObjectID
      */
     public MCRMetaIFS(String set_datapart, String set_subtag, String default_lang, String set_sourcepath) throws MCRException {
-        super(set_datapart, set_subtag, "en", "", 0);
+        super(set_subtag, "en", "", 0);
         LOGGER.debug("default_lang (" + default_lang + ") will never used."); //FIXME: use default_lang or remove it
         setSourcePath(set_sourcepath);
         maindoc = "";

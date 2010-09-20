@@ -112,16 +112,15 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      * the value of <em>set_type<em>, if it is null, an empty string was set
      * to the type element. The datapart element was set. If the value of
      * <em>set_datapart,/em> is null or empty the default was set.
-     *
-     * @param set_datapart     the data part name
      * @param set_subtag       the name of the subtag
      * @param default_lang     the default language
      * @param set_type         the optional type string
      * @param set_inherited     a int value , > 0 if the data are inherited,
      *                         else = 0.
+     *
      * @exception MCRException if the set_subtag value is null or empty
      */
-    public MCRMetaDefault(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherited)
+    public MCRMetaDefault(String set_subtag, String default_lang, String set_type, int set_inherited)
             throws MCRException {
         lang = DEFAULT_LANGUAGE;
         subtag = "";
@@ -142,9 +141,6 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
             type = set_type;
         }
 
-        if (set_datapart != null && (set_datapart = set_datapart.trim()).length() != 0) {
-            datapart = set_datapart;
-        }
     }
 
     /**
@@ -226,21 +222,6 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
     }
 
     /**
-     * This method set the datapart element. If the value of
-     * <em>set_datapart</em> is null, empty or false nothing was changed.
-     * 
-     * @param set_datapart
-     *            the data part name
-     */
-    public final void setDataPart(String set_datapart) {
-        if (set_datapart == null || (set_datapart = set_datapart.trim()).length() == 0) {
-            datapart = DEFAULT_DATAPART;
-        } else {
-            datapart = set_datapart;
-        }
-    }
-
-    /**
      * This method get the inherited element.
      * 
      * @return the inherited flag as int
@@ -283,15 +264,6 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      */
     public final String getType() {
         return type;
-    }
-
-    /**
-     * This method get the datapart element.
-     * 
-     * @return the datapart
-     */
-    public final String getDataPart() {
-        return datapart;
     }
 
     /**
