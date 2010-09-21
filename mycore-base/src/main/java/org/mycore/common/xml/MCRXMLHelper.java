@@ -204,6 +204,23 @@ public class MCRXMLHelper {
         return JDOMEquivalent.equivalent(d1, d2);
     }
 
+    /**
+     * checks whether two elements are equal.
+     * 
+     * This test performs a deep check across all child components of a
+     * element.
+     * 
+     * @param e1
+     *            first Document to compare
+     * @param e2
+     *            second Document to compare
+     * @return true, if e1 and e2 are deep equal
+     * @see Document#equals(java.lang.Object)
+     */
+    public static boolean deepEqual(Element e1, Element e2) {
+        return JDOMEquivalent.equivalent(e1, e2);
+    }
+
     private static class JDOMEquivalent {
 
         private JDOMEquivalent() {
@@ -215,7 +232,7 @@ public class MCRXMLHelper {
 
         @SuppressWarnings("unchecked")
         public static boolean equivalent(Element e1, Element e2) {
-            return equivalentName(e1, e2) && equivalentAttributes(e1, e2) && equivalentContent(e1.getDescendants(), e2.getDescendants());
+            return equivalentName(e1, e2) && equivalentAttributes(e1, e2) && equivalentContent(e1.getContent(), e2.getContent());
         }
 
         public static boolean equivalent(Text t1, Text t2) {
@@ -263,23 +280,21 @@ public class MCRXMLHelper {
 
         @SuppressWarnings("unchecked")
         public static boolean equivalentContent(Document d1, Document d2) {
-            // XXX short circuit if content size1 != content size2
-            return equivalentContent(d1.getDescendants(), d2.getDescendants());
+            return equivalentContent(d1.getContent(), d2.getContent());
         }
 
-        public static boolean equivalentContent(Iterator<Content> i1, Iterator<Content> i2) {
+        public static boolean equivalentContent(List<Content> l1, List<Content> l2) {
+            if (l1.size() != l2.size()) {
+                return false;
+            }
             boolean result = true;
+            Iterator<Content> i1 = l1.iterator();
+            Iterator<Content> i2 = l2.iterator();
             while (result && i1.hasNext() && i2.hasNext()) {
                 Object o1 = i1.next();
                 Object o2 = i2.next();
                 if (o1 instanceof Element && o2 instanceof Element) {
                     result = equivalent((Element) o1, (Element) o2);
-                    // XXX Hmm, this should work and avoid much recursion
-                    // if we can guarentee i1, i2 are instances of
-                    // DescendantIterator
-                    //
-                    // result = equivalentName((Element) o1, (Element) o2) &&
-                    // equivalentAttributes((Element) o1, (Element) o2);
                 } else if (o1 instanceof Text && o2 instanceof Text) {
                     result = equivalent((Text) o1, (Text) o2);
                 } else if (o1 instanceof Comment && o2 instanceof Comment) {
@@ -291,6 +306,9 @@ public class MCRXMLHelper {
                 } else {
                     result = false;
                 }
+            }
+            if (i1.hasNext() != i2.hasNext()) {
+                return false;
             }
             return result;
         }
