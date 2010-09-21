@@ -408,7 +408,7 @@ public final class MCRMetadataManager {
     }
 
     /**
-     * Retrieves instance of MCRDerivate with the given MCRObjectID
+     * Retrieves instance of {@link MCRDerivate} with the given {@link MCRObjectID}
      * 
      * @param id
      *            the derivate ID
@@ -421,15 +421,28 @@ public final class MCRMetadataManager {
     }
 
     /**
-     * Retrieves instance of MCRObject with the given MCRObjectID
+     * Retrieves instance of {@link MCRObject} with the given {@link MCRObjectID}
      * 
      * @param id
-     *            the derivate ID
+     *            the object ID
      * @exception MCRPersistenceException
      *                if a persistence problem is occurred
      */
     public static final MCRObject retrieveMCRObject(final MCRObjectID id) throws MCRPersistenceException {
         return new MCRObject(MCRXMLMetadataManager.instance().retrieveXML(id));
+    }
+
+    /**
+     * Retrieves instance of {@link MCRObject} or {@link MCRDerivate} depending on {@link MCRObjectID#getTypeId()}
+     * @param id derivate or object id
+     * @exception MCRPersistenceException
+     *                if a persistence problem is occurred
+     */
+    public static final MCRBase retrieve(final MCRObjectID id) throws MCRPersistenceException {
+        if (id.getTypeId().equals("derivate")) {
+            return retrieveMCRDerivate(id);
+        }
+        return retrieveMCRObject(id);
     }
 
     /**
