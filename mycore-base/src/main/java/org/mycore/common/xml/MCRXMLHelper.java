@@ -307,9 +307,6 @@ public class MCRXMLHelper {
                     result = false;
                 }
             }
-            if (i1.hasNext() != i2.hasNext()) {
-                return false;
-            }
             return result;
         }
 
