@@ -37,6 +37,11 @@ import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRQueryManager;
 
+/**
+ * Implements the ListSets request.
+ * 
+ * @author Frank L\u00fctzenkirchen
+ */
 class MCRListSetsHandler extends MCRVerbHandler
 {
   final static String VERB = "ListSets";

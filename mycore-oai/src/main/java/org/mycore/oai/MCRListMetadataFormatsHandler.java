@@ -26,6 +26,11 @@ package org.mycore.oai;
 import java.util.List;
 import java.util.Properties;
 
+/**
+ * Implements the ListMetadataFormats request
+ * 
+ * @author Frank L\u00fctzenkirchen
+ */
 class MCRListMetadataFormatsHandler extends MCRVerbHandler
 {
   final static String VERB = "ListMetadataFormats";

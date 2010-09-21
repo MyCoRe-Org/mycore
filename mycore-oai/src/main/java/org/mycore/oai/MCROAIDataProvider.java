@@ -39,6 +39,11 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
+/**
+ * Implements an OAI-PMH 2.0 Data Provider as a servlet.
+ * 
+ * @author Frank L\u00fctzenkirchen
+ */
 public class MCROAIDataProvider extends MCRServlet
 {
   protected final static Logger LOGGER = Logger.getLogger( MCROAIDataProvider.class );

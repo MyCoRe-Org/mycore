@@ -43,6 +43,11 @@ import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRQueryParser;
 
+/**
+ * Each verb handler implements one of the six OAI-PMH verbs. 
+ * 
+ * @author Frank L\u00fctzenkirchen
+ */
 public abstract class MCRVerbHandler implements MCROAIConstants
 {
   protected final static Logger LOGGER = Logger.getLogger( MCRVerbHandler.class );

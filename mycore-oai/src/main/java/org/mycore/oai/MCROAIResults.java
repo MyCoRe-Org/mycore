@@ -39,6 +39,11 @@ import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
 
+/**
+ * Represents complete results to a ListRecords or ListIdentifiers request. 
+ * 
+ * @author Frank L\u00fctzenkirchen
+ */
 public class MCROAIResults implements MCROAIConstants
 {
   private String token;

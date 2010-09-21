@@ -27,6 +27,12 @@ import java.util.Map;
 
 import org.jdom.Document;
 
+/**
+ * Implements the "bad verb" that just returns an error 
+ * when the verb argument from request is illegal. 
+ * 
+ * @author Frank L\u00fctzenkirchen
+ */
 class MCRBadVerbHandler extends MCRVerbHandler
 {
   private final static String ERROR_BAD_VERB = "badVerb";

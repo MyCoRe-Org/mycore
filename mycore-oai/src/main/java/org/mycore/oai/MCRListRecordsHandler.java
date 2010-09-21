@@ -25,6 +25,11 @@ package org.mycore.oai;
 
 import org.jdom.Element;
 
+/**
+ * Implements the ListRecords request
+ * 
+ * @author Frank L\u00fctzenkirchen
+ */
 class MCRListRecordsHandler extends MCRListDataHandler
 {
   final static String VERB = "ListRecords";

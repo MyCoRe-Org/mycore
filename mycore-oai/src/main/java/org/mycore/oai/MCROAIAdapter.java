@@ -31,6 +31,9 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.parsers.bool.MCRCondition;
 
+/**
+ * @author Frank L\u00fctzenkirchen
+ */
 public abstract class MCROAIAdapter implements MCROAIConstants
 {
   protected final static Logger LOGGER = Logger.getLogger( MCRVerbHandler.class );

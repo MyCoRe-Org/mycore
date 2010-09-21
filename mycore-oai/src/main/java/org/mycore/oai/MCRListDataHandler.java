@@ -37,6 +37,11 @@ import org.mycore.services.fieldquery.MCRQueryManager;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSortBy;
 
+/**
+ * Provides common functionality for the ListRecords and ListIdentifiers implementation.
+ * 
+ * @author Frank L\u00fctzenkirchen
+ */
 abstract class MCRListDataHandler extends MCRVerbHandler
 {
   void setAllowedParameters( Properties p )

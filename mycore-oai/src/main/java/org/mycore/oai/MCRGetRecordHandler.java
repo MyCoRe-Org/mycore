@@ -27,6 +27,11 @@ import java.util.List;
 
 import java.util.Properties;
 
+/**
+ * Implements the GetRecord request.
+ * 
+ * @author Frank L\u00fctzenkirchen
+ */
 class MCRGetRecordHandler extends MCRVerbHandler
 {
   final static String VERB = "GetRecord";

@@ -25,6 +25,11 @@ package org.mycore.oai;
 
 import org.jdom.Element;
 
+/**
+ * Implements the ListIdentifiers request.
+ * 
+ * @author Frank L\u00fctzenkirchen
+ */
 class MCRListIdentifiersHandler extends MCRListDataHandler
 {
   final static String VERB = "ListIdentifiers";

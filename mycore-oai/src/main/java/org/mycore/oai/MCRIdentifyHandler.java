@@ -29,6 +29,11 @@ import java.util.Properties;
 import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
 
+/**
+ * Implements the Identify request.
+ * 
+ * @author Frank L\u00fctzenkirchen
+ */
 class MCRIdentifyHandler extends MCRVerbHandler
 {
   final static String VERB = "Identify";
@@ -65,14 +70,16 @@ class MCRIdentifyHandler extends MCRVerbHandler
     
     addFriends();
   }
-  
+
+  /**
+   * Adds a list of other OAI data providers that are friends
+   */
   private void addFriends()
   {
     MCRConfiguration config = MCRConfiguration.instance();
     Properties friends = config.getProperties( provider.getPrefix() + "Friends." );
     if( friends.isEmpty() ) return;
 
-    // Add list of other OAI data providers that are friends
     Element description = new Element( "description", NS_OAI );
     output.addContent( description );
   
