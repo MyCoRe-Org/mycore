@@ -89,7 +89,7 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
         for (int i = 0; i < size(); ++i) {
             MCRMetaElement me = meta_list.get(i);
 
-            if (me.getHeritable()) {
+            if (me.isHeritable()) {
                 MCRMetaElement nme = (MCRMetaElement) me.clone();
 
                 for (int j = 0; j < nme.size(); j++) {
@@ -112,7 +112,7 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
         int counter = 0;
         while (elements.hasNext()) {
             MCRMetaElement me = elements.next();
-            me.removeInheritedObject();
+            me.removeInheritedMetadata();
             //remove meta element if empty (else isValid() will fail)
             if (me.size() == 0) {
                 elements.remove();
@@ -141,7 +141,7 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
             }
 
             if (pos != -1) {
-                if (!meta_list.get(pos).getNotInherit()) {
+                if (!meta_list.get(pos).inheritsNot()) {
                     meta_list.get(pos).setHeritable(true);
 
                     for (int j = 0; j < newelm.size(); j++) {

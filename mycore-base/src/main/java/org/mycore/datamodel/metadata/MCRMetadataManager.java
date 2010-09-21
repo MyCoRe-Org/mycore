@@ -606,7 +606,7 @@ public final class MCRMetadataManager {
         int numheritablemdold = 0;
         for (int i = 0; i < md.size(); i++) {
             final MCRMetaElement melm = md.getMetadataElement(i);
-            if (melm.getHeritable()) {
+            if (melm.isHeritable()) {
                 numheritablemd++;
                 try {
                     final MCRMetaElement melmold = mdold.getMetadataElement(melm.getTag());
@@ -624,7 +624,7 @@ public final class MCRMetadataManager {
         if (!updatechildren) {
             for (int i = 0; i < mdold.size(); i++) {
                 final MCRMetaElement melmold = mdold.getMetadataElement(i);
-                if (melmold.getHeritable()) {
+                if (melmold.isHeritable()) {
                     numheritablemdold++;
                 }
             }
@@ -733,7 +733,7 @@ public final class MCRMetadataManager {
 
         // delete the old inherited data from all metadata elements
         for (int i = 0; i < child.getMetadata().size(); i++) {
-            child.getMetadata().getMetadataElement(i).removeInheritedObject();
+            child.getMetadata().getMetadataElement(i).removeInheritedMetadata();
 
             if (child.getMetadata().getMetadataElement(i).size() == 0) {
                 child.getMetadata().removeMetadataElement(i);

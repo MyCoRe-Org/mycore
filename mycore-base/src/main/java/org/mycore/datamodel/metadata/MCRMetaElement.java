@@ -151,7 +151,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface> {
      * 
      * @return the heritable flag of this metadata class
      */
-    public final boolean getHeritable() {
+    public final boolean isHeritable() {
         return heritable;
     }
 
@@ -160,7 +160,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface> {
      * 
      * @return the notherit flag of this metadata class
      */
-    public final boolean getNotInherit() {
+    public final boolean inheritsNot() {
         return notinherit;
     }
 
@@ -247,7 +247,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface> {
     /**
      * The method removes all inherited metadata objects of this MCRMetaElement.
      */
-    public final void removeInheritedObject() {
+    public final void removeInheritedMetadata() {
         for (int i = 0; i < size(); i++) {
             if ((list.get(i)).getInherited() > 0) {
                 list.remove(i);
