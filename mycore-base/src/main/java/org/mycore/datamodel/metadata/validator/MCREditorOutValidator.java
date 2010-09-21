@@ -377,11 +377,11 @@ public class MCREditorOutValidator {
     /**
      * @param datatag
      */
-    @SuppressWarnings("unchecked")
     private boolean checkMetaTags(Element datatag) {
         String mcrclass = datatag.getAttributeValue("class");
-        List datataglist = datatag.getChildren();
-        Iterator datatagIt = datataglist.iterator();
+        @SuppressWarnings("unchecked")
+        List<Element> datataglist = datatag.getChildren();
+        Iterator<Element> datatagIt = datataglist.iterator();
 
         while (datatagIt.hasNext()) {
             Element datasubtag = (Element) datatagIt.next();

@@ -25,7 +25,6 @@ package org.mycore.datamodel.metadata;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
-import org.jdom.Namespace;
 import org.mycore.common.MCRException;
 
 /**

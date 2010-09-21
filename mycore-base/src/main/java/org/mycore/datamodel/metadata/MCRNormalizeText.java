@@ -23,6 +23,9 @@
 
 package org.mycore.datamodel.metadata;
 
+import java.util.List;
+
+import org.jdom.Element;
 import org.mycore.common.MCRNormalizer;
 
 /**
@@ -48,37 +51,34 @@ public class MCRNormalizeText {
             return;
         }
 
-        org.jdom.Element root = doc.getRootElement();
-        org.jdom.Element metadata = root.getChild("metadata");
+        Element root = doc.getRootElement();
+        Element metadata = root.getChild("metadata");
 
         if (metadata == null) {
             return;
         }
 
-        java.util.List metalist = metadata.getChildren();
-        int lm = metalist.size();
+        @SuppressWarnings("unchecked")
+        List<Element> metalist = metadata.getChildren();
 
-        for (int i = 0; i < lm; i++) {
-            org.jdom.Element metaitem = (org.jdom.Element) metalist.get(i);
+        for (Element metaitem : metalist) {
             String metaname = metaitem.getAttributeValue("class");
 
             if (metaname.equals("MCRMetaLangText")) {
-                java.util.List metaelms = metaitem.getChildren();
-                int le = metaelms.size();
+                @SuppressWarnings("unchecked")
+                List<Element> metaelms = metaitem.getChildren();
 
-                for (int j = 0; j < le; j++) {
-                    org.jdom.Element metaelm = (org.jdom.Element) metaelms.get(j);
+                for (Element metaelm : metaelms) {
                     metaelm.setText(MCRNormalizer.normalizeString(metaelm.getText()));
                 }
             }
 
             if (metaname.equals("MCRMetaPersonName")) {
-                java.util.List metaelms = metaitem.getChildren();
-                int le = metaelms.size();
+                @SuppressWarnings("unchecked")
+                List<Element> metaelms = metaitem.getChildren();
 
-                for (int j = 0; j < le; j++) {
-                    org.jdom.Element metaelm = (org.jdom.Element) metaelms.get(j);
-                    org.jdom.Element sub = metaelm.getChild("firstname");
+                for (Element metaelm : metaelms) {
+                    Element sub = metaelm.getChild("firstname");
                     if (sub != null) {
                         sub.setText(MCRNormalizer.normalizeString(sub.getText()));
                     }
@@ -98,12 +98,11 @@ public class MCRNormalizeText {
             }
 
             if (metaname.equals("MCRMetaInstitutionName")) {
-                java.util.List metaelms = metaitem.getChildren();
-                int le = metaelms.size();
+                @SuppressWarnings("unchecked")
+                List<Element> metaelms = metaitem.getChildren();
 
-                for (int j = 0; j < le; j++) {
-                    org.jdom.Element metaelm = (org.jdom.Element) metaelms.get(j);
-                    org.jdom.Element sub = metaelm.getChild("fullname");
+                for (Element metaelm : metaelms) {
+                    Element sub = metaelm.getChild("fullname");
                     if (sub != null) {
                         sub.setText(MCRNormalizer.normalizeString(sub.getText()));
                     }
