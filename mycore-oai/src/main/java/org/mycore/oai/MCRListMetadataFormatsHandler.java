@@ -31,31 +31,29 @@ import java.util.Properties;
  * 
  * @author Frank L\u00fctzenkirchen
  */
-class MCRListMetadataFormatsHandler extends MCRVerbHandler
-{
-  final static String VERB = "ListMetadataFormats";
-  
-  void setAllowedParameters( Properties p )
-  {
-    p.setProperty( ARG_IDENTIFIER, V_OPTIONAL );
-  }
+class MCRListMetadataFormatsHandler extends MCRVerbHandler {
+    final static String VERB = "ListMetadataFormats";
 
-  MCRListMetadataFormatsHandler( MCROAIDataProvider provider )
-  { super( provider ); }
-  
-  void handleRequest()
-  {
-    String identifier = parms.getProperty( ARG_IDENTIFIER );
-    List<MCRMetadataFormat> formats = null;
-    
-    if( identifier == null )
-      formats = provider.getMetadataFormats(); 
-    else if( checkIdentifier( identifier ) ) 
-      formats = provider.getAdapter().listMetadataFormats( identifier, provider.getMetadataFormats() ); 
-    else
-      return;
+    void setAllowedParameters(Properties p) {
+        p.setProperty(ARG_IDENTIFIER, V_OPTIONAL);
+    }
 
-    for( MCRMetadataFormat format : formats )
-      output.addContent( format.buildXML() );
-  }
+    MCRListMetadataFormatsHandler(MCROAIDataProvider provider) {
+        super(provider);
+    }
+
+    void handleRequest() {
+        String identifier = parms.getProperty(ARG_IDENTIFIER);
+        List<MCRMetadataFormat> formats = null;
+
+        if (identifier == null)
+            formats = provider.getMetadataFormats();
+        else if (checkIdentifier(identifier))
+            formats = provider.getAdapter().listMetadataFormats(identifier, provider.getMetadataFormats());
+        else
+            return;
+
+        for (MCRMetadataFormat format : formats)
+            output.addContent(format.buildXML());
+    }
 }

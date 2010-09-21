@@ -33,16 +33,15 @@ import org.jdom.Document;
  * 
  * @author Frank L\u00fctzenkirchen
  */
-class MCRBadVerbHandler extends MCRVerbHandler
-{
-  private final static String ERROR_BAD_VERB = "badVerb";
+class MCRBadVerbHandler extends MCRVerbHandler {
+    private final static String ERROR_BAD_VERB = "badVerb";
 
-  MCRBadVerbHandler( MCROAIDataProvider provider, String errorMessage )
-  {
-    super( provider );
-    addError( ERROR_BAD_VERB, errorMessage );
-  }
-  
-  Document handle( Map<String,String[]> parameters )
-  { return getResponse(); }
+    MCRBadVerbHandler(MCROAIDataProvider provider, String errorMessage) {
+        super(provider);
+        addError(ERROR_BAD_VERB, errorMessage);
+    }
+
+    Document handle(Map<String, String[]> parameters) {
+        return getResponse();
+    }
 }

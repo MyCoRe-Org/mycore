@@ -34,41 +34,38 @@ import org.mycore.parsers.bool.MCRCondition;
 /**
  * @author Frank L\u00fctzenkirchen
  */
-public abstract class MCROAIAdapter implements MCROAIConstants
-{
-  protected final static Logger LOGGER = Logger.getLogger( MCRVerbHandler.class );
-  
-  protected String recordUriPattern;
-  protected String headerUriPattern;
-  
-  void init( String prefix )
-  { 
-    recordUriPattern = MCRConfiguration.instance().getString( prefix + "RecordURIPattern" );
-    headerUriPattern = MCRConfiguration.instance().getString( prefix + "HeaderURIPattern" );
-  }
-  
-  public abstract boolean exists( String identifier );
-  
-  public List<MCRMetadataFormat> listMetadataFormats( String id, List<MCRMetadataFormat> defaults )
-  { return defaults; }
-  
-  public Element getRecord( String id, MCRMetadataFormat format )
-  {
-    String uri = recordUriPattern.replace( "{id}", id ).replace( "{format}", format.getPrefix() );
-    return getURI( uri );
-  }
+public abstract class MCROAIAdapter implements MCROAIConstants {
+    protected final static Logger LOGGER = Logger.getLogger(MCRVerbHandler.class);
 
-  public Element getHeader( String id, MCRMetadataFormat format )
-  {
-    String uri = headerUriPattern.replace( "{id}", id ).replace( "{format}", format.getPrefix() );
-    return getURI( uri );
-  }
-  
-  public abstract MCRCondition buildSetCondition( String setSpec );
-  
-  protected Element getURI( String uri )
-  {
-    LOGGER.debug( "get " + uri );
-    return (Element)( MCRURIResolver.instance().resolve( uri ).detach() );
-  }
+    protected String recordUriPattern;
+
+    protected String headerUriPattern;
+
+    void init(String prefix) {
+        recordUriPattern = MCRConfiguration.instance().getString(prefix + "RecordURIPattern");
+        headerUriPattern = MCRConfiguration.instance().getString(prefix + "HeaderURIPattern");
+    }
+
+    public abstract boolean exists(String identifier);
+
+    public List<MCRMetadataFormat> listMetadataFormats(String id, List<MCRMetadataFormat> defaults) {
+        return defaults;
+    }
+
+    public Element getRecord(String id, MCRMetadataFormat format) {
+        String uri = recordUriPattern.replace("{id}", id).replace("{format}", format.getPrefix());
+        return getURI(uri);
+    }
+
+    public Element getHeader(String id, MCRMetadataFormat format) {
+        String uri = headerUriPattern.replace("{id}", id).replace("{format}", format.getPrefix());
+        return getURI(uri);
+    }
+
+    public abstract MCRCondition buildSetCondition(String setSpec);
+
+    protected Element getURI(String uri) {
+        LOGGER.debug("get " + uri);
+        return (Element) (MCRURIResolver.instance().resolve(uri).detach());
+    }
 }

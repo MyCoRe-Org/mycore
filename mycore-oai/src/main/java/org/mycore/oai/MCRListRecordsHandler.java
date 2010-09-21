@@ -30,18 +30,15 @@ import org.jdom.Element;
  * 
  * @author Frank L\u00fctzenkirchen
  */
-class MCRListRecordsHandler extends MCRListDataHandler
-{
-  final static String VERB = "ListRecords";
-  
-  MCRListRecordsHandler( MCROAIDataProvider provider )
-  {
-    super( provider );
-  }
-  
-  protected void addHit( String ID, MCRMetadataFormat format )
-  {
-    Element record = provider.getAdapter().getRecord( ID, format );
-    output.addContent( record );
-  }
+class MCRListRecordsHandler extends MCRListDataHandler {
+    final static String VERB = "ListRecords";
+
+    MCRListRecordsHandler(MCROAIDataProvider provider) {
+        super(provider);
+    }
+
+    protected void addHit(String ID, MCRMetadataFormat format) {
+        Element record = provider.getAdapter().getRecord(ID, format);
+        output.addContent(record);
+    }
 }

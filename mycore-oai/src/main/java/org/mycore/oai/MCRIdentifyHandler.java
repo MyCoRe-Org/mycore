@@ -34,64 +34,62 @@ import org.mycore.common.MCRConfiguration;
  * 
  * @author Frank L\u00fctzenkirchen
  */
-class MCRIdentifyHandler extends MCRVerbHandler
-{
-  final static String VERB = "Identify";
-  
-  MCRIdentifyHandler( MCROAIDataProvider provider )
-  { super( provider ); }
-  
-  void handleRequest()
-  {
-    output.addContent( new Element( "repositoryName", NS_OAI ).setText( provider.getRepositoryName() ) );
-    output.addContent( new Element( "baseURL", NS_OAI ).setText( provider.getOAIBaseURL() ) );
-    output.addContent( new Element( "protocolVersion", NS_OAI ).setText( "2.0" ) );
-    output.addContent( new Element( "earliestDatestamp", NS_OAI ).setText( provider.getEarliestDatestamp() ) );
-    output.addContent( new Element( "deletedRecord", NS_OAI ).setText( provider.getDeletedRecord() ) );
-    output.addContent( new Element( "granularity", NS_OAI ).setText( MCROAIConstants.GRANULARITY ) );
-    output.addContent( new Element( "adminEmail", NS_OAI ).setText( provider.getAdminEmail() ) );
+class MCRIdentifyHandler extends MCRVerbHandler {
+    final static String VERB = "Identify";
 
-    // Add OAI Identifier description
-    Element description = new Element( "description", NS_OAI );
-    output.addContent( description );
-    
-    Element oaiIdentifier = new Element( "oai-identifier", NS_OAI_ID );
-    oaiIdentifier.setAttribute( "schemaLocation", SCHEMA_LOC_OAI_ID, NS_XSI );
-    oaiIdentifier.addNamespaceDeclaration( NS_XSI );
-    description.addContent( oaiIdentifier );
-    
-    oaiIdentifier.addContent( new Element( "scheme", NS_OAI_ID ).setText( "oai" ) );
-    oaiIdentifier.addContent( new Element( "repositoryIdentifier", NS_OAI_ID ).setText( provider.getRepositoryIdentifier() ) );
-    oaiIdentifier.addContent( new Element( "delimiter", NS_OAI_ID ).setText( ":" ) );
-    
-    Element sampleIdentifier = new Element( "sampleIdentifier", NS_OAI_ID );
-    sampleIdentifier.setText( "oai:" + provider.getRepositoryIdentifier() + ":" + provider.getRecordSampleID() );
-    oaiIdentifier.addContent( sampleIdentifier );
-    
-    addFriends();
-  }
-
-  /**
-   * Adds a list of other OAI data providers that are friends
-   */
-  private void addFriends()
-  {
-    MCRConfiguration config = MCRConfiguration.instance();
-    Properties friends = config.getProperties( provider.getPrefix() + "Friends." );
-    if( friends.isEmpty() ) return;
-
-    Element description = new Element( "description", NS_OAI );
-    output.addContent( description );
-  
-    Element eFriends = new Element( "friends", NS_FRIENDS );
-    eFriends.setAttribute( "schemaLocation", SCHEMA_LOC_FRIENDS, NS_XSI );
-    eFriends.addNamespaceDeclaration( NS_XSI );
-    description.addContent( eFriends );
-
-    for( Iterator it = friends.values().iterator(); it.hasNext(); )
-    {
-      String friend = (String)( it.next() );
-      eFriends.addContent( new Element( "baseURL", NS_FRIENDS ).setText( friend ) );  
+    MCRIdentifyHandler(MCROAIDataProvider provider) {
+        super(provider);
     }
-  }
+
+    void handleRequest() {
+        output.addContent(new Element("repositoryName", NS_OAI).setText(provider.getRepositoryName()));
+        output.addContent(new Element("baseURL", NS_OAI).setText(provider.getOAIBaseURL()));
+        output.addContent(new Element("protocolVersion", NS_OAI).setText("2.0"));
+        output.addContent(new Element("earliestDatestamp", NS_OAI).setText(provider.getEarliestDatestamp()));
+        output.addContent(new Element("deletedRecord", NS_OAI).setText(provider.getDeletedRecord()));
+        output.addContent(new Element("granularity", NS_OAI).setText(MCROAIConstants.GRANULARITY));
+        output.addContent(new Element("adminEmail", NS_OAI).setText(provider.getAdminEmail()));
+
+        // Add OAI Identifier description
+        Element description = new Element("description", NS_OAI);
+        output.addContent(description);
+
+        Element oaiIdentifier = new Element("oai-identifier", NS_OAI_ID);
+        oaiIdentifier.setAttribute("schemaLocation", SCHEMA_LOC_OAI_ID, NS_XSI);
+        oaiIdentifier.addNamespaceDeclaration(NS_XSI);
+        description.addContent(oaiIdentifier);
+
+        oaiIdentifier.addContent(new Element("scheme", NS_OAI_ID).setText("oai"));
+        oaiIdentifier.addContent(new Element("repositoryIdentifier", NS_OAI_ID).setText(provider.getRepositoryIdentifier()));
+        oaiIdentifier.addContent(new Element("delimiter", NS_OAI_ID).setText(":"));
+
+        Element sampleIdentifier = new Element("sampleIdentifier", NS_OAI_ID);
+        sampleIdentifier.setText("oai:" + provider.getRepositoryIdentifier() + ":" + provider.getRecordSampleID());
+        oaiIdentifier.addContent(sampleIdentifier);
+
+        addFriends();
+    }
+
+    /**
+     * Adds a list of other OAI data providers that are friends
+     */
+    private void addFriends() {
+        MCRConfiguration config = MCRConfiguration.instance();
+        Properties friends = config.getProperties(provider.getPrefix() + "Friends.");
+        if (friends.isEmpty())
+            return;
+
+        Element description = new Element("description", NS_OAI);
+        output.addContent(description);
+
+        Element eFriends = new Element("friends", NS_FRIENDS);
+        eFriends.setAttribute("schemaLocation", SCHEMA_LOC_FRIENDS, NS_XSI);
+        eFriends.addNamespaceDeclaration(NS_XSI);
+        description.addContent(eFriends);
+
+        for (Iterator it = friends.values().iterator(); it.hasNext();) {
+            String friend = (String) (it.next());
+            eFriends.addContent(new Element("baseURL", NS_FRIENDS).setText(friend));
+        }
+    }
 }

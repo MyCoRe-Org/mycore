@@ -33,45 +33,69 @@ import org.jdom.Namespace;
  * 
  * @author Frank L\u00FCtzenkirchen
  */
-interface MCROAIConstants
-{
-  final static Namespace NS_XSI     = Namespace.getNamespace( "xsi",    "http://www.w3.org/2001/XMLSchema-instance" );
-  final static Namespace NS_OAI     = Namespace.getNamespace(           "http://www.openarchives.org/OAI/2.0/" ); 
-  final static Namespace NS_OAI_ID  = Namespace.getNamespace(           "http://www.openarchives.org/OAI/2.0/oai-identifier" );
-  final static Namespace NS_FRIENDS = Namespace.getNamespace(           "http://www.openarchives.org/OAI/2.0/friends/" );
-  final static Namespace NS_OAI_DC  = Namespace.getNamespace( "oai_dc", "http://www.openarchives.org/OAI/2.0/oai_dc/" );
-  final static Namespace NS_DC      = Namespace.getNamespace( "dc",     "http://purl.org/dc/elements/1.1/" );
-  
-  final static String SCHEMA_LOC_OAI     = "http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd";
-  final static String SCHEMA_LOC_OAI_ID  = "http://www.openarchives.org/OAI/2.0/oai-identifier http://www.openarchives.org/OAI/2.0/oai-identifier.xsd";
-  final static String SCHEMA_LOC_FRIENDS = "http://www.openarchives.org/OAI/2.0/friends/ http://www.openarchives.org/OAI/2.0/friends.xsd";
-  final static String SCHEMA_LOC_OAI_DC  = "http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd";
+interface MCROAIConstants {
+    final static Namespace NS_XSI = Namespace.getNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
 
-  final static String ARG_VERB             = "verb";
-  final static String ARG_IDENTIFIER       = "identifier";
-  final static String ARG_METADATA_PREFIX  = "metadataPrefix";
-  final static String ARG_FROM             = "from";
-  final static String ARG_UNTIL            = "until";
-  final static String ARG_RESUMPTION_TOKEN = "resumptionToken";
-  final static String ARG_SET              = "set";
+    final static Namespace NS_OAI = Namespace.getNamespace("http://www.openarchives.org/OAI/2.0/");
 
-  final static String V_REQUIRED  = "V_REQUIRED";
-  final static String V_OPTIONAL  = "V_OPTIONAL";
-  final static String V_EXCLUSIVE = "V_EXCLUSIVE";
-  final static String V_ALWAYS    = "V_ALWAYS";
+    final static Namespace NS_OAI_ID = Namespace.getNamespace("http://www.openarchives.org/OAI/2.0/oai-identifier");
 
-  final static String ERROR_BAD_VERB                  = "badVerb";
-  final static String ERROR_BAD_ARGUMENT              = "badArgument";
-  final static String ERROR_BAD_RESUMPTION_TOKEN      = "badResumptionToken";
-  final static String ERROR_NO_SET_HIERARCHY          = "noSetHierarchy";
-  final static String ERROR_CANNOT_DISSEMINATE_FORMAT = "cannotDisseminateFormat";
-  final static String ERROR_ID_DOES_NOT_EXIST         = "idDoesNotExist";   
-  final static String ERROR_NO_METADATA_FORMATS       = "noMetadataFormats";
-  final static String ERROR_NO_RECORDS_MATCH          = "noRecordsMatch";
+    final static Namespace NS_FRIENDS = Namespace.getNamespace("http://www.openarchives.org/OAI/2.0/friends/");
 
-  /** Datestamp granularity is currently fixed to day level */
-  final static String GRANULARITY = "YYYY-MM-DD";
-  
-  final static String DATESTAMP_PATTERN = "yyyy-MM-dd";
-  final static DateFormat DATESTAMP_FORMAT = new SimpleDateFormat( DATESTAMP_PATTERN );
+    final static Namespace NS_OAI_DC = Namespace.getNamespace("oai_dc", "http://www.openarchives.org/OAI/2.0/oai_dc/");
+
+    final static Namespace NS_DC = Namespace.getNamespace("dc", "http://purl.org/dc/elements/1.1/");
+
+    final static String SCHEMA_LOC_OAI = "http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd";
+
+    final static String SCHEMA_LOC_OAI_ID = "http://www.openarchives.org/OAI/2.0/oai-identifier http://www.openarchives.org/OAI/2.0/oai-identifier.xsd";
+
+    final static String SCHEMA_LOC_FRIENDS = "http://www.openarchives.org/OAI/2.0/friends/ http://www.openarchives.org/OAI/2.0/friends.xsd";
+
+    final static String SCHEMA_LOC_OAI_DC = "http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd";
+
+    final static String ARG_VERB = "verb";
+
+    final static String ARG_IDENTIFIER = "identifier";
+
+    final static String ARG_METADATA_PREFIX = "metadataPrefix";
+
+    final static String ARG_FROM = "from";
+
+    final static String ARG_UNTIL = "until";
+
+    final static String ARG_RESUMPTION_TOKEN = "resumptionToken";
+
+    final static String ARG_SET = "set";
+
+    final static String V_REQUIRED = "V_REQUIRED";
+
+    final static String V_OPTIONAL = "V_OPTIONAL";
+
+    final static String V_EXCLUSIVE = "V_EXCLUSIVE";
+
+    final static String V_ALWAYS = "V_ALWAYS";
+
+    final static String ERROR_BAD_VERB = "badVerb";
+
+    final static String ERROR_BAD_ARGUMENT = "badArgument";
+
+    final static String ERROR_BAD_RESUMPTION_TOKEN = "badResumptionToken";
+
+    final static String ERROR_NO_SET_HIERARCHY = "noSetHierarchy";
+
+    final static String ERROR_CANNOT_DISSEMINATE_FORMAT = "cannotDisseminateFormat";
+
+    final static String ERROR_ID_DOES_NOT_EXIST = "idDoesNotExist";
+
+    final static String ERROR_NO_METADATA_FORMATS = "noMetadataFormats";
+
+    final static String ERROR_NO_RECORDS_MATCH = "noRecordsMatch";
+
+    /** Datestamp granularity is currently fixed to day level */
+    final static String GRANULARITY = "YYYY-MM-DD";
+
+    final static String DATESTAMP_PATTERN = "yyyy-MM-dd";
+
+    final static DateFormat DATESTAMP_FORMAT = new SimpleDateFormat(DATESTAMP_PATTERN);
 }

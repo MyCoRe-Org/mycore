@@ -44,125 +44,137 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * 
  * @author Frank L\u00fctzenkirchen
  */
-public class MCROAIDataProvider extends MCRServlet
-{
-  protected final static Logger LOGGER = Logger.getLogger( MCROAIDataProvider.class );
-  
-  protected void logRequest( HttpServletRequest req )
-  {
-    StringBuffer log = new StringBuffer( this.getServletName() );
-    for( Iterator it = req.getParameterMap().keySet().iterator(); it.hasNext(); )
-    {
-      String name = (String) it.next();
-      for( String value : req.getParameterValues( name ) )
-        log.append( " " ).append( name ).append( "=" ).append( value );
+public class MCROAIDataProvider extends MCRServlet {
+    protected final static Logger LOGGER = Logger.getLogger(MCROAIDataProvider.class);
+
+    protected void logRequest(HttpServletRequest req) {
+        StringBuffer log = new StringBuffer(this.getServletName());
+        for (Iterator it = req.getParameterMap().keySet().iterator(); it.hasNext();) {
+            String name = (String) it.next();
+            for (String value : req.getParameterValues(name))
+                log.append(" ").append(name).append("=").append(value);
+        }
+        LOGGER.info(log.toString());
     }
-    LOGGER.info( log.toString() );
-  }
-  
-  protected void doGetPost( MCRServletJob job ) throws Exception
-  {
-    HttpServletRequest request = job.getRequest();
-    if( myBaseURL == null ) myBaseURL = getBaseURL() + request.getServletPath().substring( 1 );
 
-    logRequest( request );
-    
-    String[] verb = request.getParameterValues( "verb" );
-    MCRVerbHandler handler = null;
-    
-    if( ( verb == null ) || ( verb.length == 0 ) )
-      handler = new MCRBadVerbHandler( this, "Missing required argument 'verb'" );
-    else if( verb.length > 1 )
-      handler = new MCRBadVerbHandler( this, "Multiple 'verb' arguments in request" );
-    else if( verb[0].trim().length() == 0 )
-      handler = new MCRBadVerbHandler( this, "Required argument 'verb' is empty" );
-    else if( MCRIdentifyHandler.VERB.equals( verb[0] ) )
-      handler = new MCRIdentifyHandler( this );
-    else if( MCRGetRecordHandler.VERB.equals( verb[0] ) )
-      handler = new MCRGetRecordHandler( this );
-    else if( MCRListMetadataFormatsHandler.VERB.equals( verb[0] ) )
-      handler = new MCRListMetadataFormatsHandler( this );
-    else if( MCRListSetsHandler.VERB.equals( verb[0] ) )
-      handler = new MCRListSetsHandler( this );
-    else if( MCRListRecordsHandler.VERB.equals( verb[0] ) )
-      handler = new MCRListRecordsHandler( this );
-    else if( MCRListIdentifiersHandler.VERB.equals( verb[0] ) )
-      handler = new MCRListIdentifiersHandler( this );
-    else 
-      handler = new MCRBadVerbHandler( this, "Bad verb: " + verb[0] );
-    
-    Document response = handler.handle( request.getParameterMap() );
-  
-    job.getResponse().setContentType( "text/xml" );
-    XMLOutputter xout = new XMLOutputter();
-    xout.setFormat( Format.getPrettyFormat().setEncoding( "UTF-8" ) );
-    xout.output( response, job.getResponse().getOutputStream() );
-  }
+    protected void doGetPost(MCRServletJob job) throws Exception {
+        HttpServletRequest request = job.getRequest();
+        if (myBaseURL == null)
+            myBaseURL = getBaseURL() + request.getServletPath().substring(1);
 
-  private MCROAIAdapter adapter;
-  
-  private String repositoryName;
-  private String repositoryIdentifier;
-  private String adminEmail;
-  private String earliestDatestamp;
-  private String recordSampleID;
-  private String deletedRecord;
-  private String myBaseURL;
-  
-  private List<MCRMetadataFormat> metadataFormats = new ArrayList<MCRMetadataFormat>();
+        logRequest(request);
 
-  private String prefix;
-  
-  String getPrefix()
-  { return prefix; }
-  
-  public void init() throws ServletException 
-  {
-    super.init();
-    
-    MCRConfiguration config = MCRConfiguration.instance();
-    prefix = "MCR.OAIDataProvider." + getServletName() + ".";
-    
-    repositoryName       = config.getString( prefix + "RepositoryName" );
-    repositoryIdentifier = config.getString( prefix + "RepositoryIdentifier" );
-    adminEmail           = config.getString( prefix + "AdminEmail" );
-    earliestDatestamp    = config.getString( prefix + "EarliestDatestamp" );
-    recordSampleID       = config.getString( prefix + "RecordSampleID" );
-    deletedRecord        = config.getString( prefix + "DeletedRecord" );
-    
-    adapter = (MCROAIAdapter)( config.getInstanceOf( prefix + "Adapter" ) );
-    adapter.init( prefix + "Adapter." );
-    
-    String formats = config.getString( prefix + "MetadataFormats" );
-    StringTokenizer st = new StringTokenizer( formats, ", " );
-    while( st.hasMoreTokens() )
-      metadataFormats.add( MCRMetadataFormat.getFormat( st.nextToken() ) );
-  }
-  
-  MCROAIAdapter getAdapter()
-  { return adapter; }
-  
-  String getRepositoryName()
-  { return repositoryName; }
-  
-  String getRepositoryIdentifier()
-  { return repositoryIdentifier; }
-  
-  String getOAIBaseURL()
-  { return myBaseURL; }
-  
-  String getEarliestDatestamp()
-  { return earliestDatestamp; }
+        String[] verb = request.getParameterValues("verb");
+        MCRVerbHandler handler = null;
 
-  String getRecordSampleID()
-  { return recordSampleID; }
-  
-  String getDeletedRecord()
-  { return deletedRecord; } 
-  
-  String getAdminEmail()
-  { return adminEmail; }
+        if ((verb == null) || (verb.length == 0))
+            handler = new MCRBadVerbHandler(this, "Missing required argument 'verb'");
+        else if (verb.length > 1)
+            handler = new MCRBadVerbHandler(this, "Multiple 'verb' arguments in request");
+        else if (verb[0].trim().length() == 0)
+            handler = new MCRBadVerbHandler(this, "Required argument 'verb' is empty");
+        else if (MCRIdentifyHandler.VERB.equals(verb[0]))
+            handler = new MCRIdentifyHandler(this);
+        else if (MCRGetRecordHandler.VERB.equals(verb[0]))
+            handler = new MCRGetRecordHandler(this);
+        else if (MCRListMetadataFormatsHandler.VERB.equals(verb[0]))
+            handler = new MCRListMetadataFormatsHandler(this);
+        else if (MCRListSetsHandler.VERB.equals(verb[0]))
+            handler = new MCRListSetsHandler(this);
+        else if (MCRListRecordsHandler.VERB.equals(verb[0]))
+            handler = new MCRListRecordsHandler(this);
+        else if (MCRListIdentifiersHandler.VERB.equals(verb[0]))
+            handler = new MCRListIdentifiersHandler(this);
+        else
+            handler = new MCRBadVerbHandler(this, "Bad verb: " + verb[0]);
 
-  List<MCRMetadataFormat> getMetadataFormats()
-  { return metadataFormats; }
+        Document response = handler.handle(request.getParameterMap());
+
+        job.getResponse().setContentType("text/xml");
+        XMLOutputter xout = new XMLOutputter();
+        xout.setFormat(Format.getPrettyFormat().setEncoding("UTF-8"));
+        xout.output(response, job.getResponse().getOutputStream());
+    }
+
+    private MCROAIAdapter adapter;
+
+    private String repositoryName;
+
+    private String repositoryIdentifier;
+
+    private String adminEmail;
+
+    private String earliestDatestamp;
+
+    private String recordSampleID;
+
+    private String deletedRecord;
+
+    private String myBaseURL;
+
+    private List<MCRMetadataFormat> metadataFormats = new ArrayList<MCRMetadataFormat>();
+
+    private String prefix;
+
+    String getPrefix() {
+        return prefix;
+    }
+
+    public void init() throws ServletException {
+        super.init();
+
+        MCRConfiguration config = MCRConfiguration.instance();
+        prefix = "MCR.OAIDataProvider." + getServletName() + ".";
+
+        repositoryName = config.getString(prefix + "RepositoryName");
+        repositoryIdentifier = config.getString(prefix + "RepositoryIdentifier");
+        adminEmail = config.getString(prefix + "AdminEmail");
+        earliestDatestamp = config.getString(prefix + "EarliestDatestamp");
+        recordSampleID = config.getString(prefix + "RecordSampleID");
+        deletedRecord = config.getString(prefix + "DeletedRecord");
+
+        adapter = (MCROAIAdapter) (config.getInstanceOf(prefix + "Adapter"));
+        adapter.init(prefix + "Adapter.");
+
+        String formats = config.getString(prefix + "MetadataFormats");
+        StringTokenizer st = new StringTokenizer(formats, ", ");
+        while (st.hasMoreTokens())
+            metadataFormats.add(MCRMetadataFormat.getFormat(st.nextToken()));
+    }
+
+    MCROAIAdapter getAdapter() {
+        return adapter;
+    }
+
+    String getRepositoryName() {
+        return repositoryName;
+    }
+
+    String getRepositoryIdentifier() {
+        return repositoryIdentifier;
+    }
+
+    String getOAIBaseURL() {
+        return myBaseURL;
+    }
+
+    String getEarliestDatestamp() {
+        return earliestDatestamp;
+    }
+
+    String getRecordSampleID() {
+        return recordSampleID;
+    }
+
+    String getDeletedRecord() {
+        return deletedRecord;
+    }
+
+    String getAdminEmail() {
+        return adminEmail;
+    }
+
+    List<MCRMetadataFormat> getMetadataFormats() {
+        return metadataFormats;
+    }
 }

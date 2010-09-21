@@ -47,100 +47,95 @@ import org.mycore.common.MCRConfiguration;
  *
  * @author Frank L\u00fctzenkirchen
  */
-class MCRMetadataFormat implements MCROAIConstants
-{
-  /** The metadata prefix */
-  private String prefix;
-  
-  /** The XML schema for this kind of metadata */
-  private String schema;
-  
-  /** The namespace for this kind of metadata */
-  private String namespace;
-  
-  /**
-   * Private constructor used in initialization
-   */
-  private MCRMetadataFormat( String prefix, String schema, String namespace )
-  {
-    this.prefix = prefix;
-    this.schema = schema;
-    this.namespace = namespace;
-  }
-  
-  /**
-   * Returns the unique metadata prefix, a string to specify the metadata format in OAI-PMH requests 
-   * issued to the repository. The prefix consists of any valid URI unreserved characters. 
-   * metadataPrefix arguments are used in ListRecords, ListIdentifiers, and GetRecord requests to retrieve records, 
-   * or the headers of records that include metadata in the format specified by the metadataPrefix 
-   */
-  public String getPrefix()
-  {
-    return prefix;
-  }
-  
-  public boolean equals( Object obj )
-  {
-    if( super.equals( obj ) ) 
-      return true;
-    else if( obj == null )
-      return false;
-    else if( ! ( obj instanceof MCRMetadataFormat ) )
-      return false;
-    else 
-      return ((MCRMetadataFormat)obj).namespace.equals( this.namespace );
-  }
+class MCRMetadataFormat implements MCROAIConstants {
+    /** The metadata prefix */
+    private String prefix;
 
-  public int hashCode()
-  {
-    return namespace.hashCode();
-  }
+    /** The XML schema for this kind of metadata */
+    private String schema;
 
-  /**
-   * Builds an xml representation of this metadata format, as returned by the ListMetadataFormats request.
-   */
-  Element buildXML()
-  {
-    Element metadataFormat = new Element( "metadataFormat", NS_OAI );
-    metadataFormat.addContent( new Element( "metadataPrefix"   , NS_OAI ).setText( prefix    ) );
-    metadataFormat.addContent( new Element( "schema"           , NS_OAI ).setText( schema    ) );
-    metadataFormat.addContent( new Element( "metadataNamespace", NS_OAI ).setText( namespace ) );
-    return metadataFormat;
-  }
-  
-  /**
-   * Maps a metadata prefix to its MCRMetadataFormat instance
-   */
-  private static Map<String,MCRMetadataFormat> map;
+    /** The namespace for this kind of metadata */
+    private String namespace;
 
-  /**
-   * Returns the metadata format defined for the given prefix.
-   */
-  static MCRMetadataFormat getFormat( String prefix )
-  {
-    return map.get( prefix );
-  }
-
-  static
-  {
-    map = new HashMap<String,MCRMetadataFormat>();
-    
-    String pre ="MCR.OAIDataProvider.MetadataFormat."; 
-    
-    MCRConfiguration config = MCRConfiguration.instance();
-    Properties formats = config.getProperties( pre );
-    
-    for( Iterator it = formats.keySet().iterator(); it.hasNext(); )
-    {
-      String key = (String)( it.next() );
-      if( ! key.endsWith( ".Schema" ) ) continue;
-      
-      String prefix = key.substring( pre.length(), key.indexOf( ".Schema" ) );
-      String schema = config.getString( key );
-      String ns     = config.getString( pre + prefix + ".Namespace" );
-      
-      MCRMetadataFormat format = new MCRMetadataFormat( prefix, schema, ns );
-      map.put( prefix, format );
+    /**
+     * Private constructor used in initialization
+     */
+    private MCRMetadataFormat(String prefix, String schema, String namespace) {
+        this.prefix = prefix;
+        this.schema = schema;
+        this.namespace = namespace;
     }
-  }
+
+    /**
+     * Returns the unique metadata prefix, a string to specify the metadata
+     * format in OAI-PMH requests issued to the repository. The prefix consists
+     * of any valid URI unreserved characters. metadataPrefix arguments are used
+     * in ListRecords, ListIdentifiers, and GetRecord requests to retrieve
+     * records, or the headers of records that include metadata in the format
+     * specified by the metadataPrefix
+     */
+    public String getPrefix() {
+        return prefix;
+    }
+
+    public boolean equals(Object obj) {
+        if (super.equals(obj))
+            return true;
+        else if (obj == null)
+            return false;
+        else if (!(obj instanceof MCRMetadataFormat))
+            return false;
+        else
+            return ((MCRMetadataFormat) obj).namespace.equals(this.namespace);
+    }
+
+    public int hashCode() {
+        return namespace.hashCode();
+    }
+
+    /**
+     * Builds an xml representation of this metadata format, as returned by the
+     * ListMetadataFormats request.
+     */
+    Element buildXML() {
+        Element metadataFormat = new Element("metadataFormat", NS_OAI);
+        metadataFormat.addContent(new Element("metadataPrefix", NS_OAI).setText(prefix));
+        metadataFormat.addContent(new Element("schema", NS_OAI).setText(schema));
+        metadataFormat.addContent(new Element("metadataNamespace", NS_OAI).setText(namespace));
+        return metadataFormat;
+    }
+
+    /**
+     * Maps a metadata prefix to its MCRMetadataFormat instance
+     */
+    private static Map<String, MCRMetadataFormat> map;
+
+    /**
+     * Returns the metadata format defined for the given prefix.
+     */
+    static MCRMetadataFormat getFormat(String prefix) {
+        return map.get(prefix);
+    }
+
+    static {
+        map = new HashMap<String, MCRMetadataFormat>();
+
+        String pre = "MCR.OAIDataProvider.MetadataFormat.";
+
+        MCRConfiguration config = MCRConfiguration.instance();
+        Properties formats = config.getProperties(pre);
+
+        for (Iterator it = formats.keySet().iterator(); it.hasNext();) {
+            String key = (String) (it.next());
+            if (!key.endsWith(".Schema"))
+                continue;
+
+            String prefix = key.substring(pre.length(), key.indexOf(".Schema"));
+            String schema = config.getString(key);
+            String ns = config.getString(pre + prefix + ".Namespace");
+
+            MCRMetadataFormat format = new MCRMetadataFormat(prefix, schema, ns);
+            map.put(prefix, format);
+        }
+    }
 }

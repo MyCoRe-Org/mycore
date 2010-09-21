@@ -42,80 +42,70 @@ import org.mycore.services.fieldquery.MCRQueryManager;
  * 
  * @author Frank L\u00fctzenkirchen
  */
-class MCRListSetsHandler extends MCRVerbHandler
-{
-  final static String VERB = "ListSets";
-  
-  void setAllowedParameters( Properties p )
-  {
-    p.setProperty( ARG_RESUMPTION_TOKEN, V_EXCLUSIVE );
-  }
-  
-  MCRListSetsHandler( MCROAIDataProvider provider )
-  {
-    super( provider );
-  }
+class MCRListSetsHandler extends MCRVerbHandler {
+    final static String VERB = "ListSets";
 
-  void handleRequest()
-  {
-    String resumptionToken = parms.getProperty( ARG_RESUMPTION_TOKEN );
-    if( resumptionToken != null )
-    {
-      addError( ERROR_BAD_RESUMPTION_TOKEN, "Bad resumption token: " + resumptionToken );
-      return;
-    }
-    
-    if( setURIs.isEmpty() )
-    {
-      addError( ERROR_NO_SET_HIERARCHY, "This repository does not provide sets" );
-      return;
-    }
-    
-    Set<String> setSpecs = new HashSet<String>();
-    List<Element> sets = new ArrayList<Element>();
-    for( String uri : setURIs )
-    {
-      Element resolved = MCRURIResolver.instance().resolve( uri );
-      for( Element set : (List<Element>)( resolved.getChildren( "set", NS_OAI ) ) )
-      {
-        String setSpec = set.getChildText( "setSpec", NS_OAI );
-        if( ! setSpecs.contains( setSpec ) ) sets.add( (Element)( set.clone() ) );
-      }
+    void setAllowedParameters(Properties p) {
+        p.setProperty(ARG_RESUMPTION_TOKEN, V_EXCLUSIVE);
     }
 
-    // Filter out empty sets
-    if( MCRConfiguration.instance().getBoolean( provider.getPrefix() + "FilterEmptySets", true ) )
-    {
-      setSpecs.clear();
-      for( Iterator<Element> it = sets.iterator(); it.hasNext(); )
-      {
-        Element set = it.next();
-        String setSpec = set.getChildText( "setSpec", NS_OAI );
-  
-        // Check parent set, if existing
-        if( setSpec.contains( ":" ) && ( setSpec.lastIndexOf( ":" ) > setSpec.indexOf( ":" ) ) )
-        {
-          String parentSetSpec = setSpec.substring( 0, setSpec.lastIndexOf( ":" ) );
-          // If parent set is empty, all child sets must be empty, too
-          if( ! setSpecs.contains( parentSetSpec ) ) 
-          {
-            it.remove();
-            continue;
-          }
+    MCRListSetsHandler(MCROAIDataProvider provider) {
+        super(provider);
+    }
+
+    void handleRequest() {
+        String resumptionToken = parms.getProperty(ARG_RESUMPTION_TOKEN);
+        if (resumptionToken != null) {
+            addError(ERROR_BAD_RESUMPTION_TOKEN, "Bad resumption token: " + resumptionToken);
+            return;
         }
-        
-        // Build a query to count results
-        MCRAndCondition query = new MCRAndCondition();
-        query.addChild( provider.getAdapter().buildSetCondition( setSpec ) );
-        if( restriction != null ) query.addChild( restriction );      
-        
-        if( MCRQueryManager.search( new MCRQuery( query ) ).getNumHits() == 0 )
-          it.remove();
-        else
-          setSpecs.add( setSpec );
-      }
+
+        if (setURIs.isEmpty()) {
+            addError(ERROR_NO_SET_HIERARCHY, "This repository does not provide sets");
+            return;
+        }
+
+        Set<String> setSpecs = new HashSet<String>();
+        List<Element> sets = new ArrayList<Element>();
+        for (String uri : setURIs) {
+            Element resolved = MCRURIResolver.instance().resolve(uri);
+            for (Element set : (List<Element>) (resolved.getChildren("set", NS_OAI))) {
+                String setSpec = set.getChildText("setSpec", NS_OAI);
+                if (!setSpecs.contains(setSpec))
+                    sets.add((Element) (set.clone()));
+            }
+        }
+
+        // Filter out empty sets
+        if (MCRConfiguration.instance().getBoolean(provider.getPrefix() + "FilterEmptySets", true)) {
+            setSpecs.clear();
+            for (Iterator<Element> it = sets.iterator(); it.hasNext();) {
+                Element set = it.next();
+                String setSpec = set.getChildText("setSpec", NS_OAI);
+
+                // Check parent set, if existing
+                if (setSpec.contains(":") && (setSpec.lastIndexOf(":") > setSpec.indexOf(":"))) {
+                    String parentSetSpec = setSpec.substring(0, setSpec.lastIndexOf(":"));
+                    // If parent set is empty, all child sets must be empty, too
+                    if (!setSpecs.contains(parentSetSpec)) {
+                        it.remove();
+                        continue;
+                    }
+                }
+
+                // Build a query to count results
+                MCRAndCondition query = new MCRAndCondition();
+                query.addChild(provider.getAdapter().buildSetCondition(setSpec));
+                if (restriction != null)
+                    query.addChild(restriction);
+
+                if (MCRQueryManager.search(new MCRQuery(query)).getNumHits() == 0)
+                    it.remove();
+                else
+                    setSpecs.add(setSpec);
+            }
+        }
+
+        output.addContent(sets);
     }
-    
-    output.addContent( sets );
-  }
 }

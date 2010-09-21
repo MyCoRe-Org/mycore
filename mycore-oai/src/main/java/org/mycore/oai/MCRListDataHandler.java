@@ -42,129 +42,115 @@ import org.mycore.services.fieldquery.MCRSortBy;
  * 
  * @author Frank L\u00fctzenkirchen
  */
-abstract class MCRListDataHandler extends MCRVerbHandler
-{
-  void setAllowedParameters( Properties p )
-  {
-    p.setProperty( ARG_METADATA_PREFIX,  V_REQUIRED  );
-    p.setProperty( ARG_FROM,             V_OPTIONAL  );
-    p.setProperty( ARG_UNTIL,            V_OPTIONAL  );
-    p.setProperty( ARG_SET,              V_OPTIONAL  );
-    p.setProperty( ARG_RESUMPTION_TOKEN, V_EXCLUSIVE );
-  }
-  
-  MCRListDataHandler( MCROAIDataProvider provider )
-  {
-    super( provider );
-  }
-
-  void handleRequest()
-  {
-    MCROAIResults oaires = null;
-    
-    String resumptionToken = parms.getProperty( ARG_RESUMPTION_TOKEN );
-    if( resumptionToken != null )
-    {
-      oaires = MCROAIResults.getResults( resumptionToken );
-      if( oaires == null )
-        addError( ERROR_BAD_RESUMPTION_TOKEN, "Bad resumption token: " + resumptionToken );
-      else
-        oaires.addHits( this, resumptionToken );
+abstract class MCRListDataHandler extends MCRVerbHandler {
+    void setAllowedParameters(Properties p) {
+        p.setProperty(ARG_METADATA_PREFIX, V_REQUIRED);
+        p.setProperty(ARG_FROM, V_OPTIONAL);
+        p.setProperty(ARG_UNTIL, V_OPTIONAL);
+        p.setProperty(ARG_SET, V_OPTIONAL);
+        p.setProperty(ARG_RESUMPTION_TOKEN, V_EXCLUSIVE);
     }
-    else
-    {
-      String metadataPrefix = parms.getProperty( ARG_METADATA_PREFIX );
-      MCRMetadataFormat metadataFormat = MCRMetadataFormat.getFormat( metadataPrefix );
-      if( ( metadataFormat == null ) || ( ! provider.getMetadataFormats().contains( metadataFormat ) ) )
-      {
-        String msg = "This metadata format is not supported by the repository: " + metadataPrefix;
-        addError( ERROR_CANNOT_DISSEMINATE_FORMAT, msg );
-        return;
-      }
-  
-      MCRConfiguration config = MCRConfiguration.instance();
 
-      MCRAndCondition queryCondition = new MCRAndCondition();
-      if( restriction != null ) queryCondition.addChild( restriction );
+    MCRListDataHandler(MCROAIDataProvider provider) {
+        super(provider);
+    }
 
-      String set = parms.getProperty( ARG_SET );
-      if( ( set != null )  )
-      {
-        if( setURIs.isEmpty() )
-        {
-          addError( ERROR_NO_SET_HIERARCHY, "This repository does not provide sets" );
-          return;
+    void handleRequest() {
+        MCROAIResults oaires = null;
+
+        String resumptionToken = parms.getProperty(ARG_RESUMPTION_TOKEN);
+        if (resumptionToken != null) {
+            oaires = MCROAIResults.getResults(resumptionToken);
+            if (oaires == null)
+                addError(ERROR_BAD_RESUMPTION_TOKEN, "Bad resumption token: " + resumptionToken);
+            else
+                oaires.addHits(this, resumptionToken);
+        } else {
+            String metadataPrefix = parms.getProperty(ARG_METADATA_PREFIX);
+            MCRMetadataFormat metadataFormat = MCRMetadataFormat.getFormat(metadataPrefix);
+            if ((metadataFormat == null) || (!provider.getMetadataFormats().contains(metadataFormat))) {
+                String msg = "This metadata format is not supported by the repository: " + metadataPrefix;
+                addError(ERROR_CANNOT_DISSEMINATE_FORMAT, msg);
+                return;
+            }
+
+            MCRConfiguration config = MCRConfiguration.instance();
+
+            MCRAndCondition queryCondition = new MCRAndCondition();
+            if (restriction != null)
+                queryCondition.addChild(restriction);
+
+            String set = parms.getProperty(ARG_SET);
+            if ((set != null)) {
+                if (setURIs.isEmpty()) {
+                    addError(ERROR_NO_SET_HIERARCHY, "This repository does not provide sets");
+                    return;
+                } else {
+                    queryCondition.addChild(provider.getAdapter().buildSetCondition(set));
+                }
+            }
+
+            String fieldFromUntil = config.getString(provider.getPrefix() + "Search.FromUntil");
+            MCRFieldDef dateField = MCRFieldDef.getDef(fieldFromUntil);
+
+            String from = parms.getProperty(ARG_FROM);
+            if ((from != null) && checkDate(from))
+                queryCondition.addChild(new MCRQueryCondition(dateField, ">=", from));
+
+            String until = parms.getProperty(ARG_UNTIL);
+            if ((until != null) && checkDate(until))
+                queryCondition.addChild(new MCRQueryCondition(dateField, "<=", until));
+
+            if ((from != null) && (until != null) && (from.compareTo(until) > 0))
+                addError(ERROR_BAD_ARGUMENT, "The 'from' date must be less or equal the 'until' date");
+
+            if (hasErrors())
+                return;
+
+            LOGGER.info("Searching for " + queryCondition.toString());
+
+            MCRQuery query = new MCRQuery(queryCondition);
+
+            List<MCRSortBy> sortBy = new ArrayList<MCRSortBy>();
+            String searchSortBy = config.getString(provider.getPrefix() + "Search.SortBy", null);
+            if (searchSortBy != null) {
+                for (StringTokenizer st = new StringTokenizer(searchSortBy, ",;:"); st.hasMoreTokens();) {
+                    String token = st.nextToken().trim();
+                    MCRFieldDef field = MCRFieldDef.getDef(token.split(" ")[0]);
+                    boolean order = "ascending".equalsIgnoreCase(token.split(" ")[1]);
+                    sortBy.add(new MCRSortBy(field, order));
+                }
+                query.setSortBy(sortBy);
+            }
+
+            MCRResults results = MCRQueryManager.search(query);
+            oaires = new MCROAIResults(results, metadataFormat, provider);
+            if (!hasErrors())
+                oaires.addHits(this);
         }
-        else
-        {
-          queryCondition.addChild( provider.getAdapter().buildSetCondition( set ) );
-        }
-      }
-      
-      String fieldFromUntil = config.getString( provider.getPrefix() + "Search.FromUntil" );
-      MCRFieldDef dateField = MCRFieldDef.getDef( fieldFromUntil ); 
-      
-      String from = parms.getProperty( ARG_FROM );
-      if( ( from != null ) && checkDate( from ) )
-        queryCondition.addChild( new MCRQueryCondition( dateField, ">=", from ) );
-   
-      String until = parms.getProperty( ARG_UNTIL );
-      if( ( until != null ) && checkDate( until ) )
-        queryCondition.addChild( new MCRQueryCondition( dateField, "<=", until ) );
-      
-      if( ( from != null ) && ( until != null ) && ( from.compareTo( until ) > 0 ) )
-        addError( ERROR_BAD_ARGUMENT, "The 'from' date must be less or equal the 'until' date" );
-        
-      if( hasErrors() ) return;
-  
-      LOGGER.info( "Searching for " + queryCondition.toString() );
-      
-      MCRQuery query = new MCRQuery( queryCondition );
-      
-      List<MCRSortBy> sortBy = new ArrayList<MCRSortBy>();
-      String searchSortBy = config.getString( provider.getPrefix() + "Search.SortBy", null );
-      if( searchSortBy != null )
-      {
-        for( StringTokenizer st = new StringTokenizer( searchSortBy, ",;:" ); st.hasMoreTokens(); )
-        {
-          String token = st.nextToken().trim();
-          MCRFieldDef field = MCRFieldDef.getDef( token.split(" ")[0] );
-          boolean order = "ascending".equalsIgnoreCase( token.split(" ")[1] );
-          sortBy.add( new MCRSortBy( field, order ) );
-        }
-        query.setSortBy( sortBy );
-      }
-      
-      MCRResults results = MCRQueryManager.search( query );
-      oaires = new MCROAIResults( results, metadataFormat, provider );
-      if( ! hasErrors() ) oaires.addHits( this );
-    }
-  }
-  
-  protected abstract void addHit( String ID, MCRMetadataFormat format );
-  
-  protected boolean checkDate( String value )
-  {
-    if( value.length() != GRANULARITY.length() )
-    {
-      addError( ERROR_BAD_ARGUMENT, "Bad date syntax: " + value );
-      return false;
-    }
-    
-    try{ DATESTAMP_FORMAT.parse( value ); }
-    catch( Exception ex )
-    {  
-      addError( ERROR_BAD_ARGUMENT, "Cannot parse date, bad syntax: " + value );
-      return false;
     }
 
-    String earliest = provider.getEarliestDatestamp();
-    if( value.compareTo( earliest ) < 0 ) 
-    {
-      addError( ERROR_NO_RECORDS_MATCH, "Earliest datestamp is " + earliest );
-      return false;
+    protected abstract void addHit(String ID, MCRMetadataFormat format);
+
+    protected boolean checkDate(String value) {
+        if (value.length() != GRANULARITY.length()) {
+            addError(ERROR_BAD_ARGUMENT, "Bad date syntax: " + value);
+            return false;
+        }
+
+        try {
+            DATESTAMP_FORMAT.parse(value);
+        } catch (Exception ex) {
+            addError(ERROR_BAD_ARGUMENT, "Cannot parse date, bad syntax: " + value);
+            return false;
+        }
+
+        String earliest = provider.getEarliestDatestamp();
+        if (value.compareTo(earliest) < 0) {
+            addError(ERROR_NO_RECORDS_MATCH, "Earliest datestamp is " + earliest);
+            return false;
+        }
+
+        return true;
     }
-    
-    return true;
-  }
 }
