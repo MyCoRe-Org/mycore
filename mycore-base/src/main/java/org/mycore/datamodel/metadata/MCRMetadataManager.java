@@ -27,7 +27,6 @@ import java.io.File;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
 import org.jdom.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
@@ -623,9 +622,9 @@ public final class MCRMetadataManager {
                 numheritablemd++;
                 try {
                     final MCRMetaElement melmold = mdold.getMetadataElement(melm.getTag());
-                    final Element jelm = melm.createXML(false);
-                    final Element jelmold = melmold.createXML(false);
-                    if (!MCRXMLHelper.deepEqual(new Document(jelmold), new Document(jelm))) {
+                    final Element jelm = melm.createXML(true);
+                    final Element jelmold = melmold.createXML(true);
+                    if (!MCRXMLHelper.deepEqual(jelmold, jelm)) {
                         updatechildren = true;
                         break;
                     }
@@ -735,46 +734,19 @@ public final class MCRMetadataManager {
      * Updates the metadata of the stored dataset and replace the
      * inherited data from the parent.
      * 
-     * @param child_id
+     * @param childId
      *            the MCRObjectID of the parent as string
      * @exception MCRPersistenceException
      *                if a persistence problem is occurred
      */
-    private static final void updateInheritedMetadata(final MCRObjectID child_id) throws MCRPersistenceException {
-        LOGGER.debug("Update metadata from Child " + child_id.toString());
-        final MCRObject child = MCRMetadataManager.retrieveMCRObject(child_id);
-
-        // delete the old inherited data from all metadata elements
-        for (int i = 0; i < child.getMetadata().size(); i++) {
-            child.getMetadata().getMetadataElement(i).removeInheritedMetadata();
-
-            if (child.getMetadata().getMetadataElement(i).size() == 0) {
-                child.getMetadata().removeMetadataElement(i);
-                i--;
-            }
-        }
-
-        // import all herited matadata from the parent
-        final MCRObjectID parent_id = child.getStructure().getParentID();
-
-        if (parent_id != null) {
-            LOGGER.debug("Parent ID = " + parent_id.toString());
-
-            try {
-                final MCRObject parent = MCRMetadataManager.retrieveMCRObject(parent_id);
-                child.getMetadata().appendMetadata(parent.getMetadata().getHeritableMetadata());
-            } catch (final Exception e) {
-                LOGGER.error(MCRException.getStackTraceAsString(e));
-                LOGGER.error("Error while merging metadata in this object.");
-            }
-        }
-
-        // update this dataset
-        MCRMetadataManager.fireUpdateEvent(child);
-
-        // update all children
-        for (int i = 0; i < child.getStructure().getChildSize(); i++) {
-            MCRMetadataManager.updateInheritedMetadata(child.getStructure().getChild(i).getXLinkHrefID());
+    private static final void updateInheritedMetadata(final MCRObjectID childId) throws MCRPersistenceException {
+        LOGGER.debug("Update metadata from Child " + childId);
+        final MCRObject child = MCRMetadataManager.retrieveMCRObject(childId);
+        try {
+            update(child);
+        } catch (MCRActiveLinkException e) {
+            //should never happen, as the object is unchanged
+            throw new MCRPersistenceException("Error while updating inherited metadata", e);
         }
     }
 }
