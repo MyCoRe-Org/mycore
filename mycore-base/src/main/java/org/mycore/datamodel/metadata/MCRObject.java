@@ -166,14 +166,19 @@ final public class MCRObject extends MCRBase {
         // get the structure data of the object
         org.jdom.Element jdom_element_root = jdom_document.getRootElement();
         org.jdom.Element jdom_element = jdom_element_root.getChild("structure");
-        mcr_struct.setFromDOM(jdom_element);
+        if(jdom_element != null){
+            mcr_struct.setFromDOM(jdom_element);
+        }
     }
 
     private void setMetadata() {
         // get the metadata of the object
         org.jdom.Element jdom_element_root = jdom_document.getRootElement();
         org.jdom.Element jdom_element = jdom_element_root.getChild("metadata");
-        mcr_metadata.setFromDOM(jdom_element);
+        
+        if(jdom_element != null){
+            mcr_metadata.setFromDOM(jdom_element);
+        }
     }
 
     private void setService() {
@@ -181,7 +186,9 @@ final public class MCRObject extends MCRBase {
         // get the service data of the object
         org.jdom.Element jdom_element_root = jdom_document.getRootElement();
         jdom_element = jdom_element_root.getChild("service");
-        mcr_service.setFromDOM(jdom_element);
+        if(jdom_element != null){
+            mcr_service.setFromDOM(jdom_element);
+        }
     }
 
     /**
