@@ -29,11 +29,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
-import org.jdom.Namespace;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRUtils;
 
 /**
  * This class implements all methode for handling one object metadata part. This
@@ -46,9 +44,7 @@ import org.mycore.common.MCRUtils;
  */
 public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
     // common data
-    private String default_lang = null;
-
-    private boolean herited_xml = false;
+    private boolean herited_xml = true;
 
     // metadata list
     private final ArrayList<MCRMetaElement> meta_list;
@@ -62,8 +58,7 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
      *                a special exception for configuartion data
      */
     public MCRObjectMetadata() throws MCRConfigurationException {
-        default_lang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang");
-        herited_xml = MCRConfiguration.instance().getBoolean("MCR.Metadata.HeritedForXML", false);
+        herited_xml = MCRConfiguration.instance().getBoolean("MCR.Metadata.HeritedForXML", true);
         meta_list = new ArrayList<MCRMetaElement>();
     }
 
@@ -243,12 +238,6 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
      *                if a problem is occured
      */
     public final void setFromDOM(org.jdom.Element element) throws MCRException {
-        String temp_lang = element.getAttributeValue("lang");
-
-        if (temp_lang != null && (temp_lang = temp_lang.trim()).length() != 0) {
-            default_lang = temp_lang;
-        }
-
         @SuppressWarnings("unchecked")
         List<Element> elements_list = element.getChildren();
 
@@ -272,8 +261,6 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
         }
 
         Element elm = new Element("metadata");
-        elm.setAttribute("lang", default_lang, Namespace.XML_NAMESPACE);
-
         for (MCRMetaElement e : this) {
             elm.addContent(e.createXML(herited_xml));
         }
@@ -294,10 +281,6 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
      */
     public final boolean isValid() {
         if (meta_list.size() == 0) {
-            return false;
-        }
-
-        if (!MCRUtils.isSupportedLang(default_lang)) {
             return false;
         }
 

@@ -54,7 +54,7 @@
             </xs:element>
           </xsl:for-each>
         </xs:all>
-        <xs:attribute ref="xml:lang" />
+        <xs:attribute ref="xml:lang" use="optional"/>
       </xs:complexType>
     </xs:element>
   </xsl:template>

@@ -110,7 +110,7 @@
         
         <xsl:value-of select="$newline"/>
       </xsd:all>
-      <xsd:attribute ref="xml:lang"/>
+      <xsd:attribute ref="xml:lang" use="optional"/>
     </xsd:complexType>
     
   </xsl:template>
