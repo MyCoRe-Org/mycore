@@ -55,7 +55,7 @@ public class MCROAIResults implements MCROAIConstants
 
   static
   {
-    String prefix = "MIL.OAIDataProvider.ResumptionTokens.";
+    String prefix = "MCR.OAIDataProvider.ResumptionTokens.";
     partitionSize = MCRConfiguration.instance().getInt( prefix + "PartitionSize", 50 );
     maxAge = MCRConfiguration.instance().getInt( prefix + "MaxAge", 30 ) * 60 * 1000;
 

@@ -116,7 +116,7 @@ public class MCROAIDataProvider extends MCRServlet
     super.init();
     
     MCRConfiguration config = MCRConfiguration.instance();
-    prefix = "MIL.OAIDataProvider." + getServletName() + ".";
+    prefix = "MCR.OAIDataProvider." + getServletName() + ".";
     
     repositoryName       = config.getString( prefix + "RepositoryName" );
     repositoryIdentifier = config.getString( prefix + "RepositoryIdentifier" );
