@@ -219,7 +219,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * 
      * @return the size of the ArrayList of language dependence texts
      */
-    public final int TextSize() {
+    public final int textSize() {
         return texts.size();
     }
 
@@ -529,7 +529,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * This method make a clone of this class.
      */
     @Override
-    public Object clone() {
+    public MCRMetaHistoryDate clone() {
         MCRMetaHistoryDate out = new MCRMetaHistoryDate(subtag, lang, type, inherited);
         for (int i = 0; i < texts.size(); i++) {
             MCRMetaHistoryDateText h = texts.get(i);

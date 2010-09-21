@@ -241,7 +241,7 @@ public class MCRMetaISBN extends MCRMetaDefault {
      * This method make a clone of this class.
      */
     @Override
-    public Object clone() {
+    public MCRMetaISBN clone() {
         return new MCRMetaISBN(subtag, inherited, isbn);
     }
 

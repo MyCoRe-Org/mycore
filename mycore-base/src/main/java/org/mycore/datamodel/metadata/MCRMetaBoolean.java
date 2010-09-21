@@ -134,7 +134,7 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
      * @param set_value
      *            the boolean value (true or false) as string
      */
-    public final void setValue(String set_value) {
+    public void setValue(String set_value) {
         set_value = set_value.toLowerCase().trim();
 
         if (set_value != null) {
@@ -174,7 +174,7 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
      * @param set_value
      *            the boolean value
      */
-    public final void setValue(boolean set_value) {
+    public void setValue(boolean set_value) {
         value = set_value;
     }
 
@@ -183,7 +183,7 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
      * 
      * @return the value as Boolean
      */
-    public final boolean getValue() {
+    public boolean getValue() {
         return value;
     }
 
@@ -192,7 +192,7 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
      * 
      * @return the value as String
      */
-    public final String getValueToString() {
+    public String getValueToString() {
         return String.valueOf(value);
     }
 
@@ -204,7 +204,7 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
      *            a relevant JDOM element for the metadata
      */
     @Override
-    public final void setFromDOM(org.jdom.Element element) {
+    public void setFromDOM(org.jdom.Element element) {
         super.setFromDOM(element);
 
         String temp_value = element.getText().trim();
@@ -227,7 +227,7 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
      * @return a JDOM Element with the XML MCRBoolean part
      */
     @Override
-    public final org.jdom.Element createXML() throws MCRException {
+    public Element createXML() throws MCRException {
         Element elm = super.createXML();
         elm.addContent(getValueToString());
         return elm;
@@ -237,7 +237,7 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
      * This method make a clone of this class.
      */
     @Override
-    public final Object clone() {
+    public MCRMetaBoolean clone() {
         return new MCRMetaBoolean(subtag, lang, type, inherited, value);
     }
 
@@ -245,7 +245,7 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
      * This method put debug data to the logger (for the debug mode).
      */
     @Override
-    public final void debug() {
+    public void debug() {
         super.debugDefault();
         LOGGER.debug("Value              = " + Boolean.toString(value));
         LOGGER.debug(" ");

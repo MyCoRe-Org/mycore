@@ -208,11 +208,12 @@ final public class MCRMetaIFS extends MCRMetaDefault {
         return true;
     }
 
-    /**
-     * This method make a NOT clone of this class. It is an empty method.
-     */
     @Override
-    public final Object clone() {
-        return null;
+    public final MCRMetaIFS clone() {
+        MCRMetaIFS ifs = new MCRMetaIFS(getSubTag(), getLang(), getSourcePath());
+        ifs.setMainDoc(getMainDoc());
+        ifs.setIFSID(getIFSID());
+        ifs.setType(getType());
+        return ifs;
     }
 }

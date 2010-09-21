@@ -213,7 +213,7 @@ final public class MCRMetaInstitutionName extends MCRMetaDefault {
      * This method make a clone of this class.
      */
     @Override
-    public final Object clone() {
+    public final MCRMetaInstitutionName clone() {
         return new MCRMetaInstitutionName(subtag, lang, type, inherited, fullname, nickname, property);
     }
 }

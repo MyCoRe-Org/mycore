@@ -202,7 +202,7 @@ public class MCRMetaClassification extends MCRMetaDefault {
      * This method make a clone of this class.
      */
     @Override
-    public Object clone() {
+    public MCRMetaClassification clone() {
         return new MCRMetaClassification(subtag, inherited, type, classid, categid);
     }
 

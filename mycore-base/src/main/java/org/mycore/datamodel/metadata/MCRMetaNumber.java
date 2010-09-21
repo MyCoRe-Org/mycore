@@ -356,7 +356,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      * This method make a clone of this class.
      */
     @Override
-    public final Object clone() {
+    public final MCRMetaNumber clone() {
         return new MCRMetaNumber(subtag, lang, inherited, dimension, measurement, number);
     }
 

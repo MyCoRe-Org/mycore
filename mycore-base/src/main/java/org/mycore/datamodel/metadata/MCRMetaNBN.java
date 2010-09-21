@@ -175,7 +175,7 @@ public class MCRMetaNBN extends MCRMetaDefault {
      * This method make a clone of this class.
      */
     @Override
-    public Object clone() {
+    public MCRMetaNBN clone() {
         return new MCRMetaNBN(subtag, inherited, nbn);
     }
 

@@ -236,7 +236,7 @@ public class MCRMetaLangText extends MCRMetaDefault {
      * This method make a clone of this class.
      */
     @Override
-    public Object clone() {
+    public MCRMetaLangText clone() {
         return new MCRMetaLangText(subtag, lang, type, inherited, form, text);
     }
 

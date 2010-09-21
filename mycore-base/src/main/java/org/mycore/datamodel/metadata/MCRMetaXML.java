@@ -127,7 +127,7 @@ public class MCRMetaXML extends MCRMetaDefault {
      * This method make a clone of this class.
      */
     @Override
-    public Object clone() {
+    public MCRMetaXML clone() {
         MCRMetaXML out = new MCRMetaXML();
         out.setFromDOM(createXML());
         return out;

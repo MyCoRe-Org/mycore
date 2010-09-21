@@ -397,7 +397,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
      * @see java.lang.Object#clone()
      */
     @Override
-    public Object clone() {
+    public MCRMetaISO8601Date clone() {
         MCRMetaISO8601Date out = new MCRMetaISO8601Date();
         out.setFromDOM((Element) createXML().clone());
         return out;

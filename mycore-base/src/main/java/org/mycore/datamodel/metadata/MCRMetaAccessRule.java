@@ -238,7 +238,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
      * This method make a clone of this class.
      */
     @Override
-    public Object clone() {
+    public MCRMetaAccessRule clone() {
         return new MCRMetaAccessRule(subtag, lang, type, inherited, permission, condition);
     }
 

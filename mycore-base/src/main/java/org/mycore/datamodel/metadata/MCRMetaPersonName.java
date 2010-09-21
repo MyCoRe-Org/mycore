@@ -338,7 +338,7 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
      * This method make a clone of this class.
      */
     @Override
-    public final Object clone() {
+    public final MCRMetaPersonName clone() {
         return new MCRMetaPersonName(subtag, lang, type, inherited, firstname, callname, surname, fullname, academic, peerage, prefix);
     }
 

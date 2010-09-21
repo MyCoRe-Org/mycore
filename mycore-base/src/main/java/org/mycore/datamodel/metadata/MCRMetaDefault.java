@@ -341,5 +341,5 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
     }
 
     @Override
-    public abstract Object clone();
+    public abstract MCRMetaInterface clone();
 }

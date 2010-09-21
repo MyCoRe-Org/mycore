@@ -325,7 +325,7 @@ final public class MCRMetaAddress extends MCRMetaDefault {
      * This method make a clone of this class.
      */
     @Override
-    public Object clone() {
+    public MCRMetaAddress clone() {
         return new MCRMetaAddress(subtag, DEFAULT_LANGUAGE, type, inherited, country, state, zipcode, city, street, number);
     }
 
