@@ -24,6 +24,7 @@
 package org.mycore.common.xml;
 
 import java.net.URI;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -225,7 +226,7 @@ public class MCRXMLHelper {
 
         public static boolean equivalent(DocType d1, DocType d2) {
             return (d1.getPublicID() == d2.getPublicID() || d1.getPublicID().equals(d2.getPublicID()))
-                    && (d1.getSystemID() == d2.getSystemID() || d1.getSystemID().equals(d2.getSystemID()));
+                && (d1.getSystemID() == d2.getSystemID() || d1.getSystemID().equals(d2.getSystemID()));
         }
 
         public static boolean equivalent(Comment c1, Comment c2) {
@@ -242,12 +243,6 @@ public class MCRXMLHelper {
             return t1.equals(t2) && d1.equals(d2);
         }
 
-        public static boolean equivalent(Attribute a1, Attribute a2) {
-            String v1 = a1.getValue();
-            String v2 = a2.getValue();
-            return equivalentName(a1, a2) && v1.equals(v2);
-        }
-
         public static boolean equivalentAttributes(Element e1, Element e2) {
             @SuppressWarnings("unchecked")
             List<Attribute> aList1 = e1.getAttributes();
@@ -256,16 +251,14 @@ public class MCRXMLHelper {
             if (aList1.size() != aList2.size()) {
                 return false;
             }
-            Iterator<Attribute> i1 = aList1.iterator();
-            Iterator<Attribute> i2 = aList2.iterator();
-            while (i1.hasNext()) {
-                Attribute a1 = i1.next();
-                Attribute a2 = i2.next();
-                if (!equivalent(a1, a2)) {
-                    return false;
-                }
+            HashSet<String> orig = new HashSet<String>(aList1.size());
+            for (Attribute attr : aList1) {
+                orig.add(attr.toString());
             }
-            return true;
+            for (Attribute attr : aList1) {
+                orig.remove(attr.toString());
+            }
+            return orig.size() == 0;
         }
 
         @SuppressWarnings("unchecked")
@@ -308,16 +301,6 @@ public class MCRXMLHelper {
 
             Namespace ns2 = e2.getNamespace();
             String localName2 = e2.getName();
-
-            return ns1.equals(ns2) && localName1.equals(localName2);
-        }
-
-        public static boolean equivalentName(Attribute a1, Attribute a2) {
-            Namespace ns1 = a1.getNamespace();
-            String localName1 = a1.getName();
-
-            Namespace ns2 = a2.getNamespace();
-            String localName2 = a2.getName();
 
             return ns1.equals(ns2) && localName1.equals(localName2);
         }
