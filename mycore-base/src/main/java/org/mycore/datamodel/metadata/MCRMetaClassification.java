@@ -196,11 +196,11 @@ public class MCRMetaClassification extends MCRMetaDefault {
         if (!super.isValid()) {
             return false;
         }
-        if (classid != null && classid.length() > 0) {
+        if (classid == null || classid.length() == 0) {
             LOGGER.warn(getSubTag() + ": classid is null or empty");
             return false;
         }
-        if (categid != null && categid.length() > 0) {
+        if (categid == null || categid.length() == 0) {
             LOGGER.warn(getSubTag() + ": categid is null or empty");
             return false;
         }
