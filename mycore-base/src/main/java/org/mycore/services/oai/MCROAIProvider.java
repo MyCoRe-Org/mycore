@@ -494,12 +494,7 @@ public class MCROAIProvider extends MCRServlet {
                         } else {
                             Element eRecord = new Element("record", ns);
                             eRecord.addContent(eHeader);
-                            MCRBase object = null; 
-                            if(identifier[3].indexOf("_derivate_") != -1){
-                                object = MCRMetadataManager.retrieveMCRDerivate(new MCRObjectID(identifier[3]));
-                            }else {
-                                object = MCRMetadataManager.retrieveMCRObject(new MCRObjectID(identifier[3]));   
-                            }
+                            MCRBase object = MCRMetadataManager.retrieve(new MCRObjectID(identifier[3]));
                             Element eMetadata = (Element) object.createXML().getRootElement().clone();
                             eRecord.addContent(eMetadata);
                             list.addContent(eRecord);
