@@ -27,7 +27,20 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * Implements the ListMetadataFormats request
+ * Implements the ListMetadataFormats request as defined in section 4.4 of the OAI-PMH specification.
+ * This verb is used to retrieve the metadata formats available from a repository. 
+ * An optional argument restricts the request to the formats available for a specific item.
+ * 
+ * When no item identifier is given in the request, this just returns all the metadata formats 
+ * configured for the data provider instance.
+ * 
+ * When the optional item identifier is given in the request, 
+ * the MCROAIAdapter's listMetadataFormats method is called 
+ * to decide which formats are available for that identifier.  
+ * 
+ * @see MCRMetadataFormat
+ * @see MCROAIDataProvider#getMetadataFormats()
+ * @see MCROAIAdapter#listMetadataFormats(String, List)
  * 
  * @author Frank L\u00fctzenkirchen
  */
