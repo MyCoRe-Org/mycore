@@ -66,7 +66,7 @@ public class MCRMetaXMLTest extends MCRTestCase {
     }
 
     @Test
-    public void xmlRoundrip() {
+    public void xmlRoundrip() throws IOException {
         MCRMetaXML mXml = new MCRMetaXML("def.heading", "complete", 0);
         Element imported = new Element("heading");
         imported.setAttribute("lang", MCRMetaDefault.DEFAULT_LANGUAGE, Namespace.XML_NAMESPACE);
@@ -90,7 +90,14 @@ public class MCRMetaXMLTest extends MCRTestCase {
                 LOGGER.warn("Failure printing xml result", e);
             }
         }
-        assertTrue(MCRXMLHelper.deepEqual(new Document(imported), new Document(exported)));
+        try {
+            assertTrue(MCRXMLHelper.deepEqual(new Document(imported), new Document(exported)));
+        } catch (AssertionError e) {
+            XMLOutputter out=new XMLOutputter(Format.getPrettyFormat());
+            out.output(imported, System.err);
+            out.output(exported, System.err);
+            throw e;
+        }
     }
 
 }

@@ -471,36 +471,20 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      */
     @Override
     public org.jdom.Element createXML() throws MCRException {
-        if (!isValid()) {
-            debug();
-            throw new MCRException("The content of MCRMetaHistoryDate is not valid.");
-        }
-
-        org.jdom.Element elm = new org.jdom.Element(subtag);
-        elm.setAttribute("lang", lang, org.jdom.Namespace.XML_NAMESPACE);
-        elm.setAttribute("inherited", Integer.toString(inherited));
+        Element elm = super.createXML();
         for (int i = 0; i < texts.size(); i++) {
             org.jdom.Element elmt = new org.jdom.Element("text");
             elmt.addContent(texts.get(i).getText());
             elmt.setAttribute("lang", texts.get(i).getLang(), org.jdom.Namespace.XML_NAMESPACE);
             elm.addContent(elmt);
         }
-        if (type != null && (type = type.trim()).length() != 0) {
-            elm.setAttribute("type", type);
-        }
-        if ((calendar = calendar.trim()).length() != 0) {
-            elm.addContent(new org.jdom.Element("calendar").addContent(calendar));
-        }
+        elm.addContent(new org.jdom.Element("calendar").addContent(calendar));
 
-        if (von != null) {
-            elm.addContent(new org.jdom.Element("ivon").addContent(Integer.toString(ivon)));
-            elm.addContent(new org.jdom.Element("von").addContent(getVonToGregorianString()));
-        }
+        elm.addContent(new org.jdom.Element("ivon").addContent(Integer.toString(ivon)));
+        elm.addContent(new org.jdom.Element("von").addContent(getVonToGregorianString()));
 
-        if (bis != null) {
-            elm.addContent(new org.jdom.Element("ibis").addContent(Integer.toString(ibis)));
-            elm.addContent(new org.jdom.Element("bis").addContent(getBisToGregorianString()));
-        }
+        elm.addContent(new org.jdom.Element("ibis").addContent(Integer.toString(ibis)));
+        elm.addContent(new org.jdom.Element("bis").addContent(getBisToGregorianString()));
         return elm;
     }
 

@@ -24,6 +24,7 @@
 package org.mycore.datamodel.metadata;
 
 import org.apache.log4j.Logger;
+import org.jdom.Element;
 import org.jdom.Namespace;
 import org.mycore.common.MCRException;
 
@@ -194,23 +195,10 @@ public class MCRMetaLangText extends MCRMetaDefault {
      */
     @Override
     public org.jdom.Element createXML() throws MCRException {
-        if (!isValid()) {
-            debug();
-            throw new MCRException("The content of MCRMetaLangText is not valid.");
-        }
-
-        org.jdom.Element elm = new org.jdom.Element(subtag);
-        elm.setAttribute("lang", lang, Namespace.XML_NAMESPACE);
-        elm.setAttribute("inherited", Integer.toString(inherited));
-
+        Element elm = super.createXML();
         if (form != null && (form = form.trim()).length() != 0) {
             elm.setAttribute("form", form);
         }
-
-        if (type != null && (type = type.trim()).length() != 0) {
-            elm.setAttribute("type", type);
-        }
-
         elm.addContent(text);
 
         return elm;

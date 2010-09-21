@@ -24,6 +24,8 @@
 package org.mycore.datamodel.metadata;
 
 import org.apache.log4j.Logger;
+import org.jdom.Element;
+import org.jdom.Namespace;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
@@ -121,27 +123,11 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      *
      * @exception MCRException if the set_subtag value is null or empty
      */
-    public MCRMetaDefault(String set_subtag, String default_lang, String set_type, int set_inherited)
-            throws MCRException {
-        lang = DEFAULT_LANGUAGE;
-        subtag = "";
-        type = "";
+    public MCRMetaDefault(String set_subtag, String default_lang, String set_type, int set_inherited) throws MCRException {
         setInherited(set_inherited);
-
-        if (set_subtag == null || (set_subtag = set_subtag.trim()).length() == 0) {
-            throw new MCRException("The set_subtag is null or empty.");
-        }
-
         subtag = set_subtag;
-
-        if (default_lang != null && (default_lang = default_lang.trim()).length() != 0) {
-            lang = default_lang;
-        }
-
-        if (set_type != null) {
-            type = set_type;
-        }
-
+        lang = default_lang;
+        type = set_type;
     }
 
     /**
@@ -152,11 +138,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      *            the inherited level value, if it is < 0, 0 was set
      */
     public final void setInherited(int value) {
-        if (value < 0) {
-            inherited = 0;
-        } else {
-            inherited = value;
-        }
+        inherited = value;
     }
 
     /**
@@ -170,9 +152,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      * This method decrements the inherited value with 1.
      */
     public final void decrementInherited() {
-        if (inherited > 0) {
-            inherited--;
-        }
+        inherited--;
     }
 
     /**
@@ -183,11 +163,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      *            the default language
      */
     public final void setLang(String default_lang) {
-        if (default_lang == null || (default_lang = default_lang.trim()).length() == 0) {
-            lang = DEFAULT_LANGUAGE;
-        } else {
-            lang = default_lang;
-        }
+        lang = default_lang;
     }
 
     /**
@@ -200,10 +176,6 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      *                if the set_subtag value is null or empty
      */
     public final void setSubTag(String set_subtag) throws MCRException {
-        if (set_subtag == null || (set_subtag = set_subtag.trim()).length() == 0) {
-            throw new MCRException("The set_subtag is null or empty.");
-        }
-
         subtag = set_subtag;
     }
 
@@ -215,10 +187,6 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      *            the optional type
      */
     public final void setType(String set_type) {
-        if (set_type == null) {
-            return;
-        }
-
         type = set_type;
     }
 
@@ -229,15 +197,6 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      */
     public final int getInherited() {
         return inherited;
-    }
-
-    /**
-     * This method get the inherited element.
-     * 
-     * @return the inherited flag as string
-     */
-    public final String getInheritedToString() {
-        return Integer.toString(inherited);
     }
 
     /**
@@ -320,7 +279,20 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML MCRMeta... part
      */
-    public abstract org.jdom.Element createXML() throws MCRException;
+    public Element createXML() throws MCRException {
+        if (!isValid()) {
+            debug();
+            throw new MCRException("The content of MCRMetaLangText is not valid.");
+        }
+        Element elm = new Element(subtag);
+        if (getLang() != null && getLang().length() > 0)
+            elm.setAttribute("lang", getLang(), Namespace.XML_NAMESPACE);
+        if (getType() != null && getType().length() > 0) {
+            elm.setAttribute("type", getType());
+        }
+        elm.setAttribute("inherited", Integer.toString(getInherited()));
+        return elm;
+    }
 
     /**
      * This method check the validation of the content of this class. The method
@@ -338,12 +310,12 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
             LOGGER.warn("No tag name defined!");
             return false;
         }
-        if (getLang()!=null && !MCRUtils.isSupportedLang(getLang())){
-            LOGGER.warn(getSubTag()+": language is not supported: "+getLang());
+        if (getLang() != null && !MCRUtils.isSupportedLang(getLang())) {
+            LOGGER.warn(getSubTag() + ": language is not supported: " + getLang());
             return false;
         }
-        if (getInherited()<0){
-            LOGGER.warn(getSubTag()+": inherited can not be smaller than '0': "+getInherited());
+        if (getInherited() < 0) {
+            LOGGER.warn(getSubTag() + ": inherited can not be smaller than '0': " + getInherited());
             return false;
         }
         return true;

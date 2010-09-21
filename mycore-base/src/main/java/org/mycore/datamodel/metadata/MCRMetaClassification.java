@@ -24,6 +24,7 @@
 package org.mycore.datamodel.metadata;
 
 import org.apache.log4j.Logger;
+import org.jdom.Element;
 import org.mycore.common.MCRException;
 
 /**
@@ -163,18 +164,8 @@ public class MCRMetaClassification extends MCRMetaDefault {
      * @return a JDOM Element with the XML MCRClassification part
      */
     @Override
-    public org.jdom.Element createXML() throws MCRException {
-        if (!isValid()) {
-            throw new MCRException("The content of MCRMetaClassification in subtag " + subtag + " is not valid.");
-        }
-
-        org.jdom.Element elm = new org.jdom.Element(subtag);
-
-        if (type != null && (type = type.trim()).length() != 0) {
-            elm.setAttribute("type", type);
-        }
-
-        elm.setAttribute("inherited", Integer.toString(inherited));
+    public Element createXML() throws MCRException {
+        Element elm = super.createXML();
         elm.setAttribute("classid", classid);
         elm.setAttribute("categid", categid);
 

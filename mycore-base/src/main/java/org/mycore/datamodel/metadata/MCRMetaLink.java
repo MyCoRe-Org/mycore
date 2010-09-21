@@ -26,6 +26,7 @@ package org.mycore.datamodel.metadata;
 import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 
 import org.apache.log4j.Logger;
+import org.jdom.Element;
 import org.mycore.common.MCRException;
 
 /**
@@ -333,16 +334,7 @@ public class MCRMetaLink extends MCRMetaDefault {
      */
     @Override
     public org.jdom.Element createXML() throws MCRException {
-        if (!isValid()) {
-            debug();
-            throw new MCRException("The content of MCRMetaLink is not valid.");
-        }
-
-        org.jdom.Element elm = new org.jdom.Element(subtag);
-        elm.setAttribute("inherited", Integer.toString(inherited));
-        if (type != null && (type = type.trim()).length() != 0) {
-            elm.setAttribute("type", type);
-        }
+        Element elm = super.createXML();
         elm.setAttribute("type", linktype, XLINK_NAMESPACE);
 
         if (linktype.equals("locator")) {

@@ -24,7 +24,7 @@
 package org.mycore.datamodel.metadata;
 
 import org.apache.log4j.Logger;
-import org.jdom.Namespace;
+import org.jdom.Element;
 import org.mycore.common.MCRException;
 
 /**
@@ -276,15 +276,6 @@ final public class MCRMetaNumber extends MCRMetaDefault {
     }
 
     /**
-     * This method get the number element as String.
-     * 
-     * @return the number String
-     */
-    public final String getNumberToString() {
-        return new Double(number).toString();
-    }
-
-    /**
      * This method read the XML input stream part from a DOM part for the
      * metadata of the document.
      * 
@@ -347,18 +338,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      */
     @Override
     public final org.jdom.Element createXML() throws MCRException {
-        if (!isValid()) {
-            throw new MCRException("The content of MCRMetaNumber is not valid.");
-        }
-
-        org.jdom.Element elm = new org.jdom.Element(subtag);
-        elm.setAttribute("lang", lang, Namespace.XML_NAMESPACE);
-        elm.setAttribute("inherited", Integer.toString(inherited));
-
-        if (type != null && (type = type.trim()).length() != 0) {
-            elm.setAttribute("type", type);
-        }
-
+        Element elm = super.createXML();
         if (dimension != null && (dimension = dimension.trim()).length() != 0) {
             elm.setAttribute("dimension", dimension);
         }
@@ -367,7 +347,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
             elm.setAttribute("measurement", measurement);
         }
 
-        elm.addContent(getNumberToString());
+        elm.addContent(String.valueOf(number));
 
         return elm;
     }

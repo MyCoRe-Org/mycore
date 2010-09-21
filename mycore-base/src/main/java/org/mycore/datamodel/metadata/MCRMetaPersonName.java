@@ -24,7 +24,7 @@
 package org.mycore.datamodel.metadata;
 
 import org.apache.log4j.Logger;
-import org.jdom.Namespace;
+import org.jdom.Element;
 import org.mycore.common.MCRException;
 
 /**
@@ -266,19 +266,7 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
      */
     @Override
     public final org.jdom.Element createXML() throws MCRException {
-        if (!isValid()) {
-            debug();
-            throw new MCRException("The content of MCRMetaPersonName is not valid.");
-        }
-
-        org.jdom.Element elm = new org.jdom.Element(subtag);
-        elm.setAttribute("lang", lang, Namespace.XML_NAMESPACE);
-        elm.setAttribute("inherited", Integer.toString(inherited));
-
-        if (type != null && (type = type.trim()).length() != 0) {
-            elm.setAttribute("type", type);
-        }
-
+        Element elm = super.createXML();
         if ((firstname = firstname.trim()).length() != 0) {
             elm.addContent(new org.jdom.Element("firstname").addContent(firstname));
         }

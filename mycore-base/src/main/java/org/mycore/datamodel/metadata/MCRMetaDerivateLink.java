@@ -49,8 +49,8 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
         }
     }
 
-    public org.jdom.Element createXML() throws MCRException {
-        org.jdom.Element elm = super.createXML();
+    public Element createXML() throws MCRException {
+        Element elm = super.createXML();
 
         Iterator<String> keys = map.keySet().iterator();
         while (keys.hasNext()) {

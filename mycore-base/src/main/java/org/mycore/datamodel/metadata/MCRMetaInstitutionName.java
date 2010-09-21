@@ -24,6 +24,7 @@
 package org.mycore.datamodel.metadata;
 
 import org.apache.log4j.Logger;
+import org.jdom.Element;
 import org.jdom.Namespace;
 import org.mycore.common.MCRException;
 
@@ -172,21 +173,8 @@ final public class MCRMetaInstitutionName extends MCRMetaDefault {
      */
     @Override
     public final org.jdom.Element createXML() throws MCRException {
-        if (!isValid()) {
-            throw new MCRException("The content of MCRMetaInstitutionName is not valid.");
-        }
-
-        org.jdom.Element elm = new org.jdom.Element(subtag);
-        elm.setAttribute("lang", lang, Namespace.XML_NAMESPACE);
-        elm.setAttribute("inherited", Integer.toString(inherited));
-
-        if (type != null && (type = type.trim()).length() != 0) {
-            elm.setAttribute("type", type);
-        }
-
-        if ((fullname = fullname.trim()).length() != 0) {
-            elm.addContent(new org.jdom.Element("fullname").addContent(fullname));
-        }
+        Element elm = super.createXML();
+        elm.addContent(new org.jdom.Element("fullname").addContent(fullname));
 
         if ((nickname = nickname.trim()).length() != 0) {
             elm.addContent(new org.jdom.Element("nickname").addContent(nickname));
@@ -215,7 +203,7 @@ final public class MCRMetaInstitutionName extends MCRMetaDefault {
             return false;
         }
         if ((fullname = fullname.trim()).length() == 0) {
-            LOGGER.warn(getSubTag() + ": sourcepath is null or empty");
+            LOGGER.warn(getSubTag() + ": fullname is null or empty");
             return false;
         }
 

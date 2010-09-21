@@ -170,19 +170,12 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
         if (!changed) {
             return (Element) export.clone();
         }
-        if (!isValid()) {
-            debug();
-            throw new MCRException("The content of MCRMetaISO8601Date is not valid.");
-        }
-        export = new org.jdom.Element(subtag, DEFAULT_NAMESPACE);
-        export.setAttribute("inherited", Integer.toString(inherited));
+        Element elm = super.createXML();
         if (!(isoFormat == null || isoFormat == IsoFormat.COMPLETE_HH_MM_SS_SSS)) {
-            export.setAttribute("format", isoFormat.toString());
+            elm.setAttribute("format", isoFormat.toString());
         }
-        if (type != null && (type = type.trim()).length() != 0) {
-            export.setAttribute("type", type);
-        }
-        export.setText(getISOString());
+        elm.setText(getISOString());
+        export = elm;
         changed = false;
         return (Element) export.clone();
     }

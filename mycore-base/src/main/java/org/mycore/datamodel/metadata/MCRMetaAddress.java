@@ -24,7 +24,7 @@
 package org.mycore.datamodel.metadata;
 
 import org.apache.log4j.Logger;
-import org.jdom.Namespace;
+import org.jdom.Element;
 import org.mycore.common.MCRException;
 
 /**
@@ -264,41 +264,14 @@ final public class MCRMetaAddress extends MCRMetaDefault {
      */
     @Override
     public final org.jdom.Element createXML() throws MCRException {
-        if (!isValid()) {
-            throw new MCRException("The content of MCRMetaAddress is not valid.");
-        }
+        Element elm = super.createXML();
 
-        org.jdom.Element elm = new org.jdom.Element(subtag);
-        elm.setAttribute("lang", lang, Namespace.XML_NAMESPACE);
-        elm.setAttribute("inherited", Integer.toString(inherited));
-
-        if (type != null && (type = type.trim()).length() != 0) {
-            elm.setAttribute("type", type);
-        }
-
-        if ((country = country.trim()).length() != 0) {
-            elm.addContent(new org.jdom.Element("country").addContent(country));
-        }
-
-        if ((state = state.trim()).length() != 0) {
-            elm.addContent(new org.jdom.Element("state").addContent(state));
-        }
-
-        if ((zipcode = zipcode.trim()).length() != 0) {
-            elm.addContent(new org.jdom.Element("zipcode").addContent(zipcode));
-        }
-
-        if ((city = city.trim()).length() != 0) {
-            elm.addContent(new org.jdom.Element("city").addContent(city));
-        }
-
-        if ((street = street.trim()).length() != 0) {
-            elm.addContent(new org.jdom.Element("street").addContent(street));
-        }
-
-        if ((number = number.trim()).length() != 0) {
-            elm.addContent(new org.jdom.Element("number").addContent(number));
-        }
+        elm.addContent(new Element("country").addContent(country));
+        elm.addContent(new Element("state").addContent(state));
+        elm.addContent(new Element("zipcode").addContent(zipcode));
+        elm.addContent(new Element("city").addContent(city));
+        elm.addContent(new Element("street").addContent(street));
+        elm.addContent(new Element("number").addContent(number));
 
         return elm;
     }

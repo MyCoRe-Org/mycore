@@ -24,6 +24,7 @@
 package org.mycore.datamodel.metadata;
 
 import org.apache.log4j.Logger;
+import org.jdom.Element;
 import org.mycore.common.MCRException;
 
 /**
@@ -172,12 +173,8 @@ final public class MCRMetaIFS extends MCRMetaDefault {
      * @return a JDOM Element with the XML MCRClassification part
      */
     @Override
-    public final org.jdom.Element createXML() throws MCRException {
-        if (!isValid()) {
-            throw new MCRException("The content is not valid.");
-        }
-
-        org.jdom.Element elm = new org.jdom.Element(subtag);
+    public final Element createXML() throws MCRException {
+        Element elm = super.createXML();
         if (sourcepath != null) {
             elm.setAttribute("sourcepath", sourcepath);
         }

@@ -41,13 +41,6 @@ public interface MCRMetaInterface extends Cloneable {
     public int getInherited();
 
     /**
-     * This method get the inherited element.
-     * 
-     * @return the inherited value as string
-     */
-    public String getInheritedToString();
-
-    /**
      * This method get the language element.
      * 
      * @return the language

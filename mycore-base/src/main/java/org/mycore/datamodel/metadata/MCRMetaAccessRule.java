@@ -24,6 +24,7 @@
 package org.mycore.datamodel.metadata;
 
 import org.apache.log4j.Logger;
+import org.jdom.Element;
 import org.mycore.common.MCRException;
 
 /**
@@ -197,17 +198,9 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
      */
     @Override
     public org.jdom.Element createXML() throws MCRException {
-        if (!isValid()) {
-            debug();
-            throw new MCRException("The content of MCRMetaAccessRule is not valid.");
-        }
-        org.jdom.Element elm = new org.jdom.Element(subtag);
-        elm.setAttribute("inherited", Integer.toString(inherited));
+        Element elm = super.createXML();
         if (permission != null && (permission = permission.trim()).length() != 0) {
             elm.setAttribute("permission", permission);
-        }
-        if (type != null && (type = type.trim()).length() != 0) {
-            elm.setAttribute("type", type);
         }
         condition.detach();
         elm.addContent(condition);

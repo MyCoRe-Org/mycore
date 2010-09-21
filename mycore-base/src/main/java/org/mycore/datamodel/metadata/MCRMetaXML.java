@@ -28,7 +28,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jdom.Content;
-import org.jdom.Namespace;
+import org.jdom.Element;
 import org.mycore.common.MCRException;
 
 /**
@@ -83,18 +83,7 @@ public class MCRMetaXML extends MCRMetaDefault {
      */
     @Override
     public org.jdom.Element createXML() throws MCRException {
-        if (!isValid()) {
-            debug();
-            throw new MCRException("The content of MCRMetaXML is not valid.");
-        }
-
-        org.jdom.Element elm = new org.jdom.Element(subtag);
-        elm.setAttribute("lang", lang, Namespace.XML_NAMESPACE);
-        elm.setAttribute("inherited", Integer.toString(inherited));
-
-        if (type != null && (type = type.trim()).length() != 0) {
-            elm.setAttribute("type", type);
-        }
+        Element elm = super.createXML();
         List<Content> addedContent = new ArrayList<Content>(content.size());
         cloneListContent(addedContent, content);
         elm.addContent(addedContent);
