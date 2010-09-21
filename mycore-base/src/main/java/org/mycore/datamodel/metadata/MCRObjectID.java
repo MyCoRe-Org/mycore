@@ -47,7 +47,7 @@ public final class MCRObjectID {
     public static final int MAX_LENGTH = 64;
 
     // configuration values
-    protected static MCRConfiguration CONFIG = MCRConfiguration.instance();;
+    private static final MCRConfiguration CONFIG = MCRConfiguration.instance();;
 
     // counter for the next IDs per project base ID
     private static HashMap<String, Integer> lastnumber = new HashMap<String, Integer>();

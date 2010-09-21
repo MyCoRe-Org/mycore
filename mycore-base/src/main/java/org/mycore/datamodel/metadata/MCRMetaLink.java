@@ -412,7 +412,7 @@ public class MCRMetaLink extends MCRMetaDefault {
      * This method make a clone of this class.
      */
     @Override
-    public final Object clone() {
+    public final MCRMetaLink clone() {
         MCRMetaLink out = new MCRMetaLink(subtag, lang, inherited);
         out.linktype = linktype;
         out.title = title;

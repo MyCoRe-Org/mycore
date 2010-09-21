@@ -47,7 +47,7 @@ import com.ibm.icu.util.GregorianCalendar;
 public class MCRMetaHistoryDate extends MCRMetaDefault {
 
     /** Logger */
-    protected static Logger LOGGER = Logger.getLogger(MCRMetaHistoryDate.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(MCRMetaHistoryDate.class);
 
     /** The maximal length of 'text' */
     public static final int MCRHISTORYDATE_MAX_TEXT = 512;

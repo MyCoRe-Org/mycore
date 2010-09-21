@@ -45,7 +45,7 @@ import org.mycore.common.MCRException;
  * @author Mathias Hegner
  * @version $Revision$ $Date$
  */
-public class MCRMetaElement implements Iterable<MCRMetaInterface> {
+public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
     // common data
     protected final static MCRConfiguration CONFIG = MCRConfiguration.instance();
 

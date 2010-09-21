@@ -180,7 +180,7 @@ public class MCRObjectStructure {
         int n = children.size();
 
         for (i = 0; i < n; ++i) {
-            if ((children.get(i)).getXLinkHref().equals(href)) {
+            if ((children.get(i)).getXLinkHrefID().equals(href)) {
                 return false;
             }
         }
