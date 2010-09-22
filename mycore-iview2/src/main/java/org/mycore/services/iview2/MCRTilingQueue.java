@@ -9,6 +9,7 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Query;
@@ -26,6 +27,8 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
 
     private static Logger LOGGER = Logger.getLogger(MCRTilingQueue.class);
 
+    private final ReentrantLock pollLock;
+
     private boolean running;
 
     private MCRTilingQueue() {
@@ -34,6 +37,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         StalledJobScheduler = Executors.newSingleThreadScheduledExecutor();
         StalledJobScheduler.scheduleAtFixedRate(MCRStalledJobResetter.getInstance(), waitTime, waitTime, TimeUnit.SECONDS);
         running = true;
+        pollLock = new ReentrantLock();
         MCRShutdownHandler.getInstance().addCloseable(this);
     }
 
@@ -43,18 +47,23 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         return instance;
     }
 
-    public synchronized MCRTileJob poll() {
+    public MCRTileJob poll() {
         if (!running)
             return null;
-        MCRTileJob job = getElement();
-        if (job != null) {
-            job.setStart(new Date(System.currentTimeMillis()));
-            job.setStatus(MCRJobState.PROCESS);
-            if (!updateJob(job)) {
-                job = null;
+        try {
+            pollLock.lock();
+            MCRTileJob job = getElement();
+            if (job != null) {
+                job.setStart(new Date(System.currentTimeMillis()));
+                job.setStatus(MCRJobState.PROCESS);
+                if (!updateJob(job)) {
+                    job = null;
+                }
             }
+            return job;
+        } finally {
+            pollLock.unlock();
         }
-        return job;
     }
 
     @Override
@@ -165,17 +174,18 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         return job;
     }
 
+    @SuppressWarnings("unchecked")
     private MCRTileJob getElement() {
         if (!running)
             return null;
         Session session = MCRHIBConnection.instance().getSession();
-        Query query = session.createQuery("FROM MCRTileJob WHERE status='" + MCRJobState.NEW.toChar() + "' ORDER BY added ASC")
-                .setMaxResults(1);
-
-        if (query.list() == null || query.list().size() != 1) {
-            return null;
+        Query query = session.createQuery("FROM MCRTileJob WHERE status='" + MCRJobState.NEW.toChar() + "' ORDER BY added ASC").setMaxResults(1);
+        Iterator<MCRTileJob> queryResult;
+        queryResult = query.iterate();
+        if (queryResult.hasNext()) {
+            return (MCRTileJob) queryResult.next();
         }
-        return (MCRTileJob) query.iterate().next();
+        return null;
     }
 
     private boolean updateJob(MCRTileJob job) {
@@ -194,10 +204,8 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         return true;
     }
 
-    public void notifyListener() {
-        synchronized (this) {
-            this.notifyAll();
-        }
+    public synchronized void notifyListener() {
+        this.notifyAll();
     }
 
     public int remove(String derivate, String path) {
