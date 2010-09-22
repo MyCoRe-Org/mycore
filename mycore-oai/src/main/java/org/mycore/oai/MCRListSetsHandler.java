@@ -38,7 +38,45 @@ import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRQueryManager;
 
 /**
- * Implements the ListSets request.
+ * Implements the ListSets request. 
+ * For a data provider instance, set support is optional and must be configured as described below.
+ * Typically, sets are mapped to categories of a classification in MyCoRe.
+ * 
+ * The set specifications are read from one or more URIs using MCRURIResolver.
+ * This allows for sets that are typically built by applying an xsl stylesheet 
+ * to the output of the classification URI resolver, but also for other ways to 
+ * dynamically create set specifications, or for a static set specification 
+ * that is read from an xml file. 
+ * 
+ * Example: 
+ * 
+ * MCR.OAIDataProvider.OAI.Sets.OA=webapp:oai/open_access.xml
+ * MCR.OAIDataProvider.OAI.Sets.DDC=xslStyle:classification2sets:classification:DDC
+ * 
+ * The first line reads a set specification from a static xml file stored in the 
+ * web application. The DINI certificate demands that there always is a set 
+ * open_access that contains all public Open Access documents. Since this set always exists,
+ * its set specification can be read from a static file.
+ * 
+ * The second line uses the classification resolver to read in a classification, then
+ * transforms the xml to build set specifications from the listed categories.
+ * 
+ * It is recommended not to list sets that are completely empty, to simplify harvesting.
+ * The fastest way to accomplish this is to somehow ensure that no set specifications
+ * from empty sets are delivered from the URIs, which means that the classification resolver
+ * filters out empty categories, or the xsl stylesheet somehow decides to filter empty sets.
+ * 
+ * Another way to filter out empty sets can be activated by setting a property:
+ * 
+ * MIL.OAIDataProvider.OAI.FilterEmptySets=true
+
+ * When set to true, the ListSets handler filters out empty sets itself after reading in the URIs.
+ * This is done by constructing a query for each set and looking for matching hits. Set queries are built
+ * using the OAI Adapter's buildSetCondition method. Filtering empty sets this way may be useful for some
+ * implementations, but it is slower and should be avoided for large set hierarchies.   
+ * 
+ * @see MCRURIResolver
+ * @see MCROAIAdapter#buildSetCondition(String)
  * 
  * @author Frank L\u00fctzenkirchen
  */

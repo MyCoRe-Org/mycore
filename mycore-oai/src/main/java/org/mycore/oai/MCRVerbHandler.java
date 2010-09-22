@@ -53,12 +53,16 @@ import org.mycore.services.fieldquery.MCRQueryParser;
 public abstract class MCRVerbHandler implements MCROAIConstants {
     protected final static Logger LOGGER = Logger.getLogger(MCRVerbHandler.class);
 
+    /** The data provider instance */
     protected MCROAIDataProvider provider;
 
+    /** The root element of the xml response to a request, as defined by section 3.2 of the OAI-PMH specification */
     protected Element response;
 
+    /** The element that contains the output of the handled request, an element with the same name as the verb of the respective OAI-PMH request */
     protected Element output;
 
+    /** Holds error elements as defined in section 3.6 of the OAI-PMH specifications */
     protected List<Element> errors = new ArrayList<Element>();
 
     protected Properties parms = new Properties();
@@ -170,10 +174,16 @@ public abstract class MCRVerbHandler implements MCROAIConstants {
         return getResponse();
     }
 
+    /**
+     * Returns true if any error conditions were detected so far
+     */
     boolean hasErrors() {
         return errors.size() > 0;
     }
 
+    /**
+     * Returns the response to the OAI-PMH request, as defined by section 3.2 of the OAI-PMH specification.
+     */
     protected Document getResponse() {
         if (hasErrors())
             response.addContent(errors);
@@ -194,6 +204,12 @@ public abstract class MCRVerbHandler implements MCROAIConstants {
         return doc;
     }
 
+    /**
+     * Adds an error to the response.
+     * 
+     * @param code the error code, see {@link MCROAIConstants} and section 3.6 of the OAI-PMH specification.
+     * @param message the optional error message providing more detailed information on the error cause. Can be null.
+     */
     void addError(String code, String message) {
         LOGGER.error(code + (message == null ? "" : ": " + message));
 
@@ -204,6 +220,15 @@ public abstract class MCRVerbHandler implements MCROAIConstants {
         errors.add(error);
     }
 
+    /**
+     * Checks a record identifier for correct syntax and existence. Identifiers must start with "oai:" followed by the
+     * repository identifier, followed by a unique item identifier, for example "oai:duepublico.uni-due.de:4711".
+     * This conforms to section 2.4 of the OAI-PMH specification and the oai-identifier syntax described in the accompanying
+     * OAI implementation guidelines. When the identifier is not valid, this method will add an error to the response. 
+     * 
+     * @param identifier the identifier to check.
+     * @return true, if the record identifier is syntactically correct and an item with that identifier exists.
+     */
     boolean checkIdentifier(String identifier) {
         String prefix = "oai:" + provider.getRepositoryIdentifier() + ":";
         if (!identifier.startsWith(prefix)) {

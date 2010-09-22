@@ -104,6 +104,7 @@ public class MCROAIDataProvider extends MCRServlet {
 
     private String adminEmail;
 
+    /** The earliest datestamp supported by this data provider instance. */
     private String earliestDatestamp;
 
     private String recordSampleID;
@@ -112,6 +113,9 @@ public class MCROAIDataProvider extends MCRServlet {
 
     private String myBaseURL;
 
+    /**
+     * List of metadata formats supported by this data provider instance. 
+     */
     private List<MCRMetadataFormat> metadataFormats = new ArrayList<MCRMetadataFormat>();
 
     private String prefix;
@@ -154,10 +158,21 @@ public class MCROAIDataProvider extends MCRServlet {
         return repositoryIdentifier;
     }
 
+    /**
+     * Returns the base URL of this data provider instance
+     */
     String getOAIBaseURL() {
         return myBaseURL;
     }
 
+    /**
+     * Returns the earliest datestamp supported by this data provider instance.
+     * That is the guaranteed lower limit of all datestamps recording changes, modifications, or deletions in the repository.
+     * A repository must not use datestamps lower than the one specified by the content of the earliestDatestamp element.
+     * Configuration is done using a property, for example
+     * 
+     * MCR.OAIDataProvider.OAI.EarliestDatestamp=1970-01-01
+     */
     String getEarliestDatestamp() {
         return earliestDatestamp;
     }
@@ -174,6 +189,19 @@ public class MCROAIDataProvider extends MCRServlet {
         return adminEmail;
     }
 
+    /**
+     * Returns the metadata formats supported by this data provider instance. 
+     * For each instance, a configuration property lists the prefixes of all supported formats, for example
+     * 
+     * MCR.OAIDataProvider.OAI.MetadataFormats=oai_dc
+     *   
+     * Each metadata format must be globally configured with its prefix, schema and namespace, for example
+     * 
+     * MCR.OAIDataProvider.MetadataFormat.oai_dc.Schema=http://www.openarchives.org/OAI/2.0/oai_dc.xsd
+     * MCR.OAIDataProvider.MetadataFormat.oai_dc.Namespace=http://www.openarchives.org/OAI/2.0/oai_dc/
+     * 
+     * @see MCRMetadataFormat
+     */
     List<MCRMetadataFormat> getMetadataFormats() {
         return metadataFormats;
     }

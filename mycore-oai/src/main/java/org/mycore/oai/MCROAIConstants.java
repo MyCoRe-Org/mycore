@@ -96,6 +96,4 @@ interface MCROAIConstants {
     final static String GRANULARITY = "YYYY-MM-DD";
 
     final static String DATESTAMP_PATTERN = "yyyy-MM-dd";
-
-    final static DateFormat DATESTAMP_FORMAT = new SimpleDateFormat(DATESTAMP_PATTERN);
 }

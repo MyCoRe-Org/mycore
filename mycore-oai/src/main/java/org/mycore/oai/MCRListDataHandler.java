@@ -23,6 +23,7 @@
 
 package org.mycore.oai;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -139,7 +140,7 @@ abstract class MCRListDataHandler extends MCRVerbHandler {
         }
 
         try {
-            DATESTAMP_FORMAT.parse(value);
+            new SimpleDateFormat(DATESTAMP_PATTERN).parse(value);
         } catch (Exception ex) {
             addError(ERROR_BAD_ARGUMENT, "Cannot parse date, bad syntax: " + value);
             return false;
