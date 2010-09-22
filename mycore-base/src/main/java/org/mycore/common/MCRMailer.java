@@ -62,11 +62,11 @@ import org.mycore.common.xml.MCRLayoutService;
  */
 public class MCRMailer {
     /** Logger */
-    static Logger logger = Logger.getLogger(MCRMailer.class);
+    private static final Logger LOGGER = Logger.getLogger(MCRMailer.class);
 
-    protected static Session mailSession;
+    private static Session mailSession;
 
-    protected static String encoding;
+    protected static final String encoding;
 
     /** How often should MCRMailer try to send mail? */
     protected static int numTries;
@@ -86,7 +86,7 @@ public class MCRMailer {
             mailSession.setDebug(config.getBoolean("MCR.Mail.Debug", false));
         } catch (MCRConfigurationException mcrx) {
             String msg = "Missing e-mail configuration data.";
-            logger.fatal(msg, mcrx);
+            LOGGER.fatal(msg, mcrx);
         }
     }
 
@@ -103,7 +103,7 @@ public class MCRMailer {
      *            the textbody of the email
      */
     public static void send(String sender, String recipient, String subject, String body) {
-        logger.debug("Called plaintext send method with single recipient.");
+        LOGGER.debug("Called plaintext send method with single recipient.");
 
         ArrayList<String> recipients = new ArrayList<String>();
         recipients.add(recipient);
@@ -126,7 +126,7 @@ public class MCRMailer {
      *            if true, sender will also get a copy as cc recipient
      */
     public static void send(String sender, List<String> recipients, String subject, String body, boolean bcc) {
-        logger.debug("Called plaintext send method with multiple recipients.");
+        LOGGER.debug("Called plaintext send method with multiple recipients.");
 
         List<String> bccList = null;
 
@@ -153,7 +153,7 @@ public class MCRMailer {
      *            the textbody of the email
      */
     public static void send(String sender, String recipient, String subject, String body, List<String> parts) {
-        logger.debug("Called multipart send method with single recipient.");
+        LOGGER.debug("Called multipart send method with single recipient.");
 
         ArrayList<String> recipients = new ArrayList<String>();
         recipients.add(recipient);
@@ -178,7 +178,7 @@ public class MCRMailer {
      *            if true, sender will also get a copy as bcc recipient
      */
     public static void send(String sender, List<String> recipients, String subject, String body, List<String> parts, boolean bcc) {
-        logger.debug("Called multipart send method with multiple recipients.");
+        LOGGER.debug("Called multipart send method with multiple recipients.");
 
         List<String> bccList = null;
 
@@ -281,7 +281,7 @@ public class MCRMailer {
                 trySending(from, replyTo, to, bcc, subject, body, parts);
             }
         } catch (Exception ex) {
-            logger.info("Sending e-mail failed: ", ex);
+            LOGGER.info("Sending e-mail failed: ", ex);
             if (numTries < 2) {
                 return;
             }
@@ -289,7 +289,7 @@ public class MCRMailer {
             Thread t = new Thread(new Runnable() {
                 public void run() {
                     for (int i = numTries - 1; i > 0; i--) {
-                        logger.info("Retrying in 5 minutes...");
+                        LOGGER.info("Retrying in 5 minutes...");
                         Object obj = new Object();
                         try {
                             synchronized (obj) {
@@ -301,10 +301,10 @@ public class MCRMailer {
 
                         try {
                             trySending(from, replyTo, to, bcc, subject, body, parts);
-                            logger.info("Successfully resended e-mail.");
+                            LOGGER.info("Successfully resended e-mail.");
                             break;
                         } catch (Exception ex) {
-                            logger.info("Sending e-mail failed: ", ex);
+                            LOGGER.info("Sending e-mail failed: ", ex);
                         }
                     }
                 }
@@ -375,7 +375,7 @@ public class MCRMailer {
             msg.setContent(multipart);
         }
 
-        logger.info("Sending e-mail to " + to.get(0));
+        LOGGER.info("Sending e-mail to " + to.get(0));
         Transport.send(msg);
     }
 
@@ -415,18 +415,18 @@ public class MCRMailer {
      * @see org.mycore.common.MCRMailer
      */
     public static Element sendMail(Document input, String stylesheet, Properties parameters) throws Exception {
-        logger.info("Generating e-mail from " + input.getRootElement().getName() + " using " + stylesheet + ".xsl");
-        if (logger.isDebugEnabled())
+        LOGGER.info("Generating e-mail from " + input.getRootElement().getName() + " using " + stylesheet + ".xsl");
+        if (LOGGER.isDebugEnabled())
             debug(input.getRootElement());
 
         Element eMail = transform(input, stylesheet, parameters).getRootElement();
-        if (logger.isDebugEnabled())
+        if (LOGGER.isDebugEnabled())
             debug(eMail);
 
         if (eMail.getChildren("to").isEmpty())
-            logger.warn("Will not send e-mail, no 'to' address specified");
+            LOGGER.warn("Will not send e-mail, no 'to' address specified");
         else {
-            logger.info("Sending e-mail to " + eMail.getChildText("to") + ": " + eMail.getChildText("subject"));
+            LOGGER.info("Sending e-mail to " + eMail.getChildText("to") + ": " + eMail.getChildText("subject"));
             MCRMailer.send(eMail);
         }
 
@@ -462,9 +462,9 @@ public class MCRMailer {
 
     private final static String delimiter = "\n--------------------------------------\n";
     
-    /** Outputs xml to the logger for debugging */
+    /** Outputs xml to the LOGGER for debugging */
     private static void debug(Element xml) {
         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-        logger.debug(delimiter + xout.outputString(xml) + delimiter);
+        LOGGER.debug(delimiter + xout.outputString(xml) + delimiter);
     }
 }

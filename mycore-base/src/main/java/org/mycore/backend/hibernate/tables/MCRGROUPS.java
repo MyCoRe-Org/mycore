@@ -23,9 +23,12 @@
 
 package org.mycore.backend.hibernate.tables;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
-public class MCRGROUPS {
+public class MCRGROUPS implements Serializable {
+    private static final long serialVersionUID = 7577971003849050053L;
+
     private String gid;
 
     private String creator;

@@ -463,11 +463,11 @@ public class MCRHIBUserStore implements MCRUserStore {
         List<MCRGROUPADMINS> groupAdmins = session.createQuery("from MCRGROUPADMINS where GID='" + group.getID() + "'").list();
 
         for (MCRGROUPADMINS grpadmins : groupAdmins) {
-            if (grpadmins.getUserid() != null && !grpadmins.getUserid().equals("")) {
+            if (grpadmins.getUserid() != null) {
                 oldAdminUserIDs.add(grpadmins.getUserid().getUid());
             }
 
-            if (grpadmins.getUserid() != null && !grpadmins.getGroupid().equals("")) {
+            if (grpadmins.getUserid() != null) {
                 oldAdminGroupIDs.add(grpadmins.getGroupid().getGid());
             }
         }
@@ -478,7 +478,7 @@ public class MCRHIBUserStore implements MCRUserStore {
         List<MCRGROUPMEMBERS> l = session.createQuery("from MCRGROUPMEMBERS where GID='" + group.getID() + "'").list();
 
         for (MCRGROUPMEMBERS grpmembers : l) {
-            if (grpmembers.getUserid() != null && !grpmembers.getUserid().equals("")) {
+            if (grpmembers.getUserid() != null) {
                 oldUserIDs.add(grpmembers.getUserid().getUid());
             }
         }
@@ -602,11 +602,11 @@ public class MCRHIBUserStore implements MCRUserStore {
                 Set<String> admUserSet = new HashSet<String>();
                 Set<String> admGroupSet = new HashSet<String>();
                 for (MCRGROUPADMINS grpadmins : groupAdmins) {
-                    if (grpadmins.getUserid() != null && !grpadmins.getUserid().equals("")) {
+                    if (grpadmins.getUserid() != null) {
                         admUserSet.add(grpadmins.getUserid().getUid());
                     }
 
-                    if (grpadmins.getGroupid() != null && !grpadmins.getGroupid().equals("")) {
+                    if (grpadmins.getGroupid() != null) {
                         admGroupSet.add(grpadmins.getGroupid().getGid());
                     }
                 }
@@ -622,7 +622,7 @@ public class MCRHIBUserStore implements MCRUserStore {
 
             if (!groupMembers.isEmpty()) {
                 for (MCRGROUPMEMBERS grpmembers : groupMembers) {
-                    if (grpmembers.getUserid() != null && !grpmembers.getUserid().equals("")) {
+                    if (grpmembers.getUserid() != null) {
                         users.add(grpmembers.getUserid().getUid());
                     }
                 }

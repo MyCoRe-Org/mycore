@@ -56,7 +56,7 @@ public abstract class MCRRuleStore {
 
     public abstract MCRAccessRule retrieveRule(String ruleid);
 
-    public static Logger logger = Logger.getLogger(MCRRuleStore.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(MCRRuleStore.class);
 
     final protected static String sqlDateformat = "yyyy-MM-dd HH:mm:ss";
 
@@ -72,7 +72,7 @@ public abstract class MCRRuleStore {
                         "org.mycore.backend.hibernate.MCRHIBRuleStore");
             }
         } catch (Exception e) {
-            logger.error(e);
+            LOGGER.error(e);
         }
 
         return implementation;

@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
@@ -45,7 +46,7 @@ import org.mycore.common.MCRException;
  * 
  */
 public class MCRHIBRuleStore extends MCRRuleStore {
-
+    private static final Logger LOGGER = Logger.getLogger(MCRHIBRuleStore.class);
     public MCRHIBRuleStore() {
         init();
     }
@@ -71,7 +72,7 @@ public class MCRHIBRuleStore extends MCRRuleStore {
             hibrule.setDescription(rule.getDescription());
             session.saveOrUpdate(hibrule);
         } else {
-            logger.error("rule with id '" + rule.getId() + "' can't be created, rule still exists.");
+            LOGGER.error("rule with id '" + rule.getId() + "' can't be created, rule still exists.");
         }
     }
 
@@ -137,7 +138,7 @@ public class MCRHIBRuleStore extends MCRRuleStore {
         try {
             new SchemaUpdate(MCRHIBConnection.instance().getConfiguration()).execute(true, true);
         } catch (Exception e) {
-            logger.error("catched error", e);
+            LOGGER.error("catched error", e);
         }
     }
 
@@ -156,12 +157,12 @@ public class MCRHIBRuleStore extends MCRRuleStore {
         MCRAccessRule rule = null;
         MCRACCESSRULE hibrule = (MCRACCESSRULE) session.createCriteria(MCRACCESSRULE.class).add(Restrictions.eq("rid", ruleid))
                 .uniqueResult();
-        logger.debug("Getting MCRACCESSRULE done");
+        LOGGER.debug("Getting MCRACCESSRULE done");
 
         if (hibrule != null) {
-            logger.debug("new MCRAccessRule");
+            LOGGER.debug("new MCRAccessRule");
             rule = new MCRAccessRule(ruleid, hibrule.getCreator(), hibrule.getCreationdate(), hibrule.getRule(), hibrule.getDescription());
-            logger.debug("new MCRAccessRule done");
+            LOGGER.debug("new MCRAccessRule done");
         }
 
         return rule;

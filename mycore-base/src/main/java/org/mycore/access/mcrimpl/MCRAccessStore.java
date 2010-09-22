@@ -70,7 +70,7 @@ public abstract class MCRAccessStore {
      */
     public abstract Collection<String> getDistinctStringIDs();
 
-    public static Logger logger = Logger.getLogger(MCRAccessStore.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(MCRAccessStore.class);
 
     final protected static String sqlDateformat = "yyyy-MM-dd HH:mm:ss";
 
@@ -91,7 +91,7 @@ public abstract class MCRAccessStore {
                         "org.mycore.backend.hibernate.MCRHIBAccessStore");
             }
         } catch (Exception e) {
-            logger.error(e);
+            LOGGER.error(e);
         }
 
         return implementation;
@@ -146,7 +146,7 @@ public abstract class MCRAccessStore {
             }
             return ret;
         } catch (Exception e) {
-            logger.error("definition loading failed: ", e);
+            LOGGER.error("definition loading failed: ", e);
             return null;
         }
     }
@@ -173,7 +173,7 @@ public abstract class MCRAccessStore {
             ret.add(def);
             return ret;
         } catch (Exception e) {
-            logger.error("definition loading failed: ");
+            LOGGER.error("definition loading failed: ");
             return null;
         }
     }

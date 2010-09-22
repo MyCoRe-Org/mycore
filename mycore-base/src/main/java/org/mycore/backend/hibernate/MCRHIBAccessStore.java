@@ -29,6 +29,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
@@ -48,7 +49,7 @@ import org.mycore.backend.hibernate.tables.MCRACCESSRULE;
  */
 public class MCRHIBAccessStore extends MCRAccessStore {
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat(sqlDateformat);
-
+    private static final Logger LOGGER = Logger.getLogger(MCRHIBAccessStore.class);
     public MCRHIBAccessStore() {
         createTables();
     }
@@ -68,7 +69,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
             // update schema -> first time create table
             new SchemaUpdate(MCRHIBConnection.instance().getConfiguration()).execute(true, true);
         } catch (Exception e) {
-            logger.error("error at createTables()", e);
+            LOGGER.error("error at createTables()", e);
         }
     }
 
@@ -121,7 +122,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
         Session session = MCRHIBConnection.instance().getSession();
 
         if (objid == null || objid.equals("")) {
-            logger.warn("empty parameter objid in existsRule");
+            LOGGER.warn("empty parameter objid in existsRule");
             return false;
         }
 
@@ -247,7 +248,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
 
     @Override
     @SuppressWarnings("unchecked")
-    public List getDistinctStringIDs() {
+    public List<String> getDistinctStringIDs() {
         List<String> ret;
         Session session = MCRHIBConnection.instance().getSession();
         String query = "select distinct(key.objid) from MCRACCESS order by OBJID";

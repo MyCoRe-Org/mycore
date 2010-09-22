@@ -34,6 +34,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.jdom.Attribute;
 import org.jdom.Element;
 import org.mycore.access.MCRAccessBaseImpl;
@@ -75,6 +76,8 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
     boolean disabled = false;
 
     static Hashtable<String, String> ruleIDTable = new Hashtable<String, String>();
+
+    private static final Logger LOGGER = Logger.getLogger(MCRAccessControlSystem.class);
 
     private MCRAccessControlSystem() {
         MCRConfiguration config = MCRConfiguration.instance();
@@ -219,8 +222,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
         String ruleStr = getNormalizedRuleString(rule);
         MCRAccessRule accessRule = new MCRAccessRule(null, "System", new Date(), ruleStr, "");
         try {
-            return accessRule.checkAccess(MCRUserMgr.instance().retrieveUser(session.getCurrentUserID()), new Date(), new MCRIPAddress(
-                    session.getCurrentIP()));
+            return accessRule.checkAccess(MCRUserMgr.instance().retrieveUser(session.getCurrentUserID()), new Date(), new MCRIPAddress(session.getCurrentIP()));
         } catch (MCRException e) {
             // only return true if access is allowed, we dont know this
             LOGGER.debug("Error while checking rule.", e);
@@ -434,16 +436,16 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
     @SuppressWarnings("unchecked")
     public Element normalize(Element rule) {
         Element newRule = new Element(rule.getName());
-        for (Iterator it = rule.getAttributes().iterator(); it.hasNext();) {
-            Attribute att = (Attribute) it.next();
+        for (Iterator<Attribute> it = rule.getAttributes().iterator(); it.hasNext();) {
+            Attribute att = it.next();
             newRule.setAttribute((Attribute) att.clone());
         }
-        List children = rule.getChildren();
+        List<Element> children = rule.getChildren();
         if (children == null || children.size() == 0) {
             return newRule;
         }
         List<Element> newList = new ArrayList<Element>();
-        for (Iterator it = children.iterator(); it.hasNext();) {
+        for (Iterator<Element> it = children.iterator(); it.hasNext();) {
             Element el = (Element) it.next();
             newList.add((Element) el.clone());
         }

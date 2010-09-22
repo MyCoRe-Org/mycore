@@ -51,7 +51,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
             "read,write,delete");
 
     /** the logger */
-    protected static Logger LOGGER = Logger.getLogger(MCRAccessBaseImpl.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(MCRAccessBaseImpl.class);
 
     public MCRAccessBaseImpl() {
     }

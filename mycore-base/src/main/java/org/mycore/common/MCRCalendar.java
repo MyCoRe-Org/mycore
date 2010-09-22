@@ -52,44 +52,44 @@ public class MCRCalendar {
     static Logger LOGGER = Logger.getLogger(MCRCalendar.class.getName());
 
     /** Tag for calendars */
-    public static String TAG_BUDDHIST = "buddhist";
+    public static final String TAG_BUDDHIST = "buddhist";
 
-    public static String TAG_CHINESE = "chinese";
+    public static final String TAG_CHINESE = "chinese";
 
-    public static String TAG_COPTIC = "coptic";
+    public static final String TAG_COPTIC = "coptic";
 
-    public static String TAG_ETHIOPIC = "ethiopic";
+    public static final String TAG_ETHIOPIC = "ethiopic";
 
-    public static String TAG_GREGORIAN = "gregorian";
+    public static final String TAG_GREGORIAN = "gregorian";
 
-    public static String TAG_HEBREW = "hebrew";
+    public static final String TAG_HEBREW = "hebrew";
 
-    public static String TAG_ISLAMIC = "islamic";
+    public static final String TAG_ISLAMIC = "islamic";
 
-    public static String TAG_ISLAMIC_CIVIL = "islamic-civil";
+    public static final String TAG_ISLAMIC_CIVIL = "islamic-civil";
 
-    public static String TAG_JAPANESE = "japanese";
+    public static final String TAG_JAPANESE = "japanese";
 
-    public static String TAG_JULIAN = "julian";
+    public static final String TAG_JULIAN = "julian";
 
-    public static String TAG_PERSIC = "persic";
+    public static final String TAG_PERSIC = "persic";
 
-    public static String TAG_ARMENIAN = "armenian";
+    public static final String TAG_ARMENIAN = "armenian";
 
-    public static String TAG_EGYPTIAN = "egyptian";
+    public static final String TAG_EGYPTIAN = "egyptian";
 
     /** Minimum Julian Day number is 0 = 01.01.4713 BC */
-    public static int MIN_JULIAN_DAY_NUMBER = 0;
+    public static final int MIN_JULIAN_DAY_NUMBER = 0;
 
     /** Maximum Julian Day number is 3182057 = 31.12.3999 */
-    public static int MAX_JULIAN_DAY_NUMBER = 3182057;
+    public static final int MAX_JULIAN_DAY_NUMBER = 3182057;
 
     /** all available calendars of ICU */
-    public static String CALENDARS_ICU[] = { TAG_BUDDHIST, TAG_CHINESE, TAG_COPTIC, TAG_ETHIOPIC, TAG_GREGORIAN, TAG_HEBREW, TAG_ISLAMIC,
+    public static final String CALENDARS_ICU[] = { TAG_BUDDHIST, TAG_CHINESE, TAG_COPTIC, TAG_ETHIOPIC, TAG_GREGORIAN, TAG_HEBREW, TAG_ISLAMIC,
             TAG_ISLAMIC_CIVIL, TAG_JAPANESE };
 
     /** convert following calendars from input to gregorian */
-    public static String CALENDARS_INPUT[] = { TAG_GREGORIAN, TAG_JULIAN, TAG_ISLAMIC, TAG_BUDDHIST, TAG_COPTIC, TAG_ETHIOPIC, TAG_PERSIC,
+    public static final String CALENDARS_INPUT[] = { TAG_GREGORIAN, TAG_JULIAN, TAG_ISLAMIC, TAG_BUDDHIST, TAG_COPTIC, TAG_ETHIOPIC, TAG_PERSIC,
             TAG_JAPANESE, TAG_ARMENIAN, TAG_EGYPTIAN };
 
     /**
@@ -1238,7 +1238,6 @@ public class MCRCalendar {
             // boolean bm = false;
             int era = 0;
             int start = 0;
-            int ende = datestr.length();
 
             // german or ISO?
             start = 0;
@@ -1630,12 +1629,10 @@ public class MCRCalendar {
             // test before
             boolean bb = false;
             int start = 0;
-            int ende = datestr.length();
             if (datestr.substring(0, 1).equals("-")) {
                 bb = true;
                 start = 1;
                 datestr = datestr.substring(start).trim();
-                ende = datestr.length();
             }
 
             // german or ISO?
@@ -1808,12 +1805,10 @@ public class MCRCalendar {
             // test before
             boolean ba = false;
             int start = 0;
-            int ende = datestr.length();
             if (datestr.substring(0, 1).equals("-")) {
                 ba = true;
                 start = 1;
                 datestr = datestr.substring(start).trim();
-                ende = datestr.length();
             }
 
             // german or ISO?

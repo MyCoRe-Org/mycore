@@ -23,9 +23,12 @@
 
 package org.mycore.backend.hibernate.tables;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
-public class MCRUSERS {
+public class MCRUSERS implements Serializable {
+    private static final long serialVersionUID = 1696391562925799720L;
+
     private int numid;
 
     private String uid;

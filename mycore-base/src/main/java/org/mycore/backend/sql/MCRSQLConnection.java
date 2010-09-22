@@ -58,7 +58,7 @@ public class MCRSQLConnection {
     /** The wrapped JDBC connection */
     protected Connection connection;
 
-    protected static Logger LOGGER = Logger.getLogger(MCRSQLConnection.class);
+    private static final Logger LOGGER = Logger.getLogger(MCRSQLConnection.class);
 
     /** The number of usages of this connection so far * */
     private int numUsages = 0;
