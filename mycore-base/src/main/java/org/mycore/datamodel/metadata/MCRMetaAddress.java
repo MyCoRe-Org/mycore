@@ -41,7 +41,7 @@ final public class MCRMetaAddress extends MCRMetaDefault {
 
     private String state;
 
-    private String zipcode;
+    private String zipCode;
 
     private String city;
 
@@ -58,12 +58,6 @@ final public class MCRMetaAddress extends MCRMetaDefault {
      */
     public MCRMetaAddress() {
         super();
-        country = "";
-        state = "";
-        zipcode = "";
-        city = "";
-        street = "";
-        number = "";
     }
 
     /**
@@ -73,7 +67,7 @@ final public class MCRMetaAddress extends MCRMetaDefault {
      * the value of <em>set_subtag<em>. If the value of <em>set_subtag</em>
      * is null or empty an exception was throwed. The type element was set to
      * the value of <em>set_type<em>, if it is null, an empty string was set
-     * to the type element. The country, state, zipcode, city, street and
+     * to the type element. The country, state, zipCode, city, street and
      * number element was set to the value of <em>set_...<em>, if they are null,
      * an empty string was set to this element.
      * @param set_subtag      the name of the subtag
@@ -82,176 +76,30 @@ final public class MCRMetaAddress extends MCRMetaDefault {
      * @param set_inherted    a value >= 0
      * @param set_country     the country name
      * @param set_state       the state name
-     * @param set_zipcode     the zipcode string
+     * @param set_zipcode     the zipCode string
      * @param set_city        the city name
      * @param set_street      the street name
      * @param set_number      the number string
      *
      * @exception MCRException if the parameter values are invalid
      */
-    public MCRMetaAddress(String set_subtag, String default_lang, String set_type, int set_inherted, String set_country, String set_state, String set_zipcode,
-        String set_city, String set_street, String set_number) throws MCRException {
+    public MCRMetaAddress(final String set_subtag, final String default_lang, final String set_type, final int set_inherted, final String set_country,
+        final String set_state, final String set_zipcode, final String set_city, final String set_street, final String set_number) throws MCRException {
         super(set_subtag, default_lang, set_type, set_inherted);
-        country = "";
-        state = "";
-        zipcode = "";
-        city = "";
-        street = "";
-        number = "";
-
-        if (set_country != null) {
-            country = set_country;
-        }
-
-        if (set_state != null) {
-            state = set_state;
-        }
-
-        if (set_zipcode != null) {
-            zipcode = set_zipcode;
-        }
-
-        if (set_city != null) {
-            city = set_city;
-        }
-
-        if (set_street != null) {
-            street = set_street;
-        }
-
-        if (set_number != null) {
-            number = set_number;
-        }
-    }
-
-    /**
-     * This methode set all address componets.
-     * 
-     * @param set_country
-     *            the country name
-     * @param set_state
-     *            the state name
-     * @param set_zipcode
-     *            the zipcode string
-     * @param set_city
-     *            the city name
-     * @param set_street
-     *            the street name
-     * @param set_number
-     *            the number string
-     */
-    public final void set(String set_country, String set_state, String set_zipcode, String set_city, String set_street, String set_number) {
-        if (set_country == null || set_state == null || set_zipcode == null || set_city == null || set_street == null || set_number == null) {
-            throw new MCRException("One parameter is null.");
-        }
-
         country = set_country;
         state = set_state;
-        zipcode = set_zipcode;
+        zipCode = set_zipcode;
         city = set_city;
         street = set_street;
         number = set_number;
     }
 
     /**
-     * This method get the country text element.
-     * 
-     * @return the country
-     */
-    public final String getCountry() {
-        return country;
-    }
-
-    /**
-     * This method get the state text element.
-     * 
-     * @return the state
-     */
-    public final String getState() {
-        return state;
-    }
-
-    /**
-     * This method get the zipcode text element.
-     * 
-     * @return the zipcode
-     */
-    public final String getZipcode() {
-        return zipcode;
-    }
-
-    /**
-     * This method get the city text element.
-     * 
-     * @return the city
-     */
-    public final String getCity() {
-        return city;
-    }
-
-    /**
-     * This method get the street text element.
-     * 
-     * @return the street
-     */
-    public final String getStreet() {
-        return street;
-    }
-
-    /**
-     * This method get the number text element.
-     * 
-     * @return the number
-     */
-    public final String getNumber() {
-        return number;
-    }
-
-    /**
-     * This method reads the XML input stream part from a DOM part for the
-     * metadata of the document.
-     * 
-     * @param element
-     *            a relevant JDOM element for the metadata
+     * This method make a clone of this class.
      */
     @Override
-    public final void setFromDOM(org.jdom.Element element) {
-        super.setFromDOM(element);
-        country = element.getChildTextTrim("country");
-
-        if (country == null) {
-            country = "";
-        }
-
-        state = element.getChildTextTrim("state");
-
-        if (state == null) {
-            state = "";
-        }
-
-        zipcode = element.getChildTextTrim("zipcode");
-
-        if (zipcode == null) {
-            zipcode = "";
-        }
-
-        city = element.getChildTextTrim("city");
-
-        if (city == null) {
-            city = "";
-        }
-
-        street = element.getChildTextTrim("street");
-
-        if (street == null) {
-            street = "";
-        }
-
-        number = element.getChildTextTrim("number");
-
-        if (number == null) {
-            number = "";
-        }
+    public MCRMetaAddress clone() {
+        return new MCRMetaAddress(subtag, DEFAULT_LANGUAGE, type, inherited, country, state, zipCode, city, street, number);
     }
 
     /**
@@ -264,69 +112,27 @@ final public class MCRMetaAddress extends MCRMetaDefault {
      */
     @Override
     public final org.jdom.Element createXML() throws MCRException {
-        Element elm = super.createXML();
-
-        elm.addContent(new Element("country").addContent(country));
-        elm.addContent(new Element("state").addContent(state));
-        elm.addContent(new Element("zipcode").addContent(zipcode));
-        elm.addContent(new Element("city").addContent(city));
-        elm.addContent(new Element("street").addContent(street));
-        elm.addContent(new Element("number").addContent(number));
+        final Element elm = super.createXML();
+        if (getCountry() != null) {
+            elm.addContent(new Element("country").addContent(getCountry()));
+        }
+        if (getState() != null) {
+            elm.addContent(new Element("state").addContent(getState()));
+        }
+        if (getZipCode() != null) {
+            elm.addContent(new Element("zipCode").addContent(getZipCode()));
+        }
+        if (getCity() != null) {
+            elm.addContent(new Element("city").addContent(getCity()));
+        }
+        if (getStreet() != null) {
+            elm.addContent(new Element("street").addContent(getStreet()));
+        }
+        if (getNumber() != null) {
+            elm.addContent(new Element("number").addContent(getNumber()));
+        }
 
         return elm;
-    }
-
-    /**
-     * This method checks the validation of the content of this class. The
-     * method returns <em>false</em> if
-     * <ul>
-     * <li>the country is empty and
-     * <li>the state is empty and
-     * <li>the zipcode is empty and
-     * <li>the city is empty and
-     * <li>the street is empty and
-     * <li>the number is empty
-     * </ul>
-     * otherwise the method returns <em>true</em>.
-     * 
-     * @return a boolean value
-     */
-    @Override
-    public final boolean isValid() {
-        if ((country = country.trim()).length() == 0) {
-            LOGGER.warn(getSubTag() + ": country is empty");
-            return false;
-        }
-        if ((state = state.trim()).length() == 0) {
-            LOGGER.warn(getSubTag() + ": state is empty");
-            return false;
-        }
-        if ((zipcode = zipcode.trim()).length() == 0) {
-            LOGGER.warn(getSubTag() + ": zipcode is empty");
-            return false;
-        }
-        if ((city = city.trim()).length() == 0) {
-            LOGGER.warn(getSubTag() + ": city is empty");
-            return false;
-        }
-        if ((street = street.trim()).length() == 0) {
-            LOGGER.warn(getSubTag() + ": street is empty");
-            return false;
-        }
-        if ((number = number.trim()).length() == 0) {
-            LOGGER.warn(getSubTag() + ": number is empty");
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * This method make a clone of this class.
-     */
-    @Override
-    public MCRMetaAddress clone() {
-        return new MCRMetaAddress(subtag, DEFAULT_LANGUAGE, type, inherited, country, state, zipcode, city, street, number);
     }
 
     /**
@@ -337,10 +143,137 @@ final public class MCRMetaAddress extends MCRMetaDefault {
         super.debugDefault();
         LOGGER.debug("Country            = " + country);
         LOGGER.debug("State              = " + state);
-        LOGGER.debug("Zipcode            = " + zipcode);
+        LOGGER.debug("Zipcode            = " + zipCode);
         LOGGER.debug("City               = " + city);
         LOGGER.debug("Street             = " + street);
         LOGGER.debug("Number             = " + number);
         LOGGER.debug(" ");
+    }
+
+    /**
+     * @return the city
+     */
+    public String getCity() {
+        return city;
+    }
+
+    /**
+     * @return the country
+     */
+    public String getCountry() {
+        return country;
+    }
+
+    /**
+     * @return the number
+     */
+    public String getNumber() {
+        return number;
+    }
+
+    /**
+     * @return the state
+     */
+    public String getState() {
+        return state;
+    }
+
+    /**
+     * @return the street
+     */
+    public String getStreet() {
+        return street;
+    }
+
+    /**
+     * @return the zipCode
+     */
+    public String getZipCode() {
+        return zipCode;
+    }
+
+    /**
+     * This method checks the validation of the content of this class. The
+     * method returns <em>false</em> if
+     * <ul>
+     * <li>the country is empty and
+     * <li>the state is empty and
+     * <li>the zipCode is empty and
+     * <li>the city is empty and
+     * <li>the street is empty and
+     * <li>the number is empty
+     * </ul>
+     * otherwise the method returns <em>true</em>.
+     * 
+     * @return a boolean value
+     */
+    @Override
+    public final boolean isValid() {
+        if (getCountry() == null && getState() == null && getZipCode() == null && getCity() == null && getStreet() == null && getNumber() == null) {
+            LOGGER.warn(getSubTag() + ": address is empty");
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param city the city to set
+     */
+    public void setCity(final String city) {
+        this.city = city;
+    }
+
+    /**
+     * @param country the country to set
+     */
+    public void setCountry(final String country) {
+        this.country = country;
+    }
+
+    /**
+     * This method reads the XML input stream part from a DOM part for the
+     * metadata of the document.
+     * 
+     * @param element
+     *            a relevant JDOM element for the metadata
+     */
+    @Override
+    public final void setFromDOM(final org.jdom.Element element) {
+        super.setFromDOM(element);
+        country = element.getChildTextTrim("country");
+        state = element.getChildTextTrim("state");
+        zipCode = element.getChildTextTrim("zipCode");
+        city = element.getChildTextTrim("city");
+        street = element.getChildTextTrim("street");
+        number = element.getChildTextTrim("number");
+    }
+
+    /**
+     * @param number the number to set
+     */
+    public void setNumber(final String number) {
+        this.number = number;
+    }
+
+    /**
+     * @param state the state to set
+     */
+    public void setState(final String state) {
+        this.state = state;
+    }
+
+    /**
+     * @param street the street to set
+     */
+    public void setStreet(final String street) {
+        this.street = street;
+    }
+
+    /**
+     * @param zipCode the zipCode to set
+     */
+    public void setZipCode(final String zipCode) {
+        this.zipCode = zipCode;
     }
 }
