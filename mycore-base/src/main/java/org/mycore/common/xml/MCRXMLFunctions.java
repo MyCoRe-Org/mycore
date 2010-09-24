@@ -27,7 +27,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -35,6 +37,10 @@ import java.util.TimeZone;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
@@ -44,6 +50,7 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRURN;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -57,11 +64,12 @@ import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.urn.MCRURNManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
  * @author Thomas Scheffler (yagee)
- * 
+ * @author Jens Kupferschmidt
  */
 public class MCRXMLFunctions {
 
@@ -358,5 +366,65 @@ public class MCRXMLFunctions {
             }
         }
         return false;
+    }
+    /**
+     * The method return a list of referenced links for a given MCR type as XML-tree.
+     * The structure is <em>linklist/[link]</em>. If no link was found it return <em>linklist</em> as root node.
+     * 
+     * @param mcrid the MCRObjectID as String, that should be referenced
+     * @param targettype the MCR datamodel type
+     * @return an XML tree as org.w3c.don.NodeList
+     */
+    public static NodeList getSecondaryLinkForMCRID(String mcrid, String targettype) {
+        Document document = DOC_BUILDER.newDocument();
+        Element rootElement = document.createElement("linklist");
+        document.appendChild(rootElement);
+        MCRLinkTableManager ltm = MCRLinkTableManager.instance();
+        List<String> list = (List<String>) ltm.getSourceOf(mcrid);
+        Collections.sort(list);
+        Iterator<String> it = list.iterator();
+        while (it.hasNext()) {
+            String st = it.next();
+            if (targettype == null || targettype.trim().length() == 0 || st.indexOf(targettype) != -1) {
+                Element link = document.createElement("link");
+                link.setTextContent(st);
+                rootElement.appendChild(link);
+            }
+        }
+        return document.getChildNodes();
+    }
+    
+    /**
+     * The method return a org.w3c.dom.NodeList as subpath of the doc input NodeList selected by a path as String.
+     * 
+     * @param doc the input org.w3c.dom.Nodelist
+     * @param path the path of doc as String
+     * @return a subpath of doc selected by path as org.w3c.dom.NodeList
+     */
+    public static NodeList getTreeByPath(NodeList doc, String path) {
+        NodeList n = null;
+        try {
+            // build path selection
+            XPathFactory factory = XPathFactory.newInstance();
+            XPath xpath = factory.newXPath();
+            XPathExpression expr = xpath.compile(path);
+            // select part
+            Document document = DOC_BUILDER.newDocument();
+            if (doc.item(0).getNodeName().equals("#document")) {
+                //LOGGER.debug("NodeList is a document.");
+                Node child = doc.item(0).getFirstChild();
+                if (child != null) {
+                    Node node = (Node) doc.item(0).getFirstChild();
+                    Node imp = document.importNode(node,true);
+                    document.appendChild(imp);
+                } else {
+                    document.appendChild(doc.item(0));
+                }
+            }
+            n = (NodeList) expr.evaluate(document, XPathConstants.NODESET);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return n;
     }
 }
