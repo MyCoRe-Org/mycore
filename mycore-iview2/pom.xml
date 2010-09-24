@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <artifactId>mycore</artifactId>
     <groupId>org.mycore</groupId>
@@ -50,4 +51,38 @@
       <artifactId>hsqldb</artifactId>
     </dependency>
   </dependencies>
+  <profiles>
+    <profile>
+      <id>jsdoc</id>
+      <activation>
+        <file>
+          <exists>${user.home}/jsdoc-toolkit/jsrun.sh</exists>
+        </file>
+      </activation>
+      <reporting>
+        <plugins>
+          <plugin>
+            <groupId>gr.abiss.mvn.plugins</groupId>
+            <artifactId>maven-jstools-plugin</artifactId>
+            <inherited>false</inherited>
+            <configuration>
+              <jsDir>src/main/resources</jsDir>
+              <includeUndocumented>true</includeUndocumented>
+              <jsdocHome>${user.home}/jsdoc-toolkit</jsdocHome>
+              <template>codeview</template>
+            </configuration>
+            <reportSets>
+              <reportSet>
+                <reports>
+                  <!-- include the desired reports -->
+                  <report>jslint</report>
+                  <report>jsdoc</report>
+                </reports>
+              </reportSet>
+            </reportSets>
+          </plugin>
+        </plugins>
+      </reporting>
+    </profile>
+  </profiles>
 </project>
