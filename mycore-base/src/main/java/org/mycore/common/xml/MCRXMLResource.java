@@ -48,25 +48,20 @@ import org.mycore.common.MCRUtils;
  */
 public class MCRXMLResource {
 
-    private static MCRCache resourceCache;
+    private volatile static MCRCache resourceCache;
 
-    private static MCRXMLResource instance;
+    private static MCRXMLResource instance = new MCRXMLResource();
 
     private static Logger LOGGER = Logger.getLogger(MCRXMLResource.class);
 
     private MCRXMLResource() {
-        if (resourceCache == null) {
-            resourceCache = new MCRCache(MCRConfiguration.instance().getInt("MCR.MCRXMLResource.Cache.Size", 100), "XML resources");
-        }
+        resourceCache = new MCRCache(MCRConfiguration.instance().getInt("MCR.MCRXMLResource.Cache.Size", 100), "XML resources");
     }
 
     /**
      * @return singleton instance
      */
-    public synchronized static MCRXMLResource instance() {
-        if (instance == null) {
-            instance = new MCRXMLResource();
-        }
+    public static MCRXMLResource instance() {
         return instance;
     }
 

@@ -110,11 +110,15 @@ public class MCRConfiguration {
     /**
      * The single instance of this class that will be used at runtime
      */
-    protected static MCRConfiguration singleton;
+    private static MCRConfiguration singleton;
 
-    private static Hashtable instanceHolder;
+    private Hashtable<String, Object> instanceHolder = new Hashtable<String, Object>();
 
-    static File lastModifiedFile;
+    private File lastModifiedFile;
+
+    static {
+        createSingleton();
+    }
 
     /**
      * Returns the single instance of this class that can be used to read and
@@ -122,11 +126,7 @@ public class MCRConfiguration {
      * 
      * @return the single instance of <CODE>MCRConfiguration</CODE> to be used
      */
-    public static synchronized MCRConfiguration instance() {
-        if (singleton == null) {
-            createSingleton();
-        }
-
+    public static MCRConfiguration instance() {
         return singleton;
     }
 
@@ -148,7 +148,11 @@ public class MCRConfiguration {
                 throw new MCRConfigurationException("Could not create MCR.Configuration.Class singleton \"" + name + "\"", exc);
             }
         } else {
-            singleton = new MCRConfiguration();
+            try {
+                singleton = new MCRConfiguration();
+            } catch (IOException e) {
+                throw new MCRConfigurationException("Could not instantiate MCRConfiguration.", e);
+            }
         }
         singleton.systemModified();
     }
@@ -172,7 +176,9 @@ public class MCRConfiguration {
      * 
      */
     public final void systemModified() {
-        lastModifiedFile.setLastModified(System.currentTimeMillis());
+        if (!lastModifiedFile.setLastModified(System.currentTimeMillis())) {
+            throw new MCRException("Could not change modify date of file " + lastModifiedFile.getAbsolutePath());
+        }
     }
 
     /**
@@ -188,8 +194,9 @@ public class MCRConfiguration {
 
     /**
      * Protected constructor to create the singleton instance
+     * @throws IOException 
      */
-    protected MCRConfiguration() {
+    protected MCRConfiguration() throws IOException {
         properties = new Properties();
         depr = new Properties();
         reload(true);
@@ -204,11 +211,14 @@ public class MCRConfiguration {
             }
         }
         if (!lastModifiedFile.exists()) {
+            FileOutputStream fout = null;
             try {
-                FileOutputStream fout = new FileOutputStream(lastModifiedFile);
+                fout = new FileOutputStream(lastModifiedFile);
                 fout.write(new byte[0]);
-            } catch (Exception e) {
-                throw new MCRException("Error while creating file: " + lastModifiedFile, e);
+            } finally {
+                if (fout != null) {
+                    fout.close();
+                }
             }
 
         }
@@ -238,7 +248,8 @@ public class MCRConfiguration {
         String fn = System.getProperty("MCR.Configuration.File", "mycore.properties");
         loadFromFile(fn);
 
-        Enumeration names = System.getProperties().propertyNames();
+        @SuppressWarnings("unchecked")
+        Enumeration<String> names = (Enumeration<String>) System.getProperties().propertyNames();
         while (names.hasMoreElements()) {
             String name = (String) names.nextElement();
             if (name.startsWith("MCR.")) {
@@ -265,7 +276,7 @@ public class MCRConfiguration {
         boolean found;
         do {
             found = false;
-            Enumeration keys = properties.keys();
+            Enumeration<Object> keys = properties.keys();
             while (keys.hasMoreElements()) {
                 String key = (String) keys.nextElement();
                 String value = properties.getProperty(key, "");
@@ -309,7 +320,7 @@ public class MCRConfiguration {
             throw new MCRConfigurationException("Could not load configuration file deprecated.properties", exc);
         }
 
-        Enumeration names = depr.keys();
+        Enumeration<Object> names = depr.keys();
         while (names.hasMoreElements()) {
             String deprecatedName = (String) names.nextElement();
             if (properties.containsKey(deprecatedName)) {
@@ -394,7 +405,8 @@ public class MCRConfiguration {
     public Properties getProperties(String startsWith) {
         Properties properties = new Properties();
 
-        Enumeration names = this.properties.propertyNames();
+        @SuppressWarnings("unchecked")
+        Enumeration<String> names = (Enumeration<String>) this.properties.propertyNames();
 
         while (names.hasMoreElements()) {
             String name = (String) names.nextElement();
@@ -413,7 +425,8 @@ public class MCRConfiguration {
      */
     public synchronized void configureLogging() {
         Properties prop = new Properties();
-        Enumeration names = properties.propertyNames();
+        @SuppressWarnings("unchecked")
+        Enumeration<String> names = (Enumeration<String>) properties.propertyNames();
         boolean reconfigure = false;
         java.util.List<String> warn = new java.util.ArrayList<String>();
 
@@ -465,7 +478,7 @@ public class MCRConfiguration {
 
         Logger.getLogger(this.getClass()).debug("Loading Class: " + classname);
 
-        Class cl;
+        Class<?> cl;
         try {
             cl = Class.forName(classname);
         } catch (Exception ex) {
@@ -546,13 +559,11 @@ public class MCRConfiguration {
      *             instantiated
      */
     public Object getSingleInstanceOf(String name, String defaultname) throws MCRConfigurationException {
-        if (instanceHolder == null) {
-            instanceHolder = new Hashtable(); // initialize the hashtable if it's not yet
-        } else if (instanceHolder.containsKey(name)) {
-            return instanceHolder.get(name); // we have an instance allready, return it
+        Object inst = instanceHolder.get(name);
+        if (inst != null) {
+            return inst;
         }
-
-        Object inst = getInstanceOf(name, defaultname); // we need a new instance, get it
+        inst = getInstanceOf(name, defaultname); // we need a new instance, get it
         instanceHolder.put(name, inst); // save the instance in the hashtable
 
         return inst;
