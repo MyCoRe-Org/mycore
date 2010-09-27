@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -121,7 +122,15 @@ public class MCRConfigurationTask extends Task {
     private Properties getProperties(File pFile) throws FileNotFoundException, IOException {
         Properties returns = new Properties();
         if (pFile.exists()) {
-            returns.load(new FileInputStream(pFile));
+            FileInputStream stream = null;
+            try {
+                stream = new FileInputStream(pFile);
+                returns.load(stream);
+            } finally {
+                if (stream != null) {
+                    stream.close();
+                }
+            }
         }
         return returns;
     }
@@ -170,8 +179,7 @@ public class MCRConfigurationTask extends Task {
      */
     private void addInclude() {
         if (valuePresent) {
-            handleOutput(new StringBuffer("Not changing ").append(propertyFile.getName()).append(": '").append(value).append(
-                    "' already included.").toString());
+            handleOutput(new StringBuffer("Not changing ").append(propertyFile.getName()).append(": '").append(value).append("' already included.").toString());
             return;
         }
         fileChanged = true;
@@ -183,8 +191,14 @@ public class MCRConfigurationTask extends Task {
         newProp += value;
         propLines.remove(lineNumber);
         propLines.add(lineNumber, newProp);
-        handleOutput(new StringBuffer(propertyFile.getName()).append(':').append(lineNumber).append(" added '").append(value).append(
-                "' to ").append(getKey()).toString());
+        handleOutput(new StringBuffer(propertyFile.getName())
+            .append(':')
+            .append(lineNumber)
+            .append(" added '")
+            .append(value)
+            .append("' to ")
+            .append(getKey())
+            .toString());
     }
 
     /**
@@ -192,16 +206,21 @@ public class MCRConfigurationTask extends Task {
      */
     private void removeInclude() {
         if (!valuePresent) {
-            handleOutput(new StringBuffer("Not changing ").append(propertyFile.getName()).append(": '").append(value).append(
-                    "' not present.").toString());
+            handleOutput(new StringBuffer("Not changing ").append(propertyFile.getName()).append(": '").append(value).append("' not present.").toString());
             return;
         }
         fileChanged = true;
         String newProp = propLines.get(lineNumber).toString().replaceAll("," + value, "");
         propLines.remove(lineNumber);
         propLines.add(lineNumber, newProp);
-        handleOutput(new StringBuffer(propertyFile.getName()).append(':').append(lineNumber).append(" removed '").append(value).append(
-                "' from ").append(getKey()).toString());
+        handleOutput(new StringBuffer(propertyFile.getName())
+            .append(':')
+            .append(lineNumber)
+            .append(" removed '")
+            .append(value)
+            .append("' from ")
+            .append(getKey())
+            .toString());
     }
 
     /*
@@ -362,8 +381,8 @@ public class MCRConfigurationTask extends Task {
             bw.newLine();
             synchronized (properties) {
                 List<String> list = new ArrayList<String>(properties.size());
-                for (Object key : properties.keySet()) {
-                    list.add(key.toString());
+                for (Entry<Object, Object> entry : properties.entrySet()) {
+                    list.add(entry.getKey().toString());
                 }
                 Collections.sort(list);
                 for (String key : list) {

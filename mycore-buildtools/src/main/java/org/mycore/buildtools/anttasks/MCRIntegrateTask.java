@@ -103,9 +103,9 @@ public class MCRIntegrateTask extends Task {
     public void setTarget(String target) {
         this.target = target;
     }
-    
+
     public void setBuildDir(String buildDir) {
-			this.buildDir = new File(getProject().getBaseDir(), buildDir);
+        this.buildDir = new File(getProject().getBaseDir(), buildDir);
     }
 
     private void getMyCoReJar() throws IOException {
@@ -159,7 +159,9 @@ public class MCRIntegrateTask extends Task {
             buildDir = getUnpackDir();
         }
         if (!buildDir.exists()) {
-            buildDir.mkdirs();
+            if (!buildDir.mkdirs()) {
+                throw new BuildException("Cannot create directory: " + buildDir.getAbsolutePath());
+            }
         }
         expandTask.setDest(buildDir);
         expandTask.setSrc(mycoreJarFile);
@@ -176,11 +178,11 @@ public class MCRIntegrateTask extends Task {
 
     private File getUnpackDir() {
         if (this.buildDir == null) {
-			File buildDir = new File(getProject().getBaseDir(), "build");
-			return new File(buildDir, "components");
-		} else {
-			return this.buildDir;
-		}
+            File buildDir = new File(getProject().getBaseDir(), "build");
+            return new File(buildDir, "components");
+        } else {
+            return this.buildDir;
+        }
     }
 
     private Set<String> getExcludedComponents() {
@@ -216,9 +218,15 @@ public class MCRIntegrateTask extends Task {
         mycoreProperty.setAttribute("name", "mycore.jar");
         mycoreProperty.setAttribute("location", mycoreJarFile.getAbsolutePath());
         project.appendChild(mycoreProperty);
-        FileOutputStream out = new FileOutputStream(new File(buildDir, "helper.xml"));
-        transformerFactory.newTransformer().transform(new DOMSource(doc), new StreamResult(out));
-        out.close();
+        FileOutputStream out = null;
+        try {
+            out = new FileOutputStream(new File(buildDir, "helper.xml"));
+            transformerFactory.newTransformer().transform(new DOMSource(doc), new StreamResult(out));
+        } finally {
+            if (out != null) {
+                out.close();
+            }
+        }
     }
 
 }

@@ -42,9 +42,7 @@ import org.mycore.frontend.cli.MCRCommandLineInterface;
  * 
  */
 public class MCRExecuteCommandTask extends Task {
-	String commands;
-	String basedir = null;
-
+	private String commands;
 	/**
 	 * method used, to read the body of an ant task xml element
 	 * @param commands
@@ -53,15 +51,6 @@ public class MCRExecuteCommandTask extends Task {
 		this.commands = commands;
 	}
 
-	/**
-	 * set the base directory, that should be used while executing the commands
-	 * @param basedir - the directory
-	 */			
-	public void setBasedir(String basedir) {
-		this.basedir = basedir;
-	}
-	
-	
 	/* (non-Javadoc)
 	 * @see org.apache.tools.ant.Task#execute()
 	 */
