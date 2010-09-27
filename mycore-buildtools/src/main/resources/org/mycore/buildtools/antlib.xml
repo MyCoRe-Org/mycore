@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <antlib>
   <!-- Tasks -->
-  <taskdef name="config" classname="org.mycore.common.MCRConfigurationTask" />
+  <taskdef name="config" classname="org.mycore.buildtools.anttasks.MCRConfigurationTask" />
   <taskdef name="integrate" classname="org.mycore.buildtools.anttasks.MCRIntegrateTask" />
   <taskdef name="execute" classname="org.mycore.buildtools.anttasks.MCRExecuteCommandTask" />
   <taskdef name="templatecheck" classname="org.mycore.buildtools.anttasks.MCRTemplateTask" />
