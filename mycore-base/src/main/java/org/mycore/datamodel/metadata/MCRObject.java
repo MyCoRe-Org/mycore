@@ -49,7 +49,7 @@ import org.xml.sax.SAXParseException;
  */
 final public class MCRObject extends MCRBase {
     // the object content
-    private MCRObjectStructure mcr_struct;
+    private final MCRObjectStructure mcr_struct;
 
     private final MCRObjectMetadata mcr_metadata;
     private static final Logger LOGGER = Logger.getLogger(MCRObject.class);
@@ -169,13 +169,6 @@ final public class MCRObject extends MCRBase {
         if(jdom_element != null){
             mcr_struct.setFromDOM(jdom_element);
         }
-    }
-
-    /**
-     * This method replace the MCRObjectStructure entry with a new from the input.
-     */
-    public final void setStructure(MCRObjectStructure newStruct) {
-        mcr_struct = newStruct;
     }
 
     private void setMetadata() {
