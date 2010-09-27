@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<FindBugsFilter>
+  <Match>
+    <Class name="org.mycore.common.xml.MCRXMLResource"/>
+    <Method name="getResource"/>
+    <Bug pattern="DMI_BLOCKING_METHODS_ON_URL"/>
+  </Match>
+</FindBugsFilter>
