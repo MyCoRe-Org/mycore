@@ -37,8 +37,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRUtils;
+import org.mycore.imagetiler.MCRImage;
 import org.mycore.iview2.services.MCRIView2Tools;
-import org.mycore.services.iview2.MCRImage;
 
 /**
  * @author Thomas Scheffler (yagee)

@@ -9,8 +9,8 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.services.iview2.MCRImage;
-import org.mycore.services.iview2.MCRTiledPictureProps;
+import org.mycore.imagetiler.MCRImage;
+import org.mycore.imagetiler.MCRTiledPictureProps;
 
 public class MCRTilingAction implements Runnable {
     private MCRTileJob image = null;

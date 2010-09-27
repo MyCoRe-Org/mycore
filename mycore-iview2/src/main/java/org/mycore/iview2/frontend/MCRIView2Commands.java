@@ -38,14 +38,14 @@ import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRCommand;
+import org.mycore.imagetiler.MCRImage;
+import org.mycore.imagetiler.MCRTiledPictureProps;
 import org.mycore.iview2.services.MCRIView2Tools;
 import org.mycore.iview2.services.MCRImageTiler;
 import org.mycore.iview2.services.MCRIview2Props;
 import org.mycore.iview2.services.MCRTileJob;
 import org.mycore.iview2.services.MCRTilingQueue;
 import org.mycore.iview2.services.webservice.MCRIView2RemoteFunctions;
-import org.mycore.services.iview2.MCRImage;
-import org.mycore.services.iview2.MCRTiledPictureProps;
 
 /**
  * @author Thomas Scheffler (yagee)

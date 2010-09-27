@@ -47,8 +47,8 @@ import org.apache.log4j.Logger;
 import org.mycore.common.MCRUtils;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.imagetiler.MCRImage;
 import org.mycore.iview2.services.MCRIView2Tools;
-import org.mycore.services.iview2.MCRImage;
 
 /**
  * @author Thomas Scheffler (yagee)

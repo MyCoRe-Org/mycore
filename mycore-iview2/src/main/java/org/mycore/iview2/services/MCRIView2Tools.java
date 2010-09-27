@@ -46,8 +46,8 @@ import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.services.iview2.MCRImage;
-import org.mycore.services.iview2.MCRTiledPictureProps;
+import org.mycore.imagetiler.MCRImage;
+import org.mycore.imagetiler.MCRTiledPictureProps;
 
 /**
  * @author Thomas Scheffler (yagee)

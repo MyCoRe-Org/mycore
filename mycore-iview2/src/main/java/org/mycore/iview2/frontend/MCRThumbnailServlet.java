@@ -46,9 +46,9 @@ import org.apache.log4j.Logger;
 import org.jdom.JDOMException;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.imagetiler.MCRImage;
+import org.mycore.imagetiler.MCRTiledPictureProps;
 import org.mycore.iview2.services.MCRIView2Tools;
-import org.mycore.services.iview2.MCRImage;
-import org.mycore.services.iview2.MCRTiledPictureProps;
 
 /**
  * @author Thomas Scheffler (yagee)
