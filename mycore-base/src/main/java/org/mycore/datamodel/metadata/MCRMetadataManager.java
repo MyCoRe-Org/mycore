@@ -527,7 +527,7 @@ public final class MCRMetadataManager {
 
         // clean the structure
         mcrObject.getStructure().clearChildren();
-        mcrObject.getStructure().clearDerivate();
+        mcrObject.getStructure().clearDerivates();
 
         // set the derivate data in structure
         for (int i = 0; i < old.getStructure().getDerivateSize(); i++) {
