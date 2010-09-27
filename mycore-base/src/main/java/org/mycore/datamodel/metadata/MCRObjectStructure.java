@@ -82,7 +82,7 @@ public class MCRObjectStructure {
      * This method clean the data lists parent, children and derivates of this
      * class.
      */
-    final void clear() {
+    public final void clear() {
         parent = null;
         children.clear();
         derivates.clear();
@@ -91,14 +91,14 @@ public class MCRObjectStructure {
     /**
      * This method clean the data lists children of this class.
      */
-    final void clearChildren() {
+    public final void clearChildren() {
         children.clear();
     }
 
     /**
      * This method clean the data lists derivate of this class.
      */
-    final void clearDerivate() {
+    public final void clearDerivates() {
         derivates.clear();
     }
 
