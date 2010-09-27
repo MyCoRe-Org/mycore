@@ -64,6 +64,7 @@
           <plugin>
             <groupId>gr.abiss.mvn.plugins</groupId>
             <artifactId>maven-jstools-plugin</artifactId>
+            <version>0.9-SNAPSHOT</version>
             <inherited>false</inherited>
             <configuration>
               <jsDir>src/main/resources</jsDir>
