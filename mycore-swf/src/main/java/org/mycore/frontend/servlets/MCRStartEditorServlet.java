@@ -740,7 +740,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         MCRObject copyobj = MCRMetadataManager.retrieveMCRObject(cd.mysemcrid);
         copyobj.setId(cd.mytfmcrid);
         copyobj.setLabel(cd.mytfmcrid.toString());
-        copyobj.setStructure(new MCRObjectStructure());
+        copyobj.getStructure().clear();
         StringBuffer sb = new StringBuffer();
         try {
             MCRMetadataManager.update(copyobj);
