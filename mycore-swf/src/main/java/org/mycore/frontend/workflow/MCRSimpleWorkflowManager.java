@@ -504,14 +504,27 @@ public class MCRSimpleWorkflowManager {
     }
 
     /**
-     * The method return the next free derivate ID. It looks in the current
-     * workflow directory and in the server.
+     * The method return the next free object ID. It looks in the current workflow directory and in the server.
+     */
+    public synchronized final MCRObjectID getNextObjectID(MCRObjectID ID) {
+        return getNextID(ID.getBase());
+    }
+
+    /**
+     * The method return the next free derivate ID. It looks in the current workflow directory and in the server.
      */
     public synchronized final MCRObjectID getNextDrivateID(MCRObjectID ID) {
-        final String myproject = ID.getProjectId() + "_derivate";
+        String myproject = ID.getProjectId() + "_derivate";
+        return getNextID(myproject);
+    }
 
+    /**
+     * The method return the next free derivate ID. It looks in the current workflow directory and in the server.
+     */
+    public synchronized final MCRObjectID getNextID(String base_id) {
+        final String myproject = base_id;
         Set<File> workdirs = new HashSet<File>();
-        workdirs.add(getDirectoryPath(ID.getBase()));
+        workdirs.add(getDirectoryPath(base_id));
         Properties propsWD = config.getProperties("MCR.SWF.Directory.");
         for (Object key : propsWD.keySet()) {
             File dir = new File(propsWD.getProperty((String) key));

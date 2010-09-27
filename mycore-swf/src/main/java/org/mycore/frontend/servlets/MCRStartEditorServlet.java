@@ -59,6 +59,7 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
+import org.mycore.datamodel.metadata.MCRObjectStructure;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.fileupload.MCRSWFUploadHandlerIFS;
 import org.mycore.frontend.fileupload.MCRSWFUploadHandlerMyCoRe;
@@ -249,7 +250,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             mytfmcrid = null;
         }
         if ((mytfmcrid == null) || ((mytfmcrid = mytfmcrid.trim()).length() == 0)) {
-            cd.mytfmcrid = new MCRObjectID(getNextMCRTFID(cd.myproject, cd.mytype));
+            cd.mytfmcrid = WFM.getNextObjectID(new MCRObjectID(cd.myproject+"_"+cd.mytype+"_1"));
         }
         LOGGER.debug("MCRID (TF) = " + cd.mytfmcrid.toString());
 
@@ -294,45 +295,6 @@ public class MCRStartEditorServlet extends MCRServlet {
         sb = new StringBuffer();
         sb.append(getBaseURL()).append("index.html");
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(sb.toString()));
-    }
-
-    /**
-     * This method return a next new MCRObjectID for the given type and project
-     * ID.
-     * 
-     * @param projectid
-     *            The MCRObjectID project ID
-     * @type type The MCRObjectID type
-     * @return the next free MCRObject for the given parameter
-     */
-    protected final String getNextMCRTFID(String myproject, String mytype) {
-        if ((mytype == null) || (mytype.trim().length() == 0) || (mytype.equals("MCR"))) {
-            mytype = "dummy";
-        }
-        if ((myproject == null) || (myproject.trim().length() == 0) || (myproject.equals("MCR"))) {
-            if (mytype.equals("dummy")) {
-                myproject = CONFIG.getString("MCR.SWF.Project.ID", "MCR");
-            } else {
-                myproject = CONFIG.getString("MCR.SWF.Project.ID." + mytype, "MCR");
-            }
-        }
-
-        final String mytypeString = "_" + mytype + "_";
-        final String project = myproject;
-        File workdir = MCRSimpleWorkflowManager.instance().getDirectoryPath(myproject + "_" + mytype);
-        String max = mytypeString + "0.xml";
-        for (String file : workdir.list(new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                return name.startsWith(project) && name.contains(mytypeString) && name.endsWith(".xml");
-            }
-        })) {
-            if (file.compareTo(max) > 0)
-                max = file;
-        }
-        int maxIDinWorkflow = Integer.parseInt(max.substring(max.lastIndexOf("_") + 1, max.length() - 4));
-
-        MCRObjectID mcridnext = MCRObjectID.getNextFreeId(myproject + "_" + mytype, maxIDinWorkflow);
-        return mcridnext.toString();
     }
 
     /**
@@ -751,6 +713,43 @@ public class MCRStartEditorServlet extends MCRServlet {
         params.put("step", cd.mystep);
         sb = new StringBuffer();
         sb.append(getBaseURL()).append(pagedir).append("editor_form_commit-derivate.xml");
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(sb.toString(), params)));
+    }
+
+    /**
+     * The method copy a object in the workflow with a a new MCRObjectID.
+     * 
+     * @param cd
+     *            the common data stack
+     * @param job
+     *            the MCRServletJob instance
+     */
+    public void scopyobj(MCRServletJob job, CommonData cd) throws IOException {
+        org.jdom.Element rule = WFM.getRuleFromFile(cd.mysemcrid, "writedb");
+        if (rule != null && !AI.checkPermission(rule)) {
+            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
+            return;
+        }
+        if (cd.mysemcrid == null) {
+            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + mcriderrorpage));
+            return;
+        }
+
+        cd.mytfmcrid = WFM.getNextObjectID(new MCRObjectID(cd.myproject+"_"+cd.mytype+"_1"));
+        LOGGER.debug("MCRID (TF) = " + cd.mytfmcrid.toString());
+        MCRObject copyobj = MCRMetadataManager.retrieveMCRObject(cd.mysemcrid);
+        copyobj.setId(cd.mytfmcrid);
+        copyobj.setLabel(cd.mytfmcrid.toString());
+        copyobj.setStructure(new MCRObjectStructure());
+        StringBuffer sb = new StringBuffer();
+        try {
+            MCRMetadataManager.update(copyobj);
+            sb.append(getBaseURL()).append("receive/").append(cd.mytfmcrid);
+        } catch (MCRActiveLinkException e) {
+            LOGGER.error(e.getMessage());
+            sb.append(getBaseURL()).append("receive/").append(cd.mysemcrid);
+        }
+        Properties params = new Properties();
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(sb.toString(), params)));
     }
 
@@ -1217,7 +1216,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             return;
         }
 
-        cd.mytfmcrid = new MCRObjectID(getNextMCRTFID(cd.myproject, cd.mytype));
+        cd.mytfmcrid = WFM.getNextObjectID(new MCRObjectID(cd.myproject+"_"+cd.mytype+"_1"));
         LOGGER.debug("MCRID (TF) = " + cd.mytfmcrid.toString());
         File outFile = new File(WFM.getDirectoryPath(cd.mytfmcrid.getBase()), cd.mytfmcrid + ".xml");
         MCRObject copyobj = new MCRObject();
