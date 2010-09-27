@@ -1,4 +1,4 @@
-package org.mycore.services.iview2;
+package org.mycore.iview2.services;
 
 import java.util.AbstractQueue;
 import java.util.Collections;

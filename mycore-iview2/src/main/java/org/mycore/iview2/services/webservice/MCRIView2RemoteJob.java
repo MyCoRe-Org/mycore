@@ -20,7 +20,7 @@
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
-package org.mycore.services.iview2.webservice;
+package org.mycore.iview2.services.webservice;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

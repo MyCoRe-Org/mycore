@@ -1,4 +1,4 @@
-package org.mycore.services.iview2;
+package org.mycore.iview2.services;
 
 import java.io.IOException;
 import java.util.Date;
@@ -9,6 +9,8 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.services.iview2.MCRImage;
+import org.mycore.services.iview2.MCRTiledPictureProps;
 
 public class MCRTilingAction implements Runnable {
     private MCRTileJob image = null;
@@ -30,10 +32,10 @@ public class MCRTilingAction implements Runnable {
                 picProps = imgTiler.tile();
                 image.setFinished(new Date());
                 image.setStatus(MCRJobState.FIN);
-                image.setHeight(picProps.height);
-                image.setWidth(picProps.width);
-                image.setTiles(picProps.tilesCount);
-                image.setZoomLevel(picProps.zoomlevel);
+                image.setHeight(picProps.getHeight());
+                image.setWidth(picProps.getWidth());
+                image.setTiles(picProps.getTilesCount());
+                image.setZoomLevel(picProps.getZoomlevel());
             } catch (IOException e) {
                 LOGGER.error("IOException occured while tiling a queued picture", e);
             }

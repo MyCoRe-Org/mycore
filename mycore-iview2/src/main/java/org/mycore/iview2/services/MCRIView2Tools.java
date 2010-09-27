@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.services.iview2;
+package org.mycore.iview2.services;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -46,6 +46,8 @@ import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.services.iview2.MCRImage;
+import org.mycore.services.iview2.MCRTiledPictureProps;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -125,22 +127,22 @@ public class MCRIView2Tools {
                 return readTile(iviewImage, reader, 0, 0, 0);
             }
             MCRTiledPictureProps imageProps = MCRTiledPictureProps.getInstance(iviewFile);
-            if (zoomLevel < 0 || zoomLevel > imageProps.zoomlevel) {
-                throw new IndexOutOfBoundsException("Zoom level " + zoomLevel + " is not in range 0 - " + imageProps.zoomlevel);
+            if (zoomLevel < 0 || zoomLevel > imageProps.getZoomlevel()) {
+                throw new IndexOutOfBoundsException("Zoom level " + zoomLevel + " is not in range 0 - " + imageProps.getZoomlevel());
             }
-            double zoomFactor = Math.pow(2, (imageProps.zoomlevel - zoomLevel));
-            int maxX = (int) Math.ceil((imageProps.width / zoomFactor) / MCRImage.TILE_SIZE);
-            int maxY = (int) Math.ceil((imageProps.height / zoomFactor) / MCRImage.TILE_SIZE);
-            LOGGER.info(MessageFormat.format("Image size:{0}x{1}, tiles:{2}x{3}", imageProps.width, imageProps.height, maxX, maxY));
+            double zoomFactor = Math.pow(2, (imageProps.getZoomlevel() - zoomLevel));
+            int maxX = (int) Math.ceil((imageProps.getWidth() / zoomFactor) / MCRImage.getTileSize());
+            int maxY = (int) Math.ceil((imageProps.getHeight() / zoomFactor) / MCRImage.getTileSize());
+            LOGGER.info(MessageFormat.format("Image size:{0}x{1}, tiles:{2}x{3}", imageProps.getWidth(), imageProps.getHeight(), maxX, maxY));
             BufferedImage sampleTile = readTile(iviewImage, reader, zoomLevel, maxX - 1, 0);
-            int xDim = ((maxX - 1) * MCRImage.TILE_SIZE + sampleTile.getWidth());
-            int yDim = ((maxY - 1) * MCRImage.TILE_SIZE + readTile(iviewImage, reader, zoomLevel, 0, maxY - 1).getHeight());
+            int xDim = ((maxX - 1) * MCRImage.getTileSize() + sampleTile.getWidth());
+            int yDim = ((maxY - 1) * MCRImage.getTileSize() + readTile(iviewImage, reader, zoomLevel, 0, maxY - 1).getHeight());
             BufferedImage resultImage = new BufferedImage(xDim, yDim, sampleTile.getType());
             graphics = resultImage.getGraphics();
             for (int x = 0; x < maxX; x++) {
                 for (int y = 0; y < maxY; y++) {
                     BufferedImage tile = readTile(iviewImage, reader, zoomLevel, x, y);
-                    graphics.drawImage(tile, x * MCRImage.TILE_SIZE, y * MCRImage.TILE_SIZE, null);
+                    graphics.drawImage(tile, x * MCRImage.getTileSize(), y * MCRImage.getTileSize(), null);
                 }
             }
             return resultImage;

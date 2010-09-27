@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.frontend.iview2;
+package org.mycore.iview2.frontend;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -38,14 +38,14 @@ import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRCommand;
-import org.mycore.services.iview2.MCRIView2Tools;
+import org.mycore.iview2.services.MCRIView2Tools;
+import org.mycore.iview2.services.MCRImageTiler;
+import org.mycore.iview2.services.MCRIview2Props;
+import org.mycore.iview2.services.MCRTileJob;
+import org.mycore.iview2.services.MCRTilingQueue;
+import org.mycore.iview2.services.webservice.MCRIView2RemoteFunctions;
 import org.mycore.services.iview2.MCRImage;
-import org.mycore.services.iview2.MCRImageTiler;
-import org.mycore.services.iview2.MCRIview2Props;
-import org.mycore.services.iview2.MCRTileJob;
 import org.mycore.services.iview2.MCRTiledPictureProps;
-import org.mycore.services.iview2.MCRTilingQueue;
-import org.mycore.services.iview2.webservice.MCRIView2RemoteFunctions;
 
 /**
  * @author Thomas Scheffler (yagee)

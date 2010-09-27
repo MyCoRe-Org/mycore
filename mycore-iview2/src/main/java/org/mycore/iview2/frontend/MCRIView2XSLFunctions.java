@@ -21,10 +21,10 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.frontend.iview2;
+package org.mycore.iview2.frontend;
 
 import org.mycore.common.MCRConfiguration;
-import org.mycore.services.iview2.MCRIView2Tools;
+import org.mycore.iview2.services.MCRIView2Tools;
 
 /**
  * @author Thomas Scheffler (yagee)

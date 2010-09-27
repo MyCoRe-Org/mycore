@@ -2,27 +2,27 @@
 <!-- Servlets and mappings of iview2                                  -->
 <!-- **************************************************************** -->
 <listener>
-  <listener-class>org.mycore.common.events.MCRIView2ServletContextListener</listener-class>
+  <listener-class>org.mycore.iview2.events.MCRIView2ServletContextListener</listener-class>
 </listener>
 
 <servlet>
   <servlet-name>MCRDirectoryXMLServlet</servlet-name>
-  <servlet-class>org.mycore.frontend.iview2.MCRDirectoryXMLServlet</servlet-class>
+  <servlet-class>org.mycore.iview2.frontend.MCRDirectoryXMLServlet</servlet-class>
 </servlet>
 
 <servlet>
   <servlet-name>MCRTileServlet</servlet-name>
-  <servlet-class>org.mycore.frontend.iview2.MCRTileServlet</servlet-class>
+  <servlet-class>org.mycore.iview2.frontend.MCRTileServlet</servlet-class>
 </servlet>
 
 <servlet>
   <servlet-name>MCRTileCombineServlet</servlet-name>
-  <servlet-class>org.mycore.frontend.iview2.MCRTileCombineServlet</servlet-class>
+  <servlet-class>org.mycore.iview2.frontend.MCRTileCombineServlet</servlet-class>
 </servlet>
 
 <servlet>
   <servlet-name>MCRThumbnailServlet</servlet-name>
-  <servlet-class>org.mycore.frontend.iview2.MCRThumbnailServlet</servlet-class>
+  <servlet-class>org.mycore.iview2.frontend.MCRThumbnailServlet</servlet-class>
 </servlet>
 
 <servlet-mapping>

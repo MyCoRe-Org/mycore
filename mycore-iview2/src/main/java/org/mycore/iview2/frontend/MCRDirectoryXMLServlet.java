@@ -1,4 +1,4 @@
-package org.mycore.frontend.iview2;
+package org.mycore.iview2.frontend;
 
 import java.io.IOException;
 

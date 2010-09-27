@@ -21,14 +21,14 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.common.events;
+package org.mycore.iview2.events;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.apache.log4j.Logger;
-import org.mycore.services.iview2.MCRImageTiler;
-import org.mycore.services.iview2.MCRTilingQueue;
+import org.mycore.iview2.services.MCRImageTiler;
+import org.mycore.iview2.services.MCRTilingQueue;
 
 /**
  * @author Thomas Scheffler (yagee)

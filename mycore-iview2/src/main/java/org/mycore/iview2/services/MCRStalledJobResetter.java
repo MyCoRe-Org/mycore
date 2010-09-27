@@ -1,4 +1,4 @@
-package org.mycore.services.iview2;
+package org.mycore.iview2.services;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Session;

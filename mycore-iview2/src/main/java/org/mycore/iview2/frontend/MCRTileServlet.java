@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.frontend.iview2;
+package org.mycore.iview2.frontend;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,7 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRUtils;
-import org.mycore.services.iview2.MCRIView2Tools;
+import org.mycore.iview2.services.MCRIView2Tools;
 import org.mycore.services.iview2.MCRImage;
 
 /**

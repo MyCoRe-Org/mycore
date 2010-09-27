@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.services.iview2.webservice;
+package org.mycore.iview2.services.webservice;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -42,10 +42,10 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.services.iview2.MCRIView2Tools;
-import org.mycore.services.iview2.MCRJobState;
-import org.mycore.services.iview2.MCRTileJob;
-import org.mycore.services.iview2.MCRTilingQueue;
+import org.mycore.iview2.services.MCRIView2Tools;
+import org.mycore.iview2.services.MCRJobState;
+import org.mycore.iview2.services.MCRTileJob;
+import org.mycore.iview2.services.MCRTilingQueue;
 
 /**
  * @author Thomas Scheffler (yagee)
