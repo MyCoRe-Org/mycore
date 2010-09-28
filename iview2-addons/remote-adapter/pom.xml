@@ -2,7 +2,7 @@
   <description>Interface to IView 2 Web Services</description>
   <parent>
   <groupId>org.mycore.iview2</groupId>
-  <artifactId>mycore-iview2-addons</artifactId>
+  <artifactId>iview2-addons</artifactId>
     <version>2.0.92-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
@@ -12,19 +12,6 @@
   <name>MyCoRe IView2 Remote Adapter</name>
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>compile</id>
-            <goals>
-              <goal>compile</goal>
-            </goals>
-            <phase>initialize</phase>
-          </execution>
-        </executions>
-      </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>jaxws-maven-plugin</artifactId>
