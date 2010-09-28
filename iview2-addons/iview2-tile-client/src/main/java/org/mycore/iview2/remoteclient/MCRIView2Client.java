@@ -36,11 +36,11 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 
 import org.apache.log4j.Logger;
-import org.mycore.services.iview2.MCRImage;
-import org.mycore.services.iview2.MCRTiledPictureProps;
-import org.mycore.services.iview2.remoteclient.MCRIView2RemoteFunctions;
-import org.mycore.services.iview2.remoteclient.MCRIView2RemoteFunctionsService;
-import org.mycore.services.iview2.remoteclient.MCRIView2RemoteJob;
+import org.mycore.imagetiler.MCRImage;
+import org.mycore.imagetiler.MCRTiledPictureProps;
+import org.mycore.iview2.services.remoteclient.MCRIView2RemoteFunctions;
+import org.mycore.iview2.services.remoteclient.MCRIView2RemoteFunctionsService;
+import org.mycore.iview2.services.remoteclient.MCRIView2RemoteJob;
 
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
@@ -175,7 +175,7 @@ public class MCRIView2Client {
             tileJob.setHeight(tiledPictureProps.getHeight());
             tileJob.setWidth(tiledPictureProps.getWidth());
             tileJob.setZoomLevel(tiledPictureProps.getZoomlevel());
-            tileJob.setTiles(tiledPictureProps.getCountTiles());
+            tileJob.setTiles(tiledPictureProps.getTilesCount());
             return true;
         }
 

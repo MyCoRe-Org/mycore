@@ -1,10 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <description>Interface to IView 2 Web Services</description>
   <parent>
-    <artifactId>mycore-parent</artifactId>
-    <groupId>org.mycore</groupId>
-    <version>2.0.90-SNAPSHOT</version>
-    <relativePath>../mycore-parent/pom.xml</relativePath>
+  <groupId>org.mycore.iview2</groupId>
+  <artifactId>mycore-iview2-addons</artifactId>
+    <version>2.0.92-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.mycore.iview2</groupId>
@@ -30,17 +30,29 @@
         <artifactId>jaxws-maven-plugin</artifactId>
         <executions>
           <execution>
+            <id>generate-wsdl</id>
             <goals>
               <goal>wsgen</goal>
             </goals>
             <phase>generate-sources</phase>
             <configuration>
               <pluginArtifacts></pluginArtifacts>
-              <sei>org.mycore.services.iview2.webservice.MCRIView2RemoteFunctions</sei>
+              <sei>org.mycore.iview2.services.webservice.MCRIView2RemoteFunctions</sei>
               <keep>true</keep>
               <verbose>true</verbose>
               <genWsdl>true</genWsdl>
-              <resourceDestDir>${project.build.outputDirectory}/org/mycore/services/iview2/webservice</resourceDestDir>
+              <resourceDestDir>${project.build.outputDirectory}/org/mycore/iview2/services/webservice</resourceDestDir>
+            </configuration>
+          </execution>
+          <execution>
+            <id>consume-wsdl</id>
+            <goals>
+              <goal>wsimport</goal>
+            </goals>
+            <phase>process-sources</phase>
+            <configuration>
+              <wsdlDirectory>${project.build.outputDirectory}/org/mycore/iview2/services/webservice</wsdlDirectory>
+              <wsdlLocation>MCRIView2RemoteFunctionsService.wsdl</wsdlLocation>
             </configuration>
           </execution>
         </executions>
@@ -51,21 +63,6 @@
             <version>${project.version}</version>
           </dependency>
         </dependencies>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>jaxws-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>wsimport</goal>
-            </goals>
-            <configuration>
-              <wsdlDirectory>${project.build.outputDirectory}/org/mycore/services/iview2/webservice</wsdlDirectory>
-              <wsdlLocation>MCRIView2RemoteFunctionsService.wsdl</wsdlLocation>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>

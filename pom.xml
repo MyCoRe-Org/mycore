@@ -1052,5 +1052,6 @@
     <module>mycore-z3950</module>
     <module>mycore-zoomify</module>
     <module>mycore-complete</module>
+    <module>iview2-addons</module>
   </modules>
 </project>
