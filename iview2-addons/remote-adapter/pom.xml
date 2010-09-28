@@ -17,29 +17,14 @@
         <artifactId>jaxws-maven-plugin</artifactId>
         <executions>
           <execution>
-            <id>generate-wsdl</id>
-            <goals>
-              <goal>wsgen</goal>
-            </goals>
-            <phase>generate-sources</phase>
-            <configuration>
-              <pluginArtifacts></pluginArtifacts>
-              <sei>org.mycore.iview2.services.webservice.MCRIView2RemoteFunctions</sei>
-              <keep>true</keep>
-              <verbose>true</verbose>
-              <genWsdl>true</genWsdl>
-              <resourceDestDir>${project.build.outputDirectory}/org/mycore/iview2/services/webservice</resourceDestDir>
-            </configuration>
-          </execution>
-          <execution>
             <id>consume-wsdl</id>
             <goals>
               <goal>wsimport</goal>
             </goals>
-            <phase>process-sources</phase>
             <configuration>
-              <wsdlDirectory>${project.build.outputDirectory}/org/mycore/iview2/services/webservice</wsdlDirectory>
-              <wsdlLocation>MCRIView2RemoteFunctionsService.wsdl</wsdlLocation>
+              <keep>true</keep>
+              <verbose>true</verbose>
+              <wsdlDirectory>${project.basedir}/../../mycore-iview2/target/jaxws/wsgen/wsdl</wsdlDirectory>
             </configuration>
           </execution>
         </executions>

@@ -9,6 +9,29 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>mycore-iview2</artifactId>
   <name>MyCoRe IView2</name>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>jaxws-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>generate-wsdl</id>
+            <goals>
+              <goal>wsgen</goal>
+            </goals>
+            <configuration>
+              <pluginArtifacts></pluginArtifacts>
+              <sei>org.mycore.iview2.services.webservice.MCRIView2RemoteFunctions</sei>
+              <keep>true</keep>
+              <verbose>true</verbose>
+              <genWsdl>true</genWsdl>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>

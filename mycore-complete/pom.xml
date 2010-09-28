@@ -84,20 +84,20 @@
       </plugin>
     </plugins>
   </build>
-<!--  <reporting>-->
-<!--    <plugins>-->
-<!--      <plugin>-->
-<!--        <artifactId>maven-javadoc-plugin</artifactId>-->
-<!--        <version>2.7</version>-->
-<!--        <configuration>-->
-<!--          <includeDependencySources>true</includeDependencySources>-->
-<!--          <dependencySourceIncludes>-->
-<!--            <dependencySourceInclude>org.mycore:*</dependencySourceInclude>-->
-<!--          </dependencySourceIncludes>-->
-<!--        </configuration>-->
-<!--      </plugin>-->
-<!--    </plugins>-->
-<!--  </reporting>-->
+  <!-- <reporting> -->
+  <!-- <plugins> -->
+  <!-- <plugin> -->
+  <!-- <artifactId>maven-javadoc-plugin</artifactId> -->
+  <!-- <version>2.7</version> -->
+  <!-- <configuration> -->
+  <!-- <includeDependencySources>true</includeDependencySources> -->
+  <!-- <dependencySourceIncludes> -->
+  <!-- <dependencySourceInclude>org.mycore:*</dependencySourceInclude> -->
+  <!-- </dependencySourceIncludes> -->
+  <!-- </configuration> -->
+  <!-- </plugin> -->
+  <!-- </plugins> -->
+  <!-- </reporting> -->
   <dependencies>
     <dependency>
       <groupId>ant-contrib</groupId>
@@ -122,6 +122,12 @@
       <groupId>org.mycore</groupId>
       <artifactId>mycore-buildtools</artifactId>
       <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.cargo</groupId>
+          <artifactId>cargo-core-api-module</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
