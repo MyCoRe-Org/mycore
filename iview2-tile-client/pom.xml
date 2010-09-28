@@ -1,0 +1,58 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <description>Uses IView2 web service to get next image file and tiles it locally</description>
+  <parent>
+    <artifactId>mycore-parent</artifactId>
+    <groupId>org.mycore</groupId>
+    <version>2.0.90-SNAPSHOT</version>
+    <relativePath>../mycore-parent/pom.xml</relativePath>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.mycore.iview2</groupId>
+  <artifactId>iview2-tile-client</artifactId>
+  <name>MyCoRe IView2 Image Tile Client</name>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+          <archive>
+            <manifest>
+              <mainClass>org.mycore.iview2.remoteclient.MCRIView2Client</mainClass>
+            </manifest>
+            <manifestEntries>
+              <Specification-Title>Java Advanced Imaging Image I/O Tools</Specification-Title>
+              <Specification-Version>1.1</Specification-Version>
+              <Specification-Vendor>Sun Microsystems, Inc.</Specification-Vendor>
+              <Implementation-Title>com.sun.media.imageio</Implementation-Title>
+              <Implementation-Version>1.1</Implementation-Version>
+              <Implementation-Vendor>Sun Microsystems, Inc.</Implementation-Vendor>
+              <Extension-Name>com.sun.media.imageio</Extension-Name>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <dependencies>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.mycore.iview2</groupId>
+      <artifactId>image-tiler</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mycore.iview2</groupId>
+      <artifactId>remote-adapter</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+</project>
