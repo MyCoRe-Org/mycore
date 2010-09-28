@@ -1,4 +1,4 @@
-<project name="iview2">
+<project name="iview2" xmlns:mcr="antlib:org.mycore.buildtools">
   <import file="../../integrate.xml" />
   <condition property="jai.available">
     <available classname="javax.media.jai.JAI" classpathref="integration.classpath" />
@@ -7,11 +7,11 @@
 	          target: config                      
 	         - - - - - - - - - - - - - - - - - -->
   <target name="config">
-    <mcr-config action="addInclude"
+    <mcr:config action="addInclude"
                 propertyfile="${build.config}/mycore.properties"
                 key="MCR.CLI.Classes.Internal"
                 value="org.mycore.iview2.frontend.MCRIView2Commands" />
-    <mcr-config action="addInclude"
+    <mcr:config action="addInclude"
                 propertyfile="${build.config}/mycore.properties"
                 key="MCR.URIResolver.xslIncludes.components"
                 value="mcr-module-startIview2.xsl" />

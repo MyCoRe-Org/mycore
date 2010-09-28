@@ -1,11 +1,11 @@
-<project name="migration20-21">
+<project name="migration20-21" xmlns:mcr="antlib:org.mycore.buildtools">
   <import file="../../integrate.xml" />
   <!-- - - - - - - - - - - - - - - - - - 
           target: config                      
          - - - - - - - - - - - - - - - - -
 -->
   <target name="config">
-    <mcr-config action="addInclude"
+    <mcr:config action="addInclude"
                 propertyfile="${build.config}/mycore.properties"
                 key="MCR.CLI.Classes.Internal"
                 value="org.mycore.services.migration.MCRMigrationCommands21" />

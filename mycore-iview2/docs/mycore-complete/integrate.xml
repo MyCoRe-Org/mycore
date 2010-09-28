@@ -1,9 +1,9 @@
-<project name="MyCoRe Components integration">
+<project name="MyCoRe Components integration" xmlns:mcr="antlib:org.mycore.buildtools">
   <property name="components.order"
-    value="acl-editor,broadcasting,buildtools,classbrowser,classhandler,doubletfinder,indexing,iview2,migration13-20,session-listing,swf,metsmods,zoomify,useradmin,userlogin,wcms,webcli,webservices,z3950"/>
+    value="acl-editor,broadcasting,buildtools,classbrowser,classhandler,doubletfinder,indexing,iview2,session-listing,swf,metsmods,zoomify,useradmin,userlogin,wcms,webcli,webservices,z3950"/>
   
   <import file="${integration.dir}/helper.xml"/>
-  <taskdef classname="org.mycore.common.MCRConfigurationTask" name="mcr-config" classpathref="integration.classpath"/>
+  <taskdef resource="org/mycore/buildtools/antlib.xml" uri="antlib:org.mycore.buildtools" classpathref="integration.classpath" onerror="fail"/>
   <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="integration.classpath"/>
   <!-- for task is not included in antcontrib.properties by default -->
   <taskdef name="for" classname="net.sf.antcontrib.logic.ForTask" classpathref="integration.classpath"/>
@@ -115,11 +115,11 @@
         <include name="*/config/mycore.properties"/>
       </fileset>
       <sequential>
-        <mcr-config propertyfile="${build.config}/mycore.properties" mergeFile="@{component.property}"/>
+        <mcr:config propertyfile="${build.config}/mycore.properties" mergeFile="@{component.property}"/>
       </sequential>
     </for>
     <for param="table.class"
-      list="MCRACCESS,MCRACCESSRULE,MCRCSTORE,MCRFSNODES,MCRGROUPS,MCRGROUPADMINS,MCRGROUPMEMBERS,MCRLINKHREF,MCRRESUMPTIONTOKEN,MCRURN,MCRUSERS,MCRXMLTABLE">
+      list="MCRACCESS,MCRACCESSRULE,MCRCSTORE,MCRFSNODES,MCRGROUPS,MCRGROUPADMINS,MCRGROUPMEMBERS,MCRLINKHREF,MCRRESUMPTIONTOKEN,MCRURN,MCRUSERS,MCRDELETEDITEMS">
       <sequential>
         <AddHibernateMapping class="org.mycore.backend.hibernate.tables.@{table.class}"/>
       </sequential>

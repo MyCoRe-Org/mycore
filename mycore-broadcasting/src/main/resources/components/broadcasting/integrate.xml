@@ -1,4 +1,4 @@
-<project name="broadcasting">
+<project name="broadcasting" xmlns:mcr="antlib:org.mycore.buildtools">
   <import file="../../integrate.xml" />
   <!-- - - - - - - - - - - - - - - - - - 
           target: create.users                      
@@ -23,7 +23,7 @@ check user data consistency
 	      target: config                      
          - - - - - - - - - - - - - - - - - -->
 	  <target name="config">
-	  	<mcr-config action="addInclude"
+	  	<mcr:config action="addInclude"
 	  	                propertyfile="${build.config}/mycore.properties"
 	  	                key="MCR.URIResolver.xslIncludes.components"
 	  	                value="mcr-module-broadcasting.xsl" />
