@@ -194,6 +194,16 @@
               </reportSet>
             </reportSets>
           </plugin>
+          <plugin>
+            <artifactId>maven-jxr-plugin</artifactId>
+            <configuration>
+              <aggregate>true</aggregate>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>dashboard-maven-plugin</artifactId>
+          </plugin>
         </plugins>
       </reporting>
     </profile>
