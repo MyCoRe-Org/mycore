@@ -185,6 +185,7 @@
               </reportSet>
               <reportSet>
                 <id>aggregate</id>
+                <inherited>false</inherited>
                 <configuration>
                 </configuration>
                 <reports>
