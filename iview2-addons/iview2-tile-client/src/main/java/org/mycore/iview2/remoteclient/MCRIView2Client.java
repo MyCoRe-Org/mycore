@@ -116,7 +116,7 @@ public class MCRIView2Client {
     }
 
     private static MCRIView2RemoteFunctions getIViewRemoteFunctions(String endPoint) throws MalformedURLException {
-        QName qName = new QName("http://mycore.org/services/iview2/remoteClient", "MCRIView2RemoteFunctionsService");
+        QName qName = new QName("http://mycore.org/iview2/services/remoteClient", "MCRIView2RemoteFunctionsService");
         URL serviceURL = new URL(endPoint + "?wsdl");
         MCRIView2RemoteFunctionsService service = new MCRIView2RemoteFunctionsService(serviceURL, qName);
         MCRIView2RemoteFunctions iView2RemoteFunctions = service.getMCRIView2RemoteFunctionsPort();
