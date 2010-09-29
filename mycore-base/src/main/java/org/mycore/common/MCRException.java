@@ -48,6 +48,10 @@ public class MCRException extends RuntimeException {
     public MCRException(String message) {
         super(message);
     }
+    
+    public MCRException(Throwable cause) {
+        super(cause);
+    }
 
     /**
      * Creates a new MCRException with an error message and a reference to an

@@ -25,11 +25,16 @@ package org.mycore.backend.lucene;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.Vector;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -104,6 +109,10 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
 
     private Vector<MCRFieldDef> addableFields = new Vector<MCRFieldDef>();
 
+    private boolean storeQueryFields;
+
+    private MCRLuceneQueryFieldLogger queryFieldLogger;
+
     /**
      * @return the sortableSuffix
      */
@@ -171,6 +180,29 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         } catch (IOException e) {
             throw new MCRException("Cannot initialize IndexReader.", e);
         }
+        storeQueryFields = MCRConfiguration.instance().getBoolean(prefix + "StoreQueryFields", false);
+        if (storeQueryFields) {
+            File queryFieldProperties = getQueryFieldLoggerProperties();
+            Properties props = new Properties();
+            if (queryFieldProperties.exists()) {
+                FileInputStream fileInputStream = null;
+                try {
+                    try {
+                        fileInputStream = new FileInputStream(queryFieldProperties);
+                        props.load(fileInputStream);
+                    } finally {
+                        fileInputStream.close();
+                    }
+                } catch (IOException e) {
+                    throw new MCRException(e);
+                }
+            }
+            queryFieldLogger = new MCRLuceneQueryFieldLogger(props);
+        }
+    }
+
+    private File getQueryFieldLoggerProperties() {
+        return new File(IndexDir.getParentFile(), IndexDir.getName() + "-usage.properties");
     }
 
     private void deleteLuceneLockFile() {
@@ -251,6 +283,21 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         if (sortFields.getSort().length == 0) {
             //one sort criteria is needed for TopFieldCollector, using internal document id then
             sortFields.setSort(SortField.FIELD_DOC);
+        }
+        if (queryFieldLogger != null) {
+            //log field usage
+            luceneQuery.rewrite(sharedIndexContext.getReader());
+            HashSet<Term> terms = new HashSet<Term>();
+            luceneQuery.extractTerms(terms);
+            for (Term term : terms) {
+                queryFieldLogger.useField(term.field());
+            }
+            for (SortField sortField : sortFields.getSort()) {
+                String field = sortField.getField();
+                if (field != null) {
+                    queryFieldLogger.useField(field);
+                }
+            }
         }
         MCRLuceneResults results = new MCRLuceneResults(sharedIndexContext, addableFields, sortFields, luceneQuery, maxResults);
         //cannot sort with "score" as the SortField is created on the fly for that search
@@ -561,6 +608,24 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
             LOGGER.warn("Error while closing " + toString(), e);
         }
         LOGGER.info("Processed " + modifyExecutor.getCompletedTaskCount() + " modification requests.");
+        if (queryFieldLogger != null) {
+            Properties properties = queryFieldLogger.getFieldUsageAsProperties();
+            FileOutputStream outputStream = null;
+            try {
+                try {
+                    File queryFieldLoggerProperties = getQueryFieldLoggerProperties();
+                    outputStream = new FileOutputStream(queryFieldLoggerProperties);
+                    properties.store(outputStream, new Date().toString());
+                    LOGGER.info("Stored " + properties.size() + " fields in usage statistics to " + queryFieldLoggerProperties);
+                } finally {
+                    if (outputStream != null) {
+                        outputStream.close();
+                    }
+                }
+            } catch (IOException e) {
+                throw new MCRException(e);
+            }
+        }
     }
 
     @Override
