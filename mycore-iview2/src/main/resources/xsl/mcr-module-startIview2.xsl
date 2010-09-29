@@ -73,7 +73,7 @@
 
   <xsl:template name="iview2.getSupport">
     <xsl:param name="derivID" />
-    <xsl:value-of xmlns:iview2="xalan://org.mycore.frontend.iview2.MCRIView2XSLFunctions"
+    <xsl:value-of xmlns:iview2="xalan://org.mycore.iview2.frontend.MCRIView2XSLFunctions"
       select="iview2:getSupportedMainFile($derivID)" />
   </xsl:template>
 </xsl:stylesheet>
