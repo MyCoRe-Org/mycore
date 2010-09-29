@@ -158,10 +158,6 @@ public class MCRCommandLineInterface {
     public static void main(String[] args) {
         config = MCRConfiguration.instance();
         logger = Logger.getLogger(MCRCommandLineInterface.class);
-        session = MCRSessionMgr.getCurrentSession();
-        session.setCurrentIP(MCRSession.getLocalIP());
-        session.setCurrentUserID(config.getString("MCR.Users.Superuser.UserName", "administrator"));
-        MCRSessionMgr.setCurrentSession(session);
         system = config.getString("MCR.CommandLineInterface.SystemName", "MyCoRe") + ":";
 
         System.out.println();
@@ -175,6 +171,10 @@ public class MCRCommandLineInterface {
             showException(ex);
             System.exit(1);
         }
+        session = MCRSessionMgr.getCurrentSession();
+        session.setCurrentIP(MCRSession.getLocalIP());
+        session.setCurrentUserID(config.getString("MCR.Users.Superuser.UserName", "administrator"));
+        MCRSessionMgr.setCurrentSession(session);
 
         System.out.println(system + " Initialization done.");
         System.out.println(system + " Type 'help' to list all commands!");
