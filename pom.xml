@@ -191,10 +191,6 @@
               <aggregate>true</aggregate>
             </configuration>
           </plugin>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>dashboard-maven-plugin</artifactId>
-          </plugin>
         </plugins>
       </reporting>
     </profile>
