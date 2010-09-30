@@ -16,6 +16,7 @@ import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TopFieldCollector;
 import org.apache.lucene.search.TopFieldDocs;
+import org.apache.lucene.store.AlreadyClosedException;
 import org.mycore.common.MCRException;
 import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRFieldValue;
@@ -51,8 +52,8 @@ class MCRLuceneResults extends MCRResults {
 
     private static Logger LOGGER = Logger.getLogger(MCRLuceneResults.class);
 
-    public MCRLuceneResults(MCRSharedLuceneIndexContext sharedIndexContext, Collection<MCRFieldDef> addableFields, Sort sortFields,
-            Query luceneQuery, int maxResults) throws CorruptIndexException, IOException {
+    public MCRLuceneResults(MCRSharedLuceneIndexContext sharedIndexContext, Collection<MCRFieldDef> addableFields, Sort sortFields, Query luceneQuery,
+        int maxResults) throws CorruptIndexException, IOException {
         super();
         this.addableFields = addableFields;
         this.sharedIndexContext = sharedIndexContext;
@@ -144,7 +145,11 @@ class MCRLuceneResults extends MCRResults {
             if (topDocs.scoreDocs.length <= i) {
                 throw new MCRException("TopDocs is not initialized.", e);
             }
-            LOGGER.warn("Error while fetching Lucene document: " + topDocs.scoreDocs[i].doc + "\nRequery Lucene index.", e);
+            if (e instanceof AlreadyClosedException) {
+                LOGGER.warn("Invalid IndexReader for fetching Lucene document: " + topDocs.scoreDocs[i].doc + "\nRequery Lucene index.");
+            } else {
+                LOGGER.warn("Error while fetching Lucene document: " + topDocs.scoreDocs[i].doc + "\nRequery Lucene index.", e);
+            }
             try {
                 reQuery();
                 hit = getMCRHit(topDocs.scoreDocs[i], indexSearcher);
