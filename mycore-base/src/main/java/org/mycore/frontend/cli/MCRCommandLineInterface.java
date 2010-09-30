@@ -99,32 +99,26 @@ public class MCRCommandLineInterface {
         // Built-in commands
         // **************************************
         knownCommands.add(new MCRCommand("process {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.readCommandsFile String",
-                "Execute the commands listed in the text file {0}."));
+            "Execute the commands listed in the text file {0}."));
         knownCommands.add(new MCRCommand("help {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.showCommandsHelp String",
-                "Show the help text for the commands beginning with {0}."));
-        knownCommands.add(new MCRCommand("help", "org.mycore.frontend.cli.MCRCommandLineInterface.listKnownCommands",
-                "List all possible commands."));
-        knownCommands.add(new MCRCommand("exit", "org.mycore.frontend.cli.MCRCommandLineInterface.exit",
-                "Stop and exit the commandline tool."));
-        knownCommands.add(new MCRCommand("quit", "org.mycore.frontend.cli.MCRCommandLineInterface.exit",
-                "Stop and exit the commandline tool."));
+            "Show the help text for the commands beginning with {0}."));
+        knownCommands.add(new MCRCommand("help", "org.mycore.frontend.cli.MCRCommandLineInterface.listKnownCommands", "List all possible commands."));
+        knownCommands.add(new MCRCommand("exit", "org.mycore.frontend.cli.MCRCommandLineInterface.exit", "Stop and exit the commandline tool."));
+        knownCommands.add(new MCRCommand("quit", "org.mycore.frontend.cli.MCRCommandLineInterface.exit", "Stop and exit the commandline tool."));
         knownCommands.add(new MCRCommand("! {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.executeShellCommand String",
-                "Execute the shell command {0}, for example '! ls' or '! cmd /c dir'"));
-        knownCommands.add(new MCRCommand("show file {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.show String",
-                "Show contents of local file {0}"));
-        knownCommands.add(new MCRCommand("change to user {0} with {1}",
-                "org.mycore.frontend.cli.MCRCommandLineInterface.changeToUser String String",
-                "Change the user {0} with the given password in {1}."));
+            "Execute the shell command {0}, for example '! ls' or '! cmd /c dir'"));
+        knownCommands.add(new MCRCommand("show file {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.show String", "Show contents of local file {0}"));
+        knownCommands.add(new MCRCommand("change to user {0} with {1}", "org.mycore.frontend.cli.MCRCommandLineInterface.changeToUser String String",
+            "Change the user {0} with the given password in {1}."));
         knownCommands.add(new MCRCommand("login {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.login String",
-                "Start the login dialog for the user {0}."));
+            "Start the login dialog for the user {0}."));
         knownCommands.add(new MCRCommand("whoami", "org.mycore.frontend.cli.MCRCommandLineInterface.whoami", "Print the current user."));
-        knownCommands.add(new MCRCommand("show command statistics",
-                "org.mycore.frontend.cli.MCRCommandLineInterface.showCommandStatistics",
-                "Show statistics on number of commands processed and execution time needed per command"));
+        knownCommands.add(new MCRCommand("show command statistics", "org.mycore.frontend.cli.MCRCommandLineInterface.showCommandStatistics",
+            "Show statistics on number of commands processed and execution time needed per command"));
         knownCommands.add(new MCRCommand("cancel on error", "org.mycore.frontend.cli.MCRCommandLineInterface.cancelOnError",
-                "Cancel execution of further commands in case of error"));
+            "Cancel execution of further commands in case of error"));
         knownCommands.add(new MCRCommand("skip on error", "org.mycore.frontend.cli.MCRCommandLineInterface.skipOnError",
-                "Skip execution of failed command in case of error"));
+            "Skip execution of failed command in case of error"));
 
         // **************************************
         // Read internal and/or external commands
@@ -263,11 +257,12 @@ public class MCRCommandLineInterface {
      */
     protected static void processCommand(String command) {
         long start = 0, end = 0;
-        Transaction tx = MCRHIBConnection.instance().getSession().beginTransaction();
+        Transaction tx = null;
         List<String> commandsReturned = null;
         String invokedCommand = null;
 
         try {
+            tx = MCRHIBConnection.instance().getSession().beginTransaction();
             for (MCRCommand currentCommand : knownCommands) {
                 start = System.currentTimeMillis();
                 commandsReturned = currentCommand.invoke(command);
@@ -310,10 +305,12 @@ public class MCRCommandLineInterface {
         } catch (Exception ex) {
             showException(ex);
             System.out.printf("%s Command failed. Performing transaction rollback...\n", system);
-            try {
-                tx.rollback();
-            } catch (Exception ex2) {
-                showException(ex2);
+            if (tx != null) {
+                try {
+                    tx.rollback();
+                } catch (Exception ex2) {
+                    showException(ex2);
+                }
             }
             if (SKIP_FAILED_COMMAND) {
                 saveFailedCommand(command);
@@ -324,9 +321,11 @@ public class MCRCommandLineInterface {
                 }
             }
         } finally {
-            tx = MCRHIBConnection.instance().getSession().beginTransaction();
-            MCRHIBConnection.instance().getSession().clear();
-            tx.commit();
+            if (tx != null) {
+                tx = MCRHIBConnection.instance().getSession().beginTransaction();
+                MCRHIBConnection.instance().getSession().clear();
+                tx.commit();
+            }
         }
     }
 
@@ -433,8 +432,7 @@ public class MCRCommandLineInterface {
         if (ex instanceof MCRActiveLinkException) {
             MCRActiveLinkException activeLinks = (MCRActiveLinkException) ex;
             StringBuffer msgBuf = new StringBuffer(system);
-            msgBuf
-                    .append(" There are links active preventing the commit of work, see error message for details. The following links where affected:");
+            msgBuf.append(" There are links active preventing the commit of work, see error message for details. The following links where affected:");
             Map links = activeLinks.getActiveLinks();
             Iterator destIt = links.keySet().iterator();
             String curDest;
@@ -462,8 +460,7 @@ public class MCRCommandLineInterface {
         if (ex instanceof MCRActiveLinkException) {
             MCRActiveLinkException activeLinks = (MCRActiveLinkException) ex;
             StringBuffer msgBuf = new StringBuffer();
-            msgBuf
-                    .append("\nThere are links active preventing the commit of work, see error message for details. The following links where affected:");
+            msgBuf.append("\nThere are links active preventing the commit of work, see error message for details. The following links where affected:");
             Map links = activeLinks.getActiveLinks();
             Iterator destIt = links.keySet().iterator();
             String curDest;
