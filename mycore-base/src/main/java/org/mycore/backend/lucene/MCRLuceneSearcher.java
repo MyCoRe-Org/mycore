@@ -286,9 +286,12 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         }
         if (queryFieldLogger != null) {
             //log field usage
-            luceneQuery.rewrite(sharedIndexContext.getReader());
+            Query rewritten = luceneQuery.rewrite(sharedIndexContext.getReader());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Transformed query: " + luceneQuery + " -> " + rewritten);
+            }
             HashSet<Term> terms = new HashSet<Term>();
-            luceneQuery.extractTerms(terms);
+            rewritten.extractTerms(terms);
             for (Term term : terms) {
                 queryFieldLogger.useField(term.field());
             }
