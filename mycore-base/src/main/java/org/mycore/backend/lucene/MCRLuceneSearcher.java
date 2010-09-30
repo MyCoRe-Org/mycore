@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -256,12 +257,12 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         try {
             List<Element> f = new ArrayList<Element>();
             f.add(condition.toXML());
-
+            Set<String> usedFields = (queryFieldLogger == null) ? null : new HashSet<String>();
             boolean reqf = true;
             // required flag Term with AND (true) or OR (false) combined
-            Query luceneQuery = MCRBuildLuceneQuery.buildLuceneQuery(null, reqf, f, analyzer);
+            Query luceneQuery = MCRBuildLuceneQuery.buildLuceneQuery(null, reqf, f, analyzer, usedFields);
             LOGGER.debug("Lucene Query: " + luceneQuery.toString());
-            return getLuceneHits(luceneQuery, maxResults, sortBy, addSortData);
+            return getLuceneHits(luceneQuery, maxResults, sortBy, addSortData, usedFields);
         } catch (Exception e) {
             LOGGER.error("Exception in MCRLuceneSearcher", e);
             return new MCRResults();
@@ -273,7 +274,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
      * 
      * @return result set
      */
-    private MCRResults getLuceneHits(Query luceneQuery, int maxResults, List<MCRSortBy> sortBy, boolean addSortData) throws Exception {
+    private MCRResults getLuceneHits(Query luceneQuery, int maxResults, List<MCRSortBy> sortBy, boolean addSortData, Set<String> usedFields) throws Exception {
         if (maxResults <= 0) {
             maxResults = 1000000;
         }
@@ -286,14 +287,8 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         }
         if (queryFieldLogger != null) {
             //log field usage
-            Query rewritten = luceneQuery.rewrite(sharedIndexContext.getReader());
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Transformed query: " + luceneQuery + " -> " + rewritten);
-            }
-            HashSet<Term> terms = new HashSet<Term>();
-            rewritten.extractTerms(terms);
-            for (Term term : terms) {
-                queryFieldLogger.useField(term.field());
+            for (String field : usedFields) {
+                queryFieldLogger.useField(field);
             }
             for (SortField sortField : sortFields.getSort()) {
                 String field = sortField.getField();

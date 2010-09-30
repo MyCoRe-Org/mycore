@@ -122,11 +122,11 @@ public class MCRFieldDef {
     }
 
     public MCRFieldDef(String index, Element def) {
-        this.index = index;
-        name = def.getAttributeValue("name");
+        this.index = index.intern();
+        name = def.getAttributeValue("name").intern();
         dataType = def.getAttributeValue("type").intern();
         sortable = "true".equals(def.getAttributeValue("sortable"));
-        objects = def.getAttributeValue("objects", (String) null);
+        objects = def.getAttributeValue("objects");
         source = def.getAttributeValue("source");
         addable = "true".equals(def.getAttributeValue("addable"));
         
@@ -181,6 +181,8 @@ public class MCRFieldDef {
 
     /**
      * Returns the name of the field
+     *
+     * The name is internalized (see {@link String#intern()}
      * 
      * @return the field's name
      */

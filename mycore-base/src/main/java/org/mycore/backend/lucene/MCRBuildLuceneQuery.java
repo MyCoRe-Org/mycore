@@ -26,6 +26,7 @@ package org.mycore.backend.lucene;
 import java.io.StringReader;
 import java.text.ParseException;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
@@ -71,7 +72,7 @@ public class MCRBuildLuceneQuery {
      * @return Lucene Query
      * 
      */
-    public static Query buildLuceneQuery(BooleanQuery r, boolean reqf, List<Element> f, Analyzer analyzer) throws Exception {
+    public static Query buildLuceneQuery(BooleanQuery r, boolean reqf, List<Element> f, Analyzer analyzer, Set<String> usedFields) throws Exception {
         for (int i = 0; i < f.size(); i++) {
             org.jdom.Element xEle = f.get(i);
             String name = xEle.getName();
@@ -86,17 +87,17 @@ public class MCRBuildLuceneQuery {
             @SuppressWarnings("unchecked")
             List<Element> children = xEle.getChildren();
             if (name.equals("and")) {
-                x = buildLuceneQuery(null, true, children, analyzer);
+                x = buildLuceneQuery(null, true, children, analyzer, usedFields);
             } else if (name.equalsIgnoreCase("or")) {
-                x = buildLuceneQuery(null, false, children, analyzer);
+                x = buildLuceneQuery(null, false, children, analyzer, usedFields);
             } else if (name.equalsIgnoreCase("not")) {
-                x = buildLuceneQuery(null, false, children, analyzer);
+                x = buildLuceneQuery(null, false, children, analyzer, usedFields);
                 reqfn = false; // javadoc lucene: It is an error to specify a
                 // clause as both required and prohibited
                 prof = true;
             } else if (name.equalsIgnoreCase("condition")) {
-                String field = xEle.getAttributeValue("field", "");
-                String operator = xEle.getAttributeValue("operator", "");
+                String field = xEle.getAttributeValue("field", "").intern();
+                String operator = xEle.getAttributeValue("operator", "").intern();
                 String value = xEle.getAttributeValue("value", "");
 
                 LOGGER.debug("field: " + field + " operator: " + operator + " value: " + value);
@@ -111,7 +112,9 @@ public class MCRBuildLuceneQuery {
                     fieldtype = "identifier";
                     value = MCRNormalizer.normalizeString(value, true);
                 }
-
+                if (usedFields != null) {
+                    usedFields.add(field);
+                }
                 x = handleCondition(field, operator, value, fieldtype, reqf, analyzer);
             }
 
@@ -137,8 +140,7 @@ public class MCRBuildLuceneQuery {
         return r;
     }
 
-    private static Query handleCondition(String field, String operator, String value, String fieldtype, boolean reqf, Analyzer analyzer)
-            throws Exception {
+    private static Query handleCondition(String field, String operator, String value, String fieldtype, boolean reqf, Analyzer analyzer) throws Exception {
         if ("text".equals(fieldtype) && "contains".equals(operator)) {
             BooleanQuery bq = null;
 
