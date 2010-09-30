@@ -38,7 +38,7 @@ public class MCRDisplayHideDerivateServlet extends MCRServlet {
             return;
         }
         LOGGER.info("Toggling display attribute of " + derivate);
-        MCRDerivate obj = MCRMetadataManager.retrieveMCRDerivate(new MCRObjectID(derivate));
+        MCRDerivate obj = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivate));
         toggleDisplay(obj);
 
         String url = getBaseURL() + "receive/" + getParentHref(obj);

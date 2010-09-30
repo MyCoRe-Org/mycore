@@ -146,7 +146,7 @@ final public class MCRObject extends MCRBase {
     private void setRoot() {
         // get object ID from DOM
         org.jdom.Element jdom_element_root = jdom_document.getRootElement();
-        mcr_id = new MCRObjectID(jdom_element_root.getAttributeValue("ID"));
+        mcr_id = MCRObjectID.getInstance(jdom_element_root.getAttributeValue("ID"));
         mcr_label = jdom_element_root.getAttributeValue("label").trim();
 
         if (mcr_label.length() > MAX_LABEL_LENGTH) {
@@ -257,12 +257,12 @@ final public class MCRObject extends MCRBase {
                     // TODO: should trigger undo-Event
                 }
                 if (inf instanceof MCRMetaLinkID) {
-                    String destination = ((MCRMetaLinkID) inf).getXLinkHref();
-                    if (!MCRXMLMetadataManager.instance().exists(new MCRObjectID(destination))) {
+                    MCRObjectID destination = ((MCRMetaLinkID) inf).getXLinkHrefID();
+                    if (!MCRXMLMetadataManager.instance().exists(destination)) {
                         continue;
                     }
                     MCRActiveLinkException activeLink = new MCRActiveLinkException("Failure while adding link!. Destination does not exist.");
-                    activeLink.addLink(getId().toString(), destination);
+                    activeLink.addLink(getId().toString(), destination.toString());
                     // throw activeLink;
                     // TODO: should trigger undo-Event
                 }

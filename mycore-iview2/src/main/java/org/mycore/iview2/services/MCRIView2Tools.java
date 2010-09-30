@@ -72,7 +72,7 @@ public class MCRIView2Tools {
 
     public static String getSupportedMainFile(String derivateID) {
         try {
-            MCRDerivate deriv = MCRMetadataManager.retrieveMCRDerivate(new MCRObjectID(derivateID));
+            MCRDerivate deriv = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateID));
             String nameOfMainFile = deriv.getDerivate().getInternals().getMainDoc();
             // verify support
             if (nameOfMainFile != null && !nameOfMainFile.equals("")) {

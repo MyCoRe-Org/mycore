@@ -122,7 +122,7 @@ public final class MCRGoogleSitemapCommon {
         for (String type : types) {
             List<String> ids = tm.listIDsOfType(type);
             for (String id : ids) {
-                MCRObjectID mcrid = new MCRObjectID(id);
+                MCRObjectID mcrid = MCRObjectID.getInstance(id);
                 MCRStoredMetadata sm = tm.getStore(mcrid).retrieve(mcrid.getNumberAsInteger());
                 objidlist.add(new MCRObjectIDFileSystemDate(sm, id));
             }

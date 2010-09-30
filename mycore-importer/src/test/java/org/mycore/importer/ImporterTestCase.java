@@ -32,8 +32,8 @@ import org.mycore.importer.mapping.mapper.MCRImportMapper;
 import org.mycore.importer.mapping.mapper.MCRImportMapperManager;
 import org.mycore.importer.mapping.resolver.metadata.MCRImportMetadataResolver;
 import org.mycore.importer.mcrimport.MCRImportImporter;
-public class ImporterTestCase extends MCRTestCase {
 
+public class ImporterTestCase extends MCRTestCase {
 
     @Before
     @Override
@@ -41,7 +41,7 @@ public class ImporterTestCase extends MCRTestCase {
         super.setUp();
         setProperty("MCR.basedir", "src", true);
     }
-    
+
     @Test
     public void datamodel() throws Exception {
         MCRImportMetadataResolverManager metadataResolverManager = new MCRImportMetadataResolverManager();
@@ -59,12 +59,12 @@ public class ImporterTestCase extends MCRTestCase {
         assertEquals("def.metaXML", dm1.getEnclosingName("metaXML"));
         assertEquals("dates", dm1.getEnclosingName("date"));
         assertEquals("def.link", dm1.getEnclosingName("link"));
-        
+
         assertEquals(true, dm1.isRequired("metaText"));
         assertEquals(true, dm1.isRequired("metaXML"));
         assertEquals(false, dm1.isRequired("date"));
         assertEquals(false, dm1.isRequired("link"));
-        
+
         assertEquals(4, dm1.getMetadataNames().size());
 
         // datamodel 2 tests
@@ -79,11 +79,11 @@ public class ImporterTestCase extends MCRTestCase {
         assertEquals("dates", dm2.getEnclosingName("date"));
         assertEquals("def.link", dm2.getEnclosingName("link"));
 
-        assertEquals("text", ((MCRImportDatamodel2)dm2).getType("metaText"));
-        assertEquals("xml", ((MCRImportDatamodel2)dm2).getType("metaXML"));
-        assertEquals("date", ((MCRImportDatamodel2)dm2).getType("date"));
-        assertEquals("link", ((MCRImportDatamodel2)dm2).getType("link"));
-        assertEquals("classification", ((MCRImportDatamodel2)dm2).getType("class"));
+        assertEquals("text", ((MCRImportDatamodel2) dm2).getType("metaText"));
+        assertEquals("xml", ((MCRImportDatamodel2) dm2).getType("metaXML"));
+        assertEquals("date", ((MCRImportDatamodel2) dm2).getType("date"));
+        assertEquals("link", ((MCRImportDatamodel2) dm2).getType("link"));
+        assertEquals("classification", ((MCRImportDatamodel2) dm2).getType("class"));
 
         assertEquals(true, dm2.isRequired("metaText"));
         assertEquals(true, dm2.isRequired("metaXML"));
@@ -102,7 +102,7 @@ public class ImporterTestCase extends MCRTestCase {
         assertNotNull(mapper);
         assertEquals("testMapper", mapper.getType());
     }
-    
+
     @Test
     public void metadataResolver() throws Exception {
         MCRImportMetadataResolverManager metadataResolverManager = new MCRImportMetadataResolverManager();
@@ -115,7 +115,7 @@ public class ImporterTestCase extends MCRTestCase {
         metadataResolver.resolve(null, null, saveToElement);
         assertEquals("1", saveToElement.getAttributeValue("test"));
     }
-    
+
     @Test
     public void config() throws Exception {
         MCRConfiguration.instance().set("MCR.basedir", "src");
@@ -132,7 +132,7 @@ public class ImporterTestCase extends MCRTestCase {
         assertEquals(true, config.isImportToMycore());
         assertEquals(true, config.isImportFilesToMycore());
     }
-    
+
     @Test
     public void fieldsAndRecords() throws Exception {
         // create a new record
@@ -146,7 +146,7 @@ public class ImporterTestCase extends MCRTestCase {
         record.addField(new MCRImportField("last", "Mustermann"));
         record.addField(new MCRImportField("first", "Max"));
         assertEquals(8, record.getFields().size());
-        
+
         // init mapping manager and create a new import object
         assertEquals(true, MCRImportMappingManager.getInstance().init(new File("src/test/resources/sample-mapping.xml")));
         MCRImportObject importObject = MCRImportMappingManager.getInstance().createMCRObject(record);
@@ -159,9 +159,9 @@ public class ImporterTestCase extends MCRTestCase {
         // test metaxml
         Element metaXML = importObject.getMetadata("metaXML").getChilds().get(0);
         assertEquals("metaXML", metaXML.getName());
-        assertEquals(2,  metaXML.getContent().size());
-        Element lastName = (Element)metaXML.getContent(new ElementFilter("lastName")).get(0);
-        Element firstName = (Element)metaXML.getContent(new ElementFilter("firstName")).get(0);
+        assertEquals(2, metaXML.getContent().size());
+        Element lastName = (Element) metaXML.getContent(new ElementFilter("lastName")).get(0);
+        Element firstName = (Element) metaXML.getContent(new ElementFilter("firstName")).get(0);
         assertEquals("Mustermann", lastName.getText());
         assertEquals("Max", firstName.getText());
 
@@ -182,7 +182,7 @@ public class ImporterTestCase extends MCRTestCase {
     }
 
     @Test
-    public void classification() throws Exception  {
+    public void classification() throws Exception {
         MCRImportRecord record = new MCRImportRecord("record");
         record.addField(new MCRImportField("id", "id"));
         record.addField(new MCRImportField("categ", "category 1"));
@@ -253,17 +253,17 @@ public class ImporterTestCase extends MCRTestCase {
         Element der1Element = builder.build("save/mapping/derivates/0.xml").getRootElement();
         assertEquals("0", der1Element.getAttributeValue("importId"));
         assertEquals("test label", der1Element.getAttributeValue("label"));
-        assertEquals("recordId_1", ((Attribute)XPath.selectSingleNode(der1Element, "linkmetas/linkmeta/@xlink:href")).getValue());
-        assertEquals("pic1.jpg" ,((Attribute)XPath.selectSingleNode(der1Element, "files/@mainDoc")).getValue());
-        String filePath = ((Text)XPath.selectSingleNode(der1Element, "files/file[1]/text()")).getValue();
+        assertEquals("recordId_1", ((Attribute) XPath.selectSingleNode(der1Element, "linkmetas/linkmeta/@xlink:href")).getValue());
+        assertEquals("pic1.jpg", ((Attribute) XPath.selectSingleNode(der1Element, "files/@mainDoc")).getValue());
+        String filePath = ((Text) XPath.selectSingleNode(der1Element, "files/file[1]/text()")).getValue();
         File file = new File(filePath);
         assertEquals(true, file.exists());
         assertEquals("pic1.jpg", file.getName());
-        filePath = ((Text)XPath.selectSingleNode(der1Element, "files/file[last()]/text()")).getValue();
+        filePath = ((Text) XPath.selectSingleNode(der1Element, "files/file[last()]/text()")).getValue();
         file = new File(filePath);
         assertEquals(true, file.exists());
         assertEquals("pic2.jpg", file.getName());
-        
+
         MCRUtils.deleteDirectory(new File("save"));
     }
 
@@ -299,9 +299,10 @@ public class ImporterTestCase extends MCRTestCase {
         // do import
         MCRImportImporter im = new MCRImportImporter(mappingFile) {
             private int count = 1;
+
             @Override
             protected MCRObjectID getNextFreeId(String base) {
-                MCRObjectID objId = new MCRObjectID(base + "_" + count++);
+                MCRObjectID objId = MCRObjectID.getInstance(MCRObjectID.formatID(base, count++));
                 return objId;
             }
         };
@@ -315,14 +316,16 @@ public class ImporterTestCase extends MCRTestCase {
         // delete save dir
         MCRUtils.deleteDirectory(new File("save"));
     }
-    
+
     public static class TestMapper implements MCRImportMapper {
         public String getType() {
             return "testMapper";
         }
-        public void map(MCRImportObject importObject, MCRImportRecord record, Element map) {}
+
+        public void map(MCRImportObject importObject, MCRImportRecord record, Element map) {
+        }
     }
-    
+
     public static class TestMetadataResolver implements MCRImportMetadataResolver {
         public boolean resolve(Element map, List<MCRImportField> fieldList, Element saveToElement) {
             saveToElement.setAttribute("test", "1");

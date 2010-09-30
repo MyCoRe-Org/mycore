@@ -494,7 +494,7 @@ public class MCROAIProvider extends MCRServlet {
                         } else {
                             Element eRecord = new Element("record", ns);
                             eRecord.addContent(eHeader);
-                            MCRBase object = MCRMetadataManager.retrieve(new MCRObjectID(identifier[3]));
+                            MCRBase object = MCRMetadataManager.retrieve(MCRObjectID.getInstance(identifier[3]));
                             Element eMetadata = (Element) object.createXML().getRootElement().clone();
                             eRecord.addContent(eMetadata);
                             list.addContent(eRecord);
@@ -1058,7 +1058,7 @@ public class MCROAIProvider extends MCRServlet {
                     if (maxReturns == 0 || elementCounter <= maxReturns) {
 
                         MCRBase object = null;
-                        MCRObjectID id = new MCRObjectID(objectId);
+                        MCRObjectID id = MCRObjectID.getInstance(objectId);
                         if (objectId.indexOf("derivate") != -1) {
                             object = MCRMetadataManager.retrieveMCRDerivate(id);
                         } else {
@@ -1367,7 +1367,7 @@ public class MCROAIProvider extends MCRServlet {
 
                     if (maxReturns == 0 || elementCounter <= maxReturns) {
 
-                        MCRObjectID id = new MCRObjectID(objectId);
+                        MCRObjectID id = MCRObjectID.getInstance(objectId);
 
                         MCRBase object = null;
                         if (objectId.indexOf("derivate") != -1) {

@@ -77,7 +77,7 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
 
         /* object is a derivate */
         if (objectId.indexOf("_derivate_") != -1) {
-            MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(new MCRObjectID(objectId));
+            MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(objectId));
             href = derivate.getDerivate().getMetaLink().getXLinkHref();
         }
         /* object is ordinary mcr object */

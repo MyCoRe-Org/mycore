@@ -154,7 +154,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * @throws MCRPersistenceException 
      */
     public static void delete(String ID) throws MCRPersistenceException, MCRActiveLinkException {
-        MCRObjectID objectID = new MCRObjectID(ID);
+        MCRObjectID objectID = MCRObjectID.getInstance(ID);
         MCRMetadataManager.deleteMCRDerivate(objectID);
         LOGGER.info(objectID + " deleted.");
     }
@@ -173,8 +173,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         int from_i = 0;
         int to_i = 0;
 
-        MCRObjectID from = new MCRObjectID(IDfrom);
-        MCRObjectID to = new MCRObjectID(IDto);
+        MCRObjectID from = MCRObjectID.getInstance(IDfrom);
+        MCRObjectID to = MCRObjectID.getInstance(IDto);
         from_i = from.getNumberAsInteger();
         to_i = to.getNumberAsInteger();
 
@@ -185,7 +185,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         for (int i = from_i; i < to_i + 1; i++) {
 
             String id = MCRObjectID.formatID(from.getProjectId(), from.getTypeId(), i);
-            if (MCRMetadataManager.exists(new MCRObjectID(id))) {
+            if (MCRMetadataManager.exists(MCRObjectID.getInstance(id))) {
                 delete(id);
             }
         }
@@ -408,7 +408,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         MCRObjectID tid = null;
 
         try {
-            fid = new MCRObjectID(fromID);
+            fid = MCRObjectID.getInstance(fromID);
         } catch (Exception ex) {
             LOGGER.error("FromID : " + ex.getMessage());
 
@@ -416,7 +416,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         }
 
         try {
-            tid = new MCRObjectID(toID);
+            tid = MCRObjectID.getInstance(toID);
         } catch (Exception ex) {
             LOGGER.error("ToID : " + ex.getMessage());
 
@@ -484,7 +484,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         MCRDerivate obj;
 
         try {
-            obj = MCRMetadataManager.retrieveMCRDerivate(new MCRObjectID(nid));
+            obj = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(nid));
             String path = obj.getDerivate().getInternals().getSourcePath();
             // reset from the absolute to relative path, for later reload
             LOGGER.info("Old Internal Path ====>" + path);
@@ -592,7 +592,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         MCRObjectID mid = null;
     
         try {
-            mid = new MCRObjectID(id);
+            mid = MCRObjectID.getInstance(id);
         } catch (Exception e) {
             LOGGER.error("The String " + id + " is not a MCRObjectID.");
             LOGGER.error(" ");
@@ -632,7 +632,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     public static void synchronizeDerivateForID(String id) {
         MCRObjectID mid = null;
         try {
-            mid = new MCRObjectID(id);
+            mid = MCRObjectID.getInstance(id);
         } catch (Exception e) {
             LOGGER.error("The String " + id + " is not a MCRObjectID.");
             return;
@@ -642,7 +642,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(mid);
         String label = der.getLabel();
         String href = der.getDerivate().getMetaLink().getXLinkHref();
-        MCRObject obj = MCRMetadataManager.retrieveMCRObject(new MCRObjectID(href));
+        MCRObject obj = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(href));
         int size = obj.getStructure().getDerivateSize();
         boolean isset = false;
         for (int i = 0; i < size; i++) {

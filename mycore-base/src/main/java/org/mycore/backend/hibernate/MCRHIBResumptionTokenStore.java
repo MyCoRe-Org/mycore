@@ -138,7 +138,7 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore {
             String specName = "";
             if (!prefix.equals("set")) {
                 String objectId = arHitBlob[i];
-                MCRObject object=MCRMetadataManager.retrieveMCRObject(new MCRObjectID(objectId));
+                MCRObject object=MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(objectId));
                 String[] header = MCROAIProvider.getHeader(object, objectId, repositoryID, instance);
                 oaiID = header[0];
                 datestamp = header[1];

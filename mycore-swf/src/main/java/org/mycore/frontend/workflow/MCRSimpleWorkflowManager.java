@@ -52,7 +52,6 @@ import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.datamodel.metadata.validator.MCREditorOutValidator;
 import org.mycore.frontend.cli.MCRDerivateCommands;
 import org.mycore.frontend.cli.MCRObjectCommands;
@@ -351,7 +350,7 @@ public class MCRSimpleWorkflowManager {
 
             if (isDerivateOfObject(dername, ID)) {
                 try {
-                    MCRObjectID DID = new MCRObjectID(dername.substring(0, dername.length() - 4));
+                    MCRObjectID DID = MCRObjectID.getInstance(dername.substring(0, dername.length() - 4));
 
                     deleteDerivateObject(ID, DID);
                 } catch (MCRException ex) {
@@ -487,7 +486,7 @@ public class MCRSimpleWorkflowManager {
     }
 
     private boolean loadDerivate(String ID, String filename) throws SAXParseException {
-        final MCRObjectID objectID = new MCRObjectID(ID);
+        final MCRObjectID objectID = MCRObjectID.getInstance(ID);
         if (MCRMetadataManager.exists(objectID)) {
             MCRDerivateCommands.updateFromFile(filename, false);
         } else {
@@ -580,7 +579,7 @@ public class MCRSimpleWorkflowManager {
         MCRMetaIFS internal = new MCRMetaIFS("internal", DD.toString());
         internal.setMainDoc("");
         der.getDerivate().setInternals(internal);
-        
+
         org.jdom.Element elm = der.getService().createXML();
         MCREditorOutValidator.setDefaultDerivateACLs(elm);
         der.getService().setFromDOM(elm);

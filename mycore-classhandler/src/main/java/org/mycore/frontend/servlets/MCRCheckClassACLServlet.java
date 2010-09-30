@@ -90,7 +90,7 @@ public class MCRCheckClassACLServlet extends MCRServlet {
 
         String oldmcrid = parms.getParameter("mcrid");
         LOGGER.debug("XSL.target.param.0 = " + oldmcrid);
-        MCRObjectID ID = new MCRObjectID(oldmcrid);
+        MCRObjectID ID = MCRObjectID.getInstance(oldmcrid);
 
         // get the MCRSession object for the current thread from the session
         // manager.

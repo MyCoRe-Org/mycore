@@ -33,7 +33,7 @@ public class MCRMigrationCommands21 extends MCRAbstractCommands {
         ScrollableResults xmlentries = session.createCriteria(MCRXMLTABLE.class).scroll(ScrollMode.FORWARD_ONLY);
         while (xmlentries.next()) {
             MCRXMLTABLE xmlentry = (MCRXMLTABLE) xmlentries.get(0);
-            MCRObjectID mcrId = new MCRObjectID(xmlentry.getId());
+            MCRObjectID mcrId = MCRObjectID.getInstance(xmlentry.getId());
             Date lastModified = xmlentry.getLastModified();
             byte[] xmlByteArray = xmlentry.getXmlByteArray();
             session.evict(xmlentry);

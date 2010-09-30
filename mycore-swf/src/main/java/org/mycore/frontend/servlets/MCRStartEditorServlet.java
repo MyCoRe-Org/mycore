@@ -25,7 +25,6 @@ package org.mycore.frontend.servlets;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URLEncoder;
@@ -40,7 +39,6 @@ import java.util.Properties;
 import javax.servlet.ServletException;
 
 import org.apache.log4j.Logger;
-
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
@@ -59,7 +57,6 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
-import org.mycore.datamodel.metadata.MCRObjectStructure;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.fileupload.MCRSWFUploadHandlerIFS;
 import org.mycore.frontend.fileupload.MCRSWFUploadHandlerMyCoRe;
@@ -215,7 +212,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         if ((mysemcrid == null) || ((mysemcrid = mysemcrid.trim()).length() == 0)) {
         } else {
             try {
-                cd.mysemcrid = new MCRObjectID(mysemcrid);
+                cd.mysemcrid = MCRObjectID.getInstance(mysemcrid);
                 cd.myproject = cd.mysemcrid.getProjectId();
                 cd.mytype = cd.mysemcrid.getTypeId();
             } catch (Exception e) {
@@ -245,12 +242,12 @@ public class MCRStartEditorServlet extends MCRServlet {
         // get the MCRObjectID from the text filed (TF)
         String mytfmcrid = getProperty(job.getRequest(), "tf_mcrid");
         try {
-            cd.mytfmcrid = new MCRObjectID(mytfmcrid);
+            cd.mytfmcrid = MCRObjectID.getInstance(mytfmcrid);
         } catch (Exception e) {
             mytfmcrid = null;
         }
         if ((mytfmcrid == null) || ((mytfmcrid = mytfmcrid.trim()).length() == 0)) {
-            cd.mytfmcrid = WFM.getNextObjectID(new MCRObjectID(cd.myproject+"_"+cd.mytype+"_1"));
+            cd.mytfmcrid = WFM.getNextObjectID(MCRObjectID.getInstance(MCRObjectID.formatID(cd.myproject, cd.mytype, 1)));
         }
         LOGGER.debug("MCRID (TF) = " + cd.mytfmcrid.toString());
 
@@ -259,7 +256,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         if ((myremcrid == null) || ((myremcrid = myremcrid.trim()).length() == 0)) {
         } else {
             try {
-                cd.myremcrid = new MCRObjectID(myremcrid);
+                cd.myremcrid = MCRObjectID.getInstance(myremcrid);
             } catch (Exception e) {
             }
         }
@@ -735,7 +732,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             return;
         }
 
-        cd.mytfmcrid = WFM.getNextObjectID(new MCRObjectID(cd.myproject+"_"+cd.mytype+"_1"));
+        cd.mytfmcrid = WFM.getNextObjectID(MCRObjectID.getInstance(MCRObjectID.formatID(cd.myproject, cd.mytype, 1)));
         LOGGER.debug("MCRID (TF) = " + cd.mytfmcrid.toString());
         MCRObject copyobj = MCRMetadataManager.retrieveMCRObject(cd.mysemcrid);
         copyobj.setId(cd.mytfmcrid);
@@ -1216,7 +1213,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             return;
         }
 
-        cd.mytfmcrid = WFM.getNextObjectID(new MCRObjectID(cd.myproject+"_"+cd.mytype+"_1"));
+        cd.mytfmcrid = WFM.getNextObjectID(MCRObjectID.getInstance(MCRObjectID.formatID(cd.myproject, cd.mytype, 1)));
         LOGGER.debug("MCRID (TF) = " + cd.mytfmcrid.toString());
         File outFile = new File(WFM.getDirectoryPath(cd.mytfmcrid.getBase()), cd.mytfmcrid + ".xml");
         MCRObject copyobj = new MCRObject();

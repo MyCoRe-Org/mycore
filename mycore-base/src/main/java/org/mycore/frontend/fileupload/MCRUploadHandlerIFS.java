@@ -83,7 +83,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
         if (derId == null) {
             return;
         }
-        MCRObjectID derOID = new MCRObjectID(derId);
+        MCRObjectID derOID = MCRObjectID.getInstance(derId);
         derID = derOID.toString();
         if (MCRMetadataManager.exists(derOID)) {
             LOGGER.debug("Derivate allready exists: " + derId);
@@ -105,7 +105,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
             } else {
                 // create new derivate with given ID
                 LOGGER.debug("derId='" + derID + "' create derivate with that ID");
-                createNewDerivate(docID, new MCRObjectID(derID));
+                createNewDerivate(docID, MCRObjectID.getInstance(derID));
             }
             LOGGER.debug("Create new derivate with id: " + derivate.getId());
             MCRMetadataManager.create(derivate);

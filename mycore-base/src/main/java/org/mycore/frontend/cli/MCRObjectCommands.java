@@ -198,7 +198,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the ID of the MCRObject that should be deleted
      */
     public static final void delete(String ID) throws MCRActiveLinkException {
-        MCRObjectID mcrId = new MCRObjectID(ID);
+        MCRObjectID mcrId = MCRObjectID.getInstance(ID);
 
         try {
             MCRMetadataManager.deleteMCRObject(mcrId);
@@ -221,8 +221,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         int to_i = 0;
 
         try {
-            MCRObjectID from = new MCRObjectID(IDfrom);
-            MCRObjectID to = new MCRObjectID(IDto);
+            MCRObjectID from = MCRObjectID.getInstance(IDfrom);
+            MCRObjectID to = MCRObjectID.getInstance(IDto);
             from_i = from.getNumberAsInteger();
             to_i = to.getNumberAsInteger();
 
@@ -232,7 +232,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
             for (int i = from_i; i < to_i + 1; i++) {
                 String id = MCRObjectID.formatID(from.getProjectId(), from.getTypeId(), i);
-                if (MCRMetadataManager.exists(new MCRObjectID(id))) {
+                if (MCRMetadataManager.exists(MCRObjectID.getInstance(id))) {
                     delete(id);
                 }
             }
@@ -457,8 +457,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
         // check fromID and toID
         try {
-            fid = new MCRObjectID(fromID);
-            tid = new MCRObjectID(toID);
+            fid = MCRObjectID.getInstance(fromID);
+            tid = MCRObjectID.getInstance(toID);
         } catch (Exception ex) {
             LOGGER.error("FromID : " + ex.getMessage());
             return;
@@ -475,7 +475,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             Transformer trans = getTransformer(style);
             for (int i = fid.getNumberAsInteger(); i < tid.getNumberAsInteger() + 1; i++) {
                 String id = MCRObjectID.formatID(fid.getProjectId(), fid.getTypeId(), i);
-                if (!MCRMetadataManager.exists(new MCRObjectID(id))) {
+                if (!MCRMetadataManager.exists(MCRObjectID.getInstance(id))) {
                     continue;
                 }
                 if (!exportMCRObject(dir, trans, id)) {
@@ -600,7 +600,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         byte[] xml = null;
         try {
             // if object do'snt exist - no exception is catched!
-            xml = MCRXMLMetadataManager.instance().retrieveBLOB(new MCRObjectID(nid));
+            xml = MCRXMLMetadataManager.instance().retrieveBLOB(MCRObjectID.getInstance(nid));
         } catch (MCRException ex) {
             return false;
         }
@@ -717,7 +717,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         MCRObjectID mid = null;
     
         try {
-            mid = new MCRObjectID(id);
+            mid = MCRObjectID.getInstance(id);
         } catch (Exception e) {
             LOGGER.error("The String " + id + " is not a MCRObjectID.");
             return;
@@ -851,7 +851,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         int notinstore = 0;
 
         for (String id : getSelectedObjectIDs()) {
-            if (MCRMetadataManager.exists(new MCRObjectID(id))) {
+            if (MCRMetadataManager.exists(MCRObjectID.getInstance(id))) {
                 instore++;
             } else {
                 LOGGER.info("is not in store " + id + " delete from search index ...");

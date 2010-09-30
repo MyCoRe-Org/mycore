@@ -104,7 +104,7 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
             //TODO: Code needs to be made fast again after IFS2 Metastore is matured
             MCRXMLMetadataManager mcrxmlTableManager = MCRXMLMetadataManager.instance();
             for (String id : mcrxmlTableManager.listIDs()) {
-                MCRObjectID mcrid = new MCRObjectID(id);
+                MCRObjectID mcrid = MCRObjectID.getInstance(id);
                 addMetaToIndex(mcrid, mcrxmlTableManager.retrieveBLOB(mcrid), false, searcher);
             }
             searcher.notifySearcher("finish");

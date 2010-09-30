@@ -334,7 +334,7 @@ public class MCRXMLMetadataManager {
     }
 
     public void delete(String mcrid) {
-        delete(new MCRObjectID(mcrid));
+        delete(MCRObjectID.getInstance(mcrid));
     }
 
     public void delete(MCRObjectID mcrid) {
@@ -581,7 +581,7 @@ public class MCRXMLMetadataManager {
     private List<MCRObjectIDDate> getObjectDateList(List<String> ids) throws IOException {
         List<MCRObjectIDDate> objidlist = new ArrayList<MCRObjectIDDate>(ids.size());
         for (String id : ids) {
-            MCRStoredMetadata sm = this.retrieveStoredMetadata(new MCRObjectID(id));
+            MCRStoredMetadata sm = this.retrieveStoredMetadata(MCRObjectID.getInstance(id));
             objidlist.add(new MCRObjectIDFileSystemDate(sm, id));
         }
         return objidlist;

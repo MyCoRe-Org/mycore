@@ -111,10 +111,10 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
             mmcrid = oldmcrid;
         }
 
-        MCRObjectID ID = new MCRObjectID(mmcrid);
+        MCRObjectID ID = MCRObjectID.getInstance(mmcrid);
 
         if (!ID.getTypeId().equals(oldtype)) {
-            ID = new MCRObjectID(oldmcrid);
+            ID = MCRObjectID.getInstance(oldmcrid);
             hasid = false;
         }
 

@@ -551,7 +551,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             String id = uri.substring(uri.indexOf(":") + 1);
             LOGGER.debug("Reading MCRObject with ID " + id);
 
-            MCRObjectID mcrid = new MCRObjectID(id);
+            MCRObjectID mcrid = MCRObjectID.getInstance(id);
             Document doc = MCRXMLMetadataManager.instance().retrieveXML(mcrid);
 
             LOGGER.debug("end resolving " + uri);

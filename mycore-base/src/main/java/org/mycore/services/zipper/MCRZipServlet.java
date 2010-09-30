@@ -129,7 +129,7 @@ public class MCRZipServlet extends MCRServlet {
         MCRObjectID mcrid = null;
 
         try {
-            mcrid = new MCRObjectID(id);
+            mcrid = MCRObjectID.getInstance(id);
         } catch (MCRException e1) {
             String msg = "Error: HTTP request id is not in the allowed id-list";
             LOGGER.error(msg + ":" + id);

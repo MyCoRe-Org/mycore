@@ -54,7 +54,7 @@ public class MCRImportCommands extends MCRAbstractCommands {
         MCRDerivate derivate = new MCRDerivate();
         String id = rootElement.getAttributeValue("ID");
         String label = rootElement.getAttributeValue("label");
-        derivate.setId(new MCRObjectID(id));
+        derivate.setId(MCRObjectID.getInstance(id));
         derivate.setLabel(label);
 
         // set the schema

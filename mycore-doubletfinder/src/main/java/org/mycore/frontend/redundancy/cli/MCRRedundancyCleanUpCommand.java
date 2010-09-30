@@ -173,7 +173,7 @@ public class MCRRedundancyCleanUpCommand {
             return;
         }
 
-        MCRObject sourceMCRObject = MCRMetadataManager.retrieveMCRObject(new MCRObjectID(sourceId));
+        MCRObject sourceMCRObject = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(sourceId));
 
         // ArrayList for equal elements
         ArrayList<Element> equalElements = new ArrayList<Element>();

@@ -74,7 +74,7 @@ public class MCRCheckEditDerivateServlet extends MCRCheckBase {
         String url = getNextURL(derID, okay);
         try {
             Element root = indoc.getRootElement();
-            derID = new MCRObjectID(root.getAttributeValue("ID"));
+            derID = MCRObjectID.getInstance(root.getAttributeValue("ID"));
             root.setAttribute("noNamespaceSchemaLocation", "datamodel-derivate.xsd", XSI_NAMESPACE);
             root.addNamespaceDeclaration(XLINK_NAMESPACE);
             root.addNamespaceDeclaration(XSI_NAMESPACE);
@@ -107,7 +107,7 @@ public class MCRCheckEditDerivateServlet extends MCRCheckBase {
             Element e = (Element) linkmetas.selectSingleNode(indoc);
             MCRDerivate der = new MCRDerivate();
             der.setFromXML(xml, true);
-            MCRObjectID objID = new MCRObjectID(e.getAttributeValue("href", XLINK_NAMESPACE));
+            MCRObjectID objID = MCRObjectID.getInstance(e.getAttributeValue("href", XLINK_NAMESPACE));
 
             // check access
             if (!checkAccess(objID)) {

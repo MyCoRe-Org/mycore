@@ -291,7 +291,7 @@ public class MCRXMLFunctions {
     }
 
     public static boolean isDisplayedEnabledDerivate(String derivateId) {
-        MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(new MCRObjectID(derivateId));
+        MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateId));
 
         org.jdom.Element derivateElem = der.getDerivate().createXML();
         String display = derivateElem.getAttributeValue("display");
@@ -310,7 +310,7 @@ public class MCRXMLFunctions {
             return false;
         }
         try {
-            MCRObjectID obj = new MCRObjectID(objId);
+            MCRObjectID obj = MCRObjectID.getInstance(objId);
             String type = obj.getTypeId();
             return isAllowedObject(type);
 
@@ -356,11 +356,11 @@ public class MCRXMLFunctions {
      * 
      * */
     public static boolean hasDisplayableDerivates(String objectId) throws Exception {
-        MCRObject obj = MCRMetadataManager.retrieveMCRObject(new MCRObjectID(objectId));
+        MCRObject obj = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(objectId));
         List<MCRMetaLinkID> links = obj.getStructure().getDerivates();
 
         for (MCRMetaLinkID aLink : links) {
-            MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(new MCRObjectID(aLink.getXLinkHref()));
+            MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(aLink.getXLinkHrefID());
             if (derivate.getDerivate().isDisplayEnabled()) {
                 return true;
             }

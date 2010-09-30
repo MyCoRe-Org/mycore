@@ -71,7 +71,7 @@ public class MCRDerivateWithURNSearcher extends MCRSearcher {
             if (aHit.getID().indexOf("_derivate_") == -1) {
                 toReturn.addHit(aHit);
             } else {
-                MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(new MCRObjectID(aHit.getID()));
+                MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(aHit.getID()));
                 String parentId = der.getDerivate().getMetaLink().getXLinkHref();
                 MCRHit hit = new MCRHit(parentId);
                 toReturn.addHit(hit);

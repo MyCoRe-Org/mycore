@@ -76,7 +76,7 @@ public class MCRCheckCommitDerivateServlet extends MCRCheckBase {
         String url = getNextURL(derID, okay);
         try {
             Element root = indoc.getRootElement();
-            derID = new MCRObjectID(root.getAttributeValue("ID"));
+            derID = MCRObjectID.getInstance(root.getAttributeValue("ID"));
             root.setAttribute("noNamespaceSchemaLocation", "datamodel-derivate.xsd", XSI_NAMESPACE);
             root.addNamespaceDeclaration(XLINK_NAMESPACE);
             root.addNamespaceDeclaration(XSI_NAMESPACE);
@@ -120,7 +120,7 @@ public class MCRCheckCommitDerivateServlet extends MCRCheckBase {
             MCRMetadataManager.updateMCRDerivateXML(der);
             String label = der.getLabel();
             String href = der.getDerivate().getMetaLink().getXLinkHref();
-            MCRObject obj = MCRMetadataManager.retrieveMCRObject(new MCRObjectID(href));
+            MCRObject obj = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(href));
             int size = obj.getStructure().getDerivateSize();
             boolean isset = false;
             for (int i = 0; i < size; i++) {

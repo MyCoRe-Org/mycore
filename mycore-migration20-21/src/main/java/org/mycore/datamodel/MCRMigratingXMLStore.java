@@ -84,7 +84,7 @@ public class MCRMigratingXMLStore extends MCRVersioningMetadataStore {
     }
 
     private void migrateObject(int id) throws IOException {
-        MCRObjectID mcrId = new MCRObjectID(getID() + "_" + id);
+        MCRObjectID mcrId = MCRObjectID.getInstance(MCRObjectID.formatID(getID(), id));
         Session session = MCRHIBConnection.instance().getSession();
         MCRXMLMetadataManager manager = MCRXMLMetadataManager.instance();
         Criteria criteria = session.createCriteria(MCRXMLTABLE.class).add(Restrictions.eq("key.id", mcrId.toString()));

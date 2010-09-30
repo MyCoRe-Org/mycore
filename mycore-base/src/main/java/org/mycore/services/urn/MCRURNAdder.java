@@ -18,7 +18,7 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaElement;
 import org.mycore.datamodel.metadata.MCRMetaInterface;
 import org.mycore.datamodel.metadata.MCRMetaLangText;
-import org.mycore.datamodel.metadata.MCRMetaLink;
+import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectDerivate;
@@ -36,7 +36,7 @@ public class MCRURNAdder {
             return false;
         }
 
-        MCRObjectID id = new MCRObjectID(objectId);
+        MCRObjectID id = MCRObjectID.getInstance(objectId);
         if (isAllowedObject(id.getTypeId())) {
             MCRObject obj = MCRMetadataManager.retrieveMCRObject(id);
             MCRMetaElement srcElement = obj.getMetadata().getMetadataElement("def.identifier");
@@ -81,7 +81,7 @@ public class MCRURNAdder {
             LOGGER.warn("Permission denied");
             return false;
         }
-        MCRObjectID id = new MCRObjectID(derivateId);
+        MCRObjectID id = MCRObjectID.getInstance(derivateId);
         MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(id);
 
         if (!parentIsAllowedObject(derivate)) {
@@ -160,7 +160,7 @@ public class MCRURNAdder {
             LOGGER.error("null not allowed as parameter. derivate=" + derivateId + ", path=" + path + ", fileId=" + fileId);
             return false;
         }
-        MCRObjectID id = new MCRObjectID(derivateId);
+        MCRObjectID id = MCRObjectID.getInstance(derivateId);
         MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(id);
 
         Document xml = derivate.createXML();
@@ -203,8 +203,8 @@ public class MCRURNAdder {
      *         derivate,<code>false</code> otherwise
      */
     private boolean parentIsAllowedObject(MCRDerivate derivate) {
-        MCRMetaLink linkToParent = derivate.getDerivate().getMetaLink();
-        MCRObjectID parentID = new MCRObjectID(linkToParent.getXLinkHref());
+        MCRMetaLinkID linkToParent = derivate.getDerivate().getMetaLink();
+        MCRObjectID parentID = linkToParent.getXLinkHrefID();
         MCRObject obj = MCRMetadataManager.retrieveMCRObject(parentID);
         return isAllowedObject(obj.getId().getTypeId());
     }

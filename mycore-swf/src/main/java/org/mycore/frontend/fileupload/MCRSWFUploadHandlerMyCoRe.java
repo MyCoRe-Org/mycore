@@ -76,15 +76,13 @@ public class MCRSWFUploadHandlerMyCoRe extends MCRUploadHandler {
         logger.debug("MCRUploadHandlerMyCoRe DocID: " + docId + " DerId: " + derId + " Mode: " + mode);
 
         try {
-            new MCRObjectID(docId);
-            this.docId = docId;
+            this.docId = MCRObjectID.getInstance(docId).toString();
         } catch (Exception e) {
             logger.debug("Error while creating MCRObjectID : " + docId, e);
         }
 
         try {
-            new MCRObjectID(derId);
-            this.derId = derId;
+            this.derId = MCRObjectID.getInstance(derId).toString();
         } catch (Exception e) {
             logger.debug("Error while creating MCRObjectID : " + derId, e);
         }
@@ -94,7 +92,7 @@ public class MCRSWFUploadHandlerMyCoRe extends MCRUploadHandler {
      * Start Upload for MyCoRe
      */
     public void startUpload(int numFiles) throws Exception {
-        MCRObjectID ID = new MCRObjectID(docId);
+        MCRObjectID ID = MCRObjectID.getInstance(docId);
         File workdir = MCRSimpleWorkflowManager.instance().getDirectoryPath(ID.getBase());
         dirname = new File(workdir, derId);
     }
@@ -176,7 +174,7 @@ public class MCRSWFUploadHandlerMyCoRe extends MCRUploadHandler {
                 File derXMLFile = new File(dirname.getAbsolutePath() + ".xml");
                 der.setFromURI(derXMLFile.toURI());
             } catch (Exception e) {
-                der = MCRSimpleWorkflowManager.instance().createDerivate(new MCRObjectID(docId), new MCRObjectID(derId));
+                der = MCRSimpleWorkflowManager.instance().createDerivate(MCRObjectID.getInstance(docId), MCRObjectID.getInstance(derId));
             }
 
             if (der.getDerivate().getInternals().getMainDoc().length() == 0) {

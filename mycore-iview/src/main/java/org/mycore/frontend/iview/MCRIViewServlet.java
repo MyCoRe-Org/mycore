@@ -898,7 +898,7 @@ public class MCRIViewServlet extends MCRServlet {
         if (request.getParameter("type").equals("support")) {
             // get name main file
             String derivID = st.nextToken();
-            MCRDerivate deriv = MCRMetadataManager.retrieveMCRDerivate(new MCRObjectID(derivID));
+            MCRDerivate deriv = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivID));
             String nameOfMainFile = deriv.getDerivate().getInternals().getMainDoc();
             // verify support
             if (nameOfMainFile != null && !nameOfMainFile.equals("")) {

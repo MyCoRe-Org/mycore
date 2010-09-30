@@ -34,19 +34,19 @@ public class MCRDerivateLinkServlet extends MCRServlet {
         // create a new root element
         Element rootElement = new Element("derivateLinks-parentList");
 
-        MCRObjectID objId = new MCRObjectID(mcrId);
+        MCRObjectID objId = MCRObjectID.getInstance(mcrId);
         if (MCRMetadataManager.exists(objId)) {
             /* mcr object exists in datastore -> add all parent with their
              * derivates to the jdom tree */
             addParentsToElement(rootElement, objId);
-        } else if (parentId != null && MCRMetadataManager.exists(new MCRObjectID(parentId))) {
+        } else if (parentId != null && MCRMetadataManager.exists(MCRObjectID.getInstance(parentId))) {
             /* mcr object doesnt exists in datastore -> use the parent id
              * to create the content */
-            Element firstParent = getMyCoReObjectElement(new MCRObjectID(parentId));
+            Element firstParent = getMyCoReObjectElement(MCRObjectID.getInstance(parentId));
             if (firstParent != null) {
                 rootElement.addContent(firstParent);
             }
-            addParentsToElement(rootElement, new MCRObjectID(parentId));
+            addParentsToElement(rootElement, MCRObjectID.getInstance(parentId));
         }
 
         // check if root element has content -> if not, show an error page

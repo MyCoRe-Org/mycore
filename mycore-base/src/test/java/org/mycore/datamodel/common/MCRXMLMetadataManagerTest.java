@@ -165,7 +165,7 @@ public class MCRXMLMetadataManagerTest extends MCRTestCase {
 
     private static class XMLInfo {
         public XMLInfo(String id, byte[] blob, Date lastModified) {
-            this.id = new MCRObjectID(id);
+            this.id = MCRObjectID.getInstance(id);
             this.blob = blob;
             this.lastModified = lastModified;
         }

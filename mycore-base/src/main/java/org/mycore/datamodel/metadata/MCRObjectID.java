@@ -197,6 +197,18 @@ public final class MCRObjectID {
     }
 
     /**
+     * Normalizes to a object ID of form <em>project_id</em>_
+     * <em>type_id</em>_<em>number</em>, where number has leading zeros.
+     * @param baseID is <em>project_id</em>_<em>type_id</em>
+     * @param number
+     * @return <em>project_id</em>_<em>type_id</em>_<em>number</em>
+     */
+    public static String formatID(String baseID, int number) {
+        String[] idParts = getIDParts(baseID);
+        return formatID(idParts[0], idParts[1], number);
+    }
+
+    /**
      * Splits the submitted <code>id</code> in its parts.
      * <code>MyCoRe_document_00000001</code> would be transformed in
      * { "MyCoRe", "document", "00000001" }

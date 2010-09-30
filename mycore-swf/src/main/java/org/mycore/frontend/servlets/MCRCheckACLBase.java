@@ -91,10 +91,10 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
 
         // prepare the MCRObjectID's for the Metadata
         String mmcrid = oldmcrid;
-        MCRObjectID ID = new MCRObjectID(mmcrid);
+        MCRObjectID ID = MCRObjectID.getInstance(mmcrid);
 
         if (!ID.getTypeId().equals(oldtype)) {
-            ID = new MCRObjectID(oldmcrid);
+            ID = MCRObjectID.getInstance(oldmcrid);
         }
 
         // check access

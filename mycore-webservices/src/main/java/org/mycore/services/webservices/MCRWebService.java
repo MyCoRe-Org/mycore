@@ -57,7 +57,7 @@ public class MCRWebService implements MCRWS {
      */
     public org.w3c.dom.Document MCRDoRetrieveObject(String ID) throws Exception {
         // check the ID and retrieve the data
-        org.jdom.Document d = TM.retrieveXML(new MCRObjectID(ID));
+        org.jdom.Document d = TM.retrieveXML(MCRObjectID.getInstance(ID));
 
         org.jdom.output.DOMOutputter doo = new org.jdom.output.DOMOutputter();
 

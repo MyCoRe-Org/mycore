@@ -95,7 +95,7 @@ public class MCROAIQueryImpl implements MCROAIQuery {
      * @return boolean
      */
     public boolean exists(String id) {
-        return MCRMetadataManager.exists(new MCRObjectID(id));
+        return MCRMetadataManager.exists(MCRObjectID.getInstance(id));
     }
 
     /**
@@ -187,8 +187,8 @@ public class MCROAIQueryImpl implements MCROAIQuery {
         List<Object> list = new ArrayList<Object>();
 
         MCRBase object = null;
-        
-        MCRObjectID mcrID=new MCRObjectID(id);
+
+        MCRObjectID mcrID = MCRObjectID.getInstance(id);
 
         if (id.indexOf("derivate") != -1) {
             object = MCRMetadataManager.retrieveMCRDerivate(mcrID);
@@ -238,8 +238,7 @@ public class MCROAIQueryImpl implements MCROAIQuery {
         return listRecordsOrIdentifiers(set, from, until, metadataPrefix, instance, true);
     }
 
-    private List<String> listRecordsOrIdentifiers(String[] set, String[] from, String[] until, String metadataPrefix, String instance,
-            boolean listRecords) {
+    private List<String> listRecordsOrIdentifiers(String[] set, String[] from, String[] until, String metadataPrefix, String instance, boolean listRecords) {
         List<String> list = new ArrayList<String>();
 
         if (hasMore() && (listRecords == lastQuery.equals("listRecords") || !listRecords == lastQuery.equals("listIdentifiers"))) {
@@ -292,12 +291,11 @@ public class MCROAIQueryImpl implements MCROAIQuery {
         }
 
         MCRFieldDef fileDateModified = null;
-        try{
-        	fileDateModified = MCRFieldDef.getDef("derivateModificationDate");
-        }
-        catch(MCRConfigurationException e){
-        	//search field "derivateModificationDate" was not defined
-        	//fileDateModified will be null
+        try {
+            fileDateModified = MCRFieldDef.getDef("derivateModificationDate");
+        } catch (MCRConfigurationException e) {
+            //search field "derivateModificationDate" was not defined
+            //fileDateModified will be null
         }
 
         if (from != null && fileDateModified != null) {

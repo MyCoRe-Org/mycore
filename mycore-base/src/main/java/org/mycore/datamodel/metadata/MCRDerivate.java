@@ -118,7 +118,7 @@ final public class MCRDerivate extends MCRBase {
 
         // get object ID from DOM
         org.jdom.Element jdom_element_root = jdom_document.getRootElement();
-        mcr_id = new MCRObjectID(jdom_element_root.getAttributeValue("ID"));
+        mcr_id = MCRObjectID.getInstance(jdom_element_root.getAttributeValue("ID"));
         mcr_label = jdom_element_root.getAttributeValue("label").trim();
 
         if (mcr_label.length() > MAX_LABEL_LENGTH) {
@@ -182,13 +182,13 @@ final public class MCRDerivate extends MCRBase {
      */
     public final MCRDirectory receiveDirectoryFromIFS(String id) throws MCRPersistenceException {
         // check the ID
-        mcr_id = new MCRObjectID(id);
+        mcr_id = MCRObjectID.getInstance(id);
 
         // receive the IFS informations
         MCRDirectory difs = MCRDirectory.getRootDirectory(mcr_id.toString());
 
         if (difs == null) {
-            throw new MCRPersistenceException("Error while receiving derivate with " + "ID " + mcr_id.toString() + " from IFS.");
+            throw new MCRPersistenceException("Error while receiving derivate with " + "ID " + mcr_id + " from IFS.");
         }
 
         return difs;
@@ -198,7 +198,7 @@ final public class MCRDerivate extends MCRBase {
      * The method print all informations about this MCRObject.
      */
     public final void debug() {
-        LOGGER.debug("MCRDerivate ID : " + mcr_id.toString());
+        LOGGER.debug("MCRDerivate ID : " + mcr_id);
         LOGGER.debug("MCRDerivate Label : " + mcr_label);
         LOGGER.debug("MCRDerivate Schema : " + mcr_schema);
         LOGGER.debug("");

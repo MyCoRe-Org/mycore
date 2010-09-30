@@ -390,7 +390,7 @@ public class MCRImportImporter {
             MCRImportFileStatus fs = idTable.get(linkId);
             if(fs == null) {
                 // print error only if its not a internal mycore id
-                if(!MCRMetadataManager.exists(new MCRObjectID(linkId)))
+                if(!MCRMetadataManager.exists(MCRObjectID.getInstance(linkId)))
                     LOGGER.error(   "Invalid id " + linkId + " found in file " + doc.getBaseURI() + 
                                     " at element " + linkElement.getName() + linkElement.getAttributes());
                 continue;

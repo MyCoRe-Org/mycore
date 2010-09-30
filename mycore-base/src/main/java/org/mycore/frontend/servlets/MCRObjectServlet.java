@@ -163,7 +163,7 @@ public class MCRObjectServlet extends MCRServlet {
 
         MCRObjectID mcrid = null;
         try {
-            mcrid = new MCRObjectID(id); // create Object with given ID, only ID syntax check performed
+            mcrid = MCRObjectID.getInstance(id); // create Object with given ID, only ID syntax check performed
         } catch (MCRException e) { // handle exception: invalid ID syntax, set HTTP error 400 "Invalid request"
             generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_BAD_REQUEST, "Error: invalid MCRObject-ID '" + id + "'", e, false);
             return null; // sorry, no object to return

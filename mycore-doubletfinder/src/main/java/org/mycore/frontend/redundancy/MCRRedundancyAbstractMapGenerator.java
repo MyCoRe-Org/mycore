@@ -89,7 +89,7 @@ public abstract class MCRRedundancyAbstractMapGenerator {
         // use the xpath values as compare string
         List<XPath> xpathList = typeData.getXPathCompareList();
         if(xpathList != null && xpathList.size() > 0) {
-            Document doc = MCRXMLMetadataManager.instance().retrieveXML(new MCRObjectID(mcrHit.getID()));
+            Document doc = MCRXMLMetadataManager.instance().retrieveXML(MCRObjectID.getInstance(mcrHit.getID()));
             for(int i = 0; i < xpathList.size(); i++) {
                 try {
                     Object o = xpathList.get(i).selectSingleNode(doc);
