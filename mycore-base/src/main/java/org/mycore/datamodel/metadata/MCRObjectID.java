@@ -72,6 +72,7 @@ public final class MCRObjectID {
      * 
      * @exception MCRException
      *                if the given string is not valid.
+     * @deprecated use {@link #getInstance(String)} instead                
      */
     public MCRObjectID(String id) throws MCRException {
         if (!setID(id)) {
@@ -108,7 +109,8 @@ public final class MCRObjectID {
             last += number_distance - rest;
         }
         lastnumber.put(base_id, last);
-        return new MCRObjectID(base_id + "_" + String.valueOf(last));
+        String[] idParts = getIDParts(base_id);
+        return getInstance(formatID(idParts[0], idParts[1], last));
     }
 
     /**
@@ -118,7 +120,11 @@ public final class MCRObjectID {
         String[] idParts = getIDParts(base_id);
         int last = lastnumber.containsKey(base_id) ? lastnumber.get(base_id) : 0;
         int stored = MCRXMLMetadataManager.instance().getHighestStoredID(idParts[0], idParts[1]);
-        return new MCRObjectID(base_id + "_" + String.valueOf(Math.max(last, stored)));
+        return getInstance(formatID(idParts[0], idParts[1], Math.max(last, stored)));
+    }
+
+    public static MCRObjectID getInstance(String id) {
+        return MCRObjectIDPool.getMCRObjectID(id);
     }
 
     /**
@@ -181,7 +187,13 @@ public final class MCRObjectID {
      * @return <em>project_id</em>_<em>type_id</em>_<em>number</em>
      */
     public static String formatID(String projectID, String type, int number) {
-        return new StringBuilder(MAX_LENGTH).append(projectID).append('_').append(type.toLowerCase()).append('_').append(number_format.format(number)).toString();
+        return new StringBuilder(MAX_LENGTH)
+            .append(projectID)
+            .append('_')
+            .append(type.toLowerCase())
+            .append('_')
+            .append(number_format.format(number))
+            .toString();
     }
 
     /**
