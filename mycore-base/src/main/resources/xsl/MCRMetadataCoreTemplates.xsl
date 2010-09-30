@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- ============================================== -->
-<!-- $Revision: 1.3 $ $Date: 2008/05/23 13:12:14 $ -->
-<!-- ============================================== -->
-
 <xsl:stylesheet
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xsd='http://www.w3.org/2001/XMLSchema'
@@ -279,7 +275,7 @@
        <xsd:extension base="xsd:string">
          <xsd:attribute name="type" use="optional" type="mcrdefaulttype" />
          <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
-         <xsd:attribute ref="xml:lang" use="optional""/>
+         <xsd:attribute ref="xml:lang" use="optional"/>
          <xsd:attribute name="dimension" use="optional" type="mcrdimension" />
          <xsd:attribute name="measurement" use="optional" type="mcrmeasurement" />
        </xsd:extension>
