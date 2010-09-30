@@ -246,6 +246,13 @@ public class MCRObjectStructure {
     }
 
     /**
+     * Returns all children in this structure
+     * */
+    public final List<MCRMetaLinkID> getChildren() {
+        return children;
+    }
+
+    /**
      * <em>addDerivate</em> methode append the given derivate link data to the
      * derivate vector. If the link could be added a "true" will be returned,
      * otherwise "false".
@@ -367,7 +374,7 @@ public class MCRObjectStructure {
             @SuppressWarnings("unchecked")
             List<Element> derobjectList = subElement.getChildren();
 
-            for (Element derElement:derobjectList) {
+            for (Element derElement : derobjectList) {
                 MCRMetaLinkID der = new MCRMetaLinkID();
                 der.setFromDOM(derElement);
                 addDerivate(der);
