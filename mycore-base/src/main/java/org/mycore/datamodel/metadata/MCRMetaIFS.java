@@ -70,13 +70,11 @@ final public class MCRMetaIFS extends MCRMetaDefault {
      * The sourcepath must be NOT null or empty.
      * @param set_subtag       the name of the subtag
      * @param set_sourcepath   the sourcepath attribute
-     *
      * @exception MCRException if the set_subtag value, the set_classid value or
      * the set_categid are null, empty, too long or not a MCRObjectID
      */
-    public MCRMetaIFS(String set_subtag, String default_lang, String set_sourcepath) throws MCRException {
-        super(set_subtag, "en", "", 0);
-        LOGGER.debug("default_lang (" + default_lang + ") will never used."); //FIXME: use default_lang or remove it
+    public MCRMetaIFS(String set_subtag, String set_sourcepath) throws MCRException {
+        super(set_subtag, null, null, 0);
         setSourcePath(set_sourcepath);
         maindoc = "";
         ifsid = "";
@@ -210,7 +208,7 @@ final public class MCRMetaIFS extends MCRMetaDefault {
 
     @Override
     public final MCRMetaIFS clone() {
-        MCRMetaIFS ifs = new MCRMetaIFS(getSubTag(), getLang(), getSourcePath());
+        MCRMetaIFS ifs = new MCRMetaIFS(getSubTag(), getSourcePath());
         ifs.setMainDoc(getMainDoc());
         ifs.setIFSID(getIFSID());
         ifs.setType(getType());

@@ -80,12 +80,6 @@ public class MCRMetaLink extends MCRMetaDefault {
      */
     public MCRMetaLink() {
         super();
-        href = "";
-        label = "";
-        title = "";
-        linktype = null;
-        from = "";
-        to = "";
     }
 
     /**
@@ -93,22 +87,13 @@ public class MCRMetaLink extends MCRMetaDefault {
      * The language element was set. If the value of <em>default_lang</em> is null, empty or false <b>en </b> was set. The subtag element was set to the value of <em>set_subtag<em>. If the value of <em>set_subtag</em> is null or empty an exception was throwed.
      * @param set_subtag
      *            the name of the subtag
-     * @param default_lang
-     *            the default language
      * @param set_inherted
      *            a value >= 0
-     * 
      * @exception MCRException
      *                if the set_datapart or set_subtag value is null or empty
      */
-    public MCRMetaLink(String set_subtag, String default_lang, int set_inherted) throws MCRException {
-        super(set_subtag, default_lang, "", set_inherted);
-        href = "";
-        label = "";
-        title = "";
-        linktype = null;
-        from = "";
-        to = "";
+    public MCRMetaLink(String set_subtag, int set_inherted) throws MCRException {
+        super(set_subtag, null, null, set_inherted);
     }
 
     /**
@@ -130,19 +115,9 @@ public class MCRMetaLink extends MCRMetaDefault {
             throw new MCRException("The href value is null or empty.");
         }
 
-        href = set_href.trim();
-
-        if (set_label == null) {
-            label = "";
-        } else {
-            label = set_label.trim();
-        }
-
-        if (set_title == null) {
-            title = "";
-        } else {
-            title = set_title.trim();
-        }
+        href = set_href;
+        label = set_label;
+        title = set_title;
     }
 
     /**
@@ -158,23 +133,16 @@ public class MCRMetaLink extends MCRMetaDefault {
      *                if the from or to element is null or empty
      */
     public void setBiLink(String set_from, String set_to, String set_title) throws MCRException {
-        linktype = "arc";
-
         if (set_from == null || (set_from = set_from.trim()).length() == 0) {
             throw new MCRException("The from value is null or empty.");
         }
-        from = set_from.trim();
-
         if (set_to == null || (set_to = set_to.trim()).length() == 0) {
             throw new MCRException("The to value is null or empty.");
         }
-        to = set_to.trim();
-
-        if (set_title == null) {
-            title = "";
-        } else {
-            title = set_title.trim();
-        }
+        linktype = "arc";
+        from = set_from;
+        to = set_to;
+        title = set_title;
     }
 
     /**
@@ -232,9 +200,7 @@ public class MCRMetaLink extends MCRMetaDefault {
      *            the xlink:title
      */
     public final void setXLinkTitle(String title) {
-        if (title != null) {
-            this.title = title;
-        }
+        this.title = title;
     }
 
     /**
@@ -300,15 +266,9 @@ public class MCRMetaLink extends MCRMetaDefault {
 
         String temp = element.getAttributeValue("type", XLINK_NAMESPACE);
 
-        if (temp != null && (temp = temp.trim()).length() != 0) {
-            if (temp.equals("locator") || temp.equals("arc")) {
-                linktype = temp;
-            } else {
-                linktype = null;
-                throw new MCRException("The xlink:type is not locator or arc.");
-            }
+        if (temp != null && (temp.equals("locator") || temp.equals("arc"))) {
+            linktype = temp;
         } else {
-            linktype = null;
             throw new MCRException("The xlink:type is not locator or arc.");
         }
 
@@ -388,19 +348,19 @@ public class MCRMetaLink extends MCRMetaDefault {
 
         if (linktype.equals("arc")) {
             if (from.equals("")) {
-                LOGGER.warn(getSubTag()+": from is null or empty");
+                LOGGER.warn(getSubTag() + ": from is null or empty");
                 return false;
             }
 
             if (to.equals("")) {
-                LOGGER.warn(getSubTag()+": to is null or empty");
+                LOGGER.warn(getSubTag() + ": to is null or empty");
                 return false;
             }
         }
 
         if (linktype.equals("locator")) {
             if (href.equals("")) {
-                LOGGER.warn(getSubTag()+": href is null or empty");
+                LOGGER.warn(getSubTag() + ": href is null or empty");
                 return false;
             }
         }
@@ -413,7 +373,7 @@ public class MCRMetaLink extends MCRMetaDefault {
      */
     @Override
     public final MCRMetaLink clone() {
-        MCRMetaLink out = new MCRMetaLink(subtag, lang, inherited);
+        MCRMetaLink out = new MCRMetaLink(subtag, inherited);
         out.linktype = linktype;
         out.title = title;
         out.type = type;

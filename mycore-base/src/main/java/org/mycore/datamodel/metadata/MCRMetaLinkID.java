@@ -60,14 +60,12 @@ final public class MCRMetaLinkID extends MCRMetaLink {
      * the value of <em>set_subtag<em>. If the value of <em>set_subtag</em>
      * is null or empty an exception was throwed.
      * @param set_subtag       the name of the subtag
-     * @param default_lang     the default language
      * @param set_inherted     a value >= 0
-     *
      * @exception MCRException if the set_datapart or set_subtag value is null or
      * empty
      */
-    public MCRMetaLinkID(String set_subtag, String default_lang, int set_inherted) throws MCRException {
-        super(set_subtag, default_lang, set_inherted);
+    public MCRMetaLinkID(String set_subtag, int set_inherted) throws MCRException {
+        super(set_subtag, set_inherted);
     }
 
     /**

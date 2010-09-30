@@ -485,7 +485,7 @@ public class MCRObjectService {
             return;
         }
         if (getRuleIndex(permission) == -1) {
-            MCRMetaAccessRule acl = new MCRMetaAccessRule("servacl", null, null, 0, permission, condition);
+            MCRMetaAccessRule acl = new MCRMetaAccessRule("servacl", null, 0, permission, condition);
             rules.add(acl);
         }
     }

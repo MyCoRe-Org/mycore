@@ -44,7 +44,7 @@ public class MCRMetaISBN extends MCRMetaDefault {
 
     protected int sum2;
 
-    protected boolean invalid = false;
+    protected boolean invalid;
 
     private static final Logger LOGGER = Logger.getLogger(MCRMetaISBN.class);
 
@@ -55,7 +55,7 @@ public class MCRMetaISBN extends MCRMetaDefault {
      */
     public MCRMetaISBN() {
         super();
-        isbn = "";
+        isbn = null;
         invalid = true;
     }
 
@@ -76,13 +76,9 @@ public class MCRMetaISBN extends MCRMetaDefault {
      * @exception MCRException if the set_subtag value is null or empty
      */
     public MCRMetaISBN(String set_subtag, int set_inherted, String set_isbn) throws MCRException {
-        super(set_subtag, "de", "", set_inherted);
-        isbn = "";
+        super(set_subtag, null, null, set_inherted);
         invalid = true;
-
-        if (set_isbn != null) {
-            set(set_isbn);
-        }
+        setISBN(set_isbn);
     }
 
     /**
@@ -91,25 +87,9 @@ public class MCRMetaISBN extends MCRMetaDefault {
      * @param set_isbn
      *            the new ISBN string
      */
-    public final void set(String set_isbn) {
-        setLang("de");
-        setType("");
-
-        if (set_isbn != null) {
-            isbn = set_isbn.trim();
-            invalid = false;
-            getSums();
-        }
-    }
-
-    /**
-     * This method set the isbn.
-     * 
-     * @param set_isbn
-     *            the new ISBN string
-     */
     public final void setISBN(String set_isbn) {
-        set(set_isbn);
+        isbn = set_isbn;
+        getSums();
     }
 
     /**
@@ -131,14 +111,7 @@ public class MCRMetaISBN extends MCRMetaDefault {
     @Override
     public void setFromDOM(org.jdom.Element element) {
         super.setFromDOM(element);
-
-        String temp_isbn = element.getText().trim();
-
-        if (temp_isbn == null) {
-            temp_isbn = "";
-        }
-
-        set(temp_isbn);
+        setISBN(element.getText());
     }
 
     /**
@@ -190,6 +163,7 @@ public class MCRMetaISBN extends MCRMetaDefault {
         if (isbn != null) {
             char[] nums = isbn.toCharArray();
 
+            invalid = false;
             for (char num : nums) {
                 switch (num) {
                 case 'X':
@@ -234,6 +208,8 @@ public class MCRMetaISBN extends MCRMetaDefault {
                     invalid = true;
                 }
             }
+        } else {
+            invalid = true;
         }
     }
 

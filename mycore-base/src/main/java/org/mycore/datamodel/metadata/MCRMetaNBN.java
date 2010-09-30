@@ -38,7 +38,7 @@ import org.mycore.common.MCRException;
 public class MCRMetaNBN extends MCRMetaDefault {
     // MetaNBN data
     protected String nbn;
-    
+
     private static final Logger LOGGER = Logger.getLogger(MCRMetaNBN.class);
 
     /**
@@ -68,12 +68,8 @@ public class MCRMetaNBN extends MCRMetaDefault {
      * @exception MCRException if the set_subtag value is null or empty
      */
     public MCRMetaNBN(String set_subtag, int set_inherted, String set_nbn) throws MCRException {
-        super(set_subtag, "de", "", set_inherted);
-        nbn = "";
-
-        if (set_nbn != null) {
-            nbn = set_nbn.trim();
-        }
+        super(set_subtag, null, null, set_inherted);
+        nbn = set_nbn;
     }
 
     /**
@@ -164,7 +160,7 @@ public class MCRMetaNBN extends MCRMetaDefault {
         }
 
         if (nbn == null || (nbn = nbn.trim()).length() == 0) {
-            LOGGER.warn(getSubTag()+": nbn is null or empty");
+            LOGGER.warn(getSubTag() + ": nbn is null or empty");
             return false;
         }
 

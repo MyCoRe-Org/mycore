@@ -76,9 +76,6 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      * inherited value is set to 0!
      */
     public MCRMetaDefault() {
-        lang = DEFAULT_LANGUAGE;
-        subtag = "";
-        type = "";
         inherited = DEFAULT_INHERITED;
         datapart = DEFAULT_DATAPART;
     }
@@ -94,16 +91,8 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      *            the default language
      */
     public MCRMetaDefault(String default_lang) {
-        lang = DEFAULT_LANGUAGE;
-
-        if (default_lang != null && (default_lang = default_lang.trim()).length() != 0) {
-            lang = default_lang;
-        }
-
-        subtag = "";
-        type = "";
-        inherited = DEFAULT_INHERITED;
-        datapart = DEFAULT_DATAPART;
+        this();
+        lang = default_lang;
     }
 
     /**
@@ -124,9 +113,9 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      * @exception MCRException if the set_subtag value is null or empty
      */
     public MCRMetaDefault(String set_subtag, String default_lang, String set_type, int set_inherited) throws MCRException {
+        this(default_lang);
         setInherited(set_inherited);
         subtag = set_subtag;
-        lang = default_lang;
         type = set_type;
     }
 

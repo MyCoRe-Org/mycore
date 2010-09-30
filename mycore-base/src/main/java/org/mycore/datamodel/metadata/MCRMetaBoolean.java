@@ -73,38 +73,8 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
      * @exception MCRException if the set_subtag value is null or empty
      */
     public MCRMetaBoolean(String set_subtag, String default_lang, String set_type, int set_inherted, String set_value) throws MCRException {
-        super(set_subtag, "en", set_type, set_inherted);
-        LOGGER.debug("default_lang (" + default_lang + ") will never used."); //FIXME: use default_lang or remove it
-
-        if (set_value != null) {
-            set_value = set_value.toLowerCase().trim();
-
-            if (set_value.equals("true")) {
-                value = true;
-
-                return;
-            }
-
-            if (set_value.equals("ja")) {
-                value = true;
-
-                return;
-            }
-
-            if (set_value.equals("yes")) {
-                value = true;
-
-                return;
-            }
-
-            if (set_value.equals("wahr")) {
-                value = true;
-
-                return;
-            }
-
-            value = false;
-        }
+        this(set_subtag, set_type, set_inherted, false);
+        setValue(set_value);
     }
 
     /**
@@ -119,12 +89,10 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
      * @param set_type         the optional type string
      * @param set_inherted     a value >= 0
      * @param set_value        the boolean value (true or false)
-     *
      * @exception MCRException if the set_subtag value is null or empty
      */
-    public MCRMetaBoolean(String set_subtag, String default_lang, String set_type, int set_inherted, boolean set_value) throws MCRException {
-        super(set_subtag, "en", set_type, set_inherted);
-        LOGGER.debug("default_lang (" + default_lang + ") will never used."); //FIXME: use default_lang or remove it
+    public MCRMetaBoolean(String set_subtag, String set_type, int set_inherted, boolean set_value) throws MCRException {
+        super(set_subtag, null, set_type, set_inherted);
         value = set_value;
     }
 
@@ -135,10 +103,14 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
      *            the boolean value (true or false) as string
      */
     public void setValue(String set_value) {
-        set_value = set_value.toLowerCase().trim();
-
+        try {
+            value = Boolean.parseBoolean(set_value);
+            return;
+        } catch (Exception e) {
+            LOGGER.warn("Boolean is not parseable, using legacy code to parse.", e);
+        }
         if (set_value != null) {
-            set_value = set_value.toLowerCase().trim();
+            set_value = set_value.toLowerCase();
 
             if (set_value.equals("true")) {
                 value = true;
@@ -206,16 +178,7 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
     @Override
     public void setFromDOM(org.jdom.Element element) {
         super.setFromDOM(element);
-
-        String temp_value = element.getText().trim();
-
-        if (temp_value == null) {
-            value = false;
-
-            return;
-        }
-
-        setValue(temp_value);
+        setValue(element.getTextTrim());
     }
 
     /**
@@ -238,7 +201,7 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
      */
     @Override
     public MCRMetaBoolean clone() {
-        return new MCRMetaBoolean(subtag, lang, type, inherited, value);
+        return new MCRMetaBoolean(subtag, type, inherited, value);
     }
 
     /**

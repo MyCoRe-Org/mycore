@@ -65,28 +65,18 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
      * to the type element. The condition element was set to the value of
      * <em>set_condition<em>, if it is null, an exception will be throwed.
      * @param set_subtag       the name of the subtag
-     * @param default_lang     the default language
      * @param set_type         the optional type string
      * @param set_inherted     a value >= 0
-     * @param set_permission         the format string, if it is empty 'READ' will be set.
+     * @param set_permission   permission
      * @param set_condition    the JDOM Element included the condition tree
-     *
      * @exception MCRException if the set_subtag value or set_condition is null or empty
      */
-    public MCRMetaAccessRule(String set_subtag, String default_lang, String set_type, int set_inherted, String set_permission, org.jdom.Element set_condition)
-        throws MCRException {
-        super(set_subtag, default_lang, set_type, set_inherted);
-        permission = set_permission;
-        if (permission == null || (permission = permission.trim()).length() == 0) {
-            permission = "read";
-        } else {
-            permission = permission.trim().toLowerCase();
-        }
+    public MCRMetaAccessRule(String set_subtag, String set_type, int set_inherted, String set_permission, org.jdom.Element set_condition) throws MCRException {
+        super(set_subtag, null, set_type, set_inherted);
         if (set_condition == null || !set_condition.getName().equals("condition")) {
             throw new MCRException("The condition Element of MCRMetaAccessRule is null.");
         }
-        condition = (org.jdom.Element) set_condition.clone();
-        condition.detach();
+        set(set_permission, set_condition);
     }
 
     /**
@@ -99,19 +89,8 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
      *                if the set_condition is null or empty
      */
     public final void set(String set_permission, org.jdom.Element set_condition) throws MCRException {
-        setLang("en");
-        setType("");
-        permission = set_permission;
-        if (permission == null || (permission = permission.trim()).length() == 0) {
-            permission = "read";
-        } else {
-            permission = permission.trim().toLowerCase();
-        }
-        if (set_condition == null || !set_condition.getName().equals("condition")) {
-            throw new MCRException("The condition Element of MCRMetaAccessRule is null.");
-        }
-        condition = set_condition;
-        condition.detach();
+        setCondition(set_condition);
+        setPermission(set_permission);
     }
 
     /**
@@ -126,23 +105,17 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
         if (set_condition == null || !set_condition.getName().equals("condition")) {
             throw new MCRException("The condition Element of MCRMetaAccessRule is null.");
         }
-        condition = (org.jdom.Element) set_condition.clone();
-        condition.detach();
+        condition = (Element) set_condition.clone();
     }
 
     /**
      * This method set the permission attribute.
      * 
      * @param set_permission
-     *            the new permission string, if it is empty 'READ' will be set.
+     *            the new permission string.
      */
     public final void setPermission(String set_permission) {
         permission = set_permission;
-        if (permission == null || (permission = permission.trim()).length() == 0) {
-            permission = "read";
-        } else {
-            permission = permission.trim().toLowerCase();
-        }
     }
 
     /**
@@ -174,18 +147,8 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
     public void setFromDOM(org.jdom.Element element) {
         super.setFromDOM(element);
 
-        org.jdom.Element temp_condition = element.getChild("condition");
-        if (temp_condition == null) {
-            throw new MCRException("The condition Element of MCRMetaAccessRule is null.");
-        }
-        condition = (org.jdom.Element) temp_condition.clone();
-        condition.detach();
-
-        String temp_permission = element.getAttributeValue("permission");
-        if (temp_permission == null) {
-            temp_permission = "read";
-        }
-        permission = temp_permission.trim().toLowerCase();
+        setCondition(element.getChild("condition"));
+        setPermission(element.getAttributeValue("permission"));
     }
 
     /**
@@ -199,11 +162,8 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
     @Override
     public org.jdom.Element createXML() throws MCRException {
         Element elm = super.createXML();
-        if (permission != null && (permission = permission.trim()).length() != 0) {
-            elm.setAttribute("permission", permission);
-        }
-        condition.detach();
-        elm.addContent(condition);
+        elm.setAttribute("permission", permission);
+        elm.addContent((Element) condition.clone());
         return elm;
     }
 
@@ -227,7 +187,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
             LOGGER.warn(getSubTag() + ": condition is null");
             return false;
         }
-        if (permission == null || (permission = permission.trim()).length() == 0) {
+        if (permission == null || permission.length() == 0) {
             LOGGER.warn(getSubTag() + ": permission is null or empty");
             return false;
         }
@@ -239,7 +199,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
      */
     @Override
     public MCRMetaAccessRule clone() {
-        return new MCRMetaAccessRule(subtag, lang, type, inherited, permission, condition);
+        return new MCRMetaAccessRule(subtag, type, inherited, permission, condition);
     }
 
     /**

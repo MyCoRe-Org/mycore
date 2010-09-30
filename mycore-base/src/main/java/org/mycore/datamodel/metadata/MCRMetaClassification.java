@@ -82,7 +82,7 @@ public class MCRMetaClassification extends MCRMetaDefault {
      * the set_categid are null, empty, too long or not a MCRObjectID
      */
     public MCRMetaClassification(String set_subtag, int set_inherted, String set_type, String set_classid, String set_categid) throws MCRException {
-        super(set_subtag, "en", set_type, set_inherted);
+        super(set_subtag, null, set_type, set_inherted);
         setValue(set_classid, set_categid);
     }
 

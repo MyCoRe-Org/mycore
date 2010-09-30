@@ -46,7 +46,7 @@
          <xsd:attribute name="type" use="optional" type="mcrdefaulttype" />
          <xsd:attribute name="form" use="optional" type="mcrdefaultform" />
          <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
-         <xsd:attribute ref="xml:lang" />
+         <xsd:attribute ref="xml:lang" use="optional"/>
        </xsd:extension>
      </xsd:simpleContent>
    </xsd:complexType>
@@ -67,7 +67,7 @@
          <xsd:attribute name="type" use="optional" type="mcrdefaulttype" />
          <xsd:attribute name="form" use="optional" type="mcrdefaultform" />
          <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
-         <xsd:attribute ref="xml:lang" />
+         <xsd:attribute ref="xml:lang" use="optional"/>
        </xsd:extension>
      </xsd:simpleContent>
    </xsd:complexType>
@@ -279,7 +279,7 @@
        <xsd:extension base="xsd:string">
          <xsd:attribute name="type" use="optional" type="mcrdefaulttype" />
          <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
-         <xsd:attribute ref="xml:lang" />
+         <xsd:attribute ref="xml:lang" use="optional""/>
          <xsd:attribute name="dimension" use="optional" type="mcrdimension" />
          <xsd:attribute name="measurement" use="optional" type="mcrmeasurement" />
        </xsd:extension>
@@ -371,7 +371,7 @@
        <xsd:extension base="xsd:string">
          <xsd:attribute name="type" use="optional" type="mcrdefaulttype" />
          <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
-         <xsd:attribute ref="xml:lang" />
+         <xsd:attribute ref="xml:lang" use="optional"/>
        </xsd:extension>
      </xsd:simpleContent>
    </xsd:complexType>
@@ -393,7 +393,7 @@
     <xsd:attribute name="permission" use="required" type="xsd:string" />
     <xsd:attribute name="inherited" use="optional" type="xsd:string" />
     <xsd:attribute name="type" use="optional" type="mcrdefaulttype" />
-    <xsd:attribute ref="xml:lang" />
+    <xsd:attribute ref="xml:lang" use="optional"/>
    </xsd:complexType>
  </xsd:element>
 </xsd:sequence>

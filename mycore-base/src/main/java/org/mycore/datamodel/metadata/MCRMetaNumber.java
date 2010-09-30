@@ -55,7 +55,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
     private String dimension;
 
     private String measurement;
-    
+
     private static final Logger LOGGER = Logger.getLogger(MCRMetaNumber.class);
 
     /**
@@ -66,8 +66,6 @@ final public class MCRMetaNumber extends MCRMetaDefault {
     public MCRMetaNumber() {
         super();
         number = 0.;
-        dimension = "";
-        measurement = "";
     }
 
     /**
@@ -83,51 +81,16 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      * was set to the number element, if it is null or not a number, a
      * MCRException was thowed.
      * @param set_subtag       the name of the subtag
-     * @param default_lang     the default language
      * @param set_inherted     a value >= 0
      * @param set_dimension    the optional dimension string
      * @param set_measurement  the optional measurement string
      * @param set_number       the number string
-     *
      * @exception MCRException if the set_subtag value is null or empty or if
      *   the number string is not in a number format
      */
-    public MCRMetaNumber(String set_subtag, String default_lang, int set_inherted, String set_dimension, String set_measurement,
-            String set_number) throws MCRException {
-        super(set_subtag, default_lang, "", set_inherted);
-        set_number = set_number.trim();
-        number = 0.;
-
-        try {
-            if (set_number == null) {
-                throw new MCRException("The format of a number is false.");
-            }
-
-            String new_number = set_number.replace(',', '.');
-            number = new Double(new_number).doubleValue();
-        } catch (NumberFormatException e) {
-            throw new MCRException("The format of a number is false.");
-        }
-
-        dimension = "";
-
-        if (set_dimension != null) {
-            dimension = set_dimension;
-        }
-
-        if (dimension.length() >= MAX_DIMENSION_LENGTH) {
-            dimension = dimension.substring(0, MAX_DIMENSION_LENGTH);
-        }
-
-        measurement = "";
-
-        if (set_measurement != null) {
-            measurement = set_measurement;
-        }
-
-        if (measurement.length() >= MAX_MEASUREMENT_LENGTH) {
-            measurement = measurement.substring(0, MAX_MEASUREMENT_LENGTH);
-        }
+    public MCRMetaNumber(String set_subtag, int set_inherted, String set_dimension, String set_measurement, String set_number) throws MCRException {
+        this(set_subtag, set_inherted, set_dimension, set_measurement, 0.);
+        setNumber(set_number);
     }
 
     /**
@@ -142,37 +105,37 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      * to the measurement element.  The number <em>set_number</em>
      * was set to the number element.
      * @param set_subtag       the name of the subtag
-     * @param default_lang     the default language
      * @param set_inherted     a value >= 0
      * @param set_dimension    the optional dimension string
      * @param set_measurement  the optional measurement string
      * @param set_number       the number value
-     *
      * @exception MCRException if the set_subtag value is null or empty
      */
-    public MCRMetaNumber(String set_subtag, String default_lang, int set_inherted, String set_dimension, String set_measurement,
-            double set_number) throws MCRException {
-        super(set_subtag, default_lang, "", set_inherted);
+    public MCRMetaNumber(String set_subtag, int set_inherted, String set_dimension, String set_measurement, double set_number) throws MCRException {
+        super(set_subtag, null, null, set_inherted);
         number = set_number;
-        dimension = "";
+        dimension = set_dimension;
+        measurement = set_measurement;
+    }
 
-        if (set_dimension != null) {
-            dimension = set_dimension;
+    /* (non-Javadoc)
+     * @see org.mycore.datamodel.metadata.MCRMetaDefault#isValid()
+     */
+    @Override
+    public boolean isValid() {
+        if (!super.isValid()) {
+            return false;
         }
 
-        if (dimension.length() >= MAX_DIMENSION_LENGTH) {
-            dimension = dimension.substring(0, MAX_DIMENSION_LENGTH);
+        if (dimension != null && dimension.length() > MAX_DIMENSION_LENGTH) {
+            LOGGER.warn(getSubTag() + ": dimension is too long: " + dimension.length());
+            return false;
         }
-
-        measurement = "";
-
-        if (set_measurement != null) {
-            measurement = set_measurement;
+        if (measurement != null && measurement.length() > MAX_MEASUREMENT_LENGTH) {
+            LOGGER.warn(getSubTag() + ": measurement is too long: " + measurement.length());
+            return false;
         }
-
-        if (measurement.length() >= MAX_MEASUREMENT_LENGTH) {
-            measurement = measurement.substring(0, MAX_MEASUREMENT_LENGTH);
-        }
+        return true;
     }
 
     /**
@@ -183,15 +146,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      *            the dimension string
      */
     public final void setDimension(String set_dimension) {
-        dimension = "";
-
-        if (set_dimension != null) {
-            dimension = set_dimension;
-        }
-
-        if (dimension.length() >= MAX_DIMENSION_LENGTH) {
-            dimension = dimension.substring(0, MAX_DIMENSION_LENGTH);
-        }
+        dimension = set_dimension;
     }
 
     /**
@@ -202,15 +157,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      *            the measurement string
      */
     public final void setMeasurement(String set_measurement) {
-        measurement = "";
-
-        if (set_measurement != null) {
-            measurement = set_measurement;
-        }
-
-        if (measurement.length() >= MAX_MEASUREMENT_LENGTH) {
-            measurement = measurement.substring(0, MAX_MEASUREMENT_LENGTH);
-        }
+        measurement = set_measurement;
     }
 
     /**
@@ -223,18 +170,14 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      *                if the number string is not in a number format
      */
     public final void setNumber(String set_number) {
-        String sset_number = set_number.replace(',', '.');
-        sset_number = sset_number.trim();
-        number = 0.;
-
         try {
-            if (sset_number == null) {
-                throw new MCRException("The format of a number is false.");
+            if (set_number == null) {
+                throw new MCRException("Number cannot be null");
             }
-
-            number = new Double(sset_number).doubleValue();
+            String new_number = set_number.replace(',', '.');
+            number = Double.parseDouble(new_number);
         } catch (NumberFormatException e) {
-            throw new MCRException("The format of a number is false.");
+            throw new MCRException("The format of a number is invalid.");
         }
     }
 
@@ -285,47 +228,9 @@ final public class MCRMetaNumber extends MCRMetaDefault {
     @Override
     public final void setFromDOM(org.jdom.Element element) {
         super.setFromDOM(element);
-
-        org.jdom.Attribute attr;
-        measurement = "";
-        attr = element.getAttribute("measurement");
-
-        if (attr != null) {
-            String temp_meas = attr.getValue();
-
-            if (temp_meas != null && (temp_meas = temp_meas.trim()).length() != 0) {
-                measurement = temp_meas;
-            }
-
-            if (measurement.length() >= MAX_MEASUREMENT_LENGTH) {
-                measurement = measurement.substring(0, MAX_MEASUREMENT_LENGTH);
-            }
-        }
-
-        dimension = "";
-        attr = element.getAttribute("dimension");
-
-        if (attr != null) {
-            String temp_dim = attr.getValue();
-
-            if (temp_dim != null && (temp_dim = temp_dim.trim()).length() != 0) {
-                dimension = temp_dim;
-            }
-
-            if (dimension.length() >= MAX_DIMENSION_LENGTH) {
-                dimension = dimension.substring(0, MAX_DIMENSION_LENGTH);
-            }
-        }
-
-        String temp_value = element.getText().trim();
-
-        if (temp_value == null) {
-            number = 0.;
-
-            return;
-        }
-
-        setNumber(temp_value);
+        measurement = element.getAttributeValue("measurement");
+        dimension = element.getAttributeValue("dimension");
+        setNumber(element.getTextTrim());
     }
 
     /**
@@ -339,11 +244,11 @@ final public class MCRMetaNumber extends MCRMetaDefault {
     @Override
     public final org.jdom.Element createXML() throws MCRException {
         Element elm = super.createXML();
-        if (dimension != null && (dimension = dimension.trim()).length() != 0) {
+        if (dimension != null && dimension.length() != 0) {
             elm.setAttribute("dimension", dimension);
         }
 
-        if (measurement != null && (measurement = measurement.trim()).length() != 0) {
+        if (measurement != null && measurement.length() != 0) {
             elm.setAttribute("measurement", measurement);
         }
 
@@ -357,7 +262,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      */
     @Override
     public final MCRMetaNumber clone() {
-        return new MCRMetaNumber(subtag, lang, inherited, dimension, measurement, number);
+        return new MCRMetaNumber(subtag, inherited, dimension, measurement, number);
     }
 
     /**
