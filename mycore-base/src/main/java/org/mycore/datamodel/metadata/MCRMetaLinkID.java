@@ -45,27 +45,28 @@ import org.mycore.common.MCRException;
  */
 final public class MCRMetaLinkID extends MCRMetaLink {
     /**
-     * This is the constructor. <br>
-     * The language element was set to <b>en </b>. All other elemnts was set to
-     * an empty value.
+     * initializes with empty values.
      */
     public MCRMetaLinkID() {
         super();
     }
 
     /**
-     * This is the constructor. <br>
-     * The language element was set. If the value of <em>default_lang</em> is
-     * null, empty or false <b>en </b> was set. The subtag element was set to
-     * the value of <em>set_subtag<em>. If the value of <em>set_subtag</em>
-     * is null or empty an exception was throwed.
-     * @param set_subtag       the name of the subtag
-     * @param set_inherted     a value >= 0
-     * @exception MCRException if the set_datapart or set_subtag value is null or
-     * empty
+     * initializes with given values.
+     * @see MCRMetaLink#MCRMetaLink(String, int) 
      */
-    public MCRMetaLinkID(String set_subtag, int set_inherted) throws MCRException {
+    public MCRMetaLinkID(String set_subtag, int set_inherted) {
         super(set_subtag, set_inherted);
+    }
+
+    /**
+     * initializes with all values needed to link to an MCRObject.
+     * 
+     *  This is the same as running {@link #MCRMetaLinkID(String, int)} and {@link #setReference(MCRObjectID, String, String)}.
+     */
+    public MCRMetaLinkID(String set_subtag, MCRObjectID id, String label, String title) {
+        this(set_subtag, 0);
+        setReference(id, label, title);
     }
 
     /**

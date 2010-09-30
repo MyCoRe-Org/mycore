@@ -28,9 +28,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
-import org.mycore.datamodel.metadata.MCRMetaLinkID;
 
 /**
  * This class implements code for the inheritance of metadata of linked objects
@@ -143,15 +141,11 @@ public class MCRObjectStructure {
      * @return boolean true, if successfully done
      */
     public final boolean addChild(MCRMetaLinkID child) {
-        int i;
-        int n = children.size();
-
-        for (i = 0; i < n; ++i) {
-            if ((children.get(i)).getXLinkHref().equals(child.getXLinkHref())) {
+        for (MCRMetaLinkID c : children) {
+            if (c.getXLinkFromID().equals(child.getXLinkHrefID())) {
                 return false;
             }
         }
-
         children.add(child);
 
         return true;
@@ -169,25 +163,10 @@ public class MCRObjectStructure {
      * @param title
      *            the link's title
      * @return boolean true, if successfully done
+     * @deprecated use {@link #addChild(MCRMetaLinkID)} instead
      */
     public final boolean addChild(MCRObjectID href, String label, String title) {
-        MCRConfiguration mcr_conf = MCRConfiguration.instance();
-        String lang = mcr_conf.getString("MCR.Metadata.DefaultLang");
-        MCRMetaLinkID link = new MCRMetaLinkID("child", 0);
-        link.setReference(href, label, title);
-
-        int i;
-        int n = children.size();
-
-        for (i = 0; i < n; ++i) {
-            if ((children.get(i)).getXLinkHrefID().equals(href)) {
-                return false;
-            }
-        }
-
-        children.add(link);
-
-        return true;
+        return addChild(new MCRMetaLinkID("child", href, label, title));
     }
 
     /**
@@ -208,7 +187,6 @@ public class MCRObjectStructure {
         for (i = 0; i < n; ++i) {
             if ((children.get(i)).getXLinkHrefID().equals(href)) {
                 children.remove(i);
-
                 return true;
             }
         }
@@ -220,9 +198,10 @@ public class MCRObjectStructure {
      * The method returns the number of child links.
      * 
      * @return int number of children
+     * @deprecated use {@link #getChildren()} instead
      */
     public final int getChildSize() {
-        return children.size();
+        return getChildren().size();
     }
 
     /**
@@ -231,18 +210,20 @@ public class MCRObjectStructure {
      * @param index
      *            the index in the link vector
      * @return MCRMetaLink the corresponding link
+     * @deprecated use {@link #getChildren()} instead
      */
     public final MCRMetaLinkID getChild(int index) {
-        return children.get(index);
+        return getChildren().get(index);
     }
 
     /**
      * The method return the child reference as a MCRObjectID.
      * 
      * @return the child MCRObjectID.
+     * @deprecated use {@link #getChildren()} and {@link MCRMetaLinkID#getXLinkHrefID()} instead
      */
     public final MCRObjectID getChildID(int index) {
-        return (children.get(index)).getXLinkHrefID();
+        return getChildren().get(index).getXLinkHrefID();
     }
 
     /**
@@ -260,22 +241,29 @@ public class MCRObjectStructure {
      * @param add_derivate
      *            the link to be added as MCRMetaLinkID
      */
-    public final void addDerivate(MCRMetaLinkID add_derivate) {
+    public final boolean addDerivate(MCRMetaLinkID add_derivate) {
         MCRObjectID href = add_derivate.getXLinkHrefID();
+        for (MCRMetaLinkID derivate : getDerivates()) {
+            if (derivate.getXLinkFromID().equals(href)) {
+                return false;
+            }
+        }
         if (MCRMetadataManager.exists(href)) {
             derivates.add(add_derivate);
-        } else {
-            LOGGER.warn("Can't find derivate " + href.toString() + " ,ignored.");
+            return true;
         }
+        LOGGER.warn("Can't find derivate " + href.toString() + " ,ignored.");
+        return false;
     }
 
     /**
      * The method return the size of the derivate array.
      * 
      * @return the size of the derivate array
+     * @deprecated use {@link #getDerivates()} instead
      */
     public final int getDerivateSize() {
-        return derivates.size();
+        return getDerivates().size();
     }
 
     /**
@@ -284,13 +272,10 @@ public class MCRObjectStructure {
      * @param index
      *            the index of the list
      * @return the derivate as MCRMetaLinkID or null
+     * @deprecated use {@link #getDerivates()} instead
      */
     public final MCRMetaLinkID getDerivate(int index) throws IndexOutOfBoundsException {
-        if (index < 0 || index > derivates.size()) {
-            throw new IndexOutOfBoundsException("Index error in getDerivate().");
-        }
-
-        return derivates.get(index);
+        return getDerivates().get(index);
     }
 
     /**
@@ -301,28 +286,10 @@ public class MCRObjectStructure {
      *            the index of the link to be removed
      * @exception IndexOutOfBoundsException
      *                throw this exception, if the index is false
+     * @deprecated use {@link #getDerivates()} or {@link #removeDerivate(String)} instead                
      */
     public final void removeDerivate(int index) throws IndexOutOfBoundsException {
-        if (index < 0 || index > derivates.size()) {
-            throw new IndexOutOfBoundsException("Index error in removeDerivate().");
-        }
-
-        derivates.remove(index);
-    }
-
-    /**
-     * Removes the derivate with the given derivate id from the structure
-     * 
-     * @param derivateId the id of the derivate 
-     * */
-    public void removeDerivate(String derivateId) {
-        for (int i = 0; i < derivates.size(); i++) {
-            MCRMetaLinkID id = derivates.get(i);
-            if (id.getXLinkHref().equals(derivateId)) {
-                derivates.remove(i);
-                return;
-            }
-        }
+        getDerivates().remove(index);
     }
 
     /** 
@@ -342,8 +309,7 @@ public class MCRObjectStructure {
      *            the structure node list
      */
     public final void setFromDOM(Element element) {
-        children.clear();
-
+        clear();
         Element subElement = element.getChild("children");
 
         if (subElement != null) {
@@ -358,7 +324,6 @@ public class MCRObjectStructure {
         }
 
         // Stricture parent part
-        parent = null;
         subElement = element.getChild("parents");
 
         if (subElement != null) {
@@ -367,7 +332,6 @@ public class MCRObjectStructure {
         }
 
         // Structure derivate part
-        derivates.clear();
         subElement = element.getChild("derobjects");
 
         if (subElement != null) {
@@ -390,40 +354,35 @@ public class MCRObjectStructure {
      *                if the content of this class is not valid
      * @return org.jdom.Element the structure XML string
      */
-    public final org.jdom.Element createXML() throws MCRException {
+    public final Element createXML() throws MCRException {
         if (!isValid()) {
             throw new MCRException("The content is not valid.");
         }
 
-        int i;
-        org.jdom.Element elm = new org.jdom.Element("structure");
+        Element elm = new Element("structure");
 
         if (children.size() > 0) {
-            org.jdom.Element elmm = new org.jdom.Element("children");
+            Element elmm = new Element("children");
             elmm.setAttribute("class", "MCRMetaLinkID");
-
-            for (i = 0; i < children.size(); ++i) {
-                elmm.addContent(((MCRMetaLink) children.get(i)).createXML());
+            for (MCRMetaLinkID child : getChildren()) {
+                elmm.addContent(child.createXML());
             }
-
             elm.addContent(elmm);
         }
 
         if (parent != null) {
-            org.jdom.Element elmm = new org.jdom.Element("parents");
+            Element elmm = new Element("parents");
             elmm.setAttribute("class", "MCRMetaLinkID");
             elmm.addContent(parent.createXML());
             elm.addContent(elmm);
         }
 
         if (derivates.size() > 0) {
-            org.jdom.Element elmm = new org.jdom.Element("derobjects");
+            Element elmm = new Element("derobjects");
             elmm.setAttribute("class", "MCRMetaLinkID");
-
-            for (i = 0; i < derivates.size(); ++i) {
-                elmm.addContent(((MCRMetaLink) derivates.get(i)).createXML());
+            for (MCRMetaLinkID derivate : getDerivates()) {
+                elmm.addContent(derivate.createXML());
             }
-
             elm.addContent(elmm);
         }
 
@@ -437,8 +396,8 @@ public class MCRObjectStructure {
      * @return boolean true, if structure is valid
      */
     public final boolean isValid() {
-        for (int i = 0; i < children.size(); ++i) {
-            if (!((MCRMetaLink) children.get(i)).isValid()) {
+        for (MCRMetaLinkID child : getChildren()) {
+            if (!child.isValid()) {
                 return false;
             }
         }
@@ -449,16 +408,16 @@ public class MCRObjectStructure {
             }
         }
 
-        for (int i = 0; i < derivates.size(); ++i) {
-            if (!(derivates.get(i)).isValid()) {
+        for (MCRMetaLinkID derivate : getDerivates()) {
+            if (!derivate.isValid()) {
                 return false;
             }
 
-            if (!(derivates.get(i)).getXLinkType().equals("locator")) {
+            if (!derivate.getXLinkType().equals("locator")) {
                 return false;
             }
 
-            if (!(derivates.get(i)).getXLinkHrefID().getTypeId().toLowerCase().equals("derivate")) {
+            if (!derivate.getXLinkHrefID().getTypeId().equals("derivate")) {
                 return false;
             }
         }
