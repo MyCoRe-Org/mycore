@@ -265,7 +265,7 @@ public class MCRObjectStructure {
     public final boolean addDerivate(MCRMetaLinkID add_derivate) {
         MCRObjectID href = add_derivate.getXLinkHrefID();
         for (MCRMetaLinkID derivate : getDerivates()) {
-            if (derivate.getXLinkFromID().equals(href)) {
+            if (derivate.getXLinkHrefID().equals(href)) {
                 return false;
             }
         }

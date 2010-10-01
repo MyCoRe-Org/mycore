@@ -483,15 +483,11 @@ public final class MCRMetadataManager {
         MCRMetadataManager.updateMCRDerivateXML(mcrDerivate);
 
         // add the link to metadata
-        try {
-            metaId = mcrDerivate.getDerivate().getMetaLink().getXLinkHrefID();
-            final MCRMetaLinkID der = new MCRMetaLinkID();
-            der.setReference(mcrDerivate.getId().toString(), mcrDerivate.getLabel(), "");
-            der.setSubTag("derobject");
-            MCRMetadataManager.addDerivateToObject(metaId, der);
-        } catch (final MCRException e) {
-            throw new MCRPersistenceException("The MCRObject " + metaId + " was not found.");
-        }
+        metaId = mcrDerivate.getDerivate().getMetaLink().getXLinkHrefID();
+        final MCRMetaLinkID der = new MCRMetaLinkID();
+        der.setReference(mcrDerivate.getId().toString(), mcrDerivate.getLabel(), "");
+        der.setSubTag("derobject");
+        MCRMetadataManager.addDerivateToObject(metaId, der);
     }
 
     /**
