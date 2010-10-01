@@ -24,6 +24,7 @@
 package org.mycore.datamodel.metadata;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -170,8 +171,8 @@ public class MCRObjectStructure {
     }
 
     /**
-     * <em>removeChild</em> removes a child link to another object from the
-     * link vector. If the link was found a "true" will be returned, otherwise
+     * removes a child link to another object.
+     *  If the link was found a "true" will be returned, otherwise
      * "false".
      * 
      * @param href
@@ -179,18 +180,38 @@ public class MCRObjectStructure {
      * @return boolean true, if successfully completed
      */
     public final boolean removeChild(MCRObjectID href) {
-        LOGGER.debug("Remove child ID " + href.toString());
+        LOGGER.debug("Remove child ID " + href);
+        return removeMetaLink(getChildren().iterator(), href);
+    }
 
-        int i;
-        int n = children.size();
+    /**
+     * removes a derivate link.
+     * If the link was found a "true" will be returned, otherwise
+     * "false".
+     * 
+     * @param href
+     *            the MCRObjectID of the child
+     * @return boolean true, if successfully completed
+     */
+    public final boolean removeDerivate(MCRObjectID href) {
+        LOGGER.debug("Remove derivate ID " + href);
+        return removeMetaLink(getDerivates().iterator(), href);
+    }
 
-        for (i = 0; i < n; ++i) {
-            if ((children.get(i)).getXLinkHrefID().equals(href)) {
-                children.remove(i);
+    /**
+     * Removes a MCRMetaLinkID instance by it MCRObjectID.
+     * @param it
+     * @param href
+     * @return
+     */
+    private boolean removeMetaLink(Iterator<MCRMetaLinkID> it, MCRObjectID href) {
+        while (it.hasNext()) {
+            MCRMetaLinkID derLink = it.next();
+            if (derLink.getXLinkHrefID().equals(href)) {
+                it.remove();
                 return true;
             }
         }
-
         return false;
     }
 
