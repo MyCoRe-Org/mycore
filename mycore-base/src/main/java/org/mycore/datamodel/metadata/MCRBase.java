@@ -114,7 +114,7 @@ public abstract class MCRBase {
         jdom_document = doc;
         setUp();
     }
-    
+
     protected abstract void setUp();
 
     /**
@@ -282,5 +282,10 @@ public abstract class MCRBase {
 
     public void setImportMode(boolean importMode) {
         this.importMode = importMode;
+    }
+
+    @Override
+    public String toString() {
+        return this.mcr_id.toString();
     }
 }
