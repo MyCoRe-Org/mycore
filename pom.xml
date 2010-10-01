@@ -175,6 +175,15 @@
             </configuration>
             <reportSets>
               <reportSet>
+                <id>default</id>
+                <configuration>
+                </configuration>
+                <reports>
+                  <report>javadoc</report>
+                  <report>test-javadoc</report>
+                </reports>
+              </reportSet>
+              <reportSet>
                 <id>aggregate</id>
                 <configuration>
                 </configuration>
