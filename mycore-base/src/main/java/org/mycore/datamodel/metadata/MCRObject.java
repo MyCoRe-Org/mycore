@@ -201,7 +201,15 @@ final public class MCRObject extends MCRBase {
     @Override
     public final org.jdom.Document createXML() throws MCRException {
         if (!isValid()) {
-            throw new MCRException("The content is not valid.");
+        	String msg;
+        	MCRObjectID id = getId();
+        	if(id==null){
+        		 msg = "The content is not valid.";
+        	}
+        	else{
+        		msg = "The content of "+id.toString()+" is not valid.";
+        	}
+            throw new MCRException(msg);
         }
 
         org.jdom.Element elm = new org.jdom.Element("mycoreobject");
