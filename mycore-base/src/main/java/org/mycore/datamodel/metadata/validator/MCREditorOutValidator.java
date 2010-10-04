@@ -135,7 +135,6 @@ public class MCREditorOutValidator {
             byte[] xml = MCRUtils.getByteArray(input);
             obj.setFromXML(xml, true);
             Date curTime = new Date();
-            obj.getService().setDate("createdate", curTime);
             obj.getService().setDate("modifydate", curTime);
 
             // return the XML tree
