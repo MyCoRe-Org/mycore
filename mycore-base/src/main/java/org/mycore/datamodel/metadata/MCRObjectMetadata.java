@@ -240,7 +240,7 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
     public final void setFromDOM(org.jdom.Element element) throws MCRException {
         @SuppressWarnings("unchecked")
         List<Element> elements_list = element.getChildren();
-
+        meta_list.clear();
         for (Element sub : elements_list) {
             MCRMetaElement obj = new MCRMetaElement();
             obj.setFromDOM(sub);
