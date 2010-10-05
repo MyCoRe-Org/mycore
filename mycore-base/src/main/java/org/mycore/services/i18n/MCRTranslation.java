@@ -118,9 +118,10 @@ public class MCRTranslation {
      *            property values
      * @return translated String
      */
-    public static String translate(String label, Object[] arguments) {
+    public static String translate(String label, Object... arguments) {
         Locale currentLocale = getCurrentLocale();
-        MessageFormat formatter = new MessageFormat(translate(label), currentLocale);
+        String msgFormat = translate(label);
+        MessageFormat formatter = new MessageFormat(msgFormat, currentLocale);
         String result = formatter.format(arguments);
         LOGGER.debug("Translation for " + label + "=" + result);
         return result;
@@ -143,7 +144,7 @@ public class MCRTranslation {
      * @see #translate(String, Object[])
      */
     public static String translate(String label, String argument) {
-        return translate(label, getStringArray(argument));
+        return translate(label, (Object[]) getStringArray(argument));
     }
 
     private static Locale getCurrentLocale() {

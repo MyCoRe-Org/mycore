@@ -46,6 +46,7 @@ import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
 import org.mycore.datamodel.ifs2.MCRVersioningMetadataStore;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.services.fieldquery.MCRCachedQueryData;
 import org.mycore.services.fieldquery.MCRHit;
@@ -98,38 +99,32 @@ public class MCRObjectServlet extends MCRServlet {
      */
     @Override
     public void doGetPost(MCRServletJob job) throws Exception {
-        try {
-            String host = getObjectHost(job);
-            String id = getObjectID(job.getRequest());
-            if (id == null || id.length() == 0) {
-                return; // request failed;
-            }
-            String editorID = getEditorID(job.getRequest());
-            setBrowseParameters(job, id, host, editorID);
-            String revision = getProperty(job.getRequest(), "r");
-            long rev = REV_CURRENT;
-            if (revision != null) {
-                rev = Long.parseLong(revision);
-            }
+        String host = getObjectHost(job);
+        String id = getObjectID(job.getRequest());
+        if (id == null || id.length() == 0) {
+            return; // request failed;
+        }
+        String editorID = getEditorID(job.getRequest());
+        setBrowseParameters(job, id, host, editorID);
+        String revision = getProperty(job.getRequest(), "r");
+        long rev = REV_CURRENT;
+        if (revision != null) {
+            rev = Long.parseLong(revision);
+        }
 
-            if (host == MCRHit.LOCAL) {
-                Document localObject;
-                if (rev == REV_CURRENT) {
-                    localObject = requestLocalObject(job);
-                } else {
-                    localObject = requestVersionedObject(job, rev);
-                }
-                if (localObject == null) {
-                    return;
-                }
-                getLayoutService().doLayout(job.getRequest(), job.getResponse(), localObject);
+        if (host == MCRHit.LOCAL) {
+            Document localObject;
+            if (rev == REV_CURRENT) {
+                localObject = requestLocalObject(job);
             } else {
-                getLayoutService().doLayout(job.getRequest(), job.getResponse(), requestRemoteObject(job));
+                localObject = requestVersionedObject(job, rev);
             }
-        } catch (MCRException e) { // Shouldn't this be 404 "NOT FOUND"?
-            generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while retrieving MCRObject with ID: "
-                + getObjectID(job.getRequest()), e, false);
-            return;
+            if (localObject == null) {
+                return;
+            }
+            getLayoutService().doLayout(job.getRequest(), job.getResponse(), localObject);
+        } else {
+            getLayoutService().doLayout(job.getRequest(), job.getResponse(), requestRemoteObject(job));
         }
     }
 
@@ -155,7 +150,11 @@ public class MCRObjectServlet extends MCRServlet {
         MCRObjectID mcrid = getMCRObjectID(job);
         if (mcrid == null)
             return null;
-        return TM.retrieveXML(mcrid);
+        if (MCRMetadataManager.exists(mcrid)) {
+            return TM.retrieveXML(mcrid);
+        }
+        job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND, getErrorI18N("notFound", mcrid));
+        return null;
     }
 
     private MCRObjectID getMCRObjectID(MCRServletJob job) throws IOException {
@@ -165,16 +164,16 @@ public class MCRObjectServlet extends MCRServlet {
         try {
             mcrid = MCRObjectID.getInstance(id); // create Object with given ID, only ID syntax check performed
         } catch (MCRException e) { // handle exception: invalid ID syntax, set HTTP error 400 "Invalid request"
-            generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_BAD_REQUEST, "Error: invalid MCRObject-ID '" + id + "'", e, false);
+            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, getErrorI18N("invalidID", id));
             return null; // sorry, no object to return
         }
 
         if (!MCRAccessManager.checkPermission(mcrid, "read")) { // check read permission for ID
-            StringBuffer msg = new StringBuffer(1024);
-            msg.append("Access denied reading MCRObject with ID: ").append(mcrid.toString());
-            msg.append(".\nCurrent User: ").append(MCRSessionMgr.getCurrentSession().getCurrentUserID());
-            msg.append("\nRemote IP: ").append(MCRSessionMgr.getCurrentSession().getCurrentIP());
-            generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_FORBIDDEN, msg.toString(), null, false);
+            job.getResponse().sendError(
+                HttpServletResponse.SC_UNAUTHORIZED,
+                getErrorI18N("accessDenied", mcrid.toString(), MCRSessionMgr.getCurrentSession().getCurrentUserID(), MCRSessionMgr
+                    .getCurrentSession()
+                    .getCurrentIP()));
             return null;
         }
         return mcrid;
@@ -203,10 +202,10 @@ public class MCRObjectServlet extends MCRServlet {
                     return version.retrieve().asXML();
                 }
             }
-            generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_NOT_FOUND, "Revision not found: " + rev, null, false);
+            job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND, getErrorI18N("revisionNotFound", rev, mcrid));
             return null;
         }
-        generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_BAD_REQUEST, "No versions available for " + mcrid, null, false);
+        job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, getErrorI18N("noVersions", mcrid));
         return null;
     }
 
