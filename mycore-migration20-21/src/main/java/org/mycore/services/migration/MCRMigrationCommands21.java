@@ -9,9 +9,12 @@ import org.hibernate.Session;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRXMLTABLE;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRCommand;
+import org.xml.sax.SAXParseException;
 
 public class MCRMigrationCommands21 extends MCRAbstractCommands {
     private static Logger LOGGER = Logger.getLogger(MCRMigrationCommands21.class);
@@ -34,8 +37,17 @@ public class MCRMigrationCommands21 extends MCRAbstractCommands {
         while (xmlentries.next()) {
             MCRXMLTABLE xmlentry = (MCRXMLTABLE) xmlentries.get(0);
             MCRObjectID mcrId = MCRObjectID.getInstance(xmlentry.getId());
-            Date lastModified = xmlentry.getLastModified();
             byte[] xmlByteArray = xmlentry.getXmlByteArray();
+            Date lastModified = xmlentry.getLastModified();
+            if(lastModified==null){
+            	try{
+            		MCRObject mcrObj= new MCRObject(xmlByteArray, true);
+            		lastModified = mcrObj.getService().getDate(MCRObjectService.DATE_TYPE_CREATEDATE);
+            	}
+            	catch(SAXParseException spe){
+            		LOGGER.error("MCRObject "+mcrId.toString()+" not valid.", spe);
+            	}
+            }
             session.evict(xmlentry);
             if (manager.exists(mcrId)) {
                 LOGGER.warn(xmlentry.getId() + " allready exists in IFS2 - skipping.");

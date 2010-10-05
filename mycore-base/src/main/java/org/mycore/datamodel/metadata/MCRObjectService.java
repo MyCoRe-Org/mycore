@@ -60,6 +60,14 @@ import org.mycore.common.MCRException;
  * @version $Revision$ $Date$
  */
 public class MCRObjectService {
+	/**
+	 * constant for create date
+	 */
+	public static final String DATE_TYPE_CREATEDATE = "createdate";
+	/**
+	 * constant for modify date
+	 */
+	public static final String DATE_TYPE_MODIFYDATE = "modifydate";
     private final ArrayList<MCRMetaISO8601Date> dates;
 
     private final ArrayList<MCRMetaAccessRule> rules;
@@ -75,10 +83,10 @@ public class MCRObjectService {
 
         Date curTime = new Date();
 
-        MCRMetaISO8601Date d = new MCRMetaISO8601Date("servdate", "createdate", 0);
+        MCRMetaISO8601Date d = new MCRMetaISO8601Date("servdate", DATE_TYPE_CREATEDATE, 0);
         d.setDate(curTime);
         dates.add(d);
-        d = new MCRMetaISO8601Date("servdate", "modifydate", 0);
+        d = new MCRMetaISO8601Date("servdate", DATE_TYPE_MODIFYDATE, 0);
         d.setDate(curTime);
         dates.add(d);
 
@@ -624,12 +632,12 @@ public class MCRObjectService {
      * @return a boolean value
      */
     public final boolean isValid() {
-        if (getISO8601Date("createdate") == null) {
-            setDate("createdate");
+        if (getISO8601Date(DATE_TYPE_CREATEDATE) == null) {
+            setDate(DATE_TYPE_CREATEDATE);
         }
 
-        if (getISO8601Date("modifydate") == null) {
-            setDate("modifydate");
+        if (getISO8601Date(DATE_TYPE_MODIFYDATE) == null) {
+            setDate(DATE_TYPE_MODIFYDATE);
         }
 
         return true;
