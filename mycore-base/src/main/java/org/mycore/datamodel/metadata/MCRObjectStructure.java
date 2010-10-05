@@ -143,7 +143,7 @@ public class MCRObjectStructure {
      */
     public final boolean addChild(MCRMetaLinkID child) {
         for (MCRMetaLinkID c : children) {
-            if (c.getXLinkFromID().equals(child.getXLinkHrefID())) {
+            if (c.getXLinkHrefID().equals(child.getXLinkHrefID())) {
                 return false;
             }
         }

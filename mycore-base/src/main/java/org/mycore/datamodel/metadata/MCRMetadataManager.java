@@ -187,8 +187,7 @@ public final class MCRMetadataManager {
                     new MCRMetaLinkID("child", mcrObject.getId(), mcrObject.getStructure().getParent().getXLinkLabel(), mcrObject.getLabel()));
                 MCRMetadataManager.fireUpdateEvent(parent);
             } catch (final Exception e) {
-                LOGGER.debug(MCRException.getStackTraceAsString(e));
-                LOGGER.error("Error while store child ID in parent object.");
+                LOGGER.error("Error while store child ID in parent object.",e);
                 try {
                     MCRMetadataManager.delete(mcrObject);
                     LOGGER.error("Child object was removed.");
@@ -576,8 +575,7 @@ public final class MCRMetadataManager {
                 parent.getStructure().addChild(new MCRMetaLinkID("child", mcrObject.getId(), mcrObject.getLabel(), mcrObject.getLabel()));
                 MCRMetadataManager.fireUpdateEvent(parent);
             } catch (final Exception e) {
-                LOGGER.debug(MCRException.getStackTraceAsString(e));
-                LOGGER.error("Error while store child ID in parent object.");
+                LOGGER.error("Error while store child ID in parent object.",e);
                 try {
                     MCRMetadataManager.delete(mcrObject);
                     LOGGER.error("Child object was removed.");
