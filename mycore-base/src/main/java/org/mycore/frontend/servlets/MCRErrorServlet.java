@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 import org.jdom.DocType;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.Namespace;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -78,6 +79,7 @@ public class MCRErrorServlet extends HttpServlet {
         }
         Element root = new Element(rootname);
         root.setAttribute("errorServlet", Boolean.TRUE.toString());
+        root.setAttribute("space", "preserve", Namespace.XML_NAMESPACE);
         if (msg != null) {
             root.setText(msg);
         }
@@ -135,5 +137,4 @@ public class MCRErrorServlet extends HttpServlet {
             }
         }
     }
-
 }
