@@ -1,0 +1,68 @@
+<document xmlns="http://maven.apache.org/changes/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/xsd/changes-1.0.0.xsd">
+  <properties>
+    <title>MyCoRe Changes Report</title>
+    <author email="thomas.scheffler(at)uni-jena.de">Thomas Scheffler</author>
+  </properties>
+  <body>
+    <release version="2.0.92" date="2010-10-?" description="Beta 2">
+      <action dev="mcrrsteph" type="fix">
+        Handle empty modify date fields in "migrate xmltable" command.
+      </action>
+      <action dev="mcrtchef" type="add">
+        Added maven projects "remote-adapter" and "iview2-tile-client" to "iview2-addons" module as part of
+        the MyCoRe build process.
+      </action>
+      <action dev="mcrtchef" type="update">
+        mycore-iview2 classes are now in package org.mycore.iview2
+      </action>
+      <action dev="mcrtchef" type="add">
+        Provided antlib.xml to define ant tasks. This requires an update in ant build files.
+      </action>
+      <action dev="mcrtchef" type="update">
+        Moved MCRConfigurationTask to package org.mycore.buildtools.anttasks. This requires an update in
+        ant build files.
+      </action>
+      <action dev="mcrjkupf" type="add">
+        Added XALAN-Extension in MCRXMLFunctions to get the sources of a MCRMetaLinkID for a given
+        MCRObjectID.
+      </action>
+      <action dev="mcrtchef" type="fix" due-to="Annedore Hainsch, hfm-weimar">
+        Fixed deadlock in MCRTilingQueue.
+      </action>
+      <action dev="mcrtchef" type="fix" due-to="Annedore Hainsch, hfm-weimar">
+        Fixed inheritance of metadata if more than one metadata is inherited.
+      </action>
+      <action dev="mcrfluet" type="add">
+        Added mycore-oai component.
+      </action>
+      <action dev="mcrtchef" type="add">
+        Added validation messages to datamodel classes to see in the log why the validation had failed.
+      </action>
+      <action dev="mcrtchef" type="add">
+        Added Changelog, Changes, Developer Activity and File Activity Reports
+      </action>
+      <action dev="mcrtchef" type="update">
+        Renamed artifacts mycore-parent to mycore and mycore to mycore-parent.
+      </action>
+      <action dev="mcrtchef" type="update">
+        Datamodel classes like MCRObject and MCRDerivate are just data containers and do not any
+        persistence operation.
+        This is done by MCRMetadataManager.
+      </action>
+      <action dev="mcrtchef" type="update">
+        Renamed MCRXMLTableManager to MCRXMLMetadataManager and MCRXMLTableEventHandler to
+        MCRXMLMetadataEventHandler.
+      </action>
+      <action dev="mcrtchef" type="fix">
+        Refactored MCRObjectID to be immutable.
+      </action>
+    </release>
+
+    <release version="2.0.91" date="2010-09-09" description="Beta 1">
+      <action dev="mcrtchef" type="update">
+        Tagged first beta version of MyCoRe 2.1
+      </action>
+    </release>
+  </body>
+</document>

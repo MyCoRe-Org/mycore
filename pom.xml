@@ -23,6 +23,7 @@
     <hibernate.version>3.3.2.GA</hibernate.version>
     <lucene.version>3.0.2</lucene.version>
     <changelog.since>2010-09-09</changelog.since>
+    <issueLink>https://sourceforge.net/tracker/index.php?func=detail&amp;aid=%ISSUE%&amp;group_id=92005&amp;atid=599192</issueLink>
   </properties>
   <ciManagement>
     <system>hudson</system>
@@ -106,13 +107,29 @@
             <artifactId>maven-changelog-plugin</artifactId>
             <configuration>
               <issueIDRegexPattern>\d{6,}</issueIDRegexPattern>
-              <issueLinkUrl>https://sourceforge.net/tracker/index.php?func=detail&amp;aid=%ISSUE%&amp;group_id=92005&amp;atid=599192</issueLinkUrl>
+              <issueLinkUrl>${issueLink}</issueLinkUrl>
               <type>date</type>
               <dates>
                 <date implementation="java.lang.String">${changelog.since}</date>
               </dates>
               <dateFormat>yyyy-MM-dd</dateFormat>
             </configuration>
+          </plugin>
+          <plugin>
+            <artifactId>maven-changes-plugin</artifactId>
+            <inherited>false</inherited>
+            <reportSets>
+              <reportSet>
+                <reports>
+                  <report>changes-report</report>
+                </reports>
+                <configuration>
+                  <issueLinkTemplatePerSystem>
+                    <default>${issueLink}</default>
+                  </issueLinkTemplatePerSystem>
+                </configuration>
+              </reportSet>
+            </reportSets>
           </plugin>
           <plugin>
             <artifactId>maven-checkstyle-plugin</artifactId>
