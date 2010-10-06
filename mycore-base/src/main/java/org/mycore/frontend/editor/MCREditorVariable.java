@@ -29,6 +29,7 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.fileupload.FileItem;
 import org.jdom.Element;
+import org.mycore.common.xml.MCRXMLHelper;
 
 /**
  * A single variable holding a value that was edited in a MyCoRe XML editor
@@ -63,7 +64,7 @@ public class MCREditorVariable implements Comparable {
     }
 
     void setValue(String value) {
-        this.value = value;
+        this.value = MCRXMLHelper.removeIllegalChars( value );
     }
 
     public String getValue() {
