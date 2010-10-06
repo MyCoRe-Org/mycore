@@ -391,6 +391,14 @@ public class MCRXMLFunctions {
         }
         return rootElement.getChildNodes();
     }
+    
+    /**
+     * same as {@link #getLinkSources(String, String)} with <code>sourceType</code>=<em>null</em>
+     * @param mcrid
+     */
+    public static NodeList getLinkSources(String mcrid){
+        return getLinkSources(mcrid, null);
+    }
 
     /**
      * The method return a org.w3c.dom.NodeList as subpath of the doc input NodeList selected by a path as String.
