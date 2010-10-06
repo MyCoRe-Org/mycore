@@ -29,7 +29,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -49,8 +48,8 @@ import org.hibernate.criterion.Restrictions;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRURN;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.common.MCRLinkTableManager;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -367,33 +366,32 @@ public class MCRXMLFunctions {
         }
         return false;
     }
+
     /**
-     * The method return a list of referenced links for a given MCR type as XML-tree.
-     * The structure is <em>linklist/[link]</em>. If no link was found it return <em>linklist</em> as root node.
+     * Returns a list of link sources of a given MCR object type.
+     * The structure is <em>link</em>. If no links are found an empty NodeList is returned.
      * 
-     * @param mcrid the MCRObjectID as String, that should be referenced
-     * @param targettype the MCR datamodel type
-     * @return an XML tree as org.w3c.don.NodeList
+     * @param mcrid MCRObjectID as String as the link target
+     * @param sourceType MCR object type
+     * @return a NodeList with <em>link</em> elements
      */
-    public static NodeList getSecondaryLinkForMCRID(String mcrid, String targettype) {
+    public static NodeList getLinkSources(String mcrid, String sourceType) {
         Document document = DOC_BUILDER.newDocument();
         Element rootElement = document.createElement("linklist");
         document.appendChild(rootElement);
         MCRLinkTableManager ltm = MCRLinkTableManager.instance();
         List<String> list = (List<String>) ltm.getSourceOf(mcrid);
         Collections.sort(list);
-        Iterator<String> it = list.iterator();
-        while (it.hasNext()) {
-            String st = it.next();
-            if (targettype == null || targettype.trim().length() == 0 || st.indexOf(targettype) != -1) {
+        for (String id : list) {
+            if (sourceType == null || MCRObjectID.getIDParts(id)[1].equals(sourceType)) {
                 Element link = document.createElement("link");
-                link.setTextContent(st);
+                link.setTextContent(id);
                 rootElement.appendChild(link);
             }
         }
-        return document.getChildNodes();
+        return rootElement.getChildNodes();
     }
-    
+
     /**
      * The method return a org.w3c.dom.NodeList as subpath of the doc input NodeList selected by a path as String.
      * 
@@ -415,7 +413,7 @@ public class MCRXMLFunctions {
                 Node child = doc.item(0).getFirstChild();
                 if (child != null) {
                     Node node = (Node) doc.item(0).getFirstChild();
-                    Node imp = document.importNode(node,true);
+                    Node imp = document.importNode(node, true);
                     document.appendChild(imp);
                 } else {
                     document.appendChild(doc.item(0));
