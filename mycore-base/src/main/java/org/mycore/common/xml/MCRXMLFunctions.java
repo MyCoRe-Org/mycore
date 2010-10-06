@@ -27,7 +27,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -380,9 +379,7 @@ public class MCRXMLFunctions {
         Element rootElement = document.createElement("linklist");
         document.appendChild(rootElement);
         MCRLinkTableManager ltm = MCRLinkTableManager.instance();
-        List<String> list = (List<String>) ltm.getSourceOf(mcrid);
-        Collections.sort(list);
-        for (String id : list) {
+        for (String id : ltm.getSourceOf(mcrid)) {
             if (sourceType == null || MCRObjectID.getIDParts(id)[1].equals(sourceType)) {
                 Element link = document.createElement("link");
                 link.setTextContent(id);
