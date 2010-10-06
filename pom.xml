@@ -23,8 +23,11 @@
     <hibernate.version>3.3.2.GA</hibernate.version>
     <lucene.version>3.0.2</lucene.version>
     <changelog.since>2010-09-09</changelog.since>
-    <issueLink>https://sourceforge.net/tracker/index.php?func=detail&amp;aid=%ISSUE%&amp;group_id=92005&amp;atid=599192</issueLink>
   </properties>
+  <issueManagement>
+    <system>sourceforge</system>
+    <url>https://sourceforge.net/tracker/index.php?group_id=92005</url>
+  </issueManagement>
   <ciManagement>
     <system>hudson</system>
     <url>http://www.mycore.org/hudson/job/MyCoRe/</url>
@@ -107,7 +110,7 @@
             <artifactId>maven-changelog-plugin</artifactId>
             <configuration>
               <issueIDRegexPattern>\d{6,}</issueIDRegexPattern>
-              <issueLinkUrl>${issueLink}</issueLinkUrl>
+              <issueLinkUrl>http://sourceforge.net/support/tracker.php?aid=%ISSUE%</issueLinkUrl>
               <type>date</type>
               <dates>
                 <date implementation="java.lang.String">${changelog.since}</date>
@@ -125,7 +128,7 @@
                 </reports>
                 <configuration>
                   <issueLinkTemplatePerSystem>
-                    <default>${issueLink}</default>
+                    <default>http://sourceforge.net/support/tracker.php?aid=%ISSUE%</default>
                   </issueLinkTemplatePerSystem>
                 </configuration>
               </reportSet>
