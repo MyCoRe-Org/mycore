@@ -27,7 +27,7 @@
         Added XALAN-Extension in MCRXMLFunctions to get the sources of a MCRMetaLinkID for a given
         MCRObjectID.
       </action>
-      <action dev="mcrtchef" type="fix" due-to="Annedore Hainsch, hfm-weimar">
+      <action dev="mcrtchef" type="fix">
         Fixed deadlock in MCRTilingQueue.
       </action>
       <action dev="mcrtchef" type="fix" due-to="Annedore Hainsch, hfm-weimar">
