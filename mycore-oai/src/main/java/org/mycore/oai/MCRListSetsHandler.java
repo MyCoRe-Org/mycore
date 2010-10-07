@@ -68,7 +68,7 @@ import org.mycore.services.fieldquery.MCRQueryManager;
  * 
  * Another way to filter out empty sets can be activated by setting a property:
  * 
- * MIL.OAIDataProvider.OAI.FilterEmptySets=true
+ * MCR.OAIDataProvider.OAI.FilterEmptySets=true
 
  * When set to true, the ListSets handler filters out empty sets itself after reading in the URIs.
  * This is done by constructing a query for each set and looking for matching hits. Set queries are built
