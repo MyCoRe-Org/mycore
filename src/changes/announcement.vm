@@ -3,6 +3,7 @@
 The ${developmentTeam} is pleased to announce the ${finalName} (${release.getDescription()}) release!
 
 ${introduction}
+#set($issueTracker="http://sourceforge.net/support/tracker.php?aid=")
 
 #if ($release.getActions().size() == 0)
 No changes defined in this version.
@@ -23,10 +24,10 @@ New features:
 #else
 #set($dueto="")
 #end
-o ${action} #if($!issue != "") Issue: $issue. #end#if($!dueto != "")Thanks to $dueto. #end
+o ${action} #if($!issue != "") Issue: $issue ($issueTracker$issue). #end#if($!dueto != "")Thanks to $dueto. #end
 
 #foreach($fix in $actionItem.getFixedIssues())
-  - Issue: $fix.getIssue()
+  - Issue: $fix.getIssue() ($issueTracker$fix.getIssue())
 #end
 
 #set($issue="")
@@ -48,10 +49,10 @@ Fixed Bugs:
 #else
 #set($dueto="")
 #end
-o ${action} #if($!issue != "") Issue: $issue. #end#if($!dueto != "")Thanks to $dueto. #end
+o ${action} #if($!issue != "") Issue: $issue ($issueTracker$issue). #end#if($!dueto != "")Thanks to $dueto. #end
 
 #foreach($fix in $actionItem.getFixedIssues())
-  - Issue: $fix.getIssue()
+  - Issue: $fix.getIssue() ($issueTracker$fix.getIssue())
 #end
 
 #set($issue="")
@@ -73,10 +74,10 @@ Changes:
 #else
 #set($dueto="")
 #end
-o ${action} #if($!issue != "") Issue: $issue. #end#if($!dueto != "")Thanks to $dueto. #end
+o ${action} #if($!issue != "") Issue: $issue ($issueTracker$issue). #end#if($!dueto != "")Thanks to $dueto. #end
 
 #foreach($fix in $actionItem.getFixedIssues())
-  - Issue: $fix.getIssue()
+  - Issue: $fix.getIssue() ($issueTracker$fix.getIssue())
 #end
 
 #set($issue="")
@@ -98,10 +99,10 @@ Removed:
 #else
 #set($dueto="")
 #end
-o ${action} #if($!issue != "") Issue: $issue. #end#if($!dueto != "")Thanks to $dueto. #end
+o ${action} #if($!issue != "") Issue: $issue ($issueTracker$issue). #end#if($!dueto != "")Thanks to $dueto. #end
 
 #foreach($fix in $actionItem.getFixedIssues())
-  - Issue: $fix.getIssue()
+  - Issue: $fix.getIssue() ($issueTracker$fix.getIssue())
 #end
 
 #set($issue="")
