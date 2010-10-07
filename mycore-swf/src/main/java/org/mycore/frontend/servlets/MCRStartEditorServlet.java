@@ -235,7 +235,12 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // get the project name
         if ((cd.myproject == null) || (cd.myproject.length() == 0)) {
-            cd.myproject = getProperty(job.getRequest(), "project");
+            String myproject = getProperty(job.getRequest(), "project");
+            if (myproject == null) {
+                myproject = CONFIG.getString("MCR.SWF.Project.ID", "MCR");
+                myproject = CONFIG.getString("MCR.SWF.Project.ID." + cd.mytype, myproject);
+            }
+            cd.myproject = myproject;
         }
         LOGGER.debug("Project = " + cd.myproject);
 
