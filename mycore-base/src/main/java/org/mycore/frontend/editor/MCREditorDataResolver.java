@@ -23,6 +23,8 @@
 
 package org.mycore.frontend.editor;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -50,13 +52,20 @@ public class MCREditorDataResolver implements MCRResolver {
         String sessionID = tokens[1];
         String xPath = tokens[2];
         
+        String pattern = "__([a-zA-Z0-9]+)__([a-zA-Z0-9]+)";
+        StringBuffer sb = new StringBuffer();
+        Matcher m = Pattern.compile(pattern).matcher(xPath);
+        while (m.find())
+            m.appendReplacement(sb, "[@" + m.group(1) + "='" + m.group(2) + "']");
+        m.appendTail(sb);
+        xPath = sb.toString();
+
         LOGGER.debug("MCREditorDataResolver editor session = " + sessionID);
         LOGGER.debug("MCREditorDataResolver xPath = " + xPath);
 
         Element editor = (Element) (MCREditorServlet.getEditorSessionCache().get(sessionID));
-        MCREditorSubmission sub = new MCREditorSubmission(editor);
-        Document xml = sub.getXML();
-        Element current = (Element) (XPath.selectSingleNode(xml, xPath));
-        return current;
+        Document xml = new MCREditorSubmission(editor).getXML();
+        Element resolved = (Element) (XPath.selectSingleNode(xml, xPath));
+        return (resolved == null ? new Element("nothingFound") : resolved);
     }
 }
