@@ -11,6 +11,10 @@
         <fixes issue="3082248" />
         <fixes issue="3078448" />
       </action>
+      <action dev="mcrtchef" type="fix">
+        Web services handle hibernate transactions through MCRSession now.
+        This should resolve any transaction related problems with web services.
+      </action>
       <action dev="mcrrsteph" type="fix">
         Handle empty modify date fields in "migrate xmltable" command.
       </action>
