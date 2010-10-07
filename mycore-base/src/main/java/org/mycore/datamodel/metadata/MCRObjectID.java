@@ -187,6 +187,15 @@ public final class MCRObjectID {
      * @return <em>project_id</em>_<em>type_id</em>_<em>number</em>
      */
     public static String formatID(String projectID, String type, int number) {
+        if (projectID == null) {
+            throw new IllegalArgumentException("projectID cannot be null");
+        }
+        if (type == null) {
+            throw new IllegalArgumentException("type cannot be null");
+        }
+        if (number < 0) {
+            throw new IllegalArgumentException("number can not be negative");
+        }
         return new StringBuilder(MAX_LENGTH)
             .append(projectID)
             .append('_')
