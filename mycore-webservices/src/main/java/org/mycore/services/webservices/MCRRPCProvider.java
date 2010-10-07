@@ -26,11 +26,10 @@ package org.mycore.services.webservices;
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.axis.Constants;
 import org.apache.axis.MessageContext;
 import org.apache.axis.providers.java.RPCProvider;
 import org.apache.log4j.Logger;
-import org.hibernate.Transaction;
-import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 
@@ -41,38 +40,34 @@ import org.mycore.common.MCRSessionMgr;
  */
 public class MCRRPCProvider extends RPCProvider {
 
+    private static final long serialVersionUID = 1L;
+
     private final static Logger LOGGER = Logger.getLogger(MCRRPCProvider.class);
-    
+
     private static AtomicInteger counter = new AtomicInteger();
-    
+
     /**
      * Wraps WebService method invocation with hibernate transaction
      */
     protected Object invokeMethod(MessageContext mc, Method method, Object obj, Object[] argValues) throws Exception {
         int count = counter.incrementAndGet();
         LOGGER.info("WebService call #" + count + " to " + method.getDeclaringClass().getName() + ":" + method.getName());
-        Transaction tx = MCRHIBConnection.instance().getSession().beginTransaction();
+        MCRSession session = MCRSessionMgr.getCurrentSession();
+        session.setLoginTime();
+        session.setCurrentUserID(mc.getUsername());
+        session.setCurrentIP(mc.getStrProp(Constants.MC_REMOTE_ADDR));
+        session.beginTransaction();
         long millis = System.currentTimeMillis();
         Object result;
 
         try {
             result = super.invokeMethod(mc, method, obj, argValues);
-            try {
-                if (tx != null && tx.isActive())
-                    tx.commit();
-            } catch (RuntimeException ex) {
-                MCRHIBConnection.instance().getSession().close();
-            }
+            session.commitTransaction();
         } catch (Exception ex) {
-            LOGGER.error("Exception while processing WebService " + method.getName());
-            LOGGER.error(ex.getClass().getName() + ": " + ex.getLocalizedMessage());
-            LOGGER.error(ex);
-            if (tx != null)
-                tx.rollback();
+            LOGGER.error("Exception while processing WebService " + method.getName(), ex);
+            session.rollbackTransaction();
             throw ex;
-        }
-        finally{
-            MCRSession session = MCRSessionMgr.getCurrentSession();
+        } finally {
             MCRSessionMgr.releaseCurrentSession();
             session.close();
         }
