@@ -75,10 +75,17 @@
                   <goal>checkstyle</goal>
                 </goals>
                 <configuration>
-                  <configLocation>${project.build.directory}/checkstyle.xml</configLocation>
+                  <configLocation>org/mycore/checkstyle.xml</configLocation>
                 </configuration>
               </execution>
             </executions>
+            <dependencies>
+              <dependency>
+                <groupId>org.mycore</groupId>
+                <artifactId>build-tools</artifactId>
+                <version>1.1</version>
+              </dependency>
+            </dependencies>
           </plugin>
           <plugin>
             <artifactId>maven-pmd-plugin</artifactId>
@@ -137,7 +144,7 @@
           <plugin>
             <artifactId>maven-checkstyle-plugin</artifactId>
             <configuration>
-              <configLocation>${project.build.directory}/checkstyle.xml</configLocation>
+              <configLocation>org/mycore/checkstyle.xml</configLocation>
             </configuration>
           </plugin>
           <plugin>
@@ -315,72 +322,6 @@
               <goal>jar-no-fork</goal>
               <goal>test-jar-no-fork</goal>
             </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <!-- The tutorial on http://maven.apache.org/plugins/maven-checkstyle-plugin/examples/multi-module-config.html does not work. Manually 
-          extracting the checkstyle.xml file from build-tools with maven-antrun-plugin. -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>pre-site</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-            <configuration>
-              <tasks>
-                <copy todir="${project.build.directory}" flatten="true">
-                  <javaresource name="org/mycore/checkstyle.xml" classpathref="maven.plugin.classpath" />
-                </copy>
-              </tasks>
-            </configuration>
-          </execution>
-          <execution>
-            <id>unpack-checkstyle-config</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-            <configuration>
-              <tasks>
-                <copy todir="${project.build.directory}" flatten="true">
-                  <javaresource name="org/mycore/checkstyle.xml" classpathref="maven.plugin.classpath" />
-                </copy>
-              </tasks>
-            </configuration>
-          </execution>
-        </executions>
-        <dependencies>
-          <!-- specify build-tools as first plugin dependency so unpacking (see above) goes a bit faster -->
-          <dependency>
-            <groupId>org.mycore</groupId>
-            <artifactId>build-tools</artifactId>
-            <version>1.1</version>
-          </dependency>
-          <dependency>
-            <groupId>org.apache.ant</groupId>
-            <artifactId>ant</artifactId>
-            <version>1.7.1</version>
-          </dependency>
-        </dependencies>
-      </plugin>
-      <plugin>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <configuration>
-          <!-- Default configuration for all reports -->
-        </configuration>
-        <executions>
-          <execution>
-            <id>aggregate</id>
-            <goals>
-              <goal>aggregate</goal>
-            </goals>
-            <phase>site</phase>
-            <configuration>
-              <!-- Specific configuration for the aggregate report -->
-            </configuration>
           </execution>
         </executions>
       </plugin>
