@@ -1,6 +1,6 @@
 ## Template copied from
 ## http://svn.apache.org/repos/asf/maven/plugins/trunk/maven-changes-plugin/src/main/resources/org/apache/maven/plugin/announcement/announcement.vm
-The ${developmentTeam} is pleased to announce the ${finalName} release!
+The ${developmentTeam} is pleased to announce the ${finalName} (${release.getDescription()}) release!
 
 ${introduction}
 
@@ -25,6 +25,10 @@ New features:
 #end
 o ${action} #if($!issue != "") Issue: $issue. #end#if($!dueto != "")Thanks to $dueto. #end
 
+#foreach($fix in $actionItem.getFixedIssues())
+  - Issue: $fix.getIssue()
+#end
+
 #set($issue="")
 #set($dueto="")
 #end 
@@ -45,6 +49,10 @@ Fixed Bugs:
 #set($dueto="")
 #end
 o ${action} #if($!issue != "") Issue: $issue. #end#if($!dueto != "")Thanks to $dueto. #end
+
+#foreach($fix in $actionItem.getFixedIssues())
+  - Issue: $fix.getIssue()
+#end
 
 #set($issue="")
 #set($dueto="")
@@ -67,6 +75,10 @@ Changes:
 #end
 o ${action} #if($!issue != "") Issue: $issue. #end#if($!dueto != "")Thanks to $dueto. #end
 
+#foreach($fix in $actionItem.getFixedIssues())
+  - Issue: $fix.getIssue()
+#end
+
 #set($issue="")
 #set($dueto="")
 #end
@@ -87,6 +99,10 @@ Removed:
 #set($dueto="")
 #end
 o ${action} #if($!issue != "") Issue: $issue. #end#if($!dueto != "")Thanks to $dueto. #end
+
+#foreach($fix in $actionItem.getFixedIssues())
+  - Issue: $fix.getIssue()
+#end
 
 #set($issue="")
 #set($dueto="")
