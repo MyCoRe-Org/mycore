@@ -11,7 +11,7 @@
   <artifactId>mycore</artifactId>
   <packaging>pom</packaging>
   <version>2.0.92-SNAPSHOT</version>
-  <name>MyCoRe POM</name>
+  <name>MyCoRe</name>
   <!-- Keep the description on a single line. Otherwise Maven might generate a corrupted MANIFEST.MF (see http://jira.codehaus.org/browse/MJAR-4) -->
   <description>MyCoRe is a system for the development of institutional content repositories, publication servers, image collections, archives, or
     similar repositories. Applications based on MyCoRe use a common core, which provides the functionality typically required for such applications,
@@ -66,6 +66,23 @@
       </activation>
       <build>
         <plugins>
+          <plugin>
+            <artifactId>maven-changes-plugin</artifactId>
+            <configuration>
+              <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
+              <smtpPort implementation="java.lang.Integer">25</smtpPort>
+              <toAddresses>
+                <toAddress implementation="java.lang.String">mycore-developer@lists.sourceforge.net</toAddress>
+                <toAddress implementation="java.lang.String">mycore-user@lists.sourceforge.net</toAddress>
+              </toAddresses>
+              <mailSender>
+                <name>${changes.mailSender.name}</name>
+                <email>${changes.mailSender.email}</email>
+              </mailSender>
+              <template>announcement.vm</template>
+              <templateDirectory>src/changes</templateDirectory>
+            </configuration>
+          </plugin>
           <plugin>
             <artifactId>maven-checkstyle-plugin</artifactId>
             <executions>
