@@ -238,7 +238,8 @@ public class MCROAIQueryImpl implements MCROAIQuery {
         return listRecordsOrIdentifiers(set, from, until, metadataPrefix, instance, true);
     }
 
-    private List<String> listRecordsOrIdentifiers(String[] set, String[] from, String[] until, String metadataPrefix, String instance, boolean listRecords) {
+    private List<String> listRecordsOrIdentifiers(String[] set, String[] from, String[] until, String metadataPrefix, String instance,
+            boolean listRecords) {
         List<String> list = new ArrayList<String>();
 
         if (hasMore() && (listRecords == lastQuery.equals("listRecords") || !listRecords == lastQuery.equals("listIdentifiers"))) {
@@ -324,12 +325,11 @@ public class MCROAIQueryImpl implements MCROAIQuery {
 
         int resultCount = results.getNumHits();
         resultArray = new ArrayList<String>();
+
         for (int i = 0; i < resultCount; i++) {
-            String objectID = results.getHit(i).getID();
-            if (MCRAccessManager.checkPermission(objectID, "read")) {
-                resultArray.add(objectID);
-            }
+            resultArray.add(results.getHit(i).getID());
         }
+
         numResults = resultArray.size();
 
         logger.debug("OAIQuery found:" + resultCount + " hits");
