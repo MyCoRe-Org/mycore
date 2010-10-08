@@ -1,9 +1,10 @@
-package org.mycore.iview2.services;
+package org.mycore.iview2.events;
 
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.iview2.frontend.MCRIView2Commands;
+import org.mycore.iview2.services.MCRTilingQueue;
 
 public class MCRImageTileEventHandler extends MCREventHandlerBase {
 
