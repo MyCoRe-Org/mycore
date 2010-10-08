@@ -87,7 +87,7 @@
           <plugin>
             <groupId>gr.abiss.mvn.plugins</groupId>
             <artifactId>maven-jstools-plugin</artifactId>
-            <version>0.9-SNAPSHOT</version>
+            <version>0.8-mcrpatch</version>
             <inherited>false</inherited>
             <configuration>
               <jsDir>src/main/resources</jsDir>
