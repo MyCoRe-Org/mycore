@@ -65,7 +65,7 @@ public class MCRImageTiler implements Runnable, Closeable {
         boolean activated = MCRConfiguration.instance().getBoolean(CONFIG_PREFIX + "LocalTiler.activated", true);
         LOGGER.info("Local Tiling is "+(activated?"activated":"deactivated"));
         if (activated) {
-            int tilingThreadCount = Integer.parseInt(MCRIview2Props.getProperty("TilingThreads"));
+            int tilingThreadCount = Integer.parseInt(MCRIView2Tools.getIView2Property("TilingThreads"));
             ThreadFactory slaveFactory = new ThreadFactory() {
                 AtomicInteger tNum = new AtomicInteger();
 

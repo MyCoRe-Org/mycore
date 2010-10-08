@@ -59,7 +59,7 @@ public class MCRIView2Tools {
 
     private static String SUPPORTED_CONTENT_TYPE = CONFIG.getString("MCR.Module-iview2.SupportedContentTypes", "");
 
-    private static File TILE_DIR = new File(MCRIview2Props.getProperty("DirectoryForTiles"));
+    private static File TILE_DIR = new File(MCRIView2Tools.getIView2Property("DirectoryForTiles"));
 
     private static Logger LOGGER = Logger.getLogger(MCRIView2Tools.class);
 
@@ -185,6 +185,10 @@ public class MCRIView2Tools {
         String baseDirName = MCRConfiguration.instance().getString("MCR.IFS.ContentStore." + storeID + ".URI");
         File file = new File(baseDirName + File.separatorChar + storageID);
         return file;
+    }
+
+    static String getIView2Property(String propName) {
+        return MCRConfiguration.instance().getString("MCR.Module-iview2." + propName, null);
     }
 
 }

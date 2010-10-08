@@ -42,7 +42,6 @@ import org.mycore.imagetiler.MCRImage;
 import org.mycore.imagetiler.MCRTiledPictureProps;
 import org.mycore.iview2.services.MCRIView2Tools;
 import org.mycore.iview2.services.MCRImageTiler;
-import org.mycore.iview2.services.MCRIview2Props;
 import org.mycore.iview2.services.MCRTileJob;
 import org.mycore.iview2.services.MCRTilingQueue;
 import org.mycore.iview2.services.webservice.MCRIView2RemoteFunctions;
@@ -203,7 +202,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
     }
 
     public static void deleteAllTiles() {
-        File storeDir = new File(MCRIview2Props.getProperty("DirectoryForTiles"));
+        File storeDir = MCRIView2Tools.getTileDir();
         for (File sub : storeDir.listFiles()) {
             if (sub.isFile())
                 sub.delete();

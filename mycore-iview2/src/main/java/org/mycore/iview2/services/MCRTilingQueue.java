@@ -33,7 +33,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
 
     private MCRTilingQueue() {
         // periodische Ausführung von runProcess
-        int waitTime = Integer.parseInt(MCRIview2Props.getProperty("TimeTillReset")) * 60;
+        int waitTime = Integer.parseInt(MCRIView2Tools.getIView2Property("TimeTillReset")) * 60;
         StalledJobScheduler = Executors.newSingleThreadScheduledExecutor();
         StalledJobScheduler.scheduleAtFixedRate(MCRStalledJobResetter.getInstance(), waitTime, waitTime, TimeUnit.SECONDS);
         running = true;
