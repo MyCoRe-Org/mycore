@@ -389,6 +389,10 @@ public class MCRServlet extends HttpServlet {
         LOGGER.warn("Exception caught in : " + servlet, ex);
     }
 
+    /**
+     * @deprecated use {@link HttpServletResponse#sendError(int, String)} instead or throw Exception
+     */
+    @Deprecated()
     protected void generateErrorPage(HttpServletRequest request, HttpServletResponse response, int error, String msg, Exception ex, boolean xmlstyle)
         throws IOException {
         LOGGER.error(getClass().getName() + ": Error " + error + " occured. The following message was given: " + msg, ex);
