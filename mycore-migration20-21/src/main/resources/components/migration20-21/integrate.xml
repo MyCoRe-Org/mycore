@@ -8,11 +8,11 @@
     <mcr:config action="addInclude"
                 propertyfile="${build.config}/mycore.properties"
                 key="MCR.CLI.Classes.Internal"
-                value="org.mycore.services.migration.MCRMigrationCommands21" />
+                value="org.mycore.migration20_21.cli.MCRMigrationCommands21" />
     <for param="table.class"
          list="MCRXMLTABLE">
       <sequential>
-        <AddHibernateMapping class="org.mycore.backend.hibernate.tables.@{table.class}" />
+        <AddHibernateMapping class="org.mycore.migration20_21.hibernate.@{table.class}" />
       </sequential>
     </for>
   </target>

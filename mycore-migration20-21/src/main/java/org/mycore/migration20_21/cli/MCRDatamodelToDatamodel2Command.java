@@ -1,4 +1,4 @@
-package org.mycore.frontend.cli.command;
+package org.mycore.migration20_21.cli;
 
 import java.io.FileOutputStream;
 import java.util.HashMap;

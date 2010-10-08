@@ -21,11 +21,12 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.backend.hibernate.tables;
+package org.mycore.migration20_21.hibernate;
 
 import java.sql.Blob;
 import java.util.Date;
 
+import org.mycore.backend.hibernate.tables.MCRBlob;
 import org.mycore.datamodel.common.MCRObjectIDDate;
 
 public class MCRXMLTABLE implements MCRObjectIDDate {

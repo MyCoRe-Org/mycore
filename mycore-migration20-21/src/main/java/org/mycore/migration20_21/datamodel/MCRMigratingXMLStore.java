@@ -1,4 +1,4 @@
-package org.mycore.datamodel;
+package org.mycore.migration20_21.datamodel;
 
 import java.io.IOException;
 import java.util.Date;
@@ -11,11 +11,11 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.backend.hibernate.tables.MCRXMLTABLE;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
 import org.mycore.datamodel.ifs2.MCRVersioningMetadataStore;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.migration20_21.hibernate.MCRXMLTABLE;
 
 /**
  * allows online migration of xml metadata from SQL database to IFS2 store.

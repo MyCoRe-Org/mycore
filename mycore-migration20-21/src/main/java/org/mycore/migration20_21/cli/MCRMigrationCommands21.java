@@ -1,4 +1,4 @@
-package org.mycore.services.migration;
+package org.mycore.migration20_21.cli;
 
 import java.util.Date;
 
@@ -7,13 +7,13 @@ import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.backend.hibernate.tables.MCRXMLTABLE;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRCommand;
+import org.mycore.migration20_21.hibernate.MCRXMLTABLE;
 import org.xml.sax.SAXParseException;
 
 public class MCRMigrationCommands21 extends MCRAbstractCommands {

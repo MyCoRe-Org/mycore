@@ -35,7 +35,7 @@ import org.mycore.common.MCRException;
 public class MCRBlob implements java.sql.Blob {
     byte[] data;
 
-    MCRBlob(byte[] data) {
+    public MCRBlob(byte[] data) {
         this.data = data;
     }
 
