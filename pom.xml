@@ -4,7 +4,7 @@
   <parent>
     <artifactId>mycore-parent</artifactId>
     <groupId>org.mycore</groupId>
-    <version>7-SNAPSHOT</version>
+    <version>8-SNAPSHOT</version>
   </parent>
   <groupId>org.mycore</groupId>
   <artifactId>mycore</artifactId>
@@ -21,7 +21,7 @@
     <!-- new versions don't work with DB2: http://opensource.atlassian.com/projects/hibernate/browse/HHH-5168 -->
     <hibernate.version>3.3.2.GA</hibernate.version>
     <lucene.version>3.0.2</lucene.version>
-    <changelog.since>2010-09-09</changelog.since>
+    <changelog.since>2010-10-08</changelog.since>
   </properties>
   <issueManagement>
     <system>sourceforge</system>
