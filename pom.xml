@@ -210,6 +210,10 @@
                   <packages>org.mycore.importer*</packages>
                 </group>
                 <group>
+                  <title>MyCoRe Component: Migration 2.0 -&gt; 2.1</title>
+                  <packages>org.mycore.migration20_21*</packages>
+                </group>
+                <group>
                   <title>MyCoRe Component: METS/MODS</title>
                   <packages>org.mycore.mets*</packages>
                 </group>
