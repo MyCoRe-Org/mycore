@@ -55,7 +55,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
             MCRTileJob job = getElement();
             if (job != null) {
                 job.setStart(new Date(System.currentTimeMillis()));
-                job.setStatus(MCRJobState.PROCESS);
+                job.setStatus(MCRJobState.PROCESSING);
                 if (!updateJob(job)) {
                     job = null;
                 }
@@ -152,7 +152,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         if (job == null)
             return null;
         job.setStart(new Date(System.currentTimeMillis()));
-        job.setStatus(MCRJobState.PROCESS);
+        job.setStatus(MCRJobState.PROCESSING);
         if (!updateJob(job)) {
             throw new NoSuchElementException();
         }

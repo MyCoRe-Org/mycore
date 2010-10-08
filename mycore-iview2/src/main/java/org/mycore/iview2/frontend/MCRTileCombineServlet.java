@@ -76,6 +76,7 @@ public class MCRTileCombineServlet extends MCRServlet {
 
     private static final String THUMBNAIL_KEY = MCRTileCombineServlet.class.getName() + ".thumb";
 
+    
     @Override
     public void init() throws ServletException {
         super.init();

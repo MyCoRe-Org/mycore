@@ -26,17 +26,20 @@ package org.mycore.iview2.frontend;
 import java.awt.image.BufferedImage;
 
 /**
- * The MCRFooterInterface adds the possiblity to write a different implementations and combine them for example with the {@link MCRTileCombineServlet}.  
+ * The MCRFooterInterface adds the possibility to write a different implementations and combine them for example with the {@link MCRTileCombineServlet}.  
  * @author Thomas Scheffler (yagee)
  *
  */
 public interface MCRFooterInterface {
     /**
      * generates a footer image that is pinned below the master image
+     * 
+     * Implementors can use <code>derivateID</code> and <code>imagePath</code> information
+     * to add some informations to the image footer, e.g. URNs.
      * @param imageWidth image width of the master image
      * @param derivateID derivate ID
      * @param imagePath path to image relative to derivate root
-     * @return
+     * @return an image of any height but with width of <code>imageWidth</code> px.
      */
     public BufferedImage getFooter(int imageWidth, String derivateID, String imagePath);
 }

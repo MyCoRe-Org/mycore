@@ -33,7 +33,7 @@ public class MCRStalledJobResetter implements Runnable {
         Transaction executorTransaction = session.beginTransaction();
         LOGGER.info("MCRTileJob is Checked for dead Entries");
 
-        Query query = session.createQuery("FROM MCRTileJob WHERE status='" + MCRJobState.PROCESS.toChar() + "' ORDER BY id ASC");
+        Query query = session.createQuery("FROM MCRTileJob WHERE status='" + MCRJobState.PROCESSING.toChar() + "' ORDER BY id ASC");
         long start = 0;
         long current = new Date(System.currentTimeMillis()).getTime() / 60000;
 

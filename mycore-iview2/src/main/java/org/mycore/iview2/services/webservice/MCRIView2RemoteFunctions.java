@@ -107,7 +107,7 @@ public class MCRIView2RemoteFunctions {
             Criteria jobCriteria = session.createCriteria(MCRTileJob.class).add(Restrictions.allEq(restrictions));
             image = (MCRTileJob) jobCriteria.uniqueResult();
             image.setFinished(new Date());
-            image.setStatus(MCRJobState.FIN);
+            image.setStatus(MCRJobState.FINISHED);
             image.setHeight(jobInfo.getHeight());
             image.setWidth(jobInfo.getWidth());
             image.setTiles(jobInfo.getTiles());

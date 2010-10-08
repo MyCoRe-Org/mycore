@@ -31,7 +31,7 @@ public class MCRTilingAction implements Runnable {
             try {
                 picProps = imgTiler.tile();
                 image.setFinished(new Date());
-                image.setStatus(MCRJobState.FIN);
+                image.setStatus(MCRJobState.FINISHED);
                 image.setHeight(picProps.getHeight());
                 image.setWidth(picProps.getWidth());
                 image.setTiles(picProps.getTilesCount());
