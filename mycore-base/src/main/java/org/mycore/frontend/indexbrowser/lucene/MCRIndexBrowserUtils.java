@@ -68,7 +68,7 @@ public class MCRIndexBrowserUtils {
      * 
      * @return the cache key in the form of index # search # mode
      */
-    protected static String getCacheKey(String index, MCRIndexBrowserIncomingData browseData) {
+    public static String getCacheKey(String index, MCRIndexBrowserIncomingData browseData) {
         StringBuffer key = new StringBuffer("");
         if (index != null) {
             key.append(index);
