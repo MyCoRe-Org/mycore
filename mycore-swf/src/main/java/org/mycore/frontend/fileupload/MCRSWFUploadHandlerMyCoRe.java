@@ -168,11 +168,11 @@ public class MCRSWFUploadHandlerMyCoRe extends MCRUploadHandler {
             return;
         }
         // add the mainfile entry
-        MCRDerivate der = new MCRDerivate();
+        MCRDerivate der;
         try {
             try {
                 File derXMLFile = new File(dirname.getAbsolutePath() + ".xml");
-                der.setFromURI(derXMLFile.toURI());
+                der = new MCRDerivate(derXMLFile.toURI());
             } catch (Exception e) {
                 der = MCRSimpleWorkflowManager.instance().createDerivate(MCRObjectID.getInstance(docId), MCRObjectID.getInstance(derId));
             }

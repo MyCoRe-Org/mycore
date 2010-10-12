@@ -380,9 +380,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     
         LOGGER.info("Reading file " + file + " ...");
     
-        MCRObject mycore_obj = new MCRObject();
+        MCRObject mycore_obj = new MCRObject(file.toURI());
         mycore_obj.setImportMode(importMode);
-        mycore_obj.setFromURI(file.toURI());
         LOGGER.debug("Label --> " + mycore_obj.getLabel());
     
         if (update) {

@@ -92,8 +92,8 @@ public class MCRCheckEditACLServlet extends MCRCheckACLBase {
         String appl = MCRConfiguration.instance().getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
         String subject = "Automatically generated message from " + appl;
         StringBuffer text = new StringBuffer();
-        text.append("The ACL data of the MyCoRe object of type ").append(ID.getTypeId()).append(" with the ID ").append(ID.toString()).append(
-                " in the workflow was changes.");
+        text.append("The ACL data of the MyCoRe object of type ").append(ID.getTypeId()).append(" with the ID ").append(ID.toString())
+                .append(" in the workflow was changes.");
         LOGGER.info(text.toString());
 
         try {
@@ -118,8 +118,7 @@ public class MCRCheckEditACLServlet extends MCRCheckACLBase {
      */
     public final boolean storeService(org.jdom.Element outelm, MCRServletJob job, MCRObjectID ID) throws MCRException, SAXParseException {
         File impex = new File(WFM.getDirectoryPath(ID.getBase()), ID.toString() + ".xml");
-        MCRObject obj = new MCRObject();
-        obj.setFromURI(impex.toURI());
+        MCRObject obj = new MCRObject(impex.toURI());
         obj.getService().setFromDOM(outelm);
 
         // Save the prepared MCRObject/MCRDerivate to a file

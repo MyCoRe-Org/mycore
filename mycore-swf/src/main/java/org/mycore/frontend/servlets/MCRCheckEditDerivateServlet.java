@@ -105,8 +105,8 @@ public class MCRCheckEditDerivateServlet extends MCRCheckBase {
 
             // read data
             Element e = (Element) linkmetas.selectSingleNode(indoc);
-            MCRDerivate der = new MCRDerivate();
-            der.setFromXML(xml, true);
+            @SuppressWarnings("unused")
+            MCRDerivate der = new MCRDerivate(xml, true);
             MCRObjectID objID = MCRObjectID.getInstance(e.getAttributeValue("href", XLINK_NAMESPACE));
 
             // check access
@@ -172,17 +172,17 @@ public class MCRCheckEditDerivateServlet extends MCRCheckBase {
             LOGGER.error("Can't send a mail to " + addr);
         }
     }
-    
+
     /**
      * check the access permission
      * @param ID the mycore ID
      * @return true if the access is set
      */
     protected boolean checkAccess(MCRObjectID ID) {
-        if (MCRAccessManager.checkPermission("create-"+ID.getBase())) {
+        if (MCRAccessManager.checkPermission("create-" + ID.getBase())) {
             return true;
         }
-        if (MCRAccessManager.checkPermission("create-"+ID.getTypeId())) {
+        if (MCRAccessManager.checkPermission("create-" + ID.getTypeId())) {
             return true;
         }
         return false;

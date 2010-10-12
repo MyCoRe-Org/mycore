@@ -123,7 +123,7 @@ public class MCREditorOutValidator {
      * @return MCRObject
      */
     public Document generateValidMyCoReObject() {
-        MCRObject obj = new MCRObject();
+        MCRObject obj;
         try {
             // load the JDOM object
             XPath editorOutput = XPath.newInstance("/mycoreobject/*/*/*[@editor.output]");
@@ -133,7 +133,7 @@ public class MCREditorOutValidator {
                 e.removeAttribute("editor.output");
             }
             byte[] xml = MCRUtils.getByteArray(input);
-            obj.setFromXML(xml, true);
+            obj = new MCRObject(xml, true);
             Date curTime = new Date();
             obj.getService().setDate("modifydate", curTime);
 
@@ -180,8 +180,7 @@ public class MCREditorOutValidator {
                 className = className.substring(className.lastIndexOf('.') + 1);
                 LOGGER.info("Adding Validator " + entry.getValue().toString() + " for class " + className);
                 @SuppressWarnings("unchecked")
-                Class<? extends MCREditorMetadataValidator> cl = (Class<? extends MCREditorMetadataValidator>) Class.forName(entry
-                        .getValue().toString());
+                Class<? extends MCREditorMetadataValidator> cl = (Class<? extends MCREditorMetadataValidator>) Class.forName(entry.getValue().toString());
                 map.put(className, cl.newInstance());
             } catch (Exception e) {
                 final String msg = "Cannot instantiate " + entry.getValue() + " as validator for class " + entry.getKey();
@@ -389,8 +388,7 @@ public class MCREditorOutValidator {
             if (validator != null) {
                 returns = validator.checkDataSubTag(datasubtag);
             } else {
-                LOGGER.warn("Tag <" + datatag.getName() + "> of type " + mcrclass
-                        + " has no validator defined, fallback to default behaviour");
+                LOGGER.warn("Tag <" + datatag.getName() + "> of type " + mcrclass + " has no validator defined, fallback to default behaviour");
                 // try to create MCRMetaInterface instance
                 try {
                     Class<? extends MCRMetaInterface> metaClass = getClass(mcrclass);

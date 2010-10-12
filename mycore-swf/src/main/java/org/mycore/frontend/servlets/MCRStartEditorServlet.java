@@ -416,11 +416,8 @@ public class MCRStartEditorServlet extends MCRServlet {
             String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
             String subject = "Automatically generated message from " + appl;
             StringBuffer text = new StringBuffer();
-            text.append("The derivate with ID ")
-                .append(cd.mysemcrid)
-                .append(" from the object with ID ")
-                .append(cd.mysemcrid)
-                .append(" was removed from server.");
+            text.append("The derivate with ID ").append(cd.mysemcrid).append(" from the object with ID ").append(cd.mysemcrid)
+                    .append(" was removed from server.");
             LOGGER.info(text.toString());
 
             try {
@@ -904,11 +901,8 @@ public class MCRStartEditorServlet extends MCRServlet {
                     String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
                     String subject = "Automatically generated message from " + appl;
                     StringBuffer text = new StringBuffer();
-                    text.append("The object of type ")
-                        .append(cd.mytype)
-                        .append(" with ID ")
-                        .append(cd.mysemcrid)
-                        .append(" was commited from workflow to the server.");
+                    text.append("The object of type ").append(cd.mytype).append(" with ID ").append(cd.mysemcrid)
+                            .append(" was commited from workflow to the server.");
                     LOGGER.info(text.toString());
 
                     try {
@@ -1139,8 +1133,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         org.jdom.Element service = null;
         try {
             if (fi.isFile() && fi.canRead()) {
-                MCRObject obj = new MCRObject();
-                obj.setFromURI(fi.toURI());
+                MCRObject obj = new MCRObject(fi.toURI());
                 service = obj.getService().createXML();
             } else {
                 LOGGER.error("Can't read file " + fi.getAbsolutePath());
@@ -1221,9 +1214,8 @@ public class MCRStartEditorServlet extends MCRServlet {
         cd.mytfmcrid = WFM.getNextObjectID(MCRObjectID.getInstance(MCRObjectID.formatID(cd.myproject, cd.mytype, 1)));
         LOGGER.debug("MCRID (TF) = " + cd.mytfmcrid.toString());
         File outFile = new File(WFM.getDirectoryPath(cd.mytfmcrid.getBase()), cd.mytfmcrid + ".xml");
-        MCRObject copyobj = new MCRObject();
         File inFile = new File(WFM.getDirectoryPath(cd.mysemcrid.getBase()), cd.mysemcrid + ".xml");
-        copyobj.setFromURI(inFile.toURI());
+        MCRObject copyobj = new MCRObject(inFile.toURI());
         copyobj.setId(cd.mytfmcrid);
         copyobj.setLabel(cd.mytfmcrid.toString());
         MCRUtils.writeJDOMToFile(copyobj.createXML(), outFile);

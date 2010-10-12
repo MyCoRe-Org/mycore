@@ -175,7 +175,7 @@ public abstract class MCRBase {
      *                general Exception of MyCoRe
      * @throws SAXParseException 
      */
-    public final void setFromURI(URI uri) throws MCRException, SAXParseException {
+    protected final void setFromURI(URI uri) throws MCRException, SAXParseException {
         setFromJDOM(MCRXMLHelper.parseURI(uri));
     }
 
@@ -189,7 +189,7 @@ public abstract class MCRBase {
      *                general Exception of MyCoRe
      * @throws SAXParseException 
      */
-    public final void setFromXML(byte[] xml, boolean valid) throws MCRException, SAXParseException {
+    protected final void setFromXML(byte[] xml, boolean valid) throws MCRException, SAXParseException {
         setFromJDOM(MCRXMLHelper.parseXML(xml, valid));
     }
 

@@ -106,10 +106,9 @@ public class MCRCheckCommitDerivateServlet extends MCRCheckBase {
             byte[] xml = MCRUtils.getByteArray(indoc);
 
             // read data
-            MCRDerivate der = new MCRDerivate();
-            der.setFromXML(xml, true);
+            MCRDerivate der = new MCRDerivate(xml, true);
             MCRObjectID objID = der.getDerivate().getMetaLink().getXLinkHrefID();
-            
+
             // check access
             if (!checkAccess(objID)) {
                 job.getResponse().sendRedirect(getBaseURL() + usererrorpage);
@@ -166,7 +165,8 @@ public class MCRCheckCommitDerivateServlet extends MCRCheckBase {
             // return all is ready
             sb.append("receive/").append(ID.toString());
         } else {
-            sb.append(MCRConfiguration.instance().getString("MCR.SWF.PageDir", "")).append(MCRConfiguration.instance().getString("MCR.SWF.PageErrorStore", "editor_error_store.xml"));
+            sb.append(MCRConfiguration.instance().getString("MCR.SWF.PageDir", "")).append(
+                    MCRConfiguration.instance().getString("MCR.SWF.PageErrorStore", "editor_error_store.xml"));
         }
         return sb.toString();
     }
