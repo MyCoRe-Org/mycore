@@ -565,7 +565,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         }
         newCateg.setChildren(new ArrayList<MCRCategory>(childAmount));
         newCateg.setId(category.getId());
-        newCateg.setLabels(new HashSet<MCRLabel>(category.getLabels()));
+        newCateg.setLabels(category.getLabels());
         newCateg.setRoot(category.getRoot());
         newCateg.setURI(category.getURI());
         newCateg.setLevel(category.getLevel());
