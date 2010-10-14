@@ -4,6 +4,7 @@
 package org.mycore.datamodel.classifications;
 
 import java.util.Collection;
+import java.util.Set;
 
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -14,7 +15,7 @@ import org.mycore.datamodel.classifications2.MCRLabel;
 class MCRCategoryTools {
     static Element getCategoryElement(MCRCategory category, boolean withCounter, int numberObjects) {
         Element ce = new Element("category");
-        Collection<MCRLabel> labels = category.getLabels();
+        Set<MCRLabel> labels = category.getLabels();
         ce.setAttribute("ID", category.getId().getID());
         if (withCounter) {
             ce.setAttribute("counter", Integer.toString(numberObjects));
