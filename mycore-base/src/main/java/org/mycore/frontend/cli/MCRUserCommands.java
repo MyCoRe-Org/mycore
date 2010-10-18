@@ -42,6 +42,7 @@ import org.mycore.user.MCRCrypt;
 import org.mycore.user.MCRGroup;
 import org.mycore.user.MCRUser;
 import org.mycore.user.MCRUserMgr;
+import org.xml.sax.SAXParseException;
 
 /**
  * This class provides a set of commands for the org.mycore.user management
@@ -336,6 +337,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
                 throw new MCRException("These data do not correspond to a user.");
             }
 
+            @SuppressWarnings("unchecked")
             List<Element> listelm = rootelm.getChildren(); // the <user>
             // elements
 
@@ -541,7 +543,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         sb = new StringBuffer();
         sb.append("          primary group=").append(user.getPrimaryGroupID());
         LOGGER.info(sb.toString());
-        List<String> groups = user.getAllGroupIDs();
+        List<String> groups = user.getGroupIDs();
         for (String gid : groups) {
             sb = new StringBuffer();
             sb.append("          member in group=").append(gid);
@@ -578,47 +580,12 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * 
      * @param filename
      *            the filename of the user data input
+     * @throws SAXParseException 
      */
-    public static final void createUserFromFile(String filename) {
-        createUserFromFile(filename, false);
-    }
-
-    /**
-     * This method invokes MCRUserMgr.createUser() with data from a file.
-     * 
-     * @param filename
-     *            the filename of the user data input
-     * @param useEncryption
-     *            flag to determine whether we use password encryption or not
-     */
-    private static final void createUserFromFile(String filename, boolean useEncryption) throws MCRException {
-        MCRUserMgr mcrUserMgr = MCRUserMgr.instance();
-        if (!checkFilename(filename)) {
-            return;
-        }
-        File input = new File(filename);
-        LOGGER.info("Reading file " + input + " ...");
-
-        try {
-            Document doc = MCRXMLHelper.parseURI(input.toURI(), true);
-            Element rootelm = doc.getRootElement();
-
-            if (!rootelm.getName().equals("mycoreuser")) {
-                throw new MCRException("The data are not for user.");
-            }
-
-            List<Element> listelm = rootelm.getChildren();
-
-            for (int i = 0; i < listelm.size(); i++) {
-                MCRUser u = new MCRUser((Element) listelm.get(i), useEncryption);
-                if (!mcrUserMgr.existUser(u.getID())) {
-                    mcrUserMgr.createUser(u);
-                } else {
-                    LOGGER.info("User " + u.getID() + " was not created, because it already exists.");
-                }
-            }
-        } catch (Exception e) {
-            throw new MCRException("Error while loading user data.", e);
+    public static final void createUserFromFile(String filename) throws SAXParseException {
+        MCRUser[] users=getMCRUsersFromFile(filename);
+        for (MCRUser user:users){
+            MCRUserMgr.instance().updateUser(user);
         }
     }
 
@@ -645,6 +612,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
                 throw new MCRException("The data are not for group.");
             }
 
+            @SuppressWarnings("unchecked")
             List<Element> listelm = rootelm.getChildren();
 
             for (int i = 0; i < listelm.size(); i++) {
@@ -713,45 +681,34 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * 
      * @param filename
      *            the filename of the user data input
+     * @throws SAXParseException if file could not be parsed
      */
-    public static final void updateUserFromFile(String filename) {
-        String useCrypt = CONFIG.getString("MCR.Users.UsePasswordEncryption", "false");
-        boolean useEncryption = useCrypt.trim().equals("true") ? true : false;
-        updateUserFromFile(filename, useEncryption);
+    public static final void updateUserFromFile(String filename) throws SAXParseException {
+        MCRUser[] users=getMCRUsersFromFile(filename);
+        for (MCRUser user:users){
+            MCRUserMgr.instance().updateUser(user);
+        }
     }
 
-    /**
-     * This method invokes MCRUserMgr.updateUser() with data from a file.
-     * 
-     * @param filename
-     *            the filename of the user data input
-     * @param useEncryption
-     *            flag to determine whether we use password encryption or not
-     */
-    private static final void updateUserFromFile(String filename, boolean useEncryption) throws MCRException {
+    private static final MCRUser[] getMCRUsersFromFile(String filename) throws SAXParseException {
         if (!checkFilename(filename)) {
-            return;
+            return new MCRUser[0];
         }
         File input = new File(filename);
         LOGGER.info("Reading file " + input + " ...");
+        Document doc = MCRXMLHelper.parseURI(input.toURI(), true);
+        Element rootelm = doc.getRootElement();
 
-        try {
-            Document doc = MCRXMLHelper.parseURI(input.toURI(), true);
-            Element rootelm = doc.getRootElement();
-
-            if (!rootelm.getName().equals("mycoreuser")) {
-                throw new MCRException("These data are not defining a user.");
-            }
-
-            List<Element> listelm = rootelm.getChildren();
-
-            for (int i = 0; i < listelm.size(); i++) {
-                MCRUser u = new MCRUser((Element) listelm.get(i), useEncryption);
-                MCRUserMgr.instance().updateUser(u);
-            }
-        } catch (Exception e) {
-            throw new MCRException("Error while updating a user from file.", e);
+        if (!rootelm.getName().equals("mycoreuser")) {
+            throw new MCRException("These data are not defining a user.");
         }
+        @SuppressWarnings("unchecked")
+        List<Element> listelm = rootelm.getChildren();
+        MCRUser[] users = new MCRUser[listelm.size()];
+        for (int i = 0; i < users.length; i++) {
+            users[i] = new MCRUser(listelm.get(i));
+        }
+        return users;
     }
 
     /**
