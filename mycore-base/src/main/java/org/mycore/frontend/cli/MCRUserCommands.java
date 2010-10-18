@@ -580,9 +580,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the filename of the user data input
      */
     public static final void createUserFromFile(String filename) {
-        String useCrypt = CONFIG.getString("MCR.Users.UsePasswordEncryption", "false");
-        boolean useEncryption = useCrypt.trim().equals("true") ? true : false;
-        createUserFromFile(filename, useEncryption);
+        createUserFromFile(filename, false);
     }
 
     /**
