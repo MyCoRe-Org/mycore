@@ -27,6 +27,8 @@ import static org.mycore.common.MCRConstants.DEFAULT_ENCODING;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -583,8 +585,8 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * @throws SAXParseException 
      */
     public static final void createUserFromFile(String filename) throws SAXParseException {
-        MCRUser[] users=getMCRUsersFromFile(filename);
-        for (MCRUser user:users){
+        MCRUser[] users = getMCRUsersFromFile(filename);
+        for (MCRUser user : users) {
             MCRUserMgr.instance().updateUser(user);
         }
     }
@@ -684,8 +686,8 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * @throws SAXParseException if file could not be parsed
      */
     public static final void updateUserFromFile(String filename) throws SAXParseException {
-        MCRUser[] users=getMCRUsersFromFile(filename);
-        for (MCRUser user:users){
+        MCRUser[] users = getMCRUsersFromFile(filename);
+        for (MCRUser user : users) {
             MCRUserMgr.instance().updateUser(user);
         }
     }
@@ -756,12 +758,15 @@ public class MCRUserCommands extends MCRAbstractCommands {
     /**
      * This method just saves a JDOM document to a file
      * 
+     * automatically closes {@link OutputStream}.
+     * 
      * @param jdomDoc
      *            the JDOM XML document to be printed
      * @param outFile
      *            a FileOutputStream object for the output
+     * @throws IOException if output file can not be closed
      */
-    private static final void saveToXMLFile(Document jdomDoc, FileOutputStream outFile) throws MCRException {
+    private static final void saveToXMLFile(Document jdomDoc, FileOutputStream outFile) throws MCRException, IOException {
         String mcr_encoding = CONFIG.getString("MCR.Metadata.DefaultEncoding", DEFAULT_ENCODING);
 
         // Create the output
@@ -771,6 +776,8 @@ public class MCRUserCommands extends MCRAbstractCommands {
             outputter.output(jdomDoc, outFile);
         } catch (Exception e) {
             throw new MCRException("Error while save XML to file.");
+        } finally {
+            outFile.close();
         }
     }
 }
