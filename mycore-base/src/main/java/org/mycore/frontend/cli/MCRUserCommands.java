@@ -587,7 +587,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
     public static final void createUserFromFile(String filename) throws SAXParseException {
         MCRUser[] users = getMCRUsersFromFile(filename);
         for (MCRUser user : users) {
-            MCRUserMgr.instance().updateUser(user);
+            MCRUserMgr.instance().createUser(user);
         }
     }
 
