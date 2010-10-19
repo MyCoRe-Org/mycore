@@ -19,6 +19,11 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
 
+/**
+ * Master image tiler thread.
+ * @author Thomas Scheffler (yagee)
+ *
+ */
 public class MCRImageTiler implements Runnable, Closeable {
     private static final SessionFactory sessionFactory = MCRHIBConnection.instance().getSessionFactory();
 
@@ -41,6 +46,9 @@ public class MCRImageTiler implements Runnable, Closeable {
         runLock = new ReentrantLock();
     }
 
+    /**
+     * @return true if image tiler thread is running.
+     */
     public static boolean isRunning() {
         if (instance == null) {
             return false;
@@ -49,6 +57,9 @@ public class MCRImageTiler implements Runnable, Closeable {
         }
     }
 
+    /**
+     * @return an instance of this class.
+     */
     public static MCRImageTiler getInstance() {
         if (instance == null) {
             instance = new MCRImageTiler();
@@ -56,6 +67,10 @@ public class MCRImageTiler implements Runnable, Closeable {
         return instance;
     }
 
+    /**
+     * Starts local tiler threads ( {@link MCRTilingAction}) and gives {@link MCRTileJob} instances to them.
+     * Use property <code>MCR.Module-iview2.TilingThreads</code> to specify how many concurrent threads should be running.
+     */
     public void run() {
         Thread.currentThread().setName("TileMaster");
         //get this MCRSession a speaking name
@@ -147,6 +162,9 @@ public class MCRImageTiler implements Runnable, Closeable {
         MCRSessionMgr.releaseCurrentSession();
     }
 
+    /**
+     * stops transmitting {@link MCRTileJob} to {@link MCRTilingAction} and prepares shutdown.
+     */
     public void prepareClose() {
         LOGGER.info("Closing master image tiling thread");
         //signal master thread to stop now
@@ -170,6 +188,9 @@ public class MCRImageTiler implements Runnable, Closeable {
         }
     }
 
+    /**
+     * Shuts down this thread and every local tiling threads spawned by {@link #run()}.
+     */
     public void close() {
         if (tilingServe != null && !tilingServe.isShutdown()) {
             LOGGER.info("We are in a hurry, closing tiling service right now");

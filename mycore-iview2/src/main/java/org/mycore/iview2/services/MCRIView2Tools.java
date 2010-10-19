@@ -50,6 +50,7 @@ import org.mycore.imagetiler.MCRImage;
 import org.mycore.imagetiler.MCRTiledPictureProps;
 
 /**
+ * Tools class with common methods for IView2.
  * @author Thomas Scheffler (yagee)
  *
  */
@@ -70,6 +71,10 @@ public class MCRIView2Tools {
         return TILE_DIR;
     }
 
+    /**
+     * @param derivateID ID of derivate
+     * @return empty String or absolute path to main file of derivate if file is supported.
+     */
     public static String getSupportedMainFile(String derivateID) {
         try {
             MCRDerivate deriv = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateID));
@@ -86,16 +91,33 @@ public class MCRIView2Tools {
         return "";
     }
 
+    /**
+     * @param derivateID ID of derivate
+     * @param absolutePath absolute path to file of derivate
+     * @return local {@link File} of {@link MCRFile} instance
+     */
     public static File getFile(String derivateID, String absolutePath) {
         MCRFile mcrFile = getMCRFile(derivateID, absolutePath);
         return getFile(mcrFile);
     }
 
+    /**
+     * @param derivateID ID of derivate
+     * @param absolutePath absolute path to file of derivate
+     * @return local path of {@link MCRFile} instance rooted by content store
+     * @see MCRFile#getStorageID()
+     */
     public static String getFilePath(String derivateID, String absolutePath) {
         MCRFile mcrFile = getMCRFile(derivateID, absolutePath);
         return mcrFile.getStorageID();
     }
 
+    /**
+     * 
+     * @param derivateID ID of derivate
+     * @param absolutePath absolute path to file of derivate
+     * @return {@link MCRFile} instance for this file.
+     */
     public static MCRFile getMCRFile(String derivateID, String absolutePath) {
         MCRDirectory root = (MCRDirectory) MCRFilesystemNode.getRootNode(derivateID);
         if (root == null)
@@ -105,19 +127,40 @@ public class MCRIView2Tools {
         return mainFile;
     }
 
+    /**
+     * @param derivateID ID of derivate
+     * @return true if {@link #getSupportedMainFile(String)} is not an empty String.
+     */
     public static boolean isDerivateSupported(String derivateID) {
         return getSupportedMainFile(derivateID).length() > 0;
     }
 
+    /**
+     * @param file image file
+     * @return if {@link MCRFile#getContentTypeID()} is in property <code>MCR.Module-iview2.SupportedContentTypes</code>
+     */
     public static boolean isFileSupported(MCRFile file) {
         return SUPPORTED_CONTENT_TYPE.indexOf(file.getContentTypeID()) > -1;
     }
 
+    /**
+     * @param file image file
+     * @return true if {@link MCRImage#getTiledFile(File, String, String)} exists
+     * @see #getTileDir()
+     */
     public static boolean isTiled(MCRFile file) {
         File tiledFile = MCRImage.getTiledFile(getTileDir(), file.getOwnerID(), file.getAbsolutePath());
         return tiledFile.exists();
     }
 
+    /**
+     * combines image tiles of specified zoomLevel to one image.
+     * @param iviewFile .iview2 file
+     * @param zoomLevel the zoom level where 0 is thumbnail size
+     * @return a combined image
+     * @throws IOException any IOException while reading tiles
+     * @throws JDOMException if image properties could not be parsed.
+     */
     public static BufferedImage getZoomLevel(File iviewFile, int zoomLevel) throws IOException, JDOMException {
         ZipFile iviewImage = new ZipFile(iviewFile);
         Graphics graphics = null;
@@ -179,6 +222,11 @@ public class MCRIView2Tools {
         }
     }
 
+    /**
+     * transforms {@link MCRFile} instance to {@link File} if <code>image</code> is local file.
+     * @param image image file
+     * @return local {@link File} representing {@link MCRFile}
+     */
     static File getFile(MCRFile image) {
         String storageID = image.getStorageID();
         String storeID = image.getStoreID();
@@ -187,6 +235,11 @@ public class MCRIView2Tools {
         return file;
     }
 
+    /**
+     * short for <code>MCRConfiguration.instance().getString("MCR.Module-iview2." + propName, null);</code>
+     * @param propName any suffix
+     * @return null or property value
+     */
     static String getIView2Property(String propName) {
         return MCRConfiguration.instance().getString("MCR.Module-iview2." + propName, null);
     }

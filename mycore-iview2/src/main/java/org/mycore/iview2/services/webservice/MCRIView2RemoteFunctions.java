@@ -48,6 +48,7 @@ import org.mycore.iview2.services.MCRTileJob;
 import org.mycore.iview2.services.MCRTilingQueue;
 
 /**
+ * WebServices from IView2.
  * @author Thomas Scheffler (yagee)
  *
  */

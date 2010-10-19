@@ -27,6 +27,10 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
+/**
+ * Container for methods of {@link MCRIView2RemoteFunctions}
+ * @author Thomas Scheffler (yagee)
+ */
 @XmlType(name = "MCRIView2RemoteJob")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class MCRIView2RemoteJob {
@@ -46,30 +50,52 @@ public class MCRIView2RemoteJob {
         this.fileSystemPath = imagePath;
     }
 
+    /**
+     * @return the derivateID
+     */
     public String getDerivateID() {
         return derivateID;
     }
 
+    /**
+     * @return absolute logical imagePath rooted by the derivate
+     */
     public String getDerivatePath() {
         return derivatePath;
     }
 
+    /**
+     * @return absolute physical imagePath rooted by the content store base directory
+     * @see org.mycore.iview2.services.MCRIView2Tools#getFilePath(String, String)
+     */
     public String getFileSystemPath() {
         return fileSystemPath;
     }
 
+    /**
+     * @return number of generated tiles
+     */
     public int getTiles() {
         return tiles;
     }
 
+    /**
+     * @return width of image
+     */
     public int getWidth() {
         return width;
     }
 
+    /**
+     * @return height of image
+     */
     public int getHeight() {
         return height;
     }
 
+    /**
+     * @return number of zoom levels
+     */
     public int getZoomLevel() {
         return zoomLevel;
     }

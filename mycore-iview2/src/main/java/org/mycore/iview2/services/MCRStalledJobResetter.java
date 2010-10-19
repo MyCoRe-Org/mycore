@@ -11,6 +11,11 @@ import java.util.Date;
 import org.hibernate.HibernateException;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 
+/**
+ * Resets jobs that took to long to tile.
+ * Set property <code>MCR.Module-iview2.TimeTillReset</code> to alter grace period.
+ * @author Thomas Scheffler (yagee)
+ */
 public class MCRStalledJobResetter implements Runnable {
     private static SessionFactory sessionFactory = MCRHIBConnection.instance().getSessionFactory();
 
@@ -27,6 +32,9 @@ public class MCRStalledJobResetter implements Runnable {
         return instance;
     }
 
+    /**
+     * Resets jobs to {@link MCRJobState#NEW} that where in status {@link MCRJobState#PROCESSING} for to long time.
+     */
     public void run() {
         boolean reset = false;
         Session session = sessionFactory.getCurrentSession();

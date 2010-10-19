@@ -47,6 +47,7 @@ import org.mycore.iview2.services.MCRTilingQueue;
 import org.mycore.iview2.services.webservice.MCRIView2RemoteFunctions;
 
 /**
+ * Provides commands for Image Viewer.
  * @author Thomas Scheffler (yagee)
  *
  */
@@ -83,11 +84,19 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         command.add(new MCRCommand("stop tile webservice", CMD_CLASS + "stopTileWebService", "stops the tile web service'"));
     }
 
+    /**
+     * meta command to tile all images of all derivates.
+     * @return list of commands to execute.
+     */
     public static List<String> tileAll() {
         String command = "tile images";
         return forAllDerivates(command);
     }
 
+    /**
+     * meta command to check (and repair) tiles of all images of all derivates.
+     * @return list of commands to execute.
+     */
     public static List<String> checkAll() {
         String command = "check tiles";
         return forAllDerivates(command);
@@ -102,11 +111,21 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         return cmds;
     }
 
+    /**
+     * meta command to tile all images of this derivate.
+     * @param derivateID a derivate ID
+     * @return list of commands to execute.
+     */
     public static List<String> tileDerivate(String derivateID) {
         String command = "tile image";
         return forAllImages(derivateID, command);
     }
 
+    /**
+     * meta command to check (and repair) all tiles of all images of this derivate.
+     * @param derivateID a derivate ID
+     * @return list of commands to execute.
+     */
     public static List<String> checkTilesOfDerivate(String derivateID) {
         String command = "check tiles of image";
         return forAllImages(derivateID, command);
@@ -134,6 +153,11 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         return returns;
     }
 
+    /**
+     * checks and repairs tile of this {@link MCRFile}
+     * @param derivate derivate ID
+     * @param absoluteImagePath absolute path to image file
+     */
     public static void checkImage(String derivate, String absoluteImagePath) {
         File iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, absoluteImagePath);
         //file checks
@@ -174,6 +198,11 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         }
     }
 
+    /**
+     * Tiles this {@link MCRFile}.
+     * @param derivate derivate ID
+     * @param absoluteImagePath absolute path to image file
+     */
     public static void tileImage(String derivate, String absoluteImagePath) {
         MCRTileJob job = new MCRTileJob();
         job.setDerivate(derivate);
@@ -182,6 +211,10 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         startMasterTilingThread();
     }
 
+    /**
+     * Tiles this {@link MCRFile}
+     * @param file
+     */
     public static void tileImage(MCRFile file) {
         if (MCRIView2Tools.isFileSupported(file)) {
             MCRTileJob job = new MCRTileJob();
@@ -201,6 +234,9 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         }
     }
 
+    /**
+     * Deletes all image tiles.
+     */
     public static void deleteAllTiles() {
         File storeDir = MCRIView2Tools.getTileDir();
         for (File sub : storeDir.listFiles()) {
@@ -212,12 +248,21 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         TILE_QUEUE.clear();
     }
 
+    /**
+     * Deletes all image tiles of this derivate.
+     * @param derivateID a derivate ID
+     */
     public static void deleteDerivateTiles(String derivateID) {
         File derivateDir = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivateID, null);
         deleteDirectory(derivateDir);
         TILE_QUEUE.remove(derivateID);
     }
 
+    /**
+     * Deletes all image tiles of this {@link MCRFile}
+     * @param derivate derivate ID
+     * @param absoluteImagePath absolute path to image file
+     */
     public static void deleteImageTiles(String derivate, String absoluteImagePath) {
         File tileFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, absoluteImagePath);
         deleteFileAndEmptyDirectories(tileFile);
@@ -264,11 +309,18 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         return files;
     }
 
+    /**
+     * Starts tile webservice ({@link MCRIView2RemoteFunctions}) on this address.
+     * @param address a URI to bind web service to
+     */
     public static void startTileWebService(String address) {
         stopTileWebService();
         tileService = Endpoint.publish(address, new MCRIView2RemoteFunctions());
     }
 
+    /**
+     * Stops web service started by {@link #startTileWebService(String)}.
+     */
     public static void stopTileWebService() {
         if (tileService == null || !tileService.isPublished()) {
             LOGGER.info("Currently there is no tiling service running");

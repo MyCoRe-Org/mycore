@@ -31,6 +31,7 @@ import org.mycore.iview2.services.MCRImageTiler;
 import org.mycore.iview2.services.MCRTilingQueue;
 
 /**
+ * Handles tiling process in a web application.
  * @author Thomas Scheffler (yagee)
  *
  */
@@ -39,7 +40,8 @@ public class MCRIView2ServletContextListener implements ServletContextListener {
 
     private Thread tilingThread;
 
-    /* (non-Javadoc)
+    /**
+     * Shuts down {@link MCRImageTiler} and {@link MCRTilingQueue}
      * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
      */
     public void contextDestroyed(ServletContextEvent sce) {
@@ -56,7 +58,7 @@ public class MCRIView2ServletContextListener implements ServletContextListener {
         }
     }
 
-    /* (non-Javadoc)
+    /** Starts new {@link MCRImageTiler} thread if not currently running
      * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
      */
     public void contextInitialized(ServletContextEvent sce) {

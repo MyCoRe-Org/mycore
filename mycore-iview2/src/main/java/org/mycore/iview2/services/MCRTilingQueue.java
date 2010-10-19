@@ -19,8 +19,6 @@ import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
 
 public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeable {
-    public char colours;
-
     private static MCRTilingQueue instance = new MCRTilingQueue();
 
     private static ScheduledExecutorService StalledJobScheduler;
@@ -41,12 +39,18 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         MCRShutdownHandler.getInstance().addCloseable(this);
     }
 
+    /**
+     * @return singleton instance of this class
+     */
     public static MCRTilingQueue getInstance() {
         if (!instance.running)
             return null;
         return instance;
     }
 
+    /**
+     * @return next available tile job instance
+     */
     public MCRTileJob poll() {
         if (!running)
             return null;
@@ -66,6 +70,11 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         }
     }
 
+    /**
+     * removes next job.
+     * same as {@link #poll()} but never returns null
+     * @throws NoSuchElementException if {@link #poll()} would return null
+     */
     @Override
     public MCRTileJob remove() throws NoSuchElementException {
         if (!running)
@@ -77,6 +86,9 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         return job;
     }
 
+    /**
+     * get next job without modifying it state to {@link MCRJobState#PROCESSING} 
+     */
     public MCRTileJob peek() {
         if (!running)
             return null;
@@ -84,6 +96,11 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         return job;
     }
 
+    /**
+     * removes next job.
+     * same as {@link #peek()} but never returns null
+     * @throws NoSuchElementException if {@link #peek()} would return null
+     */
     @Override
     public MCRTileJob element() throws NoSuchElementException {
         if (!running)
@@ -95,6 +112,10 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         return job;
     }
 
+    /**
+     * adds <code>job</code> to queue.
+     * alters date added to current time and status of job to {@link MCRJobState#NEW}
+     */
     public boolean offer(MCRTileJob job) {
         if (!running)
             return false;
@@ -114,6 +135,9 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         }
     }
 
+    /**
+     * Deletes all tile jobs no matter what the current state is.
+     */
     @Override
     public void clear() {
         if (!running)
@@ -123,6 +147,11 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         query.executeUpdate();
     }
 
+    /**
+     * iterates of jobs of status {@link MCRJobState#NEW}
+     * 
+     * does not change the status.
+     */
     @Override
     public Iterator<MCRTileJob> iterator() {
         if (!running) {
@@ -136,6 +165,9 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         return result.iterator();
     }
 
+    /**
+     * returns the current size of this queue
+     */
     @Override
     public int size() {
         if (!running)
@@ -145,6 +177,13 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         return ((Number) query.iterate().next()).intValue();
     }
 
+    /**
+     * get the specific job and alters it status to {@link MCRJobState#PROCESSING}
+     * @param derivate
+     * @param path
+     * @return
+     * @throws NoSuchElementException
+     */
     public MCRTileJob getElementOutOfOrder(String derivate, String path) throws NoSuchElementException {
         if (!running)
             return null;
@@ -179,7 +218,8 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         if (!running)
             return null;
         Session session = MCRHIBConnection.instance().getSession();
-        Query query = session.createQuery("FROM MCRTileJob WHERE status='" + MCRJobState.NEW.toChar() + "' ORDER BY added ASC").setMaxResults(1);
+        Query query = session.createQuery("FROM MCRTileJob WHERE status='" + MCRJobState.NEW.toChar() + "' ORDER BY added ASC")
+                .setMaxResults(1);
         Iterator<MCRTileJob> queryResult;
         queryResult = query.iterate();
         if (queryResult.hasNext()) {
@@ -204,10 +244,19 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         return true;
     }
 
+    /**
+     * every attached listener is informed that something happened to the state of the queue.
+     */
     public synchronized void notifyListener() {
         this.notifyAll();
     }
 
+    /**
+     * removes specific job from queue no matter what its current status is.
+     * @param derivate ID of derivate
+     * @param path absolute image path
+     * @return the number of jobs deleted
+     */
     public int remove(String derivate, String path) {
         if (!running)
             return 0;
@@ -218,6 +267,11 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         return query.executeUpdate();
     }
 
+    /**
+     * removes all jobs from queue for that <code>derivate</code> its current status is.
+     * @param derivate ID of derivate
+     * @return the number of jobs deleted
+     */
     public int remove(String derivate) {
         if (!running)
             return 0;
@@ -227,6 +281,9 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         return query.executeUpdate();
     }
 
+    /**
+     * Shuts down {@link MCRStalledJobResetter} and does not alter any job anymore.
+     */
     public void prepareClose() {
         StalledJobScheduler.shutdownNow();
         running = false;
@@ -238,10 +295,16 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         }
     }
 
+    /**
+     * does nothing
+     */
     public void close() {
         //nothing to be done in this phase
     }
 
+    /**
+     * @return "MCRTilingQueue"
+     */
     @Override
     public String toString() {
         return "MCRTilingQueue";

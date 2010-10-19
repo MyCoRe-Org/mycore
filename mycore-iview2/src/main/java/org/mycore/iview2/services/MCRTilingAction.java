@@ -12,6 +12,11 @@ import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.imagetiler.MCRImage;
 import org.mycore.imagetiler.MCRTiledPictureProps;
 
+/**
+ * A slave thread of {@link MCRImageTiler}
+ * @author Thomas Scheffler (yagee)
+ *
+ */
 public class MCRTilingAction implements Runnable {
     private MCRTileJob image = null;
 
@@ -19,6 +24,11 @@ public class MCRTilingAction implements Runnable {
 
     private static Logger LOGGER = Logger.getLogger(MCRTilingAction.class);
 
+    /**
+     * takes a {@link MCRTileJob} and tiles the referenced {@link MCRImage} instance.
+     * 
+     * Also this updates image properties of {@link MCRTileJob} in the database.
+     */
     public void run() {
         Session session = sessionFactory.getCurrentSession();
         Transaction transaction = session.beginTransaction();

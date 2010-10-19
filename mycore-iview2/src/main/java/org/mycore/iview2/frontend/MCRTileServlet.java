@@ -38,9 +38,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRUtils;
 import org.mycore.imagetiler.MCRImage;
+import org.mycore.imagetiler.MCRTiledPictureProps;
 import org.mycore.iview2.services.MCRIView2Tools;
 
 /**
+ * Get a specific tile of an image.
  * @author Thomas Scheffler (yagee)
  *
  */
@@ -48,17 +50,25 @@ public class MCRTileServlet extends HttpServlet {
 
     private static final long serialVersionUID = 3805114872438336791L;
 
+    /**
+     * how long should a tile be cached by the client
+     */
     final static int MAX_AGE = 60 * 60 * 24 * 365; // one year
 
     private final static Logger LOGGER = Logger.getLogger(MCRTileServlet.class);
 
+    /**
+     * Extracts tile or image properties from iview2 file and transmits it.
+     * 
+     * Uses {@link HttpServletRequest#getPathInfo()} (see {@link #getTileInfo(String)}) to get tile attributes.
+     * Also uses {@link #MAX_AGE} to tell the client how long it could cache the information.
+     */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         final TileInfo tileInfo = getTileInfo(getPathInfo(req));
         File iviewFile = getTileFile(tileInfo);
         if (!iviewFile.exists()) {
-            LOGGER.warn("File does not exist: " + iviewFile.getAbsolutePath());
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND, "File does not exist: " + iviewFile.getAbsolutePath());
             return;
         }
         try {
@@ -84,7 +94,7 @@ public class MCRTileServlet extends HttpServlet {
                     out.close();
                 }
             } else {
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Tile not found: " + tileInfo);
                 return;
             }
             LOGGER.debug("Ending MCRTileServlet");
@@ -100,6 +110,9 @@ public class MCRTileServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Returns at which time the specified tile (see {@link #doGet(HttpServletRequest, HttpServletResponse)} was last modified.
+     */
     @Override
     protected long getLastModified(HttpServletRequest req) {
         final TileInfo tileInfo = getTileInfo(getPathInfo(req));
@@ -115,6 +128,14 @@ public class MCRTileServlet extends HttpServlet {
         return request.getPathInfo();
     }
 
+    /**
+     * returns a {@link TileInfo} for this <code>pathInfo</code>.
+     * The format of <code>pathInfo</code> is
+     * <code>/{derivateID}/{absoluteImagePath}/{tileCoordinate}</code>
+     * where <code>tileCoordinate</code> is either {@value MCRTiledPictureProps#IMAGEINFO_XML} or <code>{z}/{y}/{x}</code> as zoomLevel and x-y-coordinates.
+     * @param pathInfo of the described format
+     * @return a {@link TileInfo} instance for <code>pathInfo</code>
+     */
     static TileInfo getTileInfo(String pathInfo) {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting MCRTileServlet: " + pathInfo);
@@ -148,6 +169,11 @@ public class MCRTileServlet extends HttpServlet {
         return MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), tileInfo.derivate, tileInfo.imagePath);
     }
 
+    /**
+     * Holds all attributes for a specific tile.
+     * @author Thomas Scheffler (yagee)
+     *
+     */
     static class TileInfo {
         String derivate, imagePath, tile;
 
@@ -155,6 +181,14 @@ public class MCRTileServlet extends HttpServlet {
             this.derivate = derivate;
             this.imagePath = imagePath;
             this.tile = tile;
+        }
+
+        /**
+         * returns "TileInfo [derivate=" + derivate + ", imagePath=" + imagePath + ", tile=" + tile + "]"
+         */
+        @Override
+        public String toString() {
+            return "TileInfo [derivate=" + derivate + ", imagePath=" + imagePath + ", tile=" + tile + "]";
         }
     }
 
