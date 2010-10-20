@@ -6,4 +6,5 @@
   <taskdef name="execute" classname="org.mycore.buildtools.anttasks.MCRExecuteCommandTask" />
   <taskdef name="templatecheck" classname="org.mycore.buildtools.anttasks.MCRTemplateTask" />
   <taskdef name="mergeSearchfields" classname="org.mycore.buildtools.anttasks.MCRMergeSearchfieldsXMLTask" />
+  <typedef name="appModuleSelector" classname="org.mycore.buildtools.anttypes.MCRApplicationModuleSelector"/>
 </antlib>

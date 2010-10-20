@@ -6,6 +6,9 @@
   </properties>
   <body>
     <release version="2.0.93" date="2010-?-?" description="Beta 3">
+      <action dev="mcrtchef" type="add">
+        Added MCRApplicationModuleSelector to detect mycore application modules.
+      </action>
       <action dev="mcrtchef" type="fix">
         Fixed export and re-import of users on systems with encrypted passwords (default case)
         If you have XML files with unencrypted passwords encrypt them with "encrypt passwords in user xml file {0} to file {1}".
