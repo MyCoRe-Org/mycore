@@ -36,12 +36,9 @@ import org.hibernate.Criteria;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
-import org.jdom.Namespace;
-
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRFSNODES;
 import org.mycore.backend.hibernate.tables.MCRXMLTABLE;
@@ -93,8 +90,8 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
         public void repair() {
             try {
                 List<MCRSearcher> searcherList = clearAndInitSearchers();
-                createNewIndex(searcherList);
-                closeSearcher(searcherList);
+                createNewIndexFor(searcherList);
+                closeSearchers(searcherList);
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -103,7 +100,7 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
             }
         }
 
-        private void closeSearcher(List<MCRSearcher> searcherList) {
+        private void closeSearchers(List<MCRSearcher> searcherList) {
             for (MCRSearcher searcher : searcherList) {
                 searcher.notifySearcher("finish");
                 LOGGER.info("Done building index " + searcher.getID());
@@ -124,7 +121,7 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
             return searcherList;
         }
 
-        private void createNewIndex(List<MCRSearcher> searcherList) {
+        private void createNewIndexFor(List<MCRSearcher> searcherList) {
             Session session = MCRHIBConnection.instance().getSession();
             Criteria xmlCriteria = session.createCriteria(MCRXMLTABLE.class);
             xmlCriteria.setCacheMode(CacheMode.IGNORE);
