@@ -114,7 +114,7 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
                     MCRSearcher searcher = MCRSearcherFactory.getSearcher(index);
                     LOGGER.info("clearing index " + index);
                     searcher.clearIndex();
-                    searcher.notifySearcher("insert");
+//                    searcher.notifySearcher("insert");
                     searcherList.add(searcher);
                 }
             }
