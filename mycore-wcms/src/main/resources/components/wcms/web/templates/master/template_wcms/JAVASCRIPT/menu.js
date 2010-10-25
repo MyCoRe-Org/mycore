@@ -28,7 +28,7 @@ var ie4=document.all
 var ns6=document.getElementById&&!document.all
 
 if (ie4||ns6)
-document.write('<div id="dropmenudiv" style="visibility:hidden;width:'+menuwidth+';background-color:'+menubgcolor+'" onMouseover="clearhidemenu()" onMouseout="dynamichide(event)"></div>')
+document.write('<div id="dropmenudiv" style="visibility:hidden;z-index:99;width:'+menuwidth+';background-color:'+menubgcolor+'" onMouseover="clearhidemenu()" onMouseout="dynamichide(event)"></div>')
 
 function getposOffset(what, offsettype){
 	var totaloffset=(offsettype=="left")? what.offsetLeft : what.offsetTop;
