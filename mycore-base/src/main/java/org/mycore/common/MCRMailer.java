@@ -50,18 +50,32 @@ import org.jdom.input.DOMBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.xml.MCRLayoutService;
+import org.mycore.frontend.editor.MCREditorSubmission;
+import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
  * This class provides methods to send emails from within a MyCoRe application.
  * 
  * @author Marc Schluepmann
- * @author Frank Lützenkirchen
+ * @author Frank L\u00FCtzenkirchen
  * @author Werner Greßhoff
  * 
  * @version $Revision$ $Date$
  */
-public class MCRMailer {
-    /** Logger */
+public class MCRMailer extends MCRServlet {
+    
+    @Override
+    protected void doGetPost(MCRServletJob job) throws Exception {
+        String goTo = job.getRequest().getParameter("goto");
+        String xsl = job.getRequest().getParameter("xsl");
+
+        MCREditorSubmission sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));
+        MCRMailer.sendMail(sub.getXML(), xsl);
+
+        job.getResponse().sendRedirect(goTo);
+    }
+
     private static final Logger LOGGER = Logger.getLogger(MCRMailer.class);
 
     private static Session mailSession;
