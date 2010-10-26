@@ -240,6 +240,16 @@
     <url-pattern>/servlets/MCRDisplayHideDerivateServlet</url-pattern>
   </servlet-mapping>
 
+  <servlet id="MCRMailer">
+    <servlet-name>MCRMailer</servlet-name>
+    <servlet-class>org.mycore.common.MCRMailer</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>MCRMailer</servlet-name>
+    <url-pattern>/servlets/MCRMailer</url-pattern>
+  </servlet-mapping>
+
   <!-- **************************************************************** -->
   <!-- General configuration                                            -->
   <!-- **************************************************************** -->
