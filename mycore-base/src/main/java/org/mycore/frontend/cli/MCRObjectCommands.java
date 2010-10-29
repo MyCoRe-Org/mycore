@@ -111,9 +111,14 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         command.add(com);
 
         com = new MCRCommand("export all objects of type {0} to directory {1} with {2}",
-            "org.mycore.frontend.cli.MCRObjectCommands.exportAllObjects String String String",
+            "org.mycore.frontend.cli.MCRObjectCommands.exportAllObjectsOfType String String String",
             "Stores all MCRObjects of type {0} to directory {1} with the stylesheet mcr_{2}-object.xsl. For {2} save is the default.");
         command.add(com);
+
+        com = new MCRCommand("export all objects of base {0} to directory {1} with {2}",
+                "org.mycore.frontend.cli.MCRObjectCommands.exportAllObjectsOfBase String String String",
+                "Stores all MCRObjects of base {0} to directory {1} with the stylesheet mcr_{2}-object.xsl. For {2} save is the default.");
+            command.add(com);
 
         com = new MCRCommand("get last ID for base {0}", "org.mycore.frontend.cli.MCRObjectCommands.getLastID String",
             "Returns the last used MCRObjectID for the ID base {0}.");
@@ -494,16 +499,14 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * Save all MCRObject's to files named <em>MCRObjectID</em> .xml in a <em>dirname</em>directory for the data type <em>type</em>. The method use the
      * converter stylesheet mcr_<em>style</em>_object.xsl.
      * 
-     * @param fromID
-     *            the ID of the MCRObject from be save.
-     * @param toID
-     *            the ID of the MCRObject to be save.
+     * @param type
+     *            the MCRObjectID type
      * @param dirname
      *            the filename to store the object
      * @param style
      *            the type of the stylesheet
      */
-    public static final List<String> exportAllObjects(String type, String dirname, String style) {
+    public static final List<String> exportAllObjectsOfType(String type, String dirname, String style) {
         // check dirname
         File dir = new File(dirname);
 
@@ -514,6 +517,49 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         List<String> objectIds = MCRXMLMetadataManager.instance().listIDsOfType(type);
         List<String> cmds = new ArrayList<String>(objectIds.size());
         for (String id : objectIds) {
+            cmds.add(new StringBuilder("export object from ")
+                .append(id)
+                .append(" to ")
+                .append(id)
+                .append(" to directory ")
+                .append(dirname)
+                .append(" with ")
+                .append(style)
+                .toString());
+        }
+        return cmds;
+    }
+
+    /**
+     * Save all MCRObject's to files named <em>MCRObjectID</em> .xml in a <em>dirname</em>directory for the data base <em>project_type</em>. The method use the
+     * converter stylesheet mcr_<em>style</em>_object.xsl.
+     * 
+     * @param base
+     *            the MCRObjectID base
+     * @param dirname
+     *            the filename to store the object
+     * @param style
+     *            the type of the stylesheet
+     */
+    public static final List<String> exportAllObjectsOfBase(String base, String dirname, String style) {
+        // check dirname
+        File dir = new File(dirname);
+
+        if (dir.isFile()) {
+            LOGGER.error(dirname + " is not a dirctory.");
+            return Collections.emptyList();
+        }
+        int i = base.indexOf("_");
+        if (i == -1) {
+            LOGGER.error(base + " is not a base of a MCRObjectID.");
+            return Collections.emptyList();
+        }
+        String type = base.substring(i+1);
+        List<String> objectIds = MCRXMLMetadataManager.instance().listIDsOfType(type);
+        List<String> cmds = new ArrayList<String>(objectIds.size());
+        for (String id : objectIds) {
+        	if (!id.startsWith(base))
+        		continue;
             cmds.add(new StringBuilder("export object from ")
                 .append(id)
                 .append(" to ")

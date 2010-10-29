@@ -112,9 +112,17 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             "Stores all derivates to the directory {0} with the stylesheet mcr_{1}-derivate.xsl. For {1} save is the default.");
         command.add(com);
 
+        com = new MCRCommand("export all derivates of project {0} to directory {1} with {2}", "org.mycore.frontend.cli.MCRDerivateCommands.exportAllDerivatesOfProject String String String",
+        "Stores all derivates of project {0} to the directory {1} with the stylesheet mcr_{2}-derivate.xsl. For {2} save is the default.");
+    command.add(com);
+
         com = new MCRCommand("show loadable derivate of {0} to directory {1}", "org.mycore.frontend.cli.MCRDerivateCommands.show String String",
             "The command store the derivate with the MCRObjectID {0} to the directory {1}, without ifs-metadata");
         command.add(com);
+
+        com = new MCRCommand("show loadable derivate of {0} to directory {1}", "org.mycore.frontend.cli.MCRDerivateCommands.show String String",
+        "The command store the derivate with the MCRObjectID {0} to the directory {1}, without ifs-metadata");
+    command.add(com);
 
         com = new MCRCommand("repair derivate search of type derivate", "org.mycore.frontend.cli.MCRDerivateCommands.repairDerivateSearch",
             "The command read the Content store and reindex the derivate search stores.");
@@ -150,7 +158,11 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * 
      * @param ID
      *            the ID of the MCRDerivate that should be deleted
-     * @throws MCRActiveLinkException 
+     * @throws MCRActiveLinkException         com = new MCRCommand("export all derivates to directory {0} with {1}", "org.mycore.frontend.cli.MCRDerivateCommands.exportAllDerivates String String",
+            "Stores all derivates to the directory {0} with the stylesheet mcr_{1}-derivate.xsl. For {1} save is the default.");
+        command.add(com);
+
+
      * @throws MCRPersistenceException 
      */
     public static void delete(String ID) throws MCRPersistenceException, MCRActiveLinkException {
@@ -453,6 +465,14 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         LOGGER.info(k + " Object's stored under " + dir.getAbsolutePath() + ".");
     }
 
+    /**
+     * The command look for all derivates in the application and build export commands.
+     * @param dirname
+     *            the filename to store the object
+     * @param style
+     *            the type of the stylesheet
+     * @return a list of export commands for each derivate
+     */
     public static List<String> exportAllDerivates(String dirname, String style) {
         // check dirname
         File dir = new File(dirname);
@@ -464,6 +484,32 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         List<String> ids = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
         List<String> cmds = new ArrayList<String>(ids.size());
         for (String id : ids) {
+            cmds.add(new StringBuilder("export derivate ").append(id).append(" to directory ").append(dirname).append(" with ").append(style).toString());
+        }
+        return cmds;
+    }
+
+    /**
+     * The command look for all derivates starts with project name in the application and build export commands.
+     * @param dirname
+     *            the filename to store the object
+     * @param style
+     *            the type of the stylesheet
+     * @return a list of export commands for derivates with project name
+     */
+    public static List<String> exportAllDerivatesOfProject(String project, String dirname, String style) {
+        // check dirname
+        File dir = new File(dirname);
+
+        if (dir.isFile()) {
+            throw new MCRException(dirname + " is not a dirctory.");
+        }
+
+        List<String> ids = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
+        List<String> cmds = new ArrayList<String>(ids.size());
+        for (String id : ids) {
+        	if (!id.startsWith(project))
+        		continue;
             cmds.add(new StringBuilder("export derivate ").append(id).append(" to directory ").append(dirname).append(" with ").append(style).toString());
         }
         return cmds;
