@@ -27,6 +27,7 @@ package org.mycore.services.oai;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.jdom.Attribute;
@@ -130,8 +131,8 @@ public class MCROAIQueryImpl implements MCROAIQuery {
             return ar;
         }
         for (int i = 0; i < categories.size(); i++) {
-            MCRCategory category = categories.get(i);
-            Collection<org.mycore.datamodel.classifications2.MCRLabel> labels = category.getLabels();
+            MCRCategory category = categories.get(i); 
+            Set<org.mycore.datamodel.classifications2.MCRLabel> labels = category.getLabels();
             for (MCRLabel label : labels) {
                 if ("x-dini".equals(label.getLang())) {
                     String[] set = new String[3];

@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
@@ -1593,7 +1594,7 @@ public class MCROAIProvider extends MCRServlet {
                         if (classifications.contains(classificationId)) {
                             String categoryId = classification.getCategId();
                             MCRCategory category = MCRCategoryDAOFactory.getInstance().getCategory(new MCRCategoryID(classificationId, categoryId), -1);
-                            Collection<org.mycore.datamodel.classifications2.MCRLabel> labels = category.getLabels();
+                            Set<org.mycore.datamodel.classifications2.MCRLabel> labels = category.getLabels();
                             boolean found = false;
                             for (MCRLabel label : labels) {
                                 if (label.getLang().equals("x-dini")) {
