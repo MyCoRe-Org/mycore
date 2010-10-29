@@ -32,6 +32,7 @@ import java.io.FileOutputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
@@ -180,7 +181,7 @@ public class MCRClassificationEditor {
             //copy new values to old copy of category
             oldCategory.setURI(newCategory.getURI());
             oldCategory.getLabels().clear();
-            Collection<MCRLabel> labels = newCategory.getLabels();
+            Set<MCRLabel> labels = newCategory.getLabels();
             oldCategory.getLabels().addAll(labels);
             //added by MCRXMLTransformer
             parent.getChildren().remove(newCategory);
