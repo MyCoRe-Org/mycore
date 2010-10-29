@@ -478,7 +478,7 @@ iview.scrollbar.View = function(args) {
 			.appendTo(complete);
 		jQuery(document)
 			.mouseup(function() { buttonMouseUp(that);})
-			.mousemove(function(e) { divMouseMove(that, e); return false;});
+			.mousemove(function(e) { divMouseMove(that, e);});
 			
 		if (this._direction) {
 			wholeSpace.css("cssFloat", "left");

@@ -947,7 +947,7 @@ function startFileLoaded(viewID){
 	
 	// Resize-Events registrieren
 	if (isBrowser("IE")) {
-		document.getElementById("viewer"+viewID).parentNode.onresize = function() {reinitializeGraphic(viewID)};
+		window.onresize = function() {reinitializeGraphic(viewID)};
 	} else {
 		ManageEvents.addEventListener(window, 'resize', function() { reinitializeGraphic(viewID);}, false);
 	}
