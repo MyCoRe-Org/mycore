@@ -138,4 +138,56 @@
 	</xsl:template>
 	<!-- ======================================================================== -->		
 
+    <xsl:template name="derivateView">
+      <xsl:param name="derivateID" />
+      <!-- example implementation -->
+      <xsl:if test="$jai.available">
+        <tr>
+          <td class="metanone" colspan="8">
+            <xsl:variable name="supportedMainFile">
+              <xsl:call-template name="iview.getSupport">
+                <xsl:with-param name="derivID" select="$derivateID" />
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:choose>
+              <xsl:when test="$supportedMainFile != ''">
+                <xsl:call-template name="iview">
+                  <xsl:with-param name="derivID" select="$derivateID" />
+                  <xsl:with-param name="pathOfImage" select="$supportedMainFile" />
+                  <xsl:with-param name="height" select="'510'" />
+                  <xsl:with-param name="width" select="'605'" />
+                  <xsl:with-param name="scaleFactor" select="'fitToWidth'" />
+                  <xsl:with-param name="display" select="'normal'" />
+                  <xsl:with-param name="style" select="'image'" />
+                </xsl:call-template>
+              </xsl:when>
+            </xsl:choose>
+          </td>
+        </tr>
+      </xsl:if>
+      <!-- MCR - IView ..end -->
+    </xsl:template>
+    
+    <xsl:template name="derivateLinkView">
+      <xsl:param name="file" />
+      <xsl:param name="derivateID" />
+      <xsl:if test="$file != ''">
+        <div class="iViewBox">
+          <a>
+            <xsl:attribute name="href">
+              <xsl:call-template name="iview.getAddress">
+                <xsl:with-param select="$derivateID" name="derivID" />
+                <xsl:with-param select="$file" name="pathOfImage" />
+                <xsl:with-param select="'500'" name="height" />
+                <xsl:with-param select="'750'" name="width" />
+                <xsl:with-param select="'fitToWidth'" name="scaleFactor" />
+                <xsl:with-param select="'extended'" name="display" />
+                <xsl:with-param select="'image'" name="style" />
+                </xsl:call-template>
+              </xsl:attribute>
+            <xsl:value-of select="i18n:translate('metaData.iView')" />
+          </a>
+        </div>
+      </xsl:if>
+    </xsl:template>    
 </xsl:stylesheet>
