@@ -36,7 +36,6 @@ import org.hibernate.Criteria;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -82,6 +81,139 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
                 "Repairs metadata index"));
     }
 
+    static class RepairIndex {
+        private RepairMechanism mechanism;
+
+        public RepairIndex(RepairMechanism mechanism) {
+            this.mechanism = mechanism;
+        }
+
+        public void repair() {
+            try {
+                List<MCRSearcher> searcherList = clearAndInitSearchers();
+                createNewIndexFor(searcherList);
+                closeSearchers(searcherList);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JDOMException e) {
+                e.printStackTrace();
+            }
+        }
+
+        private void closeSearchers(List<MCRSearcher> searcherList) {
+            for (MCRSearcher searcher : searcherList) {
+                searcher.notifySearcher("finish");
+                LOGGER.info("Done building index " + searcher.getID());
+            }
+        }
+
+        private List<MCRSearcher> clearAndInitSearchers() throws IOException, JDOMException {
+            List<MCRSearcher> searcherList = new ArrayList<MCRSearcher>();
+            for (String index : getIndexes()) {
+                if (isIndexType(index, INDEX_TYPE_METADATA)) {
+                    MCRSearcher searcher = MCRSearcherFactory.getSearcher(index);
+                    LOGGER.info("clearing index " + index);
+                    searcher.clearIndex();
+                    //                    searcher.notifySearcher("insert");
+                    searcherList.add(searcher);
+                }
+            }
+            return searcherList;
+        }
+
+        private void createNewIndexFor(List<MCRSearcher> searcherList) {
+            Session session = MCRHIBConnection.instance().getSession();
+            Criteria xmlCriteria = session.createCriteria(MCRFSNODES.class);
+            xmlCriteria.setCacheMode(CacheMode.IGNORE);
+            ScrollableResults results = xmlCriteria.scroll(ScrollMode.FORWARD_ONLY);
+            mechanism.repair(results, session, searcherList);
+        }
+
+        private List<String> getIndexes() {
+            Properties searcherProps = MCRConfiguration.instance().getProperties(SEARCHER_PROPERTY_START);
+            List<String> luceneIndexes = new ArrayList<String>(2);
+            for (Entry<Object, Object> property : searcherProps.entrySet()) {
+                if (property.getKey().toString().endsWith(SEARCHER_CLASS_SUFFIX)) {
+                    luceneIndexes.add(property.getKey().toString().split("\\.")[2]);
+                }
+            }
+            LOGGER.info("Found MCRSearcher indexes: " + luceneIndexes);
+            return luceneIndexes;
+        }
+
+        private boolean isIndexType(String index, String type) throws IOException, JDOMException {
+            Document searchFields = MCRXMLResource.instance().getResource("searchfields.xml");
+            final String indexKey = MCRConfiguration.instance().getString(SEARCHER_PROPERTY_START + index + SEARCHER_INDEX_SUFFIX);
+            for (Object indexElement : searchFields.getRootElement().getChildren("index", MCRConstants.MCR_NAMESPACE)) {
+                final Element indexE = (Element) indexElement;
+                if (indexE.getAttributeValue("id").equals(indexKey))
+                    for (Object fieldElement : indexE.getChildren("field", MCRConstants.MCR_NAMESPACE)) {
+                        String source = ((Element) fieldElement).getAttributeValue("source");
+                        if (source != null && source.startsWith(type)) {
+                            return true;
+                        }
+                    }
+            }
+            return false;
+        }
+    }
+
+    interface RepairMechanism {
+        public void repair(ScrollableResults results, Session session, List<MCRSearcher> searcherList);
+    }
+
+    static class MetaIndexRepairMechanism implements RepairMechanism {
+
+        @Override
+        public void repair(ScrollableResults results, Session session, List<MCRSearcher> searcherList) {
+            MCRXMLMetadataManager mcrxmlTableManager = MCRXMLMetadataManager.instance();
+            for (String id : mcrxmlTableManager.listIDs()) {
+                MCRObjectID mcrid = MCRObjectID.getInstance(id);
+                addMetaToIndex(mcrid, mcrxmlTableManager.retrieveBLOB(mcrid), false, searcherList);
+            }
+        }
+
+        private void addMetaToIndex(MCRObjectID id, byte[] xml, boolean update, List<MCRSearcher> searcherList) {
+            for (MCRSearcher searcher : searcherList) {
+                List<MCRFieldValue> fields = MCRData2Fields.buildFields(xml, searcher.getIndex(), MCRFieldDef.OBJECT_METADATA
+                        + MCRFieldDef.OBJECT_CATEGORY, id.getTypeId());
+                if (update) {
+                    searcher.removeFromIndex(id.toString());
+                }
+                searcher.addToIndex(id.toString(), id.toString(), fields);
+            }
+        }
+    }
+
+    static class ContentIndexRepairMechanism implements RepairMechanism {
+
+        @Override
+        public void repair(ScrollableResults results, Session session, List<MCRSearcher> searcherList) {
+            while (results.next()) {
+                MCRFSNODES node = (MCRFSNODES) results.get(0);
+                GregorianCalendar greg = new GregorianCalendar();
+                greg.setTime(node.getDate());
+                MCRFile file = (MCRFile) MCRFileMetadataManager.instance().buildNode(node.getType(), node.getId(), node.getPid(),
+                        node.getOwner(), node.getName(), node.getLabel(), node.getSize(), greg, node.getStoreid(), node.getStorageid(),
+                        node.getFctid(), node.getMd5(), node.getNumchdd(), node.getNumchdf(), node.getNumchtd(), node.getNumchtf());
+                addFileToIndex(file, false, searcherList);
+                session.evict(node);
+            }
+        }
+
+        private void addFileToIndex(MCRFile file, boolean update, List<MCRSearcher> searcherList) {
+            for (MCRSearcher searcher : searcherList) {
+                List<MCRFieldValue> fields = MCRData2Fields.buildFields(file, searcher.getIndex());
+                String entryID = file.getID();
+                String returnID = searcher.getReturnID(file);
+                if (update)
+                    searcher.removeFromIndex(entryID);
+                searcher.addToIndex(entryID, returnID, fields);
+            }
+        }
+    }
+
     /**
      * repairs all metadata indexes
      * 
@@ -89,27 +221,7 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
      * @throws JDOMException
      */
     public static void repairMetaIndex() throws IOException, JDOMException {
-        List<String> indexes = getIndexes();
-        List<String> metaSearcher = new ArrayList<String>(1);
-        for (String index : indexes) {
-            if (isIndexType(index, INDEX_TYPE_METADATA)) {
-                metaSearcher.add(index);
-            }
-        }
-        for (String searcherID : metaSearcher) {
-            MCRSearcher searcher = MCRSearcherFactory.getSearcher(searcherID);
-            LOGGER.info("clearing index " + searcherID);
-            searcher.clearIndex();
-            searcher.notifySearcher("insert");
-            //TODO: Code needs to be made fast again after IFS2 Metastore is matured
-            MCRXMLMetadataManager mcrxmlTableManager = MCRXMLMetadataManager.instance();
-            for (String id : mcrxmlTableManager.listIDs()) {
-                MCRObjectID mcrid = MCRObjectID.getInstance(id);
-                addMetaToIndex(mcrid, mcrxmlTableManager.retrieveBLOB(mcrid), false, searcher);
-            }
-            searcher.notifySearcher("finish");
-            LOGGER.info("Done building index " + searcherID);
-        }
+        new RepairIndex(new MetaIndexRepairMechanism()).repair();
     }
 
     /**
@@ -119,83 +231,7 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
      * @throws JDOMException
      */
     public static void repairContentIndex() throws IOException, JDOMException {
-        List<String> indexes = getIndexes();
-        List<String> contentSearcher = new ArrayList<String>(1);
-        for (String index : indexes) {
-            if (isIndexType(index, INDEX_TYPE_CONTENT)) {
-                contentSearcher.add(index);
-            }
-        }
-        for (String searcherID : contentSearcher) {
-            MCRSearcher searcher = MCRSearcherFactory.getSearcher(searcherID);
-            LOGGER.info("clearing index " + searcherID);
-            searcher.clearIndex();
-            searcher.notifySearcher("insert");
-            Session session = MCRHIBConnection.instance().getSession();
-            Criteria fileCriteria = session.createCriteria(MCRFSNODES.class);
-            fileCriteria.add(Restrictions.eq("type", "F"));
-            fileCriteria.setCacheMode(CacheMode.IGNORE);
-            ScrollableResults results = fileCriteria.scroll(ScrollMode.FORWARD_ONLY);
-            while (results.next()) {
-                MCRFSNODES node = (MCRFSNODES) results.get(0);
-                GregorianCalendar greg = new GregorianCalendar();
-                greg.setTime(node.getDate());
-                MCRFile file = (MCRFile) MCRFileMetadataManager.instance().buildNode(node.getType(), node.getId(), node.getPid(),
-                        node.getOwner(), node.getName(), node.getLabel(), node.getSize(), greg, node.getStoreid(), node.getStorageid(),
-                        node.getFctid(), node.getMd5(), node.getNumchdd(), node.getNumchdf(), node.getNumchtd(), node.getNumchtf());
-                addFileToIndex(file, false, searcher);
-                session.evict(node);
-            }
-            searcher.notifySearcher("finish");
-            LOGGER.info("Done building index " + searcherID);
-        }
+        new RepairIndex(new ContentIndexRepairMechanism()).repair();
     }
 
-    private static List<String> getIndexes() {
-        Properties searcherProps = MCRConfiguration.instance().getProperties(SEARCHER_PROPERTY_START);
-        List<String> luceneIndexes = new ArrayList<String>(2);
-        for (Entry<Object, Object> property : searcherProps.entrySet()) {
-            if (property.getKey().toString().endsWith(SEARCHER_CLASS_SUFFIX)) {
-                luceneIndexes.add(property.getKey().toString().split("\\.")[2]);
-            }
-        }
-        LOGGER.info("Found MCRSearcher indexes: " + luceneIndexes);
-        return luceneIndexes;
-    }
-
-    private static boolean isIndexType(String index, String type) throws IOException, JDOMException {
-        Document searchFields = MCRXMLResource.instance().getResource("searchfields.xml");
-        final String indexKey = MCRConfiguration.instance().getString(SEARCHER_PROPERTY_START + index + SEARCHER_INDEX_SUFFIX);
-        for (Object indexElement : searchFields.getRootElement().getChildren("index", MCRConstants.MCR_NAMESPACE)) {
-            final Element indexE = (Element) indexElement;
-            if (indexE.getAttributeValue("id").equals(indexKey)) {
-                for (Object fieldElement : indexE.getChildren("field", MCRConstants.MCR_NAMESPACE)) {
-                    String source = ((Element) fieldElement).getAttributeValue("source");
-                    if (source != null && source.startsWith(type)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    private static void addMetaToIndex(MCRObjectID id, byte[] xml, boolean update, MCRSearcher searcher) {
-        List<MCRFieldValue> fields = MCRData2Fields.buildFields(xml, searcher.getIndex(), MCRFieldDef.OBJECT_METADATA
-                + MCRFieldDef.OBJECT_CATEGORY, id.getTypeId());
-        if (update) {
-            searcher.removeFromIndex(id.toString());
-        }
-        searcher.addToIndex(id.toString(), id.toString(), fields);
-    }
-
-    private static void addFileToIndex(MCRFile file, boolean update, MCRSearcher searcher) {
-        List<MCRFieldValue> fields = MCRData2Fields.buildFields(file, searcher.getIndex());
-        String entryID = file.getID();
-        String returnID = searcher.getReturnID(file);
-        if (update) {
-            searcher.removeFromIndex(entryID);
-        }
-        searcher.addToIndex(entryID, returnID, fields);
-    }
 }
