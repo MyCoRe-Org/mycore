@@ -142,28 +142,24 @@
       <xsl:param name="derivateID" />
       <!-- example implementation -->
       <xsl:if test="$jai.available">
-        <tr>
-          <td class="metanone" colspan="8">
-            <xsl:variable name="supportedMainFile">
-              <xsl:call-template name="iview.getSupport">
-                <xsl:with-param name="derivID" select="$derivateID" />
-              </xsl:call-template>
-            </xsl:variable>
-            <xsl:choose>
-              <xsl:when test="$supportedMainFile != ''">
-                <xsl:call-template name="iview">
-                  <xsl:with-param name="derivID" select="$derivateID" />
-                  <xsl:with-param name="pathOfImage" select="$supportedMainFile" />
-                  <xsl:with-param name="height" select="'510'" />
-                  <xsl:with-param name="width" select="'605'" />
-                  <xsl:with-param name="scaleFactor" select="'fitToWidth'" />
-                  <xsl:with-param name="display" select="'normal'" />
-                  <xsl:with-param name="style" select="'image'" />
-                </xsl:call-template>
-              </xsl:when>
-            </xsl:choose>
-          </td>
-        </tr>
+      <xsl:variable name="supportedMainFile">
+        <xsl:call-template name="iview.getSupport">
+          <xsl:with-param name="derivID" select="$derivateID" />
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:choose>
+        <xsl:when test="$supportedMainFile != ''">
+          <xsl:call-template name="iview">
+            <xsl:with-param name="derivID" select="$derivateID" />
+            <xsl:with-param name="pathOfImage" select="$supportedMainFile" />
+            <xsl:with-param name="height" select="'510'" />
+            <xsl:with-param name="width" select="'605'" />
+            <xsl:with-param name="scaleFactor" select="'fitToWidth'" />
+            <xsl:with-param name="display" select="'normal'" />
+            <xsl:with-param name="style" select="'image'" />
+          </xsl:call-template>
+        </xsl:when>
+      </xsl:choose>
       </xsl:if>
       <!-- MCR - IView ..end -->
     </xsl:template>
