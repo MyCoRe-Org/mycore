@@ -35,7 +35,7 @@ public class MCROAIAdapterMyCoRe extends MCROAIAdapter {
 
     public boolean exists(String id) {
         try {
-            MCRObjectID oid = new MCRObjectID(id);
+            MCRObjectID oid = MCRObjectID.getInstance(id);
             return MCRXMLMetadataManager.instance().exists(oid);
         } catch (Exception ex) {
             String msg = "Exception while checking existence of object " + id;
@@ -47,6 +47,7 @@ public class MCROAIAdapterMyCoRe extends MCROAIAdapter {
     public MCRCondition buildSetCondition(String setSpec) {
         String categID = setSpec.substring(setSpec.lastIndexOf(':') + 1).trim();
         String classID = setSpec.substring(0, setSpec.indexOf(':')).trim();
-        return new MCRQueryCondition(MCRFieldDef.getDef(classID), "=", categID);
+        String id = classID + ":" + categID;
+        return new MCRQueryCondition(MCRFieldDef.getDef("category"), "=", id);
     }
 }
