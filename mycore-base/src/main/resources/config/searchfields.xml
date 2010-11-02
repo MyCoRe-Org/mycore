@@ -14,6 +14,18 @@
     <field name="modified"      type="timestamp"  source="objectMetadata" xpath="/mycoreobject/service/servdates/servdate[@type='modifydate']" value="concat(substring(.,1,10),' ',substring(.,12,8))" sortable="true" i18n="editor.search.document.datemod" />
     <field name="created"       type="timestamp"  source="objectMetadata" xpath="/mycoreobject/service/servdates/servdate[@type='createdate']" value="concat(substring(.,1,10),' ',substring(.,12,8))" sortable="true" />
 
+    <field name="category" type="identifier" source="objectCategory">
+      <xsl:for-each select="/mycoreobject/descendant::*[@classid and @categid]">
+        <xsl:variable name="classid" select="@classid" />
+        <xsl:variable name="uri" select="concat('classification:metadata:levels:parents:',@classid,':',@categid)" />
+        <xsl:for-each select="document($uri)//category">
+          <mcr:category xmlns:mcr="http://www.mycore.org/">
+            <xsl:value-of select="concat($classid,':',@ID)" />
+          </mcr:category>
+        </xsl:for-each>
+      </xsl:for-each>
+    </field>
+
     <!-- Search in all metadata fields (that have an xml:lang attribute) -->
     <field name="allMeta"       type="text"       source="objectMetadata" xpath="/mycoreobject/metadata/*//*" value="text()|@xlink:title" i18n="editor.search.metadata" />
 
