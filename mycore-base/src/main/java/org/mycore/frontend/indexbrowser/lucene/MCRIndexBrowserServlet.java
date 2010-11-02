@@ -27,6 +27,7 @@ import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -38,6 +39,9 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * @author Anja Schaar, Andreas Trappe, Matthias Eichner
  */
 public class MCRIndexBrowserServlet extends MCRServlet {
+
+    /** The logger for this class*/
+    private static final Logger LOGGER = Logger.getLogger(MCRIndexBrowserServlet.class);
 
     private static final long serialVersionUID = 4963472470316616461L;
 
@@ -51,7 +55,7 @@ public class MCRIndexBrowserServlet extends MCRServlet {
         Enumeration<String> ee = job.getRequest().getParameterNames();
         while (ee.hasMoreElements()) {
             String param = ee.nextElement();
-            System.out.println("PARAM: " + param + " VALUE: " + job.getRequest().getParameter(param));
+            LOGGER.info("PARAM: " + param + " VALUE: " + job.getRequest().getParameter(param));
         }
 
         incomingBrowserData = getIncomingBrowserData(job.getRequest());
