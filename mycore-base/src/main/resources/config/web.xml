@@ -42,8 +42,8 @@
     <servlet-name>MCROAIProvider</servlet-name>
     <servlet-class>org.mycore.services.oai.MCROAIProvider</servlet-class>
   </servlet>
-  <servlet id="OAI">
-    <servlet-name>MCROAIDataProvider</servlet-name>
+  <servlet id="OAI2">
+    <servlet-name>OAI2</servlet-name>
     <servlet-class>org.mycore.oai.MCROAIDataProvider</servlet-class>
   </servlet>
   <servlet id="StaticXMLFile">
@@ -168,7 +168,7 @@
     <url-pattern>/oai</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>MCROAIDataProvider</servlet-name>
+    <servlet-name>OAI2</servlet-name>
     <url-pattern>/oai2</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
