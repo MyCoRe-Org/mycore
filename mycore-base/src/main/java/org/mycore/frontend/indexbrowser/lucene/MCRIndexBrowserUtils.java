@@ -23,12 +23,15 @@
 
 package org.mycore.frontend.indexbrowser.lucene;
 
+import java.lang.reflect.Constructor;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.mycore.common.MCRConfiguration;
 
 /**
  * contains  utility functions for indexbrowser
@@ -36,6 +39,8 @@ import org.jdom.Element;
  * @author Anja Schaar, Andreas Trappe, Matthias Eichner, Robert Stephan
  */
 public class MCRIndexBrowserUtils {
+
+    private static final Logger LOGGER = Logger.getLogger(MCRIndexBrowserUtils.class);
 
     private static final long serialVersionUID = 4963472470316616461L;
 
@@ -55,12 +60,41 @@ public class MCRIndexBrowserUtils {
         if (MCRIndexBrowserCache.isCached(cacheKey, index)) {
             resultList = MCRIndexBrowserCache.getFromCache(cacheKey, index);
         } else {
-            MCRIndexBrowserSearcher searcher = new MCRIndexBrowserSearcher(incomingBrowserData, config);
+            MCRIndexBrowserSearcher searcher = getSearcher(incomingBrowserData, config);
             resultList = searcher.doSearch();
             MCRIndexBrowserCache.addToCache(cacheKey, index, resultList);
         }
         MCRIndexBrowserXmlGenerator xmlGen = new MCRIndexBrowserXmlGenerator(resultList, incomingBrowserData, config);
         return xmlGen.getXMLContent();
+    }
+
+    @SuppressWarnings("unchecked")
+    private static MCRIndexBrowserSearcher getSearcher(MCRIndexBrowserIncomingData browseData, MCRIndexBrowserConfig indexConfig) {
+        MCRIndexBrowserSearcher searcher = null;
+        String property = "MCR.IndexBrowserSearcher";
+        try {
+            String searcherClass = MCRConfiguration.instance().getString(property);
+            if (searcherClass == null) {
+                return searcher = new MCRIndexBrowserSearcher(browseData, indexConfig);
+            }
+            Class toLoad = Class.forName(searcherClass);
+            Class[] parameterTypes = new Class[2];
+            parameterTypes[0] = Class.forName(MCRIndexBrowserIncomingData.class.getName());
+            parameterTypes[1] = Class.forName(MCRIndexBrowserConfig.class.getName());
+            Constructor constructor = toLoad.getConstructor(parameterTypes);
+            if (constructor != null) {
+                Object[] args = { browseData, indexConfig };
+                searcher = (MCRIndexBrowserSearcher) constructor.newInstance(args);
+            }
+        } catch (Exception ex) {
+            LOGGER.warn(ex);
+            LOGGER.warn("Could not load searcher specified in property " + property);
+        }
+        if (searcher == null) {
+            LOGGER.info("Using default searcher");
+            searcher = new MCRIndexBrowserSearcher(browseData, indexConfig);
+        }
+        return searcher;
     }
 
     /**
