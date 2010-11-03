@@ -249,6 +249,16 @@
     <servlet-name>MCRMailer</servlet-name>
     <url-pattern>/servlets/MCRMailer</url-pattern>
   </servlet-mapping>
+  
+  <servlet id="MCRDerivateServlet">
+  	<servlet-name>MCRDerivateServlet</servlet-name>
+  	<servlet-class>org.mycore.frontend.servlets.MCRDerivateServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>MCRDerivateServlet</servlet-name>
+    <url-pattern>/servlets/MCRDerivateServlet/*</url-pattern>
+  </servlet-mapping>
 
   <!-- **************************************************************** -->
   <!-- General configuration                                            -->
