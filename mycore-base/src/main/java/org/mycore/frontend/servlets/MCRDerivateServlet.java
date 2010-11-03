@@ -17,13 +17,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.services.i18n.MCRTranslation;
 import org.mycore.tools.MyCoReWebPageProvider;
 
-// MCRDericateServlet.error.noDerivateId
-// MCRDericateServlet.error.noObjectId
-// MCRDericateServlet.error.noFile
-//	MCRDerivate.error.Unkown
-//
-//
-
 /**
  * @author basti
  * 
@@ -44,9 +37,9 @@ public class MCRDerivateServlet extends MCRServlet {
         }
 
         // Check the Parameter
-        String myCoreDerivateId = null; // derivateid
-        String myCoreObjectId = null; // objectid
-        String file = null; // file
+        String myCoreDerivateId = null;
+        String myCoreObjectId = null;
+        String file = null;
         String equals;
 
         for (Object parms : request.getParameterMap().keySet()) {
@@ -105,7 +98,6 @@ public class MCRDerivateServlet extends MCRServlet {
             String test = MCRTranslation.translate("MCRDerivate.error.Unkown");
             sendError("error", test, MyCoReWebPageProvider.DE, job);
         }
-
     }
 
     /**
@@ -117,7 +109,6 @@ public class MCRDerivateServlet extends MCRServlet {
      *            the MCRServletJob instance
      */
     private boolean ssetfile(String derivateId, String ObjectId, String file) throws IOException {
-
         try {
             MCRObjectID mcrid = MCRObjectID.getInstance(derivateId);
             MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(mcrid);
@@ -129,7 +120,6 @@ public class MCRDerivateServlet extends MCRServlet {
 
             return false;
         }
-
     }
 
     /**
