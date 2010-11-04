@@ -17,6 +17,10 @@
     <field name="derivateModificationDate" type="timestamp"  source="derivateMetadata" xpath="/mycorederivate/service/servdates/servdate[@type='modifydate']" value="concat(substring(.,1,10),' ',substring(.,12,8))" sortable="true" />
 	<field name="derivateCreationDate" type="timestamp"  source="derivateMetadata" xpath="/mycorederivate/service/servdates/servdate[@type='createdate']" value="concat(substring(.,1,10),' ',substring(.,12,8))" sortable="true" />    
 
+	<field name="derivateURN" type="identifier"  source="derivateMetadata" 
+		   xpath="/mycorederivate/derivate/fileset/file/urn | /mycorederivate/derivate/fileset/@urn" 
+		   value="text()" sortable="true" />
+
     <field name="category" type="identifier" source="objectCategory">
       <xsl:for-each select="/mycoreobject/descendant::*[@classid and @categid]">
         <xsl:variable name="classid" select="@classid" />
