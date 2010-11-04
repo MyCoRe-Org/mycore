@@ -200,9 +200,9 @@ public class MCREditorServlet extends MCRServlet {
             editor.addContent(new Element("cancel").setAttribute("url", cancelURL));
         }
 
-        String sessionID = buildSessionID();
-        editor.setAttribute("session", sessionID);
-        MCREditorCache.instance().putEditor(sessionID, new MCREditor( editor ));
+        MCREditor mcrEditor = new MCREditor( editor );
+        String sessionID = mcrEditor.getSessionID();
+        MCREditorCache.instance().putEditor( sessionID, mcrEditor );
         logger.debug("Storing editor under session id " + sessionID);
 
         return editor;
@@ -304,17 +304,6 @@ public class MCREditorServlet extends MCRServlet {
         }
 
         return tps;
-    }
-
-    private static Random random = new Random();
-
-    private static synchronized String buildSessionID() {
-        StringBuffer sb = new StringBuffer();
-        sb.append(Long.toString(System.currentTimeMillis(), 36));
-        sb.append(Long.toString(random.nextLong(), 36));
-        sb.reverse();
-
-        return sb.toString();
     }
 
     private void processEndSubSelect(HttpServletRequest req, HttpServletResponse res, MCRRequestParameters parms)
