@@ -63,7 +63,7 @@ public class MCREditorDataResolver implements MCRResolver {
         LOGGER.debug("MCREditorDataResolver editor session = " + sessionID);
         LOGGER.debug("MCREditorDataResolver xPath = " + xPath);
 
-        Element editor = (Element) (MCREditorServlet.getEditorSessionCache().get(sessionID));
+        Element editor = MCREditorCache.instance().getEditor(sessionID);
         Document xml = new MCREditorSubmission(editor).getXML();
         Element resolved = (Element) (XPath.selectSingleNode(xml, xPath));
         return (resolved == null ? new Element("nothingFound") : resolved);

@@ -67,53 +67,10 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
-public class MCREditorServlet extends MCRServlet implements MCRSessionListener {
+public class MCREditorServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
     protected final static Logger logger = Logger.getLogger(MCREditorServlet.class);
-
-    private final static String EDITOR_SESSIONS_KEY = "editorSessions";
-
-    @Override
-    public void init() throws ServletException {
-        super.init();
-        MCRSessionMgr.addSessionListener(this);
-    }
-
-    @Override
-    public void destroy() {
-        super.destroy();
-        MCRSessionMgr.removeSessionListener(this);
-    }
-
-    /**
-     * For each user session, the state of all editor forms most recently used
-     * is kept in a cache. The number of editor form data that is kept is controlled
-     * by the property MCR.EditorFramework.MaxEditorsInSession.
-     */
-    static MCRCache getEditorSessionCache() {
-
-        MCRSession current = MCRSessionMgr.getCurrentSession();
-        MCRCache editorsInSession = (MCRCache) current.get(EDITOR_SESSIONS_KEY);
-        if (editorsInSession == null) {
-            int maxEditors = MCRConfiguration.instance().getInt("MCR.EditorFramework.MaxEditorsInSession", 10);
-            editorsInSession = new MCRCache(maxEditors, "Editor data in MCRSessions, MCRSession=" + current.getID());
-            current.put(EDITOR_SESSIONS_KEY, editorsInSession);
-        }
-        return editorsInSession;
-    }
-
-    public void sessionEvent(MCRSessionEvent event) {
-        if (event.getType() == MCRSessionEvent.Type.destroyed) {
-            // close MCRCache instance cleanly
-            MCRSession current = event.getSession();
-            MCRCache editorsInSession = (MCRCache) current.get(EDITOR_SESSIONS_KEY);
-            if (editorsInSession != null) {
-                logger.debug(EDITOR_SESSIONS_KEY + " is NOT null");
-                editorsInSession.close();
-            }
-        }
-    }
 
     public void doGetPost(MCRServletJob job) throws ServletException, java.io.IOException {
         HttpServletRequest req = job.getRequest();
@@ -141,7 +98,7 @@ public class MCREditorServlet extends MCRServlet implements MCRSessionListener {
         Element editorResolved = null;
 
         if (sessionID != null) {
-            editorResolved = (Element) getEditorSessionCache().get(sessionID);
+            editorResolved = MCREditorCache.instance().getEditor( sessionID );
         }
 
         if (editorResolved == null || sessionID == null) {
@@ -164,7 +121,7 @@ public class MCREditorServlet extends MCRServlet implements MCRSessionListener {
 
         logger.debug("Editor session " + sessionID + " show popup " + ref);
 
-        Element editor = (Element) getEditorSessionCache().get(sessionID);
+        Element editor = MCREditorCache.instance().getEditor(sessionID);
         Element popup = MCREditorDefReader.findElementByID(ref, editor);
         Element clone = (Element) popup.clone();
 
@@ -194,7 +151,7 @@ public class MCREditorServlet extends MCRServlet implements MCRSessionListener {
         for (Element editor : editors) {
             Element editorResolved = null;
             if (sessionID != null) {
-                editorResolved = (Element) getEditorSessionCache().get(sessionID);
+                editorResolved = MCREditorCache.instance().getEditor(sessionID);
             }
 
             if (sessionID == null || editorResolved == null) {
@@ -249,7 +206,7 @@ public class MCREditorServlet extends MCRServlet implements MCRSessionListener {
 
         String sessionID = buildSessionID();
         editor.setAttribute("session", sessionID);
-        getEditorSessionCache().put(sessionID, editor);
+        MCREditorCache.instance().putEditor(sessionID, editor);
         logger.debug("Storing editor under session id " + sessionID);
 
         return editor;
@@ -406,7 +363,7 @@ public class MCREditorServlet extends MCRServlet implements MCRSessionListener {
         logger.debug("Editor: process submit");
 
         String sessionID = parms.getParameter("_session");
-        Element editor = (Element) getEditorSessionCache().get(sessionID);
+        Element editor = MCREditorCache.instance().getEditor(sessionID);
 
         if (editor == null) {
             logger.error("No editor for session <" + sessionID + ">");
@@ -648,7 +605,7 @@ public class MCREditorServlet extends MCRServlet implements MCRSessionListener {
         String webpage = parms.getParameter("subselect.webpage");
         String sessionID = parms.getParameter("subselect.session");
 
-        Element editor = (Element) getEditorSessionCache().get(sessionID);
+        Element editor = MCREditorCache.instance().getEditor(sessionID);
         MCREditorSubmission subnew = new MCREditorSubmission(editor, variables, root, parms);
 
         editor.removeChild("input");
