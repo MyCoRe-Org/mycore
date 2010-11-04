@@ -94,7 +94,7 @@ public class MCREditorServlet extends MCRServlet {
         Element editorResolved = null;
 
         if (sessionID != null) {
-            editorResolved = MCREditorCache.instance().getEditor( sessionID );
+            editorResolved = MCREditorCache.instance().getEditor( sessionID ).getXML();
         }
 
         if (editorResolved == null || sessionID == null) {
@@ -117,7 +117,7 @@ public class MCREditorServlet extends MCRServlet {
 
         logger.debug("Editor session " + sessionID + " show popup " + ref);
 
-        Element editor = MCREditorCache.instance().getEditor(sessionID);
+        Element editor = MCREditorCache.instance().getEditor(sessionID).getXML();
         Element popup = MCREditorDefReader.findElementByID(ref, editor);
         Element clone = (Element) popup.clone();
 
@@ -147,7 +147,7 @@ public class MCREditorServlet extends MCRServlet {
         for (Element editor : editors) {
             Element editorResolved = null;
             if (sessionID != null) {
-                editorResolved = MCREditorCache.instance().getEditor(sessionID);
+                editorResolved = MCREditorCache.instance().getEditor(sessionID).getXML();
             }
 
             if (sessionID == null || editorResolved == null) {
@@ -202,7 +202,7 @@ public class MCREditorServlet extends MCRServlet {
 
         String sessionID = buildSessionID();
         editor.setAttribute("session", sessionID);
-        MCREditorCache.instance().putEditor(sessionID, editor);
+        MCREditorCache.instance().putEditor(sessionID, new MCREditor( editor ));
         logger.debug("Storing editor under session id " + sessionID);
 
         return editor;
@@ -359,7 +359,7 @@ public class MCREditorServlet extends MCRServlet {
         logger.debug("Editor: process submit");
 
         String sessionID = parms.getParameter("_session");
-        Element editor = MCREditorCache.instance().getEditor(sessionID);
+        Element editor = MCREditorCache.instance().getEditor(sessionID).getXML();
 
         if (editor == null) {
             logger.error("No editor for session <" + sessionID + ">");
@@ -601,7 +601,7 @@ public class MCREditorServlet extends MCRServlet {
         String webpage = parms.getParameter("subselect.webpage");
         String sessionID = parms.getParameter("subselect.session");
 
-        Element editor = MCREditorCache.instance().getEditor(sessionID);
+        Element editor = MCREditorCache.instance().getEditor(sessionID).getXML();
         MCREditorSubmission subnew = new MCREditorSubmission(editor, variables, root, parms);
 
         editor.removeChild("input");

@@ -1,6 +1,5 @@
 package org.mycore.frontend.editor;
 
-import org.jdom.Element;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
@@ -29,11 +28,11 @@ public class MCREditorCache implements MCRSessionListener
         return INSTANCE;
     }
 
-    public Element getEditor(String editorSessionID) {
-        return (Element) (getCacheForCurrentSession().get(editorSessionID));
+    public MCREditor getEditor(String editorSessionID) {
+        return (MCREditor) (getCacheForCurrentSession().get(editorSessionID));
     }
     
-    public void putEditor(String editorSessionID, Element editor) {
+    public void putEditor(String editorSessionID, MCREditor editor) {
         getCacheForCurrentSession().put(editorSessionID, editor);
     }
 
