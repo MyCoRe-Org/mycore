@@ -13,6 +13,9 @@
     <field name="parent"        type="identifier" source="objectMetadata" xpath="/mycoreobject/structure/parents/parent" value="@xlink:href" />
     <field name="modified"      type="timestamp"  source="objectMetadata" xpath="/mycoreobject/service/servdates/servdate[@type='modifydate']" value="concat(substring(.,1,10),' ',substring(.,12,8))" sortable="true" i18n="editor.search.document.datemod" />
     <field name="created"       type="timestamp"  source="objectMetadata" xpath="/mycoreobject/service/servdates/servdate[@type='createdate']" value="concat(substring(.,1,10),' ',substring(.,12,8))" sortable="true" />
+    
+    <field name="derivateModificationDate" type="timestamp"  source="derivateMetadata" xpath="/mycorederivate/service/servdates/servdate[@type='modifydate']" value="concat(substring(.,1,10),' ',substring(.,12,8))" sortable="true" />
+	<field name="derivateCreationDate" type="timestamp"  source="derivateMetadata" xpath="/mycorederivate/service/servdates/servdate[@type='createdate']" value="concat(substring(.,1,10),' ',substring(.,12,8))" sortable="true" />    
 
     <field name="category" type="identifier" source="objectCategory">
       <xsl:for-each select="/mycoreobject/descendant::*[@classid and @categid]">
@@ -63,10 +66,4 @@
     <field name="objectsWithURN" source="objectMetadata" type="boolean" />
     <field name="objectURN" source="objectMetadata" type="text"/>
   </index>
-
-  <index id="derivate">
-    <!-- field for for quering the modification date of an derivate in the database -->
-    <field name="derivateModificationDate" source="derivateMetadata" type="timestamp" />
-  </index>
-
 </searchfields>

@@ -1,25 +1,16 @@
 /**
- * $RCSfile: MCRLuceneCommands.java,v $
- * $Revision: 1.0 $ $Date: 22.10.2008 06:48:51 $
- *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
- *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
+ * $RCSfile: MCRLuceneCommands.java,v $ $Revision: 1.0 $ $Date: 22.10.2008
+ * 06:48:51 $ This file is part of ** M y C o R e ** Visit our homepage at
+ * http://www.mycore.de/ for details. This program is free software; you can use
+ * it, redistribute it and / or modify it under the terms of the GNU General
+ * Public License (GPL) as published by the Free Software Foundation; either
+ * version 2 of the License or (at your option) any later version. This program
+ * is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details. You
+ * should have received a copy of the GNU General Public License along with this
+ * program, normally in the file license.txt. If not, write to the Free Software
+ * Foundation Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307 USA
  **/
 package org.mycore.frontend.cli;
 
@@ -115,7 +106,7 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
                     MCRSearcher searcher = MCRSearcherFactory.getSearcher(index);
                     LOGGER.info("clearing index " + index);
                     searcher.clearIndex();
-                    //                    searcher.notifySearcher("insert");
+                    // searcher.notifySearcher("insert");
                     searcherList.add(searcher);
                 }
             }
@@ -178,6 +169,9 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
             for (MCRSearcher searcher : searcherList) {
                 List<MCRFieldValue> fields = MCRData2Fields.buildFields(xml, searcher.getIndex(), MCRFieldDef.OBJECT_METADATA
                         + MCRFieldDef.OBJECT_CATEGORY, id.getTypeId());
+                List<MCRFieldValue> fieldsDerivate = MCRData2Fields.buildFields(xml, searcher.getIndex(), MCRFieldDef.DERIVATE_METADATA,
+                        id.getTypeId());
+                fields.addAll(fieldsDerivate);
                 if (update) {
                     searcher.removeFromIndex(id.toString());
                 }

@@ -49,6 +49,7 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
 import org.mycore.datamodel.metadata.MCRObject;
 
@@ -110,7 +111,7 @@ public class MCRData2Fields {
     private static Templates buildStylesheet(String index, String source) {
         String key = index + "//" + source;
         Templates stylesheet = (Templates) stylesheets.get(key);
-
+        
         if (stylesheet == null) {
             Element root = (Element) xslTemplate.clone();
             Element fv = root.getChild("template", MCRConstants.XSL_NAMESPACE).getChild("fieldValues", MCRConstants.MCR_NAMESPACE);
@@ -159,6 +160,22 @@ public class MCRData2Fields {
         Templates stylesheet = buildStylesheet(index, source);
         Document xml = obj.createXML();
         return buildValues(stylesheet, xml, obj.getId().getTypeId());
+    }
+    
+    /**
+     * Extracts field values for indexing from the given MCRDerivate metadata.
+     * 
+     * @param der
+     *            the MCRDerivate thats metadata should be indexed
+     * @param index
+     *            the ID of the index as defined in searchfields.xml
+     * @return a List of MCRFieldValue objects that contain field and value
+     */
+    public static List<MCRFieldValue> buildFields(MCRDerivate der, String index) {
+        String source = MCRFieldDef.DERIVATE_METADATA;
+        Templates stylesheet = buildStylesheet(index, source);
+        Document xml = der.createXML();
+        return buildValues(stylesheet, xml, der.getId().getTypeId());
     }
 
     /**
