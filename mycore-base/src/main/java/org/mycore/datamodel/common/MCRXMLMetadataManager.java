@@ -193,9 +193,12 @@ public class MCRXMLMetadataManager {
      * @throws ClassNotFoundException 
      */
     public MCRMetadataStore getStore(String project, String type) {
-        String prefix = "MCR.IFS2.Store." + project + "_" + type + ".";
+        String projectType = project + "_" + type;
+        String prefix = "MCR.IFS2.Store." + projectType + ".";
 
+        System.out.println(this.getClass().getSimpleName() + " prefix: " + prefix);
         String forceXML = MCRConfiguration.instance().getString(prefix + "ForceXML", null);
+        System.out.println(this.getClass().getSimpleName() + " forceXML: " + forceXML);
         if (forceXML == null) {
             synchronized (this) {
                 forceXML = MCRConfiguration.instance().getString(prefix + "ForceXML", null);
@@ -205,7 +208,15 @@ public class MCRXMLMetadataManager {
             }
         }
 
-        return MCRMetadataStore.getStore(project + "_" + type);
+        MCRMetadataStore store = MCRMetadataStore.getStore(projectType);
+        if(store == null){
+            try {
+                store = MCRStore.createStore(projectType, MCRMetadataStore.class);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return store;
     }
 
     private void setupStore(String project, String objectType, String configPrefix) {

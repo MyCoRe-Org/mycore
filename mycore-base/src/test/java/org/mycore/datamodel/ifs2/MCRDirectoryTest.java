@@ -7,60 +7,29 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.vfs.Selectors;
-import org.apache.commons.vfs.VFS;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTestCase;
 
 /**
  * JUnit test for MCRDirectory
  * 
  * @author Frank Lützenkirchen
  */
-public class MCRDirectoryTest extends MCRTestCase {
-
-    private static MCRFileStore store;
+public class MCRDirectoryTest extends MCRIFS2TestCase {
 
     private MCRFileCollection col;
-
-    protected void createStore() throws Exception {
-        File temp = File.createTempFile("base", "");
-        String path = temp.getAbsolutePath();
-        temp.delete();
-
-        setProperty("MCR.IFS2.Store.TEST.Class", "org.mycore.datamodel.ifs2.MCRFileStore", true);
-        setProperty("MCR.IFS2.Store.TEST.BaseDir", path, true);
-        setProperty("MCR.IFS2.Store.TEST.SlotLayout", "3-3-2", true);
-        store = MCRFileStore.getStore("TEST");
-    }
-
+    
     @Override
-    @Before
     public void setUp() throws Exception {
-        super.setUp();
-        if (store == null) {
-            createStore();
-        } else {
-            VFS.getManager().resolveFile(store.getBaseDir()).createFolder();
-        }
-        col = store.create();
+    	super.setUp();
+    	
+    	col = getStore().create();
     }
 
-    @Override
-    @After
-    public void tearDown() throws Exception {
-        super.tearDown();
-        VFS.getManager().resolveFile(store.getBaseDir()).delete(Selectors.SELECT_ALL);
-    }
-
-    @Test
+	@Test
     public void name() throws Exception {
         MCRDirectory dir = col.createDir("foo");
         Date created = dir.getLastModified();
@@ -101,7 +70,7 @@ public class MCRDirectoryTest extends MCRTestCase {
         assertEquals(label, dir.getCurrentLabel());
         assertEquals(2, dir.getLabels().size());
         assertEquals("english", dir.getLabel("en"));
-        MCRFileCollection col2 = store.retrieve(col.getID());
+        MCRFileCollection col2 = getStore().retrieve(col.getID());
         MCRDirectory child = (MCRDirectory) col2.getChild("foo");
         assertEquals(2, child.getLabels().size());
         dir.clearLabels();

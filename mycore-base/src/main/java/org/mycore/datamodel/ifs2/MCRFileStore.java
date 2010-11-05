@@ -24,6 +24,7 @@
 package org.mycore.datamodel.ifs2;
 
 import java.util.Iterator;
+import java.util.Set;
 
 import org.apache.commons.vfs.FileObject;
 import org.mycore.common.MCRException;
@@ -107,4 +108,8 @@ public class MCRFileStore extends MCRStore {
             retrieve(e.next()).repairMetadata();
         }
     }
+
+	public void remove(String id) {
+		stores.remove(id);
+	}
 }

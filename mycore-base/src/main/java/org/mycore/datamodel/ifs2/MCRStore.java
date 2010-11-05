@@ -25,6 +25,7 @@ package org.mycore.datamodel.ifs2;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -88,12 +89,31 @@ public abstract class MCRStore {
      *            the ID of the store
      */
     protected static MCRStore getStore(String ID) {
-        if (!stores.containsKey(ID)) {
-            MCRStore store = (MCRStore) MCRConfiguration.instance().getInstanceOf("MCR.IFS2.Store." + ID + ".Class");
-            store.init(ID);
-        }
         return stores.get(ID);
     }
+    
+    protected static <T extends MCRStore> T getStore(String ID, Class<T> storeClass) {
+    	MCRStore retrievedStore = stores.get(ID);
+    	if(storeClass.isAssignableFrom(retrievedStore.getClass())){
+    		return (T) retrievedStore;
+    	}
+    	
+    	return null;
+    }
+    
+    
+    
+
+	public static <T extends MCRStore> T createStore(String ID, Class<T> storeClass) throws Exception {
+		if (stores.containsKey(ID)) {
+			throw new MCRException("Could not create store with ID " + ID + ", store allready exists");
+		}
+		
+		T store = storeClass.newInstance();
+		store.init(ID);
+		
+		return getStore(ID, storeClass);
+	}
 
     /** The ID of the store */
     protected String id;
@@ -181,11 +201,6 @@ public abstract class MCRStore {
     }
 
     /**
-     * Used to fill small IDs with leading zeros
-     */
-    private static String nulls = "00000000000000000000000000000000";
-
-    /**
      * Returns the slot file object used to store data for the given ID. This
      * may be a file or directory, depending on the subclass of MCRStore that is
      * used.
@@ -221,9 +236,8 @@ public abstract class MCRStore {
      *         data
      */
     String[] getSlotPaths(int ID) {
-        String id = nulls + String.valueOf(ID);
-        id = id.substring(id.length() - idLength);
-
+		String id = createIDWithLeadingZeros(ID);
+        
         String[] paths = new String[slotLength.length + 1];
         StringBuffer path = new StringBuffer();
         int offset = 0;
@@ -237,6 +251,14 @@ public abstract class MCRStore {
         paths[paths.length - 1] = path.toString();
         return paths;
     }
+
+	private String createIDWithLeadingZeros(int ID) {
+		DecimalFormat numWithLeadingZerosFormat = new DecimalFormat();
+		numWithLeadingZerosFormat.setMinimumIntegerDigits(idLength);
+		numWithLeadingZerosFormat.setGroupingUsed(false);
+        String id = numWithLeadingZerosFormat.format(ID);
+		return id;
+	}
 
     /**
      * Returns true if data for the given ID is existing in the store.
@@ -495,4 +517,16 @@ public abstract class MCRStore {
             fo.delete();
         }
     }
+    
+    public boolean isEmpty() {
+		if (dir.list() == null) {
+			return true;
+		} else {
+			return dir.list().length == 0;
+		}
+	}
+
+	public void remove(String id) {
+		stores.remove(id);
+	}
 }

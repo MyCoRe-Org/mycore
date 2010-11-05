@@ -23,13 +23,14 @@
 
 package org.mycore.datamodel.ifs2;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -38,128 +39,94 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.vfs.FileObject;
-import org.apache.commons.vfs.Selectors;
-import org.apache.commons.vfs.VFS;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTestCase;
 
 /**
  * JUnit test for MCRFileStore
  * 
  * @author Frank Lützenkirchen
  */
-public class MCRFileStoreTest extends MCRTestCase {
-
-    private static MCRFileStore store;
-
-    protected void createStore() throws Exception {
-        File temp = File.createTempFile("base", "");
-        String path = temp.getAbsolutePath();
-        temp.delete();
-
-        setProperty("MCR.IFS2.Store.TEST.Class", "org.mycore.datamodel.ifs2.MCRFileStore", true);
-        setProperty("MCR.IFS2.Store.TEST.BaseDir", path, true);
-        setProperty("MCR.IFS2.Store.TEST.SlotLayout", "4-2-2", true);
-        store = MCRFileStore.getStore("TEST");
-    }
-
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-        if (store == null) {
-            createStore();
-        } else {
-            VFS.getManager().resolveFile(store.getBaseDir()).createFolder();
-        }
-    }
-
-    @Override
-    @After
-    public void tearDown() throws Exception {
-        super.tearDown();
-        VFS.getManager().resolveFile(store.getBaseDir()).delete(Selectors.SELECT_ALL);
-    }
+public class MCRFileStoreTest extends MCRIFS2TestCase {
 
     @Test
     public void create() throws Exception {
-        MCRFileCollection col = store.create();
+        MCRFileCollection col = getStore().create();
         assertNotNull(col);
         assertTrue(col.getID() > 0);
     }
 
     @Test
     public void createInt() throws Exception {
-        int id1 = store.getNextFreeID();
-        MCRFileCollection col1 = store.create(id1);
+        int id1 = getStore().getNextFreeID();
+        MCRFileCollection col1 = getStore().create(id1);
         assertNotNull(col1);
         assertEquals(id1, col1.getID());
-        assertTrue(store.exists(id1));
-        MCRFileCollection col2 = store.create(id1 + 1);
+        assertTrue(getStore().exists(id1));
+        MCRFileCollection col2 = getStore().create(id1 + 1);
         assertNotNull(col2);
         assertEquals(id1 + 1, col2.getID());
-        assertTrue(store.exists(id1 + 1));
+        assertTrue(getStore().exists(id1 + 1));
     }
 
     @Test
     public void delete() throws Exception {
-        MCRFileCollection col = store.create();
-        assertTrue(store.exists(col.getID()));
-        store.delete(col.getID());
-        assertFalse(store.exists(col.getID()));
-        MCRFileCollection col2 = store.retrieve(col.getID());
+        MCRFileCollection col = getStore().create();
+        assertTrue(getStore().exists(col.getID()));
+        getStore().delete(col.getID());
+        assertFalse(getStore().exists(col.getID()));
+        MCRFileCollection col2 = getStore().retrieve(col.getID());
         assertNull(col2);
     }
 
     @Test
     public void retrieve() throws Exception {
-        MCRFileCollection col1 = store.create();
-        MCRFileCollection col2 = store.retrieve(col1.getID());
+        MCRFileCollection col1 = getStore().create();
+        MCRFileCollection col2 = getStore().retrieve(col1.getID());
         assertNotNull(col2);
         assertEquals(col1.getID(), col2.getID());
         assertEquals(col1.getLastModified(), col2.getLastModified());
-        MCRFileCollection col3 = store.retrieve(col1.getID() + 1);
+        MCRFileCollection col3 = getStore().retrieve(col1.getID() + 1);
         assertNull(col3);
     }
 
     @Test
     public void exists() throws Exception {
-        int id = store.getNextFreeID();
-        assertFalse(store.exists(id));
-        store.create(id);
-        assertTrue(store.exists(id));
+        int id = getStore().getNextFreeID();
+        assertFalse(getStore().exists(id));
+        getStore().create(id);
+        assertTrue(getStore().exists(id));
     }
 
     @Test
     public void getNextFreeID() throws Exception {
-        int id1 = store.getNextFreeID();
+        int id1 = getStore().getNextFreeID();
         assertTrue(id1 >= 0);
-        assertFalse(store.exists(id1));
-        int id2 = store.create().getID();
+        assertFalse(getStore().exists(id1));
+        int id2 = getStore().create().getID();
         assertTrue(id2 > id1);
-        int id3 = store.getNextFreeID();
+        int id3 = getStore().getNextFreeID();
         assertTrue(id3 > id2);
     }
 
     @Test
     public void listIDs() throws Exception {
-        Iterator<Integer> IDs = store.listIDs(true);
+        Iterator<Integer> IDs = getStore().listIDs(true);
         while (IDs.hasNext()) {
-            store.delete(IDs.next());
+            getStore().delete(IDs.next());
         }
-        assertFalse(store.exists(1));
-        assertFalse(store.listIDs(true).hasNext());
-        assertFalse(store.listIDs(false).hasNext());
-        store.create();
-        store.create();
-        store.create();
+        assertFalse(getStore().exists(1));
+        assertFalse(getStore().listIDs(true).hasNext());
+        assertFalse(getStore().listIDs(false).hasNext());
+        int expectedNumOfFileCollections = 3;
+        
+        createFileCollection(expectedNumOfFileCollections);
+        
         ArrayList<Integer> l1 = new ArrayList<Integer>();
-        IDs = store.listIDs(true);
+        IDs = getStore().listIDs(true);
+        assertTrue("IDs iterator has no next element? ", IDs.hasNext());
         while (IDs.hasNext()) {
             int id = IDs.next();
             if (!l1.isEmpty()) {
@@ -167,9 +134,9 @@ public class MCRFileStoreTest extends MCRTestCase {
             }
             l1.add(id);
         }
-        assertTrue(l1.size() == 3);
+        assertEquals("ID list size", expectedNumOfFileCollections, l1.size());
         ArrayList<Integer> l2 = new ArrayList<Integer>();
-        IDs = store.listIDs(false);
+        IDs = getStore().listIDs(false);
         while (IDs.hasNext()) {
             int id = IDs.next();
             if (!l2.isEmpty()) {
@@ -182,13 +149,22 @@ public class MCRFileStoreTest extends MCRTestCase {
         assertEquals(l1, l2);
     }
 
+	private void createFileCollection(int numOfCollections) throws Exception,
+			IOException {
+		for (int i = 0; i < numOfCollections; i++) {
+        	MCRFileCollection fileCollection = getStore().create();
+        	int collectionID = fileCollection.getID();
+        	assertTrue("File collection with ID " + collectionID + " does not exists.",getStore().exists(collectionID));
+		}
+	}
+
     @Test
     public void basicFunctionality() throws Exception {
         Date first = new Date();
         synchronized (this) {
             wait(1000);
         }
-        MCRFileCollection col = store.create();
+        MCRFileCollection col = getStore().create();
         assertNotNull(col);
         assertTrue(col.getID() > 0);
         Date created = col.getLastModified();
@@ -218,7 +194,7 @@ public class MCRFileStoreTest extends MCRTestCase {
 
     @Test
     public void labels() throws Exception {
-        MCRFileCollection col = store.create();
+        MCRFileCollection col = getStore().create();
         assertTrue(col.getLabels().isEmpty());
         assertNull(col.getCurrentLabel());
         col.setLabel("de", "deutsch");
@@ -228,7 +204,7 @@ public class MCRFileStoreTest extends MCRTestCase {
         assertEquals(label, col.getCurrentLabel());
         assertEquals(2, col.getLabels().size());
         assertEquals("english", col.getLabel("en"));
-        MCRFileCollection col2 = store.retrieve(col.getID());
+        MCRFileCollection col2 = getStore().retrieve(col.getID());
         assertEquals(2, col2.getLabels().size());
         col.clearLabels();
         assertTrue(col.getLabels().isEmpty());
@@ -236,7 +212,7 @@ public class MCRFileStoreTest extends MCRTestCase {
 
     @Test
     public void repairMetadata() throws Exception {
-        MCRFileCollection col = store.create();
+        MCRFileCollection col = getStore().create();
         Document xml1 = MCRContent.readFrom(col.getMetadata()).asXML();
         col.repairMetadata();
         Document xml2 = MCRContent.readFrom(col.getMetadata()).asXML();
@@ -267,7 +243,7 @@ public class MCRFileStoreTest extends MCRTestCase {
         xml2 = MCRContent.readFrom(col.getMetadata()).asXML();
 
         col.fo.getChild("mcrdata.xml").delete();
-        col = store.retrieve(col.getID());
+        col = getStore().retrieve(col.getID());
         xml1 = MCRContent.readFrom(col.getMetadata()).asXML();
         assertTrue(equals(xml1, xml2));
 
