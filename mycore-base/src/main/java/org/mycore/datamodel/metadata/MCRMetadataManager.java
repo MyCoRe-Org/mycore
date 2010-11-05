@@ -24,8 +24,8 @@
 package org.mycore.datamodel.metadata;
 
 import java.io.File;
+import java.text.MessageFormat;
 import java.util.Collection;
-import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
@@ -187,7 +187,7 @@ public final class MCRMetadataManager {
                     new MCRMetaLinkID("child", mcrObject.getId(), mcrObject.getStructure().getParent().getXLinkLabel(), mcrObject.getLabel()));
                 MCRMetadataManager.fireUpdateEvent(parent);
             } catch (final Exception e) {
-                LOGGER.error("Error while store child ID in parent object.",e);
+                LOGGER.error("Error while store child ID in parent object.", e);
                 try {
                     MCRMetadataManager.delete(mcrObject);
                     LOGGER.error("Child object was removed.");
@@ -213,8 +213,11 @@ public final class MCRMetadataManager {
         MCRObjectID metaId = null;
         try {
             metaId = mcrDerivate.getDerivate().getMetaLink().getXLinkHrefID();
-            MCRMetadataManager.removeDerivateFromObject(metaId, mcrDerivate.getId());
-            LOGGER.info("Link in MCRObject " + metaId + " to MCRDerivate " + mcrDerivate.getId() + " is deleted.");
+            if (MCRMetadataManager.removeDerivateFromObject(metaId, mcrDerivate.getId())) {
+                LOGGER.info(MessageFormat.format("Link in MCRObject {0} to MCRDerivate {1} is deleted.", metaId, mcrDerivate.getId()));
+            } else {
+                LOGGER.warn(MessageFormat.format("Link in MCRObject {0} to MCRDerivate {1} could not be deleted.", metaId, mcrDerivate.getId()));
+            }
         } catch (final Exception e) {
             LOGGER.warn("Can't delete link for MCRDerivate " + mcrDerivate.getId() + " from MCRObject " + metaId + ". Error ignored.");
         }
@@ -575,7 +578,7 @@ public final class MCRMetadataManager {
                 parent.getStructure().addChild(new MCRMetaLinkID("child", mcrObject.getId(), mcrObject.getLabel(), mcrObject.getLabel()));
                 MCRMetadataManager.fireUpdateEvent(parent);
             } catch (final Exception e) {
-                LOGGER.error("Error while store child ID in parent object.",e);
+                LOGGER.error("Error while store child ID in parent object.", e);
                 try {
                     MCRMetadataManager.delete(mcrObject);
                     LOGGER.error("Child object was removed.");
@@ -669,18 +672,14 @@ public final class MCRMetadataManager {
         MCRMetadataManager.fireUpdateEvent(object);
     }
 
-    public static final void removeDerivateFromObject(final MCRObjectID objectID, final MCRObjectID derivateID) throws MCRPersistenceException {
+    public static final boolean removeDerivateFromObject(final MCRObjectID objectID, final MCRObjectID derivateID) throws MCRPersistenceException {
         final MCRObject object = MCRMetadataManager.retrieveMCRObject(objectID);
-        Iterator<MCRMetaLinkID> derIterator = object.getStructure().getDerivates().iterator();
-        while (derIterator.hasNext()) {
-            MCRMetaLinkID der = derIterator.next();
-            if (der.getXLinkHrefID().equals(objectID)) {
-                object.getService().setDate("modifydate");
-                derIterator.remove();
-                break;
-            }
+        if (object.getStructure().removeDerivate(derivateID)) {
+            object.getService().setDate("modifydate");
+            MCRMetadataManager.fireUpdateEvent(object);
+            return true;
         }
-        MCRMetadataManager.fireUpdateEvent(object);
+        return false;
     }
 
     private static void restore(final MCRDerivate mcrDerivate, final byte[] backup) {
