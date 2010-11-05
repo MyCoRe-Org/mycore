@@ -1,24 +1,24 @@
 /*
  * 
  * $Revision$ $Date$
- *
- * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
- *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program, in a file called gpl.txt or license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * 
+ * This file is part of *** M y C o R e *** See http://www.mycore.de/ for
+ * details.
+ * 
+ * This program is free software; you can use it, redistribute it and / or
+ * modify it under the terms of the GNU General Public License (GPL) as
+ * published by the Free Software Foundation; either version 2 of the License or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program, in a file called gpl.txt or license.txt. If not, write to the
+ * Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307 USA
  */
 
 package org.mycore.services.fieldquery;
@@ -38,13 +38,12 @@ import org.mycore.common.MCRException;
  * Represents a single result hit of a query. The hit has an ID which is the
  * MCRObjectID of the document that matched the query. The hit may have
  * MCRFieldValue objects set for sorting data or representing hit metadata like
- * score or rank.
- * 
- * If the same hit (hit with same ID) is in different result sets A and B, the
- * data of the hit objects is merged. The hit sort data is copied from one of
- * the hits that contains sort data. There is only on sort data set for each
- * hit. The hit metadata of both hits is preserved and copied from both hits, so
- * there can be multiple metadata sets from different searches for the same hit.
+ * score or rank. If the same hit (hit with same ID) is in different result sets
+ * A and B, the data of the hit objects is merged. The hit sort data is copied
+ * from one of the hits that contains sort data. There is only on sort data set
+ * for each hit. The hit metadata of both hits is preserved and copied from both
+ * hits, so there can be multiple metadata sets from different searches for the
+ * same hit.
  * 
  * @see MCRResults
  * @author Arne Seifert
@@ -176,6 +175,20 @@ public class MCRHit {
     }
 
     /**
+     * @param field
+     * @return the {@link MCRFieldValue} stored under the given field or
+     *         <code>null</code> if the field could not be found
+     */
+    public MCRFieldValue getMetaData(String field) {
+        for (MCRFieldValue v : metaData) {
+            if (v.getField().getName().equals(field)) {
+                return v;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Compares this hit with another hit by comparing the value of the given
      * search field. Used for sorting results.
      * 
@@ -186,7 +199,6 @@ public class MCRHit {
      * @return 0 if the two hits are equal, a positive value if this hit is
      *         "greater" than the other, a negative value if this hit is
      *         "smaller" than the other
-     * 
      * @see MCRResults#sortBy(List)
      */
     int compareTo(MCRFieldDef field, MCRHit other) {
