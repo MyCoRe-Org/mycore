@@ -57,18 +57,26 @@ public class MCRVersioningMetadataStoreTest extends MCRIFS2VersioningTestCase {
 
     @Test
     public void createDocument() throws Exception {
-        Document xml1 = new Document(new Element("root"));
-        MCRVersionedMetadata vm = getVersStore().create(MCRContent.readFrom(xml1));
-        assertNotNull(vm);
-        assertTrue(vm.getID() > 0);
-        assertTrue(vm.getRevision() > 0);
-        MCRVersionedMetadata vm2 = getVersStore().retrieve(vm.getID());
-        MCRContent xml2 = vm2.getMetadata();
-        assertEquals(MCRContent.readFrom(xml1).asString(), xml2.asString());
+        Document testXmlDoc = new Document(new Element("root"));
+        MCRContent testContent = MCRContent.readFrom(testXmlDoc);
+        
+        MCRVersionedMetadata versionedMetadata = getVersStore().create(testContent);
+        MCRContent contentFromStore = getVersStore().retrieve(versionedMetadata.getID()).getMetadata();
+        String contentStrFromStore = contentFromStore.asString();
+        
+        MCRContent mcrContent = MCRContent.readFrom(testXmlDoc);
+        String expectedContentStr = mcrContent.asString();
+        
+        
+        assertNotNull(versionedMetadata);
+        assertEquals(expectedContentStr, contentStrFromStore);
+        
+        assertTrue(versionedMetadata.getID() > 0);
+        assertTrue(versionedMetadata.getRevision() > 0);
 
-        MCRVersionedMetadata vm3 = getVersStore().create(MCRContent.readFrom(xml1));
-        assertTrue(vm3.getID() > vm.getID());
-        assertTrue(vm3.getRevision() > vm.getRevision());
+        MCRVersionedMetadata vm3 = getVersStore().create(MCRContent.readFrom(testXmlDoc));
+        assertTrue(vm3.getID() > versionedMetadata.getID());
+        assertTrue(vm3.getRevision() > versionedMetadata.getRevision());
     }
 
     @Test
@@ -77,8 +85,9 @@ public class MCRVersioningMetadataStoreTest extends MCRIFS2VersioningTestCase {
         assertTrue(id > 0);
         Document xml1 = new Document(new Element("root"));
         MCRVersionedMetadata vm1 = getVersStore().create(MCRContent.readFrom(xml1), id);
-        assertNotNull(vm1);
         MCRContent xml2 = getVersStore().retrieve(id).getMetadata();
+        
+        assertNotNull(vm1);
         assertEquals(MCRContent.readFrom(xml1).asString(), xml2.asString());
         getVersStore().create(MCRContent.readFrom(xml1), id + 1);
         MCRContent xml3 = getVersStore().retrieve(id + 1).getMetadata();

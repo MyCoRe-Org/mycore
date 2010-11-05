@@ -2,6 +2,7 @@ package org.mycore.common;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.junit.After;
 import org.junit.Before;
@@ -84,6 +85,25 @@ public class MCRTestCase {
             } catch (InterruptedException e) {
             }
         }
+    }
+    
+    /**
+     * Retrieve the resource file</br>
+     * Example: /Classname/recource.file
+     * 
+     * @param fileName
+     * @return 
+     *        the resource file as InputStream
+     */
+    protected InputStream getResourceAsStream(String fileName){
+        String fileLocation = buildFileLocation(fileName);
+        System.out.println("File location: " + fileLocation);
+        return Class.class.getResourceAsStream(fileLocation);
+    }
+
+    private String buildFileLocation(String fileName) {
+        String pathseparator = File.separator;
+        return pathseparator + this.getClass().getSimpleName() + pathseparator + fileName;
     }
 
 	@Test
