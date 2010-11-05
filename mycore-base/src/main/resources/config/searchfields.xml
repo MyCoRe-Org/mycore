@@ -20,7 +20,7 @@
     <field name="category" type="identifier" source="objectCategory">
       <xsl:for-each select="/mycoreobject/descendant::*[@classid and @categid]">
         <xsl:variable name="classid" select="@classid" />
-        <xsl:variable name="uri" select="concat('classification:metadata:levels:parents:',@classid,':',@categid)" />
+        <xsl:variable name="uri" select="concat('classification:metadata:0:parents:',@classid,':',@categid)" />
         <xsl:for-each select="document($uri)//category">
           <mcr:category xmlns:mcr="http://www.mycore.org/">
             <xsl:value-of select="concat($classid,':',@ID)" />
