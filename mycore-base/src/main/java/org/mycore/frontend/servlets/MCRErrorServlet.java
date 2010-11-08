@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jdom.DocType;
 import org.jdom.Document;
@@ -71,7 +72,8 @@ public class MCRErrorServlet extends HttpServlet {
 
     protected void generateErrorPage(HttpServletRequest request, HttpServletResponse response, String msg, Throwable ex, Integer statusCode,
         Class<? extends Throwable> exceptionType, String requestURI, String servletName) throws IOException {
-        LOGGER.error(MessageFormat.format("{0}: Error {1} occured. The following message was given: {2}", requestURI, statusCode, msg), ex);
+        LOGGER.log(ex == null ? Level.WARN : Level.ERROR,
+            MessageFormat.format("{0}: Error {1} occured. The following message was given: {2}", requestURI, statusCode, msg), ex);
 
         String rootname = "mcr_error";
         String style = MCRServlet.getProperty(request, "XSL.Style");
