@@ -1,19 +1,17 @@
 package org.mycore.frontend.editor;
 
-import java.util.Map;
-
 public class MCRTokenSubstitutor {
 
-    private Map<String, String> variables;
+    private MCRParameters parameters;
 
-    public MCRTokenSubstitutor(Map<String, String> variables) {
-        this.variables = variables;
+    public MCRTokenSubstitutor(MCRParameters parameters) {
+        this.parameters = parameters;
     }
 
     public String substituteTokens(String text) {
-        for (String name : variables.keySet()) {
+        for (String name : parameters.getParameterNames()) {
             String token = buildToken(name);
-            String value = getValue(name, token);
+            String value = parameters.getParameterValue(name);
             text = text.replace(token, value);
         }
         return text;
@@ -21,10 +19,5 @@ public class MCRTokenSubstitutor {
 
     private String buildToken(String name) {
         return "{" + name + "}";
-    }
-
-    private String getValue(String name, String defaultValue) {
-        String value = variables.get(name);
-        return (value != null ? value : defaultValue);
     }
 }
