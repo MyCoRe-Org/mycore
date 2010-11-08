@@ -51,9 +51,9 @@ import org.mycore.common.MCRException;
 public class MCRRequestParameters {
     protected final static Logger logger = Logger.getLogger(MCREditorServlet.class);
 
-    private Hashtable parameters = new Hashtable();
+    private Hashtable<String,String[]> parameters = new Hashtable<String,String[]>();
 
-    private Hashtable files = new Hashtable();
+    private Hashtable<String,FileItem> files = new Hashtable<String,FileItem>();
 
     private static int threshold;
 
@@ -139,14 +139,14 @@ public class MCRRequestParameters {
         if (values == null || values.length == 0) {
             return null;
         }
-        return values[0];
+        return values[0]; 
     }
 
     public String[] getParameterValues(String name) {
-        return (String[]) parameters.get(name);
+        return parameters.get(name);
     }
 
     public FileItem getFileItem(String name) {
-        return (FileItem) files.get(name);
+        return files.get(name);
     }
 }
