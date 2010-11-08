@@ -195,10 +195,7 @@ public class MCRXMLMetadataManager {
     public MCRMetadataStore getStore(String project, String type) {
         String projectType = project + "_" + type;
         String prefix = "MCR.IFS2.Store." + projectType + ".";
-
-        System.out.println(this.getClass().getSimpleName() + " prefix: " + prefix);
         String forceXML = MCRConfiguration.instance().getString(prefix + "ForceXML", null);
-        System.out.println(this.getClass().getSimpleName() + " forceXML: " + forceXML);
         if (forceXML == null) {
             synchronized (this) {
                 forceXML = MCRConfiguration.instance().getString(prefix + "ForceXML", null);
