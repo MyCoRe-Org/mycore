@@ -18,6 +18,9 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.frontend.indexbrowser.lucene.MCRIndexBrowserConfig;
+import org.mycore.frontend.indexbrowser.lucene.MCRIndexBrowserEntry;
+import org.mycore.frontend.indexbrowser.lucene.MCRIndexBrowserIncomingData;
 
 /**
  * Xml generator class for the index browser.
@@ -96,14 +99,15 @@ public class MCRIndexBrowserXmlGenerator {
             int index = from;
             do {
                 MCRIndexBrowserEntry firstEntry = resultList.get(index);
-                delims.add(new MyRangeDelim(index, firstEntry.getSortValue(0)));
+                String objectID = resultList.get(index).getObjectId();
+                delims.add(new MyRangeDelim(index, firstEntry.getSortValue(0),objectID));
                 index += stepSize;
                 String secondValue = "";
                 if (index >= to) {
                     index = to - 1;
                 }
                 secondValue = resultList.get(index).getSortValue(0);
-                delims.add(new MyRangeDelim(index, secondValue));
+                delims.add(new MyRangeDelim(index, secondValue, objectID));
             } while (++index < to);
             buildPrefixDifference(delims);
             buildXML(resultsElement, delims);
@@ -355,12 +359,14 @@ public class MCRIndexBrowserXmlGenerator {
             Element eFrom = new Element("from");
             eFrom.setAttribute("pos", String.valueOf(start.pos));
             eFrom.setAttribute("short", start.diff);
+            eFrom.setAttribute("id", start.objectID);
             eFrom.addContent(start.value);
             range.addContent(eFrom);
 
             Element eTo = new Element("to");
             eTo.setAttribute("pos", String.valueOf(end.pos));
             eTo.setAttribute("short", end.diff);
+            eTo.setAttribute("id", end.objectID);
             eTo.addContent(end.value);
             range.addContent(eTo);
         }
@@ -374,12 +380,13 @@ public class MCRIndexBrowserXmlGenerator {
         int pos;
 
         String value;
-
+        String objectID;
         String diff;
 
-        MyRangeDelim(int pos, String value) {
+        MyRangeDelim(int pos, String value, String objectID) {
             this.pos = pos;
             this.value = value;
+            this.objectID = objectID;
         }
     }
 
