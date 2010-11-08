@@ -17,7 +17,7 @@ public class MCRAttributeTokenSubstitutor {
 
     public String substituteTokens(String elementName, String attributeName, String defaultValue) {
         for (Element child : (List<Element>) (xml.getChildren(elementName))) {
-            String value = child.getAttributeValue("uri", "");
+            String value = child.getAttributeValue(attributeName, "");
             if (value.isEmpty())
                 continue;
 
