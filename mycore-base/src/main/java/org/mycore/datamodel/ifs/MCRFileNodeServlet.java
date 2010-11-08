@@ -77,12 +77,7 @@ public class MCRFileNodeServlet extends MCRServlet {
             String ownerID = getOwnerID(request);
             tx = MCRHIBConnection.instance().getSession().beginTransaction();
             MCRFilesystemNode root = MCRFilesystemNode.getRootNode(ownerID);
-            int pos = ownerID.length() + 1;
-            StringBuffer path = new StringBuffer(request.getPathInfo().substring(pos));
-            if (path.charAt(path.length() - 1) == '/' && path.length() > 1) {
-                path.deleteCharAt(path.length() - 1);
-            }
-            MCRFilesystemNode node = ((MCRDirectory) root).getChildByPath(path.toString());
+            MCRFilesystemNode node = ((MCRDirectory) root).getChildByPath(getPath(request));
             final long lastModified = node.getLastModified().getTimeInMillis();
             tx.commit();
             LOGGER.debug("getLastModified returned: " + lastModified);
@@ -178,13 +173,9 @@ public class MCRFileNodeServlet extends MCRServlet {
         }
 
         // root node is a directory
-        int pos = ownerID.length() + 1;
-        StringBuffer path = new StringBuffer(request.getPathInfo().substring(pos));
-        if (path.charAt(path.length() - 1) == '/' && path.length() > 1) {
-            path.deleteCharAt(path.length() - 1);
-        }
         MCRDirectory dir = (MCRDirectory) root;
-        MCRFilesystemNode node = dir.getChildByPath(path.toString());
+        String path = getPath(request);
+        MCRFilesystemNode node = dir.getChildByPath(path);
 
         if (node == null) {
             String msg = "Error: No such file or directory " + path;
@@ -199,7 +190,11 @@ public class MCRFileNodeServlet extends MCRServlet {
             return;
         }
     }
-
+    
+    /**
+     *  retrieves the derivate ID of the owning derivate from request path.
+     *  @param request - the http request object
+     */
     protected static String getOwnerID(HttpServletRequest request) {
         String pI = request.getPathInfo();
         StringBuffer ownerID = new StringBuffer(request.getPathInfo().length());
@@ -215,6 +210,23 @@ public class MCRFileNodeServlet extends MCRServlet {
             }
         }
         return ownerID.toString();
+    }
+    
+    /**
+     *  Retrieves the path of the file to display from request path.
+     *  @param request - the http request object
+     */
+    protected static String getPath(HttpServletRequest request){
+    	String ownerID = getOwnerID(request);
+    	int pos = ownerID.length() + 1;
+        StringBuffer path = new StringBuffer(request.getPathInfo().substring(pos));
+        if (path.length() > 1 && path.charAt(path.length() - 1) == '/') {
+            path.deleteCharAt(path.length() - 1);
+        }
+        if(path.length()==0){
+        	return "/";
+        }
+        return path.toString();
     }
 
     /**
