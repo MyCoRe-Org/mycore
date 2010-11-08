@@ -1,14 +1,18 @@
 package org.mycore.frontend.editor;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class MCRParameters {
 
-    private Map<String, List<String>> parameters;
+    private Map<String, List<String>> parameters = new HashMap<String, List<String>>();
 
+    public MCRParameters()
+    {}
+    
     public MCRParameters(Map<String, String[]> input) {
         for (String parameterName : input.keySet()) {
             String[] parameterValues = input.get(parameterName);
