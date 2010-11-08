@@ -180,9 +180,6 @@ public class MCRInputValidator {
         return new Document(stylesheet);
     }
 
-    /** Cache of reusable compiled regular expressions * */
-    private MCRCache regexpCache = new MCRCache(20, "InputValidator compiled reqular expressions");
-
     /**
      * Checks the input string against a regular expression.
      * 
@@ -193,22 +190,13 @@ public class MCRInputValidator {
      * @param regexp
      *            the regular expression using the syntax of the
      *            java.util.regex.Pattern class
-     * @return false if input is null, otherwise the result of the test is
-     *         returned
      */
     public boolean validateRegularExpression(String input, String regexp) {
         if (input == null) {
             input = "";
         }
 
-        Pattern p = (Pattern) regexpCache.get(regexp);
-
-        if (p == null) {
-            p = Pattern.compile(regexp);
-            regexpCache.put(regexp, p);
-        }
-
-        return p.matcher(input).matches();
+        return input.matches(regexp);
     }
 
     /**
