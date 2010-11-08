@@ -35,6 +35,7 @@ import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -750,8 +751,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         }
 
         removeFromIndex("id", id);
-
-        MCRObject obj = MCRMetadataManager.retrieveMCRObject(mid);
+        MCRBase obj = MCRMetadataManager.retrieve(mid);
         MCRMetadataManager.fireRepairEvent(obj);
         LOGGER.info("Repaired " + mid.toString());
     }
