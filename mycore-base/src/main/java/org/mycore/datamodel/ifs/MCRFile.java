@@ -338,7 +338,6 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         boolean changed = size != old_size || !md5.equals(old_md5);
 
         if (changed) {
-            lastModified = new GregorianCalendar();
             if (storeContentChange) {
                 storeContentChange(size - old_size);
             }
@@ -348,8 +347,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     }
 
     public void storeContentChange(long sizeDiff) {
-        manager.storeNode(this);
-
+        touch(false);
         if (hasParent()) {
             getParent().sizeOfChildChanged(sizeDiff);
         }

@@ -62,7 +62,7 @@ public abstract class MCRFilesystemNode {
     protected long size;
 
     /** The date of last modification of this node */
-    protected GregorianCalendar lastModified;
+    private GregorianCalendar lastModified;
 
     /** A flag indicating if this node is deleted and therefore invalid */
     protected boolean deleted = false;
@@ -242,12 +242,16 @@ public abstract class MCRFilesystemNode {
 
         checkName(name, true);
         this.name = name;
+        touch(true);
+    }
+
+    protected void touch(boolean recursive) {
         lastModified = new GregorianCalendar();
 
         manager.storeNode(this);
 
-        if (parentID != null) {
-            getParent().touch();
+        if (recursive && parentID != null) {
+            getParent().touch(true);
         }
     }
 
@@ -280,13 +284,7 @@ public abstract class MCRFilesystemNode {
         }
 
         this.label = label;
-        lastModified = new GregorianCalendar();
-
-        manager.storeNode(this);
-
-        if (parentID != null) {
-            getParent().touch();
-        }
+        touch(true);
     }
 
     /**

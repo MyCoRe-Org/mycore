@@ -91,8 +91,8 @@ public class MCRDirectory extends MCRFilesystemNode {
     /**
      * Internal constructor, do not use on your own.
      */
-    MCRDirectory(String ID, String parentID, String ownerID, String name, String label, long size, GregorianCalendar date, int numchdd,
-            int numchdf, int numchtd, int numchtf) {
+    MCRDirectory(String ID, String parentID, String ownerID, String name, String label, long size, GregorianCalendar date, int numchdd, int numchdf,
+        int numchtd, int numchtf) {
         super(ID, parentID, ownerID, name, label, size, date);
 
         numChildDirsHere = numchdd;
@@ -148,10 +148,7 @@ public class MCRDirectory extends MCRFilesystemNode {
             numChildDirsTotal++;
         }
 
-        lastModified = new GregorianCalendar();
-
-        manager.storeNode(this);
-
+        touch(false);
         if (hasParent()) {
             getParent().addChild(child);
         }
@@ -182,10 +179,8 @@ public class MCRDirectory extends MCRFilesystemNode {
             numChildDirsTotal--;
         }
 
-        lastModified = new GregorianCalendar();
-
-        manager.storeNode(this);
-
+        touch(false);
+        
         if (hasParent()) {
             getParent().removeChild(child);
         }
@@ -384,24 +379,9 @@ public class MCRDirectory extends MCRFilesystemNode {
      */
     protected void sizeOfChildChanged(long sizeDiff) {
         size += sizeDiff;
-        lastModified = new GregorianCalendar();
-
-        manager.storeNode(this);
-
+        touch(false);
         if (hasParent()) {
             getParent().sizeOfChildChanged(sizeDiff);
-        }
-    }
-
-    /**
-     * Updates the date of last modification to the current date and time, without changing anything else.
-     */
-    protected void touch() {
-        lastModified = new GregorianCalendar();
-        manager.storeNode(this);
-
-        if (hasParent()) {
-            getParent().touch();
         }
     }
 
