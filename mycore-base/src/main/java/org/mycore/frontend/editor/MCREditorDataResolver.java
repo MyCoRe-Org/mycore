@@ -48,10 +48,21 @@ public class MCREditorDataResolver implements MCRResolver {
      * @see org.mycore.common.xml.MCRURIResolver.MCRResolver#resolveElement(java.lang.String)
      */
     public Element resolveElement(String uri) throws Exception {
-        String[] tokens = uri.split(":");
+        String[] tokens = uri.split(":",2);
         String sessionID = tokens[1];
         String xPath = tokens[2];
-        
+        xPath = fixAttributeConditionsInXPath(xPath);
+
+        LOGGER.debug("MCREditorDataResolver editor session = " + sessionID);
+        LOGGER.debug("MCREditorDataResolver xPath = " + xPath);
+
+        Element editor = MCREditorSessionCache.instance().getEditorSession(sessionID).getXML();
+        Document xml = new MCREditorSubmission(editor).getXML();
+        Element resolved = (Element) (XPath.selectSingleNode(xml, xPath));
+        return (resolved == null ? new Element("nothingFound") : resolved);
+    }
+
+    private String fixAttributeConditionsInXPath(String xPath) {
         String pattern = "__([a-zA-Z0-9]+)__([a-zA-Z0-9]+)";
         StringBuffer sb = new StringBuffer();
         Matcher m = Pattern.compile(pattern).matcher(xPath);
@@ -59,13 +70,6 @@ public class MCREditorDataResolver implements MCRResolver {
             m.appendReplacement(sb, "[@" + m.group(1) + "='" + m.group(2) + "']");
         m.appendTail(sb);
         xPath = sb.toString();
-
-        LOGGER.debug("MCREditorDataResolver editor session = " + sessionID);
-        LOGGER.debug("MCREditorDataResolver xPath = " + xPath);
-
-        Element editor = MCREditorCache.instance().getEditor(sessionID).getXML();
-        Document xml = new MCREditorSubmission(editor).getXML();
-        Element resolved = (Element) (XPath.selectSingleNode(xml, xPath));
-        return (resolved == null ? new Element("nothingFound") : resolved);
+        return xPath;
     }
 }
