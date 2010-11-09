@@ -10,7 +10,7 @@ public class MCRDateTimeValidator extends MCRValidator {
 
     @Override
     public boolean hasRequiredPropertiesForValidation() {
-        return "datetime".equals(getProperty("type"));
+        return "datetime".equals(getProperty("type")) && hasProperty("format");
     }
 
     @Override
@@ -22,7 +22,7 @@ public class MCRDateTimeValidator extends MCRValidator {
     protected Date string2date(String input) throws Exception {
         String patterns = getProperty("format");
         for (String pattern : patterns.split(";")) {
-            DateFormat df = getDateFormat(pattern);
+            DateFormat df = getDateFormat(pattern.trim());
             try {
                 return df.parse(input);
             } catch (Exception ignored) {
