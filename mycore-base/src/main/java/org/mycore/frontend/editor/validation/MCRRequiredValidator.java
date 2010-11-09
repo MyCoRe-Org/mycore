@@ -10,14 +10,12 @@ public class MCRRequiredValidator extends MCRValidator {
     @Override
     public boolean isValid(String input) throws Exception {
         boolean required = Boolean.getBoolean(getProperty("required"));
-        
+
         if (!required)
             return true;
-        else if (input == null)
+        if (input == null)
             return false;
-        else if (input.trim().length() == 0)
-            return false;
-        else
-            return true;
+
+        return !input.trim().isEmpty();
     }
 }
