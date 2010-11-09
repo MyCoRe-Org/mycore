@@ -48,7 +48,7 @@ public class MCREditorDataResolver implements MCRResolver {
      * @see org.mycore.common.xml.MCRURIResolver.MCRResolver#resolveElement(java.lang.String)
      */
     public Element resolveElement(String uri) throws Exception {
-        String[] tokens = uri.split(":",2);
+        String[] tokens = uri.split(":",3);
         String sessionID = tokens[1];
         String xPath = tokens[2];
         xPath = fixAttributeConditionsInXPath(xPath);
