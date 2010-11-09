@@ -104,7 +104,7 @@ public abstract class MCRStore {
     
     
 
-	public static <T extends MCRStore> T createStore(String ID, Class<T> storeClass) throws Exception {
+	public static <T extends MCRStore> T createStore(String ID, Class<T> storeClass) throws InstantiationException, IllegalAccessException {
 		if (stores.containsKey(ID)) {
 			throw new MCRException("Could not create store with ID " + ID + ", store allready exists");
 		}

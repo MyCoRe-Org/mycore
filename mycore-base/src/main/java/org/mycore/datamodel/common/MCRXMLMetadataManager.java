@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -190,7 +191,8 @@ public class MCRXMLMetadataManager {
      * 
      * @param project the project, e.g. DocPortal
      * @param type the object type, e.g. document
-     * @throws ClassNotFoundException 
+     * @throws IllegalAccessException 
+     * @throws InstantiationException 
      */
     public MCRMetadataStore getStore(String project, String type) {
         String projectType = project + "_" + type;
@@ -200,35 +202,37 @@ public class MCRXMLMetadataManager {
             synchronized (this) {
                 forceXML = MCRConfiguration.instance().getString(prefix + "ForceXML", null);
                 if (forceXML == null) {
-                    setupStore(project, type, prefix);
+                    try {
+                        setupStore(project, type, prefix);
+                    } catch (Exception e) {
+                        throw new MCRPersistenceException(MessageFormat.format("Could not instantiate store for project {0} and object type {1}.", project,
+                            type), e);
+                    }
                 }
             }
         }
 
         MCRMetadataStore store = MCRMetadataStore.getStore(projectType);
-        if(store == null){
-            try {
-                store = MCRStore.createStore(projectType, MCRMetadataStore.class);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        if (store == null) {
+            throw new MCRPersistenceException(MessageFormat.format("Metadata store for project {0} and object type {1} is unconfigured.", project, type));
         }
         return store;
     }
 
-    private void setupStore(String project, String objectType, String configPrefix) {
+    @SuppressWarnings("unchecked")
+    private void setupStore(String project, String objectType, String configPrefix) throws InstantiationException, IllegalAccessException {
         MCRConfiguration config = MCRConfiguration.instance();
-
+        String baseID = project + "_" + objectType;
         String clazz = config.getString(configPrefix + "Class", null);
         if (clazz == null) {
             config.set(configPrefix + "Class", defaultClass);
             clazz = defaultClass;
         }
-        Class<?> impl;
+        Class<? extends MCRStore> impl;
         try {
-            impl = Class.forName(clazz);
+            impl = (Class<? extends MCRStore>) Class.forName(clazz);
         } catch (ClassNotFoundException e) {
-            throw new MCRException("Could not load class " + clazz + " for " + project + "_" + objectType);
+            throw new MCRException("Could not load class " + clazz + " for " + baseID);
         }
         if (MCRVersioningMetadataStore.class.isAssignableFrom(impl)) {
             String svnURL = config.getString(configPrefix + "SVNRepositoryURL", null);
@@ -259,6 +263,7 @@ public class MCRXMLMetadataManager {
 
         config.set(configPrefix + "BaseDir", typeDir.getAbsolutePath());
         config.set(configPrefix + "ForceXML", true);
+        MCRStore.createStore(baseID, impl);
     }
 
     /**
