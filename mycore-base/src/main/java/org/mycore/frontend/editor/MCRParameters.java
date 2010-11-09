@@ -5,17 +5,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 public class MCRParameters {
 
     private Map<String, List<String>> parameters = new HashMap<String, List<String>>();
 
-    public MCRParameters()
-    {}
-    
+    public MCRParameters() {
+    }
+
     public MCRParameters(Map<String, String[]> input) {
-        for (String parameterName : input.keySet()) {
-            String[] parameterValues = input.get(parameterName);
+        for (Entry<String, String[]> entry : input.entrySet()) {
+            String parameterName = entry.getKey();
+            String[] parameterValues = entry.getValue();
             if (parameterValues != null)
                 addParameterValues(parameterName, parameterValues);
         }
