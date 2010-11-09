@@ -26,16 +26,14 @@ public class MCRDecimalValidator extends MCRValidator {
 
         string = string.trim();
         checkForIllegalCharacters(string);
-        checkForMultipleDecimalSeparators(string, nf);
+
+        if (nf instanceof DecimalFormat)
+            checkForMultipleDecimalSeparators(string, (DecimalFormat) nf);
 
         return nf.parse(string).doubleValue();
     }
 
-    private void checkForMultipleDecimalSeparators(String string, NumberFormat nf) {
-        if (!(nf instanceof DecimalFormat))
-            return;
-
-        DecimalFormat df = (DecimalFormat) nf;
+    private void checkForMultipleDecimalSeparators(String string, DecimalFormat df) {
         DecimalFormatSymbols dfs = df.getDecimalFormatSymbols();
         String patternNonDecimalSeparators = "[^" + dfs.getDecimalSeparator() + "]";
         String decimalSeparatorsLeftOver = string.replaceAll(patternNonDecimalSeparators, "");
