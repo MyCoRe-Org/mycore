@@ -6,6 +6,14 @@ public abstract class MCRValidator {
 
     private Properties properties = new Properties();
 
+    public void setProperties(Properties properties) {
+        this.properties = properties;
+    }
+
+    public Properties getProperties() {
+        return properties;
+    }
+
     public void setProperty(String name, String value) {
         properties.setProperty(name, value);
     }
