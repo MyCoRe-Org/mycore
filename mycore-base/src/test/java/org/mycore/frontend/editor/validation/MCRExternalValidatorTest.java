@@ -6,18 +6,11 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.Before;
 
-public class MCRExternalValidatorTest {
-
-    MCRExternalValidator validator;
+public class MCRExternalValidatorTest extends MCRValidatorTest {
 
     @Before
     public void setup() {
         validator = new MCRExternalValidator();
-    }
-
-    @Test
-    public void testPropertiesMissing() {
-        assertFalse(validator.hasRequiredPropertiesForValidation());
     }
 
     @Test

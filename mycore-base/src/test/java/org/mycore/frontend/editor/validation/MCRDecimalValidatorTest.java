@@ -5,18 +5,11 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.junit.Before;
 
-public class MCRDecimalValidatorTest {
-
-    MCRDecimalValidator validator;
+public class MCRDecimalValidatorTest extends MCRValidatorTest {
 
     @Before
     public void setup() {
         validator = new MCRDecimalValidator();
-    }
-
-    @Test
-    public void testPropertiesMissing() {
-        assertFalse(validator.hasRequiredPropertiesForValidation());
     }
 
     @Test

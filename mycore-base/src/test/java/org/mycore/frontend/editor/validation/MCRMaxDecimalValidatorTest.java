@@ -5,20 +5,13 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.junit.Before;
 
-public class MCRMaxDecimalValidatorTest {
-
-    MCRMaxDecimalValidator validator;
+public class MCRMaxDecimalValidatorTest extends MCRValidatorTest {
 
     @Before
     public void setup() {
         validator = new MCRMaxDecimalValidator();
         validator.setProperty("type", "decimal");
         validator.setProperty("format", "de");
-    }
-
-    @Test
-    public void testPropertiesMissing() {
-        assertFalse(validator.hasRequiredPropertiesForValidation());
     }
 
     @Test

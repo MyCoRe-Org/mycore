@@ -5,19 +5,12 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.junit.Before;
 
-public class MCRMinIntegerValidatorTest {
-
-    MCRMinIntegerValidator validator;
+public class MCRMinIntegerValidatorTest extends MCRValidatorTest {
 
     @Before
     public void setup() {
         validator = new MCRMinIntegerValidator();
         validator.setProperty("type", "integer");
-    }
-
-    @Test
-    public void testPropertiesMissing() {
-        assertFalse(validator.hasRequiredPropertiesForValidation());
     }
 
     @Test

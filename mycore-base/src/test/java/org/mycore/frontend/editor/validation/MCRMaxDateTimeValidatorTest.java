@@ -5,20 +5,13 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.junit.Before;
 
-public class MCRMaxDateTimeValidatorTest {
-
-    MCRMaxDateTimeValidator validator;
+public class MCRMaxDateTimeValidatorTest extends MCRValidatorTest {
 
     @Before
     public void setup() {
         validator = new MCRMaxDateTimeValidator();
         validator.setProperty("type", "datetime");
         validator.setProperty("format", "dd.MM.yyyy");
-    }
-
-    @Test
-    public void testPropertiesMissing() {
-        assertFalse(validator.hasRequiredPropertiesForValidation());
     }
 
     @Test

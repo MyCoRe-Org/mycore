@@ -5,18 +5,11 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.junit.Before;
 
-public class MCRXSLConditionValidatorTest {
-
-    MCRXSLConditionValidator validator;
+public class MCRXSLConditionValidatorTest extends MCRValidatorTest {
 
     @Before
     public void setup() {
         validator = new MCRXSLConditionValidator();
-    }
-
-    @Test
-    public void testPropertiesMissing() {
-        assertFalse(validator.hasRequiredPropertiesForValidation());
     }
 
     @Test

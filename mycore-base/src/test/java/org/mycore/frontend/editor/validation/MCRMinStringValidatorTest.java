@@ -5,19 +5,12 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.junit.Before;
 
-public class MCRMinStringValidatorTest {
-
-    MCRMinStringValidator validator;
+public class MCRMinStringValidatorTest extends MCRValidatorTest {
 
     @Before
     public void setup() {
         validator = new MCRMinStringValidator();
         validator.setProperty("type", "string");
-    }
-
-    @Test
-    public void testPropertiesMissing() {
-        assertFalse(validator.hasRequiredPropertiesForValidation());
     }
 
     @Test

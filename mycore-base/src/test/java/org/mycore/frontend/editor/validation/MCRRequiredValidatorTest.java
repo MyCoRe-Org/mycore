@@ -5,18 +5,11 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.junit.Before;
 
-public class MCRRequiredValidatorTest {
-
-    MCRRequiredValidator validator;
+public class MCRRequiredValidatorTest extends MCRValidatorTest {
 
     @Before
     public void setup() {
         validator = new MCRRequiredValidator();
-    }
-
-    @Test
-    public void testPropertiesMissing() {
-        assertFalse(validator.hasRequiredPropertiesForValidation());
     }
 
     @Test

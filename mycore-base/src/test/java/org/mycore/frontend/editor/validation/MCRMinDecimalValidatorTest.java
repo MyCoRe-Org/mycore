@@ -5,20 +5,13 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.junit.Before;
 
-public class MCRMinDecimalValidatorTest {
-
-    MCRMinDecimalValidator validator;
+public class MCRMinDecimalValidatorTest extends MCRValidatorTest {
 
     @Before
     public void setup() {
         validator = new MCRMinDecimalValidator();
         validator.setProperty("type", "decimal");
         validator.setProperty("format", "de");
-    }
-
-    @Test
-    public void testPropertiesMissing() {
-        assertFalse(validator.hasRequiredPropertiesForValidation());
     }
 
     @Test

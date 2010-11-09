@@ -5,19 +5,12 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.junit.Before;
 
-public class MCRMaxStringValidatorTest {
-
-    MCRMaxStringValidator validator;
+public class MCRMaxStringValidatorTest extends MCRValidatorTest {
 
     @Before
     public void setup() {
         validator = new MCRMaxStringValidator();
         validator.setProperty("type", "string");
-    }
-
-    @Test
-    public void testPropertiesMissing() {
-        assertFalse(validator.hasRequiredPropertiesForValidation());
     }
 
     @Test
