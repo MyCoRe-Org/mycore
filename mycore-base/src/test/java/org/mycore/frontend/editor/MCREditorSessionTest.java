@@ -42,4 +42,10 @@ public class MCREditorSessionTest {
 
         assertThat(session1.getID(), not(equalTo(session2.getID())));
     }
+
+    @Test
+    public void testGetXML() {
+        MCREditorSession session = new MCREditorSession(xml, parameters);
+        assertThat(session.getXML(), sameInstance(xml));
+    }
 }

@@ -23,6 +23,7 @@ public class MCRAttributeTokenSubstitutorTest {
         xml.addContent(new Element("source").setAttribute("uri", "{scheme}:{id}"));
         xml.addContent(new Element("source").setAttribute("uri", "mcrobject:{id}"));
         xml.addContent(new Element("cancel").setAttribute("url", ATTRIBUTE_VALUE_WITHOUT_ANY_TOKENS));
+        xml.addContent(new Element("empty"));
         
         parameters = new MCRParameters();
         parameters.addParameterValue("id", "4711");
@@ -50,8 +51,14 @@ public class MCRAttributeTokenSubstitutorTest {
     }
 
     @Test 
-    public void testAttributeValueisMissingUseDefault() {
+    public void testElementisMissingUseDefault() {
         String value = ats.substituteTokens("missingElement", "missingAttribute", DEFAULT_VALUE);
+        assertThat(value, equalTo(DEFAULT_VALUE));
+    }
+    
+    @Test
+    public void testAttributeValueIsEmptyUseDefault() {
+        String value = ats.substituteTokens("empty", "missingAttribute", DEFAULT_VALUE);
         assertThat(value, equalTo(DEFAULT_VALUE));
     }
 }

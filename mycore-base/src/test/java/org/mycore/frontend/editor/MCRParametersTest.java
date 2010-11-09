@@ -3,7 +3,9 @@ package org.mycore.frontend.editor;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.Test;
@@ -97,5 +99,23 @@ public class MCRParametersTest {
     public void testDefault() {
         String defaultValue = "defaultValue";
         assertThat(parameters.getParameterValue("parameterName", defaultValue), equalTo(defaultValue));
+    }
+
+    @Test
+    public void testCreateFromMap() {
+        Map<String, String[]> map = new HashMap<String, String[]>();
+        map.put("one", new String[] { "1" });
+        map.put("two", new String[] { "2a", "2b" });
+        map.put("emptyArray", new String[] {} );
+        map.put("emptyValue", new String[] {""});
+        map.put("nullValue", null );
+
+        MCRParameters parameters = new MCRParameters(map);
+        
+        assertThat(parameters.getParameterValues("one").size(),equalTo(1));
+        assertThat(parameters.getParameterValues("two").size(),equalTo(2));
+        assertThat(parameters.getParameterValue("emptyArray"),nullValue());
+        assertThat(parameters.getParameterValue("emptyValue"),nullValue());
+        assertThat(parameters.getParameterValue("nullValue"),nullValue());
     }
 }
