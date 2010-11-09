@@ -67,10 +67,8 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
 
     public MCRSearcherCommands() {
         super();
-        command.add(new MCRCommand("rebuild metadata index", "org.mycore.frontend.cli.MCRSearcherCommands.repairMetaIndex",
-                "Repairs metadata index"));
-        command.add(new MCRCommand("rebuild content index", "org.mycore.frontend.cli.MCRSearcherCommands.repairContentIndex",
-                "Repairs metadata index"));
+        command.add(new MCRCommand("rebuild metadata index", "org.mycore.frontend.cli.MCRSearcherCommands.repairMetaIndex", "Repairs metadata index"));
+        command.add(new MCRCommand("rebuild content index", "org.mycore.frontend.cli.MCRSearcherCommands.repairContentIndex", "Repairs metadata index"));
     }
 
     static class RepairIndex {
@@ -163,10 +161,9 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
 
         private void addMetaToIndex(MCRObjectID id, byte[] xml, boolean update, List<MCRSearcher> searcherList) {
             for (MCRSearcher searcher : searcherList) {
-                List<MCRFieldValue> fields = MCRData2Fields.buildFields(xml, searcher.getIndex(), MCRFieldDef.OBJECT_METADATA
-                        + MCRFieldDef.OBJECT_CATEGORY, id.getTypeId());
-                List<MCRFieldValue> fieldsDerivate = MCRData2Fields.buildFields(xml, searcher.getIndex(), MCRFieldDef.DERIVATE_METADATA,
-                        id.getTypeId());
+                List<MCRFieldValue> fields = MCRData2Fields.buildFields(xml, searcher.getIndex(), MCRFieldDef.OBJECT_METADATA + MCRFieldDef.OBJECT_CATEGORY,
+                    id.getTypeId());
+                List<MCRFieldValue> fieldsDerivate = MCRData2Fields.buildFields(xml, searcher.getIndex(), MCRFieldDef.DERIVATE_METADATA, id.getTypeId());
                 fields.addAll(fieldsDerivate);
                 if (update) {
                     searcher.removeFromIndex(id.toString());
@@ -185,15 +182,19 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
             fileCriteria.add(Restrictions.eq("type", "F"));
             fileCriteria.setCacheMode(CacheMode.IGNORE);
             ScrollableResults results = fileCriteria.scroll(ScrollMode.FORWARD_ONLY);
-            while (results.next()) {
-                MCRFSNODES node = (MCRFSNODES) results.get(0);
-                GregorianCalendar greg = new GregorianCalendar();
-                greg.setTime(node.getDate());
-                MCRFile file = (MCRFile) MCRFileMetadataManager.instance().buildNode(node.getType(), node.getId(), node.getPid(),
-                        node.getOwner(), node.getName(), node.getLabel(), node.getSize(), greg, node.getStoreid(), node.getStorageid(),
-                        node.getFctid(), node.getMd5(), node.getNumchdd(), node.getNumchdf(), node.getNumchtd(), node.getNumchtf());
-                addFileToIndex(file, false, searcherList);
-                session.evict(node);
+            try {
+                while (results.next()) {
+                    MCRFSNODES node = (MCRFSNODES) results.get(0);
+                    GregorianCalendar greg = new GregorianCalendar();
+                    greg.setTime(node.getDate());
+                    MCRFile file = (MCRFile) MCRFileMetadataManager.instance().buildNode(node.getType(), node.getId(), node.getPid(), node.getOwner(),
+                        node.getName(), node.getLabel(), node.getSize(), greg, node.getStoreid(), node.getStorageid(), node.getFctid(), node.getMd5(),
+                        node.getNumchdd(), node.getNumchdf(), node.getNumchtd(), node.getNumchtf());
+                    addFileToIndex(file, false, searcherList);
+                    session.evict(node);
+                }
+            } finally {
+                results.close();
             }
         }
 
