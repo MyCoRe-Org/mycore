@@ -36,6 +36,7 @@ public class MCRRequiredValidatorTest {
         validator.setProperty("required", "true");
         assertFalse(validator.isValidExceptionsCatched(""));
         assertFalse(validator.isValidExceptionsCatched(" "));
+        assertFalse(validator.isValidExceptionsCatched(null));
     }
 
     @Test
