@@ -27,6 +27,7 @@ import org.hibernate.Criteria;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -106,7 +107,6 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
                     MCRSearcher searcher = MCRSearcherFactory.getSearcher(index);
                     LOGGER.info("clearing index " + index);
                     searcher.clearIndex();
-                    // searcher.notifySearcher("insert");
                     searcherList.add(searcher);
                 }
             }
@@ -114,11 +114,7 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
         }
 
         private void createNewIndexFor(List<MCRSearcher> searcherList) {
-            Session session = MCRHIBConnection.instance().getSession();
-            Criteria xmlCriteria = session.createCriteria(MCRFSNODES.class);
-            xmlCriteria.setCacheMode(CacheMode.IGNORE);
-            ScrollableResults results = xmlCriteria.scroll(ScrollMode.FORWARD_ONLY);
-            mechanism.repair(results, session, searcherList);
+            mechanism.repair(searcherList);
         }
 
         private List<String> getIndexes() {
@@ -151,13 +147,13 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
     }
 
     interface RepairMechanism {
-        public void repair(ScrollableResults results, Session session, List<MCRSearcher> searcherList);
+        public void repair(List<MCRSearcher> searcherList);
     }
 
     static class MetaIndexRepairMechanism implements RepairMechanism {
 
         @Override
-        public void repair(ScrollableResults results, Session session, List<MCRSearcher> searcherList) {
+        public void repair(List<MCRSearcher> searcherList) {
             MCRXMLMetadataManager mcrxmlTableManager = MCRXMLMetadataManager.instance();
             for (String id : mcrxmlTableManager.listIDs()) {
                 MCRObjectID mcrid = MCRObjectID.getInstance(id);
@@ -183,7 +179,12 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
     static class ContentIndexRepairMechanism implements RepairMechanism {
 
         @Override
-        public void repair(ScrollableResults results, Session session, List<MCRSearcher> searcherList) {
+        public void repair(List<MCRSearcher> searcherList) {
+            Session session = MCRHIBConnection.instance().getSession();
+            Criteria fileCriteria = session.createCriteria(MCRFSNODES.class);
+            fileCriteria.add(Restrictions.eq("type", "F"));
+            fileCriteria.setCacheMode(CacheMode.IGNORE);
+            ScrollableResults results = fileCriteria.scroll(ScrollMode.FORWARD_ONLY);
             while (results.next()) {
                 MCRFSNODES node = (MCRFSNODES) results.get(0);
                 GregorianCalendar greg = new GregorianCalendar();
