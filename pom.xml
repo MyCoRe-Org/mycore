@@ -168,6 +168,16 @@
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>cobertura-maven-plugin</artifactId>
             <version>2.4</version>
+            <configuration>
+              <instrumentation>
+                <ignores>
+                  <ignore>org.mycore.iview2.*</ignore>
+                </ignores>
+                <excludes>
+                  <exclude>org/mycore/iview2/**</exclude>
+                </excludes>
+              </instrumentation>
+            </configuration>
           </plugin>
           <plugin>
             <artifactId>maven-javadoc-plugin</artifactId>
