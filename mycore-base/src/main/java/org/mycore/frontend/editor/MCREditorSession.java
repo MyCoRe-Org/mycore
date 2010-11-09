@@ -29,6 +29,8 @@ public class MCREditorSession {
         String defaultSourceURI = "buildxml:_rootName_=emptySource";
         this.sourceURI = pts.substituteTokens("source", "uri", defaultSourceURI);
         this.cancelURL = pts.substituteTokens("cancel", "url", defaultCancelURL);
+        xml.removeChildren("cancel");
+        xml.addContent(new Element("cancel").setAttribute("url", cancelURL));
     }
 
     private void buildAndSetID() {
