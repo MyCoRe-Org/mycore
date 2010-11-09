@@ -92,4 +92,9 @@ public class MCRDerivateWithURNSearcher extends MCRSearcher {
         MCRQuery q = new MCRQuery(tFCond);
         return MCRQueryManager.search(q);
     }
+
+    @Override
+    public boolean isIndexer() {
+        return false;
+    }
 }

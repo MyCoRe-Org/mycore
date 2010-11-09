@@ -101,8 +101,10 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
                 if (isIndexType(index, mechanism.getIndexType())) {
                     MCRSearcher searcher = MCRSearcherFactory.getSearcher(index);
                     LOGGER.info("clearing index " + index);
-                    searcher.clearIndex();
-                    searcherList.add(searcher);
+                    if (searcher.isIndexer()) {
+                        searcher.clearIndex();
+                        searcherList.add(searcher);
+                    }
                 }
             }
             return searcherList;
@@ -143,6 +145,7 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
 
     interface RepairMechanism {
         public void repair(List<MCRSearcher> searcherList);
+
         public String getIndexType();
     }
 

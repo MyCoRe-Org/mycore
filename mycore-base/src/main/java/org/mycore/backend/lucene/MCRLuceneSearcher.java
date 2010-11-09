@@ -630,4 +630,9 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
     public String toString() {
         return getClass().getSimpleName() + ":" + ID;
     }
+
+    @Override
+    public boolean isIndexer() {
+        return true;
+    }
 }

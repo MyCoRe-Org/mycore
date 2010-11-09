@@ -56,6 +56,11 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
 
     protected static MCRCache RETURN_ID_CACHE = new MCRCache(MCRConfiguration.instance().getInt("MCR.Searcher.ReturnID.Cache", 100),
             "MCRSearcher ReturnID Cache");
+    
+    /**
+     * Returns false if this MCRSearcher implements only search and is therefore read-only.
+     */
+    public abstract boolean isIndexer();
 
     /**
      * Initializes the searcher and sets its unique ID.
