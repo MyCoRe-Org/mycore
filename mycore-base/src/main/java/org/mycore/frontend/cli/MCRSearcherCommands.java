@@ -53,9 +53,6 @@ import org.mycore.services.fieldquery.MCRSearcherFactory;
  */
 
 public class MCRSearcherCommands extends MCRAbstractCommands {
-    private static final String INDEX_TYPE_CONTENT = "file";
-
-    private static final String INDEX_TYPE_METADATA = "object";
 
     private static Logger LOGGER = Logger.getLogger(MCRSearcherCommands.class);
 
@@ -101,7 +98,7 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
         private List<MCRSearcher> clearAndInitSearchers() throws IOException, JDOMException {
             List<MCRSearcher> searcherList = new ArrayList<MCRSearcher>();
             for (String index : getIndexes()) {
-                if (isIndexType(index, INDEX_TYPE_METADATA)) {
+                if (isIndexType(index, mechanism.getIndexType())) {
                     MCRSearcher searcher = MCRSearcherFactory.getSearcher(index);
                     LOGGER.info("clearing index " + index);
                     searcher.clearIndex();
@@ -146,6 +143,7 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
 
     interface RepairMechanism {
         public void repair(List<MCRSearcher> searcherList);
+        public String getIndexType();
     }
 
     static class MetaIndexRepairMechanism implements RepairMechanism {
@@ -170,6 +168,11 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
                 }
                 searcher.addToIndex(id.toString(), id.toString(), fields);
             }
+        }
+
+        @Override
+        public String getIndexType() {
+            return "object";
         }
     }
 
@@ -207,6 +210,11 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
                     searcher.removeFromIndex(entryID);
                 searcher.addToIndex(entryID, returnID, fields);
             }
+        }
+
+        @Override
+        public String getIndexType() {
+            return "file";
         }
     }
 
