@@ -31,6 +31,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
@@ -45,6 +46,9 @@ import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRConstants;
+import org.mycore.frontend.editor.validation.MCRCombinedValidator;
+import org.mycore.frontend.editor.validation.MCRRequiredValidator;
+import org.mycore.frontend.editor.validation.MCRValidator;
 
 /**
  * Container class that holds all data and files edited and submitted from an
@@ -499,58 +503,44 @@ public class MCREditorSubmission {
     }
 
     private boolean checkCondition(Element condition, String name, String value) {
-        boolean required = "true".equals(condition.getAttributeValue("required"));
+        value = (value == null ? "" : value.trim());
+        Properties attributes = attributes2properties(condition);
+        fixRequiredCondition(name, attributes);
 
-        if (required) {
-            if (name.endsWith("]") && (value == null || value.trim().length() == 0)) {
-                return true; // repeated field is required but missing, this
-                // is
-            }
-            // ok
-            else if (!MCRInputValidator.instance().validateRequired(value)) {
-                return false; // field is required but empty, this is an error
-            }
-        } else if (!required && value.trim().length() == 0) {
-            return true; // field is not required and empty, this is OK
+        if (value.isEmpty()) {
+            return checkEmptyValue(value, attributes);
+        } else {
+            return checkNonEmptyValue(value, attributes);
         }
+    }
 
-        String type = condition.getAttributeValue("type");
-        String min = condition.getAttributeValue("min");
-        String max = condition.getAttributeValue("max");
-        String format = condition.getAttributeValue("format");
+    private void fixRequiredCondition(String name, Properties attributes) {
+        boolean required = "true".equals(attributes.getProperty("required"));
+        boolean repeated = name.endsWith("]");
+        required = required && !repeated;
+        attributes.setProperty("required", Boolean.toString(required));
+    }
 
-        if (type != null && !MCRInputValidator.instance().validateMinMaxType(value, type, min, max, format)) {
-            return false; // field type, data format and/or min max value is
-            // illegal
+    private boolean checkNonEmptyValue(String value, Properties properties) {
+        MCRCombinedValidator validator = new MCRCombinedValidator();
+        validator.setProperties(properties);
+        validator.addPredefinedValidators();
+        return validator.isValidExceptionsCatched(value);
+    }
+
+    private boolean checkEmptyValue(String value, Properties properties) {
+        MCRValidator validator = new MCRRequiredValidator();
+        validator.setProperties(properties);
+        return validator.isValidExceptionsCatched(value);
+    }
+
+    private Properties attributes2properties(Element condition) {
+        Properties attributeValues = new Properties();
+        for (Attribute attribute : (List<Attribute>) (condition.getAttributes())) {
+            if (!attribute.getValue().isEmpty())
+                attributeValues.setProperty(attribute.getName(), attribute.getValue());
         }
-
-        String minLength = condition.getAttributeValue("minLength");
-        String maxLength = condition.getAttributeValue("maxLength");
-
-        if ((maxLength != null || minLength != null) && !MCRInputValidator.instance().validateLength(value, minLength, maxLength)) {
-            return false; // field min/max length is illegal
-        }
-
-        String regexp = condition.getAttributeValue("regexp");
-
-        if (regexp != null && !MCRInputValidator.instance().validateRegularExpression(value, regexp)) {
-            return false; // field does not match given regular expression
-        }
-
-        String xsl = condition.getAttributeValue("xsl");
-
-        if (xsl != null && !MCRInputValidator.instance().validateXSLCondition(value, xsl)) {
-            return false; // field does not match given xsl condition
-        }
-
-        String clazz = condition.getAttributeValue("class");
-        String method = condition.getAttributeValue("method");
-
-        if (clazz != null && method != null && !MCRInputValidator.instance().validateExternally(clazz, method, value)) {
-            return false; // field does not validate using external method
-        }
-
-        return true;
+        return attributeValues;
     }
 
     private void addVariable(String path, String text) {
