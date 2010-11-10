@@ -252,7 +252,7 @@
 <xsd:sequence>
  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
    <xsd:complexType>
-     <xsd:attribute name="sourcepath" use="required" type="xsd:string" />
+     <xsd:attribute name="sourcepath" use="optional" type="xsd:string" />
      <xsd:attribute name="maindoc" use="required" type="xsd:string"/>
      <xsd:attribute name="ifsid" use="optional" type="xsd:string"/>
      <xsd:attribute name="type" use="optional" type="mcrdefaulttype" />
