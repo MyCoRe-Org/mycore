@@ -37,11 +37,13 @@ public class MCRImportClassificationMappingManager {
     private File classMappingDir;
 
     public MCRImportClassificationMappingManager(File mappingDirectory) {
-        if(!mappingDirectory.exists())
-            mappingDirectory.mkdirs();
+        if(!mappingDirectory.exists()) {
+            if(!mappingDirectory.mkdirs())
+                LOGGER.warn("Couldn't create directory " + mappingDirectory.getAbsolutePath());
+        }
         if(!mappingDirectory.isDirectory())
             LOGGER.warn(mappingDirectory + " is not a directory");
-        classMappingDir = mappingDirectory;
+        this.classMappingDir = mappingDirectory;
         init();
     }
 
@@ -69,7 +71,7 @@ public class MCRImportClassificationMappingManager {
             for(Element map : maps) {
                 String importValue = map.getAttributeValue("importValue");
                 String mycoreValue = map.getAttributeValue("mycoreValue");
-                valueMapper.addPair(importValue, mycoreValue);
+                valueMapper.put(importValue, mycoreValue);
             }
             classificationMapTable.put(id, valueMapper);
         }
@@ -102,7 +104,7 @@ public class MCRImportClassificationMappingManager {
                     else
                         LOGGER.warn("The root tag of " + document.getBaseURI() + " is not a valid!");
                 } catch(Exception e) {
-                    // do nothing here, because we need only valid mapping files
+                    LOGGER.warn("Couldn't parse xml file " + file.getAbsolutePath(), e);
                 }
             }
         }
@@ -151,7 +153,7 @@ public class MCRImportClassificationMappingManager {
         MCRImportClassificationMap map = classificationMapTable.get(classId);
         if(map == null)
             return false;
-        return map.getTable().containsKey(importValue);
+        return map.containsKey(importValue);
     }
 
     /**
@@ -169,8 +171,8 @@ public class MCRImportClassificationMappingManager {
             map = new MCRImportClassificationMap(classId);
             classificationMapTable.put(classId, map);
         }
-        if(!map.getTable().contains(importValue))
-            map.addPair(importValue, null);
+        if(!map.containsKey(importValue))
+            map.put(importValue, null);
     }
 
     /**
@@ -201,10 +203,9 @@ public class MCRImportClassificationMappingManager {
             map = new MCRImportClassificationMap(classId);
             classificationMapTable.put(classId, map);
         }
-        if(map.getTable().contains(importValue)) {
-            map.removePair(importValue);
-        }
-        map.addPair(importValue, newMyCoReValue);
+        if(map.containsKey(importValue))
+            map.remove(importValue);
+        map.put(importValue, newMyCoReValue);
     }
 
     /**
@@ -232,6 +233,7 @@ public class MCRImportClassificationMappingManager {
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
         FileOutputStream output = new FileOutputStream(classMappingDir.getAbsoluteFile() + "/" + classId + ".xml");
         outputter.output(new Document(rootElement), output);
+        output.close();
     }
 
     /**

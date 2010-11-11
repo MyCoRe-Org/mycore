@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.mycore.common.MCRConstants;
 import org.mycore.importer.mapping.datamodel.MCRImportDatamodel;
+import org.mycore.importer.mapping.datamodel.MCRImportDatamodel.Inheritance;
 
 /**
  * <p>
@@ -302,29 +303,24 @@ public class MCRImportObject {
      * @return a new instance of <code>MCRImportMetadata</code>
      */
     protected MCRImportMetadata createMetadata(String metadataName) {
-        try {
-            // receive the enclosingName, classname, heritable and notinherit from the datamodel
-            String className = datamodel.getClassname(metadataName);
-            Boolean notInherit = datamodel.isNotinherit(metadataName);
-            Boolean heritable = datamodel.isHeritable(metadataName);
-            String tag = datamodel.getEnclosingName(metadataName);
-            if(className == null || tag == null) {
-                LOGGER.error("Cannot create metadata element '" + metadataName + "'! Because the class name " + 
-                             " (e.g. 'classification') or the enclosing name (e.g. 'def.title') is null.");
-                return null;
-            }
-            // create the metadata object
-            MCRImportMetadata metaData = new MCRImportMetadata(tag);
-            metaData.setClassName(className);
-            if(notInherit != null)
-                metaData.setNotinherit(notInherit);
-            if(heritable != null)
-                metaData.setHeritable(heritable);
-            return metaData;
-        } catch(Exception exc) {
-            LOGGER.error(exc);
+        // receive the enclosingName, classname, heritable and notinherit from the datamodel
+        String className = datamodel.getClassname(metadataName);
+        Inheritance notInherit = datamodel.isNotinherit(metadataName);
+        Inheritance heritable = datamodel.isHeritable(metadataName);
+        String tag = datamodel.getEnclosingName(metadataName);
+        if (className == null || tag == null) {
+            LOGGER.error("Cannot create metadata element '" + metadataName + "'! Because the class name "
+                    + " (e.g. 'classification') or the enclosing name (e.g. 'def.title') is null.");
+            return null;
         }
-        return null;
+        // create the metadata object
+        MCRImportMetadata metaData = new MCRImportMetadata(tag);
+        metaData.setClassName(className);
+        if (notInherit != Inheritance.IGNORE)
+            metaData.setNotinherit(notInherit.getBoolean());
+        if (heritable != Inheritance.IGNORE)
+            metaData.setHeritable(heritable.getBoolean());
+        return metaData;
     }
 
     /**

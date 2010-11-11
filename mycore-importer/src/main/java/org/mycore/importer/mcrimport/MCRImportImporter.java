@@ -40,8 +40,6 @@ public class MCRImportImporter {
 
     private static final Logger LOGGER = Logger.getLogger(MCRImportImporter.class);
     
-    private static File TEMP_DIR;
-
     private static final String LOAD_OBJECT_COMMAND = "load object from file ";
     
     private static final String LOAD_DERIVATE_COMMAND = "internal import derivate ";
@@ -50,6 +48,8 @@ public class MCRImportImporter {
 
     private SAXBuilder builder;
 
+    private File tempDirectory;
+    
     private Hashtable<String, MCRImportFileStatus> idTable = new Hashtable<String, MCRImportFileStatus>();
 
     protected ArrayList<MCRImportStatusListener> listenerList;
@@ -91,10 +91,12 @@ public class MCRImportImporter {
             throw new FileNotFoundException(mainDirectory.getAbsolutePath());
 
         // delete the temp directory from previous imports and create it again
-        TEMP_DIR = new File(config.getSaveToPath(), "_temp");
+        tempDirectory = new File(config.getSaveToPath(), "_temp");
         LOGGER.info("delete '_temp' directory");
-        MCRUtils.deleteDirectory(TEMP_DIR);
-        TEMP_DIR.mkdirs();
+        if(MCRUtils.deleteDirectory(tempDirectory))
+            LOGGER.warn("Unable to delete temp directory " + tempDirectory.getAbsolutePath());
+        if(tempDirectory.mkdirs())
+            LOGGER.warn("Unable to create temp directory " + tempDirectory.getAbsolutePath());
 
         // create the classification manager
         this.classManager = new MCRImportClassificationMappingManager(new File(config.getSaveToPath() + "classification/"));
@@ -143,6 +145,7 @@ public class MCRImportImporter {
      * @param dir the directory where to search
      */
     protected void buildIdTable(File dir) {
+        LOGGER.info("Import preprocessing... This could take some time!");
         for(File file : dir.listFiles()) {
             if(file.isDirectory())
                 // call this method recursive if its a directory
@@ -171,6 +174,7 @@ public class MCRImportImporter {
                 }
             }
         }
+        LOGGER.info("Preprocessing finished!");
     }
 
     /**
@@ -245,10 +249,18 @@ public class MCRImportImporter {
             } else if(type.equals(MCRImportFileType.MCRDERIVATE)) {
                 mcrDocument = createMCRDerivateXml(fs);
                 loadCommand = new StringBuffer(LOAD_DERIVATE_COMMAND);
+            } else {
+                LOGGER.warn("Unknown type " + type.toString());
+                return;
             }
 
             // save xml file to temp dir
             File mcrFile = saveDocumentToTemp(fs, mcrDocument);
+            if(mcrFile == null) {
+                LOGGER.warn("Cannot create import file. Cancel import id " + importId);
+                return;
+            }
+
             fs.setSavedInTempDirectory(true);
             String mcrId = fs.getMycoreId().toString();
 
@@ -351,21 +363,38 @@ public class MCRImportImporter {
      * @param documentToSave the xml document
      * @return the saved file
      * @throws FileNotFoundException
-     * @throws IOException
      */
-    protected File saveDocumentToTemp(MCRImportFileStatus fs, Document documentToSave) throws FileNotFoundException, IOException {
+    protected File saveDocumentToTemp(MCRImportFileStatus fs, Document documentToSave) throws FileNotFoundException {
         File saveToFile = getMCRXmlFile(fs.getMycoreId());
+        if(saveToFile == null)
+            return null;
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
-        FileOutputStream output = new FileOutputStream(saveToFile);
-        outputter.output(documentToSave, output);
-        output.close();
+        FileOutputStream output = null;
+        try {
+            output = new FileOutputStream(saveToFile);
+            outputter.output(documentToSave, output);
+        } catch(IOException ioExc) {
+            LOGGER.error("while saving document to temp directory " + saveToFile.getAbsolutePath());
+            return null;
+        } finally {
+            try {
+                output.close();
+            } catch(IOException ioExc) {
+                LOGGER.error("while saving document to temp directory " + saveToFile.getAbsolutePath(), ioExc);
+                return null;
+            }
+        }
         return saveToFile;
     }
 
     public File getMCRXmlFile(MCRObjectID mcrId) {
-        File subfolder = new File(TEMP_DIR, mcrId.getTypeId());
-        if(!subfolder.exists())
-            subfolder.mkdir();
+        File subfolder = new File(this.tempDirectory, mcrId.getTypeId());
+        if(!subfolder.exists()) {
+            if(!subfolder.mkdirs()) {
+                LOGGER.warn("Unable to create folder " + subfolder.getAbsolutePath());
+                return null;
+            }
+        }
         StringBuffer fileName = new StringBuffer(mcrId.toString()).append(".xml");
         return new File(subfolder, fileName.toString());
     }
@@ -487,7 +516,7 @@ public class MCRImportImporter {
      * Internal filter class which returns only true
      * if the element is a xlink. 
      */
-    private class LinkIdFilter implements Filter {
+    private static class LinkIdFilter implements Filter {
         private static final long serialVersionUID = 1L;
 
         public boolean matches(Object arg0) {
@@ -511,7 +540,7 @@ public class MCRImportImporter {
      * Internal filter calls which returns only true
      * if the element is a classification.
      */
-    private class ClassificationFilter implements Filter {
+    private static class ClassificationFilter implements Filter {
         private static final long serialVersionUID = 1L;
 
         public boolean matches(Object arg0) {

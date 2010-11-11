@@ -428,18 +428,31 @@ public class MCRImportMappingManager {
 
         // create the xml
         Element ioElement = importObject.createXML();
-        String savePath = config.getSaveToPath() + subFolderName + "/";
+        StringBuffer savePath = new StringBuffer(config.getSaveToPath());
+        savePath.append(subFolderName).append("/");
 
+        FileOutputStream output = null;
         // save the new mapped object
         try {
-            File folder = new File(savePath + "/");
+            File folder = new File(savePath.toString());
             if(!folder.exists())
-                folder.mkdirs();
-            FileOutputStream output = new FileOutputStream(folder.getAbsolutePath() + "/" + id + ".xml");
+                if(!folder.mkdirs()) {
+                    LOGGER.warn("Unable to create folder " + folder.getAbsolutePath() +
+                                ". Cannot save MyCoRe import object.");
+                    return;
+                }
+            output = new FileOutputStream(folder.getAbsolutePath() + "/" + id + ".xml");
             outputter.output(new Document(ioElement), output);
-            output.close();
         } catch(Exception e) {
-            LOGGER.error(e);
+            LOGGER.error("Error while saving import object.",e);
+        } finally {
+            if(output != null) {
+                try {
+                    output.close();
+                } catch(IOException ioExc) {
+                    LOGGER.error("Error while closing output stream.", ioExc);
+                }
+            }
         }
     }
 
@@ -452,19 +465,32 @@ public class MCRImportMappingManager {
     public void saveDerivate(MCRImportDerivate derivate) {
         Element derivateElement = derivate.createXML();
         File folder = new File(config.getSaveToPath() + "derivates/");
-        if(!folder.exists())
-            folder.mkdirs();
+        if(!folder.exists()) {
+            if(!folder.mkdirs()) {
+                LOGGER.warn("Unable to create folder " + folder.getAbsolutePath() +
+                            ". Cannot save derivate " + derivate.getDerivateId());
+                return;
+            }
+        }
+        FileOutputStream output = null;
         try {
             // save the derivate xml file
-            FileOutputStream output = new FileOutputStream(folder.getAbsolutePath() + "/" + derivate.getDerivateId() + ".xml");
+            output = new FileOutputStream(folder.getAbsolutePath() + "/" + derivate.getDerivateId() + ".xml");
             outputter.output(new Document(derivateElement), output);
-            output.close();
             // inform all listeners that a derivate is saved
             StringBuffer buf = new StringBuffer();
             buf.append("derivate: ").append(derivate.getDerivateId());
             fireDerivateSaved(buf.toString());
         } catch(Exception e) {
             LOGGER.error(e);
+        } finally {
+            if(output != null) {
+                try {
+                    output.close();
+                } catch(IOException ioExc) {
+                    LOGGER.error("Error while closing output stream.", ioExc);
+                }
+            }
         }
     }
 

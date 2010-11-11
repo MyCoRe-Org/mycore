@@ -116,9 +116,10 @@ public class MCRImportRecord {
 
     @Override
     public String toString() {
-        String returnString = name + ": (";
+        StringBuffer sBuf = new StringBuffer();
+        sBuf.append(name).append(": (");
         for(MCRImportField f : fields)
-            returnString += f.toString() + "; ";
-        return returnString + ")";
+            sBuf.append(f.toString()).append("; ");
+        return sBuf.append(")").toString();
     }
 }

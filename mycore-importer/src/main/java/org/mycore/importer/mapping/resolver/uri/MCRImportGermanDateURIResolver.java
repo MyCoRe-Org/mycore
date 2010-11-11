@@ -10,7 +10,7 @@ public class MCRImportGermanDateURIResolver implements MCRImportURIResolver {
 
     public String resolve(String uri, String oldValue) {
         // resolve format DD.MM.YYYY
-        String[] split = oldValue.split(".");
+        String[] split = oldValue.split("\\.");
         String day = split[0];
         String month = split[1];
         String year = split[2];
@@ -23,4 +23,5 @@ public class MCRImportGermanDateURIResolver implements MCRImportURIResolver {
             year = "19" + year;
         return year + "-" + month + "-" + day;
     }
+
 }

@@ -1,6 +1,7 @@
 package org.mycore.importer.classification;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -14,20 +15,13 @@ import org.jdom.Element;
  * 
  * @author Matthias Eichner
  */
-public class MCRImportClassificationMap {
+public class MCRImportClassificationMap extends HashMap<String, String> {
 
     /**
      * The id of the classification. For example something like
      * DocPortal_class_00000001
      */
     protected String id;
-    
-    /**
-     * Hash table of classification mapping values.</br>
-     * key = import value</br>
-     * value = mycore value
-     */
-    protected Hashtable<String, String> table;
 
     /**
      * Creates a new classification mapping instance.
@@ -36,28 +30,17 @@ public class MCRImportClassificationMap {
      */
     public MCRImportClassificationMap(String id) {
         this.id = id;
-        this.table = new Hashtable<String, String>();
-    }
-    
-    /**
-     * Adds a import-/mycorevalue pair to the hash table.
-     * 
-     * @param importValue the value from the import classification source
-     * @param mycoreValue the mycore value, can be null
-     */
-    public void addPair(String importValue, String mycoreValue) {
-        if(mycoreValue == null)
-            mycoreValue = "";
-        table.put(importValue, mycoreValue);
     }
 
     /**
-     * Removes a import-/mycorevalue pair.
-     * 
-     * @param importValue the value from the import classification source
+     * key = import value</br>
+     * value = mycore value
      */
-    public void removePair(String importValue) {
-        table.remove(importValue);
+    @Override
+    public String put(String key, String value) {
+        if(value == null)
+            value = "";
+        return super.put(key, value);
     }
 
     /**
@@ -68,25 +51,16 @@ public class MCRImportClassificationMap {
      * @return the mycore value, or null if nothing is found
      */
     public String getMyCoReValue(String importValue) {
-        return table.get(importValue);
+        return this.get(importValue);
     }
-    
-    /**
-     * Returns the whole classification map hash table.
-     * 
-     * @return the classification map hashtable
-     */
-    public Hashtable<String, String> getTable() {
-        return table;
-    }
-    
+
     /**
      * Returns the classification id.
      * 
      * @return id of this instance
      */
     public String getId() {
-        return id;
+        return this.id;
     }
 
     /**
@@ -96,7 +70,7 @@ public class MCRImportClassificationMap {
      * @return true if all values are set, otherwise false
      */
     public boolean isCompletelyFilled() {
-        for(Map.Entry<String, String> entry : table.entrySet()) {
+        for(Map.Entry<String, String> entry : this.entrySet()) {
             if(entry.getKey() == null || entry.getKey().equals(""))
                 return false;
             if(entry.getValue() == null || entry.getValue().equals(""))
@@ -113,7 +87,7 @@ public class MCRImportClassificationMap {
      */
     public ArrayList<String> getEmptyImportValues() {
         ArrayList<String> emptyImportValueList = new ArrayList<String>();
-        for(Map.Entry<String, String> entry : table.entrySet()) {
+        for(Map.Entry<String, String> entry : this.entrySet()) {
             if(entry.getValue() == null || entry.getValue().equals(""))
                 emptyImportValueList.add(entry.getKey());
         }
@@ -136,7 +110,7 @@ public class MCRImportClassificationMap {
         Element rootElement = new Element("classificationMapping");
         rootElement.setAttribute("id", id);
         // go through the table and add all import and mycore values
-        for(Map.Entry<String, String> entry : table.entrySet()) {
+        for(Map.Entry<String, String> entry : this.entrySet()) {
             Element mapElement = new Element("map");
             String importValue = entry.getKey();
             String mycoreValue = entry.getValue();

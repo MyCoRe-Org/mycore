@@ -52,26 +52,30 @@ public class MCRImportDatamodel2 extends MCRImportAbstractDatamodel {
      * (non-Javadoc)
      * @see org.mycore.importer.mapping.datamodel.MCRImportDatamodel#isNotinherit(java.lang.String)
      */
-    public Boolean isNotinherit(String metadataName) {
+    public Inheritance isNotinherit(String metadataName) {
         Element metadataElement = findMetadataChild(metadataName);
         if(metadataElement == null)
-            return null;
+            return Inheritance.IGNORE;
         String notInheritValue = metadataElement.getAttributeValue("notinherit");
         if(notInheritValue == null || notInheritValue.equals("ignore"))
-            return null;
-        return Boolean.valueOf(notInheritValue);
+            return Inheritance.IGNORE;
+        if(Boolean.valueOf(notInheritValue))
+            return Inheritance.TRUE;
+        return Inheritance.FALSE;
     }
 
     /*
      * (non-Javadoc)
      * @see org.mycore.importer.mapping.datamodel.MCRImportDatamodel#isHeritable(java.lang.String)
      */
-    public Boolean isHeritable(String metadataName) {
+    public Inheritance isHeritable(String metadataName) {
         Element metadataElement = findMetadataChild(metadataName);
         String notInheritValue = metadataElement.getAttributeValue("heritable");
         if(notInheritValue == null || notInheritValue.equals("ignore"))
-            return null;
-        return Boolean.valueOf(notInheritValue);
+            return Inheritance.IGNORE;
+        if(Boolean.valueOf(notInheritValue))
+            return Inheritance.TRUE;
+        return Inheritance.FALSE;
     }
 
     public String getType(String metadataName) {

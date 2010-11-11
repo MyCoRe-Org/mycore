@@ -129,7 +129,7 @@ public class MCRImportMetadataResolverManager {
      * given type.
      */
     protected Class<?> getResolverClassByType(String type) {
-        for(ResolverData<?> rd : resolverList) {
+        for(ResolverData<?> rd : this.resolverList) {
             if(type.equals(rd.getType()))
                 return rd.getResolverClass();
         }
@@ -140,7 +140,7 @@ public class MCRImportMetadataResolverManager {
      * Internal class to represent a resolver by its type,
      * MyCoRe classname and the java class.
      */
-    private class ResolverData<T extends MCRImportMetadataResolver> {
+    private static class ResolverData<T extends MCRImportMetadataResolver> {
         private String type;
         private String className;
         private Class<T> resolverClass;
@@ -151,13 +151,13 @@ public class MCRImportMetadataResolverManager {
             this.resolverClass = resolverClass;
         }
         public String getType() {
-            return type;
+            return this.type;
         }
         public String getClassName() {
-            return className;
+            return this.className;
         }
         public Class<T> getResolverClass() {
-            return resolverClass;
+            return this.resolverClass;
         }
     }
 }

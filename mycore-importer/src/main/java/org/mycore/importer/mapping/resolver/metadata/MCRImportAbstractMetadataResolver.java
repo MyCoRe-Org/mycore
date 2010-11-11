@@ -61,7 +61,7 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
         // enclosing attributes
         resolveEnclosingAttributes(map);
         // attributes
-        if(hasAttributes());
+        if(hasAttributes())
             resolveAttributes(map, saveToElement);
         // children
         if(hasChildren())
@@ -123,7 +123,7 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
      * @return a hash table of all attributes
      */
     public Hashtable<String, String> getEnclosingAttributes() {
-        return enclosingAttributes;
+        return this.enclosingAttributes;
     }
 
     /**
@@ -132,7 +132,7 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
      * @return
      */
     public Hashtable<String, MCRCondition> getConditions() {
-        return conditionMap;
+        return this.conditionMap;
     }
 
     /**

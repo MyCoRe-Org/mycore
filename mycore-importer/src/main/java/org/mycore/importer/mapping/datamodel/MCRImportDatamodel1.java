@@ -40,19 +40,19 @@ public class MCRImportDatamodel1 extends MCRImportAbstractDatamodel {
     }
 
     /**
-     * Datamodel1 doesnt support not inherit, so null is returned.
+     * Datamodel1 doesn't support inheritance. False is returned.
      * This is equal to dm2 'ignore'.
      */
-    public Boolean isNotinherit(String metadataName) {
-        return null;
+    public Inheritance isNotinherit(String metadataName) {
+        return Inheritance.IGNORE;
     }
 
     /**
-     * Datamodel1 doesnt support not Heritable, so null is returned.
+     * Datamodel1 doesn't support inheritance. False is returned.
      * This is equal to dm2 'ignore'.
      */
-    public Boolean isHeritable(String metadataName) {
-        return null;
+    public Inheritance isHeritable(String metadataName) {
+        return Inheritance.IGNORE;
     }
 
     /*

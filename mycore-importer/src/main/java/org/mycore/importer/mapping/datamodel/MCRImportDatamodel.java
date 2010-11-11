@@ -2,9 +2,17 @@ package org.mycore.importer.mapping.datamodel;
 
 import java.util.List;
 
-import org.jdom.Element;
-
 public interface MCRImportDatamodel {
+    
+    public enum Inheritance {
+        TRUE, FALSE, IGNORE;
+
+        public boolean getBoolean() {
+            if(this.equals(Inheritance.TRUE))
+                return true;
+            return false;
+        }
+    }
 
     /**
      * <p>
@@ -36,28 +44,28 @@ public interface MCRImportDatamodel {
     
     /**
      * Return true if the metadata element is heritable, otherwise false.
-     * If the datamodel doesnt support this or the flag is set to 'ignore'
-     * this method will return null.
+     * If the data model doesn't support this or the flag is set to 'ignore'
+     * this method will return <code>Inheritance.IGNORE</code> is returned.
      * 
      * @param metadataName the name of the metadata element
-     * @return true if heritbale, false if not and null if not set
+     * @return true if heritable, false if not and null if not set
      */
-    public Boolean isHeritable(String metadataName);
-    
+    public Inheritance isHeritable(String metadataName);
+
     /**
-     * Return true if the metadata element is not inherit, otherwise false.
-     * If the datamodel doesnt support this or the flag is set to 'ignore'
-     * this method will return null.
+     * Return true if the meta data element is not inherit, otherwise false.
+     * If the data model doesn't support this or the flag is set to 'ignore'
+     * this method will return <code>Inheritance.IGNORE</code> is returned.
      * 
      * @param metadataName the name of the metadata element
      * @return false if inherit, true if not and null if not set
      */
-    public Boolean isNotinherit(String metadataName);
-    
+    public Inheritance isNotinherit(String metadataName);
+
     /**
-     * Returns the absolute path to the datamodel document.
+     * Returns the absolute path to the data model document.
      * 
-     * @return path to datamodel
+     * @return path to data model
      */
     public String getPath();
 
