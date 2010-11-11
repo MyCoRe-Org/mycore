@@ -221,7 +221,7 @@ public class MCRURNAdder {
         if (givenType == null)
             return false;
 
-        String propertyName = "URN.Enabled.Objects";
+        String propertyName = "MCR.URN.Enabled.Objects";
         String propertyValue = MCRConfiguration.instance().getString(propertyName);
         if (propertyValue == null || propertyValue.length() == 0) {
             LOGGER.error("URN assignment failed as the property \"" + propertyName + "\" is not set");
@@ -244,7 +244,7 @@ public class MCRURNAdder {
      */
     @SuppressWarnings("unchecked")
     private IURNProvider getURNProvider() throws Exception {
-        String className = MCRConfiguration.instance().getString("URN.Provider.Class");
+        String className = MCRConfiguration.instance().getString("MCR.URN.Provider.Class");
         LOGGER.info("Loading class " + className + " as IURNProvider");
         Class<IURNProvider> c = (Class<IURNProvider>) Class.forName(className);
         IURNProvider provider = c.newInstance();
