@@ -7,7 +7,9 @@ import java.util.List;
 
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.parsers.bool.MCRCondition;
 
 /**
@@ -88,9 +90,12 @@ public class MCRDerivateWithURNSearcher extends MCRSearcher {
         if (value != null && value.equalsIgnoreCase("false")) {
             List<String> idList = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
             MCRResults result = new MCRResults();
-            for (String id : idList) {
-                if (!MCRXMLFunctions.hasURNDefined(id)) {
-                    result.addHit(new MCRHit(id));
+            for (String derivateId : idList) {
+                if (!MCRXMLFunctions.hasURNDefined(derivateId)) {
+                    MCRFieldValue derivateOwner = new MCRFieldValue(MCRFieldDef.getDef("derivateOwner"), getDerivateOwner(derivateId));
+                    MCRHit newHit = new MCRHit(derivateId);
+                    newHit.addMetaData(derivateOwner);
+                    result.addHit(newHit);
                 }
             }
             return result;
@@ -100,6 +105,11 @@ public class MCRDerivateWithURNSearcher extends MCRSearcher {
         }
         MCRQuery q = new MCRQuery(tFCond);
         return MCRQueryManager.search(q);
+    }
+
+    private String getDerivateOwner(String id) {
+        MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(id));
+        return der.getDerivate().getMetaLink().getXLinkHref();
     }
 
     @Override
