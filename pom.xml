@@ -177,6 +177,10 @@
                   <exclude>org/mycore/iview2/**</exclude>
                 </excludes>
               </instrumentation>
+              <formats>
+                <format>html</format>
+                <format>xml</format>
+              </formats>
             </configuration>
           </plugin>
           <plugin>
