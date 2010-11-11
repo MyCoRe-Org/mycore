@@ -325,7 +325,7 @@ public class MCRXMLFunctions {
         if (givenType == null)
             return false;
 
-        String propertyName = "URN.Enabled.Objects";
+        String propertyName = "MCR.URN.Enabled.Objects";
         String propertyValue = MCRConfiguration.instance().getString(propertyName, null);
         if (propertyValue == null || propertyValue.length() == 0) {
             LOGGER.info("URN assignment disabled as the property \"" + propertyName + "\" is not set");
