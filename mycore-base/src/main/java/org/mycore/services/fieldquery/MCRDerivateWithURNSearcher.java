@@ -5,6 +5,9 @@ package org.mycore.services.fieldquery;
 
 import java.util.List;
 
+import org.mycore.common.xml.MCRXMLFunctions;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.parsers.bool.MCRCondition;
 
 /**
@@ -83,8 +86,14 @@ public class MCRDerivateWithURNSearcher extends MCRSearcher {
 
         MCRCondition tFCond = null;
         if (value != null && value.equalsIgnoreCase("false")) {
-            LOGGER.info("The condition " + condition + " is not supported");
-            return new MCRResults();
+            List<String> idList = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
+            MCRResults result = new MCRResults();
+            for (String id : idList) {
+                if (!MCRXMLFunctions.hasURNDefined(id)) {
+                    result.addHit(new MCRHit(id));
+                }
+            }
+            return result;
         } else {
             /* all objects with urn */
             tFCond = new MCRQueryParser().parse("derivateURN like \"urn\"");
