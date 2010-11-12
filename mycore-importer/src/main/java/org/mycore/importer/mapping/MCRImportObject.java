@@ -253,6 +253,9 @@ public class MCRImportObject {
             if(metadata != null)
                 metadataTable.put(tag, metadata);
         }
+        if(metadata == null)
+            return null;
+
         // add child
         metadata.addChild(metadataChild);
         return metadata;

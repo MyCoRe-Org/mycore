@@ -225,15 +225,30 @@ public class MCRImportClassificationMappingManager {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public void saveClassificationMap(String classId) throws FileNotFoundException, IOException {
+    public void saveClassificationMap(String classId) throws FileNotFoundException {
         MCRImportClassificationMap map = classificationMapTable.get(classId);
         if(map == null)
             return;
+        StringBuffer fileBuf = new StringBuffer(this.classMappingDir.getAbsolutePath());
+        fileBuf.append("/").append(classId).append(".xml");
+        
         Element rootElement = map.createXML();
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
-        FileOutputStream output = new FileOutputStream(classMappingDir.getAbsoluteFile() + "/" + classId + ".xml");
-        outputter.output(new Document(rootElement), output);
-        output.close();
+        FileOutputStream output = null;
+        try {
+            output = new FileOutputStream(fileBuf.toString());
+            outputter.output(new Document(rootElement), output);
+        } catch(IOException ioExc) {
+            LOGGER.error("while saving classification map to file system " + fileBuf.toString(), ioExc);
+        } finally {
+            if(output != null) {
+                try {
+                    output.close();
+                } catch(IOException ioExc) {
+                    LOGGER.error("while saving classification map to file system " + fileBuf.toString(), ioExc);
+                }
+            }
+        }
     }
 
     /**

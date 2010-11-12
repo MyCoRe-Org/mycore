@@ -51,7 +51,7 @@ public class MCRImportConditionTest extends MCRTestCase {
         assertEquals(false, cond.evaluate(res));
         // two fields
         cond = new MCRImportCondition("{f2}", ">=", "{f3}");
-        assertEquals(true, cond.evaluate(res));
+        assertEquals(false, cond.evaluate(res));
     }
 
 }

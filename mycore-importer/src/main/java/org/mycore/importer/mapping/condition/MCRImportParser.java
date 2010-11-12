@@ -45,9 +45,8 @@ public class MCRImportParser extends MCRBooleanClauseParser {
         String operator = m.group(2);
         String value2 = m.group(3);
 
-        if (value2.startsWith("\"") && value2.endsWith("\"")) {
+        if (value2.startsWith("\"") && value2.endsWith("\""))
             value2 = value2.substring(1, value2.length() - 1);
-        }
 
         return new MCRImportCondition(value1, operator, value2);
     }

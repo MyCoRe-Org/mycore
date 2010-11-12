@@ -46,7 +46,7 @@ public class MCRImportCondition implements MCRCondition {
             if(this.operator.equals("<"))
                 return floatValue1 < floatValue2;
             if(this.operator.equals(">="))
-                return floatValue1 <= floatValue2;
+                return floatValue1 >= floatValue2;
             if(this.operator.equals("<="))
                 return floatValue1 <= floatValue2;
         }
