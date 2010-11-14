@@ -23,6 +23,9 @@
 
 package org.mycore.common;
 
+import java.io.UnsupportedEncodingException;
+import java.net.ConnectException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -33,9 +36,11 @@ import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.URLDataSource;
 import javax.mail.Message;
+import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.Transport;
+import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
@@ -48,10 +53,11 @@ import org.jdom.Element;
  * This class provides methods to send emails from within a MyCoRe application.
  * 
  * @author Marc Schluepmann
- * @author Frank Lützenkirchen
- * @author Werner Greßhoff
+ * @author Frank Lï¿½tzenkirchen
+ * @author Werner Greï¿½hoff
  * 
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date: 2009-04-28 11:50:42 +0200 (Di, 28 Apr
+ *          2009) $
  */
 public class MCRMailer {
     /** Logger */
@@ -74,6 +80,7 @@ public class MCRMailer {
         try {
             numTries = config.getInt("MCR.Mail.NumTries", 1);
             mailProperties.setProperty("mail.smtp.host", config.getString("MCR.Mail.Server"));
+            mailProperties.setProperty("mail.smtp.connectiontimeout", config.getString("MCR.Mail.SMTP.Connectiontimeout", "5000"));
             mailProperties.setProperty("mail.transport.protocol", config.getString("MCR.Mail.Protocol", "smtp"));
             mailSession = Session.getDefaultInstance(mailProperties, null);
             mailSession.setDebug(config.getBoolean("MCR.Mail.Debug", false));
@@ -186,15 +193,14 @@ public class MCRMailer {
     /**
      * Send email from a given XML document. See the sample mail below:
      * 
-     * <email><from>bingo@bongo.com</from>
-     *   <to>jim.knopf@lummerland.de</to>
-     *   <bcc>frau.waas@lummerland.de</bcc>
-     *   <subject>Grüße aus der Stadt der Drachen</subject>
-     *   <body>Es ist recht bewölkt. Alles Gute, Jim.</body>
-     *   <part>http://upload.wikimedia.org/wikipedia/de/f/f7/JimKnopf.jpg</part>
+     * <email><from>bingo@bongo.com</from> <to>jim.knopf@lummerland.de</to>
+     * <bcc>frau.waas@lummerland.de</bcc> <subject>Grï¿½ï¿½e aus der Stadt der
+     * Drachen</subject> <body>Es ist recht bewï¿½lkt. Alles Gute, Jim.</body>
+     * <part>http://upload.wikimedia.org/wikipedia/de/f/f7/JimKnopf.jpg</part>
      * </email>
-     *
-     * @param email the email as JDOM element.
+     * 
+     * @param email
+     *            the email as JDOM element.
      */
     public static void send(Element email) {
         String from = email.getChildTextTrim("from");
@@ -290,7 +296,8 @@ public class MCRMailer {
                             trySending(from, replyTo, to, bcc, subject, body, parts);
                             logger.info("Successfully resended email.");
                             break;
-                        } catch (Exception ex) {
+                        } 
+                        catch (Exception ex) {
                             logger.info("Sending email failed: ", ex);
                         }
                     }
@@ -301,7 +308,7 @@ public class MCRMailer {
     }
 
     private static void trySending(String from, List<String> replyTo, List<String> to, List<String> bcc, String subject, String body,
-            List<String> parts) throws Exception {
+            List<String> parts) throws AddressException, UnsupportedEncodingException, MessagingException, MalformedURLException {
         MimeMessage msg = new MimeMessage(mailSession);
         msg.setFrom(buildAddress(from));
 
@@ -366,8 +373,11 @@ public class MCRMailer {
      * Builds email address from a string. The string may be a single email
      * address or a combination of a personal name and address, like "John Doe"
      * <john@doe.com>
+     * 
+     * @throws AddressException
+     * @throws UnsupportedEncodingException
      */
-    private static InternetAddress buildAddress(String s) throws Exception {
+    private static InternetAddress buildAddress(String s) throws AddressException, UnsupportedEncodingException {
         if (!s.endsWith(">")) {
             return new InternetAddress(s.trim());
         }
