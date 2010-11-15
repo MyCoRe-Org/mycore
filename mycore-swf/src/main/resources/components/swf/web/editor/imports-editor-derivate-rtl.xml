@@ -20,6 +20,8 @@
     
     <hidden var="derivate/internals" descendants="true"/>
     
+    <hidden var="derivate/fileset" descendants="true"/>
+    
     <hidden var="service/servdates" descendants="true"/>
     
     <hidden var="service/servacls" descendants="true"/>
