@@ -6,6 +6,13 @@
   </properties>
   <body>
     <release version="2.0.93" date="2010-?-?" description="Beta 3">
+      <action dev="mcrsherm" type="fix">
+        Renamed property URN.Enabled.Objects to MCR.URN.Enabled.Objects
+      </action>
+      <action dev="mcrsherm" type="removed">
+        Removed class org.mycore.datamodel.ifs.MCRContentIndexEventHandler
+        Functionality is preserved by command "repair derivate search of ID {0}".
+      </action>
       <action dev="mcrtchef" type="add">
         Added xsl templates "derivateView" and "derivateLinkView" as an adapter for IView and IView2
       </action>
