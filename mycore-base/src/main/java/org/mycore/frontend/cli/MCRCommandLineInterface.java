@@ -17,6 +17,7 @@
 package org.mycore.frontend.cli;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -39,13 +40,17 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Transaction;
+import org.jdom.Document;
+import org.jdom.Element;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
+import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.common.MCRActiveLinkException;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.user.MCRUserMgr;
 
 /**
@@ -119,6 +124,8 @@ public class MCRCommandLineInterface {
             "Cancel execution of further commands in case of error"));
         knownCommands.add(new MCRCommand("skip on error", "org.mycore.frontend.cli.MCRCommandLineInterface.skipOnError",
             "Skip execution of failed command in case of error"));
+        knownCommands.add(new MCRCommand("get uri {0} to file {1}", "org.mycore.frontend.cli.MCRCommandLineInterface.getURI String String",
+            "Get XML content from URI {0} and save it to a local file {1}"));
 
         // **************************************
         // Read internal and/or external commands
@@ -407,6 +414,15 @@ public class MCRCommandLineInterface {
         System.out.println();
     }
 
+    /**
+     * Reads XML content from URIResolver and sends output to a local file.
+     */
+    public static void getURI(String uri, String file) throws Exception {
+        Element resolved = MCRURIResolver.instance().resolve(uri);
+        Element cloned = (Element) resolved.clone();
+        MCRContent.readFrom(new Document(cloned)).sendTo(new File(file));
+    }
+    
     /**
      * Shows details about an exception that occured during command processing
      * 
