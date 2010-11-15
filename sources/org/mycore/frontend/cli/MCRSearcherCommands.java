@@ -27,8 +27,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Properties;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.hibernate.CacheMode;
@@ -60,9 +60,6 @@ import org.mycore.services.fieldquery.MCRSearcherFactory;
  */
 
 public class MCRSearcherCommands extends MCRAbstractCommands {
-    private static final String INDEX_TYPE_CONTENT = "file";
-
-    private static final String INDEX_TYPE_METADATA = "object";
 
     private static Logger LOGGER = Logger.getLogger(MCRSearcherCommands.class);
 
@@ -110,11 +107,10 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
         private List<MCRSearcher> clearAndInitSearchers() throws IOException, JDOMException {
             List<MCRSearcher> searcherList = new ArrayList<MCRSearcher>();
             for (String index : getIndexes()) {
-                if (isIndexType(index, INDEX_TYPE_METADATA)) {
+                if (isIndexType(index, mechanism.getIndexType())) {
                     MCRSearcher searcher = MCRSearcherFactory.getSearcher(index);
                     LOGGER.info("clearing index " + index);
                     searcher.clearIndex();
-//                    searcher.notifySearcher("insert");
                     searcherList.add(searcher);
                 }
             }
@@ -160,6 +156,7 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
 
     interface RepairMechanism {
         public void repair(ScrollableResults results, Session session, List<MCRSearcher> searcherList);
+        public String getIndexType();
     }
 
     static class MetaIndexRepairMechanism implements RepairMechanism {
@@ -183,6 +180,11 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
                     searcher.removeFromIndex(xmlEntry.getId());
                 searcher.addToIndex(xmlEntry.getId(), xmlEntry.getId(), fields);
             }
+        }
+
+        @Override
+        public String getIndexType() {
+            return "object";
         }
     }
 
@@ -211,6 +213,11 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
                     searcher.removeFromIndex(entryID);
                 searcher.addToIndex(entryID, returnID, fields);
             }
+        }
+
+        @Override
+        public String getIndexType() {
+            return "file";
         }
     }
 
