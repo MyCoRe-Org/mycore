@@ -20,18 +20,18 @@ public abstract class MCRComparingValidator extends MCRPairValidatorBase {
 
         if ("<=".equals(operator))
             return compare(valueA, valueB) <= 0;
-        else if (">=".equals(operator))
+        if (">=".equals(operator))
             return compare(valueA, valueB) >= 0;
-        else if ("<".equals(operator))
+        if ("<".equals(operator))
             return compare(valueA, valueB) < 0;
-        else if (">".equals(operator))
+        if (">".equals(operator))
             return compare(valueA, valueB) > 0;
-        else if ("!=".equals(operator))
+        if ("!=".equals(operator))
             return compare(valueA, valueB) != 0;
-        else if ("=".equals(operator))
+        if ("=".equals(operator))
             return compare(valueA, valueB) == 0;
-        else
-            throw new MCRConfigurationException("Unknown compare operator: " + operator);
+
+        throw new MCRConfigurationException("Unknown compare operator: " + operator);
     }
 
     protected abstract int compare(String valueA, String valueB);
