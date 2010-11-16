@@ -8,12 +8,12 @@ public class MCRCombinedValidator implements MCRValidator {
     private List<MCRValidator> validators = new ArrayList<MCRValidator>();
 
     public void setProperty(String name, String value) {
-        for (MCRValidator validator : validators)
+        for (MCRConfigurable validator : validators)
             validator.setProperty(name, value);
     }
 
     public boolean hasRequiredProperties() {
-        for (MCRValidator validator : validators) {
+        for (MCRConfigurable validator : validators) {
             if (validator.hasRequiredProperties())
                 return true;
         }
