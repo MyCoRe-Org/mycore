@@ -21,7 +21,6 @@ public class MCRDateTimeValidatorTest extends MCRValidatorTest {
 
     @Test
     public void testValidDates() {
-        validator.setProperty("type", "datetime");
         validator.setProperty("format", "dd.MM.yyyy");
         assertTrue(validator.isValid("22.04.1971"));
         assertTrue(validator.isValid("29.02.2000"));
@@ -29,7 +28,6 @@ public class MCRDateTimeValidatorTest extends MCRValidatorTest {
 
     @Test
     public void testInvalidDates() {
-        validator.setProperty("type", "datetime");
         validator.setProperty("format", "dd.MM.yyyy");
         assertFalse(validator.isValid("text"));
         assertFalse(validator.isValid("29.02.2001"));
@@ -37,7 +35,6 @@ public class MCRDateTimeValidatorTest extends MCRValidatorTest {
 
     @Test
     public void testMultipleFormats() {
-        validator.setProperty("type", "datetime");
         validator.setProperty("format", "dd.MM.yyyy ; yyyy-MM-dd");
         assertTrue(validator.isValid("22.04.1971"));
         assertTrue(validator.isValid("1971-04-22"));
