@@ -174,17 +174,6 @@ public class MCRInputValidator {
     }
 
     /**
-     * Checks if input is null or empty or just contains whitespace.
-     * 
-     * @param input
-     *            the string to be checked
-     * @return false if input is null or empty or just blanks
-     */
-    public boolean validateRequired(String input) {
-        return input != null && input.trim().length() > 0;
-    }
-
-    /**
      * Compares two input fields using a comparison operator.
      * 
      * @param valueA
