@@ -7,15 +7,15 @@ import java.util.Locale;
 
 import org.mycore.common.MCRException;
 
-public class MCRDecimalValidator extends MCRValidator {
+public class MCRDecimalValidator extends MCRValidatorBase {
 
     @Override
-    public boolean hasRequiredPropertiesForValidation() {
+    public boolean hasRequiredProperties() {
         return "decimal".equals(getProperty("type"));
     }
 
     @Override
-    public boolean isValid(String input) throws Exception {
+    protected boolean isValidOrDie(String input) throws Exception {
         string2double(input);
         return true;
     }

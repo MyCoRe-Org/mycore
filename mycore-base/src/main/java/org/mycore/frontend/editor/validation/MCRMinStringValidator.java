@@ -1,14 +1,14 @@
 package org.mycore.frontend.editor.validation;
 
-public class MCRMinStringValidator extends MCRValidator {
+public class MCRMinStringValidator extends MCRValidatorBase {
 
     @Override
-    public boolean hasRequiredPropertiesForValidation() {
+    public boolean hasRequiredProperties() {
         return "string".equals(getProperty("type")) && hasProperty("min");
     }
 
     @Override
-    public boolean isValid(String input) {
+    protected boolean isValidOrDie(String input) {
         String min = getProperty("min");
         return (min.compareTo(input) <= 0);
     }

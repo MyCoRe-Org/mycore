@@ -1,14 +1,14 @@
 package org.mycore.frontend.editor.validation;
 
-public class MCRRequiredValidator extends MCRValidator {
+public class MCRRequiredValidator extends MCRValidatorBase {
 
     @Override
-    public boolean hasRequiredPropertiesForValidation() {
+    public boolean hasRequiredProperties() {
         return hasProperty("required");
     }
 
     @Override
-    public boolean isValid(String input) throws Exception {
+    protected boolean isValidOrDie(String input) throws Exception {
         boolean required = Boolean.valueOf(getProperty("required"));
 
         if (!required)

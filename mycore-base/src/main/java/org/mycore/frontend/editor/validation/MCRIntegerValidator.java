@@ -1,14 +1,14 @@
 package org.mycore.frontend.editor.validation;
 
-public class MCRIntegerValidator extends MCRValidator {
+public class MCRIntegerValidator extends MCRValidatorBase {
 
     @Override
-    public boolean hasRequiredPropertiesForValidation() {
+    public boolean hasRequiredProperties() {
         return "integer".equals(getProperty("type"));
     }
 
     @Override
-    public boolean isValid(String input) throws Exception {
+    protected boolean isValidOrDie(String input) throws Exception {
         Integer.parseInt(input);
         return true;
     }

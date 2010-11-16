@@ -1,14 +1,14 @@
 package org.mycore.frontend.editor.validation;
 
-public class MCRMaxLengthValidator extends MCRValidator {
+public class MCRMaxLengthValidator extends MCRValidatorBase {
 
     @Override
-    public boolean hasRequiredPropertiesForValidation() {
+    public boolean hasRequiredProperties() {
         return hasProperty("maxLength");
     }
 
     @Override
-    public boolean isValid(String input) {
+    protected boolean isValidOrDie(String input) {
         int maxLength = Integer.parseInt(getProperty("maxLength"));
         return (input.length() <= maxLength);
     }

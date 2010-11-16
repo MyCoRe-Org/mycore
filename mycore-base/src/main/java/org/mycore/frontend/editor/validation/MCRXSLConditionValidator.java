@@ -12,15 +12,15 @@ import org.jdom.Namespace;
 import org.jdom.transform.JDOMSource;
 import org.mycore.common.MCRConstants;
 
-public class MCRXSLConditionValidator extends MCRValidator {
+public class MCRXSLConditionValidator extends MCRValidatorBase {
 
     @Override
-    public boolean hasRequiredPropertiesForValidation() {
+    public boolean hasRequiredProperties() {
         return hasProperty("xsl");
     }
 
     @Override
-    public boolean isValid(String input) throws Exception {
+    protected boolean isValidOrDie(String input) throws Exception {
         Document xsl = buildXSLStylesheet();
         Document xml = buildInputDocument(input);
         String output = transform(xml, xsl);

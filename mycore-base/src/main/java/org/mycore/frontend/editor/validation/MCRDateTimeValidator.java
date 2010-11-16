@@ -6,20 +6,20 @@ import java.util.Date;
 
 import org.mycore.common.MCRException;
 
-public class MCRDateTimeValidator extends MCRValidator {
+public class MCRDateTimeValidator extends MCRValidatorBase {
 
     @Override
-    public boolean hasRequiredPropertiesForValidation() {
+    public boolean hasRequiredProperties() {
         return "datetime".equals(getProperty("type")) && hasProperty("format");
     }
 
     @Override
-    public boolean isValid(String input) throws Exception {
+    protected boolean isValidOrDie(String input) throws Exception {
         string2date(input);
         return true;
     }
 
-    protected Date string2date(String input) throws Exception {
+    protected Date string2date(String input) throws MCRException {
         String patterns = getProperty("format");
         for (String pattern : patterns.split(";")) {
             DateFormat df = getDateFormat(pattern.trim());
@@ -31,9 +31,8 @@ public class MCRDateTimeValidator extends MCRValidator {
         throw new MCRException("DateTime value can not be parsed: " + input);
     }
 
-    protected DateFormat getDateFormat(String pattern) throws Exception {
-        DateFormat df = null;
-        df = new SimpleDateFormat(pattern);
+    protected DateFormat getDateFormat(String pattern) {
+        DateFormat df = new SimpleDateFormat(pattern);
         df.setLenient(false);
         return df;
     }

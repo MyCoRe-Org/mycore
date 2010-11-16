@@ -2,15 +2,15 @@ package org.mycore.frontend.editor.validation;
 
 import java.lang.reflect.Method;
 
-public class MCRExternalValidator extends MCRValidator {
+public class MCRExternalValidator extends MCRValidatorBase {
 
     @Override
-    public boolean hasRequiredPropertiesForValidation() {
+    public boolean hasRequiredProperties() {
         return hasProperty("class") && hasProperty("method");
     }
 
     @Override
-    public boolean isValid(String input) throws Exception {
+    protected boolean isValidOrDie(String input) throws Exception {
         String clazz = getProperty("class");
         String method = getProperty("method");
         Method m = getMethod(clazz, method);

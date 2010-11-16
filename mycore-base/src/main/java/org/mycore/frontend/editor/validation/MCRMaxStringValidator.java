@@ -1,14 +1,14 @@
 package org.mycore.frontend.editor.validation;
 
-public class MCRMaxStringValidator extends MCRValidator {
+public class MCRMaxStringValidator extends MCRValidatorBase {
 
     @Override
-    public boolean hasRequiredPropertiesForValidation() {
+    public boolean hasRequiredProperties() {
         return "string".equals(getProperty("type")) && hasProperty("max");
     }
 
     @Override
-    public boolean isValid(String input) {
+    protected boolean isValidOrDie(String input) {
         String max = getProperty("max");
         return (input.compareTo(max) <= 0);
     }

@@ -3,12 +3,12 @@ package org.mycore.frontend.editor.validation;
 public class MCRMaxIntegerValidator extends MCRIntegerValidator {
 
     @Override
-    public boolean hasRequiredPropertiesForValidation() {
-        return super.hasRequiredPropertiesForValidation() && hasProperty("max");
+    public boolean hasRequiredProperties() {
+        return super.hasRequiredProperties() && hasProperty("max");
     }
 
     @Override
-    public boolean isValid(String input) {
+    protected boolean isValidOrDie(String input) {
         int max = Integer.parseInt(getProperty("max"));
         int value = Integer.parseInt(input);
         return (value <= max);

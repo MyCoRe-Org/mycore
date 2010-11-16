@@ -1,14 +1,14 @@
 package org.mycore.frontend.editor.validation;
 
-public class MCRMinLengthValidator extends MCRValidator {
+public class MCRMinLengthValidator extends MCRValidatorBase {
 
     @Override
-    public boolean hasRequiredPropertiesForValidation() {
+    public boolean hasRequiredProperties() {
         return hasProperty("minLength");
     }
 
     @Override
-    public boolean isValid(String input) {
+    protected boolean isValidOrDie(String input) {
         int minLength = Integer.parseInt(getProperty("minLength"));
         return (input.length() >= minLength);
     }
