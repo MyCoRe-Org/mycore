@@ -3,18 +3,15 @@ package org.mycore.frontend.editor.validation;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MCRCombinedValidator extends MCRValidatorBase {
+public class MCRCombinedValidator implements MCRValidator {
 
     private List<MCRValidator> validators = new ArrayList<MCRValidator>();
 
-    @Override
     public void setProperty(String name, String value) {
-        super.setProperty(name, value);
         for (MCRValidator validator : validators)
             validator.setProperty(name, value);
     }
 
-    @Override
     public boolean hasRequiredProperties() {
         for (MCRValidator validator : validators) {
             if (validator.hasRequiredProperties())
@@ -23,8 +20,7 @@ public class MCRCombinedValidator extends MCRValidatorBase {
         return false;
     }
 
-    @Override
-    protected boolean isValidOrDie(String input) throws Exception {
+    public boolean isValid(String input) {
         for (MCRValidator validator : validators) {
             if (!validator.hasRequiredProperties())
                 continue;
