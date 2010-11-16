@@ -17,19 +17,20 @@ public abstract class MCRComparingValidator extends MCRPairValidatorBase {
             return true;
 
         String operator = getProperty("operator");
+        int result = compare(valueA, valueB);
 
         if ("<=".equals(operator))
-            return compare(valueA, valueB) <= 0;
+            return result <= 0;
         if (">=".equals(operator))
-            return compare(valueA, valueB) >= 0;
+            return result >= 0;
         if ("<".equals(operator))
-            return compare(valueA, valueB) < 0;
+            return result < 0;
         if (">".equals(operator))
-            return compare(valueA, valueB) > 0;
+            return result > 0;
         if ("!=".equals(operator))
-            return compare(valueA, valueB) != 0;
+            return result != 0;
         if ("=".equals(operator))
-            return compare(valueA, valueB) == 0;
+            return result == 0;
 
         throw new MCRConfigurationException("Unknown compare operator: " + operator);
     }
