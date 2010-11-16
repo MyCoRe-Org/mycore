@@ -52,6 +52,7 @@ import org.mycore.common.MCRException;
 import org.mycore.frontend.editor.validation.MCRIntegerPairValidator;
 import org.mycore.frontend.editor.validation.MCRPairValidator;
 import org.mycore.frontend.editor.validation.MCRStringPairValidator;
+import org.mycore.frontend.editor.validation.MCRValidatorBuilder;
 
 /**
  * This class provides input validation methods for editor data.
@@ -204,12 +205,9 @@ public class MCRInputValidator {
                 return true;
             }
 
-            if (type.equals("string")) {
-                MCRPairValidator validator = new MCRStringPairValidator();
-                validator.setProperty("operator", operator);
-                return validator.isValidPair(valueA, valueB);
-            } else if (type.equals("integer")) {
-                MCRPairValidator validator = new MCRIntegerPairValidator();
+            if (type.equals("string") || type.equals("integer")) {
+                MCRPairValidator validator = MCRValidatorBuilder.buildPredefinedCombinedPairValidator();
+                validator.setProperty("type", type);
                 validator.setProperty("operator", operator);
                 return validator.isValidPair(valueA, valueB);
             } else if (type.equals("decimal")) {
