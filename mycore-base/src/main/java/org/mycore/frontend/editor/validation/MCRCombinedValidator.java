@@ -3,51 +3,38 @@ package org.mycore.frontend.editor.validation;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MCRCombinedValidator extends MCRValidator {
+public class MCRCombinedValidator extends MCRValidatorBase {
 
     private List<MCRValidator> validators = new ArrayList<MCRValidator>();
 
     @Override
-    public boolean hasRequiredPropertiesForValidation() {
+    public void setProperty(String name, String value) {
+        super.setProperty(name, value);
+        for (MCRValidator validator : validators)
+            validator.setProperty(name, value);
+    }
+
+    @Override
+    public boolean hasRequiredProperties() {
         for (MCRValidator validator : validators) {
-            if (validator.hasRequiredPropertiesForValidation())
+            if (validator.hasRequiredProperties())
                 return true;
         }
         return false;
     }
 
     @Override
-    public boolean isValid(String input) throws Exception {
+    protected boolean isValidOrDie(String input) throws Exception {
         for (MCRValidator validator : validators) {
-            if (!validator.hasRequiredPropertiesForValidation())
+            if (!validator.hasRequiredProperties())
                 continue;
-            if (!validator.isValidExceptionsCatched(input))
+            if (!validator.isValid(input))
                 return false;
         }
         return true;
     }
 
     public void addValidator(MCRValidator validator) {
-        validator.setProperties(getProperties());
         validators.add(validator);
-    }
-
-    public void addPredefinedValidators() {
-        addValidator(new MCRMaxLengthValidator());
-        addValidator(new MCRMinLengthValidator());
-        addValidator(new MCRRegExpValidator());
-        addValidator(new MCRXSLConditionValidator());
-        addValidator(new MCRExternalValidator());
-        addValidator(new MCRDateTimeValidator());
-        addValidator(new MCRMaxDateTimeValidator());
-        addValidator(new MCRMinDateTimeValidator());
-        addValidator(new MCRIntegerValidator());
-        addValidator(new MCRMaxIntegerValidator());
-        addValidator(new MCRMinIntegerValidator());
-        addValidator(new MCRDecimalValidator());
-        addValidator(new MCRMaxDecimalValidator());
-        addValidator(new MCRMinDecimalValidator());
-        addValidator(new MCRMaxStringValidator());
-        addValidator(new MCRMinStringValidator());
     }
 }
