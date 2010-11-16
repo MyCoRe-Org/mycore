@@ -15,28 +15,28 @@ public class MCRRequiredValidatorTest extends MCRValidatorTest {
     @Test
     public void testHasRequiredProperties() {
         validator.setProperty("required", "true");
-        assertTrue(validator.hasRequiredPropertiesForValidation());
+        assertTrue(validator.hasRequiredProperties());
     }
 
     @Test
     public void testRequiredAndValid() {
         validator.setProperty("required", "true");
-        assertTrue(validator.isValidExceptionsCatched("input"));
+        assertTrue(validator.isValid("input"));
     }
 
     @Test
     public void testRequiredAndMissing() {
         validator.setProperty("required", "true");
-        assertFalse(validator.isValidExceptionsCatched(""));
-        assertFalse(validator.isValidExceptionsCatched(" "));
-        assertFalse(validator.isValidExceptionsCatched(null));
+        assertFalse(validator.isValid(""));
+        assertFalse(validator.isValid(" "));
+        assertFalse(validator.isValid(null));
     }
 
     @Test
     public void testNotRequired() {
         validator.setProperty("required", "false");
-        assertTrue(validator.isValidExceptionsCatched(""));
-        assertTrue(validator.isValidExceptionsCatched(" "));
-        assertTrue(validator.isValidExceptionsCatched("input"));
+        assertTrue(validator.isValid(""));
+        assertTrue(validator.isValid(" "));
+        assertTrue(validator.isValid("input"));
     }
 }

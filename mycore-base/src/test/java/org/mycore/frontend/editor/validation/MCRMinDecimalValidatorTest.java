@@ -17,18 +17,18 @@ public class MCRMinDecimalValidatorTest extends MCRValidatorTest {
     @Test
     public void testHasRequiredProperties() {
         validator.setProperty("min", "3,14");
-        assertTrue(validator.hasRequiredPropertiesForValidation());
+        assertTrue(validator.hasRequiredProperties());
     }
 
     @Test
     public void testMinValid() {
         validator.setProperty("min", "3,14");
-        assertTrue(validator.isValidExceptionsCatched("3,14"));
+        assertTrue(validator.isValid("3,14"));
     }
 
     @Test
     public void testMinInvalid() {
         validator.setProperty("min", "3,14");
-        assertFalse(validator.isValidExceptionsCatched("2"));
+        assertFalse(validator.isValid("2"));
     }
 }

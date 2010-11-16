@@ -15,24 +15,24 @@ public class MCRMaxLengthValidatorTest extends MCRValidatorTest {
     @Test
     public void testHasRequiredProperties() {
         validator.setProperty("maxLength", "3");
-        assertTrue(validator.hasRequiredPropertiesForValidation());
+        assertTrue(validator.hasRequiredProperties());
     }
 
     @Test
     public void testMaxLengthValid() {
         validator.setProperty("maxLength", "3");
-        assertTrue(validator.isValidExceptionsCatched("123"));
+        assertTrue(validator.isValid("123"));
     }
 
     @Test
     public void testMaxLengthInvalid() {
         validator.setProperty("maxLength", "3");
-        assertFalse(validator.isValidExceptionsCatched("1234"));
+        assertFalse(validator.isValid("1234"));
     }
 
     @Test
     public void testMaxLengthNull() {
         validator.setProperty("maxLength", "0");
-        assertTrue(validator.isValidExceptionsCatched(""));
+        assertTrue(validator.isValid(""));
     }
 }

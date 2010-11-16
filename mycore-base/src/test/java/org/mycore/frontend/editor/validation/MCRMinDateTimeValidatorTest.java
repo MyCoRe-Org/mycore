@@ -17,18 +17,18 @@ public class MCRMinDateTimeValidatorTest extends MCRValidatorTest {
     @Test
     public void testHasRequiredProperties() {
         validator.setProperty("min", "22.04.1971");
-        assertTrue(validator.hasRequiredPropertiesForValidation());
+        assertTrue(validator.hasRequiredProperties());
     }
 
     @Test
     public void testMinValid() {
         validator.setProperty("min", "22.04.1971");
-        assertTrue(validator.isValidExceptionsCatched("22.04.1971"));
+        assertTrue(validator.isValid("22.04.1971"));
     }
 
     @Test
     public void testMinInvalid() {
         validator.setProperty("min", "22.04.1971");
-        assertFalse(validator.isValidExceptionsCatched("21.04.1971"));
+        assertFalse(validator.isValid("21.04.1971"));
     }
 }

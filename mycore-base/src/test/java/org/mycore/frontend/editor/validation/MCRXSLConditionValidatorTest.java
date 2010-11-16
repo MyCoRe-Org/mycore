@@ -15,18 +15,18 @@ public class MCRXSLConditionValidatorTest extends MCRValidatorTest {
     @Test
     public void testHasRequiredProperties() {
         validator.setProperty("xsl", "true");
-        assertTrue(validator.hasRequiredPropertiesForValidation());
+        assertTrue(validator.hasRequiredProperties());
     }
 
     @Test
     public void testValidPattern() {
         validator.setProperty("xsl", "starts-with(.,'http://')");
-        assertTrue(validator.isValidExceptionsCatched("http://www.foo.bar"));
+        assertTrue(validator.isValid("http://www.foo.bar"));
     }
 
     @Test
     public void testInvalidPattern() {
         validator.setProperty("xsl", "starts-with(.,'http://')");
-        assertFalse(validator.isValidExceptionsCatched("somethingDifferent"));
+        assertFalse(validator.isValid("somethingDifferent"));
     }
 }

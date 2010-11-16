@@ -14,23 +14,23 @@ public class MCRCombinedValidatorTest extends MCRValidatorTest {
 
     @Test
     public void testEmptyCombinedValidator() {
-        assertFalse(validator.hasRequiredPropertiesForValidation());
-        assertTrue(validator.isValidExceptionsCatched("foo"));
+        assertFalse(validator.hasRequiredProperties());
+        assertTrue(validator.isValid("foo"));
     }
 
     @Test
     public void testHasRequiredProperties() {
         ((MCRCombinedValidator) validator).addValidator(new MCRMinLengthValidator());
         validator.setProperty("minLength", "3");
-        assertTrue(validator.hasRequiredPropertiesForValidation());
+        assertTrue(validator.hasRequiredProperties());
     }
 
     @Test
     public void testSingleValidator() {
         ((MCRCombinedValidator) validator).addValidator(new MCRMinLengthValidator());
         validator.setProperty("minLength", "3");
-        assertTrue(validator.isValidExceptionsCatched("123"));
-        assertFalse(validator.isValidExceptionsCatched("12"));
+        assertTrue(validator.isValid("123"));
+        assertFalse(validator.isValid("12"));
     }
 
     @Test
@@ -39,19 +39,19 @@ public class MCRCombinedValidatorTest extends MCRValidatorTest {
         ((MCRCombinedValidator) validator).addValidator(new MCRMaxLengthValidator());
         validator.setProperty("minLength", "3");
         validator.setProperty("maxLength", "5");
-        assertTrue(validator.isValidExceptionsCatched("123"));
-        assertFalse(validator.isValidExceptionsCatched("12"));
-        assertFalse(validator.isValidExceptionsCatched("123456"));
+        assertTrue(validator.isValid("123"));
+        assertFalse(validator.isValid("12"));
+        assertFalse(validator.isValid("123456"));
     }
 
     @Test
     public void testPredefinedValidators() {
-        ((MCRCombinedValidator) validator).addPredefinedValidators();
+        validator = MCRValidatorBuilder.buildPredefinedCombinedValidator();
         validator.setProperty("minLength", "3");
         validator.setProperty("type", "string");
         validator.setProperty("max", "abc");
-        assertTrue(validator.isValidExceptionsCatched("123"));
-        assertFalse(validator.isValidExceptionsCatched("12"));
-        assertFalse(validator.isValidExceptionsCatched("abd"));
+        assertTrue(validator.isValid("123"));
+        assertFalse(validator.isValid("12"));
+        assertFalse(validator.isValid("abd"));
     }
 }

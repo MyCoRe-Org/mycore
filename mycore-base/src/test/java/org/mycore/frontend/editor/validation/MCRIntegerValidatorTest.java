@@ -15,16 +15,16 @@ public class MCRIntegerValidatorTest extends MCRValidatorTest {
     @Test
     public void testHasRequiredProperties() {
         validator.setProperty("type", "integer");
-        assertTrue(validator.hasRequiredPropertiesForValidation());
+        assertTrue(validator.hasRequiredProperties());
     }
 
     @Test
     public void testValidInputFormat() {
-        assertTrue(validator.isValidExceptionsCatched("123"));
+        assertTrue(validator.isValid("123"));
     }
 
     @Test
     public void testInvalidInputFormat() {
-        assertFalse(validator.isValidExceptionsCatched("text"));
+        assertFalse(validator.isValid("text"));
     }
 }

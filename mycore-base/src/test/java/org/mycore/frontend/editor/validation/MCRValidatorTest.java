@@ -9,6 +9,6 @@ public abstract class MCRValidatorTest {
 
     @Test
     public void testPropertiesMissing() {
-        assertFalse(validator.hasRequiredPropertiesForValidation());
+        assertFalse(validator.hasRequiredProperties());
     }
 }

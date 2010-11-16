@@ -16,18 +16,18 @@ public class MCRMaxStringValidatorTest extends MCRValidatorTest {
     @Test
     public void testHasRequiredProperties() {
         validator.setProperty("max", "abc");
-        assertTrue(validator.hasRequiredPropertiesForValidation());
+        assertTrue(validator.hasRequiredProperties());
     }
 
     @Test
     public void testMaxValid() {
         validator.setProperty("max", "abc");
-        assertTrue(validator.isValidExceptionsCatched("abc"));
+        assertTrue(validator.isValid("abc"));
     }
 
     @Test
     public void testMaxInvalid() {
         validator.setProperty("max", "abc");
-        assertFalse(validator.isValidExceptionsCatched("abd"));
+        assertFalse(validator.isValid("abd"));
     }
 }

@@ -17,18 +17,18 @@ public class MCRMaxDecimalValidatorTest extends MCRValidatorTest {
     @Test
     public void testHasRequiredProperties() {
         validator.setProperty("max", "3,14");
-        assertTrue(validator.hasRequiredPropertiesForValidation());
+        assertTrue(validator.hasRequiredProperties());
     }
 
     @Test
     public void testMaxValid() {
         validator.setProperty("max", "3,14");
-        assertTrue(validator.isValidExceptionsCatched("3,13"));
+        assertTrue(validator.isValid("3,13"));
     }
 
     @Test
     public void testMaxInvalid() {
         validator.setProperty("max", "3,14");
-        assertFalse(validator.isValidExceptionsCatched("4"));
+        assertFalse(validator.isValid("4"));
     }
 }

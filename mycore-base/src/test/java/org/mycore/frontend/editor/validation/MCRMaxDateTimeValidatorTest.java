@@ -17,18 +17,18 @@ public class MCRMaxDateTimeValidatorTest extends MCRValidatorTest {
     @Test
     public void testHasRequiredProperties() {
         validator.setProperty("max", "22.04.1971");
-        assertTrue(validator.hasRequiredPropertiesForValidation());
+        assertTrue(validator.hasRequiredProperties());
     }
 
     @Test
     public void testMaxValid() {
         validator.setProperty("max", "22.04.1971");
-        assertTrue(validator.isValidExceptionsCatched("22.04.1971"));
+        assertTrue(validator.isValid("22.04.1971"));
     }
 
     @Test
     public void testMaxInvalid() {
         validator.setProperty("max", "22.04.1971");
-        assertFalse(validator.isValidExceptionsCatched("23.04.1971"));
+        assertFalse(validator.isValid("23.04.1971"));
     }
 }

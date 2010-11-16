@@ -15,24 +15,24 @@ public class MCRMinLengthValidatorTest extends MCRValidatorTest {
     @Test
     public void testHasRequiredProperties() {
         validator.setProperty("minLength", "3");
-        assertTrue(validator.hasRequiredPropertiesForValidation());
+        assertTrue(validator.hasRequiredProperties());
     }
 
     @Test
     public void testMinLengthValid() {
         validator.setProperty("minLength", "3");
-        assertTrue(validator.isValidExceptionsCatched("123"));
+        assertTrue(validator.isValid("123"));
     }
 
     @Test
     public void testMinLengthInvalid() {
         validator.setProperty("minLength", "3");
-        assertFalse(validator.isValidExceptionsCatched("12"));
+        assertFalse(validator.isValid("12"));
     }
 
     @Test
     public void testMinLengthNull() {
         validator.setProperty("minLength", "0");
-        assertTrue(validator.isValidExceptionsCatched(""));
+        assertTrue(validator.isValid(""));
     }
 }

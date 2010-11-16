@@ -15,18 +15,18 @@ public class MCRRegExpValidatorTest extends MCRValidatorTest {
     @Test
     public void testHasRequiredProperties() {
         validator.setProperty("regexp", "a*");
-        assertTrue(validator.hasRequiredPropertiesForValidation());
+        assertTrue(validator.hasRequiredProperties());
     }
 
     @Test
     public void testValidPattern() {
         validator.setProperty("regexp", "a*");
-        assertTrue(validator.isValidExceptionsCatched("aaa"));
+        assertTrue(validator.isValid("aaa"));
     }
 
     @Test
     public void testInvalidPattern() {
         validator.setProperty("regexp", "a*");
-        assertFalse(validator.isValidExceptionsCatched("aba"));
+        assertFalse(validator.isValid("aba"));
     }
 }

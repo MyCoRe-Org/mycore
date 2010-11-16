@@ -16,18 +16,18 @@ public class MCRMinStringValidatorTest extends MCRValidatorTest {
     @Test
     public void testHasRequiredProperties() {
         validator.setProperty("min", "abc");
-        assertTrue(validator.hasRequiredPropertiesForValidation());
+        assertTrue(validator.hasRequiredProperties());
     }
 
     @Test
     public void testMinValid() {
         validator.setProperty("min", "abc");
-        assertTrue(validator.isValidExceptionsCatched("abc"));
+        assertTrue(validator.isValid("abc"));
     }
 
     @Test
     public void testMinInvalid() {
         validator.setProperty("min", "abc");
-        assertFalse(validator.isValidExceptionsCatched("abb"));
+        assertFalse(validator.isValid("abb"));
     }
 }

@@ -16,24 +16,24 @@ public class MCRMinIntegerValidatorTest extends MCRValidatorTest {
     @Test
     public void testHasRequiredProperties() {
         validator.setProperty("min", "3");
-        assertTrue(validator.hasRequiredPropertiesForValidation());
+        assertTrue(validator.hasRequiredProperties());
     }
 
     @Test
     public void testMinValid() {
         validator.setProperty("min", "3");
-        assertTrue(validator.isValidExceptionsCatched("3"));
+        assertTrue(validator.isValid("3"));
     }
 
     @Test
     public void testMinInvalid() {
         validator.setProperty("min", "3");
-        assertFalse(validator.isValidExceptionsCatched("2"));
+        assertFalse(validator.isValid("2"));
     }
 
     @Test
     public void testInvalidInputFormat() {
         validator.setProperty("min", "3");
-        assertFalse(validator.isValidExceptionsCatched("text"));
+        assertFalse(validator.isValid("text"));
     }
 }
