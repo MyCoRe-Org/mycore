@@ -8,16 +8,11 @@ public abstract class MCRComparingValidator extends MCRPairValidatorBase {
     }
 
     @Override
-    protected boolean isValidPairOrDie(String valueA, String valueB) throws Exception {
-        valueA = (valueA == null ? "" : valueA.trim());
-        valueB = (valueB == null ? "" : valueB.trim());
-        if (valueA.isEmpty() || valueB.isEmpty())
+    protected boolean isValidPairOrDie(String valueA, String valueB) {
+        if (isEmpty(valueA) || isEmpty(valueB))
             return true;
 
-        String operator = getProperty("operator");
-        if ("!=".equals(operator))
-            operator = "<>";
-
+        String operator = getOperator();
         int result = compare(valueA, valueB);
 
         if (result < 0)
@@ -26,6 +21,17 @@ public abstract class MCRComparingValidator extends MCRPairValidatorBase {
             return operator.contains(">");
         else
             return operator.contains("=");
+    }
+
+    private String getOperator() {
+        String operator = getProperty("operator");
+        if ("!=".equals(operator))
+            operator = "<>";
+        return operator;
+    }
+
+    protected boolean isEmpty(String value) {
+        return (value == null) || value.trim().isEmpty();
     }
 
     protected abstract int compare(String valueA, String valueB);
