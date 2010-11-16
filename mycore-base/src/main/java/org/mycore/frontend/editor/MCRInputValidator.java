@@ -49,6 +49,9 @@ import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
+import org.mycore.frontend.editor.validation.MCRIntegerPairValidator;
+import org.mycore.frontend.editor.validation.MCRPairValidator;
+import org.mycore.frontend.editor.validation.MCRStringPairValidator;
 
 /**
  * This class provides input validation methods for editor data.
@@ -202,42 +205,13 @@ public class MCRInputValidator {
             }
 
             if (type.equals("string")) {
-                int res = valueA.compareTo(valueB);
-
-                if ("=".equals(operator)) {
-                    return res == 0;
-                } else if ("<".equals(operator)) {
-                    return res < 0;
-                } else if (">".equals(operator)) {
-                    return res > 0;
-                } else if ("<=".equals(operator)) {
-                    return res <= 0;
-                } else if (">=".equals(operator)) {
-                    return res >= 0;
-                } else if ("!=".equals(operator)) {
-                    return !(res == 0);
-                } else {
-                    throw new MCRConfigurationException("Unknown compare operator: " + operator);
-                }
+                MCRPairValidator validator = new MCRStringPairValidator();
+                validator.setProperty("operator", operator);
+                return validator.isValidPair(valueA, valueB);
             } else if (type.equals("integer")) {
-                long vA = Long.parseLong(valueA.trim());
-                long vB = Long.parseLong(valueB.trim());
-
-                if ("=".equals(operator)) {
-                    return vA == vB;
-                } else if ("<".equals(operator)) {
-                    return vA < vB;
-                } else if (">".equals(operator)) {
-                    return vA > vB;
-                } else if ("<=".equals(operator)) {
-                    return vA <= vB;
-                } else if (">=".equals(operator)) {
-                    return vA >= vB;
-                } else if ("!=".equals(operator)) {
-                    return !(vA == vB);
-                } else {
-                    throw new MCRConfigurationException("Unknown compare operator: " + operator);
-                }
+                MCRPairValidator validator = new MCRIntegerPairValidator();
+                validator.setProperty("operator", operator);
+                return validator.isValidPair(valueA, valueB);
             } else if (type.equals("decimal")) {
                 Locale locale = format == null ? Locale.getDefault() : new Locale(format);
                 NumberFormat nf = NumberFormat.getNumberInstance(locale);
