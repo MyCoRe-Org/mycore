@@ -275,7 +275,8 @@
       <xsl:value-of select="$DampInViewer" />
       <xsl:text>;</xsl:text>
     </script>
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"/>
+    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+    <script type="text/javascript">google.load("jquery", "1");</script>
     <!-- JQuery Framework -->
     <script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/jquery.mousewheel.min.js" />
     <!-- JQuery Mousewheel support -->
