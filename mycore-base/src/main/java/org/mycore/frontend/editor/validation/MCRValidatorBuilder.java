@@ -22,4 +22,11 @@ public class MCRValidatorBuilder {
         validator.addValidator(new MCRMinStringValidator());
         return validator;
     }
+
+    public static MCRCombinedPairValidator buildPredefinedCombinedPairValidator() {
+        MCRCombinedPairValidator validator = new MCRCombinedPairValidator();
+        validator.addValidator(new MCRStringPairValidator());
+        validator.addValidator(new MCRIntegerPairValidator());
+        return validator;
+    }
 }
