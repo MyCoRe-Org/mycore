@@ -1,7 +1,5 @@
 package org.mycore.frontend.editor.validation;
 
-import org.mycore.common.MCRConfigurationException;
-
 public abstract class MCRComparingValidator extends MCRPairValidatorBase {
 
     @Override
