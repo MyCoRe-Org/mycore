@@ -6,6 +6,15 @@
   </properties>
   <body>
     <release version="2.0.93" date="2010-?-?" description="Beta 3">
+      <action dev="mcrfluet" type="add">
+        Added new built-in command "get uri {uri} to file {path}" to test or use MCRURIResolver
+      </action>
+      <action dev="mcrfluet" type="add">
+        Added new generic search field "category" which contains "classificationID:categoryID" to search for any category in any classification 
+      </action>
+      <action dev="mcrfluet" type="add">
+        MCRMailer now acts as a servlet to simplify sending e-mail after editor form submission. See workshop.xml and workshop.xsl in DocPortal as an example.
+      </action>
       <action dev="mcrsherm" type="fix">
         Renamed property URN.Enabled.Objects to MCR.URN.Enabled.Objects
       </action>
