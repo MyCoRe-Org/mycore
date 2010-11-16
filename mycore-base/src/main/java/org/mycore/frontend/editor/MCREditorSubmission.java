@@ -31,7 +31,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Properties;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
@@ -46,9 +45,9 @@ import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRConstants;
-import org.mycore.frontend.editor.validation.MCRCombinedValidator;
 import org.mycore.frontend.editor.validation.MCRRequiredValidator;
 import org.mycore.frontend.editor.validation.MCRValidator;
+import org.mycore.frontend.editor.validation.MCRValidatorBuilder;
 
 /**
  * Container class that holds all data and files edited and submitted from an
@@ -504,43 +503,31 @@ public class MCREditorSubmission {
 
     private boolean checkCondition(Element condition, String name, String value) {
         value = (value == null ? "" : value.trim());
-        Properties attributes = attributes2properties(condition);
-        fixRequiredCondition(name, attributes);
 
+        MCRValidator validator;
         if (value.isEmpty()) {
-            return checkEmptyValue(value, attributes);
+            validator = new MCRRequiredValidator();
         } else {
-            return checkNonEmptyValue(value, attributes);
+            validator = MCRValidatorBuilder.buildPredefinedCombinedValidator();
         }
+
+        setValidatorProperties( validator, condition );
+        setRequiredProperty( validator, condition, name );
+        return validator.isValid(value);
     }
 
-    private void fixRequiredCondition(String name, Properties attributes) {
-        boolean required = "true".equals(attributes.getProperty("required"));
+    private void setRequiredProperty(MCRValidator validator, Element condition, String name) {
+        boolean required = "true".equals(condition.getAttributeValue("required"));
         boolean repeated = name.endsWith("]");
         required = required && !repeated;
-        attributes.setProperty("required", Boolean.toString(required));
+        validator.setProperty("required", Boolean.toString(required));
     }
 
-    private boolean checkNonEmptyValue(String value, Properties properties) {
-        MCRCombinedValidator validator = new MCRCombinedValidator();
-        validator.setProperties(properties);
-        validator.addPredefinedValidators();
-        return validator.isValidExceptionsCatched(value);
-    }
-
-    private boolean checkEmptyValue(String value, Properties properties) {
-        MCRValidator validator = new MCRRequiredValidator();
-        validator.setProperties(properties);
-        return validator.isValidExceptionsCatched(value);
-    }
-
-    private Properties attributes2properties(Element condition) {
-        Properties attributeValues = new Properties();
+    private void setValidatorProperties(MCRValidator validator, Element condition) {
         for (Attribute attribute : (List<Attribute>) (condition.getAttributes())) {
             if (!attribute.getValue().isEmpty())
-                attributeValues.setProperty(attribute.getName(), attribute.getValue());
+                validator.setProperty(attribute.getName(), attribute.getValue());
         }
-        return attributeValues;
     }
 
     private void addVariable(String path, String text) {
