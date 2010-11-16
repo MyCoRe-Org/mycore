@@ -49,9 +49,7 @@ import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
-import org.mycore.frontend.editor.validation.MCRIntegerPairValidator;
 import org.mycore.frontend.editor.validation.MCRPairValidator;
-import org.mycore.frontend.editor.validation.MCRStringPairValidator;
 import org.mycore.frontend.editor.validation.MCRValidatorBuilder;
 
 /**
