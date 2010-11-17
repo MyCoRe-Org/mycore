@@ -23,7 +23,7 @@ public class MCRExternalValidatorTest extends MCRValidatorTest {
 
     @Test
     public void testExternal() {
-        validator.setProperty("class", "org.mycore.frontend.editor.validation.value.MCRExternalValidatorTest");
+        validator.setProperty("class", this.getClass().getName() );
         validator.setProperty("method", "externalTestForValue");
         assertTrue(validator.isValid("valid"));
         assertFalse(validator.isValid("invalid"));
