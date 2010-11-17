@@ -16,11 +16,6 @@ public class MCRDateTimePairValidator extends MCRComparingValidator {
         Date a = converter.string2date(valueA);
         Date b = converter.string2date(valueB);
 
-        if (a.before(b))
-            return -1;
-        else if (a.after(b))
-            return +1;
-        else
-            return 0;
+        return Long.signum(a.getTime() - b.getTime());
     }
 }
