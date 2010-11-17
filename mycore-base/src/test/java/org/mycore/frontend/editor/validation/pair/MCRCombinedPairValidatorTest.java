@@ -1,9 +1,10 @@
-package org.mycore.frontend.editor.validation;
+package org.mycore.frontend.editor.validation.pair;
 
 import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mycore.frontend.editor.validation.MCRValidatorBuilder;
 import org.mycore.frontend.editor.validation.pair.MCRCombinedPairValidator;
 import org.mycore.frontend.editor.validation.pair.MCRIntegerPairValidator;
 import org.mycore.frontend.editor.validation.pair.MCRStringPairValidator;

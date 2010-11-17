@@ -1,4 +1,4 @@
-package org.mycore.frontend.editor.validation;
+package org.mycore.frontend.editor.validation.pair;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

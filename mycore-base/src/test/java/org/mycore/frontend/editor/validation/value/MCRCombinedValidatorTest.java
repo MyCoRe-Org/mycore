@@ -1,9 +1,11 @@
-package org.mycore.frontend.editor.validation;
+package org.mycore.frontend.editor.validation.value;
 
 import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mycore.frontend.editor.validation.MCRCombinedValidator;
+import org.mycore.frontend.editor.validation.MCRValidatorBuilder;
 import org.mycore.frontend.editor.validation.value.MCRMaxLengthValidator;
 import org.mycore.frontend.editor.validation.value.MCRMinLengthValidator;
 
