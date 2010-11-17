@@ -437,21 +437,9 @@ public class MCREditorSubmission {
                     String valueA = parms.getParameter(pathA);
                     String valueB = parms.getParameter(pathB);
 
-                    String oper = condition.getAttributeValue("operator");
-
-                    String clazz = condition.getAttributeValue("class");
-                    String method = condition.getAttributeValue("method");
-
-                    boolean ok = true;
-
-                    if (oper != null && oper.length() > 0) {
-                        MCRPairValidator validator = MCRValidatorBuilder.buildPredefinedCombinedPairValidator();
-                        setValidatorProperties(validator, condition);
-                        ok = validator.isValidPair(valueA, valueB);
-                    }
-                    if (clazz != null && clazz.length() > 0 && condition.getAttributeValue("field1") != null && condition.getAttributeValue("field2") != null) {
-                        ok = ok && MCRInputValidator.instance().validateExternally(clazz, method, valueA, valueB);
-                    }
+                    MCRPairValidator validator = MCRValidatorBuilder.buildPredefinedCombinedPairValidator();
+                    setValidatorProperties(validator, condition);
+                    boolean ok = validator.isValidPair(valueA, valueB);
 
                     if (!ok) {
                         String sortNrA = parms.getParameter("_sortnr-" + pathA);
@@ -460,12 +448,6 @@ public class MCREditorSubmission {
                         String sortNrB = parms.getParameter("_sortnr-" + pathB);
                         failed.put(sortNrB, condition);
 
-                        if (LOGGER.isDebugEnabled()) {
-                            String cond = new XMLOutputter(Format.getCompactFormat()).outputString(condition);
-                            LOGGER.debug("Validation condition failed:");
-                            LOGGER.debug(pathA + " " + oper + " " + pathB);
-                            LOGGER.debug(cond);
-                        }
                     } else if (condition.getAttribute("field1") == null) {
                         Element current = null;
 
@@ -482,6 +464,10 @@ public class MCREditorSubmission {
                                     LOGGER.debug(xml);
                                 }
                             }
+
+                            String clazz = condition.getAttributeValue("class");
+                            String method = condition.getAttributeValue("method");
+                            
                             if (clazz != null && clazz.length() > 0) {
                                 if (current == null) {
                                     current = (Element) XPath.selectSingleNode(getXML(), path);
