@@ -6,6 +6,7 @@ import org.mycore.frontend.editor.validation.pair.MCRDecimalPairValidator;
 import org.mycore.frontend.editor.validation.pair.MCRExternalPairValidator;
 import org.mycore.frontend.editor.validation.pair.MCRIntegerPairValidator;
 import org.mycore.frontend.editor.validation.pair.MCRStringPairValidator;
+import org.mycore.frontend.editor.validation.value.MCRCombinedValidator;
 import org.mycore.frontend.editor.validation.value.MCRDateTimeValidator;
 import org.mycore.frontend.editor.validation.value.MCRDecimalValidator;
 import org.mycore.frontend.editor.validation.value.MCRExternalValidator;

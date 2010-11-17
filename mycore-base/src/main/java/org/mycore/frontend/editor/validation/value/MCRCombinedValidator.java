@@ -1,6 +1,7 @@
-package org.mycore.frontend.editor.validation;
+package org.mycore.frontend.editor.validation.value;
 
-import org.mycore.frontend.editor.validation.value.MCRValidator;
+import org.mycore.frontend.editor.validation.MCRCombinedValidatorBase;
+import org.mycore.frontend.editor.validation.MCRConfigurable;
 
 public class MCRCombinedValidator extends MCRCombinedValidatorBase implements MCRValidator {
 
