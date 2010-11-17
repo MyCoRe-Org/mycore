@@ -8,9 +8,12 @@ public class MCRCombinedValidator extends MCRCombinedValidatorBase implements MC
         for (MCRConfigurable validator : validators) {
             if (!validator.hasRequiredProperties())
                 continue;
-            if (!((MCRValidator) validator).isValid(input))
+            if (!((MCRValidator) validator).isValid(input)) {
+                reportValidationResult(validator, false, input);
                 return false;
+            }
         }
+        reportValidationResult(this, true, input);
         return true;
     }
 

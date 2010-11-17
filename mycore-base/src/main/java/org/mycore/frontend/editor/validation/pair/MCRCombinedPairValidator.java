@@ -9,9 +9,12 @@ public class MCRCombinedPairValidator extends MCRCombinedValidatorBase implement
         for (MCRConfigurable validator : validators) {
             if (!validator.hasRequiredProperties())
                 continue;
-            if (!((MCRPairValidator) validator).isValidPair(valueA, valueB))
+            if (!((MCRPairValidator) validator).isValidPair(valueA, valueB)) {
+                reportValidationResult(validator, false, valueA, valueB);
                 return false;
+            }
         }
+        reportValidationResult(this, true, valueA, valueB);
         return true;
     }
 

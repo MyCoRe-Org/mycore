@@ -14,6 +14,10 @@ public abstract class MCRConfigurableBase implements MCRConfigurable {
         return properties.getProperty(name);
     }
 
+    protected Properties getProperties() {
+        return properties;
+    }
+
     public boolean hasProperty(String name) {
         return properties.containsKey(name);
     }
