@@ -29,21 +29,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 
-import org.apache.commons.vfs.Selectors;
-import org.apache.commons.vfs.VFS;
-import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
-import org.mycore.common.MCRTestCase;
 
 /**
  * JUnit test for MCRMetadataStore
@@ -51,39 +44,6 @@ import org.mycore.common.MCRTestCase;
  * @author Frank Lützenkirchen
  */
 public class MCRMetadataStoreTest extends MCRIFS2MetadataTestCase {
-
-    private static Logger LOGGER = Logger.getLogger(MCRMetadataStoreTest.class);
-
-//    private MCRMetadataStore store;
-//
-//    protected void createStore() throws Exception {
-//        File temp = File.createTempFile("base", "");
-//        String path = temp.getAbsolutePath();
-//        temp.delete();
-//    
-//        setProperty("MCR.IFS2.Store.TEST.Class", "org.mycore.datamodel.ifs2.MCRMetadataStore", true);
-//        setProperty("MCR.IFS2.Store.TEST.BaseDir", path, true);
-//        setProperty("MCR.IFS2.Store.TEST.SlotLayout", "4-2-2", true);
-//        setMetaDataStore(MCRMetadataStore.getStore("TEST"));
-//    }
-//
-//    @Override
-//    @Before
-//    public void setUp() throws Exception {
-//        super.setUp();
-//        if (getMetaDataStore() == null) {
-//            createStore();
-//        } else {
-//            VFS.getManager().resolveFile(getMetaDataStore().getBaseDir()).createFolder();
-//        }
-//    }
-//
-//    @Override
-//    @After
-//    public void tearDown() throws Exception {
-//        super.tearDown();
-//        VFS.getManager().resolveFile(getMetaDataStore().getBaseDir()).delete(Selectors.SELECT_ALL);
-//    }
 
     @Test
     public void createDocument() throws Exception {
@@ -222,53 +182,5 @@ public class MCRMetadataStoreTest extends MCRIFS2MetadataTestCase {
         assertTrue(l2.size() == 3);
         Collections.sort(l2);
         assertEquals(l1, l2);
-    }
-
-    @Test
-    public void performance() throws Exception {
-        Document xml = new Document(new Element("root"));
-        LOGGER.info("Storing 1.000 XML documents in store:");
-        long time = System.currentTimeMillis();
-        for (int i = 0; i < 1000; i++) {
-            getMetaDataStore().create(MCRContent.readFrom(xml));
-        }
-        LOGGER.info("Time: " + (System.currentTimeMillis() - time) + " ms");
-
-        LOGGER.info("getLastModified of 1.000 XML documents from store:");
-        time = System.currentTimeMillis();
-        for (Iterator<Integer> ids = getMetaDataStore().listIDs(MCRStore.ASCENDING); ids.hasNext();) {
-            getMetaDataStore().retrieve(ids.next()).getLastModified();
-        }
-        LOGGER.info("Time: " + (System.currentTimeMillis() - time) + " ms");
-
-        time = System.currentTimeMillis();
-        LOGGER.info("Retrieving 1.000 XML documents from store:");
-        for (Iterator<Integer> ids = getMetaDataStore().listIDs(MCRStore.ASCENDING); ids.hasNext();) {
-            xml = getMetaDataStore().retrieve(ids.next()).getMetadata().asXML();
-        }
-        LOGGER.info("Time: " + (System.currentTimeMillis() - time) + " ms");
-
-        time = System.currentTimeMillis();
-        xml = new Document(new Element("update"));
-        LOGGER.info("Updating 1.000 XML documents in store:");
-        for (Iterator<Integer> ids = getMetaDataStore().listIDs(MCRStore.ASCENDING); ids.hasNext();) {
-            getMetaDataStore().retrieve(ids.next()).update(MCRContent.readFrom(xml));
-        }
-        LOGGER.info("Time: " + (System.currentTimeMillis() - time) + " ms");
-
-        time = System.currentTimeMillis();
-        LOGGER.info("Listing 1.000 IDs in descending order:");
-        Iterator<Integer> IDs = getMetaDataStore().listIDs(MCRStore.DESCENDING);
-        while (IDs.hasNext()) {
-            IDs.next();
-        }
-        LOGGER.info("Time: " + (System.currentTimeMillis() - time) + " ms");
-
-        time = System.currentTimeMillis();
-        LOGGER.info("Deleting 1.000 XML documents from store:");
-        for (Iterator<Integer> ids = getMetaDataStore().listIDs(MCRStore.ASCENDING); ids.hasNext();) {
-            getMetaDataStore().delete(ids.next());
-        }
-        LOGGER.info("Time: " + (System.currentTimeMillis() - time) + " ms");
     }
 }

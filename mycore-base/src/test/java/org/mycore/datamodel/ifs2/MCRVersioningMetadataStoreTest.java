@@ -29,22 +29,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
-import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.vfs.Selectors;
-import org.apache.commons.vfs.VFS;
-import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTestCase;
 import org.mycore.common.MCRUsageException;
-import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 
 /**
  * JUnit test for MCRVersioningMetadataStore
@@ -52,8 +43,6 @@ import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
  * @author Frank Lützenkirchen
  */
 public class MCRVersioningMetadataStoreTest extends MCRIFS2VersioningTestCase {
-
-    private static Logger LOGGER = Logger.getLogger(MCRVersioningMetadataStoreTest.class);
 
     @Test
     public void createDocument() throws Exception {
@@ -235,32 +224,5 @@ public class MCRVersioningMetadataStoreTest extends MCRIFS2VersioningTestCase {
         v1.restore();
         assertFalse(vm.isDeleted());
         assertEquals(root.getName(), vm.getMetadata().asXML().getRootElement().getName());
-    }
-
-    @Test
-    public void performance() throws Exception {
-        Document xml = new Document(new Element("root"));
-        LOGGER.info("Storing 10 XML documents in store:");
-        long time = System.currentTimeMillis();
-        for (int i = 0; i < 10; i++) {
-            getVersStore().create(MCRContent.readFrom(xml));
-        }
-        LOGGER.info("Time: " + (System.currentTimeMillis() - time) + " ms");
-
-        time = System.currentTimeMillis();
-        xml = new Document(new Element("update"));
-        LOGGER.info("Updating 10 XML documents in store:");
-        for (Iterator<Integer> ids = getVersStore().listIDs(MCRStore.ASCENDING); ids.hasNext();) {
-            getVersStore().retrieve(ids.next()).update(MCRContent.readFrom(xml));
-        }
-        LOGGER.info("Time: " + (System.currentTimeMillis() - time) + " ms");
-
-        time = System.currentTimeMillis();
-        LOGGER.info("Deleting 10 XML documents from store:");
-        for (Iterator<Integer> ids = getVersStore().listIDs(MCRStore.ASCENDING); ids.hasNext();) {
-            ids.next();
-            ids.remove();
-        }
-        LOGGER.info("Time: " + (System.currentTimeMillis() - time) + " ms");
     }
 }
