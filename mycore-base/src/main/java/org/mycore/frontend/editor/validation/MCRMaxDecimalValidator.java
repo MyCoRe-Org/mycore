@@ -9,8 +9,9 @@ public class MCRMaxDecimalValidator extends MCRDecimalValidator {
 
     @Override
     protected boolean isValidOrDie(String input) throws Exception {
-        double value = string2double(input);
-        double max = string2double(getProperty("max"));
+        MCRDecimalConverter converter = getConverter();
+        double value = converter.string2double(input);
+        double max = converter.string2double(getProperty("max"));
         return (value <= max);
     }
 }
