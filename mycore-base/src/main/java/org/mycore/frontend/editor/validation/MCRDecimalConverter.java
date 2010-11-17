@@ -11,7 +11,8 @@ public class MCRDecimalConverter {
 
     private Locale locale = Locale.getDefault();
 
-    public MCRDecimalConverter(String format) {
+    public MCRDecimalConverter(MCRConfigurable validator) {
+        String format = validator.getProperty("format");
         if (format != null)
             locale = new Locale(format);
     }

@@ -11,7 +11,7 @@ public class MCRMaxDecimalValidator extends MCRDecimalValidator {
 
     @Override
     protected boolean isValidOrDie(String input) throws Exception {
-        MCRDecimalConverter converter = getConverter();
+        MCRDecimalConverter converter = new MCRDecimalConverter(this);
         double value = converter.string2double(input);
         double max = converter.string2double(getProperty("max"));
         return (value <= max);

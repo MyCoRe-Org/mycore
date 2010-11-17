@@ -11,12 +11,7 @@ public class MCRDateTimeValidator extends MCRValidatorBase {
 
     @Override
     protected boolean isValidOrDie(String input) throws Exception {
-        getConverter().string2date(input);
+        new MCRDateTimeConverter(this).string2date(input);
         return true;
-    }
-
-    protected MCRDateTimeConverter getConverter() {
-        String patterns = getProperty("format");
-        return new MCRDateTimeConverter(patterns);
     }
 }

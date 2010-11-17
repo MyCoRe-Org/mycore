@@ -11,13 +11,7 @@ public class MCRDecimalValidator extends MCRValidatorBase {
 
     @Override
     protected boolean isValidOrDie(String input) throws Exception {
-        getConverter().string2double(input);
+        new MCRDecimalConverter(this).string2double(input);
         return true;
     }
-
-    protected MCRDecimalConverter getConverter() {
-        String format = getProperty("format");
-        return new MCRDecimalConverter(format);
-    }
-
 }

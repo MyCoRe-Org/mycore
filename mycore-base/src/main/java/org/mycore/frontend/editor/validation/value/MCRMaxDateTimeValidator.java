@@ -13,7 +13,7 @@ public class MCRMaxDateTimeValidator extends MCRDateTimeValidator {
 
     @Override
     protected boolean isValidOrDie(String input) throws Exception {
-        MCRDateTimeConverter converter = getConverter();
+        MCRDateTimeConverter converter = new MCRDateTimeConverter(this);
         Date value = converter.string2date(input);
         Date max = converter.string2date(getProperty("max"));
         return value.before(max) || value.equals(max);

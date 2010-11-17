@@ -11,7 +11,7 @@ public class MCRMinDecimalValidator extends MCRDecimalValidator {
 
     @Override
     protected boolean isValidOrDie(String input) throws Exception {
-        MCRDecimalConverter converter = getConverter();
+        MCRDecimalConverter converter = new MCRDecimalConverter(this);
         double value = converter.string2double(input);
         double min = converter.string2double(getProperty("min"));
         return (min <= value);
