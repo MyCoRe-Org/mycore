@@ -8,7 +8,7 @@ public abstract class MCRComparingValidator extends MCRPairValidatorBase {
     }
 
     @Override
-    protected boolean isValidPairOrDie(String valueA, String valueB) {
+    protected boolean isValidPairOrDie(String valueA, String valueB) throws Exception {
         if (isEmpty(valueA) || isEmpty(valueB))
             return true;
 
@@ -34,5 +34,5 @@ public abstract class MCRComparingValidator extends MCRPairValidatorBase {
         return (value == null) || value.trim().isEmpty();
     }
 
-    protected abstract int compare(String valueA, String valueB);
+    protected abstract int compare(String valueA, String valueB) throws Exception;
 }
