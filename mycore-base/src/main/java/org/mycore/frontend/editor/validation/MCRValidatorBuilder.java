@@ -3,6 +3,7 @@ package org.mycore.frontend.editor.validation;
 import org.mycore.frontend.editor.validation.pair.MCRCombinedPairValidator;
 import org.mycore.frontend.editor.validation.pair.MCRDateTimePairValidator;
 import org.mycore.frontend.editor.validation.pair.MCRDecimalPairValidator;
+import org.mycore.frontend.editor.validation.pair.MCRExternalPairValidator;
 import org.mycore.frontend.editor.validation.pair.MCRIntegerPairValidator;
 import org.mycore.frontend.editor.validation.pair.MCRStringPairValidator;
 import org.mycore.frontend.editor.validation.value.MCRDateTimeValidator;
@@ -51,6 +52,7 @@ public class MCRValidatorBuilder {
         validator.addValidator(new MCRIntegerPairValidator());
         validator.addValidator(new MCRDecimalPairValidator());
         validator.addValidator(new MCRDateTimePairValidator());
+        validator.addValidator(new MCRExternalPairValidator());
         return validator;
     }
 }
