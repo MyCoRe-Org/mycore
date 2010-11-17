@@ -45,6 +45,8 @@ import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRConstants;
+import org.mycore.frontend.editor.validation.MCRConfigurable;
+import org.mycore.frontend.editor.validation.MCRPairValidator;
 import org.mycore.frontend.editor.validation.MCRRequiredValidator;
 import org.mycore.frontend.editor.validation.MCRValidator;
 import org.mycore.frontend.editor.validation.MCRValidatorBuilder;
@@ -54,7 +56,8 @@ import org.mycore.frontend.editor.validation.MCRValidatorBuilder;
  * HTML page that contains a MyCoRe XML editor form.
  * 
  * @author Frank Lützenkirchen
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date: 2010-11-16 09:59:21 +0100 (Di, 16 Nov
+ *          2010) $
  */
 public class MCREditorSubmission {
     private final static Logger LOGGER = Logger.getLogger(MCREditorSubmission.class);
@@ -178,8 +181,7 @@ public class MCREditorSubmission {
                 return key + ":";
             }
         }
-        String msg = "Namespace " + ns.getURI() + " used in editor source input, but not declared in editor definition. Using: "
-                + ns.getPrefix();
+        String msg = "Namespace " + ns.getURI() + " used in editor source input, but not declared in editor definition. Using: " + ns.getPrefix();
         LOGGER.warn(msg);
         return ns.getPrefix() + ":";
     }
@@ -435,9 +437,7 @@ public class MCREditorSubmission {
                     String valueA = parms.getParameter(pathA);
                     String valueB = parms.getParameter(pathB);
 
-                    String type = condition.getAttributeValue("type");
                     String oper = condition.getAttributeValue("operator");
-                    String format = condition.getAttributeValue("format");
 
                     String clazz = condition.getAttributeValue("class");
                     String method = condition.getAttributeValue("method");
@@ -445,10 +445,11 @@ public class MCREditorSubmission {
                     boolean ok = true;
 
                     if (oper != null && oper.length() > 0) {
-                        ok = MCRInputValidator.instance().compare(valueA, valueB, oper, type, format);
+                        MCRPairValidator validator = MCRValidatorBuilder.buildPredefinedCombinedPairValidator();
+                        setValidatorProperties(validator, condition);
+                        ok = validator.isValidPair(valueA, valueB);
                     }
-                    if (clazz != null && clazz.length() > 0 && condition.getAttributeValue("field1") != null
-                            && condition.getAttributeValue("field2") != null) {
+                    if (clazz != null && clazz.length() > 0 && condition.getAttributeValue("field1") != null && condition.getAttributeValue("field2") != null) {
                         ok = ok && MCRInputValidator.instance().validateExternally(clazz, method, valueA, valueB);
                     }
 
@@ -511,8 +512,8 @@ public class MCREditorSubmission {
             validator = MCRValidatorBuilder.buildPredefinedCombinedValidator();
         }
 
-        setValidatorProperties( validator, condition );
-        setRequiredProperty( validator, condition, name );
+        setValidatorProperties(validator, condition);
+        setRequiredProperty(validator, condition, name);
         return validator.isValid(value);
     }
 
@@ -523,7 +524,7 @@ public class MCREditorSubmission {
         validator.setProperty("required", Boolean.toString(required));
     }
 
-    private void setValidatorProperties(MCRValidator validator, Element condition) {
+    private void setValidatorProperties(MCRConfigurable validator, Element condition) {
         for (Attribute attribute : (List<Attribute>) (condition.getAttributes())) {
             if (!attribute.getValue().isEmpty())
                 validator.setProperty(attribute.getName(), attribute.getValue());

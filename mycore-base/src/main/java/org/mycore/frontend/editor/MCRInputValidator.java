@@ -27,12 +27,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
-import java.text.DateFormat;
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -46,11 +40,8 @@ import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.transform.JDOMSource;
 import org.mycore.common.MCRCache;
-import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
-import org.mycore.frontend.editor.validation.MCRPairValidator;
-import org.mycore.frontend.editor.validation.MCRValidatorBuilder;
 
 /**
  * This class provides input validation methods for editor data.
@@ -91,8 +82,7 @@ public class MCRInputValidator {
         if (xsl == null) {
             xsl = (Document) stylesheet.clone();
 
-            Element when = xsl.getRootElement().getChild("template", MCRConstants.XSL_NAMESPACE).getChild("choose",
-                    MCRConstants.XSL_NAMESPACE).getChild("when", MCRConstants.XSL_NAMESPACE);
+            Element when = xsl.getRootElement().getChild("template", MCRConstants.XSL_NAMESPACE).getChild("choose", MCRConstants.XSL_NAMESPACE).getChild("when", MCRConstants.XSL_NAMESPACE);
             when.setAttribute("test", condition);
             xslcondCache.put(condition, xsl);
         }
@@ -120,12 +110,15 @@ public class MCRInputValidator {
     }
 
     public boolean validateXSLCondition(Element input, String condition) {
-        if( input == null ) return true;
+        if (input == null)
+            return true;
         Document xml = new Document((Element) input.clone());
         return validateXSLCondition(xml, condition);
     }
 
-    /** Prepares a template stylesheet that is used for checking XSL conditions * */
+    /**
+     * Prepares a template stylesheet that is used for checking XSL conditions *
+     */
     private synchronized Document prepareStylesheet() {
         Element stylesheet = new Element("stylesheet").setAttribute("version", "1.0");
         stylesheet.setNamespace(MCRConstants.XSL_NAMESPACE);
@@ -154,109 +147,6 @@ public class MCRInputValidator {
         choose.addContent(when).addContent(otherwise);
 
         return new Document(stylesheet);
-    }
-
-    /** Cache of reusable DateFormat objects * */
-    private MCRCache formatCache = new MCRCache(20, "InputValidator DateFormat objects");
-
-    /**
-     * Returns a reusable DateFormat object for the given format string. That
-     * object may come from a cache.
-     */
-    private DateFormat getDateTimeFormat(String format) {
-        DateFormat df = (DateFormat) formatCache.get(format);
-
-        if (df == null) {
-            df = new SimpleDateFormat(format);
-            df.setLenient(false);
-            formatCache.put(format, df);
-        }
-
-        return df;
-    }
-
-    /**
-     * Compares two input fields using a comparison operator.
-     * 
-     * @param valueA
-     *            the first input string to check
-     * @param valueB
-     *            the second input string to check
-     * @param type
-     *            one of "string", "integer", "decimal" or "datetime"
-     * @param operator
-     *            One of =, <, >, <=, >=, !=
-     * @param format
-     *            for datetime input, a java.text.SimpleDateFormat pattern; for
-     *            decimal input, a ISO-639 language code
-     * 
-     * @return true if the compare result is true OR one of the input fields is
-     *         empty OR one of the input fields is in wrong format.
-     */
-    public boolean compare(String valueA, String valueB, String operator, String type, String format) {
-        try {
-            if (valueA == null || valueA.trim().length() == 0) {
-                return true;
-            }
-
-            if (valueB == null || valueB.trim().length() == 0) {
-                return true;
-            }
-
-            if (type.equals("string") || type.equals("integer")) {
-                MCRPairValidator validator = MCRValidatorBuilder.buildPredefinedCombinedPairValidator();
-                validator.setProperty("type", type);
-                validator.setProperty("operator", operator);
-                return validator.isValidPair(valueA, valueB);
-            } else if (type.equals("decimal")) {
-                Locale locale = format == null ? Locale.getDefault() : new Locale(format);
-                NumberFormat nf = NumberFormat.getNumberInstance(locale);
-                double vA = nf.parse(valueA.trim()).doubleValue();
-                double vB = nf.parse(valueB.trim()).doubleValue();
-
-                if ("=".equals(operator)) {
-                    return vA == vB;
-                } else if ("<".equals(operator)) {
-                    return vA < vB;
-                } else if (">".equals(operator)) {
-                    return vA > vB;
-                } else if ("<=".equals(operator)) {
-                    return vA <= vB;
-                } else if (">=".equals(operator)) {
-                    return vA >= vB;
-                } else if ("!=".equals(operator)) {
-                    return !(vA == vB);
-                } else {
-                    throw new MCRConfigurationException("Unknown compare operator: " + operator);
-                }
-            } else if (type.equals("datetime")) {
-                DateFormat df = getDateTimeFormat(format);
-                Date vA = df.parse(valueA.trim());
-                Date vB = df.parse(valueB.trim());
-
-                if ("=".equals(operator)) {
-                    return vA.equals(vB);
-                } else if ("<".equals(operator)) {
-                    return vA.before(vB);
-                } else if (">".equals(operator)) {
-                    return vA.after(vB);
-                } else if ("<=".equals(operator)) {
-                    return vA.before(vB) || vA.equals(vB);
-                } else if (">=".equals(operator)) {
-                    return vA.after(vB) || vA.equals(vB);
-                } else if ("!=".equals(operator)) {
-                    return !vA.equals(vB);
-                } else {
-                    throw new MCRConfigurationException("Unknown compare operator: " + operator);
-                }
-            } else {
-                throw new MCRConfigurationException("Unknown input data type: " + type);
-            }
-        } catch (ParseException ex) {
-            return true;
-        } catch (NumberFormatException ex) {
-            return true;
-        }
     }
 
     /**
