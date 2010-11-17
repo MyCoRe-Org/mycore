@@ -3,6 +3,7 @@ package org.mycore.frontend.editor.validation.pair;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mycore.frontend.editor.validation.MCRValidatorBuilder;
 import org.mycore.frontend.editor.validation.pair.MCRCombinedPairValidator;
@@ -14,14 +15,12 @@ public class MCRCombinedPairValidatorTest extends MCRPairValidatorTest {
     @Before
     public void setup() {
         validator = new MCRCombinedPairValidator();
-        lowerValue = "123";
-        higherValue = "456";
     }
 
     @Test
     public void testEmptyCombinedValidator() {
         assertFalse(validator.hasRequiredProperties());
-        assertTrue(validator.isValidPair(lowerValue, higherValue));
+        assertTrue(validator.isValidPair("123", "456"));
     }
 
     @Test
@@ -37,8 +36,8 @@ public class MCRCombinedPairValidatorTest extends MCRPairValidatorTest {
         ((MCRCombinedPairValidator) validator).addValidator(new MCRStringPairValidator());
         validator.setProperty("type", "string");
         validator.setProperty("operator", "<");
-        assertTrue(validator.isValidPair(lowerValue, higherValue));
-        assertFalse(validator.isValidPair(higherValue, lowerValue));
+        assertTrue(validator.isValidPair("abc", "abd"));
+        assertFalse(validator.isValidPair("abd", "abc"));
     }
 
     @Test
@@ -46,7 +45,15 @@ public class MCRCombinedPairValidatorTest extends MCRPairValidatorTest {
         validator = MCRValidatorBuilder.buildPredefinedCombinedPairValidator();
         validator.setProperty("type", "integer");
         validator.setProperty("operator", "<");
-        assertTrue(validator.isValidPair(lowerValue, higherValue));
-        assertFalse(validator.isValidPair(higherValue, lowerValue));
+        validator.setProperty("class", this.getClass().getName());
+        validator.setProperty("method", "externalTestForPair");
+        assertTrue(validator.isValidPair("123", "456"));
+        assertFalse(validator.isValidPair("123", "122"));
+        assertFalse(validator.isValidPair("99", "100"));
+    }
+
+    @Ignore
+    public static boolean externalTestForPair(String valueA, String valueB) {
+        return valueA.length() == valueB.length();
     }
 }
