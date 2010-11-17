@@ -8,6 +8,16 @@ import org.junit.Test;
 public abstract class MCRComparingValidatorTest extends MCRPairValidatorTest {
 
     @Test
+    public void testIncompleteInput() {
+        assertTrue(validator.isValidPair(lowerValue, null));
+        assertTrue(validator.isValidPair(null, lowerValue));
+        assertTrue(validator.isValidPair(lowerValue, emptyValue));
+        assertTrue(validator.isValidPair(emptyValue, lowerValue));
+        assertTrue(validator.isValidPair(emptyValue, emptyValue));
+        assertTrue(validator.isValidPair(null, null));
+    }
+
+    @Test
     public void testIllegalOperator() {
         validator.setProperty("operator", "?");
         assertFalse(validator.isValidPair(lowerValue, lowerValue));
