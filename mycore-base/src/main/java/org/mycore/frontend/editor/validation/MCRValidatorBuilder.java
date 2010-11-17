@@ -27,6 +27,8 @@ public class MCRValidatorBuilder {
         MCRCombinedPairValidator validator = new MCRCombinedPairValidator();
         validator.addValidator(new MCRStringPairValidator());
         validator.addValidator(new MCRIntegerPairValidator());
+        validator.addValidator(new MCRDecimalPairValidator());
+        validator.addValidator(new MCRDateTimePairValidator());
         return validator;
     }
 }
