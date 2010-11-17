@@ -7,7 +7,9 @@ public class MCRExternalValidationInvoker {
     private Method m = null;
 
     @SuppressWarnings("unchecked")
-    public MCRExternalValidationInvoker(String clazz, String method, Class[] argTypes) throws ClassNotFoundException, NoSuchMethodException {
+    public MCRExternalValidationInvoker(MCRConfigurable validator, Class[] argTypes) throws ClassNotFoundException, NoSuchMethodException {
+        String clazz = validator.getProperty("class");
+        String method = validator.getProperty("method");
         m = Class.forName(clazz).getMethod(method, argTypes);
     }
 

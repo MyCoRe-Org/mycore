@@ -9,15 +9,11 @@ public class MCRExternalPairValidator extends MCRPairValidatorBase implements MC
         return hasProperty("class") && hasProperty("method");
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public boolean isValidPairOrDie(String valueA, String valueB) throws Exception {
-        String clazz = getProperty("class");
-        String method = getProperty("method");
         Class[] argTypes = { String.class, String.class };
-
-        MCRExternalValidationInvoker invoker = new MCRExternalValidationInvoker(clazz, method, argTypes);
-
         Object[] args = { valueA, valueB };
-        return invoker.validateExternally(args);
+        return new MCRExternalValidationInvoker(this, argTypes).validateExternally(args);
     }
 }
