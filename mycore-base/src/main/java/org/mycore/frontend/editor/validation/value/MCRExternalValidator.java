@@ -1,6 +1,6 @@
 package org.mycore.frontend.editor.validation.value;
 
-import java.lang.reflect.Method;
+import org.mycore.frontend.editor.validation.MCRExternalValidationInvoker;
 
 public class MCRExternalValidator extends MCRValidatorBase {
 
@@ -10,23 +10,15 @@ public class MCRExternalValidator extends MCRValidatorBase {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected boolean isValidOrDie(String input) throws Exception {
         String clazz = getProperty("class");
         String method = getProperty("method");
-        Method m = getMethod(clazz, method);
-        return invokeMethod(m, input);
-    }
-
-    @SuppressWarnings("unchecked")
-    private Method getMethod(String clazz, String method) throws Exception {
         Class[] argTypes = { String.class };
-        Method m = Class.forName(clazz).getMethod(method, argTypes);
-        return m;
-    }
 
-    private boolean invokeMethod(Method m, String input) throws Exception {
+        MCRExternalValidationInvoker invoker = new MCRExternalValidationInvoker(clazz, method, argTypes);
+
         Object[] args = { input };
-        Object result = m.invoke(null, args);
-        return result.equals(new Boolean(true));
+        return invoker.validateExternally(args);
     }
 }
