@@ -11,8 +11,9 @@ public class MCRMinDateTimeValidator extends MCRDateTimeValidator {
 
     @Override
     protected boolean isValidOrDie(String input) throws Exception {
-        Date value = string2date(input);
-        Date min = string2date(getProperty("min"));
+        MCRDateTimeConverter converter = getConverter();
+        Date value = converter.string2date(input);
+        Date min = converter.string2date(getProperty("min"));
         return min.equals(value) || min.before(value);
     }
 }

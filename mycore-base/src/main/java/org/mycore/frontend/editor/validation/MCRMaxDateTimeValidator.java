@@ -11,8 +11,9 @@ public class MCRMaxDateTimeValidator extends MCRDateTimeValidator {
 
     @Override
     protected boolean isValidOrDie(String input) throws Exception {
-        Date value = string2date(input);
-        Date max = string2date(getProperty("max"));
+        MCRDateTimeConverter converter = getConverter();
+        Date value = converter.string2date(input);
+        Date max = converter.string2date(getProperty("max"));
         return value.before(max) || value.equals(max);
     }
 }
