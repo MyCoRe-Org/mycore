@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mycore.frontend.editor.validation.value.MCRMaxLengthValidator;
+import org.mycore.frontend.editor.validation.value.MCRMinLengthValidator;
 
 public class MCRCombinedValidatorTest extends MCRValidatorTest {
 

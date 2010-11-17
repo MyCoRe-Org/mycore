@@ -1,6 +1,8 @@
-package org.mycore.frontend.editor.validation;
+package org.mycore.frontend.editor.validation.pair;
 
 import java.util.Date;
+
+import org.mycore.frontend.editor.validation.MCRDateTimeConverter;
 
 public class MCRDateTimePairValidator extends MCRComparingValidator {
 

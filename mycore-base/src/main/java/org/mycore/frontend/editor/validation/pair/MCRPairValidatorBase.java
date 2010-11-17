@@ -1,4 +1,6 @@
-package org.mycore.frontend.editor.validation;
+package org.mycore.frontend.editor.validation.pair;
+
+import org.mycore.frontend.editor.validation.MCRConfigurableBase;
 
 public abstract class MCRPairValidatorBase extends MCRConfigurableBase implements MCRPairValidator {
 

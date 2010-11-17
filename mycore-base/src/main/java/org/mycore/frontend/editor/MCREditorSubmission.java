@@ -46,10 +46,10 @@ import org.jdom.xpath.XPath;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRConstants;
 import org.mycore.frontend.editor.validation.MCRConfigurable;
-import org.mycore.frontend.editor.validation.MCRPairValidator;
-import org.mycore.frontend.editor.validation.MCRRequiredValidator;
-import org.mycore.frontend.editor.validation.MCRValidator;
 import org.mycore.frontend.editor.validation.MCRValidatorBuilder;
+import org.mycore.frontend.editor.validation.pair.MCRPairValidator;
+import org.mycore.frontend.editor.validation.value.MCRRequiredValidator;
+import org.mycore.frontend.editor.validation.value.MCRValidator;
 
 /**
  * Container class that holds all data and files edited and submitted from an

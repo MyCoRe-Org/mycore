@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.Before;
+import org.mycore.frontend.editor.validation.value.MCRExternalValidator;
 
 public class MCRExternalValidatorTest extends MCRValidatorTest {
 

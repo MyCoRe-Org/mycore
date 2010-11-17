@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 import org.junit.Before;
+import org.mycore.frontend.editor.validation.value.MCRRequiredValidator;
 
 public class MCRRequiredValidatorTest extends MCRValidatorTest {
 

@@ -1,4 +1,4 @@
-package org.mycore.frontend.editor.validation;
+package org.mycore.frontend.editor.validation.value;
 
 public class MCRMaxIntegerValidator extends MCRIntegerValidator {
 

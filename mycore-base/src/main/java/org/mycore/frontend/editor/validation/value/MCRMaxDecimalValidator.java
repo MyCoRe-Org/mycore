@@ -1,4 +1,6 @@
-package org.mycore.frontend.editor.validation;
+package org.mycore.frontend.editor.validation.value;
+
+import org.mycore.frontend.editor.validation.MCRDecimalConverter;
 
 public class MCRMaxDecimalValidator extends MCRDecimalValidator {
 

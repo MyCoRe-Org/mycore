@@ -23,7 +23,7 @@ public class MCRDateTimeConverter {
         return df;
     }
 
-    protected Date string2date(String input) throws MCRException {
+    public Date string2date(String input) throws MCRException {
         for (DateFormat format : formats) {
             try {
                 return format.parse(input);

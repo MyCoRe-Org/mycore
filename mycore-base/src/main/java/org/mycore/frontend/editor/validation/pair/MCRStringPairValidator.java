@@ -1,4 +1,4 @@
-package org.mycore.frontend.editor.validation;
+package org.mycore.frontend.editor.validation.pair;
 
 public class MCRStringPairValidator extends MCRComparingValidator {
 

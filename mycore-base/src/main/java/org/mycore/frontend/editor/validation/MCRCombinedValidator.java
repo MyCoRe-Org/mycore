@@ -1,5 +1,7 @@
 package org.mycore.frontend.editor.validation;
 
+import org.mycore.frontend.editor.validation.value.MCRValidator;
+
 public class MCRCombinedValidator extends MCRCombinedValidatorBase implements MCRValidator {
 
     public boolean isValid(String input) {
