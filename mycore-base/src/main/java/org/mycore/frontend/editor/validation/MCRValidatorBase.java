@@ -18,11 +18,7 @@ public abstract class MCRValidatorBase implements MCRValidator {
         return properties.getProperty(name);
     }
 
-    protected Properties getProperties() {
-        return properties;
-    }
-
-    public boolean hasProperty(String name) {
+    protected boolean hasProperty(String name) {
         return properties.containsKey(name);
     }
 
@@ -56,7 +52,6 @@ public abstract class MCRValidatorBase implements MCRValidator {
         for (Object value : input)
             buffer.append("\"").append(value).append("\" ");
 
-        Properties properties = getProperties();
         if (!properties.isEmpty())
             for (Object name : properties.keySet())
                 buffer.append(name).append("=\"").append(properties.get(name)).append("\" ");

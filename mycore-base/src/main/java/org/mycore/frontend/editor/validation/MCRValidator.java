@@ -6,8 +6,6 @@ public interface MCRValidator {
 
     public String getProperty(String name);
 
-    public boolean hasProperty(String name);
-    
     public boolean hasRequiredProperties();
 
     public boolean isValid(Object... input);
