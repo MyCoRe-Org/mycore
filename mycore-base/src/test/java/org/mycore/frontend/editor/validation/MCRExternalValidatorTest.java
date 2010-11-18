@@ -44,4 +44,16 @@ public class MCRExternalValidatorTest extends MCRValidatorTest {
     public static boolean externalTestStringPair(String valueA, String valueB) {
         return valueA.endsWith(valueB);
     }
+    
+    @Test
+    public void testNullArguments() {
+        validator.setProperty("method", "externalTestNullArguments");
+        assertTrue(validator.isValid("foo",null));
+        assertTrue(validator.isValid(null,null));
+    }
+    
+    @Ignore
+    public static boolean externalTestNullArguments(String valueA, String valueB) {
+        return true;
+    }
 }

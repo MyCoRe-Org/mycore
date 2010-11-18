@@ -20,9 +20,10 @@ public class MCRExternalValidator extends MCRValidatorBase {
 
     @SuppressWarnings("unchecked")
     private Class[] buildArgTypes(Object... input) {
+        Class defaultClass = String.class;
         Class[] argTypes = new Class[input.length];
         for (int i = 0; i < input.length; i++)
-            argTypes[i] = input[i].getClass();
+            argTypes[i] = (input[i] == null ? defaultClass : input[i].getClass());
         return argTypes;
     }
 
