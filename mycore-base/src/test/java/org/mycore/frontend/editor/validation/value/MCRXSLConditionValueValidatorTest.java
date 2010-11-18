@@ -5,13 +5,13 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.junit.Before;
 import org.mycore.frontend.editor.validation.MCRValidatorTest;
-import org.mycore.frontend.editor.validation.value.MCRXSLConditionValidator;
+import org.mycore.frontend.editor.validation.value.MCRXSLConditionValueValidator;
 
-public class MCRXSLConditionValidatorTest extends MCRValidatorTest {
+public class MCRXSLConditionValueValidatorTest extends MCRValidatorTest {
 
     @Before
     public void setup() {
-        validator = new MCRXSLConditionValidator();
+        validator = new MCRXSLConditionValueValidator();
     }
 
     @Test
