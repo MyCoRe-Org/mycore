@@ -46,7 +46,7 @@ public abstract class MCRValidatorBase implements MCRValidator {
 
         buffer.append(getClass().getSimpleName());
         buffer.append(" validation ");
-        buffer.append(isValid ? "succesful" : "failed");
+        buffer.append(isValid ? "successful" : "failed");
         buffer.append(": ");
 
         for (Object value : input)
