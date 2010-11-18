@@ -430,30 +430,32 @@ public class MCREditorSubmission {
                         continue;
                     }
 
-                    String pathA = path + "/" + condition.getAttributeValue("field1");
-                    String pathB = path + "/" + condition.getAttributeValue("field2");
+                    String field1 = condition.getAttributeValue("field1","");
+                    String field2 = condition.getAttributeValue("field2",""); 
                     
-                    String valueA = parms.getParameter(pathA);
-                    String valueB = parms.getParameter(pathB);
+                    if (!field1.isEmpty()) {
+                        String pathA = path + "/" + field1;
+                        String pathB = path + "/" + field2;
 
-                    String sortNrA = parms.getParameter("_sortnr-" + pathA);
-                    String sortNrB = parms.getParameter("_sortnr-" + pathB);
+                        String valueA = parms.getParameter(pathA);
+                        String valueB = parms.getParameter(pathB);
 
-                    boolean pairValuesAlreadyInvalid = (failed.containsKey(sortNrA) || failed.containsKey(sortNrB));
-                    boolean ok = true;
+                        String sortNrA = parms.getParameter("_sortnr-" + pathA);
+                        String sortNrB = parms.getParameter("_sortnr-" + pathB);
 
-                    if (!pairValuesAlreadyInvalid) {
-                        MCRValidator validator = MCRValidatorBuilder.buildPredefinedCombinedPairValidator();
-                        setValidatorProperties(validator, condition);
-                        ok = validator.isValid(valueA, valueB);
-                    }
+                        boolean pairValuesAlreadyInvalid = (failed.containsKey(sortNrA) || failed.containsKey(sortNrB));
 
-                    if (!ok) {
-                        failed.put(sortNrA, condition);
-                        failed.put(sortNrB, condition);
-
-                    } else if (condition.getAttribute("field1") == null) {
+                        if (!pairValuesAlreadyInvalid) {
+                            MCRValidator validator = MCRValidatorBuilder.buildPredefinedCombinedPairValidator();
+                            setValidatorProperties(validator, condition);
+                            if (!validator.isValid(valueA, valueB)) {
+                                failed.put(sortNrA, condition);
+                                failed.put(sortNrB, condition);
+                            }
+                        }
+                    } else {
                         Element current = null;
+                        boolean ok = true;
 
                         try {
                             String xslcond = condition.getAttributeValue("xsl");
