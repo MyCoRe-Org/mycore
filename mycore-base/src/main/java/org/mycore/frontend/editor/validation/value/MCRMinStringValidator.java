@@ -1,6 +1,6 @@
 package org.mycore.frontend.editor.validation.value;
 
-public class MCRMinStringValidator extends MCRValidatorBase {
+public class MCRMinStringValidator extends MCRSingleValueValidator {
 
     @Override
     public boolean hasRequiredProperties() {

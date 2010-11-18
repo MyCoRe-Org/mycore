@@ -1,12 +1,13 @@
-package org.mycore.frontend.editor.validation.value;
+package org.mycore.frontend.editor.validation;
 
 import static org.junit.Assert.assertFalse;
 
 import org.junit.Test;
-import org.mycore.frontend.editor.validation.value.MCRValidator;
+import org.mycore.frontend.editor.validation.MCRValidator;
 
 public abstract class MCRValidatorTest {
-    MCRValidator validator;
+    
+    protected MCRValidator validator;
 
     @Test
     public void testPropertiesMissing() {

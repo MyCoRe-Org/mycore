@@ -45,11 +45,9 @@ import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRConstants;
-import org.mycore.frontend.editor.validation.MCRConfigurable;
+import org.mycore.frontend.editor.validation.MCRValidator;
 import org.mycore.frontend.editor.validation.MCRValidatorBuilder;
-import org.mycore.frontend.editor.validation.pair.MCRPairValidator;
 import org.mycore.frontend.editor.validation.value.MCRRequiredValidator;
-import org.mycore.frontend.editor.validation.value.MCRValidator;
 
 /**
  * Container class that holds all data and files edited and submitted from an
@@ -437,9 +435,9 @@ public class MCREditorSubmission {
                     String valueA = parms.getParameter(pathA);
                     String valueB = parms.getParameter(pathB);
 
-                    MCRPairValidator validator = MCRValidatorBuilder.buildPredefinedCombinedPairValidator();
+                    MCRValidator validator = MCRValidatorBuilder.buildPredefinedCombinedPairValidator();
                     setValidatorProperties(validator, condition);
-                    boolean ok = validator.isValidPair(valueA, valueB);
+                    boolean ok = validator.isValid(valueA, valueB);
 
                     if (!ok) {
                         String sortNrA = parms.getParameter("_sortnr-" + pathA);
@@ -510,7 +508,7 @@ public class MCREditorSubmission {
         validator.setProperty("required", Boolean.toString(required));
     }
 
-    private void setValidatorProperties(MCRConfigurable validator, Element condition) {
+    private void setValidatorProperties(MCRValidator validator, Element condition) {
         for (Attribute attribute : (List<Attribute>) (condition.getAttributes())) {
             if (!attribute.getValue().isEmpty())
                 validator.setProperty(attribute.getName(), attribute.getValue());

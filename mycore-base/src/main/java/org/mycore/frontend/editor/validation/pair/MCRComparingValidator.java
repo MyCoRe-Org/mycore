@@ -1,6 +1,8 @@
 package org.mycore.frontend.editor.validation.pair;
 
-public abstract class MCRComparingValidator extends MCRPairValidatorBase {
+import org.mycore.frontend.editor.validation.MCRValidatorBase;
+
+public abstract class MCRComparingValidator extends MCRValidatorBase {
 
     @Override
     public boolean hasRequiredProperties() {
@@ -8,7 +10,10 @@ public abstract class MCRComparingValidator extends MCRPairValidatorBase {
     }
 
     @Override
-    protected boolean isValidPairOrDie(String valueA, String valueB) throws Exception {
+    protected boolean isValidOrDie(Object... input) throws Exception {
+        String valueA = (String) (input[0]);
+        String valueB = (String) (input[1]);
+
         if (isEmpty(valueA) || isEmpty(valueB))
             return true;
 

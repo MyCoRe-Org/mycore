@@ -1,15 +1,11 @@
 package org.mycore.frontend.editor.validation;
 
-import org.mycore.frontend.editor.validation.pair.MCRCombinedPairValidator;
 import org.mycore.frontend.editor.validation.pair.MCRDateTimePairValidator;
 import org.mycore.frontend.editor.validation.pair.MCRDecimalPairValidator;
-import org.mycore.frontend.editor.validation.pair.MCRExternalPairValidator;
 import org.mycore.frontend.editor.validation.pair.MCRIntegerPairValidator;
 import org.mycore.frontend.editor.validation.pair.MCRStringPairValidator;
-import org.mycore.frontend.editor.validation.value.MCRCombinedValidator;
 import org.mycore.frontend.editor.validation.value.MCRDateTimeValidator;
 import org.mycore.frontend.editor.validation.value.MCRDecimalValidator;
-import org.mycore.frontend.editor.validation.value.MCRExternalValidator;
 import org.mycore.frontend.editor.validation.value.MCRIntegerValidator;
 import org.mycore.frontend.editor.validation.value.MCRMaxDateTimeValidator;
 import org.mycore.frontend.editor.validation.value.MCRMaxDecimalValidator;
@@ -47,13 +43,13 @@ public class MCRValidatorBuilder {
         return validator;
     }
 
-    public static MCRCombinedPairValidator buildPredefinedCombinedPairValidator() {
-        MCRCombinedPairValidator validator = new MCRCombinedPairValidator();
+    public static MCRCombinedValidator buildPredefinedCombinedPairValidator() {
+        MCRCombinedValidator validator = new MCRCombinedValidator();
         validator.addValidator(new MCRStringPairValidator());
         validator.addValidator(new MCRIntegerPairValidator());
         validator.addValidator(new MCRDecimalPairValidator());
         validator.addValidator(new MCRDateTimePairValidator());
-        validator.addValidator(new MCRExternalPairValidator());
+        validator.addValidator(new MCRExternalValidator());
         return validator;
     }
 }

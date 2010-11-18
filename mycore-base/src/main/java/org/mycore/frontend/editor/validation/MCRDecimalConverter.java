@@ -11,22 +11,21 @@ public class MCRDecimalConverter {
 
     private Locale locale = Locale.getDefault();
 
-    public MCRDecimalConverter(MCRConfigurable validator) {
+    public MCRDecimalConverter(MCRValidator validator) {
         String format = validator.getProperty("format");
         if (format != null)
             locale = new Locale(format);
     }
 
-    public double string2double(String string) throws Exception {
+    public double string2double(String value) throws Exception {
         NumberFormat nf = NumberFormat.getNumberInstance(locale);
 
-        string = string.trim();
-        checkForIllegalCharacters(string);
+        checkForIllegalCharacters(value);
 
         if (nf instanceof DecimalFormat)
-            checkForMultipleDecimalSeparators(string, (DecimalFormat) nf);
+            checkForMultipleDecimalSeparators(value, (DecimalFormat) nf);
 
-        return nf.parse(string).doubleValue();
+        return nf.parse(value).doubleValue();
     }
 
     private void checkForMultipleDecimalSeparators(String string, DecimalFormat df) {

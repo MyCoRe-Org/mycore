@@ -2,7 +2,7 @@ package org.mycore.frontend.editor.validation;
 
 import java.util.Properties;
 
-public abstract class MCRConfigurableBase implements MCRConfigurable {
+public abstract class MCRValidatorBase implements MCRValidator {
 
     private Properties properties = new Properties();
 
@@ -24,4 +24,13 @@ public abstract class MCRConfigurableBase implements MCRConfigurable {
 
     public abstract boolean hasRequiredProperties();
 
+    public boolean isValid(Object... input) {
+        try {
+            return isValidOrDie(input);
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+
+    protected abstract boolean isValidOrDie(Object... input) throws Exception;
 }

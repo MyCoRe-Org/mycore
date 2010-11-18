@@ -2,7 +2,7 @@ package org.mycore.frontend.editor.validation.value;
 
 import org.mycore.frontend.editor.validation.MCRDateTimeConverter;
 
-public class MCRDateTimeValidator extends MCRValidatorBase {
+public class MCRDateTimeValidator extends MCRSingleValueValidator {
 
     @Override
     public boolean hasRequiredProperties() {

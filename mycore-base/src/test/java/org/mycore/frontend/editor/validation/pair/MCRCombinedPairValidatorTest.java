@@ -5,27 +5,28 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mycore.frontend.editor.validation.MCRCombinedValidator;
 import org.mycore.frontend.editor.validation.MCRValidatorBuilder;
-import org.mycore.frontend.editor.validation.pair.MCRCombinedPairValidator;
+import org.mycore.frontend.editor.validation.MCRValidatorTest;
 import org.mycore.frontend.editor.validation.pair.MCRIntegerPairValidator;
 import org.mycore.frontend.editor.validation.pair.MCRStringPairValidator;
 
-public class MCRCombinedPairValidatorTest extends MCRPairValidatorTest {
+public class MCRCombinedPairValidatorTest extends MCRValidatorTest {
 
     @Before
     public void setup() {
-        validator = new MCRCombinedPairValidator();
+        validator = new MCRCombinedValidator();
     }
 
     @Test
     public void testEmptyCombinedValidator() {
         assertFalse(validator.hasRequiredProperties());
-        assertTrue(validator.isValidPair("123", "456"));
+        assertTrue(validator.isValid("123", "456"));
     }
 
     @Test
     public void testHasRequiredProperties() {
-        ((MCRCombinedPairValidator) validator).addValidator(new MCRIntegerPairValidator());
+        ((MCRCombinedValidator) validator).addValidator(new MCRIntegerPairValidator());
         validator.setProperty("type", "integer");
         validator.setProperty("operator", "<");
         assertTrue(validator.hasRequiredProperties());
@@ -33,11 +34,11 @@ public class MCRCombinedPairValidatorTest extends MCRPairValidatorTest {
 
     @Test
     public void testSingleValidator() {
-        ((MCRCombinedPairValidator) validator).addValidator(new MCRStringPairValidator());
+        ((MCRCombinedValidator) validator).addValidator(new MCRStringPairValidator());
         validator.setProperty("type", "string");
         validator.setProperty("operator", "<");
-        assertTrue(validator.isValidPair("abc", "abd"));
-        assertFalse(validator.isValidPair("abd", "abc"));
+        assertTrue(validator.isValid("abc", "abd"));
+        assertFalse(validator.isValid("abd", "abc"));
     }
 
     @Test
@@ -47,9 +48,9 @@ public class MCRCombinedPairValidatorTest extends MCRPairValidatorTest {
         validator.setProperty("operator", "<");
         validator.setProperty("class", this.getClass().getName());
         validator.setProperty("method", "externalTestForPair");
-        assertTrue(validator.isValidPair("123", "456"));
-        assertFalse(validator.isValidPair("123", "122"));
-        assertFalse(validator.isValidPair("99", "100"));
+        assertTrue(validator.isValid("123", "456"));
+        assertFalse(validator.isValid("123", "122"));
+        assertFalse(validator.isValid("99", "100"));
     }
 
     @Ignore

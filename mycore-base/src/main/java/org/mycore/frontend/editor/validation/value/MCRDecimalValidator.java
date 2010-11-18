@@ -2,7 +2,7 @@ package org.mycore.frontend.editor.validation.value;
 
 import org.mycore.frontend.editor.validation.MCRDecimalConverter;
 
-public class MCRDecimalValidator extends MCRValidatorBase {
+public class MCRDecimalValidator extends MCRSingleValueValidator {
 
     @Override
     public boolean hasRequiredProperties() {

@@ -1,6 +1,6 @@
 package org.mycore.frontend.editor.validation.value;
 
-public class MCRRegExpValidator extends MCRValidatorBase {
+public class MCRRegExpValidator extends MCRSingleValueValidator {
 
     @Override
     public boolean hasRequiredProperties() {
@@ -12,5 +12,4 @@ public class MCRRegExpValidator extends MCRValidatorBase {
         String pattern = getProperty("regexp");
         return input.matches(pattern);
     }
-
 }

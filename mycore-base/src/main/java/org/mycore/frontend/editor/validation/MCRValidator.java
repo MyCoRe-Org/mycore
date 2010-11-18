@@ -1,6 +1,6 @@
 package org.mycore.frontend.editor.validation;
 
-public interface MCRConfigurable {
+public interface MCRValidator {
 
     public void setProperty(String name, String value);
 
@@ -10,4 +10,5 @@ public interface MCRConfigurable {
     
     public boolean hasRequiredProperties();
 
+    public boolean isValid(Object... input);
 }

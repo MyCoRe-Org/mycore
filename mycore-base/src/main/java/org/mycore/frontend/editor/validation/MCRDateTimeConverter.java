@@ -12,7 +12,7 @@ public class MCRDateTimeConverter {
 
     private List<DateFormat> formats = new ArrayList<DateFormat>();
 
-    public MCRDateTimeConverter(MCRConfigurable validator) {
+    public MCRDateTimeConverter(MCRValidator validator) {
         String patterns = validator.getProperty("format");
         for (String pattern : patterns.split(";"))
             formats.add(getDateFormat(pattern.trim()));

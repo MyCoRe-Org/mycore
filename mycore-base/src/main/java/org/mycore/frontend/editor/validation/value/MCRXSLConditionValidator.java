@@ -12,7 +12,7 @@ import org.jdom.Namespace;
 import org.jdom.transform.JDOMSource;
 import org.mycore.common.MCRConstants;
 
-public class MCRXSLConditionValidator extends MCRValidatorBase {
+public class MCRXSLConditionValidator extends MCRSingleValueValidator {
 
     @Override
     public boolean hasRequiredProperties() {
