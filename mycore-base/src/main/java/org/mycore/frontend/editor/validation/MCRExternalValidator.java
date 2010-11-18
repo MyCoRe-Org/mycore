@@ -13,17 +13,24 @@ public class MCRExternalValidator extends MCRValidatorBase {
     @Override
     @SuppressWarnings("unchecked")
     protected boolean isValidOrDie(Object... input) throws Exception {
+        if (input == null)
+            input = new Object[] { null };
+
         Class[] argTypes = buildArgTypes(input);
         Method m = getMethod(argTypes);
         return invokeMethod(m, input);
     }
 
     @SuppressWarnings("unchecked")
+    protected Class getArgumentType() {
+        return String.class;
+    }
+
+    @SuppressWarnings("unchecked")
     private Class[] buildArgTypes(Object... input) {
-        Class defaultClass = String.class;
         Class[] argTypes = new Class[input.length];
-        for (int i = 0; i < input.length; i++)
-            argTypes[i] = (input[i] == null ? defaultClass : input[i].getClass());
+        for (int i = 0; i < argTypes.length; i++)
+            argTypes[i] = getArgumentType();
         return argTypes;
     }
 
@@ -31,8 +38,7 @@ public class MCRExternalValidator extends MCRValidatorBase {
     private Method getMethod(Class[] argTypes) throws NoSuchMethodException, ClassNotFoundException {
         String clazz = getProperty("class");
         String method = getProperty("method");
-        Method m = Class.forName(clazz).getMethod(method, argTypes);
-        return m;
+        return Class.forName(clazz).getMethod(method, argTypes);
     }
 
     private boolean invokeMethod(Method m, Object... input) throws IllegalAccessException, InvocationTargetException {
