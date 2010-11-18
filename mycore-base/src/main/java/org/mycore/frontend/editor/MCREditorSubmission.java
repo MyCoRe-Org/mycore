@@ -45,10 +45,10 @@ import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRConstants;
-import org.mycore.frontend.editor.validation.MCRExternalXMLValidator;
 import org.mycore.frontend.editor.validation.MCRValidator;
 import org.mycore.frontend.editor.validation.MCRValidatorBuilder;
 import org.mycore.frontend.editor.validation.value.MCRRequiredValidator;
+import org.mycore.frontend.editor.validation.xml.MCRExternalXMLValidator;
 
 /**
  * Container class that holds all data and files edited and submitted from an

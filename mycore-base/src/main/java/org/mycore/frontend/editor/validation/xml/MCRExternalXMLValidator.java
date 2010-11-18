@@ -1,6 +1,7 @@
-package org.mycore.frontend.editor.validation;
+package org.mycore.frontend.editor.validation.xml;
 
 import org.jdom.Element;
+import org.mycore.frontend.editor.validation.MCRExternalValidator;
 
 public class MCRExternalXMLValidator extends MCRExternalValidator {
 

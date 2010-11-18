@@ -1,4 +1,4 @@
-package org.mycore.frontend.editor.validation;
+package org.mycore.frontend.editor.validation.xml;
 
 import static org.junit.Assert.*;
 
@@ -6,6 +6,8 @@ import org.jdom.Element;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.Before;
+import org.mycore.frontend.editor.validation.MCRValidatorTest;
+import org.mycore.frontend.editor.validation.xml.MCRExternalXMLValidator;
 
 public class MCRExternalXMLValidatorTest extends MCRValidatorTest {
 

@@ -1,7 +1,8 @@
-package org.mycore.frontend.editor.validation;
+package org.mycore.frontend.editor.validation.xml;
 
 import org.jdom.Document;
 import org.jdom.Element;
+import org.mycore.frontend.editor.validation.MCRValidatorBase;
 import org.mycore.frontend.editor.validation.MCRXSLConditionTester;
 
 public class MCRXSLConditionElementValidator extends MCRValidatorBase {
