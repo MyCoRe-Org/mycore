@@ -49,8 +49,9 @@ public abstract class MCRValidatorBase implements MCRValidator {
         buffer.append(isValid ? "successful" : "failed");
         buffer.append(": ");
 
-        for (Object value : input)
-            buffer.append("\"").append(value).append("\" ");
+        if (input != null)
+            for (Object value : input)
+                buffer.append("\"").append(value).append("\" ");
 
         if (!properties.isEmpty())
             for (Object name : properties.keySet())
