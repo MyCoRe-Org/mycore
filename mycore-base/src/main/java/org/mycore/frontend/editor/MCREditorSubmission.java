@@ -49,6 +49,7 @@ import org.mycore.frontend.editor.validation.MCRValidator;
 import org.mycore.frontend.editor.validation.MCRValidatorBuilder;
 import org.mycore.frontend.editor.validation.value.MCRRequiredValidator;
 import org.mycore.frontend.editor.validation.xml.MCRExternalXMLValidator;
+import org.mycore.frontend.editor.validation.xml.MCRXSLConditionElementValidator;
 
 /**
  * Container class that holds all data and files edited and submitted from an
@@ -462,14 +463,10 @@ public class MCREditorSubmission {
                             String xslcond = condition.getAttributeValue("xsl");
                             if (xslcond != null && xslcond.length() > 0) {
                                 current = (Element) XPath.selectSingleNode(getXML(), path);
-                                ok = MCRInputValidator.instance().validateXSLCondition(current, xslcond);
-                                if (!ok && LOGGER.isDebugEnabled()) {
-                                    String xml = new XMLOutputter(Format.getPrettyFormat()).outputString(current);
-                                    LOGGER.debug("Validation condition failed:");
-                                    LOGGER.debug("Context xpath: " + path);
-                                    LOGGER.debug("XSL condition: " + xslcond);
-                                    LOGGER.debug(xml);
-                                }
+
+                                MCRValidator validator = new MCRXSLConditionElementValidator();
+                                validator.setProperty("xsl", xslcond);
+                                ok = validator.isValid(current);
                             }
 
                             String clazz = condition.getAttributeValue("class");
@@ -480,7 +477,7 @@ public class MCREditorSubmission {
                                     current = (Element) XPath.selectSingleNode(getXML(), path);
                                 }
 
-                                MCRExternalXMLValidator validator = new MCRExternalXMLValidator();
+                                MCRValidator validator = new MCRExternalXMLValidator();
                                 validator.setProperty("class", clazz);
                                 validator.setProperty("method", method);
 
