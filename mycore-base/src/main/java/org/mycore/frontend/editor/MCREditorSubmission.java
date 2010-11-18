@@ -48,8 +48,7 @@ import org.mycore.common.MCRConstants;
 import org.mycore.frontend.editor.validation.MCRValidator;
 import org.mycore.frontend.editor.validation.MCRValidatorBuilder;
 import org.mycore.frontend.editor.validation.value.MCRRequiredValidator;
-import org.mycore.frontend.editor.validation.xml.MCRExternalXMLValidator;
-import org.mycore.frontend.editor.validation.xml.MCRXSLConditionElementValidator;
+
 
 /**
  * Container class that holds all data and files edited and submitted from an
@@ -456,38 +455,18 @@ public class MCREditorSubmission {
                             }
                         }
                     } else {
+                        
                         Element current = null;
-                        boolean ok = true;
-
                         try {
-                            String xslcond = condition.getAttributeValue("xsl");
-                            if (xslcond != null && xslcond.length() > 0) {
-                                current = (Element) XPath.selectSingleNode(getXML(), path);
-
-                                MCRValidator validator = new MCRXSLConditionElementValidator();
-                                validator.setProperty("xsl", xslcond);
-                                ok = validator.isValid(current);
-                            }
-
-                            String clazz = condition.getAttributeValue("class");
-                            String method = condition.getAttributeValue("method");
-                            
-                            if (clazz != null && clazz.length() > 0) {
-                                if (current == null) {
-                                    current = (Element) XPath.selectSingleNode(getXML(), path);
-                                }
-
-                                MCRValidator validator = new MCRExternalXMLValidator();
-                                validator.setProperty("class", clazz);
-                                validator.setProperty("method", method);
-
-                                ok = ok && validator.isValid(current);
-                            }
+                            current = (Element) XPath.selectSingleNode(getXML(), path);
                         } catch (JDOMException ex) {
                             LOGGER.debug("Could not validate, because no element found at xpath " + path);
                             continue;
                         }
-                        if (!ok) {
+
+                        MCRValidator validator = MCRValidatorBuilder.buildPredefinedCombinedElementValidator();
+                        setValidatorProperties(validator, condition);
+                        if (!validator.isValid(current)) {
                             String sortNr = parms.getParameter("_sortnr-" + path);
                             failed.put(sortNr, condition);
                         }
