@@ -45,6 +45,7 @@ import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRConstants;
+import org.mycore.frontend.editor.validation.MCRExternalXMLValidator;
 import org.mycore.frontend.editor.validation.MCRValidator;
 import org.mycore.frontend.editor.validation.MCRValidatorBuilder;
 import org.mycore.frontend.editor.validation.value.MCRRequiredValidator;
@@ -478,7 +479,12 @@ public class MCREditorSubmission {
                                 if (current == null) {
                                     current = (Element) XPath.selectSingleNode(getXML(), path);
                                 }
-                                ok = ok && MCRInputValidator.instance().validateExternally(clazz, method, current);
+
+                                MCRExternalXMLValidator validator = new MCRExternalXMLValidator();
+                                validator.setProperty("class", clazz);
+                                validator.setProperty("method", method);
+
+                                ok = ok && validator.isValid(current);
                             }
                         } catch (JDOMException ex) {
                             LOGGER.debug("Could not validate, because no element found at xpath " + path);

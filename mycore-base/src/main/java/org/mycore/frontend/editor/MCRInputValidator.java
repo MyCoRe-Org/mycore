@@ -26,7 +26,6 @@ package org.mycore.frontend.editor;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Method;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -41,7 +40,6 @@ import org.jdom.Namespace;
 import org.jdom.transform.JDOMSource;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRException;
 
 /**
  * This class provides input validation methods for editor data.
@@ -147,35 +145,5 @@ public class MCRInputValidator {
         choose.addContent(when).addContent(otherwise);
 
         return new Document(stylesheet);
-    }
-
-    /**
-     * Calls a "public static boolean" method in the given class and validates
-     * an XML element
-     * 
-     * @param clazz
-     *            the name of the class that contains the validation method
-     * @param method
-     *            the name of the public static boolean method that should be
-     *            called
-     * @param elem
-     *            the XML element to validate
-     * 
-     * @return true, if the XML element validates
-     */
-    public boolean validateExternally(String clazz, String method, Element elem) {
-        Class[] argTypes = new Class[1];
-        argTypes[0] = Element.class;
-        Object[] args = new Object[1];
-        args[0] = elem;
-        Object result = Boolean.FALSE;
-        try {
-            Method m = Class.forName(clazz).getMethod(method, argTypes);
-            result = m.invoke(null, args);
-        } catch (Exception ex) {
-            String msg = "Exception while validating input using external method";
-            throw new MCRException(msg, ex);
-        }
-        return ((Boolean) result).booleanValue();
     }
 }
