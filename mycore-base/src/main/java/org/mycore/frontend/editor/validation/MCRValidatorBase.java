@@ -6,7 +6,7 @@ import org.apache.log4j.Logger;
 
 public abstract class MCRValidatorBase implements MCRValidator {
 
-    private final static Logger LOGGER = Logger.getLogger(MCRCombinedValidator.class);
+    private final static Logger LOGGER = Logger.getLogger(MCRValidatorBase.class);
 
     private Properties properties = new Properties();
 
