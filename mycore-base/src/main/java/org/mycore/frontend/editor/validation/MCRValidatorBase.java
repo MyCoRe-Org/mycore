@@ -28,7 +28,6 @@ public abstract class MCRValidatorBase implements MCRValidator {
         boolean isValid;
 
         try {
-            System.out.println(getClass().getSimpleName() + " hello!");
             isValid = isValidOrDie(input);
         } catch (Exception ex) {
             logException(ex);
