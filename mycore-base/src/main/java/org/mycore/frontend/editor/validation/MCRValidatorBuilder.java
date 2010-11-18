@@ -18,7 +18,7 @@ import org.mycore.frontend.editor.validation.value.MCRMinIntegerValidator;
 import org.mycore.frontend.editor.validation.value.MCRMinLengthValidator;
 import org.mycore.frontend.editor.validation.value.MCRMinStringValidator;
 import org.mycore.frontend.editor.validation.value.MCRRegExpValidator;
-import org.mycore.frontend.editor.validation.value.MCRXSLConditionValidator;
+import org.mycore.frontend.editor.validation.value.MCRXSLConditionValueValidator;
 
 public class MCRValidatorBuilder {
 
@@ -27,7 +27,7 @@ public class MCRValidatorBuilder {
         validator.addValidator(new MCRMaxLengthValidator());
         validator.addValidator(new MCRMinLengthValidator());
         validator.addValidator(new MCRRegExpValidator());
-        validator.addValidator(new MCRXSLConditionValidator());
+        validator.addValidator(new MCRXSLConditionValueValidator());
         validator.addValidator(new MCRExternalValidator());
         validator.addValidator(new MCRDateTimeValidator());
         validator.addValidator(new MCRMaxDateTimeValidator());

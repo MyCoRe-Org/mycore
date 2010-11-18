@@ -1,4 +1,4 @@
-package org.mycore.frontend.editor.validation.value;
+package org.mycore.frontend.editor.validation;
 
 import java.io.ByteArrayOutputStream;
 
@@ -12,22 +12,21 @@ import org.jdom.Namespace;
 import org.jdom.transform.JDOMSource;
 import org.mycore.common.MCRConstants;
 
-public class MCRXSLConditionValidator extends MCRSingleValueValidator {
+public class MCRXSLConditionTester {
 
-    @Override
-    public boolean hasRequiredProperties() {
-        return hasProperty("xsl");
+    private String condition;
+
+    public MCRXSLConditionTester(String condition) {
+        this.condition = condition;
     }
 
-    @Override
-    protected boolean isValidOrDie(String input) throws Exception {
-        Document xsl = buildXSLStylesheet();
-        Document xml = buildInputDocument(input);
+    public boolean testCondition(Document xml) throws Exception {
+        Document xsl = buildXSLStylesheet(condition);
         String output = transform(xml, xsl);
         return "true".equals(output);
     }
 
-    private Document buildXSLStylesheet() {
+    private Document buildXSLStylesheet(String condition) {
         Element stylesheet = new Element("stylesheet").setAttribute("version", "1.0");
         stylesheet.setNamespace(MCRConstants.XSL_NAMESPACE);
 
@@ -43,14 +42,14 @@ public class MCRXSLConditionValidator extends MCRSingleValueValidator {
         stylesheet.addContent(output);
 
         Element template = new Element("template", MCRConstants.XSL_NAMESPACE);
-        template.setAttribute("match", "/input");
+        template.setAttribute("match", "/*");
         stylesheet.addContent(template);
 
         Element choose = new Element("choose", MCRConstants.XSL_NAMESPACE);
         template.addContent(choose);
 
         Element when = new Element("when", MCRConstants.XSL_NAMESPACE);
-        when.setAttribute("test", getProperty("xsl"));
+        when.setAttribute("test", condition);
         when.addContent("true");
         choose.addContent(when);
 
@@ -59,10 +58,6 @@ public class MCRXSLConditionValidator extends MCRSingleValueValidator {
         choose.addContent(otherwise);
 
         return new Document(stylesheet);
-    }
-
-    private Document buildInputDocument(String input) {
-        return new Document(new Element("input").addContent(input));
     }
 
     private String transform(Document input, Document xsl) throws Exception {
