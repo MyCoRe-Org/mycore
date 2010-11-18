@@ -2,7 +2,11 @@ package org.mycore.frontend.editor.validation;
 
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
+
 public abstract class MCRValidatorBase implements MCRValidator {
+
+    private final static Logger LOGGER = Logger.getLogger(MCRCombinedValidator.class);
 
     private Properties properties = new Properties();
 
@@ -25,12 +29,38 @@ public abstract class MCRValidatorBase implements MCRValidator {
     public abstract boolean hasRequiredProperties();
 
     public boolean isValid(Object... input) {
+        boolean isValid;
+
         try {
-            return isValidOrDie(input);
+            isValid = isValidOrDie(input);
         } catch (Exception ex) {
-            return false;
+            isValid = false;
         }
+
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug(buildLogInfo(isValid, input));
+        
+        return isValid;
     }
 
     protected abstract boolean isValidOrDie(Object... input) throws Exception;
+    
+    private String buildLogInfo(boolean isValid, Object... input) {
+        StringBuffer buffer = new StringBuffer();
+
+        buffer.append(getClass().getSimpleName());
+        buffer.append(" validation ");
+        buffer.append(isValid ? "succesful" : "failed");
+        buffer.append(": ");
+
+        for (Object value : input)
+            buffer.append("\"").append(value).append("\" ");
+
+        Properties properties = getProperties();
+        if (!properties.isEmpty())
+            for (Object name : properties.keySet())
+                buffer.append(name).append("=\"").append(properties.get(name)).append("\" ");
+
+        return buffer.toString();
+    }
 }
