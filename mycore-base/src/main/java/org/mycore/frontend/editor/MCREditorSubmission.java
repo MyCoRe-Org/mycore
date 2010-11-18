@@ -432,18 +432,24 @@ public class MCREditorSubmission {
 
                     String pathA = path + "/" + condition.getAttributeValue("field1");
                     String pathB = path + "/" + condition.getAttributeValue("field2");
+                    
                     String valueA = parms.getParameter(pathA);
                     String valueB = parms.getParameter(pathB);
 
-                    MCRValidator validator = MCRValidatorBuilder.buildPredefinedCombinedPairValidator();
-                    setValidatorProperties(validator, condition);
-                    boolean ok = validator.isValid(valueA, valueB);
+                    String sortNrA = parms.getParameter("_sortnr-" + pathA);
+                    String sortNrB = parms.getParameter("_sortnr-" + pathB);
+
+                    boolean pairValuesAlreadyInvalid = (failed.containsKey(sortNrA) || failed.containsKey(sortNrB));
+                    boolean ok = true;
+
+                    if (!pairValuesAlreadyInvalid) {
+                        MCRValidator validator = MCRValidatorBuilder.buildPredefinedCombinedPairValidator();
+                        setValidatorProperties(validator, condition);
+                        ok = validator.isValid(valueA, valueB);
+                    }
 
                     if (!ok) {
-                        String sortNrA = parms.getParameter("_sortnr-" + pathA);
                         failed.put(sortNrA, condition);
-
-                        String sortNrB = parms.getParameter("_sortnr-" + pathB);
                         failed.put(sortNrB, condition);
 
                     } else if (condition.getAttribute("field1") == null) {
