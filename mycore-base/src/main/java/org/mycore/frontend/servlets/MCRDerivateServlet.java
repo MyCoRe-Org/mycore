@@ -5,7 +5,7 @@ package org.mycore.frontend.servlets;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
@@ -14,12 +14,9 @@ import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.services.i18n.MCRTranslation;
-import org.mycore.tools.MyCoReWebPageProvider;
 
 /**
- * @author basti
- * 
+ * @author basti, shermann
  */
 public class MCRDerivateServlet extends MCRServlet {
 
@@ -29,74 +26,54 @@ public class MCRDerivateServlet extends MCRServlet {
 
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
-
-        HttpServletRequest request = job.getRequest();
-        if (request == null) {
-            LOGGER.info(" # Request == null");
-            return;
-        }
-
-        // Check the Parameter
-        String myCoreDerivateId = null;
-        String myCoreObjectId = null;
-        String file = null;
-        String equals;
-
-        for (Object parms : request.getParameterMap().keySet()) {
-
-            equals = "derivateid";
-            if (parms.toString().equals(equals)) {
-                myCoreDerivateId = request.getParameter(equals);
-            }
-
-            equals = "objectid";
-            if (parms.toString().equals(equals)) {
-                myCoreObjectId = request.getParameter(equals);
-            }
-
-            equals = "file";
-            if (parms.toString().equals(equals)) {
-                file = request.getParameter(equals);
-            }
-        }
-
-        if (myCoreDerivateId == null) {
-            String msg = MCRTranslation.translate("MCRDerivateServlet.error.noDerivateId");
-            sendError("error", msg, MyCoReWebPageProvider.DE, job);
-            return;
-        }
-
-        if (myCoreObjectId == null) {
-            String msg = MCRTranslation.translate("MCRDerivateServlet.error.noObjectId");
-            sendError("error", msg, MyCoReWebPageProvider.DE, job);
-            return;
-        }
-
-        if (file == null) {
-            String msg = MCRTranslation.translate("MCRDerivateServlet.error.noFile");
-            sendError("error", msg, MyCoReWebPageProvider.DE, job);
-            return;
-        }
-
-        if (!MCRAccessManager.checkPermission(myCoreDerivateId, "deletedb")) {//
-            return;
-        }
-
         // check what to do
-        String val = request.getParameter("todo");
+        String task = job.getRequest().getParameter("todo");
+        if (task == null) {
+            LOGGER.error("Parameter \"todo\" is not provided");
+            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST);
+        }
+        // derivateid
+        String myCoreDerivateId = job.getRequest().getParameter("derivateid");
+        if (myCoreDerivateId == null) {
+            LOGGER.error("Parameter \"derivateid\" is not provided");
+            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST);
+        }
+        // owner id
+        String myCoreObjectId = job.getRequest().getParameter("objectid");
+        if (myCoreObjectId == null) {
+            LOGGER.error("Parameter \"objectid\" is not provided");
+            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST);
+        }
+        // file to delete or to set
+        String file = job.getRequest().getParameter("file");
+        if (file == null) {
+            LOGGER.error("Parameter \"file\" is not provided");
+            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST);
+        }
 
-        if (val.equals("ssetfile") && ssetfile(myCoreDerivateId, myCoreObjectId, file)) {
-            StringBuffer sb = new StringBuffer();
-            sb.append(getBaseURL()).append("servlets/MCRFileNodeServlet/").append(myCoreDerivateId).append("/?hosts=local");
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(sb.toString()));
+        performTask(job, task, myCoreDerivateId, myCoreObjectId, file);
+        job.getResponse().sendRedirect(
+                job.getResponse().encodeRedirectURL(getBaseURL() + "servlets/MCRFileNodeServlet/" + myCoreDerivateId));
+    }
 
-        } else if (val.equals("sdelfile") && sdelfile(myCoreDerivateId, myCoreObjectId, file)) {
-            StringBuffer sb = new StringBuffer();
-            sb.append(getBaseURL()).append("servlets/MCRFileNodeServlet/").append(myCoreDerivateId).append("/?hosts=local");
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(sb.toString()));
+    private void performTask(MCRServletJob job, String task, String myCoreDerivateId, String myCoreObjectId, String file)
+            throws IOException {
+        if (task.equals("ssetfile")) {
+            if (MCRAccessManager.checkPermission(myCoreDerivateId, "writedb")) {
+                setMainFile(myCoreDerivateId, myCoreObjectId, file);
+            } else {
+                LOGGER.error("User has not the \"writedb\" permission on object " + myCoreDerivateId);
+                job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN);
+            }
+        } else if (task.equals("sdelfile")) {
+            if (MCRAccessManager.checkPermission(myCoreDerivateId, "deletedb")) {
+                deleteFile(myCoreDerivateId, myCoreObjectId, file);
+            } else {
+                LOGGER.error("User has not the \"deletedb\" permission on object " + myCoreDerivateId);
+                job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN);
+            }
         } else {
-            String test = MCRTranslation.translate("MCRDerivate.error.Unkown");
-            sendError("error", test, MyCoReWebPageProvider.DE, job);
+            LOGGER.warn("The task \"" + task + "\" is not supported");
         }
     }
 
@@ -108,7 +85,7 @@ public class MCRDerivateServlet extends MCRServlet {
      * @param job
      *            the MCRServletJob instance
      */
-    private boolean ssetfile(String derivateId, String ObjectId, String file) throws IOException {
+    private boolean setMainFile(String derivateId, String ObjectId, String file) throws IOException {
         try {
             MCRObjectID mcrid = MCRObjectID.getInstance(derivateId);
             MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(mcrid);
@@ -116,8 +93,7 @@ public class MCRDerivateServlet extends MCRServlet {
             MCRMetadataManager.updateMCRDerivateXML(der);
             return true;
         } catch (MCRException ex) {
-            LOGGER.error("Exception while store to derivate " + derivateId);
-
+            LOGGER.error("Cannot set main file in derivate " + derivateId, ex);
             return false;
         }
     }
@@ -130,20 +106,14 @@ public class MCRDerivateServlet extends MCRServlet {
      * @param job
      *            the MCRServletJob instance
      */
-    private boolean sdelfile(String derivateId, String ObjectId, String file) throws IOException {
+    private boolean deleteFile(String derivateId, String ObjectId, String file) throws IOException {
         MCRDirectory rootdir = MCRDirectory.getRootDirectory(derivateId);
         try {
             rootdir.getChildByPath(file).delete();
             return true;
         } catch (Exception ex) {
-            LOGGER.warn("Can't remove file " + file, ex);
+            LOGGER.error("Cannot delete file " + file + " in derivate " + derivateId, ex);
             return false;
         }
-    }
-
-    private static void sendError(String title, String message, String lang, MCRServletJob job) throws IOException {
-        MyCoReWebPageProvider t = new MyCoReWebPageProvider();
-        t.addSection(title, message, lang);
-        getLayoutService().doLayout(job.getRequest(), job.getResponse(), t.getXML().getDocument());
     }
 }
