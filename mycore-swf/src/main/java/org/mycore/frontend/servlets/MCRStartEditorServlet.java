@@ -39,6 +39,7 @@ import java.util.Properties;
 import javax.servlet.ServletException;
 
 import org.apache.log4j.Logger;
+import org.jdom.Element;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
@@ -85,21 +86,16 @@ public class MCRStartEditorServlet extends MCRServlet {
 
     private static final long serialVersionUID = 1L;
 
-    // The configuration
     protected static Logger LOGGER = Logger.getLogger(MCRStartEditorServlet.class);
 
     protected static MCRConfiguration CONFIG = MCRConfiguration.instance();
 
-    // The workflow manager
     protected static MCRSimpleWorkflowManager WFM = null;
 
-    // The file slash
     protected static String SLASH = System.getProperty("file.separator");;
 
-    // the access system
     private static final MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
 
-    // static pages
     protected static String pagedir = CONFIG.getString("MCR.SWF.PageDir", "");
 
     protected static String cancelpage = pagedir + CONFIG.getString("MCR.SWF.PageCancel", "editor_cancel.xml");
@@ -724,8 +720,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      *            the MCRServletJob instance
      */
     public void scopyobj(MCRServletJob job, CommonData cd) throws IOException {
-        org.jdom.Element rule = WFM.getRuleFromFile(cd.mysemcrid, "writedb");
-        if (rule != null && !AI.checkPermission(rule)) {
+        if (!MCRAccessManager.checkPermission(cd.mysemcrid.toString(), "writedb")) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
         }
@@ -737,12 +732,18 @@ public class MCRStartEditorServlet extends MCRServlet {
         cd.mytfmcrid = WFM.getNextObjectID(MCRObjectID.getInstance(MCRObjectID.formatID(cd.myproject, cd.mytype, 1)));
         LOGGER.debug("MCRID (TF) = " + cd.mytfmcrid.toString());
         MCRObject copyobj = MCRMetadataManager.retrieveMCRObject(cd.mysemcrid);
+        Collection<String> permissions = AI.getPermissionsForID(cd.mysemcrid.toString());
         copyobj.setId(cd.mytfmcrid);
         copyobj.setLabel(cd.mytfmcrid.toString());
         copyobj.getStructure().clear();
         StringBuffer sb = new StringBuffer();
         try {
             MCRMetadataManager.update(copyobj);
+            for (String permission:permissions) {
+                Element rule_copy = AI.getRule(cd.mysemcrid.toString(), permission);
+                String rule_description = AI.getRuleDescription(cd.mysemcrid.toString(), permission);
+                AI.updateRule(cd.mytfmcrid.toString(), permission, rule_copy, rule_description);
+            }
             sb.append(getBaseURL()).append("receive/").append(cd.mytfmcrid);
         } catch (MCRActiveLinkException e) {
             LOGGER.error(e.getMessage());
