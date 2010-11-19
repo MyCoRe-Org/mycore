@@ -8,6 +8,8 @@ Version 2.1 (actual head tree)
 - Integrate the simple Mets/Mods Component.
 - Add a Zoomify component.
 - Results lists from MCRSearchServlet now can be bookmarked. When query is not in cache any more, it will be re-executed. 
+- Add the id-attribute in MCRIndexBrowser XML output for ranges to get the object data directly over Xalan extensions.
+- Add a copy function for MCRObjects in the Simple Workflow.
 
 Version 2.0
 =============
