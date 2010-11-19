@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- ============================================== -->
-<!-- $Revision: 1.9 $ $Date: 2009/03/13 09:56:46 $ -->
-<!-- ============================================== -->
-
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   
   <xsl:param name="UploadID"/>
@@ -15,7 +11,7 @@
   <xsl:variable name="applet_mm.mime" select="'application/x-java-applet;version=1.3.1'"/>
   <xsl:variable name="applet_mm.codebase" select="concat($WebApplicationBaseURL,'applet_metsmods')"/>
   <xsl:variable name="applet_mm.class" select="'org.mycore.frontend.metsmods.MCRMetsModsApplet.class'"/>
-  <xsl:variable name="applet_mm.archives" select="'metsmods.jar,jdom-1.1.jar,mycore.jar'"/>
+  <xsl:variable name="applet_mm.archives" select="'metsmods.jar,jdom-1.1.1.jar,mycore.jar'"/>
   <xsl:variable name="applet_mm.cache" select="'No'"/>
   <xsl:variable name="applet_mm.width" select="'600'"/>
   <xsl:variable name="applet_mm.height" select="'400'"/>
