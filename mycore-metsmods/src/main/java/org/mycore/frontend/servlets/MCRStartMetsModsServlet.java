@@ -55,241 +55,287 @@ import org.jdom.output.XMLOutputter;
 
 public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
 
-    private static final long serialVersionUID = -6409340238736582208L;
+	private static final long serialVersionUID = -6409340238736582208L;
 
-    private static String metsfile = CONFIG.getString("MCR.MetsMots.ConfigFile", "mets.xml");
+	private static String metsfile = CONFIG.getString(
+			"MCR.MetsMots.ConfigFile", "mets.xml");
 
-    private static String allowed = CONFIG.getString("MCR.Component.MetsMods.allowed", "");
+	private static String allowed = CONFIG.getString(
+			"MCR.Component.MetsMods.allowed", "");
 
-    private static String defaultowner = CONFIG.getString("MCR.Component.MetsMods.owner", "");
+	private static String defaultowner = CONFIG.getString(
+			"MCR.Component.MetsMods.owner", "");
 
-    private static String defaultlogo = CONFIG.getString("MCR.Component.MetsMods.ownerLogo", "");
+	private static String defaultlogo = CONFIG.getString(
+			"MCR.Component.MetsMods.ownerLogo", "");
 
-    private static String defaultownerSiteURL = CONFIG.getString("MCR.Component.MetsMods.ownerSiteURL", "");
+	private static String defaultownerSiteURL = CONFIG.getString(
+			"MCR.Component.MetsMods.ownerSiteURL", "");
 
-    private static String defaultreferenceURL = CONFIG.getString("MCR.Component.MetsMods.referenceURL", "");
+	private static String defaultreferenceURL = CONFIG.getString(
+			"MCR.Component.MetsMods.referenceURL", "");
 
-    private static String defaultpresentationURL = CONFIG.getString("MCR.Component.MetsMods.presentationURL", "");
+	private static String defaultpresentationURL = CONFIG.getString(
+			"MCR.Component.MetsMods.presentationURL", "");
 
-    private static String activated = CONFIG.getString("MCR.Component.MetsMods.activated", "");
+	private static String activated = CONFIG.getString(
+			"MCR.Component.MetsMods.activated", "");
 
-    private Transaction tx;
+	private Transaction tx;
 
-    /**
-     * public void doGetPost(MCRServletJob job) throws Exception {
-     * job.getResponse().getWriter().print("<html><head></head><body><h1>Klappt
-     * (2)!</h1></body></html>"); }
-     **/
+	/**
+	 * public void doGetPost(MCRServletJob job) throws Exception {
+	 * job.getResponse().getWriter().print("<html><head></head><body><h1>Klappt
+	 * (2)!</h1></body></html>"); }
+	 **/
 
-    private void addPicturesToList(MCRDirectory dir, ArrayList<String> list) {
-        for (int i = 0; i < dir.getChildren().length; i++) {
-            try {
-                dir = (MCRDirectory) dir.getChildren()[i];
-                addPicturesToList(dir, list);
-            } catch (Exception ClassCastException) {
-                String str = dir.getPath() + "/" + ((MCRFile) dir.getChildren()[i]).getName();
-                if (!list.contains(str))
-                    if (allowed.contains(",")) {
-                        StringTokenizer st1 = new StringTokenizer(allowed, ",");
-                        while (st1.hasMoreTokens())
-                            if (searchForAllowed(dir, st1.nextToken())) {
-                                list.add(str);
-                                break;
-                            }
-                    } else if (searchForAllowed(dir, allowed))
-                        list.add(str);
-            }
-        }
-    }
+	private void addPicturesToList(MCRDirectory dir, ArrayList<String> list) {
+		for (int i = 0; i < dir.getChildren().length; i++) {
+			try {
+				dir = (MCRDirectory) dir.getChildren()[i];
+				addPicturesToList(dir, list);
+			} catch (Exception ClassCastException) {
+				String str = dir.getPath() + "/"
+						+ ((MCRFile) dir.getChildren()[i]).getName();
+				if (!list.contains(str))
+					if (allowed.contains(",")) {
+						StringTokenizer st1 = new StringTokenizer(allowed, ",");
+						while (st1.hasMoreTokens())
+							if (searchForAllowed(dir, st1.nextToken())) {
+								list.add(str);
+								break;
+							}
+					} else if (searchForAllowed(dir, allowed))
+						list.add(str);
+			}
+		}
+	}
 
-    private boolean searchForMets(MCRDirectory dir) {
-        MCRFile mcrfile = (MCRFile) dir.getChild(metsfile);
-        if (mcrfile == null) {
-            // LOGGER.info("Nichts gefunden!");
-            return false;
-        } else {
-            // LOGGER.info("Sieht gut aus!");
-            return true;
-        }
-    }
+	private boolean searchForMets(MCRDirectory dir) {
+		MCRFile mcrfile = (MCRFile) dir.getChild(metsfile);
+		if (mcrfile == null) {
+			// LOGGER.info("Nichts gefunden!");
+			return false;
+		} else {
+			// LOGGER.info("Sieht gut aus!");
+			return true;
+		}
+	}
 
-    private boolean searchForAllowed(MCRDirectory dir, String allowed) {
-        if (allowed.compareTo("") == 0)
-            return false;
+	private boolean searchForAllowed(MCRDirectory dir, String allowed) {
+		if (allowed.compareTo("") == 0)
+			return false;
 
-        MCRFilesystemNode liste[] = dir.getChildren();
+		MCRFilesystemNode liste[] = dir.getChildren();
 
-        for (int i = 0; i < liste.length; i++)
-            if (liste[i].getName().contains(allowed))
-                return true;
-        return false;
-    }
+		for (int i = 0; i < liste.length; i++) {
+			if (liste[i] instanceof MCRFile) {
+				if (liste[i].getName().contains(allowed))
+					return true;
+			}
+		}
+		return false;
+	}
 
-    public void seditmets(MCRServletJob job, CommonData cd) throws IOException {
+	public void seditmets(MCRServletJob job, CommonData cd) throws IOException {
 
-        boolean awasfound = false;
+		boolean awasfound = false;
 
-        if (!MCRAccessManager.checkPermission(cd.myremcrid.toString(), "writedb")) {
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
-            return;
-        }
-        if (cd.mysemcrid == null) {
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + mcriderrorpage));
-            return;
-        }
+		if (!MCRAccessManager.checkPermission(cd.myremcrid.toString(),
+				"writedb")) {
+			job.getResponse().sendRedirect(
+					job.getResponse().encodeRedirectURL(
+							getBaseURL() + usererrorpage));
+			return;
+		}
+		if (cd.mysemcrid == null) {
+			job.getResponse().sendRedirect(
+					job.getResponse().encodeRedirectURL(
+							getBaseURL() + mcriderrorpage));
+			return;
+		}
 
-        String language = job.getRequest().getParameter("lang");
-        if (language == null) {
-            MCRSession session = MCRSessionMgr.getCurrentSession();
-            language = session.getCurrentLanguage();
-        }
+		String language = job.getRequest().getParameter("lang");
+		if (language == null) {
+			MCRSession session = MCRSessionMgr.getCurrentSession();
+			language = session.getCurrentLanguage();
+		}
 
-        MCRFilesystemNode node = MCRFilesystemNode.getRootNode(cd.mysemcrid.toString());
-        MCRDirectory dir = (MCRDirectory) node;
+		MCRFilesystemNode node = MCRFilesystemNode.getRootNode(cd.mysemcrid
+				.toString());
+		MCRDirectory dir = (MCRDirectory) node;
 
-        String mypath = dir.getName();
+		String mypath = dir.getName();
 
-        try {
-            ArrayList<String> pic_list = new ArrayList<String>();
-            addPicturesToList(dir, pic_list);
-            // possible code point for adding routine handling generate a
-            // mets-file in directorys with zip-files.
-            if (allowed.contains(",")) {
-                StringTokenizer st1 = new StringTokenizer(allowed, ",");
-                while (st1.hasMoreTokens())
-                    if (searchForAllowed(dir, st1.nextToken()))
-                        awasfound = true;
-            } else if (searchForAllowed(dir, allowed))
-                awasfound = true;
-            if (searchForMets(dir) == false) {
-                // build the mets.file
-                String project = cd.myremcrid.getProjectId();
+		try {
+			ArrayList<String> pic_list = new ArrayList<String>();
+			addPicturesToList(dir, pic_list);
+			// possible code point for adding routine handling generate a
+			// mets-file in directorys with zip-files.
+			if (allowed.contains(",")) {
+				StringTokenizer st1 = new StringTokenizer(allowed, ",");
+				while (st1.hasMoreTokens())
+					if (searchForAllowed(dir, st1.nextToken())) {
+						awasfound = true;
+						break;
+					}
+			} else if (searchForAllowed(dir, allowed))
+				awasfound = true;
+			if (searchForMets(dir) == false) {
+				// build the mets.file
+				String project = cd.myremcrid.getProjectId();
 
-                // owner
-                String owner = CONFIG.getString("MCR.Component.MetsMods." + project + ".owner", "");
-                if (owner.trim().length() == 0) {
-                    owner = defaultowner;
-                }
-                // logo
-                String ownerLogo = CONFIG.getString("MCR.Component.MetsMods." + project + ".ownerLogo", "");
-                if (ownerLogo.trim().length() == 0) {
-                    ownerLogo = defaultlogo;
-                }
-                // site url
-                String ownerSiteURL = CONFIG.getString("MCR.Component.MetsMods." + project + ".ownerSiteURL", "");
-                if (ownerSiteURL.trim().length() == 0) {
-                    ownerSiteURL = defaultownerSiteURL;
-                }
-                // reference url
-                String referenceURL = CONFIG.getString("MCR.Component.MetsMods." + project + ".referenceURL", "");
-                if (referenceURL.trim().length() == 0) {
-                    referenceURL = defaultreferenceURL;
-                }
-                // presentation url
-                String presentationURL = CONFIG.getString("MCR.Component.MetsMods." + project + ".presentationURL", "");
-                if (presentationURL.trim().length() == 0) {
-                    presentationURL = defaultpresentationURL;
-                }
+				// owner
+				String owner = CONFIG.getString("MCR.Component.MetsMods."
+						+ project + ".owner", "");
+				if (owner.trim().length() == 0) {
+					owner = defaultowner;
+				}
+				// logo
+				String ownerLogo = CONFIG.getString("MCR.Component.MetsMods."
+						+ project + ".ownerLogo", "");
+				if (ownerLogo.trim().length() == 0) {
+					ownerLogo = defaultlogo;
+				}
+				// site url
+				String ownerSiteURL = CONFIG.getString(
+						"MCR.Component.MetsMods." + project + ".ownerSiteURL",
+						"");
+				if (ownerSiteURL.trim().length() == 0) {
+					ownerSiteURL = defaultownerSiteURL;
+				}
+				// reference url
+				String referenceURL = CONFIG.getString(
+						"MCR.Component.MetsMods." + project + ".referenceURL",
+						"");
+				if (referenceURL.trim().length() == 0) {
+					referenceURL = defaultreferenceURL;
+				}
+				// presentation url
+				String presentationURL = CONFIG.getString(
+						"MCR.Component.MetsMods." + project
+								+ ".presentationURL", "");
+				if (presentationURL.trim().length() == 0) {
+					presentationURL = defaultpresentationURL;
+				}
 
-                MCRMetsModsUtil mmu = new MCRMetsModsUtil();
+				MCRMetsModsUtil mmu = new MCRMetsModsUtil();
 
-                Element mets = mmu.init_mets(cd.mysemcrid.toString());
-                Element amdSec = mmu.init_amdSec(cd.mysemcrid.toString(), owner, ownerLogo, ownerSiteURL, referenceURL, presentationURL);
+				Element mets = mmu.init_mets(cd.mysemcrid.toString());
+				Element amdSec = mmu.init_amdSec(cd.mysemcrid.toString(),
+						owner, ownerLogo, ownerSiteURL, referenceURL,
+						presentationURL);
 
-                mets.addContent(amdSec);
+				mets.addContent(amdSec);
 
-                // sorting the pic_list
-                Collections.sort(pic_list);
+				// sorting the pic_list
+				Collections.sort(pic_list);
 
-                Element mets2;
-                if (activated.contains("CONTENTIDS"))
-                    mets2 = mmu.createMetsElement(pic_list, mets, getBaseURL() + "servlets/MCRFileNodeServlet",
-                        getBaseURL() + "receive/" + cd.myremcrid.toString());
-                else
-                    mets2 = mmu.createMetsElement(pic_list, mets, getBaseURL() + "servlets/MCRFileNodeServlet");
+				Element mets2;
+				if (activated.contains("CONTENTIDS"))
+					mets2 = mmu.createMetsElement(pic_list, mets, getBaseURL()
+							+ "servlets/MCRFileNodeServlet", getBaseURL()
+							+ "receive/" + cd.myremcrid.toString());
+				else
+					mets2 = mmu.createMetsElement(pic_list, mets, getBaseURL()
+							+ "servlets/MCRFileNodeServlet");
 
-                XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat());
-                String full_mets = xmlout.outputString(mets2);
+				XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat());
+				String full_mets = xmlout.outputString(mets2);
 
-                // save the builded file to IFS
-                try {
-                    if (awasfound) {
-                        LOGGER.debug("storing new mets file...");
-                        // startTransaction();
-                        MCRFile file = new MCRFile("mets.xml", dir);
-                        // commitTransaction();
-                        ByteArrayInputStream bais = new ByteArrayInputStream(full_mets.getBytes());
-                        long sizeDiff = file.setContentFrom(bais, false);
-                        // startTransaction();
-                        file.storeContentChange(sizeDiff);
-                        // commitTransaction();
-                    }
-                } catch (Exception e) {
-                    LOGGER.error("Error while storing new mets file...", e);
-                    // try {
-                    // rollbackTransaction();
-                    // } catch (Exception e2) {
-                    // LOGGER.debug("Error while rolling back transaction",e);
-                    // }
+				// save the builded file to IFS
+				try {
+					if (awasfound) {
+						LOGGER.debug("storing new mets file...");
+						// startTransaction();
+						MCRFile file = new MCRFile("mets.xml", dir);
+						// commitTransaction();
+						ByteArrayInputStream bais = new ByteArrayInputStream(
+								full_mets.getBytes());
+						long sizeDiff = file.setContentFrom(bais, false);
+						// startTransaction();
+						file.storeContentChange(sizeDiff);
+						// commitTransaction();
+					}
+				} catch (Exception e) {
+					LOGGER.error("Error while storing new mets file...", e);
+					// try {
+					// rollbackTransaction();
+					// } catch (Exception e2) {
+					// LOGGER.debug("Error while rolling back transaction",e);
+					// }
 
-                }
+				}
 
-            }
+			}
 
-        } catch (Exception e) {
-            LOGGER.info("Error while accessing mets-mods", e);
-            // e.printStackTrace();
-        }
+		} catch (Exception e) {
+			LOGGER.error("Error while accessing mets-mods", e);
+			e.printStackTrace();
+		}
+		StringBuffer sb = new StringBuffer(getBaseURL()).append("receive/")
+				.append(cd.myremcrid.toString());
+		MCRSWFUploadHandlerIFS fuh = new MCRSWFUploadHandlerIFS(cd.myremcrid
+				.toString(), cd.mysemcrid.toString(), sb.toString());
+		String fuhid = fuh.getID();
 
-        StringBuffer sb = new StringBuffer(getBaseURL()).append("receive/").append(cd.myremcrid.toString());
-        MCRSWFUploadHandlerIFS fuh = new MCRSWFUploadHandlerIFS(cd.myremcrid.toString(), cd.mysemcrid.toString(), sb.toString());
-        String fuhid = fuh.getID();
+		cd.myfile = pagedir + "metsmods_commit.xml";
 
-        cd.myfile = pagedir + "metsmods_commit.xml";
+		Properties params = new Properties();
+		params.put("XSL.UploadID", fuhid);
+		params.put("XSL.target.param.1", "method=formBasedUpload");
+		params.put("XSL.target.param.2", "uploadId=" + fuhid);
+		params.put("XSL.UploadPath", mypath + "/");
+		params.put("XSL.language", language);
+		params.put("mcrid", cd.mysemcrid.toString());
+		params.put("type", cd.mytype);
+		params.put("step", cd.mystep);
+		params.put("remcrid", cd.myremcrid.toString());
+		String base = getBaseURL() + cd.myfile;
+		if (!awasfound)
+			job
+					.getResponse()
+					.sendRedirect(
+							job
+									.getResponse()
+									.encodeRedirectURL(
+											buildRedirectURL(
+													getBaseURL()
+															+ "servlets/MCRFileNodeServlet/"
+															+ cd.mysemcrid
+																	.toString()
+															+ "/?hosts=local",
+													new Properties())));
+		else
+			job.getResponse().sendRedirect(
+					job.getResponse().encodeRedirectURL(
+							buildRedirectURL(base, params)));
 
-        Properties params = new Properties();
-        params.put("XSL.UploadID", fuhid);
-        params.put("XSL.target.param.1", "method=formBasedUpload");
-        params.put("XSL.target.param.2", "uploadId=" + fuhid);
-        params.put("XSL.UploadPath", mypath + "/");
-        params.put("XSL.language", language);
-        params.put("mcrid", cd.mysemcrid.toString());
-        params.put("type", cd.mytype);
-        params.put("step", cd.mystep);
-        params.put("remcrid", cd.myremcrid.toString());
-        String base = getBaseURL() + cd.myfile;
-        if (awasfound)
-            job.getResponse().sendRedirect(
-                job.getResponse().encodeRedirectURL(
-                    buildRedirectURL(getBaseURL() + "servlets/MCRFileNodeServlet/" + cd.mysemcrid.toString() + "/?hosts=local", new Properties())));
-        else
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
+	}
 
-    }
+	protected void startTransaction() {
+		LOGGER.debug("Starting transaction");
+		if (tx == null || !tx.isActive())
+			tx = MCRHIBConnection.instance().getSession().beginTransaction();
+		else
+			throw new MCRException("Transaction already started");
+	}
 
-    protected void startTransaction() {
-        LOGGER.debug("Starting transaction");
-        if (tx == null || !tx.isActive())
-            tx = MCRHIBConnection.instance().getSession().beginTransaction();
-        else
-            throw new MCRException("Transaction already started");
-    }
+	protected void commitTransaction() {
+		LOGGER.debug("Committing transaction");
+		if (tx != null) {
+			tx.commit();
+			tx = null;
+		} else
+			throw new NullPointerException("Cannot commit transaction");
+	}
 
-    protected void commitTransaction() {
-        LOGGER.debug("Committing transaction");
-        if (tx != null) {
-            tx.commit();
-            tx = null;
-        } else
-            throw new NullPointerException("Cannot commit transaction");
-    }
-
-    protected void rollbackTransaction() {
-        LOGGER.debug("Rolling back transaction");
-        if (tx != null) {
-            tx.rollback();
-            tx = null;
-        } else
-            throw new NullPointerException("Cannot rollback transaction");
-    }
+	protected void rollbackTransaction() {
+		LOGGER.debug("Rolling back transaction");
+		if (tx != null) {
+			tx.rollback();
+			tx = null;
+		} else
+			throw new NullPointerException("Cannot rollback transaction");
+	}
 }
