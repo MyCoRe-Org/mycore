@@ -11,8 +11,8 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.services.urn.MCRURNManager;
 
 /**
- * This class is responsible for the urn after an object has been deleted in
- * the database
+ * This class is responsible for the urn after an object has been deleted in the
+ * database
  * 
  * @author shermann
  */
@@ -32,8 +32,7 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
         if (evt.getObjectType().equals(MCREvent.OBJECT_TYPE)) {
             MCRObject obj = (MCRObject) (evt.get("object"));
             if (obj != null) {
-                logger.debug(getClass().getName() + " handling " + obj.getId().toString() + " "
-                        + evt.getEventType());
+                logger.debug(getClass().getName() + " handling " + obj.getId().toString() + " " + evt.getEventType());
                 if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
                     handleObjectCreated(evt, obj);
                 } else if (evt.getEventType().equals(MCREvent.UPDATE_EVENT)) {
@@ -43,13 +42,11 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
                 } else if (evt.getEventType().equals(MCREvent.REPAIR_EVENT)) {
                     handleObjectRepaired(evt, obj);
                 } else {
-                    logger.warn("Can't find method for an object data handler for event type "
-                            + evt.getEventType());
+                    logger.warn("Can't find method for an object data handler for event type " + evt.getEventType());
                 }
                 return;
             }
-            logger.warn("Can't find method for " + MCREvent.OBJECT_TYPE + " for event type "
-                    + evt.getEventType());
+            logger.warn("Can't find method for " + MCREvent.OBJECT_TYPE + " for event type " + evt.getEventType());
             return;
         }
 
@@ -57,8 +54,7 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
         if (evt.getObjectType().equals(MCREvent.DERIVATE_TYPE)) {
             MCRDerivate der = (MCRDerivate) (evt.get("derivate"));
             if (der != null) {
-                logger.debug(getClass().getName() + " handling " + der.getId().toString() + " "
-                        + evt.getEventType());
+                logger.debug(getClass().getName() + " handling " + der.getId().toString() + " " + evt.getEventType());
                 if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
                     handleDerivateCreated(evt, der);
                 } else if (evt.getEventType().equals(MCREvent.UPDATE_EVENT)) {
@@ -68,13 +64,11 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
                 } else if (evt.getEventType().equals(MCREvent.REPAIR_EVENT)) {
                     handleDerivateRepaired(evt, der);
                 } else {
-                    logger.warn("Can't find method for a derivate data handler for event type "
-                            + evt.getEventType());
+                    logger.warn("Can't find method for a derivate data handler for event type " + evt.getEventType());
                 }
                 return;
             }
-            logger.warn("Can't find method for " + MCREvent.DERIVATE_TYPE + " for event type "
-                    + evt.getEventType());
+            logger.warn("Can't find method for " + MCREvent.DERIVATE_TYPE + " for event type " + evt.getEventType());
             return;
         }
     }
@@ -91,12 +85,13 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
     @Override
     protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
         try {
-            MCRURNManager.removeURNByObjectID(obj.getId().toString());
-            logger.info("Deleting urn from database for object belonging to "
-                    + obj.getId().toString());
+            if (MCRURNManager.hasURNAssigned(obj.getId().toString())) {
+                logger.info("Deleting urn from database for object belonging to " + obj.getId().toString());
+                MCRURNManager.removeURNByObjectID(obj.getId().toString());
+            }
+
         } catch (Exception ex) {
-            logger.error("Could not delete the urn from the database for object with id "
-                    + obj.getId().toString(), ex);
+            logger.error("Could not delete the urn from the database for object with id " + obj.getId().toString(), ex);
         }
     }
 
@@ -113,11 +108,9 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
     protected void handleDerivateDeleted(MCREvent evt, MCRDerivate der) {
         try {
             MCRURNManager.removeURNByObjectID(der.getId().toString());
-            logger.info("Deleting urn from database for derivates belonging to "
-                    + der.getId().toString());
+            logger.info("Deleting urn from database for derivates belonging to " + der.getId().toString());
         } catch (Exception ex) {
-            logger.error("Could not delete the urn from the database for object with id "
-                    + der.getId().toString(), ex);
+            logger.error("Could not delete the urn from the database for object with id " + der.getId().toString(), ex);
         }
     }
 }
