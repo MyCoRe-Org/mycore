@@ -1,0 +1,21 @@
+/* Permalink */
+
+.viewerContainer.max .permalinkArea {
+	display:none;
+	font-weight:normal;
+	height:40px;
+	left:400px;
+	opacity:0.85;
+	position:absolute;
+	text-align:left;
+	width:400px;
+	padding:5px;
+	background-color:#EFEFEF;
+	z-index:50;
+}
+
+.viewerContainer .permalinkArea .content {
+	width:100%;
+	height:100%;
+	overflow:scroll;
+}

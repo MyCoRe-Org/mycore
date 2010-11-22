@@ -1,4 +1,3 @@
-var blendings = new blendWorks();
 var length = null;
 var focus = null;//holds the element which is focused
 //TODO Preload größe anhand der von den Kacheln bestimmen
@@ -29,50 +28,58 @@ function notifyListenerNavigate(value, viewID) {
 	}
 };
 
-/*
-@description set focus to the given element
-*/
+/**
+ * @public
+ * @function
+ * @name	setFocus
+ * @memberOf	iview.Thumbnails
+ * @description	sets the focus to the given element
+ * @param 	{object} element object which should be focused
+ */
 function setFocus(element){
 	focus = element;
 }
 
-/*
-@description gets the element which is focused
-@return the element which has the focus
-*/
+/**
+ * @public
+ * @function
+ * @name	getFocus
+ * @memberOf	iview.Thumbnails
+ * @description	returns the element which has the focus
+ */
 function getFocus(e){
 	return focus;
 }
 
-/*
-@description return the focus (no element is focused after function-call)
-*/
+/**
+ * @public
+ * @function
+ * @name	resetFocus
+ * @memberOf	iview.Thumbnails
+ * @description	delete the focus so that no element has it
+ */
 function resetFocus(){
 	focus = null;
 }
 
-/*
-@description procure informations from a given XML File
-@param page numeric value who should be holded; if none is indicated tried to get one via URL
-@param absolute inicator if the value shold be handled absolute or relative
-*/
-function loadPageData(getPage, absolute, viewID) {
-	return nodeProps(Iview[viewID].buchDaten, "mets:file", getPage, absolute);
-}
-
-/*
-@description reads out the imageinfo.xml, set the correct zoomvalues and loads the page
-*/
-//TODO Loadpagedata in loadpage integrieren
+/**
+ * @public
+ * @function
+ * @name	loadPage
+ * @memberOf	iview.Thumbnails
+ * @description	reads out the imageinfo.xml, set the correct zoomvlues and loads the page
+ * @param 	{string} viewID ID of the derivate
+ * @param	{function} callback
+ */
 function loadPage(viewID, callback) {
-	var pageData;
-	if (typeof(Iview[viewID].buchDaten)=='undefined'){
-		pageData=[{"LOCTYPE":"URL","href":Iview[viewID].startFile}];
+	var url;
+	if (typeof(Iview[viewID].newMETS)=='undefined'){
+		url = Iview[viewID].startFile;
 	} else {
-		pageData=loadPageData(Iview[viewID].pagenumber - 1, true, viewID);
+		url = Iview[viewID].PhysicalModel.getCurrent().getHref();
 	}
-	Iview[viewID].prefix  = findInArrayElement(pageData, "LOCTYPE", "URL").href;
-	var imagePropertiesURL=Iview[viewID].baseUri[0]+"/"+viewID+"/"+findInArrayElement(pageData, "LOCTYPE", "URL").href+"/imageinfo.xml";
+	Iview[viewID].prefix  = url;
+	var imagePropertiesURL=Iview[viewID].baseUri[0]+"/"+viewID+"/"+url+"/imageinfo.xml";
 	jQuery.ajax({
 		url: imagePropertiesURL,
   		success: function(response) {processImageProperties(response,viewID)},
@@ -81,6 +88,14 @@ function loadPage(viewID, callback) {
 	});
 }
 
+/**
+ * @public
+ * @function
+ * @name	callBack
+ * @memberOf	iview.Thumbnails
+ * @description	execute the given function, if it's no function, do nothing or alert a comment
+ * @param 	{function} func is the function whis is to be executed
+ */
 function callBack(func){
 	if (func == null)
 		return;
@@ -90,6 +105,15 @@ function callBack(func){
 		alert("Is not a function:\n"+func);
 }
 
+/**
+ * @public
+ * @function
+ * @name	processImageProperties
+ * @memberOf	iview.Thumbnails
+ * @description	
+ * @param 	{object} imageProperties
+ * @param	{string} viewID ID of the derivate
+ */
 function processImageProperties(imageProperties, viewID){
 	var values = nodeAttributes(imageProperties.getElementsByTagName("imageinfo")[0]);
 	
@@ -156,7 +180,6 @@ function processImageProperties(imageProperties, viewID){
 		viewerBean.resize();
 	}
 	// moves viewer to zoomLevel zoomInit
-	//viewerBean.zoom(Iview[viewID].zoomInit-viewerBean.zoomLevel);
 	viewerBean.maxZoomLevel=Iview[viewID].zoomMax;
 	// handle special Modi for new Page
 	if (Iview[viewID].initialModus[0] == true) {
@@ -187,45 +210,43 @@ function processImageProperties(imageProperties, viewID){
 	}
 	updateModuls(viewID);
 }
-/*
-@description blend in the overview an creates it by the first call
-*/
+
+/**
+ * @public
+ * @function
+ * @name	openOverview
+ * @memberOf	iview.Thumbnails
+ * @description	blend in the overview and creates it by the first call
+ * @param	{string} viewID ID of the derivate
+ */
 function openOverview(viewID) {
-	if (!Iview[viewID].overviewActive) {
-		Iview[viewID].overviewActive = !Iview[viewID].overviewActive;
-		// update overview
-		Iview[viewID].overview1.actualize(Iview[viewID].pagenumber);
-
-		// im VollBild Header mit ausblenden
-		var overview=document.getElementById("overview1"+viewID);
-		var viewerContainer=document.getElementById("viewerContainer"+viewID);
-		overview.style.top = - (viewerContainer.offsetHeight) + "px";
-		overview.style.visibility = 'visible';
-		blendings.slide("overview1"+viewID, new Array(0,- (viewerContainer.offsetHeight),0,0),5,5,0,new Array(), "", "");
-
-		openChapter(false, viewID);
-	} else {
-		Iview[viewID].overviewActive = !Iview[viewID].overviewActive;
-		
-		// im VollBild Header wieder mit einblenden
-		blendings.slide("overview1"+viewID, new Array(0,0,0,- (document.getElementById("viewerContainer" + viewID).offsetHeight)),5,5,0,new Array(), "", "document.getElementById('overview1'+'"+viewID+"').style.visibility = 'hidden'");	
-	
-		openChapter(false, viewID);
-	}
+	Iview[viewID].overview.showView();
+	openChapter(false, viewID);
 }
 
-/*
-@description  saves the scaling of loaded tiles if picture fits to height or to width (for IE)
-*/
+/**
+ * @public
+ * @function
+ * @name	removeScaling
+ * @memberOf	iview.Thumbnails
+ * @description	saves the scaling of loaded tiles if picture fits to heigh or to width (for IE)
+ * @param	{string} viewID ID of the derivate
+ */
 function removeScaling(viewID) {
 	for (var img in Iview[viewID].images) {
 		Iview[viewID].images[img]["scaled"] = false;
 	}
 }
 
-/*
-@description checks if the picture is loaded
-*/
+/**
+ * @public
+ * @function
+ * @name	isloaded
+ * @memberOf	iview.Thumbnails
+ * @description	checks if the picture is loaded
+ * @param	{object} img
+ * @param	{string} viewID ID of the derivate
+ */
 function isloaded(img, viewID) {
 	/*
 	NOTE tiles are not dispalyed correctly in Opera, because the used accuracy for pixelvalues only has 
@@ -262,14 +283,19 @@ function isloaded(img, viewID) {
 	img = null;
 }
 
-/*
-@description calculates how the TileSize and the Zoomvalue needs to be if the given Zoomlevel fits into the Viewer
-@param level the zoomlevel which is used for testing
-@param totalSize the total size of the Picture Dimension X or Y
-@param viewerSize the Size of the Viewer Dimension X or Y
-@param scrollBarSize the Height or Width of the ScrollBar which needs to be dropped from the ViewerSize
-@return boolean which tells if it was successfull to scale the picture in the current zoomlevel to the viewer Size
-*/
+/**
+ * @public
+ * @function
+ * @name	calculateZoomProp
+ * @memberOf	iview.Thumbnails
+ * @description	calculates how the TileSize and the zoomvalue needs to be if the given zoomlevel fits into the viewer
+ * @param	{integer} level the zoomlevel which is used for testing
+ * @param	{integer} totalSize the total size of the Picture Dimension X or Y
+ * @param	{integer} viewerSize the Size of the Viewer Dimension X or Y
+ * @param	{integer} scrollBarSize the Height or Width of the ScrollBar which needs to be dropped from the ViewerSize
+ * @param	{string} viewID ID of the derivate
+ * @return	boolean which tells if it was successfull to scale the picture in the current zoomlevel to the viewer Size
+ */
 function calculateZoomProp(level, totalSize, viewerSize, scrollBarSize, viewID) {
 	if ((totalSize / Math.pow(2, level)) <= viewerSize) {
 		var viewerBean = Iview[viewID].viewerBean;
@@ -291,13 +317,18 @@ function calculateZoomProp(level, totalSize, viewerSize, scrollBarSize, viewID) 
 	return false;
 }
 
-/*
-@description calculates how the picture needs to be scaled so that it can be displayed within the display-area as the mode requires it
-@param screenZoom boolean which defines which display mode will be calculated
-@param stateBool boolean which holds the value which defines if the current mode is set or needs to be set.
-@param arguments[3] boolean optional tells if the function is called from the Zoombar or any Function which is connected to it or not and prevents infite loop
-@return boolean which holds the new StateBool value, so it can be saved back into the correct variable
-*/
+/**
+ * @public
+ * @function
+ * @name	switchDisplayMode
+ * @memberOf	iview.Thumbnails
+ * @description	calculates how the picture needs to be scaled so that it can be displayed within the display-area as the mode requires it
+ * @param	{boolean} screenZoom defines which displaymode will be calculated
+ * @param	{boolean} statebool holds the value which defines if the current mode is set or needs to be set
+ * @param 	{boolean}arguments[3] optional tells if the function is called from the Zoombar or any Function which is connected to it or not and prevents infite loop
+ * @param	{string} viewID ID of the derivate
+ * @return	boolean which holds the new StateBool value, so it can be saved back into the correct variable
+ */
 function switchDisplayMode(screenZoom, stateBool, viewID) {
 	var viewerBean = Iview[viewID].viewerBean;
 	if (typeof(viewerBean)=='undefined' && typeof(console)!='undefined'){
@@ -317,9 +348,7 @@ function switchDisplayMode(screenZoom, stateBool, viewID) {
 	var preload = document.getElementById("preload"+viewID);
 	if (stateBool) {
 		for (var i = 0; i <= Iview[viewID].zoomMax; i++) {
-			var pre = "viewer";
-			length = pre.length;
-			if(Iview[viewID].bildBreite/viewerBean.width > Iview[viewID].bildHoehe/document.getElementById(pre+viewID).offsetHeight || (stateBool && !screenZoom)){
+			if(Iview[viewID].bildBreite/viewerBean.width > Iview[viewID].bildHoehe/document.getElementById("viewer"+viewID).offsetHeight || (stateBool && !screenZoom)){
 			//Width > Height Or ZoomWidth is true
 				//Siehe TODO oben
 				if (calculateZoomProp(i, Iview[viewID].bildBreite, viewerBean.width, /*toInt(getStyle("scrollV"+viewID, "width"))*/0, viewID)) {
@@ -356,25 +385,43 @@ function switchDisplayMode(screenZoom, stateBool, viewID) {
 	if (Iview[viewID].useCutOut) Iview[viewID].ausschnitt.setPosition({'x':preload.offsetLeft, 'y':preload.offsetTop});
 	return stateBool;
 }
-/*
-@description calculates how the tilesize has to be so that the picture fully fits into the viewer Area, tiles used are the nearest zoomlevel to the available viewerwidth which is smaller than the viewerwidth
-*/
+
+/**
+ * @public
+ * @function
+ * @name	pictureWidth
+ * @memberOf	iview.Thumbnails
+ * @description	calculates how the tilesize has to be so that the picture fully fits into the viewer Area, tiles used are the nearest zoomlevel to the available viewerwidth which is smaller than the viewerwidth
+ * @param	{string} viewID ID of the derivate
+ */
 function pictureWidth(viewID){
 	var bool = (typeof (arguments[1]) != undefined)? arguments[1]:false;
 	Iview[viewID].zoomWidth = switchDisplayMode(false, Iview[viewID].zoomWidth, viewID, bool);
 }
 
-/*
-@description calculates how the tilesize has to be so that the picture fully fits into the viewer Area, tiles used are the nearest zoomlevel to the available viewerspace which is smaller than the viewerspace
-*/
+/**
+ * @public
+ * @function
+ * @name	pictureScreen
+ * @memberOf	iview.Thumbnails
+ * @description	calculates how the tilesize has to be so that the picture fully fits into the viewer Area, tiles used are the nearest zoomlevel to the available viewerspace which is smaller than the viewerspace
+ * @param	{string} viewID ID of the derivate
+ */
 function pictureScreen(viewID){
 	var bool = (typeof (arguments[1]) != undefined)? arguments[1]:false;
 	Iview[viewID].zoomScreen = switchDisplayMode(true, Iview[viewID].zoomScreen, viewID, bool);
 }
 
-/*
-@description loads the tiles accordingly the position of the scrollbar if they is moving
-*/
+/**
+ * @public
+ * @function
+ * @name	scrollMove
+ * @memberOf	iview.Thumbnails
+ * @description	loads the tiles accordingly the position of the scrollbar if they is moving
+ * @param	{integer} valueX number of pixels how far the bar has been moved horizontal
+ * @param	{integer} valueY number of pixels how far the bar has been moved vertical
+ * @param	{string} viewID ID of the derivate
+ */
 function scrollMove(valueX, valueY, viewID) {
 	Iview[viewID].scroller = true;
 	Iview[viewID].viewerBean.positionTiles ({'x' : valueX, 'y' : valueY}, true);
@@ -382,9 +429,14 @@ function scrollMove(valueX, valueY, viewID) {
 	Iview[viewID].scroller = false;
 }
 
-/*
-@description fit the scrollbar to the viewer-zoom
-*/
+/**
+ * @public
+ * @function
+ * @name	handleZoomScrollbars
+ * @memberOf	iview.Thumbnails
+ * @description	fit the scrollbar to the viewer-zoom
+ * @param	{string} viewID ID of the derivate
+ */
 function handleZoomScrollbars(viewID) {
 	var viewerBean = Iview[viewID].viewerBean;
 	var barX = Iview[viewID].barX;
@@ -409,9 +461,14 @@ function handleZoomScrollbars(viewID) {
 	barY.setProportion(viewerBean.height/curHoehe);
 }
 
-/*
-@description fit the scrollbar to the viewer-resize
-*/
+/**
+ * @public
+ * @function
+ * @name	handleResizeScrollbars
+ * @memberOf	iview.Thumbnails
+ * @description	fit the scrollbar to the viewer-resize
+ * @param	{string} viewID ID of the derivate
+ */
 function handleResizeScrollbars(viewID) {
 	var viewerBean = Iview[viewID].viewerBean;
 	var barX = Iview[viewID].barX;
@@ -424,7 +481,8 @@ function handleResizeScrollbars(viewID) {
 	// max scaling
 	barY.setMaxValue(curHoehe - viewerBean.height);
 	// size of the scrollbar
-	barY.setSize(viewerBean.height);
+	barY.setSize(viewerBean.height - viewerBean.top);
+	barY.my.self[0].style.top = viewerBean.top + "px";
 	// length of the bar
 	barY.setProportion(viewerBean.height/curHoehe);
 	
@@ -434,10 +492,14 @@ function handleResizeScrollbars(viewID) {
 	barX.setProportion(viewerBean.width/curBreite)
 }
 
-/*
-@description is called if viewer is zooming; handles the correct sizing and displaying of the preloadpicture,
-various buttons and positioning of the cutOut accordingly the zoomlevel
-*/
+/**
+ * @public
+ * @function
+ * @name	listenerZoom
+ * @memberOf	iview.Thumbnails
+ * @description	is called if the viewer is zooming; handles the correct sizing and displaying of the preloadpicture, various buttons and positioning of the cutOut accordingly the zoomlevel
+ * @param	{string} viewID ID of the derivate
+ */
 function listenerZoom(viewID) {
 	this.viewID=viewID;
 	this.viewerZoomed = function (zoomEvent) {
@@ -454,6 +516,9 @@ function listenerZoom(viewID) {
 		var perLoadEl=document.getElementById("preload"+viewID);
 		perLoadEl.style.width = (Iview[viewID].bildBreite / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale +  "px";
 		perLoadEl.style.height = (Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale + "px";
+	
+		// Actualize forward & backward Buttons
+		jQuery(".viewerContainer.min .toolbars .toolbar").css("width", (Iview[viewID].bildBreite / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale +  "px");
 	
 		handleZoomScrollbars(viewID);
 
@@ -476,9 +541,14 @@ function listenerZoom(viewID) {
 	}
 }
 
-/*
-@description is calling if the picture is moving in the viewer and handles the size of the cutout accordingly the size of the picture
-*/
+/**
+ * @public
+ * @function
+ * @name	listenerMove
+ * @memberOf	iview.Thumbnails
+ * @description	is calling if the picture is moving in the viewer and handles the size of the cutout accordingly the size of the picture
+ * @param	{string} viewID ID of the derivate
+ */
 function listenerMove(viewID) {
 	this.viewID=viewID;
 	this.viewerMoved = function (event) {
@@ -499,32 +569,15 @@ function listenerMove(viewID) {
 	}
 }
 
-/*
- @description Generates for the calling BSE_permalink Objects BSE_url Sibling the Permalink url and shows the BSE_url afterwards, if not already displayed
- For a BSE_permalink Object it's enough to call the function with displayURL(this)  
- @param element BSE_permalink DOM Object which BSE_url sibling shall be filled with the Permalink and displayed afterwards
+/**
+ * @public
+ * @function
+ * @name	generateURL
+ * @memberOf	iview.Thumbnails
+ * @description	generates a permalink which contains all needed informations to display the same Picture&Position and other things
+ * @param	{string} viewID ID of the derivate
+ * @return	string which contains the generated URL
  */
-function displayURL(element, viewID) {	
-	if (classIsUsed('BSE_url')) {
-		getElementsByClassName("BSE_permaUrl", element.parentNode)[0].value = generateURL(viewID);
-		getElementsByClassName("BSE_url", element.parentNode)[0].style.display = "block";
-	}
-}
-
-/*
-  @description Hides the BSE_url Sibling of the calling BSE_permalink DOM Object
-  For a BSE_permalink Object it's enough to call the function with hideURL(this)
-  @param element BSE_permalink DOM Object which BSE_url sibling shall be hidden
- */
-function hideURL(element) {
-	if (classIsUsed('BSE_url')) {
-		element.parentNode.style.display = "none";	
-	}
-}
-/*
-@description Function generates a permalink which contains all needed informations to display the same Picture&Position and other things
-@return string which contains the generated URL
-*/
 function generateURL(viewID) {
 	var url = window.location.href.substring(0, ((window.location.href.indexOf("?") != -1)? window.location.href.indexOf(window.location.search): window.location.href.length))+ "?";
 	url += "&page="+Iview[viewID].prefix;
@@ -542,31 +595,15 @@ function generateURL(viewID) {
 	return url;
 }
 
-function openChapterAndInitialize(major, viewID, button){
-	if (typeof Iview[viewID].chapter === 'undefined'){
-		var oldClassName=button.className;
-		button.className+=" loading";
-		var start=new Date().getTime();
-		setTimeout(function(){
-			importChapter(viewID);
-			updateModuls(viewID);
-			var end=new Date().getTime() - start;
-			button.className=oldClassName;
-			if (typeof(console)!='undefined'){
-				var msg="import chapters took "+end+"ms"
-				console.log(msg);
-			}
-			openChapter(major, viewID);
-		}, 50);
-		return;
-	} else {
-		openChapter(major, viewID);
-	}
-}
-
-/*
-@description open and close the chapterview
-*/
+/**
+ * @public
+ * @function
+ * @name	openChapter
+ * @memberOf	iview.Thumbnails
+ * @description	open and close the chapterview
+ * @param	{} major
+ * @param	{string} viewID ID of the derivate
+ */
 function openChapter(major, viewID){
 	if (chapterEmbedded) {
 		//alert(warnings[0])
@@ -576,13 +613,7 @@ function openChapter(major, viewID){
 	//TODO Positionierung klappt bei WebKit nicht, da die irgendwie CSS nicht einlesen durch Chapter einbau in Viewer kÃƒÂ¶nnte das behoben werden
 	if (major) {
 		// für major (Button) always reaction
-		if (!Iview[viewID].chapterActive) {
-			Iview[viewID].chapterActive = true;
-			Iview[viewID].chapter.showView();
-		} else {
-			Iview[viewID].chapterActive = false;
-			Iview[viewID].chapter.hideView();
-		}
+		Iview[viewID].chapter.toggleView();
 	} else {
 /*		// nur dann einblenden, wenn es durch Modus ausgeblendet wurde
 		if (Iview[viewID].chapterActive && !Iview[viewID].overviewActive && Iview[viewID].maximized && chapter.style.visibility == "hidden") {
@@ -606,9 +637,14 @@ function openChapter(major, viewID){
 	}
 }
 
-/*
-@description marks the correct picture in the chapterview and set zoombar to the correct zommlevel
-*/
+/**
+ * @public
+ * @function
+ * @name	updateModules
+ * @memberOf	iview.Thumbnails
+ * @description	marks the correct picture in the chapterview and set zoombar to the correct zoomlevel
+ * @param	{string} viewID ID of the derivate
+ */
 function updateModuls(viewID) {
 	var viewerBean = Iview[viewID].viewerBean;
 	// align/fit scrollbars
@@ -616,15 +652,17 @@ function updateModuls(viewID) {
 	handleResizeScrollbars(viewID);
 
 	// Actualize forward & backward Buttons
-	getElementsByClassName("BSE_forwardBehind "+viewID, "viewerContainer"+viewID, "div")[0].style.top = ((((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - 1)) * Iview[viewID].zoomScale) - toInt(getStyle(getElementsByClassName("BSE_forwardBehind "+viewID, "viewerContainer"+viewID, "div")[0],"height"))) / 2) + "px";
-	getElementsByClassName("BSE_backwardBehind "+viewID, "viewerContainer"+viewID, "div")[0].style.top = ((((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - 1)) * Iview[viewID].zoomScale) - toInt(getStyle(getElementsByClassName("BSE_backwardBehind "+viewID, "viewerContainer"+viewID, "div")[0],"height"))) / 2) + "px";
+	var previewTbView = jQuery(Iview[viewID].getToolbarCtrl().getView("previewTbView").toolbar);
+	var newTop = ((((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - 1)) * Iview[viewID].zoomScale) - (toInt(previewTbView.css("height")) + toInt(previewTbView.css("padding-top")) + toInt(previewTbView.css("padding-bottom")))) / 2) + "px";
+	if (Iview[viewID].viewerContainer.hasClass("viewerContainer min")) {
+		Iview[viewID].viewerContainer.find(".toolbars .toolbar").css("top", newTop);
+	}
 	
 	// Actualize Chapter
 	if (Iview[viewID].useChapter && !(typeof Iview[viewID].chapter === "undefined")) {
 		//prevent endless loop
 		Iview[viewID].chapterReaction = true;
-		Iview[viewID].chapter._model.setSelected(Iview[viewID].prefix);
-
+//		Iview[viewID].chapter._model.setSelected(Iview[viewID].PhysicalModel.getCurPos());//Iview[viewID].prefix);
 	}
 
 	// Actualize zoomBar
@@ -635,9 +673,15 @@ function updateModuls(viewID) {
 	}
 }
 
-/*
-@description handles if the scrollbar was moved up or down and calls the functions to load the corresponding tiles and movement
-*/
+/**
+ * @public
+ * @function
+ * @name	viewerScroll
+ * @memberOf	iview.Thumbnails
+ * @description	handles if the scrollbar was moved up or down and calls the functions to load the corresponding tiles and movement
+ * @param 	{} delta
+ * @param	{string} viewID ID of the derivate
+ */
 function viewerScroll(delta, viewID) {
 	Iview[viewID].viewerBean.positionTiles({'x': delta.x*PanoJS.MOVE_THROTTLE,
 											'y': delta.y*PanoJS.MOVE_THROTTLE}, true);
@@ -645,9 +689,13 @@ function viewerScroll(delta, viewID) {
 												'y': delta.y*PanoJS.MOVE_THROTTLE});
 }
 
-/*
-@description determine the new css-name if the design is changing
-*/
+/**
+ * @public
+ * @function
+ * @name	changeCSS
+ * @memberOf	iview.Thumbnails
+ * @description	determine the new css-name if the design is changing
+ */
 function changeCss() {
 	curDesign = styleName;
 
@@ -663,9 +711,14 @@ function changeCss() {
 	}
 }
 
-/*
-@description calls the corresponding functions to create the scrollbar
-*/
+/**
+ * @public
+ * @function
+ * @name	importZoomBar
+ * @memberOf	iview.Thumbnails
+ * @description	calls the corresponding functions to create the scrollbar
+ * @param	{string} viewID ID of the derivate
+ */
 function importZoomBar(viewID) {
 	// ZoomBar
 	Iview[viewID].zoomBar = new zoomBar("zoomBar"+viewID, document.getElementById(Iview[viewID].zoomBarParent), "");
@@ -685,9 +738,14 @@ function importZoomBar(viewID) {
 	ManageEvents.addEventListener(document.getElementById("viewer"+viewID), 'mousemove', zoombar.mouseMoveZoombar, false);
 }
 
-/*
-@description calls the corresponding functions to create the cutout
-*/
+/**
+ * @public
+ * @function
+ * @name	importCutOut
+ * @memberOf	iview.Thumbnails
+ * @description	calls the corresponding functions to create the cutout
+ * @param	{string} viewID ID of the derivate
+ */
 function importCutOut(viewID) {
 	var viewerBean = Iview[viewID].viewerBean;
 	// CutOut
@@ -721,119 +779,52 @@ function importCutOut(viewID) {
 	// ManageEvents.addEventListener($("viewer"+viewID), 'mouseScroll', ausschnitt.scroll, false);
 }
 
-/*
-@description calls the corresponding functions to create the chapter
-*/
-function importChapter(viewID) {
-	Iview[viewID].chapModelProvider = new iview.chapter.ModelProvider(Iview[viewID].buchDaten);
-	var chapView = new iview.chapter.View();
-	
-	Iview[viewID].chapter = new iview.chapter.Controller(Iview[viewID].chapModelProvider, chapView);
-	
-	//Create Listener which changes after a Page click all needed informations within Viewer
-	Iview[viewID].chapModelProvider.createModel().onevent.attach(function() {
-		if (Iview[viewID].chapterReaction) {
-			Iview[viewID].chapterReaction = false;
-			return;
-		}
-		Iview[viewID].chapterReaction = true;
-		Iview[viewID].prefix = arguments[1]["new"];
-		getPageNumberFromPic(viewID);
-		navigatePage(Iview[viewID].pagenumber, viewID);
-	});
-	Iview[viewID].chapter.createView("#viewerContainer"+viewID);
-	Iview[viewID].chapterReaction = false;
-}
-
-/*
-@description calls the corresponding functions to create the overview
-*/
-function importOverview(viewID) {
-	Iview[viewID].overview1 = new overview("overview1"+viewID, "viewerContainer"+viewID, "");
-	var overview1 = Iview[viewID].overview1;
-	overview1.setViewID(viewID);
-	//TODO wird hier lediglich Referenz gespeichert? Wenn ja ok ansonsten evtl unnötigen Kram entfernen und nur die Seiteninfos speichern
-	overview1.setBook(Iview[viewID].buchDaten)
-	overview1.setBaseUri(Iview[viewID].baseUri);
-	overview1.init();
-	overview1.setNumberOfPages(Iview[viewID].amountPages);
-
-	overview1.addListener(overview.PAGE_NUMBER, new function() { this.click = function(value) {
-			//Iview[viewID].pagenumber = value;
-			openOverview(viewID);
-			navigatePage(value, viewID);
-		}});
-	// should blend in via effect
-	document.getElementById("overview1"+viewID).style.visibility = "hidden";
-}
-
-function importPageInput(viewID, parentID) {
-	if (!classIsUsed("BSE_pageInput1")) {
-		Iview[viewID].pageInputObj = new pageInput("BSE_pageInput"+viewID, parentID, "BSE_pageInput");
-		var pageInputObj = Iview[viewID].pageInputObj;
-		pageInputObj.setViewID(viewID);
-		pageInputObj.init();
-		pageInputObj.addListener(pageInput.PAGE_NUMBER, new function() {
-			this.change = function(value) {
-				navigatePage(value, viewID);
-			}
-		});
-	} else {
-		Iview[viewID].pageInputObj.initNext();
-	}
-}
-
-function importPageForm(viewID, parentID) {
-	//if (!classIsUsed("BSE_pageForm1")) {
-		Iview[viewID].pageFormObj = new pageForm("BSE_pageForm"+viewID, parentID, "BSE_pageForm");
-		var pageFormObj = Iview[viewID].pageFormObj;
-		pageFormObj.setViewID(viewID);
-		pageFormObj.init();
-		pageFormObj.addListener(pageForm.PAGE_NUMBER, new function() {
-			this.change = function(value) {
-	    		navigatePage(value, viewID);
-			}
-		});
-	/*} else {
-		Iview[viewID].pageFormObj.initNext();
-	}*/
-}
-
-/*
-@description creates for the Styling or whatever Reason Objects within the header, which hold the given String as ClassName.
-The data is taken from Iview[viewID].headerObjects
-@param viewID the ID of the Viewer Header to apply
-*/
-function splitHeader(viewID) {
-	var createElements = Iview[viewID].headerObjects.split(",");
-	var element = null;
-	for (var i = 0; i < createElements.length;i++) {
-		element = document.createElement("div");
-		element.className = createElements[i];
-		document.getElementById("header"+viewID).appendChild(element);
-	}
-}
-
-/*
-@description After Loading the first Page this function is called to gain the currently displayed PageNumber so all other
- Elements are initialized correctly as well
+/**
+ * @public
+ * @function
+ * @name	importChapter
+ * @memberOf	iview.Thumbnails
+ * @description	calls the corresponding functions to create the chapter
+ * @param	{string} viewID ID of the derivate
  */
-function getPageNumberFromPic(viewID) {
-	var files = Iview[viewID].buchDaten.getElementsByTagName(namespaceCheck("mets:file"));
-	for (var i = 0; i < files.length;i++) {
-		if (files[i].attributes.getNamedItem("ID").value == Iview[viewID].prefix) {
-			var nodes = files[i].getElementsByTagName(namespaceCheck("mets:FLocat"));
-			for (var j = 0; j < nodes.length; j++) {
-				if (nodes[j].attributes.getNamedItem("LOCTYPE").value.toLowerCase() == "other" && nodes[j].attributes.getNamedItem("OTHERLOCTYPE") != null && nodes[j].attributes.getNamedItem("OTHERLOCTYPE").value.toLowerCase() == "pagenumber") {
-					var ref = isBrowser(["Opera","Firefox/2"])? "href":"xlink:href";
-					Iview[viewID].pagenumber = parseInt(nodes[j].attributes.getNamedItem(ref).value)+1;
-					break;
-				}
-			}
-		}
-	}
+function importChapter(viewID) {
+	$LAB.script("chapter.js", "jquery.tree.min.js").wait(function() {
+		Iview[viewID].ChapterModelProvider = new iview.METS.ChapterModelProvider(Iview[viewID].newMETS);
+		
+		Iview[viewID].chapter = new iview.chapter.Controller(Iview[viewID].ChapterModelProvider, Iview[viewID].PhysicalModelProvider);
+
+		Iview[viewID].chapter.createView(Iview[viewID].chapterParent);
+		Iview[viewID].chapterReaction = false;
+		
+		updateModuls(viewID);
+		openChapter(true, viewID);
+	});
 }
-// direction: true = in, false = out
+
+/**
+ * @public
+ * @function
+ * @name	importOverview
+ * @memberOf	iview.Thumbnails
+ * @description	calls the corresponding functions to create the overview
+ * @param	{string} viewID ID of the derivate
+ */
+function importOverview(viewID) {
+	//overview loading
+	var ov = new iview.overview.Controller(Iview[viewID].PhysicalModelProvider, iview.overview.View, Iview[viewID].viewerBean.tileUrlProvider);
+	ov.createView({'mainClass':'overview', 'parent':"#viewerContainer"+viewID, 'useScrollBar':true});
+	Iview[viewID].overview = ov;
+}
+
+/**
+ * @public
+ * @function
+ * @name	zoomViewer
+ * @memberOf	iview.Thumbnails
+ * @description	handels the direction of zooming in the viewer
+ * @param 	{boolean} direction: true = zoom in, false = zoom out
+ * @param	{string} viewID ID of the derivate
+ */
 function zoomViewer(viewID, direction) {
 	if (direction) {
 		// gesetzt den Fall, es wird vom obersten Level weiter gezoomt (falls Screen oder Width aktiv waren)
@@ -847,14 +838,16 @@ function zoomViewer(viewID, direction) {
 	}
 	if(Iview[viewID].useZoomBar) {Iview[viewID].zoomBar.moveBarToLevel(Iview[viewID].viewerBean.zoomLevel)};
 }
-/*
-@description is calling to the load-event of the window; serve for the further registration of events likewise as initioator for various objects
-@param e Daten vom Load Event
-*/
+
+/**
+ * @public
+ * @function
+ * @name	loading
+ * @memberOf	iview.Thumbnails
+ * @description	is calling to the load-event of the window; serve for the further registration of events likewise as initioator for various objects
+ * @param	{string} viewID ID of the derivate
+ */
 function loading(viewID) {
-	//TODO Viewer nimmt wieder 100% des ViewerContainers eins....muss behoben werden
-	Iview[viewID].chapterActive = false;
-	Iview[viewID].overviewActive = false;
 	var cssSheet=document.getElementById("cssSheet"+viewID);
 	if (cssSheet!=null){
 		//Opera fix: link css style to head to fix maximizeHandler()
@@ -864,20 +857,15 @@ function loading(viewID) {
 	
 	Iview[viewID].startHeight = toInt(jQuery("#viewerContainer"+viewID).css("height"));
 	Iview[viewID].startWidth = toInt(jQuery("#viewerContainer"+viewID).css("width"));
-	
-	//Create new Header Elements as specified within caller xsl
-	splitHeader(viewID);
-	
+		
 	style = styleFolderUri + styleName + "/";
 	//retrieves the mets File depending on the fact if it's exists or it request a simple one
-
-	blendings.useEffects(blendEffects);
 
 	// ScrollBars
 	// horizontal
 	Iview[viewID].barX = new iview.scrollbar.Controller();
 	var barX = Iview[viewID].barX;
-	barX.createView({ 'direction':'horizontal', 'id':'scrollH'+viewID,'parent':'#viewerContainer'+viewID, 'mainClass':'scroll'});
+	barX.createView({ 'direction':'horizontal', 'parent':'#viewerContainer'+viewID, 'mainClass':'scroll'});
 	barX._model.onevent.attach(function(sender, args) {
 		if (args.type == "curVal" && !Iview[viewID].roller) {
 			scrollMove(- (args["new"]-args["old"]), 0, viewID);
@@ -886,7 +874,7 @@ function loading(viewID) {
 	// vertical
 	Iview[viewID].barY = new iview.scrollbar.Controller();
 	var barY = Iview[viewID].barY;
-	barY.createView({ 'direction':'vertical', 'id':'scrollV'+viewID,'parent':'#viewerContainer'+viewID, 'mainClass':'scroll'});
+	barY.createView({ 'direction':'vertical', 'parent':'#viewerContainer'+viewID, 'mainClass':'scroll'});
 	barY._model.onevent.attach(function(sender, args) {
 		if (args.type == "curVal" && !Iview[viewID].roller) {
 			scrollMove( 0, -(args["new"]-args["old"]), viewID);
@@ -914,9 +902,16 @@ function loading(viewID) {
 	loadPage(viewID, function(){startFileLoaded(viewID)});
 }
 
+/**
+ * @public
+ * @function
+ * @name	startFileLoaded
+ * @memberOf	iview.Thumbnails
+ * @description	
+ * @param	{string} viewID ID of the derivate
+ */
 function startFileLoaded(viewID){
 	Iview[viewID].loaded = true;
-
 	// surface muss als Blank geladen werden, damit Ebene gefüllt und es im Vordergrund des Viewers liegt
 	// hauptsächlich wegen IE notwendig
 	getElementsByClassName("surface","viewer"+viewID,"div")[0].style.backgroundImage = "url("+Iview[viewID].webappBaseUri+"modules/iview2/web/gfx/blank.gif"+")";
@@ -933,15 +928,12 @@ function startFileLoaded(viewID){
 		maximizeHandler(viewID);
 	}
 	
-	// nochmals notwendig, da Scale erst hier verf�gbar f�r erstes Bild
-	// Actualize forward & backward Buttons
-	getElementsByClassName("BSE_forwardBehind "+viewID, "viewerContainer"+viewID, "div")[0].style.top = ((((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - 1)) * Iview[viewID].zoomScale) - toInt(getStyle(getElementsByClassName("BSE_forwardBehind "+viewID, "viewerContainer"+viewID, "div")[0],"height"))) / 2) + "px";
-	getElementsByClassName("BSE_backwardBehind "+viewID, "viewerContainer"+viewID, "div")[0].style.top = ((((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - 1)) * Iview[viewID].zoomScale) - toInt(getStyle(getElementsByClassName("BSE_backwardBehind "+viewID, "viewerContainer"+viewID, "div")[0],"height"))) / 2) + "px";
-	
-	var metsURI = Iview[viewID].webappBaseUri + "servlets/" + ((Iview[viewID].hasMets)? "MCRFileNodeServlet/": "MCRDirectoryXMLServlet/") + viewID + ((Iview[viewID].hasMets)? "/mets.xml":"?XSL.Style=mets");
+	var newMetsURI = Iview[viewID].webappBaseUri + "servlets/MCRMETSServlet/" + viewID;
 	jQuery.ajax({
-		url: metsURI,
-  		success: function(response) {processMETS(response,viewID)},
+		url: newMetsURI,
+  		success: function(response) {
+			processMETS(response,viewID);
+		},
   		error: function(request, status, exception) {alert("Error Occured while Loading METS file:\n"+exception);}
 	});
 	
@@ -960,36 +952,65 @@ function startFileLoaded(viewID){
 	
 }
 
-/*
- @description process the loaded mets and do all final configurations like setting the pagenumber, generating Chapter and so on
- @param metsDoc Document which holds in METS/MODS structure all needed informations to generate an chapter and overview of of the supplied data
+/**
+ * @public
+ * @function
+ * @name	processMETS
+ * @memberOf	iview.Thumbnails
+ * @description	process the loaded mets and do all final configurations like setting the pagenumber, generating Chapter and so on
+ * @param	{document} metsDoc holds in METS/MODS structure all needed informations to generate an chapter and overview of of the supplied data
+ * @param	{string} viewID ID of the derivate
  */
 function processMETS(metsDoc, viewID) {
-	Iview[viewID].buchDaten = metsDoc;
-	Iview[viewID].amountPages = getPageCount(Iview[viewID].buchDaten);
+	Iview[viewID].newMETS = metsDoc;
+	//create the PhysicalModelProvider
+	Iview[viewID].PhysicalModelProvider = new iview.METS.PhysicalModelProvider(Iview[viewID].newMETS);
+	Iview[viewID].PhysicalModel = Iview[viewID].PhysicalModelProvider.createModel();
+	var physicalModel = Iview[viewID].PhysicalModel;
+	Iview[viewID].amountPages = physicalModel.getNumberOfPages();
+	physicalModel.setPosition(physicalModel.getPosition("phys_"+Iview[viewID].prefix));
+	physicalModel.onevent.attach(function(sender, args) {
+		if (args.type == physicalModel.SELECT) {
+			notifyListenerNavigate(args["new"], viewID);
+			loadPage(viewID);
+			Iview[viewID].getToolbarCtrl().checkNavigation(args["new"]);
+			updateModuls(viewID);
+			if (jQuery('.navigateHandles .pageBox')[0]) {
+				Iview[viewID].getToolbarCtrl().updateDropDown($(pagelist.find("a")[args["new"] - 1]).html());
+			}
+		}
+	})
+
+	// Toolbar Operation
+	Iview[viewID].getToolbarCtrl().setState("overviewHandles", "openChapter", true);
+	Iview[viewID].getToolbarCtrl().setState("overviewHandles", "openOverview", true);
 	
-	getPageNumberFromPic(viewID);
-	
-	// additional loadings - preloads
-	//Edge-Element
-	//TODO: müsste beim import des CutOut entsprechend gesetzt werden, oder ähnlich
-	//createAbsoluteObject("div", "dampEmpty"+viewID, "viewer"+viewID);
-	
-	if (classIsUsed("BSE_pageInput1")) {
-		Iview[viewID].pageInputObj.setNumberOfPages(Iview[viewID].amountPages);
-		//doForEachInClass("amount",".value = '"+arabToRoem(Iview[viewID].amountPages)+"';", viewID); // write data next to the input-field
+	Iview[viewID].getToolbarCtrl().checkNavigation(Iview[viewID].PhysicalModel.getCurPos());
+
+	//Generating of Toolbar List
+	var it = physicalModel.iterator();
+	var curItem = null;
+	var pagelist = jQuery('<div id="pages" style="visibility: hidden; z-index: 80; position: absolute; left: -9999px;" class="hidden">');
+	var ul = jQuery("<ul>");
+	while (it.hasNext()) {
+		curItem = it.next();
+		if (curItem != null) {
+			ul.append(jQuery('<li><a href="index.html#" id='+curItem.getID()+' class="'+curItem.getOrderlabel() + "[" + curItem.getOrder() + "]"+'">'+curItem.getOrderlabel() + '[' + curItem.getOrder() + ']'+'</a></li>'));
+		}
 	}
-	
-	if (classIsUsed("BSE_pageForm1")) {
-		Iview[viewID].pageFormObj.fill(Iview[viewID].amountPages);
+	pagelist.append(ul);
+	Iview[viewID].viewerContainer.find(".toolbars").append(pagelist);
+
+	// if METS File is loaded after the drop-down-menu (in mainToolbar) its content needs to be updated
+	if (jQuery('.navigateHandles .pageBox')[0]) {
+		Iview[viewID].getToolbarCtrl().getView('mainTbView').events.notify({'type' : "new", 'elementName' : "pageBox", 'view' : jQuery('.navigateHandles .pageBox')});
+		// switch to current content
+		Iview[viewID].getToolbarCtrl().updateDropDown(jQuery(pagelist.find("a")[physicalModel.getCurPos() - 1]).html());
 	}
 
-	//The currently not correct used Pagenumber is set to correct value
-	navigatePage(Iview[viewID].pagenumber,viewID,false);
-	
 	if (Iview[viewID].useOverview) {
-		importOverview(viewID);
-		// actually be changed manually in CSS
-		if (classIsUsed("BSE_openThumbs")) doForEachInClass("BSE_openThumbs", ".style.display = 'block';", viewID);
+		$LAB.script("overview.js").wait(function() {
+			importOverview(viewID);
+		});
 	}
 }

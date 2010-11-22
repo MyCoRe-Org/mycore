@@ -1,22 +1,12 @@
-var hasTextContent = (typeof(document.getElementsByTagName("body")[0].textContent) != "undefined")? true:false;
-
-/*
- @description retrieves from an element like <div>Some</div> the inner text, in this case it would get "Some"
- @param elem the element to retrieve the innerText from
- @return String which represents the innerText of the supplied Element
- */
-function getInnerText(elem) {
-	if (!hasTextContent) {
-		return elem.text;
-	} else {
-		return elem.textContent;
-	}
-}
-/*
- @description generates from the given Information an Error Alert so that the user is able to supply better Error Traceing
- @param msg The own description so that a better location where and when the error occured is possible
- @param nr Number for the Error to display
- @param e the error Event from which the more detailed information will gained
+/**
+ * @public
+ * @function
+ * @name		alertError
+ * @memberOf	iview.Utils
+ * @description	generates from the given Information an Error Alert so that the user is able to supply better Error Traceing
+ * @param		{string} msg own the description so that a better location where and when the error occured is possible
+ * @para,		{} nr number of the error to display
+ * @param		{} e the error event from which the more detailed information will gained
  */
  function alertError(msg, nr, e) {
 		alert("Error " + toInt(nr) + ": " + msg + "\n" 
@@ -24,11 +14,16 @@ function getInnerText(elem) {
 				+ "JS-Error " + e.name + ": " + e.message + "\n"
 				+ "Browser: " + navigator.userAgent);
 	}
-/*
-@description proofs if e is set, if it isn't were on IE which doesn't give the event with it
-@param e var which will be proofed if event is supplied or not
-@return event var of the current event which happened
-*/
+
+/**
+ * @public
+ * @function
+ * @name		getEvent
+ * @memberOf	iview.Utils
+ * @description	proofs if e is set, if it isn't were on IE which doesn't give the event with it
+ * @param		{} e var which will be proofed if event is supplied or not
+ * @return		{event} which just happened
+ */
 function getEvent(e) {
 	if (!e) {
 		e = window.event;
@@ -36,15 +31,19 @@ function getEvent(e) {
 	return e;
 }
 
-/*
- @description returns all Elements which are set to the supplied class within the given Node. Further it's possible
-  to return only the Elements which belong to the given tag Type
- @param searchClass String which represents the Class to search Tags for
- @param node Optional Node-Object which child's will be looked through for the supplied Class, can be left or set to null to
-  use as start node the Document Object
- @param tag  Optional the Tagname to look for; if a Name is supplied only Elements matching the tag and Class will be returned
- which are child's of the given Node
- @return Array of Objects which matched the search Conditions
+/**
+ * @public
+ * @function
+ * @name		getElementsByClassName
+ * @memberOf	iview.Utils
+ * @description	returns all elements which are set to the supplied class within the given node. further it's possible
+  to return only the elements which belong to the given tag type
+ * @param	{string} searchClass represents the Class to search Tags for
+ * @param	{object} node optional node-object which child's will be looked through for the supplied class, can be left or set to null to
+  use as start node the document object
+ * @param	{} tag optional the tagname to look for; if a name is supplied only elements matching the tag and class will be returned
+ which are child's of the given node
+ * @return	{array} of objects which matched the search conditions
  */
 var getElementsByClassName = function (searchClass, node, tag){
 	if (Array.filter && document.getElementsByClassName){
@@ -122,10 +121,14 @@ var getElementsByClassName = function (searchClass, node, tag){
 	return getElementsByClassName(searchClass, node, tag);
 };
 
-/*
-@decription proofs if the supplied ClassName has currently any object connected with it. If so it returns true, else false
-@param className the ClassName which shall be checked if it's in use
-@return boolean which tells if the ClassName has currenly any Object linked to it or not.
+/**
+ * @public
+ * @function
+ * @name		classIsUsed
+ * @memberOf	iview.Utils
+ * @description	proofs if the supplied ClassName has currently any object connected with it. If so it returns true, else false
+ * @param		{string} className the ClassName which shall be checked if it's in use
+ * @return		{boolean} which tells if the ClassName has currenly any Object linked to it or not
  */
 function classIsUsed(className) {
 	if (getElementsByClassName(className).length != 0) {
@@ -135,12 +138,16 @@ function classIsUsed(className) {
 	}
 }
 
-/*
-@description get Each Element of the supplied ClassName and performs the given Action on it
-@param className the String which holds the ClassName to work with
-@param perform the action which will be applied to each Element of the Class
-@param arguments[3] supplies the viewID so that only Elements in this group are touched
-*/
+/**
+ * @public
+ * @function
+ * @name		doForEachInClass
+ * @memberOf	iview.Utils
+ * @description	get Each Element of the supplied ClassName and performs the given Action on it
+ * @param	{string} className holds the ClassName to work with
+ * @param	{string} perform the action which will be applied to each Element of the Class
+ * @param	{string} arguments[2] supplies the viewID so that only Elements in this group are touched
+ */
 function doForEachInClass(className, perform) {
 	var viewID = "";
 	if (typeof(arguments[2]) != "undefined") {
@@ -155,11 +162,15 @@ function doForEachInClass(className, perform) {
 	}
 }
 
-/*
-@description converts a given String into an integer, but further doesn't give NAN for String was undefined and other cases
-@param value which shall be converted into an integer
-@return integer of parsed string, 0 if var was undefined
-*/
+/**
+ * @public
+ * @function
+ * @name	toInt
+ * @memberOf	iview.Utils
+ * @description	converts a given String into an integer, but further doesn't give NAN for String was undefined and other cases
+ * @param	{string} value which shall be converted into an integer
+ * @return	{integer} of parsed string, 0 if var was undefined
+ */
 function toInt(value) {
 	if (isNaN(parseInt(value))) {
 		return 0;
@@ -168,11 +179,15 @@ function toInt(value) {
 	}
 }
 
-/*
-@description converts a given String into an float, but further doesn't give NAN for String was undefined and other cases
-@param value which shall be converted into a float
-@return float of parsed string, 0 if var was undefined
-*/
+/**
+ * @public
+ * @function
+ * @name	toFloat
+ * @memberOf	iview.Utils
+ * @description	converts a given String into an float, but further doesn't give NAN for String was undefined and other cases
+ * @param	{string} value which shall be converted into a float
+ * @return	{float} of parsed string, 0 if var was undefined
+ */
 function toFloat(value) {
 	if (isNaN(parseFloat(value))) {
 		return 0;
@@ -183,11 +198,15 @@ function toFloat(value) {
 	}
 }
 
-/*
-@description additional function, look for a parameter into a (query) string an returns it
-@param e Parameter dessen Wert man haben will
-@return Bei Erfolg der Parameterwert, bei Misserfolg ein leerer String
-*/
+/**
+ * @public
+ * @function
+ * @name		get
+ * @memberOf	String
+ * @description	additional function, look for a parameter into a (query) string an returns it
+ * @param		{string} p parameter whose value you want to have
+ * @return		{string} if p was found it'S value else an empty string
+ */
 String.prototype.get = function(p){
 	try {
 		return(this.match(new RegExp("[?|&]?" + p + "=([^&]*)"))[1]);
@@ -196,22 +215,36 @@ String.prototype.get = function(p){
 	}
 }
 
-/*
-@description tests if a given Array of Browsertypes match the used browser
-@param Array with the Names of the Browsers or some parts of the useragent which shall be looked up
-@return boolean true if within the supplied array the current browser was named or false if it wasn't
-*/
 var theBrowser = "";
+/**
+ * @public
+ * @function
+ * @name		getBrowser
+ * @memberOf	iview.Utils
+ * @description	tests if a given Array of Browsertypes match the used browser
+ * @param		{string} browser Array with the Names of the Browsers or some parts of the useragent which shall be looked up
+ * @return		{boolean} true if within the supplied array the current browser was named or false if it wasn't
+ */
 function getBrowser(browser) {
 	var browser = browser.toLowerCase();
 	if (window.opera) { theBrowser = "Opera"; return;}
 	if (window.attachEvent && !window.opera) { theBrowser = "IE"; return;}
 	if (window.addEventListener && !window.attachEvent && navigator.userAgent.indexOf("Firefox") != -1) { theBrowser = "Firefox"; return;}
+//	if (navigator.userAgent.indexOf("Chrome") != -1) { theBrowser = "Chrome"; return;}
 	if (navigator.userAgent.indexOf(browser) != -1) { theBrowser = browser; return;}
 	if (navigator.userAgent.indexOf("Safari") != -1) { theBrowser = "Safari"; return;}
 	theBrowser = "unknown";
 }
 
+/**
+ * @public
+ * @function
+ * @name	isBrowser
+ * @memberOf	iview.Utils
+ * @description	
+ * @param	{array} browsers 
+ * @return	
+ */
 function isBrowser(browsers) {
 
 	if (theBrowser == "") {
@@ -230,12 +263,16 @@ function isBrowser(browsers) {
 	}
 }
 
-/*
-@description calculates normalized the mousedelta of a supplied event and prevents if requested the default behavior
-@param e MouseScroll Event from which the delta shall be gained
-@param prevent prevent default behave, yes or no
-@return das mousedelta normalized
-*/
+/**
+ * @public
+ * @function
+ * @name		returnDelta
+ * @memberOf	iview.Utils
+ * @description	calculates normalized the mousedelta of a supplied event and prevents if requested the default behavior
+ * @param		{} e MouseScroll Event from which the delta shall be gained
+ * @param		{} prevent prevent default behave, yes or no
+ * @return	the mousedelta normalized
+ */
 function returnDelta(e, prevent) {
         e = getEvent(e);
         var delta = {x : 0, y : 0};
@@ -262,10 +299,16 @@ function returnDelta(e, prevent) {
 	return delta;
 }
 
-/*
-@description realize to read out values from the CSS
-@return the value for the inquired stylepropertiy
-*/
+/**
+ * @public
+ * @function
+ * @name		getStyle
+ * @memberOf	iview.Utils
+ * @description	realize to read out values from the CSS
+ * @param		{object} el 
+ * @param		{string} styleProp 
+ * @return	the value for the inquired stylepropertiy
+ */
 function getStyle(el,styleProp)
 {
 	if (typeof(el)!="object")
@@ -273,88 +316,14 @@ function getStyle(el,styleProp)
 	return jQuery(el).css(styleProp);
 }
 
-/*
-@description realize to read out values from the CSS for classes --- unused
-@return the value for the inquired stylepropertiy
-*/
-function getStyleClass(el, elType ,styleProp)
-{
-	var x = getElementByClass(el, elType)[0];
-	if (x.currentStyle) {
-		var y = x.currentStyle[styleProp];
-	} else if (window.getComputedStyle) {
-		var y = document.defaultView.getComputedStyle(x,null).getPropertyValue(styleProp);
-	}
-	// IE ließt sonst Null statt Auto
-	// otherwise IE reads 0 instead of auto
-	if (y==null) { y=0 };
-	return y;
-}
-
-
-function getCssProps(id, classType, parentId, properties) {
-	var tmpDiv = document.createElement("div");
-	tmpDiv.id = id;
-	tmpDiv.className = classType;
-	var parent=document.getElementById(parentId);
-	parent.appendChild(tmpDiv);
-	
-	var value = new Array();
-	for (i = 0; i < properties.length; i++) {
-		if (arguments[4]) {
-			value[i] = eval(arguments[4]+"(getStyle(tmpDiv,'"+properties[i]+"'))");
-		} else {
-			value[i] = getStyle(tmpDiv, properties[i]);
-		}
-	}
-	parent.removeChild(tmpDiv);
-	return value;
-}
-
-/*
-@description creates new objects with absolute style position
-*/
-function createAbsoluteObject(object, id, target) {
-
-	var newObject = document.createElement(object);
-	newObject.id = id;
-	newObject.className = id;
-	newObject.style.position = "absolute";
-	//if (document.getElementById(target)==null)
-		//console.trace();
-	document.getElementById(target).appendChild(newObject);
-}
-
-function copyArray(array) {
-	return array.slice(0, array.length);
-}
-
-/*
-@description cut one sign after the next of a textline in the chapter until the correct width is reached
-*/
-function getTextWidth(tmpBox,txt) {
-	tmpBox.firstChild.data = txt;
-	return tmpBox.offsetWidth;
-}
-
-/*
-@description cut Text to width
-*/
-function cutTxtToWidth(tmpBox, txt, width) {
-	while (getTextWidth(tmpBox, txt) > width && txt != "") {
-		//txt != "" da substring kein Fehler wirft bei Negativen Indizes
-		txt = txt.substring(0,txt.length - 1);
-		// if last sign == space, remove, because spaces are not a part of the offsetwidth
-		if (txt.charAt(txt.length - 1) == ' ') {
-			txt = txt.substring(0, txt.length - 1);
-		}
-	}
-	return txt;
-}
-
-/*
- @description converts a string which holds a Color somehow encoded and converts it to an RGB Array
- @param color String which holds the encoded Color information which will be decoded
+/**
+ * @public
+ * @function
+ * @name	colorToRGBArray
+ * @memberOf	iview.Utils
+ * @description	converts a string which holds a Color somehow encoded and converts it to an RGB Array
+ * @param		{string} color String which holds the encoded Color information which will be decoded
+ * @return		{array} withe the RGB-color-values
  */
 function colorToRGBArray(color) {
 	var red = 0;
@@ -373,15 +342,16 @@ function colorToRGBArray(color) {
 	return new Array (red, green, blue);
 }
 
-/*
-@description loops through the given Array and searches for the Element with
- the given Name and Value and returns it, if more Elements match the criteria
- only the first found is returned, if none is found Null is returned.
- The Function works with Arrays of Objects and with HTML-Nodes
-@param values the Array where the Item is located in
-@param name the Name of the Property which is used for search
-@oaram value the Value of the Property to match the Element
-@result the Element which matched the criteria first, or null if none was found
+/**
+ * @public
+ * @function
+ * @name		findInArrayElement
+ * @memberOf	iview.Utils
+ * @description	loops through the given Array and searches for the Element with the given Name and Value and returns it, if more Elements match the criteria only the first found is returned, if none is found Null is returned. The Function works with Arrays of Objects and with HTML-Nodes
+ * @param		{array} values the Array where the Item is located in
+ * @param		{string} name the name of the property which is used for search
+ * @param		{string} value the value of the property to match the element
+ * @return		the Element which matched the criteria first, or null if none was found
  */
 function findInArrayElement(values, name, value) {
 	for (var i = 0; i < values.length; i++) {
@@ -398,9 +368,15 @@ function findInArrayElement(values, name, value) {
 	return null;
 }
 
-/*
-@description determine the decimal value of a hex value
-*/
+/**
+ * @public
+ * @function
+ * @name		hexCharToZif
+ * @memberOf	iview.Utils
+ * @description	determines the decimal value of a hex value
+ * @param		{string} x holds the hexadecimal letter for which the decimal-number should be determined
+ * @return		the decimal-number as integer
+ */
 function hexCharToZif(x) {
 	if (x == 'a') {
 		x = 10;
@@ -418,6 +394,15 @@ function hexCharToZif(x) {
 	return parseInt(x);
 }
 
+/**
+ * @public
+ * @function
+ * @name		arabToRoem
+ * @memberOf	iview.Utils
+ * @description	determine a roman number from a arabic number
+ * @param	{float} ArabischeZahl is the arabic number
+ * @return	the roman number
+ */
 function arabToRoem(ArabischeZahl) {
 	/* Konstante und Variable definieren */
 	var EinheitRoemisch = new Array( "M", "D", "C", "L", "X", "V", "I");

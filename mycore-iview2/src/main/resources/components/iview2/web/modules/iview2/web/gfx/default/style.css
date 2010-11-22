@@ -20,7 +20,7 @@
 .tree-default li a ins.forbidden { background-position:-16px -16px; }
 .tree-default .locked li a ins { background-position:0 -48px; }
 .tree-default li span ins { background-position:-16px 0; }
-.tree-default li.leaf ins { background:url("jstree.png") -16px -50px no-repeat;}
+.tree-default li.page ins { background:url("jstree.png") -16px -50px no-repeat;}
 #jstree-dragged.tree-default ins { background:url("jstree.png") -16px -32px no-repeat; }
 #jstree-dragged.tree-default ins.forbidden { background:url("jstree.png") -16px -16px no-repeat; }
 
@@ -42,20 +42,35 @@
 
 /* Start & End - Buttons */
 .scrollH .start {
-	background-image: url('image.png');
+	background-image: url('iview2.scrollbar.png');
 	background-repeat: no-repeat;
-	background-position: -540px -0px;
-	width:15px;
-	height:15px;
-}
-.scrollH .end {
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -570px -0px;
+	background-position: -180px -0px;
 	width:15px;
 	height:15px;
 }
 
+.scrollH .start.disabled {
+	background-image: url('iview2.scrollbar.png');
+	background-repeat: no-repeat;
+	background-position: -240px -0px;
+	width:15px;
+	height:15px;
+}
+.scrollH .end {
+	background-image: url('iview2.scrollbar.png');
+	background-repeat: no-repeat;
+	background-position: -210px -0px;
+	width:15px;
+	height:15px;
+}
+
+.scrollH .end.disabled {
+	background-image: url('iview2.scrollbar.png');
+	background-repeat: no-repeat;
+	background-position: -270px -0px;
+	width:15px;
+	height:15px;
+}
 /* Scroll Area */
 .scrollH .empty { /* Main Container */
 	position:relative;
@@ -72,6 +87,7 @@
 	width:100%;
 	height: 15px;
 }
+
 .scrollH .space {
 	width:10px;
 }
@@ -87,9 +103,9 @@
 }
 .scrollH .bar .start {
 	/*background-repeat:repeat-y;*/
-	background-image: url('image.png');
+	background-image: url('iview2.scrollbar.png');
 	background-repeat: no-repeat;
-	background-position: -660px -0px;
+	background-position: -300px -0px;
 	position:relative;
 	float: left;
 	width: 2px;
@@ -108,9 +124,9 @@
 	margin:0px;
 }
 .scrollH .bar .end {
-	background-image: url('image.png');
+	background-image: url('iview2.scrollbar.png');
 	background-repeat: no-repeat;
-	background-position: -690px -0px;
+	background-position: -330px -0px;
 	position:relative;
 	float: left;
 	width: 2px;
@@ -131,16 +147,33 @@
 
 /* Start & End - Buttons */
 .scrollV .start {
-	background-image: url('image.png');
+	background-image: url('iview2.scrollbar.png');
 	background-repeat: no-repeat;
-	background-position: -510px -0px;
+	background-position: -30px -0px;
 	width:15px;
 	height:15px;
 }
-.scrollV .end {
-	background-image: url('image.png');
+
+.scrollV .start.disabled {
+	background-image: url('iview2.scrollbar.png');
 	background-repeat: no-repeat;
-	background-position: -480px -0px;
+	background-position: -90px -0px;
+	width:15px;
+	height:15px;
+}
+
+.scrollV .end {
+	background-image: url('iview2.scrollbar.png');
+	background-repeat: no-repeat;
+	background-position: -0px -0px;
+	width:15px;
+	height:15px;
+}
+
+.scrollV .end.disabled {
+	background-image: url('iview2.scrollbar.png');
+	background-repeat: no-repeat;
+	background-position: -60px -0px;
 	width:15px;
 	height:15px;
 }
@@ -177,9 +210,9 @@
 }
 .scrollV .bar .start {
 	/*background-repeat:repeat-y;*/
-	background-image: url('image.png');
+	background-image: url('iview2.scrollbar.png');
 	background-repeat: no-repeat;
-	background-position: -600px -0px;
+	background-position: -120px -0px;
 	position:relative;
 	/*float: left;*/
 	height: 2px;
@@ -198,9 +231,9 @@
 	margin:0px;
 }
 .scrollV .bar .end {
-	background-image: url('image.png');
+	background-image: url('iview2.scrollbar.png');
 	background-repeat: no-repeat;
-	background-position: -630px -0px;
+	background-position: -150px -0px;
 	position:relative;
 	/*float: left;*/
 	height: 2px;
@@ -208,22 +241,6 @@
 	margin: 0px;
 	padding: 0px;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 /* Description for z-Index:
@@ -243,19 +260,16 @@
 
 .viewerContainer {
 	position:relative;
-	/*width:100%;*/
 	left: 0px;
 	z-index: 10;
 	visibility:visible;
 }
 .viewerContainer.max {
 	position: fixed;
-	/*height: 100%;*/
-	top: 46px; /* header height + borderTop + borderBottom*/
+	top: 0px;
 }
 .viewerContainer.min {
 	position: relative;
-	/*height: 500px;*/
 	top: 0px;
 }
 .viewerContainer.min .scrollH, .viewerContainer.min .scrollV {
@@ -265,7 +279,7 @@
 	visibility:visible;
 }
 /* viewer */
-.viewer {
+.viewerContainer .viewer {
 	position: absolute;
 	top: 0px;
 	bottom: 0px;
@@ -274,9 +288,16 @@
 	/*height:100%;*/
 	/* NOTE: the size and width should be set dynamically when initialized */
 	background-color: #ffffff;
-	z-index:20;
+	/*z-index:20;*/
 	overflow: hidden;
 }
+.viewerContainer.min .viewer {
+	top: 0px;
+}
+.viewerContainer.max .viewer {
+	top: 44px;
+}
+
 .viewer .well, .viewer .surface {
 	margin: 0;
 	padding: 0;
@@ -307,425 +328,7 @@
 	display: block;
 	/*-moz-outline: 1px dashed #FF0000;*/
 }
-/*.viewer .controls {
-	background-color: #FFFFFF;
-	position: absolute;
-	left: 0px;
-	top: 0px;
-	font-size: 0px;
-	margin: 0px;
-	padding: 0 0 0 0px;
-	z-index: 31;
-}
-.viewer .controls a
-{
-	color: #000000;
-	text-decoration: none;
-	-moz-outline: none;	
-}
-.viewer .controls a img {
-	border: 0;
-	vertical-align: middle;
-}
-.viewer .controls a:active {
-	color: #FF0000;
-}*/
 
-
-/*
-#body {
-	position: absolute;
-	top: 0px;
-	left: 0px;
-	background-color: #ffffff;
-	height: 100%;
-	width: 100%;
-	margin: 0px;
-	padding: 0px;
-	color: #FFFFFF;
-	overflow: hidden;
-}*/
-
-/* ButtonSurface */
-.buttonSurface {
-	/*z-index: 10;*/
-}
-.buttonSurface.max {
-	position:fixed;
-	width:100%;
-	height:100%;
-	top:0px;
-	left:0px;
-	visibility:visible;
-}
-.buttonSurface.min {
-	position:relative;
-	visibility:hidden;
-}
-/* Header */
-.buttonSurface .header {
-	position: relative;
-	left: 0px;
-	top: 0px;
-	background-image: url('scaled/header/horizontal.png');
-	background-repeat: repeat-x;
-	width: 100%;
-	height: 44px;
-	border: 1px solid #000000;
-	z-index: 20;
-	/*display: none;*/
-}
-
-.buttonSurface.max .header { /* needed by IE8 */
-	position: absolute;
-	display: block;
-}
-.buttonSurface .header .headerLeft {
-	position: relative;
-	top: 0px;
-	left: 0px;
-	height: 44px;
-	width: 200px;
-	background-color: #c0c1c3;
-	float: left;
-}
-.buttonSurface .header .headerLCBorder {
-	position: relative;
-	top: 4px;
-	height: 36px;
-	width: 2px;
-	background-color: #858688;
-	float: left;
-}
-.buttonSurface .header .headerCenter {
-	position: relative;
-	top:0px;
-	height: 44px;
-	width: 200px;
-	background-color: #c0c1c3;
-	float: left;
-}
-.buttonSurface.max .header .headerCenter {
-	width: 750px;
-}
-.buttonSurface .header .headerCRBorder {
-	position: relative;
-	top: 4px;
-	height: 36px;
-	width: 2px;
-	background-color: #858688;
-	float: left;
-}
-.buttonSurface .header .headerRight {
-	top: 0px;
-	right: 0px;
-	left: 0px;
-	height: 44px;
-	background-color: #c0c1c3;
-}
-
-/* HeaderElements */
-/*URL*/
-.buttonSurface.max .BSE_permalink {
-	position: absolute;
-	top: 10px;
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -420px -0px;
-	height:24px;
-	width:24px;
-	left:970px;
-	z-index: 50;
-	cursor: pointer;
-}
-.buttonSurface .BSE_url {
-	position: absolute;
-	top: 11px;
-	left: 1000px;
-	z-index: 50;
-	display: none;
-	visibility: hidden;
-}
-.buttonSurface.max .BSE_url {
-	visibility: visible;
-}
-.buttonSurface .BSE_permaUrl {
-	width:200px;
-	height: 16px;
-	float: left;
-	font-size: 12px;
-	background-color: #FCFEFF;
-	visibility: hidden;
-}
-.buttonSurface.max .BSE_permaUrl {
-	visibility: visible;
-}
-.buttonSurface.max .BSE_displayOut {
-	position:relative;
-	left:3px;
-	top:0px;
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -450px -0px;
-	width:11px;
-	height:11px;
-	z-index: 50;
-	cursor: pointer;
-	float: left;
-}
-
-/* Page backwards*/
-.buttonSurface .BSE_backward {
-	position: absolute;
-	top: 0px;
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -60px -0px;
-	height: 24px;
-	width: 24px;
-	left: 0px;
-	/*z-index: 32;*/
-	cursor: pointer;
-}
-.buttonSurface .BSE_backwardBehind {
-	position: absolute;
-	top: 10px;
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -90px -0px;
-	height: 24px;
-	width: 24px;
-	left: 310px;
-	z-index: 50;
-}
-
-/* Page forward*/
-.buttonSurface .BSE_forward {
-	position: absolute;
-	top: 0px;
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -120px -0px;
-	height: 24px;
-	width: 24px;
-	left: 0px;
-	z-index: 50;
-	cursor: pointer;
-}
-.buttonSurface .BSE_forwardBehind {
-	position: absolute;
-	top: 10px;
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -150px -0px;
-	height: 24px;
-	width: 24px;
-	left: 470px;
-	z-index: 50;
-}
-
-.viewerContainer .buttonSurface {
-	width:100%;
-	height:0px;
-	z-index: 50;
-}
-.viewerContainer .header {
-	display:none;
-}
-.viewerContainer.min .buttonSurface {
-	visibility:visible;
-}
-
-.viewerContainer.max .buttonSurface {
-	visibility:hidden;
-}
-
-.viewerContainer .BSE_backward {
-	position: absolute;
-	top: 0px;
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -60px -0px;
-	height: 24px;
-	width: 24px;
-	left: 0px;
-	z-index: 32;
-	cursor: pointer;
-}
-.viewerContainer .BSE_backwardBehind {
-	position: absolute;
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -90px -0px;
-	height: 24px;
-	width: 24px;
-	left: 0px;
-	z-index: 50;
-	visibility:hidden;
-}
-
-/* Page forward*/
-.viewerContainer .BSE_forward {
-	position: absolute;
-	top: 0px;
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -120px -0px;
-	height: 24px;
-	width: 24px;
-	left: 0px;
-	z-index: 50;
-	cursor: pointer;
-}
-.viewerContainer .BSE_forwardBehind {
-	position: absolute;
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -150px -0px;
-	height: 24px;
-	width: 24px;
-	right:0px;
-	left:auto;
-	z-index: 50;
-	visibility:hidden;
-}
-
-.viewerContainer.min:hover .BSE_forwardBehind, .viewerContainer.min:hover .BSE_backwardBehind {
-	visibility:visible;
-}
-	
-/* MODUL: pageInput */
-/*.buttonSurface .BSE_pageInput1 {
-	position: absolute;
-	top: 5px;
-	left: 13%;
-	height: 20px;
-	width: 124px;
-	background-color: #FCFEFF;
-	border: 1px solid black;
-	z-index: 32;
-	visibility: hidden;
-}
-.buttonSurface.max .BSE_pageInput1 {
-	visibility: visible;
-}
-.buttonSurface.max .BSE_pageInput1 .input {
-	height: 20px;
-	width: 55px;
-	background-color: transparent;
-	border: 0px solid black;
-	overflow: hidden;
-	text-align: center;
-	font-size: 16px;
-	font-weight: bold;
-	margin: 0px;
-	padding: 0px;
-}
-.buttonSurface.max .BSE_pageInput1 .slash {	
-	height: 20px;
-	width: 14px;
-	background-color: transparent;
-	border: 0px solid black;
-	overflow: hidden;
-	text-align: center;
-	font-size: 16px;
-	font-weight: bold;
-	margin: 0px;
-	padding: 0px;
-}
-.buttonSurface.max .BSE_pageInput1 .amount {	
-	height: 20px;
-	width: 55px;
-	background-color: transparent;
-	border: 0px solid black;
-	overflow: hidden;
-	text-align: center;
-	font-size: 16px;
-	font-weight: bold;
-	margin: 0px;
-	padding: 0px;
-}*/
-
-/* MODUL: pageForm */
-.buttonSurface .BSE_pageForm1 {
-	position: absolute;
-	top: 10px;
-	left: 340px;
-	visibility: hidden;
-	z-index: 50;
-}
-.buttonSurface.max .BSE_pageForm1 {
-	visibility: visible;
-}
-.buttonSurface .BSE_pageFormSelect1 {
-	position: absolute;
-	top: 0px;
-	left: 0px;
-	width: 124px;
-	height: 20px;
-}
-.buttonSurface .BSE_pageFormOption1 {
-	background-color: #FCFEFF;
-}
-
-/* Entrance-Buttons - Chapter & Overview */
-.buttonSurface.max .BSE_openThumbs {
-	position: absolute;
-	top: 10px;
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -360px -0px;
-	height: 24px;
-	width: 24px;
-	left: 220px;
-	z-index: 50;
-	cursor: pointer;
-}
-.buttonSurface.max .BSE_chapterOpener {
-	position: absolute;
-	top: 10px;
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -390px -0px;
-	height: 24px;
-	width: 24px;
-	left: 264px;
-	z-index: 50;
-	cursor: pointer;
-}
-
-.buttonSurface.max .loading {
-	background-image: url('ajax-loader.gif');
-	background-position: 50% 50%;
-}	
-
-/* Navigation Elements */
-/* Vollbild-Button */
-/*.maximize {*/
-.buttonSurface .BSE_fullView, .buttonSurface .BSE_normalView {	
-	position: absolute;
-	top: 10px;
-	height: 24px;
-	width: 24px;
-	right: 10px;
-	margin: 0px;
-	padding: 0px;
-	cursor: pointer;
-	z-index: 50;
-}
-
-.buttonSurface .BSE_fullView {
-	display: block;
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -0px -0px;
-}
-.buttonSurface .BSE_normalView {
-	display: none;
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -30px -0px;
-}
 
 /* MODUL: ZoomBar */
 /* Main */
@@ -841,91 +444,6 @@
 	line-height: 0px;
 }
 
-/* additional ZoomIn / ZoomOut (not integrated in Zoombar)*/
-.buttonSurface.max .BSE_zoomIn {	
-	position: absolute;
-	top: 0px;
-	right: 0px;
-	height: 24px;
-	width: 24px;
-	margin: 0px;
-	padding: 0px;
-	border: 0px;
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -180px -0px;
-	/*z-index: 32;*/
-	cursor: pointer;
-}
-.buttonSurface.max .BSE_zoomInBehind {
-	position: absolute;
-	top: 10px;
-	left: 30px;
-	height: 24px;
-	width: 24px;
-	margin: 0px;
-	padding: 0px;
-	border: 0px;
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -210px -0px;
-	z-index: 50;	
-}
-.buttonSurface.max .BSE_zoomOut {	
-	position: absolute;
-	top: 0px;
-	right: 0px;
-	height: 24px;
-	width: 24px;
-	margin: 0px;
-	padding: 0px;
-	border: 0px;
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -240px -0px;
-	/*z-index: 32;*/
-	cursor: pointer;
-}
-.buttonSurface.max .BSE_zoomOutBehind {	
-	position: absolute;
-	top: 10px;
-	left: 74px;
-	height: 24px;
-	width: 24px;
-	margin: 0px;
-	padding: 0px;
-	border: 0px;
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -270px -0px;
-	z-index: 50;
-}
-
-/* Buttons - fitToScreen & fitToWidth */
-.buttonSurface.max .BSE_toWidth {
- 	position: absolute;
-	top: 10px;
- 	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -300px -0px;
- 	height: 24px;
- 	width: 24px;
- 	left: 120px;
- 	z-index: 50;
- 	cursor: pointer;
-}
-.buttonSurface.max .BSE_toScreen {
- 	position: absolute;
- 	top: 10px;
- 	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -330px -0px;
- 	height: 24px;
- 	width: 24px;
- 	left: 164px;
- 	z-index: 50;
- 	cursor: pointer;
-}
 
 /* Preview (current shown Image) */
 /* control Button */
@@ -943,17 +461,17 @@
 .dampNormal .hide {
 	width: 15px;
 	height: 15px;
-	background-image: url('image.png');
+	background-image: url('iview2.cutout.png');
 	background-repeat: no-repeat;
-	background-position: -1230px -0px;
+	background-position: -30px -0px;
 }
 
 .dampNormal .show {
 	width: 15px;
 	height: 15px;
-	background-image: url('image.png');
+	background-image: url('iview2.cutout.png');
 	background-repeat: no-repeat;
-	background-position: -1200px -0px;
+	background-position: -0px -0px;
 	display: none;
 }
 
@@ -1001,94 +519,6 @@
 }
 
 
-
-/* ScrollBar Vertical */
-/* Main Container */
-.scrollOVV {
-	width: 15px;
-	height: 100%;
-	position: absolute;
-	right: 0px;
-	top: 0px;
-	padding: 0px;
-	margin: 0px;
-	z-index: 50;
-	line-height: 0px;
-}
-
-/* Start & End - Buttons */
-.scrollOVV .start {
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -510px -0px;
-	width:15px;
-	height:15px;
-}
-.scrollOVV .end {
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -480px -0px;
-	width:15px;
-	height:15px;
-}
-
-/* Scroll Area */
-.scrollOVV .empty {
-	position:relative;
-	width:15px;
-}
-
-.scrollOVV .empty {
-	position:relative;
-	background-repeat:repeat-y;
-	background-image: url('scaled/scrollbars/eVertical.png');
-	padding:0px;
-	margin:0px;
- 	height:100%;
- 	width:15px;
-	vertical-align: top;
-}
-.scrollOVV .spaceEnd {
-	background-color:#000000;
-	width:0px;
-	height:0px;
-}
-.scrollOVVBar {  /* contains ScrollBar */
-	position:absolute;
-}
-
-/* ScrollBar */
-.scrollOVVBar .barStart {
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -600px -0px;
-	position:relative;
-	height: 2px;
-	width: 15px;
-	margin: 0px;
-	padding: 0px;
-}
-.scrollOVVBar .vertical {
-	background-repeat:repeat-y;
-	background-image: url('scaled/scrollbars/vertical.png');
-	position:relative;
-	height:100%;
-	width: 15px;
-	margin: 0px;
-	padding: 0px;
-}
-.scrollOVVBar .barEnd {
-	background-image: url('image.png');
-	background-repeat: no-repeat;
-	background-position: -630px -0px;
-	position:relative;
-	height: 2px;
-	width: 15px;
-	margin: 0px;
-	padding: 0px;
-}
-
-
 /* background Preload (current shown Image) */
 .preload {
 	position:absolute;
@@ -1107,7 +537,8 @@
 }
 .chapter {
 	position: relative;
-	left: 260px;
+	top: 0px;
+	left: 200px;
 	width: 400px;
 	height: 200px; /* also dynamic - setSize (design.xml) */
 	display:none;
@@ -1132,7 +563,7 @@
 	height: 15px;
 	background-image: url('image.png');
 	background-repeat: no-repeat;
-	background-position: -1080px -0px;
+	background-position: -0px -0px;
 	cursor: pointer;
 }
 
@@ -1173,28 +604,28 @@
 
 	background-color: #E2E6E9;
 }
+/* Main Div's with Image & Title Content */
+.overview .divBox {
+	top: 3px;
+	height: 200px;
+	width: 200px; /* For values around 50 the image disappears*/
+	border:0px solid #000000;
+	background-color: #E2E6E9;
+}
 #previewImage {	
 	width: 180px;
 	height: 160px;
 }
-.overview .infoDiv {
+.overview .divBox .previewDiv {
+	position: relative;
+}
+.overview .divBox .infoDiv {
 	width: 196px;
-	bottom: 9px;
+	height: 20px;
+	top: 180px;
+	position:relative;
 
-	border-top-style: solid;
-	border-bottom-style: solid;
-	border-left-style: solid;
-	border-right-style: solid;
-
-	border-top-width: 0px;
-	border-bottom-width: 0px;
-	border-left-width: 0px;
-	border-right-width: 0px;
-
-	border-top-color: #000000;
-	border-bottom-color: #000000;
-	border-left-color: #000000;
-	border-right-color: #000000;
+	border: solid 0px #000000;
 
 	text-align: center;
 	vertical-align: middle;
@@ -1205,14 +636,10 @@
 	overflow:hidden;
 }
 
-.blackBlank {
-	opacity:0;
-	position:absolute;
-	top:0px;
-	left:0px;
+.viewerContainer.max .overview .picContainer {
 	height:100%;
-	width:100%;
-	z-index:100;
-	background-color:black;
-	display:none;
+}
+
+.viewerContainer.max .overview .scrollV {
+	visibility: inherit;
 }

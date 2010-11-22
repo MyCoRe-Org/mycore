@@ -44,7 +44,15 @@ function zoomBar(newId, parent, identer) {
 //	this.setDisplayMode = setDisplayMode;
 	this.addListener = addListener;
 	
-	
+	/**
+	 * @public
+	 * @function
+	 * @name	addListener
+	 * @memberOf	iview.zoomBar
+	 * @description	Adds a Listener for the given Event,so the Listener will be noticed if any changes will happen for this Event
+	 * @param	{integer} type constant which defines to which type of listener it shall be added
+	 * @param	{function} theListener Object which holds a special function which is called if a Event happens
+	 */
 	function addListener(type, theListener) {
 		if (!listener[type]) {
 			listener[type] = [];
@@ -52,6 +60,15 @@ function zoomBar(newId, parent, identer) {
 		listener[type].push(theListener);
 	}
 
+	/**
+	 * @public
+	 * @function
+	 * @name	dropListener
+	 * @memberOf	iview.zoomBar
+	 * @description	Dropps a Listener for the given Event
+	 * @param	{integer} type constant which defines to which type of listener it shall be dropped
+	 * @param	{function} theListener Object which holds a special function which is called if a Event happens
+	 */
 	function dropListener(type, theListener) {
 		for (var i = 0; i < listener[type].length; i++) {
 			if (listener[type][i] == theListener) {
@@ -60,6 +77,15 @@ function zoomBar(newId, parent, identer) {
 		}
 	}
 
+	//TODO Doku ergänzen
+	/**
+	 * @public
+	 * @function
+	 * @name	notifyListenerMode
+	 * @memberOf	iview.zoomBar
+	 * @description	
+	 * @param	{} value 
+	 */
 	function notifyListenerMode(value) {
 		if (!listener[zoomBar.DISP_MODE]) {
 			return;
@@ -69,8 +95,15 @@ function zoomBar(newId, parent, identer) {
 		}
 	}
 	
-	
-	
+	//TODO Doku ergänzen
+	/**
+	 * @public
+	 * @function
+	 * @name	init
+	 * @memberOf	iview.zoomBar
+	 * @description	creates with the given Inforamtions the Zoombar
+	 * @param	{boolean} horizontal
+	 */
 	function init(horizontal/*, active*/) {
 	
 		horz = horizontal;
@@ -181,16 +214,27 @@ function zoomBar(newId, parent, identer) {
 		}*/
 	}
 
-	/*
-	@description set amountLevel
-	*/
+	//TODO Doku ergänzen
+	/**
+	 * @public
+	 * @function
+	 * @name	setAmountLevel
+	 * @memberOf	iview.zoomBar
+	 * @description	set amountLevel
+	 * @param	{} amount
+	 */
 	function setAmountLevel(amount) {
 		amountLevel = amount;
 	}
 
-	/*
-	@desciption returns height of the scalelines
-	*/
+	/**
+	 * @public
+	 * @function
+	 * @name	getScaleHeight
+	 * @memberOf	iview.zoomBar
+	 * @description	returns height of the scalelines
+	 * @return	{integer} x is the height of the scaleLines 
+	 */
 	function getScaleHeight() {
 		var tmpDiv = document.createElement("div");
 		tmpDiv.className = "scaleLine";
@@ -204,6 +248,14 @@ function zoomBar(newId, parent, identer) {
 	/*
 	@desciption returns width of the scalelines
 	*/
+	/**
+	 * @public
+	 * @function
+	 * @name	getScaleWidth
+	 * @memberOf	iview.zoomBar
+	 * @description	returns width of the scalelines
+	 * @return	{integer}  x is the width of the scaleLines
+	 */
 	function getScaleWidth() {
 		var tmpDiv = document.createElement("div");
 		tmpDiv.className = "scaleLine";
@@ -214,9 +266,13 @@ function zoomBar(newId, parent, identer) {
 		return x;
 	}
 
-	/*
-	@description creates the visual zoomlevellines on the zoombar, removes previously the old ones and then sets the new ones
-	*/
+	/**
+	 * @public
+	 * @function
+	 * @name	createScale
+	 * @memberOf	iview.zoomBar
+	 * @description	creates the visual zoomlevellines on the zoombar, removes previously the old ones and then sets the new ones
+	 */
 	function createScale() {
 
 		while (getElementsByClassName("scale",id,"div")[0].childNodes.length > 0) {
@@ -242,9 +298,15 @@ function zoomBar(newId, parent, identer) {
 		}
 	}
 
-	/*
-	@description set zoombar to the correct position
-	*/
+	//TODO Doku ergänzen
+	/**
+	 * @public
+	 * @function
+	 * @name	moveBarToLevel
+	 * @memberOf	iview.zoomBar
+	 * @description	set zoombar to the correct position
+	 * @param	{integer} zoomLevel
+	 */
 	function moveBarToLevel (zoomLevel) {
 	
 		var targetZoom;
@@ -286,10 +348,14 @@ function zoomBar(newId, parent, identer) {
 		}
 	}
 
-	/*
-	@description stores the current Position where the mousebutton was pressed over the zoombar bar stored in barPosY, this value allows it to keep the bar under the mouse
-	@param e event which was raised and which holds the needed position value
-	*/
+	/**
+	 * @public
+	 * @function
+	 * @name	mouseDownZoombar
+	 * @memberOf	iview.zoomBar
+	 * @description	stores the current Position where the mousebutton was pressed over the zoombar bar stored in barPosY, this value allows it to keep the bar under the mouse
+	 * @param	{event} e event which was raised and which holds the needed position value
+	 */
 	function mouseDownZoombar(e) {
 		if (e.button < 2) {
 			mouseOnBar = true;
@@ -312,10 +378,14 @@ function zoomBar(newId, parent, identer) {
 		}
 	}
 
-	/*
-	@description realizes that the zoombar bar follows the mouse, when mouseOnBar is set
-	@param e event which holds the current mousemove informations
-	*/
+	/**
+	 * @public
+	 * @function
+	 * @name	mouseMoveZoombar
+	 * @memberOf	iview.zoomBar
+	 * @description	realizes that the zoombar bar follows the mouse, when mouseOnBar is set
+	 * @param	{event} e event which holds the current mousemove informations
+	 */
 	function mouseMoveZoombar(e) {
 		if (mouseOnBar) {
 
@@ -341,10 +411,14 @@ function zoomBar(newId, parent, identer) {
 		}
 	}
 
-	/*
-	@description is called as soon as the mousebutton goes up, calculates depending on the zoombar Bar which zoomlevel will be zoomed to as well as positions the bar correctly to this level
-	@param e event which was raised by mouseup
-	*/
+	/**
+	 * @public
+	 * @function
+	 * @name	mouseUpZoombar
+	 * @memberOf	iview.zoomBar
+	 * @description	is called as soon as the mousebutton goes up, calculates depending on the zoombar Bar which zoomlevel will be zoomed to as well as positions the bar correctly to this level
+	 * @param	{event} e event which was raised by mouseup
+	 */
 	function mouseUpZoombar(e) {
 		if(mouseOnBar) {
 			mouseOnBar = false;
@@ -383,10 +457,14 @@ function zoomBar(newId, parent, identer) {
 		} 
 	}
 
-	/*
-	@description gains the Scrollevent delta normalized it and depending on it's value it will be zoomed in or out one step
-	@param e window (scroll)Event which occured, the mouse delta will be gained and normalized and is used to zoom depending on it
-	*/
+	/**
+	 * @public
+	 * @function
+	 * @name	mouseScrollZoombar
+	 * @memberOf	iview.zoomBar
+	 * @description	gains the Scrollevent delta normalized it and depending on it's value it will be zoomed in or out one step
+	 * @param	{event} e window (scroll)Event which occured, the mouse delta will be gained and normalized and is used to zoom depending on it
+	 */
 	function mouseScrollZoombar(e) {
 		e = getEvent(e);
 		var delta = returnDelta(e, true);
@@ -400,6 +478,16 @@ function zoomBar(newId, parent, identer) {
 		}
 	}
 	
+	//TODO Doku ergänzen
+	/**
+	 * @public
+	 * @function
+	 * @name	mouseDbClick
+	 * @memberOf	iview.zoomBar
+	 * @description	
+	 * @param	{event} e event which was raised by mouseDoubleClick
+	 * @return	{} 
+	 */
 	function mouseDbClick(e) {
 		var pos = 0;
 		var className = (e.srcElement)? e.srcElement.className:e.target.className;

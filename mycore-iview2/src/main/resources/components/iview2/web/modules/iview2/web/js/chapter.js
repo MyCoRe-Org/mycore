@@ -1,274 +1,43 @@
+/**
+ * @namespace
+ * @name		iview
+ */
 var iview = iview || {};
+/**
+ * @namespace	Package for Chapter, contains Default Chapter View and Controller
+ * @memberOf 	iview
+ * @name		chapter
+ */
 iview.chapter = iview.chapter || {};
-//TODO Add Event like: creation done
-/*
- * @package iview.chapter
- * @description Modeldata for internal METS Representation 
- */
+//FIXME seems to be as if there's now some kinda graphic glitch when the viewer slides down
 
-/*
- * @name 		Model
- * @proto		Object
- * @description
- */
-iview.chapter.Model = function(element) {
-	this._selected = null;
-	this._entries = [];
-	this.onevent = new iview.Event(this);
-	this._hashList = [];
-};
-
-( function() {
-	
-	function getEntries() {
-		return this._entries;
-	}
-	
-	/*
-	 * @description Adds to the Model a new Page with the supplied data within element
-	 * @param element Object which contains all needed informations to create a new Page within the Model
-	 */
-	function addPage(element) {
-		var page = new iview.chapter.METSPage(element.label, element.dmdid, this);
-		this._entries.push(page);
-		addHash(page);
-	}
-
-	/*
-	 * @description Adds to the Model a new Branch, the branch will be filled with the supplied data within element
-	 * @param element Object which contains all needed informations to create a branch
-	 * @return Object Branch which was created, so Subentries can be added to this branch as well
-	 */
-	function addBranch(element) {
-		var branch = new iview.chapter.METSChapter(element.label, this);
-		this._entries.push(branch);
-		return branch;
-	}
-	
-	/*
-	 * @description Sets the given entry as new selected entry within the Model, if the supplied entry
-	 *  isn't valid nothing happens. Else all Listeners will be notified about the changed Selection by
-	 *  calling the onevent The Type of the Event is 'selected' with the previously selected entry(-id)
-	 *  in old and the new Selection within new. If no entry was selected before, old holds null
-	 * @param dmdid the ID/Hash of the Element which is the new selected one
-	 */
-	function setSelected(dmdid) {
-		var newSelected = getHash(dmdid, this);
-		if (newSelected != null) {
-			var oldSelected = (this._selected != null)? this._selected.getID(): null;
-			this._selected = newSelected;
-			this.onevent.notify({"type" : 'selected', "old": oldSelected, "new": newSelected.getID()});
-		}
-	}
-	
-	/*
-	 * @description to easily add entries of subchapter to the global Hashlist give childs Hashlist
-	 */
-	function getContainer() {
-		return this;
-	}
-	
-	/*
-	 * @description adds to the list of Elements within the list the given entry if it's not already there,
-	 *  otherwise throws an alert. Within this Hashlist it's easy to find out if a given Element exists
-	 *  within the Model
-	 * @param entry Object with function getID which will be added to the Hashlist
-	 */
-	function addHash(entry) {
-		if (getHash(entry.getID(), this) != null) {
-			alert("Entry with this ID already exists. Element will not be added to List");
-			return;
-		}
-		this._hashList[entry.getID()] = entry;
-	}
-	
-	/*
-	 * @description Proves if the supplied Hash within hash is already in use within the Model,
-	 *  which is supplied through that
-	 * @param hash Hash which shall be added to the hashList
-	 * @param that Model where to check the Hashlist for the given hash
-	 * @return null if the Element doesn't exists, else it returns the content of the given Hash Position
-	 */
-	function getHash(hash, that) {
-		//check if Object with this hash is available
-		return (typeof that._hashList[hash] === "undefined")? null:that._hashList[hash];
-	}
-	
-	iview.chapter.Model.prototype.getEntries = getEntries;
-	iview.chapter.Model.prototype.addPage = addPage;
-	iview.chapter.Model.prototype.addBranch = addBranch;
-	iview.chapter.Model.prototype.getContainer = getContainer;
-	iview.chapter.Model.prototype.addHash = addHash;
-	iview.chapter.Model.prototype.setSelected = setSelected;
-})();
-
-/*
- * @name 		METSEntry
- * @proto		Object
- * @description
- */
-iview.chapter.METSEntry = function(labl) {
-	this._parent = null;
-};
-
-iview.chapter.METSEntry.prototype = {
-	setLabel: function(labl) {
-		this._label = labl;
-	},
-		
-	getLabel: function() {
-		return this._label;
-	},
-	
-	getParent: function() {
-		return this._parent;
-	}
-};
-
-/*
- * @name 		METSPage
- * @proto 		iview.chapter.METSEntry
- * @description
- */
-iview.chapter.METSPage = function(labl, id, parent) {
-	var caption = labl || id;
-	this._label = labl || "";
-	this._id = id || "";
-	this._parent = parent;
-}; iview.chapter.METSPage.prototype = new iview.chapter.METSEntry;
-
-( function() {
-	function setID(id) {
-		this._id = id;
-	}
-		
-	function getID() {
-		return this._id;
-	}
-
-	function setLabel(labl) {
-		this._label = labl;
-	}
-		
-	function getLabel() {
-		return this._label;
-	}
-	
-	iview.chapter.METSPage.prototype.setID = setID;
-	iview.chapter.METSPage.prototype.getID = getID;
-	iview.chapter.METSPage.prototype.getLabel = getLabel;
-	iview.chapter.METSPage.prototype.setLabel = setLabel;
-})();
-
-/*
- * @name		METSChapter
- * @proto		iview.chapter.METSEntry
- * @description	
- */
-iview.chapter.METSChapter = function(entry, parent) {
-	this._chapter = true;
-	this._entries = [];
-	this._entry = new iview.chapter.METSPage(entry, "", this);
-	this._parent = parent;
-	//Set the root Element so we're able to add it elements to the global Hashlist
-	this._container = parent.getContainer();
-}; iview.chapter.METSChapter.prototype = new iview.chapter.METSEntry;
-
-( function() {
-
-//	function addEntries(elements) {
-//		if (!(typeof elements === undefined)) {
-//			var that = this;
-//			if (jQuery.isArray(elements)) {
-//				jQuery.each(elements, function(index, element) { that._entries.push(element)});
-//			} else {
-//				addEntry(element);
-//			}
-//		}
-//	}	
-
-	/*
-	 * @description Adds to the Model a new Page with the supplied data within element
-	 * @param element Object which contains all needed informations to create a new Page within the Model
-	 */
-	function addPage(element) {
-		var page = new iview.chapter.METSPage(element.label, element.dmdid, this);
-		this._entries.push(page);
-		this._container.addHash(page);
-	}
-	
-	/*
-	 * @description Adds to the Model a new Branch, the branch will be filled with the supplied data within element
-	 * @param element Object which contains all needed informations to create a branch
-	 * @return Object Branch which was created, so Subentries can be added to this branch as well
-	 */
-	function addBranch(element) {
-		var branch = new iview.chapter.METSChapter(element.label, this);
-		this._entries.push(branch);
-		return branch;	
-	}
-	
-	function getEntries() {
-		return jQuery.extend( {}, this._entries);
-	}
-	
-	function getInfo() {
-		return jQuery.extend( {}, this._entry);
-	}
-	
-	function setInfo(element) {
-		this._entry = element;
-	}
-	
-	function reset() {
-		this._entries = [];
-		this._entry = null;
-	}
-	
-	function getLabel() {
-		return this._entry.getLabel();
-	}
-	
-	function setLabel(labl) {
-		this._entry.setLabel(labl);	
-	}
-	
-	function getContainer() {
-		return this._container;
-	}
-	
-//	iview.METSChapter.prototype.addEntries = addEntries;
-	iview.chapter.METSChapter.prototype.addPage = addPage;
-	iview.chapter.METSChapter.prototype.addBranch = addBranch;
-	iview.chapter.METSChapter.prototype.getEntries = getEntries;
-	iview.chapter.METSChapter.prototype.getInfo = getInfo;
-	iview.chapter.METSChapter.prototype.reset = reset;
-	iview.chapter.METSChapter.prototype.getLabel = getLabel;
-	iview.chapter.METSChapter.prototype.setLabel = setLabel;
-	iview.chapter.METSChapter.prototype.getContainer = getContainer;
-})();
-
-/********************************************************
- ********************************************************
- ********************************************************/
-/*
- * @package iview.chapter
- * @description View to Display Data as jQuery Tree
+/**
+ * @class
+ * @constructor
+ * @version	1.0
+ * @memberOf	iview.chapter
+ * @name 		View
+ * @description View to display with a given template the underlying model. Displays a METS-Document as Chapter-Entry-Tree(using jQuery jsTree Components))
+ * @requires	jsTree v0.9.6
  */
 iview.chapter.View = function() {
 	this._treeData;//Stores the Treedata to display(the jsTree Model)
 	this._visible = false;
-	this._tree = jQuery.tree.create();//The jsTree
 	this._selected = null;//stores the currently selected page and enables reset if Chapters will be selected
 	this.onevent = new iview.Event(this);//One Event to rule them all
 	this.notifyOthers = true;//onselect Event was caused by Controller calls, so don't handle them
 	this._parent = null;//where will the tree be connected to
+	this._tree = jQuery.tree.create();//The jsTree creation	
 };
 
 ( function() {
-	
-	/*
-	 * @description creates the basic background Datastructure to Display the Data as jQuery Tree
+
+	/**
+	 * @public
+	 * @function
+	 * @name		initTree
+	 * @memberOf	iview.chapter.View
+	 * @description	creates the basic background datastructure to display the data as jQuery Tree
 	 */
 	function initTree() {
 		var that = this;
@@ -293,30 +62,30 @@ iview.chapter.View = function() {
 					//or as result of some external call
 					if (!that.notifyOthers) { that.notifyOthers = true; return;}
 					
-					var chapter = (jQuery(node).attr("dmdid") === undefined)? true:false;
-					
 					//If that element isn't selected already and is no chapter notify all Listeners about the User interaction
-					if (that._selected != node && !chapter) {
+					if (that._selected != node) {
+						var old = that._selected;
 						that._selected = node;
 						that.onevent.notify({"type":'selected', 
-							"old":jQuery(that._selected).attr("dmdid"), 
-							"new":jQuery(node).attr("dmdid")});
+							"old":jQuery(old).attr("order"), 
+							"new":jQuery(that._selected).attr("order")});
 					}
-					
 				}
 			}
 		};
 	};
 
-	/*
-	 * @description adds a new branch to the supplied parentNode(mostly a branch itself), as childNode
-	 * @param branch Object which will be added to the Tree at the supplied parentNode
-	 * @param parentNode Object where the branch will be added as childNode
-	 * @return returns the just added Branch so that the User can work further on it
-	 * (to add there itself new Child Entries, or whatever)
+	/**
+	 * @public
+	 * @function
+	 * @name		addBranch
+	 * @memberOf	iview.chapter.View
+	 * @description	adds a new branch to the supplied parantNode(mostly a branch itself), as childNode
+	 * @param		{object} branch will be added to the tree at the supplied parantNode
+	 * @param		{object} parentNode object where the branch will be added as childNode
 	 */
 	function addBranch(branch, parentNode) {
-		var currentBranch = { "data": branch.label, "children": []};
+		var currentBranch = { "data": branch.label, "children": [], "attributes": { "class": "branch","logid": branch.logid, "order":branch.order}};
 		if (parentNode == this._treeData) {
 			parentNode.data.opts["static"].push(currentBranch);
 		} else {
@@ -324,19 +93,27 @@ iview.chapter.View = function() {
 		}
 		return currentBranch;
 	}
-	
-	/*
-	 * @description adds a simple page to the supplied parentNode as childNode
-	 * @param page Object which will be added to the Tree at the supplied parentNode
-	 * @param parentNode Object where the page will be added as childNode
+
+	/**
+	 * @public
+	 * @function
+	 * @name		addPage
+	 * @memberOf	iview.chapter.View
+	 * @description	adds a simple page to the supplied parantNode as childNode
+	 * @param		{object} page will be added to the tree at the supplied parantNode
+	 * @param		{object} parentNode object where the page will be added as childNode
 	 */
 	function addPage(page, parentNode) {
-		parentNode.children.push({"data":page.label, "attributes": { "dmdid": page.dmdid}});
+		parentNode.children.push({"data":page.label, "attributes": { "class": "page", "logid": page.logid, "order": page.order}});
 	}
-	
-	/*
-	 * @description adds the View to it's parent and creates the HTML Structure to display the Tree.
-	 *  Therefore makes it reachable for the user
+
+	/**
+	 * @public
+	 * @function
+	 * @name		addTree
+	 * @memberOf	iview.chapter.View
+	 * @description	adds the view to it's parent an creates the HTML-structure to display the tree. Therefore makes it reachable for the user.
+	 * @param		{String,DOM-Object,anything jQuery supports} parent DOM element to which the chapterview is added
 	 */
 	function addTree(parent) {
 		var that = this;
@@ -347,20 +124,24 @@ iview.chapter.View = function() {
 		var content = jQuery('<div>').addClass("content").css("overflow", "auto").appendTo(chapter);
 		this._parent = jQuery(chapter)
 			.mousewheel(function(event, delta) {//Add Mousescroll Capability to the View
-				that._parent[0].scrollTop = that._parent[0].scrollTop - delta*4;});
+				that._parent[0].scrollTop = that._parent[0].scrollTop - delta*4;
+			});
 		this._tree.init(content,this._treeData);
-		
 		//Add the collapse button and the functionality behind it
 		jQuery('<div>').addClass("chapSort").appendTo(chapter).click(function(){
 			that._tree.close_all();
-			that.selectNode(jQuery(that._selected).attr("dmdid"))
+			that.notifyOthers = false;
+			that.selectNode(jQuery(that._selected).attr("logid"));
 		});
 	}
-	
-	/*
-	 * @description makes the View visible depending on the given boolean value, if no value is given
-	 *  the View will switch in the opposite mode than it's currently
-	 * @param bool Boolean which holds the state into which the View shall switch
+
+	/**
+	 * @public
+	 * @function
+	 * @name		visible
+	 * @memberOf	iview.chapter.View
+	 * @description	makes the View visible depending on the given boolean value. If no value is given the View will switch in the opposite mode than it's currently
+	 * @param		{boolean} bool holds the state into which the View shall switch 
 	 */
 	function visible(bool) {
 		//if nothing is given simply switch between the states
@@ -371,45 +152,54 @@ iview.chapter.View = function() {
 			this._parent.slideDown();
 			//if the node isn't within the current Viewport it's not displayed as the previous selectBranch 
 			//wasn't able to position the entry within the viewport. because the viewport didn't existed at that time
-			this.selectNode(jQuery(this._selected).attr("dmdid"));
+			this.selectNode(jQuery(this._selected).attr("logid"));
 		} else {
 			this._visible = false;
 			this._parent.slideUp();
 		}
 	}
-	
-	/*
-	 * @description Returns the internal TreeData representation, which is/was used to build-up the Tree
-	 * @return the internal TreeData which is used to build the Tree
+
+	/**
+	 * @public
+	 * @function
+	 * @name		getTree
+	 * @memberOf	iview.chapter.View
+	 * @description	returns the internal TreeData representation, which is/was used to build-up the Tree
 	 */
 	function getTree() {
 		return this._treeData;
 	}
-	
-	/*
-	 * @description Finds within the tree, the given Entry with matching nodeID and tells
-	 *  jsTree to select it and to collapse everything except the path from the root Node
-	 *  to the newly selected Entry
-	 * @param nodeID the ID of the Entry which is the new selected entry, and therefore needs to be showed within the View
+
+	/**
+	 * @public
+	 * @function
+	 * @name		selectedNode
+	 * @memberOf	iview.chapter.View
+	 * @description	finds within the tree the given Entry with matching nodeID and tells jsTree to select it and to collapse everything except the path from the root Node to the newly selected Entry
+	 * @param 		{string} nodeID is the id of the entry which is the new selected entry, and therefore needs to be showed within the View
 	 */
 	function selectNode(nodeID) {
-		//Avoid cycling as the Tree would notify its listeners itself which could call him again...
-		this.notifyOthers = false;
 		var that = this;
 		//Find the node we're searching for
-		var res = this._parent.find('li.leaf').filter(function(index, element) {return jQuery(element).attr("dmdid") == nodeID});
+		var res = this._parent.find("li[logid='"+nodeID+"']");
 		//Select all Returned entries(should be only one, else something within the METS Document
 		//or the Model is wrong..
-		jQuery.each(res, function(index, element) {that._tree.select_branch(element); that._selected = element});
+		jQuery.each(res, function(index, element) {
+			//Avoid cycling as the Tree would notify its listeners itself which could call him again...
+			that.notifyOthers = false;
+			that._tree.select_branch(element); that._selected = element});
 	}
-	
-	/*
-	 * @description returns the currently selected entry within this view, if nothing is selected an empty String is returned
-	 * @return returns the dmdid of the currently selected entry, if no entry is selected an empty String is returned 
+
+	/**
+	 * @public
+	 * @function
+	 * @name		getSelected
+	 * @memberOf	iview.chapter.View
+	 * @description	returns the currently selected entry within this view, if nothing is selected an empty string is returned
 	 */
 	function getSelected() {
 		if (this._selected == null) return "";
-		return jQuery(this._selected).attr("dmdid");
+		return jQuery(this._selected).attr("logid");
 	}
 	
 	iview.chapter.View.prototype.visible = visible;
@@ -422,50 +212,61 @@ iview.chapter.View = function() {
 	iview.chapter.View.prototype.getSelected = getSelected; 
 })();
 
-/********************************************************
- ********************************************************
- ********************************************************/
-/*
- * @name Controller
- * @package iview.chapter
- * @description Controller to Read in METS XML Documents and parsing them into internal representation
+/**
+ * @class
+ * @constructor
+ * @version	1.0
+ * @memberOf	iview.chapter
+ * @name 		Controller
+ * @description Controller for Chapter
  */
-iview.chapter.Controller = function(modelProvider, view, metsDoc) {
+iview.chapter.Controller = function(modelProvider, physicalModelProvider, view) {
 	this._model = modelProvider.createModel();
-	this._view = view  || null;
+	this._view = new (view  || iview.chapter.View)();
 	var that = this;
+	this._physicalModel = physicalModelProvider.createModel();
 	
-	this._model.onevent.attach(function(sender, args) {
-		if (args.type == 'selected' && that._view.getSelected() != args["new"]) that._view.selectNode(args["new"]);
+	this._physicalModel.onevent.attach(function(sender, args) {
+		if (args.type == that._physicalModel.SELECT && that._view.getSelected() != args["new"]) {
+			that._view.selectNode(that._model._containedIn[args["new"]].getID());
+		}
 	});
-	this._view.onevent.attach(function(sender, args) { if (args.type == 'selected') that._model.setSelected(args["new"]);});
+	this._view.onevent.attach(function(sender, args) {
+		if (args.type == 'selected') {
+			that._model.setSelected(args["new"]);
+			that._physicalModel.setPosition(args["new"]);
+		}
+	});
 };
 
 ( function() {
-	
-	/*
-	 * @description adds the given Element(a model Entry) to the View, if the supplied Element is a Branch,
-	 *  a new Branch within the view is created for all childs of the branch, buildTree is called
-	 *  recursively to add these Elements as well. If the Element is just an ordinary Page is added to
-	 *  the View as Page
-	 * @param element Model Object which shall be added
-	 * @param parentElement View Object where element will be added to
-	 * @param view View where the element will be added to parentElement  
+
+	/**
+	 * @public
+	 * @function
+	 * @name		buildTree
+	 * @memberOf	iview.chapter.Controller
+	 * @description	Adds the given element(a model entry) to the View, if the supplied element is a branch, a new branch within the view is created for all childs of the branch, buildTree is called recursivly to add these elements as well. If the element is just an ordinary Page is added to the View as Page
+	 * @param 		{object} element Model-object which shall be added
+	 * @param		{object} parentElement View-object where element will be added to
+	 * @param		{object} view View where the element will be added to parentElement
 	 */
 	function buildTree(element, parentElement, view) {
-		if (element instanceof iview.chapter.METSChapter) {
-			parentElement = view.addBranch({"label": element._entry.getLabel()}, parentElement);
+		if (element instanceof iview.METS.ChapterBranch) {
+			parentElement = view.addBranch({"label": element.getLabel(), "logid": element.getID(), "order":element.getOrder()}, parentElement);
 			jQuery.each(element.getEntries(), function(index, node) { buildTree(node, parentElement, view)});
 		} else {
-			view.addPage({"label": element.getLabel(), "dmdid": element.getID()}, parentElement);
+			view.addPage({"label": element.getLabel(), "logid": element.getID(), "order":element.getOrder()}, parentElement);
 		}
 	}
-	
-	/*
-	 * @description this function is called to create and show(depending on the View) the controller
-	 *  connected Model to the User.
-	 * @param parentID string of the Parent Element id or any other jQuery like construction which is able
-	 *  to identify an Object
+
+	/**
+	 * @public
+	 * @function
+	 * @name		createView
+	 * @memberOf	iview.chapter.Controller
+	 * @description	this function is called to create and show (depending on the View) the controller connected Model to the user
+	 * @param 		{string} parentID string of the paranet element id or any other jQuery like construction which is able to identify an object
 	 */
 	function createView(parentID) {
 		var entries = this._model.getEntries();
@@ -475,98 +276,56 @@ iview.chapter.Controller = function(modelProvider, view, metsDoc) {
 		//start creation Process for top Level Entries within List
 		jQuery.each(entries, function(index, entry){ buildTree(entry, that._view.getTree(), that._view)});
 		this._view.addTree(parentID);
+		this._view.selectNode(this._model._containedIn[this._physicalModel.getCurPos()].getID());
 	}
-	
-	/*
-	 * @description tells the view to show up
+
+	/**
+	 * @public
+	 * @function
+	 * @name		showView
+	 * @memberOf	iview.chapter.Controller
+	 * @description	tells the view to show up
 	 */
 	function showView() {
 		this._view.visible(true);
 	}
-	
-	/*
-	 * @description tells the view to hide itself
-	 */	
+
+	/**
+	 * @public
+	 * @function
+	 * @name		hideView
+	 * @memberOf	iview.chapter.Controller
+	 * @description	tells the view to hide itself
+	 */
 	function hideView() {
 		this._view.visible(false);
-	}
+	}	
 
-	/*
-	 * @description tells the View to change it's display mode to the currently opposite mode
-	 */	
+	/**
+	 * @public
+	 * @function
+	 * @name		toggleView
+	 * @memberOf	iview.chapter.Controller
+	 * @description	tells the view to change it's display mode to the currently opposite mode
+	 */
 	function toggleView() {
 		this._view.visible();
+	}
+	
+	/**
+	 * @public
+	 * @function
+	 * @name		getActive
+	 * @memberOf	iview.chapter.Controller
+	 * @description	returns the current state of the ChapterView (if its visible or not)
+	 */
+	function getActive() {
+		return this._view._visible;
 	}
 	
 	iview.chapter.Controller.prototype.createView = createView;
 	iview.chapter.Controller.prototype.showView = showView;
 	iview.chapter.Controller.prototype.hideView = hideView;
 	iview.chapter.Controller.prototype.toggleView = toggleView;
-})();
-
-/*
- * @name ModelProvider
- * @package iview.chapter
- * @description reads in a default Model from the supplied METS Document
- */
-iview.chapter.ModelProvider = function(metsDoc) {
-	this._model = null;
-	this._metsDoc = metsDoc || null;
-};
-
-( function() {
-	/*
-	 * @description Iterate through the current Nodes childs and add them to the model. If some of these childs 
-	 *  contain it's own childs, getStructure is recursively executed for these as well 
-	 * @param metsNode the current Node which childs are added, if a branch is detected getStructure is called
-	 *  to iterate these branched entries
-	 * @param parentEntry Optional the Parent Node where to add the current entries within the parent 
-	 */
-	function generateModelFromMets(metsNode, parentEntry) {
-		//Filter all Entries which are no Elementnodes, as they're no "data"
-		var childNodes = jQuery(metsNode.childNodes).filter(function() {return this.nodeType == 1});
-		var label;
-		for (var i = 0; i < childNodes.length; i++) {
-			var child = childNodes[i];
-			var type = jQuery(child).attr("TYPE").toLowerCase();
-			if (type != "page") {
-				//If we're on a branch, move the branch down and add all Elements at the current Position within it's parent
-				generateModelFromMets(child, parentEntry.addBranch({'label':jQuery(child).attr("LABEL")}));			
-			} else {
-				//Just an ordinary Entry so add it to the current Level
-				label = (jQuery(child).attr("LABEL") === undefined)? jQuery(child).attr("DMDID"):jQuery(child).attr("LABEL");
-				parentEntry.addPage({'label':label,'dmdid': jQuery(child).attr("DMDID")});
-			}
-		}
-	}
-
-	/*
-	 *@description Starts the Reading Process of the METS file
-	 */	
-	function createModel() {
-		if (this._model == null) {
-			this._model = new iview.chapter.Model();
-			//As the Mets file can contain multiple structMap Tags find the one we're using
-			var structures = getNodes(this._metsDoc, "mets:structMap");
-			for (var i = 0; i < structures.length; i++) {
-				if (jQuery(structures[i]).attr("TYPE").toLowerCase() == "logical") {
-					generateModelFromMets(structures[i], this._model);//Correct one found, start reading of Document
-					break;
-				}
-				alert("No Matching Structure Info was delivered with the given XML Document.")
-			}
-		}
-		return this._model;
-	}
-	
-	/*
-	 * @description Starts the Reading Process of the given XML document, at the end the model is filled with all Data which the XML contained
-	 * @param document the XML Document which contains the METS Data which is read  
-	 */
-	function setDocument(metsDoc) {
-		this._metsDoc = metsDoc;	
-	}
-	
-	iview.chapter.ModelProvider.prototype.createModel = createModel;
-	iview.chapter.ModelProvider.prototype.setDocument = setDocument;
+	iview.chapter.Controller.prototype.getActive = getActive;
 })();

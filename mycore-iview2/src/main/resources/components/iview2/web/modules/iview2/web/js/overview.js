@@ -1,265 +1,205 @@
-function overview(newId, parent, identer) {
-	var id = newId;//Overview-ID
-	var identer = identer; //Allows different Styles for given Groups
-	var divSizeHeight = null;//height if the single divBoxes
-	var divSizeWidth = null;//width of the single divBoxes
-	var previewSizeHeight = null;//height of the previewImages
-	var previewSizeWidth = null;//width of the previewImages
-	var scrollBarWidth = null;//width of the scrollbar
-	var amountHeight = null;//horizontal number of previewImages
-	var amountWidth = null;//vertical number of previewImages
-	var currentFirstRow = null;//linenumber  of the first line in the overview
-	var listener = [];//array who contains the individual listeners
-	var useScrollBar = true; // 'true' requires class ScrollBars.js
-	var scrollOverview = null;
-	var viewID = "";
-	var book = null;
-	var baseUri = "";
-	var numberOfPages = 0;
-	overview.PAGE_NUMBER = 0;
+//TODO @description und @param ergänzen, wo es noch fehlt
 
-//Function declarations:	
-	this.init = init;
-	this.actualize = actualize;
-	this.addListener = addListener;
-	this.getAmountHeight = getAmountHeight;
-	this.getAmountWidth = getAmountWidth;
-	//this.loadImagesFromLine = loadImagesFromLine;
-	this.resize = resize;
-	this.setViewID = setViewID;
-	this.setNumberOfPages = setNumberOfPages;
-	this.setCurrentFirstRow = setCurrentFirstRow;
-	this.setBook = setBook;
-	this.setBaseUri = setBaseUri;
-	/*
-	@description add Listeners to the listener-array
-	*/
-	function addListener(type, theListener) {
-		if (!listener[type]) {
-			listener[type] = [];
-		}
-		listener[type].push(theListener);
-	}
+/**
+ * @namespace
+ * @name		iview
+ */
+var iview = iview || {};
+/**
+ * @namespace	Package for Overview, contains Default Overview View and Controller
+ * @memberOf 	iview
+ * @name		overview
+ */
+iview.overview = iview.overview || {};
 
-	/*
-	@description adds the individual overview-blocks into the listener-array (?)
-	*/
-	function notifyListenerClick(value) {
-		if (!listener[overview.PAGE_NUMBER]) {
-			return;
-		}
-		for(var i = 0; i < listener[overview.PAGE_NUMBER].length; i++) {
-			listener[overview.PAGE_NUMBER][i].click(value);
-		}
-	}
+/**
+ * @class
+ * @constructor
+ * @version	1.0
+ * @memberOf	iview.overview
+ * @name	 	View
+ * @description View to display with a given template the underlying model
+ */
+iview.overview.View = function() {
+	this._mainClass;
+	this._customClass;	
+	this._divSize = {};
+	this._previewSize = {};
+	this._amount = {"width":0, "height":0};
+	this._scrollBarWidth = 0;
+	this._numberOfPages = -1;
+	this._currentFirstRow = -1;
+	this._selected = 0;
+	this._visible = true;
+	this._pages = [];
+	this._tileUrlProvider = null;
+	this._useScrollBar = true;
+	this.my = null;
+	this.onevent = new iview.Event(this);
+};
 
-	/*
-	@description creates container for the div-boxes
-	*/
-	function createContainers() {
-		//calculate the number of horizontal and vertical div-boxes
-		var el=document.getElementById(id);
-		amountWidth = Math.floor((parseInt(el.offsetWidth) - scrollBarWidth) / divSizeWidth);
-		amountHeight = Math.floor(parseInt(el.offsetHeight) / divSizeHeight);
-
-		// create target Div's
-		for (var i = 0; i < amountHeight; i++) {
-			for (var j = 0; j < amountWidth; j++) {
-				createAbsoluteObject("div", "divBox", id);
-				// container is later brought into the picture
-				//$("divBox").style.left = "-10000px";
-				prepareContainer(i,j);
-				preparePreview("divBox" + viewID +((i * amountWidth) + j), i, j);
-			}
+(function() {
+	/**
+	 * @public
+	 * @function
+	 * @name		disableScrollBar
+	 * @memberOf	iview.overview.View
+	 * @description	disables the use of scrollbar. If the View was already created the scrollbar will be removed
+	 */
+	function disableScrollBar() {
+		this._useScrollBar = false;
+		this._scrollBarWidth = 0;
+		if (this.my.bar) {
+			bar.detach();
 		}
 	}
-
-	/*
-	@description set styles for the containers
-	*/
-	function prepareContainer(i,j) {
-		// CSS
-		var divBox=jQuery("#divBox");
-		divBox.css("border-top-style", divBox.css("border-top-style"));
-		divBox.css("border-bottom-style", divBox.css("border-bottom-style"));
-		divBox.css("borderLeftStyle", divBox.css("border-left-style"));
-		divBox.css("borderRightStyle", divBox.css("border-right-style"));
-
-		divBox.css("borderTopWidth", divBox.css("border-top-width"));
-		divBox.css("borderBottomWidth", divBox.css("border-bottom-width"));
-		divBox.css("borderLeftWidth", divBox.css("border-left-width"));
-		divBox.css("borderRightWidth", divBox.css("border-right-width"));
-
-		divBox.css("borderTopColor", divBox.css("border-top-color"));
-		divBox.css("borderBottomColor", divBox.css("border-bottom-color"));
-		divBox.css("borderLeftColor", divBox.css("border-left-color"));
-		divBox.css("borderRightColor", divBox.css("border-right-color"));
-
-		divBox.css("backgroundColor", divBox.css("background-color"));
-
-		divBox.attr("id", "divBox" + viewID +((i * amountWidth) + j));
+	
+	/**
+	 * @public
+	 * @function
+	 * @name		setDivSize
+	 * @memberOf	iview.overview.View
+	 * @description	sets the size of the seperate which includes the image and the related infos
+	 * @param 		{object} divSize
+	 * @param		{float} divSize.width holds the width of the Divs
+	 * @param		{float} divSize.height holds the height of the Divs
+	 */
+	function setDivSize(divSize) {
+		this._divSize = {'width':toInt(divSize.width),
+						'height':toInt(divSize.height)};
 	}
 
-	/*
-	@description set styles for the preview-pictures
-	*/
-	function preparePreview (targetDiv, i, j) {
-
-		//prepare info-div
-		createAbsoluteObject("div", "infoDiv", targetDiv);
-		var infoDiv=document.getElementById("infoDiv");
-		infoDiv.style.left = ((divSizeWidth - parseInt(document.getElementById("infoDiv").offsetWidth)) / 2) + "px";
-		infoDiv.id="infoDiv" + viewID +((i * amountWidth) + j);
-
-		//prepare preview-image
-		createAbsoluteObject("img", "previewDiv" + viewID +((i * amountWidth) + j), targetDiv);
-		document.getElementById("previewDiv" + viewID +((i * amountWidth) + j)).style.cursor = 'pointer';
-
+	/**
+	 * @public
+	 * @function
+	 * @name		setPreviewSize
+	 * @memberOf	iview.overview.View
+	 * @description	sets the according size for every preview image div
+	 * @param 		{float} previewSize
+	 * @param		{float} previewSize.width width of the preview Image div
+	 * @param		{float} previewSize.height height of the preview Image div
+	 */
+	function setPreviewSize(previewSize) {
+		this._previewSize = {'width':toInt(previewSize.width),
+							'height':toInt(previewSize.height)};
 	}
-
-	/*
-	@description positioned the container and the div-boxes to the correct position
-	*/
-	function posOverviewContainers() {
-		var el=document.getElementById(id);
-		var distanceLeft = (((parseInt(el.offsetWidth)- scrollBarWidth) - (amountWidth * divSizeWidth)) / 2);
-		var distanceTop = ((parseInt(el.offsetHeight) - (amountHeight * divSizeHeight)) / 2);
-		var divBox;
-		// position target Div's
-		for (var i = 0; i < amountHeight; i++) {
-			for (var j = 0; j < amountWidth; j++) {
-				divBox=document.getElementById("divBox" + viewID +((i * amountWidth) + j));
-				divBox.style.height = divSizeHeight + "px";
-				divBox.style.width = divSizeWidth + "px";
-				divBox.style.left = (distanceLeft + (j * divSizeWidth)) + "px";
-				divBox.style.top = (distanceTop + (i * divSizeHeight)) + "px";
-			}
+	
+	/**
+	 * @public
+	 * @function
+	 * @name		setNumberOfPages
+	 * @memberOf	iview.overview.View
+	 * @description	sets the number of pages the document has
+	 * @param	 	{float} value number of pages 
+	 */
+	function setNumberOfPages(value) {
+		this._numberOfPages = toInt(value);
+		if (this._numberOfPages < 0) {
+			this._numberOfPages *= -1;
 		}
 	}
-
-	/*
-	@description create Scrollbar in the overview
-	*/
-	function prepareScrollBar() {
-		// embed/configure scrollbar
-		scrollOverview = new scrollBar("scrollOV"+viewID, "scrollOV" + identer, "");
-		scrollOverview.init(false,50);
-		scrollOverview.addListener(scrollBar.LIST_STEP, new function() {
-			this.steped = function(value) {
-				// first condition: there are more images that should be shown
-				// second condition: all images fits in the current screen
-				if ((currentFirstRow + value > 0 && (numberOfPages > (((amountHeight - 1) + currentFirstRow + value) * amountWidth))) ||
-		  			(currentFirstRow + value == 0 /*&& (numberOfPages <= (amountHeight * amountWidth))*/)) {
-						setCurrentFirstRow(currentFirstRow + value);
-						loadImages();
-				}
-			};
-		});
-		var el=document.getElementById(id);
-		scrollOverview.setParent(id);
-		scrollOverview.setSize(el.offsetHeight);
-		scrollOverview.setStepper(true);
-		// IE specific, remove absolute Value
-		if(window.attachEvent && !window.opera) {
-			scrollOverview.my.bar.parentNode.style.width = '27px'; scrollOverview.my.bar.style.left = '0px';
-		}
-
-		// register additional Events
-		ManageEvents.addEventListener(document, 'mousemove', scrollOverview.mouseMove, false);
-		ManageEvents.addEventListener(document, 'mouseup', scrollOverview.mouseUp, false);
-		// default mouseScroll event von Scrollbar entfernen, da sonst doppelt registriert
-		ManageEvents.removeEventListener(getElementsByClassName("empty","scrollOV"+viewID,"div")[0], 'mouseScroll', scrollOverview.scroll, false);
-		ManageEvents.addEventListener(el, 'mouseScroll', scrollOverview.scroll, false);
+	
+	/**
+	 * @public
+	 * @function
+	 * @name		addPage
+	 * @memberOf	iview.overview.View
+	 * @description	adds another page to the list
+	 * @param 		{integer} id holds the id of the page which is added
+	 * @param		{string} href path to the image which is added
+	 */
+	function addPage(id, href) {
+		this._pages[id] = href;
 	}
-
-	/*
-	@description initialize-function for the overview
-	*/
-	function init() {
-		// Main
-		var main = document.createElement("div");
-		main.id = id;
-		main.className = "overview" + identer;
-		// Browser-Drag&Drop deaktiveren
-		main.onmousedown = function(){return false;}; //so that browser-drag-&-drop disabled
-		document.getElementById(parent).appendChild(main);
 		
-		// define divSize	
-		tmp = getCssProps("divBox", "", id, ["width", "border-left-width", "border-right-width", "height", "border-top-width", "border-bottom-width"], "parseInt")
-		divSizeWidth = tmp[0] + tmp[1] + tmp[2];
-		divSizeHeight = tmp[3] + tmp[4] + tmp[5];
-
-		// define previewSize
-		tmp = getCssProps("previewImage", "", id, ["width", "height"], "parseInt");
-		previewSizeWidth = tmp[0];
-		previewSizeHeight = tmp[1];
-
-		createContainers();
-		posOverviewContainers();
-		
-		if (useScrollBar) {
-			//define scrollBarWidth	
-			scrollBarWidth = getCssProps("scrollOVV" + identer, "scrollOVV" + identer, id, ["width"], "parseInt")[0];
-			
-			prepareScrollBar();
+	/**
+	 * @public
+	 * @function
+	 * @name		resize
+	 * @memberOf	iview.overview.View
+	 * @description	resizes the overview when the size of the browser is changing
+	 */
+	function resize() {
+		createContainer(this);
+		posOverviewContainer(this);
+		if (this._visible) {
+			loadImages(this);
 		}
 	}
-
-	/*
-	@description if overview is already created and is called so load loadImagesFromLine() and the scrollbar 
-	*/
-	function actualize(pageNumber) {
-
-		currentFirstRow = Math.floor((parseInt(pageNumber) - 1) / amountWidth) ;
-		// if overview is to big for remaining pages
-		if (currentFirstRow + amountHeight - 1 > Math.ceil(numberOfPages / amountWidth) - 1) {
-			currentFirstRow = Math.ceil(numberOfPages / amountWidth) - amountHeight;
-		}
-		// if all pages fit in overview
-		if (currentFirstRow < 0) {
-			currentFirstRow = 0;
-		}
-		
-		// TODO: Können eigentlich nicht (mehr) eintreten die Fälle
-		/*
-		//load preview-images in the overview if they exists
-		if (currentFirstRow >= 0 && (((amountHeight + currentFirstRow - 1) * amountWidth) <= numberOfPages - 1) ||
-		   (numberOfPages <= (amountHeight * amountWidth) && currentFirstRow == 0) ) {*/
-			loadImages(currentFirstRow);
-		//}				
-		// shift scrollbar to the actually start-line
-		if (useScrollBar) {
-			scrollOverview.setValue(currentFirstRow);
+	
+	/**
+	 * @public
+	 * @function
+	 * @name		setSelected
+	 * @memberOf	iview.overview.View
+	 * @description	takes the given pagenumber and adapts the view in that way that the selected one is visible
+	 * @param 		{integer} value pagenumber of the newly selected entry
+	 */
+	function setSelected(value) {
+		this._selected = toInt(value);
+		calculateFirstRow(this);
+		if (this.my.bar) {
+			this.my.barObj.setCurValue(this._currentFirstRow);
 		}
 	}
-
-	/*
-	@description load the overview so, that the actually picture is in first line
-	*/
-	function loadImages() {
-		// für spätere Prüfung "initialisiert"
-		var delFrom = amountHeight;
-		
-		//currentcurrentFirstRow = currentFirstRow;
+	
+	/**
+	 * @public
+	 * @function
+	 * @name		visible
+	 * @memberOf	iview.overview.View
+	 * @description	makes the View visible depending on the given boolean value, if no value is given the View will switch in the opposite mode than it's currently
+	 * @param 		{boolean} bool holds the state into which the View shall switch
+	 */
+	function visible(bool) {
+		if (typeof bool === "undefined") {
+			bool = !this._visible;
+		}
+		if (bool == true) {
+			this._visible = true;
+			//we're getting displayed so show the User the latest stuff
+			this.resize();
+			this.my.self.css("visibility", "visible");
+			this.my.self.slideDown("slow");
+		} else {
+			this._visible = false;
+			//TODO will be no longer needed as soon as jQuery 1.4.4 is used, as this version is able to gain size for hidden elements
+			var that = this.my.self;
+			this.my.self.slideUp("slow", function() {that.css("display", "block")});
+			this.my.self.css("visibility", "hidden");
+		}
+	}
+	
+	/**
+	 * @private
+	 * @function
+	 * @name		loadImages
+	 * @memberOf	iview.overview.View
+	 * @description	load the overview so that the actually picture is in first line
+	 * @param 		{instance} that
+	 */	
+	function loadImages(that) {
+		// for later check initialized
+		var delFrom = that._amount.height;		
 		
 		var divBox;
 		// proceed line wise
-		for (var i = 0; i < amountHeight; i++) {
-			for (var j = 0; j < amountWidth; j++) {
-				divBox=document.getElementById("divBox" + viewID +((i * (amountWidth)) + j));
-				//get back previously hidden div's
-				divBox.style.display = "block";
+		for (var i = 0; i < that._amount.height; i++) {
+			for (var j = 0; j < that._amount.width; j++) {
+				divBox= that.my.pictures[(i * (that._amount.width)) + j];
+				//get back previously hidden div's and set the picPos it represents
+				divBox.css("display", "block").attr("page",((i + that._currentFirstRow) * that._amount.width) + j);
 				
 				//load needed Previews
-				if ((((i + currentFirstRow) * amountWidth) + j) < numberOfPages) {
-					loadSingleImage(i, j);
+				if ((((i + that._currentFirstRow) * that._amount.width) + j) < that._numberOfPages) {
+					loadSingleImage(that, divBox);
 				}
 				// last line who contains pages
-				if ((i + currentFirstRow) >= (Math.floor((numberOfPages) / amountWidth))) {
+				if ((i + that._currentFirstRow) >= (Math.floor((that._numberOfPages) / that._amount.width))) {
 					// page not existing???
-					if ((((currentFirstRow + i) * amountWidth)+j) > (numberOfPages - 1)) {
-						divBox.style.display = "none";
-						if (i <= amountHeight) {
+					if ((((that._currentFirstRow + i) * that._amount.width)+j) > (that._numberOfPages - 1)) {
+						divBox.css("display", "none");
+						if (i <= that._amount.height) {
 							delFrom = i + 1;
 						}
 					}
@@ -267,159 +207,418 @@ function overview(newId, parent, identer) {
 			}
 		}
 		// to remove redundant divs when the pagenumbers are small
-		if (delFrom < amountHeight) {
-			for (var i = delFrom; i < amountHeight; i++) {
-				for (var j = 0; j < amountWidth; j++) {
-					document.getElementById("divBox" + viewID +((i * (amountWidth)) + j)).style.display = "none";
-				}
+		if (delFrom < that._amount.height) {
+			for (var i = delFrom * that._amount.width; i < that.my.pictures.length; i++) {
+				that.my.pictures[(i * (that._amount.width)) + j].css("display", "none");
 			}
 		}
 	}
-
-	/*
-	@description preloads the preview-image
-	*/
-	function loadSingleImage(i, j) {
-		var pageName = findInArrayElement(nodeProps(book, "mets:file", (((i + currentFirstRow) * amountWidth) + j), true), "LOCTYPE", "URL").href;
-
-		var source = Iview[viewID].viewerBean.tileUrlProvider.assembleUrl(0, 0, 0, pageName);
-		var preview = document.getElementById("previewDiv" + viewID +((i * amountWidth) + j));
+	
+	/**
+	 * @private
+	 * @function
+	 * @name		loadSingleImage
+	 * @memberOf	iview.overview.View
+	 * @description	load the separate pictures in the according divboxes
+	 * @param 		{instance} that image that is loaded
+	 * @param 		{object} divBox the according div box which contains one image
+	 */
+	function loadSingleImage(that, divBox) {
+		var pageName = that._pages[toInt(divBox.attr("page"))+1];
+		var source = that._tileUrlProvider.assembleUrl(0, 0, 0, pageName);
+		var preview = jQuery(divBox.children("img")[0]);
 		
-		// nicht sicher ob das so in allen Browsern funktioniert
-		// linking the previews with the viewer, only if this wasen't done in past
-		//if (!(ManageEvents.findEvents($("previewDiv" + viewID +((i * amountWidth) + j)),"click",""))) {
-			//ManageEvents.addEventListener($("previewDiv" + viewID +((i * amountWidth) + j)), 'click', function(e) {notifyListenerClick((((i + currentFirstRow) * amountWidth) + j) + 1);}, true);
-			preview.onclick =  function(e) {notifyListenerClick((((i + currentFirstRow) * amountWidth) + j) + 1);};
-		//}
-		
-		// original Values needs, because Img will scale automatic in each Props
+		// original Values needed, because Img will scale automatic in each Props
 		var origImage = new Image;
-		origImage.onload = function() {trimImage(preview, source, origImage.height, origImage.width);};
+		origImage.onload = function() {trimImage(preview, source, {'height':origImage.height, 'width':origImage.width}, that);};
 		origImage.src = source;
 		
 		// fill Info div
-		var infoDiv=document.getElementById("infoDiv" + viewID +((i * amountWidth) + j));
-		infoDiv.innerHTML = pageName;
-		infoDiv.title = pageName;
-		// page 0 doesn't exist
-		
-		// nett anzuschaun ist es auch, wenn source bereits vor onload des origImage gesetzt wird, da die Bilder dann sichtbar zusammenschrumpfen
-		// Muss man gegebenenfalls zuerst das Bild unsichtbar machen und dann wieder einblenden sobald es fertig geladen & geschrumpft ist.
+		var infoDiv=jQuery(divBox.children("div.infoDiv")[0]);
+		infoDiv.html(pageName);
+		infoDiv.attr("title", pageName);
 	}
-
-
-	/*
-	@desciption fits picture to the correct size within the divBox
-	*/
-	function trimImage(preview, source, origHeight, origWidth) {
-		preview.src = source;
+	
+	/**
+	 * @private
+	 * @function
+	 * @name		trimImage
+	 * @memberOf	iview.overview.View
+	 * @description	fits picture to the correct size within the divBox
+	 * @param 		{object} preview image which is displayed
+	 * @param 		{string} source path to the image
+	 * @param		{object} orig original image
+	 * @param		{instance} that
+	 */
+	function trimImage(preview, source, orig, that) {
+		preview.attr("src", source);
 	
 		// scale preview-images
-		var scaleFactorH = (previewSizeHeight / origHeight);
-		var scaleFactorW = (previewSizeWidth / origWidth);
+		var scaleFactorH = (that._previewSize.height / orig.height);
+		var scaleFactorW = (that._previewSize.width / orig.width);
 		
 		if (scaleFactorH <= 1) {
 			// image is higher then div
 			if (scaleFactorW <= 1) {
 				// image is wider than the div
 				if (scaleFactorW < scaleFactorH) {
-					preview.style.width = previewSizeWidth + "px";
-					preview.style.height = (origHeight * scaleFactorW) + "px";
+					preview.css("width", that._previewSize.width + "px");
+					preview.css("height", orig.height * scaleFactorW + "px");
 				} else {
-					preview.style.width = (origWidth * scaleFactorH) + "px";
-					preview.style.height = previewSizeHeight + "px";
+					preview.css("width", orig.width * scaleFactorH + "px");
+					preview.css("height", that._previewSize.height + "px");
 				}
 			} else {
 				// image is smaller than the div
-				preview.style.width = (origWidth * scaleFactorH) + "px";
-				preview.style.height = previewSizeHeight + "px";
+				preview.css("width", orig.width * scaleFactorH + "px");
+				preview.css("height", that._previewSize.height + "px");
 			}
-
 		} else {
 			// image is lower than the div
 			if (scaleFactorW <= 1) {
 				// image is wider than the div
-				preview.style.width = previewSizeWidth + "px";
-				preview.style.height = (origHeight * scaleFactorW) + "px";
+				preview.css("width", that._previewSize.width + "px");
+				preview.css("height", orig.height * scaleFactorW + "px");
 			} else {
 				// image is smaller than the div
 				if (scaleFactorW < scaleFactorH) {
-					preview.style.width = previewSizeWidth + "px";
-					preview.style.height = (origHeight * scaleFactorW) + "px";
+					preview.css("width", that._previewSize.width + "px");
+					preview.css("height", orig.height * scaleFactorW + "px");
 				} else {
-					preview.style.width = (origWidth * scaleFactorH) + "px";
-					preview.style.height = previewSizeHeight + "px";
+					preview.css("width", orig.width * scaleFactorH + "px");
+					preview.css("height", that._previewSize.height + "px");
 				}
 			}
 		}
-		// center previews horz & vert
-		// (infoDivs sind alle gleich groß)
-		preview.style.top = ((parseInt(document.getElementById("infoDiv" + viewID + "0").offsetTop) - 
-						parseInt(preview.style.height)) / 2) + "px";
-		preview.style.left = ((divSizeWidth - preview.offsetWidth) / 2) + "px";
-	}
-
-	function resize() {
-		clearOverview();
-		createContainers();
-		posOverviewContainers();
-		if (useScrollBar) {
-			prepareScrollBar();
-			// because no change in NumberofPages while resizing
-			scrollOverview.setSteps(Math.ceil(numberOfPages / amountWidth) - amountHeight + 1);
-		}
-	}
-
-	/*
-	@description clears the overview
-	*/
-	function clearOverview() {
-		var curOverview=document.getElementById(id);
-		var isVisible = curOverview.style.visibility;
-		var myParent = curOverview.parentNode;
-		myParent.removeChild(curOverview);
 		
-		var resetOverview = document.createElement("div");
-		resetOverview.id = id;
-		resetOverview.className = "overview" + identer;
-		resetOverview.onmousedown = function(){return false;}; //so that browser-drag-&-drop remains disabled after resize
-		myParent.appendChild(resetOverview);
-		resetOverview.style.visibility = isVisible;
-	}
-
-	function getAmountHeight() {
-		return amountHeight;
-	}
-
-	function getAmountWidth() {
-		return amountWidth;
+		// center previews horz & vert
+		// (infoDivs are all same within with width and size)
+		preview.css("left", (preview.parent().width() - preview.outerWidth(true)) / 2 + "px");
 	}
 	
-	/*
-	@description sets the ID which is needed for multiple Viewers on a page so that they different components are connected properly together
-	@param id the ID of the Viewer the class is connected to
-	*/
-	function setViewID(id) {
-		viewID = id;
-	}
-
-	function setBook(value) {
-		book = value;
-	}
-
-	function setNumberOfPages(value) {
-		numberOfPages = value;
-		// set step-number for the scrollbar
-		if (useScrollBar) {
-			scrollOverview.setSteps(Math.ceil(numberOfPages / amountWidth) - amountHeight + 1);
+	/**
+	 * @private
+	 * @function
+	 * @name		calculateFirstRow
+	 * @memberOf	iview.overview.View
+	 * @description	if overview is already created and is called so load loadImageFromLine() and adjust scrollbar
+	 * @param	 	{instance} that 
+	 */
+	function calculateFirstRow(that) {
+		that._currentFirstRow = Math.floor((parseInt(that._selected) - 1) / that._amount.width);
+		// if overview is to big for remaining pages
+		if (that._currentFirstRow + that._amount.height - 1 > Math.ceil(that._numberOfPages / that._amount.width) - 1) {
+			that._currentFirstRow = Math.ceil(that._numberOfPages / that._amount.width) - that._amount.height;
+		}
+		// if all pages fit in overview
+		if (that._currentFirstRow < 0) {
+			that._currentFirstRow = 0;
+		}
+		loadImages(that);
+		// shift scrollbar to the actually start-line
+		if (that._useScrollBar) {
+			that.my.barObj.setCurValue(currentFirstRow);
 		}
 	}
 	
-	function setCurrentFirstRow(value) {
-		currentFirstRow = value;
+	/**
+	 * @private
+	 * @function
+	 * @name		createContainer
+	 * @memberOf	iview.overview.View
+	 * @description	creates all containers which are used for the overview (#container == #previewImages)
+	 * @param 		{instance} that 
+	 */
+	function createContainer(that) {
+		//calculate the number of horizontal and vertical div-boxes
+		var el=that.my.self;
+		var width = Math.floor((el.width() - that._scrollBarWidth) / that._divSize.width);
+		var height = Math.floor(el.height() / that._divSize.height);
+		//dont do not needed work if everything is just fine
+		if (width == that._amount.width && height == that._amount.height) return;
+		that._amount = {
+			'width': width,
+			'height': height};
+		
+		if (that.my.bar) {
+			that.my.barObj.setMaxValue(Math.ceil(that._numberOfPages/width)-height);
+			that.my.barObj.setProportion(1/Math.abs(Math.ceil(that._numberOfPages/width)-height+1));
+		}
+		
+		//clear the old pictures if there
+		jQuery(that.my.pictures).each(function(pos, element) {
+			if (!element) return;//needed as the resize can happen more often than this element exists
+			element.detach();
+			delete that.my.pictures[pos];
+		});
+		// create target Div's
+		for (var i = 0; i < that._amount.height; i++) {
+			for (var j = 0; j < that._amount.width; j++) {
+				var infoDiv = jQuery("<div>")
+					.addClass("infoDiv");
+				
+				var prevImg = jQuery("<img>")
+					.addClass("previewDiv")
+					.css("cursor", "pointer");
+				//adding them to the list of available containers so we can access them easily
+				that.my.pictures[i*that._amount.width + j] = jQuery("<div>")
+					.addClass("divBox")
+					.attr("no",(i * that._amount.width) + j)
+					.css("float", "left")
+					.appendTo(that.my.picContainer)
+					.append(infoDiv)
+					.append(prevImg)
+					.click(function() {
+						that.onevent.notify({"new": toInt(jQuery(this).attr("page")), 'type':that.CLICK});
+					});
+			}
+		}
 	}
 	
-	function setBaseUri(uri) {
-		baseUri = uri;
+	/**
+	 * @private
+	 * @function
+	 * @name		posOverviewContainer
+	 * @memberOf	iview.overview.View
+	 * @description	positions nicely the divBoxes within the available Space
+	 * @param	 	{instance} that the overview object where the code is run in
+	 */
+	function posOverviewContainer(that) {
+		that._scrollBarWidth = ((that.my.bar)? that.my.bar.outerWidth(true): 0);
+	
+		if (that.my.bar) {
+			that.my.barObj.setSize(that.my.self.height());
+		}
+		that.my.picContainer.css("width", that.my.self.innerWidth() - that._scrollBarWidth);
+
+		that.my.picContainer.css("padding", 0);//reset everything else it does subsum and we screw everything up
+		that.my.picContainer.css("padding-left",
+				(that.my.picContainer.innerWidth() - (that.my.pictures[0].outerWidth(true)*that._amount.width))/2 + "px");
+		that.my.picContainer.css("padding-top",
+				(that.my.self.innerHeight() - (that.my.pictures[0].outerHeight(true)*that._amount.height))/2 + "px");
 	}
-}
+	
+	/**
+	 * @public
+	 * @function
+	 * @name		createView
+	 * @memberOf	iview.overview.View
+	 * @description	create the view in the overview
+	 * @param	 	{object} args
+	 * @param		{string} args.mainClass tells what the main Class for the scrollbar shall be
+	 * @param		{string} args.customClass allows it to modify the Scrollbar in parts to differ from others
+	 * @param		{String,DOM-Object,anything jQuery supports} parent DOM element to which the overview is added
+	 * @param 		{string} [arguments[1]] tells the id of the overview. This property isn't needed as the
+	 *  scrollbar works just fine without ids. The id maybe only needed if you plan to perform custom
+	 *  transformations on the scrollbar DOM
+	 */
+	function createView(args) {
+		this._mainClass = args.mainClass || "";
+		this._customClass = args.customClass || "";
+		
+		var main = jQuery("<div>").addClass(this._mainClass + " " + this._customClass)
+		.appendTo(args.parent)
+		.css("visibility", "hidden");
+		
+		if (typeof arguments[1] !== "undefined") {
+			main.attr("id", arguments[1]);
+		}
+		
+		//deactivate Browser Drag&Drop
+		main.mousedown(function() {return false;});
+		
+		var picContainer = jQuery("<div>").addClass("picContainer").appendTo(main);
+		
+		this.my = {'self':main, 'picContainer': picContainer, 'pictures': []};
+
+		this._useScrollBar = args._useScrollBar;
+		if (args.useScrollBar) {
+			prepareScrollBar(this);
+		}
+		
+		createContainer(this);
+		posOverviewContainer(this);
+		calculateFirstRow(this);
+		var that = this;
+		jQuery(window).resize(function() {that.resize()});
+		loadImages(this);
+	}
+	
+	/**
+	 * @private
+	 * @function
+	 * @name		prepareScrollBar
+	 * @memberOf	iview.overview.View
+	 * @description	create Scrollbar in the overview
+	 * @param 		{instance} that 
+	 */
+	function prepareScrollBar(that) {
+		var scrollbar = new iview.scrollbar.Controller();
+		var parent = that.my.self;
+		scrollbar.createView({ 'direction': 'vertical', 'parent': parent, 'mainClass': 'scroll', 'type':'stepper'});
+		scrollbar._model.onevent.attach(function(sender,args){
+			if (args.type == "curVal") {
+				that._currentFirstRow = args["new"];
+				loadImages(that);
+			}
+		});
+		scrollbar.setSize(parent.height());
+		scrollbar.setStepByClick(1);
+		scrollbar.setJumpStep(1);
+		
+		// register additional Events
+		scrollbar.addEventFrom("mousemove", parent);
+		scrollbar.addEventFrom("mouseup", parent);
+		scrollbar.addEventFrom("mousescroll", parent);
+		that.my.bar = jQuery(parent.find(".scrollV:first")[0]);
+		that.my.barObj = scrollbar;
+	}
+	
+	/**
+	 * @public
+	 * @function
+	 * @name		setTileUrlProvider
+	 * @memberOf	iview.overview.View
+	 * @description	set the tileUrlProvider from which the tiles are taken
+	 * @param 		{tileUrlProvider} provider which gives preview tiles
+	 */
+	function setTileUrlProvider(provider) {
+		this._tileUrlProvider = provider;
+	}
+	
+	iview.overview.View.prototype.createView = createView;
+	iview.overview.View.prototype.setDivSize = setDivSize;
+	iview.overview.View.prototype.resize = resize;
+	iview.overview.View.prototype.setNumberOfPages = setNumberOfPages;
+	iview.overview.View.prototype.setSelected = setSelected;
+	iview.overview.View.prototype.visible = visible;
+	iview.overview.View.prototype.addPage = addPage;
+	iview.overview.View.prototype.setTileUrlProvider = setTileUrlProvider;
+	iview.overview.View.prototype.setPreviewSize = setPreviewSize;
+	iview.overview.View.prototype.disableScrollBar = disableScrollBar;
+	iview.overview.View.prototype.CLICK = 1;
+})();
+
+/**
+ * @class
+ * @constructor
+ * @version		1.0
+ * @memberOf	iview.overview
+ * @name 		Controller
+ * @description Controller for Overview
+ */
+iview.overview.Controller = function(modelProvider, view, tileUrlProvider) {
+	this._model = modelProvider.createModel();
+	this._view = new (view || iview.overview.View)();
+	this._tileUrlProvider = tileUrlProvider;
+	var select = this._model.SELECT;
+	var that = this;
+	
+	this._model.onevent.attach(function(sender, args) {
+		if (args.type == select) {
+			that._view.setSelected(args["new"]);
+		}
+	});
+	
+	this._view.onevent.attach(function(sender, args) {
+		if (args.type == that._view.CLICK) {
+			that._view.visible(false);
+			that._model.setPosition(args["new"]+1);
+		}
+	});
+};
+
+(function() {
+	
+	/**
+	 * @public
+	 * @function
+	 * @name		createView
+	 * @memberOf	iview.overview.Controller
+	 * @description	creates the view for the overview
+	 * @param 		{object} args
+	 * @param		{string} args.mainClass tells what the main Class for the scrollbar shall be
+	 * @param		{string} args.customClass allows it to modify the Scrollbar in parts to differ from others
+	 * @param		{String,DOM-Object,anything jQuery supports} parent DOM element to which the overview is added
+	 * @param		{boolean} args.useScrollBar tells if the overview will use a scrollbar or not
+	 */
+	function createView(args) {
+		this._view.setNumberOfPages(this._model.getNumberOfPages())
+		this._view.setDivSize({'width':200, 'height':200});
+		this._view.setPreviewSize({'width':180, 'height':160});
+		this._view.setTileUrlProvider(this._tileUrlProvider);
+		var iter = this._model.iterator();
+		var temp;
+		while (iter.hasNext()) {
+			temp = iter.next();
+			this._view.addPage(temp.getOrder(), temp.getHref())
+		}
+		this._view.createView({
+			'mainClass': args.mainClass,
+			'customClass':args.customClass,
+			'useScrollBar':args.useScrollBar,
+			'parent':args.parent});
+	}
+	
+	/**
+	 * @public
+	 * @function
+	 * @name		showView
+	 * @memberOf	iview.overview.Controller
+	 * @description	tells the view to hide itself
+	 */
+	function showView() {
+		this._view.visible(true);
+	}
+	/**
+	 * @public
+	 * @function
+	 * @name		hideView
+	 * @memberOf	iview.overview.Controller
+	 * @description	tells the view to hide itself
+	 */	
+	function hideView() {
+		this._view.visible(false);
+	}
+
+	/**
+	 * @public
+	 * @function
+	 * @name		toggleView
+	 * @memberOf	iview.overview.Controller
+	 * @description	tells the View to change it's display mode to the currently opposite mode
+	 */
+	function toggleView() {
+		this._view.visible();
+	}
+	
+	/**
+	 * @public
+	 * @function
+	 * @name		setSelected
+	 * @memberOf	iview.overview.Controller
+	 * @description	takes the given pagenumber and adapts the view in that way that the selected one is visible
+	 * @param 		{integer} value pagenumber of the newly selected entry 
+	 */
+	function setSelected(value) {
+		this._view.setSelected(value);
+	}
+	
+	/**
+	 * @public
+	 * @function
+	 * @name		getActive
+	 * @memberOf	iview.overview.Controller
+	 * @description	returns the current state of the OverviewView (if its visible or not)
+	 */
+	function getActive() {
+		return this._view._visible;
+	}
+	
+	iview.overview.Controller.prototype.createView = createView;
+	iview.overview.Controller.prototype.showView = showView;
+	iview.overview.Controller.prototype.hideView = hideView;
+	iview.overview.Controller.prototype.toggleView = toggleView;
+	iview.overview.Controller.prototype.setSelected = setSelected;
+	iview.overview.Controller.prototype.getActive = getActive;
+})();

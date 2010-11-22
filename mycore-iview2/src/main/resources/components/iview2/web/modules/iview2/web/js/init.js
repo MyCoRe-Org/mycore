@@ -1,5 +1,11 @@
-var viewid;
-
+/**
+ * @public
+ * @function
+ * @name	initializeGraphic
+ * @memberOf	iview.init
+ * @description	here some important values and listener are set correctly, calculate simple image name hash value to spread request over different servers and initialise the viewer
+ * @param 	{string} viewID ID of the derivate
+ */
 function initializeGraphic(viewID) {
 	Iview[viewID].zoomScale = 1;//init for the Zoomscale is changed within CalculateZoomProp
 	Iview[viewID].loaded = false;//indicates if the window is finally loaded
@@ -112,12 +118,20 @@ function initializeGraphic(viewID) {
 		iviewTileUrlProvider.imageHashes[image]=hash;
 		return hash;
 	}
+
+	/**
+	 * returns the URL of all tileimages
+	 */
 	iviewTileUrlProvider.assembleUrl = function(xIndex, yIndex, zoom, image){
 		image=(image == null)? this.prefix : image;
 	    return this.baseUri[(iviewTileUrlProvider.getImageHash(image)+xIndex+yIndex) % this.baseUri.length] + '/'+ this.derivate+'/' + 
 	        image + '/' + zoom + '/' + yIndex + '/' + xIndex + '.' + this.extension +
 	        (PanoJS.REVISION_FLAG ? '?r=' + PanoJS.REVISION_FLAG : '');
 	};
+
+	/**
+	 * initialise the viewer
+	 */
 	if (Iview[viewID].viewerBean == null) {
 		Iview[viewID].viewerBean = new PanoJS("viewer"+viewID, {
 			initialPan: {'x' : 0, 'y' : 0 },//Koordianten der oberen linken Ecke
@@ -304,11 +318,18 @@ function initializeGraphic(viewID) {
 	}
 	
 	PanoJS.mousePressedHandler = function(e) {
-			maximizeHandler(this.parentNode.id.substring(length,this.parentNode.id.length));
+			maximizeHandler(this.backingBean.viewID);
 	}
-	
 }
 
+/**
+ * @public
+ * @function
+ * @name	reinitializeGraphic
+ * @memberOf	iview.init
+ * @description	is called if the viewer size is resized and calculates/set therefore all values for the current zoomlevel and viewModus (i.e. scrrenWidth)
+ * @param 	{string} viewID ID of the derivate
+ */
 function reinitializeGraphic(viewID) {
 	// TODO: attention on the runtime, if to slow, then the viewer will be shown shortly
 	// --> eventuell sogar rausschieben falls sinnvoll - moeglich
@@ -355,14 +376,9 @@ function reinitializeGraphic(viewID) {
 		pictureWidth(viewID);
 	}
 	
-	if (Iview[viewID].useOverview && typeof(Iview[viewID].overview1)!='undefined') {
-		Iview[viewID].overview1.resize();
-		// Aktualisierung nur wenn Overview geoeffnet ist, sonst erst beim Oeffnen
-		if (Iview[viewID].overviewActive) {
-			Iview[viewID].overview1.actualize(Iview[viewID].pagenumber);
-		}
-		// Anpassung des Black-Blank (zum Faden)
-		document.getElementById("blackBlank"+viewID).style.height = viewerContainer.offsetHeight + "px";
+	if (Iview[viewID].useOverview && Iview[viewID].overview && Iview[viewID].overview.getActive()) {
+		// actualize Overview only if visible else delay it upto the reopening
+		Iview[viewID].overview.setSelected(Iview[viewID].PhysicalModel.getCurPos());
 	}
 	
 	handleResizeScrollbars(viewID);
@@ -373,11 +389,22 @@ function reinitializeGraphic(viewID) {
 	}
 	
 	// Actualize forward & backward Buttons
-	getElementsByClassName("BSE_forwardBehind "+viewID, "viewerContainer"+viewID, "div")[0].style.top = ((((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - 1)) * Iview[viewID].zoomScale) - toInt(getStyle(getElementsByClassName("BSE_forwardBehind "+viewID, "viewerContainer"+viewID, "div")[0],"height"))) / 2) + "px";
-	getElementsByClassName("BSE_backwardBehind "+viewID, "viewerContainer"+viewID, "div")[0].style.top = ((((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - 1)) * Iview[viewID].zoomScale) - toInt(getStyle(getElementsByClassName("BSE_backwardBehind "+viewID, "viewerContainer"+viewID, "div")[0],"height"))) / 2) + "px";
+	var previewTbView = jQuery(Iview[viewID].getToolbarCtrl().getView("previewTbView").toolbar);
+	var newTop = ((((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - 1)) * Iview[viewID].zoomScale) - (toInt(previewTbView.css("height")) + toInt(previewTbView.css("padding-top")) + toInt(previewTbView.css("padding-bottom")))) / 2) + "px";
+	if (Iview[viewID].viewerContainer.hasClass("viewerContainer min")) {
+		Iview[viewID].viewerContainer.find(".toolbars .toolbar").css("top", newTop);
+	}
 }
 
 // uses the callback format GSIV.{className}Handler
+/**
+ * @public
+ * @function
+ * @name	maximizeHandler
+ * @memberOf	iview.init
+ * @description	maximize and show the viewer with the related image or minimize and close the viewer
+ * @param 	{string} viewID ID of the derivate
+ */
 function maximizeHandler(viewID) {
 	if (Iview[viewID].maximized) {
 		if (window.location.search.get("jumpback") == "true"){
@@ -386,7 +413,7 @@ function maximizeHandler(viewID) {
 		}
 		Iview[viewID].maximized = false;
 		
-		// viewer wieder einh�ngen
+		// viewer wieder einhängen
 		Iview[viewID].VIEWER = document.body.firstChild;
 		
 		// Dokumenteninhalt loeschen
@@ -402,8 +429,6 @@ function maximizeHandler(viewID) {
 		}
 		
 		// aktuellen Viewer hinzufuegen
-		//document.getElementById("viewerParent").appendChild(Iview[viewID].VIEWER);
-		//document.getElementById("viewerParent").id = null;
 		document.getElementById("viewerParent").insertBefore(Iview[viewID].VIEWER, currentPos);
 				
 		/*if (document.compatMode == "CSS1Compat") {
@@ -416,22 +441,16 @@ function maximizeHandler(viewID) {
 			openOverview(viewID);
 		}
 
-		if (classIsUsed("BSE_fullView")) doForEachInClass("BSE_fullView", ".style.display = 'block';", viewID);
-		if (classIsUsed("BSE_normalView")) doForEachInClass("BSE_normalView", ".style.display = 'none';", viewID);
-		
-		// wegen IE7 zus�tzlich
+		// wegen IE7 zusätzlich
 		document.documentElement.style.overflow="";
 		
 		document.body.style.overflow="";
 
 		// class-Wechsel löst im IE resize aus
 		document.getElementById("viewerContainer"+viewID).className = "viewerContainer min";
-		//$("buttonSurface"+viewID).className = "buttonSurface min";
-		//TODO nur auf Surfaces für bestimmen Viewer Anwenden
-		if (classIsUsed("buttonSurface")) doForEachInClass("buttonSurface", ".className = 'buttonSurface min';");
 		
 		PanoJS.mousePressedHandler = function(e) {
-			maximizeHandler(this.parentNode.id.substring(length,this.parentNode.id.length));
+			maximizeHandler(this.backingBean.viewID);
 		};
 		PanoJS.doubleClickHandler = function(e) {
 		};
@@ -441,12 +460,26 @@ function maximizeHandler(viewID) {
 	} else {
 		Iview[viewID].maximized = true;
 		
+		Iview[viewID].getToolbarCtrl().addView(new ToolbarView("mainTbView", Iview[viewID].viewerContainer.find(".toolbars")));
+		Iview[viewID].getToolbarMgr().addModel(new StandardToolbarModelProvider("mainTb", Iview[viewID].getToolbarMgr().titles).getModel());
+		if (Iview[viewID].PhysicalModel) {
+			Iview[viewID].getToolbarCtrl().checkNavigation(Iview[viewID].PhysicalModel.getCurPos());
+		}
+		
+		if (Iview[viewID].zoomWidth) {
+			$(".mainTbView .zoomHandles .fitToWidth")[0].checked = true;
+			$(".mainTbView .zoomHandles .fitToWidthLabel").addClass("ui-state-active");
+		} else if (Iview[viewID].zoomScreen) {
+			$(".mainTbView .zoomHandles .fitToScreen")[0].checked = true;
+			$(".mainTbView .zoomHandles .fitToScreenLabel").addClass("ui-state-active");
+		}
+		
 		// Dokumenteninhalt sichern
 		Iview[viewID].DOCUMENT = new Array();
 		Iview[viewID].VIEWER = document.getElementById("viewerContainer"+viewID).parentNode.parentNode.parentNode.parentNode;
 		currentPos = Iview[viewID].VIEWER.nextSibling;
 		document.getElementById("viewerContainer"+viewID).parentNode.parentNode.parentNode.parentNode.parentNode.id = "viewerParent";
-				
+		
 		// Dokumenteninhalt loeschen
 		var index = 0;
 		while (document.body.firstChild) {
@@ -458,18 +491,16 @@ function maximizeHandler(viewID) {
 		// Viewer hinzufuegen
 		document.body.appendChild(Iview[viewID].VIEWER);
 		
-		if (classIsUsed("BSE_fullView")) doForEachInClass("BSE_fullView", ".style.display = 'none';", viewID);
-		if (classIsUsed("BSE_normalView")) doForEachInClass("BSE_normalView", ".style.display = 'block';", viewID);
+		//if (classIsUsed("BSE_fullView")) doForEachInClass("BSE_fullView", ".style.display = 'none';", viewID);
+		//if (classIsUsed("BSE_normalView")) doForEachInClass("BSE_normalView", ".style.display = 'block';", viewID);
 		
-		// wegen IE7 zus�tzlich
+		// wegen IE7 zusätzlich
 		document.documentElement.style.overflow="hidden";
 		
 		document.body.style.overflow="hidden";
 
 		// class-Wechsel loesst im IE resize aus
 		document.getElementById("viewerContainer"+viewID).className = "viewerContainer max";
-
-		doForEachInClass("buttonSurface", ".className = 'buttonSurface max';");
 		
 		PanoJS.mousePressedHandler = function(e) {
 			e = e ? e : window.event;

@@ -1,0 +1,11 @@
+Plugins:
+
+-jsTree 0.9.6
+	http://www.jstree.com/
+-fg-menu 3.0
+	http://www.filamentgroup.com/lab/jquery_ipod_style_and_flyout_menus/
+
+Frameworks:
+
+-jQuery 1.4.2   (update to 1.4.4 blocked because of some errors with object retrieving; if fixed check code for TODOs which can be applied)
+-jQuery UI 1.8.6

@@ -36,24 +36,34 @@ function cutOut() {
 	var listener = [];// array who holds informations about the listeners (?)
 	var dampered = true;//saves if the thumbnail is folded or folded up
 	var setPosBlock = false;
-	
-	/*
-	@description sets the ID which is needed for multiple Viewers on a page so that they different components are connected properly together
-	@param id the ID of the Viewer the class is connected to
-	*/
+
+	/**
+	 * @public
+	 * @function
+	 * @name	setViewID
+	 * @memberOf	iview.cutOut
+	 * @description	sets the ID which is needed for multiple Viewers on a page so that they different components are connected properly together
+	 * @param	{string} id the ID of the Viewer the class is connected to
+	 */
 	function setViewID(id) {
 		viewID = id;
 	}
 
-	/*
-	@description creates with the given Informations a Thumbnail Element
-	@param id the ID of the newly created Thumbnail
-	@param idC the ID of the CutOut Div
-	@param idT the ID of the Thumbnail Image Element
-	@param parent the Parent Id or Object where the Thumbnail shall be added
-	@param idD the ID for the Damper Element
-	@param parentD the Parent Element for the Damper
-	*/
+	//TODO Doku ergänzen
+	/**
+	 * @public
+	 * @function	
+	 * @name	init
+	 * @memberOf	iview.cutOut
+	 * @description	creates with the given Informations a Thumbnail Element
+	 * @param	{string} id the ID of the newly created Thumbnail
+	 * @param	{string} idC the ID of the CutOut Div
+	 * @param	{string} idT the ID of the Thumbnail Image Element
+	 * @param	{string} parent the Parent Id or Object where the Thumbnail shall be added
+	 * @param	{string} idD the ID for the Damper Element
+	 * @param	{string} parentD the Parent Element for the Damper
+	 * @param	{string} identer
+	 */
 	function init(id, idC, idT, parent, idD, parentD, identer) {
 		var complete = document.createElement("div");
 		complete.id = id;
@@ -91,21 +101,29 @@ function cutOut() {
 		this.my = my;
 		inited = true;
 	}
-	
-	/*
-	@description sets the Width of the CutOut div
-	@param value value which represents the new Width of the CutOut
-	*/
+
+	/**
+	 * @public
+	 * @function
+	 * @name	setWidth
+	 * @memberOf	iview.cutOut
+	 * @description	ets the Width of the CutOut div
+	 * @param	{integer} value represents the new Width of the CutOut
+	 */
 	function setWidth(value) {
 		value = toInt(value);
 		my.cutOut.style.width = value + "px";
 	}
 	
-	/*
-	@description returns the width of the requested Element
-	@param which Value T or C which defines if the Width of the Thumbnail or CutOut will be returned
-	@return	integer which holds the width of the requested Element
-	*/
+	/**
+	 * @public
+	 * @function
+	 * @name	getWidth
+	 * @memberOf	iview.cutOut
+	 * @description	returns the width of the requested Element
+	 * @param	{string} which Value T or C which defines if the Width of the Thumbnail or CutOut will be returned
+	 * @return	{integer} which holds the width of the requested Element
+	 */
 	function getWidth(which) {
 		if (!inited) return 0;
 		switch (which) {
@@ -120,15 +138,29 @@ function cutOut() {
 				break;
 		}
 	}
-	/*
-	@description sets the Height of the CutOut div
-	@param value value which represents the new Height of the CutOut
-	*/
+	
+	/**
+	 * @public
+	 * @function
+	 * @name	setHeight
+	 * @memberOf	iview.cutOut
+	 * @description	sets the Height of the CutOut div
+	 * @param	{integer} value represents the new Height of the CutOut
+	 */
 	function setHeight(value) {
 		value = toInt(value);
 		my.cutOut.style.height = value + "px";
 	}
 	
+	/**
+	 * @public
+	 * @function
+	 * @name	getHeight
+	 * @memberOf	iview.cutOut
+	 * @description	returns the height of the requested Element
+	 * @param	{string} which Value T or C which defines if the height of the Thumbnail or CutOut will be returned
+	 * @return	{integer} which holds the height of the requested Element
+	 */
 	function getHeight(which) {
 		if (!inited) return 0;
 		switch (which) {
@@ -143,11 +175,16 @@ function cutOut() {
 		}
 	}
 	
-	/*
-	@description returns the height of the requested Element
-	@param which Value T or C which defines if the height of the Thumbnail or CutOut will be returned
-	@return	integer which holds the height of the requested Element
-	*/
+	//TODO Doku ergänzen
+	/**
+	 * @public
+	 * @function
+	 * @name	setPosition
+	 * @memberOf	iview.cutOut
+	 * @description	returns the height of the requested Element
+	 * @param	{object} vector
+	 * @param	{event} e holds the Event which raised it
+	 */
 	function setPosition(vector, e) {
 		if(setPosBlock == true){
 			setPosBlock = false;
@@ -170,19 +207,27 @@ function cutOut() {
 		my.cutOut.style.top = vector.y + "px";
 		if(e) e.cancelBubble = true;
 	}
-	
-	/*
-	@description returns the Left and Top Position of the CutOut Area
-	@return Object .x|.y holding integers with the connected values
-	*/
+
+	/**
+	 * @public
+	 * @function
+	 * @name	getPosition
+	 * @memberOf	iview.cutOut
+	 * @description	returns the Left and Top Position of the CutOut Area
+	 * @return	{object} .x|.y holding integers with the connected values
+	 */
 	function getPosition() {
 		return {'x':parseInt(my.cutOut.style.left), 'y':parseInt(my.cutOut.style.top)};
 	}
 	
-	/*
-	@description sets for the Image a new Image Source which is then loaded
-	@param String which represents the new URL of the Image
-	*/
+	/**
+	 * @public
+	 * @function
+	 * @name	setSRC
+	 * @memberOf	iview.cutOut
+	 * @description	sets for the Image a new Image Source which is then loaded
+	 * @param	{string} url represents the new URL of the Image
+	 */
 	function setSRC(url) {
 		my.self.removeChild(my.thumbnail);
 		my.thumbnail = new Image();
@@ -192,9 +237,13 @@ function cutOut() {
 		my.thumbnail.style.verticalAlign = "bottom";
 	}
 
-	/*
-	@description as soon as the image is loaded all listeners who listen to Onload Events will be noticed that a new Image is loaded
-	*/
+	/**
+	 * @public
+	 * @function
+	 * @name	notifyOnload
+	 * @memberOf	iview.cutOut
+	 * @description	as soon as the image is loaded all listeners who listen to Onload Events will be noticed that a new Image is loaded
+	 */
 	function notifyOnload() {
 		if (my.thumbnail.complete && isBrowser(["IE","Opera"]) || my.thumbnail.naturalWidth > 2 && !isBrowser(["IE", "opera"])) {
 			if (!listener[cutOut.ONLOAD]) {
@@ -207,10 +256,15 @@ function cutOut() {
 			window.setTimeout(function() { notifyOnload();},100);
 		}
 	}
-	/*
-	*description when a Doubleclick is raised within the Thumbnail the CutOut is centered to that point and all listeners are noticed about this event
-	*@param e Event which holds the Event which raised it
-	*/
+
+	/**
+	 * @public
+	 * @function
+	 * @name	dblClick
+	 * @memberOf	iview.cutOut
+	 * @description	when a Doubleclick is raised within the Thumbnail the CutOut is centered to that point and all listeners are noticed about this event
+	 * @param	{event} e holds the Event which raised it
+	 */
 	function dblClick(e) {
 		if (!e.layerX) {
 			var newX = e.offsetX;
@@ -224,10 +278,15 @@ function cutOut() {
 		}
 		setPosition({'x':newX - getWidth("C")/2, 'y':newY - getHeight("C")/2}, e);
 	}
-	/*
-	@description on mouseScroll all Listeners are noticed about this Event
-	*@param e event which was caused by the mousescroll
-	*/
+
+	/**
+	 * @public
+	 * @function
+	 * @name	mouseScroll
+	 * @memberOf	iview.cutOut
+	 * @description	on mouseScroll all Listeners are noticed about this Event
+	 * @param	{event} e event which was caused by the mousescroll
+	 */
 	function mouseScroll(e) {
 		var delta = returnDelta(e, true);
 		if (!listener[cutOut.SCROLL]) {
@@ -237,10 +296,15 @@ function cutOut() {
 			listener[cutOut.SCROLL][i](delta, viewID);
 		}
 	}
-	/*
-	@description captures mouse movement and resets the Mouse CutOut Position when the Mouse is pressed
-	@param e Event which occured
-	*/
+
+	/**
+	 * @public
+	 * @function
+	 * @name	mouseMove
+	 * @memberOf	iview.cutOut
+	 * @description	captures mouse movement and resets the Mouse CutOut Position when the Mouse is pressed
+	 * @param	{event} e Event which occured
+	 */
 	function mouseMove(e) {
 		if (mouseIsDown) {
 			if(isBrowser(["IE"])){//IE
@@ -254,12 +318,15 @@ function cutOut() {
 		}
 	}
 
-	/*
-	@description stores the Position where the mouse was pressed so that on Mousemovement this constellation is kept, mouseIsDown is set to true
-	so that the other functions know the current mousestate
-	@param e Event which occured
-	@return false to prevent Browser Default Drag&Drop behave
-	*/
+	/**
+	 * @public
+	 * @function
+	 * @name	mouseDown
+	 * @memberOf	iview.cutOut
+	 * @description	stores the Position where the mouse was pressed so that on Mousemovement this constellation is kept, mouseIsDown is set to true	so that the other functions know the current mousestate
+	 * @param	{event} e Event which occured
+	 * @return	{boolean} false to prevent Browser Default Drag&Drop behave
+	 */
 	function mouseDown(e) {
 		if (e.button < 2) {//nur bei linker und mittlerer Maustaste auf True setzen
 			mouseIsDown = true;
@@ -277,11 +344,14 @@ function cutOut() {
 		return false;
 	}
 
-	/*
-	@description releases the current Mousestate(mouseIsDown = false) so that no further movement of CutOut happen, although all
-	 MouseUp Listeners will be noticed about it
-	@param e Eventdata which occured
-	*/
+	/**
+	 * @public
+	 * @function
+	 * @name	mouseUp
+	 * @memberOf	iview.cutOut
+	 * @description	releases the current Mousestate(mouseIsDown = false) so that no further movement of CutOut happen, although all MouseUp Listeners will be noticed about it
+	 * @param	{event} e Event which occured
+	 */
 	function mouseUp(e) {
 		if (mouseIsDown && e.button < 2) {
 			if(isBrowser(["IE"])){//IE
@@ -302,18 +372,23 @@ function cutOut() {
 			mouseIsDown = false;
 		}
 	}
-	
-	/*
-	@description on A mouseClick Event the Thumbnail will be toggled in display state
-	*/
+
+	/**
+	 * @public
+	 * @function
+	 * @name	damper
+	 * @memberOf	iview.cutOut
+	 * @description	on A mouseClick Event the Thumbnail will be toggled in display state
+	 * @param	{event} e event which occured
+	 */
 	function damper(e) {
 		if (dampered) {
-			blendings.fadeOut(my.self.id,5, 100, "document.getElementById('"+my.self.id+"').style.visibility = 'hidden';");
+			jQuery(my.self).fadeOut();
 			my.damp.getElementsByTagName("div")[0].style.display = "none";
 			my.damp.getElementsByTagName("div")[1].style.display = "block"; 
 			my.damp.title = "Ausklappen";
 		} else {
-			blendings.fadeIn(my.self.id,5,100, '', "document.getElementById('"+my.self.id+"').style.visibility = 'visible';");
+			jQuery(my.self).fadeIn();
 			my.damp.getElementsByTagName("div")[0].style.display = "block";
 			my.damp.getElementsByTagName("div")[1].style.display = "none"; 
 			my.damp.title = "Einklappen";
@@ -321,11 +396,16 @@ function cutOut() {
 		}
 		dampered = !dampered;
 	}
-	/*
-	@description Adds/Drops a Listener for the given Event,so the Listener will be noticed if any changes will happen for this Event
-	@param type constant which defines to which type of listener it shall be added/dropped
-	@param theListener Object which holds a special function which is called if a Event happens
-	*/
+
+	/**
+	 * @public
+	 * @function
+	 * @name	addListener
+	 * @memberOf	iview.cutOut
+	 * @description	Adds a Listener for the given Event,so the Listener will be noticed if any changes will happen for this Event
+	 * @param	{integer} type constant which defines to which type of listener it shall be added
+	 * @param	{function} theListener Object which holds a special function which is called if a Event happens
+	 */
 	function addListener(type, theListener) {
 		if (!listener[type]) {
 			listener[type] = [];
@@ -333,9 +413,15 @@ function cutOut() {
 		listener[type].push(theListener);
 	}
 
-	/*
-	@description deletes eventListeners
-	*/
+	/**
+	 * @public
+	 * @function
+	 * @name	dropListener
+	 * @memberOf	iview.cutOut
+	 * @description	Dropps a Listener for the given Event
+	 * @param	{integer} type constant which defines to which type of listener it shall be dropped
+	 * @param	{function} theListener Object which holds a special function which is called if a Event happens
+	 */
 	function dropListener(type, theListener) {
 		for (var i = 0; i < listener[type].length; i++) {
 			if (listener[type][i] == theListener) {
@@ -344,9 +430,15 @@ function cutOut() {
 		}
 	}
 
-	/*
-	@description updates the size of the cutout
-	*/
+	/**
+	 * @public
+	 * @function
+	 * @name	updateSize
+	 * @memberOf	iview.cutOut
+	 * @description	updates the size of the cutout
+	 * @param	{float} ratioX the conversion factorto change the width
+	 * @param	{float} ratioY the conversion factorto change the height
+	 */
 	function updateSize(ratioX, ratioY) {
 	
 		//convert size to the thumbnail
@@ -366,9 +458,16 @@ function cutOut() {
 		}
 	}
 
-	/*
-	@description updates the position of the cutout
-	*/
+	//TODO Doku ergänzen
+	/**
+	 * @public
+	 * @function
+	 * @name	updatePos
+	 * @memberOf	iview.cutOut
+	 * @description	updates the position of the cutout
+	 * @param	{} newLeft 
+	 * @param	{} newTop
+	 */
 	function updatePos(newLeft, newTop) {
 		//determine the new left upper edgeposition
 		if ((newLeft + getWidth("C")) > getWidth("T")) {

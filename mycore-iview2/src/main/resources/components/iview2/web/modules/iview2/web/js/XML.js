@@ -1,7 +1,11 @@
-/*
-@description checks if the browser supports Namespaces within getElementsByTagName, if not the namespace will be parsed out
-@param name the Namespace name which needs to be checked
-@return the name, depending on the browser cleaned from Namespace information
+/**
+ * @public
+ * @function
+ * @name	namespaceCheck
+ * @memberOf	iview.XML
+ * @description	checks if the browser supports Namespaces within getElementsByTagName, if not the namespace will be parsed out
+ * @param	{string} name the Namespace name which needs to be checked
+ * @return	{string} name the Namespace name special convert for the browser
  */
 function namespaceCheck(name) {
 	if (isBrowser(["Opera", "Firefox/2", "Safari", "Mozilla/5"]) && name.indexOf(":") != -1) {
@@ -10,49 +14,33 @@ function namespaceCheck(name) {
 	return name;
 }
 
-//TODO renaming would be good, as the name of the function doesn't reflect the real intention of the function
-/*
-@description Gains the requested information from a given XML File.
-@param xmlfile  XML file from which the data will be extruded.
-@param nodeName the Node of the XML File which shall be gained, can be a group of nodes.
-@param getNode  return the X Nodes values
-@param absolute depending on this Value the getNode will be interpreted as absolute or relative value to the current curpage
-@return  Associated(By Nodename) array with connected values
-*/
-function nodeProps(xmlfile, nodeName, getNode, absolute) {
-	//console.log("Wie oft werden die Buchdaten ausgelesen?");
-	nodeName = namespaceCheck(nodeName); 
-	var child_nodes = xmlfile.getElementsByTagName(nodeName);
-	var Node = (absolute == true)? parseInt(getNode) : (pagenumber-1)+parseInt(getNode);
-	var values = new Array();
-	var child = null;
-	var nodes = null;
-	var count = 0;
-	try {
-		child = document.importNode( child_nodes.item(Node), true);
-		nodes = child.childNodes;
-	} catch (e) {
-		child = child_nodes;
-		nodes = child.item(Node).childNodes;
+//TODO checken, ob das so richtig
+/**
+ * @public
+ * @function
+ * @name	attributeCheck
+ * @memberOf	iview.XML
+ * @description	checks if the browser supports attributes within getElementsByTagName, if not the attributes will be parsed out
+ * @param	{string} name the attribute name which needs to be checked
+ * @return	{string} name the attribute name special convert for the browser
+ */
+function attributeCheck(name) {
+	if (isBrowser(["Opera", "Firefox/2"]) && name.indexOf(":") != -1) {
+		return name.substring(name.indexOf(":")+1,name.length);
 	}
-	for (var i = 0; i < nodes.length; i++) {
-		if (nodes.item(i).tagName) {
-			values[count++] = nodeAttributes(nodes.item(i));
-			//values[nodes.item(i).tagName] = nodes.item(i).childNodes.item(0).nodeValue;
-		}
-	}
-	try {//ANTI Memory Leak
-		return values;
-	} finally {
-		values = null;
-	}
+	return name;
 }
 
-/*
-@description collects into an array all attributes of a supplied Node, where the name of the object attribute is the attributes name,
+//TODO Doku ergänzen
+/**
+ * @public
+ * @function
+ * @name	nodeAttributes
+ * @memberOf	iview.XML
+ * @description	collects into an array all attributes of a supplied Node, where the name of the object attribute is the attributes name,
  cleaned from any namespace things like regex: .*:
-@param node the node to collect all properties from
-@return an array with all Informations the node contained as attributes
+ * @param	{object} node the node to collect all properties from
+ * @return	{} an array with all Informations the node contained as attributes
  */
 function nodeAttributes(node) {
 	var attributes = new Object();
@@ -63,16 +51,29 @@ function nodeAttributes(node) {
 	return attributes;
 }
 
-/*
-@description Gains the requested information from a given XML File.
-@param xmlfile  XML file from which the data will be extruded.
-@param nodeName the Node of the XML File which shall be gained, can be a group of nodes.
-@param getNode  return the X Nodes values
-@param absolute depending on this Value the getNode will be interpreted as absolute or relative value to the current curpage
-@return  List of all Nodes with the given NodeName
-*/
+//TODO replace Function with Code by jQuery
+//TODO Doku ergänzen	
+/**
+ * @public
+ * @function
+ * @name	getNodes
+ * @memberOf	iview.XML
+ * @description	Gains the requested information from a given XML File
+ * @param	{object} xmlfile XML file from which the data will be extruded
+ * @param	{string} nodeName the Node of the XML File which shall be gained, can be a group of nodes
+ * @return	{} List of all Nodes with the given NodeName
+ */
 function getNodes(xmlfile, nodeName) {
-	var nodes = xmlfile.getElementsByTagName(namespaceCheck(nodeName));
+	var nodes;
+	if (typeof arguments[2] === "undefined") {
+		nodes = xmlfile.getElementsByTagName(namespaceCheck(nodeName));
+	} else {
+		if (isBrowser("IE")) {
+			nodes = arguments[2].getElementsByTagName(namespaceCheck(nodeName));
+		} else {
+			nodes = xmlfile.getElementsByTagName(namespaceCheck(nodeName), arguments[2]);
+		}
+	}
 	var nodeList = new Array();
 	for ( i = 0; i < nodes.length; i++) {
 		try {
@@ -88,15 +89,45 @@ function getNodes(xmlfile, nodeName) {
 	}
 }
 
+//TODO Doku ergänzen
+/**
+ * @public
+ * @function
+ * @name	getNodesInterim
+ * @memberOf	iview.XML
+ * @description	Gains the requested information from a given XML File. Function is namespace safe. Function will be renamed as soon as getNode is dropped
+ * @param	{object} xmldata XML file from which the data will be extruded
+ * @param	{string} nodeName the Node of the XML File which shall be gained, can be a group of nodes
+ * @return	{} List of all Nodes with the given NodeName
+ */
+function getNodesInterim(xmldata, nodeName) {
+	//crawl through all nodes and return those who match the given nodeName
+	return jQuery(xmldata).find("*[nodeName$='"+nodeName+"']");
+}
+	
+//TODO Doku ergänzen
+/**
+ * @public
+ * @function
+ * @name	getPageCount
+ * @memberOf	iview.XML
+ * @description	
+ * @param	{} res
+ * @return	{integer} 
+ */
 function getPageCount(res) {
 	return res.getElementsByTagName(namespaceCheck("mets:file")).length;
 }
 
-/*
- @description searches for the first Occurence of the given Tagname within the Element List and returns it
- @param nodeList Array which contains the Elements which shall be searched
- @param tagName String which contains the TagName, we're looking for
- @return Object first Element with the given tagname, if there's one else it returns null
+/**
+ * @public
+ * @function
+ * @name	getForstNodeByTagName
+ * @memberOf	iview.XML
+ * @description	searches for the first Occurence of the given Tagname within the Element List and returns it
+ * @param	{} nodeList Array which contains the Elements which shall be searched
+ * @param	{string} tagName contains the TagName, we're looking for
+ * @return	{object} first Element with the given tagname, if there's one else it returns null
  */
 function getFirstNodeByTagName(nodeList, tagName) {
 	for (i = 0; i < nodeList.length; i++) {
@@ -106,7 +137,17 @@ function getFirstNodeByTagName(nodeList, tagName) {
 	}
 	return null;
 }
-
+	
+//TODO Doku ergänzen
+/**
+ * @public
+ * @function
+ * @name	checkType
+ * @memberOf	iview.XML
+ * @description	
+ * @param	{} node
+ * @return	{string} 
+ */
 function checkType(node) {
 	if (node.firstChild) {
 		switch (node.attributes.getNamedItem("type").value) {

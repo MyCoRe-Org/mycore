@@ -1,0 +1,255 @@
+/* Toolbar
+----------------------------------*/
+
+/* properbly .max */
+.viewerContainer .toolbars {
+	width: 100%;
+	height: 44px;
+	font-size: 11px;
+	z-index: 50;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.viewerContainer.max .toolbars a:hover, a:focus, a:active {
+	text-decoration : none;
+}
+
+.viewerContainer .toolbars .toolbar {
+	position: relative;
+	padding: 6px 2px;
+}
+.viewerContainer.min .toolbars .toolbar {
+	top: 0px;
+	left: 0px;
+	height: 30px;
+
+	background-image: url(../blank.gif);
+	/*background-image: none;*/
+	background-color: transparent;
+	border: 0px solid black;
+}
+
+.viewerContainer.max .toolbars .toolbar {
+	top: 0px !important;
+	left: 0px;
+	height: 30px;
+	width: 100% !important;
+	border: 1px solid #AAAAAA;
+}
+
+.viewerContainer.max .toolbars .toolbar .hidden {
+	display: none;
+}
+
+/* the Container, who holds the content for the drop-down-menu */
+.positionHelper {
+	z-index: 50;
+	font-size: 11px;
+	line-height: normal;
+}
+
+.positionHelper a {
+	line-height: normal;
+}
+
+
+
+/* Icon
+----------------------------------*/
+
+/* states and images */
+.iview2-icon { width: 24px !important; height: 24px !important; background-image: url(iview2.toolbar.png) !important/*{iconsContent}*/; }
+.ui-widget-content .iview2-icon {background-image: url(iview2.toolbar.png) !important/*{iconsContent}*/; }
+.ui-widget-header .iview2-icon {background-image: url(iview2.toolbar.png) !important/*{iconsHeader}*/; }
+.ui-state-default .iview2-icon { background-image: url(iview2.toolbar.png) !important/*{iconsDefault}*/; }
+.ui-state-hover .iview2-icon, .ui-state-focus .iview2-icon {background-image: url(iview2.toolbar.png) !important/*{iconsHover}*/; }
+.ui-state-active .iview2-icon {background-image: url(iview2.toolbar.png) !important/*{iconsActive}*/; }
+.ui-state-highlight .iview2-icon {background-image: url(iview2.toolbar.png) !important/*{iconsHighlight}*/; }
+.ui-state-error .iview2-icon, .ui-state-error-text .iview2-icon {background-image: url(iview2.toolbar.png) !important/*{iconsError}*/; }
+
+.loading {
+	background-image: url('loader.gif') !important;
+	width: 24px !important;
+	height: 24px !important;
+	background-position: 50% 50%;
+}
+
+/* positioning */
+.iview2-icon-zoomIn { background-position: -150px 0 !important; }
+.iview2-icon-zoomOut { background-position: -210px 0 !important; }
+.iview2-icon-fitToWidth { background-position: -270px 0 !important; }
+.iview2-icon-fitToScreen { background-position: -300px 0 !important; }
+.iview2-icon-overview { background-position: -330px 0 !important; }
+.iview2-icon-chapter { background-position: -360px 0 !important; }
+.iview2-icon-backward { background-position: -30px 0 !important; }
+.iview2-icon-dropDownArrow { background-position: -420px 0 !important; }
+.iview2-icon-forward { background-position: -90px 0 !important; }
+.iview2-icon-permalink { background-position: -390px 0 !important; }
+.iview2-icon-close { background-position: 0 0 !important; }
+.iview2-icon-empty { background-position: 30 0 !important; width:0px !important; }
+
+
+/* states and images */
+.iview2-icon { display: block !important; text-indent: -99999px !important; overflow: hidden !important; background-repeat: no-repeat !important; }
+
+
+
+/* Button
+----------------------------------*/
+
+.ui-button {
+	display: inline-block;
+	position: relative;
+	padding: 0;
+	margin-right: .1em;
+	text-decoration: none !important;
+	cursor: pointer;
+	text-align: center; zoom: 1;
+	overflow: visible;
+	float: left;
+} /* the overflow property removes extra width in IE */
+
+.ui-button-icon-only {
+	width: 3.2em;
+} /* to make room for the icon, a width needs to be set here */
+
+button.ui-button-icon-only {
+	width: 3.4em;
+} /* button elements seem to need a little more width */
+
+.ui-button-icons-only {
+	width: 4em;
+} 
+
+button.ui-button-icons-only {
+	width: 4.2em;
+} 
+
+/*button text element */
+.ui-button .ui-button-text {
+	display: block;
+	line-height: 1.4;
+}
+
+.ui-button-text-only .ui-button-text {
+	padding: .4em 1em;
+}
+
+.ui-button-icon-only .ui-button-text, .ui-button-icons-only .ui-button-text {
+	padding: .4em;
+	text-indent: -9999999px;
+}
+
+.ui-button-text-icon .ui-button-text, .ui-button-text-icons .ui-button-text {
+	padding: .4em 1em .4em 1.8em;
+}
+
+.ui-button-text-icons .ui-button-text {
+	padding-right: 1.8em;
+}
+
+/* no icon support for input elements, provide padding by default */
+input.ui-button {
+	padding: .4em 1em;
+}
+
+
+/*button icon element(s) */
+.ui-button-icon-only .ui-icon, .ui-button-text-icon .ui-icon, .ui-button-text-icons .ui-icon, .ui-button-icons-only .ui-icon {
+	position: absolute;
+	top: 50%;
+	margin-top: -12px;
+}
+
+.ui-button-icon-only .ui-icon {
+	left: 50%;
+	margin-left: -12px; 
+}
+
+.ui-button-text-icon .ui-icon-primary, .ui-button-text-icons .ui-icon-primary, .ui-button-icons-only .ui-icon-primary {
+	left: .5em;
+}
+
+.ui-button-text-icons .ui-button-icon-secondary, .ui-button-icons-only .ui-button-icon-secondary {
+	right: .5em;
+}
+
+ .ui-button-text {
+	padding-left: 10px;
+	padding-right: 30px;
+}
+
+.iview2-button-icon-dropdown .ui-button-text {
+	padding-left: 10px;
+	padding-right: 30px;
+	color: black;
+}
+
+.fg-menu-open {
+	background: #FFFFFF url(images/ui-bg_glass_65_ffffff_1x400.png) repeat-x scroll 50% 50%;
+	border:1px solid #AAAAAA;
+	color:#212121;
+	font-weight:normal;
+	outline-color:-moz-use-text-color;
+	outline-style:none;
+	outline-width:medium;
+}
+
+
+/*button sets*/
+.ui-button-set {
+	margin-right: 12px;
+	float: left;
+}
+
+.ui-button-set .ui-button {
+	margin-left: 0;
+	margin-right: -.3em;
+}
+
+
+/*divider*/
+.ui-divider {
+	display: inline-block;
+	border-left: 1px solid #c3b7ac;
+	border-right: 1px solid #fcfcfb;
+	height: 1.7em;
+	width: 0;
+	margin: 0 12px 0 .3em;
+	margin-right: 12px;
+	position: relative;
+	top: 5px;
+	float: left;
+}
+
+
+/* workarounds */
+button.ui-button::-moz-focus-inner {
+	border: 0;
+	padding: 0;
+} /* reset extra padding in Firefox */
+
+
+/* special buttonset / divider / button properties */
+.ui-button-set.previewBack .ui-button {
+	z-index: 100;
+}
+
+.viewerContainer .ui-button-set.previewForward {
+	margin-right: 8px;
+	float: right;
+}
+
+.ui-button-set.previewForward .ui-button {
+	z-index: 100;
+}
+
+.viewerContainer .previewTbView {
+	display: none;
+}
+
+.viewerContainer.min:hover .previewTbView {
+	display: block;
+}

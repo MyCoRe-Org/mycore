@@ -31,8 +31,6 @@
       addIviewProperty('<xsl:value-of select="$groupID" />', 'useOverview',<xsl:value-of select="$overview" />);
       addIviewProperty('<xsl:value-of select="$groupID" />', 'baseUri', baseUris);
       addIviewProperty('<xsl:value-of select="$groupID" />', 'webappBaseUri', '"<xsl:value-of select="$WebApplicationBaseURL"/>"');
-<!--      addIviewProperty('<xsl:value-of select="$groupID" />', 'hasMets', <xsl:value-of select="iview2:hasMETSFile($groupID)"/>);-->
-      addIviewProperty('<xsl:value-of select="$groupID" />', 'hasMets', false);
     </script>
     <div id="viewerContainer{$groupID}" class="viewerContainer min">
       <xsl:if test="string-length($style) &gt; 0">
@@ -50,13 +48,16 @@
             <img height="100%" width="100%" id="preloadImg{$groupID}" alt="{i18n:translate('component.iview2.preview')}" />
           </div>
         </div>
-        <xsl:call-template name="iview2.getToolbar">
-          <xsl:with-param name="groupID" select="$groupID" />
-          <xsl:with-param name="optOut" select="'false'" />
-          <xsl:with-param name="forward" select="'true'" />
-          <xsl:with-param name="backward" select="'true'" />
-        </xsl:call-template>
       </div>
+      <script>
+     	Iview['<xsl:value-of select="$groupID" />'].viewerContainer = jQuery(document).find("#viewerContainer<xsl:value-of select="$groupID" />");
+      </script>
+      <xsl:call-template name="iview2.getToolbar">
+        <xsl:with-param name="groupID" select="$groupID" />
+        <xsl:with-param name="optOut" select="'false'" />
+        <xsl:with-param name="forward" select="'true'" />
+        <xsl:with-param name="backward" select="'true'" />
+      </xsl:call-template>
     </div>
 
   </xsl:template>
@@ -76,124 +77,81 @@
     <xsl:param name="openThumbs" select="$optOut" />
     <xsl:param name="chapterOpener" select="$optOut" />
     <xsl:param name="permalink" select="$optOut" />
-    <xsl:param name="inputPage" select="$optOut" />
-    <xsl:param name="formPage" select="$optOut" />
-
-    <script type="text/javascript">
-      addIviewProperty('<xsl:value-of select="$groupID" />', 'headerObjects', '"<xsl:value-of select="$create" />"');
+    
+    <!-- online src-->
+    
+	<!-- jQuery Lib Files -->
+    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+	<script type="text/javascript">
+      google.load("jquery", "1.4.2");
+      google.load("jqueryui", "1.8.6");
     </script>
-    <div id="buttonSurface{$groupID}" class="buttonSurface{$idAdd} min">
-      <xsl:choose>
-        <xsl:when test="$idAdd = ''">
-          <div id="header{$groupID}" class="header {$groupID}" onmousedown="return false;" />
-        </xsl:when>
-        <xsl:otherwise>
-          <div class="BS_header {$groupID}" onmousedown="return false;" />
-        </xsl:otherwise>
-      </xsl:choose>
-      <xsl:choose>
-        <xsl:when test="$fullView = 'true'">
-          <div class="BSE_fullView {$groupID}" onclick="maximizeHandler('{$groupID}')" title="{i18n:translate('component.iview2.fullView')}">
-          </div>
-        </xsl:when>
-      </xsl:choose>
-      <xsl:choose>
-        <xsl:when test="$normalView = 'true'">
-          <div class="BSE_normalView {$groupID}" onclick="maximizeHandler('{$groupID}')" title="{i18n:translate('component.iview2.normalView')}">
-          </div>
-        </xsl:when>
-      </xsl:choose>
-      <xsl:choose>
-        <xsl:when test="$zoomIn = 'true'">
-          <div class="BSE_zoomInBehind {$groupID}">
-            <div class="BSE_zoomIn {$groupID}"
-              onclick="zoomViewer('{$groupID}', true);"
-              title="{i18n:translate('component.iview2.zoomIn')}">
-              <!-- onclick="Iview['{$groupID}'].viewerBean.zoom(1); if(Iview['{$groupID}'].useZoomBar) Iview['{$groupID}'].zoomBar.moveBarToLevel(Iview['{$groupID}'].viewerBean.zoomLevel);"-->
-            </div>
-          </div>
-        </xsl:when>
-      </xsl:choose>
-      <xsl:choose>
-        <xsl:when test="$zoomOut = 'true'">
-          <div class="BSE_zoomOutBehind {$groupID}">
-            <div class="BSE_zoomOut {$groupID}"
-              onclick="zoomViewer('{$groupID}', false);"
-              title="{i18n:translate('component.iview2.zoomOut')}">
-              <!-- onclick="Iview['{$groupID}'].viewerBean.zoom(-1); if(Iview['{$groupID}'].useZoomBar) Iview['{$groupID}'].zoomBar.moveBarToLevel(Iview['{$groupID}'].viewerBean.zoomLevel);"-->
-            </div>
-          </div>
-        </xsl:when>
-      </xsl:choose>
-      <xsl:choose>
-        <xsl:when test="$toWidth = 'true'">
-          <div class="BSE_toWidth {$groupID}" onclick="pictureWidth('{$groupID}')" title="{i18n:translate('component.iview2.toWidth')}">
-          </div>
-        </xsl:when>
-      </xsl:choose>
-      <xsl:choose>
-        <xsl:when test="$toScreen = 'true'">
-          <div class="BSE_toScreen {$groupID}" onclick="pictureScreen('{$groupID}')" title="{i18n:translate('component.iview2.toScreen')}">
-          </div>
-        </xsl:when>
-      </xsl:choose>
-      <xsl:choose>
-        <xsl:when test="$backward = 'true'">
-          <div class="BSE_backwardBehind {$groupID}">
-            <div class="BSE_backward {$groupID}" onclick="Iview['{$groupID}'].pagenumber--;navigatePage(Iview['{$groupID}'].pagenumber, '{$groupID}');" title="{i18n:translate('component.iview2.backward')}">
-            </div>
-          </div>
-        </xsl:when>
-      </xsl:choose>
-      <xsl:choose>
-        <xsl:when test="$forward = 'true'">
-          <div class="BSE_forwardBehind {$groupID}">
-            <div class="BSE_forward {$groupID}" onclick="Iview['{$groupID}'].pagenumber++;navigatePage(Iview['{$groupID}'].pagenumber, '{$groupID}');" title="{i18n:translate('component.iview2.forward')}">
-            </div>
-          </div>
-        </xsl:when>
-      </xsl:choose>
-      <xsl:choose>
-        <xsl:when test="$openThumbs = 'true'">
-          <div class="BSE_openThumbs {$groupID}" onclick="openOverview('{$groupID}')" title="{i18n:translate('component.iview2.openThumbs')}">
-          </div>
-        </xsl:when>
-      </xsl:choose>
-      <xsl:choose>
-        <xsl:when test="$chapterOpener = 'true'">
-          <div class="BSE_chapterOpener {$groupID}" onclick="openChapterAndInitialize(true,'{$groupID}', this)" title="{i18n:translate('component.iview2.chapterOpener')}">
-          </div>
-        </xsl:when>
-      </xsl:choose>
-      <xsl:choose>
-        <xsl:when test="$permalink = 'true'">
-          <div class="BSE_permalink {$groupID}" onclick="displayURL(this, '{$groupID}');" title="{i18n:translate('component.iview2.permalink')}">
-          </div>
-          <div class="BSE_url {$groupID}">
-            <input class="BSE_permaUrl {$groupID}" type="text" readonly="true" onclick="this.select();" />
-            <div class="BSE_displayOut {$groupID}" onclick="hideURL(this);">
-            </div>
-          </div>
-        </xsl:when>
-      </xsl:choose>
-      <!--
-      <xsl:choose>
-        <xsl:when test="$inputPage = 'true'">
-          <script>
-            importPageInput('<xsl:value-of select="$groupID" />', document.getElementById("buttonSurface<xsl:value-of select="$groupID" />"));
-          </script>
-        </xsl:when>
-      </xsl:choose>
--->
-      <xsl:choose>
-        <xsl:when test="$formPage = 'true'">
-          <script>   
-            importPageForm('<xsl:value-of select="$groupID" />', document.getElementById("buttonSurface<xsl:value-of select="$groupID" />"));
-          </script>
-        </xsl:when>
-      </xsl:choose>
-    </div>
-
+	<!-- button -->
+	<script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/lib/jqueryUI/ui.button.js" />
+	<script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/lib/jqueryUI/ui.widget.js" />
+	<script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/lib/jqueryUI/ui.core.js" />	
+	
+	<!-- menu -->
+	<script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/lib/fg-menu/fg.menu.js" />
+	
+	<!-- Importer Skript -->
+	<script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/iview2.toolbar/ImportToolbar.js" />
+	
+	<!--  Model, Controller, View -->
+	<!--  needs Event.js -->
+	
+	<script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/iview2.toolbar/ToolbarManager.js" />
+	
+	<script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/iview2.toolbar/ToolbarModel.js" />
+	<script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/iview2.toolbar/ToolbarButtonsetModel.js" />
+	<script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/iview2.toolbar/ToolbarDividerModel.js" />
+	<script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/iview2.toolbar/ToolbarButtonModel.js" />
+	<script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/iview2.toolbar/ToolbarController.js" />
+	<script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/iview2.toolbar/ToolbarView.js" />
+	
+	<!--  ModelProvider -->
+	<script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/iview2.toolbar/StandardToolbarModelProvider.js" />
+	<script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/iview2.toolbar/PreviewToolbarModelProvider.js" />
+	
+	<!--  CSS -->
+	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}/modules/iview2/web/lib/jqueryUI/themes/base/ui.base.css" />
+	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}/modules/iview2/web/lib/jqueryUI/themes/base/ui.theme.css" />
+	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}/modules/iview2/web/lib/jqueryUI/ui.toolbar.css" />
+	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}/modules/iview2/web/lib/fg-menu/fg.menu.css" />
+	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}/modules/iview2/web/gfx/default/iview2.toolbar.css" />
+	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}/modules/iview2/web/gfx/default/iview2.permalink.css" />
+    
+    <!-- Permalink -->
+    <script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/Permalink.js" />
+    
+	
+     
+    <div id="toolbars{$groupID}" class="toolbars" onmousedown="return false;">      
+        <script type="text/javascript">
+      		$(document).ready(function () {
+      	
+				// toolbar brauch ne Liste mit Controllern für die Übergabe (bspw. Chapter)
+				      		
+				var viewID = '<xsl:value-of select="$groupID" />';
+				
+				var titles = {
+					'zoomIn' : '<xsl:value-of select="i18n:translate('component.iview2.zoomIn')"/>',
+					'zoomOut' : '<xsl:value-of select="i18n:translate('component.iview2.zoomOut')"/>',
+					'fitToWidth' : '<xsl:value-of select="i18n:translate('component.iview2.toWidth')"/>',
+					'fitToScreen' : '<xsl:value-of select="i18n:translate('component.iview2.toScreen')"/>',
+					'openOverview' : '<xsl:value-of select="i18n:translate('component.iview2.openThumbs')"/>',
+					'openChapter' : '<xsl:value-of select="i18n:translate('component.iview2.chapterOpener')"/>',
+					'backward' : '<xsl:value-of select="i18n:translate('component.iview2.backward')"/>',
+					'forward' : '<xsl:value-of select="i18n:translate('component.iview2.forward')"/>',
+					'permalink' : '<xsl:value-of select="i18n:translate('component.iview2.permalink')"/>',
+					'close' : '<xsl:value-of select="i18n:translate('component.iview2.normalView')"/>',
+					'pageBox' : '<xsl:value-of select="i18n:translate('component.iview2.pageBox')"/>'
+				};
+			
+				ImportToolbar(viewID, titles);
+      		});
+        </script>
+        </div>
   </xsl:template>
   <xsl:template name="iview2.init">
     <xsl:param name="groupID" />
@@ -206,25 +164,17 @@
     <xsl:param name="zoomScreen" select="'false'" />
     
     <!-- design settings -->
-    <xsl:param name="blendEffects" select="'true'" />
-    
-    <!-- chapter settings -->
-    <xsl:param name="chapHover" select="'true'" />
-    <xsl:param name="chapHoverDelay" select="'100'" />
-    <xsl:param name="chapHoverStep" select="'10'" />
-    <xsl:param name="chapterEmbedded" select="'false'" />
+    <xsl:param name="effects" select="'true'" />
+	<!-- chapter settings -->
+	<xsl:param name="chapterEmbedded" select="'false'" />
     <xsl:param name="chapDynResize" select="'false'" />
-    <xsl:param name="chapResizeMul" select="'1'" />
-    <xsl:param name="chapResizeAdd" select="'0'" />
-    <xsl:param name="chapColorCur" select="'#85a6bc'" />
-    <xsl:param name="chapColorNot" select="'#fcfeff'" />
-    <xsl:param name="chapColorHov" select="'#e2e6e9'" />
-	
+    
     <!-- thumbnail settings -->
     <xsl:param name="DampInViewer" select="'true'" />
-    
+    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+    <script type="text/javascript">google.load("jquery", "1.4.2");</script>
+    <!-- JQuery Framework -->
     <script type="text/javascript">
-    <!-- Philipp möchte verbessern -->
       <xsl:text>var prefix='</xsl:text>
       <xsl:value-of select="$prefix" />
       <xsl:text>';</xsl:text>
@@ -240,17 +190,8 @@
       <xsl:text>var zoomScreen=</xsl:text>
       <xsl:value-of select="$zoomScreen" />
       <xsl:text>;</xsl:text>
-      <xsl:text>var blendEffects=</xsl:text>
-      <xsl:value-of select="$blendEffects" />
-      <xsl:text>;</xsl:text>
-      <xsl:text>var chapHover=</xsl:text>
-      <xsl:value-of select="$chapHover" />
-      <xsl:text>;</xsl:text>
-      <xsl:text>var chapHoverDelay=</xsl:text>
-      <xsl:value-of select="$chapHoverDelay" />
-      <xsl:text>;</xsl:text>
-      <xsl:text>var chapHoverStep=</xsl:text>
-      <xsl:value-of select="$chapHoverStep" />
+      <xsl:text>jQuery.fx.off=!</xsl:text>
+      <xsl:value-of select="$effects" />
       <xsl:text>;</xsl:text>
       <xsl:text>var chapterEmbedded=</xsl:text>
       <xsl:value-of select="$chapterEmbedded" />
@@ -258,30 +199,15 @@
       <xsl:text>var chapDynResize=</xsl:text>
       <xsl:value-of select="$chapDynResize" />
       <xsl:text>;</xsl:text>
-      <xsl:text>var chapResizeMul=</xsl:text>
-      <xsl:value-of select="$chapResizeMul" />
-      <xsl:text>;</xsl:text>
-      <xsl:text>var chapResizeAdd=</xsl:text>
-      <xsl:value-of select="$chapResizeAdd" />
-      <xsl:text>;</xsl:text>
-      <xsl:text>var chapColor=['</xsl:text>
-      <xsl:value-of select="$chapColorCur" />
-      <xsl:text>','</xsl:text>
-      <xsl:value-of select="$chapColorNot" />
-      <xsl:text>','</xsl:text>
-      <xsl:value-of select="$chapColorHov" />
-      <xsl:text>'];</xsl:text>
       <xsl:text>var DampInViewer=</xsl:text>
       <xsl:value-of select="$DampInViewer" />
       <xsl:text>;</xsl:text>
     </script>
-    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
-    <script type="text/javascript">google.load("jquery", "1");</script>
-    <!-- JQuery Framework -->
+    <script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/LAB.min.js"/>
+    <!-- LAB JS Loader Lib -->
     <script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/jquery.mousewheel.min.js" />
     <!-- JQuery Mousewheel support -->
     <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/ManageEvents.js" />
-    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/EventUtils.js" />
     <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/PanoJS.js" />
     <!-- Viewer -->
     <script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/Event.js"/>
@@ -290,28 +216,14 @@
     <!--XML Funktionen-->
     <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/Utils.js" />
     <!--Allgemeine Util Funktionen-->
-    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/navigation.js" />
-    <!--Navigation Functions-->
     <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/scrollBars.js" />
     <!--Scrollbar Klasse-->
-    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/blendWorks.js" />
-    <!--Blend Funktionen-->
     <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/cutOut.js" />
     <!--Ausschnittbildchen Klasse-->
-    <script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/jquery.tree/jquery.tree.min.js"/>
-    <!-- JQuery Tree Plugin -->
-    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/chapter.js" />
-    <!--Chapter Klasse-->
-    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/overview.js" />
-    <!--Overview Klasse-->
-    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/Thumbnail.js" />
+    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/METS.js" />
+    <!--METS Klasse-->
+	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/Thumbnail.js" />
     <!--Hauptdatei-->
-    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/zoomBar.js" />
-    <!--ZoomBar-->
-    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/pageInput.js" />
-    <!--PageInput-->
-    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/pageForm.js" />
-    <!--PageForm-->
     <script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/init.js"/>
     <!-- Init Funktionen -->
     <script type="text/javascript">
@@ -329,10 +241,7 @@
     <xsl:param name="style" select="'default'" />
     <!-- params out of config.xml -->
     <xsl:param name="styleFolderUri" select="'gfx/'" />
-    <xsl:param name="pagenumber" select="'1'" /><!-- TODO sollte entfernt werden da startFile Aufgabe übernimmt -->
-    <xsl:param name="mets_uri" />
     <xsl:param name="startFile" />
-
 
     <link id="cssSheet{$groupID}" rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}/modules/iview2/web/gfx/{$style}/style.css" />
     <!-- Initfunktionen -->
@@ -340,16 +249,13 @@
     <!-- Philipp möchte verbessern -->
       var styleName='<xsl:value-of select="$style" />';
       var styleFolderUri='<xsl:value-of select="$styleFolderUri" />';
-      var pagenumber='<xsl:value-of select="$pagenumber" />';
-      var mets_uri='<xsl:value-of select="$mets_uri" />';
       addIviewProperty('<xsl:value-of select="$groupID" />', 'startFile', "'<xsl:value-of select="$startFile" />'");
       
       function startViewer(viewID) {
-      if (Iview[viewID].started) return;
-      Iview[viewID].started = true;
-      //TODO: vorher 1000, jetz sporadischer Fehler: StyleFolderUri not found
-      //window.setTimeout("loading('"+viewID+"')", 100);
-      loading(viewID);
+        if (Iview[viewID].started) return;
+        Iview[viewID].started = true;
+        $LAB.setGlobalDefaults({"AllowDuplicates": false, "BasePath": '../modules/iview2/web/js/'});
+        loading(viewID);
       }
       ManageEvents.addEventListener(window, 'load', function() { startViewer('<xsl:value-of select="$groupID"/>');}, false);
     </script>
@@ -416,12 +322,12 @@
     <xsl:choose>
       <xsl:when test="$parent ='viewer'">
         <script type="text/javascript">
-          addIviewProperty('<xsl:value-of select="$groupID" />','chapterParent', '"viewer<xsl:value-of select="$groupID" />"');
+          addIviewProperty('<xsl:value-of select="$groupID" />','chapterParent', '"#viewerContainer<xsl:value-of select="$groupID" />"');
         </script>
       </xsl:when>
       <xsl:when test="$parent = 'here'">
         <script type="text/javascript">
-          addIviewProperty('<xsl:value-of select="$groupID" />','chapterParent','"chapterContainer<xsl:value-of select="$groupID" />"');
+          addIviewProperty('<xsl:value-of select="$groupID" />','chapterParent','"#chapterContainer<xsl:value-of select="$groupID" />"');
         </script>
         <div id="chapterContainer{$groupID}" class="chapterContainer{$idAdd}"></div>
       </xsl:when>
