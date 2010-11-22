@@ -5,7 +5,7 @@
     <author email="thomas.scheffler(at)uni-jena.de">Thomas Scheffler</author>
   </properties>
   <body>
-    <release version="2.0.93" date="2010-?-?" description="Beta 3">
+    <release version="2.0.93" date="2010-11-22" description="Beta 3">
       <action dev="mcrfluet" type="add">
         Added new built-in command "get uri {uri} to file {path}" to test or use MCRURIResolver
       </action>
