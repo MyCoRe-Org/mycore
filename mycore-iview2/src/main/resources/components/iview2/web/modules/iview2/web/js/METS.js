@@ -568,11 +568,7 @@ iview.METS.PhysicalModelProvider = function(doc) {
 			getHrefs(this);
 			for (var i = 0; i < structures.length; i++) {
 				if (jQuery(structures[i]).attr("TYPE") == "PHYSICAL") {
-					var entries = jQuery(structures[i]).find("*").filter(function() {
-						if (this.nodeName.indexOf("div") != -1) {
-							return 1;
-						}
-					})
+					var entries = structures[i].getElementsByTagNameNS('http://www.loc.gov/METS/','div');
 					jQuery(entries).each(function() {
 						//Foreach page which is contained within the physical area retrieve its information and add it to the physical model
 						if (jQuery(this).attr("TYPE").toLowerCase() == "page") {
