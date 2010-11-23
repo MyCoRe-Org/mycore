@@ -54,4 +54,16 @@ public class MCREditorSession {
     public String getSourceURI() {
         return sourceURI;
     }
+
+    public String getTargetType() {
+        return xml.getChild("target").getAttributeValue("type", "display");
+    }
+
+    public String getTargetURL() {
+        return xml.getChild("target").getAttributeValue("url");
+    }
+
+    public String getTargetName() {
+        return xml.getChild("target").getAttributeValue("name");
+    }
 }
