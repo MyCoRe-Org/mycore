@@ -20,7 +20,7 @@
     <uniqueVersion>false</uniqueVersion>
     <hibernate.version>3.5.6-Final</hibernate.version>
     <lucene.version>3.0.2</lucene.version>
-    <changelog.since>2010-11-23</changelog.since>
+    <changelog.since>2010-11-22</changelog.since>
   </properties>
   <issueManagement>
     <system>sourceforge</system>
