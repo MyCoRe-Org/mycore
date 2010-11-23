@@ -34,9 +34,8 @@ import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 import org.hibernate.engine.Mapping;
 import org.hibernate.engine.SessionFactoryImplementor;
-import org.hibernate.lob.BlobImpl;
+import org.hibernate.engine.jdbc.NonContextualLobCreator;
 import org.hibernate.type.BlobType;
-
 import org.mycore.common.MCRException;
 
 public class MCRXMLBlobType extends BlobType {
@@ -63,8 +62,7 @@ public class MCRXMLBlobType extends BlobType {
         } catch (Exception e1) {
             throw new MCRException("Cannot write xml elements to Blob.", e1);
         }
-        BlobImpl blob = new BlobImpl(bout.toByteArray());
-        return blob;
+        return NonContextualLobCreator.INSTANCE.createBlob(bout.toByteArray());
     }
 
     @Override

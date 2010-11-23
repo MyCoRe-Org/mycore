@@ -147,7 +147,7 @@ public class MCRHIBConnection implements Closeable {
         if (cacheProviderClass != null && cacheProviderClass.equals("net.sf.ehcache.hibernate.SingletonEhCacheProvider")) {
             CacheManager cacheMgr = CacheManager.getInstance();
             cacheMgr.setName(MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe-Application").replace(':', ' '));
-            ManagementService.registerMBeans(cacheMgr, ManagementFactory.getPlatformMBeanServer(), true, true, true, true);
+            ManagementService.registerMBeans(cacheMgr, ManagementFactory.getPlatformMBeanServer(), true, true, true, true, true);
         }
     }
 
