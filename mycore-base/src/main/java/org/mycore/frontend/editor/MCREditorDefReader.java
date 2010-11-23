@@ -218,7 +218,7 @@ public class MCREditorDefReader {
      * @return the element below that has the given ID, or null if no such
      *         element exists.
      */
-    static Element findElementByID(String id, Element candidate) {
+    public static Element findElementByID(String id, Element candidate) {
         if (id.equals(candidate.getAttributeValue("id"))) {
             return candidate;
         } else {
