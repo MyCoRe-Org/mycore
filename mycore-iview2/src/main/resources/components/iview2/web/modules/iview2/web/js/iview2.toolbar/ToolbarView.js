@@ -109,12 +109,11 @@ ToolbarView.prototype = {
 	 *  }
 	 */
     getButtonUi : function (args) {
-    	var button = jQuery(this.toolbar).find(args.button);
     	return ({
-    		'icons' : button.button( "option", "icons" ),
-    		'text' : button.button( "option", "text" ),
-    		'label' : button.button( "option", "label" ),
-    		'disabled' : button.button( "option", "disabled" )
+    		'icons' : args.button.button( "option", "icons" ),
+    		'text' : args.button.button( "option", "text" ),
+    		'label' : args.button.button( "option", "label" ),
+    		'disabled' : args.button.button( "option", "disabled" )
     	});
     },
     
