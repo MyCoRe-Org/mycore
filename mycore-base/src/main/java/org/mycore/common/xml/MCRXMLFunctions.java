@@ -1,24 +1,24 @@
 /*
  * 
  * $Revision$ $Date$
- *
- * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
- *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program, in a file called gpl.txt or license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * 
+ * This file is part of *** M y C o R e *** See http://www.mycore.de/ for
+ * details.
+ * 
+ * This program is free software; you can use it, redistribute it and / or
+ * modify it under the terms of the GNU General Public License (GPL) as
+ * published by the Free Software Foundation; either version 2 of the License or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program, in a file called gpl.txt or license.txt. If not, write to the
+ * Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307 USA
  */
 
 package org.mycore.common.xml;
@@ -210,7 +210,7 @@ public class MCRXMLFunctions {
 
     /**
      * @return true if the given object has an urn assigned, false otherwise
-     * */
+     */
     public static boolean hasURNDefined(String objId) {
         if (objId == null) {
             return false;
@@ -224,10 +224,14 @@ public class MCRXMLFunctions {
     }
 
     /**
-     * returns the URN for <code>mcrid</code> and children if <code>mcrid</code> is a derivate.
-     * @param mcrid MCRObjectID of object or derivate
+     * returns the URN for <code>mcrid</code> and children if <code>mcrid</code>
+     * is a derivate.
+     * 
+     * @param mcrid
+     *            MCRObjectID of object or derivate
      * @return list of mcrid|file to urn mappings
      */
+    @SuppressWarnings("unchecked")
     public static NodeList getURNsForMCRID(String mcrid) {
         Session session = MCRHIBConnection.instance().getSession();
         Criteria criteria = session.createCriteria(MCRURN.class);
@@ -235,9 +239,15 @@ public class MCRXMLFunctions {
         Document document = DOC_BUILDER.newDocument();
         Element rootElement = document.createElement("urn");
         document.appendChild(rootElement);
-        @SuppressWarnings("unchecked")
+
+        LOGGER.info("Getting all urns for object " + mcrid);
+        long start = System.currentTimeMillis();
         List<MCRURN> results = criteria.list();
+        LOGGER.info("This took " + (System.currentTimeMillis() - start) + " ms");
+        LOGGER.info("Processing the result list");
         for (MCRURN result : results) {
+            LOGGER.info("Processing urn " + result.getURN());
+            start = System.currentTimeMillis();
             String path = result.getPath().trim();
             if (path.length() > 0 && path.charAt(0) == '/') {
                 path = path.substring(1);
@@ -253,6 +263,8 @@ public class MCRXMLFunctions {
                 rootElement.setAttribute("urn", result.getKey().getMcrurn());
             }
             session.evict(result);
+            long duration = System.currentTimeMillis() - start;
+            LOGGER.info("URN processed in " + duration + " ms");
         }
         return rootElement.getChildNodes();
     }
@@ -269,7 +281,9 @@ public class MCRXMLFunctions {
     }
 
     /**
-     * Encodes the given url so that one can safely embed that string in a part of an URI
+     * Encodes the given url so that one can safely embed that string in a part
+     * of an URI
+     * 
      * @param source
      * @return the encoded source
      */
@@ -297,7 +311,7 @@ public class MCRXMLFunctions {
 
     /**
      * @return true if the given object is allowed for urn assignment
-     * */
+     */
     public static boolean isAllowedObjectForURNAssignment(String objId) {
         if (objId == null) {
             return false;
@@ -344,10 +358,12 @@ public class MCRXMLFunctions {
     }
 
     /**
-     * @param objectId the id of the derivate owner
-     * @return <code>true</code> if the derivate owner has a least one derivate with the display attribute set to true, <code>false</code> otherwise
-     * 
-     * */
+     * @param objectId
+     *            the id of the derivate owner
+     * @return <code>true</code> if the derivate owner has a least one derivate
+     *         with the display attribute set to true, <code>false</code>
+     *         otherwise
+     */
     public static boolean hasDisplayableDerivates(String objectId) throws Exception {
         MCRObjectID id = MCRObjectID.getInstance(objectId);
         if (MCRMetadataManager.exists(id)) {
@@ -365,11 +381,13 @@ public class MCRXMLFunctions {
     }
 
     /**
-     * Returns a list of link sources of a given MCR object type.
-     * The structure is <em>link</em>. If no links are found an empty NodeList is returned.
+     * Returns a list of link sources of a given MCR object type. The structure
+     * is <em>link</em>. If no links are found an empty NodeList is returned.
      * 
-     * @param mcrid MCRObjectID as String as the link target
-     * @param sourceType MCR object type
+     * @param mcrid
+     *            MCRObjectID as String as the link target
+     * @param sourceType
+     *            MCR object type
      * @return a NodeList with <em>link</em> elements
      */
     public static NodeList getLinkSources(String mcrid, String sourceType) {
@@ -388,7 +406,9 @@ public class MCRXMLFunctions {
     }
 
     /**
-     * same as {@link #getLinkSources(String, String)} with <code>sourceType</code>=<em>null</em>
+     * same as {@link #getLinkSources(String, String)} with
+     * <code>sourceType</code>=<em>null</em>
+     * 
      * @param mcrid
      */
     public static NodeList getLinkSources(String mcrid) {
@@ -396,10 +416,13 @@ public class MCRXMLFunctions {
     }
 
     /**
-     * The method return a org.w3c.dom.NodeList as subpath of the doc input NodeList selected by a path as String.
+     * The method return a org.w3c.dom.NodeList as subpath of the doc input
+     * NodeList selected by a path as String.
      * 
-     * @param doc the input org.w3c.dom.Nodelist
-     * @param path the path of doc as String
+     * @param doc
+     *            the input org.w3c.dom.Nodelist
+     * @param path
+     *            the path of doc as String
      * @return a subpath of doc selected by path as org.w3c.dom.NodeList
      */
     public static NodeList getTreeByPath(NodeList doc, String path) {
@@ -412,7 +435,7 @@ public class MCRXMLFunctions {
             // select part
             Document document = DOC_BUILDER.newDocument();
             if (doc.item(0).getNodeName().equals("#document")) {
-                //LOGGER.debug("NodeList is a document.");
+                // LOGGER.debug("NodeList is a document.");
                 Node child = doc.item(0).getFirstChild();
                 if (child != null) {
                     Node node = (Node) doc.item(0).getFirstChild();
