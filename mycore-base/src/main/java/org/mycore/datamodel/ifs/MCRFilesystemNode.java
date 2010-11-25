@@ -14,10 +14,13 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.mycore.common.MCRUsageException;
+
+
 
 /**
  * Represents a stored file or directory node with its metadata and content.
@@ -26,6 +29,7 @@ import org.mycore.common.MCRUsageException;
  * @version $Revision$ $Date$
  */
 public abstract class MCRFilesystemNode {
+    private static final Logger LOGGER = Logger.getLogger(MCRFilesystemNode.class);
     protected static MCRFileMetadataManager manager = MCRFileMetadataManager.instance();
 
     public static MCRFilesystemNode getNode(String ID) {
@@ -172,7 +176,7 @@ public abstract class MCRFilesystemNode {
             boolean exists = getParent().hasChild(name);
             if (exists) {
                 getParent().getChild(name).delete();
-                System.out.println(name + " exists already, file was deleted...");
+                LOGGER.info(name + " exists already, file was deleted...");
                 checkName(name, true);
             }
         }
