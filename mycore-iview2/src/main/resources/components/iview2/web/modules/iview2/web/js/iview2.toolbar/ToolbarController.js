@@ -88,12 +88,12 @@ ToolbarController.prototype.addView = function(view) {
 							var oldUi = view.getButtonUi({'button' : args.view}).icons;
 							view.setButtonUi({'button' : args.view, 'icons' : {'primary' : 'loading'}});
 							setTimeout(function(){
-								importChapter(viewerID);
+								importChapter(myself.getViewer());
 								view.setButtonUi({'button' : args.view, 'icons' : oldUi});
 							}, 500);
 							return;
 					} else {
-						openChapter(true, viewerID);
+						openChapter(true, myself.getViewer());
 					}
     			}
     		} else if (args.parentName == "navigateHandles" || args.parentName == "previewForward" || args.parentName == "previewBack") {

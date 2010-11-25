@@ -221,7 +221,7 @@ function processImageProperties(imageProperties, viewID){
  */
 function openOverview(viewID) {
 	Iview[viewID].overview.showView();
-	openChapter(false, viewID);
+	openChapter(false, Iview[viewID]);
 }
 
 /**
@@ -602,9 +602,9 @@ function generateURL(viewID) {
  * @memberOf	iview.Thumbnails
  * @description	open and close the chapterview
  * @param	{} major
- * @param	{string} viewID ID of the derivate
+ * @param	{Object} viewer of the derivate
  */
-function openChapter(major, viewID){
+function openChapter(major, viewer){
 	if (chapterEmbedded) {
 		//alert(warnings[0])
 		return;
@@ -613,7 +613,7 @@ function openChapter(major, viewID){
 	//TODO Positionierung klappt bei WebKit nicht, da die irgendwie CSS nicht einlesen durch Chapter einbau in Viewer kÃƒÂ¶nnte das behoben werden
 	if (major) {
 		// für major (Button) always reaction
-		Iview[viewID].chapter.toggleView();
+		viewer.chapter.toggleView();
 	} else {
 /*		// nur dann einblenden, wenn es durch Modus ausgeblendet wurde
 		if (Iview[viewID].chapterActive && !Iview[viewID].overviewActive && Iview[viewID].maximized && chapter.style.visibility == "hidden") {
@@ -787,17 +787,17 @@ function importCutOut(viewID) {
  * @description	calls the corresponding functions to create the chapter
  * @param	{string} viewID ID of the derivate
  */
-function importChapter(viewID) {
+function importChapter(viewer) {
 	$LAB.script("chapter.js", "jquery.tree.min.js").wait(function() {
-		Iview[viewID].ChapterModelProvider = new iview.METS.ChapterModelProvider(Iview[viewID].newMETS);
+		viewer.ChapterModelProvider = new iview.METS.ChapterModelProvider(viewer.newMETS);
 		
-		Iview[viewID].chapter = new iview.chapter.Controller(Iview[viewID].ChapterModelProvider, Iview[viewID].PhysicalModelProvider);
+		viewer.chapter = new iview.chapter.Controller(viewer.ChapterModelProvider, viewer.PhysicalModelProvider);
 
-		Iview[viewID].chapter.createView(Iview[viewID].chapterParent);
-		Iview[viewID].chapterReaction = false;
+		viewer.chapter.createView(viewer.chapterParent);
+		viewer.chapterReaction = false;
 		
-		updateModuls(viewID);
-		openChapter(true, viewID);
+		updateModuls(viewer.viewID_to_remove);
+		openChapter(true, viewer);
 	});
 }
 

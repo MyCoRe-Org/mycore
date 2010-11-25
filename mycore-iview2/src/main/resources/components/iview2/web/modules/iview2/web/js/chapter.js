@@ -274,9 +274,17 @@ iview.chapter.Controller = function(modelProvider, physicalModelProvider, view) 
 		//initialize tree structure
 		this._view.initTree();
 		//start creation Process for top Level Entries within List
-		jQuery.each(entries, function(index, entry){ buildTree(entry, that._view.getTree(), that._view)});
+		jQuery.each(entries, function(index, entry){
+			buildTree(entry, that._view.getTree(), that._view)
+		});
 		this._view.addTree(parentID);
-		this._view.selectNode(this._model._containedIn[this._physicalModel.getCurPos()].getID());
+		try {
+			this._view.selectNode(this._model._containedIn[this._physicalModel.getCurPos()].getID());
+		} catch (err) {
+			if (console){
+				console.log(err);
+			}
+		}
 	}
 
 	/**

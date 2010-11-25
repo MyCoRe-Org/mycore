@@ -109,11 +109,12 @@ ToolbarView.prototype = {
 	 *  }
 	 */
     getButtonUi : function (args) {
+    	var button = this._getButton(args.button);
     	return ({
-    		'icons' : args.button.button( "option", "icons" ),
-    		'text' : args.button.button( "option", "text" ),
-    		'label' : args.button.button( "option", "label" ),
-    		'disabled' : args.button.button( "option", "disabled" )
+    		'icons' : button.button( "option", "icons" ),
+    		'text' : button.button( "option", "text" ),
+    		'label' : button.button( "option", "label" ),
+    		'disabled' : button.button( "option", "disabled" )
     	});
     },
     
@@ -129,7 +130,7 @@ ToolbarView.prototype = {
 	 * @param {boolean} args.disabled defines if the button is enables (false) or disabled (true)
 	 */
     setButtonUi : function (args) {
-    	var button = jQuery(this.toolbar).find(args.button);
+    	var button = this._getButton(args.button);
     	if (args.icons) button.button( "option", "icons", args.icons );
     	if (args.text != undefined) button.button( "option", "text", args.text );
     	if (args.label) button.button( "option", "label", args.label );
@@ -202,6 +203,19 @@ ToolbarView.prototype = {
 				myButtonset.removeChild(myButtonset.childNodes[i]);
 			}
 		}
+    },
+    
+    /**
+     * @function
+     * @name _getButton
+     * @description returns a button view instance
+     * @param {Object}|{String} either a view instance or a jQuery selector
+     */
+    _getButton : function (button) {
+    	if (typeof button === "string"){
+    		return jQuery(this.toolbar).find(button);
+    	}
+    	return button;
     },
     
     /** 
