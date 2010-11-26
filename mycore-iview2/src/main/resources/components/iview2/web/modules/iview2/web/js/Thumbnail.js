@@ -350,23 +350,19 @@ function switchDisplayMode(screenZoom, stateBool, viewID) {
 		for (var i = 0; i <= Iview[viewID].zoomMax; i++) {
 			if(Iview[viewID].bildBreite/viewerBean.width > Iview[viewID].bildHoehe/document.getElementById("viewer"+viewID).offsetHeight || (stateBool && !screenZoom)){
 			//Width > Height Or ZoomWidth is true
-				//Siehe TODO oben
-				if (calculateZoomProp(i, Iview[viewID].bildBreite, viewerBean.width, /*toInt(getStyle("scrollV"+viewID, "width"))*/0, viewID)) {
+				if (calculateZoomProp(i, Iview[viewID].bildBreite, viewerBean.width, 0, viewID)) {
 					break;
 				}
 			} else {
-				if (calculateZoomProp(i, Iview[viewID].bildHoehe, viewerBean.height, /*toInt(getStyle("scrollH"+viewID, "height"))*/0, viewID)) {
+				if (calculateZoomProp(i, Iview[viewID].bildHoehe, viewerBean.height, 0, viewID)) {
 					break;
 				}
 			}
 		}
-		viewerBean.init();//TODO not working here
+		viewerBean.init();
 		// zoomIn-Button einblenden, da min ein "groesseres" ZoomLevel existiert, von dem aus runterskaliert wurde
 		if (classIsUsed("BSE_zoomIn")) doForEachInClass("BSE_zoomIn", ".style.display = 'block';", viewID);
 		
-		if (getElementsByClassName("buttonSurface min", document.getElementById("viewerContainer"+viewID), "div")[0]) {
-			getElementsByClassName("buttonSurface min", document.getElementById("viewerContainer"+viewID), "div")[0].style.width = preload.offsetWidth + "px";
-		}
 	} else {
 		Iview[viewID].zoomScale = 1;
 		viewerBean.tileSize = /*Iview[viewID].*/tilesize;
@@ -479,17 +475,21 @@ function handleResizeScrollbars(viewID) {
 
 	// vertical
 	// max scaling
-	barY.setMaxValue(curHoehe - viewerBean.height);
+	var height = jQuery(viewerBean.viewer).height();
+	var width = jQuery(viewerBean.viewer).width();
+	var top = jQuery(viewerBean.viewer).offset().top;
+
+	barY.setMaxValue(curHoehe - height);
 	// size of the scrollbar
-	barY.setSize(viewerBean.height - viewerBean.top);
-	barY.my.self[0].style.top = viewerBean.top + "px";
+	barY.setSize(height - top);
+	barY.my.self[0].style.top = top + "px";
 	// length of the bar
-	barY.setProportion(viewerBean.height/curHoehe);
+	barY.setProportion(height/curHoehe);
 	
 	// horizontal
-	barX.setMaxValue(curBreite - viewerBean.width);
-	barX.setSize(viewerBean.width);
-	barX.setProportion(viewerBean.width/curBreite)
+	barX.setMaxValue(curBreite - width);
+	barX.setSize(width);
+	barX.setProportion(width/curBreite);
 }
 
 /**
