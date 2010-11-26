@@ -1009,7 +1009,7 @@ function processMETS(metsDoc, viewID) {
 
 	// if METS File is loaded after the drop-down-menu (in mainToolbar) its content needs to be updated
 	if (jQuery('.navigateHandles .pageBox')[0]) {
-		Iview[viewID].getToolbarCtrl().getView('mainTbView').events.notify({'type' : "new", 'elementName' : "pageBox", 'view' : jQuery('.navigateHandles .pageBox')});
+		Iview[viewID].getToolbarCtrl().getView('mainTbView').events.notify({'type' : "new", 'elementName' : "pageBox", 'parentName' : "navigateHandles", 'view' : Iview[viewID].viewerContainer.find('.navigateHandles .pageBox')});
 		// switch to current content
 		Iview[viewID].getToolbarCtrl().updateDropDown(jQuery(pagelist.find("a")[physicalModel.getCurPos() - 1]).html());
 	}
