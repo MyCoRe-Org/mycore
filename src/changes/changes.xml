@@ -16,6 +16,12 @@
       </action>
     </release>
     <release version="2.0.93" date="2010-11-22" description="Beta 3">
+      <action dev="mcrjkupf" type="add">
+        Add a copy function for MCRObjects in the Simple Workflow.
+      </action>
+      <action dev="mcrjkupf" type="update">
+         Add the id-attribute in MCRIndexBrowser XML output for ranges to get the object data directly over Xalan extensions.
+      </action>
       <action dev="mcrfluet" type="add">
         Added new built-in command "get uri {uri} to file {path}" to test or use MCRURIResolver
       </action>
