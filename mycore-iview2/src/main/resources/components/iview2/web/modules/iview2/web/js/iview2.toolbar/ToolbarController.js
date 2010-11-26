@@ -213,6 +213,8 @@ ToolbarController.prototype.catchModels = function() {
 				   			curView.addButtonset({'elementName' : element.elementName, 'index' : element.index});
 				    	} else if (element.type == "divider") {
 				    		curView.addDivider({'elementName' : element.elementName, 'index' : element.index});
+				    	} else if (element.type == "text") {
+				    		curView.addText({'elementName' : element.elementName, 'text' : element.text, 'index' : element.index});
 				    	}
 			    	} else if (args.button) {
 			    		var button = args.button;

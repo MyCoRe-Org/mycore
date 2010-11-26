@@ -69,6 +69,27 @@ ToolbarView.prototype = {
 
     /**
      * @function
+	 * @name addText
+	 * @memberOf ToolbarView#
+	 * @description add a new text element to the toolbar view,
+	 *  a text element is simple place to show plain some information within the toolbar
+	 * @param {String} args.elementName defines the name of the divider
+	 * @param {String} args.text defines the content of the text element
+	 * @param {integer} args.index defines the special position between the other predefined elements where the new divider should be at
+	 * @return {Object} returns the parent tag of the added divider
+	 */        
+    addText : function (args) {
+    	var newText = $('<span>').addClass(args.elementName).addClass('ui-text').html(args.text);
+		if (!isNaN(args.index) && args.index != this.toolbar.childNodes.length) {
+    		newText.insertBefore(this.toolbar.childNodes[args.index]);
+    	} else {
+    		jQuery(this.toolbar).append(newText);
+    	}	
+		return newText;
+    },   
+    
+    /**
+     * @function
 	 * @name getToolbarElement
 	 * @memberOf ToolbarView#
 	 * @description returns the parent tag of a direct toolbar view element (e.g. buttonset or divider)

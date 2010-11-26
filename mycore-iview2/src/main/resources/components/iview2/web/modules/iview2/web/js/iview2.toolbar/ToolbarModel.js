@@ -61,6 +61,7 @@ ToolbarModel.prototype = {
 			this.elements.push(element);
 			this.events.notify({'type' : "add", 'element' : element});
      	}
+     	
 		return element;
     },
 

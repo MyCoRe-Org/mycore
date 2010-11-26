@@ -5,7 +5,7 @@
  * @strcuture	
  * 		Object {
  * 			String:		elementName,		//name of the buttonset
- * 			String: 	type				//type buttonset, to differ between buttonsets and dividers
+ * 			String: 	type				//type buttonset, to differ between buttonsets, text and dividers
  * 			Array:		buttons				//array of the contained buttons within the buttonset
  * 			Object:		relatedToolbar		//related toolbar model to navigate from the buttonset to its toolbar
  * 			Event:		events				//to trigger defined actions, while managing contained buttons

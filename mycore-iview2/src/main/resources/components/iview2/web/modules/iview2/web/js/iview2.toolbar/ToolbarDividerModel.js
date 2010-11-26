@@ -5,7 +5,7 @@
  * @strcuture	
  * 		Object {
  * 			String:		elementName,		//name of the divider
- * 			String: 	type				//type divider, to differ between buttonsets and dividers
+ * 			String: 	type				//type divider, to differ between buttonsets, text and dividers
  * 			Object:		relatedToolbar		//related toolbar model to navigate from the divider to its toolbar
  * 		}
  */

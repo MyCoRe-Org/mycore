@@ -225,6 +225,15 @@ input.ui-button {
 }
 
 
+/*text*/
+.ui-text {
+	margin-right: 12px;
+	padding: .6em 1em .6em 1.8em;
+	line-height: 1.4;
+	float: left;
+}
+
+
 /* workarounds */
 button.ui-button::-moz-focus-inner {
 	border: 0;

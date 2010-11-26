@@ -27,11 +27,11 @@ StandardToolbarModelProvider.prototype = {
 	 */
     getModel : function() {
     	
-    	// only for testing
-    	//$(".toolbars").append($('<div id="pages" style="visibility: hidden; z-index: 80; position: absolute; left: -9999px;" class="hidden"><ul><li><a href="index.html#">1</a></li><li><a onclick="testa()" href="index.html#">2</a></li><li><a href="index.html#">3</a></li><li><a href="index.html#">4</a></li><li><a href="index.html#">5</a></li><li><a href="index.html#">6</a></li><li><a href="index.html#">7</a></li><li><a href="index.html#">8</a></li><li><a href="index.html#">9</a></li><li><a href="index.html#">10</a></li><li><a href="index.html#">11</a></li><li><a href="index.html#">13</a></li><li><a href="index.html#">14</a></li><li><a href="index.html#">15</a></li><li><a href="index.html#">16</a></li><li><a href="index.html#">17</a></li><li><a href="index.html#">18</a></li><li><a href="index.html#">19</a></li><li><a href="index.html#">20</a></li><li><a href="index.html#">21</a></li></ul></div>'));  	
-    	
     	var curButtonset;
 
+    	// to show an text sample "Iview2 Bildbetrachter" within the toolbar
+    	//this.model.addElement(new ToolbarTextModel("Text", "Iview2 Bildbetrachter"));
+    	
 		// zoomHandles
 		curButtonset = this.model.addElement(new ToolbarButtonsetModel("zoomHandles"));
 		curButtonset.addButton(new ToolbarButtonModel("zoomIn", {'type': 'buttonDefault'}, {'label': this.titles.zoomIn, 'text': false, 'icons': {primary : 'iview2-icon iview2-icon-zoomIn'}}, this.titles.zoomIn, true));
