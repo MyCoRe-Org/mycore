@@ -134,7 +134,12 @@ ToolbarView.prototype = {
     	if (args.icons) button.button( "option", "icons", args.icons );
     	if (args.text != undefined) button.button( "option", "text", args.text );
     	if (args.label) button.button( "option", "label", args.label );
-    	if (args.disabled != undefined) button.button( "option", "disabled", args.disabled );
+    	if (args.disabled != undefined) {
+    		button.button( "option", "disabled", args.disabled );
+    		// buttons won't be un-hovered by simply disable them
+    		if (args.disabled) button.removeClass("ui-state-hover");
+    	}
+    	
     },
 
     /** 

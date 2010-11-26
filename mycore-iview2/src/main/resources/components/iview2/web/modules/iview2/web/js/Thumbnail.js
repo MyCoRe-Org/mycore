@@ -526,6 +526,11 @@ function listenerZoom(viewID) {
 			Iview[viewID].ausschnitt.updateSize((viewerBean.width / ((Iview[viewID].bildBreite / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale)), (viewerBean.height / ((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale)));
 			Iview[viewID].ausschnitt.updatePos((- (viewerBean.x / Math.pow(2, viewerBean.zoomLevel))*Iview[viewID].zoomScale), (- (viewerBean.y / Math.pow(2, viewerBean.zoomLevel))*Iview[viewID].zoomScale));
 		}
+		
+		// Buttons pürfen
+		Iview[viewID].getToolbarCtrl().checkZoom(viewerBean.zoomLevel);
+		
+		/*
 		// zoomOut prüfen
 		if (viewerBean.zoomLevel == 0) {
 			if (classIsUsed("BSE_zoomOut")) doForEachInClass("BSE_zoomOut", ".style.display = 'none';", viewID);
@@ -538,6 +543,7 @@ function listenerZoom(viewID) {
 		} else {
 			if (classIsUsed("BSE_zoomIn")) doForEachInClass("BSE_zoomIn", ".style.display = 'block';", viewID);
 		}
+		*/
 	}
 }
 

@@ -308,22 +308,39 @@ ToolbarController.prototype._checkNewModel = function(model) {
  * @param {integer} pNum defines the page number of the current shown page
  */
 ToolbarController.prototype.checkNavigation = function(pNum) {
-	var toHigh = (pNum >= this.getViewer().amountPages)? true : false;
-	var toLow = (pNum <= 1)? true : false;
+	var tooHigh = (pNum >= this.getViewer().amountPages)? true : false;
+	var tooLow = (pNum <= 1)? true : false;
 	
 	var models = this.getViewer().getToolbarMgr().getModels();
 
-	for (var i = 0; i < models.length; i++) {
-		if (models[i].id == "previewTb") {
-			//TODO
-			//this.setState('previewBack', 'backward', !toLow);
-			models[i].getElement('previewBack').getButton('backward').setActive(!toLow);
-			models[i].getElement('previewForward').getButton('forward').setActive(!toHigh);
-		} else if (models[i].id == "mainTb") {
-			models[i].getElement('navigateHandles').getButton('backward').setActive(!toLow);
-			models[i].getElement('navigateHandles').getButton('forward').setActive(!toHigh);
-		}
-	}
+	//for (var i = 0; i < models.length; i++) {
+	//	if (models[i].id == "previewTb") {
+			this.setState('previewBack', 'backward', !tooLow);
+			this.setState('previewForward', 'forward', !tooHigh);
+	//	} else if (models[i].id == "mainTb") {
+			this.setState('navigateHandles', 'backward', !tooLow);
+			this.setState('navigateHandles', 'forward', !tooHigh);
+	//	}
+	//}
+};
+
+/**
+ * @function
+ * @name checkZoom
+ * @memberOf ToolbarController#
+ * @description checks the zoom buttons (zoomIn and zoomOut) and
+ *  deactivate them if there isn't a possibility to zoom again in their direction,
+ *  zoom is only possible between level 0 and zoomMax
+ * @param {integer} zoom defines the current zoom Level of the shown content
+ */
+ToolbarController.prototype.checkZoom = function(zoom) {
+	var zoomIn = (zoom == this.getViewer().zoomMax)? false : true;
+	var zoomOut = (zoom == 0)? false : true;
+	
+	var models = this.getViewer().getToolbarMgr().getModels();
+
+	this.setState('zoomHandles', 'zoomIn', zoomIn);
+	this.setState('zoomHandles', 'zoomOut', zoomOut);
 };
 
 /**
@@ -353,7 +370,7 @@ ToolbarController.prototype.setState = function(handle, button, state) {
 	var models = this.getViewer().getToolbarMgr().getModels();
 	
 	for (var i = 0; i < models.length; i++) {
-		if (models[i].getElement(handle)) {
+		if (models[i].getElement(handle) && models[i].getElement(handle).getButton(button)) {
 			models[i].getElement(handle).getButton(button).setActive(state);
 		}
 	}
