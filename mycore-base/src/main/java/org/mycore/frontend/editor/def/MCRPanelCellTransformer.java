@@ -7,9 +7,11 @@ import org.jdom.DataConversionException;
 import org.jdom.Element;
 import org.mycore.common.MCRConfigurationException;
 
-public class MCRPanelCellTransformer extends MCREditorTransformer {
+public class MCRPanelCellTransformer extends MCRTransformerBase {
 
     private final static int UNDEFINED = Integer.MAX_VALUE;
+
+    private Element panel;
 
     private int minRow = UNDEFINED;
 
@@ -19,22 +21,18 @@ public class MCRPanelCellTransformer extends MCREditorTransformer {
 
     private int maxCol = 0;
 
-    private Element panel;
-
     private List<Element> cells;
 
     private Element[][] grid;
 
     private Element spannedCell = new Element("spannedCell");
 
-    public MCRPanelCellTransformer(Element panel) throws DataConversionException {
+    public void transform(Element panel) throws DataConversionException {
         this.panel = panel;
-        cells = panel.getChildren("cell");
+        this.cells = panel.getChildren("cell");
+
         findMinMaxCoordinates();
         addSortNrAttribute();
-    }
-
-    public void transform() throws DataConversionException {
         buildGrid();
         fillGrid();
         buildOutputRows();

@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.jdom.Element;
 
-public class MCRItemListTransformer extends MCREditorTransformer {
+public class MCRItemListTransformer extends MCRTransformerBase {
 
     private Element list;
 
@@ -14,9 +14,11 @@ public class MCRItemListTransformer extends MCREditorTransformer {
 
     private int cols;
 
-    public MCRItemListTransformer(Element list) {
+    public void transform(Element list) {
         this.list = list;
+
         calculateRowsCols();
+        buildRows();
     }
 
     private void calculateRowsCols() {
@@ -27,15 +29,7 @@ public class MCRItemListTransformer extends MCREditorTransformer {
         rows = (int) (Math.ceil((double) num / (double) cols));
     }
 
-    public int getNumRows() {
-        return rows;
-    }
-
-    public int getNumCols() {
-        return cols;
-    }
-
-    public void transform() {
+    private void buildRows() {
         List<Element> items = list.getChildren("item");
 
         for (int row = 1; row <= rows; row++) {
@@ -48,5 +42,13 @@ public class MCRItemListTransformer extends MCREditorTransformer {
                     r.addContent(items.remove(0));
             }
         }
+    }
+
+    public int getNumRows() {
+        return rows;
+    }
+
+    public int getNumCols() {
+        return cols;
     }
 }

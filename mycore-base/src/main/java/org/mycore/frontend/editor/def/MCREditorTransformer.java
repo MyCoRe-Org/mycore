@@ -1,14 +1,23 @@
 package org.mycore.frontend.editor.def;
 
+import java.util.List;
+
 import org.jdom.Element;
 
-public abstract class MCREditorTransformer {
+public class MCREditorTransformer extends MCRTransformerBase {
 
-    protected int getAttributeValue(Element element, String attributeName, int defaultValue) {
-        String value = element.getAttributeValue(attributeName, "");
-        if (value.isEmpty())
-            return defaultValue;
-        else
-            return Integer.parseInt(value);
+    public void transform(Element element) throws Exception {
+        String name = element.getName();
+        String type = element.getAttributeValue("type");
+
+        if ("panel".equals(name))
+            new MCRPanelCellTransformer().transform(element);
+        else if ("list".equals(name) && ("radio".equals(type) || "checkbox".equals(type)))
+            new MCRItemListTransformer().transform(element);
+
+        List<Element> children = element.getChildren();
+        for (Element child : children) {
+            transform(child);
+        }
     }
 }
