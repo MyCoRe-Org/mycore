@@ -6,13 +6,19 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.jdom.Element;
+import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.frontend.editor.def.MCRPanelCellTransformer;
 
-public class MCRPanelCellTransformerTest {
+public class MCRPanelCellTransformerTest extends MCRTransformerTest {
 
     MCRPanelCellTransformer transformer;
+
+    @Before
+    public void setup() {
+        transformer = new MCRPanelCellTransformer();
+    }
 
     @Test
     public void testEmptyPanel() throws Exception {
@@ -48,52 +54,26 @@ public class MCRPanelCellTransformerTest {
     @Test(expected = MCRConfigurationException.class)
     public void testPositionConflict() throws Exception {
         Element panel = buildTestPanel("2,4,*|2,4,*");
-        transformer = new MCRPanelCellTransformer(panel);
-        transformer.transform();
+        transformer.transform(panel);
     }
 
     @Test(expected = MCRConfigurationException.class)
     public void testPositionConflictWithExistingSpannedCell() throws Exception {
         Element panel = buildTestPanel("1,1,3|1,2,*");
-        transformer = new MCRPanelCellTransformer(panel);
-        transformer.transform();
+        transformer.transform(panel);
     }
 
     @Test(expected = MCRConfigurationException.class)
     public void testPositionConflictWithNewSpannedCell() throws Exception {
         Element panel = buildTestPanel("1,2,*|1,1,3");
-        transformer = new MCRPanelCellTransformer(panel);
-        transformer.transform();
+        transformer.transform(panel);
     }
 
     private void testPanelTransformation(String oldStructure, String newStructure, int minRow, int maxRow, int minCol, int maxCol) throws Exception {
         Element panel = buildTestPanel(oldStructure);
-        transformer = new MCRPanelCellTransformer(panel);
+        transformer.transform(panel);
         assertMinMax(minRow, maxRow, minCol, maxCol);
-        transformer.transform();
         assertPanelLayout(panel, newStructure);
-    }
-
-    private Element buildTestPanel(String cellLayout) {
-        Element panel = new Element("panel");
-        StringTokenizer st = new StringTokenizer(cellLayout, ",|");
-        while (st.hasMoreTokens()) {
-            Element cell = new Element("cell");
-            panel.addContent(cell);
-
-            String row = setAttribute(cell, "row", st.nextToken());
-            String col = setAttribute(cell, "col", st.nextToken());
-            setAttribute(cell, "colspan", st.nextToken());
-
-            cell.setAttribute("test", row + "," + col);
-        }
-        return panel;
-    }
-
-    private String setAttribute(Element cell, String attributeName, String value) {
-        if (!value.equals("*"))
-            cell.setAttribute(attributeName, value);
-        return value;
     }
 
     private void assertMinMax(int minRow, int maxRow, int minCol, int maxCol) {

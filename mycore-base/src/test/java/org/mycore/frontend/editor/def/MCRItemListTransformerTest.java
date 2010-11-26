@@ -6,7 +6,7 @@ import org.jdom.Element;
 import org.junit.Test;
 import org.mycore.frontend.editor.def.MCRItemListTransformer;
 
-public class MCRItemListTransformerTest {
+public class MCRItemListTransformerTest extends MCRTransformerTest {
 
     @Test
     public void testEmptyPanel() throws Exception {
@@ -51,29 +51,15 @@ public class MCRItemListTransformerTest {
     private void testTransformation(int numItems, int rows, int cols, int rowsCalculated, int colsCalculated) {
         Element list = buildTestList(numItems, rows, cols);
 
-        MCRItemListTransformer transformer = new MCRItemListTransformer(list);
+        MCRItemListTransformer transformer = new MCRItemListTransformer();
+        transformer.transform(list);
         assertEquals(rowsCalculated, transformer.getNumRows());
         assertEquals(colsCalculated, transformer.getNumCols());
 
-        transformer.transform();
         assertEquals(0, list.getChildren("item").size());
         assertEquals(rowsCalculated, list.getChildren("row").size());
 
         if (numItems > 0)
             assertEquals(colsCalculated, list.getChild("row").getChildren("item").size());
-    }
-
-    private Element buildTestList(int numItems, int rows, int cols) {
-        Element list = new Element("list");
-
-        if (rows > 0)
-            list.setAttribute("rows", Integer.toString(rows));
-        if (cols > 0)
-            list.setAttribute("cols", Integer.toString(cols));
-
-        for (int i = 0; i < numItems; i++)
-            list.addContent(new Element("item"));
-
-        return list;
     }
 }
