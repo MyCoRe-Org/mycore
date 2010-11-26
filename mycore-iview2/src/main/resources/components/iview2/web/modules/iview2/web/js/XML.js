@@ -51,12 +51,11 @@ function nodeAttributes(node) {
 	return attributes;
 }
 
-//TODO replace Function with Code by jQuery
 //TODO Doku ergänzen	
 /**
  * @public
  * @function
- * @name	getNodes
+ * @name		getNodes
  * @memberOf	iview.XML
  * @description	Gains the requested information from a given XML File
  * @param	{object} xmlfile XML file from which the data will be extruded
@@ -89,40 +88,10 @@ function getNodes(xmlfile, nodeName) {
 	}
 }
 
-//TODO Doku ergänzen
 /**
  * @public
  * @function
- * @name	getNodesInterim
- * @memberOf	iview.XML
- * @description	Gains the requested information from a given XML File. Function is namespace safe. Function will be renamed as soon as getNode is dropped
- * @param	{object} xmldata XML file from which the data will be extruded
- * @param	{string} nodeName the Node of the XML File which shall be gained, can be a group of nodes
- * @return	{} List of all Nodes with the given NodeName
- */
-function getNodesInterim(xmldata, nodeName) {
-	//crawl through all nodes and return those who match the given nodeName
-	return jQuery(xmldata).find("*[nodeName$='"+nodeName+"']");
-}
-	
-//TODO Doku ergänzen
-/**
- * @public
- * @function
- * @name	getPageCount
- * @memberOf	iview.XML
- * @description	
- * @param	{} res
- * @return	{integer} 
- */
-function getPageCount(res) {
-	return res.getElementsByTagName(namespaceCheck("mets:file")).length;
-}
-
-/**
- * @public
- * @function
- * @name	getForstNodeByTagName
+ * @name	getFirstNodeByTagName
  * @memberOf	iview.XML
  * @description	searches for the first Occurence of the given Tagname within the Element List and returns it
  * @param	{} nodeList Array which contains the Elements which shall be searched

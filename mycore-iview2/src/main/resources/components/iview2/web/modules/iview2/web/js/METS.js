@@ -568,7 +568,7 @@ iview.METS.PhysicalModelProvider = function(doc) {
 			getHrefs(this);
 			for (var i = 0; i < structures.length; i++) {
 				if (jQuery(structures[i]).attr("TYPE") == "PHYSICAL") {
-					var entries = structures[i].getElementsByTagNameNS('http://www.loc.gov/METS/','div');
+					var entries = getNodes(this._doc, "mets:div", structures[i]);
 					jQuery(entries).each(function() {
 						//Foreach page which is contained within the physical area retrieve its information and add it to the physical model
 						if (jQuery(this).attr("TYPE").toLowerCase() == "page") {
@@ -930,14 +930,13 @@ iview.METS.ChapterModelProvider = function(metsDoc) {
 		var physicals = jQuery(getNodes(that._metsDoc, "mets:structMap")).filter(function () {
 			return jQuery(this).attr("TYPE") == "PHYSICAL"
 		});
-		physicals = getNodesInterim(physicals[0], "div");
+		physicals = getNodes(that._metsDoc, "mets:div", physicals[0]);
 		var orders = [];
 		jQuery(physicals).each(function() {
 			orders[jQuery(this).attr("ID")] = jQuery(this).attr("ORDER");
 		});
-		jQuery(getNodesInterim(structLink, "smLink")).each(function() {
+		jQuery(getNodes(that._metsDoc, "mets:smLink", structLink)).each(function() {
 			that._model.addContent(orders[jQuery(this).attr(attributeCheck("xlink:to"))],jQuery(this).attr(attributeCheck("xlink:from")));
-			delete orders[jQuery(this).attr("xlink:to")];
 		});
 	}
 	
