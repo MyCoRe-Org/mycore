@@ -82,16 +82,22 @@ ToolbarController.prototype.addView = function(view) {
     			}
     		} else if (args.parentName == "overviewHandles") {
     			if (args.elementName == "openOverview") {
-    				openOverview(viewerID);
+    				if (typeof myself.getViewer().overview === 'undefined') {
+    					var oldUi = view.getButtonUi({'button' : args.view}).icons;
+    					view.setButtonUi({'button' : args.view, 'icons' : {'primary' : 'loading'}});
+    					setTimeout(function() {
+    						importOverview(viewerID, function() {view.setButtonUi({'button' : args.view, 'icons' : oldUi});});
+    					}, 10);
+    				} else {
+    					openOverview(viewerID);
+    				}
     			} else if (args.elementName == "openChapter") {
 					if (typeof myself.getViewer().chapter === 'undefined') {
 							var oldUi = view.getButtonUi({'button' : args.view}).icons;
 							view.setButtonUi({'button' : args.view, 'icons' : {'primary' : 'loading'}});
 							setTimeout(function(){
-								importChapter(myself.getViewer());
-								view.setButtonUi({'button' : args.view, 'icons' : oldUi});
-							}, 500);
-							return;
+								importChapter(myself.getViewer(), function() {view.setButtonUi({'button' : args.view, 'icons' : oldUi});});
+							}, 10);
 					} else {
 						openChapter(true, myself.getViewer());
 					}

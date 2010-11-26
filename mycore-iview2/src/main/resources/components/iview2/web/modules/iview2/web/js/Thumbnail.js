@@ -788,12 +788,13 @@ function importCutOut(viewID) {
 /**
  * @public
  * @function
- * @name	importChapter
+ * @name		importChapter
  * @memberOf	iview.Thumbnails
  * @description	calls the corresponding functions to create the chapter
- * @param	{string} viewID ID of the derivate
+ * @param		{string} viewID ID of the derivate
+ * @param		{function} callback function which is called just before the function returns
  */
-function importChapter(viewer) {
+function importChapter(viewer, callback) {
 	$LAB.script("chapter.js", "jquery.tree.min.js").wait(function() {
 		viewer.ChapterModelProvider = new iview.METS.ChapterModelProvider(viewer.newMETS);
 		
@@ -804,22 +805,28 @@ function importChapter(viewer) {
 		
 		updateModuls(viewer.viewID_to_remove);
 		openChapter(true, viewer);
+		callback();
 	});
 }
 
 /**
  * @public
  * @function
- * @name	importOverview
+ * @name		importOverview
  * @memberOf	iview.Thumbnails
  * @description	calls the corresponding functions to create the overview
- * @param	{string} viewID ID of the derivate
+ * @param		{string} viewID ID of the derivate
+ * @param		{function} callback function which is called just before the function returns
  */
-function importOverview(viewID) {
-	//overview loading
-	var ov = new iview.overview.Controller(Iview[viewID].PhysicalModelProvider, iview.overview.View, Iview[viewID].viewerBean.tileUrlProvider);
-	ov.createView({'mainClass':'overview', 'parent':"#viewerContainer"+viewID, 'useScrollBar':true});
-	Iview[viewID].overview = ov;
+function importOverview(viewID, callback) {
+	$LAB.script("overview.js").wait(function() {
+		//overview loading
+		var ov = new iview.overview.Controller(Iview[viewID].PhysicalModelProvider, iview.overview.View, Iview[viewID].viewerBean.tileUrlProvider);
+		ov.createView({'mainClass':'overview', 'parent':"#viewerContainer"+viewID, 'useScrollBar':true});
+		Iview[viewID].overview = ov;
+		openOverview(viewID);
+		callback();
+	});
 }
 
 /**
@@ -1014,9 +1021,9 @@ function processMETS(metsDoc, viewID) {
 		Iview[viewID].getToolbarCtrl().updateDropDown(jQuery(pagelist.find("a")[physicalModel.getCurPos() - 1]).html());
 	}
 
-	if (Iview[viewID].useOverview) {
-		$LAB.script("overview.js").wait(function() {
-			importOverview(viewID);
-		});
-	}
+//	if (Iview[viewID].useOverview) {
+//		$LAB.script("overview.js").wait(function() {
+//			importOverview(viewID);
+//		});
+//	}
 }
