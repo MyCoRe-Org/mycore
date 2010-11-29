@@ -1008,7 +1008,8 @@ function processMETS(metsDoc, viewID) {
 	while (it.hasNext()) {
 		curItem = it.next();
 		if (curItem != null) {
-			ul.append(jQuery('<li><a href="index.html#" id='+curItem.getID()+' class="'+curItem.getOrderlabel() + "[" + curItem.getOrder() + "]"+'">'+curItem.getOrderlabel() + '[' + curItem.getOrder() + ']'+'</a></li>'));
+			var orderLabel='[' + curItem.getOrder() + ']' + ((curItem.getOrderlabel().length > 0) ? ' - ' + curItem.getOrderlabel():'');  
+			ul.append(jQuery('<li><a href="index.html#" id='+curItem.getID()+' class="'+orderLabel+'">'+orderLabel+'</a></li>'));
 		}
 	}
 	pagelist.append(ul);
