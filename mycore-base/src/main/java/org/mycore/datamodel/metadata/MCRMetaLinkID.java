@@ -221,4 +221,9 @@ final public class MCRMetaLinkID extends MCRMetaLink {
             }
         }
     }
+    
+    @Override
+    public String toString(){
+        return getXLinkHref();
+    }
 }
