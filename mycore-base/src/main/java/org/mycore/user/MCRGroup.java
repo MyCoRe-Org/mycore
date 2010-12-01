@@ -32,6 +32,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.jdom.Element;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 
 /**
@@ -534,6 +535,10 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal {
         if (vec.contains(s)) {
             vec.remove(s);
         }
+    }
+
+    public static String getDefaultGroupID() {
+        return MCRConfiguration.instance().getString("MCR.Users.DefaultGroupName", "users");
     }
 
 }

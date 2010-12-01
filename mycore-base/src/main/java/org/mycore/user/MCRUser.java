@@ -35,7 +35,6 @@ import java.util.List;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -199,7 +198,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
 
     public MCRUser(String userid, String passwd) {
         this(MCRUserMgr.instance().getMaxUserNumID() + 1, userid, MCRSessionMgr.getCurrentSession().getCurrentUserID(), null, null, true,
-                true, null, null, MCRConfiguration.instance().getString("MCR.Users.Guestuser.GroupName", "guestgroup"), null, null, null,
+                true, null, null, MCRGroup.getDefaultGroupID(), null, null, null,
                 null, null, null, null, null, null, null, null, null, null, null, null, null, null);
     }
 

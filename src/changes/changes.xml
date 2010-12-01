@@ -9,6 +9,9 @@
       <action dev="mcrtchef" type="update">
         Separate ACL system from User system
         MCRUserMagr.login() now actually logs a (MCR) user in 
+        Guest User is not physically stored in database anymore
+        A default group for new users can be configured via property (defaults to "users"):
+        MCR.Users.DefaultGroupName
       </action>
       <action dev="mcrckoch" type="add">
         Added a new Toolbar-API to modify ImageViewer toolbar.

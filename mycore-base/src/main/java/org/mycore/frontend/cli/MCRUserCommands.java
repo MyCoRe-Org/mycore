@@ -224,6 +224,23 @@ public class MCRUserCommands extends MCRAbstractCommands {
         }
 
         LOGGER.info(MessageFormat.format("The user {0} with password {1} is installed.", suser, spasswd));
+
+        // the default group
+        try {
+            ArrayList<String> admUserIDs = new ArrayList<String>();
+
+            ArrayList<String> admGroupIDs = new ArrayList<String>();
+            ArrayList<String> mbrUserIDs = new ArrayList<String>();
+
+            MCRGroup g = new MCRGroup(MCRGroup.getDefaultGroupID(), suser, null, null, MessageFormat.format("The {0} group", MCRGroup.getDefaultGroupID()), admUserIDs, admGroupIDs, mbrUserIDs);
+
+            MCRUserMgr.instance().initializeGroup(g, suser);
+        } catch (Exception e) {
+            throw new MCRException("Can't create the default group.", e);
+        }
+
+        LOGGER.info("The group " + sgroup + " is installed.");
+
         MCRUserMgr.instance().login(suser, spasswd);
     }
 
