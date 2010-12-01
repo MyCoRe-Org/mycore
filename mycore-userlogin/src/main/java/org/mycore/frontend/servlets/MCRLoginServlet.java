@@ -24,15 +24,11 @@
 package org.mycore.frontend.servlets;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.servlet.ServletException;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
-
-import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.user.MCRUserMgr;
@@ -49,70 +45,25 @@ public class MCRLoginServlet extends MCRServlet {
     // The configuration
     private static Logger LOGGER = Logger.getLogger(MCRLoginServlet.class);
 
-    // user ID and password of the guest user
-    private static String GUEST_ID;
-
-    private static String GUEST_PWD;
-
-    private static String GUEST_GID;
-
-    public void init() throws ServletException {
-        super.init();
-
-        if ((GUEST_ID == null) || (GUEST_PWD == null)) {
-            GUEST_ID = MCRConfiguration.instance().getString("MCR.Users.Guestuser.UserName", "gast");
-            GUEST_PWD = MCRConfiguration.instance().getString("MCR.Users.Guestuser.UserPasswd", "gast");
-            GUEST_GID = MCRConfiguration.instance().getString("MCR.Users.Guestuser.GroupName", "guestgroup");
-        }
-    }
-
     /** This method overrides doGetPost of MCRServlet. */
     public void doGetPost(MCRServletJob job) throws Exception {
-        boolean loginOk = false;
-
-        // Get the MCRSession object for the current thread from the session
-        // manager.
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
 
         String uid = getProperty(job.getRequest(), "uid");
         String pwd = getProperty(job.getRequest(), "pwd");
         String backto_url = getProperty(job.getRequest(), "url");
 
-        if (uid != null) {
-            uid = (uid.trim().length() == 0) ? null : uid.trim();
-        }
-
-        if (pwd != null) {
-            pwd = (pwd.trim().length() == 0) ? null : pwd.trim();
-        }
-
-        if (backto_url != null) {
-            backto_url = (backto_url.trim().length() == 0) ? null : backto_url.trim();
-        }
         if (backto_url == null) {
             String referer = job.getRequest().getHeader("Referer");
             backto_url = (referer != null) ? referer : MCRServlet.getBaseURL();
         }
         LOGGER.debug("SessionID: " + mcrSession.getID());
-        LOGGER.debug("CurrentID: " + mcrSession.getCurrentUserID());
+        LOGGER.debug("CurrentID: " + mcrSession.getUserInformation().getCurrentUserID());
         LOGGER.debug("UID :      " + uid);
         LOGGER.debug("URL :      " + backto_url);
 
         // Do not change login, just redirect to given url:
-        if (mcrSession.getCurrentUserID().equals(uid)) {
-            job.getResponse().setHeader("Cache-Control", "no-cache");
-            job.getResponse().setHeader("Pragma", "no-cache");
-            job.getResponse().setHeader("Expires", "0");
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(backto_url));
-            return;
-        }
-
-        // Change login for default guest user, just redirect to given url:
-        if (GUEST_ID.equals(uid)) {
-            mcrSession.setCurrentUserID(GUEST_ID);
-            mcrSession.setLoginTime();
-            mcrSession.put("XSL.CurrentGroups", GUEST_GID);
-            LOGGER.info("Guest user " + GUEST_GID + " logged in successfully.");
+        if (mcrSession.getUserInformation().getCurrentUserID().equals(uid)) {
             job.getResponse().setHeader("Cache-Control", "no-cache");
             job.getResponse().setHeader("Pragma", "no-cache");
             job.getResponse().setHeader("Expires", "0");
@@ -123,63 +74,17 @@ public class MCRLoginServlet extends MCRServlet {
         org.jdom.Element root = new org.jdom.Element("mcr_user");
         org.jdom.Document jdomDoc = new org.jdom.Document(root);
 
-        root.addContent(new org.jdom.Element("guest_id").addContent(GUEST_ID));
-        root.addContent(new org.jdom.Element("guest_pwd").addContent(GUEST_PWD));
-
-        try {
-            loginOk = ((uid != null) && (pwd != null));
-            if (loginOk) {
-                loginOk = MCRUserMgr.instance().existUser(uid);
-                if (!loginOk)
-                    root.setAttribute("unknown_user", "true");
-            }
-            if (loginOk)
-                loginOk = MCRUserMgr.instance().login(uid, pwd);
-
-            // If the login attempt was successfull, change the user ID and
-            // forward to the
-            // UserServlet with mode=Select. However, if the user to login is
-            // the guest user,
-            // then the request will just be redirected to the originating URL,
-            // i.e. not
-            // forwarded to the UserServlet.
-            if (loginOk) {
-                mcrSession.setCurrentUserID(uid);
-                mcrSession.setLoginTime();
+        if (uid != null) {
+            if (MCRUserMgr.instance().login(uid, pwd)) {
+                //user logged in
                 LOGGER.info("MCRLoginServlet: user " + uid + " logged in successfully.");
-
-                // We here put the list of groups separated by blanks as a
-                // string into the HTTP
-                // session. The LayoutServlet then forwards them to the XSL
-                // Stylesheets.
-                StringBuffer groups = new StringBuffer();
-                List<String> groupList = MCRUserMgr.instance().retrieveUser(uid).getGroupIDs();
-                for (int i = 0; i < groupList.size(); i++) {
-                    if (i != 0)
-                        groups.append(" ");
-                    groups.append((String) groupList.get(i));
-                }
-                mcrSession.put("XSL.CurrentGroups", groups.toString());
-
                 job.getRequest().removeAttribute("mode");
                 job.getRequest().setAttribute("mode", "Select");
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(backto_url));
                 return;
-            }
-
-            if (uid != null) {
-                root.setAttribute("invalid_password", "true");
-            }
-        } catch (MCRException e) {
-            if (e.getMessage().equals("user can't be found in the database")) {
-                root.setAttribute("unknown_user", "true");
-                LOGGER.info("MCRLoginServlet: unknown user: " + uid);
-            } else if (e.getMessage().equals("Login denied. User is disabled.")) {
-                root.setAttribute("user_disabled", "true");
-                LOGGER.info("MCRLoginServlet: disabled user " + uid + " tried to login.");
             } else {
-                LOGGER.debug("MCRLoginServlet: unknown error: " + e.getMessage());
-                throw e;
+                //password is wrong
+                root.setAttribute("invalid_password", "true");
             }
         }
         root.addContent(new org.jdom.Element("backto_url").addContent(backto_url));

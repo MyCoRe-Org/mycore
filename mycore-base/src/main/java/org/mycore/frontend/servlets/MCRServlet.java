@@ -233,39 +233,8 @@ public class MCRServlet extends HttpServlet {
 
         MCRServletJob job = new MCRServletJob(req, res);
 
-        MCRSession session = getSession(req, getServletName());
+        MCRSession session = getSession(job.getRequest(), getServletName());
         try {
-            session.put("MCRServletJob", job);
-
-            String c = getClass().getName();
-            c = c.substring(c.lastIndexOf(".") + 1);
-
-            StringBuilder msg = new StringBuilder();
-            msg.append(c);
-            msg.append(" ip=");
-            msg.append(getRemoteAddr(req));
-            msg.append(" mcr=").append(session.getID());
-            msg.append(" user=").append(session.getCurrentUserID());
-            LOGGER.info(msg.toString());
-
-            String lang = getProperty(req, "lang");
-
-            if (lang != null && lang.trim().length() != 0) {
-                session.setCurrentLanguage(lang.trim());
-            }
-
-            // Set the IP of the current session
-            if (session.getCurrentIP().length() == 0) {
-                session.setCurrentIP(getRemoteAddr(req));
-            }
-
-            // set BASE_URL_ATTRIBUTE to MCRSession
-            if (req.getAttribute(BASE_URL_ATTRIBUTE) != null) {
-                session.put(BASE_URL_ATTRIBUTE, req.getAttribute(BASE_URL_ATTRIBUTE));
-            }
-
-            // Store XSL.*.SESSION parameters to MCRSession
-            putParamsToSession(req);
             //transaction around 1st phase of request
             Exception thinkException = processThinkPhase(job);
             //first phase completed, start rendering phase
@@ -295,6 +264,41 @@ public class MCRServlet extends HttpServlet {
         }
     }
 
+    private void configureSession(MCRServletJob job) {
+        MCRSession session = MCRSessionMgr.getCurrentSession();
+        session.put("MCRServletJob", job);
+
+        String c = getClass().getName();
+        c = c.substring(c.lastIndexOf(".") + 1);
+
+        StringBuilder msg = new StringBuilder();
+        msg.append(c);
+        msg.append(" ip=");
+        msg.append(getRemoteAddr(job.getRequest()));
+        msg.append(" mcr=").append(session.getID());
+        msg.append(" user=").append(session.getCurrentUserID());
+        LOGGER.info(msg.toString());
+
+        String lang = getProperty(job.getRequest(), "lang");
+
+        if (lang != null && lang.trim().length() != 0) {
+            session.setCurrentLanguage(lang.trim());
+        }
+
+        // Set the IP of the current session
+        if (session.getCurrentIP().length() == 0) {
+            session.setCurrentIP(getRemoteAddr(job.getRequest()));
+        }
+
+        // set BASE_URL_ATTRIBUTE to MCRSession
+        if (job.getRequest().getAttribute(BASE_URL_ATTRIBUTE) != null) {
+            session.put(BASE_URL_ATTRIBUTE, job.getRequest().getAttribute(BASE_URL_ATTRIBUTE));
+        }
+
+        // Store XSL.*.SESSION parameters to MCRSession
+        putParamsToSession(job.getRequest());
+    }
+
     private Exception processThinkPhase(MCRServletJob job) {
         MCRSession session = MCRSessionMgr.getCurrentSession();
         try {
@@ -302,6 +306,7 @@ public class MCRServlet extends HttpServlet {
                 // current Servlet not called via RequestDispatcher
                 session.beginTransaction();
             }
+            configureSession(job);
             think(job);
             if (getProperty(job.getRequest(), INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
                 // current Servlet not called via RequestDispatcher
@@ -642,7 +647,7 @@ public class MCRServlet extends HttpServlet {
             }
         }
     }
-    
+
     /**
      * returns a translated error message for the current Servlet.
      * 
@@ -650,7 +655,7 @@ public class MCRServlet extends HttpServlet {
      * @param subIdentifier last part of I18n key
      * @param args any arguments that should be passed to {@link MCRTranslation#translate(String, Object...)}
      */
-    protected String getErrorI18N(String subIdentifier, Object... args){
+    protected String getErrorI18N(String subIdentifier, Object... args) {
         String key = MessageFormat.format("error.{0}.{1}", getClass().getSimpleName(), subIdentifier);
         return MCRTranslation.translate(key, args);
     }

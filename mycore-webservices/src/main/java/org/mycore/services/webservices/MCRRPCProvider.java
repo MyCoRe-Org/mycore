@@ -24,6 +24,7 @@
 package org.mycore.services.webservices;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.axis.Constants;
@@ -32,6 +33,7 @@ import org.apache.axis.providers.java.RPCProvider;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRUserInformation;
 
 /**
  * Wraps WebService method invocation with hibernate transaction
@@ -49,14 +51,24 @@ public class MCRRPCProvider extends RPCProvider {
     /**
      * Wraps WebService method invocation with hibernate transaction
      */
-    protected Object invokeMethod(MessageContext mc, Method method, Object obj, Object[] argValues) throws Exception {
+    protected Object invokeMethod(final MessageContext mc, Method method, Object obj, Object[] argValues) throws Exception {
         int count = counter.incrementAndGet();
-        LOGGER.info("WebService call #" + count + " to " + method.getDeclaringClass().getName() + ":" + method.getName());
         MCRSession session = MCRSessionMgr.getCurrentSession();
         session.setLoginTime();
-        session.setCurrentUserID(mc.getUsername());
+        session.setUserInformation(new MCRUserInformation() {
+            @Override
+            public boolean isUserInRole(String role) {
+                return Arrays.asList(mc.getRoles()).contains(role);
+            }
+            
+            @Override
+            public String getCurrentUserID() {
+                return mc.getUsername();
+            }
+        });
         session.setCurrentIP(mc.getStrProp(Constants.MC_REMOTE_ADDR));
         session.beginTransaction();
+        LOGGER.info("WebService call #" + count + " to " + method.getDeclaringClass().getName() + ":" + method.getName());
         long millis = System.currentTimeMillis();
         Object result;
 

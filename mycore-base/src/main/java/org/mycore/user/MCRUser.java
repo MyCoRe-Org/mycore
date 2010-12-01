@@ -166,7 +166,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
             boolean updateAllowed, String description, String passwd, String primaryGroupID, List<String> groupIDs, String salutation,
             String firstname, String lastname, String street, String city, String postalcode, String country, String state,
             String institution, String faculty, String department, String institute, String telephone, String fax, String email,
-            String cellphone) throws MCRException, Exception {
+            String cellphone) {
         // The following data will never be changed by update
         super.ID = trim(ID, id_len);
         this.numID = numID;
@@ -197,7 +197,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
                 department, institute, telephone, fax, email, cellphone);
     }
 
-    public MCRUser(String userid, String passwd) throws MCRException, Exception {
+    public MCRUser(String userid, String passwd) {
         this(MCRUserMgr.instance().getMaxUserNumID() + 1, userid, MCRSessionMgr.getCurrentSession().getCurrentUserID(), null, null, true,
                 true, null, null, MCRConfiguration.instance().getString("MCR.Users.Guestuser.GroupName", "guestgroup"), null, null, null,
                 null, null, null, null, null, null, null, null, null, null, null, null, null, null);

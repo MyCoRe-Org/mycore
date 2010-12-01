@@ -25,10 +25,10 @@ package org.mycore.access.mcrimpl;
 
 import org.jdom.Attribute;
 import org.jdom.Element;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRConditionVisitor;
 import org.mycore.user.MCRGroup;
-import org.mycore.user.MCRUserFacade;
 
 /**
  * Implementation of a (group xy) clause
@@ -54,7 +54,7 @@ class MCRGroupClause implements MCRCondition {
         if (data.getUser() != null) {
             return data.getUser().isMemberOf(group) ^ not;
         }
-        return MCRUserFacade.isUserInGroup(group.getID()) ^ not;
+        return MCRSessionMgr.getCurrentSession().getUserInformation().isUserInRole(group.getID()) ^ not;
     }
 
     @Override

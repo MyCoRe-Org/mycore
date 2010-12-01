@@ -51,7 +51,9 @@ import org.mycore.common.MCRUsageException;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.ifs2.MCRContent;
+import org.mycore.user.MCRUser;
 import org.mycore.user.MCRUserMgr;
+import org.mycore.user.MCRUserRoleProvider;
 
 /**
  * The main class implementing the MyCoRe command line interface. With the command line interface, you can import, export, update and delete documents and other
@@ -173,8 +175,9 @@ public class MCRCommandLineInterface {
             System.exit(1);
         }
         session = MCRSessionMgr.getCurrentSession();
-        session.setCurrentIP(MCRSession.getLocalIP());
-        session.setCurrentUserID(config.getString("MCR.Users.Superuser.UserName", "administrator"));
+        session.setCurrentIP("127.0.0.1");
+        MCRUser adminUser = MCRUserMgr.instance().retrieveUser(config.getString("MCR.Users.Superuser.UserName", "administrator"));
+        session.setUserInformation(new MCRUserRoleProvider(adminUser));
         MCRSessionMgr.setCurrentSession(session);
 
         System.out.println(system + " Initialization done.");
@@ -422,7 +425,7 @@ public class MCRCommandLineInterface {
         Element cloned = (Element) resolved.clone();
         MCRContent.readFrom(new Document(cloned)).sendTo(new File(file));
     }
-    
+
     /**
      * Shows details about an exception that occured during command processing
      * 
@@ -598,21 +601,11 @@ public class MCRCommandLineInterface {
      *            the password of the new user
      */
     public static void changeToUser(String user, String password) {
-        if (userExists(user)) {
-            System.out.println(system + " The old user ID is " + session.getCurrentUserID());
-
-            if (org.mycore.user.MCRUserMgr.instance().login(user.trim(), password.trim())) {
-                session.setCurrentUserID(user);
-                session.setLoginTime();
-                System.out.println(system + " The new user ID is " + session.getCurrentUserID());
-            } else {
-                String msg = "Wrong password, no changes of user ID in session context!";
-                if (logger.isDebugEnabled()) {
-                    logger.debug(msg);
-                } else {
-                    System.out.println(system + " " + msg);
-                }
-            }
+        System.out.println(system + " The old user ID is " + session.getCurrentUserID());
+        if (MCRUserMgr.instance().login(user, password)) {
+            System.out.println(system + " The new user ID is " + session.getCurrentUserID());
+        } else {
+            logger.warn("Wrong password, no changes of user ID in session context!");
         }
     }
 
@@ -623,30 +616,12 @@ public class MCRCommandLineInterface {
      *            the new user ID
      */
     public static void login(String user) {
-        if (userExists(user)) {
-            System.out.println(system + " The old user ID is " + session.getCurrentUserID());
+        char[] password = {};
+        do {
+            password = System.console().readPassword("{0} Enter password for user {1} :> ", system, user);
+        } while (password.length == 0);
 
-            String password = "";
-
-            do {
-                System.out.print(system + " Enter the password for user " + user + ":> ");
-
-                try {
-                    password = console.readLine();
-                } catch (IOException ex) {
-                }
-            } while ((password = password.trim()).length() == 0);
-
-            changeToUser(user, password);
-        }
-    }
-
-    private static boolean userExists(String user) {
-        if (MCRUserMgr.instance().existUser(user)) {
-            return true;
-        }
-        System.out.println(system + " User does not exists: " + user);
-        return false;
+        changeToUser(user, String.valueOf(password));
     }
 
     /**

@@ -947,12 +947,16 @@ public class MCRUserMgr {
         if (loginUser.isEnabled()) {
             if (useEncryption) {
                 String salt = loginUser.getPassword().substring(0, 3);
-                String newCrypt = MCRCrypt.crypt(salt, passwd);
-
-                return loginUser.getPassword().equals(newCrypt);
+                passwd = MCRCrypt.crypt(salt, passwd);
             }
 
-            return loginUser.getPassword().equals(passwd);
+            if (loginUser.getPassword().equals(passwd)){
+                MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+                mcrSession.setUserInformation(new MCRUserRoleProvider(loginUser));
+                mcrSession.setLoginTime();
+                return true;
+            }
+            return false;
         }
 
         throw new MCRException("Login denied. User is disabled.");

@@ -26,15 +26,15 @@ package org.mycore.common;
 import static org.mycore.common.events.MCRSessionEvent.Type.activated;
 import static org.mycore.common.events.MCRSessionEvent.Type.passivated;
 
-import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
@@ -42,7 +42,6 @@ import org.hibernate.Transaction;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.events.MCRSessionEvent;
 import org.mycore.common.events.MCRSessionListener;
-import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
  * Instances of this class collect information kept during a session like the
@@ -81,7 +80,7 @@ public class MCRSession implements Cloneable {
     static Logger LOGGER = Logger.getLogger(MCRSession.class.getName());
 
     /** The user ID of the session */
-    private String userID = null;
+    private MCRUserInformation userInformation;
 
     /** The language for this session as upper case character */
     private String language = null;
@@ -103,13 +102,29 @@ public class MCRSession implements Cloneable {
 
     private StackTraceElement[] constructingStackTrace;
 
+    private static MCRUserInformation guestUserInformation = new MCRUserInformation() {
+        String guestUserID = MCRConfiguration.instance().getString("MCR.Users.Guestuser.UserName", "guest");
+
+        String guestGroup = MCRConfiguration.instance().getString("MCR.Users.Guestuser.GroupName", "guestgroup");
+
+        @Override
+        public boolean isUserInRole(String role) {
+            return guestGroup.equals(role);
+        }
+
+        @Override
+        public String getCurrentUserID() {
+            return guestUserID;
+        }
+    };
+
     /**
      * The constructor of a MCRSession. As default the user ID is set to the
      * value of the property variable named 'MCR.Users.Guestuser.UserName'.
      */
     MCRSession() {
         MCRConfiguration config = MCRConfiguration.instance();
-        userID = config.getString("MCR.Users.Guestuser.UserName", "gast");
+        userInformation = guestUserInformation;
         language = config.getString("MCR.Metadata.DefaultLang", "de");
         dataBaseAccess = MCRConfiguration.instance().getBoolean("MCR.Persistence.Database.Enable", true);
 
@@ -138,26 +153,8 @@ public class MCRSession implements Cloneable {
      * Constructs a unique session ID for this session, based on current time
      * and IP address of host where the code runs.
      */
-    private static synchronized String buildSessionID() {
-        String localip = getLocalIP();
-
-        java.util.StringTokenizer st = new java.util.StringTokenizer(localip, ".");
-
-        long sum = Integer.parseInt(st.nextToken());
-
-        while (st.hasMoreTokens()) {
-            sum = (sum << 8) + Integer.parseInt(st.nextToken());
-        }
-
-        String address = Long.toString(sum, 36);
-        address = "000000" + address;
-
-        String prefix = address.substring(address.length() - 6);
-
-        long now = System.currentTimeMillis();
-        String suffix = Long.toString(now, 36);
-
-        return prefix + "-" + suffix;
+    private static String buildSessionID() {
+        return UUID.randomUUID().toString();
     }
 
     /**
@@ -192,14 +189,11 @@ public class MCRSession implements Cloneable {
         return mapEntries;
     }
 
-    /** returns the current user ID */
+    /** returns the current user ID
+     * @deprecated use {@link #getUserInformation()}.getCurrentUserID() instead;
+     */
     public final String getCurrentUserID() {
-        return userID;
-    }
-
-    /** sets the current user ID */
-    public final void setCurrentUserID(String userID) {
-        this.userID = userID;
+        return getUserInformation().getCurrentUserID();
     }
 
     /** returns the current language */
@@ -212,22 +206,30 @@ public class MCRSession implements Cloneable {
         this.language = language;
     }
 
-    /** returns the current document ID */
+    /** returns the current document ID
+     * @deprecated without replacement
+     */
     public final String getCurrentDocumentID() {
         return CurrentDocumentID;
     }
 
-    /** returns the current document ID */
+    /** returns the current document ID
+     * @deprecated without replacement
+     */
     public final String getCurrentUserName() {
         return FullName;
     }
 
-    /** sets the current user fullname */
+    /** sets the current user fullname
+     * @deprecated without replacement 
+     */
     public final void setCurrentUserName(String userName) {
         FullName = userName;
     }
 
-    /** sets the current document ID */
+    /** sets the current document ID
+     * @deprecated without replacement
+     */
     public final void setCurrentDocumentID(String DocumentID) {
         CurrentDocumentID = DocumentID;
     }
@@ -235,7 +237,7 @@ public class MCRSession implements Cloneable {
     /** Write data to the logger for debugging purposes */
     public final void debug() {
         LOGGER.debug("SessionID = " + sessionID);
-        LOGGER.debug("UserID    = " + userID);
+        LOGGER.debug("UserID    = " + getUserInformation().getCurrentUserID());
         LOGGER.debug("IP        = " + ip);
         LOGGER.debug("language  = " + language);
     }
@@ -256,7 +258,9 @@ public class MCRSession implements Cloneable {
         map.remove(key);
     }
 
-    /** Get the ip value to the local IP */
+    /** Get the ip value to the local IP
+     * @deprecated without replacement
+     */
     public static final String getLocalIP() {
         try {
             return java.net.InetAddress.getLocalHost().getHostAddress();
@@ -391,26 +395,6 @@ public class MCRSession implements Cloneable {
         return createTime;
     }
 
-    public Principal getUserPrincipal() {
-        MCRServletJob job = (MCRServletJob) get("MCRServletJob");
-        if (job == null) {
-            return null;
-        }
-        return job.getRequest().getUserPrincipal();
-    }
-
-    public boolean isPrincipalInRole(String role) {
-        Principal p = getUserPrincipal();
-        if (p == null) {
-            return false;
-        }
-        MCRServletJob job = (MCRServletJob) get("MCRServletJob");
-        if (job == null) {
-            return false;
-        }
-        return job.getRequest().isUserInRole(role);
-    }
-
     /**
      * starts a new database transaction.
      */
@@ -456,6 +440,20 @@ public class MCRSession implements Cloneable {
 
     public StackTraceElement[] getConstructingStackTrace() {
         return constructingStackTrace;
+    }
+
+    /**
+     * @return the userInformation
+     */
+    public MCRUserInformation getUserInformation() {
+        return userInformation;
+    }
+
+    /**
+     * @param userInformation the userInformation to set
+     */
+    public void setUserInformation(MCRUserInformation userSystemAdapter) {
+        this.userInformation = userSystemAdapter;
     }
 
 }

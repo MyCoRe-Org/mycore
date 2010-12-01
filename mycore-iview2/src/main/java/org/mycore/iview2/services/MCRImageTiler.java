@@ -16,6 +16,7 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
 
@@ -75,8 +76,7 @@ public class MCRImageTiler implements Runnable, Closeable {
         Thread.currentThread().setName("TileMaster");
         //get this MCRSession a speaking name
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        mcrSession.setCurrentUserID("SYSTEM");
-        mcrSession.setCurrentUserName(Thread.currentThread().getName());
+        mcrSession.setUserInformation(MCRSystemUserInformation.getInstance());
         boolean activated = MCRConfiguration.instance().getBoolean(CONFIG_PREFIX + "LocalTiler.activated", true);
         LOGGER.info("Local Tiling is "+(activated?"activated":"deactivated"));
         if (activated) {
