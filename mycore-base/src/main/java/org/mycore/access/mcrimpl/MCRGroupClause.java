@@ -28,7 +28,6 @@ import org.jdom.Element;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRConditionVisitor;
-import org.mycore.user.MCRGroup;
 
 /**
  * Implementation of a (group xy) clause
@@ -37,7 +36,6 @@ import org.mycore.user.MCRGroup;
  * @author Mathias Fricke
  */
 class MCRGroupClause implements MCRCondition {
-    private MCRGroup group;
 
     private String groupname;
 
@@ -45,16 +43,11 @@ class MCRGroupClause implements MCRCondition {
 
     MCRGroupClause(String group, boolean not) {
         groupname = group;
-        this.group = new MCRGroup(group);
         this.not = not;
     }
 
     public boolean evaluate(Object o) {
-        MCRAccessData data = (MCRAccessData) o;
-        if (data.getUser() != null) {
-            return data.getUser().isMemberOf(group) ^ not;
-        }
-        return MCRSessionMgr.getCurrentSession().getUserInformation().isUserInRole(group.getID()) ^ not;
+        return MCRSessionMgr.getCurrentSession().getUserInformation().isUserInRole(groupname) ^ not;
     }
 
     @Override

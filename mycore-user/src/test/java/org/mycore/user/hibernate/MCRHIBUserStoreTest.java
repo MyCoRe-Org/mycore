@@ -1,13 +1,17 @@
-package org.mycore.backend.hibernate;
+package org.mycore.user.hibernate;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import org.hibernate.cfg.Configuration;
 import org.junit.Before;
 import org.junit.Test;
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRHibTestCase;
-import org.mycore.frontend.cli.MCRUserCommands;
 import org.mycore.user.MCRGroup;
 import org.mycore.user.MCRUser;
-import static org.junit.Assert.*;
+import org.mycore.user.MCRUserCommands;
 
 public class MCRHIBUserStoreTest extends MCRHibTestCase {
 
@@ -19,6 +23,22 @@ public class MCRHIBUserStoreTest extends MCRHibTestCase {
         setProperty("MCR.Users.Superuser.GroupName", "adminGroup", true);
         setProperty("MCR.Persistence.User.Store.Class", MCRHIBUserStore.class.getCanonicalName(), true);
         MCRUserCommands.initSuperuser();
+    }
+
+    /* (non-Javadoc)
+     * @see org.mycore.common.MCRHibTestCase#getHibernateConfiguration(org.mycore.backend.hibernate.MCRHIBConnection)
+     */
+    @Override
+    protected Configuration getHibernateConfiguration() {
+        MCRHIBConnection connection = MCRHIBConnection.instance();
+        Configuration conf = connection.getConfiguration();
+        if (connection.containsMapping("MCRUSERS"))
+            return conf;
+        return conf
+            .addResource("org/mycore/user/hibernate/MCRGROUPADMINS.hbm.xml")
+            .addResource("org/mycore/user/hibernate/MCRGROUPMEMBERS.hbm.xml")
+            .addResource("org/mycore/user/hibernate/MCRGROUPS.hbm.xml")
+            .addResource("org/mycore/user/hibernate/MCRUSERS.hbm.xml");
     }
 
     @Test

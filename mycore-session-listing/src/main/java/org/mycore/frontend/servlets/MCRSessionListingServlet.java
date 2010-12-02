@@ -27,14 +27,11 @@ import java.util.Collection;
 
 import org.jdom.Document;
 import org.jdom.Element;
-
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRUserInformation;
 import org.mycore.common.xml.MCRLayoutService;
-import org.mycore.user.MCRUser;
-import org.mycore.user.MCRUserContact;
-import org.mycore.user.MCRUserMgr;
 
 public class MCRSessionListingServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
@@ -53,18 +50,17 @@ public class MCRSessionListingServlet extends MCRServlet {
         // ConcurrentModificationException)
         Collection<MCRSession> sessions = new ArrayList<MCRSession>(MCRSessionMgr.getAllSessions().values());
         Element sessionsXML = new Element("sessionListing");
-        MCRUserMgr um = MCRUserMgr.instance();
         for (MCRSession session : sessions) {
             Element sessionXML = new Element("session");
             sessionXML.addContent(new Element("id").setText(session.getID()));
-            String currentUserID = session.getCurrentUserID();
+            String currentUserID = session.getUserInformation().getCurrentUserID();
             sessionXML.addContent(new Element("login").setText(currentUserID));
             sessionXML.addContent(new Element("ip").setText(session.getCurrentIP()));
             if (currentUserID != null) {
-                MCRUser user = um.retrieveUser(currentUserID);
-                MCRUserContact userContacts = user.getUserContact();
-                String userRealName = userContacts.getFirstName() + " " + userContacts.getLastName();
-                sessionXML.addContent(new Element("userRealName").setText(userRealName));
+                String userRealName = session.getUserInformation().getUserAttribute(MCRUserInformation.ATT_REAL_NAME);
+                if (userRealName != null) {
+                    sessionXML.addContent(new Element("userRealName").setText(userRealName));
+                }
             }
             sessionXML.addContent(new Element("createTime").setText(Long.toString(session.getCreateTime())));
             sessionXML.addContent(new Element("lastAccessTime").setText(Long.toString(session.getLastAccessedTime())));
@@ -80,7 +76,7 @@ public class MCRSessionListingServlet extends MCRServlet {
                 cst.addContent(e);
             }
             //if session still valid
-            if (session.getID()!=null)
+            if (session.getID() != null)
                 sessionsXML.addContent(sessionXML);
         }
         return new Document(sessionsXML);

@@ -11,12 +11,9 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.output.DOMOutputter;
 import org.jdom.xpath.XPath;
-import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.frontend.MCRLayoutUtilities;
-import org.mycore.user.MCRUser;
-import org.mycore.user.MCRUserMgr;
 
 public class MCRWCMSUtilities {
 
@@ -152,8 +149,7 @@ public class MCRWCMSUtilities {
             Element child = (Element) childIter.next();
             boolean access = false;
             if (!userID.equals("")) {
-                MCRUser user = MCRUserMgr.instance().retrieveUser(userID);
-                access = MCRLayoutUtilities.itemAccess(getWritePermissionWebpage(), child, false, user);
+                access = MCRLayoutUtilities.itemAccess(getWritePermissionWebpage(), child, false, userID);
             } else
                 access = MCRLayoutUtilities.itemAccess(getWritePermissionWebpage(), child, false);
             if (access) {

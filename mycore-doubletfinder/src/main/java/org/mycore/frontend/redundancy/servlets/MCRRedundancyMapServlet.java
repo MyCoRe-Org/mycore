@@ -41,10 +41,10 @@ import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRUserInformation;
 import org.mycore.frontend.redundancy.MCRRedundancyUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
-import org.mycore.user.MCRUserMgr;
 
 /**
  * @author Matthias Eichner
@@ -163,17 +163,18 @@ public class MCRRedundancyMapServlet extends MCRServlet {
             }
             // edit doublet entry
             objectElement.setAttribute("status", selection);
-            
+
             count++;
         }
         // add some general infos to the redObjectsElements
-        String user = session.getCurrentUserID();
-        String userRealName = MCRUserMgr.instance().retrieveUser(user).getUserContact().getFirstName() + " "
-                + MCRUserMgr.instance().retrieveUser(user).getUserContact().getLastName();
+        MCRUserInformation userInformation = session.getUserInformation();
+        String user = userInformation.getCurrentUserID();
+        String userRealName = userInformation.getUserAttribute(MCRUserInformation.ATT_REAL_NAME);
         long time = System.currentTimeMillis();
         java.util.Date date = new java.util.Date(time);
         redObjectsElement.setAttribute("user", user);
-        redObjectsElement.setAttribute("userRealName", userRealName);
+        if (userRealName != null)
+            redObjectsElement.setAttribute("userRealName", userRealName);
         redObjectsElement.setAttribute("time", Long.toString(time));
         redObjectsElement.setAttribute("timePretty", date.toGMTString());
         if (closed)

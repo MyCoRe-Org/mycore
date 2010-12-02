@@ -29,7 +29,6 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
-import org.mycore.user.MCRUserMgr;
 
 /**
  * This class is the superclass of servlets which checks the MCREditorServlet
@@ -47,9 +46,6 @@ abstract public class MCRCheckBase extends MCRServlet {
 
     // The Workflow Manager
     protected static MCRSimpleWorkflowManager WFM = MCRSimpleWorkflowManager.instance();
-
-    // The User Manager
-    protected static MCRUserMgr UM = MCRUserMgr.instance();
 
     // pagedir
     protected static String pagedir = MCRConfiguration.instance().getString("MCR.SWF.PageDir", "");

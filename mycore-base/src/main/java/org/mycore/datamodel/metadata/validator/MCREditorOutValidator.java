@@ -35,8 +35,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -48,6 +48,7 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRUserInformation;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRParserXerces;
 import org.mycore.datamodel.metadata.MCRMetaAccessRule;
@@ -68,7 +69,6 @@ import org.mycore.datamodel.metadata.MCRMetaNumber;
 import org.mycore.datamodel.metadata.MCRMetaPersonName;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.user.MCRUserMgr;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -492,14 +492,18 @@ public class MCREditorOutValidator {
                         continue;
                     }
                     if (value.equals("$CurrentUser")) {
-                        String thisuser = MCRSessionMgr.getCurrentSession().getCurrentUserID();
+                        String thisuser = MCRSessionMgr.getCurrentSession().getUserInformation().getCurrentUserID();
                         firstcond.setAttribute("value", thisuser);
                         continue;
                     }
                     if (value.equals("$CurrentGroup")) {
-                        String thisuser = MCRSessionMgr.getCurrentSession().getCurrentUserID();
-                        String thisgroup = MCRUserMgr.instance().getPrimaryGroupIDOfUser(thisuser);
-                        firstcond.setAttribute("value", thisgroup);
+                        MCRUserInformation userInformation = MCRSessionMgr.getCurrentSession().getUserInformation();
+                        String thisgroup = userInformation.getUserAttribute(MCRUserInformation.ATT_PRIMARY_GROUP);
+                        if (thisgroup != null) {
+                            firstcond.setAttribute("value", thisgroup);
+                        } else {
+                            throw new MCRException("Could not aquire primary group for user " + userInformation.getCurrentUserID());
+                        }
                         continue;
                     }
                     int i = value.indexOf("$CurrentIP");

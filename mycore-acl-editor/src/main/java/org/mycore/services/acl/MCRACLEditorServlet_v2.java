@@ -10,13 +10,12 @@ import org.apache.log4j.Logger;
 import org.jdom.DocType;
 import org.jdom.Document;
 import org.jdom.Element;
-
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
-import org.mycore.user.MCRUserMgr;
 
 public class MCRACLEditorServlet_v2 extends MCRServlet {
 
@@ -73,7 +72,7 @@ public class MCRACLEditorServlet_v2 extends MCRServlet {
 
     public void verifyAccess(MCRServletJob job) throws IOException {
         if (!MCRAccessManager.getAccessImpl().checkPermission("use-aclEditor")) {
-            LOGGER.info("Access denied for userID=" + MCRUserMgr.instance().getCurrentUser().getID());
+            LOGGER.info("Access denied for userID=" + MCRSessionMgr.getCurrentSession().getUserInformation().getCurrentUserID());
             final String queryString = (job.getRequest().getQueryString() != null) ? "?" + job.getRequest().getQueryString() : ":";
             job.getResponse().sendRedirect(
                     job.getResponse()

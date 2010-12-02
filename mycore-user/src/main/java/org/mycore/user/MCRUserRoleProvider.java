@@ -23,6 +23,9 @@
 
 package org.mycore.user;
 
+import java.text.MessageFormat;
+import java.util.HashMap;
+
 import org.mycore.common.MCRUserInformation;
 
 /**
@@ -34,8 +37,18 @@ public class MCRUserRoleProvider implements MCRUserInformation {
 
     private MCRUser user;
 
+    private HashMap<String, String> attr;
+
     public MCRUserRoleProvider(MCRUser user) {
         this.user = user;
+        initAttributes();
+    }
+
+    private void initAttributes() {
+        attr = new HashMap<String, String>();
+        attr.put(ATT_PRIMARY_GROUP, this.user.getPrimaryGroupID());
+        MCRUserContact userContact = this.user.getUserContact();
+        attr.put(ATT_REAL_NAME, MessageFormat.format("{0} {1}", userContact.getFirstName(), userContact.getLastName()));
     }
 
     /* (non-Javadoc)
@@ -52,6 +65,11 @@ public class MCRUserRoleProvider implements MCRUserInformation {
     @Override
     public boolean isUserInRole(String role) {
         return user.getGroupIDs().contains(role);
+    }
+
+    @Override
+    public String getUserAttribute(String attribute) {
+        return attr.get(attribute);
     }
 
 }

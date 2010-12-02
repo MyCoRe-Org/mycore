@@ -8,6 +8,7 @@
     <release version="2.0.94" date="201?-?-?" description="Beta 4">
       <action dev="mcrtchef" type="update">
       	merged mycore-useradmin and mycore-userlogin component into mycore-user
+        moved user system related code from mycore-base to mycore-user
       </action>
       <action dev="mcrtchef" type="update">
         Separate ACL system from User system

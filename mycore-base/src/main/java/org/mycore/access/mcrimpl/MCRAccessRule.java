@@ -31,7 +31,6 @@ import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRParseException;
-import org.mycore.user.MCRUser;
 
 public class MCRAccessRule {
     String id = "";
@@ -60,16 +59,16 @@ public class MCRAccessRule {
         }
     }
 
-    public boolean checkAccess(MCRUser user, Date date, MCRIPAddress ip) {
+    public boolean checkAccess(String userID, Date date, MCRIPAddress ip) {
         if (parsedRule == null) {
-            if (user.getID().equals(MCRAccessControlSystem.superuserID)) {
+            if (userID.equals(MCRAccessControlSystem.superuserID)) {
                 Logger.getLogger(MCRAccessRule.class).debug("No rule defined, grant access to super user.");
                 return true;
             }
             return false;
         }
         Logger.getLogger(this.getClass()).debug("new MCRAccessData");
-        MCRAccessData data = new MCRAccessData(user, date, ip);
+        MCRAccessData data = new MCRAccessData(userID, date, ip);
         Logger.getLogger(this.getClass()).debug("new MCRAccessData done.");
 
         Logger.getLogger(this.getClass()).debug("evaluate MCRAccessData");

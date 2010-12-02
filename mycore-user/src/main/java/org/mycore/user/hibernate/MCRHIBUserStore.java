@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.backend.hibernate;
+package org.mycore.user.hibernate;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -34,11 +34,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.mycore.backend.hibernate.tables.MCRGROUPADMINS;
-import org.mycore.backend.hibernate.tables.MCRGROUPADMINSPK;
-import org.mycore.backend.hibernate.tables.MCRGROUPMEMBERS;
-import org.mycore.backend.hibernate.tables.MCRGROUPS;
-import org.mycore.backend.hibernate.tables.MCRUSERS;
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.user.MCRGroup;

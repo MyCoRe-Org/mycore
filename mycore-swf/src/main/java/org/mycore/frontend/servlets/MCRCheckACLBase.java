@@ -180,22 +180,6 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
                                                     continue;
                                                 }
                                                 String condfield = incond.getAttributeValue("field");
-                                                if (condfield.equals("user")) {
-                                                    if (!UM.existUser(condvalue)) {
-                                                        inbool.get(j).removeContent(incond);
-                                                        k--;
-                                                        l--;
-                                                        continue;
-                                                    }
-                                                }
-                                                if (condfield.equals("group")) {
-                                                    if (!UM.existGroup(condvalue)) {
-                                                        inbool.get(j).removeContent(incond);
-                                                        k--;
-                                                        l--;
-                                                        continue;
-                                                    }
-                                                }
                                                 if (condfield.equals("date")) {
                                                     if (MCRUtils.covertDateToISO(condvalue) == null) {
                                                         inbool.get(j).removeContent(incond);

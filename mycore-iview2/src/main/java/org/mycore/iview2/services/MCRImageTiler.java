@@ -76,7 +76,7 @@ public class MCRImageTiler implements Runnable, Closeable {
         Thread.currentThread().setName("TileMaster");
         //get this MCRSession a speaking name
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        mcrSession.setUserInformation(MCRSystemUserInformation.getInstance());
+        mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
         boolean activated = MCRConfiguration.instance().getBoolean(CONFIG_PREFIX + "LocalTiler.activated", true);
         LOGGER.info("Local Tiling is "+(activated?"activated":"deactivated"));
         if (activated) {

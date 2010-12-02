@@ -32,7 +32,6 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -81,8 +80,6 @@ import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
-import org.mycore.user.MCRUser;
-import org.mycore.user.MCRUserMgr;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
@@ -355,24 +352,8 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
             }
         }
 
-        String uid = MCRSessionMgr.getCurrentSession().getCurrentUserID();
-
-        boolean setCurrentGroups = MCRConfiguration.instance().getBoolean("MCR.Users.SetCurrentGroups", true);
-        if (setCurrentGroups) { // for MyCoRe applications, always true
-            final MCRUser mcrUser = MCRUserMgr.instance().retrieveUser(uid);
-            StringBuffer groups = new StringBuffer(mcrUser.getPrimaryGroupID());
-            List<String> groupList = mcrUser.getGroupIDs();
-            for (int i = 0; i < groupList.size(); i++) {
-                if (i != 0) {
-                    groups.append(' ');
-                }
-                groups.append((String) groupList.get(i));
-            }
-            parameters.put("CurrentGroups", groups.toString());
-        }
-
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-
+        String uid = mcrSession.getUserInformation().getCurrentUserID();
         // set parameters
         parameters.put("CurrentUser", uid);
         parameters.put("DefaultLang", MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "en"));
@@ -386,7 +367,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         }
 
         LOGGER.debug("LayoutServlet XSL.MCRSessionID=" + parameters.getProperty("MCRSessionID"));
-        LOGGER.debug("LayoutServlet XSL.CurrentUser =" + mcrSession.getCurrentUserID());
+        LOGGER.debug("LayoutServlet XSL.CurrentUser =" + uid);
         LOGGER.debug("LayoutServlet HttpSession =" + parameters.getProperty("HttpSession"));
         LOGGER.debug("LayoutServlet JSessionID =" + parameters.getProperty("JSessionID"));
         LOGGER.debug("LayoutServlet RefererURL =" + parameters.getProperty("Referer"));

@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.cfg.Configuration;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.junit.After;
 import org.junit.Before;
@@ -44,6 +45,8 @@ public abstract class MCRHibTestCase extends MCRTestCase {
 
     protected Transaction tx;
 
+    protected Configuration configuration = getHibernateConfiguration();
+
     @Before
     public void setUp() throws Exception {
         // Configure logging etc.
@@ -56,8 +59,9 @@ public abstract class MCRHibTestCase extends MCRTestCase {
         }
         try {
             final MCRHIBConnection connection = MCRHIBConnection.instance();
+            MCRHIBConnection.buildSessionFactory(configuration);
+            SchemaExport export = new SchemaExport(configuration);
             sessionFactory = connection.getSessionFactory();
-            SchemaExport export = new SchemaExport(connection.getConfiguration());
             export.create(false, true);
             beginTransaction();
             sessionFactory.getCurrentSession().clear();
@@ -65,6 +69,10 @@ public abstract class MCRHibTestCase extends MCRTestCase {
             Logger.getLogger(MCRHibTestCase.class).error("Error while setting up hibernate JUnit test.", e);
             throw e;
         }
+    }
+
+    protected Configuration getHibernateConfiguration() {
+        return MCRHIBConnection.instance().getConfiguration();
     }
 
     @After

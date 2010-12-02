@@ -31,7 +31,6 @@ import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
-import org.mycore.user.MCRUser;
 
 /**
  * This class is a base implementation of the <code>MCRAccessInterface</code>.
@@ -154,9 +153,9 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * @see org.mycore.access.MCRAccessInterface#checkAccess(java.lang.String,
      *      java.lang.String, MCRUser)
      */
-    public boolean checkPermission(String id, String permission, MCRUser user) {
+    public boolean checkPermission(String id, String permission, String userID) {
         LOGGER.debug("Execute MCRAccessBaseImpl checkPermission for ID " + id + " for permission " + permission + " for user"
-                + user.getID());
+                + userID);
         return true;
     }
 
@@ -175,8 +174,8 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * 
      * @see org.mycore.access.MCRAccessInterface#checkAccess(java.lang.String, MCRUser)
      */
-    public boolean checkPermission(String permission, MCRUser user) {
-        LOGGER.debug("Execute MCRAccessBaseImpl checkPermission for permission " + permission + " for user " + user.getID());
+    public boolean checkPermissionForUser(String permission, String userID) {
+        LOGGER.debug("Execute MCRAccessBaseImpl checkPermission for permission " + permission + " for user " + userID);
         return true;
     }
 

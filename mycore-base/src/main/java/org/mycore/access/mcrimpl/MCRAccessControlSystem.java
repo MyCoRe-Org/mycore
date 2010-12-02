@@ -44,8 +44,6 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.user.MCRUser;
-import org.mycore.user.MCRUserMgr;
 
 /**
  * MyCoRe-Standard Implementation of the MCRAccessInterface
@@ -181,10 +179,10 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
     public boolean checkPermission(String id, String permission) {
         long start = System.currentTimeMillis();
         MCRSession session = MCRSessionMgr.getCurrentSession();
-        MCRUser user = MCRUserMgr.instance().retrieveUser(session.getCurrentUserID());
+        String userID = session.getUserInformation().getCurrentUserID();
         LOGGER.debug("Get current User took: " + (System.currentTimeMillis() - start));
         try {
-            boolean returns = checkAccess(id, permission, user, new MCRIPAddress(session.getCurrentIP()));
+            boolean returns = checkAccess(id, permission, userID, new MCRIPAddress(session.getCurrentIP()));
             LOGGER.debug("Check " + permission + " on " + id + " took:" + (System.currentTimeMillis() - start));
             return returns;
         } catch (MCRException e) {
@@ -199,8 +197,8 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
     }
 
     @Override
-    public boolean checkPermission(String id, String permission, MCRUser user) {
-        return checkAccess(id, permission, user, null);
+    public boolean checkPermission(String id, String permission, String userID) {
+        return checkAccess(id, permission, userID, null);
     }
 
     @Override
@@ -212,8 +210,8 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
     }
 
     @Override
-    public boolean checkPermission(String permission, MCRUser user) {
-        return checkAccess(poolPrivilegeID, permission, user, null);
+    public boolean checkPermissionForUser(String permission, String userID) {
+        return checkAccess(poolPrivilegeID, permission, userID, null);
     }
 
     @Override
@@ -222,7 +220,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
         String ruleStr = getNormalizedRuleString(rule);
         MCRAccessRule accessRule = new MCRAccessRule(null, "System", new Date(), ruleStr, "");
         try {
-            return accessRule.checkAccess(MCRUserMgr.instance().retrieveUser(session.getCurrentUserID()), new Date(), new MCRIPAddress(session.getCurrentIP()));
+            return accessRule.checkAccess(session.getUserInformation().getCurrentUserID(), new Date(), new MCRIPAddress(session.getCurrentIP()));
         } catch (MCRException e) {
             // only return true if access is allowed, we dont know this
             LOGGER.debug("Error while checking rule.", e);
@@ -333,18 +331,18 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
      *            ip-Address
      * @return true if access is granted according to defined access rules
      */
-    public boolean checkAccess(String objID, String permission, MCRUser user, MCRIPAddress ip) {
+    public boolean checkAccess(String objID, String permission, String userID, MCRIPAddress ip) {
         Date date = new Date();
         LOGGER.debug("getAccess()");
         MCRAccessRule rule = getAccess(objID, permission);
         LOGGER.debug("getAccess() is done");
         if (rule == null) {
-            if (user.getID().equals(superuserID)) {
+            if (userID.equals(superuserID)) {
                 return true;
             }
             return false;
         }
-        return rule.checkAccess(user, date, ip);
+        return rule.checkAccess(userID, date, ip);
     }
 
     /**

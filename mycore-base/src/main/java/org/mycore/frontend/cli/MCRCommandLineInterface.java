@@ -47,13 +47,11 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.ifs2.MCRContent;
-import org.mycore.user.MCRUser;
-import org.mycore.user.MCRUserMgr;
-import org.mycore.user.MCRUserRoleProvider;
 
 /**
  * The main class implementing the MyCoRe command line interface. With the command line interface, you can import, export, update and delete documents and other
@@ -115,10 +113,6 @@ public class MCRCommandLineInterface {
         knownCommands.add(new MCRCommand("! {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.executeShellCommand String",
             "Execute the shell command {0}, for example '! ls' or '! cmd /c dir'"));
         knownCommands.add(new MCRCommand("show file {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.show String", "Show contents of local file {0}"));
-        knownCommands.add(new MCRCommand("change to user {0} with {1}", "org.mycore.frontend.cli.MCRCommandLineInterface.changeToUser String String",
-            "Change the user {0} with the given password in {1}."));
-        knownCommands.add(new MCRCommand("login {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.login String",
-            "Start the login dialog for the user {0}."));
         knownCommands.add(new MCRCommand("whoami", "org.mycore.frontend.cli.MCRCommandLineInterface.whoami", "Print the current user."));
         knownCommands.add(new MCRCommand("show command statistics", "org.mycore.frontend.cli.MCRCommandLineInterface.showCommandStatistics",
             "Show statistics on number of commands processed and execution time needed per command"));
@@ -176,8 +170,7 @@ public class MCRCommandLineInterface {
         }
         session = MCRSessionMgr.getCurrentSession();
         session.setCurrentIP("127.0.0.1");
-        MCRUser adminUser = MCRUserMgr.instance().retrieveUser(config.getString("MCR.Users.Superuser.UserName", "administrator"));
-        session.setUserInformation(new MCRUserRoleProvider(adminUser));
+        session.setUserInformation(MCRSystemUserInformation.getSuperUserInstance());
         MCRSessionMgr.setCurrentSession(session);
 
         System.out.println(system + " Initialization done.");
@@ -590,38 +583,6 @@ public class MCRCommandLineInterface {
      */
     public static void whoami() {
         System.out.println(system + " You are user " + session.getCurrentUserID());
-    }
-
-    /**
-     * This command changes the user of the session context to a new user.
-     * 
-     * @param user
-     *            the new user ID
-     * @param password
-     *            the password of the new user
-     */
-    public static void changeToUser(String user, String password) {
-        System.out.println(system + " The old user ID is " + session.getCurrentUserID());
-        if (MCRUserMgr.instance().login(user, password)) {
-            System.out.println(system + " The new user ID is " + session.getCurrentUserID());
-        } else {
-            logger.warn("Wrong password, no changes of user ID in session context!");
-        }
-    }
-
-    /**
-     * This command changes the user of the session context to a new user.
-     * 
-     * @param user
-     *            the new user ID
-     */
-    public static void login(String user) {
-        char[] password = {};
-        do {
-            password = System.console().readPassword("{0} Enter password for user {1} :> ", system, user);
-        } while (password.length == 0);
-
-        changeToUser(user, String.valueOf(password));
     }
 
     /**

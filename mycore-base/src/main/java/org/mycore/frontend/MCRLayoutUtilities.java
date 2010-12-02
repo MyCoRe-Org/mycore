@@ -15,7 +15,6 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.user.MCRUser;
 
 public class MCRLayoutUtilities {
     final static String OBJIDPREFIX_WEBPAGE = "webpage:";
@@ -248,11 +247,11 @@ public class MCRLayoutUtilities {
      * @param user
      * @return
      */
-    public static boolean itemAccess(String permission, Element item, boolean access, MCRUser user) {
+    public static boolean itemAccess(String permission, Element item, boolean access, String userID) {
         MCRAccessInterface am = MCRAccessManager.getAccessImpl();
         String objID = getWebpageACLID(item);
         if (am.hasRule(objID, permission)) {
-            access = am.checkPermission(objID, permission, user);
+            access = am.checkPermission(objID, permission, userID);
         }
         return access;
     }

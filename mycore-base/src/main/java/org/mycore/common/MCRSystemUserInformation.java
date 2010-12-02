@@ -30,9 +30,23 @@ package org.mycore.common;
  */
 public class MCRSystemUserInformation implements MCRUserInformation {
 
-    private static MCRSystemUserInformation instance = new MCRSystemUserInformation();
+    private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
-    private MCRSystemUserInformation() {
+    private static MCRSystemUserInformation systemInstance = new MCRSystemUserInformation("SYSTEM", false);
+
+    private static MCRSystemUserInformation guestInstance = new MCRSystemUserInformation(CONFIG.getString("MCR.Users.Guestuser.UserName",
+        "guest"), false);
+
+    private static MCRSystemUserInformation superUserInstance = new MCRSystemUserInformation(CONFIG.getString(
+        "MCR.Users.Superuser.UserName", "administrator"), true);
+
+    private boolean roleReturn;
+
+    private String userID;
+
+    private MCRSystemUserInformation(String userID, boolean roleReturn) {
+        this.userID = userID;
+        this.roleReturn = roleReturn;
     }
 
     /**
@@ -40,7 +54,7 @@ public class MCRSystemUserInformation implements MCRUserInformation {
      */
     @Override
     public String getCurrentUserID() {
-        return "SYSTEM";
+        return userID;
     }
 
     /**
@@ -48,14 +62,33 @@ public class MCRSystemUserInformation implements MCRUserInformation {
      */
     @Override
     public boolean isUserInRole(String role) {
-        return false;
+        return roleReturn;
     }
 
     /**
-     * @return the instance
+     * @return the systemInstance
      */
-    public static MCRSystemUserInformation getInstance() {
-        return instance;
+    public static MCRSystemUserInformation getSystemUserInstance() {
+        return systemInstance;
+    }
+
+    @Override
+    public String getUserAttribute(String attribute) {
+        return null;
+    }
+
+    /**
+     * @return the guestInstance
+     */
+    public static MCRSystemUserInformation getGuestInstance() {
+        return guestInstance;
+    }
+
+    /**
+     * @return the superUserInstance
+     */
+    public static MCRSystemUserInformation getSuperUserInstance() {
+        return superUserInstance;
     }
 
 }

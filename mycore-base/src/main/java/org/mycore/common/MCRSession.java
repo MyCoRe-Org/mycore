@@ -102,21 +102,7 @@ public class MCRSession implements Cloneable {
 
     private StackTraceElement[] constructingStackTrace;
 
-    private static MCRUserInformation guestUserInformation = new MCRUserInformation() {
-        String guestUserID = MCRConfiguration.instance().getString("MCR.Users.Guestuser.UserName", "guest");
-
-        String guestGroup = MCRConfiguration.instance().getString("MCR.Users.Guestuser.GroupName", "guestgroup");
-
-        @Override
-        public boolean isUserInRole(String role) {
-            return guestGroup.equals(role);
-        }
-
-        @Override
-        public String getCurrentUserID() {
-            return guestUserID;
-        }
-    };
+    private static MCRUserInformation guestUserInformation = MCRSystemUserInformation.getGuestInstance();
 
     /**
      * The constructor of a MCRSession. As default the user ID is set to the

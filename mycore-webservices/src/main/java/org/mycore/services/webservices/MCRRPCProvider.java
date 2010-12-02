@@ -65,6 +65,11 @@ public class MCRRPCProvider extends RPCProvider {
             public String getCurrentUserID() {
                 return mc.getUsername();
             }
+
+            @Override
+            public String getUserAttribute(String attribute) {
+                return null;
+            }
         });
         session.setCurrentIP(mc.getStrProp(Constants.MC_REMOTE_ADDR));
         session.beginTransaction();

@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.frontend.cli;
+package org.mycore.user;
 
 import static org.mycore.common.MCRConstants.DEFAULT_ENCODING;
 
@@ -38,14 +38,14 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.xml.MCRXMLHelper;
-import org.mycore.user.MCRCrypt;
-import org.mycore.user.MCRGroup;
-import org.mycore.user.MCRUser;
-import org.mycore.user.MCRUserMgr;
+import org.mycore.frontend.cli.MCRAbstractCommands;
+import org.mycore.frontend.cli.MCRCommand;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -62,6 +62,8 @@ public class MCRUserCommands extends MCRAbstractCommands {
     /** The logger */
     private static Logger LOGGER = Logger.getLogger(MCRUserCommands.class.getName());
 
+    private static final String SYSTEM = MCRConfiguration.instance().getString("MCR.CommandLineInterface.SystemName", "MyCoRe") + ":";
+
     /**
      * The constructor.
      */
@@ -69,6 +71,10 @@ public class MCRUserCommands extends MCRAbstractCommands {
         super();
 
         MCRCommand com = null;
+
+        command.add(new MCRCommand("change to user {0} with {1}", "org.mycore.user.MCRUserCommands.changeToUser String String",
+            "Change the user {0} with the given password in {1}."));
+        command.add(new MCRCommand("login {0}", "org.mycore.user.MCRUserCommands.login String", "Start the login dialog for the user {0}."));
 
         com = new MCRCommand("init superuser", "org.mycore.frontend.cli.MCRUserCommands.initSuperuser",
             "Initialized the user system. This command runs only if the user database does not exist.");
@@ -162,6 +168,39 @@ public class MCRUserCommands extends MCRAbstractCommands {
     }
 
     /**
+     * This command changes the user of the session context to a new user.
+     * 
+     * @param user
+     *            the new user ID
+     * @param password
+     *            the password of the new user
+     */
+    public static void changeToUser(String user, String password) {
+        MCRSession session = MCRSessionMgr.getCurrentSession();
+        System.out.println(SYSTEM + " The old user ID is " + session.getUserInformation().getCurrentUserID());
+        if (MCRUserMgr.instance().login(user, password)) {
+            System.out.println(SYSTEM + " The new user ID is " + session.getUserInformation().getCurrentUserID());
+        } else {
+            LOGGER.warn("Wrong password, no changes of user ID in session context!");
+        }
+    }
+
+    /**
+     * This command changes the user of the session context to a new user.
+     * 
+     * @param user
+     *            the new user ID
+     */
+    public static void login(String user) {
+        char[] password = {};
+        do {
+            password = System.console().readPassword("{0} Enter password for user {1} :> ", SYSTEM, user);
+        } while (password.length == 0);
+
+        changeToUser(user, String.valueOf(password));
+    }
+
+    /**
      * This method initializes the user and group system an creates a superuser
      * with values set in mycore.properties.private As 'super' default, if no
      * properties were set, mcradmin with password mycore will be used.
@@ -186,6 +225,11 @@ public class MCRUserCommands extends MCRAbstractCommands {
             @Override
             public String getCurrentUserID() {
                 return suser;
+            }
+
+            @Override
+            public String getUserAttribute(String attribute) {
+                return null;
             }
         });
 
@@ -232,7 +276,8 @@ public class MCRUserCommands extends MCRAbstractCommands {
             ArrayList<String> admGroupIDs = new ArrayList<String>();
             ArrayList<String> mbrUserIDs = new ArrayList<String>();
 
-            MCRGroup g = new MCRGroup(MCRGroup.getDefaultGroupID(), suser, null, null, MessageFormat.format("The {0} group", MCRGroup.getDefaultGroupID()), admUserIDs, admGroupIDs, mbrUserIDs);
+            MCRGroup g = new MCRGroup(MCRGroup.getDefaultGroupID(), suser, null, null, MessageFormat.format("The {0} group", MCRGroup.getDefaultGroupID()),
+                admUserIDs, admGroupIDs, mbrUserIDs);
 
             MCRUserMgr.instance().initializeGroup(g, suser);
         } catch (Exception e) {

@@ -161,7 +161,7 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
         boolean adminsFound = false;
         for (String userID : userIDs) {
             MCRUser mcrUser = um.retrieveUser(userID);
-            if (am.checkPermission(permission, mcrUser)) {
+            if (am.checkPermissionForUser(permission, userID)) {
                 adminUsers.addContent(mcrUser.toJDOMElement());
                 adminsFound = true;
             }

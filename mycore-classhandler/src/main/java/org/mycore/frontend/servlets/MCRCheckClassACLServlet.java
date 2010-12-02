@@ -42,7 +42,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
-import org.mycore.user.MCRUserMgr;
 
 /**
  * The servlet store the MCREditorServlet output XML in a file of a MCR type
@@ -64,9 +63,6 @@ public class MCRCheckClassACLServlet extends MCRServlet {
     // the configured permissions
     private static String storedrules = MCRConfiguration.instance().getString("MCR.Access.StorePermissions", "read,write,delete");
 
-    // The User Manager
-    protected static MCRUserMgr UM = MCRUserMgr.instance();
-
     /**
      * This method overrides doGetPost of MCRServlet and handels all actions
      * against the ACL data.
@@ -82,11 +78,7 @@ public class MCRCheckClassACLServlet extends MCRServlet {
         // read the parameter
         MCRRequestParameters parms;
 
-        if (sub == null) {
-            parms = new MCRRequestParameters(job.getRequest());
-        } else {
-            parms = sub.getParameters();
-        }
+        parms = sub.getParameters();
 
         String oldmcrid = parms.getParameter("mcrid");
         LOGGER.debug("XSL.target.param.0 = " + oldmcrid);
@@ -126,7 +118,8 @@ public class MCRCheckClassACLServlet extends MCRServlet {
         if (okay) {
             sb.append("browse?mode=edit");
         } else {
-            sb.append(MCRConfiguration.instance().getString("MCR.SWF.PageDir", "")).append(MCRConfiguration.instance().getString("MCR.SWF.PageErrorStore", "editor_error_store.xml"));
+            sb.append(MCRConfiguration.instance().getString("MCR.SWF.PageDir", "")).append(
+                MCRConfiguration.instance().getString("MCR.SWF.PageErrorStore", "editor_error_store.xml"));
         }
         return sb.toString();
     }
@@ -158,7 +151,7 @@ public class MCRCheckClassACLServlet extends MCRServlet {
     @SuppressWarnings("unchecked")
     protected Element prepareService(org.jdom.Document jdom_in, MCRObjectID ID, MCRServletJob job, String lang) throws Exception {
         Element elm_out = null;
-        ArrayList <String>logtext = new ArrayList<String>();
+        ArrayList<String> logtext = new ArrayList<String>();
         Element root = jdom_in.getRootElement();
         if (root != null) {
             Element servacls = root.getChild("servacls");
@@ -186,23 +179,6 @@ public class MCRCheckClassACLServlet extends MCRServlet {
                                                     k--;
                                                     l--;
                                                     continue;
-                                                }
-                                                String condfield = incond.getAttributeValue("field");
-                                                if (condfield.equals("user")) {
-                                                    if (!UM.existUser(condvalue)) {
-                                                        ((Element) inbool.get(j)).removeContent(incond);
-                                                        k--;
-                                                        l--;
-                                                        continue;
-                                                    }
-                                                }
-                                                if (condfield.equals("group")) {
-                                                    if (!UM.existGroup(condvalue)) {
-                                                        ((Element) inbool.get(j)).removeContent(incond);
-                                                        k--;
-                                                        l--;
-                                                        continue;
-                                                    }
                                                 }
                                             }
                                             if (k == 1) {
