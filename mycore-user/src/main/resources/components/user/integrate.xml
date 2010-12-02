@@ -1,0 +1,16 @@
+<project name="user" xmlns:mcr="antlib:org.mycore.buildtools">
+  <import file="../../integrate.xml" />
+  <!-- - - - - - - - - - - - - - - - - - 
+            target: config                      
+           - - - - - - - - - - - - - - - - - -->
+  <target name="config">
+    <mcr:config action="addInclude"
+                propertyfile="${build.config}/mycore.properties"
+                key="MCR.CLI.Classes.Internal"
+                value="org.mycore.user.MCRUserCommands" />
+    <AddHibernateMapping class="org.mycore.user.hibernate.MCRGROUPADMINS" />
+    <AddHibernateMapping class="org.mycore.user.hibernate.MCRGROUPMEMBERS" />
+    <AddHibernateMapping class="org.mycore.user.hibernate.MCRGROUPS" />
+    <AddHibernateMapping class="org.mycore.user.hibernate.MCRUSERS" />
+  </target>
+</project>

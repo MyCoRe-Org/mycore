@@ -1,6 +1,6 @@
 <project name="MyCoRe Components integration" xmlns:mcr="antlib:org.mycore.buildtools">
   <property name="components.order"
-    value="acl-editor,broadcasting,buildtools,classbrowser,classhandler,doubletfinder,imaging,indexing,iview,migration20-21,session-listing,swf,metsmods,zoomify,useradmin,userlogin,wcms,webcli,webservices,z3950"/>
+    value="acl-editor,broadcasting,buildtools,classbrowser,classhandler,doubletfinder,imaging,indexing,iview,migration20-21,session-listing,swf,metsmods,zoomify,user,wcms,webcli,webservices,z3950"/>
   
   <import file="${integration.dir}/helper.xml"/>
   <taskdef resource="org/mycore/buildtools/antlib.xml" uri="antlib:org.mycore.buildtools" classpathref="integration.classpath" onerror="fail"/>
@@ -119,7 +119,7 @@
       </sequential>
     </for>
     <for param="table.class"
-      list="MCRACCESS,MCRACCESSRULE,MCRCSTORE,MCRFSNODES,MCRGROUPS,MCRGROUPADMINS,MCRGROUPMEMBERS,MCRLINKHREF,MCRRESUMPTIONTOKEN,MCRURN,MCRUSERS,MCRDELETEDITEMS">
+      list="MCRACCESS,MCRACCESSRULE,MCRCSTORE,MCRFSNODES,MCRLINKHREF,MCRRESUMPTIONTOKEN,MCRURN,MCRDELETEDITEMS">
       <sequential>
         <AddHibernateMapping class="org.mycore.backend.hibernate.tables.@{table.class}"/>
       </sequential>
