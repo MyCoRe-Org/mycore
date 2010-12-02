@@ -195,12 +195,7 @@
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
-      <artifactId>mycore-useradmin</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.mycore</groupId>
-      <artifactId>mycore-userlogin</artifactId>
+      <artifactId>mycore-user</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

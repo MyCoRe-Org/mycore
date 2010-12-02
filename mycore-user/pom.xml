@@ -6,8 +6,8 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>mycore-useradmin</artifactId>
-  <name>MyCoRe user admin</name>
+  <artifactId>mycore-user</artifactId>
+  <name>MyCoRe User System</name>
   <dependencies>
     <dependency>
       <groupId>org.mycore</groupId>
