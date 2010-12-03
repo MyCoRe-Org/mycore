@@ -85,13 +85,9 @@ public class MCRUserServlet extends MCRServlet {
 
         // Get the MCRSession object for the current thread from the session
         // manager.
-        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-
         if (mode.length() == 0) {
             mode = "Select";
         }
-        LOGGER.debug("SessionID: "+mcrSession.getID());
-        LOGGER.debug("CurrentID: "+mcrSession.getCurrentUserID());
         LOGGER.debug("Mode     : "+mode);
 
         if (mode.equals("ChangePwd")) {
@@ -139,7 +135,7 @@ public class MCRUserServlet extends MCRServlet {
         // Get the MCRSession object for the current thread from the session
         // manager.
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        String currentUser = mcrSession.getCurrentUserID();
+        String currentUser = mcrSession.getUserInformation().getCurrentUserID();
 
         String pwd_1 = getProperty(job.getRequest(), "pwd_1").trim();
         String pwd_2 = getProperty(job.getRequest(), "pwd_2").trim();
@@ -230,7 +226,7 @@ public class MCRUserServlet extends MCRServlet {
         // Get the MCRSession object for the current thread from the session
         // manager.
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        String currentUser = mcrSession.getCurrentUserID();
+        String currentUser = mcrSession.getUserInformation().getCurrentUserID();
 
         org.jdom.Document jdomDoc = createJdomDocBase(job);
         org.jdom.Element root = jdomDoc.getRootElement();

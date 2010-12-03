@@ -127,7 +127,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
         // Get the MCRSession object for the current thread from the session
         // manager.
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        String currentUserID = mcrSession.getCurrentUserID();
+        String currentUserID = mcrSession.getUserInformation().getCurrentUserID();
         List<String> groupIDs = null;
 
         try {
@@ -140,8 +140,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
             } else if (MCRAccessManager.checkPermission("create-user")) {
                 groupIDs = currentUser.getGroupIDs();
             } else {
-                LOGGER.warn("MCRUserEditorServlet: not enough permissions! "
-                        + "Someone might have tried to call the new user form directly.");
+                LOGGER.warn("MCRUserEditorServlet: not enough permissions! " + "Someone might have tried to call the new user form directly.");
                 showNoPrivsPage(job);
                 return;
             }
@@ -154,8 +153,9 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
         org.jdom.Element root = new org.jdom.Element("items");
 
         for (int i = 0; i < groupIDs.size(); i++) {
-            org.jdom.Element item = new org.jdom.Element("item").setAttribute("value", (String) groupIDs.get(i)).setAttribute("label",
-                    (String) groupIDs.get(i));
+            org.jdom.Element item = new org.jdom.Element("item")
+                .setAttribute("value", (String) groupIDs.get(i))
+                .setAttribute("label", (String) groupIDs.get(i));
             root.addContent(item);
         }
 
@@ -187,8 +187,9 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
         org.jdom.Element root = new org.jdom.Element("items");
 
         for (int i = 0; i < groupIDs.size(); i++) {
-            org.jdom.Element item = new org.jdom.Element("item").setAttribute("value", (String) groupIDs.get(i)).setAttribute("label",
-                    (String) groupIDs.get(i));
+            org.jdom.Element item = new org.jdom.Element("item")
+                .setAttribute("value", (String) groupIDs.get(i))
+                .setAttribute("label", (String) groupIDs.get(i));
             root.addContent(item);
         }
 
@@ -220,8 +221,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
         org.jdom.Element root = new org.jdom.Element("items");
 
         for (int i = 0; i < userIDs.size(); i++) {
-            org.jdom.Element item = new org.jdom.Element("item").setAttribute("value", (String) userIDs.get(i)).setAttribute("label",
-                    (String) userIDs.get(i));
+            org.jdom.Element item = new org.jdom.Element("item").setAttribute("value", (String) userIDs.get(i)).setAttribute("label", (String) userIDs.get(i));
             root.addContent(item);
         }
 
@@ -320,7 +320,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
      */
     private void getEditorSubmission(MCRServletJob job) throws IOException {
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        String currentUserID = mcrSession.getCurrentUserID();
+        String currentUserID = mcrSession.getUserInformation().getCurrentUserID();
 
         // Read the XML data sent by the editor
         MCREditorSubmission sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));
@@ -329,17 +329,13 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
         // Read the request parameters
         MCRRequestParameters parms;
 
-        if (sub == null) {
-            parms = new MCRRequestParameters(job.getRequest());
-        } else {
-            parms = sub.getParameters();
-        }
+        parms = sub.getParameters();
 
         String useCase = parms.getParameter("usecase");
 
         // Determine the use case
         if ((useCase.equals("create-user") || useCase.equals("modify-user") || useCase.equals("modify-contact"))
-                && jdomDoc.getRootElement().getName().equals("mycoreuser")) {
+            && jdomDoc.getRootElement().getName().equals("mycoreuser")) {
             String numID = Integer.toString(MCRUserMgr.instance().getMaxUserNumID() + 1);
             jdomDoc.getRootElement().getChild("user").setAttribute("numID", numID);
 
@@ -353,53 +349,39 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
 
             org.jdom.Element userElement = jdomDoc.getRootElement().getChild("user");
 
-            try {
-                if (useCase.equals("create-user")) {
-                    MCRUser newUser = new MCRUser(userElement, true);
-                    MCRUserMgr.instance().createUser(newUser);
+            if (useCase.equals("create-user")) {
+                MCRUser newUser = new MCRUser(userElement, true);
+                MCRUserMgr.instance().createUser(newUser);
 
-                    LOGGER.info("User " + currentUserID + " has successfully created the new user: " + newUser.getID());
+                LOGGER.info("User " + currentUserID + " has successfully created the new user: " + newUser.getID());
+            } else {
+                String uid = jdomDoc.getRootElement().getChild("user").getAttributeValue("ID");
+                String newpwd = jdomDoc.getRootElement().getChild("user").getChild("user.password").getText();
+                MCRUserMgr umgr = MCRUserMgr.instance();
+                MCRUser olduser = umgr.retrieveUser(uid);
+                MCRUser thisUser = null;
+                if (olduser.getPassword().compareTo(newpwd) == 0) {
+                    thisUser = new MCRUser(userElement, false);
                 } else {
-                    String uid = jdomDoc.getRootElement().getChild("user").getAttributeValue("ID");
-                    String newpwd = jdomDoc.getRootElement().getChild("user").getChild("user.password").getText();
-                    MCRUserMgr umgr = MCRUserMgr.instance();
-                    MCRUser olduser = umgr.retrieveUser(uid);
-                    MCRUser thisUser = null;
-                    if (olduser.getPassword().compareTo(newpwd) == 0) {
-                        thisUser = new MCRUser(userElement, false);
-                    } else {
-                        thisUser = new MCRUser(userElement, true);
-                    }
-                    MCRUserMgr.instance().updateUser(thisUser);
+                    thisUser = new MCRUser(userElement, true);
                 }
-
-                // doLayout(job, "xml", jdomDoc, true);
-                showOkPage(job);
-            } catch (MCRException ex) {
-                generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.getMessage(), ex,
-                        false);
-
-                return;
+                MCRUserMgr.instance().updateUser(thisUser);
             }
-        } else if ((useCase.equals("create-group") || useCase.equals("modify-group"))
-                && jdomDoc.getRootElement().getName().equals("mycoregroup")) {
-            try {
-                String groupID = jdomDoc.getRootElement().getChild("group").getAttributeValue("ID");
-                if (groupID == null)
-                    throw new MCRException("groupid is not valid");
-                MCRGroup group = new MCRGroup(jdomDoc.getRootElement().getChild("group"));
-                if (useCase.equals("create-group")) {
-                    MCRUserMgr.instance().createGroup(group);
-                } else {
-                    MCRUserMgr.instance().updateGroup(group);
-                }
-                // doLayout(job, "xml", jdomDoc, true);
-                showOkPage(job);
-            } catch (MCRException ex) {
-                generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.getMessage(), ex,
-                        false);
-                return;
+
+            // doLayout(job, "xml", jdomDoc, true);
+            showOkPage(job);
+        } else if ((useCase.equals("create-group") || useCase.equals("modify-group")) && jdomDoc.getRootElement().getName().equals("mycoregroup")) {
+            String groupID = jdomDoc.getRootElement().getChild("group").getAttributeValue("ID");
+            if (groupID == null)
+                throw new MCRException("groupid is not valid");
+            MCRGroup group = new MCRGroup(jdomDoc.getRootElement().getChild("group"));
+            if (useCase.equals("create-group")) {
+                MCRUserMgr.instance().createGroup(group);
+            } else {
+                MCRUserMgr.instance().updateGroup(group);
             }
+            // doLayout(job, "xml", jdomDoc, true);
+            showOkPage(job);
         } else {
             // TODO: error message
         }

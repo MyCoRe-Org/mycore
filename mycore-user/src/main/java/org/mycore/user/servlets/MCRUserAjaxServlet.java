@@ -24,14 +24,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -71,51 +69,46 @@ public class MCRUserAjaxServlet extends MCRServlet {
     public void doGetPost(MCRServletJob job) throws IOException {
         if (MCRWebsiteWriteProtection.printInfoPageIfNoAccess(job.getRequest(), job.getResponse(), getBaseURL()))
             return;
-        try {
-            String mode = getProperty(job.getRequest(), "mode");
-            String username = getProperty(job.getRequest(), "user");
-            String group = getProperty(job.getRequest(), "group");
-            if (mode == null) {
-                buidPage(job);
-            } else if (mode.equals("users")) {
-                getData(job, "");
-            } else if (mode.equals("update")) {
-                if (username.equals("undefined")) {
-                    getGroup(job, group, "0");
-                } else {
-                    updateGroup(group, username, job);
-                    getGroup(job, group, "0");
-                }
-
-            } else if (mode.equals("delete")) {
-                if (group.equals("null")) {
-                    if (removeUser(username) == 1) {
-                        getData(job, MCRTranslation.translate("users.error.root"));
-                    } else {
-                        getData(job, "0");
-                    }
-                } else {
-
-                    if (deleteUser(group, username) == 1) {
-                        getGroup(job, group, MCRTranslation.translate("users.error.primGroup", username + ";" + group));
-                    } else {
-                        getGroup(job, group, "0");
-                    }
-                }
-            } else if (mode.equals("deleteGroup")) {
-                LOGGER.info("DELETE GROUP");
-                deleteGroup(job, group);
-            } else if (mode.equals("deleteGroupComplete")) {
-                LOGGER.info("DELETE GROUP COMPLETE");
-                completeDelete(job, group);
+        String mode = getProperty(job.getRequest(), "mode");
+        String username = getProperty(job.getRequest(), "user");
+        String group = getProperty(job.getRequest(), "group");
+        if (mode == null) {
+            buidPage(job);
+        } else if (mode.equals("users")) {
+            getData(job, "");
+        } else if (mode.equals("update")) {
+            if (username.equals("undefined")) {
+                getGroup(job, group, "0");
+            } else {
+                updateGroup(group, username, job);
+                getGroup(job, group, "0");
             }
-        } catch (Exception e) {
-            generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage(), e, false);
+
+        } else if (mode.equals("delete")) {
+            if (group.equals("null")) {
+                if (removeUser(username) == 1) {
+                    getData(job, MCRTranslation.translate("users.error.root"));
+                } else {
+                    getData(job, "0");
+                }
+            } else {
+
+                if (deleteUser(group, username) == 1) {
+                    getGroup(job, group, MCRTranslation.translate("users.error.primGroup", username + ";" + group));
+                } else {
+                    getGroup(job, group, "0");
+                }
+            }
+        } else if (mode.equals("deleteGroup")) {
+            LOGGER.info("DELETE GROUP");
+            deleteGroup(job, group);
+        } else if (mode.equals("deleteGroupComplete")) {
+            LOGGER.info("DELETE GROUP COMPLETE");
+            completeDelete(job, group);
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private void completeDelete(MCRServletJob job, String groupName) throws Exception {
+    private void completeDelete(MCRServletJob job, String groupName) throws IOException {
         MCRGroup group = MCRUserMgr.instance().retrieveGroup(groupName);
         Boolean primaryGroup = false;
         ArrayList<String> primaryUsers = new ArrayList<String>();
@@ -158,7 +151,7 @@ public class MCRUserAjaxServlet extends MCRServlet {
         }
     }
 
-    private void deleteGroup(MCRServletJob job, String groupName) throws Exception {
+    private void deleteGroup(MCRServletJob job, String groupName) throws IOException {
         MCRGroup group = MCRUserMgr.instance().retrieveGroup(groupName);
         if (group.getMemberUserIDs().isEmpty()) {
             MCRUserMgr.instance().deleteGroup(groupName);
@@ -226,7 +219,7 @@ public class MCRUserAjaxServlet extends MCRServlet {
      * @param job
      * @throws IOException
      */
-    private void updateGroup(String gruppe, String nutzer, MCRServletJob job) throws Exception {
+    private void updateGroup(String gruppe, String nutzer, MCRServletJob job) {
         LOGGER.debug("User to update: " + nutzer + " , group to update: " + gruppe);
         MCRGroup group = MCRUserMgr.instance().retrieveGroup(gruppe);
         LOGGER.debug("GroupID: " + group.getID());
@@ -247,25 +240,21 @@ public class MCRUserAjaxServlet extends MCRServlet {
      *            The group to be returned as JSON Doc.
      * @throws IOException
      */
-    private void getGroup(MCRServletJob job, String gruppe, String Msg) throws Exception {
+    private void getGroup(MCRServletJob job, String gruppe, String Msg) throws IOException {
         MCRGroup group = MCRUserMgr.instance().retrieveGroup(gruppe);
 
         JSONObject json = new JSONObject();
         JSONObject groupToUpdate = new JSONObject();
         JSONArray users = new JSONArray();
         JSONArray error = new JSONArray();
-        ArrayList members = group.getMemberUserIDs();
+        ArrayList<String> members = group.getMemberUserIDs();
 
         if (!(Msg.equals(""))) {
             error.add(Msg);
         } else {
             error.add("none");
         }
-
-        Iterator it = members.iterator();
-        while (it.hasNext()) {
-            users.add(it.next());
-        }
+        users.addAll(members);
         groupToUpdate.put("name", gruppe);
         groupToUpdate.put("desc", group.getDescription());
         groupToUpdate.put("users", users);
@@ -289,7 +278,7 @@ public class MCRUserAjaxServlet extends MCRServlet {
      * @param job
      * @throws IOException
      */
-    private void getData(MCRServletJob job, String Msg) throws Exception {
+    private void getData(MCRServletJob job, String Msg) throws IOException {
         List<String> userIDs = MCRUserMgr.instance().getAllUserIDs();
         List<String> groupsIDs = MCRUserMgr.instance().getAllGroupIDs();
 
@@ -297,9 +286,8 @@ public class MCRUserAjaxServlet extends MCRServlet {
         JSONArray users = new JSONArray();
         JSONArray groups = new JSONArray();
         JSONArray error = new JSONArray();
-        
-        List<String> newID = Collections.synchronizedList(new LinkedList<String>());
-        Map idMap = new HashMap();
+
+        Map<Object, JSONObject> idMap = new HashMap<Object, JSONObject>();
         MCRUser UserToAdd;
         String lastName;
         String firstName;
@@ -307,15 +295,15 @@ public class MCRUserAjaxServlet extends MCRServlet {
         // sort for lastname, firstname then id
         for (String id : userIDs) {
             UserToAdd = MCRUserMgr.instance().retrieveUser(id);
-            
+
             if (UserToAdd == null)
                 LOGGER.debug("USERTOADD is NULL");
             if (UserToAdd.getUserContact() == null)
                 LOGGER.debug("USERCONTACT IS NULL");
-            
+
             lastName = UserToAdd.getUserContact().getLastName();
             firstName = UserToAdd.getUserContact().getFirstName();
-            
+
             JSONObject user = new JSONObject();
             // the field name for the JSON object differ from the java
             // variable name, because it's not a modification from the original
@@ -325,25 +313,22 @@ public class MCRUserAjaxServlet extends MCRServlet {
             user.put("userID", id);
             idMap.put(lastName + firstName + id, user);
         }
-        
-        Set idKeys = Collections.synchronizedSet(new TreeSet(idMap.keySet()));
-        
-        for (Iterator iterator = idKeys.iterator(); iterator.hasNext();) {
+
+        Set<Object> idKeys = Collections.synchronizedSet(new TreeSet<Object>(idMap.keySet()));
+
+        for (Iterator<Object> iterator = idKeys.iterator(); iterator.hasNext();) {
             Object idKey = (Object) iterator.next();
-            JSONObject user = (JSONObject ) idMap.get(idKey);
-            
+            JSONObject user = (JSONObject) idMap.get(idKey);
+
             users.add(user);
         }
-        
+
         for (String groupID : groupsIDs) {
             MCRGroup gruppe = MCRUserMgr.instance().retrieveGroup(groupID);
-            ArrayList memUsers = MCRUserMgr.instance().retrieveGroup(groupID).getMemberUserIDs();
+            ArrayList<String> memUsers = MCRUserMgr.instance().retrieveGroup(groupID).getMemberUserIDs();
             JSONArray memUserList = new JSONArray();
             JSONObject group = new JSONObject();
-            Iterator iter = memUsers.iterator();
-            while (iter.hasNext()) {
-                memUserList.add(iter.next());
-            }
+            memUserList.add(memUsers);
             group.put("name", groupID);
             group.put("desc", gruppe.getDescription());
             group.put("users", memUserList);
@@ -364,7 +349,7 @@ public class MCRUserAjaxServlet extends MCRServlet {
         job.getResponse().getWriter().print(json);
     }
 
-    private void buidPage(MCRServletJob job) throws Exception {
+    private void buidPage(MCRServletJob job) throws IOException {
         org.jdom.Element root = new org.jdom.Element("mcr_user");
 
         org.jdom.Document document = new Document(root);

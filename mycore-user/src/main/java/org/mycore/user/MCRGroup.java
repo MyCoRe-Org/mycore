@@ -203,6 +203,7 @@ public class MCRGroup extends MCRUserObject {
         Element adminElement = elm.getChild("group.admins");
 
         if (adminElement != null) {
+            @SuppressWarnings("unchecked")
             List<Element> adminIDList = adminElement.getChildren();
 
             for (int j = 0; j < adminIDList.size(); j++) {
@@ -228,6 +229,7 @@ public class MCRGroup extends MCRUserObject {
         Element memberElement = elm.getChild("group.members");
 
         if (memberElement != null) {
+            @SuppressWarnings("unchecked")
             List<Element> memberIDList = memberElement.getChildren();
 
             for (int j = 0; j < memberIDList.size(); j++) {
