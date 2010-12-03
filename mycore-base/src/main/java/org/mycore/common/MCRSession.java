@@ -301,7 +301,7 @@ public class MCRSession implements Cloneable {
         sb.append("MCRSession[");
         sb.append(getID());
         sb.append(",user:'");
-        sb.append(getCurrentUserID());
+        sb.append(getUserInformation().getCurrentUserID());
         sb.append("',ip:");
         sb.append(getCurrentIP());
         sb.append("]");
