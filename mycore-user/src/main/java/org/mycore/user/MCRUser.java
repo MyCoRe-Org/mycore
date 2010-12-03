@@ -26,7 +26,6 @@ package org.mycore.user;
 import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
-import java.security.Principal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
@@ -51,10 +50,9 @@ import org.mycore.common.MCRSessionMgr;
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
  * @author Heiko Helmbrecht
- * @version $Revision$ $Date: 2008-10-09 11:30:08 +0200 (Do, 09. Okt
- *          2008) $
+ * @version $Revision$ $Date$
  */
-public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
+public class MCRUser extends MCRUserObject {
     /** The numerical ID of the MyCoRe user unit (either user ID or group ID) */
     protected int numID = -1;
 
@@ -197,7 +195,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
     }
 
     public MCRUser(String userid, String passwd) {
-        this(MCRUserMgr.instance().getMaxUserNumID() + 1, userid, MCRSessionMgr.getCurrentSession().getCurrentUserID(), null, null, true,
+        this(MCRUserMgr.instance().getMaxUserNumID() + 1, userid, MCRSessionMgr.getCurrentSession().getUserInformation().getCurrentUserID(), null, null, true,
                 true, null, null, MCRGroup.getDefaultGroupID(), null, null, null,
                 null, null, null, null, null, null, null, null, null, null, null, null, null, null);
     }
@@ -591,7 +589,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
         // Get the MCRSession object for the current thread from the session
         // manager.
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        String currentUserID = mcrSession.getCurrentUserID();
+        String currentUserID = mcrSession.getUserInformation().getCurrentUserID();
 
         MCRGroup primaryGroup = MCRUserMgr.instance().retrieveGroup(primaryGroupID, false);
 
@@ -610,7 +608,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
             for (int i = 0; i < admGroupIDs.size(); i++) {
                 MCRGroup currentGroup = MCRUserMgr.instance().retrieveGroup(admGroupIDs.get(i), false);
 
-                if (currentGroup.getMemberUserIDs().contains(mcrSession.getCurrentUserID())) {
+                if (currentGroup.getMemberUserIDs().contains(currentUserID)) {
                     return true;
                 }
             }
@@ -633,13 +631,6 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
         } catch (Exception e) {
             return 0;
         }
-    }
-
-    /**
-     * @see #getID()
-     */
-    public String getName() {
-        return getID();
     }
 
     /**

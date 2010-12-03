@@ -50,7 +50,7 @@ import org.mycore.common.MCRException;
  * @version $Revision$ $Date: 2007-05-02 22:23:40 +0200 (Mi, 02 Mai
  *          2007) $
  */
-public class MCRGroup extends MCRUserObject implements MCRPrincipal {
+public class MCRGroup extends MCRUserObject {
     /** A list of users which have the privilege to administer this group */
     private ArrayList<String> admUserIDs = null;
 
