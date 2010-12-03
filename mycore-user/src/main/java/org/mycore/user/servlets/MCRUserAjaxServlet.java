@@ -17,7 +17,7 @@
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
-package org.mycore.frontend.servlets;
+package org.mycore.user.servlets;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,6 +40,8 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
+import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.services.i18n.MCRTranslation;
 import org.mycore.user.MCRGroup;
 import org.mycore.user.MCRUser;

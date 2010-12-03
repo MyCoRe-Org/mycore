@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.frontend.servlets;
+package org.mycore.user.servlets;
 
 import java.io.IOException;
 
@@ -30,6 +30,8 @@ import javax.servlet.ServletException;
 import org.jdom.Document;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
  * This servlet provides some common methods for the editors of the user

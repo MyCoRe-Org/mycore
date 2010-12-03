@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.frontend.servlets;
+package org.mycore.user.servlets;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
+import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
  * This servlet controls the web interface for the editors of the user

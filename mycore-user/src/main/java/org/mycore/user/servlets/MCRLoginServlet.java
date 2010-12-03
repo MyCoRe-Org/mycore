@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.frontend.servlets;
+package org.mycore.user.servlets;
 
 import java.io.IOException;
 
@@ -31,6 +31,8 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.user.MCRUserMgr;
 
 /**

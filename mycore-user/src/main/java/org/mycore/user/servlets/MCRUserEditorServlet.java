@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.frontend.servlets;
+package org.mycore.user.servlets;
 
 import java.io.IOException;
 import java.util.List;
@@ -38,6 +38,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
+import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.user.MCRGroup;
 import org.mycore.user.MCRUser;
 import org.mycore.user.MCRUserMgr;

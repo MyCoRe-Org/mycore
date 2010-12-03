@@ -4,15 +4,15 @@
 
   <servlet id="MCRUserAdmin">
     <servlet-name>MCRUserAdminServlet</servlet-name>
-    <servlet-class>org.mycore.frontend.servlets.MCRUserAdminServlet</servlet-class>
+    <servlet-class>org.mycore.user.servlets.MCRUserAdminServlet</servlet-class>
   </servlet>
   <servlet id="MCRUserEditor">
     <servlet-name>MCRUserEditorServlet</servlet-name>
-    <servlet-class>org.mycore.frontend.servlets.MCRUserEditorServlet</servlet-class>
+    <servlet-class>org.mycore.user.servlets.MCRUserEditorServlet</servlet-class>
   </servlet>
   <servlet id="MCRUserAjax">
     <servlet-name>MCRUserAjaxServlet</servlet-name>
-    <servlet-class>org.mycore.frontend.servlets.MCRUserAjaxServlet</servlet-class>
+    <servlet-class>org.mycore.user.servlets.MCRUserAjaxServlet</servlet-class>
     </servlet>
   <servlet-mapping>
     <servlet-name>MCRUserAdminServlet</servlet-name>
@@ -33,11 +33,11 @@
 
   <servlet id="User">
     <servlet-name>MCRUserServlet</servlet-name>
-    <servlet-class>org.mycore.frontend.servlets.MCRUserServlet</servlet-class>
+    <servlet-class>org.mycore.user.servlets.MCRUserServlet</servlet-class>
   </servlet>
   <servlet id="Login">
     <servlet-name>MCRLoginServlet</servlet-name>
-    <servlet-class>org.mycore.frontend.servlets.MCRLoginServlet</servlet-class>
+    <servlet-class>org.mycore.user.servlets.MCRLoginServlet</servlet-class>
   </servlet>
 
   <filter-mapping>
