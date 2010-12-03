@@ -578,39 +578,16 @@ function listenerMove(viewID) {
 /**
  * @public
  * @function
- * @name	generateURL
- * @memberOf	iview.Thumbnails
- * @description	generates a permalink which contains all needed informations to display the same Picture&Position and other things
- * @param	{string} viewID ID of the derivate
- * @return	string which contains the generated URL
- */
-function generateURL(viewID) {
-	var url = window.location.href.substring(0, ((window.location.href.indexOf("?") != -1)? window.location.href.indexOf(window.location.search): window.location.href.length))+ "?";
-	url += "&page="+Iview[viewID].prefix;
-	url += "&zoom="+Iview[viewID].viewerBean.zoomLevel;
-	url += "&x="+Iview[viewID].viewerBean.x;
-	url += "&y="+Iview[viewID].viewerBean.y;
-	var size = "none";
-	if (Iview[viewID].zoomWidth)
-		size = "width";
-	if (Iview[viewID].zoomScreen)
-		size = "screen";
-	url += "&tosize="+size;
-	url += "&maximized="+Iview[viewID].maximized;
-	url += "&css="+styleName;
-	return url;
-}
-
-/**
- * @public
- * @function
  * @name	openChapter
  * @memberOf	iview.Thumbnails
  * @description	open and close the chapterview
  * @param	{} major
  * @param	{Object} viewer of the derivate
  */
-function openChapter(major, viewer){
+function openChapter(major, viewID){
+	
+	var viewer = Iview[viewID];
+	
 	if (chapterEmbedded) {
 		//alert(warnings[0])
 		return;
@@ -794,7 +771,9 @@ function importCutOut(viewID) {
  * @param		{string} viewID ID of the derivate
  * @param		{function} callback function which is called just before the function returns
  */
-function importChapter(viewer, callback) {
+function importChapter(viewID, callback) {
+	var viewer = Iview[viewID];
+
 	$LAB.script("chapter.js", "jquery.tree.min.js").wait(function() {
 		viewer.ChapterModelProvider = new iview.METS.ChapterModelProvider(viewer.newMETS);
 		
@@ -803,8 +782,8 @@ function importChapter(viewer, callback) {
 		viewer.chapter.createView(viewer.chapterParent);
 		viewer.chapterReaction = false;
 		
-		updateModuls(viewer.viewID_to_remove);
-		openChapter(true, viewer);
+		updateModuls(viewID);
+		openChapter(true, viewID);
 		callback();
 	});
 }
@@ -861,6 +840,7 @@ function zoomViewer(viewID, direction) {
  * @param	{string} viewID ID of the derivate
  */
 function loading(viewID) {
+	
 	var cssSheet=document.getElementById("cssSheet"+viewID);
 	if (cssSheet!=null){
 		//Opera fix: link css style to head to fix maximizeHandler()
@@ -913,6 +893,48 @@ function loading(viewID) {
 	//remove leading '/'
 	Iview[viewID].startFile = Iview[viewID].startFile.replace(/^\/*/,"");
 	loadPage(viewID, function(){startFileLoaded(viewID)});
+	
+	
+	
+	
+	
+	// should be replaced while constructing MVC concept
+	Iview[viewID].pictureScreen = function() {
+		pictureScreen(viewID);
+	}
+	
+	Iview[viewID].pictureWidth = function() {
+		pictureWidth(viewID);
+	}
+	
+	Iview[viewID].zoomViewer = function(direction) {
+		zoomViewer(viewID, direction);
+	}
+	
+
+	Iview[viewID].modules = new Object;
+
+	Iview[viewID].modules.importOverview = function(callback) {
+		importOverview(viewID, callback);
+	}
+	
+	Iview[viewID].modules.openOverview = function() {
+		openOverview(viewID);
+	}
+
+	Iview[viewID].modules.importChapter = function(callback) {
+		importChapter(viewID, callback);
+	}
+	
+	Iview[viewID].modules.openChapter = function(major) {
+		openChapter(major, viewID);
+	}
+	
+	
+	Iview[viewID].maximizeHandler = function() {
+		maximizeHandler(viewID);
+	}
+	
 }
 
 /**

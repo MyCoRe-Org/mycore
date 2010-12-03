@@ -85,10 +85,12 @@ iview.Permalink.View.prototype = {
  * @description main Controller to control the permalink,
  *  functionalities to display, update registred permalink (views)
  *  views will be add directly here and further direct references to them are hold
+ * @param {Object} parent holds the reference to the viewer
  * @param {AssoArray} views hold direct references to each added toolbar view
  * @param {boolean} active describes the state of the permalink: displayed (true) or hidden (false)
  */
-iview.Permalink.Controller = function () {
+iview.Permalink.Controller = function (parent) {
+	this.parent = parent;
 	this.views = [];
 
 	this.active = false;
@@ -145,16 +147,32 @@ iview.Permalink.Controller.prototype = {
 		}
 		this.active = !this.active;
 	},
-
+	
 	/**
 	 * @function
-	 * @memberOf View#
-	 * @description returns the updated link to the current viewer content,
-	 * @return {String} returns the generated URL
+	 * @memberOf	View#
+	 * @description	generates a permalink which contains all needed informations to display the same Picture&Position and other things
+	 * @return 		{String} string which contains the generated URL
 	 */
 	_update: function() {
-		var viewerID = this.getViewer().viewID_to_remove;
-		// TODO sollte mit in die PermaLink Klasse
-		return generateURL(viewerID);
+		var viewer = this.getViewer();
+		
+		var url = window.location.href.substring(0, ((window.location.href.indexOf("?") != -1)? window.location.href.indexOf(window.location.search): window.location.href.length))+ "?";
+		url += "&page="+viewer.prefix;
+		url += "&zoom="+viewer.viewerBean.zoomLevel;
+		url += "&x="+viewer.viewerBean.x;
+		url += "&y="+viewer.viewerBean.y;
+		
+		var size = "none";
+		if (viewer.zoomWidth)
+			size = "width";
+		if (viewer.zoomScreen)
+			size = "screen";
+		
+		url += "&tosize="+size;
+		url += "&maximized="+viewer.maximized;
+		url += "&css="+styleName;
+		
+		return url;
 	}
 };

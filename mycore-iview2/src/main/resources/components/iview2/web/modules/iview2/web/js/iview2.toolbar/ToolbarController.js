@@ -5,11 +5,13 @@
  *  connects the models with their related views,
  *  models are provided by the ToolbarManager,
  *  views will be add directly here and further direct references to them are hold
+ * @param {Object} parent holds the reference to the viewer
  * @param {AssoArray} views hold direct references to each added toolbar view
  * @param {AssoArray} relations defines the informations about each connections between model and view
  * @requires fg.menu 3.0 
  */
-var ToolbarController = function () {
+var ToolbarController = function (parent) {
+	this.parent = parent;
 	this.views = [];
 	
 	// holds relation between Model and View
@@ -59,26 +61,26 @@ ToolbarController.prototype.addView = function(view) {
     				myself.getViewer().getToolbarMgr().getModel("mainTb").getElement(args.parentName).getButton("fitToWidth").setSubtypeState(false);
     				myself.getViewer().getToolbarMgr().getModel("mainTb").getElement(args.parentName).getButton("fitToScreen").setSubtypeState(false);
     				
-    				zoomViewer(viewerID, true);
+        			myself.getViewer().zoomViewer(true);
     			} else if (args.elementName == "zoomOut") {
     				// FitToScreen - Button wieder reseten
     				// FitToWidth - Button wieder reseten
     				myself.getViewer().getToolbarMgr().getModel("mainTb").getElement(args.parentName).getButton("fitToWidth").setSubtypeState(false);
     				myself.getViewer().getToolbarMgr().getModel("mainTb").getElement(args.parentName).getButton("fitToScreen").setSubtypeState(false);
     				
-    				zoomViewer(viewerID, false);
+        			myself.getViewer().zoomViewer(false);
     			} else if (args.elementName == "fitToWidth") {
     				// FitToScreen - Button wieder reseten
     				myself.getViewer().getToolbarMgr().getModel("mainTb").getElement(args.parentName).getButton("fitToWidth").setSubtypeState(true);
     				myself.getViewer().getToolbarMgr().getModel("mainTb").getElement(args.parentName).getButton("fitToScreen").setSubtypeState(false);
     				
-    				pictureWidth(viewerID);
+        			myself.getViewer().pictureWidth();
     			} else if (args.elementName == "fitToScreen") {    				
     				// FitToWidth - Button wieder reseten
     				myself.getViewer().getToolbarMgr().getModel("mainTb").getElement(args.parentName).getButton("fitToWidth").setSubtypeState(false);
     				myself.getViewer().getToolbarMgr().getModel("mainTb").getElement(args.parentName).getButton("fitToScreen").setSubtypeState(true);
     				
-    				pictureScreen(viewerID);
+    				myself.getViewer().pictureScreen();
     			}
     		} else if (args.parentName == "overviewHandles") {
     			if (args.elementName == "openOverview") {
@@ -86,27 +88,27 @@ ToolbarController.prototype.addView = function(view) {
     					var oldUi = view.getButtonUi({'button' : args.view}).icons;
     					view.setButtonUi({'button' : args.view, 'icons' : {'primary' : 'loading'}});
     					setTimeout(function() {
-    						importOverview(viewerID, function() {view.setButtonUi({'button' : args.view, 'icons' : oldUi});});
+    						myself.getViewer().modules.importOverview(function() {view.setButtonUi({'button' : args.view, 'icons' : oldUi});});
     					}, 10);
     				} else {
-    					openOverview(viewerID);
+    					myself.getViewer().modules.openOverview();
     				}
     			} else if (args.elementName == "openChapter") {
 					if (typeof myself.getViewer().chapter === 'undefined') {
 							var oldUi = view.getButtonUi({'button' : args.view}).icons;
 							view.setButtonUi({'button' : args.view, 'icons' : {'primary' : 'loading'}});
 							setTimeout(function(){
-								importChapter(myself.getViewer(), function() {view.setButtonUi({'button' : args.view, 'icons' : oldUi});});
+								myself.getViewer().modules.importChapter(function() {view.setButtonUi({'button' : args.view, 'icons' : oldUi});});
 							}, 10);
 					} else {
-						openChapter(true, myself.getViewer());
+						myself.getViewer().modules.openChapter(true);
 					}
     			}
     		} else if (args.parentName == "navigateHandles" || args.parentName == "previewForward" || args.parentName == "previewBack") {
     			if (args.elementName == "backward") {
-    				Iview[viewerID].PhysicalModel.setPrevious();
+    				myself.getViewer().PhysicalModel.setPrevious();
     			} else if (args.elementName == "forward") {
-    				Iview[viewerID].PhysicalModel.setNext();
+    				myself.getViewer().PhysicalModel.setNext();
     			}
     		} else if (args.parentName == "permalinkHandles") {
     			if (args.elementName == "permalink") {
@@ -115,7 +117,8 @@ ToolbarController.prototype.addView = function(view) {
     			}
     		} else if (args.parentName == "closeHandles") {
     			if (args.elementName == "close") {
-    				maximizeHandler(viewerID);
+    				myself.getViewer().maximizeHandler();
+    				// TODO: move into the maximize method
     				myself.getViewer().getToolbarMgr().destroyModel('mainTb');
     			}		
     		}

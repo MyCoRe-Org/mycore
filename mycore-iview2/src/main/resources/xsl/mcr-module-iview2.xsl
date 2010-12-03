@@ -95,7 +95,7 @@
 	<script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/lib/fg-menu/fg.menu.js" />
 	
 	<!-- Importer Skript -->
-	<script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/iview2.toolbar/ImportToolbar.js" />
+	<script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/iview2.toolbar/ToolbarImporter.js" />
 	
 	<!--  Model, Controller, View -->
 	<!--  needs Event.js -->
@@ -105,6 +105,7 @@
 	<script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/iview2.toolbar/ToolbarModel.js" />
 	<script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/iview2.toolbar/ToolbarButtonsetModel.js" />
 	<script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/iview2.toolbar/ToolbarDividerModel.js" />
+	<script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/iview2.toolbar/ToolbarTextModel.js" />
 	<script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/iview2.toolbar/ToolbarButtonModel.js" />
 	<script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/iview2.toolbar/ToolbarController.js" />
 	<script type="text/javascript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/iview2.toolbar/ToolbarView.js" />
@@ -148,7 +149,7 @@
 					'pageBox' : '<xsl:value-of select="i18n:translate('component.iview2.pageBox')"/>'
 				};
 			
-				ImportToolbar(viewID, titles);
+				Iview[viewID].ToolbarImporter = new ToolbarImporter(Iview[viewID], titles);
       		});
         </script>
         </div>
