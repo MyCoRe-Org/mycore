@@ -64,7 +64,7 @@ public class MCRUserRoleProvider implements MCRUserInformation {
      */
     @Override
     public boolean isUserInRole(String role) {
-        return user.getGroupIDs().contains(role);
+        return user.isMemberOf(role);
     }
 
     @Override

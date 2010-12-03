@@ -405,11 +405,18 @@ public class MCRUser extends MCRUserObject {
      * @return Returns true if the user is a member of the given group.
      */
     public boolean isMemberOf(MCRGroup group) {
-        if (getPrimaryGroupID().equals(group.getID()) || groupIDs.contains(group.getID())) {
-            return true;
-        }
-
-        return false;
+        return isMemberOf(group.getID());
+    }
+    
+    /**
+     * This method checks if the user is member of a given group.
+     * 
+     * @param group
+     *            Is the user a member of this group?
+     * @return Returns true if the user is a member of the given group.
+     */
+    public boolean isMemberOf(String groupID) {
+        return getPrimaryGroupID().equals(groupID) || groupIDs.contains(groupID);
     }
 
     /**
