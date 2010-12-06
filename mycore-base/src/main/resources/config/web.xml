@@ -5,7 +5,7 @@
   <display-name>MyCoRe Application</display-name>
 
   <!-- **************************************************************** -->
-  <!-- Servlets and mapping from MyCoRe kernel                          -->
+  <!-- Servlets and mapping from MyCoRe kernel -->
   <!-- **************************************************************** -->
 
   <listener>
@@ -91,9 +91,9 @@
     <servlet-name>MCRDerivateLinkServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRDerivateLinkServlet</servlet-class>
   </servlet>
-  
-  
-  
+
+
+
   <filter-mapping>
     <filter-name>WebAppBaseFilter</filter-name>
     <url-pattern>/*</url-pattern>
@@ -219,7 +219,7 @@
     <servlet-name>MCRDerivateLinkServlet</servlet-name>
     <url-pattern>/servlets/MCRDerivateLinkServlet</url-pattern>
   </servlet-mapping>
-  
+
   <servlet id="MCRAddURNToObjectServlet">
     <servlet-name>MCRAddURNToObjectServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRAddURNToObjectServlet</servlet-class>
@@ -229,12 +229,12 @@
     <servlet-name>MCRAddURNToObjectServlet</servlet-name>
     <url-pattern>/servlets/MCRAddURNToObjectServlet</url-pattern>
   </servlet-mapping>
-  
+
   <servlet id="MCRDisplayHideDerivateServlet">
     <servlet-name>MCRDisplayHideDerivateServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRDisplayHideDerivateServlet</servlet-class>
   </servlet>
-  
+
   <servlet-mapping>
     <servlet-name>MCRDisplayHideDerivateServlet</servlet-name>
     <url-pattern>/servlets/MCRDisplayHideDerivateServlet</url-pattern>
@@ -244,24 +244,34 @@
     <servlet-name>MCRMailer</servlet-name>
     <servlet-class>org.mycore.common.MCRMailer</servlet-class>
   </servlet>
-  
+
   <servlet-mapping>
     <servlet-name>MCRMailer</servlet-name>
     <url-pattern>/servlets/MCRMailer</url-pattern>
   </servlet-mapping>
-  
+
   <servlet id="MCRDerivateServlet">
-  	<servlet-name>MCRDerivateServlet</servlet-name>
-  	<servlet-class>org.mycore.frontend.servlets.MCRDerivateServlet</servlet-class>
+    <servlet-name>MCRDerivateServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRDerivateServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>
     <servlet-name>MCRDerivateServlet</servlet-name>
     <url-pattern>/servlets/MCRDerivateServlet/*</url-pattern>
   </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>MCRLogoutServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRLogoutServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>MCRLogoutServlet</servlet-name>
+    <url-pattern>/servlets/logout</url-pattern>
+  </servlet-mapping>
 
   <!-- **************************************************************** -->
-  <!-- General configuration                                            -->
+  <!-- General configuration -->
   <!-- **************************************************************** -->
 
   <session-config>
@@ -277,17 +287,17 @@
     <welcome-file>default.jsp</welcome-file>
     <welcome-file>index.xml</welcome-file>
   </welcome-file-list>
-  
+
   <servlet>
     <servlet-name>ErrorServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRErrorServlet</servlet-class>
   </servlet>
-  
+
   <servlet-mapping>
     <servlet-name>ErrorServlet</servlet-name>
     <url-pattern>/servlets/ErrorServlet</url-pattern>
   </servlet-mapping>
-  
+
   <error-page>
     <exception-type>java.lang.Throwable</exception-type>
     <location>/servlets/ErrorServlet</location>
