@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
+ * Invalidates a session and sends redirect to referring page.
  * @author Thomas Scheffler (yagee)
  *
  */
@@ -50,9 +51,8 @@ public class MCRLogoutServlet extends HttpServlet {
         }
         session.invalidate();
         String returnURL = req.getHeader("Referer");
-        log("Hello");
         if (returnURL == null) {
-            returnURL = req.getContextPath() + "/"; //redirect to servlets container root
+            returnURL = req.getContextPath() + "/";
         }
         resp.sendRedirect(returnURL);
     }
