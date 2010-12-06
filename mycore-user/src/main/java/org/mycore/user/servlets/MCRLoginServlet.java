@@ -77,7 +77,9 @@ public class MCRLoginServlet extends MCRServlet {
         org.jdom.Document jdomDoc = new org.jdom.Document(root);
 
         if (uid != null) {
-            if (MCRUserMgr.instance().login(uid, pwd)) {
+            if (!MCRUserMgr.instance().existUser(uid)) {
+                root.setAttribute("unknown_user", "true");
+            } else if (MCRUserMgr.instance().login(uid, pwd)) {
                 //user logged in
                 LOGGER.info("MCRLoginServlet: user " + uid + " logged in successfully.");
                 job.getRequest().removeAttribute("mode");
