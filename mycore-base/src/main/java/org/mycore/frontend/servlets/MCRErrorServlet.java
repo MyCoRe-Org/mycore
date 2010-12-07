@@ -30,6 +30,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -67,7 +68,25 @@ public class MCRErrorServlet extends HttpServlet {
         Throwable exception = (Throwable) req.getAttribute("javax.servlet.error.exception");
         String requestURI = (String) req.getAttribute("javax.servlet.error.request_uri");
         String servletName = (String) req.getAttribute("javax.servlet.error.servletName");
-        generateErrorPage(req, resp, message, exception, statusCode, exceptionType, requestURI, servletName);
+        MCRSession session = getMCRSession(req, servletName);
+        if (session != null) {
+            MCRSessionMgr.setCurrentSession(session);
+        }
+        try {
+            generateErrorPage(req, resp, message, exception, statusCode, exceptionType, requestURI, servletName);
+        } finally {
+            if (session != null) {
+                MCRSessionMgr.releaseCurrentSession();
+            }
+        }
+    }
+
+    private MCRSession getMCRSession(HttpServletRequest req, String servletName) {
+        HttpSession session = req.getSession(false);
+        if (session == null) {
+            return null;
+        }
+        return MCRServlet.getSession(req, servletName);
     }
 
     protected void generateErrorPage(HttpServletRequest request, HttpServletResponse response, String msg, Throwable ex, Integer statusCode,
