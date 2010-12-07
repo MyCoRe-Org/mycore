@@ -88,7 +88,7 @@ public class MCRUserServlet extends MCRServlet {
         if (mode.length() == 0) {
             mode = "Select";
         }
-        LOGGER.debug("Mode     : "+mode);
+        LOGGER.debug("Mode     : " + mode);
 
         if (mode.equals("ChangePwd")) {
             if (MCRWebsiteWriteProtection.printInfoPageIfNoAccess(job.getRequest(), job.getResponse(), getBaseURL()))
@@ -109,7 +109,7 @@ public class MCRUserServlet extends MCRServlet {
             if (backto_url.length() == 0) {
                 return;
             }
-            LOGGER.debug("URL :      "+backto_url);
+            LOGGER.debug("URL :      " + backto_url);
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(backto_url));
             return;
         }
@@ -232,7 +232,8 @@ public class MCRUserServlet extends MCRServlet {
         org.jdom.Element root = jdomDoc.getRootElement();
 
         MCRUser user = MCRUserMgr.instance().retrieveUser(currentUser);
-        root.addContent(user.toJDOMElement());
+        if (user != null)
+            root.addContent(user.toJDOMElement());
 
         doLayout(job, "Metadata", jdomDoc); // use the stylesheet
 
