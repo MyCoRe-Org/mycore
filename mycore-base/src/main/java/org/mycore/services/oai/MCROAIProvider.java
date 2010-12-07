@@ -1,24 +1,24 @@
 /*
- * $RCSfile$
- * $Revision: 15646 $ $Date: 2009-07-28 11:32:04 +0200 (Di, 28. Jul 2009) $
- *
- * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
- *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program, in a file called gpl.txt or license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * $RCSfile$ $Revision: 15646 $ $Date: 2009-07-28 11:32:04 +0200 (Di, 28. Jul
+ * 2009) $
+ * 
+ * This file is part of *** M y C o R e *** See http://www.mycore.de/ for
+ * details.
+ * 
+ * This program is free software; you can use it, redistribute it and / or
+ * modify it under the terms of the GNU General Public License (GPL) as
+ * published by the Free Software Foundation; either version 2 of the License or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program, in a file called gpl.txt or license.txt. If not, write to the
+ * Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307 USA
  */
 
 package org.mycore.services.oai;
@@ -30,7 +30,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
@@ -66,12 +65,14 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaElement;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
@@ -91,7 +92,7 @@ public class MCROAIProvider extends MCRServlet {
 
     private static long lastTokenID = 0;
 
-    private static Logger logger = Logger.getLogger(MCROAIProvider.class);
+    private static Logger LOGGER = Logger.getLogger(MCROAIProvider.class);
 
     private static HashMap<String, MCROAIConfigBean> oaiConfig;
 
@@ -122,7 +123,7 @@ public class MCROAIProvider extends MCRServlet {
         oaiResumptionTokenTimeOut = MCRConfiguration.instance().getInt("MCR.OAI.Resumptiontoken.Timeout", 72);
         maxReturns = MCRConfiguration.instance().getInt("MCR.OAI.MaxReturns", 10);
         resStore = (MCROAIResumptionTokenStore) MCRConfiguration.instance().getInstanceOf("MCR.OAI.Resumptiontoken.Store",
-            "org.mycore.backend.hibernate.MCRHIBResumptionTokenStore");
+                "org.mycore.backend.hibernate.MCRHIBResumptionTokenStore");
     }
 
     // property name for the implementing class of MCROAIQuery
@@ -177,10 +178,32 @@ public class MCROAIProvider extends MCRServlet {
 
     private static final String STR_GRANULARITY_SHORT = "yyyy-MM-dd";
 
-    //OAI 2.0 Specification says: "the finest harvesting granularity supported by the repository."
+    // OAI 2.0 Specification says:
+    // "the finest harvesting granularity supported by the repository."
     private static final String STR_REPOSITORY_GRANULARITY = "YYYY-MM-DDThh:mm:ssZ";
 
-    private static final String STR_FIRST_DATE = "2000-01-01";
+    private static String STR_FIRST_DATE;
+    static {
+        try {
+            Date compareDate = new Date();
+            long start = System.currentTimeMillis();
+            List<String> idList = MCRXMLMetadataManager.instance().listIDs();
+            for (String id : idList) {
+                Date dateCreated = MCRMetadataManager.retrieve(MCRObjectID.getInstance(id)).getService()
+                        .getDate(MCRObjectService.DATE_TYPE_CREATEDATE);
+                if (dateCreated.before(compareDate)) {
+                    compareDate = dateCreated;
+                }
+            }
+            LOGGER.info("Checked " + idList.size() + " objects in " + ((System.currentTimeMillis() - start) / 1000) + " ms.");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            sdf.setTimeZone(TimeZone.getDefault());
+            STR_FIRST_DATE = sdf.format(compareDate);
+        } catch (Exception ex) {
+            LOGGER.error("Error occured while examining create date of first created object", ex);
+            STR_FIRST_DATE = "2000-01-01";
+        }
+    }
 
     private static final String ERR_FAULTY_VERB = "No verb or too much verbs";
 
@@ -196,7 +219,8 @@ public class MCROAIProvider extends MCRServlet {
 
     private static final String ERR_UNKNOWN_FORMAT = "Unknown metadata format";
 
-    private static final String[] STR_VERBS = { "GetRecord", "Identify", "ListIdentifiers", "ListMetadataFormats", "ListRecords", "ListSets" };
+    private static final String[] STR_VERBS = { "GetRecord", "Identify", "ListIdentifiers", "ListMetadataFormats", "ListRecords",
+            "ListSets" };
 
     /**
      * Method destroy. Automatically destroys the Servlet.
@@ -266,7 +290,7 @@ public class MCROAIProvider extends MCRServlet {
             String verb[] = getParameter("verb", request);
 
             if (verb == null || verb.length != 1) {
-                logger.info("Request without a verb.");
+                LOGGER.info("Request without a verb.");
                 document = addError(header, "badVerb", ERR_FAULTY_VERB);
             } else {
                 // Check if a correct verb was given
@@ -283,7 +307,7 @@ public class MCROAIProvider extends MCRServlet {
                 } else if (verb[0].equalsIgnoreCase(STR_VERBS[5])) {
                     document = listSets(request, header);
                 } else {
-                    logger.info("Request with a bad verb:" + verb[0]);
+                    LOGGER.info("Request with a bad verb:" + verb[0]);
                     document = addError(header, "badVerb", ERR_ILLEGAL_VERB);
                 }
             }
@@ -312,9 +336,9 @@ public class MCROAIProvider extends MCRServlet {
             outputter.output(document, out);
             return;
         } catch (MCRException mcrx) {
-            logger.warn(mcrx.getMessage());
+            LOGGER.warn(mcrx.getMessage());
         } catch (IOException ioex) {
-            logger.warn(ioex.getMessage());
+            LOGGER.warn(ioex.getMessage());
         }
     }
 
@@ -347,7 +371,7 @@ public class MCROAIProvider extends MCRServlet {
             parameter = parameters.nextElement();
             if (parameter.equalsIgnoreCase(p)) {
                 paramValues = request.getParameterValues(parameter);
-                logger.debug("Parameter mit Wert " + p + " gefunden.");
+                LOGGER.debug("Parameter mit Wert " + p + " gefunden.");
                 return paramValues;
             }
         }
@@ -431,7 +455,8 @@ public class MCROAIProvider extends MCRServlet {
      * @return Element The new List
      * @throws IOException
      */
-    private Element listFromResumptionToken(Element list, String resumptionToken, String prefix, Namespace ns, String listType) throws IOException {
+    private Element listFromResumptionToken(Element list, String resumptionToken, String prefix, Namespace ns, String listType)
+            throws IOException {
 
         try {
             String[] array = resumptionToken.split("x");
@@ -467,8 +492,8 @@ public class MCROAIProvider extends MCRServlet {
                         Namespace xsi = Namespace.getNamespace("xsi", STR_SCHEMA_INSTANCE);
                         eDC.addNamespaceDeclaration(dc);
                         eDC.addNamespaceDeclaration(xsi);
-                        eDC.setAttribute("schemaLocation", STR_OAI_NAMESPACE + STR_OAI_VERSION + "/oai_dc/ " + STR_OAI_NAMESPACE + STR_OAI_VERSION
-                            + "/oai_dc.xsd", xsi);
+                        eDC.setAttribute("schemaLocation", STR_OAI_NAMESPACE + STR_OAI_VERSION + "/oai_dc/ " + STR_OAI_NAMESPACE
+                                + STR_OAI_VERSION + "/oai_dc.xsd", xsi);
                         Element eDescription = new Element("description", dc);
                         eDescription.addContent(setArray[5]);
                         eDC.addContent(eDescription);
@@ -533,7 +558,7 @@ public class MCROAIProvider extends MCRServlet {
      * @return Date the date or null
      */
     private Date getDate(String date) {
-        logger.debug("Given date: " + date);
+        LOGGER.debug("Given date: " + date);
         SimpleDateFormat dateFormat = new SimpleDateFormat(STR_GRANULARITY);
         if (date.length() > STR_REPOSITORY_GRANULARITY.length()) {
             return null;
@@ -594,11 +619,11 @@ public class MCROAIProvider extends MCRServlet {
      * @return Document The document with all new elements added.
      */
     private org.jdom.Document identify(HttpServletRequest request, org.jdom.Document header) {
-        logger.info("The harvester has called the 'Identify' value.");
+        LOGGER.info("The harvester has called the 'Identify' value.");
         org.jdom.Document document = header;
 
         if (badArguments(request, 1)) {
-            logger.warn("There are too many arguments in the request. OAI 2.0 define an interupt in this case.");
+            LOGGER.warn("There are too many arguments in the request. OAI 2.0 define an interupt in this case.");
             return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
         }
 
@@ -632,12 +657,14 @@ public class MCROAIProvider extends MCRServlet {
         Element eOAIIdentifier = new Element("oai-identifier", idns);
         Namespace xsi = Namespace.getNamespace("xsi", STR_SCHEMA_INSTANCE);
         eOAIIdentifier.addNamespaceDeclaration(xsi);
-        eOAIIdentifier.setAttribute("schemaLocation", STR_OAI_NAMESPACE + "2.0/oai-identifier " + STR_OAI_NAMESPACE + "2.0/oai-identifier.xsd", xsi);
+        eOAIIdentifier.setAttribute("schemaLocation", STR_OAI_NAMESPACE + "2.0/oai-identifier " + STR_OAI_NAMESPACE
+                + "2.0/oai-identifier.xsd", xsi);
 
         eOAIIdentifier.addContent(newElementWithContent("scheme", idns, "oai"));
         eOAIIdentifier.addContent(newElementWithContent("repositoryIdentifier", idns, repositoryIdentifier));
         eOAIIdentifier.addContent(newElementWithContent("delimiter", idns, ":"));
-        eOAIIdentifier.addContent(newElementWithContent("sampleIdentifier", idns, "oai:" + repositoryIdentifier + ":MyCoReDemoDC_Document_1"));
+        eOAIIdentifier.addContent(newElementWithContent("sampleIdentifier", idns, "oai:" + repositoryIdentifier
+                + ":MyCoReDemoDC_Document_1"));
 
         eOAIDescription.addContent(eOAIIdentifier);
         eIdentify.addContent(eOAIDescription);
@@ -674,7 +701,7 @@ public class MCROAIProvider extends MCRServlet {
      * @return Document The document with all new elements added.
      */
     private org.jdom.Document listMetadataFormats(HttpServletRequest request, org.jdom.Document header) {
-        logger.info("Harvester hat 'listMetadatFormats' angefordert");
+        LOGGER.info("Harvester hat 'listMetadatFormats' angefordert");
         org.jdom.Document document = header;
 
         Element eRoot = document.getRootElement();
@@ -684,7 +711,7 @@ public class MCROAIProvider extends MCRServlet {
         try {
             query = (MCROAIQuery) MCRConfiguration.instance().getInstanceOf(STR_OAI_QUERYSERVICE);
         } catch (MCRConfigurationException mcrx) {
-            logger.fatal("Missing configuration item: " + STR_OAI_QUERYSERVICE + " is missing.");
+            LOGGER.fatal("Missing configuration item: " + STR_OAI_QUERYSERVICE + " is missing.");
             return null;
         }
 
@@ -695,21 +722,21 @@ public class MCROAIProvider extends MCRServlet {
         List<Object> record = null;
         if (identifier == null) {
             if (badArguments(request, 1)) {
-                logger.info("Anfrage 'listMetadataFormats' wurde wegen fehlendem Parameter abgebrochen.");
+                LOGGER.info("Anfrage 'listMetadataFormats' wurde wegen fehlendem Parameter abgebrochen.");
                 return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
             }
             Element eRequest = eRoot.getChild("request", ns);
             eRequest.setAttribute("verb", "ListMetadataFormats");
         } else if (identifier.length > 1) {
             // Es ist nur ein Identifier erlaubt!
-            logger.info("Anfrage 'listMetadataFormats' wurde wegen zu vieler Parameter abgebrochen.");
+            LOGGER.info("Anfrage 'listMetadataFormats' wurde wegen zu vieler Parameter abgebrochen.");
             return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
         } else {
             String id;
             try {
                 id = legalOAIIdentifier(identifier[0]);
             } catch (MCRException mcrx) {
-                logger.info("Anfrage 'listMetadataFormats' wurde wegen fehlerhaftem Identifier abgebrochen.");
+                LOGGER.info("Anfrage 'listMetadataFormats' wurde wegen fehlerhaftem Identifier abgebrochen.");
                 return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
             }
 
@@ -717,7 +744,7 @@ public class MCROAIProvider extends MCRServlet {
             eRequest.setAttribute("verb", "ListMetadataFormats");
             eRequest.setAttribute("identifier", identifier[0]);
             if (!query.exists(id)) {
-                logger.info("Anfrage 'listMetadataFormats' wurde wegen falscher ID abgebrochen.");
+                LOGGER.info("Anfrage 'listMetadataFormats' wurde wegen falscher ID abgebrochen.");
                 return addError(document, "idDoesNotExist", ERR_UNKNOWN_ID);
             } else {
                 record = query.getRecord(id, "oai_dc", getServletName());
@@ -755,11 +782,10 @@ public class MCROAIProvider extends MCRServlet {
             }
             Element eMetadataFormat = new Element("metadataFormat", ns);
             eMetadataFormat.addContent(newElementWithContent("metadataPrefix", ns, metadataPrefix));
-            eMetadataFormat.addContent(newElementWithContent("schema", ns, MCRConfiguration
-                .instance()
-                .getString(STR_OAI_METADATA_SCHEMA + "." + metadataPrefix)));
+            eMetadataFormat.addContent(newElementWithContent("schema", ns,
+                    MCRConfiguration.instance().getString(STR_OAI_METADATA_SCHEMA + "." + metadataPrefix)));
             eMetadataFormat.addContent(newElementWithContent("metadataNamespace", ns,
-                MCRConfiguration.instance().getString(STR_OAI_METADATA_NAMESPACE + "." + metadataPrefix)));
+                    MCRConfiguration.instance().getString(STR_OAI_METADATA_NAMESPACE + "." + metadataPrefix)));
             eListMetadataFormats.addContent(eMetadataFormat);
         }
 
@@ -791,7 +817,7 @@ public class MCROAIProvider extends MCRServlet {
         }
         // The number of arguments must not exceed maxArguments
         if (badArguments(request, maxArguments)) {
-            logger.info("Anfrage 'listSets' enthaelt fehlerhafte Parameter.");
+            LOGGER.info("Anfrage 'listSets' enthaelt fehlerhafte Parameter.");
             return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
         }
 
@@ -807,12 +833,12 @@ public class MCROAIProvider extends MCRServlet {
             try {
                 eListSets = listFromResumptionToken(eListSets, resumptionToken[0], "null", ns, "set");
                 if (eListSets == null) {
-                    logger.info("Anfrage 'listSets' enthaelt fehlerhaften Resumption Token " + resumptionToken[0] + ".");
+                    LOGGER.info("Anfrage 'listSets' enthaelt fehlerhaften Resumption Token " + resumptionToken[0] + ".");
                     return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
                 }
                 eRoot.addContent(eListSets);
             } catch (IOException e) {
-                logger.error(e.getMessage());
+                LOGGER.error(e.getMessage());
                 return addError(document, "badResumptionToken", ERR_BAD_RESUMPTION_TOKEN);
             }
 
@@ -824,7 +850,7 @@ public class MCROAIProvider extends MCRServlet {
         try {
             query = (MCROAIQuery) MCRConfiguration.instance().getInstanceOf(STR_OAI_QUERYSERVICE);
         } catch (MCRConfigurationException mcrx) {
-            logger.fatal(mcrx.getMessage());
+            LOGGER.fatal(mcrx.getMessage());
             return addError(document, "badResumptionToken", mcrx.getMessage());
         }
 
@@ -863,8 +889,8 @@ public class MCROAIProvider extends MCRServlet {
                     Namespace xsi = Namespace.getNamespace("xsi", STR_SCHEMA_INSTANCE);
                     eDC.addNamespaceDeclaration(dc);
                     eDC.addNamespaceDeclaration(xsi);
-                    eDC.setAttribute("schemaLocation", STR_OAI_NAMESPACE + STR_OAI_VERSION + "/oai_dc/ " + STR_OAI_NAMESPACE + STR_OAI_VERSION + "/oai_dc.xsd",
-                        xsi);
+                    eDC.setAttribute("schemaLocation", STR_OAI_NAMESPACE + STR_OAI_VERSION + "/oai_dc/ " + STR_OAI_NAMESPACE
+                            + STR_OAI_VERSION + "/oai_dc.xsd", xsi);
                     Element eDescription = new Element("description", dc);
                     eDescription.addContent(set[2]);
                     eDC.addContent(eDescription);
@@ -931,7 +957,7 @@ public class MCROAIProvider extends MCRServlet {
         if (resumptionToken != null) {
             maxArguments++;
             if (from != null || until != null || set != null || metadataPrefix != null) {
-                logger.info("Anfrage 'listRecords' enthaelt fehlerhafte Parameter.");
+                LOGGER.info("Anfrage 'listRecords' enthaelt fehlerhafte Parameter.");
                 return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
             }
         } else {
@@ -939,7 +965,7 @@ public class MCROAIProvider extends MCRServlet {
             if (from != null) {
                 fromDate = getDate(from[0]);
                 if (fromDate == null) {
-                    logger.info("Anfrage 'listIdentifiers' enthaelt fehlerhafte Parameter.");
+                    LOGGER.info("Anfrage 'listIdentifiers' enthaelt fehlerhafte Parameter.");
                     return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
                 }
                 maxArguments++;
@@ -950,16 +976,16 @@ public class MCROAIProvider extends MCRServlet {
             if (until != null) {
                 untilDate = getDate(until[0]);
                 if (untilDate == null) {
-                    logger.info("Anfrage 'listIdentifiers' enthaelt fehlerhafte Parameter.");
+                    LOGGER.info("Anfrage 'listIdentifiers' enthaelt fehlerhafte Parameter.");
                     return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
                 }
                 if (fromDate != null) {
                     if (fromDate.after(untilDate)) {
-                        logger.info("Anfrage 'listIdentifiers' enthaelt fehlerhafte Parameter.");
+                        LOGGER.info("Anfrage 'listIdentifiers' enthaelt fehlerhafte Parameter.");
                         return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
                     }
                     if (from[0].length() != until[0].length()) {
-                        logger.info("Anfrage 'listIdentifiers' enthaelt fehlerhafte Parameter (Granularität von from und until muss gleich sein.)");
+                        LOGGER.info("Anfrage 'listIdentifiers' enthaelt fehlerhafte Parameter (Granularität von from und until muss gleich sein.)");
                         return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
                     }
                 }
@@ -969,13 +995,13 @@ public class MCROAIProvider extends MCRServlet {
                 maxArguments++;
             }
             if (metadataPrefix == null) {
-                logger.info("Anfrage 'listRecords' enthaelt fehlerhafte Parameter.");
+                LOGGER.info("Anfrage 'listRecords' enthaelt fehlerhafte Parameter.");
                 return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
             }
         }
         // The number of arguments must not exceed maxArguments
         if (badArguments(request, maxArguments)) {
-            logger.info("Anfrage 'listIdentifiers' wegen falschen Parametern abgebrochen.");
+            LOGGER.info("Anfrage 'listIdentifiers' wegen falschen Parametern abgebrochen.");
             return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
         }
 
@@ -1001,11 +1027,11 @@ public class MCROAIProvider extends MCRServlet {
             try {
                 prefix = resStore.getPrefix(resumptionToken[0].substring(0, resumptionToken[0].indexOf("x")));
             } catch (StringIndexOutOfBoundsException ex) {
-                logger.info("Error in resumption token.", ex);
+                LOGGER.info("Error in resumption token.", ex);
                 return addError(document, "badResumptionToken", ERR_BAD_RESUMPTION_TOKEN);
             }
             if (prefix == null) {
-                logger.info("Error in resumption token.");
+                LOGGER.info("Error in resumption token.");
                 return addError(document, "badResumptionToken", ERR_BAD_RESUMPTION_TOKEN);
             }
         }
@@ -1015,7 +1041,7 @@ public class MCROAIProvider extends MCRServlet {
             // check if property is set, else Exception is thrown
             MCRConfiguration.instance().getString(STR_OAI_METADATA_TRANSFORMER + "." + prefix);
         } catch (MCRConfigurationException mcrx) {
-            logger.info("Anfrage 'listIdentifiers' wegen unbekanntem Metadatenformat " + prefix + " abgebrochen.");
+            LOGGER.info("Anfrage 'listIdentifiers' wegen unbekanntem Metadatenformat " + prefix + " abgebrochen.");
             return addError(document, "cannotDisseminateFormat", ERR_UNKNOWN_FORMAT);
         }
 
@@ -1025,12 +1051,12 @@ public class MCROAIProvider extends MCRServlet {
             try {
                 eListIdentifiers = listFromResumptionToken(eListIdentifiers, resumptionToken[0], prefix, ns, "identifiers");
                 if (eListIdentifiers == null) {
-                    logger.info("Anfrage 'listIdentifiers' enthaelt fehlerhaften Resumption Token " + resumptionToken[0] + ".");
+                    LOGGER.info("Anfrage 'listIdentifiers' enthaelt fehlerhaften Resumption Token " + resumptionToken[0] + ".");
                     return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
                 }
                 eRoot.addContent(eListIdentifiers);
             } catch (IOException e) {
-                logger.error(e.getMessage());
+                LOGGER.error(e.getMessage());
                 return addError(document, "badResumptionToken", ERR_BAD_RESUMPTION_TOKEN);
             }
 
@@ -1045,7 +1071,7 @@ public class MCROAIProvider extends MCRServlet {
 
             query = (MCROAIQuery) MCRConfiguration.instance().getInstanceOf(STR_OAI_QUERYSERVICE);
         } catch (MCRConfigurationException e) {
-            logger.fatal(e.getMessage());
+            LOGGER.fatal(e.getMessage());
             return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
         }
 
@@ -1126,8 +1152,9 @@ public class MCROAIProvider extends MCRServlet {
         String identifier[] = getParameter("identifier", request);
         // Then: check if there was an metadataPrefix in the request (required)
         String metadataPrefix[] = getParameter("metadataPrefix", request);
-        if (identifier == null || metadataPrefix == null || identifier.length != 1 || metadataPrefix.length != 1 || badArguments(request, 3)) {
-            logger.info("Anfrage 'getRecord' wurde wegen fehlendem Parameter abgebrochen.");
+        if (identifier == null || metadataPrefix == null || identifier.length != 1 || metadataPrefix.length != 1
+                || badArguments(request, 3)) {
+            LOGGER.info("Anfrage 'getRecord' wurde wegen fehlendem Parameter abgebrochen.");
             return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
         }
 
@@ -1135,7 +1162,7 @@ public class MCROAIProvider extends MCRServlet {
         try {
             id = legalOAIIdentifier(identifier[0]);
         } catch (MCRException mcrx) {
-            logger.info("Anfrage 'getRecord' wurde wegen fehlerhaftem Identifier abgebrochen.");
+            LOGGER.info("Anfrage 'getRecord' wurde wegen fehlerhaftem Identifier abgebrochen.");
             return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
         }
 
@@ -1149,9 +1176,9 @@ public class MCROAIProvider extends MCRServlet {
         // Check, if the requested metadata format is supported
         try {
             format = MCRConfiguration.instance().getString(STR_OAI_METADATA_TRANSFORMER + "." + metadataPrefix[0]);
-            logger.info("Transformer: " + format);
+            LOGGER.info("Transformer: " + format);
         } catch (MCRConfigurationException mcrx) {
-            logger.info("Anfrage 'getRecord' wurde wegen fehlendem Metadatenformat " + metadataPrefix[0] + " abgebrochen.");
+            LOGGER.info("Anfrage 'getRecord' wurde wegen fehlendem Metadatenformat " + metadataPrefix[0] + " abgebrochen.");
             return addError(document, "cannotDisseminateFormat", ERR_UNKNOWN_FORMAT);
         }
 
@@ -1160,7 +1187,7 @@ public class MCROAIProvider extends MCRServlet {
         try {
             query = (MCROAIQuery) MCRConfiguration.instance().getInstanceOf(STR_OAI_QUERYSERVICE);
         } catch (MCRConfigurationException mcrx) {
-            logger.fatal(mcrx.getMessage());
+            LOGGER.fatal(mcrx.getMessage());
             return addError(document, "idDoesNotExist", ERR_UNKNOWN_ID);
         }
 
@@ -1189,14 +1216,14 @@ public class MCROAIProvider extends MCRServlet {
                 if (newDocument != null) {
                     document = newDocument;
                 } else {
-                    logger.error("Die Transformation in 'getRecord' hat nicht funktioniert.");
+                    LOGGER.error("Die Transformation in 'getRecord' hat nicht funktioniert.");
                 }
             } else {
-                logger.info("Anfrage 'getRecord' wurde wegen fehlendem Metadatenformat " + metadataPrefix[0] + " abgebrochen.");
+                LOGGER.info("Anfrage 'getRecord' wurde wegen fehlendem Metadatenformat " + metadataPrefix[0] + " abgebrochen.");
                 return addError(document, "cannotDisseminateFormat", ERR_UNKNOWN_FORMAT);
             }
         } else {
-            logger.info("Anfrage 'getRecord' wurde fegen fehlender ID " + id + " abgebrochen.");
+            LOGGER.info("Anfrage 'getRecord' wurde fegen fehlender ID " + id + " abgebrochen.");
             return addError(document, "idDoesNotExist", ERR_UNKNOWN_ID);
         }
 
@@ -1231,7 +1258,7 @@ public class MCROAIProvider extends MCRServlet {
         if (resumptionToken != null) {
             maxArguments++;
             if (from != null || until != null || set != null || metadataPrefix != null) {
-                logger.info("Anfrage 'listRecords' enthaelt fehlerhafte Parameter.");
+                LOGGER.info("Anfrage 'listRecords' enthaelt fehlerhafte Parameter.");
                 return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
             }
         } else {
@@ -1239,7 +1266,7 @@ public class MCROAIProvider extends MCRServlet {
             if (from != null) {
                 fromDate = getDate(from[0]);
                 if (fromDate == null) {
-                    logger.info("Anfrage 'listRecords' enthaelt fehlerhafte Parameter.");
+                    LOGGER.info("Anfrage 'listRecords' enthaelt fehlerhafte Parameter.");
                     return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
                 }
                 maxArguments++;
@@ -1250,16 +1277,16 @@ public class MCROAIProvider extends MCRServlet {
             if (until != null) {
                 untilDate = getDate(until[0]);
                 if (untilDate == null) {
-                    logger.info("Anfrage 'listRecords' enthaelt nicht das richtige Datumsformat.");
+                    LOGGER.info("Anfrage 'listRecords' enthaelt nicht das richtige Datumsformat.");
                     return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
                 }
                 if (fromDate != null) {
                     if (fromDate.after(untilDate)) {
-                        logger.info("Anfrage 'listRecords' enthaelt nicht das richtige Datumsformat.");
+                        LOGGER.info("Anfrage 'listRecords' enthaelt nicht das richtige Datumsformat.");
                         return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
                     }
                     if (from[0].length() != until[0].length()) {
-                        logger.info("Anfrage 'listIdentifiers' enthaelt fehlerhafte Parameter (Granularität von from und until muss gleich sein.)");
+                        LOGGER.info("Anfrage 'listIdentifiers' enthaelt fehlerhafte Parameter (Granularität von from und until muss gleich sein.)");
                         return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
                     }
                 }
@@ -1269,13 +1296,13 @@ public class MCROAIProvider extends MCRServlet {
                 maxArguments++;
             }
             if (metadataPrefix == null) {
-                logger.info("Anfrage 'listRecords' enthaelt fehlerhafte Parameter.");
+                LOGGER.info("Anfrage 'listRecords' enthaelt fehlerhafte Parameter.");
                 return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
             }
         }
         // The number of arguments must not exceed maxArguments
         if (badArguments(request, maxArguments)) {
-            logger.info("Anfrage 'listRecords' enthaelt fehlerhafte Parameter.");
+            LOGGER.info("Anfrage 'listRecords' enthaelt fehlerhafte Parameter.");
             return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
         }
 
@@ -1301,11 +1328,11 @@ public class MCROAIProvider extends MCRServlet {
             try {
                 prefix = resStore.getPrefix(resumptionToken[0].substring(0, resumptionToken[0].indexOf("x")));
             } catch (StringIndexOutOfBoundsException ex) {
-                logger.info("Error in resumption token.", ex);
+                LOGGER.info("Error in resumption token.", ex);
                 return addError(document, "badResumptionToken", ERR_BAD_RESUMPTION_TOKEN);
             }
             if (prefix == null) {
-                logger.info("Error in resumption token.");
+                LOGGER.info("Error in resumption token.");
                 return addError(document, "badResumptionToken", ERR_BAD_RESUMPTION_TOKEN);
             }
         }
@@ -1316,7 +1343,7 @@ public class MCROAIProvider extends MCRServlet {
         try {
             format = MCRConfiguration.instance().getString(STR_OAI_METADATA_TRANSFORMER + "." + prefix);
         } catch (MCRConfigurationException mcrx) {
-            logger.info("Anfrage 'listRecords' wurde wegen fehlendem Metadatenformat " + prefix + " abgebrochen.");
+            LOGGER.info("Anfrage 'listRecords' wurde wegen fehlendem Metadatenformat " + prefix + " abgebrochen.");
             return addError(document, "cannotDisseminateFormat", ERR_UNKNOWN_FORMAT);
         }
 
@@ -1326,12 +1353,12 @@ public class MCROAIProvider extends MCRServlet {
             try {
                 eListRecords = listFromResumptionToken(eListRecords, resumptionToken[0], prefix, ns, "records");
                 if (eListRecords == null) {
-                    logger.info("Anfrage 'listRecords' enthaelt fehlerhaften Resumption Token " + resumptionToken[0] + ".");
+                    LOGGER.info("Anfrage 'listRecords' enthaelt fehlerhaften Resumption Token " + resumptionToken[0] + ".");
                     return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
                 }
                 eRoot.addContent(eListRecords);
             } catch (IOException e) {
-                logger.error(e.getMessage());
+                LOGGER.error(e.getMessage());
                 return addError(document, "badResumptionToken", ERR_BAD_RESUMPTION_TOKEN);
             }
 
@@ -1339,7 +1366,7 @@ public class MCROAIProvider extends MCRServlet {
             if (newDocument != null) {
                 document = newDocument;
             } else {
-                logger.error("Die Transformation in 'listRecords' hat nicht funktioniert.");
+                LOGGER.error("Die Transformation in 'listRecords' hat nicht funktioniert.");
             }
 
             return document;
@@ -1354,7 +1381,7 @@ public class MCROAIProvider extends MCRServlet {
 
             query = (MCROAIQuery) MCRConfiguration.instance().getInstanceOf(STR_OAI_QUERYSERVICE);
         } catch (MCRConfigurationException e) {
-            logger.fatal(e.getMessage());
+            LOGGER.fatal(e.getMessage());
             return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
         }
         String instance = getServletName();
@@ -1423,7 +1450,7 @@ public class MCROAIProvider extends MCRServlet {
             if (newDocument != null) {
                 document = newDocument;
             } else {
-                logger.error("Die Transformation in 'listRecords' hat nicht funktioniert.");
+                LOGGER.error("Die Transformation in 'listRecords' hat nicht funktioniert.");
             }
         } else {
             return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
@@ -1593,7 +1620,8 @@ public class MCROAIProvider extends MCRServlet {
                         String classificationId = classification.getClassId();
                         if (classifications.contains(classificationId)) {
                             String categoryId = classification.getCategId();
-                            MCRCategory category = MCRCategoryDAOFactory.getInstance().getCategory(new MCRCategoryID(classificationId, categoryId), -1);
+                            MCRCategory category = MCRCategoryDAOFactory.getInstance().getCategory(
+                                    new MCRCategoryID(classificationId, categoryId), -1);
                             Set<org.mycore.datamodel.classifications2.MCRLabel> labels = category.getLabels();
                             boolean found = false;
                             for (MCRLabel label : labels) {
