@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
+import java.util.Vector;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -40,10 +41,18 @@ import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.parsers.bool.MCRCondition;
+import org.mycore.services.fieldquery.MCRFieldDef;
+import org.mycore.services.fieldquery.MCRQuery;
+import org.mycore.services.fieldquery.MCRQueryManager;
+import org.mycore.services.fieldquery.MCRQueryParser;
+import org.mycore.services.fieldquery.MCRResults;
+import org.mycore.services.fieldquery.MCRSortBy;
 
 /**
  * Implements an OAI-PMH 2.0 Data Provider as a servlet.
@@ -111,26 +120,25 @@ public class MCROAIDataProvider extends MCRServlet {
     private String adminEmail;
 
     /** The earliest datestamp supported by this data provider instance. */
-    private static String EARLIEST_Datestamp;
+    private static String EARLIEST_DATESTAMP;
     static {
         try {
-            Date compareDate = new Date();
-            long start = System.currentTimeMillis();
-            List<String> idList = MCRXMLMetadataManager.instance().listIDs();
-            for (String id : idList) {
-                Date dateCreated = MCRMetadataManager.retrieve(MCRObjectID.getInstance(id)).getService()
-                        .getDate(MCRObjectService.DATE_TYPE_CREATEDATE);
-                if (dateCreated.before(compareDate)) {
-                    compareDate = dateCreated;
-                }
+            MCRCondition condition = new MCRQueryParser().parse("objectType like *");
+            List<MCRSortBy> sortByList = new Vector<MCRSortBy>();
+            MCRSortBy sortBy = new MCRSortBy(MCRFieldDef.getDef("created"), MCRSortBy.ASCENDING);
+            sortByList.add(sortBy);
+            MCRQuery q = new MCRQuery(condition, sortByList, 1);
+            MCRResults result = MCRQueryManager.search(q);
+            if (result.getNumHits() > 0) {
+                MCRObject obj = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(result.getHit(0).getID()));
+                Date dateCreated = obj.getService().getDate(MCRObjectService.DATE_TYPE_CREATEDATE);
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                sdf.setTimeZone(TimeZone.getDefault());
+                EARLIEST_DATESTAMP = sdf.format(dateCreated);
             }
-            LOGGER.info("Checked " + idList.size() + " objects in " + ((System.currentTimeMillis() - start)) + " ms.");
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            sdf.setTimeZone(TimeZone.getDefault());
-            EARLIEST_Datestamp = sdf.format(compareDate);
         } catch (Exception ex) {
             LOGGER.error("Error occured while examining create date of first created object", ex);
-            EARLIEST_Datestamp = "1970-01-01";
+            EARLIEST_DATESTAMP = "2000-01-01";
         }
     }
 
@@ -201,7 +209,7 @@ public class MCROAIDataProvider extends MCRServlet {
      * example MCR.OAIDataProvider.OAI.EarliestDatestamp=1970-01-01
      */
     String getEarliestDatestamp() {
-        return EARLIEST_Datestamp;
+        return EARLIEST_DATESTAMP;
     }
 
     String getRecordSampleID() {
