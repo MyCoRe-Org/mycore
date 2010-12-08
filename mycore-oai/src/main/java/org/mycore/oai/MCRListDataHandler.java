@@ -91,7 +91,7 @@ abstract class MCRListDataHandler extends MCRVerbHandler {
                 }
             }
 
-            String fieldFromUntil = config.getString(provider.getPrefix() + "Search.FromUntil");
+            String fieldFromUntil = config.getString(provider.getPrefix() + "Search.FromUntil", "modified");
             MCRFieldDef dateField = MCRFieldDef.getDef(fieldFromUntil);
 
             String from = parms.getProperty(ARG_FROM);
@@ -113,16 +113,14 @@ abstract class MCRListDataHandler extends MCRVerbHandler {
             MCRQuery query = new MCRQuery(queryCondition);
 
             List<MCRSortBy> sortBy = new ArrayList<MCRSortBy>();
-            String searchSortBy = config.getString(provider.getPrefix() + "Search.SortBy", null);
-            if (searchSortBy != null) {
-                for (StringTokenizer st = new StringTokenizer(searchSortBy, ",;:"); st.hasMoreTokens();) {
-                    String token = st.nextToken().trim();
-                    MCRFieldDef field = MCRFieldDef.getDef(token.split(" ")[0]);
-                    boolean order = "ascending".equalsIgnoreCase(token.split(" ")[1]);
-                    sortBy.add(new MCRSortBy(field, order));
-                }
-                query.setSortBy(sortBy);
+            String searchSortBy = config.getString(provider.getPrefix() + "Search.SortBy", "modified descending, id descending");
+            for (StringTokenizer st = new StringTokenizer(searchSortBy, ",;:"); st.hasMoreTokens();) {
+                String token = st.nextToken().trim();
+                MCRFieldDef field = MCRFieldDef.getDef(token.split(" ")[0]);
+                boolean order = "ascending".equalsIgnoreCase(token.split(" ")[1]);
+                sortBy.add(new MCRSortBy(field, order));
             }
+            query.setSortBy(sortBy);
 
             MCRResults results = MCRQueryManager.search(query);
             oaires = new MCROAIResults(results, metadataFormat, provider);

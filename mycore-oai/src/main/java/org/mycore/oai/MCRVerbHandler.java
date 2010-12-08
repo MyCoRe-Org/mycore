@@ -193,8 +193,8 @@ public abstract class MCRVerbHandler implements MCROAIConstants {
         Document doc = new Document(response);
 
         // Add link to XSL stylesheet for displaying OAI response in web browser
-        String xsl = MCRConfiguration.instance().getString(provider.getPrefix() + "ResponseStylesheet", null);
-        if (xsl != null) {
+        String xsl = MCRConfiguration.instance().getString(provider.getPrefix() + "ResponseStylesheet", "oai/oai2.xsl");
+        if (!xsl.isEmpty()) {
             Map<String, String> pairs = new HashMap<String, String>();
             pairs.put("type", "text/xsl");
             pairs.put("href", MCRServlet.getBaseURL() + xsl);

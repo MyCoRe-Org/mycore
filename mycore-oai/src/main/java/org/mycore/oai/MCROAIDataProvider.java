@@ -167,12 +167,12 @@ public class MCROAIDataProvider extends MCRServlet {
 
         repositoryName = config.getString(prefix + "RepositoryName");
         repositoryIdentifier = config.getString(prefix + "RepositoryIdentifier");
-        adminEmail = config.getString(prefix + "AdminEmail");
+        adminEmail = config.getString(prefix + "AdminEmail", config.getString("MCR.Mail.Address"));
 
         recordSampleID = config.getString(prefix + "RecordSampleID");
-        deletedRecord = config.getString(prefix + "DeletedRecord");
+        deletedRecord = config.getString(prefix + "DeletedRecord", "transient");
 
-        adapter = (MCROAIAdapter) (config.getInstanceOf(prefix + "Adapter"));
+        adapter = (MCROAIAdapter) (config.getInstanceOf(prefix + "Adapter", MCROAIAdapterMyCoRe.class.getName()));
         adapter.init(prefix + "Adapter.");
 
         String formats = config.getString(prefix + "MetadataFormats");
