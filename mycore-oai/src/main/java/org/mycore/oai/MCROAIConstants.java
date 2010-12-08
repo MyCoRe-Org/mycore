@@ -23,9 +23,6 @@
 
 package org.mycore.oai;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-
 import org.jdom.Namespace;
 
 /**
@@ -33,7 +30,7 @@ import org.jdom.Namespace;
  * 
  * @author Frank L\u00FCtzenkirchen
  */
-interface MCROAIConstants {
+class MCROAIConstants {
     final static Namespace NS_XSI = Namespace.getNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
 
     final static Namespace NS_OAI = Namespace.getNamespace("http://www.openarchives.org/OAI/2.0/");

@@ -23,6 +23,10 @@
 
 package org.mycore.oai;
 
+import static org.mycore.oai.MCROAIConstants.ERROR_BAD_RESUMPTION_TOKEN;
+import static org.mycore.oai.MCROAIConstants.ERROR_NO_RECORDS_MATCH;
+import static org.mycore.oai.MCROAIConstants.NS_OAI;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -35,16 +39,16 @@ import java.util.TimerTask;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
 import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRResults;
-import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
 
 /**
  * Represents complete results to a ListRecords or ListIdentifiers request. 
  * 
  * @author Frank L\u00fctzenkirchen
  */
-public class MCROAIResults implements MCROAIConstants {
+public class MCROAIResults {
     private String token;
 
     private List<String> ids;

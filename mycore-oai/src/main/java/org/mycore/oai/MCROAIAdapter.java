@@ -34,7 +34,7 @@ import org.mycore.parsers.bool.MCRCondition;
 /**
  * @author Frank L\u00fctzenkirchen
  */
-public abstract class MCROAIAdapter implements MCROAIConstants {
+public abstract class MCROAIAdapter {
     protected final static Logger LOGGER = Logger.getLogger(MCRVerbHandler.class);
 
     protected String recordUriPattern;

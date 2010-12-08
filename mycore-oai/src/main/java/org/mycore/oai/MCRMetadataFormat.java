@@ -23,6 +23,8 @@
 
 package org.mycore.oai;
 
+import static org.mycore.oai.MCROAIConstants.NS_OAI;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -47,7 +49,7 @@ import org.mycore.common.MCRConfiguration;
  *
  * @author Frank L\u00fctzenkirchen
  */
-class MCRMetadataFormat implements MCROAIConstants {
+class MCRMetadataFormat {
     /** The metadata prefix */
     private String prefix;
 

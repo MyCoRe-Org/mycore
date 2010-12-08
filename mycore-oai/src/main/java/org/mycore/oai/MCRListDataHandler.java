@@ -23,6 +23,22 @@
 
 package org.mycore.oai;
 
+import static org.mycore.oai.MCROAIConstants.ARG_FROM;
+import static org.mycore.oai.MCROAIConstants.ARG_METADATA_PREFIX;
+import static org.mycore.oai.MCROAIConstants.ARG_RESUMPTION_TOKEN;
+import static org.mycore.oai.MCROAIConstants.ARG_SET;
+import static org.mycore.oai.MCROAIConstants.ARG_UNTIL;
+import static org.mycore.oai.MCROAIConstants.DATESTAMP_PATTERN;
+import static org.mycore.oai.MCROAIConstants.ERROR_BAD_ARGUMENT;
+import static org.mycore.oai.MCROAIConstants.ERROR_BAD_RESUMPTION_TOKEN;
+import static org.mycore.oai.MCROAIConstants.ERROR_CANNOT_DISSEMINATE_FORMAT;
+import static org.mycore.oai.MCROAIConstants.ERROR_NO_RECORDS_MATCH;
+import static org.mycore.oai.MCROAIConstants.ERROR_NO_SET_HIERARCHY;
+import static org.mycore.oai.MCROAIConstants.GRANULARITY;
+import static org.mycore.oai.MCROAIConstants.V_EXCLUSIVE;
+import static org.mycore.oai.MCROAIConstants.V_OPTIONAL;
+import static org.mycore.oai.MCROAIConstants.V_REQUIRED;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;

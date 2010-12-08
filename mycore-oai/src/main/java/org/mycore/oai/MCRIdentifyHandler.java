@@ -23,6 +23,13 @@
 
 package org.mycore.oai;
 
+import static org.mycore.oai.MCROAIConstants.NS_FRIENDS;
+import static org.mycore.oai.MCROAIConstants.NS_OAI;
+import static org.mycore.oai.MCROAIConstants.NS_OAI_ID;
+import static org.mycore.oai.MCROAIConstants.NS_XSI;
+import static org.mycore.oai.MCROAIConstants.SCHEMA_LOC_FRIENDS;
+import static org.mycore.oai.MCROAIConstants.SCHEMA_LOC_OAI_ID;
+
 import java.util.Iterator;
 import java.util.Properties;
 

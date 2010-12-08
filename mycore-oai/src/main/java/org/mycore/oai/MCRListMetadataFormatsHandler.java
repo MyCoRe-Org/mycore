@@ -23,6 +23,9 @@
 
 package org.mycore.oai;
 
+import static org.mycore.oai.MCROAIConstants.ARG_IDENTIFIER;
+import static org.mycore.oai.MCROAIConstants.V_OPTIONAL;
+
 import java.util.List;
 import java.util.Properties;
 

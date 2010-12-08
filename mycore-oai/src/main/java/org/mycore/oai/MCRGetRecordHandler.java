@@ -23,8 +23,12 @@
 
 package org.mycore.oai;
 
-import java.util.List;
+import static org.mycore.oai.MCROAIConstants.ARG_IDENTIFIER;
+import static org.mycore.oai.MCROAIConstants.ARG_METADATA_PREFIX;
+import static org.mycore.oai.MCROAIConstants.ERROR_CANNOT_DISSEMINATE_FORMAT;
+import static org.mycore.oai.MCROAIConstants.V_REQUIRED;
 
+import java.util.List;
 import java.util.Properties;
 
 /**

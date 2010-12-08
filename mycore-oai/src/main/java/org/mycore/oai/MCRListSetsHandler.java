@@ -22,6 +22,11 @@
  */
 
 package org.mycore.oai;
+import static org.mycore.oai.MCROAIConstants.ARG_RESUMPTION_TOKEN;
+import static org.mycore.oai.MCROAIConstants.ERROR_BAD_RESUMPTION_TOKEN;
+import static org.mycore.oai.MCROAIConstants.ERROR_NO_SET_HIERARCHY;
+import static org.mycore.oai.MCROAIConstants.NS_OAI;
+import static org.mycore.oai.MCROAIConstants.V_EXCLUSIVE;
 
 import java.util.ArrayList;
 import java.util.HashSet;

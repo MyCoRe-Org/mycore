@@ -23,6 +23,17 @@
 
 package org.mycore.oai;
 
+import static org.mycore.oai.MCROAIConstants.ARG_RESUMPTION_TOKEN;
+import static org.mycore.oai.MCROAIConstants.ARG_VERB;
+import static org.mycore.oai.MCROAIConstants.ERROR_BAD_ARGUMENT;
+import static org.mycore.oai.MCROAIConstants.ERROR_ID_DOES_NOT_EXIST;
+import static org.mycore.oai.MCROAIConstants.NS_OAI;
+import static org.mycore.oai.MCROAIConstants.NS_XSI;
+import static org.mycore.oai.MCROAIConstants.SCHEMA_LOC_OAI;
+import static org.mycore.oai.MCROAIConstants.V_ALWAYS;
+import static org.mycore.oai.MCROAIConstants.V_EXCLUSIVE;
+import static org.mycore.oai.MCROAIConstants.V_REQUIRED;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -50,7 +61,7 @@ import org.mycore.services.fieldquery.MCRQueryParser;
  * 
  * @author Frank L\u00fctzenkirchen
  */
-public abstract class MCRVerbHandler implements MCROAIConstants {
+public abstract class MCRVerbHandler {
     protected final static Logger LOGGER = Logger.getLogger(MCRVerbHandler.class);
 
     /** The data provider instance */
