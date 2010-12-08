@@ -50,4 +50,10 @@ public class MCROAIAdapterMyCoRe extends MCROAIAdapter {
         String id = classID + ":" + categID;
         return new MCRQueryCondition(MCRFieldDef.getDef("category"), "=", id);
     }
+
+    @Override
+    public String formatURI(String uri, String id, MCRMetadataFormat format) {
+        String objectType = MCRObjectID.getIDParts(id)[1];
+        return super.formatURI(uri, id, format).replace("{objectType}", objectType);
+    }
 }

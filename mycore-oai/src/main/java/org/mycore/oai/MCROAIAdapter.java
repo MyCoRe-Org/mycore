@@ -53,13 +53,17 @@ public abstract class MCROAIAdapter implements MCROAIConstants {
     }
 
     public Element getRecord(String id, MCRMetadataFormat format) {
-        String uri = recordUriPattern.replace("{id}", id).replace("{format}", format.getPrefix());
+        String uri = formatURI(recordUriPattern, id, format);
         return getURI(uri);
     }
 
     public Element getHeader(String id, MCRMetadataFormat format) {
-        String uri = headerUriPattern.replace("{id}", id).replace("{format}", format.getPrefix());
+        String uri = formatURI(headerUriPattern, id, format);
         return getURI(uri);
+    }
+
+    public String formatURI(String uri, String id, MCRMetadataFormat format) {
+        return uri.replace("{id}", id).replace("{format}", format.getPrefix());
     }
 
     public abstract MCRCondition buildSetCondition(String setSpec);
