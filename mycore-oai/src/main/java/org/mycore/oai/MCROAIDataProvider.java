@@ -124,7 +124,7 @@ public class MCROAIDataProvider extends MCRServlet {
                     compareDate = dateCreated;
                 }
             }
-            LOGGER.info("Checked " + idList.size() + " objects in " + ((System.currentTimeMillis() - start) / 1000) + " ms.");
+            LOGGER.info("Checked " + idList.size() + " objects in " + ((System.currentTimeMillis() - start)) + " ms.");
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             sdf.setTimeZone(TimeZone.getDefault());
             EARLIEST_Datestamp = sdf.format(compareDate);
