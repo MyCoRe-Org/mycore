@@ -457,11 +457,6 @@ public class MCRXMLFunctions {
      * @param objectId
      */
     public static boolean exists(String objectId) {
-        try {
-            MCRBase obj = MCRMetadataManager.retrieve(MCRObjectID.getInstance(objectId));
-            return obj == null ? false : true;
-        } catch (Exception ex) {
-            return false;
-        }
+        return MCRMetadataManager.exists(MCRObjectID.getInstance(objectId));
     }
 }
