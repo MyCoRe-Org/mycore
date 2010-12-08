@@ -48,6 +48,7 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRURN;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.common.MCRLinkTableManager;
+import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
@@ -450,5 +451,17 @@ public class MCRXMLFunctions {
             e.printStackTrace();
         }
         return n;
+    }
+
+    /**
+     * @param objectId
+     */
+    public static boolean exists(String objectId) {
+        try {
+            MCRBase obj = MCRMetadataManager.retrieve(MCRObjectID.getInstance(objectId));
+            return obj == null ? false : true;
+        } catch (Exception ex) {
+            return false;
+        }
     }
 }
