@@ -23,14 +23,23 @@
 
 package org.mycore.iview2.frontend;
 
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+
 import org.mycore.common.MCRConfiguration;
 import org.mycore.iview2.services.MCRIView2Tools;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @author Thomas Scheffler (yagee)
  *
  */
 public class MCRIView2XSLFunctions {
+
+    private static final String METS_NAMESPACE_URI = "http://www.loc.gov/METS/";
 
     public static boolean hasMETSFile(String derivateID) {
         return (MCRIView2Tools.getMCRFile(derivateID, "/mets.xml") != null);
@@ -52,5 +61,66 @@ public class MCRIView2XSLFunctions {
             imagePath = imagePath.substring(0, dotPos);
         baseURL.append(imagePath).append(".iview2/0/0/0.jpg");
         return baseURL.toString();
+    }
+
+    public static int getOrder(Node metsDiv) {
+        Document document = metsDiv.getOwnerDocument();
+        if (metsDiv.getLocalName().equals("smLink")) {
+            return getSmLinkOrder(document, metsDiv);
+        }
+        Node structLink = document.getElementsByTagNameNS(METS_NAMESPACE_URI, "structLink").item(0);
+        return getLowestOrder(document, metsDiv, structLink);
+    }
+
+    private static int getLowestOrder(Document document, Node metsDiv, Node structLink) {
+        int order = Integer.MAX_VALUE;
+        NodeList childDivs = metsDiv.getChildNodes();
+        for (int i = 0; i < childDivs.getLength(); i++) {
+            Node childDiv = childDivs.item(i);
+            if (childDiv.getNodeType() != Node.ELEMENT_NODE || !childDiv.getLocalName().equals("div")) {
+                continue;
+            }
+            order = Math.min(order, getLowestOrder(document, childDiv, structLink));
+        }
+        String logId = metsDiv.getAttributes().getNamedItem("ID").getNodeValue();
+        NodeList smLinks = structLink.getChildNodes();
+        for (int i = 0; i < smLinks.getLength(); i++) {
+            Node smLink = smLinks.item(i);
+            Node xlinkFrom = smLink.getAttributes().getNamedItemNS(XLINK_NAMESPACE.getURI(), "from");
+            if (xlinkFrom == null || !xlinkFrom.getNodeValue().equals(logId)) {
+                continue;
+            }
+            int smLinkOrder = getSmLinkOrder(document, smLink);
+            order = Math.min(order, smLinkOrder);
+        }
+        return order;
+    }
+
+    private static int getSmLinkOrder(Document document, Node smLink) {
+        Node xlinkTo = smLink.getAttributes().getNamedItemNS(XLINK_NAMESPACE.getURI(), "to");
+        Node physDiv = getElementById(document.getDocumentElement(), xlinkTo.getNodeValue());
+        String orderValue = physDiv.getAttributes().getNamedItem("ORDER").getNodeValue();
+        return Integer.parseInt(orderValue);
+    }
+
+    private static Node getElementById(Node base, String ID) {
+        NamedNodeMap attributes = base.getAttributes();
+        for (int i = 0; i < attributes.getLength(); i++) {
+            Attr attr = (Attr) attributes.item(i);
+            if (attr.getLocalName().toLowerCase().equals("id") && attr.getNodeValue().equals(ID)) {
+                return base;
+            }
+        }
+        NodeList childNodes = base.getChildNodes();
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            Node child = childNodes.item(i);
+            if (child.getNodeType() == Node.ELEMENT_NODE) {
+                Node test = getElementById(child, ID);
+                if (test != null) {
+                    return test;
+                }
+            }
+        }
+        return null;
     }
 }
