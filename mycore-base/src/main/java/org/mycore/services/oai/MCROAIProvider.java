@@ -60,13 +60,14 @@ import org.jdom.transform.JDOMSource;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRUtils;
+import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.common.xml.MCRXMLResource;
 import org.mycore.common.xml.MCRXSLTransformation;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
-import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaElement;
@@ -519,6 +520,9 @@ public class MCROAIProvider extends MCRServlet {
                         Element eHeader = new Element("header", ns);
                         eHeader.addContent(newElementWithContent("identifier", ns, identifier[0]));
                         eHeader.addContent(newElementWithContent("datestamp", ns, identifier[1]));
+                        if (!MCRMetadataManager.exists(MCRObjectID.getInstance(identifier[3]))) {
+                            eHeader.setAttribute("status", "deleted");
+                        }
                         eHeader = setSpec(eHeader, identifier[2], ns);
 
                         if (!listType.equals("records")) {
@@ -527,7 +531,12 @@ public class MCROAIProvider extends MCRServlet {
                         } else {
                             Element eRecord = new Element("record", ns);
                             eRecord.addContent(eHeader);
-                            MCRBase object = MCRMetadataManager.retrieve(MCRObjectID.getInstance(identifier[3]));
+                            MCRBase object = null;
+                            if (!MCRMetadataManager.exists(MCRObjectID.getInstance(identifier[3]))) {
+                                object = new MCRObject(MCRUtils.requestVersionedObject(MCRObjectID.getInstance(identifier[3]), -1));
+                            } else {
+                                object = MCRMetadataManager.retrieve(MCRObjectID.getInstance(identifier[3]));
+                            }
                             Element eMetadata = (Element) object.createXML().getRootElement().clone();
                             eRecord.addContent(eMetadata);
                             list.addContent(eRecord);
@@ -1093,10 +1102,12 @@ public class MCROAIProvider extends MCRServlet {
 
                         MCRBase object = null;
                         MCRObjectID id = MCRObjectID.getInstance(objectId);
-                        if (objectId.indexOf("derivate") != -1) {
-                            object = MCRMetadataManager.retrieveMCRDerivate(id);
-                        } else {
-                            object = MCRMetadataManager.retrieveMCRObject(id);
+                        if (MCRXMLFunctions.exists(id.toString())) {
+                            object = MCRMetadataManager.retrieve(id);
+                        }
+                        /* handle deleted objects */
+                        else {
+                            object = new MCRObject(MCRUtils.requestVersionedObject(id, -1));
                         }
 
                         String[] array = getHeader(object, objectId, repositoryID, instance);
@@ -1104,6 +1115,9 @@ public class MCROAIProvider extends MCRServlet {
                         eHeader.addContent(newElementWithContent("identifier", ns, array[0]));
                         eHeader.addContent(newElementWithContent("datestamp", ns, array[1]));
                         eHeader = setSpec(eHeader, array[2], ns);
+                        if (!MCRMetadataManager.exists(id)) {
+                            eHeader.setAttribute("status", "deleted");
+                        }
                         eListIdentifiers.addContent(eHeader);
                     }
                     resumptionList.add(objectId);
@@ -1208,6 +1222,14 @@ public class MCROAIProvider extends MCRServlet {
                 Element eHeader = new Element("header", ns);
                 eHeader.addContent(newElementWithContent("identifier", ns, array[0]));
                 eHeader.addContent(newElementWithContent("datestamp", ns, array[1]));
+                try {
+                    if (!MCRMetadataManager.exists(MCRObjectID.getInstance(id))) {
+                        eHeader.setAttribute("status", "deleted");
+                    }
+                } catch (Exception e) {
+                    LOGGER.error("Could not set status attribute of header element", e);
+                }
+
                 eHeader = setSpec(eHeader, array[2], ns);
 
                 Element eRecord = new Element("record", ns);
@@ -1403,12 +1425,13 @@ public class MCROAIProvider extends MCRServlet {
                     if (maxReturns == 0 || elementCounter <= maxReturns) {
 
                         MCRObjectID id = MCRObjectID.getInstance(objectId);
-
                         MCRBase object = null;
-                        if (objectId.indexOf("derivate") != -1) {
-                            object = MCRMetadataManager.retrieveMCRDerivate(id);
-                        } else {
-                            object = MCRMetadataManager.retrieveMCRObject(id);
+                        if (MCRXMLFunctions.exists(id.toString())) {
+                            object = MCRMetadataManager.retrieve(id);
+                        }
+                        /* handle deleted objects */
+                        else {
+                            object = new MCRObject(MCRUtils.requestVersionedObject(id, -1));
                         }
 
                         String[] array = getHeader(object, objectId, repositoryID, instance);
@@ -1416,6 +1439,10 @@ public class MCROAIProvider extends MCRServlet {
                         Element eHeader = new Element("header", ns);
                         eHeader.addContent(newElementWithContent("identifier", ns, array[0]));
                         eHeader.addContent(newElementWithContent("datestamp", ns, array[1]));
+                        if (!MCRMetadataManager.exists(id)) {
+                            eHeader.setAttribute("status", "deleted");
+                        }
+
                         eHeader = setSpec(eHeader, array[2], ns);
 
                         Element eRecord = new Element("record", ns);

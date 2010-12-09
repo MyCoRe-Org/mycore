@@ -954,6 +954,7 @@ public class MCRUtils {
      *         with the given revision
      */
     public static Document requestVersionedObject(MCRObjectID objId, long revision) {
+        LOGGER.info("Getting object " + objId + " in revision " + revision);
         try {
             MCRObjectID mcrid = objId;
             if (mcrid == null)

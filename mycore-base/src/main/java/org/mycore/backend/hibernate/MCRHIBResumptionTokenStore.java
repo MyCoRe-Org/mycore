@@ -1,25 +1,16 @@
 /**
- * 
- * $Revision$ $Date$
- *
- * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
- *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program, in a file called gpl.txt or license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
+ * $Revision$ $Date$ This file is part of *** M y C o R e *** See
+ * http://www.mycore.de/ for details. This program is free software; you can use
+ * it, redistribute it and / or modify it under the terms of the GNU General
+ * Public License (GPL) as published by the Free Software Foundation; either
+ * version 2 of the License or (at your option) any later version. This program
+ * is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details. You
+ * should have received a copy of the GNU General Public License along with this
+ * program, in a file called gpl.txt or license.txt. If not, write to the Free
+ * Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307
+ * USA
  **/
 
 package org.mycore.backend.hibernate;
@@ -34,6 +25,7 @@ import org.hibernate.criterion.Restrictions;
 import org.mycore.backend.hibernate.tables.MCRRESUMPTIONTOKEN;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -97,8 +89,8 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore {
         Session session = MCRHIBConnection.instance().getSession();
         ;
 
-        List<MCRRESUMPTIONTOKEN> delList = session.createCriteria(MCRRESUMPTIONTOKEN.class).add(
-                Restrictions.le("created", new Date(outdateTime))).list();
+        List<MCRRESUMPTIONTOKEN> delList = session.createCriteria(MCRRESUMPTIONTOKEN.class)
+                .add(Restrictions.le("created", new Date(outdateTime))).list();
         for (MCRRESUMPTIONTOKEN token : delList) {
             session.delete(token);
         }
@@ -112,8 +104,8 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore {
         Session session = MCRHIBConnection.instance().getSession();
         ;
 
-        MCRRESUMPTIONTOKEN resumptionToken = (MCRRESUMPTIONTOKEN) session.createCriteria(MCRRESUMPTIONTOKEN.class).add(
-                Restrictions.eq("resumptionTokenID", resumptionTokenID)).uniqueResult();
+        MCRRESUMPTIONTOKEN resumptionToken = (MCRRESUMPTIONTOKEN) session.createCriteria(MCRRESUMPTIONTOKEN.class)
+                .add(Restrictions.eq("resumptionTokenID", resumptionTokenID)).uniqueResult();
 
         String prefix = resumptionToken.getPrefix();
         String instance = resumptionToken.getInstance();
@@ -138,7 +130,12 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore {
             String specName = "";
             if (!prefix.equals("set")) {
                 String objectId = arHitBlob[i];
-                MCRObject object=MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(objectId));
+                MCRObject object = null;
+                if (!MCRMetadataManager.exists(MCRObjectID.getInstance(objectId))) {
+                    object = new MCRObject(MCRUtils.requestVersionedObject(MCRObjectID.getInstance(objectId), -1));
+                } else {
+                    object = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(objectId));
+                }
                 String[] header = MCROAIProvider.getHeader(object, objectId, repositoryID, instance);
                 oaiID = header[0];
                 datestamp = header[1];
@@ -170,7 +167,9 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore {
     /*
      * (non-Javadoc)
      * 
-     * @see org.mycore.services.oai.MCROAIResumptionTokenStore#getPrefix(java.lang.String)
+     * @see
+     * org.mycore.services.oai.MCROAIResumptionTokenStore#getPrefix(java.lang
+     * .String)
      */
     public String getPrefix(String token) {
         Session session = MCRHIBConnection.instance().getSession();
@@ -182,14 +181,15 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore {
     /**
      * The method create a new MCRResumptionToken in the datastore.
      * 
-     * @param id:
-     *            the id of an ResumptionToken
-     * @param prefix:
-     *            prefix of resumptionToken type, fg. "set"
-     * @param instance:
-     *            String of OAI-instance
-     * @param resultList:
-     *            List delivered of OAIQueryService for the new resumptionToken
+     * @param id
+     *            : the id of an ResumptionToken
+     * @param prefix
+     *            : prefix of resumptionToken type, fg. "set"
+     * @param instance
+     *            : String of OAI-instance
+     * @param resultList
+     *            : List delivered of OAIQueryService for the new
+     *            resumptionToken
      */
     public final void createResumptionToken(String id, String prefix, String instance, List<?> resultList) {
         String sepOAIHIT = config.getString(STR_OAI_SEPARATOR_OAIHIT, ";");
@@ -204,8 +204,8 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore {
                 String spec = arSpec[0];
                 String specName = arSpec[1] != null ? arSpec[1] : "";
                 String specDescription = arSpec[2] != null ? arSpec[2] : "";
-                sbHitBlob.append(spec).append(sepSpec).append(specName).append(sepSpec).append(specDescription).append(sepSpec).append(
-                        "dummyForSplit");
+                sbHitBlob.append(spec).append(sepSpec).append(specName).append(sepSpec).append(specDescription).append(sepSpec)
+                        .append("dummyForSplit");
                 sbHitBlob.append(sepOAIHIT);
             }
         }

@@ -1,40 +1,31 @@
 /**
- * $RCSfile$
- * $Revision$ $Date$
- *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
- *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
+ * $RCSfile$ $Revision$ $Date$ This file is part of ** M y C o R e ** Visit our
+ * homepage at http://www.mycore.de/ for details. This program is free software;
+ * you can use it, redistribute it and / or modify it under the terms of the GNU
+ * General Public License (GPL) as published by the Free Software Foundation;
+ * either version 2 of the License or (at your option) any later version. This
+ * program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with
+ * this program, normally in the file license.txt. If not, write to the Free
+ * Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307
+ * USA
  **/
 
 package org.mycore.services.oai;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.xpath.XPath;
-import org.mycore.access.MCRAccessManager;
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -56,11 +47,8 @@ import org.mycore.services.fieldquery.MCRResults;
 
 /**
  * @author Heiko Helmbrecht
- * 
- * @version $Revision$ $Date$
- * 
- *          This is the MyCoRe-Implementation of the <i>MCROAIQuery
- *          </i>-Interface.
+ * @version $Revision$ $Date$ This is the MyCoRe-Implementation of the
+ *          <i>MCROAIQuery </i>-Interface.
  */
 public class MCROAIQueryImpl implements MCROAIQuery {
 
@@ -107,8 +95,8 @@ public class MCROAIQueryImpl implements MCROAIQuery {
      * @param instance
      *            the Servletinstance
      * @return List a list that contains an array of three Strings: the category
-     *         id, the label and a description
-     *         or NULL, if the server does not support sets
+     *         id, the label and a description or NULL, if the server does not
+     *         support sets
      */
     public List<String[]> listSets(String instance) {
         String[] classifications = MCROAIProvider.getConfigBean(instance).getClassificationIDs();
@@ -131,7 +119,7 @@ public class MCROAIQueryImpl implements MCROAIQuery {
             return ar;
         }
         for (int i = 0; i < categories.size(); i++) {
-            MCRCategory category = categories.get(i); 
+            MCRCategory category = categories.get(i);
             Set<org.mycore.datamodel.classifications2.MCRLabel> labels = category.getLabels();
             for (MCRLabel label : labels) {
                 if ("x-dini".equals(label.getLang())) {
@@ -296,8 +284,8 @@ public class MCROAIQueryImpl implements MCROAIQuery {
         try {
             fileDateModified = MCRFieldDef.getDef("derivateModificationDate");
         } catch (MCRConfigurationException e) {
-            //search field "derivateModificationDate" was not defined
-            //fileDateModified will be null
+            // search field "derivateModificationDate" was not defined
+            // fileDateModified will be null
         }
 
         if (from != null && fileDateModified != null) {
@@ -331,6 +319,11 @@ public class MCROAIQueryImpl implements MCROAIQuery {
             resultArray.add(results.getHit(i).getID());
         }
 
+        // add the deleted items
+        String fromDate = from != null ? getTimeStamp(from[0]) : null;
+        String untilDate = until != null ? getUntilTimeStamp(until[0]) : null;
+        resultArray.addAll(getDeletedItems(fromDate, untilDate));
+
         numResults = resultArray.size();
 
         logger.debug("OAIQuery found:" + resultCount + " hits");
@@ -343,6 +336,35 @@ public class MCROAIQueryImpl implements MCROAIQuery {
         }
 
         return list;
+    }
+
+    /**
+     * @param from
+     * @param until
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public List<String> getDeletedItems(String from, String until) {
+        logger.info("Getting identifiers of deleted items");
+        List<String> deletedItems = new Vector<String>();
+        try {
+            MCRHIBConnection conn = MCRHIBConnection.instance();
+            String q = "SELECT DISTINCT identifier FROM mcrdeleteditems WHERE ";
+            if (from != null && until != null) {
+                q += "date_deleted >= '" + from + "' and date_deleted <= '" + until + "'";
+            } else if (from != null) {
+                q += "date_deleted >= '" + from + "'";
+            } else if (until != null) {
+                q += "date_deleted <= '" + until + "'";
+            } else {
+                q += "true";
+            }
+            deletedItems = conn.getSession().createSQLQuery(q).list();
+        } catch (Exception ex) {
+            logger.warn("Could not retrieve identifiers of deleted objects", ex);
+        }
+
+        return deletedItems;
     }
 
     /**
