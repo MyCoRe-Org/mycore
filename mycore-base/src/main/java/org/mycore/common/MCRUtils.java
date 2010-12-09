@@ -1,24 +1,24 @@
 /*
  * 
  * $Revision$ $Date$
- *
- * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
- *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program, in a file called gpl.txt or license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * 
+ * This file is part of *** M y C o R e *** See http://www.mycore.de/ for
+ * details.
+ * 
+ * This program is free software; you can use it, redistribute it and / or
+ * modify it under the terms of the GNU General Public License (GPL) as
+ * published by the Free Software Foundation; either version 2 of the License or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program, in a file called gpl.txt or license.txt. If not, write to the
+ * Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307 USA
  */
 
 package org.mycore.common;
@@ -43,6 +43,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -54,6 +55,13 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.ifs2.MCRMetadataStore;
+import org.mycore.datamodel.ifs2.MCRMetadataVersion;
+import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
+import org.mycore.datamodel.ifs2.MCRVersioningMetadataStore;
+import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.helpers.DefaultHandler;
@@ -65,8 +73,8 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author Jens Kupferschmidt
  * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
- * 
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date: 2010-09-07 10:54:00 +0200 (Tue, 07 Sep
+ *          2010) $
  */
 public class MCRUtils {
     // The file slash
@@ -398,10 +406,10 @@ public class MCRUtils {
                 if (bytesRead > 0) {
                     if (target != null) {
                         target.write(ba, 0 /* offset in ba */, bytesRead /*
-                                                                              * bytes
-                                                                              * to
-                                                                              * write
-                                                                              */);
+                                                                          * bytes
+                                                                          * to
+                                                                          * write
+                                                                          */);
                     }
                 } else {
                     break; // hit eof
@@ -456,10 +464,10 @@ public class MCRUtils {
                 if (charsRead > 0) {
                     if (target != null) {
                         target.write(ca, 0 /* offset in ba */, charsRead /*
-                                                                              * bytes
-                                                                              * to
-                                                                              * write
-                                                                              */);
+                                                                          * bytes
+                                                                          * to
+                                                                          * write
+                                                                          */);
                     }
                 } else {
                     break; // hit eof
@@ -542,8 +550,10 @@ public class MCRUtils {
     /**
      * The method cut an ArrayList for a maximum of items.
      * 
-     * @param arrayin The incoming ArrayList
-     * @param maxitem The maximum number of items
+     * @param arrayin
+     *            The incoming ArrayList
+     * @param maxitem
+     *            The maximum number of items
      * @return the cutted ArrayList
      */
     public static final <T> ArrayList<T> cutArrayList(ArrayList<? extends T> arrayin, int maxitems) {
@@ -565,13 +575,13 @@ public class MCRUtils {
     }
 
     /**
-     * Reads exactly <code>len</code> bytes from the input stream into the
-     * byte array. This method reads repeatedly from the underlying stream until
-     * all the bytes are read. InputStream.read is often documented to block
-     * like this, but in actuality it does not always do so, and returns early
-     * with just a few bytes. readBlockiyng blocks until all the bytes are read,
-     * the end of the stream is detected, or an exception is thrown. You will
-     * always get as many bytes as you asked for unless you get an eof or other
+     * Reads exactly <code>len</code> bytes from the input stream into the byte
+     * array. This method reads repeatedly from the underlying stream until all
+     * the bytes are read. InputStream.read is often documented to block like
+     * this, but in actuality it does not always do so, and returns early with
+     * just a few bytes. readBlockiyng blocks until all the bytes are read, the
+     * end of the stream is detected, or an exception is thrown. You will always
+     * get as many bytes as you asked for unless you get an eof or other
      * exception. Unlike readFully, you find out how many bytes you did get.
      * 
      * @param b
@@ -583,7 +593,6 @@ public class MCRUtils {
      * @return number of bytes actually read.
      * @exception IOException
      *                if an I/O error occurs.
-     * 
      */
     public static final int readBlocking(InputStream in, byte[] b, int off, int len) throws IOException {
         int totalBytesRead = 0;
@@ -602,14 +611,14 @@ public class MCRUtils {
     } // end readBlocking
 
     /**
-     * Reads exactly <code>len</code> bytes from the input stream into the
-     * byte array. This method reads repeatedly from the underlying stream until
-     * all the bytes are read. Reader.read is often documented to block like
-     * this, but in actuality it does not always do so, and returns early with
-     * just a few bytes. readBlockiyng blocks until all the bytes are read, the
-     * end of the stream is detected, or an exception is thrown. You will always
-     * get as many bytes as you asked for unless you get an eof or other
-     * exception. Unlike readFully, you find out how many bytes you did get.
+     * Reads exactly <code>len</code> bytes from the input stream into the byte
+     * array. This method reads repeatedly from the underlying stream until all
+     * the bytes are read. Reader.read is often documented to block like this,
+     * but in actuality it does not always do so, and returns early with just a
+     * few bytes. readBlockiyng blocks until all the bytes are read, the end of
+     * the stream is detected, or an exception is thrown. You will always get as
+     * many bytes as you asked for unless you get an eof or other exception.
+     * Unlike readFully, you find out how many bytes you did get.
      * 
      * @param c
      *            the buffer into which the data is read.
@@ -620,7 +629,6 @@ public class MCRUtils {
      * @return number of bytes actually read.
      * @exception IOException
      *                if an I/O error occurs.
-     * 
      */
     public static final int readBlocking(Reader in, char[] c, int off, int len) throws IOException {
         int totalCharsRead = 0;
@@ -847,11 +855,10 @@ public class MCRUtils {
 
     /**
      * This method deletes a directory and all its content.
-     *
+     * 
      * @param dir
      *            the File instance of the directory to delete
-     * @return
-     *            true if the directory was deleted successfully, otherwise false
+     * @return true if the directory was deleted successfully, otherwise false
      */
     public static boolean deleteDirectory(File dir) {
         if (dir.isDirectory()) {
@@ -915,10 +922,12 @@ public class MCRUtils {
         return detected.getProperty("docType");
     }
 
-    /** Transforms the given Document into a String 
+    /**
+     * Transforms the given Document into a String
      * 
-     * @return the xml document as {@link String} or null if an {@link Exception} occurs   
-     * */
+     * @return the xml document as {@link String} or null if an
+     *         {@link Exception} occurs
+     */
     public static String documentAsString(Document doc) {
         String value = null;
         try {
@@ -932,5 +941,47 @@ public class MCRUtils {
             return null;
         }
         return value;
+    }
+
+    /**
+     * @param objId
+     *            the id of the object to be retrieved
+     * @param revision
+     *            the revision to be returned, specify -1 if you want to
+     *            retrieve the latest revision (includes deleted objects also)
+     * @return a {@link Document} representing the {@link MCRObject} of the
+     *         given revision or <code>null</code> if there is no such object
+     *         with the given revision
+     */
+    public static Document requestVersionedObject(MCRObjectID objId, long revision) {
+        try {
+            MCRObjectID mcrid = objId;
+            if (mcrid == null)
+                return null;
+            MCRMetadataStore metadataStore = MCRXMLMetadataManager.instance().getStore(mcrid);
+            if (metadataStore instanceof MCRVersioningMetadataStore) {
+                MCRVersioningMetadataStore verStore = (MCRVersioningMetadataStore) metadataStore;
+                MCRVersionedMetadata versionedMetadata = verStore.retrieve(mcrid.getNumberAsInteger());
+                List<MCRMetadataVersion> versions = versionedMetadata.listVersions();
+                if (revision == -1 && versions.size() > 0) {
+                    // request latest available revision
+                    MCRMetadataVersion lastVersion = versions.get(versions.size() - 1);
+                    if (lastVersion.getType() == MCRMetadataVersion.DELETED) {
+                        lastVersion = versions.get(versions.size() - 2);
+                    }
+                    return lastVersion.retrieve().asXML();
+                }
+                for (MCRMetadataVersion version : versions) {
+                    // request specific revision
+                    if (version.getRevision() == revision) {
+                        return version.retrieve().asXML();
+                    }
+                }
+                return null;
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error occured while retrieving revision '" + revision + "' for object " + objId, e);
+        }
+        return null;
     }
 }
