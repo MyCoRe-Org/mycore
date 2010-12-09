@@ -280,10 +280,6 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
      * @return a boolean value
      */
     public final boolean isValid() {
-        if (meta_list.size() == 0) {
-            return false;
-        }
-
         for (MCRMetaElement e : this) {
             if (!e.isValid()) {
                 Logger.getLogger(MCRObjectMetadata.class).warn(e.getTag() + " is not valid.");

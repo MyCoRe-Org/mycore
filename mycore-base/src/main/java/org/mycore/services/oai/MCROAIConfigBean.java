@@ -21,13 +21,29 @@ public class MCROAIConfigBean {
 
     private String oaiURLPath;
 
-    //	 you can define for each instance of your application a special restriction
+    private String deletedRecordPolicy;
+
+    /**
+     * @return the deleted record policy as specified in
+     *         MCR.OAI.Deleted.Items.Policy. If this property is not set the
+     *         default value is <code>no</code>
+     */
+    public String getDeletedRecordPolicy() {
+        return deletedRecordPolicy;
+    }
+
+    public void setDeletedRecordPolicy(String deletedRecordPolicy) {
+        this.deletedRecordPolicy = deletedRecordPolicy;
+    }
+
+    // you can define for each instance of your application a special
+    // restriction
     private String queryRestriction;
 
-    //	 searchfields from searchfields.xml relevant for oai list set
+    // searchfields from searchfields.xml relevant for oai list set
     private List<String> searchFields = new ArrayList<String>();
 
-    //	 classificationID relevant for the oai list set
+    // classificationID relevant for the oai list set
     private String[] classificationIDs = new String[] {};
 
     public MCROAIConfigBean(String instance) {
@@ -42,8 +58,8 @@ public class MCROAIConfigBean {
             searchFields = Arrays.asList(searchFieldsAr);
             List<String> lstClassificationIDs = new ArrayList<String>();
             for (String element : searchFieldsAr) {
-                String[] classIDs = config.getString("MCR.OAI.Setscheme.Classids." + instance + "." + element).replaceAll(" ", "").split(
-                        ",");
+                String[] classIDs = config.getString("MCR.OAI.Setscheme.Classids." + instance + "." + element).replaceAll(" ", "")
+                        .split(",");
                 for (String classID : classIDs) {
                     lstClassificationIDs.add(classID);
                 }
@@ -60,6 +76,7 @@ public class MCROAIConfigBean {
         repositoryIdentifier = config.getString("MCR.OAI.Repository.Identifier." + instance, "oai.mycore.de");
         repositoryName = config.getString("MCR.OAI.Repository.Name." + instance, "MyCoRe Repository fuer Online Hochschulschriften");
         oaiURLPath = config.getString("MCR.OAI.Repository.URLPath." + instance, "servlets/MCROAIProvider");
+        deletedRecordPolicy = config.getString("MCR.OAI.Deleted.Items.Policy", "no");
     }
 
     public String[] getClassificationIDs() {

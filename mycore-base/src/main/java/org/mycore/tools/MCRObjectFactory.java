@@ -8,7 +8,8 @@ import java.util.Date;
 
 import org.jdom.Document;
 import org.jdom.Element;
-import org.mycore.common.MCRUtils;
+import org.mycore.common.MCRConstants;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
@@ -16,7 +17,12 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  */
 public class MCRObjectFactory {
 
-    /***/
+    /**
+     * Creates a {@link Document} suitable for
+     * {@link MCRObject#MCRObject(Document)}. The metadata element of this
+     * mycore object is empty. The create and modify date are set to
+     * "right now".
+     */
     public static Document getSampleObject(MCRObjectID id) {
         Document xml = new Document();
         Element root = createRootElement(id);
@@ -59,18 +65,19 @@ public class MCRObjectFactory {
 
     /***/
     private static Element createMetadataElement(MCRObjectID id) {
-        return id.toString().indexOf("_derivate_") != -1 ? new Element("derivate") : new Element("metadata");
+        Element inner = "derivate".equals(id.getTypeId()) ? new Element("derivate") : new Element("metadata");
+        return inner;
     }
 
     /**
      * @param id
      */
     private static Element createRootElement(MCRObjectID id) {
-        String rootTag = (id.toString().indexOf("_derivate_") != -1) ? "mycorederivate" : "mycoreobject";
+        String rootTag = "derivate".equals(id.getTypeId()) ? "mycorederivate" : "mycoreobject";
         Element root = new Element(rootTag);
         root.setAttribute("ID", id.toString());
         root.setAttribute("label", id.toString());
-        root.setAttribute("noNamespaceSchemaLocation", getXSD(id), MCRUtils.XSI);
+        root.setAttribute("noNamespaceSchemaLocation", getXSD(id), MCRConstants.XSI_NAMESPACE);
         root.setAttribute("version", "2.0");
         return root;
     }

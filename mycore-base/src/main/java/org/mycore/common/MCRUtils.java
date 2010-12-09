@@ -53,7 +53,6 @@ import javax.xml.parsers.SAXParserFactory;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.Namespace;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -63,7 +62,6 @@ import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
 import org.mycore.datamodel.ifs2.MCRVersioningMetadataStore;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.tools.MCRObjectFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.helpers.DefaultHandler;
@@ -87,9 +85,6 @@ public class MCRUtils {
     public final static char COMMAND_AND = 'A';
 
     public final static char COMMAND_XOR = 'X';
-
-    /** Constant for the xsi-namespace */
-    public final static Namespace XSI = Namespace.getNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
 
     // public constant data
     private static final Logger LOGGER = Logger.getLogger(MCRUtils.class);
@@ -986,9 +981,8 @@ public class MCRUtils {
                 }
             }
         } catch (Exception e) {
-            LOGGER.error("Error occured while retrieving revision '" + revision + "' for object " + objId, e);
+            LOGGER.warn("Error occured while retrieving revision '" + revision + "' for object " + objId + " (" + e.getMessage() + ")");
         }
-        LOGGER.info("Getting sample object with id " + objId);
-        return MCRObjectFactory.getSampleObject(objId);
+        return null;
     }
 }

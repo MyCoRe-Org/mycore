@@ -22,6 +22,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import org.jdom.Document;
 import org.mycore.backend.hibernate.tables.MCRRESUMPTIONTOKEN;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
@@ -31,6 +32,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.services.oai.MCROAIProvider;
 import org.mycore.services.oai.MCROAIResumptionTokenStore;
+import org.mycore.tools.MCRObjectFactory;
 
 /**
  * This class implements the MCRHIBResumptionTokenStore
@@ -132,7 +134,13 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore {
                 String objectId = arHitBlob[i];
                 MCRObject object = null;
                 if (!MCRMetadataManager.exists(MCRObjectID.getInstance(objectId))) {
-                    object = new MCRObject(MCRUtils.requestVersionedObject(MCRObjectID.getInstance(objectId), -1));
+                    Document xml = MCRUtils.requestVersionedObject(MCRObjectID.getInstance(objectId), -1);
+                    if (xml != null) {
+                        object = new MCRObject(xml);
+                    } else {
+                        object = new MCRObject(MCRObjectFactory.getSampleObject(MCRObjectID.getInstance(objectId)));
+                    }
+
                 } else {
                     object = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(objectId));
                 }

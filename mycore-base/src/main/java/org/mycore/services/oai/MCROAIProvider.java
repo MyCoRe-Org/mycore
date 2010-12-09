@@ -84,6 +84,7 @@ import org.mycore.services.fieldquery.MCRQueryManager;
 import org.mycore.services.fieldquery.MCRQueryParser;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSortBy;
+import org.mycore.tools.MCRObjectFactory;
 
 /**
  * This class implements an OAI Data Provider for MyCoRe and Miless
@@ -533,7 +534,13 @@ public class MCROAIProvider extends MCRServlet {
                             eRecord.addContent(eHeader);
                             MCRBase object = null;
                             if (!MCRMetadataManager.exists(MCRObjectID.getInstance(identifier[3]))) {
-                                object = new MCRObject(MCRUtils.requestVersionedObject(MCRObjectID.getInstance(identifier[3]), -1));
+                                Document xml = MCRUtils.requestVersionedObject(MCRObjectID.getInstance(identifier[3]), -1);
+                                if (xml != null) {
+                                    object = new MCRObject(xml);
+                                } else {
+                                    LOGGER.info("Getting sample object with id " + identifier[3]);
+                                    object = new MCRObject(MCRObjectFactory.getSampleObject(MCRObjectID.getInstance(identifier[3])));
+                                }
                             } else {
                                 object = MCRMetadataManager.retrieve(MCRObjectID.getInstance(identifier[3]));
                             }
@@ -661,7 +668,8 @@ public class MCROAIProvider extends MCRServlet {
         eIdentify.addContent(newElementWithContent("protocolVersion", ns, STR_OAI_VERSION));
         eIdentify.addContent(newElementWithContent("adminEmail", ns, oaiAdminEmail));
         eIdentify.addContent(newElementWithContent("earliestDatestamp", ns, STR_FIRST_DATE));
-        eIdentify.addContent(newElementWithContent("deletedRecord", ns, "no"));
+        eIdentify.addContent(newElementWithContent("deletedRecord", ns, configBean.getDeletedRecordPolicy()));
+
         eIdentify.addContent(newElementWithContent("granularity", ns, STR_REPOSITORY_GRANULARITY));
         // If we don't support compression, this SHOULD NOT be mentioned, so it
         // is outmarked
@@ -1107,7 +1115,13 @@ public class MCROAIProvider extends MCRServlet {
                         }
                         /* handle deleted objects */
                         else {
-                            object = new MCRObject(MCRUtils.requestVersionedObject(id, -1));
+                            Document xml = MCRUtils.requestVersionedObject(id, -1);
+                            if (xml != null) {
+                                object = new MCRObject(xml);
+                            } else {
+                                LOGGER.info("Getting sample object with id " + id);
+                                object = new MCRObject(MCRObjectFactory.getSampleObject(id));
+                            }
                         }
 
                         String[] array = getHeader(object, objectId, repositoryID, instance);
@@ -1431,7 +1445,13 @@ public class MCROAIProvider extends MCRServlet {
                         }
                         /* handle deleted objects */
                         else {
-                            object = new MCRObject(MCRUtils.requestVersionedObject(id, -1));
+                            Document xml = MCRUtils.requestVersionedObject(id, -1);
+                            if (xml != null) {
+                                object = new MCRObject(xml);
+                            } else {
+                                LOGGER.info("Getting sample object with id " + id);
+                                object = new MCRObject(MCRObjectFactory.getSampleObject(id));
+                            }
                         }
 
                         String[] array = getHeader(object, objectId, repositoryID, instance);
