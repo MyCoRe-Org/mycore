@@ -53,6 +53,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.Namespace;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -62,6 +63,7 @@ import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
 import org.mycore.datamodel.ifs2.MCRVersioningMetadataStore;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.tools.MCRObjectFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.helpers.DefaultHandler;
@@ -85,6 +87,9 @@ public class MCRUtils {
     public final static char COMMAND_AND = 'A';
 
     public final static char COMMAND_XOR = 'X';
+
+    /** Constant for the xsi-namespace */
+    public final static Namespace XSI = Namespace.getNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
 
     // public constant data
     private static final Logger LOGGER = Logger.getLogger(MCRUtils.class);
@@ -957,8 +962,9 @@ public class MCRUtils {
         LOGGER.info("Getting object " + objId + " in revision " + revision);
         try {
             MCRObjectID mcrid = objId;
-            if (mcrid == null)
+            if (mcrid == null) {
                 return null;
+            }
             MCRMetadataStore metadataStore = MCRXMLMetadataManager.instance().getStore(mcrid);
             if (metadataStore instanceof MCRVersioningMetadataStore) {
                 MCRVersioningMetadataStore verStore = (MCRVersioningMetadataStore) metadataStore;
@@ -978,11 +984,11 @@ public class MCRUtils {
                         return version.retrieve().asXML();
                     }
                 }
-                return null;
             }
         } catch (Exception e) {
             LOGGER.error("Error occured while retrieving revision '" + revision + "' for object " + objId, e);
         }
-        return null;
+        LOGGER.info("Getting sample object with id " + objId);
+        return MCRObjectFactory.getSampleObject(objId);
     }
 }
