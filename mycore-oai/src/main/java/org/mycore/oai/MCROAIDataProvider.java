@@ -120,26 +120,6 @@ public class MCROAIDataProvider extends MCRServlet {
 
     /** The earliest datestamp supported by this data provider instance. */
     private static String EARLIEST_DATESTAMP;
-    static {
-        try {
-            MCRCondition condition = new MCRQueryParser().parse("objectType like *");
-            List<MCRSortBy> sortByList = new Vector<MCRSortBy>();
-            MCRSortBy sortBy = new MCRSortBy(MCRFieldDef.getDef("created"), MCRSortBy.ASCENDING);
-            sortByList.add(sortBy);
-            MCRQuery q = new MCRQuery(condition, sortByList, 1);
-            MCRResults result = MCRQueryManager.search(q);
-            if (result.getNumHits() > 0) {
-                MCRObject obj = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(result.getHit(0).getID()));
-                Date dateCreated = obj.getService().getDate(MCRObjectService.DATE_TYPE_CREATEDATE);
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                sdf.setTimeZone(TimeZone.getDefault());
-                EARLIEST_DATESTAMP = sdf.format(dateCreated);
-            }
-        } catch (Exception ex) {
-            LOGGER.error("Error occured while examining create date of first created object", ex);
-            EARLIEST_DATESTAMP = "2000-01-01";
-        }
-    }
 
     private String recordSampleID;
 
@@ -163,7 +143,7 @@ public class MCROAIDataProvider extends MCRServlet {
 
         MCRConfiguration config = MCRConfiguration.instance();
         prefix = "MCR.OAIDataProvider." + getServletName() + ".";
-
+        EARLIEST_DATESTAMP = config.getString(prefix + "EarliestDatestamp");
         repositoryName = config.getString(prefix + "RepositoryName");
         repositoryIdentifier = config.getString(prefix + "RepositoryIdentifier");
         adminEmail = config.getString(prefix + "AdminEmail", config.getString("MCR.Mail.Address"));
