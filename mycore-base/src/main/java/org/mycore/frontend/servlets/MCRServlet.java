@@ -164,7 +164,7 @@ public class MCRServlet extends HttpServlet {
 
         MCRSession fromHttpSession = (MCRSession) theSession.getAttribute("mycore.session");
 
-        if (fromHttpSession != null) {
+        if (fromHttpSession != null && fromHttpSession.getID()!=null) {
             // Take session from HttpSession with servlets
             session = fromHttpSession;
         } else {
