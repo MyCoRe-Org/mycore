@@ -72,7 +72,7 @@ Date:		September 2008
 .fg-menu a:link,
 .fg-menu a:visited,
 .fg-menu a:hover,
-.fg-menu a:active { float:left; width:92%; padding:.3em 3%; text-decoration:none; outline: 0 !important; }
+.fg-menu a:active { float:left; width:95%; padding:.3em; white-space:nowrap; text-decoration:none; outline: 0 !important; }
 
 .fg-menu a { border: 1px dashed transparent; }
 

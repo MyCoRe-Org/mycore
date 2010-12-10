@@ -150,7 +150,6 @@ iview.chapter.View = function() {
 	 */
 	function visible(bool) {
 		//if nothing is given simply switch between the states
-		console.log("hier")
 		if (typeof bool === "undefined")
 			bool = !this._visible;
 		if (bool === true) {

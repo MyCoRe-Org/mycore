@@ -41,7 +41,7 @@ StandardToolbarModelProvider.prototype = {
 		
 		// overviewHandles
 		curButtonset = this.model.addElement(new ToolbarButtonsetModel("overviewHandles"));
-		curButtonset.addButton(new ToolbarButtonModel("openOverview", {'type': 'buttonDefault'}, {'label': this.titles.openOverview, 'text': false, 'icons': {primary : 'iview2-icon iview2-icon-overview'}}, this.titles.openOverview, false));
+		curButtonset.addButton(new ToolbarButtonModel("openOverview", {'type': 'buttonCheck', 'state' : false}, {'label': this.titles.openOverview, 'text': false, 'icons': {primary : 'iview2-icon iview2-icon-overview'}}, this.titles.openOverview, false));
 		curButtonset.addButton(new ToolbarButtonModel("openChapter", {'type': 'buttonCheck', 'state': false}, {'label': this.titles.openChapter, 'text': false, 'icons': {primary : 'iview2-icon iview2-icon-chapter'}}, this.titles.openChapter, false));
 		
 		// navigateHandles

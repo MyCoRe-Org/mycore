@@ -220,7 +220,7 @@ function processImageProperties(imageProperties, viewID){
  * @param	{string} viewID ID of the derivate
  */
 function openOverview(viewID) {
-	Iview[viewID].overview.showView();
+	Iview[viewID].overview.toggleView();
 	openChapter(false, Iview[viewID]);
 }
 

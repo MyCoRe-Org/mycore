@@ -88,7 +88,17 @@ ToolbarController.prototype.addView = function(view) {
     					var oldUi = view.getButtonUi({'button' : args.view}).icons;
     					view.setButtonUi({'button' : args.view, 'icons' : {'primary' : 'loading'}});
     					setTimeout(function() {
-    						myself.getViewer().modules.importOverview(function() {view.setButtonUi({'button' : args.view, 'icons' : oldUi});});
+    						myself.getViewer().modules.importOverview(function() {
+    							view.setButtonUi({'button' : args.view, 'icons' : oldUi});
+    							
+    							var mainArgs = args;
+            					myself.getViewer().overview.attach(function(sender, args) {
+            						// type 1: click on overview div
+            						if (args.type == 1) {
+            		    				myself.getViewer().getToolbarMgr().getModel("mainTb").getElement(mainArgs.parentName).getButton(mainArgs.elementName).setSubtypeState(false);
+            						}
+            					});
+    						});
     					}, 10);
     				} else {
     					myself.getViewer().modules.openOverview();
@@ -137,7 +147,7 @@ ToolbarController.prototype.addView = function(view) {
 			      	args.view.menu({
 			      		// content list to navigate
 					    content: myself.getViewer().viewerContainer.find('#pages').html(),
-					    width: 50,
+					    /*width: 100,*/
 					    maxHeight: 280,
 					    positionOpts: {
 							posX: 'left', 
@@ -256,6 +266,12 @@ ToolbarController.prototype.catchModels = function() {
 		    				if (args.state == true) {
 		    					jQuery(curView.toolbar).find("."+args.elementName+" .openChapter")[0].checked = true;
 		    					jQuery(curView.toolbar).find("."+args.elementName+" .openChapterLabel").addClass("ui-state-active");
+				    		}
+		    				// the other case won't be used
+		    			} else if (args.buttonName == "openOverview") {
+		    				if (args.state == false) {
+		    					jQuery(curView.toolbar).find("."+args.elementName+" .openOverview")[0].checked = false;
+		    					jQuery(curView.toolbar).find("."+args.elementName+" .openOverviewLabel").removeClass("ui-state-active");
 				    		}
 		    				// the other case won't be used
 		    			}

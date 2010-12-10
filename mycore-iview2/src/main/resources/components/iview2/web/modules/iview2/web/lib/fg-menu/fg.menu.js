@@ -201,8 +201,9 @@ function Menu(caller, options){
 		});
 	};
 	
-	this.create = function(){	
-		container.css({ width: options.width }).appendTo('body').find('ul:first').not('.fg-menu-breadcrumb').addClass('fg-menu');
+	this.create = function(){
+		/* mcrkoch: must not use css width declaration in case of dynamic content based width */
+		container/*.css({ width: options.width })*/.appendTo('body').find('ul:first').not('.fg-menu-breadcrumb').addClass('fg-menu');
 		container.find('ul, li a').addClass('ui-corner-all');
 		
 		// aria roles & attributes
@@ -483,7 +484,8 @@ Menu.prototype.setPosition = function(widget, caller, options) {
 	var xVal, yVal;
 	
 	var helper = $('<div class="positionHelper"></div>');
-	helper.css({ position: 'absolute', left: dims.refX, top: dims.refY, width: dims.refW, height: dims.refH });
+	/* mcrkoch: must not use css width declaration in case of dynamic content based width */
+	helper.css({ position: 'absolute', left: dims.refX, top: dims.refY/*, width: dims.refW*/, height: dims.refH });
 	el.wrap(helper);
 	
 	// get X pos

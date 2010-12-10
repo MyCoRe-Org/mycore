@@ -257,28 +257,64 @@ ToolbarView.prototype = {
     _checkButtonStyle : function (args) {
     	var buttonset = args.buttonset;
     	var buttonIndex = args.buttonIndex;
+    	
+    	
+    	// needs to differ between checkButtons (Label + Input = 2 Elements) and simple Buttons (Button = 1 Element)
+    	var buttonCount = 0;
+    	for (var i = 0; i < buttonset.childNodes.length; i++) {
+			if (buttonset.childNodes[i].nodeName == "LABEL" ||
+				buttonset.childNodes[i].nodeName == "BUTTON") {
+				buttonCount++;
+			}
+    	}
+    	
+    	var isFirstButton = ((buttonIndex == 0 && buttonset.childNodes[buttonIndex].nodeName == "BUTTON") ||
+    			(buttonIndex == 1 && buttonset.childNodes[buttonIndex].nodeName == "LABEL"));
+
+    	var isLastButton = (buttonIndex == buttonset.childNodes.length - 1);
+    	
+    	var ancestorIndex;
+    	// either its a simple button
+    	if (buttonset.childNodes[buttonIndex].nodeName == "BUTTON") {
+    		ancestorIndex = buttonIndex - 1;
+    	// or its a Label Tag of a check Button
+    	} else {
+    		ancestorIndex = buttonIndex - 2;
+    	}
+    	
+    	var successorIndex;
+    	if (buttonset.childNodes[buttonIndex + 1]) {
+			if (buttonset.childNodes[buttonIndex + 1].nodeName == "BUTTON") {
+				successorIndex = buttonIndex + 1;
+	    	// or its a Input Tag of a check Button
+	    	} else {
+	    		successorIndex = buttonIndex + 2;
+	    	}
+    	}
+    	
+    	
     	if (args.reason == "add") {
-    		if (buttonset.childNodes.length == 2) {
-    			if (buttonIndex == 0) {
-    				$(buttonset.childNodes[buttonIndex + 1]).removeClass('ui-corner-all');
-    				$(buttonset.childNodes[buttonIndex + 1]).addClass('ui-corner-right');
+    		if (buttonCount == 2) {
+    			if (isFirstButton) {
+    				$(buttonset.childNodes[successorIndex]).removeClass('ui-corner-all');
+    				$(buttonset.childNodes[successorIndex]).addClass('ui-corner-right');
     				$(buttonset.childNodes[buttonIndex]).removeClass('ui-corner-all');
     				$(buttonset.childNodes[buttonIndex]).addClass('ui-corner-left');
     			} else {
-    				$(buttonset.childNodes[buttonIndex - 1]).removeClass('ui-corner-all');
-    				$(buttonset.childNodes[buttonIndex - 1]).addClass('ui-corner-left');
+    				$(buttonset.childNodes[ancestorIndex]).removeClass('ui-corner-all');
+    				$(buttonset.childNodes[ancestorIndex]).addClass('ui-corner-left');
     				$(buttonset.childNodes[buttonIndex]).removeClass('ui-corner-all');
     				$(buttonset.childNodes[buttonIndex]).addClass('ui-corner-right');
     			}	
-    		} else if (buttonset.childNodes.length > 2) {
-    			if (buttonIndex == 0) {
-    				$(buttonset.childNodes[buttonIndex + 1]).removeClass('ui-corner-left');
-    				$(buttonset.childNodes[buttonIndex + 1]).addClass('ui-corner-none');
+    		} else if (buttonCount > 2) {
+    			if (isFirstButton) {
+    				$(buttonset.childNodes[successorIndex]).removeClass('ui-corner-left');
+    				$(buttonset.childNodes[successorIndex]).addClass('ui-corner-none');
     				$(buttonset.childNodes[buttonIndex]).removeClass('ui-corner-all');
     				$(buttonset.childNodes[buttonIndex]).addClass('ui-corner-left');
-    			} else if (buttonIndex == buttonset.childNodes.length - 1) {
-    				$(buttonset.childNodes[buttonIndex - 1]).removeClass('ui-corner-right');
-    				$(buttonset.childNodes[buttonIndex - 1]).addClass('ui-corner-none');
+    			} else if (isLastButton) {
+    				$(buttonset.childNodes[ancestorIndex]).removeClass('ui-corner-right');
+    				$(buttonset.childNodes[ancestorIndex]).addClass('ui-corner-none');
     				$(buttonset.childNodes[buttonIndex]).removeClass('ui-corner-all');
     				$(buttonset.childNodes[buttonIndex]).addClass('ui-corner-right');
     			} else {
@@ -288,20 +324,20 @@ ToolbarView.prototype = {
     		}
 		} else if (args.reason == "del") {
 			if ($(buttonset.childNodes[buttonIndex]).hasClass('ui-corner-left')) {
-				if (buttonset.childNodes.length == 2) {
-					$(buttonset.childNodes[buttonIndex + 1]).removeClass('ui-corner-right');
-			    	$(buttonset.childNodes[buttonIndex + 1]).addClass('ui-corner-all');
+				if (buttonCount == 2) {
+					$(buttonset.childNodes[successorIndex]).removeClass('ui-corner-right');
+			    	$(buttonset.childNodes[successorIndex]).addClass('ui-corner-all');
 			    } else {
-			    	$(buttonset.childNodes[buttonIndex + 1]).removeClass('ui-corner-none');
-			    	$(buttonset.childNodes[buttonIndex + 1]).addClass('ui-corner-left');
+			    	$(buttonset.childNodes[successorIndex]).removeClass('ui-corner-none');
+			    	$(buttonset.childNodes[successorIndex]).addClass('ui-corner-left');
 			    }
 			} else if ($(buttonset.childNodes[buttonIndex]).hasClass('ui-corner-right')) {
-				if (buttonset.childNodes.length == 2) {
-					$(buttonset.childNodes[buttonIndex - 1]).removeClass('ui-corner-left');
-			    	$(buttonset.childNodes[buttonIndex - 1]).addClass('ui-corner-all');
+				if (buttonCount == 2) {
+					$(buttonset.childNodes[ancestorIndex]).removeClass('ui-corner-left');
+			    	$(buttonset.childNodes[ancestorIndex]).addClass('ui-corner-all');
 			    } else {
-					$(buttonset.childNodes[buttonIndex - 1]).removeClass('ui-corner-none');
-		    		$(buttonset.childNodes[buttonIndex - 1]).addClass('ui-corner-right');
+					$(buttonset.childNodes[ancestorIndex]).removeClass('ui-corner-none');
+		    		$(buttonset.childNodes[ancestorIndex]).addClass('ui-corner-right');
 			    }
 			}
 		}
