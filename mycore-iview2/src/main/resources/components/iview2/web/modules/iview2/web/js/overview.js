@@ -623,7 +623,7 @@ iview.overview.Controller = function(modelProvider, view, tileUrlProvider) {
 	 * @description	attach Eventlistener to used overview model
 	 */
 	function attach(listener) {
-		this._model.attach(listener);
+		this._model.onevent.attach(listener);
 	}
 	
 	/**
@@ -634,7 +634,7 @@ iview.overview.Controller = function(modelProvider, view, tileUrlProvider) {
 	 * @description	detach previously attached Eventlistener from overview model
 	 */
 	function detach(listener) {
-		this._model.detach(listener);
+		this._model.onevent.detach(listener);
 	}
 	
 	iview.overview.Controller.prototype.createView = createView;
