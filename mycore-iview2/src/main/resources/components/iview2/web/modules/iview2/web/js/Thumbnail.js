@@ -951,16 +951,21 @@ function startFileLoaded(viewID){
 	// hauptsächlich wegen IE notwendig
 	getElementsByClassName("surface","viewer"+viewID,"div")[0].style.backgroundImage = "url("+Iview[viewID].webappBaseUri+"modules/iview2/web/gfx/blank.gif"+")";
 	// PermaLink Handling
-	
-	if (window.location.search.get("tosize") == "width") {
-		pictureWidth(viewID);
-	} else if (window.location.search.get("tosize") == "screen") {
-		pictureScreen(viewID);
-	} else if (isNaN(parseInt(window.location.search.get("zoom")))){
-		pictureScreen(viewID);
-	}
+
+	// choice of zoomLevel or special zoomMode only makes sense in maximized viewer
 	if (window.location.search.get("maximized") == "true") {
+		if (window.location.search.get("tosize") == "width") {
+			if (!Iview[viewID].zoomWidth) pictureWidth(viewID);
+		} else if (window.location.search.get("tosize") == "screen") {
+			if (!Iview[viewID].zoomScreen) pictureScreen(viewID);
+		} else if (isNaN(parseInt(window.location.search.get("zoom")))){
+			if (!Iview[viewID].zoomScreen) pictureScreen(viewID);
+		}
+		
 		maximizeHandler(viewID);
+	} else {
+		// in minimized viewer always pictureScreen
+		if (!Iview[viewID].zoomScreen) pictureScreen(viewID);
 	}
 	
 	var newMetsURI = Iview[viewID].webappBaseUri + "servlets/MCRMETSServlet/" + viewID;

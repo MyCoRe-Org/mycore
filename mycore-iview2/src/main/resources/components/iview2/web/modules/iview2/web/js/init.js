@@ -454,7 +454,8 @@ function maximizeHandler(viewID) {
 		};
 		PanoJS.doubleClickHandler = function(e) {
 		};
-		if (Iview[viewID].zoomScreen == false) {
+
+		if (!Iview[viewID].zoomScreen) {
 			pictureScreen(viewID);
 		}
 	} else {
