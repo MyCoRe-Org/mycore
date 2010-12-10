@@ -121,6 +121,12 @@ iview.overview.View = function() {
 	 */
 	function resize() {
 		createContainer(this);
+		//calculates the new correct height so the toolbar is visible into the overview-View
+		if (window.innerWidth) {
+			this.my.self.css("height", window.innerHeight - 44 + "px"); //44 is the Height of the Toolbar
+		} else {
+			this.my.self.css("height", document.documentElement.clientHeight - 44 + "px"); //44 is the Height of the Toolbar
+		}
 		posOverviewContainer(this);
 		if (this._visible) {
 			loadImages(this);
