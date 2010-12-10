@@ -615,10 +615,34 @@ iview.overview.Controller = function(modelProvider, view, tileUrlProvider) {
 		return this._view._visible;
 	}
 	
+	/**
+	 * @public
+	 * @function
+	 * @name		attach
+	 * @memberOf	iview.overview.Controller
+	 * @description	attach Eventlistener to used overview model
+	 */
+	function attach(listener) {
+		this._model.attach(listener);
+	}
+	
+	/**
+	 * @public
+	 * @function
+	 * @name		detach
+	 * @memberOf	iview.overview.Controller
+	 * @description	detach previously attached Eventlistener from overview model
+	 */
+	function detach(listener) {
+		this._model.detach(listener);
+	}
+	
 	iview.overview.Controller.prototype.createView = createView;
 	iview.overview.Controller.prototype.showView = showView;
 	iview.overview.Controller.prototype.hideView = hideView;
 	iview.overview.Controller.prototype.toggleView = toggleView;
 	iview.overview.Controller.prototype.setSelected = setSelected;
 	iview.overview.Controller.prototype.getActive = getActive;
+	iview.overview.Controller.prototype.attach = attach;
+	iview.overview.Controller.prototype.detach = detach;
 })();
