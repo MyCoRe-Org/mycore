@@ -66,6 +66,11 @@ iview.chapter.View = function() {
 					if (that._selected != node) {
 						var old = that._selected;
 						that._selected = node;
+						//in case a branch was clicked with no files itself redirect to the first subchapter with content in it
+						if (jQuery(that._selected).attr("order") == Number.MAX_VALUE) {
+							that._selected = jQuery(that._selected).find("li[order!=" + Number.MAX_VALUE + "]").first();
+							that.selectNode(that._selected.attr("logid"));
+						}
 						that.onevent.notify({"type":'selected', 
 							"old":jQuery(old).attr("order"), 
 							"new":jQuery(that._selected).attr("order")});
@@ -145,14 +150,17 @@ iview.chapter.View = function() {
 	 */
 	function visible(bool) {
 		//if nothing is given simply switch between the states
+		console.log("hier")
 		if (typeof bool === "undefined")
 			bool = !this._visible;
 		if (bool === true) {
 			this._visible = true;
-			this._parent.slideDown();
+			var that = this
 			//if the node isn't within the current Viewport it's not displayed as the previous selectBranch 
 			//wasn't able to position the entry within the viewport. because the viewport didn't existed at that time
-			this.selectNode(jQuery(this._selected).attr("logid"));
+			this._parent.slideDown(function() {
+				that.selectNode(jQuery(that._selected).attr("logid"));
+			});
 		} else {
 			this._visible = false;
 			this._parent.slideUp();
