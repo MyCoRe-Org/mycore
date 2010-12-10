@@ -71,6 +71,7 @@ public class MCROAIResults {
         maxAge = MCRConfiguration.instance().getInt(prefix + "MaxAge", 30) * 60 * 1000;
 
         TimerTask tt = new TimerTask() {
+            @SuppressWarnings("rawtypes")
             public void run() {
                 for (Iterator it = tokenMap.keySet().iterator(); it.hasNext();) {
                     String token = (String) (it.next());
@@ -90,13 +91,13 @@ public class MCROAIResults {
         this.token = results.getID();
 
         ids = new ArrayList<String>(results.getNumHits());
-        String prefix = "oai:" + provider.getRepositoryIdentifier() + ":";
+        String prefix = "oai:" + provider.getAdapter().getRepositoryIdentifier() + ":";
 
         for (Iterator<MCRHit> hits = results.iterator(); hits.hasNext();) {
             MCRHit hit = hits.next();
             String identifier = prefix + hit.getID();
 
-            List<MCRMetadataFormat> formats = provider.getAdapter().listMetadataFormats(identifier, provider.getMetadataFormats());
+            List<MCRMetadataFormat> formats = provider.getAdapter().listMetadataFormats(identifier, provider.getAdapter().getMetadataFormats());
             if (formats.contains(format))
                 ids.add(hit.getID());
         }

@@ -49,13 +49,13 @@ class MCRIdentifyHandler extends MCRVerbHandler {
     }
 
     void handleRequest() {
-        output.addContent(new Element("repositoryName", NS_OAI).setText(provider.getRepositoryName()));
+        output.addContent(new Element("repositoryName", NS_OAI).setText(provider.getAdapter().getRepositoryName()));
         output.addContent(new Element("baseURL", NS_OAI).setText(provider.getOAIBaseURL()));
         output.addContent(new Element("protocolVersion", NS_OAI).setText("2.0"));
-        output.addContent(new Element("earliestDatestamp", NS_OAI).setText(provider.getEarliestDatestamp()));
-        output.addContent(new Element("deletedRecord", NS_OAI).setText(provider.getDeletedRecord()));
+        output.addContent(new Element("earliestDatestamp", NS_OAI).setText(provider.getAdapter().getEarliestDatestamp()));
+        output.addContent(new Element("deletedRecord", NS_OAI).setText(provider.getAdapter().getDeletedRecord()));
         output.addContent(new Element("granularity", NS_OAI).setText(MCROAIConstants.GRANULARITY));
-        output.addContent(new Element("adminEmail", NS_OAI).setText(provider.getAdminEmail()));
+        output.addContent(new Element("adminEmail", NS_OAI).setText(provider.getAdapter().getAdminEmail()));
 
         // Add OAI Identifier description
         Element description = new Element("description", NS_OAI);
@@ -67,11 +67,11 @@ class MCRIdentifyHandler extends MCRVerbHandler {
         description.addContent(oaiIdentifier);
 
         oaiIdentifier.addContent(new Element("scheme", NS_OAI_ID).setText("oai"));
-        oaiIdentifier.addContent(new Element("repositoryIdentifier", NS_OAI_ID).setText(provider.getRepositoryIdentifier()));
+        oaiIdentifier.addContent(new Element("repositoryIdentifier", NS_OAI_ID).setText(provider.getAdapter().getRepositoryIdentifier()));
         oaiIdentifier.addContent(new Element("delimiter", NS_OAI_ID).setText(":"));
 
         Element sampleIdentifier = new Element("sampleIdentifier", NS_OAI_ID);
-        sampleIdentifier.setText("oai:" + provider.getRepositoryIdentifier() + ":" + provider.getRecordSampleID());
+        sampleIdentifier.setText("oai:" + provider.getAdapter().getRepositoryIdentifier() + ":" + provider.getAdapter().getRecordSampleID());
         oaiIdentifier.addContent(sampleIdentifier);
 
         addFriends();
@@ -80,6 +80,7 @@ class MCRIdentifyHandler extends MCRVerbHandler {
     /**
      * Adds a list of other OAI data providers that are friends
      */
+    @SuppressWarnings("rawtypes")
     private void addFriends() {
         MCRConfiguration config = MCRConfiguration.instance();
         Properties friends = config.getProperties(provider.getPrefix() + "Friends.");

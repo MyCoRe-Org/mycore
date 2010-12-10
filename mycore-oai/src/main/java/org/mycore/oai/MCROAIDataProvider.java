@@ -22,14 +22,8 @@
 
 package org.mycore.oai;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 import java.util.StringTokenizer;
-import java.util.TimeZone;
-import java.util.Vector;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -39,19 +33,8 @@ import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
-import org.mycore.parsers.bool.MCRCondition;
-import org.mycore.services.fieldquery.MCRFieldDef;
-import org.mycore.services.fieldquery.MCRQuery;
-import org.mycore.services.fieldquery.MCRQueryManager;
-import org.mycore.services.fieldquery.MCRQueryParser;
-import org.mycore.services.fieldquery.MCRResults;
-import org.mycore.services.fieldquery.MCRSortBy;
 
 /**
  * Implements an OAI-PMH 2.0 Data Provider as a servlet.
@@ -59,18 +42,17 @@ import org.mycore.services.fieldquery.MCRSortBy;
  * @author Frank L\u00fctzenkirchen
  */
 public class MCROAIDataProvider extends MCRServlet {
+    private static final long serialVersionUID = 1L;
+
     protected final static Logger LOGGER = Logger.getLogger(MCROAIDataProvider.class);
 
-    protected void logRequest(HttpServletRequest req) {
-        StringBuffer log = new StringBuffer(this.getServletName());
-        for (Iterator it = req.getParameterMap().keySet().iterator(); it.hasNext();) {
-            String name = (String) it.next();
-            for (String value : req.getParameterValues(name))
-                log.append(" ").append(name).append("=").append(value);
-        }
-        LOGGER.info(log.toString());
-    }
+    private MCROAIAdapter adapter;
 
+    private String myBaseURL;
+
+    private String prefix;
+
+    @SuppressWarnings("unchecked")
     protected void doGetPost(MCRServletJob job) throws Exception {
         HttpServletRequest request = job.getRequest();
         if (myBaseURL == null)
@@ -110,66 +92,37 @@ public class MCROAIDataProvider extends MCRServlet {
         xout.output(response, job.getResponse().getOutputStream());
     }
 
-    private MCROAIAdapter adapter;
-
-    private String repositoryName;
-
-    private String repositoryIdentifier;
-
-    private String adminEmail;
-
-    /** The earliest datestamp supported by this data provider instance. */
-    private static String EARLIEST_DATESTAMP;
-
-    private String recordSampleID;
-
-    private String deletedRecord;
-
-    private String myBaseURL;
-
     /**
-     * List of metadata formats supported by this data provider instance.
+     * @param req
      */
-    private List<MCRMetadataFormat> metadataFormats = new ArrayList<MCRMetadataFormat>();
-
-    private String prefix;
-
-    String getPrefix() {
-        return prefix;
+    @SuppressWarnings("rawtypes")
+    protected void logRequest(HttpServletRequest req) {
+        StringBuffer log = new StringBuffer(this.getServletName());
+        for (Iterator it = req.getParameterMap().keySet().iterator(); it.hasNext();) {
+            String name = (String) it.next();
+            for (String value : req.getParameterValues(name))
+                log.append(" ").append(name).append("=").append(value);
+        }
+        LOGGER.info(log.toString());
     }
 
     public void init() throws ServletException {
         super.init();
-
         MCRConfiguration config = MCRConfiguration.instance();
         prefix = "MCR.OAIDataProvider." + getServletName() + ".";
-        EARLIEST_DATESTAMP = config.getString(prefix + "EarliestDatestamp");
-        repositoryName = config.getString(prefix + "RepositoryName");
-        repositoryIdentifier = config.getString(prefix + "RepositoryIdentifier");
-        adminEmail = config.getString(prefix + "AdminEmail", config.getString("MCR.Mail.Address"));
-
-        recordSampleID = config.getString(prefix + "RecordSampleID");
-        deletedRecord = config.getString(prefix + "DeletedRecord", "transient");
-
         adapter = (MCROAIAdapter) (config.getInstanceOf(prefix + "Adapter", MCROAIAdapterMyCoRe.class.getName()));
         adapter.init(prefix + "Adapter.");
 
         String formats = config.getString(prefix + "MetadataFormats");
         StringTokenizer st = new StringTokenizer(formats, ", ");
-        while (st.hasMoreTokens())
-            metadataFormats.add(MCRMetadataFormat.getFormat(st.nextToken()));
+        while (st.hasMoreTokens()) {
+            getAdapter().getMetadataFormats().add(MCRMetadataFormat.getFormat(st.nextToken()));
+        }
     }
 
+    /** Returns the underlying {@link MCROAIAdapter} */
     MCROAIAdapter getAdapter() {
         return adapter;
-    }
-
-    String getRepositoryName() {
-        return repositoryName;
-    }
-
-    String getRepositoryIdentifier() {
-        return repositoryIdentifier;
     }
 
     /**
@@ -179,44 +132,7 @@ public class MCROAIDataProvider extends MCRServlet {
         return myBaseURL;
     }
 
-    /**
-     * Returns the earliest datestamp supported by this data provider instance.
-     * That is the guaranteed lower limit of all datestamps recording changes,
-     * modifications, or deletions in the repository. A repository must not use
-     * datestamps lower than the one specified by the content of the
-     * earliestDatestamp element. Configuration is done using a property, for
-     * example MCR.OAIDataProvider.OAI.EarliestDatestamp=1970-01-01
-     */
-    String getEarliestDatestamp() {
-        return EARLIEST_DATESTAMP;
-    }
-
-    String getRecordSampleID() {
-        return recordSampleID;
-    }
-
-    String getDeletedRecord() {
-        return deletedRecord;
-    }
-
-    String getAdminEmail() {
-        return adminEmail;
-    }
-
-    /**
-     * Returns the metadata formats supported by this data provider instance.
-     * For each instance, a configuration property lists the prefixes of all
-     * supported formats, for example
-     * MCR.OAIDataProvider.OAI.MetadataFormats=oai_dc Each metadata format must
-     * be globally configured with its prefix, schema and namespace, for example
-     * MCR.OAIDataProvider.MetadataFormat.oai_dc.Schema=http://www.openarchives.
-     * org/OAI/2.0/oai_dc.xsd
-     * MCR.OAIDataProvider.MetadataFormat.oai_dc.Namespace
-     * =http://www.openarchives.org/OAI/2.0/oai_dc/
-     * 
-     * @see MCRMetadataFormat
-     */
-    List<MCRMetadataFormat> getMetadataFormats() {
-        return metadataFormats;
+    String getPrefix() {
+        return prefix;
     }
 }

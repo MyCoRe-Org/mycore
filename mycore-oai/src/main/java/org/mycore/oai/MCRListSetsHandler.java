@@ -96,6 +96,7 @@ class MCRListSetsHandler extends MCRVerbHandler {
         super(provider);
     }
 
+    @SuppressWarnings("unchecked")
     void handleRequest() {
         String resumptionToken = parms.getProperty(ARG_RESUMPTION_TOKEN);
         if (resumptionToken != null) {
