@@ -261,7 +261,7 @@ public abstract class MCRVerbHandler {
      *         item with that identifier exists.
      */
     boolean checkIdentifier(String identifier) {
-        String prefix = "oai:" + provider.getAdapter().getRepositoryIdentifier() + ":";
+        String prefix = "oai:" + provider.getRepositoryIdentifier() + ":";
         if (!identifier.startsWith(prefix)) {
             addError(ERROR_ID_DOES_NOT_EXIST, "Identifier must start with " + prefix);
             return false;

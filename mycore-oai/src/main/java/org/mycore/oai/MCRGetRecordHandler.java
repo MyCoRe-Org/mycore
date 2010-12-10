@@ -62,7 +62,7 @@ class MCRGetRecordHandler extends MCRVerbHandler {
             return;
         }
 
-        List<MCRMetadataFormat> formats = provider.getAdapter().listMetadataFormats(identifier, provider.getAdapter().getMetadataFormats());
+        List<MCRMetadataFormat> formats = provider.getAdapter().listMetadataFormats(identifier, provider.getMetadataFormats());
         if (!formats.contains(format)) {
             String msg = "The item " + identifier + " does not support the metadata format " + metadata_prefix;
             addError(ERROR_CANNOT_DISSEMINATE_FORMAT, msg);

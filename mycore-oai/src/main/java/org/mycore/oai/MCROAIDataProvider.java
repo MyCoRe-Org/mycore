@@ -22,7 +22,9 @@
 
 package org.mycore.oai;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.servlet.ServletException;
@@ -51,6 +53,20 @@ public class MCROAIDataProvider extends MCRServlet {
     private String myBaseURL;
 
     private String prefix;
+
+    private String repositoryName;
+
+    private String repositoryIdentifier;
+
+    private String adminEmail;
+
+    /** the sample id */
+    private String recordSampleID;
+
+    /**
+     * List of metadata formats supported by this data provider instance.
+     */
+    private List<MCRMetadataFormat> metadataFormats = new ArrayList<MCRMetadataFormat>();
 
     @SuppressWarnings("unchecked")
     protected void doGetPost(MCRServletJob job) throws Exception {
@@ -113,10 +129,16 @@ public class MCROAIDataProvider extends MCRServlet {
         adapter = (MCROAIAdapter) (config.getInstanceOf(prefix + "Adapter", MCROAIAdapterMyCoRe.class.getName()));
         adapter.init(prefix);
 
+        repositoryName = config.getString(prefix + "RepositoryName");
+        repositoryIdentifier = config.getString(prefix + "RepositoryIdentifier");
+        adminEmail = config.getString(prefix + "AdminEmail", config.getString("MCR.Mail.Address"));
+        recordSampleID = config.getString(prefix + "RecordSampleID");
+        adapter.setDeletedRecordPolicy(config.getString(prefix + "DeletedRecord", MCROAIConstants.DELETED_RECORD_POLICY_TRANSIENT));
+
         String formats = config.getString(prefix + "MetadataFormats");
         StringTokenizer st = new StringTokenizer(formats, ", ");
         while (st.hasMoreTokens()) {
-            getAdapter().getMetadataFormats().add(MCRMetadataFormat.getFormat(st.nextToken()));
+            getMetadataFormats().add(MCRMetadataFormat.getFormat(st.nextToken()));
         }
     }
 
@@ -134,5 +156,51 @@ public class MCROAIDataProvider extends MCRServlet {
 
     String getPrefix() {
         return prefix;
+    }
+
+    /** Returns the name of the repository */
+    public String getRepositoryName() {
+        return repositoryName;
+    }
+
+    /** Returns the id of the oai repository */
+    public String getRepositoryIdentifier() {
+        return repositoryIdentifier;
+    }
+
+    /** Returns a samle record id */
+    public String getRecordSampleID() {
+        return recordSampleID;
+    }
+
+    /**
+     * Returns the policy for deleted items
+     * 
+     * @return one of no, transient or persistent
+     */
+    public String getDeletedRecordPolicy() {
+        return getAdapter().getDeletedRecordPolicy();
+    }
+
+    /** Returns the admin email adress */
+    public String getAdminEmail() {
+        return adminEmail;
+    }
+
+    /**
+     * Returns the metadata formats supported by this data provider instance.
+     * For each instance, a configuration property lists the prefixes of all
+     * supported formats, for example
+     * MCR.OAIDataProvider.OAI.MetadataFormats=oai_dc Each metadata format must
+     * be globally configured with its prefix, schema and namespace, for example
+     * MCR.OAIDataProvider.MetadataFormat.oai_dc.Schema=http://www.openarchives.
+     * org/OAI/2.0/oai_dc.xsd
+     * MCR.OAIDataProvider.MetadataFormat.oai_dc.Namespace
+     * =http://www.openarchives.org/OAI/2.0/oai_dc/
+     * 
+     * @see MCRMetadataFormat
+     */
+    List<MCRMetadataFormat> getMetadataFormats() {
+        return metadataFormats;
     }
 }

@@ -90,8 +90,9 @@ public class MCROAIAdapterMyCoRe extends MCROAIAdapter {
     @Override
     @SuppressWarnings("unchecked")
     List<String> getDeletedObjectsIdentifiers(String from, String until) {
-        String policy = getDeletedRecord();
-        if ("no".equalsIgnoreCase(policy) || "transient".equalsIgnoreCase(policy)) {
+        String policy = getDeletedRecordPolicy();
+        if (MCROAIConstants.DELETED_RECORD_POLICY_NO.equalsIgnoreCase(policy)
+                || MCROAIConstants.DELETED_RECORD_POLICY_TRANSIENT.equalsIgnoreCase(policy)) {
             return super.getDeletedObjectsIdentifiers(from, until);
         }
         LOGGER.info("Getting identifiers of deleted items");

@@ -86,7 +86,7 @@ abstract class MCRListDataHandler extends MCRVerbHandler {
         } else {
             String metadataPrefix = parms.getProperty(ARG_METADATA_PREFIX);
             MCRMetadataFormat metadataFormat = MCRMetadataFormat.getFormat(metadataPrefix);
-            if ((metadataFormat == null) || (!provider.getAdapter().getMetadataFormats().contains(metadataFormat))) {
+            if ((metadataFormat == null) || (!provider.getMetadataFormats().contains(metadataFormat))) {
                 String msg = "This metadata format is not supported by the repository: " + metadataPrefix;
                 addError(ERROR_CANNOT_DISSEMINATE_FORMAT, msg);
                 return;

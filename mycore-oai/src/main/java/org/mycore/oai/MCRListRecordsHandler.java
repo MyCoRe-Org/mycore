@@ -40,7 +40,7 @@ class MCRListRecordsHandler extends MCRListDataHandler {
     protected void addHit(String ID, MCRMetadataFormat format) {
         Element record = provider.getAdapter().getRecord(ID, format);
         if (!getProvider().getAdapter().exists(ID)) {
-            record.getChild("header", MCRConstants.OAI_PMH).setAttribute("status", "deleted");
+            record.getChild("header", MCROAIConstants.NS_OAI).setAttribute("status", "deleted");
         }
         output.addContent(record);
     }

@@ -63,9 +63,9 @@ class MCRListMetadataFormatsHandler extends MCRVerbHandler {
         List<MCRMetadataFormat> formats = null;
 
         if (identifier == null)
-            formats = provider.getAdapter().getMetadataFormats();
+            formats = provider.getMetadataFormats();
         else if (checkIdentifier(identifier))
-            formats = provider.getAdapter().listMetadataFormats(identifier, provider.getAdapter().getMetadataFormats());
+            formats = provider.getAdapter().listMetadataFormats(identifier, provider.getMetadataFormats());
         else
             return;
 

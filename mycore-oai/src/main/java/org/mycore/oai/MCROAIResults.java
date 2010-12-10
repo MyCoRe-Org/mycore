@@ -91,13 +91,13 @@ public class MCROAIResults {
         this.token = results.getID();
 
         ids = new ArrayList<String>(results.getNumHits());
-        String prefix = "oai:" + provider.getAdapter().getRepositoryIdentifier() + ":";
+        String prefix = "oai:" + provider.getRepositoryIdentifier() + ":";
 
         for (Iterator<MCRHit> hits = results.iterator(); hits.hasNext();) {
             MCRHit hit = hits.next();
             String identifier = prefix + hit.getID();
 
-            List<MCRMetadataFormat> formats = provider.getAdapter().listMetadataFormats(identifier, provider.getAdapter().getMetadataFormats());
+            List<MCRMetadataFormat> formats = provider.getAdapter().listMetadataFormats(identifier, provider.getMetadataFormats());
             if (formats.contains(format))
                 ids.add(hit.getID());
         }
