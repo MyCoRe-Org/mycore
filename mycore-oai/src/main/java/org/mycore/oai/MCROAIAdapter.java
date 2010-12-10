@@ -24,6 +24,7 @@ package org.mycore.oai;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
@@ -150,6 +151,19 @@ public abstract class MCROAIAdapter {
      */
     List<MCRMetadataFormat> getMetadataFormats() {
         return metadataFormats;
+    }
+
+    /**
+     * Sublasses should override this method. This implementation returns an
+     * empty list.
+     * 
+     * @param from
+     * @param until
+     * @return returns the identifiers of the deleted items matching the given
+     *         date boundaries
+     */
+    List<String> getDeletedObjectsIdentifiers(String from, String until) {
+        return new Vector<String>();
     }
 
     protected Element getURI(String uri) {

@@ -29,6 +29,7 @@ import java.util.TimeZone;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -73,12 +74,45 @@ public class MCROAIAdapterMyCoRe extends MCROAIAdapter {
     @Override
     public String formatURI(String uri, String id, MCRMetadataFormat format) {
         String objectType = MCRObjectID.getIDParts(id)[1];
-        return super.formatURI(uri, id, format).replace("{objectType}", objectType);
+        boolean exists = MCRMetadataManager.exists(MCRObjectID.getInstance(id));
+        String value = super.formatURI(uri, id, format).replace("{objectType}", objectType)
+                .replace(":{flag}", exists == false ? ":deletedMcrObject" : "");
+        return value;
     }
 
+    /**
+     * Method returns a list with identifiers of the deleted objects within the
+     * given date boundary. If the record policy indicates that there is not
+     * support for tracking deleted items empty list is returned.
+     * 
+     * @return a list with identifiers of the deleted objects
+     */
     @Override
-    public String getDeletedRecord() {
-        return super.getDeletedRecord();
+    @SuppressWarnings("unchecked")
+    List<String> getDeletedObjectsIdentifiers(String from, String until) {
+        String policy = getDeletedRecord();
+        if ("no".equalsIgnoreCase(policy) || "transient".equalsIgnoreCase(policy)) {
+            return super.getDeletedObjectsIdentifiers(from, until);
+        }
+        LOGGER.info("Getting identifiers of deleted items");
+        List<String> deletedItems = new Vector<String>();
+        try {
+            MCRHIBConnection conn = MCRHIBConnection.instance();
+            String q = "SELECT DISTINCT identifier FROM mcrdeleteditems WHERE ";
+            if (from != null && until != null) {
+                q += "date_deleted >= '" + from + "' and date_deleted <= '" + until + "'";
+            } else if (from != null) {
+                q += "date_deleted >= '" + from + "'";
+            } else if (until != null) {
+                q += "date_deleted <= '" + until + "'";
+            } else {
+                q += "true";
+            }
+            deletedItems = conn.getSession().createSQLQuery(q).list();
+        } catch (Exception ex) {
+            LOGGER.warn("Could not retrieve identifiers of deleted objects", ex);
+        }
+        return deletedItems;
     }
 
     /**

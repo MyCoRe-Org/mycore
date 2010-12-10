@@ -53,6 +53,8 @@ public final class MCRConstants {
 
     public final static Namespace XLINK_NAMESPACE = Namespace.getNamespace("xlink", XLINK_URL);
 
+    public final static Namespace OAI_PMH =Namespace.getNamespace("OAI-PMH","http://www.openarchives.org/OAI/2.0/");
+    
     /** The URL of the XSI */
     private final static String XSI_URL = "http://www.w3.org/2001/XMLSchema-instance";
 
