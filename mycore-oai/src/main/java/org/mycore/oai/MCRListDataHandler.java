@@ -1,24 +1,23 @@
 /*
- * $Revision$ 
- * $Date$
- *
- * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
- *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program, in a file called gpl.txt or license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * $Revision$ $Date$
+ * 
+ * This file is part of *** M y C o R e *** See http://www.mycore.de/ for
+ * details.
+ * 
+ * This program is free software; you can use it, redistribute it and / or
+ * modify it under the terms of the GNU General Public License (GPL) as
+ * published by the Free Software Foundation; either version 2 of the License or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program, in a file called gpl.txt or license.txt. If not, write to the
+ * Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307 USA
  */
 
 package org.mycore.oai;
@@ -44,10 +43,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.Vector;
 
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.services.fieldquery.MCRFieldDef;
+import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRQueryCondition;
 import org.mycore.services.fieldquery.MCRQueryManager;
@@ -55,7 +57,8 @@ import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSortBy;
 
 /**
- * Provides common functionality for the ListRecords and ListIdentifiers implementation.
+ * Provides common functionality for the ListRecords and ListIdentifiers
+ * implementation.
  * 
  * @author Frank L\u00fctzenkirchen
  */
@@ -139,10 +142,64 @@ abstract class MCRListDataHandler extends MCRVerbHandler {
             query.setSortBy(sortBy);
 
             MCRResults results = MCRQueryManager.search(query);
+            LOGGER.info("Adding identifiers of deleted records to the result set");
+            results = addDeletedItems(results, from, until);
+
             oaires = new MCROAIResults(results, metadataFormat, provider);
             if (!hasErrors())
                 oaires.addHits(this);
         }
+    }
+
+    /**
+     * Adds the identifiers of the deleted items to the given result.
+     * 
+     * @param source
+     * @param from
+     * @param until
+     */
+    private MCRResults addDeletedItems(MCRResults source, String from, String until) {
+        MCRResults all = new MCRResults();
+
+        for (MCRHit hit : source) {
+            all.addHit(hit);
+        }
+
+        List<String> deletedItems = getDeletedItems(from, until);
+        for (String deletedItemId : deletedItems) {
+            all.addHit(new MCRHit(deletedItemId));
+        }
+
+        return all;
+    }
+
+    /**
+     * @param from
+     * @param until
+     * @return returns the identifiers of the deleted items matching the given
+     *         date boundaries
+     */
+    @SuppressWarnings("unchecked")
+    public List<String> getDeletedItems(String from, String until) {
+        LOGGER.info("Getting identifiers of deleted items");
+        List<String> deletedItems = new Vector<String>();
+        try {
+            MCRHIBConnection conn = MCRHIBConnection.instance();
+            String q = "SELECT DISTINCT identifier FROM mcrdeleteditems WHERE ";
+            if (from != null && until != null) {
+                q += "date_deleted >= '" + from + "' and date_deleted <= '" + until + "'";
+            } else if (from != null) {
+                q += "date_deleted >= '" + from + "'";
+            } else if (until != null) {
+                q += "date_deleted <= '" + until + "'";
+            } else {
+                q += "true";
+            }
+            deletedItems = conn.getSession().createSQLQuery(q).list();
+        } catch (Exception ex) {
+            LOGGER.warn("Could not retrieve identifiers of deleted objects", ex);
+        }
+        return deletedItems;
     }
 
     protected abstract void addHit(String ID, MCRMetadataFormat format);
