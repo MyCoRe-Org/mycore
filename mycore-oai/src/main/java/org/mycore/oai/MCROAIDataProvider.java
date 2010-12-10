@@ -111,7 +111,7 @@ public class MCROAIDataProvider extends MCRServlet {
         MCRConfiguration config = MCRConfiguration.instance();
         prefix = "MCR.OAIDataProvider." + getServletName() + ".";
         adapter = (MCROAIAdapter) (config.getInstanceOf(prefix + "Adapter", MCROAIAdapterMyCoRe.class.getName()));
-        adapter.init(prefix + "Adapter.");
+        adapter.init(prefix);
 
         String formats = config.getString(prefix + "MetadataFormats");
         StringTokenizer st = new StringTokenizer(formats, ", ");

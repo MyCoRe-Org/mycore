@@ -63,9 +63,11 @@ public abstract class MCROAIAdapter {
 
     void init(String prefix) {
         MCRConfiguration config = MCRConfiguration.instance();
-        recordUriPattern = MCRConfiguration.instance().getString(prefix + "RecordURIPattern");
+
+        recordUriPattern = MCRConfiguration.instance().getString(prefix + "Adapter." + "RecordURIPattern");
+        headerUriPattern = MCRConfiguration.instance().getString(prefix + "Adapter." + "HeaderURIPattern");
+
         EARLIEST_DATESTAMP = config.getString(prefix + "EarliestDatestamp", "1970-01-01");
-        headerUriPattern = MCRConfiguration.instance().getString(prefix + "HeaderURIPattern");
         repositoryName = config.getString(prefix + "RepositoryName");
         repositoryIdentifier = config.getString(prefix + "RepositoryIdentifier");
         adminEmail = config.getString(prefix + "AdminEmail", config.getString("MCR.Mail.Address"));
