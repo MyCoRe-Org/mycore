@@ -91,6 +91,10 @@
     <servlet-name>MCRDerivateLinkServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRDerivateLinkServlet</servlet-class>
   </servlet>
+  <servlet id="MCRContainerLogin">
+    <servlet-name>MCRContainerLoginServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRContainerLoginServlet</servlet-class>
+  </servlet>
 
 
 
@@ -218,6 +222,10 @@
   <servlet-mapping>
     <servlet-name>MCRDerivateLinkServlet</servlet-name>
     <url-pattern>/servlets/MCRDerivateLinkServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRContainerLoginServlet</servlet-name>
+    <url-pattern>/servlets/MCRContainerLoginServlet</url-pattern>
   </servlet-mapping>
 
   <servlet id="MCRAddURNToObjectServlet">
@@ -395,5 +403,23 @@
     <error-code>504</error-code>
     <location>/servlets/ErrorServlet</location>
   </error-page>
+  
+  <login-config>
+    <auth-method>DIGEST</auth-method>
+    <realm-name>Restricted</realm-name>
+  </login-config>
+  <security-role>
+    <description>every permitted user</description>
+    <role-name>users</role-name>
+  </security-role>
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>container login</web-resource-name>
+      <url-pattern>/servlets/MCRContainerLoginServlet</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>users</role-name>
+    </auth-constraint>
+  </security-constraint>
 
 </web-app>
