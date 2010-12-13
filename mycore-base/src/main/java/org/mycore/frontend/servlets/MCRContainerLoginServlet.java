@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUserInformation;
 
 /**
@@ -82,6 +83,10 @@ public class MCRContainerLoginServlet extends MCRServlet {
                 return lastUser;
             }
             Principal principal = request.getUserPrincipal();
+            if (principal == null) {
+                LOGGER.warn("Principal for current user is null. Using guest user as fallback!");
+                return MCRSystemUserInformation.getGuestInstance().getCurrentUserID();
+            }
             lastUser = principal.getName();
             return lastUser;
         }
