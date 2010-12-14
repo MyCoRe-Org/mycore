@@ -50,19 +50,11 @@ public class MCRLogoutServlet extends HttpServlet {
             return;
         }
         session.invalidate();
-        //FIXME: upgrade jetty version to 6.0.2 or higher
-        try {
-            //add extra time for jetty
-            Thread.sleep(200);
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
         String returnURL = req.getHeader("Referer");
         if (returnURL == null) {
             returnURL = req.getContextPath() + "/";
         }
-        resp.sendRedirect(resp.encodeRedirectURL(returnURL));
+        resp.sendRedirect(returnURL);
     }
 
 }
