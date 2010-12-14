@@ -41,10 +41,10 @@ public class MCRMigrationCommands21 extends MCRAbstractCommands {
             Date lastModified = xmlentry.getLastModified();
             if(lastModified==null){
             	try{
-            		MCRObject mcrObj= new MCRObject(xmlByteArray, true);
+            		MCRObject mcrObj= new MCRObject(xmlByteArray, false);
             		lastModified = mcrObj.getService().getDate(MCRObjectService.DATE_TYPE_CREATEDATE);
             	}
-            	catch(SAXParseException spe){
+            	catch(Exception spe){
             		LOGGER.error("MCRObject "+mcrId.toString()+" not valid.", spe);
             	}
             }
