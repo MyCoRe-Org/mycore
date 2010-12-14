@@ -201,7 +201,10 @@ function processImageProperties(imageProperties, viewID){
 	Iview[viewID].zoomBack = Iview[viewID].zoomInit;
 	var initX = toFloat(window.location.search.get("x"));
 	var initY = toFloat(window.location.search.get("y"));
+	
+	Iview[viewID].roller = true;
 	viewerBean.positionTiles ({'x' : initX, 'y' : initY}, true);
+	
 	preload.style.width = "100%";
 	preload.style.height = "100%";
 	//$("preload"+viewID).style.visibility = "visible";
@@ -209,6 +212,8 @@ function processImageProperties(imageProperties, viewID){
 		Iview[viewID].ausschnitt.setSRC(viewerBean.tileUrlProvider.assembleUrl(0,0,0));
 	}
 	updateModuls(viewID);
+	
+	Iview[viewID].roller = false;
 }
 
 /**
