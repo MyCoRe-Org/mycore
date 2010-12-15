@@ -94,8 +94,8 @@ public class MCRIView2Client {
         MySignalHandler.install("INT");
 
         LOGGER.info("Connecting to WebService on " + endPoint);
-        final MCRIView2RemoteFunctions iView2RemoteFunctions = getIViewRemoteFunctions(endPoint);
         for (int i = 0; i < threadCount; i++) {
+            final MCRIView2RemoteFunctions iView2RemoteFunctions = getIViewRemoteFunctions(endPoint);
             EXECUTOR_SERVICE.submit(new ImageTiler(iView2RemoteFunctions, tileDir, fileStoreDir));
         }
         while (!EXECUTOR_SERVICE.isTerminated()) {
@@ -167,6 +167,7 @@ public class MCRIView2Client {
         }
 
         private static boolean handleTileJob(MCRIView2RemoteJob tileJob, File tileDir, File fileStoreDir) throws IOException {
+            
             LOGGER.info("Tiling " + tileJob.getDerivateID() + tileJob.getDerivatePath());
             MCRImage mcrImage = MCRImage.getInstance(new File(fileStoreDir, tileJob.getFileSystemPath()), tileJob.getDerivateID(), tileJob
                     .getDerivatePath());
