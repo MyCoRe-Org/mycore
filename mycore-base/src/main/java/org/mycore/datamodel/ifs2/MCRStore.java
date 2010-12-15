@@ -95,7 +95,9 @@ public abstract class MCRStore {
     protected static <T extends MCRStore> T getStore(String ID, Class<T> storeClass) {
     	MCRStore retrievedStore = stores.get(ID);
     	if(storeClass.isAssignableFrom(retrievedStore.getClass())){
-    		return (T) retrievedStore;
+    	    @SuppressWarnings("unchecked")
+    		T store = (T) retrievedStore;
+            return store;
     	}
     	
     	return null;
