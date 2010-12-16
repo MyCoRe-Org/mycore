@@ -67,7 +67,7 @@ public class MCRIView2Client {
             return;
         }
         LOGGER.info("Activating headless mode");
-        System.setProperty("java.awt.headless", "true"); 
+        System.setProperty("java.awt.headless", "true");
         String endPoint = args[0];
         final File fileStoreDir = new File(System.getProperty("fileStoreDir", "filestore"));
         if (!fileStoreDir.exists() && !fileStoreDir.canRead()) {
@@ -139,24 +139,21 @@ public class MCRIView2Client {
 
         @Override
         public MCRIView2RemoteJob call() throws Exception {
-            LOGGER.info("Thread started");
+            LOGGER.info("Thread started " + iView2RemoteFunctions);
             MCRIView2RemoteJob tileJob = iView2RemoteFunctions.nextTileJob();
+            LOGGER.info("Got next tile job " + tileJob);
             if (tileJob.getDerivateID() != null) {
                 try {
                     if (!handleTileJob(tileJob, tileDir, fileStoreDir))
                         return null;
+                    iView2RemoteFunctions.finishTileJob(tileJob);
+                    return tileJob;
                 } catch (Error e) {
                     LOGGER.error("Error while tiling " + tileJob.getDerivateID() + tileJob.getDerivatePath(), e);
-                    EXECUTOR_SERVICE.shutdown();
                     throw e;
                 } catch (Exception e) {
                     LOGGER.error("Exception while tiling " + tileJob.getDerivateID() + tileJob.getDerivatePath(), e);
-                    EXECUTOR_SERVICE.shutdown();
                     throw e;
-                }
-                iView2RemoteFunctions.finishTileJob(tileJob);
-                try {
-                    return tileJob;
                 } finally {
                     if (!EXECUTOR_SERVICE.isShutdown())
                         EXECUTOR_SERVICE.submit(this);
@@ -167,10 +164,9 @@ public class MCRIView2Client {
         }
 
         private static boolean handleTileJob(MCRIView2RemoteJob tileJob, File tileDir, File fileStoreDir) throws IOException {
-            
+
             LOGGER.info("Tiling " + tileJob.getDerivateID() + tileJob.getDerivatePath());
-            MCRImage mcrImage = MCRImage.getInstance(new File(fileStoreDir, tileJob.getFileSystemPath()), tileJob.getDerivateID(), tileJob
-                    .getDerivatePath());
+            MCRImage mcrImage = MCRImage.getInstance(new File(fileStoreDir, tileJob.getFileSystemPath()), tileJob.getDerivateID(), tileJob.getDerivatePath());
             mcrImage.setTileDir(tileDir);
             MCRTiledPictureProps tiledPictureProps = mcrImage.tile();
             tileJob.setHeight(tiledPictureProps.getHeight());

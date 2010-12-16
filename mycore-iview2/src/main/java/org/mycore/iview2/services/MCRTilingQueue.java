@@ -226,7 +226,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         if (job != null) {
             return job;
         }
-        LOGGER.info("No prefetched jobs available");
+        LOGGER.debug("No prefetched jobs available");
         if (preFetch(100) == 0) {
             return null;
         }
@@ -235,7 +235,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
 
     private MCRTileJob getNextPrefetchedElement() {
         MCRTileJob job = preFetch.poll();
-        LOGGER.info("fetched job :" + job);
+        LOGGER.debug("Fetched job: " + job);
         return job;
     }
 
@@ -247,9 +247,11 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         int i = 0;
         while (queryResult.hasNext()) {
             i++;
-            preFetch.add(queryResult.next());
+            MCRTileJob job = queryResult.next();
+            preFetch.add(job.clone());
+            session.evict(job);
         }
-        LOGGER.info("prefetched " + i + " tile jobs");
+        LOGGER.debug("prefetched " + i + " tile jobs");
         return i;
     }
 

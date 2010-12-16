@@ -1,5 +1,6 @@
 package org.mycore.iview2.services;
 
+import java.text.MessageFormat;
 import java.util.Date;
 
 /**
@@ -7,7 +8,7 @@ import java.util.Date;
  * @author Thomas Scheffler (yagee)
  *
  */
-public class MCRTileJob {
+public class MCRTileJob implements Cloneable {
 
     private long id;
 
@@ -119,7 +120,6 @@ public class MCRTileJob {
         this.status = status.toChar();
     }
 
-    @SuppressWarnings("unused")
     private void setStatus(char status) {
         this.status = status;
     }
@@ -155,6 +155,34 @@ public class MCRTileJob {
 
     public void setZoomLevel(long zoomLevel) {
         this.zoomLevel = zoomLevel;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#clone()
+     */
+    @Override
+    public MCRTileJob clone() {
+        MCRTileJob clone = new MCRTileJob();
+        clone.setAdded(getAdded());
+        clone.setDerivate(getDerivate());
+        clone.setFinished(getFinished());
+        clone.setHeight(getHeight());
+        clone.setId(getId());
+        clone.setPath(getPath());
+        clone.setStart(getStart());
+        clone.setStatus(getStatus());
+        clone.setTiles(getTiles());
+        clone.setWidth(getWidth());
+        clone.setZoomLevel(getZoomLevel());
+        return clone;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return MessageFormat.format("MCRTileJob [derivate:{0}, path:{1}, added:{2}]", getDerivate(), getPath(), getAdded());
     }
 
 }
