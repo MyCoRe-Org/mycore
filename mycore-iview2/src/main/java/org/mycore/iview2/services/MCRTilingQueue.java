@@ -4,8 +4,10 @@ import java.util.AbstractQueue;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Queue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -21,6 +23,8 @@ import org.mycore.common.events.MCRShutdownHandler.Closeable;
 public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeable {
     private static MCRTilingQueue instance = new MCRTilingQueue();
 
+    private static Queue<MCRTileJob> preFetch;
+
     private static ScheduledExecutorService StalledJobScheduler;
 
     private static Logger LOGGER = Logger.getLogger(MCRTilingQueue.class);
@@ -34,6 +38,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         int waitTime = Integer.parseInt(MCRIView2Tools.getIView2Property("TimeTillReset")) * 60;
         StalledJobScheduler = Executors.newSingleThreadScheduledExecutor();
         StalledJobScheduler.scheduleAtFixedRate(MCRStalledJobResetter.getInstance(), waitTime, waitTime, TimeUnit.SECONDS);
+        preFetch = new LinkedList<MCRTileJob>();
         running = true;
         pollLock = new ReentrantLock();
         MCRShutdownHandler.getInstance().addCloseable(this);
@@ -210,22 +215,42 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         if (!results.hasNext())
             return null;
         MCRTileJob job = results.next();
+        clearPreFetch();
         return job;
     }
 
-    @SuppressWarnings("unchecked")
     private MCRTileJob getElement() {
         if (!running)
             return null;
-        Session session = MCRHIBConnection.instance().getSession();
-        Query query = session.createQuery("FROM MCRTileJob WHERE status='" + MCRJobState.NEW.toChar() + "' ORDER BY added ASC")
-                .setMaxResults(1);
-        Iterator<MCRTileJob> queryResult;
-        queryResult = query.iterate();
-        if (queryResult.hasNext()) {
-            return (MCRTileJob) queryResult.next();
+        MCRTileJob job = getNextPrefetchedElement();
+        if (job != null) {
+            return job;
         }
-        return null;
+        if (preFetch(100) == 0) {
+            return null;
+        }
+        return getNextPrefetchedElement();
+    }
+
+    private MCRTileJob getNextPrefetchedElement() {
+        return preFetch.poll();
+    }
+
+    private int preFetch(int amount) {
+        Session session = MCRHIBConnection.instance().getSession();
+        Query query = session.createQuery("FROM MCRTileJob WHERE status='" + MCRJobState.NEW.toChar() + "' ORDER BY added ASC").setMaxResults(amount);
+        @SuppressWarnings("unchecked")
+        Iterator<MCRTileJob> queryResult = query.iterate();
+        int i = 0;
+        if (queryResult.hasNext()) {
+            i++;
+            preFetch.add(queryResult.next());
+        }
+        return i;
+    }
+
+    private void clearPreFetch() {
+        preFetch.clear();
     }
 
     private boolean updateJob(MCRTileJob job) {
@@ -264,7 +289,11 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         Query query = session.createQuery("DELETE FROM " + MCRTileJob.class.getName() + " WHERE derivate = :derivate AND path = :path");
         query.setParameter("derivate", derivate);
         query.setParameter("path", path);
-        return query.executeUpdate();
+        try {
+            return query.executeUpdate();
+        } finally {
+            clearPreFetch();
+        }
     }
 
     /**
@@ -278,7 +307,11 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         Session session = MCRHIBConnection.instance().getSession();
         Query query = session.createQuery("DELETE FROM " + MCRTileJob.class.getName() + " WHERE derivate = :derivate");
         query.setParameter("derivate", derivate);
-        return query.executeUpdate();
+        try {
+            return query.executeUpdate();
+        } finally {
+            clearPreFetch();
+        }
     }
 
     /**
