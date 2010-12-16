@@ -67,7 +67,7 @@ public class MCRIView2RemoteFunctions {
      */
     @WebMethod(operationName = "next-tile-job")
     @WebResult(name = "tile-job")
-    public synchronized MCRIView2RemoteJob getNextTileParameters() {
+    public MCRIView2RemoteJob getNextTileParameters() {
         Session session = sessionFactory.getCurrentSession();
         Transaction transaction = session.beginTransaction();
         try {
