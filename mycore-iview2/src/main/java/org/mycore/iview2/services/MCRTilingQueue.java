@@ -245,7 +245,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         @SuppressWarnings("unchecked")
         Iterator<MCRTileJob> queryResult = query.iterate();
         int i = 0;
-        if (queryResult.hasNext()) {
+        while (queryResult.hasNext()) {
             i++;
             preFetch.add(queryResult.next());
         }
