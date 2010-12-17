@@ -5,7 +5,7 @@ public class MCRIFS2MetadataTestCase extends MCRIFS2TestCase {
     
     protected void createStore() throws Exception {
         setProperties();
-        setMetaDataStore(MCRStore.createStore(STORE_ID, MCRMetadataStore.class));
+        setMetaDataStore(MCRStoreManager.createStore(STORE_ID, MCRMetadataStore.class));
     }
 
     public void setMetaDataStore(MCRMetadataStore metaDataStore) {

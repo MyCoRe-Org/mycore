@@ -21,7 +21,8 @@ public class MCRIFS2TestCase extends MCRTestCase {
 
     protected void createStore() throws Exception {
         setProperties();
-        setStore(MCRStore.createStore(STORE_ID, MCRFileStore.class));
+        System.out.println(getClass() + " store id: " + STORE_ID);
+        setStore(MCRStoreManager.createStore(STORE_ID, MCRFileStore.class));
     }
 
     protected void setProperties() throws IOException {
@@ -51,8 +52,8 @@ public class MCRIFS2TestCase extends MCRTestCase {
     public void tearDown() throws Exception {
         super.tearDown();
         VFS.getManager().resolveFile(getGenericStore().getBaseDir()).delete(Selectors.SELECT_ALL);
-        getGenericStore().remove(STORE_ID);
-        assertNull("Could not remove store " + STORE_ID, MCRStore.getStore(STORE_ID));
+        MCRStoreManager.removeStore(STORE_ID);
+        assertNull("Could not remove store " + STORE_ID, MCRStoreManager.getStore(STORE_ID));
     }
 
     public void setStore(MCRFileStore store) {

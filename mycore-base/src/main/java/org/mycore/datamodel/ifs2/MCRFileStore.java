@@ -42,17 +42,6 @@ import org.mycore.common.MCRException;
 public class MCRFileStore extends MCRStore {
 
     /**
-     * Returns the store with the given ID
-     * 
-     * @param ID
-     *            the ID of the store
-     * @return the store with that ID
-     */
-    public static MCRFileStore getStore(String type) {
-        return (MCRFileStore) MCRStore.getStore(type);
-    }
-
-    /**
      * Creates and stores a new, empty file collection using the next free ID in
      * the store.
      * 
@@ -108,8 +97,4 @@ public class MCRFileStore extends MCRStore {
             retrieve(e.next()).repairMetadata();
         }
     }
-
-	public void remove(String id) {
-		stores.remove(id);
-	}
 }

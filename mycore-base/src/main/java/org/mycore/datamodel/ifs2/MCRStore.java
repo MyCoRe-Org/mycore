@@ -76,47 +76,7 @@ import org.mycore.common.MCRException;
  * @author Frank Lützenkirchen
  */
 public abstract class MCRStore {
-
-    /**
-     * Map of defined stores, where store ID is the map key.
-     */
-    protected static HashMap<String, MCRStore> stores = new HashMap<String, MCRStore>();
-
-    /**
-     * Returns the store with the given ID
-     * 
-     * @param ID
-     *            the ID of the store
-     */
-    protected static MCRStore getStore(String ID) {
-        return stores.get(ID);
-    }
     
-    protected static <T extends MCRStore> T getStore(String ID, Class<T> storeClass) {
-    	MCRStore retrievedStore = stores.get(ID);
-    	if(storeClass.isAssignableFrom(retrievedStore.getClass())){
-    	    @SuppressWarnings("unchecked")
-    		T store = (T) retrievedStore;
-            return store;
-    	}
-    	
-    	return null;
-    }
-    
-    
-    
-
-	public static <T extends MCRStore> T createStore(String ID, Class<T> storeClass) throws InstantiationException, IllegalAccessException {
-		if (stores.containsKey(ID)) {
-			throw new MCRException("Could not create store with ID " + ID + ", store allready exists");
-		}
-		
-		T store = storeClass.newInstance();
-		store.init(ID);
-		
-		return getStore(ID, storeClass);
-	}
-
     /** The ID of the store */
     protected String id;
 
@@ -142,7 +102,6 @@ public abstract class MCRStore {
      * Initializes a new store instance
      */
     protected void init(String id) {
-        stores.put(id, this);
         this.id = id;
 
         String cfg = "MCR.IFS2.Store." + id + ".";
@@ -238,7 +197,7 @@ public abstract class MCRStore {
      *         data
      */
     String[] getSlotPaths(int ID) {
-		String id = createIDWithLeadingZeros(ID);
+        String id = createIDWithLeadingZeros(ID);
         
         String[] paths = new String[slotLength.length + 1];
         StringBuffer path = new StringBuffer();
@@ -254,13 +213,13 @@ public abstract class MCRStore {
         return paths;
     }
 
-	private String createIDWithLeadingZeros(int ID) {
-		DecimalFormat numWithLeadingZerosFormat = new DecimalFormat();
-		numWithLeadingZerosFormat.setMinimumIntegerDigits(idLength);
-		numWithLeadingZerosFormat.setGroupingUsed(false);
+    private String createIDWithLeadingZeros(int ID) {
+        DecimalFormat numWithLeadingZerosFormat = new DecimalFormat();
+        numWithLeadingZerosFormat.setMinimumIntegerDigits(idLength);
+        numWithLeadingZerosFormat.setGroupingUsed(false);
         String id = numWithLeadingZerosFormat.format(ID);
-		return id;
-	}
+        return id;
+    }
 
     /**
      * Returns true if data for the given ID is existing in the store.
@@ -521,14 +480,10 @@ public abstract class MCRStore {
     }
     
     public boolean isEmpty() {
-		if (dir.list() == null) {
-			return true;
-		} else {
-			return dir.list().length == 0;
-		}
-	}
-
-	public void remove(String id) {
-		stores.remove(id);
-	}
+        if (dir.list() == null) {
+            return true;
+        } else {
+            return dir.list().length == 0;
+        }
+    }
 }

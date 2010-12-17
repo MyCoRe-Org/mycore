@@ -15,7 +15,7 @@ public class MCRIFS2VersioningTestCase extends MCRIFS2TestCase {
         String path = "file:///" + temp.getAbsolutePath().replace('\\', '/');
         temp.delete();
         setProperty("MCR.IFS2.Store.TEST.SVNRepositoryURL", path, true);
-        setVersStore(MCRStore.createStore(STORE_ID, MCRVersioningMetadataStore.class));
+        setVersStore(MCRStoreManager.createStore(STORE_ID, MCRVersioningMetadataStore.class));
     }
 
     @Override

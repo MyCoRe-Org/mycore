@@ -61,17 +61,6 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
         FSRepositoryFactory.setup();
     }
 
-    /**
-     * Returns the store for the given metadata document type
-     * 
-     * @param type
-     *            the type of metadata to store
-     * @return the store for this metadata type
-     */
-    public static MCRVersioningMetadataStore getStore(String type) {
-        return (MCRVersioningMetadataStore) MCRStore.getStore(type);
-    }
-
     @Override
     protected void init(String type) {
         super.init(type);

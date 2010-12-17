@@ -54,17 +54,6 @@ public class MCRMetadataStore extends MCRStore {
     protected boolean forceXML = true;
 
     /**
-     * Returns the store for the given metadata object type
-     * 
-     * @param type
-     *            the type of metadata to store
-     * @return the store for this metadata type
-     */
-    public static MCRMetadataStore getStore(String type) {
-        return (MCRMetadataStore) MCRStore.getStore(type);
-    }
-
-    /**
      * Initializes a new metadata store instance.
      * 
      * @param type

@@ -42,6 +42,7 @@ import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.ifs2.MCRObjectIDFileSystemDate;
 import org.mycore.datamodel.ifs2.MCRStore;
+import org.mycore.datamodel.ifs2.MCRStoreManager;
 import org.mycore.datamodel.ifs2.MCRStoredMetadata;
 import org.mycore.datamodel.ifs2.MCRVersioningMetadataStore;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -212,7 +213,7 @@ public class MCRXMLMetadataManager {
             }
         }
 
-        MCRMetadataStore store = MCRMetadataStore.getStore(projectType);
+        MCRMetadataStore store = MCRStoreManager.getStore(projectType, MCRMetadataStore.class);
         if (store == null) {
             throw new MCRPersistenceException(MessageFormat.format("Metadata store for project {0} and object type {1} is unconfigured.", project, type));
         }
@@ -263,7 +264,7 @@ public class MCRXMLMetadataManager {
 
         config.set(configPrefix + "BaseDir", typeDir.getAbsolutePath());
         config.set(configPrefix + "ForceXML", true);
-        MCRStore.createStore(baseID, impl);
+        MCRStoreManager.createStore(baseID, impl);
     }
 
     /**
