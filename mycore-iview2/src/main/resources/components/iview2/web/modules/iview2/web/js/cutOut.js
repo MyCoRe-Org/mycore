@@ -1,487 +1,475 @@
-//TODO rewrite so das lokale Position auf min&maxWerte abgebildet wird
-function cutOut() {
-	cutOut.ONLOAD = 0;
-	cutOut.SCROLL = 1;
-	cutOut.DBL_CLICK = 2;
-	cutOut.MOUSE_UP = 3;
+var iview = iview || {};
+/**
+ * @namespace	Package for CutOut contains Controller, View and Model
+ * @memberOf 	iview
+ * @name		cutOut
+ */
+iview.cutOut = iview.cutOut || {};
 
-	this.setWidth = setWidth;
-	this.getWidthT = function() { return getWidth("T");};
-	this.getWidth = function() { return getWidth("C");};
-	this.setHeight = setHeight;
-	this.getHeightT = function() { return getHeight("T");};
-	this.getHeight = function() { return getHeight("C");};
-	this.setPosition = setPosition;
-	this.getPosition = getPosition;
-	this.setSRC = setSRC;
-	this.addListener = addListener;
-	this.dropListener = dropListener;
-	this.init = init;
-	this.my = my;
-	this.scroll = mouseScroll;
-	this.mouseMove = mouseMove;
-	this.mouseUp =  mouseUp;
-	this.updateSize = updateSize;
-	this.updatePos = updatePos;
-	this.setViewID = setViewID
-	
-	var my = null;// cutOut-object
-	var viewID = "";
-	var ausschnittPosX = 0;// x-position of the left upper edge of the cutout
-	var ausschnittPosY = 0;// y-position of the left upper edge of the cutout
-	var curx = 0;// last x-position of the left upper edge of the cutout
-	var cury = 0;// last y-osition of the left upper edge of the cutout
-	var mouseIsDown = false;// indicator if the mouse is pressed
-	var inited = false;// indicator if the cutout was already initialized
-	var listener = [];// array who holds informations about the listeners (?)
-	var dampered = true;//saves if the thumbnail is folded or folded up
-	var setPosBlock = false;
+iview.cutOut.View = function() {
+	this._mousedown = false;
+	this.onevent = new iview.Event(this);
+	this._visible = true;
+	this._ratioX = 0;
+	this._ratioY = 0;
+	this._x = 0;
+	this._y = 0;
+	this._sizeX = 0;
+	this._sizeY = 0;
+	this._curX = 0;
+	this._curY = 0;
+	this._mouseX = 0;
+	this._mouseY = 0;
+};
 
-	/**
-	 * @public
-	 * @function
-	 * @name	setViewID
-	 * @memberOf	iview.cutOut
-	 * @description	sets the ID which is needed for multiple Viewers on a page so that they different components are connected properly together
-	 * @param	{string} id the ID of the Viewer the class is connected to
-	 */
-	function setViewID(id) {
-		viewID = id;
-	}
-
-	//TODO Doku ergänzen
-	/**
-	 * @public
-	 * @function	
-	 * @name	init
-	 * @memberOf	iview.cutOut
-	 * @description	creates with the given Informations a Thumbnail Element
-	 * @param	{string} id the ID of the newly created Thumbnail
-	 * @param	{string} idC the ID of the CutOut Div
-	 * @param	{string} idT the ID of the Thumbnail Image Element
-	 * @param	{string} parent the Parent Id or Object where the Thumbnail shall be added
-	 * @param	{string} idD the ID for the Damper Element
-	 * @param	{string} parentD the Parent Element for the Damper
-	 * @param	{string} identer
-	 */
-	function init(id, idC, idT, parent, idD, parentD, identer) {
-		var complete = document.createElement("div");
-		complete.id = id;
-		complete.className = "thumb" + identer;
-		complete.style.overflow = "hidden";
-		var ausschnitt = document.createElement("div");
-		ausschnitt.id = idC;
-		ausschnitt.className = "ausschnitt" + identer;
-		complete.appendChild(ausschnitt);
-		var thumb = new Image();
-		complete.appendChild(thumb);
-		document.getElementById(parent).appendChild(complete);
-		var damp = document.createElement("div");
-		damp.id = idD;
-		damp.className = "damp" + identer;
-		var hide = document.createElement("div");
-		hide.className = "hide";
-		var show = document.createElement("div");
-		show.className = "show";
-		damp.appendChild(hide);
-		damp.appendChild(show);
-		document.getElementById(parentD).appendChild(damp);
-
-		ManageEvents.addEventListener(complete, "mouseScroll", mouseScroll, false);
-		ManageEvents.addEventListener(complete, "dblclick", dblClick, false);
-		ManageEvents.addEventListener(ausschnitt, "mousedown", mouseDown, false);
-		ManageEvents.addEventListener(complete, "mouseup", mouseUp, false);
-		ManageEvents.addEventListener(complete, "mousemove", mouseMove, false);
-		ManageEvents.addEventListener(damp, "mousedown", damper, false);
-		
-		// Browser-Drag&Drop deaktiveren
-		complete.onmousedown = function() { return false;};
-		
-		my = {'self':complete, 'cutOut':ausschnitt, 'thumbnail':thumb, 'damp':damp};
-		this.my = my;
-		inited = true;
-	}
-
-	/**
-	 * @public
-	 * @function
-	 * @name	setWidth
-	 * @memberOf	iview.cutOut
-	 * @description	ets the Width of the CutOut div
-	 * @param	{integer} value represents the new Width of the CutOut
-	 */
-	function setWidth(value) {
-		value = toInt(value);
-		my.cutOut.style.width = value + "px";
-	}
+(function() {
 	
 	/**
-	 * @public
+	 * @private
 	 * @function
-	 * @name	getWidth
-	 * @memberOf	iview.cutOut
-	 * @description	returns the width of the requested Element
-	 * @param	{string} which Value T or C which defines if the Width of the Thumbnail or CutOut will be returned
-	 * @return	{integer} which holds the width of the requested Element
-	 */
-	function getWidth(which) {
-		if (!inited) return 0;
-		switch (which) {
-			case "T":
-				return my.thumbnail.width;
-				break;
-			case "C":
-				return toInt(my.cutOut.style.width);
-				break;
-			default:
-				return 0;
-				break;
-		}
-	}
-	
-	/**
-	 * @public
-	 * @function
-	 * @name	setHeight
-	 * @memberOf	iview.cutOut
-	 * @description	sets the Height of the CutOut div
-	 * @param	{integer} value represents the new Height of the CutOut
-	 */
-	function setHeight(value) {
-		value = toInt(value);
-		my.cutOut.style.height = value + "px";
-	}
-	
-	/**
-	 * @public
-	 * @function
-	 * @name	getHeight
-	 * @memberOf	iview.cutOut
-	 * @description	returns the height of the requested Element
-	 * @param	{string} which Value T or C which defines if the height of the Thumbnail or CutOut will be returned
-	 * @return	{integer} which holds the height of the requested Element
-	 */
-	function getHeight(which) {
-		if (!inited) return 0;
-		switch (which) {
-			case "T":
-				return my.thumbnail.height;
-				break;
-			case "C":
-				return toInt(my.cutOut.style.height);
-				break;
-			default:
-				return 0;
-		}
-	}
-	
-	//TODO Doku ergänzen
-	/**
-	 * @public
-	 * @function
-	 * @name	setPosition
-	 * @memberOf	iview.cutOut
-	 * @description	returns the height of the requested Element
-	 * @param	{object} vector
-	 * @param	{event} e holds the Event which raised it
-	 */
-	function setPosition(vector, e) {
-		if(setPosBlock == true){
-			setPosBlock = false;
-			return;
-		}
-		vector.x = toInt(vector.x);
-		vector.y = toInt(vector.y);
-		if (vector.x + getWidth("C") > getWidth("T")) {
-			vector.x = getWidth("T") - getWidth("C");
-		} else if (vector.x < 0) {
-			vector.x = 0;
-		}
-
-		if (vector.y + getHeight("C") > getHeight("T")) {
-			vector.y = getHeight("T") - getHeight("C");
-		} else if (vector.y < 0) {
-			vector.y = 0;
-		}
-		my.cutOut.style.left = vector.x + "px";
-		my.cutOut.style.top = vector.y + "px";
-		if(e) e.cancelBubble = true;
-	}
-
-	/**
-	 * @public
-	 * @function
-	 * @name	getPosition
-	 * @memberOf	iview.cutOut
-	 * @description	returns the Left and Top Position of the CutOut Area
-	 * @return	{object} .x|.y holding integers with the connected values
-	 */
-	function getPosition() {
-		return {'x':parseInt(my.cutOut.style.left), 'y':parseInt(my.cutOut.style.top)};
-	}
-	
-	/**
-	 * @public
-	 * @function
-	 * @name	setSRC
-	 * @memberOf	iview.cutOut
-	 * @description	sets for the Image a new Image Source which is then loaded
-	 * @param	{string} url represents the new URL of the Image
-	 */
-	function setSRC(url) {
-		my.self.removeChild(my.thumbnail);
-		my.thumbnail = new Image();
-		my.self.appendChild(my.thumbnail);
-		my.thumbnail.onload = function() {notifyOnload();};
-		my.thumbnail.src = url;
-		my.thumbnail.style.verticalAlign = "bottom";
-	}
-
-	/**
-	 * @public
-	 * @function
-	 * @name	notifyOnload
-	 * @memberOf	iview.cutOut
+	 * @name		notifyOnload
+	 * @memberOf	iview.cutOut.Model
 	 * @description	as soon as the image is loaded all listeners who listen to Onload Events will be noticed that a new Image is loaded
+	 * @param		{instance} that
 	 */
-	function notifyOnload() {
-		if (my.thumbnail.complete && isBrowser(["IE","Opera"]) || my.thumbnail.naturalWidth > 2 && !isBrowser(["IE", "opera"])) {
-			if (!listener[cutOut.ONLOAD]) {
-				return;
-			}
-			for(var i = 0; i < listener[cutOut.ONLOAD].length; i++) {
-				listener[cutOut.ONLOAD][i](viewID);
-			}
+	function notifyOnload(that) {
+		if (that.my.thumbnail.complete && isBrowser(["IE","Opera"]) 
+			|| that.my.thumbnail.naturalWidth > 2 && !isBrowser(["IE", "opera"])) {
+			applyValues(that);
 		} else {
-			window.setTimeout(function() { notifyOnload();},100);
+			window.setTimeout(function() { notifyOnload(that);},100);
 		}
 	}
-
+	
 	/**
 	 * @public
 	 * @function
-	 * @name	dblClick
-	 * @memberOf	iview.cutOut
-	 * @description	when a Doubleclick is raised within the Thumbnail the CutOut is centered to that point and all listeners are noticed about this event
-	 * @param	{event} e holds the Event which raised it
+	 * @name		createView
+	 * @memberOf	iview.cutOut.View
+	 * @description	creates a new view based upon the values from the model and given parameters
+	 * @param		{object} args Arguments to modify the view
+	 * @param		{string} args.mainClass tells what the main Class for the scrollbar shall be
+	 * @param		{string} args.customClass allows it to modify the Scrollbar in parts to differ from others
 	 */
-	function dblClick(e) {
-		if (!e.layerX) {
-			var newX = e.offsetX;
-			var newY = e.offsetY;
-		} else {
-			var newX = e.layerX;
-			var newY = e.layerY;
-		}
-		for(var i = 0; i < listener[cutOut.DBL_CLICK].length; i++) {
-			listener[cutOut.DBL_CLICK][i]({'x':newX, 'y':newY}, viewID);
-		}
-		setPosition({'x':newX - getWidth("C")/2, 'y':newY - getHeight("C")/2}, e);
-	}
+	function createView(args) {
+		var that = this;
+		var complete = jQuery("<div>")
+			.addClass("thumb " + args.mainClass + " " + args.customClass)
+			.css("overflow","hidden")
+			.dblclick(function(e) { 
+				var newX = (e.layerX)? e.layerX : e.offsetX;
+				var newY = (e.layerY)? e.layerY : e.offsetY;
+				that.onevent.notify({"type":"move", "x" : {"new":scale(that, newX, true)}, "y" : {"new":scale(that, newY, false)}})
+			})
+			.mousewheel(function(e, delta) {
+				that.onevent.notify({"type":"scroll", "delta": delta});
+			})
+			.mouseup(function(e) { mouseUp(that, e)})
+			.mousemove(function(e) { mouseMove(that, e)})
+			.mousedown(function() { return false;});// deactivate Browser-Drag&Drop
+		
+		var cutOut = jQuery("<div>")
+			.addClass("ausschnitt " + args.mainClass + " " + args.customClass)
+			.mousedown(function(e) { mouseDown(that, e)})
+			.mouseup(function(e) {mouseUp(that, e)});
+		var thumb = new Image();
+		
+		complete.append(cutOut)
+			.append(thumb)
+			.appendTo(args.thumbParent);
+		
+		var toggler = jQuery("<div>")
+			.addClass("toggler hide")
+			.click(function() {damper(that);});
+		
+		var damp = jQuery("<div>")
+			.addClass("damp " + args.mainClass + " " + args.customClass)
+			.append(toggler)
+			.appendTo(args.dampParent);
 
+		this.my = {'self':complete, 'cutOut':cutOut, 'thumbnail':thumb, 'damp':damp};
+	}
+	
 	/**
-	 * @public
+	 * @private
 	 * @function
-	 * @name	mouseScroll
-	 * @memberOf	iview.cutOut
-	 * @description	on mouseScroll all Listeners are noticed about this Event
-	 * @param	{event} e event which was caused by the mousescroll
+	 * @name		setSrc
+	 * @memberOf	iview.cutOut.Model
+	 * @description	sets for the Image a new Image Source which is then loaded
+	 * @param		{instance} that
+	 * @param		{string} path represents the new URL of the Image
 	 */
-	function mouseScroll(e) {
-		var delta = returnDelta(e, true);
-		if (!listener[cutOut.SCROLL]) {
-			return;
-		}
-		for(var i = 0; i < listener[cutOut.SCROLL].length; i++) {
-			listener[cutOut.SCROLL][i](delta, viewID);
+	function setSrc(that, path) {
+		var thumb = jQuery(that.my.thumbnail);
+		thumb.remove();
+		thumb = new Image();
+		jQuery(thumb)
+			.appendTo(that.my.self)
+			.load(function() { notifyOnload(that);})
+			.css("verticalAlign", "bottom")
+			.attr("src", path);
+		that.my.thumbnail = thumb;
+	}
+	
+	/**
+	 * @private
+	 * @function
+	 * @name		adaptView
+	 * @memberOf	iview.cutOut.View
+	 * @description	takes the incoming change events and prepares them so that the view can be adapted correspondingly
+	 * @param		{object} args arguments of the property change event
+	 */
+	function adaptView(args) {
+		switch (args.type) {
+		case "move":
+			this._x = toFloat(args.value.x);
+			this._y = toFloat(args.value.y);
+			applyValues(this);
+			break;
+		case "ratio":
+			this._ratioX = toFloat(args.value.x);
+			this._ratioY = toFloat(args.value.y);
+			applyValues(this);
+			break;
+		case "size":
+			this._sizeX = toFloat(args.value.x);
+			this._sizeY = toFloat(args.value.y);
+			applyValues(this);
+			break;
+		case "path":
+			setSrc(this, args.value);
+			break;
+		default:
+			if (console && console.log) {
+				console.log ("got unknown type " + args.type);
+			}
 		}
 	}
+	
+	/**
+	 * @private
+	 * @function
+	 * @name		applyValues
+	 * @memberOf	iview.cutOut.View
+	 * @description	adapt View so that it represents the latest changes within properties
+	 * @param		{that} instance
+	 */
+	function applyValues(that) {
+		var cutOut = that.my.cutOut;
+		var thumbnail = jQuery(that.my.thumbnail);
+		
+		cutOut.css("width", thumbnail.width() * that._ratioX + "px");
+		cutOut.css("height", thumbnail.height() * that._ratioY + "px");
+		
+		if (cutOut.outerWidth() > thumbnail.width()) {
+			cutOut.css("width", thumbnail.width() - (cutOut.outerWidth() - cutOut.width()) + "px")
+		}
+		if (cutOut.outerHeight() > thumbnail.height()) {
+			cutOut.css("height", thumbnail.height() - (cutOut.outerHeight() - cutOut.height()) + "px")
+		}
+
+		if (that._x < 0) {
+			that._x = 0;
+		}
+		if (cutOut.outerWidth() + that._x > thumbnail.width()) {
+			that._x = thumbnail.width() - cutOut.outerWidth();
+		}
+		
+		if (that._y < 0) {
+			that._y = 0;
+		}
+		if (cutOut.outerHeight() + that._y > thumbnail.height()) {
+			that._y = thumbnail.height() - cutOut.outerHeight();
+		}
+		cutOut.css({"left":that._x + "px", "top": that._y + "px"});
+	}
+	
 
 	/**
-	 * @public
+	 * @private
 	 * @function
-	 * @name	mouseMove
-	 * @memberOf	iview.cutOut
+	 * @name		mouseMove
+	 * @memberOf	iview.cutOut.Model
 	 * @description	captures mouse movement and resets the Mouse CutOut Position when the Mouse is pressed
-	 * @param	{event} e Event which occured
+	 * @param		{event} e Event which occured
 	 */
-	function mouseMove(e) {
-		if (mouseIsDown) {
-			if(isBrowser(["IE"])){//IE
-				var positionX = curx + (e.clientX - ausschnittPosX);
-				var positionY = cury + (e.clientY - ausschnittPosY);
+	function mouseMove(that, e) {
+		if (that._mouseIsDown) {
+			if (isBrowser(["IE"])){//IE
+				that._x = that._curX + (e.clientX - that._mouseX);
+				that._y = that._curY + (e.clientY - that._mouseY);
 			} else {//Mozilla
-				var positionX = curx + (e.pageX - ausschnittPosX);
-				var positionY = cury + (e.pageY - ausschnittPosY);
-			}			
-			setPosition({'x':positionX, 'y':positionY}, e);
+				that._x = that._curX + (e.pageX - that._mouseX);
+				that._y = that._curY + (e.pageY - that._mouseY);
+			}
+			that.my.cutOut.css({"left": "0", "top":0})
+			applyValues(that);
 		}
 	}
 
 	/**
-	 * @public
+	 * @private
 	 * @function
-	 * @name	mouseDown
-	 * @memberOf	iview.cutOut
+	 * @name		mouseDown
+	 * @memberOf	iview.cutOut.Model
 	 * @description	stores the Position where the mouse was pressed so that on Mousemovement this constellation is kept, mouseIsDown is set to true	so that the other functions know the current mousestate
-	 * @param	{event} e Event which occured
-	 * @return	{boolean} false to prevent Browser Default Drag&Drop behave
+	 * @param		{event} e Event which occured
+	 * @return		{boolean} false to prevent Browser Default Drag&Drop behave
 	 */
-	function mouseDown(e) {
+	function mouseDown(that, e) {
 		if (e.button < 2) {//nur bei linker und mittlerer Maustaste auf True setzen
-			mouseIsDown = true;
+			that._mouseIsDown = true;
 			if(isBrowser(["IE"])){//IE
-				ausschnittPosX = e.clientX;
-				ausschnittPosY = e.clientY;
+				that._mouseX = e.clientX;
+				that._mouseY = e.clientY;
 			} else {//Mozilla
-				ausschnittPosX = e.pageX;
-				ausschnittPosY = e.pageY;
+				that._mouseX = e.pageX;
+				that._mouseY = e.pageY;
 			}
 			//Bestimmen der aktuellen oberen Ecke, und Bewegungsvektor
-			curx = parseInt(my.cutOut.style.left);
-			cury = parseInt(my.cutOut.style.top);
+			that._curX = parseInt(that.my.cutOut.css("left"));
+			that._curY = parseInt(that.my.cutOut.css("top"));
 		}
 		return false;
 	}
 
 	/**
-	 * @public
+	 * @private
 	 * @function
-	 * @name	mouseUp
-	 * @memberOf	iview.cutOut
+	 * @name		mouseUp
+	 * @memberOf	iview.cutOut.View
 	 * @description	releases the current Mousestate(mouseIsDown = false) so that no further movement of CutOut happen, although all MouseUp Listeners will be noticed about it
-	 * @param	{event} e Event which occured
+	 * @param		{event} e Event which occured
 	 */
-	function mouseUp(e) {
-		if (mouseIsDown && e.button < 2) {
+	function mouseUp(that, e) {
+		if (that._mouseIsDown && e.button < 2) {
 			if(isBrowser(["IE"])){//IE
-				var positionX = curx + (e.clientX - ausschnittPosX);
-				var positionY = cury + (e.clientY - ausschnittPosY);
+				var positionX = that._curX + (e.clientX - that._mouseX);
+				var positionY = that._curY + (e.clientY - that._mouseY);
 			} else {//Mozilla
-				var positionX = curx + (e.pageX - ausschnittPosX);
-				var positionY = cury + (e.pageY - ausschnittPosY);
+				var positionX = that._curX + (e.pageX - that._mouseX);
+				var positionY = that._curY + (e.pageY - that._mouseY);
 			}
 
 			setPosBlock = true;
 			
-			if (positionX != curx || positionY != cury) {
-				for(var i = 0; i < listener[cutOut.MOUSE_UP].length; i++) {
-					listener[cutOut.MOUSE_UP][i]({'x':positionX, 'y':positionY}, viewID);
-				}
+			if (positionX != that._curX || positionY != that._curY) {
+				that.onevent.notify({'type':'move', x: {"new": scale(that, positionX + that.my.cutOut.width()/2, true), "old": scale(that, that._curX, true)}, y: {"new": scale(that, positionY + that.my.cutOut.height()/2, false), "old": scale(that, that._curY, false)}});
 			}
-			mouseIsDown = false;
+			that._mouseIsDown = false;
 		}
-	}
-
-	/**
-	 * @public
-	 * @function
-	 * @name	damper
-	 * @memberOf	iview.cutOut
-	 * @description	on A mouseClick Event the Thumbnail will be toggled in display state
-	 * @param	{event} e event which occured
-	 */
-	function damper(e) {
-		if (dampered) {
-			jQuery(my.self).fadeOut();
-			my.damp.getElementsByTagName("div")[0].style.display = "none";
-			my.damp.getElementsByTagName("div")[1].style.display = "block"; 
-			my.damp.title = "Ausklappen";
-		} else {
-			jQuery(my.self).fadeIn();
-			my.damp.getElementsByTagName("div")[0].style.display = "block";
-			my.damp.getElementsByTagName("div")[1].style.display = "none"; 
-			my.damp.title = "Einklappen";
-
-		}
-		dampered = !dampered;
-	}
-
-	/**
-	 * @public
-	 * @function
-	 * @name	addListener
-	 * @memberOf	iview.cutOut
-	 * @description	Adds a Listener for the given Event,so the Listener will be noticed if any changes will happen for this Event
-	 * @param	{integer} type constant which defines to which type of listener it shall be added
-	 * @param	{function} theListener Object which holds a special function which is called if a Event happens
-	 */
-	function addListener(type, theListener) {
-		if (!listener[type]) {
-			listener[type] = [];
-		}
-		listener[type].push(theListener);
-	}
-
-	/**
-	 * @public
-	 * @function
-	 * @name	dropListener
-	 * @memberOf	iview.cutOut
-	 * @description	Dropps a Listener for the given Event
-	 * @param	{integer} type constant which defines to which type of listener it shall be dropped
-	 * @param	{function} theListener Object which holds a special function which is called if a Event happens
-	 */
-	function dropListener(type, theListener) {
-		for (var i = 0; i < listener[type].length; i++) {
-			if (listener[type][i] == theListener) {
-				listener[type].splice(i,1);
-			}
-		}
-	}
-
-	/**
-	 * @public
-	 * @function
-	 * @name	updateSize
-	 * @memberOf	iview.cutOut
-	 * @description	updates the size of the cutout
-	 * @param	{float} ratioX the conversion factorto change the width
-	 * @param	{float} ratioY the conversion factorto change the height
-	 */
-	function updateSize(ratioX, ratioY) {
-	
-		//convert size to the thumbnail
-		curBreite = getWidth("T") * ratioX;
-		curHoehe = getHeight("T") * ratioY;
-		
-		//prevent that the cutout will be bigger as the thumbnail
-		if (curBreite > getWidth("T")) {
-			setWidth(getWidth("T"));
-		} else {
-			setWidth(curBreite);
-		}
-		if (curHoehe > getHeight("T")) {
-			setHeight(getHeight("T"));
-		} else {
-			setHeight(curHoehe);
-		}
-	}
-
-	//TODO Doku ergänzen
-	/**
-	 * @public
-	 * @function
-	 * @name	updatePos
-	 * @memberOf	iview.cutOut
-	 * @description	updates the position of the cutout
-	 * @param	{} newLeft 
-	 * @param	{} newTop
-	 */
-	function updatePos(newLeft, newTop) {
-		//determine the new left upper edgeposition
-		if ((newLeft + getWidth("C")) > getWidth("T")) {
-			newLeft = getWidth("T") - getWidth("C");
-		} else if (newLeft < 0) {
-			newLeft = 0;
-		}
-		if ((newTop + getHeight("C")) > getHeight("T")) {
-			newTop = getHeight("T") - getHeight("C");
-		} else if (newTop < 0) {
-			newTop = 0;
-		}
-		
-		setPosition({'x': newLeft, 'y':newTop});
 	}
 	
-}
+	/**
+	 * @private
+	 * @function
+	 * @name		scale
+	 * @memberOf	iview.cutOut.View
+	 * @description	calculates how much a pixel within the thumbnail represents pixels in the original picture
+	 * @param		{instance} that
+	 * @param		{float} value to transform to outside pixel count
+	 * @param		{boolean} x value is a width (true) or height (false) valuetype
+	 */
+	function scale(that, value, x) {
+		if (x) {
+			return value / (jQuery(that.my.thumbnail).width() / that._sizeX);
+		} else {
+			return value / (jQuery(that.my.thumbnail).height() / that._sizeY);
+		}
+	}
+	
+	/**
+	 * @private
+	 * @function
+	 * @name		damper
+	 * @memberOf	iview.cutOut.View
+	 * @description	on a mouseclick event the Thumbnail will be toggled in display state
+	 * @param		{instance} that as the function is just an "Class" one and not connected to an instance we need to handle
+	 *  over the instance from which is called to work properly
+	 */
+	function damper(that) {
+		if (that._visible) {
+			that.my.self.fadeOut();
+			that.my.damp.find(".toggler").removeClass("hide").addClass("show").attr("title", "Ausklappen");
+		} else {
+			that.my.self.fadeIn();
+			that.my.damp.find(".toggler").removeClass("show").addClass("hide").attr("title", "Einklappen");
+		}
+		that._visible = !that._visible;
+	}
+	
+	iview.cutOut.View.prototype.createView = createView;
+	iview.cutOut.View.prototype.adaptView = adaptView;
+})();
+
+/**
+ * @class
+ * @constructor
+ * @memberOf	iview.cutOut
+ * @name 		Model
+ * @description Model for CutOut, Model is just a fake model and doesn't contain any Data itself. It's only a pipeline.
+ */
+iview.cutOut.Model = function() {
+	this.onevent = new iview.Event(this);
+};
+
+(function() {
+	
+	/**
+	 * @public
+	 * @function
+	 * @name		setRatio
+	 * @memberOf	iview.cutOut.Model
+	 * @description	set ratio of cutOut to thumbnail
+	 * @param		{object} ratio x and y ratio of cutOut to thumbnail
+	 * @param		{float} ratio.x width ratio of cutOut to thumbnail
+	 * @param		{float} ratio.y height ratio of cutOut to thumbnail
+	 */
+	function setRatio(ratio) {
+		ratio.x = toFloat(ratio.x);
+		ratio.y = toFloat(ratio.y);
+		this.onevent.notify({'type': 'ratio',"value": {"x" :ratio.x,"y" : ratio.y}});
+	}
+	
+	/**
+	 * @public
+	 * @function
+	 * @name		setPos
+	 * @memberOf	iview.cutOut.Model
+	 * @description	set the current position of the cutOut within the thumbnail
+	 * @param		{object} pos new x and y coords of the left upper corner of the cutOut
+	 * @param		{float} pos.x new x coord of the upper left corner
+	 * @param		{float} pos.y new y coord of the upper left corner
+	 */
+	function setPos(pos) {
+		pos.x = toInt(pos.x);
+		pos.y = toInt(pos.y);
+		this.onevent.notify({'type': 'move', "value": {"x":pos.x,"y":pos.y}});
+	}
+	
+	/**
+	 * @public
+	 * @function
+	 * @name		setSrc
+	 * @memberOf	iview.cutOut.Model
+	 * @description	set the current Path of the thumbnail picture and notifies all listeners about it
+	 * @param		{path} path to new thumbnail picture
+	 */
+	function setSrc(path) {
+		this.onevent.notify({'type':'path', 'new': path});
+	}
+	
+	/**
+	 * @public
+	 * @function
+	 * @name		setSize
+	 * @memberOf	iview.cutOut.Model
+	 * @description	sets the size of the original picture to the model and notifies all listeners about a change
+	 * @param		{object} size of the original picture
+	 * @param		{float} size.x width of the original picture
+	 * @param		{float} size.y height of the original picture
+	 */
+	function setSize(size) {
+		this.onevent.notify({'type': 'size', "value": {"x":size.x, "y":size.y}});
+	}
+	
+	iview.cutOut.Model.prototype.setPos = setPos;
+	iview.cutOut.Model.prototype.setRatio = setRatio;
+	iview.cutOut.Model.prototype.setSrc = setSrc;
+	iview.cutOut.Model.prototype.setSize = setSize;
+})();
+
+/**
+ * @class
+ * @constructor
+ * @memberOf	iview.cutOut
+ * @name 		Controller
+ * @description Controller for CutOut
+ */
+iview.cutOut.Controller = function(modelProvider, view) {
+	this._model = modelProvider.createModel();
+	this._view = new (view || iview.cutOut.View)();
+	var that = this;
+	
+	this._model.onevent.attach(function(sender, args) {
+		 that._view.adaptView({'type':args.type,'value':args["new"] || args.value});
+	});
+};
+
+(function() {
+	
+	/**
+	 * @public
+	 * @function
+	 * @name		createView
+	 * @memberOf	iview.cutOut.Controller
+	 * @description	this function is called to create and show (depending on the View) the controller connected Model to the user
+	 * @param 		{object} args params to build view
+	 * @param		{String,DOM-Object,anything jQuery supports} args.thumbParent parent Element of the thumbnail
+	 * @param		{String,DOM-Object,anything jQuery supports} args.dampParent parent Element of the toggler button for the thumbnail
+ 	 * @param		{string} [args.mainClass]
+	 * @param		{string} [args.customClass]
+	 * @param		{string} [id] of the thumbnail, not required at all 
+	 */
+	function createView(args, id) {
+		this._view.createView({'thumbParent': args.thumbParent, 'dampParent': args.dampParent, 'mainClass': (args.mainClass || ""), 'customClass': (args.customClass || "")}, id)
+	}
+	
+	/**
+	 * @public
+	 * @function
+	 * @name		attach
+	 * @memberOf	iview.cutOut.Controller
+	 * @description	adds the given listener to the view so the listener will be notified about changes within the view
+	 * @param		{function} listener to add to the view
+	 */
+	function attach(listener) {
+		this._view.onevent.attach(listener);
+	}
+	
+	/**
+	 * @public
+	 * @function
+	 * @name		detach
+	 * @memberOf	iview.cutOut.Controller
+	 * @description	removes the given listener from the view so the listener will no longer receive
+	 *  notifications about changes within the view
+	 * @param		{function} listener to add to the view
+	 */
+	function detach(listener) {
+		this._view.onevent.detach(listener);
+	}
+	
+	iview.cutOut.Controller.prototype.createView = createView;
+	iview.cutOut.Controller.prototype.attach = attach;
+	iview.cutOut.Controller.prototype.detach = detach;
+})();
+
+/**
+ * @class
+ * @constructor
+ * @memberOf	iview.cutOut
+ * @name 		ModelProvider
+ * @description ModelProvider for cutOut standard Model
+ */
+iview.cutOut.ModelProvider = function() {
+	this._model = null;
+};
+
+(function() {
+	/**
+	 * @public
+	 * @function
+	 * @memberOf	iview.cutOut.ModelProvider
+	 * @name 		createModel
+	 * @description creates a new Model if none exists or returns the existing one
+	 */
+	function createModel() {
+		if (this._model == null) {
+			this._model = new iview.cutOut.Model(); 
+		}
+		return this._model;
+	}
+	
+	iview.cutOut.ModelProvider.prototype.createModel = createModel; 
+})();

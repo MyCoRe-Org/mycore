@@ -384,8 +384,12 @@ function reinitializeGraphic(viewID) {
 	handleResizeScrollbars(viewID);
 	
 	if (Iview[viewID].useCutOut) {
-		Iview[viewID].ausschnitt.updateSize((viewerBean.width / ((Iview[viewID].bildBreite / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale)), (viewerBean.height / ((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale)));
-		Iview[viewID].ausschnitt.updatePos((- (viewerBean.x / Math.pow(2, viewerBean.zoomLevel))*Iview[viewID].zoomScale), (- (viewerBean.y / Math.pow(2, viewerBean.zoomLevel))*Iview[viewID].zoomScale));
+		Iview[viewID].cutOutModel.setRatio({
+			'x': viewerBean.width / ((Iview[viewID].bildBreite / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale),
+			'y': viewerBean.height / ((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale)});
+		Iview[viewID].cutOutModel.setPos({
+			'x': - (viewerBean.x / Math.pow(2, viewerBean.zoomLevel))*Iview[viewID].zoomScale,
+			'y': - (viewerBean.y / Math.pow(2, viewerBean.zoomLevel))*Iview[viewID].zoomScale});
 	}
 	
 	// Actualize forward & backward Buttons
@@ -491,9 +495,6 @@ function maximizeHandler(viewID) {
 
 		// Viewer hinzufuegen
 		document.body.appendChild(Iview[viewID].VIEWER);
-		
-		//if (classIsUsed("BSE_fullView")) doForEachInClass("BSE_fullView", ".style.display = 'none';", viewID);
-		//if (classIsUsed("BSE_normalView")) doForEachInClass("BSE_normalView", ".style.display = 'block';", viewID);
 		
 		// wegen IE7 zusätzlich
 		document.documentElement.style.overflow="hidden";

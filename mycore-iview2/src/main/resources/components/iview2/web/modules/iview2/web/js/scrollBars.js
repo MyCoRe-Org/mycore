@@ -1,4 +1,5 @@
 //TODO einbauen das Scrollbar minimale Größe hat, damit man sie noch benutzen kann
+//TODO Scrollbar broken in IE see http://jsfiddle.net/ueeys/1/
 /**
  * @namespace
  * @name		iview
@@ -682,21 +683,21 @@ iview.scrollbar.View = function() {
 		var my = that.my;
 		var size = that._size;
 		if (that._direction) {
-			my.self.css("width", size + "px");
-			my.space.css("width", Math.abs(size - toInt(my.bUL.css("width")) - toInt(my.bDR.css("width"))) + "px");
-			my.space.children("[class='space']").css("width", Math.abs(toInt(my.space.css("width")) - toInt(my.space.children('[class="start"]').css("width")) - toInt(my.space.children("[class='end']").css("width"))) + "px");
-			if (toInt(my.bar.css("width")) > toInt(my.space.css("width")) || that._maxVal === 0) {
-				my.bar.css("width", my.space.css("width"));
+			my.self.width(size + "px");
+			my.space.width(my.self.width() - my.bUL.width() - my.bDR.width() + "px");
+			my.space.children("[class='space']").width(my.space.width() - my.space.children('[class="start"]').width() - my.space.children("[class='end']").width() + "px");
+			if (my.bar.width() > my.space.width() || that._maxVal === 0) {
+				my.bar.width(my.space.width() + "px");
 			}
-			my.bar.children("[class='scroll']").css("width", Math.abs(toInt(my.bar.css("width")) - toInt(my.bar.children("[class='start']").css("width")) - toInt(my.bar.children("[class='end']").css("width"))) + "px");
+			my.bar.children("[class='scroll']").width(my.bar.width() - my.bar.children("[class='start']").width() - my.bar.children("[class='end']").width() + "px");
 		} else {
-			my.self.css("height", size + "px");
-			my.space.css("height", Math.abs(size - toInt(my.bUL.css("height")) - toInt(my.bDR.css("height"))) + "px");
-			my.space.children("[class='space']").css("height", Math.abs(toInt(my.space.css("height")) - toInt(my.space.children('[class="start"]').css("height")) - toInt(my.space.children("[class='end']").css("height"))) + "px");
-			if (toInt(my.bar.css("height")) > toInt(my.space.css("height")) || that._maxVal === 0) {
-				my.bar.css("height", my.space.css("height"));
+			my.self.height(size + "px");
+			my.space.height(size - my.bUL.height() - my.bDR.height() + "px");
+			my.space.children("[class='space']").height(my.space.height() - my.space.children('[class="start"]').height() - my.space.children("[class='end']").height() + "px");
+			if (my.bar.height() > my.space.height() || that._maxVal === 0) {
+				my.bar.height(my.space.height() + "px");
 			}
-			my.bar.children("[class='scroll']").css("height", Math.abs(toInt(my.bar.css("height")) - toInt(my.bar.children("[class='start']").css("height")) - toInt(my.bar.children("[class='end']").css("height"))) + "px");
+			my.bar.children("[class='scroll']").height(my.bar.height() - my.bar.children("[class='start']").height() - my.bar.children("[class='end']").height() + "px");
 		}
 	}
 	
@@ -723,7 +724,7 @@ iview.scrollbar.View = function() {
 		var customClass = args.customClass || "";
 		
 		var complete = jQuery("<div>")
-			.addClass(mainClass +((this._direction)? "H":"V"));
+			.addClass(mainClass +((this._direction)? "H":"V"))
 		
 		//Add additional Class to override the overall scrollbar setting
 		if (customClass != "") {
@@ -788,7 +789,7 @@ iview.scrollbar.View = function() {
 			.appendTo(complete);
 		jQuery(document)
 			.mouseup(function() { buttonMouseUp(that);})
-			.mousemove(function(e) { divMouseMove(that, e); return;});
+			.mousemove(function(e) { divMouseMove(that, e);});
 			
 		if (this._direction) {
 			wholeSpace.css("cssFloat", "left");
@@ -839,7 +840,6 @@ iview.scrollbar.View = function() {
 	 */
 	function adaptView(args) {
 		var my = this.my;
-		var direction = (this._direction)? "width":"height";
 		switch (args.type) {
 			case "curVal":
 				this._curVal = args.value;
@@ -868,12 +868,18 @@ iview.scrollbar.View = function() {
 				}
 		}
 		//calculate the bar size
-		my.bar.css(direction ,this._proportion*toFloat(my.space.css(direction)) + "px");
 		//calculate the pixelPerUnit rate to set the positioning of the bar correctly
-		this._pixelPerUnit = Math.abs((toInt(my.space.css(direction))-toInt(my.bar.css(direction)))/this._maxVal);
+		if (this._direction) {
+			my.bar.width(this._proportion*my.space.width());
+			this._pixelPerUnit = Math.abs(my.space.width()-my.bar.width())/this._maxVal;
+		} else {
+			my.bar.height(this._proportion*my.space.height());
+			this._pixelPerUnit = Math.abs(my.space.height()-my.bar.height())/this._maxVal;
+		}
+
 		//IE throws as usual Errors if some value isn't in the expected range, so a 0 within maxVal gets him mad
 		if (this._maxVal != 0) {
-			my.bar.css((direction == "width")? "left":"top",this._curVal*this._pixelPerUnit + "px");
+			my.bar.css((this._direction)? "left":"top",this._curVal*this._pixelPerUnit + "px");
 		}
 		applySize(this);
 	}
@@ -913,7 +919,7 @@ iview.scrollbar.View = function() {
 		}
 		//calculate the movement which has to take place and if the scrollbar is already under the mouse stop the interval		
 		var curVal = (that._direction)? toInt(that.my.bar.css("left")): toInt(that.my.bar.css("top"));
-		var barLength = (that._direction)? toInt(that.my.bar.css("width")): toInt(that.my.bar.css("height"));
+		var barLength = (that._direction)? that.my.bar.width(): that.my.bar.height();
 		if ((that._before && (that._moveTo >= curVal)) || (!that._before && (that._moveTo <= curVal + barLength))) {
 			dropInterval(that)
 			that._mouseDown = false;

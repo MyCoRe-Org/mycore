@@ -554,7 +554,7 @@ iview.METS.PhysicalModelProvider = function(doc) {
 	}
 	}
 	/**
-	 * @private
+	 * @public
 	 * @function
 	 * @memberOf	iview.METS.PhysicalModelProvider
 	 * @name 		createModel

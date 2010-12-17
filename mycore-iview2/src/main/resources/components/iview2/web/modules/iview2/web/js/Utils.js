@@ -124,47 +124,6 @@ var getElementsByClassName = function (searchClass, node, tag){
 /**
  * @public
  * @function
- * @name		classIsUsed
- * @memberOf	iview.Utils
- * @description	proofs if the supplied ClassName has currently any object connected with it. If so it returns true, else false
- * @param		{string} className the ClassName which shall be checked if it's in use
- * @return		{boolean} which tells if the ClassName has currenly any Object linked to it or not
- */
-function classIsUsed(className) {
-	if (getElementsByClassName(className).length != 0) {
-		return true;
-	} else {
-		return false;
-	}
-}
-
-/**
- * @public
- * @function
- * @name		doForEachInClass
- * @memberOf	iview.Utils
- * @description	get Each Element of the supplied ClassName and performs the given Action on it
- * @param	{string} className holds the ClassName to work with
- * @param	{string} perform the action which will be applied to each Element of the Class
- * @param	{string} arguments[2] supplies the viewID so that only Elements in this group are touched
- */
-function doForEachInClass(className, perform) {
-	var viewID = "";
-	if (typeof(arguments[2]) != "undefined") {
-		viewID = arguments[2];
-	}
-	var elements = getElementsByClassName(className);
-	for (var i = 0; i < elements.length; i++) {
-		
-		if (elements[i].className.lastIndexOf(viewID) != -1) {
-			eval( "elements[i]" + perform);		
-		}
-	}
-}
-
-/**
- * @public
- * @function
  * @name	toInt
  * @memberOf	iview.Utils
  * @description	converts a given String into an integer, but further doesn't give NAN for String was undefined and other cases
@@ -266,6 +225,7 @@ function isBrowser(browsers) {
 /**
  * @public
  * @function
+ * @deprecated	use jQuery Mousewheel Plugin instead
  * @name		returnDelta
  * @memberOf	iview.Utils
  * @description	calculates normalized the mousedelta of a supplied event and prevents if requested the default behavior
@@ -302,23 +262,6 @@ function returnDelta(e, prevent) {
 /**
  * @public
  * @function
- * @name		getStyle
- * @memberOf	iview.Utils
- * @description	realize to read out values from the CSS
- * @param		{object} el 
- * @param		{string} styleProp 
- * @return	the value for the inquired stylepropertiy
- */
-function getStyle(el,styleProp)
-{
-	if (typeof(el)!="object")
-		el = document.getElementById(el);
-	return jQuery(el).css(styleProp);
-}
-
-/**
- * @public
- * @function
  * @name	colorToRGBArray
  * @memberOf	iview.Utils
  * @description	converts a string which holds a Color somehow encoded and converts it to an RGB Array
@@ -342,31 +285,6 @@ function colorToRGBArray(color) {
 	return new Array (red, green, blue);
 }
 
-/**
- * @public
- * @function
- * @name		findInArrayElement
- * @memberOf	iview.Utils
- * @description	loops through the given Array and searches for the Element with the given Name and Value and returns it, if more Elements match the criteria only the first found is returned, if none is found Null is returned. The Function works with Arrays of Objects and with HTML-Nodes
- * @param		{array} values the Array where the Item is located in
- * @param		{string} name the name of the property which is used for search
- * @param		{string} value the value of the property to match the element
- * @return		the Element which matched the criteria first, or null if none was found
- */
-function findInArrayElement(values, name, value) {
-	for (var i = 0; i < values.length; i++) {
-		if (values[i].attributes) {
-			if (values[i].attributes.getNamedItem(name).value == value) {
-				return values[i];
-			}
-		} else {
-			if (values[i][name] == value) {
-				return values[i];
-			}
-		}
-	}
-	return null;
-}
 
 /**
  * @public

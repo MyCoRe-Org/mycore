@@ -209,7 +209,7 @@ function processImageProperties(imageProperties, viewID){
 	preload.style.height = "100%";
 	//$("preload"+viewID).style.visibility = "visible";
 	if (Iview[viewID].useCutOut) {
-		Iview[viewID].ausschnitt.setSRC(viewerBean.tileUrlProvider.assembleUrl(0,0,0));
+		Iview[viewID].cutOutModel.setSrc(viewerBean.tileUrlProvider.assembleUrl(0,0,0));
 	}
 	updateModuls(viewID);
 	
@@ -365,9 +365,6 @@ function switchDisplayMode(screenZoom, stateBool, viewID) {
 			}
 		}
 		viewerBean.init();
-		// zoomIn-Button einblenden, da min ein "groesseres" ZoomLevel existiert, von dem aus runterskaliert wurde
-		if (classIsUsed("BSE_zoomIn")) doForEachInClass("BSE_zoomIn", ".style.display = 'block';", viewID);
-		
 	} else {
 		Iview[viewID].zoomScale = 1;
 		viewerBean.tileSize = /*Iview[viewID].*/tilesize;
@@ -382,8 +379,7 @@ function switchDisplayMode(screenZoom, stateBool, viewID) {
 
 	Iview[viewID].barX.setCurValue(-parseInt(preload.offsetLeft));
 	Iview[viewID].barY.setCurValue(-parseInt(preload.offsetTop));
-	//TODO zu machen?
-	if (Iview[viewID].useCutOut) Iview[viewID].ausschnitt.setPosition({'x':preload.offsetLeft, 'y':preload.offsetTop});
+	if (Iview[viewID].useCutOut) Iview[viewID].cutOutModel.setPos({'x':preload.offsetLeft, 'y':preload.offsetTop});
 	return stateBool;
 }
 
@@ -528,27 +524,19 @@ function listenerZoom(viewID) {
 		handleZoomScrollbars(viewID);
 
 		if (Iview[viewID].useCutOut) {
-			Iview[viewID].ausschnitt.updateSize((viewerBean.width / ((Iview[viewID].bildBreite / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale)), (viewerBean.height / ((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale)));
-			Iview[viewID].ausschnitt.updatePos((- (viewerBean.x / Math.pow(2, viewerBean.zoomLevel))*Iview[viewID].zoomScale), (- (viewerBean.y / Math.pow(2, viewerBean.zoomLevel))*Iview[viewID].zoomScale));
+			Iview[viewID].cutOutModel.setSize({
+				'x': jQuery(perLoadEl).width(),
+				'y': jQuery(perLoadEl).height()});
+			Iview[viewID].cutOutModel.setRatio({
+				'x': viewerBean.width / ((Iview[viewID].bildBreite / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale),
+				'y': viewerBean.height / ((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale)});
+			Iview[viewID].cutOutModel.setPos({
+				'x': - (viewerBean.x / Math.pow(2, viewerBean.zoomLevel))*Iview[viewID].zoomScale,
+				'y': - (viewerBean.y / Math.pow(2, viewerBean.zoomLevel))*Iview[viewID].zoomScale});
 		}
 		
 		// Buttons pürfen
 		Iview[viewID].getToolbarCtrl().checkZoom(viewerBean.zoomLevel);
-		
-		/*
-		// zoomOut prüfen
-		if (viewerBean.zoomLevel == 0) {
-			if (classIsUsed("BSE_zoomOut")) doForEachInClass("BSE_zoomOut", ".style.display = 'none';", viewID);
-		} else {
-			if (classIsUsed("BSE_zoomOut")) doForEachInClass("BSE_zoomOut", ".style.display = 'block';", viewID);
-		}
-		// zoomIn prüfen
-		if (viewerBean.zoomLevel == Iview[viewID].zoomMax) {
-			if (classIsUsed("BSE_zoomIn")) doForEachInClass("BSE_zoomIn", ".style.display = 'none';", viewID);
-		} else {
-			if (classIsUsed("BSE_zoomIn")) doForEachInClass("BSE_zoomIn", ".style.display = 'block';", viewID);
-		}
-		*/
 	}
 }
 
@@ -569,7 +557,7 @@ function listenerMove(viewID) {
 		var newY = - (event.y / Math.pow(2, Iview[viewID].viewerBean.zoomLevel))/Iview[viewID].zoomScale;
 
 		if (Iview[viewID].useCutOut) {
-			Iview[viewID].ausschnitt.setPosition({'x':newX, 'y':newY});
+			Iview[viewID].cutOutModel.setPos({'x':newX, 'y':newY});
 		}
 		// set Roller that no circles are created, and we end in an endless loop
 		Iview[viewID].roller = true;
@@ -735,36 +723,22 @@ function importZoomBar(viewID) {
  * @param	{string} viewID ID of the derivate
  */
 function importCutOut(viewID) {
-	var viewerBean = Iview[viewID].viewerBean;
-	// CutOut
-	Iview[viewID].ausschnitt = new cutOut(Iview[viewID]);
-	var ausschnitt = Iview[viewID].ausschnitt;
-	ausschnitt.setViewID(viewID);
-	ausschnitt.init("thumb"+viewID, "ausschnitt"+viewID, "thumbnail"+viewID, Iview[viewID].ausschnittParent, "damp"+viewID, Iview[viewID].ausschnittParent/*"viewer"+viewID*/, "Normal");
-	// Additional Listener
-	// also in zoom-Listener, but to early without onload
-	ausschnitt.addListener(cutOut.ONLOAD, function(viewID) {
-			var viewerBean = Iview[viewID].viewerBean;
-			ausschnitt.updateSize((viewerBean.width / ((Iview[viewID].bildBreite / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale)), (viewerBean.height / ((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale)));
-			ausschnitt.updatePos((- (viewerBean.x / Math.pow(2, viewerBean.zoomLevel))*Iview[viewID].zoomScale), (- (viewerBean.y / Math.pow(2, viewerBean.zoomLevel))*Iview[viewID].zoomScale));
-	});
-	ausschnitt.addListener(cutOut.DBL_CLICK, function(vector, viewID) {
+	Iview[viewID].cutOutMP = new iview.cutOut.ModelProvider();
+	Iview[viewID].cutOutModel = Iview[viewID].cutOutMP.createModel();
+	Iview[viewID].ausschnitt = new iview.cutOut.Controller(Iview[viewID].cutOutMP);
+	Iview[viewID].ausschnitt.createView({'thumbParent': Iview[viewID].ausschnittParent, 'dampParent': Iview[viewID].ausschnittParent});
+	Iview[viewID].ausschnitt.attach(function(sender, args) {
+		if (args.type == "move") {
 			Iview[viewID].viewerBean.recenter(
-			{'x' : ((vector.x)*Math.pow(2, Iview[viewID].viewerBean.zoomLevel))*Iview[viewID].zoomScale ,
-			 'y' : ((vector.y)*Math.pow(2, Iview[viewID].viewerBean.zoomLevel))*Iview[viewID].zoomScale
-		}, true);});
-	// calculate the position on the image and center new, according to the middle of the cutout and the zoomlevel
-	ausschnitt.addListener(cutOut.MOUSE_UP, function(vector, viewID) {
-				Iview[viewID].viewerBean.recenter(
-				{'x' : (Iview[viewID].ausschnitt.getWidth()/2 + Iview[viewID].ausschnitt.getPosition().x)*Math.pow(2, Iview[viewID].viewerBean.zoomLevel)*Iview[viewID].zoomScale,
-				 'y' : (Iview[viewID].ausschnitt.getHeight()/2 + Iview[viewID].ausschnitt.getPosition().y)*Math.pow(2, Iview[viewID].viewerBean.zoomLevel)*Iview[viewID].zoomScale
-				}, true);
-				});
-	// Additional Events
-	ManageEvents.addEventListener(document, 'mouseup', ausschnitt.mouseUp, false);
-	ManageEvents.addEventListener(document, 'mousemove', ausschnitt.mouseMove, false);
-	// wird in Klasse für cutOut bzw. in loading für viewer gemacht
-	// ManageEvents.addEventListener($("viewer"+viewID), 'mouseScroll', ausschnitt.scroll, false);
+					{'x' : args.x["new"]*Iview[viewID].zoomScale,
+					 'y' : args.y["new"]*Iview[viewID].zoomScale
+					}, true);
+		}
+	});
+	var preload = document.getElementById("preload"+viewID);
+	Iview[viewID].cutOutModel.setSize({
+		'x': jQuery(preload).width(),
+		'y': jQuery(preload).height()});
 }
 
 /**

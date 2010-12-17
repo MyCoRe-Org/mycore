@@ -72,10 +72,7 @@
 	height:15px;
 }
 /* Scroll Area */
-.scrollH .empty { /* Main Container */
-	position:relative;
-	height:15px;
-}
+
 .scrollH .emptyStart {
 }
 .scrollH .empty {
@@ -179,10 +176,6 @@
 }
 
 /* Scroll Area */
-.scrollV .empty { /* Main Container */
-	position:relative;
-	width:15px;
-}
 .scrollV .emptyStart {
 }
 .scrollV .empty {
@@ -447,7 +440,7 @@
 
 /* Preview (current shown Image) */
 /* control Button */
-.dampNormal {
+.damp {
 	position:absolute;
 	bottom: 0px;
 	right: 0px;
@@ -458,7 +451,7 @@
 	background-position: -1260px -0px;
 	z-index: 50;
 }
-.dampNormal .hide {
+.damp .hide {
 	width: 15px;
 	height: 15px;
 	background-image: url('iview2.cutout.png');
@@ -466,17 +459,16 @@
 	background-position: -30px -0px;
 }
 
-.dampNormal .show {
+.damp .show {
 	width: 15px;
 	height: 15px;
 	background-image: url('iview2.cutout.png');
 	background-repeat: no-repeat;
 	background-position: -0px -0px;
-	display: none;
 }
 
 /* image */
-.viewerContainer .thumbNormal {
+.viewerContainer .thumb {
 	background-color: #000000;
 	position: absolute;
 	right: 15px;
@@ -486,14 +478,14 @@
 	border: 0px solid #000000;
 	z-index: 50;
 }
-.viewerContainer.min .thumbNormal, .viewerContainer.min .dampNormal {
+.viewerContainer.min .thumb, .viewerContainer.min .damp {
 	visibility:hidden;
 }
-.viewerContainer.max .thumbNormal, .viewerContainer.max .dampNormal {
+.viewerContainer.max .thumb, .viewerContainer.max .damp {
 	visibility:visible;
 }
 /* current Cut */
-.ausschnittNormal {
+.ausschnitt {
 	background-image: url('scaled/thumbnail/cutout.png');
 	position: absolute;
 	left:0px;

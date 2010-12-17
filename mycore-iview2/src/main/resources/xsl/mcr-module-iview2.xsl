@@ -83,7 +83,7 @@
 	<!-- jQuery Lib Files -->
     <script type="text/javascript" src="http://www.google.com/jsapi"></script>
 	<script type="text/javascript">
-      google.load("jquery", "1.4.2");
+      google.load("jquery", "1");
       google.load("jqueryui", "1.8.6");
     </script>
 	<!-- button -->
@@ -300,12 +300,12 @@
     <xsl:choose>
       <xsl:when test="$parent = 'viewer'">
         <script type="text/javascript">
-          addIviewProperty('<xsl:value-of select="$groupID" />','ausschnittParent', '"viewer<xsl:value-of select="$groupID" />"');
+          addIviewProperty('<xsl:value-of select="$groupID" />','ausschnittParent', '"#viewer<xsl:value-of select="$groupID" />"');
         </script>
       </xsl:when>
       <xsl:when test="$parent = 'here'">
         <script type="text/javascript">
-          addIviewProperty('<xsl:value-of select="$groupID" />','ausschnittParent', '"thumbnailContainer<xsl:value-of select="$groupID" />"');
+          addIviewProperty('<xsl:value-of select="$groupID" />','ausschnittParent', '"#thumbnailContainer<xsl:value-of select="$groupID" />"');
         </script>
         <div id="thumbnailContainer{$groupID}" class="thumbnailContainer{$idAdd}"></div>
       </xsl:when>
