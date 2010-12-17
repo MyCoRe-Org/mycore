@@ -174,10 +174,9 @@ ToolbarView.prototype = {
 	 * @param {integer} args.index defines a special position between the other buttons where the current button should be inserted
 	 */
     addButton : function (args) {
-
     	var myButtonset = this.getToolbarElement(args.parentName);
     	var myView = this;
-
+    	
 		var newButton = null;
 
 		var onClick = function(event) {
@@ -195,11 +194,28 @@ ToolbarView.prototype = {
 				.attr('title', args.title);
 			newButton[1].onclick = onClick;
 		}
-
-    	if (!isNaN(args.index) && args.index != myButtonset.childNodes.length) {
-    		newButton.insertBefore(myButtonset.childNodes[args.index]);
+		
+		var curIndex = 0;
+    	if (!isNaN(args.index) && myButtonset.childNodes.length != 0) {
+    		// needs to differ between checkButtons (Label + Input = 2 Elements) and simple Buttons (Button = 1 Element)
+        	var buttonCount = 0;
+        	var i = 0;
+        	while (buttonCount < args.index && i <= myButtonset.childNodes.length) {
+    			if (myButtonset.childNodes[i].nodeName == "LABEL" ||
+    				myButtonset.childNodes[i].nodeName == "BUTTON") {
+    				buttonCount++;
+    			}
+    			i++;
+        	}
+        	
+    		newButton.insertBefore(myButtonset.childNodes[i]);
+    		
+    		curIndex = i;
+    		// its an checkButton
+    		if (newButton[1]) curIndex++;
     	} else {
     		jQuery(myButtonset).append(newButton);
+    		curIndex =  myButtonset.childNodes.length - 1;
     	}
 
     	// must appear after append (for checkbox-function)
@@ -208,8 +224,8 @@ ToolbarView.prototype = {
     	if (!args.active) {
     		newButton.button( "option", "disabled", true )
     	}
-    	
-    	this._checkButtonStyle({'buttonset' : myButtonset, 'buttonIndex' :  (!isNaN(args.index))? args.index : myButtonset.childNodes.length - 1, 'reason' : "add"});
+
+    	this._checkButtonStyle({'buttonset' : myButtonset, 'buttonIndex' : curIndex, 'reason' : "add"});
     	this.events.notify({'type' : "new", 'elementName' : args.elementName, 'parentName' : args.parentName, 'view' : newButton});
     },
     

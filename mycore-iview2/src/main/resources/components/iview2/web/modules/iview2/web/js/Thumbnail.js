@@ -224,9 +224,29 @@ function processImageProperties(imageProperties, viewID){
  * @description	blend in the overview and creates it by the first call
  * @param	{string} viewID ID of the derivate
  */
-function openOverview(viewID) {
-	Iview[viewID].overview.toggleView();
-	openChapter(false, Iview[viewID]);
+function openOverview(button, viewID) {
+	
+	// check if overview was created yet
+	if (typeof Iview[viewID].overview === 'undefined') {
+		button.setLoading(true);
+		setTimeout(function(){
+			var callback = function() {
+				// try again openOverview (recursive call)
+				openOverview(button, viewID);
+				button.setLoading(false);
+				
+				Iview[viewID].overview.attach(function(sender, args) {
+					// type 1: click on overview div
+					if (args.type == 1) {
+						button.setSubtypeState(false);
+					}
+				});
+			};
+			importOverview(viewID, callback);
+		}, 10);
+	} else {
+		Iview[viewID].overview.toggleView();
+	}
 }
 
 /**
@@ -577,7 +597,7 @@ function listenerMove(viewID) {
  * @param	{} major
  * @param	{Object} viewer of the derivate
  */
-function openChapter(major, viewID){
+function openChapter(button, viewID){
 	
 	var viewer = Iview[viewID];
 	
@@ -586,30 +606,20 @@ function openChapter(major, viewID){
 		return;
 	}
 
-	//TODO Positionierung klappt bei WebKit nicht, da die irgendwie CSS nicht einlesen durch Chapter einbau in Viewer kÃƒÂ¶nnte das behoben werden
-	if (major) {
-		// für major (Button) always reaction
-		viewer.chapter.toggleView();
+	// chapter isn't created
+	if (typeof viewer.chapter === 'undefined') {
+		button.setLoading(true);
+		setTimeout(function(){
+			var callback = function() {
+				// try again openChapter (recursive call)
+				openChapter(button, viewID);
+				button.setLoading(false);
+			};
+			importChapter(viewID, callback);
+		}, 10);
 	} else {
-/*		// nur dann einblenden, wenn es durch Modus ausgeblendet wurde
-		if (Iview[viewID].chapterActive && !Iview[viewID].overviewActive && Iview[viewID].maximized && chapter.style.visibility == "hidden") {
-			chapter.style.visibility = "visible";
-			Iview[viewID].chapter1.showCurrentPageCenter(Iview[viewID].pagenumber);
-			var chapterOut=document.getElementById("chapter1"+viewID+"Out");
-			var chapterOut=document.getElementById("chapter1"+viewID+"In");
-			blendings.slide("chapter1"+viewID,new Array(toFloat(getStyle(chapterOut, "left")) - toFloat(getStyle(chapterOut, "right")), toFloat(getStyle(chapterOut,"top")), toFloat(getStyle(chapterIn, "left")) - toFloat(getStyle(chapterIn, "right")), toFloat(getStyle(chapterIn, "top"))),5,5,0,new Array("chapter1"+viewID+":in"));
-		} else if (Iview[viewID].chapterActive && !Iview[viewID].overviewActive && Iview[viewID].maximized && chapter.style.visibility == "visible") {
-			// nothing to do
-		} else if (chapter.style.visibility == "visible" && Iview[viewID].overviewActive) {
-			// do nothing for Overview
-		} else if (chapter.style.visibility == "visible") {
-			//blendings.slide("chapter1"+viewID,new Array(toFloat(getStyle($("chapter1"+viewID+"In"), "left")) - toFloat(getStyle($("chapter1"+viewID+"In"), "right")), toFloat(getStyle($("chapter1"+viewID+"In"), "top")), toFloat(getStyle($("chapter1"+viewID+"Out"), "left")) - toFloat(getStyle($("chapter1"+viewID+"Out"), "right")), toFloat(getStyle($("chapter1"+viewID+"Out"), "top"))),60,10,0,new Array("chapter1"+viewID+":out"), "", "$('chapter1'+'"+viewID+"').style.visibility = 'hidden'");
-			// chapter soll sofort weg sein, nicht erst noch blenden, bspw. wenn vom Vollbild zurück ins normale
-			chapter.style.visibility = 'hidden';
-			chapter.style.top = getStyle(document.getElementById("chapter1"+viewID+"Out"), "top");
-		}
-		// last possible case (bool=false & vis=hidden) only for major
-		*/
+		//TODO Positionierung klappt bei WebKit nicht, da die irgendwie CSS nicht einlesen durch Chapter einbau in Viewer kÃƒÂ¶nnte das behoben werden
+		viewer.chapter.toggleView();
 	}
 }
 
@@ -761,8 +771,8 @@ function importChapter(viewID, callback) {
 		viewer.chapter.createView(viewer.chapterParent);
 		viewer.chapterReaction = false;
 		
-		updateModuls(viewID);
-		openChapter(true, viewID);
+		//updateModuls(viewID);
+
 		callback();
 	});
 }
@@ -782,7 +792,7 @@ function importOverview(viewID, callback) {
 		var ov = new iview.overview.Controller(Iview[viewID].PhysicalModelProvider, iview.overview.View, Iview[viewID].viewerBean.tileUrlProvider);
 		ov.createView({'mainClass':'overview', 'parent':"#viewerContainer"+viewID, 'useScrollBar':true});
 		Iview[viewID].overview = ov;
-		openOverview(viewID);
+		//openOverview(viewID);
 		callback();
 	});
 }
@@ -893,27 +903,20 @@ function loading(viewID) {
 
 	Iview[viewID].modules = new Object;
 
-	Iview[viewID].modules.importOverview = function(callback) {
-		importOverview(viewID, callback);
+	
+	Iview[viewID].modules.openOverview = function(button) {
+		openOverview(button, viewID);
 	}
 	
-	Iview[viewID].modules.openOverview = function() {
-		openOverview(viewID);
-	}
-
-	Iview[viewID].modules.importChapter = function(callback) {
-		importChapter(viewID, callback);
-	}
 	
-	Iview[viewID].modules.openChapter = function(major) {
-		openChapter(major, viewID);
+	Iview[viewID].modules.openChapter = function(button) {
+		openChapter(button, viewID);
 	}
 	
 	
 	Iview[viewID].maximizeHandler = function() {
 		maximizeHandler(viewID);
 	}
-	
 }
 
 /**
@@ -1001,8 +1004,8 @@ function processMETS(metsDoc, viewID) {
 	})
 
 	// Toolbar Operation
-	Iview[viewID].getToolbarCtrl().setState("overviewHandles", "openChapter", true);
-	Iview[viewID].getToolbarCtrl().setState("overviewHandles", "openOverview", true);
+	Iview[viewID].getToolbarCtrl().perform("setActive", true, "overviewHandles", "openChapter");
+	Iview[viewID].getToolbarCtrl().perform("setActive", true, "overviewHandles", "openOverview");
 	
 	Iview[viewID].getToolbarCtrl().checkNavigation(Iview[viewID].PhysicalModel.getCurPos());
 
@@ -1033,4 +1036,49 @@ function processMETS(metsDoc, viewID) {
 //			importOverview(viewID);
 //		});
 //	}
+}
+
+// global function to return the viewer
+function getViewers() {
+	// only temporary used (to transform AssoArray to standard one)
+	var viewers = new Array();
+	for (var viewer in Iview) {
+		viewers.push(Iview[viewer]);
+	}
+	return viewers;
+}
+
+// put this content to the archive-common.xsl if you want alter some toolbar models
+function tmpToolbar() {
+	var viewers = getViewers();
+	for (var i = 0; i < viewers.length; i++) {
+		var viewer = viewers[i];
+		// check that the toolbarMgr is initialized and so viewer contains a toolbar
+		if (viewer.getToolbarMgr()) {
+			// to change only the current instance (make sure that the changed model exists)
+			// notice that these first changes won't take any effect for the current viewer configuration,
+			// because the mainTb will always destroy and rebuild while switching between minimized and maximized mode
+			if (viewer.getToolbarMgr().getModel('mainTb')) {
+				// add a text element
+//				viewer.getToolbarMgr().getModel('mainTb').addElement(new ToolbarTextModel("Text", "Iview2 Bildbetrachter"));
+				
+				// add a new buttonset
+//				viewer.getToolbarMgr().getModel('mainTb').getElement("newHandles").addButton(new ToolbarButtonModel("mach_was", {"type": "buttonDefault"}, {"label": this.titles.zoomIn, "text": false, "icons": {primary : "iview2-icon iview2-icon-zoomIn"}}, this.titles.zoomIn, true, false), 3);
+			
+				// add a button to this new buttonset
+//				viewer.getToolbarMgr().getModel('mainTb').getElement("newHandles").addButton(new ToolbarButtonModel("mach_was_anderes", {"type": "buttonCheck", "state" : false}, {"label": this.titles.zoomIn, "text": false, "icons": {primary : "iview2-icon iview2-icon-zoomIn"}}, this.titles.zoomIn, true, false));
+			}
+			
+			// to make durable changes on the defined toolbar model (for each following instance)
+			// add a text element
+//			viewer.getToolbarMgr().change('mainTb', 'addElement(new ToolbarTextModel("Text", "Iview2 Bildbetrachter"), 1);');
+			
+			// add a new buttonset
+//			viewer.getToolbarMgr().change('mainTb', 'addElement(new ToolbarButtonsetModel("newHandles"), 4);');
+			
+			// add some buttons to this new buttonset
+//			viewer.getToolbarMgr().change('mainTb', 'getElement("newHandles").addButton(new ToolbarButtonModel("mach_was", {"type": "buttonDefault"}, {"label": this.titles.zoomIn, "text": false, "icons": {primary : "iview2-icon iview2-icon-zoomIn"}}, this.titles.zoomIn, true, false), 0);');
+//			viewer.getToolbarMgr().change('mainTb', 'getElement("newHandles").addButton(new ToolbarButtonModel("mach_was_anderesds", {"type": "buttonCheck", "state" : false}, {"label": this.titles.zoomIn, "text": false, "icons": {primary : "iview2-icon iview2-icon-zoomIn"}}, this.titles.zoomIn, true, false), 0);');
+		}
+	}
 }

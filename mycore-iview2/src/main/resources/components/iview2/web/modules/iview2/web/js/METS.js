@@ -221,13 +221,18 @@ iview.METS.PhysicalModel = function () {
 	 * @return		{integer} at which position the physicalID is located or -1 if no matching ID was found
 	 */
 	function getPosition(physID) {
-		var res = this._entries[physID];
-		if (typeof res === "undefined") {
-			return -1;
-		} else {
-			return res.getOrder();
-		}
-	}
+        var res = '';
+        for(var i in this._entries){
+            if(this._entries[i].getHref() == physID){
+                res = this._entries[i].getOrder();
+            }
+        }
+        if (typeof res === "undefined") {
+            return -1;
+        } else {
+            return res;
+        }
+    }
 	
 	/**
 	 * @public

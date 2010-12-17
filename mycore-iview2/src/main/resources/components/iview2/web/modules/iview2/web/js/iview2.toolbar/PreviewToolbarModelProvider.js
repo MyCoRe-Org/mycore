@@ -29,10 +29,10 @@ PreviewToolbarModelProvider.prototype = {
 
 		// previewHandles
 		curButtonset = this.model.addElement(new ToolbarButtonsetModel("previewBack", this.model));
-		curButtonset.addButton(new ToolbarButtonModel("backward", {'type': 'buttonDefault'}, {'label': this.titles.backward, 'text': false, 'icons': {primary : 'iview2-icon iview2-icon-backward'}}, this.titles.backward, true));
+		curButtonset.addButton(new ToolbarButtonModel("backward", {'type': 'buttonDefault'}, {'label': this.titles.backward, 'text': false, 'icons': {primary : 'iview2-icon iview2-icon-backward'}}, this.titles.backward, true, false));
 
 		curButtonset = this.model.addElement(new ToolbarButtonsetModel("previewForward", this.model));
-		curButtonset.addButton(new ToolbarButtonModel("forward", {'type': 'buttonDefault'}, {'label': this.titles.forward, 'text': false, 'icons': {primary : 'iview2-icon iview2-icon-forward'}}, this.titles.forward, true));
+		curButtonset.addButton(new ToolbarButtonModel("forward", {'type': 'buttonDefault'}, {'label': this.titles.forward, 'text': false, 'icons': {primary : 'iview2-icon iview2-icon-forward'}}, this.titles.forward, true, false));
 		
 		return this.model;
     }

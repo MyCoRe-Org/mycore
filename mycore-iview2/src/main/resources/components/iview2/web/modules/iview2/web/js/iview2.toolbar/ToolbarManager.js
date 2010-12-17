@@ -6,12 +6,14 @@
  * 		Object {
  * 			Array:		models				//array of the contained models within the toolbar manager
  * 			Event:		events				//to trigger defined actions, while managing contained models
+ * 			AssoArray:	changes				//holds all durable changes for each toolbar model, to perform them after creating new toolbar model instances
  *  		AssoArray:	titles				//titles of each button within the whole models of the toolbar manager
  * 		}
  */
 var ToolbarManager = function () {
 	this.models = [];
 	this.events = new iview.Event(this);
+	this.changes = [];
 	
 	this.titles = null;
 };
@@ -63,6 +65,11 @@ ToolbarManager.prototype = {
     	
     	this.models[this.models.length] = model;
 	    this.events.notify({'type' : 'new', 'modelId' : model.id});
+	    
+    	// are there any durable changes to perform
+    	if (this.changes[model.id]) {
+    		eval(this.changes[model.id]);
+    	}
     },
     
 	/**
@@ -92,5 +99,22 @@ ToolbarManager.prototype = {
 	 */    
     setTitles : function(titles) {
     	this.titles = titles;
+    },
+
+	/**
+	 * @function
+	 * @name change
+	 * @memberOf ToolbarModel#
+	 * @description defines durable changes to a special model,
+	 *  so these changes will perform after each instancing such a model
+	 * @param String modeId defines the id of a special model
+	 * @param String operation defines the change operation which should be performed after instancing
+	 */   
+    change : function(modelId, operation) {
+    	if (!this.changes[modelId]) {
+    		this.changes[modelId] = 'model.' + operation;
+    	} else {
+    		this.changes[modelId] = this.changes[modelId] + 'model.' + operation;
+    	}
     }
 };

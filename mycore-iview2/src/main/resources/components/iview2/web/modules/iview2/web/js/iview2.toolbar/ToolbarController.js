@@ -58,61 +58,46 @@ ToolbarController.prototype.addView = function(view) {
     			if (args.elementName == "zoomIn") {
     				// FitToScreen - Button wieder reseten
     				// FitToWidth - Button wieder reseten
-    				myself.getViewer().getToolbarMgr().getModel("mainTb").getElement(args.parentName).getButton("fitToWidth").setSubtypeState(false);
-    				myself.getViewer().getToolbarMgr().getModel("mainTb").getElement(args.parentName).getButton("fitToScreen").setSubtypeState(false);
-    				
+    				myself.perform("setSubtypeState", false, args.parentName, "fitToWidth");
+    				myself.perform("setSubtypeState", false, args.parentName, "fitToScreen");
+
         			myself.getViewer().zoomViewer(true);
     			} else if (args.elementName == "zoomOut") {
     				// FitToScreen - Button wieder reseten
     				// FitToWidth - Button wieder reseten
-    				myself.getViewer().getToolbarMgr().getModel("mainTb").getElement(args.parentName).getButton("fitToWidth").setSubtypeState(false);
-    				myself.getViewer().getToolbarMgr().getModel("mainTb").getElement(args.parentName).getButton("fitToScreen").setSubtypeState(false);
-    				
+    				myself.perform("setSubtypeState", false, args.parentName, "fitToWidth");
+    				myself.perform("setSubtypeState", false, args.parentName, "fitToScreen");
+ 
         			myself.getViewer().zoomViewer(false);
     			} else if (args.elementName == "fitToWidth") {
     				// FitToScreen - Button wieder reseten
-    				myself.getViewer().getToolbarMgr().getModel("mainTb").getElement(args.parentName).getButton("fitToWidth").setSubtypeState(true);
-    				myself.getViewer().getToolbarMgr().getModel("mainTb").getElement(args.parentName).getButton("fitToScreen").setSubtypeState(false);
-    				
+    				myself.perform("setSubtypeState", true, args.parentName, "fitToWidth");
+    				myself.perform("setSubtypeState", false, args.parentName, "fitToScreen");
+
         			myself.getViewer().pictureWidth();
     			} else if (args.elementName == "fitToScreen") {    				
     				// FitToWidth - Button wieder reseten
-    				myself.getViewer().getToolbarMgr().getModel("mainTb").getElement(args.parentName).getButton("fitToWidth").setSubtypeState(false);
-    				myself.getViewer().getToolbarMgr().getModel("mainTb").getElement(args.parentName).getButton("fitToScreen").setSubtypeState(true);
-    				
+    				myself.perform("setSubtypeState", false, args.parentName, "fitToWidth");
+    				myself.perform("setSubtypeState", true, args.parentName, "fitToScreen");
+  
     				myself.getViewer().pictureScreen();
     			}
     		} else if (args.parentName == "overviewHandles") {
     			if (args.elementName == "openOverview") {
-    				if (typeof myself.getViewer().overview === 'undefined') {
-    					var oldUi = view.getButtonUi({'button' : args.view}).icons;
-    					view.setButtonUi({'button' : args.view, 'icons' : {'primary' : 'loading'}});
-    					setTimeout(function() {
-    						myself.getViewer().modules.importOverview(function() {
-    							view.setButtonUi({'button' : args.view, 'icons' : oldUi});
-    							
-    							var mainArgs = args;
-            					myself.getViewer().overview.attach(function(sender, args) {
-            						// type 1: click on overview div
-            						if (args.type == 1) {
-            		    				myself.getViewer().getToolbarMgr().getModel("mainTb").getElement(mainArgs.parentName).getButton(mainArgs.elementName).setSubtypeState(false);
-            						}
-            					});
-    						});
-    					}, 10);
-    				} else {
-    					myself.getViewer().modules.openOverview();
+    				var button = new Object;
+    				button.setLoading = function(loading) {
+    					myself.perform("setLoading", loading, args.parentName, args.elementName);
     				}
+    				button.setSubtypeState = function(state) {
+    					myself.perform("setSubtypeState", state, args.parentName, args.elementName);
+    				}
+    				myself.getViewer().modules.openOverview(button);
     			} else if (args.elementName == "openChapter") {
-					if (typeof myself.getViewer().chapter === 'undefined') {
-							var oldUi = view.getButtonUi({'button' : args.view}).icons;
-							view.setButtonUi({'button' : args.view, 'icons' : {'primary' : 'loading'}});
-							setTimeout(function(){
-								myself.getViewer().modules.importChapter(function() {view.setButtonUi({'button' : args.view, 'icons' : oldUi});});
-							}, 10);
-					} else {
-						myself.getViewer().modules.openChapter(true);
-					}
+    				var button = new Object;
+    				button.setLoading = function(loading) {
+    					myself.perform("setLoading", loading, args.parentName, args.elementName);
+    				}
+    				myself.getViewer().modules.openChapter(button);
     			}
     		} else if (args.parentName == "navigateHandles" || args.parentName == "previewForward" || args.parentName == "previewBack") {
     			if (args.elementName == "backward") {
@@ -137,7 +122,7 @@ ToolbarController.prototype.addView = function(view) {
 	    	if (args.parentName == "overviewHandles") {
     			if (args.elementName == "openChapter") {
     				if (myself.getViewer().chapter && myself.getViewer().chapter.getActive()) {
-    					myself.getViewer().getToolbarMgr().getModel("mainTb").getElement(args.parentName).getButton(args.elementName).setSubtypeState(true);
+    					myself.perform("setSubtypeState", true, args.parentName, args.elementName);
     				}
     			}
 	    	} else if (args.parentName == "navigateHandles") {
@@ -172,8 +157,9 @@ ToolbarController.prototype.addView = function(view) {
 				      	var initContent = $($('#pages').find('a')[myself.getViewer().PhysicalModel.getCurPos() - 1]).html();
 				      	myself.updateDropDown(initContent);
 				      	
-				      	myself.setState("overviewHandles", "openChapter", true);
-				      	myself.setState("overviewHandles", "openOverview", true);
+				      	// chapter and overview need to wait for METS informations
+				      	myself.perform("setActive", true, 'overviewHandles', 'openChapter');
+				      	myself.perform("setActive", true, 'overviewHandles', 'openOverview');
 			      	}
 	    		}
 	    	} else if (args.parentName == "permalinkHandles") {
@@ -278,6 +264,13 @@ ToolbarController.prototype.catchModels = function() {
 		    		}
     			} else if (args.type == "changeActive") {
     				curView.setButtonUi({'button' : '.'+args.elementName+' .'+args.buttonName, 'disabled' : !args.active});
+    			} else if (args.type == "changeLoading") {
+    				if (args.loading) {
+    					curView.setButtonUi({'button' : '.'+args.elementName+' .'+args.buttonName, 'icons' : {'primary' : 'loading'}});
+    				} else {
+    					var ui = toolbarMgr.getModel(args.modelId).getElement(args.elementName).getButton(args.buttonName).ui;
+    					curView.setButtonUi({'button' : '.'+args.elementName+' .'+args.buttonName, 'icons' : ui.icons});
+    				}
     			}
 			}
 	    }
@@ -297,19 +290,9 @@ ToolbarController.prototype.catchModels = function() {
  * @description checks each element of the given toolbar model and
  *  notify its corresponding add listener
  * @param {Object} model defines the toolbar model which will be check
+ * @param useIndexes describes whether defined element and button indexes will be used or not
  */
 ToolbarController.prototype._checkNewModel = function(model) {
-	
-	// doesn't make sense
-	/*
-	// use the right view for the current model
-	var curViewIds = this.relations[model.id];
-	var curViews = [];
-	
-	for (var j = 0; j < curViewIds.length; j++) {
-		curViews.push(this.views[curViewIds[j]]);
-	}
-	*/
 	
 	// checks predefined models
 	for (var i = 0; i < model.elements.length; i++) {
@@ -342,11 +325,11 @@ ToolbarController.prototype.checkNavigation = function(pNum) {
 
 	//for (var i = 0; i < models.length; i++) {
 	//	if (models[i].id == "previewTb") {
-			this.setState('previewBack', 'backward', !tooLow);
-			this.setState('previewForward', 'forward', !tooHigh);
+			this.perform("setActive", !tooLow, 'previewBack', 'backward');
+			this.perform("setActive", !tooHigh, 'previewForward', 'forward');
 	//	} else if (models[i].id == "mainTb") {
-			this.setState('navigateHandles', 'backward', !tooLow);
-			this.setState('navigateHandles', 'forward', !tooHigh);
+			this.perform("setActive", !tooLow, 'navigateHandles', 'backward');
+			this.perform("setActive", !tooHigh, 'navigateHandles', 'forward');
 	//	}
 	//}
 };
@@ -366,8 +349,8 @@ ToolbarController.prototype.checkZoom = function(zoom) {
 	
 	var models = this.getViewer().getToolbarMgr().getModels();
 
-	this.setState('zoomHandles', 'zoomIn', zoomIn);
-	this.setState('zoomHandles', 'zoomOut', zoomOut);
+	this.perform("setActive", zoomIn, 'zoomHandles', 'zoomIn');
+	this.perform("setActive", zoomOut, 'zoomHandles', 'zoomOut');
 };
 
 /**
@@ -384,21 +367,24 @@ ToolbarController.prototype.updateDropDown = function(content) {
 
 /**
  * @function
- * @name setState
+ * @name perform
  * @memberOf ToolbarController#
- * @description activate or deactivate Buttons,
- *  for e.g. forward or backward buttons,
- *  it has nothing to do with activate and deactivate of checkbuttons
- * @param {String} handle defines the buttonset of the button
+ * @description performs an special action for a single button wihtin a buttonset,
+ *  setActive : activate or deactivate Buttons (for e.g. forward or backward buttons),
+ *              it has nothing to do with activate and deactivate of checkbuttons
+ *  setSubtypeState : check or uncheck checkButtons,
+ *  setLoading : activate or deactivate loading icon of Buttons (for e.g. spinning arrows)
+ * @param {String} action defines the action (setActive, setSubtypeState, setLoading)
+ * @param {String} argument defines the argumentfor the special action of the button
+ * @param {String} buttonset defines the buttonset of the button
  * @param {String} button defines the name of the button
- * @param {boolean} state defines the target state of the button
  */
-ToolbarController.prototype.setState = function(handle, button, state) {
+ToolbarController.prototype.perform = function(action, argument, buttonset, button) {
 	var models = this.getViewer().getToolbarMgr().getModels();
-	
+
 	for (var i = 0; i < models.length; i++) {
-		if (models[i].getElement(handle) && models[i].getElement(handle).getButton(button)) {
-			models[i].getElement(handle).getButton(button).setActive(state);
+		if (models[i].getElement(buttonset) && models[i].getElement(buttonset).getButton(button)) {
+			eval("models[i].getElement(buttonset).getButton(button)."+action+"("+argument+")");
 		}
 	}
 };

@@ -59,7 +59,7 @@ ToolbarButtonsetModel.prototype = {
     	
      	if (!isNaN(index)) {
      		this.buttons = this.buttons.slice(0, index).concat(button, this.buttons.slice(index, this.buttons.length));
-     		this.events.notify({'type' : "add", 'button' : jQuery.extend({'index' : index}, button)});
+     		this.events.notify({'type' : "add", 'button' : jQuery.extend(button, {'index' : index})});
      	} else {
      		this.buttons.push(button);
 			this.events.notify({'type' : "add", 'button' : button});

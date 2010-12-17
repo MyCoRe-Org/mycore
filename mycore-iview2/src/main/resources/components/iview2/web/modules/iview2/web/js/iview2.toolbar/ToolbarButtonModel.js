@@ -4,23 +4,25 @@
  * @description model of a toolbar button with its functionalities to manipulate button properties
  * @strcuture	
  * 		Object {
- * 			String:		elementName,		//name of the button
+ * 			String:		elementName,		//name of the button (must not have any space)
  * 			String: 	type				//type button, to differ between other elements
  * 			String: 	subtype				//defines if the button is a checkbutton or a standard one
  * 			AssoArray: 	ui					//jQuery button ui informations (label, text, icons) to render the button into the view
  * 			String:		title				//title of the button
  * 			Boolean:	active				//describes if a button is enabled or disabled currently
+ * 			Boolean:	loading				//describes if a button is shows loading symbol or the defined ui content
  * 			Object:		relatedButtonset	//related buttonset model to navigate from the button to its buttonset
  * 			Event:		events				//to trigger defined actions, while manipulate button properties
  * 		}
  */
-var ToolbarButtonModel = function (elementName, subtype, ui, title, active) {
+var ToolbarButtonModel = function (elementName, subtype, ui, title, active, loading) {
     this.elementName = elementName;
     this.type = "button";
     this.subtype = subtype;
     this.ui = ui;
     this.title = title;
     this.active = active;
+    this.loading = loading;
     // will set indirectly while adding
     this.relatedButtonset = null;
     
@@ -37,6 +39,18 @@ var ToolbarButtonModel = function (elementName, subtype, ui, title, active) {
 ToolbarButtonModel.prototype.setActive = function(active) {
 	this.active = active;
 	this.events.notify({'type' : "changeActive", 'active' : this.active});
+}
+
+/**
+ * @function
+ * @name setLoading
+ * @memberOf ToolbarButtonModel#
+ * @description enables or disables the loading facility of a button and triggers the related event
+ * @param {boolean} active defines the loading state (true or false)
+ */
+ToolbarButtonModel.prototype.setLoading = function(loading) {
+	this.loading = loading;
+	this.events.notify({'type' : "changeLoading", 'loading' : this.loading});
 }
 
 /**
