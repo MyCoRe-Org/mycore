@@ -990,7 +990,7 @@ function processMETS(metsDoc, viewID) {
 	Iview[viewID].PhysicalModel = Iview[viewID].PhysicalModelProvider.createModel();
 	var physicalModel = Iview[viewID].PhysicalModel;
 	Iview[viewID].amountPages = physicalModel.getNumberOfPages();
-	physicalModel.setPosition(physicalModel.getPosition("phys_"+Iview[viewID].prefix));
+	physicalModel.setPosition(physicalModel.getPosition(Iview[viewID].prefix));
 	physicalModel.onevent.attach(function(sender, args) {
 		if (args.type == physicalModel.SELECT) {
 			notifyListenerNavigate(args["new"], viewID);
