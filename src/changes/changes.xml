@@ -6,6 +6,10 @@
   </properties>
   <body>
     <release version="2.0.94" date="201?-?-?" description="Beta 4">
+      <action dev="mcrvuchi" type="update">
+      	adding manager class for creating, get, removing store in IFS2. MCRStore is no longer 
+      	responsible for these operations.
+      </action>
       <action dev="mcrtchef" type="update">
       	merged mycore-useradmin and mycore-userlogin component into mycore-user
         moved user system related code from mycore-base to mycore-user
