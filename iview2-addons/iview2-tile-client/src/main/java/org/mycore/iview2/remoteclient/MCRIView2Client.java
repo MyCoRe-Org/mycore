@@ -36,6 +36,7 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 
 import org.apache.log4j.Logger;
+import org.jdom.JDOMException;
 import org.mycore.imagetiler.MCRImage;
 import org.mycore.imagetiler.MCRTiledPictureProps;
 import org.mycore.iview2.services.remoteclient.MCRIView2RemoteFunctions;
@@ -92,11 +93,12 @@ public class MCRIView2Client {
         });
         LOGGER.info("Install SIGINT handler");
         MySignalHandler.install("INT");
+        boolean skipExisting = System.getProperty("skipExisting") != null;
 
         LOGGER.info("Connecting to WebService on " + endPoint);
         for (int i = 0; i < threadCount; i++) {
             final MCRIView2RemoteFunctions iView2RemoteFunctions = getIViewRemoteFunctions(endPoint);
-            EXECUTOR_SERVICE.submit(new ImageTiler(iView2RemoteFunctions, tileDir, fileStoreDir));
+            EXECUTOR_SERVICE.submit(new ImageTiler(iView2RemoteFunctions, tileDir, fileStoreDir, skipExisting));
         }
         while (!EXECUTOR_SERVICE.isTerminated()) {
             Thread.yield();
@@ -110,6 +112,7 @@ public class MCRIView2Client {
         System.out.println("java <options> org.mycore.iview2.remoteclient.MCRIView2Client <endpoint>\n");
         System.out.println("    endpoint: WebService endpoint for IView2\n");
         System.out.println("Options:");
+        System.out.println("              -DskipExisting: Whether to skip existing *.iview2 files");
         System.out.println("             -DtileDir=<dir>: Directory where to save tiles, defaults to './iview2/tiles'");
         System.out.println("        -DfileStoreDir=<dir>: Where to get the images from, defaults to './filestore'");
         System.out.println(" -DtileThreads=<threadCount>: How many threads should run in parallel, defaults to '1'");
@@ -129,11 +132,14 @@ public class MCRIView2Client {
 
         MCRIView2RemoteFunctions iView2RemoteFunctions;
 
-        public ImageTiler(MCRIView2RemoteFunctions iView2RemoteFunctions, File tileDir, File fileStoreDir) {
+        private boolean skipExisting;
+
+        public ImageTiler(MCRIView2RemoteFunctions iView2RemoteFunctions, File tileDir, File fileStoreDir, boolean skipExisting) {
             super();
             this.iView2RemoteFunctions = iView2RemoteFunctions;
             this.tileDir = tileDir;
             this.fileStoreDir = fileStoreDir;
+            this.skipExisting = skipExisting;
             LOGGER.info("ImageTile initialized");
         }
 
@@ -144,7 +150,7 @@ public class MCRIView2Client {
             LOGGER.info("Got next tile job " + tileJob);
             if (tileJob.getDerivateID() != null) {
                 try {
-                    if (!handleTileJob(tileJob, tileDir, fileStoreDir))
+                    if (!handleTileJob(tileJob, tileDir, fileStoreDir, skipExisting))
                         return null;
                     iView2RemoteFunctions.finishTileJob(tileJob);
                     return tileJob;
@@ -163,12 +169,19 @@ public class MCRIView2Client {
             return null;
         }
 
-        private static boolean handleTileJob(MCRIView2RemoteJob tileJob, File tileDir, File fileStoreDir) throws IOException {
+        private static boolean handleTileJob(MCRIView2RemoteJob tileJob, File tileDir, File fileStoreDir, boolean skipExisting) throws IOException,
+            JDOMException {
 
             LOGGER.info("Tiling " + tileJob.getDerivateID() + tileJob.getDerivatePath());
-            MCRImage mcrImage = MCRImage.getInstance(new File(fileStoreDir, tileJob.getFileSystemPath()), tileJob.getDerivateID(), tileJob.getDerivatePath());
-            mcrImage.setTileDir(tileDir);
-            MCRTiledPictureProps tiledPictureProps = mcrImage.tile();
+            File tiledFile = MCRImage.getTiledFile(tileDir, tileJob.getDerivateID(), tileJob.getDerivatePath());
+            MCRTiledPictureProps tiledPictureProps;
+            if (skipExisting && tiledFile.exists()) {
+                tiledPictureProps=MCRTiledPictureProps.getInstance(tiledFile);
+            } else {
+                MCRImage mcrImage = MCRImage.getInstance(new File(fileStoreDir, tileJob.getFileSystemPath()), tileJob.getDerivateID(), tileJob.getDerivatePath());
+                mcrImage.setTileDir(tileDir);
+                tiledPictureProps = mcrImage.tile();
+            }
             tileJob.setHeight(tiledPictureProps.getHeight());
             tileJob.setWidth(tiledPictureProps.getWidth());
             tileJob.setZoomLevel(tiledPictureProps.getZoomlevel());
