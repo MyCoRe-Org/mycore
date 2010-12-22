@@ -9,8 +9,9 @@ import org.junit.Test;
 import org.mycore.datamodel.ifs2.MCRStore;
 import org.mycore.datamodel.ifs2.MCRStoreCenter;
 import org.mycore.datamodel.ifs2.StoreAlreadyExistsException;
+import org.mycore.datamodel.ifs2.MCRStore.MCRStoreConfig;
 
-public class MCRStoreHeapTest {
+public class MCRStoreCenterTest {
     @Before
     public void init() {
         MCRStoreCenter.instance().clear();
@@ -20,11 +21,9 @@ public class MCRStoreHeapTest {
     public void heapOp() throws Exception {
         MCRStoreCenter storeHeap = MCRStoreCenter.instance();
 
-        String storeID = "fake";
-        System.setProperty(getPropName(storeID, "BaseDir"), "fake");
-        System.setProperty(getPropName(storeID, "SlotLayout"), "4-4-2");
-
-        storeHeap.addStore(new FakeStore(storeID));
+        FakeStoreConfig config = new FakeStoreConfig();
+        storeHeap.addStore(new FakeStore(config));
+        String storeID = config.getID();
         FakeStore fakeStore = storeHeap.getStore(storeID, FakeStore.class);
 
         assertNotNull("The store should be not null.", fakeStore);
@@ -38,13 +37,28 @@ public class MCRStoreHeapTest {
     public void addStoreTwice() throws Exception {
         MCRStoreCenter storeHeap = MCRStoreCenter.instance();
 
-        String storeID = "fake";
-        System.setProperty(getPropName(storeID, "BaseDir"), "fake");
-        System.setProperty(getPropName(storeID, "SlotLayout"), "4-4-2");
+        FakeStore fakeStore = new FakeStore(new FakeStoreConfig());
+        storeHeap.addStore(fakeStore);
+        storeHeap.addStore(fakeStore);
+    }
+    
+    class FakeStoreConfig implements MCRStoreConfig{
 
-        FakeStore fakeStore = new FakeStore(storeID);
-        storeHeap.addStore(fakeStore);
-        storeHeap.addStore(fakeStore);
+        @Override
+        public String getID() {
+            return "fake";
+        }
+
+        @Override
+        public String getBaseDir() {
+            return "ram://fake";
+        }
+
+        @Override
+        public String getSlotLayout() {
+            return "4-4-2";
+        }
+        
     }
 
     private String getPropName(String storeID, String propType) {
@@ -54,8 +68,8 @@ public class MCRStoreHeapTest {
     public static class FakeStore extends MCRStore {
         private String msg = "Fake Store";
 
-        public FakeStore(String storeID) {
-            id = storeID;
+        public FakeStore(MCRStoreConfig config) {
+            init(config);
         }
 
         public void setMsg(String msg) {

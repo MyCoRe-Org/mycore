@@ -15,6 +15,7 @@ public class MCRIFS2VersioningTestCase extends MCRIFS2TestCase {
         String path = "file:///" + temp.getAbsolutePath().replace('\\', '/');
         temp.delete();
         setProperty("MCR.IFS2.Store.TEST.SVNRepositoryURL", path, true);
+        
         setVersStore(MCRStoreManager.createStore(STORE_ID, MCRVersioningMetadataStore.class));
     }
 
@@ -22,6 +23,7 @@ public class MCRIFS2VersioningTestCase extends MCRIFS2TestCase {
     @After
     public void tearDown() throws Exception {
         super.tearDown();
+        System.out.println("teardown: " + getVersStore().repURL);
         VFS.getManager().resolveFile(getVersStore().repURL.getPath()).delete(Selectors.SELECT_ALL);
     }
 

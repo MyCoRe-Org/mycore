@@ -38,7 +38,6 @@ import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.Selectors;
 import org.apache.commons.vfs.VFS;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 
@@ -77,6 +76,14 @@ import org.mycore.common.MCRException;
  * @author Frank Lützenkirchen
  */
 public abstract class MCRStore {
+    public interface MCRStoreConfig {
+
+        public String getID();
+
+        public String getBaseDir();
+
+        public String getSlotLayout();
+    }
 
     /** The ID of the store */
     protected String id;
@@ -99,20 +106,21 @@ public abstract class MCRStore {
     /** The suffix of slot names */
     protected String suffix = "";
 
+    private MCRStoreConfig storeConfig;
+
     /**
      * Initializes a new store instance
      */
     protected void init(String id) {
-        this.id = id;
+        init(new MCRStoreDefaultConfig(id));
+    }
 
-        String cfg = "MCR.IFS2.Store." + id + ".";
-        MCRConfiguration config = MCRConfiguration.instance();
-        String baseDir = config.getString(cfg + "BaseDir");
-        String slotLayout = config.getString(cfg + "SlotLayout");
+    protected void init(MCRStoreConfig config) {
+        setStoreConfig(config);
 
         idLength = 0;
 
-        StringTokenizer st = new StringTokenizer(slotLayout, "-");
+        StringTokenizer st = new StringTokenizer(getStoreConfig().getSlotLayout(), "-");
         slotLength = new int[st.countTokens() - 1];
 
         int i = 0;
@@ -123,18 +131,18 @@ public abstract class MCRStore {
         idLength += Integer.parseInt(st.nextToken());
 
         try {
-            baseDirectory = VFS.getManager().resolveFile(baseDir);
+            baseDirectory = VFS.getManager().resolveFile(getStoreConfig().getBaseDir());
 
             if (!baseDirectory.exists()) {
                 baseDirectory.createFolder();
             } else {
                 if (!baseDirectory.isReadable()) {
-                    String msg = "Store directory " + baseDir + " is not readable";
+                    String msg = "Store directory " + getStoreConfig().getBaseDir() + " is not readable";
                     throw new MCRConfigurationException(msg);
                 }
 
                 if (baseDirectory.getType() != FileType.FOLDER) {
-                    String msg = "Store " + baseDir + " is a file, not a directory";
+                    String msg = "Store " + getStoreConfig().getBaseDir() + " is a file, not a directory";
                     throw new MCRConfigurationException(msg);
                 }
             }
@@ -147,7 +155,7 @@ public abstract class MCRStore {
      * Returns the ID of this store
      */
     public String getID() {
-        return id;
+        return getStoreConfig().getID();
     }
 
     /**
@@ -300,13 +308,13 @@ public abstract class MCRStore {
      * @return the highest slot file name / ID currently stored
      */
     private String findMaxID(FileObject dir, int depth) throws FileSystemException {
-        FileObject[] children = dir.findFiles(new FileDepthSelector(slotLength.length+1, slotLength.length+1));
+        FileObject[] children = dir.findFiles(new FileDepthSelector(slotLength.length + 1, slotLength.length + 1));
         Arrays.sort(children, new FileObjectComparator());
-        
-        if(children.length > 0) {
-            return children[children.length-1].getName().getBaseName();
+
+        if (children.length > 0) {
+            return children[children.length - 1].getName().getBaseName();
         }
-        
+
         return null;
     }
 
@@ -382,11 +390,13 @@ public abstract class MCRStore {
              * @throws FileSystemException 
              */
             private void addChildren(FileObject dir) throws FileSystemException {
-                FileObject[] children = dir.getChildren();
-                Arrays.sort(children, new FileObjectComparator());
-                
-                for (int i = 0; i < children.length; i++) {
-                    files.add((order ? i : 0), children[i]);
+                if (dir.getType() == FileType.FOLDER) {
+                    FileObject[] children = dir.getChildren();
+                    Arrays.sort(children, new FileObjectComparator());
+
+                    for (int i = 0; i < children.length; i++) {
+                        files.add((order ? i : 0), children[i]);
+                    }
                 }
             }
 
@@ -478,7 +488,15 @@ public abstract class MCRStore {
         } catch (FileSystemException e) {
             e.printStackTrace();
         }
-        
+
         return false;
+    }
+
+    protected void setStoreConfig(MCRStoreConfig storeConfig) {
+        this.storeConfig = storeConfig;
+    }
+
+    protected MCRStoreConfig getStoreConfig() {
+        return storeConfig;
     }
 }

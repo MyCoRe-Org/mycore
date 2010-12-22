@@ -64,11 +64,21 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
     @Override
     protected void init(String type) {
         super.init(type);
+        setupSVN(type);
+    }
+    
+    @Override
+    protected void init(MCRStoreConfig config) {
+        super.init(config);
+        setupSVN(config.getID());
+    }
 
+    private void setupSVN(String type) {
         String repositoryURL = MCRConfiguration.instance().getString("MCR.IFS2.Store." + type + ".SVNRepositoryURL");
         try {
             LOGGER.info("Versioning metadata store " + type + " repository URL: " + repositoryURL);
             repURL = SVNURL.parseURIDecoded(repositoryURL);
+            LOGGER.info("repURL: " + repURL);
             File dir = new File(repURL.getPath());
             if (!dir.exists()) {
                 LOGGER.info("Repository does not exist, creating new SVN repository at " + repositoryURL);

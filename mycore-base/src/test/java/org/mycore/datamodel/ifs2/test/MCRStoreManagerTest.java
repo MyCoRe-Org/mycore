@@ -7,20 +7,33 @@ import java.text.MessageFormat;
 import org.junit.Test;
 import org.mycore.datamodel.ifs2.MCRFileStore;
 import org.mycore.datamodel.ifs2.MCRStoreManager;
+import org.mycore.datamodel.ifs2.MCRStore.MCRStoreConfig;
 
 
 public class MCRStoreManagerTest {
     @Test
     public void createMCRFileStore() throws Exception {
-        String storeID = "Test";
-        System.setProperty(getPropName(storeID, "BaseDir"), "fake");
-        System.setProperty(getPropName(storeID, "SlotLayout"), "4-4-2");
-        MCRFileStore fileStore = MCRStoreManager.createStore(storeID, MCRFileStore.class);
+        MCRFileStore fileStore = MCRStoreManager.createStore(new StoreConfig(), MCRFileStore.class);
         
         assertNotNull("MCRStoreManager could not create Filestore.", fileStore);
     }
     
-    private String getPropName(String storeID, String propType) {
-        return MessageFormat.format("MCR.IFS2.Store.{0}.{1}", storeID, propType);
+    class StoreConfig implements MCRStoreConfig{
+
+        @Override
+        public String getID() {
+            return "Test";
+        }
+
+        @Override
+        public String getBaseDir() {
+            return "ram:///fake";
+        }
+
+        @Override
+        public String getSlotLayout() {
+            return "4-4-2";
+        }
+        
     }
 }

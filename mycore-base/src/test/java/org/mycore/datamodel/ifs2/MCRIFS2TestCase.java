@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.UUID;
 
 import org.apache.commons.vfs.Selectors;
 import org.apache.commons.vfs.VFS;
