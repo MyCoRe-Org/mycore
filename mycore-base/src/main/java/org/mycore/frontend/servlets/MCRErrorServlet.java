@@ -69,7 +69,7 @@ public class MCRErrorServlet extends HttpServlet {
         String requestURI = (String) req.getAttribute("javax.servlet.error.request_uri");
         String servletName = (String) req.getAttribute("javax.servlet.error.servletName");
         MCRSession session = getMCRSession(req, servletName);
-        if (session != null && !MCRSessionMgr.hasCurrentSession()) {
+        if (session != null) {
             MCRSessionMgr.setCurrentSession(session);
         }
         try {

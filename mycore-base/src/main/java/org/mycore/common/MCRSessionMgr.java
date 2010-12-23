@@ -73,15 +73,6 @@ public class MCRSessionMgr {
         }
     };
 
-    private static ThreadLocal<Boolean> inUse = new ThreadLocal<Boolean>() {
-
-        @Override
-        protected Boolean initialValue() {
-            return Boolean.FALSE;
-        }
-
-    };
-
     /**
      * This method returns the unique MyCoRe session object for the current
      * Thread. The session object is initialized with the default MyCoRe session
@@ -90,7 +81,6 @@ public class MCRSessionMgr {
      * @return MyCoRe MCRSession object
      */
     public static MCRSession getCurrentSession() {
-        inUse.set(Boolean.TRUE);
         return theThreadLocalSession.get();
     }
 
@@ -120,16 +110,7 @@ public class MCRSessionMgr {
         MCRSession session = theThreadLocalSession.get();
         session.passivate();
         MCRSession.LOGGER.debug("MCRSession released " + session.getID());
-        inUse.remove();
         theThreadLocalSession.remove();
-    }
-
-    /**
-     * Returns a boolean indicating if a {@link MCRSession} is bound to the current thread.
-     * @return true if a session is bound to the current thread
-     */
-    public static boolean hasCurrentSession() {
-        return inUse.get().booleanValue();
     }
 
     /**

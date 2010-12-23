@@ -324,8 +324,11 @@ public class MCRSession implements Cloneable {
         if (currentThreadCount.get().getAndIncrement() == 0) {
             fireSessionEvent(activated, concurrentAccess.incrementAndGet());
         } else {
-            RuntimeException exception = new RuntimeException("Cannot activate a Session more than once per thread: " + currentThreadCount.get().get());
-            LOGGER.debug("Too many activate() calls stacktrace:", exception);
+            try {
+                throw new MCRException("Cannot activate a Session more than once per thread: " + currentThreadCount.get().get());
+            } catch (Exception e) {
+                LOGGER.debug("Too many activate() calls stacktrace:", e);
+            }
         }
     }
 
