@@ -68,6 +68,10 @@ public class MCRErrorServlet extends HttpServlet {
         Throwable exception = (Throwable) req.getAttribute("javax.servlet.error.exception");
         String requestURI = (String) req.getAttribute("javax.servlet.error.request_uri");
         String servletName = (String) req.getAttribute("javax.servlet.error.servletName");
+        if (LOGGER.isDebugEnabled()) {
+            String msg = MessageFormat.format("Handling error {0} for request ''{1}'' message: {2}", statusCode, requestURI, message);
+            LOGGER.debug(msg, exception);
+        }
         MCRSession session = getMCRSession(req, servletName);
         if (session != null) {
             MCRSessionMgr.setCurrentSession(session);
