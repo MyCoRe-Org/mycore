@@ -23,10 +23,13 @@
 
 package org.mycore.datamodel.classifications2.mapper;
 
+import static org.junit.Assert.*;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Test;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 
 /**
@@ -58,5 +61,10 @@ public class MCRTestCategoryMapper extends MCRCategoryMapperBase {
     @Override
     protected String getMappingRule(MCRCategoryID categoryID) {
         return mappingRules.get(categoryID);
+    }
+   
+    @Test
+    public void doNothing() throws Exception {
+        // remove me if needed, just prevent test errors java.lang.Exception: No runnable methods
     }
 }
