@@ -70,6 +70,8 @@ import org.mycore.services.i18n.MCRTranslation;
  *          2008) $
  */
 public class MCRServlet extends HttpServlet {
+    private static final String CURRENT_THREAD_NAME_KEY = "currentThreadName";
+
     public static final String MCR_SERVLET_JOB_KEY = "MCRServletJob";
 
     private static final String INITIAL_SERVLET_NAME_KEY = "currentServletName";
@@ -166,7 +168,7 @@ public class MCRServlet extends HttpServlet {
 
         MCRSession fromHttpSession = (MCRSession) theSession.getAttribute("mycore.session");
 
-        if (fromHttpSession != null && fromHttpSession.getID()!=null) {
+        if (fromHttpSession != null && fromHttpSession.getID() != null) {
             // Take session from HttpSession with servlets
             session = fromHttpSession;
         } else {
@@ -179,13 +181,10 @@ public class MCRServlet extends HttpServlet {
         // store the HttpSession ID in MCRSession
         session.put("http.session", theSession.getId());
 
-        String currentThread = getProperty(req, "currentThreadName");
-        // check if this is request passed the same thread before
-        // (RequestDispatcher)
-        if (currentThread == null || !currentThread.equals(Thread.currentThread().getName())) {
+        if (!isSessionBoundToCurrentRequest(req)) {
             // Bind current session to this thread:
             MCRSessionMgr.setCurrentSession(session);
-            req.setAttribute("currentThreadName", Thread.currentThread().getName());
+            req.setAttribute(CURRENT_THREAD_NAME_KEY, Thread.currentThread().getName());
             req.setAttribute(INITIAL_SERVLET_NAME_KEY, servletName);
         }
 
@@ -193,6 +192,13 @@ public class MCRServlet extends HttpServlet {
         req.setAttribute("XSL.MCRSessionID", session.getID());
 
         return session;
+    }
+
+    public static boolean isSessionBoundToCurrentRequest(HttpServletRequest req) {
+        String currentThread = getProperty(req, CURRENT_THREAD_NAME_KEY);
+        // check if this is request passed the same thread before
+        // (RequestDispatcher)
+        return currentThread != null && currentThread.equals(Thread.currentThread().getName());
     }
 
     /**
