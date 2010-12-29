@@ -102,6 +102,8 @@ public class MCRSession implements Cloneable {
 
     private StackTraceElement[] constructingStackTrace;
 
+    private Throwable lastActivatedStackTrace;
+
     private static MCRUserInformation guestUserInformation = MCRSystemUserInformation.getGuestInstance();
 
     /**
@@ -322,12 +324,14 @@ public class MCRSession implements Cloneable {
         thisAccessTime = System.currentTimeMillis();
         accessCount.incrementAndGet();
         if (currentThreadCount.get().getAndIncrement() == 0) {
+            lastActivatedStackTrace = new RuntimeException("This is for debugging purposes only");
             fireSessionEvent(activated, concurrentAccess.incrementAndGet());
         } else {
             try {
                 throw new MCRException("Cannot activate a Session more than once per thread: " + currentThreadCount.get().get());
             } catch (Exception e) {
-                LOGGER.debug("Too many activate() calls stacktrace:", e);
+                LOGGER.warn("Too many activate() calls stacktrace:", e);
+                LOGGER.warn("First activate() call stacktrace:", lastActivatedStackTrace);
             }
         }
     }
