@@ -73,14 +73,10 @@ public class MCRErrorServlet extends HttpServlet {
             LOGGER.debug(msg, exception);
         }
         MCRSession session = getMCRSession(req, servletName);
-        boolean bindSession = session != null && !MCRServlet.isSessionBoundToCurrentRequest(req);
-        if (bindSession) {
-            MCRSessionMgr.setCurrentSession(session);
-        }
         try {
             generateErrorPage(req, resp, message, exception, statusCode, exceptionType, requestURI, servletName);
         } finally {
-            if (bindSession) {
+            if (session != null) {
                 MCRSessionMgr.releaseCurrentSession();
             }
         }
