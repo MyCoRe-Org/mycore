@@ -71,7 +71,7 @@ public class MCRDFGViewerServlet extends MCRStartEditorServlet {
         MCRConfiguration CONFIG = MCRConfiguration.instance();
         MCRSession session = MCRSessionMgr.getCurrentSession();
         String lang = session.getCurrentLanguage();
-        String defa = CONFIG.getString("MCR.Metadata.DefaultLang", "de");
+        String defa = CONFIG.getString("MCR.Metadata.DefaultLang", MCRConstants.DEFAULT_LANG);
         String base = cd.myremcrid.getBase();
         String type = cd.myremcrid.getTypeId();
         // get title

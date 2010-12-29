@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -57,12 +58,12 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
 
     protected final ReentrantReadWriteLock childrenLock = new ReentrantReadWriteLock();
 
-    private static String defaultLang;
+    private String defaultLang;
 
     public MCRAbstractCategoryImpl() {
         super();
         if (defaultLang == null) {
-            defaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "en");
+            defaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", MCRConstants.DEFAULT_LANG);
         }
     }
 
@@ -163,6 +164,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         if (label != null) {
             return label;
         }
+        
         label = getLabel(defaultLang);
         if (label != null) {
             return label;

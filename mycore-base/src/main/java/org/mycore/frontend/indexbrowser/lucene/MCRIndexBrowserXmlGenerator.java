@@ -14,6 +14,7 @@ import org.jdom.filter.ElementFilter;
 import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -33,7 +34,7 @@ public class MCRIndexBrowserXmlGenerator {
 
     protected static Logger LOGGER = Logger.getLogger(MCRIndexBrowserXmlGenerator.class);
 
-    protected static final String defaultlang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "de");
+    protected static final String defaultlang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", MCRConstants.DEFAULT_LANG);
 
     protected Element page;
 

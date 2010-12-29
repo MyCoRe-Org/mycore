@@ -12,6 +12,7 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.xpath.XPath;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConstants;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -227,7 +228,7 @@ class RowCreator_Lines implements RowCreator {
         Element label = (Element) XPath.selectSingleNode(line, "label[lang('" + lang + "')]");
         if (label == null) {
             label = (Element) XPath.selectSingleNode(line, "label[lang('"
-                    + MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "en") + "')]");
+                    + MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", MCRConstants.DEFAULT_LANG) + "')]");
         }
 
         if (label == null) {

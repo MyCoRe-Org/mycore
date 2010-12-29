@@ -34,6 +34,7 @@ import org.apache.commons.vfs.VFS;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSessionMgr;
 
 /**
@@ -190,7 +191,7 @@ public abstract class MCRStoredNode extends MCRNode {
             return label;
         }
 
-        String defaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "en");
+        String defaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", MCRConstants.DEFAULT_LANG);
         label = getLabel(defaultLang);
         if (label != null) {
             return label;

@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 
@@ -49,7 +50,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
     // common data
     protected static final String NL = System.getProperties().getProperty("line.separator");
 
-    protected static final String DEFAULT_LANGUAGE = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "en");
+    protected static final String DEFAULT_LANGUAGE = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", MCRConstants.DEFAULT_LANG);
 
     protected static final String DEFAULT_DATAPART = "metadata";
 

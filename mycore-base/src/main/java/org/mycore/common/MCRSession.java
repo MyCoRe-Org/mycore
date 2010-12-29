@@ -111,7 +111,7 @@ public class MCRSession implements Cloneable {
     MCRSession() {
         MCRConfiguration config = MCRConfiguration.instance();
         userInformation = guestUserInformation;
-        language = config.getString("MCR.Metadata.DefaultLang", "de");
+        language = config.getString("MCR.Metadata.DefaultLang", MCRConstants.DEFAULT_LANG);
         dataBaseAccess = MCRConfiguration.instance().getBoolean("MCR.Persistence.Database.Enable", true);
 
         accessCount = new AtomicInteger();

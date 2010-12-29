@@ -48,6 +48,7 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 
@@ -155,7 +156,7 @@ public class MCRWCMSChooseServlet extends MCRWCMSServlet {
 
         /* get languages */
         if (mcrSession != null) {
-            defaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "en").toLowerCase();
+            defaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", MCRConstants.DEFAULT_LANG).toLowerCase();
             currentLang = mcrSession.getCurrentLanguage().toLowerCase();
         }
 

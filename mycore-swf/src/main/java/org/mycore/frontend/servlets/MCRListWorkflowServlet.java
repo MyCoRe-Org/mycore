@@ -42,6 +42,7 @@ import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
@@ -92,7 +93,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
     public void init() throws MCRConfigurationException, javax.servlet.ServletException {
         super.init();
         WFM = MCRSimpleWorkflowManager.instance();
-        DefaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "en");
+        DefaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", MCRConstants.DEFAULT_LANG);
     }
 
     /**

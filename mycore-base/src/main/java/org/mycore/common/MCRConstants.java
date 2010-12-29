@@ -47,6 +47,9 @@ import org.jdom.Namespace;
 public final class MCRConstants {
     /** MyCoRe version */
     public final static String VERSION = "2.0";
+    
+    /** MCR.Metadata.DefaultLang */
+    public static final String DEFAULT_LANG = "de";
 
     /** The URL of the XLink */
     private final static String XLINK_URL = "http://www.w3.org/1999/xlink";

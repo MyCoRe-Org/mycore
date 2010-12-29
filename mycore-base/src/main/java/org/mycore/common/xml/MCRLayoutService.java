@@ -73,6 +73,7 @@ import org.jdom.transform.JDOMSource;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -356,7 +357,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         String uid = mcrSession.getUserInformation().getCurrentUserID();
         // set parameters
         parameters.put("CurrentUser", uid);
-        parameters.put("DefaultLang", MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "en"));
+        parameters.put("DefaultLang", MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", MCRConstants.DEFAULT_LANG));
         parameters.put("CurrentLang", mcrSession.getCurrentLanguage());
         parameters.put("WebApplicationBaseURL", MCRServlet.getBaseURL());
         parameters.put("ServletsBaseURL", MCRServlet.getServletBaseURL());

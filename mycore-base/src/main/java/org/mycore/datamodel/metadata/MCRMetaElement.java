@@ -30,6 +30,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 
 /**
@@ -49,7 +50,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
     // common data
     protected final static MCRConfiguration CONFIG = MCRConfiguration.instance();
 
-    public final static String DEFAULT_LANGUAGE = CONFIG.getString("MCR.Metadata.DefaultLang", "de");;
+    public final static String DEFAULT_LANGUAGE = CONFIG.getString("MCR.Metadata.DefaultLang", MCRConstants.DEFAULT_LANG);;
 
     public final static boolean DEFAULT_HERITABLE = CONFIG.getBoolean("MCR.MetaElement.defaults.heritable", false);
 

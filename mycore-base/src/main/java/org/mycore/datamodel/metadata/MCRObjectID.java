@@ -47,7 +47,7 @@ public final class MCRObjectID {
     public static final int MAX_LENGTH = 64;
 
     // configuration values
-    private static final MCRConfiguration CONFIG = MCRConfiguration.instance();;
+    private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
     // counter for the next IDs per project base ID
     private static HashMap<String, Integer> lastnumber = new HashMap<String, Integer>();
@@ -61,11 +61,27 @@ public final class MCRObjectID {
 
     private int mcr_number = -1;
 
-    private static final int number_distance = CONFIG.getInt("MCR.Metadata.ObjectID.NumberDistance", 1);
+    private static final MCRObjectIDFormat idFormat = new MCRObjectIDDefaultFormat();
+    
+    public interface MCRObjectIDFormat{
+        public int numberDistance();
+        public DecimalFormat numberFormat();
+    }
+    
+    private static class MCRObjectIDDefaultFormat implements MCRObjectIDFormat{
 
-    private static final String number_pattern = CONFIG.getString("MCR.Metadata.ObjectID.NumberPattern", "0000000000");
+        @Override
+        public int numberDistance() {
+            return MCRConfiguration.instance().getInt("MCR.Metadata.ObjectID.NumberDistance", 1);
+        }
 
-    private static final DecimalFormat number_format = new DecimalFormat(number_pattern);
+        @Override
+        public DecimalFormat numberFormat() {
+            String numberPattern = MCRConfiguration.instance().getString("MCR.Metadata.ObjectID.NumberPattern", "0000000000");
+            return new DecimalFormat(numberPattern);
+        }
+        
+    }
 
     /**
      * The constructor for MCRObjectID from a given string.
@@ -104,9 +120,9 @@ public final class MCRObjectID {
      */
     public static synchronized MCRObjectID getNextFreeId(String base_id, int maxInWorkflow) {
         int last = Math.max(getLastID(base_id).getNumberAsInteger(), maxInWorkflow) + 1;
-        int rest = last % number_distance;
+        int rest = last % idFormat.numberDistance();
         if (rest != 0) {
-            last += number_distance - rest;
+            last += idFormat.numberDistance() - rest;
         }
         lastnumber.put(base_id, last);
         String[] idParts = getIDParts(base_id);
@@ -154,7 +170,7 @@ public final class MCRObjectID {
      * @return the string of the number
      */
     public final String getNumberAsString() {
-        return number_format.format(mcr_number);
+        return idFormat.numberFormat().format(mcr_number);
     }
 
     /**
@@ -201,7 +217,7 @@ public final class MCRObjectID {
             .append('_')
             .append(type.toLowerCase())
             .append('_')
-            .append(number_format.format(number))
+            .append(idFormat.numberFormat().format(number))
             .toString();
     }
 
@@ -250,7 +266,6 @@ public final class MCRObjectID {
         }
 
         String mcr_id = id.trim();
-
         if (mcr_id.length() > MAX_LENGTH || mcr_id.length() == 0) {
             return false;
         }
