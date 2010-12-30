@@ -159,6 +159,7 @@ public class MCRHIBConnection implements Closeable {
      */
     public Session getSession() {
         Session session = SESSION_FACTORY.getCurrentSession();
+        LOGGER.info("Returning session: "+session);
         return session;
     }
 
