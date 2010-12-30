@@ -162,7 +162,7 @@ public class MCRServlet extends HttpServlet {
         doGetPost(job);
     }
 
-    public static MCRSession getSession(HttpServletRequest req, String servletName) {
+    public static MCRSession getSession(HttpServletRequest req) {
         HttpSession theSession = req.getSession(true);
         MCRSession session = null;
 
@@ -180,21 +180,22 @@ public class MCRServlet extends HttpServlet {
         theSession.setAttribute("mycore.session", session);
         // store the HttpSession ID in MCRSession
         session.put("http.session", theSession.getId());
-
-        if (!isSessionBoundToCurrentRequest(req)) {
-            // Bind current session to this thread:
-            MCRSessionMgr.setCurrentSession(session);
-            req.setAttribute(CURRENT_THREAD_NAME_KEY, Thread.currentThread().getName());
-            req.setAttribute(INITIAL_SERVLET_NAME_KEY, servletName);
-        }
-
         // Forward MCRSessionID to XSL Stylesheets
         req.setAttribute("XSL.MCRSessionID", session.getID());
 
         return session;
     }
 
-    public static boolean isSessionBoundToCurrentRequest(HttpServletRequest req) {
+    private static void bindSessionToRequest(HttpServletRequest req, String servletName, MCRSession session) {
+        if (!isSessionBoundToRequest(req)) {
+            // Bind current session to this thread:
+            MCRSessionMgr.setCurrentSession(session);
+            req.setAttribute(CURRENT_THREAD_NAME_KEY, Thread.currentThread().getName());
+            req.setAttribute(INITIAL_SERVLET_NAME_KEY, servletName);
+        }
+    }
+
+    private static boolean isSessionBoundToRequest(HttpServletRequest req) {
         String currentThread = getProperty(req, CURRENT_THREAD_NAME_KEY);
         // check if this is request passed the same thread before
         // (RequestDispatcher)
@@ -241,7 +242,8 @@ public class MCRServlet extends HttpServlet {
 
         MCRServletJob job = new MCRServletJob(req, res);
 
-        MCRSession session = getSession(job.getRequest(), getServletName());
+        MCRSession session = getSession(job.getRequest());
+        bindSessionToRequest(req, getServletName(), session);
         try {
             //transaction around 1st phase of request
             Exception thinkException = processThinkPhase(job);

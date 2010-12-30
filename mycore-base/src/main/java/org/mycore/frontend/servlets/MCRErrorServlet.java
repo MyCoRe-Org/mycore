@@ -73,6 +73,9 @@ public class MCRErrorServlet extends HttpServlet {
             LOGGER.debug(msg, exception);
         }
         MCRSession session = getMCRSession(req, servletName);
+        if (session != null && !MCRSessionMgr.hasCurrentSession()) {
+            MCRSessionMgr.setCurrentSession(session);
+        }
         try {
             generateErrorPage(req, resp, message, exception, statusCode, exceptionType, requestURI, servletName);
         } finally {
@@ -87,7 +90,7 @@ public class MCRErrorServlet extends HttpServlet {
         if (session == null) {
             return null;
         }
-        return MCRServlet.getSession(req, servletName);
+        return MCRServlet.getSession(req);
     }
 
     protected void generateErrorPage(HttpServletRequest request, HttpServletResponse response, String msg, Throwable ex, Integer statusCode,

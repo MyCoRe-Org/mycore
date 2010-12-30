@@ -72,6 +72,13 @@ public class MCRSessionMgr {
             return new MCRSession();
         }
     };
+    
+    private static ThreadLocal<Boolean> isSessionAttached=new ThreadLocal<Boolean>(){
+        @Override
+        protected Boolean initialValue() {
+            return Boolean.FALSE;
+        }
+    };
 
     /**
      * This method returns the unique MyCoRe session object for the current
@@ -81,6 +88,7 @@ public class MCRSessionMgr {
      * @return MyCoRe MCRSession object
      */
     public static MCRSession getCurrentSession() {
+        isSessionAttached.set(Boolean.TRUE);
         return theThreadLocalSession.get();
     }
 
@@ -94,6 +102,7 @@ public class MCRSessionMgr {
     public static void setCurrentSession(MCRSession theSession) {
         theSession.activate();
         theThreadLocalSession.set(theSession);
+        isSessionAttached.set(Boolean.TRUE);
     }
 
     /**
@@ -111,6 +120,15 @@ public class MCRSessionMgr {
         session.passivate();
         MCRSession.LOGGER.debug("MCRSession released " + session.getID());
         theThreadLocalSession.remove();
+        isSessionAttached.remove();
+    }
+    
+    /**
+     *  Returns a boolean indicating if a {@link MCRSession} is bound to the current thread.
+     *  @return true if a session is bound to the current thread
+     */
+    public static boolean hasCurrentSession(){
+        return isSessionAttached.get().booleanValue();
     }
 
     /**
