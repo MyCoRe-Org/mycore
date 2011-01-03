@@ -792,10 +792,10 @@ iview.scrollbar.View = function() {
 			.mousemove(function(e) { divMouseMove(that, e);});
 			
 		if (this._direction) {
-			wholeSpace.css("cssFloat", "left");
-			space.css("cssFloat", "left");
-			buttonUL.css("cssFloat", "left");
-			buttonDR.css("cssFloat", "left");
+			wholeSpace.css("float", "left");
+			space.css("float", "left");
+			buttonUL.css("float", "left");
+			buttonDR.css("float", "left");
 			scroll.css("left", "0px");
 		} else {
 			scroll.css("top", "0px");

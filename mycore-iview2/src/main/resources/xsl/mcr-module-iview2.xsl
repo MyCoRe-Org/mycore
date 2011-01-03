@@ -300,7 +300,7 @@
     <xsl:choose>
       <xsl:when test="$parent = 'viewer'">
         <script type="text/javascript">
-          addIviewProperty('<xsl:value-of select="$groupID" />','ausschnittParent', '"#viewer<xsl:value-of select="$groupID" />"');
+          addIviewProperty('<xsl:value-of select="$groupID" />','ausschnittParent', '"#viewerContainer<xsl:value-of select="$groupID" />"');
         </script>
       </xsl:when>
       <xsl:when test="$parent = 'here'">
