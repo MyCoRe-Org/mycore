@@ -1,17 +1,15 @@
 package org.mycore.datamodel.ifs2;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.UUID;
 
 import org.apache.commons.vfs.Selectors;
 import org.apache.commons.vfs.VFS;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 
 public class MCRIFS2TestCase extends MCRTestCase {
@@ -42,7 +40,7 @@ public class MCRIFS2TestCase extends MCRTestCase {
         if (getGenericStore() == null) {
             createStore();
         } else {
-            VFS.getManager().resolveFile(getGenericStore().getBaseDir()).createFolder();
+            VFS.getManager().resolveFile(getGenericStore().getBaseDirURI()).createFolder();
         }
 
         assertTrue("Store is not Empty", getGenericStore().isEmpty());
@@ -52,7 +50,7 @@ public class MCRIFS2TestCase extends MCRTestCase {
     @After
     public void tearDown() throws Exception {
         super.tearDown();
-        VFS.getManager().resolveFile(getGenericStore().getBaseDir()).delete(Selectors.SELECT_ALL);
+        VFS.getManager().resolveFile(getGenericStore().getBaseDirURI()).delete(Selectors.SELECT_ALL);
         MCRStoreManager.removeStore(STORE_ID);
         assertNull("Could not remove store " + STORE_ID, MCRStoreManager.getStore(STORE_ID));
     }

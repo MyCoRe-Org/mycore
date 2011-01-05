@@ -163,8 +163,8 @@ public abstract class MCRStore {
      * 
      * @return the base directory storing the data
      */
-    String getBaseDir() {
-        return baseDirectory.getName().getPath();
+    String getBaseDirURI() {
+        return baseDirectory.getName().getURI();
     }
 
     /**
