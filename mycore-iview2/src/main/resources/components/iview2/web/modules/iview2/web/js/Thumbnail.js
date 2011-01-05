@@ -632,10 +632,10 @@ function updateModuls(viewID) {
  * @param	{string} viewID ID of the derivate
  */
 function viewerScroll(delta, viewID) {
-	Iview[viewID].viewerBean.positionTiles({'x': delta.x*PanoJS.MOVE_THROTTLE,
-											'y': delta.y*PanoJS.MOVE_THROTTLE}, true);
-	Iview[viewID].viewerBean.notifyViewerMoved({'x': delta.x*PanoJS.MOVE_THROTTLE,
-												'y': delta.y*PanoJS.MOVE_THROTTLE});
+	Iview[viewID].viewerBean.positionTiles({'x': /*delta.x*PanoJS.MOVE_THROTTLE*/0,
+											'y': delta/*.y*/*PanoJS.MOVE_THROTTLE}, true);
+	Iview[viewID].viewerBean.notifyViewerMoved({'x': /*delta.x*PanoJS.MOVE_THROTTLE*/0,
+												'y': delta/*.y*/*PanoJS.MOVE_THROTTLE});
 }
 
 /**
@@ -783,10 +783,10 @@ function zoomViewer(viewID, direction) {
 /**
  * @public
  * @function
- * @name	loading
+ * @name		loading
  * @memberOf	iview.Thumbnails
- * @description	is calling to the load-event of the window; serve for the further registration of events likewise as initioator for various objects
- * @param	{string} viewID ID of the derivate
+ * @description	is calling to the load-event of the window; serve for the further registration of events likewise as initiator for various objects
+ * @param		{string} viewID ID of the derivate
  */
 function loading(viewID) {
 	
@@ -808,7 +808,7 @@ function loading(viewID) {
 	Iview[viewID].barX = new iview.scrollbar.Controller();
 	var barX = Iview[viewID].barX;
 	barX.createView({ 'direction':'horizontal', 'parent':'#viewerContainer'+viewID, 'mainClass':'scroll'});
-	barX._model.onevent.attach(function(sender, args) {
+	barX.attach(function(sender, args) {
 		if (args.type == "curVal" && !Iview[viewID].roller) {
 			scrollMove(- (args["new"]-args["old"]), 0, viewID);
 		}
@@ -817,7 +817,7 @@ function loading(viewID) {
 	Iview[viewID].barY = new iview.scrollbar.Controller();
 	var barY = Iview[viewID].barY;
 	barY.createView({ 'direction':'vertical', 'parent':'#viewerContainer'+viewID, 'mainClass':'scroll'});
-	barY._model.onevent.attach(function(sender, args) {
+	barY.attach(function(sender, args) {
 		if (args.type == "curVal" && !Iview[viewID].roller) {
 			scrollMove( 0, -(args["new"]-args["old"]), viewID);
 		}
@@ -825,7 +825,7 @@ function loading(viewID) {
 
 	// Additional Events
 	// register to scroll into the viewer
-	ManageEvents.addEventListener(document.getElementById("viewer"+viewID), 'mouseScroll', function(e) { e = getEvent(e); preventDefault(e); viewerScroll(returnDelta(e), viewID);}, false);
+	jQuery("#viewer"+viewID).mousewheel(function(e, delta) {e.preventDefault(); viewerScroll(delta, viewID);});
 	
 	// damit viewer ueber scrollBarX endet, fortan in reinitialize
 	document.getElementById("viewer"+viewID).style.width = Iview[viewID].startWidth - ((Iview[viewID].barX.my.self.css("visibility") == "visible")? Iview[viewID].barX.my.self.css("offsetWidth") : 0)  + "px";
@@ -916,11 +916,12 @@ function startFileLoaded(viewID){
 	});
 	
 	// Resize-Events registrieren
-	if (isBrowser("IE")) {
-		window.onresize = function() {reinitializeGraphic(viewID)};
-	} else {
-		ManageEvents.addEventListener(window, 'resize', function() { reinitializeGraphic(viewID);}, false);
-	}
+	jQuery(window).resize(function() { reinitializeGraphic(viewID)});
+//	if (isBrowser("IE")) {
+//		window.onresize = function() {reinitializeGraphic(viewID)};
+//	} else {
+//		ManageEvents.addEventListener(window, 'resize', function() { reinitializeGraphic(viewID);}, false);
+//	}
 	
 	if (Iview[viewID].useZoomBar) {
 		importZoomBar(viewID);
@@ -985,40 +986,5 @@ function processMETS(metsDoc, viewID) {
 		Iview[viewID].getToolbarCtrl().getView('mainTbView').events.notify({'type' : "new", 'elementName' : "pageBox", 'parentName' : "navigateHandles", 'view' : Iview[viewID].viewerContainer.find('.navigateHandles .pageBox')});
 		// switch to current content
 		Iview[viewID].getToolbarCtrl().updateDropDown(jQuery(pagelist.find("a")[physicalModel.getCurPos() - 1]).html());
-	}
-}
-
-// put this content to the archive-common.xsl if you want alter some toolbar models
-function tmpToolbar() {
-	var viewers = getViewers();
-	for (var i = 0; i < viewers.length; i++) {
-		var viewer = viewers[i];
-		// check that the toolbarMgr is initialized and so viewer contains a toolbar
-		if (viewer.getToolbarMgr()) {
-			// to change only the current instance (make sure that the changed model exists)
-			// notice that these first changes won't take any effect for the current viewer configuration,
-			// because the mainTb will always destroy and rebuild while switching between minimized and maximized mode
-			if (viewer.getToolbarMgr().getModel('mainTb')) {
-				// add a text element
-//				viewer.getToolbarMgr().getModel('mainTb').addElement(new ToolbarTextModel("Text", "Iview2 Bildbetrachter"));
-				
-				// add a new buttonset
-//				viewer.getToolbarMgr().getModel('mainTb').getElement("newHandles").addButton(new ToolbarButtonModel("mach_was", {"type": "buttonDefault"}, {"label": this.titles.zoomIn, "text": false, "icons": {primary : "iview2-icon iview2-icon-zoomIn"}}, this.titles.zoomIn, true, false), 3);
-			
-				// add a button to this new buttonset
-//				viewer.getToolbarMgr().getModel('mainTb').getElement("newHandles").addButton(new ToolbarButtonModel("mach_was_anderes", {"type": "buttonCheck", "state" : false}, {"label": this.titles.zoomIn, "text": false, "icons": {primary : "iview2-icon iview2-icon-zoomIn"}}, this.titles.zoomIn, true, false));
-			}
-			
-			// to make durable changes on the defined toolbar model (for each following instance)
-			// add a text element
-//			viewer.getToolbarMgr().change('mainTb', 'addElement(new ToolbarTextModel("Text", "Iview2 Bildbetrachter"), 1);');
-			
-			// add a new buttonset
-//			viewer.getToolbarMgr().change('mainTb', 'addElement(new ToolbarButtonsetModel("newHandles"), 4);');
-			
-			// add some buttons to this new buttonset
-//			viewer.getToolbarMgr().change('mainTb', 'getElement("newHandles").addButton(new ToolbarButtonModel("mach_was", {"type": "buttonDefault"}, {"label": this.titles.zoomIn, "text": false, "icons": {primary : "iview2-icon iview2-icon-zoomIn"}}, this.titles.zoomIn, true, false), 0);');
-//			viewer.getToolbarMgr().change('mainTb', 'getElement("newHandles").addButton(new ToolbarButtonModel("mach_was_anderesds", {"type": "buttonCheck", "state" : false}, {"label": this.titles.zoomIn, "text": false, "icons": {primary : "iview2-icon iview2-icon-zoomIn"}}, this.titles.zoomIn, true, false), 0);');
-		}
 	}
 }

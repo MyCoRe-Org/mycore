@@ -173,7 +173,7 @@
     <!-- thumbnail settings -->
     <xsl:param name="DampInViewer" select="'true'" />
     <script type="text/javascript" src="http://www.google.com/jsapi"></script>
-    <script type="text/javascript">google.load("jquery", "1.4.2");</script>
+    <script type="text/javascript">google.load("jquery", "1");</script>
     <!-- JQuery Framework -->
     <script type="text/javascript">
       <xsl:text>var prefix='</xsl:text>
@@ -258,7 +258,7 @@
         $LAB.setGlobalDefaults({"AllowDuplicates": false, "BasePath": '../modules/iview2/web/js/'});
         loading(viewID);
       }
-      ManageEvents.addEventListener(window, 'load', function() { startViewer('<xsl:value-of select="$groupID"/>');}, false);
+      jQuery(window).load(function() { startViewer('<xsl:value-of select="$groupID"/>');});
     </script>
   </xsl:template>
   <xsl:template name="iview2.getZoomBar">

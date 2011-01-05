@@ -1132,5 +1132,30 @@ iview.scrollbar.Controller.prototype = {
 		this._view.setSpaceDelay(150);
 		this._view.setIntervalTime(100);//period with which the scroll is automaticall resumed
 		this.my = this._view.my;
+	},
+	
+	/**
+	 * @public
+	 * @function
+	 * @name		attach
+	 * @memberOf	iview.scrollbar.Controller#
+	 * @description	adds the given listener to the model so the listener will be notified about changes within the model
+	 * @param		{function} listener to add to the model
+	 */
+	attach: function(listener) {
+		this._model.onevent.attach(listener);
+	},
+	
+	/**
+	 * @public
+	 * @function
+	 * @name		detach
+	 * @memberOf	iview.scrollbar.Controller#
+	 * @description	removes the given listener from the model so the listener will no longer receive
+	 *  notifications about changes within the model
+	 * @param		{function} listener to add to the model
+	 */
+	detach: function(listener) {
+		this._model.onevent.detach(listener);
 	}
 }

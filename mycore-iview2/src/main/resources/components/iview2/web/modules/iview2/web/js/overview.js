@@ -458,7 +458,7 @@ iview.overview.View = function() {
 		var scrollbar = new iview.scrollbar.Controller();
 		var parent = that.my.self;
 		scrollbar.createView({ 'direction': 'vertical', 'parent': parent, 'mainClass': 'scroll', 'type':'stepper'});
-		scrollbar._model.onevent.attach(function(sender,args){
+		scrollbar.attach(function(sender,args){
 			if (args.type == "curVal") {
 				that._currentFirstRow = args["new"];
 				loadImages(that);
