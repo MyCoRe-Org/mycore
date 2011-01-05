@@ -165,14 +165,11 @@ iview.overview.View = function() {
 			this._visible = true;
 			//we're getting displayed so show the User the latest stuff
 			this.resize();
-			this.my.self.css("visibility", "visible");
 			this.my.self.slideDown("slow");
 		} else {
 			this._visible = false;
-			//TODO will be no longer needed as soon as jQuery 1.4.4 is used, as this version is able to gain size for hidden elements
 			var that = this.my.self;
-			this.my.self.slideUp("slow", function() {that.css("display", "block")});
-			this.my.self.css("visibility", "hidden");
+			this.my.self.slideUp("slow");
 		}
 	}
 	
@@ -423,8 +420,7 @@ iview.overview.View = function() {
 		this._customClass = args.customClass || "";
 		
 		var main = jQuery("<div>").addClass(this._mainClass + " " + this._customClass)
-		.appendTo(args.parent)
-		.css("visibility", "hidden");
+		.appendTo(args.parent);
 		
 		if (typeof arguments[1] !== "undefined") {
 			main.attr("id", arguments[1]);

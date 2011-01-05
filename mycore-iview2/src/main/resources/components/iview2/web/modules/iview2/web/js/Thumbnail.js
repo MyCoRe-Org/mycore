@@ -31,40 +31,6 @@ function notifyListenerNavigate(value, viewID) {
 /**
  * @public
  * @function
- * @name	setFocus
- * @memberOf	iview.Thumbnails
- * @description	sets the focus to the given element
- * @param 	{object} element object which should be focused
- */
-function setFocus(element){
-	focus = element;
-}
-
-/**
- * @public
- * @function
- * @name	getFocus
- * @memberOf	iview.Thumbnails
- * @description	returns the element which has the focus
- */
-function getFocus(e){
-	return focus;
-}
-
-/**
- * @public
- * @function
- * @name	resetFocus
- * @memberOf	iview.Thumbnails
- * @description	delete the focus so that no element has it
- */
-function resetFocus(){
-	focus = null;
-}
-
-/**
- * @public
- * @function
  * @name	loadPage
  * @memberOf	iview.Thumbnails
  * @description	reads out the imageinfo.xml, set the correct zoomvlues and loads the page
@@ -207,7 +173,6 @@ function processImageProperties(imageProperties, viewID){
 	
 	preload.style.width = "100%";
 	preload.style.height = "100%";
-	//$("preload"+viewID).style.visibility = "visible";
 	if (Iview[viewID].useCutOut) {
 		Iview[viewID].cutOutModel.setSrc(viewerBean.tileUrlProvider.assembleUrl(0,0,0));
 	}
@@ -225,7 +190,6 @@ function processImageProperties(imageProperties, viewID){
  * @param	{string} viewID ID of the derivate
  */
 function openOverview(button, viewID) {
-	
 	// check if overview was created yet
 	if (typeof Iview[viewID].overview === 'undefined') {
 		button.setLoading(true);
@@ -387,7 +351,7 @@ function switchDisplayMode(screenZoom, stateBool, viewID) {
 		viewerBean.init();
 	} else {
 		Iview[viewID].zoomScale = 1;
-		viewerBean.tileSize = /*Iview[viewID].*/tilesize;
+		viewerBean.tileSize = tilesize;
 		viewerBean.init();
 		
 		//an infinite loop would arise if the repeal of the zoombar comes
@@ -648,7 +612,6 @@ function updateModuls(viewID) {
 	if (Iview[viewID].useChapter && !(typeof Iview[viewID].chapter === "undefined")) {
 		//prevent endless loop
 		Iview[viewID].chapterReaction = true;
-//		Iview[viewID].chapter._model.setSelected(Iview[viewID].PhysicalModel.getCurPos());//Iview[viewID].prefix);
 	}
 
 	// Actualize zoomBar
@@ -770,8 +733,6 @@ function importChapter(viewID, callback) {
 
 		viewer.chapter.createView(viewer.chapterParent);
 		viewer.chapterReaction = false;
-		
-		//updateModuls(viewID);
 
 		callback();
 	});
@@ -792,7 +753,6 @@ function importOverview(viewID, callback) {
 		var ov = new iview.overview.Controller(Iview[viewID].PhysicalModelProvider, iview.overview.View, Iview[viewID].viewerBean.tileUrlProvider);
 		ov.createView({'mainClass':'overview', 'parent':"#viewerContainer"+viewID, 'useScrollBar':true});
 		Iview[viewID].overview = ov;
-		//openOverview(viewID);
 		callback();
 	});
 }
@@ -882,10 +842,6 @@ function loading(viewID) {
 	//remove leading '/'
 	Iview[viewID].startFile = Iview[viewID].startFile.replace(/^\/*/,"");
 	loadPage(viewID, function(){startFileLoaded(viewID)});
-	
-	
-	
-	
 	
 	// should be replaced while constructing MVC concept
 	Iview[viewID].pictureScreen = function() {
@@ -1030,22 +986,6 @@ function processMETS(metsDoc, viewID) {
 		// switch to current content
 		Iview[viewID].getToolbarCtrl().updateDropDown(jQuery(pagelist.find("a")[physicalModel.getCurPos() - 1]).html());
 	}
-
-//	if (Iview[viewID].useOverview) {
-//		$LAB.script("overview.js").wait(function() {
-//			importOverview(viewID);
-//		});
-//	}
-}
-
-// global function to return the viewer
-function getViewers() {
-	// only temporary used (to transform AssoArray to standard one)
-	var viewers = new Array();
-	for (var viewer in Iview) {
-		viewers.push(Iview[viewer]);
-	}
-	return viewers;
 }
 
 // put this content to the archive-common.xsl if you want alter some toolbar models
