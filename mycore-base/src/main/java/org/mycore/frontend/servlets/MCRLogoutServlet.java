@@ -31,6 +31,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.log4j.Logger;
+
 /**
  * Invalidates a session and sends redirect to referring page.
  * @author Thomas Scheffler (yagee)
@@ -49,11 +51,14 @@ public class MCRLogoutServlet extends HttpServlet {
         if (session == null) {
             return;
         }
+        Logger logger = Logger.getLogger(getClass());
+        logger.debug("Invalidate HTTP-Session: " + session.getId());
         session.invalidate();
         String returnURL = req.getHeader("Referer");
         if (returnURL == null) {
             returnURL = req.getContextPath() + "/";
         }
+        logger.debug("Redirect to: " + returnURL);
         resp.sendRedirect(returnURL);
     }
 
