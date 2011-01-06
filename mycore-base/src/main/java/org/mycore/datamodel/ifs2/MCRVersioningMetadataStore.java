@@ -100,7 +100,7 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
      */
     SVNRepository getRepository() throws SVNException {
         SVNRepository repository = SVNRepositoryFactory.create(repURL);
-        String user = MCRSessionMgr.getCurrentSession().getCurrentUserID();
+        String user = MCRSessionMgr.getCurrentSession().getUserInformation().getCurrentUserID();
         SVNAuthentication[] auth = new SVNAuthentication[] { new SVNUserNameAuthentication(user, false) };
         BasicAuthenticationManager authManager = new BasicAuthenticationManager(auth);
         repository.setAuthenticationManager(authManager);
