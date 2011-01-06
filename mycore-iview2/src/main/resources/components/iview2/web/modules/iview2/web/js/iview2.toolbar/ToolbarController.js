@@ -177,12 +177,13 @@ ToolbarController.prototype.addView = function(view) {
 
 /**
  * @function
- * @name catchModelsView
- * @memberOf ToolbarController#
- * @description catches each current toolbar model and
+ * @name		catchModelsView
+ * @memberOf	ToolbarController#
+ * @description	catches each current toolbar model and
  *  adds listeners for rendering this models to their current defined views,
  *  calls for each toolbar model the function checkNewModel,
  *  should call only ones after instancing the ToolbarController
+ * @throws		{toolbarloaded} event on document Node after new Model is added to Controller
  */
 ToolbarController.prototype.catchModels = function() {
 	var myself = this;
@@ -285,12 +286,13 @@ ToolbarController.prototype.catchModels = function() {
 /**
  * @private
  * @function
- * @name cheackNewModel
- * @memberOf ToolbarController#
- * @description checks each element of the given toolbar model and
+ * @name		cheackNewModel
+ * @memberOf	ToolbarController#
+ * @description	checks each element of the given toolbar model and
  *  notify its corresponding add listener
- * @param {Object} model defines the toolbar model which will be check
- * @param useIndexes describes whether defined element and button indexes will be used or not
+ * @param		{Object} model defines the toolbar model which will be check
+ * @param		useIndexes describes whether defined element and button indexes will be used or not
+ * @throws		{toolbarloaded} event on document Node after new Model is added to Controller
  */
 ToolbarController.prototype._checkNewModel = function(model) {
 	
@@ -307,6 +309,12 @@ ToolbarController.prototype._checkNewModel = function(model) {
 			}
 		}
 	}
+	
+	//Send notification that new Model was added
+	var loadEvent = jQuery.Event("toolbarloaded");
+	loadEvent.viewer = this.getViewer();
+	loadEvent.modelId = model.id;
+	jQuery(document).trigger(loadEvent);
 };
 
 /**
