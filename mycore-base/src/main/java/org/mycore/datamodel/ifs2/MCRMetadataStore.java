@@ -66,6 +66,20 @@ public class MCRMetadataStore extends MCRStore {
         suffix = ".xml";
         forceXML = MCRConfiguration.instance().getBoolean("MCR.IFS2.Store." + type + ".ForceXML", true);
     }
+    
+    /**
+     * Initializes a new metadata store instance.
+     * 
+     * @param config
+     *            the configuration for the store
+     */
+    @Override
+    protected void init(MCRStoreConfig config) {
+        super.init(config);
+        prefix = config.getID()+"_";
+        suffix = ".xml";
+        forceXML = MCRConfiguration.instance().getBoolean("MCR.IFS2.Store." + config.getID() + ".ForceXML", true);
+    }
 
     protected boolean shouldForceXML() {
         return forceXML;
