@@ -1,24 +1,24 @@
 /*
  * 
  * $Revision$ $Date$
- *
- * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
- *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program, in a file called gpl.txt or license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * 
+ * This file is part of *** M y C o R e *** See http://www.mycore.de/ for
+ * details.
+ * 
+ * This program is free software; you can use it, redistribute it and / or
+ * modify it under the terms of the GNU General Public License (GPL) as
+ * published by the Free Software Foundation; either version 2 of the License or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program, in a file called gpl.txt or license.txt. If not, write to the
+ * Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307 USA
  */
 
 package org.mycore.datamodel.metadata;
@@ -26,6 +26,7 @@ package org.mycore.datamodel.metadata;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 
+import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -38,7 +39,8 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
  * 
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date: 2010-12-29 09:18:22 +0100 (Wed, 29 Dec
+ *          2010) $
  */
 public final class MCRObjectID {
     /**
@@ -62,13 +64,16 @@ public final class MCRObjectID {
     private int mcr_number = -1;
 
     private static final MCRObjectIDFormat idFormat = new MCRObjectIDDefaultFormat();
-    
-    public interface MCRObjectIDFormat{
+
+    private static final Logger LOGGER = Logger.getLogger(MCRObjectID.class);
+
+    public interface MCRObjectIDFormat {
         public int numberDistance();
+
         public DecimalFormat numberFormat();
     }
-    
-    private static class MCRObjectIDDefaultFormat implements MCRObjectIDFormat{
+
+    private static class MCRObjectIDDefaultFormat implements MCRObjectIDFormat {
 
         @Override
         public int numberDistance() {
@@ -80,7 +85,7 @@ public final class MCRObjectID {
             String numberPattern = MCRConfiguration.instance().getString("MCR.Metadata.ObjectID.NumberPattern", "0000000000");
             return new DecimalFormat(numberPattern);
         }
-        
+
     }
 
     /**
@@ -88,7 +93,7 @@ public final class MCRObjectID {
      * 
      * @exception MCRException
      *                if the given string is not valid.
-     * @deprecated use {@link #getInstance(String)} instead                
+     * @deprecated use {@link #getInstance(String)} instead
      */
     public MCRObjectID(String id) throws MCRException {
         if (!setID(id)) {
@@ -98,9 +103,9 @@ public final class MCRObjectID {
 
     /**
      * Returns a MCRObjectID from a given base ID string. A base ID is
-     * <em>project_id</em>_<em>type_id</em>. The number is computed by
-     * this method. It is the next free number of an item in the database for
-     * the given project ID and type ID.
+     * <em>project_id</em>_<em>type_id</em>. The number is computed by this
+     * method. It is the next free number of an item in the database for the
+     * given project ID and type ID.
      * 
      * @param base_id
      *            <em>project_id</em>_<em>type_id</em>
@@ -110,12 +115,15 @@ public final class MCRObjectID {
     }
 
     /**
-     * Returns a MCRObjectID from a given base ID string. Similar to {@link #getNextFreeId(String)}
-     * but the additional parameter acts as a lower limit for integer part of the ID.
+     * Returns a MCRObjectID from a given base ID string. Similar to
+     * {@link #getNextFreeId(String)} but the additional parameter acts as a
+     * lower limit for integer part of the ID.
+     * 
      * @param base_id
-     *  <em>project_id</em>_<em>type_id</em>
+     *            <em>project_id</em>_<em>type_id</em>
      * @param maxInWorkflow
-     *  returned integer part of id will be at least <code>maxInWorkflow + 1</code>
+     *            returned integer part of id will be at least
+     *            <code>maxInWorkflow + 1</code>
      * @return
      */
     public static synchronized MCRObjectID getNextFreeId(String base_id, int maxInWorkflow) {
@@ -154,8 +162,8 @@ public final class MCRObjectID {
     }
 
     /**
-     * This method get the string with <em>type_id</em>. If the ID is not
-     * valid, an empty string was returned.
+     * This method get the string with <em>type_id</em>. If the ID is not valid,
+     * an empty string was returned.
      * 
      * @return the string of the type id
      */
@@ -164,8 +172,8 @@ public final class MCRObjectID {
     }
 
     /**
-     * This method get the string with <em>number</em>. If the ID is not
-     * valid, an empty string was returned.
+     * This method get the string with <em>number</em>. If the ID is not valid,
+     * an empty string was returned.
      * 
      * @return the string of the number
      */
@@ -174,8 +182,8 @@ public final class MCRObjectID {
     }
 
     /**
-     * This method get the integer with <em>number</em>. If the ID is not
-     * valid, a -1 was returned.
+     * This method get the integer with <em>number</em>. If the ID is not valid,
+     * a -1 was returned.
      * 
      * @return the number as integer
      */
@@ -185,8 +193,7 @@ public final class MCRObjectID {
 
     /**
      * This method get the basic string with <em>project_id</em>_
-     * <em>type_id</em>. If the Id is not valid, an empty string was
-     * returned.
+     * <em>type_id</em>. If the Id is not valid, an empty string was returned.
      * 
      * @return the string of the schema name
      */
@@ -195,8 +202,9 @@ public final class MCRObjectID {
     }
 
     /**
-     * Normalizes to a object ID of form <em>project_id</em>_
-     * <em>type_id</em>_<em>number</em>, where number has leading zeros.
+     * Normalizes to a object ID of form <em>project_id</em>_ <em>type_id</em>_
+     * <em>number</em>, where number has leading zeros.
+     * 
      * @param projectID
      * @param type
      * @param number
@@ -212,19 +220,16 @@ public final class MCRObjectID {
         if (number < 0) {
             throw new IllegalArgumentException("number can not be negative");
         }
-        return new StringBuilder(MAX_LENGTH)
-            .append(projectID)
-            .append('_')
-            .append(type.toLowerCase())
-            .append('_')
-            .append(idFormat.numberFormat().format(number))
-            .toString();
+        return new StringBuilder(MAX_LENGTH).append(projectID).append('_').append(type.toLowerCase()).append('_')
+                .append(idFormat.numberFormat().format(number)).toString();
     }
 
     /**
-     * Normalizes to a object ID of form <em>project_id</em>_
-     * <em>type_id</em>_<em>number</em>, where number has leading zeros.
-     * @param baseID is <em>project_id</em>_<em>type_id</em>
+     * Normalizes to a object ID of form <em>project_id</em>_ <em>type_id</em>_
+     * <em>number</em>, where number has leading zeros.
+     * 
+     * @param baseID
+     *            is <em>project_id</em>_<em>type_id</em>
      * @param number
      * @return <em>project_id</em>_<em>type_id</em>_<em>number</em>
      */
@@ -235,9 +240,11 @@ public final class MCRObjectID {
 
     /**
      * Splits the submitted <code>id</code> in its parts.
-     * <code>MyCoRe_document_00000001</code> would be transformed in
-     * { "MyCoRe", "document", "00000001" }
-     * @param id either baseID or complete ID
+     * <code>MyCoRe_document_00000001</code> would be transformed in { "MyCoRe",
+     * "document", "00000001" }
+     * 
+     * @param id
+     *            either baseID or complete ID
      */
     public static String[] getIDParts(String id) {
         return id.split("_");
@@ -245,8 +252,8 @@ public final class MCRObjectID {
 
     /**
      * This method return the validation value of a MCRObjectId and store the
-     * components in this class. The <em>type_id</em> was set to lower case.
-     * The MCRObjectID is valid if:
+     * components in this class. The <em>type_id</em> was set to lower case. The
+     * MCRObjectID is valid if:
      * <ul>
      * <li>The argument is not null.
      * <li>The syntax of the ID is <em>project_id</em>_<em>type_id</em>_
@@ -281,6 +288,7 @@ public final class MCRObjectID {
         mcr_type_id = idParts[1].toLowerCase().intern();
 
         if (!CONFIG.getBoolean("MCR.Metadata.Type." + mcr_type_id, false)) {
+            LOGGER.warn("Property MCR.Metadata.Type." + mcr_type_id + " is not set. Thus " + id + " cannot be a valid id");
             return false;
         }
 
@@ -331,7 +339,9 @@ public final class MCRObjectID {
 
     /**
      * @see java.lang.Object#toString()
-     * @return {@link #formatID(String, String, int)} with {@link #getProjectId()}, {@link #getTypeId()}, {@link #getNumberAsInteger()}
+     * @return {@link #formatID(String, String, int)} with
+     *         {@link #getProjectId()}, {@link #getTypeId()},
+     *         {@link #getNumberAsInteger()}
      */
     @Override
     public String toString() {
