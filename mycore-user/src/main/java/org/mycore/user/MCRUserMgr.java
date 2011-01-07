@@ -135,7 +135,8 @@ public class MCRUserMgr {
             return;
         }
         // For this action you must have list rights.
-        if (!MCRAccessManager.checkPermission("administrate-user") && !session.getUserInformation().getCurrentUserID().equals(MCRSystemUserInformation.getSuperUserInstance().getCurrentUserID())) {
+        if (!MCRAccessManager.checkPermission("administrate-user")
+            && !session.getUserInformation().getCurrentUserID().equals(MCRSystemUserInformation.getSuperUserInstance().getCurrentUserID())) {
             locked = false;
             throw new MCRException("The session does not have the permission \"administrate-user\"!");
         }
@@ -168,8 +169,7 @@ public class MCRUserMgr {
             ArrayList<String> mbrUserIDs = primaryGroup.getMemberUserIDs();
 
             if (!mbrUserIDs.contains(currentUser.getID())) {
-                LOGGER.error("user : '" + currentUser.getID() + "' error: is not member of" + " primary group '"
-                        + currentUser.getPrimaryGroupID() + "'!");
+                LOGGER.error("user : '" + currentUser.getID() + "' error: is not member of" + " primary group '" + currentUser.getPrimaryGroupID() + "'!");
             }
         }
 
@@ -187,8 +187,7 @@ public class MCRUserMgr {
 
             for (int j = 0; j < admUserIDs.size(); j++) {
                 if (!mcrUserStore.existsUser((String) admUserIDs.get(j))) {
-                    LOGGER.error("group: '" + currentGroup.getID() + "' error: unknown admin" + " user '" + (String) admUserIDs.get(j)
-                            + "'!");
+                    LOGGER.error("group: '" + currentGroup.getID() + "' error: unknown admin" + " user '" + (String) admUserIDs.get(j) + "'!");
                 }
             }
 
@@ -197,8 +196,7 @@ public class MCRUserMgr {
 
             for (int j = 0; j < admGroupIDs.size(); j++) {
                 if (!mcrUserStore.existsGroup((String) admGroupIDs.get(j))) {
-                    LOGGER.error("group: '" + currentGroup.getID() + "' error: unknown admin" + " group '" + (String) admGroupIDs.get(j)
-                            + "'!");
+                    LOGGER.error("group: '" + currentGroup.getID() + "' error: unknown admin" + " group '" + (String) admGroupIDs.get(j) + "'!");
                 }
             }
 
@@ -436,7 +434,7 @@ public class MCRUserMgr {
 
         if (primUserIDs.iterator().hasNext()) {
             throw new MCRException("Group '" + groupID + "' can't be deleted since there" + " are users with '" + groupID
-                    + "' as their primary group. First update or" + " delete the users!");
+                + "' as their primary group. First update or" + " delete the users!");
         }
 
         try {
@@ -951,7 +949,7 @@ public class MCRUserMgr {
                 passwd = MCRCrypt.crypt(salt, passwd);
             }
 
-            if (loginUser.getPassword().equals(passwd)){
+            if (loginUser.getPassword().equals(passwd)) {
                 MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
                 mcrSession.setUserInformation(new MCRUserRoleProvider(loginUser));
                 mcrSession.setLoginTime();
@@ -1173,21 +1171,12 @@ public class MCRUserMgr {
             throw new MCRException("Cant find user with ID " + userID + "!");
         }
 
-        if (!user.isUpdateAllowed()) {
+        boolean adminUser = MCRAccessManager.checkPermission("administrate-user");
+        if (!(user.isUpdateAllowed() || adminUser)) {
             throw new MCRException("The update for the user " + userID + " is not allowed!");
         }
 
-        boolean test = false;
-
-        if (session.getUserInformation().getCurrentUserID().equals(userID)) {
-            test = true;
-        } else {
-            if (MCRAccessManager.checkPermission("administrate-user")) {
-                test = true;
-            }
-        }
-
-        if (!test) {
+        if (!(session.getUserInformation().getCurrentUserID().equals(userID) || adminUser)) {
             throw new MCRException("You have no rights to change the users password!");
         }
 
@@ -1410,8 +1399,7 @@ public class MCRUserMgr {
 
             if (!mcrUserStore.existsGroup(gid)) {
                 StringBuffer msg = new StringBuffer("You tried to update ");
-                msg.append(updUser instanceof MCRUser ? "user '" : "group '").append(ID).append("' with the unknown group '").append(gid)
-                        .append("'.");
+                msg.append(updUser instanceof MCRUser ? "user '" : "group '").append(ID).append("' with the unknown group '").append(gid).append("'.");
                 throw new MCRException(msg.toString());
             }
         }
