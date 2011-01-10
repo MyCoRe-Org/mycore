@@ -72,20 +72,18 @@ public class MCRErrorServlet extends HttpServlet {
             String msg = MessageFormat.format("Handling error {0} for request ''{1}'' message: {2}", statusCode, requestURI, message);
             LOGGER.debug(msg, exception);
         }
-        MCRSession session = getMCRSession(req, servletName);
+        generateErrorPage(req, resp, message, exception, statusCode, exceptionType, requestURI, servletName);
+    }
+
+    private boolean setCurrentSession(HttpServletRequest req) {
+        MCRSession session = getMCRSession(req);
         if (session != null && !MCRSessionMgr.hasCurrentSession()) {
             MCRSessionMgr.setCurrentSession(session);
         }
-        try {
-            generateErrorPage(req, resp, message, exception, statusCode, exceptionType, requestURI, servletName);
-        } finally {
-            if (session != null) {
-                MCRSessionMgr.releaseCurrentSession();
-            }
-        }
+        return session != null;
     }
 
-    private MCRSession getMCRSession(HttpServletRequest req, String servletName) {
+    private MCRSession getMCRSession(HttpServletRequest req) {
         HttpSession session = req.getSession(false);
         if (session == null) {
             return null;
@@ -146,15 +144,25 @@ public class MCRErrorServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
             request.setAttribute(requestAttr, msg);
-            MCRSession currentSession = MCRSessionMgr.getCurrentSession();
-            boolean openTransaction = currentSession.isTransactionActive();
-            if (!openTransaction) {
-                currentSession.beginTransaction();
+            boolean sessionFromRequest = setCurrentSession(request);
+            MCRSession session = null;
+            try {
+                session = MCRSessionMgr.getCurrentSession();
+                boolean openTransaction = session.isTransactionActive();
+                if (!openTransaction) {
+                    session.beginTransaction();
+                }
+                LAYOUT_SERVICE.doLayout(request, response, errorDoc);
+                if (!openTransaction)
+                    session.commitTransaction();
+                return;
+            } finally {
+                MCRSessionMgr.releaseCurrentSession();
+                if (!sessionFromRequest) {
+                    //new session created for transaction
+                    session.close();
+                }
             }
-            LAYOUT_SERVICE.doLayout(request, response, errorDoc);
-            if (!openTransaction)
-                currentSession.commitTransaction();
-            return;
         } else {
             if (request.getAttribute(requestAttr) != null) {
                 LOGGER.warn("Could not send error page. Generating error page failed. The original message:\n" + request.getAttribute(requestAttr));
