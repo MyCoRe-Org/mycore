@@ -197,12 +197,12 @@
                             </xsl:call-template>
                         </xsl:variable>
                         <a href="{$aclEditorAddress_edit}">
-                            <img width="18" height="13" src="{concat($WebApplicationBaseURL,'/modules/wcms/aif/web/images/editRule.gif')}"
+                            <img width="18" height="13" src="{concat($WebApplicationBaseURL,'modules/wcms/aif/web/images/editRule.gif')}"
                                 title="{i18n:translate('wcms.rightsManag.acl.edit')}" alt="{i18n:translate('wcms.rightsManag.acl.edit')}" />
                         </a>
                         ,
                         <a href="{$aclEditorAddress_delete}">
-                            <img width="18" height="13" src="{concat($WebApplicationBaseURL,'/modules/wcms/aif/web/images/deleteRule.gif')}"
+                            <img width="18" height="13" src="{concat($WebApplicationBaseURL,'modules/wcms/aif/web/images/deleteRule.gif')}"
                                 title="{i18n:translate('wcms.rightsManag.acl.delete')}" alt="{i18n:translate('wcms.rightsManag.acl.delete')}" />
                         </a>
                     </xsl:when>
@@ -215,7 +215,7 @@
                             </xsl:call-template>
                         </xsl:variable>
                         <a href="{$aclEditorAddress_add}">
-                            <img width="18" height="13" src="{concat($WebApplicationBaseURL,'/modules/wcms/aif/web/images/addRule.gif')}"
+                            <img width="18" height="13" src="{concat($WebApplicationBaseURL,'modules/wcms/aif/web/images/addRule.gif')}"
                                 title="{i18n:translate('wcms.rightsManag.acl.add')}" alt="{i18n:translate('wcms.rightsManag.acl.add')}" />
                         </a>
                     </xsl:otherwise>
