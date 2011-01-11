@@ -912,7 +912,11 @@ function startFileLoaded(viewID){
   		success: function(response) {
 			processMETS(response,viewID);
 		},
-  		error: function(request, status, exception) {alert("Error Occured while Loading METS file:\n"+exception);}
+  		error: function(request, status, exception) {
+  			if(console){
+  				console.log("Error Occured while Loading METS file:\n"+exception);
+  			}
+  		}
 	});
 	
 	// Resize-Events registrieren
