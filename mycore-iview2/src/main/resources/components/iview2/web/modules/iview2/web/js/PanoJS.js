@@ -295,6 +295,15 @@ PanoJS.prototype = {
 		this.surface.style.cursor = PanoJS.GRAB_MOUSE_CURSOR;
 		this.prepareTiles();
 		this.initialized = true;
+		
+		//addition
+		this.top = 0;
+		this.left = 0;
+		for (var node = this.viewer; node; node = node.offsetParent) {
+			this.top += node.offsetTop;
+			this.left += node.offsetLeft;
+		}
+		//end addition
 	},
 
 	prepareTiles : function() {
@@ -331,8 +340,8 @@ PanoJS.prototype = {
 		this.surface.onmouseup = this.surface.onmouseout = PanoJS.mouseReleasedHandler;
 		this.surface.ondblclick = PanoJS.doubleClickHandler;
 		if (PanoJS.USE_KEYBOARD) {
-			window.onkeypress = PanoJS.keyboardMoveHandler;
-			window.onkeydown = PanoJS.keyboardZoomHandler;
+			document.onkeypress = PanoJS.keyboardMoveHandler;
+			document.onkeydown = PanoJS.keyboardZoomHandler;
 		}
 
 		this.positionTiles();
@@ -348,6 +357,38 @@ PanoJS.prototype = {
 		if (typeof motion == 'undefined') {
 			motion = { 'x' : 0, 'y' : 0 };
 		}
+		
+		//addition
+		var viewID = this.viewID;
+		//Changed to work for multiple Viewers
+		//hinzugefuegt damit Bild nicht ueber die Raender laeuft
+		if (-(this.x + motion.x) > ((Iview[viewID].bildBreite/Math.pow(2, Iview[viewID].zoomMax - this.zoomLevel))*Iview[viewID].zoomScale-this.width)) {
+			motion.x = 0;
+			this.x = -((Iview[viewID].bildBreite/Math.pow(2, Iview[viewID].zoomMax - this.zoomLevel))*Iview[viewID].zoomScale-this.width);
+		}
+		if (-(this.y + motion.y) > ((Iview[viewID].bildHoehe/Math.pow(2, Iview[viewID].zoomMax - this.zoomLevel))*Iview[viewID].zoomScale-this.height)) {
+			motion.y = 0;
+			this.y = -((Iview[viewID].bildHoehe/Math.pow(2, Iview[viewID].zoomMax - this.zoomLevel))*Iview[viewID].zoomScale-this.height);
+		}
+		if(this.x + motion.x > 0){
+			this.x = 0;
+			motion.x = 0;
+		}		
+		if(this.y + motion.y > 0){
+			this.y = 0;
+			motion.y = 0;
+		}
+		/*verschieben des Preload bildes damit man eine grobe Vorschau sieht von dem was kommt
+		  wird nur ausgeführt wenn Seite geladen ist, da ansonsten die Eigenschaften noch nicht vorhanden sind*/
+		if(Iview[viewID].loaded) {
+			var preLoadEl=document.getElementById('preload'+viewID);
+			//folgende beide IF-Anweisungen für IE
+			if(isNaN(this.x)) this.x = 0; 
+			if(isNaN(this.y)) this.y = 0;
+			preLoadEl.style.left = (this.x + motion.x) + "px";
+			preLoadEl.style.top = (this.y + motion.y) + "px";
+		}
+		//end addition
 
 		for (var c = 0; c < this.tiles.length; c++) {
 			for (var r = 0; r < this.tiles[c].length; r++) {
@@ -423,6 +464,10 @@ PanoJS.prototype = {
 				// seems to need this no matter what
 				tile.element.style.top = tile.posy + 'px';
 				tile.element.style.left = tile.posx + 'px';
+				//addition
+				tile.width = this.tileSize + "px";
+				tile.height = this.tileSize + "px";
+				//end addition
 			}
 		}
 
@@ -450,10 +495,21 @@ PanoJS.prototype = {
 		if (!useBlankImage) {
 			var left = tile.xIndex < 0;
 			var high = tile.yIndex < 0;
-			var right = tile.xIndex >= Math.pow(2, this.zoomLevel);
-			var low = tile.yIndex >= Math.pow(2, this.zoomLevel);
-			if (high || left || low || right) {
-				useBlankImage = true;
+			if (left || high) {
+				useBlankImage=true;
+			} else {
+				//modification to original PanonJS code
+				var iView=Iview[this.viewID];
+				var currentWidth = Math.floor(iView.bildBreite / Math.pow(2, iView.zoomMax - this.zoomLevel));
+				var xTileCount = Math.ceil( currentWidth / iView.tilesize);
+				var currentHeight = Math.floor(iView.bildHoehe / Math.pow(2, iView.zoomMax - this.zoomLevel));
+				var yTileCount = Math.ceil( currentHeight / iView.tilesize);
+				var right = tile.xIndex >= xTileCount; //index starts at 0
+				var low = tile.yIndex >= yTileCount;
+				if (low || right) {
+					useBlankImage = true;
+				}
+				//modification ends
 			}
 		}
 
@@ -520,6 +576,12 @@ PanoJS.prototype = {
 				tileImg.image.src = tileImg.src;
 			}
 		}
+//additions	
+		isloaded(tileImg, this.viewID);
+		//changes all not available Tiles to the blank one, so that no ugly Image not Found Pics popup.
+		//tileImg.onerror = function () {this.src = Iview[this.viewID].viewerBean.cache['blank'].src; return true;};
+		tileImg.onerror = function () {this.src = Iview[this.viewID].viewerBean.cache['blank'].src; return true;};
+//endadd
 	},
 
 	createPrototype : function(src) {
@@ -527,9 +589,12 @@ PanoJS.prototype = {
 		img.src = src;
 		img.relativeSrc = src;
 		img.className = PanoJS.TILE_STYLE_CLASS;
-		img.style.width = this.tileSize + 'px';
-		img.style.height = this.tileSize + 'px';
-		return img;
+		//don't handle width with tiles
+		try {
+			return img;
+		} finally {
+			img = null;
+		}
 	},
 
 	addViewerMovedListener : function(listener) {

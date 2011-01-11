@@ -113,8 +113,6 @@ ToolbarController.prototype.addView = function(view) {
     		} else if (args.parentName == "closeHandles") {
     			if (args.elementName == "close") {
     				myself.getViewer().maximizeHandler();
-    				// TODO: move into the maximize method
-    				myself.getViewer().getToolbarMgr().destroyModel('mainTb');
     			}		
     		}
 	    } else if (args.type == "new") {
