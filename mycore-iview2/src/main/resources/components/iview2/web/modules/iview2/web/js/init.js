@@ -222,11 +222,11 @@ function maximizeHandler(viewID) {
 		}
 		
 		if (Iview[viewID].zoomWidth) {
-			$(".mainTbView .zoomHandles .fitToWidth")[0].checked = true;
-			$(".mainTbView .zoomHandles .fitToWidthLabel").addClass("ui-state-active");
+			jQuery(".mainTbView .zoomHandles .fitToWidth")[0].checked = true;
+			jQuery(".mainTbView .zoomHandles .fitToWidthLabel").addClass("ui-state-active");
 		} else if (Iview[viewID].zoomScreen) {
-			$(".mainTbView .zoomHandles .fitToScreen")[0].checked = true;
-			$(".mainTbView .zoomHandles .fitToScreenLabel").addClass("ui-state-active");
+			jQuery(".mainTbView .zoomHandles .fitToScreen")[0].checked = true;
+			jQuery(".mainTbView .zoomHandles .fitToScreenLabel").addClass("ui-state-active");
 		}
 		
 		// save document content

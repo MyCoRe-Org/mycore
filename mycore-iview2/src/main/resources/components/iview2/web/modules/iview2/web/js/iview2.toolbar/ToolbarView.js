@@ -37,7 +37,7 @@ ToolbarView.prototype = {
 	 * @return {Object} returns the parent tag of the added buttonset
 	 */
     addButtonset : function (args) {
-    	var newButtonset = $('<span>').buttonset().addClass(args.elementName);
+    	var newButtonset = jQuery('<span>').buttonset().addClass(args.elementName);
     	if (!isNaN(args.index) && args.index != this.toolbar.childNodes.length) {
     		newButtonset.insertBefore(this.toolbar.childNodes[args.index]);
     	} else {
@@ -58,7 +58,7 @@ ToolbarView.prototype = {
 	 * @return {Object} returns the parent tag of the added divider
 	 */        
     addDivider : function (args) {
-    	var newDivider = $('<span>').addClass(args.elementName).addClass('ui-divider')/*.addClass('ui-button-size-normal')*/;
+    	var newDivider = jQuery('<span>').addClass(args.elementName).addClass('ui-divider');
 		if (!isNaN(args.index) && args.index != this.toolbar.childNodes.length) {
     		newDivider.insertBefore(this.toolbar.childNodes[args.index]);
     	} else {
@@ -79,7 +79,7 @@ ToolbarView.prototype = {
 	 * @return {Object} returns the parent tag of the added divider
 	 */        
     addText : function (args) {
-    	var newText = $('<span>').addClass(args.elementName).addClass('ui-text').html(args.text);
+    	var newText = jQuery('<span>').addClass(args.elementName).addClass('ui-text').html(args.text);
 		if (!isNaN(args.index) && args.index != this.toolbar.childNodes.length) {
     		newText.insertBefore(this.toolbar.childNodes[args.index]);
     	} else {
@@ -187,10 +187,10 @@ ToolbarView.prototype = {
     		};
 
 		if (args.subtype.type == "buttonDefault") {
-    		newButton = $('<button>').attr('title', args.title).addClass(args.elementName);
+    		newButton = jQuery('<button>').attr('title', args.title).addClass(args.elementName);
     		newButton.click(onClick);
 		} else if (args.subtype.type == "buttonCheck") {
-			newButton = $('<input type="checkbox" id="'+args.elementName+'" class='+args.elementName+' /><label for='+args.elementName+' class='+args.elementName+"Label"+'>'+args.title+'</label>')
+			newButton = jQuery('<input type="checkbox" id="'+args.elementName+'" class='+args.elementName+' /><label for='+args.elementName+' class='+args.elementName+"Label"+'>'+args.title+'</label>')
 				.attr('title', args.title);
 			newButton[1].onclick = onClick;
 		}
@@ -219,7 +219,7 @@ ToolbarView.prototype = {
     	}
 
     	// must appear after append (for checkbox-function)
-    	newButton = $("."+this.id+" ."+args.parentName+" ."+args.elementName).button(args.ui);
+    	newButton = jQuery("."+this.id+" ."+args.parentName+" ."+args.elementName).button(args.ui);
 
     	if (!args.active) {
     		newButton.button( "option", "disabled", true )
@@ -312,48 +312,48 @@ ToolbarView.prototype = {
     	if (args.reason == "add") {
     		if (buttonCount == 2) {
     			if (isFirstButton) {
-    				$(buttonset.childNodes[successorIndex]).removeClass('ui-corner-all');
-    				$(buttonset.childNodes[successorIndex]).addClass('ui-corner-right');
-    				$(buttonset.childNodes[buttonIndex]).removeClass('ui-corner-all');
-    				$(buttonset.childNodes[buttonIndex]).addClass('ui-corner-left');
+    				jQuery(buttonset.childNodes[successorIndex]).removeClass('ui-corner-all');
+    				jQuery(buttonset.childNodes[successorIndex]).addClass('ui-corner-right');
+    				jQuery(buttonset.childNodes[buttonIndex]).removeClass('ui-corner-all');
+    				jQuery(buttonset.childNodes[buttonIndex]).addClass('ui-corner-left');
     			} else {
-    				$(buttonset.childNodes[ancestorIndex]).removeClass('ui-corner-all');
-    				$(buttonset.childNodes[ancestorIndex]).addClass('ui-corner-left');
-    				$(buttonset.childNodes[buttonIndex]).removeClass('ui-corner-all');
-    				$(buttonset.childNodes[buttonIndex]).addClass('ui-corner-right');
+    				jQuery(buttonset.childNodes[ancestorIndex]).removeClass('ui-corner-all');
+    				jQuery(buttonset.childNodes[ancestorIndex]).addClass('ui-corner-left');
+    				jQuery(buttonset.childNodes[buttonIndex]).removeClass('ui-corner-all');
+    				jQuery(buttonset.childNodes[buttonIndex]).addClass('ui-corner-right');
     			}	
     		} else if (buttonCount > 2) {
     			if (isFirstButton) {
-    				$(buttonset.childNodes[successorIndex]).removeClass('ui-corner-left');
-    				$(buttonset.childNodes[successorIndex]).addClass('ui-corner-none');
-    				$(buttonset.childNodes[buttonIndex]).removeClass('ui-corner-all');
-    				$(buttonset.childNodes[buttonIndex]).addClass('ui-corner-left');
+    				jQuery(buttonset.childNodes[successorIndex]).removeClass('ui-corner-left');
+    				jQuery(buttonset.childNodes[successorIndex]).addClass('ui-corner-none');
+    				jQuery(buttonset.childNodes[buttonIndex]).removeClass('ui-corner-all');
+    				jQuery(buttonset.childNodes[buttonIndex]).addClass('ui-corner-left');
     			} else if (isLastButton) {
-    				$(buttonset.childNodes[ancestorIndex]).removeClass('ui-corner-right');
-    				$(buttonset.childNodes[ancestorIndex]).addClass('ui-corner-none');
-    				$(buttonset.childNodes[buttonIndex]).removeClass('ui-corner-all');
-    				$(buttonset.childNodes[buttonIndex]).addClass('ui-corner-right');
+    				jQuery(buttonset.childNodes[ancestorIndex]).removeClass('ui-corner-right');
+    				jQuery(buttonset.childNodes[ancestorIndex]).addClass('ui-corner-none');
+    				jQuery(buttonset.childNodes[buttonIndex]).removeClass('ui-corner-all');
+    				jQuery(buttonset.childNodes[buttonIndex]).addClass('ui-corner-right');
     			} else {
-    				$(buttonset.childNodes[buttonIndex]).removeClass('ui-corner-all');
-    				$(buttonset.childNodes[buttonIndex]).addClass('ui-corner-none');
+    				jQuery(buttonset.childNodes[buttonIndex]).removeClass('ui-corner-all');
+    				jQuery(buttonset.childNodes[buttonIndex]).addClass('ui-corner-none');
     			}
     		}
 		} else if (args.reason == "del") {
-			if ($(buttonset.childNodes[buttonIndex]).hasClass('ui-corner-left')) {
+			if (jQuery(buttonset.childNodes[buttonIndex]).hasClass('ui-corner-left')) {
 				if (buttonCount == 2) {
-					$(buttonset.childNodes[successorIndex]).removeClass('ui-corner-right');
-			    	$(buttonset.childNodes[successorIndex]).addClass('ui-corner-all');
+					jQuery(buttonset.childNodes[successorIndex]).removeClass('ui-corner-right');
+			    	v(buttonset.childNodes[successorIndex]).addClass('ui-corner-all');
 			    } else {
-			    	$(buttonset.childNodes[successorIndex]).removeClass('ui-corner-none');
-			    	$(buttonset.childNodes[successorIndex]).addClass('ui-corner-left');
+			    	jQuery(buttonset.childNodes[successorIndex]).removeClass('ui-corner-none');
+			    	jQuery(buttonset.childNodes[successorIndex]).addClass('ui-corner-left');
 			    }
-			} else if ($(buttonset.childNodes[buttonIndex]).hasClass('ui-corner-right')) {
+			} else if (jQuery(buttonset.childNodes[buttonIndex]).hasClass('ui-corner-right')) {
 				if (buttonCount == 2) {
-					$(buttonset.childNodes[ancestorIndex]).removeClass('ui-corner-left');
-			    	$(buttonset.childNodes[ancestorIndex]).addClass('ui-corner-all');
+					jQuery(buttonset.childNodes[ancestorIndex]).removeClass('ui-corner-left');
+					jQuery(buttonset.childNodes[ancestorIndex]).addClass('ui-corner-all');
 			    } else {
-					$(buttonset.childNodes[ancestorIndex]).removeClass('ui-corner-none');
-		    		$(buttonset.childNodes[ancestorIndex]).addClass('ui-corner-right');
+			    	jQuery(buttonset.childNodes[ancestorIndex]).removeClass('ui-corner-none');
+			    	jQuery(buttonset.childNodes[ancestorIndex]).addClass('ui-corner-right');
 			    }
 			}
 		}

@@ -144,15 +144,15 @@ ToolbarController.prototype.addView = function(view) {
 							linkToFront: false
 					    },
 						onChoose: function(item) {
-								args.view.button( "option", "label", $(item).text());
-								var content = ($(item).text());
+								args.view.button( "option", "label", jQuery(item).text());
+								var content = (jQuery(item).text());
 								var page = content.substring(content.lastIndexOf('[') + 1, content.lastIndexOf(']'));
 								myself.getViewer().PhysicalModel.setPosition(page);
 						}
 					});
 			      	// MainTbView erst nachträglich geladen, Mets zuvor gelesen
 			      	if (myself.getViewer().PhysicalModel) {
-				      	var initContent = $($('#pages').find('a')[myself.getViewer().PhysicalModel.getCurPos() - 1]).html();
+				      	var initContent = jQuery(jQuery('#pages').find('a')[myself.getViewer().PhysicalModel.getCurPos() - 1]).html();
 				      	myself.updateDropDown(initContent);
 				      	
 				      	// chapter and overview need to wait for METS informations
@@ -201,18 +201,24 @@ ToolbarController.prototype.catchModels = function() {
 			// process for each view
 			for (var i = 0; i < curViewIds.length; i++) {
 				var curView = myself.views[curViewIds[i]];
-		    	if (args.type == "destroy") {
+				switch (args.type) {
+				case "destroy":
 		    		curView.destroy();
 		    		delete(myself.views[myself.relations[args.modelId]]);
-		    	} else if (args.type == "add") {
+		    	break;
+				case "add":
 		    		if (args.element) {
 				    	var element = args.element;
-				    	if (element.type == "buttonset") {
+				    	switch (element.type) {
+				    	case "buttonset":
 				   			curView.addButtonset({'elementName' : element.elementName, 'index' : element.index});
-				    	} else if (element.type == "divider") {
+				   		break;
+				    	case "divider":
 				    		curView.addDivider({'elementName' : element.elementName, 'index' : element.index});
-				    	} else if (element.type == "text") {
+				    	break;
+				    	case "text":
 				    		curView.addText({'elementName' : element.elementName, 'text' : element.text, 'index' : element.index});
+				    	break;
 				    	}
 			    	} else if (args.button) {
 			    		var button = args.button;
@@ -220,7 +226,8 @@ ToolbarController.prototype.catchModels = function() {
 			    			curView.addButton({'elementName' : button.elementName, 'ui' : button.ui, 'index' : button.index, 'title' : button.title, 'subtype' : button.subtype, 'parentName' : button.relatedButtonset.elementName, 'active' : button.active});
 			    		}
 			    	}
-		    	} else if (args.type == "del") {
+		    	break;
+				case "del":
 		    		if (args.element) {
 				    	var element = args.element;
 				    	if (element.type == "buttonset" || element.type == "divider") {
@@ -230,7 +237,8 @@ ToolbarController.prototype.catchModels = function() {
 		    			var button = args.button;
 				    	curView.removeButton({'elementName' : button.elementName, 'parentName' : button.relatedButtonset.elementName});
 				    }
-		    	} else if (args.type == "changeState") {
+		    	break;
+				case "changeState":
 		    		// TODO: maybe it will be fine to move this to the view
 		    		if (args.elementName == "zoomHandles") {
 			    		if (args.buttonName == "fitToWidth") {
@@ -261,15 +269,18 @@ ToolbarController.prototype.catchModels = function() {
 		    				// the other case won't be used
 		    			}
 		    		}
-    			} else if (args.type == "changeActive") {
+		    	break;
+				case "changeActive":
     				curView.setButtonUi({'button' : '.'+args.elementName+' .'+args.buttonName, 'disabled' : !args.active});
-    			} else if (args.type == "changeLoading") {
+    			break;
+				case "changeLoading":
     				if (args.loading) {
     					curView.setButtonUi({'button' : '.'+args.elementName+' .'+args.buttonName, 'icons' : {'primary' : 'loading'}});
     				} else {
     					var ui = toolbarMgr.getModel(args.modelId).getElement(args.elementName).getButton(args.buttonName).ui;
     					curView.setButtonUi({'button' : '.'+args.elementName+' .'+args.buttonName, 'icons' : ui.icons});
     				}
+    			break;
     			}
 			}
 	    }
@@ -368,7 +379,7 @@ ToolbarController.prototype.checkZoom = function(zoom) {
  */
 ToolbarController.prototype.updateDropDown = function(content) {
 	// TODO: sollte eventuell nochmal überdacht werden (vieleicht direkter Wechsel auf Seite)
-	$('.navigateHandles .pageBox').button('option', 'label', content);
+	jQuery('.navigateHandles .pageBox').button('option', 'label', content);
 };
 
 /**
