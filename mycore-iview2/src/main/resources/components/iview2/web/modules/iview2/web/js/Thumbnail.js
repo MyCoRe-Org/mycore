@@ -49,7 +49,11 @@ function loadPage(viewID, callback) {
 	jQuery.ajax({
 		url: imagePropertiesURL,
   		success: function(response) {processImageProperties(response,viewID)},
-  		error: function(request, status, exception) {alert("Error occured while loading image properties:\n"+exception);},
+  		error: function(request, status, exception) {
+  			if(console){
+  				console.log("Error occured while loading image properties:\n"+exception);
+  			}
+  		},
   		complete: function() {callBack(callback)}
 	});
 }
