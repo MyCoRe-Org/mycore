@@ -25,6 +25,8 @@ package org.mycore.frontend.servlets;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.jdom.Document;
 import org.jdom.Element;
 import org.mycore.access.MCRAccessManager;
@@ -32,22 +34,22 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.xml.MCRLayoutService;
+import org.mycore.services.i18n.MCRTranslation;
 
 public class MCRSessionListingServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
     public void doGetPost(MCRServletJob job) throws Exception {
-
-        if (!MCRAccessManager.checkPermission("manage-sessions"))
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + "access_deny.xml"));
-
-        Document sessionsXML = listSessions(job);
+        if (!MCRAccessManager.checkPermission("manage-sessions")){
+            job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN, MCRTranslation.translate("component.session-listing.page.text"));
+            return;
+        }
+        Document sessionsXML = getSessions();
         MCRLayoutService.instance().doLayout(job.getRequest(), job.getResponse(), sessionsXML);
     }
 
-    private Document listSessions(MCRServletJob job) {
-        // copy all session to new collection (fixes:
-        // ConcurrentModificationException)
+    private Document getSessions() {
+        // copy all session to new collection (fixes: ConcurrentModificationException)
         Collection<MCRSession> sessions = new ArrayList<MCRSession>(MCRSessionMgr.getAllSessions().values());
         Element sessionsXML = new Element("sessionListing");
         for (MCRSession session : sessions) {
