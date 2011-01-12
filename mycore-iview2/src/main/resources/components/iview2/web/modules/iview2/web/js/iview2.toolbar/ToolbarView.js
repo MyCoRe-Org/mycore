@@ -187,8 +187,7 @@ ToolbarView.prototype = {
     		};
 
 		if (args.subtype.type == "buttonDefault") {
-    		newButton = jQuery('<button>').attr('title', args.title).addClass(args.elementName);
-    		newButton.click(onClick);
+    		newButton = jQuery('<button>').attr('title', args.title).addClass(args.elementName).click(onClick);
 		} else if (args.subtype.type == "buttonCheck") {
 			newButton = jQuery('<input type="checkbox" id="'+args.elementName+'" class='+args.elementName+' /><label for='+args.elementName+' class='+args.elementName+"Label"+'>'+args.title+'</label>')
 				.attr('title', args.title);
@@ -312,48 +311,48 @@ ToolbarView.prototype = {
     	if (args.reason == "add") {
     		if (buttonCount == 2) {
     			if (isFirstButton) {
-    				jQuery(buttonset.childNodes[successorIndex]).removeClass('ui-corner-all');
-    				jQuery(buttonset.childNodes[successorIndex]).addClass('ui-corner-right');
-    				jQuery(buttonset.childNodes[buttonIndex]).removeClass('ui-corner-all');
-    				jQuery(buttonset.childNodes[buttonIndex]).addClass('ui-corner-left');
+    				jQuery(buttonset.childNodes[successorIndex])
+    					.removeClass('ui-corner-all').addClass('ui-corner-right');
+    				jQuery(buttonset.childNodes[buttonIndex])
+    					.removeClass('ui-corner-all').addClass('ui-corner-left');
     			} else {
-    				jQuery(buttonset.childNodes[ancestorIndex]).removeClass('ui-corner-all');
-    				jQuery(buttonset.childNodes[ancestorIndex]).addClass('ui-corner-left');
-    				jQuery(buttonset.childNodes[buttonIndex]).removeClass('ui-corner-all');
-    				jQuery(buttonset.childNodes[buttonIndex]).addClass('ui-corner-right');
+    				jQuery(buttonset.childNodes[ancestorIndex])
+    					.removeClass('ui-corner-all').addClass('ui-corner-left');
+    				jQuery(buttonset.childNodes[buttonIndex])
+    					.removeClass('ui-corner-all').addClass('ui-corner-right');
     			}	
     		} else if (buttonCount > 2) {
     			if (isFirstButton) {
-    				jQuery(buttonset.childNodes[successorIndex]).removeClass('ui-corner-left');
-    				jQuery(buttonset.childNodes[successorIndex]).addClass('ui-corner-none');
-    				jQuery(buttonset.childNodes[buttonIndex]).removeClass('ui-corner-all');
-    				jQuery(buttonset.childNodes[buttonIndex]).addClass('ui-corner-left');
+    				jQuery(buttonset.childNodes[successorIndex])
+    					.removeClass('ui-corner-left').addClass('ui-corner-none');
+    				jQuery(buttonset.childNodes[buttonIndex])
+    					.removeClass('ui-corner-all').addClass('ui-corner-left');
     			} else if (isLastButton) {
-    				jQuery(buttonset.childNodes[ancestorIndex]).removeClass('ui-corner-right');
-    				jQuery(buttonset.childNodes[ancestorIndex]).addClass('ui-corner-none');
-    				jQuery(buttonset.childNodes[buttonIndex]).removeClass('ui-corner-all');
-    				jQuery(buttonset.childNodes[buttonIndex]).addClass('ui-corner-right');
+    				jQuery(buttonset.childNodes[ancestorIndex])
+    					.removeClass('ui-corner-right').addClass('ui-corner-none');
+    				jQuery(buttonset.childNodes[buttonIndex])
+    					.removeClass('ui-corner-all').addClass('ui-corner-right');
     			} else {
-    				jQuery(buttonset.childNodes[buttonIndex]).removeClass('ui-corner-all');
-    				jQuery(buttonset.childNodes[buttonIndex]).addClass('ui-corner-none');
+    				jQuery(buttonset.childNodes[buttonIndex])
+    					.removeClass('ui-corner-all').addClass('ui-corner-none');
     			}
     		}
 		} else if (args.reason == "del") {
 			if (jQuery(buttonset.childNodes[buttonIndex]).hasClass('ui-corner-left')) {
 				if (buttonCount == 2) {
-					jQuery(buttonset.childNodes[successorIndex]).removeClass('ui-corner-right');
-			    	v(buttonset.childNodes[successorIndex]).addClass('ui-corner-all');
+					jQuery(buttonset.childNodes[successorIndex])
+						.removeClass('ui-corner-right').addClass('ui-corner-all');
 			    } else {
-			    	jQuery(buttonset.childNodes[successorIndex]).removeClass('ui-corner-none');
-			    	jQuery(buttonset.childNodes[successorIndex]).addClass('ui-corner-left');
+			    	jQuery(buttonset.childNodes[successorIndex])
+			    		.removeClass('ui-corner-none').addClass('ui-corner-left');
 			    }
 			} else if (jQuery(buttonset.childNodes[buttonIndex]).hasClass('ui-corner-right')) {
 				if (buttonCount == 2) {
-					jQuery(buttonset.childNodes[ancestorIndex]).removeClass('ui-corner-left');
-					jQuery(buttonset.childNodes[ancestorIndex]).addClass('ui-corner-all');
+					jQuery(buttonset.childNodes[ancestorIndex])
+						.removeClass('ui-corner-left').addClass('ui-corner-all');
 			    } else {
-			    	jQuery(buttonset.childNodes[ancestorIndex]).removeClass('ui-corner-none');
-			    	jQuery(buttonset.childNodes[ancestorIndex]).addClass('ui-corner-right');
+			    	jQuery(buttonset.childNodes[ancestorIndex])
+			    		.removeClass('ui-corner-none').addClass('ui-corner-right');
 			    }
 			}
 		}
