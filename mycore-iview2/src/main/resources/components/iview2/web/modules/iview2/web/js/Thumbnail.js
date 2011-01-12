@@ -636,10 +636,10 @@ function updateModuls(viewID) {
  * @param	{string} viewID ID of the derivate
  */
 function viewerScroll(delta, viewID) {
-	Iview[viewID].viewerBean.positionTiles({'x': /*delta.x*PanoJS.MOVE_THROTTLE*/0,
-											'y': delta/*.y*/*PanoJS.MOVE_THROTTLE}, true);
-	Iview[viewID].viewerBean.notifyViewerMoved({'x': /*delta.x*PanoJS.MOVE_THROTTLE*/0,
-												'y': delta/*.y*/*PanoJS.MOVE_THROTTLE});
+	Iview[viewID].viewerBean.positionTiles({'x': delta.x*PanoJS.MOVE_THROTTLE,
+											'y': delta.y*PanoJS.MOVE_THROTTLE}, true);
+	Iview[viewID].viewerBean.notifyViewerMoved({'x': delta.x*PanoJS.MOVE_THROTTLE,
+												'y': delta.y*PanoJS.MOVE_THROTTLE});
 }
 
 /**
@@ -829,7 +829,7 @@ function loading(viewID) {
 
 	// Additional Events
 	// register to scroll into the viewer
-	jQuery("#viewer"+viewID).mousewheel(function(e, delta) {e.preventDefault(); viewerScroll(delta, viewID);});
+	jQuery("#viewer"+viewID).mousewheel(function(e, delta, deltaX, deltaY) {e.preventDefault(); viewerScroll({"x":deltaX, "y":deltaY}, viewID);});
 	
 	// damit viewer ueber scrollBarX endet, fortan in reinitialize
 	document.getElementById("viewer"+viewID).style.width = Iview[viewID].startWidth - ((Iview[viewID].barX.my.self.css("visibility") == "visible")? Iview[viewID].barX.my.self.css("offsetWidth") : 0)  + "px";
@@ -963,7 +963,7 @@ function processMETS(metsDoc, viewID) {
 			Iview[viewID].getToolbarCtrl().checkNavigation(args["new"]);
 			updateModuls(viewID);
 			if (jQuery('.navigateHandles .pageBox')[0]) {
-				Iview[viewID].getToolbarCtrl().updateDropDown($(pagelist.find("a")[args["new"] - 1]).html());
+				Iview[viewID].getToolbarCtrl().updateDropDown(jQuery(pagelist.find("a")[args["new"] - 1]).html());
 			}
 		}
 	})
