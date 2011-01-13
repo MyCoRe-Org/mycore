@@ -1,10 +1,16 @@
 /*
- * $Revision$ $Date$ This file is part of M y C o R e See http://www.mycore.de/ for details. This program
- * is free software; you can use it, redistribute it and / or modify it under the terms of the GNU General Public License (GPL) as published by the Free
- * Software Foundation; either version 2 of the License or (at your option) any later version. This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details. You should have received a copy of the GNU General Public License along with this program, in a file called gpl.txt or license.txt. If not,
- * write to the Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307 USA
+ * $Revision$ $Date$ This
+ * file is part of M y C o R e See http://www.mycore.de/ for details. This
+ * program is free software; you can use it, redistribute it and / or modify it
+ * under the terms of the GNU General Public License (GPL) as published by the
+ * Free Software Foundation; either version 2 of the License or (at your option)
+ * any later version. This program is distributed in the hope that it will be
+ * useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details. You should have received a copy of the GNU
+ * General Public License along with this program, in a file called gpl.txt or
+ * license.txt. If not, write to the Free Software Foundation Inc., 59 Temple
+ * Place - Suite 330, Boston, MA 02111-1307 USA
  */
 
 package org.mycore.datamodel.ifs;
@@ -25,7 +31,8 @@ import org.mycore.common.MCRUsageException;
  * Represents a directory node with its metadata and content.
  * 
  * @author Frank Lützenkirchen
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date: 2010-11-08 15:05:28 +0100 (Mon, 08 Nov
+ *          2010) $
  */
 public class MCRDirectory extends MCRFilesystemNode {
     /** The child nodes in this directory * */
@@ -44,8 +51,9 @@ public class MCRDirectory extends MCRFilesystemNode {
     private int numChildFilesTotal = 0;
 
     /**
-     * Creates a new, empty root MCRDirectory with the given name, belonging to the given ownerID. The directory is assumed to be a standalone "root directory"
-     * that has no parent.
+     * Creates a new, empty root MCRDirectory with the given name, belonging to
+     * the given ownerID. The directory is assumed to be a standalone
+     * "root directory" that has no parent.
      * 
      * @param name
      *            the name of the new MCRDirectory
@@ -58,7 +66,8 @@ public class MCRDirectory extends MCRFilesystemNode {
     }
 
     /**
-     * Creates a new, empty MCRDirectory with the given name in the parent MCRDirectory.
+     * Creates a new, empty MCRDirectory with the given name in the parent
+     * MCRDirectory.
      * 
      * @param name
      *            the name of the new MCRDirectory
@@ -72,14 +81,15 @@ public class MCRDirectory extends MCRFilesystemNode {
     }
 
     /**
-     * Creates a new, empty MCRDirectory with the given name in the parent MCRDirectory.
+     * Creates a new, empty MCRDirectory with the given name in the parent
+     * MCRDirectory.
      * 
      * @param name
      *            the name of the new MCRDirectory
      * @param parent
      *            the parent directory that will contain the new child
      * @param doExistCheck
-     *              checks if file with that Name already exists 
+     *            checks if file with that Name already exists
      * @throws MCRUsageException
      *             if that directory already contains a child with that name
      */
@@ -91,8 +101,8 @@ public class MCRDirectory extends MCRFilesystemNode {
     /**
      * Internal constructor, do not use on your own.
      */
-    MCRDirectory(String ID, String parentID, String ownerID, String name, String label, long size, GregorianCalendar date, int numchdd, int numchdf,
-        int numchtd, int numchtf) {
+    MCRDirectory(String ID, String parentID, String ownerID, String name, String label, long size, GregorianCalendar date, int numchdd,
+            int numchdf, int numchtd, int numchtf) {
         super(ID, parentID, ownerID, name, label, size, date);
 
         numChildDirsHere = numchdd;
@@ -106,18 +116,21 @@ public class MCRDirectory extends MCRFilesystemNode {
      * 
      * @param ID
      *            the unique ID of the MCRDirectory to return
-     * @return the MCRDirectory with the given ID, or null if no such directory exists
+     * @return the MCRDirectory with the given ID, or null if no such directory
+     *         exists
      */
     public static MCRDirectory getDirectory(String ID) {
         return (MCRDirectory) MCRFilesystemNode.getNode(ID);
     }
 
     /**
-     * Returns the root MCRDirectory that has no parent and is logically owned by the object with the given ID.
+     * Returns the root MCRDirectory that has no parent and is logically owned
+     * by the object with the given ID.
      * 
      * @param ownerID
      *            the ID of the logical owner of that directory
-     * @return the root MCRDirectory stored for that owner ID, or null if no such directory exists
+     * @return the root MCRDirectory stored for that owner ID, or null if no
+     *         such directory exists
      */
     public static MCRDirectory getRootDirectory(String ownerID) {
         return (MCRDirectory) MCRFilesystemNode.getRootNode(ownerID);
@@ -180,7 +193,7 @@ public class MCRDirectory extends MCRFilesystemNode {
         }
 
         touch(false);
-        
+
         if (hasParent()) {
             getParent().removeChild(child);
         }
@@ -203,8 +216,12 @@ public class MCRDirectory extends MCRFilesystemNode {
     }
 
     /**
-     * Returns all direct child nodes in this directory, sorted by the given Comparator implementation. You may use one of the Comparators defined as static
-     * constants in this class, or build your own Comparator.
+     * Returns all direct child nodes in this directory, sorted by the given
+     * Comparator implementation. You may use one of the following comparators
+     * constants: {@link MCRDirectory#SORT_BY_DATE},
+     * {@link MCRDirectory#SORT_BY_NAME},
+     * {@link MCRDirectory#SORT_BY_NAME_IGNORECASE} or
+     * {@link MCRDirectory#SORT_BY_DATE}
      * 
      * @param sortOrder
      *            the Comparator to be used to sort the children
@@ -222,7 +239,8 @@ public class MCRDirectory extends MCRFilesystemNode {
     }
 
     /**
-     * Returns true, if this directory contains a direct child with the given filename.
+     * Returns true, if this directory contains a direct child with the given
+     * filename.
      * 
      * @param name
      *            the name of the child file or directory
@@ -236,7 +254,8 @@ public class MCRDirectory extends MCRFilesystemNode {
     }
 
     /**
-     * Returns the direct child of this directory at the given position in the natural order of the children
+     * Returns the direct child of this directory at the given position in the
+     * natural order of the children
      * 
      * @param index
      *            the index of the child in the list of children
@@ -251,7 +270,9 @@ public class MCRDirectory extends MCRFilesystemNode {
     }
 
     /**
-     * Returns the child node with the given filename. This method also accepts the aliases "." for the current directory or ".." for the parent directory.
+     * Returns the child node with the given filename. This method also accepts
+     * the aliases "." for the current directory or ".." for the parent
+     * directory.
      * 
      * @param name
      *            the name of the child file or directory
@@ -269,12 +290,16 @@ public class MCRDirectory extends MCRFilesystemNode {
     }
 
     /**
-     * Returns the node that is addressed by the given absolute or relative path. If an absolute path starting with a slash "/" is given, the node will be
-     * located relative to the root directory of this directory. If a relative path is given, the path may contain the aliases "." for the current directory or
-     * ".." for the parent directory, and the node will be located relative to this directory.
+     * Returns the node that is addressed by the given absolute or relative
+     * path. If an absolute path starting with a slash "/" is given, the node
+     * will be located relative to the root directory of this directory. If a
+     * relative path is given, the path may contain the aliases "." for the
+     * current directory or ".." for the parent directory, and the node will be
+     * located relative to this directory.
      * 
      * @param path
-     *            the absolute path (starting with a "/") or path relative to this directory, possibly containing "." or ".." aliases
+     *            the absolute path (starting with a "/") or path relative to
+     *            this directory, possibly containing "." or ".." aliases
      * @return the node that matches this path, or null if no such node exists
      */
     public MCRFilesystemNode getChildByPath(String path) {
@@ -315,7 +340,8 @@ public class MCRDirectory extends MCRFilesystemNode {
     }
 
     /**
-     * Returns true if this directory is not empty and therefore contains any subdirectories or files.
+     * Returns true if this directory is not empty and therefore contains any
+     * subdirectories or files.
      */
     public boolean hasChildren() {
         ensureNotDeleted();
@@ -336,18 +362,22 @@ public class MCRDirectory extends MCRFilesystemNode {
     public final static int HERE = 1;
 
     /**
-     * Constant for choosing both direct and indirect child nodes contained in subdirectories of this directory *
+     * Constant for choosing both direct and indirect child nodes contained in
+     * subdirectories of this directory *
      */
     public final static int TOTAL = 2;
 
     /**
-     * Returns the number of child nodes in this directory. The additional parameters control what type of nodes will be counted and if only direct children or
-     * all children will be counted.
+     * Returns the number of child nodes in this directory. The additional
+     * parameters control what type of nodes will be counted and if only direct
+     * children or all children will be counted.
      * 
      * @param nodetype
-     *            one of the constants FILES, DIRECTORIES, or NODES for both types
+     *            one of the constants FILES, DIRECTORIES, or NODES for both
+     *            types
      * @param where
-     *            either HERE to only count direct children, or TOTAL to count also indirect children
+     *            either HERE to only count direct children, or TOTAL to count
+     *            also indirect children
      */
     public int getNumChildren(int nodetype, int where) {
         ensureNotDeleted();
@@ -375,7 +405,8 @@ public class MCRDirectory extends MCRFilesystemNode {
     }
 
     /**
-     * Internal method that is called when the size of a child node has changed, to update the total size of the parent directory.
+     * Internal method that is called when the size of a child node has changed,
+     * to update the total size of the parent directory.
      */
     protected void sizeOfChildChanged(long sizeDiff) {
         size += sizeDiff;
@@ -434,7 +465,9 @@ public class MCRDirectory extends MCRFilesystemNode {
     };
 
     /**
-     * Creates a list of all MD5 checksums of all files that are direct or indirect children of this directory and adds them to the given list object.
+     * Creates a list of all MD5 checksums of all files that are direct or
+     * indirect children of this directory and adds them to the given list
+     * object.
      */
     protected void collectMD5Lines(List list) {
         MCRFilesystemNode[] nodes = getChildren();
@@ -452,11 +485,14 @@ public class MCRDirectory extends MCRFilesystemNode {
     }
 
     /**
-     * Builds a fingerprint of all file's contents of this directory, by collecting the MD5 checksums of all direct or indirect child files of this directory,
-     * sorting them to ascending order and writing this list line by line as UTF-8 encoded bytes. This method can be used to digitally sign the content of a
-     * directory in the future
+     * Builds a fingerprint of all file's contents of this directory, by
+     * collecting the MD5 checksums of all direct or indirect child files of
+     * this directory, sorting them to ascending order and writing this list
+     * line by line as UTF-8 encoded bytes. This method can be used to digitally
+     * sign the content of a directory in the future
      * 
-     * @return the fingerprint that changes when any content of a file in this directory changes
+     * @return the fingerprint that changes when any content of a file in this
+     *         directory changes
      */
     public byte[] buildFingerprint() {
         ensureNotDeleted();
