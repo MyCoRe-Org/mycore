@@ -172,6 +172,9 @@ function maximizeHandler(viewID) {
 		}
 		Iview[viewID].maximized = false;
 		
+		//close Overview when going to minimized mode 
+		Iview[viewID].overview.hideView();
+
 		// append viewer to dom again
 		Iview[viewID].VIEWER = document.body.firstChild;
 		
@@ -190,16 +193,6 @@ function maximizeHandler(viewID) {
 		// add current Viewer
 		document.getElementById("viewerParent").insertBefore(Iview[viewID].VIEWER, currentPos);
 				
-		/*if (document.compatMode == "CSS1Compat") {
-			document.documentElement.style.overflow="auto";
-		} else {
-			document.body.style.overflow="auto";
-		}*/
-		//close Overview when going to minimized mode 
-		if (Iview[viewID].useOverview && Iview[viewID].overviewActive) {
-			openOverview(viewID);
-		}
-
 		// because of IE7 in
 		document.documentElement.style.overflow="";
 		
