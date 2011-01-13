@@ -35,7 +35,6 @@
 	top: 0px !important;
 	left: 0px;
 	height: 30px;
-	width: 100% !important;
 	border: 1px solid #AAAAAA;
 }
 
@@ -253,6 +252,11 @@ button.ui-button::-moz-focus-inner {
 
 .ui-button-set.previewForward .ui-button {
 	z-index: 100;
+}
+
+.ui-spring {
+	height: 1px;
+	float: left;
 }
 
 .viewerContainer .previewTbView {

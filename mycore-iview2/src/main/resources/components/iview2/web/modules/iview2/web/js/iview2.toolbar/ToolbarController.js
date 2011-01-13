@@ -219,6 +219,9 @@ ToolbarController.prototype.catchModels = function() {
 				    	case "text":
 				    		curView.addText({'elementName' : element.elementName, 'text' : element.text, 'index' : element.index});
 				    	break;
+				    	case "spring":
+				    		curView.addSpring({'elementName' : element.elementName, 'weight' : element.weight, 'index' : element.index});
+				    	break;
 				    	}
 			    	} else if (args.button) {
 			    		var button = args.button;
@@ -340,15 +343,10 @@ ToolbarController.prototype.checkNavigation = function(pNum) {
 	
 	var models = this.getViewer().getToolbarMgr().getModels();
 
-	//for (var i = 0; i < models.length; i++) {
-	//	if (models[i].id == "previewTb") {
-			this.perform("setActive", !tooLow, 'previewBack', 'backward');
-			this.perform("setActive", !tooHigh, 'previewForward', 'forward');
-	//	} else if (models[i].id == "mainTb") {
-			this.perform("setActive", !tooLow, 'navigateHandles', 'backward');
-			this.perform("setActive", !tooHigh, 'navigateHandles', 'forward');
-	//	}
-	//}
+	this.perform("setActive", !tooLow, 'previewBack', 'backward');
+	this.perform("setActive", !tooHigh, 'previewForward', 'forward');
+	this.perform("setActive", !tooLow, 'navigateHandles', 'backward');
+	this.perform("setActive", !tooHigh, 'navigateHandles', 'forward');
 };
 
 /**
@@ -384,17 +382,17 @@ ToolbarController.prototype.updateDropDown = function(content) {
 
 /**
  * @function
- * @name perform
- * @memberOf ToolbarController#
+ * @name		perform
+ * @memberOf	ToolbarController#
  * @description performs an special action for a single button wihtin a buttonset,
  *  setActive : activate or deactivate Buttons (for e.g. forward or backward buttons),
  *              it has nothing to do with activate and deactivate of checkbuttons
  *  setSubtypeState : check or uncheck checkButtons,
  *  setLoading : activate or deactivate loading icon of Buttons (for e.g. spinning arrows)
- * @param {String} action defines the action (setActive, setSubtypeState, setLoading)
- * @param {String} argument defines the argumentfor the special action of the button
- * @param {String} buttonset defines the buttonset of the button
- * @param {String} button defines the name of the button
+ * @param		{String} action defines the action (setActive, setSubtypeState, setLoading)
+ * @param		{String} argument defines the argumentfor the special action of the button
+ * @param		{String} buttonset defines the buttonset of the button
+ * @param		{String} button defines the name of the button
  */
 ToolbarController.prototype.perform = function(action, argument, buttonset, button) {
 	var models = this.getViewer().getToolbarMgr().getModels();
@@ -402,6 +400,26 @@ ToolbarController.prototype.perform = function(action, argument, buttonset, butt
 	for (var i = 0; i < models.length; i++) {
 		if (models[i].getElement(buttonset) && models[i].getElement(buttonset).getButton(button)) {
 			eval("models[i].getElement(buttonset).getButton(button)."+action+"("+argument+")");
+		}
+	}
+};
+
+/**
+ * @function
+ * @name		paint
+ * @memberOf	ToolbarController#
+ * @description	repaint all Views of the given Model, as some Components are not able to
+ *  be browser automatic refreshed
+ * @param		{string} name under which the Model is registered at this controller
+ */
+ToolbarController.prototype.paint = function(model) {
+	try {
+		for (var view in this.relations[model]) {
+			this.views[this.relations[model][view]].paint();
+		}
+	} catch (e) {
+		if (console) {
+			console.log(e)
 		}
 	}
 };

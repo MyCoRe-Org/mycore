@@ -1,11 +1,11 @@
 /**
  * @class
- * @name ToolbarView
+ * @name		ToolbarView
  * @description view of a toolbar to present the model informations
- * @param {String} id identifies the current toolbar view
- * @param {Object} events to trigger defined actions, while managing contained elements
- * @param {Object} parent defines the parent node of the toolbar view
- * @param {Object} toolbar represents the main node of the toolbar view
+ * @param		{String} id identifies the current toolbar view
+ * @param		{Object} events to trigger defined actions, while managing contained elements
+ * @param		{Object} parent defines the parent node of the toolbar view
+ * @param		{Object} toolbar represents the main node of the toolbar view
  */
 var ToolbarView = function (id, parent) {
     this.id = id;
@@ -18,9 +18,9 @@ var ToolbarView = function (id, parent) {
 ToolbarView.prototype = {
 	/**
 	 * @function
-	 * @name destroy
-	 * @memberOf ToolbarView#
-	 * @description remove the complete toolbar view from the DOM
+	 * @name		destroy
+	 * @memberOf	ToolbarView#
+	 * @description	remove the complete toolbar view from the DOM
 	 */
     destroy : function () {
 		jQuery(this.toolbar).remove();
@@ -65,6 +65,25 @@ ToolbarView.prototype = {
     		jQuery(this.toolbar).append(newDivider);
     	}	
 		return newDivider;
+    },
+    
+    /**
+     * @function
+	 * @name		addSpring
+	 * @memberOf	ToolbarView#
+	 * @description add a new spring to the toolbar view, a spring creates space between its surrounding elements
+	 * @param		{String} args.elementName defines the name of the spring
+	 * @param		{integer} args.index defines the special position between the other predefined elements where the new spring should be at
+	 * @return		{Object} returns the parent tag of the added spring
+	 */ 
+    addSpring : function (args) {
+    	var newSpring = jQuery('<span>').addClass(args.elementName).addClass('ui-spring').attr("weight",args.weight);
+    	if (!isNaN(args.index) && args.index != this.toolbar.childNodes.length) {
+    		newSpring.insertBefore(this.toolbar.childNodes[args.index]);
+    	} else {
+    		jQuery(this.toolbar).append(newSpring);
+    	}
+    	return newSpring;
     },
 
     /**
@@ -356,5 +375,25 @@ ToolbarView.prototype = {
 			    }
 			}
 		}
+    },
+    
+    /** 
+     * @function
+	 * @name		paint
+	 * @memberOf	ToolbarView#
+	 * @description repaints this view or atleast those components who are not browser automatic refreshed
+	 */
+    paint: function() {
+    	var toolbar = this.toolbar;
+    	var width = 0;
+    	jQuery(toolbar.childNodes).not(".ui-spring").each(function() {
+    		width += Math.ceil(jQuery(this).outerWidth(true));
+    	});
+    	
+    	width = Math.floor(jQuery(toolbar).width() - width);
+    	jQuery(toolbar).children(".ui-spring").each(function() {
+    		var spring = jQuery(this);
+    		spring.css("width", toFloat(spring.attr("weight")) * width);
+    	});
     }
 };

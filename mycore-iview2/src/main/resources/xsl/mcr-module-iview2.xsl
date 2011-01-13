@@ -105,6 +105,7 @@
 	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarModel.js" />
 	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarButtonsetModel.js" />
 	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarDividerModel.js" />
+	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarSpringModel.js" />
 	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarTextModel.js" />
 	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarButtonModel.js" />
 	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarController.js" />

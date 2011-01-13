@@ -154,6 +154,7 @@ function reinitializeGraphic(viewID) {
 	if (Iview[viewID].viewerContainer.hasClass("viewerContainer min")) {
 		Iview[viewID].viewerContainer.find(".toolbars .toolbar").css("top", newTop);
 	}
+	Iview[viewID].toolbarCtrl.paint("mainTb");
 }
 
 /**
@@ -172,9 +173,10 @@ function maximizeHandler(viewID) {
 		}
 		Iview[viewID].maximized = false;
 		
-		//close Overview when going to minimized mode 
-		Iview[viewID].overview.hideView();
-
+		//close Overview when going to minimized mode
+		if (Iview[viewID].overview) {
+			Iview[viewID].overview.hideView();
+		}
 		// append viewer to dom again
 		Iview[viewID].VIEWER = document.body.firstChild;
 		
@@ -246,14 +248,12 @@ function maximizeHandler(viewID) {
 
 		// class-change causes in IE resize
 		document.getElementById("viewerContainer"+viewID).className = "viewerContainer max";
-		
+		Iview[viewID].toolbarCtrl.paint("mainTb");
 	}
 
-// IE löst resize bereits bei den Class-Wechsel (sicherlich wegen position rel <-> fix)
-	//IE führt die zwar so irgendwie mehrfach aus... aber ohne die auch nicht...muss man wohl mit leben
-//	if (!(isBrowser("IE"))) {
-		reinitializeGraphic(viewID);
-//	}
+	/*IE causes resize already at class change (mostly because position: rel <> fix)
+	 IE runs resize multiple times...but without this line he doesn't...*/
+	reinitializeGraphic(viewID);
 }
 
 PanoJS.doubleClickHandler = function(e) {

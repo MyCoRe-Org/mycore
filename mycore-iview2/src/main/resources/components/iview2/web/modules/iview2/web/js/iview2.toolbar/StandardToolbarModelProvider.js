@@ -55,7 +55,8 @@ StandardToolbarModelProvider.prototype = {
 		curButtonset = this.model.addElement(new ToolbarButtonsetModel("permalinkHandles"));
 		curButtonset.addButton(new ToolbarButtonModel("permalink", {'type': 'buttonCheck', 'state' : false}, {'label': this.titles.permalink, 'text': false, 'icons': {primary : 'iview2-icon iview2-icon-permalink'}}, this.titles.permalink, true, false));
 		
-		this.model.addElement(new ToolbarDividerModel("Strich"));
+		this.model.addElement(new ToolbarDividerModel("line"));
+		this.model.addElement(new ToolbarSpringModel("spring", 1));
 		
 		// closeHandles
 		curButtonset = this.model.addElement(new ToolbarButtonsetModel("closeHandles"));

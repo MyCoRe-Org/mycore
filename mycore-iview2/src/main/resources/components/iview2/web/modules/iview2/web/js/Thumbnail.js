@@ -925,18 +925,12 @@ function startFileLoaded(viewID){
 	
 	// Resize-Events registrieren
 	jQuery(window).resize(function() { reinitializeGraphic(viewID)});
-//	if (isBrowser("IE")) {
-//		window.onresize = function() {reinitializeGraphic(viewID)};
-//	} else {
-//		ManageEvents.addEventListener(window, 'resize', function() { reinitializeGraphic(viewID);}, false);
-//	}
 	
 	if (Iview[viewID].useZoomBar) {
 		importZoomBar(viewID);
 	}
 	
 	updateModuls(viewID);
-	
 }
 
 /**
@@ -995,4 +989,6 @@ function processMETS(metsDoc, viewID) {
 		// switch to current content
 		Iview[viewID].getToolbarCtrl().updateDropDown(jQuery(pagelist.find("a")[physicalModel.getCurPos() - 1]).html());
 	}
+	//at other positions Opera doesn't get it correctly (although it still doesn't look that smooth as in other browsers) 
+	window.setTimeout("Iview['"+viewID+"'].toolbarCtrl.paint('mainTb')",10);
 }
