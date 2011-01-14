@@ -20,6 +20,23 @@ ToolbarModel.prototype = {
 
 	/**
 	 * @function
+	 * @name getElementIndex
+	 * @memberOf ToolbarModel#
+	 * @description returns the index of the given element
+	 * @param {String} elementName name that identifies a single element model
+	 * @return {int} returns the index of the element model, identified by its elementName or -1 if not found
+	 */
+    getElementIndex : function(elementName) {
+	    for (var i = 0; i < this.elements.length; i++) {
+			if (this.elements[i].elementName == elementName) {
+				return i;
+			}
+		}
+	    return -1;
+    },
+
+	/**
+	 * @function
 	 * @name getElement
 	 * @memberOf ToolbarModel#
 	 * @description returns a single element model out of the toolbar containing elements
@@ -27,11 +44,10 @@ ToolbarModel.prototype = {
 	 * @return {Object} returns a single element model, identified by its elementName
 	 */
     getElement : function(elementName) {
-	    for (var i = 0; i < this.elements.length; i++) {
-			if (this.elements[i].elementName == elementName) {
-				return this.elements[i];
-			}
-		}
+    	var i = this.getElementIndex(elementName);
+    	if (i >= 0){
+    		return this.elements[i];
+    	}
     },
 
 	/**
