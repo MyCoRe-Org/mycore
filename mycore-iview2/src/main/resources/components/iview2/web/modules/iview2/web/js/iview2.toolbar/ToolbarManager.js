@@ -1,8 +1,9 @@
 /**
  * @class
- * @name ToolbarManager
+ * @constructor
+ * @name		ToolbarManager
  * @description model of a toolbar buttonset with its functionalities to manage contained buttons
- * @strcuture	
+ * @structure	
  * 		Object {
  * 			Array:		models				//array of the contained models within the toolbar manager
  * 			Event:		events				//to trigger defined actions, while managing contained models
@@ -21,12 +22,13 @@ var ToolbarManager = function () {
 ToolbarManager.prototype = {
 	
 	/**
+	 * @public
 	 * @function
-	 * @name getModel
-	 * @memberOf ToolbarModel#
+	 * @name		getModel
+	 * @memberOf	ToolbarModel#
 	 * @description returns a single toolbar model out of the toolbar manager
-	 * @param {String} modelId id that identifies a single toolbar model
-	 * @return {Object} returns a single toolbar model, identified by its modelId
+	 * @param		{String} modelId id that identifies a single toolbar model
+	 * @return		{Object} returns a single toolbar model, identified by its modelId
 	 */
 	getModel : function(modelId) {
 	    for (var i = 0; i < this.models.length; i++) {
@@ -37,23 +39,25 @@ ToolbarManager.prototype = {
 	},
 
 	/**
+	 * @public
 	 * @function
-	 * @name getModels
-	 * @memberOf ToolbarModel#
+	 * @name		getModels
+	 * @memberOf	ToolbarModel#
 	 * @description returns an array with each toolbar model out of the toolbar manager
-	 * @return {Array} returns an array of all toolbar models, which are registred in the toolbar manager
+	 * @return		{Array} returns an array of all toolbar models, which are registred in the toolbar manager
 	 */
 	getModels : function() {
 		return this.models;
 	},
 
 	/**
+	 * @public
 	 * @function
-	 * @name addModel
-	 * @memberOf ToolbarModel#
+	 * @name		addModel
+	 * @memberOf	ToolbarModel#
 	 * @description adds a single toolbar model to the toolbar manager,
 	 *  notify the event-listener (to pass the informations)
-	 * @param {Object} model defines the whole toolbar model
+	 * @param 		{Object} model defines the whole toolbar model
 	 */
     addModel : function(model) {
     	var myself = this;
@@ -73,12 +77,13 @@ ToolbarManager.prototype = {
     },
     
 	/**
+	 * @public
 	 * @function
-	 * @name destroyModel
-	 * @memberOf ToolbarModel#
+	 * @name		destroyModel
+	 * @memberOf	ToolbarModel#
 	 * @description removes a single toolbar model from the toolbar manager,
 	 *  notify the event-listener (to pass the informations)
-	 * @param {String} id identifies the toolbar model
+	 * @param		{String} id identifies the toolbar model
 	 */
     destroyModel : function(id) {
     	for (var i = 0; i < this.models.length; i++) {
@@ -91,24 +96,26 @@ ToolbarManager.prototype = {
     },
     
 	/**
+	 * @public
 	 * @function
-	 * @name setTitles
-	 * @memberOf ToolbarModel#
+	 * @name		setTitles
+	 * @memberOf	ToolbarModel#
 	 * @description sets the titles (after parsing out of the iview2 xsl)
-	 * @param {Array} titles titles of each button within the whole models of the toolbar manager
+	 * @param		{Array} titles titles of each button within the whole models of the toolbar manager
 	 */    
     setTitles : function(titles) {
     	this.titles = titles;
     },
 
 	/**
+	 * @public
 	 * @function
-	 * @name change
-	 * @memberOf ToolbarModel#
+	 * @name		change
+	 * @memberOf 	ToolbarModel#
 	 * @description defines durable changes to a special model,
 	 *  so these changes will perform after each instancing such a model
-	 * @param String modeId defines the id of a special model
-	 * @param String operation defines the change operation which should be performed after instancing
+	 * @param		{String} modeId defines the id of a special model
+	 * @param		{String} operation defines the change operation which should be performed after instancing
 	 */   
     change : function(modelId, operation) {
     	if (!this.changes[modelId]) {

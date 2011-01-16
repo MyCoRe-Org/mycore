@@ -1,14 +1,15 @@
 /**
  * @class
- * @name ToolbarController
+ * @constructor
+ * @name		ToolbarController
  * @description main Controller to control the toolbar,
  *  connects the models with their related views,
  *  models are provided by the ToolbarManager,
  *  views will be add directly here and further direct references to them are hold
- * @param {Object} parent holds the reference to the viewer
- * @param {AssoArray} views hold direct references to each added toolbar view
- * @param {AssoArray} relations defines the informations about each connections between model and view
- * @requires fg.menu 3.0 
+ * @param		{Object} parent holds the reference to the viewer
+ * @param		{AssoArray} views hold direct references to each added toolbar view
+ * @param		{AssoArray} relations defines the informations about each connections between model and view
+ * @requires	fg.menu 3.0 
  */
 var ToolbarController = function (parent) {
 	this.parent = parent;
@@ -19,24 +20,26 @@ var ToolbarController = function (parent) {
 };
 
 /**
+ * @public
  * @function
- * @name getView
- * @memberOf ToolbarController#
+ * @name		getView
+ * @memberOf	ToolbarController#
  * @description returns a single view out of the views array
- * @param {String} viewID name that identifies a single view
- * @return {Object} a single view, identified by its viewID
+ * @param		{String} viewID name that identifies a single view
+ * @return		{Object} a single view, identified by its viewID
  */
 ToolbarController.prototype.getView = function(viewID) {
 	return this.views[viewID];
 };
 
 /**
+ * @public
  * @function
- * @name addView
- * @memberOf ToolbarController#
+ * @name		addView
+ * @memberOf	ToolbarController#
  * @description adds an existing view to the ToolbarController,
  *  attach to its events (press, new) and define the actions for each button
- * @param {Object} view View which should be add to the toolbar 
+ * @param		{Object} view View which should be add to the toolbar 
  */
 ToolbarController.prototype.addView = function(view) {
 	var viewerID = this.getViewer().viewID_to_remove;
@@ -174,6 +177,7 @@ ToolbarController.prototype.addView = function(view) {
 };
 
 /**
+ * @public
  * @function
  * @name		catchModelsView
  * @memberOf	ToolbarController#
@@ -330,12 +334,13 @@ ToolbarController.prototype._checkNewModel = function(model) {
 };
 
 /**
+ * @public
  * @function
- * @name checkNavigation
- * @memberOf ToolbarController#
+ * @name		checkNavigation
+ * @memberOf	ToolbarController#
  * @description checks the navigation buttons (forward and backward) and
  *  deactivate them if there isn't a page in direction
- * @param {integer} pNum defines the page number of the current shown page
+ * @param		{integer} pNum defines the page number of the current shown page
  */
 ToolbarController.prototype.checkNavigation = function(pNum) {
 	var tooHigh = (pNum >= this.getViewer().amountPages)? true : false;
@@ -350,13 +355,14 @@ ToolbarController.prototype.checkNavigation = function(pNum) {
 };
 
 /**
+ * @public
  * @function
- * @name checkZoom
- * @memberOf ToolbarController#
+ * @name		checkZoom
+ * @memberOf	ToolbarController#
  * @description checks the zoom buttons (zoomIn and zoomOut) and
  *  deactivate them if there isn't a possibility to zoom again in their direction,
  *  zoom is only possible between level 0 and zoomMax
- * @param {integer} zoom defines the current zoom Level of the shown content
+ * @param		{integer} zoom defines the current zoom Level of the shown content
  */
 ToolbarController.prototype.checkZoom = function(zoom) {
 	var zoomIn = (zoom == this.getViewer().zoomMax)? false : true;
@@ -369,11 +375,12 @@ ToolbarController.prototype.checkZoom = function(zoom) {
 };
 
 /**
+ * @public
  * @function
- * @name updateDropDown
- * @memberOf ToolbarController#
+ * @name		updateDropDown
+ * @memberOf	ToolbarController#
  * @description updates the current content of the drop-down-menue button
- * @param {String} content defines the current shown content which is choose in the drop-down-box
+ * @param		{String} content defines the current shown content which is choose in the drop-down-box
  */
 ToolbarController.prototype.updateDropDown = function(content) {
 	// TODO: sollte eventuell nochmal überdacht werden (vieleicht direkter Wechsel auf Seite)
@@ -381,6 +388,7 @@ ToolbarController.prototype.updateDropDown = function(content) {
 };
 
 /**
+ * @public
  * @function
  * @name		perform
  * @memberOf	ToolbarController#
@@ -405,6 +413,7 @@ ToolbarController.prototype.perform = function(action, argument, buttonset, butt
 };
 
 /**
+ * @public
  * @function
  * @name		paint
  * @memberOf	ToolbarController#

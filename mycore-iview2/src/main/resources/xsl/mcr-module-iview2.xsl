@@ -130,7 +130,7 @@
      
     <div id="toolbars{$groupID}" class="toolbars" onmousedown="return false;">      
         <script type="text/javascript">
-      		$(document).ready(function () {
+      		jQuery(document).ready(function () {
       	
 				// toolbar brauch ne Liste mit Controllern für die Übergabe (bspw. Chapter)
 				      		

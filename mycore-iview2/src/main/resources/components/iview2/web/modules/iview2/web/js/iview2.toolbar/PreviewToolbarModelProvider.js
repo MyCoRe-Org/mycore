@@ -1,12 +1,12 @@
 /**
  * @class
- * @name PreviewToolbarModelProvider
+ * @constructor
+ * @name 		PreviewToolbarModelProvider
  * @description provides the model of a preview toolbar with only navigation functionalities/buttons,
  *  especially forward and backward buttons and of course a possibility to switch to the main viewer screen
- * @param {String} id is the identifier of the model provider
- * @param {String} model provides the toolbar model with fix defined structure
- * @param {AssoArray} tites defines an array of the neccesary button titles, parsed out of the iview2 xsl
- * 		}
+ * @param		{String} id is the identifier of the model provider
+ * @param		{String} model provides the toolbar model with fix defined structure
+ * @param		{AssoArray} titles defines an array of the necessary button titles, parsed out of the iview2 xsl
  */
 var PreviewToolbarModelProvider = function (id, titles) {
 	this.id = id;
@@ -18,10 +18,10 @@ PreviewToolbarModelProvider.prototype = {
 
 	/**
 	 * @function
-	 * @name getModel
-	 * @memberOf PreviewToolbarModelProvider#
+	 * @name		getModel
+	 * @memberOf	PreviewToolbarModelProvider#
 	 * @description returns a complete toolbar model with only navigation functionalities
-	 * @return {Object} returns the complete model for a preview iview2 toolbar
+	 * @return		{Object} returns the complete model for a preview iview2 toolbar
 	 */
     getModel : function() {
 

@@ -1,8 +1,9 @@
 /**
  * @class
- * @name ToolbarModel
+ * @constructor
+ * @name		ToolbarModel
  * @description model of a toolbar with its functionalities to manage contained elements (e.g. buttonsets or divider)
- * @strcuture	
+ * @structure	
  * 		Object {
  * 			String:		id,					//identifier of the toolbar model
  * 			Array:		elements			//array of the contained elements within the toolbar (e.g. buttonset or divider)
@@ -19,12 +20,13 @@ var ToolbarModel = function (id) {
 ToolbarModel.prototype = {
 
 	/**
+	 * @public
 	 * @function
-	 * @name getElementIndex
-	 * @memberOf ToolbarModel#
+	 * @name		getElementIndex
+	 * @memberOf	ToolbarModel#
 	 * @description returns the index of the given element
-	 * @param {String} elementName name that identifies a single element model
-	 * @return {int} returns the index of the element model, identified by its elementName or -1 if not found
+	 * @param		{String} elementName name that identifies a single element model
+	 * @return		{integer} returns the index of the element model, identified by its elementName or -1 if not found
 	 */
     getElementIndex : function(elementName) {
 	    for (var i = 0; i < this.elements.length; i++) {
@@ -36,12 +38,13 @@ ToolbarModel.prototype = {
     },
 
 	/**
+	 * @public
 	 * @function
-	 * @name getElement
-	 * @memberOf ToolbarModel#
+	 * @name		getElement
+	 * @memberOf	ToolbarModel#
 	 * @description returns a single element model out of the toolbar containing elements
-	 * @param {String} elementName name that identifies a single element model
-	 * @return {Object} returns a single element model, identified by its elementName
+	 * @param		{String} elementName name that identifies a single element model
+	 * @return		{Object} returns a single element model, identified by its elementName
 	 */
     getElement : function(elementName) {
     	var i = this.getElementIndex(elementName);
@@ -51,13 +54,14 @@ ToolbarModel.prototype = {
     },
 
 	/**
+	 * @public
 	 * @function
-	 * @name addElement
-	 * @memberOf ToolbarModel#
+	 * @name		addElement
+	 * @memberOf	ToolbarModel#
 	 * @description adds a single element model to the toolbar,
 	 *  notify the event-listener (to pass the informations to the toolbar (model) manager)
-	 * @param {Object} element defines the whole element model
-	 * @param {integer} index if set, defines the special position where to add the element between the other predefined elements
+	 * @param		{Object} element defines the whole element model
+	 * @param		{integer} index if set, defines the special position where to add the element between the other predefined elements
 	 */
     addElement : function(element, index) {
     	var element = jQuery.extend(element, {'relatedToolbar' : this});
@@ -81,13 +85,14 @@ ToolbarModel.prototype = {
 		return element;
     },
 
-	/** 
+	/**
+	 * @public
 	 * @function
-	 * @name removeElement
-	 * @memberOf ToolbarModel#
+	 * @name		removeElement
+	 * @memberOf	ToolbarModel#
 	 * @description removes a single element model from the toolbar,
 	 *  notify the event-listener (to pass the informations to the toolbar (model) manager)
-	 * @param {String} elementName name that identifies a single element model
+	 * @param		{String} elementName name that identifies a single element model
 	 */     
     removeElement : function(elementName) {
      	var element = this.getElement(elementName);

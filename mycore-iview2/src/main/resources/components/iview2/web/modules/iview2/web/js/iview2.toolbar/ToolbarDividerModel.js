@@ -1,8 +1,9 @@
 /**
  * @class
+ * @constructor
  * @name ToolbarDividerModel
  * @description simple model of a toolbar divider (vertical buttonset separator)
- * @strcuture	
+ * @structure	
  * 		Object {
  * 			String:		elementName,		//name of the divider
  * 			String: 	type				//type divider, to differ between buttonsets, text and dividers

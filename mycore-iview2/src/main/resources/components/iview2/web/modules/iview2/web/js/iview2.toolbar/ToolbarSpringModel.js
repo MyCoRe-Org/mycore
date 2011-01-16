@@ -1,5 +1,6 @@
 /**
  * @class
+ * @constructor
  * @name		ToolbarSpringModel
  * @description simple model for a tension spring to keep space between Toolbar elements
  * @structure	

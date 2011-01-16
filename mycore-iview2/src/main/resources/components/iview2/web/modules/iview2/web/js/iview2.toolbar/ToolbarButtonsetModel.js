@@ -1,8 +1,9 @@
 /**
  * @class
- * @name ToolbarButtonsetModel
+ * @constructor
+ * @name		ToolbarButtonsetModel
  * @description model of a toolbar buttonset with its functionalities to manage contained buttons
- * @strcuture	
+ * @structure	
  * 		Object {
  * 			String:		elementName,		//name of the buttonset
  * 			String: 	type				//type buttonset, to differ between buttonsets, text and dividers
@@ -24,12 +25,13 @@ var ToolbarButtonsetModel = function (elementName) {
 ToolbarButtonsetModel.prototype = {
 
 	/**
+	 * @public
 	 * @function
-	 * @name getButton
-	 * @memberOf ToolbarButtonsetModel#
+	 * @name		getButton
+	 * @memberOf	ToolbarButtonsetModel#
 	 * @description returns a single button model out of the buttonset containing buttons
-	 * @param buttonName name that identifies a single button model
-	 * @return {Object} returns a single button model, identified by its buttonName
+	 * @param		{string} buttonName name that identifies a single button model
+	 * @return		{Object} returns a single button model, identified by its buttonName
 	 */
     getButton : function(buttonName) {
 	    for (var i = 0; i < this.buttons.length; i++) {
@@ -40,13 +42,14 @@ ToolbarButtonsetModel.prototype = {
     },
 
 	/**
+	 * @public
 	 * @function
-	 * @name addButton
-	 * @memberOf ToolbarButtonsetModel#
+	 * @name		addButton
+	 * @memberOf	ToolbarButtonsetModel#
 	 * @description adds a single button model to the buttonset,
 	 *  notify the event-listener (to pass the informations to the toolbar model)
-	 * @param {Object} button defines the whole button model
-	 * @param {integer} index if set, defines the special position where to add the button between the other predefined buttons
+	 * @param		{Object} button defines the whole button model
+	 * @param		{integer} index if set, defines the special position where to add the button between the other predefined buttons
 	 */
     addButton : function(button, index) {
     	var button = jQuery.extend(button, {'relatedButtonset' : this});
@@ -68,11 +71,11 @@ ToolbarButtonsetModel.prototype = {
 
 	/**
 	 * @function
-	 * @name removeButton
-	 * @memberOf ToolbarButtonsetModel#
+	 * @name		removeButton
+	 * @memberOf	ToolbarButtonsetModel#
 	 * @description removes a single button model from the buttonset,
 	 *  notify the event-listener (to pass the informations to the toolbar model)
-	 * @param buttonName name that identifies a single button model
+	 * @param		{string} buttonName name that identifies a single button model
 	 */     
     removeButton : function(buttonName) {
      	var button = this.getButton(buttonName);

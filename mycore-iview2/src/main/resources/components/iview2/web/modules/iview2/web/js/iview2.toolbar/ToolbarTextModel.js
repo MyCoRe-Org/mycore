@@ -1,8 +1,9 @@
 /**
  * @class
- * @name ToolbarTextModel
+ * @constructor
+ * @name		ToolbarTextModel
  * @description simple model of a toolbar text element (plain text within toolbar)
- * @strcuture	
+ * @structure	
  * 		Object {
  * 			String:		elementName,		//name of the text element
  * 			String: 	type				//type text, to differ between buttonsets, dividers and text

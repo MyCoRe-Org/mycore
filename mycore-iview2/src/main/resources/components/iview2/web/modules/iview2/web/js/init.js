@@ -312,7 +312,6 @@ PanoJS.keyboardMoveHandler = function(e) {
 
 PanoJS.keyboardZoomHandler = function(e) {
 	e = getEvent(e);
-	console.log(e.keyCode)
 	for (var i = 0; i < PanoJS.VIEWERS.length; i++) {
 		var viewer = PanoJS.VIEWERS[i];
 		var zoomDir = 0;

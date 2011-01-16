@@ -1,9 +1,10 @@
 /**
  * @class
- * @name StandardToolbarModelProvider
+ * @constructor
+ * @name		StandardToolbarModelProvider
  * @description provides the model of a toolbar with main functionalities/buttons,
  *  especially zoom, overview, navigate, permalink and close capabilities
- * @strcuture	
+ * @strutucre	
  * 		Object {
  * 			String:		id,					//identifier of the modelProvider
  * 			String: 	model				//provided toolbar model with fix defined structure
@@ -21,7 +22,8 @@ var StandardToolbarModelProvider = function (id, titles) {
 StandardToolbarModelProvider.prototype = {
 
 	/**
-	 * function
+	 * @public
+	 * @function
 	 * @name init
 	 * @memberOf StandardToolbarModelProvider#
 	 * @description builds a complete toolbar model with main functionalities
@@ -64,7 +66,8 @@ StandardToolbarModelProvider.prototype = {
 	},
 		
 	/**
-	 * function
+	 * @public
+	 * @function
 	 * @name getModel
 	 * @memberOf StandardToolbarModelProvider#
 	 * @description returns a complete toolbar model with main functionalities
