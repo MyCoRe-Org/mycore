@@ -40,7 +40,6 @@ ToolbarButtonModel.prototype = {
 		 * @param		{boolean} active defines the target state of activation (true or false)
 		 */
 		setActive: function(active) {
-		}
 			this.active = active;
 			this.events.notify({'type' : "changeActive", 'active' : this.active});
 		},
@@ -53,7 +52,7 @@ ToolbarButtonModel.prototype = {
 		 * @description enables or disables the loading facility of a button and triggers the related event
 		 * @param		{boolean} active defines the loading state (true or false)
 		 */
-		setLoading = function(loading) {
+		setLoading: function(loading) {
 			this.loading = loading;
 			this.events.notify({'type' : "changeLoading", 'loading' : this.loading});
 		},
@@ -66,7 +65,7 @@ ToolbarButtonModel.prototype = {
 		 * @description press or unpress a checkbutton and triggers the related event
 		 * @param		{boolean} state defines the target state of pressing (true or false)
 		 */
-		setSubtypeState = function(state) {
+		setSubtypeState: function(state) {
 			this.subtype.state = state;
 			this.events.notify({'type' : "changeState", 'state' : this.subtype.state});
 		},
@@ -78,8 +77,8 @@ ToolbarButtonModel.prototype = {
 		 * @memberOf	ToolbarButtonModel#
 		 * @description simply changes the pressing state of a checkbutton and triggers the related event
 		 */
-		changeSubtypeState = function() {
+		changeSubtypeState: function() {
 			this.subtype.state = !this.subtype.state;
 			this.events.notify({'type' : "changeState", 'state' : this.subtype.state});
-		};
+		}
 }
