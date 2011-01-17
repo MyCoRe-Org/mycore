@@ -506,7 +506,7 @@ PanoJS.prototype = {
 				var yTileCount = Math.ceil( currentHeight / iView.tilesize);
 				var right = tile.xIndex >= xTileCount; //index starts at 0
 				var low = tile.yIndex >= yTileCount;
-				if (low || right) {
+				if (low || right || this.zoomLevel>iView.zoomMax) {
 					useBlankImage = true;
 				}
 				//modification ends
