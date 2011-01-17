@@ -23,16 +23,26 @@
 
 package org.mycore.frontend.servlets;
 
+import java.text.MessageFormat;
+import java.util.Date;
+import java.util.HashSet;
+
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
-import org.mycore.mets.model.MCRMETSGenerator;
+import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.mets.tools.METSGenerator;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -44,37 +54,98 @@ public class MCRMETSServlet extends MCRServlet {
 
     private static final Logger LOGGER = Logger.getLogger(MCRMETSServlet.class);
 
+    private static int CACHE_TIME;
+
+    /* (non-Javadoc)
+     * @see org.mycore.frontend.servlets.MCRServlet#init()
+     */
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        String cacheParam = getInitParameter("cacheTime");
+        CACHE_TIME = cacheParam != null ? Integer.parseInt(cacheParam) : (60 * 60 * 24);//default is one day
+    }
+
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
-        LOGGER.info(job.getRequest().getPathInfo());
-        String derivate = getOwnerID(job.getRequest());
+        HttpServletRequest request = job.getRequest();
+        HttpServletResponse response = job.getResponse();
+        LOGGER.info(request.getPathInfo());
+
+        String derivate = getOwnerID(request.getPathInfo());
         MCRDirectory dir = MCRDirectory.getRootDirectory(derivate);
+        if (dir == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, MessageFormat.format("Derivate {0} does not exist.", derivate));
+            return;
+        }
         MCRFilesystemNode metsFile = dir.getChildByPath("mets.xml");
-        job.getRequest().setAttribute("XSL.derivateID", derivate);
-        job.getRequest().setAttribute("XSL.objectID", MCRLinkTableManager.instance().getSourceOf(derivate).iterator().next());
-        if (metsFile != null) {
-            MCRLayoutService.instance().doLayout(job.getRequest(), job.getResponse(), ((MCRFile) metsFile).getContentAsInputStream());
+        request.setAttribute("XSL.derivateID", derivate);
+        request.setAttribute("XSL.objectID", MCRLinkTableManager.instance().getSourceOf(derivate).iterator().next());
+
+        long lastModified = dir.getLastModified().getTimeInMillis();
+        writeHeaders(response, lastModified);
+
+        if (metsFile != null && useExistingMets(request)) {
+            MCRLayoutService.instance().doLayout(request, response, ((MCRFile) metsFile).getContentAsInputStream());
         } else {
-            Document mets = MCRMETSGenerator.getMETS(dir);
-            MCRLayoutService.instance().doLayout(job.getRequest(), job.getResponse(), mets);
+            HashSet<MCRFilesystemNode> ignoreNodes = new HashSet<MCRFilesystemNode>();
+            if (metsFile != null)
+                ignoreNodes.add(metsFile);
+            Document mets = METSGenerator.getMETS(dir, ignoreNodes);
+            MCRLayoutService.instance().doLayout(request, response, mets);
         }
     }
 
-    protected static String getOwnerID(HttpServletRequest request) {
-        String pI = request.getPathInfo();
-        StringBuilder ownerID = new StringBuilder(request.getPathInfo().length());
+    private boolean useExistingMets(HttpServletRequest request) {
+        String useExistingMetsParam = request.getParameter("useExistingMets");
+        if (useExistingMetsParam == null)
+            return true;
+        return Boolean.valueOf(useExistingMetsParam);
+    }
+
+    private void writeHeaders(HttpServletResponse response, long lastModified) {
+        response.setHeader("Cache-Control", "max-age=" + CACHE_TIME);
+        response.setContentType("image/jpeg");
+        response.setDateHeader("Last-Modified", lastModified);
+        Date expires = new Date(System.currentTimeMillis() + CACHE_TIME * 1000);
+        LOGGER.info("Last-Modified: " + new Date(lastModified) + ", expire on: " + expires);
+        response.setDateHeader("Expires", expires.getTime());
+    }
+
+    protected static String getOwnerID(String pathInfo) {
+        StringBuilder ownerID = new StringBuilder(pathInfo.length());
         boolean running = true;
-        for (int i = (pI.charAt(0) == '/') ? 1 : 0; (i < pI.length() && running); i++) {
-            switch (pI.charAt(i)) {
+        for (int i = (pathInfo.charAt(0) == '/') ? 1 : 0; (i < pathInfo.length() && running); i++) {
+            switch (pathInfo.charAt(i)) {
             case '/':
                 running = false;
                 break;
             default:
-                ownerID.append(pI.charAt(i));
+                ownerID.append(pathInfo.charAt(i));
                 break;
             }
         }
         return ownerID.toString();
+    }
+
+    /* (non-Javadoc)
+     * @see org.mycore.frontend.servlets.MCRServlet#getLastModified(javax.servlet.http.HttpServletRequest)
+     */
+    @Override
+    protected long getLastModified(HttpServletRequest request) {
+        String ownerID = getOwnerID(request.getPathInfo());
+        MCRSession session = MCRSessionMgr.getCurrentSession();
+        try {
+            session.beginTransaction();
+            MCRDirectory rootNode = MCRDirectory.getRootDirectory(ownerID);
+            if (rootNode != null)
+                return rootNode.getLastModified().getTimeInMillis();
+            return -1l;
+        } finally {
+            session.commitTransaction();
+            MCRSessionMgr.releaseCurrentSession();
+            session.close(); //just created session for db transaction
+        }
     }
 
 }

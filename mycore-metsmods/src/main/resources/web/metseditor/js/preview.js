@@ -1,0 +1,80 @@
+/* $Revision: 3080 $ 
+ * $Date: 2010-11-01 11:30:18 +0100 (Mon, 01 Nov 2010) $ 
+ * $LastChangedBy: shermann $
+ * Copyright 2010 - Thüringer Universitäts- und Landesbibliothek Jena
+ *  
+ * Mets-Editor is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Mets-Editor is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Mets-Editor.  If not, see http://www.gnu.org/licenses/.
+ */
+
+function onTreeLoaded(){
+	console.log("Tree loaded");
+	loadingMsgContainer = document.getElementById("c1");
+	loadingMsg = document.getElementById("loadingMsg");
+	if(loadingMsg != null){
+		loadingMsgContainer.removeChild(loadingMsg);
+	}
+	toggleReverseButton();
+}
+
+function loadPreviewImage(selectedItem, source, event){
+	console.log("loadPreviewImage()");
+	/* the div containing the images */
+	var previewBaseURL = webApplicationBaseURL + "servlets/MCRThumbnailServlet/" + derivateId + "/";
+	var container = document.getElementById('previewImageContainer');
+	
+	var manyImagesContainerKey = "manyImagesContainer";
+	var previewImageKey = "previewImage"; 
+	
+	/* remove all old images */
+	var olddiv = document.getElementById(manyImagesContainerKey);
+	if(olddiv != null){
+		container.removeChild(olddiv);
+	}
+	
+	/* remove a single preview image */
+	olddiv = null;
+	olddiv = document.getElementById(previewImageKey);
+	if(olddiv != null){
+		container.removeChild(olddiv);
+	}
+	
+	/* reference to tree */
+	var tree = dijit.byId("itemTree");
+	
+	/* show the selected image(s) */
+	if(selectedItem.type == "item"){
+		var imgURL = previewBaseURL + selectedItem.path;
+		var previewImage = document.createElement('img');
+		previewImage.id = previewImageKey;
+		previewImage.src = imgURL;
+		container.appendChild(previewImage);
+	} 
+	/* avoid to display all images contained within a derivate */
+	else if (selectedItem != tree.model.root) {
+		var divWithManyImg = document.createElement('div');
+		divWithManyImg.id = manyImagesContainerKey;
+		container.appendChild(divWithManyImg);
+		
+		for(var i = 0; i < selectedItem.children.length; i++){
+			var currentItem = selectedItem.children[i];
+			
+			if(currentItem.type == "item"){
+				var newImg = document.createElement('img');
+				newImg.src = previewBaseURL + currentItem.path;
+				console.log("Adding <img> element to document "+ newImg.src);
+				divWithManyImg.appendChild(newImg);
+			}
+		}
+	} 
+}

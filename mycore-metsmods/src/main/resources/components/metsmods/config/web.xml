@@ -1,34 +1,53 @@
 
 <!-- **************************************************************** -->
-<!-- Servlets and mappings of metsmods                                -->
+<!-- Servlets and mappings of metsmods -->
 <!-- **************************************************************** -->
-
 <servlet id="MCRDFGViewer">
-  <servlet-name>MCRDFGViewerServlet</servlet-name>
-  <servlet-class>org.mycore.frontend.servlets.MCRDFGViewerServlet</servlet-class>
+    <servlet-name>MCRDFGViewerServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRDFGViewerServlet</servlet-class>
 </servlet>
+
+<servlet-mapping>
+    <servlet-name>MCRDFGViewerServlet</servlet-name>
+    <url-pattern>/servlets/MCRDFGViewerServlet</url-pattern>
+</servlet-mapping>
 
 <servlet id="MCRStartMetsMods">
-  <servlet-name>MCRStartMetsModsServlet</servlet-name>
-  <servlet-class>org.mycore.frontend.servlets.MCRStartMetsModsServlet</servlet-class>
-</servlet>
-
-<servlet>
-  <servlet-name>MCRMETSServlet</servlet-name>
-  <servlet-class>org.mycore.frontend.servlets.MCRMETSServlet</servlet-class>
+    <servlet-name>MCRStartMetsModsServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRStartMetsModsServlet</servlet-class>
 </servlet>
 
 <servlet-mapping>
-  <servlet-name>MCRDFGViewerServlet</servlet-name>
-  <url-pattern>/servlets/MCRDFGViewerServlet</url-pattern>
+    <servlet-name>MCRStartMetsModsServlet</servlet-name>
+    <url-pattern>/servlets/MCRStartMetsModsServlet</url-pattern>
 </servlet-mapping>
 
-<servlet-mapping>
-  <servlet-name>MCRStartMetsModsServlet</servlet-name>
-  <url-pattern>/servlets/MCRStartMetsModsServlet</url-pattern>
-</servlet-mapping>
+<servlet id="SaveMetsServlet">
+    <servlet-name>SaveMetsServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.SaveMetsServlet</servlet-class>
+</servlet>
 
 <servlet-mapping>
-  <servlet-name>MCRMETSServlet</servlet-name>
-  <url-pattern>/servlets/MCRMETSServlet/*</url-pattern>
+    <servlet-name>SaveMetsServlet</servlet-name>
+    <url-pattern>/servlets/SaveMetsServlet</url-pattern>
+</servlet-mapping>
+
+<servlet id="MCRMETSServlet">
+    <servlet-name>MCRMETSServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRMETSServlet</servlet-class>
+</servlet>
+
+<servlet-mapping>
+    <servlet-name>MCRMETSServlet</servlet-name>
+    <url-pattern>/servlets/MCRMETSServlet/*</url-pattern>
+</servlet-mapping>
+
+<servlet id="MCRFilelistProviderServlet">
+    <servlet-name>MCRFilelistProviderServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRFilelistProviderServlet</servlet-class>
+</servlet>
+
+<servlet-mapping>
+    <servlet-name>MCRFilelistProviderServlet</servlet-name>
+    <url-pattern>/servlets/MCRFilelistProviderServlet</url-pattern>
 </servlet-mapping>
