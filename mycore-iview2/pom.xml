@@ -11,6 +11,88 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>com.samaxes.maven</groupId>
+        <artifactId>maven-minify-plugin</artifactId>
+        <version>1.3.1</version>
+        <executions>
+          <execution>
+            <id>default-minify</id>
+            <phase>process-resources</phase>
+            <configuration>
+            <verbose>true</verbose>
+              <webappSourceDir>${basedir}/src/main/resources</webappSourceDir>
+              <webappTargetDir>${project.build.outputDirectory}</webappTargetDir>
+              <cssSourceDir>components/iview2/web/modules/iview2/web</cssSourceDir>
+              <cssSourceFiles>
+                <cssSourceFile>lib/jqueryUI/ui.toolbar.css</cssSourceFile>
+                <cssSourceFile>lib/fg-menu/fg.menu.css</cssSourceFile>
+                <cssSourceFile>gfx/default/iview2.toolbar.css</cssSourceFile>
+                <cssSourceFile>gfx/default/iview2.permalink.css</cssSourceFile>
+              </cssSourceFiles>
+              <cssFinalFile>gfx/default/iview2.css</cssFinalFile>
+              <jsSourceDir>components/iview2/web/modules/iview2/web/js</jsSourceDir>
+              <jsSourceFiles>
+                <!-- iview.init BEGIN -->
+                <jsSourceFile>LAB.min.js</jsSourceFile>
+                <jsSourceFile>jquery.mousewheel.min.js</jsSourceFile>
+                <!-- JQuery Mousewheel support -->
+                <jsSourceFile>ManageEvents.js</jsSourceFile>
+                <jsSourceFile>PanoJS.js</jsSourceFile>
+                <!-- Viewer -->
+                <jsSourceFile>Event.js</jsSourceFile>
+                <!-- Event Registration utility -->
+                <jsSourceFile>XML.js</jsSourceFile>
+                <!--XML Funktionen-->
+                <jsSourceFile>Utils.js</jsSourceFile>
+                <!--Allgemeine Util Funktionen-->
+                <jsSourceFile>scrollBars.js</jsSourceFile>
+                <!--Scrollbar Klasse-->
+                <jsSourceFile>cutOut.js</jsSourceFile>
+                <!--Ausschnittbildchen Klasse-->
+                <jsSourceFile>METS.js</jsSourceFile>
+                <!--METS Klasse-->
+                <jsSourceFile>Thumbnail.js</jsSourceFile>
+                <!--Hauptdatei-->
+                <jsSourceFile>init.js</jsSourceFile>
+                <!-- iview.init END -->
+                <jsSourceFile>../lib/jqueryUI/ui.button.js</jsSourceFile>
+                
+                <!-- menu -->
+                <jsSourceFile>../lib/fg-menu/fg.menu.js</jsSourceFile>
+                
+                <!-- Importer Skript -->
+                <jsSourceFile>iview2.toolbar/ToolbarImporter.js</jsSourceFile>
+                
+                <!--  Model, Controller, View -->
+                <!--  needs Event.js -->
+                
+                <jsSourceFile>iview2.toolbar/ToolbarManager.js</jsSourceFile>
+                
+                <jsSourceFile>iview2.toolbar/ToolbarModel.js</jsSourceFile>
+                <jsSourceFile>iview2.toolbar/ToolbarButtonsetModel.js</jsSourceFile>
+                <jsSourceFile>iview2.toolbar/ToolbarDividerModel.js</jsSourceFile>
+                <jsSourceFile>iview2.toolbar/ToolbarSpringModel.js</jsSourceFile>
+                <jsSourceFile>iview2.toolbar/ToolbarTextModel.js</jsSourceFile>
+                <jsSourceFile>iview2.toolbar/ToolbarButtonModel.js</jsSourceFile>
+                <jsSourceFile>iview2.toolbar/ToolbarController.js</jsSourceFile>
+                <jsSourceFile>iview2.toolbar/ToolbarView.js</jsSourceFile>
+                
+                <!--  ModelProvider -->
+                <jsSourceFile>iview2.toolbar/StandardToolbarModelProvider.js</jsSourceFile>
+                <jsSourceFile>iview2.toolbar/PreviewToolbarModelProvider.js</jsSourceFile>
+                            
+                <!-- Permalink -->
+                <jsSourceFile>Permalink.js</jsSourceFile>
+              </jsSourceFiles>
+              <jsFinalFile>iview2.js</jsFinalFile>
+            </configuration>
+            <goals>
+              <goal>minify</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>jaxws-maven-plugin</artifactId>
         <executions>

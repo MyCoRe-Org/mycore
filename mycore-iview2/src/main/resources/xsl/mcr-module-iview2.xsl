@@ -2,8 +2,10 @@
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:mcrxml="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:iview2="xalan://org.mycore.frontend.iview2.MCRIView2XSLFunctions" version="1.0"
   exclude-result-prefixes="xlink i18n mcrxml iview2">
   <xsl:param name="MCR.Module-iview2.BaseURL" />
+  <xsl:param name="MCR.Module-iview2.DeveloperMode" />
   <xsl:param name="WebApplicationBaseURL" />
   <xsl:param name="ServletsBaseURL" />
+  <xsl:variable name="jqueryUI.version" select="'1.8.8'"/>
   <xsl:output method="html" indent="yes" encoding="UTF-8" media-type="text/html" />
   <xsl:template name="iview2.getViewer" mode="iview2">
     <xsl:param name="groupID" />
@@ -80,52 +82,43 @@
     
     <!-- online src-->
     
-	<!-- jQuery Lib Files -->
-    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
-	<script type="text/javascript">
-      google.load("jquery", "1");
-      google.load("jqueryui", "1.8.6");
-    </script>
-	<!-- button -->
-	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/lib/jqueryUI/ui.button.js" />
-	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/lib/jqueryUI/ui.widget.js" />
-	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/lib/jqueryUI/ui.core.js" />	
-	
-	<!-- menu -->
-	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/lib/fg-menu/fg.menu.js" />
-	
-	<!-- Importer Skript -->
-	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarImporter.js" />
-	
-	<!--  Model, Controller, View -->
-	<!--  needs Event.js -->
-	
-	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarManager.js" />
-	
-	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarModel.js" />
-	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarButtonsetModel.js" />
-	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarDividerModel.js" />
-	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarSpringModel.js" />
-	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarTextModel.js" />
-	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarButtonModel.js" />
-	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarController.js" />
-	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarView.js" />
-	
-	<!--  ModelProvider -->
-	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/StandardToolbarModelProvider.js" />
-	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/PreviewToolbarModelProvider.js" />
-	
-	<!--  CSS -->
-	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/web/lib/jqueryUI/themes/base/ui.base.css" />
-	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/web/lib/jqueryUI/themes/base/ui.theme.css" />
-	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/web/lib/jqueryUI/ui.toolbar.css" />
-	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/web/lib/fg-menu/fg.menu.css" />
-	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/web/gfx/default/iview2.toolbar.css" />
-	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/web/gfx/default/iview2.permalink.css" />
-    
-    <!-- Permalink -->
-    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/Permalink.js" />
-    
+    <xsl:if test="$MCR.Module-iview2.DeveloperMode='true'">
+    	<!-- button -->
+    	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/jqueryUI/ui.button.js" />
+    	
+    	<!-- menu -->
+    	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/fg-menu/fg.menu.js" />
+    	
+    	<!-- Importer Skript -->
+    	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarImporter.js" />
+    	
+    	<!--  Model, Controller, View -->
+    	<!--  needs Event.js -->
+    	
+    	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarManager.js" />
+    	
+    	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarModel.js" />
+    	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarButtonsetModel.js" />
+    	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarDividerModel.js" />
+    	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarSpringModel.js" />
+    	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarTextModel.js" />
+    	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarButtonModel.js" />
+    	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarController.js" />
+    	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarView.js" />
+    	
+    	<!--  ModelProvider -->
+    	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/StandardToolbarModelProvider.js" />
+    	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/PreviewToolbarModelProvider.js" />
+    	
+    	<!--  CSS -->
+    	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/web/lib/jqueryUI/ui.toolbar.css" />
+    	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/web/lib/fg-menu/fg.menu.css" />
+    	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/web/gfx/default/iview2.toolbar.css" />
+    	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/web/gfx/default/iview2.permalink.css" />
+        
+        <!-- Permalink -->
+        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/Permalink.js" />
+    </xsl:if>
 	
      
     <div id="toolbars{$groupID}" class="toolbars" onmousedown="return false;">      
@@ -174,7 +167,11 @@
     <!-- thumbnail settings -->
     <xsl:param name="DampInViewer" select="'true'" />
     <script type="text/javascript" src="http://www.google.com/jsapi"></script>
-    <script type="text/javascript">google.load("jquery", "1");</script>
+    <script type="text/javascript">
+      google.load("jquery", "1");
+      <xsl:text>google.load("jqueryui", "</xsl:text><xsl:value-of select="$jqueryUI.version"/><xsl:text>");</xsl:text>
+    </script>
+    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/{$jqueryUI.version}/themes/base/jquery-ui.css"/>
     <!-- JQuery Framework -->
     <script type="text/javascript">
       <xsl:text>var prefix='</xsl:text>
@@ -205,28 +202,36 @@
       <xsl:value-of select="$DampInViewer" />
       <xsl:text>;</xsl:text>
     </script>
-    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/LAB.min.js"/>
-    <!-- LAB JS Loader Lib -->
-    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/jquery.mousewheel.min.js" />
-    <!-- JQuery Mousewheel support -->
-    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/ManageEvents.js" />
-    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/PanoJS.js" />
-    <!-- Viewer -->
-    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/Event.js"/>
-    <!-- Event Registration utility -->
-    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/XML.js" />
-    <!--XML Funktionen-->
-    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/Utils.js" />
-    <!--Allgemeine Util Funktionen-->
-    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/scrollBars.js" />
-    <!--Scrollbar Klasse-->
-    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/cutOut.js" />
-    <!--Ausschnittbildchen Klasse-->
-    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/METS.js" />
-    <!--METS Klasse-->
-	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/Thumbnail.js" />
-    <!--Hauptdatei-->
-    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/init.js"/>
+    <xsl:choose>
+      <xsl:when test="$MCR.Module-iview2.DeveloperMode='true'">
+        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/LAB.min.js"/>
+        <!-- LAB JS Loader Lib -->
+        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/jquery.mousewheel.min.js" />
+        <!-- JQuery Mousewheel support -->
+        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/ManageEvents.js" />
+        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/PanoJS.js" />
+        <!-- Viewer -->
+        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/Event.js"/>
+        <!-- Event Registration utility -->
+        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/XML.js" />
+        <!--XML Funktionen-->
+        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/Utils.js" />
+        <!--Allgemeine Util Funktionen-->
+        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/scrollBars.js" />
+        <!--Scrollbar Klasse-->
+        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/cutOut.js" />
+        <!--Ausschnittbildchen Klasse-->
+        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/METS.js" />
+        <!--METS Klasse-->
+        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/Thumbnail.js" />
+        <!--Hauptdatei-->
+        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/init.js"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.min.js"/>
+        <link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/web/gfx/default/iview2.css" />
+      </xsl:otherwise>
+    </xsl:choose>
     <!-- Init Funktionen -->
     <script type="text/javascript">
       function addIviewProperty(viewID, propertyName, val) {
@@ -347,4 +352,5 @@
     <xsl:param name="class" select="''" />
     <img src="{concat($WebApplicationBaseURL,'servlets/MCRThumbnailServlet/',$derivate,$imagePath)}" style="{$style}" class="{$class}"/>
   </xsl:template>
+  
 </xsl:stylesheet>
