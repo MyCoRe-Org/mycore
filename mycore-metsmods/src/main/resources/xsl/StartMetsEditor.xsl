@@ -1,4 +1,4 @@
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0" xmlns:property="xalan://org.mycore.common.xml.PropertyFunctions"
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0" xmlns:property="xalan://org.mycore.common.xml.MCRPropertyFunctions"
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:acl="xalan://org.mycore.access.MCRAccessManager">
   <xsl:output method="html" indent="yes" doctype-public="-//IETF//DTD HTML 2.0//EN" />
   <xsl:param name="RequestURL" />
@@ -11,7 +11,7 @@
   <xsl:variable name="useExistingMets">
     <xsl:value-of select="property:getParameterValue($RequestURL,'useExistingMets')" />
   </xsl:variable>
-  <xsl:variable name="createMetsAllowed" select="acl:checkPermission($derivateId,'writedb')" />
+  <xsl:variable name="createMetsAllowed" select="acl:checkPermission($derivateId,'write-db')" />
 
   <xsl:template match="/StartMetsEditor">
     <!--
