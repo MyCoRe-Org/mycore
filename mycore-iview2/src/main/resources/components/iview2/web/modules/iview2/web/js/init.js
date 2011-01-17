@@ -49,6 +49,7 @@ function initializeGraphic(viewID) {
 	PanoJS.USE_SLIDE = false;
 	PanoJS.USE_LOADER_IMAGE = false;
 	PanoJS.MOVE_THROTTLE = 10;
+	PanoJS.BLANK_TILE_IMAGE = "../modules/iview2/web/" + styleFolderUri + 'blank.gif';
 	
 	// opera triggers the onload twice
 	var iviewTileUrlProvider = new PanoJS.TileUrlProvider(Iview[viewID].baseUri, Iview[viewID].prefix, 'jpg');
@@ -64,7 +65,6 @@ function initializeGraphic(viewID) {
 			tileUrlProvider: iviewTileUrlProvider,
 			maxZoom: Iview[viewID].zoomMax,
 			initialZoom: Iview[viewID].zoomInit,//Anfangs-Zoomlevel
-			blankTile: "../modules/iview2/web/" + styleFolderUri + 'blank.gif',
 			loadingTile: "../modules/iview2/web/" + styleFolderUri + 'blank.gif'
 		});
 

@@ -579,8 +579,7 @@ PanoJS.prototype = {
 //additions	
 		isloaded(tileImg, this.viewID);
 		//changes all not available Tiles to the blank one, so that no ugly Image not Found Pics popup.
-		//tileImg.onerror = function () {this.src = Iview[this.viewID].viewerBean.cache['blank'].src; return true;};
-		tileImg.onerror = function () {this.src = Iview[this.viewID].viewerBean.cache['blank'].src; return true;};
+		tileImg.onerror = function () {this.src = PanoJS.BLANK_TILE_IMAGE; return true;};
 //endadd
 	},
 
