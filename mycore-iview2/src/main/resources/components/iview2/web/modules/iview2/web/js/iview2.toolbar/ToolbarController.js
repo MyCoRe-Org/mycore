@@ -329,7 +329,17 @@ ToolbarController.prototype._checkNewModel = function(model) {
 	//Send notification that new Model was added
 	var loadEvent = jQuery.Event("toolbarloaded");
 	loadEvent.viewer = this.getViewer();
-	loadEvent.modelId = model.id;
+	loadEvent.model = model;
+	//TODO: optimize this method invocation 
+	loadEvent.getViews = function(){
+		var ctrl=this.viewer.getToolbarCtrl();
+		var views=[];
+		var relView=ctrl.relations[this.model.id];
+		for (var i = 0; i < relView.length; i++){
+			views.push(ctrl.getView(relView[i]));
+		}
+		return views;
+	};
 	jQuery(document).trigger(loadEvent);
 };
 
