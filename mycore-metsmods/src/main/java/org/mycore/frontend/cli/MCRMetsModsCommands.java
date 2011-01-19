@@ -1,7 +1,4 @@
 /*
- * 
- * $Revision: 13085 $ $Date: 2008-02-06 18:27:24 +0100 (Mi, 06 Feb 2008) $
- *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
  *
@@ -42,6 +39,7 @@ import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObjectStructure;
 import org.mycore.frontend.metsmods.MCRMetsModsUtil;
 import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRHit;
@@ -51,7 +49,7 @@ import org.mycore.services.fieldquery.MCRQueryManager;
 import org.mycore.services.fieldquery.MCRResults;
 
 /**
- * This class builds a google sitemap containing links to all documents and store them to the webapps directory. This can be configured with property variable MCR.GoogleSitemap.Directory. The web.xml file should contain a mapping to /sitemap.xml See http://www.google.com/webmasters/sitemaps/docs/en/protocol.html
+ * This class containing commands to administered mets.xml files in derivates
  * 
  * @author Frank Luetzenkirchen
  * @author Jens Kupferschmidt
@@ -61,7 +59,6 @@ import org.mycore.services.fieldquery.MCRResults;
  */
 public final class MCRMetsModsCommands extends MCRAbstractCommands {
 
-    /** The logger */
     private static Logger LOGGER = Logger.getLogger(MCRMetsModsCommands.class.getName());
 
     /**
@@ -77,11 +74,11 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         command.add(com);
 
         com = new MCRCommand("build mets files for Object {0}", "org.mycore.frontend.cli.MCRMetsModsCommands.buildMetsForMCRObjectID String",
-                        "Create the mets.xml file for all dfg-derivate's of the given object.");
+                        "Create the mets.xml file for all derivates for the given object ID.");
         command.add(com);
 
         com = new MCRCommand("build mets files for Derivate {0}", "org.mycore.frontend.cli.MCRMetsModsCommands.buildMetsForMCRDerivateID String",
-                        "Create the mets.xml file in the derivate directory of the given derivate.");
+                        "Create the mets.xml file in the derivate of the given derivate ID.");
         command.add(com);
 
         com = new MCRCommand("build mets files", "org.mycore.frontend.cli.MCRMetsModsCommands.buildMets", "Create the mets.xml file in the derivate directory.");
@@ -100,11 +97,11 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         command.add(com);
 
         com = new MCRCommand("check mets files for Object {0}", "org.mycore.frontend.cli.MCRMetsModsCommands.checkMetsForMCRObjectID String",
-                        "Check mets files for given object.");
+                        "Check mets files for given object ID.");
         command.add(com);
 
         com = new MCRCommand("check mets files for Derivate {0}", "org.mycore.frontend.cli.MCRMetsModsCommands.checkMetsForMCRDerivateID String",
-                        "Check mets files for given derivate.");
+                        "Check mets files for given derivate ID.");
         command.add(com);
 
         com = new MCRCommand("check mets files", "org.mycore.frontend.cli.MCRMetsModsCommands.checkMets", "Check the mets.xml file.");
@@ -123,13 +120,11 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
     public static final void buildMetsForType(String type) {
         LOGGER.info("Build METS file for type " + type + " start.");
         final long start = System.currentTimeMillis();
-        // get all MCRObjectIDs for the type
         MCRQueryCondition fromcond = new MCRQueryCondition(MCRFieldDef.getDef("objectType"), "=", type);
         MCRQuery fromquery = new MCRQuery(fromcond);
         MCRResults fromresult = MCRQueryManager.search(fromquery);
         Iterator<MCRHit> fromiter = fromresult.iterator();
         while (fromiter.hasNext()) {
-            // build for a MCRObjectID
             MCRHit fromhit = fromiter.next();
             String fromid = fromhit.getID();
             buildMetsForMCRObjectID(fromid);
@@ -147,8 +142,10 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         LOGGER.info("Build METS file for ID " + MCRID + " start.");
         final long start = System.currentTimeMillis();
         MCRObject mcrobj = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(MCRID));
-        for (int i = 0; i < mcrobj.getStructure().getDerivateSize(); i++) {
-            MCRMetaLinkID mcrder = mcrobj.getStructure().getDerivate(i);
+        MCRObjectStructure structure = mcrobj.getStructure();
+        List<MCRMetaLinkID> derivates = structure.getDerivates();
+        for (int i = 0; i < derivates.size(); i++) {
+            MCRMetaLinkID mcrder = derivates.get(i);
             LOGGER.debug("For ID " + MCRID + " found derivate " + mcrder.getXLinkHref());
             String label = mcrder.getXLinkLabel();
             if (label.contains("dfg"))
@@ -221,7 +218,6 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
                     Element mets2 = mmu.createMetsElement(pic_list, new_mets, baseurl + "servlets/MCRFileNodeServlet");
                     XMLOutputter xmlout = new XMLOutputter();
                     String full_mets = xmlout.outputString(mets2);
-                    // save the builded file to IFS
                     try {
                         LOGGER.debug("Storing new mets.xml file");
                         // startTransaction();
@@ -247,10 +243,8 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
      * The command build mets.xml files in the derivates if it does not exist and the content are images.
      */
     public static final void buildMets() throws Exception {
-        // check time
         LOGGER.debug("Build all METS files start.");
         final long start = System.currentTimeMillis();
-        // get all derivates
         List<String> derlist = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
         for (String der : derlist) {
             buildMetsForMCRDerivateID(der);
@@ -310,8 +304,10 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         final long start = System.currentTimeMillis();
 
         MCRObject mcrobj = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(MCRID));
-        for (int i = 0; i < mcrobj.getStructure().getDerivateSize(); i++) {
-            MCRMetaLinkID mcrder = mcrobj.getStructure().getDerivate(i);
+        MCRObjectStructure structure = mcrobj.getStructure();
+        List<MCRMetaLinkID> derivates = structure.getDerivates();
+        for (int i = 0; i < derivates.size(); i++) {
+            MCRMetaLinkID mcrder = derivates.get(i);
             LOGGER.debug("found derivate " + mcrder.getXLinkTitle());
             String label = mcrder.getXLinkLabel();
 
@@ -349,15 +345,12 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
      * The command check mets.xml files in the derivates.
      */
     public static void checkMets() throws Exception {
-        // check time
         LOGGER.debug("Check METS file start.");
         final long start = System.currentTimeMillis();
-        // get all derivates
         List<String> derlist = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
         for (String der : derlist) {
             checkMetsForMCRDerivateID(der);
         }
-        // check time
         LOGGER.debug("Check METS file took " + (System.currentTimeMillis() - start) + "ms.");
     }
 
@@ -375,9 +368,10 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
             String fromid = fromhit.getID();
 
             MCRObject fromobj = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(fromid));
-
-            for (int i = 0; i < fromobj.getStructure().getDerivateSize(); i++) {
-                MCRObjectID mcrderid = fromobj.getStructure().getDerivate(i).getXLinkHrefID();
+            MCRObjectStructure structure = fromobj.getStructure();
+            List<MCRMetaLinkID> derivates = structure.getDerivates();
+            for (int i = 0; i < derivates.size(); i++) {
+                MCRObjectID mcrderid = derivates.get(i).getXLinkHrefID();
                 MCRDerivate mcrder = new MCRDerivate();
                 MCRDirectory derdir = mcrder.receiveDirectoryFromIFS(mcrderid.toString());
                 if (derdir.getChild("mets.xml") != null) {
