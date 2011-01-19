@@ -176,8 +176,16 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
                     if (fsnode[i].getName().endsWith(".jpg")) {
                         checkimage = true;
                     } else {
+                        if (fsnode[i].getName().endsWith(".tif")) {
+                            checkimage = true;
+                        } else {
+                            if (fsnode[i].getName().endsWith(".png")) {
+                                checkimage = true;
+                            } else {
                         checkimage = false;
                         break;
+                            }
+                        }
                     }
                 }
                 if (checkimage) {
@@ -243,7 +251,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
      * The command build mets.xml files in the derivates if it does not exist and the content are images.
      */
     public static final void buildMets() throws Exception {
-        LOGGER.debug("Build all METS files start.");
+        LOGGER.info("Build all METS files start.");
         final long start = System.currentTimeMillis();
         List<String> derlist = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
         for (String der : derlist) {
@@ -257,7 +265,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
     }
 
     public static void checkMetsForType(String type, String exclude) {
-        LOGGER.debug("Check METS file for type " + type + " start.");
+        LOGGER.info("Check METS file for type " + type + " start.");
         final long start = System.currentTimeMillis();
 
         MCRQueryCondition fromcond = new MCRQueryCondition(MCRFieldDef.getDef("objectType"), "=", type);
@@ -333,9 +341,9 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         if (difs != null) {
             MCRFilesystemNode mets = difs.getChild("mets.xml");
             if (mets == null) {
-                LOGGER.info("No mets.xml file was found.");
+                LOGGER.error("No mets.xml file was found.");
             } else {
-                LOGGER.info("mets.xml exist.");
+                LOGGER.debug("mets.xml exist.");
             }
         }
         LOGGER.debug("Check METS file took " + (System.currentTimeMillis() - start) + "ms.");
