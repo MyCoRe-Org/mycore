@@ -229,7 +229,7 @@
       </xsl:when>
       <xsl:otherwise>
         <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.min.js"/>
-        <link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/web/gfx/default/iview2.css" />
+        <link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/web/gfx/default/iview2.min.css" />
       </xsl:otherwise>
     </xsl:choose>
     <!-- Init Funktionen -->

@@ -22,14 +22,14 @@
             <verbose>true</verbose>
               <webappSourceDir>${basedir}/src/main/resources</webappSourceDir>
               <webappTargetDir>${project.build.outputDirectory}</webappTargetDir>
-              <cssSourceDir>components/iview2/web/modules/iview2/web</cssSourceDir>
+              <cssSourceDir>components/iview2/web/modules/iview2/web/gfx/default</cssSourceDir>
               <cssSourceFiles>
-                <cssSourceFile>lib/jqueryUI/ui.toolbar.css</cssSourceFile>
-                <cssSourceFile>lib/fg-menu/fg.menu.css</cssSourceFile>
-                <cssSourceFile>gfx/default/iview2.toolbar.css</cssSourceFile>
-                <cssSourceFile>gfx/default/iview2.permalink.css</cssSourceFile>
+                <cssSourceFile>../../lib/jqueryUI/ui.toolbar.css</cssSourceFile>
+                <cssSourceFile>../../lib/fg-menu/fg.menu.css</cssSourceFile>
+                <cssSourceFile>iview2.toolbar.css</cssSourceFile>
+                <cssSourceFile>iview2.permalink.css</cssSourceFile>
               </cssSourceFiles>
-              <cssFinalFile>gfx/default/iview2.css</cssFinalFile>
+              <cssFinalFile>iview2.css</cssFinalFile>
               <jsSourceDir>components/iview2/web/modules/iview2/web/js</jsSourceDir>
               <jsSourceFiles>
                 <!-- iview.init BEGIN -->
