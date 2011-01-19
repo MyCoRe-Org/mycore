@@ -24,7 +24,6 @@
               <webappTargetDir>${project.build.outputDirectory}</webappTargetDir>
               <cssSourceDir>components/iview2/web/modules/iview2/web/gfx/default</cssSourceDir>
               <cssSourceFiles>
-                <cssSourceFile>../../lib/jqueryUI/ui.toolbar.css</cssSourceFile>
                 <cssSourceFile>../../lib/fg-menu/fg.menu.css</cssSourceFile>
                 <cssSourceFile>iview2.toolbar.css</cssSourceFile>
                 <cssSourceFile>iview2.permalink.css</cssSourceFile>
