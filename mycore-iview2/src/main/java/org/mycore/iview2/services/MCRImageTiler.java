@@ -1,5 +1,6 @@
 package org.mycore.iview2.services;
 
+import java.lang.reflect.Constructor;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -14,6 +15,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
@@ -42,9 +44,21 @@ public class MCRImageTiler implements Runnable, Closeable {
 
     private ReentrantLock runLock;
 
+    private Constructor<? extends MCRTilingAction> tilingActionConstructor;
+
+    @SuppressWarnings("unchecked")
     private MCRImageTiler() {
         MCRShutdownHandler.getInstance().addCloseable(this);
         runLock = new ReentrantLock();
+        try {
+            Class<? extends MCRTilingAction> tilingActionImpl = (Class<? extends MCRTilingAction>) Class.forName(MCRConfiguration
+                .instance()
+                .getString(CONFIG_PREFIX + "MCRTilingActionImpl", MCRTilingAction.class.getName()));
+            tilingActionConstructor = tilingActionImpl.getConstructor(MCRTileJob.class);
+        } catch (Exception e) {
+            LOGGER.error("Error while initializing", e);
+            throw new MCRException(e);
+        }
     }
 
     /**
@@ -78,7 +92,7 @@ public class MCRImageTiler implements Runnable, Closeable {
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
         boolean activated = MCRConfiguration.instance().getBoolean(CONFIG_PREFIX + "LocalTiler.activated", true);
-        LOGGER.info("Local Tiling is "+(activated?"activated":"deactivated"));
+        LOGGER.info("Local Tiling is " + (activated ? "activated" : "deactivated"));
         if (activated) {
             int tilingThreadCount = Integer.parseInt(MCRIView2Tools.getIView2Property("TilingThreads"));
             ThreadFactory slaveFactory = new ThreadFactory() {
@@ -130,7 +144,7 @@ public class MCRImageTiler implements Runnable, Closeable {
                         }
                         if (job != null && !tilingServe.isShutdown()) {
                             LOGGER.info("Creating:" + job.getPath());
-                            tilingServe.execute(new MCRTilingAction(job));
+                            tilingServe.execute(getTilingAction(job));
                         } else {
                             try {
                                 synchronized (tq) {
@@ -149,7 +163,7 @@ public class MCRImageTiler implements Runnable, Closeable {
                         runLock.unlock();
                     }
                 } // while(tilingServe.getActiveCount() < tilingServe.getCorePoolSize())
-                if (activeThreads.get()<tilingThreadCount)
+                if (activeThreads.get() < tilingThreadCount)
                     try {
                         LOGGER.info("Waiting for a tiling job to finish");
                         Thread.sleep(1000);
@@ -160,6 +174,15 @@ public class MCRImageTiler implements Runnable, Closeable {
         }
         LOGGER.info("Tiling thread finished");
         MCRSessionMgr.releaseCurrentSession();
+    }
+
+    private MCRTilingAction getTilingAction(MCRTileJob job) {
+        try {
+            MCRTilingAction tilingAction = tilingActionConstructor.newInstance(job);
+            return tilingAction;
+        } catch (Exception e) {
+            throw new MCRException(e);
+        }
     }
 
     /**

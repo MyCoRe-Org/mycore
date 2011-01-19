@@ -14,11 +14,15 @@ import org.mycore.imagetiler.MCRTiledPictureProps;
 
 /**
  * A slave thread of {@link MCRImageTiler}
+ * 
+ * This class can be extended. Any extending class should provide and implementation for {@link #getMCRImage()}.
+ * To get the extending class invoked, one need to define a MyCoRe property, which defaults to:
+ * <code>MCR.Module-iview2.MCRTilingActionImpl=org.mycore.iview2.services.MCRTilingAction</code>
  * @author Thomas Scheffler (yagee)
  *
  */
 public class MCRTilingAction implements Runnable {
-    private MCRTileJob image = null;
+    protected MCRTileJob tileJob = null;
 
     private static SessionFactory sessionFactory = MCRHIBConnection.instance().getSessionFactory();
 
@@ -27,29 +31,28 @@ public class MCRTilingAction implements Runnable {
     /**
      * takes a {@link MCRTileJob} and tiles the referenced {@link MCRImage} instance.
      * 
-     * Also this updates image properties of {@link MCRTileJob} in the database.
+     * Also this updates tileJob properties of {@link MCRTileJob} in the database.
      */
     public void run() {
         Session session = sessionFactory.getCurrentSession();
         Transaction transaction = session.beginTransaction();
         try {
-            MCRFile file = MCRIView2Tools.getMCRFile(image.getDerivate(), image.getPath());
-            MCRImage imgTiler = MCRImage.getInstance(MCRIView2Tools.getFile(file), file.getOwnerID(), file.getAbsolutePath());
-            imgTiler.setTileDir(MCRIView2Tools.getTileDir());
+            MCRImage image = getMCRImage();
+            image.setTileDir(MCRIView2Tools.getTileDir());
             MCRTiledPictureProps picProps = new MCRTiledPictureProps();
-            image.setStart(new Date());
+            tileJob.setStart(new Date());
             try {
-                picProps = imgTiler.tile();
-                image.setFinished(new Date());
-                image.setStatus(MCRJobState.FINISHED);
-                image.setHeight(picProps.getHeight());
-                image.setWidth(picProps.getWidth());
-                image.setTiles(picProps.getTilesCount());
-                image.setZoomLevel(picProps.getZoomlevel());
+                picProps = image.tile();
+                tileJob.setFinished(new Date());
+                tileJob.setStatus(MCRJobState.FINISHED);
+                tileJob.setHeight(picProps.getHeight());
+                tileJob.setWidth(picProps.getWidth());
+                tileJob.setTiles(picProps.getTilesCount());
+                tileJob.setZoomLevel(picProps.getZoomlevel());
             } catch (IOException e) {
                 LOGGER.error("IOException occured while tiling a queued picture", e);
             }
-            session.update(image);
+            session.update(tileJob);
             transaction.commit();
         } catch (Exception e) {
             LOGGER.error("Error while getting next tiling job.", e);
@@ -61,7 +64,17 @@ public class MCRTilingAction implements Runnable {
         }
     }
 
-    MCRTilingAction(MCRTileJob image) {
-        this.image = image;
+    /**
+     * @return MCRImage instance based on the information provided by {@link #tileJob}
+     * @throws IOException thrown by {@link MCRImage#getInstance(java.io.File, String, String)}
+     */
+    protected MCRImage getMCRImage() throws IOException {
+        MCRFile file = MCRIView2Tools.getMCRFile(tileJob.getDerivate(), tileJob.getPath());
+        MCRImage imgTiler = MCRImage.getInstance(MCRIView2Tools.getFile(file), file.getOwnerID(), file.getAbsolutePath());
+        return imgTiler;
+    }
+
+    public MCRTilingAction(MCRTileJob image) {
+        this.tileJob = image;
     }
 }
