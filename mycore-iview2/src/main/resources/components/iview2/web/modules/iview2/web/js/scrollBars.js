@@ -750,7 +750,8 @@ iview.scrollbar.View = function() {
 				return false;})
 			.appendTo(complete);
 
-		var spaceStart = jQuery("<div>")
+		//spaceStart
+		jQuery("<div>")
 			.addClass("emptyStart")
 			.appendTo(wholeSpace);
 			
@@ -758,7 +759,8 @@ iview.scrollbar.View = function() {
 			.addClass("space")
 			.appendTo(wholeSpace);
 		
-		var spaceEnd = jQuery("<div>")
+		//spaceEnd
+		jQuery("<div>")
 			.addClass("emptyEnd")
 			.appendTo(wholeSpace);
 		
@@ -770,7 +772,8 @@ iview.scrollbar.View = function() {
 			.css("position", "absolute")
 			.appendTo(wholeSpace);
 		
-		var barStart = jQuery("<div>")
+		//barStart
+		jQuery("<div>")
 			.addClass("start")
 			.appendTo(barScroll);
 		
@@ -778,7 +781,8 @@ iview.scrollbar.View = function() {
 			.addClass("scroll")
 			.appendTo(barScroll);
 		
-		var barEnd = jQuery("<div>")
+		//barEnd
+		jQuery("<div>")
 			.addClass("end")
 			.appendTo(barScroll);
 		
@@ -787,6 +791,7 @@ iview.scrollbar.View = function() {
 			.mousedown(function() { return false;})
 			.mousedown(function() { buttonMouseDown(that, true);})
 			.appendTo(complete);
+		
 		jQuery(document)
 			.mouseup(function() { buttonMouseUp(that);})
 			.mousemove(function(e) { divMouseMove(that, e);});

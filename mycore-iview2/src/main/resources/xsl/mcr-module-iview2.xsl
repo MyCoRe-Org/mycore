@@ -83,11 +83,8 @@
     <!-- online src-->
     
     <xsl:if test="$MCR.Module-iview2.DeveloperMode='true'">
-    	<!-- button -->
-    	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/jqueryUI/ui.button.js" />
-    	
     	<!-- menu -->
-    	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/fg-menu/fg.menu.js" />
+    	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/lib/fg-menu/fg.menu.js" />
     	
     	<!-- Importer Skript -->
     	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarImporter.js" />
@@ -111,7 +108,6 @@
     	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/PreviewToolbarModelProvider.js" />
     	
     	<!--  CSS -->
-    	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/web/lib/jqueryUI/ui.toolbar.css" />
     	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/web/lib/fg-menu/fg.menu.css" />
     	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/web/gfx/default/iview2.toolbar.css" />
     	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/web/gfx/default/iview2.permalink.css" />

@@ -102,7 +102,6 @@
 	display: inline-block;
 	position: relative;
 	padding: 0;
-	margin-right: .1em;
 	text-decoration: none !important;
 	cursor: pointer;
 	text-align: center; zoom: 1;
@@ -198,12 +197,12 @@ input.ui-button {
 
 
 /*button sets*/
-.ui-button-set {
+.ui-buttonset {
 	margin-right: 12px;
 	float: left;
 }
 
-.ui-button-set .ui-button {
+.ui-buttonset .ui-button {
 	margin-left: 0;
 	margin-right: -.3em;
 }
@@ -241,17 +240,13 @@ button.ui-button::-moz-focus-inner {
 
 
 /* special buttonset / divider / button properties */
-.ui-button-set.previewBack .ui-button {
+.ui-buttonset.previewBack .ui-button, .ui-buttonset.previewForward .ui-button {
 	z-index: 100;
 }
 
-.viewerContainer .ui-button-set.previewForward {
+.viewerContainer .ui-buttonset.previewForward {
 	margin-right: 8px;
 	float: right;
-}
-
-.ui-button-set.previewForward .ui-button {
-	z-index: 100;
 }
 
 .ui-spring {

@@ -54,7 +54,6 @@
                 <!--Hauptdatei-->
                 <jsSourceFile>init.js</jsSourceFile>
                 <!-- iview.init END -->
-                <jsSourceFile>../lib/jqueryUI/ui.button.js</jsSourceFile>
                 
                 <!-- menu -->
                 <jsSourceFile>../lib/fg-menu/fg.menu.js</jsSourceFile>
