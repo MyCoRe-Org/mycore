@@ -110,10 +110,6 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         com = new MCRCommand("check mets files", "org.mycore.frontend.cli.MCRMetsModsCommands.checkMets", "Check the mets.xml file.");
         command.add(com);
 
-        com = new MCRCommand("remove mets files from zoomify", "org.mycore.frontend.cli.MCRMetsModsCommands.removeMetsByZoomify",
-                        "Remove all mets files in zoomify derivate directorys.");
-        command.add(com);
-
         com = new MCRCommand("remove mets files", "org.mycore.frontend.cli.MCRMetsModsCommands.removeMets", "Remove all mets files.");
         command.add(com);
 
@@ -416,38 +412,6 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
             }
         }
         LOGGER.debug("Remove METS file request took " + (System.currentTimeMillis() - start) + "ms.");
-    }
-
-    /**
-     * Remove mets.xml files from all derivates typed by zoomify.
-     * 
-     * @throws Exception
-     */
-    public static void removeMetsByZoomify() throws Exception {
-        LOGGER.debug("Remove METS file from zoomify derivates start.");
-        final long start = System.currentTimeMillis();
-        List<String> derlist = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
-        for (String der : derlist) {
-            MCRDirectory difs = MCRDirectory.getRootDirectory(der);
-            if (difs != null) {
-                MCRFilesystemNode mets = difs.getChild("mets.xml");
-
-                MCRFilesystemNode l[] = difs.getChildren();
-
-                boolean zipfound = false;
-                for (int i = 0; i < l.length; i++)
-                    if (l[i].getName().contains(".zip")) {
-                        zipfound = true;
-                        break;
-                    }
-
-                if (mets != null && zipfound) {
-                    LOGGER.info("Mets file found on " + der);
-                    mets.delete();
-                }
-            }
-        }
-        LOGGER.debug("Remove METS file from zoomify derivates request took " + (System.currentTimeMillis() - start) + "ms.");
     }
 
     private static void addPicturesToList(MCRDirectory dir, ArrayList<String> list) {
