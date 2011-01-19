@@ -108,6 +108,7 @@ public class MCRIndexBrowserXmlGenerator {
                     index = to - 1;
                 }
                 secondValue = resultList.get(index).getSortValue(0);
+                objectID = resultList.get(index).getObjectId();
                 delims.add(new MyRangeDelim(index, secondValue, objectID));
             } while (++index < to);
             buildPrefixDifference(delims);
