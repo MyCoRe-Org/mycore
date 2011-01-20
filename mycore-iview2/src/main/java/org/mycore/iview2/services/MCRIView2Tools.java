@@ -58,7 +58,9 @@ public class MCRIView2Tools {
 
     private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
-    private static String SUPPORTED_CONTENT_TYPE = CONFIG.getString("MCR.Module-iview2.SupportedContentTypes", "");
+    public static final String CONFIG_PREFIX = "MCR.Module-iview2.";
+
+    private static String SUPPORTED_CONTENT_TYPE = CONFIG.getString(CONFIG_PREFIX + "SupportedContentTypes", "");
 
     private static File TILE_DIR = new File(MCRIView2Tools.getIView2Property("DirectoryForTiles"));
 

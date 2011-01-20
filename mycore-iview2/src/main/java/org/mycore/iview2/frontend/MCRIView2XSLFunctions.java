@@ -26,7 +26,6 @@ package org.mycore.iview2.frontend;
 import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 
 import org.mycore.common.MCRConfiguration;
-import org.mycore.iview2.services.MCRIView2Tools;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -41,12 +40,14 @@ public class MCRIView2XSLFunctions {
 
     private static final String METS_NAMESPACE_URI = "http://www.loc.gov/METS/";
 
+    private static final MCRIView2XSLFunctionsAdapter adapter = MCRIView2XSLFunctionsAdapter.getInstance();
+
     public static boolean hasMETSFile(String derivateID) {
-        return (MCRIView2Tools.getMCRFile(derivateID, "/mets.xml") != null);
+        return adapter.hasMETSFile(derivateID);
     }
 
     public static String getSupportedMainFile(String derivateID) {
-        return MCRIView2Tools.getSupportedMainFile(derivateID);
+        return adapter.getSupportedMainFile(derivateID);
     }
 
     public static String getThumbnailURL(String derivate, String imagePath) {

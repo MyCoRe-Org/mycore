@@ -30,8 +30,6 @@ import org.mycore.common.events.MCRShutdownHandler.Closeable;
 public class MCRImageTiler implements Runnable, Closeable {
     private static final SessionFactory sessionFactory = MCRHIBConnection.instance().getSessionFactory();
 
-    private static final String CONFIG_PREFIX = "MCR.Module-iview2.";
-
     private static MCRImageTiler instance = null;
 
     private static Logger LOGGER = Logger.getLogger(MCRImageTiler.class);
@@ -53,7 +51,7 @@ public class MCRImageTiler implements Runnable, Closeable {
         try {
             Class<? extends MCRTilingAction> tilingActionImpl = (Class<? extends MCRTilingAction>) Class.forName(MCRConfiguration
                 .instance()
-                .getString(CONFIG_PREFIX + "MCRTilingActionImpl", MCRTilingAction.class.getName()));
+                .getString(MCRIView2Tools.CONFIG_PREFIX + "MCRTilingActionImpl", MCRTilingAction.class.getName()));
             tilingActionConstructor = tilingActionImpl.getConstructor(MCRTileJob.class);
         } catch (Exception e) {
             LOGGER.error("Error while initializing", e);
@@ -91,7 +89,7 @@ public class MCRImageTiler implements Runnable, Closeable {
         //get this MCRSession a speaking name
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
-        boolean activated = MCRConfiguration.instance().getBoolean(CONFIG_PREFIX + "LocalTiler.activated", true);
+        boolean activated = MCRConfiguration.instance().getBoolean(MCRIView2Tools.CONFIG_PREFIX + "LocalTiler.activated", true);
         LOGGER.info("Local Tiling is " + (activated ? "activated" : "deactivated"));
         if (activated) {
             int tilingThreadCount = Integer.parseInt(MCRIView2Tools.getIView2Property("TilingThreads"));
