@@ -167,7 +167,6 @@
       google.load("jquery", "1");
       <xsl:text>google.load("jqueryui", "</xsl:text><xsl:value-of select="$jqueryUI.version"/><xsl:text>");</xsl:text>
     </script>
-    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/{$jqueryUI.version}/themes/base/jquery-ui.css"/>
     <!-- JQuery Framework -->
     <script type="text/javascript">
       <xsl:text>var prefix='</xsl:text>
@@ -225,7 +224,15 @@
       </xsl:when>
       <xsl:otherwise>
         <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.min.js"/>
-        <link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/web/gfx/default/iview2.min.css" />
+        <script type="text/javascript">
+          <xsl:text>loadCssFile('http://ajax.googleapis.com/ajax/libs/jqueryui/</xsl:text>
+          <xsl:value-of select="$jqueryUI.version"/>
+          <xsl:text>/themes/base/jquery-ui.css');</xsl:text>
+
+          <xsl:text>loadCssFile('</xsl:text>
+          <xsl:value-of select="$WebApplicationBaseURL"/>
+          <xsl:text>modules/iview2/web/gfx/default/iview2.min.css');</xsl:text>
+        </script>
       </xsl:otherwise>
     </xsl:choose>
     <!-- Init Funktionen -->
@@ -246,7 +253,6 @@
     <xsl:param name="styleFolderUri" select="'gfx/'" />
     <xsl:param name="startFile" />
 
-    <link id="cssSheet{$groupID}" rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/web/gfx/{$style}/style.css" />
     <!-- Initfunktionen -->
     <script type="text/javascript">
     <!-- Philipp möchte verbessern -->

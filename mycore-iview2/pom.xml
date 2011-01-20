@@ -27,6 +27,7 @@
                 <cssSourceFile>../../lib/fg-menu/fg.menu.css</cssSourceFile>
                 <cssSourceFile>iview2.toolbar.css</cssSourceFile>
                 <cssSourceFile>iview2.permalink.css</cssSourceFile>
+                <cssSourceFile>style.css</cssSourceFile>
               </cssSourceFiles>
               <cssFinalFile>iview2.css</cssFinalFile>
               <jsSourceDir>components/iview2/web/modules/iview2/web/js</jsSourceDir>

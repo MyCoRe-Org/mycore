@@ -346,3 +346,13 @@ function arabToRoem(ArabischeZahl) {
 	
 	return RoemischeZahl;
 }
+
+function loadCssFile(pathToFile) {
+    var css = jQuery("<link>");
+    css.attr({
+      rel:  "stylesheet",
+      type: "text/css",
+      href: pathToFile
+    });
+    $("head").append(css);
+}
