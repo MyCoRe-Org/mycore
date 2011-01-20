@@ -6,8 +6,8 @@
       <generator class="native" />
     </id>
     <natural-id>
-      <property name="derivate" type="string" />
-      <property name="path" type="string" />
+      <property name="derivate" type="string" length="64"/>
+      <property name="path" type="string" length="255"/>
     </natural-id>
     <property name="status" type="char" />
     <property name="added" type="java.util.Date" />
@@ -17,5 +17,10 @@
     <property name="width" type="long" />
     <property name="height" type="long" />
     <property name="zoomLevel" type="long" />
+    <!--
+    It is recommended to add the two indices manually to your database for optimal performance:
+    STATUS: (status)
+    STATUS_ADDED_ID: (status, added, id) 
+     -->
   </class>
 </hibernate-mapping>
