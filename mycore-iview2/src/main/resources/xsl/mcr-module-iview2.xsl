@@ -9,7 +9,6 @@
   <xsl:output method="html" indent="yes" encoding="UTF-8" media-type="text/html" />
   <xsl:template name="iview2.getViewer" mode="iview2">
     <xsl:param name="groupID" />
-    <xsl:param name="zoomBar" select="'true'" />
     <xsl:param name="chapter" select="'true'" />
     <xsl:param name="cutOut" select="'true'" />
     <xsl:param name="overview" select="'true'" />
@@ -27,7 +26,6 @@
         </xsl:choose>
       </xsl:variable>
       var baseUris='["'+'<xsl:value-of select="$baseUris"/>'.split(',').join('","')+'"]';
-      addIviewProperty('<xsl:value-of select="$groupID" />', 'useZoomBar',<xsl:value-of select="$zoomBar" />);
       addIviewProperty('<xsl:value-of select="$groupID" />', 'useChapter',<xsl:value-of select="$chapter" />);
       addIviewProperty('<xsl:value-of select="$groupID" />', 'useCutOut',<xsl:value-of select="$cutOut" />);
       addIviewProperty('<xsl:value-of select="$groupID" />', 'useOverview',<xsl:value-of select="$overview" />);
@@ -83,6 +81,8 @@
     <!-- online src-->
     
     <xsl:if test="$MCR.Module-iview2.DeveloperMode='true'">
+    	<!-- button -->
+    	
     	<!-- menu -->
     	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/lib/fg-menu/fg.menu.js" />
     	
@@ -203,7 +203,6 @@
         <!-- LAB JS Loader Lib -->
         <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/jquery.mousewheel.min.js" />
         <!-- JQuery Mousewheel support -->
-        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/ManageEvents.js" />
         <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/PanoJS.js" />
         <!-- Viewer -->
         <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/Event.js"/>
@@ -268,37 +267,6 @@
       }
       jQuery(window).load(function() { startViewer('<xsl:value-of select="$groupID"/>');});
     </script>
-  </xsl:template>
-  <xsl:template name="iview2.getZoomBar">
-    <xsl:param name="groupID" />
-    <xsl:param name="parent" select="'viewer'" />
-    <xsl:param name="direction" select="'true'" />
-    <xsl:param name="horizontal" select="'true'" />
-    <xsl:param name="idAdd" />
-    <xsl:choose>
-      <xsl:when test="$parent = 'viewer'">
-        <script type="text/javascript">
-          addIviewProperty('<xsl:value-of select="$groupID" />', 'zoomBarParent', '"viewer<xsl:value-of select="$groupID" />"');
-          addIviewProperty('<xsl:value-of select="$groupID" />', 'zoomBarDirection', '<xsl:value-of select="$direction" />');
-          addIviewProperty('<xsl:value-of select="$groupID" />', 'zoomBarHorz', '<xsl:value-of select="$horizontal" />"');
-        </script>
-      </xsl:when>
-      <xsl:when test="$parent = 'here'">
-        <script type="text/javascript">
-          addIviewProperty('<xsl:value-of select="$groupID" />','zoomBarParent', '"zoomBarContainer<xsl:value-of select="$groupID" />"');
-          addIviewProperty('<xsl:value-of select="$groupID" />', 'zoomBarDirection', '<xsl:value-of select="$direction" />');
-          addIviewProperty('<xsl:value-of select="$groupID" />', 'zoomBarHorz', '<xsl:value-of select="$horizontal" />');
-        </script>
-        <div id="zoomBarContainer{$groupID}" class="zoomBarContainer{$idAdd}"></div>
-      </xsl:when>
-      <xsl:otherwise>
-        <script type="text/javascript">
-          addIviewProperty('<xsl:value-of select="$groupID" />','zoomBarParent', '"<xsl:value-of select="$parent" />"');
-          addIviewProperty('<xsl:value-of select="$groupID" />', 'zoomBarDirection', '<xsl:value-of select="$direction" />');
-          addIviewProperty('<xsl:value-of select="$groupID" />', 'zoomBarHorz', '<xsl:value-of select="$horizontal" />');
-        </script>
-      </xsl:otherwise>
-    </xsl:choose>
   </xsl:template>
 
   <xsl:template name="iview2.getThumbnail">

@@ -268,7 +268,6 @@ PanoJS.doubleClickHandler = function(e) {
 		}
 		if (self.zoomLevel < self.maxZoomLevel) {
 			self.zoom(1);
-			if (Iview[viewID].useZoomBar) Iview[viewID].zoomBar.moveBarToLevel(self.zoomLevel);
 		}
 	}
 };
@@ -329,9 +328,6 @@ PanoJS.keyboardZoomHandler = function(e) {
 		
 		if (zoomDir != 0 && Iview[viewer.viewID].maximized) {
 			viewer.zoom(zoomDir);
-			if (Iview[viewer.viewID].useZoombar) {
-				Iview[viewer.viewID].zoomBar.moveBarToLevel(viewer.zoomLevel);
-			}
 			preventDefault(e);
 			e.cancelBubble = true;
 			return false;

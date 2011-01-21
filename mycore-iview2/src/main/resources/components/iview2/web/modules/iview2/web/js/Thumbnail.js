@@ -304,7 +304,6 @@ function calculateZoomProp(level, totalSize, viewerSize, scrollBarSize, viewID) 
 		viewerBean.tileSize = Math.floor((viewerSize - viewerRatio * lastTileWidth) / fullTileCount);
 		Iview[viewID].zoomBack = viewerBean.zoomLevel;
 		viewerBean.zoom(level - viewerBean.zoomLevel);
-		if (Iview[viewID].useZoomBar) Iview[viewID].zoomBar.moveBarToLevel(level);
 		return true;
 	}
 	return false;
@@ -361,7 +360,6 @@ function switchDisplayMode(screenZoom, stateBool, viewID) {
 		//an infinite loop would arise if the repeal of the zoombar comes
 		if (typeof (arguments[3]) == "undefined" || arguments[3] == false) {
 			viewerBean.zoom(Iview[viewID].zoomBack - viewerBean.zoomLevel);
-			if (Iview[viewID].useZoomBar) Iview[viewID].zoomBar.moveBarToLevel(viewerBean.zoomLevel);
 		}
 	}
 
@@ -617,13 +615,6 @@ function updateModuls(viewID) {
 		//prevent endless loop
 		Iview[viewID].chapterReaction = true;
 	}
-
-	// Actualize zoomBar
-	if (Iview[viewID].useZoomBar) {
-		Iview[viewID].zoomBar.setAmountLevel(Iview[viewID].zoomMax + 1);
-		Iview[viewID].zoomBar.createScale();
-		Iview[viewID].zoomBar.moveBarToLevel(Iview[viewID].viewerBean.zoomLevel);
-	}
 }
 
 /**
@@ -662,33 +653,6 @@ function changeCss() {
 	} else {
 		window.location.search += "&css="+curDesign;
 	}
-}
-
-/**
- * @public
- * @function
- * @name	importZoomBar
- * @memberOf	iview.Thumbnails
- * @description	calls the corresponding functions to create the scrollbar
- * @param	{string} viewID ID of the derivate
- */
-function importZoomBar(viewID) {
-	// ZoomBar
-	Iview[viewID].zoomBar = new zoomBar("zoomBar"+viewID, document.getElementById(Iview[viewID].zoomBarParent), "");
-	var zoombar = Iview[viewID].zoomBar;
-	
-	zoombar.init(Iview[viewID].zoomBarHorz/*, Iview[viewID].useZoomBar*/);
-	zoombar.setZoomLevelReference("Iview['"+viewID+"'].viewerBean.zoomLevel"); // Requires a String, not the current Value
-	zoombar.setZoomFunction("Iview['"+viewID+"'].viewerBean.zoom");
-	zoombar.setZoomDirection(Iview[viewID].zoomBarDirection);
-	// Listener
-	zoombar.addListener(zoomBar.DISP_MODE, new function() { this.change = function(width, screen) {
-		Iview[viewID].zoomWidth = width;
-		Iview[viewID].zoomScreen = screen;
-	}});
-	// additional Events
-	ManageEvents.addEventListener(document.getElementById("viewer"+viewID), 'mouseup', zoombar.mouseUpZoombar, false);
-	ManageEvents.addEventListener(document.getElementById("viewer"+viewID), 'mousemove', zoombar.mouseMoveZoombar, false);
 }
 
 /**
@@ -781,7 +745,6 @@ function zoomViewer(viewID, direction) {
 	} else {
 		Iview[viewID].viewerBean.zoom(-1);
 	}
-	if(Iview[viewID].useZoomBar) {Iview[viewID].zoomBar.moveBarToLevel(Iview[viewID].viewerBean.zoomLevel)};
 }
 
 /**
@@ -925,10 +888,6 @@ function startFileLoaded(viewID){
 	
 	// Resize-Events registrieren
 	jQuery(window).resize(function() { reinitializeGraphic(viewID)});
-	
-	if (Iview[viewID].useZoomBar) {
-		importZoomBar(viewID);
-	}
 	
 	updateModuls(viewID);
 }

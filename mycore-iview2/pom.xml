@@ -36,7 +36,6 @@
                 <jsSourceFile>LAB.min.js</jsSourceFile>
                 <jsSourceFile>jquery.mousewheel.min.js</jsSourceFile>
                 <!-- JQuery Mousewheel support -->
-                <jsSourceFile>ManageEvents.js</jsSourceFile>
                 <jsSourceFile>PanoJS.js</jsSourceFile>
                 <!-- Viewer -->
                 <jsSourceFile>Event.js</jsSourceFile>
