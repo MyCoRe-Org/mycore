@@ -106,7 +106,6 @@ iview.cutOut.View = function() {
 		jQuery(thumb)
 			.appendTo(that.my.self)
 			.load(function() { notifyOnload(that);})
-			.css("verticalAlign", "bottom")
 			.attr("src", path);
 		that.my.thumbnail = thumb;
 	}
@@ -157,7 +156,9 @@ iview.cutOut.View = function() {
 	function applyValues(that) {
 		var cutOut = that.my.cutOut;
 		var thumbnail = jQuery(that.my.thumbnail);
-		
+
+		that.my.self.css({"width": thumbnail.width(), "height": thumbnail.height()});
+
 		cutOut.css("width", thumbnail.width() * that._ratioX + "px");
 		cutOut.css("height", thumbnail.height() * that._ratioY + "px");
 		

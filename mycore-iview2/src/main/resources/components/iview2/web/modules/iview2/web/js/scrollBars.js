@@ -772,8 +772,7 @@ iview.scrollbar.View = function() {
 			.css("position", "absolute")
 			.appendTo(wholeSpace);
 		
-		//barStart
-		jQuery("<div>")
+		var barStart = jQuery("<div>")
 			.addClass("start")
 			.appendTo(barScroll);
 		
@@ -781,8 +780,7 @@ iview.scrollbar.View = function() {
 			.addClass("scroll")
 			.appendTo(barScroll);
 		
-		//barEnd
-		jQuery("<div>")
+		var barEnd = jQuery("<div>")
 			.addClass("end")
 			.appendTo(barScroll);
 		
@@ -797,10 +795,7 @@ iview.scrollbar.View = function() {
 			.mousemove(function(e) { divMouseMove(that, e);});
 			
 		if (this._direction) {
-			wholeSpace.css("float", "left");
-			space.css("float", "left");
-			buttonUL.css("float", "left");
-			buttonDR.css("float", "left");
+			jQuery(complete).find("*").css("float", "left");
 			scroll.css("left", "0px");
 		} else {
 			scroll.css("top", "0px");

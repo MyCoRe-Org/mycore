@@ -52,7 +52,7 @@ ToolbarButtonsetModel.prototype = {
 	 * @param		{integer} index if set, defines the special position where to add the button between the other predefined buttons
 	 */
     addButton : function(button, index) {
-    	var button = jQuery.extend(button, {'relatedButtonset' : this});
+    	button.relatedButtonset = this;
     	
     	var myself = this;
     	// Events aus dem Button-Model "weiterleiten"

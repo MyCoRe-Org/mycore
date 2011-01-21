@@ -104,7 +104,6 @@
 	background-repeat: no-repeat;
 	background-position: -300px -0px;
 	position:relative;
-	float: left;
 	width: 2px;
 	height: 15px;
 	margin: 0px;
@@ -114,7 +113,6 @@
 	background-repeat:repeat-x;
 	background-image: url('scaled/scrollbars/horizontal.png');
 	position:relative;
-	float: left;
 	left:100%;
 	height:15px;
 	padding:0px;
@@ -125,7 +123,6 @@
 	background-repeat: no-repeat;
 	background-position: -330px -0px;
 	position:relative;
-	float: left;
 	width: 2px;
 	height: 15px;
 	margin: 0px;
@@ -202,12 +199,10 @@
 	top:0px;
 }
 .scrollV .bar .start {
-	/*background-repeat:repeat-y;*/
 	background-image: url('iview2.scrollbar.png');
 	background-repeat: no-repeat;
 	background-position: -120px -0px;
 	position:relative;
-	/*float: left;*/
 	height: 2px;
 	width: 15px;
 	margin: 0px;
@@ -217,7 +212,6 @@
 	background-repeat:repeat-y;
 	background-image: url('scaled/scrollbars/vertical.png');
 	position:relative;
-	/*float: left;*/
 	top:100%;
 	width:15px;
 	padding:0px;
@@ -228,7 +222,6 @@
 	background-repeat: no-repeat;
 	background-position: -150px -0px;
 	position:relative;
-	/*float: left;*/
 	height: 2px;
 	width: 15px;
 	margin: 0px;
@@ -278,10 +271,8 @@
 	bottom: 0px;
 	left: 0px;
 	width:100%;
-	/*height:100%;*/
 	/* NOTE: the size and width should be set dynamically when initialized */
 	background-color: #ffffff;
-	/*z-index:20;*/
 	overflow: hidden;
 }
 .viewerContainer.min .viewer {
@@ -469,12 +460,10 @@
 
 /* image */
 .viewerContainer .thumb {
-	background-color: #000000;
+	line-height:100%;
 	position: absolute;
 	right: 15px;
 	bottom: 15px;
-	vertical-align: middle;
-	font-weight: bold;
 	border: 0px solid #000000;
 	z-index: 50;
 }
@@ -494,7 +483,6 @@
 	width:10px;
 	display: block;
 	border:1px solid #000000;
-	/*z-index:30;*/
 	cursor: pointer;
 }
 
