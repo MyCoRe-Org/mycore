@@ -1,7 +1,7 @@
 /* $Revision: 3080 $ 
  * $Date: 2010-11-01 11:30:18 +0100 (Mon, 01 Nov 2010) $ 
  * $LastChangedBy: shermann $
- * Copyright 2010 - Thüringer Universitäts- und Landesbibliothek Jena
+ * Copyright 2010 - Thï¿½ringer Universitï¿½ts- und Landesbibliothek Jena
  *  
  * Mets-Editor is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ function onTreeLoaded(){
 function loadPreviewImage(selectedItem, source, event){
 	console.log("loadPreviewImage()");
 	/* the div containing the images */
-	var previewBaseURL = webApplicationBaseURL + "servlets/MCRThumbnailServlet/" + derivateId + "/";
+	var previewBaseURL = webApplicationBaseURL + "servlets/MCRTileCombineServlet/MID/" + derivateId + "/";
 	var container = document.getElementById('previewImageContainer');
 	
 	var manyImagesContainerKey = "manyImagesContainer";
