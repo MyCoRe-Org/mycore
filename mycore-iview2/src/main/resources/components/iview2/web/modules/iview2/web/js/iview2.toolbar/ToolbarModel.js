@@ -64,15 +64,9 @@ ToolbarModel.prototype = {
 	 * @param		{integer} index if set, defines the special position where to add the element between the other predefined elements
 	 */
     addElement : function(element, index) {
-    	var element = jQuery.extend(element, {'relatedToolbar' : this});
+    	element.relatedToolbar = this;
     	
     	var myself = this;
-    	if (element.type == "buttonset") {
-	    	// Events aus dem Buttonset-Model "weiterleiten"
-	    	element.events.attach(function (sender, args) {
-		    	myself.events.notify(jQuery.extend(args, {'elementName' : element.elementName}));
-		    });
-    	}
     	
     	if (!isNaN(index)) {
      		this.elements = this.elements.slice(0, index).concat(element, this.elements.slice(index, this.elements.length));
@@ -82,6 +76,25 @@ ToolbarModel.prototype = {
 			this.events.notify({'type' : "add", 'element' : element});
      	}
      	
+    	if (element.type == "buttonset") {
+    		// Events aus dem Buttonset-Model "weiterleiten"
+    		element.events.attach(function (sender, args) {
+    			myself.events.notify(jQuery.extend(args, {'elementName' : element.elementName}));
+    		});
+    		jQuery(element.buttons).each(function() {
+    			element.events.notify({"type":"add", "button": 
+    			{
+    				"elementName":this.elementName,
+    				"type" : this.type,
+    				"subtype" : this.subtype,
+    				"ui" : this.ui,
+    				"title" : this.title,
+    				"active" : this.active,
+    				"loading" : this.loading,
+    				"relatedButtonset": this.relatedButtonset}
+    			})
+    		});
+    	}
 		return element;
     },
 

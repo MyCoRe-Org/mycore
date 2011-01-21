@@ -11,7 +11,7 @@
 var PreviewToolbarModelProvider = function (id, titles) {
 	this.id = id;
     this.model = new ToolbarModel(id);
-    this.titles = titles;
+    this.titles = titles || {"backward": "<", "forward": ">"};
 };
 
 PreviewToolbarModelProvider.prototype = {
@@ -24,7 +24,6 @@ PreviewToolbarModelProvider.prototype = {
 	 * @return		{Object} returns the complete model for a preview iview2 toolbar
 	 */
     getModel : function() {
-
     	var curButtonset;
 
 		// previewHandles

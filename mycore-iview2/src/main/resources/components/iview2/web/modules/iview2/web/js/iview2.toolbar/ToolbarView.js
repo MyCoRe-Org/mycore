@@ -41,7 +41,7 @@ ToolbarView.prototype = {
 	 */
     addButtonset : function (args) {
     	var newButtonset = jQuery('<span>').buttonset().addClass(args.elementName);
-    	if (!isNaN(args.index) && args.index != this.toolbar.childNodes.length) {
+    	if (!isNaN(args.index) && args.index < this.toolbar.childNodes.length) {
     		newButtonset.insertBefore(this.toolbar.childNodes[args.index]);
     	} else {
     		jQuery(this.toolbar).append(newButtonset);
@@ -62,8 +62,8 @@ ToolbarView.prototype = {
 	 * @return		{Object} returns the parent tag of the added divider
 	 */        
     addDivider : function (args) {
-    	var newDivider = jQuery('<span>').addClass(args.elementName).addClass('ui-divider');
-		if (!isNaN(args.index) && args.index != this.toolbar.childNodes.length) {
+    	var newDivider = jQuery('<span>').addClass(args.elementName + ' ui-divider');
+		if (!isNaN(args.index) && args.index < this.toolbar.childNodes.length) {
     		newDivider.insertBefore(this.toolbar.childNodes[args.index]);
     	} else {
     		jQuery(this.toolbar).append(newDivider);
@@ -82,8 +82,8 @@ ToolbarView.prototype = {
 	 * @return		{Object} returns the parent tag of the added spring
 	 */ 
     addSpring : function (args) {
-    	var newSpring = jQuery('<span>').addClass(args.elementName).addClass('ui-spring').attr("weight",args.weight);
-    	if (!isNaN(args.index) && args.index != this.toolbar.childNodes.length) {
+    	var newSpring = jQuery('<span>').addClass(args.elementName + ' ui-spring').attr("weight",args.weight);
+    	if (!isNaN(args.index) && args.index < this.toolbar.childNodes.length) {
     		newSpring.insertBefore(this.toolbar.childNodes[args.index]);
     	} else {
     		jQuery(this.toolbar).append(newSpring);
@@ -104,8 +104,8 @@ ToolbarView.prototype = {
 	 * @return		{Object} returns the parent tag of the added divider
 	 */        
     addText : function (args) {
-    	var newText = jQuery('<span>').addClass(args.elementName).addClass('ui-text').html(args.text);
-		if (!isNaN(args.index) && args.index != this.toolbar.childNodes.length) {
+    	var newText = jQuery('<span>').addClass(args.elementName + ' ui-text').html(args.text);
+		if (!isNaN(args.index) && args.index < this.toolbar.childNodes.length) {
     		newText.insertBefore(this.toolbar.childNodes[args.index]);
     	} else {
     		jQuery(this.toolbar).append(newText);
