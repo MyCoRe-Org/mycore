@@ -231,7 +231,7 @@
 
           <xsl:text>loadCssFile('</xsl:text>
           <xsl:value-of select="$WebApplicationBaseURL"/>
-          <xsl:text>modules/iview2/web/gfx/default/iview2.min.css');</xsl:text>
+          <xsl:text>modules/iview2/web/gfx/default/iview2.min.css', 'iviewCss');</xsl:text>
         </script>
       </xsl:otherwise>
     </xsl:choose>

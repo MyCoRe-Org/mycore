@@ -347,12 +347,15 @@ function arabToRoem(ArabischeZahl) {
 	return RoemischeZahl;
 }
 
-function loadCssFile(pathToFile) {
+function loadCssFile(pathToFile, id) {
     var css = jQuery("<link>");
     css.attr({
       rel:  "stylesheet",
       type: "text/css",
       href: pathToFile
     });
+    if (id) {
+    	css.attr('id',id);
+    }
     $("head").append(css);
 }
