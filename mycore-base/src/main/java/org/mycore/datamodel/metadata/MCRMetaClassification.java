@@ -125,11 +125,11 @@ public class MCRMetaClassification extends MCRMetaDefault {
         }
 
         if (set_classid.length() > MAX_CLASSID_LENGTH) {
-            throw new MCRException("The classid is too long.");
+            throw new MCRException("The classid "+ set_classid +" is too long.");
         }
 
         if (set_categid.length() > MAX_CATEGID_LENGTH) {
-            throw new MCRException("The categid is too long.");
+            throw new MCRException("The categid "+set_categid+" is too long.");
         }
 
         classid = set_classid;
