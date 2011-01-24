@@ -58,6 +58,9 @@ function loadPreviewImage(selectedItem, source, event){
 		var previewImage = document.createElement('img');
 		previewImage.id = previewImageKey;
 		previewImage.src = imgURL;
+		//set size
+		previewImage.height = '512';
+		
 		container.appendChild(previewImage);
 	} 
 	/* avoid to display all images contained within a derivate */
@@ -72,6 +75,7 @@ function loadPreviewImage(selectedItem, source, event){
 			if(currentItem.type == "item"){
 				var newImg = document.createElement('img');
 				newImg.src = previewBaseURL + currentItem.path;
+				newImg.height = '512';
 				console.log("Adding <img> element to document "+ newImg.src);
 				divWithManyImg.appendChild(newImg);
 			}
