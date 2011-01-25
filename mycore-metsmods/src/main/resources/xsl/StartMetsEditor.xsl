@@ -11,7 +11,7 @@
   <xsl:variable name="useExistingMets">
     <xsl:value-of select="property:getParameterValue($RequestURL,'useExistingMets')" />
   </xsl:variable>
-  <xsl:variable name="createMetsAllowed" select="acl:checkPermission($derivateId,'write-db')" />
+  <xsl:variable name="createMetsAllowed" select="acl:checkPermission($derivateId,'writedb')" />
 
   <xsl:template match="/StartMetsEditor">
     <!--
