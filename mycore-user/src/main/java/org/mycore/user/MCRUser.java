@@ -28,6 +28,7 @@ import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -102,7 +103,8 @@ public class MCRUser extends MCRUserObject {
      *            the named user ID
      */
     public MCRUser(String id) {
-        super.ID = id.trim();
+        this();
+        super.ID = trim(id, id_len);
     }
 
     /**
@@ -126,62 +128,20 @@ public class MCRUser extends MCRUserObject {
      *            the ID of the primary group of the user
      * @param groupIDs
      *            a ArrayList of groups (IDs) the user belongs to
-     * @param salutation
+     * @param userContact
      *            contact information
-     * @param firstname
-     *            contact information
-     * @param lastname
-     *            contact information
-     * @param street
-     *            contact information
-     * @param city
-     *            contact information
-     * @param postalcode
-     *            contact information
-     * @param country
-     *            contact information
-     * @param state
-     *            contact information
-     * @param institution
-     *            contact information
-     * @param faculty
-     *            contact information
-     * @param department
-     *            contact information
-     * @param institute
-     *            contact information
-     * @param telephone
-     *            telephone number
-     * @param fax
-     *            fax number
-     * @param email
-     *            email address
-     * @param cellphone
-     *            number of cellular phone, if available
      */
-    public MCRUser(int numID, String ID, String creator, Timestamp creationDate, Timestamp modifiedDate, boolean idEnabled,
-            boolean updateAllowed, String description, String passwd, String primaryGroupID, List<String> groupIDs, String salutation,
-            String firstname, String lastname, String street, String city, String postalcode, String country, String state,
-            String institution, String faculty, String department, String institute, String telephone, String fax, String email,
-            String cellphone) {
+    public MCRUser(int numID, String ID, String creator, Timestamp creationDate, Timestamp modifiedDate, boolean idEnabled, boolean updateAllowed,
+        String description, String passwd, String primaryGroupID, List<String> groupIDs, MCRUserContact userContact) {
         // The following data will never be changed by update
-        super.ID = trim(ID, id_len);
+        this(ID);
         this.numID = numID;
         super.creator = trim(creator, id_len);
 
         // check if the creation and modified timestamp is provided. If not, use
         // current timestamp
-        if (creationDate == null) {
-            super.creationDate = new Timestamp(new GregorianCalendar().getTime().getTime());
-        } else {
-            super.creationDate = creationDate;
-        }
-
-        if (modifiedDate == null) {
-            super.modifiedDate = new Timestamp(new GregorianCalendar().getTime().getTime());
-        } else {
-            super.modifiedDate = modifiedDate;
-        }
+        super.creationDate = creationDate == null ? new Timestamp(new Date().getTime()) : creationDate;
+        super.modifiedDate = modifiedDate == null ? new Timestamp(new Date().getTime()) : modifiedDate;
 
         this.idEnabled = idEnabled;
         this.updateAllowed = updateAllowed;
@@ -190,14 +150,12 @@ public class MCRUser extends MCRUserObject {
         this.primaryGroupID = trim(primaryGroupID, id_len);
         this.groupIDs = groupIDs;
 
-        userContact = new MCRUserContact(salutation, firstname, lastname, street, city, postalcode, country, state, institution, faculty,
-                department, institute, telephone, fax, email, cellphone);
+        this.userContact = userContact == null ? new MCRUserContact() : userContact;
     }
 
     public MCRUser(String userid, String passwd) {
         this(MCRUserMgr.instance().getMaxUserNumID() + 1, userid, MCRSessionMgr.getCurrentSession().getUserInformation().getCurrentUserID(), null, null, true,
-                true, null, null, MCRGroup.getDefaultGroupID(), null, null, null,
-                null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+            true, null, null, MCRGroup.getDefaultGroupID(), null, null);
     }
 
     /**
@@ -407,7 +365,7 @@ public class MCRUser extends MCRUserObject {
     public boolean isMemberOf(MCRGroup group) {
         return isMemberOf(group.getID());
     }
-    
+
     /**
      * This method checks if the user is member of a given group.
      * 
@@ -550,8 +508,11 @@ public class MCRUser extends MCRUserObject {
      */
     @Override
     public Element toJDOMElement() throws MCRException {
-        Element user = new Element("user").setAttribute("numID", Integer.toString(numID)).setAttribute("ID", ID).setAttribute("id_enabled",
-                idEnabled ? "true" : "false").setAttribute("update_allowed", updateAllowed ? "true" : "false");
+        Element user = new Element("user")
+            .setAttribute("numID", Integer.toString(numID))
+            .setAttribute("ID", ID)
+            .setAttribute("id_enabled", idEnabled ? "true" : "false")
+            .setAttribute("update_allowed", updateAllowed ? "true" : "false");
         Element Creator = new Element("user.creator").setText(super.creator);
         Element CreationDate = new Element("user.creation_date").setText(super.creationDate.toString());
         Element ModifiedDate = new Element("user.last_modified").setText(super.modifiedDate.toString());
@@ -560,8 +521,13 @@ public class MCRUser extends MCRUserObject {
         Element Primarygroup = new Element("user.primary_group").setText(primaryGroupID);
 
         // Aggregate user element
-        user.addContent(Creator).addContent(CreationDate).addContent(ModifiedDate).addContent(Passwd).addContent(Description).addContent(
-                Primarygroup).addContent(userContact.toJDOMElement());
+        user.addContent(Creator)
+            .addContent(CreationDate)
+            .addContent(ModifiedDate)
+            .addContent(Passwd)
+            .addContent(Description)
+            .addContent(Primarygroup)
+            .addContent(userContact.toJDOMElement());
 
         // Loop over all group IDs
         if (groupIDs.size() != 0) {
@@ -665,8 +631,7 @@ public class MCRUser extends MCRUserObject {
     }
 
     private boolean fastEquals(MCRUser u) {
-        return (getID() == u.getID() || getID().equals(u.getID()))
-                && (getUserContact() == u.getUserContact() || getUserContact().equals(u.getUserContact()));
+        return (getID() == u.getID() || getID().equals(u.getID())) && (getUserContact() == u.getUserContact() || getUserContact().equals(u.getUserContact()));
     }
 
     @Override

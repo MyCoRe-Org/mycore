@@ -39,6 +39,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.user.MCRGroup;
 import org.mycore.user.MCRUser;
+import org.mycore.user.MCRUserContact;
 import org.mycore.user.MCRUserStore;
 
 /**
@@ -231,9 +232,10 @@ public class MCRHIBUserStore implements MCRUserStore {
 
             // We create the user object
             try {
-                retuser = new MCRUser(numID, userID, creator, created, modified, id_enabled, update_allowed, description, passwd,
-                        primaryGroupID, groups, salutation, firstname, lastname, street, city, postalcode, country, state, institution,
-                        faculty, department, institute, telephone, fax, email, cellphone);
+                MCRUserContact userContact = new MCRUserContact(salutation, firstname, lastname, street, city, postalcode, country, state, institution,
+                    faculty, department, institute, telephone, fax, email, cellphone);
+                retuser = new MCRUser(numID, userID, creator, created, modified, id_enabled, update_allowed, description, passwd, primaryGroupID, groups,
+                    userContact);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -367,8 +369,8 @@ public class MCRHIBUserStore implements MCRUserStore {
      */
     public boolean existsGroup(String groupID) throws MCRException {
         Session session = MCRHIBConnection.instance().getSession();
-        return ((Number) session.createCriteria(MCRGROUPS.class).setProjection(Projections.rowCount()).add(Restrictions.eq("gid", groupID))
-                .uniqueResult()).intValue() > 0;
+        return ((Number) session.createCriteria(MCRGROUPS.class).setProjection(Projections.rowCount()).add(Restrictions.eq("gid", groupID)).uniqueResult())
+            .intValue() > 0;
     }
 
     /**
@@ -413,8 +415,10 @@ public class MCRHIBUserStore implements MCRUserStore {
     @SuppressWarnings("unchecked")
     public List<String> getGroupIDsWithAdminUser(String userID) throws MCRException {
         Session session = MCRHIBConnection.instance().getSession();
-        Criteria c = session.createCriteria(MCRGROUPADMINS.class).setProjection(Projections.property("key.gid.gid")).add(
-                Restrictions.eq("key.userid", session.get(MCRUSERS.class, userID)));
+        Criteria c = session
+            .createCriteria(MCRGROUPADMINS.class)
+            .setProjection(Projections.property("key.gid.gid"))
+            .add(Restrictions.eq("key.userid", session.get(MCRUSERS.class, userID)));
         return c.list();
     }
 
@@ -520,10 +524,8 @@ public class MCRHIBUserStore implements MCRUserStore {
         // the table
         for (int i = 0; i < oldAdminUserIDs.size(); i++) {
             if (!newAdminUserIDs.contains(oldAdminUserIDs.get(i))) {
-                int deletedEntities = session
-                        .createQuery(
-                                "delete MCRGROUPADMINS " + "where GID = '" + group.getID() + "'" + " and USERID = '"
-                                        + oldAdminUserIDs.get(i) + "'").executeUpdate();
+                int deletedEntities = session.createQuery(
+                    "delete MCRGROUPADMINS " + "where GID = '" + group.getID() + "'" + " and USERID = '" + oldAdminUserIDs.get(i) + "'").executeUpdate();
                 logger.info(deletedEntities + " groupadmin-entries deleted");
             }
         }
@@ -531,8 +533,7 @@ public class MCRHIBUserStore implements MCRUserStore {
         for (int i = 0; i < oldAdminGroupIDs.size(); i++) {
             if (!newAdminGroupIDs.contains(oldAdminGroupIDs.get(i))) {
                 int deletedEntities = session.createQuery(
-                        "delete MCRGROUPADMINS " + "where GID = '" + group.getID() + "'" + " and GROUPID = '" + oldAdminGroupIDs.get(i)
-                                + "'").executeUpdate();
+                    "delete MCRGROUPADMINS " + "where GID = '" + group.getID() + "'" + " and GROUPID = '" + oldAdminGroupIDs.get(i) + "'").executeUpdate();
                 logger.info(deletedEntities + " groupadmin-entries deleted");
             }
         }
@@ -554,7 +555,7 @@ public class MCRHIBUserStore implements MCRUserStore {
         for (int i = 0; i < oldUserIDs.size(); i++) {
             if (!newUserIDs.contains(oldUserIDs.get(i))) {
                 List<MCRGROUPMEMBERS> deleteEntities = session.createQuery(
-                        "from MCRGROUPMEMBERS where GID = '" + group.getID() + "' " + "and USERID ='" + oldUserIDs.get(i) + "'").list();
+                    "from MCRGROUPMEMBERS where GID = '" + group.getID() + "' " + "and USERID ='" + oldUserIDs.get(i) + "'").list();
                 for (MCRGROUPMEMBERS member : deleteEntities) {
                     session.delete(member);
                 }
@@ -625,8 +626,11 @@ public class MCRHIBUserStore implements MCRUserStore {
             }
 
             // Add all users with groupID as primary group
-            List<String> userIds = session.createCriteria(MCRUSERS.class).setProjection(Projections.property("uid")).add(
-                    Restrictions.eq("primgroup", groups)).list();
+            List<String> userIds = session
+                .createCriteria(MCRUSERS.class)
+                .setProjection(Projections.property("uid"))
+                .add(Restrictions.eq("primgroup", groups))
+                .list();
             for (String uid : userIds) {
                 users.add(uid);
             }

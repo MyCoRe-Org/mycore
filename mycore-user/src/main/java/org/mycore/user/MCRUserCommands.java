@@ -84,8 +84,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
             "This command checks the user system for its consistency.");
         command.add(com);
 
-        com = new MCRCommand("encrypt passwords in user xml file {0} to file {1}",
-            "org.mycore.user.MCRUserCommands.encryptPasswordsInXMLFile String String",
+        com = new MCRCommand("encrypt passwords in user xml file {0} to file {1}", "org.mycore.user.MCRUserCommands.encryptPasswordsInXMLFile String String",
             "This is a migration tool to change old plain text password entries to encrpted entries.");
         command.add(com);
 
@@ -260,7 +259,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
             groupIDs.add(sgroup);
 
             MCRUser u = new MCRUser(1, suser, suser, null, null, true, true, "Superuser", useEncryption ? MCRCrypt.crypt(spasswd) : spasswd, sgroup, groupIDs,
-                null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+                null);
 
             MCRUserMgr.instance().initializeUser(u, suser);
         } catch (Exception e) {
