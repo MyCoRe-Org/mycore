@@ -243,6 +243,7 @@ public class MCRXMLFunctions {
 
         LOGGER.info("Getting all urns for object " + mcrid);
         long start = System.currentTimeMillis();
+        long temp = start;
         List<MCRURN> results = criteria.list();
         LOGGER.info("This took " + (System.currentTimeMillis() - start) + " ms");
         LOGGER.info("Processing the result list");
@@ -267,6 +268,7 @@ public class MCRXMLFunctions {
             long duration = System.currentTimeMillis() - start;
             LOGGER.info("URN processed in " + duration + " ms");
         }
+        LOGGER.info("Processing all URN took " + (System.currentTimeMillis()-temp) + " ms");
         return rootElement.getChildNodes();
     }
 
