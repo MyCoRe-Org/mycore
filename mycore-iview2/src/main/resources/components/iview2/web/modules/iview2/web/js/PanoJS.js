@@ -340,8 +340,7 @@ PanoJS.prototype = {
 		this.surface.onmouseup = this.surface.onmouseout = PanoJS.mouseReleasedHandler;
 		this.surface.ondblclick = PanoJS.doubleClickHandler;
 		if (PanoJS.USE_KEYBOARD) {
-			document.onkeypress = PanoJS.keyboardMoveHandler;
-			document.onkeydown = PanoJS.keyboardZoomHandler;
+			document.onkeydown = PanoJS.keyboardHandler;
 		}
 
 		this.positionTiles();
@@ -949,7 +948,7 @@ PanoJS.doubleClickHandler = function(e) {
 	}
 };
 
-PanoJS.keyboardMoveHandler = function(e) {
+PanoJS.keyboardHandler = function(e) {
 	e = e ? e : window.event;
 	for (var i = 0; i < PanoJS.VIEWERS.length; i++) {
 		var viewer = PanoJS.VIEWERS[i];
@@ -961,17 +960,10 @@ PanoJS.keyboardMoveHandler = function(e) {
 				viewer.positionTiles({'x': 0,'y': PanoJS.MOVE_THROTTLE}, true);
 		if (e.keyCode == 37)
 				viewer.positionTiles({'x': PanoJS.MOVE_THROTTLE,'y': 0}, true);
-	}
-}
-
-PanoJS.keyboardZoomHandler = function(e) {
-	e = e ? e : window.event;
-	for (var i = 0; i < PanoJS.VIEWERS.length; i++) {
-		var viewer = PanoJS.VIEWERS[i];
 		if (e.keyCode == 109)
-				viewer.zoom(-1);
+			viewer.zoom(-1);
 		if (e.keyCode == 107)
-				viewer.zoom(1);
+			viewer.zoom(1);
 	}
 }
 

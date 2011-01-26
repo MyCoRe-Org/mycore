@@ -290,8 +290,10 @@ PanoJS.mousePressedHandler = function(e) {
 }
 
 //Listener need to be notified and position has to be performed correctly
-PanoJS.keyboardMoveHandler = function(e) {
+PanoJS.keyboardHandler = function(e) {
 	e = getEvent(e);
+	if (iview.credits)
+		iview.credits(e);
 	if (e.keyCode >= 37 && e.keyCode <=40) {
 		//cursorkey movement
 		var motion = {
@@ -304,36 +306,31 @@ PanoJS.keyboardMoveHandler = function(e) {
 			viewer.positionTiles(motion, true);
 			viewer.notifyViewerMoved(motion);
 		}
-		preventDefault(e);
+		if(e.preventDefault){e.preventDefault()} else {e.returnValue=false}
 		return false;
 	}
-};
-
-PanoJS.keyboardZoomHandler = function(e) {
-	e = getEvent(e);
-	for (var i = 0; i < PanoJS.VIEWERS.length; i++) {
-		var viewer = PanoJS.VIEWERS[i];
-		var zoomDir = 0;
-		//+/- Buttons for Zooming
-		//107 and 109 NumPad +/- supported by all, other keys are standard keypad codes of the given Browser
-		if (e.keyCode == 109 || (e.keyCode == 45 && isBrowser("opera")) || e.keyCode == 189) {
-			zoomDir = -1;
-		} else if (e.keyCode == 107 || e.keyCode == 61 || (isBrowser(["Chrome", "IE"]) && e.keyCode == 187) || (isBrowser("Safari") && e.keyCode == 144)) {
-			zoomDir = 1;
-		} else if (e.keyCode == 27) {
-			if (Iview[viewer.viewID].maximized){
-				maximizeHandler(viewer.viewID);
+	if ([109,45,189,107,61,187,144,27].indexOf(e.keyCode)>=0) {
+		for (var i = 0; i < PanoJS.VIEWERS.length; i++) {
+			var viewer = PanoJS.VIEWERS[i];
+			var zoomDir = 0;
+			//+/- Buttons for Zooming
+			//107 and 109 NumPad +/- supported by all, other keys are standard keypad codes of the given Browser
+			if (e.keyCode == 109 || (e.keyCode == 45 && isBrowser("opera")) || e.keyCode == 189) {
+				zoomDir = -1;
+			} else if (e.keyCode == 107 || e.keyCode == 61 || (isBrowser(["Chrome", "IE"]) && e.keyCode == 187) || (isBrowser("Safari") && e.keyCode == 144)) {
+				zoomDir = 1;
+			} else if (e.keyCode == 27) {
+				if (Iview[viewer.viewID].maximized){
+					maximizeHandler(viewer.viewID);
+				}
 			}
-		}
-		
-		if (zoomDir != 0 && Iview[viewer.viewID].maximized) {
-			viewer.zoom(zoomDir);
-			preventDefault(e);
-			e.cancelBubble = true;
-			return false;
-		} else {
-			//Safari does not support "onkeypress" for cursor keys but "onkeydown", so move over
-			PanoJS.keyboardMoveHandler(e);
+			
+			if (zoomDir != 0 && Iview[viewer.viewID].maximized) {
+				viewer.zoom(zoomDir);
+				if(e.preventDefault){e.preventDefault()} else {e.returnValue=false}
+				e.cancelBubble = true;
+				return false;
+			}
 		}
 	}
 };
