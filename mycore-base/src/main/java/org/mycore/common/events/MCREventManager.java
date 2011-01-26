@@ -161,6 +161,7 @@ public class MCREventManager {
         int step = direction ? 1 : -1;
         int undoPos = first;
 
+        Exception handleEventExceptionCaught = null;
         for (int i = first; i != last + step; i += step) {
             MCREventHandler eh = list.get(i);
             logger.debug("EventManager " + evt.getObjectType() + " " + evt.getEventType() + " calling handler " + eh.getClass().getName());
@@ -168,6 +169,7 @@ public class MCREventManager {
             try {
                 eh.doHandleEvent(evt);
             } catch (Exception ex) {
+                handleEventExceptionCaught = ex;
                 logger.error("Exception caught while calling event handler", ex);
                 logger.error("Trying rollback by calling undo method of event handlers");
 
@@ -188,6 +190,11 @@ public class MCREventManager {
             } catch (Exception ex) {
                 logger.error("Exception caught while calling undo of event handler", ex);
             }
+        }
+        
+        if (handleEventExceptionCaught != null) {
+            String msg = "Exception caught in EventHandler, rollback by calling undo of successfull handlers done.";
+            throw new MCRException(msg, handleEventExceptionCaught);
         }
     }
 
