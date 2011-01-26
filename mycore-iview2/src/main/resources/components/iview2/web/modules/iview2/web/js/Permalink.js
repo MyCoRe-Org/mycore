@@ -100,16 +100,14 @@ iview.Permalink.Controller = function (parent) {
 iview.Permalink.Controller.prototype = {
 
 	/**
+	 * @public
 	 * @function
-	 * @memberOf View#
+	 * @memberOf	iview.Permalink.Controller#
 	 * @description adds an existing view to the PermalinkController,
 	 *  attach to its events (press) and define the actions for each button
 	 * @param {Object} view View which should be add
 	 */
 	addView: function(view) {
-
-		var viewerID = this.getViewer().viewID_to_remove;
-		
 		var myself = this;
 		this.views[view.id] = view;
 		
@@ -120,18 +118,20 @@ iview.Permalink.Controller.prototype = {
 	},
 	
    /**
+    * @public
     * @function
-    * @memberOf View#
-    * @description returns the current state of the permalink (active or not)
-    * @return {boolean} returns the current active state
+    * @memberOf		iview.Permalink.Controller#
+    * @description	returns the current state of the permalink (active or not)
+    * @return		{boolean} returns the current active state
     */
 	getActive: function() {
 		return this.active;
 	},
 	
 	/**
+	 * @public
 	 * @function
-	 * @memberOf View#
+	 * @memberOf	iview.Permalink.Controller#
 	 * @description displays or hides the permalink view,
 	 *  the current state, given in this.active, defines the following action
 	 */
@@ -149,8 +149,9 @@ iview.Permalink.Controller.prototype = {
 	},
 	
 	/**
+	 * @private
 	 * @function
-	 * @memberOf	View#
+	 * @memberOf	iview.Permalink.Controller#
 	 * @description	generates a permalink which contains all needed informations to display the same Picture&Position and other things
 	 * @return 		{String} string which contains the generated URL
 	 */

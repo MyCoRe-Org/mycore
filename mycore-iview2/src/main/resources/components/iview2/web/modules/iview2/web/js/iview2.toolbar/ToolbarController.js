@@ -110,8 +110,11 @@ ToolbarController.prototype.addView = function(view) {
     			}
     		} else if (args.parentName == "permalinkHandles") {
     			if (args.elementName == "permalink") {
-    				myself.getViewer().getPermalinkCtrl().show();
-    				//displayURL(this, viewerID);
+    				var button = new Object;
+    				button.setLoading = function(loading) {
+    					myself.perform("setLoading", loading, args.parentName, args.elementName);
+    				}
+    				myself.getViewer().modules.openPermalink(button);
     			}
     		} else if (args.parentName == "closeHandles") {
     			if (args.elementName == "close") {
@@ -165,7 +168,7 @@ ToolbarController.prototype.addView = function(view) {
 	    		}
 	    	} else if (args.parentName == "permalinkHandles") {
     			if (args.elementName == "permalink") {
-    				if (myself.getViewer().getPermalinkCtrl().getActive()) {
+    				if (typeof myself.getViewer().getPermalinkCtrl !== "undefined" && myself.getViewer().getPermalinkCtrl().getActive()) {
     					// TODO: Model for Permalink
 			    		jQuery(view.toolbar).find("."+args.parentName+" .permalink")[0].checked = true;
 			    		jQuery(view.toolbar).find("."+args.parentName+" .permalinkLabel").addClass("ui-state-active");
@@ -247,35 +250,15 @@ ToolbarController.prototype.catchModels = function() {
 		    	break;
 				case "changeState":
 		    		// TODO: maybe it will be fine to move this to the view
-		    		if (args.elementName == "zoomHandles") {
-			    		if (args.buttonName == "fitToWidth") {
-			    			if (args.state == false) {
-			    				jQuery(curView.toolbar).find("."+args.elementName+" .fitToWidth")[0].checked = false;
-			    				jQuery(curView.toolbar).find("."+args.elementName+" .fitToWidthLabel").removeClass("ui-state-active");
-			    			}
-			    			// the view provides the TRUE functionality on its own (by click)
-			    		} else if (args.buttonName == "fitToScreen") {
-			    			if (args.state == false) {
-			    				jQuery(curView.toolbar).find("."+args.elementName+" .fitToScreen")[0].checked = false;
-			    				jQuery(curView.toolbar).find("."+args.elementName+" .fitToScreenLabel").removeClass("ui-state-active");
-			    			}
-			    			// the view provides the TRUE functionality on its own (by click)
-			    		}
-		    		} else if (args.elementName == "overviewHandles") {
-		    			if (args.buttonName == "openChapter") {
-		    				if (args.state == true) {
-		    					jQuery(curView.toolbar).find("."+args.elementName+" .openChapter")[0].checked = true;
-		    					jQuery(curView.toolbar).find("."+args.elementName+" .openChapterLabel").addClass("ui-state-active");
-				    		}
-		    				// the other case won't be used
-		    			} else if (args.buttonName == "openOverview") {
-		    				if (args.state == false) {
-		    					jQuery(curView.toolbar).find("."+args.elementName+" .openOverview")[0].checked = false;
-		    					jQuery(curView.toolbar).find("."+args.elementName+" .openOverviewLabel").removeClass("ui-state-active");
-				    		}
-		    				// the other case won't be used
-		    			}
-		    		}
+					if ((args.elementName == "zoomHandles" && (args.buttonName == "fitToWidth" || args.buttonName == "fitToScreen"))
+					|| (args.elementName == "overviewHandles" && (args.buttonName == "openChapter" || args.buttonName == "openOverview"))) {
+						// the view provides the TRUE functionality on its own (by click)
+						// the other case won't be used
+						if (args.state == false) {
+							jQuery(curView.toolbar).find("."+args.elementName+" ." + args.buttonName)[0].checked = false;
+							jQuery(curView.toolbar).find("."+args.elementName+" ." + args.buttonName + "Label").removeClass("ui-state-active");
+						}
+					}
 		    	break;
 				case "changeActive":
     				curView.setButtonUi({'button' : '.'+args.elementName+' .'+args.buttonName, 'disabled' : !args.active});

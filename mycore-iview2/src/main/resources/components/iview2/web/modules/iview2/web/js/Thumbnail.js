@@ -188,10 +188,10 @@ function processImageProperties(imageProperties, viewID){
 /**
  * @public
  * @function
- * @name	openOverview
+ * @name		openOverview
  * @memberOf	iview.Thumbnails
  * @description	blend in the overview and creates it by the first call
- * @param	{string} viewID ID of the derivate
+ * @param		{string} viewID ID of the derivate
  */
 function openOverview(button, viewID) {
 	// check if overview was created yet
@@ -215,6 +215,54 @@ function openOverview(button, viewID) {
 	} else {
 		Iview[viewID].overview.toggleView();
 	}
+}
+
+/**
+ * @public
+ * @function
+ * @name		openPermalink
+ * @memberOf	iview.Thumbnails
+ * @description	switch between visibility of Permalink element, if needed it's created at first run
+ * @param		{string} viewID ID of the derivate
+ */
+function openPermalink(button, viewID) {
+	if (typeof Iview[viewID].getPermalinkCtrl === "undefined") {
+		button.setLoading(true);
+		setTimeout(function() {
+			var callback = function() {
+				openPermalink(button, viewID);
+				button.setLoading(false)};
+			importPermalink(viewID, callback);
+		}, 10);
+	} else {
+		Iview[viewID].getPermalinkCtrl().show();
+	}
+}
+
+/**
+ * @public
+ * @function
+ * @name		importPermalink
+ * @memberOf	iview.Thumbnails
+ * @description	calls the corresponding functions to create the Permalink
+ * @param		{string} viewID ID of the derivate
+ */
+function importPermalink(viewID, callback) {
+	// Permalink
+	Iview[viewID].getPermalinkCtrl = function() {
+		if (!this.permalinkCtrl) {
+			this.permalinkCtrl = new iview.Permalink.Controller(this);
+			
+			//iview.Permalink.Controller.prototype.getViewer = function() {
+			this.permalinkCtrl.getViewer = function() {
+				return this.parent;
+			}
+		}
+		return this.permalinkCtrl;
+	}
+
+	Iview[viewID].getPermalinkCtrl().addView(new iview.Permalink.View("permalinkView", jQuery("#viewerContainer"+viewID + " .toolbars").parent()));
+	callback();
 }
 
 /**
@@ -735,16 +783,17 @@ function importOverview(viewID, callback) {
  * @param	{string} viewID ID of the derivate
  */
 function zoomViewer(viewID, direction) {
+	var viewer = Iview[viewID].viewerBean;
+	var dir = 0;
 	if (direction) {
 		// gesetzt den Fall, es wird vom obersten Level weiter gezoomt (falls Screen oder Width aktiv waren)
-		if (Iview[viewID].viewerBean.zoomLevel == Iview[viewID].zoomMax) {
-			Iview[viewID].viewerBean.zoom(0);
-		} else {
-			Iview[viewID].viewerBean.zoom(1);
+		if (viewer != Iview[viewID].zoomMax) {
+			dir = 1;
 		}
 	} else {
-		Iview[viewID].viewerBean.zoom(-1);
+		dir = -1;
 	}
+	zoomCenter(viewID,dir,{"x":viewer.width/2, "y":viewer.height/2});
 }
 
 /**
@@ -836,6 +885,9 @@ function loading(viewID) {
 		openChapter(button, viewID);
 	}
 	
+	Iview[viewID].modules.openPermalink = function(button) {
+		openPermalink(button, viewID);
+	}
 	
 	Iview[viewID].maximizeHandler = function() {
 		maximizeHandler(viewID);

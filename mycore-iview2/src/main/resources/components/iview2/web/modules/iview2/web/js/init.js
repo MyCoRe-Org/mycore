@@ -32,6 +32,31 @@ PanoJS.TileUrlProvider.prototype.assembleUrl = function(xIndex, yIndex, zoom, im
 /**
  * @public
  * @function
+ * @name		zoomCenter
+ * @description	Zooms the given Viewer so that the given point will be in center of view
+ * @param		{string} viewID to identify the viewer which shall be zoomed
+ * @param		{integer} direction to zoom in = 1 out = -1
+ * @param		{object} point coordinates to center
+ * @param		{integer} point.x x-coordinate to center
+ * @param		{integer} point.y y-coordinate to center
+ */
+function zoomCenter(viewID, direction, point) {
+	var viewer = Iview[viewID].viewerBean;
+	var preload = jQuery("#preload"+viewID);
+	var preDim = {"x" :toInt(preload.css("left")),"y":toInt(preload.css("top")), "width":preload.width(), "height":preload.height()};
+	viewer.zoom(direction);
+	var newDim = {"width":preload.width(), "height":preload.height()};
+	viewer.x = 0;
+	viewer.y = 0;
+	point.x =((-preDim.x + point.x) / preDim.width) * newDim.width;
+	point.y =((-preDim.y + point.y) / preDim.height) * newDim.height;
+	viewer.resetSlideMotion();
+	viewer.recenter(point,true);
+}
+
+/**
+ * @public
+ * @function
  * @name		initializeGraphic
  * @memberOf	iview.init
  * @description	here some important values and listener are set correctly, calculate simple image name hash value to spread request over different servers and initialise the viewer
@@ -262,12 +287,11 @@ PanoJS.doubleClickHandler = function(e) {
 		e = getEvent(e);
 		var self = this.backingBean;
 		coords = self.resolveCoordinates(e);
-		if (!self.pointExceedsBoundaries(coords)) {
+		if (self.zoomLevel < self.maxZoomLevel) {
+			zoomCenter(viewID,1,coords);
+		} else {
 			self.resetSlideMotion();
 			self.recenter(coords);
-		}
-		if (self.zoomLevel < self.maxZoomLevel) {
-			self.zoom(1);
 		}
 	}
 };
@@ -306,28 +330,28 @@ PanoJS.keyboardHandler = function(e) {
 			viewer.positionTiles(motion, true);
 			viewer.notifyViewerMoved(motion);
 		}
-		if(e.preventDefault){e.preventDefault()} else {e.returnValue=false}
+		preventDefault(e);
 		return false;
 	}
 	if ([109,45,189,107,61,187,144,27].indexOf(e.keyCode)>=0) {
 		for (var i = 0; i < PanoJS.VIEWERS.length; i++) {
 			var viewer = PanoJS.VIEWERS[i];
-			var zoomDir = 0;
+			var dir = 0;
 			//+/- Buttons for Zooming
 			//107 and 109 NumPad +/- supported by all, other keys are standard keypad codes of the given Browser
 			if (e.keyCode == 109 || (e.keyCode == 45 && isBrowser("opera")) || e.keyCode == 189) {
-				zoomDir = -1;
+				dir = -1;
 			} else if (e.keyCode == 107 || e.keyCode == 61 || (isBrowser(["Chrome", "IE"]) && e.keyCode == 187) || (isBrowser("Safari") && e.keyCode == 144)) {
-				zoomDir = 1;
+				dir = 1;
 			} else if (e.keyCode == 27) {
 				if (Iview[viewer.viewID].maximized){
 					maximizeHandler(viewer.viewID);
 				}
 			}
 			
-			if (zoomDir != 0 && Iview[viewer.viewID].maximized) {
-				viewer.zoom(zoomDir);
-				if(e.preventDefault){e.preventDefault()} else {e.returnValue=false}
+			if (dir != 0 && Iview[viewer.viewID].maximized) {
+				zoomCenter(viewer.viewID, dir,{"x":viewer.width/2, "y":viewer.height/2}); 
+				preventDefault(e);
 				e.cancelBubble = true;
 				return false;
 			}

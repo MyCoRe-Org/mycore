@@ -33,20 +33,4 @@ var ToolbarImporter = function (Iview2, titles) {
 	
 	// holt alle bisherigen Models in den Controller und setzt diese entsprechend um
 	Iview2.getToolbarCtrl().catchModels();
-
-	
-	// Permalink
-	Iview2.getPermalinkCtrl = function() {
-		if (!this.permalinkCtrl) {
-			this.permalinkCtrl = new iview.Permalink.Controller(this);
-			
-			//iview.Permalink.Controller.prototype.getViewer = function() {
-			this.permalinkCtrl.getViewer = function() {
-				return this.parent;
-			}
-		}
-		return this.permalinkCtrl;
-	}
-
-	Iview2.getPermalinkCtrl().addView(new iview.Permalink.View("permalinkView", Iview2.viewerContainer.find(".toolbars").parent()));
 };

@@ -234,3 +234,11 @@ function loadCssFile(pathToFile, id) {
     }
     $("head").append(css);
 }
+
+function preventDefault(e) {
+	if (e.preventDefault) {
+		e.preventDefault();
+	} else {
+		e.returnValue = false;
+	}
+}
