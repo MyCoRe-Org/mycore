@@ -1,7 +1,7 @@
 /* $Revision: 2770 $ 
  * $Date: 2010-07-22 12:55:30 +0200 (Thu, 22 Jul 2010) $ 
  * $LastChangedBy: shermann $
- * Copyright 2010 - Thüringer Universitäts- und Landesbibliothek Jena
+ * Copyright 2010 - Thï¿½ringer Universitï¿½ts- und Landesbibliothek Jena
  *  
  * Mets-Editor is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,17 +24,17 @@ function buildDataStructure() {
 
 	model.getChildren(model.root, 
 		function(items) {
-			console.log("All items retrieved");	
+			log("All items retrieved");	
 			/* setting id and name of the structure */
 			structure.setId(items[0]._S._arrayOfAllItems[0].id);
 			structure.setName(items[0]._S._arrayOfAllItems[0].name);
 			structure.setStructureType(items[0]._S._arrayOfAllItems[0].structureType);
-			console.log("Building structure...");
+			log("Building structure...");
 			build(structure, items, 1);
-			console.log("Building structure...done");
+			log("Building structure...done");
 		}, 
 		function() {
-			console.log("Error occured in buildDataStructure()")
+			log("Error occured in buildDataStructure()")
 	    });
 	return structure;
 }
@@ -42,10 +42,10 @@ function buildDataStructure() {
 function build(structure, items, counter){
 	c = counter;
 	for(var i = 0; i < items.length; i++) {
-		//console.log(i + " / "+ items.length);
+		//log(i + " / "+ items.length);
 		if(items[i].type == "item"){
 			//create page
-			//console.log("Creating Page -> " + items[i].id, items[i].name);
+			//log("Creating Page -> " + items[i].id, items[i].name);
 			var page = new Page(items[i].id, items[i].name);
 			/* just the order of the files */
 			page.setPhysicalOrder(c++);
@@ -64,7 +64,7 @@ function build(structure, items, counter){
 				/* create structure, add it to parent structure,
 				 * call method with new structure and its children
 				 * */
-				//console.log("Creating Structure -> " + items[i].id+" with " +items[i].children.length + " children");
+				//log("Creating Structure -> " + items[i].id+" with " +items[i].children.length + " children");
 				var categ = new Structure(items[i].id);
 				categ.setName(items[i].name);
 				/* the order within a structure*/

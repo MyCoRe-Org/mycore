@@ -1,7 +1,7 @@
 /* $Revision: 2658 $ 
  * $Date: 2010-06-01 13:17:58 +0200 (Tue, 01 Jun 2010) $ 
  * $LastChangedBy: shermann $
- * Copyright 2010 - Thüringer Universitäts- und Landesbibliothek Jena
+ * Copyright 2010 - Thï¿½ringer Universitï¿½ts- und Landesbibliothek Jena
  *  
  * Mets-Editor is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,17 +18,17 @@
  */
 
 function saveTreeStore(store){
-	console.log("saveTreeStore()")
+	log("saveTreeStore()")
 	if(store == null){
-		console.log("Cannot save store - is null");
+		log("Cannot save store - is null");
 		return;
 	}
 	store.save({onComplete: 
 		   function saveDone() {
-			   console.log("Modifying tree store...done.");
+			   log("Modifying tree store...done.");
 	   		}, 
 	   		onError: function saveFailed() {
-	   			console.log("Modifying tree store...failed.");
+	   			log("Modifying tree store...failed.");
 	   		}
 	   	});
 }

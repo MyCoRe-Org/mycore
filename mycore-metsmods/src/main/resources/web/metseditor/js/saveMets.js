@@ -1,7 +1,7 @@
 /* $Revision: 3080 $ 
  * $Date: 2010-11-01 11:30:18 +0100 (Mon, 01 Nov 2010) $ 
  * $LastChangedBy: shermann $
- * Copyright 2010 - Thüringer Universitäts- und Landesbibliothek Jena
+ * Copyright 2010 - Thï¿½ringer Universitï¿½ts- und Landesbibliothek Jena
  *  
  * Mets-Editor is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 
 /* returns an Array of invalid items (categories having not at least on child (a page)) */
 function getInvalidItems(){
-	console.log("getInvalidItems()");
+	log("getInvalidItems()");
 	
 	var tree = dijit.byId("itemTree");
 	var model = tree.model;
@@ -28,13 +28,13 @@ function getInvalidItems(){
 	
 	model.getChildren(model.root, 
 		function(items) {
-			console.log("Validating tree");	
+			log("Validating tree");	
 			invalidItems = new Array();
 			performValidation(items, invalidItems);
-			console.log("Validating tree...done");
+			log("Validating tree...done");
 		}, 
 		function() {
-			console.log("Error occured in performValidation()")
+			log("Error occured in performValidation()")
 	    });
 	return invalidItems;
 }
@@ -47,7 +47,7 @@ function performValidation(items, invalidItems){
 		} else {
 			if(items[i].type == "category"){
 				if(items[i].children.length == 0){
-					console.log("Found invalid item " + items[i].id);
+					log("Found invalid item " + items[i].id);
 					invalidItems.push(items[i]);
 				} 
 				performValidation(items[i].children, invalidItems);
@@ -68,7 +68,7 @@ function containsPages(anItem){
 
 /* displays the invalid items to the user */
 function displaySaveFailedDialog(invalidItems){
-	console.log("displaySaveFailedDialog()");
+	log("displaySaveFailedDialog()");
 	var msg = "";
 	
 	for(var i = 0; i < invalidItems.length; i++){
@@ -84,30 +84,30 @@ function displaySaveFailedDialog(invalidItems){
 
 /* saves the tree/structure */
 function save(){
-   console.log("save()");
+   log("save()");
    var invalidItems = getInvalidItems(); 
    
    if(invalidItems.length > 0){
-	   console.log("Mets tree is in an invalid state");
+	   log("Mets tree is in an invalid state");
 	   displaySaveFailedDialog(invalidItems);
 	   return;
    }
    var tree = buildDataStructure();
-   console.log(dojo.toJson(tree));
+   log(dojo.toJson(tree));
 
    var data = dojo.toJson(tree);
    
-   console.log("Submitting to Server...");
-   console.log(data);
+   log("Submitting to Server...");
+   log(data);
    dojo.xhrPost({
 	   url: webApplicationBaseURL + "servlets/SaveMetsServlet",
 	   handleAs: "text",
 	   postData: "jsontree=" + data + "&derivate=" + derivateId,
 	   load: function(response) {
-	   		console.log('Mets successfully saved');
+	   		log('Mets successfully saved');
    		},
    		error: function(err, ioArgs){
-   			console.log('Please log in to use Mets Editor');
+   			log('Please log in to use Mets Editor');
    			var secondDlg = new dijit.Dialog({
    				title: "Zugriff verweigert",
    				style: "width: 300px"

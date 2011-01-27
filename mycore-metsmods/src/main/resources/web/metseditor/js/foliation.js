@@ -22,7 +22,7 @@
  * */
 function showFoliationDialog() {
 	var tracker = new SelectionTracker.getInstance();
-	console.log("showFoliationDialog()");
+	log("showFoliationDialog()");
 	document.getElementById('labelFrom').innerHTML = tracker.getFrom().path;
 	document.getElementById('labelTo').innerHTML = tracker.getTo().path;
 	dijit.byId('foliationDialog').show();
@@ -70,7 +70,7 @@ function validateFoliationSettings(){
 }
 
 function doFoliate(start, ty ) {
-	console.log("doFoliate()");
+	log("doFoliate()");
 	var tracker = new SelectionTracker.getInstance();
 	var from = tracker.getFrom();
 	var to = tracker.getTo();
@@ -81,15 +81,15 @@ function doFoliate(start, ty ) {
 	model.getChildren(model.root, 
 			function(items) {
 				if(checkbox.checked == false){
-					console.log("performFoliatonPreOrder(" + from.id + ", " + to.id +", items[], false, " + labelProvider.type + " OrderLabelProvider)...");
+					log("performFoliatonPreOrder(" + from.id + ", " + to.id +", items[], false, " + labelProvider.type + " OrderLabelProvider)...");
 					performFoliatonPreOrder(from, to, items, false, labelProvider);	
 				}else{
-					console.log("performFoliatonPostOrder(" + from.id + ", " + to.id +", items[], false, " + labelProvider.type + " OrderLabelProvider)...");
+					log("performFoliatonPostOrder(" + from.id + ", " + to.id +", items[], false, " + labelProvider.type + " OrderLabelProvider)...");
 					performFoliatonPostOrder(from, to, items, false, labelProvider);
 				}
 			},
 			function() {
-				console.log("Error occured in doFoliate()")
+				log("Error occured in doFoliate()")
 			});
 
 	tracker.reset();
@@ -107,15 +107,15 @@ function performFoliatonPreOrder(from, to, items, doFoliate, labelProvider){
 		if(items[i].type == "item"){
 			if(items[i].id == from.id){
 				flag = true;
-				console.log("Foliation has started...");
+				log("Foliation has started...");
 			}
 			if(flag){
 				items[i].orderLabel = labelProvider.getNext();
-				console.log(items[i].id +" -> " + items[i].orderLabel);
+				log(items[i].id +" -> " + items[i].orderLabel);
 			}
 			if(items[i].id == to.id){
 				flag = false;
-				console.log("Foliating has ended...");
+				log("Foliating has ended...");
 				return;
 			}
 		} else {
@@ -134,15 +134,15 @@ function performFoliatonPostOrder(from, to, items, doFoliate, labelProvider){
 		if(items[i].type == "item"){
 			if(items[i].id == to.id){
 				flag = true;
-				console.log("Foliation has started...");
+				log("Foliation has started...");
 			}
 			if(flag){
 				items[i].orderLabel = labelProvider.getNext();
-				console.log(items[i].id +" -> " + items[i].orderLabel);
+				log(items[i].id +" -> " + items[i].orderLabel);
 			}
 			if(items[i].id == from.id){
 				flag = false;
-				console.log("Foliating has ended...");
+				log("Foliating has ended...");
 				return;
 			}
 		} else {
@@ -158,9 +158,9 @@ function performFoliatonPostOrder(from, to, items, doFoliate, labelProvider){
  * @param type the type of foliation e.g. roman, arabic and so on
  * */
 function OrderLabelProvider(startIndex, ty) {
-	console.log("Initialising OrderLabelProvider");
-	console.log("OrderLabelProvider startIndex = " + startIndex);
-	console.log("OrderLabelProvider type = " + ty);
+	log("Initialising OrderLabelProvider");
+	log("OrderLabelProvider startIndex = " + startIndex);
+	log("OrderLabelProvider type = " + ty);
 	this.startIndex = startIndex;
 	this.type = ty;
 	this.postfix = null;
@@ -200,7 +200,7 @@ function OrderLabelProvider(startIndex, ty) {
 		if(this.type == "arabic"){
 			return this.startIndex++;
 		}
-		console.log("ERROR - Unsupported Foliation type");
+		log("ERROR - Unsupported Foliation type");
 	}
 	
 	this.asRoman = function(N, s, b, a, o, t){

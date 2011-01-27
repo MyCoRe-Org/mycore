@@ -17,7 +17,7 @@
  * along with Mets-Editor.  If not, see http://www.gnu.org/licenses/.
  */
 function displayItemProperties(){
-	console.log("displayItemProperties()");
+	log("displayItemProperties()");
 	var tree = dijit.byId("itemTree");
 	var selectedItem = tree.lastFocused.item;;
 	var propString =  "id=" + selectedItem.id + "<br/>" 

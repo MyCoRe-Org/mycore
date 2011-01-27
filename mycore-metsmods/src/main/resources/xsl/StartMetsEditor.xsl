@@ -141,6 +141,7 @@
             <script type="text/javascript" src="js/help.js"></script>
             <script type="text/javascript" src="js/storeUtils.js"></script>
             <script type="text/javascript" src="js/uuid.js"></script>
+            <script type="text/javascript" src="js/logger.js"></script>
 
             <script type="text/javascript">
               <xsl:value-of

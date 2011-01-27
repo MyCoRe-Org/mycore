@@ -18,7 +18,7 @@
  */
 
 function onTreeLoaded(){
-	console.log("Tree loaded");
+	log("Tree loaded");
 	loadingMsgContainer = document.getElementById("c1");
 	loadingMsg = document.getElementById("loadingMsg");
 	if(loadingMsg != null){
@@ -28,7 +28,7 @@ function onTreeLoaded(){
 }
 
 function loadPreviewImage(selectedItem, source, event){
-	console.log("loadPreviewImage()");
+	log("loadPreviewImage()");
 	/* the div containing the images */
 	var previewBaseURL = webApplicationBaseURL + "servlets/MCRTileCombineServlet/MID/" + derivateId + "/";
 	var container = document.getElementById('previewImageContainer');
@@ -76,7 +76,7 @@ function loadPreviewImage(selectedItem, source, event){
 				var newImg = document.createElement('img');
 				newImg.src = previewBaseURL + currentItem.path;
 				newImg.height = '512';
-				console.log("Adding <img> element to document "+ newImg.src);
+				log("Adding <img> element to document "+ newImg.src);
 				divWithManyImg.appendChild(newImg);
 			}
 		}

@@ -18,7 +18,7 @@
  */
 
 function toggleReverseButton(){
-	console.log("toggleReverseButton()");
+	log("toggleReverseButton()");
 	var tree = dijit.byId("itemTree");
 	var model = tree.model;
 	var itemList = null;
@@ -37,12 +37,12 @@ function toggleReverseButton(){
 		disableReverseButton(hasCategs);
 		
 	}, function() {
-		console.log("Error occured in toggleReverseButton()")
+		log("Error occured in toggleReverseButton()")
 	});
 }
 
 function disableReverseButton(flag){
-	console.log("disableReverseButton(" + flag + ")");
+	log("disableReverseButton(" + flag + ")");
 	var button = dijit.byId('toolbar1.reverse');
 	button.attr("disabled", flag);
 	
@@ -56,7 +56,7 @@ function disableReverseButton(flag){
 
 /* changes the order of the elements in a tree the 1st becomes the last one and vice versa */
 function reverseTree() {
-	console.log("reverseTree()");
+	log("reverseTree()");
 	var tree = dijit.byId("itemTree");
 	var model = tree.model;
 	var itemList = null;
@@ -67,7 +67,7 @@ function reverseTree() {
 			itemList.push(items[i]);
 		}
 	}, function() {
-		console.log("Error occured in doFoliate()")
+		log("Error occured in doFoliate()")
 	});
 
 	var store = model.store;

@@ -1,7 +1,7 @@
 /* $Revision: 2988 $ 
  * $Date: 2010-09-23 12:09:04 +0200 (Thu, 23 Sep 2010) $ 
  * $LastChangedBy: shermann $
- * Copyright 2010 - Thüringer Universitäts- und Landesbibliothek Jena
+ * Copyright 2010 - Thï¿½ringer Universitï¿½ts- und Landesbibliothek Jena
  *  
  * Mets-Editor is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -88,10 +88,10 @@ function addStructureToTree() {
 		store.save( {
 			onComplete : function saveDone() {
 				textfield.setValue("");
-				console.log("Modifying tree store...done.");
+				log("Modifying tree store...done.");
 			},
 			onError : function saveFailed() {
-				console.log("Modifying tree store...failed.");
+				log("Modifying tree store...failed.");
 			}
 		});
 
@@ -122,18 +122,18 @@ function disableEditStructureButton(flag) {
 }
 
 function showEditStructureDialog() {
-	console.log("showEditStructureDialog()");
+	log("showEditStructureDialog()");
 	var tracker = new SelectionTracker.getInstance();
 	var selStruct = tracker.getSelectedStructure();
 	var selItem = tracker.getFrom();
 	
 	if (selStruct == null) {
-		console.log("The item currently selected is not a category/structure");
-		console.log("The edit structure dialog cannot be displayed");
+		log("The item currently selected is not a category/structure");
+		log("The edit structure dialog cannot be displayed");
 		
 		if(selItem != null && selItem.type == 'item'){
-			console.log("The type currently selected item '" + selItem.type +"'");
-			console.log("Displaying the editItemPropertiesDialog");
+			log("The type currently selected item '" + selItem.type +"'");
+			log("Displaying the editItemPropertiesDialog");
 			displayEditItemDiaglog();
 		}
 		return;
@@ -149,7 +149,7 @@ function showEditStructureDialog() {
 }
 
 function displayEditItemDiaglog(){
-	console.log("displayEditItemDiaglog()");
+	log("displayEditItemDiaglog()");
 	var dialog = dijit.byId("editItemDialog")
 	var tracker = new SelectionTracker.getInstance();
 	var selItem = tracker.getFrom();
@@ -169,7 +169,7 @@ function displayEditItemDiaglog(){
 }
 
 function saveItemProperties(){
-	console.log("saveItemProperties()");
+	log("saveItemProperties()");
 	var tracker = new SelectionTracker.getInstance();
 	var selItem = tracker.getFrom();
 	var textBox = dijit.byId("orderLabelTextBox");
@@ -179,7 +179,7 @@ function saveItemProperties(){
 	var commonLabelText = commonLabelTextBox.getValue();
 	
 	if(commonLabelText == null || commonLabelText.length == 0){
-		console.log("Label for item is not set. Please provide a label");
+		log("Label for item is not set. Please provide a label");
 		return;
 	}
 	
@@ -204,11 +204,11 @@ function saveItemProperties(){
 }
 
 function configureEditDialog() {
-	console.log("configureEditDialog()");
+	log("configureEditDialog()");
 	var tracker = new SelectionTracker.getInstance();
 	var selStruct = tracker.getSelectedStructure();
 	if (selStruct == null) {
-		console.log("The item currently selected is not a category/structure");
+		log("The item currently selected is not a category/structure");
 		return;
 	}
 	var combo = dijit.byId("structureTypeEdit");
@@ -221,7 +221,7 @@ function configureEditDialog() {
 			combo.item = item;
 		},
 		onError : function(item, request) {
-			console.log("Error fetching item from store");
+			log("Error fetching item from store");
 		}
 	});
 
@@ -230,7 +230,7 @@ function configureEditDialog() {
 }
 
 function saveEditedStructure() {
-	console.log("saveEditedStructure()");
+	log("saveEditedStructure()");
 	var tracker = new SelectionTracker.getInstance();
 	var selStruct = tracker.getSelectedStructure();
 
@@ -258,20 +258,20 @@ function saveEditedStructure() {
 
 /* shows the edit document type and title dialog */
 function showEditDocTypeDialog() {
-	console.log("showEditDocTypeDialog()");
+	log("showEditDocTypeDialog()");
 	configureEditDocTypeDialog();
 	dijit.byId("setDocumentTypeAndTitleDialog").show();
 }
 
 /* sets default values if any available */
 function configureEditDocTypeDialog() {
-	console.log("configureEditDocTypeDialog()");
+	log("configureEditDocTypeDialog()");
 	var typeCombo = dijit.byId("docTypeCombo");
 	var store = typeCombo.store;
 	var rootItem = getRootItemFromStore();
 
-	console.log("Got as root item");
-	console.log(rootItem);
+	log("Got as root item");
+	log(rootItem);
 
 	store.fetchItemByIdentity( {
 		identity : rootItem.structureType,
@@ -280,11 +280,11 @@ function configureEditDocTypeDialog() {
 			typeCombo.item = item;
 		},
 		onError : function(item, request) {
-			console.log("Error fetching item  from store in 'configureEditDocTypeDialog()'");
-			console.log("Item was:");
-			console.log(item);
-			console.log("Request was:");
-			console.log(request);
+			log("Error fetching item  from store in 'configureEditDocTypeDialog()'");
+			log("Item was:");
+			log(item);
+			log("Request was:");
+			log(request);
 		}
 	});
 
@@ -294,18 +294,18 @@ function configureEditDocTypeDialog() {
 
 /* saves document title and type to tree */
 function saveDocTypeAndTitle() {
-	console.log("saveDocTypeAndTitle()");
+	log("saveDocTypeAndTitle()");
 	var typeCombo = dijit.byId("docTypeCombo");
 	var titleTextArea = dijit.byId("titleTextBox");
 
 	if (typeCombo.item == null || typeCombo.item.id == "unit") {
-		console.log("Could not save type of document, no valid type selected");
+		log("Could not save type of document, no valid type selected");
 		return;
 	}
 
 	var titleEntered = titleTextArea.getValue();
 	if (titleEntered.length == 0) {
-		console.log("Could not save title of document, no title provided");
+		log("Could not save title of document, no title provided");
 		return;
 	}
 
@@ -314,10 +314,10 @@ function saveDocTypeAndTitle() {
 
 	var rootItem = getRootItemFromStore();
 
-	console.log("Setting title of document to \"" + titleEntered + "\"");
+	log("Setting title of document to \"" + titleEntered + "\"");
 	store.setValue(rootItem, "name", titleEntered);
 
-	console.log("Setting type of document to \"" + typeCombo.item.id + "\"");
+	log("Setting type of document to \"" + typeCombo.item.id + "\"");
 	store.setValue(rootItem, "structureType", typeCombo.item.id);
 
 	dijit.byId("setDocumentTypeAndTitleDialog").hide();
@@ -327,7 +327,7 @@ function saveDocTypeAndTitle() {
 
 /* returns the item representing the root from the store */
 function getRootItemFromStore() {
-	console.log("getRootItemFromStore()");
+	log("getRootItemFromStore()");
 
 	var tree = dijit.byId("itemTree");
 	var store = tree.model.store;
@@ -340,11 +340,11 @@ function getRootItemFromStore() {
 		/* derivateId has been defined in StartMetsEditor.xsl */
 		identity : rootItemId,
 		onItem : function(item, request) {
-			console.log("Fetching item " + rootItemId + " from store");
+			log("Fetching item " + rootItemId + " from store");
 			rootItem = item;
 		},
 		onError : function(item, request) {
-			console.log("Error fetching root item from store");
+			log("Error fetching root item from store");
 		}
 	});
 	return rootItem;

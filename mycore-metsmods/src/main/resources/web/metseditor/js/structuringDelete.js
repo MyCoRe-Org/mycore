@@ -1,7 +1,7 @@
 /* $Revision: 2948 $ 
  * $Date: 2010-09-08 15:12:34 +0200 (Wed, 08 Sep 2010) $ 
  * $LastChangedBy: shermann $
- * Copyright 2010 - Thüringer Universitäts- und Landesbibliothek Jena
+ * Copyright 2010 - Thï¿½ringer Universitï¿½ts- und Landesbibliothek Jena
  *  
  * Mets-Editor is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,21 +18,21 @@
  */
 
 function handleKeyDown(event){
-	console.log("handleKeyDown()");
+	log("handleKeyDown()");
 	if(event.keyCode == dojo.keys.DELETE) {
 		deleteStructure();
 	}
 }
 
 function deleteStructure(){
-	console.log("deleteStructure()");
+	log("deleteStructure()");
 	var tree = dijit.byId("itemTree");
 	
 	var tracker = new SelectionTracker.getInstance();
 	var selectedItem = tracker.getSelectedStructure();
 
 	if(selectedItem == null){
-		console.log("No structure selected, delete canceled");
+		log("No structure selected, delete canceled");
 		return;
 	}
 	

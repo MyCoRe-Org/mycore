@@ -1,7 +1,7 @@
 /* $Revision: 2658 $ 
  * $Date: 2010-06-01 13:17:58 +0200 (Tue, 01 Jun 2010) $ 
  * $LastChangedBy: shermann $
- * Copyright 2010 - Thüringer Universitäts- und Landesbibliothek Jena
+ * Copyright 2010 - Thï¿½ringer Universitï¿½ts- und Landesbibliothek Jena
  *  
  * Mets-Editor is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
  * along with Mets-Editor.  If not, see http://www.gnu.org/licenses/.
  */
 function trackSelection(selectedItem, source, event) {
-	console.log();
 	var tracker = new SelectionTracker.getInstance();
 
 	if (event.ctrlKey == true && selectedItem.type == "item") {
@@ -48,7 +47,7 @@ var SelectionTracker = (function() {
 		}
 		
 		this.setSelectedStructure = function(obj) {
-			console.log("SelectionTracker.setSelectedStructure()");
+			log("SelectionTracker.setSelectedStructure()");
 			this.selectedStructure = obj;
 		}
 		
@@ -56,7 +55,7 @@ var SelectionTracker = (function() {
 			return this.from;
 		}
 		this.setFrom = function(obj) {
-			console.log("SelectionTracker.setFrom()");
+			log("SelectionTracker.setFrom()");
 			this.from = obj;
 		}
 
@@ -65,7 +64,7 @@ var SelectionTracker = (function() {
 		}
 
 		this.setTo = function(obj) {
-			console.log("SelectionTracker.setTo()");
+			log("SelectionTracker.setTo()");
 			this.to = obj;
 		}
 
@@ -84,7 +83,7 @@ var SelectionTracker = (function() {
 		}
 
 		this.reset = function() {
-			console.log("SelectionTracker.reset()");
+			log("SelectionTracker.reset()");
 			this.from = null;
 			this.to = null;
 			this.selectedStructure = null;
