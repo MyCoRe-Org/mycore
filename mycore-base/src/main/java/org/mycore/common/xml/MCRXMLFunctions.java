@@ -47,8 +47,8 @@ import org.hibernate.criterion.Restrictions;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRURN;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.common.MCRLinkTableManager;
-import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
@@ -453,6 +453,15 @@ public class MCRXMLFunctions {
             e.printStackTrace();
         }
         return n;
+    }
+    
+    /**
+     * checks if the current user is in a specific role
+     * @param role a role name
+     * @return true if user has this role
+     */
+    public static boolean isCurrentUserInRole(String role){
+        return MCRSessionMgr.getCurrentSession().getUserInformation().isUserInRole(role);
     }
 
     /**
