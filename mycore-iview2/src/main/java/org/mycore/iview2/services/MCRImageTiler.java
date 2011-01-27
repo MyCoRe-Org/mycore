@@ -1,12 +1,15 @@
 package org.mycore.iview2.services;
 
 import java.lang.reflect.Constructor;
+import java.util.Arrays;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
+
+import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
@@ -91,6 +94,7 @@ public class MCRImageTiler implements Runnable, Closeable {
         mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
         boolean activated = MCRConfiguration.instance().getBoolean(MCRIView2Tools.CONFIG_PREFIX + "LocalTiler.activated", true);
         LOGGER.info("Local Tiling is " + (activated ? "activated" : "deactivated"));
+        LOGGER.info("Supported image file types for reading: "+Arrays.toString(ImageIO.getReaderFormatNames()));
         if (activated) {
             int tilingThreadCount = Integer.parseInt(MCRIView2Tools.getIView2Property("TilingThreads"));
             ThreadFactory slaveFactory = new ThreadFactory() {
