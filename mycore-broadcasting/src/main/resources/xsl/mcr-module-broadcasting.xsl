@@ -115,7 +115,7 @@
             <xsl:variable name="messageFound">
               <!-- check each group within -->
               <xsl:for-each select="group">
-                <xsl:if test="contains($CurrentGroups,text())">
+                <xsl:if test="mcrxml:isCurrentUserInRole(text())">
                   <xsl:value-of select="'true'" />
                 </xsl:if>
               </xsl:for-each>
