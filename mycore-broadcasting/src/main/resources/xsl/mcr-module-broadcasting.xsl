@@ -23,7 +23,7 @@
   <xsl:variable name="servlet" select="concat($WebApplicationBaseURL,'servlets/MCRBroadcastingServlet',$HttpSession)" />
   <xsl:variable name="servletURIRes" select="'request:servlets/MCRBroadcastingServlet'" />
   <xsl:variable name="sender">
-    <xsl:value-of select="concat($WebApplicationBaseURL,$HttpSession,'/modules/broadcasting/config/mcr-module-broadcasting.xml')" />
+    <xsl:value-of select="concat($WebApplicationBaseURL,$HttpSession,'modules/broadcasting/config/mcr-module-broadcasting.xml')" />
   </xsl:variable>
   <xsl:variable name="initJS">
     <xsl:call-template name="get.initJS" />
