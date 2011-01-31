@@ -303,4 +303,8 @@ public class MCRHIBConnection implements Closeable {
         return getSession().getNamedQuery(name);
     }
 
+    @Override
+    public int getPriority(){
+        return MCRShutdownHandler.Closeable.DEFAULT_PRIORITY;
+    }
 }

@@ -635,4 +635,9 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
     public boolean isIndexer() {
         return true;
     }
+    
+    @Override
+    public int getPriority(){
+        return MCRShutdownHandler.Closeable.DEFAULT_PRIORITY;
+    }
 }

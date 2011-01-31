@@ -227,4 +227,9 @@ public class MCRImageTiler implements Runnable, Closeable {
             }
         }
     }
+    
+    @Override
+    public int getPriority(){
+        return MCRShutdownHandler.Closeable.DEFAULT_PRIORITY;
+    }
 }

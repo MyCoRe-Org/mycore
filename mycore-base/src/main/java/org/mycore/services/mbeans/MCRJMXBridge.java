@@ -121,4 +121,9 @@ public class MCRJMXBridge implements Closeable {
         }
         SINGLETON.clear();
     }
+    
+    @Override
+    public int getPriority(){
+        return MCRShutdownHandler.Closeable.DEFAULT_PRIORITY;
+    }
 }

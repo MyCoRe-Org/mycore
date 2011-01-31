@@ -61,6 +61,17 @@ public class MCRShutdownHandler {
          * so.
          */
         public void close();
+    
+        /**
+         * Returns the priority. A Closeable with a higher priority will be closed before a Closeable with a lower priority. 
+         * Default priority is 5.   
+         * */
+        public int getPriority();
+        
+        /**
+         * The default priority 
+         * */
+        public static int DEFAULT_PRIORITY = 5;
     }
 
     private static MCRShutdownHandler SINGLETON = new MCRShutdownHandler();

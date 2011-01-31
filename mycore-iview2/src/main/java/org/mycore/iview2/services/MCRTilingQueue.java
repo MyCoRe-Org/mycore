@@ -348,4 +348,9 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
     public String toString() {
         return "MCRTilingQueue";
     }
+    
+    @Override
+    public int getPriority(){
+        return MCRShutdownHandler.Closeable.DEFAULT_PRIORITY;
+    }
 }
