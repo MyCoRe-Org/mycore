@@ -45,17 +45,6 @@ public class MCRIView2ServletContextListener implements ServletContextListener {
      * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
      */
     public void contextDestroyed(ServletContextEvent sce) {
-        while (tilingThread.isAlive()) {
-            MCRImageTiler.getInstance().prepareClose();
-            MCRTilingQueue tilingQueue = MCRTilingQueue.getInstance();
-            if (tilingQueue != null)
-                tilingQueue.prepareClose();
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                LOGGER.error(Thread.currentThread().getName() + " thread was interrupted.", e);
-            }
-        }
     }
 
     /** Starts new {@link MCRImageTiler} thread if not currently running
