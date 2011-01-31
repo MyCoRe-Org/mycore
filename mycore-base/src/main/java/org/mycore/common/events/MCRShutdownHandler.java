@@ -1,25 +1,16 @@
 /**
- * 
- * $Revision$ $Date$
- *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
- *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
+ * $Revision$ $Date$ This
+ * file is part of ** M y C o R e ** Visit our homepage at http://www.mycore.de/
+ * for details. This program is free software; you can use it, redistribute it
+ * and / or modify it under the terms of the GNU General Public License (GPL) as
+ * published by the Free Software Foundation; either version 2 of the License or
+ * (at your option) any later version. This program is distributed in the hope
+ * that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details. You should have received a copy of
+ * the GNU General Public License along with this program, normally in the file
+ * license.txt. If not, write to the Free Software Foundation Inc., 59 Temple
+ * Place - Suite 330, Boston, MA 02111-1307 USA
  **/
 package org.mycore.common.events;
 
@@ -35,19 +26,15 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
 
 /**
- * is a wrapper for shutdown hooks.
- * 
- * When used inside a web application this shutdown hook is bound to the
- * ServletContext. If not this hook is bound to the Java Runtime.
- * 
- * Every <code>Closeable</code> that is added via <code>addCloseable()</code>
- * will be closed at shutdown time. Do not forget to remove any closeable via
- * <code>removeCloseable()</code> to remove any instances.
- * 
- * For registering this hook for a web application see <code>MCRServletContextListener</code>
+ * is a wrapper for shutdown hooks. When used inside a web application this
+ * shutdown hook is bound to the ServletContext. If not this hook is bound to
+ * the Java Runtime. Every <code>Closeable</code> that is added via
+ * <code>addCloseable()</code> will be closed at shutdown time. Do not forget to
+ * remove any closeable via <code>removeCloseable()</code> to remove any
+ * instances. For registering this hook for a web application see
+ * <code>MCRServletContextListener</code>
  * 
  * @author Thomas Scheffler (yagee)
- * 
  * @see org.mycore.common.events.MCRShutdownThread
  * @see org.mycore.common.events.MCRServletContextListener
  * @since 1.3
@@ -61,16 +48,15 @@ public class MCRShutdownHandler {
      */
     public static interface Closeable {
         /**
-         * prepare for closing this object that implements <code>Closeable</code>.
-         * 
-         * This is the first part of the closing process. As a object may need database
-         * access to close cleanly this method can be used to be ahead of database outtake.
+         * prepare for closing this object that implements
+         * <code>Closeable</code>. This is the first part of the closing
+         * process. As a object may need database access to close cleanly this
+         * method can be used to be ahead of database outtake.
          */
         public void prepareClose();
 
         /**
          * cleanly closes this object that implements <code>Closeable</code>.
-         * 
          * You can provide some functionality to close open files and sockets or
          * so.
          */
@@ -119,9 +105,11 @@ public class MCRShutdownHandler {
         LOGGER.debug("requests: " + requests.toString());
         synchronized (requests) {
             shuttingDown = true;
-            for (Closeable c : requests) {
+            for (Iterator<Closeable> it = requests.iterator(); it.hasNext();) {
+                MCRShutdownHandler.Closeable c = it.next();
                 c.prepareClose();
             }
+
             for (Iterator<Closeable> it = requests.iterator(); it.hasNext();) {
                 MCRShutdownHandler.Closeable c = it.next();
                 LOGGER.debug("Closing: " + c.toString());
@@ -133,7 +121,7 @@ public class MCRShutdownHandler {
         MCRSessionMgr.close();
         System.out.println(system + " Goodbye, and remember: \"Alles wird gut.\"\n");
         LogManager.shutdown();
-        //may be needed in webapp to release file handles correctly.
+        // may be needed in webapp to release file handles correctly.
         Introspector.flushCaches();
     }
 
