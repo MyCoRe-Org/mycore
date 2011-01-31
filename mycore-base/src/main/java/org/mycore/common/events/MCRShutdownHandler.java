@@ -15,9 +15,9 @@
 package org.mycore.common.events;
 
 import java.beans.Introspector;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.log4j.LogManager;
@@ -61,16 +61,17 @@ public class MCRShutdownHandler {
          * so.
          */
         public void close();
-    
+
         /**
-         * Returns the priority. A Closeable with a higher priority will be closed before a Closeable with a lower priority. 
-         * Default priority is 5.   
-         * */
+         * Returns the priority. A Closeable with a higher priority will be
+         * closed before a Closeable with a lower priority. Default priority is
+         * 5.
+         */
         public int getPriority();
-        
+
         /**
-         * The default priority 
-         * */
+         * The default priority
+         */
         public static int DEFAULT_PRIORITY = 5;
     }
 
@@ -116,21 +117,21 @@ public class MCRShutdownHandler {
         LOGGER.debug("requests: " + requests.toString());
         synchronized (requests) {
             shuttingDown = true;
-            for (Iterator<Closeable> it = requests.iterator(); it.hasNext();) {
-                MCRShutdownHandler.Closeable c = it.next();
+            Closeable[] closeables = requests.toArray(new Closeable[0]);
+            Arrays.sort(closeables, new MCRCloseableComparator());
+            for (Closeable c : closeables) {
                 c.prepareClose();
             }
 
-            for (Iterator<Closeable> it = requests.iterator(); it.hasNext();) {
-                MCRShutdownHandler.Closeable c = it.next();
+            for (Closeable c : closeables) {
                 LOGGER.debug("Closing: " + c.toString());
                 c.close();
-                it.remove();
+                requests.remove(c);
             }
         }
-        System.out.println(system + " closing any remaining MCRSession instances, please wait...\n");
+        LOGGER.info(system + " closing any remaining MCRSession instances, please wait...\n");
         MCRSessionMgr.close();
-        System.out.println(system + " Goodbye, and remember: \"Alles wird gut.\"\n");
+        LOGGER.info(system + " Goodbye, and remember: \"Alles wird gut.\"\n");
         LogManager.shutdown();
         // may be needed in webapp to release file handles correctly.
         Introspector.flushCaches();
