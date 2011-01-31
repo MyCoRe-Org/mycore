@@ -246,6 +246,22 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
     }
 
     /**
+     * The method remove a metadata object, that implements the MCRMetaInterface to
+     * this element.
+     * 
+     * @param obj
+     *            a metadata object
+     * @exception MCRException
+     *                if the class name of the object is not the same like the
+     *                name of all store metadata in this element.
+     * @return true if this <code>MCRMetaElement</code> contained the specified
+     *              <code>MCRMetaInterface</code>
+     */
+    public final boolean removeMetaObject(MCRMetaInterface obj) {
+        return list.remove(obj);
+    }
+
+    /**
      * The method removes all inherited metadata objects of this MCRMetaElement.
      */
     public final void removeInheritedMetadata() {
