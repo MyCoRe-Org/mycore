@@ -261,6 +261,7 @@ public class MCRFileNodeServlet extends MCRServlet {
         {
             res.setContentType(file.getContentType().getMimeType());
             res.setContentLength((int) file.getSize());
+            res.addHeader("Accept-Ranges", "none"); // Advice client not to attempt range requests
             // no transaction needed to copy long streams over slow connections
             MCRSessionMgr.getCurrentSession().commitTransaction();
             OutputStream out = new BufferedOutputStream(res.getOutputStream());
