@@ -208,16 +208,16 @@
     <xsl:variable name="format">
       <xsl:choose>
         <xsl:when test="string-length(normalize-space($isoTime))=4">
-          <xsl:value-of select="i18n:translate('metaData.dateYear')"/>
+          <xsl:value-of select="i18n:translate('component.session-listing.metaData.dateYear')"/>
         </xsl:when>
         <xsl:when test="string-length(normalize-space($isoTime))=7">
-          <xsl:value-of select="i18n:translate('metaData.dateYearMonth')"/>
+          <xsl:value-of select="i18n:translate('component.session-listing.metaData.dateYearMonth')"/>
         </xsl:when>
         <xsl:when test="string-length(normalize-space($isoTime))=10">
-          <xsl:value-of select="i18n:translate('metaData.dateYearMonthDay')"/>
+          <xsl:value-of select="i18n:translate('component.session-listing.metaData.dateYearMonthDay')"/>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="i18n:translate('metaData.dateTime')"/>
+          <xsl:value-of select="i18n:translate('component.session-listing.metaData.dateTime')"/>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
