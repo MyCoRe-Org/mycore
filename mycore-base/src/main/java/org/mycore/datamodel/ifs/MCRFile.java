@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.security.DigestOutputStream;
-import java.security.MessageDigest;
 import java.util.GregorianCalendar;
 
 import org.jdom.Document;
@@ -413,17 +411,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         ensureNotDeleted();
 
         if (storageID.length() != 0) {
-            MessageDigest digest = MCRContentInputStream.buildMD5Digest();
-
-            DigestOutputStream dos = new DigestOutputStream(target, digest);
-            getContentStore().retrieveContent(this, dos);
-
-            String md5_new = MCRContentInputStream.getMD5String(digest);
-
-            if (!md5.equals(md5_new)) {
-                String msg = "MD5 Checksum failure while retrieving file content for file " + ID;
-                throw new MCRPersistenceException(msg);
-            }
+            getContentStore().retrieveContent(this, target);
         }
     }
 
