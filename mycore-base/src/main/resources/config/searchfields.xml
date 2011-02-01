@@ -43,7 +43,6 @@
       </xsl:for-each>
 
       <xsl:for-each select="/mycoreobject/metadata/*/*[@classid and @categid]">
-        <xsl:variable name="classid" select="@classid"/>
         <xsl:variable name="uri" select="concat('classification:metadata:0:parents:',@classid,':',@categid)" />
 
         <xsl:for-each select="document($uri)//category/label">
