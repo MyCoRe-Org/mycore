@@ -54,7 +54,7 @@ function loadPreviewImage(selectedItem, source, event){
 	
 	/* show the selected image(s) */
 	if(selectedItem.type == "item"){
-		var imgURL = previewBaseURL + selectedItem.path;
+		var imgURL = previewBaseURL + escape(selectedItem.path);
 		var previewImage = document.createElement('img');
 		previewImage.id = previewImageKey;
 		previewImage.src = imgURL;
@@ -74,7 +74,7 @@ function loadPreviewImage(selectedItem, source, event){
 			
 			if(currentItem.type == "item"){
 				var newImg = document.createElement('img');
-				newImg.src = previewBaseURL + currentItem.path;
+				newImg.src = previewBaseURL + escape(currentItem.path);
 				newImg.height = '512';
 				log("Adding <img> element to document "+ newImg.src);
 				divWithManyImg.appendChild(newImg);
