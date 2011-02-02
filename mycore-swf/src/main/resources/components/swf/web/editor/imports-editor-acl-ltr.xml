@@ -117,8 +117,8 @@
   
   <!-- *** Data for the buttons ** -->
   
-  <submitButton id="BSubmit" width="100px" i18n="common.button.save"/>
-  <cancelButton id="BCancel" width="100px" i18n="common.button.cancel"/>
+  <submitButton id="BSubmit" width="100px" i18n="component.swf.editor.button.save"/>
+  <cancelButton id="BCancel" width="100px" i18n="component.swf.editor.button.cancel"/>
   
   <panel id="TwoButtons">
     <cell col="1" row="1" anchor="WEST" ref="BCancel"/>
