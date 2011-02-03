@@ -146,7 +146,6 @@
   </xsl:template>
   <xsl:template name="iview2.init">
     <xsl:param name="groupID" />
-    <xsl:param name="prefix"/>
     <xsl:param name="tilesize" select="'256'" />
     
     <!-- startUp settings -->
@@ -169,9 +168,6 @@
     </script>
     <!-- JQuery Framework -->
     <script type="text/javascript">
-      <xsl:text>var prefix='</xsl:text>
-      <xsl:value-of select="$prefix" />
-      <xsl:text>';</xsl:text>
       <xsl:text>var tilesize=</xsl:text>
       <xsl:value-of select="$tilesize" />
       <xsl:text>;</xsl:text>

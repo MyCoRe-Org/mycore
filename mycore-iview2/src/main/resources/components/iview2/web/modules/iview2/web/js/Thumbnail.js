@@ -44,7 +44,7 @@ function loadPage(viewID, callback) {
 	} else {
 		url = Iview[viewID].PhysicalModel.getCurrent().getHref();
 	}
-	Iview[viewID].prefix  = url;
+	Iview[viewID].curImage  = url;
 	var imagePropertiesURL=Iview[viewID].baseUri[0]+"/"+viewID+"/"+url+"/imageinfo.xml";
 	jQuery.ajax({
 		url: imagePropertiesURL,
@@ -145,7 +145,7 @@ function processImageProperties(imageProperties, viewID){
 		} else {
 			Iview[viewID].zoomInit = Iview[viewID].zoomMax;
 		}
-		viewerBean.tileUrlProvider.prefix = Iview[viewID].prefix;
+		viewerBean.tileUrlProvider.prefix = Iview[viewID].curImage;
 		preload.src = viewerBean.tileUrlProvider.assembleUrl(0,0,0);
 		viewerBean.resize();
 	}
@@ -658,6 +658,11 @@ function updateModuls(viewID) {
 		Iview[viewID].viewerContainer.find(".toolbars .toolbar").css("top", newTop);
 	}
 	
+	try {
+		//repaint Toolbar as if the width of the dropdown changes the spring needs to be adjusted
+		Iview[viewID].getToolbarCtrl().paint("mainTb");	
+	} catch (e) {}
+	
 	// Actualize Chapter
 	if (Iview[viewID].useChapter && !(typeof Iview[viewID].chapter === "undefined")) {
 		//prevent endless loop
@@ -960,7 +965,7 @@ function processMETS(metsDoc, viewID) {
 	Iview[viewID].PhysicalModel = Iview[viewID].PhysicalModelProvider.createModel();
 	var physicalModel = Iview[viewID].PhysicalModel;
 	Iview[viewID].amountPages = physicalModel.getNumberOfPages();
-	physicalModel.setPosition(physicalModel.getPosition(Iview[viewID].prefix));
+	physicalModel.setPosition(physicalModel.getPosition(Iview[viewID].curImage));
 	physicalModel.onevent.attach(function(sender, args) {
 		if (args.type == physicalModel.SELECT) {
 			notifyListenerNavigate(args["new"], viewID);

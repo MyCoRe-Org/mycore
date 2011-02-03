@@ -77,7 +77,7 @@ function initializeGraphic(viewID) {
 	PanoJS.BLANK_TILE_IMAGE = "../modules/iview2/web/" + styleFolderUri + 'blank.gif';
 	
 	// opera triggers the onload twice
-	var iviewTileUrlProvider = new PanoJS.TileUrlProvider(Iview[viewID].baseUri, Iview[viewID].prefix, 'jpg');
+	var iviewTileUrlProvider = new PanoJS.TileUrlProvider(Iview[viewID].baseUri, Iview[viewID].curImage, 'jpg');
 	iviewTileUrlProvider.derivate = viewID;
 
 	/**
