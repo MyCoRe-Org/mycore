@@ -92,9 +92,9 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
      * reserved URI characters should not be in uploaded filenames
      * see RFC3986, Section 2.2
      */
-    static Pattern genDelims = Pattern.compile("[^:?#\\[\\]@]*");
+    static Pattern genDelims = Pattern.compile("[^:?%#\\[\\]@]*");
 
-    static Pattern subDelims = Pattern.compile("[^!$&'()*+,;=]*");
+    static Pattern subDelims = Pattern.compile("[^!%$&'()*+,;=]*");
 
     static boolean doRun = true;
     
@@ -396,11 +396,11 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
      */
     protected static void checkPathName(String path) throws MCRException {
         if (!genDelims.matcher(path).matches()) {
-            String delims = "\":\" / \"/\" / \"?\" / \"#\" / \"[\" / \"]\" / \"@\"";
+            String delims = "\":\" / \"/\" / \"?\" / \"#\" / \"[\" / \"]\" / \"@\" \"%\"";
             throw new MCRException("Path name " + path + " contains reserved characters from gen-delims: " + delims);
         }
         if (!subDelims.matcher(path).matches()) {
-            String delims = "\"!\" / \"$\" / \"&\" / \"'\" / \"(\" / \")\" / \"*\" / \"+\" / \",\" / \";\" / \"=\"";
+            String delims = "\"!\" / \"$\" / \"&\" / \"'\" / \"(\" / \")\" / \"*\" / \"+\" / \",\" / \";\" / \"=\" \"%\"";
             throw new MCRException("Path name " + path + " contains reserved characters from sub-delims: " + delims);
         }
     }
