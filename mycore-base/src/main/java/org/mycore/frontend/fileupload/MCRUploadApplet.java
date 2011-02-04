@@ -1,24 +1,24 @@
 /*
  * 
  * $Revision$ $Date$
- *
- * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
- *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program, in a file called gpl.txt or license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * 
+ * This file is part of *** M y C o R e *** See http://www.mycore.de/ for
+ * details.
+ * 
+ * This program is free software; you can use it, redistribute it and / or
+ * modify it under the terms of the GNU General Public License (GPL) as
+ * published by the Free Software Foundation; either version 2 of the License or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program, in a file called gpl.txt or license.txt. If not, write to the
+ * Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307 USA
  */
 
 package org.mycore.frontend.fileupload;
@@ -39,6 +39,7 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
 import javax.swing.JApplet;
@@ -56,8 +57,8 @@ import javax.swing.filechooser.FileFilter;
  * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
- * 
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date: 2010-03-12 16:54:13 +0100 (Fri, 12 Mar
+ *          2010) $
  */
 public class MCRUploadApplet extends JApplet {
     private static final long serialVersionUID = -118475099247635561L;
@@ -77,8 +78,6 @@ public class MCRUploadApplet extends JApplet {
     protected JFileChooser locationChooser;
 
     protected static File lastDirectory;
-
-    private static final File DRIVE_C = new File("C:\\");
 
     @Override
     public void init() {
@@ -152,12 +151,31 @@ public class MCRUploadApplet extends JApplet {
                     return acceptFileTypes;
                 }
             });
+        } else {
+            locationChooser.setFileFilter(new FileFilter() {
+                private Pattern pattern = Pattern.compile("[^:?%#\\[\\]@]*");
+
+                @Override
+                public boolean accept(File f) {
+                    if (!pattern.matcher(f.getName()).matches()) {
+                        System.out.println(f.getAbsolutePath() + " is an invalid filename");
+                        return false;
+                    }
+                    return true;
+                }
+
+                @Override
+                public String getDescription() {
+                    return MCRUploadApplet.this.translateI18N("MCRUploadApplet.filefilter.label");
+                }
+            });
         }
 
         if (lastDirectory != null) {
             locationChooser.setCurrentDirectory(lastDirectory);
-        } else if (DRIVE_C.exists()) {
-            locationChooser.setCurrentDirectory(DRIVE_C);
+        } else {
+            File userHome = new File(System.getenv("HOME"));
+            locationChooser.setCurrentDirectory(userHome);
         }
 
         JPanel content = new JPanel();
@@ -246,9 +264,8 @@ public class MCRUploadApplet extends JApplet {
     }
 
     /**
-     * provides translation for the given label (property key).
-     * 
-     * Use the current locale that is needed for translation.
+     * provides translation for the given label (property key). Use the current
+     * locale that is needed for translation.
      * 
      * @param label
      * @return translated String
