@@ -133,6 +133,7 @@ public class MCRUploadApplet extends JApplet {
             locationChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
             locationChooser.setFileFilter(new FileFilter() {
                 Set accepted = new HashSet();
+                MCRUploadApplet.InvalidFileNameFilter ifnf = new MCRUploadApplet.InvalidFileNameFilter();
 
                 @Override
                 public boolean accept(File f) {
@@ -143,7 +144,7 @@ public class MCRUploadApplet extends JApplet {
                         }
                     }
                     String[] ext = f.getName().split("\\.");
-                    return accepted.contains(ext[ext.length - 1]);
+                    return accepted.contains(ext[ext.length - 1]) && ifnf.accept(f);
                 }
 
                 @Override
@@ -152,23 +153,7 @@ public class MCRUploadApplet extends JApplet {
                 }
             });
         } else {
-            locationChooser.setFileFilter(new FileFilter() {
-                private Pattern pattern = Pattern.compile("[^:?%#\\[\\]@]*");
-
-                @Override
-                public boolean accept(File f) {
-                    if (!pattern.matcher(f.getName()).matches()) {
-                        System.out.println(f.getAbsolutePath() + " is an invalid filename");
-                        return false;
-                    }
-                    return true;
-                }
-
-                @Override
-                public String getDescription() {
-                    return MCRUploadApplet.this.translateI18N("MCRUploadApplet.filefilter.label");
-                }
-            });
+            locationChooser.setFileFilter(new InvalidFileNameFilter());
         }
 
         if (lastDirectory != null) {
@@ -327,4 +312,24 @@ public class MCRUploadApplet extends JApplet {
         }
     }
 
+    /**
+     * Class filters files invalid file names for upload.
+     */
+    private class InvalidFileNameFilter extends FileFilter {
+        private Pattern pattern = Pattern.compile("[^:?%#\\[\\]@]*");
+
+        @Override
+        public boolean accept(File f) {
+            if (!pattern.matcher(f.getName()).matches()) {
+                System.out.println(f.getAbsolutePath() + " is an invalid filename");
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public String getDescription() {
+            return MCRUploadApplet.this.translateI18N("MCRUploadApplet.filefilter.label");
+        }
+    }
 }
