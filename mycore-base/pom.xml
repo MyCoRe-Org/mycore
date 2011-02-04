@@ -1,5 +1,6 @@
-<?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <artifactId>mycore</artifactId>
     <groupId>org.mycore</groupId>
@@ -81,26 +82,29 @@
             <phase>compile</phase>
             <configuration>
               <tasks>
-                <path id="compile.classpath" refid="maven.compile.classpath" />
-                <property name="target.applet.classes" location="${project.build.directory}/applet-classes" />
+                <path id="compile.classpath" refid="maven.compile.classpath"/>
+                <property name="target.applet.classes" location="${project.build.directory}/applet-classes"/>
                 <path id="sources.path">
-                  <dirset dir="${basedir}" includes="src/main/java" />
+                  <dirset dir="${basedir}" includes="src/main/java"/>
                 </path>
-                <echo message="compile classpath: ${compile.classpath}" />
-                <echo message="target directory: ${target.applet.classes}" />
-                <mkdir dir="${target.applet.classes}" />
-                <javac destdir="${target.applet.classes}" includes="org/mycore/frontend/fileupload/**" excludes="org/mycore/frontend/fileupload/*Handler* org/mycore/frontend/fileupload/*Servlet*" classpathref="compile.classpath" debug="true" optimize="true" target="1.5" source="1.5" encoding="UTF-8" fork="yes" deprecation="off">
+                <echo message="compile classpath: ${compile.classpath}"/>
+                <echo message="target directory: ${target.applet.classes}"/>
+                <mkdir dir="${target.applet.classes}"/>
+                <javac destdir="${target.applet.classes}" includes="org/mycore/frontend/fileupload/**"
+                  excludes="org/mycore/frontend/fileupload/*Handler* org/mycore/frontend/fileupload/*Servlet*"
+                  classpathref="compile.classpath" debug="true" optimize="true" target="1.5" source="1.5" encoding="UTF-8"
+                  fork="yes" deprecation="off">
                   <src>
-                    <path refid="sources.path" />
+                    <path refid="sources.path"/>
                   </src>
                 </javac>
                 <copy todir="${target.applet.classes}">
                   <fileset dir="${basedir}/src/main/applet-resources">
-                    <include name="**/*" />
+                    <include name="**/*"/>
                   </fileset>
                 </copy>
                 <jar jarfile="${project.build.outputDirectory}/uploadApplet-unsigned.jar">
-                  <fileset dir="${target.applet.classes}" />
+                  <fileset dir="${target.applet.classes}"/>
                 </jar>
               </tasks>
             </configuration>
@@ -141,9 +145,7 @@
           </excludes>
           <property>
             <name>known.issues</name>
-            <value>
-              org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImplTest#testHasLinks
-            </value>
+            <value> org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImplTest#testHasLinks </value>
           </property>
         </configuration>
       </plugin>
@@ -155,7 +157,7 @@
             <manifest>
               <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
               <mainClass>org.mycore.common.MCRCoreVersion</mainClass>
-              <addExtensions />
+              <addExtensions/>
             </manifest>
             <manifestEntries>
               <Implementation-Build>${buildNumber}</Implementation-Build>
