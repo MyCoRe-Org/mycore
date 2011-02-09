@@ -133,6 +133,7 @@ public class MCRUploadApplet extends JApplet {
             locationChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
             locationChooser.setFileFilter(new FileFilter() {
                 Set accepted = new HashSet();
+
                 MCRUploadApplet.InvalidFileNameFilter ifnf = new MCRUploadApplet.InvalidFileNameFilter();
 
                 @Override
@@ -159,7 +160,7 @@ public class MCRUploadApplet extends JApplet {
         if (lastDirectory != null) {
             locationChooser.setCurrentDirectory(lastDirectory);
         } else {
-            File userHome = new File(System.getenv("HOME"));
+            File userHome = new File(System.getProperty("user.home"));
             locationChooser.setCurrentDirectory(userHome);
         }
 
