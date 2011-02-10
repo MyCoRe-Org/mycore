@@ -287,7 +287,7 @@ public class MCRServlet extends HttpServlet {
         msg.append(" ip=");
         msg.append(getRemoteAddr(job.getRequest()));
         msg.append(" mcr=").append(session.getID());
-        msg.append(" user=").append(session.getCurrentUserID());
+        msg.append(" user=").append(session.getUserInformation().getCurrentUserID());
         LOGGER.info(msg.toString());
 
         String lang = getProperty(job.getRequest(), "lang");
