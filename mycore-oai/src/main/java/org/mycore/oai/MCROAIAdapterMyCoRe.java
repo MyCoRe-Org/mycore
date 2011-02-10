@@ -97,9 +97,9 @@ public class MCROAIAdapterMyCoRe extends MCROAIAdapter {
         }
         LOGGER.info("Getting identifiers of deleted items");
         List<String> deletedItems = new Vector<String>();
+        String q = "SELECT DISTINCT identifier FROM mcrdeleteditems WHERE ";
         try {
             MCRHIBConnection conn = MCRHIBConnection.instance();
-            String q = "SELECT DISTINCT identifier FROM mcrdeleteditems WHERE ";
             if (from != null && until != null) {
                 q += "date_deleted >= '" + from + "' and date_deleted <= '" + until + "'";
             } else if (from != null) {
@@ -112,6 +112,7 @@ public class MCROAIAdapterMyCoRe extends MCROAIAdapter {
             deletedItems = conn.getSession().createSQLQuery(q).list();
         } catch (Exception ex) {
             LOGGER.warn("Could not retrieve identifiers of deleted objects", ex);
+            LOGGER.warn("Executed query was \"" + q + "\"");
         }
         return deletedItems;
     }
