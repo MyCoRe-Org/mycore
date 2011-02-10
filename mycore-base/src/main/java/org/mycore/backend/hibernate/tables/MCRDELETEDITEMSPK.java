@@ -21,7 +21,11 @@ public class MCRDELETEDITEMSPK implements Serializable {
     private String identifier;
 
     private Date dateDeleted;
-
+    
+    public MCRDELETEDITEMSPK(){
+        
+    }
+    
     public MCRDELETEDITEMSPK(String identifier, Date dateDeleted) {
         this.identifier = identifier;
         this.dateDeleted = dateDeleted;
