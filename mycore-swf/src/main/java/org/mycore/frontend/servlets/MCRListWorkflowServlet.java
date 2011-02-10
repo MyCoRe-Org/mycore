@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.sax.TransformerHandler;
 
 import org.apache.log4j.Logger;
@@ -43,7 +44,6 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLHelper;
@@ -72,24 +72,22 @@ import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
  * <b>.../servlets/MCRListWorkflowServlet/XSL.Style=xml&type=...&step=... </b>
  * 
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date: 2010-12-29 09:18:22 +0100 (Mi, 29. Dez
+ *          2010) $
  */
 public class MCRListWorkflowServlet extends MCRServlet {
 
     private static final long serialVersionUID = 1L;
 
-    // The LOGGER
     private static Logger LOGGER = Logger.getLogger(MCRListWorkflowServlet.class.getName());
 
-    // The workflow manager
     private static MCRSimpleWorkflowManager WFM = null;
 
-    // The file slash
     private static String SLASH = System.getProperty("file.separator");
 
     private static String DefaultLang = null;
 
-    /** Initialisation of the servlet */
+    /** Initialization of the servlet */
     public void init() throws MCRConfigurationException, javax.servlet.ServletException {
         super.init();
         WFM = MCRSimpleWorkflowManager.instance();
@@ -101,7 +99,8 @@ public class MCRListWorkflowServlet extends MCRServlet {
      * in the LayoutService. <br />
      * Input parameter are <br />
      * <ul>
-     * <li>type - the MyCoRe type</li>
+     * <li>base - the MyCoRe ID base or</li>
+     * <li>type - the MyCoRe ID type</li>
      * <li>step - the workflow step</li>
      * </ul>
      * 
@@ -109,34 +108,43 @@ public class MCRListWorkflowServlet extends MCRServlet {
      *            an instance of MCRServletJob
      */
     public void doGetPost(MCRServletJob job) throws Exception {
-        // get the base
         String base = getProperty(job.getRequest(), "base");
         if (base != null) {
             base = base.trim();
-            LOGGER.debug("MCRListWorkflowServlet : base = " + base);
+            LOGGER.debug("Property from request : base = " + base);
         }
 
-        // get the type
         String type = getProperty(job.getRequest(), "type");
         if (type != null) {
             type = type.trim();
-            LOGGER.debug("MCRListWorkflowServlet : type = " + type);
+            LOGGER.debug("Property from request : type = " + type);
         }
 
-        // get the step
         String step = getProperty(job.getRequest(), "step");
         if (step != null) {
             step = step.trim();
-            LOGGER.debug("MCRListWorkflowServlet : step = " + step);
+            LOGGER.debug("Property from request : step = " + step);
         }
+
+        String with_derivate = getProperty(job.getRequest(), "with_derivate");
+        if (with_derivate != null) {
+            with_derivate = with_derivate.trim();
+            if (!with_derivate.equals("true"))
+                with_derivate = "false";
+        } else {
+            with_derivate = "false";
+        }
+        LOGGER.debug("Property from request : with_derivate = " + with_derivate);
 
         if (((base == null) && (type == null)) || (step == null)) {
-            throw new MCRException("Wrong parameter input.");
+            String msg = "Error: HTTP request has no base or type argument";
+            LOGGER.error(msg);
+            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
+            return;
         }
 
-        // get the lang
         String lang = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
-        LOGGER.debug("MCRListWorkflowServlet : lang = " + lang);
+        LOGGER.debug("Property from request : lang = " + lang);
 
         if (type == null) {
             int ibase = base.indexOf('_');
@@ -146,7 +154,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
                 type = base.substring(ibase + 1);
             }
         }
-        // read directory
+
         ArrayList<String> workfiles;
         ArrayList<String> derifiles;
 
@@ -246,8 +254,14 @@ public class MCRListWorkflowServlet extends MCRServlet {
         // build the frame of mcr_workflow
         org.jdom.Element root = new org.jdom.Element("mcr_workflow");
         root.addNamespaceDeclaration(XSI_NAMESPACE);
+        if (base != null) {
+            root.setAttribute("base", base);
+        } else {
+            root.setAttribute("base", "");
+        }
         root.setAttribute("type", type);
         root.setAttribute("step", step);
+        root.setAttribute("with_derivate", with_derivate);
 
         org.jdom.Document workflow_in = null;
         org.jdom.Element writewf = null;

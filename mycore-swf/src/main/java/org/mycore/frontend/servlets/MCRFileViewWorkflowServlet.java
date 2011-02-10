@@ -33,26 +33,34 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRException;
+import org.mycore.access.MCRAccessManager;
+import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
+import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
 
 /**
- * This servlet read a digital object from the workflow and put it to the web.
- * <br />
+ * This servlet read a digital object from the workflow and put it to the web. <br />
  * Call this servlet with <b>.../servlets/MCRFileViewWorkflowServlet/
- * <em>path_to_file</em> ?type=... </b>
+ * <em>path_to_file</em> ?[base=... | type=...]</b>
  * 
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date: 2009-07-28 11:32:04 +0200 (Di, 28. Jul
+ *          2009) $
  */
 public class MCRFileViewWorkflowServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
-    // The configuration
     private static Logger LOGGER = Logger.getLogger(MCRFileViewWorkflowServlet.class.getName());
+
+    private static MCRSimpleWorkflowManager WFM = null;
+
+    /** Initialization of the servlet */
+    public void init() throws MCRConfigurationException, javax.servlet.ServletException {
+        super.init();
+        WFM = MCRSimpleWorkflowManager.instance();
+    }
 
     /**
      * This method overrides doGetPost of MCRServlet and responds the file
@@ -61,64 +69,83 @@ public class MCRFileViewWorkflowServlet extends MCRServlet {
         HttpServletRequest req = job.getRequest();
         HttpServletResponse res = job.getResponse();
 
-        // check the request path
         String requestPath = req.getPathInfo();
-        LOGGER.info("MCRFileViewWorkflowServlet: request path = " + requestPath);
-
+        LOGGER.debug("Request path = " + requestPath);
         if (requestPath == null) {
             String msg = "Error: HTTP request path is null";
             LOGGER.error(msg);
-            generateErrorPage(req, res, HttpServletResponse.SC_BAD_REQUEST, msg, new MCRException("No path was given in the request"),
-                    false);
-
+            res.sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
             return;
         }
-
         if (requestPath.length() <= 1) {
             String msg = "Error: HTTP request path is empty";
             LOGGER.error(msg);
-            generateErrorPage(req, res, HttpServletResponse.SC_BAD_REQUEST, msg, new MCRException("Empty path was given in the request"),
-                    false);
+            res.sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
+            return;
+        }
+        String file = requestPath.substring(1, requestPath.length());
 
+        String base = getProperty(job.getRequest(), "base");
+        if (base != null) {
+            base = base.trim();
+            LOGGER.debug("Property from request : base = " + base);
+        }
+
+        String type = getProperty(job.getRequest(), "type").trim();
+        if (type != null) {
+            type = type.trim();
+            LOGGER.debug("Property from request : type = " + type);
+        }
+
+        if (base == null && type == null) {
+            String msg = "Error: HTTP request has no base or type argument";
+            LOGGER.error(msg);
+            res.sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
             return;
         }
 
-        String file = requestPath.substring(1, requestPath.length());
+        boolean haspriv = MCRAccessManager.checkPermission("create-" + base);
+        if (!haspriv)
+            haspriv = MCRAccessManager.checkPermission("create-" + type);
 
-        // get the type
-        String type = getProperty(job.getRequest(), "type").trim();
-        LOGGER.debug("MCRFileViewWorkflowServlet : type = " + type);
+        if (!haspriv) {
+            LOGGER.warn("The user has no privileges!");
+            return;
+        }
 
-        // check the privileg
-        boolean haspriv = true;
+        File dirname = null;
+        if (base != null) {
+            dirname = WFM.getDirectoryPath(base);
+        } else {
+            dirname = WFM.getDirectoryPath(type);
+        }
+        if (dirname == null) {
+            LOGGER.warn("Can't get directory for base or type property!");
+            return;
+        }
 
-        // read the file and write to output
-        String dirname = MCRConfiguration.instance().getString("MCR.editor_" + type + "_directory", null);
+        File in = new File(dirname, file);
 
-        if ((dirname != null) && haspriv) {
-            File in = new File(dirname, file);
+        if (in.isFile()) {
+            FileInputStream fin = new FileInputStream(in);
+            MCRContentInputStream cis = new MCRContentInputStream(fin);
+            OutputStream out = new BufferedOutputStream(job.getResponse().getOutputStream());
+            try {
+                byte[] header = cis.getHeader();
+                String mime = MCRFileContentTypeFactory.detectType(in.getName(), header).getMimeType();
+                LOGGER.debug("MimeType = " + mime);
+                job.getResponse().setContentType(mime);
+                fin = new FileInputStream(in);
+                job.getResponse().setContentLength((int) (in.length()));
 
-            if (in.isFile()) {
-                FileInputStream fin = new FileInputStream(in);
-                MCRContentInputStream cis = new MCRContentInputStream(fin);
-                OutputStream out = new BufferedOutputStream(job.getResponse().getOutputStream());
-                try {
-                    byte[] header = cis.getHeader();
-                    String mime = MCRFileContentTypeFactory.detectType(in.getName(), header).getMimeType();
-                    LOGGER.debug("MimeType = " + mime);
-                    job.getResponse().setContentType(mime);
-                    fin = new FileInputStream(in);
-                    job.getResponse().setContentLength((int) (in.length()));
-
-                    MCRUtils.copyStream(fin, out);
-                } finally {
-                    out.close();
-                    fin.close();
-                    cis.close();
-                }
-            } else {
-                LOGGER.warn("File " + in.getName() + " not found.");
+                MCRUtils.copyStream(fin, out);
+            } finally {
+                out.close();
+                fin.close();
+                cis.close();
             }
+        } else {
+            LOGGER.warn("File " + in.getName() + " not found.");
         }
     }
 }

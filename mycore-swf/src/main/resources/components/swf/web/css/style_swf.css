@@ -1,0 +1,206 @@
+@charset "UTF-8";
+
+/**
+ * "Component SWF" 
+ *
+ * @creator       Kupferschmidt
+ * @file          style_swf.css
+ * @myIHS		  1.0
+ */
+
+#swf_workflow_common_list {
+  width:100%;
+}
+
+#swf_workflow_common_list .item_var {
+  border:1px solid #000000;
+}
+
+#swf_workflow_common_list .item_const_ltr {
+  margin-bottom:10px;
+}
+
+#swf_workflow_common_list .item_const_rtl {
+  margin-bottom:10px;
+}
+
+#swf_workflow_common_list .headline_var {
+  background-color:#CEDEEE;
+}
+
+#swf_workflow_common_list .headline_const_ltr {
+  padding:3px;
+}
+
+#swf_workflow_common_list .headline_const_rtl {
+  padding:3px;
+}
+
+#swf_workflow_common_list .headline_label_var {
+}
+
+#swf_workflow_common_list .headline_label_const_ltr {
+  float:left;
+  width:400px;
+}
+
+#swf_workflow_common_list .headline_label_const_rtl {
+  text-align:right;
+}
+
+#swf_workflow_common_list .headline_id_var {
+}
+
+#swf_workflow_common_list .headline_id_const_ltr {
+}
+
+#swf_workflow_common_list .headline_id_const_rtl {
+  float:left;
+  width:300px;
+  text-align:right;
+}
+
+#swf_workflow_common_list .dataline_var {
+  background-color:#F3F7FD;
+}
+
+#swf_workflow_common_list .dataline_const_ltr {
+  padding:3px;
+}
+
+#swf_workflow_common_list .dataline_const_rtl {
+  padding:3px;
+}
+
+#swf_workflow_common_list .dataline_label_var {
+}
+
+#swf_workflow_common_list .dataline_label_const_ltr {
+  float:left;
+  width:400px;
+}
+
+#swf_workflow_common_list .dataline_label_const_rtl {
+  text-align:right;
+}
+
+#swf_workflow_common_list .dataline_icons_var {
+}
+
+#swf_workflow_common_list .dataline_icons_const_ltr {
+}
+
+#swf_workflow_common_list .dataline_icons_const_rtl {
+  float:left;
+  width:300px;
+  text-align:right;
+}
+
+#swf_workflow_common_list .icon {
+  border:0px;
+  width:35px;
+  text-align:center;
+}
+
+#swf_workflow_common_list .derivateline_var {
+  background-color:#F3F7FD;
+}
+
+#swf_workflow_common_list .derivateline_const_ltr {
+  padding:3px;
+}
+
+#swf_workflow_common_list .derivateline_const_rtl {
+  padding:3px;
+}
+
+#swf_workflow_common_list .derivateline_label_var {
+}
+
+#swf_workflow_common_list .derivateline_label_const_ltr {
+  float:left;
+  width:400px;
+}
+
+#swf_workflow_common_list .derivateline_label_const_rtl {
+  text-align:right;
+  min-height:30px;
+}
+
+#swf_workflow_common_list .derivateline_icons_var {
+}
+
+#swf_workflow_common_list .derivateline_icons_const_ltr {
+}
+
+#swf_workflow_common_list .derivateline_icons_const_rtl {
+  float:left;
+  width:300px;
+  text-align:right;
+}
+
+#swf_workflow_common_list .button {
+  border:0px;
+}
+
+#swf_workflow_common_list .derivatefiles_var {
+  background-color:#F3F7FD;
+}
+
+#swf_workflow_common_list .derivatefiles_const_ltr {
+  padding:3px;
+}
+
+#swf_workflow_common_list .derivatefiles_const_rtl {
+  padding:3px;
+}
+
+#swf_workflow_common_list .derivatefiles_active_var {
+}
+
+#swf_workflow_common_list .derivatefiles_active_const_ltr {
+  float:left;
+  width:35px;
+  text-align:center;
+}
+
+#swf_workflow_common_list .derivatefiles_active_const_rtl {
+  clear:float;
+  text-align:center;
+}
+
+#swf_workflow_common_list .derivatefiles_filename_var {
+}
+
+#swf_workflow_common_list .derivatefiles_filename_const_ltr {
+  float:left;
+  width:630px;
+}
+
+#swf_workflow_common_list .derivatefiles_filename_const_rtl {
+  float:left;
+  width:630px;
+  text-align:right;
+}
+
+#swf_workflow_common_list .derivatefiles_delete_var {
+}
+
+#swf_workflow_common_list .derivatefiles_delete_const_ltr {
+  text-align:center;
+  clear:float;
+}
+
+#swf_workflow_common_list .derivatefiles_delete_const_rtl {
+  float:left;
+  width:35px;
+  text-align:center;
+}
+
+#swf_workflow_common_list .text_var {
+}
+
+#swf_workflow_common_list .text_const_ltr {
+  margin:auto;
+  text-align:center;
+}
