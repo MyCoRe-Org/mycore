@@ -23,13 +23,19 @@
 package org.mycore.oai;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Criteria;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.hibernate.tables.MCRDELETEDITEMS;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -97,22 +103,35 @@ public class MCROAIAdapterMyCoRe extends MCROAIAdapter {
         }
         LOGGER.info("Getting identifiers of deleted items");
         List<String> deletedItems = new Vector<String>();
-        String q = "SELECT DISTINCT identifier FROM mcrdeleteditems WHERE ";
         try {
+            // the date formatter for parsing the from and until values
+            SimpleDateFormat dateParser = new SimpleDateFormat("yyyy-MM-dd");
+
+            // building the query
             MCRHIBConnection conn = MCRHIBConnection.instance();
+            Criteria criteria = conn.getSession().createCriteria(MCRDELETEDITEMS.class);
+            criteria.setProjection(Projections.property("id.identifier"));
+
             if (from != null && until != null) {
-                q += "date_deleted >= '" + from + "' and date_deleted <= '" + until + "'";
+                // we must set the time of the date manually to 23:59:59
+                Date untilAsDate = dateParser.parse(until);
+                Calendar myCal = Calendar.getInstance();
+                myCal.setTime(untilAsDate);
+                myCal.set(Calendar.HOUR_OF_DAY, 23);
+                myCal.set(Calendar.MINUTE, 59);
+                myCal.set(Calendar.SECOND, 59);
+                Criterion lowerBound = Restrictions.ge("id.dateDeleted", dateParser.parse(from));
+                Criterion upperBound = Restrictions.le("id.dateDeleted", myCal.getTime());
+                criteria.add(Restrictions.and(lowerBound, upperBound));
             } else if (from != null) {
-                q += "date_deleted >= '" + from + "'";
+                criteria.add(Restrictions.ge("id.dateDeleted", dateParser.parse(from)));
             } else if (until != null) {
-                q += "date_deleted <= '" + until + "'";
-            } else {
-                q += "true";
+                criteria.add(Restrictions.le("id.dateDeleted", dateParser.parse(until)));
             }
-            deletedItems = conn.getSession().createSQLQuery(q).list();
+
+            deletedItems = criteria.list();
         } catch (Exception ex) {
             LOGGER.warn("Could not retrieve identifiers of deleted objects", ex);
-            LOGGER.warn("Executed query was \"" + q + "\"");
         }
         return deletedItems;
     }
