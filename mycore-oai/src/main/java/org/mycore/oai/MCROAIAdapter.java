@@ -22,6 +22,8 @@
 
 package org.mycore.oai;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 
@@ -122,5 +124,20 @@ public abstract class MCROAIAdapter {
      */
     public void setDeletedRecordPolicy(String policy) {
         this.recordPolicy = policy;
+    }
+
+    /**
+     * Sets the time of the until date to 23:59:59
+     * 
+     * @param until
+     *            the until date
+     */
+    protected Date modifyUntilDate(Date until) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(until);
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        return calendar.getTime();
     }
 }

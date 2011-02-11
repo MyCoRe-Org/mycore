@@ -113,20 +113,13 @@ public class MCROAIAdapterMyCoRe extends MCROAIAdapter {
             criteria.setProjection(Projections.property("id.identifier"));
 
             if (from != null && until != null) {
-                // we must set the time of the date manually to 23:59:59
-                Date untilAsDate = dateParser.parse(until);
-                Calendar myCal = Calendar.getInstance();
-                myCal.setTime(untilAsDate);
-                myCal.set(Calendar.HOUR_OF_DAY, 23);
-                myCal.set(Calendar.MINUTE, 59);
-                myCal.set(Calendar.SECOND, 59);
                 Criterion lowerBound = Restrictions.ge("id.dateDeleted", dateParser.parse(from));
-                Criterion upperBound = Restrictions.le("id.dateDeleted", myCal.getTime());
+                Criterion upperBound = Restrictions.le("id.dateDeleted", modifyUntilDate(dateParser.parse(until)));
                 criteria.add(Restrictions.and(lowerBound, upperBound));
             } else if (from != null) {
                 criteria.add(Restrictions.ge("id.dateDeleted", dateParser.parse(from)));
             } else if (until != null) {
-                criteria.add(Restrictions.le("id.dateDeleted", dateParser.parse(until)));
+                criteria.add(Restrictions.le("id.dateDeleted", modifyUntilDate(dateParser.parse(until))));
             }
 
             deletedItems = criteria.list();
