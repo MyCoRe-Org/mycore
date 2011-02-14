@@ -1,5 +1,5 @@
 function log(logMessage) {
-    if (console) {
+    if (typeof console != "undefined") {
         console.log(logMessage);
     }
 }
