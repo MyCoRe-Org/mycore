@@ -139,7 +139,7 @@ iview.cutOut.View = function() {
 			setSrc(this, args.value);
 			break;
 		default:
-			if (console && console.log) {
+			if (typeof console != "undefined") {
 				console.log ("got unknown type " + args.type);
 			}
 		}

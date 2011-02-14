@@ -288,7 +288,7 @@ iview.chapter.Controller = function(modelProvider, physicalModelProvider, view) 
 		try {
 			this._view.selectNode(this._model._containedIn[this._physicalModel.getCurPos()].getID());
 		} catch (err) {
-			if (console){
+			if (typeof console != "undefined"){
 				console.log(err);
 			}
 		}

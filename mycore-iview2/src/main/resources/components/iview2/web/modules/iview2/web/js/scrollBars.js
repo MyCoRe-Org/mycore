@@ -863,7 +863,7 @@ iview.scrollbar.View = function() {
 				applySize(this);
 				break;
 			default:
-				if (console) {
+				if (typeof console != "undefined") {
 					console.log("Got:"+args.type+" as argument type, don't know what to do with it");
 				}
 		}

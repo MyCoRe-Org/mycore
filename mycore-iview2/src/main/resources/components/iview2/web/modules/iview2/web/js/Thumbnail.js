@@ -936,7 +936,7 @@ function startFileLoaded(viewID){
 			processMETS(response,viewID);
 		},
   		error: function(request, status, exception) {
-  			if(console){
+  			if(typeof console != "undefined"){
   				console.log("Error Occured while Loading METS file:\n"+exception);
   			}
   		}

@@ -695,7 +695,7 @@ iview.METS.ChapterModel = function(element) {
 	function addHash(entry) {
 		var that = arguments[1] || this;
 		if (getHash(entry.getID(), that) != null) {
-			if (console) {
+			if (typeof console != "undefined") {
 				console.log("Entry with the ID "+entry.getID() +" already exists. Element will not be added to List");
 			}
 			return;
