@@ -157,9 +157,7 @@ iview.Permalink.Controller.prototype = {
 	 */
 	_update: function() {
 		var viewer = this.getViewer();
-		var url = window.location.host + window.location.pathname + "?" + window.location.search.replace(/[?|&](x|y|page|zoom|tosize|maximized|css)=([^&]*)/g,"").replace(/\?/,"");
-		
-		url += "&page="+viewer.curImage;
+		var url = "&page="+viewer.curImage;
 		url += "&zoom="+viewer.viewerBean.zoomLevel;
 		url += "&x="+viewer.viewerBean.x;
 		url += "&y="+viewer.viewerBean.y;
@@ -174,6 +172,6 @@ iview.Permalink.Controller.prototype = {
 		url += "&maximized="+viewer.maximized;
 		url += "&css="+styleName;
 		
-		return url;
+		return window.location.host + window.location.pathname + "?" + window.location.search.replace(/[?|&](x|y|page|zoom|tosize|maximized|css)=([^&]*)/g,"").replace(/\?/,"") + encodeURI(url);
 	}
 };
