@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,10 +40,9 @@ import org.jdom.JDOMException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs2.MCRMetadataStore;
-import org.mycore.datamodel.ifs2.MCRMetadataVersion;
-import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
 import org.mycore.datamodel.ifs2.MCRVersioningMetadataStore;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -74,8 +72,6 @@ public class MCRObjectServlet extends MCRServlet {
     private static final Pattern SEARCH_ID_PATTERN = Pattern.compile("[\\?&]id=([^&]+)");
 
     private static final String EDITOR_ID_TABLE_KEY = "MCRObjectServlet.editorIds";
-
-    private static final int REV_LATEST = -1;
 
     private static final int REV_CURRENT = 0;
 
@@ -181,26 +177,14 @@ public class MCRObjectServlet extends MCRServlet {
 
     private Document requestVersionedObject(MCRServletJob job, long rev) throws JDOMException, Exception {
         MCRObjectID mcrid = getMCRObjectID(job);
-        if (mcrid == null)
+        if (mcrid == null) {
             return null;
-        MCRMetadataStore metadataStore = TM.getStore(mcrid);
+        }
+        MCRMetadataStore metadataStore = MCRXMLMetadataManager.instance().getStore(mcrid);
         if (metadataStore instanceof MCRVersioningMetadataStore) {
-            MCRVersioningMetadataStore verStore = (MCRVersioningMetadataStore) metadataStore;
-            MCRVersionedMetadata versionedMetadata = verStore.retrieve(mcrid.getNumberAsInteger());
-            List<MCRMetadataVersion> versions = versionedMetadata.listVersions();
-            if (rev == REV_LATEST && versions.size() > 0) {
-                //request latest available revision
-                MCRMetadataVersion lastVersion = versions.get(versions.size() - 1);
-                if (lastVersion.getType() == MCRMetadataVersion.DELETED) {
-                    lastVersion = versions.get(versions.size() - 2);
-                }
-                return lastVersion.retrieve().asXML();
-            }
-            for (MCRMetadataVersion version : versions) {
-                //request specific revision
-                if (version.getRevision() == rev) {
-                    return version.retrieve().asXML();
-                }
+            Document doc = MCRUtils.requestVersionedObject(mcrid, rev);
+            if(doc != null) {
+                return doc;
             }
             job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND, getErrorI18N("revisionNotFound", rev, mcrid));
             return null;

@@ -134,7 +134,13 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore {
                 String objectId = arHitBlob[i];
                 MCRObject object = null;
                 if (!MCRMetadataManager.exists(MCRObjectID.getInstance(objectId))) {
-                    Document xml = MCRUtils.requestVersionedObject(MCRObjectID.getInstance(objectId), -1);
+                    Document xml = null;
+                    try {
+                        xml = MCRUtils.requestVersionedObject(MCRObjectID.getInstance(objectId), -1);
+                    } catch(Exception exc) {
+                        logger.error("Error occured while retrieving current revision for object " +
+                                      objectId, exc);
+                    }
                     if (xml != null) {
                         object = new MCRObject(xml);
                     } else {

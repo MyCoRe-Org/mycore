@@ -229,27 +229,30 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
      * repository
      * 
      * @return all stored versions of this metadata object
-     * @throws SVNException 
      */
-    public List<MCRMetadataVersion> listVersions() throws SVNException {
-        List<MCRMetadataVersion> versions = new ArrayList<MCRMetadataVersion>();
-        SVNRepository repository = getStore().getRepository();
-        String path = store.getSlotPath(id);
+    public List<MCRMetadataVersion> listVersions() throws IOException {
+        try {
+            List<MCRMetadataVersion> versions = new ArrayList<MCRMetadataVersion>();
+            SVNRepository repository = getStore().getRepository();
+            String path = store.getSlotPath(id);
 
-        String dir = path.contains("/") ? path.substring(0, path.lastIndexOf('/')) : "";
-        @SuppressWarnings("unchecked")
-        Collection<SVNLogEntry> entries = repository.log(new String[] { dir }, null, 0, -1, true, true);
-
-        path = "/" + path;
-        for (SVNLogEntry entry : entries) {
+            String dir = path.contains("/") ? path.substring(0, path.lastIndexOf('/')) : "";
             @SuppressWarnings("unchecked")
-            Map<String, SVNLogEntryPath> paths = entry.getChangedPaths();
-            if (paths.containsKey(path)) {
-                char type = paths.get(path).getType();
-                versions.add(new MCRMetadataVersion(this, entry, type));
+            Collection<SVNLogEntry> entries = repository.log(new String[] { dir }, null, 0, -1, true, true);
+
+            path = "/" + path;
+            for (SVNLogEntry entry : entries) {
+                @SuppressWarnings("unchecked")
+                Map<String, SVNLogEntryPath> paths = entry.getChangedPaths();
+                if (paths.containsKey(path)) {
+                    char type = paths.get(path).getType();
+                    versions.add(new MCRMetadataVersion(this, entry, type));
+                }
             }
+            return versions;
+        } catch(SVNException svnExc) {
+            throw new IOException(svnExc);
         }
-        return versions;
     }
 
     /**

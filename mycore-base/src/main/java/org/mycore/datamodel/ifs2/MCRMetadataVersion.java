@@ -24,9 +24,12 @@
 package org.mycore.datamodel.ifs2;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Date;
 
+import org.jdom.JDOMException;
 import org.mycore.common.MCRUsageException;
+import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.io.SVNRepository;
 
@@ -149,16 +152,20 @@ public class MCRMetadataVersion {
      * @throws MCRUsageException
      *             if this is a deleted version, which can not be retrieved
      */
-    public MCRContent retrieve() throws Exception {
+    public MCRContent retrieve() throws IOException {
         if (type == DELETED) {
             String msg = "You can not retrieve a deleted version, retrieve a previous version instead";
             throw new MCRUsageException(msg);
         }
-        SVNRepository repository = vm.getStore().getRepository();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        repository.getFile(vm.getStore().getSlotPath(vm.getID()), revision, null, baos);
-        baos.close();
-        return MCRContent.readFrom(baos.toByteArray());
+        try {
+            SVNRepository repository = vm.getStore().getRepository();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            repository.getFile(vm.getStore().getSlotPath(vm.getID()), revision, null, baos);
+            baos.close();
+            return MCRContent.readFrom(baos.toByteArray());
+        } catch (SVNException e) {
+            throw new IOException(e);
+        }
     }
 
     /**
@@ -167,7 +174,7 @@ public class MCRMetadataVersion {
      * version. The stored metadata document is updated to this old version of
      * the metadata.
      */
-    public void restore() throws Exception {
+    public void restore() throws IOException, JDOMException {
         vm.update(retrieve());
     }
 }

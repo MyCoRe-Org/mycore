@@ -15,6 +15,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
@@ -29,12 +30,16 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
+import org.jdom.Document;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -176,6 +181,16 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         com = new MCRCommand("set mode {0} of searcher for index {1}",
                 "org.mycore.frontend.cli.MCRObjectCommands.notifySearcher String String",
                 "Notify Searcher of Index {1} what is going on {0}.");
+        command.add(com);
+        
+        com = new MCRCommand("list revisions of {0}",
+                "org.mycore.frontend.cli.MCRObjectCommands.listRevisions String",
+                "List revisions of MCRObject.");
+        command.add(com);
+        
+        com = new MCRCommand("restore {0} to revision {1}",
+                "org.mycore.frontend.cli.MCRObjectCommands.restoreToRevision String int",
+                "Restores the selected MCRObject to the selected revision.");
         command.add(com);
     }
 
@@ -926,5 +941,63 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     public static final void notifySearcher(String mode, String index) {
         MCRSearcher searcher = MCRSearcherFactory.getSearcherForIndex(index);
         searcher.notifySearcher(mode);
+    }
+
+    /**
+     * List revisions of an MyCoRe Object.
+     * 
+     * @param id
+     *            id of MyCoRe Object
+     */
+    public static final void listRevisions(String id) {
+        MCRObjectID mcrId = MCRObjectID.getInstance(id);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            StringBuffer log = new StringBuffer("Revisions:\n");
+            List<MCRMetadataVersion> revisions = MCRUtils.listRevisions(mcrId);
+            for(MCRMetadataVersion revision : revisions) {
+               log.append(revision.getRevision()).append(" ");
+               log.append(revision.getType()).append(" ");
+               log.append(sdf.format(revision.getDate())).append(" ");
+               log.append(revision.getUser());
+               log.append("\n");
+            }
+            LOGGER.info(log.toString());
+        } catch(Exception exc) {
+            LOGGER.error("While print revisions.", exc);
+        }
+    }
+
+    /**
+     * This method restores a MyCoRe Object to the selected revision. Please note
+     * that children and derivates are not deleted or reverted!
+     *
+     * @param id
+     *            id of MyCoRe Object
+     * @param revision
+     *            revision to restore
+     * @throws MCRActiveLinkException
+     *             if object is created (no real update), see
+     *             {@link #create(MCRObject)}
+     */
+    public static final void restoreToRevision(String id, int revision) throws MCRActiveLinkException {
+        LOGGER.info("Try to restore object " + id + " with revision " + revision);
+        MCRObjectID mcrId = MCRObjectID.getInstance(id);
+        // get xml of revision
+        Document xml = null;
+        try {
+            xml = MCRUtils.requestVersionedObject(mcrId, revision);
+            if(xml == null) {
+                LOGGER.warn("No such object " + id + " with revision " + revision);
+                return;
+            }
+        } catch(Exception e) {
+            LOGGER.error("While retrieving object " + id + " with revision " + revision, e);
+            return;
+        }
+        // store it
+        MCRObject mcrObj = new MCRObject(xml);
+        MCRMetadataManager.update(mcrObj);
+        LOGGER.info("Object " + id + " successfully restored!");
     }
 }

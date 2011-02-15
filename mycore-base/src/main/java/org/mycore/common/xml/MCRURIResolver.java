@@ -81,8 +81,6 @@ import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.ifs2.MCRStoredMetadata;
-import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
-import org.mycore.datamodel.ifs2.MCRVersioningMetadataStore;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.services.fieldquery.MCRQuery;
@@ -1329,17 +1327,14 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         public Source resolve(String href, String base) throws TransformerException {
             String id = href.substring(href.indexOf(":") + 1);
             LOGGER.debug("Reading version info of MCRObject with ID " + id);
-            String[] idParts = id.split("_");
-            int intID = Integer.parseInt(idParts[2]);
-            MCRMetadataStore metadataStore = MCRXMLMetadataManager.instance().getStore(idParts[0], idParts[1]);
+            MCRObjectID mcrId = MCRObjectID.getInstance(id);
             try {
-                if (metadataStore instanceof MCRVersioningMetadataStore) {
-                    MCRVersioningMetadataStore vms = (MCRVersioningMetadataStore) metadataStore;
-                    MCRVersionedMetadata versionedMetadata = vms.retrieve(intID);
-                    List<MCRMetadataVersion> versions = versionedMetadata.listVersions();
+                List<MCRMetadataVersion> versions = MCRUtils.listRevisions(mcrId);
+                if(versions != null && !versions.isEmpty()) {
                     return getSource(versions);
                 } else {
-                    return getSource(metadataStore.retrieve(intID));
+                    MCRMetadataStore metadataStore = MCRXMLMetadataManager.instance().getStore(id);
+                    return getSource(metadataStore.retrieve(mcrId.getNumberAsInteger()));
                 }
             } catch (Exception e) {
                 throw new TransformerException(e);
@@ -1385,7 +1380,12 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             String[] parts = href.split(":");
             String mcrId = parts[parts.length - 1];
             LOGGER.info("Resolving deleted object " + mcrId);
-            Document xml = MCRUtils.requestVersionedObject(MCRObjectID.getInstance(mcrId), -1);
+            Document xml = null;
+            try {
+                xml = MCRUtils.requestVersionedObject(MCRObjectID.getInstance(mcrId), -1);
+            } catch(Exception exc) {
+                LOGGER.error("while retrieving current version of object " + mcrId, exc);
+            }
             if (xml == null) {
                 LOGGER.warn("Could not resolve deleted object " + mcrId);
                 return new JDOMSource(MCRObjectFactory.getSampleObject(MCRObjectID.getInstance(mcrId)));

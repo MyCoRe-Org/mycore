@@ -53,6 +53,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -85,6 +86,8 @@ public class MCRUtils {
     public final static char COMMAND_AND = 'A';
 
     public final static char COMMAND_XOR = 'X';
+
+    private static final int REV_LATEST = -1;
 
     // public constant data
     private static final Logger LOGGER = Logger.getLogger(MCRUtils.class);
@@ -406,10 +409,10 @@ public class MCRUtils {
                 if (bytesRead > 0) {
                     if (target != null) {
                         target.write(ba, 0 /* offset in ba */, bytesRead /*
-                                                                          * bytes
-                                                                          * to
-                                                                          * write
-                                                                          */);
+                                                                           * bytes
+                                                                           * to
+                                                                           * write
+                                                                           */);
                     }
                 } else {
                     break; // hit eof
@@ -464,10 +467,10 @@ public class MCRUtils {
                 if (charsRead > 0) {
                     if (target != null) {
                         target.write(ca, 0 /* offset in ba */, charsRead /*
-                                                                          * bytes
-                                                                          * to
-                                                                          * write
-                                                                          */);
+                                                                           * bytes
+                                                                           * to
+                                                                           * write
+                                                                           */);
                     }
                 } else {
                     break; // hit eof
@@ -952,37 +955,76 @@ public class MCRUtils {
      * @return a {@link Document} representing the {@link MCRObject} of the
      *         given revision or <code>null</code> if there is no such object
      *         with the given revision
+     * @throws IOException 
+     * @throws JDOMException 
      */
-    public static Document requestVersionedObject(MCRObjectID objId, long revision) {
+    public static Document requestVersionedObject(MCRObjectID objId, long revision) throws IOException, JDOMException {
         LOGGER.info("Getting object " + objId + " in revision " + revision);
-        try {
-            MCRObjectID mcrid = objId;
-            if (mcrid == null) {
-                return null;
+        MCRMetadataVersion version = getMetadataVersion(objId, revision);
+        if (version != null) {
+            return version.retrieve().asXML();
+        }
+
+        return null;
+    }
+
+    /**
+     * Lists all versions of this metadata object available in the
+     * subversion repository.
+     * 
+     * @param id
+     *            the id of the object to be retrieved
+     * @return {@link List} with all {@link MCRMetadataVersion} of
+     *         the given object or null if the id is null or the metadata
+     *         store doesn't support versioning
+     * @throws IOException
+     */
+    public static List<MCRMetadataVersion> listRevisions(MCRObjectID id) throws IOException {
+        if (id == null) {
+            return null;
+        }
+        MCRMetadataStore metadataStore = MCRXMLMetadataManager.instance().getStore(id);
+        if (!(metadataStore instanceof MCRVersioningMetadataStore)) {
+            return null;
+        }
+        MCRVersioningMetadataStore verStore = (MCRVersioningMetadataStore) metadataStore;
+        MCRVersionedMetadata vm = verStore.retrieve(id.getNumberAsInteger());
+        return vm.listVersions();
+    }
+
+    /**
+     * Returns the {@link MCRMetadataVersion} of the given id and revision.
+     * 
+     * @param objId
+     *            the id of the object to be retrieved
+     * @param rev
+     *            the revision to be returned, specify -1 if you want to
+     *            retrieve the latest revision (includes deleted objects also)
+     * @return a {@link MCRMetadataVersion} representing the {@link MCRObject} of the
+     *         given revision or <code>null</code> if there is no such object
+     *         with the given revision
+     * @throws IOException
+     */
+    public static MCRMetadataVersion getMetadataVersion(MCRObjectID mcrId, long rev) throws IOException {
+        List<MCRMetadataVersion> versions = listRevisions(mcrId);
+        if (versions == null) {
+            return null;
+        }
+        if (rev == REV_LATEST && versions.size() > 0) {
+            //request latest available revision
+            MCRMetadataVersion lastVersion = versions.get(versions.size() - 1);
+            if (lastVersion.getType() == MCRMetadataVersion.DELETED) {
+                lastVersion = versions.get(versions.size() - 2);
             }
-            MCRMetadataStore metadataStore = MCRXMLMetadataManager.instance().getStore(mcrid);
-            if (metadataStore instanceof MCRVersioningMetadataStore) {
-                MCRVersioningMetadataStore verStore = (MCRVersioningMetadataStore) metadataStore;
-                MCRVersionedMetadata versionedMetadata = verStore.retrieve(mcrid.getNumberAsInteger());
-                List<MCRMetadataVersion> versions = versionedMetadata.listVersions();
-                if (revision == -1 && versions.size() > 0) {
-                    // request latest available revision
-                    MCRMetadataVersion lastVersion = versions.get(versions.size() - 1);
-                    if (lastVersion.getType() == MCRMetadataVersion.DELETED) {
-                        lastVersion = versions.get(versions.size() - 2);
-                    }
-                    return lastVersion.retrieve().asXML();
-                }
-                for (MCRMetadataVersion version : versions) {
-                    // request specific revision
-                    if (version.getRevision() == revision) {
-                        return version.retrieve().asXML();
-                    }
-                }
+            return lastVersion;
+        }
+        for (MCRMetadataVersion version : versions) {
+            //request specific revision
+            if (version.getRevision() == rev) {
+                return version;
             }
-        } catch (Exception e) {
-            LOGGER.warn("Error occured while retrieving revision '" + revision + "' for object " + objId + " (" + e.getMessage() + ")");
         }
         return null;
     }
+
 }

@@ -1115,7 +1115,13 @@ public class MCROAIProvider extends MCRServlet {
                         }
                         /* handle deleted objects */
                         else {
-                            Document xml = MCRUtils.requestVersionedObject(id, -1);
+                            Document xml = null;
+                            try {
+                                xml = MCRUtils.requestVersionedObject(id, -1);
+                            } catch(Exception exc) {
+                                LOGGER.error("Error occured while retrieving current revision for object " +
+                                        id, exc);
+                            }
                             if (xml != null) {
                                 object = new MCRObject(xml);
                             } else {
