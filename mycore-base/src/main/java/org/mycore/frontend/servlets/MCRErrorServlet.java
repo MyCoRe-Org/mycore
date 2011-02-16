@@ -90,6 +90,12 @@ public class MCRErrorServlet extends HttpServlet {
         }
         return MCRServlet.getSession(req);
     }
+    
+    private void setWebAppBaseURL(MCRSession session, HttpServletRequest request){
+        if (request.getAttribute(MCRServlet.BASE_URL_ATTRIBUTE) != null) {
+            session.put(MCRServlet.BASE_URL_ATTRIBUTE, request.getAttribute(MCRServlet.BASE_URL_ATTRIBUTE));
+        }
+    }
 
     protected void generateErrorPage(HttpServletRequest request, HttpServletResponse response, String msg, Throwable ex, Integer statusCode,
         Class<? extends Throwable> exceptionType, String requestURI, String servletName) throws IOException {
@@ -152,6 +158,7 @@ public class MCRErrorServlet extends HttpServlet {
                 if (!openTransaction) {
                     session.beginTransaction();
                 }
+                setWebAppBaseURL(session, request);
                 LAYOUT_SERVICE.doLayout(request, response, errorDoc);
                 if (!openTransaction)
                     session.commitTransaction();
