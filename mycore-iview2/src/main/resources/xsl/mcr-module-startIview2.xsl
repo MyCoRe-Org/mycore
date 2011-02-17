@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-                xmlns:iview2="xalan://org.mycore.iview2.frontend.MCRIView2XSLFunctions"
-                xmlns:encoder="xalan://java.net.URLEncoder"
-                exclude-result-prefixes="iview2 encoder">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:iview2="xalan://org.mycore.iview2.frontend.MCRIView2XSLFunctions" exclude-result-prefixes="iview2">
 
   <xsl:include href="mcr-module-iview2.xsl" />
 
@@ -15,7 +12,7 @@
     <xsl:param name="derivateID" />
     <xsl:call-template name="derivateLinkView">
       <xsl:with-param name="derivateID" select="$derivateID"/>
-      <xsl:with-param name="file" select="encoder:encode(iview2:getSupportedMainFile($derivateID))"/>
+      <xsl:with-param name="file" select="iview2:getSupportedMainFile($derivateID)"/>
     </xsl:call-template>
   </xsl:template>
 
