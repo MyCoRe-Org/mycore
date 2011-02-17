@@ -25,7 +25,7 @@
       </xsl:call-template>
       <xsl:call-template name="iview2.getThumbnail">
         <xsl:with-param name="groupID" select="$derivateID" />
-        <xsl:with-param name="parent" select="viewer" />
+        <xsl:with-param name="parent" select="'viewer'" />
       </xsl:call-template>
       <xsl:call-template name="iview2.getChapter">
         <xsl:with-param name="groupID" select="$derivateID" />
