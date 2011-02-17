@@ -21,7 +21,6 @@ PanoJS.TileUrlProvider.prototype.getImageHash = function(image){
 }
 /*
  * returns the URL of all tileimages
- * @param [string] image which shall be loaded, must be URI encoded
  */
 PanoJS.TileUrlProvider.prototype.assembleUrl = function(xIndex, yIndex, zoom, image){
 	image=(image == null)? this.prefix : image;
@@ -29,15 +28,6 @@ PanoJS.TileUrlProvider.prototype.assembleUrl = function(xIndex, yIndex, zoom, im
         image + '/' + zoom + '/' + yIndex + '/' + xIndex + '.' + this.extension +
         (PanoJS.REVISION_FLAG ? '?r=' + PanoJS.REVISION_FLAG : '');
 };
-
-PanoJS.TileUrlProvider.prototype.setPrefix = function(prefix) {
-	this.prefix = encodeURI(prefix);
-}
-
-PanoJS.TileUrlProvider.prototype.getPrefix = function() {
-	return decodeURI(this.prefix);
-}
-
 
 /**
  * @public
@@ -87,7 +77,7 @@ function initializeGraphic(viewID) {
 	PanoJS.BLANK_TILE_IMAGE = "../modules/iview2/web/" + styleFolderUri + 'blank.gif';
 	
 	// opera triggers the onload twice
-	var iviewTileUrlProvider = new PanoJS.TileUrlProvider(Iview[viewID].baseUri, encodeURI(Iview[viewID].curImage), 'jpg');
+	var iviewTileUrlProvider = new PanoJS.TileUrlProvider(Iview[viewID].baseUri, Iview[viewID].curImage, 'jpg');
 	iviewTileUrlProvider.derivate = viewID;
 
 	/**

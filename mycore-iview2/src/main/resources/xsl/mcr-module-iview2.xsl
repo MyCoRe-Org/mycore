@@ -218,7 +218,7 @@
         <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/init.js"/>
       </xsl:when>
       <xsl:otherwise>
-        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.min.js"/>
+        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.js"/>
         <script type="text/javascript">
           <xsl:text>loadCssFile('http://ajax.googleapis.com/ajax/libs/jqueryui/</xsl:text>
           <xsl:value-of select="$jqueryUI.version"/>

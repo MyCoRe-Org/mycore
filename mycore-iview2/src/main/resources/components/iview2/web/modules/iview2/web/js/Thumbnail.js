@@ -38,14 +38,14 @@ function notifyListenerNavigate(value, viewID) {
  * @param	{function} callback
  */
 function loadPage(viewID, callback) {
-	var image;
+	var url;
 	if (typeof(Iview[viewID].newMETS)=='undefined'){
-		image = Iview[viewID].startFile;
+		url = Iview[viewID].startFile;
 	} else {
-		image = Iview[viewID].PhysicalModel.getCurrent().getHref();
+		url = Iview[viewID].PhysicalModel.getCurrent().getHref();
 	}
-	Iview[viewID].curImage  = image;
-	var imagePropertiesURL=Iview[viewID].baseUri[0]+"/"+viewID+"/"+encodeURI(image)+"/imageinfo.xml";
+	Iview[viewID].curImage  = url;
+	var imagePropertiesURL=Iview[viewID].baseUri[0]+"/"+viewID+"/"+url+"/imageinfo.xml";
 	jQuery.ajax({
 		url: imagePropertiesURL,
   		success: function(response) {processImageProperties(response,viewID)},
@@ -145,8 +145,9 @@ function processImageProperties(imageProperties, viewID){
 		} else {
 			Iview[viewID].zoomInit = Iview[viewID].zoomMax;
 		}
-		viewerBean.tileUrlProvider.setPrefix(Iview[viewID].curImage);
+		viewerBean.tileUrlProvider.prefix = Iview[viewID].curImage;
 		preload.src = viewerBean.tileUrlProvider.assembleUrl(0,0,0);
+		viewerBean.resize();
 	}
 	// moves viewer to zoomLevel zoomInit
 	viewerBean.maxZoomLevel=Iview[viewID].zoomMax;
@@ -857,7 +858,7 @@ function loading(viewID) {
 	// Load Page
 	if (window.location.search.get("page") != "") {
 		//TODO may be incomplete: Prevent Remote File Inclusion, but never Ever drop
-		Iview[viewID].startFile = decodeURI(window.location.search.get("page").replace(/(:|\.\.|&#35|&#46|&#58|&#38|&#35|&amp)/,"§"));
+		Iview[viewID].startFile = window.location.search.get("page").replace(/(:|\.\.|&#35|&#46|&#58|&#38|&#35|&amp)/,"§"); 
 	}
 	//remove leading '/'
 	Iview[viewID].startFile = Iview[viewID].startFile.replace(/^\/*/,"");

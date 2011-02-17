@@ -8,12 +8,12 @@
  * @para,		{} nr number of the error to display
  * @param		{} e the error event from which the more detailed information will gained
  */
-function alertError(msg, nr, e) {
+ function alertError(msg, nr, e) {
 		alert("Error " + toInt(nr) + ": " + msg + "\n" 
 				+ "Error Occured in File: " + e.fileName + ", line:" + e.lineNumber + "\n" 
 				+ "JS-Error " + e.name + ": " + e.message + "\n"
 				+ "Browser: " + navigator.userAgent);
-}
+	}
 
 /**
  * @public
