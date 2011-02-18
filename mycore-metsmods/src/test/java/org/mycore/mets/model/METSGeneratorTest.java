@@ -18,11 +18,7 @@ public class METSGeneratorTest {
         MCRConfiguration.instance().set("MCR.Component.MetsMods.generator", TestGenerator.class.getName());
         // check getGenerator
         MCRMETSGenerator gen = MCRMETSGenerator.getGenerator();
-        if(gen instanceof TestGenerator) {
-            assertTrue(true);
-        } else {
-            assertTrue(false);
-        }
+        assertTrue(gen instanceof TestGenerator);
     }
 
     public static class TestGenerator extends MCRMETSGenerator {
