@@ -1,7 +1,4 @@
 /*
- * 
- * $Revision: 1.6 $ $Date: 2009/01/19 10:06:12 $
- *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
  *
@@ -23,16 +20,17 @@
 
 package org.mycore.frontend.metsmods;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.jdom.*;
-import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConstants;
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * @author Stefan Freitag
@@ -41,8 +39,17 @@ import org.mycore.common.MCRConstants;
 
 public class MCRMetsModsUtil {
 
-    Element fileSec = new Element("fileSec", MCRConstants.METS_NAMESPACE);
-    Element structMap = new Element("structMap", MCRConstants.METS_NAMESPACE);
+    private static Logger LOGGER = Logger.getLogger(MCRMetsModsUtil.class.getName());
+
+    public Element createNewMetsFile(String derivate_id) {
+        Element root = new Element("mets", MCRConstants.METS_NAMESPACE);
+        root.addNamespaceDeclaration(MCRConstants.XSI_NAMESPACE);
+        root.addNamespaceDeclaration(MCRConstants.XLINK_NAMESPACE);
+        root.setAttribute("noNamespaceSchemaLocation", "http://www.loc.gov/METS/ http://www.loc.gov/mets/mets.xsd", MCRConstants.XSI_NAMESPACE);
+        root.addContent(init_fileSec(derivate_id));
+        root.addContent(init_structMap(derivate_id));
+        return root;
+    }
 
     public Element createMetsElement(ArrayList<String> list, Element mets, String default_url, String ContentIDS) {
         Iterator<String> iter = list.iterator();
@@ -81,37 +88,6 @@ public class MCRMetsModsUtil {
         return mets;
     }
 
-    private Element create_mets_head() {
-        String empty_mets_url = new String("../webapps/empty.mets.xml");
-
-        try {
-            Document doc = new SAXBuilder().build(empty_mets_url);
-
-            doc.getRootElement().removeContent();
-
-            return doc.getRootElement();
-
-        } catch (JDOMException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    public Element init_mets(String derivate_id) {
-        Element mets = create_mets_head();
-        if (mets == null)
-            mets = new Element("mets", MCRConstants.METS_NAMESPACE);
-        mets.addContent(init_fileSec(derivate_id));
-        mets.addContent(init_structMap(derivate_id));
-
-        return mets;
-    }
-
     public Element init_mods(String derivate_id, String title, String display, String place, String date) {
         Element dmdSec = new Element("dmdSec", MCRConstants.METS_NAMESPACE);
         dmdSec.setAttribute("ID", "dmd_" + derivate_id);
@@ -132,9 +108,9 @@ public class MCRMetsModsUtil {
 
         Element originInfo = new Element("originInfo", MCRConstants.MODS_NAMESPACE);
         originInfo.addContent(new Element("place", MCRConstants.MODS_NAMESPACE).addContent(new Element("placeTerm", MCRConstants.MODS_NAMESPACE).setAttribute(
-                        "type", "text").setText(place)));
+                "type", "text").setText(place)));
         originInfo.addContent(new Element("dateIssued", MCRConstants.MODS_NAMESPACE).setAttribute("keyDate", "yes").setAttribute("encoding", "w3cdtf").setText(
-                        date));
+                date));
 
         mods.addContent(titleInfo);
         mods.addContent(name);
@@ -150,7 +126,12 @@ public class MCRMetsModsUtil {
     public Element init_amdSec(String derivate_id, String owner, String ownerLogo, String ownerSiteURL, String reference, String presentation) {
         Element amdSec = new Element("amdSec", MCRConstants.METS_NAMESPACE);
         amdSec.setAttribute("ID", "amd_" + derivate_id);
+        amdSec.addContent(init_rights(derivate_id, owner, ownerLogo, ownerSiteURL));
+        amdSec.addContent(init_digiprov(derivate_id, reference, presentation));
+        return amdSec;
+    }
 
+    public Element init_rights(String derivate_id, String owner, String ownerLogo, String ownerSiteURL) {
         Element rightsMD = new Element("rightsMD", MCRConstants.METS_NAMESPACE);
         rightsMD.setAttribute("ID", "rights_" + derivate_id);
 
@@ -169,13 +150,10 @@ public class MCRMetsModsUtil {
         mdWrap.addContent(xmlData);
         rightsMD.addContent(mdWrap);
 
-        amdSec.addContent(rightsMD);
-        amdSec.addContent(init_digiprov(derivate_id, reference, presentation));
-
-        return amdSec;
+        return rightsMD;
     }
 
-    private Element init_digiprov(String derivate_id, String reference, String presentation) {
+    public Element init_digiprov(String derivate_id, String reference, String presentation) {
         Element digiprovMD = new Element("digiprovMD", MCRConstants.METS_NAMESPACE);
         digiprovMD.setAttribute("ID", "digiprov_" + derivate_id);
 
@@ -196,35 +174,24 @@ public class MCRMetsModsUtil {
         return digiprovMD;
     }
 
-    public void showElement(Element e) {
-        try {
-            XMLOutputter xmlout = new XMLOutputter();
-            xmlout.output(e, System.out);
-        } catch (Exception p) {
-            p.printStackTrace();
-        }
-    }
-
-    public Element init_fileSec(String derivate_id) {
+    private Element init_fileSec(String derivate_id) {
+        Element fileSec = new Element("fileSec", MCRConstants.METS_NAMESPACE);
         fileSec.setAttribute("ID", "fileSec_" + derivate_id);
         Element fileGrp = new Element("fileGrp", MCRConstants.METS_NAMESPACE);
         fileGrp.setAttribute("USE", "DEFAULT");
-
         fileSec.addContent(fileGrp);
-
         return fileSec;
     }
 
-    public Element init_structMap(String derivate_id) {
+    private Element init_structMap(String derivate_id) {
+        Element structMap = new Element("structMap", MCRConstants.METS_NAMESPACE);
         structMap.setAttribute("TYPE", "PHYSICAL");
         Element div = new Element("div", MCRConstants.METS_NAMESPACE);
         div.setAttribute("ID", "phys_" + derivate_id);
         div.setAttribute("DMDID", "dmd_" + derivate_id);
         div.setAttribute("ADMID", "amd_" + derivate_id);
         div.setAttribute("TYPE", "physSequence");
-
         structMap.addContent(div);
-
         return structMap;
     }
 
@@ -255,10 +222,12 @@ public class MCRMetsModsUtil {
         Element div_ = new Element("div", MCRConstants.METS_NAMESPACE);
         div_.setAttribute("ID", file_id);
         div_.setAttribute("ORDER", String.valueOf(order));
-        // The following line has changed in order to set the filename as orderlabel...
+        // The following line has changed in order to set the filename as
+        // orderlabel...
         div_.setAttribute("ORDERLABEL", file_id);// String.valueOf(order));
         div_.setAttribute("type", type);
-        // The following line contains the CONTENTIDS, if is null then do nothing
+        // The following line contains the CONTENTIDS, if is null then do
+        // nothing
         if (contentids != null)
             div_.setAttribute("CONTENTIDS", contentids);
         Element fptr = new Element("fptr", MCRConstants.METS_NAMESPACE);
