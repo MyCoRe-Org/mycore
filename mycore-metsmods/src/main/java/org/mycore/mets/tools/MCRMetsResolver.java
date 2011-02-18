@@ -36,6 +36,7 @@ import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.mets.model.MCRMETSGenerator;
 
 /**
  * returns a structured METS document for any valid MyCoRe ID (object or
@@ -70,7 +71,7 @@ public class MCRMetsResolver implements MCRResolver {
         HashSet<MCRFilesystemNode> ignoreNodes = new HashSet<MCRFilesystemNode>();
         if (metsFile != null)
             ignoreNodes.add(metsFile);
-        Document mets = METSGenerator.getMETS(dir, ignoreNodes);
+        Document mets = MCRMETSGenerator.getMETS(dir, ignoreNodes);
         return mets.getRootElement();
     }
 

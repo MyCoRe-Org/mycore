@@ -17,7 +17,7 @@
  * along with Mets-Editor.  If not, see http://www.gnu.org/licenses/.
  */
 
-package org.mycore.mets.tools;
+package org.mycore.mets.model;
 
 import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
@@ -39,7 +39,7 @@ import org.mycore.datamodel.ifs.MCRFilesystemNode;
  * @author Thomas Scheffler (yagee)
  *
  */
-public class METSGenerator {
+public class MCRMETSGenerator {
     private static final Namespace METS = Namespace.getNamespace("mets", "http://www.loc.gov/METS/");
 
     public static Document getMETS(MCRDirectory dir, Set<MCRFilesystemNode> ignoreNodes) throws URISyntaxException {

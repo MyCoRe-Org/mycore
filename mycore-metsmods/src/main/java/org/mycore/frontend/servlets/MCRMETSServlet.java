@@ -42,7 +42,7 @@ import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
-import org.mycore.mets.tools.METSGenerator;
+import org.mycore.mets.model.MCRMETSGenerator;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -91,7 +91,7 @@ public class MCRMETSServlet extends MCRServlet {
             HashSet<MCRFilesystemNode> ignoreNodes = new HashSet<MCRFilesystemNode>();
             if (metsFile != null)
                 ignoreNodes.add(metsFile);
-            Document mets = METSGenerator.getMETS(dir, ignoreNodes);
+            Document mets = MCRMETSGenerator.getMETS(dir, ignoreNodes);
             MCRLayoutService.instance().doLayout(request, response, mets);
         }
     }
