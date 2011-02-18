@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Mets-Editor.  If not, see http://www.gnu.org/licenses/.
  */
-package org.mycore.frontend.servlets;
+package org.mycore.mets.servlets;
 
 import java.util.Arrays;
 import java.util.Comparator;

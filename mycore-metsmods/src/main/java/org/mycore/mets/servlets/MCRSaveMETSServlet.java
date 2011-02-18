@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License along with
  * Mets-Editor. If not, see http://www.gnu.org/licenses/.
  */
-package org.mycore.frontend.servlets;
+package org.mycore.mets.servlets;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -35,9 +35,9 @@ import org.mycore.mets.tools.MetsSave;
 /**
  * @author Silvio Hermann (shermann)
  */
-public class SaveMetsServlet extends MCRServlet {
+public class MCRSaveMETSServlet extends MCRServlet {
 
-    private static final Logger LOGGER = Logger.getLogger(SaveMetsServlet.class);
+    private static final Logger LOGGER = Logger.getLogger(MCRSaveMETSServlet.class);
 
     private static final long serialVersionUID = 1L;
 
