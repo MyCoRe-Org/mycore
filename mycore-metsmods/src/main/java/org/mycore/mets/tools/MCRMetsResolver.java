@@ -71,7 +71,7 @@ public class MCRMetsResolver implements MCRResolver {
         HashSet<MCRFilesystemNode> ignoreNodes = new HashSet<MCRFilesystemNode>();
         if (metsFile != null)
             ignoreNodes.add(metsFile);
-        Document mets = MCRMETSGenerator.getMETS(dir, ignoreNodes);
+        Document mets = MCRMETSGenerator.getGenerator().getMETS(dir, ignoreNodes);
         return mets.getRootElement();
     }
 
