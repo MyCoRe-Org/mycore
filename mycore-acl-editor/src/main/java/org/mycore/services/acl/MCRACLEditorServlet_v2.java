@@ -2,7 +2,6 @@ package org.mycore.services.acl;
 
 import java.io.IOException;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -11,7 +10,6 @@ import org.jdom.DocType;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -25,16 +23,14 @@ public class MCRACLEditorServlet_v2 extends MCRServlet {
 
     protected static final String LOGINSERVLET_URL = "MCRLoginServlet";
 
-    public void init() throws MCRConfigurationException, ServletException {
-        super.init();
-    }
-
     public void doGetPost(MCRServletJob job) throws Exception {
         HttpServletRequest request = job.getRequest();
         HttpServletResponse response = job.getResponse();
         String mode = request.getParameter("mode");
 
-        verifyAccess(job);
+        if (verifyAccess(job)){
+            return;
+        }
 
         if (MCRWebsiteWriteProtection.printInfoPageIfNoAccess(request, response, getBaseURL()))
             return;
@@ -70,14 +66,16 @@ public class MCRACLEditorServlet_v2 extends MCRServlet {
         }
     }
 
-    public void verifyAccess(MCRServletJob job) throws IOException {
+    private boolean verifyAccess(MCRServletJob job) throws IOException {
         if (!MCRAccessManager.getAccessImpl().checkPermission("use-aclEditor")) {
             LOGGER.info("Access denied for userID=" + MCRSessionMgr.getCurrentSession().getUserInformation().getCurrentUserID());
             final String queryString = (job.getRequest().getQueryString() != null) ? "?" + job.getRequest().getQueryString() : ":";
             job.getResponse().sendRedirect(
                     job.getResponse()
                             .encodeRedirectURL(getServletBaseURL() + LOGINSERVLET_URL + "?url=" + job.getRequest().getRequestURL().append(queryString)));
+            return false;
         }
+        return true;
     }
 
     private void redirect(HttpServletResponse response, String url) {
