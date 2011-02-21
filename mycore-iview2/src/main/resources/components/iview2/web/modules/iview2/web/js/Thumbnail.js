@@ -861,7 +861,7 @@ function loading(viewID) {
 		Iview[viewID].startFile = window.location.search.get("page").replace(/(:|\.\.|&#35|&#46|&#58|&#38|&#35|&amp)/,"§"); 
 	}
 	//remove leading '/'
-	Iview[viewID].startFile = Iview[viewID].startFile.replace(/^\/*/,"");
+	Iview[viewID].startFile = encodeURI(Iview[viewID].startFile.replace(/^\/*/,""));
 	loadPage(viewID, function(){startFileLoaded(viewID)});
 	
 	// should be replaced while constructing MVC concept
