@@ -238,8 +238,8 @@ iview.overview.View = function() {
 		
 		// fill Info div
 		var infoDiv=jQuery(divBox.children("div.infoDiv")[0]);
-		infoDiv.html(pageName);
-		infoDiv.attr("title", pageName);
+		infoDiv.html(decodeURI(pageName));
+		infoDiv.attr("title", decodeURI(pageName));
 	}
 	
 	/**
