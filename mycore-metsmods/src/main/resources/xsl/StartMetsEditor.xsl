@@ -145,10 +145,14 @@
 
             <script type="text/javascript">
               <xsl:value-of
-                select="concat('function resetTree(){window.location=&quot;',$WebApplicationBaseURL,'metseditor/start_mets_editor.xml?derivate=',$derivateId,'&amp;useExistingMets=false','&quot;;}')" />
+                select="concat('function resetTree(){
+                  if(userConfirmsReset()){
+                    window.location=&quot;',$WebApplicationBaseURL,'metseditor/start_mets_editor.xml?derivate=',$derivateId,'&amp;useExistingMets=false','&quot;;}}')" />
 
               <xsl:value-of
-                select="concat('function reloadTree(){window.location=&quot;',$WebApplicationBaseURL,'metseditor/start_mets_editor.xml?derivate=',$derivateId,'&amp;useExistingMets=true','&quot;;}')" />
+                select="concat('function reloadTree(){
+                  if(userConfirmsReset()){
+                    window.location=&quot;',$WebApplicationBaseURL,'metseditor/start_mets_editor.xml?derivate=',$derivateId,'&amp;useExistingMets=true','&quot;;}}')" />
 
               <xsl:value-of select="concat('var webApplicationBaseURL = &quot;', $WebApplicationBaseURL,'&quot;;')" />
               <xsl:value-of select="concat('var derivateId = &quot;', $derivateId,'&quot;;')" />
@@ -183,6 +187,7 @@
                 onclick="reloadTree"></div>
               <div dojoType="dijit.form.Button" id="toolbar1.resetTree" iconClass="dijitEditorIcon dijitEditorIconNewPage" showLabel="true"
                 onclick="resetTree"></div>
+              <div dojoType="dijit.ToolbarSeparator" id="toolbar1.sep4"></div>
               <div dojoType="dijit.form.Button" id="toolbar1.save" iconClass="dijitEditorIcon dijitEditorIconSave" showLabel="false"
                 onclick="save"></div>
               <div dojoType="ToolbarSectionStart" label="Strukturierung"></div>
