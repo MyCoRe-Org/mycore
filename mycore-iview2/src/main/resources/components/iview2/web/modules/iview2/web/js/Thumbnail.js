@@ -858,7 +858,7 @@ function loading(viewID) {
 	// Load Page
 	if (window.location.search.get("page") != "") {
 		//TODO may be incomplete: Prevent Remote File Inclusion, but never Ever drop
-		Iview[viewID].startFile = window.location.search.get("page").replace(/(:|\.\.|&#35|&#46|&#58|&#38|&#35|&amp)/,"§"); 
+		Iview[viewID].startFile = decodeURI(window.location.search.get("page").replace(/(:|\.\.|&#35|&#46|&#58|&#38|&#35|&amp)/,"§")); 
 	}
 	//remove leading '/'
 	Iview[viewID].startFile = encodeURI(Iview[viewID].startFile.replace(/^\/*/,""));
