@@ -50,7 +50,7 @@ public class MCRMigrationCommands21 extends MCRAbstractCommands {
             }
             session.evict(xmlentry);
             if (manager.exists(mcrId)) {
-                LOGGER.warn(xmlentry.getId() + " allready exists in IFS2 - skipping.");
+                LOGGER.warn(xmlentry.getId() + " already exists in IFS2 - skipping.");
                 continue;
             }
             LOGGER.info("Migrating " + mcrId + " to IFS2.");
