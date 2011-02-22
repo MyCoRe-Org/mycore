@@ -223,7 +223,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         };
 
         Session session = MCRHIBConnection.instance().getSession();
-        String queryString = "select distinct node.classid from MCRCATEGORY as node, MCRCATEGORYLINK as link where node.internalid=link.category";
+        String queryString = "select distinct node.classid from MCRCategory as node, MCRCategoryLink as link where node.internalid=link.category";
         SQLQuery sqlQueryHasLink = session.createSQLQuery(queryString);
         @SuppressWarnings("unchecked")
         List<String> categList = sqlQueryHasLink.list();
