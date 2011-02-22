@@ -172,7 +172,6 @@ iview.Permalink.Controller.prototype = {
 		
 		url += "&tosize="+size;
 		url += "&maximized="+viewer.maximized;
-		url += "&css="+styleName;
 		
 		return url;
 	}

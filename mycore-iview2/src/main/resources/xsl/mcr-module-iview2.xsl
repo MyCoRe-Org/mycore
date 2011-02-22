@@ -38,8 +38,6 @@
           <xsl:value-of select="$style"/>
         </xsl:attribute>
       </xsl:if>
-      <div id="blackBlank{$groupID}" class="blackBlank">
-      </div>
       <div id="viewer{$groupID}" class="viewer min" onmousedown="return false;">
         <div class="surface" style="width:100%;height:100%;z-index:30">
         </div>
@@ -116,6 +114,11 @@
         <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/Permalink.js" />
     </xsl:if>
 	
+	<script type="text/javascript">
+		<xsl:text>loadCssFile('http://ajax.googleapis.com/ajax/libs/jqueryui/</xsl:text>
+		<xsl:value-of select="$jqueryUI.version"/>
+		<xsl:text>/themes/base/jquery-ui.css');</xsl:text>
+	</script>
      
     <div id="toolbars{$groupID}" class="toolbars" onmousedown="return false;">      
         <script type="text/javascript">
@@ -216,14 +219,12 @@
         <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/Thumbnail.js" />
         <!--Hauptdatei-->
         <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/init.js"/>
+		<!-- Main Stylesheet -->
+    	<link id="cssSheet{$groupID}" rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/web/gfx/default/style.css" />
       </xsl:when>
       <xsl:otherwise>
         <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.js"/>
-        <script type="text/javascript">
-          <xsl:text>loadCssFile('http://ajax.googleapis.com/ajax/libs/jqueryui/</xsl:text>
-          <xsl:value-of select="$jqueryUI.version"/>
-          <xsl:text>/themes/base/jquery-ui.css');</xsl:text>
-
+        <script>
           <xsl:text>loadCssFile('</xsl:text>
           <xsl:value-of select="$WebApplicationBaseURL"/>
           <xsl:text>modules/iview2/web/gfx/default/iview2.min.css', 'iviewCss');</xsl:text>
@@ -243,18 +244,18 @@
   </xsl:template>
   <xsl:template name="iview2.start">
     <xsl:param name="groupID" />
-    <xsl:param name="style" select="'default'" />
+    <!--<xsl:param name="style" select="'default'" />-->
     <!-- params out of config.xml -->
     <xsl:param name="styleFolderUri" select="'gfx/'" />
     <xsl:param name="startFile" />
 
     <!-- Initfunktionen -->
     <script type="text/javascript">
-    <!-- Philipp möchte verbessern -->
+      <!-- 
       var styleName='<xsl:value-of select="$style" />';
+       -->
       var styleFolderUri='<xsl:value-of select="$styleFolderUri" />';
       addIviewProperty('<xsl:value-of select="$groupID" />', 'startFile', "'<xsl:value-of select="$startFile" />'");
-      
       function startViewer(viewID) {
         if (Iview[viewID].started) return;
         Iview[viewID].started = true;

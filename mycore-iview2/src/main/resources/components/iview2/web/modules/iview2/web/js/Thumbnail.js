@@ -689,28 +689,6 @@ function viewerScroll(delta, viewID) {
 /**
  * @public
  * @function
- * @name	changeCSS
- * @memberOf	iview.Thumbnails
- * @description	determine the new css-name if the design is changing
- */
-function changeCss() {
-	curDesign = styleName;
-
-	if (curDesign == "red") {
-		curDesign = "standard";
-	} else {
-		curDesign = "red";
-	}
-	if (window.location.search.indexOf("&css=") != -1)  {
-		window.location.search = window.location.search.substring(0,window.location.search.indexOf("&css=")) + "&css="+curDesign;
-	} else {
-		window.location.search += "&css="+curDesign;
-	}
-}
-
-/**
- * @public
- * @function
  * @name	importCutOut
  * @memberOf	iview.Thumbnails
  * @description	calls the corresponding functions to create the cutout
@@ -821,9 +799,6 @@ function loading(viewID) {
 	Iview[viewID].startHeight = toInt(jQuery("#viewerContainer"+viewID).css("height"));
 	Iview[viewID].startWidth = toInt(jQuery("#viewerContainer"+viewID).css("width"));
 		
-	style = styleFolderUri + styleName + "/";
-	//retrieves the mets File depending on the fact if it's exists or it request a simple one
-
 	// ScrollBars
 	// horizontal
 	Iview[viewID].barX = new iview.scrollbar.Controller();
@@ -858,7 +833,7 @@ function loading(viewID) {
 	// Load Page
 	if (window.location.search.get("page") != "") {
 		//TODO may be incomplete: Prevent Remote File Inclusion, but never Ever drop
-		Iview[viewID].startFile = decodeURI(window.location.search.get("page").replace(/(:|\.\.|&#35|&#46|&#58|&#38|&#35|&amp)/,"§")); 
+		Iview[viewID].startFile = decodeURI(window.location.search.get("page").replace(/(:|\.\.|&#35|&#46|&#58|&#38|&#35|&amp)/,"§"));
 	}
 	//remove leading '/'
 	Iview[viewID].startFile = encodeURI(Iview[viewID].startFile.replace(/^\/*/,""));
