@@ -392,13 +392,11 @@ iview.overview.View = function() {
 		if (that.my.bar) {
 			that.my.barObj.setSize(that.my.self.height());
 		}
-		that.my.picContainer.css("width", that.my.self.innerWidth() - that._scrollBarWidth);
-
-		that.my.picContainer.css("padding", 0);//reset everything else it does subsum and we screw everything up
-		that.my.picContainer.css("padding-left",
-				(that.my.picContainer.innerWidth() - (that.my.pictures[0].outerWidth(true)*that._amount.width))/2 + "px");
-		that.my.picContainer.css("padding-top",
-				(that.my.self.innerHeight() - (that.my.pictures[0].outerHeight(true)*that._amount.height))/2 + "px");
+		//reset everything else it does subsum and we screw everything up
+		that.my.picContainer.css({"width": that.my.self.innerWidth() - that._scrollBarWidth,
+			"padding": 0,
+			"padding-left": (that.my.picContainer.innerWidth() - (that.my.pictures[0].outerWidth(true)*that._amount.width))/2 + "px",
+			"padding-top": (that.my.self.innerHeight() - (that.my.pictures[0].outerHeight(true)*that._amount.height))/2 + "px"});
 	}
 	
 	/**
@@ -440,7 +438,7 @@ iview.overview.View = function() {
 		
 		createContainer(this);
 		posOverviewContainer(this);
-		calculateFirstRow(this);
+		this.setSelected(args.selected || 0);
 		var that = this;
 		jQuery(window).resize(function() {that.resize()});
 		loadImages(this);
@@ -488,17 +486,18 @@ iview.overview.View = function() {
 		this._tileUrlProvider = provider;
 	}
 	
-	iview.overview.View.prototype.createView = createView;
-	iview.overview.View.prototype.setDivSize = setDivSize;
-	iview.overview.View.prototype.resize = resize;
-	iview.overview.View.prototype.setNumberOfPages = setNumberOfPages;
-	iview.overview.View.prototype.setSelected = setSelected;
-	iview.overview.View.prototype.visible = visible;
-	iview.overview.View.prototype.addPage = addPage;
-	iview.overview.View.prototype.setTileUrlProvider = setTileUrlProvider;
-	iview.overview.View.prototype.setPreviewSize = setPreviewSize;
-	iview.overview.View.prototype.disableScrollBar = disableScrollBar;
-	iview.overview.View.prototype.CLICK = 1;
+	var prototype = iview.overview.View.prototype
+	prototype.createView = createView;
+	prototype.setDivSize = setDivSize;
+	prototype.resize = resize;
+	prototype.setNumberOfPages = setNumberOfPages;
+	prototype.setSelected = setSelected;
+	prototype.visible = visible;
+	prototype.addPage = addPage;
+	prototype.setTileUrlProvider = setTileUrlProvider;
+	prototype.setPreviewSize = setPreviewSize;
+	prototype.disableScrollBar = disableScrollBar;
+	prototype.CLICK = 1;
 })();
 
 /**
@@ -559,6 +558,7 @@ iview.overview.Controller = function(modelProvider, view, tileUrlProvider) {
 			'mainClass': args.mainClass,
 			'customClass':args.customClass,
 			'useScrollBar':args.useScrollBar,
+			'selected': this._model.getCurPos(),
 			'parent':args.parent});
 	}
 	
@@ -639,12 +639,13 @@ iview.overview.Controller = function(modelProvider, view, tileUrlProvider) {
 		this._model.onevent.detach(listener);
 	}
 	
-	iview.overview.Controller.prototype.createView = createView;
-	iview.overview.Controller.prototype.showView = showView;
-	iview.overview.Controller.prototype.hideView = hideView;
-	iview.overview.Controller.prototype.toggleView = toggleView;
-	iview.overview.Controller.prototype.setSelected = setSelected;
-	iview.overview.Controller.prototype.getActive = getActive;
-	iview.overview.Controller.prototype.attach = attach;
-	iview.overview.Controller.prototype.detach = detach;
+	var prototype = iview.overview.Controller.prototype;
+	prototype.createView = createView;
+	prototype.showView = showView;
+	prototype.hideView = hideView;
+	prototype.toggleView = toggleView;
+	prototype.setSelected = setSelected;
+	prototype.getActive = getActive;
+	prototype.attach = attach;
+	prototype.detach = detach;
 })();
