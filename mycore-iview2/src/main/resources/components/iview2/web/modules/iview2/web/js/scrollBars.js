@@ -966,15 +966,16 @@ iview.scrollbar.View = function() {
 		}
 	}
 	
-	iview.scrollbar.View.prototype.createView = createView;
-	iview.scrollbar.View.prototype.addTo = addTo;
-	iview.scrollbar.View.prototype.adaptView = adaptView;
-	iview.scrollbar.View.prototype.setStepByClick = setStepByClick;
-	iview.scrollbar.View.prototype.setJumpStep = setJumpStep;
-	iview.scrollbar.View.prototype.setScrollDelay = setScrollDelay; 
-	iview.scrollbar.View.prototype.setSpaceDelay = setSpaceDelay;
-	iview.scrollbar.View.prototype.setIntervalTime = setIntervalTime;
-	iview.scrollbar.View.prototype.addEventFrom = addEventFrom;
+	var prototype = iview.scrollbar.View.prototype;
+	prototype.createView = createView;
+	prototype.addTo = addTo;
+	prototype.adaptView = adaptView;
+	prototype.setStepByClick = setStepByClick;
+	prototype.setJumpStep = setJumpStep;
+	prototype.setScrollDelay = setScrollDelay; 
+	prototype.setSpaceDelay = setSpaceDelay;
+	prototype.setIntervalTime = setIntervalTime;
+	prototype.addEventFrom = addEventFrom;
 })();
 
 /**

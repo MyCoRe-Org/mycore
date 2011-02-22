@@ -209,14 +209,15 @@ iview.chapter.View = function() {
 		return jQuery(this._selected).attr("logid");
 	}
 	
-	iview.chapter.View.prototype.visible = visible;
-	iview.chapter.View.prototype.getTree = getTree;
-	iview.chapter.View.prototype.addTree = addTree;
-	iview.chapter.View.prototype.addBranch = addBranch;
-	iview.chapter.View.prototype.addPage = addPage;
-	iview.chapter.View.prototype.initTree = initTree;
-	iview.chapter.View.prototype.selectNode = selectNode;
-	iview.chapter.View.prototype.getSelected = getSelected; 
+	var prototype = iview.chapter.View.prototype;
+	prototype.visible = visible;
+	prototype.getTree = getTree;
+	prototype.addTree = addTree;
+	prototype.addBranch = addBranch;
+	prototype.addPage = addPage;
+	prototype.initTree = initTree;
+	prototype.selectNode = selectNode;
+	prototype.getSelected = getSelected; 
 })();
 
 /**
@@ -338,9 +339,10 @@ iview.chapter.Controller = function(modelProvider, physicalModelProvider, view) 
 		return this._view._visible;
 	}
 	
-	iview.chapter.Controller.prototype.createView = createView;
-	iview.chapter.Controller.prototype.showView = showView;
-	iview.chapter.Controller.prototype.hideView = hideView;
-	iview.chapter.Controller.prototype.toggleView = toggleView;
-	iview.chapter.Controller.prototype.getActive = getActive;
+	var prototype = iview.chapter.Controller.prototype;
+	prototype.createView = createView;
+	prototype.showView = showView;
+	prototype.hideView = hideView;
+	prototype.toggleView = toggleView;
+	prototype.getActive = getActive;
 })();

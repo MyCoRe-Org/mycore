@@ -299,8 +299,9 @@ iview.cutOut.View = function() {
 		that._visible = !that._visible;
 	}
 	
-	iview.cutOut.View.prototype.createView = createView;
-	iview.cutOut.View.prototype.adaptView = adaptView;
+	var prototype = iview.cutOut.View.prototype
+	prototype.createView = createView;
+	prototype.adaptView = adaptView;
 })();
 
 /**
@@ -374,10 +375,11 @@ iview.cutOut.Model = function() {
 		this.onevent.notify({'type': 'size', "value": {"x":size.x, "y":size.y}});
 	}
 	
-	iview.cutOut.Model.prototype.setPos = setPos;
-	iview.cutOut.Model.prototype.setRatio = setRatio;
-	iview.cutOut.Model.prototype.setSrc = setSrc;
-	iview.cutOut.Model.prototype.setSize = setSize;
+	var prototype = iview.cutOut.Model.prototype
+	prototype.setPos = setPos;
+	prototype.setRatio = setRatio;
+	prototype.setSrc = setSrc;
+	prototype.setSize = setSize;
 })();
 
 /**
@@ -441,9 +443,10 @@ iview.cutOut.Controller = function(modelProvider, view) {
 		this._view.onevent.detach(listener);
 	}
 	
-	iview.cutOut.Controller.prototype.createView = createView;
-	iview.cutOut.Controller.prototype.attach = attach;
-	iview.cutOut.Controller.prototype.detach = detach;
+	var prototype = iview.cutOut.Controller.prototype;
+	prototype.createView = createView;
+	prototype.attach = attach;
+	prototype.detach = detach;
 })();
 
 /**

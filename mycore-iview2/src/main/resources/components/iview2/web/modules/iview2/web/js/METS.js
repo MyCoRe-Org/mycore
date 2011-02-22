@@ -109,10 +109,11 @@ iview.utils.SimpleIterator = function(objectIterate) {
 		}
 	}
 	
-	iview.utils.SimpleIterator.prototype.hasNext = hasNext;
-	iview.utils.SimpleIterator.prototype.next = next;
-	iview.utils.SimpleIterator.prototype.hasPrevious = hasPrevious;
-	iview.utils.SimpleIterator.prototype.previous = previous;
+	var prototype = iview.utils.SimpleIterator.prototype;
+	prototype.hasNext = hasNext;
+	prototype.next = next;
+	prototype.hasPrevious = hasPrevious;
+	prototype.previous = previous;
 })();
 
 /**
@@ -395,21 +396,22 @@ iview.METS.PhysicalModel = function () {
 		return new iview.utils.SimpleIterator(this._order);
 	}
 	
-	iview.METS.PhysicalModel.prototype.addPage = addPage;
-	iview.METS.PhysicalModel.prototype.setPosition = setPosition;
-	iview.METS.PhysicalModel.prototype.setEnd = setEnd;
-	iview.METS.PhysicalModel.prototype.setStart = setStart;
-	iview.METS.PhysicalModel.prototype.getNumberOfPages = getNumberOfPages;
-	iview.METS.PhysicalModel.prototype.getCurPos = getCurPos;
-	iview.METS.PhysicalModel.prototype.getCurrent = getCurrent;
-	iview.METS.PhysicalModel.prototype.getEntryAt = getEntryAt;
-	iview.METS.PhysicalModel.prototype.getNext = getNext;
-	iview.METS.PhysicalModel.prototype.setNext = setNext;
-	iview.METS.PhysicalModel.prototype.getPosition = getPosition;
-	iview.METS.PhysicalModel.prototype.getPrevious = getPrevious;
-	iview.METS.PhysicalModel.prototype.setPrevious = setPrevious;
-	iview.METS.PhysicalModel.prototype.iterator = iterator;
-	iview.METS.PhysicalModel.prototype.SELECT = 1;
+	var prototype = iview.METS.PhysicalModel.prototype;
+	prototype.addPage = addPage;
+	prototype.setPosition = setPosition;
+	prototype.setEnd = setEnd;
+	prototype.setStart = setStart;
+	prototype.getNumberOfPages = getNumberOfPages;
+	prototype.getCurPos = getCurPos;
+	prototype.getCurrent = getCurrent;
+	prototype.getEntryAt = getEntryAt;
+	prototype.getNext = getNext;
+	prototype.setNext = setNext;
+	prototype.getPosition = getPosition;
+	prototype.getPrevious = getPrevious;
+	prototype.setPrevious = setPrevious;
+	prototype.iterator = iterator;
+	prototype.SELECT = 1;
 })();
 
 /**
@@ -504,10 +506,11 @@ iview.METS.PhysicalEntry = function(values) {
 		return this._orderlabel;
 	}
 	
-	iview.METS.PhysicalEntry.prototype.getHref = getHref;
-	iview.METS.PhysicalEntry.prototype.getID = getID;
-	iview.METS.PhysicalEntry.prototype.getOrder = getOrder;
-	iview.METS.PhysicalEntry.prototype.getOrderlabel = getOrderlabel;
+	var prototype = iview.METS.PhysicalEntry.prototype;
+	prototype.getHref = getHref;
+	prototype.getID = getID;
+	prototype.getOrder = getOrder;
+	prototype.getOrderlabel = getOrderlabel;
 })();
 
 /**
@@ -609,8 +612,9 @@ iview.METS.PhysicalModelProvider = function(doc) {
 		this._doc = doc;
 	}
 
-	iview.METS.PhysicalModelProvider.prototype.setDocument = setDocument;
-	iview.METS.PhysicalModelProvider.prototype.createModel = createModel;
+	var prototype = iview.METS.PhysicalModelProvider.prototype;
+	prototype.setDocument = setDocument;
+	prototype.createModel = createModel;
 })();
 //TODO Chapter METS Information could be merged into PhysicalModel
 /*********************************************
@@ -732,14 +736,15 @@ iview.METS.ChapterModel = function(element) {
 		}
 	}
 	
-	iview.METS.ChapterModel.prototype.getEntries = getEntries;
-	iview.METS.ChapterModel.prototype.addPage = addPage;
-	iview.METS.ChapterModel.prototype.addBranch = addBranch;
-	iview.METS.ChapterModel.prototype.getContainer = getContainer;
-	iview.METS.ChapterModel.prototype.addHash = addHash;
-	iview.METS.ChapterModel.prototype.getHash = getHash;
-	iview.METS.ChapterModel.prototype.setSelected = setSelected;
-	iview.METS.ChapterModel.prototype.addContent = addContent;
+	var prototype = iview.METS.ChapterModel.prototype;
+	prototype.getEntries = getEntries;
+	prototype.addPage = addPage;
+	prototype.addBranch = addBranch;
+	prototype.getContainer = getContainer;
+	prototype.addHash = addHash;
+	prototype.getHash = getHash;
+	prototype.setSelected = setSelected;
+	prototype.addContent = addContent;
 })();
 
 /*
@@ -794,10 +799,11 @@ iview.METS.ChapterPage = function(properties, parent) {
 		this._order = value;
 	}
 	
-	iview.METS.ChapterPage.prototype.getID = getID;
-	iview.METS.ChapterPage.prototype.getLabel = getLabel;
-	iview.METS.ChapterPage.prototype.getOrder = getOrder;
-	iview.METS.ChapterPage.prototype.setOrder = setOrder;
+	var prototype = iview.METS.ChapterPage.prototype;
+	prototype.getID = getID;
+	prototype.getLabel = getLabel;
+	prototype.getOrder = getOrder;
+	prototype.setOrder = setOrder;
 })();
 
 /*
@@ -877,16 +883,17 @@ iview.METS.ChapterBranch = function(entry, parent) {
 		return this._container;
 	}
 	
-	iview.METS.ChapterBranch.prototype.addPage = addPage;
-	iview.METS.ChapterBranch.prototype.addBranch = addBranch;
-	iview.METS.ChapterBranch.prototype.getEntries = getEntries;
-	iview.METS.ChapterBranch.prototype.getInfo = getInfo;
-	iview.METS.ChapterBranch.prototype.reset = reset;
-	iview.METS.ChapterBranch.prototype.getLabel = getLabel;
-	iview.METS.ChapterBranch.prototype.getID = getID;
-	iview.METS.ChapterBranch.prototype.getOrder = getOrder;
-	iview.METS.ChapterBranch.prototype.setOrder = setOrder;
-	iview.METS.ChapterBranch.prototype.getContainer = getContainer;
+	var prototype = iview.METS.ChapterBranch.prototype;
+	prototype.addPage = addPage;
+	prototype.addBranch = addBranch;
+	prototype.getEntries = getEntries;
+	prototype.getInfo = getInfo;
+	prototype.reset = reset;
+	prototype.getLabel = getLabel;
+	prototype.getID = getID;
+	prototype.getOrder = getOrder;
+	prototype.setOrder = setOrder;
+	prototype.getContainer = getContainer;
 })();
 
 /*
@@ -974,6 +981,7 @@ iview.METS.ChapterModelProvider = function(metsDoc) {
 		this._metsDoc = metsDoc;	
 	}
 	
-	iview.METS.ChapterModelProvider.prototype.createModel = createModel;
-	iview.METS.ChapterModelProvider.prototype.setDocument = setDocument;
+	var prototype = iview.METS.ChapterModelProvider.prototype;
+	prototype.createModel = createModel;
+	prototype.setDocument = setDocument;
 })();
