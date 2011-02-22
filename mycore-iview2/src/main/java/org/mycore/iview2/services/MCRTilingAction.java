@@ -8,6 +8,9 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.imagetiler.MCRImage;
 import org.mycore.imagetiler.MCRTiledPictureProps;
@@ -34,6 +37,8 @@ public class MCRTilingAction implements Runnable {
      * Also this updates tileJob properties of {@link MCRTileJob} in the database.
      */
     public void run() {
+        MCRSession mcrSession=MCRSessionMgr.getCurrentSession();
+        mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
         Session session = sessionFactory.getCurrentSession();
         Transaction transaction = session.beginTransaction();
         try {
@@ -61,6 +66,8 @@ public class MCRTilingAction implements Runnable {
             }
         } finally {
             session.close();
+            MCRSessionMgr.releaseCurrentSession();
+            mcrSession.close();
         }
     }
 
