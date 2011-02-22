@@ -28,7 +28,7 @@ public class MCRACLEditorServlet_v2 extends MCRServlet {
         HttpServletResponse response = job.getResponse();
         String mode = request.getParameter("mode");
 
-        if (verifyAccess(job)){
+        if (!verifyAccess(job)){
             return;
         }
 
