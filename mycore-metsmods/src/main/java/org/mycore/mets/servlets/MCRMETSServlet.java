@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.xml.MCRLayoutService;
@@ -54,6 +55,8 @@ public class MCRMETSServlet extends MCRServlet {
 
     private static final Logger LOGGER = Logger.getLogger(MCRMETSServlet.class);
 
+    private boolean useExpire;
+
     private static int CACHE_TIME;
 
     /* (non-Javadoc)
@@ -64,6 +67,7 @@ public class MCRMETSServlet extends MCRServlet {
         super.init();
         String cacheParam = getInitParameter("cacheTime");
         CACHE_TIME = cacheParam != null ? Integer.parseInt(cacheParam) : (60 * 60 * 24);//default is one day
+        useExpire = MCRConfiguration.instance().getBoolean("MCR.Component.MetsMods.Servlet.UseExpire", true);
     }
 
     @Override
@@ -105,11 +109,13 @@ public class MCRMETSServlet extends MCRServlet {
 
     private void writeHeaders(HttpServletResponse response, long lastModified) {
         response.setHeader("Cache-Control", "max-age=" + CACHE_TIME);
-        response.setContentType("image/jpeg");
+        response.setContentType("text/xml");
         response.setDateHeader("Last-Modified", lastModified);
-        Date expires = new Date(System.currentTimeMillis() + CACHE_TIME * 1000);
-        LOGGER.info("Last-Modified: " + new Date(lastModified) + ", expire on: " + expires);
-        response.setDateHeader("Expires", expires.getTime());
+        if (useExpire) {
+            Date expires = new Date(System.currentTimeMillis() + CACHE_TIME * 1000);
+            LOGGER.info("Last-Modified: " + new Date(lastModified) + ", expire on: " + expires);
+            response.setDateHeader("Expires", expires.getTime());
+        }
     }
 
     protected static String getOwnerID(String pathInfo) {
