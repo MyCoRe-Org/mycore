@@ -228,7 +228,7 @@ public class MCRHit {
      */
     public void merge(MCRHit other) {
         // Copy other hit sort data
-        if (sortData.isEmpty() && !other.sortData.isEmpty()) {
+        if (!other.sortData.isEmpty()) {
             sortData.addAll(other.sortData);
             sortValues.putAll(other.sortValues);
         }
