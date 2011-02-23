@@ -25,13 +25,19 @@ package org.mycore.mets.tools;
 import java.util.Collection;
 import java.util.HashSet;
 
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.URIResolver;
+import javax.xml.transform.stream.StreamSource;
+
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
-import org.mycore.common.xml.MCRURIResolver.MCRResolver;
+import org.jdom.transform.JDOMSource;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
+import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -45,34 +51,35 @@ import org.mycore.mets.model.MCRMETSGenerator;
  * 
  * @author Thomas Scheffler (yagee)
  */
-public class MCRMetsResolver implements MCRResolver {
+public class MCRMetsResolver implements URIResolver {
     private static final Logger LOGGER = Logger.getLogger(MCRMetsResolver.class);
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.mycore.common.xml.MCRURIResolver.MCRResolver#resolveElement(java.
-     * lang.String)
-     */
-    public Element resolveElement(String uri) throws Exception {
-        String id = uri.substring(uri.indexOf(":") + 1);
+    @Override
+    public Source resolve(String href, String base) throws TransformerException {
+        String id = href.substring(href.indexOf(":") + 1);
         LOGGER.debug("Reading METS for ID " + id);
         MCRObjectID objId = MCRObjectID.getInstance(id);
         if (!objId.getTypeId().equals("derivate")) {
             String derivateID = getDerivateFromObject(id);
             if (derivateID == null) {
-                return new Element("mets", Namespace.getNamespace("mets", "http://www.loc.gov/METS/"));
+                return new JDOMSource(new Element("mets", Namespace.getNamespace("mets", "http://www.loc.gov/METS/")));
             }
             id = derivateID;
         }
         MCRDirectory dir = MCRDirectory.getRootDirectory(id);
         MCRFilesystemNode metsFile = dir.getChildByPath("mets.xml");
         HashSet<MCRFilesystemNode> ignoreNodes = new HashSet<MCRFilesystemNode>();
-        if (metsFile != null)
-            ignoreNodes.add(metsFile);
-        Document mets = MCRMETSGenerator.getGenerator().getMETS(dir, ignoreNodes);
-        return mets.getRootElement();
+        try {
+            if (metsFile != null) {
+                //TODO: generate new METS Output
+                //ignoreNodes.add(metsFile);
+                return new StreamSource(((MCRFile) metsFile).getContentAsInputStream());
+            }
+            Document mets = MCRMETSGenerator.getGenerator().getMETS(dir, ignoreNodes);
+            return new JDOMSource(mets);
+        } catch (Exception e) {
+            throw new TransformerException(e);
+        }
     }
 
     private String getDerivateFromObject(String id) {
@@ -85,4 +92,5 @@ public class MCRMetsResolver implements MCRResolver {
         }
         return null;
     }
+
 }
