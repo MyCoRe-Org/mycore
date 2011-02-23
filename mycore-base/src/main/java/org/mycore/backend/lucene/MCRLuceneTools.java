@@ -157,6 +157,10 @@ public class MCRLuceneTools {
         	if (df == null) {
                 df = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSS'Z'");
             }
+        case 4: //"yyyy""
+        	if (df == null) {
+                df = new SimpleDateFormat("yyyy");
+            }
         case 10://"yyyy-MM-dd"
             if (df == null) {
                 df = new SimpleDateFormat("yyyy-MM-dd");

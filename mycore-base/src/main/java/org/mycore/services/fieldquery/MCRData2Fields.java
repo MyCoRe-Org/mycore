@@ -303,14 +303,16 @@ public class MCRData2Fields {
     private static List<MCRFieldValue> buildValues(Templates stylesheet, Source xml, String objectType) {
         List<MCRFieldValue> values = new ArrayList<MCRFieldValue>();
 
-        List fieldValues = null;
+        @SuppressWarnings("rawtypes")
+		List fieldValues = null;
         try {
             JDOMResult xmlres = new JDOMResult();
             Transformer transformer = factory.newTransformerHandler(stylesheet).getTransformer();
             transformer.setParameter("objectType", objectType);
             transformer.transform(xml, xmlres);
 
-            List resultList = xmlres.getResult();
+            @SuppressWarnings("rawtypes")
+			List resultList = xmlres.getResult();
             Element root = (Element) resultList.get(0);
             fieldValues = root.getChildren();
         } catch (Exception ex) {
@@ -348,7 +350,11 @@ public class MCRData2Fields {
         try {
             MCRMetaISO8601Date iDate = new MCRMetaISO8601Date();
             iDate.setDate(sDate.trim());
-            return iDate.getISOString().substring(0, 10);
+            String isoDateString =iDate.getISOString();
+            if(isoDateString.length()==4){
+            	return isoDateString;
+            }
+            return isoDateString.substring(0, 10);
         } catch (Exception ex) {
             LOGGER.debug(ex);
             return "";
