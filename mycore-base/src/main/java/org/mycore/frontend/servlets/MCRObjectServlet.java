@@ -26,6 +26,7 @@ package org.mycore.frontend.servlets;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.text.MessageFormat;
 import java.util.Hashtable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -307,7 +308,8 @@ public class MCRObjectServlet extends MCRServlet {
 
     protected final String getEditorIDFromObjectID(HttpServletRequest request, String referer) {
         String servletPath = request.getServletPath();
-        Pattern p = Pattern.compile(servletPath + "([^;\\?]*)");
+        //matches all referers with the same servletPath
+        Pattern p = Pattern.compile(MessageFormat.format("^[^;\\?]+{0}([^;\\?]*)", servletPath));
         Matcher m = p.matcher(referer);
         if (m.find()) {
             try {
