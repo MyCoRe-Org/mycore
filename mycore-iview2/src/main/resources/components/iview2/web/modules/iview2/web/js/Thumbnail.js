@@ -124,13 +124,13 @@ function processImageProperties(imageProperties, viewID){
 		// zoomLevel 0 ist erstes Level
 		Iview[viewID].zoomInit = Math.ceil((Iview[viewID].zoomMax + 1) / 2) - 1;
 	}
-	var preLoadEl=document.getElementById("preload"+viewID);
-	preLoadEl.style.width = Iview[viewID].bildBreite / Math.pow(2, Iview[viewID].zoomMax - Iview[viewID].zoomInit) + "px";
-	preLoadEl.style.height = Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - Iview[viewID].zoomInit) + "px";
-	preLoadEl.removeChild(document.getElementById("preloadImg"+viewID));
 	var preload = new Image();
 	preload.id = "preloadImg" + viewID;
-	preLoadEl.appendChild(preload);
+	var preloadEl=jQuery("#preload"+viewID);
+	preloadEl.css({	"width" : Iview[viewID].bildBreite / Math.pow(2, Iview[viewID].zoomMax - Iview[viewID].zoomInit) + "px",
+					"height" : Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - Iview[viewID].zoomInit) + "px"})
+			 .empty()
+			 .append(preload);
 
 	if (viewerBean == null) {
 		initializeGraphic(viewID);
@@ -707,10 +707,10 @@ function importCutOut(viewID) {
 					}, true);
 		}
 	});
-	var preload = document.getElementById("preload"+viewID);
+	var preload = jQuery(document.getElementById("preload"+viewID));
 	Iview[viewID].cutOutModel.setSize({
-		'x': jQuery(preload).width(),
-		'y': jQuery(preload).height()});
+		'x': preload.width(),
+		'y': preload.height()});
 }
 
 /**
@@ -761,16 +761,21 @@ function importOverview(viewID, callback) {
  * @function
  * @name	zoomViewer
  * @memberOf	iview.Thumbnails
- * @description	handels the direction of zooming in the viewer
- * @param 	{boolean} direction: true = zoom in, false = zoom out
+ * @description	handles the direction of zooming in the viewer
  * @param	{string} viewID ID of the derivate
+ * @param 	{boolean} direction: true = zoom in, false = zoom out
  */
 function zoomViewer(viewID, direction) {
 	var viewer = Iview[viewID].viewerBean;
 	var dir = 0;
 	if (direction) {
-		// gesetzt den Fall, es wird vom obersten Level weiter gezoomt (falls Screen oder Width aktiv waren)
-		if (viewer != Iview[viewID].zoomMax) {
+		//if zoomWidth or zoomScreen was active and we're already in the max zoomlevel just reset the displayMode
+		if (Iview[viewID].zoomScreen) {
+			pictureScreen(viewID);
+		} else if (Iview[viewID].zoomWidth) {
+			pictureWidth(viewID);
+		}
+		if (viewer.zoomLevel != Iview[viewID].zoomMax) {
 			dir = 1;
 		}
 	} else {

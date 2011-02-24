@@ -358,7 +358,9 @@ ToolbarController.prototype.checkNavigation = function(pNum) {
  * @param		{integer} zoom defines the current zoom Level of the shown content
  */
 ToolbarController.prototype.checkZoom = function(zoom) {
-	var zoomIn = (zoom == this.getViewer().zoomMax)? false : true;
+	var viewer = this.getViewer()
+	var preload = jQuery("#preload"+viewer.viewerBean.viewID);
+	var zoomIn = (viewer.bildBreite <= preload.width() && viewer.bildHoehe <= preload.height())? false : true;
 	var zoomOut = (zoom == 0)? false : true;
 	
 	var models = this.getViewer().getToolbarMgr().getModels();
