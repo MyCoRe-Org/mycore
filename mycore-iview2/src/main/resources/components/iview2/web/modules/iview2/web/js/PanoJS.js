@@ -361,13 +361,13 @@ PanoJS.prototype = {
 		var viewID = this.viewID;
 		//Changed to work for multiple Viewers
 		//hinzugefuegt damit Bild nicht ueber die Raender laeuft
-		if (-(this.x + motion.x) > ((Iview[viewID].bildBreite/Math.pow(2, Iview[viewID].zoomMax - this.zoomLevel))*Iview[viewID].zoomScale-this.width)) {
+		if (-(this.x + motion.x) > ((Iview[viewID].picWidth/Math.pow(2, Iview[viewID].zoomMax - this.zoomLevel))*Iview[viewID].zoomScale-this.width)) {
 			motion.x = 0;
-			this.x = -((Iview[viewID].bildBreite/Math.pow(2, Iview[viewID].zoomMax - this.zoomLevel))*Iview[viewID].zoomScale-this.width);
+			this.x = -((Iview[viewID].picWidth/Math.pow(2, Iview[viewID].zoomMax - this.zoomLevel))*Iview[viewID].zoomScale-this.width);
 		}
-		if (-(this.y + motion.y) > ((Iview[viewID].bildHoehe/Math.pow(2, Iview[viewID].zoomMax - this.zoomLevel))*Iview[viewID].zoomScale-this.height)) {
+		if (-(this.y + motion.y) > ((Iview[viewID].picHeight/Math.pow(2, Iview[viewID].zoomMax - this.zoomLevel))*Iview[viewID].zoomScale-this.height)) {
 			motion.y = 0;
-			this.y = -((Iview[viewID].bildHoehe/Math.pow(2, Iview[viewID].zoomMax - this.zoomLevel))*Iview[viewID].zoomScale-this.height);
+			this.y = -((Iview[viewID].picHeight/Math.pow(2, Iview[viewID].zoomMax - this.zoomLevel))*Iview[viewID].zoomScale-this.height);
 		}
 		if(this.x + motion.x > 0){
 			this.x = 0;
@@ -499,9 +499,9 @@ PanoJS.prototype = {
 			} else {
 				//modification to original PanonJS code
 				var iView=Iview[this.viewID];
-				var currentWidth = Math.floor(iView.bildBreite / Math.pow(2, iView.zoomMax - this.zoomLevel));
+				var currentWidth = Math.floor(iView.picWidth / Math.pow(2, iView.zoomMax - this.zoomLevel));
 				var xTileCount = Math.ceil( currentWidth / iView.tilesize);
-				var currentHeight = Math.floor(iView.bildHoehe / Math.pow(2, iView.zoomMax - this.zoomLevel));
+				var currentHeight = Math.floor(iView.picHeight / Math.pow(2, iView.zoomMax - this.zoomLevel));
 				var yTileCount = Math.ceil( currentHeight / iView.tilesize);
 				var right = tile.xIndex >= xTileCount; //index starts at 0
 				var low = tile.yIndex >= yTileCount;

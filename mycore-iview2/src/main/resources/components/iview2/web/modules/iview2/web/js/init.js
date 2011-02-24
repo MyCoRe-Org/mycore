@@ -166,8 +166,8 @@ function reinitializeGraphic(viewID) {
 	
 	if (Iview[viewID].useCutOut) {
 		Iview[viewID].cutOutModel.setRatio({
-			'x': viewerBean.width / ((Iview[viewID].bildBreite / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale),
-			'y': viewerBean.height / ((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale)});
+			'x': viewerBean.width / ((Iview[viewID].picWidth / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale),
+			'y': viewerBean.height / ((Iview[viewID].picHeight / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale)});
 		Iview[viewID].cutOutModel.setPos({
 			'x': - (viewerBean.x / Math.pow(2, viewerBean.zoomLevel))*Iview[viewID].zoomScale,
 			'y': - (viewerBean.y / Math.pow(2, viewerBean.zoomLevel))*Iview[viewID].zoomScale});
@@ -175,7 +175,7 @@ function reinitializeGraphic(viewID) {
 	
 	// Actualize forward & backward Buttons
 	var previewTbView = jQuery(Iview[viewID].getToolbarCtrl().getView("previewTbView").toolbar);
-	var newTop = ((((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - 1)) * Iview[viewID].zoomScale) - (toInt(previewTbView.css("height")) + toInt(previewTbView.css("padding-top")) + toInt(previewTbView.css("padding-bottom")))) / 2) + "px";
+	var newTop = ((((Iview[viewID].picHeight / Math.pow(2, Iview[viewID].zoomMax - 1)) * Iview[viewID].zoomScale) - (toInt(previewTbView.css("height")) + toInt(previewTbView.css("padding-top")) + toInt(previewTbView.css("padding-bottom")))) / 2) + "px";
 	if (Iview[viewID].viewerContainer.hasClass("viewerContainer min")) {
 		Iview[viewID].viewerContainer.find(".toolbars .toolbar").css("top", newTop);
 	}

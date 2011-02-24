@@ -360,7 +360,7 @@ ToolbarController.prototype.checkNavigation = function(pNum) {
 ToolbarController.prototype.checkZoom = function(zoom) {
 	var viewer = this.getViewer()
 	var preload = jQuery("#preload"+viewer.viewerBean.viewID);
-	var zoomIn = (viewer.bildBreite <= preload.width() && viewer.bildHoehe <= preload.height())? false : true;
+	var zoomIn = (viewer.picWidth <= preload.width() && viewer.picHeight <= preload.height())? false : true;
 	var zoomOut = (zoom == 0)? false : true;
 	
 	var models = this.getViewer().getToolbarMgr().getModels();

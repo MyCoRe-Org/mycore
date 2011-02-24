@@ -88,8 +88,8 @@ function processImageProperties(imageProperties, viewID){
 	var values = nodeAttributes(imageProperties.getElementsByTagName("imageinfo")[0]);
 	
 	Iview[viewID].tiles = parseInt(values['tiles']);
-	Iview[viewID].bildBreite = parseInt(values['width']);
-	Iview[viewID].bildHoehe = parseInt(values['height']);
+	Iview[viewID].picWidth = parseInt(values['width']);
+	Iview[viewID].picHeight = parseInt(values['height']);
 	var viewerBean = Iview[viewID].viewerBean;
 
 	if (viewerBean) {
@@ -127,8 +127,8 @@ function processImageProperties(imageProperties, viewID){
 	var preload = new Image();
 	preload.id = "preloadImg" + viewID;
 	var preloadEl=jQuery("#preload"+viewID);
-	preloadEl.css({	"width" : Iview[viewID].bildBreite / Math.pow(2, Iview[viewID].zoomMax - Iview[viewID].zoomInit) + "px",
-					"height" : Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - Iview[viewID].zoomInit) + "px"})
+	preloadEl.css({	"width" : Iview[viewID].picWidth / Math.pow(2, Iview[viewID].zoomMax - Iview[viewID].zoomInit) + "px",
+					"height" : Iview[viewID].picHeight / Math.pow(2, Iview[viewID].zoomMax - Iview[viewID].zoomInit) + "px"})
 			 .empty()
 			 .append(preload);
 
@@ -388,13 +388,13 @@ function switchDisplayMode(screenZoom, stateBool, viewID) {
 	var preload = document.getElementById("preload"+viewID);
 	if (stateBool) {
 		for (var i = 0; i <= Iview[viewID].zoomMax; i++) {
-			if(Iview[viewID].bildBreite/viewerBean.width > Iview[viewID].bildHoehe/document.getElementById("viewer"+viewID).offsetHeight || (stateBool && !screenZoom)){
+			if(Iview[viewID].picWidth/viewerBean.width > Iview[viewID].picHeight/document.getElementById("viewer"+viewID).offsetHeight || (stateBool && !screenZoom)){
 			//Width > Height Or ZoomWidth is true
-				if (calculateZoomProp(i, Iview[viewID].bildBreite, viewerBean.width, 0, viewID)) {
+				if (calculateZoomProp(i, Iview[viewID].picWidth, viewerBean.width, 0, viewID)) {
 					break;
 				}
 			} else {
-				if (calculateZoomProp(i, Iview[viewID].bildHoehe, viewerBean.height, 0, viewID)) {
+				if (calculateZoomProp(i, Iview[viewID].picHeight, viewerBean.height, 0, viewID)) {
 					break;
 				}
 			}
@@ -473,8 +473,8 @@ function handleZoomScrollbars(viewID) {
 	var barX = Iview[viewID].barX;
 	var barY = Iview[viewID].barY;
 	// determine the current imagesize
-	var curBreite = (Iview[viewID].bildBreite / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale;
-	var curHoehe = (Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale;
+	var curBreite = (Iview[viewID].picWidth / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale;
+	var curHoehe = (Iview[viewID].picHeight / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale;
 
 	// horizontal
 	// max scaling
@@ -505,8 +505,8 @@ function handleResizeScrollbars(viewID) {
 	var barX = Iview[viewID].barX;
 	var barY = Iview[viewID].barY;
 	// determine the current imagesize
-	var curBreite = (Iview[viewID].bildBreite / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale;
-	var curHoehe = (Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale;
+	var curBreite = (Iview[viewID].picWidth / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale;
+	var curHoehe = (Iview[viewID].picHeight / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale;
 
 	// vertical
 	// max scaling
@@ -549,11 +549,11 @@ function listenerZoom(viewID) {
 			pictureScreen(viewID, true);
 		}
 		var perLoadEl=document.getElementById("preload"+viewID);
-		perLoadEl.style.width = (Iview[viewID].bildBreite / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale +  "px";
-		perLoadEl.style.height = (Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale + "px";
+		perLoadEl.style.width = (Iview[viewID].picWidth / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale +  "px";
+		perLoadEl.style.height = (Iview[viewID].picHeight / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale + "px";
 	
 		// Actualize forward & backward Buttons
-		jQuery(".viewerContainer.min .toolbars .toolbar").css("width", (Iview[viewID].bildBreite / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale +  "px");
+		jQuery(".viewerContainer.min .toolbars .toolbar").css("width", (Iview[viewID].picWidth / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale +  "px");
 	
 		handleZoomScrollbars(viewID);
 
@@ -562,8 +562,8 @@ function listenerZoom(viewID) {
 				'x': jQuery(perLoadEl).width(),
 				'y': jQuery(perLoadEl).height()});
 			Iview[viewID].cutOutModel.setRatio({
-				'x': viewerBean.width / ((Iview[viewID].bildBreite / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale),
-				'y': viewerBean.height / ((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale)});
+				'x': viewerBean.width / ((Iview[viewID].picWidth / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale),
+				'y': viewerBean.height / ((Iview[viewID].picHeight / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale)});
 			Iview[viewID].cutOutModel.setPos({
 				'x': - (viewerBean.x / Math.pow(2, viewerBean.zoomLevel))*Iview[viewID].zoomScale,
 				'y': - (viewerBean.y / Math.pow(2, viewerBean.zoomLevel))*Iview[viewID].zoomScale});
@@ -653,7 +653,7 @@ function updateModuls(viewID) {
 
 	// Actualize forward & backward Buttons
 	var previewTbView = jQuery(Iview[viewID].getToolbarCtrl().getView("previewTbView").toolbar);
-	var newTop = ((((Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - 1)) * Iview[viewID].zoomScale) - (toInt(previewTbView.css("height")) + toInt(previewTbView.css("padding-top")) + toInt(previewTbView.css("padding-bottom")))) / 2) + "px";
+	var newTop = ((((Iview[viewID].picHeight / Math.pow(2, Iview[viewID].zoomMax - 1)) * Iview[viewID].zoomScale) - (toInt(previewTbView.css("height")) + toInt(previewTbView.css("padding-top")) + toInt(previewTbView.css("padding-bottom")))) / 2) + "px";
 	if (Iview[viewID].viewerContainer.hasClass("viewerContainer min")) {
 		Iview[viewID].viewerContainer.find(".toolbars .toolbar").css("top", newTop);
 	}
