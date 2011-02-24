@@ -117,8 +117,3 @@ function save(){
    	    }
    });
 }
-
-function userConfirmsReset(){
-    log("userConfirmsReset()");
-    return confirm('Alle ungespeicherten Änderungen gehen verloren! Wollen Sie fortsetzen?');
-}

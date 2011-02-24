@@ -13,7 +13,7 @@
   </xsl:variable>
   <xsl:variable name="createMetsAllowed" select="acl:checkPermission($derivateId,'writedb')" />
 
-  <xsl:template match="/StartMetsEditor">
+  <xsl:template match="/StartMetsEditor"> 
     <!--
       $Revision: 3162 $ $Date: 2010-11-24 08:59:25 +0100 (Wed, 24 Nov 2010) $ $LastChangedBy: shermann $ Copyright 2010 - Thüringer
       Universitäts- und Landesbibliothek Jena Mets-Editor is free software: you can redistribute it and/or modify it under the terms of the GNU
@@ -142,19 +142,16 @@
             <script type="text/javascript" src="js/storeUtils.js"></script>
             <script type="text/javascript" src="js/uuid.js"></script>
             <script type="text/javascript" src="js/logger.js"></script>
+            <script type="text/javascript" src="js/reload.js"></script>
 
             <script type="text/javascript">
-              <xsl:value-of
-                select="concat('function resetTree(){
-                  if(userConfirmsReset()){
-                    window.location=&quot;',$WebApplicationBaseURL,'metseditor/start_mets_editor.xml?derivate=',$derivateId,'&amp;useExistingMets=false','&quot;;}}')" />
-
-              <xsl:value-of
-                select="concat('function reloadTree(){
-                  if(userConfirmsReset()){
-                    window.location=&quot;',$WebApplicationBaseURL,'metseditor/start_mets_editor.xml?derivate=',$derivateId,'&amp;useExistingMets=true','&quot;;}}')" />
-
+              <!-- define resetTreeURL -->
+              <xsl:value-of select="concat('var resetTreeURL = &quot;',$WebApplicationBaseURL, 'metseditor/start_mets_editor.xml?derivate=',$derivateId,'&amp;useExistingMets=false','&quot;;')"/>
+              <!-- define reloadTreeURL -->
+              <xsl:value-of select="concat('var reloadTreeURL = &quot;',$WebApplicationBaseURL, 'metseditor/start_mets_editor.xml?derivate=',$derivateId,'&amp;useExistingMets=true','&quot;;')"/>                
+              <!-- define webApplicationBaseURL -->
               <xsl:value-of select="concat('var webApplicationBaseURL = &quot;', $WebApplicationBaseURL,'&quot;;')" />
+              <!-- define derivateId -->
               <xsl:value-of select="concat('var derivateId = &quot;', $derivateId,'&quot;;')" />
 
               dojo.addOnLoad(function() {
@@ -444,6 +441,21 @@
                 </div>
               </div>
 
+            </div>
+
+            <!-- ############################################# -->
+            <!-- Definition of the confirm reload/reset dialog -->
+            <!-- ############################################# -->
+            
+            <div id="confirmReloadDialog" dojoType="dijit.Dialog" title="Struktur zurücksetzen/neuladen?">
+              <div id="confirmReloadDialogContentPane" dojoType="dijit.layout.ContentPane" style="width:300px; height:100px;">
+                <label id="userInfoMsg">
+                  Alle nicht gespeicherten Information gehen verloren! Wollen Sie fortfahren?
+                  <br />
+                </label>
+                <button dojoType="dijit.form.Button" id="cancelReload" label="Abbrechen" iconClass="circleIcon" onclick="dijit.byId('confirmReloadDialog').hide()" style="float: right; padding-top: 2em;"/>
+                <button dojoType="dijit.form.Button" id="okReload" label="Ok" iconClass="circleIcon" style="float: right; padding-top: 2em;" onclick="redirect"/>
+              </div>
             </div>
 
             <!-- ############################# -->
