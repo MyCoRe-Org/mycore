@@ -126,9 +126,9 @@ function processImageProperties(imageProperties, viewID){
 	}
 	var preload = new Image();
 	preload.id = "preloadImg" + viewID;
-	var preloadEl=jQuery("#preload"+viewID);
-	preloadEl.css({	"width" : Iview[viewID].picWidth / Math.pow(2, Iview[viewID].zoomMax - Iview[viewID].zoomInit) + "px",
-					"height" : Iview[viewID].picHeight / Math.pow(2, Iview[viewID].zoomMax - Iview[viewID].zoomInit) + "px"})
+	var preloadCont=Iview[viewID].preload;
+	preloadCont.css({"width" : Iview[viewID].picWidth / Math.pow(2, Iview[viewID].zoomMax - Iview[viewID].zoomInit) + "px",
+					 "height" : Iview[viewID].picHeight / Math.pow(2, Iview[viewID].zoomMax - Iview[viewID].zoomInit) + "px"})
 			 .empty()
 			 .append(preload);
 
@@ -385,7 +385,7 @@ function switchDisplayMode(screenZoom, stateBool, viewID) {
 	stateBool = (stateBool)? false: true;
 	viewerBean.clear();
 	removeScaling(viewID);
-	var preload = document.getElementById("preload"+viewID);
+	var preload = Iview[viewID].preload;
 	if (stateBool) {
 		for (var i = 0; i <= Iview[viewID].zoomMax; i++) {
 			if(Iview[viewID].picWidth/viewerBean.width > Iview[viewID].picHeight/document.getElementById("viewer"+viewID).offsetHeight || (stateBool && !screenZoom)){
@@ -411,9 +411,9 @@ function switchDisplayMode(screenZoom, stateBool, viewID) {
 		}
 	}
 
-	Iview[viewID].barX.setCurValue(-parseInt(preload.offsetLeft));
-	Iview[viewID].barY.setCurValue(-parseInt(preload.offsetTop));
-	if (Iview[viewID].useCutOut) Iview[viewID].cutOutModel.setPos({'x':preload.offsetLeft, 'y':preload.offsetTop});
+	Iview[viewID].barX.setCurValue(-parseInt(preload.css("offsetLeft")));
+	Iview[viewID].barY.setCurValue(-parseInt(preload.css("offsetTop")));
+	if (Iview[viewID].useCutOut) Iview[viewID].cutOutModel.setPos({'x':preload.css("offsetLeft"), 'y':preload.css("offsetTop")});
 	return stateBool;
 }
 
@@ -548,9 +548,9 @@ function listenerZoom(viewID) {
 		if (Iview[viewID].zoomScreen) {
 			pictureScreen(viewID, true);
 		}
-		var perLoadEl=document.getElementById("preload"+viewID);
-		perLoadEl.style.width = (Iview[viewID].picWidth / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale +  "px";
-		perLoadEl.style.height = (Iview[viewID].picHeight / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale + "px";
+		var preload=Iview[viewID].preload;
+		preload.css({"width": (Iview[viewID].picWidth / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale +  "px",
+					 "height": (Iview[viewID].picHeight / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale + "px"});
 	
 		// Actualize forward & backward Buttons
 		jQuery(".viewerContainer.min .toolbars .toolbar").css("width", (Iview[viewID].picWidth / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale +  "px");
@@ -559,8 +559,8 @@ function listenerZoom(viewID) {
 
 		if (Iview[viewID].useCutOut) {
 			Iview[viewID].cutOutModel.setSize({
-				'x': jQuery(perLoadEl).width(),
-				'y': jQuery(perLoadEl).height()});
+				'x': preload.width(),
+				'y': preload.height()});
 			Iview[viewID].cutOutModel.setRatio({
 				'x': viewerBean.width / ((Iview[viewID].picWidth / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale),
 				'y': viewerBean.height / ((Iview[viewID].picHeight / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale)});
@@ -595,9 +595,9 @@ function listenerMove(viewID) {
 		}
 		// set Roller that no circles are created, and we end in an endless loop
 		Iview[viewID].roller = true;
-		var preload=document.getElementById("preload"+viewID);
-		Iview[viewID].barX.setCurValue(-parseInt(preload.offsetLeft));
-		Iview[viewID].barY.setCurValue(-parseInt(preload.offsetTop));
+		var preload=Iview[viewID].preload;
+		Iview[viewID].barX.setCurValue(-parseInt(preload.css("offsetLeft")));
+		Iview[viewID].barY.setCurValue(-parseInt(preload.css("offsetTop")));
 		Iview[viewID].roller = false;
 	}
 }
@@ -707,7 +707,7 @@ function importCutOut(viewID) {
 					}, true);
 		}
 	});
-	var preload = jQuery(document.getElementById("preload"+viewID));
+	var preload = Iview[viewID].preload;
 	Iview[viewID].cutOutModel.setSize({
 		'x': preload.width(),
 		'y': preload.height()});

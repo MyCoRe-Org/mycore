@@ -42,7 +42,7 @@
         <div class="surface" style="width:100%;height:100%;z-index:30">
         </div>
         <div class="well">
-          <div id="preload{$groupID}" class="preload">
+          <div class="preload">
             <img height="100%" width="100%" id="preloadImg{$groupID}" alt="{i18n:translate('component.iview2.preview')}" />
           </div>
         </div>
@@ -259,6 +259,7 @@
       function startViewer(viewID) {
         if (Iview[viewID].started) return;
         Iview[viewID].started = true;
+        Iview[viewID].preload = jQuery("#viewerContainer" + viewID + " .preload");
         $LAB.setGlobalDefaults({"AllowDuplicates": false, "BasePath": '../modules/iview2/web/js/'});
         loading(viewID);
       }
