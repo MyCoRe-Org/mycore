@@ -200,6 +200,7 @@ public class MCRHit {
      *         "greater" than the other, a negative value if this hit is
      *         "smaller" than the other
      * @see MCRResults#sortBy(List)
+     * @see MCRLuceneSearcher#getFieldType(MCRFieldDef fieldDef) for data type value strings
      */
     int compareTo(MCRFieldDef field, MCRHit other) {
         String va = sortValues.get(field);
@@ -210,9 +211,9 @@ public class MCRHit {
         } else if (vb == null || vb.trim().length() == 0) {
             return va == null || va.trim().length() == 0 ? 0 : 1;
         } else if ("decimal".equals(field.getDataType())) {
-            return (int) Math.signum(Double.parseDouble(va) - Double.parseDouble(vb));
-        } else if ("integer".equals(field.getDataType())) {
-            return (int) (Long.parseLong(va) - Long.parseLong(vb));
+            return Double.valueOf(va).compareTo(Double.valueOf(vb));
+        } else if ("date".equals(field.getDataType()) || "timestamp".equals(field.getDataType()) || "time".equals(field.getDataType()) || "integer".equals(field.getDataType())) {
+            return Long.valueOf(va).compareTo(Long.valueOf(vb));
         } else {
             return va.compareTo(vb);
         }
