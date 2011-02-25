@@ -471,15 +471,19 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
                     doc.add(new Field(name, s, Field.Store.NO, Field.Index.ANALYZED));
                 }
             } else {
+            	Field.Store store = Field.Store.NO;
+            	if(field.getField().isSortable()){
+            		store = Field.Store.YES;
+            	}
                 if ("date".equals(type) || "time".equals(type) || "timestamp".equals(type)) {
-                    doc.add(new NumericField(name).setLongValue(MCRLuceneTools.getLongValue(content)));
+                    doc.add(new NumericField(name,store, true).setLongValue(MCRLuceneTools.getLongValue(content)));
                 } else if ("boolean".equals(type)) {
                     content = "true".equals(content) ? "1" : "0";
                     type = "identifier";
                 } else if ("decimal".equals(type)) {
-                    doc.add(new NumericField(name).setFloatValue(Float.parseFloat(content)));
+                    doc.add(new NumericField(name, store, true).setFloatValue(Float.parseFloat(content)));
                 } else if ("integer".equals(type)) {
-                    doc.add(new NumericField(name).setLongValue(Long.parseLong(content)));
+                    doc.add(new NumericField(name,store, true).setLongValue(Long.parseLong(content)));
                 }
 
                 if (type.equals("identifier")) {
