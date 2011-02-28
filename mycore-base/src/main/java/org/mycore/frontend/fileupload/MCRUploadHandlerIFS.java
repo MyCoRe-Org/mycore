@@ -148,7 +148,9 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
             if (myLength >= length) {
                 return myLength;
             } else {
+                startTransaction();
                 file.delete(); // Incomplete file transfer, user canceled upload
+                commitTransaction();
                 return 0;
             }
         } catch (Exception e) {
