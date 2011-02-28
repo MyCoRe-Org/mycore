@@ -1,7 +1,6 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xalan="http://xml.apache.org/xalan"
   xmlns:mcr="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:mets="http://www.loc.gov/METS/" xmlns:decoder="xalan://java.net.URLDecoder"
-  xmlns:iview2="xalan://org.mycore.iview2.frontend.MCRIView2XSLFunctions" xmlns:str="http://exslt.org/strings" extension-element-prefixes="str"
-  version="1.0">
+  xmlns:iview2="xalan://org.mycore.iview2.frontend.MCRIView2XSLFunctions" xmlns:str="http://exslt.org/strings" extension-element-prefixes="str" version="1.0">
   <xsl:output method="text" media-type="application/x-json" />
   <xsl:param name="derivateID" />
   <xsl:param name="objectID" />
@@ -38,20 +37,18 @@
         <xsl:text>", structureType:"</xsl:text>
         <xsl:value-of select="@TYPE" />
         <xsl:text>", type: "category"</xsl:text>
-        <xsl:if test="mets:div or /mets:mets/mets:structLink/mets:smLink[@xlink:from=$logID]">
-          <xsl:text>, children:[ </xsl:text>
-          <xsl:for-each select="/mets:mets/mets:structLink/mets:smLink[@xlink:from = $logID] | mets:div">
-            <xsl:sort select="iview2:getOrder(.)" data-type="number" />
-            <xsl:if test="position()!=1">
-              <xsl:value-of select="','" />
-            </xsl:if>
-            <xsl:apply-templates select="." mode="logical">
-              <xsl:with-param name="logID" select="$logID" />
-            </xsl:apply-templates>
-          </xsl:for-each>
-          <xsl:text>&#xA; ]</xsl:text>
-          <xsl:text>}</xsl:text>
-        </xsl:if>
+        <xsl:text>, children:[ </xsl:text>
+        <xsl:for-each select="/mets:mets/mets:structLink/mets:smLink[@xlink:from = $logID] | mets:div">
+          <xsl:sort select="iview2:getOrder(.)" data-type="number" />
+          <xsl:if test="position()!=1">
+            <xsl:value-of select="','" />
+          </xsl:if>
+          <xsl:apply-templates select="." mode="logical">
+            <xsl:with-param name="logID" select="$logID" />
+          </xsl:apply-templates>
+        </xsl:for-each>
+        <xsl:text>&#xA; ]</xsl:text>
+        <xsl:text>}</xsl:text>
       </xsl:when>
       <xsl:otherwise>
         <xsl:apply-templates select="/mets:mets/mets:structLink/mets:smLink[@xlink:from = $logID]">
