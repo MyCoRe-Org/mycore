@@ -28,12 +28,9 @@ import java.util.Collection;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Transaction;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRException;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
@@ -61,8 +58,6 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     protected String derID, docID;
 
     protected boolean newDerivate = true;
-
-    private Transaction tx;
 
     private static final String ID_TYPE = "derivate";
 
@@ -278,35 +273,6 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
             for (String permission : configuredPermissions) {
                 MCRAccessManager.addRule(derID, permission, MCRAccessManager.getTrueRule(), "default derivate rule");
             }
-        }
-    }
-
-    protected void startTransaction() {
-        LOGGER.debug("Starting transaction");
-        if (tx == null || !tx.isActive()) {
-            tx = MCRHIBConnection.instance().getSession().beginTransaction();
-        } else {
-            throw new MCRException("Transaction already started");
-        }
-    }
-
-    protected void commitTransaction() {
-        LOGGER.debug("Committing transaction");
-        if (tx != null) {
-            tx.commit();
-            tx = null;
-        } else {
-            throw new NullPointerException("Cannot commit transaction");
-        }
-    }
-
-    protected void rollbackTransaction() {
-        LOGGER.debug("Rolling back transaction");
-        if (tx != null) {
-            tx.rollback();
-            tx = null;
-        } else {
-            throw new NullPointerException("Cannot rollback transaction");
         }
     }
 

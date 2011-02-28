@@ -25,6 +25,8 @@ package org.mycore.frontend.fileupload;
 import java.io.InputStream;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Transaction;
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
 
@@ -43,14 +45,16 @@ import org.mycore.frontend.MCRWebsiteWriteProtection;
  * @see MCRUploadHandlerManager
  */
 public abstract class MCRUploadHandler {
-    /** The logger * */
-    protected Logger logger = Logger.getLogger(MCRUploadHandler.class);
+    /** The LOGGER * */
+    private static Logger LOGGER = Logger.getLogger(MCRUploadHandler.class);
 
     /** The unique ID of this upload session * */
     protected String uploadID;
 
     /** The url where to go after upload is finished. * */
     protected String url;
+
+    private Transaction tx;
 
     /** Creates a new upload handler and registers it at the handler manager * */
     protected MCRUploadHandler() {
@@ -160,5 +164,34 @@ public abstract class MCRUploadHandler {
      */
     public void unregister() {
         MCRUploadHandlerManager.unregister(uploadID);
+    }
+
+    protected void startTransaction() {
+        LOGGER.debug("Starting transaction");
+        if (tx == null || !tx.isActive()) {
+            tx = MCRHIBConnection.instance().getSession().beginTransaction();
+        } else {
+            throw new MCRException("Transaction already started");
+        }
+    }
+
+    protected void commitTransaction() {
+        LOGGER.debug("Committing transaction");
+        if (tx != null) {
+            tx.commit();
+            tx = null;
+        } else {
+            throw new NullPointerException("Cannot commit transaction");
+        }
+    }
+
+    protected void rollbackTransaction() {
+        LOGGER.debug("Rolling back transaction");
+        if (tx != null) {
+            tx.rollback();
+            tx = null;
+        } else {
+            throw new NullPointerException("Cannot rollback transaction");
+        }
     }
 }

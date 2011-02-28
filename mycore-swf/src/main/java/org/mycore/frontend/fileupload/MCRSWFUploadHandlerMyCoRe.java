@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.StringTokenizer;
 
+import org.apache.log4j.Logger;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -48,6 +49,8 @@ import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
  * @see MCRUploadHandler
  */
 public class MCRSWFUploadHandlerMyCoRe extends MCRUploadHandler {
+    private static Logger LOGGER = Logger.getLogger(MCRSWFUploadHandlerIFS.class);
+
     private String mainfile = "";
 
     private File dirname;
@@ -73,18 +76,18 @@ public class MCRSWFUploadHandlerMyCoRe extends MCRUploadHandler {
      */
     public MCRSWFUploadHandlerMyCoRe(String docId, String derId, String mode, String url) {
         this.url = url;
-        logger.debug("MCRUploadHandlerMyCoRe DocID: " + docId + " DerId: " + derId + " Mode: " + mode);
+        LOGGER.debug("MCRUploadHandlerMyCoRe DocID: " + docId + " DerId: " + derId + " Mode: " + mode);
 
         try {
             this.docId = MCRObjectID.getInstance(docId).toString();
         } catch (Exception e) {
-            logger.debug("Error while creating MCRObjectID : " + docId, e);
+            LOGGER.debug("Error while creating MCRObjectID : " + docId, e);
         }
 
         try {
             this.derId = MCRObjectID.getInstance(derId).toString();
         } catch (Exception e) {
-            logger.debug("Error while creating MCRObjectID : " + derId, e);
+            LOGGER.debug("Error while creating MCRObjectID : " + derId, e);
         }
     }
 
@@ -99,14 +102,14 @@ public class MCRSWFUploadHandlerMyCoRe extends MCRUploadHandler {
 
     public long receiveFile(String path, InputStream in, long length, String md5) throws Exception {
         // prepare to save
-        logger.debug("Upload file path: " + path);
+        LOGGER.debug("Upload file path: " + path);
 
         // convert path
         String fname = path.replace(' ', '_');
         try {
             if (!dirname.isDirectory()) {
                 dirname.mkdir();
-                logger.debug("Create directory " + dirname);
+                LOGGER.debug("Create directory " + dirname);
             }
         } catch (Exception e) {
         }
@@ -122,7 +125,7 @@ public class MCRSWFUploadHandlerMyCoRe extends MCRUploadHandler {
             try {
                 if (!newdir.isDirectory()) {
                     newdir.mkdir();
-                    logger.debug("Create directory " + newdir);
+                    LOGGER.debug("Create directory " + newdir);
                 }
             } catch (Exception e) {
             }
@@ -137,9 +140,9 @@ public class MCRSWFUploadHandlerMyCoRe extends MCRUploadHandler {
             BufferedOutputStream fouts = new BufferedOutputStream(new FileOutputStream(fout));
             MCRUtils.copyStream(in, fouts);
             fouts.close();
-            logger.info("Data object stored under " + fout.getName());
+            LOGGER.info("Data object stored under " + fout.getName());
         } catch (IOException e) {
-            logger.error("Can't store the data object " + fout.getName());
+            LOGGER.error("Can't store the data object " + fout.getName());
         }
 
         // set mainfile
@@ -164,7 +167,7 @@ public class MCRSWFUploadHandlerMyCoRe extends MCRUploadHandler {
         // check for content
         if (dirname.list().length == 0) {
             dirname.delete();
-            logger.warn("No file were uploaded, delete directory " + dirname + " and return.");
+            LOGGER.warn("No file were uploaded, delete directory " + dirname + " and return.");
             return;
         }
         // add the mainfile entry
@@ -187,8 +190,7 @@ public class MCRSWFUploadHandlerMyCoRe extends MCRUploadHandler {
                     out.write(outxml);
                     out.flush();
                 } catch (IOException ex) {
-                    logger.error(ex.getMessage());
-                    logger.error("Exception while store to file " + dirname + ".xml");
+                    LOGGER.error("Exception while store to file " + dirname + ".xml", ex);
                 }
             }
         } catch (Exception e) {
