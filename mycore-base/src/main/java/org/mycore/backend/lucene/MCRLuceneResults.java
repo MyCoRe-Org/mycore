@@ -108,10 +108,13 @@ class MCRLuceneResults extends MCRResults {
                 
                 Set<String> knownIDs = new HashSet<String>();
                 for(int i=0; i<reader.maxDoc(); i++) {
-                    doc = reader.document(i);
-                    String returnid = doc.get("returnid");
-                    if(!knownIDs.contains(returnid)) {
-                        knownIDs.add(returnid);
+                	if(reader.isDeleted(i)){
+                		continue;
+                	}
+                	doc = reader.document(i);
+                	String returnid = doc.get("returnid");
+                	if(!knownIDs.contains(returnid)) {
+                		knownIDs.add(returnid);
                         bits.set( i );
                     }
                 }
