@@ -771,9 +771,9 @@ function zoomViewer(viewID, direction) {
 	if (direction) {
 		//if zoomWidth or zoomScreen was active and we're already in the max zoomlevel just reset the displayMode
 		if (Iview[viewID].zoomScreen) {
-			pictureScreen(viewID);
+			pictureScreen(viewID, true);
 		} else if (Iview[viewID].zoomWidth) {
-			pictureWidth(viewID);
+			pictureWidth(viewID, true);
 		}
 		if (viewer.zoomLevel != Iview[viewID].zoomMax) {
 			dir = 1;

@@ -42,7 +42,7 @@ PanoJS.TileUrlProvider.prototype.assembleUrl = function(xIndex, yIndex, zoom, im
  */
 function zoomCenter(viewID, direction, point) {
 	var viewer = Iview[viewID].viewerBean;
-	var preload = viewer.preload;
+	var preload = Iview[viewID].preload;
 	var preDim = {"x" :toInt(preload.css("left")),"y":toInt(preload.css("top")), "width":preload.width(), "height":preload.height()};
 	viewer.zoom(direction);
 	var newDim = {"width":preload.width(), "height":preload.height()};
