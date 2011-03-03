@@ -1,6 +1,6 @@
 /*
- * 
- * $Revision$ $Date$
+ * $Revision$ 
+ * $Date$
  *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
@@ -25,31 +25,73 @@ package org.mycore.frontend.fileupload;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRCache;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRUsageException;
 
 /**
  * @author Frank Lützenkirchen
  * @author Harald Richter
  * @author Jens Kupferschmidt
  * 
- * @version $Revision$ $Date$
+ * @version $Revision$
  */
 public class MCRUploadHandlerManager {
+
+    /** Cache of currently active upload handler sessions */
     protected static MCRCache handlers = new MCRCache(100, "UploadHandlerManager UploadHandlers");
 
     private static Logger logger = Logger.getLogger(MCRUploadHandlerManager.class);
 
     static void register(MCRUploadHandler handler) {
-        logger.debug("Registered " + handler.getClass().getName() + " with upload ID " + handler.getID());
-        handlers.put(handler.getID(), handler);
+        logger.debug("Registering " + handler.getClass().getName() + " with upload ID " + handler.getID());
+        String sessionID = MCRSessionMgr.getCurrentSession().getID();
+        handlers.put(handler.getID(), new MCRUploadHandlerCacheEntry(sessionID, handler));
     }
 
     public static MCRUploadHandler getHandler(String uploadID) {
-        long yesterday = System.currentTimeMillis() - 86400000;
 
-        return (MCRUploadHandler) handlers.getIfUpToDate(uploadID, yesterday);
+        long yesterday = System.currentTimeMillis() - 86400000;
+        MCRUploadHandlerCacheEntry entry = (MCRUploadHandlerCacheEntry) handlers.getIfUpToDate(uploadID, yesterday);
+
+        if (entry == null)
+            throw new MCRUsageException("Upload session " + uploadID + " timed out");
+
+        String sessionID = entry.getSessionID();
+        MCRSession session = MCRSessionMgr.getSession(sessionID);
+        if (session == null)
+            throw new MCRUsageException("MCRSession " + sessionID + " for upload session " + uploadID + " timed out");
+
+        if (sessionID != MCRSessionMgr.getCurrentSession().getID())
+            MCRSessionMgr.setCurrentSession(session);
+
+        return entry.getUploadHandler();
     }
 
     public static void unregister(String uploadID) {
         handlers.remove(uploadID);
+    }
+}
+
+/** Represents a cache entry of currently active upload handler session */
+class MCRUploadHandlerCacheEntry {
+
+    /** The ID of the MCRSession this upload is associated with */
+    private String sessionID;
+
+    /** The MCRUploadHander instance to be used */
+    private MCRUploadHandler handler;
+
+    public MCRUploadHandlerCacheEntry(String sessionID, MCRUploadHandler handler) {
+        this.sessionID = sessionID;
+        this.handler = handler;
+    }
+
+    public String getSessionID() {
+        return sessionID;
+    }
+
+    public MCRUploadHandler getUploadHandler() {
+        return handler;
     }
 }

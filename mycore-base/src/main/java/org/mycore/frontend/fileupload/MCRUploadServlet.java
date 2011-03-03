@@ -50,7 +50,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
-import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
@@ -83,8 +82,6 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
     static ServerSocket server;
 
     static Logger LOGGER = Logger.getLogger(MCRUploadServlet.class);
-
-    static MCRCache sessionIDs = new MCRCache(100, "UploadServlet Upload sessions");
 
     final static int bufferSize = 65536; // 64 KByte
 
@@ -167,14 +164,6 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             LOGGER.debug("Received length   = " + length);
             LOGGER.debug("Received md5      = " + md5);
 
-            // Remember current MCRSession for upload
-            String sessionID = (String) sessionIDs.get(uploadId);
-            if (sessionID != null) {
-                MCRSession session = MCRSessionMgr.getSession(sessionID);
-                if (session != null) {
-                    MCRSessionMgr.setCurrentSession(session);
-                }
-            }
             //start transaction after MCRSession is initialized
             long numBytesStored = MCRUploadHandlerManager.getHandler(uploadId).receiveFile(path, zis, length, md5);
 
@@ -278,10 +267,6 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             }
             int numFiles = Integer.parseInt(req.getParameter("numFiles"));
             MCRUploadHandlerManager.getHandler(uploadId).startUpload(numFiles);
-
-            // Remember current MCRSession for upload
-            String sessionID = session.getID();
-            sessionIDs.put(uploadId, sessionID);
 
             LOGGER.info("UploadServlet start session " + uploadId);
             sendResponse(res, "OK");
