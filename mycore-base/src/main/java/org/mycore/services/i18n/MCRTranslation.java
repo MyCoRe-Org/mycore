@@ -26,9 +26,12 @@ package org.mycore.services.i18n;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
@@ -72,14 +75,6 @@ public class MCRTranslation {
         Locale currentLocale = getCurrentLocale();
         LOGGER.debug("Translation for current locale: " + currentLocale.getLanguage());
 
-        // workaround for bug with indonesian
-        // INDONESIAN      ID     OCEANIC/INDONESIAN [*Changed 1989 from original ISO 639:1988, IN]
-        // Java doesn't work with id
-        if (currentLocale.getLanguage().equals("id")) {
-            currentLocale = new Locale("in");
-            LOGGER.debug("Translation for current locale: " + currentLocale.getLanguage());
-        }
-
         ResourceBundle message = ResourceBundle.getBundle("messages", currentLocale);
         try {
             result = message.getString(label);
@@ -102,8 +97,31 @@ public class MCRTranslation {
             result = "???" + label + "???";
             LOGGER.debug(mre.getMessage());
         }
-
         return result;
+    }
+
+    /**
+     * Returns a map of label/value pairs which match with the given prefix.
+     * 
+     * The current locale that is needed for translation is gathered by the
+     * language of the current MCRSession.
+     * 
+     * @param prefix label starts with
+     * @return map of labels with translated values
+     */
+    public static Map<String, String> translatePrefix(String prefix) {
+        HashMap<String, String> map = new HashMap<String, String>();
+        Locale currentLocale = getCurrentLocale();
+        LOGGER.debug("Translation for current locale: " + currentLocale.getLanguage());
+        ResourceBundle message = ResourceBundle.getBundle("messages", currentLocale);
+        Enumeration<String> keys = message.getKeys();
+        while(keys.hasMoreElements()) {
+            String key = keys.nextElement();
+            if(key.startsWith(prefix)) {
+                map.put(key, message.getString(key));
+            }
+        }
+        return map;
     }
 
     /**
@@ -148,7 +166,15 @@ public class MCRTranslation {
     }
 
     private static Locale getCurrentLocale() {
-        return new Locale(MCRSessionMgr.getCurrentSession().getCurrentLanguage());
+        Locale currentLocale = new Locale(MCRSessionMgr.getCurrentSession().getCurrentLanguage());
+        // workaround for bug with indonesian
+        // INDONESIAN      ID     OCEANIC/INDONESIAN [*Changed 1989 from original ISO 639:1988, IN]
+        // Java doesn't work with id
+        if (currentLocale.getLanguage().equals("id")) {
+            currentLocale = new Locale("in");
+            LOGGER.debug("Translation for current locale: " + currentLocale.getLanguage());
+        }
+        return currentLocale;
     }
 
     static String[] getStringArray(String masked) {
