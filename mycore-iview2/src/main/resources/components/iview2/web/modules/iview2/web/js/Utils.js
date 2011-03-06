@@ -31,95 +31,7 @@ function getEvent(e) {
 	return e;
 }
 
-/**
- * @public
- * @function
- * @name		getElementsByClassName
- * @memberOf	iview.Utils
- * @description	returns all elements which are set to the supplied class within the given node. further it's possible
-  to return only the elements which belong to the given tag type
- * @param	{string} searchClass represents the Class to search Tags for
- * @param	{object} node optional node-object which child's will be looked through for the supplied class, can be left or set to null to
-  use as start node the document object
- * @param	{} tag optional the tagname to look for; if a name is supplied only elements matching the tag and class will be returned
- which are child's of the given node
- * @return	{array} of objects which matched the search conditions
- */
-var getElementsByClassName = function (searchClass, node, tag){
-	if (Array.filter && document.getElementsByClassName){
-		// Fast JS 1.6 Implementation
-		getElementsByClassName = function (searchClass, node, tag) {
-			if (node!=null && typeof(node)!="object")
-				node=document.getElementById(node);
-			node = node || document;
-			if (tag!=null){
-				tag=tag.toUpperCase();
-				return Array.filter(node.getElementsByClassName(searchClass), function(elem){
-					return elem.nodeName == tag; 
-				});
-			}
-			return node.getElementsByClassName(searchClass);
-		};
-	} else if (document.evaluate) {                                                                                                                                                                   
-        getElementsByClassName = function (searchClass, node, tag){                                                                                                                               
-        	if (node!=null && typeof(node)!="object")
-        		node=document.getElementById(node);
-        	node = node || document;
-            tag = tag || "*";                                                                                                                                                               
-            var classes = searchClass.split(" "),                                                                                                                                             
-                    classesToCheck = "",                                                                                                                                                    
-                    xhtmlNamespace = "http://www.w3.org/1999/xhtml",                                                                                                                        
-                    namespaceResolver = (document.documentElement.namespaceURI === xhtmlNamespace)? xhtmlNamespace : null,                                                                  
-                    returnElements = [],                                                                                                                                                    
-                    elements,                                                                                                                                                               
-                    node;                                                                                                                                                                   
-            for(var j=0, jl=classes.length; j<jl; j+=1){                                                                                                                                    
-                    classesToCheck += "[contains(concat(' ', @class, ' '), ' " + classes[j] + " ')]";                                                                                       
-            }                                                                                                                                                                               
-            try     {                                                                                                                                                                       
-                    elements = document.evaluate(".//" + tag + classesToCheck, node, namespaceResolver, 0, null);
-            }
-            catch (e) {
-                    elements = document.evaluate(".//" + tag + classesToCheck, node, null, 0, null);
-            }
-            while ((node = elements.iterateNext())) {
-                    returnElements.push(node);
-            }
-            return returnElements;
-        };
-	} else {
-        getElementsByClassName = function (searchClass, node, tag) {
-        	if (node!=null && typeof(node)!="object")
-        		node=document.getElementById(node);
-        	node = node || document;
-            tag = tag || "*";
-            var classes = searchClass.split(" "),
-                    classesToCheck = [],
-                    elements = (tag === "*" && node.all)? node.all : node.getElementsByTagName(tag),
-                    current,
-                    returnElements = [],
-                    match;
-            for(var k=0, kl=classes.length; k<kl; k+=1){
-                    classesToCheck.push(new RegExp("(^|\\s)" + classes[k] + "(\\s|$)"));
-            }
-            for(var l=0, ll=elements.length; l<ll; l+=1){
-                    current = elements[l];
-                    match = false;
-                    for(var m=0, ml=classesToCheck.length; m<ml; m+=1){
-                            match = classesToCheck[m].test(current.className);
-                            if (!match) {
-                                    break;
-                            }
-                    }
-                    if (match) {
-                            returnElements.push(current);
-                    }
-            }
-            return returnElements;
-        };
-	}
-	return getElementsByClassName(searchClass, node, tag);
-};
+//};
 
 /**
  * @public
@@ -232,7 +144,7 @@ function loadCssFile(pathToFile, id) {
     if (id) {
     	css.attr('id',id);
     }
-    $("head").append(css);
+    jQuery("head").append(css);
 }
 
 function preventDefault(e) {

@@ -100,15 +100,12 @@ function processImageProperties(imageProperties, viewID){
 		}
 		
 		// checks for enabled Modi & reset before
-		Iview[viewID].initialModus[0] = false;
-		Iview[viewID].initialModus[1] = false;
+		Iview[viewID].initialModus = "none";
 		if (Iview[viewID].zoomWidth) {
-			Iview[viewID].initialModus[0] = true;
-			Iview[viewID].initialModus[1] = false;
+			Iview[viewID].initialModus = "width";
 		}
 		if (Iview[viewID].zoomScreen) {
-			Iview[viewID].initialModus[0] = false;
-			Iview[viewID].initialModus[1] = true;
+			Iview[viewID].initialModus = "screen";
 		}
 	}
 
@@ -152,12 +149,12 @@ function processImageProperties(imageProperties, viewID){
 	// moves viewer to zoomLevel zoomInit
 	viewerBean.maxZoomLevel=Iview[viewID].zoomMax;
 	// handle special Modi for new Page
-	if (Iview[viewID].initialModus[0] == true) {
+	if (Iview[viewID].initialModus == "width") {
 		// letzte Seite war in fitToWidth
 		// aktuell ist fuer die neue Page noch kein Modi aktiv
 		Iview[viewID].zoomWidth = false;
 		pictureWidth(viewID);
-	} else if (Iview[viewID].initialModus[1] == true) {
+	} else if (Iview[viewID].initialModus == "screen") {
 		// letzte Seite war in fitToScreen
 		// aktuelle ist fuer die neue Page noch kein Modi aktiv
 		Iview[viewID].zoomScreen = false;
@@ -632,7 +629,6 @@ function openChapter(button, viewID){
 			importChapter(viewID, callback);
 		}, 10);
 	} else {
-		//TODO Positionierung klappt bei WebKit nicht, da die irgendwie CSS nicht einlesen durch Chapter einbau in Viewer kÃƒÂ¶nnte das behoben werden
 		viewer.chapter.toggleView();
 	}
 }
@@ -889,12 +885,12 @@ function loading(viewID) {
  */
 function startFileLoaded(viewID){
 	Iview[viewID].loaded = true;
-	// surface muss als Blank geladen werden, damit Ebene gefüllt und es im Vordergrund des Viewers liegt
-	// hauptsächlich wegen IE notwendig
-	getElementsByClassName("surface","viewer"+viewID,"div")[0].style.backgroundImage = "url("+Iview[viewID].webappBaseUri+"modules/iview2/web/gfx/blank.gif"+")";
-	// PermaLink Handling
+	//Blank needs to be loaded as blank, so the level is filled. Else it lays not ontop; needed for IE 
+	jQuery(".surface#viewer"+viewID).css("backgroundImage", "url("+Iview[viewID].webappBaseUri+"modules/iview2/web/gfx/blank.gif"+")");
+//	getElementsByClassName("surface","viewer"+viewID,"div")[0].style.backgroundImage = "url("+Iview[viewID].webappBaseUri+"modules/iview2/web/gfx/blank.gif"+")";
 
-	// choice of zoomLevel or special zoomMode only makes sense in maximized viewer
+	// PermaLink Handling
+	// choice if zoomLevel or special; zoomMode only makes sense in maximized viewer
 	if (window.location.search.get("maximized") == "true") {
 		if (window.location.search.get("tosize") == "width") {
 			if (!Iview[viewID].zoomWidth) pictureWidth(viewID);

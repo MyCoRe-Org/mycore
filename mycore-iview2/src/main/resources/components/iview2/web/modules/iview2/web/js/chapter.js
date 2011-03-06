@@ -9,7 +9,6 @@ var iview = iview || {};
  * @name		chapter
  */
 iview.chapter = iview.chapter || {};
-//FIXME seems to be as if there's now some kinda graphic glitch when the viewer slides down
 
 /**
  * @class

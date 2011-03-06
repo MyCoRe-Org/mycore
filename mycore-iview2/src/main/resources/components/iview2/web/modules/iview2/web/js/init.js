@@ -66,7 +66,7 @@ function initializeGraphic(viewID) {
 	Iview[viewID].zoomScale = 1;//init for the Zoomscale is changed within CalculateZoomProp
 	Iview[viewID].loaded = false;//indicates if the window is finally loaded
 	Iview[viewID].tilesize = tilesize;
-	Iview[viewID].initialModus = [false, false];
+	Iview[viewID].initialModus = "none";
 	// if the viewer started with an image with an single zoomLevel 0, because zoomMax = zoomInit & so initialZoom wont set
 	Iview[viewID].initialZoom = 0;
 	Iview[viewID].maximized = maximized;
