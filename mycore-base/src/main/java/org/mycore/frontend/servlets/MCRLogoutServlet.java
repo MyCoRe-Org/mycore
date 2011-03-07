@@ -42,23 +42,23 @@ public class MCRLogoutServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
+    private static final Logger LOGGER = Logger.getLogger(MCRLogoutServlet.class);
+
     /* (non-Javadoc)
      * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession(false);
-        if (session == null) {
-            return;
+        if (session != null) {
+            LOGGER.debug("Invalidate HTTP-Session: " + session.getId());
+            session.invalidate();
         }
-        Logger logger = Logger.getLogger(getClass());
-        logger.debug("Invalidate HTTP-Session: " + session.getId());
-        session.invalidate();
         String returnURL = req.getHeader("Referer");
         if (returnURL == null) {
             returnURL = req.getContextPath() + "/";
         }
-        logger.debug("Redirect to: " + returnURL);
+        LOGGER.debug("Redirect to: " + returnURL);
         resp.sendRedirect(returnURL);
     }
 
