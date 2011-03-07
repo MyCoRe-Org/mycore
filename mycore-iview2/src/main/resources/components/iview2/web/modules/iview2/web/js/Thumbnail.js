@@ -408,8 +408,8 @@ function switchDisplayMode(screenZoom, stateBool, viewID) {
 		}
 	}
 
-	Iview[viewID].barX.setCurValue(-parseInt(preload.css("offsetLeft")));
-	Iview[viewID].barY.setCurValue(-parseInt(preload.css("offsetTop")));
+	Iview[viewID].barX.setCurValue(-toInt(preload.css("left")));
+	Iview[viewID].barY.setCurValue(-toInt(preload.css("top")));
 	if (Iview[viewID].useCutOut) Iview[viewID].cutOutModel.setPos({'x':preload.css("offsetLeft"), 'y':preload.css("offsetTop")});
 	return stateBool;
 }
@@ -507,9 +507,10 @@ function handleResizeScrollbars(viewID) {
 
 	// vertical
 	// max scaling
-	var height = jQuery(viewerBean.viewer).height();
-	var width = jQuery(viewerBean.viewer).width();
-	var top = jQuery(viewerBean.viewer).offset().top;
+	var viewer = jQuery(viewerBean.viewer);
+	var height = viewer.height();
+	var width = viewer.width();
+	var top = viewer.offset().top;
 
 	barY.setMaxValue(curHoehe - height);
 	// size of the scrollbar
@@ -593,8 +594,8 @@ function listenerMove(viewID) {
 		// set Roller that no circles are created, and we end in an endless loop
 		Iview[viewID].roller = true;
 		var preload=Iview[viewID].preload;
-		Iview[viewID].barX.setCurValue(-parseInt(preload.css("offsetLeft")));
-		Iview[viewID].barY.setCurValue(-parseInt(preload.css("offsetTop")));
+		Iview[viewID].barX.setCurValue(-toInt(preload.css("left")));
+		Iview[viewID].barY.setCurValue(-toInt(preload.css("top")));
 		Iview[viewID].roller = false;
 	}
 }
@@ -943,25 +944,25 @@ function processMETS(metsDoc, viewID) {
 	Iview[viewID].PhysicalModelProvider = new iview.METS.PhysicalModelProvider(Iview[viewID].newMETS);
 	Iview[viewID].PhysicalModel = Iview[viewID].PhysicalModelProvider.createModel();
 	var physicalModel = Iview[viewID].PhysicalModel;
+	var toolbarCtrl = Iview[viewID].getToolbarCtrl();
 	Iview[viewID].amountPages = physicalModel.getNumberOfPages();
 	physicalModel.setPosition(physicalModel.getPosition(Iview[viewID].curImage));
 	physicalModel.onevent.attach(function(sender, args) {
 		if (args.type == physicalModel.SELECT) {
 			notifyListenerNavigate(args["new"], viewID);
 			loadPage(viewID);
-			Iview[viewID].getToolbarCtrl().checkNavigation(args["new"]);
+			toolbarCtrl.checkNavigation(args["new"]);
 			updateModuls(viewID);
 			if (jQuery('.navigateHandles .pageBox')[0]) {
-				Iview[viewID].getToolbarCtrl().updateDropDown(jQuery(pagelist.find("a")[args["new"] - 1]).html());
+				toolbarCtrl.updateDropDown(jQuery(pagelist.find("a")[args["new"] - 1]).html());
 			}
 		}
 	})
 
 	// Toolbar Operation
-	Iview[viewID].getToolbarCtrl().perform("setActive", true, "overviewHandles", "openChapter");
-	Iview[viewID].getToolbarCtrl().perform("setActive", true, "overviewHandles", "openOverview");
-	
-	Iview[viewID].getToolbarCtrl().checkNavigation(Iview[viewID].PhysicalModel.getCurPos());
+	toolbarCtrl.perform("setActive", true, "overviewHandles", "openChapter");
+	toolbarCtrl.perform("setActive", true, "overviewHandles", "openOverview");
+	toolbarCtrl.checkNavigation(Iview[viewID].PhysicalModel.getCurPos());
 
 	//Generating of Toolbar List
 	var it = physicalModel.iterator();
@@ -980,9 +981,9 @@ function processMETS(metsDoc, viewID) {
 
 	// if METS File is loaded after the drop-down-menu (in mainToolbar) its content needs to be updated
 	if (jQuery('.navigateHandles .pageBox')[0]) {
-		Iview[viewID].getToolbarCtrl().getView('mainTbView').events.notify({'type' : "new", 'elementName' : "pageBox", 'parentName' : "navigateHandles", 'view' : Iview[viewID].viewerContainer.find('.navigateHandles .pageBox')});
+		toolbarCtrl.getView('mainTbView').events.notify({'type' : "new", 'elementName' : "pageBox", 'parentName' : "navigateHandles", 'view' : Iview[viewID].viewerContainer.find('.navigateHandles .pageBox')});
 		// switch to current content
-		Iview[viewID].getToolbarCtrl().updateDropDown(jQuery(pagelist.find("a")[physicalModel.getCurPos() - 1]).html());
+		toolbarCtrl.updateDropDown(jQuery(pagelist.find("a")[physicalModel.getCurPos() - 1]).html());
 	}
 	//at other positions Opera doesn't get it correctly (although it still doesn't look that smooth as in other browsers) 
 	window.setTimeout("Iview['"+viewID+"'].toolbarCtrl.paint('mainTb')",10);
