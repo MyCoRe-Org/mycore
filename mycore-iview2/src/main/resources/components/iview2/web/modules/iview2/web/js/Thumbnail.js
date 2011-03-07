@@ -886,7 +886,10 @@ function loading(viewID) {
 function startFileLoaded(viewID){
 	Iview[viewID].loaded = true;
 	//Blank needs to be loaded as blank, so the level is filled. Else it lays not ontop; needed for IE 
-	jQuery(".surface#viewer"+viewID).css("backgroundImage", "url("+Iview[viewID].webappBaseUri+"modules/iview2/web/gfx/blank.gif"+")");
+	jQuery("#viewer" + viewID + " .surface").css(
+			"backgroundImage",
+			"url(" + Iview[viewID].webappBaseUri
+					+ "modules/iview2/web/gfx/blank.gif" + ")");
 //	getElementsByClassName("surface","viewer"+viewID,"div")[0].style.backgroundImage = "url("+Iview[viewID].webappBaseUri+"modules/iview2/web/gfx/blank.gif"+")";
 
 	// PermaLink Handling
