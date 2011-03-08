@@ -1,24 +1,24 @@
 /*
  * 
  * $Revision$ $Date$
- *
- * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
- *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program, in a file called gpl.txt or license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * 
+ * This file is part of *** M y C o R e *** See http://www.mycore.de/ for
+ * details.
+ * 
+ * This program is free software; you can use it, redistribute it and / or
+ * modify it under the terms of the GNU General Public License (GPL) as
+ * published by the Free Software Foundation; either version 2 of the License or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program, in a file called gpl.txt or license.txt. If not, write to the
+ * Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307 USA
  */
 
 package org.mycore.datamodel.metadata;
@@ -37,12 +37,13 @@ import org.mycore.datamodel.ifs.MCRDirectory;
 import org.xml.sax.SAXParseException;
 
 /**
- * This class holds all information of a derivate.
- * For persistence operations see methods of {@link MCRMetadataManager}.
+ * This class holds all information of a derivate. For persistence operations
+ * see methods of {@link MCRMetadataManager}.
  * 
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date: 2010-09-30 17:49:21 +0200 (Thu, 30 Sep
+ *          2010) $
  */
 final public class MCRDerivate extends MCRBase {
     private static final Logger LOGGER = Logger.getLogger(MCRDerivate.class);
@@ -179,6 +180,7 @@ final public class MCRDerivate extends MCRBase {
      * @return the MCRDirectory of the multimedia object
      * @exception MCRPersistenceException
      *                if a persistence problem is occured
+     * @deprecated use {@link MCRDerivate#receiveDirectoryFromIFS()} instead
      */
     public final MCRDirectory receiveDirectoryFromIFS(String id) throws MCRPersistenceException {
         // check the ID
@@ -191,6 +193,26 @@ final public class MCRDerivate extends MCRBase {
             throw new MCRPersistenceException("Error while receiving derivate with " + "ID " + mcr_id + " from IFS.");
         }
 
+        return difs;
+    }
+
+    /**
+     * The methode receive the multimedia object(s) for the given MCRObjectID
+     * and returned it as MCRDirectory.
+     * 
+     * @param id
+     *            the object ID
+     * @return the MCRDirectory of the multimedia object
+     * @exception MCRPersistenceException
+     *                if a persistence problem is occured
+     */
+    public final MCRDirectory receiveDirectoryFromIFS() throws MCRPersistenceException {
+        // receive the IFS informations
+        MCRDirectory difs = MCRDirectory.getRootDirectory(getId().toString());
+
+        if (difs == null) {
+            throw new MCRPersistenceException("Error while receiving derivate with " + "ID " + getId() + " from IFS.");
+        }
         return difs;
     }
 
