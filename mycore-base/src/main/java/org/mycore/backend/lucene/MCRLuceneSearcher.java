@@ -114,6 +114,8 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
 
     private MCRLuceneQueryFieldLogger queryFieldLogger;
 
+    private boolean initializeResult;
+
     /**
      * @return the sortableSuffix
      */
@@ -126,6 +128,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         super.init(ID);
 
         MCRConfiguration config = MCRConfiguration.instance();
+        initializeResult = config.getBoolean(prefix + "inititalizeResult", false);
         IndexDir = new File(config.getString(prefix + "IndexDir"));
         LOGGER.info(prefix + "indexDir: " + IndexDir);
         if (!IndexDir.exists()) {
@@ -262,7 +265,11 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
             // required flag Term with AND (true) or OR (false) combined
             Query luceneQuery = MCRBuildLuceneQuery.buildLuceneQuery(null, reqf, f, analyzer, usedFields);
             LOGGER.debug("Lucene Query: " + luceneQuery.toString());
-            return getLuceneHits(luceneQuery, maxResults, sortBy, addSortData, usedFields);
+            MCRResults luceneHits = getLuceneHits(luceneQuery, maxResults, sortBy, addSortData, usedFields);
+            if (initializeResult) {
+                return MCRResults.union(luceneHits);
+            }
+            return luceneHits;
         } catch (Exception e) {
             LOGGER.error("Exception in MCRLuceneSearcher", e);
             return new MCRResults();
@@ -471,19 +478,19 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
                     doc.add(new Field(name, s, Field.Store.NO, Field.Index.ANALYZED));
                 }
             } else {
-            	Field.Store store = Field.Store.NO;
-            	if(field.getField().isSortable()){
-            		store = Field.Store.YES;
-            	}
+                Field.Store store = Field.Store.NO;
+                if (field.getField().isSortable()) {
+                    store = Field.Store.YES;
+                }
                 if ("date".equals(type) || "time".equals(type) || "timestamp".equals(type)) {
-                    doc.add(new NumericField(name,store, true).setLongValue(MCRLuceneTools.getLongValue(content)));
+                    doc.add(new NumericField(name, store, true).setLongValue(MCRLuceneTools.getLongValue(content)));
                 } else if ("boolean".equals(type)) {
                     content = "true".equals(content) ? "1" : "0";
                     type = "identifier";
                 } else if ("decimal".equals(type)) {
                     doc.add(new NumericField(name, store, true).setFloatValue(Float.parseFloat(content)));
                 } else if ("integer".equals(type)) {
-                    doc.add(new NumericField(name,store, true).setLongValue(Long.parseLong(content)));
+                    doc.add(new NumericField(name, store, true).setLongValue(Long.parseLong(content)));
                 }
 
                 if (type.equals("identifier")) {
@@ -639,9 +646,9 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
     public boolean isIndexer() {
         return true;
     }
-    
+
     @Override
-    public int getPriority(){
+    public int getPriority() {
         return MCRShutdownHandler.Closeable.DEFAULT_PRIORITY;
     }
 }
