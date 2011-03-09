@@ -10,15 +10,24 @@
 package org.mycore.datamodel.ifs;
 
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
+
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectInstance;
+import javax.management.ReflectionException;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.mycore.common.MCRUsageException;
+import org.mycore.services.mbeans.MCRJMXBridge;
 
 
 
@@ -139,6 +148,32 @@ public abstract class MCRFilesystemNode {
         deleted = true;
     }
 
+    public void move(MCRDirectory dest) {
+        this.ownerID = dest.getOwnerID();
+        this.parentID = dest.getID();
+        manager.storeNode(this);
+        clearCache();
+    }
+    
+    private void clearCache() {
+        try {
+            ObjectInstance mcrCacheMBean = MCRJMXBridge.getMBean("MCRCache", "IFS FileSystemNodes");
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            mbs.invoke(mcrCacheMBean.getObjectName(), "clear", null, null);
+        } catch (MalformedObjectNameException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InstanceNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (ReflectionException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (MBeanException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
     /*
      * protected void checkName(String name, boolean doExistCheck) {
      * MCRArgumentChecker.ensureNotEmpty(name, "name");

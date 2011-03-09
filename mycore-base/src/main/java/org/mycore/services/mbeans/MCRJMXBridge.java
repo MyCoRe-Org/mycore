@@ -28,8 +28,10 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import javax.management.InstanceNotFoundException;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
+import javax.management.ObjectInstance;
 import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
@@ -125,5 +127,16 @@ public class MCRJMXBridge implements Closeable {
     @Override
     public int getPriority(){
         return MCRShutdownHandler.Closeable.DEFAULT_PRIORITY;
+    }
+    
+    public static ObjectInstance getMBean(String type, String component) throws MalformedObjectNameException, InstanceNotFoundException  {
+        ObjectName name = getObjectName(type, component);
+
+        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+        if (mbs.isRegistered(name)) {
+            return mbs.getObjectInstance(name);
+        }
+
+        return null;
     }
 }
