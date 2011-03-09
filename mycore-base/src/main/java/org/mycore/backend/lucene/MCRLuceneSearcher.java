@@ -128,7 +128,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         super.init(ID);
 
         MCRConfiguration config = MCRConfiguration.instance();
-        initializeResult = config.getBoolean(prefix + "inititalizeResult", false);
+        initializeResult = config.getBoolean(prefix + "initializeResult", false);
         IndexDir = new File(config.getString(prefix + "IndexDir"));
         LOGGER.info(prefix + "indexDir: " + IndexDir);
         if (!IndexDir.exists()) {
