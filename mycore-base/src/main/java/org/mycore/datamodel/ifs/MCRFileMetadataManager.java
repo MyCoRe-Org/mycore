@@ -245,4 +245,8 @@ public class MCRFileMetadataManager {
         cache.remove(ID);
         store.deleteNode(ID);
     }
+    
+    void clearMetadataCache(){
+        cache.clear();
+    }
 }
