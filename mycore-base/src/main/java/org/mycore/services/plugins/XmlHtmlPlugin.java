@@ -105,6 +105,7 @@ public class XmlHtmlPlugin implements TextFilterPlugin {
      *      java.io.OutputStream)
      */
     public Reader transform(MCRFileContentType ct, InputStream input) throws FilterPluginTransformException {
+        LOGGER.info("Getting text of "+ct);
         if (getSupportedContentTypes().contains(ct)) {
             String tx = getFullText(ct, input);
 
