@@ -3,18 +3,12 @@ package org.mycore.backend.lucene;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.search.DocIdSet;
-import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
@@ -23,7 +17,6 @@ import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TopFieldCollector;
 import org.apache.lucene.search.TopFieldDocs;
 import org.apache.lucene.store.AlreadyClosedException;
-import org.apache.lucene.util.DocIdBitSet;
 import org.mycore.common.MCRException;
 import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRFieldValue;
@@ -95,35 +88,7 @@ class MCRLuceneResults extends MCRResults {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Query: " + query);
         }
-        
-        /* DuplicateFilter did not work?! So I wrote my own one (Andy).
-         * DuplicateFilter df = new DuplicateFilter("returnid");
-         * df.setKeepMode(DuplicateFilter.KM_USE_FIRST_OCCURRENCE);*/
-        Filter df = new Filter () {
-            private static final long serialVersionUID = -4307588787875177743L;
-
-            public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
-                BitSet bits = new BitSet(reader.maxDoc());
-                org.apache.lucene.document.Document doc;
-                
-                Set<String> knownIDs = new HashSet<String>();
-                for(int i=0; i<reader.maxDoc(); i++) {
-                	if(reader.isDeleted(i)){
-                		continue;
-                	}
-                	doc = reader.document(i);
-                	String returnid = doc.get("returnid");
-                	if(!knownIDs.contains(returnid)) {
-                		knownIDs.add(returnid);
-                        bits.set( i );
-                    }
-                }
-                
-                return new DocIdBitSet(bits);
-            }
-        };
-        
-        indexSearcher.search(query, df, collector);
+        indexSearcher.search(query, collector);
         //Lucene 2.4.1 has a bug: be sure to call collector.topDocs() just once
         //see http://issues.apache.org/jira/browse/LUCENE-942
         topDocs = (TopFieldDocs) collector.topDocs();
