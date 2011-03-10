@@ -721,17 +721,14 @@ function importCutOut(viewID) {
  */
 function importChapter(viewID, callback) {
 	var viewer = Iview[viewID];
+	viewer.ChapterModelProvider = new iview.METS.ChapterModelProvider(viewer.newMETS);
+	
+	viewer.chapter = new iview.chapter.Controller(viewer.ChapterModelProvider, viewer.PhysicalModelProvider);
 
-	$LAB.script("chapter.js", "jquery.tree.min.js").wait(function() {
-		viewer.ChapterModelProvider = new iview.METS.ChapterModelProvider(viewer.newMETS);
-		
-		viewer.chapter = new iview.chapter.Controller(viewer.ChapterModelProvider, viewer.PhysicalModelProvider);
+	viewer.chapter.createView(viewer.chapterParent);
+	viewer.chapterReaction = false;
 
-		viewer.chapter.createView(viewer.chapterParent);
-		viewer.chapterReaction = false;
-
-		callback();
-	});
+	callback();
 }
 
 /**
@@ -744,13 +741,10 @@ function importChapter(viewID, callback) {
  * @param		{function} callback function which is called just before the function returns
  */
 function importOverview(viewID, callback) {
-	$LAB.script("overview.js").wait(function() {
-		//overview loading
-		var ov = new iview.overview.Controller(Iview[viewID].PhysicalModelProvider, iview.overview.View, Iview[viewID].viewerBean.tileUrlProvider);
-		ov.createView({'mainClass':'overview', 'parent':"#viewerContainer"+viewID, 'useScrollBar':true});
-		Iview[viewID].overview = ov;
-		callback();
-	});
+	var ov = new iview.overview.Controller(Iview[viewID].PhysicalModelProvider, iview.overview.View, Iview[viewID].viewerBean.tileUrlProvider);
+	ov.createView({'mainClass':'overview', 'parent':"#viewerContainer"+viewID, 'useScrollBar':true});
+	Iview[viewID].overview = ov;
+	callback();
 }
 
 /**

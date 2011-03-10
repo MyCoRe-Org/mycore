@@ -35,9 +35,10 @@
               <jsSourceDir>components/iview2/web/modules/iview2/web/js</jsSourceDir>
               <jsSourceFiles>
                 <!-- iview.init BEGIN -->
-                <jsSourceFile>LAB.min.js</jsSourceFile>
                 <jsSourceFile>jquery.mousewheel.min.js</jsSourceFile>
                 <!-- JQuery Mousewheel support -->
+                <jsSourceFile>jquery.tree.min.js</jsSourceFile>
+                <!-- jQuery Tree -->
                 <jsSourceFile>PanoJS.js</jsSourceFile>
                 <!-- Viewer -->
                 <jsSourceFile>Event.js</jsSourceFile>
@@ -46,6 +47,10 @@
                 <!--XML Funktionen-->
                 <jsSourceFile>Utils.js</jsSourceFile>
                 <!--Allgemeine Util Funktionen-->
+                <jsSourceFile>chapter.js</jsSourceFile>
+                <!-- Chapter -->
+                <jsSourceFile>overview.js</jsSourceFile>
+                <!-- Chapter -->
                 <jsSourceFile>scrollBars.js</jsSourceFile>
                 <!--Scrollbar Klasse-->
                 <jsSourceFile>cutOut.js</jsSourceFile>

@@ -77,41 +77,11 @@
     <xsl:param name="permalink" select="$optOut" />
     
     <!-- online src-->
-    
     <xsl:if test="$MCR.Module-iview2.DeveloperMode='true'">
-    	<!-- button -->
-    	
-    	<!-- menu -->
-    	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/lib/fg-menu/fg.menu.js" />
-    	
-    	<!-- Importer Skript -->
-    	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarImporter.js" />
-    	
-    	<!--  Model, Controller, View -->
-    	<!--  needs Event.js -->
-    	
-    	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarManager.js" />
-    	
-    	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarModel.js" />
-    	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarButtonsetModel.js" />
-    	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarDividerModel.js" />
-    	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarSpringModel.js" />
-    	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarTextModel.js" />
-    	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarButtonModel.js" />
-    	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarController.js" />
-    	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/ToolbarView.js" />
-    	
-    	<!--  ModelProvider -->
-    	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/StandardToolbarModelProvider.js" />
-    	<script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.toolbar/PreviewToolbarModelProvider.js" />
-    	
     	<!--  CSS -->
     	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/web/lib/fg-menu/fg.menu.css" />
     	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/web/gfx/default/iview2.toolbar.css" />
     	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/web/gfx/default/iview2.permalink.css" />
-        
-        <!-- Permalink -->
-        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/Permalink.js" />
     </xsl:if>
 	
 	<script type="text/javascript">
@@ -166,11 +136,9 @@
     <xsl:param name="DampInViewer" select="'true'" />
     <script type="text/javascript" src="http://www.google.com/jsapi"></script>
     <script type="text/javascript">
+    <!-- JQuery Framework -->
       google.load("jquery", "1");
       <xsl:text>google.load("jqueryui", "</xsl:text><xsl:value-of select="$jqueryUI.version"/><xsl:text>");</xsl:text>
-    </script>
-    <!-- JQuery Framework -->
-    <script type="text/javascript">
       <xsl:text>var tilesize=</xsl:text>
       <xsl:value-of select="$tilesize" />
       <xsl:text>;</xsl:text>
@@ -195,44 +163,7 @@
       <xsl:text>var DampInViewer=</xsl:text>
       <xsl:value-of select="$DampInViewer" />
       <xsl:text>;</xsl:text>
-    </script>
-    <xsl:choose>
-      <xsl:when test="$MCR.Module-iview2.DeveloperMode='true'">
-        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/LAB.min.js"/>
-        <!-- LAB JS Loader Lib -->
-        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/jquery.mousewheel.min.js" />
-        <!-- JQuery Mousewheel support -->
-        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/PanoJS.js" />
-        <!-- Viewer -->
-        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/Event.js"/>
-        <!-- Event Registration utility -->
-        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/XML.js" />
-        <!--XML Funktionen-->
-        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/Utils.js" />
-        <!--Allgemeine Util Funktionen-->
-        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/scrollBars.js" />
-        <!--Scrollbar Klasse-->
-        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/cutOut.js" />
-        <!--Ausschnittbildchen Klasse-->
-        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/METS.js" />
-        <!--METS Klasse-->
-        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/Thumbnail.js" />
-        <!--Hauptdatei-->
-        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/init.js"/>
-		<!-- Main Stylesheet -->
-    	<link id="cssSheet{$groupID}" rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/web/gfx/default/style.css" />
-      </xsl:when>
-      <xsl:otherwise>
-        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.js"/>
-        <script>
-          <xsl:text>loadCssFile('</xsl:text>
-          <xsl:value-of select="$WebApplicationBaseURL"/>
-          <xsl:text>modules/iview2/web/gfx/default/iview2.min.css', 'iviewCss');</xsl:text>
-        </script>
-      </xsl:otherwise>
-    </xsl:choose>
     <!-- Init Funktionen -->
-    <script type="text/javascript">
       function addIviewProperty(viewID, propertyName, val) {
       if (typeof (Iview) == "undefined") eval("Iview = new Object()");
       if (typeof (Iview[viewID]) == "undefined") {
@@ -241,6 +172,21 @@
       eval('Iview["'+viewID+'"].'+propertyName+'= '+val+';');
       }
     </script>
+    
+    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.js"/>
+    <xsl:choose>
+      <xsl:when test="$MCR.Module-iview2.DeveloperMode='true'">
+		<!-- Main Stylesheet -->
+    	<link id="cssSheet{$groupID}" rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/web/gfx/default/style.css" />
+      </xsl:when>
+      <xsl:otherwise>
+        <script>
+          <xsl:text>loadCssFile('</xsl:text>
+          <xsl:value-of select="$WebApplicationBaseURL"/>
+          <xsl:text>modules/iview2/web/gfx/default/iview2.min.css', 'iviewCss');</xsl:text>
+        </script>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
   <xsl:template name="iview2.start">
     <xsl:param name="groupID" />
@@ -260,7 +206,7 @@
         if (Iview[viewID].started) return;
         Iview[viewID].started = true;
         Iview[viewID].preload = jQuery("#viewerContainer" + viewID + " .preload");
-        $LAB.setGlobalDefaults({"AllowDuplicates": false, "BasePath": '../modules/iview2/web/js/'});
+        //$LAB.setGlobalDefaults({"AllowDuplicates": false, "BasePath": '../modules/iview2/web/js/'});
         loading(viewID);
       }
       jQuery(window).load(function() { startViewer('<xsl:value-of select="$groupID"/>');});
