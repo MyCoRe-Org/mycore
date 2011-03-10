@@ -72,7 +72,7 @@ public class MetsSave {
      * 
      * @return the reference to the mets file
      */
-    public static File save(Document mets) throws Exception {
+    private static File save(Document mets) throws Exception {
         File file = File.createTempFile(UUID.randomUUID().toString(), ".xml");
         FileOutputStream stream = new FileOutputStream(file);
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
@@ -94,8 +94,10 @@ public class MetsSave {
     public static void update(MCRDerivate derivate, String file) throws Exception {
         String mf = MCRConfiguration.instance().getString("MCR.Mets.Filename", "mets.xml");
         MCRFilesystemNode metsDocNode = derivate.receiveDirectoryFromIFS().getChild(mf);
-        if (!(metsDocNode instanceof MCRFile))
+        if (!(metsDocNode instanceof MCRFile)) {
+            LOGGER.info("Derivate with id \"" + derivate.getId().toString() + "\" has no mets file. Nothing to do");
             return;
+        }
         Document mets = new SAXBuilder().build(((MCRFile) metsDocNode).getContentAsInputStream());
         mets = MetsSave.updateMetsDocument(mets, file);
         if (mets != null)
