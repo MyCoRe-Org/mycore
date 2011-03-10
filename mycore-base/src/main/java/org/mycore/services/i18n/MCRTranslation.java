@@ -71,11 +71,21 @@ public class MCRTranslation {
      * @return translated String
      */
     public static String translate(String label) {
-        String result = null;
         Locale currentLocale = getCurrentLocale();
-        LOGGER.debug("Translation for current locale: " + currentLocale.getLanguage());
+        return translate(label, currentLocale);
+    }
 
-        ResourceBundle message = ResourceBundle.getBundle("messages", currentLocale);
+    /**
+     * provides translation for the given label (property key).
+     * 
+     * @param label
+     * @param locale target locale of translation 
+     * @return translated String
+     */
+    public static String translate(String label, Locale locale) {
+        LOGGER.debug("Translation for current locale: " + locale.getLanguage());
+        ResourceBundle message = ResourceBundle.getBundle("messages", locale);
+        String result = null;
         try {
             result = message.getString(label);
             LOGGER.debug("Translation for " + label + "=" + result);
@@ -110,14 +120,25 @@ public class MCRTranslation {
      * @return map of labels with translated values
      */
     public static Map<String, String> translatePrefix(String prefix) {
-        HashMap<String, String> map = new HashMap<String, String>();
         Locale currentLocale = getCurrentLocale();
-        LOGGER.debug("Translation for current locale: " + currentLocale.getLanguage());
-        ResourceBundle message = ResourceBundle.getBundle("messages", currentLocale);
+        return translatePrefix(prefix, currentLocale);
+    }
+
+    /**
+     * Returns a map of label/value pairs which match with the given prefix.
+     * 
+     * @param prefix label starts with
+     * @param locale target locale of translation 
+     * @return map of labels with translated values
+     */
+    public static Map<String, String> translatePrefix(String prefix, Locale locale) {
+        LOGGER.debug("Translation for locale: " + locale.getLanguage());
+        HashMap<String, String> map = new HashMap<String, String>();
+        ResourceBundle message = ResourceBundle.getBundle("messages", locale);
         Enumeration<String> keys = message.getKeys();
-        while(keys.hasMoreElements()) {
+        while (keys.hasMoreElements()) {
             String key = keys.nextElement();
-            if(key.startsWith(prefix)) {
+            if (key.startsWith(prefix)) {
                 map.put(key, message.getString(key));
             }
         }
@@ -165,16 +186,21 @@ public class MCRTranslation {
         return translate(label, (Object[]) getStringArray(argument));
     }
 
-    private static Locale getCurrentLocale() {
-        Locale currentLocale = new Locale(MCRSessionMgr.getCurrentSession().getCurrentLanguage());
-        // workaround for bug with indonesian
-        // INDONESIAN      ID     OCEANIC/INDONESIAN [*Changed 1989 from original ISO 639:1988, IN]
-        // Java doesn't work with id
-        if (currentLocale.getLanguage().equals("id")) {
-            currentLocale = new Locale("in");
-            LOGGER.debug("Translation for current locale: " + currentLocale.getLanguage());
+    public static Locale getCurrentLocale() {
+        String currentLanguage = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
+        return getLocale(currentLanguage);
+    }
+
+    public static Locale getLocale(String language) {
+        if (language.equals("id")) {
+            // workaround for bug with indonesian
+            // INDONESIAN      ID     OCEANIC/INDONESIAN [*Changed 1989 from original ISO 639:1988, IN]
+            // Java doesn't work with id
+            language = "in";
+            LOGGER.debug("Translation for current locale: " + language);
         }
-        return currentLocale;
+        Locale locale = new Locale(language);
+        return locale;
     }
 
     static String[] getStringArray(String masked) {
