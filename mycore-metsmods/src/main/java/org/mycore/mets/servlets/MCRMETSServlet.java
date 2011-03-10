@@ -24,7 +24,6 @@
 package org.mycore.mets.servlets;
 
 import java.text.MessageFormat;
-import java.util.Date;
 import java.util.HashSet;
 
 import javax.servlet.ServletException;
@@ -87,7 +86,7 @@ public class MCRMETSServlet extends MCRServlet {
         request.setAttribute("XSL.objectID", MCRLinkTableManager.instance().getSourceOf(derivate).iterator().next());
 
         long lastModified = dir.getLastModified().getTimeInMillis();
-        writeHeaders(response, lastModified);
+        writeCacheHeaders(response, CACHE_TIME, lastModified, useExpire);
 
         if (metsFile != null && useExistingMets(request)) {
             MCRLayoutService.instance().doLayout(request, response, ((MCRFile) metsFile).getContentAsInputStream());
@@ -105,17 +104,6 @@ public class MCRMETSServlet extends MCRServlet {
         if (useExistingMetsParam == null)
             return true;
         return Boolean.valueOf(useExistingMetsParam);
-    }
-
-    private void writeHeaders(HttpServletResponse response, long lastModified) {
-        response.setHeader("Cache-Control", "max-age=" + CACHE_TIME);
-        response.setContentType("text/xml");
-        response.setDateHeader("Last-Modified", lastModified);
-        if (useExpire) {
-            Date expires = new Date(System.currentTimeMillis() + CACHE_TIME * 1000);
-            LOGGER.info("Last-Modified: " + new Date(lastModified) + ", expire on: " + expires);
-            response.setDateHeader("Expires", expires.getTime());
-        }
     }
 
     protected static String getOwnerID(String pathInfo) {

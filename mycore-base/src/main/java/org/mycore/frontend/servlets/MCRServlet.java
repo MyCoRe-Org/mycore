@@ -31,6 +31,7 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -671,6 +672,17 @@ public class MCRServlet extends HttpServlet {
     protected String getErrorI18N(String subIdentifier, Object... args) {
         String key = MessageFormat.format("error.{0}.{1}", getClass().getSimpleName(), subIdentifier);
         return MCRTranslation.translate(key, args);
+    }
+
+    protected void writeCacheHeaders(HttpServletResponse response, int CACHE_TIME, long lastModified, boolean useExpire) {
+        response.setHeader("Cache-Control", "max-age=" + CACHE_TIME);
+        response.setContentType("text/xml");
+        response.setDateHeader("Last-Modified", lastModified);
+        if (useExpire) {
+            Date expires = new Date(System.currentTimeMillis() + CACHE_TIME * 1000);
+            LOGGER.info("Last-Modified: " + new Date(lastModified) + ", expire on: " + expires);
+            response.setDateHeader("Expires", expires.getTime());
+        }
     }
 
     /**
