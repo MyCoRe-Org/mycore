@@ -205,6 +205,10 @@
       <artifactId>commons-vfs</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+    </dependency>
+    <dependency>
       <!-- required for commons-vfs -->
       <groupId>com.jcraft</groupId>
       <artifactId>jsch</artifactId>

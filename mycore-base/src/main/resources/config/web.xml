@@ -278,6 +278,16 @@
     <url-pattern>/servlets/logout</url-pattern>
   </servlet-mapping>
 
+  <servlet>
+    <servlet-name>MCRLocaleServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRLocaleServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>MCRLocaleServlet</servlet-name>
+    <url-pattern>/servlets/MCRLocaleServlet/*</url-pattern>
+  </servlet-mapping>
+
   <!-- **************************************************************** -->
   <!-- General configuration -->
   <!-- **************************************************************** -->

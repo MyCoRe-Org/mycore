@@ -475,6 +475,11 @@
         <optional>false</optional>
       </dependency>
       <dependency>
+        <groupId>com.google.code.gson</groupId>
+        <artifactId>gson</artifactId>
+        <version>1.4</version>
+      </dependency>
+      <dependency>
         <!-- required for commons-vfs -->
         <groupId>com.jcraft</groupId>
         <artifactId>jsch</artifactId>
