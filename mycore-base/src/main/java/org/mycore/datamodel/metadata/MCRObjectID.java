@@ -36,6 +36,8 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
  * The MyCoRe Object ID is a special ID to identify each metadata object with
  * three parts, they are the project identifier, the type identifier and a
  * string with a number.
+ * The syntax of the ID is "<em>projectID</em>_<em>typeID</em>_
+ * <em>number</em>" as "<em>String_String_Integer</em>".
  * 
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
@@ -97,7 +99,7 @@ public final class MCRObjectID {
      */
     public MCRObjectID(String id) throws MCRException {
         if (!setID(id)) {
-            throw new MCRException("The ID is not valid: " + id);
+            throw new MCRException("The ID is not valid: " + id + " , it should has the form String_String_Integer");
         }
     }
 
