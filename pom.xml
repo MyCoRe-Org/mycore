@@ -259,6 +259,10 @@
                   <title>MyCoRe Component: OAI</title>
                   <packages>org.mycore.oai*</packages>
                 </group>
+                <group>
+                  <title>MyCoRe Component: Web-CLI</title>
+                  <packages>org.mycore.webcli*</packages>
+                </group>
               </groups>
               <tags>
                 <tag>
