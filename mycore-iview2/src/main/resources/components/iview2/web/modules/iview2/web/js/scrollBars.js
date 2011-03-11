@@ -713,11 +713,11 @@ iview.scrollbar.View = function() {
 	 * @param		{string} args.direction=(horizontal|vertical) tells if the bar will be vertical or horizontal
 	 * @param		{string} args.mainClass tells what the main Class for the scrollbar shall be
 	 * @param		{string} args.customClass allows it to modify the Scrollbar in parts to differ from others
-	 * @param 		{string} [arguments[1]] tells the id of the scrollbar. This property isn't needed as the
+	 * @param 		{string} [id] tells the id of the scrollbar. This property isn't needed as the
 	 *  scrollbar works just fine without ids. The id maybe only needed if you plan to perform custom
 	 *  transformations on the scrollbar DOM
 	 */
-	function createView(args) {
+	function createView(args, id) {
 		var that = this;
 		this._direction = (args.direction == "horizontal")? true:false;
 		var mainClass = args.mainClass || "";
@@ -730,8 +730,8 @@ iview.scrollbar.View = function() {
 		if (customClass != "") {
 			complete.addClass(customClass +((this._direction)? "H":"V"));
 		}
-		if (typeof arguments[1] !== "undefined") {
-			complete.attr("id", arguments[1]);
+		if (typeof id !== "undefined") {
+			complete.attr("id", id);
 		}
 			
 	//Start Up/Left

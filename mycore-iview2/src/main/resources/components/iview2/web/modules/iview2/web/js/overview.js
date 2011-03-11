@@ -409,19 +409,19 @@ iview.overview.View = function() {
 	 * @param		{string} args.mainClass tells what the main Class for the scrollbar shall be
 	 * @param		{string} args.customClass allows it to modify the Scrollbar in parts to differ from others
 	 * @param		{String,DOM-Object,anything jQuery supports} parent DOM element to which the overview is added
-	 * @param 		{string} [arguments[1]] tells the id of the overview. This property isn't needed as the
+	 * @param 		{string} [id] tells the id of the overview. This property isn't needed as the
 	 *  scrollbar works just fine without ids. The id maybe only needed if you plan to perform custom
 	 *  transformations on the scrollbar DOM
 	 */
-	function createView(args) {
+	function createView(args, id) {
 		this._mainClass = args.mainClass || "";
 		this._customClass = args.customClass || "";
 		
 		var main = jQuery("<div>").addClass(this._mainClass + " " + this._customClass)
 		.appendTo(args.parent);
 		
-		if (typeof arguments[1] !== "undefined") {
-			main.attr("id", arguments[1]);
+		if (typeof id !== "undefined") {
+			main.attr("id", id);
 		}
 		
 		//deactivate Browser Drag&Drop

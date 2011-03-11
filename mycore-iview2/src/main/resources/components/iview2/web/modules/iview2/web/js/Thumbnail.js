@@ -362,11 +362,11 @@ function calculateZoomProp(level, totalSize, viewerSize, scrollBarSize, viewID) 
  * @description	calculates how the picture needs to be scaled so that it can be displayed within the display-area as the mode requires it
  * @param	{boolean} screenZoom defines which displaymode will be calculated
  * @param	{boolean} statebool holds the value which defines if the current mode is set or needs to be set
- * @param 	{boolean}arguments[3] optional tells if the function is called from the Zoombar or any Function which is connected to it or not and prevents infite loop
  * @param	{string} viewID ID of the derivate
+ * @param 	{boolean} [preventLooping] optional tells if the function is called from the Zoombar or any Function which is connected to it or not and prevents infite loop
  * @return	boolean which holds the new StateBool value, so it can be saved back into the correct variable
  */
-function switchDisplayMode(screenZoom, stateBool, viewID) {
+function switchDisplayMode(screenZoom, stateBool, viewID, preventLooping) {
 	var viewerBean = Iview[viewID].viewerBean;
 	if (typeof(viewerBean)=='undefined' && typeof(console)!='undefined'){
 		console.log("undefined property viewerBean");
@@ -403,7 +403,7 @@ function switchDisplayMode(screenZoom, stateBool, viewID) {
 		viewerBean.init();
 		
 		//an infinite loop would arise if the repeal of the zoombar comes
-		if (typeof (arguments[3]) == "undefined" || arguments[3] == false) {
+		if (typeof (preventLooping) == "undefined" || preventLooping == false) {
 			viewerBean.zoom(Iview[viewID].zoomBack - viewerBean.zoomLevel);
 		}
 	}
@@ -421,9 +421,10 @@ function switchDisplayMode(screenZoom, stateBool, viewID) {
  * @memberOf	iview.Thumbnails
  * @description	calculates how the tilesize has to be so that the picture fully fits into the viewer Area, tiles used are the nearest zoomlevel to the available viewerwidth which is smaller than the viewerwidth
  * @param	{string} viewID ID of the derivate
+ * @param 	{boolean} [preventLooping] optional tells if the function is called from the Zoombar or any Function which is connected to it or not and prevents infite loop
  */
-function pictureWidth(viewID){
-	var bool = (typeof (arguments[1]) != undefined)? arguments[1]:false;
+function pictureWidth(viewID, preventLooping){
+	var bool = (typeof (preventLooping) != undefined)? preventLooping:false;
 	Iview[viewID].zoomWidth = switchDisplayMode(false, Iview[viewID].zoomWidth, viewID, bool);
 }
 
@@ -434,9 +435,10 @@ function pictureWidth(viewID){
  * @memberOf	iview.Thumbnails
  * @description	calculates how the tilesize has to be so that the picture fully fits into the viewer Area, tiles used are the nearest zoomlevel to the available viewerspace which is smaller than the viewerspace
  * @param	{string} viewID ID of the derivate
+ * @param 	{boolean} [preventLooping] optional tells if the function is called from the Zoombar or any Function which is connected to it or not and prevents infite loop
  */
-function pictureScreen(viewID){
-	var bool = (typeof (arguments[1]) != undefined)? arguments[1]:false;
+function pictureScreen(viewID, preventLooping){
+	var bool = (typeof (preventLooping) != undefined)? preventLooping:false;
 	Iview[viewID].zoomScreen = switchDisplayMode(true, Iview[viewID].zoomScreen, viewID, bool);
 }
 

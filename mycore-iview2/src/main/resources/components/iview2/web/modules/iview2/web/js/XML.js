@@ -60,17 +60,18 @@ function nodeAttributes(node) {
  * @description	Gains the requested information from a given XML File
  * @param	{object} xmlfile XML file from which the data will be extruded
  * @param	{string} nodeName the Node of the XML File which shall be gained, can be a group of nodes
+ * @param	{object} [parent] Node which is used as Start for search
  * @return	{} List of all Nodes with the given NodeName
  */
-function getNodes(xmlfile, nodeName) {
+function getNodes(xmlfile, nodeName, parent) {
 	var nodes;
-	if (typeof arguments[2] === "undefined") {
+	if (typeof parent === "undefined") {
 		nodes = xmlfile.getElementsByTagName(namespaceCheck(nodeName));
 	} else {
 		if (isBrowser("IE")) {
-			nodes = arguments[2].getElementsByTagName(namespaceCheck(nodeName));
+			nodes = parent.getElementsByTagName(namespaceCheck(nodeName));
 		} else {
-			nodes = xmlfile.getElementsByTagName(namespaceCheck(nodeName), arguments[2]);
+			nodes = xmlfile.getElementsByTagName(namespaceCheck(nodeName), parent);
 		}
 	}
 	var nodeList = new Array();
