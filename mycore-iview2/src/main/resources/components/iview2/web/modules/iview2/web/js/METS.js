@@ -650,7 +650,7 @@ iview.METS.ChapterModel = function(element) {
 	function addPage(element) {
 		var page = new iview.METS.ChapterPage(element, this);
 		this._entries.push(page);
-		addHash(page, this);
+		addHash.call(this, page);
 	}
 
 	/*
@@ -661,7 +661,7 @@ iview.METS.ChapterModel = function(element) {
 	function addBranch(element) {
 		var branch = new iview.METS.ChapterBranch(element, this);
 		this._entries.push(branch);
-		addHash(branch, this);
+		addHash.call(this, branch);
 		return branch;
 	}
 	
@@ -697,27 +697,24 @@ iview.METS.ChapterModel = function(element) {
 	 * @param entry Object with function getID which will be added to the Hashlist
 	 */
 	function addHash(entry) {
-		var that = arguments[1] || this;
-		if (getHash(entry.getID(), that) != null) {
+		if (getHash.call(this, entry.getID()) != null) {
 			if (typeof console != "undefined") {
 				console.log("Entry with the ID "+entry.getID() +" already exists. Element will not be added to List");
 			}
 			return;
 		}
-		that._hashList[entry.getID()] = entry;
+		this._hashList[entry.getID()] = entry;
 	}
 	
 	/*
 	 * @description Proves if the supplied Hash within hash is already in use within the Model,
 	 *  which is supplied through that
 	 * @param hash Hash which shall be added to the hashList
-	 * @param that Model where to check the Hashlist for the given hash
 	 * @return null if the Element doesn't exists, else it returns the content of the given Hash Position
 	 */
 	function getHash(hash) {
-		var that = arguments[1] || this;
 		//check if Object with this hash is available
-		return (typeof that._hashList[hash] === "undefined")? null:that._hashList[hash];
+		return (typeof this._hashList[hash] === "undefined")? null:this._hashList[hash];
 	}
 	
 	/*
@@ -729,7 +726,7 @@ iview.METS.ChapterModel = function(element) {
 	 * @param		parentID a (valid) logical METS Div id where the given physical one will link to
 	 */
 	function addContent(orderNo, parentID) {
-		var entry = getHash(parentID, this);
+		var entry = getHash.call(this, parentID);
 		this._containedIn[orderNo] = entry;
 		if (entry.getOrder() > orderNo) {
 			entry.setOrder(orderNo);
