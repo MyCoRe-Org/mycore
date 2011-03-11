@@ -35,6 +35,7 @@ import javax.servlet.ServletException;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRJSONUtils;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -146,7 +147,7 @@ public class MCRUserAjaxServlet extends MCRServlet {
         } else {
             JsonObject json = new JsonObject();
             json.addProperty("error", "primaryGroup");
-            json.add("users", getJsonArray(primaryUsers));
+            json.add("users", MCRJSONUtils.getJsonArray(primaryUsers));
             LOGGER.debug("JSON STRING" + json.toString());
             job.getResponse().setContentType("application/x-json");
             job.getResponse().getWriter().print(json);
@@ -256,7 +257,7 @@ public class MCRUserAjaxServlet extends MCRServlet {
         } else {
             error.add(new JsonPrimitive("none"));
         }
-        users.addAll(getJsonArray(members));
+        users.addAll(MCRJSONUtils.getJsonArray(members));
         groupToUpdate.addProperty("name", gruppe);
         groupToUpdate.addProperty("desc", group.getDescription());
         groupToUpdate.add("users", users);
@@ -265,14 +266,6 @@ public class MCRUserAjaxServlet extends MCRServlet {
         LOGGER.debug("JSON STRING" + json.toString());
         job.getResponse().setContentType("application/x-json");
         job.getResponse().getWriter().print(json);
-    }
-
-    private static JsonArray getJsonArray(Collection<String> list) {
-        JsonArray ja = new JsonArray();
-        for (String s : list) {
-            ja.add(new JsonPrimitive(s));
-        }
-        return ja;
     }
 
     /**
@@ -338,7 +331,7 @@ public class MCRUserAjaxServlet extends MCRServlet {
             ArrayList<String> memUsers = MCRUserMgr.instance().retrieveGroup(groupID).getMemberUserIDs();
             JsonArray memUserList = new JsonArray();
             JsonObject group = new JsonObject();
-            memUserList.add(getJsonArray(memUsers));
+            memUserList.add(MCRJSONUtils.getJsonArray(memUsers));
             group.addProperty("name", groupID);
             group.addProperty("desc", gruppe.getDescription());
             group.add("users", memUserList);

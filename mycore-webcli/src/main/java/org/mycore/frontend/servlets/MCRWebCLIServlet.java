@@ -3,7 +3,6 @@ package org.mycore.frontend.servlets;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Collection;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,13 +11,12 @@ import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRJSONUtils;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.cli.MCRExternalCommandInterface;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 
 /**
  * Handles request from AJAX GUI.
@@ -96,7 +94,7 @@ public class MCRWebCLIServlet extends MCRServlet {
                     printJsonObject(MCRWebCLIContainer.getKnownCommands(), job.getResponse());
                     return;
                 } else if (request.equals("getCommandQueue")) {
-                    jsonObject.add("commandQueue", getJsonArray(getCurrentSessionContainer(true, hsession).getCommandQueue()));
+                    jsonObject.add("commandQueue", MCRJSONUtils.getJsonArray(getCurrentSessionContainer(true, hsession).getCommandQueue()));
                     printJsonObject(jsonObject, job.getResponse());
                     return;
                 }
@@ -142,14 +140,6 @@ public class MCRWebCLIServlet extends MCRServlet {
             }
         }
         return (MCRWebCLIContainer) sessionValue;
-    }
-
-    private static JsonArray getJsonArray(Collection<String> list) {
-        JsonArray ja = new JsonArray();
-        for (String s : list) {
-            ja.add(new JsonPrimitive(s));
-        }
-        return ja;
     }
 
     private static void generateErrorResponse(HttpServletRequest request, HttpServletResponse response, int errorCode, String message) throws IOException {

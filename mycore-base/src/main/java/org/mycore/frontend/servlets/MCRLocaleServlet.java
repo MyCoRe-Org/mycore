@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRJSONUtils;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.services.i18n.MCRTranslation;
 
@@ -96,8 +97,6 @@ public class MCRLocaleServlet extends MCRServlet {
     }
 
     private String handlePrefetch(String prefix, String lang) {
-        Map<String, String> transMap = MCRTranslation.translatePrefix(prefix, MCRTranslation.getLocale(lang));
-        Gson gson = new Gson();
-        return gson.toJson(transMap);
+        return MCRJSONUtils.getTranslations(prefix, lang);
     }
 }
