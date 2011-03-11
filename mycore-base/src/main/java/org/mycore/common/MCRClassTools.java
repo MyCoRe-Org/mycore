@@ -1,4 +1,4 @@
-package org.mycore.common.tools;
+package org.mycore.common;
 
 import java.io.File;
 import java.net.MalformedURLException;

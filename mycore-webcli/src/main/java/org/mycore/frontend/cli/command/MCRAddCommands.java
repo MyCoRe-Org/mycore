@@ -6,7 +6,7 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.mycore.common.tools.MCRClassTools;
+import org.mycore.common.MCRClassTools;
 import org.mycore.frontend.cli.MCRCommandPool;
 import org.mycore.frontend.cli.MCRJarTools;
 
