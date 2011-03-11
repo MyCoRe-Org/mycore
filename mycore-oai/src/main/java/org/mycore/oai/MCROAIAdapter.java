@@ -51,8 +51,8 @@ public abstract class MCROAIAdapter {
     void init(String prefix) {
         MCRConfiguration config = MCRConfiguration.instance();
 
-        recordUriPattern = MCRConfiguration.instance().getString(prefix + "Adapter." + "RecordURIPattern");
-        headerUriPattern = MCRConfiguration.instance().getString(prefix + "Adapter." + "HeaderURIPattern");
+        recordUriPattern = MCRConfiguration.instance().getString(prefix + "Adapter.RecordURIPattern");
+        headerUriPattern = MCRConfiguration.instance().getString(prefix + "Adapter.HeaderURIPattern");
         EARLIEST_DATESTAMP = config.getString(prefix + "Adapter.EarliestDatestamp", "1970-01-01");
     }
 
