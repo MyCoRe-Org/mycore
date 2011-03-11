@@ -1,4 +1,4 @@
-package org.mycore.frontend.cli;
+package org.mycore.webcli.cli;
 
 import java.io.File;
 import java.io.FilenameFilter;

@@ -4,7 +4,7 @@
 
 <servlet id="MCRWebCLIServlet">
   <servlet-name>MCRWebCLIServlet</servlet-name>
-  <servlet-class>org.mycore.frontend.servlets.MCRWebCLIServlet</servlet-class>
+  <servlet-class>org.mycore.webcli.servlets.MCRWebCLIServlet</servlet-class>
 </servlet>
 
 <servlet-mapping>

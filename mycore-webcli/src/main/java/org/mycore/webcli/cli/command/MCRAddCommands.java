@@ -1,4 +1,4 @@
-package org.mycore.frontend.cli.command;
+package org.mycore.webcli.cli.command;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,8 +7,8 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRClassTools;
-import org.mycore.frontend.cli.MCRCommandPool;
-import org.mycore.frontend.cli.MCRJarTools;
+import org.mycore.webcli.cli.MCRCommandPool;
+import org.mycore.webcli.cli.MCRJarTools;
 
 public class MCRAddCommands extends MCRWebCLICommand {
     private static final Logger LOGGER = Logger.getLogger(MCRAddCommands.class);

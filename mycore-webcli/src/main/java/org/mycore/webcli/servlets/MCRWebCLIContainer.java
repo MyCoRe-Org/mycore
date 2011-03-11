@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  *
  **/
-package org.mycore.frontend.servlets;
+package org.mycore.webcli.servlets;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -55,9 +55,9 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
 import org.mycore.frontend.cli.MCRCommand;
-import org.mycore.frontend.cli.MCRCommandPool;
 import org.mycore.frontend.cli.MCRExternalCommandInterface;
-import org.mycore.frontend.cli.command.MCRAddCommands;
+import org.mycore.webcli.cli.MCRCommandPool;
+import org.mycore.webcli.cli.command.MCRAddCommands;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -178,9 +178,9 @@ class MCRWebCLIContainer {
         if (knownCommands == null) {
             knownCommands = new TreeMap<String, List<MCRCommand>>();
             ArrayList<MCRCommand> basicCommands = new ArrayList<MCRCommand>();
-            basicCommands.add(new MCRCommand("process {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.readCommandsFile String",
+            basicCommands.add(new MCRCommand("process {0}", "org.mycore.webcli.cli.MCRCommandLineInterface.readCommandsFile String",
                 "Execute the commands listed in the text file {0}."));
-            basicCommands.add(new MCRCommand("show command statistics", "org.mycore.frontend.cli.MCRCommandLineInterface.showCommandStatistics",
+            basicCommands.add(new MCRCommand("show command statistics", "org.mycore.webcli.cli.MCRCommandLineInterface.showCommandStatistics",
                 "Show statistics on number of commands processed and execution time needed per command"));
             basicCommands.add(new MCRAddCommands());
             LOGGER.warn("known commands:" + knownCommands);

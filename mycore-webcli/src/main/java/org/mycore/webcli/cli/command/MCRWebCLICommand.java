@@ -1,4 +1,4 @@
-package org.mycore.frontend.cli.command;
+package org.mycore.webcli.cli.command;
 
 import java.lang.reflect.Method;
 import java.text.Format;

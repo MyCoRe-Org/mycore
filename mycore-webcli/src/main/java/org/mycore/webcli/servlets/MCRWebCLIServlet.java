@@ -1,4 +1,4 @@
-package org.mycore.frontend.servlets;
+package org.mycore.webcli.servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -15,6 +15,8 @@ import org.mycore.common.MCRJSONUtils;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.cli.MCRExternalCommandInterface;
+import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.frontend.servlets.MCRServletJob;
 
 import com.google.gson.JsonObject;
 

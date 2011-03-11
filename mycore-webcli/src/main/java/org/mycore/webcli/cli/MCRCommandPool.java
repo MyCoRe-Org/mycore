@@ -1,9 +1,10 @@
-package org.mycore.frontend.cli;
+package org.mycore.webcli.cli;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.mycore.frontend.cli.command.MCRWebCLICommand;
+import org.mycore.frontend.cli.MCRCommand;
+import org.mycore.webcli.cli.command.MCRWebCLICommand;
 
 public class MCRCommandPool {
     private static MCRCommandPool instance;
