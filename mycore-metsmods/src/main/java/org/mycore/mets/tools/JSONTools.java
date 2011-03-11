@@ -18,8 +18,6 @@
  */
 package org.mycore.mets.tools;
 
-import net.sf.json.util.JSONUtils;
-
 /**
  * @author Silvio Hermann (shermann)
  * 
@@ -42,6 +40,13 @@ public class JSONTools {
     }
 
     public static String stripBracketsAndQuotes(String input) {
-        return JSONUtils.stripQuotes(JSONTools.stripBrackets(input));
+        input = stripBrackets(input);
+        if (input.length() < 2) {
+            return input;
+        }
+        if (input.startsWith("\"") && input.endsWith("\"") || input.startsWith("'") && input.endsWith("'")) {
+            return input.substring(1, input.length() - 1);
+        }
+        return input;
     }
 }

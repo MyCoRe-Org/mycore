@@ -21,6 +21,7 @@ package org.mycore.user.servlets;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -30,9 +31,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import javax.servlet.ServletException;
-
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -44,6 +42,10 @@ import org.mycore.services.i18n.MCRTranslation;
 import org.mycore.user.MCRGroup;
 import org.mycore.user.MCRUser;
 import org.mycore.user.MCRUserMgr;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 /**
  * This servlet handles requests from the user interface for group and user
@@ -136,15 +138,15 @@ public class MCRUserAjaxServlet extends MCRServlet {
             }
             MCRUserMgr.instance().updateGroup(group);
             MCRUserMgr.instance().deleteGroup(groupName);
-            JSONObject json = new JSONObject();
-            json.put("response", "ok");
+            JsonObject json = new JsonObject();
+            json.addProperty("response", "ok");
             LOGGER.debug("JSON STRING" + json.toString());
             job.getResponse().setContentType("application/x-json");
             job.getResponse().getWriter().print(json);
         } else {
-            JSONObject json = new JSONObject();
-            json.put("error", "primaryGroup");
-            json.put("users", primaryUsers);
+            JsonObject json = new JsonObject();
+            json.addProperty("error", "primaryGroup");
+            json.add("users", getJsonArray(primaryUsers));
             LOGGER.debug("JSON STRING" + json.toString());
             job.getResponse().setContentType("application/x-json");
             job.getResponse().getWriter().print(json);
@@ -155,15 +157,15 @@ public class MCRUserAjaxServlet extends MCRServlet {
         MCRGroup group = MCRUserMgr.instance().retrieveGroup(groupName);
         if (group.getMemberUserIDs().isEmpty()) {
             MCRUserMgr.instance().deleteGroup(groupName);
-            JSONObject json = new JSONObject();
-            json.put("response", "ok");
+            JsonObject json = new JsonObject();
+            json.addProperty("response", "ok");
             LOGGER.debug("JSON STRING" + json.toString());
             job.getResponse().setContentType("application/x-json");
             job.getResponse().getWriter().print(json);
         } else {
-            JSONObject json = new JSONObject();
-            json.put("error", "hasMembers");
-            json.put("group", groupName);
+            JsonObject json = new JsonObject();
+            json.addProperty("error", "hasMembers");
+            json.addProperty("group", groupName);
             LOGGER.debug("JSON STRING" + json.toString());
             job.getResponse().setContentType("application/x-json");
             job.getResponse().getWriter().print(json);
@@ -243,26 +245,34 @@ public class MCRUserAjaxServlet extends MCRServlet {
     private void getGroup(MCRServletJob job, String gruppe, String Msg) throws IOException {
         MCRGroup group = MCRUserMgr.instance().retrieveGroup(gruppe);
 
-        JSONObject json = new JSONObject();
-        JSONObject groupToUpdate = new JSONObject();
-        JSONArray users = new JSONArray();
-        JSONArray error = new JSONArray();
+        JsonObject json = new JsonObject();
+        JsonObject groupToUpdate = new JsonObject();
+        JsonArray users = new JsonArray();
+        JsonArray error = new JsonArray();
         ArrayList<String> members = group.getMemberUserIDs();
 
         if (!(Msg.equals(""))) {
-            error.add(Msg);
+            error.add(new JsonPrimitive(Msg));
         } else {
-            error.add("none");
+            error.add(new JsonPrimitive("none"));
         }
-        users.addAll(members);
-        groupToUpdate.put("name", gruppe);
-        groupToUpdate.put("desc", group.getDescription());
-        groupToUpdate.put("users", users);
-        json.put("gruppe", groupToUpdate);
-        json.put("error", error);
+        users.addAll(getJsonArray(members));
+        groupToUpdate.addProperty("name", gruppe);
+        groupToUpdate.addProperty("desc", group.getDescription());
+        groupToUpdate.add("users", users);
+        json.add("gruppe", groupToUpdate);
+        json.add("error", error);
         LOGGER.debug("JSON STRING" + json.toString());
         job.getResponse().setContentType("application/x-json");
         job.getResponse().getWriter().print(json);
+    }
+
+    private static JsonArray getJsonArray(Collection<String> list) {
+        JsonArray ja = new JsonArray();
+        for (String s : list) {
+            ja.add(new JsonPrimitive(s));
+        }
+        return ja;
     }
 
     /**
@@ -282,12 +292,12 @@ public class MCRUserAjaxServlet extends MCRServlet {
         List<String> userIDs = MCRUserMgr.instance().getAllUserIDs();
         List<String> groupsIDs = MCRUserMgr.instance().getAllGroupIDs();
 
-        JSONObject json = new JSONObject();
-        JSONArray users = new JSONArray();
-        JSONArray groups = new JSONArray();
-        JSONArray error = new JSONArray();
+        JsonObject json = new JsonObject();
+        JsonArray users = new JsonArray();
+        JsonArray groups = new JsonArray();
+        JsonArray error = new JsonArray();
 
-        Map<Object, JSONObject> idMap = new HashMap<Object, JSONObject>();
+        Map<Object, JsonObject> idMap = new HashMap<Object, JsonObject>();
         MCRUser UserToAdd;
         String lastName;
         String firstName;
@@ -304,13 +314,13 @@ public class MCRUserAjaxServlet extends MCRServlet {
             lastName = UserToAdd.getUserContact().getLastName();
             firstName = UserToAdd.getUserContact().getFirstName();
 
-            JSONObject user = new JSONObject();
+            JsonObject user = new JsonObject();
             // the field name for the JSON object differ from the java
             // variable name, because it's not a modification from the original
             // creator.
-            user.put("name", firstName);
-            user.put("surname", lastName);
-            user.put("userID", id);
+            user.addProperty("name", firstName);
+            user.addProperty("surname", lastName);
+            user.addProperty("userID", id);
             idMap.put(lastName + firstName + id, user);
         }
 
@@ -318,7 +328,7 @@ public class MCRUserAjaxServlet extends MCRServlet {
 
         for (Iterator<Object> iterator = idKeys.iterator(); iterator.hasNext();) {
             Object idKey = (Object) iterator.next();
-            JSONObject user = (JSONObject) idMap.get(idKey);
+            JsonObject user = (JsonObject) idMap.get(idKey);
 
             users.add(user);
         }
@@ -326,23 +336,22 @@ public class MCRUserAjaxServlet extends MCRServlet {
         for (String groupID : groupsIDs) {
             MCRGroup gruppe = MCRUserMgr.instance().retrieveGroup(groupID);
             ArrayList<String> memUsers = MCRUserMgr.instance().retrieveGroup(groupID).getMemberUserIDs();
-            JSONArray memUserList = new JSONArray();
-            JSONObject group = new JSONObject();
-            memUserList.add(memUsers);
-            group.put("name", groupID);
-            group.put("desc", gruppe.getDescription());
-            group.put("users", memUserList);
+            JsonArray memUserList = new JsonArray();
+            JsonObject group = new JsonObject();
+            memUserList.add(getJsonArray(memUsers));
+            group.addProperty("name", groupID);
+            group.addProperty("desc", gruppe.getDescription());
+            group.add("users", memUserList);
             groups.add(group);
         }
-        if (!(Msg.equals(""))) {
-            error.add(Msg);
-        } else {
-            error.add("none");
+        if (Msg.equals("")) {
+            Msg = "none";
         }
+        error.add(new JsonPrimitive(Msg));
 
-        json.put("users", users);
-        json.put("groups", groups);
-        json.put("error", error);
+        json.add("users", users);
+        json.add("groups", groups);
+        json.add("error", error);
         LOGGER.debug("JSON STRING" + json.toString());
         job.getResponse().setContentType("application/x-json");
         job.getResponse().setCharacterEncoding(MCRConfiguration.instance().getString("MCR.Request.CharEncoding", "UTF-8"));

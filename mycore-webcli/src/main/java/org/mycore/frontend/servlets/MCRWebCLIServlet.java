@@ -3,13 +3,11 @@ package org.mycore.frontend.servlets;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.LinkedList;
+import java.util.Collection;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import net.sf.json.JSONObject;
 
 import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
@@ -17,6 +15,10 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.cli.MCRExternalCommandInterface;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 /**
  * Handles request from AJAX GUI.
@@ -71,7 +73,7 @@ public class MCRWebCLIServlet extends MCRServlet {
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
         MCRSession session = MCRSessionMgr.getCurrentSession();
-        String user = session.getCurrentUserID();
+        String user = session.getUserInformation().getCurrentUserID();
         if (!MCRAccessManager.checkPermission("use-webcli")) {
             StringBuilder sb = new StringBuilder("Access denied: ");
             sb.append(user).append("\nIP: ").append(session.getCurrentIP());
@@ -82,20 +84,20 @@ public class MCRWebCLIServlet extends MCRServlet {
             String request = getProperty(job.getRequest(), "request");
             HttpSession hsession = job.getRequest().getSession();
             if (request != null) {
-                JSONObject jsonObject = new JSONObject();
+                JsonObject jsonObject = new JsonObject();
                 if (request.equals("getStatus")) {
-                    jsonObject.put("running", isRunning());
-                    printJSONObject(jsonObject, job.getResponse());
+                    jsonObject.addProperty("running", isRunning());
+                    printJsonObject(jsonObject, job.getResponse());
                     return;
                 } else if (request.equals("getLogs")) {
-                    printJSONObject(getCurrentSessionContainer(true, hsession).getLogs(), job.getResponse());
+                    printJsonObject(getCurrentSessionContainer(true, hsession).getLogs(), job.getResponse());
                     return;
                 } else if (request.equals("getKnownCommands")) {
-                    printJSONObject(MCRWebCLIContainer.getKnownCommands(), job.getResponse());
+                    printJsonObject(MCRWebCLIContainer.getKnownCommands(), job.getResponse());
                     return;
                 } else if (request.equals("getCommandQueue")) {
-                    jsonObject.put("commandQueue", new LinkedList<String>(getCurrentSessionContainer(true, hsession).getCommandQueue()));
-                    printJSONObject(jsonObject, job.getResponse());
+                    jsonObject.add("commandQueue", getJsonArray(getCurrentSessionContainer(true, hsession).getCommandQueue()));
+                    printJsonObject(jsonObject, job.getResponse());
                     return;
                 }
             }
@@ -113,7 +115,7 @@ public class MCRWebCLIServlet extends MCRServlet {
         }
     }
 
-    private static void printJSONObject(JSONObject json, HttpServletResponse response) throws IOException {
+    private static void printJsonObject(JsonObject json, HttpServletResponse response) throws IOException {
         LOGGER.debug("JSON STRING" + json.toString());
         response.setContentType("application/x-json");
         response.setCharacterEncoding(MCRConfiguration.instance().getString("MCR.Request.CharEncoding", "UTF-8"));
@@ -142,8 +144,15 @@ public class MCRWebCLIServlet extends MCRServlet {
         return (MCRWebCLIContainer) sessionValue;
     }
 
-    private static void generateErrorResponse(HttpServletRequest request, HttpServletResponse response, int errorCode, String message)
-            throws IOException {
+    private static JsonArray getJsonArray(Collection<String> list) {
+        JsonArray ja = new JsonArray();
+        for (String s : list) {
+            ja.add(new JsonPrimitive(s));
+        }
+        return ja;
+    }
+
+    private static void generateErrorResponse(HttpServletRequest request, HttpServletResponse response, int errorCode, String message) throws IOException {
         response.setStatus(errorCode);
         response.setContentType("text/plain");
         response.getWriter().println(message);

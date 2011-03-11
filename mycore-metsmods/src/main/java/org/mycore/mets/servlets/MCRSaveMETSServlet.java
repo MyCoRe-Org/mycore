@@ -20,7 +20,6 @@ package org.mycore.mets.servlets;
 
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONObject;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -31,6 +30,9 @@ import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.mets.model.Mets;
 import org.mycore.mets.tools.MetsProvider;
 import org.mycore.mets.tools.MetsSave;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 /**
  * @author Silvio Hermann (shermann)
@@ -43,7 +45,7 @@ public class MCRSaveMETSServlet extends MCRServlet {
 
     public void doGetPost(MCRServletJob job) throws Exception {
         String jsontree = job.getRequest().getParameter("jsontree");
-        JSONObject json = JSONObject.fromObject(jsontree);
+        JsonObject json = new JsonParser().parse(jsontree).getAsJsonObject();
         // extract derivate id from json object (root id of the tree)
         String derivateId = job.getRequest().getParameter("derivate");
 

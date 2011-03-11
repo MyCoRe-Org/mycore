@@ -45,9 +45,6 @@ import java.util.concurrent.ThreadFactory;
 
 import javax.servlet.http.HttpSession;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
@@ -61,6 +58,10 @@ import org.mycore.frontend.cli.MCRCommand;
 import org.mycore.frontend.cli.MCRCommandPool;
 import org.mycore.frontend.cli.MCRExternalCommandInterface;
 import org.mycore.frontend.cli.command.MCRAddCommands;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 /**
  * Is a wrapper class around command execution.
@@ -149,25 +150,26 @@ class MCRWebCLIContainer {
      *  &#160;&#160;&#160;&#160;"exception": <code>exception</code><br/>
      *  }}
      */
-    public JSONObject getLogs() {
-        JSONObject json = new JSONObject();
-        json.put("logs", getJSONLogs(processCallable.logs));
+    public JsonObject getLogs() {
+        JsonObject json = new JsonObject();
+        json.add("logs", getJSONLogs(processCallable.logs));
         return json;
     }
 
-    public static JSONObject getKnownCommands() {
+    public static JsonObject getKnownCommands() {
         updateKnownCommandsIfNeeded();
-        JSONObject commandsJSON = new JSONObject();
-        commandsJSON.put("commands", new ArrayList<Object>());
+        JsonObject commandsJSON = new JsonObject();
+        JsonArray jsonArray = new JsonArray();
+        commandsJSON.add("commands", jsonArray);
         for (Map.Entry<String, List<MCRCommand>> entry : knownCommands.entrySet()) {
-            List<String> commands = new ArrayList<String>(entry.getValue().size());
+            JsonArray commands = new JsonArray();
             for (final MCRCommand cmd : entry.getValue()) {
-                commands.add(cmd.showSyntax());
+                commands.add(new JsonPrimitive(cmd.showSyntax()));
             }
-            JSONObject item = new JSONObject();
-            item.put("name", entry.getKey());
-            item.put("commands", commands);
-            commandsJSON.getJSONArray("commands").add(item);
+            JsonObject item = new JsonObject();
+            item.addProperty("name", entry.getKey());
+            item.add("commands", commands);
+            jsonArray.add(item);
         }
         return commandsJSON;
     }
@@ -218,13 +220,13 @@ class MCRWebCLIContainer {
         }
     }
 
-    private static JSONArray getJSONLogs(Queue<LoggingEvent> events) {
-        JSONArray array = new JSONArray();
+    private static JsonArray getJSONLogs(Queue<LoggingEvent> events) {
+        JsonArray array = new JsonArray();
         while (!events.isEmpty()) {
             LoggingEvent event = events.poll();
-            JSONObject json = new JSONObject();
-            json.put("logLevel", event.getLevel().toString());
-            json.put("message", event.getRenderedMessage());
+            JsonObject json = new JsonObject();
+            json.addProperty("logLevel", event.getLevel().toString());
+            json.addProperty("message", event.getRenderedMessage());
             String exception = null;
             if (event.getThrowableInformation() != null) {
                 StringWriter sw = new StringWriter();
@@ -233,8 +235,8 @@ class MCRWebCLIContainer {
                 pw.close();
                 exception = sw.toString();
             }
-            json.put("exception", exception);
-            json.put("time", event.timeStamp);
+            json.addProperty("exception", exception);
+            json.addProperty("time", event.timeStamp);
             array.add(json);
         }
         return array;

@@ -21,10 +21,6 @@ package org.mycore.mets.tools;
 import java.io.IOException;
 import java.util.Iterator;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONException;
-import net.sf.json.JSONObject;
-
 import org.apache.log4j.Logger;
 import org.jdom.JDOMException;
 import org.mycore.mets.misc.LogicalIdProvider;
@@ -43,8 +39,12 @@ import org.mycore.mets.model.struct.SmLink;
 import org.mycore.mets.model.struct.StructLink;
 import org.mycore.mets.model.struct.SubDiv;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 /**
- * The class creates {@link Mets} from {@link JSONObject} objects
+ * The class creates {@link Mets} from {@link JsonObject} objects
  * 
  * @author Silvio Hermann (shermann)
  */
@@ -109,7 +109,7 @@ public class MetsProvider {
     }
 
     @SuppressWarnings("unchecked")
-    public Mets toMets(JSONObject source) throws JDOMException, IOException {
+    public Mets toMets(JsonObject source) throws JDOMException, IOException {
         // these are derivate id and probably a name/label
         String name = source.get("name").toString();
         String docType = source.get("structureType").toString();
@@ -118,31 +118,29 @@ public class MetsProvider {
         this.logicalStructMp.getDivContainer().setDocumentType(JSONTools.stripBracketsAndQuotes(docType));
 
         // the children of the derivate should be present
-        JSONArray children = null;
-        try {
-            children = source.getJSONArray("children");
-        } catch (JSONException ex) {
+        JsonArray children = (JsonArray) source.get("children");
+        if (children == null) {
             LOGGER.error("No children attribute found and thus not a valid json format for mets.");
             return null;
         }
 
-        process((Iterator<JSONObject>) children.iterator(), null);
+        process((Iterator<JsonElement>) children.iterator(), null);
 
         return this.mets;
     }
 
     /**
      * @param parent
-     *            a JSONObject with children attribut
+     *            a JsonObject with children attribut
      */
     @SuppressWarnings("unchecked")
-    private void process(Iterator<JSONObject> it, SubDiv parentDiv) {
+    private void process(Iterator<JsonElement> it, SubDiv parentDiv) {
         while (it.hasNext()) {
-            JSONObject json = it.next();
-            String id = JSONTools.stripBracketsAndQuotes(json.getString("id"));
-            String label = JSONTools.stripBracketsAndQuotes(json.getString("name"));
-            String structType = JSONTools.stripBracketsAndQuotes(json.getString("structureType"));
-            int logicalOrder = json.getInt("logicalOrder");
+            JsonObject json = it.next().getAsJsonObject();
+            String id = JSONTools.stripBracketsAndQuotes(json.get("id").getAsString());
+            String label = JSONTools.stripBracketsAndQuotes(json.get("name").getAsString());
+            String structType = JSONTools.stripBracketsAndQuotes(json.get("structureType").getAsString());
+            int logicalOrder = json.get("logicalOrder").getAsInt();
             /*
              * current json object is a structure (as defined in
              * StructureModel.js) and not actually a file/image
@@ -155,7 +153,7 @@ public class MetsProvider {
                     // reference to 1st file (file may be in a sub structure)
                     /* TODO remove condition once it is needed */
                     if (false) {
-                        String firstFileId = getFirstFileId(json.getJSONArray("children").iterator());
+                        String firstFileId = getFirstFileId(json.get("children").getAsJsonArray().iterator());
                         if (firstFileId != null) {
                             SubDiv physical = new SubDiv(firstFileId, null, -1, null);
                             structLink.addSmLink(new SmLink(parentDiv, physical));
@@ -164,16 +162,16 @@ public class MetsProvider {
                 } else {
                     logicalStructMp.getDivContainer().addSubDiv(logDiv);
                 }
-                process((Iterator<JSONObject>) json.getJSONArray("children").iterator(), logDiv);
+                process(json.get("children").getAsJsonArray().iterator(), logDiv);
             }
             /*
              * current json object is a file/image, thus we must register it in
              * the different fileSec objects
              */
             else {
-                String path = JSONTools.stripBracketsAndQuotes(json.getString("path"));
-                int physicalOrder = json.getInt("physicalOrder");
-                String orderLabel = JSONTools.stripBracketsAndQuotes(json.getString("orderLabel"));
+                String path = JSONTools.stripBracketsAndQuotes(json.get("path").getAsString());
+                int physicalOrder = json.get("physicalOrder").getAsInt();
+                String orderLabel = JSONTools.stripBracketsAndQuotes(json.get("orderLabel").getAsString());
 
                 SubDiv physical = addFileToPhysicalStructMp(id, path, physicalOrder, orderLabel);
                 addFileToGroups(id, path, label);
@@ -198,18 +196,17 @@ public class MetsProvider {
      * @return the id of the first file in the hierarchy or <code>null</code> if
      *         there is no such file
      */
-    @SuppressWarnings("unchecked")
-    private String getFirstFileId(Iterator<JSONObject> iterator) {
+    private String getFirstFileId(Iterator<JsonElement> iterator) {
         String fileId = null;
         while (iterator.hasNext()) {
-            JSONObject json = iterator.next();
+            JsonObject json = iterator.next().getAsJsonObject();
             if (json.has("children")) {
-                return getFirstFileId(json.getJSONArray("children").iterator());
+                return getFirstFileId(json.get("children").getAsJsonArray().iterator());
             }
 
-            String structType = JSONTools.stripBracketsAndQuotes(json.getString("structureType"));
+            String structType = JSONTools.stripBracketsAndQuotes(json.get("structureType").getAsString());
             if ("page".equals(structType)) {
-                fileId = JSONTools.stripBracketsAndQuotes(json.getString("id"));
+                fileId = JSONTools.stripBracketsAndQuotes(json.get("id").getAsString());
                 return SubDiv.ID_PREFIX + fileId;
             }
         }
