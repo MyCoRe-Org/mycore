@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
+import org.mycore.common.MCRSystemUserInformation;
 
 /**
  * Wraps WebService method invocation with hibernate transaction
@@ -55,7 +56,9 @@ public class MCRRPCProvider extends RPCProvider {
         int count = counter.incrementAndGet();
         MCRSession session = MCRSessionMgr.getCurrentSession();
         session.setLoginTime();
-        session.setUserInformation(new MCRUserInformation() {
+
+        MCRUserInformation uiGuest = MCRSystemUserInformation.getGuestInstance();
+        MCRUserInformation uiContext = new MCRUserInformation() {
             @Override
             public boolean isUserInRole(String role) {
                 return Arrays.asList(mc.getRoles()).contains(role);
@@ -70,7 +73,9 @@ public class MCRRPCProvider extends RPCProvider {
             public String getUserAttribute(String attribute) {
                 return null;
             }
-        });
+        };
+        session.setUserInformation( mc.getUsername() == null ? uiGuest : uiContext );
+        
         session.setCurrentIP(mc.getStrProp(Constants.MC_REMOTE_ADDR));
         session.beginTransaction();
         LOGGER.info("WebService call #" + count + " to " + method.getDeclaringClass().getName() + ":" + method.getName());
