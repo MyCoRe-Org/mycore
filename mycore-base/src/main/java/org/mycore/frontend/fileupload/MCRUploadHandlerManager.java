@@ -58,12 +58,12 @@ public class MCRUploadHandlerManager {
             throw new MCRUsageException("Upload session " + uploadID + " timed out");
 
         String sessionID = entry.getSessionID();
-        MCRSession session = MCRSessionMgr.getSession(sessionID);
-        if (session == null)
-            throw new MCRUsageException("MCRSession " + sessionID + " for upload session " + uploadID + " timed out");
 
-        if (sessionID != MCRSessionMgr.getCurrentSession().getID())
-            MCRSessionMgr.setCurrentSession(session);
+        if (sessionID != MCRSessionMgr.getCurrentSession().getID()) {
+            MCRSession session = MCRSessionMgr.getSession(sessionID);
+            if (session != null)
+                MCRSessionMgr.setCurrentSession(session);
+        }
 
         return entry.getUploadHandler();
     }
