@@ -52,11 +52,7 @@
   <xsl:param name="validate" select="'false'" /> <!-- If true, validate against editor.xsd schema -->
   
   <xsl:variable name="url">
-    <xsl:value-of select="$ServletsBaseURL" />
-    <xsl:text>XMLEditor</xsl:text>
-    <xsl:value-of select="$HttpSession" />
-    <xsl:text>?_action=include&amp;_uri=</xsl:text>
-    <xsl:value-of select="encoder:encode($uri)" />
+    <xsl:value-of select="concat($ServletsBaseURL,'XMLEditor',$HttpSession,'?_action=include&amp;_uri=',encoder:encode($uri))" />
     <xsl:text>&amp;_ref=</xsl:text>
     <xsl:value-of select="$ref" />
     <xsl:text>&amp;_validate=</xsl:text>
@@ -93,13 +89,18 @@
       <!-- ======== start at the root panel ======== -->
       <tr>
         <td>
-          <xsl:apply-templates select="components/panel">
-            <xsl:with-param name="var" select="components/@var" />
-          </xsl:apply-templates>
+          <xsl:apply-templates select="components" />
         </td>
       </tr>
     </table>
   </form>
+</xsl:template>
+
+<!-- ======== start at the root panel ======== -->
+<xsl:template match="components">
+  <xsl:apply-templates select="panel">
+    <xsl:with-param name="var" select="@var" />
+  </xsl:apply-templates>
 </xsl:template>
 
 <!-- ======== set form attributes ======== -->
@@ -108,76 +109,30 @@
   <!-- ======== method ======== -->
   <xsl:attribute name="method">
     <xsl:choose>
-      <xsl:when test="descendant::file">
-        <xsl:text>post</xsl:text>
-      </xsl:when>
+      <xsl:when test="descendant::file">post</xsl:when>
       <xsl:when test="target/@method">
         <xsl:value-of select="target/@method" />
       </xsl:when>
-      <xsl:otherwise>
-        <xsl:text>post</xsl:text>
-      </xsl:otherwise>
+      <xsl:otherwise>post</xsl:otherwise>
     </xsl:choose>
   </xsl:attribute>
 
   <!-- ======== form data encoding ======== -->
   <xsl:if test="descendant::file">
-    <xsl:attribute name="enctype">
-      <xsl:text>multipart/form-data</xsl:text>
-    </xsl:attribute>
+    <xsl:attribute name="enctype">multipart/form-data</xsl:attribute>
   </xsl:if>
-
-  <!-- ======== target type servlet or url or xml display ======== -->
-  <xsl:choose>
-    <xsl:when test="target/@type">
-      <input type="hidden" name="_target-type" value="{target/@type}" />
-    </xsl:when>
-    <xsl:otherwise>
-      <input type="hidden" name="_target-type" value="display" />
-    </xsl:otherwise>
-  </xsl:choose>
-
-  <!-- ======== target url ======== -->
-  <xsl:if test="target/@url">
-    <xsl:variable name="url">
-        <xsl:call-template name="UrlAddSession">
-            <xsl:with-param name="url" select="target/@url" />
-        </xsl:call-template>
-    </xsl:variable>
-    <input type="hidden" name="_target-url" value="{$url}" />
-  </xsl:if>
-
-  <!-- ======== target servlet name ======== -->
-  <xsl:if test="target/@name">
-    <input type="hidden" name="_target-name" value="{target/@name}" />
-  </xsl:if>
-
-  <!-- ======== target output format xml or name=value ======== -->
-  <xsl:choose>
-    <xsl:when test="target/@format">
-      <input type="hidden" name="_target-format" value="{target/@format}" />
-    </xsl:when>
-    <xsl:otherwise>
-      <input type="hidden" name="_target-format" value="xml" />
-    </xsl:otherwise>
-  </xsl:choose>
 
   <!-- ======== send editor session ID to servlet ======== -->
   <input type="hidden" name="_session" value="{@session}" />
   <input type="hidden" name="_action"  value="submit" />
-  <input type="hidden" name="_root"    value="{@var}" />
   <input type="hidden" name="_webpage">
     <xsl:attribute name="value">
       <xsl:value-of select="substring-after($RequestURL,$WebApplicationBaseURL)" />
       <xsl:choose>
         <xsl:when test="contains($RequestURL,'?')">
-          <xsl:if test="not(substring($RequestURL,string-length($RequestURL))='&amp;')">
-            <xsl:text>&amp;</xsl:text>
-          </xsl:if>
+          <xsl:if test="not(substring($RequestURL,string-length($RequestURL))='&amp;')">&amp;</xsl:if>
         </xsl:when>
-        <xsl:otherwise>
-          <xsl:text>?</xsl:text>
-        </xsl:otherwise>
+        <xsl:otherwise>?</xsl:otherwise>
       </xsl:choose>
     </xsl:attribute>
   </input>
@@ -187,8 +142,6 @@
     <input type="hidden" name="{@name}" value="{text()}" />
   </xsl:for-each>
 
-  <!-- ======== Cancel URL durchreichen ======== -->
-  <input type="hidden" name="_cancelURL" value="{cancel/@url}" />
 </xsl:template>
 
 <!-- ======== headline ======== -->
@@ -293,9 +246,7 @@
   <!-- ======== build the "position number" of this repeated component ======== -->
   <xsl:variable name="pos.new">
     <xsl:value-of select="$pos" />
-    <xsl:if test="$pos">
-      <xsl:text>.</xsl:text>
-    </xsl:if>
+    <xsl:if test="$pos">.</xsl:if>
     <xsl:value-of select="position()" />
   </xsl:variable>
 
@@ -303,9 +254,7 @@
   <xsl:variable name="var.new">
     <xsl:value-of select="$var" />
     <xsl:if test="position() &gt; 1">
-      <xsl:text>[</xsl:text>
-      <xsl:value-of select="position()" />
-      <xsl:text>]</xsl:text>
+      <xsl:value-of select="concat('[',position(),']')" />
     </xsl:if>
   </xsl:variable>
  
@@ -356,16 +305,6 @@
   <xsl:param name="var" />
   <xsl:param name="pos" select="1" />
 
-  <xsl:variable name="combined" select="*" />
-  <xsl:variable name="combined.cellpos.tmp">
-    <xsl:for-each select="$combined[name()='cell']">
-      <xsl:sort select="@row" data-type="number" />
-      <xsl:sort select="@col" data-type="number" />
-      <cell row="{@row}" col="{@col}" />
-    </xsl:for-each>
-  </xsl:variable>
-  <xsl:variable name="combined.cellpos" select="xalan:nodeset($combined.cellpos.tmp)" />
-
   <table>
     <xsl:call-template name="editor.set.css" />
     <xsl:if test="key('failed',$pos)">
@@ -383,84 +322,36 @@
       </tr>
     </xsl:if>
     
-    <xsl:variable name="rows.tmp">
-      <xsl:for-each select="$combined.cellpos/cell">
-        <xsl:if test="not(preceding-sibling::cell/@row = current()/@row)">
-          <row nr="{@row}" />
-        </xsl:if>
-      </xsl:for-each>
-    </xsl:variable>
-    <xsl:variable name="rows" select="xalan:nodeset($rows.tmp)" />
-
-    <xsl:variable name="cols.tmp">
-      <xsl:for-each select="$combined.cellpos/cell">
-        <xsl:sort select="@col" data-type="number" />
-        <xsl:if test="not(preceding-sibling::cell/@col = current()/@col)">
-          <col nr="{@col}" />
-        </xsl:if>
-      </xsl:for-each>
-    </xsl:variable>
-    <xsl:variable name="cols" select="xalan:nodeset($cols.tmp)" />
-
-    <xsl:for-each select="$rows/row">
-      <xsl:variable name="row" select="@nr" />
+    <xsl:for-each select="row">
       <tr>
-        <xsl:for-each select="$cols/col">
-          <xsl:variable name="col" select="@nr" />
-          <xsl:variable name="cell" select="$combined[(@row=$row) and (@col=$col)]" />
-          
-          <xsl:choose>
-            <xsl:when test="count($cell) &gt; 0">
-              <!-- There is a cell defined for this row and col -->
-              <xsl:for-each select="$cell">
-              <td>
-                <xsl:copy-of select="@colspan" />
-                <xsl:call-template name="cell">
-                  <xsl:with-param name="var" select="$var" />
-                  <xsl:with-param name="pos">
-                    <xsl:value-of select="$pos" />
-                    <xsl:text>.</xsl:text>
-                    <xsl:choose>
-                      <xsl:when test="@sortnr">
-                        <xsl:value-of select="@sortnr"/>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:for-each select="$combined.cellpos/cell">
-                          <xsl:if test="(@row=$row) and (@col=$col)">
-                            <xsl:value-of select="position()" />
-                          </xsl:if>
-                        </xsl:for-each> 
-                      </xsl:otherwise>
-                    </xsl:choose>
-                  </xsl:with-param>
-                </xsl:call-template>
-              </td>
-              </xsl:for-each>
-            </xsl:when>
-            <xsl:when test="$combined[ (@row=$row) and (number(@col) &lt; number($col)) and (number(@col)+number(@colspan) &gt;= number($col))]">
-              <!-- There is a cell in this row before this col with a colspan spanning over this col, nothing to do -->
-            </xsl:when>
-            <xsl:otherwise>
-              <!-- We have to insert an empty td cell here -->
-              <td/>
-            </xsl:otherwise>
-          </xsl:choose>          
+        <xsl:for-each select="cell">
+          <td>
+            <xsl:copy-of select="@colspan" />
+            <xsl:if test="*">
+              <xsl:call-template name="cell">
+                <xsl:with-param name="var" select="$var" />
+                <xsl:with-param name="pos" select="concat($pos,'.',@sortnr)" />
+              </xsl:call-template>
+            </xsl:if>
+          </td>
         </xsl:for-each>
       </tr>
     </xsl:for-each>
   </table>
 
   <!-- ======== handle hidden fields ======== -->
-  <xsl:apply-templates select="$combined[name()='hidden']">
-    <xsl:with-param name="numcells" select="count($combined.cellpos/cell)" />
+  <xsl:apply-templates select="hidden"> 
+    <xsl:with-param name="numcells" select="count(row/cell)" />
     <xsl:with-param name="var" select="$var" />
     <xsl:with-param name="pos" select="$pos" />
   </xsl:apply-templates>
 
   <!-- ======== handle panel validation conditions ======== -->
-  <xsl:for-each select="$combined[name()='condition']">
-    <input type="hidden" name="_cond-{$var}" value="{@id}" />
+  <xsl:if test="condition">
     <input type="hidden" name="_sortnr-{$var}" value="{$pos}" />
+  </xsl:if>
+  <xsl:for-each select="condition">
+    <input type="hidden" name="_cond-{$var}" value="{@id}" />
   </xsl:for-each>
   
 </xsl:template>
@@ -571,9 +462,7 @@
   <xsl:param name="var" />
 
   <xsl:value-of select="$var" />
-  <xsl:if test="(string-length($var) &gt; 0) and (string-length(@var) &gt; 0)">
-    <xsl:text>/</xsl:text>
-  </xsl:if>
+  <xsl:if test="(string-length($var) &gt; 0) and (string-length(@var) &gt; 0)">/</xsl:if>
   <xsl:value-of select="@var" />
 </xsl:template>
 
@@ -584,14 +473,10 @@
     	   <a href="#">?<span> 	 
               <xsl:attribute name="style"> 	 
                  <xsl:if test="@width"> 	 
-                    <xsl:text>width:</xsl:text> 	 
-                    <xsl:value-of select="@width"/> 	 
-                    <xsl:text>;</xsl:text> 	 
+                    <xsl:value-of select="concat('width:',@width,';')"/> 	 
                  </xsl:if> 	 
                  <xsl:if test="@height"> 	 
-                    <xsl:text>height:</xsl:text> 	 
-                    <xsl:value-of select="@height"/> 	 
-                    <xsl:text>;</xsl:text> 	 
+                    <xsl:value-of select="concat('height:',@height,';')"/>   
                 </xsl:if> 	 
            </xsl:attribute> 	 
            <xsl:call-template name="output.label" /> 	 
@@ -604,12 +489,7 @@
   <xsl:variable name="url" select="concat($ServletsBaseURL,'XMLEditor',$HttpSession,'?_action=show.popup&amp;_session=',ancestor::editor/@session,'&amp;_ref=',@id)" />
 
   <xsl:variable name="properties">
-    <xsl:text>width=</xsl:text>
-    <xsl:value-of select="@width" />
-    <xsl:text>, </xsl:text>
-    <xsl:text>height=</xsl:text>
-    <xsl:value-of select="@height" />
-    <xsl:text>, </xsl:text>
+    <xsl:value-of select="concat('width=',@width,', height=',@height,', ')" />
     <xsl:text>dependent=yes, location=no, menubar=no, resizable=yes, </xsl:text>
     <xsl:text>top=100, left=100, scrollbars=yes, status=no</xsl:text>
   </xsl:variable>
@@ -763,6 +643,9 @@
     <input tabindex="1" type="text" size="{@width}" name="{$var}" value="{$value}">
       <xsl:copy-of select="@maxlength" />
       <xsl:call-template name="editor.set.css" />
+      <xsl:if test="@disabled='true'">
+        <xsl:attribute name="readonly">readonly</xsl:attribute>
+      </xsl:if>
     </input>
   </xsl:if>
   <xsl:if test="local-name() = 'textarea'">
@@ -784,13 +667,7 @@
     <!-- ======== Use the WYSIWYG HTML Editor? ======== -->
     <xsl:if test="@wysiwygEditor='true'">
       <script type="text/javascript">
-        <xsl:text>startFCK('</xsl:text>
-        <xsl:value-of select="$var" />
-        <xsl:text>',</xsl:text>
-        <xsl:value-of select="@editorWidth" />
-        <xsl:text>,</xsl:text>
-        <xsl:value-of select="@editorHeight" />
-        <xsl:text>);</xsl:text>
+        <xsl:text />startFCK('<xsl:value-of select="$var" />',<xsl:value-of select="@editorWidth" />,<xsl:value-of select="@editorHeight" />);<xsl:text/>
       </script>
     </xsl:if>
     
@@ -935,63 +812,31 @@
 <!-- ======== list of radio or checkbox ======== -->
 <xsl:template match="list[(@type='radio') or (@type='checkbox')]">
   <xsl:param name="var" />
-  <xsl:variable name="default" select="@default" />
-
-  <xsl:variable name="last" select="count(item)-1" />
-
-  <xsl:variable name="cols">
-    <xsl:choose>
-       <xsl:when test="@cols"><xsl:value-of select="@cols"/></xsl:when>
-       <xsl:when test="@rows"><xsl:value-of select="(($last - ($last mod @rows)) div @rows)+1"/></xsl:when>
-       <xsl:otherwise><xsl:value-of select="count(item)"/></xsl:otherwise>
-    </xsl:choose>
-  </xsl:variable>
-  <xsl:variable name="rows">
-    <xsl:choose>
-       <xsl:when test="@rows"><xsl:value-of select="@rows"/></xsl:when>
-       <xsl:otherwise><xsl:value-of select="(($last - ($last mod $cols)) div $cols)+1"/></xsl:otherwise>
-    </xsl:choose>
-  </xsl:variable>
-
-  <xsl:variable name="type" select="@type" />
 
   <table>
     <xsl:call-template name="editor.set.css" />
 
-    <xsl:for-each select="item">
+    <xsl:for-each select="row">
+      <tr>
+    
+      <xsl:for-each select="item">
+        <td>
+          <xsl:if test="../../@type='radio'">
+            <xsl:call-template name="editor.radio">
+              <xsl:with-param name="var"     select="$var"     />
+              <xsl:with-param name="default" select="../../@default" />
+            </xsl:call-template>
+          </xsl:if>
+          <xsl:if test="../../@type='checkbox'">
+            <xsl:call-template name="editor.checkbox">
+              <xsl:with-param name="var"     select="$var"     />
+              <xsl:with-param name="default" select="../../@default" />
+            </xsl:call-template>
+          </xsl:if>
+        </td>
+      </xsl:for-each>
 
-      <xsl:variable name="pxy" select="position() - 1" />
-
-      <xsl:variable name="col" select="$pxy mod $cols" />
-
-      <!-- ======== start a new row? ======== -->
-      <xsl:if test="$col = 0">
-        <xsl:if test="position() &gt; 1">
-          <xsl:text disable-output-escaping="yes">&lt;/tr&gt;</xsl:text>
-        </xsl:if>
-        <xsl:text disable-output-escaping="yes">&lt;tr&gt;</xsl:text>
-      </xsl:if>
-
-      <td>
-        <xsl:if test="$type='radio'">
-          <xsl:call-template name="editor.radio">
-            <xsl:with-param name="var"     select="$var"     />
-            <xsl:with-param name="default" select="$default" />
-          </xsl:call-template>
-        </xsl:if>
-        <xsl:if test="$type='checkbox'">
-          <xsl:call-template name="editor.checkbox">
-            <xsl:with-param name="var"     select="$var"     />
-            <xsl:with-param name="default" select="$default" />
-          </xsl:call-template>
-        </xsl:if>
-      </td>
-
-      <!-- ======== end last row? ======== -->
-      <xsl:if test="position() = last()">
-        <xsl:text disable-output-escaping="yes">&lt;/tr&gt;</xsl:text>
-      </xsl:if>
-
+      </tr>
     </xsl:for-each>
   </table>
 </xsl:template>
@@ -1088,14 +933,10 @@
     <xsl:attribute name="style">
       <xsl:text>margin: 0px; </xsl:text>
       <xsl:if test="@width">
-        <xsl:text>padding-left: </xsl:text>
-        <xsl:value-of select="@width" />
-        <xsl:text>; </xsl:text>
+        <xsl:value-of select="concat('padding-left: ',@width,'; ')" />
       </xsl:if>
       <xsl:if test="@height">
-        <xsl:text>padding-bottom: </xsl:text>
-        <xsl:value-of select="@height" />
-        <xsl:text>; </xsl:text>
+        <xsl:value-of select="concat('padding-bottom: ',@height,'; ')" />
       </xsl:if>
     </xsl:attribute> 
   </div>
