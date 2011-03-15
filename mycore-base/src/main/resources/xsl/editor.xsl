@@ -762,6 +762,9 @@
   <xsl:if test="local-name() = 'textfield'">
     <input tabindex="1" type="text" size="{@width}" name="{$var}" value="{$value}">
       <xsl:copy-of select="@maxlength" />
+      <xsl:if test="@disabled='true'">
+        <xsl:attribute name="readonly">readonly</xsl:attribute>
+      </xsl:if>
       <xsl:call-template name="editor.set.css" />
     </input>
   </xsl:if>
