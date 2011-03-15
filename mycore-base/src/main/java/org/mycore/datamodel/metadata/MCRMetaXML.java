@@ -72,6 +72,14 @@ public class MCRMetaXML extends MCRMetaDefault {
 
         content = element.cloneContent();
     }
+    
+    public void addContent(Content content) {
+        if(this.content == null){
+            this.content = new ArrayList<Content>();
+        }
+        
+        this.content.add(content);
+    }
 
     /**
      * This method create a XML stream for all data in this class, defined by
