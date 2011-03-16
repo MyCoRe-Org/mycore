@@ -5,10 +5,31 @@
     <author email="thomas.scheffler(at)uni-jena.de">Thomas Scheffler</author>
   </properties>
   <body>
-    <release version="2.0.94" date="201?-?-?" description="Beta 4">
+    <release version="2.0.94" date="2011-03-?" description="Beta 4">
+      <action dev="mcrfluet" type="add">
+      Added functionality to disable editing of a textfield and set it read-only with @disabled="true", same as for list elements.
+      </action>
+      <action dev="mcrtchef" type="add">
+        added MCRLocalServlet to allow multi lingual javascript applications 
+      </action>
+      <action dev="mcrtchef" type="update">
+        moved all webcli classes in package org.mycore.webcli
+      </action>
+      <action dev="mcrtchef" type="update">
+        added option to initialize all hits of a lucene query: MCR.Searcher.{ID}.initializeResult=true
+      </action>
+      <action dev="mcrsteph" type="update">
+        enable storing of fields of type long and date, so they can be use for sorting
+      </action>
+      <action dev="mcrmeich" type="add">
+        added two command 'list' and 'restore' to handle revision of a metadata object
+      </action>
+      <action dev="mcrsherm" type="add">
+        added METS editor
+      </action>
       <action dev="mcrvuchi" type="update">
-      	adding manager class for creating, get, removing store in IFS2. MCRStore is no longer 
-      	responsible for these operations.
+        adding manager class for creating, get, removing store in IFS2. MCRStore is no longer 
+        responsible for these operations.
       </action>
       <action dev="mcrtchef" type="update">
       	merged mycore-useradmin and mycore-userlogin component into mycore-user
