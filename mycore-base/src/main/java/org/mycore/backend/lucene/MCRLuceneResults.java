@@ -48,7 +48,7 @@ class MCRLuceneResults extends MCRResults {
 
     private MCRSharedLuceneIndexContext sharedIndexContext;
 
-    private IndexSearcher indexSearcher;
+    //    private IndexSearcher indexSearcher;
 
     private static Logger LOGGER = Logger.getLogger(MCRLuceneResults.class);
 
@@ -71,24 +71,12 @@ class MCRLuceneResults extends MCRResults {
         setSorted(true);
     }
 
-    private void checkIndexSearcher() {
-        if (sharedIndexContext.isValid(indexSearcher)) {
-            return;
-        }
-        try {
-            indexSearcher = sharedIndexContext.getSearcher();
-        } catch (Exception e) {
-            throw new MCRException("Error while getting IndexSearcher.", e);
-        }
-    }
-
     private void reQuery() throws IOException {
-        checkIndexSearcher();
         TopFieldCollector collector = TopFieldCollector.create(sortFields, maxResults, false, true, false, false);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Query: " + query);
         }
-        indexSearcher.search(query, collector);
+        sharedIndexContext.getSearcher().search(query, collector);
         //Lucene 2.4.1 has a bug: be sure to call collector.topDocs() just once
         //see http://issues.apache.org/jira/browse/LUCENE-942
         topDocs = (TopFieldDocs) collector.topDocs();
@@ -114,7 +102,12 @@ class MCRLuceneResults extends MCRResults {
     @Override
     protected MCRHit getHit(String key) {
         if (!loadComplete) {
-            checkIndexSearcher();
+            IndexSearcher indexSearcher;
+            try {
+                indexSearcher = sharedIndexContext.getSearcher();
+            } catch (IOException e) {
+                throw new MCRException(e);
+            }
             for (int i = 0; i < getNumHits(); i++) {
                 inititializeTopDoc(i, indexSearcher);
             }
@@ -129,7 +122,11 @@ class MCRLuceneResults extends MCRResults {
         }
         MCRHit hit = super.getHit(i);
         if (hit == null) {
-            inititializeTopDoc(i, indexSearcher);
+            try {
+                inititializeTopDoc(i, sharedIndexContext.getSearcher());
+            } catch (IOException e) {
+                throw new MCRException(e);
+            }
             hit = super.getHit(i);
         }
         return hit;
