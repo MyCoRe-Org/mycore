@@ -76,7 +76,8 @@ function addStructureToTree() {
 	unit.setStructureType(selectedTypeId);
 	unit.setId(generateUUID());
 
-	var selectedItem = tree._getSelectedItemAttr();
+    var tracker = new SelectionTracker.getInstance();
+	var selectedItem = tracker.getSelectedStructure();
 
 	/* avoid adding structures to pages */
 	if (myStore.hasAttribute(selectedItem, "children") == true) {
