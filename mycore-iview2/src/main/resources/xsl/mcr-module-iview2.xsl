@@ -14,25 +14,25 @@
     <xsl:param name="overview" select="'true'" />
     <xsl:param name="style" />
     
-    <script type="text/javascript">
-      <xsl:variable name="baseUris">
-        <xsl:choose>
-          <xsl:when test="string-length($MCR.Module-iview2.BaseURL)&lt;10">
-            <xsl:value-of select="concat($ServletsBaseURL,'MCRTileServlet')" />
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="$MCR.Module-iview2.BaseURL" />
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:variable>
-      var baseUris='["'+'<xsl:value-of select="$baseUris"/>'.split(',').join('","')+'"]';
-      addIviewProperty('<xsl:value-of select="$groupID" />', 'useChapter',<xsl:value-of select="$chapter" />);
-      addIviewProperty('<xsl:value-of select="$groupID" />', 'useCutOut',<xsl:value-of select="$cutOut" />);
-      addIviewProperty('<xsl:value-of select="$groupID" />', 'useOverview',<xsl:value-of select="$overview" />);
-      addIviewProperty('<xsl:value-of select="$groupID" />', 'baseUri', baseUris);
-      addIviewProperty('<xsl:value-of select="$groupID" />', 'webappBaseUri', '"<xsl:value-of select="$WebApplicationBaseURL"/>"');
-    </script>
     <div id="viewerContainer{$groupID}" class="viewerContainer min">
+	    <script type="text/javascript">
+	      <xsl:variable name="baseUris">
+	        <xsl:choose>
+	          <xsl:when test="string-length($MCR.Module-iview2.BaseURL)&lt;10">
+	            <xsl:value-of select="concat($ServletsBaseURL,'MCRTileServlet')" />
+	          </xsl:when>
+	          <xsl:otherwise>
+	            <xsl:value-of select="$MCR.Module-iview2.BaseURL" />
+	          </xsl:otherwise>
+	        </xsl:choose>
+	      </xsl:variable>
+	      var baseUris='["'+'<xsl:value-of select="$baseUris"/>'.split(',').join('","')+'"]';
+	      addIviewProperty('<xsl:value-of select="$groupID" />', 'useChapter',<xsl:value-of select="$chapter" />);
+	      addIviewProperty('<xsl:value-of select="$groupID" />', 'useCutOut',<xsl:value-of select="$cutOut" />);
+	      addIviewProperty('<xsl:value-of select="$groupID" />', 'useOverview',<xsl:value-of select="$overview" />);
+	      addIviewProperty('<xsl:value-of select="$groupID" />', 'baseUri', baseUris);
+	      addIviewProperty('<xsl:value-of select="$groupID" />', 'webappBaseUri', '"<xsl:value-of select="$WebApplicationBaseURL"/>"');
+	    </script>
       <xsl:if test="string-length($style) &gt; 0">
         <xsl:attribute name="style">
           <xsl:value-of select="$style"/>
@@ -204,9 +204,9 @@
       addIviewProperty('<xsl:value-of select="$groupID" />', 'startFile', "'<xsl:value-of select="$startFile" />'");
       function startViewer(viewID) {
         if (Iview[viewID].started) return;
+        Iview[viewID].gen = new iview.General(Iview[viewID]);
         Iview[viewID].started = true;
         Iview[viewID].preload = jQuery("#viewerContainer" + viewID + " .preload");
-        //$LAB.setGlobalDefaults({"AllowDuplicates": false, "BasePath": '../modules/iview2/web/js/'});
         loading(viewID);
       }
       jQuery(window).load(function() { startViewer('<xsl:value-of select="$groupID"/>');});

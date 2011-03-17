@@ -130,7 +130,7 @@ function processImageProperties(imageProperties, viewID){
 			 .append(preload);
 
 	if (viewerBean == null) {
-		initializeGraphic(viewID);
+		Iview[viewID].gen.initializeGraphic(viewID);
 		viewerBean = Iview[viewID].viewerBean;
 		viewerBean.addViewerZoomedListener(new listenerZoom(viewID));
 		viewerBean.addViewerMovedListener(new listenerMove(viewID));
@@ -408,9 +408,10 @@ function switchDisplayMode(screenZoom, stateBool, viewID, preventLooping) {
 		}
 	}
 
-	Iview[viewID].barX.setCurValue(-toInt(preload.css("left")));
-	Iview[viewID].barY.setCurValue(-toInt(preload.css("top")));
-	if (Iview[viewID].useCutOut) Iview[viewID].cutOutModel.setPos({'x':preload.css("offsetLeft"), 'y':preload.css("offsetTop")});
+	var offset = preload.offset();
+	Iview[viewID].barX.setCurValue(-offset.left);
+	Iview[viewID].barY.setCurValue(-offset.top);
+	if (Iview[viewID].useCutOut) Iview[viewID].cutOutModel.setPos({'x':offset.left, 'y':offset.top});
 	return stateBool;
 }
 
@@ -596,8 +597,9 @@ function listenerMove(viewID) {
 		// set Roller that no circles are created, and we end in an endless loop
 		Iview[viewID].roller = true;
 		var preload=Iview[viewID].preload;
-		Iview[viewID].barX.setCurValue(-toInt(preload.css("left")));
-		Iview[viewID].barY.setCurValue(-toInt(preload.css("top")));
+		var offset = preload.offset();
+		Iview[viewID].barX.setCurValue(-offset.left);
+		Iview[viewID].barY.setCurValue(-offset.top);
 		Iview[viewID].roller = false;
 	}
 }
@@ -774,7 +776,7 @@ function zoomViewer(viewID, direction) {
 	} else {
 		dir = -1;
 	}
-	zoomCenter(viewID,dir,{"x":viewer.width/2, "y":viewer.height/2});
+	Iview[viewID].gen.zoomCenter(dir,{"x":viewer.width/2, "y":viewer.height/2});
 }
 
 /**
@@ -794,9 +796,8 @@ function loading(viewID) {
 		document.getElementsByTagName("head")[0].appendChild(cssSheet);
 	}
 	
-	Iview[viewID].startHeight = toInt(jQuery("#viewerContainer"+viewID).css("height"));
-	Iview[viewID].startWidth = toInt(jQuery("#viewerContainer"+viewID).css("width"));
-		
+	//TODO don't use the global one rather than the instance tilesize
+	Iview[viewID].startHeight = Iview[viewID].startWidth = tilesize;
 	// ScrollBars
 	// horizontal
 	Iview[viewID].barX = new iview.scrollbar.Controller();
@@ -819,11 +820,11 @@ function loading(viewID) {
 
 	// Additional Events
 	// register to scroll into the viewer
-	jQuery("#viewer"+viewID).mousewheel(function(e, delta, deltaX, deltaY) {e.preventDefault(); viewerScroll({"x":deltaX, "y":deltaY}, viewID);});
+	jQuery("#viewer"+viewID).mousewheel(function(e, delta, deltaX, deltaY) {e.preventDefault(); viewerScroll({"x":deltaX, "y":deltaY}, viewID);})
+		.css({	'width':Iview[viewID].startWidth - ((Iview[viewID].barX.my.self.css("visibility") == "visible")? Iview[viewID].barX.my.self.outerWidth() : 0)  + "px",
+				'height':Iview[viewID].startHeight - ((Iview[viewID].barY.my.self.css("visibility") == "visible")? Iview[viewID].barY.my.self.outerHeight() : 0)  + "px"
+		});
 	
-	// damit viewer ueber scrollBarX endet, fortan in reinitialize
-	document.getElementById("viewer"+viewID).style.width = Iview[viewID].startWidth - ((Iview[viewID].barX.my.self.css("visibility") == "visible")? Iview[viewID].barX.my.self.css("offsetWidth") : 0)  + "px";
-	document.getElementById("viewer"+viewID).style.height = Iview[viewID].startHeight - ((Iview[viewID].barY.my.self.css("visibility") == "visible")? Iview[viewID].barY.my.self.css("offsetHeight") : 0)  + "px";
 	if (Iview[viewID].useCutOut) {
 		importCutOut(viewID);
 	}
@@ -883,11 +884,7 @@ function loading(viewID) {
 function startFileLoaded(viewID){
 	Iview[viewID].loaded = true;
 	//Blank needs to be loaded as blank, so the level is filled. Else it lays not ontop; needed for IE 
-	jQuery("#viewer" + viewID + " .surface").css(
-			"backgroundImage",
-			"url(" + Iview[viewID].webappBaseUri
-					+ "modules/iview2/web/gfx/blank.gif" + ")");
-//	getElementsByClassName("surface","viewer"+viewID,"div")[0].style.backgroundImage = "url("+Iview[viewID].webappBaseUri+"modules/iview2/web/gfx/blank.gif"+")";
+	jQuery("#viewer" + viewID + " .surface").css("backgroundImage", "url(" + Iview[viewID].webappBaseUri + "modules/iview2/web/gfx/blank.gif" + ")");
 
 	// PermaLink Handling
 	// choice if zoomLevel or special; zoomMode only makes sense in maximized viewer
@@ -920,7 +917,7 @@ function startFileLoaded(viewID){
 	});
 	
 	// Resize-Events registrieren
-	jQuery(window).resize(function() { reinitializeGraphic(viewID)});
+	jQuery(window).resize(function() { Iview[viewID].gen.reinitializeGraphic()});
 	
 	updateModuls(viewID);
 }

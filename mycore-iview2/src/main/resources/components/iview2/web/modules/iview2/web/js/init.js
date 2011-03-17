@@ -1,3 +1,18 @@
+var iview = iview || {};
+/**
+ * @class
+ * @constructor
+ * @memberOf	iview.General
+ * @name		General
+ * @description All Viewer data and functions which don't fit in other packages
+ */
+iview.General = function(iview) {
+	//TODO later it should be possible to remove all this.iview with just this
+	this.iview = iview;
+}
+
+var genProto = iview.General.prototype;
+
 //IE and Opera doesn't accept our TileUrlProvider Instance as one of PanoJS
 PanoJS.isInstance = function () { return true};
 /*
@@ -32,6 +47,7 @@ PanoJS.TileUrlProvider.prototype.assembleUrl = function(xIndex, yIndex, zoom, im
 /**
  * @public
  * @function
+ * @memberOf	iview.General
  * @name		zoomCenter
  * @description	Zooms the given Viewer so that the given point will be in center of view
  * @param		{string} viewID to identify the viewer which shall be zoomed
@@ -40,65 +56,66 @@ PanoJS.TileUrlProvider.prototype.assembleUrl = function(xIndex, yIndex, zoom, im
  * @param		{integer} point.x x-coordinate to center
  * @param		{integer} point.y y-coordinate to center
  */
-function zoomCenter(viewID, direction, point) {
-	var viewer = Iview[viewID].viewerBean;
-	var preload = Iview[viewID].preload;
+genProto.zoomCenter = function(direction, point) {
+	var viewer = this.iview.viewerBean;
+	var preload = this.iview.preload;
 	var preDim = {"x" :toInt(preload.css("left")),"y":toInt(preload.css("top")), "width":preload.width(), "height":preload.height()};
 	viewer.zoom(direction);
 	var newDim = {"width":preload.width(), "height":preload.height()};
 	viewer.x = 0;
 	viewer.y = 0;
-	point.x =((-preDim.x + point.x) / preDim.width) * newDim.width;
-	point.y =((-preDim.y + point.y) / preDim.height) * newDim.height;
+	var npoint ={'x': ((-preDim.x + point.x) / preDim.width) * newDim.width,
+				'y': ((-preDim.y + point.y) / preDim.height) * newDim.height};
 	viewer.resetSlideMotion();
-	viewer.recenter(point,true);
+	viewer.recenter(npoint,true);
 }
 
 /**
  * @public
  * @function
  * @name		initializeGraphic
- * @memberOf	iview.init
+ * @memberOf	iview.General
  * @description	here some important values and listener are set correctly, calculate simple image name hash value to spread request over different servers and initialise the viewer
  * @param 		{string} viewID ID of the derivate
  */
-function initializeGraphic(viewID) {
-	Iview[viewID].zoomScale = 1;//init for the Zoomscale is changed within CalculateZoomProp
-	Iview[viewID].loaded = false;//indicates if the window is finally loaded
-	Iview[viewID].tilesize = tilesize;
-	Iview[viewID].initialModus = "none";
+genProto.initializeGraphic = function(viewID) {
+	this.viewID = viewID;
+	this.iview.zoomScale = 1;//init for the Zoomscale is changed within CalculateZoomProp
+	this.iview.loaded = false;//indicates if the window is finally loaded
+	this.iview.tilesize = tilesize;
+	this.iview.initialModus = "none";
 	// if the viewer started with an image with an single zoomLevel 0, because zoomMax = zoomInit & so initialZoom wont set
-	Iview[viewID].initialZoom = 0;
-	Iview[viewID].maximized = maximized;
-	Iview[viewID].images = [];
+	this.iview.initialZoom = 0;
+	this.iview.maximized = maximized;
+	this.iview.images = [];
 	PanoJS.USE_SLIDE = false;
 	PanoJS.USE_LOADER_IMAGE = false;
 	PanoJS.MOVE_THROTTLE = 10;
 	PanoJS.BLANK_TILE_IMAGE = "../modules/iview2/web/" + styleFolderUri + 'blank.gif';
 	
 	// opera triggers the onload twice
-	var iviewTileUrlProvider = new PanoJS.TileUrlProvider(Iview[viewID].baseUri, Iview[viewID].curImage, 'jpg');
+	var iviewTileUrlProvider = new PanoJS.TileUrlProvider(this.iview.baseUri, this.iview.curImage, 'jpg');
 	iviewTileUrlProvider.derivate = viewID;
 
 	/**
 	 * initialise the viewer
 	 */
-	if (Iview[viewID].viewerBean == null) {
-		Iview[viewID].viewerBean = new PanoJS("viewer"+viewID, {
+	if (this.iview.viewerBean == null) {
+		this.iview.viewerBean = new PanoJS("viewer"+viewID, {
 			initialPan: {'x' : 0, 'y' : 0 },//Koordianten der oberen linken Ecke
-			tileSize: Iview[viewID].tilesize,//Kachelgroesse
+			tileSize: this.iview.tilesize,//Kachelgroesse
 			tileUrlProvider: iviewTileUrlProvider,
-			maxZoom: Iview[viewID].zoomMax,
-			initialZoom: Iview[viewID].zoomInit,//Anfangs-Zoomlevel
+			maxZoom: this.iview.zoomMax,
+			initialZoom: this.iview.zoomInit,//Anfangs-Zoomlevel
 			loadingTile: "../modules/iview2/web/" + styleFolderUri + 'blank.gif'
 		});
 
-		Iview[viewID].viewerBean.viewID = viewID;//Add Viewer ID mit übergeben damit der Viewer darauf arbeiten kann
+		this.iview.viewerBean.viewID = viewID;//Add Viewer ID mit übergeben damit der Viewer darauf arbeiten kann
 
-		Iview[viewID].viewerBean.init();
+		this.iview.viewerBean.init();
 		//Newer Opera/Safari Versions need somehow something from reinitGraphics to show the viewer on Startup
 		if (navigator.userAgent.match(/Opera(.*)?Version\/10\.[0-9]*/i) || isBrowser(["Safari"])) {
-			reinitializeGraphic(viewID);
+			this.reinitializeGraphic();
 		}
 	}
 }
@@ -107,14 +124,11 @@ function initializeGraphic(viewID) {
  * @public
  * @function
  * @name		reinitializeGraphic
- * @memberOf	iview.init
+ * @memberOf	iview.General
  * @description	is called if the viewer size is resized and calculates/set therefore all values for the current zoomlevel and viewModus (i.e. scrrenWidth)
- * @param 		{string} viewID ID of the derivate
  */
-function reinitializeGraphic(viewID) {
-	// TODO: attention on the runtime, if to slow, then the viewer will be shown shortly
-	// --> eventuell sogar rausschieben falls sinnvoll - moeglich
-	var viewerBean = Iview[viewID].viewerBean;
+genProto.reinitializeGraphic = function() {
+	var viewerBean = this.iview.viewerBean;
 	if (viewerBean == null) return;
 		
 	var curHeight = 0;
@@ -128,58 +142,59 @@ function reinitializeGraphic(viewID) {
 		curHeight = (document.compatMode == 'CSS1Compat' ? document.documentElement.clientHeight : document.body.clientHeight);
 	}
 
-	// damit volle Höhe gewährleistet werden kann, height: 100% nicht verwendbar
-	var viewerContainer=document.getElementById("viewerContainer"+viewID);
-	var viewer=document.getElementById("viewer"+viewID);
-	if (Iview[viewID].maximized == true) {
-		viewerContainer.style.height = curHeight - viewerContainer.offsetTop + "px";
-		viewer.style.height = curHeight - viewer.parentNode.offsetTop - Iview[viewID].barX.my.self[0].offsetHeight  + "px";
-		viewerContainer.style.width = curWidth + "px";
-		viewer.style.width = curWidth - Iview[viewID].barY.my.self[0].offsetWidth  + "px";
+	var viewerContainer = jQuery("#viewerContainer"+this.viewID);
+	var viewer = jQuery("#viewer"+this.viewID);
+
+	if (this.iview.maximized == true) {
+		//to grant usage of the complete height it's not possible to simply use height:100%
+		viewerContainer.css({'height': curHeight - viewerContainer.offset().top + "px",
+							'width': curWidth + "px"});
+		viewer.css({'height': curHeight - viewer.parent().offset().top - this.iview.barX.my.self.outerHeight()  + "px",
+					'width': curWidth - this.iview.barY.my.self.outerWidth()  + "px"});
 	} else {
-		// Wert wieder herstellen
-		viewerContainer.style.height = Iview[viewID].startHeight + "px";
-		viewer.style.height = Iview[viewID].startHeight - ((Iview[viewID].barY.my.self.css("visibility") == "visible")? Iview[viewID].barY.my.self[0].offsetHeight : 0)  + "px";
-		viewerContainer.style.width = Iview[viewID].startHeight + "px";
-		viewer.style.width = Iview[viewID].startWidth - ((Iview[viewID].barX.my.self.css("visibility") == "visible")? Iview[viewID].scrollBarX.my.self[0].offsetWidth : 0)  + "px";
+		//restore minimized size settings
+		viewerContainer.css({'height': this.iview.startHeight + "px",
+							'width': this.iview.startWidth + "px"});
+		viewer.css({'height': this.iview.startHeight - ((this.iview.barY.my.self.css("visibility") == "visible")? this.iview.barY.my.self.outerHeight() : 0)  + "px",
+					'width': this.iview.startWidth - ((this.iview.barX.my.self.css("visibility") == "visible")? this.iview.scrollBarX.my.self.outerWidth() : 0)  + "px"});
 	}
 	
-	viewerBean.width = viewer.offsetWidth;
-	viewerBean.height = viewer.offsetHeight;
+	viewerBean.width = viewer.outerWidth();
+	viewerBean.height = viewer.outerHeight();
 	viewerBean.resize();
 	
 	// den Modus beibehalten & aktualisieren
-	if(Iview[viewID].zoomScreen){
-		Iview[viewID].zoomScreen = !Iview[viewID].zoomScreen;	
-		pictureScreen(viewID);
-	} else if(Iview[viewID].zoomWidth){
-		Iview[viewID].zoomWidth = !Iview[viewID].zoomWidth;
-		pictureWidth(viewID);
+	if(this.iview.zoomScreen){
+		this.iview.zoomScreen = !this.iview.zoomScreen;	
+		pictureScreen(this.viewID);
+	} else if(this.iview.zoomWidth){
+		this.iview.zoomWidth = !this.iview.zoomWidth;
+		pictureWidth(this.viewID);
 	}
 	
-	if (Iview[viewID].useOverview && Iview[viewID].overview && Iview[viewID].overview.getActive()) {
+	if (this.iview.useOverview && this.iview.overview && this.iview.overview.getActive()) {
 		// actualize Overview only if visible else delay it upto the reopening
-		Iview[viewID].overview.setSelected(Iview[viewID].PhysicalModel.getCurPos());
+		this.iview.overview.setSelected(this.iview.PhysicalModel.getCurPos());
 	}
 	
-	handleResizeScrollbars(viewID);
+	handleResizeScrollbars(this.viewID);
 	
-	if (Iview[viewID].useCutOut) {
-		Iview[viewID].cutOutModel.setRatio({
-			'x': viewerBean.width / ((Iview[viewID].picWidth / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale),
-			'y': viewerBean.height / ((Iview[viewID].picHeight / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale)});
-		Iview[viewID].cutOutModel.setPos({
-			'x': - (viewerBean.x / Math.pow(2, viewerBean.zoomLevel))*Iview[viewID].zoomScale,
-			'y': - (viewerBean.y / Math.pow(2, viewerBean.zoomLevel))*Iview[viewID].zoomScale});
+	if (this.iview.useCutOut) {
+		this.iview.cutOutModel.setRatio({
+			'x': viewerBean.width / ((this.iview.picWidth / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale),
+			'y': viewerBean.height / ((this.iview.picHeight / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale)});
+		this.iview.cutOutModel.setPos({
+			'x': - (viewerBean.x / Math.pow(2, viewerBean.zoomLevel))*this.iview.zoomScale,
+			'y': - (viewerBean.y / Math.pow(2, viewerBean.zoomLevel))*this.iview.zoomScale});
 	}
 	
 	// Actualize forward & backward Buttons
-	var previewTbView = jQuery(Iview[viewID].getToolbarCtrl().getView("previewTbView").toolbar);
-	var newTop = ((((Iview[viewID].picHeight / Math.pow(2, Iview[viewID].zoomMax - 1)) * Iview[viewID].zoomScale) - (toInt(previewTbView.css("height")) + toInt(previewTbView.css("padding-top")) + toInt(previewTbView.css("padding-bottom")))) / 2) + "px";
-	if (Iview[viewID].viewerContainer.hasClass("viewerContainer min")) {
-		Iview[viewID].viewerContainer.find(".toolbars .toolbar").css("top", newTop);
+	var previewTbView = jQuery(this.iview.getToolbarCtrl().getView("previewTbView").toolbar);
+	var newTop = ((((this.iview.picHeight / Math.pow(2, this.iview.zoomMax - 1)) * this.iview.zoomScale) - (previewTbView.height() + toInt(previewTbView.css("padding-top")) + toInt(previewTbView.css("padding-bottom")))) / 2) + "px";
+	if (this.iview.viewerContainer.hasClass("viewerContainer min")) {
+		this.iview.viewerContainer.find(".toolbars .toolbar").css("top", newTop);
 	}
-	Iview[viewID].toolbarCtrl.paint("mainTb");
+	this.iview.toolbarCtrl.paint("mainTb");
 }
 
 /**
@@ -278,7 +293,7 @@ function maximizeHandler(viewID) {
 
 	/*IE causes resize already at class change (mostly because position: rel <> fix)
 	 IE runs resize multiple times...but without this line he doesn't...*/
-	reinitializeGraphic(viewID);
+	Iview[viewID].gen.reinitializeGraphic();
 }
 
 PanoJS.doubleClickHandler = function(e) {
@@ -288,7 +303,7 @@ PanoJS.doubleClickHandler = function(e) {
 		var self = this.backingBean;
 		coords = self.resolveCoordinates(e);
 		if (self.zoomLevel < self.maxZoomLevel) {
-			zoomCenter(viewID,1,coords);
+			Iview[viewID].gen.zoomCenter(1,coords);
 		} else {
 			self.resetSlideMotion();
 			self.recenter(coords);
@@ -350,7 +365,7 @@ PanoJS.keyboardHandler = function(e) {
 			}
 			
 			if (dir != 0 && Iview[viewer.viewID].maximized) {
-				zoomCenter(viewer.viewID, dir,{"x":viewer.width/2, "y":viewer.height/2}); 
+				Iview[viewID].gen.zoomCenter(dir,{"x":viewer.width/2, "y":viewer.height/2}); 
 				preventDefault(e);
 				e.cancelBubble = true;
 				return false;
