@@ -438,7 +438,7 @@
       <dependency>
         <groupId>org.mycore.iview2</groupId>
         <artifactId>image-tiler</artifactId>
-        <version>1.6-SNAPSHOT</version>
+        <version>1.6</version>
       </dependency>
       <dependency>
         <groupId>junit</groupId>
