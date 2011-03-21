@@ -17,62 +17,81 @@
  * along with Mets-Editor.  If not, see http://www.gnu.org/licenses/.
  */
 
-function handleKeyDown(event){
+function handleKeyDown(event) {
 	log("handleKeyDown()");
-	if(event.keyCode == dojo.keys.DELETE) {
+	if (event.keyCode == dojo.keys.DELETE) {
 		deleteStructure();
 	}
 }
 
-function deleteStructure(){
+function deleteStructure() {
 	log("deleteStructure()");
 	var tree = dijit.byId("itemTree");
-	
 	var tracker = new SelectionTracker.getInstance();
-	var selectedItem = tracker.getSelectedStructure();
 
-	if(selectedItem == null){
-		log("No structure selected, delete canceled");
-		return;
-	}
-	
-	var pages = new Array();
-	var sections = new Array();
-	
-	getPagesForStructure(selectedItem.children, pages, sections);
+	log("Elements to delete : " + tracker.getSelectedItems().length);
+	var l = tracker.getSelectedItems().length;
+	for ( var j = 0; j < l; j++) {
+		var selectedItem = tracker.getSelectedItems()[j];
+		log("try to delete " + selectedItem);
+		/* Checks selected element is (not) empty */
+		if (selectedItem == null) {
+			log("No structure selected, jumping to next element");
+			continue;
+		}
+		/* Checks selected element is (not) root element */
+		if (selectedItem == getRootItemFromStore()) {
+			log("Selected Item is Root Element, jumping to next element");
+			continue;
+		}
+
+		var root = getRootItemFromStore();
+		/* Checks selected element (not) exist */
+		if (!storeContainsElement(selectedItem, root)) {
+			log("Store doesnt Contains this Element, jumping to next element");
+			continue;
+		}
+
+		log(selectedItem);
+		var pages = new Array();
+		var sections = new Array();
 		
-	var store = tree.model.store;
+		if (getPagesForStructure(selectedItem.children, pages, sections)) {
+			var store = tree.model.store;
+			/* delete pages */
+			for ( var i = 0; i < pages.length; i++) {
+				store.deleteItem(pages[i]);
+			}
+			/* delete child folders */
+			for ( var i = 0; i < sections.length; i++) {
+				store.deleteItem(sections[i]);
+			}
+		}
+		
+		/* delete originally selected section */
+		store.deleteItem(selectedItem);
 
-	/* delete pages */
-	for(var i = 0; i < pages.length; i++){
-		store.deleteItem(pages[i]);
-	}
-	
-	/* delete child folders*/
-	for(var i = 0; i < sections.length; i++){
-		store.deleteItem(sections[i]);
-	}
-	
-	/* delete originally selected section */ 
-	store.deleteItem(selectedItem);
-	
-	saveTreeStore(store);
-	
-	var root = getRootItemFromStore();
+		saveTreeStore(store);
 
-	/* add the items to the root of the tree */
-	for(var i = 0; i < pages.length; i++){
-		var newItem = {
-				id: new String(pages[i].id), 
-				name: pages[i].name, 
-				orderLabel:pages[i].orderLabel,
-				structureType:pages[i].structureType,
-				type:pages[i].type,
-				path:pages[i].path
-			   };
-		store.newItem(newItem,{parent:root, attribute:'children'});
+		/* add the items to the root of the tree */
+		for ( var i = 0; i < pages.length; i++) {
+			var newItem = {
+				id : new String(pages[i].id),
+				name : pages[i].name,
+				orderLabel : pages[i].orderLabel,
+				structureType : pages[i].structureType,
+				type : pages[i].type,
+				path : pages[i].path
+			};
+			store.newItem(newItem, {
+				parent : root,
+				attribute : 'children'
+			});
+		}
+		saveTreeStore(store);
+
 	}
-	saveTreeStore(store);
+
 	tracker.reset();
 	toggleStructureButtons();
 	/* may be we can now enable the reverse button */
@@ -80,14 +99,19 @@ function deleteStructure(){
 }
 
 /* returns all pages a structure has */
-function getPagesForStructure(children, pages, sections){
-	for(var i = 0; i < children.length; i++){
-		if(children[i].type == 'item'){
-			pages.push(children[i]);
-		}else if(children[i].type == 'category'){
-					sections.push(children[i]);		
-					getPagesForStructure(children[i].children, pages, sections);
-				}
-		
+function getPagesForStructure(children, pages, sections) {
+	if (children == null) {
+		log("getPagesForStructure(): children are null return: false");
+		return false;
 	}
+	for ( var i = 0; i < children.length; i++) {
+		if (children[i].type == 'item') {
+			pages.push(children[i]);
+		} else if (children[i].type == 'category') {
+			sections.push(children[i]);
+			getPagesForStructure(children[i].children, pages, sections);
+		}
+
+	}
+	return true;
 }

@@ -22,11 +22,21 @@ function trackSelection(selectedItem, source, event) {
 	if (event.ctrlKey == true && selectedItem.type == "item") {
 		tracker.setTo(selectedItem);
 		tracker.setSelectedStructure(null);
+		tracker.clearSelectedStuff;
+		log("clear selected stuff");
 	} else if(event.ctrlKey != true && selectedItem.type == "item") {
 			tracker.setFrom(selectedItem);
 			tracker.setSelectedStructure(null);
-	} else if(event.ctrlKey != true && selectedItem.type == "category"){
-		tracker.setSelectedStructure(selectedItem);
+			tracker.clearSelectedStuff;
+			log("clear selected stuff");
+	} else if(selectedItem.type == "category"){
+			if(tracker.selectedItems==null || (!event.ctrlKey && !event.shiftkey) ){
+				tracker.clearSelectedItems();
+				log("clearSelectedItems()");
+			}
+			log("add category to Selected Stuff");
+			tracker.addSelectedItems(selectedItem);
+			tracker.setSelectedStructure(selectedItem);
 	} else {
 		tracker.reset();
 	}
@@ -41,7 +51,22 @@ var SelectionTracker = (function() {
 		var from = null;
 		var to = null;
 		var selectedStructure = null;
-
+		var selectedItems = new Array();
+		
+		this.addSelectedItems = function(obj) {
+			this.selectedItems.push(obj);
+		}
+		
+		this.getSelectedItems = function() {
+			return this.selectedItems;
+		}
+		
+		this.clearSelectedItems = function() 
+		{
+			this.selectedItems
+			this.selectedItems = new Array();
+		}
+		
 		this.getSelectedStructure = function() {
 			return this.selectedStructure;
 		}

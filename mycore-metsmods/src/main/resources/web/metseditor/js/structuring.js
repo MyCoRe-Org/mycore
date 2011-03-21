@@ -30,12 +30,12 @@ function toggleStructureButtons(event) {
 	var selectedItem = tree.lastFocused.item;
 
 	if (selectedItem.type == "item") {
-		disableAddStructureButton(true);
+		disableAddStructureButton(false);
 		disableEditStructureButton(false);
 		disableDeleteStructureButton(true);
 	} else {
 		disableAddStructureButton(false);
-		/* the root of the tree must not be edited */
+		/* the root of the tree mudoarst not be edited */
 		var tree = dijit.byId("itemTree");
 		var model = tree.model;
 
@@ -64,6 +64,7 @@ function addStructureToTree() {
 	var combo = dijit.byId("structureType");
 
 	if (textfield.getValue() == "" || combo.item == null) {
+		log("Textfield or combo is empty");
 		return;
 	}
 	/* adding the item to the tree */
@@ -76,7 +77,7 @@ function addStructureToTree() {
 	unit.setStructureType(selectedTypeId);
 	unit.setId(generateUUID());
 
-    var tracker = new SelectionTracker.getInstance();
+	var tracker = new SelectionTracker.getInstance();
 	var selectedItem = tracker.getSelectedStructure();
 
 	/* avoid adding structures to pages */
@@ -86,7 +87,7 @@ function addStructureToTree() {
 			parent : selectedItem,
 			attribute : 'children'
 		});
-		store.save( {
+		store.save({
 			onComplete : function saveDone() {
 				textfield.setValue("");
 				log("Modifying tree store...done.");
@@ -127,81 +128,80 @@ function showEditStructureDialog() {
 	var tracker = new SelectionTracker.getInstance();
 	var selStruct = tracker.getSelectedStructure();
 	var selItem = tracker.getFrom();
-	
+
 	if (selStruct == null) {
 		log("The item currently selected is not a category/structure");
 		log("The edit structure dialog cannot be displayed");
-		
-		if(selItem != null && selItem.type == 'item'){
-			log("The type currently selected item '" + selItem.type +"'");
+
+		if (selItem != null && selItem.type == 'item') {
+			log("The type currently selected item '" + selItem.type + "'");
 			log("Displaying the editItemPropertiesDialog");
 			displayEditItemDiaglog();
 		}
 		return;
 	}
-	
+
 	if (selStruct == getRootItemFromStore()) {
 		showEditDocTypeDialog();
 		return;
 	}
-	
+
 	configureEditDialog();
 	dijit.byId('editStructureDialog').show();
 }
 
-function displayEditItemDiaglog(){
+function displayEditItemDiaglog() {
 	log("displayEditItemDiaglog()");
 	var dialog = dijit.byId("editItemDialog")
 	var tracker = new SelectionTracker.getInstance();
 	var selItem = tracker.getFrom();
-	
+
 	var textBox = dijit.byId("orderLabelTextBox");
 	var commonLabelTextBox = dijit.byId("commonLabelTextBox");
-	
-	if(selItem.orderLabel != null){
+
+	if (selItem.orderLabel != null) {
 		textBox.setValue(selItem.orderLabel);
 	}
-	
-	if(commonLabelTextBox.name != null){
+
+	if (commonLabelTextBox.name != null) {
 		commonLabelTextBox.setValue(selItem.name);
 	}
-	
+
 	dialog.show();
 }
 
-function saveItemProperties(){
+function saveItemProperties() {
 	log("saveItemProperties()");
 	var tracker = new SelectionTracker.getInstance();
 	var selItem = tracker.getFrom();
 	var textBox = dijit.byId("orderLabelTextBox");
-	var text = textBox.getValue(); 
-	
+	var text = textBox.getValue();
+
 	var commonLabelTextBox = dijit.byId("commonLabelTextBox");
 	var commonLabelText = commonLabelTextBox.getValue();
-	
-	if(commonLabelText == null || commonLabelText.length == 0){
+
+	if (commonLabelText == null || commonLabelText.length == 0) {
 		log("Label for item is not set. Please provide a label");
 		return;
 	}
-	
-	if(text != null){
+
+	if (text != null) {
 		selItem.orderLabel = text;
 		textBox.setValue("");
 	}
-	
 
-	if(commonLabelText != null){
+	if (commonLabelText != null) {
 		selItem.name = commonLabelText;
-		
+
 		var tree = dijit.byId("itemTree");
 		var store = tree.model.store;
 		store.setValue(selItem, "name", selItem.name);
-		
+
 		commonLabelTextBox.setValue("");
 
 	}
 	dijit.byId("editItemDialog").hide();
-	displayItemProperties();	
+	displayItemProperties();
 }
 
 function configureEditDialog() {
@@ -215,7 +215,7 @@ function configureEditDialog() {
 	var combo = dijit.byId("structureTypeEdit");
 	var store = combo.store;
 
-	store.fetchItemByIdentity( {
+	store.fetchItemByIdentity({
 		identity : selStruct.structureType,
 		onItem : function(item, request) {
 			combo.setDisplayedValue(item.name);
@@ -274,20 +274,21 @@ function configureEditDocTypeDialog() {
 	log("Got as root item");
 	log(rootItem);
 
-	store.fetchItemByIdentity( {
-		identity : rootItem.structureType,
-		onItem : function(item, request) {
-			typeCombo.setDisplayedValue(item.name);
-			typeCombo.item = item;
-		},
-		onError : function(item, request) {
-			log("Error fetching item  from store in 'configureEditDocTypeDialog()'");
-			log("Item was:");
-			log(item);
-			log("Request was:");
-			log(request);
-		}
-	});
+	store
+			.fetchItemByIdentity({
+				identity : rootItem.structureType,
+				onItem : function(item, request) {
+					typeCombo.setDisplayedValue(item.name);
+					typeCombo.item = item;
+				},
+				onError : function(item, request) {
+					log("Error fetching item  from store in 'configureEditDocTypeDialog()'");
+					log("Item was:");
+					log(item);
+					log("Request was:");
+					log(request);
+				}
+			});
 
 	var titleTextArea = dijit.byId("titleTextBox");
 	titleTextArea.attr('displayedValue', rootItem.name);
@@ -335,9 +336,9 @@ function getRootItemFromStore() {
 	var rootItem = null;
 
 	var rootItemId = store._arrayOfTopLevelItems[0].id;
-	
+
 	/* fetch the root of the tree */
-	store.fetchItemByIdentity( {
+	store.fetchItemByIdentity({
 		/* derivateId has been defined in StartMetsEditor.xsl */
 		identity : rootItemId,
 		onItem : function(item, request) {
@@ -349,6 +350,43 @@ function getRootItemFromStore() {
 		}
 	});
 	return rootItem;
+}
+
+/* Checks if treePart contains element (childs included).
+ * Element can be a normal Item or a Category.
+ * TreePart should be a Category or the Root Element.
+ *  */
+function storeContainsElement(element, treePart) {
+	log("StoreContainsElement()");
+
+	var root = treePart;
+
+	var pages = new Array();
+	var sections = new Array();
+	
+	if (treePart.children == null) {
+		log("StoreContainsElement(): Children are null return: false");
+		return false;
+	}
+	
+	if (getPagesForStructure(treePart.children, pages, sections)) {
+		for ( var i = 0; i < pages.length; i++) {
+			if (pages[i] == element) {
+				log("StoreContainsElement(): found element return: true");
+				return true;
+			}
+		}
+
+		for ( var i = 0; i < sections.length; i++) {
+			if (sections[i].id == element.id || storeContainsElement(element, sections[i])) {
+				log("StoreContainsElement(): found element return: true");
+				return true;
+			}
+		}
+	}
+	
+	log("StoreContainsElement(): cannot find element return: false");
+	return false;
 }
 
 function disableDeleteStructureButton(flag) {
