@@ -132,6 +132,19 @@ public class MCRSessionMgr {
     }
 
     /**
+     *  Returns the current session ID.
+     *  
+     *  This method does not spawn a new session as {@link #getCurrentSession()} would do.
+     *  @return current session ID or <code>null</code> if current thread has no session attached.
+     */
+    public static String getCurrentSessionID(){
+        if (hasCurrentSession()){
+            return getCurrentSession().getID();
+        }
+        return null;
+    }
+
+    /**
      * Returns the MCRSession for the given sessionID.
      */
     public static MCRSession getSession(String sessionID) {
