@@ -1,0 +1,15 @@
+
+  <!-- **************************************************************** -->
+  <!-- Servlets and mapping for MediaObject Thumbnail                   -->
+  <!-- **************************************************************** -->
+
+  <servlet id="MCRMediaThumbnailServlet">
+    <servlet-name>MCRMediaThumbnailServlet</servlet-name>
+    <servlet-class>org.mycore.media.frontend.MCRMediaThumbnailServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>MCRMediaThumbnailServlet</servlet-name>
+    <url-pattern>/servlets/MCRMediaThumbnailServlet/*</url-pattern>
+  </servlet-mapping>  
+

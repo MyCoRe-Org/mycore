@@ -1111,6 +1111,7 @@
     <module>mycore-indexing</module>
     <module>mycore-iview</module>
     <module>mycore-iview2</module>
+    <module>mycore-media</module>
     <module>mycore-metsmods</module>
     <module>mycore-migration20-21</module>
     <module>mycore-oai</module>
