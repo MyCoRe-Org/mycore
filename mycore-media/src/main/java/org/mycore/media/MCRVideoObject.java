@@ -235,11 +235,11 @@ public class MCRVideoObject extends MCRMediaObject {
         createElement( stream, "@framerate", String.valueOf(frameRate) );
         createElement( stream, "@duration", String.valueOf(duration) );
         
-        Element dimentions = new Element("dimentions");
-        createElement( dimentions, "@width", String.valueOf(width) );
-        createElement( dimentions, "@height", String.valueOf(height) );
-        createElement( dimentions, "@aspectRatio", aspectRatio );
-        stream.addContent(dimentions);
+        Element dimensions = new Element("dimensions");
+        createElement( dimensions, "@width", String.valueOf(width) );
+        createElement( dimensions, "@height", String.valueOf(height) );
+        createElement( dimensions, "@aspectRatio", aspectRatio );
+        stream.addContent(dimensions);
         
         Element subformat = new Element("format");
         subformat.addContent(subFormatFull);
