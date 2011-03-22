@@ -455,7 +455,6 @@
         <groupId>org.jdom</groupId>
         <artifactId>jdom</artifactId>
         <version>1.1.1</version>
-        <optional>false</optional>
       </dependency>
       <dependency>
         <groupId>jaxen</groupId>
@@ -481,7 +480,6 @@
         <groupId>commons-vfs</groupId>
         <artifactId>commons-vfs</artifactId>
         <version>1.0</version>
-        <optional>false</optional>
       </dependency>
       <dependency>
         <groupId>com.google.code.gson</groupId>
@@ -499,31 +497,26 @@
         <groupId>org.hibernate</groupId>
         <artifactId>jtidy-r8</artifactId>
         <version>21122004</version>
-        <optional>false</optional>
       </dependency>
       <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
         <version>2.0.1</version>
-        <optional>false</optional>
       </dependency>
       <dependency>
         <groupId>org.apache.axis</groupId>
         <artifactId>axis</artifactId>
         <version>1.4</version>
-        <optional>false</optional>
       </dependency>
       <dependency>
         <groupId>com.sun.media</groupId>
         <artifactId>jai-codec</artifactId>
         <version>1.1.3</version>
-        <optional>false</optional>
       </dependency>
       <dependency>
         <groupId>javax.media</groupId>
         <artifactId>jai-core</artifactId>
         <version>1.1.3</version>
-        <optional>false</optional>
       </dependency>
       <dependency>
         <groupId>javax.media</groupId>
@@ -540,7 +533,6 @@
         <groupId>log4j</groupId>
         <artifactId>log4j</artifactId>
         <version>1.2.16</version>
-        <optional>false</optional>
         <exclusions>
           <exclusion>
             <groupId>com.sun.jdmk</groupId>
@@ -560,7 +552,6 @@
         <groupId>dom4j</groupId>
         <artifactId>dom4j</artifactId>
         <version>1.6.1</version>
-        <optional>false</optional>
         <exclusions>
           <exclusion>
             <groupId>xml-apis</groupId>
@@ -572,31 +563,26 @@
         <groupId>commons-lang</groupId>
         <artifactId>commons-lang</artifactId>
         <version>2.6</version>
-        <optional>false</optional>
       </dependency>
       <dependency>
         <groupId>org.apache.lucene</groupId>
         <artifactId>lucene-core</artifactId>
         <version>${lucene.version}</version>
-        <optional>false</optional>
       </dependency>
       <dependency>
         <groupId>org.apache.lucene</groupId>
         <artifactId>lucene-analyzers</artifactId>
         <version>${lucene.version}</version>
-        <optional>false</optional>
       </dependency>
       <dependency>
         <groupId>org.apache.lucene</groupId>
         <artifactId>lucene-queries</artifactId>
         <version>${lucene.version}</version>
-        <optional>false</optional>
       </dependency>
       <dependency>
         <groupId>xerces</groupId>
         <artifactId>xercesImpl</artifactId>
         <version>2.9.1</version>
-        <optional>false</optional>
         <exclusions>
           <exclusion>
             <groupId>xml-apis</groupId>
@@ -608,25 +594,21 @@
         <groupId>com.ibm.icu</groupId>
         <artifactId>icu4j</artifactId>
         <version>4.6</version>
-        <optional>false</optional>
       </dependency>
       <dependency>
         <groupId>javax.mail</groupId>
         <artifactId>mail</artifactId>
         <version>1.4.3</version>
-        <optional>false</optional>
       </dependency>
       <dependency>
         <groupId>javax.activation</groupId>
         <artifactId>activation</artifactId>
         <version>1.1.1</version>
-        <optional>false</optional>
       </dependency>
       <dependency>
         <groupId>xalan</groupId>
         <artifactId>xalan</artifactId>
         <version>2.7.0</version>
-        <optional>false</optional>
         <exclusions>
           <exclusion>
             <groupId>xml-apis</groupId>
@@ -635,34 +617,39 @@
         </exclusions>
       </dependency>
       <dependency>
+        <groupId>xom</groupId>
+        <artifactId>xom</artifactId>
+        <version>1.1</version>
+      </dependency>
+      <dependency>
         <groupId>commons-fileupload</groupId>
         <artifactId>commons-fileupload</artifactId>
         <version>1.2.2</version>
-        <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>commons-httpclient</groupId>
+        <artifactId>commons-httpclient</artifactId>
+        <version>3.1</version>
       </dependency>
       <dependency>
         <groupId>com.drewnoakes</groupId>
         <artifactId>metadata-extractor</artifactId>
         <version>2.4.0-beta1</version>
-        <optional>false</optional>
       </dependency>
       <dependency>
         <groupId>net.sf.javamusictag</groupId>
         <artifactId>jid3lib</artifactId>
         <version>0.5.4</version>
-        <optional>false</optional>
       </dependency>
       <dependency>
         <groupId>org.apache.pdfbox</groupId>
         <artifactId>pdfbox</artifactId>
         <version>1.4.0</version>
-        <optional>false</optional>
       </dependency>
       <dependency>
         <groupId>org.tmatesoft.svnkit</groupId>
         <artifactId>svnkit</artifactId>
         <version>1.3.5</version>
-        <optional>false</optional>
       </dependency>
       <dependency>
         <groupId>net.java.dev.jna</groupId>
@@ -675,19 +662,16 @@
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
         <version>1.6.2</version>
-        <optional>false</optional>
       </dependency>
       <dependency>
         <groupId>org.apache.axis</groupId>
         <artifactId>axis-jaxrpc</artifactId>
         <version>1.4</version>
-        <optional>false</optional>
       </dependency>
       <dependency>
         <groupId>org.apache.xmlgraphics</groupId>
         <artifactId>fop</artifactId>
         <version>1.0</version>
-        <optional>false</optional>
         <exclusions>
           <exclusion>
             <groupId>xml-apis</groupId>
@@ -703,66 +687,56 @@
         <groupId>org.textmining</groupId>
         <artifactId>tm-extractors</artifactId>
         <version>0.4</version>
-        <optional>false</optional>
       </dependency>
       <dependency>
         <groupId>org.apache.ws.security</groupId>
         <artifactId>wss4j</artifactId>
         <version>1.5.7</version>
-        <optional>false</optional>
       </dependency>
       <dependency>
         <groupId>javax.servlet</groupId>
         <artifactId>servlet-api</artifactId>
         <version>2.4</version>
         <scope>provided</scope>
-        <optional>false</optional>
       </dependency>
       <dependency>
         <groupId>org.apache.avalon.framework</groupId>
         <artifactId>avalon-framework-impl</artifactId>
         <version>4.3.1</version>
-        <optional>false</optional>
       </dependency>
       <dependency>
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-core</artifactId>
         <version>${hibernate.version}</version>
-        <optional>false</optional>
       </dependency>
       <dependency>
         <groupId>org.apache.ant</groupId>
         <artifactId>ant</artifactId>
         <version>1.8.2</version>
         <scope>provided</scope>
-        <optional>false</optional>
       </dependency>
       <dependency>
         <groupId>org.hsqldb</groupId>
         <artifactId>hsqldb</artifactId>
         <version>2.0.0</version>
         <scope>test</scope>
-        <optional>false</optional>
       </dependency>
       <dependency>
         <groupId>net.sf.ehcache</groupId>
         <artifactId>ehcache-core</artifactId>
         <version>2.3.2</version>
-        <optional>false</optional>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-log4j12</artifactId>
         <version>1.6.1</version>
         <scope>runtime</scope>
-        <optional>false</optional>
       </dependency>
       <dependency>
         <groupId>org.javassist</groupId>
         <artifactId>javassist</artifactId>
         <version>3.14.0-GA</version>
         <scope>runtime</scope>
-        <optional>false</optional>
       </dependency>
       <dependency>
         <groupId>ant-contrib</groupId>
