@@ -80,10 +80,12 @@ function addStructureToTree() {
 	var tracker = new SelectionTracker.getInstance();
 	var selectedItem = tracker.getSelectedStructure();
 
+	var createdElement;
+
 	/* avoid adding structures to pages */
-	if (myStore.hasAttribute(selectedItem, "children") == true) {
+	if (selectedItem != null && selectedItem.type == "category") {
 		var store = tree.model.store;
-		store.newItem(unit, {
+		createdElement = store.newItem(unit, {
 			parent : selectedItem,
 			attribute : 'children'
 		});
@@ -98,14 +100,86 @@ function addStructureToTree() {
 		});
 
 	} else {
-		/* create a structure and add the selected items to the new structure */
-		console
-				.log("Illegal operation. Adding a structure to a page is not permitted.");
+		/* add a new Folder to */
+		var store = tree.model.store;
+		createdElement = store.newItem(unit, {
+			parent : getRootItemFromStore(),
+			attribute : 'children'
+		});
+
+		store.save({
+			onComplete : function saveDone() {
+				textfield.setValue("");
+				log("Modifying tree store...done.");
+			},
+			onError : function saveFailed() {
+				log("Modifying tree store...failed.");
+			}
+		});
 	}
+
+	var pages = new Array();
+	var selectedItems = tracker.getSelectedItems();
+
+	/* push all items to pages */
+	log("backup Elements");
+	for ( var k = 0; k < selectedItems.length; k++) {
+		if (selectedItems[k].type == "item") {
+			pages.push(selectedItems[k]);
+			log(selectedItems[k]);
+		}
+	}
+
+	/* delete all items from store */
+	log("delete Elements");
+	for ( var i = 0; i < pages.length; i++) {
+		log(pages[i]);
+		store.deleteItem(pages[i]);
+	}
+
+	/* save the changes(delete items) */
+	store.save({
+		onComplete : function saveDone() {
+			log("Modifying tree store...done.");
+		},
+		onError : function saveFailed() {
+			log("Modifying tree store...failed.");
+		}
+	});
+
+	/* add the old pages to the new category */
+	for ( var i = 0; i < pages.length; i++) {
+		var newItem = {
+			id : new String(pages[i].id),
+			name : pages[i].name,
+			orderLabel : pages[i].orderLabel,
+			structureType : pages[i].structureType,
+			type : pages[i].type,
+			path : pages[i].path
+		};
+		store.newItem(newItem, {
+			parent : createdElement,
+			attribute : 'children'
+		});
+	}
+
+	/* save the new added items */
+	store.save({
+		onComplete : function saveDone() {
+			log("Modifying tree store...done.");
+		},
+		onError : function saveFailed() {
+			log("Modifying tree store...failed.");
+		}
+	});
+	
+
 	/* disable the reverse button */
 	toggleReverseButton();
+
 	/* close/hide the dialog */
 	dijit.byId("addStructureDialog").hide();
+
 	combo.setValue("");
 }
 
@@ -352,10 +426,10 @@ function getRootItemFromStore() {
 	return rootItem;
 }
 
-/* Checks if treePart contains element (childs included).
- * Element can be a normal Item or a Category.
- * TreePart should be a Category or the Root Element.
- *  */
+/*
+ * Checks if treePart contains element (childs included). Element can be a
+ * normal Item or a Category. TreePart should be a Category or the Root Element.
+ */
 function storeContainsElement(element, treePart) {
 	log("StoreContainsElement()");
 
@@ -363,12 +437,12 @@ function storeContainsElement(element, treePart) {
 
 	var pages = new Array();
 	var sections = new Array();
-	
+
 	if (treePart.children == null) {
 		log("StoreContainsElement(): Children are null return: false");
 		return false;
 	}
-	
+
 	if (getPagesForStructure(treePart.children, pages, sections)) {
 		for ( var i = 0; i < pages.length; i++) {
 			if (pages[i] == element) {
@@ -378,13 +452,14 @@ function storeContainsElement(element, treePart) {
 		}
 
 		for ( var i = 0; i < sections.length; i++) {
-			if (sections[i].id == element.id || storeContainsElement(element, sections[i])) {
+			if (sections[i].id == element.id
+					|| storeContainsElement(element, sections[i])) {
 				log("StoreContainsElement(): found element return: true");
 				return true;
 			}
 		}
 	}
-	
+
 	log("StoreContainsElement(): cannot find element return: false");
 	return false;
 }

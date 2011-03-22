@@ -34,11 +34,19 @@ function deleteStructure() {
 	for ( var j = 0; j < l; j++) {
 		var selectedItem = tracker.getSelectedItems()[j];
 		log("try to delete " + selectedItem);
+		
 		/* Checks selected element is (not) empty */
 		if (selectedItem == null) {
 			log("No structure selected, jumping to next element");
 			continue;
 		}
+		
+		/* checks selected element is (not) a category */
+		if(selectedItem.type != "category"){
+			log("Selected item is no category, jumping to next element");
+			continue;
+		}
+		
 		/* Checks selected element is (not) root element */
 		if (selectedItem == getRootItemFromStore()) {
 			log("Selected Item is Root Element, jumping to next element");

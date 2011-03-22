@@ -18,17 +18,22 @@
  */
 function trackSelection(selectedItem, source, event) {
 	var tracker = new SelectionTracker.getInstance();
-
+	if(tracker.getSelectedItems() == null){
+		tracker.clearSelectedItems();
+	}
+		
 	if (event.ctrlKey == true && selectedItem.type == "item") {
 		tracker.setTo(selectedItem);
 		tracker.setSelectedStructure(null);
-		tracker.clearSelectedStuff;
-		log("clear selected stuff");
-	} else if(event.ctrlKey != true && selectedItem.type == "item") {
+		tracker.addSelectedItems(selectedItem);
+		
+	} else if(!event.ctrlKey && selectedItem.type == "item") {
+		
 			tracker.setFrom(selectedItem);
 			tracker.setSelectedStructure(null);
 			tracker.clearSelectedStuff;
-			log("clear selected stuff");
+			tracker.addSelectedItems(selectedItem);
+			
 	} else if(selectedItem.type == "category"){
 			if(tracker.selectedItems==null || (!event.ctrlKey && !event.shiftkey) ){
 				tracker.clearSelectedItems();
