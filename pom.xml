@@ -187,23 +187,23 @@
             <artifactId>maven-javadoc-plugin</artifactId>
             <configuration>
               <!-- APIviz begin -->
-<!--              <doclet>org.jboss.apiviz.APIviz</doclet>-->
-<!--              <docletArtifact>-->
-<!--                <groupId>org.jboss.apiviz</groupId>-->
-<!--                <artifactId>apiviz</artifactId>-->
-<!--                <version>1.3.1.GA</version>-->
-<!--              </docletArtifact>-->
-<!--              <useStandardDocletOptions>true</useStandardDocletOptions>-->
-<!--              <charset>UTF-8</charset>-->
-<!--              <encoding>UTF-8</encoding>-->
-<!--              <docencoding>UTF-8</docencoding>-->
-<!--              <breakiterator>true</breakiterator>-->
-<!--              <version>true</version>-->
-<!--              <author>true</author>-->
-<!--              <keywords>true</keywords>-->
-<!--              <additionalparam>-->
-<!--                -sourceclasspath ${project.build.outputDirectory}-->
-<!--              </additionalparam>-->
+              <!-- <doclet>org.jboss.apiviz.APIviz</doclet> -->
+              <!-- <docletArtifact> -->
+              <!-- <groupId>org.jboss.apiviz</groupId> -->
+              <!-- <artifactId>apiviz</artifactId> -->
+              <!-- <version>1.3.1.GA</version> -->
+              <!-- </docletArtifact> -->
+              <!-- <useStandardDocletOptions>true</useStandardDocletOptions> -->
+              <!-- <charset>UTF-8</charset> -->
+              <!-- <encoding>UTF-8</encoding> -->
+              <!-- <docencoding>UTF-8</docencoding> -->
+              <!-- <breakiterator>true</breakiterator> -->
+              <!-- <version>true</version> -->
+              <!-- <author>true</author> -->
+              <!-- <keywords>true</keywords> -->
+              <!-- <additionalparam> -->
+              <!-- -sourceclasspath ${project.build.outputDirectory} -->
+              <!-- </additionalparam> -->
               <!-- APIviz end -->
               <source>${java.target.version}</source>
               <groups>
@@ -439,6 +439,11 @@
         <groupId>org.mycore.iview2</groupId>
         <artifactId>image-tiler</artifactId>
         <version>1.6</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore.mets</groupId>
+        <artifactId>mets-model</artifactId>
+        <version>0.0.1</version>
       </dependency>
       <dependency>
         <groupId>junit</groupId>
