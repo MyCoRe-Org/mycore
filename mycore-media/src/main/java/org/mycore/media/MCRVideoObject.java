@@ -287,9 +287,9 @@ public class MCRVideoObject extends MCRMediaObject {
         video.frameRate = Float.parseFloat(getXMLValue(xml, "videostream/@framerate", "0.0"));
         video.duration = Long.parseLong(getXMLValue(xml, "videostream/@duration", "0"));
 
-        video.width = Integer.parseInt(getXMLValue(xml, "videostream/dimentions/@width", "0"));
-        video.height = Integer.parseInt(getXMLValue(xml, "videostream/dimentions/@height", "0"));
-        video.aspectRatio = getXMLValue(xml, "videostream/dimentions/@aspectRatio");
+        video.width = Integer.parseInt(getXMLValue(xml, "videostream/dimensions/@width", "0"));
+        video.height = Integer.parseInt(getXMLValue(xml, "videostream/dimensions/@height", "0"));
+        video.aspectRatio = getXMLValue(xml, "videostream/dimensions/@aspectRatio");
         
         video.subFormat = getXMLValue(xml, "videostream/format/@short");
         video.subFormatVersion = getXMLValue(xml, "videostream/format/@version");
