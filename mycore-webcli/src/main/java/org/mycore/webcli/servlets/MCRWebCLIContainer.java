@@ -163,7 +163,7 @@ class MCRWebCLIContainer {
         for (Map.Entry<String, List<MCRCommand>> entry : knownCommands.entrySet()) {
             JsonArray commands = new JsonArray();
             for (final MCRCommand cmd : entry.getValue()) {
-                commands.add(new JsonPrimitive(cmd.showSyntax()));
+                commands.add(new JsonPrimitive(cmd.getSyntax()));
             }
             JsonObject item = new JsonObject();
             item.addProperty("name", entry.getKey());
