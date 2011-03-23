@@ -131,28 +131,13 @@ public class MCRConfiguration {
     }
 
     /**
-     * Instantiates the singleton by calling the protected constructor. If the
-     * system property <CODE>MCR.Configuration.Class</CODE> is set when the
-     * system starts, the class specified in that property will be instantiated
-     * instead. This allows for subclassing <CODE>MCRConfiguration</CODE> to
-     * change behaviour and use the subclass instead of <CODE>MCRConfiguration
-     * </CODE>.
+     * Instantiates the singleton by calling the protected constructor.
      */
     protected static void createSingleton() {
-        String name = System.getProperty("MCR.Configuration.Class");
-
-        if (name != null) {
-            try {
-                singleton = (MCRConfiguration) Class.forName(name).newInstance();
-            } catch (Exception exc) {
-                throw new MCRConfigurationException("Could not create MCR.Configuration.Class singleton \"" + name + "\"", exc);
-            }
-        } else {
-            try {
-                singleton = new MCRConfiguration();
-            } catch (IOException e) {
-                throw new MCRConfigurationException("Could not instantiate MCRConfiguration.", e);
-            }
+        try {
+            singleton = new MCRConfiguration();
+        } catch (IOException e) {
+            throw new MCRConfigurationException("Could not instantiate MCRConfiguration.", e);
         }
         singleton.systemModified();
     }
