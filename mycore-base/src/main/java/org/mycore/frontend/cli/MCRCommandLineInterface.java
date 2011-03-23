@@ -178,11 +178,9 @@ public class MCRCommandLineInterface {
      */
     protected static void processCommand(String command) {
 
-        String invokedCommand = null;
         MCRSession session = MCRSessionMgr.getCurrentSession();
 
         try {
-            
             session.beginTransaction();
             List<String> commandsReturned = knownCommands.invokeCommand(command);
             session.commitTransaction();
@@ -191,7 +189,7 @@ public class MCRCommandLineInterface {
             {
                 // Add commands to queue
                 if (commandsReturned.size() > 0) {
-                    System.out.println(system + " Queueing " + commandsReturned.size() + " commands to process");
+                    output("Queueing " + commandsReturned.size() + " commands to process");
 
                     for (int i = 0; i < commandsReturned.size(); i++) {
                         commandQueue.insertElementAt(commandsReturned.get(i), i);
