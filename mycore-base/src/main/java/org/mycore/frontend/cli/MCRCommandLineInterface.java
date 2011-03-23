@@ -1,8 +1,9 @@
 /*
+ * $Revision$ 
+ * $Date$
  * 
- * $Revision$ $Date$
- * 
- * This file is part of M y C o R e See http://www.mycore.de/ for details.
+ * This file is part of   M y C o R e 
+ * See http://www.mycore.de/ for details.
  * 
  * This program is free software; you can use it, redistribute it and / or modify it under the terms of the GNU General Public License (GPL) as published by the
  * Free Software Foundation; either version 2 of the License or (at your option) any later version.
@@ -58,15 +59,14 @@ import org.mycore.datamodel.ifs2.MCRContent;
  * <code>MCRCommand</code>.
  * 
  * @see MCRCommand
+ * 
  * @author Frank Lützenkirchen
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
- * @version $Revision$ $Date: 2011-03-23 10:46:53 +0100 (Mi, 23 Mrz
- *          2011) $
  */
 public class MCRCommandLineInterface {
-    /** The Logger */
+    
     static Logger logger = Logger.getLogger(MCRCommandLineInterface.class);
 
     /** The name of the system */
@@ -105,19 +105,14 @@ public class MCRCommandLineInterface {
                 "Execute the commands listed in the text file {0}."));
         knownCommands.add(new MCRCommand("help {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.showCommandsHelp String",
                 "Show the help text for the commands beginning with {0}."));
-        knownCommands.add(new MCRCommand("help", "org.mycore.frontend.cli.MCRCommandLineInterface.listKnownCommands",
-                "List all possible commands."));
-        knownCommands.add(new MCRCommand("exit", "org.mycore.frontend.cli.MCRCommandLineInterface.exit",
-                "Stop and exit the commandline tool."));
-        knownCommands.add(new MCRCommand("quit", "org.mycore.frontend.cli.MCRCommandLineInterface.exit",
-                "Stop and exit the commandline tool."));
+        knownCommands.add(new MCRCommand("help", "org.mycore.frontend.cli.MCRCommandLineInterface.listKnownCommands", "List all possible commands."));
+        knownCommands.add(new MCRCommand("exit", "org.mycore.frontend.cli.MCRCommandLineInterface.exit", "Stop and exit the commandline tool."));
+        knownCommands.add(new MCRCommand("quit", "org.mycore.frontend.cli.MCRCommandLineInterface.exit", "Stop and exit the commandline tool."));
         knownCommands.add(new MCRCommand("! {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.executeShellCommand String",
                 "Execute the shell command {0}, for example '! ls' or '! cmd /c dir'"));
-        knownCommands.add(new MCRCommand("show file {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.show String",
-                "Show contents of local file {0}"));
+        knownCommands.add(new MCRCommand("show file {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.show String", "Show contents of local file {0}"));
         knownCommands.add(new MCRCommand("whoami", "org.mycore.frontend.cli.MCRCommandLineInterface.whoami", "Print the current user."));
-        knownCommands.add(new MCRCommand("show command statistics",
-                "org.mycore.frontend.cli.MCRCommandLineInterface.showCommandStatistics",
+        knownCommands.add(new MCRCommand("show command statistics", "org.mycore.frontend.cli.MCRCommandLineInterface.showCommandStatistics",
                 "Show statistics on number of commands processed and execution time needed per command"));
         knownCommands.add(new MCRCommand("cancel on error", "org.mycore.frontend.cli.MCRCommandLineInterface.cancelOnError",
                 "Cancel execution of further commands in case of error"));
