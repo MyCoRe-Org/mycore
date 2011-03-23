@@ -48,7 +48,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
-import org.hibernate.Transaction;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
@@ -276,7 +275,7 @@ class MCRWebCLIContainer {
         private boolean processCommand(String command, boolean continueIfOneFails) throws IOException {
             LOGGER.info("Processing command:'" + command + "' (" + commands.size() + " left)");
             long start = System.currentTimeMillis();
-            Transaction tx = MCRHIBConnection.instance().getSession().beginTransaction();
+            session.beginTransaction();
             try {
                 List<String> commandsReturned = null;
                 for (List<MCRCommand> cmds : knownCommands.values()) {
@@ -286,7 +285,7 @@ class MCRWebCLIContainer {
                     commandsReturned = runCommand(command, cmds);
                 }
                 updateKnownCommandsIfNeeded();
-                tx.commit();
+                session.commitTransaction();
                 if (commandsReturned != null)
                     LOGGER.info("Command processed (" + (System.currentTimeMillis() - start) + " ms)");
                 else {
@@ -295,7 +294,7 @@ class MCRWebCLIContainer {
             } catch (Exception ex) {
                 LOGGER.error("Command '" + command + "' failed. Performing transaction rollback...", ex);
                 try {
-                    tx.rollback();
+                    session.rollbackTransaction();
                 } catch (Exception ex2) {
                     LOGGER.error("Error while perfoming rollback for command '" + command + "'!", ex2);
                 }
@@ -304,9 +303,9 @@ class MCRWebCLIContainer {
                 }
                 return false;
             } finally {
-                tx = MCRHIBConnection.instance().getSession().beginTransaction();
+                session.beginTransaction();
                 MCRHIBConnection.instance().getSession().clear();
-                tx.commit();
+                session.commitTransaction();
             }
             return true;
         }
