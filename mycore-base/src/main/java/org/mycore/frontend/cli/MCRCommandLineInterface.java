@@ -25,7 +25,6 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -79,9 +78,6 @@ public class MCRCommandLineInterface {
     protected static Vector<String> commandQueue = new Vector<String>();
 
     protected static Vector<String> failedCommands = new Vector<String>();
-
-    /** The standard input console where the user enters commands */
-    protected static BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
 
     protected static ConcurrentLinkedQueue<Number> benchList = new ConcurrentLinkedQueue<Number>();
 
@@ -175,10 +171,11 @@ public class MCRCommandLineInterface {
         String command = null;
         String firstCommand = null;
 
+        MCRCommandPrompt prompt = new MCRCommandPrompt( system );
         while (true) {
             if (commandQueue.isEmpty()) {
                 if (interactiveMode) {
-                    command = readCommandFromPrompt();
+                    command = prompt.readCommand();
                 } else {
                     if (firstCommand != null && shouldSaveRuntimeStatistics()) {
                         saveMillis(firstCommand);
@@ -235,29 +232,6 @@ public class MCRCommandLineInterface {
         session.setCurrentIP("127.0.0.1");
         session.setUserInformation(MCRSystemUserInformation.getSuperUserInstance());
         MCRSessionMgr.setCurrentSession(session);
-    }
-
-    /**
-     * Shows up a command prompt.
-     * 
-     * @return The command entered by the user at stdin
-     */
-    protected static String readCommandFromPrompt() {
-        String line = "";
-        do {
-            line = readLineFromConsole();
-        } while (line.isEmpty());
-        return line;
-    }
-
-    private static String readLineFromConsole() {
-        System.out.print(system + "> ");
-
-        try {
-            return console.readLine().trim();
-        } catch (IOException ignored) {
-            return "";
-        }
     }
 
     /** Stores total time needed for all executions of the given command */
