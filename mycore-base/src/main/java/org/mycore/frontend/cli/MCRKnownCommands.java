@@ -113,7 +113,10 @@ public class MCRKnownCommands {
                 return commandsReturned;
             }
         }
-        return null;
+        
+        MCRCommandLineInterface.output("Command not understood:" + command);
+        MCRCommandLineInterface.output("Enter 'help' to get a list of commands.");
+        return new ArrayList<String>();
     }
 
     /**
