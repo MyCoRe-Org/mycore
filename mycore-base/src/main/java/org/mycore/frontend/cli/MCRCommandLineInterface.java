@@ -142,7 +142,7 @@ public class MCRCommandLineInterface {
      * The main method that either shows up an interactive command prompt or reads a file containing a list of commands to be processed
      */
     public static void main(String[] args) {
-        system = MCRConfiguration.instance().getString("MCR.CommandLineInterface.SystemName", "MyCoRe") + ": foo ";
+        system = MCRConfiguration.instance().getString("MCR.CommandLineInterface.SystemName", "MyCoRe") + ":";
         initSession();
 
         System.out.println();
