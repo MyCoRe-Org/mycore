@@ -39,7 +39,6 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.ifs2.MCRContent;
@@ -61,7 +60,7 @@ import org.mycore.datamodel.ifs2.MCRContent;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRCommandLineInterface {
-    
+
     static Logger logger = Logger.getLogger(MCRCommandLineInterface.class);
 
     /** The name of the system */
@@ -77,32 +76,32 @@ public class MCRCommandLineInterface {
     private static boolean SKIP_FAILED_COMMAND = false;
 
     private static MCRKnownCommands knownCommands;
-    
+
     /**
      * The main method that either shows up an interactive command prompt or
      * reads a file containing a list of commands to be processed
      */
     public static void main(String[] args) {
         system = MCRConfiguration.instance().getString("MCR.CommandLineInterface.SystemName", "MyCoRe") + ":";
+
         initSession();
 
-        System.out.println();
+        output("");
         output("Command Line Interface.");
         output("");
+
         output("Initializing...");
-
         knownCommands = new MCRKnownCommands();
-
         output("Initialization done.");
+
         output("Type 'help' to list all commands!");
         output("");
 
         readCommandFromArguments(args);
 
         String command = null;
-        String firstCommand = null;
 
-        MCRCommandPrompt prompt = new MCRCommandPrompt( system );
+        MCRCommandPrompt prompt = new MCRCommandPrompt(system);
         while (true) {
             if (commandQueue.isEmpty()) {
                 if (interactiveMode) {
@@ -111,10 +110,7 @@ public class MCRCommandLineInterface {
                     exit();
                 }
             } else {
-                command = (String) commandQueue.firstElement();
-                if (firstCommand == null) {
-                    firstCommand = command;
-                }
+                command = commandQueue.firstElement();
                 commandQueue.removeElementAt(0);
                 System.out.println(system + "> " + command);
             }
@@ -172,7 +168,7 @@ public class MCRCommandLineInterface {
             session.beginTransaction();
             List<String> commandsReturned = knownCommands.invokeCommand(command);
             session.commitTransaction();
-            
+
             if (commandsReturned != null) // Command was executed
             {
                 // Add commands to queue
@@ -183,13 +179,9 @@ public class MCRCommandLineInterface {
                         commandQueue.insertElementAt(commandsReturned.get(i), i);
                     }
                 }
-            }
-            else {
-                if (interactiveMode) {
-                    System.out.printf("%s Command not understood. Enter 'help' to get a list of commands.\n", system);
-                } else {
-                    throw new MCRUsageException("Command not understood: " + command);
-                }
+            } else {
+                output("Command not understood:" + command);
+                output("Enter 'help' to get a list of commands.");
             }
         } catch (Exception ex) {
             MCRCLIExceptionHandler.handleException(ex);
