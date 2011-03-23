@@ -168,7 +168,7 @@ public class MCRCommandLineInterface {
         String command = null;
         String firstCommand = null;
 
-        while ( ! shouldExit ) {
+        while ( true ) {
             if (commandQueue.isEmpty()) {
                 if (interactiveMode) {
                     command = readCommandFromPrompt();
@@ -181,7 +181,6 @@ public class MCRCommandLineInterface {
                         }
                     }
                     exit();
-                    break;
                 }
             } else {
                 command = (String) commandQueue.firstElement();
@@ -619,15 +618,13 @@ public class MCRCommandLineInterface {
         fout.close();
     }
 
-    private static boolean shouldExit = false;
-    
     /**
      * Exits the command line interface. This method implements the "exit" and "quit" commands.
      */
     public static void exit() {
         showSessionDuration();
         handleFailedCommands();
-        shouldExit = true;
+        System.exit(0);
     }
 
     private static void showSessionDuration() {
