@@ -43,7 +43,6 @@ public class MCRCommandStatistics {
         StatisticsEntry entry = getEntry(command);
         entry.numInvocations++;
         entry.totalTimeNeeded += timeNeeded;
-        MCRCommandLineInterface.addMillis(timeNeeded);
     }
 
     /**

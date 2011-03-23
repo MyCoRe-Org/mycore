@@ -26,12 +26,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -74,8 +72,6 @@ public class MCRCommandLineInterface {
 
     protected static Vector<String> failedCommands = new Vector<String>();
 
-    protected static ConcurrentLinkedQueue<Number> benchList = new ConcurrentLinkedQueue<Number>();
-
     private static boolean interactiveMode = true;
 
     private static boolean SKIP_FAILED_COMMAND = false;
@@ -112,9 +108,6 @@ public class MCRCommandLineInterface {
                 if (interactiveMode) {
                     command = prompt.readCommand();
                 } else {
-                    if (firstCommand != null && shouldSaveRuntimeStatistics()) {
-                        saveMillis(firstCommand);
-                    }
                     exit();
                 }
             } else {
@@ -128,11 +121,6 @@ public class MCRCommandLineInterface {
 
             processCommand(command);
         }
-    }
-
-    private static boolean shouldSaveRuntimeStatistics() {
-        String property = "MCR.CLI.SaveRuntimeStatistics";
-        return MCRConfiguration.instance().getBoolean(property, false);
     }
 
     private static void readCommandFromArguments(String[] args) {
@@ -380,27 +368,6 @@ public class MCRCommandLineInterface {
 
     public static void skipOnError() {
         SKIP_FAILED_COMMAND = true;
-    }
-
-    public static void addMillis(long l) {
-        benchList.add(l);
-    }
-
-    public static void clearMillis() {
-        benchList.clear();
-    }
-
-    public static void saveMillis(String fileBaseName) {
-        try {
-            PrintStream fout = new PrintStream(fileBaseName + ".dat");
-
-            for (int i = 1; !benchList.isEmpty(); i++) {
-                fout.printf("%d %d\n", i, benchList.poll().intValue());
-            }
-            fout.close();
-        } catch (IOException ex) {
-            MCRCLIExceptionHandler.handleException(ex);
-        }
     }
 
     /**
