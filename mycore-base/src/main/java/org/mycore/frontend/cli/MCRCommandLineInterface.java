@@ -28,12 +28,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -43,20 +40,21 @@ import org.jdom.Element;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRURIResolver;
-import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.ifs2.MCRContent;
 
 /**
- * The main class implementing the MyCoRe command line interface. With the command line interface, you can import, export, update and delete documents and other
- * data from/to the filesystem. Metadata is imported from and exported to XML files. The command line interface is for administrative purposes and to be used on
- * the server side. It implements an interactive command prompt and understands a set of commands. Each command is an instance of the class
+ * The main class implementing the MyCoRe command line interface. With the
+ * command line interface, you can import, export, update and delete documents
+ * and other data from/to the filesystem. Metadata is imported from and exported
+ * to XML files. The command line interface is for administrative purposes and
+ * to be used on the server side. It implements an interactive command prompt
+ * and understands a set of commands. Each command is an instance of the class
  * <code>MCRCommand</code>.
  * 
  * @see MCRCommand
@@ -64,7 +62,8 @@ import org.mycore.datamodel.ifs2.MCRContent;
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date: 2011-03-23 10:46:53 +0100 (Mi, 23 Mrz
+ *          2011) $
  */
 public class MCRCommandLineInterface {
     /** The Logger */
@@ -91,31 +90,41 @@ public class MCRCommandLineInterface {
     private static boolean SKIP_FAILED_COMMAND = false;
 
     private static void initKnownCommands() {
-        initBuiltInCommands();
-        initConfiguredCommands("Internal");
-        initConfiguredCommands("External");
+        try {
+            initBuiltInCommands();
+            initConfiguredCommands("Internal");
+            initConfiguredCommands("External");
+        } catch (Exception ex) {
+            MCRCLIExceptionHandler.handleException(ex);
+            System.exit(1);
+        }
     }
 
     private static void initBuiltInCommands() {
         knownCommands.add(new MCRCommand("process {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.readCommandsFile String",
-            "Execute the commands listed in the text file {0}."));
+                "Execute the commands listed in the text file {0}."));
         knownCommands.add(new MCRCommand("help {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.showCommandsHelp String",
-            "Show the help text for the commands beginning with {0}."));
-        knownCommands.add(new MCRCommand("help", "org.mycore.frontend.cli.MCRCommandLineInterface.listKnownCommands", "List all possible commands."));
-        knownCommands.add(new MCRCommand("exit", "org.mycore.frontend.cli.MCRCommandLineInterface.exit", "Stop and exit the commandline tool."));
-        knownCommands.add(new MCRCommand("quit", "org.mycore.frontend.cli.MCRCommandLineInterface.exit", "Stop and exit the commandline tool."));
+                "Show the help text for the commands beginning with {0}."));
+        knownCommands.add(new MCRCommand("help", "org.mycore.frontend.cli.MCRCommandLineInterface.listKnownCommands",
+                "List all possible commands."));
+        knownCommands.add(new MCRCommand("exit", "org.mycore.frontend.cli.MCRCommandLineInterface.exit",
+                "Stop and exit the commandline tool."));
+        knownCommands.add(new MCRCommand("quit", "org.mycore.frontend.cli.MCRCommandLineInterface.exit",
+                "Stop and exit the commandline tool."));
         knownCommands.add(new MCRCommand("! {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.executeShellCommand String",
-            "Execute the shell command {0}, for example '! ls' or '! cmd /c dir'"));
-        knownCommands.add(new MCRCommand("show file {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.show String", "Show contents of local file {0}"));
+                "Execute the shell command {0}, for example '! ls' or '! cmd /c dir'"));
+        knownCommands.add(new MCRCommand("show file {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.show String",
+                "Show contents of local file {0}"));
         knownCommands.add(new MCRCommand("whoami", "org.mycore.frontend.cli.MCRCommandLineInterface.whoami", "Print the current user."));
-        knownCommands.add(new MCRCommand("show command statistics", "org.mycore.frontend.cli.MCRCommandLineInterface.showCommandStatistics",
-            "Show statistics on number of commands processed and execution time needed per command"));
+        knownCommands.add(new MCRCommand("show command statistics",
+                "org.mycore.frontend.cli.MCRCommandLineInterface.showCommandStatistics",
+                "Show statistics on number of commands processed and execution time needed per command"));
         knownCommands.add(new MCRCommand("cancel on error", "org.mycore.frontend.cli.MCRCommandLineInterface.cancelOnError",
-            "Cancel execution of further commands in case of error"));
+                "Cancel execution of further commands in case of error"));
         knownCommands.add(new MCRCommand("skip on error", "org.mycore.frontend.cli.MCRCommandLineInterface.skipOnError",
-            "Skip execution of failed command in case of error"));
+                "Skip execution of failed command in case of error"));
         knownCommands.add(new MCRCommand("get uri {0} to file {1}", "org.mycore.frontend.cli.MCRCommandLineInterface.getURI String String",
-            "Get XML content from URI {0} and save it to a local file {1}"));
+                "Get XML content from URI {0} and save it to a local file {1}"));
     }
 
     /** Read internal and/or external commands */
@@ -148,7 +157,8 @@ public class MCRCommandLineInterface {
     }
 
     /**
-     * The main method that either shows up an interactive command prompt or reads a file containing a list of commands to be processed
+     * The main method that either shows up an interactive command prompt or
+     * reads a file containing a list of commands to be processed
      */
     public static void main(String[] args) {
         system = MCRConfiguration.instance().getString("MCR.CommandLineInterface.SystemName", "MyCoRe") + ":";
@@ -159,12 +169,7 @@ public class MCRCommandLineInterface {
         output("");
         output("Initializing...");
 
-        try {
-            initKnownCommands();
-        } catch (Exception ex) {
-            showException(ex);
-            System.exit(1);
-        }
+        initKnownCommands();
 
         output("Initialization done.");
         output("Type 'help' to list all commands!");
@@ -181,11 +186,7 @@ public class MCRCommandLineInterface {
                     command = readCommandFromPrompt();
                 } else {
                     if (firstCommand != null && shouldSaveRuntimeStatistics()) {
-                        try {
-                            saveMillis(firstCommand);
-                        } catch (IOException ex) {
-                            showException(ex);
-                        }
+                        saveMillis(firstCommand);
                     }
                     exit();
                 }
@@ -271,7 +272,8 @@ public class MCRCommandLineInterface {
     protected static HashMap<String, Integer> numInvocations = new HashMap<String, Integer>();
 
     /**
-     * Processes a command entered by searching a matching command in the list of known commands and executing its method.
+     * Processes a command entered by searching a matching command in the list
+     * of known commands and executing its method.
      * 
      * @param command
      *            The command string to be processed
@@ -324,13 +326,14 @@ public class MCRCommandLineInterface {
                 }
             }
         } catch (Exception ex) {
-            showException(ex);
+            MCRCLIExceptionHandler.handleException(ex);
+
             System.out.printf("%s Command failed. Performing transaction rollback...\n", system);
             if (session.isTransactionActive()) {
                 try {
                     session.rollbackTransaction();
                 } catch (Exception ex2) {
-                    showException(ex2);
+                    MCRCLIExceptionHandler.handleException(ex2);
                 }
             }
             if (SKIP_FAILED_COMMAND) {
@@ -351,7 +354,8 @@ public class MCRCommandLineInterface {
     }
 
     /**
-     * Shows statistics on number of invocations and time needed for each command successfully executed.
+     * Shows statistics on number of invocations and time needed for each
+     * command successfully executed.
      */
     public static void showCommandStatistics() {
         System.out.println();
@@ -388,7 +392,7 @@ public class MCRCommandLineInterface {
             }
             pw.close();
         } catch (IOException ex) {
-            showException(ex);
+            MCRCLIExceptionHandler.handleException(ex);
         }
     }
 
@@ -438,64 +442,9 @@ public class MCRCommandLineInterface {
     }
 
     /**
-     * Shows details about an exception that occured during command processing
-     * 
-     * @param ex
-     *            The exception that was caught while processing a command
-     */
-    protected static void showException(Throwable ex) {
-        if (ex instanceof InvocationTargetException) {
-            ex = ((InvocationTargetException) ex).getTargetException();
-            showException(ex);
-            return;
-        } else if (ex instanceof ExceptionInInitializerError) {
-            ex = ((ExceptionInInitializerError) ex).getCause();
-            showException(ex);
-            return;
-        }
-
-        output("");
-        output("Exception occured: " + ex.getClass().getName());
-        output("Exception message: " + ex.getLocalizedMessage());
-        output("");
-
-        String trace = MCRException.getStackTraceAsString(ex);
-        if (logger.isDebugEnabled()) {
-            logger.debug(trace);
-        } else {
-            output(trace);
-        }
-
-        if (ex instanceof MCRActiveLinkException) {
-            showActiveLinks((MCRActiveLinkException) ex);
-        }
-        if (ex instanceof MCRException) {
-            ex = ((MCRException) ex).getCause();
-            if (ex != null) {
-                output("");
-                output("This exception was caused by:");
-                showException(ex);
-            }
-        }
-    }
-
-    private static void showActiveLinks(MCRActiveLinkException activeLinks) {
-        output("There are links active preventing the commit of work, see error message for details.");
-        output("The following links where affected:");
-
-        Map<String, Collection<String>> links = activeLinks.getActiveLinks();
-
-        for (String curDest : links.keySet()) {
-            logger.debug("Current Destination: " + curDest);
-            Collection<String> sources = links.get(curDest);
-            for (String source : sources)
-                output(source + " ==> " + curDest);
-        }
-    }
-
-    /**
-     * Reads a file containing a list of commands to be executed and adds them to the commands queue for processing. This method implements the "process ..."
-     * command.
+     * Reads a file containing a list of commands to be executed and adds them
+     * to the commands queue for processing. This method implements the
+     * "process ..." command.
      * 
      * @param file
      *            The file holding the commands to be processed
@@ -524,7 +473,8 @@ public class MCRCommandLineInterface {
     }
 
     /**
-     * Shows a list of commands understood by the command line interface and shows their input syntax. This method implements the "help" command
+     * Shows a list of commands understood by the command line interface and
+     * shows their input syntax. This method implements the "help" command
      */
     public static void listKnownCommands() {
         output("The following " + knownCommands.size() + " commands can be used:");
@@ -538,7 +488,8 @@ public class MCRCommandLineInterface {
     /**
      * Shows the help text for one or more commands.
      * 
-     * @param com the command, or a fragment of it
+     * @param com
+     *            the command, or a fragment of it
      */
     public static void showCommandsHelp(String com) {
         boolean foundMatchingCommand = false;
@@ -562,14 +513,15 @@ public class MCRCommandLineInterface {
     }
 
     /**
-     * Executes simple shell commands from inside the command line interface and shows their output. 
-     * This method implements commands entered beginning with exclamation mark, like 
-     * "! ls -l /temp"
+     * Executes simple shell commands from inside the command line interface and
+     * shows their output. This method implements commands entered beginning
+     * with exclamation mark, like "! ls -l /temp"
      * 
      * @param command
      *            the shell command to be executed
      * @throws IOException
-     *             when an IO error occured while catching the output returned by the command
+     *             when an IO error occured while catching the output returned
+     *             by the command
      * @throws SecurityException
      *             when the command could not be executed for security reasons
      */
@@ -589,9 +541,9 @@ public class MCRCommandLineInterface {
     }
 
     /**
-     * Catches the output read from an input stream and prints it line by line on standard out. 
-     * This is used to catch the stdout and stderr stream output when
-     * executing an external shell command.
+     * Catches the output read from an input stream and prints it line by line
+     * on standard out. This is used to catch the stdout and stderr stream
+     * output when executing an external shell command.
      */
     private static void showOutput(InputStream in) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -616,17 +568,22 @@ public class MCRCommandLineInterface {
         benchList.clear();
     }
 
-    public static void saveMillis(String fileBaseName) throws IOException {
-        PrintStream fout = new PrintStream(fileBaseName + ".dat");
+    public static void saveMillis(String fileBaseName) {
+        try {
+            PrintStream fout = new PrintStream(fileBaseName + ".dat");
 
-        for (int i = 1; !benchList.isEmpty(); i++) {
-            fout.printf("%d %d\n", i, benchList.poll().intValue());
+            for (int i = 1; !benchList.isEmpty(); i++) {
+                fout.printf("%d %d\n", i, benchList.poll().intValue());
+            }
+            fout.close();
+        } catch (IOException ex) {
+            MCRCLIExceptionHandler.handleException(ex);
         }
-        fout.close();
     }
 
     /**
-     * Exits the command line interface. This method implements the "exit" and "quit" commands.
+     * Exits the command line interface. This method implements the "exit" and
+     * "quit" commands.
      */
     public static void exit() {
         showSessionDuration();
@@ -640,7 +597,7 @@ public class MCRCommandLineInterface {
         output("Session duration: " + duration + " ms");
     }
 
-    private static void output(String message) {
+    static void output(String message) {
         System.out.println(system + " " + message);
     }
 }
