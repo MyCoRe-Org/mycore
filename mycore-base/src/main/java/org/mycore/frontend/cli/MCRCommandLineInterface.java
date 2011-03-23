@@ -168,32 +168,11 @@ public class MCRCommandLineInterface {
             session.beginTransaction();
             List<String> commandsReturned = knownCommands.invokeCommand(command);
             session.commitTransaction();
-
-            if (commandsReturned != null) // Command was executed
-            {
-                // Add commands to queue
-                if (commandsReturned.size() > 0) {
-                    output("Queueing " + commandsReturned.size() + " commands to process");
-
-                    for (int i = 0; i < commandsReturned.size(); i++) {
-                        commandQueue.insertElementAt(commandsReturned.get(i), i);
-                    }
-                }
-            } else {
-                output("Command not understood:" + command);
-                output("Enter 'help' to get a list of commands.");
-            }
+            addCommandsToQueue(commandsReturned);
         } catch (Exception ex) {
             MCRCLIExceptionHandler.handleException(ex);
-
-            System.out.printf("%s Command failed. Performing transaction rollback...\n", system);
-            if (session.isTransactionActive()) {
-                try {
-                    session.rollbackTransaction();
-                } catch (Exception ex2) {
-                    MCRCLIExceptionHandler.handleException(ex2);
-                }
-            }
+            rollbackTransaction(session);
+            
             if (SKIP_FAILED_COMMAND) {
                 saveFailedCommand(command);
             } else {
@@ -203,10 +182,36 @@ public class MCRCommandLineInterface {
                 }
             }
         } finally {
-            if (!session.isTransactionActive()) {
-                session.beginTransaction();
-                MCRHIBConnection.instance().getSession().clear();
-                session.commitTransaction();
+            clearSession(session);
+        }
+    }
+
+    private static void clearSession(MCRSession session) {
+        if (!session.isTransactionActive()) {
+            session.beginTransaction();
+            MCRHIBConnection.instance().getSession().clear();
+            session.commitTransaction();
+        }
+    }
+
+    private static void rollbackTransaction(MCRSession session) {
+        output("Command failed. Performing transaction rollback...");
+
+        if (session.isTransactionActive()) {
+            try {
+                session.rollbackTransaction();
+            } catch (Exception ex2) {
+                MCRCLIExceptionHandler.handleException(ex2);
+            }
+        }
+    }
+
+    private static void addCommandsToQueue(List<String> commandsReturned) {
+        if (commandsReturned.size() > 0) {
+            output("Queueing " + commandsReturned.size() + " commands to process");
+
+            for (int i = 0; i < commandsReturned.size(); i++) {
+                commandQueue.insertElementAt(commandsReturned.get(i), i);
             }
         }
     }
