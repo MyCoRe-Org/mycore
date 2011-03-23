@@ -1,7 +1,5 @@
 package org.mycore.frontend.servlets;
 
-import java.util.Map;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -9,10 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRJSONUtils;
-import org.mycore.common.MCRSessionMgr;
 import org.mycore.services.i18n.MCRTranslation;
-
-import com.google.gson.Gson;
 
 public class MCRLocaleServlet extends MCRServlet {
 
