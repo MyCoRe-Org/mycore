@@ -255,7 +255,13 @@ public class MCRCommand {
      * 
      * @return the input syntax for this command
      */
-    public final String showSyntax() {
+    public final String getSyntax() {
         return messageFormat.toPattern();
+    }
+    
+    public void outputHelp() {
+        MCRCommandLineInterface.output(getSyntax());
+        MCRCommandLineInterface.output("    " + getHelpText());
+        MCRCommandLineInterface.output("");
     }
 }

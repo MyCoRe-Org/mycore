@@ -262,7 +262,7 @@ public class MCRCommandLineInterface {
                 if (commandsReturned != null) // Command was executed
                 {
                     end = System.currentTimeMillis();
-                    invokedCommand = currentCommand.showSyntax();
+                    invokedCommand = currentCommand.getSyntax();
 
                     long sum = timeNeeded.containsKey(invokedCommand) ? timeNeeded.get(invokedCommand) : 0L;
                     sum += end - start;
@@ -450,7 +450,7 @@ public class MCRCommandLineInterface {
         output("");
 
         for (MCRCommand command : knownCommands) {
-            output(command.showSyntax());
+            output(command.getSyntax());
         }
     }
 
@@ -464,8 +464,8 @@ public class MCRCommandLineInterface {
         boolean foundMatchingCommand = false;
 
         for (MCRCommand command : knownCommands) {
-            if (command.showSyntax().contains(com)) {
-                showCommandHelp(command);
+            if (command.getSyntax().contains(com)) {
+                command.outputHelp();
                 foundMatchingCommand = true;
             }
         }
@@ -473,12 +473,6 @@ public class MCRCommandLineInterface {
         if (!foundMatchingCommand) {
             output("Unknown command:" + com);
         }
-    }
-
-    private static void showCommandHelp(MCRCommand command) {
-        output(command.showSyntax());
-        output("    " + command.getHelpText());
-        output("");
     }
 
     /**
