@@ -29,7 +29,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -39,7 +38,6 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
@@ -71,9 +69,6 @@ public class MCRCommandLineInterface {
     /** The name of the system */
     private static String system = null;
 
-    /** The array holding all known commands */
-    protected static ArrayList<MCRCommand> knownCommands = new ArrayList<MCRCommand>();
-
     /** A queue of commands waiting to be executed */
     protected static Vector<String> commandQueue = new Vector<String>();
 
@@ -85,68 +80,8 @@ public class MCRCommandLineInterface {
 
     private static boolean SKIP_FAILED_COMMAND = false;
 
-    private static void initKnownCommands() {
-        try {
-            initBuiltInCommands();
-            initConfiguredCommands("Internal");
-            initConfiguredCommands("External");
-        } catch (Exception ex) {
-            MCRCLIExceptionHandler.handleException(ex);
-            System.exit(1);
-        }
-    }
-
-    private static void initBuiltInCommands() {
-        knownCommands.add(new MCRCommand("process {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.readCommandsFile String",
-                "Execute the commands listed in the text file {0}."));
-        knownCommands.add(new MCRCommand("help {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.showCommandsHelp String",
-                "Show the help text for the commands beginning with {0}."));
-        knownCommands.add(new MCRCommand("help", "org.mycore.frontend.cli.MCRCommandLineInterface.listKnownCommands", "List all possible commands."));
-        knownCommands.add(new MCRCommand("exit", "org.mycore.frontend.cli.MCRCommandLineInterface.exit", "Stop and exit the commandline tool."));
-        knownCommands.add(new MCRCommand("quit", "org.mycore.frontend.cli.MCRCommandLineInterface.exit", "Stop and exit the commandline tool."));
-        knownCommands.add(new MCRCommand("! {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.executeShellCommand String",
-                "Execute the shell command {0}, for example '! ls' or '! cmd /c dir'"));
-        knownCommands.add(new MCRCommand("show file {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.show String", "Show contents of local file {0}"));
-        knownCommands.add(new MCRCommand("whoami", "org.mycore.frontend.cli.MCRCommandLineInterface.whoami", "Print the current user."));
-        knownCommands.add(new MCRCommand("show command statistics", "org.mycore.frontend.cli.MCRCommandLineInterface.showCommandStatistics",
-                "Show statistics on number of commands processed and execution time needed per command"));
-        knownCommands.add(new MCRCommand("cancel on error", "org.mycore.frontend.cli.MCRCommandLineInterface.cancelOnError",
-                "Cancel execution of further commands in case of error"));
-        knownCommands.add(new MCRCommand("skip on error", "org.mycore.frontend.cli.MCRCommandLineInterface.skipOnError",
-                "Skip execution of failed command in case of error"));
-        knownCommands.add(new MCRCommand("get uri {0} to file {1}", "org.mycore.frontend.cli.MCRCommandLineInterface.getURI String String",
-                "Get XML content from URI {0} and save it to a local file {1}"));
-    }
-
-    /** Read internal and/or external commands */
-    private static void initConfiguredCommands(String type) {
-        String propertyName = "MCR.CLI.Classes." + type;
-        String[] classNames = MCRConfiguration.instance().getString(propertyName, "").split(",");
-
-        for (String className : classNames) {
-            className = className.trim();
-            if (className.isEmpty())
-                continue;
-            logger.debug("Will load commands from the " + type.toLowerCase() + " class " + className);
-            addKnownCommandsFromClass(className);
-        }
-    }
-
-    private static void addKnownCommandsFromClass(String className) {
-        Object obj = buildInstanceOfClass(className);
-        ArrayList<MCRCommand> commands = ((MCRExternalCommandInterface) obj).getPossibleCommands();
-        knownCommands.addAll(commands);
-    }
-
-    private static Object buildInstanceOfClass(String className) {
-        try {
-            return Class.forName(className).newInstance();
-        } catch (Exception ex) {
-            String msg = "Could not instantiate class " + className;
-            throw new MCRConfigurationException(msg, ex);
-        }
-    }
-
+    private static MCRKnownCommands knownCommands;
+    
     /**
      * The main method that either shows up an interactive command prompt or
      * reads a file containing a list of commands to be processed
@@ -160,7 +95,7 @@ public class MCRCommandLineInterface {
         output("");
         output("Initializing...");
 
-        initKnownCommands();
+        knownCommands = new MCRKnownCommands();
 
         output("Initialization done.");
         output("Type 'help' to list all commands!");
@@ -234,12 +169,6 @@ public class MCRCommandLineInterface {
         MCRSessionMgr.setCurrentSession(session);
     }
 
-    /** Stores total time needed for all executions of the given command */
-    protected static HashMap<String, Long> timeNeeded = new HashMap<String, Long>();
-
-    /** Stores total number of executions for each command */
-    protected static HashMap<String, Integer> numInvocations = new HashMap<String, Integer>();
-
     /**
      * Processes a command entered by searching a matching command in the list
      * of known commands and executing its method.
@@ -248,46 +177,28 @@ public class MCRCommandLineInterface {
      *            The command string to be processed
      */
     protected static void processCommand(String command) {
-        long start = 0, end = 0;
-        List<String> commandsReturned = null;
+
         String invokedCommand = null;
         MCRSession session = MCRSessionMgr.getCurrentSession();
 
         try {
+            
             session.beginTransaction();
-            for (MCRCommand currentCommand : knownCommands) {
-                start = System.currentTimeMillis();
-                commandsReturned = currentCommand.invoke(command);
+            List<String> commandsReturned = knownCommands.invokeCommand(command);
+            session.commitTransaction();
+            
+            if (commandsReturned != null) // Command was executed
+            {
+                // Add commands to queue
+                if (commandsReturned.size() > 0) {
+                    System.out.println(system + " Queueing " + commandsReturned.size() + " commands to process");
 
-                if (commandsReturned != null) // Command was executed
-                {
-                    end = System.currentTimeMillis();
-                    invokedCommand = currentCommand.getSyntax();
-
-                    long sum = timeNeeded.containsKey(invokedCommand) ? timeNeeded.get(invokedCommand) : 0L;
-                    sum += end - start;
-                    timeNeeded.put(invokedCommand, sum);
-
-                    int num = 1 + (numInvocations.containsKey(invokedCommand) ? numInvocations.get(invokedCommand) : 0);
-                    numInvocations.put(invokedCommand, num);
-
-                    // Add commands to queue
-                    if (commandsReturned.size() > 0) {
-                        System.out.println(system + " Queueing " + commandsReturned.size() + " commands to process");
-
-                        for (int i = 0; i < commandsReturned.size(); i++) {
-                            commandQueue.insertElementAt(commandsReturned.get(i), i);
-                        }
+                    for (int i = 0; i < commandsReturned.size(); i++) {
+                        commandQueue.insertElementAt(commandsReturned.get(i), i);
                     }
-
-                    break;
                 }
             }
-            session.commitTransaction();
-            if (commandsReturned != null) {
-                System.out.printf("%s Command processed (%d ms)\n", system, (end - start));
-                addMillis(end - start);
-            } else {
+            else {
                 if (interactiveMode) {
                     System.out.printf("%s Command not understood. Enter 'help' to get a list of commands.\n", system);
                 } else {
@@ -320,22 +231,6 @@ public class MCRCommandLineInterface {
                 session.commitTransaction();
             }
         }
-    }
-
-    /**
-     * Shows statistics on number of invocations and time needed for each
-     * command successfully executed.
-     */
-    public static void showCommandStatistics() {
-        System.out.println();
-        for (Object key : timeNeeded.keySet().toArray()) {
-            long tn = timeNeeded.get(key);
-            int num = numInvocations.get(key);
-
-            System.out.println(key);
-            System.out.println("  total: " + tn + " ms, average: " + tn / num + " ms, " + num + " invocations.");
-        }
-        System.out.println();
     }
 
     protected static void saveQueue(String lastCommand) {
@@ -439,40 +334,6 @@ public class MCRCommandLineInterface {
 
         reader.close();
         return list;
-    }
-
-    /**
-     * Shows a list of commands understood by the command line interface and
-     * shows their input syntax. This method implements the "help" command
-     */
-    public static void listKnownCommands() {
-        output("The following " + knownCommands.size() + " commands can be used:");
-        output("");
-
-        for (MCRCommand command : knownCommands) {
-            output(command.getSyntax());
-        }
-    }
-
-    /**
-     * Shows the help text for one or more commands.
-     * 
-     * @param com
-     *            the command, or a fragment of it
-     */
-    public static void showCommandsHelp(String com) {
-        boolean foundMatchingCommand = false;
-
-        for (MCRCommand command : knownCommands) {
-            if (command.getSyntax().contains(com)) {
-                command.outputHelp();
-                foundMatchingCommand = true;
-            }
-        }
-
-        if (!foundMatchingCommand) {
-            output("Unknown command:" + com);
-        }
     }
 
     /**
