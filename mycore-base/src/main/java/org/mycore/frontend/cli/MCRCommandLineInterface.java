@@ -118,6 +118,8 @@ public class MCRCommandLineInterface {
         String[] classNames = MCRConfiguration.instance().getString(propertyName, "").split(",");
 
         for (String className : classNames) {
+            className = className.trim();
+            if( className.isEmpty() ) continue;
             logger.debug("Will load commands from the " + type.toLowerCase() + " class " + className);
             addKnownCommandsFromClass(className);
         }
