@@ -38,8 +38,8 @@ import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
 
 /**
- * Represents a stored file with its metadata and content. USED BY MILESS 1.3
- * ONLY!
+ * Represents a stored file with its metadata and content. 
+ * USED BY MILESS ONLY!
  * 
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
