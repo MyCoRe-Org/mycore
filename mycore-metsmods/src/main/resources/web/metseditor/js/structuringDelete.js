@@ -29,10 +29,10 @@ function deleteStructure() {
 	var tree = dijit.byId("itemTree");
 	var tracker = new SelectionTracker.getInstance();
 
-	log("Elements to delete : " + tracker.getSelectedItems().length);
-	var l = tracker.getSelectedItems().length;
+	log("Elements to delete : " + tree.selectedItems.length);
+	var l = tree.selectedItems.length;
 	for ( var j = 0; j < l; j++) {
-		var selectedItem = tracker.getSelectedItems()[j];
+		var selectedItem = tree.selectedItems[j];
 		log("try to delete " + selectedItem);
 		
 		/* Checks selected element is (not) empty */

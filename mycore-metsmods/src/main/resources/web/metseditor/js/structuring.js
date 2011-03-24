@@ -30,23 +30,64 @@ function toggleStructureButtons(event) {
 	var selectedItem = tree.lastFocused.item;
 
 	if (selectedItem.type == "item") {
-		disableAddStructureButton(false);
+		
 		disableEditStructureButton(false);
 		disableDeleteStructureButton(true);
 	} else {
-		disableAddStructureButton(false);
+		//disableAddStructureButton(false);
 		/* the root of the tree mudoarst not be edited */
 		var tree = dijit.byId("itemTree");
 		var model = tree.model;
 
 		if (model.root == selectedItem) {
+			
+			//
+		} else {
+			
+			//disableDeleteStructureButton(false);
+		}
+		
+		
+
+	}
+	disableEditStructureButton(false);
+	disableDeleteStructureButton(false);
+	disableAddStructureButton(false);
+	
+	var l = tree.selectedItems.length;
+	
+	/*
+	 * if there more then one item Selected 
+	 * you cannot edit the structure
+	 * 
+	 * */
+	if( l > 1){
+		disableEditStructureButton(true);
+	}
+	
+
+	for ( var j = 0; j < l; j++) {
+		var selectedItem = tree.selectedItems[j];
+		
+		/*
+		 * if there is one Item in selected items
+		 * you cannot edit the structure 
+		 * and you cannot delete the structure
+		 */
+		if(selectedItem.type == "item"){
 			disableEditStructureButton(true);
 			disableDeleteStructureButton(true);
-		} else {
-			disableEditStructureButton(false);
-			disableDeleteStructureButton(false);
 		}
+		
+		/*
+		 * if there is one category in selected items
+		 * you cannot add a category
+		 *
+		if( selectedItem.type != "category"){
+			disableAddStructureButton(true);
+		} */
 	}
+	
 }
 
 function disableAddStructureButton(flag) {
@@ -119,7 +160,8 @@ function addStructureToTree() {
 	}
 
 	var pages = new Array();
-	var selectedItems = tracker.getSelectedItems();
+	var selectedItems = tree.selectedItems;
+
 
 	/* push all items to pages */
 	log("backup Elements");
