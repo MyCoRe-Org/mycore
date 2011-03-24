@@ -85,8 +85,8 @@ public class MCRKnownCommands {
 
     private void addKnownCommandsFromClass(String className) {
         Object obj = buildInstanceOfClass(className);
-        ArrayList<MCRCommand> commands = ((MCRExternalCommandInterface) obj).getPossibleCommands();
-        commands.addAll(commands);
+        ArrayList<MCRCommand> commandsToAdd = ((MCRExternalCommandInterface) obj).getPossibleCommands();
+        commands.addAll(commandsToAdd);
     }
 
     private Object buildInstanceOfClass(String className) {
