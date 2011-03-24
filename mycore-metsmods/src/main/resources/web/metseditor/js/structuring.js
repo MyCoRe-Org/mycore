@@ -29,27 +29,7 @@ function toggleStructureButtons(event) {
 	var tree = dijit.byId("itemTree");
 	var selectedItem = tree.lastFocused.item;
 
-	if (selectedItem.type == "item") {
-		
-		disableEditStructureButton(false);
-		disableDeleteStructureButton(true);
-	} else {
-		//disableAddStructureButton(false);
-		/* the root of the tree mudoarst not be edited */
-		var tree = dijit.byId("itemTree");
-		var model = tree.model;
 
-		if (model.root == selectedItem) {
-			
-			//
-		} else {
-			
-			//disableDeleteStructureButton(false);
-		}
-		
-		
-
-	}
 	disableEditStructureButton(false);
 	disableDeleteStructureButton(false);
 	disableAddStructureButton(false);
