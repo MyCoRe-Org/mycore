@@ -104,6 +104,15 @@ public interface MCRCategLinkService {
     public abstract Collection<String> getLinksFromCategory(MCRCategoryID id);
 
     /**
+     * Returns a list of linked Object IDs.
+     * 
+     * @param id
+     *            ID of the category
+     * @return Collection of Object IDs, empty Collection when no links exist
+     */
+    public abstract boolean isInCategory(String objectId, MCRCategoryID id);
+
+    /**
      * Returns a list of linked Object IDs restricted by the specified type.
      * 
      * @param id

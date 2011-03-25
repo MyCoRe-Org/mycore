@@ -204,6 +204,19 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         assertTrue("Category should be in use", SERVICE.hasLinks(germany).get(germany.getId()).booleanValue());
     }
 
+    @Test
+    public void isInCategory() {
+        MCRCategoryImpl germany = (MCRCategoryImpl) category.getChildren().get(0).getChildren().get(0);
+        MCRCategoryImpl europe = (MCRCategoryImpl) category.getChildren().get(0);
+        MCRCategoryImpl asia = (MCRCategoryImpl) category.getChildren().get(1);
+        MCRObjectReference jena = new MCRObjectReference("Jena", "city");
+        addTestLinks();
+        startNewTransaction();
+        assertTrue("Jena should be in Germany", SERVICE.isInCategory(jena.getObjectID(), germany.getId()));
+        assertTrue("Jena should be in Europe", SERVICE.isInCategory(jena.getObjectID(), europe.getId()));
+        assertFalse("Jena should not be in Asia", SERVICE.isInCategory(jena.getObjectID(), asia.getId()));
+    }
+
     private void loadWorldClassification() throws URISyntaxException, MCRException, SAXParseException {
         URL worlClassUrl = this.getClass().getResource(WORLD_CLASS_RESOURCE_NAME);
         Document xml = MCRXMLHelper.parseURI(worlClassUrl.toURI());

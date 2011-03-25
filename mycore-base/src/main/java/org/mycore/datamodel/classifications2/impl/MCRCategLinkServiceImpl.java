@@ -299,4 +299,14 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     public boolean hasLink(MCRCategory mcrCategory) {
         return !hasLinks(mcrCategory).isEmpty();
     }
+
+    @Override
+    public boolean isInCategory(String objectId, MCRCategoryID id) {
+        Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(LINK_CLASS.getName() + ".CategoryAndObjectID");
+        q.setCacheable(true);
+        q.setParameter("rootID", id.getRootID());
+        q.setParameter("categID", id.getID());
+        q.setParameter("objectID", objectId);
+        return !q.list().isEmpty();
+    }
 }

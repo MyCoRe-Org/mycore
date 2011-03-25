@@ -102,6 +102,18 @@ DELETE FROM MCRCategoryLink WHERE objectReference.objectID IN (:ids)
 SELECT objectReference.objectID FROM MCRCategoryLink WHERE category.rootID=:rootID and category.categID=:categID
       ]]>
     </query>
+    <query name="CategoryAndObjectID">
+      <![CDATA[
+SELECT link.objectReference.objectID
+  FROM MCRCategoryLink link, MCRCategoryImpl cat, MCRCategoryImpl cattree
+  WHERE cattree.internalID = link.category
+    AND link.objectReference.objectID=:objectID
+    AND cattree.rootID=:rootID
+    AND cat.rootID=:rootID
+    AND cat.categID=:categID
+    AND cattree.left BETWEEN cat.left AND cat.right
+      ]]>
+    </query>
     <query name="ObjectIDByCategoryAndType">
       <![CDATA[
 SELECT objectReference.objectID FROM MCRCategoryLink WHERE category.rootID=:rootID and category.categID=:categID and objectReference.type=:type
