@@ -23,12 +23,12 @@
 
 package org.mycore.common.events;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
-import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
@@ -47,6 +47,49 @@ import org.mycore.services.fieldquery.MCRSearcherFactory;
  * @author Frank Lützenkirchen
  */
 public class MCREventManager {
+
+    /**
+     * Parse the property key of event handlers, extract type and mode.
+     * 
+     * @see MCREventHandler
+     * 
+     * @author Huu Chi Vu
+     *
+     */
+    private class EventHandlerProperty {
+
+        private String type;
+
+        private String mode;
+
+        public EventHandlerProperty(String propertyKey) {
+            String[] splitedKey = propertyKey.split("\\.");
+            if (splitedKey.length != 5) {
+                throw new MCRConfigurationException("Property key " + propertyKey + " for event handler not valid.");
+            }
+
+            this.setType(splitedKey[2]);
+            this.setMode(splitedKey[4]);
+        }
+
+        private void setType(String type) {
+            this.type = type;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        private void setMode(String mode) {
+            this.mode = mode;
+        }
+
+        public String getMode() {
+            return mode;
+        }
+
+    }
+
     private static Logger logger = Logger.getLogger(MCREventManager.class);
 
     private static MCREventManager instance;
@@ -80,52 +123,53 @@ public class MCREventManager {
             return;
         }
 
-        List<String> names = new ArrayList<String>(props.size());
+        List<String> propertyKeyList = new ArrayList<String>(props.size());
         for (Object name : props.keySet()) {
-            names.add(name.toString());
+            propertyKeyList.add(name.toString());
         }
-        Collections.sort(names);
+        Collections.sort(propertyKeyList);
 
-        List<MCREventHandler> instances = null;
+        for (String propertyKey : propertyKeyList) {
+            EventHandlerProperty eventHandlerProperty = new EventHandlerProperty(propertyKey);
 
-        for (int i = 0; i < names.size(); i++) {
-            String name = names.get(i);
+            String type = eventHandlerProperty.getType();
+            String mode = eventHandlerProperty.getMode();
 
-            StringTokenizer st = new StringTokenizer(name, ".");
-            st.nextToken();
-            st.nextToken();
-
-            String type = st.nextToken();
-            int nr = Integer.parseInt(st.nextToken());
-            String mode = st.nextToken(); // "Class" or "Indexer"
-
-            if (nr == 1) {
-                instances = new ArrayList<MCREventHandler>();
-                handlers.put(type, instances);
-            }
-
-            logger.debug("EventManager instantiating handler " + config.getString(name) + " for type " + type);
+            logger.debug("EventManager instantiating handler " + config.getString(propertyKey) + " for type " + type);
 
             Object handler = null;
 
-            if ("Class".equals(mode)) {
-                if (config.getString(name).length() == 0) {
-                    //if property from mycore.properties is overwritten with empty value
-                    //by mycore.properties.private
-                    continue;
+            if (propKeyIsSet(propertyKey)) {
+                if ("Class".equals(mode)) {
+                    handler = config.getSingleInstanceOf(propertyKey);
+                } else if("Indexer".equals(mode)){
+                    handler = MCRSearcherFactory.getSearcher(config.getString(propertyKey));
+                } else{
+                    throw new MCRConfigurationException(MessageFormat.format("Unsupported mode {0} for event handler.", mode));
                 }
-                handler = config.getSingleInstanceOf(name);
-            } else { // "Indexer"
-                handler = MCRSearcherFactory.getSearcher(config.getString(name));
-            }
 
-            if (!(handler instanceof MCREventHandler)) {
-                String msg = "Error: Class does not implement MCREventHandler: " + name;
-                throw new MCRConfigurationException(msg);
-            }
+                if (!(handler instanceof MCREventHandler)) {
+                    String msg = "Error: Class does not implement MCREventHandler: " + propertyKey;
+                    throw new MCRConfigurationException(msg);
+                }
 
-            instances.add((MCREventHandler) handler);
+                getOrCreateEventHandlerListOfType(type).add((MCREventHandler) handler);
+            }
         }
+    }
+
+    private boolean propKeyIsSet(String propertyKey) {
+        return MCRConfiguration.instance().getString(propertyKey).length() != 0;
+    }
+
+    private List<MCREventHandler> getOrCreateEventHandlerListOfType(String type) {
+        List<MCREventHandler> eventHandlerList = handlers.get(type);
+        if (eventHandlerList == null) {
+            eventHandlerList = new ArrayList<MCREventHandler>();
+            handlers.put(type, eventHandlerList);
+        }
+
+        return eventHandlerList;
     }
 
     /** Call event handlers in forward direction (create, update) */
@@ -191,7 +235,7 @@ public class MCREventManager {
                 logger.error("Exception caught while calling undo of event handler", ex);
             }
         }
-        
+
         if (handleEventExceptionCaught != null) {
             String msg = "Exception caught in EventHandler, rollback by calling undo of successfull handlers done.";
             throw new MCRException(msg, handleEventExceptionCaught);
