@@ -3,11 +3,19 @@
  */
 package org.mycore.tools;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.io.StringReader;
+
+import org.jdom.Content;
 import org.jdom.DocType;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.Namespace;
+import org.jdom.Text;
+import org.jdom.input.JDOMParseException;
+import org.jdom.input.SAXBuilder;
+import org.mycore.frontend.servlets.MCRServlet;
 
 /**
  * This class provides a simple way to dynamically create MyCoRe webpages. These pages might be rendered 
@@ -30,44 +38,61 @@ import org.jdom.Namespace;
  * @author shermann
  */
 public class MyCoReWebPageProvider {
+    public static final String MYCORE_WEBPAGE = "MyCoReWebPage";
+
     /** German language key */
     public static final String EN = "en";
 
     /** English language key */
     public static final String DE = "de";
 
-    private static Logger LOGGER = Logger.getLogger(MyCoReWebPageProvider.class);
-
     private Document xml;
 
     public MyCoReWebPageProvider() {
-        xml = new Document();
-        xml.setDocType(new DocType("MyCoReWebPage"));
-        xml.setRootElement(new Element("MyCoReWebPage"));
+        this.xml = new Document();
+        this.xml.setDocType(new DocType(MYCORE_WEBPAGE));
+        this.xml.setRootElement(new Element(MYCORE_WEBPAGE));
     }
 
     /**
      * Adds a section to the MyCoRe webpage.
      * @param title the title of the section
-     * @param text the message contained within the section
+     * @param xmlAsText xml string which is added to the section
      * @param lang the language of the section specified by a language key.
+     * @return added section
      */
-    public void addSection(String title, String text, String lang) {
-        if (text == null || lang == null || lang.length() != 2) {
-            LOGGER.warn("Section could not be added as either \"text\" or \"lang\" is null");
-            return;
+    public Element addSection(String title, String xmlAsString, String lang) throws IOException, JDOMException {
+        Content content = null;
+        try {
+            SAXBuilder saxBuilder = new SAXBuilder();
+            StringReader reader = new StringReader(xmlAsString);
+            Document doc = saxBuilder.build(reader);
+            content = doc.getRootElement();
+            content.detach();
+        } catch(JDOMParseException jdomParseExc) {
+            content = new Text(xmlAsString);
         }
-        Element section = new Element("section");
-        section.setAttribute("lang", lang, Namespace.XML_NAMESPACE);
+        return this.addSection(title, content, lang);
+    }
 
-        if (title == null || title.length() == 0) {
+    /**
+     * Adds a section to the MyCoRe webpage.
+     * @param title the title of the section
+     * @param content jdom element which is added to the section
+     * @param lang the language of the section specified by a language key.
+     * @return added section
+     */
+    public Element addSection(String title, Content content, String lang) {
+        Element section = new Element("section");
+        if(lang != null) {
+            section.setAttribute("lang", lang, Namespace.XML_NAMESPACE);
+        }
+        if (title != null && !title.equals("")) {
             section.setAttribute("title", title);
         }
-
-        Element paragraph = new Element("p");
-        section.addContent(paragraph);
-        paragraph.setText(text);
-        xml.getRootElement().addContent(section);
+        section.addContent(content);
+        this.xml.getRootElement().addContent(section);
+        return section;
     }
 
     /**
