@@ -89,7 +89,7 @@ public class MCRSWORDServiceDocumentServlet extends MCRServlet {
 
         // Are there any authentication details?
         Pair<String, String> requestAuthData = MCRSWORDUtils.readBasicAuthData(request);
-        if (authenticator.authenticate(requestAuthData.first, requestAuthData.second)) {
+        if (requestAuthData != null && authenticator.authenticate(requestAuthData.first, requestAuthData.second)) {
             sdr.setUsername(requestAuthData.first);
             sdr.setPassword(requestAuthData.second);
         } else {

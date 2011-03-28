@@ -124,6 +124,9 @@ public class MCRSWORDAuthenticator {
      */
     private boolean handleBasicAuth(String username, String password) throws IOException {
 
+        if (username == null)
+            return false;
+        
         loadBasicAuthData();
         try {
 
