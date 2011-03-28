@@ -5,6 +5,8 @@ package org.mycore.tools;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.jdom.Content;
 import org.jdom.DocType;
@@ -93,6 +95,38 @@ public class MyCoReWebPageProvider {
         section.addContent(content);
         this.xml.getRootElement().addContent(section);
         return section;
+    }
+
+    /**
+     * Updates the meta element of the webpage.
+     * 
+     * @param editor last editor of webpage
+     * @param labelPath path info
+     */
+    public void updateMeta(String editor, String labelPath) {
+        // get meta & log element
+        Element meta = this.xml.getRootElement().getChild("meta");
+        if(meta == null) {
+            meta = new Element("meta");
+            this.xml.getRootElement().addContent(meta);
+        }
+        Element log = meta.getChild("log");
+        if(log == null) {
+            log = new Element("log");
+            meta.addContent(log);
+        }
+        // update attributes
+        if(editor != null) {
+            log.setAttribute("lastEditor", editor);
+        }
+        if(labelPath != null) {
+            log.setAttribute("labelPath", labelPath);
+        }
+        Date date = new Date(System.currentTimeMillis());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        log.setAttribute("date", dateFormat.format(date));
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+        log.setAttribute("time", timeFormat.format(date));
     }
 
     /**

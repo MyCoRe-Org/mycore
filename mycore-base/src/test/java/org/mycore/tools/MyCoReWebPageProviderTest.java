@@ -33,4 +33,18 @@ public class MyCoReWebPageProviderTest extends MCRTestCase {
         assertEquals(3, wp.getXML().getRootElement().getContentSize());
     }
 
+    @Test
+    public void updateMeta() throws Exception {
+        MyCoReWebPageProvider wp = new MyCoReWebPageProvider();
+        wp.updateMeta("myId", "myPath");
+        Element rootElement = wp.getXML().getRootElement();
+        Element meta = rootElement.getChild("meta");
+        assertNotNull(meta);
+        Element log = meta.getChild("log");
+        assertNotNull(log);
+        assertNotNull(log.getAttribute("date"));
+        assertNotNull(log.getAttribute("time"));
+        assertEquals("myId", log.getAttributeValue("lastEditor"));
+        assertEquals("myPath", log.getAttributeValue("labelPath"));
+    }
 }
