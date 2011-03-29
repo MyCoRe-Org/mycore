@@ -67,7 +67,7 @@ iview.chapter.View = function() {
 						that._selected = node;
 						//in case a branch was clicked with no files itself redirect to the first subchapter with content in it
 						if (jQuery(that._selected).attr("order") == Number.MAX_VALUE) {
-							that._selected = jQuery(that._selected).find("li[order!=" + Number.MAX_VALUE + "]").first();
+							that._selected = jQuery(that._selected).find("li[order!='" + Number.MAX_VALUE + "']").first();
 							that.selectNode(that._selected.attr("logid"));
 						}
 						that.onevent.notify({"type":'selected', 

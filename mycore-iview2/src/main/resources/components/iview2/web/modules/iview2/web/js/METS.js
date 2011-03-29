@@ -674,7 +674,7 @@ iview.METS.ChapterModel = function(element) {
 	 */
 	function setSelected(logid) {
 		logid = this._containedIn[logid].getID();
-		var newSelected = getHash(logid, this);
+		var newSelected = getHash.call(this, logid);
 		if (newSelected != null) {
 			var oldSelected = (this._selected != null)? this._selected.getOrder(): null;
 			var oldID = (this._selected != null)? this._selected.getID(): null;
