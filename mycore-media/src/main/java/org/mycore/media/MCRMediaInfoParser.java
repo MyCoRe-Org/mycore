@@ -34,6 +34,17 @@ import org.mycore.media.NativeLibExporter;
 /**
  * This Class implements a parser of various files using the MediaInfo 
  * library.
+ * <br>
+ * To get this working you need some libraries like MediaInfo and ffmpeg.
+ * <br>
+ * On <b>Windows or Mac</b> you can cross your fingers all needed libraries came 
+ * with the module.
+ * <br>
+ * If you using an <b>*nix system</b> follow the link and install MediaInfo Lib
+ * and the Zen Lib.
+ * <br>
+ * You need also installed the ffmpeg libraries and the 
+ * application for your system. 
  * 
  * @see <a href="http://mediainfo.sourceforge.net/">MediaInfo</a>
  * 
