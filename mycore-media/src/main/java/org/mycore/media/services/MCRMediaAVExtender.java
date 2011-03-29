@@ -1,3 +1,26 @@
+/*
+ * 
+ * $Revision$ $Date$
+ *
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
+ *
+ * This program is free software; you can use it, redistribute it
+ * and / or modify it under the terms of the GNU General Public License
+ * (GPL) as published by the Free Software Foundation; either version 2
+ * of the License or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program, in a file called gpl.txt or license.txt.
+ * If not, write to the Free Software Foundation Inc.,
+ * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ */
+
 package org.mycore.media.services;
 
 import java.io.OutputStream;
@@ -7,6 +30,8 @@ import org.apache.log4j.Logger;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.ifs.MCRAudioVideoExtender;
 import org.mycore.datamodel.ifs.MCRFileReader;
+import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
+import org.mycore.datamodel.ifs.MCRFileContentType;
 import org.mycore.media.MCRAudioObject;
 import org.mycore.media.MCRMediaObject;
 import org.mycore.media.MCRMediaParser;
@@ -68,24 +93,124 @@ public class MCRMediaAVExtender extends MCRAudioVideoExtender {
         }
     }
     
+    /**
+     * Returns the Media Object.
+     * 
+     * @return the Media Object
+     */
     public MCRMediaObject getMediaObject() {
         return media;
     }
     
+    /**
+     * Returns the Video Object if is a Video file.
+     * 
+     * @return the Video Object or null
+     */
     public MCRVideoObject getVideoObject() {
         return ( isVideo() ? (MCRVideoObject)media : null );
     }
     
+    /**
+     * Returns the Audio Object if is a Audio file.
+     * 
+     * @return the Audio Object or null
+     */
     public MCRAudioObject getAudioObject() {
         return ( isAudio() ? (MCRAudioObject)media : null );
     }
     
+    /**
+     * Checks if Media Object is a Video.
+     * 
+     * @return bool
+     */
     public boolean isVideo() {
         return ( media != null ? media.getType() == MCRMediaObject.MediaType.VIDEO : false );
     }
     
+    /**
+     * Checks if Media Object is a Audio.
+     * 
+     * @return bool
+     */
     public boolean isAudio() {
         return ( media != null ? media.getType() == MCRMediaObject.MediaType.AUDIO : false );
+    }
+
+    /**
+     * Returns the ID of the content type of this asset
+     * 
+     * @return the ID of the content type of this asset
+     */
+    public String getContentTypeID() {
+        if ( media.getMimeType() != null ) {
+            try {
+                LOGGER.info( "Try to detect file content type by mime type '" + media.getMimeType() + "'..." );
+                MCRFileContentType cType = MCRFileContentTypeFactory.getTypeByMimeType( media.getMimeType() );
+                contentTypeID = cType.getID();
+            } catch ( Throwable ex ) {
+                LOGGER.info( "Try to detect file content type with extension '" + file.getExtension() + "'..." );
+                try {
+                    MCRFileContentType cType = MCRFileContentTypeFactory.getType( file.getExtension() );
+                    contentTypeID = cType.getID();
+                } catch ( Throwable ex2 ) {
+                    LOGGER.info( "Try to detect file content type with format '" + media.getFormat() + "'..." );
+                    contentTypeID = detectContentTypeIDByFormat( media.getFormat() );
+                    if ( contentTypeID == null ) {
+                        LOGGER.info( "Try to detect file content type with subformat '" + ( isVideo() ? getVideoObject().getSubFormat() : getAudioObject().getSubFormat() ) + "'..." );
+                        contentTypeID = detectContentTypeIDByFormat( isVideo() ? getVideoObject().getSubFormat() : getAudioObject().getSubFormat() );
+                        if ( contentTypeID == null ) {
+                            contentTypeID = file.getContentTypeID();
+                        }
+                    }
+                }
+            }
+        } else {
+            LOGGER.info( "Try to detect file content type with extension '" + file.getExtension() + "'..." );
+            try {
+                MCRFileContentType cType = MCRFileContentTypeFactory.getType( file.getExtension() );
+                contentTypeID = cType.getID();
+            } catch ( Throwable ex2 ) {
+                LOGGER.info( "Try to detect file content type with format '" + media.getFormat() + "'..." );
+                contentTypeID = detectContentTypeIDByFormat( media.getFormat() );
+                if ( contentTypeID == null ) {
+                    LOGGER.info( "Try to detect file content type with subformat '" + ( isVideo() ? getVideoObject().getSubFormat() : getAudioObject().getSubFormat() ) + "'..." );
+                    contentTypeID = detectContentTypeIDByFormat( isVideo() ? getVideoObject().getSubFormat() : getAudioObject().getSubFormat() );
+                    if ( contentTypeID == null ) {
+                        contentTypeID = file.getContentTypeID();
+                    }
+                }
+            }
+        }
+
+        return contentTypeID;
+    }
+    
+    /**
+     * Returns the ID of the content type witch detected by parsing format string.
+     * 
+     * @param can be the format of the media container or the subformat of stream.
+     * @return the ID of the content type
+     */
+    private String detectContentTypeIDByFormat( String format ) {
+        String cType = null;
+        
+        if (format.indexOf("MPEG Layer 3") >= 0) {
+            cType = "mp3";
+        } else if (format.indexOf("MPEG") >= 0) {
+            cType = "mpegvid";
+        } else if (format.indexOf("RealVideo") >= 0) {
+            cType = "realvid";
+        } else if (format.indexOf("RealAudio") >= 0) {
+            cType = "realaud";
+        } else if (format.indexOf("Flash Video") >= 0) {
+            cType = "flv";
+        } else if (format.indexOf("Wave File") >= 0) {
+            cType = "wav";
+        }
+        
+        return cType;
     }
     
     public void getPlayerStarterTo(OutputStream out, String startPos, String stopPos) throws MCRPersistenceException {};
