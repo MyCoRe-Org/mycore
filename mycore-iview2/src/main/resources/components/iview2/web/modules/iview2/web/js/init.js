@@ -113,10 +113,7 @@ genProto.initializeGraphic = function(viewID) {
 		this.iview.viewerBean.viewID = viewID;//Add Viewer ID mit übergeben damit der Viewer darauf arbeiten kann
 
 		this.iview.viewerBean.init();
-		//Newer Opera/Safari Versions need somehow something from reinitGraphics to show the viewer on Startup
-		if (navigator.userAgent.match(/Opera(.*)?Version\/10\.[0-9]*/i) || isBrowser(["Safari"])) {
-			this.reinitializeGraphic();
-		}
+		this.reinitializeGraphic();
 	}
 }
 
@@ -136,8 +133,7 @@ genProto.reinitializeGraphic = function() {
 	if (window.innerWidth) {
 		curWidth = window.innerWidth;
 		curHeight = window.innerHeight;
-	}
-	else {
+	} else {
 		curWidth = (document.compatMode == 'CSS1Compat' ? document.documentElement.clientWidth : document.body.clientWidth);
 		curHeight = (document.compatMode == 'CSS1Compat' ? document.documentElement.clientHeight : document.body.clientHeight);
 	}
