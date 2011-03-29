@@ -25,6 +25,7 @@ package org.mycore.datamodel.ifs;
 
 import java.util.Hashtable;
 import java.util.List;
+import java.util.HashSet;
 
 import org.jdom.Element;
 import org.mycore.common.MCRArgumentChecker;
@@ -109,6 +110,29 @@ public class MCRFileContentTypeFactory {
             return (MCRFileContentType) typesTable.get(ID);
         }
         String msg = "There is no file content type with ID = " + ID + " configured";
+        throw new MCRConfigurationException(msg);
+    }
+    
+    /**
+     * Returns the file content type with the given mime type
+     * 
+     * @param mimeType
+     *            The non-null mimeType of the content type that should be returned
+     * @return The file content type with the given ID
+     * 
+     * @throws MCRConfigurationException
+     *             if no such file content type is known in the system
+     */
+    public static MCRFileContentType getTypeByMimeType(String mimeType) throws MCRConfigurationException {
+        HashSet<String> types = new HashSet( typesTable.keySet() );
+        
+        for ( String key : types ) {
+            MCRFileContentType contentType = (MCRFileContentType)typesTable.get(key);
+            
+            if ( mimeType.equals( contentType.getMimeType() ) )
+                return (MCRFileContentType) typesTable.get(key);
+        }
+        String msg = "There is no file content type for mime type = " + mimeType + " configured";
         throw new MCRConfigurationException(msg);
     }
 
