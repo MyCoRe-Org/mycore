@@ -22,7 +22,7 @@ package org.mycore.mets.tools;
  * @author Silvio Hermann (shermann)
  * 
  */
-public class JSONTools {
+public class MCRJSONTools {
     /**
      * Removes brackets ('[' at the beginning and ']' at the end) from the given
      * string

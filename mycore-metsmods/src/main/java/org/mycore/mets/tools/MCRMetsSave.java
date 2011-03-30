@@ -30,9 +30,9 @@ import org.mycore.mets.model.struct.SubDiv;
 /**
  * @author shermann
  */
-public class MetsSave {
+public class MCRMetsSave {
 
-    private final static Logger LOGGER = Logger.getLogger(MetsSave.class);
+    private final static Logger LOGGER = Logger.getLogger(MCRMetsSave.class);
 
     /**
      * Saves the content of the given document to file and then adds the file to
@@ -99,9 +99,9 @@ public class MetsSave {
             return;
         }
         Document mets = new SAXBuilder().build(((MCRFile) metsDocNode).getContentAsInputStream());
-        mets = MetsSave.updateMetsDocument(mets, file);
+        mets = MCRMetsSave.updateMetsDocument(mets, file);
         if (mets != null)
-            MetsSave.saveMets(mets, derivate.getId().toString());
+            MCRMetsSave.saveMets(mets, derivate.getId().toString());
     }
 
     /**

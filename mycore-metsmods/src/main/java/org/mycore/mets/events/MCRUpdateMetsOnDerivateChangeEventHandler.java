@@ -8,7 +8,7 @@ import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.mets.tools.MetsSave;
+import org.mycore.mets.tools.MCRMetsSave;
 
 /**
  * EventHandler updates the mets.xml after a file is added to an existing
@@ -32,7 +32,7 @@ public class MCRUpdateMetsOnDerivateChangeEventHandler extends MCREventHandlerBa
         }
 
         try {
-            MetsSave.update(owner, file.getName());
+            MCRMetsSave.update(owner, file.getName());
         } catch (Exception e) {
             LOGGER.error("Error while updating mets file", e);
         }

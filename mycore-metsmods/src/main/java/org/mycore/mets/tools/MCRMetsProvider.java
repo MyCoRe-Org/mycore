@@ -48,9 +48,9 @@ import com.google.gson.JsonObject;
  * 
  * @author Silvio Hermann (shermann)
  */
-public class MetsProvider {
+public class MCRMetsProvider {
 
-    final private static Logger LOGGER = Logger.getLogger(MetsProvider.class);
+    final private static Logger LOGGER = Logger.getLogger(MCRMetsProvider.class);
 
     private Mets mets;
 
@@ -71,7 +71,7 @@ public class MetsProvider {
     private LogicalIdProvider idProvider;
 
     /** Sets up the underlying mets object */
-    public MetsProvider(String derivate) {
+    public MCRMetsProvider(String derivate) {
         this.idProvider = new LogicalIdProvider("log", 6);
         mets = new Mets();
         dmdSec = new DmdSec("dmd_" + derivate);
@@ -114,8 +114,8 @@ public class MetsProvider {
         String name = source.get("name").toString();
         String docType = source.get("structureType").toString();
 
-        this.logicalStructMp.getDivContainer().setLabel(JSONTools.stripBracketsAndQuotes(name));
-        this.logicalStructMp.getDivContainer().setDocumentType(JSONTools.stripBracketsAndQuotes(docType));
+        this.logicalStructMp.getDivContainer().setLabel(MCRJSONTools.stripBracketsAndQuotes(name));
+        this.logicalStructMp.getDivContainer().setDocumentType(MCRJSONTools.stripBracketsAndQuotes(docType));
 
         // the children of the derivate should be present
         JsonArray children = (JsonArray) source.get("children");
@@ -137,9 +137,9 @@ public class MetsProvider {
     private void process(Iterator<JsonElement> it, SubDiv parentDiv) {
         while (it.hasNext()) {
             JsonObject json = it.next().getAsJsonObject();
-            String id = JSONTools.stripBracketsAndQuotes(json.get("id").getAsString());
-            String label = JSONTools.stripBracketsAndQuotes(json.get("name").getAsString());
-            String structType = JSONTools.stripBracketsAndQuotes(json.get("structureType").getAsString());
+            String id = MCRJSONTools.stripBracketsAndQuotes(json.get("id").getAsString());
+            String label = MCRJSONTools.stripBracketsAndQuotes(json.get("name").getAsString());
+            String structType = MCRJSONTools.stripBracketsAndQuotes(json.get("structureType").getAsString());
             int logicalOrder = json.get("logicalOrder").getAsInt();
             /*
              * current json object is a structure (as defined in
@@ -169,9 +169,9 @@ public class MetsProvider {
              * the different fileSec objects
              */
             else {
-                String path = JSONTools.stripBracketsAndQuotes(json.get("path").getAsString());
+                String path = MCRJSONTools.stripBracketsAndQuotes(json.get("path").getAsString());
                 int physicalOrder = json.get("physicalOrder").getAsInt();
-                String orderLabel = JSONTools.stripBracketsAndQuotes(json.get("orderLabel").getAsString());
+                String orderLabel = MCRJSONTools.stripBracketsAndQuotes(json.get("orderLabel").getAsString());
 
                 SubDiv physical = addFileToPhysicalStructMp(id, path, physicalOrder, orderLabel);
                 addFileToGroups(id, path, label);
@@ -204,9 +204,9 @@ public class MetsProvider {
                 return getFirstFileId(json.get("children").getAsJsonArray().iterator());
             }
 
-            String structType = JSONTools.stripBracketsAndQuotes(json.get("structureType").getAsString());
+            String structType = MCRJSONTools.stripBracketsAndQuotes(json.get("structureType").getAsString());
             if ("page".equals(structType)) {
-                fileId = JSONTools.stripBracketsAndQuotes(json.get("id").getAsString());
+                fileId = MCRJSONTools.stripBracketsAndQuotes(json.get("id").getAsString());
                 return SubDiv.ID_PREFIX + fileId;
             }
         }
@@ -224,7 +224,7 @@ public class MetsProvider {
      */
     private SubDiv addFileToPhysicalStructMp(String id, String path, int physicalOrder, String orderLabel) {
         Div divContainer = physicalStructMp.getDivContainer();
-        String idStripped = JSONTools.stripBracketsAndQuotes(id);
+        String idStripped = MCRJSONTools.stripBracketsAndQuotes(id);
 
         SubDiv subDiv = new SubDiv(SubDiv.ID_PREFIX + idStripped, SubDiv.TYPE_PAGE, physicalOrder, true);
         subDiv.setOrderLabel(orderLabel);
@@ -245,8 +245,8 @@ public class MetsProvider {
      *            the name/label of the file
      */
     private void addFileToGroups(String id, String path, String name) {
-        String idStripped = JSONTools.stripBracketsAndQuotes(id);
-        String nameStripped = JSONTools.stripBracketsAndQuotes(name);
+        String idStripped = MCRJSONTools.stripBracketsAndQuotes(id);
+        String nameStripped = MCRJSONTools.stripBracketsAndQuotes(name);
         File file = null;
 
         file = new File(idStripped, nameStripped, File.MIME_TYPE_TIFF);

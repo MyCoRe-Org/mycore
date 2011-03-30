@@ -52,7 +52,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectStructure;
 import org.mycore.frontend.metsmods.MCRMetsModsUtil;
 import org.mycore.mets.tools.MCRMetsResolver;
-import org.mycore.mets.tools.MetsSave;
+import org.mycore.mets.tools.MCRMetsSave;
 import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRQuery;
@@ -471,7 +471,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         }
 
         try {
-            MetsSave.update(MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivate)), filename);
+            MCRMetsSave.update(MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivate)), filename);
         } catch (Exception ex) {
             LOGGER.error("Error while updating mets file", ex);
         }

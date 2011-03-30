@@ -28,8 +28,8 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.mets.model.Mets;
-import org.mycore.mets.tools.MetsProvider;
-import org.mycore.mets.tools.MetsSave;
+import org.mycore.mets.tools.MCRMetsProvider;
+import org.mycore.mets.tools.MCRMetsSave;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -55,14 +55,10 @@ public class MCRSaveMETSServlet extends MCRServlet {
             job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
-
-        if (jsontree.length() > 100) {
-            LOGGER.info(jsontree.substring(0, 100) + "...");
-        } else {
-            LOGGER.info(jsontree);
-        }
-
-        MetsProvider mp = new MetsProvider(derivateId);
+        
+        LOGGER.debug(jsontree);
+        
+        MCRMetsProvider mp = new MCRMetsProvider(derivateId);
         LOGGER.info("Creating Mets object for derivate with id " + derivateId);
         Mets mets = mp.toMets(json);
         LOGGER.info("Creating Mets object for derivate with id " + derivateId + " was succesful");
@@ -71,7 +67,7 @@ public class MCRSaveMETSServlet extends MCRServlet {
         Document metsDoc = mets.asDocument();
         LOGGER.info("Creating METS document from Mets object was succesful");
 
-        MetsSave.saveMets(metsDoc, derivateId);
+        MCRMetsSave.saveMets(metsDoc, derivateId);
         return;
     }
 }

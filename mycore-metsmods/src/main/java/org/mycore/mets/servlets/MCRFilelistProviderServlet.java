@@ -33,7 +33,7 @@ import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
-import org.mycore.mets.tools.JSONProvider;
+import org.mycore.mets.tools.MCRJSONProvider;
 
 /**
  * This servlet provides the data in json format for the dijit tree at the
@@ -61,7 +61,7 @@ public class MCRFilelistProviderServlet extends MCRServlet implements Comparator
         Document mets = getMetsXML(derivate);
         if (mets != null && useExistingMets) {
             LOGGER.info("Creating JSONObject from " + MCRFilelistProviderServlet.DEFAULT_METS_FILENAME + " for derivate with id \"" + derivate + "\"");
-            JSONProvider provider = new JSONProvider(mets, derivate);
+            MCRJSONProvider provider = new MCRJSONProvider(mets, derivate);
             json = provider.toJSON();
         } else {
             LOGGER.info("Creating initial JSONObject for derivate with id \"" + derivate + "\"");

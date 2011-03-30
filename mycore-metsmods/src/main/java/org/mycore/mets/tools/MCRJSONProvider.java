@@ -38,8 +38,8 @@ import org.mycore.mets.tools.model.MetsTree;
  * @author Silvio Hermann (shermann)
  *
  */
-public class JSONProvider {
-    final private static Logger LOGGER = Logger.getLogger(JSONProvider.class);
+public class MCRJSONProvider {
+    final private static Logger LOGGER = Logger.getLogger(MCRJSONProvider.class);
 
     private String derivate;
 
@@ -52,7 +52,7 @@ public class JSONProvider {
      * @param derivate the derivate id
      */
     @SuppressWarnings("unchecked")
-    public JSONProvider(Document mets, String derivate) throws DocumentException {
+    public MCRJSONProvider(Document mets, String derivate) throws DocumentException {
         this.derivate = derivate;
         this.mets = mets;
 
