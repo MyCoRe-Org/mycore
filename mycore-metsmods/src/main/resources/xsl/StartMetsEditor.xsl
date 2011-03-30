@@ -1,21 +1,30 @@
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0" xmlns:property="xalan://org.mycore.common.xml.MCRPropertyFunctions"
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:acl="xalan://org.mycore.access.MCRAccessManager">
   <xsl:output method="html" indent="yes" doctype-public="-//IETF//DTD HTML 2.0//EN" />
+  <xsl:include href="coreFunctions.xsl"/>
+  
   <xsl:param name="RequestURL" />
   <xsl:param name="WebApplicationBaseURL" />
-
+  
   <xsl:variable name="derivateId">
-    <xsl:value-of select="property:getParameterValue($RequestURL,'derivate')" />
+		<xsl:call-template name="UrlGetParam">
+		  <xsl:with-param name="url" select="$RequestURL"/>
+		  <xsl:with-param name="par" select="'derivate'"/>
+		</xsl:call-template>
   </xsl:variable>
-
+  
   <xsl:variable name="useExistingMets">
-    <xsl:value-of select="property:getParameterValue($RequestURL,'useExistingMets')" />
+    <xsl:call-template name="UrlGetParam">
+      <xsl:with-param name="url" select="$RequestURL"/>
+      <xsl:with-param name="par" select="'useExistingMets'"/>
+    </xsl:call-template>
   </xsl:variable>
+  
   <xsl:variable name="createMetsAllowed" select="acl:checkPermission($derivateId,'writedb')" />
 
   <xsl:template match="/StartMetsEditor"> 
     <!--
-      $Revision: 3162 $ $Date: 2010-11-24 08:59:25 +0100 (Wed, 24 Nov 2010) $ $LastChangedBy: shermann $ Copyright 2010 - Thüringer
+      $Revision$ $Date$ $LastChangedBy$ Copyright 2010 - Thüringer
       Universitäts- und Landesbibliothek Jena Mets-Editor is free software: you can redistribute it and/or modify it under the terms of the GNU
       General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
       version. Mets-Editor is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
