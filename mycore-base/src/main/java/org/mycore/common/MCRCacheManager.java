@@ -28,7 +28,7 @@ package org.mycore.common;
  * @author Thomas Scheffler (yagee)
  * 
  * Need to insert some things here
- * @jmx.mbean
+ * jmx.mbean
  */
 public class MCRCacheManager implements MCRCacheManagerMBean {
 
@@ -63,7 +63,7 @@ public class MCRCacheManager implements MCRCacheManagerMBean {
     }
 
     /**
-     * @jmx.managed-operation
+     * jmx.managed-operation
      */
     public void setCapacity(int capacity) {
         cache.setCapacity(capacity);

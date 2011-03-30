@@ -175,8 +175,6 @@ public class MCRHIBAccessStore extends MCRAccessStore {
     /**
      * method returns AccessDefinition for given key values
      * 
-     * @param ruleid
-     *            name of rule
      * @param pool
      *            name of accesspool
      * @param objid

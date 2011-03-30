@@ -203,7 +203,7 @@ public interface MCRAccessInterface {
      *            the ID-String of the object
      * @param permission
      *            the permission/action to be granted, e.g. "read"
-     * @param user
+     * @param userID
      *            the MCRUser, whose permissions are checked           
      * @return true if the permission is granted, else false
      * @see org.mycore.common.MCRSessionMgr#getCurrentSession()
@@ -242,7 +242,7 @@ public interface MCRAccessInterface {
      * 
      * @param permission
      *            the permission/action to be granted, e.g. "create-document"
-     * @param user
+     * @param userID
      *            the MCRUser, whose permissions are checked            
      * @return true if the permission is granted, else false
      * @see org.mycore.common.MCRSessionMgr#getCurrentSession()

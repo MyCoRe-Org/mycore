@@ -437,7 +437,7 @@ public class MCRSession implements Cloneable {
     }
 
     /**
-     * @param userInformation the userInformation to set
+     * @param userSystemAdapter the userInformation to set
      */
     public void setUserInformation(MCRUserInformation userSystemAdapter) {
         this.userInformation = userSystemAdapter;

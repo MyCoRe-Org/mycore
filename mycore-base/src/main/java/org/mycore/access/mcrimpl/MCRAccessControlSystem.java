@@ -325,7 +325,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
      *            poolname as string
      * @param objID
      *            MCRObjectID as string
-     * @param user
+     * @param userID
      *            MCRUser
      * @param ip
      *            ip-Address

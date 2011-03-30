@@ -555,7 +555,7 @@ public class MCRUtils {
      * 
      * @param arrayin
      *            The incoming ArrayList
-     * @param maxitem
+     * @param maxitems
      *            The maximum number of items
      * @return the cutted ArrayList
      */
@@ -995,7 +995,7 @@ public class MCRUtils {
     /**
      * Returns the {@link MCRMetadataVersion} of the given id and revision.
      * 
-     * @param objId
+     * @param mcrId
      *            the id of the object to be retrieved
      * @param rev
      *            the revision to be returned, specify -1 if you want to

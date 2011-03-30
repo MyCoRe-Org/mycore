@@ -536,7 +536,7 @@ public class MCRXMLMetadataManager {
     /**
      * Lists all MCRObjectIDs stored for the given object type, for all projects
      * 
-     * @param base the MCRObject type, e.g. document
+     * @param type the MCRObject type, e.g. document
      */
     public List<String> listIDsOfType(String type) {
         List<String> list = new ArrayList<String>();
@@ -571,8 +571,6 @@ public class MCRXMLMetadataManager {
 
     /**
      * lists objects and their last modified date. 
-     * @param type type of object
-     * @return
      */
     public List<MCRObjectIDDate> listObjectDates() throws IOException {
         return getObjectDateList(this.listIDs());
@@ -581,7 +579,6 @@ public class MCRXMLMetadataManager {
     /**
      * lists objects of the specified <code>type</code> and their last modified date. 
      * @param type type of object
-     * @return
      */
     public List<MCRObjectIDDate> listObjectDates(String type) throws IOException {
         return getObjectDateList(this.listIDsOfType(type));

@@ -66,7 +66,7 @@ public interface MCRCategLinkService {
     /**
      * Counts links to a collection of categories.
      * 
-     * @param categIDs
+     * @param category
      *            a subtree rooted at a MCRCategory for which links should be counted
      * @param type
      *            restrict links that refer to object of this type
@@ -142,8 +142,8 @@ public interface MCRCategLinkService {
      *            reference to a Object
      * @param categories
      *            a collection of categoryIDs to be linked to
-     * @see #countLinks(Collection)
-     * @see #countLinksForType(Collection, String)
+     * @see #countLinks(category, childrenOnly)
+     * @see #countLinksForType(category, type, childrenOnly)
      */
     public abstract void setLinks(MCRObjectReference objectReference, Collection<MCRCategoryID> categories);
 

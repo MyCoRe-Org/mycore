@@ -467,7 +467,6 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
          * 
          * @param URI
          *            String in URI Syntax
-         * @return
          * @throws Exception
          */
         public Element resolveElement(String URI) throws Exception;

@@ -61,7 +61,6 @@ public class MCRCategoryTransformer {
      * 
      * @param cl
      *            Classification
-     * @return
      */
     public static Document getMetaDataDocument(MCRCategory cl, boolean withCounter) {
         Map<MCRCategoryID, Number> countMap = null;
@@ -78,7 +77,6 @@ public class MCRCategoryTransformer {
      * 
      * @param category
      *            a category of a classification
-     * @return
      */
     public static Element getMetaDataElement(MCRCategory category, boolean withCounter) {
         Map<MCRCategoryID, Number> countMap = null;
@@ -98,7 +96,6 @@ public class MCRCategoryTransformer {
      *            if true, sort items
      * @param emptyLeaves
      *            if true, also include empty leaves
-     * @return
      */
     public static Element getEditorItems(MCRCategory cl, boolean sort, boolean emptyLeaves) {
         return new ItemElementFactory(cl, STANDARD_LABEL, sort, emptyLeaves).getResult();
@@ -126,7 +123,6 @@ public class MCRCategoryTransformer {
      *            if true, sort items
      * @param emptyLeaves
      *            if true, also include empty leaves
-     * @return
      */
     public static Element getEditorItems(MCRCategory cl, String labelFormat, boolean sort, boolean emptyLeaves) {
         return new ItemElementFactory(cl, labelFormat, sort, emptyLeaves).getResult();

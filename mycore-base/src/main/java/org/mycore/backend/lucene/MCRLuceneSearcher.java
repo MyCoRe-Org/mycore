@@ -241,8 +241,6 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
      *            string name of lucene field with stored id
      * @param id
      *            string document id
-     * @param indexDir *
-     *            the directory where index is stored
      * 
      */
     public void deleteLuceneDocument(String fieldname, String id) throws Exception {

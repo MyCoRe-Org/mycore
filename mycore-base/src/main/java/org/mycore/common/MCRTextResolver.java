@@ -353,7 +353,7 @@ public class MCRTextResolver {
     /**
      * Enable or disable MyCoRe property resolving.
      * 
-     * @param useMCRProperties
+     * @param value
      */
     public static void setUseMCRProperties(boolean value) {
         useMCRProperties = value;
@@ -432,7 +432,8 @@ public class MCRTextResolver {
         /**
          * Does term specific resolving for the current character.
          * 
-         * @param c the current character from text
+         * @param text
+         * @param pos
          * @return true if the end string is reached, otherwise false
          */
         protected abstract boolean resolveInternal(String text, int pos);

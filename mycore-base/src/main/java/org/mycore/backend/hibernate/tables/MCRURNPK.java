@@ -55,7 +55,7 @@ public class MCRURNPK implements Serializable {
     /**
      * Set the data field document ID.
      * 
-     * @param mcrid
+     * @param id
      *            The document ID to set.
      */
     public void setMcrid(String id) {
@@ -74,7 +74,7 @@ public class MCRURNPK implements Serializable {
     /**
      * Set the data filed URN.
      * 
-     * @param mcrurn
+     * @param urn
      *            The URN to set.
      */
     public void setMcrurn(String urn) {

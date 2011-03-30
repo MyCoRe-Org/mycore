@@ -216,8 +216,8 @@ public class MCRHIBURNStore implements MCRURNStore {
      * Removes the urn (and assigned document ID) from the persistent store by the given 
      * object id
      * 
-     * @param urn
-     *            a URN
+     * @param objID
+     *            object id
      * @exception MCRPersistenceException
      *                the method argument is not correct
      */

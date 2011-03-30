@@ -19,7 +19,7 @@
             <id>compile</id>
             <phase>compile</phase>
             <configuration>
-              <tasks>
+              <target>
                 <path id="compile.classpath" refid="maven.compile.classpath" />
                 <property name="target.applet.classes" location="${project.build.directory}/applet-classes" />
                 <path id="sources.path">
@@ -41,7 +41,7 @@
                 <jar jarfile="${project.build.outputDirectory}/metsmodsApplet-unsigned.jar">
                   <fileset dir="${target.applet.classes}" />
                 </jar>
-              </tasks>
+              </target>
             </configuration>
             <goals>
               <goal>run</goal>
