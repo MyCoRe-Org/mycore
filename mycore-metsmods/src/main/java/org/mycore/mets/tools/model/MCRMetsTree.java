@@ -27,16 +27,16 @@ import java.util.Vector;
  * @author Silvio Hermann (shermann)
  *
  */
-public class MetsTree implements Comparator<IMetsSortable> {
-    private List<Directory> dirs;
+public class MCRMetsTree implements Comparator<MCRIMetsSortable> {
+    private List<MCRDirectory> dirs;
 
-    private List<Entry> entries;
+    private List<MCREntry> entries;
 
     private String derivate, docType,docTitle;
 
-    public MetsTree(String derivate) {
-        dirs = new Vector<Directory>();
-        entries = new Vector<Entry>();
+    public MCRMetsTree(String derivate) {
+        dirs = new Vector<MCRDirectory>();
+        entries = new Vector<MCREntry>();
         this.derivate = derivate;
         this.docTitle = derivate;
         this.docType = "''";
@@ -45,14 +45,14 @@ public class MetsTree implements Comparator<IMetsSortable> {
     /**
      * @param e
      */
-    public void addEntry(Entry e) {
+    public void addEntry(MCREntry e) {
         this.entries.add(e);
     }
 
     /**
      * @param dir
      */
-    public void addDirectory(Directory dir) {
+    public void addDirectory(MCRDirectory dir) {
         this.dirs.add(dir);
     }
 
@@ -86,7 +86,7 @@ public class MetsTree implements Comparator<IMetsSortable> {
 
     public String asJson() {
         StringBuilder buffer = new StringBuilder();
-        IMetsSortable[] elements = getOrderedElements();
+        MCRIMetsSortable[] elements = getOrderedElements();
 
         buffer.append("{identifier: 'id',label: 'name',items: [\n");
         buffer.append("{id: '" + this.derivate + "', name:'" + this.docTitle +"', structureType:'" + this.docType + "',children:[\n");
@@ -102,21 +102,21 @@ public class MetsTree implements Comparator<IMetsSortable> {
         return buffer.toString();
     }
 
-    private IMetsSortable[] getOrderedElements() {
-        Vector<IMetsSortable> v = new Vector<IMetsSortable>();
-        for (Directory dir : this.dirs) {
+    private MCRIMetsSortable[] getOrderedElements() {
+        Vector<MCRIMetsSortable> v = new Vector<MCRIMetsSortable>();
+        for (MCRDirectory dir : this.dirs) {
             v.add(dir);
         }
 
-        for (Entry e : this.entries) {
+        for (MCREntry e : this.entries) {
             v.add(e);
         }
-        IMetsSortable[] obj = v.toArray(new IMetsSortable[0]);
+        MCRIMetsSortable[] obj = v.toArray(new MCRIMetsSortable[0]);
         Arrays.sort(obj, this);
         return obj;
     }
 
-    public int compare(IMetsSortable arg0, IMetsSortable arg1) {
+    public int compare(MCRIMetsSortable arg0, MCRIMetsSortable arg1) {
         if (arg0.getOrder() < arg1.getOrder()) {
             return -1;
         }

@@ -22,12 +22,12 @@ package org.mycore.mets.tools.model;
  * @author Silvio Hermann (shermann)
  *
  */
-public class Entry implements IMetsSortable {
+public class MCREntry implements MCRIMetsSortable {
     int order;
 
     private String physicalId, label, itemId, structureType, orderLabel;
 
-    public Entry(String itemId, String physical, String label, String structureType) {
+    public MCREntry(String itemId, String physical, String label, String structureType) {
         this.physicalId = physical;
         this.label = label;
         this.itemId = itemId;

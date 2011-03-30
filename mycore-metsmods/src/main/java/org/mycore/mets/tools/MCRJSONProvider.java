@@ -30,9 +30,9 @@ import org.jdom.JDOMException;
 import org.jdom.filter.ElementFilter;
 import org.jdom.xpath.XPath;
 import org.mycore.mets.model.IMetsElement;
-import org.mycore.mets.tools.model.Directory;
-import org.mycore.mets.tools.model.Entry;
-import org.mycore.mets.tools.model.MetsTree;
+import org.mycore.mets.tools.model.MCRDirectory;
+import org.mycore.mets.tools.model.MCREntry;
+import org.mycore.mets.tools.model.MCRMetsTree;
 
 /**
  * @author Silvio Hermann (shermann)
@@ -102,7 +102,7 @@ public class MCRJSONProvider {
             return null;
         }
 
-        MetsTree tree = new MetsTree(derivate);
+        MCRMetsTree tree = new MCRMetsTree(derivate);
         /* setting document type and title */
         String docType = parentDiv.getAttributeValue("TYPE");
         String docTitle = parentDiv.getAttributeValue("LABEL");
@@ -125,7 +125,7 @@ public class MCRJSONProvider {
             if (structureType.equals("page")) {
                 String physId = getPhysicalIdsForLogical(logicalId)[0];
                 String itemId = physId.substring(physId.indexOf("_") + 1);
-                Entry page = new Entry(itemId, physId, label, "page");
+                MCREntry page = new MCREntry(itemId, physId, label, "page");
                 int order = Integer.valueOf(getOrderAttribute(physId));
                 page.setOrder(order);
                 String orderLabel = getOrderLabelAttribute(physId);
@@ -140,7 +140,7 @@ public class MCRJSONProvider {
                     /* list of children */
                     List<Element> list = kiddies.selectNodes(currentLogicalDiv);
 
-                    Directory dir = new Directory(logicalId, label, structureType);
+                    MCRDirectory dir = new MCRDirectory(logicalId, label, structureType);
                     tree.addDirectory(dir);
 
                     boolean flag = firstIsFile(logicalId);
@@ -215,7 +215,7 @@ public class MCRJSONProvider {
 
     /** This methods builds the tree with the mets document as a base */
     @SuppressWarnings("unchecked")
-    private void buildTree(Directory parent, List<Element> children) {
+    private void buildTree(MCRDirectory parent, List<Element> children) {
         Iterator<Element> it = children.iterator();
         while (it.hasNext()) {
             Element logicalDiv = it.next();
@@ -223,7 +223,7 @@ public class MCRJSONProvider {
             String logicalDivId = logicalDiv.getAttributeValue("ID");
             String logicalDivLabel = logicalDiv.getAttributeValue("LABEL");
 
-            Directory dir = new Directory(logicalDivId, logicalDivLabel, divType);
+            MCRDirectory dir = new MCRDirectory(logicalDivId, logicalDivLabel, divType);
             int order = Integer.valueOf(getOrderAttribute(getPhysicalIdsForLogical(logicalDivId)[0]));
             dir.setOrder(order);
             addFiles(dir);
@@ -245,12 +245,12 @@ public class MCRJSONProvider {
      *  
      * @param dir
      */
-    private void addFiles(Directory dir) {
+    private void addFiles(MCRDirectory dir) {
         String[] physIds = getPhysicalIdsForLogical(dir.getLogicalId());
         for (int i = 0; i < physIds.length; i++) {
             String itemId = physIds[i].substring(physIds[i].indexOf("_") + 1);
             /* TODO get real label from mets */
-            Entry page = new Entry(itemId, physIds[i], itemId, "page");
+            MCREntry page = new MCREntry(itemId, physIds[i], itemId, "page");
             page.setOrder(getOrderAttribute(physIds[i]));
             String orderLabel = getOrderLabelAttribute(physIds[i]);
             page.setOrderLabel(orderLabel);

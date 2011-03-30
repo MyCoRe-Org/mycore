@@ -22,7 +22,7 @@ package org.mycore.mets.tools.model;
  * @author Silvio Hermann (shermann)
  *
  */
-public interface IMetsSortable {
+public interface MCRIMetsSortable {
 
     /**
      * @return the order of the implementer

@@ -24,17 +24,17 @@ import java.util.List;
 import java.util.Vector;
 
 /**
- * This class models a structure/folder within a tree. It may contain {@link Entry}s and {@link Directory}s. 
+ * This class models a structure/folder within a tree. It may contain {@link MCREntry}s and {@link MCRDirectory}s. 
  * 
  * @author Silvio Hermann (shermann)
  *
  */
-public class Directory implements IMetsSortable, Comparator<IMetsSortable> {
+public class MCRDirectory implements MCRIMetsSortable, Comparator<MCRIMetsSortable> {
     private String logicalId, label, structureType;
 
-    private List<Directory> dirs;
+    private List<MCRDirectory> dirs;
 
-    private List<Entry> entries;
+    private List<MCREntry> entries;
 
     int order;
 
@@ -44,12 +44,12 @@ public class Directory implements IMetsSortable, Comparator<IMetsSortable> {
      * 
      * @param structureType 
      */
-    public Directory(String logicalId, String label, String structureType) {
+    public MCRDirectory(String logicalId, String label, String structureType) {
         this.logicalId = logicalId;
         this.label = label;
         this.structureType = structureType;
-        dirs = new Vector<Directory>();
-        entries = new Vector<Entry>();
+        dirs = new Vector<MCRDirectory>();
+        entries = new Vector<MCREntry>();
     }
 
     /**
@@ -111,14 +111,14 @@ public class Directory implements IMetsSortable, Comparator<IMetsSortable> {
     /**
      * @param e
      */
-    public void addEntry(Entry e) {
+    public void addEntry(MCREntry e) {
         this.entries.add(e);
     }
 
     /**
      * @param dir
      */
-    public void addDirectory(Directory dir) {
+    public void addDirectory(MCRDirectory dir) {
         this.dirs.add(dir);
     }
 
@@ -133,18 +133,18 @@ public class Directory implements IMetsSortable, Comparator<IMetsSortable> {
     public String asJson() {
         StringBuilder buffer = new StringBuilder();
 
-        IMetsSortable[] obj = getOrderedElements();
+        MCRIMetsSortable[] obj = getOrderedElements();
 
         buffer.append("\t{ id: '" + label + "', name:'" + label + "', type:'category'" + ", structureType:'" + structureType + "'");
         buffer.append(", children:[\n");
 
         for (int i = 0; i < obj.length; i++) {
-            if (obj[i] instanceof Entry) {
+            if (obj[i] instanceof MCREntry) {
                 buffer.append(obj[i].asJson());
             }
-            if (obj[i] instanceof Directory) {
-                Directory aDir = (Directory) obj[i];
-                IMetsSortable[] children = aDir.getOrderedElements();
+            if (obj[i] instanceof MCRDirectory) {
+                MCRDirectory aDir = (MCRDirectory) obj[i];
+                MCRIMetsSortable[] children = aDir.getOrderedElements();
 
                 buffer.append("{ id: '" + aDir.getLabel() + "', name:'" + aDir.getLabel() + "', type:'category'" + ", structureType:'"
                         + aDir.getStructureType() + "'");
@@ -168,16 +168,16 @@ public class Directory implements IMetsSortable, Comparator<IMetsSortable> {
         return toReturn;
     }
 
-    private IMetsSortable[] getOrderedElements() {
-        Vector<IMetsSortable> v = new Vector<IMetsSortable>();
-        for (Directory dir : this.dirs) {
+    private MCRIMetsSortable[] getOrderedElements() {
+        Vector<MCRIMetsSortable> v = new Vector<MCRIMetsSortable>();
+        for (MCRDirectory dir : this.dirs) {
             v.add(dir);
         }
 
-        for (Entry e : this.entries) {
+        for (MCREntry e : this.entries) {
             v.add(e);
         }
-        IMetsSortable[] obj = v.toArray(new IMetsSortable[0]);
+        MCRIMetsSortable[] obj = v.toArray(new MCRIMetsSortable[0]);
         Arrays.sort(obj, this);
         return obj;
     }
@@ -186,7 +186,7 @@ public class Directory implements IMetsSortable, Comparator<IMetsSortable> {
      * (non-Javadoc)
      * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
      */
-    public int compare(IMetsSortable arg0, IMetsSortable arg1) {
+    public int compare(MCRIMetsSortable arg0, MCRIMetsSortable arg1) {
         if (arg0.getOrder() < arg1.getOrder()) {
             return -1;
         }
