@@ -4,7 +4,7 @@ package org.mycore.services.urn;
 /**
  * Base implementation for IURNProviders
  * */
-public abstract class AbstractURNProvider implements IURNProvider {
+public abstract class MCRAbstractURNProvider implements MCRIURNProvider {
 
     /**
      * Generates multiple urns. The generated urns have the following structure
@@ -12,16 +12,16 @@ public abstract class AbstractURNProvider implements IURNProvider {
      * <code>&lt;base-urn&gt;-amount</code>
      * 
      * @param int the amount of urn to generate, must be &gt;= 1
-     * @param URN
+     * @param MCRURN
      *            the base urn
      */
-    public URN[] generateURN(int amount, URN base) {
+    public MCRURN[] generateURN(int amount, MCRURN base) {
         if (base == null || amount < 1)
             return null;
-        URN[] urn = new URN[amount];
+        MCRURN[] urn = new MCRURN[amount];
 
         for (int i = 1; i <= amount; i++) {
-            urn[i - 1] = new URN(base.getNamespaceIdentfiers(), base.getNamespaceIdentfiersSpecificPart() + "-"
+            urn[i - 1] = new MCRURN(base.getNamespaceIdentfiers(), base.getNamespaceIdentfiersSpecificPart() + "-"
                     + this.addLeadingZeroes(amount, i));
         }
         return urn;
@@ -38,16 +38,16 @@ public abstract class AbstractURNProvider implements IURNProvider {
      *            the base urn
      * @param setId
      *            must represent an integer &gt;= 0, e.g. 1, 001 or 00004
-     * @return an Array of {@link URN} or <code>null</code> if the base urn is
+     * @return an Array of {@link MCRURN} or <code>null</code> if the base urn is
      *         null or amount &lt;1 or the setID &lt;0
      */
-    public URN[] generateURN(int amount, URN base, String setId) {
+    public MCRURN[] generateURN(int amount, MCRURN base, String setId) {
         if (base == null || amount < 1 || setId == null)
             return null;
-        URN[] urn = new URN[amount];
+        MCRURN[] urn = new MCRURN[amount];
 
         for (int i = 1; i <= amount; i++) {
-            urn[i - 1] = new URN(base.getNamespaceIdentfiers(), base.getNamespaceIdentfiersSpecificPart() + "-" + setId + "-"
+            urn[i - 1] = new MCRURN(base.getNamespaceIdentfiers(), base.getNamespaceIdentfiersSpecificPart() + "-" + setId + "-"
                     + this.addLeadingZeroes(amount, i));
         }
         return urn;

@@ -6,7 +6,7 @@ package org.mycore.services.urn;
  * 
  * @author shermann
  */
-public interface IConcordanceTable {
+public interface MCRIConcordanceTable {
     /* Numbers */
     public static final int _0     = 1;
     public static final int _1     = 2;

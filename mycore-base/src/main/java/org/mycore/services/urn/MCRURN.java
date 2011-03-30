@@ -7,7 +7,7 @@ import java.net.URI;
  * 
  * @author shermann
  */
-public class URN {
+public class MCRURN {
     private static final String[] DEFAULT_NAMESPACE_IDENTIFIERS = new String[] { "nbn", "de" };
 
     final private static String DEFAULT_SCHEMA = "urn";
@@ -29,7 +29,7 @@ public class URN {
      * @throws IllegalArgumentException
      *             if one of the arguments is <code>null</code>
      * */
-    public URN(String[] namespaceIdentifiers, String namespaceSpecificPart) {
+    public MCRURN(String[] namespaceIdentifiers, String namespaceSpecificPart) {
 
         if (namespaceIdentifiers == null || namespaceSpecificPart == null) {
             throw new IllegalArgumentException("All Arguments must not be null.");
@@ -43,7 +43,7 @@ public class URN {
      * @return the schema, always returns <code>urn</code>
      */
     public String getSchema() {
-        return URN.DEFAULT_SCHEMA;
+        return MCRURN.DEFAULT_SCHEMA;
     }
 
     /**
@@ -51,14 +51,14 @@ public class URN {
      * 
      * @param String
      *            the string the urn should be created from
-     * @see URN#normalize()
+     * @see MCRURN#normalize()
      * */
-    public static URN valueOf(String s) {
+    public static MCRURN valueOf(String s) {
         if (s == null)
             return null;
         String[] parts = s.split(":");
 
-        if (!parts[0].equals(URN.DEFAULT_SCHEMA))
+        if (!parts[0].equals(MCRURN.DEFAULT_SCHEMA))
             return null;
         try {
             // just check wether the urn has the correct syntax
@@ -72,7 +72,7 @@ public class URN {
             namespaceIdentifiersOfTheURNToBe[i] = parts[i + 1];
         }
 
-        URN toReturn = new URN(namespaceIdentifiersOfTheURNToBe, parts[parts.length - 1]);
+        MCRURN toReturn = new MCRURN(namespaceIdentifiersOfTheURNToBe, parts[parts.length - 1]);
         return toReturn;
     }
 
@@ -96,7 +96,7 @@ public class URN {
      * Calculates the checksum of this urn. Checksum is calculated for urn with
      * the following structure <code>urn:nbn:de:&lt;your stuff here&gt;</code>.
      * For other schemas the calculated checksum may not be correct. Thus one
-     * should subclass {@link org.mycore.services.urn.URN} and override this
+     * should subclass {@link org.mycore.services.urn.MCRURN} and override this
      * method.
      * 
      * @return the calculated checksum
@@ -138,95 +138,95 @@ public class URN {
     /**
      * Returns the integer value for a given String
      * 
-     * @see IConcordanceTable
+     * @see MCRIConcordanceTable
      * @throws IllegalArgumentException
      *             when the given String is null or its size does not equals 1
      */
     private int getIntegerAlias(String s) throws IllegalArgumentException {
         if (s == null || s.length() != 1)
             throw new IllegalArgumentException("Invalid String specified: " + s);
-        if (s.equalsIgnoreCase(IConcordanceTable.A))
-            return IConcordanceTable._A;
-        if (s.equalsIgnoreCase(IConcordanceTable.B))
-            return IConcordanceTable._B;
-        if (s.equalsIgnoreCase(IConcordanceTable.C))
-            return IConcordanceTable._C;
-        if (s.equalsIgnoreCase(IConcordanceTable.D))
-            return IConcordanceTable._D;
-        if (s.equalsIgnoreCase(IConcordanceTable.E))
-            return IConcordanceTable._E;
-        if (s.equalsIgnoreCase(IConcordanceTable.F))
-            return IConcordanceTable._F;
-        if (s.equalsIgnoreCase(IConcordanceTable.G))
-            return IConcordanceTable._G;
-        if (s.equalsIgnoreCase(IConcordanceTable.H))
-            return IConcordanceTable._H;
-        if (s.equalsIgnoreCase(IConcordanceTable.I))
-            return IConcordanceTable._I;
-        if (s.equalsIgnoreCase(IConcordanceTable.J))
-            return IConcordanceTable._J;
-        if (s.equalsIgnoreCase(IConcordanceTable.K))
-            return IConcordanceTable._K;
-        if (s.equalsIgnoreCase(IConcordanceTable.L))
-            return IConcordanceTable._L;
-        if (s.equalsIgnoreCase(IConcordanceTable.M))
-            return IConcordanceTable._M;
-        if (s.equalsIgnoreCase(IConcordanceTable.N))
-            return IConcordanceTable._N;
-        if (s.equalsIgnoreCase(IConcordanceTable.O))
-            return IConcordanceTable._O;
-        if (s.equalsIgnoreCase(IConcordanceTable.P))
-            return IConcordanceTable._P;
-        if (s.equalsIgnoreCase(IConcordanceTable.Q))
-            return IConcordanceTable._Q;
-        if (s.equalsIgnoreCase(IConcordanceTable.R))
-            return IConcordanceTable._R;
-        if (s.equalsIgnoreCase(IConcordanceTable.S))
-            return IConcordanceTable._S;
-        if (s.equalsIgnoreCase(IConcordanceTable.T))
-            return IConcordanceTable._T;
-        if (s.equalsIgnoreCase(IConcordanceTable.U))
-            return IConcordanceTable._U;
-        if (s.equalsIgnoreCase(IConcordanceTable.V))
-            return IConcordanceTable._V;
-        if (s.equalsIgnoreCase(IConcordanceTable.W))
-            return IConcordanceTable._W;
-        if (s.equalsIgnoreCase(IConcordanceTable.X))
-            return IConcordanceTable._X;
-        if (s.equalsIgnoreCase(IConcordanceTable.Y))
-            return IConcordanceTable._Y;
-        if (s.equalsIgnoreCase(IConcordanceTable.Z))
-            return IConcordanceTable._Z;
+        if (s.equalsIgnoreCase(MCRIConcordanceTable.A))
+            return MCRIConcordanceTable._A;
+        if (s.equalsIgnoreCase(MCRIConcordanceTable.B))
+            return MCRIConcordanceTable._B;
+        if (s.equalsIgnoreCase(MCRIConcordanceTable.C))
+            return MCRIConcordanceTable._C;
+        if (s.equalsIgnoreCase(MCRIConcordanceTable.D))
+            return MCRIConcordanceTable._D;
+        if (s.equalsIgnoreCase(MCRIConcordanceTable.E))
+            return MCRIConcordanceTable._E;
+        if (s.equalsIgnoreCase(MCRIConcordanceTable.F))
+            return MCRIConcordanceTable._F;
+        if (s.equalsIgnoreCase(MCRIConcordanceTable.G))
+            return MCRIConcordanceTable._G;
+        if (s.equalsIgnoreCase(MCRIConcordanceTable.H))
+            return MCRIConcordanceTable._H;
+        if (s.equalsIgnoreCase(MCRIConcordanceTable.I))
+            return MCRIConcordanceTable._I;
+        if (s.equalsIgnoreCase(MCRIConcordanceTable.J))
+            return MCRIConcordanceTable._J;
+        if (s.equalsIgnoreCase(MCRIConcordanceTable.K))
+            return MCRIConcordanceTable._K;
+        if (s.equalsIgnoreCase(MCRIConcordanceTable.L))
+            return MCRIConcordanceTable._L;
+        if (s.equalsIgnoreCase(MCRIConcordanceTable.M))
+            return MCRIConcordanceTable._M;
+        if (s.equalsIgnoreCase(MCRIConcordanceTable.N))
+            return MCRIConcordanceTable._N;
+        if (s.equalsIgnoreCase(MCRIConcordanceTable.O))
+            return MCRIConcordanceTable._O;
+        if (s.equalsIgnoreCase(MCRIConcordanceTable.P))
+            return MCRIConcordanceTable._P;
+        if (s.equalsIgnoreCase(MCRIConcordanceTable.Q))
+            return MCRIConcordanceTable._Q;
+        if (s.equalsIgnoreCase(MCRIConcordanceTable.R))
+            return MCRIConcordanceTable._R;
+        if (s.equalsIgnoreCase(MCRIConcordanceTable.S))
+            return MCRIConcordanceTable._S;
+        if (s.equalsIgnoreCase(MCRIConcordanceTable.T))
+            return MCRIConcordanceTable._T;
+        if (s.equalsIgnoreCase(MCRIConcordanceTable.U))
+            return MCRIConcordanceTable._U;
+        if (s.equalsIgnoreCase(MCRIConcordanceTable.V))
+            return MCRIConcordanceTable._V;
+        if (s.equalsIgnoreCase(MCRIConcordanceTable.W))
+            return MCRIConcordanceTable._W;
+        if (s.equalsIgnoreCase(MCRIConcordanceTable.X))
+            return MCRIConcordanceTable._X;
+        if (s.equalsIgnoreCase(MCRIConcordanceTable.Y))
+            return MCRIConcordanceTable._Y;
+        if (s.equalsIgnoreCase(MCRIConcordanceTable.Z))
+            return MCRIConcordanceTable._Z;
         if (s.equalsIgnoreCase(":"))
-            return IConcordanceTable._COLON;
+            return MCRIConcordanceTable._COLON;
         if (s.equalsIgnoreCase("-"))
-            return IConcordanceTable._MINUS;
+            return MCRIConcordanceTable._MINUS;
         if (s.equalsIgnoreCase("0"))
-            return IConcordanceTable._0;
+            return MCRIConcordanceTable._0;
         if (s.equalsIgnoreCase("1"))
-            return IConcordanceTable._1;
+            return MCRIConcordanceTable._1;
         if (s.equalsIgnoreCase("2"))
-            return IConcordanceTable._2;
+            return MCRIConcordanceTable._2;
         if (s.equalsIgnoreCase("3"))
-            return IConcordanceTable._3;
+            return MCRIConcordanceTable._3;
         if (s.equalsIgnoreCase("4"))
-            return IConcordanceTable._4;
+            return MCRIConcordanceTable._4;
         if (s.equalsIgnoreCase("5"))
-            return IConcordanceTable._5;
+            return MCRIConcordanceTable._5;
         if (s.equalsIgnoreCase("6"))
-            return IConcordanceTable._6;
+            return MCRIConcordanceTable._6;
         if (s.equalsIgnoreCase("7"))
-            return IConcordanceTable._7;
+            return MCRIConcordanceTable._7;
         if (s.equalsIgnoreCase("8"))
-            return IConcordanceTable._8;
+            return MCRIConcordanceTable._8;
         if (s.equalsIgnoreCase("9"))
-            return IConcordanceTable._9;
+            return MCRIConcordanceTable._9;
         throw new IllegalArgumentException("Invalid String specified: " + s);
     }
 
     /**
      * Checks whether the URN has a checksum attached or not. Use this method
-     * after a an URN has been created through {@link URN#valueOf(String)}.
+     * after a an URN has been created through {@link MCRURN#valueOf(String)}.
      * 
      * @return <code>true</code> if the last digit of the urn is a valid
      *         checksum <code>false</code> otherwise.
@@ -244,7 +244,7 @@ public class URN {
         }
         String toTest = toValidate.substring(0, toValidate.length() - 1);
         try {
-            if (URN.valueOf(toTest).checksum() == chk) {
+            if (MCRURN.valueOf(toTest).checksum() == chk) {
                 return true;
             } else {
                 return false;
@@ -257,7 +257,7 @@ public class URN {
     /**
      * Removes the checksum from the urn, if any
      * 
-     * @see URN#valueOf(String)
+     * @see MCRURN#valueOf(String)
      */
     public void normalize() {
         if (this.hasChecksumAttached() == false)
@@ -271,7 +271,7 @@ public class URN {
         if (namespaceIdentifiers == null || namespaceSpecificPart == null)
             return null;
         StringBuilder urn = new StringBuilder();
-        urn.append(URN.DEFAULT_SCHEMA);
+        urn.append(MCRURN.DEFAULT_SCHEMA);
         for (int i = 0; i < namespaceIdentifiers.length; i++) {
             urn.append(":" + namespaceIdentifiers[i]);
         }
@@ -282,21 +282,21 @@ public class URN {
     /***/
     public static String[] getDefaultNamespaceIdentifiers() {
 
-        String[] arr = new String[URN.DEFAULT_NAMESPACE_IDENTIFIERS.length];
-        for (int i = 0; i < URN.DEFAULT_NAMESPACE_IDENTIFIERS.length; i++) {
-            arr[i] = new String(URN.DEFAULT_NAMESPACE_IDENTIFIERS[i]);
+        String[] arr = new String[MCRURN.DEFAULT_NAMESPACE_IDENTIFIERS.length];
+        for (int i = 0; i < MCRURN.DEFAULT_NAMESPACE_IDENTIFIERS.length; i++) {
+            arr[i] = new String(MCRURN.DEFAULT_NAMESPACE_IDENTIFIERS[i]);
         }
         return arr;
     }
 
     /**
      * Generates the checksum and permanently attaches the checksum to the urn.
-     * That means if the {@link URN#toString()} is called the checksum will be
+     * That means if the {@link MCRURN#toString()} is called the checksum will be
      * the last digit.
      * 
      * @return <code>true</code> if the checksum was attached,
      *         <code>false</code> otherwise
-     * @see {@link URN#hasChecksumAttached()}
+     * @see {@link MCRURN#hasChecksumAttached()}
      */
     public boolean attachChecksum() throws Exception {
         if (this.hasChecksumAttached()) {

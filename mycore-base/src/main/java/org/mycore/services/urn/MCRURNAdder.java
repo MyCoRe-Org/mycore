@@ -28,7 +28,7 @@ public class MCRURNAdder {
 
     private static final Logger LOGGER = Logger.getLogger(MCRURNAdder.class);
 
-    /** This methods adds a URN to the metadata of a cbu mycore object */
+    /** This methods adds an URN to the metadata of a mycore object */
     public boolean addURN(String objectId) throws Exception {
         // checking access right
         if (!MCRAccessManager.checkPermission(objectId, "writedb")) {
@@ -40,8 +40,8 @@ public class MCRURNAdder {
         if (isAllowedObject(id.getTypeId())) {
             MCRObject obj = MCRMetadataManager.retrieveMCRObject(id);
             MCRMetaElement srcElement = obj.getMetadata().getMetadataElement("def.identifier");
-            IURNProvider urnProvider = this.getURNProvider();
-            URN myURN = urnProvider.generateURN();
+            MCRIURNProvider urnProvider = this.getURNProvider();
+            MCRURN myURN = urnProvider.generateURN();
             String myURNString = myURN.toString() + myURN.checksum();
 
             /* objects with ppn have already the def.identifier element defined */
@@ -74,7 +74,9 @@ public class MCRURNAdder {
         return true;
     }
 
-    /** This methods adds a URN to the derivates mycore object and to all files within this derivate */
+    /** This methods adds a URN to the derivate of a mycore object and to all files within this derivate 
+     * @param derivateId the derivate id
+     * */
     public boolean addURNToDerivates(String derivateId) throws Exception {
         //checking access right
         if (!MCRAccessManager.checkPermission(derivateId, "writedb")) {
@@ -90,8 +92,8 @@ public class MCRURNAdder {
         }
         /* Generating base urn for the derivate */
         LOGGER.info("Generating base urn for derivate " + derivate.getId().toString());
-        IURNProvider urnProvider = this.getURNProvider();
-        URN parentURN = urnProvider.generateURN();
+        MCRIURNProvider urnProvider = this.getURNProvider();
+        MCRURN parentURN = urnProvider.generateURN();
         parentURN.attachChecksum();
 
         MCRFilesystemNode node = MCRFilesystemNode.getRootNode(derivateId);
@@ -113,17 +115,17 @@ public class MCRURNAdder {
             // get the files/directories in the filesystem
             MCRFilesystemNode[] nodes = ((MCRDirectory) node).getChildren();
             /* the list containing the path-filename pairs */
-            List<Pair<String, MCRFile>> pairs = new Vector<Pair<String, MCRFile>>();
+            List<MCRPair<String, MCRFile>> pairs = new Vector<MCRPair<String, MCRFile>>();
             /* fill the list with the path-filename pairs */
             getPathFilenamePairs(nodes, pairs);
             Collections.sort(pairs);
             /* generate the urn based on the parent urn */
             String setId = derivate.getId().getNumberAsString();
-            URN[] urnToSet = urnProvider.generateURN(pairs.size(), parentURN, setId);
+            MCRURN[] urnToSet = urnProvider.generateURN(pairs.size(), parentURN, setId);
             Element fileset = new Element("fileset");
             fileset.setAttribute("urn", parentURN.toString());
             for (int i = 0; i < pairs.size(); i++) {
-                Pair<String, MCRFile> current = pairs.get(i);
+                MCRPair<String, MCRFile> current = pairs.get(i);
                 LOGGER.info("Assigning urn " + urnToSet[i] + urnToSet[i].checksum() + " to " + current.getLeftComponent()
                     + current.getRightComponent().getName());
                 /* save the urn in the database here */
@@ -170,9 +172,9 @@ public class MCRURNAdder {
             LOGGER.error("No fileset element in derivate. URN assignment to single file canceled");
             return false;
         }
-        IURNProvider provider = getURNProvider();
-        URN base = provider.generateURN();
-        URN[] u = provider.generateURN(1, base, derivate.getId().getNumberAsString());
+        MCRIURNProvider provider = getURNProvider();
+        MCRURN base = provider.generateURN();
+        MCRURN[] u = provider.generateURN(1, base, derivate.getId().getNumberAsString());
         u[0].attachChecksum();
 
         LOGGER.info("Assigning urn " + u[0] + " to " + path);
@@ -243,11 +245,11 @@ public class MCRURNAdder {
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
-    private IURNProvider getURNProvider() throws Exception {
+    private MCRIURNProvider getURNProvider() throws Exception {
         String className = MCRConfiguration.instance().getString("MCR.URN.Provider.Class");
         LOGGER.info("Loading class " + className + " as IURNProvider");
-        Class<IURNProvider> c = (Class<IURNProvider>) Class.forName(className);
-        IURNProvider provider = c.newInstance();
+        Class<MCRIURNProvider> c = (Class<MCRIURNProvider>) Class.forName(className);
+        MCRIURNProvider provider = c.newInstance();
         return provider;
     }
 
@@ -258,7 +260,7 @@ public class MCRURNAdder {
      * @param pairs
      *            the variable where the pairs are stored in
      */
-    private void getPathFilenamePairs(MCRFilesystemNode[] m, List<Pair<String, MCRFile>> pairs) {
+    private void getPathFilenamePairs(MCRFilesystemNode[] m, List<MCRPair<String, MCRFile>> pairs) {
         if (pairs == null)
             return;
         for (int i = 0; i < m.length; i++) {
@@ -266,13 +268,13 @@ public class MCRURNAdder {
                 getPathFilenamePairs(((MCRDirectory) m[i]).getChildren(), pairs);
             }
             if (m[i] instanceof MCRFile) {
-                pairs.add(new Pair<String, MCRFile>(getPath((MCRFile) m[i]), (MCRFile) m[i]));
+                pairs.add(new MCRPair<String, MCRFile>(getPath((MCRFile) m[i]), (MCRFile) m[i]));
             }
         }
     }
 
     /** Adds a file element to the fileset element */
-    private void addToFilesetElement(Element fileset, URN urn, Pair<String, MCRFile> currentFile) throws Exception {
+    private void addToFilesetElement(Element fileset, MCRURN urn, MCRPair<String, MCRFile> currentFile) throws Exception {
         Element fileElement = new Element("file");
         fileElement.setAttribute("name", currentFile.getRightComponent().getAbsolutePath());
         fileElement.setAttribute("ifsid", currentFile.getRightComponent().getID());

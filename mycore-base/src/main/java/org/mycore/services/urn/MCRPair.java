@@ -10,11 +10,11 @@ import org.mycore.datamodel.ifs.MCRFile;
  * 
  * @author shermann
  * */
-public class Pair<S, H> implements Comparable<Pair<String, MCRFile>> {
+public class MCRPair<S, H> implements Comparable<MCRPair<String, MCRFile>> {
     private S leftComponent;
     private H rightComponent;
 
-    public Pair(S leftComponent, H rightComponent) {
+    public MCRPair(S leftComponent, H rightComponent) {
         this.leftComponent = leftComponent;
         this.rightComponent = rightComponent;
     }
@@ -53,7 +53,7 @@ public class Pair<S, H> implements Comparable<Pair<String, MCRFile>> {
      * Interface method. If one wants to compare other pairs than
      * Pair<String,MCRFile> one should subclass Pair and override this method
      */
-    public int compareTo(Pair<String, MCRFile> aPair) {
+    public int compareTo(MCRPair<String, MCRFile> aPair) {
         if (!(this.rightComponent instanceof MCRFile))
             return 0;
 

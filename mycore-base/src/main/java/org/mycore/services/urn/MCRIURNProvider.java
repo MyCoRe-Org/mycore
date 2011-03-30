@@ -8,16 +8,16 @@ package org.mycore.services.urn;
  * @author shermann
  *
  */
-public interface IURNProvider {
+public interface MCRIURNProvider {
     /** Generates a single URN */
-    public URN generateURN();
+    public MCRURN generateURN();
 
     /**
      * Generates multiple urns
      * 
      * @param int the amount of urn to generate, must be &gt;= 1
      */
-    public URN[] generateURN(int amount);
+    public MCRURN[] generateURN(int amount);
 
     /**
      * Generates multiple urns. The generated urns have the following structure
@@ -25,10 +25,10 @@ public interface IURNProvider {
      * <code>&lt;base-urn&gt;-amount</code>
      * 
      * @param int the amount of urn to generate, must be &gt;= 1
-     * @param URN
+     * @param MCRURN
      *            the base urn
      */
-    public URN[] generateURN(int amount, URN base);
+    public MCRURN[] generateURN(int amount, MCRURN base);
 
     /**
      * Generates multiple urns. The generated urns have the following structure
@@ -41,8 +41,8 @@ public interface IURNProvider {
      *            the base urn
      * @param setId
      *            must represent an integer &gt;= 0, e.g. 1, 001 or 00004
-     * @return an Array of {@link URN} or <code>null</code> if the base urn is
+     * @return an Array of {@link MCRURN} or <code>null</code> if the base urn is
      *         null or amount &lt;1 or the setID &lt;0
      */
-    public URN[] generateURN(int amount, URN base, String setId);
+    public MCRURN[] generateURN(int amount, MCRURN base, String setId);
 }
