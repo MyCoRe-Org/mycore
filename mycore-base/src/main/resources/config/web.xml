@@ -67,10 +67,6 @@
     <servlet-name>MCRIndexBrowserServlet</servlet-name>
     <servlet-class>org.mycore.frontend.indexbrowser.lucene.MCRIndexBrowserServlet</servlet-class>
   </servlet>
-  <servlet id="IndexBrowser">
-    <servlet-name>MCRIndexServlet</servlet-name>
-    <servlet-class>org.mycore.frontend.indexbrowser.sql.MCRIndexServlet</servlet-class>
-  </servlet>
   <servlet id="StoreBrowser">
     <servlet-name>MCRStoreBrowserServlet</servlet-name>
     <servlet-class>org.mycore.datamodel.ifs2.MCRStoreBrowserServlet</servlet-class>
@@ -198,14 +194,6 @@
   <servlet-mapping>
     <servlet-name>MCRIndexBrowserServlet</servlet-name>
     <url-pattern>/indexpage</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>MCRIndexServlet</servlet-name>
-    <url-pattern>/servlets/IndexServlet/*</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>MCRIndexServlet</servlet-name>
-    <url-pattern>/index/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>MCRStoreBrowserServlet</servlet-name>

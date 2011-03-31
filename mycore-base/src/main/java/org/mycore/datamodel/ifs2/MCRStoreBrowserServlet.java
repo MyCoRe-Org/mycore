@@ -43,11 +43,12 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * using storeBrowser.xsl. 
  * 
  * Some usage examples:
- * http://localhost:8291/storeBrowser/DocPortal_author/
- * http://localhost:8291/storeBrowser/DocPortal_author/0041/09
+ * http://localhost:8291/storeBrowser/DocPortal_author/index.html
+ * http://localhost:8291/storeBrowser/DocPortal_author/0041/09/index.html
  * 
- * The extra path info of the request to start browsing must be 
- * the ID of the IFS2 metadata store.
+ * The first path fragment following the servlet mapping storeBrowser/ 
+ * must be the ID of the IFS2 metadata store, which is same as the
+ * MCRObjectID base.
  * 
  * @author Frank L\u00FCtzenkirchen
  */
@@ -78,7 +79,7 @@ class MCRStoreBrowserRequest {
         String storeID = tokenizer.nextToken();
         getStore(storeID);
 
-        while (tokenizer.hasMoreTokens())
+        while (tokenizer.countTokens() > 1)
             pathElements.add(tokenizer.nextToken());
     }
 
@@ -117,11 +118,13 @@ class MCRStoreBrowserRequest {
      * @param child the file name of the object metadata file in store
      */
     private Element buildObjectXML(String child) throws IOException {
-        Element xml;
-        xml = new Element("object");
-        xml.setAttribute("id", child);
+        String objectID = child.replace(".xml", "");
         int id = store.slot2id(child);
-        xml.setAttribute("lastModified", getLastModifiedDate(id));
+        String lastModified = getLastModifiedDate(id);
+
+        Element xml = new Element("object");
+        xml.setAttribute("id", objectID);
+        xml.setAttribute("lastModified", lastModified);
         return xml;
     }
 
@@ -131,8 +134,7 @@ class MCRStoreBrowserRequest {
      * @param child the file name of the slot directory in store
      */
     private Element buildSlotXML(String slot) {
-        Element xml;
-        xml = new Element("slot");
+        Element xml = new Element("slot");
         xml.setAttribute("from", buildMinimumIDContained(slot));
         xml.setAttribute("path", slot);
         return xml;
