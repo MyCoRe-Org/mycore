@@ -160,6 +160,11 @@ public class MCRHIBConnection implements Closeable {
      */
     public Session getSession() {
         Session session = SESSION_FACTORY.getCurrentSession();
+        if (!session.isOpen()){
+            LOGGER.warn(MessageFormat.format("Hibernate session {0} is closed, generating new session",
+                    Integer.toHexString(session.hashCode())));
+            session = SESSION_FACTORY.openSession();
+        }
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(MessageFormat.format("Returning session: {0} open: {1}", Integer.toHexString(session.hashCode()), session.isOpen()));
         }
