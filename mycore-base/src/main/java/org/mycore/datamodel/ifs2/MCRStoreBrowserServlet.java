@@ -32,6 +32,7 @@ import java.util.StringTokenizer;
 
 import org.jdom.Document;
 import org.jdom.Element;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
@@ -66,6 +67,8 @@ class MCRStoreBrowserRequest {
 
         String storeID = tokenizer.nextToken();
         store = MCRStoreCenter.instance().getStore(storeID, MCRMetadataStore.class);
+        if (store == null)
+            store = MCRXMLMetadataManager.instance().getStore(storeID);
 
         while (tokenizer.hasMoreTokens())
             tokens.add(tokenizer.nextToken());
