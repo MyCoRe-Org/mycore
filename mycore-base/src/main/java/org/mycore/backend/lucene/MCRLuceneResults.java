@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 
 import org.apache.log4j.Logger;
 import org.apache.lucene.index.CorruptIndexException;
@@ -53,8 +52,8 @@ class MCRLuceneResults extends MCRResults {
 
     private static Logger LOGGER = Logger.getLogger(MCRLuceneResults.class);
 
-    public MCRLuceneResults(MCRSharedLuceneIndexContext sharedIndexContext, Collection<MCRFieldDef> addableFields, Sort sortFields,
-            Query luceneQuery, int maxResults) throws CorruptIndexException, IOException {
+    public MCRLuceneResults(MCRSharedLuceneIndexContext sharedIndexContext, Collection<MCRFieldDef> addableFields, Sort sortFields, Query luceneQuery,
+        int maxResults) throws CorruptIndexException, IOException {
         super();
         this.addableFields = addableFields;
         this.sharedIndexContext = sharedIndexContext;
@@ -77,12 +76,7 @@ class MCRLuceneResults extends MCRResults {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Query: " + query);
         }
-        ReadLock readLock = sharedIndexContext.getIndexLock().readLock();
-        try {
-            sharedIndexContext.getSearcher().search(query, collector);
-        } finally {
-            readLock.unlock();
-        }
+        sharedIndexContext.getSearcher().search(query, collector);
         //Lucene 2.4.1 has a bug: be sure to call collector.topDocs() just once
         //see http://issues.apache.org/jira/browse/LUCENE-942
         topDocs = (TopFieldDocs) collector.topDocs();
@@ -108,19 +102,14 @@ class MCRLuceneResults extends MCRResults {
     @Override
     protected MCRHit getHit(String key) {
         if (!loadComplete) {
-            ReadLock readLock = sharedIndexContext.getIndexLock().readLock();
+            IndexSearcher indexSearcher;
             try {
-                IndexSearcher indexSearcher;
-                try {
-                    indexSearcher = sharedIndexContext.getSearcher();
-                } catch (IOException e) {
-                    throw new MCRException(e);
-                }
-                for (int i = 0; i < getNumHits(); i++) {
-                    inititializeTopDoc(i, indexSearcher);
-                }
-            } finally {
-                readLock.unlock();
+                indexSearcher = sharedIndexContext.getSearcher();
+            } catch (IOException e) {
+                throw new MCRException(e);
+            }
+            for (int i = 0; i < getNumHits(); i++) {
+                inititializeTopDoc(i, indexSearcher);
             }
         }
         return super.getHit(key);
@@ -133,13 +122,10 @@ class MCRLuceneResults extends MCRResults {
         }
         MCRHit hit = super.getHit(i);
         if (hit == null) {
-            ReadLock readLock = sharedIndexContext.getIndexLock().readLock();
             try {
                 inititializeTopDoc(i, sharedIndexContext.getSearcher());
             } catch (IOException e) {
                 throw new MCRException(e);
-            } finally {
-                readLock.unlock();
             }
             hit = super.getHit(i);
         }
