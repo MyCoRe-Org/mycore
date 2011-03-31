@@ -40,7 +40,14 @@ import org.mycore.frontend.servlets.MCRServletJob;
 /**
  * Browses the hierarchical structure of any MCRMetadataStore to allow
  * robots access to all metadata. The XML output is rendered to HTML
- * using storeBrowser.xsl.  
+ * using storeBrowser.xsl. 
+ * 
+ * Some usage examples:
+ * http://localhost:8291/storeBrowser/DocPortal_author/
+ * http://localhost:8291/storeBrowser/DocPortal_author/0041/09
+ * 
+ * The extra path info of the request to start browsing must be 
+ * the ID of the IFS2 metadata store.
  * 
  * @author Frank L\u00FCtzenkirchen
  */
@@ -59,22 +66,30 @@ public class MCRStoreBrowserServlet extends MCRServlet {
 
 class MCRStoreBrowserRequest {
 
-    private List<String> tokens = new ArrayList<String>();
+    /** The slot path elements given from request, for example /0041/09/ */
+    private List<String> pathElements = new ArrayList<String>();
 
+    /** The store thats contents should be browsed */
     private MCRMetadataStore store;
 
     MCRStoreBrowserRequest(String pathInfo) {
         StringTokenizer tokenizer = new StringTokenizer(pathInfo, "/");
 
         String storeID = tokenizer.nextToken();
+        getStore(storeID);
+
+        while (tokenizer.hasMoreTokens())
+            pathElements.add(tokenizer.nextToken());
+    }
+
+    /** Gets the MCRMetadataStore for the given storeID */
+    private void getStore(String storeID) {
         store = MCRStoreCenter.instance().getStore(storeID, MCRMetadataStore.class);
         if (store == null)
             store = MCRXMLMetadataManager.instance().getStore(storeID);
-
-        while (tokenizer.hasMoreTokens())
-            tokens.add(tokenizer.nextToken());
     }
 
+    /** Builds the xml output to be rendered as response */
     Document buildResponseXML() throws Exception {
         File dir = getRequestedDirectory();
 
@@ -87,10 +102,20 @@ class MCRStoreBrowserRequest {
         return new Document(xml);
     }
 
+    /** 
+     * Builds the xml output for a single child slot or object below the current browse level
+     * 
+     * @param child the file name of the slot directory or object metadata file in store
+     */
     private Element buildXML(String child) throws Exception {
         return childIsSlot(child) ? buildSlotXML(child) : buildObjectXML(child);
     }
 
+    /** 
+     * Builds the xml output of a single object below the current slot directory to browse
+     * 
+     * @param child the file name of the object metadata file in store
+     */
     private Element buildObjectXML(String child) throws IOException {
         Element xml;
         xml = new Element("object");
@@ -100,6 +125,11 @@ class MCRStoreBrowserRequest {
         return xml;
     }
 
+    /** 
+     * Builds the xml output of a single child slot directory below the current slot to browse
+     * 
+     * @param child the file name of the slot directory in store
+     */
     private Element buildSlotXML(String slot) {
         Element xml;
         xml = new Element("slot");
@@ -108,16 +138,22 @@ class MCRStoreBrowserRequest {
         return xml;
     }
 
+    /**
+     * Returns the date of last modification for the given object id in store. 
+     */
     private String getLastModifiedDate(int id) throws IOException {
         Date lastModified = store.retrieve(id).getLastModified();
-        String s = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(lastModified);
-        return s;
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(lastModified);
     }
 
+    /**
+     * Returns the minimum ID of any object that can be stored below
+     * the given slot directory.
+     */
     private String buildMinimumIDContained(String slot) {
         StringBuffer sb = new StringBuffer();
 
-        for (String token : tokens)
+        for (String token : pathElements)
             sb.append(token);
         sb.append(slot);
 
@@ -129,17 +165,24 @@ class MCRStoreBrowserRequest {
         return String.valueOf(id);
     }
 
+    /**
+     * Checks if the given file name represents a slot directory
+     * 
+     * @return true, if this is a slot directory, false if it is a object metadata file
+     */
     private boolean childIsSlot(String child) {
         return child.length() < store.getIDLength();
     }
 
+    /** Returns the directory in filesystem the requested slot path is mapped to in the store */
     private File getRequestedDirectory() {
         File dir = getBaseDir();
-        for (String token : tokens)
+        for (String token : pathElements)
             dir = new File(dir, token);
         return dir;
     }
 
+    /** Returns the base directory in the local filesystem the store to be browsed uses */
     private File getBaseDir() {
         return new File(store.getStoreConfig().getBaseDir());
     }
