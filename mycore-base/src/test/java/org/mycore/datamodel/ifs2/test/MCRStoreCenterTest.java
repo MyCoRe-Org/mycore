@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mycore.datamodel.ifs2.MCRStore;
 import org.mycore.datamodel.ifs2.MCRStoreCenter;
-import org.mycore.datamodel.ifs2.StoreAlreadyExistsException;
+import org.mycore.datamodel.ifs2.MCRStoreAlreadyExistsException;
 import org.mycore.datamodel.ifs2.MCRStore.MCRStoreConfig;
 
 public class MCRStoreCenterTest {
@@ -33,7 +33,7 @@ public class MCRStoreCenterTest {
         assertNull("There should be no store with ID: " + storeID, storeHeap.getStore(storeID, FakeStore.class));
     }
 
-    @Test(expected = StoreAlreadyExistsException.class)
+    @Test(expected = MCRStoreAlreadyExistsException.class)
     public void addStoreTwice() throws Exception {
         MCRStoreCenter storeHeap = MCRStoreCenter.instance();
 

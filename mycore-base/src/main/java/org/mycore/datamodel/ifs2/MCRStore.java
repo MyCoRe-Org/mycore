@@ -68,14 +68,13 @@ import org.mycore.common.MCRException;
  * "DocPortal_document_00010485.xml" for example.
  * 
  * MCR.IFS2.Store.ID.Class=org.mycore.datamodel.ifs2.MCRFileStore
- * 
  * MCR.IFS2.Store.ID.BaseDir=/foo/bar
- * 
  * MCR.IFS2.Store.ID.SlotLayout=4-2-2
  * 
  * @author Frank Lützenkirchen
  */
 public abstract class MCRStore {
+    
     public interface MCRStoreConfig {
 
         public String getID();
@@ -226,6 +225,10 @@ public abstract class MCRStore {
         String id = numWithLeadingZerosFormat.format(ID);
         return id;
     }
+    
+    /** Returns the maximum length of any ID stored in this store */  
+    int getIDLength()
+    { return idLength; }
 
     /**
      * Returns true if data for the given ID is existing in the store.
@@ -291,7 +294,7 @@ public abstract class MCRStore {
      *            the file name of the slot containing the data
      * @return the ID of that data
      */
-    private int slot2id(String slot) {
+    int slot2id(String slot) {
         slot = slot.substring(prefix.length());
         slot = slot.substring(0, idLength);
         return Integer.parseInt(slot);
@@ -309,7 +312,7 @@ public abstract class MCRStore {
      */
     private String findMaxID(FileObject dir, int depth) throws FileSystemException {
         FileObject[] children = dir.findFiles(new FileDepthSelector(slotLength.length + 1, slotLength.length + 1));
-        Arrays.sort(children, new FileObjectComparator());
+        Arrays.sort(children, new MCRFileObjectComparator());
 
         if (children.length > 0) {
             return children[children.length - 1].getName().getBaseName();
@@ -392,7 +395,7 @@ public abstract class MCRStore {
             private void addChildren(FileObject dir) throws FileSystemException {
                 if (dir.getType() == FileType.FOLDER) {
                     FileObject[] children = dir.getChildren();
-                    Arrays.sort(children, new FileObjectComparator());
+                    Arrays.sort(children, new MCRFileObjectComparator());
 
                     for (int i = 0; i < children.length; i++) {
                         files.add((order ? i : 0), children[i]);

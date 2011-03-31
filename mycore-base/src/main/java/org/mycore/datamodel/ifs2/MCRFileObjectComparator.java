@@ -4,7 +4,7 @@ import java.util.Comparator;
 
 import org.apache.commons.vfs.FileObject;
 
-class FileObjectComparator implements Comparator<FileObject>{
+class MCRFileObjectComparator implements Comparator<FileObject>{
 
     @Override
     public int compare(FileObject o1, FileObject o2) {
