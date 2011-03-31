@@ -26,6 +26,7 @@ package org.mycore.datamodel.ifs2;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -58,7 +59,7 @@ public class MCRStoreBrowserServlet extends MCRServlet {
 
 class MCRStoreBrowserRequest {
 
-    private List<String> tokens;
+    private List<String> tokens = new ArrayList<String>();
 
     private MCRMetadataStore store;
 
