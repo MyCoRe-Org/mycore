@@ -216,7 +216,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      * 
      * @param filename
      *            the filename of the file that contains the mcrpermissions
-     * @see #updatePermissionsFromFile(String)
+     * @see #createPermissionsFromFile(String)
      */
     public static void loadPermissionsFromFile(String filename) throws Exception {
         createPermissionsFromFile(filename);
@@ -374,8 +374,6 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      * 
      * @param permission
      *            String type of permission like read, writedb, etc.
-     * @param documentType
-     *            String a MCRObjectID-Type like document, disshab, etc.
      * @param strFileRule
      *            String the path to the xml file, that contains the rule
      * @throws SAXParseException 
@@ -391,8 +389,6 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      * 
      * @param permission
      *            String type of permission like read, writedb, etc.
-     * @param documentType
-     *            String a MCRObjectID-Type like document, disshab, etc.
      * @param strFileRule
      *            String the path to the xml file, that contains the rule
      * @param description

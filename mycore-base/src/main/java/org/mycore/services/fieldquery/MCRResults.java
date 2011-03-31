@@ -305,7 +305,7 @@ public class MCRResults implements Iterable<MCRHit> {
      * this results list. The data of common hits is combined from both result
      * lists.
      * 
-     * @param other
+     * @param others
      *            the other result lists
      */
     public static MCRResults intersect(MCRResults... others) {
@@ -342,7 +342,7 @@ public class MCRResults implements Iterable<MCRHit> {
      * Adds all hits of another result list that are not yet in this result
      * list. Combines the MCRHit data of both result lists.
      * 
-     * @param other
+     * @param others
      *            the other result lists
      */
     public static MCRResults union(MCRResults... others) {
@@ -375,10 +375,10 @@ public class MCRResults implements Iterable<MCRHit> {
     }
 
     /**
-     * returns false if {@link #addHit(MCRHit)} and {@link #merge(Document, String)} are safe operations. 
-     * @return
+     * @return false if {@link #addHit(MCRHit)} and {@link #merge(Document, String)} are safe operations. 
+     * 
      */
     public boolean isReadonly() {
-        return false;
+        return false; // default implementation
     }
 }

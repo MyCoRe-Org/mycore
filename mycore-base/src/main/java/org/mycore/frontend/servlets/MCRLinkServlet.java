@@ -45,6 +45,7 @@ import org.mycore.services.fieldquery.MCRResults;
  * is a simplified mcr:results JDOM tree.
  * 
  * @author Jens Kupferschmidt
+ * @author A.Schaar
  * 
  * @see org.mycore.frontend.servlets.MCRServlet
  */
@@ -134,8 +135,7 @@ public class MCRLinkServlet extends MCRServlet {
     /**
      * Forwards the document to the output
      * 
-     * @author A.Schaar
-     * @see its overwritten in jspdocportal
+     * see its overwritten in jspdocportal
      */
     protected void sendToLayout(HttpServletRequest req, HttpServletResponse res, Document jdom) throws IOException {
         getLayoutService().doLayout(req, res, jdom);

@@ -50,7 +50,6 @@ public class MCRIndexBrowserUtils {
 
     /**
      * Creates a xml document with the results of the index browser.
-     * @return 
      */
     public static Document createResultListDocument(MCRIndexBrowserIncomingData incomingBrowserData, MCRIndexBrowserConfig config) {
         List<MCRIndexBrowserEntry> resultList = null;

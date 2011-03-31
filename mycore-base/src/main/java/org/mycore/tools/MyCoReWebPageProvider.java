@@ -59,7 +59,7 @@ public class MyCoReWebPageProvider {
     /**
      * Adds a section to the MyCoRe webpage.
      * @param title the title of the section
-     * @param xmlAsText xml string which is added to the section
+     * @param xmlAsString xml string which is added to the section
      * @param lang the language of the section specified by a language key.
      * @return added section
      */

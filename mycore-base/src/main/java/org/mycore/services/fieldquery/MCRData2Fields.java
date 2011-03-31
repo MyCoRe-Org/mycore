@@ -62,7 +62,7 @@ import org.mycore.datamodel.metadata.MCRObject;
  * metadata, MCRFile xml content. MCRFile additional data, MCRFile text content
  * using the text filter plug-ins, and any plain XML document.
  * 
- * @see MCRSearcher#addToIndex(String, List)
+ * @see MCRSearcher#addToIndex(String, String, List)
  * @author Frank Lützenkirchen
  */
 public class MCRData2Fields {
@@ -343,7 +343,7 @@ public class MCRData2Fields {
      * xpath="/mycoreobject/metadata/dates/date"
      * value="ext:normalizeDate(string(text()))" &gt;
      * 
-     * @param date
+     * @param sDate
      *            the date string in a locale-dependent format
      */
     public static String normalizeDate(String sDate) {

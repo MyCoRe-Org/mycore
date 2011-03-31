@@ -90,8 +90,6 @@ public class MCRQueryClientBase implements MCRQueryClientInterface {
     /**
      * Retrieves an Object from remote host using the defined service.
      * 
-     * @param hostAlias
-     *            the alias of the remote host as defined in hosts.xml
      * @param ID
      *            the ID of the Object to retrieve
      * @return the object document
@@ -122,8 +120,6 @@ public class MCRQueryClientBase implements MCRQueryClientInterface {
     /**
      * Retrieves an link from remote host using the WebService.
      * 
-     * @param hostAlias
-     *            the alias of the remote host as defined in hosts.xml
      * @param from
      *            the source of the link
      * @param to

@@ -26,6 +26,7 @@ import org.mycore.common.MCRUsageException;
  * Represents a stored file or directory node with its metadata and content.
  * 
  * @author Frank Lützenkirchen
+ * @author Stefan Freitag
  * @version $Revision$ $Date$
  */
 public abstract class MCRFilesystemNode {
@@ -149,8 +150,6 @@ public abstract class MCRFilesystemNode {
 
     /**
      * Changed method because of problems with update of files.
-     * 
-     * @author Stefan Freitag
      * 
      */
     protected void checkName(String name, boolean doExistCheck) {

@@ -54,6 +54,8 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
+ * @author A.Schaar
+ * @author Robert Stephan
  * 
  * @version $Revision$ $Date: 2008-01-14 11:02:17 +0000 (Mo, 14 Jan
  *          2008) $
@@ -283,7 +285,6 @@ public class MCRFileNodeServlet extends MCRServlet {
     /**
      * Called to layout the directory structure
      * 
-     * @author Robert Stephan
      * @param req
      *            the html request
      * @param res
@@ -291,7 +292,7 @@ public class MCRFileNodeServlet extends MCRServlet {
      * @param jdom
      *            the jdom document
      * @throws IOException
-     * @see overwritten in JSPDocportal
+     * see overwritten in JSPDocportal
      */
     protected void layoutDirectory(HttpServletRequest req, HttpServletResponse res, Document jdom) throws IOException {
         getLayoutService().doLayout(req, res, jdom);
@@ -300,8 +301,7 @@ public class MCRFileNodeServlet extends MCRServlet {
     /**
      * Forwards the error to generate the output
      * 
-     * @author A.Schaar
-     * @see its overwritten in jspdocportal
+     * see its overwritten in jspdocportal
      */
     protected void errorPage(HttpServletRequest req, HttpServletResponse res, int error, String msg, Exception ex, boolean xmlstyle)
             throws IOException {

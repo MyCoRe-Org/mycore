@@ -40,7 +40,7 @@ import org.mycore.datamodel.ifs.MCRFile;
  * from JPEG etc.) whenever an MCRFile's content is changed. The extracted data
  * is stored in MCRFile's additional xml data.
  * 
- * @see org.mycore.datamodel.ifs.MCRFilesystemNode#getAdditionalData()
+ * @see org.mycore.datamodel.ifs.MCRFilesystemNode#getAdditionalData(dataName)
  * 
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$

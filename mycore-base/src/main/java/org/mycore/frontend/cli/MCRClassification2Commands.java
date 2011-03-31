@@ -124,7 +124,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * 
      * Classification is built from a file.
      * 
-     * @param filname
+     * @param filename
      *            file in mcrclass xml format
      * @throws URISyntaxException 
      * @throws SAXParseException 
@@ -222,7 +222,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * 
      * @param ID
      *            the ID of the MCRClassification to be save.
-     * @param filename
+     * @param dirname
      *            the filename to store the classification
      * @param style
      *            the name part of the stylesheet like <em>style</em>

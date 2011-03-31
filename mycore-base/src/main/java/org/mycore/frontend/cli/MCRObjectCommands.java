@@ -977,7 +977,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            revision to restore
      * @throws MCRActiveLinkException
      *             if object is created (no real update), see
-     *             {@link #create(MCRObject)}
+     *             {@link #getInstance(MCRObject)}
      */
     public static final void restoreToRevision(String id, int revision) throws MCRActiveLinkException {
         LOGGER.info("Try to restore object " + id + " with revision " + revision);

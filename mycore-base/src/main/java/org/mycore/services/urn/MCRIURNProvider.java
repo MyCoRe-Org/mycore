@@ -15,7 +15,7 @@ public interface MCRIURNProvider {
     /**
      * Generates multiple urns
      * 
-     * @param int the amount of urn to generate, must be &gt;= 1
+     * @param amount the amount of urn to generate, must be &gt;= 1
      */
     public MCRURN[] generateURN(int amount);
 
@@ -24,8 +24,8 @@ public interface MCRIURNProvider {
      * <code>&lt;base-urn&gt;-1</code> up to
      * <code>&lt;base-urn&gt;-amount</code>
      * 
-     * @param int the amount of urn to generate, must be &gt;= 1
-     * @param MCRURN
+     * @param amount the amount of urn to generate, must be &gt;= 1
+     * @param base
      *            the base urn
      */
     public MCRURN[] generateURN(int amount, MCRURN base);

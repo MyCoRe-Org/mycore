@@ -203,7 +203,7 @@ public class MCRQuery {
     /**
      * Parses a XML representation of a query.
      * 
-     * @param xml
+     * @param doc
      *            the XML document
      * @return the parsed MCRQuery
      */

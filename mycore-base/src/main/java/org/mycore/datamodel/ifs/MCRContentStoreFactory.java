@@ -51,7 +51,6 @@ public class MCRContentStoreFactory {
 
     /**
      * Hashtable StoreID to MCRContentStore implementing
-     * {@link org.mycore.services.query.MCRTextSearchInterface}
      */
     protected static Hashtable INDEX_STORES;
 

@@ -126,7 +126,6 @@ public final class MCRObjectID {
      * @param maxInWorkflow
      *            returned integer part of id will be at least
      *            <code>maxInWorkflow + 1</code>
-     * @return
      */
     public static synchronized MCRObjectID getNextFreeId(String base_id, int maxInWorkflow) {
         int last = Math.max(getLastID(base_id).getNumberAsInteger(), maxInWorkflow) + 1;

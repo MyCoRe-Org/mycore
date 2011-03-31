@@ -246,7 +246,7 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
      * Executes a query on this searcher. The query MUST only refer to fields
      * that are managed by this searcher.
      * 
-     * @param cond
+     * @param condition
      *            the query condition
      * @param maxResults
      *            the maximum number of results to return, 0 means all results

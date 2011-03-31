@@ -240,8 +240,8 @@ public class MCROAIProvider extends MCRServlet {
     /**
      * The method replace the default from MCRServlet
      * 
-     * @param MCRServlet
-     *            job
+     * @param job 
+     *           MCRServlet
      * @throws JDOMException
      * @throws ServletException
      * @throws IOException

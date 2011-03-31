@@ -186,7 +186,6 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
      * 
      * @param obj
      *            the MCRMetaElement object
-     * @return true if set was succesful, otherwise false
      */
     public final void setMetadataElement(MCRMetaElement obj) {
         MCRMetaElement old = getMetadataElement(obj.getTag());

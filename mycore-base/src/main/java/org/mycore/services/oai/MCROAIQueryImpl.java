@@ -91,7 +91,6 @@ public class MCROAIQueryImpl implements MCROAIQuery {
      * Method listSets. Gets a list of classificationId's and Labels for a given
      * ID
      * 
-     * @param classificationId
      * @param instance
      *            the Servletinstance
      * @return List a list that contains an array of three Strings: the category
@@ -341,7 +340,6 @@ public class MCROAIQueryImpl implements MCROAIQuery {
     /**
      * @param from
      * @param until
-     * @return
      */
     @SuppressWarnings("unchecked")
     public List<String> getDeletedItems(String from, String until) {

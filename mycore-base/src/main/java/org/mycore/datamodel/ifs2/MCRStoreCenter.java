@@ -57,8 +57,8 @@ public class MCRStoreCenter {
     /**
      * Remove the store from store center
      * 
-     * @param store - Removed this store from store center
-     * @return True if successfully removed or false
+     * @param id - Removed this store from store center
+     * @return true if successfully removed or false
      */
     public boolean removeStore(String id) {
         return getStoreHeap().remove(id) != null;

@@ -22,9 +22,9 @@ public class MCRURN {
     private int checksum;
 
     /**
-     * @param String
-     *            [] Namespace identiefiers
-     * @param String
+     * @param namespaceIdentifiers
+     *            [] Namespace identifiers
+     * @param namespaceSpecificPart
      *            namespace specific part of the uri
      * @throws IllegalArgumentException
      *             if one of the arguments is <code>null</code>
@@ -49,7 +49,7 @@ public class MCRURN {
     /**
      * Creates a new urn by a given string.
      * 
-     * @param String
+     * @param s
      *            the string the urn should be created from
      * @see MCRURN#normalize()
      * */
@@ -296,7 +296,7 @@ public class MCRURN {
      * 
      * @return <code>true</code> if the checksum was attached,
      *         <code>false</code> otherwise
-     * @see {@link MCRURN#hasChecksumAttached()}
+     * @see MCRURN#hasChecksumAttached()
      */
     public boolean attachChecksum() throws Exception {
         if (this.hasChecksumAttached()) {

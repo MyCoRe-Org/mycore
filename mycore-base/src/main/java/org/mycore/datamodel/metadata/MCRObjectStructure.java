@@ -307,7 +307,7 @@ public class MCRObjectStructure {
      *            the index of the link to be removed
      * @exception IndexOutOfBoundsException
      *                throw this exception, if the index is false
-     * @deprecated use {@link #getDerivates()} or {@link #removeDerivate(String)} instead                
+     * @deprecated use {@link #getDerivate(int)} or {@link #removeDerivate(MCRObjectID)} instead                
      */
     public final void removeDerivate(int index) throws IndexOutOfBoundsException {
         getDerivates().remove(index);

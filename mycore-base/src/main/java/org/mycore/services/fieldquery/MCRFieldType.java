@@ -81,7 +81,6 @@ public class MCRFieldType {
      * @param fieldType
      *            the field type, e.g. "identifier"
      * @return true, if this search operator can be used, false otherwise
-     * @return
      */
     public static boolean isValidOperatorForType(String fieldType, String operator) {
         if (!isValidType(fieldType)) {

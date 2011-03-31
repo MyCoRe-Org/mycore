@@ -65,6 +65,8 @@ import org.mycore.parsers.bool.MCRSetCondition;
  * 
  * @author Frank Lützenkirchen
  * @author Harald Richter
+ * @author A.Schaar
+ * 
  */
 public class MCRSearchServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
@@ -414,10 +416,8 @@ public class MCRSearchServlet extends MCRServlet {
     /**      
      * Redirect browser to results page     
      *      
-     * @author A.Schaar   
-     * @author Frank Lützenkirchen
      *   
-     * @see its overwritten in jspdocportal     
+     * see its overwritten in jspdocportal     
      */
     protected void sendRedirect(HttpServletRequest req, HttpServletResponse res, MCRCachedQueryData qd, Document query) throws IOException {
 
@@ -458,8 +458,7 @@ public class MCRSearchServlet extends MCRServlet {
     /**
       * Forwards the document to the output
       * 
-      * @author A.Schaar
-      * @see its overwritten in jspdocportal
+      * see its overwritten in jspdocportal
       */
     protected void sendToLayout(HttpServletRequest req, HttpServletResponse res, Document jdom) throws IOException {
         getLayoutService().doLayout(req, res, jdom);

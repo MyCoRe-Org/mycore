@@ -16,6 +16,11 @@ import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
 
+/**
+ * 
+ * Xalan extention for navigation.xsl
+ *
+ */
 public class MCRLayoutUtilities {
     final static String OBJIDPREFIX_WEBPAGE = "webpage:";
 
@@ -52,9 +57,9 @@ public class MCRLayoutUtilities {
      * and exclusive $blockerWebpageID are verified. Use this, if you want to
      * speed up the check
      * 
-     * @param webpageID,
+     * @param webpageID
      *            any item/@href from navigation.xml
-     * @param blockerWebpageID,
+     * @param blockerWebpageID
      *            any ancestor item of webpageID from navigation.xml
      * @return true if access granted, false if not
      */
@@ -75,7 +80,7 @@ public class MCRLayoutUtilities {
      * permission, based on ACL-System. To be used by XSL with
      * Xalan-Java-Extension-Call.
      * 
-     * @param webpageID,
+     * @param webpageID
      *            any item/@href from navigation.xml
      * @return true if access granted, false if not
      */
@@ -95,7 +100,7 @@ public class MCRLayoutUtilities {
      * Returns all labels of the ancestor axis for the given item within
      * navigation.xml
      * 
-     * @param itemClone
+     * @param item
      * @return Label as String, like "labelRoot > labelChild >
      *         labelChildOfChild"
      * @throws JDOMException
@@ -136,11 +141,11 @@ public class MCRLayoutUtilities {
     /**
      * Verifies, if an item of navigation.xml has a given $permission.
      * 
-     * @param webpageID,
+     * @param webpageID
      *            item/@href
-     * @param permission,
+     * @param permission
      *            permission to look for
-     * @param strategy:
+     * @param strategy
      *            ALLTRUE => all ancestor items of webpageID must have the
      *            permission, ONETRUE_ALLTRUE => only 1 ancestor item must have
      *            the permission
@@ -170,14 +175,14 @@ public class MCRLayoutUtilities {
      * Verifies, if an item of navigation.xml has a given $permission with a
      * stop item ($blockerWebpageID)
      * 
-     * @param webpageID,
+     * @param webpageID
      *            item/@href
-     * @param permission,
+     * @param permission
      *            permission to look for
-     * @param strategy:
+     * @param strategy
      *            ALL2BLOCKER_TRUE => all ancestor items of webpageID till and
      *            exlusiv $blockerWebpageID must have the permission
-     * @param blockerWebpageID:
+     * @param blockerWebpageID
      *            any ancestor item of webpageID from navigation.xml
      * @return true, if access, false if no access
      */
@@ -224,7 +229,7 @@ public class MCRLayoutUtilities {
      * 
      * @param permission
      * @param item
-     * @param access,
+     * @param access
      *            initial value
      * @return
      */
@@ -242,10 +247,9 @@ public class MCRLayoutUtilities {
      * 
      * @param permission
      * @param item
-     * @param access,
+     * @param access
      *            initial value
-     * @param user
-     * @return
+     * @param userID
      */
     public static boolean itemAccess(String permission, Element item, boolean access, String userID) {
         MCRAccessInterface am = MCRAccessManager.getAccessImpl();

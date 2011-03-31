@@ -372,7 +372,7 @@ public final class MCRMetadataManager {
     /**
      * Fires {@link MCREvent#REPAIR_EVENT} for given object.
      * 
-     * @param mcrObject
+     * @param mcrBaseObj
      */
     public static final void fireRepairEvent(final MCRBase mcrBaseObj) throws MCRPersistenceException {
         if (mcrBaseObj instanceof MCRDerivate) {

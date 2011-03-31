@@ -200,8 +200,6 @@ final public class MCRDerivate extends MCRBase {
      * The methode receive the multimedia object(s) for the given MCRObjectID
      * and returned it as MCRDirectory.
      * 
-     * @param id
-     *            the object ID
      * @return the MCRDirectory of the multimedia object
      * @exception MCRPersistenceException
      *                if a persistence problem is occured

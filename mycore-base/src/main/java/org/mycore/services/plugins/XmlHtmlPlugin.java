@@ -100,10 +100,6 @@ public class XmlHtmlPlugin implements TextFilterPlugin {
         return contentTypes;
     }
 
-    /**
-     * @see org.mycore.services.plugins.TextFilterPlugin#transform(org.mycore.datamodel.ifs.MCRFileContentType,org.mycore.datamodel.ifs.MCRContentInputStream,
-     *      java.io.OutputStream)
-     */
     public Reader transform(MCRFileContentType ct, InputStream input) throws FilterPluginTransformException {
         if (getSupportedContentTypes().contains(ct)) {
             String tx = getFullText(ct, input);

@@ -586,7 +586,6 @@ public class MCRXMLMetadataManager {
 
     /**
      * @param ids MCRObject ids
-     * @return
      * @throws IOException thrown by {@link MCRObjectIDFileSystemDate}
      */
     private List<MCRObjectIDDate> getObjectDateList(List<String> ids) throws IOException {
