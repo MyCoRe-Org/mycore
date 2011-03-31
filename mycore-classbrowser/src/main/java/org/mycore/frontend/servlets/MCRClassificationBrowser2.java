@@ -36,9 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
-
 import org.mycore.common.MCRConfigurationException;
-import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
