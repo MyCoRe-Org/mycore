@@ -116,4 +116,8 @@ class MCRSharedLuceneIndexContext {
             LOGGER.warn("Error while closing indexreader " + toString(), e1);
         }
     }
+
+    public ReentrantReadWriteLock getIndexLock() {
+        return indexLock;
+    }
 }

@@ -39,6 +39,7 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
@@ -279,7 +280,8 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
      * 
      * @return result set
      */
-    private MCRResults getLuceneHits(Query luceneQuery, int maxResults, List<MCRSortBy> sortBy, boolean addSortData, Set<String> usedFields) throws Exception {
+    private MCRResults getLuceneHits(Query luceneQuery, int maxResults, List<MCRSortBy> sortBy, boolean addSortData, Set<String> usedFields)
+            throws Exception {
         if (maxResults <= 0) {
             maxResults = 1000000;
         }
@@ -463,7 +465,8 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
                 if (PLUGIN_MANAGER.isSupported(mcrfile.getContentType())) {
                     LOGGER.debug("####### Index MCRFile: " + mcrfile.getPath());
 
-                    BufferedReader in = new BufferedReader(PLUGIN_MANAGER.transform(mcrfile.getContentType(), mcrfile.getContentAsInputStream()));
+                    BufferedReader in = new BufferedReader(PLUGIN_MANAGER.transform(mcrfile.getContentType(),
+                            mcrfile.getContentAsInputStream()));
                     String s;
                     StringBuffer text = new StringBuffer();
                     while ((s = in.readLine()) != null) {
@@ -521,14 +524,15 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
 
     @Override
     public void addSortData(Iterator<MCRHit> hits, List<MCRSortBy> sortBy) {
+        ReadLock readLock = sharedIndexContext.getIndexLock().readLock();
         try {
+            IndexSearcher indexSearcher = sharedIndexContext.getSearcher();
             while (hits.hasNext()) {
                 MCRHit hit = hits.next();
                 String id = hit.getID();
                 Term te1 = new Term("mcrid", id);
 
                 TermQuery qu = new TermQuery(te1);
-                IndexSearcher indexSearcher = sharedIndexContext.getSearcher();
                 TopDocs hitl = indexSearcher.search(qu, 1);
                 if (hitl.totalHits > 0) {
                     org.apache.lucene.document.Document doc = indexSearcher.doc(hitl.scoreDocs[0].doc);
@@ -537,6 +541,8 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
             }
         } catch (IOException e) {
             LOGGER.error("Exception in MCRLuceneSearcher (addSortData)", e);
+        } finally {
+            readLock.unlock();
         }
     }
 
