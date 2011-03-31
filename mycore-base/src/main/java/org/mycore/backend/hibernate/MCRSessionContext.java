@@ -49,16 +49,7 @@ public class MCRSessionContext extends ThreadLocalSessionContext implements MCRS
 
     private static final long serialVersionUID = -801352757721845792L;
 
-    private static final String SESSION_KEY = "hibernateSession";
-
     private static final Logger LOGGER = Logger.getLogger(MCRSessionContext.class);
-
-    ThreadLocal<Boolean> firstThread = new ThreadLocal<Boolean>() {
-        @Override
-        protected Boolean initialValue() {
-            return Boolean.FALSE;
-        }
-    };
 
     public MCRSessionContext(SessionFactoryImplementor factory) {
         super(factory);
@@ -71,32 +62,16 @@ public class MCRSessionContext extends ThreadLocalSessionContext implements MCRS
         switch (event.getType()) {
         case activated:
             if (event.getConcurrentAccessors() <= 1) {
-                // mark this Thread as first Thread of MCRSession
                 LOGGER.debug("First Thread to access " + mcrSession);
-                firstThread.set(true);
             }
             break;
         case passivated:
             currentSession = unbind(factory);
-            if (event.getConcurrentAccessors() <= 1) {
-                // save Session for later use;
-                LOGGER.debug("Saving hibernate Session for later use in " + mcrSession);
-                //mcrSession.put(SESSION_KEY, currentSession);
-                autoCloseSession(currentSession);
-            } else {
-                autoCloseSession(currentSession);
-            }
-            // reset firstThread marker as this Session passivates now
-            firstThread.remove();
+            autoCloseSession(currentSession);
             break;
         case destroyed:
             currentSession = unbind(factory);
             autoCloseSession(currentSession);
-            Object obj = mcrSession.get(SESSION_KEY);
-            if (obj != null && currentSession != obj) {
-                autoCloseSession((Session) obj);
-            }
-            firstThread.remove();
             break;
         case created:
             break;
@@ -117,34 +92,11 @@ public class MCRSessionContext extends ThreadLocalSessionContext implements MCRS
 
     @Override
     protected org.hibernate.classic.Session buildOrObtainSession() {
-        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         org.hibernate.classic.Session session = null;
         try {
-            if (firstThread.get()) {
-                LOGGER.debug("First Thread to access " + mcrSession);
-                LOGGER.debug("Try to reuse hibernate Session from current " + mcrSession);
-                Object obj = mcrSession.get(SESSION_KEY);
-                if (obj != null && ((Session) obj).isOpen()) {
-                    LOGGER.debug("Reusing old hibernate Session.");
-                    session = (org.hibernate.classic.Session) obj;
-                } else if (obj == null) {
-                    LOGGER.debug("No Hibernate Session found.");
-                } else if (!((Session) obj).isOpen()) {
-                    LOGGER.debug("Found only a closed Hibernate Session.");
-                }
-            }
-            if (session == null) {
-                // creates a new one
-                LOGGER.debug("Obtaining new hibernate Session.");
-                session = super.buildOrObtainSession();
-                if (mcrSession.get(SESSION_KEY) == null || firstThread.get()) {
-                    // must be a Sessions that started before this instance added as
-                    // MCRSessionListener or old Session was closed
-                    LOGGER.debug("Storing hibernate session in current MCRSession");
-                    firstThread.set(true);
-                    mcrSession.put(SESSION_KEY, session);
-                }
-            }
+            // creates a new one
+            LOGGER.debug("Obtaining new hibernate Session.");
+            session = super.buildOrObtainSession();
             return session;
         } finally {
             LOGGER.debug("Returning session with transaction: " + session.getTransaction());
