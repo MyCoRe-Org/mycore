@@ -1,0 +1,10 @@
+<project name="indexing" xmlns:mcr="antlib:org.mycore.buildtools">
+  
+  <import file="../../integrate.xml"/>
+  
+  <target name="config">
+    <mcr:config action="addInclude" propertyfile="${build.config}/mycore.properties" key="MCR.CLI.Classes.Internal"
+      value="org.mycore.frontend.indexbrowser.MCRGoogleSitemapCommands"/>
+  </target>
+  
+</project>
