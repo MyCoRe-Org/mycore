@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Properties;
 
@@ -66,20 +65,23 @@ public class MCRSWORDAuthenticator {
 
     /** Private Constructor for use as a singleton. */
     public MCRSWORDAuthenticator() {
-
+        init();
+    }
+    
+    private void init() {
+        
+        LOG.info("initializing authenticator");
         basicAuthData = new Properties();
         try {
             String authFilename = MCRConfiguration.instance().getString("MCR.SWORD.auth.file");
             if (authFilename != null) {
-                swordUsersFile = new File(this.getClass().getResource("/" + authFilename).toURI());
+                swordUsersFile = new File(authFilename);
                 loadBasicAuthData();
             }
         } catch (IOException e) {
             LOG.error("couldn't load sword auth data: " + e.getMessage(), e);
-        } catch (URISyntaxException e) {
-            LOG.error("couldn't load sword auth data: " + e.getMessage(), e);
         }
-
+        
         authN = MCRConfiguration.instance().getString("MCR.SWORD.auth.method", "None");
         if (authN != null) {
             LOG.info("setting auth method to: " + authN);
