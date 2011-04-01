@@ -254,9 +254,11 @@ public class MCRSWORDDepositServlet extends MCRServlet {
                 DepositResponse dr = myRepository.doDeposit(d, job);
                 
                 Generator g = dr.getEntry().getGenerator();
-                if (g != null) {
-                    g.setUri(getBaseURL() + MCRConfiguration.instance().getString("MCR.SWORD.generator.uri", ""));
+                if (g == null) {
+                    dr.getEntry().setGenerator(new Generator());
                 }
+                g.setUri(getBaseURL() + MCRConfiguration.instance().getString("MCR.SWORD.generator.uri", ""));
+                g.setVersion(MCRConfiguration.instance().getString("MCR.SWORD.generator.version", ""));
 
                 // Echo back the user agent
                 if (request.getHeader(HttpHeaders.USER_AGENT.toString()) != null) {
