@@ -119,10 +119,11 @@ public class MCRIndexBrowserSearcher {
                 cAnd.addChild(new MCRQueryCondition(fieldproject, "=", indexConfig.getIndex().substring(0, ilen)));
             }
         }
-        if (browseData.getSearch() != null && browseData.getSearch().length() > 0) {
+        if (browseData.getSearch() != null && !browseData.getSearch().isEmpty()) {
             MCRFieldDef field = MCRFieldDef.getDef(indexConfig.getBrowseField());
             String value = browseData.getSearch();
-            if (browseData != null && browseData.getMode() != null && browseData.getMode().equalsIgnoreCase("contains")) {
+            String operator = getOperator();
+            if ("like".equals(operator)) {
                 if (!value.startsWith("\\*")) {
                     value = "*" + value;
                 }
@@ -130,7 +131,6 @@ public class MCRIndexBrowserSearcher {
                     value = value + "*";
                 }
             }
-            String operator = getOperator();
             cAnd.addChild(new MCRQueryCondition(field, operator, value));
         }
         return cAnd;
@@ -187,25 +187,27 @@ public class MCRIndexBrowserSearcher {
         return hitList;
     }
 
+    
+    /** The default query condition operator to use if not given in request */
+    protected final static String defaultOperator = "like";
+    
     /**
-     * Returns the lucene search operator as String to be used doing a lucene
-     * query. This will be taken from MyBrowseData.mode; If MyBrowseData.mode ==
-     * "prefix" -> return "like", If MyBrowseData.mode == "equals" -> return
-     * "=", Else return "like"
-     * 
-     * @return The lucene search operator as String
-     * 
+     * Returns the query condition operator to be used. 
      */
     protected String getOperator() {
-        if (browseData != null && browseData.getMode() != null && browseData.getMode().equalsIgnoreCase("equals")) {
+        if (browseData == null)
+            return defaultOperator;
+
+        String mode = browseData.getMode();
+
+        if ("equals".equalsIgnoreCase(mode))
             return "=";
-        } else if (browseData != null && browseData.getMode() != null && browseData.getMode().equalsIgnoreCase("prefix")) {
+        else if ("prefix".equalsIgnoreCase(mode) || "like".equalsIgnoreCase(mode))
             return "like";
-        } else if (browseData != null && browseData.getMode() != null && browseData.getMode().equalsIgnoreCase("contains")) {
-            return "like";
-        } else {
-            return "like";
-        }
+        else if ("contains".equalsIgnoreCase(mode))
+            return "contains";
+        else
+            return defaultOperator;
     }
 
     /**
