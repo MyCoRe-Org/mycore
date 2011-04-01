@@ -133,6 +133,9 @@ public class MCRSWORDServer implements SWORDServer, MCRSWORDIngester {
     /** Counter counts op deposits. */
     private int counter;
 
+    /**
+     * @category SWORDServer
+     */
     public AtomDocumentResponse doAtomDocument(AtomDocumentRequest adr, MCRServletJob job) throws SWORDAuthenticationException, SWORDErrorException,
             SWORDException {
 
@@ -322,6 +325,7 @@ public class MCRSWORDServer implements SWORDServer, MCRSWORDIngester {
      * Performs the deposit for a {@link #METS_PROFILE}. Inside ingest validation of the
      * package profile is done. If valid profile is given a specific implementation of
      * {@link MCRSWORDIngester} is used, which is able to handle the {@link #METS_PROFILE}. 
+     * @category MCRSWORDIngester
      */
     @Override
     public void ingest(Deposit deposit, SWORDEntry response, StringBuffer verboseInfo, MCRServletJob job) throws IOException, SWORDException,
@@ -341,6 +345,9 @@ public class MCRSWORDServer implements SWORDServer, MCRSWORDIngester {
             
             // check packaging of descriptor
             validatePackageProfile(packageDescriptor, extractedFiles);
+            
+            // set package descriptor, so ingester does not need to search for it
+            deposit.setPackageDescriptor(packageDescriptor);
             
             // ingest
             MCRSWORDIngester ingester = (MCRSWORDIngester) MCRConfiguration.instance().getSingleInstanceOf("MCR.SWORD.ingester.class");
@@ -468,6 +475,10 @@ public class MCRSWORDServer implements SWORDServer, MCRSWORDIngester {
         File file = deposit.getFile();
         ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new CheckedInputStream(new FileInputStream(file), new Adler32())));
         ZipEntry ze;
+        
+        // configure temp dir
+        String tempDirString = MCRConfiguration.instance().getString("MCR.SWORD.temp.upload.dir", System.getProperty("java.io.tmpdir"));
+        File tempDir = new File(tempDirString);
 
         StringBuffer skippedDirectories = new StringBuffer(LINE_SEPARATOR + "skipped directories: {");
         StringBuffer decompressedFiles = new StringBuffer(LINE_SEPARATOR + "decompressed files: {");
@@ -486,7 +497,7 @@ public class MCRSWORDServer implements SWORDServer, MCRSWORDIngester {
             // write temp file
             String filePrefix = filename.substring(0, filename.lastIndexOf("."));
             String fileSuffix = filename.substring(filename.lastIndexOf(".") + 1);
-            File tempFile = File.createTempFile(filePrefix, fileSuffix);
+            File tempFile = File.createTempFile(filePrefix, fileSuffix, tempDir);
             FileOutputStream output = new FileOutputStream(tempFile);
             int bytesRead;
             while ((bytesRead = zip.read(buffer)) != -1) {
@@ -522,6 +533,7 @@ public class MCRSWORDServer implements SWORDServer, MCRSWORDIngester {
      *             thrown if one of the previous details is invalid
      * @throws SWORDException
      *             thrown if a internal error occured
+     * @category Helper
      */
     @SuppressWarnings("unchecked")
     protected void validatePackageProfile(File packageDescriptor, Map<File, String> extractedFiles) throws SWORDErrorException, SWORDException {
