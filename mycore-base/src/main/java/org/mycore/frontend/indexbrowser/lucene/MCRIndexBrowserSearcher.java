@@ -123,7 +123,9 @@ public class MCRIndexBrowserSearcher {
             MCRFieldDef field = MCRFieldDef.getDef(indexConfig.getBrowseField());
             String value = browseData.getSearch();
             String operator = getOperator();
-            if ("like".equals(operator)) {
+            if ("prefix".equals(browseData.getMode()))
+                value += "*";
+            else if ("like".equals(operator)) {
                 if (!value.startsWith("\\*")) {
                     value = "*" + value;
                 }
