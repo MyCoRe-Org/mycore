@@ -32,25 +32,25 @@ import com.ibm.icu.text.Normalizer;
 
 /**
  * This class implements only static methods to normalize text values. Rules
- * written as x&gt;u .You can configure this normalization with three property
+ * written as x&gt;u .You can configure this normalization with following property
  * values<br>
  * <ul>
+ * <li>MCR.Metadata.Normalize - true (standard) | false - switch normalization on or off</li>
+ * <li>MCR.Metadata.Normalize.UseRuleFirst - true to run private rules before diacritics replacement | false (standard) run after diacritics replacement
+ * <li>MCR.Metadata.Normalize.DiacriticRule true (standard) | false - switch diacritics replacement on or off
  * <li>MCR.Metadata.Normalize.AddRule - add more rules to the default rule</li>
  * <li>MCR.Metadata.Normalize.SetRule - replace the default rule</li>
- * <li>MCR.Metadata.Normalize.DiacriticRule true (standard) | false - first
- * rule, remove diacritics from letters <br>
+ * </ul><br>
  * Here you can see how decomposition works:
  * http://www.icu-project.org/apiref/icu4j/com/ibm/icu/text/Normalizer.html <br>
  * These diacritics will be removed from letters when property is true: <br>
  * "\u0301", // &amp;#769; (0xcc 0x81 = 204 129) COMBINING ACUTE ACCENT <br>
  * "\u0300", // &amp;#768; (0xcc 0x80 = 204 128) COMBINING GRAVE ACCENT <br>
- * "\u0302", // &amp;#770; (0xcc 0x82 = 204 130) COMBINING CIRCUMFLEX ACCENT
- * <br>
+ * "\u0302", // &amp;#770; (0xcc 0x82 = 204 130) COMBINING CIRCUMFLEX ACCENT<br>
  * "\u0307", // &amp;#775; (0xcc 0x87 = 204 135) COMBINING DOT ABOVE <br>
  * "\u0308", // &amp;#776; (0xcc 0x88 = 204 136) COMBINING DIAERESIS <br>
  * "\u0306", // &amp;#774; (0xcc 0x86 = 204 134) COMBINING BREVE <br>
- * "\u030B", // &amp;#779; (0xcc 0x8b = 204 139) COMBINING DOUBLE ACUTE ACCENT
- * <br>
+ * "\u030B", // &amp;#779; (0xcc 0x8b = 204 139) COMBINING DOUBLE ACUTE ACCENT<br>
  * "\u030C", // &amp;#780; (0xcc 0x8c = 204 140) COMBINING CARON (Hacek) <br>
  * "\u030A", // &amp;#778; (0xcc 0x8a = 204 138) COMBINING RING ABOVE <br>
  * "\u0304", // &amp;#772; (0xcc 0x84 = 204 132) COMBINING MACRON <br>
@@ -58,14 +58,10 @@ import com.ibm.icu.text.Normalizer;
  * "\u0328", // &amp;#808; (0xcc 0xa8 = 204 168) COMBINING OGONEK <br>
  * "\u0327", // &amp;#807; (0xcc 0xa7 = 204 167) COMBINING CEDILLA <br>
  * "\u0323", // &amp;#803; (0xcc 0xa3 = 204 163) COMBINING DOT BELOW <br>
- * "\u0338", // &amp;#824; (0xcc 0xb8 = 204 184) COMBINING LONG SOLIDUS OVERLAY
- * <br>
- * "\u0336", // &amp;#822; (0xcc 0xb6 = 204 182) COMBINING LONG STROKE OVERLAY
- * <br>
+ * "\u0338", // &amp;#824; (0xcc 0xb8 = 204 184) COMBINING LONG SOLIDUS OVERLAY<br>
+ * "\u0336", // &amp;#822; (0xcc 0xb6 = 204 182) COMBINING LONG STROKE OVERLAY<br>
  * "\u0332", // &amp;#818; (0xcc 0xb2 = 204 178) COMBINING LOW LINE <br>
  * "\u0303"};// &amp;#771; (0xcc 0x83 = 204 131) COMBINING TILDE <br>
- * </li>
- * </ul>
  * 
  * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
@@ -78,7 +74,7 @@ public class MCRNormalizer {
     static Logger logger = Logger.getLogger(MCRNormalizer.class);
 
     /** List of characters that will be replaced */
-    private static String rules = "\u00DF>ss \u00E4>ae \u00C4>ae \u00F6>oe \u00D6>oe \u00FC>ue \u00DC>ue"; // sz ae Ae oe Oe ue Ue
+    private static String rules = "\u00DF>ss \u00E4>ae \u00C4>ae \u00F6>oe \u00D6>oe \u00FC>ue \u00DC>ue"; // sz ae ae oe oe ue ue
 
     private static Pattern[] patterns;
 
@@ -127,14 +123,20 @@ public class MCRNormalizer {
      * @return the normalized String in lower case.
      */
     public static final String normalizeString(String in) {
+    	
+        if (in == null || in.trim().length() == 0) {
+            return "";
+        }
+        
+        if (!normalize) {
+        	return in;
+        }
+        
         String temp = in;
-        // use private rules first
         if (useRuleFirst) {
-            temp = normalizeString(temp, normalize);
+            temp = doNormalize(temp);
         }
 
-        // replace letters with diacritics with therr corresponding letter
-        // lower letter umlat a is replaces with a
         if (diacriticRule) {
             temp = Normalizer.decompose(temp, false);
 
@@ -181,40 +183,18 @@ public class MCRNormalizer {
         }
 
         if (!useRuleFirst) {
-            temp = normalizeString(temp, normalize);
+            temp = doNormalize(temp);
         }
 
         return temp;
     }
 
-    public static final String normalizeString(String in, boolean reallyNormalize) {
-        if (in == null || in.trim().length() == 0) {
-            return "";
-        }
-
-        if (!reallyNormalize) {
-            return in;
-        }
-
-        // in = in.toLowerCase(Locale.GERMANY).trim();
+    private static final String doNormalize(String in) {
         in = in.toLowerCase().trim();
-
         for (int i = 0; i < patterns.length; i++) {
             in = patterns[i].matcher(in).replaceAll(replace[i]);
         }
-
         return in;
     }
 
-    /**
-     * Activates or deactivates normalizing. Used in miless software to make
-     * indexing of scorm and searching possible
-     * 
-     * @param value
-     *            true normalize strings false do not normalize strings
-     * 
-     */
-    public static final void setDoNormalize(boolean value) {
-        normalize = value;
-    }
 }

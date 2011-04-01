@@ -110,7 +110,7 @@ public class MCRBuildLuceneQuery {
 
                 if ("index".equals(fieldtype)) {
                     fieldtype = "identifier";
-                    value = MCRNormalizer.normalizeString(value, true);
+                    value = MCRNormalizer.normalizeString(value);
                 }
                 if (usedFields != null) {
                     usedFields.add(field);
