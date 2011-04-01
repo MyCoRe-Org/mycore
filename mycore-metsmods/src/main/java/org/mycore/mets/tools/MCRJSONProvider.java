@@ -1,20 +1,20 @@
-/* $Revision: 3033 $ 
- * $Date: 2010-10-22 13:41:12 +0200 (Fri, 22 Oct 2010) $ 
- * $LastChangedBy: thosch $
- * Copyright 2010 - Thüringer Universitäts- und Landesbibliothek Jena
- *  
- * Mets-Editor is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Mets-Editor is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Mets-Editor.  If not, see http://www.gnu.org/licenses/.
+/*
+ * $Revision$ $Date$
+ * $LastChangedBy$ Copyright 2010 - Thüringer Universitäts- und
+ * Landesbibliothek Jena
+ * 
+ * Mets-Editor is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * Mets-Editor is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * Mets-Editor. If not, see http://www.gnu.org/licenses/.
  */
 package org.mycore.mets.tools;
 
@@ -24,11 +24,13 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.dom4j.DocumentException;
+import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.filter.ElementFilter;
 import org.jdom.xpath.XPath;
+import org.mycore.common.MCRConstants;
 import org.mycore.mets.model.IMetsElement;
 import org.mycore.mets.tools.model.MCRDirectory;
 import org.mycore.mets.tools.model.MCREntry;
@@ -36,7 +38,6 @@ import org.mycore.mets.tools.model.MCRMetsTree;
 
 /**
  * @author Silvio Hermann (shermann)
- *
  */
 public class MCRJSONProvider {
     final private static Logger LOGGER = Logger.getLogger(MCRJSONProvider.class);
@@ -48,15 +49,17 @@ public class MCRJSONProvider {
     private Document mets;
 
     /**
-     * @param mets the Mets document
-     * @param derivate the derivate id
+     * @param mets
+     *            the Mets document
+     * @param derivate
+     *            the derivate id
      */
     @SuppressWarnings("unchecked")
     public MCRJSONProvider(Document mets, String derivate) throws DocumentException {
         this.derivate = derivate;
         this.mets = mets;
 
-        /*set the struct link*/
+        /* set the struct link */
         Iterator<Element> it = mets.getDescendants(new ElementFilter("structLink", IMetsElement.METS));
         if (!it.hasNext()) {
             throw new DocumentException("Mets document is invalid, no structLink element found");
@@ -75,15 +78,15 @@ public class MCRJSONProvider {
 
     /**
      * @param mets
-     * @return String a String in JSON format suitable for a client side dijit tree
+     * @return String a String in JSON format suitable for a client side dijit
+     *         tree
      */
     @SuppressWarnings("unchecked")
     public String toJSON() {
         Element logStructMap = getLogicalStructMapElement(this.mets);
         Element parentDiv = logStructMap.getChild("div", IMetsElement.METS);
         if (parentDiv == null) {
-            LOGGER
-                    .error("Invalid mets document, as there is no div container in the logical structure map <mets:structMap TYPE=\"LOGICAL\"> ");
+            LOGGER.error("Invalid mets document, as there is no div container in the logical structure map <mets:structMap TYPE=\"LOGICAL\"> ");
             return null;
         }
 
@@ -115,6 +118,7 @@ public class MCRJSONProvider {
         }
 
         Iterator<Element> divIterator = nodes.iterator();
+
         while (divIterator.hasNext()) {
             Element currentLogicalDiv = divIterator.next();
             String logicalId = currentLogicalDiv.getAttributeValue("ID");
@@ -125,14 +129,25 @@ public class MCRJSONProvider {
             if (structureType.equals("page")) {
                 String physId = getPhysicalIdsForLogical(logicalId)[0];
                 String itemId = physId.substring(physId.indexOf("_") + 1);
-                MCREntry page = new MCREntry(itemId, physId, label, "page");
+                String path = getHref(itemId);
+                String labelPage = getLabelByPhysicalId(physId);
+
+                if (labelPage == null) {
+                    LOGGER.debug("Could not determine label attribute. Using file name as label");
+                    label = path.substring(path.lastIndexOf("/") + 1);
+                }
+                MCREntry page = new MCREntry(itemId, labelPage, path, physId, "page");
+
                 int order = Integer.valueOf(getOrderAttribute(physId));
                 page.setOrder(order);
                 String orderLabel = getOrderLabelAttribute(physId);
                 page.setOrderLabel(orderLabel);
                 tree.addEntry(page);
             }
-            /* current element is about to be a category/parent in the digit tree */
+            /*
+             * current element is about to be a category/parent in the digit
+             * tree
+             */
             else {
                 try {
                     XPath kiddies = XPath.newInstance("mets:div");
@@ -161,14 +176,15 @@ public class MCRJSONProvider {
                 }
             }
         }
+
         LOGGER.debug(tree.asJson());
         return tree.asJson();
     }
 
     /**
-     * @return the orderlabel attribute of the div with the given physical id, 
-     * returns an empty string if there is no such label
-     * */
+     * @return the orderlabel attribute of the div with the given physical id,
+     *         returns an empty string if there is no such label
+     */
     @SuppressWarnings("unchecked")
     private String getOrderLabelAttribute(String physId) {
         XPath xpath = null;
@@ -194,7 +210,7 @@ public class MCRJSONProvider {
         return array.length == 0 ? false : true;
     }
 
-    /**@return the id of the first logical div where the 1st child is a file */
+    /** @return the id of the first logical div where the 1st child is a file */
     @SuppressWarnings("unchecked")
     private String getFirstDivWithFiles(String parentLogicalDivId, List<Element> children) throws JDOMException {
         Iterator<Element> iterator = children.iterator();
@@ -240,17 +256,24 @@ public class MCRJSONProvider {
     }
 
     /**
-     * Gets the files (physical ids) belonging to the directory, 
-     * creates a entry for each file and adds it to the directory
-     *  
+     * Gets the files (physical ids) belonging to the directory, creates a entry
+     * for each file and adds it to the directory
+     * 
      * @param dir
      */
     private void addFiles(MCRDirectory dir) {
         String[] physIds = getPhysicalIdsForLogical(dir.getLogicalId());
         for (int i = 0; i < physIds.length; i++) {
+            /* determine base properties */
             String itemId = physIds[i].substring(physIds[i].indexOf("_") + 1);
-            /* TODO get real label from mets */
-            MCREntry page = new MCREntry(itemId, physIds[i], itemId, "page");
+            String path = getHref(itemId);
+            String label = getLabelByPhysicalId(physIds[i]);
+            if (label == null) {
+                LOGGER.debug("Could not determine label attribute. Using file name as label");
+                label = path.substring(path.lastIndexOf("/") + 1);
+            }
+
+            MCREntry page = new MCREntry(itemId, label, path, physIds[i], "page");
             page.setOrder(getOrderAttribute(physIds[i]));
             String orderLabel = getOrderLabelAttribute(physIds[i]);
             page.setOrderLabel(orderLabel);
@@ -258,7 +281,58 @@ public class MCRJSONProvider {
         }
     }
 
-    /** Returns the physical order of the file associated with the given physical id */
+    /**
+     * @param physId
+     */
+    private String getLabelByPhysicalId(String physId) {
+        try {
+            String path = "mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div[@ID='" + physId + "']/@LABEL";
+            XPath xp = XPath.newInstance(path);
+            xp.addNamespace(MCRConstants.METS_NAMESPACE);
+            xp.addNamespace(MCRConstants.XLINK_NAMESPACE);
+
+            Object node = xp.selectSingleNode(this.mets);
+            if (node instanceof Attribute) {
+                return ((Attribute) node).getValue();
+            }
+
+        } catch (Exception ex) {
+            LOGGER.error("Error determining LABEL in structMap (physical) for physical id " + physId, ex);
+        }
+        return null;
+    }
+
+    /**
+     * Returns the href attribute of the given file within the fileGrp section
+     * 
+     * @param masterFildID
+     *            the fileid to lookup (must be in the mets:fileGrp USE="MASTER"
+     *            element)
+     * @return the href attribute
+     */
+    private String getHref(String masterFildID) {
+        try {
+            String path = "mets:mets/mets:fileSec/mets:fileGrp[@USE='MASTER']/mets:file[@ID='" + masterFildID
+                    + "']/mets:FLocat/@xlink:href";
+            XPath xp = XPath.newInstance(path);
+            xp.addNamespace(MCRConstants.METS_NAMESPACE);
+            xp.addNamespace(MCRConstants.XLINK_NAMESPACE);
+
+            Object node = xp.selectSingleNode(this.mets);
+            if (node instanceof Attribute) {
+                return ((Attribute) node).getValue();
+            }
+
+        } catch (Exception ex) {
+            LOGGER.error("Error determining path in file group with use=\"master\" for master file id " + masterFildID, ex);
+        }
+        return null;
+    }
+
+    /**
+     * Returns the physical order of the file associated with the given physical
+     * id
+     */
     @SuppressWarnings("unchecked")
     private int getOrderAttribute(String physId) {
         XPath xpath = null;
@@ -277,7 +351,8 @@ public class MCRJSONProvider {
     }
 
     /**
-     * @param mets the source mets document
+     * @param mets
+     *            the source mets document
      * @return the logical structure map of the mets document
      */
     @SuppressWarnings("unchecked")

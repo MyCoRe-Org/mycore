@@ -32,12 +32,12 @@
     <url-pattern>/servlets/MCRMETSServlet/*</url-pattern>
 </servlet-mapping>
 
-<servlet id="MCRFilelistProviderServlet">
-    <servlet-name>MCRFilelistProviderServlet</servlet-name>
-    <servlet-class>org.mycore.mets.servlets.MCRFilelistProviderServlet</servlet-class>
+<servlet id="MCRJSONProviderServlet">
+    <servlet-name>MCRJSONProviderServlet</servlet-name>
+    <servlet-class>org.mycore.mets.servlets.MCRJSONProviderServlet</servlet-class>
 </servlet>
 
 <servlet-mapping>
-    <servlet-name>MCRFilelistProviderServlet</servlet-name>
-    <url-pattern>/servlets/MCRFilelistProviderServlet</url-pattern>
+    <servlet-name>MCRJSONProviderServlet</servlet-name>
+    <url-pattern>/servlets/MCRJSONProviderServlet</url-pattern>
 </servlet-mapping>

@@ -1,6 +1,6 @@
-/* $Revision: 3033 $ 
- * $Date: 2010-10-22 13:41:12 +0200 (Fri, 22 Oct 2010) $ 
- * $LastChangedBy: thosch $
+/* $Revision$ 
+ * $Date$ 
+ * $LastChangedBy$
  * Copyright 2010 - Thüringer Universitäts- und Landesbibliothek Jena
  *  
  * Mets-Editor is free software: you can redistribute it and/or modify

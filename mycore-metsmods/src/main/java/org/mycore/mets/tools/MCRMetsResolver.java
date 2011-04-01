@@ -1,5 +1,5 @@
 /*
- * $Id$ $Revision: 5697 $ $Date: 23.08.2010 $
+ * $Id$ $Revision$ $Date$
  * 
  * This file is part of *** M y C o R e *** See http://www.mycore.de/ for
  * details.
