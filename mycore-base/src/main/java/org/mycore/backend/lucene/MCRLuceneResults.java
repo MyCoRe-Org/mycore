@@ -76,7 +76,12 @@ class MCRLuceneResults extends MCRResults {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Query: " + query);
         }
-        sharedIndexContext.getSearcher().search(query, collector);
+        sharedIndexContext.getIndexReadLock().lock();
+        try {
+            sharedIndexContext.getSearcher().search(query, collector);
+        } finally {
+            sharedIndexContext.getIndexReadLock().unlock();
+        }
         //Lucene 2.4.1 has a bug: be sure to call collector.topDocs() just once
         //see http://issues.apache.org/jira/browse/LUCENE-942
         topDocs = (TopFieldDocs) collector.topDocs();
@@ -102,14 +107,19 @@ class MCRLuceneResults extends MCRResults {
     @Override
     protected MCRHit getHit(String key) {
         if (!loadComplete) {
-            IndexSearcher indexSearcher;
+            sharedIndexContext.getIndexReadLock().lock();
             try {
-                indexSearcher = sharedIndexContext.getSearcher();
-            } catch (IOException e) {
-                throw new MCRException(e);
-            }
-            for (int i = 0; i < getNumHits(); i++) {
-                inititializeTopDoc(i, indexSearcher);
+                IndexSearcher indexSearcher;
+                try {
+                    indexSearcher = sharedIndexContext.getSearcher();
+                } catch (IOException e) {
+                    throw new MCRException(e);
+                }
+                for (int i = 0; i < getNumHits(); i++) {
+                    inititializeTopDoc(i, indexSearcher);
+                }
+            } finally {
+                sharedIndexContext.getIndexReadLock().unlock();
             }
         }
         return super.getHit(key);
@@ -122,10 +132,13 @@ class MCRLuceneResults extends MCRResults {
         }
         MCRHit hit = super.getHit(i);
         if (hit == null) {
+            sharedIndexContext.getIndexReadLock().lock();
             try {
                 inititializeTopDoc(i, sharedIndexContext.getSearcher());
             } catch (IOException e) {
                 throw new MCRException(e);
+            } finally {
+                sharedIndexContext.getIndexReadLock().unlock();
             }
             hit = super.getHit(i);
         }

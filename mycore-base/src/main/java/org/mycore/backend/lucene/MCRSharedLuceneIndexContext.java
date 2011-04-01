@@ -25,6 +25,7 @@ package org.mycore.backend.lucene;
 
 import java.io.IOException;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 
 import org.apache.log4j.Logger;
 import org.apache.lucene.index.CorruptIndexException;
@@ -115,5 +116,9 @@ class MCRSharedLuceneIndexContext {
         } catch (IOException e1) {
             LOGGER.warn("Error while closing indexreader " + toString(), e1);
         }
+    }
+
+    public ReadLock getIndexReadLock() {
+        return indexLock.readLock();
     }
 }

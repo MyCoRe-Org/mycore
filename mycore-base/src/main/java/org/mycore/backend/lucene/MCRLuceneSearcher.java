@@ -90,7 +90,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
 
     private static TextFilterPluginManager PLUGIN_MANAGER = null;
 
-    static Analyzer analyzer = new PerFieldAnalyzerWrapper(new GermanAnalyzer(Version.LUCENE_CURRENT));
+    static Analyzer analyzer = new PerFieldAnalyzerWrapper(new GermanAnalyzer(Version.LUCENE_30));
 
     File IndexDir;
 
@@ -521,14 +521,15 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
 
     @Override
     public void addSortData(Iterator<MCRHit> hits, List<MCRSortBy> sortBy) {
+        sharedIndexContext.getIndexReadLock().lock();
         try {
+            IndexSearcher indexSearcher = sharedIndexContext.getSearcher();
             while (hits.hasNext()) {
                 MCRHit hit = hits.next();
                 String id = hit.getID();
                 Term te1 = new Term("mcrid", id);
 
                 TermQuery qu = new TermQuery(te1);
-                IndexSearcher indexSearcher = sharedIndexContext.getSearcher();
                 TopDocs hitl = indexSearcher.search(qu, 1);
                 if (hitl.totalHits > 0) {
                     org.apache.lucene.document.Document doc = indexSearcher.doc(hitl.scoreDocs[0].doc);
@@ -537,6 +538,8 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
             }
         } catch (IOException e) {
             LOGGER.error("Exception in MCRLuceneSearcher (addSortData)", e);
+        } finally {
+            sharedIndexContext.getIndexReadLock().unlock();
         }
     }
 
