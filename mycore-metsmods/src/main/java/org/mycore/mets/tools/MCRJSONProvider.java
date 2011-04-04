@@ -204,7 +204,7 @@ public class MCRJSONProvider implements Comparator<MCRFilesystemNode> {
         /* handle the pages direct assigned to the root */
         String[] physIDsUnderRoot = getPhysicalIdsForLogical(parentDiv.getAttributeValue("ID"));
         for (String physicalId : physIDsUnderRoot) {
-            String itemID = physicalId.substring(physicalId.indexOf("_") + 1);
+            String itemID = getFileID(physicalId);
             String path = getHref(itemID);
             String label = getLabelByPhysicalId(physicalId);
             if (label == null) {
@@ -305,7 +305,7 @@ public class MCRJSONProvider implements Comparator<MCRFilesystemNode> {
         String[] physIds = getPhysicalIdsForLogical(dir.getLogicalId());
         for (int i = 0; i < physIds.length; i++) {
             /* determine base properties */
-            String itemId = physIds[i].substring(physIds[i].indexOf("_") + 1);
+            String itemId = getFileID(physIds[i]);
             String path = getHref(itemId);
             String label = getLabelByPhysicalId(physIds[i]);
             if (label == null) {
@@ -320,6 +320,29 @@ public class MCRJSONProvider implements Comparator<MCRFilesystemNode> {
             page.setOrderLabel(orderLabel);
             dir.addEntry(page);
         }
+    }
+
+    /**
+     * Method returns the file id for the given physical id
+     * 
+     * @return the file id for the given physical id
+     */
+    private String getFileID(String physicalID) {
+        try {
+            String path = "mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div/mets:div[@ID='" + physicalID + "']/mets:fptr/@FILEID";
+            XPath xp = XPath.newInstance(path);
+            xp.addNamespace(MCRConstants.METS_NAMESPACE);
+            xp.addNamespace(MCRConstants.XLINK_NAMESPACE);
+
+            Object node = xp.selectSingleNode(this.mets);
+            if (node instanceof Attribute) {
+                return ((Attribute) node).getValue();
+            }
+
+        } catch (Exception ex) {
+            LOGGER.error("Error determining file id in structMap for physical file id " + physicalID, ex);
+        }
+        return null;
     }
 
     /**
@@ -346,15 +369,14 @@ public class MCRJSONProvider implements Comparator<MCRFilesystemNode> {
     /**
      * Returns the href attribute of the given file within the fileGrp section
      * 
-     * @param masterFildID
+     * @param fileID
      *            the fileid to lookup (must be in the mets:fileGrp USE="MASTER"
      *            element)
      * @return the href attribute
      */
-    private String getHref(String masterFildID) {
+    private String getHref(String fileID) {
         try {
-            String path = "mets:mets/mets:fileSec/mets:fileGrp[@USE='MASTER']/mets:file[@ID='" + masterFildID
-                    + "']/mets:FLocat/@xlink:href";
+            String path = "mets:mets/mets:fileSec/mets:fileGrp[@USE='MASTER']/mets:file[@ID='" + fileID + "']/mets:FLocat/@xlink:href";
             XPath xp = XPath.newInstance(path);
             xp.addNamespace(MCRConstants.METS_NAMESPACE);
             xp.addNamespace(MCRConstants.XLINK_NAMESPACE);
@@ -365,7 +387,7 @@ public class MCRJSONProvider implements Comparator<MCRFilesystemNode> {
             }
 
         } catch (Exception ex) {
-            LOGGER.error("Error determining path in file group with use=\"master\" for master file id " + masterFildID, ex);
+            LOGGER.error("Error determining path in file group with use=\"master\" for master file id " + fileID, ex);
         }
         return null;
     }

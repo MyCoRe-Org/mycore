@@ -66,10 +66,8 @@ public class MCRMETSServlet extends MCRServlet {
     public void init() throws ServletException {
         super.init();
         String cacheParam = getInitParameter("cacheTime");
-        CACHE_TIME = cacheParam != null ? Integer.parseInt(cacheParam) : (60 * 60 * 24);// default
-                                                                                        // is
-                                                                                        // one
-                                                                                        // day
+        /* default is one day */
+        CACHE_TIME = cacheParam != null ? Integer.parseInt(cacheParam) : (60 * 60 * 24);
         useExpire = MCRConfiguration.instance().getBoolean("MCR.Component.MetsMods.Servlet.UseExpire", true);
     }
 
@@ -101,7 +99,7 @@ public class MCRMETSServlet extends MCRServlet {
             Document mets = MCRMETSGenerator.getGenerator().getMETS(dir, ignoreNodes);
             MCRLayoutService.instance().doLayout(request, response, mets);
         }
-        LOGGER.info("Generation of JSON (" + this.getClass().getSimpleName() + ") took " + (System.currentTimeMillis() - start) + " ms");
+        LOGGER.info("Generation of code by " + this.getClass().getSimpleName() + " took " + (System.currentTimeMillis() - start) + " ms");
     }
 
     private boolean useExistingMets(HttpServletRequest request) {

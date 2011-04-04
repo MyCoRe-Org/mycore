@@ -221,7 +221,7 @@
                   <!-- the actual tree -->
                   <div dojoType="dojo.data.ItemFileWriteStore" jsId="myStore"
                     urlPreventCache="true"
-                    url="{concat($WebApplicationBaseURL,'servlets/MCRMETSServlet/',$derivateId,'?XSL.Style=json&amp;useExistingMets=',$useExistingMets)}">
+                    url="{concat($WebApplicationBaseURL, 'servlets/MCRJSONProviderServlet?derivate=', $derivateId, '&amp;useExistingMets=',$useExistingMets)}">
                   </div>
                   <div dojoType="dijit.tree.TreeStoreModel" jsId="itemModel" store="myStore" childrenAttrs="children">
                   </div>

@@ -18,6 +18,8 @@
  */
 package org.mycore.mets.servlets;
 
+import java.util.HashSet;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
@@ -29,6 +31,7 @@ import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.mets.model.MCRMETSGenerator;
 import org.mycore.mets.tools.MCRJSONProvider;
 
 /**
@@ -51,7 +54,7 @@ public class MCRJSONProviderServlet extends MCRServlet {
         boolean useExistingMets = true;
         useExistingMets = Boolean.valueOf(useExistingMetsParam);
 
-        Document mets = getMetsXML(derivate);
+        Document mets = getExistingMetsXML(derivate);
         long start = System.currentTimeMillis();
         String json = null;
 
@@ -61,7 +64,7 @@ public class MCRJSONProviderServlet extends MCRServlet {
             json = provider.toJSON();
         } else {
             LOGGER.info("Creating initial JSONObject for derivate with id \"" + derivate + "\"");
-            MCRJSONProvider provider = new MCRJSONProvider(derivate);
+            MCRJSONProvider provider = new MCRJSONProvider(getBaseMetsXML(derivate), derivate);
             json = provider.toJSON();
         }
 
@@ -78,7 +81,7 @@ public class MCRJSONProviderServlet extends MCRServlet {
      *            the derivate id for which the document should be returned
      * @return Document the mets document
      */
-    private Document getMetsXML(String derivate) {
+    private Document getExistingMetsXML(String derivate) throws Exception {
         MCRDirectory dir = MCRDirectory.getRootDirectory(derivate);
         MCRFilesystemNode file = dir.getChildByPath(MCRJSONProvider.DEFAULT_METS_FILENAME);
 
@@ -93,5 +96,23 @@ public class MCRJSONProviderServlet extends MCRServlet {
         }
 
         return null;
+    }
+
+    /**
+     * @param derivate
+     *            the derivate id for which the document should be returned
+     * @return Document the mets document on base of the derivate
+     */
+    private Document getBaseMetsXML(String derivate) throws Exception {
+        MCRDirectory dir = MCRDirectory.getRootDirectory(derivate);
+        MCRFilesystemNode metsFile = dir.getChildByPath(MCRJSONProvider.DEFAULT_METS_FILENAME);
+
+        HashSet<MCRFilesystemNode> ignoreNodes = new HashSet<MCRFilesystemNode>();
+        if (metsFile != null) {
+            ignoreNodes.add(metsFile);
+        }
+        Document mets = MCRMETSGenerator.getGenerator().getMETS(dir, ignoreNodes);
+
+        return mets;
     }
 }
