@@ -18,8 +18,11 @@
  */
 package org.mycore.mets.tools;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -30,7 +33,10 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.filter.ElementFilter;
 import org.jdom.xpath.XPath;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRConstants;
+import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.mets.model.IMetsElement;
 import org.mycore.mets.tools.model.MCRDirectory;
 import org.mycore.mets.tools.model.MCREntry;
@@ -39,7 +45,9 @@ import org.mycore.mets.tools.model.MCRMetsTree;
 /**
  * @author Silvio Hermann (shermann)
  */
-public class MCRJSONProvider {
+public class MCRJSONProvider implements Comparator<MCRFilesystemNode> {
+    public static final String DEFAULT_METS_FILENAME = MCRConfiguration.instance().getString("MCR.Mets.Filename", "mets.xml");
+
     final private static Logger LOGGER = Logger.getLogger(MCRJSONProvider.class);
 
     private String derivate;
@@ -50,7 +58,7 @@ public class MCRJSONProvider {
 
     /**
      * @param mets
-     *            the Mets document
+     *            the Mets document, must be non null
      * @param derivate
      *            the derivate id
      */
@@ -69,6 +77,17 @@ public class MCRJSONProvider {
     }
 
     /**
+     * Use this constructor if no mets document for the given derivate is
+     * available. The {@link MCRJSONProvider#toJSON()} method will return a
+     * default JSON string.
+     * 
+     * @param derivate
+     */
+    public MCRJSONProvider(String derivate) throws DocumentException {
+        this.derivate = derivate;
+    }
+
+    /**
      * @return
      */
     public String getDerivate() {
@@ -83,6 +102,11 @@ public class MCRJSONProvider {
      */
     @SuppressWarnings("unchecked")
     public String toJSON() {
+        if (this.mets == null) {
+            LOGGER.info("No mets document set. Return default JSON for derivate \"" + derivate + "\"");
+            return this.toJSON(this.derivate);
+        }
+
         Element logStructMap = getLogicalStructMapElement(this.mets);
         Element parentDiv = logStructMap.getChild("div", IMetsElement.METS);
         if (parentDiv == null) {
@@ -91,7 +115,7 @@ public class MCRJSONProvider {
         }
 
         XPath xpath = null;
-        List nodes = null;
+        List<Element> nodes = null;
         try {
             xpath = XPath.newInstance("mets:mets/mets:structMap[@TYPE='LOGICAL']/mets:div/mets:div");
             xpath.addNamespace(IMetsElement.METS);
@@ -134,7 +158,8 @@ public class MCRJSONProvider {
 
                 if (labelPage == null) {
                     LOGGER.debug("Could not determine label attribute. Using file name as label");
-                    label = path.substring(path.lastIndexOf("/") + 1);
+                    int index = path.lastIndexOf("/");
+                    label = path.substring(index == -1 ? 0 : index + 1);
                 }
                 MCREntry page = new MCREntry(itemId, labelPage, path, physId, "page");
 
@@ -175,6 +200,22 @@ public class MCRJSONProvider {
                     LOGGER.error(ex);
                 }
             }
+        }
+
+        /* handle the pages direct assigned to the root */
+        String[] physIDsUnderRoot = getPhysicalIdsForLogical(parentDiv.getAttributeValue("ID"));
+        for (String physicalId : physIDsUnderRoot) {
+            String itemID = physicalId.substring(physicalId.indexOf("_") + 1);
+            String path = getHref(itemID);
+            String label = getLabelByPhysicalId(physicalId);
+            if (label == null) {
+                int index = path.lastIndexOf("/");
+                label = path.substring(index == -1 ? 0 : index + 1);
+            }
+            MCREntry e = new MCREntry(itemID, label, path, physicalId, "page");
+            e.setOrderLabel(getOrderLabelAttribute(physicalId));
+            e.setOrder(getOrderAttribute(physicalId));
+            tree.addEntry(e);
         }
 
         LOGGER.debug(tree.asJson());
@@ -270,7 +311,8 @@ public class MCRJSONProvider {
             String label = getLabelByPhysicalId(physIds[i]);
             if (label == null) {
                 LOGGER.debug("Could not determine label attribute. Using file name as label");
-                label = path.substring(path.lastIndexOf("/") + 1);
+                int index = path.lastIndexOf("/");
+                label = path.substring(index == -1 ? 0 : index + 1);
             }
 
             MCREntry page = new MCREntry(itemId, label, path, physIds[i], "page");
@@ -369,6 +411,55 @@ public class MCRJSONProvider {
         return null;
     }
 
+    /** Creates a JSON Object for the dojo tree at the client side */
+    private String toJSON(String derivate) {
+        MCRFilesystemNode node = MCRFilesystemNode.getRootNode(derivate);
+        MCRFilesystemNode[] nodes = ((org.mycore.datamodel.ifs.MCRDirectory) node).getChildren();
+        StringBuilder builder = new StringBuilder();
+
+        Arrays.sort(nodes, this);
+
+        builder.append("{identifier: 'id',label: 'name',items: [\n");
+        builder.append("{id: '" + derivate + "', name:'" + derivate + "', structureType:'monograph', type:'category', children:[\n");
+        String metsFName = null;
+
+        try {
+            metsFName = DEFAULT_METS_FILENAME;
+        } catch (MCRConfigurationException ex) {
+            LOGGER.warn(ex.getMessage());
+            metsFName = "mets.xml";
+            LOGGER.warn("Using default file  \"" + metsFName + "\" as mets file");
+        }
+
+        // TODO handle sub directories
+        for (int i = 0; i < nodes.length; i++) {
+            String name = nodes[i].getName();
+            /* ignore the mets file that may be available */
+            if (!name.endsWith(metsFName)) {
+                builder.append("\t{ id: '");
+                builder.append("master_" + UUID.randomUUID());
+
+                builder.append("', name:'");
+                builder.append(name);
+
+                builder.append("', path:'");
+                builder.append(name);
+
+                builder.append("', structureType:'");
+                builder.append("page");
+
+                builder.append("', orderLabel:'");
+                builder.append("',type:'item'}");
+
+                if (i != nodes.length - 1) {
+                    builder.append(",\n");
+                }
+            }
+        }
+        builder.append("]}\n]}");
+        return builder.toString();
+    }
+
     /**
      * @param logicalId
      * @return the list of physical ids belonging to the given logical id
@@ -385,5 +476,23 @@ public class MCRJSONProvider {
             }
         }
         return col.toArray(new String[0]);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+     */
+    public int compare(MCRFilesystemNode o1, MCRFilesystemNode o2) {
+        if (o1.getName().compareTo(o2.getName()) < 0) {
+            return -1;
+        }
+        if (o1.getName().compareTo(o2.getName()) > 0) {
+            return 1;
+        }
+        if (o1.getName().compareTo(o2.getName()) == 0) {
+            return 0;
+        }
+        return 0;
     }
 }

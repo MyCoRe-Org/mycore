@@ -1,24 +1,24 @@
 /*
- * $Id$
- * $Revision$ $Date$
- *
- * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
- *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program, in a file called gpl.txt or license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * $Id$ $Revision:
+ * 20489 $ $Date$
+ * 
+ * This file is part of *** M y C o R e *** See http://www.mycore.de/ for
+ * details.
+ * 
+ * This program is free software; you can use it, redistribute it and / or
+ * modify it under the terms of the GNU General Public License (GPL) as
+ * published by the Free Software Foundation; either version 2 of the License or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program, in a file called gpl.txt or license.txt. If not, write to the
+ * Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307 USA
  */
 
 package org.mycore.mets.servlets;
@@ -46,7 +46,6 @@ import org.mycore.mets.model.MCRMETSGenerator;
 
 /**
  * @author Thomas Scheffler (yagee)
- *
  */
 public class MCRMETSServlet extends MCRServlet {
 
@@ -58,14 +57,19 @@ public class MCRMETSServlet extends MCRServlet {
 
     private static int CACHE_TIME;
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mycore.frontend.servlets.MCRServlet#init()
      */
     @Override
     public void init() throws ServletException {
         super.init();
         String cacheParam = getInitParameter("cacheTime");
-        CACHE_TIME = cacheParam != null ? Integer.parseInt(cacheParam) : (60 * 60 * 24);//default is one day
+        CACHE_TIME = cacheParam != null ? Integer.parseInt(cacheParam) : (60 * 60 * 24);// default
+                                                                                        // is
+                                                                                        // one
+                                                                                        // day
         useExpire = MCRConfiguration.instance().getBoolean("MCR.Component.MetsMods.Servlet.UseExpire", true);
     }
 
@@ -87,7 +91,7 @@ public class MCRMETSServlet extends MCRServlet {
 
         long lastModified = dir.getLastModified().getTimeInMillis();
         writeCacheHeaders(response, CACHE_TIME, lastModified, useExpire);
-
+        long start = System.currentTimeMillis();
         if (metsFile != null && useExistingMets(request)) {
             MCRLayoutService.instance().doLayout(request, response, ((MCRFile) metsFile).getContentAsInputStream());
         } else {
@@ -97,6 +101,7 @@ public class MCRMETSServlet extends MCRServlet {
             Document mets = MCRMETSGenerator.getGenerator().getMETS(dir, ignoreNodes);
             MCRLayoutService.instance().doLayout(request, response, mets);
         }
+        LOGGER.info("Generation of JSON (" + this.getClass().getSimpleName() + ") took " + (System.currentTimeMillis() - start) + " ms");
     }
 
     private boolean useExistingMets(HttpServletRequest request) {
@@ -122,8 +127,12 @@ public class MCRMETSServlet extends MCRServlet {
         return ownerID.toString();
     }
 
-    /* (non-Javadoc)
-     * @see org.mycore.frontend.servlets.MCRServlet#getLastModified(javax.servlet.http.HttpServletRequest)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.mycore.frontend.servlets.MCRServlet#getLastModified(javax.servlet
+     * .http.HttpServletRequest)
      */
     @Override
     protected long getLastModified(HttpServletRequest request) {
@@ -138,7 +147,7 @@ public class MCRMETSServlet extends MCRServlet {
         } finally {
             session.commitTransaction();
             MCRSessionMgr.releaseCurrentSession();
-            session.close(); //just created session for db transaction
+            session.close(); // just created session for db transaction
         }
     }
 

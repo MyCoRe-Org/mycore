@@ -28,31 +28,51 @@ public class MCREntry implements MCRIMetsSortable {
 
     /**
      * @param itemId
-     * @param physical
+     *            the id of the item, to be used in the dijit tree at the client
+     *            side
      * @param label
-     * @param structureType
-     * @deprecated
-     */
-    /*
-     * public MCREntry(String itemId, String physical, String label, String
-     * structureType) { this.physicalId = physical; this.label = label;
-     * this.itemId = itemId; this.structureType = structureType; this.orderLabel
-     * = new String(""); }
-     */
-    /**
-     * @param itemId
-     * @param label
+     *            the label of the page, currently not supported, neither by the
+     *            dfg viewer or iview2
      * @param path
-     * @param physical
+     *            the path to the file (the href attribute in the
+     *            fileGrp/file/Flocat element)
+     * @param physicalId
+     *            the physical id of the file (see
+     *            mets/structMap[@TYPE='PHYSICAL']/div/div/fptr/@ID)
      * @param structureType
+     *            the structure type of the entry, usually <cdoe>"page"</code>
      */
-    public MCREntry(String itemId, String label, String path, String physical, String structureType) {
+    public MCREntry(String itemId, String label, String path, String physicalId, String structureType) {
         this.itemId = itemId;
         this.path = path;
-        this.physicalId = physical;
+        this.physicalId = physicalId;
         this.label = label;
         this.structureType = structureType;
         this.orderLabel = new String("");
+    }
+
+    /**
+     * @param itemId
+     *            the id of the item, to be used in the dijit tree at the client
+     *            side
+     * @param label
+     *            the label of the page, currently not supported, neither by the
+     *            dfg viewer or iview2
+     * @param orderLabel
+     *            the order label of the entry, e.g. one of I, II, III, IV or
+     *            1r, 2v, 3r
+     * @param path
+     *            the path to the file (the href attribute in the
+     *            fileGrp/file/Flocat element)
+     * @param physicalId
+     *            the physical id of the file (see
+     *            mets/structMap[@TYPE='PHYSICAL']/div/div/fptr/@ID)
+     * @param structureType
+     *            the structure type of the entry, usually <cdoe>"page"</code>
+     */
+    public MCREntry(String itemId, String label, String orderLabel, String path, String physicalId, String structureType) {
+        this(itemId, label, path, physicalId, structureType);
+        this.orderLabel = orderLabel;
     }
 
     /**

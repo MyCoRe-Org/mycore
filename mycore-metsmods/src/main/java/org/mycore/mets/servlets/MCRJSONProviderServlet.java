@@ -18,17 +18,12 @@
  */
 package org.mycore.mets.servlets;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.UUID;
-
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.input.SAXBuilder;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRConfigurationException;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
@@ -44,9 +39,7 @@ import org.mycore.mets.tools.MCRJSONProvider;
  * 
  * @author Silvio Hermann (shermann)
  */
-public class MCRJSONProviderServlet extends MCRServlet implements Comparator<MCRFilesystemNode> {
-
-    private static final String DEFAULT_METS_FILENAME = MCRConfiguration.instance().getString("MCR.Mets.Filename");
+public class MCRJSONProviderServlet extends MCRServlet {
 
     private static final Logger LOGGER = Logger.getLogger(MCRJSONProviderServlet.class);
 
@@ -57,22 +50,22 @@ public class MCRJSONProviderServlet extends MCRServlet implements Comparator<MCR
         String useExistingMetsParam = job.getRequest().getParameter("useExistingMets");
         boolean useExistingMets = true;
         useExistingMets = Boolean.valueOf(useExistingMetsParam);
-        
+
         Document mets = getMetsXML(derivate);
         long start = System.currentTimeMillis();
         String json = null;
-        
+
         if (mets != null && useExistingMets) {
-            LOGGER.info("Creating JSONObject from " + MCRJSONProviderServlet.DEFAULT_METS_FILENAME + " for derivate with id \"" + derivate
-                    + "\"");
+            LOGGER.info("Creating JSONObject from " + MCRJSONProvider.DEFAULT_METS_FILENAME + " for derivate with id \"" + derivate + "\"");
             MCRJSONProvider provider = new MCRJSONProvider(mets, derivate);
             json = provider.toJSON();
         } else {
             LOGGER.info("Creating initial JSONObject for derivate with id \"" + derivate + "\"");
-            json = createInitialJSON(derivate);
+            MCRJSONProvider provider = new MCRJSONProvider(derivate);
+            json = provider.toJSON();
         }
 
-        LOGGER.info("Generation of JSON took " + (System.currentTimeMillis() - start) + " ms");
+        LOGGER.info("Generation of JSON (" + getClass().getSimpleName() + ") took " + (System.currentTimeMillis() - start) + " ms");
         HttpServletResponse response = job.getResponse();
         response.setContentType("application/x-json");
         response.setCharacterEncoding(MCRConfiguration.instance().getString("MCR.Request.CharEncoding", "UTF-8"));
@@ -87,7 +80,7 @@ public class MCRJSONProviderServlet extends MCRServlet implements Comparator<MCR
      */
     private Document getMetsXML(String derivate) {
         MCRDirectory dir = MCRDirectory.getRootDirectory(derivate);
-        MCRFilesystemNode file = dir.getChildByPath(MCRJSONProviderServlet.DEFAULT_METS_FILENAME);
+        MCRFilesystemNode file = dir.getChildByPath(MCRJSONProvider.DEFAULT_METS_FILENAME);
 
         if (file instanceof MCRFile) {
             MCRFile f = (MCRFile) file;
@@ -100,64 +93,5 @@ public class MCRJSONProviderServlet extends MCRServlet implements Comparator<MCR
         }
 
         return null;
-    }
-
-    /** Creates a JSON Object for the dojo tree at the client side */
-    private String createInitialJSON(String derivate) {
-        MCRFilesystemNode node = MCRFilesystemNode.getRootNode(derivate);
-        MCRFilesystemNode[] nodes = ((MCRDirectory) node).getChildren();
-        StringBuilder builder = new StringBuilder();
-
-        Arrays.sort(nodes, this);
-
-        builder.append("{identifier: 'id',label: 'name',items: [\n");
-        builder.append("{id: '" + derivate + "', name:'" + derivate + "', structureType:'monograph', children:[\n");
-        String metsFName = null;
-
-        try {
-            metsFName = DEFAULT_METS_FILENAME;
-        } catch (MCRConfigurationException ex) {
-            LOGGER.warn(ex.getMessage());
-            metsFName = "mets.xml";
-            LOGGER.warn("Using default file  \"" + metsFName + "\" as mets file");
-        }
-
-        // TODO handle sub directories
-        for (int i = 0; i < nodes.length; i++) {
-            String name = nodes[i].getName();
-            /* ignore the mets file that may be available */
-            if (!name.endsWith(metsFName)) {
-                builder.append("\t{ id: '");
-                builder.append("master_" + UUID.randomUUID());
-
-                builder.append("', name:'");
-                builder.append(name);
-
-                builder.append("', path:'");
-                builder.append(name);
-
-                builder.append("', orderLabel:'");
-                builder.append("',type:'item'}");
-
-                if (i != nodes.length - 1) {
-                    builder.append(",\n");
-                }
-            }
-        }
-        builder.append("]}\n]}");
-        return builder.toString();
-    }
-
-    public int compare(MCRFilesystemNode o1, MCRFilesystemNode o2) {
-        if (o1.getName().compareTo(o2.getName()) < 0) {
-            return -1;
-        }
-        if (o1.getName().compareTo(o2.getName()) > 0) {
-            return 1;
-        }
-        if (o1.getName().compareTo(o2.getName()) == 0) {
-            return 0;
-        }
-        return 0;
     }
 }

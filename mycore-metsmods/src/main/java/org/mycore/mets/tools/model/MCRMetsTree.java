@@ -89,7 +89,7 @@ public class MCRMetsTree implements Comparator<MCRIMetsSortable> {
         MCRIMetsSortable[] elements = getOrderedElements();
 
         buffer.append("{identifier: 'id',label: 'name',items: [\n");
-        buffer.append("{id: '" + this.derivate + "', name:'" + this.docTitle +"', structureType:'" + this.docType + "',children:[\n");
+        buffer.append("{id: '" + this.derivate + "', name:'" + this.docTitle +"', structureType:'" + this.docType + "', type:'category', children:[\n");
 
         for (int i = 0; i < elements.length; i++) {
             buffer.append(elements[i].asJson());
