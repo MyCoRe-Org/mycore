@@ -496,6 +496,15 @@ public class MCRJSONProvider implements Comparator<MCRFilesystemNode> {
      */
     @SuppressWarnings("unchecked")
     private String[] getPhysicalIdsForLogical(String logicalId) {
+        try {
+            XPath xp = XPath.newInstance("mets:mets/mets:structLink/mets:smLink[@xlink:from='" + logicalId + "']/@xlink:to");
+            xp.addNamespace(MCRConstants.METS_NAMESPACE);
+            xp.addNamespace(MCRConstants.XLINK_NAMESPACE);
+            List a = xp.selectNodes(this.mets);
+        } catch (Exception ex) {
+            LOGGER.error(ex);
+        }
+
         Vector<String> col = new Vector<String>();
         Iterator<Element> it = this.structLink.getDescendants(new ElementFilter("smLink", IMetsElement.METS));
         while (it.hasNext()) {
