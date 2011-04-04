@@ -54,33 +54,27 @@ class MCRSharedLuceneIndexContext {
     }
 
     private void initReaderIfNeeded() throws CorruptIndexException, IOException {
-        indexLock.readLock().lock();
         try {
             if (reader == null && searcher == null) {
-                indexLock.readLock().unlock();
                 indexLock.writeLock().lock();
                 reader = IndexReader.open(indexDir, true);
                 searcher = new IndexSearcher(reader);
-                indexLock.readLock().lock();
                 indexLock.writeLock().unlock();
             } else {
                 if (!reader.isCurrent()) {
                     IndexReader newReader = reader.reopen();
                     if (newReader != reader) {
                         LOGGER.info("new Searcher for index: " + ID);
-                        indexLock.readLock().unlock();
                         indexLock.writeLock().lock();
                         reader.close();
                         searcher.close();
                         reader = newReader;
                         searcher = new IndexSearcher(reader);
-                        indexLock.readLock().lock();
                         indexLock.writeLock().unlock();
                     }
                 }
             }
         } finally {
-            indexLock.readLock().unlock();
             if (indexLock.isWriteLockedByCurrentThread()) {
                 indexLock.writeLock().unlock();
             }
