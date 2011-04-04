@@ -34,7 +34,6 @@ import org.jdom.JDOMException;
 import org.jdom.filter.ElementFilter;
 import org.jdom.xpath.XPath;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRConstants;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.mets.model.IMetsElement;
@@ -411,53 +410,62 @@ public class MCRJSONProvider implements Comparator<MCRFilesystemNode> {
         return null;
     }
 
-    /** Creates a JSON Object for the dojo tree at the client side */
+    /**
+     * Creates a JSON Object for the dojo tree at the client side
+     * 
+     * @param derivate
+     *            the id of the derivate for which to create the initial json
+     * @return the json string for the given derivate
+     */
     private String toJSON(String derivate) {
         MCRFilesystemNode node = MCRFilesystemNode.getRootNode(derivate);
         MCRFilesystemNode[] nodes = ((org.mycore.datamodel.ifs.MCRDirectory) node).getChildren();
-        StringBuilder builder = new StringBuilder();
-
         Arrays.sort(nodes, this);
 
+        StringBuilder builder = new StringBuilder();
         builder.append("{identifier: 'id',label: 'name',items: [\n");
         builder.append("{id: '" + derivate + "', name:'" + derivate + "', structureType:'monograph', type:'category', children:[\n");
-        String metsFName = null;
 
-        try {
-            metsFName = DEFAULT_METS_FILENAME;
-        } catch (MCRConfigurationException ex) {
-            LOGGER.warn(ex.getMessage());
-            metsFName = "mets.xml";
-            LOGGER.warn("Using default file  \"" + metsFName + "\" as mets file");
-        }
+        processNodes(nodes, builder);
 
-        // TODO handle sub directories
+        builder.append("]}\n]}");
+        return builder.toString();
+    }
+
+    /**
+     * @param nodes
+     * @param builder
+     */
+    private void processNodes(MCRFilesystemNode[] nodes, StringBuilder builder) {
         for (int i = 0; i < nodes.length; i++) {
             String name = nodes[i].getName();
             /* ignore the mets file that may be available */
-            if (!name.endsWith(metsFName)) {
-                builder.append("\t{ id: '");
-                builder.append("master_" + UUID.randomUUID());
-
-                builder.append("', name:'");
-                builder.append(name);
-
-                builder.append("', path:'");
-                builder.append(name);
-
-                builder.append("', structureType:'");
-                builder.append("page");
-
-                builder.append("', orderLabel:'");
-                builder.append("',type:'item'}");
-
-                if (i != nodes.length - 1) {
-                    builder.append(",\n");
+            if (!name.endsWith(DEFAULT_METS_FILENAME)) {
+                if (nodes[i] instanceof org.mycore.datamodel.ifs.MCRDirectory) {
+                    builder.append("\t{ id: '");
+                    builder.append(UUID.randomUUID());
+                    builder.append("', name:'");
+                    builder.append(name + "', ");
+                    builder.append("structureType:'section', ");
+                    builder.append("orderLabel:'', ");
+                    builder.append("type:'category', ");
+                    builder.append("children:[\n");
+                    processNodes(((org.mycore.datamodel.ifs.MCRDirectory) nodes[i]).getChildren(), builder);
+                    builder.append("]}\n");
+                } else {
+                    builder.append("\t{ id: '");
+                    builder.append("master_" + UUID.randomUUID() + "', ");
+                    builder.append("name:'" + name + "', ");
+                    builder.append("path:'" + nodes[i].getAbsolutePath().substring(1) + "', ");
+                    builder.append("structureType:'page', ");
+                    builder.append("orderLabel:'', ");
+                    builder.append("type:'item'}");
                 }
             }
+            if (i != nodes.length - 1) {
+                builder.append(",\n");
+            }
         }
-        builder.append("]}\n]}");
-        return builder.toString();
     }
 
     /**
