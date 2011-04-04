@@ -85,7 +85,8 @@ class MCRStoreBrowserRequest {
 
     /** Gets the MCRMetadataStore for the given storeID */
     private void getStore(String storeID) {
-        store = MCRStoreCenter.instance().getStore(storeID, MCRMetadataStore.class);
+        if (storeID.contains("_"))
+            store = MCRStoreCenter.instance().getStore(storeID, MCRMetadataStore.class);
         if (store == null)
             store = MCRXMLMetadataManager.instance().getStore(storeID);
     }
