@@ -74,25 +74,34 @@ public class MCRNormalizer {
     static Logger logger = Logger.getLogger(MCRNormalizer.class);
 
     /** List of characters that will be replaced */
-    private static String rules = "\u00DF>ss \u00E4>ae \u00C4>ae \u00F6>oe \u00D6>oe \u00FC>ue \u00DC>ue"; // sz ae ae oe oe ue ue
+    private static String rules = "\u00DF>ss \u00E4>ae \u00C4>ae \u00F6>oe \u00D6>oe \u00FC>ue \u00DC>ue"; // ss ae ae oe oe ue ue
 
     private static Pattern[] patterns;
 
     private static String[] replace;
 
-    private static MCRConfiguration config = MCRConfiguration.instance();
+    private static boolean normalize;
 
-    private static boolean normalize = config.getBoolean("MCR.Metadata.Normalize", true);
+    private static String addRule;
 
-    private static String addRule = config.getString("MCR.Metadata.Normalize.AddRule", "");
+    private static String setRule;
 
-    private static String setRule = config.getString("MCR.Metadata.Normalize.SetRule", "");
+    private static boolean diacriticRule;
 
-    private static boolean diacriticRule = config.getBoolean("MCR.Metadata.Normalize.DiacriticRule", true);
-
-    private static boolean useRuleFirst = config.getBoolean("MCR.Metadata.Normalize.UseRuleFirst", false);
+    private static boolean useRuleFirst;
 
     static {
+        loadConfig();
+    }
+    
+    public static void loadConfig() {
+        MCRConfiguration config = MCRConfiguration.instance();
+        normalize = config.getBoolean("MCR.Metadata.Normalize", true);
+        addRule = config.getString("MCR.Metadata.Normalize.AddRule", "");
+        setRule = config.getString("MCR.Metadata.Normalize.SetRule", "");
+        diacriticRule = config.getBoolean("MCR.Metadata.Normalize.DiacriticRule", true);
+        useRuleFirst = config.getBoolean("MCR.Metadata.Normalize.UseRuleFirst", false);
+        
         if (setRule != null && setRule.trim().length() != 0) {
             rules = setRule;
         } else {
