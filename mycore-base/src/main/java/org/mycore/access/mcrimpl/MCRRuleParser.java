@@ -23,7 +23,6 @@
 
 package org.mycore.access.mcrimpl;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -38,11 +37,9 @@ class MCRRuleParser extends MCRBooleanClauseParser {
     MCRRuleParser() {
     }
 
-    private static DateFormat dateformat = new SimpleDateFormat("dd.MM.yyyy");
-
     private static Date parseDate(String s, boolean dayafter) throws MCRParseException {
         try {
-            long time = dateformat.parse(s).getTime();
+            long time = new SimpleDateFormat("dd.MM.yyyy").parse(s).getTime();
 
             if (dayafter) {
                 time += 1000 * 60 * 60 * 24;
