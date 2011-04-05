@@ -23,7 +23,6 @@
 
 package org.mycore.datamodel.ifs2;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -168,7 +167,7 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
         assertNotNull(col);
         assertTrue(col.getID() > 0);
         Date created = col.getLastModified();
-        assertTrue(created.after(first));
+        assertFalse(first.after(created));
         bzzz();
         MCRFile build = col.createFile("build.xml");
         assertNotNull(build);
