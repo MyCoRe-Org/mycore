@@ -92,15 +92,11 @@ public class MCRSessionContext extends ThreadLocalSessionContext implements MCRS
 
     @Override
     protected org.hibernate.classic.Session buildOrObtainSession() {
-        org.hibernate.classic.Session session = null;
-        try {
-            // creates a new one
-            LOGGER.debug("Obtaining new hibernate Session.");
-            session = super.buildOrObtainSession();
-            return session;
-        } finally {
-            LOGGER.debug("Returning session with transaction: " + session.getTransaction());
-        }
+        // creates a new one
+        LOGGER.debug("Obtaining new hibernate Session.");
+        org.hibernate.classic.Session session = super.buildOrObtainSession();
+        LOGGER.debug("Returning session with transaction: " + session.getTransaction());
+        return session;
     }
 
     @Override
