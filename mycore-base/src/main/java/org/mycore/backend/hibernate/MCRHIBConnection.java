@@ -67,9 +67,9 @@ import org.mycore.services.mbeans.MCRJMXBridge;
  * 
  */
 public class MCRHIBConnection implements Closeable {
-    static Configuration HIBCFG;
+    private static Configuration HIBCFG;
 
-    static SessionFactory SESSION_FACTORY;
+    private SessionFactory sessionFactory;
 
     static MCRHIBConnection SINGLETON;
 
@@ -126,21 +126,21 @@ public class MCRHIBConnection implements Closeable {
     /**
      * This method creates the SessionFactory for hiberante
      */
-    private static void buildSessionFactory() {
-        if (SESSION_FACTORY == null) {
-            SESSION_FACTORY = HIBCFG.buildSessionFactory();
+    private void buildSessionFactory() {
+        if (sessionFactory == null) {
+            sessionFactory = HIBCFG.buildSessionFactory();
         }
     }
 
-    public static void buildSessionFactory(Configuration config) {
-        SESSION_FACTORY.close();
-        SESSION_FACTORY = config.buildSessionFactory();
+    public void buildSessionFactory(Configuration config) {
+        sessionFactory.close();
+        sessionFactory = config.buildSessionFactory();
         HIBCFG = config;
     }
 
     private static void registerStatisticsService() {
         StatisticsService stats = new StatisticsService();
-        stats.setSessionFactory(SESSION_FACTORY);
+        stats.setSessionFactory(instance().getSessionFactory());
         final String hibernateBaseName = "Hibernate";
         MCRJMXBridge.register(stats, hibernateBaseName, "Statistics");
         String cacheProviderClass = HIBCFG.getProperty(Environment.CACHE_PROVIDER);
@@ -159,11 +159,10 @@ public class MCRHIBConnection implements Closeable {
      * @return Session current session object
      */
     public Session getSession() {
-        Session session = SESSION_FACTORY.getCurrentSession();
-        if (!session.isOpen()){
-            LOGGER.warn(MessageFormat.format("Hibernate session {0} is closed, generating new session",
-                    Integer.toHexString(session.hashCode())));
-            session = SESSION_FACTORY.openSession();
+        Session session = sessionFactory.getCurrentSession();
+        if (!session.isOpen()) {
+            LOGGER.warn(MessageFormat.format("Hibernate session {0} is closed, generating new session", Integer.toHexString(session.hashCode())));
+            session = sessionFactory.openSession();
         }
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(MessageFormat.format("Returning session: {0} open: {1}", Integer.toHexString(session.hashCode()), session.isOpen()));
@@ -182,7 +181,6 @@ public class MCRHIBConnection implements Closeable {
      *            sql-table name as string
      * @return boolean
      */
-    @SuppressWarnings("unchecked")
     public boolean containsMapping(String tablename) {
         Iterator<Table> it = HIBCFG.getTableMappings();
         while (it.hasNext()) {
@@ -223,11 +221,11 @@ public class MCRHIBConnection implements Closeable {
     }
 
     public void close() {
-        if (SESSION_FACTORY == null) {
+        if (sessionFactory == null) {
             return;
         }
         LOGGER.debug("Closing hibernate sessions.");
-        Statistics stats = SESSION_FACTORY.getStatistics();
+        Statistics stats = sessionFactory.getStatistics();
         if (stats.isStatisticsEnabled()) {
             try {
                 handleStatistics(stats);
@@ -239,8 +237,8 @@ public class MCRHIBConnection implements Closeable {
                 e.printStackTrace();
             }
         }
-        SESSION_FACTORY.close();
-        SESSION_FACTORY = null;
+        sessionFactory.close();
+        sessionFactory = null;
         SINGLETON = null;
     }
 
@@ -273,7 +271,12 @@ public class MCRHIBConnection implements Closeable {
         doc.getRootElement().addContent(new Element("metric").setAttribute("queryCacheHitCount", String.valueOf(stats.getQueryCacheHitCount())));
         doc.getRootElement().addContent(new Element("metric").setAttribute("queryCacheMissCount", String.valueOf(stats.getQueryCacheMissCount())));
         doc.getRootElement().addContent(addStringArray(new Element("queries"), "query", "value", stats.getQueries()));
-        new XMLOutputter(Format.getPrettyFormat()).output(doc, new FileOutputStream(statsFile));
+        FileOutputStream fileOutputStream = new FileOutputStream(statsFile);
+        try {
+            new XMLOutputter(Format.getPrettyFormat()).output(doc, fileOutputStream);
+        } finally {
+            fileOutputStream.close();
+        }
     }
 
     public Element addStringArray(Element base, String tagName, String attrName, String[] values) {
@@ -284,7 +287,7 @@ public class MCRHIBConnection implements Closeable {
     }
 
     public SessionFactory getSessionFactory() {
-        return SESSION_FACTORY;
+        return sessionFactory;
     }
 
     /**
@@ -309,7 +312,7 @@ public class MCRHIBConnection implements Closeable {
     }
 
     @Override
-    public int getPriority(){
+    public int getPriority() {
         return MCRShutdownHandler.Closeable.DEFAULT_PRIORITY;
     }
 }
