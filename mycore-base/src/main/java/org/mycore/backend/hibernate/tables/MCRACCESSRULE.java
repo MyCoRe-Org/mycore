@@ -129,8 +129,8 @@ public class MCRACCESSRULE {
                 return false;
             }
             // We will remove milliseconds as they don't need to be saved
-            long thisLong = (long) Math.floor(creationdate.getTime() / 1000);
-            long otherLong = (long) Math.floor(other.getCreationdate().getTime() / 1000);
+            long thisLong = creationdate.getTime() / 1000;
+            long otherLong = other.getCreationdate().getTime() / 1000;
             if (thisLong != otherLong) {
                 return false;
             }
