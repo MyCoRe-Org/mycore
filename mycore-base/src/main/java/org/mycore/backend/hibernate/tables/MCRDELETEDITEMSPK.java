@@ -21,28 +21,28 @@ public class MCRDELETEDITEMSPK implements Serializable {
     private String identifier;
 
     private Date dateDeleted;
-    
-    public MCRDELETEDITEMSPK(){
-        
+
+    public MCRDELETEDITEMSPK() {
+
     }
-    
+
     public MCRDELETEDITEMSPK(String identifier, Date dateDeleted) {
-        this.identifier = identifier;
-        this.dateDeleted = dateDeleted;
+        setIdentifier(identifier);
+        setDateDeleted(dateDeleted);
     }
 
     /**
      * @return the dateDeleted
      */
     public Date getDateDeleted() {
-        return dateDeleted;
+        return new Date(dateDeleted.getTime());
     }
 
     /**
      * @param dateDeleted the dateDeleted to set
      */
     public void setDateDeleted(Date dateDeleted) {
-        this.dateDeleted = dateDeleted;
+        this.dateDeleted = new Date(dateDeleted.getTime());
     }
 
     /**
@@ -66,8 +66,7 @@ public class MCRDELETEDITEMSPK implements Serializable {
 
         MCRDELETEDITEMSPK castother = (MCRDELETEDITEMSPK) other;
 
-        return new EqualsBuilder().append(this.getIdentifier(), castother.getIdentifier()).append(this.getDateDeleted(),
-                castother.getDateDeleted()).isEquals();
+        return new EqualsBuilder().append(this.getIdentifier(), castother.getIdentifier()).append(this.getDateDeleted(), castother.getDateDeleted()).isEquals();
     }
 
     public int hashCode() {
