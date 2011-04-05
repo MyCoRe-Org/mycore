@@ -73,7 +73,7 @@ class MCRStoreBrowserRequest {
     /** The store thats contents should be browsed */
     private MCRMetadataStore store;
 
-    MCRStoreBrowserRequest(String pathInfo) {
+    MCRStoreBrowserRequest(String pathInfo) throws Exception {
         StringTokenizer tokenizer = new StringTokenizer(pathInfo, "/");
 
         String storeID = tokenizer.nextToken();
@@ -84,11 +84,14 @@ class MCRStoreBrowserRequest {
     }
 
     /** Gets the MCRMetadataStore for the given storeID */
-    private void getStore(String storeID) {
+    private void getStore(String storeID) throws Exception {
         if (storeID.contains("_"))
             store = MCRXMLMetadataManager.instance().getStore(storeID);
-        if (store == null)
+        if (store == null) {
             store = MCRStoreCenter.instance().getStore(storeID, MCRMetadataStore.class);
+            if (store == null)
+                store = MCRStoreManager.createStore(storeID, MCRMetadataStore.class);
+        }
     }
 
     /** Builds the xml output to be rendered as response */
