@@ -363,7 +363,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
         }
         sNextFreeID = lexicographicalPattern + String.valueOf(nextFreeID);
         sNextFreeID = sNextFreeID.substring(sNextFreeID.length() - lexicographicalPattern.length());
-        nextFreeRuleID.put(prefix, new Integer(nextFreeID + 1));
+        nextFreeRuleID.put(prefix, Integer.valueOf(nextFreeID + 1));
         return prefix + sNextFreeID;
     }
 
@@ -459,7 +459,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
      * conditions
      * 
      */
-    private class MCRAccessConditionsComparator implements Comparator<Element> {
+    private static class MCRAccessConditionsComparator implements Comparator<Element> {
 
         public int compare(Element el0, Element el1) {
             String nameEl0 = el0.getName().toLowerCase();
