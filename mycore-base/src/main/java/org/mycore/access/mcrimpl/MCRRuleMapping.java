@@ -69,11 +69,11 @@ public class MCRRuleMapping {
     }
 
     public Date getCreationdate() {
-        return creationdate;
+        return new Date(creationdate.getTime());
     }
 
     public void setCreationdate(Date creationdate) {
-        this.creationdate = creationdate;
+        this.creationdate = new Date(creationdate.getTime());
     }
 
     public String getCreator() {
