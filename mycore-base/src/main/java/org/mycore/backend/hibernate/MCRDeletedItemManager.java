@@ -19,7 +19,7 @@ import org.mycore.common.MCRSessionMgr;
  */
 public class MCRDeletedItemManager {
 
-    private static MCRDeletedItemManager _instance;
+    private static MCRDeletedItemManager _instance = new MCRDeletedItemManager();
 
     private static final Logger LOGGER = Logger.getLogger(MCRDeletedItemManager.class);
 
@@ -27,9 +27,6 @@ public class MCRDeletedItemManager {
     }
 
     public static MCRDeletedItemManager getInstance() {
-        if (_instance == null) {
-            _instance = new MCRDeletedItemManager();
-        }
         return _instance;
     }
 
@@ -43,15 +40,15 @@ public class MCRDeletedItemManager {
 
         Session dataBaseSession = getSession();
         MCRDELETEDITEMSPK pk = new MCRDELETEDITEMSPK(identifier, dateDeleted);
-        MCRSession httpSession = MCRSessionMgr.getCurrentSession();
+        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
 
         MCRDELETEDITEMS tab = (MCRDELETEDITEMS) dataBaseSession.get(MCRDELETEDITEMS.class, pk);
         if (tab == null) {
             tab = new MCRDELETEDITEMS();
             tab.setKey(pk);
         }
-        tab.setUserid(httpSession.getCurrentUserID());
-        tab.setIp(httpSession.getCurrentIP());
+        tab.setUserid(mcrSession.getUserInformation().getCurrentUserID());
+        tab.setIp(mcrSession.getCurrentIP());
 
         LOGGER.debug("Inserting into MCRDELETEDITEMS table");
         dataBaseSession.save(tab);
