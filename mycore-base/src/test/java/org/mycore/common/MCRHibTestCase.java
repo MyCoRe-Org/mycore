@@ -59,7 +59,7 @@ public abstract class MCRHibTestCase extends MCRTestCase {
         }
         try {
             final MCRHIBConnection connection = MCRHIBConnection.instance();
-            MCRHIBConnection.instance().buildSessionFactory(configuration);
+            connection.buildSessionFactory(configuration);
             SchemaExport export = new SchemaExport(configuration);
             sessionFactory = connection.getSessionFactory();
             export.create(false, true);
