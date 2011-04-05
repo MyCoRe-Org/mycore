@@ -48,11 +48,11 @@ public class MCRAccessRule {
     static MCRRuleParser parser = new MCRRuleParser();
 
     public MCRAccessRule(String id, String creator, Date creationTime, String rule, String description) throws MCRParseException {
-        this.id = id;
-        this.creator = creator;
-        this.creationTime = creationTime;
-        this.rule = rule;
-        this.description = description;
+        setId(id);
+        setCreator(creator);
+        setCreationTime(creationTime);
+        setRule(rule);
+        setDescription(description);
 
         if (this.rule != null) {
             parsedRule = parser.parse(this.rule);
@@ -98,11 +98,11 @@ public class MCRAccessRule {
     }
 
     public Date getCreationTime() {
-        return creationTime;
+        return new Date(creationTime.getTime());
     }
 
     public void setCreationTime(Date creationTime) {
-        this.creationTime = creationTime;
+        this.creationTime = new Date(creationTime.getTime());
     }
 
     public String getCreator() {
