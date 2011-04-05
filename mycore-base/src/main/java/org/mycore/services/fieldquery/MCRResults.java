@@ -64,7 +64,7 @@ public class MCRResults implements Iterable<MCRHit> {
      * A map containing MCRHit IDs used for and/or operations on two different
      * MCRResult objects
      */
-    protected HashMap<String, MCRHit> map = new HashMap<String, MCRHit>();
+    protected Map<String, MCRHit> map = Collections.synchronizedMap(new HashMap<String, MCRHit>());
 
     /** If true, this results are already sorted */
     private boolean isSorted = false;
