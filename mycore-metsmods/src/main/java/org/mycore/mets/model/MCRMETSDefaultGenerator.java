@@ -84,7 +84,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
         logContainer.setAttribute("ID", "log_" + dir.getOwnerID());
         logContainer.setAttribute("DMDID", "dmd_" + dir.getOwnerID());
         logContainer.setAttribute("ADMID", "amd_" + dir.getOwnerID());
-        logContainer.setAttribute("TYPE", "unit");
+        logContainer.setAttribute("TYPE", "monograph");
         logContainer.setAttribute("LABEL", dir.getOwnerID());
         //structure Links
         Element structLink = new Element("structLink", METS);
