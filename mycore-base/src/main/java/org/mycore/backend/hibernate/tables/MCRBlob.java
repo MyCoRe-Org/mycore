@@ -26,13 +26,16 @@ package org.mycore.backend.hibernate.tables;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.sql.Blob;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
 
-public class MCRBlob implements java.sql.Blob {
+public class MCRBlob implements java.sql.Blob, Serializable {
+    private static final long serialVersionUID = 1L;
+
     byte[] data;
 
     public MCRBlob(byte[] data) {
@@ -148,15 +151,14 @@ public class MCRBlob implements java.sql.Blob {
             throw new SQLException("The ordinal position is less than 1: " + pos);
         }
         if (pos > data.length) {
-            throw new ArrayIndexOutOfBoundsException("Ordinal position is greater than the number of bytes (" + data.length
-                    + ") in the Blob: " + length);
+            throw new ArrayIndexOutOfBoundsException("Ordinal position is greater than the number of bytes (" + data.length + ") in the Blob: " + length);
         }
         if (length < 0) {
             throw new SQLException("The number of consecutive bytes to be copied must be 0 or greater: " + length);
         }
         if (pos + length > data.length) {
-            throw new SQLException("The ordinal position(" + pos + ") + the length(" + length
-                    + ") in bytes are greater than the number of bytes (" + data.length + ") in the Blob.");
+            throw new SQLException("The ordinal position(" + pos + ") + the length(" + length + ") in bytes are greater than the number of bytes ("
+                + data.length + ") in the Blob.");
         }
         // first byte is position 1 according to java.sql API, but position 0 in
         // array

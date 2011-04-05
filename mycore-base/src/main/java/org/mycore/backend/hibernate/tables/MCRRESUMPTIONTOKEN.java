@@ -33,12 +33,11 @@ public class MCRRESUMPTIONTOKEN implements Serializable {
 
     /** full constructor */
     public MCRRESUMPTIONTOKEN(String resumptionTokenID, String prefix, long completeSize, Date created, String instance, Blob hitBlob) {
-        this.resumptionTokenID = resumptionTokenID;
-        this.prefix = prefix;
-        this.completeSize = completeSize;
-        this.created = created;
-        this.instance = instance;
-        this.hitBlob = hitBlob;
+        this(resumptionTokenID, hitBlob);
+        setPrefix(prefix);
+        setCompleteSize(completeSize);
+        setCreated(created);
+        setInstance(instance);
     }
 
     /** default constructor */
@@ -47,8 +46,8 @@ public class MCRRESUMPTIONTOKEN implements Serializable {
 
     /** minimal constructor */
     public MCRRESUMPTIONTOKEN(String resumptionTokenID, Blob hitBlob) {
-        this.resumptionTokenID = resumptionTokenID;
-        this.hitBlob = hitBlob;
+        setResumptionTokenID(resumptionTokenID);
+        setHitBlob(hitBlob);
     }
 
     public String getResumptionTokenID() {
@@ -76,11 +75,11 @@ public class MCRRESUMPTIONTOKEN implements Serializable {
     }
 
     public Date getCreated() {
-        return created;
+        return new Date(created.getTime());
     }
 
     public void setCreated(Date created) {
-        this.created = created;
+        this.created = new Date(created.getTime());
     }
 
     public String getInstance() {
