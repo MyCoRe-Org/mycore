@@ -138,9 +138,9 @@ public class MCRHIBConnection implements Closeable {
         HIBCFG = config;
     }
 
-    private static void registerStatisticsService() {
+    private void registerStatisticsService() {
         StatisticsService stats = new StatisticsService();
-        stats.setSessionFactory(instance().getSessionFactory());
+        stats.setSessionFactory(getSessionFactory());
         final String hibernateBaseName = "Hibernate";
         MCRJMXBridge.register(stats, hibernateBaseName, "Statistics");
         String cacheProviderClass = HIBCFG.getProperty(Environment.CACHE_PROVIDER);
