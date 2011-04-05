@@ -40,7 +40,7 @@ import org.mycore.parsers.bool.MCRConditionVisitor;
 class MCRDateAfterClause implements MCRCondition {
     private Date date;
 
-    private static DateFormat dateformat = new SimpleDateFormat("dd.MM.yyyy");
+    private DateFormat dateformat = new SimpleDateFormat("dd.MM.yyyy");
 
     MCRDateAfterClause(Date date) {
         this.date = date;
