@@ -61,8 +61,12 @@ public class MCRShutdownServer {
         Class.forName(dbDriver);
         Connection con = DriverManager.getConnection(dbURL, user, pwd);
         Statement statement = con.createStatement();
-        statement.executeUpdate("SHUTDOWN");
-        statement.close();
+        try {
+            statement.executeUpdate("SHUTDOWN");
+        } finally {
+            statement.close();
+            con.close();
+        }
     }
 
     private static Properties getConnectionProperties() throws IOException, JDOMException {
