@@ -63,7 +63,7 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore {
     // and
     // SPECDESCRIPTIONS
 
-    static MCRConfiguration config;
+    private MCRConfiguration config;
 
     /**
      * The constructor for the class MCRSQLClassificationStore. It reads the
@@ -80,19 +80,16 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore {
         try {
             timeout_h = config.getInt(STR_OAI_RESUMPTIONTOKEN_TIMEOUT);
         } catch (MCRConfigurationException mcrx) {
-            logger.error("Die Property '" + STR_OAI_RESUMPTIONTOKEN_TIMEOUT
-                    + "' ist nicht konfiguriert. Resumption Tokens werden nicht unterstuetzt.");
+            logger.error("Die Property '" + STR_OAI_RESUMPTIONTOKEN_TIMEOUT + "' ist nicht konfiguriert. Resumption Tokens werden nicht unterstuetzt.");
             return;
         } catch (NumberFormatException nfx) {
             timeout_h = 72;
         }
-        long outdateTime = new Date().getTime() - timeout_h * 60 * 60 * 1000;
+        long outdateTime = new Date().getTime() - timeout_h * 60 * 60 * 1000L;
 
         Session session = MCRHIBConnection.instance().getSession();
-        ;
 
-        List<MCRRESUMPTIONTOKEN> delList = session.createCriteria(MCRRESUMPTIONTOKEN.class)
-                .add(Restrictions.le("created", new Date(outdateTime))).list();
+        List<MCRRESUMPTIONTOKEN> delList = session.createCriteria(MCRRESUMPTIONTOKEN.class).add(Restrictions.le("created", new Date(outdateTime))).list();
         for (MCRRESUMPTIONTOKEN token : delList) {
             session.delete(token);
         }
@@ -104,10 +101,11 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore {
         String sepSpec = config.getString(STR_OAI_SEPARATOR_SPEC, "###");
 
         Session session = MCRHIBConnection.instance().getSession();
-        ;
 
-        MCRRESUMPTIONTOKEN resumptionToken = (MCRRESUMPTIONTOKEN) session.createCriteria(MCRRESUMPTIONTOKEN.class)
-                .add(Restrictions.eq("resumptionTokenID", resumptionTokenID)).uniqueResult();
+        MCRRESUMPTIONTOKEN resumptionToken = (MCRRESUMPTIONTOKEN) session
+            .createCriteria(MCRRESUMPTIONTOKEN.class)
+            .add(Restrictions.eq("resumptionTokenID", resumptionTokenID))
+            .uniqueResult();
 
         String prefix = resumptionToken.getPrefix();
         String instance = resumptionToken.getInstance();
@@ -137,9 +135,8 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore {
                     Document xml = null;
                     try {
                         xml = MCRUtils.requestVersionedObject(MCRObjectID.getInstance(objectId), -1);
-                    } catch(Exception exc) {
-                        logger.error("Error occured while retrieving current revision for object " +
-                                      objectId, exc);
+                    } catch (Exception exc) {
+                        logger.error("Error occured while retrieving current revision for object " + objectId, exc);
                     }
                     if (xml != null) {
                         object = new MCRObject(xml);
@@ -187,8 +184,9 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore {
      */
     public String getPrefix(String token) {
         Session session = MCRHIBConnection.instance().getSession();
-        String prefix = (String) session.createQuery(
-                "select prefix from " + "MCRRESUMPTIONTOKEN " + "where resumptionTokenID like '" + token + "'").uniqueResult();
+        String prefix = (String) session
+            .createQuery("select prefix from " + "MCRRESUMPTIONTOKEN " + "where resumptionTokenID like '" + token + "'")
+            .uniqueResult();
         return prefix;
     }
 
@@ -218,8 +216,7 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore {
                 String spec = arSpec[0];
                 String specName = arSpec[1] != null ? arSpec[1] : "";
                 String specDescription = arSpec[2] != null ? arSpec[2] : "";
-                sbHitBlob.append(spec).append(sepSpec).append(specName).append(sepSpec).append(specDescription).append(sepSpec)
-                        .append("dummyForSplit");
+                sbHitBlob.append(spec).append(sepSpec).append(specName).append(sepSpec).append(specDescription).append(sepSpec).append("dummyForSplit");
                 sbHitBlob.append(sepOAIHIT);
             }
         }
