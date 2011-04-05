@@ -48,7 +48,7 @@ import org.mycore.backend.hibernate.tables.MCRACCESSRULE;
  * 
  */
 public class MCRHIBAccessStore extends MCRAccessStore {
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat(sqlDateformat);
+    private final DateFormat dateFormat = new SimpleDateFormat(sqlDateformat);
     private static final Logger LOGGER = Logger.getLogger(MCRHIBAccessStore.class);
     public MCRHIBAccessStore() {
         createTables();
@@ -93,7 +93,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
             accdef.setKey(new MCRACCESSPK(rulemapping.getPool(), rulemapping.getObjId()));
             accdef.setRule(accessRule);
             accdef.setCreator(rulemapping.getCreator());
-            accdef.setCreationdate(Timestamp.valueOf(DATE_FORMAT.format(rulemapping.getCreationdate())));
+            accdef.setCreationdate(Timestamp.valueOf(dateFormat.format(rulemapping.getCreationdate())));
             session.save(accdef);
         }
     }
@@ -168,7 +168,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
         MCRACCESS accdef = (MCRACCESS) session.get(MCRACCESS.class, new MCRACCESSPK(rulemapping.getPool(), rulemapping.getObjId()));
         accdef.setRule(accessRule);
         accdef.setCreator(rulemapping.getCreator());
-        accdef.setCreationdate(Timestamp.valueOf(DATE_FORMAT.format(rulemapping.getCreationdate())));
+        accdef.setCreationdate(Timestamp.valueOf(dateFormat.format(rulemapping.getCreationdate())));
         session.update(accdef);
     }
 
