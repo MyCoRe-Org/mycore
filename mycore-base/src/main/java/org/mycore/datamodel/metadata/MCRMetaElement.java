@@ -95,7 +95,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
      *            the name of the MCRMeta... class
      */
     public MCRMetaElement(Class<? extends MCRMetaInterface> clazz, String set_tag, boolean set_heritable, boolean set_notinherit,
-        ArrayList<MCRMetaInterface> set_list) {
+        List<MCRMetaInterface> set_list) {
         this();
         this.clazz = clazz;
         setTag(set_tag);
