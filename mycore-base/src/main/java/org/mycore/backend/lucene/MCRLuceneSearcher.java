@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -279,7 +280,8 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
      * 
      * @return result set
      */
-    private MCRResults getLuceneHits(Query luceneQuery, int maxResults, List<MCRSortBy> sortBy, boolean addSortData, Set<String> usedFields) throws Exception {
+    private MCRResults getLuceneHits(Query luceneQuery, int maxResults, List<MCRSortBy> sortBy, boolean addSortData, Set<String> usedFields)
+            throws Exception {
         if (maxResults <= 0) {
             maxResults = 1000000;
         }
@@ -463,7 +465,8 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
                 if (PLUGIN_MANAGER.isSupported(mcrfile.getContentType())) {
                     LOGGER.debug("####### Index MCRFile: " + mcrfile.getPath());
 
-                    BufferedReader in = new BufferedReader(PLUGIN_MANAGER.transform(mcrfile.getContentType(), mcrfile.getContentAsInputStream()));
+                    BufferedReader in = new BufferedReader(PLUGIN_MANAGER.transform(mcrfile.getContentType(),
+                            mcrfile.getContentAsInputStream()));
                     String s;
                     StringBuffer text = new StringBuffer();
                     while ((s = in.readLine()) != null) {
@@ -613,7 +616,13 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         LOGGER.info("Closing " + toString() + "...");
         modifyExecutor.shutdown();
         try {
-            modifyExecutor.awaitTermination(60 * 60, TimeUnit.SECONDS);
+            for (int tSec = 0; tSec < 60 * 6; tSec++) {
+                long taskCount = modifyExecutor.getTaskCount();
+                if (taskCount > 0) {
+                    LOGGER.info(MessageFormat.format("Still {0} modification requests in queue of {1}.", taskCount, toString()));
+                }
+                modifyExecutor.awaitTermination(tSec * 10, TimeUnit.SECONDS);
+            }
         } catch (InterruptedException e) {
             LOGGER.warn("Error while closing " + toString(), e);
         }
