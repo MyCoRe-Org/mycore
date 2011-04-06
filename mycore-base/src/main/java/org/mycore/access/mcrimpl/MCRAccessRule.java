@@ -102,7 +102,7 @@ public class MCRAccessRule {
     }
 
     public void setCreationTime(Date creationTime) {
-        this.creationTime = new Date(creationTime.getTime());
+        this.creationTime = creationTime == null ? null : new Date(creationTime.getTime());
     }
 
     public String getCreator() {
