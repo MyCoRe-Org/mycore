@@ -4,7 +4,7 @@
     <xs:import namespace="http://www.loc.gov/mods/v3" schemaLocation="http://www.loc.gov/mods/v3/mods-3-4.xsd" />
   </xsd>
   <metadata>
-    <element name="modsContainer" type="xml" style="dontknow" notinherit="ignore" heritable="ignore">
+    <element name="modsContainer" type="xml" style="dontknow" notinherit="true" heritable="false">
       <xs:sequence>
         <xs:element name="mods:mods" type="mods:modsDefinition" />
       </xs:sequence>
