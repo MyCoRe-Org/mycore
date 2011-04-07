@@ -24,11 +24,14 @@
 package org.mycore.datamodel.metadata;
 
 import static org.mycore.common.MCRConstants.DEFAULT_ENCODING;
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 import java.net.URI;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
+import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRConstants;
@@ -247,7 +250,32 @@ public abstract class MCRBase {
      *                if the content of this class is not valid
      * @return a JDOM Document with the XML data of the object as byte array
      */
-    public abstract org.jdom.Document createXML() throws MCRException;
+    public Document createXML() throws MCRException {
+        if (!isValid()) {
+            String msg;
+            MCRObjectID id = getId();
+            if (id == null) {
+                msg = "The content is not valid.";
+            } else {
+                msg = "The content of " + id.toString() + " is not valid.";
+            }
+            throw new MCRException(msg);
+        }
+
+        Element elm = new Element(getRootTagName());
+        Document doc = new Document(elm);
+        elm.addNamespaceDeclaration(XSI_NAMESPACE);
+        elm.addNamespaceDeclaration(XLINK_NAMESPACE);
+        elm.setAttribute("noNamespaceSchemaLocation", mcr_schema, XSI_NAMESPACE);
+        elm.setAttribute("ID", mcr_id.toString());
+        if (mcr_label != null) {
+            elm.setAttribute("label", mcr_label);
+        }
+        elm.setAttribute("version", mcr_version);
+        return doc;
+    }
+
+    protected abstract String getRootTagName();
 
     /**
      * This method check the validation of the content of this class. The method

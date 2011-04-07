@@ -23,13 +23,13 @@
 
 package org.mycore.datamodel.metadata;
 
-import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 import java.net.URI;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
+import org.jdom.Element;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
@@ -153,22 +153,16 @@ final public class MCRDerivate extends MCRBase {
      */
     @Override
     public final org.jdom.Document createXML() throws MCRException {
-        if (!isValid()) {
-            throw new MCRException("The content is not valid.");
-        }
-
-        org.jdom.Element elm = new org.jdom.Element("mycorederivate");
-        org.jdom.Document doc = new org.jdom.Document(elm);
-        elm.addNamespaceDeclaration(XSI_NAMESPACE);
-        elm.addNamespaceDeclaration(XLINK_NAMESPACE);
-        elm.setAttribute("noNamespaceSchemaLocation", mcr_schema, XSI_NAMESPACE);
-        elm.setAttribute("ID", mcr_id.toString());
-        elm.setAttribute("label", mcr_label);
-        elm.setAttribute("version", mcr_version);
+        Document doc = super.createXML();
+        Element elm = doc.getRootElement();
         elm.addContent(mcr_derivate.createXML());
         elm.addContent(mcr_service.createXML());
-
         return doc;
+    }
+
+    @Override
+    protected String getRootTagName() {
+        return "mycorederivate";
     }
 
     /**

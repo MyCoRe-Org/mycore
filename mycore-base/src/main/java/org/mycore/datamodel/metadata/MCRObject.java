@@ -23,13 +23,13 @@
 
 package org.mycore.datamodel.metadata;
 
-import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 import java.net.URI;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
+import org.jdom.Element;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -52,6 +52,7 @@ final public class MCRObject extends MCRBase {
     private final MCRObjectStructure mcr_struct;
 
     private final MCRObjectMetadata mcr_metadata;
+
     private static final Logger LOGGER = Logger.getLogger(MCRObject.class);
 
     /**
@@ -120,7 +121,7 @@ final public class MCRObject extends MCRBase {
     public final MCRObjectStructure getStructure() {
         return mcr_struct;
     }
-    
+
     /**
      * The given DOM was convert into an internal view of metadata. This are the
      * object ID and the object label, also the blocks structure, flags and
@@ -166,7 +167,7 @@ final public class MCRObject extends MCRBase {
         // get the structure data of the object
         org.jdom.Element jdom_element_root = jdom_document.getRootElement();
         org.jdom.Element jdom_element = jdom_element_root.getChild("structure");
-        if(jdom_element != null){
+        if (jdom_element != null) {
             mcr_struct.setFromDOM(jdom_element);
         }
     }
@@ -175,8 +176,8 @@ final public class MCRObject extends MCRBase {
         // get the metadata of the object
         org.jdom.Element jdom_element_root = jdom_document.getRootElement();
         org.jdom.Element jdom_element = jdom_element_root.getChild("metadata");
-        
-        if(jdom_element != null){
+
+        if (jdom_element != null) {
             mcr_metadata.setFromDOM(jdom_element);
         }
     }
@@ -186,7 +187,7 @@ final public class MCRObject extends MCRBase {
         // get the service data of the object
         org.jdom.Element jdom_element_root = jdom_document.getRootElement();
         jdom_element = jdom_element_root.getChild("service");
-        if(jdom_element != null){
+        if (jdom_element != null) {
             mcr_service.setFromDOM(jdom_element);
         }
     }
@@ -199,32 +200,18 @@ final public class MCRObject extends MCRBase {
      * @return a JDOM Document with the XML data of the object as byte array
      */
     @Override
-    public final org.jdom.Document createXML() throws MCRException {
-        if (!isValid()) {
-        	String msg;
-        	MCRObjectID id = getId();
-        	if(id==null){
-        		 msg = "The content is not valid.";
-        	}
-        	else{
-        		msg = "The content of "+id.toString()+" is not valid.";
-        	}
-            throw new MCRException(msg);
-        }
-
-        org.jdom.Element elm = new org.jdom.Element("mycoreobject");
-        org.jdom.Document doc = new org.jdom.Document(elm);
-        elm.addNamespaceDeclaration(XSI_NAMESPACE);
-        elm.addNamespaceDeclaration(XLINK_NAMESPACE);
-        elm.setAttribute("noNamespaceSchemaLocation", mcr_schema, XSI_NAMESPACE);
-        elm.setAttribute("ID", mcr_id.toString());
-        elm.setAttribute("label", mcr_label);
-        elm.setAttribute("version", mcr_version);
+    public final Document createXML() throws MCRException {
+        Document doc = super.createXML();
+        Element elm = doc.getRootElement();
         elm.addContent(mcr_struct.createXML());
         elm.addContent(mcr_metadata.createXML());
         elm.addContent(mcr_service.createXML());
-
         return doc;
+    }
+
+    @Override
+    protected String getRootTagName() {
+        return "mycoreobject";
     }
 
     /**
