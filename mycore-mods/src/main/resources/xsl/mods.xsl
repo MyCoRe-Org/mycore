@@ -3,6 +3,7 @@
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:acl="xalan://org.mycore.access.MCRAccessManager" xmlns:mcr="http://www.mycore.org/"
   xmlns:xlink="http://www.w3.org/1999/xlink" exclude-result-prefixes="xlink mcr i18n acl" version="1.0">
   <xsl:param select="'local'" name="objectHost" />
+  <xsl:include href="mods2html.xsl" />
   <!--Template for result list hit: see results.xsl -->
   <xsl:template match="mcr:hit[contains(@id,'_mods_')]">
     <xsl:param name="mcrobj" />
@@ -81,10 +82,15 @@
     </xsl:variable>
     <table cellspacing="0" cellpadding="0" id="metaData">
       <!--1***modsContainer************************************* -->
-      <xsl:call-template name="printMetaDate">
-        <xsl:with-param select="./metadata/def.modsContainer/modsContainer" name="nodes" />
-        <xsl:with-param select="i18n:translate('metaData.mods.modsContainer')" name="label" />
-      </xsl:call-template>
+      <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/*/*" />
+<!--       <tr> -->
+<!--         <td class="metaname"> -->
+<!--           <xsl:value-of select="concat(i18n:translate('metaData.mods.modsContainer'),' :')" /> -->
+<!--         </td> -->
+<!--         <td class="metavalue"> -->
+<!--           <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/*" /> -->
+<!--         </td> -->
+<!--       </tr> -->
       <!--*** Editor Buttons ************************************* -->
       <xsl:call-template name="editobject_with_der">
         <xsl:with-param select="./@ID" name="id" />
