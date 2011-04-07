@@ -8,5 +8,9 @@
                 propertyfile="${build.config}/mycore.properties"
                 key="MCR.CLI.Classes.Internal"
                 value="org.mycore.mods.MCRMODSCommands" />
+    <mcr:config action="addInclude"
+                propertyfile="${build.config}/mycore.properties"
+                key="MCR.URIResolver.xslIncludes.components"
+                value="mods.xsl" />
   </target>
 </project>
