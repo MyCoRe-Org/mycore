@@ -120,14 +120,12 @@ public class MCRCheckCommitDerivateServlet extends MCRCheckBase {
             String label = der.getLabel();
             String href = der.getDerivate().getMetaLink().getXLinkHref();
             MCRObject obj = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(href));
-            int size = obj.getStructure().getDerivateSize();
             boolean isset = false;
-            for (int i = 0; i < size; i++) {
-                MCRMetaLinkID link = obj.getStructure().getDerivate(i);
+            for (MCRMetaLinkID link : obj.getStructure().getDerivates()) {
                 if (link.getXLinkHref().equals(der.getId().toString())) {
                     String oldlabel = link.getXLinkLabel();
                     if ((oldlabel != null) && (!oldlabel.trim().equals(label))) {
-                        obj.getStructure().getDerivate(i).setXLinkLabel(label);
+                        link.setXLinkLabel(label);
                         isset = true;
                     }
                     break;
@@ -183,7 +181,7 @@ public class MCRCheckCommitDerivateServlet extends MCRCheckBase {
             return;
         }
         String sender = WFM.getMailSender();
-        String appl = MCRConfiguration.instance().getString("MCR.SWF.Mail.ApplicationID", "MyCoRe");
+        String appl = MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe");
         String subject = "Automatically generated message from " + appl;
         StringBuffer text = new StringBuffer();
         text.append("The title of the derivate with the ID ").append(ID.toString()).append(" was changed in the server.");

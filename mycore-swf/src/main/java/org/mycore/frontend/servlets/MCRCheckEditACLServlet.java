@@ -89,7 +89,7 @@ public class MCRCheckEditACLServlet extends MCRCheckACLBase {
         }
 
         String sender = WFM.getMailSender();
-        String appl = MCRConfiguration.instance().getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
+        String appl = MCRConfiguration.instance().getString("MCR.NameOfProject", "DocPortal");
         String subject = "Automatically generated message from " + appl;
         StringBuffer text = new StringBuffer();
         text.append("The ACL data of the MyCoRe object of type ").append(ID.getTypeId()).append(" with the ID ").append(ID.toString())

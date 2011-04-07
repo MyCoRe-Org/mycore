@@ -29,12 +29,10 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRMailer;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
-import org.xml.sax.SAXParseException;
 
 /**
  * The servlet store the MCREditorServlet output XML in a file of a MCR type
@@ -96,7 +94,7 @@ public class MCRCheckCommitDataServlet extends MCRCheckDataBase {
         }
 
         String sender = WFM.getMailSender();
-        String appl = MCRConfiguration.instance().getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
+        String appl = MCRConfiguration.instance().getString("MCR.NameOfProject", "DocPortal");
         String subject = "Automatically generated message from " + appl;
         StringBuffer text = new StringBuffer();
         text.append("An Object with type ").append(ID.getTypeId()).append(" and ID ").append(ID.toString()).append(
