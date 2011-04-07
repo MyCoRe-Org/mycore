@@ -26,7 +26,6 @@ package org.mycore.mods;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
@@ -35,7 +34,6 @@ import org.jdom.JDOMException;
 import org.jdom.xpath.XPath;
 import org.junit.Before;
 import org.junit.Test;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -60,12 +58,10 @@ public class MCRMODSWrapperTest extends MCRTestCase {
      * Test method for {@link org.mycore.mods.MCRMODSWrapper#wrapMODSDocument(org.jdom.Element, java.lang.String)}.
      * @throws URISyntaxException 
      * @throws SAXParseException 
-     * @throws MCRException 
      * @throws JDOMException 
-     * @throws MalformedURLException 
      */
     @Test
-    public void testWrapMODSDocument() throws MCRException, SAXParseException, URISyntaxException, JDOMException, MalformedURLException {
+    public void testWrapMODSDocument() throws SAXParseException, URISyntaxException, JDOMException {
         Document modsDoc = loadMODSDocument();
         MCRObject mcrObj = MCRMODSWrapper.wrapMODSDocument(modsDoc.getRootElement(), "JUnit");
         assertTrue("Generated MCRObject is not valid.", mcrObj.isValid());
@@ -78,7 +74,7 @@ public class MCRMODSWrapperTest extends MCRTestCase {
         assertEquals("Did not find mods data", 1, xpathCheck.selectNodes(mcrObjXml).size());
     }
 
-    private Document loadMODSDocument() throws MCRException, SAXParseException, URISyntaxException, MalformedURLException {
+    private Document loadMODSDocument() throws SAXParseException, URISyntaxException {
         URL worlClassUrl = this.getClass().getResource("/mods80700998.xml");
         Document xml = MCRXMLHelper.parseURI(worlClassUrl.toURI());
         return xml;
