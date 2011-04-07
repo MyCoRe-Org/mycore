@@ -255,6 +255,10 @@
                   <packages>org.mycore.mets*</packages>
                 </group>
                 <group>
+                  <title>MyCoRe Component: MODS</title>
+                  <packages>org.mycore.mods*</packages>
+                </group>
+                <group>
                   <title>MyCoRe Component: OAI</title>
                   <packages>org.mycore.oai*</packages>
                 </group>
@@ -1092,6 +1096,7 @@
     <module>mycore-media</module>
     <module>mycore-metsmods</module>
     <module>mycore-migration20-21</module>
+    <module>mycore-mods</module>
     <module>mycore-oai</module>
     <module>mycore-session-listing</module>
     <module>mycore-swf</module>
