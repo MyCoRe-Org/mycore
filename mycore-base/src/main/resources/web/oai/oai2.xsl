@@ -171,13 +171,24 @@ p.intro {
 </html>
 </xsl:template>
 
+<xsl:variable name="metaDataFormats" select="document(concat(/oai:OAI-PMH/oai:request,'?verb=ListMetadataFormats'))//oai:metadataPrefix"/>
+
 <xsl:template name="quicklinks">
     <ul class="quicklinks">
       <li><a href="?verb=Identify">Identify</a> | </li> 
-      <li><a href="?verb=ListRecords&amp;metadataPrefix=oai_dc">ListRecords</a> | </li>
       <li><a href="?verb=ListSets">ListSets</a> | </li>
       <li><a href="?verb=ListMetadataFormats">ListMetadataFormats</a> | </li>
-      <li><a href="?verb=ListIdentifiers&amp;metadataPrefix=oai_dc">ListIdentifiers</a></li>
+      <li><a href="?verb=ListIdentifiers&amp;metadataPrefix=oai_dc">ListIdentifiers</a> | </li>
+      <xsl:for-each select="$metaDataFormats">
+        <li>
+          <a href="?verb=ListRecords&amp;metadataPrefix={.}">
+            <xsl:value-of select="concat('ListRecords (',.,')')"/>
+          </a>
+          <xsl:if test="position() != last()">
+            <xsl:value-of select="' | '"/>
+          </xsl:if>
+        </li>
+      </xsl:for-each>
     </ul>
 </xsl:template>
 
@@ -486,8 +497,15 @@ p.intro {
     <tr><td class="key">OAI Identifier</td>
     <td class="value">
       <xsl:value-of select="oai:identifier"/>
-      <xsl:text> </xsl:text><a class="link" href="?verb=GetRecord&amp;metadataPrefix=oai_dc&amp;identifier={oai:identifier}">oai_dc</a>
-      <xsl:text> </xsl:text><a class="link" href="?verb=ListMetadataFormats&amp;identifier={oai:identifier}">formats</a>
+      <xsl:variable name="oaiIdentifier" select="oai:identifier"/>
+      <xsl:for-each select="$metaDataFormats">
+        <xsl:value-of select="' '"/>
+        <a class="link" href="?verb=GetRecord&amp;metadataPrefix={.}&amp;identifier={$oaiIdentifier}">
+        <xsl:value-of select="."/>
+        </a>
+      </xsl:for-each>
+      <xsl:value-of select="' '"/>
+      <a class="link" href="?verb=ListMetadataFormats&amp;identifier={oai:identifier}">formats</a>
     </td></tr>
     <tr><td class="key">Datestamp</td>
     <td class="value"><xsl:value-of select="oai:datestamp"/></td></tr>
