@@ -280,8 +280,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
      * 
      * @return result set
      */
-    private MCRResults getLuceneHits(Query luceneQuery, int maxResults, List<MCRSortBy> sortBy, boolean addSortData, Set<String> usedFields)
-            throws Exception {
+    private MCRResults getLuceneHits(Query luceneQuery, int maxResults, List<MCRSortBy> sortBy, boolean addSortData, Set<String> usedFields) throws Exception {
         if (maxResults <= 0) {
             maxResults = 1000000;
         }
@@ -465,8 +464,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
                 if (PLUGIN_MANAGER.isSupported(mcrfile.getContentType())) {
                     LOGGER.debug("####### Index MCRFile: " + mcrfile.getPath());
 
-                    BufferedReader in = new BufferedReader(PLUGIN_MANAGER.transform(mcrfile.getContentType(),
-                            mcrfile.getContentAsInputStream()));
+                    BufferedReader in = new BufferedReader(PLUGIN_MANAGER.transform(mcrfile.getContentType(), mcrfile.getContentAsInputStream()));
                     String s;
                     StringBuffer text = new StringBuffer();
                     while ((s = in.readLine()) != null) {
@@ -616,7 +614,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         LOGGER.info("Closing " + toString() + "...");
         modifyExecutor.shutdown();
         try {
-            for (int tSec = 0; tSec < 60 * 6; tSec++) {
+            for (int tSec = 0; modifyExecutor.isShutdown() || tSec < 60 * 6; tSec++) {
                 long taskCount = modifyExecutor.getTaskCount();
                 if (taskCount > 0) {
                     LOGGER.info(MessageFormat.format("Still {0} modification requests in queue of {1}.", taskCount, toString()));
