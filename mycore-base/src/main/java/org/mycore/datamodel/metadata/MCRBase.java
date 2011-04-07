@@ -265,10 +265,6 @@ public abstract class MCRBase {
             return false;
         }
 
-        if (mcr_label == null || (mcr_label = mcr_label.trim()).length() == 0) {
-            return false;
-        }
-
         if (mcr_schema == null || (mcr_schema = mcr_schema.trim()).length() == 0) {
             return false;
         }
