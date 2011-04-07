@@ -614,7 +614,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         LOGGER.info("Closing " + toString() + "...");
         modifyExecutor.shutdown();
         try {
-            for (int tSec = 0; modifyExecutor.isShutdown() || tSec < 60 * 6; tSec++) {
+            for (int tSec = 0; !modifyExecutor.isShutdown() || tSec < 60 * 6; tSec++) {
                 long taskCount = modifyExecutor.getTaskCount();
                 if (taskCount > 0) {
                     LOGGER.info(MessageFormat.format("Still {0} modification requests in queue of {1}.", taskCount, toString()));
