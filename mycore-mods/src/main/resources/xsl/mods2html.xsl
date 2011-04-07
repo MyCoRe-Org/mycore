@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsl:stylesheet version="1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  exclude-result-prefixes="mods">
+<xsl:stylesheet version="1.0" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" exclude-result-prefixes="mods i18n">
   <!-- MODS2 records to html ntra added 4th child level 4/2/04 -->
-
-  <xsl:variable name="dictionary" select="document('http://www.loc.gov/standards/mods/modsDictionary.xml')/dictionary" />
 
   <xsl:template match="mods:modsCollection">
     <xsl:apply-templates select="mods:mods" />
@@ -150,12 +148,13 @@
 
   <xsl:template name="longName">
     <xsl:param name="name" />
+    <xsl:variable name="value" select="i18n:translate(concat('metaData.mods.dictionary.',$name))" />
     <xsl:choose>
-      <xsl:when test="$dictionary/entry[@key=$name]">
-        <xsl:value-of select="$dictionary/entry[@key=$name]" />
+      <xsl:when test="contains($value,'???')">
+        <xsl:value-of select="$name" />
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="$name" />
+        <xsl:value-of select="$value" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
