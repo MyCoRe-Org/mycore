@@ -613,18 +613,17 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         handleRamDir();
         LOGGER.info("Closing " + toString() + "...");
         modifyExecutor.shutdown();
+        long taskCount = modifyExecutor.getTaskCount();
         try {
             for (int tSec = 0; !modifyExecutor.isShutdown() || tSec < 60 * 6; tSec++) {
-                long taskCount = modifyExecutor.getTaskCount();
-                if (taskCount > 0) {
-                    LOGGER.info(MessageFormat.format("Still {0} modification requests in queue of {1}.", taskCount, toString()));
-                }
+                long numProcessed = modifyExecutor.getCompletedTaskCount();
+                LOGGER.info(MessageFormat.format("Processed {0} of {1} modification requests, still working...",numProcessed,taskCount,toString()));
                 modifyExecutor.awaitTermination(tSec * 10, TimeUnit.SECONDS);
             }
         } catch (InterruptedException e) {
             LOGGER.warn("Error while closing " + toString(), e);
         }
-        LOGGER.info("Processed " + modifyExecutor.getCompletedTaskCount() + " modification requests.");
+        LOGGER.info("Processed all " + modifyExecutor.getCompletedTaskCount() + " modification requests.");
         if (queryFieldLogger != null) {
             Properties properties = queryFieldLogger.getFieldUsageAsProperties();
             FileOutputStream outputStream = null;
