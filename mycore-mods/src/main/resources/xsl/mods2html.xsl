@@ -9,11 +9,11 @@
 
   <xsl:template match="mods:mods">
     <table>
-      <xsl:apply-templates />
+      <xsl:apply-templates/>
     </table>
   </xsl:template>
 
-  <xsl:template match="*">
+  <xsl:template match="mods:*">
     <xsl:choose>
       <xsl:when test="child::*">
         <tr>
