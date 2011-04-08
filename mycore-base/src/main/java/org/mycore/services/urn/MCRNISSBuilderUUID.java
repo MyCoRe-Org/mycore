@@ -42,7 +42,7 @@ public class MCRNISSBuilderUUID implements MCRNISSBuilder {
     public void init(String configID) {
     }
 
-    public synchronized String buildNISS() {
+    public String buildNISS() {
         UUID u = UUID.randomUUID();
         String niss = u.toString();
 
