@@ -203,7 +203,7 @@ genProto.reinitializeGraphic = function() {
  */
 function maximizeHandler(viewID) {
 	if (Iview[viewID].maximized) {
-		if (window.location.search.get("jumpback") == "true"){
+		if (URL.getParam("jumpback") == "true"){
 			history.back();
 			return;
 		}

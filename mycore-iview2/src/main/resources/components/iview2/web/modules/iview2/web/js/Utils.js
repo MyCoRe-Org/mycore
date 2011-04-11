@@ -69,23 +69,6 @@ function toFloat(value) {
 	}
 }
 
-/**
- * @public
- * @function
- * @name		get
- * @memberOf	String
- * @description	additional function, look for a parameter into a (query) string an returns it
- * @param		{string} p parameter whose value you want to have
- * @return		{string} if p was found it'S value else an empty string
- */
-String.prototype.get = function(p){
-	try {
-		return(this.match(new RegExp("[?|&]?" + p + "=([^&]*)"))[1]);
-	} catch (e) {
-		return "";
-	}
-}
-
 var theBrowser = "";
 /**
  * @public

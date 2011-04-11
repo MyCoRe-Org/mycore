@@ -111,8 +111,8 @@ function processImageProperties(imageProperties, viewID){
 
 	Iview[viewID].zoomMax = parseInt(values['zoomLevel']);
 
-	if (!isNaN(parseInt(window.location.search.get("zoom")))) {
-		Iview[viewID].zoomInit = parseInt(window.location.search.get("zoom"));
+	if (!isNaN(parseInt(URL.getParam("zoom")))) {
+		Iview[viewID].zoomInit = parseInt(URL.getParam("zoom"));
 		if (Iview[viewID].zoomInit > Iview[viewID].zoomMax)
 			Iview[viewID].zoomInit = Iview[viewID].zoomMax;
 		if (Iview[viewID].zoomInit < 0)
@@ -166,8 +166,8 @@ function processImageProperties(imageProperties, viewID){
 	
 	// damit das alte zoomBack bei Modi-Austritt nicht verwendet wird
 	Iview[viewID].zoomBack = Iview[viewID].zoomInit;
-	var initX = toFloat(window.location.search.get("x"));
-	var initY = toFloat(window.location.search.get("y"));
+	var initX = toFloat(URL.getParam("x"));
+	var initY = toFloat(URL.getParam("y"));
 	
 	Iview[viewID].roller = true;
 	viewerBean.positionTiles ({'x' : initX, 'y' : initY}, true);
@@ -830,9 +830,9 @@ function loading(viewID) {
 	}
 
 	// Load Page
-	if (window.location.search.get("page") != "") {
+	if (URL.getParam("page") != "") {
 		//TODO may be incomplete: Prevent Remote File Inclusion, but never Ever drop
-		Iview[viewID].startFile = decodeURI(window.location.search.get("page").replace(/(:|\.\.|&#35|&#46|&#58|&#38|&#35|&amp)/,"§"));
+		Iview[viewID].startFile = decodeURI(URL.getParam("page").replace(/(:|\.\.|&#35|&#46|&#58|&#38|&#35|&amp)/,"§"));
 	}
 	//remove leading '/'
 	Iview[viewID].startFile = encodeURI(Iview[viewID].startFile.replace(/^\/*/,""));
@@ -888,12 +888,12 @@ function startFileLoaded(viewID){
 
 	// PermaLink Handling
 	// choice if zoomLevel or special; zoomMode only makes sense in maximized viewer
-	if (window.location.search.get("maximized") == "true") {
-		if (window.location.search.get("tosize") == "width") {
+	if (URL.getParam("maximized") == "true") {
+		if (URL.getParam("tosize") == "width") {
 			if (!Iview[viewID].zoomWidth) pictureWidth(viewID);
-		} else if (window.location.search.get("tosize") == "screen") {
+		} else if (URL.getParam("tosize") == "screen") {
 			if (!Iview[viewID].zoomScreen) pictureScreen(viewID);
-		} else if (isNaN(parseInt(window.location.search.get("zoom")))){
+		} else if (isNaN(parseInt(URL.getParam("zoom")))){
 			if (!Iview[viewID].zoomScreen) pictureScreen(viewID);
 		}
 		
@@ -980,4 +980,22 @@ function processMETS(metsDoc, viewID) {
 	}
 	//at other positions Opera doesn't get it correctly (although it still doesn't look that smooth as in other browsers) 
 	window.setTimeout("Iview['"+viewID+"'].toolbarCtrl.paint('mainTb')",10);
+}
+
+var URL = { "location": window.location};
+/**
+ * @public
+ * @function
+ * @name		getParam
+ * @memberOf	URL
+ * @description	additional function, look for a parameter into search string an returns it
+ * @param		{string} param parameter whose value you want to have
+ * @return		{string} if param was found it's value, else an empty string
+ */
+URL.getParam = function(param) {
+	try {
+		return(this.location.search.match(new RegExp("[?|&]?" + param + "=([^&]*)"))[1]);
+	} catch (e) {
+		return "";
+	}
 }
