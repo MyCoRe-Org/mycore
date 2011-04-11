@@ -352,7 +352,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         if (difs != null) {
             MCRFilesystemNode mets = difs.getChild("mets.xml");
             if (mets == null) {
-                LOGGER.error("No mets.xml file was found.");
+                LOGGER.error("No mets.xml file was found in derivate " + MCRID + ".");
             } else {
                 LOGGER.debug("mets.xml exist.");
             }
