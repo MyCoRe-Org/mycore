@@ -899,7 +899,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
                 if (addr.size() != 0) {
                     String sender = WFM.getMailSender();
-                    String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
+                    String appl = CONFIG.getString("MCR.NameOfProject", "DocPortal");
                     String subject = "Automatically generated message from " + appl;
                     StringBuffer text = new StringBuffer();
                     text.append("The object of type ").append(cd.mytype).append(" with ID ").append(cd.mysemcrid)
