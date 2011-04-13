@@ -24,6 +24,7 @@
 package org.mycore.frontend.filter;
 
 import java.io.IOException;
+import java.util.StringTokenizer;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -40,13 +41,15 @@ public class MCRWebAppBaseFilter implements Filter {
 
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
         // check if BASE_URL_ATTRIBUTE is present
+        // for used proxy header use the first entry of list
         if (req.getAttribute(MCRServlet.BASE_URL_ATTRIBUTE) == null) {
             HttpServletRequest request = (HttpServletRequest) req;
             StringBuilder webappBase = new StringBuilder(request.getScheme());
             webappBase.append("://");
-            String proxyHost = request.getHeader(PROXY_HEADER);
-            if (proxyHost != null) {
-                //proxy detected, use proxy host and port
+            String proxyHeader = request.getHeader(PROXY_HEADER);
+            if (proxyHeader != null) {
+                StringTokenizer sttoken = new StringTokenizer(proxyHeader,",");
+                String proxyHost = sttoken.nextToken().trim();
                 webappBase.append(proxyHost);
             } else {
                 webappBase.append(request.getServerName());
