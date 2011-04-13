@@ -109,7 +109,7 @@ public class MCRServlet extends HttpServlet {
         MCRSession session = MCRSessionMgr.getCurrentSession();
         Object value = session.get(BASE_URL_ATTRIBUTE);
         if (value != null) {
-            LOGGER.debug("Returning BaseURL from user session.");
+            LOGGER.debug("Returning BaseURL " + value.toString() + " from user session.");
             return value.toString();
         }
         return BASE_URL;
@@ -120,6 +120,7 @@ public class MCRServlet extends HttpServlet {
         MCRSession session = MCRSessionMgr.getCurrentSession();
         Object value = session.get(BASE_URL_ATTRIBUTE);
         if (value != null) {
+            LOGGER.debug("Returning BaseURL " + value.toString() + "servlets/ from user session.");
             return value.toString() + "servlets/";
         }
         return SERVLET_URL;
