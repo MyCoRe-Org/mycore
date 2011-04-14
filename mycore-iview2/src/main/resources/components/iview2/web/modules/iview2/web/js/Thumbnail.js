@@ -464,7 +464,6 @@ genProto.handleZoomScrollbars = function() {
 	barX.setProportion(viewerBean.width/curBreite);
 	// vertical
 	var ymaxVal = curHoehe - viewerBean.height;
-	console.log("maxVal", ymaxVal)
 	barY.setMaxValue((ymaxVal < 0)? 0:ymaxVal);
 	barY.setCurValue(-viewerBean.y);
 	barY.setProportion(viewerBean.height/curHoehe);
@@ -794,7 +793,6 @@ genProto.loading = function() {
 	
 	//remove leading '/'
 	this.iview.startFile = encodeURI(this.iview.startFile.replace(/^\/*/,""));
-	console.log(this)
 	this.loadPage(function(){that.startFileLoaded()});
 }
 
@@ -926,3 +924,6 @@ URL.getParam = function(param) {
 		return "";
 	}
 }
+
+//var i18n = new iview.i18n();
+//i18n.executeWhenLoaded(function() {console.log("hello World")});

@@ -42,7 +42,6 @@ ToolbarController.prototype.getView = function(viewID) {
  * @param		{Object} view View which should be add to the toolbar 
  */
 ToolbarController.prototype.addView = function(view) {
-	console.log(this.getViewer().gen)
 	var viewerID = this.getViewer().viewID;
 	
 	// helps the IE7 to maxmimize the viewer also by clicking between the preview buttons
