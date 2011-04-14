@@ -156,9 +156,9 @@ iview.Permalink.Controller.prototype = {
 	 * @return 		{String} string which contains the generated URL
 	 */
 	_update: function() {
-		var viewer = this.getViewer();
+		var viewer = this.getViewer().iview;
 		var url = window.location.host + window.location.pathname + "?" + window.location.search.replace(/[?|&](x|y|page|zoom|tosize|maximized|css)=([^&]*)/g,"").replace(/\?/,"");
-		
+		console.log("der",viewer)
 		url += "&page="+viewer.curImage;
 		url += "&zoom="+viewer.viewerBean.zoomLevel;
 		url += "&x="+viewer.viewerBean.x;

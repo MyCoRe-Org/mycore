@@ -42,13 +42,14 @@ ToolbarController.prototype.getView = function(viewID) {
  * @param		{Object} view View which should be add to the toolbar 
  */
 ToolbarController.prototype.addView = function(view) {
-	var viewerID = this.getViewer().viewID_to_remove;
+	console.log(this.getViewer().gen)
+	var viewerID = this.getViewer().viewID;
 	
 	// helps the IE7 to maxmimize the viewer also by clicking between the preview buttons
 	// TODO: maybe switch to another position	
   	if (view.id == "previewTbView") {
   		jQuery(view.toolbar).click(function() {
-  			maximizeHandler(viewerID);
+  			Iview[viewerID].gen.maximizeHandler();
   		});
   	}
 	
@@ -64,26 +65,26 @@ ToolbarController.prototype.addView = function(view) {
     				myself.perform("setSubtypeState", false, args.parentName, "fitToWidth");
     				myself.perform("setSubtypeState", false, args.parentName, "fitToScreen");
 
-        			myself.getViewer().zoomViewer(true);
+        			myself.getViewer().gen.zoomViewer(true);
     			} else if (args.elementName == "zoomOut") {
     				// FitToScreen - Button wieder reseten
     				// FitToWidth - Button wieder reseten
     				myself.perform("setSubtypeState", false, args.parentName, "fitToWidth");
     				myself.perform("setSubtypeState", false, args.parentName, "fitToScreen");
  
-        			myself.getViewer().zoomViewer(false);
+        			myself.getViewer().gen.zoomViewer(false);
     			} else if (args.elementName == "fitToWidth") {
     				// FitToScreen - Button wieder reseten
     				myself.perform("setSubtypeState", true, args.parentName, "fitToWidth");
     				myself.perform("setSubtypeState", false, args.parentName, "fitToScreen");
 
-        			myself.getViewer().pictureWidth();
+        			myself.getViewer().gen.pictureWidth();
     			} else if (args.elementName == "fitToScreen") {    				
     				// FitToWidth - Button wieder reseten
     				myself.perform("setSubtypeState", false, args.parentName, "fitToWidth");
     				myself.perform("setSubtypeState", true, args.parentName, "fitToScreen");
   
-    				myself.getViewer().pictureScreen();
+    				myself.getViewer().gen.pictureScreen();
     			}
     		} else if (args.parentName == "overviewHandles") {
     			if (args.elementName == "openOverview") {
@@ -94,13 +95,13 @@ ToolbarController.prototype.addView = function(view) {
     				button.setSubtypeState = function(state) {
     					myself.perform("setSubtypeState", state, args.parentName, args.elementName);
     				}
-    				myself.getViewer().modules.openOverview(button);
+    				myself.getViewer().gen.openOverview(button);
     			} else if (args.elementName == "openChapter") {
     				var button = new Object;
     				button.setLoading = function(loading) {
     					myself.perform("setLoading", loading, args.parentName, args.elementName);
     				}
-    				myself.getViewer().modules.openChapter(button);
+    				myself.getViewer().gen.openChapter(button);
     			}
     		} else if (args.parentName == "navigateHandles" || args.parentName == "previewForward" || args.parentName == "previewBack") {
     			if (args.elementName == "backward") {
@@ -114,11 +115,11 @@ ToolbarController.prototype.addView = function(view) {
     				button.setLoading = function(loading) {
     					myself.perform("setLoading", loading, args.parentName, args.elementName);
     				}
-    				myself.getViewer().modules.openPermalink(button);
+    				myself.getViewer().gen.openPermalink(button);
     			}
     		} else if (args.parentName == "closeHandles") {
     			if (args.elementName == "close") {
-    				myself.getViewer().maximizeHandler();
+    				myself.getViewer().gen.maximizeHandler();
     			}		
     		}
 	    } else if (args.type == "new") {
@@ -135,7 +136,7 @@ ToolbarController.prototype.addView = function(view) {
 			    	args.view.addClass("iview2-button-icon-dropdown");
 			      	args.view.menu({
 			      		// content list to navigate
-					    content: myself.getViewer().viewerContainer.find('#pages').html(),
+					    content: myself.getViewer().my.container.find('#pages').html(),
 					    /*width: 100,*/
 					    maxHeight: 280,
 					    positionOpts: {

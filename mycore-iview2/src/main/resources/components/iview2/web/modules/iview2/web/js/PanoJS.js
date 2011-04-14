@@ -358,16 +358,16 @@ PanoJS.prototype = {
 		}
 		
 		//addition
-		var viewID = this.viewID;
+		var iview = this.iview;
 		//Changed to work for multiple Viewers
-		//hinzugefuegt damit Bild nicht ueber die Raender laeuft
-		if (-(this.x + motion.x) > ((Iview[viewID].picWidth/Math.pow(2, Iview[viewID].zoomMax - this.zoomLevel))*Iview[viewID].zoomScale-this.width)) {
+		//added so that pictures can't be moved out of borders
+		if (-(this.x + motion.x) > ((iview.picWidth/Math.pow(2, iview.zoomMax - this.zoomLevel))*iview.zoomScale-this.width)) {
 			motion.x = 0;
-			this.x = -((Iview[viewID].picWidth/Math.pow(2, Iview[viewID].zoomMax - this.zoomLevel))*Iview[viewID].zoomScale-this.width);
+			this.x = -((iview.picWidth/Math.pow(2, iview.zoomMax - this.zoomLevel))*iview.zoomScale-this.width);
 		}
-		if (-(this.y + motion.y) > ((Iview[viewID].picHeight/Math.pow(2, Iview[viewID].zoomMax - this.zoomLevel))*Iview[viewID].zoomScale-this.height)) {
+		if (-(this.y + motion.y) > ((iview.picHeight/Math.pow(2, iview.zoomMax - this.zoomLevel))*iview.zoomScale-this.height)) {
 			motion.y = 0;
-			this.y = -((Iview[viewID].picHeight/Math.pow(2, Iview[viewID].zoomMax - this.zoomLevel))*Iview[viewID].zoomScale-this.height);
+			this.y = -((iview.picHeight/Math.pow(2, iview.zoomMax - this.zoomLevel))*iview.zoomScale-this.height);
 		}
 		if(this.x + motion.x > 0){
 			this.x = 0;
@@ -379,8 +379,8 @@ PanoJS.prototype = {
 		}
 		/*verschieben des Preload bildes damit man eine grobe Vorschau sieht von dem was kommt
 		  wird nur ausgeführt wenn Seite geladen ist, da ansonsten die Eigenschaften noch nicht vorhanden sind*/
-		if(Iview[viewID].loaded) {
-			var preload=Iview[viewID].preload
+		if(iview.loaded) {
+			var preload=iview.my.preload
 			//folgende beide IF-Anweisungen für IE
 			if(isNaN(this.x)) this.x = 0; 
 			if(isNaN(this.y)) this.y = 0;
@@ -498,14 +498,14 @@ PanoJS.prototype = {
 				useBlankImage=true;
 			} else {
 				//modification to original PanonJS code
-				var iView=Iview[this.viewID];
-				var currentWidth = Math.floor(iView.picWidth / Math.pow(2, iView.zoomMax - this.zoomLevel));
-				var xTileCount = Math.ceil( currentWidth / iView.tilesize);
-				var currentHeight = Math.floor(iView.picHeight / Math.pow(2, iView.zoomMax - this.zoomLevel));
-				var yTileCount = Math.ceil( currentHeight / iView.tilesize);
+				var iview=this.iview;
+				var currentWidth = Math.floor(iview.picWidth / Math.pow(2, iview.zoomMax - this.zoomLevel));
+				var xTileCount = Math.ceil( currentWidth / iview.tilesize);
+				var currentHeight = Math.floor(iview.picHeight / Math.pow(2, iview.zoomMax - this.zoomLevel));
+				var yTileCount = Math.ceil( currentHeight / iview.tilesize);
 				var right = tile.xIndex >= xTileCount; //index starts at 0
 				var low = tile.yIndex >= yTileCount;
-				if (low || right || this.zoomLevel>iView.zoomMax) {
+				if (low || right || this.zoomLevel>iview.zoomMax) {
 					useBlankImage = true;
 				}
 				//modification ends
@@ -575,8 +575,8 @@ PanoJS.prototype = {
 				tileImg.image.src = tileImg.src;
 			}
 		}
-//additions	
-		isloaded(tileImg, this.viewID);
+//additions
+		this.iview.gen.isloaded(tileImg);
 		//changes all not available Tiles to the blank one, so that no ugly Image not Found Pics popup.
 		tileImg.onerror = function () {this.src = PanoJS.BLANK_TILE_IMAGE; return true;};
 //endadd

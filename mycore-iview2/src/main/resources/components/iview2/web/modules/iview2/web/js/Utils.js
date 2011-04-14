@@ -15,6 +15,23 @@ function alertError(msg, nr, e) {
 				+ "Browser: " + navigator.userAgent);
 }
 
+//TODO rename Function and make proper use where needed of it name callFunc
+/**
+ * @public
+ * @function
+ * @name		callBack
+ * @description	execute the given function, if it's no function, do nothing or alert a comment
+ * @param 		{function} func is the function whis is to be executed
+ */
+function callBack(func){
+	if (func == null)
+		return;
+	if (typeof(func)=='function')
+		func();
+	else
+		alert("Is not a function:\n"+func);
+}
+
 /**
  * @public
  * @function

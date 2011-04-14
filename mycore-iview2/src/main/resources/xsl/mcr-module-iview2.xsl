@@ -204,10 +204,10 @@
       addIviewProperty('<xsl:value-of select="$groupID" />', 'startFile', "'<xsl:value-of select="$startFile" />'");
       function startViewer(viewID) {
         if (Iview[viewID].started) return;
-        Iview[viewID].gen = new iview.General(Iview[viewID]);
+        Iview[viewID].gen = new iview.General(Iview[viewID], viewID);
         Iview[viewID].started = true;
         Iview[viewID].preload = jQuery("#viewerContainer" + viewID + " .preload");
-        loading(viewID);
+        Iview[viewID].gen.loading();
       }
       jQuery(window).load(function() { startViewer('<xsl:value-of select="$groupID"/>');});
     </script>

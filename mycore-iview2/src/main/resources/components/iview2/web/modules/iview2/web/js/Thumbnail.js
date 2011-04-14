@@ -1,54 +1,54 @@
 var length = null;
 var focus = null;//holds the element which is focused
 //TODO Preload größe anhand der von den Kacheln bestimmen
-var listener = []; // array who holds informations about the listeners (?)
-NAVIGATE = 0;
-
-function addListener(type, theListener) {
-	if (!listener[type]) {
-		listener[type] = [];
-	}
-	listener[type].push(theListener);
-}
-
-function dropListener(type, theListener) {
-	for (var i = 0; i < listener[type].length; i++) {
-		if (listener[type][i] == theListener) {
-			listener[type].splice(i,1);
-		}
-	}
-}
-
-function notifyListenerNavigate(value, viewID) {
-	if (!listener[NAVIGATE]) {
-		return;
-	}
-	for(var i = 0; i < listener[NAVIGATE].length; i++) {
-		listener[NAVIGATE][i].navi(value,viewID);
-	}
-};
+//var listener = []; // array who holds informations about the listeners (?)
+//NAVIGATE = 0;
+//
+//function addListener(type, theListener) {
+//	if (!listener[type]) {
+//		listener[type] = [];
+//	}
+//	listener[type].push(theListener);
+//}
+//
+//function dropListener(type, theListener) {
+//	for (var i = 0; i < listener[type].length; i++) {
+//		if (listener[type][i] == theListener) {
+//			listener[type].splice(i,1);
+//		}
+//	}
+//}
+//
+//notifyListenerNavigate(value, viewID) {
+//	if (!listener[NAVIGATE]) {
+//		return;
+//	}
+//	for(var i = 0; i < listener[NAVIGATE].length; i++) {
+//		listener[NAVIGATE][i].navi(value,viewID);
+//	}
+//};
 
 /**
  * @public
  * @function
- * @name	loadPage
- * @memberOf	iview.Thumbnails
+ * @name		loadPage
+ * @memberOf	iview.General
  * @description	reads out the imageinfo.xml, set the correct zoomvlues and loads the page
- * @param 	{string} viewID ID of the derivate
- * @param	{function} callback
+ * @param		{function} callback
  */
-function loadPage(viewID, callback) {
+genProto.loadPage = function(callback) {
 	var url;
-	if (typeof(Iview[viewID].newMETS)=='undefined'){
-		url = Iview[viewID].startFile;
+	if (typeof(this.iview.metsDoc)=='undefined'){
+		url = this.iview.startFile;
 	} else {
-		url = Iview[viewID].PhysicalModel.getCurrent().getHref();
+		url = this.iview.PhysicalModel.getCurrent().getHref();
 	}
-	Iview[viewID].curImage  = url;
-	var imagePropertiesURL=Iview[viewID].baseUri[0]+"/"+viewID+"/"+url+"/imageinfo.xml";
+	this.iview.curImage  = url;
+	var imagePropertiesURL = this.iview.baseUri[0]+"/"+this.iview.viewID+"/"+url+"/imageinfo.xml";
+	var that = this;
 	jQuery.ajax({
 		url: imagePropertiesURL,
-  		success: function(response) {processImageProperties(response,viewID)},
+  		success: function(response) {that.processImageProperties(response)},
   		error: function(request, status, exception) {
   			if(console){
   				console.log("Error occured while loading image properties:\n"+exception);
@@ -61,156 +61,139 @@ function loadPage(viewID, callback) {
 /**
  * @public
  * @function
- * @name	callBack
- * @memberOf	iview.Thumbnails
- * @description	execute the given function, if it's no function, do nothing or alert a comment
- * @param 	{function} func is the function whis is to be executed
- */
-function callBack(func){
-	if (func == null)
-		return;
-	if (typeof(func)=='function')
-		func();
-	else
-		alert("Is not a function:\n"+func);
-}
-
-/**
- * @public
- * @function
- * @name	processImageProperties
- * @memberOf	iview.Thumbnails
+ * @name		processImageProperties
+ * @memberOf	iview.General
  * @description	
- * @param 	{object} imageProperties
- * @param	{string} viewID ID of the derivate
+ * @param 		{object} imageProperties
  */
-function processImageProperties(imageProperties, viewID){
+genProto.processImageProperties = function(imageProperties){
 	var values = nodeAttributes(imageProperties.getElementsByTagName("imageinfo")[0]);
 	
-	Iview[viewID].tiles = parseInt(values['tiles']);
-	Iview[viewID].picWidth = parseInt(values['width']);
-	Iview[viewID].picHeight = parseInt(values['height']);
-	var viewerBean = Iview[viewID].viewerBean;
+	this.iview.tiles = parseInt(values['tiles']);
+	this.iview.picWidth = parseInt(values['width']);
+	this.iview.picHeight = parseInt(values['height']);
+	var viewerBean = this.iview.viewerBean;
 
 	if (viewerBean) {
 		// checks if current zoomlevel was "greater" as zoomMax, so the current zoomLevel wouldn't reach
 		// update the initialZoom only if this is not the case
-		if (viewerBean.zoomLevel != Iview[viewID].zoomMax || Iview[viewID].initialZoom <= viewerBean.zoomLevel) {
-			Iview[viewID].initialZoom = viewerBean.zoomLevel;
+		if (viewerBean.zoomLevel != this.iview.zoomMax || this.iview.initialZoom <= viewerBean.zoomLevel) {
+			this.iview.initialZoom = viewerBean.zoomLevel;
 		}
 		
 		// checks for enabled Modi & reset before
-		Iview[viewID].initialModus = "none";
-		if (Iview[viewID].zoomWidth) {
-			Iview[viewID].initialModus = "width";
+		this.iview.initialModus = "none";
+		if (this.iview.zoomWidth) {
+			this.iview.initialModus = "width";
 		}
-		if (Iview[viewID].zoomScreen) {
-			Iview[viewID].initialModus = "screen";
+		if (this.iview.zoomScreen) {
+			this.iview.initialModus = "screen";
 		}
 	}
 
-	Iview[viewID].zoomMax = parseInt(values['zoomLevel']);
+	this.iview.zoomMax = parseInt(values['zoomLevel']);
 
 	if (!isNaN(parseInt(URL.getParam("zoom")))) {
-		Iview[viewID].zoomInit = parseInt(URL.getParam("zoom"));
-		if (Iview[viewID].zoomInit > Iview[viewID].zoomMax)
-			Iview[viewID].zoomInit = Iview[viewID].zoomMax;
-		if (Iview[viewID].zoomInit < 0)
-			Iview[viewID].zoomInit = 0;
+		this.iview.zoomInit = parseInt(URL.getParam("zoom"));
+		if (this.iview.zoomInit > this.iview.zoomMax)
+			this.iview.zoomInit = this.iview.zoomMax;
+		if (this.iview.zoomInit < 0)
+			this.iview.zoomInit = 0;
 	} else {
 		// zoomLevel 0 ist erstes Level
-		Iview[viewID].zoomInit = Math.ceil((Iview[viewID].zoomMax + 1) / 2) - 1;
+		this.iview.zoomInit = Math.ceil((this.iview.zoomMax + 1) / 2) - 1;
 	}
 	var preload = new Image();
-	preload.id = "preloadImg" + viewID;
-	var preloadCont=Iview[viewID].preload;
-	preloadCont.css({"width" : Iview[viewID].picWidth / Math.pow(2, Iview[viewID].zoomMax - Iview[viewID].zoomInit) + "px",
-					 "height" : Iview[viewID].picHeight / Math.pow(2, Iview[viewID].zoomMax - Iview[viewID].zoomInit) + "px"})
+	preload.className = "preloadImg";
+	var preloadCont=this.iview.my.preload;
+	preloadCont.css({"width" : this.iview.picWidth / Math.pow(2, this.iview.zoomMax - this.iview.zoomInit) + "px",
+					 "height" : this.iview.picHeight / Math.pow(2, this.iview.zoomMax - this.iview.zoomInit) + "px"})
 			 .empty()
 			 .append(preload);
 
 	if (viewerBean == null) {
-		Iview[viewID].gen.initializeGraphic(viewID);
-		viewerBean = Iview[viewID].viewerBean;
-		viewerBean.addViewerZoomedListener(new listenerZoom(viewID));
-		viewerBean.addViewerMovedListener(new listenerMove(viewID));
+		this.initializeGraphic();
+		viewerBean = this.iview.viewerBean;
+		viewerBean.addViewerZoomedListener(this);
+		viewerBean.addViewerMovedListener(this);
 		preload.src = viewerBean.tileUrlProvider.assembleUrl(0,0,0);
 	} else {
 		// prevents that (max) Zoomlevel will be reached which doesn't exists
-		if (Iview[viewID].initialZoom < Iview[viewID].zoomMax) {
-			Iview[viewID].zoomInit = Iview[viewID].initialZoom;
+		if (this.iview.initialZoom < this.iview.zoomMax) {
+			this.iview.zoomInit = this.iview.initialZoom;
 		} else {
-			Iview[viewID].zoomInit = Iview[viewID].zoomMax;
+			this.iview.zoomInit = this.iview.zoomMax;
 		}
-		viewerBean.tileUrlProvider.prefix = Iview[viewID].curImage;
+		viewerBean.tileUrlProvider.prefix = this.iview.curImage;
 		preload.src = viewerBean.tileUrlProvider.assembleUrl(0,0,0);
 		viewerBean.resize();
 	}
 	// moves viewer to zoomLevel zoomInit
-	viewerBean.maxZoomLevel=Iview[viewID].zoomMax;
+	viewerBean.maxZoomLevel = this.iview.zoomMax;
 	// handle special Modi for new Page
-	if (Iview[viewID].initialModus == "width") {
+	if (this.iview.initialModus == "width") {
 		// letzte Seite war in fitToWidth
 		// aktuell ist fuer die neue Page noch kein Modi aktiv
-		Iview[viewID].zoomWidth = false;
-		pictureWidth(viewID);
-	} else if (Iview[viewID].initialModus == "screen") {
+		this.iview.zoomWidth = false;
+		this.pictureWidth();
+	} else if (this.iview.initialModus == "screen") {
 		// letzte Seite war in fitToScreen
 		// aktuelle ist fuer die neue Page noch kein Modi aktiv
-		Iview[viewID].zoomScreen = false;
-		pictureScreen(viewID);
+		this.iview.zoomScreen = false;
+		this.pictureScreen();
 	} else {
 		// moves viewer to zoomLevel zoomInit
-		viewerBean.zoom(Iview[viewID].zoomInit - viewerBean.zoomLevel);
+		viewerBean.zoom(this.iview.zoomInit - viewerBean.zoomLevel);
 	}
 	
 	// damit das alte zoomBack bei Modi-Austritt nicht verwendet wird
-	Iview[viewID].zoomBack = Iview[viewID].zoomInit;
+	this.iview.zoomBack = this.iview.zoomInit;
 	var initX = toFloat(URL.getParam("x"));
 	var initY = toFloat(URL.getParam("y"));
 	
-	Iview[viewID].roller = true;
+	this.iview.roller = true;
 	viewerBean.positionTiles ({'x' : initX, 'y' : initY}, true);
 	
 	preload.style.width = "100%";
 	preload.style.height = "100%";
-	if (Iview[viewID].useCutOut) {
-		Iview[viewID].cutOutModel.setSrc(viewerBean.tileUrlProvider.assembleUrl(0,0,0));
+	if (this.iview.useCutOut) {
+		this.iview.cutOutModel.setSrc(viewerBean.tileUrlProvider.assembleUrl(0,0,0));
 	}
-	updateModuls(viewID);
+	this.updateModuls();
 	
-	Iview[viewID].roller = false;
+	this.iview.roller = false;
 }
 
 /**
  * @public
  * @function
  * @name		openOverview
- * @memberOf	iview.Thumbnails
+ * @memberOf	iview.General
  * @description	blend in the overview and creates it by the first call
- * @param		{string} viewID ID of the derivate
+ * @param		{button} button to which represents the Overview in the toolbar
  */
-function openOverview(button, viewID) {
+genProto.openOverview = function(button) {
+	var that = this;
 	// check if overview was created yet
-	if (typeof Iview[viewID].overview === 'undefined') {
+	if (typeof this.iview.overview === 'undefined') {
 		button.setLoading(true);
 		setTimeout(function(){
 			var callback = function() {
 				// try again openOverview (recursive call)
-				openOverview(button, viewID);
+				that.openOverview(button);
 				button.setLoading(false);
 				
-				Iview[viewID].overview.attach(function(sender, args) {
+				that.iview.overview.attach(function(sender, args) {
 					// type 1: click on overview div
 					if (args.type == 1) {
 						button.setSubtypeState(false);
 					}
 				});
 			};
-			importOverview(viewID, callback);
+			that.importOverview(callback);
 		}, 10);
 	} else {
-		Iview[viewID].overview.toggleView();
+		this.iview.overview.toggleView();
 	}
 }
 
@@ -218,21 +201,22 @@ function openOverview(button, viewID) {
  * @public
  * @function
  * @name		openPermalink
- * @memberOf	iview.Thumbnails
+ * @memberOf	iview.General
  * @description	switch between visibility of Permalink element, if needed it's created at first run
- * @param		{string} viewID ID of the derivate
+* @param		{button} button to which represents the Permalink in the toolbar
  */
-function openPermalink(button, viewID) {
-	if (typeof Iview[viewID].getPermalinkCtrl === "undefined") {
+genProto.openPermalink = function(button) {
+	var that = this;
+	if (typeof this.getPermalinkCtrl === "undefined") {
 		button.setLoading(true);
 		setTimeout(function() {
 			var callback = function() {
-				openPermalink(button, viewID);
+				that.openPermalink(button);
 				button.setLoading(false)};
-			importPermalink(viewID, callback);
+			that.importPermalink(callback);
 		}, 10);
 	} else {
-		Iview[viewID].getPermalinkCtrl().show();
+		this.getPermalinkCtrl().show();
 	}
 }
 
@@ -240,13 +224,13 @@ function openPermalink(button, viewID) {
  * @public
  * @function
  * @name		importPermalink
- * @memberOf	iview.Thumbnails
+ * @memberOf	iview.General
  * @description	calls the corresponding functions to create the Permalink
- * @param		{string} viewID ID of the derivate
+ * @param		{function} callback function to call after the permalink was loaded successfully
  */
-function importPermalink(viewID, callback) {
+genProto.importPermalink = function(callback) {
 	// Permalink
-	Iview[viewID].getPermalinkCtrl = function() {
+	this.getPermalinkCtrl = function() {
 		if (!this.permalinkCtrl) {
 			this.permalinkCtrl = new iview.Permalink.Controller(this);
 			
@@ -258,63 +242,62 @@ function importPermalink(viewID, callback) {
 		return this.permalinkCtrl;
 	}
 
-	Iview[viewID].getPermalinkCtrl().addView(new iview.Permalink.View("permalinkView", jQuery("#viewerContainer"+viewID + " .toolbars").parent()));
+	this.getPermalinkCtrl().addView(new iview.Permalink.View("permalinkView", jQuery("#viewerContainer"+ this.iview.viewID + " .toolbars").parent()));
 	callback();
 }
 
 /**
  * @public
  * @function
- * @name	removeScaling
- * @memberOf	iview.Thumbnails
- * @description	saves the scaling of loaded tiles if picture fits to heigh or to width (for IE)
- * @param	{string} viewID ID of the derivate
+ * @name		removeScaling
+ * @memberOf	iview.General
+ * @description	saves the scaling of loaded tiles if picture fits to height or to width (for IE)
  */
-function removeScaling(viewID) {
-	for (var img in Iview[viewID].images) {
-		Iview[viewID].images[img]["scaled"] = false;
+genProto.removeScaling = function() {
+	for (var img in this.iview.images) {
+		this.iview.images[img]["scaled"] = false;
 	}
 }
 
 /**
  * @public
  * @function
- * @name	isloaded
- * @memberOf	iview.Thumbnails
+ * @name		isloaded
+ * @memberOf	iview.General
  * @description	checks if the picture is loaded
- * @param	{object} img
- * @param	{string} viewID ID of the derivate
+ * @param		{object} img
  */
-function isloaded(img, viewID) {
+genProto.isloaded = function(img) {
 	/*
 	NOTE tiles are not dispalyed correctly in Opera, because the used accuracy for pixelvalues only has 
 	2 dezimal places, however 3 are neccessary for the correct representation as in FF
 	*/
-	if (!Iview[viewID].images[img.src]) {
-		Iview[viewID].images[img.src] = new Object();
-		Iview[viewID].images[img.src]["scaled"] = false;
+	if (!this.iview.images[img.src]) {
+		this.iview.images[img.src] = new Object();
+		this.iview.images[img.src]["scaled"] = false;
 		img.style.display = "none";
 	}
 	if (((img.naturalWidth == 0 && img.naturalHeight == 0)  && !isBrowser(["IE", "Opera"])) || (!img.complete && isBrowser(["IE", "Opera"]))) {
 		if (img.src.indexOf("blank.gif") == -1) {//change
-			window.setTimeout(function(image) { return function(){isloaded(image, viewID);} }(img), 100);
+			var that = this;
+			window.setTimeout(function(image) { return function(){that.isloaded(image);} }(img), 100);
 		}
 	} else if (img.src.indexOf("blank.gif") == -1) {
-		if (Iview[viewID].images[img.src]["scaled"] != true) {
+		if (this.iview.images[img.src]["scaled"] != true) {
 			img.style.display = "inline";
-			Iview[viewID].images[img.src]["scaled"] = true;//notice that this picture already was scaled
+			this.iview.images[img.src]["scaled"] = true;//notice that this picture already was scaled
 			//TODO math Floor rein bauen bei Höhe und Breite
 			if (!isBrowser(["IE","Opera"])) {
-				img.style.width = Iview[viewID].zoomScale * img.naturalWidth + "px";
-				img.style.height = Iview[viewID].zoomScale * img.naturalHeight + "px";
+				img.style.width = this.iview.zoomScale * img.naturalWidth + "px";
+				img.style.height = this.iview.zoomScale * img.naturalHeight + "px";
 			} else {
-				if (!Iview[viewID].images[img.src]["once"]) {
-					Iview[viewID].images[img.src]["once"] = true;
-					Iview[viewID].images[img.src]["naturalheight"] = img.clientHeight;
-					Iview[viewID].images[img.src]["naturalwidth"] = img.clientWidth;
+				if (!this.iview.images[img.src]["once"]) {
+					this.iview.images[img.src]["once"] = true;
+					this.iview.images[img.src]["naturalheight"] = img.clientHeight;
+					this.iview.images[img.src]["naturalwidth"] = img.clientWidth;
 				}
-				img.style.width = Iview[viewID].zoomScale * Iview[viewID].images[img.src]["naturalwidth"] + "px";
-				img.style.height = Iview[viewID].zoomScale * Iview[viewID].images[img.src]["naturalheight"] + "px";
+				img.style.width = this.iview.zoomScale * this.iview.images[img.src]["naturalwidth"] + "px";
+				img.style.height = this.iview.zoomScale * this.iview.images[img.src]["naturalheight"] + "px";
 			}
 		}
 	}
@@ -324,30 +307,29 @@ function isloaded(img, viewID) {
 /**
  * @public
  * @function
- * @name	calculateZoomProp
- * @memberOf	iview.Thumbnails
+ * @name		calculateZoomProp
+ * @memberOf	iview.General
  * @description	calculates how the TileSize and the zoomvalue needs to be if the given zoomlevel fits into the viewer
- * @param	{integer} level the zoomlevel which is used for testing
- * @param	{integer} totalSize the total size of the Picture Dimension X or Y
- * @param	{integer} viewerSize the Size of the Viewer Dimension X or Y
- * @param	{integer} scrollBarSize the Height or Width of the ScrollBar which needs to be dropped from the ViewerSize
- * @param	{string} viewID ID of the derivate
- * @return	boolean which tells if it was successfull to scale the picture in the current zoomlevel to the viewer Size
+ * @param		{integer} level the zoomlevel which is used for testing
+ * @param		{integer} totalSize the total size of the Picture Dimension X or Y
+ * @param		{integer} viewerSize the Size of the Viewer Dimension X or Y
+ * @param		{integer} scrollBarSize the Height or Width of the ScrollBar which needs to be dropped from the ViewerSize
+ * @return		boolean which tells if it was successfull to scale the picture in the current zoomlevel to the viewer Size
  */
-function calculateZoomProp(level, totalSize, viewerSize, scrollBarSize, viewID) {
+genProto.calculateZoomProp = function(level, totalSize, viewerSize, scrollBarSize) {
 	if ((totalSize / Math.pow(2, level)) <= viewerSize) {
-		var viewerBean = Iview[viewID].viewerBean;
+		var viewerBean = this.iview.viewerBean;
 		if (level != 0) {
 			level--;
 		}
 		var currentWidth = totalSize / Math.pow(2, level);
 		var viewerRatio = viewerSize / currentWidth;
-		var fullTileCount = Math.floor( currentWidth / Iview[viewID].tilesize);
-		var lastTileWidth = currentWidth - fullTileCount * Iview[viewID].tilesize;
-		Iview[viewID].zoomScale = viewerRatio;//determine the scaling ratio
-		level = Iview[viewID].zoomMax - level;
+		var fullTileCount = Math.floor( currentWidth / this.iview.tilesize);
+		var lastTileWidth = currentWidth - fullTileCount * this.iview.tilesize;
+		this.iview.zoomScale = viewerRatio;//determine the scaling ratio
+		level = this.iview.zoomMax - level;
 		viewerBean.tileSize = Math.floor((viewerSize - viewerRatio * lastTileWidth) / fullTileCount);
-		Iview[viewID].zoomBack = viewerBean.zoomLevel;
+		this.iview.zoomBack = viewerBean.zoomLevel;
 		viewerBean.zoom(level - viewerBean.zoomLevel);
 		return true;
 	}
@@ -357,124 +339,120 @@ function calculateZoomProp(level, totalSize, viewerSize, scrollBarSize, viewID) 
 /**
  * @public
  * @function
- * @name	switchDisplayMode
- * @memberOf	iview.Thumbnails
+ * @name		switchDisplayMode
+ * @memberOf	iview.General
  * @description	calculates how the picture needs to be scaled so that it can be displayed within the display-area as the mode requires it
- * @param	{boolean} screenZoom defines which displaymode will be calculated
- * @param	{boolean} statebool holds the value which defines if the current mode is set or needs to be set
- * @param	{string} viewID ID of the derivate
- * @param 	{boolean} [preventLooping] optional tells if the function is called from the Zoombar or any Function which is connected to it or not and prevents infite loop
- * @return	boolean which holds the new StateBool value, so it can be saved back into the correct variable
+ * @param		{boolean} screenZoom defines which displaymode will be calculated
+ * @param		{boolean} statebool holds the value which defines if the current mode is set or needs to be set
+ * @param 		{boolean} [preventLooping] optional tells if the function is called from the Zoombar or any Function which is connected to it or not and prevents infite loop
+ * @return		boolean which holds the new StateBool value, so it can be saved back into the correct variable
  */
-function switchDisplayMode(screenZoom, stateBool, viewID, preventLooping) {
-	var viewerBean = Iview[viewID].viewerBean;
+genProto.switchDisplayMode = function(screenZoom, stateBool, preventLooping) {
+	var viewerBean = this.iview.viewerBean;
 	if (typeof(viewerBean)=='undefined' && typeof(console)!='undefined'){
 		console.log("undefined property viewerBean");
-		console.log(Iview[viewID]);
+		console.log(this);
 		console.trace();
 		return;
 	}
 	if (screenZoom) {
-		Iview[viewID].zoomWidth = false;
+		this.iview.zoomWidth = false;
 	} else {
-		Iview[viewID].zoomScreen = false;
+		this.iview.zoomScreen = false;
 	}
 	stateBool = (stateBool)? false: true;
 	viewerBean.clear();
-	removeScaling(viewID);
-	var preload = Iview[viewID].preload;
+	this.removeScaling();
+	var preload = this.iview.my.preload;
 	if (stateBool) {
-		for (var i = 0; i <= Iview[viewID].zoomMax; i++) {
-			if(Iview[viewID].picWidth/viewerBean.width > Iview[viewID].picHeight/document.getElementById("viewer"+viewID).offsetHeight || (stateBool && !screenZoom)){
+		for (var i = 0; i <= this.iview.zoomMax; i++) {
+			if(this.iview.picWidth/viewerBean.width > this.iview.picHeight/this.iview.my.viewer.outerHeight(true) || (stateBool && !screenZoom)){
 			//Width > Height Or ZoomWidth is true
-				if (calculateZoomProp(i, Iview[viewID].picWidth, viewerBean.width, 0, viewID)) {
+				if (this.calculateZoomProp(i, this.iview.picWidth, viewerBean.width, 0)) {
 					break;
 				}
 			} else {
-				if (calculateZoomProp(i, Iview[viewID].picHeight, viewerBean.height, 0, viewID)) {
+				if (this.calculateZoomProp(i, this.iview.picHeight, viewerBean.height, 0)) {
 					break;
 				}
 			}
 		}
 		viewerBean.init();
 	} else {
-		Iview[viewID].zoomScale = 1;
+		this.iview.zoomScale = 1;
 		viewerBean.tileSize = tilesize;
 		viewerBean.init();
 		
 		//an infinite loop would arise if the repeal of the zoombar comes
 		if (typeof (preventLooping) == "undefined" || preventLooping == false) {
-			viewerBean.zoom(Iview[viewID].zoomBack - viewerBean.zoomLevel);
+			viewerBean.zoom(this.iview.zoomBack - viewerBean.zoomLevel);
 		}
 	}
 
 	var offset = preload.offset();
-	Iview[viewID].barX.setCurValue(-offset.left);
-	Iview[viewID].barY.setCurValue(-offset.top);
-	if (Iview[viewID].useCutOut) Iview[viewID].cutOutModel.setPos({'x':offset.left, 'y':offset.top});
+	this.iview.my.barX.setCurValue(-offset.left);
+	this.iview.my.barY.setCurValue(-offset.top);
+	if (this.iview.useCutOut) this.iview.cutOutModel.setPos({'x':offset.left, 'y':offset.top});
 	return stateBool;
 }
 
 /**
  * @public
  * @function
- * @name	pictureWidth
- * @memberOf	iview.Thumbnails
+ * @name		pictureWidth
+ * @memberOf	iview.General
  * @description	calculates how the tilesize has to be so that the picture fully fits into the viewer Area, tiles used are the nearest zoomlevel to the available viewerwidth which is smaller than the viewerwidth
- * @param	{string} viewID ID of the derivate
- * @param 	{boolean} [preventLooping] optional tells if the function is called from the Zoombar or any Function which is connected to it or not and prevents infite loop
+ * @param 		{boolean} [preventLooping] optional tells if the function is called from the Zoombar or any Function which is connected to it or not and prevents infite loop
  */
-function pictureWidth(viewID, preventLooping){
+genProto.pictureWidth = function(preventLooping){
 	var bool = (typeof (preventLooping) != undefined)? preventLooping:false;
-	Iview[viewID].zoomWidth = switchDisplayMode(false, Iview[viewID].zoomWidth, viewID, bool);
+	this.iview.zoomWidth = this.switchDisplayMode(false, this.iview.zoomWidth, bool);
 }
 
 /**
  * @public
  * @function
- * @name	pictureScreen
- * @memberOf	iview.Thumbnails
+ * @name		pictureScreen
+ * @memberOf	iview.General
  * @description	calculates how the tilesize has to be so that the picture fully fits into the viewer Area, tiles used are the nearest zoomlevel to the available viewerspace which is smaller than the viewerspace
- * @param	{string} viewID ID of the derivate
- * @param 	{boolean} [preventLooping] optional tells if the function is called from the Zoombar or any Function which is connected to it or not and prevents infite loop
+ * @param 		{boolean} [preventLooping] optional tells if the function is called from the Zoombar or any Function which is connected to it or not and prevents infite loop
  */
-function pictureScreen(viewID, preventLooping){
+genProto.pictureScreen = function(preventLooping){
 	var bool = (typeof (preventLooping) != undefined)? preventLooping:false;
-	Iview[viewID].zoomScreen = switchDisplayMode(true, Iview[viewID].zoomScreen, viewID, bool);
+	this.iview.zoomScreen = this.switchDisplayMode(true, this.iview.zoomScreen, bool);
 }
 
 /**
  * @public
  * @function
- * @name	scrollMove
- * @memberOf	iview.Thumbnails
+ * @name		scrollMove
+ * @memberOf	iview.General
  * @description	loads the tiles accordingly the position of the scrollbar if they is moving
- * @param	{integer} valueX number of pixels how far the bar has been moved horizontal
- * @param	{integer} valueY number of pixels how far the bar has been moved vertical
- * @param	{string} viewID ID of the derivate
+ * @param		{integer} valueX number of pixels how far the bar has been moved horizontal
+ * @param		{integer} valueY number of pixels how far the bar has been moved vertical
  */
-function scrollMove(valueX, valueY, viewID) {
-	Iview[viewID].scroller = true;
-	Iview[viewID].viewerBean.positionTiles ({'x' : valueX, 'y' : valueY}, true);
-	Iview[viewID].viewerBean.notifyViewerMoved({'x' : valueX, 'y' : valueY});
-	Iview[viewID].scroller = false;
+genProto.scrollMove = function(valueX, valueY) {
+	this.iview.scroller = true;
+	this.iview.viewerBean.positionTiles ({'x' : valueX, 'y' : valueY}, true);
+	this.iview.viewerBean.notifyViewerMoved({'x' : valueX, 'y' : valueY});
+	this.iview.scroller = false;
 }
 
+//TODO could handleZoomScrollbars and handleResizeScrollbars be merged?
 /**
  * @public
  * @function
- * @name	handleZoomScrollbars
- * @memberOf	iview.Thumbnails
+ * @name		handleZoomScrollbars
+ * @memberOf	iview.General
  * @description	fit the scrollbar to the viewer-zoom
- * @param	{string} viewID ID of the derivate
  */
-function handleZoomScrollbars(viewID) {
-	var viewerBean = Iview[viewID].viewerBean;
-	var barX = Iview[viewID].barX;
-	var barY = Iview[viewID].barY;
+genProto.handleZoomScrollbars = function() {
+	var viewerBean = this.iview.viewerBean;
+	var barX = this.iview.my.barX;
+	var barY = this.iview.my.barY;
 	// determine the current imagesize
-	var curBreite = (Iview[viewID].picWidth / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale;
-	var curHoehe = (Iview[viewID].picHeight / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale;
+	var curBreite = (this.iview.picWidth / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale;
+	var curHoehe = (this.iview.picHeight / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale;
 
 	// horizontal
 	// max scaling
@@ -483,10 +461,10 @@ function handleZoomScrollbars(viewID) {
 	// current position
 	barX.setCurValue(-viewerBean.x);
 	// length of the bar
-	var damp=document.getElementById("damp"+viewID);
 	barX.setProportion(viewerBean.width/curBreite);
 	// vertical
 	var ymaxVal = curHoehe - viewerBean.height;
+	console.log("maxVal", ymaxVal)
 	barY.setMaxValue((ymaxVal < 0)? 0:ymaxVal);
 	barY.setCurValue(-viewerBean.y);
 	barY.setProportion(viewerBean.height/curHoehe);
@@ -495,22 +473,21 @@ function handleZoomScrollbars(viewID) {
 /**
  * @public
  * @function
- * @name	handleResizeScrollbars
- * @memberOf	iview.Thumbnails
+ * @name		handleResizeScrollbars
+ * @memberOf	iview.General
  * @description	fit the scrollbar to the viewer-resize
- * @param	{string} viewID ID of the derivate
  */
-function handleResizeScrollbars(viewID) {
-	var viewerBean = Iview[viewID].viewerBean;
-	var barX = Iview[viewID].barX;
-	var barY = Iview[viewID].barY;
+genProto.handleResizeScrollbars = function() {
+	var viewerBean = this.iview.viewerBean;
+	var barX = this.iview.my.barX;
+	var barY = this.iview.my.barY;
+	var viewer = this.iview.my.viewer;
 	// determine the current imagesize
-	var curBreite = (Iview[viewID].picWidth / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale;
-	var curHoehe = (Iview[viewID].picHeight / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale;
+	var curBreite = (this.iview.picWidth / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale;
+	var curHoehe = (this.iview.picHeight / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale;
 
 	// vertical
 	// max scaling
-	var viewer = jQuery(viewerBean.viewer);
 	var height = viewer.height();
 	var width = viewer.width();
 	var top = viewer.offset().top;
@@ -531,185 +508,169 @@ function handleResizeScrollbars(viewID) {
 /**
  * @public
  * @function
- * @name	listenerZoom
- * @memberOf	iview.Thumbnails
+ * @name		viewerZoomed
+ * @memberOf	iview.General
  * @description	is called if the viewer is zooming; handles the correct sizing and displaying of the preloadpicture, various buttons and positioning of the cutOut accordingly the zoomlevel
- * @param	{string} viewID ID of the derivate
  */
-function listenerZoom(viewID) {
-	this.viewID=viewID;
-	this.viewerZoomed = function (zoomEvent) {
-		var viewID = this.viewID;
-		var viewerBean = Iview[viewID].viewerBean;
-		
-		// handle special Modes, needs to close
-		if (Iview[viewID].zoomWidth) {
-			pictureWidth(viewID, true);
-		}
-		if (Iview[viewID].zoomScreen) {
-			pictureScreen(viewID, true);
-		}
-		var preload=Iview[viewID].preload;
-		preload.css({"width": (Iview[viewID].picWidth / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale +  "px",
-					 "height": (Iview[viewID].picHeight / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale + "px"});
+genProto.viewerZoomed = function (zoomEvent) {
+	var viewerBean = this.iview.viewerBean;
 	
-		// Actualize forward & backward Buttons
-		jQuery(".viewerContainer.min .toolbars .toolbar").css("width", (Iview[viewID].picWidth / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale +  "px");
-	
-		handleZoomScrollbars(viewID);
-
-		if (Iview[viewID].useCutOut) {
-			Iview[viewID].cutOutModel.setSize({
-				'x': preload.width(),
-				'y': preload.height()});
-			Iview[viewID].cutOutModel.setRatio({
-				'x': viewerBean.width / ((Iview[viewID].picWidth / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale),
-				'y': viewerBean.height / ((Iview[viewID].picHeight / Math.pow(2, Iview[viewID].zoomMax - viewerBean.zoomLevel))*Iview[viewID].zoomScale)});
-			Iview[viewID].cutOutModel.setPos({
-				'x': - (viewerBean.x / Math.pow(2, viewerBean.zoomLevel))*Iview[viewID].zoomScale,
-				'y': - (viewerBean.y / Math.pow(2, viewerBean.zoomLevel))*Iview[viewID].zoomScale});
-		}
-		
-		// Buttons pürfen
-		Iview[viewID].getToolbarCtrl().checkZoom(viewerBean.zoomLevel);
+	// handle special Modes, needs to close
+	if (this.iview.zoomWidth) {
+		this.pictureWidth(true);
 	}
+	if (this.iview.zoomScreen) {
+		this.pictureScreen(true);
+	}
+	var preload = this.iview.my.preload;
+	preload.css({"width": (this.iview.picWidth / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale +  "px",
+				 "height": (this.iview.picHeight / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale + "px"});
+
+	// Actualize forward & backward Buttons
+	jQuery(".viewerContainer.min .toolbars .toolbar").css("width", (this.iview.picWidth / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale +  "px");
+
+	this.handleZoomScrollbars();
+
+	if (this.iview.useCutOut) {
+		this.iview.cutOutModel.setSize({
+			'x': preload.width(),
+			'y': preload.height()});
+		this.iview.cutOutModel.setRatio({
+			'x': viewerBean.width / ((this.iview.picWidth / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale),
+			'y': viewerBean.height / ((this.iview.picHeight / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale)});
+		this.iview.cutOutModel.setPos({
+			'x': - (viewerBean.x / Math.pow(2, viewerBean.zoomLevel))*this.iview.zoomScale,
+			'y': - (viewerBean.y / Math.pow(2, viewerBean.zoomLevel))*this.iview.zoomScale});
+	}
+	
+	// check buttons
+	this.iview.getToolbarCtrl().checkZoom(viewerBean.zoomLevel);
 }
 
 /**
  * @public
  * @function
- * @name	listenerMove
- * @memberOf	iview.Thumbnails
- * @description	is calling if the picture is moving in the viewer and handles the size of the cutout accordingly the size of the picture
- * @param	{string} viewID ID of the derivate
+ * @name		viewerMoved
+ * @memberOf	iview.General
+ * @description	is called if the picture is moving in the viewer and handles the size of the cutout accordingly the size of the picture
  */
-function listenerMove(viewID) {
-	this.viewID=viewID;
-	this.viewerMoved = function (event) {
-		// calculate via zoomlevel to the preview the left top point
-		var viewID = this.viewID;
-		var newX = - (event.x / Math.pow(2, Iview[viewID].viewerBean.zoomLevel))/Iview[viewID].zoomScale;
-		var newY = - (event.y / Math.pow(2, Iview[viewID].viewerBean.zoomLevel))/Iview[viewID].zoomScale;
+genProto.viewerMoved = function (event) {
+	// calculate via zoomlevel to the preview the left top point
+	var newX = - (event.x / Math.pow(2, this.iview.viewerBean.zoomLevel))/this.iview.zoomScale;
+	var newY = - (event.y / Math.pow(2, this.iview.viewerBean.zoomLevel))/this.iview.zoomScale;
 
-		if (Iview[viewID].useCutOut) {
-			Iview[viewID].cutOutModel.setPos({'x':newX, 'y':newY});
-		}
-		// set Roller that no circles are created, and we end in an endless loop
-		Iview[viewID].roller = true;
-		var preload=Iview[viewID].preload;
-		var pos = preload.position();
-		Iview[viewID].barX.setCurValue(-pos.left);
-		Iview[viewID].barY.setCurValue(-pos.top);
-		Iview[viewID].roller = false;
+	if (this.iview.useCutOut) {
+		this.iview.cutOutModel.setPos({'x':newX, 'y':newY});
 	}
+	// set Roller this no circles are created, and we end in an endless loop
+	this.iview.roller = true;
+	var preload = this.iview.my.preload;
+	var pos = preload.position();
+	this.iview.my.barX.setCurValue(-pos.left);
+	this.iview.my.barY.setCurValue(-pos.top);
+	this.iview.roller = false;
 }
 
 /**
  * @public
  * @function
- * @name	openChapter
- * @memberOf	iview.Thumbnails
+ * @name		openChapter
+ * @memberOf	iview.General
  * @description	open and close the chapterview
- * @param	{} major
- * @param	{Object} viewer of the derivate
+ * @param		{button} button to which represents the chapter in the toolbar
  */
-function openChapter(button, viewID){
-	
-	var viewer = Iview[viewID];
-	
+genProto.openChapter = function(button){
 	if (chapterEmbedded) {
 		//alert(warnings[0])
 		return;
 	}
-
+	var that = this;
 	// chapter isn't created
-	if (typeof viewer.chapter === 'undefined') {
+	if (typeof this.iview.chapter === 'undefined') {
 		button.setLoading(true);
 		setTimeout(function(){
 			var callback = function() {
 				// try again openChapter (recursive call)
-				openChapter(button, viewID);
+				that.openChapter(button);
 				button.setLoading(false);
 			};
-			importChapter(viewID, callback);
+			that.importChapter(callback);
 		}, 10);
 	} else {
-		viewer.chapter.toggleView();
+		this.iview.chapter.toggleView();
 	}
 }
 
 /**
  * @public
  * @function
- * @name	updateModules
+ * @name		updateModules
  * @memberOf	iview.Thumbnails
  * @description	marks the correct picture in the chapterview and set zoombar to the correct zoomlevel
- * @param	{string} viewID ID of the derivate
  */
-function updateModuls(viewID) {
-	var viewerBean = Iview[viewID].viewerBean;
+genProto.updateModuls = function() {
+	var viewerBean = this.iview.viewerBean;
 	// align/fit scrollbars
-	handleZoomScrollbars(viewID);
-	handleResizeScrollbars(viewID);
+	this.handleZoomScrollbars();
+	this.handleResizeScrollbars();
 
 	// Actualize forward & backward Buttons
-	var previewTbView = jQuery(Iview[viewID].getToolbarCtrl().getView("previewTbView").toolbar);
-	var newTop = ((((Iview[viewID].picHeight / Math.pow(2, Iview[viewID].zoomMax - 1)) * Iview[viewID].zoomScale) - (toInt(previewTbView.css("height")) + toInt(previewTbView.css("padding-top")) + toInt(previewTbView.css("padding-bottom")))) / 2) + "px";
-	if (Iview[viewID].viewerContainer.hasClass("viewerContainer min")) {
-		Iview[viewID].viewerContainer.find(".toolbars .toolbar").css("top", newTop);
+	var previewTbView = jQuery(this.iview.getToolbarCtrl().getView("previewTbView").toolbar);
+	var newTop = ((((this.iview.picHeight / Math.pow(2, this.iview.zoomMax - 1)) * this.iview.zoomScale) - (toInt(previewTbView.css("height")) + toInt(previewTbView.css("padding-top")) + toInt(previewTbView.css("padding-bottom")))) / 2) + "px";
+	if (this.iview.my.container.hasClass("viewerContainer min")) {
+		this.iview.my.container.find(".toolbars .toolbar").css("top", newTop);
 	}
 	
 	try {
 		//repaint Toolbar as if the width of the dropdown changes the spring needs to be adjusted
-		Iview[viewID].getToolbarCtrl().paint("mainTb");	
+		this.iview.getToolbarCtrl().paint("mainTb");	
 	} catch (e) {}
 	
 	// Actualize Chapter
-	if (Iview[viewID].useChapter && !(typeof Iview[viewID].chapter === "undefined")) {
+	if (this.iview.useChapter && !(typeof this.iview.chapter === "undefined")) {
 		//prevent endless loop
-		Iview[viewID].chapterReaction = true;
+		this.iview.chapterReaction = true;
 	}
 }
 
 /**
  * @public
  * @function
- * @name	viewerScroll
- * @memberOf	iview.Thumbnails
+ * @name		viewerScroll
+ * @memberOf	iview.General
  * @description	handles if the scrollbar was moved up or down and calls the functions to load the corresponding tiles and movement
- * @param 	{} delta
- * @param	{string} viewID ID of the derivate
+ * @param 		{} delta
  */
-function viewerScroll(delta, viewID) {
-	Iview[viewID].viewerBean.positionTiles({'x': delta.x*PanoJS.MOVE_THROTTLE,
+genProto.viewerScroll = function(delta) {
+	this.iview.viewerBean.positionTiles({'x': delta.x*PanoJS.MOVE_THROTTLE,
 											'y': delta.y*PanoJS.MOVE_THROTTLE}, true);
-	Iview[viewID].viewerBean.notifyViewerMoved({'x': delta.x*PanoJS.MOVE_THROTTLE,
+	this.iview.viewerBean.notifyViewerMoved({'x': delta.x*PanoJS.MOVE_THROTTLE,
 												'y': delta.y*PanoJS.MOVE_THROTTLE});
 }
 
 /**
  * @public
  * @function
- * @name	importCutOut
- * @memberOf	iview.Thumbnails
+ * @name		importCutOut
+ * @memberOf	iview.General
  * @description	calls the corresponding functions to create the cutout
- * @param	{string} viewID ID of the derivate
  */
-function importCutOut(viewID) {
-	Iview[viewID].cutOutMP = new iview.cutOut.ModelProvider();
-	Iview[viewID].cutOutModel = Iview[viewID].cutOutMP.createModel();
-	Iview[viewID].ausschnitt = new iview.cutOut.Controller(Iview[viewID].cutOutMP);
-	Iview[viewID].ausschnitt.createView({'thumbParent': Iview[viewID].ausschnittParent, 'dampParent': Iview[viewID].ausschnittParent});
-	Iview[viewID].ausschnitt.attach(function(sender, args) {
+genProto.importCutOut = function() {
+	var that = this;
+	this.iview.cutOutMP = new iview.cutOut.ModelProvider();
+	this.iview.cutOutModel = this.iview.cutOutMP.createModel();
+	this.iview.ausschnitt = new iview.cutOut.Controller(this.iview.cutOutMP);
+	this.iview.ausschnitt.createView({'thumbParent': this.iview.ausschnittParent, 'dampParent': this.iview.ausschnittParent});
+	this.iview.ausschnitt.attach(function(sender, args) {
 		if (args.type == "move") {
-			Iview[viewID].viewerBean.recenter(
-					{'x' : args.x["new"]*Iview[viewID].zoomScale,
-					 'y' : args.y["new"]*Iview[viewID].zoomScale
+			that.iview.viewerBean.recenter(
+					{'x' : args.x["new"]*that.iview.zoomScale,
+					 'y' : args.y["new"]*that.iview.zoomScale
 					}, true);
 		}
 	});
-	var preload = Iview[viewID].preload;
-	Iview[viewID].cutOutModel.setSize({
+	var preload = this.iview.my.preload;
+	this.iview.cutOutModel.setSize({
 		'x': preload.width(),
 		'y': preload.height()});
 }
@@ -718,19 +679,17 @@ function importCutOut(viewID) {
  * @public
  * @function
  * @name		importChapter
- * @memberOf	iview.Thumbnails
+ * @memberOf	iview.General
  * @description	calls the corresponding functions to create the chapter
- * @param		{string} viewID ID of the derivate
  * @param		{function} callback function which is called just before the function returns
  */
-function importChapter(viewID, callback) {
-	var viewer = Iview[viewID];
-	viewer.ChapterModelProvider = new iview.METS.ChapterModelProvider(viewer.newMETS);
+genProto.importChapter = function(callback) {
+	this.iview.ChapterModelProvider = new iview.METS.ChapterModelProvider(this.iview.metsDoc);
 	
-	viewer.chapter = new iview.chapter.Controller(viewer.ChapterModelProvider, viewer.PhysicalModelProvider);
+	this.iview.chapter = new iview.chapter.Controller(this.iview.ChapterModelProvider, this.iview.PhysicalModelProvider);
 
-	viewer.chapter.createView(viewer.chapterParent);
-	viewer.chapterReaction = false;
+	this.iview.chapter.createView(this.iview.chapterParent);
+	this.iview.chapterReaction = false;
 
 	callback();
 }
@@ -739,175 +698,141 @@ function importChapter(viewID, callback) {
  * @public
  * @function
  * @name		importOverview
- * @memberOf	iview.Thumbnails
+ * @memberOf	iview.General
  * @description	calls the corresponding functions to create the overview
- * @param		{string} viewID ID of the derivate
  * @param		{function} callback function which is called just before the function returns
  */
-function importOverview(viewID, callback) {
-	var ov = new iview.overview.Controller(Iview[viewID].PhysicalModelProvider, iview.overview.View, Iview[viewID].viewerBean.tileUrlProvider);
-	ov.createView({'mainClass':'overview', 'parent':"#viewerContainer"+viewID, 'useScrollBar':true});
-	Iview[viewID].overview = ov;
+genProto.importOverview = function(callback) {
+	var ov = new iview.overview.Controller(this.iview.PhysicalModelProvider, iview.overview.View, this.iview.viewerBean.tileUrlProvider);
+	ov.createView({'mainClass':'overview', 'parent':this.iview.my.container, 'useScrollBar':true});
+	this.iview.overview = ov;
 	callback();
 }
 
 /**
  * @public
  * @function
- * @name	zoomViewer
- * @memberOf	iview.Thumbnails
+ * @name		zoomViewer
+ * @memberOf	iview.General
  * @description	handles the direction of zooming in the viewer
- * @param	{string} viewID ID of the derivate
- * @param 	{boolean} direction: true = zoom in, false = zoom out
+ * @param 		{boolean} direction: true = zoom in, false = zoom out
  */
-function zoomViewer(viewID, direction) {
-	var viewer = Iview[viewID].viewerBean;
+genProto.zoomViewer = function(direction) {
+	var viewerBean = this.iview.viewerBean;
 	var dir = 0;
 	if (direction) {
 		//if zoomWidth or zoomScreen was active and we're already in the max zoomlevel just reset the displayMode
-		if (Iview[viewID].zoomScreen) {
-			pictureScreen(viewID, true);
-		} else if (Iview[viewID].zoomWidth) {
-			pictureWidth(viewID, true);
+		if (this.iview.zoomScreen) {
+			this.pictureScreen(true);
+		} else if (this.iview.zoomWidth) {
+			this.pictureWidth(true);
 		}
-		if (viewer.zoomLevel != Iview[viewID].zoomMax) {
+		if (viewerBean.zoomLevel != this.iview.zoomMax) {
 			dir = 1;
 		}
 	} else {
 		dir = -1;
 	}
-	Iview[viewID].gen.zoomCenter(dir,{"x":viewer.width/2, "y":viewer.height/2});
+	this.zoomCenter(dir, {"x":viewerBean.width/2, "y":viewerBean.height/2});
 }
 
 /**
  * @public
  * @function
  * @name		loading
- * @memberOf	iview.Thumbnails
+ * @memberOf	iview.General
  * @description	is calling to the load-event of the window; serve for the further registration of events likewise as initiator for various objects
- * @param		{string} viewID ID of the derivate
  */
-function loading(viewID) {
+genProto.loading = function() {
+	var that = this;
 	
-	var cssSheet=document.getElementById("cssSheet"+viewID);
+	var cssSheet=document.getElementById("cssSheet"+this.iview.viewID);
 	if (cssSheet!=null){
 		//Opera fix: link css style to head to fix maximizeHandler()
 		cssSheet.parentNode.removeChild(cssSheet);
 		document.getElementsByTagName("head")[0].appendChild(cssSheet);
 	}
-	
 	//TODO don't use the global one rather than the instance tilesize
-	Iview[viewID].startHeight = Iview[viewID].startWidth = tilesize;
+	this.iview.startHeight = this.iview.startWidth = tilesize;
 	// ScrollBars
 	// horizontal
-	Iview[viewID].barX = new iview.scrollbar.Controller();
-	var barX = Iview[viewID].barX;
-	barX.createView({ 'direction':'horizontal', 'parent':'#viewerContainer'+viewID, 'mainClass':'scroll'});
+	this.iview.my.barX = new iview.scrollbar.Controller();
+	var barX = this.iview.my.barX;
+	barX.createView({ 'direction':'horizontal', 'parent':this.iview.my.container, 'mainClass':'scroll'});
 	barX.attach(function(sender, args) {
-		if (args.type == "curVal" && !Iview[viewID].roller) {
-			scrollMove(- (args["new"]-args["old"]), 0, viewID);
+		if (args.type == "curVal" && !that.iview.roller) {
+			that.scrollMove(- (args["new"]-args["old"]), 0);
 		}
 	});
 	// vertical
-	Iview[viewID].barY = new iview.scrollbar.Controller();
-	var barY = Iview[viewID].barY;
-	barY.createView({ 'direction':'vertical', 'parent':'#viewerContainer'+viewID, 'mainClass':'scroll'});
+	this.iview.my.barY = new iview.scrollbar.Controller();
+	var barY = this.iview.my.barY;
+	barY.createView({ 'direction':'vertical', 'parent':this.iview.my.container, 'mainClass':'scroll'});
 	barY.attach(function(sender, args) {
-		if (args.type == "curVal" && !Iview[viewID].roller) {
-			scrollMove( 0, -(args["new"]-args["old"]), viewID);
+		if (args.type == "curVal" && !that.iview.roller) {
+			that.scrollMove( 0, -(args["new"]-args["old"]));
 		}
 	});
 
 	// Additional Events
 	// register to scroll into the viewer
-	jQuery("#viewer"+viewID).mousewheel(function(e, delta, deltaX, deltaY) {e.preventDefault(); viewerScroll({"x":deltaX, "y":deltaY}, viewID);})
-		.css({	'width':Iview[viewID].startWidth - ((Iview[viewID].barX.my.self.css("visibility") == "visible")? Iview[viewID].barX.my.self.outerWidth() : 0)  + "px",
-				'height':Iview[viewID].startHeight - ((Iview[viewID].barY.my.self.css("visibility") == "visible")? Iview[viewID].barY.my.self.outerHeight() : 0)  + "px"
+	this.iview.my.viewer.mousewheel(function(e, delta, deltaX, deltaY) {e.preventDefault(); that.viewerScroll({"x":deltaX, "y":deltaY});})
+		.css({	'width':this.iview.startWidth - ((this.iview.my.barX.my.self.css("visibility") == "visible")? this.iview.my.barX.my.self.outerWidth() : 0)  + "px",
+				'height':this.iview.startHeight - ((this.iview.my.barY.my.self.css("visibility") == "visible")? this.iview.my.barY.my.self.outerHeight() : 0)  + "px"
 		});
 	
-	if (Iview[viewID].useCutOut) {
-		importCutOut(viewID);
+	if (this.iview.useCutOut) {
+		this.importCutOut();
 	}
 
 	// Load Page
 	if (URL.getParam("page") != "") {
 		//TODO may be incomplete: Prevent Remote File Inclusion, but never Ever drop
-		Iview[viewID].startFile = decodeURI(URL.getParam("page").replace(/(:|\.\.|&#35|&#46|&#58|&#38|&#35|&amp)/,"§"));
+		this.iview.startFile = decodeURI(URL.getParam("page").replace(/(:|\.\.|&#35|&#46|&#58|&#38|&#35|&amp)/,"§"));
 	}
+	
+	
 	//remove leading '/'
-	Iview[viewID].startFile = encodeURI(Iview[viewID].startFile.replace(/^\/*/,""));
-	loadPage(viewID, function(){startFileLoaded(viewID)});
-	
-	// should be replaced while constructing MVC concept
-	Iview[viewID].pictureScreen = function() {
-		pictureScreen(viewID);
-	}
-	
-	Iview[viewID].pictureWidth = function() {
-		pictureWidth(viewID);
-	}
-	
-	Iview[viewID].zoomViewer = function(direction) {
-		zoomViewer(viewID, direction);
-	}
-	
-
-	Iview[viewID].modules = new Object;
-
-	
-	Iview[viewID].modules.openOverview = function(button) {
-		openOverview(button, viewID);
-	}
-	
-	
-	Iview[viewID].modules.openChapter = function(button) {
-		openChapter(button, viewID);
-	}
-	
-	Iview[viewID].modules.openPermalink = function(button) {
-		openPermalink(button, viewID);
-	}
-	
-	Iview[viewID].maximizeHandler = function() {
-		maximizeHandler(viewID);
-	}
+	this.iview.startFile = encodeURI(this.iview.startFile.replace(/^\/*/,""));
+	console.log(this)
+	this.loadPage(function(){that.startFileLoaded()});
 }
 
 /**
  * @public
  * @function
- * @name	startFileLoaded
- * @memberOf	iview.Thumbnails
+ * @name		startFileLoaded
+ * @memberOf	iview.General
  * @description	
- * @param	{string} viewID ID of the derivate
  */
-function startFileLoaded(viewID){
-	Iview[viewID].loaded = true;
+genProto.startFileLoaded = function(){
+	this.iview.loaded = true;
+	var that = this;
 	//Blank needs to be loaded as blank, so the level is filled. Else it lays not ontop; needed for IE 
-	jQuery("#viewer" + viewID + " .surface").css("backgroundImage", "url(" + Iview[viewID].webappBaseUri + "modules/iview2/web/gfx/blank.gif" + ")");
+	this.iview.my.viewer.find(".surface").css("backgroundImage", "url(" + this.iview.webappBaseUri + "modules/iview2/web/gfx/blank.gif" + ")");
 
 	// PermaLink Handling
 	// choice if zoomLevel or special; zoomMode only makes sense in maximized viewer
 	if (URL.getParam("maximized") == "true") {
 		if (URL.getParam("tosize") == "width") {
-			if (!Iview[viewID].zoomWidth) pictureWidth(viewID);
+			if (!this.iview.zoomWidth) this.pictureWidth();
 		} else if (URL.getParam("tosize") == "screen") {
-			if (!Iview[viewID].zoomScreen) pictureScreen(viewID);
+			if (!this.iview.zoomScreen) this.pictureScreen();
 		} else if (isNaN(parseInt(URL.getParam("zoom")))){
-			if (!Iview[viewID].zoomScreen) pictureScreen(viewID);
+			if (!this.iview.zoomScreen) this.pictureScreen();
 		}
 		
-		maximizeHandler(viewID);
+		this.maximizeHandler();
 	} else {
 		// in minimized viewer always pictureScreen
-		if (!Iview[viewID].zoomScreen) pictureScreen(viewID);
+		if (!this.iview.zoomScreen) this.pictureScreen();
 	}
 	
-	var newMetsURI = Iview[viewID].webappBaseUri + "servlets/MCRMETSServlet/" + viewID;
+	var metsDocURI = this.iview.webappBaseUri + "servlets/MCRMETSServlet/" + this.iview.viewID;
 	jQuery.ajax({
-		url: newMetsURI,
+		url: metsDocURI,
   		success: function(response) {
-			processMETS(response,viewID);
+			that.processMETS(response);
 		},
   		error: function(request, status, exception) {
   			if(typeof console != "undefined"){
@@ -917,35 +842,36 @@ function startFileLoaded(viewID){
 	});
 	
 	// Resize-Events registrieren
-	jQuery(window).resize(function() { Iview[viewID].gen.reinitializeGraphic()});
+	var that = this;
+	jQuery(window).resize(function() { that.reinitializeGraphic()});
 	
-	updateModuls(viewID);
+	this.updateModuls();
 }
 
 /**
  * @public
  * @function
- * @name	processMETS
- * @memberOf	iview.Thumbnails
+ * @name		processMETS
+ * @memberOf	iview.General
  * @description	process the loaded mets and do all final configurations like setting the pagenumber, generating Chapter and so on
- * @param	{document} metsDoc holds in METS/MODS structure all needed informations to generate an chapter and overview of of the supplied data
- * @param	{string} viewID ID of the derivate
+ * @param		{document} metsDoc holds in METS/MODS structure all needed informations to generate an chapter and overview of of the supplied data
  */
-function processMETS(metsDoc, viewID) {
-	Iview[viewID].newMETS = metsDoc;
+genProto.processMETS = function(metsDoc) {
+	var that = this;
+	this.iview.metsDoc = metsDoc;
 	//create the PhysicalModelProvider
-	Iview[viewID].PhysicalModelProvider = new iview.METS.PhysicalModelProvider(Iview[viewID].newMETS);
-	Iview[viewID].PhysicalModel = Iview[viewID].PhysicalModelProvider.createModel();
-	var physicalModel = Iview[viewID].PhysicalModel;
-	var toolbarCtrl = Iview[viewID].getToolbarCtrl();
-	Iview[viewID].amountPages = physicalModel.getNumberOfPages();
-	physicalModel.setPosition(physicalModel.getPosition(Iview[viewID].curImage));
+	this.iview.PhysicalModelProvider = new iview.METS.PhysicalModelProvider(metsDoc);
+	this.iview.PhysicalModel = this.iview.PhysicalModelProvider.createModel();
+	var physicalModel = this.iview.PhysicalModel;
+	var toolbarCtrl = this.iview.getToolbarCtrl();
+	this.iview.amountPages = physicalModel.getNumberOfPages();
+	physicalModel.setPosition(physicalModel.getPosition(this.iview.curImage));
 	physicalModel.onevent.attach(function(sender, args) {
 		if (args.type == physicalModel.SELECT) {
-			notifyListenerNavigate(args["new"], viewID);
-			loadPage(viewID);
+//			that.notifyListenerNavigate(args["new"]);
+			that.loadPage();
 			toolbarCtrl.checkNavigation(args["new"]);
-			updateModuls(viewID);
+			that.updateModuls();
 			if (jQuery('.navigateHandles .pageBox')[0]) {
 				toolbarCtrl.updateDropDown(jQuery(pagelist.find("a")[args["new"] - 1]).html());
 			}
@@ -955,7 +881,7 @@ function processMETS(metsDoc, viewID) {
 	// Toolbar Operation
 	toolbarCtrl.perform("setActive", true, "overviewHandles", "openChapter");
 	toolbarCtrl.perform("setActive", true, "overviewHandles", "openOverview");
-	toolbarCtrl.checkNavigation(Iview[viewID].PhysicalModel.getCurPos());
+	toolbarCtrl.checkNavigation(this.iview.PhysicalModel.getCurPos());
 
 	//Generating of Toolbar List
 	var it = physicalModel.iterator();
@@ -970,16 +896,17 @@ function processMETS(metsDoc, viewID) {
 		}
 	}
 	pagelist.append(ul);
-	Iview[viewID].viewerContainer.find(".toolbars").append(pagelist);
+	this.iview.my.container.find(".toolbars").append(pagelist);
 
 	// if METS File is loaded after the drop-down-menu (in mainToolbar) its content needs to be updated
 	if (jQuery('.navigateHandles .pageBox')[0]) {
-		toolbarCtrl.getView('mainTbView').events.notify({'type' : "new", 'elementName' : "pageBox", 'parentName' : "navigateHandles", 'view' : Iview[viewID].viewerContainer.find('.navigateHandles .pageBox')});
+		toolbarCtrl.getView('mainTbView').events.notify({'type' : "new", 'elementName' : "pageBox", 'parentName' : "navigateHandles", 'view' : this.iview.my.container.find('.navigateHandles .pageBox')});
 		// switch to current content
 		toolbarCtrl.updateDropDown(jQuery(pagelist.find("a")[physicalModel.getCurPos() - 1]).html());
 	}
 	//at other positions Opera doesn't get it correctly (although it still doesn't look that smooth as in other browsers) 
-	window.setTimeout("Iview['"+viewID+"'].toolbarCtrl.paint('mainTb')",10);
+	//TODO needs to be adapted to work correctly with the new structure
+	window.setTimeout("Iview['"+this.iview.viewID+"'].toolbarCtrl.paint('mainTb')",10);
 }
 
 var URL = { "location": window.location};

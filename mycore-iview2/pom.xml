@@ -41,26 +41,26 @@
                 <!-- jQuery Tree -->
                 <jsSourceFile>PanoJS.js</jsSourceFile>
                 <!-- Viewer -->
+                <jsSourceFile>init.js</jsSourceFile>
                 <jsSourceFile>Event.js</jsSourceFile>
                 <!-- Event Registration utility -->
-                <jsSourceFile>XML.js</jsSourceFile>
-                <!--XML Funktionen-->
-                <jsSourceFile>Utils.js</jsSourceFile>
-                <!--Allgemeine Util Funktionen-->
                 <jsSourceFile>chapter.js</jsSourceFile>
                 <!-- Chapter -->
                 <jsSourceFile>overview.js</jsSourceFile>
-                <!-- Chapter -->
-                <jsSourceFile>scrollBars.js</jsSourceFile>
-                <!--Scrollbar Klasse-->
+                <!-- Overview -->
                 <jsSourceFile>cutOut.js</jsSourceFile>
                 <!--Ausschnittbildchen Klasse-->
                 <jsSourceFile>METS.js</jsSourceFile>
                 <!--METS Klasse-->
+                <jsSourceFile>scrollBars.js</jsSourceFile>
+                <!--Scrollbar Klasse-->
+                <jsSourceFile>XML.js</jsSourceFile>
+                <!--XML Funktionen-->
+                <jsSourceFile>Utils.js</jsSourceFile>
+                <!--Allgemeine Util Funktionen-->
                 <jsSourceFile>Thumbnail.js</jsSourceFile>
                 <!--Hauptdatei-->
-                <jsSourceFile>init.js</jsSourceFile>
-                <!-- iview.init END -->
+                <!-- iview.init END-->
                 
                 <!-- menu -->
                 <jsSourceFile>../lib/fg-menu/fg.menu.js</jsSourceFile>
