@@ -597,9 +597,9 @@ function listenerMove(viewID) {
 		// set Roller that no circles are created, and we end in an endless loop
 		Iview[viewID].roller = true;
 		var preload=Iview[viewID].preload;
-		var offset = preload.offset();
-		Iview[viewID].barX.setCurValue(-offset.left);
-		Iview[viewID].barY.setCurValue(-offset.top);
+		var pos = preload.position();
+		Iview[viewID].barX.setCurValue(-pos.left);
+		Iview[viewID].barY.setCurValue(-pos.top);
 		Iview[viewID].roller = false;
 	}
 }
