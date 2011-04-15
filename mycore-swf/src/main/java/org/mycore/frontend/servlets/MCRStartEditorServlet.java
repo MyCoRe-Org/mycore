@@ -233,7 +233,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         if ((cd.myproject == null) || (cd.myproject.length() == 0)) {
             String myproject = getProperty(job.getRequest(), "project");
             if (myproject == null) {
-                myproject = CONFIG.getString("MCR.SWF.Project.ID", "MCR");
+                myproject = CONFIG.getString("MCR.SWF.Project.ID", "MyCoRe");
                 myproject = CONFIG.getString("MCR.SWF.Project.ID." + cd.mytype, myproject);
             }
             cd.myproject = myproject;
@@ -409,7 +409,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         if (addr.size() != 0) {
             String sender = WFM.getMailSender();
-            String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
+            String appl = CONFIG.getString("MCR.SWF.Project.ID", "MyCoRe");
             String subject = "Automatically generated message from " + appl;
             StringBuffer text = new StringBuffer();
             text.append("The derivate with ID ").append(cd.mysemcrid).append(" from the object with ID ").append(cd.mysemcrid)
@@ -517,7 +517,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         if (addr.size() != 0) {
             String sender = WFM.getMailSender();
-            String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
+            String appl = CONFIG.getString("MCR.SWF.Project.ID", "MyCoRe");
             String subject = "Automatically generated message from " + appl;
             StringBuffer text = new StringBuffer();
             text.append("The object with type ").append(cd.mytype).append(" with ID ").append(cd.mytfmcrid).append(" was removed from server.");
@@ -899,7 +899,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
                 if (addr.size() != 0) {
                     String sender = WFM.getMailSender();
-                    String appl = CONFIG.getString("MCR.NameOfProject", "DocPortal");
+                    String appl = CONFIG.getString("MCR.NameOfProject", "MyCoRe");
                     String subject = "Automatically generated message from " + appl;
                     StringBuffer text = new StringBuffer();
                     text.append("The object of type ").append(cd.mytype).append(" with ID ").append(cd.mysemcrid)
@@ -962,7 +962,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         if (addr.size() != 0) {
             String sender = WFM.getMailSender();
-            String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
+            String appl = CONFIG.getString("MCR.SWF.Project.ID", "MyCoRe");
             String subject = "Automatically generated message from " + appl;
             StringBuffer text = new StringBuffer();
             text.append("The derivate with ID ").append(cd.mysemcrid).append(" was removed from workflow.");
@@ -1063,7 +1063,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         if (addr.size() != 0) {
             String sender = WFM.getMailSender();
-            String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "MyCoRe");
+            String appl = CONFIG.getString("MCR.SWF.Project.ID", "MyCoRe");
             String subject = "Automatically generated message from " + appl;
             StringBuffer text = new StringBuffer();
             text.append("The object of type ").append(cd.mytype).append(" with ID ").append(cd.mysemcrid).append(" was removed from the workflow.");

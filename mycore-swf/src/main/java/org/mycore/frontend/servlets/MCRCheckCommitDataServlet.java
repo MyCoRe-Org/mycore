@@ -94,7 +94,7 @@ public class MCRCheckCommitDataServlet extends MCRCheckDataBase {
         }
 
         String sender = WFM.getMailSender();
-        String appl = MCRConfiguration.instance().getString("MCR.NameOfProject", "DocPortal");
+        String appl = MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe");
         String subject = "Automatically generated message from " + appl;
         StringBuffer text = new StringBuffer();
         text.append("An Object with type ").append(ID.getTypeId()).append(" and ID ").append(ID.toString()).append(
