@@ -6,7 +6,16 @@ var iview = iview || {};
  */
 iview.cutOut = iview.cutOut || {};
 
-iview.cutOut.View = function() {
+/**
+ * @class
+ * @constructor
+ * @name		View
+ * @memberOf	iview.cutOut
+ * @description	Standard View for the CutOut Object
+ * @param		{i18n} i18n Class to allow translations
+ */
+iview.cutOut.View = function(i18n) {
+	this._i18n = i18n;
 	this._mousedown = false;
 	this.onevent = new iview.Event(this);
 	this._visible = true;
@@ -82,12 +91,17 @@ iview.cutOut.View = function() {
 			.addClass("toggler hide")
 			.click(function() {damper(that);});
 		
+		//set the default translation and keep upto date if it should change later
+		jQuery(this._i18n.executeWhenLoaded(function(i) {toggler.attr("title", i.translate("cutOut.fadeOut"))}))
+			.bind("i18n.change i18n.load",function(e, obj) {console.log(e); toggler.attr("title", obj.i18n.translate("cutOut.fade" + (that._visible? "Out":"In")))});
+		
+		
 		var damp = jQuery("<div>")
 			.addClass("damp " + args.mainClass + " " + args.customClass)
 			.append(toggler)
 			.appendTo(args.dampParent);
 
-		this.my = {'self':complete, 'cutOut':cutOut, 'thumbnail':thumb, 'damp':damp};
+		this.my = {'self':complete, 'cutOut':cutOut, 'thumbnail':thumb, 'damp':damp, 'toggler': toggler};
 	}
 	
 	/**
@@ -291,10 +305,12 @@ iview.cutOut.View = function() {
 	function damper(that) {
 		if (that._visible) {
 			that.my.self.fadeOut();
-			that.my.damp.find(".toggler").removeClass("hide").addClass("show").attr("title", "Ausklappen");
+			that.my.toggler.removeClass("hide").addClass("show")
+			that._i18n.executeWhenLoaded(function(i) {that.my.toggler.attr("title", i.translate("cutOut.fadeIn"))});
 		} else {
 			that.my.self.fadeIn();
-			that.my.damp.find(".toggler").removeClass("show").addClass("hide").attr("title", "Einklappen");
+			that.my.toggler.removeClass("show").addClass("hide")
+			that._i18n.executeWhenLoaded(function(i) {that.my.toggler.attr("title", i.translate("cutOut.fadeOut"))});
 		}
 		that._visible = !that._visible;
 	}
@@ -388,10 +404,13 @@ iview.cutOut.Model = function() {
  * @memberOf	iview.cutOut
  * @name 		Controller
  * @description Controller for CutOut
+ * @param		{ModelProvider} modelProvider to create a cutOut Model
+ * @param		{i18n} i18n Class to allow translations
+ * @param		{view} [view] where the model will be rendered to
  */
-iview.cutOut.Controller = function(modelProvider, view) {
+iview.cutOut.Controller = function(modelProvider, i18n, view) {
 	this._model = modelProvider.createModel();
-	this._view = new (view || iview.cutOut.View)();
+	this._view = new (view || iview.cutOut.View)(i18n);
 	var that = this;
 	
 	this._model.onevent.attach(function(sender, args) {

@@ -39,6 +39,8 @@
                 <!-- JQuery Mousewheel support -->
                 <jsSourceFile>jquery.tree.min.js</jsSourceFile>
                 <!-- jQuery Tree -->
+                <jsSourceFile>i18n.js</jsSourceFile>
+                <!-- i18n Module -->
                 <jsSourceFile>PanoJS.js</jsSourceFile>
                 <!-- Viewer -->
                 <jsSourceFile>init.js</jsSourceFile>

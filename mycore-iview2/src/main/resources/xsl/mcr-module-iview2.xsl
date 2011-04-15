@@ -138,31 +138,16 @@
     <script type="text/javascript">
     <!-- JQuery Framework -->
       google.load("jquery", "1");
-      <xsl:text>google.load("jqueryui", "</xsl:text><xsl:value-of select="$jqueryUI.version"/><xsl:text>");</xsl:text>
-      <xsl:text>var tilesize=</xsl:text>
-      <xsl:value-of select="$tilesize" />
-      <xsl:text>;</xsl:text>
-      <xsl:text>var maximized=</xsl:text>
-      <xsl:value-of select="$maximized" />
-      <xsl:text>;</xsl:text>
-      <xsl:text>var zoomWidth=</xsl:text>
-      <xsl:value-of select="$zoomWidth" />
-      <xsl:text>;</xsl:text>
-      <xsl:text>var zoomScreen=</xsl:text>
-      <xsl:value-of select="$zoomScreen" />
-      <xsl:text>;</xsl:text>
-      <xsl:text>jQuery.fx.off=!</xsl:text>
-      <xsl:value-of select="$effects" />
-      <xsl:text>;</xsl:text>
-      <xsl:text>var chapterEmbedded=</xsl:text>
-      <xsl:value-of select="$chapterEmbedded" />
-      <xsl:text>;</xsl:text>
-      <xsl:text>var chapDynResize=</xsl:text>
-      <xsl:value-of select="$chapDynResize" />
-      <xsl:text>;</xsl:text>
-      <xsl:text>var DampInViewer=</xsl:text>
-      <xsl:value-of select="$DampInViewer" />
-      <xsl:text>;</xsl:text>
+      google.load("jqueryui", "<xsl:value-of select="$jqueryUI.version"/>");
+      jQuery.fx.off=!<xsl:value-of select="$effects" />;
+      
+      var tilesize=<xsl:value-of select="$tilesize" />;
+	  var maximized=<xsl:value-of select="$maximized" />;
+      var zoomWidth=<xsl:value-of select="$zoomWidth" />;
+      var zoomScreen=<xsl:value-of select="$zoomScreen" />;
+      var chapterEmbedded=<xsl:value-of select="$chapterEmbedded" />;
+      var chapDynResize=<xsl:value-of select="$chapDynResize" />;
+      var DampInViewer=<xsl:value-of select="$DampInViewer" />;
     <!-- Init Funktionen -->
       function addIviewProperty(viewID, propertyName, val) {
       if (typeof (Iview) == "undefined") eval("Iview = new Object()");
@@ -174,6 +159,9 @@
     </script>
     
     <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.js"/>
+    <script type="text/javascript">
+      	var i18n = i18n || new iview.i18n('<xsl:value-of select="$WebApplicationBaseURL"/>', '<xsl:value-of select="$CurrentLang"/>');
+    </script>
     <xsl:choose>
       <xsl:when test="$MCR.Module-iview2.DeveloperMode='true'">
 		<!-- Main Stylesheet -->
@@ -191,7 +179,6 @@
   <xsl:template name="iview2.start">
     <xsl:param name="groupID" />
     <!--<xsl:param name="style" select="'default'" />-->
-    <!-- params out of config.xml -->
     <xsl:param name="styleFolderUri" select="'gfx/'" />
     <xsl:param name="startFile" />
 

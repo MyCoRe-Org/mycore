@@ -658,7 +658,7 @@ genProto.importCutOut = function() {
 	var that = this;
 	this.iview.cutOutMP = new iview.cutOut.ModelProvider();
 	this.iview.cutOutModel = this.iview.cutOutMP.createModel();
-	this.iview.ausschnitt = new iview.cutOut.Controller(this.iview.cutOutMP);
+	this.iview.ausschnitt = new iview.cutOut.Controller(this.iview.cutOutMP, i18n);
 	this.iview.ausschnitt.createView({'thumbParent': this.iview.ausschnittParent, 'dampParent': this.iview.ausschnittParent});
 	this.iview.ausschnitt.attach(function(sender, args) {
 		if (args.type == "move") {
@@ -924,6 +924,3 @@ URL.getParam = function(param) {
 		return "";
 	}
 }
-
-//var i18n = new iview.i18n();
-//i18n.executeWhenLoaded(function() {console.log("hello World")});
