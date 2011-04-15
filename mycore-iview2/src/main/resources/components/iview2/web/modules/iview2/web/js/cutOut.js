@@ -93,7 +93,7 @@ iview.cutOut.View = function(i18n) {
 		
 		//set the default translation and keep upto date if it should change later
 		jQuery(this._i18n.executeWhenLoaded(function(i) {toggler.attr("title", i.translate("cutOut.fadeOut"))}))
-			.bind("i18n.change i18n.load",function(e, obj) {console.log(e); toggler.attr("title", obj.i18n.translate("cutOut.fade" + (that._visible? "Out":"In")))});
+			.bind("change.i18n load.i18n",function(e, obj) {console.log(e); toggler.attr("title", obj.i18n.translate("cutOut.fade" + (that._visible? "Out":"In")))});
 		
 		
 		var damp = jQuery("<div>")

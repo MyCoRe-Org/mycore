@@ -55,7 +55,7 @@ iview.i18n.prototype = {
 	 * @param		{string} languageCode of the language which shall be newly loaded
 	 * @param		{array|function} [callback] a single function or an array of functions which is called after the language file has been loaded
 	 * @description loads the given language and makes it for further access available;
-		As soon as the new language is available an event i18n.load is raised on this, if the language is already loaded the event will not be triggered again
+		As soon as the new language is available an event load.i18n is raised on this, if the language is already loaded the event will not be triggered again
 	 * @return		this
 	 */
 	loadLanguage: function(languageCode, callback) {
@@ -66,7 +66,7 @@ iview.i18n.prototype = {
 			jQuery.each(data,function(key,val) {
 				that._langs[languageCode][key.replace("component.iview2.","")] = val;
 			});
-			jQuery(that).trigger('i18n.load', {'language': languageCode, 'i18n':that});
+			jQuery(that).trigger('load.i18n', {'language': languageCode, 'i18n':that});
 		}).done(that._deferredObjects[languageCode].resolve(that)).fail(that._deferredObjects[languageCode].reject(that));
 		if (typeof callback !== "undefined") {
 			this.executeWhenLoaded(callback, languageCode);
@@ -81,9 +81,9 @@ iview.i18n.prototype = {
 	 * @memberOf	iview.i18n#
 	 * @param		{string} id identifier for the translation to load
 	 * @param		{string} [languageCode] language to get translation from, if none is specified the current default language will be returned
-	 * @description returns for the given id and languageCode the translation, if the translation isn't available the result looks this way: languageCode.ID;
+	 * @description returns for the given id and languageCode the translation, if the translation isn't available the result looks this way: languageCode::ID;
 	 * note that if the language is currently not loaded an empty string will be returned, to ensure that the language is already loaded @see executeWhenLoaded
-	 * @return		string translation of the given id in the requested language or languageCode.ID if no translation was found
+	 * @return		string translation of the given id in the requested language or languageCode::ID if no translation was found
 	 */
 	translate: function(id, languageCode) {
 		var translation = this._langs[languageCode || this._defLang][id];
@@ -119,22 +119,22 @@ iview.i18n.prototype = {
 	 * @param		{string} languageCode which shall be the new default Language
 	 * @description sets the new default Language, if the language is currently not loaded it will be loaded
 	 * @param		{array|function} [callback] a single function or an array of functions which is called after the language file has been loaded.
-	 *	After the change the event i18n.change is raised to notify all listeners about the new default language 
+	 *	After the change the event change.i18n is raised to notify all listeners about the new default language 
 	 * @return		this
 	 */
 	setDefaultLanguage: function(languageCode, callback) {
 		var that = this;
 		this._defLang = languageCode;
 		if (typeof this._langs[languageCode] === "undefined") {
-			jQuery(this).one("i18n.load", function(e) {
+			jQuery(this).one("load.i18n", function(e) {
 				//if multiple translations are loaded avoid that one may got lost
 				e.stopImmediatePropagation();
 				//after the event i18n.load happened lets notify all listeners about the fact that a new defLang was set
-				jQuery(that).trigger("i18n.change", {"language": languageCode, "i18n": that});
+				jQuery(that).trigger("change.i18n", {"language": languageCode, "i18n": that});
 			});
 			this.loadLanguage(languageCode, callback)
 		} else {
-			jQuery(this).trigger("i18n.change", {"language": languageCode, "i18n": this});
+			jQuery(this).trigger("change.i18n", {"language": languageCode, "i18n": this});
 		}
 		return this;
 	}
