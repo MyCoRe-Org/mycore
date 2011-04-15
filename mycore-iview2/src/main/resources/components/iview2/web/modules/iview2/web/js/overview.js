@@ -395,7 +395,7 @@ iview.overview.View = function() {
 		//reset everything else it does subsum and we screw everything up
 		that.my.picContainer.css({"width": that.my.self.innerWidth() - that._scrollBarWidth,
 			"padding": 0,
-			"padding-left": (that.my.picContainer.innerWidth() - (that.my.pictures[0].outerWidth(true)*that._amount.width))/2 + "px",
+			"padding-left": (that.my.self.innerWidth() - (that.my.pictures[0].outerWidth(true)*that._amount.width))/2 + "px",
 			"padding-top": (that.my.self.innerHeight() - (that.my.pictures[0].outerHeight(true)*that._amount.height))/2 + "px"});
 	}
 	
