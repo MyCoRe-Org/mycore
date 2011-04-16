@@ -17,7 +17,6 @@ iview.cutOut = iview.cutOut || {};
 iview.cutOut.View = function(i18n) {
 	this._i18n = i18n;
 	this._mousedown = false;
-	this.onevent = new iview.Event(this);
 	this._visible = true;
 	this._ratioX = 0;
 	this._ratioY = 0;
@@ -68,10 +67,10 @@ iview.cutOut.View = function(i18n) {
 			.dblclick(function(e) { 
 				var newX = (e.layerX)? e.layerX : e.offsetX;
 				var newY = (e.layerY)? e.layerY : e.offsetY;
-				that.onevent.notify({"type":"move", "x" : {"new":scale(that, newX, true)}, "y" : {"new":scale(that, newY, false)}})
+				jQuery(that).trigger("move.cutOut", {"x" : {"new":scale(that, newX, true)}, "y" : {"new":scale(that, newY, false)}})
 			})
 			.mousewheel(function(e, delta) {
-				that.onevent.notify({"type":"scroll", "delta": delta});
+				jQuery(that).trigger("scroll.cutOut", {"delta": delta});
 			})
 			.mouseup(function(e) { mouseUp(that, e)})
 			.mousemove(function(e) { mouseMove(that, e)})
@@ -93,7 +92,7 @@ iview.cutOut.View = function(i18n) {
 		
 		//set the default translation and keep upto date if it should change later
 		jQuery(this._i18n.executeWhenLoaded(function(i) {toggler.attr("title", i.translate("cutOut.fadeOut"))}))
-			.bind("change.i18n load.i18n",function(e, obj) {console.log(e); toggler.attr("title", obj.i18n.translate("cutOut.fade" + (that._visible? "Out":"In")))});
+			.bind("change.i18n load.i18n",function(e, obj) {toggler.attr("title", obj.i18n.translate("cutOut.fade" + (that._visible? "Out":"In")))});
 		
 		
 		var damp = jQuery("<div>")
@@ -269,7 +268,7 @@ iview.cutOut.View = function(i18n) {
 			setPosBlock = true;
 			
 			if (positionX != that._curX || positionY != that._curY) {
-				that.onevent.notify({'type':'move', x: {"new": scale(that, positionX + that.my.cutOut.width()/2, true), "old": scale(that, that._curX, true)}, y: {"new": scale(that, positionY + that.my.cutOut.height()/2, false), "old": scale(that, that._curY, false)}});
+				jQuery(that).trigger("move.cutOut", {x: {"new": scale(that, positionX + that.my.cutOut.width()/2, true), "old": scale(that, that._curX, true)}, y: {"new": scale(that, positionY + that.my.cutOut.height()/2, false), "old": scale(that, that._curY, false)}});
 			}
 			that._mouseIsDown = false;
 		}
@@ -327,9 +326,7 @@ iview.cutOut.View = function(i18n) {
  * @name 		Model
  * @description Model for CutOut, Model is just a fake model and doesn't contain any Data itself. It's only a pipeline.
  */
-iview.cutOut.Model = function() {
-	this.onevent = new iview.Event(this);
-};
+iview.cutOut.Model = function() {};
 
 (function() {
 	
@@ -346,7 +343,7 @@ iview.cutOut.Model = function() {
 	function setRatio(ratio) {
 		ratio.x = toFloat(ratio.x);
 		ratio.y = toFloat(ratio.y);
-		this.onevent.notify({'type': 'ratio',"value": {"x" :ratio.x,"y" : ratio.y}});
+		jQuery(this).trigger("ratio.cutOut", {"value": {"x" :ratio.x,"y" : ratio.y}});
 	}
 	
 	/**
@@ -362,7 +359,7 @@ iview.cutOut.Model = function() {
 	function setPos(pos) {
 		pos.x = toInt(pos.x);
 		pos.y = toInt(pos.y);
-		this.onevent.notify({'type': 'move', "value": {"x":pos.x,"y":pos.y}});
+		jQuery(this).trigger("move.cutOut", {"value": {"x":pos.x,"y":pos.y}});
 	}
 	
 	/**
@@ -374,7 +371,7 @@ iview.cutOut.Model = function() {
 	 * @param		{path} path to new thumbnail picture
 	 */
 	function setSrc(path) {
-		this.onevent.notify({'type':'path', 'new': path});
+		jQuery(this).trigger("path.cutOut", {'new': path});
 	}
 	
 	/**
@@ -388,7 +385,7 @@ iview.cutOut.Model = function() {
 	 * @param		{float} size.y height of the original picture
 	 */
 	function setSize(size) {
-		this.onevent.notify({'type': 'size', "value": {"x":size.x, "y":size.y}});
+		jQuery(this).trigger("size.cutOut", {"value": {"x":size.x, "y":size.y}});
 	}
 	
 	var prototype = iview.cutOut.Model.prototype
@@ -413,8 +410,8 @@ iview.cutOut.Controller = function(modelProvider, i18n, view) {
 	this._view = new (view || iview.cutOut.View)(i18n);
 	var that = this;
 	
-	this._model.onevent.attach(function(sender, args) {
-		 that._view.adaptView({'type':args.type,'value':args["new"] || args.value});
+	jQuery(this._model).bind("ratio.cutOut path.cutOut move.cutOut size.cutOut", function(e, val) {
+		 that._view.adaptView({'type':e.type,'value':val["new"] || val.value});
 	});
 };
 
@@ -444,22 +441,24 @@ iview.cutOut.Controller = function(modelProvider, i18n, view) {
 	 * @memberOf	iview.cutOut.Controller
 	 * @description	adds the given listener to the view so the listener will be notified about changes within the view
 	 * @param		{function} listener to add to the view
+	 * @description	attach Eventlistener to used overview model
 	 */
-	function attach(listener) {
-		this._view.onevent.attach(listener);
+	function attach(event, listener) {
+		jQuery(this._view).bind(event, listener);
 	}
 	
 	/**
 	 * @public
 	 * @function
 	 * @name		detach
-	 * @memberOf	iview.cutOut.Controller
+	 * @memberOf	iview.overview.Controller
+	 * @param		{string} event name of events to detach the listener from
+	 * @param		{function} listener to add to the view
 	 * @description	removes the given listener from the view so the listener will no longer receive
 	 *  notifications about changes within the view
-	 * @param		{function} listener to add to the view
 	 */
-	function detach(listener) {
-		this._view.onevent.detach(listener);
+	function detach(event, listener) {
+		jQuery(this._view).unbind(event, listener);
 	}
 	
 	var prototype = iview.cutOut.Controller.prototype;

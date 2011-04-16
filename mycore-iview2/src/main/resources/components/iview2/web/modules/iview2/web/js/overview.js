@@ -35,7 +35,6 @@ iview.overview.View = function() {
 	this._tileUrlProvider = null;
 	this._useScrollBar = true;
 	this.my = null;
-	this.onevent = new iview.Event(this);
 };
 
 (function() {
@@ -50,7 +49,7 @@ iview.overview.View = function() {
 		this._useScrollBar = false;
 		this._scrollBarWidth = 0;
 		if (this.my.bar) {
-			bar.detach();
+			this.my.bar.detach();
 		}
 	}
 	
@@ -372,7 +371,7 @@ iview.overview.View = function() {
 					.append(infoDiv)
 					.append(prevImg)
 					.click(function() {
-						that.onevent.notify({"new": toInt(jQuery(this).attr("page")), 'type':that.CLICK});
+						jQuery(that).trigger("click.overview", {"new": toInt(jQuery(this).attr("page"))});
 					});
 			}
 		}
@@ -456,11 +455,9 @@ iview.overview.View = function() {
 		var scrollbar = new iview.scrollbar.Controller();
 		var parent = that.my.self;
 		scrollbar.createView({ 'direction': 'vertical', 'parent': parent, 'mainClass': 'scroll', 'type':'stepper'});
-		scrollbar.attach(function(sender,args){
-			if (args.type == "curVal") {
-				that._currentFirstRow = args["new"];
-				loadImages(that);
-			}
+		scrollbar.attach("curVal.scrollbar", function(e,val){
+			that._currentFirstRow = val["new"];
+			loadImages(that);
 		});
 		scrollbar.setSize(parent.height());
 		scrollbar.setStepByClick(1);
@@ -497,7 +494,6 @@ iview.overview.View = function() {
 	prototype.setTileUrlProvider = setTileUrlProvider;
 	prototype.setPreviewSize = setPreviewSize;
 	prototype.disableScrollBar = disableScrollBar;
-	prototype.CLICK = 1;
 })();
 
 /**
@@ -512,20 +508,15 @@ iview.overview.Controller = function(modelProvider, view, tileUrlProvider) {
 	this._model = modelProvider.createModel();
 	this._view = new (view || iview.overview.View)();
 	this._tileUrlProvider = tileUrlProvider;
-	var select = this._model.SELECT;
 	var that = this;
 	
-	this._model.onevent.attach(function(sender, args) {
-		if (args.type == select) {
-			that._view.setSelected(args["new"]);
-		}
+	jQuery(this._model).bind("select.METS", function(e, val) {
+		that._view.setSelected(val["new"]);
 	});
 	
-	this._view.onevent.attach(function(sender, args) {
-		if (args.type == that._view.CLICK) {
-			that._view.visible(false);
-			that._model.setPosition(args["new"]+1);
-		}
+	jQuery(this._view).bind("click.overview", function(e, val) {
+		that._view.visible(false);
+		that._model.setPosition(val["new"]+1);
 	});
 };
 
@@ -572,6 +563,7 @@ iview.overview.Controller = function(modelProvider, view, tileUrlProvider) {
 	function showView() {
 		this._view.visible(true);
 	}
+	
 	/**
 	 * @public
 	 * @function
@@ -622,10 +614,12 @@ iview.overview.Controller = function(modelProvider, view, tileUrlProvider) {
 	 * @function
 	 * @name		attach
 	 * @memberOf	iview.overview.Controller
-	 * @description	attach Eventlistener to used overview model
+	 * @param		{string} event name of events to register the listener to
+	 * @param		{function} listener to add to the view
+	 * @description	attach Eventlistener to used overview view
 	 */
-	function attach(listener) {
-		this._model.onevent.attach(listener);
+	function attach(event, listener) {
+		jQuery(this._view).bind(event, listener);
 	}
 	
 	/**
@@ -633,10 +627,12 @@ iview.overview.Controller = function(modelProvider, view, tileUrlProvider) {
 	 * @function
 	 * @name		detach
 	 * @memberOf	iview.overview.Controller
-	 * @description	detach previously attached Eventlistener from overview model
+	 * @param		{string} event name of events to detach the listener from
+	 * @param		{function} listener to add to the view
+	 * @description	detach previously attached Eventlistener from overview view
 	 */
-	function detach(listener) {
-		this._model.onevent.detach(listener);
+	function detach(event, listener) {
+		jQuery(this._view).unbind(event, listener);
 	}
 	
 	var prototype = iview.overview.Controller.prototype;

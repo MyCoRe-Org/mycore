@@ -1,5 +1,4 @@
 //TODO einbauen das Scrollbar minimale Größe hat, damit man sie noch benutzen kann
-//TODO Scrollbar broken in IE see http://jsfiddle.net/ueeys/1/
 /**
  * @namespace
  * @name		iview
@@ -52,7 +51,6 @@ iview.scrollbar.Model = function() {
 	 * @description	holds the proportion in percent from whole scrollbar area and the slider within,
 	 */
 	this._proportion;
-	this.onevent = new iview.Event(this);//One Event to rule them all
 };
 
 iview.scrollbar.Model.prototype = {
@@ -71,7 +69,7 @@ iview.scrollbar.Model.prototype = {
 			var oldVal = this._size;
 			this._size = value;
 			//Notify all listeners that a change happened
-			this.onevent.notify({ 'type': 'size', 'old': oldVal, 'new': value });
+			jQuery(this).trigger("size.scrollbar", {'old': oldVal, 'new': value });
 		}
 	},
 	
@@ -101,7 +99,7 @@ iview.scrollbar.Model.prototype = {
 		if (this._proportion != value) {
 			var oldVal = this._proportion;
 			this._proportion = value;
-			this.onevent.notify({ 'type': 'proportion', 'old': oldVal, 'new':value });
+			jQuery(this).trigger("proportion.scrollbar", {'old': oldVal, 'new':value });
 		}
 	},
 
@@ -134,7 +132,7 @@ iview.scrollbar.Model.prototype = {
 			var oldVal = this._maxVal;
 			this._maxVal = value;
 			//Notify all listeners that a change happened
-			this.onevent.notify({ 'type': 'maxVal', 'old': oldVal, 'new': value });
+			jQuery(this).trigger("maxVal.scrollbar", { 'old': oldVal, 'new': value });
 		}
 	},
 	
@@ -168,7 +166,7 @@ iview.scrollbar.Model.prototype = {
 			var oldVal = this._curVal;
 			this._curVal = value;
 			//Notify all listeners that a change happened
-			this.onevent.notify({ 'type': 'curVal', 'old':oldVal, 'new':value });
+			jQuery(this).trigger("curVal.scrollbar", { 'old':oldVal, 'new':value });
 		}
 	},
 	
@@ -201,7 +199,7 @@ iview.scrollbar.Model.prototype = {
 		if (this._curVal > this._maxVal) this._curVal = this._maxVal;
 		//only raise Event if a change happened
 		if (oldVal != this._curVal)
-			this.onevent.notify({'type': 'curVal', 'old': oldVal, 'new': this._curVal});
+			jQuery(this).trigger("curVal.scrollbar", { 'old': oldVal, 'new': this._curVal});
 	}
 }
 
@@ -330,8 +328,6 @@ iview.scrollbar.View = function() {
 	 * @description	holds the currently running interval, null if none is running
 	 */
 	this._type = "scroll";
-	
-	this.onevent = new iview.Event(this);
 };
 
 ( function() {
@@ -571,7 +567,7 @@ iview.scrollbar.View = function() {
 				vector = e.clientY - that._oldPos.y;
 			}
 			//notify all listeners of the event
-			that.onevent.notify({'type':'mouseMove','change':vector/that._pixelPerUnit});
+			jQuery(that).trigger("mouseMove.scrollbar", {'change':vector/that._pixelPerUnit});
 		} else {
 			var barStart;
 			var barSize;
@@ -588,9 +584,9 @@ iview.scrollbar.View = function() {
 				barSize = that.my.bar.height();
 			}
 			if (vector < 0 && pos < barStart) {
-				that.onevent.notify({'type':'mouseMove','change':-1});
+				jQuery(that).trigger("mouseMove.scrollbar", {'change':-1});
 			} else if (vector > 0 && pos > barStart + barSize) {
-				that.onevent.notify({'type':'mouseMove','change':1});
+				jQuery(that).trigger("mouseMove.scrollbar", {'change':1});
 			}
 			
 		}
@@ -650,11 +646,7 @@ iview.scrollbar.View = function() {
 	 * @param 		{integer} delta of the mousescroll event which occurred. Note that the delta needs to be already normalized as jQuery does
 	 */
 	function mouseScroll(that, delta) {
-		if (that._type != "stepper") {
-			that.onevent.notify({'type':'mouseWheel', 'change':2*-delta/that._pixelPerUnit}); 
-		} else {
-			that.onevent.notify({'type':'mouseWheel', 'change':-delta});
-		}
+		jQuery(that).trigger("mouseWheel.scrollbar", {'change': ((that._type != "stepper")? 2*-delta/that._pixelPerUnit: -delta)});
 	}
 	
 	/**
@@ -897,7 +889,7 @@ iview.scrollbar.View = function() {
 	 */
 	function notifyClick(that, isIncrease) {
 		if (that._curVal < 0 || that._curVal >= that._maxValue) return;
-		that.onevent.notify({'type':'mouseClick', 'change':(isIncrease === true)? that._stepByClick: -that._stepByClick});
+		jQuery(that).trigger("mouseClick.scrollbar", {'change':(isIncrease === true)? that._stepByClick: -that._stepByClick});
 	}
 
 	/**
@@ -925,12 +917,8 @@ iview.scrollbar.View = function() {
 			that._mouseDown = false;
 			return;
 		}
-		//Notify all Listeners about the occured change, prepare the Event Object depending on the direction
-		if (that._direction) {
-			that.onevent.notify({'type': 'mouseClick', 'change':((that._before)?-that._jumpStep:that._jumpStep)});
-		} else {
-			that.onevent.notify({'type': 'mouseClick', 'change':((that._before)?-that._jumpStep:that._jumpStep)});
-		}
+		//Notify all Listeners about the occured change, prepare the Event Object depending on the clicked positon
+		jQuery(that).trigger("mouseClick.scrollbar", {'change':((that._before)?-that._jumpStep:that._jumpStep)});
 	}
 	
 	/**
@@ -995,14 +983,12 @@ iview.scrollbar.Controller = function(model, view) {
 	this._view = new (view || iview.scrollbar.View)();
 	var that = this;
 	
-	this._model.onevent.attach(function(sender, args) {
-		 that._view.adaptView({'type':args.type,'value':args["new"]});
+	jQuery(this._model).bind("size.scrollbar proportion.scrollbar curVal.scrollbar maxVal.scrollbar", function(e, val) {
+		 that._view.adaptView({'type':e.type, 'value': val["new"]});
 	});
 	
-	this._view.onevent.attach(function(sender, args) {
-		if (args.type == "mouseClick" || args.type == "mouseMove" || args.type == "mouseWheel") {
-			that._model.changeCurVal(args.change);
-		}
+	jQuery(this._view).bind("mouseClick.scrollbar mouseMove.scrollbar mouseWheel.scrollbar", function(e, val) {
+		that._model.changeCurVal(val.change);
 	});
 }
 
@@ -1141,10 +1127,11 @@ iview.scrollbar.Controller.prototype = {
 	 * @name		attach
 	 * @memberOf	iview.scrollbar.Controller#
 	 * @description	adds the given listener to the model so the listener will be notified about changes within the model
+	 * @param		{string} event name of events to register the listener to
 	 * @param		{function} listener to add to the model
 	 */
-	attach: function(listener) {
-		this._model.onevent.attach(listener);
+	attach: function(event, listener) {
+		jQuery(this._model).bind(event, listener);
 	},
 	
 	/**
@@ -1154,9 +1141,10 @@ iview.scrollbar.Controller.prototype = {
 	 * @memberOf	iview.scrollbar.Controller#
 	 * @description	removes the given listener from the model so the listener will no longer receive
 	 *  notifications about changes within the model
+	 * @param		{string} event name of events to detach the listener from
 	 * @param		{function} listener to add to the model
 	 */
-	detach: function(listener) {
-		this._model.onevent.detach(listener);
+	detach: function(event, listener) {
+		jQuery(this._model).unbind(event, listener);
 	}
 }

@@ -25,13 +25,8 @@ iview.Permalink = {};
 iview.Permalink.View = function (id, parent) {
     this.id = id;
     
-    this.events = new iview.Event(this);
-    
-    var newPermalink = jQuery('<div>').addClass(id).addClass('permalinkArea').appendTo(parent);
-    var content = jQuery('<textarea class="content" readonly="readonly" wrap="off" onfocus="this.select()"/>').appendTo(newPermalink);
-    
-    this.content = content[0];
-  	this.permalink = newPermalink[0];
+    this.content = jQuery('<textarea class="content" readonly="readonly" wrap="off" onfocus="this.select()"/>').first();
+  	this.permalink = jQuery('<div>').addClass(id).addClass('permalinkArea').appendTo(parent).append(this.content).first();
 };
  
 iview.Permalink.View.prototype = {
@@ -42,7 +37,7 @@ iview.Permalink.View.prototype = {
 	 * @description removes the permalink view and its content
 	 */
     destroy : function () {
-		jQuery(this.permalink).remove();
+		this.permalink.remove();
     },
     
 	/**
@@ -51,7 +46,7 @@ iview.Permalink.View.prototype = {
 	 * @description displays the permalink container with slide-down effect
 	 */    
     show : function () {
-    	jQuery(this.permalink).show("blind");
+    	this.permalink.show("blind");
     },
   
 	/**
@@ -60,7 +55,7 @@ iview.Permalink.View.prototype = {
 	 * @description hides the permalink container with slide-up effect
 	 */  
     hide : function () {
-    	jQuery(this.permalink).hide("blind");
+    	this.permalink.hide("blind");
     },
  
 	/**
@@ -70,7 +65,7 @@ iview.Permalink.View.prototype = {
 	 * @param {String} url defines the target url, which should be shown in the permalink container
 	 */    
     setURL : function (url) {
-    	jQuery(this.content).text(url);
+    	this.content.text(url);
     }
 };
 
@@ -110,11 +105,6 @@ iview.Permalink.Controller.prototype = {
 	addView: function(view) {
 		var myself = this;
 		this.views[view.id] = view;
-		
-		view.events.attach(function (sender, args) {
-	    	if (args.type == "press") {
-		    }
-	    });
 	},
 	
    /**
@@ -157,7 +147,7 @@ iview.Permalink.Controller.prototype = {
 	 */
 	_update: function() {
 		var viewer = this.getViewer().iview;
-		var url = window.location.host + window.location.pathname + "?" + window.location.search.replace(/[?|&](x|y|page|zoom|tosize|maximized|css)=([^&]*)/g,"").replace(/\?/,"");
+		var url = "http://" + window.location.host + window.location.pathname + "?" + window.location.search.replace(/[?|&](x|y|page|zoom|tosize|maximized|css)=([^&]*)/g,"").replace(/\?/,"");
 		url += "&page="+viewer.curImage;
 		url += "&zoom="+viewer.viewerBean.zoomLevel;
 		url += "&x="+viewer.viewerBean.x;

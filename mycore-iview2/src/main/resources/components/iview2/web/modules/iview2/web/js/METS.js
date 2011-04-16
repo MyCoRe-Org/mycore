@@ -163,7 +163,6 @@ iview.METS.PhysicalModel = function () {
 	 * @description	amount of pages within current Model
 	 */
 	this._pageCount = 0;
-	this.onevent = new iview.Event(this);
 };
 
 (function() {
@@ -249,7 +248,7 @@ iview.METS.PhysicalModel = function () {
 		value = (value > this._order.length)? this._order.length:value;
 		if (value != this._curPos) {
 			this._curPos = value;
-			this.onevent.notify({'type':this.SELECT, 'old': this._curPos, 'new': value});
+			jQuery(this).trigger("select.METS", {'old': this._curPos, 'new': value});
 		}
 	}
 	
@@ -264,7 +263,7 @@ iview.METS.PhysicalModel = function () {
 		if (this._curPos != this._order.length) {
 			var old = this._curPos;
 			this._curPos = this._order.length;
-			this.onevent.notify({'type':this.SELECT, 'old': old,'new':this._curPos});
+			jQuery(this).trigger("select.METS", {'old': old, 'new': this._curPos});
 		}
 	}
 
@@ -279,7 +278,7 @@ iview.METS.PhysicalModel = function () {
 		if (this._curPos != 0) {
 			var old = this._curPos;
 			this._curPos = 0;
-			this.onevent.notify({'type':this.SELECT,'old':old, 'new':this._curPos});
+			jQuery(this).trigger("select.METS", {'old': old, 'new': this._curPos});
 		}
 	}
 	
@@ -294,7 +293,7 @@ iview.METS.PhysicalModel = function () {
 	function setNext() {
 		if (this._curPos < this._order.length) {
 			this._curPos++;
-			this.onevent.notify({'type':this.SELECT,'old':this._curPos-1, 'new':this._curPos});
+			jQuery(this).trigger("select.METS", {'old':this._curPos-1, 'new':this._curPos});
 			return this._curPos;
 		} else {
 			return this._order.length;
@@ -312,7 +311,7 @@ iview.METS.PhysicalModel = function () {
 	function getNext() {
 		if (this._curPos < this._order.length) {
 			this._curPos++;
-			this.onevent.notify({'type':this.SELECT,'old':this._curPos-1, 'new':this._curPos});
+			jQuery(this).trigger("select.METS", {'old':this._curPos-1, 'new':this._curPos});
 			return this._order[this._curPos];
 		} else {
 			return null;
@@ -330,7 +329,7 @@ iview.METS.PhysicalModel = function () {
 	function setPrevious() {
 		if (this._curPos > 0) {
 			this._curPos--;
-			this.onevent.notify({'type':this.SELECT,'old':this._curPos+1, 'new':this._curPos});
+			jQuery(this).trigger("select.METS", {'old':this._curPos+1, 'new':this._curPos});
 			return this._curPos;
 		} else {
 			return 0;
@@ -348,7 +347,7 @@ iview.METS.PhysicalModel = function () {
 	function getPrevious() {
 		if (this._curPos > 0) {
 			this._curPos--;
-			this.onevent.notify({'type':this.SELECT,'old':this._curPos+1, 'new':this._curPos});
+			jQuery(this).trigger("select.METS", {'old':this._curPos+1, 'new':this._curPos});
 			return this._order[this._curPos];
 		} else {
 			return null;
@@ -411,7 +410,6 @@ iview.METS.PhysicalModel = function () {
 	prototype.getPrevious = getPrevious;
 	prototype.setPrevious = setPrevious;
 	prototype.iterator = iterator;
-	prototype.SELECT = 1;
 })();
 
 /**
@@ -628,13 +626,11 @@ iview.METS.PhysicalModelProvider = function(doc) {
 iview.METS.ChapterModel = function(element) {
 	this._selected = null;
 	this._entries = [];
-	this.onevent = new iview.Event(this);
 	this._hashList = [];
 	this._containedIn = [];/*holds the smlinks to xlink:to as id and as content the object it belongs to,
 	*  so that pages which are not displayed within the chapter structure explicitly will be mapped to the
 	*  chapter where they lay in
 	*/
-//	this._logToOrder = [];//contains logical ids to their ordering numbers, so that we find the way out of the chapter
 };
 
 ( function() {
@@ -668,7 +664,7 @@ iview.METS.ChapterModel = function(element) {
 	/*
 	 * @description Sets the given entry as new selected entry within the Model, if the supplied entry
 	 *  isn't valid nothing happens. Else all Listeners will be notified about the changed Selection by
-	 *  calling the onevent The Type of the Event is 'selected' with the previously selected entry(-id)
+	 *  raising an Event of the type 'selected.METS' with the previously selected entry(-id)
 	 *  in old and the new Selection within new. If no entry was selected before, old holds null
 	 * @param logid the ID/Hash of the Element which is the new selected one
 	 */
@@ -679,7 +675,7 @@ iview.METS.ChapterModel = function(element) {
 			var oldSelected = (this._selected != null)? this._selected.getOrder(): null;
 			var oldID = (this._selected != null)? this._selected.getID(): null;
 			this._selected = newSelected;
-			this.onevent.notify({"type" : 'selected', "old": oldSelected, "new": newSelected.getOrder(), "oldID":oldID, "newID":newSelected.getID()});
+			jQuery(this).trigger("selected.METS", {"old": oldSelected, "new": newSelected.getOrder(), "oldID":oldID, "newID":newSelected.getID()});
 		}
 	}
 	

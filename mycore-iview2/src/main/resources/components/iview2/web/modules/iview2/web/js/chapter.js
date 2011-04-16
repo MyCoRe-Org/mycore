@@ -23,7 +23,6 @@ iview.chapter.View = function() {
 	this._treeData;//Stores the Treedata to display(the jsTree Model)
 	this._visible = false;
 	this._selected = null;//stores the currently selected page and enables reset if Chapters will be selected
-	this.onevent = new iview.Event(this);//One Event to rule them all
 	this.notifyOthers = true;//onselect Event was caused by Controller calls, so don't handle them
 	this._parent = null;//where will the tree be connected to
 	this._tree = jQuery.tree.create();//The jsTree creation	
@@ -70,8 +69,8 @@ iview.chapter.View = function() {
 							that._selected = jQuery(that._selected).find("li[order!='" + Number.MAX_VALUE + "']").first();
 							that.selectNode(that._selected.attr("logid"));
 						}
-						that.onevent.notify({"type":'selected', 
-							"old":jQuery(old).attr("order"), 
+						jQuery(that).trigger("select.chapter",
+							{"old":jQuery(old).attr("order"), 
 							"new":jQuery(that._selected).attr("order")});
 					}
 				}
@@ -233,16 +232,14 @@ iview.chapter.Controller = function(modelProvider, physicalModelProvider, view) 
 	var that = this;
 	this._physicalModel = physicalModelProvider.createModel();
 	
-	this._physicalModel.onevent.attach(function(sender, args) {
-		if (args.type == that._physicalModel.SELECT && that._view.getSelected() != args["new"]) {
-			that._view.selectNode(that._model._containedIn[args["new"]].getID());
+	jQuery(this._physicalModel).bind("select.METS", function(e, val) {
+		if (that._view.getSelected() != val["new"]) {
+			that._view.selectNode(that._model._containedIn[val["new"]].getID());
 		}
 	});
-	this._view.onevent.attach(function(sender, args) {
-		if (args.type == 'selected') {
-			that._model.setSelected(args["new"]);
-			that._physicalModel.setPosition(args["new"]);
-		}
+	jQuery(this._view).bind("select.chapter", function(e, val) {
+		that._model.setSelected(val["new"]);
+		that._physicalModel.setPosition(val["new"]);
 	});
 };
 

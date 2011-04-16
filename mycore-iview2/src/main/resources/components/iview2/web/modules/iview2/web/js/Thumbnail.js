@@ -183,11 +183,9 @@ genProto.openOverview = function(button) {
 				that.openOverview(button);
 				button.setLoading(false);
 				
-				that.iview.overview.attach(function(sender, args) {
+				that.iview.overview.attach("click.overview", function(e, val) {
 					// type 1: click on overview div
-					if (args.type == 1) {
-						button.setSubtypeState(false);
-					}
+					button.setSubtypeState(false);
 				});
 			};
 			that.importOverview(callback);
@@ -660,13 +658,11 @@ genProto.importCutOut = function() {
 	this.iview.cutOutModel = this.iview.cutOutMP.createModel();
 	this.iview.ausschnitt = new iview.cutOut.Controller(this.iview.cutOutMP, i18n);
 	this.iview.ausschnitt.createView({'thumbParent': this.iview.ausschnittParent, 'dampParent': this.iview.ausschnittParent});
-	this.iview.ausschnitt.attach(function(sender, args) {
-		if (args.type == "move") {
-			that.iview.viewerBean.recenter(
-					{'x' : args.x["new"]*that.iview.zoomScale,
-					 'y' : args.y["new"]*that.iview.zoomScale
-					}, true);
-		}
+	this.iview.ausschnitt.attach("move.cutOut", function(e, val) {
+		that.iview.viewerBean.recenter(
+			{'x' : val.x["new"]*that.iview.zoomScale,
+			 'y' : val.y["new"]*that.iview.zoomScale
+			}, true);
 	});
 	var preload = this.iview.my.preload;
 	this.iview.cutOutModel.setSize({
@@ -758,18 +754,18 @@ genProto.loading = function() {
 	this.iview.my.barX = new iview.scrollbar.Controller();
 	var barX = this.iview.my.barX;
 	barX.createView({ 'direction':'horizontal', 'parent':this.iview.my.container, 'mainClass':'scroll'});
-	barX.attach(function(sender, args) {
-		if (args.type == "curVal" && !that.iview.roller) {
-			that.scrollMove(- (args["new"]-args["old"]), 0);
+	barX.attach("curVal.scrollbar", function(e, val) {
+		if (!that.iview.roller) {
+			that.scrollMove(- (val["new"]-val["old"]), 0);
 		}
 	});
 	// vertical
 	this.iview.my.barY = new iview.scrollbar.Controller();
 	var barY = this.iview.my.barY;
 	barY.createView({ 'direction':'vertical', 'parent':this.iview.my.container, 'mainClass':'scroll'});
-	barY.attach(function(sender, args) {
-		if (args.type == "curVal" && !that.iview.roller) {
-			that.scrollMove( 0, -(args["new"]-args["old"]));
+	barY.attach("curVal.scrollbar", function(e, val) {
+		if (!that.iview.roller) {
+			that.scrollMove( 0, -(val["new"]-val["old"]));
 		}
 	});
 
@@ -864,15 +860,13 @@ genProto.processMETS = function(metsDoc) {
 	var toolbarCtrl = this.iview.getToolbarCtrl();
 	this.iview.amountPages = physicalModel.getNumberOfPages();
 	physicalModel.setPosition(physicalModel.getPosition(this.iview.curImage));
-	physicalModel.onevent.attach(function(sender, args) {
-		if (args.type == physicalModel.SELECT) {
-//			that.notifyListenerNavigate(args["new"]);
-			that.loadPage();
-			toolbarCtrl.checkNavigation(args["new"]);
-			that.updateModuls();
-			if (jQuery('.navigateHandles .pageBox')[0]) {
-				toolbarCtrl.updateDropDown(jQuery(pagelist.find("a")[args["new"] - 1]).html());
-			}
+	jQuery(physicalModel).bind("select.METS", function(e, val) {
+//			that.notifyListenerNavigate(val["new"]);
+		that.loadPage();
+		toolbarCtrl.checkNavigation(val["new"]);
+		that.updateModuls();
+		if (jQuery('.navigateHandles .pageBox')[0]) {
+			toolbarCtrl.updateDropDown(jQuery(pagelist.find("a")[val["new"] - 1]).html());
 		}
 	})
 
