@@ -677,7 +677,6 @@ public class MCRServlet extends HttpServlet {
 
     protected void writeCacheHeaders(HttpServletResponse response, int CACHE_TIME, long lastModified, boolean useExpire) {
         response.setHeader("Cache-Control", "max-age=" + CACHE_TIME);
-        response.setContentType("text/xml");
         response.setDateHeader("Last-Modified", lastModified);
         if (useExpire) {
             Date expires = new Date(System.currentTimeMillis() + CACHE_TIME * 1000);

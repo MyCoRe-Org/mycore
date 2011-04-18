@@ -88,6 +88,7 @@ public class MCRMETSServlet extends MCRServlet {
         request.setAttribute("XSL.objectID", MCRLinkTableManager.instance().getSourceOf(derivate).iterator().next());
 
         long lastModified = dir.getLastModified().getTimeInMillis();
+        response.setContentType("text/xml");
         writeCacheHeaders(response, CACHE_TIME, lastModified, useExpire);
         long start = System.currentTimeMillis();
         if (metsFile != null && useExistingMets(request)) {
