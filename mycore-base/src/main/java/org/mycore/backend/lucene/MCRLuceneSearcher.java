@@ -615,7 +615,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         modifyExecutor.shutdown();
         long taskCount = modifyExecutor.getTaskCount();
         try {
-            for (int tSec = 0; !modifyExecutor.isShutdown() && tSec < 60 * 6; tSec++) {
+            for (int tSec = 0; !modifyExecutor.isTerminated() && tSec < 60 * 6; tSec++) {
                 long numProcessed = modifyExecutor.getCompletedTaskCount();
                 LOGGER.info(MessageFormat.format("Processed {0} of {1} modification requests, still working...",numProcessed,taskCount,toString()));
                 modifyExecutor.awaitTermination(10, TimeUnit.SECONDS);
