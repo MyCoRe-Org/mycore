@@ -233,7 +233,7 @@ ToolbarController.prototype.catchModels = function() {
 			    	} else if (args.button) {
 			    		var button = args.button;
 			    		if (button.type == 'button') {
-			    			curView.addButton({'elementName' : button.elementName, 'ui' : button.ui, 'index' : button.index, 'title' : button.title, 'subtype' : button.subtype, 'parentName' : button.relatedButtonset.elementName, 'active' : button.active});
+			    			curView.addButton({'elementName' : button.elementName, 'ui' : button.ui, 'index' : button.index, 'captionId' : button.captionId, 'subtype' : button.subtype, 'parentName' : button.relatedButtonset.elementName, 'active' : button.active});
 			    		}
 			    	}
 		    	break;

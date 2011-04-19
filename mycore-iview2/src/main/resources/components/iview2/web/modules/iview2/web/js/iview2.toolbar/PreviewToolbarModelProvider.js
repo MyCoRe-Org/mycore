@@ -5,13 +5,10 @@
  * @description provides the model of a preview toolbar with only navigation functionalities/buttons,
  *  especially forward and backward buttons and of course a possibility to switch to the main viewer screen
  * @param		{String} id is the identifier of the model provider
- * @param		{String} model provides the toolbar model with fix defined structure
- * @param		{AssoArray} titles defines an array of the necessary button titles, parsed out of the iview2 xsl
  */
-var PreviewToolbarModelProvider = function (id, titles) {
+var PreviewToolbarModelProvider = function (id) {
 	this.id = id;
     this.model = new ToolbarModel(id);
-    this.titles = titles || {"backward": "<", "forward": ">"};
 };
 
 PreviewToolbarModelProvider.prototype = {
@@ -28,12 +25,11 @@ PreviewToolbarModelProvider.prototype = {
 
 		// previewHandles
 		curButtonset = this.model.addElement(new ToolbarButtonsetModel("previewBack", this.model));
-		curButtonset.addButton(new ToolbarButtonModel("backward", {'type': 'buttonDefault'}, {'label': this.titles.backward, 'text': false, 'icons': {primary : 'iview2-icon iview2-icon-backward'}}, this.titles.backward, true, false));
+		curButtonset.addButton(new ToolbarButtonModel("backward", {'type': 'buttonDefault'}, {'icons': {primary : 'iview2-icon iview2-icon-backward'}}, "toolbar.backward", true, false));
 
 		curButtonset = this.model.addElement(new ToolbarButtonsetModel("previewForward", this.model));
-		curButtonset.addButton(new ToolbarButtonModel("forward", {'type': 'buttonDefault'}, {'label': this.titles.forward, 'text': false, 'icons': {primary : 'iview2-icon iview2-icon-forward'}}, this.titles.forward, true, false));
+		curButtonset.addButton(new ToolbarButtonModel("forward", {'type': 'buttonDefault'}, {'icons': {primary : 'iview2-icon iview2-icon-forward'}}, "toolbar.forward", true, false));
 		
 		return this.model;
     }
 };
-

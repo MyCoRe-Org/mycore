@@ -8,15 +8,12 @@
  * 			Array:		models				//array of the contained models within the toolbar manager
  * 			Event:		events				//to trigger defined actions, while managing contained models
  * 			AssoArray:	changes				//holds all durable changes for each toolbar model, to perform them after creating new toolbar model instances
- *  		AssoArray:	titles				//titles of each button within the whole models of the toolbar manager
  * 		}
  */
 var ToolbarManager = function () {
 	this.models = [];
 	this.events = new iview.Event(this);
 	this.changes = [];
-	
-	this.titles = null;
 };
 
 ToolbarManager.prototype = {
@@ -95,18 +92,6 @@ ToolbarManager.prototype = {
     	}
     },
     
-	/**
-	 * @public
-	 * @function
-	 * @name		setTitles
-	 * @memberOf	ToolbarModel#
-	 * @description sets the titles (after parsing out of the iview2 xsl)
-	 * @param		{Array} titles titles of each button within the whole models of the toolbar manager
-	 */    
-    setTitles : function(titles) {
-    	this.titles = titles;
-    },
-
 	/**
 	 * @public
 	 * @function

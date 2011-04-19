@@ -1,5 +1,5 @@
 // maybe move this to iview2.xsl
-var ToolbarImporter = function (Iview2, titles) {
+var ToolbarImporter = function (Iview2, i18n) {
 
 	Iview2.getToolbarMgr = function() {
 		if (!this.toolbarMgr) {
@@ -24,12 +24,9 @@ var ToolbarImporter = function (Iview2, titles) {
 	// vom Drop Down Menu nur die View oder auch ein Model im ToolbarManager?
 	
 	// Toolbar Manager
-	Iview2.getToolbarMgr().setTitles(titles);
-	
-	Iview2.getToolbarMgr().addModel(new PreviewToolbarModelProvider("previewTb", titles).getModel());
-	
+	Iview2.getToolbarMgr().addModel(new PreviewToolbarModelProvider("previewTb").getModel());
 	// Toolbar Controller
-	Iview2.getToolbarCtrl().addView(new ToolbarView("previewTbView", Iview2.viewerContainer.find(".toolbars")));
+	Iview2.getToolbarCtrl().addView(new ToolbarView("previewTbView", Iview2.viewerContainer.find(".toolbars"), i18n));
 	
 	// holt alle bisherigen Models in den Controller und setzt diese entsprechend um
 	Iview2.getToolbarCtrl().catchModels();

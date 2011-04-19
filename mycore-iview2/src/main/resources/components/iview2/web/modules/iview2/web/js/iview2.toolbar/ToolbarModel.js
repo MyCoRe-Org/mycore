@@ -88,7 +88,7 @@ ToolbarModel.prototype = {
     				"type" : this.type,
     				"subtype" : this.subtype,
     				"ui" : this.ui,
-    				"title" : this.title,
+    				"captionId" : this.captionId,
     				"active" : this.active,
     				"loading" : this.loading,
     				"relatedButtonset": this.relatedButtonset}

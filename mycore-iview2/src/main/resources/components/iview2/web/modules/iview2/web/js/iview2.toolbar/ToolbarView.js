@@ -7,10 +7,12 @@
  * @param		{Object} events to trigger defined actions, while managing contained elements
  * @param		{Object} parent defines the parent node of the toolbar view
  * @param		{Object} toolbar represents the main node of the toolbar view
+ * @param		{i18n} i18n Class to allow translations
  */
-var ToolbarView = function (id, parent) {
+var ToolbarView = function (id, parent, i18n) {
     this.id = id;
     this.events = new iview.Event(this);
+    this.i18n = i18n;
     
     var newToolbar = jQuery('<div>').addClass(id).addClass('toolbar ui-widget-header ui-corner-all ui-helper-clearfix').appendTo(parent);
   	this.toolbar = newToolbar[0];
@@ -200,7 +202,7 @@ ToolbarView.prototype = {
 	 * @description adds a given button with its given properties to the toolbar view
 	 * @param		{String} args.parentName defines the buttonset name in which the button should insert
 	 * @param		{String} args.elementName defines the name of the button
-	 * @param		{String} args.title defines the title text of the button,
+	 * @param		{String} args.captionId defines the title-Id text of the button,
 	 * @param		{integer} args.index defines a special position between the other buttons where the current button should be inserted
 	 */
     addButton : function (args) {
@@ -215,12 +217,14 @@ ToolbarView.prototype = {
     			myView.events.notify({'type' : "press", 'elementName' : args.elementName, 'parentName' : args.parentName, 'view' : newButton});
     			return false;
     		};
-
 		if (args.subtype.type == "buttonDefault") {
-    		newButton = jQuery('<button>').attr('title', args.title).addClass(args.elementName).click(onClick);
+    		newButton = jQuery('<button>').addClass(args.elementName).click(onClick);
+    		jQuery(this.i18n.executeWhenLoaded(function(i) {newButton.attr("title", i.translate(args.captionId))}))
+    			.bind("change.i18n load.i18n",function(e, obj) {newButton.attr("title", obj.i18n.translate(args.captionId))});
 		} else if (args.subtype.type == "buttonCheck") {
-			newButton = jQuery('<input type="checkbox" id="'+args.elementName+'" class='+args.elementName+' /><label for='+args.elementName+' class='+args.elementName+"Label"+'>'+args.title+'</label>')
-				.attr('title', args.title);
+			newButton = jQuery('<input type="checkbox" id="'+args.elementName+'" class='+args.elementName+' /><label for='+args.elementName+' class='+args.elementName+"Label"+'></label>');
+			jQuery(this.i18n.executeWhenLoaded(function(i) {newButton.attr("title", i.translate(args.captionId)).find("label").html(i.translate(args.captionId))}))
+				.bind("change.i18n load.i18n",function(e, obj) {newButton.attr("title", obj.i18n.translate(args.captionId)).find("label").html(i.translate(args.captionId))});
 			newButton[1].onclick = onClick;
 		}
 		

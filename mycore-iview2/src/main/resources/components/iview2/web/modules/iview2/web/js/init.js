@@ -248,7 +248,7 @@ genProto.maximizeHandler = function() {
 	} else {
 		this.iview.maximized = true;
 		
-		this.iview.getToolbarCtrl().addView(new ToolbarView("mainTbView", this.iview.viewerContainer.find(".toolbars")));
+		this.iview.getToolbarCtrl().addView(new ToolbarView("mainTbView", this.iview.viewerContainer.find(".toolbars"), i18n));
 		this.iview.getToolbarMgr().addModel(new StandardToolbarModelProvider("mainTb", this.iview.getToolbarMgr().titles).getModel());
 		if (this.iview.PhysicalModel) {
 			this.iview.getToolbarCtrl().checkNavigation(this.iview.PhysicalModel.getCurPos());

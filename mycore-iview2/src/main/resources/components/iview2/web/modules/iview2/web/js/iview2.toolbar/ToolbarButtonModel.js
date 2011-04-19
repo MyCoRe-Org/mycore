@@ -9,19 +9,19 @@
  * 			String: 	type				//type button, to differ between other elements
  * 			String: 	subtype				//defines if the button is a checkbutton or a standard one
  * 			AssoArray: 	ui					//jQuery button ui informations (label, text, icons) to render the button into the view
- * 			String:		title				//title of the button
+ * 			String:		captionId			//id for the translation to use on the button
  * 			Boolean:	active				//describes if a button is enabled or disabled currently
  * 			Boolean:	loading				//describes if a button is shows loading symbol or the defined ui content
  * 			Object:		relatedButtonset	//related buttonset model to navigate from the button to its buttonset
  * 			Event:		events				//to trigger defined actions, while manipulate button properties
  * 		}
  */
-var ToolbarButtonModel = function (elementName, subtype, ui, title, active, loading) {
+var ToolbarButtonModel = function (elementName, subtype, ui, captionId, active, loading) {
     this.elementName = elementName;
     this.type = "button";
     this.subtype = subtype;
-    this.ui = ui;
-    this.title = title;
+    this.ui = (!ui.text && !ui.label)? jQuery.extend(ui, {'label':"a", "text":false}): ui;//if label is omitted the button is displayed too small
+    this.captionId = captionId;
     this.active = active;
     this.loading = loading;
     // will set indirectly while adding

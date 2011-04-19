@@ -90,32 +90,7 @@
 		<xsl:text>/themes/base/jquery-ui.css');</xsl:text>
 	</script>
      
-    <div id="toolbars{$groupID}" class="toolbars" onmousedown="return false;">      
-        <script type="text/javascript">
-      		jQuery(document).ready(function () {
-      	
-				// toolbar brauch ne Liste mit Controllern für die Übergabe (bspw. Chapter)
-				      		
-				var viewID = '<xsl:value-of select="$groupID" />';
-				
-				var titles = {
-					'zoomIn' : '<xsl:value-of select="i18n:translate('component.iview2.zoomIn')"/>',
-					'zoomOut' : '<xsl:value-of select="i18n:translate('component.iview2.zoomOut')"/>',
-					'fitToWidth' : '<xsl:value-of select="i18n:translate('component.iview2.toWidth')"/>',
-					'fitToScreen' : '<xsl:value-of select="i18n:translate('component.iview2.toScreen')"/>',
-					'openOverview' : '<xsl:value-of select="i18n:translate('component.iview2.openThumbs')"/>',
-					'openChapter' : '<xsl:value-of select="i18n:translate('component.iview2.chapterOpener')"/>',
-					'backward' : '<xsl:value-of select="i18n:translate('component.iview2.backward')"/>',
-					'forward' : '<xsl:value-of select="i18n:translate('component.iview2.forward')"/>',
-					'permalink' : '<xsl:value-of select="i18n:translate('component.iview2.permalink')"/>',
-					'close' : '<xsl:value-of select="i18n:translate('component.iview2.normalView')"/>',
-					'pageBox' : '<xsl:value-of select="i18n:translate('component.iview2.pageBox')"/>'
-				};
-			
-				Iview[viewID].ToolbarImporter = new ToolbarImporter(Iview[viewID], titles);
-      		});
-        </script>
-        </div>
+    <div id="toolbars{$groupID}" class="toolbars" onmousedown="return false;" />      
   </xsl:template>
   <xsl:template name="iview2.init">
     <xsl:param name="groupID" />
@@ -191,6 +166,7 @@
       addIviewProperty('<xsl:value-of select="$groupID" />', 'startFile', "'<xsl:value-of select="$startFile" />'");
       function startViewer(viewID) {
         if (Iview[viewID].started) return;
+        Iview[viewID].ToolbarImporter = new ToolbarImporter(Iview[viewID], i18n);
         Iview[viewID].gen = new iview.General(Iview[viewID], viewID);
         Iview[viewID].started = true;
         Iview[viewID].preload = jQuery("#viewerContainer" + viewID + " .preload");
