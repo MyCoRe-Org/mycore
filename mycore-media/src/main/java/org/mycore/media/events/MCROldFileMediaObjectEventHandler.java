@@ -21,6 +21,7 @@ public class MCROldFileMediaObjectEventHandler implements MCREventHandler {
     public void doHandleEvent( MCREvent evt ) throws MCRException
     {
       MCROldFile file = (MCROldFile)( evt.get( "file" ) );
+      if( file.getSize() < 1 ) return; // do not handle empty files, they have no StoreID!
 
       if( MCREvent.UPDATE_EVENT.equals( evt.getEventType() ) )
       {
@@ -53,6 +54,7 @@ public class MCROldFileMediaObjectEventHandler implements MCREventHandler {
     public void undoHandleEvent( MCREvent evt ) throws MCRException
     {
       MCROldFile file = (MCROldFile)( evt.get( "file" ) );
+      if( file.getSize() < 1 ) return; // do not handle empty files, they have no StoreID!
       deleteMetadata( file );
       deleteThumbnail( file );
     }
