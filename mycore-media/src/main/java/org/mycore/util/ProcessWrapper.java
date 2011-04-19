@@ -5,12 +5,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import org.apache.log4j.Logger;
+
 /**
  * Wrapper for running processes.
  * @author Reuben Firmin
  */
 public class ProcessWrapper {
 
+    private final static Logger LOGGER = Logger.getLogger( ProcessWrapper.class );
+  
     private BufferedStreamReader err;
     private BufferedStreamReader out;
 
@@ -30,6 +34,7 @@ public class ProcessWrapper {
         throws IOException, InterruptedException
     {
         final ProcessBuilder pb = new ProcessBuilder(command);
+        debug(command);
         final Process p = pb.start();
         err = new BufferedStreamReader(p.getErrorStream());
         out = new BufferedStreamReader(p.getInputStream());
@@ -39,6 +44,17 @@ public class ProcessWrapper {
         t2.start();
         // blocks until process is done
         return p.waitFor();
+    }
+
+    private void debug(String... command) {
+        if (!LOGGER.isDebugEnabled())
+            return;
+        
+        StringBuffer sb = new StringBuffer();
+        for (String arg : command)
+            sb.append(arg).append(' ');
+        LOGGER.debug(sb.toString());
+
     }
 
     /**
