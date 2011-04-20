@@ -5,7 +5,9 @@
     <author email="thomas.scheffler(at)uni-jena.de">Thomas Scheffler</author>
   </properties>
   <body>
-    <release version="2.0.94" date="2011-03-?" description="Beta 4">
+    <release version="2.1" date="2011-??-??" description="LTS">
+    </release>
+    <release version="2.0.94" date="2011-03-22" description="Beta 4">
       <action dev="mcrfluet" type="add">
       Added functionality to disable editing of a textfield and set it read-only with @disabled="true", same as for list elements.
       </action>
