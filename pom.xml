@@ -254,7 +254,7 @@
                   <packages>org.mycore.migration20_21*</packages>
                 </group>
                 <group>
-                  <title>MyCoRe Component: METS/MODS</title>
+                  <title>MyCoRe Component: METS</title>
                   <packages>org.mycore.mets*</packages>
                 </group>
                 <group>
@@ -1097,7 +1097,7 @@
     <module>mycore-iview</module>
     <module>mycore-iview2</module>
     <module>mycore-media</module>
-    <module>mycore-metsmods</module>
+    <module>mycore-mets</module>
     <module>mycore-migration20-21</module>
     <module>mycore-mods</module>
     <module>mycore-oai</module>

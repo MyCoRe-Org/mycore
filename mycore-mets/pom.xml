@@ -8,8 +8,8 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>mycore-metsmods</artifactId>
-  <name>MyCoRe METS/MODS</name>
+  <artifactId>mycore-mets</artifactId>
+  <name>MyCoRe METS</name>
   <build>
     <plugins>
       <plugin>
