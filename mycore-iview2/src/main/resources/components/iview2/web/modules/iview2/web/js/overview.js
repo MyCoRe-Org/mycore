@@ -1,5 +1,3 @@
-//TODO @description und @param ergänzen, wo es noch fehlt
-
 /**
  * @namespace
  * @name		iview
@@ -42,7 +40,7 @@ iview.overview.View = function() {
 	 * @public
 	 * @function
 	 * @name		disableScrollBar
-	 * @memberOf	iview.overview.View
+	 * @memberOf	iview.overview.View#
 	 * @description	disables the use of scrollbar. If the View was already created the scrollbar will be removed
 	 */
 	function disableScrollBar() {
@@ -57,7 +55,7 @@ iview.overview.View = function() {
 	 * @public
 	 * @function
 	 * @name		setDivSize
-	 * @memberOf	iview.overview.View
+	 * @memberOf	iview.overview.View#
 	 * @description	sets the size of the seperate which includes the image and the related infos
 	 * @param 		{object} divSize
 	 * @param		{float} divSize.width holds the width of the Divs
@@ -72,7 +70,7 @@ iview.overview.View = function() {
 	 * @public
 	 * @function
 	 * @name		setPreviewSize
-	 * @memberOf	iview.overview.View
+	 * @memberOf	iview.overview.View#
 	 * @description	sets the according size for every preview image div
 	 * @param 		{float} previewSize
 	 * @param		{float} previewSize.width width of the preview Image div
@@ -87,7 +85,7 @@ iview.overview.View = function() {
 	 * @public
 	 * @function
 	 * @name		setNumberOfPages
-	 * @memberOf	iview.overview.View
+	 * @memberOf	iview.overview.View#
 	 * @description	sets the number of pages the document has
 	 * @param	 	{float} value number of pages 
 	 */
@@ -102,7 +100,7 @@ iview.overview.View = function() {
 	 * @public
 	 * @function
 	 * @name		addPage
-	 * @memberOf	iview.overview.View
+	 * @memberOf	iview.overview.View#
 	 * @description	adds another page to the list
 	 * @param 		{integer} id holds the id of the page which is added
 	 * @param		{string} href path to the image which is added
@@ -115,7 +113,7 @@ iview.overview.View = function() {
 	 * @public
 	 * @function
 	 * @name		resize
-	 * @memberOf	iview.overview.View
+	 * @memberOf	iview.overview.View#
 	 * @description	resizes the overview when the size of the browser is changing
 	 */
 	function resize() {
@@ -136,7 +134,7 @@ iview.overview.View = function() {
 	 * @public
 	 * @function
 	 * @name		setSelected
-	 * @memberOf	iview.overview.View
+	 * @memberOf	iview.overview.View#
 	 * @description	takes the given pagenumber and adapts the view in that way that the selected one is visible
 	 * @param 		{integer} value pagenumber of the newly selected entry
 	 */
@@ -152,7 +150,7 @@ iview.overview.View = function() {
 	 * @public
 	 * @function
 	 * @name		visible
-	 * @memberOf	iview.overview.View
+	 * @memberOf	iview.overview.View#
 	 * @description	makes the View visible depending on the given boolean value, if no value is given the View will switch in the opposite mode than it's currently
 	 * @param 		{boolean} bool holds the state into which the View shall switch
 	 */
@@ -176,7 +174,7 @@ iview.overview.View = function() {
 	 * @private
 	 * @function
 	 * @name		loadImages
-	 * @memberOf	iview.overview.View
+	 * @memberOf	iview.overview.View#
 	 * @description	load the overview so that the actually picture is in first line
 	 * @param 		{instance} that
 	 */	
@@ -220,7 +218,7 @@ iview.overview.View = function() {
 	 * @private
 	 * @function
 	 * @name		loadSingleImage
-	 * @memberOf	iview.overview.View
+	 * @memberOf	iview.overview.View#
 	 * @description	load the separate pictures in the according divboxes
 	 * @param 		{instance} that image that is loaded
 	 * @param 		{object} divBox the according div box which contains one image
@@ -245,7 +243,7 @@ iview.overview.View = function() {
 	 * @private
 	 * @function
 	 * @name		trimImage
-	 * @memberOf	iview.overview.View
+	 * @memberOf	iview.overview.View#
 	 * @description	fits picture to the correct size within the divBox
 	 * @param 		{object} preview image which is displayed
 	 * @param 		{string} source path to the image
@@ -302,7 +300,7 @@ iview.overview.View = function() {
 	 * @private
 	 * @function
 	 * @name		calculateFirstRow
-	 * @memberOf	iview.overview.View
+	 * @memberOf	iview.overview.View#
 	 * @description	if overview is already created and is called so load loadImageFromLine() and adjust scrollbar
 	 * @param	 	{instance} that 
 	 */
@@ -327,7 +325,7 @@ iview.overview.View = function() {
 	 * @private
 	 * @function
 	 * @name		createContainer
-	 * @memberOf	iview.overview.View
+	 * @memberOf	iview.overview.View#
 	 * @description	creates all containers which are used for the overview (#container == #previewImages)
 	 * @param 		{instance} that 
 	 */
@@ -381,7 +379,7 @@ iview.overview.View = function() {
 	 * @private
 	 * @function
 	 * @name		posOverviewContainer
-	 * @memberOf	iview.overview.View
+	 * @memberOf	iview.overview.View#
 	 * @description	positions nicely the divBoxes within the available Space
 	 * @param	 	{instance} that the overview object where the code is run in
 	 */
@@ -402,7 +400,7 @@ iview.overview.View = function() {
 	 * @public
 	 * @function
 	 * @name		createView
-	 * @memberOf	iview.overview.View
+	 * @memberOf	iview.overview.View#
 	 * @description	create the view in the overview
 	 * @param	 	{object} args
 	 * @param		{string} args.mainClass tells what the main Class for the scrollbar shall be
@@ -447,7 +445,7 @@ iview.overview.View = function() {
 	 * @private
 	 * @function
 	 * @name		prepareScrollBar
-	 * @memberOf	iview.overview.View
+	 * @memberOf	iview.overview.View#
 	 * @description	create Scrollbar in the overview
 	 * @param 		{instance} that 
 	 */
@@ -475,7 +473,7 @@ iview.overview.View = function() {
 	 * @public
 	 * @function
 	 * @name		setTileUrlProvider
-	 * @memberOf	iview.overview.View
+	 * @memberOf	iview.overview.View#
 	 * @description	set the tileUrlProvider from which the tiles are taken
 	 * @param 		{tileUrlProvider} provider which gives preview tiles
 	 */
@@ -503,6 +501,10 @@ iview.overview.View = function() {
  * @memberOf	iview.overview
  * @name 		Controller
  * @description Controller for Overview
+ * @param		{iview.METS.PhysicalModelProvider, API-equal Object} model for overview data
+ * @param		{iview.overview.View, API-equal Object} [view=iview.overview.View] Viewtype to use for
+ *  this Overview, if not the package Type is used be sure to use a compatible one
+ * @param		{tileUrlProvider} tileUrlProvider to retrieve urls for thumbnails from
  */
 iview.overview.Controller = function(modelProvider, view, tileUrlProvider) {
 	this._model = modelProvider.createModel();
@@ -526,7 +528,7 @@ iview.overview.Controller = function(modelProvider, view, tileUrlProvider) {
 	 * @public
 	 * @function
 	 * @name		createView
-	 * @memberOf	iview.overview.Controller
+	 * @memberOf	iview.overview.Controller#
 	 * @description	creates the view for the overview
 	 * @param 		{object} args
 	 * @param		{string} args.mainClass tells what the main Class for the scrollbar shall be
@@ -557,7 +559,7 @@ iview.overview.Controller = function(modelProvider, view, tileUrlProvider) {
 	 * @public
 	 * @function
 	 * @name		showView
-	 * @memberOf	iview.overview.Controller
+	 * @memberOf	iview.overview.Controller#
 	 * @description	tells the view to hide itself
 	 */
 	function showView() {
@@ -567,7 +569,7 @@ iview.overview.Controller = function(modelProvider, view, tileUrlProvider) {
 	/**
 	 * @public
 	 * @function
-	 * @name		hideView
+	 * @name		hideView#
 	 * @memberOf	iview.overview.Controller
 	 * @description	tells the view to hide itself
 	 */	
@@ -579,7 +581,7 @@ iview.overview.Controller = function(modelProvider, view, tileUrlProvider) {
 	 * @public
 	 * @function
 	 * @name		toggleView
-	 * @memberOf	iview.overview.Controller
+	 * @memberOf	iview.overview.Controller#
 	 * @description	tells the View to change it's display mode to the currently opposite mode
 	 */
 	function toggleView() {
@@ -590,7 +592,7 @@ iview.overview.Controller = function(modelProvider, view, tileUrlProvider) {
 	 * @public
 	 * @function
 	 * @name		setSelected
-	 * @memberOf	iview.overview.Controller
+	 * @memberOf	iview.overview.Controller#
 	 * @description	takes the given pagenumber and adapts the view in that way that the selected one is visible
 	 * @param 		{integer} value pagenumber of the newly selected entry 
 	 */
@@ -602,7 +604,7 @@ iview.overview.Controller = function(modelProvider, view, tileUrlProvider) {
 	 * @public
 	 * @function
 	 * @name		getActive
-	 * @memberOf	iview.overview.Controller
+	 * @memberOf	iview.overview.Controller#
 	 * @description	returns the current state of the OverviewView (if its visible or not)
 	 */
 	function getActive() {
@@ -613,10 +615,10 @@ iview.overview.Controller = function(modelProvider, view, tileUrlProvider) {
 	 * @public
 	 * @function
 	 * @name		attach
-	 * @memberOf	iview.overview.Controller
+	 * @memberOf	iview.overview.Controller#
+	 * @description	attach Eventlistener to used overview view
 	 * @param		{string} event name of events to register the listener to
 	 * @param		{function} listener to add to the view
-	 * @description	attach Eventlistener to used overview view
 	 */
 	function attach(event, listener) {
 		jQuery(this._view).bind(event, listener);
@@ -626,10 +628,10 @@ iview.overview.Controller = function(modelProvider, view, tileUrlProvider) {
 	 * @public
 	 * @function
 	 * @name		detach
-	 * @memberOf	iview.overview.Controller
+	 * @memberOf	iview.overview.Controller#
+	 * @description	detach previously attached Eventlistener from overview view
 	 * @param		{string} event name of events to detach the listener from
 	 * @param		{function} listener to add to the view
-	 * @description	detach previously attached Eventlistener from overview view
 	 */
 	function detach(event, listener) {
 		jQuery(this._view).unbind(event, listener);

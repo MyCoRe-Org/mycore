@@ -14,15 +14,14 @@ function namespaceCheck(name) {
 	return name;
 }
 
-//TODO checken, ob das so richtig
 /**
  * @public
  * @function
- * @name	attributeCheck
+ * @name		attributeCheck
  * @memberOf	iview.XML
- * @description	checks if the browser supports attributes within getElementsByTagName, if not the attributes will be parsed out
- * @param	{string} name the attribute name which needs to be checked
- * @return	{string} name the attribute name special convert for the browser
+ * @description	checks if the browser supports namespaces for attributes, if not the namespace will be removed
+ * @param		{string} name the attribute name which needs to be checked
+ * @return		string attribute name with or without namespace, depending on the fact if the browser supports namespaces for attributes
  */
 function attributeCheck(name) {
 	if (isBrowser(["Opera", "Firefox/2"]) && name.indexOf(":") != -1) {
@@ -31,16 +30,15 @@ function attributeCheck(name) {
 	return name;
 }
 
-//TODO Doku ergänzen
 /**
  * @public
  * @function
- * @name	nodeAttributes
+ * @name		nodeAttributes
  * @memberOf	iview.XML
  * @description	collects into an array all attributes of a supplied Node, where the name of the object attribute is the attributes name,
  cleaned from any namespace things like regex: .*:
- * @param	{object} node the node to collect all properties from
- * @return	{} an array with all Informations the node contained as attributes
+ * @param		{object} node the node to collect all properties from
+ * @return		array with all Informations the node contains as attributes
  */
 function nodeAttributes(node) {
 	var attributes = new Object();
@@ -51,17 +49,16 @@ function nodeAttributes(node) {
 	return attributes;
 }
 
-//TODO Doku ergänzen	
 /**
  * @public
  * @function
  * @name		getNodes
  * @memberOf	iview.XML
  * @description	Gains the requested information from a given XML File
- * @param	{object} xmlfile XML file from which the data will be extruded
- * @param	{string} nodeName the Node of the XML File which shall be gained, can be a group of nodes
- * @param	{object} [parent] Node which is used as Start for search
- * @return	{} List of all Nodes with the given NodeName
+ * @param		{object} xmlfile XML file from which the data will be extruded
+ * @param		{string} nodeName the Node of the XML File which shall be gained, can be a group of nodes
+ * @param		{object} [parent] Node which is used as Start for search
+ * @return		{} List of all Nodes with the given NodeName
  */
 function getNodes(xmlfile, nodeName, parent) {
 	var nodes;
