@@ -34,7 +34,11 @@ import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.parsers.bool.MCRCondition;
 
 /**
+ * This class encapsulates application specific functionality for the
+ * implementation of an OAI data provider.
+ * 
  * @author Frank L\u00fctzenkirchen
+ * @author Robert Stephan
  */
 public abstract class MCROAIAdapter {
     protected final static Logger LOGGER = Logger.getLogger(MCRVerbHandler.class);
@@ -42,6 +46,8 @@ public abstract class MCROAIAdapter {
     protected String recordUriPattern;
 
     protected String headerUriPattern;
+    
+    protected String prefix;
 
     private String recordPolicy;
 
@@ -50,7 +56,7 @@ public abstract class MCROAIAdapter {
 
     void init(String prefix) {
         MCRConfiguration config = MCRConfiguration.instance();
-
+        this.prefix = prefix;
         recordUriPattern = MCRConfiguration.instance().getString(prefix + "Adapter.RecordURIPattern");
         headerUriPattern = MCRConfiguration.instance().getString(prefix + "Adapter.HeaderURIPattern");
         EARLIEST_DATESTAMP = config.getString(prefix + "Adapter.EarliestDatestamp", "1970-01-01");

@@ -42,10 +42,6 @@
     <servlet-name>MCROAIProvider</servlet-name>
     <servlet-class>org.mycore.services.oai.MCROAIProvider</servlet-class>
   </servlet>
-  <servlet id="OAI2">
-    <servlet-name>OAI2</servlet-name>
-    <servlet-class>org.mycore.oai.MCROAIDataProvider</servlet-class>
-  </servlet>
   <servlet id="StaticXMLFile">
     <servlet-name>MCRStaticXMLFileServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRStaticXMLFileServlet</servlet-class>
@@ -170,10 +166,6 @@
   <servlet-mapping>
     <servlet-name>MCROAIProvider</servlet-name>
     <url-pattern>/oai</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>OAI2</servlet-name>
-    <url-pattern>/oai2</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>XMLEditor</servlet-name>

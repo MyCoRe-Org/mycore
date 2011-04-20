@@ -90,16 +90,18 @@ public abstract class MCRVerbHandler {
 
     protected MCRCondition restriction;
 
-    @SuppressWarnings("rawtypes")
     MCRVerbHandler(MCROAIDataProvider provider) {
         this.provider = provider;
 
         MCRConfiguration config = MCRConfiguration.instance();
 
-        Properties p = config.getProperties(provider.getPrefix() + "Sets.");
-        for (Iterator it = p.values().iterator(); it.hasNext();)
-            setURIs.add((String) (it.next()));
-
+       String[] sets = config.getString(provider.getPrefix() + "Sets", "").split(",");
+        for(String s: sets){
+            if(config.getString(provider.getPrefix()+"Set."+s, "").trim().length()>0){
+                setURIs.add(config.getString(provider.getPrefix()+"Set."+s).trim());
+            }
+        }
+        
         String r = config.getString(provider.getPrefix() + "Search.Restriction", null);
         if (r != null) {
             try {

@@ -35,11 +35,13 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRDELETEDITEMS;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
+import org.mycore.oai.classmapping.MCRClassificationAndSetMapper;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRQuery;
@@ -49,6 +51,13 @@ import org.mycore.services.fieldquery.MCRQueryParser;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSortBy;
 
+/**
+ * This class is an implementation of MCROAIAdapter
+ * especially for MyCoRe.
+ * 
+ * @author Frank L\u00fctzenkirchen
+ * @author Robert Stephan
+ */
 public class MCROAIAdapterMyCoRe extends MCROAIAdapter {
     private final static Logger LOGGER = Logger.getLogger(MCROAIAdapterMyCoRe.class);
 
@@ -70,10 +79,23 @@ public class MCROAIAdapterMyCoRe extends MCROAIAdapter {
     }
 
     public MCRCondition buildSetCondition(String setSpec) {
-        String categID = setSpec.substring(setSpec.lastIndexOf(':') + 1).trim();
-        String classID = setSpec.substring(0, setSpec.indexOf(':')).trim();
-        String id = classID + ":" + categID;
-        return new MCRQueryCondition(MCRFieldDef.getDef("category"), "=", id);
+        if (setSpec.contains(":")) {
+            String categID = setSpec.substring(setSpec.lastIndexOf(':') + 1).trim();
+            String classID = setSpec.substring(0, setSpec.indexOf(':')).trim();
+            classID = MCRClassificationAndSetMapper.mapSetToClassification(prefix, classID);
+            String id = classID + ":" + categID;
+            return new MCRQueryCondition(MCRFieldDef.getDef("category"), "=", id);
+        } else {
+            String id = setSpec;
+            String query = MCRConfiguration.instance().getString(prefix + "MapSetToQuery."+id, "");
+            if(!query.equals("")){
+                return new MCRQueryParser().parse(query);
+            }
+            else{
+                id = MCRClassificationAndSetMapper.mapSetToClassification(prefix, id);
+                return new MCRQueryCondition(MCRFieldDef.getDef("category"), "like", id+"*");
+            }
+        }
     }
 
     @Override

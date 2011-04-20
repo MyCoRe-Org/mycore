@@ -1,0 +1,158 @@
+/*
+ * $Revision: 19544 $ 
+ * $Date: 2010-12-10 09:56:57 +0100 (Fr, 10 Dez 2010) $
+ *
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
+ *
+ * This program is free software; you can use it, redistribute it
+ * and / or modify it under the terms of the GNU General Public License
+ * (GPL) as published by the Free Software Foundation; either version 2
+ * of the License or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program, in a file called gpl.txt or license.txt.
+ * If not, write to the Free Software Foundation Inc.,
+ * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ */
+package org.mycore.oai.classmapping;
+
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.xpath.XPath;
+import org.mycore.common.events.MCREvent;
+import org.mycore.common.events.MCREventHandlerBase;
+import org.mycore.datamodel.classifications2.MCRCategory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.classifications2.MCRLabel;
+import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
+import org.mycore.datamodel.metadata.MCRMetaClassification;
+import org.mycore.datamodel.metadata.MCRMetaElement;
+import org.mycore.datamodel.metadata.MCRObject;
+
+/**
+ * This class implements an event handler, which reloads classification entries
+ * stored in datafield mappings/mapping. These entries are retrieved from other 
+ * classifications where they are stored in as labels with language "x-mapping".
+ * 
+ * @author Robert Stephan
+ * 
+ * @version $Revision: 20629 $ $Date: 2011-04-07 16:01:26 +0200 (Do, 07 Apr 2011) $
+ */
+public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
+    private static XPath xpathClassifications;
+
+    private static final MCRCategoryDAO DAO = new MCRCategoryDAOImpl();
+
+    private static Logger LOGGER = Logger.getLogger(MCRClassificationMappingEventHandler.class);
+    static {
+        try {
+            xpathClassifications = XPath.newInstance("//*[@categid]");
+        } catch (JDOMException je) {
+            LOGGER.error("Error creating XPath expression", je);
+        }
+    }
+
+    private MCRMetaElement oldMappings = null;
+
+    @Override
+    protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
+        createMapping(obj);
+    }
+
+    @Override
+    protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
+        createMapping(obj);
+    }
+
+    @Override
+    protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
+        createMapping(obj);
+    }
+
+    @Override
+    protected void undoObjectCreated(MCREvent evt, MCRObject obj) {
+        undo(obj);
+    }
+
+    @Override
+    protected void undoObjectUpdated(MCREvent evt, MCRObject obj) {
+        undo(obj);
+    }
+
+    @Override
+    protected void undoObjectRepaired(MCREvent evt, MCRObject obj) {
+        undo(obj);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void createMapping(MCRObject obj) {
+        MCRMetaElement mappings = obj.getMetadata().getMetadataElement("mappings");
+        if (mappings != null) {
+            oldMappings = mappings.clone();
+            obj.getMetadata().removeMetadataElement("mappings");
+        }
+
+        try {
+            List<Element> lClassif = xpathClassifications.selectNodes(obj.getMetadata().createXML());
+            Document doc = new Document((Element) obj.getMetadata().createXML().detach());
+            lClassif = xpathClassifications.selectNodes(doc);
+            if (lClassif.size() > 0 && mappings == null) {
+                mappings = new MCRMetaElement();
+                mappings.setTag("mappings");
+                mappings.setClass(MCRMetaClassification.class);
+                mappings.setHeritable(false);
+                mappings.setNotInherit(true);
+                obj.getMetadata().setMetadataElement(mappings);
+            }
+            for (Element eClassif : lClassif) {
+                MCRCategory categ = DAO.getCategory(
+                        new MCRCategoryID(eClassif.getAttributeValue("classid"), eClassif.getAttributeValue("categid")), 0);
+                addMappings(mappings, categ);
+            }
+            if (mappings == null || mappings.size() == 0) {
+                obj.getMetadata().removeMetadataElement("mappings");
+            }
+        } catch (Exception je) {
+            LOGGER.error("Error while finding classification elements", je);
+        }
+    }
+
+    private void addMappings(MCRMetaElement mappings, MCRCategory categ) {
+        if (categ != null) {
+            MCRLabel label = categ.getLabel("x-mapping");
+            if (label != null) {
+                String[] str = label.getText().split("\\s");
+                for (String s : str) {
+                    if (s.contains(":")) {
+                        String[] mapClass = s.split(":");
+                        MCRMetaClassification metaClass = new MCRMetaClassification("mapping", 0, null, mapClass[0], mapClass[1]);
+                        mappings.addMetaObject(metaClass);
+                    }
+                }
+            }
+        }
+    }
+
+    private void undo(MCRObject obj) {
+        if (oldMappings == null) {
+            obj.getMetadata().removeMetadataElement("mappings");
+        } else {
+            MCRMetaElement mmap = obj.getMetadata().getMetadataElement("mappings");
+
+            for (int i = 0; i < oldMappings.size(); i++) {
+                mmap.addMetaObject(oldMappings.getElement(i));
+            }
+        }
+    }
+}

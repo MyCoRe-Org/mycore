@@ -23,7 +23,6 @@
 package org.mycore.oai;
 
 import org.jdom.Element;
-import org.mycore.common.MCRConstants;
 
 /**
  * Implements the ListRecords request

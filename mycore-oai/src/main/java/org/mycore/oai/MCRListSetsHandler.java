@@ -20,7 +20,6 @@
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
-
 package org.mycore.oai;
 import static org.mycore.oai.MCROAIConstants.ARG_RESUMPTION_TOKEN;
 import static org.mycore.oai.MCROAIConstants.ERROR_BAD_RESUMPTION_TOKEN;
@@ -38,6 +37,7 @@ import java.util.Set;
 import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.oai.classmapping.MCRClassificationAndSetMapper;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRQueryManager;
@@ -115,8 +115,15 @@ class MCRListSetsHandler extends MCRVerbHandler {
             Element resolved = MCRURIResolver.instance().resolve(uri);
             for (Element set : (List<Element>) (resolved.getChildren("set", NS_OAI))) {
                 String setSpec = set.getChildText("setSpec", NS_OAI);
-                if (!setSpecs.contains(setSpec))
-                    sets.add((Element) (set.clone()));
+                if (!setSpecs.contains(setSpec)){
+                    Element setClone = (Element) set.clone();
+                    if (setSpec.contains(":")) {
+                        String classID = setSpec.substring(0, setSpec.indexOf(':')).trim();
+                        classID = MCRClassificationAndSetMapper.mapClassificationToSet(provider.getAdapter().prefix, classID);
+                        setClone.getChild("setSpec", NS_OAI).setText(classID+setSpec.substring(setSpec.indexOf(':')));  
+                    }
+                    sets.add((Element) (setClone));
+                }
             }
         }
 
@@ -149,7 +156,6 @@ class MCRListSetsHandler extends MCRVerbHandler {
                     setSpecs.add(setSpec);
             }
         }
-
         output.addContent(sets);
     }
 }
