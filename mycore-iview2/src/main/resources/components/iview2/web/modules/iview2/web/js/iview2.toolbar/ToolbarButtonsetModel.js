@@ -52,10 +52,10 @@ ToolbarButtonsetModel.prototype = {
     addButton : function(button, index) {
     	button.relatedButtonset = this;
     	
-    	var myself = this;
+    	var that = this;
     	// Events aus dem Button-Model "weiterleiten"
     	jQuery(button).bind("changeState changeLoading changeActive", function (e, val) {
-	    	jQuery(myself).trigger(e.type, jQuery.extend(val, {'buttonName' : button.elementName}));
+	    	jQuery(that).trigger(e.type, jQuery.extend(val, {'buttonName' : button.elementName}));
 	    });
     	
      	if (!isNaN(index)) {

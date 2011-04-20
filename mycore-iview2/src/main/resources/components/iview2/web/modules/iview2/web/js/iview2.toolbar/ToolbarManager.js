@@ -56,11 +56,11 @@ ToolbarManager.prototype = {
 	 * @param 		{Object} model defines the whole toolbar model
 	 */
     addModel : function(model) {
-    	var myself = this;
+    	var that = this;
     	
     	// pass events from the toolbar model
     	jQuery(model).bind("changeState changeActive changeLoading add del", function (e, val) {
-	    	jQuery(myself).trigger(e.type, jQuery.extend(val, {'modelId' : model.id}));
+	    	jQuery(that).trigger(e.type, jQuery.extend(val, {'modelId' : model.id}));
 	    });
     	
     	this.models[this.models.length] = model;

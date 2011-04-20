@@ -52,7 +52,7 @@ ToolbarController.prototype.addView = function(view) {
   		});
   	}
 	
-	var myself = this;
+	var that = this;
 	this.views[view.id] = view;
 	
 	jQuery(view)
@@ -61,64 +61,64 @@ ToolbarController.prototype.addView = function(view) {
 				if (args.elementName == "zoomIn") {
 					// FitToScreen - Button wieder reseten
 					// FitToWidth - Button wieder reseten
-					myself.perform("setSubtypeState", false, args.parentName, "fitToWidth");
-					myself.perform("setSubtypeState", false, args.parentName, "fitToScreen");
+					that.perform("setSubtypeState", false, args.parentName, "fitToWidth");
+					that.perform("setSubtypeState", false, args.parentName, "fitToScreen");
 	
-	    			myself.getViewer().gen.zoomViewer(true);
+	    			that.getViewer().gen.zoomViewer(true);
 				} else if (args.elementName == "zoomOut") {
 					// FitToScreen - Button wieder reseten
 					// FitToWidth - Button wieder reseten
-					myself.perform("setSubtypeState", false, args.parentName, "fitToWidth");
-					myself.perform("setSubtypeState", false, args.parentName, "fitToScreen");
+					that.perform("setSubtypeState", false, args.parentName, "fitToWidth");
+					that.perform("setSubtypeState", false, args.parentName, "fitToScreen");
 	 
-	        			myself.getViewer().gen.zoomViewer(false);
+	        			that.getViewer().gen.zoomViewer(false);
 	    			} else if (args.elementName == "fitToWidth") {
 					// FitToScreen - Button wieder reseten
-					myself.perform("setSubtypeState", true, args.parentName, "fitToWidth");
-					myself.perform("setSubtypeState", false, args.parentName, "fitToScreen");
+					that.perform("setSubtypeState", true, args.parentName, "fitToWidth");
+					that.perform("setSubtypeState", false, args.parentName, "fitToScreen");
 	
-	    			myself.getViewer().gen.pictureWidth();
+	    			that.getViewer().gen.pictureWidth();
 				} else if (args.elementName == "fitToScreen") {    				
 					// FitToWidth - Button wieder reseten
-					myself.perform("setSubtypeState", false, args.parentName, "fitToWidth");
-					myself.perform("setSubtypeState", true, args.parentName, "fitToScreen");
+					that.perform("setSubtypeState", false, args.parentName, "fitToWidth");
+					that.perform("setSubtypeState", true, args.parentName, "fitToScreen");
 	  
-	    				myself.getViewer().gen.pictureScreen();
+	    				that.getViewer().gen.pictureScreen();
 	    			}
 	    		} else if (args.parentName == "overviewHandles") {
 				if (args.elementName == "openOverview") {
 					var button = new Object;
 					button.setLoading = function(loading) {
-						myself.perform("setLoading", loading, args.parentName, args.elementName);
+						that.perform("setLoading", loading, args.parentName, args.elementName);
 					}
 					button.setSubtypeState = function(state) {
-						myself.perform("setSubtypeState", state, args.parentName, args.elementName);
+						that.perform("setSubtypeState", state, args.parentName, args.elementName);
 					}
-					myself.getViewer().gen.openOverview(button);
+					that.getViewer().gen.openOverview(button);
 				} else if (args.elementName == "openChapter") {
 					var button = new Object;
 					button.setLoading = function(loading) {
-						myself.perform("setLoading", loading, args.parentName, args.elementName);
+						that.perform("setLoading", loading, args.parentName, args.elementName);
 					}
-					myself.getViewer().gen.openChapter(button);
+					that.getViewer().gen.openChapter(button);
 				}
 			} else if (args.parentName == "navigateHandles" || args.parentName == "previewForward" || args.parentName == "previewBack") {
 				if (args.elementName == "backward") {
-					myself.getViewer().PhysicalModel.setPrevious();
+					that.getViewer().PhysicalModel.setPrevious();
 				} else if (args.elementName == "forward") {
-					myself.getViewer().PhysicalModel.setNext();
+					that.getViewer().PhysicalModel.setNext();
 				}
 			} else if (args.parentName == "permalinkHandles") {
 				if (args.elementName == "permalink") {
 					var button = new Object;
 					button.setLoading = function(loading) {
-						myself.perform("setLoading", loading, args.parentName, args.elementName);
+						that.perform("setLoading", loading, args.parentName, args.elementName);
 					}
-					myself.getViewer().gen.openPermalink(button);
+					that.getViewer().gen.openPermalink(button);
 				}
 			} else if (args.parentName == "closeHandles") {
 				if (args.elementName == "close") {
-					myself.getViewer().gen.maximizeHandler();
+					that.getViewer().gen.maximizeHandler();
 				}
 			}
 		})
@@ -126,8 +126,8 @@ ToolbarController.prototype.addView = function(view) {
 	    	// this is more than a button
 	    	if (args.parentName == "overviewHandles") {
     			if (args.elementName == "openChapter") {
-    				if (myself.getViewer().chapter && myself.getViewer().chapter.getActive()) {
-    					myself.perform("setSubtypeState", true, args.parentName, args.elementName);
+    				if (that.getViewer().chapter && that.getViewer().chapter.getActive()) {
+    					that.perform("setSubtypeState", true, args.parentName, args.elementName);
     				}
     			}
 	    	} else if (args.parentName == "navigateHandles") {
@@ -136,7 +136,7 @@ ToolbarController.prototype.addView = function(view) {
 			    	args.view.addClass("iview2-button-icon-dropdown");
 			      	args.view.menu({
 			      		// content list to navigate
-					    content: myself.getViewer().my.container.find('#pages').html(),
+					    content: that.getViewer().my.container.find('#pages').html(),
 					    /*width: 100,*/
 					    maxHeight: 280,
 					    positionOpts: {
@@ -154,22 +154,22 @@ ToolbarController.prototype.addView = function(view) {
 								args.view.button( "option", "label", jQuery(item).text());
 								var content = (jQuery(item).text());
 								var page = content.substring(content.lastIndexOf('[') + 1, content.lastIndexOf(']'));
-								myself.getViewer().PhysicalModel.setPosition(page);
+								that.getViewer().PhysicalModel.setPosition(page);
 						}
 					});
 			      	// MainTbView erst nachträglich geladen, Mets zuvor gelesen
-			      	if (myself.getViewer().PhysicalModel) {
-				      	var initContent = jQuery(jQuery('#pages').find('a')[myself.getViewer().PhysicalModel.getCurPos() - 1]).html();
-				      	myself.updateDropDown(initContent);
+			      	if (that.getViewer().PhysicalModel) {
+				      	var initContent = jQuery(jQuery('#pages').find('a')[that.getViewer().PhysicalModel.getCurPos() - 1]).html();
+				      	that.updateDropDown(initContent);
 				      	
 				      	// chapter and overview need to wait for METS informations
-				      	myself.perform("setActive", true, 'overviewHandles', 'openChapter');
-				      	myself.perform("setActive", true, 'overviewHandles', 'openOverview');
+				      	that.perform("setActive", true, 'overviewHandles', 'openChapter');
+				      	that.perform("setActive", true, 'overviewHandles', 'openOverview');
 			      	}
 	    		}
 	    	} else if (args.parentName == "permalinkHandles") {
     			if (args.elementName == "permalink") {
-    				if (typeof myself.getViewer().getPermalinkCtrl !== "undefined" && myself.getViewer().getPermalinkCtrl().getActive()) {
+    				if (typeof that.getViewer().getPermalinkCtrl !== "undefined" && that.getViewer().getPermalinkCtrl().getActive()) {
     					// TODO: Model for Permalink
 			    		jQuery(view.toolbar).find("."+args.parentName+" .permalink")[0].checked = true;
 			    		jQuery(view.toolbar).find("."+args.parentName+" .permalinkLabel").addClass("ui-state-active");
@@ -191,7 +191,7 @@ ToolbarController.prototype.addView = function(view) {
  * @throws		{toolbarloaded} event on document Node after new Model is added to Controller
  */
 ToolbarController.prototype.catchModels = function() {
-	var myself = this;
+	var that = this;
 
 	var toolbarMgr = this.getViewer().getToolbarMgr();
 	var models = toolbarMgr.getModels();
@@ -199,18 +199,18 @@ ToolbarController.prototype.catchModels = function() {
 	// attach listeners to ToolbarManager
     jQuery(toolbarMgr).bind("changeState changeLoading changeActive add del destroy new", function (e, args) {
     	if (e.type == "new") {
-	    	myself._checkNewModel(toolbarMgr.getModel(args.modelId));
+	    	that._checkNewModel(toolbarMgr.getModel(args.modelId));
 	    } else {
 	    	// use the right view for the current model
-			var curViewIds = myself.relations[args.modelId];
+			var curViewIds = that.relations[args.modelId];
 			
 			// process for each view
 			for (var i = 0; i < curViewIds.length; i++) {
-				var curView = myself.views[curViewIds[i]];
+				var curView = that.views[curViewIds[i]];
 				switch (e.type) {
 				case "destroy":
 		    		curView.destroy();
-		    		delete(myself.views[myself.relations[args.modelId]]);
+		    		delete(that.views[that.relations[args.modelId]]);
 		    	break;
 				case "add":
 		    		if (args.element) {

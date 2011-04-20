@@ -206,14 +206,14 @@ ToolbarView.prototype = {
 	 */
     addButton : function (args) {
     	var myButtonset = this.getToolbarElement(args.parentName);
-    	var myView = this;
+    	var that = this;
     	
 		var newButton = null;
 
 		var onClick = function(event) {
 				if (jQuery(this).attr("aria-disabled") == "true") return false;
 				getEvent(event).cancelBubble = true;
-    			jQuery(myView).trigger("press", {'elementName' : args.elementName, 'parentName' : args.parentName, 'view' : newButton});
+    			jQuery(that).trigger("press", {'elementName' : args.elementName, 'parentName' : args.parentName, 'view' : newButton});
     			return false;
     		};
 

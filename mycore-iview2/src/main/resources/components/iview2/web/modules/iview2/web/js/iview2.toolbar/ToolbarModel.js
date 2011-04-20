@@ -64,7 +64,7 @@ ToolbarModel.prototype = {
     addElement : function(element, index) {
     	element.relatedToolbar = this;
     	
-    	var myself = this;
+    	var that = this;
     	
     	if (!isNaN(index)) {
      		this.elements = this.elements.slice(0, index).concat(element, this.elements.slice(index, this.elements.length));
@@ -77,7 +77,7 @@ ToolbarModel.prototype = {
     	if (element.type == "buttonset") {
     		// Events aus dem Buttonset-Model "weiterleiten"
     		jQuery(element).bind("changeState changeLoading changeActive add del", function (e, val) {
-    			jQuery(myself).trigger(e.type, jQuery.extend(val, {'elementName' : element.elementName}));
+    			jQuery(that).trigger(e.type, jQuery.extend(val, {'elementName' : element.elementName}));
     		});
     		jQuery(element.buttons).each(function() {
     			jQuery(element).trigger("add", {"button": 
