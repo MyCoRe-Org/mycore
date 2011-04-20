@@ -12,7 +12,6 @@
  */
 var ToolbarManager = function () {
 	this.models = [];
-	this.events = new iview.Event(this);
 	this.changes = [];
 };
 
@@ -51,7 +50,7 @@ ToolbarManager.prototype = {
 	 * @public
 	 * @function
 	 * @name		addModel
-	 * @memberOf	ToolbarModel#
+	 * @memberOf	ToolbarManager#
 	 * @description adds a single toolbar model to the toolbar manager,
 	 *  notify the event-listener (to pass the informations)
 	 * @param 		{Object} model defines the whole toolbar model
@@ -60,12 +59,12 @@ ToolbarManager.prototype = {
     	var myself = this;
     	
     	// pass events from the toolbar model
-    	model.events.attach(function (sender, args) {
-	    	myself.events.notify(jQuery.extend(args, {'modelId' : model.id}));
+    	jQuery(model).bind("changeState changeActive changeLoading add del", function (e, val) {
+	    	jQuery(myself).trigger(e.type, jQuery.extend(val, {'modelId' : model.id}));
 	    });
     	
     	this.models[this.models.length] = model;
-	    this.events.notify({'type' : 'new', 'modelId' : model.id});
+	    jQuery(this).trigger('new', {'modelId' : model.id});
 	    
     	// are there any durable changes to perform
     	if (this.changes[model.id]) {
@@ -77,7 +76,7 @@ ToolbarManager.prototype = {
 	 * @public
 	 * @function
 	 * @name		destroyModel
-	 * @memberOf	ToolbarModel#
+	 * @memberOf	ToolbarManager#
 	 * @description removes a single toolbar model from the toolbar manager,
 	 *  notify the event-listener (to pass the informations)
 	 * @param		{String} id identifies the toolbar model
@@ -85,7 +84,7 @@ ToolbarManager.prototype = {
     destroyModel : function(id) {
     	for (var i = 0; i < this.models.length; i++) {
     		if (this.models[i].id == id) {
-    			this.events.notify({'type' : 'destroy', 'modelId' : this.models[i].id});
+    			jQuery(this).trigger('destroy', {'modelId' : this.models[i].id});
     			this.models.splice(i, 1);
     			return;
     		}
@@ -96,7 +95,7 @@ ToolbarManager.prototype = {
 	 * @public
 	 * @function
 	 * @name		change
-	 * @memberOf 	ToolbarModel#
+	 * @memberOf 	ToolbarManager#
 	 * @description defines durable changes to a special model,
 	 *  so these changes will perform after each instancing such a model
 	 * @param		{String} modeId defines the id of a special model

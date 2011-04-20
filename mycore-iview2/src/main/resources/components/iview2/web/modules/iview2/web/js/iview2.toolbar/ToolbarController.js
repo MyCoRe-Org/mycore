@@ -55,73 +55,74 @@ ToolbarController.prototype.addView = function(view) {
 	var myself = this;
 	this.views[view.id] = view;
 	
-	view.events.attach(function (sender, args) {
-    	if (args.type == "press") {
-    		if (args.parentName == "zoomHandles") {
-    			if (args.elementName == "zoomIn") {
-    				// FitToScreen - Button wieder reseten
-    				// FitToWidth - Button wieder reseten
-    				myself.perform("setSubtypeState", false, args.parentName, "fitToWidth");
-    				myself.perform("setSubtypeState", false, args.parentName, "fitToScreen");
-
-        			myself.getViewer().gen.zoomViewer(true);
-    			} else if (args.elementName == "zoomOut") {
-    				// FitToScreen - Button wieder reseten
-    				// FitToWidth - Button wieder reseten
-    				myself.perform("setSubtypeState", false, args.parentName, "fitToWidth");
-    				myself.perform("setSubtypeState", false, args.parentName, "fitToScreen");
- 
-        			myself.getViewer().gen.zoomViewer(false);
-    			} else if (args.elementName == "fitToWidth") {
-    				// FitToScreen - Button wieder reseten
-    				myself.perform("setSubtypeState", true, args.parentName, "fitToWidth");
-    				myself.perform("setSubtypeState", false, args.parentName, "fitToScreen");
-
-        			myself.getViewer().gen.pictureWidth();
-    			} else if (args.elementName == "fitToScreen") {    				
-    				// FitToWidth - Button wieder reseten
-    				myself.perform("setSubtypeState", false, args.parentName, "fitToWidth");
-    				myself.perform("setSubtypeState", true, args.parentName, "fitToScreen");
-  
-    				myself.getViewer().gen.pictureScreen();
-    			}
-    		} else if (args.parentName == "overviewHandles") {
-    			if (args.elementName == "openOverview") {
-    				var button = new Object;
-    				button.setLoading = function(loading) {
-    					myself.perform("setLoading", loading, args.parentName, args.elementName);
-    				}
-    				button.setSubtypeState = function(state) {
-    					myself.perform("setSubtypeState", state, args.parentName, args.elementName);
-    				}
-    				myself.getViewer().gen.openOverview(button);
-    			} else if (args.elementName == "openChapter") {
-    				var button = new Object;
-    				button.setLoading = function(loading) {
-    					myself.perform("setLoading", loading, args.parentName, args.elementName);
-    				}
-    				myself.getViewer().gen.openChapter(button);
-    			}
-    		} else if (args.parentName == "navigateHandles" || args.parentName == "previewForward" || args.parentName == "previewBack") {
-    			if (args.elementName == "backward") {
-    				myself.getViewer().PhysicalModel.setPrevious();
-    			} else if (args.elementName == "forward") {
-    				myself.getViewer().PhysicalModel.setNext();
-    			}
-    		} else if (args.parentName == "permalinkHandles") {
-    			if (args.elementName == "permalink") {
-    				var button = new Object;
-    				button.setLoading = function(loading) {
-    					myself.perform("setLoading", loading, args.parentName, args.elementName);
-    				}
-    				myself.getViewer().gen.openPermalink(button);
-    			}
-    		} else if (args.parentName == "closeHandles") {
-    			if (args.elementName == "close") {
-    				myself.getViewer().gen.maximizeHandler();
-    			}		
-    		}
-	    } else if (args.type == "new") {
+	jQuery(view)
+		.bind("press", function (e, args) {
+			if (args.parentName == "zoomHandles") {
+				if (args.elementName == "zoomIn") {
+					// FitToScreen - Button wieder reseten
+					// FitToWidth - Button wieder reseten
+					myself.perform("setSubtypeState", false, args.parentName, "fitToWidth");
+					myself.perform("setSubtypeState", false, args.parentName, "fitToScreen");
+	
+	    			myself.getViewer().gen.zoomViewer(true);
+				} else if (args.elementName == "zoomOut") {
+					// FitToScreen - Button wieder reseten
+					// FitToWidth - Button wieder reseten
+					myself.perform("setSubtypeState", false, args.parentName, "fitToWidth");
+					myself.perform("setSubtypeState", false, args.parentName, "fitToScreen");
+	 
+	        			myself.getViewer().gen.zoomViewer(false);
+	    			} else if (args.elementName == "fitToWidth") {
+					// FitToScreen - Button wieder reseten
+					myself.perform("setSubtypeState", true, args.parentName, "fitToWidth");
+					myself.perform("setSubtypeState", false, args.parentName, "fitToScreen");
+	
+	    			myself.getViewer().gen.pictureWidth();
+				} else if (args.elementName == "fitToScreen") {    				
+					// FitToWidth - Button wieder reseten
+					myself.perform("setSubtypeState", false, args.parentName, "fitToWidth");
+					myself.perform("setSubtypeState", true, args.parentName, "fitToScreen");
+	  
+	    				myself.getViewer().gen.pictureScreen();
+	    			}
+	    		} else if (args.parentName == "overviewHandles") {
+				if (args.elementName == "openOverview") {
+					var button = new Object;
+					button.setLoading = function(loading) {
+						myself.perform("setLoading", loading, args.parentName, args.elementName);
+					}
+					button.setSubtypeState = function(state) {
+						myself.perform("setSubtypeState", state, args.parentName, args.elementName);
+					}
+					myself.getViewer().gen.openOverview(button);
+				} else if (args.elementName == "openChapter") {
+					var button = new Object;
+					button.setLoading = function(loading) {
+						myself.perform("setLoading", loading, args.parentName, args.elementName);
+					}
+					myself.getViewer().gen.openChapter(button);
+				}
+			} else if (args.parentName == "navigateHandles" || args.parentName == "previewForward" || args.parentName == "previewBack") {
+				if (args.elementName == "backward") {
+					myself.getViewer().PhysicalModel.setPrevious();
+				} else if (args.elementName == "forward") {
+					myself.getViewer().PhysicalModel.setNext();
+				}
+			} else if (args.parentName == "permalinkHandles") {
+				if (args.elementName == "permalink") {
+					var button = new Object;
+					button.setLoading = function(loading) {
+						myself.perform("setLoading", loading, args.parentName, args.elementName);
+					}
+					myself.getViewer().gen.openPermalink(button);
+				}
+			} else if (args.parentName == "closeHandles") {
+				if (args.elementName == "close") {
+					myself.getViewer().gen.maximizeHandler();
+				}
+			}
+		})
+	    .bind("new", function(e, args) {
 	    	// this is more than a button
 	    	if (args.parentName == "overviewHandles") {
     			if (args.elementName == "openChapter") {
@@ -175,8 +176,7 @@ ToolbarController.prototype.addView = function(view) {
 			    	}
     			}
 	    	}
-	    }
-    });
+	    });
 };
 
 /**
@@ -197,9 +197,8 @@ ToolbarController.prototype.catchModels = function() {
 	var models = toolbarMgr.getModels();
 	
 	// attach listeners to ToolbarManager
-    toolbarMgr.events.attach(function (sender, args) {
-    	
-    	if (args.type == "new") {
+    jQuery(toolbarMgr).bind("changeState changeLoading changeActive add del destroy new", function (e, args) {
+    	if (e.type == "new") {
 	    	myself._checkNewModel(toolbarMgr.getModel(args.modelId));
 	    } else {
 	    	// use the right view for the current model
@@ -208,7 +207,7 @@ ToolbarController.prototype.catchModels = function() {
 			// process for each view
 			for (var i = 0; i < curViewIds.length; i++) {
 				var curView = myself.views[curViewIds[i]];
-				switch (args.type) {
+				switch (e.type) {
 				case "destroy":
 		    		curView.destroy();
 		    		delete(myself.views[myself.relations[args.modelId]]);
@@ -299,12 +298,12 @@ ToolbarController.prototype._checkNewModel = function(model) {
 	for (var i = 0; i < model.elements.length; i++) {
 		
 		// notify views for ModelProvider elements
-		model.events.notify({'type' : "add", 'element' : model.elements[i]});
+		jQuery(model).trigger("add", {'element' : model.elements[i]});
 		if (model.elements[i].type == "buttonset") {
 
 			// notify views for buttons
 			for (var k = 0; k < model.elements[i].buttons.length; k++) {
-				model.elements[i].events.notify({'type' : "add", 'button' :model.elements[i].buttons[k]});
+				jQuery(model.elements[i]).trigger("add", {'button' :model.elements[i].buttons[k]});
 			}
 		}
 	}

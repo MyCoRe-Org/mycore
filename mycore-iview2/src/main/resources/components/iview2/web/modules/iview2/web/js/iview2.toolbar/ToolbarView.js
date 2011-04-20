@@ -11,7 +11,6 @@
  */
 var ToolbarView = function (id, parent, i18n) {
     this.id = id;
-    this.events = new iview.Event(this);
     this.i18n = i18n;
     
     var newToolbar = jQuery('<div>').addClass(id).addClass('toolbar ui-widget-header ui-corner-all ui-helper-clearfix').appendTo(parent);
@@ -214,9 +213,10 @@ ToolbarView.prototype = {
 		var onClick = function(event) {
 				if (jQuery(this).attr("aria-disabled") == "true") return false;
 				getEvent(event).cancelBubble = true;
-    			myView.events.notify({'type' : "press", 'elementName' : args.elementName, 'parentName' : args.parentName, 'view' : newButton});
+    			jQuery(myView).trigger("press", {'elementName' : args.elementName, 'parentName' : args.parentName, 'view' : newButton});
     			return false;
     		};
+
 		if (args.subtype.type == "buttonDefault") {
     		newButton = jQuery('<button>').addClass(args.elementName).click(onClick);
     		jQuery(this.i18n.executeWhenLoaded(function(i) {newButton.attr("title", i.translate(args.captionId))}))
@@ -259,7 +259,7 @@ ToolbarView.prototype = {
     	}
 
     	this._checkButtonStyle({'buttonset' : myButtonset, 'buttonIndex' : curIndex, 'reason' : "add"});
-    	this.events.notify({'type' : "new", 'elementName' : args.elementName, 'parentName' : args.parentName, 'view' : newButton});
+    	jQuery(this).trigger("new", {'elementName' : args.elementName, 'parentName' : args.parentName, 'view' : newButton});
     },
     
     /**

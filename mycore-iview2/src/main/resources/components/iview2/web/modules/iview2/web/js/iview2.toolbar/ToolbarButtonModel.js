@@ -26,8 +26,6 @@ var ToolbarButtonModel = function (elementName, subtype, ui, captionId, active, 
     this.loading = loading;
     // will set indirectly while adding
     this.relatedButtonset = null;
-    
-    this.events = new iview.Event(this);
 };
 
 ToolbarButtonModel.prototype = {
@@ -41,7 +39,7 @@ ToolbarButtonModel.prototype = {
 		 */
 		setActive: function(active) {
 			this.active = active;
-			this.events.notify({'type' : "changeActive", 'active' : this.active});
+			jQuery(this).trigger("changeActive", {'active' : this.active});
 		},
 		
 		/**
@@ -54,7 +52,7 @@ ToolbarButtonModel.prototype = {
 		 */
 		setLoading: function(loading) {
 			this.loading = loading;
-			this.events.notify({'type' : "changeLoading", 'loading' : this.loading});
+			jQuery(this).trigger("changeLoading", {'loading' : this.loading});
 		},
 		
 		/**
@@ -67,7 +65,7 @@ ToolbarButtonModel.prototype = {
 		 */
 		setSubtypeState: function(state) {
 			this.subtype.state = state;
-			this.events.notify({'type' : "changeState", 'state' : this.subtype.state});
+			jQuery(this).trigger("changeState", {'state' : this.subtype.state});
 		},
 		
 		/**
@@ -79,6 +77,6 @@ ToolbarButtonModel.prototype = {
 		 */
 		changeSubtypeState: function() {
 			this.subtype.state = !this.subtype.state;
-			this.events.notify({'type' : "changeState", 'state' : this.subtype.state});
+			jQuery(this).trigger("changeState", {'state' : this.subtype.state});
 		}
 }

@@ -13,8 +13,6 @@
 var ToolbarModel = function (id) {
     this.id = id;
     this.elements = [];
-    
-    this.events = new iview.Event(this);
 };
 
 ToolbarModel.prototype = {
@@ -70,19 +68,19 @@ ToolbarModel.prototype = {
     	
     	if (!isNaN(index)) {
      		this.elements = this.elements.slice(0, index).concat(element, this.elements.slice(index, this.elements.length));
-     		this.events.notify({'type' : "add", 'element' : jQuery.extend(element, {'index' : index})});
+     		jQuery(this).trigger("add", {'element' : jQuery.extend(element, {'index' : index})});
      	} else {
 			this.elements.push(element);
-			this.events.notify({'type' : "add", 'element' : element});
+			jQuery(this).trigger("add", {'element' : element});
      	}
      	
     	if (element.type == "buttonset") {
     		// Events aus dem Buttonset-Model "weiterleiten"
-    		element.events.attach(function (sender, args) {
-    			myself.events.notify(jQuery.extend(args, {'elementName' : element.elementName}));
+    		jQuery(element).bind("changeState changeLoading changeActive add del", function (e, val) {
+    			jQuery(myself).trigger(e.type, jQuery.extend(val, {'elementName' : element.elementName}));
     		});
     		jQuery(element.buttons).each(function() {
-    			element.events.notify({"type":"add", "button": 
+    			jQuery(element).trigger("add", {"button": 
     			{
     				"elementName":this.elementName,
     				"type" : this.type,
@@ -110,6 +108,6 @@ ToolbarModel.prototype = {
     removeElement : function(elementName) {
      	var element = this.getElement(elementName);
      	this.elements.splice(element.index, 1);
-     	this.events.notify({'type' : "del", 'element' : element});
+     	jQuery(this).trigger("del", {'element' : element});
     }
 };

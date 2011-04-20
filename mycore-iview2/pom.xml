@@ -44,8 +44,6 @@
                 <jsSourceFile>PanoJS.js</jsSourceFile>
                 <!-- Viewer -->
                 <jsSourceFile>init.js</jsSourceFile>
-                <jsSourceFile>Event.js</jsSourceFile>
-                <!-- Event Registration utility -->
                 <jsSourceFile>chapter.js</jsSourceFile>
                 <!-- Chapter -->
                 <jsSourceFile>overview.js</jsSourceFile>

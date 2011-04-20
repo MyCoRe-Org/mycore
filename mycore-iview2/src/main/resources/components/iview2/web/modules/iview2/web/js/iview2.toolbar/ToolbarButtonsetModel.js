@@ -18,8 +18,6 @@ var ToolbarButtonsetModel = function (elementName) {
     this.buttons = [];
     // will set indirectly while adding
     this.relatedToolbar = null;
-
-    this.events = new iview.Event(this);
 };
 
 ToolbarButtonsetModel.prototype = {
@@ -56,16 +54,16 @@ ToolbarButtonsetModel.prototype = {
     	
     	var myself = this;
     	// Events aus dem Button-Model "weiterleiten"
-    	button.events.attach(function (sender, args) {
-	    	myself.events.notify(jQuery.extend(args, {'buttonName' : button.elementName}));
+    	jQuery(button).bind("changeState changeLoading changeActive", function (e, val) {
+	    	jQuery(myself).trigger(e.type, jQuery.extend(val, {'buttonName' : button.elementName}));
 	    });
     	
      	if (!isNaN(index)) {
      		this.buttons = this.buttons.slice(0, index).concat(button, this.buttons.slice(index, this.buttons.length));
-     		this.events.notify({'type' : "add", 'button' : jQuery.extend(button, {'index' : index})});
+     		jQuery(this).trigger("add", {'button' : jQuery.extend(button, {'index' : index})});
      	} else {
      		this.buttons.push(button);
-			this.events.notify({'type' : "add", 'button' : button});
+			jQuery(this).trigger("add", {'button' : button});
      	}
     },
 
@@ -80,6 +78,6 @@ ToolbarButtonsetModel.prototype = {
     removeButton : function(buttonName) {
      	var button = this.getButton(buttonName);
      	this.buttons.splice(button.index, 1);
-     	this.events.notify({'type' : "del", 'button' : button});
+     	jQuery(this).trigger("del", {'button' : button});
     }
 };
