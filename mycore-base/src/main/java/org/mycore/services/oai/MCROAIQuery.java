@@ -33,6 +33,10 @@ import java.util.List;
  * This is an interface which encapsulates the functions needed for the
  * communication with the datastore. All functions which are MyCoRe or Miless
  * specific should be implemented here.
+ *
+ * @deprecated 
+ *  code will be removed after the next releasee
+ *  use new implementation from MyCoRe oai module
  */
 public interface MCROAIQuery {
     /**

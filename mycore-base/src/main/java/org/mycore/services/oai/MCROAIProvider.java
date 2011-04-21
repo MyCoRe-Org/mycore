@@ -92,7 +92,12 @@ import org.mycore.tools.MCRObjectFactory;
  * @author Werner Greßhoff
  * @author Heiko Helmbrecht
  * @version $Revision$ $Date$
+ * 
+ * @deprecated 
+ *  code will be removed after the next releasee
+ *  use new implementation from MyCoRe oai module
  */
+
 public class MCROAIProvider extends MCRServlet {
     /**
      * <code>serialVersionUID</code> introduced for compatibility with JDK 1.4

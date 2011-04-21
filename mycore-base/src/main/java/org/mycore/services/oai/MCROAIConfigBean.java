@@ -7,6 +7,11 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 
+/**
+ * @deprecated 
+ *  code will be removed after the next releasee
+ *  use new implementation from MyCoRe oai module
+ */
 public class MCROAIConfigBean {
 
     private static MCRConfiguration config = MCRConfiguration.instance();

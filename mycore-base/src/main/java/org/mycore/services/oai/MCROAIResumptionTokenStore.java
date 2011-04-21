@@ -13,7 +13,12 @@ import java.util.List;
  *
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
+ *
+ * @deprecated 
+ *  code will be removed after the next releasee
+ *  use new implementation from MyCoRe oai module
  */
+
 public interface MCROAIResumptionTokenStore {
 
     public List<String[]> getResumptionTokenHits(String resumptionTokenID, int requestedSize, int maxResults);

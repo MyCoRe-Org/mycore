@@ -49,6 +49,10 @@ import org.mycore.services.fieldquery.MCRResults;
  * @author Heiko Helmbrecht
  * @version $Revision$ $Date$ This is the MyCoRe-Implementation of the
  *          <i>MCROAIQuery </i>-Interface.
+ *
+ * @deprecated 
+ *  code will be removed after the next releasee
+ *  use new implementation from MyCoRe oai module
  */
 public class MCROAIQueryImpl implements MCROAIQuery {
 
