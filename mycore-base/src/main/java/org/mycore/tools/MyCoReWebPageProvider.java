@@ -38,9 +38,9 @@ import org.mycore.frontend.servlets.MCRServlet;
  * </code>
  * 
  * @author shermann
+ * @author Matthias Eichner
  */
 public class MyCoReWebPageProvider {
-    public static final String MYCORE_WEBPAGE = "MyCoReWebPage";
 
     /** German language key */
     public static final String EN = "en";
@@ -48,12 +48,26 @@ public class MyCoReWebPageProvider {
     /** English language key */
     public static final String DE = "de";
 
+    public static final String XML_MYCORE_WEBPAGE = "MyCoReWebPage";
+    public static final String XML_SECTION = "section";
+    public static final String XML_LANG = "lang";
+    public static final String XML_TITLE = "title";
+    public static final String XML_META = "meta";
+    public static final String XML_LOG = "log";
+    public static final String XML_LASTEDITOR = "lastEditor";
+    public static final String XML_LABELPATH = "labelPath";
+    public static final String XML_DATE = "date";
+    public static final String XML_TIME = "time";
+
+    public static final String DATE_FORMAT = "yyyy-MM-dd";
+    public static final String TIME_FORMAT = "HH:mm";
+
     private Document xml;
 
     public MyCoReWebPageProvider() {
         this.xml = new Document();
-        this.xml.setDocType(new DocType(MYCORE_WEBPAGE));
-        this.xml.setRootElement(new Element(MYCORE_WEBPAGE));
+        this.xml.setDocType(new DocType(XML_MYCORE_WEBPAGE));
+        this.xml.setRootElement(new Element(XML_MYCORE_WEBPAGE));
     }
 
     /**
@@ -85,12 +99,12 @@ public class MyCoReWebPageProvider {
      * @return added section
      */
     public Element addSection(String title, Content content, String lang) {
-        Element section = new Element("section");
+        Element section = new Element(XML_SECTION);
         if(lang != null) {
-            section.setAttribute("lang", lang, Namespace.XML_NAMESPACE);
+            section.setAttribute(XML_LANG, lang, Namespace.XML_NAMESPACE);
         }
         if (title != null && !title.equals("")) {
-            section.setAttribute("title", title);
+            section.setAttribute(XML_TITLE, title);
         }
         section.addContent(content);
         this.xml.getRootElement().addContent(section);
@@ -105,28 +119,28 @@ public class MyCoReWebPageProvider {
      */
     public void updateMeta(String editor, String labelPath) {
         // get meta & log element
-        Element meta = this.xml.getRootElement().getChild("meta");
+        Element meta = this.xml.getRootElement().getChild(XML_META);
         if(meta == null) {
-            meta = new Element("meta");
+            meta = new Element(XML_META);
             this.xml.getRootElement().addContent(meta);
         }
-        Element log = meta.getChild("log");
+        Element log = meta.getChild(XML_LOG);
         if(log == null) {
-            log = new Element("log");
+            log = new Element(XML_LOG);
             meta.addContent(log);
         }
         // update attributes
         if(editor != null) {
-            log.setAttribute("lastEditor", editor);
+            log.setAttribute(XML_LASTEDITOR, editor);
         }
         if(labelPath != null) {
-            log.setAttribute("labelPath", labelPath);
+            log.setAttribute(XML_LABELPATH, labelPath);
         }
         Date date = new Date(System.currentTimeMillis());
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        log.setAttribute("date", dateFormat.format(date));
-        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
-        log.setAttribute("time", timeFormat.format(date));
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+        log.setAttribute(XML_DATE, dateFormat.format(date));
+        SimpleDateFormat timeFormat = new SimpleDateFormat(TIME_FORMAT);
+        log.setAttribute(XML_TIME, timeFormat.format(date));
     }
 
     /**
