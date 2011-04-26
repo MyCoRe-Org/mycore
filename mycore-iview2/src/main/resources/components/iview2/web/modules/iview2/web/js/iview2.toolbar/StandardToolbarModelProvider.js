@@ -61,7 +61,7 @@ StandardToolbarModelProvider.prototype = {
 		
 		// closeHandles
 		curButtonset = this.model.addElement(new ToolbarButtonsetModel("closeHandles"));
-		curButtonset.addButton(new ToolbarButtonModel("close", {'type': 'buttonDefault'}, {'icons': {primary : 'iview2-icon iview2-icon-close'}}, "toolbar.close", true, false));
+		curButtonset.addButton(new ToolbarButtonModel("close", {'type': 'buttonDefault'}, {'icons': {primary : 'iview2-icon iview2-icon-close'}}, "toolbar.normalView", true, false));
 	},
 		
 	/**
