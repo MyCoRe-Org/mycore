@@ -218,7 +218,7 @@ ToolbarView.prototype = {
 		} else if (args.subtype.type == "buttonCheck") {
 			newButton = jQuery('<input type="checkbox" id="'+args.elementName+'" class='+args.elementName+' /><label for='+args.elementName+' class='+args.elementName+"Label"+'></label>');
 			jQuery(this.i18n.executeWhenLoaded(function(i) {newButton.attr("title", i.translate(args.captionId)).find("label").html(i.translate(args.captionId))}))
-				.bind("change.i18n load.i18n",function(e, obj) {newButton.attr("title", obj.i18n.translate(args.captionId)).find("label").html(i.translate(args.captionId))});
+				.bind("change.i18n load.i18n",function(e, obj) {newButton.attr("title", obj.i18n.translate(args.captionId)).find("label").html(obj.i18n.translate(args.captionId))});
 			newButton[1].onclick = onClick;
 		}
 		
