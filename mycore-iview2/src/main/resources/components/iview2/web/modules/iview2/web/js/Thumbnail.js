@@ -436,70 +436,52 @@ genProto.scrollMove = function(valueX, valueY) {
 	this.iview.scroller = false;
 }
 
-//TODO could handleZoomScrollbars and handleResizeScrollbars be merged?
 /**
  * @public
  * @function
- * @name		handleZoomScrollbars
- * @memberOf	iview.General
- * @description	fit the scrollbar to the viewer-zoom
+ * @name		handleScrollbars
+ * @memberOf	iview.General#
+ * @description	adapts the scrollbars to correctly represent the new view after a zoom or resize event occured to the viewer. The adaptations cover sizing the bar, the bar proportion, maxValue and currentValue depending on the given reason
+ * @param		{string} [reason] the reason why the function was called, possible values are "resize" and "zoom" or void if you want to have all adaptations to be applied
  */
-genProto.handleZoomScrollbars = function() {
+genProto.handleScrollbars = function(reason) {
+	if (typeof reason === "undefined") reason = "all";
+	
 	var viewerBean = this.iview.viewerBean;
 	var barX = this.iview.my.barX;
 	var barY = this.iview.my.barY;
 	// determine the current imagesize
-	var curBreite = (this.iview.picWidth / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale;
-	var curHoehe = (this.iview.picHeight / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale;
+	var curWidth = (this.iview.picWidth / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale;
+	var curHeight = (this.iview.picHeight / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale;
 
-	// horizontal
-	// max scaling
-	var xmaxVal = curBreite - viewerBean.width;
-	barX.setMaxValue((xmaxVal < 0)? 0:xmaxVal);
-	// current position
-	barX.setCurValue(-viewerBean.x);
-	// length of the bar
-	barX.setProportion(viewerBean.width/curBreite);
-	// vertical
-	var ymaxVal = curHoehe - viewerBean.height;
-	barY.setMaxValue((ymaxVal < 0)? 0:ymaxVal);
-	barY.setCurValue(-viewerBean.y);
-	barY.setProportion(viewerBean.height/curHoehe);
-}
-
-/**
- * @public
- * @function
- * @name		handleResizeScrollbars
- * @memberOf	iview.General
- * @description	fit the scrollbar to the viewer-resize
- */
-genProto.handleResizeScrollbars = function() {
-	var viewerBean = this.iview.viewerBean;
-	var barX = this.iview.my.barX;
-	var barY = this.iview.my.barY;
-	var viewer = this.iview.my.viewer;
-	// determine the current imagesize
-	var curBreite = (this.iview.picWidth / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale;
-	var curHoehe = (this.iview.picHeight / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale;
-
-	// vertical
-	// max scaling
 	var height = viewer.height();
 	var width = viewer.width();
 	var top = viewer.offset().top;
-
-	barY.setMaxValue(curHoehe - height);
-	// size of the scrollbar
-	barY.setSize(height - top);
-	barY.my.self[0].style.top = top + "px";
-	// length of the bar
-	barY.setProportion(height/curHoehe);
 	
-	// horizontal
-	barX.setMaxValue(curBreite - width);
-	barX.setSize(width);
-	barX.setProportion(width/curBreite);
+	// vertical bar
+	var ymaxVal = curHeight - height;
+	barY.setMaxValue((ymaxVal < 0)? 0:ymaxVal);
+	barY.setProportion(height/curHeight);
+	
+	// horizontal bar
+	var xmaxVal = curWidth - width;
+	barX.setMaxValue(xmaxVal);
+	barX.setProportion(width/curWidth);
+
+	switch (reason) {
+	case "all":
+	case "zoom":
+		// correctly represent the new view position
+		barX.setCurValue(-viewerBean.x);
+		barY.setCurValue(-viewerBean.y);
+		if (!reason == "all") break;
+	case "resize":
+		// set the new size of the scrollbar
+		barY.setSize(height - top);
+		barY.my.self[0].style.top = top + "px";
+		barX.setSize(width);
+		if (!reason == "all") break;
+	}
 }
 
 /**
@@ -526,7 +508,7 @@ genProto.viewerZoomed = function (zoomEvent) {
 	// Actualize forward & backward Buttons
 	jQuery(".viewerContainer.min .toolbars .toolbar").css("width", (this.iview.picWidth / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale +  "px");
 
-	this.handleZoomScrollbars();
+	this.handleScrollbars("zoom");
 
 	if (this.iview.useCutOut) {
 		this.iview.cutOutModel.setSize({
@@ -608,8 +590,7 @@ genProto.openChapter = function(button){
 genProto.updateModuls = function() {
 	var viewerBean = this.iview.viewerBean;
 	// align/fit scrollbars
-	this.handleZoomScrollbars();
-	this.handleResizeScrollbars();
+	this.handleScrollbars();
 
 	// Actualize forward & backward Buttons
 	var previewTbView = jQuery(this.iview.getToolbarCtrl().getView("previewTbView").toolbar);

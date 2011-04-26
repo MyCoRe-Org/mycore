@@ -176,7 +176,7 @@ genProto.reinitializeGraphic = function() {
 		this.iview.overview.setSelected(this.iview.PhysicalModel.getCurPos());
 	}
 	
-	this.handleResizeScrollbars();
+	this.handleScrollbars("resize");
 	
 	if (this.iview.useCutOut) {
 		this.iview.cutOutModel.setRatio({
