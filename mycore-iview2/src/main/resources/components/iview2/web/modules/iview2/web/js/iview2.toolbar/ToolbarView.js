@@ -5,7 +5,7 @@
  * @description view of a toolbar to present the model informations
  * @param		{String} id identifies the current toolbar view
  * @param		{Object} events to trigger defined actions, while managing contained elements
- * @param		{Object} parent defines the parent node of the toolbar view
+ * @param		{Object} parent the parent node of the toolbar view
  * @param		{Object} toolbar represents the main node of the toolbar view
  * @param		{i18n} i18n Class to allow translations
  */
@@ -36,19 +36,12 @@ ToolbarView.prototype = {
 	 * @memberOf	ToolbarView#
 	 * @description add a new buttonset to the toolbar view,
 	 *  either on the next position or on a special position defined by args.index
-	 * @param		{String} args.elementName defines the name of the buttonset
-	 * @param		{integer} args.index defines the special position between the other predefined elements where the new buttonset should be added
-	 * @return		{Object} returns the parent tag of the added buttonset
+	 * @param		{String} args.elementName the name of the buttonset
+	 * @param		{integer} args.index the position between the other predefined elements where the new buttonset should be added
+	 * @return		{Object} the buttonset which was just added
 	 */
     addButtonset : function (args) {
-    	var newButtonset = jQuery('<span>').buttonset().addClass(args.elementName);
-    	if (!isNaN(args.index) && args.index < this.toolbar.childNodes.length) {
-    		newButtonset.insertBefore(this.toolbar.childNodes[args.index]);
-    	} else {
-    		jQuery(this.toolbar).append(newButtonset);
-    	}
-    	
-		return newButtonset;
+    	return this._addElement(jQuery('<span>').buttonset().addClass(args.elementName), args.index);
     },
 
     /**
@@ -58,18 +51,12 @@ ToolbarView.prototype = {
 	 * @memberOf	ToolbarView#
 	 * @description add a new divider to the toolbar view,
 	 *  a divider is only a vertical line for a better visual seperation of two buttonsets
-	 * @param		{String} args.elementName defines the name of the divider
-	 * @param		{integer} args.index defines the special position between the other predefined elements where the new divider should be at
-	 * @return		{Object} returns the parent tag of the added divider
+	 * @param		{String} args.elementName the name of the divider
+	 * @param		{integer} args.index the position between the other predefined elements where the new divider should be added
+	 * @return		{jQuery-Object} the divider element which was just added
 	 */        
     addDivider : function (args) {
-    	var newDivider = jQuery('<span>').addClass(args.elementName + ' ui-divider');
-		if (!isNaN(args.index) && args.index < this.toolbar.childNodes.length) {
-    		newDivider.insertBefore(this.toolbar.childNodes[args.index]);
-    	} else {
-    		jQuery(this.toolbar).append(newDivider);
-    	}	
-		return newDivider;
+    	return this._addElement(jQuery('<span>').addClass(args.elementName + ' ui-divider'), args.index);
     },
     
     /**
@@ -78,18 +65,12 @@ ToolbarView.prototype = {
 	 * @name		addSpring
 	 * @memberOf	ToolbarView#
 	 * @description add a new spring to the toolbar view, a spring creates space between its surrounding elements
-	 * @param		{String} args.elementName defines the name of the spring
-	 * @param		{integer} args.index defines the special position between the other predefined elements where the new spring should be at
-	 * @return		{Object} returns the parent tag of the added spring
+	 * @param		{String} args.elementName the name of the spring
+	 * @param		{integer} args.index the position between the other predefined elements where the new spring should be added
+	 * @return		{jQuery-Object} the spring element which was just added
 	 */ 
     addSpring : function (args) {
-    	var newSpring = jQuery('<span>').addClass(args.elementName + ' ui-spring').attr("weight",args.weight);
-    	if (!isNaN(args.index) && args.index < this.toolbar.childNodes.length) {
-    		newSpring.insertBefore(this.toolbar.childNodes[args.index]);
-    	} else {
-    		jQuery(this.toolbar).append(newSpring);
-    	}
-    	return newSpring;
+    	return this._addElement(jQuery('<span>').addClass(args.elementName + ' ui-spring').attr("weight",args.weight), args.index);
     },
 
     /**
@@ -97,22 +78,35 @@ ToolbarView.prototype = {
      * @function
 	 * @name		addText
 	 * @memberOf	ToolbarView#
-	 * @description add a new text element to the toolbar view,
+	 * @description adds a new text element to the toolbar view,
 	 *  a text element is simple place to show plain some information within the toolbar
-	 * @param		{String} args.elementName defines the name of the divider
-	 * @param		{String} args.text defines the content of the text element
-	 * @param		{integer} args.index defines the special position between the other predefined elements where the new divider should be at
-	 * @return		{Object} returns the parent tag of the added divider
+	 * @param		{String} args.elementName the name of the divider
+	 * @param		{String} args.text the content of the text element
+	 * @param		{integer} args.index the position between the other predefined elements where the new divider should be added
+	 * @return		{jQuery-Object} the text-element which was just added
 	 */        
     addText : function (args) {
-    	var newText = jQuery('<span>').addClass(args.elementName + ' ui-text').html(args.text);
-		if (!isNaN(args.index) && args.index < this.toolbar.childNodes.length) {
-    		newText.insertBefore(this.toolbar.childNodes[args.index]);
+    	return this._addElement(jQuery('<span>').addClass(args.elementName + ' ui-text').html(args.text),args.index);
+    },
+    
+    /**
+     * @private
+     * @function
+	 * @name		addElement
+	 * @memberOf	ToolbarView#
+	 * @description adds a new element to the toolbar view,
+	 * @param		{jQuery-Object} element to add to the view
+	 * @param		{integer} index the position between the other predefined elements where the new element should be added
+	 * @return		{jQuery-Object} the element which was previously added
+	 */ 
+    _addElement : function (element, index) {
+    	if (!isNaN(index) && index < this.toolbar.childNodes.length) {
+    		newText.insertBefore(this.toolbar.childNodes[index]);
     	} else {
-    		jQuery(this.toolbar).append(newText);
-    	}	
-		return newText;
-    },   
+    		jQuery(this.toolbar).append(element);
+    	}
+    	return element
+    },
     
     /**
      * @public
@@ -121,7 +115,7 @@ ToolbarView.prototype = {
 	 * @memberOf	ToolbarView#
 	 * @description returns the parent tag of a direct toolbar view element (e.g. buttonset or divider)
 	 *  (buttons aren't direct elements, they are within a special buttonset
-	 * @param		{String} elementName defines the name of a direct toolbar view element
+	 * @param		{String} elementName the name of a direct toolbar view element
 	 * @return		{Object} returns a single view element
 	 */        
     getToolbarElement : function (elementName) {
@@ -137,7 +131,7 @@ ToolbarView.prototype = {
 	 * @memberOf	ToolbarView#
 	 * @description removes a direct toolbar view element (e.g. buttonset or divider)
 	 *  (buttons aren't direct elements, they are within a special buttonset
-	 * @param		{String} args.elementName defines the name of a direct toolbar view element
+	 * @param		{String} args.elementName the name of a direct toolbar view element
 	 */  
     removeToolbarElement : function (args) {
     	this.toolbar.removeChild(this.getToolbarElement(args.elementName));
@@ -149,13 +143,13 @@ ToolbarView.prototype = {
 	 * @name		getButtonUi
 	 * @memberOf	ToolbarView#
 	 * @description returns the button ui properties of a single jQuery Ui Button
-	 * @param		{!Object} args.button defines a special button
+	 * @param		{!Object} args.button a special button
 	 * @return		{Object} returns the button ui properties <br>
 	 * 	{ <br>
-	 *   icons: defines the button icons (primary, second), <br>
-	 *   text: defines if the label will shown within the button <br>
-	 *   label: defines the label and if enabled the text of the button, <br>
-	 *   disabled: defines if the button is enables (false) or disabled (true) <br>
+	 *   icons: the button icons (primary, second), <br>
+	 *   text: if the label will shown within the button <br>
+	 *   label: the label and if enabled the text of the button, <br>
+	 *   disabled: if the button is enables (false) or disabled (true) <br>
 	 *  }
 	 */
     getButtonUi : function (args) {
@@ -174,11 +168,11 @@ ToolbarView.prototype = {
 	 * @name		setButtonUi
 	 * @memberOf	ToolbarView#
 	 * @description sets the given button ui properties to a single jQuery Ui Button
-	 * @param		{Object} args.button defines a special button
-	 * @param		{Object} args.icons defines the button icons (primary, second)
-	 * @param		{String} args.text defines if the label will shown within the button
-	 * @param		{boolean} args.label defines the label and if enabled the text of the button,
-	 * @param		{boolean} args.disabled defines if the button is enables (false) or disabled (true)
+	 * @param		{Object} args.button a special button
+	 * @param		{Object} args.icons the button icons (primary, second)
+	 * @param		{String} args.text if the label will shown within the button
+	 * @param		{boolean} args.label the label and if enabled the text of the button,
+	 * @param		{boolean} args.disabled if the button is enables (false) or disabled (true)
 	 */
     setButtonUi : function (args) {
     	var button = this._getButton(args.button);
@@ -199,10 +193,10 @@ ToolbarView.prototype = {
 	 * @name		addButton
 	 * @memberOf	ToolbarView#   
 	 * @description adds a given button with its given properties to the toolbar view
-	 * @param		{String} args.parentName defines the buttonset name in which the button should insert
-	 * @param		{String} args.elementName defines the name of the button
-	 * @param		{String} args.captionId defines the title-Id text of the button,
-	 * @param		{integer} args.index defines a special position between the other buttons where the current button should be inserted
+	 * @param		{String} args.parentName the buttonset name in which the button should insert
+	 * @param		{String} args.elementName the name of the button
+	 * @param		{String} args.captionId the title-Id text of the button,
+	 * @param		{integer} args.index a special position between the other buttons where the current button should be inserted
 	 */
     addButton : function (args) {
     	var myButtonset = this.getToolbarElement(args.parentName);
@@ -268,8 +262,8 @@ ToolbarView.prototype = {
 	 * @name		removeButton
 	 * @memberOf	ToolbarView#  
 	 * @description removes a given button from its buttonset
-	 * @param		{String} args.parentName defines the buttonset name which contains the button
-	 * @param		{String} args.elementName defines the name of the button
+	 * @param		{String} args.parentName the buttonset name which contains the button
+	 * @param		{String} args.elementName the name of the button
 	 */
     removeButton : function (args) {
     	var myButtonset = this.getToolbarElement(args.parentName);
@@ -301,9 +295,9 @@ ToolbarView.prototype = {
 	 * @name		checkButtonStyle
 	 * @memberOf	ToolbarView#
 	 * @description checks a single button and its neighbours to correct their corners within their buttonset
-	 * @param		{Object} args.buttonset defines the buttonset which contains the button(s)
-	 * @param		{integer} args.buttonIndex defines the index of the current changed button
-	 * @param		{String} args.reason defines the reason of changing (add, del)
+	 * @param		{Object} args.buttonset the buttonset which contains the button(s)
+	 * @param		{integer} args.buttonIndex the index of the current changed button
+	 * @param		{String} args.reason the reason of changing (add, del)
 	 */
     // checks for round button edges
     _checkButtonStyle : function (args) {
