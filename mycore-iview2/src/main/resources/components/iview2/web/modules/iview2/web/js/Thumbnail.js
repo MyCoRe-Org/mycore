@@ -448,6 +448,7 @@ genProto.handleScrollbars = function(reason) {
 	if (typeof reason === "undefined") reason = "all";
 	
 	var viewerBean = this.iview.viewerBean;
+	var viewer = this.iview.my.viewer;
 	var barX = this.iview.my.barX;
 	var barY = this.iview.my.barY;
 	// determine the current imagesize
