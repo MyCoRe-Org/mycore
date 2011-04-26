@@ -64,7 +64,7 @@ public class MCREditorVariable implements Comparable {
     }
 
     void setValue(String value) {
-        this.value = MCRXMLHelper.removeIllegalChars( value );
+        this.value = MCRXMLHelper.removeIllegalChars( value.trim() );
     }
 
     public String getValue() {
