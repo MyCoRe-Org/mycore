@@ -275,7 +275,7 @@ ToolbarView.prototype = {
     	var myButtonset = this.getToolbarElement(args.parentName);
     	for (var i = 0; i < myButtonset.childNodes.length; i++) {
 			if (myButtonset.childNodes[i].className.indexOf(args.elementName) > -1) {
-				this.checkButtonStyle({'buttonset' : myButtonset, 'buttonIndex' : i, 'reason' : "del"});
+				this._checkButtonStyle({'buttonset' : myButtonset, 'buttonIndex' : i, 'reason' : "del"});
 				myButtonset.removeChild(myButtonset.childNodes[i]);
 			}
 		}
