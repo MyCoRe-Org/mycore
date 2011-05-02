@@ -874,7 +874,7 @@ genProto.processMETS = function(metsDoc) {
 
 	// if METS File is loaded after the drop-down-menu (in mainToolbar) its content needs to be updated
 	if (jQuery('.navigateHandles .pageBox')[0]) {
-		toolbarCtrl.getView('mainTbView').events.notify({'type' : "new", 'elementName' : "pageBox", 'parentName' : "navigateHandles", 'view' : this.iview.my.container.find('.navigateHandles .pageBox')});
+		jQuery(toolbarCtrl.getView('mainTbView')).trigger("new", {'elementName' : "pageBox", 'parentName' : "navigateHandles", 'view' : this.iview.my.container.find('.navigateHandles .pageBox')});
 		// switch to current content
 		toolbarCtrl.updateDropDown(jQuery(pagelist.find("a")[physicalModel.getCurPos() - 1]).html());
 	}
