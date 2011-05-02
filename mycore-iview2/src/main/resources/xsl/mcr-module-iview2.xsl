@@ -79,9 +79,9 @@
     <!-- online src-->
     <xsl:if test="$MCR.Module-iview2.DeveloperMode='true'">
     	<!--  CSS -->
-    	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/web/lib/fg-menu/fg.menu.css" />
-    	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/web/gfx/default/iview2.toolbar.css" />
-    	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/web/gfx/default/iview2.permalink.css" />
+    	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/lib/fg-menu/fg.menu.css" />
+    	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/gfx/default/iview2.toolbar.css" />
+    	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/gfx/default/iview2.permalink.css" />
     </xsl:if>
 	
 	<script type="text/javascript">
@@ -133,20 +133,20 @@
       }
     </script>
     
-    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/web/js/iview2.js"/>
+    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/js/iview2.js"/>
     <script type="text/javascript">
       	var i18n = i18n || new iview.i18n('<xsl:value-of select="$WebApplicationBaseURL"/>', '<xsl:value-of select="$CurrentLang"/>');
     </script>
     <xsl:choose>
       <xsl:when test="$MCR.Module-iview2.DeveloperMode='true'">
 		<!-- Main Stylesheet -->
-    	<link id="cssSheet{$groupID}" rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/web/gfx/default/style.css" />
+    	<link id="cssSheet{$groupID}" rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/gfx/default/style.css" />
       </xsl:when>
       <xsl:otherwise>
         <script>
           <xsl:text>loadCssFile('</xsl:text>
           <xsl:value-of select="$WebApplicationBaseURL"/>
-          <xsl:text>modules/iview2/web/gfx/default/iview2.min.css', 'iviewCss');</xsl:text>
+          <xsl:text>modules/iview2/gfx/default/iview2.min.css', 'iviewCss');</xsl:text>
         </script>
       </xsl:otherwise>
     </xsl:choose>
