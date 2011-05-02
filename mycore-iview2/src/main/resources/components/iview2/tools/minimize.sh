@@ -8,7 +8,7 @@ sources=( "jquery.mousewheel.min.js" "jquery.tree.min.js" "i18n.js" "PanoJS.js" 
 destpath="/host/workspace/archive/docportal/build/webapps/modules/iview2/web/js/iview2.js"
 
 path=`dirname $0`
-srcpath=${path}"/../web/modules/iview2/web/js/"
+srcpath=${path}"/../web/modules/iview2/js/"
 
 #initial Creation, we dont know what happened before the start of the script
 rm -f $destpath
