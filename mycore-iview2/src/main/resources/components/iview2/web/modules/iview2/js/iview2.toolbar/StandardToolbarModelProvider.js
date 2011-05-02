@@ -37,8 +37,8 @@ StandardToolbarModelProvider.prototype = {
 		curButtonset = this.model.addElement(new ToolbarButtonsetModel("zoomHandles"));
 		curButtonset.addButton(new ToolbarButtonModel("zoomIn", {'type': 'buttonDefault'}, {'icons': {primary : 'iview2-icon iview2-icon-zoomIn'}}, "toolbar.zoomIn", true, false));
 		curButtonset.addButton(new ToolbarButtonModel("zoomOut", {'type': 'buttonDefault'}, {'icons': {primary : 'iview2-icon iview2-icon-zoomOut'}}, "toolbar.zoomOut", true));
-		curButtonset.addButton(new ToolbarButtonModel("fitToWidth", {'type': 'buttonCheck', 'state': false}, {'text': false, 'icons': {primary : 'iview2-icon iview2-icon-fitToWidth'}}, "toolbar.fitToWidth", true, false));
-		curButtonset.addButton(new ToolbarButtonModel("fitToScreen", {'type': 'buttonCheck', 'state': false}, {'icons': {primary : 'iview2-icon iview2-icon-fitToScreen'}}, "toolbar.fitToScreen", true, false));
+		curButtonset.addButton(new ToolbarButtonModel("fitToWidth", {'type': 'buttonCheck', 'state': false}, {'text': false, 'icons': {primary : 'iview2-icon iview2-icon-fitToWidth'}}, "toolbar.toWidth", true, false));
+		curButtonset.addButton(new ToolbarButtonModel("fitToScreen", {'type': 'buttonCheck', 'state': false}, {'icons': {primary : 'iview2-icon iview2-icon-fitToScreen'}}, "toolbar.toScreen", true, false));
 		
 		// overviewHandles
 		curButtonset = this.model.addElement(new ToolbarButtonsetModel("overviewHandles"));
