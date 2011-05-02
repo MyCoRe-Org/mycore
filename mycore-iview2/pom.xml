@@ -24,7 +24,7 @@
               <verbose>true</verbose>
               <webappSourceDir>${basedir}/src/main/resources</webappSourceDir>
               <webappTargetDir>${project.build.outputDirectory}</webappTargetDir>
-              <cssSourceDir>components/iview2/web/modules/iview2/web/gfx/default</cssSourceDir>
+              <cssSourceDir>components/iview2/web/modules/iview2/gfx/default</cssSourceDir>
               <cssSourceFiles>
                 <cssSourceFile>../../lib/fg-menu/fg.menu.css</cssSourceFile>
                 <cssSourceFile>iview2.toolbar.css</cssSourceFile>
@@ -32,7 +32,7 @@
                 <cssSourceFile>style.css</cssSourceFile>
               </cssSourceFiles>
               <cssFinalFile>iview2.css</cssFinalFile>
-              <jsSourceDir>components/iview2/web/modules/iview2/web/js</jsSourceDir>
+              <jsSourceDir>components/iview2/web/modules/iview2/js</jsSourceDir>
               <jsSourceFiles>
                 <!-- iview.init BEGIN -->
                 <jsSourceFile>jquery.mousewheel.min.js</jsSourceFile>
