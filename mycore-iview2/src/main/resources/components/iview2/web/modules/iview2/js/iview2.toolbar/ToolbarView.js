@@ -101,7 +101,7 @@ ToolbarView.prototype = {
 	 */ 
     _addElement : function (element, index) {
     	if (!isNaN(index) && index < this.toolbar.childNodes.length) {
-    		newText.insertBefore(this.toolbar.childNodes[index]);
+    		jQuery(this.toolbar).insertBefore(this.toolbar.childNodes[index]);
     	} else {
     		jQuery(this.toolbar).append(element);
     	}
