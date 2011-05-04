@@ -114,8 +114,8 @@
     <!-- JQuery Framework -->
       google.load("jquery", "1");
       google.load("jqueryui", "<xsl:value-of select="$jqueryUI.version"/>");
-      jQuery.fx.off=!<xsl:value-of select="$effects" />;
-      
+
+      var effects = <xsl:value-of select="$effects" />;
       var tilesize=<xsl:value-of select="$tilesize" />;
 	  var maximized=<xsl:value-of select="$maximized" />;
       var zoomWidth=<xsl:value-of select="$zoomWidth" />;
@@ -166,6 +166,7 @@
       addIviewProperty('<xsl:value-of select="$groupID" />', 'startFile', "'<xsl:value-of select="$startFile" />'");
       function startViewer(viewID) {
         if (Iview[viewID].started) return;
+        jQuery.fx.off=!effects;
         Iview[viewID].ToolbarImporter = new ToolbarImporter(Iview[viewID], i18n);
         Iview[viewID].gen = new iview.General(Iview[viewID], viewID);
         Iview[viewID].started = true;
