@@ -785,7 +785,7 @@ genProto.startFileLoaded = function(){
 	this.iview.loaded = true;
 	var that = this;
 	//Blank needs to be loaded as blank, so the level is filled. Else it lays not ontop; needed for IE 
-	this.iview.my.viewer.find(".surface").css("backgroundImage", "url(" + this.iview.webappBaseUri + "modules/iview2/web/gfx/blank.gif" + ")");
+	this.iview.my.viewer.find(".surface").css("backgroundImage", "url(" + this.iview.webappBaseUri + "modules/iview2/gfx/blank.gif" + ")");
 
 	// PermaLink Handling
 	// choice if zoomLevel or special; zoomMode only makes sense in maximized viewer
