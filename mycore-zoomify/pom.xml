@@ -23,7 +23,7 @@
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
-      <artifactId>mycore-metsmods</artifactId>
+      <artifactId>mycore-mets</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
