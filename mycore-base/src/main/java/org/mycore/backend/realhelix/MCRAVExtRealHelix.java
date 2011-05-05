@@ -117,6 +117,12 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender {
             if (sType.indexOf("MPEG Layer 3") >= 0) {
                 contentTypeID = "mp3";
                 mediaType = AUDIO;
+            } else if (sType.indexOf("3GPP") >= 0) {
+                contentTypeID = "3gp";
+                mediaType = VIDEO;
+            } else if (sType.indexOf("MPEG4") >= 0) {
+                contentTypeID = "mpeg4";
+                mediaType = VIDEO;
             } else if (sType.indexOf("MPEG") >= 0) {
                 contentTypeID = "mpegvid";
                 mediaType = VIDEO;
