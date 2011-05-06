@@ -110,16 +110,25 @@ public class MCRNormalizer {
             }
 
         }
-        StringTokenizer st = new StringTokenizer(rules, "> ");
-        int numPatterns = st.countTokens() / 2;
-
+        logger.debug("normalize rules --> " + rules);
+        StringTokenizer tokens = new StringTokenizer(rules, " ");
+        
+        int numPatterns = tokens.countTokens();
+        logger.debug("normalize count token --> " + numPatterns);
         patterns = new Pattern[numPatterns];
         replace = new String[numPatterns];
-
         for (int i = 0; i < numPatterns; i++) {
-            patterns[i] = Pattern.compile(st.nextToken());
-            replace[i] = st.nextToken();
-            logger.debug("normalize -->" + patterns[i] + " to -->" + replace[i]);
+        	String token = tokens.nextToken();
+        	int j = token.indexOf('>');
+        	if ( j != -1 ) {
+                patterns[i] = Pattern.compile(token.substring(0,j));
+                if (j < token.length()) {
+                    replace[i] = token.substring(j+1);
+                } else {
+                	replace[i] = " ";
+                }
+                logger.debug("normalize --> " + patterns[i] + " to --> " + replace[i]);
+        	}
         }
     }
 

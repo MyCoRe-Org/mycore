@@ -74,6 +74,11 @@ public class MCRNormalizerTest extends MCRTestCase {
         result_string = MCRNormalizer.normalizeString("abc ÄöÜß ñ");
         assertEquals("wrong output string", "abc aeoeuess x", result_string);
         
+        MCRConfiguration.instance().set("MCR.Metadata.Normalize.AddRule", "é>");
+        MCRNormalizer.loadConfig();
+        result_string = MCRNormalizer.normalizeString("abc ÄöÜß éñ");
+        assertEquals("wrong output string", "abc aeoeuess x", result_string);
+        
         MCRConfiguration.instance().set("MCR.Metadata.Normalize.SetRule", "ß>sz");
         MCRNormalizer.loadConfig();
         result_string = MCRNormalizer.normalizeString("abc ÄöÜß ñ");
