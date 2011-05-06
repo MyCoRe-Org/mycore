@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
@@ -810,5 +811,14 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             HIB_CONNECTION_INSTANCE = MCRHIBConnection.instance();
         }
         return HIB_CONNECTION_INSTANCE;
+    }
+
+    @Override
+    public MCRCategory createCategory(MCRCategoryID id,  Set<MCRLabel> labels, MCRCategory parent) {
+        MCRCategoryImpl newCategory = new MCRCategoryImpl();
+        newCategory.setId(id);
+        newCategory.setLabels(labels);
+        newCategory.setParent(parent);
+        return newCategory;
     }
 }

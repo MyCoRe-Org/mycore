@@ -24,6 +24,7 @@
 package org.mycore.datamodel.classifications2;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Interface of the Data Access Object for Classifications.
@@ -207,6 +208,20 @@ public interface MCRCategoryDAO {
      *            to be set or updated
      */
     public abstract void setLabel(MCRCategoryID id, MCRLabel label);
+    
+    /**
+     * Create a new category
+     * 
+     * @param id
+     *          ID of the category
+     * @param label
+     *          to be set or updated
+     * @param parent
+     *          parent category, null when root category
+     * @return
+     *          new MCRCategory
+     */
+    public abstract MCRCategory createCategory(MCRCategoryID id,  Set<MCRLabel> labels, MCRCategory parent);
 
     /**
      * allows to determine when the last change was made to the categories.
