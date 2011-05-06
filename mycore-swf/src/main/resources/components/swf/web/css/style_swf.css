@@ -8,199 +8,233 @@
  * @myIHS		  1.0
  */
 
+/* Worflow object list */
+
 #swf_workflow_common_list {
   width:100%;
 }
 
-#swf_workflow_common_list .item_var {
+#swf_workflow_common_list .item {
   border:1px solid #000000;
-}
-
-#swf_workflow_common_list .item_const_ltr {
   margin-bottom:10px;
 }
 
-#swf_workflow_common_list .item_const_rtl {
-  margin-bottom:10px;
+#swf_workflow_common_list .item_table {
+  padding:0px;
+  width:100%;  
 }
 
-#swf_workflow_common_list .headline_var {
+#swf_workflow_common_list .item_col {
+  height:0px;
+  padding:0px;
+  }
+#swf_workflow_common_list .item_col1_ltr {
+  width:30px;
+  }
+#swf_workflow_common_list .item_col1_rtl {
+  width:30px;
+  }
+#swf_workflow_common_list .item_col2_ltr {
+  width:450px;
+  }
+#swf_workflow_common_list .item_col2_rtl {
+  width:190px;
+  }
+#swf_workflow_common_list .item_col3_ltr {
+  width:190px;
+  }
+#swf_workflow_common_list .item_col3_rtl {
+  width:450px;
+  }
+#swf_workflow_common_list .item_col4_ltr {
+  width:30px;
+  }
+#swf_workflow_common_list .item_col4_rtl {
+  width:30px;
+  }
+  
+#swf_workflow_common_list .headline_ltr {
   background-color:#CEDEEE;
 }
 
-#swf_workflow_common_list .headline_const_ltr {
+#swf_workflow_common_list .headline_rtl {
+  background-color:#CEDEEE;
+}
+
+#swf_workflow_common_list .headline_label_ltr {
+  padding:3px;
+  font-weight:bold;
+}
+
+#swf_workflow_common_list .headline_label_rtl {
+  padding:3px;
+  text-align:right;
+  font-weight:bold;
+}
+
+#swf_workflow_common_list .headline_id_ltr {
   padding:3px;
 }
 
-#swf_workflow_common_list .headline_const_rtl {
+#swf_workflow_common_list .headline_id_rtl {
   padding:3px;
-}
-
-#swf_workflow_common_list .headline_label_var {
-}
-
-#swf_workflow_common_list .headline_label_const_ltr {
-  float:left;
-  width:400px;
-}
-
-#swf_workflow_common_list .headline_label_const_rtl {
   text-align:right;
 }
 
-#swf_workflow_common_list .headline_id_var {
-}
-
-#swf_workflow_common_list .headline_id_const_ltr {
-}
-
-#swf_workflow_common_list .headline_id_const_rtl {
-  float:left;
-  width:300px;
-  text-align:right;
-}
-
-#swf_workflow_common_list .dataline_var {
+#swf_workflow_common_list .dataline_ltr {
   background-color:#F3F7FD;
 }
 
-#swf_workflow_common_list .dataline_const_ltr {
-  padding:3px;
+#swf_workflow_common_list .dataline_rtl {
+  background-color:#F3F7FD;
 }
 
-#swf_workflow_common_list .dataline_const_rtl {
-  padding:3px;
+#swf_workflow_common_list .dataline_label_ltr {
 }
 
-#swf_workflow_common_list .dataline_label_var {
-}
-
-#swf_workflow_common_list .dataline_label_const_ltr {
-  float:left;
-  width:400px;
-}
-
-#swf_workflow_common_list .dataline_label_const_rtl {
+#swf_workflow_common_list .dataline_label_rtl {
   text-align:right;
 }
 
-#swf_workflow_common_list .dataline_icons_var {
+#swf_workflow_common_list .dataline_icons_ltr {
+	padding:3px;
 }
 
-#swf_workflow_common_list .dataline_icons_const_ltr {
-}
-
-#swf_workflow_common_list .dataline_icons_const_rtl {
-  float:left;
-  width:300px;
+#swf_workflow_common_list .dataline_icons_rtl {
   text-align:right;
+  padding:3px;
 }
 
-#swf_workflow_common_list .icon {
+#swf_workflow_common_list .icon_ltr {
   border:0px;
-  width:35px;
   text-align:center;
+  width:29px;
+  height:22px;
+  float:left;
+  padding:3px;
 }
 
-#swf_workflow_common_list .derivateline_var {
+#swf_workflow_common_list .icon_rtl {
+  border:0px;
+  text-align:center;
+  width:29px;
+  height:22px;
+  float:right;
+  padding:3px;
+}
+
+#swf_workflow_common_list .icon_workflow_objedit {
+  background: transparent url("../images/workflow_objedit.gif") no-repeat ;
+  background-position:center;
+}
+
+#swf_workflow_common_list .icon_workflow_objcopy {
+  background: transparent url("../images/workflow_objcopy.gif") no-repeat ;
+  background-position:center;
+}
+
+#swf_workflow_common_list .icon_workflow_acledit {
+  background: transparent url("../images/workflow_acledit.gif") no-repeat ;
+  background-position:center;
+}
+
+#swf_workflow_common_list .icon_workflow_objcommit {
+  background: transparent url("../images/workflow_objcommit.gif") no-repeat ;
+  background-position:center;
+}
+
+#swf_workflow_common_list .icon_workflow_objdelete {
+  background: transparent url("../images/workflow_objdelete.gif") no-repeat ;
+  background-position:center;
+}
+
+#swf_workflow_common_list .icon_workflow_deradd_ltr {
+  background: transparent url("../images/workflow_deradd_ltr.gif") no-repeat ;
+  background-position:center;
+}
+
+#swf_workflow_common_list .icon_workflow_deradd_rtl {
+  background: transparent url("../images/workflow_deradd_rtl.gif") no-repeat ;
+  background-position:center;
+}
+
+#swf_workflow_common_list .icon_workflow_deredit {
+  background: transparent url("../images/workflow_deredit.gif") no-repeat ;
+  background-position:center;
+}
+
+#swf_workflow_common_list .icon_workflow_derdelete {
+  background: transparent url("../images/workflow_derdelete.gif") no-repeat ;
+  background-position:center;
+}
+
+#swf_workflow_common_list .derivateline_ltr {
   background-color:#F3F7FD;
 }
 
-#swf_workflow_common_list .derivateline_const_ltr {
+#swf_workflow_common_list .derivateline_rtl {
+  background-color:#F3F7FD;
+}
+
+#swf_workflow_common_list .derivateline_label_ltr {
   padding:3px;
 }
 
-#swf_workflow_common_list .derivateline_const_rtl {
+#swf_workflow_common_list .derivateline_label_rtl {
+  text-align:right;
   padding:3px;
 }
 
-#swf_workflow_common_list .derivateline_label_var {
+#swf_workflow_common_list .derivateline_icons_ltr {
 }
 
-#swf_workflow_common_list .derivateline_label_const_ltr {
-  float:left;
-  width:400px;
-}
-
-#swf_workflow_common_list .derivateline_label_const_rtl {
-  text-align:right;
-  min-height:30px;
-}
-
-#swf_workflow_common_list .derivateline_icons_var {
-}
-
-#swf_workflow_common_list .derivateline_icons_const_ltr {
-}
-
-#swf_workflow_common_list .derivateline_icons_const_rtl {
-  float:left;
-  width:300px;
-  text-align:right;
+#swf_workflow_common_list .derivateline_icons_rtl {
+  text-align: right;
 }
 
 #swf_workflow_common_list .button {
   border:0px;
 }
 
-#swf_workflow_common_list .derivatefiles_var {
+#swf_workflow_common_list .derivatefiles_ltr {
   background-color:#F3F7FD;
-}
-
-#swf_workflow_common_list .derivatefiles_const_ltr {
   padding:3px;
 }
 
-#swf_workflow_common_list .derivatefiles_const_rtl {
+#swf_workflow_common_list .derivatefiles_rtl {
+  background-color:#F3F7FD;
   padding:3px;
 }
 
-#swf_workflow_common_list .derivatefiles_active_var {
-}
-
-#swf_workflow_common_list .derivatefiles_active_const_ltr {
-  float:left;
-  width:35px;
+#swf_workflow_common_list .derivatefiles_active_ltr {
   text-align:center;
 }
 
-#swf_workflow_common_list .derivatefiles_active_const_rtl {
-  clear:float;
+#swf_workflow_common_list .derivatefiles_active_rtl {
   text-align:center;
 }
 
-#swf_workflow_common_list .derivatefiles_filename_var {
+#swf_workflow_common_list .derivatefiles_filename_ltr {
 }
 
-#swf_workflow_common_list .derivatefiles_filename_const_ltr {
-  float:left;
-  width:630px;
-}
-
-#swf_workflow_common_list .derivatefiles_filename_const_rtl {
-  float:left;
-  width:630px;
+#swf_workflow_common_list .derivatefiles_filename_rtl {
   text-align:right;
 }
 
-#swf_workflow_common_list .derivatefiles_delete_var {
-}
-
-#swf_workflow_common_list .derivatefiles_delete_const_ltr {
-  text-align:center;
-  clear:float;
-}
-
-#swf_workflow_common_list .derivatefiles_delete_const_rtl {
-  float:left;
-  width:35px;
+#swf_workflow_common_list .derivatefiles_delete_ltr {
   text-align:center;
 }
 
-#swf_workflow_common_list .text_var {
+#swf_workflow_common_list .derivatefiles_delete_rtl {
+  text-align:center;
 }
 
-#swf_workflow_common_list .text_const_ltr {
+#swf_workflow_common_list .text_ltr {
+  margin:auto;
+  text-align:center;
+}
+
+#swf_workflow_common_list .text_rtl {
   margin:auto;
   text-align:center;
 }
