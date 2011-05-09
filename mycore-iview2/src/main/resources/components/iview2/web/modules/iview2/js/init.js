@@ -93,7 +93,7 @@ genProto.initializeGraphic = function() {
 	PanoJS.USE_SLIDE = false;
 	PanoJS.USE_LOADER_IMAGE = false;
 	PanoJS.MOVE_THROTTLE = 10;
-	PanoJS.BLANK_TILE_IMAGE = "../modules/iview2/web/" + styleFolderUri + 'blank.gif';
+	PanoJS.BLANK_TILE_IMAGE = "../modules/iview2/" + styleFolderUri + 'blank.gif';
 	
 	// opera triggers the onload twice
 	var iviewTileUrlProvider = new PanoJS.TileUrlProvider(this.iview.baseUri, this.iview.curImage, 'jpg');
@@ -109,7 +109,7 @@ genProto.initializeGraphic = function() {
 			tileUrlProvider: iviewTileUrlProvider,
 			maxZoom: this.iview.zoomMax,
 			initialZoom: this.iview.zoomInit,//Anfangs-Zoomlevel
-			loadingTile: "../modules/iview2/web/" + styleFolderUri + 'blank.gif'
+			loadingTile: "../modules/iview2/" + styleFolderUri + 'blank.gif'
 		});
 
 		this.iview.viewerBean.iview = this.iview;//handle Viewer informations so PanoJS can work with it
