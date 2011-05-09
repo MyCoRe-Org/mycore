@@ -97,7 +97,7 @@ public class MCRMETSServlet extends MCRServlet {
             HashSet<MCRFilesystemNode> ignoreNodes = new HashSet<MCRFilesystemNode>();
             if (metsFile != null)
                 ignoreNodes.add(metsFile);
-            Document mets = MCRMETSGenerator.getGenerator().getMETS(dir, ignoreNodes);
+            Document mets = MCRMETSGenerator.getGenerator().getMETS(dir, ignoreNodes).asDocument();
             MCRLayoutService.instance().doLayout(request, response, mets);
         }
         LOGGER.info("Generation of code by " + this.getClass().getSimpleName() + " took " + (System.currentTimeMillis() - start) + " ms");

@@ -75,7 +75,7 @@ public class MCRMetsResolver implements URIResolver {
                 //ignoreNodes.add(metsFile);
                 return new StreamSource(((MCRFile) metsFile).getContentAsInputStream());
             }
-            Document mets = MCRMETSGenerator.getGenerator().getMETS(dir, ignoreNodes);
+            Document mets = MCRMETSGenerator.getGenerator().getMETS(dir, ignoreNodes).asDocument();
             return new JDOMSource(mets);
         } catch (Exception e) {
             throw new TransformerException(e);

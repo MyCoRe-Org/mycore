@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
@@ -22,7 +21,6 @@ import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.mets.model.Mets;
 import org.mycore.mets.model.files.FLocat;
 import org.mycore.mets.model.files.File;
 import org.mycore.mets.model.files.FileGrp;
@@ -67,7 +65,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
     protected HashMap<SubDiv, SubDiv> structLinkMap;
 
     @Override
-    public synchronized Document getMETS(MCRDirectory dir, Set<MCRFilesystemNode> ignoreNodes) {
+    public synchronized Mets getMETS(MCRDirectory dir, Set<MCRFilesystemNode> ignoreNodes) {
         long startTime = System.currentTimeMillis();        
         // get derivate
         MCRObjectID derId = MCRObjectID.getInstance(dir.getOwnerID());
@@ -99,7 +97,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
         LOGGER.info("mets creation for derivate " + derId.toString() + " took " +
                     (System.currentTimeMillis() - startTime) +  "ms!");
 
-        return mets.asDocument();
+        return mets;
     }
 
     /**

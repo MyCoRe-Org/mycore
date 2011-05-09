@@ -111,7 +111,7 @@ public class MCRJSONProviderServlet extends MCRServlet {
         if (metsFile != null) {
             ignoreNodes.add(metsFile);
         }
-        Document mets = MCRMETSGenerator.getGenerator().getMETS(dir, ignoreNodes);
+        Document mets = MCRMETSGenerator.getGenerator().getMETS(dir, ignoreNodes).asDocument();
 
         return mets;
     }

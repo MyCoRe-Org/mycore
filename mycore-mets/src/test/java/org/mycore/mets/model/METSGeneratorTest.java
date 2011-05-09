@@ -4,7 +4,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Set;
 
-import org.jdom.Document;
 import org.junit.Test;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.ifs.MCRDirectory;
@@ -23,8 +22,8 @@ public class METSGeneratorTest {
 
     public static class TestGenerator extends MCRMETSGenerator {
         @Override
-        public Document getMETS(MCRDirectory dir, Set<MCRFilesystemNode> ignoreNodes) {
-            return new Document();
+        public Mets getMETS(MCRDirectory dir, Set<MCRFilesystemNode> ignoreNodes) {
+            return new Mets();
         }
     }
 }

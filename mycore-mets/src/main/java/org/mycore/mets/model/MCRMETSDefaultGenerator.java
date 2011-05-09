@@ -19,130 +19,119 @@
 
 package org.mycore.mets.model;
 
-import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
-import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Set;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
 import org.jdom.Namespace;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
+import org.mycore.mets.model.files.FLocat;
+import org.mycore.mets.model.files.File;
+import org.mycore.mets.model.files.FileGrp;
+import org.mycore.mets.model.files.FileSec;
+import org.mycore.mets.model.sections.AmdSec;
+import org.mycore.mets.model.sections.DmdSec;
+import org.mycore.mets.model.struct.Div;
+import org.mycore.mets.model.struct.Fptr;
+import org.mycore.mets.model.struct.LogicalStructMap;
+import org.mycore.mets.model.struct.PhysicalStructMap;
+import org.mycore.mets.model.struct.SmLink;
+import org.mycore.mets.model.struct.StructLink;
+import org.mycore.mets.model.struct.SubDiv;
 
 /**
+ * 
  * @author Thomas Scheffler (yagee)
- *
+ * @author Matthias Eichner
  */
 public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
 
     private static final Logger LOGGER = Logger.getLogger(MCRMETSGenerator.class);
 
-    private static final Namespace METS = Namespace.getNamespace("mets", "http://www.loc.gov/METS/");
+    public Mets getMETS(MCRDirectory dir, Set<MCRFilesystemNode> ignoreNodes) {
+        // add dmdsec
+        DmdSec dmdSec = new DmdSec("dmd_" + dir.getOwnerID());
+        // add amdsec
+        AmdSec amdSec = new AmdSec("amd_" + dir.getOwnerID());
+        // file sec
+        FileSec fileSec = new FileSec();
+        FileGrp fileGrp = new FileGrp(FileGrp.USE_MASTER);
+        fileSec.addFileGrp(fileGrp);
+        // physical structure
+        PhysicalStructMap physicalStructMap = new PhysicalStructMap();
+        Div physicalDiv = new Div("phys_dmd_" + dir.getOwnerID(), "physSequence");
+        physicalStructMap.setDivContainer(physicalDiv);
+        // logical structure
+        LogicalStructMap logicalStructMap = new LogicalStructMap();
+        Div logicalDiv = new Div("log_" + dir.getOwnerID(), dmdSec.getId(), amdSec.getId(), "monograph", dir.getOwnerID());
+        logicalStructMap.setDivContainer(logicalDiv);
+        // struct Link
+        StructLink structLink = new StructLink();
 
-    public Document getMETS(MCRDirectory dir, Set<MCRFilesystemNode> ignoreNodes) {
-        Document mets = new Document();
-        Element root = new Element("mets", METS);
-        mets.setRootElement(root);
-        root.addNamespaceDeclaration(XLINK_NAMESPACE);
-        root.setAttribute("schemaLocation",
-            "http://www.loc.gov/METS/ http://www.loc.gov/mets/mets.xsd http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-2.xsd",
-            XSI_NAMESPACE);
-        //dmdSec
-        /*
-         * stylesheets my rely on the fact that derivate ID is part of dmdSec/@ID
-         */
-        root.addContent(new Element("dmdSec", METS).setAttribute("ID", "dmd_" + dir.getOwnerID()));
-        //amdSec
-        root.addContent(new Element("amdSec", METS).setAttribute("ID", "amd_" + dir.getOwnerID()));
-        //file section
-        Element fileSec = new Element("fileSec", METS);
-        root.addContent(fileSec);
-        Element fileGrp = new Element("fileGrp", METS);
-        fileSec.addContent(fileGrp);
-        fileGrp.setAttribute("USE", "MASTER");
-        //physical structure
-        Element physicalMap = new Element("structMap", METS);
-        root.addContent(physicalMap);
-        physicalMap.setAttribute("TYPE", "PHYSICAL");
-        Element physSequence = new Element("div", METS);
-        physicalMap.addContent(physSequence);
-        physSequence.setAttribute("ID", "phys_dmd_" + dir.getOwnerID());
-        physSequence.setAttribute("TYPE", "physSequence");
-        //logical structure
-        Element logicalMap = new Element("structMap", METS);
-        root.addContent(logicalMap);
-        logicalMap.setAttribute("TYPE", "LOGICAL");
-        Element logContainer = new Element("div", METS);
-        logicalMap.addContent(logContainer);
-        logContainer.setAttribute("ID", "log_" + dir.getOwnerID());
-        logContainer.setAttribute("DMDID", "dmd_" + dir.getOwnerID());
-        logContainer.setAttribute("ADMID", "amd_" + dir.getOwnerID());
-        logContainer.setAttribute("TYPE", "monograph");
-        logContainer.setAttribute("LABEL", dir.getOwnerID());
-        //structure Links
-        Element structLink = new Element("structLink", METS);
-        root.addContent(structLink);
-        addFolder(dir, ignoreNodes, fileGrp, physSequence, logContainer, structLink, 0);
+        // create
+        createMets(dir, ignoreNodes, fileGrp, physicalDiv, logicalDiv, null, structLink, 0, 0);
+
+        // add to mets
+        Mets mets = new Mets();
+        mets.addDmdSec(dmdSec);
+        mets.addAmdSec(amdSec);
+        mets.setFileSec(fileSec);
+        mets.setPysicalStructMap(physicalStructMap);
+        mets.setLogicalStructMap(logicalStructMap);
+        mets.setStructLink(structLink);
+
         return mets;
     }
 
-    private void addFolder(MCRDirectory dir, Set<MCRFilesystemNode> ignoreNodes, Element fileGrp, Element physSequence, Element logicalContainer,
-        Element structLink, int logCounter) {
+    private void createMets(MCRDirectory dir, Set<MCRFilesystemNode> ignoreNodes, FileGrp fileGrp, Div physicalDiv, Div logicalDiv, SubDiv logicalContainer, StructLink structLink, int logOrder, int physOrder) {
         MCRFilesystemNode[] children = dir.getChildren(MCRDirectory.SORT_BY_NAME_IGNORECASE);
         for (MCRFilesystemNode node : children) {
             if (ignoreNodes.contains(node))
                 continue;
             if (node instanceof MCRDirectory) {
                 MCRDirectory subDir = (MCRDirectory) node;
-                Element section = new Element("div", METS);
-                logicalContainer.addContent(section);
-                section.setAttribute("TYPE", "section");
-                section.setAttribute("ID", "log" + Integer.toString(++logCounter));
-                section.setAttribute("LABEL", subDir.getName());
-                addFolder(subDir, ignoreNodes, fileGrp, physSequence, section, structLink, logCounter);
+                SubDiv section = new SubDiv("log_" + Integer.toString(++logOrder), "section", logOrder, subDir.getName());
+                section.setLabel(subDir.getName());
+                if(logicalContainer == null) {
+                    logicalDiv.addSubDiv(section);
+                } else {
+                    logicalContainer.addLogicalDiv(section);
+                }
+                createMets((MCRDirectory)node, ignoreNodes, fileGrp, physicalDiv, logicalDiv, section, structLink, logOrder, physOrder);
             } else {
-                // node is a file
-                MCRFile subFile = (MCRFile) node;
-                // add to fileGrp
-                Element file = new Element("file", METS);
-                fileGrp.addContent(file);
+                MCRFile mcrFile = (MCRFile) node;
                 final UUID uuid = UUID.randomUUID();
                 final String fileID = "master_" + uuid.toString();
                 final String physicalID = "phys_" + uuid.toString();
-                file.setAttribute("ID", fileID);
-                file.setAttribute("MIMETYPE", getMimeType(subFile));
-                Element fLocat = new Element("FLocat", METS);
-                file.addContent(fLocat);
-                fLocat.setAttribute("LOCTYPE", "URL");
                 try {
-                    final String href = new URI(null, subFile.getAbsolutePath().substring(1), null).toString();
-                    fLocat.setAttribute("href", href, XLINK_NAMESPACE);
+                    final String href = new URI(null, mcrFile.getAbsolutePath().substring(1), null).toString();
+                    // file
+                    File file = new File(fileID, getMimeType(mcrFile));
+                    FLocat fLocat = new FLocat(FLocat.LOCTYPE_URL, href);
+                    file.setFLocat(fLocat);
+                    fileGrp.addFile(file);
                 } catch(URISyntaxException uriSyntaxException) {
-                    LOGGER.error("invalid href",uriSyntaxException);
+                    LOGGER.error("invalid href", uriSyntaxException);
                     continue;
                 }
-                //add to physical structMap
-                Element physPage = new Element("div", METS);
-                physSequence.addContent(physPage);
-                physPage.setAttribute("TYPE", "page");
-                physPage.setAttribute("ID", physicalID);
-                physPage.setAttribute("ORDER", Integer.toString(physSequence.getContentSize()));
-                Element fptr = new Element("fptr", METS);
-                physPage.addContent(fptr);
-                fptr.setAttribute("FILEID", fileID);
-                //add to logical structMap and structLink
-                //add to StructLink
-                Element smLink = new Element("smLink", METS);
-                structLink.addContent(smLink);
-                smLink.setAttribute("from", logicalContainer.getAttributeValue("ID"), XLINK_NAMESPACE);
-                smLink.setAttribute("to", physicalID, XLINK_NAMESPACE);
+                // physical
+                SubDiv physPage = new SubDiv(physicalID, SubDiv.TYPE_PAGE, ++physOrder, true);
+                Fptr fptr = new Fptr(fileID);
+                physPage.addFptr(fptr);
+                physicalDiv.addSubDiv(physPage);
+                // struct link
+                if(logicalContainer == null) {
+                    SmLink smLink = new SmLink(logicalDiv.asLogicalSubDiv(), physPage);
+                    structLink.addSmLink(smLink);    
+                } else {
+                    SmLink smLink = new SmLink(logicalContainer, physPage);
+                    structLink.addSmLink(smLink);
+                }
             }
         }
     }

@@ -24,6 +24,6 @@ public abstract class MCRMETSGenerator {
         return metsGeneratorClass.newInstance();
     }
 
-    public abstract Document getMETS(MCRDirectory dir, Set<MCRFilesystemNode> ignoreNodes);
+    public abstract Mets getMETS(MCRDirectory dir, Set<MCRFilesystemNode> ignoreNodes);
 
 }
