@@ -21,7 +21,7 @@
   <properties>
     <java.target.version>1.6</java.target.version>
     <uniqueVersion>false</uniqueVersion>
-    <hibernate.version>3.6.3.Final</hibernate.version>
+    <hibernate.version>3.6.4.Final</hibernate.version>
     <lucene.version>3.1.0</lucene.version>
     <changelog.since>2011-03-22</changelog.since>
   </properties>
@@ -759,7 +759,7 @@
       <dependency>
         <groupId>commons-discovery</groupId>
         <artifactId>commons-discovery</artifactId>
-        <version>0.4</version>
+        <version>0.5</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
