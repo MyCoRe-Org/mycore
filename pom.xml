@@ -819,6 +819,17 @@
         <role>developer</role>
       </roles>
     </developer>
+    <developer>
+      <id>mcrnverh</id>
+      <name>Nils Verheyen</name>
+      <organization>Universität Duisburg-Essen, Universitätsbibliothek</organization>
+      <email>nils.verheyen (at) uni-duisburg-essen.de</email>
+      <organizationUrl>http://www.uni-due.de/ub/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>programmer</role>
+      </roles>
+    </developer>
     <!-- Freiburg -->
     <developer>
       <id>mcrddege</id>
@@ -863,6 +874,18 @@
       <timezone>+1</timezone>
       <organization>Universität Hamburg, Regionales Rechenzentrum</organization>
       <organizationUrl>http://www.rrz.uni-hamburg.de/</organizationUrl>
+      <roles>
+        <role>programmer</role>
+      </roles>
+    </developer>
+    <!-- Ilmenau -->
+    <developer>
+      <id>mcradler</id>
+      <name>René Adler</name>
+      <organization>Technischen Universität Ilmenau, Universitätsbibliothek</organization>
+      <email>rene.adler (at) tu-ilmenau.de</email>
+      <organizationUrl>http://www.tu-ilmenau.de/ilmedia/</organizationUrl>
+      <timezone>+1</timezone>
       <roles>
         <role>programmer</role>
       </roles>
@@ -918,6 +941,17 @@
       <timezone>+1</timezone>
       <roles>
         <role>developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrshofm</id>
+      <name>Sebastian Hofmann</name>
+      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
+      <email>vo62xat (at) uni-jena.de</email>
+      <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>programmer</role>
       </roles>
     </developer>
     <developer>
