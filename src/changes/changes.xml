@@ -6,6 +6,98 @@
   </properties>
   <body>
     <release version="2.1" date="2011-??-??" description="LTS">
+      <action dev="mcrmeich" type="add">
+        MCRMETSGenerator: do not return jdom Document but METS document from interface
+      </action>
+      <action dev="mcrvuchi" type="add">
+        add create category method to category DAO
+      </action>
+      <action dev="mcrtchef" type="fix">
+        404 Error lead to infinite loop on startup
+        <fixes issue="3297504"/>
+      </action>
+      <action dev="mcrtchef" type="update">
+        removed web directory under modules/iview2
+        subfolders are moved to modules/iview2
+      </action>
+      <action dev="mcrfluet" type="update">
+        Always trim() input coming from editor form.
+        That means one can not input text with leading or trailing whitespace any more. 
+      </action>
+      <action dev="mcrsteph" type="add">
+        new OAI implementation
+      </action>
+      <action dev="mcrheinz" type="update">
+        refactored iview2:
+         - jQuery Eventing is used for all JS code
+         - Added component for dynamic change of translations
+         - Capsulation of Functions
+      </action>
+      <action dev="mcrjkupf" type="fix">
+        Wrong MCRApplicationBaseURL
+        <fixes issue="328566"/>
+      </action>
+      <action dev="mcrvuchi" type="add">
+        add Method addParent(String), addParent(MCRObjectID) to MCRObjectStructure
+      </action>
+      <action dev="mcrkrebs" type="add">
+        added NISS implementation based on UUID random generator
+      </action>
+      <action dev="mcrtchef" type="add">
+        added mycore-mods component
+        renamed mycore-metsmods to mycore-mets
+      </action>
+      <action dev="mcrtchef" type="fix">
+        High load due to upload?
+        try to get rid of infinitive loop on HashMap.get()
+        <fixes issue="3266973"/>
+      </action>
+      <action dev="mcrfluet" type="fix">
+        Unexpected result after search about index of documents
+        The "contains" mode in IndexBrowser is now mapped to the "contains" query operator.
+        <fixes issue="2799965"/>
+      </action>
+      <action dev="mcrtchef" type="fix">
+        lucene.store.AlreadyClosedException: this IndexReader is closed
+        <fixes issue="3204324"/>
+      </action>
+      <action dev="mcrfluet" type="update">
+        renamed IFS classes according to mycore class naming standard
+      </action>
+      <action dev="mcrtchef" type="fix">
+        org.hibernate.SessionException: Session is closed!
+        <fixes issue="3198245"/>
+      </action>
+      <action dev="mcrsherm" type="update">
+        removed MCRPropertyFunctions
+      </action>
+      <action dev="mcrkrebs" type="fix">
+        removed inclusion of non existing files info.gif and sound.js
+        <fixes issue="3252038"/>
+      </action>
+      <action dev="mcrsherm" type="update">
+        renamed URN and METS classes according to mycore class naming standard
+      </action>
+      <action dev="mcrheinz" type="fix">
+        Clicking on empty Folder in Iview-Chapter caused site reload
+        <fixes issue="3194981"/>
+      </action>
+      <action dev="mcrmeich" type="add">
+        improved MyCoReWebPageProvider to handle real xml data
+        added updateMeta method to update the meta element of a webpage
+      </action>
+      <action dev="mcrtchef" type="add">
+        added method isInCategory to quickly determine if a object is in a specific category
+      </action>
+      <action dev="mcrshofm" type="fix">
+        fixed multiselect in METS - editor
+      </action>
+      <action dev="mcrfluet" type="update">
+        refactored mycore CLI
+      </action>
+      <action dev="mcradler" type="add">
+        added mycore-media component
+      </action>
     </release>
     <release version="2.0.94" date="2011-03-22" description="Beta 4">
       <action dev="mcrfluet" type="add">
