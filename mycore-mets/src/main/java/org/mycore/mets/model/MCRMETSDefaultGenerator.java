@@ -25,7 +25,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
-import org.jdom.Namespace;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
@@ -36,13 +35,16 @@ import org.mycore.mets.model.files.FileGrp;
 import org.mycore.mets.model.files.FileSec;
 import org.mycore.mets.model.sections.AmdSec;
 import org.mycore.mets.model.sections.DmdSec;
-import org.mycore.mets.model.struct.Div;
+import org.mycore.mets.model.struct.AbstractLogicalDiv;
 import org.mycore.mets.model.struct.Fptr;
+import org.mycore.mets.model.struct.LogicalDiv;
 import org.mycore.mets.model.struct.LogicalStructMap;
+import org.mycore.mets.model.struct.LogicalSubDiv;
+import org.mycore.mets.model.struct.PhysicalDiv;
 import org.mycore.mets.model.struct.PhysicalStructMap;
+import org.mycore.mets.model.struct.PhysicalSubDiv;
 import org.mycore.mets.model.struct.SmLink;
 import org.mycore.mets.model.struct.StructLink;
-import org.mycore.mets.model.struct.SubDiv;
 
 /**
  * 
@@ -64,45 +66,41 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
         fileSec.addFileGrp(fileGrp);
         // physical structure
         PhysicalStructMap physicalStructMap = new PhysicalStructMap();
-        Div physicalDiv = new Div("phys_dmd_" + dir.getOwnerID(), "physSequence");
+        PhysicalDiv physicalDiv = new PhysicalDiv("phys_dmd_" + dir.getOwnerID(), "physSequence");
         physicalStructMap.setDivContainer(physicalDiv);
         // logical structure
         LogicalStructMap logicalStructMap = new LogicalStructMap();
-        Div logicalDiv = new Div("log_" + dir.getOwnerID(), dmdSec.getId(), amdSec.getId(), "monograph", dir.getOwnerID());
+        LogicalDiv logicalDiv = new LogicalDiv("log_" + dir.getOwnerID(), "monograph", dir.getOwnerID(), 1, amdSec.getId(), dmdSec.getId());
+        logicalDiv.setDmdId(dmdSec.getId());
         logicalStructMap.setDivContainer(logicalDiv);
         // struct Link
         StructLink structLink = new StructLink();
 
         // create
-        createMets(dir, ignoreNodes, fileGrp, physicalDiv, logicalDiv, null, structLink, 0, 0);
+        createMets(dir, ignoreNodes, fileGrp, physicalDiv, logicalDiv, structLink, 0, 0);
 
         // add to mets
         Mets mets = new Mets();
         mets.addDmdSec(dmdSec);
         mets.addAmdSec(amdSec);
         mets.setFileSec(fileSec);
-        mets.setPysicalStructMap(physicalStructMap);
-        mets.setLogicalStructMap(logicalStructMap);
+        mets.addStructMap(physicalStructMap);
+        mets.addStructMap(logicalStructMap);
         mets.setStructLink(structLink);
 
         return mets;
     }
 
-    private void createMets(MCRDirectory dir, Set<MCRFilesystemNode> ignoreNodes, FileGrp fileGrp, Div physicalDiv, Div logicalDiv, SubDiv logicalContainer, StructLink structLink, int logOrder, int physOrder) {
+    private void createMets(MCRDirectory dir, Set<MCRFilesystemNode> ignoreNodes, FileGrp fileGrp, PhysicalDiv physicalDiv, AbstractLogicalDiv logicalDiv, StructLink structLink, int logOrder, int physOrder) {
         MCRFilesystemNode[] children = dir.getChildren(MCRDirectory.SORT_BY_NAME_IGNORECASE);
         for (MCRFilesystemNode node : children) {
             if (ignoreNodes.contains(node))
                 continue;
             if (node instanceof MCRDirectory) {
                 MCRDirectory subDir = (MCRDirectory) node;
-                SubDiv section = new SubDiv("log_" + Integer.toString(++logOrder), "section", logOrder, subDir.getName());
-                section.setLabel(subDir.getName());
-                if(logicalContainer == null) {
-                    logicalDiv.addSubDiv(section);
-                } else {
-                    logicalContainer.addLogicalDiv(section);
-                }
-                createMets((MCRDirectory)node, ignoreNodes, fileGrp, physicalDiv, logicalDiv, section, structLink, logOrder, physOrder);
+                LogicalSubDiv section = new LogicalSubDiv("log_" + Integer.toString(++logOrder), "section", subDir.getName(), logOrder);
+                logicalDiv.add(section);
+                createMets((MCRDirectory)node, ignoreNodes, fileGrp, physicalDiv, section, structLink, logOrder, physOrder);
             } else {
                 MCRFile mcrFile = (MCRFile) node;
                 final UUID uuid = UUID.randomUUID();
@@ -120,18 +118,13 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
                     continue;
                 }
                 // physical
-                SubDiv physPage = new SubDiv(physicalID, SubDiv.TYPE_PAGE, ++physOrder, true);
+                PhysicalSubDiv pyhsicalPage = new PhysicalSubDiv(physicalID, "page",  ++physOrder);
                 Fptr fptr = new Fptr(fileID);
-                physPage.addFptr(fptr);
-                physicalDiv.addSubDiv(physPage);
+                pyhsicalPage.add(fptr);
+                physicalDiv.add(pyhsicalPage);
                 // struct link
-                if(logicalContainer == null) {
-                    SmLink smLink = new SmLink(logicalDiv.asLogicalSubDiv(), physPage);
-                    structLink.addSmLink(smLink);    
-                } else {
-                    SmLink smLink = new SmLink(logicalContainer, physPage);
-                    structLink.addSmLink(smLink);
-                }
+                SmLink smLink = new SmLink(logicalDiv.getId(), physicalID);
+                structLink.addSmLink(smLink);    
             }
         }
     }

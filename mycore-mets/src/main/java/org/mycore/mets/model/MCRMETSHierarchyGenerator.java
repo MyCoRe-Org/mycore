@@ -2,7 +2,6 @@ package org.mycore.mets.model;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -27,13 +26,16 @@ import org.mycore.mets.model.files.FileGrp;
 import org.mycore.mets.model.files.FileSec;
 import org.mycore.mets.model.sections.AmdSec;
 import org.mycore.mets.model.sections.DmdSec;
-import org.mycore.mets.model.struct.Div;
+import org.mycore.mets.model.struct.AbstractLogicalDiv;
 import org.mycore.mets.model.struct.Fptr;
+import org.mycore.mets.model.struct.LogicalDiv;
 import org.mycore.mets.model.struct.LogicalStructMap;
+import org.mycore.mets.model.struct.LogicalSubDiv;
+import org.mycore.mets.model.struct.PhysicalDiv;
 import org.mycore.mets.model.struct.PhysicalStructMap;
+import org.mycore.mets.model.struct.PhysicalSubDiv;
 import org.mycore.mets.model.struct.SmLink;
 import org.mycore.mets.model.struct.StructLink;
-import org.mycore.mets.model.struct.SubDiv;
 
 /**
  * This class generates a METS xml file for the METS-Editor. In difference to the default
@@ -58,12 +60,6 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
     protected LogicalStructMap logicalStructMap;
     protected StructLink structLink;
 
-    /**
-     * Hashmap to store logical and physical divs. An entry is added
-     * for each derivate link.
-     */
-    protected HashMap<SubDiv, SubDiv> structLinkMap;
-
     @Override
     public synchronized Mets getMETS(MCRDirectory dir, Set<MCRFilesystemNode> ignoreNodes) {
         long startTime = System.currentTimeMillis();        
@@ -77,21 +73,20 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
         LOGGER.info("create mets for derivate " + derId.toString() + "...");
 
         // create mets sections
-        this.structLinkMap = new HashMap<SubDiv, SubDiv>();
         this.amdSection = createAmdSection();
         this.dmdSection = createDmdSection();
         this.fileSection = createFileSection(dir, ignoreNodes);
         this.physicalStructMap = createPhysicalStruct();
+        this.structLink = new StructLink();
         this.logicalStructMap = createLogicalStruct();
-        this.structLink = createStructLink();
 
         // add to mets
         Mets mets = new Mets();
         mets.addAmdSec(this.amdSection);
         mets.addDmdSec(this.dmdSection);
         mets.setFileSec(this.fileSection);
-        mets.setPysicalStructMap(this.physicalStructMap);
-        mets.setLogicalStructMap(this.logicalStructMap);
+        mets.addStructMap(this.physicalStructMap);
+        mets.addStructMap(this.logicalStructMap);
         mets.setStructLink(this.structLink);
 
         LOGGER.info("mets creation for derivate " + derId.toString() + " took " +
@@ -173,8 +168,8 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
     protected PhysicalStructMap createPhysicalStruct() {
         PhysicalStructMap pstr = new PhysicalStructMap();
         // set main div
-        Div mainDiv = new Div("phys_" + this.mcrDer.getId().toString(), Div.TYPE_PHYS_SEQ);
-        pstr.setDivContainer(mainDiv);
+        PhysicalDiv physicalDiv = new PhysicalDiv("phys_" + this.mcrDer.getId().toString(), PhysicalDiv.TYPE_PHYS_SEQ);
+        pstr.setDivContainer(physicalDiv);
         // run through files
         FileGrp masterGroup = this.fileSection.getFileGroup(FileGrp.USE_MASTER);
         List<File> fList = masterGroup.getfList();
@@ -182,64 +177,69 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
         for(File file : fList) {
             String fileId = file.getId();
             // add page
-            SubDiv page = new SubDiv(SubDiv.ID_PREFIX + fileId, SubDiv.TYPE_PAGE, order++, true);
-            mainDiv.addSubDiv(page);
+            PhysicalSubDiv page = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + fileId, PhysicalSubDiv.TYPE_PAGE, order++);
+            physicalDiv.add(page);
             // add file pointer
             Fptr fptr = new Fptr(fileId);
-            page.addFptr(fptr);
+            page.add(fptr);
         }
         return pstr;
     }
 
     protected LogicalStructMap createLogicalStruct() {
         LogicalStructMap lstr = new LogicalStructMap();
-        MCRObjectID derId = this.mcrDer.getId();
+        MCRObjectID objId = this.rootObj.getId();
         // create main div
-        String id = "log_" + derId.toString();
+        String id = "log_" + objId.toString();
         String amdId = this.dmdSection.getId();
         String dmdId = this.dmdSection.getId();
-        Div mainDiv = new Div(id, dmdId, amdId, getType(this.rootObj), getLabel(this.rootObj));
-        mainDiv.setOrder(1);
-        lstr.setDivContainer(mainDiv);
-
+        LogicalDiv logicalDiv = new LogicalDiv(id, getType(this.rootObj), getLabel(this.rootObj), 1, amdId, dmdId);
+        lstr.setDivContainer(logicalDiv);
+        // add struct link
+        PhysicalSubDiv physicalSubDiv = this.physicalStructMap.getDivContainer().getChildren().get(0);
+        addStructLink(logicalDiv.getId(), physicalSubDiv.getId());
         // run through all children
-        List<MCRMetaLinkID> links = this.rootObj.getStructure().getChildren();
-        for(int i = 0; i < links.size(); i++) {
-            MCRMetaLinkID linkId = links.get(i);
-            SubDiv subDiv = createLogicalStruct(linkId.getXLinkHrefID(), derId, i + 1);
-            mainDiv.addSubDiv(subDiv);
-        }
+        createLogicalStruct(this.rootObj, this.mcrDer.getId(), physicalSubDiv, logicalDiv);
         return lstr;
     }
 
-    private SubDiv createLogicalStruct(MCRObjectID mcrId, MCRObjectID derId, int order) {
-        // create new logical sub div
-        MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(mcrId);
-        String id = "log_" + mcrId.toString();
-        SubDiv logicalDiv = new SubDiv(id, getType(mcrObj), order, getLabel(mcrObj));
-        // check if a derivate link exists and get the linked file
-        String linkedFile = getLinkedFile(derId, mcrObj);
-        if(linkedFile != null) {
-            String fileId = getFileId(linkedFile);
-            if(fileId != null) {
-                SubDiv physicalDiv = getPhysicalDiv(fileId);
-                if(physicalDiv != null) {
-                    // add physical and logical div to hashmap
-                    // map is used in structLink
-                    structLinkMap.put(physicalDiv, logicalDiv);
-                }
-            }
-        }
+    private void createLogicalStruct(MCRObject parentObject, MCRObjectID derId, PhysicalSubDiv lastPhysicalDiv, AbstractLogicalDiv parentLogicalDiv) {
         // run through all children
-        List<MCRMetaLinkID> links = mcrObj.getStructure().getChildren();
+        List<MCRMetaLinkID> links = parentObject.getStructure().getChildren();
         for(int i = 0; i < links.size(); i++) {
             MCRMetaLinkID linkId = links.get(i);
-            SubDiv subDiv = createLogicalStruct(linkId.getXLinkHrefID(), derId, i + 1);
-            logicalDiv.addLogicalDiv(subDiv);
+            MCRObjectID childId = MCRObjectID.getInstance(linkId.getXLinkHref());
+            MCRObject childObject = MCRMetadataManager.retrieveMCRObject(childId);
+
+            // create new logical sub div
+            String id = "log_" + childId.toString();
+            LogicalSubDiv logicalChildDiv = new LogicalSubDiv(id, getType(childObject), getLabel(childObject), i+1);
+
+            // check if a derivate link exists and get the linked file
+            String linkedFile = getLinkedFile(derId, childObject);
+            if(linkedFile != null) {
+                String fileId = getFileId(linkedFile);
+                if(fileId != null) {
+                    PhysicalSubDiv physicalDiv = getPhysicalDiv(fileId);
+                    if(physicalDiv != null) {
+                        lastPhysicalDiv = physicalDiv;
+                    }
+                }
+            }
+            // add struct link
+            addStructLink(logicalChildDiv.getId(), lastPhysicalDiv.getId());
+            // add to parent
+            parentLogicalDiv.add(logicalChildDiv);
+            // do recursive call for children
+            createLogicalStruct(childObject, derId, lastPhysicalDiv, logicalChildDiv);
         }
-        return logicalDiv;
     }
 
+    private void addStructLink(String from, String to) {
+        SmLink smLink = new SmLink(from, to);
+        this.structLink.addSmLink(smLink);
+    }
+    
     private String getFileId(String linkedFile) {
         if(linkedFile == null)
             return null;
@@ -250,30 +250,14 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
         return null;
     }
 
-    private SubDiv getPhysicalDiv(String fileId) {
+    private PhysicalSubDiv getPhysicalDiv(String fileId) {
         if(fileId == null)
             return null;
-        Div mainDiv = this.physicalStructMap.getDivContainer();
-        for(SubDiv subDiv : mainDiv.getSubDivList())
+        PhysicalDiv mainDiv = this.physicalStructMap.getDivContainer();
+        for(PhysicalSubDiv subDiv : mainDiv.getChildren())
             if(subDiv.getId().contains(fileId))
                 return subDiv;
         return null;
-    }
-
-    protected StructLink createStructLink() {
-        StructLink structLink = new StructLink();
-        SubDiv currentLogicalDiv = logicalStructMap.getDivContainer().asLogicalSubDiv();
-        Div mainDiv = this.physicalStructMap.getDivContainer();
-        List<SubDiv> subDivList = mainDiv.getSubDivList();
-        for(SubDiv physLink : subDivList) {
-            SubDiv newLogicalDiv = structLinkMap.get(physLink);
-            if(newLogicalDiv != null) {
-                currentLogicalDiv = newLogicalDiv;
-            }
-            SmLink smLink = new SmLink(currentLogicalDiv, physLink);
-            structLink.addSmLink(smLink);
-        }
-        return structLink;
     }
 
     protected String getLinkedFile(MCRObjectID derId, MCRObject mcrObj) {

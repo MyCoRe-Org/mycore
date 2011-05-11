@@ -31,13 +31,14 @@ import org.mycore.mets.model.files.FileGrp;
 import org.mycore.mets.model.files.FileSec;
 import org.mycore.mets.model.sections.AmdSec;
 import org.mycore.mets.model.sections.DmdSec;
-import org.mycore.mets.model.struct.Div;
-import org.mycore.mets.model.struct.Fptr;
+import org.mycore.mets.model.struct.AbstractLogicalDiv;
+import org.mycore.mets.model.struct.LogicalDiv;
 import org.mycore.mets.model.struct.LogicalStructMap;
+import org.mycore.mets.model.struct.LogicalSubDiv;
+import org.mycore.mets.model.struct.PhysicalDiv;
 import org.mycore.mets.model.struct.PhysicalStructMap;
 import org.mycore.mets.model.struct.SmLink;
 import org.mycore.mets.model.struct.StructLink;
-import org.mycore.mets.model.struct.SubDiv;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -90,32 +91,30 @@ public class MCRMetsProvider {
         /* init the two structure maps */
         /* init logical structure map */
         logicalStructMp = new LogicalStructMap();
-        Div logDivContainer = new Div("log_" + derivate, dmdSec.getId(), amdSec.getId(), "monograph", "Label for " + derivate);
-        logDivContainer.setOrder(1);
+        LogicalDiv logDivContainer = new LogicalDiv("log_" + derivate, "monograph", "Label for " + derivate, 1, amdSec.getId(), dmdSec.getId());
         logicalStructMp.setDivContainer(logDivContainer);
 
         /* init physical structure map */
         physicalStructMp = new PhysicalStructMap();
-        Div physDivContainer = new Div("phys_" + dmdSec.getId(), Div.TYPE_PHYS_SEQ);
+        PhysicalDiv physDivContainer = new PhysicalDiv("phys_" + dmdSec.getId(), PhysicalDiv.TYPE_PHYS_SEQ);
         physicalStructMp.setDivContainer(physDivContainer);
 
         /* add the different structure maps */
-        mets.setPysicalStructMap(physicalStructMp);
-        mets.setLogicalStructMap(logicalStructMp);
+        mets.addStructMap(physicalStructMp);
+        mets.addStructMap(logicalStructMp);
 
         /* add the struct link section */
         structLink = new StructLink();
         mets.setStructLink(structLink);
     }
 
-    @SuppressWarnings("unchecked")
     public Mets toMets(JsonObject source) throws JDOMException, IOException {
         // these are derivate id and probably a name/label
         String name = source.get("name").toString();
         String docType = source.get("structureType").toString();
 
         this.logicalStructMp.getDivContainer().setLabel(MCRJSONTools.stripBracketsAndQuotes(name));
-        this.logicalStructMp.getDivContainer().setDocumentType(MCRJSONTools.stripBracketsAndQuotes(docType));
+        this.logicalStructMp.getDivContainer().setType(MCRJSONTools.stripBracketsAndQuotes(docType));
 
         // the children of the derivate should be present
         JsonArray children = (JsonArray) source.get("children");
@@ -133,8 +132,7 @@ public class MCRMetsProvider {
      * @param parent
      *            a JsonObject with children attribut
      */
-    @SuppressWarnings("unchecked")
-    private void process(Iterator<JsonElement> it, SubDiv parentDiv) {
+    private void process(Iterator<JsonElement> it, AbstractLogicalDiv parentDiv) {
         while (it.hasNext()) {
             JsonObject json = it.next().getAsJsonObject();
             String id = MCRJSONTools.stripBracketsAndQuotes(json.get("id").getAsString());
@@ -146,21 +144,11 @@ public class MCRMetsProvider {
              * StructureModel.js) and not actually a file/image
              */
             if (json.has("children")) {
-                SubDiv logDiv = new SubDiv(idProvider.getNextId(), structType, logicalOrder, label);
-
+                LogicalSubDiv logDiv = new LogicalSubDiv(idProvider.getNextId(), structType, label, logicalOrder);
                 if (parentDiv != null) {
-                    parentDiv.addLogicalDiv(logDiv);
-                    // reference to 1st file (file may be in a sub structure)
-                    /* TODO remove condition once it is needed */
-                    if (false) {
-                        String firstFileId = getFirstFileId(json.get("children").getAsJsonArray().iterator());
-                        if (firstFileId != null) {
-                            SubDiv physical = new SubDiv(firstFileId, null, -1, null);
-                            structLink.addSmLink(new SmLink(parentDiv, physical));
-                        }
-                    }
+                    parentDiv.add(logDiv);
                 } else {
-                    logicalStructMp.getDivContainer().addSubDiv(logDiv);
+                    logicalStructMp.getDivContainer().add(logDiv);
                 }
                 process(json.get("children").getAsJsonArray().iterator(), logDiv);
             }
@@ -170,69 +158,17 @@ public class MCRMetsProvider {
              */
             else {
                 String path = MCRJSONTools.stripBracketsAndQuotes(json.get("path").getAsString());
-                int physicalOrder = json.get("physicalOrder").getAsInt();
-                String orderLabel = MCRJSONTools.stripBracketsAndQuotes(json.get("orderLabel").getAsString());
-
-                SubDiv physical = addFileToPhysicalStructMp(id, path, physicalOrder, orderLabel);
                 addFileToGroups(id, path, label);
 
                 /* create div in log struct map and add the symlink */
                 if (parentDiv != null) {
-                    structLink.addSmLink(new SmLink(parentDiv, physical));
+                    structLink.addSmLink(new SmLink(parentDiv.getId(), id));
                 } else {
-                    SmLink link = new SmLink(logicalStructMp.getDivContainer().asLogicalSubDiv(), physical);
-                    structLink.addSmLink(link);
+                    structLink.addSmLink(new SmLink(logicalStructMp.getDivContainer().getId(), id));
                 }
             }
         }
 
-    }
-
-    /**
-     * Method traverses through the objects in the iterator and looks for a json
-     * object representing a file. The id of the first file found is returned.
-     * 
-     * @param iterator
-     * @return the id of the first file in the hierarchy or <code>null</code> if
-     *         there is no such file
-     */
-    private String getFirstFileId(Iterator<JsonElement> iterator) {
-        String fileId = null;
-        while (iterator.hasNext()) {
-            JsonObject json = iterator.next().getAsJsonObject();
-            if (json.has("children")) {
-                return getFirstFileId(json.get("children").getAsJsonArray().iterator());
-            }
-
-            String structType = MCRJSONTools.stripBracketsAndQuotes(json.get("structureType").getAsString());
-            if ("page".equals(structType)) {
-                fileId = MCRJSONTools.stripBracketsAndQuotes(json.get("id").getAsString());
-                return SubDiv.ID_PREFIX + fileId;
-            }
-        }
-        return fileId;
-    }
-
-    /**
-     * Adds the file with the given id to the physical struct map
-     * 
-     * @param id
-     *            the id of the file
-     * @param physicalOrder
-     *            the position of the file in the sequence of all files
-     * @return the {@link SubDiv}
-     */
-    private SubDiv addFileToPhysicalStructMp(String id, String path, int physicalOrder, String orderLabel) {
-        Div divContainer = physicalStructMp.getDivContainer();
-        String idStripped = MCRJSONTools.stripBracketsAndQuotes(id);
-
-        SubDiv subDiv = new SubDiv(SubDiv.ID_PREFIX + idStripped, SubDiv.TYPE_PAGE, physicalOrder, true);
-        subDiv.setOrderLabel(orderLabel);
-
-        subDiv.addFptr(new Fptr(id));
-        divContainer.addSubDiv(subDiv);
-
-        return subDiv;
     }
 
     /**
