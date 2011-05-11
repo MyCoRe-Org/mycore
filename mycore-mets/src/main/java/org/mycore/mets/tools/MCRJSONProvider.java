@@ -18,6 +18,7 @@
  */
 package org.mycore.mets.tools;
 
+import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -152,8 +153,8 @@ public class MCRJSONProvider implements Comparator<MCRFilesystemNode> {
             if (structureType.equals("page")) {
                 String physId = getPhysicalIdsForLogical(logicalId)[0];
                 String itemId = physId.substring(physId.indexOf("_") + 1);
-                String path = getHref(itemId);
-                String labelPage = getLabelByPhysicalId(physId);
+                String path = decode(getHref(itemId));
+                String labelPage = decode(getLabelByPhysicalId(physId));
 
                 if (labelPage == null) {
                     LOGGER.debug("Could not determine label attribute. Using file name as label");
@@ -205,8 +206,8 @@ public class MCRJSONProvider implements Comparator<MCRFilesystemNode> {
         String[] physIDsUnderRoot = getPhysicalIdsForLogical(parentDiv.getAttributeValue("ID"));
         for (String physicalId : physIDsUnderRoot) {
             String itemID = getFileID(physicalId);
-            String path = getHref(itemID);
-            String label = getLabelByPhysicalId(physicalId);
+            String path = decode(getHref(itemID));
+            String label = decode(getLabelByPhysicalId(physicalId));
             if (label == null) {
                 int index = path.lastIndexOf("/");
                 label = path.substring(index == -1 ? 0 : index + 1);
@@ -219,6 +220,22 @@ public class MCRJSONProvider implements Comparator<MCRFilesystemNode> {
 
         LOGGER.debug(tree.asJson());
         return tree.asJson();
+    }
+
+    /**
+     * @param source
+     * @return
+     */
+    private String decode(String source) {
+        if (source == null) {
+            return null;
+        }
+        try {
+            source = URLDecoder.decode(source, "UTF-8");
+        } catch (Exception ex) {
+            LOGGER.error("Error occured while decoding source string \"" + source + "\"", ex);
+        }
+        return source;
     }
 
     /**
@@ -306,8 +323,8 @@ public class MCRJSONProvider implements Comparator<MCRFilesystemNode> {
         for (int i = 0; i < physIds.length; i++) {
             /* determine base properties */
             String itemId = getFileID(physIds[i]);
-            String path = getHref(itemId);
-            String label = getLabelByPhysicalId(physIds[i]);
+            String path = decode(getHref(itemId));
+            String label = decode(getLabelByPhysicalId(physIds[i]));
             if (label == null) {
                 LOGGER.debug("Could not determine label attribute. Using file name as label");
                 int index = path.lastIndexOf("/");
