@@ -20,7 +20,6 @@ package org.mycore.mets.servlets;
 
 import javax.servlet.http.HttpServletResponse;
 
-
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.mycore.access.MCRAccessManager;
@@ -55,18 +54,25 @@ public class MCRSaveMETSServlet extends MCRServlet {
             job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
-        
+
         LOGGER.debug(jsontree);
-        
+
         MCRMetsProvider mp = new MCRMetsProvider(derivateId);
         LOGGER.info("Creating Mets object for derivate with id " + derivateId);
         Mets mets = mp.toMets(json);
         LOGGER.info("Creating Mets object for derivate with id " + derivateId + " was succesful");
 
-        LOGGER.info("Creating METS document from Mets object");
-        Document metsDoc = mets.asDocument();
-        LOGGER.info("Creating METS document from Mets object was succesful");
+        LOGGER.info("Validating METS document ...");
+        if (!mets.isValid()) {
+            LOGGER.error("Validating METS document failed");
+            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST,
+                    "The METS document provided is not valid. See server log for details");
+            return;
+        }
+        LOGGER.info("Validating METS document was successful");
 
+        LOGGER.info("Saving mets file ...");
+        Document metsDoc = mets.asDocument();
         MCRMetsSave.saveMets(metsDoc, derivateId);
         return;
     }
