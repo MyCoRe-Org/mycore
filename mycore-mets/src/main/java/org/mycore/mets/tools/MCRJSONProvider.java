@@ -154,7 +154,7 @@ public class MCRJSONProvider implements Comparator<MCRFilesystemNode> {
                 String physId = getPhysicalIdsForLogical(logicalId)[0];
                 String itemId = physId.substring(physId.indexOf("_") + 1);
                 String path = decode(getHref(itemId));
-                String labelPage = decode(getLabelByPhysicalId(physId));
+                String labelPage = getLabelByPhysicalId(physId);
 
                 if (labelPage == null) {
                     LOGGER.debug("Could not determine label attribute. Using file name as label");
@@ -207,7 +207,7 @@ public class MCRJSONProvider implements Comparator<MCRFilesystemNode> {
         for (String physicalId : physIDsUnderRoot) {
             String itemID = getFileID(physicalId);
             String path = decode(getHref(itemID));
-            String label = decode(getLabelByPhysicalId(physicalId));
+            String label = getLabelByPhysicalId(physicalId);
             if (label == null) {
                 int index = path.lastIndexOf("/");
                 label = path.substring(index == -1 ? 0 : index + 1);
@@ -425,7 +425,7 @@ public class MCRJSONProvider implements Comparator<MCRFilesystemNode> {
             int order = Integer.valueOf(e.getAttributeValue("ORDER"));
             return order;
         } catch (Exception e) {
-            LOGGER.error(e);
+            LOGGER.error("Error occured while getting order attribute for physical id \"" + physId + "\"", e);
         }
         return -1;
     }

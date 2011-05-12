@@ -19,6 +19,8 @@
 package org.mycore.mets.tools;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
@@ -32,11 +34,13 @@ import org.mycore.mets.model.files.FileSec;
 import org.mycore.mets.model.sections.AmdSec;
 import org.mycore.mets.model.sections.DmdSec;
 import org.mycore.mets.model.struct.AbstractLogicalDiv;
+import org.mycore.mets.model.struct.Fptr;
 import org.mycore.mets.model.struct.LogicalDiv;
 import org.mycore.mets.model.struct.LogicalStructMap;
 import org.mycore.mets.model.struct.LogicalSubDiv;
 import org.mycore.mets.model.struct.PhysicalDiv;
 import org.mycore.mets.model.struct.PhysicalStructMap;
+import org.mycore.mets.model.struct.PhysicalSubDiv;
 import org.mycore.mets.model.struct.SmLink;
 import org.mycore.mets.model.struct.StructLink;
 
@@ -91,7 +95,8 @@ public class MCRMetsProvider {
         /* init the two structure maps */
         /* init logical structure map */
         logicalStructMp = new LogicalStructMap();
-        LogicalDiv logDivContainer = new LogicalDiv("log_" + derivate, "monograph", "Label for " + derivate, 1, amdSec.getId(), dmdSec.getId());
+        LogicalDiv logDivContainer = new LogicalDiv("log_" + derivate, "monograph", "Label for " + derivate, 1, amdSec.getId(),
+                dmdSec.getId());
         logicalStructMp.setDivContainer(logDivContainer);
 
         /* init physical structure map */
@@ -158,35 +163,78 @@ public class MCRMetsProvider {
              */
             else {
                 String path = MCRJSONTools.stripBracketsAndQuotes(json.get("path").getAsString());
-                addFileToGroups(id, path, label);
+                int physicalOrder = json.get("physicalOrder").getAsInt();
+                String orderLabel = MCRJSONTools.stripBracketsAndQuotes(json.get("orderLabel").getAsString());
+                path = encode(path);
+
+                /* create the physical div and add it to the physical struct map */
+                PhysicalSubDiv physDiv = createPhysicalDiv(id, physicalOrder, orderLabel);
+                physicalStructMp.getDivContainer().add(physDiv);
+
+                /* create the file object and add it to the file section */
+                File file = createFile(id, path);
+                fileGrpMaster.addFile(file);
 
                 /* create div in log struct map and add the symlink */
                 if (parentDiv != null) {
-                    structLink.addSmLink(new SmLink(parentDiv.getId(), id));
+                    structLink.addSmLink(new SmLink(parentDiv.getId(), physDiv.getId()));
                 } else {
-                    structLink.addSmLink(new SmLink(logicalStructMp.getDivContainer().getId(), id));
+                    structLink.addSmLink(new SmLink(logicalStructMp.getDivContainer().getId(), physDiv.getId()));
                 }
             }
         }
-
     }
 
     /**
-     * Adds the file to the 3 goups (default,min and max) and sets the FLocat
-     * object to the files
+     * Creates a {@link PhysicalSubDiv}.
      * 
      * @param id
      *            the id of the file
-     * @param name
-     *            the name/label of the file
+     * @param physicalOrder
+     *            the position of the file in the sequence of all files
+     * @param orderLabel
+     *            the order label of the file
      */
-    private void addFileToGroups(String id, String path, String name) {
+    private PhysicalSubDiv createPhysicalDiv(String id, int physicalOrder, String orderLabel) {
         String idStripped = MCRJSONTools.stripBracketsAndQuotes(id);
-        String nameStripped = MCRJSONTools.stripBracketsAndQuotes(name);
-        File file = null;
+        PhysicalSubDiv physDiv = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + idStripped, PhysicalSubDiv.TYPE_PAGE, physicalOrder,
+                orderLabel);
+        physDiv.add(new Fptr(id));
+        return physDiv;
+    }
 
-        file = new File(idStripped, nameStripped, File.MIME_TYPE_TIFF);
+    /**
+     * Creates a {@link File} object and sets the FLocat object to the files
+     * 
+     * @param id
+     *            the id of the file
+     * @param path
+     *            the path of the image relative to the derivate root, must be
+     *            encoded
+     */
+    private File createFile(String id, String path) {
+        String idStripped = MCRJSONTools.stripBracketsAndQuotes(id);
+        File file = null;
+        file = new File(idStripped, File.MIME_TYPE_TIFF);
         file.setFLocat(new FLocat(FLocat.LOCTYPE_URL, path));
-        fileGrpMaster.addFile(file);
+
+        return file;
+    }
+
+    /**
+     * @param source
+     *            the string to decode (url decode)
+     * @return the input string decoded or null if the input string is null
+     */
+    private String encode(String source) {
+        if (source == null) {
+            return null;
+        }
+        try {
+            source = URLEncoder.encode(source, "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            LOGGER.error("Error occured while decoding source string \"" + source + "\"", ex);
+        }
+        return source;
     }
 }
