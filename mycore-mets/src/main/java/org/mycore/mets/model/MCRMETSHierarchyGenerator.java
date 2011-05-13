@@ -2,8 +2,10 @@ package org.mycore.mets.model;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -60,6 +62,12 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
     protected LogicalStructMap logicalStructMap;
     protected StructLink structLink;
 
+    /**
+     * Hashmap to store logical and physical ids. An entry is added
+     * for each derivate link.
+     */
+    private Map<String, String> structLinkMap;
+    
     @Override
     public synchronized Mets getMETS(MCRDirectory dir, Set<MCRFilesystemNode> ignoreNodes) {
         long startTime = System.currentTimeMillis();        
@@ -72,13 +80,15 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
 
         LOGGER.info("create mets for derivate " + derId.toString() + "...");
 
+        this.structLinkMap = new HashMap<String, String>();
+
         // create mets sections
         this.amdSection = createAmdSection();
         this.dmdSection = createDmdSection();
         this.fileSection = createFileSection(dir, ignoreNodes);
         this.physicalStructMap = createPhysicalStruct();
-        this.structLink = new StructLink();
         this.logicalStructMap = createLogicalStruct();
+        this.structLink = createStructLink();
 
         // add to mets
         Mets mets = new Mets();
@@ -195,61 +205,113 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
         String dmdId = this.dmdSection.getId();
         LogicalDiv logicalDiv = new LogicalDiv(id, getType(this.rootObj), getLabel(this.rootObj), 1, amdId, dmdId);
         lstr.setDivContainer(logicalDiv);
-        // add struct link
-        PhysicalSubDiv physicalSubDiv = this.physicalStructMap.getDivContainer().getChildren().get(0);
-        addStructLink(logicalDiv.getId(), physicalSubDiv.getId());
         // run through all children
-        createLogicalStruct(this.rootObj, this.mcrDer.getId(), physicalSubDiv, logicalDiv);
+        createLogicalStruct(this.rootObj, logicalDiv);
+        // remove not linked logical divs
+        Iterator<LogicalSubDiv> it = logicalDiv.getChildren().iterator();
+        while(it.hasNext()) {
+            LogicalSubDiv child = it.next();
+            if(!validateLogicalStruct(logicalDiv, child))
+                it.remove();
+        }
         return lstr;
     }
 
-    private void createLogicalStruct(MCRObject parentObject, MCRObjectID derId, PhysicalSubDiv lastPhysicalDiv, AbstractLogicalDiv parentLogicalDiv) {
+    /**
+     * Creates the logical structure recursive. 
+     * 
+     * @param parentObject mycore object
+     * @param derId 
+     * @param parentLogicalDiv
+     */
+    private void createLogicalStruct(MCRObject parentObject, AbstractLogicalDiv parentLogicalDiv) {
         // run through all children
         List<MCRMetaLinkID> links = parentObject.getStructure().getChildren();
         for(int i = 0; i < links.size(); i++) {
             MCRMetaLinkID linkId = links.get(i);
             MCRObjectID childId = MCRObjectID.getInstance(linkId.getXLinkHref());
             MCRObject childObject = MCRMetadataManager.retrieveMCRObject(childId);
-
             // create new logical sub div
             String id = "log_" + childId.toString();
             LogicalSubDiv logicalChildDiv = new LogicalSubDiv(id, getType(childObject), getLabel(childObject), i+1);
-
-            // check if a derivate link exists and get the linked file
-            String linkedFile = getLinkedFile(derId, childObject);
-            if(linkedFile != null) {
-                String fileId = getFileId(linkedFile);
-                if(fileId != null) {
-                    PhysicalSubDiv physicalDiv = getPhysicalDiv(fileId);
-                    if(physicalDiv != null) {
-                        lastPhysicalDiv = physicalDiv;
-                    }
-                }
-            }
-            // add struct link
-            addStructLink(logicalChildDiv.getId(), lastPhysicalDiv.getId());
             // add to parent
             parentLogicalDiv.add(logicalChildDiv);
+            // check if a derivate link exists and get the linked file
+            String linkedFile = getLinkedFile(childObject);
+            if(linkedFile != null) {
+                try {
+                    String uriEncodedFile = new URI(null, linkedFile, null).toString();
+                    String fileId = getFileId(uriEncodedFile);
+                    if(fileId != null) {
+                        PhysicalSubDiv physicalDiv = getPhysicalDiv(fileId);
+                        if(physicalDiv != null) {
+                            this.structLinkMap.put(physicalDiv.getId(), logicalChildDiv.getId());
+                        }
+                    }
+                } catch(Exception exc) {
+                    LOGGER.error("",exc);
+                }
+            }
             // do recursive call for children
-            createLogicalStruct(childObject, derId, lastPhysicalDiv, logicalChildDiv);
+            createLogicalStruct(childObject, logicalChildDiv);
         }
     }
 
-    private void addStructLink(String from, String to) {
-        SmLink smLink = new SmLink(from, to);
-        this.structLink.addSmLink(smLink);
+    /**
+     * Its important to remove not linked logical divs without children to
+     * get a valid logical structure.
+     * 
+     * @param parent
+     * @param logicalDiv
+     * @return
+     */
+    private boolean validateLogicalStruct(AbstractLogicalDiv parent, LogicalSubDiv logicalDiv) {
+        // has link
+        if(this.structLinkMap.containsValue(logicalDiv.getId()))
+            return true;
+        // has children with link
+        Iterator<LogicalSubDiv> it = logicalDiv.getChildren().iterator();
+        while(it.hasNext()) {
+            LogicalSubDiv child = it.next();
+            if(validateLogicalStruct(logicalDiv, child))
+                return true;
+            // nothing -> delete it
+            it.remove();
+        }
+        return false;
     }
-    
-    private String getFileId(String linkedFile) {
-        if(linkedFile == null)
+
+    protected StructLink createStructLink() {
+        StructLink structLink = new StructLink();
+        String currentLogicalDivId = logicalStructMap.getDivContainer().getId();
+        PhysicalDiv physicalDiv = this.physicalStructMap.getDivContainer();
+        List<PhysicalSubDiv> subDivList = physicalDiv.getChildren();
+        for(PhysicalSubDiv physLink : subDivList) {
+            String logicalId = structLinkMap.get(physLink.getId());
+            if(logicalId != null) {
+                currentLogicalDivId = logicalId;
+            }
+            structLink.addSmLink(new SmLink(currentLogicalDivId, physLink.getId()));
+        }
+        return structLink;
+    }
+
+    private String getFileId(String uriEncodedLinkedFile) {
+        if(uriEncodedLinkedFile == null)
             return null;
         FileGrp masterGroup = this.fileSection.getFileGroup(FileGrp.USE_MASTER);
         for(File f : masterGroup.getfList())
-            if(linkedFile.equals(f.getFLocat().getHref()))
+            if(uriEncodedLinkedFile.equals(f.getFLocat().getHref()))
                 return f.getId();
         return null;
     }
 
+    /**
+     * Returns a physical sub div by the given fileId.
+     * 
+     * @param fileId id of a file element in fileGrp
+     * @return
+     */
     private PhysicalSubDiv getPhysicalDiv(String fileId) {
         if(fileId == null)
             return null;
@@ -260,7 +322,14 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
         return null;
     }
 
-    protected String getLinkedFile(MCRObjectID derId, MCRObject mcrObj) {
+    /**
+     * Returns the file name of a derivate link.
+     * 
+     * @param derId derivate which contains the file
+     * @param mcrObj object which contains the derivate link
+     * @return
+     */
+    protected String getLinkedFile(MCRObject mcrObj) {
         MCRMetaElement me = mcrObj.getMetadata().getMetadataElement(getEnclosingDerivateLinkName());
         // no derivate link
         if(me == null)
@@ -281,7 +350,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
                 continue;
             // return if its the wrong derivate
             String derIdAsString = href.substring(0, indexOfSlash);
-            if(!derId.equals(MCRObjectID.getInstance(derIdAsString)))
+            if(!this.mcrDer.getId().equals(MCRObjectID.getInstance(derIdAsString)))
                 continue;
             // finally get the linked file
             return href.substring(indexOfSlash + 1);
