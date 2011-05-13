@@ -251,7 +251,13 @@ public class MCRBuildLuceneQuery {
             LOGGER.debug("Lucene query: " + query.toString());
 
             return query;
-        } else {
+        } else if(("text".equals(fieldtype) || "identifier".equals(fieldtype) || "index".equals(fieldtype))
+        		  &&("<".equals(operator) || "<=".equals(operator) 
+        				  || ">=".equals(operator) || ">".equals(operator))){
+        	return TermInequalityQuery(field, fieldtype, operator, value);
+        }
+        
+        else {
             LOGGER.info("Not supported, fieldtype: " + fieldtype + " operator: " + operator);
         }
 
@@ -355,6 +361,36 @@ public class MCRBuildLuceneQuery {
         return null;
     }
 
+    /***************************************************************************
+     * TermInequalityQuery ()
+     * deals with operators: <, <=, =>, >
+     * for field types: text index, identifier
+     **************************************************************************/
+    private static Query TermInequalityQuery(String fieldname, String type, String op, String value) {
+        if (value == null) {
+            return null;
+        }
+        if (type.equals("text") || type.equals("identifier") || type.equals("index")) {
+            String lower = null;
+            String upper = null;
+            if (op.equals(">") || op.equals(">=")) {
+                lower = value;
+                return new TermRangeQuery(fieldname, lower, upper, op.length() == 2, true);
+            }
+            if (op.equals("<") || op.equals("<=")) {
+                upper = value;
+                return new TermRangeQuery(fieldname, lower, upper, true, op.length() == 2);
+            }
+            if (op.equals("=")) {
+                return new TermRangeQuery(fieldname, value, value, true, true);
+            }
+        }
+        LOGGER.info("Invalid operator: " + op);
+
+        return null;
+    }
+
+    
     /***************************************************************************
      * DateQuery2 ()
      * @throws ParseException 
