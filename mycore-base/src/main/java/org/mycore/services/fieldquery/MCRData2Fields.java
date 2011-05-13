@@ -91,6 +91,8 @@ public class MCRData2Fields {
         xslTemplate.setAttribute("version", "1.0");
         xslTemplate.setNamespace(MCRConstants.XSL_NAMESPACE);
         xslTemplate.addNamespaceDeclaration(Namespace.XML_NAMESPACE);
+        xslTemplate.addNamespaceDeclaration(MCRConstants.METS_NAMESPACE);
+        xslTemplate.addNamespaceDeclaration(MCRConstants.MODS_NAMESPACE);
         xslTemplate.addNamespaceDeclaration(MCRConstants.XLINK_NAMESPACE);
         xslTemplate.addNamespaceDeclaration(MCRFieldDef.xalanns);
         xslTemplate.addNamespaceDeclaration(MCRFieldDef.extns);
