@@ -218,8 +218,8 @@ public final class MCRObjectID {
         if (type == null) {
             throw new IllegalArgumentException("type cannot be null");
         }
-        if (number < 0) {
-            throw new IllegalArgumentException("number can not be negative");
+        if (number <= 0) {
+            throw new IllegalArgumentException("number must be positive");
         }
         return new StringBuilder(MAX_LENGTH).append(projectID).append('_').append(type.toLowerCase()).append('_')
                 .append(idFormat.numberFormat().format(number)).toString();
@@ -301,7 +301,7 @@ public final class MCRObjectID {
             return false;
         }
 
-        if (mcr_number < 0) {
+        if (mcr_number <= 0) {
             return false;
         }
         this.mcr_id = formatID(mcr_project_id, mcr_type_id, mcr_number);
