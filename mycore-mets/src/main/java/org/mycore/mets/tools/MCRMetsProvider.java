@@ -20,11 +20,13 @@ package org.mycore.mets.tools;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.jdom.JDOMException;
+import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.mets.misc.LogicalIdProvider;
 import org.mycore.mets.model.Mets;
 import org.mycore.mets.model.files.FLocat;
@@ -231,8 +233,8 @@ public class MCRMetsProvider {
             return null;
         }
         try {
-            source = URLEncoder.encode(source, "UTF-8");
-        } catch (UnsupportedEncodingException ex) {
+            source = MCRServlet.encodeURL(source);
+        } catch (URISyntaxException ex) {
             LOGGER.error("Error occured while decoding source string \"" + source + "\"", ex);
         }
         return source;

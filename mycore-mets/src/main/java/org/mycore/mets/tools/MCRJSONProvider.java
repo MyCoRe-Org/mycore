@@ -18,7 +18,6 @@
  */
 package org.mycore.mets.tools;
 
-import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -26,6 +25,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.Vector;
 
+import org.apache.commons.vfs.provider.UriParser;
 import org.apache.log4j.Logger;
 import org.dom4j.DocumentException;
 import org.jdom.Attribute;
@@ -224,14 +224,15 @@ public class MCRJSONProvider implements Comparator<MCRFilesystemNode> {
 
     /**
      * @param source
-     * @return
+     *            the string to uri encode
+     * @return the decoded string or null if the source is null
      */
     private String decode(String source) {
         if (source == null) {
             return null;
         }
         try {
-            source = URLDecoder.decode(source, "UTF-8");
+            source = UriParser.decode(source);
         } catch (Exception ex) {
             LOGGER.error("Error occured while decoding source string \"" + source + "\"", ex);
         }
