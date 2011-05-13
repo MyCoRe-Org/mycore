@@ -128,7 +128,7 @@ public final class MCRObjectID {
      *            <code>maxInWorkflow + 1</code>
      */
     public static synchronized MCRObjectID getNextFreeId(String base_id, int maxInWorkflow) {
-        int last = Math.max(getLastID(base_id).getNumberAsInteger(), maxInWorkflow) + 1;
+        int last = Math.max(getLastIDNumber(base_id), maxInWorkflow) + 1;
         int rest = last % idFormat.numberDistance();
         if (rest != 0) {
             last += idFormat.numberDistance() - rest;
@@ -139,13 +139,30 @@ public final class MCRObjectID {
     }
 
     /**
+     * Returns the last ID number used or reserved for the given object base type.
+     * This may return the value 0 when there is no ID last used or in the store.
+     */
+    private static int getLastIDNumber(String base_id) {
+        int lastIDKnown = lastnumber.containsKey(base_id) ? lastnumber.get(base_id) : 0;
+
+        String[] idParts = getIDParts(base_id);
+        int highestStoredID = MCRXMLMetadataManager.instance().getHighestStoredID(idParts[0], idParts[1]);
+
+        return Math.max(lastIDKnown, highestStoredID);
+    }
+    
+    /**
      * Returns the last ID used or reserved for the given object base type.
+     * 
+     * @return a valid MCRObjectID, or null when there is no ID for the given type 
      */
     public static MCRObjectID getLastID(String base_id) {
+        int lastIDNumber = getLastIDNumber(base_id);
+        if (lastIDNumber == 0)
+            return null;
+
         String[] idParts = getIDParts(base_id);
-        int last = lastnumber.containsKey(base_id) ? lastnumber.get(base_id) : 0;
-        int stored = MCRXMLMetadataManager.instance().getHighestStoredID(idParts[0], idParts[1]);
-        return getInstance(formatID(idParts[0], idParts[1], Math.max(last, stored)));
+        return getInstance(formatID(idParts[0], idParts[1], lastIDNumber));
     }
 
     public static MCRObjectID getInstance(String id) {
