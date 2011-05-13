@@ -1031,6 +1031,17 @@
     </developer>
     <!-- Leipzig -->
     <developer>
+      <id>mcrsfrei</id>
+      <name>Stefan Freitag</name>
+      <email>freitag (at) rz.uni-leipzig.de</email>
+      <organization>Universität Leipzig, Universitätsrechenzentrum</organization>
+      <organizationUrl>http://www.urz.uni-leipzig.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <developer>
       <id>mcrjkupf</id>
       <name>Jens Kupferschmidt</name>
       <email>kupferschmidt (at) rz.uni-leipzig.de</email>
@@ -1040,6 +1051,17 @@
       <roles>
         <role>developer</role>
         <role>architect</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>mcrawerm</id>
+      <name>Andy Wermke</name>
+      <email>andy_wermke (at) web.de</email>
+      <organization>Universität Leipzig, Universitätsbibliothek</organization>
+      <organizationUrl>http://www.ub.uni-leipzig.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>programmer</role>
       </roles>
     </developer>
     <!-- München -->
