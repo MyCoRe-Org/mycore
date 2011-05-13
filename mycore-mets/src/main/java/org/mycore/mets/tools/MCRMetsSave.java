@@ -22,10 +22,9 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mets.model.files.FLocat;
 import org.mycore.mets.model.files.FileGrp;
-import org.mycore.mets.model.struct.Div;
 import org.mycore.mets.model.struct.Fptr;
+import org.mycore.mets.model.struct.PhysicalSubDiv;
 import org.mycore.mets.model.struct.SmLink;
-import org.mycore.mets.model.struct.SubDiv;
 
 /**
  * @author shermann
@@ -132,8 +131,9 @@ public class MCRMetsSave {
             /* add to structMap physical */
             xp = XPath.newInstance("mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']/mets:div[last()]/@ORDER");
             Attribute orderAttribute = (Attribute) xp.selectSingleNode(mets);
-            SubDiv div = new SubDiv(SubDiv.ID_PREFIX + fileId, SubDiv.TYPE_PAGE, orderAttribute.getIntValue() + 1, true);
-            div.addFptr(new Fptr(fileId));
+            PhysicalSubDiv div = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + fileId, PhysicalSubDiv.TYPE_PAGE,
+                    orderAttribute.getIntValue() + 1);
+            div.add(new Fptr(fileId));
 
             // actually alter the mets document
             xp = XPath.newInstance("mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']");
@@ -147,8 +147,8 @@ public class MCRMetsSave {
 
             xp = XPath.newInstance("mets:mets/mets:structLink");
             Element structLink = (Element) xp.selectSingleNode(mets);
-            Div log = new Div(rootID, null, null, null, null);
-            structLink.addContent((new SmLink(log.asLogicalSubDiv(), div)).asElement());
+
+            structLink.addContent((new SmLink(rootID, div.getId()).asElement()));
 
         } catch (Exception ex) {
             LOGGER.error("Error occured while adding file " + file + " to the existing mets file", ex);
