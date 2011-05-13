@@ -35,21 +35,27 @@
   width:30px;
   }
 #swf_workflow_common_list .item_col2_ltr {
-  width:450px;
+  width:400px;
   }
 #swf_workflow_common_list .item_col2_rtl {
   width:190px;
   }
 #swf_workflow_common_list .item_col3_ltr {
-  width:190px;
+  width:50px;
   }
 #swf_workflow_common_list .item_col3_rtl {
-  width:450px;
+  width:50px;
   }
 #swf_workflow_common_list .item_col4_ltr {
-  width:30px;
+  width:190px;
   }
 #swf_workflow_common_list .item_col4_rtl {
+  width:400px;
+  }
+#swf_workflow_common_list .item_col5_ltr {
+  width:30px;
+  }
+#swf_workflow_common_list .item_col5_rtl {
   width:30px;
   }
   
@@ -74,11 +80,12 @@
 
 #swf_workflow_common_list .headline_id_ltr {
   padding:3px;
+  text-align:right;
 }
 
 #swf_workflow_common_list .headline_id_rtl {
   padding:3px;
-  text-align:right;
+  text-align:left;
 }
 
 #swf_workflow_common_list .dataline_ltr {
@@ -90,9 +97,11 @@
 }
 
 #swf_workflow_common_list .dataline_label_ltr {
+	padding:3px;
 }
 
 #swf_workflow_common_list .dataline_label_rtl {
+	padding:3px;
   text-align:right;
 }
 
@@ -186,10 +195,12 @@
 }
 
 #swf_workflow_common_list .derivateline_icons_ltr {
+  padding:3px;
 }
 
 #swf_workflow_common_list .derivateline_icons_rtl {
   text-align: right;
+  padding:3px;
 }
 
 #swf_workflow_common_list .button {

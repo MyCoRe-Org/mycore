@@ -79,15 +79,14 @@
                       <td class="item_col item_col2_rtl"/>
                       <td class="item_col item_col3_rtl"/>
                       <td class="item_col item_col4_rtl"/>
+                      <td class="item_col item_col5_rtl"/>
                     </tr>
                     <tr class="headline_rtl">
-                      <td class="headline_label_rtl" colspan="4">
-                        <xsl:value-of select="label"/>
-                      </td>
-                    </tr>
-                    <tr class="headline_rtl">
-                      <td class="headline_id_rtl" colspan="4">
+                      <td class="headline_id_rtl" colspan="3">
                         <xsl:value-of select="$obj_id"/>
+                      </td>
+                      <td class="headline_label_rtl" colspan="2">
+                        <xsl:value-of select="label"/>
                       </td>
                     </tr>
                     <tr class="dataline_rtl">
@@ -129,7 +128,7 @@
                           </a>
                         </xsl:if>
                       </td>
-                      <td class="dataline_label_rtl" colspan="2">
+                      <td class="dataline_label_rtl" colspan="3">
                         <xsl:for-each select="data">
                           <xsl:if test="position() != 1">
                             <br/>
@@ -162,7 +161,7 @@
                             </a>
                           </xsl:if>
                         </td>
-                        <td class="derivateline_label_rtl" colspan="2">
+                        <td class="derivateline_label_rtl" colspan="3">
                           <xsl:choose>
                             <xsl:when test="@title">
                               <xsl:value-of select="@title"/>
@@ -203,7 +202,7 @@
                                   </xsl:otherwise>
                                 </xsl:choose>
                               </td>
-                              <td class="derivatefiles_filename_rtl" colspan="2">
+                              <td class="derivatefiles_filename_rtl" colspan="3">
                                 <xsl:variable name="fileurl"
                                   select="concat($WebApplicationBaseURL,'servlets/MCRFileViewWorkflowServlet/',text(),$JSessionID,'?type=',$type,'&amp;base=',$base)"/>
                                 <xsl:text>[</xsl:text>
@@ -283,19 +282,18 @@
                       <td class="item_col item_col2_ltr"/>
                       <td class="item_col item_col3_ltr"/>
                       <td class="item_col item_col4_ltr"/>
+                      <td class="item_col item_col5_ltr"/>
                     </tr>
                     <tr class="headline_ltr">
-                      <td class="headline_label_ltr" colspan="4">
+                      <td class="headline_label_ltr" colspan="2">
                         <xsl:value-of select="label"/>
                       </td>
-                    </tr>
-                    <tr class="headline_ltr">
-                      <td class="headline_id_ltr" colspan="4">
+                      <td class="headline_id_ltr" colspan="3">
                         <xsl:value-of select="$obj_id"/>
                       </td>
                     </tr>
                     <tr class="dataline_ltr">
-                      <td class="dataline_label_ltr" colspan="2">
+                      <td class="dataline_label_ltr" colspan="3">
                         <xsl:for-each select="data">
                           <xsl:if test="position() != 1">
                             <br/>
@@ -345,7 +343,7 @@
                     </tr>
                     <xsl:for-each select="derivate">
                       <tr class="derivateline_ltr">
-                        <td class="derivateline_label_ltr" colspan="2">
+                        <td class="derivateline_label_ltr" colspan="3">
                           <xsl:choose>
                             <xsl:when test="@title">
                               <xsl:value-of select="@title"/>
@@ -399,7 +397,7 @@
                                   </xsl:otherwise>
                                 </xsl:choose>
                               </td>
-                              <td class="derivatefiles_filename_ltr" colspan="2">
+                              <td class="derivatefiles_filename_ltr" colspan="3">
                                 <xsl:variable name="fileurl"
                                   select="concat($WebApplicationBaseURL,'servlets/MCRFileViewWorkflowServlet/',text(),$JSessionID,'?type=',$type,'&amp;base=',$base)"/>
                                 <a class="linkButton">
