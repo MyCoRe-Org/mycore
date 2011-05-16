@@ -70,6 +70,9 @@ import org.w3c.dom.NodeList;
  * @author Thomas Scheffler (yagee)
  * @author Jens Kupferschmidt
  */
+/**
+ * @author shermann
+ */
 public class MCRXMLFunctions {
 
     static MCRConfiguration CONFIG = MCRConfiguration.instance();
@@ -268,7 +271,7 @@ public class MCRXMLFunctions {
             long duration = System.currentTimeMillis() - start;
             LOGGER.info("URN processed in " + duration + " ms");
         }
-        LOGGER.info("Processing all URN took " + (System.currentTimeMillis()-temp) + " ms");
+        LOGGER.info("Processing all URN took " + (System.currentTimeMillis() - temp) + " ms");
         return rootElement.getChildNodes();
     }
 
@@ -454,13 +457,15 @@ public class MCRXMLFunctions {
         }
         return n;
     }
-    
+
     /**
      * checks if the current user is in a specific role
-     * @param role a role name
+     * 
+     * @param role
+     *            a role name
      * @return true if user has this role
      */
-    public static boolean isCurrentUserInRole(String role){
+    public static boolean isCurrentUserInRole(String role) {
         return MCRSessionMgr.getCurrentSession().getUserInformation().isUserInRole(role);
     }
 
@@ -469,5 +474,19 @@ public class MCRXMLFunctions {
      */
     public static boolean exists(String objectId) {
         return MCRMetadataManager.exists(MCRObjectID.getInstance(objectId));
+    }
+
+    /**
+     * Method returns the amount of space consumed by the files contained in the
+     * derivate container. The returned string is already formatted meaning it
+     * has already the optimal measurement unit attached (e.g. 142 MB, ).
+     * 
+     * @param derivateId
+     *            the derivate id for which the size should be returned
+     * @return the size as formatted string
+     */
+    public static String getSize(String derivateId) {
+        MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateId));
+        return derivate.receiveDirectoryFromIFS().getSizeFormatted();
     }
 }
