@@ -29,8 +29,6 @@ import java.util.Properties;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.log4j.Logger;
-
 /**
  * @author Thomas Scheffler (yagee)
  *
