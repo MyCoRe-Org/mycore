@@ -77,7 +77,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
         StructLink structLink = new StructLink();
 
         // create
-        createMets(dir, ignoreNodes, fileGrp, physicalDiv, logicalDiv, structLink, 0, 0);
+        createMets(dir, ignoreNodes, fileGrp, physicalDiv, logicalDiv, structLink, 0);
 
         // add to mets
         Mets mets = new Mets();
@@ -91,7 +91,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
         return mets;
     }
 
-    private void createMets(MCRDirectory dir, Set<MCRFilesystemNode> ignoreNodes, FileGrp fileGrp, PhysicalDiv physicalDiv, AbstractLogicalDiv logicalDiv, StructLink structLink, int logOrder, int physOrder) {
+    private void createMets(MCRDirectory dir, Set<MCRFilesystemNode> ignoreNodes, FileGrp fileGrp, PhysicalDiv physicalDiv, AbstractLogicalDiv logicalDiv, StructLink structLink, int logOrder) {
         MCRFilesystemNode[] children = dir.getChildren(MCRDirectory.SORT_BY_NAME_IGNORECASE);
         for (MCRFilesystemNode node : children) {
             if (ignoreNodes.contains(node))
@@ -100,7 +100,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
                 MCRDirectory subDir = (MCRDirectory) node;
                 LogicalSubDiv section = new LogicalSubDiv("log_" + Integer.toString(++logOrder), "section", subDir.getName(), logOrder);
                 logicalDiv.add(section);
-                createMets((MCRDirectory)node, ignoreNodes, fileGrp, physicalDiv, section, structLink, logOrder, physOrder);
+                createMets((MCRDirectory)node, ignoreNodes, fileGrp, physicalDiv, section, structLink, logOrder);
             } else {
                 MCRFile mcrFile = (MCRFile) node;
                 final UUID uuid = UUID.randomUUID();
@@ -118,7 +118,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
                     continue;
                 }
                 // physical
-                PhysicalSubDiv pyhsicalPage = new PhysicalSubDiv(physicalID, "page",  ++physOrder);
+                PhysicalSubDiv pyhsicalPage = new PhysicalSubDiv(physicalID, "page",  physicalDiv.getChildren().size() + 1);
                 Fptr fptr = new Fptr(fileID);
                 pyhsicalPage.add(fptr);
                 physicalDiv.add(pyhsicalPage);
