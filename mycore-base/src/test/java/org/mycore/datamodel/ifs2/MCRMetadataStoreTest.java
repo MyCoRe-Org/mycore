@@ -28,6 +28,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,9 +62,15 @@ public class MCRMetadataStoreTest extends MCRIFS2MetadataTestCase {
 
     @Test
     public void createDocumentInt() throws Exception {
+        Document xml1 = new Document(new Element("root"));
+        try {
+            getMetaDataStore().create(MCRContent.readFrom(xml1), 0);
+            fail("metadata store allows to save with id \"0\".");
+        } catch (Exception e) {
+            //test passed
+        }
         int id = getMetaDataStore().getNextFreeID();
         assertTrue(id > 0);
-        Document xml1 = new Document(new Element("root"));
         MCRStoredMetadata sm1 = getMetaDataStore().create(MCRContent.readFrom(xml1), id);
         assertNotNull(sm1);
         MCRContent xml2 = getMetaDataStore().retrieve(id).getMetadata();

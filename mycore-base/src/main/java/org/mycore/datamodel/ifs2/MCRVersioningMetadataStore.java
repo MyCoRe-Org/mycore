@@ -124,7 +124,7 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
     }
 
     @Override
-    public MCRVersionedMetadata create(MCRContent xml) throws Exception {
+    public MCRVersionedMetadata create(MCRContent xml) throws IOException, JDOMException {
         return (MCRVersionedMetadata) super.create(xml);
     }
 

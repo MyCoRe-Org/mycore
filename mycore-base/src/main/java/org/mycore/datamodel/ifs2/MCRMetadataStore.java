@@ -66,7 +66,7 @@ public class MCRMetadataStore extends MCRStore {
         suffix = ".xml";
         forceXML = MCRConfiguration.instance().getBoolean("MCR.IFS2.Store." + type + ".ForceXML", true);
     }
-    
+
     /**
      * Initializes a new metadata store instance.
      * 
@@ -76,7 +76,7 @@ public class MCRMetadataStore extends MCRStore {
     @Override
     protected void init(MCRStoreConfig config) {
         super.init(config);
-        prefix = config.getID()+"_";
+        prefix = config.getID() + "_";
         suffix = ".xml";
         forceXML = MCRConfiguration.instance().getBoolean("MCR.IFS2.Store." + config.getID() + ".ForceXML", true);
     }
@@ -91,8 +91,10 @@ public class MCRMetadataStore extends MCRStore {
      * @param xml
      *            the XML document to be stored
      * @return the stored metadata object
+     * @throws JDOMException 
+     * @throws IOException 
      */
-    public MCRStoredMetadata create(MCRContent xml) throws Exception {
+    public MCRStoredMetadata create(MCRContent xml) throws IOException, JDOMException {
         int id = getNextFreeID();
         return create(xml, id);
     }
@@ -108,6 +110,9 @@ public class MCRMetadataStore extends MCRStore {
      * @throws JDOMException 
      */
     public MCRStoredMetadata create(MCRContent xml, int id) throws IOException, JDOMException {
+        if (id <= 0) {
+            throw new MCRException("ID of metadata object must be a positive integer");
+        }
         FileObject fo = getSlot(id);
         if (fo.exists()) {
             String msg = "Metadata object with ID " + id + " already exists in store";
