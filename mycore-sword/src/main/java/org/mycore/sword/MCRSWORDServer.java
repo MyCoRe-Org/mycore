@@ -231,6 +231,8 @@ public class MCRSWORDServer implements SWORDServer, MCRSWORDIngester {
      */
     public DepositResponse doDeposit(Deposit deposit, MCRServletJob job) throws SWORDAuthenticationException, SWORDErrorException, SWORDException {
 
+        LOG.info("performing deposit for user: " + deposit.getUsername());
+        
         SWORDEntry swordEntry = new SWORDEntry();
         StringBuffer verboseInfo = new StringBuffer("Deposit info: ");
 
@@ -243,6 +245,8 @@ public class MCRSWORDServer implements SWORDServer, MCRSWORDIngester {
 
         // create response
         DepositResponse response = createDepositResponse(verboseInfo, deposit, swordEntry);
+        
+        LOG.info("deposit for user: " + deposit.getUsername() + " performed");
 
         return response;
     }
@@ -260,12 +264,15 @@ public class MCRSWORDServer implements SWORDServer, MCRSWORDIngester {
     protected void validateDeposit(Deposit deposit) throws SWORDErrorException {
 
         if (deposit.getOnBehalfOf() != null && !deposit.getOnBehalfOf().isEmpty()) {
+            LOG.error(String.format("throwing error: mediated user (%1$s)", deposit.getOnBehalfOf()));
             throw new SWORDErrorException(ErrorCodes.MEDIATION_NOT_ALLOWED, "Mediated deposit not allowed");
         }
         if (!METS_PACKAGING.equals(deposit.getPackaging())) {
+            LOG.error(String.format("throwing error: invalid packaging (%1$s)", deposit.getPackaging()));
             throw new SWORDErrorException(ErrorCodes.ERROR_CONTENT, "Invalid packaging given");
         }
         if (!ZIP_MIME_TYPE.equals(deposit.getContentType())) {
+            LOG.error(String.format("throwing error: invalid mime type (%1$s)", deposit.getContentType()));
             throw new SWORDErrorException(ErrorCodes.ERROR_CONTENT, "Invalid mime type given");
         }
     }
@@ -543,6 +550,7 @@ public class MCRSWORDServer implements SWORDServer, MCRSWORDIngester {
             Element metsElement = document.getRootElement();
             Attribute profile = metsElement.getAttribute("PROFILE");
             if (profile == null || !METS_PROFILE.equals(profile.getValue())) {
+                LOG.error(String.format("throwing error: invalid profile (%1$s)", profile.getValue()));
                 throw new SWORDErrorException(ErrorCodes.ERROR_CONTENT, "Invalid profile inside package descriptor. PROFILE must me " + METS_PROFILE);
             }
 
@@ -573,8 +581,9 @@ public class MCRSWORDServer implements SWORDServer, MCRSWORDIngester {
                     }
                 }
             }
-            if (!missingFiles.isEmpty())
+            if (!missingFiles.isEmpty()) {
                 throw new SWORDErrorException(ErrorCodes.ERROR_CONTENT, "The following file(s) were not found inside zip: " + missingFiles);
+            }
         } catch (JDOMException e) {
             throw new SWORDErrorException(ErrorCodes.ERROR_CONTENT, "invalid package descriptor given -> " + e.getMessage());
         } catch (IOException e) {

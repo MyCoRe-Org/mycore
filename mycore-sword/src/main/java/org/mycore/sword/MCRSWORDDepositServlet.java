@@ -131,14 +131,20 @@ public class MCRSWORDDepositServlet extends MCRServlet {
         // Create the Deposit request
         Deposit d = new Deposit();
         Date date = new Date();
-        LOG.debug("Starting deposit processing at " + date.toString() + " by " + request.getRemoteAddr());
+        LOG.info("Starting deposit processing at " + date.toString() + " by " + request.getRemoteAddr());
 
         // Are there any authentication details?
         Pair<String, String> requestAuthData = MCRSWORDUtils.readBasicAuthData(request);
         if (authenticator.authenticate(requestAuthData.first, requestAuthData.second)) {
+
+            LOG.info("requesting user: " + requestAuthData.first);
+            
             d.setUsername(requestAuthData.first);
             d.setPassword(requestAuthData.second);
         } else {
+            
+            LOG.info("unauthorized request for service document send -> host: " + request.getRemoteHost());
+            
             String s = "BASIC realm=\"" + MCRSWORDUtils.getAuthRealm() + "\"";
             response.setHeader("WWW-Authenticate", s);
             response.setStatus(401);
@@ -168,6 +174,7 @@ public class MCRSWORDDepositServlet extends MCRServlet {
             OutputStream fout = new FileOutputStream(file);
             IOUtils.copy(fin, fout);
             if ((maxUploadSize != -1) && (file.length() > maxUploadSize)) {
+                LOG.info("max upload size exeeded: " + file.length());
                 this.makeErrorDocument(ErrorCodes.MAX_UPLOAD_SIZE_EXCEEDED, HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE,
                         "The uploaded file exceeded the maximum file size this server will accept (the file is " + fLength
                                 + " kB but the server will only accept files as large as " + maxUploadSize + " kB)", request, response);
@@ -299,7 +306,7 @@ public class MCRSWORDDepositServlet extends MCRServlet {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             LOG.error(nsae.toString());
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error(e.toString(), e);
             throw e;
         } finally {
             // Close the input stream if it still open

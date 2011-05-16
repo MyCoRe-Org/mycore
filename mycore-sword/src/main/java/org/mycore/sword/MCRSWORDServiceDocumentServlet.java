@@ -83,6 +83,8 @@ public class MCRSWORDServiceDocumentServlet extends MCRServlet {
     protected void doGet(MCRServletJob job) throws Exception {
         HttpServletRequest request = job.getRequest();
         HttpServletResponse response = job.getResponse();
+        
+        LOG.info("executing new SWORD service document request");
 
         // Create the ServiceDocumentRequest
         ServiceDocumentRequest sdr = new ServiceDocumentRequest();
@@ -90,18 +92,24 @@ public class MCRSWORDServiceDocumentServlet extends MCRServlet {
         // Are there any authentication details?
         Pair<String, String> requestAuthData = MCRSWORDUtils.readBasicAuthData(request);
         if (requestAuthData != null && authenticator.authenticate(requestAuthData.first, requestAuthData.second)) {
+
+            LOG.info("requesting user: " + requestAuthData.first);
+            
             sdr.setUsername(requestAuthData.first);
             sdr.setPassword(requestAuthData.second);
         } else {
+            
+            LOG.info("unauthorized request for service document send -> host: " + request.getRemoteHost());
+
             String s = "BASIC realm=\"" + MCRSWORDUtils.getAuthRealm() + "\"";
             response.setHeader("WWW-Authenticate", s);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            LOG.info("unauthorized request for service document send -> host: " + request.getRemoteHost());
             return;
         }
 
         // Set the x-on-behalf-of header
         sdr.setOnBehalfOf(request.getHeader(HttpHeaders.X_ON_BEHALF_OF.toString()));
+        LOG.info("on behalf of user: " + sdr.getOnBehalfOf());
 
         // Set the IP address
         sdr.setIPAddress(request.getRemoteAddr());
