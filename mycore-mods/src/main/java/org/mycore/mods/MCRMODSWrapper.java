@@ -24,7 +24,7 @@ public class MCRMODSWrapper {
     public static final Namespace MODS_NS = Namespace.getNamespace("mods", "http://www.loc.gov/mods/v3");
 
     public static MCRObject wrapMODSDocument(Element modsDefinition, String projectID) {
-        MCRObjectID objID = MCRObjectID.getInstance(MessageFormat.format("{0}_{1}_0", projectID, MODS_OBJECT_TYPE));
+        MCRObjectID objID = MCRObjectID.getInstance(MessageFormat.format("{0}_{1}_00000008", projectID, MODS_OBJECT_TYPE));
         MCRObject obj = new MCRObject();
         obj.setId(objID);
         obj.setSchema("datamodel-mods.xsd");
