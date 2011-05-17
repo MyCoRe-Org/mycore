@@ -37,6 +37,7 @@ public interface MCRCategoryDAO {
 
     /**
      * Adds a category as child of another category.
+     * When parentID is null a root category will be created.
      * 
      * @param parentID
      *            ID of the parent category
@@ -209,20 +210,6 @@ public interface MCRCategoryDAO {
      */
     public abstract void setLabel(MCRCategoryID id, MCRLabel label);
     
-    /**
-     * Create a new category
-     * 
-     * @param id
-     *          ID of the category
-     * @param label
-     *          to be set or updated
-     * @param parent
-     *          parent category, null when root category
-     * @return
-     *          new MCRCategory
-     */
-    public abstract MCRCategory createCategory(MCRCategoryID id,  Set<MCRLabel> labels, MCRCategory parent);
-
     /**
      * allows to determine when the last change was made to the categories.
      * @return either the last change time or the init time of the DAO class

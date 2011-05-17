@@ -812,13 +812,4 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         }
         return HIB_CONNECTION_INSTANCE;
     }
-
-    @Override
-    public MCRCategory createCategory(MCRCategoryID id,  Set<MCRLabel> labels, MCRCategory parent) {
-        MCRCategoryImpl newCategory = new MCRCategoryImpl();
-        newCategory.setId(id);
-        newCategory.setLabels(labels);
-        newCategory.setParent(parent);
-        return newCategory;
-    }
 }
