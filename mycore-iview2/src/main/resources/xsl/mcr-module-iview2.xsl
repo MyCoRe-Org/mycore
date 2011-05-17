@@ -5,7 +5,7 @@
   <xsl:param name="MCR.Module-iview2.DeveloperMode" />
   <xsl:param name="WebApplicationBaseURL" />
   <xsl:param name="ServletsBaseURL" />
-  <xsl:variable name="jqueryUI.version" select="'1.8.8'"/>
+  <xsl:variable name="jqueryUI.version" select="'1.8.12'"/>
   <xsl:output method="html" indent="yes" encoding="UTF-8" media-type="text/html" />
   <xsl:template name="iview2.getViewer" mode="iview2">
     <xsl:param name="groupID" />
@@ -133,7 +133,14 @@
       }
     </script>
     
-    <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/js/iview2.js"/>
+    <xsl:choose>
+      <xsl:when test="$MCR.Module-iview2.DeveloperMode='true'">
+        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/js/iview2.js"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/js/iview2.min.js"/>
+      </xsl:otherwise>
+      </xsl:choose>
     <script type="text/javascript">
       	var i18n = i18n || new iview.i18n('<xsl:value-of select="$WebApplicationBaseURL"/>', '<xsl:value-of select="$CurrentLang"/>');
     </script>
