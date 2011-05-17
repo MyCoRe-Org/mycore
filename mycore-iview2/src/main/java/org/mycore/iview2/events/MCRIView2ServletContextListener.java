@@ -53,6 +53,7 @@ public class MCRIView2ServletContextListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
         if (!MCRImageTiler.isRunning()) {
             LOGGER.info("Starting Tiling thread.");
+            System.setProperty("java.awt.headless", "true");
             tilingThread = new Thread(MCRImageTiler.getInstance());
             tilingThread.start();
         }
