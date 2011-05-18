@@ -5,7 +5,28 @@
     <author email="thomas.scheffler(at)uni-jena.de">Thomas Scheffler</author>
   </properties>
   <body>
-    <release version="2.1" date="2011-??-??" description="LTS">
+    <release version="2.1" date="2011-05-??" description="LTS">
+      <action dev="mcrsteph" type="add">
+        new OAI implementationreadded support for operators: &lt;, &lt;=, =&gt;, &gt; on field types text, index, identifier
+      </action>
+      <action dev="mcrsherm" type="fix">
+        MCRZipServlet does not check access rights
+        <fixes issue="3301497"/>
+      </action>
+      <action dev="mcrtchef" type="fix">
+        Do not allow metadata objects with int id "0" to be saved in store
+      </action>
+      <action dev="mcrsherm" type="fix">
+        Href attr. in file section of a mets document is url encoded
+        <fixes issue="3301079"/>
+      </action>
+      <action dev="mcrsherm" type="add">
+        METS-editor: validate generated METS document
+      </action>
+      <action dev="mcrsherm" type="fix">
+        METS-editor:decoding label and path to image
+        <fixes issue="3300479"/>
+      </action>
       <action dev="mcrmeich" type="add">
         MCRMETSGenerator: do not return jdom Document but METS document from interface
       </action>
