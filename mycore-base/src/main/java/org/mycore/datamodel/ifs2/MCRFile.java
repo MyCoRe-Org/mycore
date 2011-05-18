@@ -24,6 +24,7 @@
 package org.mycore.datamodel.ifs2;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.provider.local.LocalFile;
@@ -56,7 +57,7 @@ public class MCRFile extends MCRStoredNode {
      * @param fo
      *            the file in the local underlying filesystem storing this file
      */
-    protected MCRFile(MCRDirectory parent, FileObject fo, Element data) throws Exception {
+    protected MCRFile(MCRDirectory parent, FileObject fo, Element data) throws IOException {
         super(parent, fo, data);
     }
 
@@ -68,7 +69,7 @@ public class MCRFile extends MCRStoredNode {
      * @param name
      *            the file name
      */
-    protected MCRFile(MCRDirectory parent, String name) throws Exception {
+    protected MCRFile(MCRDirectory parent, String name) throws IOException {
         super(parent, name, "file");
         fo.createFile();
         data.setAttribute("md5", MCRFile.MD5_OF_EMPTY_FILE);
@@ -80,7 +81,7 @@ public class MCRFile extends MCRStoredNode {
      * is a container, like zip or tar, may contain other files as children.
      */
     @Override
-    protected MCRVirtualNode buildChildNode(FileObject fo) throws Exception {
+    protected MCRVirtualNode buildChildNode(FileObject fo) throws IOException {
         return new MCRVirtualNode(this, fo);
     }
 
@@ -113,7 +114,7 @@ public class MCRFile extends MCRStoredNode {
      *            the content to be read
      * @return the MD5 checksum of the stored content
      */
-    public String setContent(MCRContent source) throws Exception {
+    public String setContent(MCRContent source) throws IOException {
         MCRContentInputStream cis = source.getContentInputStream();
         source.sendTo(fo);
         String md5 = cis.getMD5String();
@@ -128,7 +129,7 @@ public class MCRFile extends MCRStoredNode {
      * 
      * @return the file in the local filesystem representing this file
      */
-    public File getLocalFile() throws Exception {
+    public File getLocalFile() throws IOException {
         if (fo instanceof LocalFile) {
             return new File(fo.getURL().getPath());
         } else {
@@ -140,7 +141,7 @@ public class MCRFile extends MCRStoredNode {
      * Repairs additional metadata of this file and all its children
      */
     @Override
-    void repairMetadata() throws Exception {
+    void repairMetadata() throws IOException {
         data.setName("file");
         data.setAttribute("name", getName());
         data.removeChildren("file");

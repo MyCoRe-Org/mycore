@@ -175,7 +175,7 @@ public abstract class MCRStore {
      *            the ID of the data
      * @return the file object storing that data
      */
-    FileObject getSlot(int ID) throws IOException {
+    protected FileObject getSlot(int ID) throws IOException {
         return VFS.getManager().resolveFile(baseDirectory, getSlotPath(ID));
     }
 

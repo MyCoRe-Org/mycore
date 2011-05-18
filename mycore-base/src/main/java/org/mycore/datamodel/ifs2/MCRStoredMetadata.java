@@ -149,7 +149,7 @@ public class MCRStoredMetadata {
      * Deletes the metadata document. This object is invalid afterwards, do not
      * use it any more.
      * 
-     * @throws Exception
+     * @throws IOException
      */
     public void delete() throws IOException {
         if (!isDeleted()) {

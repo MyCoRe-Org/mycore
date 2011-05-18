@@ -23,8 +23,8 @@
 
 package org.mycore.datamodel.ifs2;
 
+import java.io.IOException;
 import java.util.Iterator;
-import java.util.Set;
 
 import org.apache.commons.vfs.FileObject;
 import org.mycore.common.MCRException;
@@ -47,7 +47,7 @@ public class MCRFileStore extends MCRStore {
      * 
      * @return a newly created file collection
      */
-    public MCRFileCollection create() throws Exception {
+    public MCRFileCollection create() throws IOException {
         int id = getNextFreeID();
         return create(id);
     }
@@ -58,10 +58,10 @@ public class MCRFileStore extends MCRStore {
      * @param id
      *            the ID of the file collection
      * @return a newly created file collection
-     * @throws Exception
+     * @throws IOException
      *             when a file collection with the given ID already exists
      */
-    public MCRFileCollection create(int id) throws Exception {
+    public MCRFileCollection create(int id) throws IOException {
         FileObject fo = getSlot(id);
         if (fo.exists()) {
             String msg = "FileCollection with ID " + id + " already exists";
@@ -78,7 +78,7 @@ public class MCRFileStore extends MCRStore {
      *            the file collection's ID
      * @return the file collection with the given ID, or null
      */
-    public MCRFileCollection retrieve(int id) throws Exception {
+    public MCRFileCollection retrieve(int id) throws IOException {
         FileObject fo = getSlot(id);
         if (!fo.exists()) {
             return null;
@@ -90,9 +90,9 @@ public class MCRFileStore extends MCRStore {
     /**
      * Repairs metadata of all file collections stored here
      * 
-     * @throws Exception
+     * @throws IOException
      */
-    public void repairAllMetadata() throws Exception {
+    public void repairAllMetadata() throws IOException {
         for (Iterator<Integer> e = listIDs(MCRStore.ASCENDING); e.hasNext();) {
             retrieve(e.next()).repairMetadata();
         }

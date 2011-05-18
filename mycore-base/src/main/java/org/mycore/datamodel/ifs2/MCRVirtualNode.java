@@ -23,6 +23,8 @@
 
 package org.mycore.datamodel.ifs2;
 
+import java.io.IOException;
+
 import org.apache.commons.vfs.FileObject;
 
 /**
@@ -49,7 +51,7 @@ public class MCRVirtualNode extends MCRNode {
      * Returns a virtual node that is a child of this virtual node.
      */
     @Override
-    protected MCRVirtualNode buildChildNode(FileObject fo) throws Exception {
+    protected MCRVirtualNode buildChildNode(FileObject fo) throws IOException {
         return new MCRVirtualNode(this, fo);
     }
 }

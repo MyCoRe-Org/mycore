@@ -23,6 +23,7 @@
 
 package org.mycore.datamodel.ifs2;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.vfs.FileObject;
@@ -45,7 +46,7 @@ public class MCRDirectory extends MCRStoredNode {
      * @param fo
      *            the local directory in the store storing this directory
      */
-    protected MCRDirectory(MCRDirectory parent, FileObject fo, Element data) throws Exception {
+    protected MCRDirectory(MCRDirectory parent, FileObject fo, Element data) throws IOException {
         super(parent, fo, data);
     }
 
@@ -57,7 +58,7 @@ public class MCRDirectory extends MCRStoredNode {
      * @param name
      *            the name of the new subdirectory to create
      */
-    protected MCRDirectory(MCRDirectory parent, String name) throws Exception {
+    protected MCRDirectory(MCRDirectory parent, String name) throws IOException {
         super(parent, name, "dir");
         fo.createFolder();
         getRoot().saveAdditionalData();
@@ -69,7 +70,7 @@ public class MCRDirectory extends MCRStoredNode {
      * @param name
      *            the name of the new directory
      */
-    public MCRDirectory createDir(String name) throws Exception {
+    public MCRDirectory createDir(String name) throws IOException {
         return new MCRDirectory(this, name);
     }
 
@@ -79,10 +80,11 @@ public class MCRDirectory extends MCRStoredNode {
      * @param name
      *            the name of the new file
      */
-    public MCRFile createFile(String name) throws Exception {
+    public MCRFile createFile(String name) throws IOException {
         return new MCRFile(this, name);
     }
 
+    @SuppressWarnings("unchecked")
     private Element getChildData(String name) {
         for (Element child : (List<Element>) data.getChildren()) {
             if (name.equals(child.getAttributeValue("name"))) {
@@ -104,7 +106,7 @@ public class MCRDirectory extends MCRStoredNode {
      * @return an MCRFile or MCRDirectory child
      */
     @Override
-    protected MCRStoredNode buildChildNode(FileObject fo) throws Exception {
+    protected MCRStoredNode buildChildNode(FileObject fo) throws IOException {
         if (fo == null) {
             return null;
         }
@@ -121,7 +123,8 @@ public class MCRDirectory extends MCRStoredNode {
      * Repairs additional metadata of this directory and all its children
      */
     @Override
-    void repairMetadata() throws Exception {
+    @SuppressWarnings("unchecked")
+    void repairMetadata() throws IOException {
         data.setName("dir");
         data.setAttribute("name", getName());
 

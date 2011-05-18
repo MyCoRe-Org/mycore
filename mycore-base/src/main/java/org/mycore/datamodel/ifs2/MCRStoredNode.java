@@ -23,6 +23,7 @@
 
 package org.mycore.datamodel.ifs2;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +62,7 @@ public abstract class MCRStoredNode extends MCRNode {
      *            the additional data of this node that is not stored in the
      *            file object
      */
-    protected MCRStoredNode(MCRDirectory parent, FileObject fo, Element data) throws Exception {
+    protected MCRStoredNode(MCRDirectory parent, FileObject fo, Element data) throws IOException {
         super(parent, fo);
         this.data = data;
     }
@@ -76,7 +77,7 @@ public abstract class MCRStoredNode extends MCRNode {
      * @param type
      *            the node type, dir or file
      */
-    protected MCRStoredNode(MCRDirectory parent, String name, String type) throws Exception {
+    protected MCRStoredNode(MCRDirectory parent, String name, String type) throws IOException {
         super(parent, VFS.getManager().resolveFile(parent.fo, name));
         data = new Element(type);
         data.setAttribute("name", name);
@@ -86,7 +87,7 @@ public abstract class MCRStoredNode extends MCRNode {
     /**
      * Deletes this node with all its data and children
      */
-    public void delete() throws Exception {
+    public void delete() throws IOException {
         data.detach();
         fo.delete(Selectors.SELECT_ALL);
         getRoot().saveAdditionalData();
@@ -98,7 +99,7 @@ public abstract class MCRStoredNode extends MCRNode {
      * @param name
      *            the new file name
      */
-    public void renameTo(String name) throws Exception {
+    public void renameTo(String name) throws IOException {
         FileObject fNew = VFS.getManager().resolveFile(fo.getParent(), name);
         fo.moveTo(fNew);
         fo = fNew;
@@ -113,7 +114,7 @@ public abstract class MCRStoredNode extends MCRNode {
      * @param time
      *            the time to be stored as last modification time
      */
-    public void setLastModified(Date time) throws Exception {
+    public void setLastModified(Date time) throws IOException {
         fo.getContent().setLastModifiedTime(time.getTime());
     }
 
@@ -125,7 +126,8 @@ public abstract class MCRStoredNode extends MCRNode {
      * @param label
      *            the label in this language
      */
-    public void setLabel(String lang, String label) throws Exception {
+    @SuppressWarnings("unchecked")
+    public void setLabel(String lang, String label) throws IOException {
         Element found = null;
         for (Element child : (List<Element>) data.getChildren("label")) {
             if (lang.equals(child.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
@@ -145,7 +147,7 @@ public abstract class MCRStoredNode extends MCRNode {
     /**
      * Removes all labels set
      */
-    public void clearLabels() throws Exception {
+    public void clearLabels() throws IOException {
         data.removeChildren("label");
         getRoot().saveAdditionalData();
     }
@@ -154,6 +156,7 @@ public abstract class MCRStoredNode extends MCRNode {
      * Returns a map of all labels, sorted by xml:lang, Key is xml:lang, value
      * is the label for that language.
      */
+    @SuppressWarnings("unchecked")
     public Map<String, String> getLabels() {
         Map<String, String> labels = new TreeMap<String, String>();
         for (Element label : (List<Element>) data.getChildren("label")) {
@@ -169,6 +172,7 @@ public abstract class MCRStoredNode extends MCRNode {
      *            the xml:lang language ID
      * @return the label, or null if there is no label for that language
      */
+    @SuppressWarnings("unchecked")
     public String getLabel(String lang) {
         for (Element label : (List<Element>) data.getChildren("label")) {
             if (lang.equals(label.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
@@ -203,5 +207,5 @@ public abstract class MCRStoredNode extends MCRNode {
     /**
      * Repairs additional metadata of this node
      */
-    abstract void repairMetadata() throws Exception;
+    abstract void repairMetadata() throws IOException;
 }

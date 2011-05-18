@@ -23,11 +23,14 @@
 
 package org.mycore.datamodel.ifs2;
 
+import java.io.IOException;
+
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.VFS;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 
 /**
  * Represents a set of files and directories belonging together, that are stored
@@ -64,7 +67,7 @@ public class MCRFileCollection extends MCRDirectory {
      * @param id
      *            the ID of this file collection
      */
-    protected MCRFileCollection(MCRStore store, int id) throws Exception {
+    protected MCRFileCollection(MCRStore store, int id) throws IOException {
         super(null, store.getSlot(id), new Element("collection"));
         this.store = store;
         this.id = id;
@@ -79,7 +82,7 @@ public class MCRFileCollection extends MCRDirectory {
 
     private final static String dataFile = "mcrdata.xml";
 
-    private void readAdditionalData() throws Exception {
+    private void readAdditionalData() throws IOException {
         FileObject src = VFS.getManager().resolveFile(fo, dataFile);
         if (!src.exists()) {
             LOGGER.warn("Metadata file is missing, repairing metadata...");
@@ -87,10 +90,14 @@ public class MCRFileCollection extends MCRDirectory {
             new Document(data);
             repairMetadata();
         }
-        data = MCRContent.readFrom(src).asXML().getRootElement();
+        try {
+            data = MCRContent.readFrom(src).asXML().getRootElement();
+        } catch(JDOMException jdomExc) {
+            throw new IOException(jdomExc);
+        }
     }
 
-    protected void saveAdditionalData() throws Exception {
+    protected void saveAdditionalData() throws IOException {
         FileObject target = VFS.getManager().resolveFile(fo, dataFile);
         MCRContent.readFrom(data.getDocument()).sendTo(target);
     }
@@ -134,12 +141,12 @@ public class MCRFileCollection extends MCRDirectory {
     }
 
     @Override
-    public int getNumChildren() throws Exception {
+    public int getNumChildren() throws IOException {
         return super.getNumChildren() - 1;
     }
 
     @Override
-    public MCRNode getChild(String name) throws Exception {
+    public MCRNode getChild(String name) throws IOException {
         if (dataFile.equals(name)) {
             return null;
         } else {
@@ -157,7 +164,7 @@ public class MCRFileCollection extends MCRDirectory {
      * collection
      */
     @Override
-    public void repairMetadata() throws Exception {
+    public void repairMetadata() throws IOException {
         super.repairMetadata();
         data.setName("collection");
         data.removeAttribute("name");
@@ -168,7 +175,7 @@ public class MCRFileCollection extends MCRDirectory {
      * Returns additional metadata stored for all files and directories in this
      * collection
      */
-    Document getMetadata() throws Exception {
+    Document getMetadata() {
         return data.getDocument();
     }
 }

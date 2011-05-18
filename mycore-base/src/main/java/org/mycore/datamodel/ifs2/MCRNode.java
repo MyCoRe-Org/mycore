@@ -23,6 +23,7 @@
 
 package org.mycore.datamodel.ifs2;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -81,9 +82,9 @@ public abstract class MCRNode {
      * Path always start with a slash, slash is used as directory delimiter.
      * 
      * @return the absolute path of this node
-     * @throws Exception
+     * @throws IOException
      */
-    public String getPath() throws Exception {
+    public String getPath() throws IOException {
         if (parent != null) {
             if (parent.parent == null) {
                 return "/" + getName();
@@ -118,7 +119,7 @@ public abstract class MCRNode {
      * 
      * @return true if this node is a file
      */
-    public boolean isFile() throws Exception {
+    public boolean isFile() throws IOException {
         return fo.getType().equals(FileType.FILE);
     }
 
@@ -127,7 +128,7 @@ public abstract class MCRNode {
      * 
      * @return true if this node is a directory
      */
-    public boolean isDirectory() throws Exception {
+    public boolean isDirectory() throws IOException {
         return fo.getType().equals(FileType.FOLDER);
     }
 
@@ -137,7 +138,7 @@ public abstract class MCRNode {
      * 
      * @return the file size in bytes
      */
-    public long getSize() throws Exception {
+    public long getSize() throws IOException {
         if (isFile()) {
             return fo.getContent().getSize();
         } else {
@@ -151,7 +152,7 @@ public abstract class MCRNode {
      * 
      * @return the time this node was last modified
      */
-    public Date getLastModified() throws Exception {
+    public Date getLastModified() throws IOException {
         FileContent content = fo.getContent();
         if (content != null) {
             return new Date(content.getLastModifiedTime());
@@ -166,7 +167,7 @@ public abstract class MCRNode {
      * 
      * @return true if children exist
      */
-    public boolean hasChildren() throws Exception {
+    public boolean hasChildren() throws IOException {
         return getNumChildren() > 0;
     }
 
@@ -178,7 +179,7 @@ public abstract class MCRNode {
      * 
      * @return the father of this node's children in VFS
      */
-    private FileObject getFather() throws Exception {
+    private FileObject getFather() throws IOException {
         if (isDirectory()) {
             return fo;
         } else if (getSize() == 0) {
@@ -199,7 +200,7 @@ public abstract class MCRNode {
      * 
      * @return the number of child nodes of this node.
      */
-    public int getNumChildren() throws Exception {
+    public int getNumChildren() throws IOException {
         FileObject father = getFather();
         if (father == null) {
             return 0;
@@ -214,7 +215,7 @@ public abstract class MCRNode {
      * 
      * @return a List of child nodes, which may be empty, in undefined order
      */
-    public List<MCRNode> getChildren() throws Exception {
+    public List<MCRNode> getChildren() throws IOException {
         List<MCRNode> children = new ArrayList<MCRNode>();
         FileObject father = getFather();
         if (father != null) {
@@ -239,7 +240,7 @@ public abstract class MCRNode {
      *            filesystem
      * @return the child node
      */
-    protected abstract MCRNode buildChildNode(FileObject fo) throws Exception;
+    protected abstract MCRNode buildChildNode(FileObject fo) throws IOException;
 
     /**
      * Returns the child node with the given filename, or null
@@ -248,7 +249,7 @@ public abstract class MCRNode {
      *            the name of the child node
      * @return the child node with that name, or null when no such file exists
      */
-    public MCRNode getChild(String name) throws Exception {
+    public MCRNode getChild(String name) throws IOException {
         FileObject father = getFather();
         return father == null ? null : buildChildNode(getFather().getChild(name));
     }
@@ -267,7 +268,7 @@ public abstract class MCRNode {
      *            . or ..
      * @return the node at the given path, or null
      */
-    public MCRNode getNodeByPath(String path) throws Exception {
+    public MCRNode getNodeByPath(String path) throws IOException {
         MCRNode current = path.startsWith("/") ? getRoot() : this;
         StringTokenizer st = new StringTokenizer(path, "/");
         while (st.hasMoreTokens() && current != null) {
@@ -289,7 +290,7 @@ public abstract class MCRNode {
      * 
      * @return the content of the file
      */
-    public MCRContent getContent() throws Exception {
+    public MCRContent getContent() throws IOException {
         return isFile() ? MCRContent.readFrom(fo) : null;
     }
 
@@ -300,7 +301,7 @@ public abstract class MCRNode {
      * 
      * @return the content of this file, for random access
      */
-    public RandomAccessContent getRandomAccessContent() throws Exception {
+    public RandomAccessContent getRandomAccessContent() throws IOException {
         return isFile() ? fo.getContent().getRandomAccessContent(RandomAccessMode.READ) : null;
     }
 }
