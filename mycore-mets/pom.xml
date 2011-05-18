@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <artifactId>mycore</artifactId>
     <groupId>org.mycore</groupId>
-    <version>2.0.95-SNAPSHOT</version>
+    <version>2.1.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
@@ -21,28 +20,26 @@
             <phase>compile</phase>
             <configuration>
               <target>
-                <path id="compile.classpath" refid="maven.compile.classpath"/>
-                <property name="target.applet.classes" location="${project.build.directory}/applet-classes"/>
+                <path id="compile.classpath" refid="maven.compile.classpath" />
+                <property name="target.applet.classes" location="${project.build.directory}/applet-classes" />
                 <path id="sources.path">
-                  <dirset dir="${basedir}" includes="src/main/java"/>
+                  <dirset dir="${basedir}" includes="src/main/java" />
                 </path>
-                <echo message="compile classpath: ${compile.classpath}"/>
-                <echo message="target directory: ${target.applet.classes}"/>
-                <mkdir dir="${target.applet.classes}"/>
-                <javac destdir="${target.applet.classes}" includes="org/mycore/frontend/metsmods/**"
-                  classpathref="compile.classpath" debug="true" optimize="true" target="${java.target.version}"
-                  source="${java.target.version}" encoding="ISO-8859-15" fork="yes" deprecation="off">
+                <echo message="compile classpath: ${compile.classpath}" />
+                <echo message="target directory: ${target.applet.classes}" />
+                <mkdir dir="${target.applet.classes}" />
+                <javac destdir="${target.applet.classes}" includes="org/mycore/frontend/metsmods/**" classpathref="compile.classpath" debug="true" optimize="true" target="${java.target.version}" source="${java.target.version}" encoding="ISO-8859-15" fork="yes" deprecation="off">
                   <src>
-                    <path refid="sources.path"/>
+                    <path refid="sources.path" />
                   </src>
                 </javac>
                 <copy todir="${target.applet.classes}">
                   <fileset dir="${basedir}/src/main/applet-resources">
-                    <include name="**/*"/>
+                    <include name="**/*" />
                   </fileset>
                 </copy>
                 <jar jarfile="${project.build.outputDirectory}/metsmodsApplet-unsigned.jar">
-                  <fileset dir="${target.applet.classes}"/>
+                  <fileset dir="${target.applet.classes}" />
                 </jar>
               </target>
             </configuration>
