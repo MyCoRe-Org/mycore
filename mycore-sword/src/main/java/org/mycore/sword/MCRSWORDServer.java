@@ -550,7 +550,8 @@ public class MCRSWORDServer implements SWORDServer, MCRSWORDIngester {
             Element metsElement = document.getRootElement();
             Attribute profile = metsElement.getAttribute("PROFILE");
             if (profile == null || !METS_PROFILE.equals(profile.getValue())) {
-                LOG.error(String.format("throwing error: invalid profile (%1$s)", profile.getValue()));
+                String profileValue = profile == null ? "null" : profile.getValue();
+                LOG.error(String.format("throwing error: invalid profile (%1$s)", profileValue));
                 throw new SWORDErrorException(ErrorCodes.ERROR_CONTENT, "Invalid profile inside package descriptor. PROFILE must me " + METS_PROFILE);
             }
 
