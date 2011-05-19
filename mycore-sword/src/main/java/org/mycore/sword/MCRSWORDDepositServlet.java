@@ -135,7 +135,7 @@ public class MCRSWORDDepositServlet extends MCRServlet {
 
         // Are there any authentication details?
         Pair<String, String> requestAuthData = MCRSWORDUtils.readBasicAuthData(request);
-        if (authenticator.authenticate(requestAuthData.first, requestAuthData.second)) {
+        if (requestAuthData != null && authenticator.authenticate(requestAuthData.first, requestAuthData.second)) {
 
             LOG.info("requesting user: " + requestAuthData.first);
             
