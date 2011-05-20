@@ -1,24 +1,24 @@
 /*
  * 
  * $Revision$ $Date$
- * 
- * This file is part of *** M y C o R e *** See http://www.mycore.de/ for
- * details.
- * 
- * This program is free software; you can use it, redistribute it and / or
- * modify it under the terms of the GNU General Public License (GPL) as
- * published by the Free Software Foundation; either version 2 of the License or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- * 
- * You should have received a copy of the GNU General Public License along with
- * this program, in a file called gpl.txt or license.txt. If not, write to the
- * Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307 USA
+ *
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
+ *
+ * This program is free software; you can use it, redistribute it
+ * and / or modify it under the terms of the GNU General Public License
+ * (GPL) as published by the Free Software Foundation; either version 2
+ * of the License or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program, in a file called gpl.txt or license.txt.
+ * If not, write to the Free Software Foundation Inc.,
+ * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
 package org.mycore.datamodel.ifs;
@@ -40,9 +40,6 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
@@ -59,6 +56,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * @author Thomas Scheffler (yagee)
  * @author A.Schaar
  * @author Robert Stephan
+ * 
  * @version $Revision$ $Date: 2008-01-14 11:02:17 +0000 (Mo, 14 Jan
  *          2008) $
  */
@@ -95,14 +93,13 @@ public class MCRFileNodeServlet extends MCRServlet {
             return -1;
         } finally {
             /*
-             * A new MCRSession may be created due to MCRHIBConnection
-             * implementation. As the MCRSession is not bound to a HttpSession
-             * that is closed automatically, we close it here, if no IP address
-             * is known.
+             * A new MCRSession may be created due to MCRHIBConnection implementation.
+             * As the MCRSession is not bound to a HttpSession that is closed automatically,
+             * we close it here, if no IP address is known.
              */
             MCRSession session = MCRSessionMgr.getCurrentSession();
             if (session.getCurrentIP().length() < 7) {
-                // it's a stalled session close it
+                //it's a stalled session close it
                 session.close();
             }
         }
@@ -115,19 +112,6 @@ public class MCRFileNodeServlet extends MCRServlet {
     public void doGetPost(MCRServletJob job) throws IOException {
         HttpServletRequest request = job.getRequest();
         HttpServletResponse response = job.getResponse();
-
-        MCRObjectID derivateId = MCRObjectID.getInstance(getOwnerID(request));
-        MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateId);
-
-        if (!MCRAccessManager.checkPermission(derivate.getDerivate().getMetaLink().getXLinkHrefID().toString(), "view-derivate")) {
-            String ip = MCRSessionMgr.getCurrentSession().getCurrentIP();
-            String userId = MCRSessionMgr.getCurrentSession().getUserInformation().getCurrentUserID();
-            String msg = "Unsufficient privileges to read content of derivate \"" + derivateId + "\"";
-            LOGGER.warn(msg + "[user=" + userId + ", ip=" + ip + "]");
-            job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN, msg);
-            return;
-        }
-
         if (!isParametersValid(request, response)) {
             return;
         }
@@ -208,12 +192,10 @@ public class MCRFileNodeServlet extends MCRServlet {
             return;
         }
     }
-
+    
     /**
-     * retrieves the derivate ID of the owning derivate from request path.
-     * 
-     * @param request
-     *            - the http request object
+     *  retrieves the derivate ID of the owning derivate from request path.
+     *  @param request - the http request object
      */
     protected static String getOwnerID(HttpServletRequest request) {
         String pI = request.getPathInfo();
@@ -231,22 +213,20 @@ public class MCRFileNodeServlet extends MCRServlet {
         }
         return ownerID.toString();
     }
-
+    
     /**
-     * Retrieves the path of the file to display from request path.
-     * 
-     * @param request
-     *            - the http request object
+     *  Retrieves the path of the file to display from request path.
+     *  @param request - the http request object
      */
-    protected static String getPath(HttpServletRequest request) {
-        String ownerID = getOwnerID(request);
-        int pos = ownerID.length() + 1;
+    protected static String getPath(HttpServletRequest request){
+    	String ownerID = getOwnerID(request);
+    	int pos = ownerID.length() + 1;
         StringBuffer path = new StringBuffer(request.getPathInfo().substring(pos));
         if (path.length() > 1 && path.charAt(path.length() - 1) == '/') {
             path.deleteCharAt(path.length() - 1);
         }
-        if (path.length() == 0) {
-            return "/";
+        if(path.length()==0){
+        	return "/";
         }
         return path.toString();
     }
@@ -283,8 +263,7 @@ public class MCRFileNodeServlet extends MCRServlet {
         {
             res.setContentType(file.getContentType().getMimeType());
             res.setContentLength((int) file.getSize());
-            res.addHeader("Accept-Ranges", "none"); // Advice client not to
-                                                    // attempt range requests
+            res.addHeader("Accept-Ranges", "none"); // Advice client not to attempt range requests
             // no transaction needed to copy long streams over slow connections
             MCRSessionMgr.getCurrentSession().commitTransaction();
             OutputStream out = new BufferedOutputStream(res.getOutputStream());
@@ -313,15 +292,16 @@ public class MCRFileNodeServlet extends MCRServlet {
      * @param jdom
      *            the jdom document
      * @throws IOException
-     *             see overwritten in JSPDocportal
+     * see overwritten in JSPDocportal
      */
     protected void layoutDirectory(HttpServletRequest req, HttpServletResponse res, Document jdom) throws IOException {
         getLayoutService().doLayout(req, res, jdom);
     }
 
     /**
-     * Forwards the error to generate the output see its overwritten in
-     * jspdocportal
+     * Forwards the error to generate the output
+     * 
+     * see its overwritten in jspdocportal
      */
     protected void errorPage(HttpServletRequest req, HttpServletResponse res, int error, String msg, Exception ex, boolean xmlstyle)
             throws IOException {
