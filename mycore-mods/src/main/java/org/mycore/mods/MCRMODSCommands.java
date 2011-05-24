@@ -24,14 +24,17 @@
 package org.mycore.mods;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -39,13 +42,15 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRCommand;
-import org.xml.sax.SAXParseException;
+import org.xml.sax.SAXException;
 
 /**
  * @author Thomas Scheffler (yagee)
  *
  */
 public class MCRMODSCommands extends MCRAbstractCommands {
+
+    private static final String MODS_V3_XSD_URI = "http://www.loc.gov/standards/mods/v3/mods-3-4.xsd";
 
     private static final Logger LOGGER = Logger.getLogger(MCRMODSCommands.class);
 
@@ -78,16 +83,31 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         return cmds;
     }
 
-    public static void loadFromFile(String modsFile, String projectID) throws SAXParseException, MCRPersistenceException, MCRActiveLinkException {
-        File dir = new File(modsFile);
-        if (!dir.isFile()) {
-            throw new MCRException(MessageFormat.format("File {0} is not a file.", modsFile));
+    public static void loadFromFile(String modsFileName, String projectID) throws JDOMException, IOException, MCRActiveLinkException, SAXException {
+        File modsFile = new File(modsFileName);
+        if (!modsFile.isFile()) {
+            throw new MCRException(MessageFormat.format("File {0} is not a file.", modsFile.getAbsolutePath()));
         }
-        Document modsDoc = MCRXMLHelper.parseURI(dir.toURI(), true);
-        if (!modsDoc.getRootElement().getNamespace().equals(MCRMODSWrapper.MODS_NS)) {
-            throw new MCRException(MessageFormat.format("File {0} is not a MODS document.", modsFile));
+        SAXBuilder s = new SAXBuilder(false);
+        Document modsDoc = s.build(modsFile);
+        MCRXMLHelper.validate(modsDoc, MODS_V3_XSD_URI);
+        Element modsRoot = modsDoc.getRootElement();
+        if (!modsRoot.getNamespace().equals(MCRMODSWrapper.MODS_NS)) {
+            throw new MCRException(MessageFormat.format("File {0} is not a MODS document.", modsFile.getAbsolutePath()));
         }
-        MCRObject mcrObject = MCRMODSWrapper.wrapMODSDocument(modsDoc.getRootElement(), projectID);
+        if (modsRoot.getName().equals("modsCollection")) {
+            @SuppressWarnings("unchecked")
+            List<Element> modsElements = modsRoot.getChildren("mods", MCRMODSWrapper.MODS_NS);
+            for (Element mods : modsElements) {
+                saveAsMyCoReObject(projectID, mods);
+            }
+        } else {
+            saveAsMyCoReObject(projectID, modsRoot);
+        }
+    }
+
+    private static void saveAsMyCoReObject(String projectID, Element modsRoot) throws MCRActiveLinkException {
+        MCRObject mcrObject = MCRMODSWrapper.wrapMODSDocument(modsRoot, projectID);
         mcrObject.setId(MCRObjectID.getNextFreeId(mcrObject.getId().getBase()));
         MCRMetadataManager.create(mcrObject);
     }

@@ -23,10 +23,17 @@
 
 package org.mycore.common.xml;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.xml.XMLConstants;
+import javax.xml.transform.TransformerException;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 
 import org.jdom.Attribute;
 import org.jdom.Comment;
@@ -38,8 +45,10 @@ import org.jdom.Namespace;
 import org.jdom.ProcessingInstruction;
 import org.jdom.Text;
 import org.jdom.Verifier;
+import org.jdom.transform.JDOMSource;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
+import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -185,6 +194,35 @@ public class MCRXMLHelper {
             }
         }
         return sb.toString();
+    }
+
+    /**
+     * validates <code>doc</code> using XML Schema defined <code>schemaURI</code>
+     * @param doc document to be validated
+     * @param schemaURI URI of XML Schema document
+     * @throws SAXException if validation fails
+     * @throws IOException if resolving resources fails
+     */
+    public static void validate(Document doc, String schemaURI) throws SAXException, IOException {
+        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        Schema schema;
+        try {
+            schema = sf.newSchema(MCRURIResolver.instance().resolve(schemaURI, null));
+        } catch (TransformerException e) {
+            Throwable cause = e.getCause();
+            if (cause == null) {
+                throw new IOException(e);
+            }
+            if (cause instanceof SAXException) {
+                throw (SAXException) cause;
+            }
+            if (cause instanceof IOException) {
+                throw (IOException) cause;
+            }
+            throw new IOException(e);
+        }
+        Validator validator = schema.newValidator();
+        validator.validate(new JDOMSource(doc));
     }
 
     /**
