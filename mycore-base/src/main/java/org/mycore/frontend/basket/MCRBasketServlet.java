@@ -97,6 +97,6 @@ public class MCRBasketServlet extends MCRServlet
       return;
     }
 
-    res.sendRedirect( getServletBaseURL() + "BasketServlet?action=show&type=" + type );
+    res.sendRedirect( getServletBaseURL() + "MCRBasketServlet?action=show&type=" + type );
   }
 }
