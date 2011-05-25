@@ -5,6 +5,13 @@
     <author email="thomas.scheffler(at)uni-jena.de">Thomas Scheffler</author>
   </properties>
   <body>
+    <release version="2.2">
+      <action dev="mcrfluet" type="add">
+        Added basket functionality to web front end. A basket collects objects in the user's session. 
+        Objects can be added, removed, their order can be changed and the basket can be cleared completely.
+        There can be different baskets for different purposes within the same session. 
+      </action>
+    </release>
     <release version="2.1.0" date="2011-05-18" description="LTS">
       <action dev="mcrsteph" type="add">
         new OAI implementationreadded support for operators: &lt;, &lt;=, =&gt;, &gt; on field types text, index, identifier
