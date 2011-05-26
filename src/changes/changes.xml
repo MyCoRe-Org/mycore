@@ -7,6 +7,9 @@
   <body>
     <release version="2.2">
       <action dev="mcrfluet" type="add">
+        Added templates for share/subscribe buttons. See share.xsl and document metadata details view in DocPortal for an example.
+      </action>
+      <action dev="mcrfluet" type="add">
         Added basket functionality to web front end. A basket collects objects in the user's session. 
         Objects can be added, removed, their order can be changed and the basket can be cleared completely.
         There can be different baskets for different purposes within the same session. 
