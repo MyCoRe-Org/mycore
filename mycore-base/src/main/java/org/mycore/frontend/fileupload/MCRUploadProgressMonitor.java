@@ -1,24 +1,24 @@
 /*
  * 
  * $Revision$ $Date$
- *
- * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
- *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program, in a file called gpl.txt or license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * 
+ * This file is part of *** M y C o R e *** See http://www.mycore.de/ for
+ * details.
+ * 
+ * This program is free software; you can use it, redistribute it and / or
+ * modify it under the terms of the GNU General Public License (GPL) as
+ * published by the Free Software Foundation; either version 2 of the License or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program, in a file called gpl.txt or license.txt. If not, write to the
+ * Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307 USA
  */
 
 package org.mycore.frontend.fileupload;
@@ -58,9 +58,16 @@ import javax.swing.WindowConstants;
  * 
  * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date: 2010-03-12 16:54:13 +0100 (Fri, 12 Mar
+ *          2010) $
  */
 public class MCRUploadProgressMonitor extends JDialog {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected MCRUploadApplet applet;
 
     protected boolean canceled; // if true, upload is canceled
@@ -478,21 +485,8 @@ public class MCRUploadProgressMonitor extends JDialog {
      *            the Exception to be shown
      */
     public static void reportException(Exception ex) {
-        String title = "Fehler bei der Übertragung";
-        StringBuffer msg = new StringBuffer();
-        msg.append(title).append(":\n");
-        msg.append(ex.getClass().getName()).append("\n");
-        msg.append(ex.getLocalizedMessage()).append("\n");
-
-        if (ex instanceof MCRUploadException) {
-            MCRUploadException uex = (MCRUploadException) ex;
-            msg.append("Fehlermeldung des Servers:\n");
-            msg.append(uex.getServerSideClassName()).append("\n");
-            msg.append(uex.getMessage()).append("\n");
-            msg.append(uex.getServerSideStackTrace()).append("\n");
-        }
-
-        JOptionPane.showMessageDialog(null, msg, title, JOptionPane.ERROR_MESSAGE);
+        MCRStackTraceDialog dialog = new MCRStackTraceDialog(ex, "Error while transfering data");
+        dialog.setVisible(true);
     }
 
     protected void end() {
@@ -549,7 +543,8 @@ public class MCRUploadProgressMonitor extends JDialog {
             }
             while ((num = fin.read(buffer, 0, buffer.length)) != -1) {
                 // Simulate a read error and the following cancel() invocation
-                // if( i == 2 ) { upm.cancel( new java.io.IOException( "Simulierter Lesefehler" ) ); return; }
+                // if( i == 2 ) { upm.cancel( new java.io.IOException(
+                // "Simulierter Lesefehler" ) ); return; }
 
                 if (upm.isCanceled()) {
                     break;
