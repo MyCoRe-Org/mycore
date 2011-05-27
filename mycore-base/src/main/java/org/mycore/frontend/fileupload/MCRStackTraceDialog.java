@@ -50,13 +50,10 @@ public class MCRStackTraceDialog extends JDialog {
         }
 
         // create the dialog
-        this.setSize(680, 520);
         this.setModal(true);
         this.setTitle(title);
         this.getContentPane().setLayout(new FlowLayout());
         this.setResizable(false);
-        Dimension screenRes = Toolkit.getDefaultToolkit().getScreenSize();
-        this.setLocation(((int) screenRes.getWidth() / 4), ((int) screenRes.getHeight() / 4));
 
         // create the text area with scrollbars
         final JTextArea textArea = new JTextArea();
@@ -108,7 +105,7 @@ public class MCRStackTraceDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // hide the dialog
-                MCRStackTraceDialog.this.setVisible(false);
+                MCRStackTraceDialog.this.dispose();
             }
         });
 
@@ -126,5 +123,22 @@ public class MCRStackTraceDialog extends JDialog {
         StringWriter sw = new StringWriter();
         ex.printStackTrace(new PrintWriter(sw));
         return sw.toString();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.awt.Dialog#setVisible(boolean)
+     */
+    @Override
+    public void setVisible(boolean flag) {
+        this.pack();
+        Dimension screenRes = Toolkit.getDefaultToolkit().getScreenSize();
+
+        int x = (int) (screenRes.getWidth() / 2 - this.getSize().getWidth() / 2);
+        int y = (int) (screenRes.getHeight() / 2 - this.getSize().getHeight() / 2);
+
+        this.setLocation(x, y);
+        super.setVisible(flag);
     }
 }
