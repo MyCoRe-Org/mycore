@@ -39,8 +39,8 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.transform.JDOMSource;
 import org.mycore.common.MCRConfigurationException;
+import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRCommand;
-import org.mycore.frontend.cli.MCRExternalCommandInterface;
 import org.mycore.parsers.bool.MCRCondition;
 
 /**
@@ -51,7 +51,7 @@ import org.mycore.parsers.bool.MCRCondition;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
-public class MCRQueryCommands implements MCRExternalCommandInterface {
+public class MCRQueryCommands extends MCRAbstractCommands {
 
     /**
      * The method returns all available commands.
