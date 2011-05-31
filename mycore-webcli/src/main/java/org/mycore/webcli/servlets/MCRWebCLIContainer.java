@@ -1,25 +1,16 @@
 /**
- * $RCSfile$
- * $Revision$ $Date$
- *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
- *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
+ * $RCSfile$ $Revision$ $Date: 2011-03-23 13:37:07 +0100 (Wed, 23 Mar
+ * 2011) $ This file is part of ** M y C o R e ** Visit our homepage at
+ * http://www.mycore.de/ for details. This program is free software; you can use
+ * it, redistribute it and / or modify it under the terms of the GNU General
+ * Public License (GPL) as published by the Free Software Foundation; either
+ * version 2 of the License or (at your option) any later version. This program
+ * is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details. You
+ * should have received a copy of the GNU General Public License along with this
+ * program, normally in the file license.txt. If not, write to the Free Software
+ * Foundation Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307 USA
  **/
 package org.mycore.webcli.servlets;
 
@@ -63,11 +54,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 /**
- * Is a wrapper class around command execution.
- * 
- * Commands will be {@link #addCommand(String) queued} and executed in a
- * seperate thread. All logging events in that thread are grabbed and can be
- * retrieved by the {@link #getLogs() getLogs} method.
+ * Is a wrapper class around command execution. Commands will be
+ * {@link #addCommand(String) queued} and executed in a seperate thread. All
+ * logging events in that thread are grabbed and can be retrieved by the
+ * {@link #getLogs() getLogs} method.
  * 
  * @author Thomas Scheffler (yagee)
  * @since 2.0
@@ -100,19 +90,20 @@ class MCRWebCLIContainer {
      *            commands that are supported by the web gui.
      * @param session
      *            the current HttpSession of the usere using the gui.
-     * 
      */
     public MCRWebCLIContainer(HttpSession session) {
         processCallable = new ProcessCallable(MCRSessionMgr.getCurrentSession(), session);
     }
 
     /**
-     * Adds this <code>cmd</code> to the current command queue.
+     * Adds this <code>cmd</code> to the current command queue. The thread
+     * executing the commands will be started automatically if the queue was
+     * previously empty.
      * 
-     * The thread executing the commands will be started automatically if the
-     * queue was previously empty.
-     * 
-     * @param cmd a valid String representation of a {@link #MCRWebCLIContainer(List, HttpSession) known} <code>MCRCommand</code>
+     * @param cmd
+     *            a valid String representation of a
+     *            {@link #MCRWebCLIContainer(List, HttpSession) known}
+     *            <code>MCRCommand</code>
      */
     public void addCommand(String cmd) {
         LOGGER.info("appending command: " + cmd);
@@ -124,6 +115,7 @@ class MCRWebCLIContainer {
 
     /**
      * Gets the current command queue.
+     * 
      * @return the queue of commands yet to be processed
      */
     public LinkedList<String> getCommandQueue() {
@@ -132,6 +124,7 @@ class MCRWebCLIContainer {
 
     /**
      * Returns the status of the command execution thread.
+     * 
      * @return true if the thread is running
      */
     public boolean isRunning() {
@@ -139,15 +132,14 @@ class MCRWebCLIContainer {
     }
 
     /**
-     * Returns all logs that were grabbed in the command execution thread.
+     * Returns all logs that were grabbed in the command execution thread. This
+     * method is backed by a queue that will be empty after the method returns.
      * 
-     * This method is backed by a queue that will be empty after the method returns. 
-     * @return
-     *  {"logs": {<br/>
-     *  &#160;&#160;&#160;&#160;"logLevel": <code>logLevel</code>,<br/>
-     *  &#160;&#160;&#160;&#160;"message": <code>message</code>,<br/>
-     *  &#160;&#160;&#160;&#160;"exception": <code>exception</code><br/>
-     *  }}
+     * @return {"logs": {<br/>
+     *         &#160;&#160;&#160;&#160;"logLevel": <code>logLevel</code>,<br/>
+     *         &#160;&#160;&#160;&#160;"message": <code>message</code>,<br/>
+     *         &#160;&#160;&#160;&#160;"exception": <code>exception</code><br/>
+     *         }}
      */
     public JsonObject getLogs() {
         JsonObject json = new JsonObject();
@@ -178,9 +170,10 @@ class MCRWebCLIContainer {
             knownCommands = new TreeMap<String, List<MCRCommand>>();
             ArrayList<MCRCommand> basicCommands = new ArrayList<MCRCommand>();
             basicCommands.add(new MCRCommand("process {0}", "org.mycore.webcli.cli.MCRCommandLineInterface.readCommandsFile String",
-                "Execute the commands listed in the text file {0}."));
-            basicCommands.add(new MCRCommand("show command statistics", "org.mycore.webcli.cli.MCRCommandLineInterface.showCommandStatistics",
-                "Show statistics on number of commands processed and execution time needed per command"));
+                    "Execute the commands listed in the text file {0}."));
+            basicCommands.add(new MCRCommand("show command statistics",
+                    "org.mycore.webcli.cli.MCRCommandLineInterface.showCommandStatistics",
+                    "Show statistics on number of commands processed and execution time needed per command"));
             basicCommands.add(new MCRAddCommands());
             LOGGER.warn("known commands:" + knownCommands);
             knownCommands.put("Basic commands", basicCommands);
@@ -215,7 +208,7 @@ class MCRWebCLIContainer {
                 throw new org.mycore.common.MCRConfigurationException(msg, e);
             }
             ArrayList<MCRCommand> commands = ((MCRExternalCommandInterface) obj).getPossibleCommands();
-            knownCommands.put(obj.getClass().getSimpleName(), commands);
+            knownCommands.put(((MCRExternalCommandInterface) obj).getDisplayName(), commands);
         }
     }
 
@@ -279,7 +272,7 @@ class MCRWebCLIContainer {
             try {
                 List<String> commandsReturned = null;
                 for (List<MCRCommand> cmds : knownCommands.values()) {
-                    //previous attempt to run command was successful
+                    // previous attempt to run command was successful
                     if (commandsReturned != null)
                         break;
                     commandsReturned = runCommand(command, cmds);
@@ -310,8 +303,8 @@ class MCRWebCLIContainer {
             return true;
         }
 
-        private List<String> runCommand(String command, List<MCRCommand> commandList) throws IllegalAccessException, InvocationTargetException,
-            ClassNotFoundException, NoSuchMethodException {
+        private List<String> runCommand(String command, List<MCRCommand> commandList) throws IllegalAccessException,
+                InvocationTargetException, ClassNotFoundException, NoSuchMethodException {
             List<String> commandsReturned = null;
             for (MCRCommand currentCommand : commandList) {
                 commandsReturned = currentCommand.invoke(command, this.getClass().getClassLoader());
