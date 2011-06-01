@@ -35,7 +35,7 @@ import org.mycore.common.MCRConfiguration;
  * @version $Revision$ $Date: 2009-07-28 11:32:04 +0200 (Tue, 28 Jul
  *          2009) $
  */
-public class MCRAbstractCommands implements MCRExternalCommandInterface {
+abstract public class MCRAbstractCommands implements MCRExternalCommandInterface {
     /** The configuration instance */
     protected static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
@@ -45,7 +45,7 @@ public class MCRAbstractCommands implements MCRExternalCommandInterface {
     private String displayName;
 
     /**
-     * The constrctor.
+     * The constructor.
      */
     protected MCRAbstractCommands() {
         command = new ArrayList<MCRCommand>();
