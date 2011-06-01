@@ -31,16 +31,12 @@ public class MCROrCondition extends MCRSetCondition {
     public MCROrCondition() {
         super("or");
     }
-
-    public MCROrCondition(MCRCondition firstchild) {
+    
+    public MCROrCondition(MCRCondition...conditions) {
         this();
-        addChild(firstchild);
-    }
-
-    public MCROrCondition(MCRCondition firstchild, MCRCondition secondchild) {
-        this();
-        addChild(firstchild);
-        addChild(secondchild);
+        for (MCRCondition mcrCondition : conditions) {
+            addChild(mcrCondition);
+        }
     }
 
     @Override

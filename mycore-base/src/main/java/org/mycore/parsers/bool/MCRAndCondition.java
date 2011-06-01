@@ -32,15 +32,11 @@ public class MCRAndCondition extends MCRSetCondition {
         super("and");
     }
 
-    public MCRAndCondition(MCRCondition firstchild) {
+    public MCRAndCondition(MCRCondition...children) {
         this();
-        addChild(firstchild);
-    }
-
-    public MCRAndCondition(MCRCondition firstchild, MCRCondition secondchild) {
-        this();
-        addChild(firstchild);
-        addChild(secondchild);
+        for (MCRCondition mcrCondition : children) {
+            addChild(mcrCondition);
+        }
     }
 
     @Override
