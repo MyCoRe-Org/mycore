@@ -180,8 +180,8 @@ public final class MCRObjectID {
     }
 
     /**
-     * This method get the string with <em>type_id</em>. If the ID is not valid,
-     * an empty string was returned.
+     * This method gets the string with <em>type_id</em>. If the ID is not valid,
+     * an empty string will be returned.
      * 
      * @return the string of the type id
      */
@@ -190,8 +190,8 @@ public final class MCRObjectID {
     }
 
     /**
-     * This method get the string with <em>number</em>. If the ID is not valid,
-     * an empty string was returned.
+     * This method gets the string with <em>number</em>. If the ID is not valid,
+     * an empty string will be returned.
      * 
      * @return the string of the number
      */
@@ -200,8 +200,8 @@ public final class MCRObjectID {
     }
 
     /**
-     * This method get the integer with <em>number</em>. If the ID is not valid,
-     * a -1 was returned.
+     * This method gets the integer with <em>number</em>. If the ID is not valid,
+     * -1 will be returned.
      * 
      * @return the number as integer
      */
@@ -210,8 +210,8 @@ public final class MCRObjectID {
     }
 
     /**
-     * This method get the basic string with <em>project_id</em>_
-     * <em>type_id</em>. If the Id is not valid, an empty string was returned.
+     * This method gets the basic string with <em>project_id</em>_
+     * <em>type_id</em>. If the Id is not valid, an empty string will be returned.
      * 
      * @return the string of the schema name
      */
