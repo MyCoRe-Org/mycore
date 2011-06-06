@@ -119,15 +119,6 @@ public class MCRFileNodeServlet extends MCRServlet {
         MCRObjectID derivateId = MCRObjectID.getInstance(getOwnerID(request));
         MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateId);
 
-        if (!MCRAccessManager.checkPermission(derivate.getDerivate().getMetaLink().getXLinkHrefID().toString(), "view-derivate")) {
-            String ip = MCRSessionMgr.getCurrentSession().getCurrentIP();
-            String userId = MCRSessionMgr.getCurrentSession().getUserInformation().getCurrentUserID();
-            String msg = "Unsufficient privileges to read content of derivate \"" + derivateId + "\"";
-            LOGGER.warn(msg + "[user=" + userId + ", ip=" + ip + "]");
-            job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN, msg);
-            return;
-        }
-
         if (!isParametersValid(request, response)) {
             return;
         }

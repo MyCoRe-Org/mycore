@@ -111,18 +111,6 @@ public class MCRZipServlet extends MCRServlet {
 
         // get Parameter
         String paramid = getProperty(req, "id");
-
-        MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(paramid));
-
-        if (!MCRAccessManager.checkPermission(derivate.getDerivate().getMetaLink().getXLinkHrefID().toString(), "view-derivate")) {
-            String ip = MCRSessionMgr.getCurrentSession().getCurrentIP();
-            String userId = MCRSessionMgr.getCurrentSession().getUserInformation().getCurrentUserID();
-            String msg = "Unsufficient privileges to read content of derivate \"" + derivate.getId() + "\"";
-            LOGGER.warn(msg + "[user=" + userId + ", ip=" + ip + "]");
-            job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN, msg);
-            return;
-        }
-
         String id;
         String path;
         ZipOutputStream out = null;
