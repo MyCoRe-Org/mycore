@@ -52,10 +52,10 @@ class MCRIdentifyHandler extends MCRVerbHandler {
         output.addContent(new Element("repositoryName", NS_OAI).setText(provider.getRepositoryName()));
         output.addContent(new Element("baseURL", NS_OAI).setText(provider.getOAIBaseURL()));
         output.addContent(new Element("protocolVersion", NS_OAI).setText("2.0"));
+        output.addContent(new Element("adminEmail", NS_OAI).setText(provider.getAdminEmail()));
         output.addContent(new Element("earliestDatestamp", NS_OAI).setText(provider.getAdapter().getEarliestDatestamp()));
         output.addContent(new Element("deletedRecord", NS_OAI).setText(provider.getDeletedRecordPolicy()));
         output.addContent(new Element("granularity", NS_OAI).setText(MCROAIConstants.GRANULARITY));
-        output.addContent(new Element("adminEmail", NS_OAI).setText(provider.getAdminEmail()));
 
         // Add OAI Identifier description
         Element description = new Element("description", NS_OAI);
