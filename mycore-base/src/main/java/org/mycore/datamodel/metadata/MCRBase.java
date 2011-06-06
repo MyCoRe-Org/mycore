@@ -149,8 +149,7 @@ public abstract class MCRBase {
     }
 
     /**
-     * This methode return the object schema. If this is not set, null was
-     * returned.
+     * Method returns the object schema. If the schema is not set <code>null</code> will be returned.
      * 
      * @return the schema as a string
      */
