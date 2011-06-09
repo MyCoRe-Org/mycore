@@ -117,4 +117,19 @@ public class MCRFileContentType {
 
         return sb.toString();
     }
+
+    @Override
+    public boolean equals( Object other )
+    {
+        if (other instanceof MCRFileContentType)
+            return ((MCRFileContentType) other).ID.equals(ID);
+        else
+            return false;
+    }
+
+    @Override
+    public int hashCode()
+    {
+      return ID.hashCode();
+    }
 }
