@@ -181,7 +181,7 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
                                                 }
                                                 String condfield = incond.getAttributeValue("field");
                                                 if (condfield.equals("date")) {
-                                                    if (MCRUtils.covertDateToISO(condvalue) == null) {
+                                                    if (MCRUtils.convertDateToISO(condvalue) == null) {
                                                         inbool.get(j).removeContent(incond);
                                                         k--;
                                                         l--;

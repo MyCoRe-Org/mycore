@@ -774,11 +774,17 @@ public class MCRStartEditorServlet extends MCRServlet {
         StringBuffer sb = new StringBuffer();
         // TODO: should transform mcrobject and use "session:" to save roundtrip
         Properties params = new Properties();
-        sb.append("request:receive/").append(cd.mytfmcrid).append("?XSL.Style=editor");
-        params.put("sourceUri", sb.toString());
-        sb = new StringBuffer();
-        sb.append(getBaseURL()).append("receive/").append(cd.mytfmcrid);
-        params.put("cancelUrl", sb.toString());
+        String sourceUri = getProperty(job.getRequest(), "sourceUri");
+        if (sourceUri == null || sourceUri.length() == 0) {
+            sb.append("request:receive/").append(cd.mytfmcrid).append("?XSL.Style=editor");
+            params.put("sourceUri", sb.toString());
+            sb = new StringBuffer();
+            sb.append(getBaseURL()).append("receive/").append(cd.mytfmcrid);
+            params.put("cancelUrl", sb.toString());
+        } else {
+            params.put("sourceUri", sourceUri);
+            params.put("cancelUrl", getReferer(job));
+        }
         params.put("mcrid", cd.mytfmcrid.toString());
         params.put("type", cd.mytype);
         params.put("step", cd.mystep);
