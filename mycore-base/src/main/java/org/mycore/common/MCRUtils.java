@@ -146,7 +146,7 @@ public class MCRUtils {
      *            the date input
      * @return the ISO output or null
      */
-    public static final String covertDateToISO(String indate) {
+    public static final String convertDateToISO(String indate) {
         if (indate == null || (indate = indate.trim()).length() == 0) {
             return null;
         }
@@ -195,7 +195,7 @@ public class MCRUtils {
      *            the date input
      * @return the GregorianCalendar or null
      */
-    public static final GregorianCalendar covertDateToGregorianCalendar(String indate) {
+    public static final GregorianCalendar convertDateToGregorianCalendar(String indate) {
         if (indate == null || (indate = indate.trim()).length() == 0) {
             return null;
         }
