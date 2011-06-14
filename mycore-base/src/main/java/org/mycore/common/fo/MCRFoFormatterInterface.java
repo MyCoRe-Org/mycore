@@ -22,8 +22,10 @@
 
 package org.mycore.common.fo;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import javax.xml.transform.TransformerException;
 
 /**
  * This is an interface to use configured XSL-FO formatters for the layout service.
@@ -33,7 +35,7 @@ import java.io.ByteArrayOutputStream;
  */
 
 public interface MCRFoFormatterInterface {
-    
-    public abstract ByteArrayOutputStream transform(ByteArrayInputStream fo_stream);
-    
+
+    public void transform(InputStream fo_stream, OutputStream out) throws TransformerException;
+
 }

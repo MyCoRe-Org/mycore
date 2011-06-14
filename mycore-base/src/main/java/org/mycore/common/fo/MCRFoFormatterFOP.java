@@ -22,13 +22,14 @@
 
 package org.mycore.common.fo;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
@@ -42,7 +43,6 @@ import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRURIResolver;
 import org.xml.sax.SAXException;
 
@@ -72,7 +72,7 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
         if ((fo_cfg != null) && (fo_cfg.length() != 0)) {
             DefaultConfigurationBuilder cfgBuilder = new DefaultConfigurationBuilder();
             try {
-                cfg = cfgBuilder.build(MCRFoFormatterFOP.class.getResourceAsStream("/"+fo_cfg));
+                cfg = cfgBuilder.build(MCRFoFormatterFOP.class.getResourceAsStream("/" + fo_cfg));
             } catch (ConfigurationException e) {
                 LOGGER.error("ConfigurationException - Can't use FOP configuration for " + fo_cfg);
                 LOGGER.error(e.getMessage());
@@ -94,8 +94,7 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
         }
     }
 
-    public final ByteArrayOutputStream transform(ByteArrayInputStream in_stream) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+    public final void transform(InputStream in_stream, OutputStream out) throws TransformerException {
         try {
             Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, out);
             Source src = new StreamSource(in_stream);
@@ -103,10 +102,8 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
             TransformerFactory factory = TransformerFactory.newInstance();
             Transformer transformer = factory.newTransformer();
             transformer.transform(src, res);
-            out.close();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (FOPException e) {
+            throw new TransformerException(e);
         }
-        return out;
     }
 }
