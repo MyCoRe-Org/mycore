@@ -68,7 +68,7 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
     public MCRFoFormatterFOP() throws Exception {
         fopFactory = FopFactory.newInstance();
         fopFactory.setURIResolver(MCRURIResolver.instance());
-        String fo_cfg = MCRConfiguration.instance().getString("MCR.LayoutService.FoFormatter.FOP.config");
+        String fo_cfg = MCRConfiguration.instance().getString("MCR.LayoutService.FoFormatter.FOP.config",null);
         if ((fo_cfg != null) && (fo_cfg.length() != 0)) {
             DefaultConfigurationBuilder cfgBuilder = new DefaultConfigurationBuilder();
             try {
