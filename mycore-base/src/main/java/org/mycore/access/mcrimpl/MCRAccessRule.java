@@ -23,16 +23,19 @@
 
 package org.mycore.access.mcrimpl;
 
+import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRParseException;
 
-public class MCRAccessRule {
+public class MCRAccessRule implements org.mycore.access.MCRAccessRule {
     String id = "";
 
     String creator = "";
@@ -138,5 +141,19 @@ public class MCRAccessRule {
         el.addContent(new Element("rule").setText(rule));
         el.addContent(new Element("description").setText("" + description));
         return el;
+    }
+
+    @Override
+    public boolean validate() {
+        MCRSession session = MCRSessionMgr.getCurrentSession();
+        String userID = session.getUserInformation().getCurrentUserID();
+        MCRIPAddress mcripAddress;
+        try {
+            mcripAddress = new MCRIPAddress(session.getCurrentIP());
+        } catch (UnknownHostException e) {
+            Logger.getLogger(MCRAccessRule.class).warn("Error while checking rule.", e);
+            return false;
+        }
+        return checkAccess(userID, new Date(), mcripAddress);
     }
 }

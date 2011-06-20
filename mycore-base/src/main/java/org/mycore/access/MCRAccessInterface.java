@@ -170,6 +170,18 @@ public interface MCRAccessInterface {
     /**
      * determines whether the current user has the permission to perform a
      * certain action.
+     * same as:
+     * <pre>
+     *  {@link MCRAccessRule} rule={@link #getAccessRule(String, String)};
+     *  if (rule==null)
+     *      return false;
+     *  return rule.validate();
+     * </pre>
+     */
+    public boolean checkPermission(String id, String permission);
+    
+    /**
+     * returns a MCRAccessRule which could be validated
      * 
      * All information regarding the current user is capsulated by a
      * <code>MCRSession</code> instance which can be retrieved by
@@ -185,11 +197,11 @@ public interface MCRAccessInterface {
      *            the ID-String of the object
      * @param permission
      *            the permission/action to be granted, e.g. "read"
-     * @return true if the permission is granted, else false
+     * @return MCRAccessRule instance or null if no rule is defined;
      * @see org.mycore.common.MCRSessionMgr#getCurrentSession()
      * @see org.mycore.common.MCRSession
      */
-    public boolean checkPermission(String id, String permission);
+    public MCRAccessRule getAccessRule(String id, String permission);
 
     /**
      * determines whether a given user has the permission to perform a

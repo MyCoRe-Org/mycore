@@ -176,27 +176,6 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
     }
 
     @Override
-    public boolean checkPermission(String id, String permission) {
-        long start = System.currentTimeMillis();
-        MCRSession session = MCRSessionMgr.getCurrentSession();
-        String userID = session.getUserInformation().getCurrentUserID();
-        LOGGER.debug("Get current User took: " + (System.currentTimeMillis() - start));
-        try {
-            boolean returns = checkAccess(id, permission, userID, new MCRIPAddress(session.getCurrentIP()));
-            LOGGER.debug("Check " + permission + " on " + id + " took:" + (System.currentTimeMillis() - start));
-            return returns;
-        } catch (MCRException e) {
-            // only return true if access is allowed, we dont know this
-            LOGGER.debug("Error while checking rule.", e);
-            return false;
-        } catch (UnknownHostException e) {
-            // only return true if access is allowed, we dont know this
-            LOGGER.debug("Error while checking rule.", e);
-            return false;
-        }
-    }
-
-    @Override
     public boolean checkPermission(String id, String permission, String userID) {
         return checkAccess(id, permission, userID, null);
     }

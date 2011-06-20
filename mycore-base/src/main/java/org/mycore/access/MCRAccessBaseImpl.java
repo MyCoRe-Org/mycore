@@ -46,8 +46,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
 
     private static MCRAccessInterface SINGLETON;
 
-    final protected static String AccessPermissions = MCRConfiguration.instance().getString("MCR.Access.AccessPermissions",
-            "read,write,delete");
+    final protected static String AccessPermissions = MCRConfiguration.instance().getString("MCR.Access.AccessPermissions", "read,write,delete");
 
     /** the logger */
     private static final Logger LOGGER = Logger.getLogger(MCRAccessBaseImpl.class);
@@ -144,7 +143,16 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      */
     public boolean checkPermission(String id, String permission) {
         LOGGER.debug("Execute MCRAccessBaseImpl checkPermission for ID " + id + " for permission " + permission);
-        return true;
+        long start = System.currentTimeMillis();
+        try {
+            MCRAccessRule rule = getAccessRule(id, permission);
+            if (rule == null) {
+                return false;
+            }
+            return rule.validate();
+        } finally {
+            LOGGER.debug("Check " + permission + " on " + id + " took:" + (System.currentTimeMillis() - start));
+        }
     }
 
     /*
@@ -154,8 +162,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      *      java.lang.String, MCRUser)
      */
     public boolean checkPermission(String id, String permission, String userID) {
-        LOGGER.debug("Execute MCRAccessBaseImpl checkPermission for ID " + id + " for permission " + permission + " for user"
-                + userID);
+        LOGGER.debug("Execute MCRAccessBaseImpl checkPermission for ID " + id + " for permission " + permission + " for user" + userID);
         return true;
     }
 
@@ -303,5 +310,16 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
     public String getNormalizedRuleString(Element rule) {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public MCRAccessRule getAccessRule(String id, String permission) {
+        return new MCRAccessRule() {
+
+            @Override
+            public boolean validate() {
+                return true;
+            }
+        };
     }
 }
