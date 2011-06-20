@@ -10,12 +10,14 @@ import org.jdom.Namespace;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.datamodel.ifs.MCRFilesystemNode;
 
 public class MCRMetaDerivateLink extends MCRMetaLink {
 
     private static final String ANNOTATION = "annotation";
+
     private static final String ATTRIBUTE = "lang";
-    
+
     private static final Logger LOGGER = Logger.getLogger(MCRMetaDerivateLink.class);
 
     private HashMap<String, String> map;
@@ -42,8 +44,7 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
 
         while (annotationsIter.hasNext()) {
             org.jdom.Element anAnnotation = annotationsIter.next();
-            String key = anAnnotation.getAttributeValue(MCRMetaDerivateLink.ATTRIBUTE,
-                    Namespace.XML_NAMESPACE);
+            String key = anAnnotation.getAttributeValue(MCRMetaDerivateLink.ATTRIBUTE, Namespace.XML_NAMESPACE);
             String annotationText = anAnnotation.getText();
             this.map.put(key, annotationText);
         }
@@ -56,8 +57,7 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
         while (keys.hasNext()) {
             String key = keys.next();
             org.jdom.Element annotationElem = new Element(MCRMetaDerivateLink.ANNOTATION);
-            annotationElem
-                    .setAttribute(MCRMetaDerivateLink.ATTRIBUTE, key, Namespace.XML_NAMESPACE);
+            annotationElem.setAttribute(MCRMetaDerivateLink.ATTRIBUTE, key, Namespace.XML_NAMESPACE);
             String content = map.get(key);
             if (content == null || content.length() == 0)
                 continue;
@@ -74,7 +74,8 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
             return null;
         String owner = super.href.substring(0, index);
         String path = super.href.substring(index);
-        return (MCRFile) ((MCRDirectory) MCRFile.getRootNode(owner)).getChildByPath(path);
+        MCRFilesystemNode rootNode = MCRFile.getRootNode(owner);
+        return rootNode == null ? null : (MCRFile) ((MCRDirectory) rootNode).getChildByPath(path);
     }
 
     @Override
