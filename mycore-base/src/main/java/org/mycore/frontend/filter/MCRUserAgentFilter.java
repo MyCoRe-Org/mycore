@@ -54,7 +54,7 @@ public class MCRUserAgentFilter implements Filter {
 
     public void init(FilterConfig arg0) throws ServletException {
         String agentRegEx = MCRConfiguration.instance()
-                .getString("MCR.Filter.UserAgent", "(bot|spider|crawler|mercator|slurp|seek|nagios)");
+                .getString("MCR.Filter.UserAgent", "(bot|spider|crawler|mercator|slurp|seek|nagios|Java)");
         agentPattern = Pattern.compile(agentRegEx);
     }
 
