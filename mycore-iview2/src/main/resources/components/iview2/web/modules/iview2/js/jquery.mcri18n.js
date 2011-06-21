@@ -7,7 +7,6 @@
       i18n.executeWhenLoaded(function(i) {
         return that.each(function() {
           // here is my code
-          console.log(this);
           if (this.type == "submit" || this.type == "button") {
             // input fields
             this.value = i.translate(this.value);
