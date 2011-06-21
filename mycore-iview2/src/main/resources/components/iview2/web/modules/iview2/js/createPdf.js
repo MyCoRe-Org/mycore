@@ -90,7 +90,7 @@ iview.Pdf.View.prototype = {
       onOpen : this.open,
       onClose : function(d) {
         that.close.call(this, d);
-        that.pdfCreator = jQuery("div.modal-content").parent();
+        that._initPdfCreator = true;
         if (closeCallback) {
           closeCallback();
         }
@@ -147,6 +147,10 @@ iview.Pdf.View.prototype = {
    * @returns jQuery html node of pdf creator view
    */
   getPdfCreator : function() {
+    if (this._initPdfCreator) {
+      this.pdfCreator = jQuery("div.modal-content").parent();
+      delete this._initPdfCreator;
+    }
     return this.pdfCreator;
   },
 
@@ -333,7 +337,7 @@ iview.Pdf.Controller.validateRange = function(range, maxPages, i18n) {
     throw new Error(i18n.translate("component.iview2.createPdf.errors.noPages"));
   }
   if (pages > maxPages) {
-    throw new Error(i18n.translate("component.iview2.createPdf.errors.tooManyPages")+": " + pages);
+    throw new Error(i18n.translate("component.iview2.createPdf.errors.tooManyPages") + ": " + pages);
   }
 };
 
@@ -350,7 +354,7 @@ iview.Pdf.Controller.amountPages = function(range, i18n) {
       var from = parseInt(ft[0]);
       var to = parseInt(ft[1]);
       if (from > to) {
-        throw new Error(i18n.translate("component.iview2.createPdf.errors.rangeInvalid")+": " + r);
+        throw new Error(i18n.translate("component.iview2.createPdf.errors.rangeInvalid") + ": " + r);
       }
       pages += to - from + 1;
     } else {
