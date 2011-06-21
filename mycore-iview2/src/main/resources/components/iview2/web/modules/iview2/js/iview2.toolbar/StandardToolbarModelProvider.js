@@ -11,11 +11,11 @@
  * 			AssoArray:	buttons				//array of the neccesary button titles, parsed out of the iview2 xsl
  * 		}
  */
-var StandardToolbarModelProvider = function (id) {
+var StandardToolbarModelProvider = function (id, titles, iviewRef) {
 	this.id = id;
     this.model = new ToolbarModel(id);
     
-    this.init();
+    this.init(iviewRef);
 };
 
 StandardToolbarModelProvider.prototype = {
@@ -27,7 +27,7 @@ StandardToolbarModelProvider.prototype = {
 	 * @memberOf StandardToolbarModelProvider#
 	 * @description builds a complete toolbar model with main functionalities
 	 */
-	init : function() {
+	init : function(iviewRef) {
 		var curButtonset;
 	
 		// to show an text sample "Iview2 Bildbetrachter" within the toolbar
@@ -55,6 +55,12 @@ StandardToolbarModelProvider.prototype = {
 		// permalinkHandles
 		curButtonset = this.model.addElement(new ToolbarButtonsetModel("permalinkHandles"));
 		curButtonset.addButton(new ToolbarButtonModel("permalink", {'type': 'buttonCheck', 'state' : false}, {'icons': {primary : 'iview2-icon iview2-icon-permalink'}}, "toolbar.permalink", true, false));
+
+		if (iviewRef.pdfCreatorURI !== "undefined" && iviewRef.pdfCreatorURI.length>0){
+			//TODO: PDF check
+			curButtonset = this.model.addElement(new ToolbarButtonsetModel("pdfHandles"));
+			curButtonset.addButton(new ToolbarButtonModel("createPdf", {'type': 'buttonDefault'}, {'icons': {primary : 'iview2-icon iview2-icon-pdf'}}, "toolbar.pdf", true, false));
+		}
 		
 		this.model.addElement(new ToolbarDividerModel("line"));
 		this.model.addElement(new ToolbarSpringModel("spring", 1));

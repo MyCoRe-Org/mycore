@@ -37,6 +37,8 @@
                 <jsSourceFile>jquery.mousewheel.min.js</jsSourceFile>
                 <!-- JQuery Mousewheel support -->
                 <jsSourceFile>jquery.tree.min.js</jsSourceFile>
+                <!-- JQuery Mousewheel support -->
+                <jsSourceFile>jquery.simplemodal.js</jsSourceFile>
                 <!-- jQuery Tree -->
                 <jsSourceFile>i18n.js</jsSourceFile>
                 <!-- i18n Module -->
@@ -87,6 +89,7 @@
                 
                 <!-- Permalink -->
                 <jsSourceFile>Permalink.js</jsSourceFile>
+                <jsSourceFile>createPdf.js</jsSourceFile>
               </jsSourceFiles>
               <jsFinalFile>iview2.js</jsFinalFile>
             </configuration>

@@ -3,6 +3,8 @@
   exclude-result-prefixes="xlink i18n mcrxml iview2">
   <xsl:param name="MCR.Module-iview2.BaseURL" />
   <xsl:param name="MCR.Module-iview2.DeveloperMode" />
+  <xsl:param name="MCR.Module-iview2.PDFCreatorURI" />
+  <xsl:param name="MCR.Module-iview2.PDFCreatorStyle" />
   <xsl:param name="WebApplicationBaseURL" />
   <xsl:param name="ServletsBaseURL" />
   <xsl:variable name="jqueryUI.version" select="'1.8.12'"/>
@@ -31,7 +33,9 @@
 	      addIviewProperty('<xsl:value-of select="$groupID" />', 'useCutOut',<xsl:value-of select="$cutOut" />);
 	      addIviewProperty('<xsl:value-of select="$groupID" />', 'useOverview',<xsl:value-of select="$overview" />);
 	      addIviewProperty('<xsl:value-of select="$groupID" />', 'baseUri', baseUris);
-	      addIviewProperty('<xsl:value-of select="$groupID" />', 'webappBaseUri', '"<xsl:value-of select="$WebApplicationBaseURL"/>"');
+          addIviewProperty('<xsl:value-of select="$groupID" />', 'webappBaseUri', '"<xsl:value-of select="$WebApplicationBaseURL"/>"');
+	      addIviewProperty('<xsl:value-of select="$groupID" />', 'pdfCreatorURI', '"<xsl:value-of select="$MCR.Module-iview2.PDFCreatorURI"/>"');
+          addIviewProperty('<xsl:value-of select="$groupID" />', 'pdfCreatorStyle', '"<xsl:value-of select="$MCR.Module-iview2.PDFCreatorStyle"/>"');
 	    </script>
       <xsl:if test="string-length($style) &gt; 0">
         <xsl:attribute name="style">
@@ -82,6 +86,7 @@
     	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/lib/fg-menu/fg.menu.css" />
     	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/gfx/default/iview2.toolbar.css" />
     	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/gfx/default/iview2.permalink.css" />
+        <link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/gfx/default/iview2.createpdf.css" />
     </xsl:if>
 	
 	<script type="text/javascript">

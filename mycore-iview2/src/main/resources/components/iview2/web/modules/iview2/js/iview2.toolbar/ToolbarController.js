@@ -116,6 +116,10 @@ ToolbarController.prototype.addView = function(view) {
 					}
 					that.getViewer().gen.openPermalink(button);
 				}
+			} else if (args.parentName == "pdfHandles") {
+				if (args.elementName == "createPdf") {
+					that.getViewer().gen.openPdfCreator(button);
+				}
 			} else if (args.parentName == "closeHandles") {
 				if (args.elementName == "close") {
 					that.getViewer().gen.maximizeHandler();

@@ -1,4 +1,24 @@
 var iview = iview || {};
+
+/**
+ * @public
+ * @function
+ * @memberOf iview
+ * @description	adjusts image css style properties so that image is resized with correct aspect ration
+ * @param		{object} image Object
+ * @param		{string} max-width (css-value)
+ * @param		{string} max-height (css-value)
+ */
+iview.resizeImage = function (img, width, height) {
+	if (img.height > img.width) {
+		img.style.height = height;
+		img.style.width = "auto";
+	} else {
+		img.style.height = "auto";
+		img.style.width = width;
+	}
+};
+
 /**
  * @class
  * @constructor
@@ -14,12 +34,43 @@ iview.General = function(iview, viewID) {
 					'viewer': jQuery("#viewer" + viewID),
 					'preload': jQuery("#viewerContainer" + viewID + " .preload")};
 	this.iview.viewID = viewID;
-}
+	this.inputHandlerEnabled=true;
+};
 
 var genProto = iview.General.prototype;
 
+/**
+ * @function
+ * @memberOf iview.General
+ * @name isInputHandlerEnabled
+ * @returns true if input events (keyboard, mouse) are captured
+ */
+genProto.isInputHandlerEnabled = function() {
+  return this.inputHandlerEnabled;
+};
+
+/**
+ * @function
+ * @memberOf iview.General
+ * @name disableInputHandler
+ * @description disable input events
+ */
+genProto.disableInputHandler = function() {
+  this.inputHandlerEnabled=false;
+};
+
+/**
+ * @function
+ * @memberOf iview.General
+ * @name enableInputHandler
+ * @description enable input events
+ */
+genProto.enableInputHandler = function() {
+  this.inputHandlerEnabled=true;
+};
+
 //IE and Opera doesn't accept our TileUrlProvider Instance as one of PanoJS
-PanoJS.isInstance = function () { return true};
+PanoJS.isInstance = function () {return true;};
 /*
  * calculate simple image name hash value to spread request over different servers
  * but allow browser cache to be used by allways return the same value for a given name 
@@ -38,7 +89,7 @@ PanoJS.TileUrlProvider.prototype.getImageHash = function(image){
 	}
 	this.imageHashes[image]=hash;
 	return hash;
-}
+};
 /*
  * returns the URL of all tileimages
  */
@@ -72,7 +123,7 @@ genProto.zoomCenter = function(direction, point) {
 				'y': ((-preDim.y + point.y) / preDim.height) * newDim.height};
 	viewer.resetSlideMotion();
 	viewer.recenter(npoint,true);
-}
+};
 
 /**
  * @public
@@ -118,7 +169,7 @@ genProto.initializeGraphic = function() {
 		
 		this.reinitializeGraphic();
 	}
-}
+};
 
 /**
  * @public
@@ -194,7 +245,7 @@ genProto.reinitializeGraphic = function() {
 		this.iview.viewerContainer.find(".toolbars .toolbar").css("top", newTop);
 	}
 	this.iview.toolbarCtrl.paint("mainTb");
-}
+};
 
 /**
  * @public
@@ -249,7 +300,7 @@ genProto.maximizeHandler = function() {
 		this.iview.maximized = true;
 		
 		this.iview.getToolbarCtrl().addView(new ToolbarView("mainTbView", this.iview.viewerContainer.find(".toolbars"), i18n));
-		this.iview.getToolbarMgr().addModel(new StandardToolbarModelProvider("mainTb", this.iview.getToolbarMgr().titles).getModel());
+		this.iview.getToolbarMgr().addModel(new StandardToolbarModelProvider("mainTb", this.iview.getToolbarMgr().titles, this.iview).getModel());
 		if (this.iview.PhysicalModel) {
 			this.iview.getToolbarCtrl().checkNavigation(this.iview.PhysicalModel.getCurPos());
 		}
@@ -292,12 +343,12 @@ genProto.maximizeHandler = function() {
 	/*IE causes resize already at class change (mostly because position: rel <> fix)
 	 IE runs resize multiple times...but without this line he doesn't...*/
 	this.reinitializeGraphic();
-}
+};
 
 //TODO drop Iview[viewID] commands and replace them with own General Object access
 PanoJS.doubleClickHandler = function(e) {
 	var iview = this.backingBean.iview;
-	if (iview.maximized) {
+	if (iview.maximized && iview.gen.isInputHandlerEnabled()) {
 		e = getEvent(e);
 		var self = this.backingBean;
 		coords = self.resolveCoordinates(e);
@@ -312,63 +363,63 @@ PanoJS.doubleClickHandler = function(e) {
 
 PanoJS.mousePressedHandler = function(e) {
 	var that = this.backingBean.iview.gen;
-	e = getEvent(e);
-	if (that.iview.maximized) {
-		// only grab on left-click
-		if (e.button < 2) {
-			var self = this.backingBean;
-			var coords = self.resolveCoordinates(e);
-			self.press(coords);
-		}
-	} else {
-		that.maximizeHandler();
-	}
-	// NOTE: MANDATORY! must return false so event does not propagate to well!
-	return false;
-}
+	if (that.isInputHandlerEnabled()){
+  	e = getEvent(e);
+  	if (that.iview.maximized) {
+  		// only grab on left-click
+  		if (e.button < 2) {
+  			var self = this.backingBean;
+  			var coords = self.resolveCoordinates(e);
+  			self.press(coords);
+  		}
+  	} else {
+  		that.maximizeHandler();
+  	}
+  	// NOTE: MANDATORY! must return false so event does not propagate to well!
+  	return false;
+ 	}
+};
 
 //Listener need to be notified and position has to be performed correctly
 PanoJS.keyboardHandler = function(e) {
 	e = getEvent(e);
 	if (iview.credits)
 		iview.credits(e);
-	if (e.keyCode >= 37 && e.keyCode <=40) {
-		//cursorkey movement
-		var motion = {
-				'x': PanoJS.MOVE_THROTTLE * (e.keyCode % 2) * (38 - e.keyCode),
-				'y': PanoJS.MOVE_THROTTLE * ((39 - e.keyCode) % 2)};
-		var viewer;
-		for (var pos in PanoJS.VIEWERS) {
-			viewer = PanoJS.VIEWERS[pos];
-			if (!viewer.iview.maximized) break;
-			viewer.positionTiles(motion, true);
-			viewer.notifyViewerMoved(motion);
-		}
-		preventDefault(e);
-		return false;
-	}
-	if ([109,45,189,107,61,187,144,27].indexOf(e.keyCode)>=0) {
-		for (var i = 0; i < PanoJS.VIEWERS.length; i++) {
-			var viewer = PanoJS.VIEWERS[i];
-			var dir = 0;
-			//+/- Buttons for Zooming
-			//107 and 109 NumPad +/- supported by all, other keys are standard keypad codes of the given Browser
-			if (e.keyCode == 109 || (e.keyCode == 45 && isBrowser("opera")) || e.keyCode == 189) {
-				dir = -1;
-			} else if (e.keyCode == 107 || e.keyCode == 61 || (isBrowser(["Chrome", "IE"]) && e.keyCode == 187) || (isBrowser("Safari") && e.keyCode == 144)) {
-				dir = 1;
-			} else if (e.keyCode == 27) {
-				if (viewer.iview.maximized){
-					viewer.iview.maximizeHandler();
-				}
-			}
-			
-			if (dir != 0 && viewer.iview.maximized) {
-				viewer.iview.zoomCenter(dir,{"x":viewer.width/2, "y":viewer.height/2}); 
-				preventDefault(e);
-				e.cancelBubble = true;
-				return false;
-			}
-		}
-	}
+	for (var i in PanoJS.VIEWERS){
+	  var viewer = PanoJS.VIEWERS[i];
+	  if (viewer.iview.gen.isInputHandlerEnabled()){
+	    if (e.keyCode >= 37 && e.keyCode <=40) {
+	      //cursorkey movement
+	      var motion = {
+	          'x': PanoJS.MOVE_THROTTLE * (e.keyCode % 2) * (38 - e.keyCode),
+	          'y': PanoJS.MOVE_THROTTLE * ((39 - e.keyCode) % 2)};
+	      if (viewer.iview.maximized){
+	        viewer.positionTiles(motion, true);
+	        viewer.notifyViewerMoved(motion);
+        }
+	      preventDefault(e);
+	      return false;
+	    } else if ([109,45,189,107,61,187,144,27].indexOf(e.keyCode)>=0) {
+        var dir = 0;
+        //+/- Buttons for Zooming
+        //107 and 109 NumPad +/- supported by all, other keys are standard keypad codes of the given Browser
+        if (e.keyCode == 109 || (e.keyCode == 45 && isBrowser("opera")) || e.keyCode == 189) {
+          dir = -1;
+        } else if (e.keyCode == 107 || e.keyCode == 61 || (isBrowser(["Chrome", "IE"]) && e.keyCode == 187) || (isBrowser("Safari") && e.keyCode == 144)) {
+          dir = 1;
+        } else if (e.keyCode == 27) {
+          if (viewer.iview.maximized){
+            viewer.iview.maximizeHandler();
+          }
+        }
+        
+        if (dir != 0 && viewer.iview.maximized) {
+          viewer.iview.zoomCenter(dir,{"x":viewer.width/2, "y":viewer.height/2}); 
+          preventDefault(e);
+          e.cancelBubble = true;
+          return false;
+        }
+	    }//zoom
+	  }//input events enabled
+	}//every viewer
 };
