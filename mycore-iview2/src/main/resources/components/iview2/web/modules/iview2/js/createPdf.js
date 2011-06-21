@@ -26,7 +26,7 @@ iview.General.prototype.openPdfCreator = function(button) {
         this.iview.pdfCreatorURI,
         this.iview.webappBaseUri + "servlets/MCRMETSServlet/" + this.iview.viewID + "?XSL.Style=" + this.iview.pdfCreatorStyle,
         function() {
-          that.getPdfCtrl().initView();
+          that.getPdfCtrl().initView(i18n);
         }));
   } else {
     this.getPdfCtrl().show();
@@ -227,7 +227,8 @@ iview.Pdf.Controller.prototype = {
    * @param view
    *          {Object} View which should be initialized
    */
-  initView : function() {
+  initView : function(i18n) {
+    this.i18n = i18n;
     var pdfEl = this.view.getPdfCreator();
     var that = this;
     jQuery("input[type=radio]", pdfEl).focus(function() {
@@ -237,8 +238,9 @@ iview.Pdf.Controller.prototype = {
       that.changeManualInput(this);
     });
     jQuery("form", pdfEl).submit(function(event) {
-      return iview.Pdf.Controller.validateForm(event.target, that.maxPages);
+      return iview.Pdf.Controller.validateForm(event.target, that.maxPages, that.i18n);
     });
+    jQuery(".mcri18n").mcrI18N(i18n);
     this.show();
   },
 
@@ -259,7 +261,7 @@ iview.Pdf.Controller.prototype = {
   validateRangeInput : function(el) {
     this.view.setValidationText("");
     try {
-      iview.Pdf.Controller.validateRange(el.value, this.maxPages);
+      iview.Pdf.Controller.validateRange(el.value, this.maxPages, this.i18n);
       this.displayPreview(el.value);
     } catch (e) {
       this.view.setValidationText(e.message);
@@ -301,11 +303,13 @@ iview.Pdf.Controller.prototype = {
    */
   show : function() {
     this.parent.disableInputHandler();
+    var that = this;
     var cP = this.parent.iview.PhysicalModel._curPos;
-    this.view.setCurrentPageText("Aktuelle Seite:", cP);
+    this.i18n.executeWhenLoaded(function(i) {
+      that.view.setCurrentPageText(i.translate("component.iview2.createPdf.range.currentPage") + ":", cP);
+    });
     this.view.setMaxPageNumber(this.parent.iview.PhysicalModel._pageCount);
     this.displayPreview(String(cP));
-    var that = this;
     this.view.show(function() {
       // on close:
       that.parent.enableInputHandler();
@@ -323,17 +327,17 @@ iview.Pdf.Controller.prototype = {
  *          integer of max allowed pages in range
  * @description throw a validation error if {range} is not valid
  */
-iview.Pdf.Controller.validateRange = function(range, maxPages) {
-  var pages = iview.Pdf.Controller.amountPages(range);
+iview.Pdf.Controller.validateRange = function(range, maxPages, i18n) {
+  var pages = iview.Pdf.Controller.amountPages(range, i18n);
   if (pages == 0) {
-    throw new Error("No pages selected");
+    throw new Error(i18n.translate("component.iview2.createPdf.errors.noPages"));
   }
   if (pages > maxPages) {
-    throw new Error("Too many pages: " + pages);
+    throw new Error(i18n.translate("component.iview2.createPdf.errors.tooManyPages")+": " + pages);
   }
 };
 
-iview.Pdf.Controller.amountPages = function(range) {
+iview.Pdf.Controller.amountPages = function(range, i18n) {
   var pages = 0;
   var ranges = range.split(",");
   if (ranges[0].length == 0) {
@@ -346,7 +350,7 @@ iview.Pdf.Controller.amountPages = function(range) {
       var from = parseInt(ft[0]);
       var to = parseInt(ft[1]);
       if (from > to) {
-        throw new Error("Range is invalid: " + r);
+        throw new Error(i18n.translate("component.iview2.createPdf.errors.rangeInvalid")+": " + r);
       }
       pages += to - from + 1;
     } else {
@@ -356,11 +360,11 @@ iview.Pdf.Controller.amountPages = function(range) {
   return pages;
 };
 
-iview.Pdf.Controller.validateForm = function(form, maxPages) {
+iview.Pdf.Controller.validateForm = function(form, maxPages, i18n) {
   for ( var i = 0; i < form.pages.length; i++) {
     if (form.pages[i].checked) {
       try {
-        iview.Pdf.Controller.validateRange(form.pages[i].value, maxPages);
+        iview.Pdf.Controller.validateRange(form.pages[i].value, maxPages, i18n);
       } catch (e) {
         alert(e.message);
         return false;

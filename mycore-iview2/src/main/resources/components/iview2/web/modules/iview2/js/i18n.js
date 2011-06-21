@@ -64,7 +64,8 @@ iview.i18n.prototype = {
 		this._deferredObjects[languageCode] = new jQuery.Deferred();
 		jQuery.getJSON(this._location + "servlets/MCRLocaleServlet/" + languageCode + "/component.iview2.*", function(data) {
 			jQuery.each(data,function(key,val) {
-				that._langs[languageCode][key.replace("component.iview2.","")] = val;
+        that._langs[languageCode][key.replace("component.iview2.","")] = val;
+        that._langs[languageCode][key] = val;
 			});
 			jQuery(that).trigger('load.i18n', {'language': languageCode, 'i18n':that});
 		}).done(that._deferredObjects[languageCode].resolve(that)).fail(that._deferredObjects[languageCode].reject(that));

@@ -39,6 +39,8 @@
                 <jsSourceFile>jquery.tree.min.js</jsSourceFile>
                 <!-- JQuery Mousewheel support -->
                 <jsSourceFile>jquery.simplemodal.js</jsSourceFile>
+                <!-- JQuery MCRI18N support -->
+                <jsSourceFile>jquery.mcri18n.js</jsSourceFile>
                 <!-- jQuery Tree -->
                 <jsSourceFile>i18n.js</jsSourceFile>
                 <!-- i18n Module -->
