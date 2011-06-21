@@ -6,11 +6,6 @@
 </listener>
 
 <servlet>
-  <servlet-name>MCRDirectoryXMLServlet</servlet-name>
-  <servlet-class>org.mycore.iview2.frontend.MCRDirectoryXMLServlet</servlet-class>
-</servlet>
-
-<servlet>
   <servlet-name>MCRTileServlet</servlet-name>
   <servlet-class>org.mycore.iview2.frontend.MCRTileServlet</servlet-class>
 </servlet>
@@ -26,11 +21,6 @@
 </servlet>
 
 <servlet-mapping>
-  <servlet-name>MCRDirectoryXMLServlet</servlet-name>
-  <url-pattern>/servlets/MCRDirectoryXMLServlet/*</url-pattern>
-</servlet-mapping>
-
-<servlet-mapping>
   <servlet-name>MCRTileServlet</servlet-name>
   <url-pattern>/servlets/MCRTileServlet/*</url-pattern>
 </servlet-mapping>
@@ -44,3 +34,14 @@
   <servlet-name>MCRThumbnailServlet</servlet-name>
   <url-pattern>/servlets/MCRThumbnailServlet/*</url-pattern>
 </servlet-mapping>
+
+<filter-mapping>
+  <filter-name>UserAgentFilter</filter-name>
+  <servlet-name>MCRTileCombineServlet</servlet-name>
+  <dispatcher>REQUEST</dispatcher>
+</filter-mapping>
+<filter-mapping>
+  <filter-name>UserAgentFilter</filter-name>
+  <servlet-name>MCRThumbnailServlet</servlet-name>
+  <dispatcher>REQUEST</dispatcher>
+</filter-mapping>
