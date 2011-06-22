@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.ifs.MCROldFile;
 import org.mycore.datamodel.ifs.MCRFileReader;
-import org.mycore.util.ProcessWrapper;
+import org.mycore.frontend.cli.MCRExternalProcess;
 
 import com.sun.jna.Platform;
 
@@ -270,10 +270,8 @@ public class MCRMediaParser {
      * @return boolean if is
      */
     public static boolean isFFMpegInstalled() {
-        ProcessWrapper pw = new ProcessWrapper();
-        
         try {
-            return pw.runCommand("ffmpeg") == 1;
+            return new MCRExternalProcess( "ffmpeg" ).run() == 1;
         } catch ( Exception e ) {
             return false;
         }

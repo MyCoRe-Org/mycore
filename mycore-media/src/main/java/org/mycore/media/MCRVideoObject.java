@@ -24,11 +24,11 @@
 package org.mycore.media;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.mycore.util.ProcessWrapper;
+import org.mycore.datamodel.ifs2.MCRContent;
+import org.mycore.frontend.cli.MCRExternalProcess;
 
 import org.jdom.Element;
 
@@ -148,7 +148,7 @@ public class MCRVideoObject extends MCRMediaObject {
      * @throws Exception
      */
     public synchronized byte[] getThumbnail( MCRVideoObject media, long seek, int maxWidth, int maxHeight, boolean keepAspect ) throws Exception {
-        ProcessWrapper pw = new ProcessWrapper();
+        MCRExternalProcess ep;
         try {
             File tmpFile = File.createTempFile("MCRVideoObject", ".png");
             tmpFile.deleteOnExit();
@@ -169,16 +169,12 @@ public class MCRVideoObject extends MCRMediaObject {
             args[10]= "-f";
             args[11]= "image2";
             args[12]= tmpFile.getAbsolutePath();
+            ep = new MCRExternalProcess(args);
             
-            if ( pw.runCommand(args) != 0 )
-                throw new Exception("An error occures on run getThumb.\n" + pw.getStdErr());
+            if ( ep.run() != 0 )
+                throw new Exception("An error occures on run getThumb.\n" + ep.getErrors());
             else {
-                FileInputStream in = new FileInputStream(tmpFile);
-                byte[] data = new byte[(int) tmpFile.length()];    
-                in.read(data);
-                in.close();
-
-                return data;
+                return MCRContent.readFrom( tmpFile ).asByteArray();
             }
         } catch ( Exception e ) {
             throw new Exception(e.getMessage());
