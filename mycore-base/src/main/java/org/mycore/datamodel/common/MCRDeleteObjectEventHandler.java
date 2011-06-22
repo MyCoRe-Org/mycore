@@ -14,7 +14,6 @@ import org.mycore.datamodel.metadata.MCRObject;
 
 /**
  * @author shermann
- *
  */
 public class MCRDeleteObjectEventHandler extends MCREventHandlerBase {
     private static Logger LOGGER = Logger.getLogger(MCRDeleteObjectEventHandler.class);
@@ -74,7 +73,8 @@ public class MCRDeleteObjectEventHandler extends MCREventHandlerBase {
     }
 
     /**
-     * Stores the id, timestamp,current userid and the ip address in the database table MCRDELETEDITEMS
+     * Stores the id, timestamp,current userid and the ip address in the
+     * database table MCRDELETEDITEMS
      * 
      * @param evt
      *            the event that occured
@@ -86,6 +86,24 @@ public class MCRDeleteObjectEventHandler extends MCREventHandlerBase {
         try {
             LOGGER.info("Saving deletion information for object " + obj.getId());
             MCRDeletedItemManager.getInstance().addEntry(obj.getId().toString(), new Date());
+        } catch (Exception ex) {
+            LOGGER.error(ex);
+        }
+    }
+
+    /**
+     * Stores the id, timestamp,current userid and the ip address in the
+     * database table MCRDELETEDITEMS
+     * 
+     * @param evt
+     *            the event that occured
+     * @param derivate
+     *            the MCRDerivate that caused the event
+     */
+    protected void handleDerivateDeleted(MCREvent evt, MCRDerivate derivate) {
+        try {
+            LOGGER.info("Saving deletion information for derivate " + derivate.getId());
+            MCRDeletedItemManager.getInstance().addEntry(derivate.getId().toString(), new Date());
         } catch (Exception ex) {
             LOGGER.error(ex);
         }

@@ -15,7 +15,6 @@ import org.mycore.common.MCRSessionMgr;
 
 /**
  * @author shermann
- *
  */
 public class MCRDeletedItemManager {
 
@@ -30,6 +29,13 @@ public class MCRDeletedItemManager {
         return _instance;
     }
 
+    /**
+     * @param identifier
+     *            the identifier of the MCRObject or MCRDerivate
+     * @param dateDeleted
+     *            the current date
+     * @throws MCRPersistenceException
+     */
     public synchronized final void addEntry(String identifier, Date dateDeleted) throws MCRPersistenceException {
         if (identifier == null) {
             throw new MCRPersistenceException("The identifier is null.");
