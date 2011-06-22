@@ -243,6 +243,14 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
         return "";
     }
 
+    /* (non-Javadoc)
+     * @see org.mycore.access.MCRAccessBaseImpl#getAccessRule(java.lang.String, java.lang.String)
+     */
+    @Override
+    public org.mycore.access.MCRAccessRule getAccessRule(String id, String permission) {
+        return getAccess(id, permission);
+    }
+
     @Override
     public Collection<String> getPermissionsForID(String objid) {
         Collection<String> ret = accessStore.getPoolsForObject(objid);
