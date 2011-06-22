@@ -332,10 +332,18 @@ public class MCRCommandLineInterface {
      * @throws SecurityException
      *             when the command could not be executed for security reasons
      */
-    public static void executeShellCommand(String command) throws IOException, SecurityException {
+    public static void executeShellCommand(String command) throws Exception {
         Process p = Runtime.getRuntime().exec(command);
-        showOutput(p.getInputStream());
-        showOutput(p.getErrorStream());
+
+        MCRStreamSucker in = new MCRStreamSucker( p.getInputStream() );
+        in.start();
+        MCRStreamSucker err = new MCRStreamSucker( p.getErrorStream() );
+        err.start();
+        
+        p.waitFor();
+        
+        output( in.getContent().asString() );
+        output( err.getContent().asString() );
     }
 
     /**
@@ -345,18 +353,6 @@ public class MCRCommandLineInterface {
         MCRSession session = MCRSessionMgr.getCurrentSession();
         String userName = session.getUserInformation().getCurrentUserID();
         output("You are user " + userName);
-    }
-
-    /**
-     * Catches the output read from an input stream and prints it line by line
-     * on standard out. This is used to catch the stdout and stderr stream
-     * output when executing an external shell command.
-     */
-    private static void showOutput(InputStream in) throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        MCRUtils.copyStream(in, out);
-        out.close();
-        output(out.toString());
     }
 
     public static void cancelOnError() {
