@@ -41,6 +41,7 @@ import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -60,8 +61,6 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
     public static final String poolPrivilegeID = "POOLPRIVILEGE";
 
     public static final String lexicographicalPattern = "0000000000";
-
-    static String superuserID = MCRConfiguration.instance().getString("MCR.Users.Superuser.UserName", "mcradmin");
 
     static MCRCache cache;
 
@@ -317,7 +316,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
         MCRAccessRule rule = getAccessRule(objID, permission);
         LOGGER.debug("getAccess() is done");
         if (rule == null) {
-            if (userID.equals(superuserID)) {
+            if (userID.equals(MCRConstants.SUPER_USER_ID)) {
                 return true;
             }
             return false;

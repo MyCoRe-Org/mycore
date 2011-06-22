@@ -30,7 +30,9 @@ import java.util.Collections;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRSessionMgr;
 
 /**
  * This class is a base implementation of the <code>MCRAccessInterface</code>.
@@ -147,6 +149,9 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
         try {
             MCRAccessRule rule = getAccessRule(id, permission);
             if (rule == null) {
+                if (MCRConstants.SUPER_USER_ID.equals(MCRSessionMgr.getCurrentSession().getUserInformation().getCurrentUserID())) {
+                    return true;
+                }
                 return false;
             }
             return rule.validate();

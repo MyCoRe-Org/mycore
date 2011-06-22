@@ -47,7 +47,7 @@ import org.jdom.Namespace;
 public final class MCRConstants {
     /** MyCoRe version */
     public final static String VERSION = "2.0";
-    
+
     /** MCR.Metadata.DefaultLang */
     public static final String DEFAULT_LANG = "de";
 
@@ -55,7 +55,7 @@ public final class MCRConstants {
     private final static String XLINK_URL = "http://www.w3.org/1999/xlink";
 
     public final static Namespace XLINK_NAMESPACE = Namespace.getNamespace("xlink", XLINK_URL);
-    
+
     /** The URL of the XSI */
     private final static String XSI_URL = "http://www.w3.org/2001/XMLSchema-instance";
 
@@ -85,6 +85,8 @@ public final class MCRConstants {
     private final static String MCR_URL = "http://www.mycore.org/";
 
     public final static Namespace MCR_NAMESPACE = Namespace.getNamespace("mcr", MCR_URL);
+
+    public final static String SUPER_USER_ID = MCRConfiguration.instance().getString("MCR.Users.Superuser.UserName", "mcradmin");
 
     private final static List<Namespace> namespaces;
 
