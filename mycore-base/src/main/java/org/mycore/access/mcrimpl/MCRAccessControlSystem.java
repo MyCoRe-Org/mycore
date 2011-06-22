@@ -213,7 +213,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
 
     @Override
     public Element getRule(String objID, String permission) {
-        MCRAccessRule accessRule = getAccess(objID, permission);
+        MCRAccessRule accessRule = getAccessRule(objID, permission);
         MCRRuleParser parser = new MCRRuleParser();
         Element rule = parser.parse(accessRule.rule).toXML();
         Element condition = new Element("condition");
@@ -236,19 +236,11 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
 
     @Override
     public String getRuleDescription(String objID, String permission) {
-        MCRAccessRule accessRule = getAccess(objID, permission);
+        MCRAccessRule accessRule = getAccessRule(objID, permission);
         if (accessRule != null && accessRule.getDescription() != null) {
             return accessRule.getDescription();
         }
         return "";
-    }
-
-    /* (non-Javadoc)
-     * @see org.mycore.access.MCRAccessBaseImpl#getAccessRule(java.lang.String, java.lang.String)
-     */
-    @Override
-    public org.mycore.access.MCRAccessRule getAccessRule(String id, String permission) {
-        return getAccess(id, permission);
     }
 
     @Override
@@ -282,8 +274,9 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
     public boolean isDisabled() {
         return disabled;
     }
-
-    public MCRAccessRule getAccess(String objID, String pool) {
+    
+    @Override
+    public MCRAccessRule getAccessRule(String objID, String pool) {
         if (disabled) {
             return dummyRule;
         }
@@ -321,7 +314,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
     public boolean checkAccess(String objID, String permission, String userID, MCRIPAddress ip) {
         Date date = new Date();
         LOGGER.debug("getAccess()");
-        MCRAccessRule rule = getAccess(objID, permission);
+        MCRAccessRule rule = getAccessRule(objID, permission);
         LOGGER.debug("getAccess() is done");
         if (rule == null) {
             if (userID.equals(superuserID)) {
