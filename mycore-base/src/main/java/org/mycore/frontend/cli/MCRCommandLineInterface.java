@@ -18,13 +18,11 @@
 package org.mycore.frontend.cli;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -39,7 +37,6 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.ifs2.MCRContent;
 
@@ -333,17 +330,10 @@ public class MCRCommandLineInterface {
      *             when the command could not be executed for security reasons
      */
     public static void executeShellCommand(String command) throws Exception {
-        Process p = Runtime.getRuntime().exec(command);
-
-        MCRStreamSucker in = new MCRStreamSucker( p.getInputStream() );
-        in.start();
-        MCRStreamSucker err = new MCRStreamSucker( p.getErrorStream() );
-        err.start();
-        
-        p.waitFor();
-        
-        output( in.getContent().asString() );
-        output( err.getContent().asString() );
+        MCRExternalProcess process = new MCRExternalProcess( command );
+        process.run();
+        output( process.getOutput().asString() );
+        output( process.getErrors() );
     }
 
     /**
