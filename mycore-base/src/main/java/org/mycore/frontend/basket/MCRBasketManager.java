@@ -30,14 +30,21 @@ import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 
 /**
- * Creates and stores Basket objects in the user's current MCRSession.
- * The session may store multiple baskets with different type IDs,
+ * Manages basket objects in the user's current MCRSession and the persistent store.
+ * A session may store multiple baskets with different type IDs,
  * for example a basket for documents and another for an other type of entry.
+ * A basket can be saved to and loaded from a derivate. The persistent form
+ * of a basket is a file "basket.xml" in a derivate.
  * 
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRBasketManager {
 
+    /**
+     * Convenience method to get a basket of the given type. 
+     * When there already is a basket in the session, that basket is returned.
+     * Otherwise a new basket is created and saved in the session.
+     */
     public static MCRBasket getOrCreateBasketInSession(String type) {
         MCRBasket basket = getBasketFromSession(type);
         if (basket == null) {
@@ -47,30 +54,54 @@ public class MCRBasketManager {
         return basket;
     }
 
+    /**
+     * Returns the basket of the given type from the current session, if there is any.
+     */
     public static MCRBasket getBasketFromSession(String type) {
         String key = getBasketKey(type);
         return (MCRBasket) (MCRSessionMgr.getCurrentSession().get(key));
     }
 
+    /**
+     * Stores the given basket in the current user's session
+     */
     public static void setBasketInSession(MCRBasket basket) {
         String key = getBasketKey(basket.getType());
         MCRSessionMgr.getCurrentSession().put(key, basket);
     }
 
+    /**
+     * Returns the key to be used to store a basket in the current user's MCRSession
+     */
     private static String getBasketKey(String type) {
         return "basket." + type;
     }
 
+    /**
+     * Loads a basket from an XML file in the given derivate.
+     */
     public static MCRBasket loadBasket(String derivateID) throws Exception {
-        MCRDirectory dir = (MCRDirectory) (MCRFilesystemNode.getRootNode(derivateID));
-        MCRFile file = (MCRFile) (dir.getChild("basket.xml"));
+        MCRFile file = getBasketFile(derivateID);
         Document xml = file.getContentAsJDOM();
         return new MCRBasketXMLParser().parseXML(xml);
     }
 
-    public static void updateBasket(MCRBasket basket, String derivateID) throws Exception {
+    /**
+     * Returns the MCRFile that stores the persistent data of a basket within the given derivate.
+     */
+    private static MCRFile getBasketFile(String derivateID) {
         MCRDirectory dir = (MCRDirectory) (MCRFilesystemNode.getRootNode(derivateID));
         MCRFile file = (MCRFile) (dir.getChild("basket.xml"));
+        return file;
+    }
+
+    /**
+     * Updates the basket's data in the persistent store by saving its XML representation
+     * to a file in a derivate. The ID of the derivate is given in the basket's properties. 
+     */
+    public static void updateBasket(MCRBasket basket) throws Exception {
+        String derivateID = basket.getDerivateID();
+        MCRFile file = getBasketFile(derivateID);
         Document xml = new MCRBasketXMLBuilder(false).buildXML(basket);
         file.setContentFrom(xml);
     }

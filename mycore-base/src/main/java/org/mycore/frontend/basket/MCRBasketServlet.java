@@ -55,6 +55,10 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * BasketServlet?type=objects&action=comment&id=DocPortal_document_00774301
  *   to change the comment stored in the basket. This is called
  *   using EditorServlet submission, see basket-edit.xml for an example. 
+ * BasketServlet?action=load&derivateID=DocPortal_derivate_12345678
+ *   loads a basket's data from a file "basket.xml" in the given derivate into the current user's session.
+ * BasketServlet?type=objects&action=update
+ *   updates a persistent basket in its derivate - that is the derivate the basket was loaded from.
  * 
  * @author Frank L\u00fctzenkirchen
  **/
@@ -71,7 +75,7 @@ public class MCRBasketServlet extends MCRServlet {
         String uri = req.getParameter("uri");
         boolean resolveContent = "true".equals(req.getParameter("resolve"));
 
-        LOGGER.info(type + " " + action + " " + (id == null ? "" : id));
+        LOGGER.info(action + " " + type + " " + (id == null ? "" : id));
 
         MCRBasket basket = MCRBasketManager.getOrCreateBasketInSession(type);
 
@@ -88,7 +92,14 @@ public class MCRBasketServlet extends MCRServlet {
             basket.down(basket.get(id));
         else if ("clear".equals(action))
             basket.clear();
-        else if ("comment".equals(action)) {
+        else if ("update".equals(action))
+            MCRBasketManager.updateBasket(basket);
+        else if ("load".equals(action)) {
+            String derivateID = req.getParameter("derivateID");
+            basket = MCRBasketManager.loadBasket(derivateID);
+            type = basket.getType();
+            MCRBasketManager.setBasketInSession(basket);
+        } else if ("comment".equals(action)) {
             MCREditorSubmission sub = (MCREditorSubmission) (req.getAttribute("MCREditorSubmission"));
             String comment = sub.getXML().getRootElement().getChildTextTrim("comment");
             basket.get(id).setComment(comment);
