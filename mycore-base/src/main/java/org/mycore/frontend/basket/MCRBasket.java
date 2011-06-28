@@ -30,8 +30,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 
-import org.jdom.Element;
-
 /**
  * Implements a basket of entries.
  * The basket has a type attribute that allows to
@@ -247,18 +245,5 @@ public class MCRBasket implements List<MCRBasketEntry>, Set<MCRBasketEntry> {
 
         remove(posOld);
         add(posNew, entry);
-    }
-
-    /**
-     * Builds an XML representation of this basket and it's content.
-     * 
-     * @param addContent if true, the XML data representing each object in the basket entry is added, too.
-     */
-    public Element buildXML(boolean addContent) {
-        Element basket = new Element("basket");
-        basket.setAttribute("type", type);
-        for (MCRBasketEntry entry : this)
-            basket.addContent(entry.buildXML(addContent));
-        return basket;
     }
 }

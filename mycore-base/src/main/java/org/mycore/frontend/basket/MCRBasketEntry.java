@@ -112,22 +112,6 @@ public class MCRBasketEntry {
         this.comment = comment;
     }
 
-    /**
-     * Builds an XML representation of this basket entry.
-     * 
-     * @param addContent if true, the XML data representing this object is included too.
-     * Note that setContent() or resolveContent() should have been called before.
-     */
-    public Element buildXML(boolean addContent) {
-        Element entry = new Element("entry");
-        entry.setAttribute("id", id);
-        entry.setAttribute("uri", uri);
-        if (addContent && (content != null))
-            entry.addContent((Element) (content.clone()));
-        entry.addContent(new Element("comment").setText(comment));
-        return entry;
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof MCRBasketEntry)
