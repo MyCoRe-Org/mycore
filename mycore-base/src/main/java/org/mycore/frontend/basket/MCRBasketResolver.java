@@ -44,6 +44,7 @@ public class MCRBasketResolver implements URIResolver {
             String id = tokens[2];
 
             MCRBasketEntry entry = MCRBasketManager.getBasket(type).get(id);
+            entry.resolveContent();
             Document xml = new Document(entry.buildXML(true));
             return new JDOMSource(xml);
         } catch (Exception ex) {
