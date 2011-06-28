@@ -28,47 +28,84 @@ import org.mycore.common.xml.MCRURIResolver;
 
 public class MCRBasketEntry {
 
+    /** The ID of the object contained in this basket entry */
     private String id;
 
+    /** The URI where to read the object's XML data from */
     private String uri;
 
+    /** Optional comment for this basket entry */
     private String comment;
 
+    /** The XML data of the object in the basket, read from the URI */
     private Element content;
 
+    /**
+     * Creates a new basket entry. The XML that represents the object
+     * is not immediately read from the given URI. Call resolveContent() to
+     * read the content. 
+     * 
+     * @param id the ID of the object to add to the basket.
+     * @param uri the URI where to read the object's xml data from
+     */
     public MCRBasketEntry(String id, String uri) {
         this.id = id;
         this.uri = uri;
     }
 
+    /** Returns the ID of the object contained in this basket entry */
     public String getID() {
         return id;
     }
 
+    /** Returns the URI where to read the object's XML data from */
     public String getURI() {
         return uri;
     }
 
+    /** 
+     * Reads the XML data of the object in the basket entry, using the given URI, 
+     * and stores it in the basket entry.
+     */
     public void resolveContent() {
         setContent(MCRURIResolver.instance().resolve(uri));
     }
 
+    /**
+     * Returns the XML data of the object in the basket entry, or null if 
+     * setContent() or resolveContent() was not called yet.
+     */
     public Element getContent() {
         return content;
     }
 
+    /**
+     * Sets the XML data of the object in the basket entry.
+     */
     public void setContent(Element content) {
         this.content = (Element) (content.clone());
     }
 
+    /**
+     * Returns the optional comment set for this basket entry.
+     */
     public String getComment() {
         return comment;
     }
 
+    /**
+     * Sets the optional comment for this basket entry.
+     */
     public void setComment(String comment) {
         this.comment = comment;
     }
 
+    /**
+     * Builds an XML representation of this basket entry.
+     * 
+     * @param addContent if true, the XML data representing this object is included too.
+     * Note that setContent() or resolveContent() should have been called before.
+     */
     public Element buildXML(boolean addContent) {
         Element entry = new Element("entry");
         entry.setAttribute("id", id);
@@ -91,5 +128,4 @@ public class MCRBasketEntry {
     public int hashCode() {
         return id.hashCode();
     }
-
 }
