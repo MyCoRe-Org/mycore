@@ -26,6 +26,18 @@ package org.mycore.frontend.basket;
 import org.jdom.Element;
 import org.mycore.common.xml.MCRURIResolver;
 
+/**
+ * Represents an entry in a basket. Each entry has at least
+ * a unique ID, for example the MCRObjectID, and an URI that
+ * can be used to read the object's XML representation to
+ * render the object in the basket UI. Each basket entry
+ * may have an optional comment. The basket entry provides 
+ * methods to resolve the object's XML and to set in in the
+ * basket entry. This can be used by applications that wish
+ * to edit XML in the basket itself.
+ * 
+ * @author Frank L\u00FCtzenkirchen
+ */
 public class MCRBasketEntry {
 
     /** The ID of the object contained in this basket entry */

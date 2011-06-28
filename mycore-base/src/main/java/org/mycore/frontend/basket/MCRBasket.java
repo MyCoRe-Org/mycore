@@ -32,16 +32,37 @@ import java.util.Set;
 
 import org.jdom.Element;
 
+/**
+ * Implements a basket of entries.
+ * The basket has a type attribute that allows to
+ * distinguish multiple baskets within the same session.
+ * The basket implements the List and Set interfaces,
+ * it behaves like an ordered Set of entries. 
+ * Entries already contained in the basket can not be 
+ * re-added, each entry can be contained only once in the basket. 
+ * 
+ * @author Frank L\u00FCtzenkirchen
+ */
 public class MCRBasket implements List<MCRBasketEntry>, Set<MCRBasketEntry> {
 
+    /** The internal list of basket entries */
     private List<MCRBasketEntry> list = new ArrayList<MCRBasketEntry>();
 
+    /** The type of basket */
     private String type;
 
+    /**
+     * Creates a new basket of the given type.
+     * 
+     * @param type the type of basket, an attribute that can be used by the application to distinguish multiple basket within the same session.
+     */
     public MCRBasket(String type) {
         this.type = type;
     }
 
+    /**
+     * Returns the type of basket.
+     */
     public String getType() {
         return type;
     }
@@ -97,6 +118,11 @@ public class MCRBasket implements List<MCRBasketEntry>, Set<MCRBasketEntry> {
         return list.get(index);
     }
 
+    /**
+     * Returns the basket entry with the given ID, or null.
+     *
+     * @param id the ID of the basket entry.
+     */
     public MCRBasketEntry get(String id) {
         for (MCRBasketEntry entry : this)
             if (id.equals(entry.getID()))
@@ -144,12 +170,16 @@ public class MCRBasket implements List<MCRBasketEntry>, Set<MCRBasketEntry> {
         return list.remove(o);
     }
 
+    /**
+     * Removes the entry with the given ID from the basket.
+     * 
+     * @return true, if the basket entry was removed successfully.
+     */
     public boolean removeEntry(String id) {
         MCRBasketEntry entry = get(id);
         if (entry == null)
             return false;
-        remove(entry);
-        return true;
+        return remove(entry);
     }
 
     @Override
@@ -187,14 +217,28 @@ public class MCRBasket implements List<MCRBasketEntry>, Set<MCRBasketEntry> {
         return list.toArray(a);
     }
 
+    /**
+     * Moves the basket entry one position up in the
+     * list of basket entries.
+     */
     public void up(MCRBasketEntry entry) {
         move(entry, -1);
     }
 
+    /**
+     * Moves the basket entry one position down in the
+     * list of basket entries.
+     */
     public void down(MCRBasketEntry entry) {
         move(entry, 1);
     }
 
+    /**
+     * Moves a basket entry up or down in the
+     * list of basket entries.
+     * 
+     * @param change the number of index positions to move the entry.
+     */
     public void move(MCRBasketEntry entry, int change) {
         int posOld = indexOf(entry);
         int posNew = posOld + change;
@@ -205,6 +249,11 @@ public class MCRBasket implements List<MCRBasketEntry>, Set<MCRBasketEntry> {
         add(posNew, entry);
     }
 
+    /**
+     * Builds an XML representation of this basket and it's content.
+     * 
+     * @param addContent if true, the XML data representing each object in the basket entry is added, too.
+     */
     public Element buildXML(boolean addContent) {
         Element basket = new Element("basket");
         basket.setAttribute("type", type);
