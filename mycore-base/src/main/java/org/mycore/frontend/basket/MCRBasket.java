@@ -205,11 +205,11 @@ public class MCRBasket implements List<MCRBasketEntry>, Set<MCRBasketEntry> {
         add(posNew, entry);
     }
 
-    public Element buildXML() {
+    public Element buildXML(boolean addContent) {
         Element basket = new Element("basket");
         basket.setAttribute("type", type);
         for (MCRBasketEntry entry : this)
-            basket.addContent(entry.buildXML());
+            basket.addContent(entry.buildXML(addContent));
         return basket;
     }
 }

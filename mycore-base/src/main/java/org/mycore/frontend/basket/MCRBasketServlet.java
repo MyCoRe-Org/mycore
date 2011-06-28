@@ -75,7 +75,7 @@ public class MCRBasketServlet extends MCRServlet {
         if ("add".equals(action))
             basket.add(new MCRBasketEntry(id, uri));
         else if ("remove".equals(action))
-            basket.remove(id);
+            basket.removeEntry(id);
         else if ("up".equals(action))
             basket.up(basket.get(id));
         else if ("down".equals(action))
@@ -88,7 +88,7 @@ public class MCRBasketServlet extends MCRServlet {
             basket.get(id).setComment(comment);
         } else if ("show".equals(action)) {
             req.setAttribute("XSL.Style", type);
-            getLayoutService().doLayout(req, res, new Document(basket.buildXML()));
+            getLayoutService().doLayout(req, res, new Document(basket.buildXML(true)));
             return;
         }
 

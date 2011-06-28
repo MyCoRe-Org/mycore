@@ -36,21 +36,18 @@ import org.jdom.transform.JDOMSource;
  * 
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRBasketResolver implements URIResolver
-{
-  public Source resolve( String href, String base ) throws TransformerException
-  {
-    try
-    {
-      String[] tokens = href.split( ":" );
-      String type = tokens[ 1 ];
-      String id = tokens[ 2 ];
-      
-      MCRBasketEntry entry = MCRBasketManager.getBasket( type ).get( id );
-      Document xml = new Document( entry.buildXML() );
-      return new JDOMSource( xml );
+public class MCRBasketResolver implements URIResolver {
+    public Source resolve(String href, String base) throws TransformerException {
+        try {
+            String[] tokens = href.split(":");
+            String type = tokens[1];
+            String id = tokens[2];
+
+            MCRBasketEntry entry = MCRBasketManager.getBasket(type).get(id);
+            Document xml = new Document(entry.buildXML(true));
+            return new JDOMSource(xml);
+        } catch (Exception ex) {
+            throw new TransformerException(ex);
+        }
     }
-    catch( Exception ex )
-    { throw new TransformerException( ex ); }
-  }
 }

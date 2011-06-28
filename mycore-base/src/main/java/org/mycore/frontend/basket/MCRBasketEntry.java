@@ -24,6 +24,7 @@
 package org.mycore.frontend.basket;
 
 import org.jdom.Element;
+import org.mycore.common.xml.MCRURIResolver;
 
 public class MCRBasketEntry {
 
@@ -32,6 +33,8 @@ public class MCRBasketEntry {
     private String uri;
 
     private String comment;
+
+    private Element content;
 
     public MCRBasketEntry(String id, String uri) {
         this.id = id;
@@ -46,6 +49,18 @@ public class MCRBasketEntry {
         return uri;
     }
 
+    public void resolveContent() {
+        setContent(MCRURIResolver.instance().resolve(uri));
+    }
+
+    public Element getContent() {
+        return content;
+    }
+
+    public void setContent(Element content) {
+        this.content = (Element) (content.clone());
+    }
+
     public String getComment() {
         return comment;
     }
@@ -54,10 +69,12 @@ public class MCRBasketEntry {
         this.comment = comment;
     }
 
-    public Element buildXML() {
+    public Element buildXML(boolean addContent) {
         Element entry = new Element("entry");
         entry.setAttribute("id", id);
         entry.setAttribute("uri", uri);
+        if (addContent && (content != null))
+            entry.addContent((Element) (content.clone()));
         entry.addContent(new Element("comment").setText(comment));
         return entry;
     }
