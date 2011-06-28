@@ -71,6 +71,11 @@ public class MCRBasketXMLBuilder {
     public Document buildXML(MCRBasket basket) {
         Element xml = new Element("basket");
         xml.setAttribute("type", basket.getType());
+
+        String derivateID = basket.getDerivateID();
+        if (derivateID != null)
+            xml.setAttribute("id", derivateID);
+
         for (MCRBasketEntry entry : basket)
             xml.addContent(buildXML(entry));
         return new Document(xml);

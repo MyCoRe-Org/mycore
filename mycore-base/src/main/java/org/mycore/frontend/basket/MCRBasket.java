@@ -49,6 +49,9 @@ public class MCRBasket implements List<MCRBasketEntry>, Set<MCRBasketEntry> {
     /** The type of basket */
     private String type;
 
+    /** The ID of the derivate that holds the persistent data of this basket */
+    private String derivateID;
+
     /**
      * Creates a new basket of the given type.
      * 
@@ -63,6 +66,20 @@ public class MCRBasket implements List<MCRBasketEntry>, Set<MCRBasketEntry> {
      */
     public String getType() {
         return type;
+    }
+
+    /** 
+     * Returns the ID of the derivate that holds the persistent data of this basket, or null
+     */
+    public String getDerivateID() {
+        return derivateID;
+    }
+
+    /**
+     * Sets the ID of the derivate that holds the persistent data of this basket
+     */
+    public void setDerivateID(String derivateID) {
+        this.derivateID = derivateID;
     }
 
     @Override

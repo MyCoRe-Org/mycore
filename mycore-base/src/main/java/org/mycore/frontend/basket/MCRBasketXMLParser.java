@@ -40,8 +40,13 @@ public class MCRBasketXMLParser {
      */
     public MCRBasket parseXML(Document doc) {
         Element xml = doc.getRootElement();
+
         String type = xml.getAttributeValue("type");
         MCRBasket basket = new MCRBasket(type);
+
+        String derivateID = xml.getAttributeValue("id");
+        if (derivateID != null)
+            basket.setDerivateID(derivateID);
 
         for (Element child : (List<Element>) (xml.getChildren())) {
             MCRBasketEntry entry = parseXML(child);
