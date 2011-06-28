@@ -44,6 +44,8 @@ import org.mycore.frontend.servlets.MCRServletJob;
  *   to remove all entries in the objects basket.  
  * BasketServlet?type=objects&action=add&id=DocPortal_document_00774301&uri=mcrobject:DocPortal_document_00774301
  *   to add a new entry with ID DocPortal_document_00774301 to the basket, reading its contents from URI mcrobject:DocPortal_document_00774301
+ * BasketServlet?type=objects&action=add&id=DocPortal_document_00774301&uri=mcrobject:DocPortal_document_00774301&resolve=true
+ *   to add a new entry with ID DocPortal_document_00774301 to the basket, immediately resolving content from the given URI.
  * BasketServlet?type=objects&action=remove&id=DocPortal_document_00774301
  *   to remove the entry with ID DocPortal_document_00774301 from the basket  
  * BasketServlet?type=objects&action=up&id=DocPortal_document_00774301
@@ -67,14 +69,18 @@ public class MCRBasketServlet extends MCRServlet {
         String action = req.getParameter("action");
         String id = req.getParameter("id");
         String uri = req.getParameter("uri");
+        boolean resolveContent = "true".equals(req.getParameter("resolve"));
 
         LOGGER.info(type + " " + action + " " + (id == null ? "" : id));
 
         MCRBasket basket = MCRBasketManager.getBasket(type);
 
-        if ("add".equals(action))
-            basket.add(new MCRBasketEntry(id, uri));
-        else if ("remove".equals(action))
+        if ("add".equals(action)) {
+            MCRBasketEntry entry = new MCRBasketEntry(id, uri);
+            basket.add(entry);
+            if (resolveContent)
+                entry.resolveContent();
+        } else if ("remove".equals(action))
             basket.removeEntry(id);
         else if ("up".equals(action))
             basket.up(basket.get(id));
