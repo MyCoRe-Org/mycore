@@ -28,6 +28,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
 import org.jdom.Document;
+import org.jdom.Element;
 import org.jdom.transform.JDOMSource;
 
 /**
@@ -43,10 +44,11 @@ public class MCRBasketResolver implements URIResolver {
             String type = tokens[1];
             String id = tokens[2];
 
-            MCRBasketEntry entry = MCRBasketManager.getBasket(type).get(id);
+            MCRBasketEntry entry = MCRBasketManager.getOrCreateBasketInSession(type).get(id);
             entry.resolveContent();
-            Document xml = new Document(entry.buildXML(true));
-            return new JDOMSource(xml);
+            Element xml = new MCRBasketXMLBuilder(true).buildXML(entry);
+            Document doc = new Document(xml);
+            return new JDOMSource(doc);
         } catch (Exception ex) {
             throw new TransformerException(ex);
         }

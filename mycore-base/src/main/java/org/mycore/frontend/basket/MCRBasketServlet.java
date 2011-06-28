@@ -73,7 +73,7 @@ public class MCRBasketServlet extends MCRServlet {
 
         LOGGER.info(type + " " + action + " " + (id == null ? "" : id));
 
-        MCRBasket basket = MCRBasketManager.getBasket(type);
+        MCRBasket basket = MCRBasketManager.getOrCreateBasketInSession(type);
 
         if ("add".equals(action)) {
             MCRBasketEntry entry = new MCRBasketEntry(id, uri);
@@ -94,7 +94,8 @@ public class MCRBasketServlet extends MCRServlet {
             basket.get(id).setComment(comment);
         } else if ("show".equals(action)) {
             req.setAttribute("XSL.Style", type);
-            getLayoutService().doLayout(req, res, new Document(basket.buildXML(true)));
+            Document xml = new MCRBasketXMLBuilder(true).buildXML(basket);
+            getLayoutService().doLayout(req, res, xml);
             return;
         }
 
