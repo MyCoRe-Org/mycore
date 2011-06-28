@@ -23,8 +23,11 @@
 
 package org.mycore.frontend.basket;
 
-import org.mycore.common.MCRSession;
+import org.jdom.Document;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.datamodel.ifs.MCRDirectory;
+import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.datamodel.ifs.MCRFilesystemNode;
 
 /**
  * Creates and stores Basket objects in the user's current MCRSession.
@@ -33,17 +36,42 @@ import org.mycore.common.MCRSessionMgr;
  * 
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRBasketManager
-{
-  public static MCRBasket getBasket( String type )
-  {
-    MCRSession session = MCRSessionMgr.getCurrentSession();
-    MCRBasket basket = (MCRBasket)( session.get( type ) );
-    if( basket == null )
-    {
-      basket = new MCRBasket( type );
-      session.put( type, basket );
+public class MCRBasketManager {
+
+    public static MCRBasket getOrCreateBasketInSession(String type) {
+        MCRBasket basket = getBasketFromSession(type);
+        if (basket == null) {
+            basket = new MCRBasket(type);
+            setBasketInSession(basket);
+        }
+        return basket;
     }
-    return basket;
-  }
+
+    public static MCRBasket getBasketFromSession(String type) {
+        String key = getBasketKey(type);
+        return (MCRBasket) (MCRSessionMgr.getCurrentSession().get(key));
+    }
+
+    public static void setBasketInSession(MCRBasket basket) {
+        String key = getBasketKey(basket.getType());
+        MCRSessionMgr.getCurrentSession().put(key, basket);
+    }
+
+    private static String getBasketKey(String type) {
+        return "basket." + type;
+    }
+
+    public static MCRBasket loadBasket(String derivateID) throws Exception {
+        MCRDirectory dir = (MCRDirectory) (MCRFilesystemNode.getRootNode(derivateID));
+        MCRFile file = (MCRFile) (dir.getChild("basket.xml"));
+        Document xml = file.getContentAsJDOM();
+        return new MCRBasketXMLParser().parseXML(xml);
+    }
+
+    public static void updateBasket(MCRBasket basket, String derivateID) throws Exception {
+        MCRDirectory dir = (MCRDirectory) (MCRFilesystemNode.getRootNode(derivateID));
+        MCRFile file = (MCRFile) (dir.getChild("basket.xml"));
+        Document xml = new MCRBasketXMLBuilder(false).buildXML(basket);
+        file.setContentFrom(xml);
+    }
 }
