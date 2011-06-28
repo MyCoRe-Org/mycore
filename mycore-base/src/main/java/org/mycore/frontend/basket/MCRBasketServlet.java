@@ -26,12 +26,12 @@ package org.mycore.frontend.basket;
 import javax.servlet.http.*;
 
 import org.apache.log4j.Logger;
+import org.jdom.Document;
 import org.mycore.frontend.basket.MCRBasket;
 import org.mycore.frontend.basket.MCRBasketManager;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
-
 
 /**
  * Provides the web front end to manage baskets and their contents.
@@ -56,47 +56,42 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * 
  * @author Frank L\u00fctzenkirchen
  **/
-public class MCRBasketServlet extends MCRServlet
-{
-  private final static Logger LOGGER = Logger.getLogger( MCRBasketServlet.class );
-  
-  public void doGetPost( MCRServletJob job ) throws Exception
-  {
-    HttpServletRequest req = job.getRequest();
-    HttpServletResponse res = job.getResponse();
+public class MCRBasketServlet extends MCRServlet {
+    private final static Logger LOGGER = Logger.getLogger(MCRBasketServlet.class);
 
-    String type = req.getParameter( "type" );
-    String action = req.getParameter( "action" );
-    String id = req.getParameter( "id" );
-    String uri = req.getParameter( "uri" );
+    public void doGetPost(MCRServletJob job) throws Exception {
+        HttpServletRequest req = job.getRequest();
+        HttpServletResponse res = job.getResponse();
 
-    LOGGER.info( type + " " + action + " " + ( id == null ? "" : id ) );
-    
-    MCRBasket mCRBasket = MCRBasketManager.getBasket( type );
+        String type = req.getParameter("type");
+        String action = req.getParameter("action");
+        String id = req.getParameter("id");
+        String uri = req.getParameter("uri");
 
-    if( "add".equals( action ) )
-      mCRBasket.add( id, uri );
-    else if( "remove".equals( action ) )
-      mCRBasket.remove( id );
-    else if( "up".equals( action ) )
-      mCRBasket.up( id );
-    else if( "down".equals( action ) )
-      mCRBasket.down( id );
-    else if( "clear".equals( action ) )
-      mCRBasket.clear();
-    else if( "comment".equals( action ) )
-    {
-      MCREditorSubmission sub = (MCREditorSubmission)( req.getAttribute( "MCREditorSubmission" ) );
-      String comment = sub.getXML().getRootElement().getChildTextTrim( "comment" );
-      mCRBasket.setComment( id, comment );
+        LOGGER.info(type + " " + action + " " + (id == null ? "" : id));
+
+        MCRBasket basket = MCRBasketManager.getBasket(type);
+
+        if ("add".equals(action))
+            basket.add(new MCRBasketEntry(id, uri));
+        else if ("remove".equals(action))
+            basket.remove(id);
+        else if ("up".equals(action))
+            basket.up(basket.get(id));
+        else if ("down".equals(action))
+            basket.down(basket.get(id));
+        else if ("clear".equals(action))
+            basket.clear();
+        else if ("comment".equals(action)) {
+            MCREditorSubmission sub = (MCREditorSubmission) (req.getAttribute("MCREditorSubmission"));
+            String comment = sub.getXML().getRootElement().getChildTextTrim("comment");
+            basket.get(id).setComment(comment);
+        } else if ("show".equals(action)) {
+            req.setAttribute("XSL.Style", type);
+            getLayoutService().doLayout(req, res, new Document(basket.buildXML()));
+            return;
+        }
+
+        res.sendRedirect(getServletBaseURL() + "MCRBasketServlet?action=show&type=" + type);
     }
-    else if( "show".equals( action ) )
-    {
-      req.setAttribute( "XSL.Style", type );
-      getLayoutService().doLayout( req, res, mCRBasket.getXML() );
-      return;
-    }
-
-    res.sendRedirect( getServletBaseURL() + "MCRBasketServlet?action=show&type=" + type );
-  }
 }

@@ -23,165 +23,193 @@
 
 package org.mycore.frontend.basket;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.ListIterator;
+import java.util.Set;
 
-import org.jdom.Document;
 import org.jdom.Element;
-import org.mycore.common.xml.MCRURIResolver;
 
-/**
- * Implements a basket of entries.
- * Each entry has a unique ID and contains an XML element.
- * When adding entries, XML is read from any URI using URIResolver.   
- * 
- * @author Frank L\u00FCtzenkirchen
- */
-public class MCRBasket
-{
-  /** The root element if the basket data */
-  private Element root;
+public class MCRBasket implements List<MCRBasketEntry>, Set<MCRBasketEntry> {
 
-  /** Map of entries, key is the entry ID */
-  private Map<String, Element> entryMap = new HashMap<String, Element>();
+    private List<MCRBasketEntry> list = new ArrayList<MCRBasketEntry>();
 
-  /**
-   * Creates a new basket of the given type.
-   * 
-   * @type a unique ID identifying this type of basket.
-   */
-  public MCRBasket( String type )
-  {
-    root = new Element( "basket" );
-    root.setAttribute( "type", type );
-    new Document( root );
-  }
+    private String type;
 
-  /**
-   * Checks if the basket contains an entry with the given ID.
-   */
-  public boolean contains( String id )
-  {
-    return entryMap.containsKey( id );
-  }
+    public MCRBasket(String type) {
+        this.type = type;
+    }
 
-  /**
-   * Returns the entry xml element with the given ID. 
-   */
-  public Element get( String id )
-  {
-    return entryMap.get( id );
-  }
-  
-  /**
-   * Returns a list of all entries.
-   */
-  public List<Element> getEntries()
-  {
-    return root.getChildren( "entry" );
-  }
+    public String getType() {
+        return type;
+    }
 
-  /**
-   * Reads an XML element from the given URI using MCRURIResolver, 
-   * and stores a copy of it in the basket under the given ID.  
-   * 
-   * @param id, the ID of the entry, for example a document ID.
-   * @param uri the URI to read the xml data from, using URIResolver.
-   */
-  public void add( String id, String uri )
-  {
-    if( contains( id ) ) return;
+    @Override
+    public void add(int index, MCRBasketEntry entry) {
+        if (!contains(entry))
+            list.add(index, entry);
+    }
 
-    Element entry = buildEntry( id, uri );
-    entryMap.put( id, entry );
-    root.addContent( entry );
-  }
+    @Override
+    public boolean add(MCRBasketEntry entry) {
+        return (contains(entry) ? false : list.add(entry));
+    }
 
-  /**
-   * Builds a new entry element.
-   */
-  private Element buildEntry( String id, String uri )
-  {
-    Element entry = new Element( "entry" );
-    entry.setAttribute( "id", id );
+    @Override
+    public boolean addAll(Collection<? extends MCRBasketEntry> collection) {
+        boolean changed = false;
+        for (MCRBasketEntry entry : collection)
+            if (!contains(entry)) {
+                changed = true;
+                add(entry);
+            }
+        return changed;
+    }
 
-    Element content = MCRURIResolver.instance().resolve( uri );
-    entry.addContent( (Element)( content.clone() ) );
+    @Override
+    public boolean addAll(int index, Collection<? extends MCRBasketEntry> collection) {
+        List<MCRBasketEntry> copy = new ArrayList<MCRBasketEntry>();
+        for (MCRBasketEntry entry : collection)
+            if (!contains(entry))
+                copy.add(entry);
+        return list.addAll(index, copy);
+    }
 
-    return entry;
-  }
+    @Override
+    public void clear() {
+        list.clear();
+    }
 
-  /**
-   * Removes the entry with the given ID.
-   */
-  public void remove( String id )
-  {
-    Element entry = get( id );
-    if( entry != null ) entry.detach();
-    entryMap.remove( id );
-  }
+    @Override
+    public boolean contains(Object o) {
+        return list.contains(o);
+    }
 
-  /**
-   * Moves the entry with the given ID one position up
-   * in basket document order.
-   */
-  public void up( String id )
-  {
-    move( id, -1 );
-  }
+    @Override
+    public boolean containsAll(Collection<?> c) {
+        return list.containsAll(c);
+    }
 
-  /**
-   * Moves the entry with the given ID one position down
-   * in basket document order.
-   */
-  public void down( String id )
-  {
-    move( id, 1 );
-  }
+    @Override
+    public MCRBasketEntry get(int index) {
+        return list.get(index);
+    }
 
-  /**
-   * Changes the position of the entry with the given ID 
-   * by moving it the given number of entries up or down.
-   */
-  public void move( String id, int change )
-  {
-    Element entry = get( id );
-    List<Element> children = root.getChildren();
+    public MCRBasketEntry get(String id) {
+        for (MCRBasketEntry entry : this)
+            if (id.equals(entry.getID()))
+                return entry;
+        return null;
+    }
 
-    int posOld = children.indexOf( entry );
-    int posNew = posOld + change;
-    if( ( posNew < 0 ) || ( posNew > children.size() - 1 ) ) return;
+    @Override
+    public int indexOf(Object o) {
+        return list.indexOf(o);
+    }
 
-    children.remove( posOld );
-    children.add( posNew, entry );
-  }
+    @Override
+    public boolean isEmpty() {
+        return list.isEmpty();
+    }
 
-  /**
-   * Removes all entries from the basket.
-   */
-  public void clear()
-  {
-    root.removeContent();
-    entryMap.clear();
-  }
+    @Override
+    public Iterator<MCRBasketEntry> iterator() {
+        return list.iterator();
+    }
 
-  /**
-   * Sets a comment for the given entry.
-   */
-  public void setComment( String id, String comment )
-  {
-    Element entry = get( id );
-    entry.removeChildren( "comment" );
-    if( ( comment != null ) && ( ! comment.isEmpty() ) )
-      entry.addContent( new Element( "comment" ).setText( comment ) );
-  }
+    @Override
+    public int lastIndexOf(Object o) {
+        return list.lastIndexOf(o);
+    }
 
-  /**
-   * Returns an XML representation of this basket.
-   */
-  public Document getXML()
-  {
-    return root.getDocument();
-  }
+    @Override
+    public ListIterator<MCRBasketEntry> listIterator() {
+        return list.listIterator();
+    }
+
+    @Override
+    public ListIterator<MCRBasketEntry> listIterator(int index) {
+        return list.listIterator(index);
+    }
+
+    @Override
+    public MCRBasketEntry remove(int index) {
+        return list.remove(index);
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        return list.remove(o);
+    }
+
+    public boolean removeEntry(String id) {
+        MCRBasketEntry entry = get(id);
+        if (entry == null)
+            return false;
+        remove(entry);
+        return true;
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        return list.removeAll(c);
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        return list.retainAll(c);
+    }
+
+    @Override
+    public MCRBasketEntry set(int index, MCRBasketEntry entry) {
+        return (contains(entry) ? null : list.set(index, entry));
+    }
+
+    @Override
+    public int size() {
+        return list.size();
+    }
+
+    @Override
+    public List<MCRBasketEntry> subList(int fromIndex, int toIndex) {
+        return list.subList(fromIndex, toIndex);
+    }
+
+    @Override
+    public Object[] toArray() {
+        return list.toArray();
+    }
+
+    @Override
+    public <T> T[] toArray(T[] a) {
+        return list.toArray(a);
+    }
+
+    public void up(MCRBasketEntry entry) {
+        move(entry, -1);
+    }
+
+    public void down(MCRBasketEntry entry) {
+        move(entry, 1);
+    }
+
+    public void move(MCRBasketEntry entry, int change) {
+        int posOld = indexOf(entry);
+        int posNew = posOld + change;
+        if ((posNew < 0) || (posNew > list.size() - 1))
+            return;
+
+        remove(posOld);
+        add(posNew, entry);
+    }
+
+    public Element buildXML() {
+        Element basket = new Element("basket");
+        basket.setAttribute("type", type);
+        for (MCRBasketEntry entry : this)
+            basket.addContent(entry.buildXML());
+        return basket;
+    }
 }

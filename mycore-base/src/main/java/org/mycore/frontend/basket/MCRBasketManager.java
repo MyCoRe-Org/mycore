@@ -38,12 +38,12 @@ public class MCRBasketManager
   public static MCRBasket getBasket( String type )
   {
     MCRSession session = MCRSessionMgr.getCurrentSession();
-    MCRBasket mCRBasket = (MCRBasket)( session.get( type ) );
-    if( mCRBasket == null )
+    MCRBasket basket = (MCRBasket)( session.get( type ) );
+    if( basket == null )
     {
-      mCRBasket = new MCRBasket( type );
-      session.put( type, mCRBasket );
+      basket = new MCRBasket( type );
+      session.put( type, basket );
     }
-    return mCRBasket;
+    return basket;
   }
 }
