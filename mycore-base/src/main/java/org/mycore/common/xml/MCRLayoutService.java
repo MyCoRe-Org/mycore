@@ -51,6 +51,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
@@ -78,7 +79,10 @@ import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * Does the layout for other MyCoRe servlets by transforming XML input to
@@ -468,8 +472,12 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         }
         if (stylesheet == null) {
             try {
-                byte[] bytes = XML_RESOURCE.getRawResource(resource, this.getClass().getClassLoader());
-                stylesheet = factory.newTemplates(new StreamSource(new ByteArrayInputStream(bytes)));
+                //have to use SAX here to resolve entities
+                XMLReader reader = XMLReaderFactory.createXMLReader();
+                reader.setEntityResolver(MCRURIResolver.instance());
+                InputSource input = new InputSource(new ByteArrayInputStream(XML_RESOURCE.getRawResource(resource, this.getClass().getClassLoader())));
+                SAXSource source = new SAXSource(reader, input);
+                stylesheet = factory.newTemplates(source);
                 LOGGER.debug("MCRLayoutService compiled stylesheet resource " + resource);
             } catch (Exception exc) {
                 reportCompileError(resource, exc);
