@@ -1,6 +1,6 @@
 /*
  * 
- * $Revision: 1.5 $ $Date: 2009/03/03 12:31:47 $
+ * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.

@@ -1,5 +1,5 @@
 /*
- * $Revision: 13278 $ $Date: 2008-03-17 17:12:15 +0100 (Mo, 17 Mrz 2008) $
+ * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.

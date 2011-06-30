@@ -1,6 +1,6 @@
 /*
  * 
- * $Revision: 13085 $ $Date: 21.11.2009 01:03:08 $
+ * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.

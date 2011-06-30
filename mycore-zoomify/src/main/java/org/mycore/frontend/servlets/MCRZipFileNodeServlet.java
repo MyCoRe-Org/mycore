@@ -1,6 +1,6 @@
 /*
  * 
- * $Revision: 15202 $ $Date: 2009-05-15 17:00:44 +0200 (Fr, 15 Mai 2009) $
+ * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
@@ -51,7 +51,7 @@ import org.mycore.datamodel.ifs.MCRFilesystemNode;
  * @author Stefan Freitag
  * @author Jens Kupferschmidt
  * @author Frank Lützenkirchen
- * @version $Revision: 15202 $ $Date: 2008-01-14 11:02:17 +0000 (Mo, 14 Jan 2008) $
+ * @version $Revision$ $Date$
  */
 public class MCRZipFileNodeServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;

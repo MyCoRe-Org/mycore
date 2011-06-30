@@ -1,6 +1,6 @@
 /**
  * $RCSfile: MCRXMLSchemaTask.java,v $
- * $Revision: 1.0 $ $Date: 24.06.2008 12:21:55 $
+ * $Revision$ $Date$
  *
  * This file is part of ** M y C o R e **
  * Visit our homepage at http://www.mycore.de/ for details.

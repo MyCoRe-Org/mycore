@@ -1,6 +1,6 @@
 /*
  * $RCSfile: MergeProperties.java,v $
- * $Revision: 1.2 $ $Date: 2006/11/22 10:50:21 $
+ * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
@@ -55,7 +55,7 @@ import org.xml.sax.InputSource;
  * 
  * @author Robert Stephan
  * 
- * @version $Revision: 13085 $ $Date: 2008-02-06 18:27:24 +0100 (Mi, 06 Feb
+ * @version $Revision$ $Date: 2008-02-06 18:27:24 +0100 (Mi, 06 Feb
  *          2008) $
  * 
  */

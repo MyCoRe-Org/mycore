@@ -1,6 +1,6 @@
 /*
  * $RCSfile: MCRClassificationBrowserData.java,v $
- * $Revision: 16296 $ $Date: 2009-12-09 17:16:29 +0100 (Mi, 09 Dez 2009) $
+ * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.

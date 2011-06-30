@@ -1,5 +1,5 @@
 /**
- * $RCSfile: MCRIntegrateTask.java,v $ $Revision: 1.0 $ $Date: 18.06.2008 09:40:38 $ This file is part of ** M y C o R e
+ * $RCSfile: MCRIntegrateTask.java,v $ $Revision$ $Date$ This file is part of ** M y C o R e
  * ** Visit our homepage at http://www.mycore.de/ for details. This program is free software; you can use it,
  * redistribute it and / or modify it under the terms of the GNU General Public License (GPL) as published by the Free
  * Software Foundation; either version 2 of the License or (at your option) any later version. This program is

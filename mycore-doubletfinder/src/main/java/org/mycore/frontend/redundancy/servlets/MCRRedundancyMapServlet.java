@@ -1,6 +1,6 @@
 /*
  * $RCSfile$
- * $Revision: 817 $ $Date: 2009-04-21 13:22:33 +0200 (Di, 21 Apr 2009) $
+ * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.

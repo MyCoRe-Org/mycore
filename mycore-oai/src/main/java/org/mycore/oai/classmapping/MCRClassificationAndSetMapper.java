@@ -1,5 +1,5 @@
 /*
- * $Revision: 19559 $ $Date: 2010-12-10 14:06:28 +0100 (Fr, 10 Dez 2010) $
+ * $Revision$ $Date$
  * 
  * This file is part of *** M y C o R e *** See http://www.mycore.de/ for
  * details.
@@ -37,7 +37,7 @@ import org.mycore.common.MCRConfigurationException;
  * 
  * @author Robert Stephan
  * 
- * @version $Revision: 20629 $ $Date: 2011-04-07 16:01:26 +0200 (Do, 07 Apr 2011) $
+ * @version $Revision$ $Date$
  */
 public class MCRClassificationAndSetMapper {
     private static MCRConfiguration config = MCRConfiguration.instance();
