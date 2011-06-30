@@ -102,7 +102,7 @@ public class MCROAIDataProvider extends MCRServlet {
 
         Document response = handler.handle(request.getParameterMap());
 
-        job.getResponse().setContentType("text/xml");
+        job.getResponse().setContentType("text/xml; charset=UTF-8");
         XMLOutputter xout = new XMLOutputter();
         xout.setFormat(Format.getPrettyFormat().setEncoding("UTF-8"));
         xout.output(response, job.getResponse().getOutputStream());
