@@ -61,7 +61,10 @@ public class MCRBasketXMLBuilder {
                 xml.addContent((Element) (content.clone()));
         }
 
-        xml.addContent(new Element("comment").setText(entry.getComment()));
+        String comment = entry.getComment();
+        if (comment != null)
+            xml.addContent(new Element("comment").setText(comment));
+
         return xml;
     }
 
