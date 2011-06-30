@@ -8,7 +8,6 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.mycore.iview2</groupId>
   <artifactId>iview2-tile-client</artifactId>
   <name>MyCoRe IView2 Image Tile Client</name>
   <build>
@@ -54,7 +53,6 @@
     <dependency>
       <groupId>org.mycore.iview2</groupId>
       <artifactId>image-tiler</artifactId>
-      <version>1.6</version>
     </dependency>
     <dependency>
       <groupId>org.jdom</groupId>

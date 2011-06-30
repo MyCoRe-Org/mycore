@@ -6,7 +6,6 @@
     <groupId>org.mycore</groupId>
     <version>11-SNAPSHOT</version>
   </parent>
-  <groupId>org.mycore</groupId>
   <artifactId>mycore</artifactId>
   <packaging>pom</packaging>
   <version>2.1.80-SNAPSHOT</version>
