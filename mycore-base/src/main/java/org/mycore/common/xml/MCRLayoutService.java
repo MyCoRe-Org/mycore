@@ -65,6 +65,9 @@ import org.apache.xalan.trace.TraceManager;
 import org.apache.xalan.trace.TracerEvent;
 import org.apache.xml.utils.WrappedRuntimeException;
 import org.jdom.Document;
+import org.jdom.JDOMException;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMSource;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
@@ -76,6 +79,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.fo.MCRFoFormatterInterface;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.w3c.dom.Node;
@@ -171,10 +175,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
     }
 
     public void sendXML(HttpServletRequest req, HttpServletResponse res, org.jdom.Document jdom) throws IOException {
-        res.setContentType("text/xml");
-        OutputStream out = res.getOutputStream();
-        new org.jdom.output.XMLOutputter().output(jdom, out);
-        out.close();
+        sendXML(req, res, MCRContent.readFrom(jdom));
     }
 
     public void sendXML(HttpServletRequest req, HttpServletResponse res, org.w3c.dom.Document dom) throws IOException {
@@ -182,16 +183,24 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
     }
 
     public void sendXML(HttpServletRequest req, HttpServletResponse res, InputStream in) throws IOException {
-        res.setContentType("text/xml");
+        sendXML(req, res, MCRContent.readFrom(in));
+    }
+
+    private void sendXML(HttpServletRequest req, HttpServletResponse res, MCRContent xml) throws IOException {
+        res.setContentType("text/xml; charset=UTF-8");
+        XMLOutputter xout = new XMLOutputter();
+        xout.setFormat(Format.getRawFormat().setEncoding("UTF-8"));
         OutputStream out = res.getOutputStream();
-        MCRUtils.copyStream(in, out);
+        try {
+            xout.output(xml.asXML(), out);
+        } catch (JDOMException ex) {
+            throw new MCRException("Output is not XML", ex);
+        }
         out.close();
     }
 
     public void sendXML(HttpServletRequest req, HttpServletResponse res, File file) throws IOException {
-        FileInputStream fis = new FileInputStream(file);
-        sendXML(req, res, fis);
-        fis.close();
+        sendXML(req, res, MCRContent.readFrom(file));
     }
 
     public void doLayout(HttpServletRequest req, HttpServletResponse res, org.jdom.Document jdom) throws IOException {
