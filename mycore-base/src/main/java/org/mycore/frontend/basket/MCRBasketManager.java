@@ -23,18 +23,12 @@
 
 package org.mycore.frontend.basket;
 
-import org.jdom.Document;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.datamodel.ifs.MCRDirectory;
-import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.ifs.MCRFilesystemNode;
 
 /**
- * Manages basket objects in the user's current MCRSession and the persistent store.
+ * Manages basket objects in the user's current MCRSession.
  * A session may store multiple baskets with different type IDs,
  * for example a basket for documents and another for an other type of entry.
- * A basket can be saved to and loaded from a derivate. The persistent form
- * of a basket is a file "basket.xml" in a derivate.
  * 
  * @author Frank L\u00FCtzenkirchen
  */
@@ -75,34 +69,5 @@ public class MCRBasketManager {
      */
     private static String getBasketKey(String type) {
         return "basket." + type;
-    }
-
-    /**
-     * Loads a basket from an XML file in the given derivate.
-     */
-    public static MCRBasket loadBasket(String derivateID) throws Exception {
-        MCRFile file = getBasketFile(derivateID);
-        Document xml = file.getContentAsJDOM();
-        return new MCRBasketXMLParser().parseXML(xml);
-    }
-
-    /**
-     * Returns the MCRFile that stores the persistent data of a basket within the given derivate.
-     */
-    private static MCRFile getBasketFile(String derivateID) {
-        MCRDirectory dir = (MCRDirectory) (MCRFilesystemNode.getRootNode(derivateID));
-        MCRFile file = (MCRFile) (dir.getChild("basket.xml"));
-        return file;
-    }
-
-    /**
-     * Updates the basket's data in the persistent store by saving its XML representation
-     * to a file in a derivate. The ID of the derivate is given in the basket's properties. 
-     */
-    public static void updateBasket(MCRBasket basket) throws Exception {
-        String derivateID = basket.getDerivateID();
-        MCRFile file = getBasketFile(derivateID);
-        Document xml = new MCRBasketXMLBuilder(false).buildXML(basket);
-        file.setContentFrom(xml);
     }
 }

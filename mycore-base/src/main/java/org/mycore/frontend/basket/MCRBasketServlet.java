@@ -27,6 +27,7 @@ import javax.servlet.http.*;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.basket.MCRBasket;
 import org.mycore.frontend.basket.MCRBasketManager;
 import org.mycore.frontend.editor.MCREditorSubmission;
@@ -54,11 +55,13 @@ import org.mycore.frontend.servlets.MCRServletJob;
  *   to move the entry with ID DocPortal_document_00774301 one position down in the basket  
  * BasketServlet?type=objects&action=comment&id=DocPortal_document_00774301
  *   to change the comment stored in the basket. This is called
- *   using EditorServlet submission, see basket-edit.xml for an example. 
- * BasketServlet?action=load&derivateID=DocPortal_derivate_12345678
- *   loads a basket's data from a file "basket.xml" in the given derivate into the current user's session.
+ *   using EditorServlet submission, see basket-edit.xml for an example.
+ * BasketServlet?type=objects&action=create&ownerID=DocPortal_basket_01234567
+ *    to store a basket in a new file "basket" in a new derivate that is owned by the metadata object with the given ownerID.
  * BasketServlet?type=objects&action=update
- *   updates a persistent basket in its derivate - that is the derivate the basket was loaded from.
+ *   to update a persistent basket in its derivate - that is the derivate the basket was loaded from.
+ * BasketServlet?action=retrieve&derivateID=DocPortal_derivate_12345678
+ *   to retrieve a basket's data from a file "basket.xml" in the given derivate into the current user's session.
  * 
  * @author Frank L\u00fctzenkirchen
  **/
@@ -92,11 +95,15 @@ public class MCRBasketServlet extends MCRServlet {
             basket.down(basket.get(id));
         else if ("clear".equals(action))
             basket.clear();
-        else if ("update".equals(action))
-            MCRBasketManager.updateBasket(basket);
-        else if ("load".equals(action)) {
+        else if ("create".equals(action)) {
+            String ownerID = req.getParameter("ownerID");
+            MCRObjectID ownerOID = MCRObjectID.getInstance(ownerID);
+            MCRBasketPersistence.createDerivateWithBasket(basket, ownerOID);
+        } else if ("update".equals(action))
+            MCRBasketPersistence.updateBasket(basket);
+        else if ("retrieve".equals(action)) {
             String derivateID = req.getParameter("derivateID");
-            basket = MCRBasketManager.loadBasket(derivateID);
+            basket = MCRBasketPersistence.retrieveBasket(derivateID);
             type = basket.getType();
             MCRBasketManager.setBasketInSession(basket);
         } else if ("comment".equals(action)) {
