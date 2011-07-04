@@ -26,12 +26,12 @@ public class MCRDisplayHideDerivateServlet extends MCRServlet {
 
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
-        if (!MCRAccessManager.checkPermission("writedb")) {
+        String derivate = job.getRequest().getParameter("derivate");
+        if (!MCRAccessManager.checkPermission(MCRObjectID.getInstance(derivate), "writedb")) {
             job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN, "You have to be logged in.");
             return;
         }
-
-        String derivate = job.getRequest().getParameter("derivate");
+        
         if (derivate == null || (derivate.indexOf("_derivate_") == -1)) {
             LOGGER.error("Cannot toogle display attribute. No derivate id provided.");
             job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, "You must provide a proper derivate id");
