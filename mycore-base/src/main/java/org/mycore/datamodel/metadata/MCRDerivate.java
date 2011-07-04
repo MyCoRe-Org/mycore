@@ -230,5 +230,11 @@ final public class MCRDerivate extends MCRBase {
         }
         return true;
     }
-
+    
+    /**
+     * @return the {@link MCRObjectID} of the owner of the derivate
+     */
+    public MCRObjectID getOwnerID() {
+        return this.getDerivate().getMetaLink().getXLinkHrefID();
+    }
 }

@@ -27,7 +27,7 @@ import java.util.Collection;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.mycore.access.strategies.MCRAccessCheckStrategy;
-import org.mycore.access.strategies.MCRObjectIDStrategy;
+import org.mycore.access.strategies.MCRDerivateIDStrategy;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.common.MCRLinkTableManager;
@@ -45,7 +45,7 @@ public class MCRAccessManager {
             "MCR.Access.Class", MCRAccessBaseImpl.class.getName());
 
     private static final MCRAccessCheckStrategy ACCESS_STRATEGY = (MCRAccessCheckStrategy) MCRConfiguration.instance().getInstanceOf(
-            "MCR.Access.Strategy.Class", MCRObjectIDStrategy.class.getName());
+            "MCR.Access.Strategy.Class", MCRDerivateIDStrategy.class.getName());
 
     public static final Logger LOGGER = Logger.getLogger(MCRAccessManager.class);
 
