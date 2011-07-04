@@ -17,7 +17,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * @author shermann
- *
  */
 public class MCRDisplayHideDerivateServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
@@ -26,12 +25,12 @@ public class MCRDisplayHideDerivateServlet extends MCRServlet {
 
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
-        if (!MCRAccessManager.checkPermission("writedb")) {
+        String derivate = job.getRequest().getParameter("derivate");
+        if (!MCRAccessManager.checkPermission(MCRObjectID.getInstance(derivate), "writedb")) {
             job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN, "You have to be logged in.");
             return;
         }
 
-        String derivate = job.getRequest().getParameter("derivate");
         if (derivate == null || (derivate.indexOf("_derivate_") == -1)) {
             LOGGER.error("Cannot toogle display attribute. No derivate id provided.");
             job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, "You must provide a proper derivate id");
@@ -50,9 +49,9 @@ public class MCRDisplayHideDerivateServlet extends MCRServlet {
         return obj.getDerivate().getMetaLink().getXLinkHref();
     }
 
-    /** 
-     * Toggles the display attribute value of the derivate element. 
-     * */
+    /**
+     * Toggles the display attribute value of the derivate element.
+     */
     private void toggleDisplay(MCRDerivate derObj) throws Exception {
         Document xml = derObj.createXML();
         XPath xp = XPath.newInstance("mycorederivate/derivate");
