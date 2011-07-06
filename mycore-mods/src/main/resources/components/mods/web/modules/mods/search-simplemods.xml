@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MyCoReWebPage>
+  <section title="Suchmaske für MODS-Dokumente" xml:lang="de" />
+
+  <section title="Search mask for MODS documents" xml:lang="en" />
+
+  <section xml:lang="all">
+    <editor id="searchmask">
+      <source uri="request:servlets/MCRSearchServlet?mode=load&amp;id={id}" />
+      <target type="servlet" name="MCRSearchServlet" method="post" format="xml" />
+
+      <components root="root" var="/query">
+        <headline anchor="LEFT">
+          <text i18n="editor.search.mods.label" />
+        </headline>
+        <panel id="root">
+          <hidden var="@mask" default="modules/mods/search-simplemods.xml" />
+
+          <hidden var="conditions/@format" default="xml" />
+          <hidden var="conditions/boolean/@operator" default="and" />
+      <!-- Search only for object type mods -->
+          <hidden var="conditions/boolean/condition1/@field" default="objectType" />
+          <hidden var="conditions/boolean/condition1/@operator" default="=" />
+          <hidden var="conditions/boolean/condition1/@value" default="mods" />
+
+      <!-- Search in field "allMeta" with operator "contains" -->
+          <hidden var="conditions/boolean/condition6/@field" default="allMeta" />
+          <hidden var="conditions/boolean/condition6/@operator" default="contains" />
+          <cell row="6" col="1" anchor="EAST">
+            <text i18n="editor.search.metadata" />
+          </cell>
+          <cell row="6" col="2" anchor="WEST" var="conditions/boolean/condition6/@value">
+            <textfield width="40" />
+          </cell>
+
+      <!-- Search in field "content" with operator "contains" -->
+          <hidden var="conditions/boolean/condition7/@field" default="content" />
+          <hidden var="conditions/boolean/condition7/@operator" default="contains" />
+          <cell row="7" col="1" anchor="EAST">
+            <text i18n="editor.search.derivate" />
+          </cell>
+          <cell row="7" col="2" anchor="WEST" var="conditions/boolean/condition7/@value">
+            <textfield width="40" />
+          </cell>
+		
+	  <!-- result attributes -->
+          <cell row="19" col="1" colspan="2" anchor="SOUTHEAST" height="50px">
+            <panel>
+              <cell row="1" col="1" anchor="WEST">
+                <text i18n="editor.search.max" />
+              </cell>
+              <cell row="1" col="2" anchor="WEST" var="@maxResults">
+                <list type="dropdown" default="0">
+                  <item value="20" label="20" />
+                  <item value="100" label="100" />
+                  <item value="500" label="500" />
+                  <item value="0" i18n="editor.search.all" />
+                </list>
+              </cell>
+              <cell row="1" col="3" anchor="WEST">
+                <text i18n="editor.search.label" />
+              </cell>
+              <cell row="1" col="4" anchor="WEST" var="@numPerPage">
+                <list type="dropdown" default="10">
+                  <item value="10" label="10" />
+                  <item value="20" label="20" />
+                  <item value="50" label="50" />
+                  <item value="0" i18n="editor.search.all" />
+                </list>
+              </cell>
+              <cell row="1" col="5" anchor="WEST">
+                <text i18n="editor.search.perpage" />
+              </cell>
+            </panel>
+          </cell>
+          <cell row="20" col="1" colspan="2" anchor="EAST">
+            <submitButton i18n="editor.search.search" width="150px" />
+          </cell>
+        </panel>
+      </components>
+    </editor>
+  </section>
+</MyCoReWebPage>
