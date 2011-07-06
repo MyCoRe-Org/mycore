@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan"
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:acl="xalan://org.mycore.access.MCRAccessManager" xmlns:mcr="http://www.mycore.org/"
-  xmlns:xlink="http://www.w3.org/1999/xlink" exclude-result-prefixes="xlink mcr i18n acl" version="1.0">
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3" exclude-result-prefixes="xlink mcr i18n acl mods" version="1.0">
   <xsl:param select="'local'" name="objectHost" />
   <xsl:include href="mods2html.xsl" />
   <!--Template for result list hit: see results.xsl -->
@@ -22,7 +22,45 @@
     </tr>
     <tr>
       <td colspan="2" class="description">
-        <div>please edit &lt;template match=mcr:hit[contains(@id,'_mods_')]&gt; for object type: mods</div>
+        <div>
+          <xsl:for-each select="$mcrobj/metadata/def.modsContainer/modsContainer/*">    <!-- Title, 16pt -->
+            <xsl:for-each select="mods:titleInfo/mods:title">
+              <xsl:value-of select="." />
+              <br />
+            </xsl:for-each>
+    <!-- Link to presentation, ?pt -->
+            <xsl:for-each select="mods:identifier[@type='uri']">
+              <a href="{.}">
+                <xsl:value-of select="." />
+              </a>
+              <br />
+            </xsl:for-each>
+    <!-- Place, ?pt -->
+            <xsl:for-each select="mods:originInfo/mods:place/mods:placeTerm[@type='text']">
+              <xsl:value-of select="." />
+            </xsl:for-each>
+    <!-- Author -->
+            <xsl:for-each select="mods:name[mods:role/mods:roleTerm/text()='aut']">
+              <xsl:if test="position()!=1">
+                <xsl:value-of select="'; '" />
+              </xsl:if>
+              <xsl:value-of select="mods:displayForm" />
+              <xsl:if test="position()=last()">
+                <br />
+              </xsl:if>
+            </xsl:for-each>
+    <!-- Shelfmark -->
+            <xsl:for-each select="mods:location/mods:shelfLocator">
+              <xsl:value-of select="." />
+              <br />
+            </xsl:for-each>
+    <!-- URN -->
+            <xsl:for-each select="mods:identifier[@type='urn']">
+              <xsl:value-of select="." />
+              <br />
+            </xsl:for-each>
+          </xsl:for-each>
+        </div>
         <!-- you could insert here a preview for your metadata, e.g. uncomment the next block and replace "your-tags/here" by something of your 
           metadata -->
         <!-- <div> short description: <xsl:call-template name="printI18N"> <xsl:with-param name="nodes" select="$mcrobj/metadata/your-tags/here" 
@@ -49,7 +87,7 @@
         </xsl:call-template>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="@label" />
+        <xsl:value-of select="@ID" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
