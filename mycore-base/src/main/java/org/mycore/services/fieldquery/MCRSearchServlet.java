@@ -65,7 +65,7 @@ import org.mycore.parsers.bool.MCRSetCondition;
  * 
  * @author Frank Lützenkirchen
  * @author Harald Richter
- * @author A.Schaar
+ * @author A. Schaar
  * 
  */
 public class MCRSearchServlet extends MCRServlet {
@@ -288,13 +288,10 @@ public class MCRSearchServlet extends MCRServlet {
      * Returns a query that was previously submitted, to reload it into the
      * editor search mask. Usage: MCRSearchServlet?mode=load&id=XXXXX
      */
+    @Deprecated
     protected void loadQuery(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String id = request.getParameter("id");
-        MCRCachedQueryData qd = MCRCachedQueryData.getData(id);
-        if (qd == null) {
-            throw new MCRException("Result list is not in cache any more, please re-run query");
-        }
-        getLayoutService().sendXML(request, response, qd.getInput());
+        String msg = "MCRSearchServlet?mode=load is not supported any more. Please change your search masks to use source uri=\"searchInput:{id}\" ";
+        throw new MCRException(msg);
     }
 
     /**
