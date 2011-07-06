@@ -23,6 +23,7 @@
  */
 package org.mycore.datamodel.classifications2.impl;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -244,6 +245,14 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         final URI germanURI = new URI("http://www.deutschland.de");
         final MCRCategory germany = rootNode.getChildren().get(0).getChildren().get(0);
         assertEquals("URI was not updated", germanURI, germany.getURI());
+    }
+    
+    @Test
+    public void replaceSameCategory() throws Exception {
+        loadWorldClassification2();
+        addWorldClassification();
+        MCRCategory oldCategory = DAO.getCategory(new MCRCategoryID("World", "Europe"), -1);
+        DAO.replaceCategory(oldCategory);
     }
 
     @Test
