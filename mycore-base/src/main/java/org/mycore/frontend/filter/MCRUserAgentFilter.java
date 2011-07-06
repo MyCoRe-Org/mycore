@@ -52,28 +52,31 @@ public class MCRUserAgentFilter implements Filter {
 
     private static final Logger LOGGER = Logger.getLogger(MCRUserAgentFilter.class);
 
-    public void init(FilterConfig arg0) throws ServletException {
-        String agentRegEx = MCRConfiguration.instance()
-                .getString("MCR.Filter.UserAgent", "(bot|spider|crawler|mercator|slurp|seek|nagios|Java)");
+    @Override
+    public void init(final FilterConfig arg0) throws ServletException {
+        final String agentRegEx = MCRConfiguration.instance().getString("MCR.Filter.UserAgent", "(bot|spider|crawler|mercator|slurp|seek|nagios|Java)");
         agentPattern = Pattern.compile(agentRegEx);
     }
 
+    @Override
     public void destroy() {
     }
 
-    public void doFilter(ServletRequest sreq, ServletResponse sres, FilterChain chain) throws IOException, ServletException {
-        HttpServletRequest request = (HttpServletRequest) sreq;
+    @Override
+    public void doFilter(final ServletRequest sreq, final ServletResponse sres, final FilterChain chain) throws IOException, ServletException {
+        final HttpServletRequest request = (HttpServletRequest) sreq;
+        final boolean newSession = request.getSession(false) == null;
         chain.doFilter(sreq, sres);
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            String userAgent = request.getHeader("User-Agent");
+        final HttpSession session = request.getSession(false);
+        if (session != null && newSession) {
+            final String userAgent = request.getHeader("User-Agent");
             if (userAgent != null) {
                 if (agentPattern.matcher(userAgent).find()) {
                     try {
-                        session.invalidate();
                         LOGGER.info("Closing session: " + userAgent + " matches " + agentPattern);
+                        session.invalidate();
                     } catch (IllegalStateException e) {
-                        //session is already closed
+                        LOGGER.warn("Session was allready closed");
                     }
                 } else {
                     LOGGER.debug(userAgent + " does not match " + agentPattern);
