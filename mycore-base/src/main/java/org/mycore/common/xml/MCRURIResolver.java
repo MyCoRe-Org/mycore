@@ -89,6 +89,7 @@ import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRQueryClient;
 import org.mycore.services.fieldquery.MCRQueryManager;
 import org.mycore.services.fieldquery.MCRResults;
+import org.mycore.services.fieldquery.MCRSearchInputResolver;
 import org.mycore.tools.MCRObjectFactory;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -186,6 +187,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         supportedSchemes.put("localclass", new MCRLocalClassResolver());
         supportedSchemes.put("classification", getURIResolver(new MCRClassificationResolver()));
         supportedSchemes.put("query", getURIResolver(new MCRQueryResolver()));
+        supportedSchemes.put("searchInput", new MCRSearchInputResolver());
         supportedSchemes.put("buildxml", getURIResolver(new MCRBuildXMLResolver()));
         supportedSchemes.put("notnull", new MCRNotNullResolver());
         supportedSchemes.put("xslStyle", new MCRXslStyleResolver());
