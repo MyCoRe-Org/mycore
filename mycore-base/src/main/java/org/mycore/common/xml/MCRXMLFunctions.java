@@ -228,6 +228,29 @@ public class MCRXMLFunctions {
     }
 
     /**
+     * Method generates an alternative urn to a given urn by adding additional
+     * text to the namespace specific part. <br/>
+     * <br/>
+     * Invoking method with
+     * <code>"urn:nbn:de:urmel-37e1f5f1-54df-4a9c-8e54-c576f46c01f73"</code> and
+     * <code>"dfg"</code> leads to
+     * <code>"urn:nbn:de:urmel-dfg-37e1f5f1-54df-4a9c-8e54-c576f46c01f73"</code>
+     * 
+     * @param urn
+     *            the source urn
+     * @return the given urn but to the namespace specific part the value stored
+     *         in the <code>toAppend</code> parameter is attached
+     */
+    public static String createAlternativeURN(String urn, String toAppend) {
+        String[] parts = urn.split("-");
+        StringBuilder b = new StringBuilder(parts[0] + "-" + toAppend);
+        for (int i = 1; i < parts.length; i++) {
+            b.append("-" + parts[i]);
+        }
+        return b.toString();
+    }
+
+    /**
      * returns the URN for <code>mcrid</code> and children if <code>mcrid</code>
      * is a derivate.
      * 
