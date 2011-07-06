@@ -35,6 +35,7 @@ iview.General = function(iviewInst, viewID) {
 					'preload': jQuery("#viewerContainer" + viewID + " .preload")};
 	//TODO: get rid of those parentNode crap
 	this.iview.context = new iview.Context(this.iview.my.container);
+	this.iview.currentImage = new iview.CurrentImage();
 	this.iview.viewID = viewID;
 	this.inputHandlerEnabled=true;
 };
@@ -149,7 +150,7 @@ genProto.initializeGraphic = function() {
 	PanoJS.BLANK_TILE_IMAGE = "../modules/iview2/" + styleFolderUri + 'blank.gif';
 	
 	// opera triggers the onload twice
-	var iviewTileUrlProvider = new PanoJS.TileUrlProvider(this.iview.baseUri, this.iview.curImage, 'jpg');
+	var iviewTileUrlProvider = new PanoJS.TileUrlProvider(this.iview.baseUri, this.iview.currentImage.getName(), 'jpg');
 	iviewTileUrlProvider.derivate = this.iview.viewID;
 
 	/**

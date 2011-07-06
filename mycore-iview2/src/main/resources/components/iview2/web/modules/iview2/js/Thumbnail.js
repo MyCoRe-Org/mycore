@@ -43,20 +43,20 @@ genProto.loadPage = function(callback) {
 	} else {
 		url = this.iview.PhysicalModel.getCurrent().getHref();
 	}
-	this.iview.curImage  = url;
+	this.iview.currentImage.setName(url);
 	var imagePropertiesURL = this.iview.baseUri[0]+"/"+this.iview.viewID+"/"+url+"/imageinfo.xml";
 	var that = this;
 	jQuery.ajax({
 		url: imagePropertiesURL,
-  		success: function(response) {that.processImageProperties(response)},
+  		success: function(response) {that.processImageProperties(response);},
   		error: function(request, status, exception) {
   			if(console){
   				console.log("Error occured while loading image properties:\n"+exception);
   			}
   		},
-  		complete: function() {callBack(callback)}
+  		complete: function() {callBack(callback);}
 	});
-}
+};
 
 /**
  * @public
@@ -124,7 +124,7 @@ genProto.processImageProperties = function(imageProperties){
 		} else {
 			this.iview.zoomInit = this.iview.zoomMax;
 		}
-		viewerBean.tileUrlProvider.prefix = this.iview.curImage;
+		viewerBean.tileUrlProvider.prefix = this.iview.currentImage.getName();
 		preload.src = viewerBean.tileUrlProvider.assembleUrl(0,0,0);
 		viewerBean.resize();
 	}
@@ -841,7 +841,7 @@ genProto.processMETS = function(metsDoc) {
 	var physicalModel = this.iview.PhysicalModel;
 	var toolbarCtrl = this.iview.getToolbarCtrl();
 	this.iview.amountPages = physicalModel.getNumberOfPages();
-	physicalModel.setPosition(physicalModel.getPosition(this.iview.curImage));
+	physicalModel.setPosition(physicalModel.getPosition(this.iview.currentImage.getName()));
 	jQuery(physicalModel).bind("select.METS", function(e, val) {
 //			that.notifyListenerNavigate(val["new"]);
 		that.loadPage();
