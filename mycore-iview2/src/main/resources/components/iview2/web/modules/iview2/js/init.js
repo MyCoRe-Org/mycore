@@ -234,8 +234,8 @@ genProto.reinitializeGraphic = function() {
 	
 	if (this.iview.useCutOut) {
 		this.iview.cutOutModel.setRatio({
-			'x': viewerBean.width / ((this.iview.picWidth / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale),
-			'y': viewerBean.height / ((this.iview.picHeight / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale)});
+			'x': viewerBean.width / ((this.iview.currentImage.getWidth() / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale),
+			'y': viewerBean.height / ((this.iview.currentImage.getHeight() / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale)});
 		this.iview.cutOutModel.setPos({
 			'x': - (viewerBean.x / Math.pow(2, viewerBean.zoomLevel))*this.iview.zoomScale,
 			'y': - (viewerBean.y / Math.pow(2, viewerBean.zoomLevel))*this.iview.zoomScale});
@@ -243,7 +243,7 @@ genProto.reinitializeGraphic = function() {
 	
 	// Actualize forward & backward Buttons
 	var previewTbView = jQuery(this.iview.getToolbarCtrl().getView("previewTbView").toolbar);
-	var newTop = ((((this.iview.picHeight / Math.pow(2, this.iview.zoomMax - 1)) * this.iview.zoomScale) - (previewTbView.height() + toInt(previewTbView.css("padding-top")) + toInt(previewTbView.css("padding-bottom")))) / 2) + "px";
+	var newTop = ((((this.iview.currentImage.getHeight() / Math.pow(2, this.iview.zoomMax - 1)) * this.iview.zoomScale) - (previewTbView.height() + toInt(previewTbView.css("padding-top")) + toInt(previewTbView.css("padding-bottom")))) / 2) + "px";
 	if (this.iview.viewerContainer.hasClass("viewerContainer min")) {
 		this.iview.viewerContainer.find(".toolbars .toolbar").css("top", newTop);
 	}

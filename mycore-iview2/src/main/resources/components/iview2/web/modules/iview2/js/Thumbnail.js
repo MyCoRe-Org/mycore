@@ -70,8 +70,8 @@ genProto.processImageProperties = function(imageProperties){
 	var values = nodeAttributes(imageProperties.getElementsByTagName("imageinfo")[0]);
 	
 	this.iview.tiles = parseInt(values['tiles']);
-	this.iview.picWidth = parseInt(values['width']);
-	this.iview.picHeight = parseInt(values['height']);
+	this.iview.currentImage.setWidth(parseInt(values['width']));
+	this.iview.currentImage.setHeight(parseInt(values['height']));
 	var viewerBean = this.iview.viewerBean;
 
 	if (viewerBean) {
@@ -106,8 +106,8 @@ genProto.processImageProperties = function(imageProperties){
 	var preload = new Image();
 	preload.className = "preloadImg";
 	var preloadCont=this.iview.my.preload;
-	preloadCont.css({"width" : this.iview.picWidth / Math.pow(2, this.iview.zoomMax - this.iview.zoomInit) + "px",
-					 "height" : this.iview.picHeight / Math.pow(2, this.iview.zoomMax - this.iview.zoomInit) + "px"})
+	preloadCont.css({"width" : this.iview.currentImage.getWidth() / Math.pow(2, this.iview.zoomMax - this.iview.zoomInit) + "px",
+					 "height" : this.iview.currentImage.getHeight() / Math.pow(2, this.iview.zoomMax - this.iview.zoomInit) + "px"})
 			 .empty()
 			 .append(preload);
 
@@ -364,13 +364,13 @@ genProto.switchDisplayMode = function(screenZoom, stateBool, preventLooping) {
 	var preload = this.iview.my.preload;
 	if (stateBool) {
 		for (var i = 0; i <= this.iview.zoomMax; i++) {
-			if(this.iview.picWidth/viewerBean.width > this.iview.picHeight/this.iview.my.viewer.outerHeight(true) || (stateBool && !screenZoom)){
+			if(this.iview.currentImage.getWidth()/viewerBean.width > this.iview.currentImage.getHeight()/this.iview.my.viewer.outerHeight(true) || (stateBool && !screenZoom)){
 			//Width > Height Or ZoomWidth is true
-				if (this.calculateZoomProp(i, this.iview.picWidth, viewerBean.width, 0)) {
+				if (this.calculateZoomProp(i, this.iview.currentImage.getWidth(), viewerBean.width, 0)) {
 					break;
 				}
 			} else {
-				if (this.calculateZoomProp(i, this.iview.picHeight, viewerBean.height, 0)) {
+				if (this.calculateZoomProp(i, this.iview.currentImage.getHeight(), viewerBean.height, 0)) {
 					break;
 				}
 			}
@@ -452,8 +452,8 @@ genProto.handleScrollbars = function(reason) {
 	var barX = this.iview.my.barX;
 	var barY = this.iview.my.barY;
 	// determine the current imagesize
-	var curWidth = (this.iview.picWidth / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale;
-	var curHeight = (this.iview.picHeight / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale;
+	var curWidth = (this.iview.currentImage.getWidth() / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale;
+	var curHeight = (this.iview.currentImage.getHeight() / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale;
 
 	var height = viewer.height();
 	var width = viewer.width();
@@ -503,11 +503,11 @@ genProto.viewerZoomed = function (zoomEvent) {
 		this.pictureScreen(true);
 	}
 	var preload = this.iview.my.preload;
-	preload.css({"width": (this.iview.picWidth / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale +  "px",
-				 "height": (this.iview.picHeight / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale + "px"});
+	preload.css({"width": (this.iview.currentImage.getWidth() / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale +  "px",
+				 "height": (this.iview.currentImage.getHeight() / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale + "px"});
 
 	// Actualize forward & backward Buttons
-	jQuery(".viewerContainer.min .toolbars .toolbar").css("width", (this.iview.picWidth / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale +  "px");
+	jQuery(".viewerContainer.min .toolbars .toolbar").css("width", (this.iview.currentImage.getWidth() / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale +  "px");
 
 	this.handleScrollbars("zoom");
 
@@ -516,8 +516,8 @@ genProto.viewerZoomed = function (zoomEvent) {
 			'x': preload.width(),
 			'y': preload.height()});
 		this.iview.cutOutModel.setRatio({
-			'x': viewerBean.width / ((this.iview.picWidth / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale),
-			'y': viewerBean.height / ((this.iview.picHeight / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale)});
+			'x': viewerBean.width / ((this.iview.currentImage.getWidth() / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale),
+			'y': viewerBean.height / ((this.iview.currentImage.getHeight() / Math.pow(2, this.iview.zoomMax - viewerBean.zoomLevel))*this.iview.zoomScale)});
 		this.iview.cutOutModel.setPos({
 			'x': - (viewerBean.x / Math.pow(2, viewerBean.zoomLevel))*this.iview.zoomScale,
 			'y': - (viewerBean.y / Math.pow(2, viewerBean.zoomLevel))*this.iview.zoomScale});
@@ -595,7 +595,7 @@ genProto.updateModuls = function() {
 
 	// Actualize forward & backward Buttons
 	var previewTbView = jQuery(this.iview.getToolbarCtrl().getView("previewTbView").toolbar);
-	var newTop = ((((this.iview.picHeight / Math.pow(2, this.iview.zoomMax - 1)) * this.iview.zoomScale) - (toInt(previewTbView.css("height")) + toInt(previewTbView.css("padding-top")) + toInt(previewTbView.css("padding-bottom")))) / 2) + "px";
+	var newTop = ((((this.iview.currentImage.getHeight() / Math.pow(2, this.iview.zoomMax - 1)) * this.iview.zoomScale) - (toInt(previewTbView.css("height")) + toInt(previewTbView.css("padding-top")) + toInt(previewTbView.css("padding-bottom")))) / 2) + "px";
 	if (this.iview.my.container.hasClass("viewerContainer min")) {
 		this.iview.my.container.find(".toolbars .toolbar").css("top", newTop);
 	}

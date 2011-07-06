@@ -5,6 +5,8 @@
 
     function constructor() {
       this.name = null;
+      this.height = 0;
+      this.width = 0;
     }
 
     constructor.prototype = {
@@ -15,6 +17,18 @@
         var oldValue = this.name;
         this.name = name;
         return oldValue;
+      },
+      getWidth : function ci_getWidth() {
+        return this.width;
+      },
+      getHeight : function ci_getHeight() {
+        return this.height;
+      },
+      setWidth : function ci_setWidth(width) {
+        this.width = width;
+      },
+      setHeight : function ci_setHeight(height) {
+        this.height = height;
       },
     };
 

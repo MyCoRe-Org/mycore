@@ -361,13 +361,13 @@ PanoJS.prototype = {
 		var iview = this.iview;
 		//Changed to work for multiple Viewers
 		//added so that pictures can't be moved out of borders
-		if (-(this.x + motion.x) > ((iview.picWidth/Math.pow(2, iview.zoomMax - this.zoomLevel))*iview.zoomScale-this.width)) {
+		if (-(this.x + motion.x) > ((iview.currentImage.getWidth()/Math.pow(2, iview.zoomMax - this.zoomLevel))*iview.zoomScale-this.width)) {
 			motion.x = 0;
-			this.x = -((iview.picWidth/Math.pow(2, iview.zoomMax - this.zoomLevel))*iview.zoomScale-this.width);
+			this.x = -((iview.currentImage.getWidth()/Math.pow(2, iview.zoomMax - this.zoomLevel))*iview.zoomScale-this.width);
 		}
-		if (-(this.y + motion.y) > ((iview.picHeight/Math.pow(2, iview.zoomMax - this.zoomLevel))*iview.zoomScale-this.height)) {
+		if (-(this.y + motion.y) > ((iview.currentImage.getHeight()/Math.pow(2, iview.zoomMax - this.zoomLevel))*iview.zoomScale-this.height)) {
 			motion.y = 0;
-			this.y = -((iview.picHeight/Math.pow(2, iview.zoomMax - this.zoomLevel))*iview.zoomScale-this.height);
+			this.y = -((iview.currentImage.getHeight()/Math.pow(2, iview.zoomMax - this.zoomLevel))*iview.zoomScale-this.height);
 		}
 		if(this.x + motion.x > 0){
 			this.x = 0;
@@ -499,9 +499,9 @@ PanoJS.prototype = {
 			} else {
 				//modification to original PanonJS code
 				var iview=this.iview;
-				var currentWidth = Math.floor(iview.picWidth / Math.pow(2, iview.zoomMax - this.zoomLevel));
+				var currentWidth = Math.floor(iview.currentImage.getWidth() / Math.pow(2, iview.zoomMax - this.zoomLevel));
 				var xTileCount = Math.ceil( currentWidth / iview.tilesize);
-				var currentHeight = Math.floor(iview.picHeight / Math.pow(2, iview.zoomMax - this.zoomLevel));
+				var currentHeight = Math.floor(iview.currentImage.getHeight() / Math.pow(2, iview.zoomMax - this.zoomLevel));
 				var yTileCount = Math.ceil( currentHeight / iview.tilesize);
 				var right = tile.xIndex >= xTileCount; //index starts at 0
 				var low = tile.yIndex >= yTileCount;
