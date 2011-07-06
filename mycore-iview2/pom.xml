@@ -47,6 +47,7 @@
                 <jsSourceFile>PanoJS.js</jsSourceFile>
                 <!-- Viewer -->
                 <jsSourceFile>init.js</jsSourceFile>
+                <jsSourceFile>context.js</jsSourceFile>
                 <jsSourceFile>chapter.js</jsSourceFile>
                 <!-- Chapter -->
                 <jsSourceFile>overview.js</jsSourceFile>

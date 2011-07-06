@@ -26,13 +26,15 @@ iview.resizeImage = function (img, width, height) {
  * @name		General
  * @description All Viewer data and functions which don't fit in other packages
  */
-iview.General = function(iview, viewID) {
+iview.General = function(iviewInst, viewID) {
 	//TODO later it should be possible to remove all this.iview with just this
-	this.iview = iview;
+	this.iview = iviewInst;
 	//structure for all Viewer DOM-Objects
 	this.iview.my = {'container': jQuery("#viewerContainer" + viewID),
 					'viewer': jQuery("#viewer" + viewID),
 					'preload': jQuery("#viewerContainer" + viewID + " .preload")};
+	//TODO: get rid of those parentNode crap
+	this.iview.context = new iview.Context(this.iview.my.container);
 	this.iview.viewID = viewID;
 	this.inputHandlerEnabled=true;
 };
@@ -267,31 +269,8 @@ genProto.maximizeHandler = function() {
 			this.iview.overview.hideView();
 		}
 		// append viewer to dom again
-		this.iview.VIEWER = document.body.firstChild;
-		
-		// clear document content
-		while (document.body.firstChild) {
-			document.body.removeChild(document.body.firstChild);
-		}
-		
-		// restore current document content
-		var index = 0;
-		while (index < this.iview.DOCUMENT.length) {
-			document.body.appendChild(this.iview.DOCUMENT[index]);
-			index++;
-		}
-		
-		// add current Viewer
-		document.getElementById("viewerParent").insertBefore(this.iview.VIEWER, currentPos);
-				
-		// because of IE7 in
-		document.documentElement.style.overflow="";
-		
-		document.body.style.overflow="";
+		this.iview.context.switchContext();
 
-		// class-change causes in IE resize
-		this.iview.my.container.removeClass("max").addClass("min");
-		
 		if (!this.iview.zoomScreen) {
 			this.pictureScreen();
 		}
@@ -314,29 +293,8 @@ genProto.maximizeHandler = function() {
 		}
 		
 		// save document content
-		this.iview.DOCUMENT = new Array();
-		this.iview.VIEWER = this.iview.my.container[0].parentNode.parentNode.parentNode.parentNode;
-		currentPos = this.iview.VIEWER.nextSibling;
-		this.iview.VIEWER.parentNode.id = "viewerParent";
-		
-		// clear document content
-		var index = 0;
-		while (document.body.firstChild) {
-			this.iview.DOCUMENT[index] = document.body.firstChild;
-			document.body.removeChild(document.body.firstChild);
-			index++;
-		}
+    this.iview.context.switchContext();
 
-		// add Viewer
-		document.body.appendChild(this.iview.VIEWER);
-		
-		// because of IE7 in
-		document.documentElement.style.overflow="hidden";
-		
-		document.body.style.overflow="hidden";
-
-		// class-change causes in IE resize
-		this.iview.my.container.removeClass("min").addClass("max");
 		this.iview.toolbarCtrl.paint("mainTb");
 	}
 
