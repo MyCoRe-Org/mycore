@@ -127,9 +127,7 @@
 <xsl:template match="mcr:searchfields">
   <editor id="searchmask">
 
-    <source>
-      <xsl:attribute name="uri">request:servlets/MCRSearchServlet?mode=load&amp;id={id}</xsl:attribute>
-    </source>
+    <source uri="searchInput:{id}" />
     <target type="servlet" name="MCRSearchServlet" method="post" format="xml" />
 
     <components root="root" var="/query">
