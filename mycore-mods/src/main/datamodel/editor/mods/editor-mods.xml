@@ -2,7 +2,7 @@
 
 <imports>
 
-  <panel id="editor-mods">
+  <panel id="edit-mods">
     <hidden var="@ID" />
     <hidden var="@label" />
     <hidden var="@version" />
@@ -25,31 +25,6 @@
         <label xml:lang="en">(please select)</label>
       </item>
     </list>
-
-    <!-- ========== metadata/notes/note ========== -->
-
-    <cell col="1" row="49" anchor="NORTHEAST">
-      <text>
-        <label xml:lang="de">Anmerkungen</label>
-        <label xml:lang="en">Note</label>
-      </text>
-    </cell>
-    <cell col="2" row="49" anchor="NORTHEAST">
-      <helpPopup id="HelpNote" width="400px" height="250px">
-        <label xml:lang="de">Dieses Feld ist optional. Hier können Sie zusätzliche Anmerkungen eintragen.</label>
-        <label xml:lang="en">This field is optional. You can enter additional information, such as notes and comments.</label>
-      </helpPopup>
-    </cell>
-    <cell col="3" row="49" anchor="NORTHWEST" var="metadata/notes[@class='MCRMetaLangText']/note">
-      <repeater min="1" max="5">
-        <panel>
-          <cell row="1" col="1" anchor="NORTHWEST">
-            <textarea width="60" height="4" maxlength="4096" />
-          </cell>
-          <cell row="1" col="2" anchor="NORTHWEST" ref="ListLang" var="@xml:lang" />
-        </panel>
-      </repeater>
-    </cell>
 
     <cell col="1" colspan="3" row="50" anchor="EAST" style="padding-top:20px;">
       <submitButton width="100px" i18n="common.button.save" />
