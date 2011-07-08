@@ -50,7 +50,6 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.MCRUtils;
-import org.mycore.common.xml.MCRParserXerces;
 import org.mycore.datamodel.metadata.MCRMetaAccessRule;
 import org.mycore.datamodel.metadata.MCRMetaAddress;
 import org.mycore.datamodel.metadata.MCRMetaBoolean;
@@ -121,29 +120,25 @@ public class MCREditorOutValidator {
      * tries to generate a valid MCRObject as JDOM Document.
      * 
      * @return MCRObject
+     * @throws JDOMException 
+     * @throws SAXParseException 
      */
-    public Document generateValidMyCoReObject() {
+    public Document generateValidMyCoReObject() throws JDOMException, SAXParseException {
         MCRObject obj;
-        try {
-            // load the JDOM object
-            XPath editorOutput = XPath.newInstance("/mycoreobject/*/*/*[@editor.output]");
-            for (Object node : editorOutput.selectNodes(input)) {
-                Element e = (Element) node;
-                LOGGER.debug("removing \"editor.output\" Attribute from " + e.getName());
-                e.removeAttribute("editor.output");
-            }
-            byte[] xml = MCRUtils.getByteArray(input);
-            obj = new MCRObject(xml, true);
-            Date curTime = new Date();
-            obj.getService().setDate("modifydate", curTime);
-
-            // return the XML tree
-            input = obj.createXML();
-        } catch (SAXParseException e) {
-            errorlog.add(MCRParserXerces.getSAXErrorMessage(e));
-        } catch (Exception e) {
-            errorlog.add(e.getMessage());
+        // load the JDOM object
+        XPath editorOutput = XPath.newInstance("/mycoreobject/*/*/*[@editor.output]");
+        for (Object node : editorOutput.selectNodes(input)) {
+            Element e = (Element) node;
+            LOGGER.debug("removing \"editor.output\" Attribute from " + e.getName());
+            e.removeAttribute("editor.output");
         }
+        byte[] xml = MCRUtils.getByteArray(input);
+        obj = new MCRObject(xml, true);
+        Date curTime = new Date();
+        obj.getService().setDate("modifydate", curTime);
+
+        // return the XML tree
+        input = obj.createXML();
         return input;
     }
 
