@@ -6,7 +6,7 @@
   <metadata>
     <element name="modsContainer" type="xml" style="dontknow" notinherit="true" heritable="false">
       <xs:sequence>
-        <xs:element name="mods:mods" type="mods:modsDefinition" />
+        <xs:element ref="mods:mods"/>
       </xs:sequence>
     </element>
   </metadata>
