@@ -31,6 +31,7 @@ import java.net.URI;
 import org.apache.log4j.Logger;
 import org.apache.xerces.parsers.SAXParser;
 import org.jdom.Document;
+import org.jdom.input.JDOMParseException;
 import org.jdom.input.SAXBuilder;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
@@ -233,6 +234,10 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
             if (ex instanceof SAXParseException) {
                 throw (SAXParseException) ex;
             }
+            Throwable cause = ex.getCause();
+            if (cause instanceof SAXParseException) {
+                throw (SAXParseException) cause;
+            }
             throw new MCRException(msg, ex);
         }
     }
@@ -249,7 +254,7 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
     /**
      * Handles parse errors
      */
-    public void error(SAXParseException ex) throws SAXParseException{
+    public void error(SAXParseException ex) throws SAXParseException {
         LOGGER.error(getSAXErrorMessage(ex), ex);
         throw ex;
     }
@@ -257,7 +262,7 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
     /**
      * Handles fatal parse errors
      */
-    public void fatalError(SAXParseException ex)throws SAXParseException {
+    public void fatalError(SAXParseException ex) throws SAXParseException {
         LOGGER.fatal(getSAXErrorMessage(ex));
         throw ex;
     }

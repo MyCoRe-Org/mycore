@@ -43,10 +43,13 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.MCRUtils;
@@ -132,8 +135,14 @@ public class MCREditorOutValidator {
             LOGGER.debug("removing \"editor.output\" Attribute from " + e.getName());
             e.removeAttribute("editor.output");
         }
-        byte[] xml = MCRUtils.getByteArray(input);
-        obj = new MCRObject(xml, true);
+        try {
+            byte[] xml = MCRUtils.getByteArray(input);
+            obj = new MCRObject(xml, true);
+        } catch (SAXParseException e) {
+            XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
+            LOGGER.warn("Failure while parsing document:\n" + xout.outputString(input));
+            throw e;
+        }
         Date curTime = new Date();
         obj.getService().setDate("modifydate", curTime);
 

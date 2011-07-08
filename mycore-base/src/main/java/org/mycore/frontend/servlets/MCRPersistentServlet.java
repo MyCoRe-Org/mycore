@@ -333,14 +333,9 @@ public class MCRPersistentServlet extends MCRServlet {
             return;
         }
         if (ex != null) {
-            if (ex instanceof MCRException && ex.getMessage().startsWith("Error while parsing")) {
+            if (ex instanceof SAXParseException) {
                 ArrayList<String> errorLog = new ArrayList<String>();
-                errorLog.add(ex.getMessage());
-                while (ex.getCause() instanceof Exception) {
-                    ex = (Exception) ex.getCause();
-                    if (ex instanceof SAXParseException)
-                        errorLog.add(getSAXErrorMessage((SAXParseException) ex));
-                }
+                errorLog.add(getSAXErrorMessage((SAXParseException) ex));
                 errorHandlerValid(job, errorLog);
                 return;
             }
