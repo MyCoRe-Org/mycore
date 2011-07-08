@@ -8,16 +8,6 @@
     <hidden var="@version" />
     <hidden var="service" descendants="true" />
     <hidden var="metadata/@xml:lang" default="de" />
-    <list id="ListLang" type="dropdown" default="de">
-      <item value="de">
-        <label xml:lang="de">Deutsch</label>
-        <label xml:lang="en">German</label>
-      </item>
-      <item value="en">
-        <label xml:lang="de">Englisch</label>
-        <label xml:lang="en">English</label>
-      </item>
-    </list>
 
     <list id="pleaseSelect">
       <item value="">
@@ -35,6 +25,8 @@
     <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre" descendants="true" />
     <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/@ID" />
     <hidden var="metadata/def.modsContainer/@class" default="MCRMetaXML" />
+    <hidden var="metadata/def.modsContainer/@notinherit" default="true" />
+    <hidden var="metadata/def.modsContainer/@heritable" default="false" />
 
 <!-- pub_title_orig [text] -->
     <cell col="1" row="1" anchor="EAST">
@@ -178,7 +170,7 @@
         </label>
       </helpPopup>
     </cell>
-    <cell col="3" row="4" anchor="WEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@type='reviewer']">
+    <cell col="3" row="4" anchor="WEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@type='personal']">
 	  <!-- ToDo: reviewer sicherstellen, reviewer gegen personal tauschen -->
       <repeater min="1" max="5" pos="right">
         <panel>
@@ -239,15 +231,21 @@
         </label>
       </helpPopup>
     </cell>
-    <cell col="3" row="5" anchor="WEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:language">
+    <cell col="3" row="5" anchor="WEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:language/mods:languageTerm">
       <panel>
+        <hidden var="@authority" default="iso639-2b" />
+        <hidden var="@type" default="code" />
         <cell col="1">
-          <textfield width="80" maxlength="128">
-            <condition required="true">
-              <label xml:lang="de">Tragen Sie hier die Sprache der Dissertation/Hab./Diplom ein.</label>
-              <label xml:lang="en">Enter the language of thesis here.</label>
-            </condition>
-          </textfield>
+          <list id="ListLang" type="dropdown" default="ger">
+            <item value="ger">
+              <label xml:lang="de">Deutsch</label>
+              <label xml:lang="en">German</label>
+            </item>
+            <item value="eng">
+              <label xml:lang="de">Englisch</label>
+              <label xml:lang="en">English</label>
+            </item>
+          </list>
         </cell>
       </panel>
     </cell>
@@ -501,7 +499,7 @@
       </helpPopup>
     </cell>
 	<!-- ToDo: richtiges MODS-Feld finden -->
-    <cell col="3" row="13" anchor="WEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:location">
+    <cell col="3" row="13" anchor="WEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:physicalLocation">
       <textfield width="80" maxlength="128">
         <label xml:lang="de">Tragen Sie hier die interne Archivnummer ein.</label>
         <label xml:lang="en">Enter internal archive number of thesis here.</label>
