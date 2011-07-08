@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="ISO_8859-1"?>
+<!DOCTYPE MyCoReWebPage>
+
+<MyCoReWebPage>
+  <section title="Neueingabe eines Objektes" xml:lang="de" />
+  <section title="Create a new object" xml:lang="en" />
+  <section xml:lang="all">
+    <p class="editorform">
+      <editor id="author-file">
+        <source uri="{sourceUri}" />
+        <cancel url="{cancelUrl}" />
+        <target type="servlet" name="MCRCheckNewDataServlet" method="post" format="xml" />
+        <validationMessage>
+          <label xml:lang="de">Eingabefehler: Bitte korrigieren Sie die markierten Felder.</label>
+          <label xml:lang="en">Inputerror: Please correct the marked fields.</label>
+        </validationMessage>
+        <components root="edit-file" var="/mycoreobject"
+          xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <include uri="webapp:editor/editor-file.xml" />
+        </components>
+      </editor>
+    </p>
+  </section>
+</MyCoReWebPage>

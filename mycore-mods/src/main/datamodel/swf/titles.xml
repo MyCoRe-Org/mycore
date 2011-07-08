@@ -1,0 +1,8 @@
+<titles>
+  <title step="author" type="mods" xml:lang="de">MODS-Dokument erstellen</title>
+  <title step="author" type="mods" xml:lang="en">create MODS document</title>
+  <title step="commit" type="mods" xml:lang="de">MODS-Dokument bearbeiten</title>
+  <title step="commit" type="mods" xml:lang="en">edit MODS document</title>
+  <title step="editor" type="mods" xml:lang="de">MODS-Dokument bearbeiten</title>
+  <title step="editor" type="mods" xml:lang="en">edit MODS document</title>
+</titles>

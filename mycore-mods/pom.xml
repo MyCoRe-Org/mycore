@@ -19,6 +19,8 @@
           <execution>
             <goals>
               <goal>schema</goal>
+              <goal>swf-pages</goal>
+              <goal>copy-editor</goal>
             </goals>
           </execution>
         </executions>

@@ -1,0 +1,489 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<imports>
+
+  <include uri="webapp:editor/imports-editor.xml" />
+
+  <panel id="editor-mods">
+    <include ref="commonComponents" />
+    
+    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:typeOfResource" descendants="true" />
+    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre" descendants="true" />
+	<hidden var="metadata/def.modsContainer/modsContainer/mods:mods/@ID" />
+
+<!-- pub_title_orig [text] -->
+    <cell col="1" row="1" anchor="EAST">
+      <text>
+        <label xml:lang="de">Titel</label>
+        <label xml:lang="en">Title</label>
+      </text>
+    </cell>
+    <cell col="2" row="1" anchor="EAST">
+      <helpPopup width="400px" height="250px">
+        <label xml:lang="de">
+          Titel der Dissertation/Hab./Diplom
+        </label>
+        <label xml:lang="en">
+          title of thesis
+        </label>
+      </helpPopup>
+    </cell>
+    <cell col="3" row="1" anchor="WEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title">
+      <panel>
+        <cell col="1">
+		  <textfield width="80" maxlength="128">
+		    <condition required="true" >
+              <label xml:lang="de">Tragen Sie hier den Titel der Dissertation/Hab./Diplom ein.</label>
+              <label xml:lang="en">Enter the title of thesis here.</label>
+			</condition>
+          </textfield>
+		</cell>
+      </panel>
+    </cell>
+<!-- pub_title_orig [text] END -->
+
+
+<!-- pub_title_engl[text] -->
+    <cell col="1" row="2" anchor="EAST">
+      <text>
+        <label xml:lang="de">Titel uebersetzt</label>
+        <label xml:lang="en">Title translated</label>
+      </text>
+    </cell>
+    <cell col="2" row="2" anchor="EAST">
+      <helpPopup width="400px" height="250px">
+        <label xml:lang="de">
+          Titel uebersetzt (mehrere Sprachen)
+        </label>
+        <label xml:lang="en">
+          title translated
+        </label>
+      </helpPopup>
+    </cell>
+    <cell col="3" row="2" anchor="WEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo[@type='translated']/mods:title">
+      <repeater min="1" max="5" pos="right">
+        <panel>
+          <cell col="1">
+		    <textfield width="80" maxlength="128">
+              <label xml:lang="de">Tragen Sie hier den uebersetzten Titel der Dissertation/Hab./Diplom ein.</label>
+              <label xml:lang="en">Enter the translated title of thesis here.</label>
+            </textfield>
+		  </cell>
+        </panel>
+      </repeater>
+    </cell>
+<!-- pub_title_engl[text] END -->
+
+
+<!-- pub_autor_dok_txt [text] -->
+    <cell col="1" row="3" anchor="EAST">
+      <text>
+        <label xml:lang="de">Autor</label>
+        <label xml:lang="en">Author</label>
+      </text>
+    </cell>
+    <cell col="2" row="3" anchor="EAST">
+      <helpPopup width="400px" height="250px">
+        <label xml:lang="de">
+          Autor (evtl. mit Verweis auf PND)
+        </label>
+        <label xml:lang="en">
+          Autor (evtl. mit Verweis auf PND)
+        </label>
+      </helpPopup>
+    </cell>
+    <cell col="3" row="3" anchor="WEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@type='personal']">
+	  <!-- ToDo: author sicherstellen -->
+      <repeater min="1" max="5" pos="right">
+        <panel>
+          <cell col="1" row="1" anchor="EAST">
+            <text>
+              <label xml:lang="de">Vorname</label>
+              <label xml:lang="en">First Name</label>
+            </text>
+          </cell>
+          <cell col="1" row="1" anchor="EAST" var="mods:namePart[@type='given']">
+		    <textfield width="60" maxlength="128">
+              <label xml:lang="de">Tragen Sie hier den Vornamen des Autors ein.</label>
+              <label xml:lang="en">Enter authors first name here.</label>
+		  	  <condition required="true" >
+		        <label xml:lang="de">Bitte geben Sie den Vornamen des Autors an!</label>
+                <label xml:lang="en">Please insert authors first name.</label>
+			  </condition>
+		    </textfield>
+		  </cell>
+          <cell col="1" row="2" anchor="EAST">
+            <text>
+              <label xml:lang="de">Nachname</label>
+              <label xml:lang="en">Last Name</label>
+            </text>
+          </cell>
+          <cell col="1" row="2" anchor="EAST" var="mods:namePart[@type='family']">
+		    <textfield width="60" maxlength="128">
+              <label xml:lang="de">Tragen Sie hier den Nachnamen des Autors ein.</label>
+              <label xml:lang="en">Enter authors last name here.</label>
+			  <condition required="true" >
+		        <label xml:lang="de">Bitte geben Sie den Nachnamen des Autors an!</label>
+                <label xml:lang="en">Please insert authors last name.</label>
+			  </condition>
+            </textfield>
+		  </cell>
+		  <!--  ToDo: @type='text' fehlt noch --> 
+		  <hidden var="mods:role/mods:roleTerm[@authority='marcrelator']" default="author" />
+        </panel>
+      </repeater>
+    </cell>
+<!-- pub_autor_dok_txt [text] END -->
+
+
+<!-- Gutachter -->
+    <cell col="1" row="4" anchor="EAST">
+      <text>
+        <label xml:lang="de">Gutachter</label>
+        <label xml:lang="en">Reviewer</label>
+      </text>
+    </cell>
+    <cell col="2" row="4" anchor="EAST">
+      <helpPopup width="400px" height="250px">
+        <label xml:lang="de">
+          Gutachter (evtl. mit Verweis auf PND)
+        </label>
+        <label xml:lang="en">
+          Reviewer (evtl. mit Verweis auf PND)
+        </label>
+      </helpPopup>
+    </cell>
+    <cell col="3" row="4" anchor="WEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@type='reviewer']">
+	  <!-- ToDo: reviewer sicherstellen, reviewer gegen personal tauschen -->
+      <repeater min="1" max="5" pos="right">
+        <panel>
+          <cell col="1" row="1" anchor="EAST">
+            <text>
+              <label xml:lang="de">Vorname</label>
+              <label xml:lang="en">First Name</label>
+            </text>
+          </cell>
+          <cell col="1" row="1" anchor="EAST" var="mods:namePart[@type='given']">
+		    <textfield width="60" maxlength="128">
+              <label xml:lang="de">Tragen Sie hier den Vornamen des Gutachters ein.</label>
+              <label xml:lang="en">Enter reviewers first name here.</label>
+			  <condition required="true" >
+		        <label xml:lang="de">Bitte geben Sie den Vornamen des Gutachters an!</label>
+                <label xml:lang="en">Please insert reviewsers first name.</label>
+			  </condition>
+            </textfield>
+		  </cell>
+          <cell col="1" row="2" anchor="EAST">
+            <text>
+              <label xml:lang="de">Nachname</label>
+              <label xml:lang="en">Last Name</label>
+            </text>
+          </cell>
+          <cell col="1" row="2" anchor="EAST" var="mods:namePart[@type='family']">
+		    <textfield width="60" maxlength="128">
+              <label xml:lang="de">Tragen Sie hier den Nachnamen des Gutachters ein.</label>
+              <label xml:lang="en">Enter reviewers last name here.</label>
+			  <condition required="true" >
+		        <label xml:lang="de">Bitte geben Sie den Nachnamen des Gutachters an!</label>
+                <label xml:lang="en">Please insert reviewsers last name.</label>
+			  </condition>
+            </textfield>
+		  </cell>
+		  <!--  ToDo: @type='text' fehlt noch --> 
+		  <hidden var="mods:role/mods:roleTerm[@authority='marcrelator']" default="reviewer" />
+        </panel>
+      </repeater>
+    </cell>
+<!-- Gutachter END -->
+
+
+<!-- pub_sprache_txt -->
+    <cell col="1" row="5" anchor="EAST">
+      <text>
+        <label xml:lang="de">Sprache</label>
+        <label xml:lang="en">Language</label>
+      </text>
+    </cell>
+    <cell col="2" row="5" anchor="EAST">
+      <helpPopup width="400px" height="250px">
+        <label xml:lang="de">
+          Sprache der Arbeit
+        </label>
+        <label xml:lang="en">
+          language of thesis
+        </label>
+      </helpPopup>
+    </cell>
+    <cell col="3" row="5" anchor="WEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:language">
+      <panel>
+        <cell col="1">
+		  <textfield width="80" maxlength="128">
+		    <condition required="true" >
+              <label xml:lang="de">Tragen Sie hier die Sprache der Dissertation/Hab./Diplom ein.</label>
+              <label xml:lang="en">Enter the language of thesis here.</label>
+			</condition>
+          </textfield>
+		</cell>
+      </panel>
+    </cell>
+<!-- pub_sprache_txt END -->
+
+
+<!-- pub_kurzfassg -->
+    <!-- ToDo: Sprachabhaengig machen -->
+    <cell col="1" row="6" anchor="EAST">
+      <text>
+        <label xml:lang="de">Zusammenfassung</label>
+        <label xml:lang="en">Abstract</label>
+      </text>
+    </cell>
+    <cell col="2" row="6" anchor="EAST">
+      <helpPopup width="400px" height="250px">
+        <label xml:lang="de">
+          Abstract in verschiedenen Sprachen
+        </label>
+        <label xml:lang="en">
+          abstract (translated also)
+        </label>
+      </helpPopup>
+    </cell>
+    <cell col="3" row="6" anchor="WEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:abstract">
+      <repeater min="1" max="5" pos="right">
+        <panel>
+          <cell col="1">
+		    <textarea width="60" height="5">
+              <label xml:lang="de">Tragen Sie hier deine Kurzbeschreibung der Dissertation/Hab./Diplom ein.</label>
+              <label xml:lang="en">Enter the abstract of thesis here.</label>
+            </textarea>
+		  </cell>
+        </panel>
+      </repeater>
+    </cell>
+<!-- pub_title_engl[text] END -->
+
+
+<!-- pub_klassifik -->
+    <cell col="1" row="7" anchor="NORTHEAST">
+      <text>
+        <label xml:lang="de">Klassifikation</label>
+        <label xml:lang="en">Classification</label>
+      </text>
+    </cell>
+    <cell col="2" row="7" anchor="NORTHEAST">
+      <helpPopup width="400px" height="250px">
+        <label xml:lang="de">Waehlen Sie bitte eine Zuordnung zur DDC-Sachgruppe aus.</label>
+        <label xml:lang="en">Select an entry from the ddc list.</label>
+      </helpPopup>
+    </cell>
+    <cell col="3" row="7" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:classification">
+      <list width="60" type="dropdown">
+        <include ref="pleaseSelect" />
+        <include uri="classification:editor:-1:children:ddc-sg" cacheable="false"/>
+        <condition required="true" >
+          <label xml:lang="de">Bitte waehlen Sie einen Wert aus!</label>
+          <label xml:lang="en">Please select one entry!</label>
+        </condition>
+      </list>
+    </cell>
+<!-- pub_klassifik END -->
+
+<!-- Identifier -->
+    <cell col="1" row="8" anchor="EAST">
+      <text>
+        <label xml:lang="de">Identifier</label>
+        <label xml:lang="en">Identifier</label>
+      </text>
+    </cell>
+    <cell col="2" row="8" anchor="EAST">
+      <helpPopup width="400px" height="250px">
+        <label xml:lang="de">
+          Identifier  (ggf. mehrere, URN, DOI,...)
+        </label>
+        <label xml:lang="en">
+          Identifier  (ggf. mehrere, URN, DOI,...)
+        </label>
+      </helpPopup>
+    </cell>
+    <cell col="3" row="8" anchor="WEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier">
+      <repeater min="1" max="5" pos="right">
+        <panel>
+          <cell row="1" col="1">
+		    <textfield width="80" maxlength="128">
+              <label xml:lang="de">Tragen Sie hier den Identifier der Dissertation/Hab./Diplom ein.</label>
+              <label xml:lang="en">Enter the identifier of thesis here.</label>
+            </textfield>
+		  </cell>
+		  <cell row="1" col="2" anchor="NORTHWEST" var="@type">
+		    <list type="dropdown" default="unknown">
+			  <item value="urn">
+			    <label xml:lang="de">URN</label>
+				<label xml:lang="en">URN</label>
+		      </item>
+			  <item value="citekey">
+			    <label xml:lang="de">Citekey</label>
+				<label xml:lang="en">Citekey</label>
+			  </item>
+			  <item value="unknown">
+			    <label xml:lang="de">Unbekannt</label>
+				<label xml:lang="en">Unknown</label>
+			  </item>
+			</list>
+		  </cell>
+        </panel>
+      </repeater>
+    </cell>
+<!-- Identifier END -->
+
+
+<!-- Datum der Promotion [text] -->
+    <cell col="1" row="9" anchor="EAST">
+      <text>
+        <label xml:lang="de">Datum</label>
+        <label xml:lang="en">Date</label>
+      </text>
+    </cell>
+    <cell col="2" row="9" anchor="EAST">
+      <helpPopup width="400px" height="250px">
+        <label xml:lang="de">
+          Datum der Promotion
+        </label>
+        <label xml:lang="en">
+          Date of Thesis
+        </label>
+      </helpPopup>
+    </cell>
+    <cell col="3" row="9" anchor="WEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateIssued">
+      <panel>
+        <cell col="1">
+		  <textfield width="80" maxlength="128">
+		    <condition required="true" >
+              <label xml:lang="de">Tragen Sie hier das Datum der Dissertation/Hab./Diplom ein.</label>
+              <label xml:lang="en">Enter the date of thesis here.</label>
+			</condition>
+          </textfield>
+		</cell>
+      </panel>
+    </cell>
+<!-- Datum der Promotion END -->
+
+
+<!-- Institution -->
+    <cell col="1" row="10" anchor="NORTHEAST">
+      <text>
+        <label xml:lang="de">Institution</label>
+        <label xml:lang="en">Institution</label>
+      </text>
+    </cell>
+    <cell col="2" row="10" anchor="NORTHEAST">
+      <helpPopup width="400px" height="250px">
+        <label xml:lang="de">Waehlen Sie die Institution aus, an der die Promotion eingereicht wurde</label>
+        <label xml:lang="en">Select an institution from the list.</label>
+      </helpPopup>
+    </cell>
+    <cell col="3" row="10" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:publisher">
+      <list width="60" type="dropdown">
+        <include ref="pleaseSelect" />
+		<!-- ToDo: richtige Klassifikation anlegen und einbinden -->
+        <include uri="classification:editor:-1:children:DocPortal_class_00000002" cacheable="false"/>
+        <condition required="true" >
+          <label xml:lang="de">Bitte waehlen Sie einen Wert aus!</label>
+          <label xml:lang="en">Please select one entry!</label>
+        </condition>
+      </list>
+    </cell>
+<!-- Institution END -->
+
+
+<!-- Stichworte -->
+    <cell col="1" row="11" anchor="EAST">
+      <text>
+        <label xml:lang="de">Stichworte</label>
+        <label xml:lang="en">Subject</label>
+      </text>
+    </cell>
+    <cell col="2" row="11" anchor="EAST">
+      <helpPopup width="400px" height="250px">
+        <label xml:lang="de">
+          Stichworte
+        </label>
+        <label xml:lang="en">
+          Subject
+        </label>
+      </helpPopup>
+    </cell>
+    <cell col="3" row="11" anchor="WEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:subject">
+      <repeater min="1" max="500" pos="right" var="mods:topic">
+        <panel>
+          <cell col="1">
+		    <textfield width="80" maxlength="128">
+              <label xml:lang="de">Tragen Sie hier Stichworte zur Dissertation/Hab./Diplom ein.</label>
+              <label xml:lang="en">Enter subject of thesis here.</label>
+            </textfield>
+		  </cell>
+        </panel>
+      </repeater>
+    </cell>
+<!-- Stichworte END -->
+
+
+<!-- Kommentar -->
+    <cell col="1" row="12" anchor="EAST">
+      <text>
+        <label xml:lang="de">Kommentar</label>
+        <label xml:lang="en">Comment</label>
+      </text>
+    </cell>
+    <cell col="2" row="12" anchor="EAST">
+      <helpPopup width="400px" height="250px">
+        <label xml:lang="de">
+          Kommentar
+        </label>
+        <label xml:lang="en">
+          Comment
+        </label>
+      </helpPopup>
+    </cell>
+    <cell col="3" row="12" anchor="WEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:note">
+      <repeater min="1" max="10" pos="right">
+        <panel>
+          <cell col="1">
+		    <textfield width="80" maxlength="128">
+              <label xml:lang="de">Tragen Sie hier Kommentare zur Dissertation/Hab./Diplom ein.</label>
+              <label xml:lang="en">Enter comments of thesis here.</label>
+            </textfield>
+		  </cell>
+        </panel>
+      </repeater>
+    </cell>
+<!-- Stichworte END -->
+
+
+<!-- Standort -->
+    <cell col="1" row="13" anchor="EAST">
+      <text>
+        <label xml:lang="de">Standort</label>
+        <label xml:lang="en">Standort</label>
+      </text>
+    </cell>
+    <cell col="2" row="13" anchor="EAST">
+      <helpPopup width="400px" height="250px">
+        <label xml:lang="de">
+          Standort
+        </label>
+        <label xml:lang="en">
+          Standort
+        </label>
+      </helpPopup>
+    </cell>
+	<!-- ToDo: richtiges MODS-Feld finden -->
+    <cell col="3" row="13" anchor="WEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:location">
+      <textfield width="80" maxlength="128">
+        <label xml:lang="de">Tragen Sie hier die interne Archivnummer ein.</label>
+        <label xml:lang="en">Enter internal archive number of thesis here.</label>
+      </textfield>
+    </cell>
+<!-- Standort END -->
+
+  </panel>
+
+</imports>
