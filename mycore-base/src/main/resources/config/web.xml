@@ -30,6 +30,103 @@
     <filter-class>org.mycore.frontend.filter.MCRUserAgentFilter</filter-class>
   </filter>
 
+  <servlet id="CreateObjectServlet">
+    <servlet-name>CreateObjectServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRPersistentServlet</servlet-class>
+    <init-param>
+      <param-name>operation</param-name>
+      <param-value>create</param-value>
+    </init-param>
+    <init-param>
+      <param-name>type</param-name>
+      <param-value>object</param-value>
+    </init-param>
+  </servlet>
+  <servlet id="UpdateObjectServlet">
+    <servlet-name>UpdateObjectServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRPersistentServlet</servlet-class>
+    <init-param>
+      <param-name>operation</param-name>
+      <param-value>update</param-value>
+    </init-param>
+    <init-param>
+      <param-name>type</param-name>
+      <param-value>object</param-value>
+    </init-param>
+  </servlet>
+  <servlet id="DeleteObjectServlet">
+    <servlet-name>DeleteObjectServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRPersistentServlet</servlet-class>
+    <init-param>
+      <param-name>operation</param-name>
+      <param-value>delete</param-value>
+    </init-param>
+    <init-param>
+      <param-name>type</param-name>
+      <param-value>object</param-value>
+    </init-param>
+  </servlet>
+  <servlet id="CreateDerivateServlet">
+    <servlet-name>CreateDerivateServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRPersistentServlet</servlet-class>
+    <init-param>
+      <param-name>operation</param-name>
+      <param-value>create</param-value>
+    </init-param>
+    <init-param>
+      <param-name>type</param-name>
+      <param-value>derivate</param-value>
+    </init-param>
+  </servlet>
+  <servlet id="UpdateDerivateServlet">
+    <servlet-name>UpdateDerivateServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRPersistentServlet</servlet-class>
+    <init-param>
+      <param-name>operation</param-name>
+      <param-value>update</param-value>
+    </init-param>
+    <init-param>
+      <param-name>type</param-name>
+      <param-value>derivate</param-value>
+    </init-param>
+  </servlet>
+  <servlet id="DeleteDerivateServlet">
+    <servlet-name>DeleteDerivateServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRPersistentServlet</servlet-class>
+    <init-param>
+      <param-name>operation</param-name>
+      <param-value>delete</param-value>
+    </init-param>
+    <init-param>
+      <param-name>type</param-name>
+      <param-value>derivate</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>CreateObjectServlet</servlet-name>
+    <url-pattern>/servlets/object/create</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>UpdateObjectServlet</servlet-name>
+    <url-pattern>/servlets/object/update</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>DeleteObjectServlet</servlet-name>
+    <url-pattern>/servlets/object/delete</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>CreateDerivateServlet</servlet-name>
+    <url-pattern>/servlets/derivate/create</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>UpdateDerivateServlet</servlet-name>
+    <url-pattern>/servlets/derivate/update</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>DeleteDerivateServlet</servlet-name>
+    <url-pattern>/servlets/derivate/delete</url-pattern>
+  </servlet-mapping>
+
   <servlet id="FileNode">
     <servlet-name>MCRFileNodeServlet</servlet-name>
     <servlet-class>org.mycore.datamodel.ifs.MCRFileNodeServlet</servlet-class>
