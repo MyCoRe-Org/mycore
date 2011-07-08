@@ -34,6 +34,7 @@
     <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:typeOfResource" descendants="true" />
     <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre" descendants="true" />
     <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/@ID" />
+    <hidden var="metadata/def.modsContainer/@class" default="MCRMetaXML" />
 
 <!-- pub_title_orig [text] -->
     <cell col="1" row="1" anchor="EAST">
