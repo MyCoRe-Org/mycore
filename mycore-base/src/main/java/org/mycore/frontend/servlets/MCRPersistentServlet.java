@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Properties;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -59,6 +60,7 @@ import org.mycore.frontend.cli.MCRDerivateCommands;
 import org.mycore.frontend.cli.MCRObjectCommands;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.fileupload.MCRUploadHandlerIFS;
+import org.mycore.services.i18n.MCRTranslation;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -71,8 +73,6 @@ public class MCRPersistentServlet extends MCRServlet {
     private static final Logger LOGGER = Logger.getLogger(MCRPersistentServlet.class);
 
     protected static String pagedir = MCRConfiguration.instance().getString("MCR.SWF.PageDir", "");
-
-    protected static String usererrorpage = pagedir + MCRConfiguration.instance().getString("MCR.SWF.PageErrorUser", "editor_error_user.xml");
 
     private static enum Operation {
         create, update, delete
@@ -428,7 +428,8 @@ public class MCRPersistentServlet extends MCRServlet {
         }
         String base = projectID + "_" + type;
         if (!(MCRAccessManager.checkPermission("create-" + base) || MCRAccessManager.checkPermission("create-" + type))) {
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
+            String msg = MCRTranslation.translate("component.swf.page.error.user.text");
+            job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN, msg);
             return;
         }
         StringBuilder sb = new StringBuilder();
