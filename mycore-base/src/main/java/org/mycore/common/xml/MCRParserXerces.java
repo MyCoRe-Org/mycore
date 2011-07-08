@@ -249,17 +249,17 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
     /**
      * Handles parse errors
      */
-    public void error(SAXParseException ex) {
+    public void error(SAXParseException ex) throws SAXParseException{
         LOGGER.error(getSAXErrorMessage(ex), ex);
-        throw new RuntimeException(ex);
+        throw ex;
     }
 
     /**
      * Handles fatal parse errors
      */
-    public void fatalError(SAXParseException ex) {
+    public void fatalError(SAXParseException ex)throws SAXParseException {
         LOGGER.fatal(getSAXErrorMessage(ex));
-        throw new RuntimeException(ex);
+        throw ex;
     }
 
     /**
