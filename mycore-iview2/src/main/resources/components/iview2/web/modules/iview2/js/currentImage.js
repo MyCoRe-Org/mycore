@@ -7,7 +7,7 @@
       this.name = null;
       this.height = 0;
       this.width = 0;
-      this.maxZoom = 0;
+      this.zoomInfo = new iview.ZoomInformation();
       iview.IViewObject.call(this, iviewInst);
       jQuery(this).bind(iview.CurrentImage.CHANGE_EVENT, function(event) {
         if (console && console.log) {
@@ -40,19 +40,13 @@
     constructor.prototype.setHeight = function ci_setHeight(height) {
       this.height = height;
     };
-    constructor.prototype.getMaxZoomLevel = function ci_getMaxZoomLevel() {
-      return this.maxZoom;
-    };
-    constructor.prototype.setMaxZoomLevel = function ci_setMaxZoomLevel(maxZoom) {
-      return this.maxZoom = maxZoom;
-    };
     constructor.prototype.processImageProperties = function ci_processImageProperties(imageProperties, name) {
       var values = nodeAttributes(imageProperties.getElementsByTagName("imageinfo")[0]);
       // this.iview.tiles = parseInt(values['tiles']);
       this.setName(name);
       this.setWidth(parseInt(values['width']));
       this.setHeight(parseInt(values['height']));
-      this.setMaxZoomLevel(parseInt(values['zoomLevel']));
+      this.zoomInfo.setMaxLevel(parseInt(values['zoomLevel']));
       jQuery(this).trigger(iview.CurrentImage.CHANGE_EVENT);
     };
 
@@ -60,5 +54,27 @@
 
   })();
   iview.CurrentImage.CHANGE_EVENT = "imageChanged";
+  
+  iview.ZoomInformation=(function(){
+    function constructor(){
+      this.maxZoom=0;
+      this.scale=1;
+    }
+    constructor.prototype = {
+        getMaxLevel : function zi_getMaxLevel() {
+          return this.maxZoom;
+        },
+        setMaxLevel : function zi_setMaxLevel(maxZoom) {
+          return this.maxZoom = maxZoom;
+        },
+        getScale : function zi_getScale() {
+          return this.scale;
+        },
+        setScale : function zi_setScale(scale) {
+          return this.scale = scale;
+        },
+    };
+    return constructor;
+  })();
 })();
 

@@ -158,7 +158,6 @@ genProto.zoomCenter = function(direction, point) {
  * @description	here some important values and listener are set correctly, calculate simple image name hash value to spread request over different servers and initialise the viewer
  */
 genProto.initializeGraphic = function() {
-	this.iview.zoomScale = 1;//init for the Zoomscale is changed within CalculateZoomProp
 	this.iview.loaded = false;//indicates if the window is finally loaded
 	this.iview.tilesize = tilesize;
 	this.iview.initialModus = "none";
@@ -183,7 +182,7 @@ genProto.initializeGraphic = function() {
 			initialPan: {'x' : 0, 'y' : 0 },//Koordianten der oberen linken Ecke
 			tileSize: this.iview.tilesize,//Kachelgroesse
 			tileUrlProvider: iviewTileUrlProvider,
-			maxZoom: this.iview.currentImage.getMaxZoomLevel(),
+			maxZoom: this.iview.currentImage.zoomInfo.getMaxLevel(),
 			initialZoom: this.iview.zoomInit,//Anfangs-Zoomlevel
 			loadingTile: "../modules/iview2/" + styleFolderUri + 'blank.gif'
 		});
@@ -254,18 +253,19 @@ genProto.reinitializeGraphic = function() {
 	
 	this.handleScrollbars("resize");
 	
+	var zoomScale=this.iview.currentImage.zoomInfo.getScale();
 	if (this.iview.useCutOut) {
 		this.iview.cutOutModel.setRatio({
-			'x': viewerBean.width / ((this.iview.currentImage.getWidth() / Math.pow(2, this.iview.currentImage.getMaxZoomLevel() - viewerBean.zoomLevel))*this.iview.zoomScale),
-			'y': viewerBean.height / ((this.iview.currentImage.getHeight() / Math.pow(2, this.iview.currentImage.getMaxZoomLevel() - viewerBean.zoomLevel))*this.iview.zoomScale)});
+			'x': viewerBean.width / ((this.iview.currentImage.getWidth() / Math.pow(2, this.iview.currentImage.zoomInfo.getMaxLevel() - viewerBean.zoomLevel))*zoomScale),
+			'y': viewerBean.height / ((this.iview.currentImage.getHeight() / Math.pow(2, this.iview.currentImage.zoomInfo.getMaxLevel() - viewerBean.zoomLevel))*zoomScale)});
 		this.iview.cutOutModel.setPos({
-			'x': - (viewerBean.x / Math.pow(2, viewerBean.zoomLevel))*this.iview.zoomScale,
-			'y': - (viewerBean.y / Math.pow(2, viewerBean.zoomLevel))*this.iview.zoomScale});
+			'x': - (viewerBean.x / Math.pow(2, viewerBean.zoomLevel))*zoomScale,
+			'y': - (viewerBean.y / Math.pow(2, viewerBean.zoomLevel))*zoomScale});
 	}
 	
 	// Actualize forward & backward Buttons
 	var previewTbView = jQuery(this.iview.getToolbarCtrl().getView("previewTbView").toolbar);
-	var newTop = ((((this.iview.currentImage.getHeight() / Math.pow(2, this.iview.currentImage.getMaxZoomLevel() - 1)) * this.iview.zoomScale) - (previewTbView.height() + toInt(previewTbView.css("padding-top")) + toInt(previewTbView.css("padding-bottom")))) / 2) + "px";
+	var newTop = ((((this.iview.currentImage.getHeight() / Math.pow(2, this.iview.currentImage.zoomInfo.getMaxLevel() - 1)) * zoomScale) - (previewTbView.height() + toInt(previewTbView.css("padding-top")) + toInt(previewTbView.css("padding-bottom")))) / 2) + "px";
 	if (this.iview.viewerContainer.hasClass("viewerContainer min")) {
 		this.iview.viewerContainer.find(".toolbars .toolbar").css("top", newTop);
 	}
