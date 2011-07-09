@@ -422,7 +422,8 @@ ToolbarController.prototype.perform = function(action, argument, buttonset, butt
 ToolbarController.prototype.paint = function(model) {
 	try {
 		for (var view in this.relations[model]) {
-			this.views[this.relations[model][view]].paint();
+		  if (typeof this.views[this.relations[model][view]]!= "undefined")
+		    this.views[this.relations[model][view]].paint();
 		}
 	} catch (e) {
 		if (typeof console != "undefined") {
