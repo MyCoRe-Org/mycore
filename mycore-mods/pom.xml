@@ -24,6 +24,16 @@
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <layoutDefinitions>
+            <layoutDefinition>
+              <objectType>mods</objectType>
+              <layouts>
+                <layout>diplom</layout>
+              </layouts>
+            </layoutDefinition>
+          </layoutDefinitions>
+        </configuration>
       </plugin>
     </plugins>
   </build>
