@@ -154,3 +154,19 @@ function preventDefault(e) {
 		e.returnValue = false;
 	}
 }
+
+function hideProperty(o,name,writeable){
+  if (typeof Object.defineProperty === 'function'){
+    Object.defineProperty(o, name, {
+      writable: (typeof writeable !== "undefined")? writeable : true,
+      enumerable: false,
+      configurable: false,
+    });
+  }
+}
+
+function log(msg){
+  if (typeof(console)!=="undefined") {
+    console.log(msg);
+  }
+}

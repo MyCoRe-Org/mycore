@@ -10,11 +10,9 @@
       this.zoomInfo = new iview.ZoomInformation();
       iview.IViewObject.call(this, iviewInst);
       jQuery(this).bind(iview.CurrentImage.CHANGE_EVENT, function(event) {
-        if (console && console.log) {
-          console.log("Catched event: " + iview.CurrentImage.CHANGE_EVENT);
-          console.log(this);
-          console.log(event);
-        }
+        log("Catched event: " + iview.CurrentImage.CHANGE_EVENT);
+        log(this);
+        log(event);
       });
     }
 
@@ -54,27 +52,26 @@
 
   })();
   iview.CurrentImage.CHANGE_EVENT = "imageChanged";
-  
-  iview.ZoomInformation=(function(){
-    function constructor(){
-      this.maxZoom=0;
-      this.scale=1;
+
+  iview.ZoomInformation = (function() {
+    function constructor() {
+      this.maxZoom = 0;
+      this.scale = 1;
     }
     constructor.prototype = {
-        getMaxLevel : function zi_getMaxLevel() {
-          return this.maxZoom;
-        },
-        setMaxLevel : function zi_setMaxLevel(maxZoom) {
-          return this.maxZoom = maxZoom;
-        },
-        getScale : function zi_getScale() {
-          return this.scale;
-        },
-        setScale : function zi_setScale(scale) {
-          return this.scale = scale;
-        },
+      getMaxLevel : function zi_getMaxLevel() {
+        return this.maxZoom;
+      },
+      setMaxLevel : function zi_setMaxLevel(maxZoom) {
+        return this.maxZoom = maxZoom;
+      },
+      getScale : function zi_getScale() {
+        return this.scale;
+      },
+      setScale : function zi_setScale(scale) {
+        return this.scale = scale;
+      },
     };
     return constructor;
   })();
 })();
-

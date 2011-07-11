@@ -1,24 +1,15 @@
 var iview = iview || {};
 
-//this is for opera, ff<4, ie<9
-if (typeof Object.create !== 'function') {
-  Object.create = function(o) {
-    var F = function() {
-    };
-    F.prototype = o;
-    return new F();
-  };
-}
-
 iview.IViewObject = (function(){
   function constructor(iviewInst){
     this._iview=iviewInst;
+    hideProperty(this,"_iview", false);
   }
   constructor.prototype = {
       getViewer: function iv_getViewer(){
         return this._iview;
       },
-  }
+  };
   return constructor;
 })();
 

@@ -41,9 +41,10 @@
                 <jsSourceFile>jquery.simplemodal.js</jsSourceFile>
                 <!-- JQuery MCRI18N support -->
                 <jsSourceFile>jquery.mcri18n.js</jsSourceFile>
-                <!-- jQuery Tree -->
-                <jsSourceFile>i18n.js</jsSourceFile>
+                <!-- Compatibility Library for browsers that do not support ECMA-Script 5th Edition -->
+                <jsSourceFile>ecma5compat.js</jsSourceFile>
                 <!-- i18n Module -->
+                <jsSourceFile>i18n.js</jsSourceFile>
                 <jsSourceFile>PanoJS.js</jsSourceFile>
                 <!-- Viewer -->
                 <jsSourceFile>init.js</jsSourceFile>
