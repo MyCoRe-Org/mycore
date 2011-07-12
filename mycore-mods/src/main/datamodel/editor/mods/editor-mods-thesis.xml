@@ -2,7 +2,7 @@
 
 <imports>
 
-  <panel id="edit-mods-diplom">
+  <panel id="edit-mods-thesis">
     <hidden var="@ID" />
     <hidden var="@label" />
     <hidden var="@version" />

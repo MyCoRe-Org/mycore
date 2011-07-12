@@ -31,7 +31,7 @@
             <layoutDefinition>
               <objectType>mods</objectType>
               <layouts>
-                <layout>diplom</layout>
+                <layout>thesis</layout>
               </layouts>
             </layoutDefinition>
           </layoutDefinitions>

@@ -133,7 +133,7 @@
       <xsl:variable name="layout">
         <xsl:choose>
           <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='thesis'">
-            <xsl:value-of select="'diplom'"/>
+            <xsl:value-of select="'thesis'"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="'$'"/>
