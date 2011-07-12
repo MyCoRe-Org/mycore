@@ -25,6 +25,8 @@
           </execution>
         </executions>
         <configuration>
+          <targetEditorDirectory>${project.build.outputDirectory}/components/mods/web/editor</targetEditorDirectory>
+          <webDirectory>${project.build.outputDirectory}/components/mods/web</webDirectory>
           <layoutDefinitions>
             <layoutDefinition>
               <objectType>mods</objectType>

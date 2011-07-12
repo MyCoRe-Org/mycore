@@ -130,8 +130,19 @@
 <!--         </td> -->
 <!--       </tr> -->
       <!--*** Editor Buttons ************************************* -->
+      <xsl:variable name="layout">
+        <xsl:choose>
+          <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='thesis'">
+            <xsl:value-of select="'diplom'"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="'$'"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
       <xsl:call-template name="editobject_with_der">
         <xsl:with-param select="./@ID" name="id" />
+        <xsl:with-param select="$layout" name="layout" />
       </xsl:call-template>
       <xsl:variable name="typeToken">
         <types>
