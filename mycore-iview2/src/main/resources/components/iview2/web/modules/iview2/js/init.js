@@ -110,7 +110,7 @@ PanoJS.TileUrlProvider.prototype.getImageHash = function(image){
  * returns the URL of all tileimages
  */
 PanoJS.TileUrlProvider.prototype.assembleUrl = function(xIndex, yIndex, zoom, image){
-	image=(image == null)? this.prefix : image;
+	image=(image == null)? this.getCurrentImage().getName() : image;
     return this.baseUri[(this.getImageHash(image)+xIndex+yIndex) % this.baseUri.length] + '/'+ this.derivate+'/' + 
         image + '/' + zoom + '/' + yIndex + '/' + xIndex + '.' + this.extension +
         (PanoJS.REVISION_FLAG ? '?r=' + PanoJS.REVISION_FLAG : '');
@@ -151,9 +151,6 @@ genProto.zoomCenter = function(direction, point) {
 genProto.initializeGraphic = function() {
 	this.iview.loaded = false;//indicates if the window is finally loaded
 	this.iview.tilesize = tilesize;
-	this.iview.initialModus = "none";
-	// if the viewer started with an image with an single zoomLevel 0, because zoomMax = zoomInit & so initialZoom wont set
-	this.iview.initialZoom = 0;
 	this.iview.maximized = maximized;
 	this.iview.images = [];
 	PanoJS.USE_SLIDE = false;
@@ -164,10 +161,14 @@ genProto.initializeGraphic = function() {
 	// opera triggers the onload twice
 	var iviewTileUrlProvider = new PanoJS.TileUrlProvider(this.iview.baseUri, this.iview.currentImage.getName(), 'jpg');
 	iviewTileUrlProvider.derivate = this.iview.viewID;
+	var that = this;
+	iviewTileUrlProvider.getCurrentImage = function initializeGraphic_getCurrentImage(){
+	  return that.iview.currentImage;
+	};
 
 	/**
-	 * initialise the viewer
-	 */
+   * initialise the viewer
+   */
 	if (this.iview.viewerBean == null) {
 		this.iview.viewerBean = new PanoJS("viewer"+this.iview.viewID, {
 			initialPan: {'x' : 0, 'y' : 0 },//Koordianten der oberen linken Ecke

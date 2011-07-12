@@ -69,34 +69,14 @@ genProto.loadPage = function(callback) {
 genProto.processImageProperties = function(imageProperties, url){
   this.iview.currentImage.processImageProperties(imageProperties, url);
 	var viewerBean = this.iview.viewerBean;
-
-	if (viewerBean) {
-		// checks if current zoomlevel was "greater" as zoomMax, so the current zoomLevel wouldn't reach
-		// update the initialZoom only if this is not the case
-		if (viewerBean.zoomLevel != this.iview.currentImage.zoomInfo.getMaxLevel() || this.iview.initialZoom <= viewerBean.zoomLevel) {
-			this.iview.initialZoom = viewerBean.zoomLevel;
-		}
-		
-		// checks for enabled Modi & reset before
-		this.iview.initialModus = "none";
-		if (this.iview.zoomWidth) {
-			this.iview.initialModus = "width";
-		}
-		if (this.iview.zoomScreen) {
-			this.iview.initialModus = "screen";
-		}
-	}
-
-	if (!isNaN(parseInt(URL.getParam("zoom")))) {
-		this.iview.zoomInit = parseInt(URL.getParam("zoom"));
-		if (this.iview.zoomInit > this.iview.currentImage.zoomInfo.getMaxLevel())
-			this.iview.zoomInit = this.iview.currentImage.zoomInfo.getMaxLevel();
-		if (this.iview.zoomInit < 0)
-			this.iview.zoomInit = 0;
-	} else {
-		// zoomLevel 0 ist erstes Level
-		this.iview.zoomInit = Math.ceil((this.iview.currentImage.zoomInfo.getMaxLevel() + 1) / 2) - 1;
-	}
+	
+	// checks for enabled Modi & reset before
+	//TODO: check if initialModus is still needed
+	this.iview.initialModus = this.iview.zoomWidth ? "width" : this.iview.zoomScreen ? "screen" : "none";
+  //TODO: check if zoomInit is still needed
+	this.iview.zoomInit = Math.min(viewerBean.zoomLevel,this.iview.currentImage.zoomInfo.getMaxLevel());
+	var thumbSource=viewerBean.tileUrlProvider.assembleUrl(0,0,0);
+	
 	var preload = new Image();
 	preload.className = "preloadImg";
 	var preloadCont=this.iview.my.preload;
@@ -104,36 +84,19 @@ genProto.processImageProperties = function(imageProperties, url){
 					 "height" : this.iview.currentImage.getHeight() / Math.pow(2, this.iview.currentImage.zoomInfo.getMaxLevel() - this.iview.zoomInit) + "px"})
 			 .empty()
 			 .append(preload);
-
-	if (viewerBean == null) {
-		this.initializeGraphic();
-		viewerBean = this.iview.viewerBean;
-		viewerBean.addViewerZoomedListener(this);
-		viewerBean.addViewerMovedListener(this);
-		preload.src = viewerBean.tileUrlProvider.assembleUrl(0,0,0);
-	} else {
-		// prevents that (max) Zoomlevel will be reached which doesn't exists
-		if (this.iview.initialZoom < this.iview.currentImage.zoomInfo.getMaxLevel()) {
-			this.iview.zoomInit = this.iview.initialZoom;
-		} else {
-			this.iview.zoomInit = this.iview.currentImage.zoomInfo.getMaxLevel();
-		}
-		viewerBean.tileUrlProvider.prefix = this.iview.currentImage.getName();
-		preload.src = viewerBean.tileUrlProvider.assembleUrl(0,0,0);
-		viewerBean.resize();
-	}
+	preload.src = thumbSource;
+	preload.style.width = "100%";
+	preload.style.height = "100%";
+	
+	viewerBean.resize();
 	// moves viewer to zoomLevel zoomInit
 	viewerBean.maxZoomLevel = this.iview.currentImage.zoomInfo.getMaxLevel();
 	// handle special Modi for new Page
-	if (this.iview.initialModus == "width") {
-		// letzte Seite war in fitToWidth
-		// aktuell ist fuer die neue Page noch kein Modi aktiv
-		this.iview.zoomWidth = false;
-		this.pictureWidth();
-	} else if (this.iview.initialModus == "screen") {
-		// letzte Seite war in fitToScreen
-		// aktuelle ist fuer die neue Page noch kein Modi aktiv
-		this.iview.zoomScreen = false;
+	if (this.iview.zoomWidth) {
+	  this.iview.zoomWidth=false;
+	  this.pictureWidth();
+	} else if (this.iview.zoomScreen) {
+	  this.iview.zoomScreen=false;
 		this.pictureScreen();
 	} else {
 		// moves viewer to zoomLevel zoomInit
@@ -148,10 +111,8 @@ genProto.processImageProperties = function(imageProperties, url){
 	this.iview.roller = true;
 	viewerBean.positionTiles ({'x' : initX, 'y' : initY}, true);
 	
-	preload.style.width = "100%";
-	preload.style.height = "100%";
 	if (this.iview.useCutOut) {
-		this.iview.cutOutModel.setSrc(viewerBean.tileUrlProvider.assembleUrl(0,0,0));
+		this.iview.cutOutModel.setSrc(thumbSource);
 	}
 	this.updateModuls();
 	
@@ -773,7 +734,16 @@ genProto.loading = function() {
 	
 	//remove leading '/'
 	this.iview.startFile = encodeURI(this.iview.startFile.replace(/^\/*/,""));
-	this.loadPage(function(){that.startFileLoaded()});
+	that.initializeGraphic();
+	viewerBean = that.iview.viewerBean;
+	viewerBean.addViewerZoomedListener(that);
+	viewerBean.addViewerMovedListener(that);
+  if (!isNaN(parseInt(URL.getParam("zoom")))) {
+    viewerBean.zoomLevel= parseInt(URL.getParam("zoom"));
+  }
+	this.loadPage(function(){
+	  that.startFileLoaded()
+	});
 }
 
 /**
