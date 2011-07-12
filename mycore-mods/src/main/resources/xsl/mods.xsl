@@ -121,19 +121,14 @@
     <table cellspacing="0" cellpadding="0" id="metaData">
       <!--1***modsContainer************************************* -->
       <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/*/*" />
-<!--       <tr> -->
-<!--         <td class="metaname"> -->
-<!--           <xsl:value-of select="concat(i18n:translate('metaData.mods.modsContainer'),' :')" /> -->
-<!--         </td> -->
-<!--         <td class="metavalue"> -->
-<!--           <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/*" /> -->
-<!--         </td> -->
-<!--       </tr> -->
       <!--*** Editor Buttons ************************************* -->
       <xsl:variable name="layout">
         <xsl:choose>
           <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='thesis'">
             <xsl:value-of select="'thesis'"/>
+          </xsl:when>
+          <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:genre='periodical'">
+            <xsl:value-of select="'periodical'"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="'$'"/>
