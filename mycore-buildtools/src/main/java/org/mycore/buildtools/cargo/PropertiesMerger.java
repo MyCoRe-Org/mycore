@@ -34,7 +34,7 @@ import org.mycore.buildtools.common.OutputSortedProperties;
 /**
  * This class implements a merger for property files The properties in the base
  * file will be overwritten or complemented by the properties of the delta file.
- * Itwill be used for the goal cargo:uberwar of the Cargo Maven2 Plugin
+ * It will be used for the goal cargo:uberwar of the Cargo Maven2 Plugin
  * (http://cargo.codehaus.org/Maven2+plugin) where different property files are
  * merged together. It works also for i18n language files (like
  * messages_de.properties). The result is a properties file alphabetically
@@ -45,7 +45,6 @@ import org.mycore.buildtools.common.OutputSortedProperties;
  * 
  * @author Robert Stephan
  */
-@SuppressWarnings("unchecked")
 public class PropertiesMerger implements MergeProcessor {
 	private ArrayList<ByteArrayInputStream> propsList;
 
@@ -53,7 +52,7 @@ public class PropertiesMerger implements MergeProcessor {
 	 * the constructor
 	 */
 	public PropertiesMerger() {
-		propsList = new ArrayList();
+		propsList = new ArrayList<ByteArrayInputStream>();
 
 	}
 
@@ -89,8 +88,9 @@ public class PropertiesMerger implements MergeProcessor {
 					.output(baseProps, sw,
 							"Properties merged by org.mycore.buildtools.cargo.PropertiesMerger");
 
+			//property files should always be ISO-8859-1 encoded in Java
 			ByteArrayInputStream bais = new ByteArrayInputStream(sw.toString()
-					.getBytes());
+					.getBytes("ISO-8859-1"));
 			return bais;
 		} catch (Exception e) {
 			return null;
