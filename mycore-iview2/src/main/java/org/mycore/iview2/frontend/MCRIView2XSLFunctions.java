@@ -1,31 +1,37 @@
 /*
  * $Id$
  * $Revision$ $Date$
- *
- * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
- *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program, in a file called gpl.txt or license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * 
+ * This file is part of *** M y C o R e *** See http://www.mycore.de/ for
+ * details.
+ * 
+ * This program is free software; you can use it, redistribute it and / or
+ * modify it under the terms of the GNU General Public License (GPL) as
+ * published by the Free Software Foundation; either version 2 of the License or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program, in a file called gpl.txt or license.txt. If not, write to the
+ * Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307 USA
  */
 
 package org.mycore.iview2.frontend;
 
 import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 
+import java.util.List;
+
 import org.mycore.common.MCRConfiguration;
+import org.mycore.datamodel.metadata.MCRMetaLinkID;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -34,7 +40,6 @@ import org.w3c.dom.NodeList;
 
 /**
  * @author Thomas Scheffler (yagee)
- *
  */
 public class MCRIView2XSLFunctions {
 
@@ -48,6 +53,21 @@ public class MCRIView2XSLFunctions {
 
     public static String getSupportedMainFile(String derivateID) {
         return adapter.getSupportedMainFile(derivateID);
+    }
+
+    /**
+     * Get the full path of the main file of the first derivate.
+     * 
+     * @param mcrID
+     * @return the mainfile of the first derivate related to the given mcrid or
+     *         null if there are no derivates related to the given mcrid
+     */
+    public static String getSupportedMainFileByOwner(String mcrID) {
+        MCRObject obj = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(mcrID));
+        List<MCRMetaLinkID> derivates = obj.getStructure().getDerivates();
+        if (derivates.size() > 0)
+            return derivates.get(0).toString() + adapter.getSupportedMainFile(derivates.get(0).toString());
+        return null;
     }
 
     public static String getThumbnailURL(String derivate, String imagePath) {
