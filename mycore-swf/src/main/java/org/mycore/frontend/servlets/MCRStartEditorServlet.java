@@ -760,12 +760,36 @@ public class MCRStartEditorServlet extends MCRServlet {
      * 
      * @param job
      *            the MCRServletJob instance
+     * @param cd
+     *            the common data block
      */
     public void seditobj(MCRServletJob job, CommonData cd) throws IOException {
         if (!MCRAccessManager.checkPermission(cd.mytfmcrid, "writedb")) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
         }
+        sobj(job,cd);
+    }
+    
+    /**
+     * The method start the editor to add a metadata object that is stored in
+     * the server. The method use the input parameter: <b>type</b>,<b>step</b>
+     * and <b>tf_mcrid</b>. Access rights must be 'create-...'.
+     * 
+     * @param job
+     *            the MCRServletJob instance
+     * @param cd
+     *            the common data block
+     */
+    public void snewobj(MCRServletJob job, CommonData cd) throws IOException {
+        if ((!AI.checkPermission("create-" + cd.mytfmcrid.getBase())) && (!MCRAccessManager.checkPermission("create-" + cd.mytype))) {
+            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
+            return;
+        }
+        sobj(job,cd);
+    }
+
+    private void sobj(MCRServletJob job, CommonData cd) throws IOException {
         if (cd.mytfmcrid == null) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + mcriderrorpage));
             return;
