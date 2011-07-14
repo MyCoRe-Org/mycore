@@ -3,22 +3,22 @@
 
 <MyCoReWebPage>
 
-<section i18n="component.metsmods.page.commit.title" direction="ltr">
-  <p><i18n key="component.metsmods.page.commit.title"/></p>
+<section i18n="component.mets.page.commit.title" direction="ltr">
+  <p><i18n key="component.mets.page.commit.title"/></p>
   <p /><br /><p />
   <div class="textnormalnormal">
-    <i18n key="component.metsmods.page.commit.text"/>
+    <i18n key="component.mets.page.commit.text"/>
   </div>
   <p /><br /><p />
   <metsmods/>
 </section>
 
-<section i18n="component.metsmods.page.commit.title" direction="rtl">
+<section i18n="component.mets.page.commit.title" direction="rtl">
   <div style="text-align:right">
-  <p><i18n key="component.metsmods.page.commit.title"/></p>
+  <p><i18n key="component.mets.page.commit.title"/></p>
   <p /><br /><p />
   <div class="textnormalnormal">
-    <i18n key="component.metsmods.page.commit.text"/>
+    <i18n key="component.mets.page.commit.text"/>
   </div>
   <p /><br /><p />
   <metsmods/>

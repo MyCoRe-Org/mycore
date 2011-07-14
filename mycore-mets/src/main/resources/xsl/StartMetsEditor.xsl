@@ -250,7 +250,9 @@
                 <div dojoType="dijit.layout.ContentPane">
 
                   <div style="padding-top:0.5em;">
-                    <label for="structureType">Strukturtyp: </label>
+                    <label for="structureType">
+                      <xsl:value-of select="concat(i18n:translate('component.mets.dialog.structuretype'),': ')" />
+                    </label>
                     <div style="float:right;">
                       <input id="structureType" name="structureType" dojoType="dijit.form.ComboBox" autoComplete="true" type="text"
                         forceValidOption="true" persist="false" store="DFGStructureDatasetStore">
@@ -258,7 +260,9 @@
                     </div>
                   </div>
                   <div style="padding-top:0.5em;">
-                    <label for="structure">Strukturelement: </label>
+                    <label for="structure">
+                      <xsl:value-of select="concat(i18n:translate('component.mets.dialog.structureelement'),': ')" />
+                    </label>
                     <div style="float:right;">
                       <input id="structureName" name="structureName" dojoType="dijit.form.TextBox" class="dijitTextBox" type="text"
                         autocomplete="off"
@@ -284,7 +288,9 @@
                 <div dojoType="dijit.layout.ContentPane">
 
                   <div style="padding-top:0.5em;">
-                    <label for="structureTypeEdit">Strukturtyp </label>
+                    <label for="structureTypeEdit">
+                      <xsl:value-of select="i18n:translate('component.mets.dialog.structuretype')" />
+                    </label>
                     <div style="float:right;">
                       <input id="structureTypeEdit" name="structureTypeEdit" dojoType="dijit.form.ComboBox" autoComplete="true" type="text"
                         forceValidOption="true" persist="false" store="DFGStructureDatasetStore2" />
@@ -292,7 +298,9 @@
                   </div>
 
                   <div style="padding-top:0.5em;">
-                    <label for="structureNameEdit">Strukturelement </label>
+                    <label for="structureNameEdit">
+                      <xsl:value-of select="i18n:translate('component.mets.dialog.structureelement')" />
+                    </label>
                     <div style="float:right;">
                       <input id="structureNameEdit" name="structureNameEdit" dojoType="dijit.form.TextBox" />
                     </div>
@@ -319,14 +327,22 @@
                 <div id="cp1" dojoType="dijit.layout.ContentPane" style="height:120;">
                   <!-- from and to -->
                   <div style="float:left;">
-                    <label id="labelFromPrefix">Erste Seite: </label>
+                    <label id="labelFromPrefix">
+                      <xsl:value-of select="i18n:translate('component.mets.dialog.firstpage')" />
+                    </label>
                     <br />
-                    <label id="labelToPrefix">Letzte Seite: </label>
+                    <label id="labelToPrefix">
+                      <xsl:value-of select="i18n:translate('component.mets.dialog.lastpage')" />
+                    </label>
                   </div>
                   <div style="padding-bottom:0.5em;">
-                    <label id="labelFrom" class="foliationRange">to be set on the fly</label>
+                    <label id="labelFrom" class="foliationRange">
+                      <xsl:value-of select="i18n:translate('component.mets.dialog.label')" />
+                    </label>
                     <br />
-                    <label id="labelTo" class="foliationRange">to be set on the fly</label>
+                    <label id="labelTo" class="foliationRange">
+                      <xsl:value-of select="i18n:translate('component.mets.dialog.label')" />
+                    </label>
                   </div>
 
                   <!-- the combobox with the foliation types                -->
@@ -370,11 +386,7 @@
             <div id="saveFailedDialog" dojoType="dijit.Dialog" title="Ungültige Struktur">
               <div id="saveFailedDialogContentPane" dojoType="dijit.layout.ContentPane" style="width:300px; height:150px;">
                 <label id="saveFailedMsg" class="saveFailedMsg">
-                  Die Strukturinformationen konnten nicht gespeichert werden, da sie ungültig sind. Ein Strukturelement muss mindestens eine
-                  Seite (ein Bild) enthalten.
-                  <br />
-                  <br />
-                  Folgende Strukturelemente sind ungültig:
+                  <xsl:value-of select="i18n:translate('component.mets.msg.savefailed')" />
                 </label>
                 <label id="affectedItems" class="affectedItems" />
 
@@ -393,7 +405,9 @@
                 <div dojoType="dijit.layout.ContentPane">
                   <div dojoType="dojo.data.ItemFileReadStore" jsId="DocumentTypeStore" url="js/stores/DocumentTypes.js"></div>
                   <div style="padding-top:0.5em;">
-                    <label for="docTypeCombo">Dokumenttyp </label>
+                    <label for="docTypeCombo">
+                      <xsl:value-of select="i18n:translate('component.mets.msg.doctype')" />
+                    </label>
                     <div>
                       <input id="docTypeCombo" dojoType="dijit.form.ComboBox" autoComplete="true" invalidMessage="Bitte wählen Sie einen gültigen Dokumenttyp"
                         type="text" forceValidOption="true" persist="false" store="DocumentTypeStore">
@@ -402,7 +416,9 @@
                   </div>
 
                   <div style="padding-top:0.5em;">
-                    <label for="titleTextArea">Angezeigter Titel</label>
+                    <label for="titleTextArea">
+                      <xsl:value-of select="i18n:translate('component.msg.msg.title')" />
+                    </label>
                     <div>
                       <textarea id="titleTextBox" dojoType="dijit.form.SimpleTextarea" rows="4" cols="25"></textarea>
                     </div>
@@ -426,7 +442,9 @@
               <div id="upperEditItemDialogDialogContentPane" dojoType="dijit.layout.ContentPane" style="height:120px; width:300px">
                 <div dojoType="dijit.layout.ContentPane">
                   <div style="padding-top:0.5em;">
-                    <label for="orderLabelTextBox">Seitennummer</label>
+                    <label for="orderLabelTextBox">
+                      <xsl:value-of select="i18n:translate('component.mets.editor.pagenumber')" />
+                    </label>
                     <div style="float:right;">
                       <input id="orderLabelTextBox" dojoType="dijit.form.TextBox" class="dijitTextBox" type="text" />
                     </div>
@@ -434,7 +452,9 @@
                 </div>
                 <div dojoType="dijit.layout.ContentPane">
                   <div style="padding-top:0.5em;">
-                    <label for="commonLabelTextBox">Label (DFG-Viewer)</label>
+                    <label for="commonLabelTextBox">
+                      <xsl:value-of select="i18n:translate('component.mets.editor.label')" />
+                    </label>
                     <div style="float:right;">
                       <input id="commonLabelTextBox" dojoType="dijit.form.TextBox" class="dijitTextBox" type="text" />
                     </div>
@@ -457,7 +477,7 @@
             <div id="confirmReloadDialog" dojoType="dijit.Dialog" title="Struktur zurücksetzen/neuladen?">
               <div id="confirmReloadDialogContentPane" dojoType="dijit.layout.ContentPane" style="width:300px; height:100px;">
                 <label id="userInfoMsg">
-                  Alle nicht gespeicherten Information gehen verloren! Wollen Sie fortfahren?
+                  <xsl:value-of select="i18n:translate('component.mets.msg.reload')" />
                   <br />
                 </label>
                 <button dojoType="dijit.form.Button" id="cancelReload" label="Abbrechen" iconClass="circleIcon" onclick="dijit.byId('confirmReloadDialog').hide()" style="float: right; padding-top: 2em;"/>
@@ -476,46 +496,47 @@
 
             <!-- Tooltips -->
             <span dojoType="dijit.Tooltip" connectId="toolbar1.save">
-              Speichern
+              <xsl:value-of select="i18n:translate('component.mets.editor.type.save')" />
               </span>
+            
             <span dojoType="dijit.Tooltip" connectId="toolbar1.resetTree">
-              Strukturansicht zurückzusetzen
+              <xsl:value-of select="i18n:translate('component.mets.editor.type.reset')" />
               </span>
 
             <span dojoType="dijit.Tooltip" connectId="toolbar1.reloadTree">
-              Zur zuletzt gespeicherten Version zurückkehren
+              <xsl:value-of select="i18n:translate('component.mets.editor.type.lastversion')" />
               </span>
 
             <span dojoType="dijit.Tooltip" connectId="toolbar1.setDocType">
-              Dokumenttitel und Dokumenttyp festlegen 
+              <xsl:value-of select="i18n:translate('component.mets.editor.type.title')" />
               </span>
 
             <span dojoType="dijit.Tooltip" connectId="toolbar1.addStructure">
-              Einen neuen Strukturtyp hinzufügen 
+              <xsl:value-of select="i18n:translate('component.mets.editor.type.add')" />
               </span>
 
             <span dojoType="dijit.Tooltip" connectId="toolbar1.editStructure">
-              Ausgewählten Strukturtyp bearbeiten
+              <xsl:value-of select="i18n:translate('component.mets.editor.type.edit')" />
               </span>
 
             <span dojoType="dijit.Tooltip" connectId="toolbar1.deleteStructure">
-              Ausgewählten Strukturtyp löschen
+              <xsl:value-of select="i18n:translate('component.mets.editor.type.delete')" />
               </span>
 
             <span dojoType="dijit.Tooltip" connectId="toolbar1.foliation">
-              Paginierung vornehmen
+              <xsl:value-of select="i18n:translate('component.mets.editor.pagination')" />
               </span>
 
             <span dojoType="dijit.Tooltip" connectId="toolbar1.reverse">
-              Reihenfolge umkehren
+              <xsl:value-of select="i18n:translate('component.mets.editor.order')" />
               </span>
 
             <span dojoType="dijit.Tooltip" connectId="toolbar1.help">
-              Hilfe
+              <xsl:value-of select="i18n:translate('component.mets.editor.help')" />
               </span>
 
             <span dojoType="dijit.Tooltip" connectId="saveItemProperties">
-              Änderungen übernehmen
+              <xsl:value-of select="i18n:translate('component.mets.editor.apply')" />
               </span>
           </body>
         </html>
@@ -524,12 +545,12 @@
         <html>
           <head>
             <title>
-              <xsl:value-of select="concat('Mets Editor ',i18n:translate('mets.editor.accessDenied'))" />
+              <xsl:value-of select="concat('Mets Editor ',i18n:translate('component.mets.editor.accessDenied'))" />
             </title>
           </head>
           <body>
             <div id="noAccessMsg">
-              <xsl:value-of select="i18n:translate('mets.editor.accessDenied.reason')" />
+              <xsl:value-of select="i18n:translate('component.mets.editor.accessDenied.reason')" />
             </div>
           </body>
         </html>
