@@ -512,4 +512,15 @@ public class MCRXMLFunctions {
         MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateId));
         return derivate.receiveDirectoryFromIFS().getSizeFormatted();
     }
+
+    /**
+     * @param derivateID
+     *            the derivate id
+     * @return the id of the mycore object that contains the derivate with the
+     *         given id
+     */
+    public static String getMCRObjectID(String derivateID) {
+        return MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateID)).getOwnerID().toString();
+    }
+
 }
