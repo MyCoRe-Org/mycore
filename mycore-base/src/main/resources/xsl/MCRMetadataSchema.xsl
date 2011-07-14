@@ -27,7 +27,7 @@
       elementFormDefault="qualified">
 
       <xsd:import namespace='http://www.w3.org/XML/1998/namespace' schemaLocation='xml-2001.xsd' />
-      <xsd:import namespace="http://www.w3.org/1999/xlink" schemaLocation="xlinks-2001.xsd" />
+      <xsd:import namespace="http://www.w3.org/1999/xlink" schemaLocation="xlink-2008-06.xsd" />
 
       <xsl:call-template name="mcrtypedefinitioncore" />
       <xsl:call-template name="mcrtypedefinition" />

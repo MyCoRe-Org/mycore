@@ -5,7 +5,7 @@
   elementFormDefault="qualified">
 
 <xsd:import schemaLocation="xml-2001.xsd" namespace="http://www.w3.org/XML/1998/namespace"/>
-<xsd:import schemaLocation="xlinks-2001.xsd" namespace="http://www.w3.org/1999/xlink"/>
+<xsd:import schemaLocation="xlink-2008-06.xsd" namespace="http://www.w3.org/1999/xlink"/>
  
 <xsd:element type="MCRClass" name="mycoreclass"/>
 
