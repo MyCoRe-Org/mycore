@@ -2,8 +2,8 @@
 <!-- Via XMLSpy,  Ray Denenberg, Library of Congress; rden@loc.gov -->
 <xs:schema xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.loc.gov/mods/v3" targetNamespace="http://www.loc.gov/mods/v3" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<!-- -->
-	<xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="http://www.loc.gov/mods/xml.xsd"/>
-	<xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="http://www.loc.gov/standards/xlink/xlink.xsd"/>
+	<xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml-2001.xsd"/>
+	<xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="xlink-2008-06.xsd"/>
 	<!-- 
                                                                     ****************************************************************
                                                                     *                                                                              * 
@@ -205,7 +205,7 @@ All type names are part of the MODS namespace
 	<xs:complexType name="accessConditionDefinition">
 		<xs:complexContent>
 			<xs:extension base="extensionDefinition">
-				<xs:attributeGroup ref="xlink:simpleLink"/>
+				<xs:attributeGroup ref="xlink:simpleAttrs"/>
 				<xs:attributeGroup ref="languageAttributeGroup"/>
 				<!-- attribute "displayLabel" was here in 3.3, removed in 3.4 because it has been added to the <extension> definition. -->
 				<xs:attribute name="type" type="xs:string"/>
@@ -499,7 +499,7 @@ All type names are part of the MODS namespace
 		<xs:attribute name="type" type="relatedItemTypeAttributeDefinition"/>
 		<xs:attribute name="displayLabel" type="xs:string"/>
 		<xs:attribute name="ID" type="xs:ID"/>
-		<xs:attributeGroup ref="xlink:simpleLink"/>
+		<xs:attributeGroup ref="xlink:simpleAttrs"/>
 	</xs:complexType>
 	<!--  
 
@@ -1048,7 +1048,7 @@ All type names are part of the MODS namespace
 			<xs:extension base="xsString">
 				<xs:attribute name="displayLabel" type="xs:string"/>
 				<xs:attribute name="type" type="xs:string"/>
-				<xs:attributeGroup ref="xlink:simpleLink"/>
+				<xs:attributeGroup ref="xlink:simpleAttrs"/>
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
@@ -1385,7 +1385,7 @@ Following are the element of the MODS 3.x namespace, as of version 3.4, declared
 	<xs:complexType name="stringPlusAuthorityPlusTypePlusDisplayLabelPlusXlink">
 		<xs:simpleContent>
 			<xs:extension base="stringPlusAuthorityPlusTypePlusDisplayLabel">
-				<xs:attributeGroup ref="xlink:simpleLink"/>
+				<xs:attributeGroup ref="xlink:simpleAttrs"/>
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
@@ -1450,7 +1450,7 @@ Following are the element of the MODS 3.x namespace, as of version 3.4, declared
 	<xs:attributeGroup name="idAuthorityXlinkLanguageDisplayLabelAttributeGroup">
 		<xs:attribute name="ID" type="xs:ID"/>
 		<xs:attributeGroup ref="authorityAttributeGroup"/>
-		<xs:attributeGroup ref="xlink:simpleLink"/>
+		<xs:attributeGroup ref="xlink:simpleAttrs"/>
 		<xs:attributeGroup ref="languageAttributeGroup"/>
 		<xs:attribute name="displayLabel" type="xs:string"/>
 	</xs:attributeGroup>
