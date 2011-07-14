@@ -32,8 +32,8 @@
 <!-- pub_title_orig [text] -->
     <cell col="1" row="1" anchor="NORTHEAST">
       <text>
-        <label xml:lang="de">Titel</label>
-        <label xml:lang="en">Title</label>
+        <label xml:lang="de">Titel (*)</label>
+        <label xml:lang="en">Title (*)</label>
       </text>
     </cell>
     <cell col="2" row="1" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title">
@@ -96,8 +96,8 @@
 <!-- pub_autor_dok_txt [text] and reviewer-->
     <cell col="1" row="3" anchor="NORTHEAST">
       <text>
-        <label xml:lang="de">Autor</label>
-        <label xml:lang="en">Author</label>
+        <label xml:lang="de">Autor (*)</label>
+        <label xml:lang="en">Author (*)</label>
       </text>
     </cell>
     <cell col="2" row="3" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@type='personal']">
@@ -153,8 +153,8 @@
 <!-- pub_sprache_txt -->
     <cell col="1" row="5" anchor="NORTHEAST">
       <text>
-        <label xml:lang="de">Sprache</label>
-        <label xml:lang="en">Language</label>
+        <label xml:lang="de">Sprache (*)</label>
+        <label xml:lang="en">Language (*)</label>
       </text>
     </cell>
     <cell col="2" row="5" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:language/mods:languageTerm">
@@ -163,6 +163,10 @@
         <hidden var="@type" default="code" />
         <cell col="1">
           <list id="ListLang" type="dropdown" default="ger">
+            <condition required="true">
+              <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
+              <label xml:lang="en">Please select one entry!</label>
+            </condition>
             <item value="ger">
               <label xml:lang="de">Deutsch</label>
               <label xml:lang="en">German</label>
@@ -224,22 +228,50 @@
 <!-- pub_klassifik -->
     <cell col="1" row="7" anchor="NORTHEAST">
       <text>
-        <label xml:lang="de">Genre</label>
-        <label xml:lang="en">Genre</label>
+        <label xml:lang="de">Genre (*)</label>
+        <label xml:lang="en">Genre (*)</label>
       </text>
     </cell>
     <cell col="2" row="7" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:classification">
-      <textfield width="44" maxlength="128">
+      <list id="ListGenre" type="dropdown" default="01">
         <condition required="true">
-          <label xml:lang="de">Forschungsergebnisse, In House Publikationen, Presseerklärungen, Poster, Zeitschrifteninhaltsverzeichnisse, …</label>
+          <label xml:lang="de">Forschungsergebnisse, In House Publikationen, Presseerklärungen, Poster, Zeitschrifteninhaltsverzeichnisse</label>
           <label xml:lang="en">What kind of report is this?</label>
         </condition>
-      </textfield>
+        <item value="01">
+          <label xml:lang="de">Forschungsergebnisse</label>
+          <label xml:lang="en">Forschungsergebnisse</label>
+        </item>
+        <item value="02">
+          <label xml:lang="de">In House</label>
+          <label xml:lang="en">In House</label>
+        </item>
+        <item value="03">
+          <label xml:lang="de">Presseerklärung</label>
+          <label xml:lang="en">Presseerklärung</label>
+        </item>
+        <item value="04">
+          <label xml:lang="de">Poster</label>
+          <label xml:lang="en">Poster</label>
+        </item>
+        <item value="05">
+          <label xml:lang="de">In House</label>
+          <label xml:lang="en">In House</label>
+        </item>
+        <item value="06">
+          <label xml:lang="de">Zeitschrifteninhaltsverzeichnis</label>
+          <label xml:lang="en">Zeitschrifteninhaltsverzeichnis</label>
+        </item>
+        <item value="07">
+          <label xml:lang="de">Sonstige</label>
+          <label xml:lang="en">Other</label>
+        </item>
+      </list>
     </cell>
     <cell col="3" row="7" anchor="NORTHWEST">
       <helpPopup width="400px" height="250px">
-        <label xml:lang="de">Wählen Sie bitte eine Zuordnung zur DDC-Sachgruppe aus.</label>
-        <label xml:lang="en">Select an entry from the ddc list.</label>
+        <label xml:lang="de">Wählen Sie bitte eine Zuordnung aus.</label>
+        <label xml:lang="en">Select an entry from the list.</label>
       </helpPopup>
     </cell>
 <!-- pub_klassifik END -->
@@ -291,21 +323,20 @@
     </cell>
 <!-- Identifier END -->
 
-
-<!-- Datum der Promotion [text] -->
+<!-- Publisher [text] -->
     <cell col="1" row="9" anchor="NORTHEAST">
       <text>
-        <label xml:lang="de">Datum</label>
-        <label xml:lang="en">Date</label>
+        <label xml:lang="de">Herausgeber</label>
+        <label xml:lang="en">Publisher</label>
       </text>
     </cell>
-    <cell col="2" row="9" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateIssued">
+    <cell col="2" row="9" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:publisher">
       <panel>
         <cell col="1">
           <textfield width="60" maxlength="128">
             <condition required="true">
-              <label xml:lang="de">Tragen Sie hier das Datum der Dissertation/Hab./Diplom ein.</label>
-              <label xml:lang="en">Enter the date of thesis here.</label>
+              <label xml:lang="de">Tragen Sie hier den Verleger/Herausgeber ein (Druckerei, Medienanstalt ...)).</label>
+              <label xml:lang="en">Enter publisher here.</label>
             </condition>
           </textfield>
         </cell>
@@ -314,24 +345,137 @@
     <cell col="3" row="9" anchor="NORTHWEST">
       <helpPopup width="400px" height="250px">
         <label xml:lang="de">
-          Datum der Promotion
+          Publisher (Druckerei, Medienanstalt ...)
         </label>
         <label xml:lang="en">
-          Date of Thesis
+          Publisher
         </label>
       </helpPopup>
     </cell>
-<!-- Datum der Promotion END -->
+<!-- Publisher END -->
 
 
-<!-- Institution -->
+<!-- Datum der Veröffentlichung [text] -->
     <cell col="1" row="10" anchor="NORTHEAST">
       <text>
-        <label xml:lang="de">Institution</label>
-        <label xml:lang="en">Institution</label>
+        <label xml:lang="de">Veröffentlichungsdatum (*)</label>
+        <label xml:lang="en">Date of Publishing (*)</label>
       </text>
     </cell>
-    <cell col="2" row="10" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:publisher">
+    <cell col="2" row="10" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateIssued">
+      <panel>
+        <cell col="1">
+          <textfield width="60" maxlength="128">
+            <condition required="true">
+              <label xml:lang="de">Tragen Sie hier das Datum der Veröffentlichung ein.</label>
+              <label xml:lang="en">Enter the date of publication here.</label>
+            </condition>
+          </textfield>
+        </cell>
+      </panel>
+    </cell>
+    <cell col="3" row="10" anchor="NORTHWEST">
+      <helpPopup width="400px" height="250px">
+        <label xml:lang="de">
+          Datum der Veröffentlichung
+        </label>
+        <label xml:lang="en">
+          Date of Publication
+        </label>
+      </helpPopup>
+    </cell>
+<!-- Datum der Veröffentlichung END -->
+
+<!-- Datum der Erstellung [text] -->
+    <cell col="1" row="11" anchor="NORTHEAST">
+      <text>
+        <label xml:lang="de">Erstellungsdatum</label>
+        <label xml:lang="en">Date of Creation</label>
+      </text>
+    </cell>
+    <!-- ToDo: richtiges MODS-Feld? -->
+    <cell col="2" row="11" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateCreated">
+      <panel>
+        <cell col="1">
+          <textfield width="60" maxlength="128" />
+        </cell>
+      </panel>
+    </cell>
+    <cell col="3" row="11" anchor="NORTHWEST">
+      <helpPopup width="400px" height="250px">
+        <label xml:lang="de">
+          Datum der Erstellung
+        </label>
+        <label xml:lang="en">
+          Date of Creation
+        </label>
+      </helpPopup>
+    </cell>
+<!-- Datum der Erstellung END -->
+
+<!-- Bei Postern -> Größe [text] -->
+    <cell col="1" row="12" anchor="NORTHEAST">
+      <text>
+        <label xml:lang="de">Größe</label>
+        <label xml:lang="en">Physical Description</label>
+      </text>
+    </cell>
+    <!-- ToDo: richtiges MODS-Feld? -->
+    <cell col="2" row="12" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:physicalDescription">
+      <panel>
+        <cell col="1">
+          <textfield width="60" maxlength="128" />
+        </cell>
+      </panel>
+    </cell>
+    <cell col="3" row="12" anchor="NORTHWEST">
+      <helpPopup width="400px" height="250px">
+        <label xml:lang="de">
+          Physikalische Beschreibung, z.B. bei Postern die Größe
+        </label>
+        <label xml:lang="en">
+          Physical description, e.g. size of poster
+        </label>
+      </helpPopup>
+    </cell>
+<!-- Bei Postern -> Größe [text] END -->
+
+
+<!-- Verweis auf andere Quelle -->
+    <cell col="1" row="13" anchor="NORTHEAST">
+      <text>
+        <label xml:lang="de">Weitere Quellen</label>
+        <label xml:lang="en">Related Resource</label>
+      </text>
+    </cell>
+    <!-- ToDo: richtiges MODS-Feld? -->
+    <cell col="2" row="13" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem">
+      <panel>
+        <cell col="1">
+          <textfield width="60" maxlength="128" />
+        </cell>
+      </panel>
+    </cell>
+    <cell col="3" row="13" anchor="NORTHWEST">
+      <helpPopup width="400px" height="250px">
+        <label xml:lang="de">
+          Verweis auf andere Quelle, z.B. Konferenzband
+        </label>
+        <label xml:lang="en">
+          Link to other source, e.g. conference proceeding
+        </label>
+      </helpPopup>
+    </cell>
+<!-- Verweis auf andere Quelle END -->
+
+<!-- Institution -->
+    <cell col="1" row="14" anchor="NORTHEAST">
+      <text>
+        <label xml:lang="de">Institution (*)</label>
+        <label xml:lang="en">Institution (*)</label>
+      </text>
+    </cell>
+    <cell col="2" row="14" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:publisher">
       <list width="30" type="dropdown">
         <include ref="pleaseSelect" />
         <!-- ToDo: richtige Klassifikation anlegen und einbinden -->
@@ -342,7 +486,7 @@
         </condition>
       </list>
     </cell>
-    <cell col="3" row="10" anchor="NORTHWEST">
+    <cell col="3" row="14" anchor="NORTHWEST">
       <helpPopup width="400px" height="250px">
         <label xml:lang="de">Wählen Sie die Institution aus, an der die Promotion eingereicht wurde</label>
         <label xml:lang="en">Select an institution from the list.</label>
@@ -352,13 +496,13 @@
 
 
 <!-- Stichworte -->
-    <cell col="1" row="11" anchor="NORTHEAST">
+    <cell col="1" row="15" anchor="NORTHEAST">
       <text>
         <label xml:lang="de">Stichworte</label>
         <label xml:lang="en">Subject</label>
       </text>
     </cell>
-    <cell col="2" row="11" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:subject">
+    <cell col="2" row="15" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:subject">
       <repeater min="1" max="500" pos="right" var="mods:topic">
         <panel>
           <cell col="1">
@@ -370,7 +514,7 @@
         </panel>
       </repeater>
     </cell>
-    <cell col="3" row="11" anchor="NORTHWEST">
+    <cell col="3" row="15" anchor="NORTHWEST">
       <helpPopup width="400px" height="250px">
         <label xml:lang="de">
           Stichworte
@@ -384,13 +528,13 @@
 
 
 <!-- Kommentar -->
-    <cell col="1" row="12" anchor="NORTHEAST">
+    <cell col="1" row="16" anchor="NORTHEAST">
       <text>
         <label xml:lang="de">Kommentar</label>
         <label xml:lang="en">Comment</label>
       </text>
     </cell>
-    <cell col="2" row="12" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:note">
+    <cell col="2" row="16" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:note">
       <repeater min="1" max="10" pos="right">
         <panel>
           <cell col="1">
@@ -402,7 +546,7 @@
         </panel>
       </repeater>
     </cell>
-    <cell col="3" row="12" anchor="NORTHWEST">
+    <cell col="3" row="16" anchor="NORTHWEST">
       <helpPopup width="400px" height="250px">
         <label xml:lang="de">
           Kommentar
@@ -416,19 +560,19 @@
 
 
 <!-- Standort -->
-    <cell col="1" row="13" anchor="NORTHEAST">
+    <cell col="1" row="17" anchor="NORTHEAST">
       <text>
         <label xml:lang="de">Standort</label>
         <label xml:lang="en">Location</label>
       </text>
     </cell>
-    <cell col="2" row="13" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:physicalLocation">
+    <cell col="2" row="17" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:physicalLocation">
       <textfield width="60" maxlength="128">
         <label xml:lang="de">Tragen Sie hier die interne Archivnummer ein.</label>
         <label xml:lang="en">Enter internal archive number of thesis here.</label>
       </textfield>
     </cell>
-    <cell col="3" row="13" anchor="NORTHWEST">
+    <cell col="3" row="17" anchor="NORTHWEST">
       <helpPopup width="400px" height="250px">
         <label xml:lang="de">
           Standort
