@@ -40,7 +40,8 @@ import org.jdom.output.XMLOutputter;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
-import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.common.xml.MCRXMLParserFactory;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -175,7 +176,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      * 
      */
     @SuppressWarnings("unchecked")
-    public static void createPermissionsFromFile(String filename) throws MCRException, SAXParseException {
+    public static void createPermissionsFromFile(String filename) throws Exception {
         MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
         if (!checkFilename(filename)) {
             return;
@@ -184,7 +185,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
 
         LOGGER.info("Reading file " + input + " ...");
 
-        org.jdom.Document doc = MCRXMLHelper.parseURI(input.toURI(), true);
+        org.jdom.Document doc = MCRXMLParserFactory.getValidatingParser().parseXML(MCRContent.readFrom(input));
         org.jdom.Element rootelm = doc.getRootElement();
 
         if (!rootelm.getName().equals("mcrpermissions")) {
@@ -308,13 +309,13 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         out.output(doc, fos);
     }
 
-    private static Element getRuleFromFile(String fileName) throws MCRException, SAXParseException {
+    private static Element getRuleFromFile(String fileName) throws Exception {
         if (!checkFilename(fileName)) {
             LOGGER.warn("Wrong file format or file doesn't exist");
             return null;
         }
         File input = new File(fileName);
-        Document ruleDom = MCRXMLHelper.parseURI(input.toURI());
+        Document ruleDom = MCRXMLParserFactory.getParser().parseXML(MCRContent.readFrom(input));
         Element rule = ruleDom.getRootElement();
         if (!rule.getName().equals("condition")) {
             LOGGER.warn("ROOT element is not valid, a valid rule would be for example:");
@@ -337,7 +338,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    public static void permissionUpdateForID(String permission, String id, String strFileRule) throws MCRException, SAXParseException {
+    public static void permissionUpdateForID(String permission, String id, String strFileRule) throws Exception {
         permissionUpdateForID(permission, id, strFileRule, "");
     }
 
@@ -357,8 +358,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    public static void permissionUpdateForID(String permission, String id, String strFileRule, String description) throws MCRException,
-            SAXParseException {
+    public static void permissionUpdateForID(String permission, String id, String strFileRule, String description) throws Exception {
         MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
         Element rule = getRuleFromFile(strFileRule);
         if (rule == null) {
@@ -379,7 +379,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    public static void permissionUpdateForSelected(String permission, String strFileRule) throws MCRException, SAXParseException {
+    public static void permissionUpdateForSelected(String permission, String strFileRule) throws Exception {
         permissionUpdateForSelected(permission, strFileRule, "");
     }
 
@@ -397,8 +397,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    public static void permissionUpdateForSelected(String permission, String strFileRule, String description) throws MCRException,
-            SAXParseException {
+    public static void permissionUpdateForSelected(String permission, String strFileRule, String description) throws Exception {
         MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
         Element rule = getRuleFromFile(strFileRule);
         if (rule == null) {
