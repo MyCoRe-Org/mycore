@@ -142,6 +142,7 @@ public abstract class MCRFilesystemNode {
 
     public void move(MCRDirectory dest) {
         this.ownerID = dest.getOwnerID();
+        getParent().removeChild(this);
         this.parentID = dest.getID();
         manager.storeNode(this);
         manager.clearMetadataCache();
