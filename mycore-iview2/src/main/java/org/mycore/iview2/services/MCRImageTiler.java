@@ -196,14 +196,18 @@ public class MCRImageTiler implements Runnable, Closeable {
         running = false;
         //Wake up, Neo!
         synchronized (tq) {
+            LOGGER.debug("Wake up tiling queue");
             tq.notifyAll();
         }
         runLock.lock();
         try {
             if (tilingServe != null) {
+                LOGGER.debug("Shutdown tiling executor jobs.");
                 tilingServe.shutdown();
                 try {
+                    LOGGER.debug("Await termination of tiling executor jobs.");
                     tilingServe.awaitTermination(60, TimeUnit.SECONDS);
+                    LOGGER.debug("All jobs finished.");
                 } catch (InterruptedException e) {
                     LOGGER.debug("Could not wait 60 seconds...", e);
                 }
