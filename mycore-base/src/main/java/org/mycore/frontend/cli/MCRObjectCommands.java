@@ -35,9 +35,10 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRURIResolver;
-import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -646,15 +647,16 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             return false;
         }
 
+        MCRContent content = MCRContent.readFrom(xml);
         File xmlOutput = new File(dir, nid.toString() + ".xml");
-        FileOutputStream out = new FileOutputStream(xmlOutput);
 
         if (trans != null) {
+            FileOutputStream out = new FileOutputStream(xmlOutput);
             StreamResult sr = new StreamResult(out);
-            trans.transform(new org.jdom.transform.JDOMSource(MCRXMLHelper.parseXML(xml, false)), sr);
+            Document doc = MCRXMLParserFactory.getNonValidatingParser().parseXML(content);
+            trans.transform(new org.jdom.transform.JDOMSource(doc), sr);
         } else {
-            out.write(xml);
-            out.flush();
+            content.sendTo(xmlOutput);
         }
         LOGGER.info("Object " + nid.toString() + " saved to " + xmlOutput.getCanonicalPath() + ".");
         return true;
@@ -692,7 +694,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    public static final boolean checkXMLFile(String fileName) throws MCRException, SAXParseException {
+    public static final boolean checkXMLFile(String fileName) throws MCRException, SAXParseException, IOException {
         if (!fileName.endsWith(".xml")) {
             LOGGER.warn(fileName + " ignored, does not end with *.xml");
 
@@ -708,10 +710,10 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         }
 
         LOGGER.info("Reading file " + file + " ...");
+        MCRContent content = MCRContent.readFrom(file);
 
-        if (MCRXMLHelper.parseURI(file.toURI()) != null) {
-            LOGGER.info("The file has no XML errors.");
-        }
+        MCRXMLParserFactory.getParser().parseXML(content);
+        LOGGER.info("The file has no XML errors.");
 
         return true;
     }

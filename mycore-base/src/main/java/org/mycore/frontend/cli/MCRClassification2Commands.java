@@ -25,6 +25,7 @@ package org.mycore.frontend.cli;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRURIResolver;
-import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -52,6 +53,7 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.common.MCRActiveLinkException;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -131,9 +133,9 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * @throws MCRException 
      * @see MCRCategoryDAO#addCategory(MCRCategoryID, MCRCategory)
      */
-    public static void loadFromFile(String filename) throws URISyntaxException, MCRException, SAXParseException {
+    public static void loadFromFile(String filename) throws URISyntaxException, MCRException, SAXParseException, IOException {
         File file = new File(filename);
-        Document xml = MCRXMLHelper.parseURI(file.toURI());
+        Document xml = MCRXMLParserFactory.getParser().parseXML(MCRContent.readFrom(file));
         MCRCategory category = MCRXMLTransformer.getCategory(xml);
         DAO.addCategory(null, category);
     }
@@ -148,9 +150,9 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * @throws MCRException 
      * @see MCRCategoryDAO#replaceCategory(MCRCategory)
      */
-    public static void updateFromFile(String filename) throws URISyntaxException, MCRException, SAXParseException {
+    public static void updateFromFile(String filename) throws URISyntaxException, MCRException, SAXParseException, IOException {
         File file = new File(filename);
-        Document xml = MCRXMLHelper.parseURI(file.toURI());
+        Document xml = MCRXMLParserFactory.getParser().parseXML(MCRContent.readFrom(file));
         MCRCategory category = MCRXMLTransformer.getCategory(xml);
         if (DAO.exist(category.getId())) {
             DAO.replaceCategory(category);
