@@ -120,6 +120,7 @@ public class MCRShutdownHandler {
             Closeable[] closeables = requests.toArray(new Closeable[0]);
             Arrays.sort(closeables, new MCRCloseableComparator());
             for (Closeable c : closeables) {
+                LOGGER.debug("Prepare Closing: " + c.toString());
                 c.prepareClose();
             }
 
