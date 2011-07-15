@@ -1,8 +1,22 @@
 <titles>
   <title step="author" type="mods" xml:lang="de">MODS-Dokument erstellen</title>
-  <title step="author" type="mods" xml:lang="en">create MODS document</title>
+  <title step="author" type="mods" xml:lang="en">Create MODS document</title>
   <title step="commit" type="mods" xml:lang="de">MODS-Dokument bearbeiten</title>
-  <title step="commit" type="mods" xml:lang="en">edit MODS document</title>
+  <title step="commit" type="mods" xml:lang="en">Edit MODS document</title>
   <title step="editor" type="mods" xml:lang="de">MODS-Dokument bearbeiten</title>
-  <title step="editor" type="mods" xml:lang="en">edit MODS document</title>
+  <title step="editor" type="mods" xml:lang="en">Edit MODS document</title>
+  
+  <title step="author" type="mods" layout="thesis" xml:lang="de">Dissertation erstellen</title>
+  <title step="author" type="mods" layout="thesis" xml:lang="en">Create Thesis</title>
+  <title step="commit" type="mods" layout="thesis" xml:lang="de">Dissertation bearbeiten</title>
+  <title step="commit" type="mods" layout="thesis" xml:lang="en">Edit Thesis</title>
+  <title step="editor" type="mods" layout="thesis" xml:lang="de">Dissertation bearbeiten</title>
+  <title step="editor" type="mods" layout="thesis" xml:lang="en">Edit Thesis</title>
+  
+  <title step="author" type="mods" layout="periodical" xml:lang="de">Report erstellen</title>
+  <title step="author" type="mods" layout="periodical" xml:lang="en">Create Report</title>
+  <title step="commit" type="mods" layout="periodical" xml:lang="de">Report bearbeiten</title>
+  <title step="commit" type="mods" layout="periodical" xml:lang="en">Edit Report</title>
+  <title step="editor" type="mods" layout="periodical" xml:lang="de">Report bearbeiten</title>
+  <title step="editor" type="mods" layout="periodical" xml:lang="en">Edit Report</title>
 </titles>
