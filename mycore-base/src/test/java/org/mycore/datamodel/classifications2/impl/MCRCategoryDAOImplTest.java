@@ -33,8 +33,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.criterion.Projections;
 import org.jdom.Document;
@@ -220,6 +222,83 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         MCRCategory movedNode = rootNode.getChildren().get(0);
         assertEquals("Did not expect this category on position 0.", moveNode.getId(), movedNode.getId());
     }
+    
+    @Test
+    public void moveRightCategory() throws SQLException {
+        String rootIDStr = "rootID";
+        MCRCategoryID rootID = MCRCategoryID.rootID(rootIDStr);
+        MCRCategoryID child1ID = new MCRCategoryID(rootIDStr, "child1");
+        MCRCategoryID child2ID = new MCRCategoryID(rootIDStr, "child2");
+        MCRCategoryImpl root = newCategory(rootID, "root node");
+        addChild(root, newCategory(child1ID, "child node 1"));
+        addChild(root, newCategory(child2ID, "child node 2"));
+        startNewTransaction();
+        DAO.addCategory(null, root);
+        endTransaction();
+        assertLeftRightVal(rootID, 0, 5);
+        assertLeftRightVal(child1ID, 1, 2);
+        assertLeftRightVal(child2ID, 3, 4);
+        
+        startNewTransaction();
+        DAO.moveCategory(child2ID, child1ID);
+        endTransaction();
+        assertLeftRightVal(rootID, 0, 5);
+        assertLeftRightVal(child1ID, 1, 4);
+        assertLeftRightVal(child2ID, 2, 3);
+    }
+    
+    @Test
+    public void moveLeftCategory() throws SQLException {
+        String rootIDStr = "rootID";
+        MCRCategoryID rootID = MCRCategoryID.rootID(rootIDStr);
+        MCRCategoryID child1ID = new MCRCategoryID(rootIDStr, "child1");
+        MCRCategoryID child2ID = new MCRCategoryID(rootIDStr, "child2");
+        MCRCategoryImpl root = newCategory(rootID, "root node");
+        MCRCategoryImpl child1 = newCategory(child1ID, "child node 1");
+        addChild(root, child1);
+        addChild(child1, newCategory(child2ID, "child node 2"));
+        
+        startNewTransaction();
+        DAO.addCategory(null, root);
+        endTransaction();
+        assertLeftRightVal(rootID, 0, 5);
+        assertLeftRightVal(child1ID, 1, 4);
+        assertLeftRightVal(child2ID, 2, 3);
+        
+        startNewTransaction();
+        DAO.moveCategory(child2ID, rootID);
+        endTransaction();
+        assertLeftRightVal(rootID, 0, 5);
+        assertLeftRightVal(child1ID, 1, 2);
+        assertLeftRightVal(child2ID, 3, 4);
+    }
+
+    private void assertLeftRightVal(MCRCategoryID categID, int expectedLeftVal, int expectedRightVal) {
+        startNewTransaction();
+        MCRCategoryImpl retrievedRoot = (MCRCategoryImpl) DAO.getCategory(categID, 0);
+        endTransaction();
+        assertNotNull(retrievedRoot);
+        assertEquals("Left value should be " + expectedLeftVal + ".",expectedLeftVal, retrievedRoot.getLeft());
+        assertEquals("Right value should be " + expectedRightVal + ".",expectedRightVal , retrievedRoot.getRight());
+    }
+
+    private void addChild(MCRCategoryImpl parent, MCRCategoryImpl child) {
+        List<MCRCategory> children = parent.getChildren();
+        if(children == null){
+            parent.setChildren(new ArrayList<MCRCategory>());
+            children = parent.getChildren();
+        }
+        children.add(child);
+    }
+
+    private MCRCategoryImpl newCategory(MCRCategoryID id,String description) {
+        MCRCategoryImpl newCateg = new MCRCategoryImpl();
+        newCateg.setId(id);
+        Set<MCRLabel> labels = new HashSet<MCRLabel>();
+        labels.add(new MCRLabel("en", id.toString(), description));
+        newCateg.setLabels(labels);
+        return newCateg;
+    }
 
     @Test
     public void removeLabel() {
@@ -254,7 +333,7 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         MCRCategory oldCategory = DAO.getCategory(new MCRCategoryID("World", "Europe"), -1);
         DAO.replaceCategory(oldCategory);
     }
-
+    
     @Test
     public void setLabel() {
         addWorldClassification();
