@@ -28,14 +28,11 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URI;
 
-import org.apache.log4j.Logger;
 import org.apache.xerces.parsers.SAXParser;
 import org.jdom.Document;
-import org.jdom.input.JDOMParseException;
 import org.jdom.input.SAXBuilder;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
-import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
 
@@ -49,10 +46,7 @@ import org.xml.sax.SAXParseException;
  * 
  * @version $Revision$ $Date$
  */
-public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
-
-    /** The logger */
-    private final static Logger LOGGER = Logger.getLogger(MCRParserXerces.class);
+public class MCRParserXerces implements MCRParserInterface {
 
     private final static String PARSER_CLASS_NAME = SAXParser.class.getCanonicalName();
 
@@ -83,14 +77,14 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
         builderValid.setFeature(FEATURE_SCHEMA_SUPPORT, true);
         builderValid.setFeature(FEATURE_FULL_SCHEMA_SUPPORT, false);
         builderValid.setReuseParser(false);
-        builderValid.setErrorHandler(this);
+        builderValid.setErrorHandler(new MCRXMLParserErrorHandler());
         builderValid.setEntityResolver(MCRURIResolver.instance());
         builder = new SAXBuilder(PARSER_CLASS_NAME, false);
         builder.setFeature(FEATURE_NAMESPACES, true);
         builder.setFeature(FEATURE_SCHEMA_SUPPORT, false);
         builder.setFeature(FEATURE_FULL_SCHEMA_SUPPORT, false);
         builder.setReuseParser(false);
-        builder.setErrorHandler(this);
+        builder.setErrorHandler(new MCRXMLParserErrorHandler());
         builder.setEntityResolver(MCRURIResolver.instance());
     }
 
@@ -243,56 +237,4 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
     }
 
     private final static String msg = "Error while parsing XML document: ";
-
-    /**
-     * Handles parser warnings
-     */
-    public void warning(SAXParseException ex) {
-        LOGGER.warn(getSAXErrorMessage(ex), ex);
-    }
-
-    /**
-     * Handles parse errors
-     */
-    public void error(SAXParseException ex) throws SAXParseException {
-        LOGGER.error(getSAXErrorMessage(ex), ex);
-        throw ex;
-    }
-
-    /**
-     * Handles fatal parse errors
-     */
-    public void fatalError(SAXParseException ex) throws SAXParseException {
-        LOGGER.fatal(getSAXErrorMessage(ex));
-        throw ex;
-    }
-
-    /**
-     * Returns a text indicating at which line and column the error occured.
-     * 
-     * @param ex
-     *            the SAXParseException exception
-     * @return the location string
-     */
-    public static String getSAXErrorMessage(SAXParseException ex) {
-        StringBuffer str = new StringBuffer();
-
-        String systemId = ex.getSystemId();
-        if (systemId != null) {
-            int index = systemId.lastIndexOf('/');
-
-            if (index != -1) {
-                systemId = systemId.substring(index + 1);
-            }
-
-            str.append(systemId).append(": ");
-        }
-
-        str.append("line ").append(ex.getLineNumber());
-        str.append(", column ").append(ex.getColumnNumber());
-        str.append(", ");
-        str.append(ex.getLocalizedMessage());
-
-        return str.toString();
-    }
 }
