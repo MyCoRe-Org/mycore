@@ -23,7 +23,6 @@
 
 package org.mycore.frontend.editor;
 
-import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -36,12 +35,11 @@ import org.jdom.Content;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.filter.ElementFilter;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.xml.MCRURIResolver;
-import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.common.xml.MCRXMLParserFactory;
+import org.mycore.datamodel.ifs2.MCRContent;
 
 /*
  * Reads in definition of editor forms like search mask and data input forms.
@@ -110,13 +108,8 @@ public class MCREditorDefReader {
         Document doc = new Document(editor);
         editor.setAttribute("noNamespaceSchemaLocation", "editor.xsd", MCRConstants.XSI_NAMESPACE);
 
-        XMLOutputter xout = new XMLOutputter();
-        xout.setFormat(Format.getPrettyFormat());
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            xout.output(doc, baos);
-            baos.close();
-            MCRXMLHelper.parseXML(baos.toByteArray(), true);
+            MCRXMLParserFactory.getValidatingParser().parseXML(MCRContent.readFrom(doc));
         } catch (Exception ex) {
             String msg = "Error validating editor " + uri;
             LOGGER.error(msg);

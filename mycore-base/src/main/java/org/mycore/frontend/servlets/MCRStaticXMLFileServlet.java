@@ -39,7 +39,8 @@ import org.jdom.Document;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
-import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.common.xml.MCRXMLParserFactory;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.frontend.editor.MCREditorServlet;
 import org.xml.sax.SAXParseException;
 
@@ -105,7 +106,7 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
 
         // For defined document types like static webpages, replace editor elements with complete editor definition
         if (docTypesMap.containsKey(type)) {
-            Document xml = MCRXMLHelper.parseURI(file.toURI(), false);
+            Document xml = MCRXMLParserFactory.getNonValidatingParser().parseXML(MCRContent.readFrom(file));
             MCREditorServlet.replaceEditorElements(request, file.toURI().toURL().toString(), xml);
             getLayoutService().doLayout(request, response, xml);
         } else {
