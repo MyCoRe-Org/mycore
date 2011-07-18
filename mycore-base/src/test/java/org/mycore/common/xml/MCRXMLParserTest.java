@@ -27,6 +27,8 @@ package org.mycore.common.xml;
 
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRConfiguration;
@@ -39,9 +41,9 @@ import org.xml.sax.SAXParseException;
  */
 public class MCRXMLParserTest extends MCRTestCase {
 
-    private MCRContent xmlResource = null;
+    private byte[] xmlResource = null;
 
-    private MCRContent xmlResourceInvalid = null;
+    private byte[] xmlResourceInvalid = null;
 
     /* (non-Javadoc)
      * @see org.mycore.common.MCRTestCase#setUp()
@@ -52,8 +54,8 @@ public class MCRXMLParserTest extends MCRTestCase {
         super.setUp();
         super.setProperty("MCR.XMLParser.ValidateSchema", "true", false);
         boolean setProperty = super.setProperty("log4j.logger.org.mycore.common.xml.MCRParserXerces", "FATAL", false);
-        xmlResource = MCRContent.readFrom( MCRXMLParserTest.class.getResource("/MCRParserXercesTest-valid.xml").openStream() );
-        xmlResourceInvalid = MCRContent.readFrom( MCRXMLParserTest.class.getResource("/MCRParserXercesTest-invalid.xml").openStream() );
+        xmlResource = MCRContent.readFrom( MCRXMLParserTest.class.getResource("/MCRParserXercesTest-valid.xml").openStream() ).asByteArray();
+        xmlResourceInvalid = MCRContent.readFrom( MCRXMLParserTest.class.getResource("/MCRParserXercesTest-invalid.xml").openStream() ).asByteArray();
         if (setProperty) {
             MCRConfiguration.instance().configureLogging();
         }
@@ -64,13 +66,13 @@ public class MCRXMLParserTest extends MCRTestCase {
      * @throws SAXParseException 
      */
     @Test
-    public void parseURIStringBoolean() throws SAXParseException {
+    public void parseURIStringBoolean() throws SAXParseException, IOException {
         try {
-            MCRXMLParserFactory.getValidatingParser().parseXML(xmlResourceInvalid);
+            MCRXMLParserFactory.getValidatingParser().parseXML(MCRContent.readFrom(xmlResourceInvalid));
             fail("MCRParserXerces accepts invalid XML content when validation is requested");
         } catch (Exception e) {
         }
-        MCRXMLParserFactory.getNonValidatingParser().parseXML(xmlResourceInvalid);
-        MCRXMLParserFactory.getValidatingParser().parseXML(xmlResource);
+        MCRXMLParserFactory.getNonValidatingParser().parseXML(MCRContent.readFrom(xmlResourceInvalid));
+        MCRXMLParserFactory.getValidatingParser().parseXML(MCRContent.readFrom(xmlResource));
     }
 }
