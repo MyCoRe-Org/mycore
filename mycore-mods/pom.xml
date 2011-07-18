@@ -33,6 +33,7 @@
               <layouts>
                 <layout>thesis</layout>
                 <layout>periodical</layout>
+                <layout>report</layout>
               </layouts>
             </layoutDefinition>
           </layoutDefinitions>

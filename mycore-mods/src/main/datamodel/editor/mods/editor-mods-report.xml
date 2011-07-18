@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<imports>
+  <panel id="edit-mods-report">
+    <hidden var="@ID" />
+    <hidden var="@label" />
+    <hidden var="@version" />
+    <hidden var="service" descendants="true" />
+    <hidden var="metadata/@xml:lang" default="de" />
+
+    <list id="pleaseSelect">
+      <item value="">
+        <label xml:lang="de">(bitte wählen)</label>
+        <label xml:lang="en">(please select)</label>
+      </item>
+    </list>
+
+    <cell col="1" row="1" anchor="NORTHEAST">
+      <text>
+        <label xml:lang="de">Titel (*)</label>
+        <label xml:lang="en">Title (*)</label>
+      </text>
+    </cell>
+    <cell col="2" row="1" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title">
+      <panel>
+        <cell col="1">
+          <textfield width="60" maxlength="128">
+            <condition required="true">
+              <label xml:lang="de">Tragen Sie hier den Titel des Reports ein.</label>
+              <label xml:lang="en">Enter the title of the report here.</label>
+            </condition>
+          </textfield>
+        </cell>
+      </panel>
+    </cell>
+    <cell col="3" row="1" anchor="NORTHWEST">
+      <helpPopup width="400px" height="250px">
+        <label xml:lang="de">
+          Titel des Reports
+        </label>
+        <label xml:lang="en">
+          title of report
+        </label>
+      </helpPopup>
+    </cell>
+
+
+    <cell col="1" colspan="3" row="50" anchor="EAST" style="padding-top:20px;">
+      <submitButton width="100px" i18n="common.button.save" />
+      <cancelButton width="100px" i18n="common.button.cancel" />
+    </cell>
+  </panel>
+</imports>
