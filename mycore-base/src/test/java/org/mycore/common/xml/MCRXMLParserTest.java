@@ -45,9 +45,6 @@ public class MCRXMLParserTest extends MCRTestCase {
 
     private byte[] xmlResourceInvalid = null;
 
-    /* (non-Javadoc)
-     * @see org.mycore.common.MCRTestCase#setUp()
-     */
     @Override
     @Before
     public void setUp() throws Exception {
@@ -61,18 +58,18 @@ public class MCRXMLParserTest extends MCRTestCase {
         }
     }
 
-    /**
-     * Test method for {@link org.mycore.common.xml.MCRParserXerces#parseURI(java.lang.String, boolean)}.
-     * @throws SAXParseException 
-     */
     @Test
-    public void parseURIStringBoolean() throws SAXParseException, IOException {
+    public void testInvalidXML() throws SAXParseException, IOException {
         try {
             MCRXMLParserFactory.getValidatingParser().parseXML(MCRContent.readFrom(xmlResourceInvalid));
             fail("MCRParserXerces accepts invalid XML content when validation is requested");
         } catch (Exception e) {
         }
         MCRXMLParserFactory.getNonValidatingParser().parseXML(MCRContent.readFrom(xmlResourceInvalid));
+    }
+
+    @Test
+    public void testValidXML() throws SAXParseException, IOException {
         MCRXMLParserFactory.getValidatingParser().parseXML(MCRContent.readFrom(xmlResource));
     }
 }
