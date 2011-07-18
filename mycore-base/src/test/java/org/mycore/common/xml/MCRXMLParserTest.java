@@ -1,5 +1,6 @@
 /**
  * $RCSfile: MCRParserXercesTest.java,v $
+
  * $Revision: 1.0 $ $Date: 29.07.2008 07:27:14 $
  *
  * This file is part of ** M y C o R e **
@@ -21,31 +22,26 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  *
  **/
+
 package org.mycore.common.xml;
 
 import static org.junit.Assert.fail;
-
-import java.net.URI;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRTestCase;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.xml.sax.SAXParseException;
 
 /**
  * @author Thomas Scheffler (yagee)
- * 
- * Need to insert some things here
- *
  */
-public class MCRParserXercesTest extends MCRTestCase {
+public class MCRXMLParserTest extends MCRTestCase {
 
-    private URI xmlResource = null;
+    private MCRContent xmlResource = null;
 
-    private URI xmlResourceInvalid = null;
-
-    private MCRParserXerces parser = null;
+    private MCRContent xmlResourceInvalid = null;
 
     /* (non-Javadoc)
      * @see org.mycore.common.MCRTestCase#setUp()
@@ -56,9 +52,8 @@ public class MCRParserXercesTest extends MCRTestCase {
         super.setUp();
         super.setProperty("MCR.XMLParser.ValidateSchema", "true", false);
         boolean setProperty = super.setProperty("log4j.logger.org.mycore.common.xml.MCRParserXerces", "FATAL", false);
-        xmlResource = MCRParserXercesTest.class.getResource("/MCRParserXercesTest-valid.xml").toURI();
-        xmlResourceInvalid = MCRParserXercesTest.class.getResource("/MCRParserXercesTest-invalid.xml").toURI();
-        parser = new MCRParserXerces();
+        xmlResource = MCRContent.readFrom( MCRXMLParserTest.class.getResource("/MCRParserXercesTest-valid.xml").openStream() );
+        xmlResourceInvalid = MCRContent.readFrom( MCRXMLParserTest.class.getResource("/MCRParserXercesTest-invalid.xml").openStream() );
         if (setProperty) {
             MCRConfiguration.instance().configureLogging();
         }
@@ -71,12 +66,11 @@ public class MCRParserXercesTest extends MCRTestCase {
     @Test
     public void parseURIStringBoolean() throws SAXParseException {
         try {
-            parser.parseURI(xmlResourceInvalid, true);
+            MCRXMLParserFactory.getValidatingParser().parseXML(xmlResourceInvalid);
             fail("MCRParserXerces accepts invalid XML content when validation is requested");
         } catch (Exception e) {
         }
-        parser.parseURI(xmlResourceInvalid, false);
-        parser.parseURI(xmlResource, true);
+        MCRXMLParserFactory.getNonValidatingParser().parseXML(xmlResourceInvalid);
+        MCRXMLParserFactory.getValidatingParser().parseXML(xmlResource);
     }
-
 }
