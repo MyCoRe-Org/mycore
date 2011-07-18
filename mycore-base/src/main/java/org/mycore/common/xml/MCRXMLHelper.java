@@ -24,6 +24,8 @@
 package org.mycore.common.xml;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -46,33 +48,20 @@ import org.jdom.ProcessingInstruction;
 import org.jdom.Text;
 import org.jdom.Verifier;
 import org.jdom.transform.JDOMSource;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 /**
  * This class provides some static utility methods to deal with XML/DOM
- * elements, nodes etc. The class *must* be considered as "work in progress"!
- * There is plenty left to do.
+ * elements, nodes etc.
  * 
  * @author Detlev Degenhardt
  * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
- * @version $Revision$ $Date$
  */
 public class MCRXMLHelper {
-    private static MCRParserInterface PARSER;
-
-    /** Returns the XML Parser as configured in mycore.properties */
-    public static MCRParserInterface getParser() throws MCRException {
-        if (PARSER == null) {
-            Object o = MCRConfiguration.instance().getInstanceOf("MCR.XMLParser.Class", "org.mycore.common.xml.MCRParserXerces");
-            PARSER = (MCRParserInterface) o;
-        }
-
-        return PARSER;
-    }
 
     /**
      * Parses an XML file from a URI and returns it as DOM. Use the validation
@@ -84,9 +73,16 @@ public class MCRXMLHelper {
      *             if XML could not be parsed
      * @return the XML file as a DOM object
      * @throws SAXParseException 
+     * @deprecated use MCRXMLParserFactory.getParser().parseXML(MCRContent xml)
      */
     public static Document parseURI(URI uri) throws MCRException, SAXParseException {
-        return getParser().parseURI(uri);
+        try {
+            return MCRXMLParserFactory.getParser().parseXML(MCRContent.readFrom(uri.toURL()));
+        } catch (MalformedURLException e) {
+            throw new MCRException(e);
+        } catch (IOException e) {
+            throw new MCRException(e);
+        }
     }
 
     /**
@@ -101,9 +97,16 @@ public class MCRXMLHelper {
      *             if XML could not be parsed
      * @return the XML file as a DOM object
      * @throws SAXParseException 
+     * @deprecated use MCRXMLParserFactory.getParser(boolean validate).parseXML(MCRContent xml)
      */
     public static Document parseURI(URI uri, boolean valid) throws MCRException, SAXParseException {
-        return getParser().parseURI(uri, valid);
+        try {
+            return MCRXMLParserFactory.getParser(valid).parseXML(MCRContent.readFrom(uri.toURL()));
+        } catch (MalformedURLException e) {
+            throw new MCRException(e);
+        } catch (IOException e) {
+            throw new MCRException(e);
+        }
     }
 
     /**
@@ -116,9 +119,16 @@ public class MCRXMLHelper {
      *             if XML could not be parsed
      * @return the XML file as a DOM object
      * @throws SAXParseException 
+     * @deprecated use MCRXMLParserFactory.getParser().parseXML(MCRContent xml)
      */
     public static Document parseXML(String xml) throws MCRException, SAXParseException {
-        return getParser().parseXML(xml);
+        try {
+            return MCRXMLParserFactory.getParser().parseXML(MCRContent.readFrom(xml));
+        } catch (UnsupportedEncodingException e) {
+            throw new MCRException( e );
+        } catch (IOException e) {
+            throw new MCRException( e );
+        }
     }
 
     /**
@@ -133,9 +143,16 @@ public class MCRXMLHelper {
      *             if XML could not be parsed
      * @return the XML file as a DOM object
      * @throws SAXParseException 
+     * @deprecated use MCRXMLParserFactory.getParser(boolean validate).parseXML(MCRContent xml)
      */
     public static Document parseXML(String xml, boolean valid) throws MCRException, SAXParseException {
-        return getParser().parseXML(xml, valid);
+        try {
+            return MCRXMLParserFactory.getParser(valid).parseXML(MCRContent.readFrom(xml));
+        } catch (UnsupportedEncodingException e) {
+            throw new MCRException( e );
+        } catch (IOException e) {
+            throw new MCRException( e );
+        }
     }
 
     /**
@@ -148,9 +165,14 @@ public class MCRXMLHelper {
      *             if XML could not be parsed
      * @return the XML file as a DOM object
      * @throws SAXParseException 
+     * @deprecated use MCRXMLParserFactory.getParser().parseXML(MCRContent xml)
      */
     public static Document parseXML(byte[] xml) throws MCRException, SAXParseException {
-        return getParser().parseXML(xml);
+        try {
+            return MCRXMLParserFactory.getParser().parseXML(MCRContent.readFrom(xml));
+        } catch (IOException e) {
+            throw new MCRException( e );
+        }
     }
 
     /**
@@ -165,9 +187,14 @@ public class MCRXMLHelper {
      *             if XML could not be parsed
      * @return the XML file as a DOM object
      * @throws SAXParseException 
+     * @deprecated use MCRXMLParserFactory.getParser(boolean validate).parseXML(MCRContent xml)
      */
     public static Document parseXML(byte[] xml, boolean valid) throws MCRException, SAXParseException {
-        return getParser().parseXML(xml, valid);
+        try {
+            return MCRXMLParserFactory.getParser(valid).parseXML(MCRContent.readFrom(xml));
+        } catch (IOException e) {
+            throw new MCRException( e );
+        }
     }
 
     /**
