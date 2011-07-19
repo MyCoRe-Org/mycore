@@ -15,14 +15,39 @@
       </item>
     </list>
 
-    <!-- TITLE -->
+    <!-- genre classification -->
     <cell col="1" row="1" anchor="NORTHEAST">
+      <text>
+        <label xml:lang="de">Genre (*)</label>
+        <label xml:lang="en">Genre (*)</label>
+      </text>
+    </cell>
+    <cell col="2" row="1" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:classification">
+      <list width="30" type="dropdown">
+        <include ref="pleaseSelect" />
+        <include uri="classification:editor:-1:children:diniPublType" cacheable="false" />
+        <condition required="true">
+          <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
+          <label xml:lang="en">Please select one entry!</label>
+        </condition>
+      </list>
+    </cell>
+    <cell col="3" row="1" anchor="NORTHWEST">
+      <helpPopup width="400px" height="250px">
+        <label xml:lang="de">Wählen Sie bitte das zugehörige Genre aus.</label>
+        <label xml:lang="en">Select an entry from the genre list.</label>
+      </helpPopup>
+    </cell>
+    <!-- genre classification END -->
+
+    <!-- TITLE -->
+    <cell col="1" row="3" anchor="NORTHEAST">
       <text>
         <label xml:lang="de">Titel (*)</label>
         <label xml:lang="en">Title (*)</label>
       </text>
     </cell>
-    <cell col="2" row="1" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title">
+    <cell col="2" row="3" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title">
       <panel>
         <cell col="1">
           <textfield width="60" maxlength="128">
@@ -34,7 +59,7 @@
         </cell>
       </panel>
     </cell>
-    <cell col="3" row="1" anchor="NORTHWEST">
+    <cell col="3" row="3" anchor="NORTHWEST">
       <helpPopup width="400px" height="250px">
         <label xml:lang="de">
           Titel des Reports
