@@ -319,25 +319,32 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         // update needed for old and newParent;
         // Update Left, Right values of other categories
         boolean movedToRight = isCategoryMovedRight(oldParent, newParent, index, oldIndex);
+        boolean movedUp = isCategoryMovedUp(oldParent, newParent);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("OldParent left: " + oldParent.getLeft() + " Right: " + oldParent.getRight() + " Level: " + oldParent.getLevel());
             LOGGER.debug("NewParent left: " + newParent.getLeft() + " Right: " + newParent.getRight() + " Level: " + newParent.getLevel());
             LOGGER.debug("SubTree   left: " + subTree.getLeft() + " Right: " + subTree.getRight() + " Level: " + subTree.getLevel());
             if (movedToRight) {
                 LOGGER.debug("Category '" + id + "' is moved right.");
+            } else if (movedUp) {
+                LOGGER.debug("Category '" + id + "' is moved up.");
             } else {
                 LOGGER.debug("Category '" + id + "' is moved left.");
             }
         }
         if (movedToRight) {
             updateMoveRight(connection, oldParent, newParent, left, right, index, oldIndex);
-        } else {
+        } else if (!movedUp) {
             updateMoveLeft(connection, oldParent, newParent, left, right, index, oldIndex);
         }
         // use newParent.left+1 if no left sibling else leftSibling.right+1
         int leftStart = index == 0 ? getLeftRightValues(newParent.getId())[0] + 1 : getLeftRightValues(newParent.getChildren().get(index - 1).getId())[1] + 1;
         // update Left, Right and Level values
-        subTree.calculateLeftRightAndLevel(leftStart, newParent.getLevel() + 1);
+        if (movedUp) {
+            newParent.calculateLeftRightAndLevel(newParent.getLeft(), newParent.getLevel());
+        } else {
+            subTree.calculateLeftRightAndLevel(leftStart, newParent.getLevel() + 1);
+        }
         // only update oldParent if newParent is not its ancestor
         boolean updateOldParent = oldParent.getLeft() < newParent.getLeft() || oldParent.getRight() > newParent.getRight() ? true : false;
         // only update newParent if newParent!=oldParent and
@@ -524,6 +531,10 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
          */
         LOGGER.debug("oldParent and newParent are on the same level in the tree");
         return newParent.getLeft() > oldParent.getLeft();
+    }
+
+    private static boolean isCategoryMovedUp(MCRCategoryImpl oldParent, MCRCategoryImpl newParent) {
+        return newParent.getLeft() < oldParent.getLeft() && newParent.getRight() > oldParent.getRight();
     }
 
     private static Criterion getCategoryCriterion(MCRCategoryID id) {
