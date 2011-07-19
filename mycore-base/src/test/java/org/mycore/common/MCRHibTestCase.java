@@ -23,6 +23,11 @@
  **/
 package org.mycore.common;
 
+import java.io.PrintStream;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
@@ -46,6 +51,22 @@ public abstract class MCRHibTestCase extends MCRTestCase {
     protected Transaction tx;
 
     protected Configuration configuration = getHibernateConfiguration();
+
+    protected static void printResultSet(ResultSet resultSet, PrintStream out) throws SQLException {
+        ResultSetMetaData metaData = resultSet.getMetaData();
+        int columns = metaData.getColumnCount();
+        Table t = new Table(columns);
+        for (int i = 1; i <= columns; i++) {
+            t.addValue(metaData.getColumnName(i));
+        }
+        while (resultSet.next()) {
+            for (int i = 1; i <= columns; i++) {
+                String value = resultSet.getString(i);
+                t.addValue(value != null ? value : "null");
+            }
+        }
+        t.print(out);
+    }
 
     @Before
     public void setUp() throws Exception {
