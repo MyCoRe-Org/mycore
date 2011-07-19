@@ -126,7 +126,7 @@ public class MCRXMLMetadataManagerTest extends MCRTestCase {
 
     @Test
     public void retrieve() throws JDOMException, IOException {
-        store.create(MyCoRe_document_00000001.id, MCRContent.readFrom(MyCoRe_document_00000001.blob), MyCoRe_document_00000001.lastModified);
+        store.create(MyCoRe_document_00000001.id, MCRContent.readFrom(MyCoRe_document_00000001.blob, null), MyCoRe_document_00000001.lastModified);
         Document doc = store.retrieveXML(MyCoRe_document_00000001.id);
         assertEquals("Stored document ID do not match:", MyCoRe_document_00000001.id.toString(), doc.getRootElement().getAttributeValue("id"));
         try {

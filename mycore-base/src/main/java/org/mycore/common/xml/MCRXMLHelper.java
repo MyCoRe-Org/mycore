@@ -101,7 +101,7 @@ public class MCRXMLHelper {
      */
     public static Document parseURI(URI uri, boolean valid) throws MCRException, SAXParseException {
         try {
-            return MCRXMLParserFactory.getParser(valid).parseXML(MCRContent.readFrom(uri.toURL()));
+            return MCRXMLParserFactory.getParser(valid).parseXML(MCRContent.readFrom(uri));
         } catch (MalformedURLException e) {
             throw new MCRException(e);
         } catch (IOException e) {
@@ -125,9 +125,9 @@ public class MCRXMLHelper {
         try {
             return MCRXMLParserFactory.getParser().parseXML(MCRContent.readFrom(xml));
         } catch (UnsupportedEncodingException e) {
-            throw new MCRException( e );
+            throw new MCRException(e);
         } catch (IOException e) {
-            throw new MCRException( e );
+            throw new MCRException(e);
         }
     }
 
@@ -149,9 +149,9 @@ public class MCRXMLHelper {
         try {
             return MCRXMLParserFactory.getParser(valid).parseXML(MCRContent.readFrom(xml));
         } catch (UnsupportedEncodingException e) {
-            throw new MCRException( e );
+            throw new MCRException(e);
         } catch (IOException e) {
-            throw new MCRException( e );
+            throw new MCRException(e);
         }
     }
 
@@ -169,9 +169,9 @@ public class MCRXMLHelper {
      */
     public static Document parseXML(byte[] xml) throws MCRException, SAXParseException {
         try {
-            return MCRXMLParserFactory.getParser().parseXML(MCRContent.readFrom(xml));
+            return MCRXMLParserFactory.getParser().parseXML(MCRContent.readFrom(xml, null));
         } catch (IOException e) {
-            throw new MCRException( e );
+            throw new MCRException(e);
         }
     }
 
@@ -191,9 +191,9 @@ public class MCRXMLHelper {
      */
     public static Document parseXML(byte[] xml, boolean valid) throws MCRException, SAXParseException {
         try {
-            return MCRXMLParserFactory.getParser(valid).parseXML(MCRContent.readFrom(xml));
+            return MCRXMLParserFactory.getParser(valid).parseXML(MCRContent.readFrom(xml, null));
         } catch (IOException e) {
-            throw new MCRException( e );
+            throw new MCRException(e);
         }
     }
 

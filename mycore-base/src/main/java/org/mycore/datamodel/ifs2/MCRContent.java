@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URL;
 
 import org.apache.commons.vfs.FileObject;
@@ -72,6 +73,11 @@ public class MCRContent {
     protected boolean isXML = false;
 
     /**
+     * Holds the systemID of the current content
+     */
+    protected String systemId;
+
+    /**
      * Creates content from a String, using UTF-8 encoding
      * 
      * @param text
@@ -90,7 +96,7 @@ public class MCRContent {
      *            the encoding to be used to write bytes
      */
     public static MCRContent readFrom(String text, String encoding) throws IOException, UnsupportedEncodingException {
-        return readFrom(text.getBytes(encoding));
+        return readFrom(text.getBytes(encoding), null);
     }
 
     /**
@@ -100,7 +106,7 @@ public class MCRContent {
      *            the local file to read
      */
     public static MCRContent readFrom(File file) throws IOException {
-        return readFrom(new FileInputStream(file));
+        return readFrom(new FileInputStream(file), file.toURI().toString());
     }
 
     /**
@@ -110,7 +116,7 @@ public class MCRContent {
      *            the file object to read content from
      */
     public static MCRContent readFrom(FileObject fo) throws IOException {
-        return readFrom(fo.getContent().getInputStream());
+        return readFrom(fo.getContent().getInputStream(), fo.getURL().toString());
     }
 
     /**
@@ -119,8 +125,8 @@ public class MCRContent {
      * @param bytes
      *            the content's bytes
      */
-    public static MCRContent readFrom(byte[] bytes) throws IOException {
-        return readFrom(new ByteArrayInputStream(bytes));
+    public static MCRContent readFrom(byte[] bytes, String systemId) throws IOException {
+        return readFrom(new ByteArrayInputStream(bytes), systemId);
     }
 
     /**
@@ -132,11 +138,10 @@ public class MCRContent {
      */
     public static MCRContent readFrom(Document xml) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        XMLOutputter xout = new XMLOutputter();
-        xout.setFormat(Format.getPrettyFormat().setEncoding("UTF-8").setIndent("  "));
+        XMLOutputter xout = new XMLOutputter(Format.getRawFormat());
         xout.output(xml, out);
         out.close();
-        MCRContent content = readFrom(out.toByteArray());
+        MCRContent content = readFrom(out.toByteArray(), null);
         content.isXML = true;
         return content;
     }
@@ -147,12 +152,13 @@ public class MCRContent {
      * @param in
      *            the input stream to read content from
      */
-    public static MCRContent readFrom(InputStream in) {
-        return new MCRContent(in);
+    public static MCRContent readFrom(InputStream in, String systemId) {
+        return new MCRContent(in, systemId);
     }
 
-    private MCRContent(InputStream in) {
+    private MCRContent(InputStream in, String systemId) {
         this.in = in;
+        this.systemId = systemId;
     }
 
     /**
@@ -162,7 +168,19 @@ public class MCRContent {
      *            the url to read content from
      */
     public static MCRContent readFrom(URL url) throws IOException {
-        return readFrom(VFS.getManager().resolveFile(url.toExternalForm()));
+        MCRContent content = readFrom(VFS.getManager().resolveFile(url.toExternalForm()));
+        content.systemId = url.toString();
+        return content;
+    }
+
+    /**
+     * Creates new content reading from the given URI.
+     * 
+     * @param uri
+     *            the uri to read content from
+     */
+    public static MCRContent readFrom(URI uri) throws IOException {
+        return readFrom(uri.toURL());
     }
 
     /**
@@ -302,8 +320,12 @@ public class MCRContent {
         MCRContent[] copies = new MCRContent[numCopies];
         byte[] bytes = asByteArray();
         for (int i = 0; i < numCopies; i++) {
-            copies[i] = MCRContent.readFrom(bytes);
+            copies[i] = MCRContent.readFrom(bytes, systemId);
         }
         return copies;
+    }
+
+    public String getSystemId() {
+        return systemId;
     }
 }

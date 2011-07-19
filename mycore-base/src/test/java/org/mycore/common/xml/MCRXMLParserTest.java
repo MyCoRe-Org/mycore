@@ -28,6 +28,7 @@ package org.mycore.common.xml;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.net.URL;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -41,9 +42,9 @@ import org.xml.sax.SAXParseException;
  */
 public class MCRXMLParserTest extends MCRTestCase {
 
-    private byte[] xmlResource = null;
+    private URL xmlResource = null;
 
-    private byte[] xmlResourceInvalid = null;
+    private URL xmlResourceInvalid = null;
 
     @Override
     @Before
@@ -51,8 +52,8 @@ public class MCRXMLParserTest extends MCRTestCase {
         super.setUp();
         super.setProperty("MCR.XMLParser.ValidateSchema", "true", false);
         boolean setProperty = super.setProperty("log4j.logger.org.mycore.common.xml.MCRParserXerces", "FATAL", false);
-        xmlResource = MCRContent.readFrom( MCRXMLParserTest.class.getResource("/MCRParserXercesTest-valid.xml").openStream() ).asByteArray();
-        xmlResourceInvalid = MCRContent.readFrom( MCRXMLParserTest.class.getResource("/MCRParserXercesTest-invalid.xml").openStream() ).asByteArray();
+        xmlResource = MCRXMLParserTest.class.getResource("/MCRParserXercesTest-valid.xml");
+        xmlResourceInvalid = MCRXMLParserTest.class.getResource("/MCRParserXercesTest-invalid.xml");
         if (setProperty) {
             MCRConfiguration.instance().configureLogging();
         }

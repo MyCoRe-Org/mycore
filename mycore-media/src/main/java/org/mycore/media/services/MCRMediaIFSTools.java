@@ -12,200 +12,209 @@ import org.mycore.datamodel.ifs2.MCRFileCollection;
 import org.mycore.datamodel.ifs2.MCRFileStore;
 import org.mycore.datamodel.ifs2.MCRNode;
 import org.mycore.datamodel.ifs2.MCRStoreManager;
-import org.mycore.media.MCRMediaParser;
 
 public class MCRMediaIFSTools {
-    private static final Logger LOGGER = Logger.getLogger( MCRMediaIFSTools.class );
-    
-    private static MCRConfiguration config =  MCRConfiguration.instance();
-    
+    private static final Logger LOGGER = Logger.getLogger(MCRMediaIFSTools.class);
+
+    private static MCRConfiguration config = MCRConfiguration.instance();
+
     private static String mediaStore = config.getString("MCR.Media.ContentStore.Name", "avdata");
-    
-    private static String getPath( String filePath ) {
-        if ( filePath.lastIndexOf("/") != -1 ) {
+
+    private static String getPath(String filePath) {
+        if (filePath.lastIndexOf("/") != -1) {
             return filePath.substring(0, filePath.lastIndexOf("/") + 1);
         }
-        
+
         return "";
     }
-    
-    private static String getFileName( String filePath ) {
+
+    private static String getFileName(String filePath) {
         return filePath.replace(getPath(filePath), "");
     }
-    
-    private static String getFileExtension( String filePath ) {
+
+    private static String getFileExtension(String filePath) {
         String fileName = getFileName(filePath);
-        if ( fileName.lastIndexOf(".") != -1 ) {
-            return fileName.substring(fileName.lastIndexOf(".")+1);
+        if (fileName.lastIndexOf(".") != -1) {
+            return fileName.substring(fileName.lastIndexOf(".") + 1);
         }
-        
+
         return "";
     }
-    
-    private static String buildFileName( String filePath ) {
+
+    private static String buildFileName(String filePath) {
         String ext = getFileExtension(filePath);
-        
-        if ( filePath.lastIndexOf("." + ext) != -1 )
+
+        if (filePath.lastIndexOf("." + ext) != -1)
             return filePath.substring(0, filePath.lastIndexOf("." + ext)) + "_" + ext;
-        
-        
+
         return filePath;
     }
-    
-    public static void deleteMetadata( String derivateID, String filePath ) throws MCRException {
-        LOGGER.debug( "Delete metadata for file \"" + filePath + "\" in Derivate " + derivateID );
-        try {
-            MCRFileStore store = MCRStoreManager.getStore( mediaStore, MCRFileStore.class );
-            if ( store == null ) store = MCRStoreManager.createStore( mediaStore, MCRFileStore.class );
-            
-            MCRFileCollection col = store.retrieve( Integer.parseInt(derivateID) );
-            if ( col != null ) {
-                MCRNode node = col.getNodeByPath( buildFileName(filePath) + ".moxml" );
-                if ( node != null ) {
-                    if ( node.isFile() ) ((MCRFile)node).delete();
-                    while ( node.getParent() != null ) {
-                        node = node.getParent();
-                        if ( node.isDirectory() && !node.hasChildren() )
-                            ((MCRDirectory)node).delete();
-                    }
-                }
-            }
-        } catch ( Exception ex ) {
-            throw new MCRException(ex);
-        }
-    }
-    
-    public static void storeMetadata( org.jdom.Element mediaXML, String derivateID, String filePath ) throws MCRException {   
-        LOGGER.debug( "Store metadata for file \"" + filePath + "\" in Derivate " + derivateID );
-        try {
-            MCRFileStore store = MCRStoreManager.getStore( mediaStore, MCRFileStore.class );
-            if ( store == null ) store = MCRStoreManager.createStore( mediaStore, MCRFileStore.class );
-            
-            MCRFileCollection col = store.retrieve( Integer.parseInt(derivateID) );
-            if ( col == null ) col = store.create( Integer.parseInt(derivateID) );
-            
-            MCRDirectory dir = null;
-            StringTokenizer pathTok = new StringTokenizer( getPath(filePath), "/" );
-            while ( pathTok.hasMoreTokens() ) {
-                dir = col.createDir( pathTok.nextToken() );
-            }
-            
-            MCRFile data;
-            if ( dir != null )
-                data = dir.createFile( buildFileName(getFileName(filePath)) + ".moxml" );
-            else
-                data = col.createFile( buildFileName(getFileName(filePath)) + ".moxml" );
-            
-            org.jdom.Document xml = new org.jdom.Document( mediaXML );
-            data.setContent( MCRContent.readFrom( xml ) );
-        } catch ( Exception ex ) {
-            throw new MCRException(ex);
-        }
-    }
-    
-    public static void deleteThumbnail( String derivateID, String filePath ) throws MCRException {
-        LOGGER.debug( "Delete thumbnail for file \"" + filePath + "\" in Derivate " + derivateID );
-        try {
-            MCRFileStore store = MCRStoreManager.getStore( mediaStore, MCRFileStore.class );
-            if ( store == null ) store = MCRStoreManager.createStore( mediaStore, MCRFileStore.class );
-            
-            MCRFileCollection col = store.retrieve( Integer.parseInt(derivateID) );
-            if ( col != null ) {
-                MCRNode node = col.getNodeByPath( buildFileName(filePath) + ".mothumb" );
-                if ( node != null ) {
-                    if ( node.isFile() ) ((MCRFile)node).delete();
-                    while ( node.getParent() != null ) {
-                        node = node.getParent();
-                        if ( node.isDirectory() && !node.hasChildren() )
-                            ((MCRDirectory)node).delete();
-                    }
-                }
-            }
-        } catch ( Exception ex ) {
-            throw new MCRException(ex);
-        }
-    }
-    
-    public static org.jdom.Document getMetadataFromStore( String derivateID, String filePath ) throws MCRException {
-        LOGGER.debug( "Get metadata for file \"" + filePath + "\" in Derivate " + derivateID );
-        try {
-            MCRFileStore store = MCRStoreManager.getStore( mediaStore, MCRFileStore.class );
-            if ( store == null ) store = MCRStoreManager.createStore( mediaStore, MCRFileStore.class );
 
-            MCRFileCollection col = store.retrieve( Integer.parseInt(derivateID) );
-            if ( col != null ) {
+    public static void deleteMetadata(String derivateID, String filePath) throws MCRException {
+        LOGGER.debug("Delete metadata for file \"" + filePath + "\" in Derivate " + derivateID);
+        try {
+            MCRFileStore store = MCRStoreManager.getStore(mediaStore, MCRFileStore.class);
+            if (store == null)
+                store = MCRStoreManager.createStore(mediaStore, MCRFileStore.class);
+
+            MCRFileCollection col = store.retrieve(Integer.parseInt(derivateID));
+            if (col != null) {
                 MCRNode node = col.getNodeByPath(buildFileName(filePath) + ".moxml");
-                if ( node != null && node.isFile() ) {
+                if (node != null) {
+                    if (node.isFile())
+                        ((MCRFile) node).delete();
+                    while (node.getParent() != null) {
+                        node = node.getParent();
+                        if (node.isDirectory() && !node.hasChildren())
+                            ((MCRDirectory) node).delete();
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            throw new MCRException(ex);
+        }
+    }
+
+    public static void storeMetadata(org.jdom.Element mediaXML, String derivateID, String filePath) throws MCRException {
+        LOGGER.debug("Store metadata for file \"" + filePath + "\" in Derivate " + derivateID);
+        try {
+            MCRFileStore store = MCRStoreManager.getStore(mediaStore, MCRFileStore.class);
+            if (store == null)
+                store = MCRStoreManager.createStore(mediaStore, MCRFileStore.class);
+
+            MCRFileCollection col = store.retrieve(Integer.parseInt(derivateID));
+            if (col == null)
+                col = store.create(Integer.parseInt(derivateID));
+
+            MCRDirectory dir = null;
+            StringTokenizer pathTok = new StringTokenizer(getPath(filePath), "/");
+            while (pathTok.hasMoreTokens()) {
+                dir = col.createDir(pathTok.nextToken());
+            }
+
+            MCRFile data;
+            if (dir != null)
+                data = dir.createFile(buildFileName(getFileName(filePath)) + ".moxml");
+            else
+                data = col.createFile(buildFileName(getFileName(filePath)) + ".moxml");
+
+            org.jdom.Document xml = new org.jdom.Document(mediaXML);
+            data.setContent(MCRContent.readFrom(xml));
+        } catch (Exception ex) {
+            throw new MCRException(ex);
+        }
+    }
+
+    public static void deleteThumbnail(String derivateID, String filePath) throws MCRException {
+        LOGGER.debug("Delete thumbnail for file \"" + filePath + "\" in Derivate " + derivateID);
+        try {
+            MCRFileStore store = MCRStoreManager.getStore(mediaStore, MCRFileStore.class);
+            if (store == null)
+                store = MCRStoreManager.createStore(mediaStore, MCRFileStore.class);
+
+            MCRFileCollection col = store.retrieve(Integer.parseInt(derivateID));
+            if (col != null) {
+                MCRNode node = col.getNodeByPath(buildFileName(filePath) + ".mothumb");
+                if (node != null) {
+                    if (node.isFile())
+                        ((MCRFile) node).delete();
+                    while (node.getParent() != null) {
+                        node = node.getParent();
+                        if (node.isDirectory() && !node.hasChildren())
+                            ((MCRDirectory) node).delete();
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            throw new MCRException(ex);
+        }
+    }
+
+    public static org.jdom.Document getMetadataFromStore(String derivateID, String filePath) throws MCRException {
+        LOGGER.debug("Get metadata for file \"" + filePath + "\" in Derivate " + derivateID);
+        try {
+            MCRFileStore store = MCRStoreManager.getStore(mediaStore, MCRFileStore.class);
+            if (store == null)
+                store = MCRStoreManager.createStore(mediaStore, MCRFileStore.class);
+
+            MCRFileCollection col = store.retrieve(Integer.parseInt(derivateID));
+            if (col != null) {
+                MCRNode node = col.getNodeByPath(buildFileName(filePath) + ".moxml");
+                if (node != null && node.isFile()) {
                     return node.getContent().asXML();
                 } else
                     throw new MCRException("Metadata for file \"" + filePath + "\" not found.");
             } else
                 throw new MCRException("Derivate " + derivateID + " not found.");
-        } catch ( Exception ex ) {
+        } catch (Exception ex) {
             throw new MCRException(ex);
         }
     }
-    
-    public static void storeThumbnail( byte[] thumb, String derivateID, String filePath ) throws MCRException {
-        LOGGER.debug( "Store thumbnail for file \"" + filePath + "\" in Derivate " + derivateID );
-        try {
-            MCRFileStore store = MCRStoreManager.getStore( mediaStore, MCRFileStore.class );
-            if ( store == null ) store = MCRStoreManager.createStore( mediaStore, MCRFileStore.class );
-            
-            MCRFileCollection col = store.retrieve( Integer.parseInt(derivateID) );
-            if ( col == null ) col = store.create( Integer.parseInt(derivateID) );
-            
-            MCRDirectory dir = null;
-            StringTokenizer pathTok = new StringTokenizer( getPath(filePath), "/" );
-            while ( pathTok.hasMoreTokens() ) {
-                dir = col.createDir( pathTok.nextToken() );
-            }
-            
-            MCRFile data;
-            if ( dir != null )
-                data = dir.createFile( buildFileName(getFileName(filePath)) + ".mothumb" );
-            else
-                data = col.createFile( buildFileName(getFileName(filePath)) + ".mothumb" );
-            
-            data.setContent( MCRContent.readFrom( thumb ) );
-        } catch ( Exception ex ) {
-            throw new MCRException(ex);
-        }
-    }
-    
-    public static MCRFile getThumbnailFromStore( String derivateID, String filePath ) throws MCRException {
-        LOGGER.debug( "Get thumbnail for file \"" + filePath + "\" in Derivate " + derivateID );
-        try {
-            MCRFileStore store = MCRStoreManager.getStore( mediaStore, MCRFileStore.class );
-            if ( store == null ) store = MCRStoreManager.createStore( mediaStore, MCRFileStore.class );
 
-            MCRFileCollection col = store.retrieve( Integer.parseInt(derivateID) );
-            if ( col != null ) {
+    public static void storeThumbnail(byte[] thumb, String derivateID, String filePath) throws MCRException {
+        LOGGER.debug("Store thumbnail for file \"" + filePath + "\" in Derivate " + derivateID);
+        try {
+            MCRFileStore store = MCRStoreManager.getStore(mediaStore, MCRFileStore.class);
+            if (store == null)
+                store = MCRStoreManager.createStore(mediaStore, MCRFileStore.class);
+
+            MCRFileCollection col = store.retrieve(Integer.parseInt(derivateID));
+            if (col == null)
+                col = store.create(Integer.parseInt(derivateID));
+
+            MCRDirectory dir = null;
+            StringTokenizer pathTok = new StringTokenizer(getPath(filePath), "/");
+            while (pathTok.hasMoreTokens()) {
+                dir = col.createDir(pathTok.nextToken());
+            }
+
+            MCRFile data;
+            if (dir != null)
+                data = dir.createFile(buildFileName(getFileName(filePath)) + ".mothumb");
+            else
+                data = col.createFile(buildFileName(getFileName(filePath)) + ".mothumb");
+
+            data.setContent(MCRContent.readFrom(thumb, null));
+        } catch (Exception ex) {
+            throw new MCRException(ex);
+        }
+    }
+
+    public static MCRFile getThumbnailFromStore(String derivateID, String filePath) throws MCRException {
+        LOGGER.debug("Get thumbnail for file \"" + filePath + "\" in Derivate " + derivateID);
+        try {
+            MCRFileStore store = MCRStoreManager.getStore(mediaStore, MCRFileStore.class);
+            if (store == null)
+                store = MCRStoreManager.createStore(mediaStore, MCRFileStore.class);
+
+            MCRFileCollection col = store.retrieve(Integer.parseInt(derivateID));
+            if (col != null) {
                 MCRNode node = col.getNodeByPath(buildFileName(filePath) + ".mothumb");
-                if ( node != null && node.isFile() ) {
-                    return (MCRFile)node;
+                if (node != null && node.isFile()) {
+                    return (MCRFile) node;
                 } else
                     throw new MCRException("Thumbnail for file \"" + filePath + "\" not found.");
             } else
                 throw new MCRException("Derivate " + derivateID + " not found.");
-        } catch ( Exception ex ) {
+        } catch (Exception ex) {
             throw new MCRException(ex);
         }
     }
-    
-    public static boolean hasThumbnailInStore( String derivateID, String filePath ) throws MCRException {
-        try {
-            MCRFileStore store = MCRStoreManager.getStore( mediaStore, MCRFileStore.class );
-            if ( store == null ) store = MCRStoreManager.createStore( mediaStore, MCRFileStore.class );
 
-            MCRFileCollection col = store.retrieve( Integer.parseInt(derivateID) );
-            if ( col != null ) {
+    public static boolean hasThumbnailInStore(String derivateID, String filePath) throws MCRException {
+        try {
+            MCRFileStore store = MCRStoreManager.getStore(mediaStore, MCRFileStore.class);
+            if (store == null)
+                store = MCRStoreManager.createStore(mediaStore, MCRFileStore.class);
+
+            MCRFileCollection col = store.retrieve(Integer.parseInt(derivateID));
+            if (col != null) {
                 MCRNode node = col.getNodeByPath(buildFileName(filePath) + ".mothumb");
-                return ( node != null && node.isFile() );
+                return (node != null && node.isFile());
             }
-            
+
             return false;
-        } catch ( Exception ex ) {
+        } catch (Exception ex) {
             throw new MCRException(ex);
         }
     }

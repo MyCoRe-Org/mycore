@@ -185,7 +185,7 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
         assertEquals(2, col.getNumChildren());
         assertTrue(modified.before(col.getLastModified()));
         byte[] content = "Hello World!".getBytes("UTF-8");
-        dir.createFile("readme.txt").setContent(MCRContent.readFrom(content));
+        dir.createFile("readme.txt").setContent(MCRContent.readFrom(content, null));
         MCRFile child = (MCRFile) dir.getChild("readme.txt");
         assertNotNull(child);
         assertEquals(content.length, child.getSize());

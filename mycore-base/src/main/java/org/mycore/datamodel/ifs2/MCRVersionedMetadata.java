@@ -221,7 +221,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         revision = repository.getFile(store.getSlotPath(id), -1, null, baos);
         baos.close();
-        MCRContent.readFrom(baos.toByteArray()).sendTo(fo);
+        MCRContent.readFrom(baos.toByteArray(), null).sendTo(fo);
     }
 
     /**

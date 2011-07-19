@@ -647,7 +647,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             return false;
         }
 
-        MCRContent content = MCRContent.readFrom(xml);
+        MCRContent content = MCRContent.readFrom(xml, null);
         File xmlOutput = new File(dir, nid.toString() + ".xml");
 
         if (trans != null) {

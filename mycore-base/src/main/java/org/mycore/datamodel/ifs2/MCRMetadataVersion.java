@@ -162,7 +162,7 @@ public class MCRMetadataVersion {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             repository.getFile(vm.getStore().getSlotPath(vm.getID()), revision, null, baos);
             baos.close();
-            return MCRContent.readFrom(baos.toByteArray());
+            return MCRContent.readFrom(baos.toByteArray(), null);
         } catch (SVNException e) {
             throw new IOException(e);
         }

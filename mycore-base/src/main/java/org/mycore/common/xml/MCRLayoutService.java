@@ -183,7 +183,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
     }
 
     public void sendXML(HttpServletRequest req, HttpServletResponse res, InputStream in) throws IOException {
-        sendXML(req, res, MCRContent.readFrom(in));
+        sendXML(req, res, MCRContent.readFrom(in, null));
     }
 
     private void sendXML(HttpServletRequest req, HttpServletResponse res, MCRContent xml) throws IOException {
