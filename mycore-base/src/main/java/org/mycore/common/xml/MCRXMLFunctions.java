@@ -253,7 +253,7 @@ public class MCRXMLFunctions {
         try {
             u.attachChecksum();
         } catch (Exception ex) {
-            LOGGER.error("Could not attach checksum to urn " + b.toString());
+            LOGGER.error("Could not attach checksum to urn " + b.toString(), ex);
             return null;
         }
         return u.toString();
