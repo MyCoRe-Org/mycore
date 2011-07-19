@@ -229,12 +229,13 @@ public class MCRXMLFunctions {
 
     /**
      * Method generates an alternative urn to a given urn by adding additional
-     * text to the namespace specific part. <br/>
+     * text to the namespace specific part. Then a new checksum is calculated
+     * and attached to the new generated urn<br/>
      * <br/>
      * Invoking method with
      * <code>"urn:nbn:de:urmel-37e1f5f1-54df-4a9c-8e54-c576f46c01f73"</code> and
      * <code>"dfg"</code> leads to
-     * <code>"urn:nbn:de:urmel-dfg-37e1f5f1-54df-4a9c-8e54-c576f46c01f73"</code>
+     * <code>"urn:nbn:de:urmel-dfg-37e1f5f1-54df-4a9c-8e54-c576f46c01f738"</code>
      * 
      * @param urn
      *            the source urn
@@ -247,7 +248,15 @@ public class MCRXMLFunctions {
         for (int i = 1; i < parts.length; i++) {
             b.append("-" + parts[i]);
         }
-        return b.toString();
+
+        org.mycore.services.urn.MCRURN u = org.mycore.services.urn.MCRURN.valueOf(b.toString());
+        try {
+            u.attachChecksum();
+        } catch (Exception ex) {
+            LOGGER.error("Could not attach checksum to urn " + b.toString());
+            return null;
+        }
+        return u.toString();
     }
 
     /**

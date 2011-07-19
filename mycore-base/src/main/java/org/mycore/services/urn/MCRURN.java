@@ -28,7 +28,7 @@ public class MCRURN {
      *            namespace specific part of the uri
      * @throws IllegalArgumentException
      *             if one of the arguments is <code>null</code>
-     * */
+     */
     public MCRURN(String[] namespaceIdentifiers, String namespaceSpecificPart) {
 
         if (namespaceIdentifiers == null || namespaceSpecificPart == null) {
@@ -52,7 +52,7 @@ public class MCRURN {
      * @param s
      *            the string the urn should be created from
      * @see MCRURN#normalize()
-     * */
+     */
     public static MCRURN valueOf(String s) {
         if (s == null)
             return null;
@@ -265,7 +265,9 @@ public class MCRURN {
         namespaceSpecificPart = namespaceSpecificPart.substring(0, namespaceSpecificPart.length() - 1);
     }
 
-    /** @return a String representation of this urn without the trailing checksum */
+    /**
+     * @return a String representation of this urn
+     */
     @Override
     public String toString() {
         if (namespaceIdentifiers == null || namespaceSpecificPart == null)
@@ -291,8 +293,8 @@ public class MCRURN {
 
     /**
      * Generates the checksum and permanently attaches the checksum to the urn.
-     * That means if the {@link MCRURN#toString()} is called the checksum will be
-     * the last digit.
+     * That means if the {@link MCRURN#toString()} is called the checksum will
+     * be the last digit.
      * 
      * @return <code>true</code> if the checksum was attached,
      *         <code>false</code> otherwise
