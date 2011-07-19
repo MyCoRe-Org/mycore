@@ -34,6 +34,7 @@
                 <layout>thesis</layout>
                 <layout>periodical</layout>
                 <layout>report</layout>
+                <layout>av-media</layout>
               </layouts>
             </layoutDefinition>
           </layoutDefinitions>
