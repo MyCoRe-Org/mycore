@@ -312,7 +312,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
     public InputSource resolveEntity(String publicId, String systemId) throws IOException {
         LOGGER.debug("Resolving " + publicId + " :: " + systemId);
         try {
-            return resolveEntity(null, publicId, null, systemId);
+            return resolveEntity(null, publicId, null, getFileName(systemId));
         } catch (SAXException e) {
             throw new IOException(e);
         }
@@ -338,7 +338,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             // if you overwrite SYSTEM by empty String in XSL
             return new InputSource(new StringReader(""));
         }
-        InputStream is = getCachedResource("/" + getFileName(systemId));
+        InputStream is = getCachedResource("/" + systemId);
         if (is == null) {
             return null;
         }
