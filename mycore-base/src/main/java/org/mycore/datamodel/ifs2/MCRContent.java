@@ -44,6 +44,7 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUtils;
+import org.xml.sax.InputSource;
 
 /**
  * Used to read/write content from any source to any target. Sources and targets
@@ -202,6 +203,17 @@ public class MCRContent {
     public InputStream getInputStream() {
         checkConsumed();
         return in;
+    }
+    
+    /**
+     * Returns content as SAX input source.
+     * 
+     * @return input source to read content from
+     */
+    public InputSource getInputSource() {
+        InputSource source = new InputSource(getInputStream());
+        source.setSystemId(systemId);
+        return source;
     }
 
     /**

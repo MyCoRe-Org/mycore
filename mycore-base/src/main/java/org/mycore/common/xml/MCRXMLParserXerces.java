@@ -72,8 +72,7 @@ public class MCRXMLParserXerces implements MCRXMLParser {
 
     public Document parseXML(MCRContent content) throws SAXParseException {
         try {
-            InputSource source = new InputSource(content.getInputStream());
-            source.setSystemId(content.getSystemId());
+            InputSource source = content.getInputSource();
             return builder.build(source);
         } catch (Exception ex) {
             if (ex instanceof SAXParseException) {
