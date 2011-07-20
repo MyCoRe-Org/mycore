@@ -1,14 +1,314 @@
 <imports xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  <!-- *** Text fields *** -->
-  <textfield id="TFzeile10" width="10" maxlength="10" />
-  <textfield id="TFzeile32" width="32" maxlength="32" />
-  <textfield id="TFzeile64" width="48" maxlength="64" />
-  <textfield id="TFzeile128" width="60" maxlength="128" />
-  <textfield id="TFzeile512" width="60" maxlength="512" />
-  <textfield id="TFzeile1024" width="60" maxlength="1024" />
-  <!-- *** Text area *** -->
-  <textarea id="TFarea4096" width="48" height="8" maxlength="4096" />
-  <textarea id="TFeditor" wysiwygEditor="true" editorWidth="500" editorHeight="200" width="60" height="10" />
+
+  <!-- genre classification -->
+  <text id="mods.genre.class.label">
+    <label xml:lang="de">Genre (*)</label>
+    <label xml:lang="en">Genre (*)</label>
+  </text>
+
+  <panel id="mods.genre.class">
+    <cell anchor="NORTHWEST" var="mods:classification">
+      <list width="30" type="dropdown">
+        <include ref="pleaseSelect" />
+        <include uri="classification:editor:-1:children:diniPublType" cacheable="false" />
+      </list>
+    </cell>
+    <condition required="true">
+      <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
+      <label xml:lang="en">Please select one entry!</label>
+    </condition>
+  </panel>
+
+  <helpPopup id="mods.genre.class.help" width="400px" height="250px">
+    <label xml:lang="de">Wählen Sie bitte das zugehörige Genre aus.</label>
+    <label xml:lang="en">Select an entry from the genre list.</label>
+  </helpPopup>
+  <!-- genre classification END -->
+
+  <!-- TITLE -->
+  <text id="mods.title.label">
+    <label xml:lang="de">Titel (*)</label>
+    <label xml:lang="en">Title (*)</label>
+  </text>
+
+  <panel id="mods.title">
+    <cell anchor="NORTHWEST" var="mods:title">
+      <panel>
+        <cell anchor="NORTHWEST" ref="TFzeile512" />
+        <condition required="true">
+          <label xml:lang="de">Tragen Sie hier den Titel des Dokumentes ein.</label>
+          <label xml:lang="en">Enter the title of the document here.</label>
+        </condition>
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.title.help" width="400px" height="250px">
+    <label xml:lang="de">
+      Titel des Reports
+        </label>
+    <label xml:lang="en">
+      title of report
+        </label>
+  </helpPopup>
+  <!-- TITLE END -->
+
+  <!-- LANGUAGE -->
+  <text id="mods.languageTerm.label">
+    <label xml:lang="de">Sprache (*)</label>
+    <label xml:lang="en">Language (*)</label>
+  </text>
+
+  <panel id="mods.languageTerm">
+    <cell anchor="NORTHWEST" var="mods:languageTerm">
+      <panel>
+        <hidden var="@authority" default="iso639-2b" />
+        <hidden var="@type" default="code" />
+        <cell col="1">
+          <list id="ListLang" type="dropdown" default="ger">
+            <item value="ger">
+              <label xml:lang="de">Deutsch</label>
+              <label xml:lang="en">German</label>
+            </item>
+            <item value="eng">
+              <label xml:lang="de">Englisch</label>
+              <label xml:lang="en">English</label>
+            </item>
+          </list>
+        </cell>
+        <condition required="true">
+          <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
+          <label xml:lang="en">Please select one entry!</label>
+        </condition>
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.languageTerm.help" width="400px" height="250px">
+    <label xml:lang="de">
+      Sprache des Dokuments
+        </label>
+    <label xml:lang="en">
+      language of document
+        </label>
+  </helpPopup>
+  <!-- LANGUAGE END -->
+
+  <!-- Author -->
+  <text id="mods.author.label">
+    <label xml:lang="de">Autor (*)</label>
+    <label xml:lang="en">Author (*)</label>
+  </text>
+
+  <panel id="mods.author">
+    <cell anchor="NORTHWEST" var="mods:name[@type='person']">
+      <panel>
+        <hidden var="mods:role/mods:roleTerm" default="author" />
+        <hidden var="mods:role/mods:roleTerm/@authority" default="marcrelator" />
+        <hidden var="mods:role/mods:roleTerm/@type" default="text" />
+        <cell col="1" row="1" anchor="EAST" var="mods:namePart[@type='given']">
+          <cell anchor="NORTHWEST" ref="TFzeile512" />
+        </cell>
+        <condition required="true">
+          <label xml:lang="de">Bitte geben Sie den Namen des Autors an!</label>
+          <label xml:lang="en">Please insert the name of the author.</label>
+        </condition>
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.author.help" width="400px" height="250px">
+    <label xml:lang="de">Bitte geben Sie den Namen des Autors an!</label>
+    <label xml:lang="en">Please insert the name of the author.</label>
+  </helpPopup>
+  <!-- Author END -->
+
+  <!-- Institutionszugehörigkeit -->
+  <text id="mods.nameCorporate.label">
+    <label xml:lang="de">Einreichung (*)</label>
+    <label xml:lang="en">Submission (*)</label>
+  </text>
+
+  <panel id="mods.nameCorporate">
+    <cell anchor="NORTHWEST" var="mods:name[@type='corporate']">
+      <panel>
+        <hidden var="mods:role/mods:roleTerm" default="institution" />
+        <hidden var="mods:role/mods:roleTerm/@authority" default="marcrelator" />
+        <hidden var="mods:role/mods:roleTerm/@type" default="text" />
+        <cell col="1" row="1" anchor="EAST" var="mods:namePart[@type='given']">
+          <cell anchor="NORTHWEST" ref="TFzeile512" />
+        </cell>
+        <condition required="true">
+          <label xml:lang="de">Bitte geben Sie den Namen der Institution an!</label>
+          <label xml:lang="en">Please insert institution name.</label>
+        </condition>
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.nameCorporate.help" width="400px" height="250px">
+    <label xml:lang="de">Wählen Sie die Institution aus.</label>
+    <label xml:lang="en">Select an institution from the list.</label>
+  </helpPopup>
+  <!-- Institutionszugehörigkeit END -->
+
+  <!-- Publisher [text] -->
+  <text id="mods.publisher.label">
+    <label xml:lang="de">Herausgeber (*)</label>
+    <label xml:lang="en">Publisher (*)</label>
+  </text>
+
+  <panel id="mods.publisher">
+    <cell anchor="NORTHWEST" var="mods:publisher">
+      <panel>
+        <cell anchor="NORTHWEST" ref="TFzeile512" />
+        <condition required="true">
+          <label xml:lang="de">Tragen Sie hier den Verleger/Herausgeber ein (Druckerei, Medienanstalt ...)).</label>
+          <label xml:lang="en">Enter publisher here.</label>
+        </condition>
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.publisher.help" width="400px" height="250px">
+    <label xml:lang="de">
+      Publisher (Druckerei, Medienanstalt ...)
+        </label>
+    <label xml:lang="en">
+      Publisher
+        </label>
+  </helpPopup>
+  <!-- Publisher END -->
+
+  <!-- Datum der Veröffentlichung [text] -->
+  <text id="mods.dateIssued.label">
+    <label xml:lang="de">Veröffentlichungsdatum (*)</label>
+    <label xml:lang="en">Date of Publishing (*)</label>
+  </text>
+
+  <panel id="mods.dateIssued">
+    <cell anchor="NORTHWEST" var="mods:dateIssued">
+      <panel>
+        <cell anchor="NORTHWEST" ref="TFzeile512" />
+        <condition required="true">
+          <label xml:lang="de">Tragen Sie hier das Datum der Veröffentlichung ein.</label>
+          <label xml:lang="en">Enter the date of publication here.</label>
+        </condition>
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.dateIssued.help" width="400px" height="250px">
+    <label xml:lang="de">
+      Datum der Veröffentlichung
+        </label>
+    <label xml:lang="en">
+      Date of Publication
+        </label>
+  </helpPopup>
+  <!-- Datum der Veröffentlichung END -->
+
+  <!-- Abstract -->
+  <!-- ToDo: Sprachabhaengig machen -->
+  <text id="mods.abstract.label">
+    <label xml:lang="de">Zusammenfassung</label>
+    <label xml:lang="en">Abstract</label>
+  </text>
+
+  <panel id="mods.abstract">
+    <cell col="2" row="50" anchor="NORTHWEST" var="mods:abstract">
+      <repeater min="1" max="5" pos="right">
+        <panel>
+          <cell anchor="NORTHWEST" ref="TFarea4096" />
+        </panel>
+      </repeater>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.abstract.help" width="400px" height="250px">
+    <label xml:lang="de">
+      Abstract in verschiedenen Sprachen
+        </label>
+    <label xml:lang="en">
+      abstract (translated also)
+        </label>
+  </helpPopup>
+  <!-- Abstract END -->
+
+  <!-- Stichworte -->
+  <text id="mods.subject.label">
+    <label xml:lang="de">Stichworte</label>
+    <label xml:lang="en">Subject</label>
+  </text>
+
+  <panel id="mods.subject">
+    <cell anchor="NORTHWEST" var="mods:subject">
+      <repeater min="1" max="500" pos="right" var="mods:topic">
+        <panel>
+          <cell anchor="NORTHWEST" ref="TFzeile512" />
+        </panel>
+      </repeater>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.subject.help" width="400px" height="250px">
+    <label xml:lang="de">
+      Stichworte
+        </label>
+    <label xml:lang="en">
+      Subject
+        </label>
+  </helpPopup>
+  <!-- Stichworte END -->
+
+  <!-- Kommentar -->
+  <text id="mods.note.label">
+    <label xml:lang="de">Kommentar</label>
+    <label xml:lang="en">Comment</label>
+  </text>
+
+  <panel id="mods.note">
+    <cell anchor="NORTHWEST" var="mods:note">
+      <repeater min="1" max="10" pos="right">
+        <panel>
+          <cell anchor="NORTHWEST" ref="TFzeile512" />
+        </panel>
+      </repeater>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.note.help" width="400px" height="250px">
+    <label xml:lang="de">
+      Kommentar
+        </label>
+    <label xml:lang="en">
+      Comment
+        </label>
+  </helpPopup>
+  <!-- Kommentar END -->
+
+  <!-- Standort -->
+  <text id="mods.physicalLocation.label">
+    <label xml:lang="de">Standort</label>
+    <label xml:lang="en">Location</label>
+  </text>
+  <panel id="mods.physicalLocation">
+    <cell anchor="NORTHWEST" var="mods:physicalLocation">
+      <panel>
+        <cell anchor="NORTHWEST" ref="TFzeile512" />
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.physicalLocation.help" width="400px" height="250px">
+    <label xml:lang="de">
+      Standort
+        </label>
+    <label xml:lang="en">
+      Location
+        </label>
+  </helpPopup>
+  <!-- Standort END -->
 
   <!-- Quelle -->
   <text id="mods.relatedItem.label">
@@ -17,9 +317,9 @@
   </text>
 
   <panel id="mods.relatedItem">
-    <cell anchor="WEST" var="relatedItem">
+    <cell anchor="NORTHWEST" var="relatedItem">
       <panel>
-        <cell anchor="WEST" ref="TFzeile512" />
+        <cell anchor="NORTHWEST" ref="TFzeile512" />
       </panel>
     </cell>
   </panel>
@@ -33,5 +333,24 @@
       </label>
   </helpPopup>
   <!-- Quelle END -->
+
+  <!-- *** Text fields *** -->
+  <textfield id="TFzeile10" width="10" maxlength="10" />
+  <textfield id="TFzeile32" width="32" maxlength="32" />
+  <textfield id="TFzeile64" width="48" maxlength="64" />
+  <textfield id="TFzeile128" width="60" maxlength="128" />
+  <textfield id="TFzeile512" width="60" maxlength="512" />
+  <textfield id="TFzeile1024" width="60" maxlength="1024" />
+  <!-- *** Text area *** -->
+  <textarea id="TFarea4096" width="48" height="8" maxlength="4096" />
+  <textarea id="TFeditor" wysiwygEditor="true" editorWidth="500" editorHeight="200" width="60" height="10" />
+
+  <list id="pleaseSelect">
+    <item value="">
+      <label xml:lang="de">(bitte wählen)</label>
+      <label xml:lang="en">(please select)</label>
+    </item>
+  </list>
+
 
 </imports>
