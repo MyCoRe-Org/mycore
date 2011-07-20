@@ -23,15 +23,19 @@
 
 package org.mycore.common.xml;
 
-import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.text.MessageFormat;
 
+import org.apache.log4j.Logger;
 import org.apache.xerces.parsers.SAXParser;
 import org.jdom.Document;
 import org.jdom.input.SAXBuilder;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.ifs2.MCRContent;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
+import org.xml.sax.ext.EntityResolver2;
 
 /**
  * Parses XML content using the default Xerces parser. 
@@ -59,7 +63,7 @@ public class MCRXMLParserXerces implements MCRXMLParser {
         builder.setFeature(FEATURE_FULL_SCHEMA_SUPPORT, false);
         builder.setReuseParser(false);
         builder.setErrorHandler(new MCRXMLParserErrorHandler());
-        builder.setEntityResolver(MCRURIResolver.instance());
+        builder.setEntityResolver(new XercesBugFixResolver(MCRURIResolver.instance()));
     }
 
     public boolean isValidating() {
@@ -81,5 +85,50 @@ public class MCRXMLParserXerces implements MCRXMLParser {
             }
             throw new MCRException(msg, ex);
         }
+    }
+
+    /**
+     * Xerces 2.11.0 does not provide a relative systemId if baseURI is a XML file to be validated by a schema specified in systemId.
+     * This EntityResolver makes a relative systemId so that the fallback could conform to the defined interface.
+     * @author Thomas Scheffler (yagee)
+     *
+     */
+    private static class XercesBugFixResolver implements EntityResolver2 {
+        private EntityResolver2 fallback;
+
+        private static Logger LOGGER = Logger.getLogger(MCRXMLParserXerces.class);
+
+        public XercesBugFixResolver(EntityResolver2 fallback) {
+            this.fallback = fallback;
+        }
+
+        @Override
+        public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
+            return fallback.resolveEntity(publicId, systemId);
+        }
+
+        @Override
+        public InputSource getExternalSubset(String name, String baseURI) throws SAXException, IOException {
+            return fallback.getExternalSubset(name, baseURI);
+        }
+
+        @Override
+        public InputSource resolveEntity(String name, String publicId, String baseURI, String systemId) throws SAXException, IOException {
+            String prefix = getPrefix(baseURI);
+            LOGGER.debug(MessageFormat.format("systemId: {0} prefixed? {1}", systemId, systemId.startsWith(prefix)));
+            if (prefix.length() > 0 && systemId.startsWith(prefix)) {
+                systemId = systemId.substring(prefix.length());
+                LOGGER.debug("new systemId: " + systemId);
+            }
+            return fallback.resolveEntity(name, publicId, baseURI, systemId);
+        }
+
+        private static String getPrefix(String baseURI) {
+            int pos = baseURI.lastIndexOf('/');
+            String prefix = baseURI.substring(0, pos + 1);
+            LOGGER.debug(MessageFormat.format("prefix of baseURI ''{0}'' is: {1}", baseURI, prefix));
+            return prefix;
+        }
+
     }
 }
