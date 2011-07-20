@@ -1,0 +1,37 @@
+<imports xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <!-- *** Text fields *** -->
+  <textfield id="TFzeile10" width="10" maxlength="10" />
+  <textfield id="TFzeile32" width="32" maxlength="32" />
+  <textfield id="TFzeile64" width="48" maxlength="64" />
+  <textfield id="TFzeile128" width="60" maxlength="128" />
+  <textfield id="TFzeile512" width="60" maxlength="512" />
+  <textfield id="TFzeile1024" width="60" maxlength="1024" />
+  <!-- *** Text area *** -->
+  <textarea id="TFarea4096" width="48" height="8" maxlength="4096" />
+  <textarea id="TFeditor" wysiwygEditor="true" editorWidth="500" editorHeight="200" width="60" height="10" />
+
+  <!-- Quelle -->
+  <text id="mods.relatedItem.label">
+    <label xml:lang="de">2. Quelle</label>
+    <label xml:lang="en">2nd source</label>
+  </text>
+
+  <panel id="mods.relatedItem">
+    <cell anchor="WEST" var="relatedItem">
+      <panel>
+        <cell anchor="WEST" ref="TFzeile512" />
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.relatedItem.help" width="400px" height="250px">
+    <label xml:lang="de">
+      Quellenangabe
+      </label>
+    <label xml:lang="en">
+      Source
+      </label>
+  </helpPopup>
+  <!-- Quelle END -->
+
+</imports>

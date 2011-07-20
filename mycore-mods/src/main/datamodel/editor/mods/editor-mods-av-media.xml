@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <imports>
+  <include uri="webapp:editor/editor-mods-common.xml" />
   <panel id="edit-mods-av-media">
     <hidden var="@ID" />
     <hidden var="@label" />
@@ -355,28 +356,9 @@
     <!-- Standort END -->
 
     <!-- Quelle -->
-    <cell col="1" row="90" anchor="NORTHEAST">
-      <text>
-        <label xml:lang="de">2. Quelle</label>
-        <label xml:lang="en">2nd source</label>
-      </text>
-    </cell>
-    <cell col="2" row="90" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/relatedItem">
-      <textfield width="60" maxlength="128">
-        <label xml:lang="de">Geben Sie die Quelle an</label>
-        <label xml:lang="en">Enter the source</label>
-      </textfield>
-    </cell>
-    <cell col="3" row="90" anchor="NORTHWEST">
-      <helpPopup width="400px" height="250px">
-        <label xml:lang="de">
-          Quellenangabe
-        </label>
-        <label xml:lang="en">
-          Source
-        </label>
-      </helpPopup>
-    </cell>
+    <cell row="90" col="1" anchor="EAST" ref="mods.relatedItem.label" />
+    <cell row="90" col="2" anchor="WEST" ref="mods.relatedItem" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="90" col="3" anchor="EAST" ref="mods.relatedItem.help" />
     <!-- Quelle END -->
 
     <cell col="1" colspan="3" row="150" anchor="EAST" style="padding-top:20px;">
