@@ -119,11 +119,21 @@ public class MCRXMLParserXerces implements MCRXMLParser {
             if (prefix.length() > 0 && systemId.startsWith(prefix)) {
                 systemId = systemId.substring(prefix.length());
                 LOGGER.debug("new systemId: " + systemId);
+            } else {
+                LOGGER.debug("Try to use EntityResolver interface");
+                InputSource inputSource = resolveEntity(publicId, systemId);
+                if (inputSource != null) {
+                    LOGGER.debug("Found resource in EntityResolver interface");
+                    return inputSource;
+                }
             }
             return fallback.resolveEntity(name, publicId, baseURI, systemId);
         }
 
         private static String getPrefix(String baseURI) {
+            if (baseURI == null) {
+                return "";
+            }
             int pos = baseURI.lastIndexOf('/');
             String prefix = baseURI.substring(0, pos + 1);
             LOGGER.debug(MessageFormat.format("prefix of baseURI ''{0}'' is: {1}", baseURI, prefix));
