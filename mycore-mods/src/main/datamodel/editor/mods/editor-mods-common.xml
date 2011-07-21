@@ -53,6 +53,33 @@
   </helpPopup>
   <!-- TITLE END -->
 
+  <!-- TITLE Translated -->
+  <text id="mods.title.translated.label">
+    <label xml:lang="de">Titel übersetzt</label>
+    <label xml:lang="en">Title translated</label>
+  </text>
+
+  <panel id="mods.title.translated">
+    <cell anchor="NORTHWEST" var="mods:titleInfo[@type='translated']/mods:title">
+      <repeater min="1" max="5" pos="right">
+        <panel>
+          <cell anchor="NORTHWEST" ref="TFzeile512" />
+        </panel>
+      </repeater>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.title.translated.help" width="400px" height="250px">
+    <label xml:lang="de">
+      Titel übersetzt (mehrere Sprachen)
+        </label>
+    <label xml:lang="en">
+      title translated
+        </label>
+  </helpPopup>
+
+  <!-- TITLE Translated END -->
+
   <!-- LANGUAGE -->
   <text id="mods.languageTerm.label">
     <label xml:lang="de">Sprache (*)</label>
@@ -94,36 +121,78 @@
   </helpPopup>
   <!-- LANGUAGE END -->
 
-  <!-- Author -->
+  <!-- pub_autor_dok_txt [text] and reviewer -->
   <text id="mods.author.label">
-    <label xml:lang="de">Autor (*)</label>
-    <label xml:lang="en">Author (*)</label>
+    <label xml:lang="de">Personen (*)</label>
+    <label xml:lang="en">Persons (*)</label>
   </text>
 
   <panel id="mods.author">
-    <cell anchor="NORTHWEST" var="mods:name[@type='person']">
-      <panel>
-        <hidden var="mods:role/mods:roleTerm" default="author" />
-        <hidden var="mods:role/mods:roleTerm/@authority" default="marcrelator" />
-        <hidden var="mods:role/mods:roleTerm/@type" default="text" />
-        <cell col="1" row="1" anchor="EAST" var="mods:namePart[@type='given']">
-          <cell anchor="NORTHWEST" ref="TFzeile512" />
-        </cell>
-        <condition required="true">
-          <label xml:lang="de">Bitte geben Sie den Namen des Autors an!</label>
-          <label xml:lang="en">Please insert the name of the author.</label>
-        </condition>
-      </panel>
+    <cell anchor="NORTHWEST" var="mods:name[@type='personal']">
+      <repeater min="1" max="20" pos="right">
+        <panel>
+          <cell col="1" row="1" var="mods:role/mods:roleTerm">
+            <panel>
+              <hidden var="@authority" default="marcrelator" />
+              <hidden var="@type" default="text" />
+              <cell>
+                <list type="dropdown" default="author">
+                  <item value="author">
+                    <label xml:lang="de">Autor</label>
+                    <label xml:lang="en">Author</label>
+                  </item>
+                  <item value="reviewer">
+                    <label xml:lang="de">Gutachter</label>
+                    <label xml:lang="en">Reviewer</label>
+                  </item>
+                </list>
+              </cell>
+            </panel>
+          </cell>
+          <cell col="2" row="1" anchor="EAST">
+            <text>
+              <label xml:lang="de">Vorname</label>
+              <label xml:lang="en">First Name</label>
+            </text>
+          </cell>
+          <cell col="3" row="1" anchor="EAST" var="mods:namePart[@type='given']">
+            <textfield width="31" maxlength="128">
+              <condition required="true">
+                <label xml:lang="de">Bitte geben Sie den Vornamen der Person an!</label>
+                <label xml:lang="en">Please insert authors first name.</label>
+              </condition>
+            </textfield>
+          </cell>
+          <cell col="2" row="2" anchor="EAST">
+            <text>
+              <label xml:lang="de">Nachname</label>
+              <label xml:lang="en">Last Name</label>
+            </text>
+          </cell>
+          <cell col="3" row="2" anchor="EAST" var="mods:namePart[@type='family']">
+            <textfield width="31" maxlength="128">
+              <condition required="true">
+                <label xml:lang="de">Bitte geben Sie den Nachnamen der Person an!</label>
+                <label xml:lang="en">Please insert persons last name.</label>
+              </condition>
+            </textfield>
+          </cell>
+        </panel>
+      </repeater>
     </cell>
   </panel>
 
   <helpPopup id="mods.author.help" width="400px" height="250px">
-    <label xml:lang="de">Bitte geben Sie den Namen des Autors an!</label>
-    <label xml:lang="en">Please insert the name of the author.</label>
+    <label xml:lang="de">
+      Personen (Verlinkung auf PND)
+        </label>
+    <label xml:lang="en">
+      Persons (ref to pnd)
+        </label>
   </helpPopup>
-  <!-- Author END -->
+  <!-- pub_autor_dok_txt [text] and reviewer END -->
 
-  <!-- Institutionszugehörigkeit -->
+  <!-- Institution der Einreichung -->
   <text id="mods.nameCorporate.label">
     <label xml:lang="de">Einreichung (*)</label>
     <label xml:lang="en">Submission (*)</label>
@@ -179,6 +248,33 @@
         </label>
   </helpPopup>
   <!-- Publisher END -->
+
+  <!-- Institution der Einreichung -->
+  <text id="mods.submissionAtInstituteClass.label">
+    <label xml:lang="de">Institution (*)</label>
+    <label xml:lang="en">Institution (*)</label>
+  </text>
+
+  <panel id="mods.submissionAtInstituteClass">
+    <cell anchor="NORTHWEST" var="mods:originInfo/mods:publisher">
+      <list width="30" type="dropdown">
+        <include ref="pleaseSelect" />
+        <!-- ToDo: richtige Klassifikation anlegen und einbinden -->
+        <include uri="classification:editor:-1:children:DocPortal_class_00000002" cacheable="false" />
+        <condition required="true">
+          <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
+          <label xml:lang="en">Please select one entry!</label>
+        </condition>
+      </list>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.submissionAtInstituteClass.help" width="400px" height="250px">
+    <label xml:lang="de">Wählen Sie die Institution aus, an der die Promotion eingereicht wurde</label>
+    <label xml:lang="en">Select an institution from the list.</label>
+  </helpPopup>
+  <!-- Institution END -->
+
 
   <!-- Datum der Veröffentlichung [text] -->
   <text id="mods.dateIssued.label">
@@ -333,6 +429,73 @@
       </label>
   </helpPopup>
   <!-- Quelle END -->
+
+  <!-- Identifier -->
+  <text id="mods.identifier.label">
+    <label xml:lang="de">Identifier (*)</label>
+    <label xml:lang="en">Identifier (*)</label>
+  </text>
+
+  <panel id="mods.identifier">
+    <cell anchor="NORTHWEST" var="mods:identifier">
+      <repeater min="1" max="5" pos="right">
+        <panel>
+          <cell anchor="NORTHWEST" ref="TFzeile512" />
+          <cell row="1" col="2" anchor="NORTHWEST" var="@type">
+            <list type="dropdown" default="unknown">
+              <item value="urn">
+                <label xml:lang="de">URN</label>
+                <label xml:lang="en">URN</label>
+              </item>
+              <item value="citekey">
+                <label xml:lang="de">Citekey</label>
+                <label xml:lang="en">Citekey</label>
+              </item>
+              <item value="unknown">
+                <label xml:lang="de">Unbekannt</label>
+                <label xml:lang="en">Unknown</label>
+              </item>
+            </list>
+          </cell>
+        </panel>
+      </repeater>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.identifier.help" width="400px" height="250px">
+    <label xml:lang="de">
+      Identifier (ggf. mehrere, URN, DOI,...)
+        </label>
+    <label xml:lang="en">
+      Identifier (ggf. mehrere, URN, DOI,...)
+        </label>
+  </helpPopup>
+  <!-- Identifier END -->
+
+  <!-- DDC pub_klassifik -->
+  <text id="mods.ddc.label">
+    <label xml:lang="de">Klassifikation (*)</label>
+    <label xml:lang="en">Classification (*)</label>
+  </text>
+
+  <panel id="mods.ddc">
+    <cell anchor="NORTHWEST" var="mods:classification">
+      <list width="30" type="dropdown">
+        <include ref="pleaseSelect" />
+        <include uri="classification:editor:-1:children:ddc-sg" cacheable="false" />
+        <condition required="true">
+          <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
+          <label xml:lang="en">Please select one entry!</label>
+        </condition>
+      </list>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.ddc.help" width="400px" height="250px">
+    <label xml:lang="de">Wählen Sie bitte eine Zuordnung zur DDC-Sachgruppe aus.</label>
+    <label xml:lang="en">Select an entry from the ddc list.</label>
+  </helpPopup>
+  <!-- DDC pub_klassifik END -->
 
   <!-- *** Text fields *** -->
   <textfield id="TFzeile10" width="10" maxlength="10" />

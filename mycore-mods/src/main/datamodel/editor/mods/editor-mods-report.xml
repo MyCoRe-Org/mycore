@@ -28,12 +28,12 @@
     <!-- LANGUAGE END -->
 
     <!-- Author -->
-    <cell row="15" col="1" anchor="EAST" ref="mods.author.label" />
+    <cell row="15" col="1" anchor="NORTHEAST" ref="mods.author.label" />
     <cell row="15" col="2" anchor="WEST" ref="mods.author" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="15" col="3" anchor="WEST" ref="mods.author.help" />
     <!-- Author END -->
 
-    <!-- Institutionszugehörigkeit -->
+    <!-- Institution der Einreichung -->
     <cell row="20" col="1" anchor="EAST" ref="mods.nameCorporate.label" />
     <cell row="20" col="2" anchor="WEST" ref="mods.nameCorporate" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="20" col="3" anchor="WEST" ref="mods.nameCorporate.help" />
