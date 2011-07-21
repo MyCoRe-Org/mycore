@@ -56,7 +56,7 @@ StandardToolbarModelProvider.prototype = {
 		curButtonset = this.model.addElement(new ToolbarButtonsetModel("permalinkHandles"));
 		curButtonset.addButton(new ToolbarButtonModel("permalink", {'type': 'buttonCheck', 'state' : false}, {'icons': {primary : 'iview2-icon iview2-icon-permalink'}}, "toolbar.permalink", true, false));
 
-		if (iviewRef.pdfCreatorURI !== "undefined" && iviewRef.pdfCreatorURI.length>0){
+		if (typeof iviewRef.pdfCreatorURI !== "undefined" && iviewRef.pdfCreatorURI.length>0){
 			//TODO: PDF check
 			curButtonset = this.model.addElement(new ToolbarButtonsetModel("pdfHandles"));
 			curButtonset.addButton(new ToolbarButtonModel("createPdf", {'type': 'buttonDefault'}, {'icons': {primary : 'iview2-icon iview2-icon-pdf'}}, "toolbar.pdf", true, false));
