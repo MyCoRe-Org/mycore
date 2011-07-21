@@ -174,7 +174,7 @@ public class MCRMediaIFSTools {
             else
                 data = col.createFile(buildFileName(getFileName(filePath)) + ".mothumb");
 
-            data.setContent(MCRContent.readFrom(thumb, null));
+            data.setContent(MCRContent.readFrom(thumb));
         } catch (Exception ex) {
             throw new MCRException(ex);
         }

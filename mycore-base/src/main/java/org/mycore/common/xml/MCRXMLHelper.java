@@ -169,7 +169,7 @@ public class MCRXMLHelper {
      */
     public static Document parseXML(byte[] xml) throws MCRException, SAXParseException {
         try {
-            return MCRXMLParserFactory.getParser().parseXML(MCRContent.readFrom(xml, null));
+            return MCRXMLParserFactory.getParser().parseXML(MCRContent.readFrom(xml));
         } catch (IOException e) {
             throw new MCRException(e);
         }
@@ -191,7 +191,7 @@ public class MCRXMLHelper {
      */
     public static Document parseXML(byte[] xml, boolean valid) throws MCRException, SAXParseException {
         try {
-            return MCRXMLParserFactory.getParser(valid).parseXML(MCRContent.readFrom(xml, null));
+            return MCRXMLParserFactory.getParser(valid).parseXML(MCRContent.readFrom(xml));
         } catch (IOException e) {
             throw new MCRException(e);
         }

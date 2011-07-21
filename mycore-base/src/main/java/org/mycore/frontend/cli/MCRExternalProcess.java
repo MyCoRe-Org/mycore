@@ -79,7 +79,7 @@ public class MCRExternalProcess {
     }
 
     public MCRContent getOutput() throws IOException {
-        return MCRContent.readFrom(output.getOutput(),null);
+        return MCRContent.readFrom(output.getOutput());
     }
 }
 

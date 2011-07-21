@@ -97,7 +97,7 @@ public class MCRContent {
      *            the encoding to be used to write bytes
      */
     public static MCRContent readFrom(String text, String encoding) throws IOException, UnsupportedEncodingException {
-        return readFrom(text.getBytes(encoding), null);
+        return readFrom(text.getBytes(encoding));
     }
 
     /**
@@ -126,6 +126,16 @@ public class MCRContent {
      * @param bytes
      *            the content's bytes
      */
+    public static MCRContent readFrom(byte[] bytes) throws IOException {
+        return readFrom(new ByteArrayInputStream(bytes));
+    }
+
+    /**
+     * Creates content from byte[] arrray
+     * 
+     * @param bytes
+     *            the content's bytes
+     */
     public static MCRContent readFrom(byte[] bytes, String systemId) throws IOException {
         return readFrom(new ByteArrayInputStream(bytes), systemId);
     }
@@ -142,9 +152,19 @@ public class MCRContent {
         XMLOutputter xout = new XMLOutputter(Format.getRawFormat());
         xout.output(xml, out);
         out.close();
-        MCRContent content = readFrom(out.toByteArray(), null);
+        MCRContent content = readFrom(out.toByteArray());
         content.isXML = true;
         return content;
+    }
+
+    /**
+     * Creates new content from input stream
+     * 
+     * @param in
+     *            the input stream to read content from
+     */
+    public static MCRContent readFrom(InputStream in) {
+        return new MCRContent(in, null);
     }
 
     /**
