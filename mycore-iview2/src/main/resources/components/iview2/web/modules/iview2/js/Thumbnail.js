@@ -1,5 +1,3 @@
-var length = null;
-var focus = null;//holds the element which is focused
 //TODO Preload größe anhand der von den Kacheln bestimmen
 //var listener = []; // array who holds informations about the listeners (?)
 //NAVIGATE = 0;
