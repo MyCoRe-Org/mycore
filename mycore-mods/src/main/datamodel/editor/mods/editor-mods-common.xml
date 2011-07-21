@@ -77,8 +77,33 @@
       title translated
         </label>
   </helpPopup>
-
   <!-- TITLE Translated END -->
+
+  <!-- SUBTITLE pub_title_engl[text] -->
+  <text id="mods.subTitle.label">
+    <label xml:lang="de">Untertitel</label>
+    <label xml:lang="en">Sub Title translated</label>
+  </text>
+
+  <panel id="mods.subTitle">
+    <cell anchor="NORTHWEST" var="mods:titleInfo/mods:subTitle">
+      <repeater min="1" max="5" pos="right">
+        <panel>
+          <cell anchor="NORTHWEST" ref="TFzeile512" />
+        </panel>
+      </repeater>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.subTitle.help" width="400px" height="250px">
+    <label xml:lang="de">
+      Untertitel des Reports
+        </label>
+    <label xml:lang="en">
+      subtitle of reports
+        </label>
+  </helpPopup>
+  <!-- SUBTITLE pub_title_engl[text] END -->
 
   <!-- LANGUAGE -->
   <text id="mods.languageTerm.label">
@@ -304,6 +329,32 @@
   </helpPopup>
   <!-- Datum der Veröffentlichung END -->
 
+  <!-- Datum der Erstellung [text] -->
+  <text id="mods.dateCreated.label">
+    <label xml:lang="de">Erstellungsdatum</label>
+    <label xml:lang="en">Date of Creation</label>
+  </text>
+
+  <panel id="mods.dateCreated">
+    <cell anchor="NORTHWEST" var="mods:dateCreated">
+      <panel>
+        <cell col="1">
+          <textfield width="60" maxlength="128" />
+        </cell>
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.dateCreated.help" width="400px" height="250px">
+    <label xml:lang="de">
+      Datum der Erstellung
+        </label>
+    <label xml:lang="en">
+      Date of Creation
+        </label>
+  </helpPopup>
+  <!-- Datum der Erstellung END -->
+
   <!-- Abstract -->
   <!-- ToDo: Sprachabhaengig machen -->
   <text id="mods.abstract.label">
@@ -413,7 +464,7 @@
   </text>
 
   <panel id="mods.relatedItem">
-    <cell anchor="NORTHWEST" var="relatedItem">
+    <cell anchor="NORTHWEST" var="mods:relatedItem[@type='isReferencedBy']">
       <panel>
         <cell anchor="NORTHWEST" ref="TFzeile512" />
       </panel>
@@ -496,6 +547,82 @@
     <label xml:lang="en">Select an entry from the ddc list.</label>
   </helpPopup>
   <!-- DDC pub_klassifik END -->
+
+  <!-- Bei Postern -> Größe [text] -->
+  <text id="mods.physicalDescription.label">
+    <label xml:lang="de">Größe</label>
+    <label xml:lang="en">Physical Description</label>
+  </text>
+
+  <panel id="mods.physicalDescription">
+    <cell anchor="NORTHWEST" var="mods:physicalDescription/mods:extent">
+      <panel>
+        <cell anchor="NORTHWEST" ref="TFzeile512" />
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.physicalDescription.help" width="400px" height="250px">
+    <label xml:lang="de">
+      Physikalische Beschreibung, z.B. bei Postern die Größe
+        </label>
+    <label xml:lang="en">
+      Physical description, e.g. size of poster
+        </label>
+  </helpPopup>
+  <!-- Bei Postern -> Größe [text] END -->
+
+  <!-- pub_klassifik -->
+  <text id="mods.genre.kindOfReport.label">
+    <label xml:lang="de">Genre (*)</label>
+    <label xml:lang="en">Genre (*)</label>
+  </text>
+
+  <panel id="mods.genre.kindOfReport">
+    <cell anchor="NORTHWEST" var="mods:classification">
+      <list id="ListGenre" type="dropdown" default="01">
+        <condition required="true">
+          <label xml:lang="de">Forschungsergebnisse, In House Publikationen, Presseerklärungen, Poster, Zeitschrifteninhaltsverzeichnisse
+          </label>
+          <label xml:lang="en">What kind of report is this?</label>
+        </condition>
+        <item value="01">
+          <label xml:lang="de">Forschungsergebnisse</label>
+          <label xml:lang="en">Forschungsergebnisse</label>
+        </item>
+        <item value="02">
+          <label xml:lang="de">In House</label>
+          <label xml:lang="en">In House</label>
+        </item>
+        <item value="03">
+          <label xml:lang="de">Presseerklärung</label>
+          <label xml:lang="en">Presseerklärung</label>
+        </item>
+        <item value="04">
+          <label xml:lang="de">Poster</label>
+          <label xml:lang="en">Poster</label>
+        </item>
+        <item value="05">
+          <label xml:lang="de">In House</label>
+          <label xml:lang="en">In House</label>
+        </item>
+        <item value="06">
+          <label xml:lang="de">Zeitschrifteninhaltsverzeichnis</label>
+          <label xml:lang="en">Zeitschrifteninhaltsverzeichnis</label>
+        </item>
+        <item value="07">
+          <label xml:lang="de">Sonstige</label>
+          <label xml:lang="en">Other</label>
+        </item>
+      </list>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.genre.kindOfReport.help" width="400px" height="250px">
+    <label xml:lang="de">Wählen Sie bitte eine Zuordnung aus.</label>
+    <label xml:lang="en">Select an entry from the list.</label>
+  </helpPopup>
+  <!-- pub_klassifik END -->
 
   <!-- *** Text fields *** -->
   <textfield id="TFzeile10" width="10" maxlength="10" />
