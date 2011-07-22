@@ -464,7 +464,7 @@
   </text>
 
   <panel id="mods.relatedItem">
-    <cell anchor="NORTHWEST" var="mods:relatedItem[@type='isReferencedBy']">
+    <cell anchor="NORTHWEST" var="mods:relatedItem[@type='isReferencedBy']/mods:titleInfo/mods:title">
       <panel>
         <cell anchor="NORTHWEST" ref="TFzeile512" />
       </panel>
