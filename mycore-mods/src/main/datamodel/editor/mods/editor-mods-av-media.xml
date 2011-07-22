@@ -10,45 +10,45 @@
     <hidden var="metadata/@xml:lang" default="de" />
 
     <!-- genre classification -->
-    <cell row="4" col="1" anchor="EAST" ref="mods.genre.class.label" />
-    <cell row="4" col="2" anchor="WEST" ref="mods.genre.class" var="metadata/def.modsContainer/modsContainer/mods:mods/" />
-    <cell row="4" col="3" anchor="WEST" ref="mods.genre.class.help" />
+    <cell row="4" col="1" anchor="NORTHEAST" ref="mods.genre.class.label" />
+    <cell row="4" col="2" anchor="NORTHWEST" ref="mods.genre.class" var="metadata/def.modsContainer/modsContainer/mods:mods/" />
+    <cell row="4" col="3" anchor="NORTHWEST" ref="mods.genre.class.help" />
     <!-- genre classification END -->
 
     <!-- TITLE -->
-    <cell row="7" col="1" anchor="EAST" ref="mods.title.label" />
-    <cell row="7" col="2" anchor="WEST" ref="mods.title" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
-    <cell row="7" col="3" anchor="WEST" ref="mods.title.help" />
+    <cell row="7" col="1" anchor="NORTHEAST" ref="mods.title.label" />
+    <cell row="7" col="2" anchor="NORTHWEST" ref="mods.title" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
+    <cell row="7" col="3" anchor="NORTHWEST" ref="mods.title.help" />
     <!-- TITLE END -->
 
     <!-- LANGUAGE -->
-    <cell row="10" col="1" anchor="EAST" ref="mods.languageTerm.label" />
-    <cell row="10" col="2" anchor="WEST" ref="mods.languageTerm" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
-    <cell row="10" col="3" anchor="WEST" ref="mods.languageTerm.help" />
+    <cell row="10" col="1" anchor="NORTHEAST" ref="mods.languageTerm.label" />
+    <cell row="10" col="2" anchor="NORTHWEST" ref="mods.languageTerm" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
+    <cell row="10" col="3" anchor="NORTHWEST" ref="mods.languageTerm.help" />
     <!-- LANGUAGE END -->
 
     <!-- Author -->
-    <cell row="15" col="1" anchor="EAST" ref="mods.author.label" />
-    <cell row="15" col="2" anchor="WEST" ref="mods.author" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="15" col="3" anchor="WEST" ref="mods.author.help" />
+    <cell row="15" col="1" anchor="NORTHEAST" ref="mods.author.label" />
+    <cell row="15" col="2" anchor="NORTHWEST" ref="mods.author" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="15" col="3" anchor="NORTHWEST" ref="mods.author.help" />
     <!-- Author END -->
 
     <!-- Institutionszugehörigkeit -->
-    <cell row="20" col="1" anchor="EAST" ref="mods.nameCorporate.label" />
-    <cell row="20" col="2" anchor="WEST" ref="mods.nameCorporate" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="20" col="3" anchor="WEST" ref="mods.nameCorporate.help" />
+    <cell row="20" col="1" anchor="NORTHEAST" ref="mods.nameCorporate.label" />
+    <cell row="20" col="2" anchor="NORTHWEST" ref="mods.nameCorporate" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="20" col="3" anchor="NORTHWEST" ref="mods.nameCorporate.help" />
     <!-- Institutionszugehörigkeit END -->
 
     <!-- Publisher [text] -->
-    <cell row="30" col="1" anchor="EAST" ref="mods.publisher.label" />
-    <cell row="30" col="2" anchor="WEST" ref="mods.publisher" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
-    <cell row="30" col="3" anchor="WEST" ref="mods.publisher.help" />
+    <cell row="30" col="1" anchor="NORTHEAST" ref="mods.publisher.label" />
+    <cell row="30" col="2" anchor="NORTHWEST" ref="mods.publisher" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
+    <cell row="30" col="3" anchor="NORTHWEST" ref="mods.publisher.help" />
     <!-- Publisher END -->
 
     <!-- Datum der Veröffentlichung [text] -->
-    <cell row="40" col="1" anchor="EAST" ref="mods.dateIssued.label" />
-    <cell row="40" col="2" anchor="WEST" ref="mods.dateIssued" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
-    <cell row="40" col="3" anchor="WEST" ref="mods.dateIssued.help" />
+    <cell row="40" col="1" anchor="NORTHEAST" ref="mods.dateIssued.label" />
+    <cell row="40" col="2" anchor="NORTHWEST" ref="mods.dateIssued" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
+    <cell row="40" col="3" anchor="NORTHWEST" ref="mods.dateIssued.help" />
     <!-- Datum der Veröffentlichung END -->
 
     <!-- Abstract -->
@@ -70,18 +70,18 @@
     <!-- Kommentar END -->
 
     <!-- Standort -->
-    <cell row="80" col="1" anchor="EAST" ref="mods.physicalLocation.label" />
-    <cell row="80" col="2" anchor="WEST" ref="mods.physicalLocation" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:location" />
-    <cell row="80" col="3" anchor="WEST" ref="mods.physicalLocation.help" />
+    <cell row="80" col="1" anchor="NORTHEAST" ref="mods.physicalLocation.label" />
+    <cell row="80" col="2" anchor="NORTHWEST" ref="mods.physicalLocation" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:location" />
+    <cell row="80" col="3" anchor="NORTHWEST" ref="mods.physicalLocation.help" />
     <!-- Standort END -->
 
     <!-- Quelle -->
-    <cell row="90" col="1" anchor="EAST" ref="mods.relatedItem.label" />
-    <cell row="90" col="2" anchor="WEST" ref="mods.relatedItem" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="90" col="3" anchor="WEST" ref="mods.relatedItem.help" />
+    <cell row="90" col="1" anchor="NORTHEAST" ref="mods.relatedItem.label" />
+    <cell row="90" col="2" anchor="NORTHWEST" ref="mods.relatedItem" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="90" col="3" anchor="NORTHWEST" ref="mods.relatedItem.help" />
     <!-- Quelle END -->
 
-    <cell col="1" colspan="3" row="150" anchor="EAST" style="padding-top:20px;">
+    <cell col="1" colspan="3" row="150" anchor="NORTHEAST" style="padding-top:20px;">
       <submitButton width="100px" i18n="common.button.save" />
       <cancelButton width="100px" i18n="common.button.cancel" />
     </cell>

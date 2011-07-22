@@ -156,7 +156,7 @@
     <cell anchor="NORTHWEST" var="mods:name[@type='personal']">
       <repeater min="1" max="20" pos="right">
         <panel>
-          <cell col="1" row="1" var="mods:role/mods:roleTerm">
+          <cell col="1" row="1" anchor="NORTHEAST" var="mods:role/mods:roleTerm">
             <panel>
               <hidden var="@authority" default="marcrelator" />
               <hidden var="@type" default="text" />
@@ -174,13 +174,13 @@
               </cell>
             </panel>
           </cell>
-          <cell col="2" row="1" anchor="EAST">
+          <cell col="2" row="1" anchor="NORTHEAST">
             <text>
               <label xml:lang="de">Vorname</label>
               <label xml:lang="en">First Name</label>
             </text>
           </cell>
-          <cell col="3" row="1" anchor="EAST" var="mods:namePart[@type='given']">
+          <cell col="3" row="1" anchor="NORTHEAST" var="mods:namePart[@type='given']">
             <textfield width="31" maxlength="128">
               <condition required="true">
                 <label xml:lang="de">Bitte geben Sie den Vornamen der Person an!</label>
@@ -188,13 +188,13 @@
               </condition>
             </textfield>
           </cell>
-          <cell col="2" row="2" anchor="EAST">
+          <cell col="2" row="2" anchor="NORTHEAST">
             <text>
               <label xml:lang="de">Nachname</label>
               <label xml:lang="en">Last Name</label>
             </text>
           </cell>
-          <cell col="3" row="2" anchor="EAST" var="mods:namePart[@type='family']">
+          <cell col="3" row="2" anchor="NORTHEAST" var="mods:namePart[@type='family']">
             <textfield width="31" maxlength="128">
               <condition required="true">
                 <label xml:lang="de">Bitte geben Sie den Nachnamen der Person an!</label>
