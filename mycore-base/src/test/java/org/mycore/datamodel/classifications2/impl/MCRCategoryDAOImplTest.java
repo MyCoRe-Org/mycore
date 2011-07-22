@@ -382,6 +382,16 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         assertEquals("Category count does not match.", countNodes(category), countNodes(rootNode));
         assertEquals("Label count does not match.", category.getChildren().get(0).getLabels().size(), rootNode.getChildren().get(0).getLabels().size());
     }
+    
+//  @Test
+    public void replaceCategoryWithItself() {
+        addWorldClassification();
+        MCRCategory europe = category.getChildren().get(0);
+        MCRCategory germany = europe.getChildren().get(0);
+        DAO.replaceCategory(germany);
+        startNewTransaction();
+        MCRCategory rootNode = getRootCategoryFromSession();
+    }
 
     /**
      * tests top category child to new parent
