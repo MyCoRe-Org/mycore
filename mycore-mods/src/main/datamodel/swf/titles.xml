@@ -13,10 +13,59 @@
   <title step="editor" type="mods" layout="thesis" xml:lang="de">Dissertation bearbeiten</title>
   <title step="editor" type="mods" layout="thesis" xml:lang="en">Edit Thesis</title>
   
-  <title step="author" type="mods" layout="periodical" xml:lang="de">Report erstellen</title>
-  <title step="author" type="mods" layout="periodical" xml:lang="en">Create Report</title>
-  <title step="commit" type="mods" layout="periodical" xml:lang="de">Report bearbeiten</title>
-  <title step="commit" type="mods" layout="periodical" xml:lang="en">Edit Report</title>
-  <title step="editor" type="mods" layout="periodical" xml:lang="de">Report bearbeiten</title>
-  <title step="editor" type="mods" layout="periodical" xml:lang="en">Edit Report</title>
+  <title step="author" type="mods" layout="report" xml:lang="de">Report erstellen</title>
+  <title step="author" type="mods" layout="report" xml:lang="en">Create Report</title>
+  <title step="commit" type="mods" layout="report" xml:lang="de">Report bearbeiten</title>
+  <title step="commit" type="mods" layout="report" xml:lang="en">Edit Report</title>
+  <title step="editor" type="mods" layout="report" xml:lang="de">Report bearbeiten</title>
+  <title step="editor" type="mods" layout="report" xml:lang="en">Edit Report</title>
+
+  <title step="author" type="mods" layout="av-media" xml:lang="de">AV-Medium erstellen</title>
+  <title step="author" type="mods" layout="av-media" xml:lang="en">Create AV Media</title>
+  <title step="commit" type="mods" layout="av-media" xml:lang="de">AV-Medium bearbeiten</title>
+  <title step="commit" type="mods" layout="av-media" xml:lang="en">Edit AV Media</title>
+  <title step="editor" type="mods" layout="av-media" xml:lang="de">AV-Medium bearbeiten</title>
+  <title step="editor" type="mods" layout="av-media" xml:lang="en">Edit AV Media</title>
+
+  <title step="author" type="mods" layout="cproceeding" xml:lang="de">Konferenzband erstellen</title>
+  <title step="author" type="mods" layout="cproceeding" xml:lang="en">Create Conference Proceeding</title>
+  <title step="commit" type="mods" layout="cproceeding" xml:lang="de">Konferenzband bearbeiten</title>
+  <title step="commit" type="mods" layout="cproceeding" xml:lang="en">Edit Conference Proceeding</title>
+  <title step="editor" type="mods" layout="cproceeding" xml:lang="de">Konferenzband bearbeiten</title>
+  <title step="editor" type="mods" layout="cproceeding" xml:lang="en">Edit Conference Proceeding</title>
+
+  <title step="author" type="mods" layout="cpublication" xml:lang="de">Konferenzbeitrag erstellen</title>
+  <title step="author" type="mods" layout="cpublication" xml:lang="en">Create Conference Publication</title>
+  <title step="commit" type="mods" layout="cpublication" xml:lang="de">Konferenzbeitrag bearbeiten</title>
+  <title step="commit" type="mods" layout="cpublication" xml:lang="en">Edit Conference Publication</title>
+  <title step="editor" type="mods" layout="cpublication" xml:lang="de">Konferenzbeitrag bearbeiten</title>
+  <title step="editor" type="mods" layout="cpublication" xml:lang="en">Edit Conference Publication</title>
+
+  <title step="author" type="mods" layout="bchapter" xml:lang="de">Buchkapitel erstellen</title>
+  <title step="author" type="mods" layout="bchapter" xml:lang="en">Create Book Chapter</title>
+  <title step="commit" type="mods" layout="bchapter" xml:lang="de">Buchkapitel bearbeiten</title>
+  <title step="commit" type="mods" layout="bchapter" xml:lang="en">Edit Book Chapter</title>
+  <title step="editor" type="mods" layout="bchapter" xml:lang="de">Buchkapitel bearbeiten</title>
+  <title step="editor" type="mods" layout="bchapter" xml:lang="en">Edit Book Chapter</title>
+
+  <title step="author" type="mods" layout="book" xml:lang="de">Buch erstellen</title>
+  <title step="author" type="mods" layout="book" xml:lang="en">Create Book</title>
+  <title step="commit" type="mods" layout="book" xml:lang="de">Buch bearbeiten</title>
+  <title step="commit" type="mods" layout="book" xml:lang="en">Edit Book</title>
+  <title step="editor" type="mods" layout="book" xml:lang="de">Buch bearbeiten</title>
+  <title step="editor" type="mods" layout="book" xml:lang="en">Edit Book</title>
+
+  <title step="author" type="mods" layout="journal" xml:lang="de">Zeitschrift erstellen</title>
+  <title step="author" type="mods" layout="journal" xml:lang="en">Create Journal</title>
+  <title step="commit" type="mods" layout="journal" xml:lang="de">Zeitschrift bearbeiten</title>
+  <title step="commit" type="mods" layout="journal" xml:lang="en">Edit Journal</title>
+  <title step="editor" type="mods" layout="journal" xml:lang="de">Zeitschrift bearbeiten</title>
+  <title step="editor" type="mods" layout="journal" xml:lang="en">Edit Journal</title>
+
+  <title step="author" type="mods" layout="article" xml:lang="de">Zeitschriftenaufsatz erstellen</title>
+  <title step="author" type="mods" layout="article" xml:lang="en">Create Article</title>
+  <title step="commit" type="mods" layout="article" xml:lang="de">Zeitschriftenaufsatz bearbeiten</title>
+  <title step="commit" type="mods" layout="article" xml:lang="en">Edit Article</title>
+  <title step="editor" type="mods" layout="article" xml:lang="de">Zeitschriftenaufsatz bearbeiten</title>
+  <title step="editor" type="mods" layout="article" xml:lang="en">Edit Article</title>
 </titles>
