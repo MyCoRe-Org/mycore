@@ -217,7 +217,7 @@
   </helpPopup>
   <!-- pub_autor_dok_txt [text] and reviewer END -->
 
-  <!-- Institutionszugehörigkeit (wo bei BMELV-Forschung zugeordnet) -->
+  <!-- Institutionszugehörigkeit (wo zugeordnet) -->
   <text id="mods.assignedInstituteClass.label">
     <label xml:lang="de">Institutionszugehörigkeit (*)</label>
     <label xml:lang="en">Assignment (*)</label>
@@ -225,26 +225,24 @@
 
   <panel id="mods.assignedInstituteClass">
     <cell anchor="NORTHWEST" var="mods:name[@type='corporate']">
-      <panel>
-        <hidden var="mods:role/mods:roleTerm" default="institution" />
-        <hidden var="mods:role/mods:roleTerm/@authority" default="marcrelator" />
-        <hidden var="mods:role/mods:roleTerm/@type" default="text" />
-        <repeater min="1" max="5" pos="right">
-          <panel>
-            <cell col="1" row="1" anchor="EAST" var="mods:namePart[@type='given']">
-              <list width="30" type="dropdown">
-                <include ref="pleaseSelect" />
-                <!-- ToDo: richtige Klassifikation anlegen und einbinden -->
-                <include uri="classification:editor:-1:children:DocPortal_class_00000002" cacheable="false" />
-                <condition required="true">
-                  <label xml:lang="de">Bitte wählen den Namen der Institution aus!</label>
-                  <label xml:lang="en">Please select institution!</label>
-                </condition>
-              </list>
-            </cell>
-          </panel>
-        </repeater>
-      </panel>
+      <hidden var="mods:role/mods:roleTerm" default="institution" />
+      <hidden var="mods:role/mods:roleTerm/@authority" default="marcrelator" />
+      <hidden var="mods:role/mods:roleTerm/@type" default="text" />
+      <repeater min="1" max="5" pos="right">
+        <panel>
+          <cell col="1" row="1" anchor="EAST" var="mods:namePart[@type='given']">
+            <list width="30" type="dropdown">
+              <include ref="pleaseSelect" />
+              <!-- ToDo: richtige Klassifikation anlegen und einbinden -->
+              <include uri="classification:editor:-1:children:DocPortal_class_00000002" cacheable="false" />
+              <condition required="true">
+                <label xml:lang="de">Bitte wählen den Namen der Institution aus!</label>
+                <label xml:lang="en">Please select institution!</label>
+              </condition>
+            </list>
+          </cell>
+        </panel>
+      </repeater>
     </cell>
   </panel>
 
@@ -320,7 +318,7 @@
       <panel>
         <cell anchor="NORTHWEST" ref="TFzeile512" />
         <condition required="true">
-          <label xml:lang="de">Tragen Sie hier das Datum der Veröffentlichung ein.</label>
+          <label xml:lang="de">Tragen Sie hier das Datum der Veröffentlichung (oder z.B. bei Filmen das Datum der Aufnahme) ein.</label>
           <label xml:lang="en">Enter the date of publication here.</label>
         </condition>
       </panel>
