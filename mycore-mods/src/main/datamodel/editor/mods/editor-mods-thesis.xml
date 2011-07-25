@@ -11,7 +11,7 @@
     <hidden var="metadata/@xml:lang" default="de" />
 
     <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:typeOfResource" descendants="true" />
-    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre" descendants="true" />
+    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre" default="thesis" />
     <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/@ID" />
     <hidden var="metadata/def.modsContainer/@class" default="MCRMetaXML" />
     <hidden var="metadata/def.modsContainer/@notinherit" default="true" />

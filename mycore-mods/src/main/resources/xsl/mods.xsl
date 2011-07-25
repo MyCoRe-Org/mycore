@@ -127,11 +127,31 @@
           <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='thesis'">
             <xsl:value-of select="'thesis'"/>
           </xsl:when>
-          <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:genre='periodical'">
-            <xsl:value-of select="'periodical'"/>
+          <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='article' or
+                          (./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:genre='periodical' and
+                           ./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier/@type='doi')">
+            <xsl:value-of select="'article'"/>
+          </xsl:when>
+          <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='av media'">
+            <xsl:value-of select="'av-media'"/>
+          </xsl:when>
+          <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='conference proceeding'">
+            <xsl:value-of select="'cproceeding'"/>
+          </xsl:when>
+          <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='conference publication'">
+            <xsl:value-of select="'cpublication'"/>
+          </xsl:when>
+          <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='book chapter'">
+            <xsl:value-of select="'bchapter'"/>
+          </xsl:when>
+          <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='book'">
+            <xsl:value-of select="'book'"/>
+          </xsl:when>
+          <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='journal'">
+            <xsl:value-of select="'journal'"/>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="'$'"/>
+            <xsl:value-of select="'report'"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
