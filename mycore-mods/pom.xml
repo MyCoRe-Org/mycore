@@ -32,9 +32,14 @@
               <objectType>mods</objectType>
               <layouts>
                 <layout>thesis</layout>
-                <layout>periodical</layout>
                 <layout>report</layout>
                 <layout>av-media</layout>
+                <layout>cproceeding</layout>
+                <layout>cpublication</layout>
+                <layout>bchapter</layout>
+                <layout>book</layout>
+                <layout>journal</layout>
+                <layout>article</layout>
               </layouts>
             </layoutDefinition>
           </layoutDefinitions>
