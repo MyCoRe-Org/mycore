@@ -10,6 +10,9 @@
   <artifactId>mycore-complete</artifactId>
   <name>MyCoRe Complete JAR package</name>
   <description>jar packaging of MyCoRe containing mycore-base and all components</description>
+  <properties>
+    <include.dependencies>org.mycore*</include.dependencies>
+  </properties>
   <build>
     <plugins>
       <plugin>
@@ -59,12 +62,22 @@
               </transformers>
               <artifactSet>
                 <includes>
-                  <include>org.mycore*</include>
+                  <include>${include.dependencies}</include>
                 </includes>
               </artifactSet>
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <failOnError>false</failOnError>
+          <includeDependencySources>true</includeDependencySources>
+          <dependencySourceIncludes>
+            <dependencySourceInclude>${include.dependencies}</dependencySourceInclude>
+          </dependencySourceIncludes>
+        </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-source-plugin</artifactId>
