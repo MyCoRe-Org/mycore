@@ -59,7 +59,7 @@
               </transformers>
               <artifactSet>
                 <includes>
-                  <include>org.mycore:mycore-*</include>
+                  <include>org.mycore*</include>
                 </includes>
               </artifactSet>
             </configuration>
