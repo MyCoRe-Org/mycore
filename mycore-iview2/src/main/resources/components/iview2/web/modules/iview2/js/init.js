@@ -258,10 +258,12 @@ genProto.reinitializeGraphic = function() {
 	}
 	
 	// Actualize forward & backward Buttons
-	var previewTbView = jQuery(this.iview.getToolbarCtrl().getView("previewTbView").toolbar);
-	var newTop = ((((this.iview.currentImage.getHeight() / Math.pow(2, this.iview.currentImage.zoomInfo.getMaxLevel() - 1)) * zoomScale) - (previewTbView.height() + toInt(previewTbView.css("padding-top")) + toInt(previewTbView.css("padding-bottom")))) / 2) + "px";
-	if (this.iview.viewerContainer.hasClass("viewerContainer min")) {
-		this.iview.getToolbarCtrl().toolbarContainer.find(".toolbar").css("top", newTop);
+	if (!this.iview.maximized) {
+	  //TODO: align image and toolbar to the center
+	  //TODO: compare redundant code with gen.updateModuls()
+	  //var previewTbView = jQuery(this.iview.getToolbarCtrl().getView("previewTbView").toolbar);
+	  //var newTop = ((((this.iview.currentImage.getHeight() / Math.pow(2, this.iview.currentImage.zoomInfo.getMaxLevel() - 1)) * zoomScale) - (previewTbView.height() + toInt(previewTbView.css("padding-top")) + toInt(previewTbView.css("padding-bottom")))) / 2) + "px";
+		//this.iview.getToolbarCtrl().toolbarContainer.find(".toolbar").css("top", newTop);
 	}
 	this.iview.toolbarCtrl.paint("mainTb");
 };

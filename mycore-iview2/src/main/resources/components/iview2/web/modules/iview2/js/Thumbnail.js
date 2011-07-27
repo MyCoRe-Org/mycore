@@ -47,13 +47,15 @@ genProto.loadPage = function(callback, startFile) {
 	var that = this;
 	jQuery.ajax({
 		url: imagePropertiesURL,
-  		success: function(response) {that.processImageProperties(response, url);},
+  		success: function(response) {
+  		  that.processImageProperties(response, url);
+  		  callBack(callback);
+  		},
   		error: function(request, status, exception) {
   			if(console){
   				console.log("Error occured while loading image properties:\n"+exception);
   			}
   		},
-  		complete: function() {callBack(callback);}
 	});
 };
 
@@ -113,7 +115,7 @@ genProto.processImageProperties = function(imageProperties, url){
 	if (this.iview.useCutOut) {
 		this.iview.cutOutModel.setSrc(thumbSource);
 	}
-	this.updateModuls();
+  this.updateModuls();
 	
 	this.iview.roller = false;
 }
@@ -549,29 +551,28 @@ genProto.openChapter = function(button){
  * @description	marks the correct picture in the chapterview and set zoombar to the correct zoomlevel
  */
 genProto.updateModuls = function() {
-	var viewerBean = this.iview.viewerBean;
-	// align/fit scrollbars
-	this.handleScrollbars();
-
-	// Actualize forward & backward Buttons
-	var previewTbView = jQuery(this.iview.getToolbarCtrl().getView("previewTbView").toolbar);
-	var currentImage = this.iview.currentImage;
-  var zoomScale=currentImage.zoomInfo.getScale();
-	var newTop = ((((currentImage.getHeight() / Math.pow(2, currentImage.zoomInfo.getMaxLevel() - 1)) * zoomScale) - (toInt(previewTbView.css("height")) + toInt(previewTbView.css("padding-top")) + toInt(previewTbView.css("padding-bottom")))) / 2) + "px";
-	if (this.iview.my.container.hasClass("viewerContainer min")) {
-		this.iview.getToolbarCtrl().toolbarContainer.find(".toolbar").css("top", newTop);
-	}
-	
-	try {
-		//repaint Toolbar as if the width of the dropdown changes the spring needs to be adjusted
-		this.iview.getToolbarCtrl().paint("mainTb");	
-	} catch (e) {}
-	
-	// Actualize Chapter
-	if (this.iview.useChapter && !(typeof this.iview.chapter === "undefined")) {
-		//prevent endless loop
-		this.iview.chapterReaction = true;
-	}
+  if (this.iview.maximized){
+    // align/fit scrollbars
+    this.handleScrollbars();
+    try {
+      //repaint Toolbar as if the width of the dropdown changes the spring needs to be adjusted
+      this.iview.getToolbarCtrl().paint("mainTb");	
+    } catch (e) {}
+  } else {
+    //TODO: align image and toolbar to the center
+//    var previewTbView = jQuery(this.iview.getToolbarCtrl().getView("previewTbView").toolbar);
+//    var currentImage = this.iview.currentImage;
+//    var zoomScale=currentImage.zoomInfo.getScale();
+//    var newTop = ((((currentImage.getHeight() / Math.pow(2, currentImage.zoomInfo.getMaxLevel() - 1)) * zoomScale) - (toInt(previewTbView.css("height")) + toInt(previewTbView.css("padding-top")) + toInt(previewTbView.css("padding-bottom")))) / 2) + "px";
+//    if (this.iview.my.container.hasClass("viewerContainer min")) {
+//      this.iview.getToolbarCtrl().toolbarContainer.find(".toolbar").css("top", newTop);
+//    }
+  }
+  // Actualize Chapter
+  if (this.iview.useChapter && !(typeof this.iview.chapter === "undefined")) {
+    //prevent endless loop
+    this.iview.chapterReaction = true;
+  }
 }
 
 /**

@@ -19,18 +19,21 @@
       this.gen = new iview.General(this);
       this.toolbarMgr = new ToolbarManager();
       this.toolbarCtrl = new ToolbarController(this);
-      //TODO: load in jQuery(document).load() so that all resources are ready
-      // entweder Mgr macht alles und Übergabe des related... (Modelprovider) oder Models kümmern sich untereinander und schöne Form (siehe unten)
-      // Iview[viewID].getToolbarCtrl() oder Iview[viewID].toolbarCtrl verwenden?
-      // vom Drop Down Menu nur die View oder auch ein Model im ToolbarManager?
-      
-      // Toolbar Manager
-      this.toolbarMgr.addModel(new PreviewToolbarModelProvider("previewTb").getModel());
-      // Toolbar Controller
-      this.toolbarCtrl.addView(new ToolbarView("previewTbView", this.toolbarCtrl.toolbarContainer, i18n));
-      
-      // holt alle bisherigen Models in den Controller und setzt diese entsprechend um
-      this.toolbarCtrl.catchModels();
+      //load toolbar after all resources (css, images) are ready
+      var that = this;
+      jQuery(window).load(function ii_initToolbars(){
+        // entweder Mgr macht alles und Übergabe des related... (Modelprovider) oder Models kümmern sich untereinander und schöne Form (siehe unten)
+        // Iview[viewID].getToolbarCtrl() oder Iview[viewID].toolbarCtrl verwenden?
+        // vom Drop Down Menu nur die View oder auch ein Model im ToolbarManager?
+
+        // Toolbar Manager
+        that.toolbarMgr.addModel(new PreviewToolbarModelProvider("previewTb").getModel());
+        // Toolbar Controller
+        that.toolbarCtrl.addView(new ToolbarView("previewTbView", that.toolbarCtrl.toolbarContainer, i18n));
+        
+        // holt alle bisherigen Models in den Controller und setzt diese entsprechend um
+        that.toolbarCtrl.catchModels();
+      });
     }
     
     constructor.prototype.startViewer = function ii_startViewer(startFile){
