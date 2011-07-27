@@ -25,7 +25,6 @@
       </xsl:call-template>
       <xsl:call-template name="iview2.getViewer">
         <xsl:with-param name="groupID" select="$derivateID" />
-        <xsl:with-param name="zoomBar" select="'false'" />
         <xsl:with-param name="chapter" select="'true'" />
         <xsl:with-param name="cutOut" select="'true'" />
         <xsl:with-param name="overview" select="'true'" />

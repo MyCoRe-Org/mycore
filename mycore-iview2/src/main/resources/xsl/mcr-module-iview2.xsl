@@ -33,9 +33,6 @@
       </div>
       <xsl:call-template name="iview2.getToolbar">
         <xsl:with-param name="groupID" select="$groupID" />
-        <xsl:with-param name="optOut" select="'false'" />
-        <xsl:with-param name="forward" select="'true'" />
-        <xsl:with-param name="backward" select="'true'" />
       </xsl:call-template>
       <script type="text/javascript">
         <xsl:variable name="baseUris">
@@ -68,23 +65,9 @@
     </div>
 
   </xsl:template>
+
   <xsl:template name="iview2.getToolbar" mode="iview2">
     <xsl:param name="groupID" />
-    <xsl:param name="idAdd" />
-    <xsl:param name="create" />
-    <xsl:param name="optOut" select="'false'" />
-    <xsl:param name="zoomIn" select="$optOut" />
-    <xsl:param name="zoomOut" select="$optOut" />
-    <xsl:param name="normalView" select="$optOut" />
-    <xsl:param name="fullView" select="$optOut" />
-    <xsl:param name="toWidth" select="$optOut" />
-    <xsl:param name="toScreen" select="$optOut" />
-    <xsl:param name="backward" select="$optOut" />
-    <xsl:param name="forward" select="$optOut" />
-    <xsl:param name="openThumbs" select="$optOut" />
-    <xsl:param name="chapterOpener" select="$optOut" />
-    <xsl:param name="permalink" select="$optOut" />
-    
     <!-- online src-->
     <xsl:if test="$MCR.Module-iview2.DeveloperMode='true'">
     	<!--  CSS -->
@@ -93,15 +76,14 @@
     	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/gfx/default/iview2.permalink.css" />
         <link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/gfx/default/iview2.createpdf.css" />
     </xsl:if>
-	
 	<script type="text/javascript">
 		<xsl:text>loadCssFile('http://ajax.googleapis.com/ajax/libs/jqueryui/</xsl:text>
 		<xsl:value-of select="$jqueryUI.version"/>
 		<xsl:text>/themes/base/jquery-ui.css');</xsl:text>
 	</script>
-     
     <div id="toolbars{$groupID}" class="toolbars" onmousedown="return false;" />      
   </xsl:template>
+
   <xsl:template name="iview2.init">
     <xsl:param name="groupID" />
     <xsl:param name="tilesize" select="'256'" />
