@@ -17,26 +17,6 @@
     <xsl:param name="style" />
     
     <div id="viewerContainer{$groupID}" class="viewerContainer min">
-	    <script type="text/javascript">
-	      <xsl:variable name="baseUris">
-	        <xsl:choose>
-	          <xsl:when test="string-length($MCR.Module-iview2.BaseURL)&lt;10">
-	            <xsl:value-of select="concat($ServletsBaseURL,'MCRTileServlet')" />
-	          </xsl:when>
-	          <xsl:otherwise>
-	            <xsl:value-of select="$MCR.Module-iview2.BaseURL" />
-	          </xsl:otherwise>
-	        </xsl:choose>
-	      </xsl:variable>
-	      var baseUris='["'+'<xsl:value-of select="$baseUris"/>'.split(',').join('","')+'"]';
-	      addIviewProperty('<xsl:value-of select="$groupID" />', 'useChapter',<xsl:value-of select="$chapter" />);
-	      addIviewProperty('<xsl:value-of select="$groupID" />', 'useCutOut',<xsl:value-of select="$cutOut" />);
-	      addIviewProperty('<xsl:value-of select="$groupID" />', 'useOverview',<xsl:value-of select="$overview" />);
-	      addIviewProperty('<xsl:value-of select="$groupID" />', 'baseUri', baseUris);
-          addIviewProperty('<xsl:value-of select="$groupID" />', 'webappBaseUri', '"<xsl:value-of select="$WebApplicationBaseURL"/>"');
-	      addIviewProperty('<xsl:value-of select="$groupID" />', 'pdfCreatorURI', '"<xsl:value-of select="$MCR.Module-iview2.PDFCreatorURI"/>"');
-          addIviewProperty('<xsl:value-of select="$groupID" />', 'pdfCreatorStyle', '"<xsl:value-of select="$MCR.Module-iview2.PDFCreatorStyle"/>"');
-	    </script>
       <xsl:if test="string-length($style) &gt; 0">
         <xsl:attribute name="style">
           <xsl:value-of select="$style"/>
@@ -51,15 +31,40 @@
           </div>
         </div>
       </div>
-      <script>
-     	Iview['<xsl:value-of select="$groupID" />'].viewerContainer = jQuery(document).find("#viewerContainer<xsl:value-of select="$groupID" />");
-      </script>
       <xsl:call-template name="iview2.getToolbar">
         <xsl:with-param name="groupID" select="$groupID" />
         <xsl:with-param name="optOut" select="'false'" />
         <xsl:with-param name="forward" select="'true'" />
         <xsl:with-param name="backward" select="'true'" />
       </xsl:call-template>
+      <script type="text/javascript">
+        <xsl:variable name="baseUris">
+          <xsl:choose>
+            <xsl:when test="string-length($MCR.Module-iview2.BaseURL)&lt;10">
+              <xsl:value-of select="concat($ServletsBaseURL,'MCRTileServlet')" />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$MCR.Module-iview2.BaseURL" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        var baseUris='["'+'<xsl:value-of select="$baseUris"/>'.split(',').join('","')+'"]';
+          var currentNode=(function(){
+            var nodes=document.getElementsByTagName('script');
+            return nodes[nodes.length-1];
+          })();
+          var Iview = Iview || {};
+          (function initViewer(viewID){
+            Iview[viewID] = new iview.IViewInstance(viewID, jQuery(currentNode.parentNode));
+            addIviewProperty(viewID, 'useChapter',<xsl:value-of select="$chapter" />);
+            addIviewProperty(viewID, 'useCutOut',<xsl:value-of select="$cutOut" />);
+            addIviewProperty(viewID, 'useOverview',<xsl:value-of select="$overview" />);
+            addIviewProperty(viewID, 'baseUri', baseUris);
+            addIviewProperty(viewID, 'webappBaseUri', '"<xsl:value-of select="$WebApplicationBaseURL"/>"');
+            addIviewProperty(viewID, 'pdfCreatorURI', '"<xsl:value-of select="$MCR.Module-iview2.PDFCreatorURI"/>"');
+            addIviewProperty(viewID, 'pdfCreatorStyle', '"<xsl:value-of select="$MCR.Module-iview2.PDFCreatorStyle"/>"');
+          })('<xsl:value-of select="$groupID" />');
+      </script>
     </div>
 
   </xsl:template>
@@ -120,7 +125,6 @@
       google.load("jquery", "1");
       google.load("jqueryui", "<xsl:value-of select="$jqueryUI.version"/>");
 
-      var effects = <xsl:value-of select="$effects" />;
       var tilesize=<xsl:value-of select="$tilesize" />;
 	  var maximized=<xsl:value-of select="$maximized" />;
       var zoomWidth=<xsl:value-of select="$zoomWidth" />;
@@ -130,11 +134,13 @@
       var DampInViewer=<xsl:value-of select="$DampInViewer" />;
     <!-- Init Funktionen -->
       function addIviewProperty(viewID, propertyName, val) {
-      if (typeof (Iview) == "undefined") eval("Iview = new Object()");
-      if (typeof (Iview[viewID]) == "undefined") {
-      Iview[viewID] = new Object();
-      }
-      eval('Iview["'+viewID+'"].'+propertyName+'= '+val+';');
+        if (typeof (Iview) == "undefined") {
+          throw new Error("Iview instance container undefined");
+        }
+        if (typeof (Iview[viewID]) == "undefined") {
+          throw new Error("Iview instance undefined");
+        }
+        eval('Iview["'+viewID+'"].'+propertyName+'= '+val+';');
       }
     </script>
     
@@ -165,76 +171,27 @@
   </xsl:template>
   <xsl:template name="iview2.start">
     <xsl:param name="groupID" />
-    <!--<xsl:param name="style" select="'default'" />-->
     <xsl:param name="styleFolderUri" select="'gfx/'" />
     <xsl:param name="startFile" />
 
     <!-- Initfunktionen -->
     <script type="text/javascript">
-      <!-- 
-      var styleName='<xsl:value-of select="$style" />';
-       -->
       var styleFolderUri='<xsl:value-of select="$styleFolderUri" />';
-      addIviewProperty('<xsl:value-of select="$groupID" />', 'startFile', "'<xsl:value-of select="$startFile" />'");
-      function startViewer(viewID) {
-        if (Iview[viewID].started) return;
-        jQuery.fx.off=!effects;
-        Iview[viewID].ToolbarImporter = new ToolbarImporter(Iview[viewID], i18n);
-        Iview[viewID].gen = new iview.General(Iview[viewID], viewID);
-        Iview[viewID].started = true;
-        Iview[viewID].preload = jQuery("#viewerContainer" + viewID + " .preload");
-        Iview[viewID].gen.loading();
-      }
-      jQuery(window).load(function() { startViewer('<xsl:value-of select="$groupID"/>');});
+      jQuery(document).ready(function(){
+          function startViewer(viewID) {
+            if (Iview[viewID].started) return;
+            addIviewProperty(viewID, 'startFile', "'<xsl:value-of select="$startFile" />'");
+            Iview[viewID].started = true;
+            Iview[viewID].preload = jQuery("#viewerContainer" + viewID + " .preload");
+            Iview[viewID].gen.loading();
+            console.log(Iview[viewID]);
+          }
+          startViewer('<xsl:value-of select="$groupID"/>');
+        }
+      );
     </script>
   </xsl:template>
 
-  <xsl:template name="iview2.getThumbnail">
-    <xsl:param name="groupID" />
-    <xsl:param name="parent" select="'viewer'" />
-    <xsl:param name="idAdd" />
-    <xsl:choose>
-      <xsl:when test="$parent = 'viewer'">
-        <script type="text/javascript">
-          addIviewProperty('<xsl:value-of select="$groupID" />','ausschnittParent', '"#viewerContainer<xsl:value-of select="$groupID" />"');
-        </script>
-      </xsl:when>
-      <xsl:when test="$parent = 'here'">
-        <script type="text/javascript">
-          addIviewProperty('<xsl:value-of select="$groupID" />','ausschnittParent', '"#thumbnailContainer<xsl:value-of select="$groupID" />"');
-        </script>
-        <div id="thumbnailContainer{$groupID}" class="thumbnailContainer{$idAdd}"></div>
-      </xsl:when>
-      <xsl:otherwise>
-        <script type="text/javascript">
-          addIviewProperty('<xsl:value-of select="$groupID" />','ausschnittParent', '"<xsl:value-of select="$parent" />"');
-        </script>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-  <xsl:template name="iview2.getChapter">
-    <xsl:param name="groupID" />
-    <xsl:param name="parent" select="'viewer'" />
-    <xsl:param name="idAdd" />
-    <xsl:choose>
-      <xsl:when test="$parent ='viewer'">
-        <script type="text/javascript">
-          addIviewProperty('<xsl:value-of select="$groupID" />','chapterParent', '"#viewerContainer<xsl:value-of select="$groupID" />"');
-        </script>
-      </xsl:when>
-      <xsl:when test="$parent = 'here'">
-        <script type="text/javascript">
-          addIviewProperty('<xsl:value-of select="$groupID" />','chapterParent','"#chapterContainer<xsl:value-of select="$groupID" />"');
-        </script>
-        <div id="chapterContainer{$groupID}" class="chapterContainer{$idAdd}"></div>
-      </xsl:when>
-      <xsl:otherwise>
-        <script type="text/javascript">
-          addIviewProperty('<xsl:value-of select="$groupID" />','chapterParent','"<xsl:value-of select="$parent" />"');
-        </script>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
   <xsl:template name="iview2.getImageElement">
     <xsl:param name="derivate" />
     <xsl:param name="imagePath" />

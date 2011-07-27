@@ -11,10 +11,6 @@ var ToolbarImporter = function (Iview2, i18n) {
 	Iview2.getToolbarCtrl = function() {
 		if (!this.toolbarCtrl) {
 			this.toolbarCtrl = new ToolbarController(this);
-
-			this.toolbarCtrl.getViewer = function() {
-				return this.parent;
-			}
 		}
 		return this.toolbarCtrl;
 	}

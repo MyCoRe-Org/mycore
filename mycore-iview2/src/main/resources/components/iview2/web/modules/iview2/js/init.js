@@ -1,6 +1,7 @@
 var iview = iview || {};
 
 iview.IViewObject = (function(){
+  "use strict";
   function constructor(iviewInst){
     this._iview=iviewInst;
     hideProperty(this,"_iview", false);
@@ -42,6 +43,7 @@ iview.resizeImage = function (img, width, height) {
 iview.General = function(iviewInst, viewID) {
 	//TODO later it should be possible to remove all this.iview with just this
 	this.iview = iviewInst;
+	var viewID=iviewInst.derivateId; //TODO: get rid of viewID
 	//structure for all Viewer DOM-Objects
 	this.iview.my = {'container': jQuery("#viewerContainer" + viewID),
 					'viewer': jQuery("#viewer" + viewID),

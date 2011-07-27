@@ -49,6 +49,7 @@
                 <!-- Viewer -->
                 <jsSourceFile>init.js</jsSourceFile>
                 <!-- new API -->
+                <jsSourceFile>iviewInstance.js</jsSourceFile>
                 <jsSourceFile>context.js</jsSourceFile>
                 <jsSourceFile>currentImage.js</jsSourceFile>
                 <!-- new API ends -->

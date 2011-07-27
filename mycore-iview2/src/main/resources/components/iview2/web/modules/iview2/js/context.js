@@ -8,7 +8,7 @@
       this.container=container;
       //TODO: get rid of those parentNode crap
       this.viewer = container[0].parentNode.parentNode.parentNode.parentNode;
-      this.viewerSibling = this.viewer.nextSibling;
+      this.viewerSibling = this.viewer.previousSibling;
     }
 
     constructor.prototype = {
@@ -40,7 +40,7 @@
             document.body.appendChild(this.doc[index]);
             index++;
           }
-          this.viewerSibling.parentNode.insertBefore(this.viewer, this.viewerSibling);
+          this.viewerSibling.parentNode.insertBefore(this.viewer, this.viewerSibling.nextSibling);
           // because of IE7 in
           document.documentElement.style.overflow = "";
           document.body.style.overflow = "";

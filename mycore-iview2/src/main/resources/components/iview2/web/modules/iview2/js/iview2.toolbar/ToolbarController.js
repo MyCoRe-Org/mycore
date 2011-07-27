@@ -11,13 +11,18 @@
  * @param		{AssoArray} relations defines the informations about each connections between model and view
  * @requires	fg.menu 3.0 
  */
-var ToolbarController = function (parent) {
-	this.parent = parent;
-	this.views = [];
-	
-	// holds relation between Model and View
-	this.relations = {'mainTb' : ['mainTbView'], 'previewTb' : ['previewTbView']};
-};
+var ToolbarController =(function() {
+  function constructor(parent) {
+  	this.parent = parent;
+  	this.views = [];
+    iview.IViewObject.call(this, parent);
+  
+  	// holds relation between Model and View
+  	this.relations = {'mainTb' : ['mainTbView'], 'previewTb' : ['previewTbView']};
+  };
+  constructor.prototype = Object.create(iview.IViewObject.prototype);
+  return constructor;
+})();
 
 /**
  * @public
@@ -42,17 +47,15 @@ ToolbarController.prototype.getView = function(viewID) {
  * @param		{Object} view View which should be add to the toolbar 
  */
 ToolbarController.prototype.addView = function(view) {
-	var viewerID = this.getViewer().viewID;
-	
+  var that = this;
 	// helps the IE7 to maxmimize the viewer also by clicking between the preview buttons
 	// TODO: maybe switch to another position	
   	if (view.id == "previewTbView") {
   		jQuery(view.toolbar).click(function() {
-  			Iview[viewerID].gen.maximizeHandler();
+  		  that.getViewer().gen.maximizeHandler();
   		});
   	}
 	
-	var that = this;
 	this.views[view.id] = view;
 	
 	jQuery(view)
@@ -427,7 +430,7 @@ ToolbarController.prototype.paint = function(model) {
 		}
 	} catch (e) {
 		if (typeof console != "undefined") {
-			console.log(e)
+			console.log(e);
 		}
 	}
 };
