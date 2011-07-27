@@ -685,12 +685,6 @@ genProto.zoomViewer = function(direction) {
 genProto.loading = function(startFile) {
 	var that = this;
 	
-	var cssSheet=document.getElementById("cssSheet"+this.iview.viewID);
-	if (cssSheet!=null){
-		//Opera fix: link css style to head to fix maximizeHandler()
-		cssSheet.parentNode.removeChild(cssSheet);
-		document.getElementsByTagName("head")[0].appendChild(cssSheet);
-	}
 	//TODO don't use the global one rather than the instance tilesize
 	this.iview.startHeight = this.iview.startWidth = tilesize;
 	// ScrollBars

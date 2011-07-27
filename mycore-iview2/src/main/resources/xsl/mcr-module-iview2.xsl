@@ -45,12 +45,10 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-        var baseUris='["'+'<xsl:value-of select="$baseUris"/>'.split(',').join('","')+'"]';
           var currentNode=(function(){
             var nodes=document.getElementsByTagName('script');
             return nodes[nodes.length-1];
           })();
-          var Iview = Iview || {};
           (function initViewer(viewID){
             var options = {
               'useChapter' : <xsl:value-of select="$chapter" />,
@@ -71,13 +69,6 @@
   <xsl:template name="iview2.getToolbar" mode="iview2">
     <xsl:param name="groupID" />
     <!-- online src-->
-    <xsl:if test="$MCR.Module-iview2.DeveloperMode='true'">
-    	<!--  CSS -->
-    	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/lib/fg-menu/fg.menu.css" />
-    	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/gfx/default/iview2.toolbar.css" />
-    	<link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/gfx/default/iview2.permalink.css" />
-        <link rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/gfx/default/iview2.createpdf.css" />
-    </xsl:if>
 	<script type="text/javascript">
 		<xsl:text>loadCssFile('http://ajax.googleapis.com/ajax/libs/jqueryui/</xsl:text>
 		<xsl:value-of select="$jqueryUI.version"/>
@@ -108,14 +99,6 @@
     <!-- JQuery Framework -->
       google.load("jquery", "1");
       google.load("jqueryui", "<xsl:value-of select="$jqueryUI.version"/>");
-
-      var tilesize=<xsl:value-of select="$tilesize" />;
-	  var maximized=<xsl:value-of select="$maximized" />;
-      var zoomWidth=<xsl:value-of select="$zoomWidth" />;
-      var zoomScreen=<xsl:value-of select="$zoomScreen" />;
-      var chapterEmbedded=<xsl:value-of select="$chapterEmbedded" />;
-      var chapDynResize=<xsl:value-of select="$chapDynResize" />;
-      var DampInViewer=<xsl:value-of select="$DampInViewer" />;
     </script>
     
     <xsl:choose>
@@ -125,23 +108,28 @@
       <xsl:otherwise>
         <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/js/iview2.min.js"/>
       </xsl:otherwise>
-      </xsl:choose>
-    <script type="text/javascript">
-      	var i18n = i18n || new iview.i18n('<xsl:value-of select="$WebApplicationBaseURL"/>', '<xsl:value-of select="$CurrentLang"/>');
-    </script>
-    <xsl:choose>
-      <xsl:when test="$MCR.Module-iview2.DeveloperMode='true'">
-		<!-- Main Stylesheet -->
-    	<link id="cssSheet{$groupID}" rel="stylesheet" type="text/css" href="{$WebApplicationBaseURL}modules/iview2/gfx/default/style.css" />
-      </xsl:when>
-      <xsl:otherwise>
-        <script>
-          <xsl:text>loadCssFile('</xsl:text>
-          <xsl:value-of select="$WebApplicationBaseURL"/>
-          <xsl:text>modules/iview2/gfx/default/iview2.min.css', 'iviewCss');</xsl:text>
-        </script>
-      </xsl:otherwise>
     </xsl:choose>
+    <script type="text/javascript">
+      var tilesize=<xsl:value-of select="$tilesize" />;
+      var maximized=<xsl:value-of select="$maximized" />;
+      var zoomWidth=<xsl:value-of select="$zoomWidth" />;
+      var zoomScreen=<xsl:value-of select="$zoomScreen" />;
+      var chapterEmbedded=<xsl:value-of select="$chapterEmbedded" />;
+      var chapDynResize=<xsl:value-of select="$chapDynResize" />;
+      var DampInViewer=<xsl:value-of select="$DampInViewer" />;
+      var Iview = Iview || {};
+      var i18n = i18n || new iview.i18n('<xsl:value-of select="$WebApplicationBaseURL"/>', '<xsl:value-of select="$CurrentLang"/>');
+      <xsl:text>loadCssFile('</xsl:text>
+      <xsl:value-of select="$WebApplicationBaseURL"/>
+      <xsl:choose>
+        <xsl:when test="$MCR.Module-iview2.DeveloperMode='true'">
+          <xsl:text>modules/iview2/gfx/default/iview2.css', 'iviewCss');</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>modules/iview2/gfx/default/iview2.min.css', 'iviewCss');</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </script>
   </xsl:template>
   <xsl:template name="iview2.start">
     <xsl:param name="groupID" />
