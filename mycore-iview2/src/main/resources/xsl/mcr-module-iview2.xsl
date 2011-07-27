@@ -63,7 +63,6 @@
           })('<xsl:value-of select="$groupID" />');
       </script>
     </div>
-
   </xsl:template>
 
   <xsl:template name="iview2.getToolbar" mode="iview2">
@@ -87,6 +86,7 @@
     <xsl:param name="zoomScreen" select="'false'" />
     
     <!-- design settings -->
+    <xsl:param name="styleFolderUri" select="'gfx/'" />
     <xsl:param name="effects" select="'true'" />
 	<!-- chapter settings -->
 	<xsl:param name="chapterEmbedded" select="'false'" />
@@ -110,6 +110,7 @@
       </xsl:otherwise>
     </xsl:choose>
     <script type="text/javascript">
+      var styleFolderUri='<xsl:value-of select="$styleFolderUri" />';
       var tilesize=<xsl:value-of select="$tilesize" />;
       var maximized=<xsl:value-of select="$maximized" />;
       var zoomWidth=<xsl:value-of select="$zoomWidth" />;
@@ -133,12 +134,10 @@
   </xsl:template>
   <xsl:template name="iview2.start">
     <xsl:param name="groupID" />
-    <xsl:param name="styleFolderUri" select="'gfx/'" />
     <xsl:param name="startFile" />
 
     <!-- Initfunktionen -->
     <script type="text/javascript">
-      var styleFolderUri='<xsl:value-of select="$styleFolderUri" />';
       jQuery(document).ready(function(){
           Iview['<xsl:value-of select="$groupID"/>'].startViewer('<xsl:value-of select="$startFile" />');
         }

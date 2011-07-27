@@ -32,7 +32,6 @@
       </xsl:call-template>
       <xsl:call-template name="iview2.start">
         <xsl:with-param name="groupID" select="$derivateID" />
-        <!--<xsl:with-param name="style" select="'default'" />-->
         <xsl:with-param name="startFile" select="$file" />
       </xsl:call-template>
     </xsl:if>
