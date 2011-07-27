@@ -4,7 +4,7 @@
 
 #ADOPT:destpath to your docportal build dir
 declare -a sources
-sources=( "jquery.mousewheel.min.js" "jquery.tree.min.js" "jquery.simplemodal.js" "jquery.mcri18n.js" "ecma5compat.js" "i18n.js" "PanoJS.js" "init.js" "iviewInstance.js" "context.js" "currentImage.js" "chapter.js" "overview.js" "cutOut.js" "METS.js" "scrollBars.js" "XML.js" "Utils.js" "Thumbnail.js" "../lib/fg-menu/fg.menu.js" "iview2.toolbar/ToolbarImporter.js" "iview2.toolbar/ToolbarManager.js" "iview2.toolbar/ToolbarModel.js" "iview2.toolbar/ToolbarButtonsetModel.js" "iview2.toolbar/ToolbarDividerModel.js" "iview2.toolbar/ToolbarSpringModel.js" "iview2.toolbar/ToolbarTextModel.js" "iview2.toolbar/ToolbarButtonModel.js" "iview2.toolbar/ToolbarController.js" "iview2.toolbar/ToolbarView.js" "iview2.toolbar/StandardToolbarModelProvider.js" "iview2.toolbar/PreviewToolbarModelProvider.js" "Permalink.js" )
+sources=( "jquery.mousewheel.min.js" "jquery.tree.min.js" "jquery.simplemodal.js" "jquery.mcri18n.js" "ecma5compat.js" "i18n.js" "PanoJS.js" "init.js" "iviewInstance.js" "context.js" "currentImage.js" "chapter.js" "overview.js" "cutOut.js" "METS.js" "scrollBars.js" "XML.js" "Utils.js" "Thumbnail.js" "../lib/fg-menu/fg.menu.js" "iview2.toolbar/ToolbarManager.js" "iview2.toolbar/ToolbarModel.js" "iview2.toolbar/ToolbarButtonsetModel.js" "iview2.toolbar/ToolbarDividerModel.js" "iview2.toolbar/ToolbarSpringModel.js" "iview2.toolbar/ToolbarTextModel.js" "iview2.toolbar/ToolbarButtonModel.js" "iview2.toolbar/ToolbarController.js" "iview2.toolbar/ToolbarView.js" "iview2.toolbar/StandardToolbarModelProvider.js" "iview2.toolbar/PreviewToolbarModelProvider.js" "Permalink.js" )
 destpath="/host/workspace/archive/docportal/build/webapps/modules/iview2/js/iview2.js"
 
 path=`dirname $0`

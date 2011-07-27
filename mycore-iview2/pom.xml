@@ -74,9 +74,6 @@
                 <!-- menu -->
                 <jsSourceFile>../lib/fg-menu/fg.menu.js</jsSourceFile>
                 
-                <!-- Importer Skript -->
-                <jsSourceFile>iview2.toolbar/ToolbarImporter.js</jsSourceFile>
-                
                 <!--  Model, Controller, View -->
                 <!--  needs Event.js -->
                 

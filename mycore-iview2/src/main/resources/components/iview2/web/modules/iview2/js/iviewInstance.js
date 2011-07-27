@@ -17,7 +17,20 @@
       this.chapterParent = container; // TODO: get rid of this
       this.preload = container.find(".preload"); //TODO: move this somewhere
       this.gen = new iview.General(this);
-      this.ToolbarImporter = new ToolbarImporter(this, i18n);
+      this.toolbarMgr = new ToolbarManager();
+      this.toolbarCtrl = new ToolbarController(this);
+      //TODO: load in jQuery(document).load() so that all resources are ready
+      // entweder Mgr macht alles und Übergabe des related... (Modelprovider) oder Models kümmern sich untereinander und schöne Form (siehe unten)
+      // Iview[viewID].getToolbarCtrl() oder Iview[viewID].toolbarCtrl verwenden?
+      // vom Drop Down Menu nur die View oder auch ein Model im ToolbarManager?
+      
+      // Toolbar Manager
+      this.toolbarMgr.addModel(new PreviewToolbarModelProvider("previewTb").getModel());
+      // Toolbar Controller
+      this.toolbarCtrl.addView(new ToolbarView("previewTbView", this.toolbarCtrl.toolbarContainer, i18n));
+      
+      // holt alle bisherigen Models in den Controller und setzt diese entsprechend um
+      this.toolbarCtrl.catchModels();
     }
     
     constructor.prototype.startViewer = function ii_startViewer(startFile){
@@ -30,6 +43,14 @@
       //remove leading '/'
       startFile = encodeURI(startFile.replace(/^\/*/,""));
       this.gen.loading(startFile);
+    };
+    
+    constructor.prototype.getToolbarMgr = function ii_getToolbarMgr(){
+      return this.toolbarMgr;
+    };
+    
+    constructor.prototype.getToolbarCtrl = function ii_getToolbarCtrl(){
+      return this.toolbarCtrl;
     };
     
     return constructor;
