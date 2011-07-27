@@ -52,14 +52,16 @@
           })();
           var Iview = Iview || {};
           (function initViewer(viewID){
-            Iview[viewID] = new iview.IViewInstance(viewID, jQuery(currentNode.parentNode));
-            addIviewProperty(viewID, 'useChapter',<xsl:value-of select="$chapter" />);
-            addIviewProperty(viewID, 'useCutOut',<xsl:value-of select="$cutOut" />);
-            addIviewProperty(viewID, 'useOverview',<xsl:value-of select="$overview" />);
-            addIviewProperty(viewID, 'baseUri', baseUris);
-            addIviewProperty(viewID, 'webappBaseUri', '"<xsl:value-of select="$WebApplicationBaseURL"/>"');
-            addIviewProperty(viewID, 'pdfCreatorURI', '"<xsl:value-of select="$MCR.Module-iview2.PDFCreatorURI"/>"');
-            addIviewProperty(viewID, 'pdfCreatorStyle', '"<xsl:value-of select="$MCR.Module-iview2.PDFCreatorStyle"/>"');
+            var options = {
+              'useChapter' : <xsl:value-of select="$chapter" />,
+              'useCutOut' : <xsl:value-of select="$cutOut" />,
+              'useOverview' : <xsl:value-of select="$overview" />,
+              'baseUri' : "<xsl:value-of select="$baseUris"/>".split(","),
+              'webappBaseUri' : "<xsl:value-of select="$WebApplicationBaseURL"/>",
+              'pdfCreatorURI' : "<xsl:value-of select="$MCR.Module-iview2.PDFCreatorURI"/>",
+              'pdfCreatorStyle' : "<xsl:value-of select="$MCR.Module-iview2.PDFCreatorStyle"/>",
+            };
+            Iview[viewID] = new iview.IViewInstance(viewID, jQuery(currentNode.parentNode), options);
           })('<xsl:value-of select="$groupID" />');
       </script>
     </div>
@@ -114,16 +116,6 @@
       var chapterEmbedded=<xsl:value-of select="$chapterEmbedded" />;
       var chapDynResize=<xsl:value-of select="$chapDynResize" />;
       var DampInViewer=<xsl:value-of select="$DampInViewer" />;
-    <!-- Init Funktionen -->
-      function addIviewProperty(viewID, propertyName, val) {
-        if (typeof (Iview) == "undefined") {
-          throw new Error("Iview instance container undefined");
-        }
-        if (typeof (Iview[viewID]) == "undefined") {
-          throw new Error("Iview instance undefined");
-        }
-        eval('Iview["'+viewID+'"].'+propertyName+'= '+val+';');
-      }
     </script>
     
     <xsl:choose>
@@ -160,15 +152,7 @@
     <script type="text/javascript">
       var styleFolderUri='<xsl:value-of select="$styleFolderUri" />';
       jQuery(document).ready(function(){
-          function startViewer(viewID) {
-            if (Iview[viewID].started) return;
-            addIviewProperty(viewID, 'startFile', "'<xsl:value-of select="$startFile" />'");
-            Iview[viewID].started = true;
-            Iview[viewID].preload = jQuery("#viewerContainer" + viewID + " .preload");
-            Iview[viewID].gen.loading();
-            console.log(Iview[viewID]);
-          }
-          startViewer('<xsl:value-of select="$groupID"/>');
+          Iview['<xsl:value-of select="$groupID"/>'].startViewer('<xsl:value-of select="$startFile" />');
         }
       );
     </script>

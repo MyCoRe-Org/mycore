@@ -33,11 +33,12 @@
  * @memberOf	iview.General
  * @description	reads out the imageinfo.xml, set the correct zoomvlues and loads the page
  * @param		{function} callback
+ * @param   {String} [startFile] optional page to open
  */
-genProto.loadPage = function(callback) {
+genProto.loadPage = function(callback, startFile) {
 	var url;
 	if (typeof(this.iview.metsDoc)=='undefined'){
-		url = this.iview.startFile;
+		url = startFile;
 	} else {
 		url = this.iview.PhysicalModel.getCurrent().getHref();
 	}
@@ -681,7 +682,7 @@ genProto.zoomViewer = function(direction) {
  * @memberOf	iview.General
  * @description	is calling to the load-event of the window; serve for the further registration of events likewise as initiator for various objects
  */
-genProto.loading = function() {
+genProto.loading = function(startFile) {
 	var that = this;
 	
 	var cssSheet=document.getElementById("cssSheet"+this.iview.viewID);
@@ -723,15 +724,6 @@ genProto.loading = function() {
 		this.importCutOut();
 	}
 
-	// Load Page
-	if (URL.getParam("page") != "") {
-		//TODO may be incomplete: Prevent Remote File Inclusion, but never Ever drop
-		this.iview.startFile = decodeURI(URL.getParam("page").replace(/(:|\.\.|&#35|&#46|&#58|&#38|&#35|&amp)/,"§"));
-	}
-	
-	
-	//remove leading '/'
-	this.iview.startFile = encodeURI(this.iview.startFile.replace(/^\/*/,""));
 	that.initializeGraphic();
 	viewerBean = that.iview.viewerBean;
 	viewerBean.addViewerZoomedListener(that);
@@ -740,9 +732,9 @@ genProto.loading = function() {
     viewerBean.zoomLevel= parseInt(URL.getParam("zoom"));
   }
 	this.loadPage(function(){
-	  that.startFileLoaded()
-	});
-}
+	  that.startFileLoaded();
+	}, startFile);
+};
 
 /**
  * @public
