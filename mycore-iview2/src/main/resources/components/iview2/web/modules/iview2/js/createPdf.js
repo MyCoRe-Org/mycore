@@ -21,7 +21,7 @@ iview.General.prototype.openPdfCreator = function(button) {
       return this.pdfCtrl;
     };
     this.getPdfCtrl().setView(new iview.Pdf.View("pdfCreatorView",
-        jQuery("#viewerContainer" + this.iview.viewID + " .toolbars").parent(),
+        this.iview.viewerContainer,
         this.iview.webappBaseUri + "modules/iview2",
         this.iview.pdfCreatorURI,
         this.iview.webappBaseUri + "servlets/MCRMETSServlet/" + this.iview.viewID + "?XSL.Style=" + this.iview.pdfCreatorStyle,

@@ -192,11 +192,11 @@ genProto.importPermalink = function(callback) {
 			}
 		}
 		return this.permalinkCtrl;
-	}
+	};
 
-	this.getPermalinkCtrl().addView(new iview.Permalink.View("permalinkView", jQuery("#viewerContainer"+ this.iview.viewID + " .toolbars").parent()));
+	this.getPermalinkCtrl().addView(new iview.Permalink.View("permalinkView", this.iview.viewerContainer));
 	callback();
-}
+};
 
 /**
  * @public
@@ -465,8 +465,9 @@ genProto.viewerZoomed = function (zoomEvent) {
 				 "height": (currentImage.getHeight() / Math.pow(2, zoomInfo.getMaxLevel() - viewerBean.zoomLevel))*zoomInfo.getScale() + "px"});
 
 	// Actualize forward & backward Buttons
-	jQuery(".viewerContainer.min .toolbars .toolbar").css("width", (currentImage.getWidth() / Math.pow(2, zoomInfo.getMaxLevel() - viewerBean.zoomLevel))*zoomInfo.getScale() +  "px");
-
+	if (!this.iview.maximized){
+	  this.iview.getToolbarCtrl().toolbarContainer.find(".toolbar").css("width", (currentImage.getWidth() / Math.pow(2, zoomInfo.getMaxLevel() - viewerBean.zoomLevel))*zoomInfo.getScale() +  "px");
+	}
 	this.handleScrollbars("zoom");
 
 	if (this.iview.useCutOut) {
@@ -558,7 +559,7 @@ genProto.updateModuls = function() {
   var zoomScale=currentImage.zoomInfo.getScale();
 	var newTop = ((((currentImage.getHeight() / Math.pow(2, currentImage.zoomInfo.getMaxLevel() - 1)) * zoomScale) - (toInt(previewTbView.css("height")) + toInt(previewTbView.css("padding-top")) + toInt(previewTbView.css("padding-bottom")))) / 2) + "px";
 	if (this.iview.my.container.hasClass("viewerContainer min")) {
-		this.iview.my.container.find(".toolbars .toolbar").css("top", newTop);
+		this.iview.getToolbarCtrl().toolbarContainer.find(".toolbar").css("top", newTop);
 	}
 	
 	try {
@@ -826,7 +827,7 @@ genProto.processMETS = function(metsDoc) {
 		}
 	}
 	pagelist.append(ul);
-	this.iview.my.container.find(".toolbars").append(pagelist);
+	this.iview.getToolbarCtrl().toolbarContainer.append(pagelist);
 
 	// if METS File is loaded after the drop-down-menu (in mainToolbar) its content needs to be updated
 	if (jQuery('.navigateHandles .pageBox')[0]) {

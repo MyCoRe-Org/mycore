@@ -16,6 +16,7 @@ var ToolbarController =(function() {
   	this.parent = parent;
   	this.views = [];
     iview.IViewObject.call(this, parent);
+    this.toolbarContainer = jQuery('<div class="toolbars" onmousedown="return false;" />').appendTo(parent.viewerContainer);
   
   	// holds relation between Model and View
   	this.relations = {'mainTb' : ['mainTbView'], 'previewTb' : ['previewTbView']};

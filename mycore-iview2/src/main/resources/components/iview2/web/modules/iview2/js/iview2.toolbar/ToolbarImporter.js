@@ -22,7 +22,7 @@ var ToolbarImporter = function (Iview2, i18n) {
 	// Toolbar Manager
 	Iview2.getToolbarMgr().addModel(new PreviewToolbarModelProvider("previewTb").getModel());
 	// Toolbar Controller
-	Iview2.getToolbarCtrl().addView(new ToolbarView("previewTbView", Iview2.viewerContainer.find(".toolbars"), i18n));
+	Iview2.getToolbarCtrl().addView(new ToolbarView("previewTbView", Iview2.getToolbarCtrl().toolbarContainer, i18n));
 	
 	// holt alle bisherigen Models in den Controller und setzt diese entsprechend um
 	Iview2.getToolbarCtrl().catchModels();

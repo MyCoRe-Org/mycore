@@ -14,7 +14,7 @@ var ToolbarView = function (id, parent, i18n) {
     this.i18n = i18n;
     
     var newToolbar = jQuery('<div>').addClass(id).addClass('toolbar ui-widget-header ui-corner-all ui-helper-clearfix').appendTo(parent);
-  	this.toolbar = newToolbar[0];
+  	this.toolbar = newToolbar[0]; //TODO keep jQuery object
 };
 
 ToolbarView.prototype = {

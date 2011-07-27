@@ -31,9 +31,6 @@
           </div>
         </div>
       </div>
-      <xsl:call-template name="iview2.getToolbar">
-        <xsl:with-param name="groupID" select="$groupID" />
-      </xsl:call-template>
       <script type="text/javascript">
         <xsl:variable name="baseUris">
           <xsl:choose>
@@ -63,17 +60,6 @@
           })('<xsl:value-of select="$groupID" />');
       </script>
     </div>
-  </xsl:template>
-
-  <xsl:template name="iview2.getToolbar" mode="iview2">
-    <xsl:param name="groupID" />
-    <!-- online src-->
-	<script type="text/javascript">
-		<xsl:text>loadCssFile('http://ajax.googleapis.com/ajax/libs/jqueryui/</xsl:text>
-		<xsl:value-of select="$jqueryUI.version"/>
-		<xsl:text>/themes/base/jquery-ui.css');</xsl:text>
-	</script>
-    <div id="toolbars{$groupID}" class="toolbars" onmousedown="return false;" />      
   </xsl:template>
 
   <xsl:template name="iview2.init">
@@ -130,6 +116,9 @@
           <xsl:text>modules/iview2/gfx/default/iview2.min.css', 'iviewCss');</xsl:text>
         </xsl:otherwise>
       </xsl:choose>
+      <xsl:text>loadCssFile('http://ajax.googleapis.com/ajax/libs/jqueryui/</xsl:text>
+      <xsl:value-of select="$jqueryUI.version"/>
+      <xsl:text>/themes/base/jquery-ui.css');</xsl:text>
     </script>
   </xsl:template>
   <xsl:template name="iview2.start">
