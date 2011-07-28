@@ -64,12 +64,6 @@
 
   <xsl:template name="iview2.init">
     <xsl:param name="groupID" />
-    <xsl:param name="tilesize" select="'256'" />
-    
-    <!-- startUp settings -->
-    <xsl:param name="maximized" select="'false'" />
-    <xsl:param name="zoomWidth" select="'false'" />
-    <xsl:param name="zoomScreen" select="'false'" />
     
     <!-- design settings -->
     <xsl:param name="styleFolderUri" select="'gfx/'" />
@@ -97,10 +91,6 @@
     </xsl:choose>
     <script type="text/javascript">
       var styleFolderUri='<xsl:value-of select="$styleFolderUri" />';
-      var tilesize=<xsl:value-of select="$tilesize" />;
-      var maximized=<xsl:value-of select="$maximized" />;
-      var zoomWidth=<xsl:value-of select="$zoomWidth" />;
-      var zoomScreen=<xsl:value-of select="$zoomScreen" />;
       var chapterEmbedded=<xsl:value-of select="$chapterEmbedded" />;
       var chapDynResize=<xsl:value-of select="$chapDynResize" />;
       var DampInViewer=<xsl:value-of select="$DampInViewer" />;

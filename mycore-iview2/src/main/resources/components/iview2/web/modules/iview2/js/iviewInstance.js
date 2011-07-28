@@ -3,17 +3,13 @@
 
   iview.IViewInstance = (function() {
     function constructor(derivateId, container, options) {
-      if (typeof options === "undefined") {
-        options = {};
-      }
-      //TODO copy options to properties
-      for (var prop in options) {
-        this[prop] = options[prop];
-      }
       var defaultOpts = {
         "useChapter" : true,
         "useCutOut" : true,
         "useOverview" : true,
+        "maximized" : false,
+        "zoomWidth" : false,
+        "zoomScreen" : false,
         "tileSize" : 256,
         "startHeight" : 256,
         "startWidth" : 256

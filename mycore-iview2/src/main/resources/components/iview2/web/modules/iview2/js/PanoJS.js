@@ -501,9 +501,9 @@ PanoJS.prototype = {
 				//modification to original PanonJS code
 				var iview=this.iview;
 				var currentWidth = Math.floor(iview.currentImage.getWidth() / Math.pow(2, iview.currentImage.zoomInfo.getMaxLevel() - this.zoomLevel));
-				var xTileCount = Math.ceil( currentWidth / iview.tilesize);
+				var xTileCount = Math.ceil( currentWidth / iview.properties.tileSize);
 				var currentHeight = Math.floor(iview.currentImage.getHeight() / Math.pow(2, iview.currentImage.zoomInfo.getMaxLevel() - this.zoomLevel));
-				var yTileCount = Math.ceil( currentHeight / iview.tilesize);
+				var yTileCount = Math.ceil( currentHeight / iview.properties.tileSize);
 				var right = tile.xIndex >= xTileCount; //index starts at 0
 				var low = tile.yIndex >= yTileCount;
 				if (low || right || this.zoomLevel>iview.currentImage.zoomInfo.getMaxLevel()) {

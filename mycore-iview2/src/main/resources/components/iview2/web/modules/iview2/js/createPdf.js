@@ -22,9 +22,9 @@ iview.General.prototype.openPdfCreator = function(button) {
     };
     this.getPdfCtrl().setView(new iview.Pdf.View("pdfCreatorView",
         this.iview.viewerContainer,
-        this.iview.webappBaseUri + "modules/iview2",
-        this.iview.pdfCreatorURI,
-        this.iview.webappBaseUri + "servlets/MCRMETSServlet/" + this.iview.viewID + "?XSL.Style=" + this.iview.pdfCreatorStyle,
+        this.iview.properties.webappBaseUri + "modules/iview2",
+        this.iview.properties.pdfCreatorURI,
+        this.iview.properties.webappBaseUri + "servlets/MCRMETSServlet/" + this.iview.viewID + "?XSL.Style=" + this.iview.properties.pdfCreatorStyle,
         function() {
           that.getPdfCtrl().initView(i18n);
         }));
@@ -213,7 +213,7 @@ iview.Pdf.Controller = function(parent) {
   this.maxPages = 0;
   var that = this;
   jQuery.ajax({
-    url : this.parent.iview.pdfCreatorURI + "?getRestrictions",
+    url : this.parent.iview.properties.pdfCreatorURI + "?getRestrictions",
     success : function(data) {
       data = jQuery.parseJSON(data);
       that.maxPages = data.maxPages;
@@ -283,7 +283,7 @@ iview.Pdf.Controller.prototype = {
       return;
     }
     var imgPath = this.order[first]._href;
-    this.view.displayPreview(this.parent.iview.webappBaseUri + "servlets/MCRTileServlet/" + this.parent.iview.viewID + "/" + imgPath
+    this.view.displayPreview(this.parent.iview.properties.webappBaseUri + "servlets/MCRTileServlet/" + this.parent.iview.viewID + "/" + imgPath
         + "/0/0/0.jpg");
   },
 

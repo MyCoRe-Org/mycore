@@ -43,7 +43,7 @@ genProto.loadPage = function(callback, startFile) {
 		url = this.iview.PhysicalModel.getCurrent().getHref();
 	}
 	this.iview.currentImage.setName(url);
-	var imagePropertiesURL = this.iview.baseUri[0]+"/"+this.iview.viewID+"/"+url+"/imageinfo.xml";
+	var imagePropertiesURL = this.iview.properties.baseUri[0]+"/"+this.iview.viewID+"/"+url+"/imageinfo.xml";
 	var that = this;
 	jQuery.ajax({
 		url: imagePropertiesURL,
@@ -112,7 +112,7 @@ genProto.processImageProperties = function(imageProperties, url){
 	this.iview.roller = true;
 	viewerBean.positionTiles ({'x' : initX, 'y' : initY}, true);
 	
-	if (this.iview.useCutOut) {
+	if (this.iview.properties.useCutOut) {
 		this.iview.cutOutModel.setSrc(thumbSource);
 	}
   this.updateModuls();
@@ -279,8 +279,8 @@ genProto.calculateZoomProp = function(level, totalSize, viewerSize, scrollBarSiz
 		}
 		var currentWidth = totalSize / Math.pow(2, level);
 		var viewerRatio = viewerSize / currentWidth;
-		var fullTileCount = Math.floor( currentWidth / this.iview.tilesize);
-		var lastTileWidth = currentWidth - fullTileCount * this.iview.tilesize;
+		var fullTileCount = Math.floor( currentWidth / this.iview.properties.tileSize);
+		var lastTileWidth = currentWidth - fullTileCount * this.iview.properties.tileSize;
 	  this.iview.currentImage.zoomInfo.setScale(viewerRatio); //determine the scaling ratio
 		level = this.iview.currentImage.zoomInfo.getMaxLevel() - level;
 		viewerBean.tileSize = Math.floor((viewerSize - viewerRatio * lastTileWidth) / fullTileCount);
@@ -335,7 +335,7 @@ genProto.switchDisplayMode = function(screenZoom, stateBool, preventLooping) {
 		viewerBean.init();
 	} else {
 	  this.iview.currentImage.zoomInfo.setScale(1);
-		viewerBean.tileSize = tilesize;
+		viewerBean.tileSize = this.iview.properties.tileSize;
 		viewerBean.init();
 		
 		//an infinite loop would arise if the repeal of the zoombar comes
@@ -347,7 +347,7 @@ genProto.switchDisplayMode = function(screenZoom, stateBool, preventLooping) {
 	var offset = preload.offset();
 	this.iview.my.barX.setCurValue(-offset.left);
 	this.iview.my.barY.setCurValue(-offset.top);
-	if (this.iview.useCutOut) this.iview.cutOutModel.setPos({'x':offset.left, 'y':offset.top});
+	if (this.iview.properties.useCutOut) this.iview.cutOutModel.setPos({'x':offset.left, 'y':offset.top});
 	return stateBool;
 }
 
@@ -472,7 +472,7 @@ genProto.viewerZoomed = function (zoomEvent) {
 	}
 	this.handleScrollbars("zoom");
 
-	if (this.iview.useCutOut) {
+	if (this.iview.properties.useCutOut) {
 		this.iview.cutOutModel.setSize({
 			'x': preload.width(),
 			'y': preload.height()});
@@ -501,7 +501,7 @@ genProto.viewerMoved = function (event) {
 	var newX = - (event.x / Math.pow(2, this.iview.viewerBean.zoomLevel))/zoomScale;
 	var newY = - (event.y / Math.pow(2, this.iview.viewerBean.zoomLevel))/zoomScale;
 
-	if (this.iview.useCutOut) {
+	if (this.iview.properties.useCutOut) {
 		this.iview.cutOutModel.setPos({'x':newX, 'y':newY});
 	}
 	// set Roller this no circles are created, and we end in an endless loop
@@ -569,7 +569,7 @@ genProto.updateModuls = function() {
 //    }
   }
   // Actualize Chapter
-  if (this.iview.useChapter && !(typeof this.iview.chapter === "undefined")) {
+  if (this.iview.properties.useChapter && !(typeof this.iview.chapter === "undefined")) {
     //prevent endless loop
     this.iview.chapterReaction = true;
   }
@@ -687,8 +687,6 @@ genProto.zoomViewer = function(direction) {
 genProto.loading = function(startFile) {
 	var that = this;
 	
-	//TODO don't use the global one rather than the instance tilesize
-	this.iview.startHeight = this.iview.startWidth = tilesize;
 	// ScrollBars
 	// horizontal
 	this.iview.my.barX = new iview.scrollbar.Controller();
@@ -712,11 +710,11 @@ genProto.loading = function(startFile) {
 	// Additional Events
 	// register to scroll into the viewer
 	this.iview.my.viewer.mousewheel(function(e, delta, deltaX, deltaY) {e.preventDefault(); that.viewerScroll({"x":deltaX, "y":deltaY});})
-		.css({	'width':this.iview.startWidth - ((this.iview.my.barX.my.self.css("visibility") == "visible")? this.iview.my.barX.my.self.outerWidth() : 0)  + "px",
-				'height':this.iview.startHeight - ((this.iview.my.barY.my.self.css("visibility") == "visible")? this.iview.my.barY.my.self.outerHeight() : 0)  + "px"
+		.css({	'width':this.iview.properties.startWidth - ((this.iview.my.barX.my.self.css("visibility") == "visible")? this.iview.my.barX.my.self.outerWidth() : 0)  + "px",
+				'height':this.iview.properties.startHeight - ((this.iview.my.barY.my.self.css("visibility") == "visible")? this.iview.my.barY.my.self.outerHeight() : 0)  + "px"
 		});
 	
-	if (this.iview.useCutOut) {
+	if (this.iview.properties.useCutOut) {
 		this.importCutOut();
 	}
 
@@ -743,7 +741,7 @@ genProto.startFileLoaded = function(){
 	this.iview.loaded = true;
 	var that = this;
 	//Blank needs to be loaded as blank, so the level is filled. Else it lays not ontop; needed for IE 
-	this.iview.my.viewer.find(".surface").css("backgroundImage", "url(" + this.iview.webappBaseUri + "modules/iview2/gfx/blank.gif" + ")");
+	this.iview.my.viewer.find(".surface").css("backgroundImage", "url(" + this.iview.properties.webappBaseUri + "modules/iview2/gfx/blank.gif" + ")");
 
 	// PermaLink Handling
 	// choice if zoomLevel or special; zoomMode only makes sense in maximized viewer
@@ -769,7 +767,7 @@ genProto.startFileLoaded = function(){
 		if (!this.iview.zoomScreen) this.pictureScreen();
 	}
 	
-	var metsDocURI = this.iview.webappBaseUri + "servlets/MCRMETSServlet/" + this.iview.viewID;
+	var metsDocURI = this.iview.properties.webappBaseUri + "servlets/MCRMETSServlet/" + this.iview.viewID;
 	jQuery.ajax({
 		url: metsDocURI,
   		success: function(response) {

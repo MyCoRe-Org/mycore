@@ -152,8 +152,7 @@ genProto.zoomCenter = function(direction, point) {
  */
 genProto.initializeGraphic = function() {
 	this.iview.loaded = false;//indicates if the window is finally loaded
-	this.iview.tilesize = tilesize;
-	this.iview.maximized = maximized;
+	this.iview.maximized = this.iview.properties.maximized;
 	this.iview.images = [];
 	PanoJS.USE_SLIDE = false;
 	PanoJS.USE_LOADER_IMAGE = false;
@@ -161,7 +160,7 @@ genProto.initializeGraphic = function() {
 	PanoJS.BLANK_TILE_IMAGE = "../modules/iview2/" + styleFolderUri + 'blank.gif';
 	
 	// opera triggers the onload twice
-	var iviewTileUrlProvider = new PanoJS.TileUrlProvider(this.iview.baseUri, this.iview.currentImage.getName(), 'jpg');
+	var iviewTileUrlProvider = new PanoJS.TileUrlProvider(this.iview.properties.baseUri, this.iview.currentImage.getName(), 'jpg');
 	iviewTileUrlProvider.derivate = this.iview.viewID;
 	var that = this;
 	iviewTileUrlProvider.getCurrentImage = function initializeGraphic_getCurrentImage(){
@@ -174,7 +173,7 @@ genProto.initializeGraphic = function() {
 	if (this.iview.viewerBean == null) {
 		this.iview.viewerBean = new PanoJS("viewer"+this.iview.viewID, {
 			initialPan: {'x' : 0, 'y' : 0 },//Koordianten der oberen linken Ecke
-			tileSize: this.iview.tilesize,//Kachelgroesse
+			tileSize: this.iview.properties.tileSize,//Kachelgroesse
 			tileUrlProvider: iviewTileUrlProvider,
 			maxZoom: this.iview.currentImage.zoomInfo.getMaxLevel(),
 			initialZoom: this.iview.zoomInit,//Anfangs-Zoomlevel
@@ -221,10 +220,10 @@ genProto.reinitializeGraphic = function() {
 					'width': curWidth - this.iview.my.barY.my.self.outerWidth()  + "px"});
 	} else {
 		//restore minimized size settings
-		viewerContainer.css({'height': this.iview.startHeight + "px",
-							'width': this.iview.startWidth + "px"});
-		viewer.css({'height': this.iview.startHeight - ((this.iview.my.barY.my.self.css("visibility") == "visible")? this.iview.my.barY.my.self.outerHeight() : 0)  + "px",
-					'width': this.iview.startWidth - ((this.iview.my.barX.my.self.css("visibility") == "visible")? this.iview.my.barX.my.self.outerWidth() : 0)  + "px"});
+		viewerContainer.css({'height': this.iview.properties.startHeight + "px",
+							'width': this.iview.properties.startWidth + "px"});
+		viewer.css({'height': this.iview.properties.startHeight - ((this.iview.my.barY.my.self.css("visibility") == "visible")? this.iview.my.barY.my.self.outerHeight() : 0)  + "px",
+					'width': this.iview.properties.startWidth - ((this.iview.my.barX.my.self.css("visibility") == "visible")? this.iview.my.barX.my.self.outerWidth() : 0)  + "px"});
 	}
 	
 	viewerBean.width = viewer.outerWidth();
@@ -240,7 +239,7 @@ genProto.reinitializeGraphic = function() {
 		this.pictureWidth();
 	}
 	
-	if (this.iview.useOverview && this.iview.overview && this.iview.overview.getActive()) {
+	if (this.iview.properties.useOverview && this.iview.overview && this.iview.overview.getActive()) {
 		// actualize Overview only if visible else delay it upto the reopening
 		this.iview.overview.setSelected(this.iview.PhysicalModel.getCurPos());
 	}
@@ -248,7 +247,7 @@ genProto.reinitializeGraphic = function() {
 	this.handleScrollbars("resize");
 	
 	var zoomScale=this.iview.currentImage.zoomInfo.getScale();
-	if (this.iview.useCutOut) {
+	if (this.iview.properties.useCutOut) {
 		this.iview.cutOutModel.setRatio({
 			'x': viewerBean.width / ((this.iview.currentImage.getWidth() / Math.pow(2, this.iview.currentImage.zoomInfo.getMaxLevel() - viewerBean.zoomLevel))*zoomScale),
 			'y': viewerBean.height / ((this.iview.currentImage.getHeight() / Math.pow(2, this.iview.currentImage.zoomInfo.getMaxLevel() - viewerBean.zoomLevel))*zoomScale)});
