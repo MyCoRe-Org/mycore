@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<imports>
+  <include uri="webapp:editor/editor-mods-common.xml" />
+  <panel id="edit-mods-cpublication">
+    <hidden var="@ID" />
+    <hidden var="@label" />
+    <hidden var="@version" />
+    <hidden var="service" descendants="true" />
+    <hidden var="metadata/@xml:lang" default="de" />
+
+    <!-- genre classification -->
+    <cell row="4" col="1" anchor="EAST" ref="mods.genre.class.label" />
+    <cell row="4" col="2" anchor="WEST" ref="mods.genre.class" var="metadata/def.modsContainer/modsContainer/mods:mods/" />
+    <cell row="4" col="3" anchor="WEST" ref="mods.genre.class.help" />
+    <!-- genre classification END -->
+
+    <!-- TITLE -->
+    <cell row="7" col="1" anchor="EAST" ref="mods.title.label" />
+    <cell row="7" col="2" anchor="WEST" ref="mods.title" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
+    <cell row="7" col="3" anchor="WEST" ref="mods.title.help" />
+    <!-- TITLE END -->
+
+    <!-- LANGUAGE -->
+    <cell row="10" col="1" anchor="EAST" ref="mods.languageTerm.label" />
+    <cell row="10" col="2" anchor="WEST" ref="mods.languageTerm" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
+    <cell row="10" col="3" anchor="WEST" ref="mods.languageTerm.help" />
+    <!-- LANGUAGE END -->
+
+    <!-- Author -->
+    <cell row="15" col="1" anchor="NORTHEAST" ref="mods.author.label" />
+    <cell row="15" col="2" anchor="WEST" ref="mods.author" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="15" col="3" anchor="WEST" ref="mods.author.help" />
+    <!-- Author END -->
+
+    <!-- Institution der Einreichung -->
+    <cell row="20" col="1" anchor="EAST" ref="mods.nameCorporate.label" />
+    <cell row="20" col="2" anchor="WEST" ref="mods.nameCorporate" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="20" col="3" anchor="WEST" ref="mods.nameCorporate.help" />
+    <!-- Institutionszugehörigkeit END -->
+
+    <!-- Publisher [text] -->
+    <cell row="30" col="1" anchor="EAST" ref="mods.publisher.label" />
+    <cell row="30" col="2" anchor="WEST" ref="mods.publisher" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
+    <cell row="30" col="3" anchor="WEST" ref="mods.publisher.help" />
+    <!-- Publisher END -->
+
+    <!-- Datum der Veröffentlichung [text] -->
+    <cell row="40" col="1" anchor="EAST" ref="mods.dateIssued.label" />
+    <cell row="40" col="2" anchor="WEST" ref="mods.dateIssued" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
+    <cell row="40" col="3" anchor="WEST" ref="mods.dateIssued.help" />
+    <!-- Datum der Veröffentlichung END -->
+
+    <!-- Abstract -->
+    <cell row="50" col="1" anchor="NORTHEAST" ref="mods.abstract.label" />
+    <cell row="50" col="2" anchor="NORTHWEST" ref="mods.abstract" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="50" col="3" anchor="NORTHWEST" ref="mods.abstract.help" />
+    <!-- Abstract END -->
+
+    <!-- Stichworte -->
+    <cell row="60" col="1" anchor="NORTHEAST" ref="mods.subject.label" />
+    <cell row="60" col="2" anchor="NORTHWEST" ref="mods.subject" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="60" col="3" anchor="NORTHWEST" ref="mods.subject.help" />
+    <!-- Stichworte END -->
+
+    <!-- Kommentar -->
+    <cell row="70" col="1" anchor="NORTHEAST" ref="mods.note.label" />
+    <cell row="70" col="2" anchor="NORTHWEST" ref="mods.note" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="70" col="3" anchor="NORTHWEST" ref="mods.note.help" />
+    <!-- Kommentar END -->
+
+    <!-- Standort -->
+    <cell row="80" col="1" anchor="EAST" ref="mods.physicalLocation.label" />
+    <cell row="80" col="2" anchor="WEST" ref="mods.physicalLocation" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:location" />
+    <cell row="80" col="3" anchor="WEST" ref="mods.physicalLocation.help" />
+    <!-- Standort END -->
+
+    <!-- Quelle -->
+    <cell row="90" col="1" anchor="EAST" ref="mods.relatedItem.label" />
+    <cell row="90" col="2" anchor="WEST" ref="mods.relatedItem" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="90" col="3" anchor="WEST" ref="mods.relatedItem.help" />
+    <!-- Quelle END -->
+
+    <!-- Save and Cancel buttons -->
+    <cell col="1" colspan="3" row="150" anchor="EAST" style="padding-top:20px;">
+      <submitButton width="100px" i18n="common.button.save" />
+      <cancelButton width="100px" i18n="common.button.cancel" />
+    </cell>
+  </panel>
+</imports>
