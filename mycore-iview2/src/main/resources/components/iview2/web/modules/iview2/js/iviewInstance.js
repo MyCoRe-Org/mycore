@@ -2,7 +2,6 @@
   "use strict";
 
   iview.IViewInstance = (function() {
-    "use strict";
     function constructor(derivateId, container, options) {
       if (typeof options === "undefined") {
         options = {};
@@ -11,6 +10,16 @@
       for (var prop in options) {
         this[prop] = options[prop];
       }
+      var defaultOpts = {
+        "useChapter" : true,
+        "useCutOut" : true,
+        "useOverview" : true,
+        "tileSize" : 256,
+        "startHeight" : 256,
+        "startWidth" : 256
+      };
+      this.properties = new iview.Properties(defaultOpts);
+      this.properties.set(options);
       this.initialized=false;
       this.derivateId = derivateId;
       this.viewerContainer = container;

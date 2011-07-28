@@ -2,10 +2,9 @@
 #REQUIRES:This Script needs the inotify-tools package and a kernel above 2.6.12
 #Allows it to automatically build the new iview2.js file, as soon as changes happen to any of the js files
 
-#ADOPT:destpath to your docportal build dir
 declare -a sources
-sources=( "jquery.mousewheel.min.js" "jquery.tree.min.js" "jquery.simplemodal.js" "jquery.mcri18n.js" "ecma5compat.js" "i18n.js" "PanoJS.js" "init.js" "iviewInstance.js" "context.js" "currentImage.js" "chapter.js" "overview.js" "cutOut.js" "METS.js" "scrollBars.js" "XML.js" "Utils.js" "Thumbnail.js" "../lib/fg-menu/fg.menu.js" "iview2.toolbar/ToolbarManager.js" "iview2.toolbar/ToolbarModel.js" "iview2.toolbar/ToolbarButtonsetModel.js" "iview2.toolbar/ToolbarDividerModel.js" "iview2.toolbar/ToolbarSpringModel.js" "iview2.toolbar/ToolbarTextModel.js" "iview2.toolbar/ToolbarButtonModel.js" "iview2.toolbar/ToolbarController.js" "iview2.toolbar/ToolbarView.js" "iview2.toolbar/StandardToolbarModelProvider.js" "iview2.toolbar/PreviewToolbarModelProvider.js" "Permalink.js" )
-destpath="/host/workspace/archive/docportal/build/webapps/modules/iview2/js/iview2.js"
+sources=( "jquery.mousewheel.min.js" "jquery.tree.min.js" "jquery.simplemodal.js" "jquery.mcri18n.js" "ecma5compat.js" "i18n.js" "PanoJS.js" "init.js" "iviewInstance.js" "properties.js" "context.js" "currentImage.js" "chapter.js" "overview.js" "cutOut.js" "METS.js" "scrollBars.js" "XML.js" "Utils.js" "Thumbnail.js" "../lib/fg-menu/fg.menu.js" "iview2.toolbar/ToolbarManager.js" "iview2.toolbar/ToolbarModel.js" "iview2.toolbar/ToolbarButtonsetModel.js" "iview2.toolbar/ToolbarDividerModel.js" "iview2.toolbar/ToolbarSpringModel.js" "iview2.toolbar/ToolbarTextModel.js" "iview2.toolbar/ToolbarButtonModel.js" "iview2.toolbar/ToolbarController.js" "iview2.toolbar/ToolbarView.js" "iview2.toolbar/StandardToolbarModelProvider.js" "iview2.toolbar/PreviewToolbarModelProvider.js" "Permalink.js" )
+destpath=$(readlink -f ${1})
 
 path=`dirname $0`
 srcpath=${path}"/../web/modules/iview2/js/"
@@ -19,10 +18,13 @@ do
 done
 
 while { inotifywait -r -e modify -e create -e move -e delete $srcpath; }; do
+	echo -n "building new version of ${destpath} "
 	rm -f $destpath
 	touch $destpath
 	for file in ${sources[@]}
 	do
+		echo -n "."
 		cat ${srcpath}$file >> $destpath
 	done
+	echo "done."
 done
