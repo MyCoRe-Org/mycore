@@ -280,6 +280,65 @@
   </helpPopup>
   <!-- Publisher END -->
 
+  <!-- Ort der Konferenz [text] -->
+  <text id="mods.conferencePlace.label">
+    <label xml:lang="de">Ort der Konferenz (*)</label>
+    <label xml:lang="en">City of Conference (*)</label>
+  </text>
+
+  <panel id="mods.conferencePlace">
+    <cell anchor="NORTHWEST" var="mods:place/mods:placeTerm[@type='text']">
+      <panel>
+        <cell anchor="NORTHWEST" ref="TFzeile512" />
+        <condition required="true">
+          <label xml:lang="de">Tragen Sie hier den Ort ein, an dem die Konferenz stattfand.</label>
+          <label xml:lang="en">Enter place of conference here.</label>
+        </condition>
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.conferencePlace.help" width="400px" height="250px">
+    <label xml:lang="de">
+      Ort der Konferenz
+        </label>
+    <label xml:lang="en">
+      Conference Place
+        </label>
+  </helpPopup>
+  <!-- Ort der Konferenz END -->
+
+
+  <!-- Land in dem die Konferenz stattfand [text] -->
+  <text id="mods.conferenceLand.label">
+    <label xml:lang="de">Land der Konferenz (*)</label>
+    <label xml:lang="en">Conference Country (*)</label>
+  </text>
+
+  <panel id="mods.conferenceLand">
+    <cell anchor="NORTHWEST" var="mods:place/mods:placeTerm[@authority='marccountry']">
+      <hidden var="@type" default="code" /> <!-- ToDo: Klassifikation für Ländercodes -->
+      <panel>
+        <cell anchor="NORTHWEST" ref="TFzeile512" />
+        <condition required="true">
+          <label xml:lang="de">Tragen Sie hier das Land ein, in dem die Konferenz stattfand.</label>
+          <label xml:lang="en">Enter country of conference here.</label>
+        </condition>
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.conferenceLand.help" width="400px" height="250px">
+    <label xml:lang="de">
+      Land der Konferenz
+        </label>
+    <label xml:lang="en">
+      Country Place
+        </label>
+  </helpPopup>
+  <!-- Land in dem die Konferenz stattfand END -->
+
+
   <!-- Institution der Einreichung -->
   <text id="mods.submissionAtInstituteClass.label">
     <label xml:lang="de">Institut der Einreichung (*)</label>
@@ -360,6 +419,35 @@
         </label>
   </helpPopup>
   <!-- Datum der Erstellung END -->
+
+  <!-- Zeit in der die Konferenz stattfand [text] -->
+  <text id="mods.dateOccured.label">
+    <label xml:lang="de">Zeitraum der Konferenz (*)</label>
+    <label xml:lang="en">Date of Conference (*)</label>
+  </text>
+
+  <panel id="mods.dateOccured">
+    <cell anchor="NORTHWEST">
+      <panel>
+        <cell col="1" row="1" var="mods:dateOther[@point='start']">
+          <textfield width="20" maxlength="40" />
+        </cell>
+        <cell col="2" row="1" var="mods:dateOther[@point='end']">
+          <textfield width="20" maxlength="40" />
+        </cell>
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.dateOccured.help" width="400px" height="250px">
+    <label xml:lang="de">
+      Zeitraum in der die Konferenz stattfand (von, bis).
+        </label>
+    <label xml:lang="en">
+      Date of Conference (start, end)
+        </label>
+  </helpPopup>
+  <!--Zeit in der die Konferenz stattfand END -->
 
   <!-- Abstract -->
   <!-- ToDo: Sprachabhaengig machen -->
@@ -678,6 +766,66 @@
     <label xml:lang="en">Select an entry from the list.</label>
   </helpPopup>
   <!-- av_medium_genre END -->
+
+  <!-- Konferenztitel -->
+  <text id="mods.nameConference.label">
+    <label xml:lang="de">Konferenztitel (*)</label>
+    <label xml:lang="en">Title of Conference (*)</label>
+  </text>
+
+  <panel id="mods.nameConference">
+    <cell anchor="NORTHWEST" var="mods:name[@type='conference']">
+      <hidden var="mods:role/mods:roleTerm" default="conference" />
+      <!-- ToDo: korrekte Zuordnung fehlt, siehe http://www.loc.gov/marc/relators/relaterm.html -->
+      <!-- hidden var="mods:role/mods:roleTerm/@authority" default="marcrelator" /-->
+      <hidden var="mods:role/mods:roleTerm/@type" default="text" />
+      <panel>
+        <cell col="1" row="1" anchor="EAST" var="mods:namePart">
+          <panel>
+            <cell anchor="NORTHWEST" ref="TFzeile512" />
+          </panel>
+        </cell>
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.nameConference.help" width="400px" height="250px">
+    <label xml:lang="de">Geben Sie den Namen der Konferenz ein.</label>
+    <label xml:lang="en">Insert Conference Name.</label>
+  </helpPopup>
+  <!-- Konferenztitel END -->
+
+  <!-- Körperschaft -->
+  <text id="mods.corporation.label">
+    <label xml:lang="de">Körperschaft (*)</label>
+    <label xml:lang="en">Corporation (*)</label>
+  </text>
+
+  <panel id="mods.corporation">
+    <cell anchor="NORTHWEST" var="mods:name[@type='family']"> <!-- ToDo: familiy ist nur ein workaround ... weil 2x corporate nicht geht *arg* -->
+      <!-- ToDo: richtige URI finden!-->
+      <hidden var="@authority" default="gnd" />
+      <hidden var="@authorityURI" default="http://d-nb.info/gnd" />
+      <hidden var="@valueURI" default="http://d-nb.info/gnd/xxx" />
+      <!-- ToDo: korrekte Zuordnung fehlt, siehe http://www.loc.gov/marc/relators/relaterm.html -->
+      <!-- hidden var="mods:role/mods:roleTerm/@authority" default="marcrelator" /-->
+      <hidden var="mods:role/mods:roleTerm/@type" default="text" />
+      <hidden var="mods:role/mods:roleTerm" default="corporation" />
+      <panel>
+        <cell col="1" row="1" anchor="EAST" var="mods:namePart">  <!-- ToDo: Anbindung an Katalog? (GKD) -->
+          <panel>
+            <cell anchor="NORTHWEST" ref="TFzeile512" />
+          </panel>
+        </cell>
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.corporation.help" width="400px" height="250px">
+    <label xml:lang="de">Geben Sie die Körperschaft ein ein.</label>
+    <label xml:lang="en">Insert corporate name.</label>
+  </helpPopup>
+  <!-- Körperschaft END -->
 
 
   <!-- *** Text fields *** -->
