@@ -755,8 +755,15 @@ genProto.startFileLoaded = function(){
 		} else if (isNaN(parseInt(URL.getParam("zoom")))){
 			if (!this.iview.zoomScreen) this.pictureScreen();
 		}
-		
-		this.maximizeHandler();
+		//Toolbar is initialized on dom-load event and may not yet ready
+	  var waitForToolbar = function (self, iviewInst){
+	    if (iviewInst.initialized){
+	      iviewInst.gen.maximizeHandler();
+	    } else {
+	      setTimeout(function(){self(self,iviewInst);}, 100);
+	    }
+	  };
+	  waitForToolbar(waitForToolbar, this.iview);
 	} else {
 		// in minimized viewer always pictureScreen
 		if (!this.iview.zoomScreen) this.pictureScreen();

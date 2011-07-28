@@ -11,6 +11,7 @@
       for (var prop in options) {
         this[prop] = options[prop];
       }
+      this.initialized=false;
       this.derivateId = derivateId;
       this.viewerContainer = container;
       this.ausschnittParent = container; // TODO: get rid of this
@@ -33,6 +34,7 @@
         
         // holt alle bisherigen Models in den Controller und setzt diese entsprechend um
         that.toolbarCtrl.catchModels();
+        that.initialized=true;
       });
     }
     
