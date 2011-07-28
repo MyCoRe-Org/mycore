@@ -55,8 +55,9 @@
               'webappBaseUri' : "<xsl:value-of select="$WebApplicationBaseURL"/>",
               'pdfCreatorURI' : "<xsl:value-of select="$MCR.Module-iview2.PDFCreatorURI"/>",
               'pdfCreatorStyle' : "<xsl:value-of select="$MCR.Module-iview2.PDFCreatorStyle"/>",
+              'derivateId' : viewID,
             };
-            Iview[viewID] = new iview.IViewInstance(viewID, jQuery(currentNode.parentNode), options);
+            Iview[viewID] = new iview.IViewInstance(jQuery(currentNode.parentNode), options);
           })('<xsl:value-of select="$groupID" />');
       </script>
     </div>
