@@ -37,6 +37,15 @@
         throw new iview.IviewInstanceError("No derivateId defined.", this);
       }
       //passed
+      var paramDerId=URL.getParam("derivateId");
+      this.properties.useParam = false;
+      if (Iview[this.properties.derivateId].length === 0) {
+        var cnt=0;
+        for (var derId in Iview){
+          cnt++;
+        }
+        this.properties.useParam = (paramDerId === this.properties.derivateId) || (paramDerId.length === 0 && cnt === 1);
+      }
       this.initialized = false;
       this.viewerContainer = container;
       this.ausschnittParent = container; // TODO: get rid of this

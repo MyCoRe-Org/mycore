@@ -106,8 +106,8 @@ genProto.processImageProperties = function(imageProperties, url){
 	
 	// damit das alte zoomBack bei Modi-Austritt nicht verwendet wird
 	this.iview.zoomBack = this.iview.zoomInit;
-	var initX = toFloat(URL.getParam("x"));
-	var initY = toFloat(URL.getParam("y"));
+	var initX = this.iview.properties.useParam ? toFloat(URL.getParam("x")) : 0;
+  var initY = this.iview.properties.useParam ? toFloat(URL.getParam("y")) : 0;
 	
 	this.iview.roller = true;
 	viewerBean.positionTiles ({'x' : initX, 'y' : initY}, true);
@@ -118,7 +118,7 @@ genProto.processImageProperties = function(imageProperties, url){
   this.updateModuls();
 	
 	this.iview.roller = false;
-}
+};
 
 /**
  * @public
@@ -722,7 +722,7 @@ genProto.loading = function(startFile) {
 	viewerBean = that.iview.viewerBean;
 	viewerBean.addViewerZoomedListener(that);
 	viewerBean.addViewerMovedListener(that);
-  if (!isNaN(parseInt(URL.getParam("zoom")))) {
+  if (this.iview.properties.useParam && !isNaN(parseInt(URL.getParam("zoom")))) {
     viewerBean.zoomLevel= parseInt(URL.getParam("zoom"));
   }
 	this.loadPage(function(){
@@ -745,7 +745,7 @@ genProto.startFileLoaded = function(){
 
 	// PermaLink Handling
 	// choice if zoomLevel or special; zoomMode only makes sense in maximized viewer
-	if (URL.getParam("maximized") == "true") {
+	if (this.iview.properties.useParam && URL.getParam("maximized") == "true") {
 		if (URL.getParam("tosize") == "width") {
 			if (!this.iview.zoomWidth) this.pictureWidth();
 		} else if (URL.getParam("tosize") == "screen") {

@@ -147,7 +147,8 @@ iview.Permalink.Controller.prototype = {
 	_update: function() {
 		var viewer = this.getViewer().iview;
 		var url = "http://" + window.location.host + window.location.pathname + "?" + window.location.search.replace(/[?|&](x|y|page|zoom|tosize|maximized|css)=([^&]*)/g,"").replace(/\?/,"");
-		url += "&page="+viewer.currentImage.getName();
+    url += "&page="+viewer.currentImage.getName();
+    url += "&derivate="+viewer.properties.derivateId;
 		url += "&zoom="+viewer.viewerBean.zoomLevel;
 		url += "&x="+viewer.viewerBean.x;
 		url += "&y="+viewer.viewerBean.y;
