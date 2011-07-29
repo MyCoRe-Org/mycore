@@ -346,7 +346,7 @@
   </text>
 
   <panel id="mods.submissionAtInstituteClass">
-    <cell anchor="NORTHWEST" var="mods:originInfo/mods:publisher">
+    <cell anchor="NORTHWEST" var="mods:originInfo/mods:place/mods:placeTerm[@type='text']">
       <list width="30" type="dropdown">
         <include ref="pleaseSelect" />
         <!-- ToDo: richtige Klassifikation anlegen und einbinden -->
@@ -429,10 +429,22 @@
   <panel id="mods.dateOccured">
     <cell anchor="NORTHWEST">
       <panel>
-        <cell col="1" row="1" var="mods:dateOther[@point='start']">
+        <cell col="1" row="1">
+          <text>
+            <label xml:lang="de">von</label>
+            <label xml:lang="en">from</label>
+          </text>
+        </cell>
+        <cell col="2" row="1" var="mods:dateOther[@point='start']">
           <textfield width="20" maxlength="40" />
         </cell>
-        <cell col="2" row="1" var="mods:dateOther[@point='end']">
+        <cell col="3" row="1">
+          <text>
+            <label xml:lang="de">bis</label>
+            <label xml:lang="en">until</label>
+          </text>
+        </cell>
+        <cell col="4" row="1" var="mods:dateOther[@point='end']">
           <textfield width="20" maxlength="40" />
         </cell>
       </panel>
@@ -450,7 +462,6 @@
   <!--Zeit in der die Konferenz stattfand END -->
 
   <!-- Abstract -->
-  <!-- ToDo: Sprachabhaengig machen -->
   <text id="mods.abstract.label">
     <label xml:lang="de">Zusammenfassung</label>
     <label xml:lang="en">Abstract</label>
@@ -461,6 +472,22 @@
       <repeater min="1" max="5" pos="right">
         <panel>
           <cell anchor="NORTHWEST" ref="TFarea4096" />
+          <cell row="1" col="2" anchor="NORTHWEST" var="@lang">
+            <list type="dropdown" default="de">
+              <item value="de">
+                <label xml:lang="de">deutsch</label>
+                <label xml:lang="en">german</label>
+              </item>
+              <item value="en">
+                <label xml:lang="de">englisch</label>
+                <label xml:lang="en">english</label>
+              </item>
+              <item value="other">
+                <label xml:lang="de">sontige</label>
+                <label xml:lang="en">other</label>
+              </item>
+            </list>
+          </cell>
         </panel>
       </repeater>
     </cell>
