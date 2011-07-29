@@ -37,7 +37,7 @@
         throw new iview.IviewInstanceError("No derivateId defined.", this);
       }
       //passed
-      var paramDerId=URL.getParam("derivateId");
+      var paramDerId=URL.getParam("derivate");
       this.properties.useParam = false;
       if (Iview[this.properties.derivateId].length === 0) {
         var cnt=0;
@@ -76,7 +76,7 @@
     constructor.prototype.startViewer = function ii_startViewer(startFile) {
       this.started = true; // TODO: check if still necessary
       // Load Page
-      if (URL.getParam("page") != "") {
+      if (this.properties.useParam && URL.getParam("page") != "") {
         // TODO may be incomplete: Prevent Remote File Inclusion, but never Ever drop
         startFile = decodeURI(URL.getParam("page").replace(/(:|\.\.|&#35|&#46|&#58|&#38|&#35|&amp)/, "§"));
       }
