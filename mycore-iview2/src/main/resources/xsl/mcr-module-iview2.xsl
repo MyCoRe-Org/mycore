@@ -57,7 +57,10 @@
               'pdfCreatorStyle' : "<xsl:value-of select="$MCR.Module-iview2.PDFCreatorStyle"/>",
               'derivateId' : viewID,
             };
-            Iview[viewID] = new iview.IViewInstance(jQuery(currentNode.parentNode), options);
+            if (typeof Iview[viewID] ==="undefined"){
+              Iview[viewID] = [];
+            }
+            Iview[viewID].push(new iview.IViewInstance(jQuery(currentNode.parentNode), options));
           })('<xsl:value-of select="$groupID" />');
       </script>
     </div>
@@ -95,7 +98,7 @@
       var chapterEmbedded=<xsl:value-of select="$chapterEmbedded" />;
       var chapDynResize=<xsl:value-of select="$chapDynResize" />;
       var DampInViewer=<xsl:value-of select="$DampInViewer" />;
-      var Iview = Iview || {};
+      var Iview = Iview || [];
       var i18n = i18n || new iview.i18n('<xsl:value-of select="$WebApplicationBaseURL"/>', '<xsl:value-of select="$CurrentLang"/>');
       <xsl:text>loadCssFile('</xsl:text>
       <xsl:value-of select="$WebApplicationBaseURL"/>
@@ -119,7 +122,8 @@
     <!-- Initfunktionen -->
     <script type="text/javascript">
       jQuery(document).ready(function(){
-          Iview['<xsl:value-of select="$groupID"/>'].startViewer('<xsl:value-of select="$startFile" />');
+          var instList=Iview['<xsl:value-of select="$groupID"/>'];
+          instList[instList.length-1].startViewer('<xsl:value-of select="$startFile" />');
         }
       );
     </script>

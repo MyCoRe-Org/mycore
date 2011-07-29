@@ -43,7 +43,6 @@ iview.resizeImage = function (img, width, height) {
 iview.General = function(iviewInst) {
 	//TODO later it should be possible to remove all this.iview with just this
 	this.iview = iviewInst;
-	this.iview.viewID = iviewInst.properties.derivateId; //TODO: get rid of viewID
 	//structure for all Viewer DOM-Objects
 	this.iview.my = {'container': iviewInst.viewerContainer,
 					'viewer': iviewInst.viewerContainer.find(".viewer"),
@@ -160,7 +159,7 @@ genProto.initializeGraphic = function() {
 	
 	// opera triggers the onload twice
 	var iviewTileUrlProvider = new PanoJS.TileUrlProvider(this.iview.properties.baseUri, this.iview.currentImage.getName(), 'jpg');
-	iviewTileUrlProvider.derivate = this.iview.viewID;
+	iviewTileUrlProvider.derivate = this.iview.properties.derivateId;
 	var that = this;
 	iviewTileUrlProvider.getCurrentImage = function initializeGraphic_getCurrentImage(){
 	  return that.iview.currentImage;
@@ -170,7 +169,7 @@ genProto.initializeGraphic = function() {
    * initialise the viewer
    */
 	if (this.iview.viewerBean == null) {
-		this.iview.viewerBean = new PanoJS("viewer"+this.iview.viewID, {
+		this.iview.viewerBean = new PanoJS(this.iview.my.viewer[0], {
 			initialPan: {'x' : 0, 'y' : 0 },//Koordianten der oberen linken Ecke
 			tileSize: this.iview.properties.tileSize,//Kachelgroesse
 			tileUrlProvider: iviewTileUrlProvider,

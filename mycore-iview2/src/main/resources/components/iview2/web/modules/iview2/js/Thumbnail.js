@@ -43,7 +43,7 @@ genProto.loadPage = function(callback, startFile) {
 		url = this.iview.PhysicalModel.getCurrent().getHref();
 	}
 	this.iview.currentImage.setName(url);
-	var imagePropertiesURL = this.iview.properties.baseUri[0]+"/"+this.iview.viewID+"/"+url+"/imageinfo.xml";
+	var imagePropertiesURL = this.iview.properties.baseUri[0]+"/"+this.iview.properties.derivateId+"/"+url+"/imageinfo.xml";
 	var that = this;
 	jQuery.ajax({
 		url: imagePropertiesURL,
@@ -767,7 +767,7 @@ genProto.startFileLoaded = function(){
 		if (!this.iview.zoomScreen) this.pictureScreen();
 	}
 	
-	var metsDocURI = this.iview.properties.webappBaseUri + "servlets/MCRMETSServlet/" + this.iview.viewID;
+	var metsDocURI = this.iview.properties.webappBaseUri + "servlets/MCRMETSServlet/" + this.iview.properties.derivateId;
 	jQuery.ajax({
 		url: metsDocURI,
   		success: function(response) {
@@ -843,8 +843,10 @@ genProto.processMETS = function(metsDoc) {
 	}
 	//at other positions Opera doesn't get it correctly (although it still doesn't look that smooth as in other browsers) 
 	//TODO needs to be adapted to work correctly with the new structure
-	window.setTimeout("Iview['"+this.iview.viewID+"'].toolbarCtrl.paint('mainTb')",10);
-}
+	window.setTimeout(function() {
+    that.iview.toolbarCtrl.paint('mainTb');
+  }, 10);
+};
 
 var URL = { "location": window.location};
 /**
@@ -862,4 +864,4 @@ URL.getParam = function(param) {
 	} catch (e) {
 		return "";
 	}
-}
+};
