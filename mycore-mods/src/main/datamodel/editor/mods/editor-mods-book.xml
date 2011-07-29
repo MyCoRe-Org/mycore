@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <import>
   <include uri="webapp:editor/editor-mods-common.xml" />
+  <include uri="webapp:editor/editor-mods-book-label.xml" />
+  <include uri="webapp:editor/editor-mods-book-help.xml" />
   <panel id="edit-mods-book">
     <hidden var="@ID" />
     <hidden var="@label" />
@@ -17,90 +19,89 @@
     <cell id="mainCell" row="1" col="1" anchor="NORTWEST" var="metadata/def.modsContainer/modsContainer/mods:mods">
       <panel>
         <cell row="10" col="1" anchor="NORTHEAST" ref="mods.title.label" />
-        <cell row="10" col="2" anchor="NORTHWEST" var="mods:titleInfo" ref="mods.book.pub.title.orig" />
-        <cell row="10" col="3" anchor="NORTHWEST" ref="mods.book.pub.title.helpPopup" />
+        <cell row="10" col="2" anchor="NORTHWEST" var="mods:titleInfo" ref="mods.book.title.orig" />
+        <cell row="10" col="3" anchor="NORTHWEST" ref="mods.book.title.helpPopup" />
 
         <cell row="30" col="1" anchor="NORTHEAST" ref="mods.title.translated.label" />
-        <cell row="30" col="2" anchor="NORTHWEST" var="mods:titleInfo[@type='translated']" ref="mods.book.pub.title.eng" />
-        <cell row="30" col="3" anchor="NORTHWEST" ref="mods.book.pub.title.helpPopup" />
+        <cell row="30" col="2" anchor="NORTHWEST" var="mods:titleInfo[@type='translated']" ref="mods.book.title.translated.repeater" />
+        <cell row="30" col="3" anchor="NORTHWEST" ref="mods.book.title.translated.helpPopup" />
 
-        <cell row="50" col="1" colspan="2" anchor="NORTHWEST" var="mods:name[@type='personal']" ref="mods.book.pub.person.repeater" />
-        <cell row="50" col="3" anchor="NORTHWEST" ref="mods.book.pub.author.mon.helpPopup" />
+        <cell row="50" col="1" colspan="2" anchor="NORTHEAST" var="mods:name[@type='personal']" ref="mods.book.autor.repeater"/>
+        <cell row="50" col="3" anchor="NORTHWEST" ref="mods.book.author.mon.helpPopup" />
 
         <cell row="90" col="1" colspan="3" anchor="CENTER" var="mods:originInfo">
           <panel>
             <!-- Herausgeber des Buches auch in name/namePart/role ?? -->
-            <cell row="10" col="1" anchor="NORTHEAST" ref="mods.publisher.label" />
+            <cell row="10" col="1" anchor="NORTHEAST" ref="mods.book.publisher.label" />
             <cell row="10" col="2" anchor="NORTHWEST" var="mods:publisher" ref="TFzeile512" />
-            <cell row="10" col="3" anchor="NORTHWEST" ref="mods.book.pub.title.helpPopup" />
+            <cell row="10" col="3" anchor="NORTHWEST" ref="mods.book.publisher.helpPopup" />
 
             <cell row="20" col="1" anchor="NORTHEAST" ref="mods.edition.label" />
             <cell row="20" col="2" anchor="NORTHWEST" var="mods:edition" ref="TFzeile512" />
             <!-- TODO: create own help popup -->
-            <cell row="20" col="3" anchor="NORTHWEST" ref="mods.book.pub.title.helpPopup" />
+            <cell row="20" col="3" anchor="NORTHWEST" ref="mods.book.title.helpPopup" />
 
             <cell row="30" col="1" anchor="NORTHEAST" ref="mods.book.place.label" />
             <cell row="30" col="2" anchor="NORTHWEST" var="mods:place/mods:placeTerm[@type='text']" ref="TFzeile512" />
             <!-- TODO: create own help popup -->
-            <cell row="30" col="3" anchor="NORTHWEST" ref="mods.book.pub.title.helpPopup" />
+            <cell row="30" col="3" anchor="NORTHWEST" ref="mods.book.title.helpPopup" />
 
             <cell row="40" col="1" anchor="NORTHEAST" ref="mods.book.country.label" />
             <cell row="40" col="2" anchor="NORTHWEST" var="mods:place/mods:placeTerm[@type='code']" ref="TFzeile512" />
             <!-- TODO: create own help popup -->
-            <cell row="40" col="3" anchor="NORTHWEST" ref="mods.book.pub.title.helpPopup" />
+            <cell row="40" col="3" anchor="NORTHWEST" ref="mods.book.title.helpPopup" />
 
             <cell row="50" col="1" anchor="NORTHEAST" ref="mods.book.year.label" />
             <cell row="50" col="2" anchor="NORTHWEST" var="mods:dateIssued" ref="TFzeile512" />
             <!-- TODO: create own help popup -->
-            <cell row="50" col="3" anchor="NORTHWEST" ref="mods.book.pub.title.helpPopup" />
+            <cell row="50" col="3" anchor="NORTHWEST" ref="mods.book.title.helpPopup" />
           </panel>
         </cell>
 
         <cell row="100" col="1" anchor="NORTHEAST" ref="mods.book.serie.label" />
         <cell row="100" col="2" anchor="NORTHWEST" var="mods:part" ref="TFzeile512" />
         <!-- TODO: create own help popup -->
-        <cell row="100" col="3" anchor="NORTHWEST" ref="mods.book.pub.title.helpPopup" />
+        <cell row="100" col="3" anchor="NORTHWEST" ref="mods.book.title.helpPopup" />
 
         <cell row="120" col="1" anchor="NORTHEAST" ref="mods.book.extend.label" />
         <cell row="120" col="2" anchor="NORTHWEST" var="mods:part/mods:extended" ref="TFzeile512" />
         <!-- TODO: create own help popup -->
-        <cell row="120" col="3" anchor="NORTHWEST" ref="mods.book.pub.title.helpPopup" />
+        <cell row="120" col="3" anchor="NORTHWEST" ref="mods.book.title.helpPopup" />
 
         <cell row="140" col="1" anchor="NORTHEAST" ref="mods.book.counter.label" />
         <cell row="140" col="2" anchor="NORTHWEST" var="mods:part/mods:extended" ref="TFzeile512" />
         <!-- TODO: create own help popup -->
-        <cell row="140" col="3" anchor="NORTHWEST" ref="mods.book.pub.title.helpPopup" />
+        <cell row="140" col="3" anchor="NORTHWEST" ref="mods.book.title.helpPopup" />
 
         <cell row="160" col="1" anchor="NORTHEAST" ref="mods.book.isbn.label" />
         <cell row="160" col="2" anchor="NORTHWEST" var="mods:identifier" ref="TFzeile512" />
         <!-- TODO: create own help popup -->
-        <cell row="160" col="3" anchor="NORTHWEST" ref="mods.book.pub.title.helpPopup" />
+        <cell row="160" col="3" anchor="NORTHWEST" ref="mods.book.title.helpPopup" />
 
         <cell row="170" col="1" anchor="NORTHEAST" ref="mods.book.identifier.label" />
         <cell row="170" col="2" anchor="NORTHWEST" var="mods:identifier" ref="TFzeile512" />
         <!-- TODO: create own help popup -->
-        <cell row="170" col="3" anchor="NORTHWEST" ref="mods.book.pub.title.helpPopup" />
+        <cell row="170" col="3" anchor="NORTHWEST" ref="mods.book.title.helpPopup" />
 
         <cell row="180" col="1" anchor="NORTHEAST" ref="mods.books.identifier.uri.label" />
         <cell row="180" col="2" anchor="NORTHWEST" var="mods:location/mods:uri" ref="TFzeile512" />
         <!-- TODO: create own help popup -->
-        <cell row="180" col="3" anchor="NORTHWEST" ref="mods.book.pub.title.helpPopup" />
+        <cell row="180" col="3" anchor="NORTHWEST" ref="mods.book.title.helpPopup" />
 
         <cell row="185" col="1" anchor="NORTHEAST" ref="mods.book.language.label" />
         <cell row="185" col="2" anchor="NORTHWEST" var="mods:language" ref="TFzeile512" />
         <!-- TODO: create own help popup -->
-        <cell row="185" col="3" anchor="NORTHWEST" ref="mods.book.pub.title.helpPopup" />
+        <cell row="185" col="3" anchor="NORTHWEST" ref="mods.book.title.helpPopup" />
 
         <cell row="220" col="1" anchor="NORTHEAST" ref="mods.book.abstract.label" />
         <cell row="220" col="2" anchor="NORTHWEST" var="mods:abstract" ref="TFzeile512" />
         <!-- TODO: create own help popup -->
-        <cell row="220" col="3" anchor="NORTHWEST" ref="mods.book.pub.title.helpPopup" />
+        <cell row="220" col="3" anchor="NORTHWEST" ref="mods.book.title.helpPopup" />
 
         <cell row="240" col="1" anchor="NORTHEAST" ref="mods.book.ddc.label" />
         <cell row="240" col="2" anchor="NORTHWEST" var="mods:classification" ref="TFzeile512" />
         <!-- TODO: create own help popup -->
-        <cell row="240" col="3" anchor="NORTHWEST" ref="mods.book.pub.title.helpPopup" />
-
+        <cell row="240" col="3" anchor="NORTHWEST" ref="mods.book.title.helpPopup" />
 
         <!-- Stichworte -->
         <cell row="250" col="1" anchor="NORTHEAST" ref="mods.subject.label" />
@@ -128,78 +129,16 @@
       </panel>
 
     </cell>
-    <!-- References -->
-    <text id="mods.book.ddc.label">
-      <label xml:lang="de">DDC</label>
-      <label xml:lang="en">DDC</label>
-    </text>
+    
+    <!-- buttons -->
+    <cell col="1" colspan="3" row="300" anchor="EAST" style="padding-top:20px;">
+      <submitButton width="100px" i18n="common.button.save" />
+      <cancelButton width="100px" i18n="common.button.cancel" />
+    </cell>
+  </panel>
 
-    <text id="mods.book.abstract.label">
-      <label xml:lang="de">Abstract</label>
-      <label xml:lang="en">Abstract</label>
-    </text>
-
-    <text id="mods.book.language.label">
-      <label xml:lang="de">Sprache</label>
-      <label xml:lang="en">Language</label>
-    </text>
-
-    <text id="mods.books.identifier.uri.label">
-      <label xml:lang="de">Identifier</label>
-      <label xml:lang="en">Identifier</label>
-    </text>
-
-    <text id="mods.book.identifier.label">
-      <label xml:lang="de">Identifier</label>
-      <label xml:lang="en">Identifier</label>
-    </text>
-
-    <text id="mods.book.isbn.label">
-      <label xml:lang="de">ISBN</label>
-      <label xml:lang="en">ISBN</label>
-    </text>
-
-    <text id="mods.book.counter.label">
-      <label xml:lang="de">Bandzählung</label>
-      <!-- TODO: english translation -->
-      <label xml:lang="en">Bandzählung</label>
-    </text>
-
-    <text id="mods.book.extend.label">
-      <label xml:lang="de">Umfang</label>
-      <!-- TODO: english translation -->
-      <label xml:lang="en">Umfang</label>
-    </text>
-
-    <text id="mods.book.serie.label">
-      <label xml:lang="de">Serie</label>
-      <label xml:lang="en">Serie</label>
-    </text>
-
-    <text id="mods.book.year.label">
-      <label xml:lang="de">Erscheinungsjahr</label>
-      <!-- TODO: english translation -->
-      <label xml:lang="en">Erscheinungsjahr</label>
-    </text>
-
-    <text id="mods.book.country.label">
-      <label xml:lang="de">Erscheinungsland</label>
-      <!-- TODO: english translation -->
-      <label xml:lang="en">Erscheinungsland</label>
-    </text>
-
-    <text id="mods.book.place.label">
-      <label xml:lang="de">Erscheinungsort</label>
-      <!-- TODO: english translation -->
-      <label xml:lang="en">Erscheinungsort</label>
-    </text>
-
-    <text id="mods.edition.label">
-      <label xml:lang="de">Auflage</label>
-      <label xml:lang="en">Edition</label>
-    </text>
-
-    <panel id="mods.book.pub.title.orig">
+    <!-- input fields -->
+    <panel id="mods.book.title.orig">
       <cell row="1" col="2" anchor="NORTHWEST" var="mods:title">
         <textfield id="book.pub.title.required" width="60" maxlength="512">
           <condition required="true">
@@ -209,45 +148,34 @@
         </textfield>
       </cell>
     </panel>
+    
+  <!-- repeater -->
+  <repeater id="mods.book.title.translated.repeater" min="1" max="50" anchor="NORTHWEST">
+    <panel>
+      <cell anchor="NORTHWEST" var="mods:title" ref="TFzeile512" />
+    </panel>
+  </repeater>
 
-    <helpPopup id="mods.book.pub.title.helpPopup" width="400px" height="250px">
-      <label xml:lang="de">Titel des Buches</label>
-      <label xml:lang="en">title of the book</label>
-    </helpPopup>
+  <repeater id="mods.book.autor.repeater" min="1" max="20" anchor="NORTHWEST">
+    <panel>
+      <cell anchor="NORTHEAST" var="mods:role/mods:roleTerm[@type='text']">
+        <list type="dropdown" default="author">
+          <item value="author">
+            <label xml:lang="de">Autor</label>
+            <label xml:lang="en">Author</label>
+          </item>
+          <item value="editor">
+            <label xml:lang="de">Herausgeber</label>
+            <label xml:lang="en">Editor</label>
+          </item>
+          <item value="institution">
+            <label xml:lang="de">Institution</label>
+            <label xml:lang="en">Institution</label>
+          </item>
+        </list>
+      </cell>
+      <cell row="1" col="2" anchor="NORTHWEST" var="mods:namePart" ref="TFzeile512" />
+    </panel>
+  </repeater>
 
-    <repeater id="mods.book.pub.title.eng">
-      <panel>
-        <cell anchor="NORTHWEST" var="mods:title" ref="TFzeile512" />
-      </panel>
-    </repeater>
-    <cell col="1" colspan="3" row="300" anchor="EAST" style="padding-top:20px;">
-      <submitButton width="100px" i18n="common.button.save" />
-      <cancelButton width="100px" i18n="common.button.cancel" />
-    </cell>
-
-    <repeater id="mods.book.pub.person.repeater" min="1" max="20" pos="right">
-      <panel>
-        <cell anchor="NORTHEAST" var="mods:role/mods:roleTerm[@type='text']">
-          <list type="dropdown" default="author">
-            <item value="author">
-              <label xml:lang="de">Autor</label>
-              <label xml:lang="en">Author</label>
-            </item>
-            <item value="editor">
-              <label xml:lang="de">Herausgeber</label>
-              <label xml:lang="en">Editor</label>
-            </item>
-            <item value="institution">
-              <label xml:lang="de">Institution</label>
-              <label xml:lang="en">Institution</label>
-            </item>
-          </list>
-        </cell>
-        <cell row="1" col="2" anchor="NORTHWEST" var="mods:namePart" ref="TFzeile512" />
-      </panel>
-    </repeater>
-    <helpPopup id="mods.book.pub.author.mon.helpPopup" width="400px" height="250px">
-      <label xml:lang="de">Autor des Buches</label>
-      <label xml:lang="en">Author of the book</label>
-    </helpPopup>
-  </panel>
+</import>

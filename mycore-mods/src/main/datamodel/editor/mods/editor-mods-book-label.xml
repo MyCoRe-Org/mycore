@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<import>
+  <text id="mods.book.ddc.label">
+    <label xml:lang="de">DDC (*)</label>
+    <label xml:lang="en">DDC (*)</label>
+  </text>
+
+  <text id="mods.book.abstract.label">
+    <label xml:lang="de">Abstract</label>
+    <label xml:lang="en">Abstract</label>
+  </text>
+
+  <text id="mods.book.language.label">
+    <label xml:lang="de">Sprache (*)</label>
+    <label xml:lang="en">Language (*)</label>
+  </text>
+
+  <text id="mods.books.identifier.uri.label">
+    <label xml:lang="de">Identifier</label>
+    <label xml:lang="en">Identifier</label>
+  </text>
+
+  <text id="mods.book.identifier.label">
+    <label xml:lang="de">Identifier</label>
+    <label xml:lang="en">Identifier</label>
+  </text>
+
+  <text id="mods.book.isbn.label">
+    <label xml:lang="de">ISBN (*)</label>
+    <label xml:lang="en">ISBN (*)</label>
+  </text>
+
+  <text id="mods.book.counter.label">
+    <label xml:lang="de">Bandzählung</label>
+    <!-- TODO: english translation -->
+    <label xml:lang="en">Bandzählung</label>
+  </text>
+
+  <text id="mods.book.extend.label">
+    <label xml:lang="de">Umfang</label>
+    <!-- TODO: english translation -->
+    <label xml:lang="en">Umfang</label>
+  </text>
+
+  <text id="mods.book.serie.label">
+    <label xml:lang="de">Serie</label>
+    <label xml:lang="en">Serie</label>
+  </text>
+
+  <text id="mods.book.year.label">
+    <label xml:lang="de">Erscheinungsjahr (*)</label>
+    <!-- TODO: english translation -->
+    <label xml:lang="en">Erscheinungsjahr (*)</label>
+  </text>
+
+  <text id="mods.book.country.label">
+    <label xml:lang="de">Erscheinungsland</label>
+    <!-- TODO: english translation -->
+    <label xml:lang="en">Erscheinungsland</label>
+  </text>
+
+  <text id="mods.book.place.label">
+    <label xml:lang="de">Erscheinungsort (*)</label>
+    <!-- TODO: english translation -->
+    <label xml:lang="en">Erscheinungsort (*)</label>
+  </text>
+
+  <text id="mods.edition.label">
+    <label xml:lang="de">Auflage (*)</label>
+    <label xml:lang="en">Edition (*)</label>
+  </text>
+  
+  <text id="mods.book.publisher.label">
+    <label xml:lang="de">Verlag (*)</label>
+    <label xml:lang="en">Publisher (*)</label>
+  </text>
+</import>
