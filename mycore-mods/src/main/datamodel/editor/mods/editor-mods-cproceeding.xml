@@ -29,7 +29,12 @@
     <!-- pub_title_engl[text] END -->
 
     <!-- Herausgabejahr -->
-    <cell row="30" col="1" anchor="NORTHEAST" ref="mods.dateIssued.label" />
+    <cell row="30" col="1" anchor="NORTHEAST">
+      <text>
+        <label xml:lang="de">Herausgabejahr (*)</label>
+        <label xml:lang="en">Date Issued (*)</label>
+      </text>
+    </cell>
     <cell row="30" col="2" anchor="NORTHWEST" ref="mods.dateIssued" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
     <cell row="30" col="3" anchor="NORTHWEST" ref="mods.dateIssued.help" />
     <!-- Herausgabejahr END -->
@@ -46,35 +51,37 @@
     <cell row="50" col="3" anchor="NORTHWEST" ref="mods.identifier.help" />
     <!-- Identifier END -->
 
+    <!-- Körperschaft -->
+    <cell row="60" col="1" anchor="NORTHEAST" ref="mods.corporation.label" />
+    <cell row="60" col="2" anchor="NORTHWEST" ref="mods.corporation" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="60" col="3" anchor="NORTHWEST" ref="mods.corporation.help" />
+    <!-- Körperschaft END -->
+
+  <cell row="70" colspan="3" class="border"><panel>
     <!-- Konferenztitel -->
-    <cell row="60" col="1" anchor="NORTHEAST" ref="mods.nameConference.label" />
-    <cell row="60" col="2" anchor="NORTHWEST" ref="mods.nameConference" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="60" col="3" anchor="NORTHWEST" ref="mods.nameConference.help" />
+    <cell row="10" col="1" anchor="NORTHEAST" ref="mods.nameConference.label" />
+    <cell row="10" col="2" anchor="NORTHWEST" ref="mods.nameConference" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="10" col="3" anchor="NORTHEAST" ref="mods.nameConference.help" />
     <!-- Konferenztitel END -->
 
     <!-- Konferenzzeitraum -->
-    <cell row="70" col="1" anchor="NORTHEAST" ref="mods.dateOccured.label" />
-    <cell row="70" col="2" anchor="NORTHWEST" ref="mods.dateOccured" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
-    <cell row="70" col="3" anchor="NORTHWEST" ref="mods.dateOccured.help" />
+    <cell row="20" col="1" anchor="NORTHEAST" ref="mods.dateOccured.label" />
+    <cell row="20" col="2" anchor="NORTHWEST" ref="mods.dateOccured" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
+    <cell row="20" col="3" anchor="NORTHWEST" ref="mods.dateOccured.help" />
     <!-- Konferenzzeitraum END -->
 
     <!-- Ort -->
-    <cell row="80" col="1" anchor="NORTHEAST" ref="mods.conferencePlace.label" />
-    <cell row="80" col="2" anchor="NORTHWEST" ref="mods.conferencePlace" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
-    <cell row="80" col="3" anchor="NORTHWEST" ref="mods.conferencePlace.help" />
+    <cell row="30" col="1" anchor="NORTHEAST" ref="mods.conferencePlace.label" />
+    <cell row="30" col="2" anchor="NORTHWEST" ref="mods.conferencePlace" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
+    <cell row="30" col="3" anchor="NORTHWEST" ref="mods.conferencePlace.help" />
     <!-- Ort END -->
 
     <!-- Land -->
-    <cell row="90" col="1" anchor="NORTHEAST" ref="mods.conferenceLand.label" />
-    <cell row="90" col="2" anchor="NORTHWEST" ref="mods.conferenceLand" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
-    <cell row="90" col="3" anchor="NORTHWEST" ref="mods.conferenceLand.help" />
+    <cell row="40" col="1" anchor="NORTHEAST" ref="mods.conferenceLand.label" />
+    <cell row="40" col="2" anchor="NORTHWEST" ref="mods.conferenceLand" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
+    <cell row="40" col="3" anchor="NORTHWEST" ref="mods.conferenceLand.help" />
     <!-- Land END -->
-
-    <!-- Körperschaft -->
-    <cell row="100" col="1" anchor="NORTHEAST" ref="mods.corporation.label" />
-    <cell row="100" col="2" anchor="NORTHWEST" ref="mods.corporation" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="100" col="3" anchor="NORTHWEST" ref="mods.corporation.help" />
-    <!-- Körperschaft END -->
+  </panel></cell>
 
     <!-- Institution (wo bei BMELV-Forschung zugeordnet) -->
     <cell row="110" col="1" anchor="NORTHEAST" ref="mods.assignedInstituteClass.label" />
