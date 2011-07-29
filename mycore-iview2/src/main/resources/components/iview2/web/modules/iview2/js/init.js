@@ -40,18 +40,17 @@ iview.resizeImage = function (img, width, height) {
  * @name		General
  * @description All Viewer data and functions which don't fit in other packages
  */
-iview.General = function(iviewInst, viewID) {
+iview.General = function(iviewInst) {
 	//TODO later it should be possible to remove all this.iview with just this
 	this.iview = iviewInst;
-	var viewID=iviewInst.derivateId; //TODO: get rid of viewID
+	this.iview.viewID = iviewInst.properties.derivateId; //TODO: get rid of viewID
 	//structure for all Viewer DOM-Objects
-	this.iview.my = {'container': jQuery("#viewerContainer" + viewID),
-					'viewer': jQuery("#viewer" + viewID),
-					'preload': jQuery("#viewerContainer" + viewID + " .preload")};
+	this.iview.my = {'container': iviewInst.viewerContainer,
+					'viewer': iviewInst.viewerContainer.find(".viewer"),
+					'preload': iviewInst.viewerContainer.find(".preload")};
 	//TODO: get rid of those parentNode crap
 	this.iview.context = new iview.Context(this.iview.my.container);
 	this.iview.currentImage = new iview.CurrentImage(this.iview);
-	this.iview.viewID = viewID;
 	this.inputHandlerEnabled=true;
 };
 

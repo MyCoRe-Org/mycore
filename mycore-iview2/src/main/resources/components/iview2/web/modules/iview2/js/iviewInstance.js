@@ -37,7 +37,6 @@
         throw new iview.IviewInstanceError("No derivateId defined.", this);
       }
       //passed
-      this.derivateId=this.properties.derivateId; //TODO: use from properties
       this.initialized = false;
       this.viewerContainer = container;
       this.ausschnittParent = container; // TODO: get rid of this
