@@ -72,7 +72,7 @@ final public class MCRDerivate extends MCRBase {
      * @param valid
      * @throws SAXParseException
      */
-    public MCRDerivate(byte[] bytes, boolean valid) throws SAXParseException {
+    public MCRDerivate(byte[] bytes, boolean valid) throws SAXParseException, IOException {
         this();
         setFromXML(bytes, valid);
     }

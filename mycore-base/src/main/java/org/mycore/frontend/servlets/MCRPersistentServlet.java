@@ -281,7 +281,7 @@ public class MCRPersistentServlet extends MCRServlet {
      *  MCRObjectID of the MyCoRe object
      * @throws SAXParseException 
      */
-    private MCRObjectID updateDerivateXML(Document editorSubmission) throws SAXParseException {
+    private MCRObjectID updateDerivateXML(Document editorSubmission) throws SAXParseException, IOException {
         MCRObjectID objectID;
         Element root = editorSubmission.getRootElement();
         root.setAttribute("noNamespaceSchemaLocation", "datamodel-derivate.xsd", XSI_NAMESPACE);

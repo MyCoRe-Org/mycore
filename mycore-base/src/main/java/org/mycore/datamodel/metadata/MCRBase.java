@@ -195,8 +195,9 @@ public abstract class MCRBase {
      *                general Exception of MyCoRe
      * @throws SAXParseException 
      */
-    protected final void setFromXML(byte[] xml, boolean valid) throws MCRException, SAXParseException {
-        setFromJDOM(MCRXMLHelper.parseXML(xml, valid));
+    protected final void setFromXML(byte[] xml, boolean valid) throws MCRException, SAXParseException, IOException {
+        Document jdom = MCRXMLParserFactory.getParser().parseXML(MCRContent.readFrom(xml));
+        setFromJDOM(jdom);
     }
 
     /**

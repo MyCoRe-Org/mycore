@@ -80,7 +80,7 @@ final public class MCRObject extends MCRBase {
      * @param valid
      * @throws SAXParseException
      */
-    public MCRObject(byte[] bytes, boolean valid) throws SAXParseException {
+    public MCRObject(byte[] bytes, boolean valid) throws SAXParseException, IOException {
         this();
         setFromXML(bytes, valid);
     }

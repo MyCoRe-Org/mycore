@@ -126,7 +126,7 @@ public class MCREditorOutValidator {
      * @throws JDOMException 
      * @throws SAXParseException 
      */
-    public Document generateValidMyCoReObject() throws JDOMException, SAXParseException {
+    public Document generateValidMyCoReObject() throws JDOMException, SAXParseException, IOException {
         MCRObject obj;
         // load the JDOM object
         XPath editorOutput = XPath.newInstance("/mycoreobject/*/*/*[@editor.output]");
