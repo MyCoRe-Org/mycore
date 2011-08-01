@@ -608,7 +608,7 @@
 
   <panel id="mods.cproceeding">
     <cell anchor="NORTHWEST" var="mods:relatedItem[@type='host']/@xlink:href">
-    <!-- TODO: add Subselect -->
+      <!-- TODO: add Subselect -->
       <panel>
         <cell anchor="NORTHWEST" ref="TFzeile512" />
       </panel>
@@ -624,7 +624,7 @@
       </label>
   </helpPopup>
   <!-- Verweis auf Konferenzband END -->
-  
+
 
   <!-- Identifier -->
   <text id="mods.identifier.label">
@@ -809,11 +809,14 @@
 
   <helpPopup id="mods.genre.kindOfAVMedia.help" width="400px" height="250px">
     <label xml:lang="de">Als audiovisuelle Medien (AV-Medien) werden synchrone technische
-    Kommunikationsmittel bezeichnet, die die visuellen und/oder auditiven Sinne des Menschen
-    durch Ton und Bild bedienen. AV-Medien können analog sein (z. B. ein VHS-Videoband) oder
-    digital (z. B. ein MPEG-codiertes Video). Wählen Sie hier bitte aus, welche Art AV-Medium
-    Sie katalogisieren möchten. Sollte eine Möglichkeit fehlen, wenden Sie sich bitte an Ihren
-    Systemadministrator.</label>
+      Kommunikationsmittel bezeichnet, die die visuellen
+      und/oder auditiven Sinne des Menschen
+      durch Ton und Bild bedienen. AV-Medien können analog sein (z. B. ein VHS-Videoband) oder
+      digital
+      (z. B. ein MPEG-codiertes Video). Wählen Sie hier bitte aus, welche Art AV-Medium
+      Sie katalogisieren möchten. Sollte eine Möglichkeit
+      fehlen, wenden Sie sich bitte an Ihren
+      Systemadministrator.</label>
     <label xml:lang="en">Select an entry from the list.</label>
   </helpPopup>
   <!-- av_medium_genre END -->
@@ -828,7 +831,7 @@
     <cell anchor="NORTHWEST" var="mods:name[@type='conference']">
       <hidden var="mods:role/mods:roleTerm" default="conference" />
       <!-- ToDo: korrekte Zuordnung fehlt, siehe http://www.loc.gov/marc/relators/relaterm.html -->
-      <!-- hidden var="mods:role/mods:roleTerm/@authority" default="marcrelator" /-->
+      <!-- hidden var="mods:role/mods:roleTerm/@authority" default="marcrelator" / -->
       <hidden var="mods:role/mods:roleTerm/@type" default="text" />
       <panel>
         <cell col="1" row="1" anchor="EAST" var="mods:namePart">
@@ -854,12 +857,12 @@
 
   <panel id="mods.corporation">
     <cell anchor="NORTHWEST" var="mods:name[@type='family']"> <!-- ToDo: familiy ist nur ein workaround ... weil 2x corporate nicht geht *arg* -->
-      <!-- ToDo: richtige URI finden!-->
+      <!-- ToDo: richtige URI finden! -->
       <hidden var="@authority" default="gnd" />
       <hidden var="@authorityURI" default="http://d-nb.info/gnd" />
       <hidden var="@valueURI" default="http://d-nb.info/gnd/xxx" />
       <!-- ToDo: korrekte Zuordnung fehlt, siehe http://www.loc.gov/marc/relators/relaterm.html -->
-      <!-- hidden var="mods:role/mods:roleTerm/@authority" default="marcrelator" /-->
+      <!-- hidden var="mods:role/mods:roleTerm/@authority" default="marcrelator" / -->
       <hidden var="mods:role/mods:roleTerm/@type" default="text" />
       <hidden var="mods:role/mods:roleTerm" default="corporation" />
       <panel>
@@ -878,6 +881,166 @@
   </helpPopup>
   <!-- Körperschaft END -->
 
+  <!-- Edition -->
+  <text id="mods.edition.label">
+    <label xml:lang="de">Auflage (*)</label>
+    <label xml:lang="en">Edition (*)</label>
+  </text>
+
+  <panel id="mods.edition">
+    <cell anchor="NORTHWEST" var="mods:edition">
+      <panel>
+        <cell anchor="NORTHWEST" ref="TFzeile512" />
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.edition.help" width="400px" height="250px">
+    <label xml:lang="de">Geben Sie die Körperschaft ein ein.</label>
+    <label xml:lang="en">Insert corporate name.</label>
+  </helpPopup>
+  <!-- Edition END -->
+
+  <!-- Place -->
+  <text id="mods.book.place.label">
+    <label xml:lang="de">Erscheinungsort (*)</label>
+    <label xml:lang="en">Place of publication</label>
+  </text>
+
+  <panel id="mods.book.place">
+    <cell anchor="NORTHWEST" var="mods:place/mods:placeTerm[@type='text']">
+      <panel>
+        <cell anchor="NORTHWEST" ref="TFzeile512" />
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.book.place.help" width="400px" height="250px">
+    <label xml:lang="de">Ort</label>
+    <label xml:lang="en">Place</label>
+  </helpPopup>
+  <!-- Place END -->
+
+  <!-- Country of publication -->
+  <text id="mods.countryOfPublication.label">
+    <label xml:lang="de">Erscheinungsland</label>
+    <!-- TODO: english translation -->
+    <label xml:lang="en">Erscheinungsland</label>
+  </text>
+
+  <panel id="mods.countryOfPublication">
+    <cell anchor="NORTHWEST" var="mods:place/mods:placeTerm[@type='code']">
+      <panel>
+        <cell anchor="NORTHWEST" ref="TFzeile512" />
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.countryOfPublication.help" width="400px" height="250px">
+    <label xml:lang="de">Erscheinungsland</label>
+    <label xml:lang="en">Country of publication</label>
+  </helpPopup>
+  <!-- Country of publication END -->
+
+  <!-- Series -->
+  <text id="mods.book.series.label">
+    <label xml:lang="de">Serie</label>
+    <label xml:lang="en">Series</label>
+  </text>
+
+  <panel id="mods.book.series">
+    <cell anchor="NORTHWEST" var="mods:part">
+      <panel>
+        <cell anchor="NORTHWEST" ref="TFzeile512" />
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.book.series.help" width="400px" height="250px">
+    <label xml:lang="de">Serie</label>
+    <label xml:lang="en">Series</label>
+  </helpPopup>
+  <!-- Series END -->
+
+  <!-- Extent|Part -->
+  <text id="mods.book.part.extent.label">
+    <label xml:lang="de">Umfang</label>
+    <label xml:lang="en">Extent</label>
+  </text>
+
+  <panel id="mods.book.part.extent">
+    <cell anchor="NORTHWEST" var="mods:part/mods:extent">
+      <panel>
+        <cell anchor="NORTHWEST" ref="TFzeile512" />
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.book.part.extent.help" width="400px" height="250px">
+    <label xml:lang="de">Umfang</label>
+    <label xml:lang="en">Extent</label>
+  </helpPopup>
+  <!-- Extent|Part END -->
+
+  <!-- Bandzählung -->
+  <text id="mods.book.volume.count.label">
+    <label xml:lang="de">Bandzählung</label>
+    <label xml:lang="en">Volume Count</label>
+  </text>
+
+  <panel id="mods.book.volume.count">
+    <cell anchor="NORTHWEST" var="mods:part/mods:extent">
+      <panel>
+        <cell anchor="NORTHWEST" ref="TFzeile512" />
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.book.volume.count.help">
+    <label xml:lang="de">Bandzählung</label>
+    <label xml:lang="en">Volume Count</label>
+  </helpPopup>
+  <!-- Bandzählung END -->
+
+  <!-- ISBN -->
+  <text id="mods.book.isbn.label">
+    <label xml:lang="de">ISBN (*)</label>
+    <label xml:lang="en">ISBN (*)</label>
+  </text>
+
+  <panel id="mods.book.isbn">
+    <cell anchor="NORTHWEST" var="mods:identifier">
+      <panel>
+        <cell anchor="NORTHWEST" ref="TFzeile512" />
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.book.isbn.help">
+    <label xml:lang="de">ISBN (*)</label>
+    <label xml:lang="en">ISBN (*)</label>
+  </helpPopup>
+  <!-- ISBN END -->
+
+  <!-- Identifier URI -->
+  <text id="mods.books.identifier.uri.label">
+    <label xml:lang="de">Identifier (URI)</label>
+    <label xml:lang="en">Identifier (URI)</label>
+  </text>
+
+  <panel id="mods.books.identifier.uri">
+    <cell anchor="NORTHWEST" var="mods:location/mods:uri">
+      <panel>
+        <cell anchor="NORTHWEST" ref="TFzeile512" />
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.books.identifier.uri.help">
+    <label xml:lang="de">Identifier (URI)</label>
+    <label xml:lang="en">Identifier (URI)</label>
+  </helpPopup>
+  <!-- Identifier URI END -->
 
   <!-- *** Text fields *** -->
   <textfield id="TFzeile10" width="10" maxlength="10" />
