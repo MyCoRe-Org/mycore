@@ -44,6 +44,8 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.common.xml.MCRXMLParserFactory;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRCommand;
 import org.xml.sax.SAXParseException;
@@ -349,7 +351,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         LOGGER.info("Reading file " + input + " ...");
 
         try {
-            Document doc = MCRXMLHelper.parseURI(input.toURI(), true);
+            Document doc = MCRXMLParserFactory.getValidatingParser().parseXML(MCRContent.readFrom(input));
             Element rootelm = doc.getRootElement();
 
             if (!rootelm.getName().equals("mycoreuser")) {
@@ -609,7 +611,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the filename of the user data input
      * @throws SAXParseException 
      */
-    public static final void createUserFromFile(String filename) throws SAXParseException {
+    public static final void createUserFromFile(String filename) throws SAXParseException, IOException {
         MCRUser[] users = getMCRUsersFromFile(filename);
         for (MCRUser user : users) {
             try {
@@ -636,7 +638,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         LOGGER.info("Reading file " + input + " ...");
 
         try {
-            Document doc = MCRXMLHelper.parseURI(input.toURI(), true);
+            Document doc = MCRXMLParserFactory.getValidatingParser().parseXML(MCRContent.readFrom(input));
             Element rootelm = doc.getRootElement();
 
             if (!rootelm.getName().equals("mycoregroup")) {
@@ -681,15 +683,15 @@ public class MCRUserCommands extends MCRAbstractCommands {
             // read groups
             File groupFile = new File(groupFileName);
             LOGGER.info("Reading group file " + groupFile + " ...");
-            Document groupdoc = MCRXMLHelper.parseURI(groupFile.toURI(), true);
+            Document groupdoc = MCRXMLParserFactory.getValidatingParser().parseXML(MCRContent.readFrom(groupFile));
             Element grouprootelm = groupdoc.getRootElement();
             if (!grouprootelm.getName().equals("mycoregroup")) {
                 throw new MCRException("The data are not for group.");
             }
             // read users
-            File userfILE = new File(userFileName);
-            LOGGER.info("Reading user file " + userfILE + " ...");
-            Document userdoc = MCRXMLHelper.parseURI(userfILE.toURI(), true);
+            File userFile = new File(userFileName);
+            LOGGER.info("Reading user file " + userFile + " ...");
+            Document userdoc = MCRXMLParserFactory.getValidatingParser().parseXML(MCRContent.readFrom(userFile));
             Element userrootelm = userdoc.getRootElement();
             if (!userrootelm.getName().equals("mycoreuser")) {
                 throw new MCRException("The data are not for user.");
@@ -714,20 +716,20 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the filename of the user data input
      * @throws SAXParseException if file could not be parsed
      */
-    public static final void updateUserFromFile(String filename) throws SAXParseException {
+    public static final void updateUserFromFile(String filename) throws SAXParseException, IOException {
         MCRUser[] users = getMCRUsersFromFile(filename);
         for (MCRUser user : users) {
             MCRUserMgr.instance().updateUser(user);
         }
     }
 
-    private static final MCRUser[] getMCRUsersFromFile(String filename) throws SAXParseException {
+    private static final MCRUser[] getMCRUsersFromFile(String filename) throws SAXParseException, IOException {
         if (!checkFilename(filename)) {
             return new MCRUser[0];
         }
         File input = new File(filename);
         LOGGER.info("Reading file " + input + " ...");
-        Document doc = MCRXMLHelper.parseURI(input.toURI(), true);
+        Document doc = MCRXMLParserFactory.getValidatingParser().parseXML(MCRContent.readFrom(input));
         Element rootelm = doc.getRootElement();
 
         if (!rootelm.getName().equals("mycoreuser")) {
