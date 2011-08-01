@@ -600,6 +600,32 @@
   </helpPopup>
   <!-- Quelle END -->
 
+  <!-- Verweis auf Konferenzband -->
+  <text id="mods.cproceeding.label">
+    <label xml:lang="de">Konferenzband (*)</label>
+    <label xml:lang="en">Conference Proceeding (*)</label>
+  </text>
+
+  <panel id="mods.cproceeding">
+    <cell anchor="NORTHWEST" var="mods:relatedItem[@type='host']/@xlink:href">
+    <!-- TODO: add Subselect -->
+      <panel>
+        <cell anchor="NORTHWEST" ref="TFzeile512" />
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.cproceeding.help" width="400px" height="250px">
+    <label xml:lang="de">
+      Verweis auf Konferenzband
+      </label>
+    <label xml:lang="en">
+      Link to related Conference Proceeding
+      </label>
+  </helpPopup>
+  <!-- Verweis auf Konferenzband END -->
+  
+
   <!-- Identifier -->
   <text id="mods.identifier.label">
     <label xml:lang="de">Identifier (*)</label>
