@@ -36,6 +36,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.common.xml.MCRXMLParserFactory;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.xml.sax.SAXParseException;
 
@@ -74,9 +76,9 @@ public class MCRMODSWrapperTest extends MCRTestCase {
         assertEquals("Did not find mods data", 1, xpathCheck.selectNodes(mcrObjXml).size());
     }
 
-    private Document loadMODSDocument() throws SAXParseException, URISyntaxException {
+    private Document loadMODSDocument() {
         URL worlClassUrl = this.getClass().getResource("/mods80700998.xml");
-        Document xml = MCRXMLHelper.parseURI(worlClassUrl.toURI());
+        Document xml = MCRXMLParserFactory.getParser().parseXML(MCRContent.readFrom(worldClassUrl));
         return xml;
     }
 

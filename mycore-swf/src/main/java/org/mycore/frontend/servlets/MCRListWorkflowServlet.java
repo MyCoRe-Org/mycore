@@ -47,8 +47,10 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.common.xml.MCRXMLResource;
 import org.mycore.common.xml.MCRXSLTransformation;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
@@ -202,7 +204,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
             objid = "";
 
             try {
-                der_in = MCRXMLHelper.parseURI(derivateFile.toURI(), false);
+                der_in = MCRXMLParserFactory.getNonValidatingParser().parseXML(MCRContent.readFrom(derivateFile));
                 // LOGGER.debug("Derivate file "+dername+" was readed.");
                 der = der_in.getRootElement();
                 label = der.getAttributeValue("label");
@@ -285,7 +287,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
             org.jdom.Element elm = null;
 
             try {
-                workflow_in = MCRXMLHelper.parseURI(wf.toURI(), false);
+                workflow_in = MCRXMLParserFactory.getNonValidatingParser().parseXML(MCRContent.readFrom(wf));
                 MCRObject obj = new MCRObject(workflow_in);
                 MCRObjectService service = obj.getService();
                 int j = service.getRuleIndex("writewf");

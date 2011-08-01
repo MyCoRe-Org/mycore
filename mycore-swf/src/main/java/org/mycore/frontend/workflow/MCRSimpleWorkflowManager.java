@@ -46,7 +46,9 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.common.MCRActiveLinkException;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
@@ -280,7 +282,7 @@ public class MCRSimpleWorkflowManager {
         org.jdom.Document workflow_in = null;
 
         try {
-            workflow_in = MCRXMLHelper.parseURI(fname.toURI());
+            workflow_in = MCRXMLParserFactory.getParser().parseXML(MCRContent.readFrom(fname));
             logger.debug("Readed from workflow " + fname);
         } catch (Exception ex) {
             logger.error("Error while reading XML workflow file " + filename);
@@ -603,7 +605,7 @@ public class MCRSimpleWorkflowManager {
         try {
             File fi = new File(fn);
             if (fi.isFile() && fi.canRead()) {
-                Document wfDoc = MCRXMLHelper.parseURI(fi.toURI(), false);
+                Document wfDoc = MCRXMLParserFactory.getNonValidatingParser().parseXML(MCRContent.readFrom(fi));
                 XPath path = XPath.newInstance("/*/service/servacls/servacl[@permission='" + permission + "']/condition");
                 @SuppressWarnings("unchecked")
                 List<Element> results = path.selectNodes(wfDoc);
