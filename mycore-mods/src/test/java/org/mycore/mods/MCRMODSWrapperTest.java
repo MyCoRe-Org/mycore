@@ -26,6 +26,7 @@ package org.mycore.mods;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
@@ -63,7 +64,7 @@ public class MCRMODSWrapperTest extends MCRTestCase {
      * @throws JDOMException 
      */
     @Test
-    public void testWrapMODSDocument() throws SAXParseException, URISyntaxException, JDOMException {
+    public void testWrapMODSDocument() throws SAXParseException, URISyntaxException, JDOMException, IOException {
         Document modsDoc = loadMODSDocument();
         MCRObject mcrObj = MCRMODSWrapper.wrapMODSDocument(modsDoc.getRootElement(), "JUnit");
         assertTrue("Generated MCRObject is not valid.", mcrObj.isValid());
@@ -76,7 +77,7 @@ public class MCRMODSWrapperTest extends MCRTestCase {
         assertEquals("Did not find mods data", 1, xpathCheck.selectNodes(mcrObjXml).size());
     }
 
-    private Document loadMODSDocument() {
+    private Document loadMODSDocument() throws SAXParseException, IOException {
         URL worldClassUrl = this.getClass().getResource("/mods80700998.xml");
         Document xml = MCRXMLParserFactory.getParser().parseXML(MCRContent.readFrom(worldClassUrl));
         return xml;
