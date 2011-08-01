@@ -17,7 +17,7 @@
 
     <!-- Konferenzband -> Verweis auf MyCoRe-ID -->
     <cell row="10" col="1" anchor="NORTHEAST" ref="mods.cproceeding.label" />
-    <cell row="10" col="2" anchor="NORTHWEST" ref="mods.cproceeding" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem" />
+    <cell row="10" col="2" anchor="NORTHWEST" ref="mods.cproceeding" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='host']" />
     <cell row="10" col="3" anchor="NORTHWEST" ref="mods.cproceeding.help" />
     <!-- Konferenzband END -->
 
