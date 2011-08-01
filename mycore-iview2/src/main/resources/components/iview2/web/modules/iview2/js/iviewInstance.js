@@ -16,6 +16,14 @@
     constructor.prototype.name = "IviewInstanceError";
     return constructor;
   })();
+  
+  iview.addInstance = function(iViewInst){
+    var derivateId=iViewInst.properties.derivateId;
+    if (typeof Iview[derivateId] ==="undefined"){
+      Iview[derivateId] = [];
+    }
+    return Iview[derivateId].push(iViewInst);
+  };
 
   iview.IViewInstance = (function() {
     function constructor(container, options) {
@@ -39,12 +47,13 @@
       //passed
       var paramDerId=URL.getParam("derivate");
       this.properties.useParam = false;
-      if (Iview[this.properties.derivateId].length === 0) {
-        var cnt=0;
+      if (typeof Iview[this.properties.derivateId] === "undefined") {
+        var first=true;
         for (var derId in Iview){
-          cnt++;
+          first=false;
+          break;
         }
-        this.properties.useParam = (paramDerId === this.properties.derivateId) || (paramDerId.length === 0 && cnt === 1);
+        this.properties.useParam = (paramDerId === this.properties.derivateId) || (paramDerId.length === 0 && first);
       }
       this.initialized = false;
       this.viewerContainer = container;

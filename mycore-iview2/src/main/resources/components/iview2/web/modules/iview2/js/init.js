@@ -1,4 +1,5 @@
-var iview = iview || {};
+var iview = iview || {}; // holds API
+var Iview = Iview || {}; // holds instances
 
 iview.IViewObject = (function(){
   "use strict";

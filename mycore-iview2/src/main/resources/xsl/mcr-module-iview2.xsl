@@ -16,18 +16,18 @@
     <xsl:param name="overview" select="'true'" />
     <xsl:param name="style" />
     
-    <div id="viewerContainer{$groupID}" class="viewerContainer min">
+    <div class="viewerContainer min">
       <xsl:if test="string-length($style) &gt; 0">
         <xsl:attribute name="style">
           <xsl:value-of select="$style"/>
         </xsl:attribute>
       </xsl:if>
-      <div id="viewer{$groupID}" class="viewer min" onmousedown="return false;">
+      <div class="viewer min" onmousedown="return false;">
         <div class="surface" style="width:100%;height:100%;z-index:30">
         </div>
         <div class="well">
           <div class="preload">
-            <img height="100%" width="100%" id="preloadImg{$groupID}" alt="{i18n:translate('component.iview2.preview')}" />
+            <img height="100%" width="100%" alt="{i18n:translate('component.iview2.preview')}" />
           </div>
         </div>
       </div>
@@ -57,18 +57,13 @@
               'pdfCreatorStyle' : "<xsl:value-of select="$MCR.Module-iview2.PDFCreatorStyle"/>",
               'derivateId' : viewID,
             };
-            if (typeof Iview[viewID] ==="undefined"){
-              Iview[viewID] = [];
-            }
-            Iview[viewID].push(new iview.IViewInstance(jQuery(currentNode.parentNode), options));
+            iview.addInstance(new iview.IViewInstance(jQuery(currentNode.parentNode), options));
           })('<xsl:value-of select="$groupID" />');
       </script>
     </div>
   </xsl:template>
 
   <xsl:template name="iview2.init">
-    <xsl:param name="groupID" />
-    
     <!-- design settings -->
     <xsl:param name="styleFolderUri" select="'gfx/'" />
     <xsl:param name="effects" select="'true'" />
@@ -98,7 +93,6 @@
       var chapterEmbedded=<xsl:value-of select="$chapterEmbedded" />;
       var chapDynResize=<xsl:value-of select="$chapDynResize" />;
       var DampInViewer=<xsl:value-of select="$DampInViewer" />;
-      var Iview = Iview || {};
       var i18n = i18n || new iview.i18n('<xsl:value-of select="$WebApplicationBaseURL"/>', '<xsl:value-of select="$CurrentLang"/>');
       <xsl:text>loadCssFile('</xsl:text>
       <xsl:value-of select="$WebApplicationBaseURL"/>
@@ -115,6 +109,7 @@
       <xsl:text>/themes/base/jquery-ui.css');</xsl:text>
     </script>
   </xsl:template>
+  
   <xsl:template name="iview2.start">
     <xsl:param name="groupID" />
     <xsl:param name="startFile" />
