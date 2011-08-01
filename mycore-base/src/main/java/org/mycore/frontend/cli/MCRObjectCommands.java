@@ -367,7 +367,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    public static final boolean updateFromFile(String file) throws MCRActiveLinkException, MCRException, SAXParseException {
+    public static final boolean updateFromFile(String file) throws MCRActiveLinkException, MCRException, SAXParseException, IOException {
         return updateFromFile(file, true);
     }
 
@@ -401,7 +401,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws MCRException 
      */
     private static final boolean processFromFile(File file, boolean update, boolean importMode) throws MCRActiveLinkException,
-            MCRException, SAXParseException {
+            MCRException, SAXParseException, IOException {
         if (!file.getName().endsWith(".xml")) {
             LOGGER.warn(file + " ignored, does not end with *.xml");
             return false;

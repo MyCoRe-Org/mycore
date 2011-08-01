@@ -24,6 +24,7 @@
 package org.mycore.frontend.servlets;
 
 import java.io.InputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -129,7 +130,7 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    abstract public boolean storeService(Element outelm, MCRServletJob job, MCRObjectID ID) throws MCRException, SAXParseException;
+    abstract public boolean storeService(Element outelm, MCRServletJob job, MCRObjectID ID) throws MCRException, SAXParseException, IOException;
 
     /**
      * The method read the incoming servacls JDOM tree in a MCRService and
