@@ -482,7 +482,7 @@ public class MCRSimpleWorkflowManager {
      *            the MCRObjectID as String of the derivate object
      * @throws SAXParseException 
      */
-    public final boolean commitDerivateObject(MCRObjectID ID) throws SAXParseException {
+    public final boolean commitDerivateObject(MCRObjectID ID) throws SAXParseException, IOException {
         String fn = getDirectoryPath(ID.getBase()) + File.separator + ID.toString() + ".xml";
 
         return loadDerivate(ID.toString(), fn);
