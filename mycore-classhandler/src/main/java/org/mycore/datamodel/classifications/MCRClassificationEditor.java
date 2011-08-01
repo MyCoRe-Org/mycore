@@ -43,11 +43,13 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.classifications.ClassificationUserTableFactory.ClassificationUserTable;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
+import org.mycore.datamodel.ifs2.MCRContent;
 
 /**
  * This class implements all methods for a edit, modify delete categories in
@@ -224,7 +226,7 @@ public class MCRClassificationEditor {
             try {
                 File file = new File(fileName);
                 LOGGER.info("Reading file " + file + " ...\n");
-                Document jdom = MCRXMLHelper.parseURI(file.toURI());
+                Document jdom = MCRXMLParserFactory.getParser().parseXML(MCRContent.readFrom(file));
                 MCRCategory classification = MCRXMLTransformer.getCategory(jdom);
 
                 getClassificationPool().updateClassification(classification);

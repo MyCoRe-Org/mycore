@@ -30,6 +30,8 @@ import org.jdom.Document;
 
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.common.xml.MCRXMLParserFactory;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
@@ -67,7 +69,7 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
         LOGGER.debug("Build Google check file " + fnsm);
         File fi = new File(fnsm);
         if (fi.isFile()) {
-            jdom = MCRXMLHelper.parseURI(fi.toURI(), false);
+            jdom = MCRXMLParserFactory.getNonValidatingParser().parseXML(MCRContent.readFrom(fi));
             if (jdom == null) {
                 if (number == 1) {
                     jdom = common.buildSitemap();
