@@ -338,7 +338,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    public static final boolean loadFromFile(String file) throws MCRActiveLinkException, MCRException, SAXParseException {
+    public static final boolean loadFromFile(String file) throws MCRActiveLinkException, MCRException, SAXParseException, IOException {
         return loadFromFile(file, true);
     }
 
@@ -354,7 +354,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws MCRException 
      */
     public static final boolean loadFromFile(String file, boolean importMode) throws MCRActiveLinkException, MCRException,
-            SAXParseException {
+            SAXParseException, IOException {
         return processFromFile(new File(file), false, importMode);
     }
 
@@ -383,7 +383,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws MCRException 
      */
     public static final boolean updateFromFile(String file, boolean importMode) throws MCRActiveLinkException, MCRException,
-            SAXParseException {
+            SAXParseException, IOException {
         return processFromFile(new File(file), true, importMode);
     }
 

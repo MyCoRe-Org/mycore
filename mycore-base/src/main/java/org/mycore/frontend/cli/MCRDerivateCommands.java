@@ -295,7 +295,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the location of the xml file
      * @throws SAXParseException
      */
-    public static boolean loadFromFile(String file) throws SAXParseException {
+    public static boolean loadFromFile(String file) throws SAXParseException, IOException {
         return loadFromFile(file, true);
     }
 
@@ -308,7 +308,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            if true, servdates are taken from xml file
      * @throws SAXParseException
      */
-    public static boolean loadFromFile(String file, boolean importMode) throws SAXParseException {
+    public static boolean loadFromFile(String file, boolean importMode) throws SAXParseException, IOException {
         return processFromFile(new File(file), false, importMode);
     }
 
@@ -319,7 +319,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the location of the xml file
      * @throws SAXParseException
      */
-    public static boolean updateFromFile(String file) throws SAXParseException {
+    public static boolean updateFromFile(String file) throws SAXParseException, IOException {
         return updateFromFile(file, true);
     }
 
@@ -332,7 +332,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            if true, servdates are taken from xml file
      * @throws SAXParseException
      */
-    public static boolean updateFromFile(String file, boolean importMode) throws SAXParseException {
+    public static boolean updateFromFile(String file, boolean importMode) throws SAXParseException, IOException {
         return processFromFile(new File(file), true, importMode);
     }
 
@@ -347,7 +347,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            if true, servdates are taken from xml file
      * @throws SAXParseException
      */
-    private static boolean processFromFile(File file, boolean update, boolean importMode) throws SAXParseException {
+    private static boolean processFromFile(File file, boolean update, boolean importMode) throws SAXParseException, IOException {
         if (!file.getName().endsWith(".xml")) {
             LOGGER.warn(file + " ignored, does not end with *.xml");
             return false;
