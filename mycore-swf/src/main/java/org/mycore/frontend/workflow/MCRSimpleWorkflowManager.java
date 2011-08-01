@@ -28,6 +28,7 @@ import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -439,7 +440,7 @@ public class MCRSimpleWorkflowManager {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    public final boolean commitMetadataObject(MCRObjectID ID) throws MCRActiveLinkException, MCRException, SAXParseException {
+    public final boolean commitMetadataObject(MCRObjectID ID) throws MCRActiveLinkException, MCRException, SAXParseException, IOException {
         // commit metadata
         String fn = getDirectoryPath(ID.getBase()) + File.separator + ID + ".xml";
 
@@ -487,7 +488,7 @@ public class MCRSimpleWorkflowManager {
         return loadDerivate(ID.toString(), fn);
     }
 
-    private boolean loadDerivate(String ID, String filename) throws SAXParseException {
+    private boolean loadDerivate(String ID, String filename) throws SAXParseException, IOException {
         final MCRObjectID objectID = MCRObjectID.getInstance(ID);
         if (MCRMetadataManager.exists(objectID)) {
             MCRDerivateCommands.updateFromFile(filename, false);
