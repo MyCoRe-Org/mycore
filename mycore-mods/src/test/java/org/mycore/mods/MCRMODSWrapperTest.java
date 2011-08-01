@@ -77,7 +77,7 @@ public class MCRMODSWrapperTest extends MCRTestCase {
     }
 
     private Document loadMODSDocument() {
-        URL worlClassUrl = this.getClass().getResource("/mods80700998.xml");
+        URL worldClassUrl = this.getClass().getResource("/mods80700998.xml");
         Document xml = MCRXMLParserFactory.getParser().parseXML(MCRContent.readFrom(worldClassUrl));
         return xml;
     }
