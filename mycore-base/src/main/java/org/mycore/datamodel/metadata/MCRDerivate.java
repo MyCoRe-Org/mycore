@@ -25,6 +25,7 @@ package org.mycore.datamodel.metadata;
 
 import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
+import java.io.IOException;
 import java.net.URI;
 
 import org.apache.log4j.Logger;
@@ -89,7 +90,7 @@ final public class MCRDerivate extends MCRBase {
      * @param uri
      * @throws SAXParseException
      */
-    public MCRDerivate(URI uri) throws SAXParseException {
+    public MCRDerivate(URI uri) throws SAXParseException, IOException {
         this();
         setFromURI(uri);
     }

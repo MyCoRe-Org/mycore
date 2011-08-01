@@ -27,6 +27,7 @@ import static org.mycore.common.MCRConstants.DEFAULT_ENCODING;
 import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
+import java.io.IOException;
 import java.net.URI;
 
 import org.apache.log4j.Logger;
@@ -37,6 +38,8 @@ import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.common.xml.MCRXMLParserFactory;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -177,8 +180,9 @@ public abstract class MCRBase {
      *                general Exception of MyCoRe
      * @throws SAXParseException 
      */
-    protected final void setFromURI(URI uri) throws MCRException, SAXParseException {
-        setFromJDOM(MCRXMLHelper.parseURI(uri));
+    protected final void setFromURI(URI uri) throws MCRException, SAXParseException, IOException {
+        Document jdom = MCRXMLParserFactory.getParser().parseXML(MCRContent.readFrom(uri));
+        setFromJDOM(jdom);
     }
 
     /**
