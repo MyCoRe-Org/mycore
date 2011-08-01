@@ -90,14 +90,14 @@ class MCRIndexWriteExecutor extends ThreadPoolExecutor {
             firstJob = false;
         }
         if (closeModifierEarly || getCompletedTaskCount() % maxIndexWriteActions == 0) {
-            clopenIndexWriter(true);
+            closeIndexWriter();
         } else {
             cancelDelayedIndexCloser();
             try {
                 delayedFuture = scheduler.schedule(delayedCloser, 2, TimeUnit.SECONDS);
             } catch (RejectedExecutionException e) {
                 LOGGER.warn("Cannot schedule delayed IndexWriter closer. Closing IndexWriter now.");
-                clopenIndexWriter(true);
+                closeIndexWriter();
             }
         }
     }
@@ -105,10 +105,10 @@ class MCRIndexWriteExecutor extends ThreadPoolExecutor {
     @Override
     protected void beforeExecute(Thread t, Runnable r) {
         //do not close IndexWriter while IndexWriterActions is processed
-        writeAccess.get().lock();
         cancelDelayedIndexCloser();
+        writeAccess.get().lock();
         if (modifierClosed) {
-            clopenIndexWriter(false);
+            openIndexWriter();
         }
         super.beforeExecute(t, r);
     }
@@ -129,14 +129,7 @@ class MCRIndexWriteExecutor extends ThreadPoolExecutor {
             LOGGER.warn("Error while closing DelayedIndexWriterCloser", e);
         }
         super.shutdown();
-        clopenIndexWriter(true);
-    }
-
-    synchronized void clopenIndexWriter(boolean close) {
-        if (close)
-            closeIndexWriter();
-        else
-            openIndexWriter();
+        closeIndexWriter();
     }
 
     private void openIndexWriter() {
@@ -152,7 +145,7 @@ class MCRIndexWriteExecutor extends ThreadPoolExecutor {
         }
     }
 
-    private void closeIndexWriter() {
+    void closeIndexWriter() {
         //TODO: check if indexWriter.commit() is sufficient here
         Lock writerLock = IndexCloserLock.writeLock();
         try {
@@ -194,7 +187,7 @@ class MCRIndexWriteExecutor extends ThreadPoolExecutor {
 
     @Override
     protected void finalize() {
-        clopenIndexWriter(true);
+        closeIndexWriter();
         super.finalize();
     }
 

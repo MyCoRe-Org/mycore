@@ -32,7 +32,7 @@ class MCRDelayedIndexWriterCloser implements Runnable {
 
     public void run() {
         if (!executor.modifierClosed && executor.getQueue().isEmpty()) {
-            executor.clopenIndexWriter(true);
+            executor.closeIndexWriter();
         }
     }
 
