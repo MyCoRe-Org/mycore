@@ -608,8 +608,8 @@
 
   <panel id="mods.cproceeding">
     <cell anchor="NORTHWEST" var="mods:location">
-      <hidden var="mods:url" default="xxx" />
-      <hidden var="mods:url/@note" default="xxx" />
+      <hidden var="mods:url" />
+      <hidden var="mods:url/@note" />
       <subselect id="mods.cproceeding.subselect" type="webpage" href="indexpage?searchclass=cproceeding_sub">
         <label xml:lang="de">Konferenzband wählen</label>
         <label xml:lang="en">Select conference proceeding</label>
