@@ -14,6 +14,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImplTest.DAO;
 import static org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImplTest.WORLD_CLASS_RESOURCE_NAME;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -30,10 +31,12 @@ import org.junit.Test;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRHibTestCase;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRObjectReference;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -217,7 +220,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         assertFalse("Jena should not be in Asia", SERVICE.isInCategory(jena.getObjectID(), asia.getId()));
     }
 
-    private void loadWorldClassification() throws URISyntaxException, MCRException, SAXParseException {
+    private void loadWorldClassification() throws URISyntaxException, MCRException, SAXParseException, IOException {
         URL worlClassUrl = this.getClass().getResource(WORLD_CLASS_RESOURCE_NAME);
         Document xml = MCRXMLParserFactory.getParser().parseXML(MCRContent.readFrom(worlClassUrl));
         category = MCRXMLTransformer.getCategory(xml);
