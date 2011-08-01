@@ -233,8 +233,7 @@
           <cell col="1" row="1" anchor="EAST" var="mods:namePart[@type='given']">
             <list width="30" type="dropdown">
               <include ref="pleaseSelect" />
-              <!-- ToDo: richtige Klassifikation anlegen und einbinden -->
-              <include uri="classification:editor:-1:children:DocPortal_class_00000002" cacheable="false" />
+              <include uri="classification:editor:-1:children:bmelv_class_origin" cacheable="false" />
               <condition required="true">
                 <label xml:lang="de">Bitte wählen den Namen der Institution aus!</label>
                 <label xml:lang="en">Please select institution!</label>
@@ -349,8 +348,7 @@
     <cell anchor="NORTHWEST" var="mods:originInfo/mods:place/mods:placeTerm[@type='text']">
       <list width="30" type="dropdown">
         <include ref="pleaseSelect" />
-        <!-- ToDo: richtige Klassifikation anlegen und einbinden -->
-        <include uri="classification:editor:-1:children:DocPortal_class_00000002" cacheable="false" />
+        <include uri="classification:editor:-1:children:bmelv_class_origin" cacheable="false" />
         <condition required="true">
           <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
           <label xml:lang="en">Please select one entry!</label>
