@@ -20,14 +20,9 @@
     <xsl:param name="file" />
     <xsl:param name="derivateID" />
     <xsl:if test="$file != ''">
-      <xsl:call-template name="iview2.init">
-        <xsl:with-param name="groupID" select="$derivateID" />
-      </xsl:call-template>
+      <xsl:call-template name="iview2.init" />
       <xsl:call-template name="iview2.getViewer">
         <xsl:with-param name="groupID" select="$derivateID" />
-        <xsl:with-param name="chapter" select="'true'" />
-        <xsl:with-param name="cutOut" select="'true'" />
-        <xsl:with-param name="overview" select="'true'" />
         <xsl:with-param name="style" select="'width:256px; height:256px;'" />
       </xsl:call-template>
       <xsl:call-template name="iview2.start">

@@ -55,6 +55,10 @@ public class MCRIView2XSLFunctions {
         return adapter.getSupportedMainFile(derivateID);
     }
 
+    public static String getOptions(String derivateID, String extensions) {
+        return adapter.getOptions(derivateID, extensions);
+    }
+
     /**
      * Get the full path of the main file of the first derivate.
      * 

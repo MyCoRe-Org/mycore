@@ -1,5 +1,5 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink"
-  xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:mcrxml="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:iview2="xalan://org.mycore.frontend.iview2.MCRIView2XSLFunctions" version="1.0"
+  xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:mcrxml="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:iview2="xalan://org.mycore.iview2.frontend.MCRIView2XSLFunctions" version="1.0"
   exclude-result-prefixes="xlink i18n mcrxml iview2">
   <xsl:param name="MCR.Module-iview2.BaseURL" />
   <xsl:param name="MCR.Module-iview2.DeveloperMode" />
@@ -7,13 +7,12 @@
   <xsl:param name="MCR.Module-iview2.PDFCreatorStyle" />
   <xsl:param name="WebApplicationBaseURL" />
   <xsl:param name="ServletsBaseURL" />
-  <xsl:variable name="jqueryUI.version" select="'1.8.12'"/>
-  <xsl:output method="html" indent="yes" encoding="UTF-8" media-type="text/html" />
+  <xsl:variable name="jquery.version" select="'1.6.2'"/>
+  <xsl:variable name="jqueryUI.version" select="'1.8.14'"/>
+
   <xsl:template name="iview2.getViewer" mode="iview2">
     <xsl:param name="groupID" />
-    <xsl:param name="chapter" select="'true'" />
-    <xsl:param name="cutOut" select="'true'" />
-    <xsl:param name="overview" select="'true'" />
+    <xsl:param name="extensions" select="''"/>
     <xsl:param name="style" />
     
     <div class="viewerContainer min">
@@ -32,33 +31,12 @@
         </div>
       </div>
       <script type="text/javascript">
-        <xsl:variable name="baseUris">
-          <xsl:choose>
-            <xsl:when test="string-length($MCR.Module-iview2.BaseURL)&lt;10">
-              <xsl:value-of select="concat($ServletsBaseURL,'MCRTileServlet')" />
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="$MCR.Module-iview2.BaseURL" />
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:variable>
-          var currentNode=(function(){
+          (function(){
+            "use strict";
             var nodes=document.getElementsByTagName('script');
-            return nodes[nodes.length-1];
+            var currentNode=nodes[nodes.length-1];
+            iview.addInstance(new iview.IViewInstance(jQuery(currentNode.parentNode), <xsl:value-of select="iview2:getOptions($groupID, $extensions)" />));
           })();
-          (function initViewer(viewID){
-            var options = {
-              'useChapter' : <xsl:value-of select="$chapter" />,
-              'useCutOut' : <xsl:value-of select="$cutOut" />,
-              'useOverview' : <xsl:value-of select="$overview" />,
-              'baseUri' : "<xsl:value-of select="$baseUris"/>".split(","),
-              'webappBaseUri' : "<xsl:value-of select="$WebApplicationBaseURL"/>",
-              'pdfCreatorURI' : "<xsl:value-of select="$MCR.Module-iview2.PDFCreatorURI"/>",
-              'pdfCreatorStyle' : "<xsl:value-of select="$MCR.Module-iview2.PDFCreatorStyle"/>",
-              'derivateId' : viewID,
-            };
-            iview.addInstance(new iview.IViewInstance(jQuery(currentNode.parentNode), options));
-          })('<xsl:value-of select="$groupID" />');
       </script>
     </div>
   </xsl:template>
@@ -66,7 +44,6 @@
   <xsl:template name="iview2.init">
     <!-- design settings -->
     <xsl:param name="styleFolderUri" select="'gfx/'" />
-    <xsl:param name="effects" select="'true'" />
 	<!-- chapter settings -->
 	<xsl:param name="chapterEmbedded" select="'false'" />
     <xsl:param name="chapDynResize" select="'false'" />
@@ -76,7 +53,7 @@
     <script type="text/javascript" src="http://www.google.com/jsapi"></script>
     <script type="text/javascript">
     <!-- JQuery Framework -->
-      google.load("jquery", "1");
+      google.load("jquery", "<xsl:value-of select="$jquery.version"/>");
       google.load("jqueryui", "<xsl:value-of select="$jqueryUI.version"/>");
     </script>
     
