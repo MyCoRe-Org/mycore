@@ -607,26 +607,15 @@
   </text>
 
   <panel id="mods.cproceeding">
-    <cell anchor="NORTHWEST" var="mods:typeOfResource">
-      <hidden var="@collection" default="yes" />
-      <panel><cell var="mods:location">
+    <cell anchor="NORTHWEST" var="mods:location">
+      <hidden var="mods:url" default="xxx" />
+      <hidden var="mods:url/@note" default="xxx" />
       <subselect id="mods.cproceeding.subselect" type="webpage" href="indexpage?searchclass=cproceeding_sub">
         <label xml:lang="de">Konferenzband wählen</label>
         <label xml:lang="en">Select conference proceeding</label>
       </subselect>
-      </cell></panel>
     </cell>
   </panel>
-  
-<!--   <mods:relatedItem type="host">
-<mods:typeOfResource collection="yes">  
-   <mods:titleInfo>
-      <mods:title>Interborough Rapid Transit Company Subway Posters</mods:title>
-   </mods:titleInfo>
-   <mods:location>
-      <mods:url note="Digital Collection">http://arks.princeton.edu/ark:/88435/ns064606d</mods:url>
-   </mods:location>
-</mods:relatedItem> -->
 
   <helpPopup id="mods.cproceeding.help" width="400px" height="250px">
     <label xml:lang="de">
