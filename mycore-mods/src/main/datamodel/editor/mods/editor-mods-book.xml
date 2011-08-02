@@ -66,31 +66,37 @@
 
     <!-- Series -->
     <cell row="100" col="1" anchor="EAST" ref="mods.book.series.label" />
-    <cell row="100" col="2" anchor="WEST" ref="mods.book.series" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
+    <cell row="100" col="2" anchor="WEST" ref="mods.book.series" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="100" col="3" anchor="EAST" ref="mods.book.series.help" />
     <!-- Series END -->
 
     <!-- Extent|Part -->
     <cell row="120" col="1" anchor="EAST" ref="mods.book.part.extent.label" />
-    <cell row="120" col="2" anchor="WEST" ref="mods.book.part.extent" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
+    <cell row="120" col="2" anchor="WEST" ref="mods.book.part.extent" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="120" col="3" anchor="EAST" ref="mods.book.part.extent.help" />
     <!-- Extent|Part END -->
 
     <!-- Volume Count|Part -->
     <cell row="130" col="1" anchor="EAST" ref="mods.book.volume.count.label" />
-    <cell row="130" col="2" anchor="WEST" ref="mods.book.volume.count" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
+    <cell row="130" col="2" anchor="WEST" ref="mods.book.volume.count" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="130" col="3" anchor="EAST" ref="mods.book.volume.count.help" />
     <!-- Volume Count|Part END -->
 
     <!-- ISBN -->
     <cell row="160" col="1" anchor="EAST" ref="mods.book.isbn.label" />
-    <cell row="160" col="2" anchor="WEST" ref="mods.book.isbn" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
+    <cell row="160" col="2" anchor="WEST" ref="mods.book.isbn" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="160" col="3" anchor="EAST" ref="mods.book.isbn.help" />
     <!-- ISBN END -->
 
+    <!-- Standort -->
+    <cell row="170" col="1" anchor="EAST" ref="mods.physicalLocation.label" />
+    <cell row="170" col="2" anchor="WEST" ref="mods.physicalLocation" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:location" />
+    <cell row="170" col="3" anchor="EAST" ref="mods.physicalLocation.help" />
+    <!-- Standort END -->
+
     <!-- Identifier URI -->
     <cell row="180" col="1" anchor="EAST" ref="mods.books.identifier.uri.label" />
-    <cell row="180" col="2" anchor="WEST" ref="mods.books.identifier.uri" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
+    <cell row="180" col="2" anchor="WEST" ref="mods.books.identifier.uri" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="180" col="3" anchor="EAST" ref="mods.books.identifier.uri.help" />
     <!-- Identifier URI END -->
 
@@ -114,28 +120,21 @@
 
     <!-- Stichworte -->
     <cell row="250" col="1" anchor="EAST" ref="mods.subject.label" />
-    <cell row="250" col="2" anchor="WEST" ref="mods.subject" />
+    <cell row="250" col="2" anchor="WEST" ref="mods.subject" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="250" col="3" anchor="EAST" ref="mods.subject.help" />
     <!-- Stichworte END -->
 
     <!-- Institution (wo bei BMELV-Forschung zugeordnet) -->
     <cell row="260" col="1" anchor="EAST" ref="mods.assignedInstituteClass.label" />
-    <cell row="260" col="2" anchor="WEST" ref="mods.assignedInstituteClass" />
+    <cell row="260" col="2" anchor="WEST" ref="mods.assignedInstituteClass" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="260" col="3" anchor="EAST" ref="mods.assignedInstituteClass.help" />
     <!-- Institution END -->
 
     <!-- Kommentar -->
     <cell row="270" col="1" anchor="EAST" ref="mods.note.label" />
-    <cell row="270" col="2" anchor="WEST" ref="mods.note" />
+    <cell row="270" col="2" anchor="WEST" ref="mods.note" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="270" col="3" anchor="EAST" ref="mods.note.help" />
     <!-- Kommentar END -->
-
-    <!-- Standort -->
-    <cell row="280" col="1" anchor="EAST" ref="mods.physicalLocation.label" />
-    <cell row="280" col="2" anchor="WEST" ref="mods.physicalLocation" />
-    <cell row="280" col="3" anchor="EAST" ref="mods.physicalLocation.help" />
-    <!-- Standort END -->
-
 
     <!-- save/cancel buttons -->
     <cell col="1" colspan="3" row="300" anchor="EAST" style="padding-top:20px;">

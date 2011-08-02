@@ -951,7 +951,7 @@
   </text>
 
   <panel id="mods.book.series">
-    <cell anchor="NORTHWEST" var="mods:part">
+    <cell anchor="NORTHWEST" var="mods:part/mods:detail/mods:number">
       <panel>
         <cell anchor="NORTHWEST" ref="TFzeile512" />
       </panel>
@@ -971,7 +971,7 @@
   </text>
 
   <panel id="mods.book.part.extent">
-    <cell anchor="NORTHWEST" var="mods:part/mods:extent">
+    <cell anchor="NORTHWEST" var="mods:part/mods:extent/mods:total">
       <panel>
         <cell anchor="NORTHWEST" ref="TFzeile512" />
       </panel>
@@ -991,7 +991,7 @@
   </text>
 
   <panel id="mods.book.volume.count">
-    <cell anchor="NORTHWEST" var="mods:part/mods:extent">
+    <cell anchor="NORTHWEST" var="mods:part/mods:detail/mods:number">
       <panel>
         <cell anchor="NORTHWEST" ref="TFzeile512" />
       </panel>
@@ -1011,7 +1011,7 @@
   </text>
 
   <panel id="mods.book.isbn">
-    <cell anchor="NORTHWEST" var="mods:identifier">
+    <cell anchor="NORTHWEST" var="mods:identifier[@type='isbn']">
       <panel>
         <cell anchor="NORTHWEST" ref="TFzeile512" />
       </panel>
@@ -1031,7 +1031,7 @@
   </text>
 
   <panel id="mods.books.identifier.uri">
-    <cell anchor="NORTHWEST" var="mods:location/mods:uri">
+    <cell anchor="NORTHWEST" var="mods:location/mods:url">
       <panel>
         <cell anchor="NORTHWEST" ref="TFzeile512" />
       </panel>
