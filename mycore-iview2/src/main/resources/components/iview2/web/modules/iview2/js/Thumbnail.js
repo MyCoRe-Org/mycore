@@ -345,11 +345,11 @@ genProto.switchDisplayMode = function(screenZoom, stateBool, preventLooping) {
 	}
 
 	var offset = preload.offset();
-	this.iview.my.barX.setCurValue(-offset.left);
-	this.iview.my.barY.setCurValue(-offset.top);
+	this.iview.scrollbars.barX.setCurValue(-offset.left);
+	this.iview.scrollbars.barY.setCurValue(-offset.top);
 	if (this.iview.properties.useCutOut) this.iview.cutOutModel.setPos({'x':offset.left, 'y':offset.top});
 	return stateBool;
-}
+};
 
 /**
  * @public
@@ -362,7 +362,7 @@ genProto.switchDisplayMode = function(screenZoom, stateBool, preventLooping) {
 genProto.pictureWidth = function(preventLooping){
 	var bool = (typeof (preventLooping) != undefined)? preventLooping:false;
 	this.iview.zoomWidth = this.switchDisplayMode(false, this.iview.zoomWidth, bool);
-}
+};
 
 /**
  * @public
@@ -406,8 +406,8 @@ genProto.handleScrollbars = function(reason) {
 	
 	var viewerBean = this.iview.viewerBean;
 	var viewer = this.iview.context.viewer;
-	var barX = this.iview.my.barX;
-	var barY = this.iview.my.barY;
+	var barX = this.iview.scrollbars.barX;
+	var barY = this.iview.scrollbars.barY;
 	var currentImage=this.iview.currentImage;
 	// determine the current imagesize
   var zoomScale=currentImage.zoomInfo.getScale();
@@ -509,8 +509,8 @@ genProto.viewerMoved = function (event) {
 	this.iview.roller = true;
 	var preload = this.iview.context.preload;
 	var pos = preload.position();
-	this.iview.my.barX.setCurValue(-pos.left);
-	this.iview.my.barY.setCurValue(-pos.top);
+	this.iview.scrollbars.barX.setCurValue(-pos.left);
+	this.iview.scrollbars.barY.setCurValue(-pos.top);
 	this.iview.roller = false;
 };
 
@@ -690,8 +690,9 @@ genProto.loading = function(startFile) {
 	
 	// ScrollBars
 	// horizontal
-	this.iview.my.barX = new iview.scrollbar.Controller();
-	var barX = this.iview.my.barX;
+	this.iview.scrollbars={};//TODO: make real Object
+	this.iview.scrollbars.barX = new iview.scrollbar.Controller();
+	var barX = this.iview.scrollbars.barX;
 	barX.createView({ 'direction':'horizontal', 'parent':this.iview.context.container, 'mainClass':'scroll'});
 	barX.attach("curVal.scrollbar", function(e, val) {
 		if (!that.iview.roller) {
@@ -699,8 +700,8 @@ genProto.loading = function(startFile) {
 		}
 	});
 	// vertical
-	this.iview.my.barY = new iview.scrollbar.Controller();
-	var barY = this.iview.my.barY;
+	this.iview.scrollbars.barY = new iview.scrollbar.Controller();
+	var barY = this.iview.scrollbars.barY;
 	barY.createView({ 'direction':'vertical', 'parent':this.iview.context.container, 'mainClass':'scroll'});
 	barY.attach("curVal.scrollbar", function(e, val) {
 		if (!that.iview.roller) {
@@ -711,8 +712,8 @@ genProto.loading = function(startFile) {
 	// Additional Events
 	// register to scroll into the viewer
 	this.iview.context.viewer.mousewheel(function(e, delta, deltaX, deltaY) {e.preventDefault(); that.viewerScroll({"x":deltaX, "y":deltaY});})
-		.css({	'width':this.iview.properties.startWidth - ((this.iview.my.barX.my.self.css("visibility") == "visible")? this.iview.my.barX.my.self.outerWidth() : 0)  + "px",
-				'height':this.iview.properties.startHeight - ((this.iview.my.barY.my.self.css("visibility") == "visible")? this.iview.my.barY.my.self.outerHeight() : 0)  + "px"
+		.css({	'width':this.iview.properties.startWidth - ((barX.my.self.css("visibility") == "visible")? barX.my.self.outerWidth() : 0)  + "px",
+				'height':this.iview.properties.startHeight - ((barY.my.self.css("visibility") == "visible")? barY.my.self.outerHeight() : 0)  + "px"
 		});
 	
 	if (this.iview.properties.useCutOut) {

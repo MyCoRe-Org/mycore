@@ -46,8 +46,7 @@ iview.General = function(iviewInst) {
 	this.iview = iviewInst;
 	//structure for all Viewer DOM-Objects
 	this.iview.context = new iview.Context(iviewInst.viewerContainer);
-	this.iview.my = {}; //TODO: get rid of it
-	this.iview.currentImage = new iview.CurrentImage(this.iview);
+	this.iview.currentImage = new iview.CurrentImage(iviewInst);
 	this.inputHandlerEnabled=true;
 };
 
@@ -207,19 +206,21 @@ genProto.reinitializeGraphic = function() {
 
 	var viewerContainer = this.iview.context.container;
 	var viewer = this.iview.context.viewer;
+	var barX=this.iview.scrollbars.barX;
+	var barY=this.iview.scrollbars.barY;
 
 	if (this.iview.maximized == true) {
 		//to grant usage of the complete height it's not possible to simply use height:100%
 		viewerContainer.css({'height': curHeight - viewerContainer.offset().top + "px",
 							'width': curWidth + "px"});
-		viewer.css({'height': curHeight - viewer.parent().offset().top - this.iview.my.barX.my.self.outerHeight()  + "px",
-					'width': curWidth - this.iview.my.barY.my.self.outerWidth()  + "px"});
+		viewer.css({'height': curHeight - viewer.parent().offset().top - barX.my.self.outerHeight()  + "px",
+					'width': curWidth - barY.my.self.outerWidth()  + "px"});
 	} else {
 		//restore minimized size settings
 		viewerContainer.css({'height': this.iview.properties.startHeight + "px",
 							'width': this.iview.properties.startWidth + "px"});
-		viewer.css({'height': this.iview.properties.startHeight - ((this.iview.my.barY.my.self.css("visibility") == "visible")? this.iview.my.barY.my.self.outerHeight() : 0)  + "px",
-					'width': this.iview.properties.startWidth - ((this.iview.my.barX.my.self.css("visibility") == "visible")? this.iview.my.barX.my.self.outerWidth() : 0)  + "px"});
+		viewer.css({'height': this.iview.properties.startHeight - ((barY.my.self.css("visibility") == "visible")? barY.my.self.outerHeight() : 0)  + "px",
+					'width': this.iview.properties.startWidth - ((barX.my.self.css("visibility") == "visible")? barX.my.self.outerWidth() : 0)  + "px"});
 	}
 	
 	viewerBean.width = viewer.outerWidth();
