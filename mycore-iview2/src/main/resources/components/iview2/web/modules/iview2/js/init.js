@@ -45,11 +45,9 @@ iview.General = function(iviewInst) {
 	//TODO later it should be possible to remove all this.iview with just this
 	this.iview = iviewInst;
 	//structure for all Viewer DOM-Objects
-	this.iview.my = {'container': iviewInst.viewerContainer,
-					'viewer': iviewInst.viewerContainer.find(".viewer"),
-					'preload': iviewInst.viewerContainer.find(".preload")};
-	//TODO: get rid of those parentNode crap
-	this.iview.context = new iview.Context(this.iview.my.container);
+	this.iview.context = new iview.Context(iviewInst.viewerContainer);
+	this.iview.my = {'viewer': iviewInst.context.container.find(".viewer"),
+					'preload': iviewInst.context.container.find(".preload")};
 	this.iview.currentImage = new iview.CurrentImage(this.iview);
 	this.inputHandlerEnabled=true;
 };
@@ -208,7 +206,7 @@ genProto.reinitializeGraphic = function() {
 		curHeight = (document.compatMode == 'CSS1Compat' ? document.documentElement.clientHeight : document.body.clientHeight);
 	}
 
-	var viewerContainer = this.iview.my.container;
+	var viewerContainer = this.iview.context.container;
 	var viewer = this.iview.my.viewer;
 
 	if (this.iview.maximized == true) {

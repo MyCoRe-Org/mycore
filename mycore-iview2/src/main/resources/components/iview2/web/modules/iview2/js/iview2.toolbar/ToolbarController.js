@@ -144,7 +144,7 @@ ToolbarController.prototype.addView = function(view) {
 			    	args.view.addClass("iview2-button-icon-dropdown");
 			      	args.view.menu({
 			      		// content list to navigate
-					    content: that.getViewer().my.container.find('#pages').html(),
+					    content: that.getViewer().context.container.find('#pages').html(),
 					    /*width: 100,*/
 					    maxHeight: 280,
 					    positionOpts: {

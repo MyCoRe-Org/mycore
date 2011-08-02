@@ -645,7 +645,7 @@ genProto.importChapter = function(callback) {
  */
 genProto.importOverview = function(callback) {
 	var ov = new iview.overview.Controller(this.iview.PhysicalModelProvider, iview.overview.View, this.iview.viewerBean.tileUrlProvider);
-	ov.createView({'mainClass':'overview', 'parent':this.iview.my.container, 'useScrollBar':true});
+	ov.createView({'mainClass':'overview', 'parent':this.iview.context.container, 'useScrollBar':true});
 	this.iview.overview = ov;
 	callback();
 }
@@ -691,7 +691,7 @@ genProto.loading = function(startFile) {
 	// horizontal
 	this.iview.my.barX = new iview.scrollbar.Controller();
 	var barX = this.iview.my.barX;
-	barX.createView({ 'direction':'horizontal', 'parent':this.iview.my.container, 'mainClass':'scroll'});
+	barX.createView({ 'direction':'horizontal', 'parent':this.iview.context.container, 'mainClass':'scroll'});
 	barX.attach("curVal.scrollbar", function(e, val) {
 		if (!that.iview.roller) {
 			that.scrollMove(- (val["new"]-val["old"]), 0);
@@ -700,7 +700,7 @@ genProto.loading = function(startFile) {
 	// vertical
 	this.iview.my.barY = new iview.scrollbar.Controller();
 	var barY = this.iview.my.barY;
-	barY.createView({ 'direction':'vertical', 'parent':this.iview.my.container, 'mainClass':'scroll'});
+	barY.createView({ 'direction':'vertical', 'parent':this.iview.context.container, 'mainClass':'scroll'});
 	barY.attach("curVal.scrollbar", function(e, val) {
 		if (!that.iview.roller) {
 			that.scrollMove( 0, -(val["new"]-val["old"]));
@@ -837,7 +837,7 @@ genProto.processMETS = function(metsDoc) {
 
 	// if METS File is loaded after the drop-down-menu (in mainToolbar) its content needs to be updated
 	if (jQuery('.navigateHandles .pageBox')[0]) {
-		jQuery(toolbarCtrl.getView('mainTbView')).trigger("new", {'elementName' : "pageBox", 'parentName' : "navigateHandles", 'view' : this.iview.my.container.find('.navigateHandles .pageBox')});
+		jQuery(toolbarCtrl.getView('mainTbView')).trigger("new", {'elementName' : "pageBox", 'parentName' : "navigateHandles", 'view' : this.iview.context.container.find('.navigateHandles .pageBox')});
 		// switch to current content
 		toolbarCtrl.updateDropDown(jQuery(pagelist.find("a")[physicalModel.getCurPos() - 1]).html());
 	}
