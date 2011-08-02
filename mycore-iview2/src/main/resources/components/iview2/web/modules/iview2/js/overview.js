@@ -1,9 +1,4 @@
 /**
- * @namespace
- * @name		iview
- */
-var iview = iview || {};
-/**
  * @namespace	Package for Overview, contains Default Overview View and Controller
  * @memberOf 	iview
  * @name		overview
