@@ -1,10 +1,5 @@
 //TODO einbauen das Scrollbar minimale Größe hat, damit man sie noch benutzen kann
 /**
- * @namespace
- * @name		iview
- */
-var iview = iview || {};
-/**
  * @namespace	Package for Scrollbar, contains Default Scrollbar Model, View and Controller
  * @memberOf 	iview
  * @name		scrollbar
