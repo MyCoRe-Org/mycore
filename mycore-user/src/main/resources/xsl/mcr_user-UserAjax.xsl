@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xsl:stylesheet [
+  <!ENTITY html-output SYSTEM "xsl/xsl-output-html.fragment">
+]>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
   exclude-result-prefixes="xlink i18n" xmlns:acl="xalan://org.mycore.access.MCRAccessManager">
-
+  &html-output;
   <xsl:include href="MyCoReLayout.xsl" />
 
   <xsl:variable name="MainTitle" select="i18n:translate('titles.mainTitle')" />
