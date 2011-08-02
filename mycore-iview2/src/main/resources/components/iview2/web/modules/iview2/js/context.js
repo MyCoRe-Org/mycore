@@ -6,9 +6,7 @@
     function constructor(container) {
       this.doc = null;
       this.container=container;
-      //TODO: get rid of those parentNode crap
-      this.viewer = container[0].parentNode.parentNode.parentNode.parentNode;
-      this.viewerSibling = this.viewer.previousSibling;
+      this.viewerSibling = container[0].previousSibling;
     }
 
     constructor.prototype = {
@@ -23,7 +21,7 @@
             index++;
           }
           // add Viewer
-          document.body.appendChild(this.viewer);
+          document.body.appendChild(this.container[0]);
           // because of IE7 in
           document.documentElement.style.overflow = "hidden";
           document.body.style.overflow = "hidden";
@@ -40,7 +38,7 @@
             document.body.appendChild(this.doc[index]);
             index++;
           }
-          this.viewerSibling.parentNode.insertBefore(this.viewer, this.viewerSibling.nextSibling);
+          this.viewerSibling.parentNode.insertBefore(this.container[0], this.viewerSibling.nextSibling);
           // because of IE7 in
           document.documentElement.style.overflow = "";
           document.body.style.overflow = "";
