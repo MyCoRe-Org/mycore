@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xsl:stylesheet [
+  <!ENTITY html-output SYSTEM "xsl/xsl-output-html.fragment">
+]>
 
 <!-- ============================================== -->
 <!-- $Revision: 1.3 $ $Date: 2009/03/18 15:04:15 $ -->
@@ -48,7 +51,7 @@
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" exclude-result-prefixes="xlink i18n">
-  
+  &html-output;
   <xsl:include href="mcr_user-Common.xsl"/>
   <xsl:include href="MyCoReLayout.xsl"/>
   

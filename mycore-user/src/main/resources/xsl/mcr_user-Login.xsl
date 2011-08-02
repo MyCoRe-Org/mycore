@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xsl:stylesheet [
+  <!ENTITY html-output SYSTEM "xsl/xsl-output-html.fragment">
+]>
 
 <!-- ============================================== -->
 <!-- $Revision: 1.4 $ $Date: 2009/03/20 10:42:33 $ -->
@@ -28,7 +31,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:encoder="xalan://java.net.URLEncoder"
   exclude-result-prefixes="xlink encoder i18n">
-  
+  &html-output;
   <xsl:include href="mcr_user-Common.xsl"/>
   <xsl:include href="MyCoReLayout.xsl"/>
   

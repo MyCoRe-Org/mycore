@@ -1,7 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE xsl:stylesheet [
-  <!ENTITY html-output SYSTEM "xsl/xsl-output-html.fragment">
-]>
 
 <!-- ============================================== -->
 <!-- $Revision: 1.2 $ $Date: 2008/04/11 11:47:59 $ -->
@@ -29,7 +26,7 @@
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:encoder="xalan://java.net.URLEncoder" exclude-result-prefixes="xlink encoder">
-  &html-output;
+
   <xsl:variable name="backto_url" select="/mcr_user/backto_url"/>
   <xsl:variable name="guest_id" select="/mcr_user/guest_id"/>
   <xsl:variable name="guest_pwd" select="/mcr_user/guest_pwd"/>
