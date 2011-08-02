@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE xsl:stylesheet [
+  <!ENTITY html-output SYSTEM "xsl/xsl-output-html.fragment">
+]>
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan"
     xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation">
+    &html-output;
     <xsl:include href="MyCoReLayout.xsl" />
 
     <!-- 
