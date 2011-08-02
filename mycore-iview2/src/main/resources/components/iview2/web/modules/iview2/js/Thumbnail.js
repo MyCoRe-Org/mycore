@@ -80,7 +80,7 @@ genProto.processImageProperties = function(imageProperties, url){
 	
 	var preload = new Image();
 	preload.className = "preloadImg";
-	var preloadCont=this.iview.my.preload;
+	var preloadCont=this.iview.context.preload;
 	preloadCont.css({"width" : this.iview.currentImage.getWidth() / Math.pow(2, this.iview.currentImage.zoomInfo.getMaxLevel() - this.iview.zoomInit) + "px",
 					 "height" : this.iview.currentImage.getHeight() / Math.pow(2, this.iview.currentImage.zoomInfo.getMaxLevel() - this.iview.zoomInit) + "px"})
 			 .empty()
@@ -318,10 +318,10 @@ genProto.switchDisplayMode = function(screenZoom, stateBool, preventLooping) {
 	stateBool = (stateBool)? false: true;
 	viewerBean.clear();
 	this.removeScaling();
-	var preload = this.iview.my.preload;
+	var preload = this.iview.context.preload;
 	if (stateBool) {
 		for (var i = 0; i <= this.iview.currentImage.zoomInfo.getMaxLevel(); i++) {
-			if(this.iview.currentImage.getWidth()/viewerBean.width > this.iview.currentImage.getHeight()/this.iview.my.viewer.outerHeight(true) || (stateBool && !screenZoom)){
+			if(this.iview.currentImage.getWidth()/viewerBean.width > this.iview.currentImage.getHeight()/this.iview.context.viewer.outerHeight(true) || (stateBool && !screenZoom)){
 			//Width > Height Or ZoomWidth is true
 				if (this.calculateZoomProp(i, this.iview.currentImage.getWidth(), viewerBean.width, 0)) {
 					break;
@@ -405,13 +405,14 @@ genProto.handleScrollbars = function(reason) {
 	if (typeof reason === "undefined") reason = "all";
 	
 	var viewerBean = this.iview.viewerBean;
-	var viewer = this.iview.my.viewer;
+	var viewer = this.iview.context.viewer;
 	var barX = this.iview.my.barX;
 	var barY = this.iview.my.barY;
+	var currentImage=this.iview.currentImage;
 	// determine the current imagesize
-  var zoomScale=this.iview.currentImage.zoomInfo.getScale();
-	var curWidth = (this.iview.currentImage.getWidth() / Math.pow(2, this.iview.currentImage.zoomInfo.getMaxLevel() - viewerBean.zoomLevel))*zoomScale;
-	var curHeight = (this.iview.currentImage.getHeight() / Math.pow(2, this.iview.currentImage.zoomInfo.getMaxLevel() - viewerBean.zoomLevel))*zoomScale;
+  var zoomScale=currentImage.zoomInfo.getScale();
+	var curWidth = (currentImage.getWidth() / Math.pow(2, currentImage.zoomInfo.getMaxLevel() - viewerBean.zoomLevel))*zoomScale;
+	var curHeight = (currentImage.getHeight() / Math.pow(2, currentImage.zoomInfo.getMaxLevel() - viewerBean.zoomLevel))*zoomScale;
 
 	var height = viewer.height();
 	var width = viewer.width();
@@ -441,7 +442,7 @@ genProto.handleScrollbars = function(reason) {
 		barX.setSize(width);
 		if (!reason == "all") break;
 	}
-}
+};
 
 /**
  * @public
@@ -460,7 +461,7 @@ genProto.viewerZoomed = function (zoomEvent) {
 	if (this.iview.zoomScreen) {
 		this.pictureScreen(true);
 	}
-	var preload = this.iview.my.preload;
+	var preload = this.iview.context.preload;
 	var currentImage=this.iview.currentImage;
   var zoomInfo=currentImage.zoomInfo;
 	preload.css({"width": (currentImage.getWidth() / Math.pow(2, zoomInfo.getMaxLevel() - viewerBean.zoomLevel))*zoomInfo.getScale() +  "px",
@@ -506,12 +507,12 @@ genProto.viewerMoved = function (event) {
 	}
 	// set Roller this no circles are created, and we end in an endless loop
 	this.iview.roller = true;
-	var preload = this.iview.my.preload;
+	var preload = this.iview.context.preload;
 	var pos = preload.position();
 	this.iview.my.barX.setCurValue(-pos.left);
 	this.iview.my.barY.setCurValue(-pos.top);
 	this.iview.roller = false;
-}
+};
 
 /**
  * @public
@@ -610,11 +611,11 @@ genProto.importCutOut = function() {
 			 'y' : val.y["new"]*zoomScale
 			}, true);
 	});
-	var preload = this.iview.my.preload;
+	var preload = this.iview.context.preload;
 	this.iview.cutOutModel.setSize({
 		'x': preload.width(),
 		'y': preload.height()});
-}
+};
 
 /**
  * @public
@@ -633,7 +634,7 @@ genProto.importChapter = function(callback) {
 	this.iview.chapterReaction = false;
 
 	callback();
-}
+};
 
 /**
  * @public
@@ -709,7 +710,7 @@ genProto.loading = function(startFile) {
 
 	// Additional Events
 	// register to scroll into the viewer
-	this.iview.my.viewer.mousewheel(function(e, delta, deltaX, deltaY) {e.preventDefault(); that.viewerScroll({"x":deltaX, "y":deltaY});})
+	this.iview.context.viewer.mousewheel(function(e, delta, deltaX, deltaY) {e.preventDefault(); that.viewerScroll({"x":deltaX, "y":deltaY});})
 		.css({	'width':this.iview.properties.startWidth - ((this.iview.my.barX.my.self.css("visibility") == "visible")? this.iview.my.barX.my.self.outerWidth() : 0)  + "px",
 				'height':this.iview.properties.startHeight - ((this.iview.my.barY.my.self.css("visibility") == "visible")? this.iview.my.barY.my.self.outerHeight() : 0)  + "px"
 		});
@@ -741,7 +742,7 @@ genProto.startFileLoaded = function(){
 	this.iview.loaded = true;
 	var that = this;
 	//Blank needs to be loaded as blank, so the level is filled. Else it lays not ontop; needed for IE 
-	this.iview.my.viewer.find(".surface").css("backgroundImage", "url(" + this.iview.properties.webappBaseUri + "modules/iview2/gfx/blank.gif" + ")");
+	this.iview.context.viewer.find(".surface").css("backgroundImage", "url(" + this.iview.properties.webappBaseUri + "modules/iview2/gfx/blank.gif" + ")");
 
 	// PermaLink Handling
 	// choice if zoomLevel or special; zoomMode only makes sense in maximized viewer

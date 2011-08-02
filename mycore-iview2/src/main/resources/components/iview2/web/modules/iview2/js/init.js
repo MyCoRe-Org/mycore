@@ -46,8 +46,7 @@ iview.General = function(iviewInst) {
 	this.iview = iviewInst;
 	//structure for all Viewer DOM-Objects
 	this.iview.context = new iview.Context(iviewInst.viewerContainer);
-	this.iview.my = {'viewer': iviewInst.context.container.find(".viewer"),
-					'preload': iviewInst.context.container.find(".preload")};
+	this.iview.my = {}; //TODO: get rid of it
 	this.iview.currentImage = new iview.CurrentImage(this.iview);
 	this.inputHandlerEnabled=true;
 };
@@ -128,7 +127,7 @@ PanoJS.TileUrlProvider.prototype.assembleUrl = function(xIndex, yIndex, zoom, im
  */
 genProto.zoomCenter = function(direction, point) {
 	var viewer = this.iview.viewerBean;
-	var preload = this.iview.my.preload;
+	var preload = this.iview.context.preload;
 	var preDim = {"x" :toInt(preload.css("left")),"y":toInt(preload.css("top")), "width":preload.width(), "height":preload.height()};
 	viewer.zoom(direction);
 	var newDim = {"width":preload.width(), "height":preload.height()};
@@ -168,7 +167,7 @@ genProto.initializeGraphic = function() {
    * initialise the viewer
    */
 	if (this.iview.viewerBean == null) {
-		this.iview.viewerBean = new PanoJS(this.iview.my.viewer[0], {
+		this.iview.viewerBean = new PanoJS(this.iview.context.viewer[0], {
 			initialPan: {'x' : 0, 'y' : 0 },//Koordianten der oberen linken Ecke
 			tileSize: this.iview.properties.tileSize,//Kachelgroesse
 			tileUrlProvider: iviewTileUrlProvider,
@@ -207,7 +206,7 @@ genProto.reinitializeGraphic = function() {
 	}
 
 	var viewerContainer = this.iview.context.container;
-	var viewer = this.iview.my.viewer;
+	var viewer = this.iview.context.viewer;
 
 	if (this.iview.maximized == true) {
 		//to grant usage of the complete height it's not possible to simply use height:100%
