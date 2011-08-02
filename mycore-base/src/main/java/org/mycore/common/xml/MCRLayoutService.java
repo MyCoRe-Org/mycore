@@ -32,6 +32,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
@@ -113,6 +114,15 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
     private final static Logger LOGGER = Logger.getLogger(MCRLayoutService.class);
 
     private static final MCRLayoutService SINGLETON = new MCRLayoutService();
+    
+    private ThreadLocal<HashMap<String, String>> transformMap=new ThreadLocal<HashMap<String,String>>(){
+
+        @Override
+        protected HashMap<String, String> initialValue() {
+            return new HashMap<String, String>();
+        }
+        
+    };
 
     public static MCRLayoutService instance() {
         return SINGLETON;
@@ -172,6 +182,10 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
             e.printStackTrace();
         }
 
+    }
+    
+    public Map<String,String> getCurrentTransformationMap(){
+        return transformMap.get();
     }
 
     public void sendXML(HttpServletRequest req, HttpServletResponse res, org.jdom.Document jdom) throws IOException {
@@ -627,11 +641,13 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Result result = new StreamResult(out);
         try {
+            transformMap.get().clear();
             transformer.transform(xml, result);
         } catch (TransformerException ex) {
             String msg = "Error while transforming XML using XSL stylesheet: " + ex.getMessageAndLocation();
             throw new MCRException(msg, ex);
         } finally {
+            transformMap.get().clear();
             out.close();
         }
 
