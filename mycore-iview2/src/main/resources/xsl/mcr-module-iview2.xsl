@@ -50,41 +50,43 @@
     
     <!-- thumbnail settings -->
     <xsl:param name="DampInViewer" select="'true'" />
-    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
-    <script type="text/javascript">
-    <!-- JQuery Framework -->
-      google.load("jquery", "<xsl:value-of select="$jquery.version"/>");
-      google.load("jqueryui", "<xsl:value-of select="$jqueryUI.version"/>");
-    </script>
-    
-    <xsl:choose>
-      <xsl:when test="$MCR.Module-iview2.DeveloperMode='true'">
-        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/js/iview2.js"/>
-      </xsl:when>
-      <xsl:otherwise>
-        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/js/iview2.min.js"/>
-      </xsl:otherwise>
-    </xsl:choose>
-    <script type="text/javascript">
-      var styleFolderUri='<xsl:value-of select="$styleFolderUri" />';
-      var chapterEmbedded=<xsl:value-of select="$chapterEmbedded" />;
-      var chapDynResize=<xsl:value-of select="$chapDynResize" />;
-      var DampInViewer=<xsl:value-of select="$DampInViewer" />;
-      var i18n = i18n || new iview.i18n('<xsl:value-of select="$WebApplicationBaseURL"/>', '<xsl:value-of select="$CurrentLang"/>');
-      <xsl:text>loadCssFile('</xsl:text>
-      <xsl:value-of select="$WebApplicationBaseURL"/>
+    <xsl:if test="mcrxml:putVariable('iview2.init','done')!='done'">
+      <script type="text/javascript" src="http://www.google.com/jsapi"/>
+      <script type="text/javascript">
+      <!-- JQuery Framework -->
+        google.load("jquery", "<xsl:value-of select="$jquery.version"/>");
+        google.load("jqueryui", "<xsl:value-of select="$jqueryUI.version"/>");
+      </script>
+      
       <xsl:choose>
         <xsl:when test="$MCR.Module-iview2.DeveloperMode='true'">
-          <xsl:text>modules/iview2/gfx/default/iview2.css', 'iviewCss');</xsl:text>
+          <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/js/iview2.js"/>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:text>modules/iview2/gfx/default/iview2.min.css', 'iviewCss');</xsl:text>
+          <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/js/iview2.min.js"/>
         </xsl:otherwise>
       </xsl:choose>
-      <xsl:text>loadCssFile('http://ajax.googleapis.com/ajax/libs/jqueryui/</xsl:text>
-      <xsl:value-of select="$jqueryUI.version"/>
-      <xsl:text>/themes/base/jquery-ui.css');</xsl:text>
-    </script>
+      <script type="text/javascript">
+        var styleFolderUri='<xsl:value-of select="$styleFolderUri" />';
+        var chapterEmbedded=<xsl:value-of select="$chapterEmbedded" />;
+        var chapDynResize=<xsl:value-of select="$chapDynResize" />;
+        var DampInViewer=<xsl:value-of select="$DampInViewer" />;
+        var i18n = i18n || new iview.i18n('<xsl:value-of select="$WebApplicationBaseURL"/>', '<xsl:value-of select="$CurrentLang"/>');
+        <xsl:text>loadCssFile('</xsl:text>
+        <xsl:value-of select="$WebApplicationBaseURL"/>
+        <xsl:choose>
+          <xsl:when test="$MCR.Module-iview2.DeveloperMode='true'">
+            <xsl:text>modules/iview2/gfx/default/iview2.css', 'iviewCss');</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>modules/iview2/gfx/default/iview2.min.css', 'iviewCss');</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:text>loadCssFile('http://ajax.googleapis.com/ajax/libs/jqueryui/</xsl:text>
+        <xsl:value-of select="$jqueryUI.version"/>
+        <xsl:text>/themes/base/jquery-ui.css');</xsl:text>
+      </script>
+    </xsl:if>
   </xsl:template>
   
   <xsl:template name="iview2.start">
