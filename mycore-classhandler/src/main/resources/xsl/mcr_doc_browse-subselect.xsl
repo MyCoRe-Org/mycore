@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
+<!DOCTYPE xsl:stylesheet [
+  <!ENTITY html-output SYSTEM "xsl/xsl-output-html.fragment">
+]>
 <!-- ============================================== -->
 <!-- $Revision: 1.2 $ $Date: 2006-09-22 09:45:04 $ -->
 <!-- ============================================== -->
@@ -20,7 +22,7 @@
   xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
   exclude-result-prefixes="xlink">
-	
+  &html-output;
 <xsl:variable name="Navigation.title"  select="i18n:translate('component.classhandler.titles.pageTitle.chooseClass')" />
 <xsl:variable name="MainTitle" select="i18n:translate('common.titles.mainTitle')"/>
 <xsl:variable name="PageTitle" select="$Navigation.title"/>

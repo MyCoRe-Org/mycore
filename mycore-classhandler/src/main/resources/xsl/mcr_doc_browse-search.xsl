@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
+<!DOCTYPE xsl:stylesheet [
+  <!ENTITY html-output SYSTEM "xsl/xsl-output-html.fragment">
+]>
 <!-- ============================================== -->
 <!-- $Revision: 1.4 $ $Date: 2007-08-16 06:51:55 $ -->
 <!-- ============================================== -->
@@ -20,7 +22,7 @@
   xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
   exclude-result-prefixes="xlink">
-
+  &html-output;
 <xsl:include href="MyCoReLayout.xsl"/>
 
 <xsl:variable name="Navigation.title" select="i18n:translate('component.classhandler.titles.pageTitle.classBrowse')" />

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
+<!DOCTYPE xsl:stylesheet [
+  <!ENTITY html-output SYSTEM "xsl/xsl-output-html.fragment">
+]>
   <!-- ============================================== -->
   <!-- $Revision: 1.13 $ $Date: 2007-11-06 16:57:10 $ -->
   <!-- ============================================== -->
@@ -11,6 +13,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:acl="xalan://org.mycore.access.MCRAccessManager"
   exclude-result-prefixes="xlink i18n acl xsl">
+  &html-output;
   <xsl:include href="start-acl-editor.xsl" />
   <xsl:variable name="Navigation.title" select="i18n:translate('component.classhandler.titles.pageTitle.classEdit')" />
   <xsl:variable name="MainTitle" select="i18n:translate('common.titles.mainTitle')" />
