@@ -94,11 +94,14 @@
 
     <!-- Initfunktionen -->
     <script type="text/javascript">
-      jQuery(document).ready(function(){
-          var instList=Iview['<xsl:value-of select="$groupID"/>'];
-          instList[instList.length-1].startViewer('<xsl:value-of select="$startFile" />');
-        }
-      );
+      (function(){
+        var instList=Iview['<xsl:value-of select="$groupID"/>'];
+        var cI=instList[instList.length-1];
+        jQuery(document).ready(function(){
+            cI.startViewer('<xsl:value-of select="$startFile" />');
+          }
+        );
+      })();
     </script>
   </xsl:template>
 
