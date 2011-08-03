@@ -290,14 +290,6 @@ genProto.maximizeHandler = function() {
 		this.iview.maximized = true;
 		jQuery(this.iview.viewerContainer).trigger("maximize.viewerContainer");
 		
-		if (this.iview.zoomWidth) {
-			jQuery(".mainTbView .zoomHandles .fitToWidth")[0].checked = true;
-			jQuery(".mainTbView .zoomHandles .fitToWidthLabel").addClass("ui-state-active");
-		} else if (this.iview.zoomScreen) {
-			jQuery(".mainTbView .zoomHandles .fitToScreen")[0].checked = true;
-			jQuery(".mainTbView .zoomHandles .fitToScreenLabel").addClass("ui-state-active");
-		}
-		
 		// save document content
 		this.iview.context.switchContext();
 

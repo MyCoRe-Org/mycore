@@ -88,6 +88,16 @@
     			that.toolbarCtrl.checkNavigation(that.PhysicalModel.getCurPos());
     		}
     		that.toolbarCtrl.paint("mainTb");
+			if (that.zoomWidth) {
+				/*TODO rebuild so that setActive of the corresponding Buttons is called, so the view can take care of the display part
+    		needs rewriting of some parts within ToolbarController and View
+				 */
+				jQuery(".mainTbView .zoomHandles .fitToWidth")[0].checked = true;
+				jQuery(".mainTbView .zoomHandles .fitToWidthLabel").addClass("ui-state-active");
+			} else if (that.zoomScreen) {
+				jQuery(".mainTbView .zoomHandles .fitToScreen")[0].checked = true;
+				jQuery(".mainTbView .zoomHandles .fitToScreenLabel").addClass("ui-state-active");
+			}
       })
       	.bind("minimize.viewerContainer", function() {
       		that.toolbarMgr.destroyModel('mainTb');
