@@ -286,16 +286,9 @@ genProto.maximizeHandler = function() {
 		if (!this.iview.zoomScreen) {
 			this.pictureScreen();
 		}
-//		this.iview.toolbarMgr.destroyModel('mainTb');
 	} else {
 		this.iview.maximized = true;
 		jQuery(this.iview.viewerContainer).trigger("maximize.viewerContainer");
-		
-//		this.iview.getToolbarCtrl().addView(new ToolbarView("mainTbView", this.iview.getToolbarCtrl().toolbarContainer, i18n));
-//		this.iview.getToolbarMgr().addModel(new StandardToolbarModelProvider("mainTb", this.iview.getToolbarMgr().titles, this.iview).getModel());
-//		if (this.iview.PhysicalModel) {
-//			this.iview.getToolbarCtrl().checkNavigation(this.iview.PhysicalModel.getCurPos());
-//		}
 		
 		if (this.iview.zoomWidth) {
 			jQuery(".mainTbView .zoomHandles .fitToWidth")[0].checked = true;
@@ -308,7 +301,6 @@ genProto.maximizeHandler = function() {
 		// save document content
 		this.iview.context.switchContext();
 
-//		this.iview.toolbarCtrl.paint("mainTb");
 	}
 
 	/*IE causes resize already at class change (mostly because position: rel <> fix)
