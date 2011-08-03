@@ -61,6 +61,7 @@ ToolbarController.prototype.addView = function(view) {
 	
 	jQuery(view)
 		.bind("press", function (e, args) {
+			console.log(args)
 			if (args.parentName == "zoomHandles") {
 				if (args.elementName == "zoomIn") {
 					// FitToScreen - Button wieder reseten
@@ -177,10 +178,10 @@ ToolbarController.prototype.addView = function(view) {
 	    		}
 	    	} else if (args.parentName == "permalinkHandles") {
     			if (args.elementName == "permalink") {
+    				console.log("here drin")
     				if (typeof that.getViewer().getPermalinkCtrl !== "undefined" && that.getViewer().getPermalinkCtrl().getActive()) {
     					// TODO: Model for Permalink
-			    		jQuery(view.toolbar).find("."+args.parentName+" .permalink")[0].checked = true;
-			    		jQuery(view.toolbar).find("."+args.parentName+" .permalinkLabel").addClass("ui-state-active");
+			    		that.perform("setActive", true, 'permalinkHandles', 'permalink');
 			    	}
     			}
 	    	}
