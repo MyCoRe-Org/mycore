@@ -310,7 +310,7 @@ iview.Pdf.Controller.prototype = {
     var that = this;
     var cP = this.parent.iview.PhysicalModel._curPos;
     this.i18n.executeWhenLoaded(function(i) {
-      that.view.setCurrentPageText(i.translate("component.iview2.createPdf.range.currentPage") + ":", cP);
+      that.view.setCurrentPageText(i.translate("createPdf.range.currentPage") + ":", cP);
     });
     this.view.setMaxPageNumber(this.parent.iview.PhysicalModel._pageCount);
     this.displayPreview(String(cP));
@@ -334,10 +334,10 @@ iview.Pdf.Controller.prototype = {
 iview.Pdf.Controller.validateRange = function(range, maxPages, i18n) {
   var pages = iview.Pdf.Controller.amountPages(range, i18n);
   if (pages == 0) {
-    throw new Error(i18n.translate("component.iview2.createPdf.errors.noPages"));
+    throw new Error(i18n.translate("createPdf.errors.noPages"));
   }
   if (pages > maxPages) {
-    throw new Error(i18n.translate("component.iview2.createPdf.errors.tooManyPages") + ": " + pages);
+    throw new Error(i18n.translate("createPdf.errors.tooManyPages") + ": " + pages);
   }
 };
 
@@ -354,7 +354,7 @@ iview.Pdf.Controller.amountPages = function(range, i18n) {
       var from = parseInt(ft[0]);
       var to = parseInt(ft[1]);
       if (from > to) {
-        throw new Error(i18n.translate("component.iview2.createPdf.errors.rangeInvalid") + ": " + r);
+        throw new Error(i18n.translate("createPdf.errors.rangeInvalid") + ": " + r);
       }
       pages += to - from + 1;
     } else {

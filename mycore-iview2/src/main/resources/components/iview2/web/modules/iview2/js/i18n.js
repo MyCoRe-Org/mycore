@@ -9,7 +9,7 @@ var iview = iview || {};
  * @param		{string} [defLang=de] language to use if none is specified by function calls
  * @description functionality for internationalisation
  */
-iview.i18n = function(location, defLanguage) {
+iview.i18n = function(location, defLanguage, prefix) {
 	/**
 	 * @private
 	 * @name		location
@@ -42,6 +42,14 @@ iview.i18n = function(location, defLanguage) {
 	 * @description	languageCode for the default Language which is returned through all functions if nothing different is specified
 	 */
 	this._defLang = defLanguage || "de";
+	/**
+	 * @private
+	 * @name		prefix
+	 * @memberOf	iview.i18n#
+	 * @type		string
+	 * @description	holds an optional prefix which will be added infront of the supplied string-id
+	 */
+	this._prefix = (typeof prefix !== "undefined")? prefix + "." : "";
 	
 	this.loadLanguage(this._defLang);
 }
@@ -64,7 +72,6 @@ iview.i18n.prototype = {
 		this._deferredObjects[languageCode] = new jQuery.Deferred();
 		jQuery.getJSON(this._location + "servlets/MCRLocaleServlet/" + languageCode + "/component.iview2.*", function(data) {
 			jQuery.each(data,function(key,val) {
-        that._langs[languageCode][key.replace("component.iview2.","")] = val;
         that._langs[languageCode][key] = val;
 			});
 			jQuery(that).trigger('load.i18n', {'language': languageCode, 'i18n':that});
@@ -87,7 +94,8 @@ iview.i18n.prototype = {
 	 * @return		string translation of the given id in the requested language or languageCode::ID if no translation was found
 	 */
 	translate: function(id, languageCode) {
-		var translation = this._langs[languageCode || this._defLang][id];
+		console.log(this._prefix + id)
+		var translation = this._langs[languageCode || this._defLang][this._prefix + id];
 		if (typeof translation !== "undefined") {
 			return translation;
 		} else {

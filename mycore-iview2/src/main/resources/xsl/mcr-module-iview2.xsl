@@ -70,7 +70,7 @@
         var chapterEmbedded=<xsl:value-of select="$chapterEmbedded" />;
         var chapDynResize=<xsl:value-of select="$chapDynResize" />;
         var DampInViewer=<xsl:value-of select="$DampInViewer" />;
-        var i18n = i18n || new iview.i18n('<xsl:value-of select="$WebApplicationBaseURL"/>', '<xsl:value-of select="$CurrentLang"/>');
+        var i18n = i18n || new iview.i18n('<xsl:value-of select="$WebApplicationBaseURL"/>', '<xsl:value-of select="$CurrentLang"/>', 'component.iview2');
         <xsl:text>loadCssFile('</xsl:text>
         <xsl:value-of select="$WebApplicationBaseURL"/>
         <xsl:choose>
