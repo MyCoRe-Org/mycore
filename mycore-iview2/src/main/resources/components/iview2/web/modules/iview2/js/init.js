@@ -244,11 +244,11 @@ genProto.reinitializeGraphic = function() {
 	this.handleScrollbars("resize");
 	
 	var zoomScale=this.iview.currentImage.zoomInfo.getScale();
-	if (this.iview.properties.useCutOut) {
-		this.iview.cutOutModel.setRatio({
+	if (this.iview.properties.useOverview) {
+		this.iview.overview.Model.setRatio({
 			'x': viewerBean.width / ((this.iview.currentImage.getWidth() / Math.pow(2, this.iview.currentImage.zoomInfo.getMaxLevel() - viewerBean.zoomLevel))*zoomScale),
 			'y': viewerBean.height / ((this.iview.currentImage.getHeight() / Math.pow(2, this.iview.currentImage.zoomInfo.getMaxLevel() - viewerBean.zoomLevel))*zoomScale)});
-		this.iview.cutOutModel.setPos({
+		this.iview.overview.Model.setPos({
 			'x': - (viewerBean.x / Math.pow(2, viewerBean.zoomLevel))*zoomScale,
 			'y': - (viewerBean.y / Math.pow(2, viewerBean.zoomLevel))*zoomScale});
 	}

@@ -29,7 +29,7 @@
     function constructor(container, options) {
       var defaultOpts = {
         "useChapter" : true,
-        "useCutOut" : true,
+        "useOverview" : true,
         "useThumbnailPanel" : true,
         "maximized" : false,
         "zoomWidth" : false,

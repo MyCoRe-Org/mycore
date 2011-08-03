@@ -1,20 +1,20 @@
 var iview = iview || {};
 /**
- * @namespace	Package for CutOut contains Controller, View and Model
+ * @namespace	Package for overview contains Controller, View and Model
  * @memberOf 	iview
- * @name		cutOut
+ * @name		overview
  */
-iview.cutOut = iview.cutOut || {};
+iview.overview = iview.overview || {};
 
 /**
  * @class
  * @constructor
  * @name		View
- * @memberOf	iview.cutOut
- * @description	Standard View for the CutOut Object
+ * @memberOf	iview.overview
+ * @description	Standard View for the overview Object
  * @param		{i18n} i18n Class to allow translations
  */
-iview.cutOut.View = function(i18n) {
+iview.overview.View = function(i18n) {
 	this._i18n = i18n;
 	this._mousedown = false;
 	this._visible = true;
@@ -36,7 +36,7 @@ iview.cutOut.View = function(i18n) {
 	 * @private
 	 * @function
 	 * @name		notifyOnload
-	 * @memberOf	iview.cutOut.Model
+	 * @memberOf	iview.overview.Model
 	 * @description	as soon as the image is loaded all listeners who listen to Onload Events will be noticed that a new Image is loaded
 	 * @param		{instance} that
 	 */
@@ -53,7 +53,7 @@ iview.cutOut.View = function(i18n) {
 	 * @public
 	 * @function
 	 * @name		createView
-	 * @memberOf	iview.cutOut.View
+	 * @memberOf	iview.overview.View
 	 * @description	creates a new view based upon the values from the model and given parameters
 	 * @param		{object} args Arguments to modify the view
 	 * @param		{string} args.mainClass tells what the main Class for the scrollbar shall be
@@ -67,22 +67,22 @@ iview.cutOut.View = function(i18n) {
 			.dblclick(function(e) { 
 				var newX = (e.layerX)? e.layerX : e.offsetX;
 				var newY = (e.layerY)? e.layerY : e.offsetY;
-				jQuery(that).trigger("move.cutOut", {"x" : {"new":scale(that, newX, true)}, "y" : {"new":scale(that, newY, false)}})
+				jQuery(that).trigger("move.overview", {"x" : {"new":scale(that, newX, true)}, "y" : {"new":scale(that, newY, false)}})
 			})
 			.mousewheel(function(e, delta) {
-				jQuery(that).trigger("scroll.cutOut", {"delta": delta});
+				jQuery(that).trigger("scroll.overview", {"delta": delta});
 			})
 			.mouseup(function(e) { mouseUp(that, e)})
 			.mousemove(function(e) { mouseMove(that, e)})
 			.mousedown(function() { return false;});// deactivate Browser-Drag&Drop
 		
-		var cutOut = jQuery("<div>")
+		var overview = jQuery("<div>")
 			.addClass("ausschnitt " + args.mainClass + " " + args.customClass)
 			.mousedown(function(e) { mouseDown(that, e)})
 			.mouseup(function(e) {mouseUp(that, e)});
 		var thumb = new Image();
 		
-		complete.append(cutOut)
+		complete.append(overview)
 			.append(thumb)
 			.appendTo(args.thumbParent);
 		
@@ -91,8 +91,8 @@ iview.cutOut.View = function(i18n) {
 			.click(function() {damper(that);});
 		
 		//set the default translation and keep upto date if it should change later
-		jQuery(this._i18n.executeWhenLoaded(function(i) {toggler.attr("title", i.translate("cutOut.fadeOut"))}))
-			.bind("change.i18n load.i18n",function(e, obj) {toggler.attr("title", obj.i18n.translate("cutOut.fade" + (that._visible? "Out":"In")))});
+		jQuery(this._i18n.executeWhenLoaded(function(i) {toggler.attr("title", i.translate("overview.fadeOut"))}))
+			.bind("change.i18n load.i18n",function(e, obj) {toggler.attr("title", obj.i18n.translate("overview.fade" + (that._visible? "Out":"In")))});
 		
 		
 		var damp = jQuery("<div>")
@@ -100,14 +100,14 @@ iview.cutOut.View = function(i18n) {
 			.append(toggler)
 			.appendTo(args.dampParent);
 
-		this.my = {'self':complete, 'cutOut':cutOut, 'thumbnail':thumb, 'damp':damp, 'toggler': toggler};
+		this.my = {'self':complete, 'overview':overview, 'thumbnail':thumb, 'damp':damp, 'toggler': toggler};
 	}
 	
 	/**
 	 * @private
 	 * @function
 	 * @name		setSrc
-	 * @memberOf	iview.cutOut.Model
+	 * @memberOf	iview.overview.Model
 	 * @description	sets for the Image a new Image Source which is then loaded
 	 * @param		{instance} that
 	 * @param		{string} path represents the new URL of the Image
@@ -127,7 +127,7 @@ iview.cutOut.View = function(i18n) {
 	 * @private
 	 * @function
 	 * @name		adaptView
-	 * @memberOf	iview.cutOut.View
+	 * @memberOf	iview.overview.View
 	 * @description	takes the incoming change events and prepares them so that the view can be adapted correspondingly
 	 * @param		{object} args arguments of the property change event
 	 */
@@ -162,40 +162,40 @@ iview.cutOut.View = function(i18n) {
 	 * @private
 	 * @function
 	 * @name		applyValues
-	 * @memberOf	iview.cutOut.View
+	 * @memberOf	iview.overview.View
 	 * @description	adapt View so that it represents the latest changes within properties
 	 * @param		{that} instance
 	 */
 	function applyValues(that) {
-		var cutOut = that.my.cutOut;
+		var overview = that.my.overview;
 		var thumbnail = jQuery(that.my.thumbnail);
 
 		that.my.self.css({"width": thumbnail.width(), "height": thumbnail.height()});
 
-		cutOut.css("width", thumbnail.width() * that._ratioX + "px");
-		cutOut.css("height", thumbnail.height() * that._ratioY + "px");
+		overview.css("width", thumbnail.width() * that._ratioX + "px");
+		overview.css("height", thumbnail.height() * that._ratioY + "px");
 		
-		if (cutOut.outerWidth() > thumbnail.width()) {
-			cutOut.css("width", thumbnail.width() - (cutOut.outerWidth() - cutOut.width()) + "px")
+		if (overview.outerWidth() > thumbnail.width()) {
+			overview.css("width", thumbnail.width() - (overview.outerWidth() - overview.width()) + "px")
 		}
-		if (cutOut.outerHeight() > thumbnail.height()) {
-			cutOut.css("height", thumbnail.height() - (cutOut.outerHeight() - cutOut.height()) + "px")
+		if (overview.outerHeight() > thumbnail.height()) {
+			overview.css("height", thumbnail.height() - (overview.outerHeight() - overview.height()) + "px")
 		}
 
 		if (that._x < 0) {
 			that._x = 0;
 		}
-		if (cutOut.outerWidth() + that._x > thumbnail.width()) {
-			that._x = thumbnail.width() - cutOut.outerWidth();
+		if (overview.outerWidth() + that._x > thumbnail.width()) {
+			that._x = thumbnail.width() - overview.outerWidth();
 		}
 		
 		if (that._y < 0) {
 			that._y = 0;
 		}
-		if (cutOut.outerHeight() + that._y > thumbnail.height()) {
-			that._y = thumbnail.height() - cutOut.outerHeight();
+		if (overview.outerHeight() + that._y > thumbnail.height()) {
+			that._y = thumbnail.height() - overview.outerHeight();
 		}
-		cutOut.css({"left":that._x + "px", "top": that._y + "px"});
+		overview.css({"left":that._x + "px", "top": that._y + "px"});
 	}
 	
 
@@ -203,8 +203,8 @@ iview.cutOut.View = function(i18n) {
 	 * @private
 	 * @function
 	 * @name		mouseMove
-	 * @memberOf	iview.cutOut.Model
-	 * @description	captures mouse movement and resets the Mouse CutOut Position when the Mouse is pressed
+	 * @memberOf	iview.overview.Model
+	 * @description	captures mouse movement and resets the Mouse overview Position when the Mouse is pressed
 	 * @param		{event} e Event which occured
 	 */
 	function mouseMove(that, e) {
@@ -216,7 +216,7 @@ iview.cutOut.View = function(i18n) {
 				that._x = that._curX + (e.pageX - that._mouseX);
 				that._y = that._curY + (e.pageY - that._mouseY);
 			}
-			that.my.cutOut.css({"left": "0", "top":0})
+			that.my.overview.css({"left": "0", "top":0})
 			applyValues(that);
 		}
 	}
@@ -225,7 +225,7 @@ iview.cutOut.View = function(i18n) {
 	 * @private
 	 * @function
 	 * @name		mouseDown
-	 * @memberOf	iview.cutOut.Model
+	 * @memberOf	iview.overview.Model
 	 * @description	stores the Position where the mouse was pressed so that on Mousemovement this constellation is kept, mouseIsDown is set to true	so that the other functions know the current mousestate
 	 * @param		{event} e Event which occured
 	 * @return		{boolean} false to prevent Browser Default Drag&Drop behave
@@ -241,8 +241,8 @@ iview.cutOut.View = function(i18n) {
 				that._mouseY = e.pageY;
 			}
 			//Bestimmen der aktuellen oberen Ecke, und Bewegungsvektor
-			that._curX = parseInt(that.my.cutOut.css("left"));
-			that._curY = parseInt(that.my.cutOut.css("top"));
+			that._curX = parseInt(that.my.overview.css("left"));
+			that._curY = parseInt(that.my.overview.css("top"));
 		}
 		return false;
 	}
@@ -251,8 +251,8 @@ iview.cutOut.View = function(i18n) {
 	 * @private
 	 * @function
 	 * @name		mouseUp
-	 * @memberOf	iview.cutOut.View
-	 * @description	releases the current Mousestate(mouseIsDown = false) so that no further movement of CutOut happen, although all MouseUp Listeners will be noticed about it
+	 * @memberOf	iview.overview.View
+	 * @description	releases the current Mousestate(mouseIsDown = false) so that no further movement of overview happen, although all MouseUp Listeners will be noticed about it
 	 * @param		{event} e Event which occured
 	 */
 	function mouseUp(that, e) {
@@ -268,7 +268,7 @@ iview.cutOut.View = function(i18n) {
 			setPosBlock = true;
 			
 			if (positionX != that._curX || positionY != that._curY) {
-				jQuery(that).trigger("move.cutOut", {x: {"new": scale(that, positionX + that.my.cutOut.width()/2, true), "old": scale(that, that._curX, true)}, y: {"new": scale(that, positionY + that.my.cutOut.height()/2, false), "old": scale(that, that._curY, false)}});
+				jQuery(that).trigger("move.overview", {x: {"new": scale(that, positionX + that.my.overview.width()/2, true), "old": scale(that, that._curX, true)}, y: {"new": scale(that, positionY + that.my.overview.height()/2, false), "old": scale(that, that._curY, false)}});
 			}
 			that._mouseIsDown = false;
 		}
@@ -278,7 +278,7 @@ iview.cutOut.View = function(i18n) {
 	 * @private
 	 * @function
 	 * @name		scale
-	 * @memberOf	iview.cutOut.View
+	 * @memberOf	iview.overview.View
 	 * @description	calculates how much a pixel within the thumbnail represents pixels in the original picture
 	 * @param		{instance} that
 	 * @param		{float} value to transform to outside pixel count
@@ -296,7 +296,7 @@ iview.cutOut.View = function(i18n) {
 	 * @private
 	 * @function
 	 * @name		damper
-	 * @memberOf	iview.cutOut.View
+	 * @memberOf	iview.overview.View
 	 * @description	on a mouseclick event the Thumbnail will be toggled in display state
 	 * @param		{instance} that as the function is just an "Class" one and not connected to an instance we need to handle
 	 *  over the instance from which is called to work properly
@@ -305,16 +305,16 @@ iview.cutOut.View = function(i18n) {
 		if (that._visible) {
 			that.my.self.fadeOut();
 			that.my.toggler.removeClass("hide").addClass("show")
-			that._i18n.executeWhenLoaded(function(i) {that.my.toggler.attr("title", i.translate("cutOut.fadeIn"))});
+			that._i18n.executeWhenLoaded(function(i) {that.my.toggler.attr("title", i.translate("overview.fadeIn"))});
 		} else {
 			that.my.self.fadeIn();
 			that.my.toggler.removeClass("show").addClass("hide")
-			that._i18n.executeWhenLoaded(function(i) {that.my.toggler.attr("title", i.translate("cutOut.fadeOut"))});
+			that._i18n.executeWhenLoaded(function(i) {that.my.toggler.attr("title", i.translate("overview.fadeOut"))});
 		}
 		that._visible = !that._visible;
 	}
 	
-	var prototype = iview.cutOut.View.prototype
+	var prototype = iview.overview.View.prototype
 	prototype.createView = createView;
 	prototype.adaptView = adaptView;
 })();
@@ -322,11 +322,11 @@ iview.cutOut.View = function(i18n) {
 /**
  * @class
  * @constructor
- * @memberOf	iview.cutOut
+ * @memberOf	iview.overview
  * @name 		Model
- * @description Model for CutOut, Model is just a fake model and doesn't contain any Data itself. It's only a pipeline.
+ * @description Model for overview, Model is just a fake model and doesn't contain any Data itself. It's only a pipeline.
  */
-iview.cutOut.Model = function() {};
+iview.overview.Model = function() {};
 
 (function() {
 	
@@ -334,61 +334,61 @@ iview.cutOut.Model = function() {};
 	 * @public
 	 * @function
 	 * @name		setRatio
-	 * @memberOf	iview.cutOut.Model
-	 * @description	set ratio of cutOut to thumbnail
-	 * @param		{object} ratio x and y ratio of cutOut to thumbnail
-	 * @param		{float} ratio.x width ratio of cutOut to thumbnail
-	 * @param		{float} ratio.y height ratio of cutOut to thumbnail
+	 * @memberOf	iview.overview.Model
+	 * @description	set ratio of overview to thumbnail
+	 * @param		{object} ratio x and y ratio of overview to thumbnail
+	 * @param		{float} ratio.x width ratio of overview to thumbnail
+	 * @param		{float} ratio.y height ratio of overview to thumbnail
 	 */
 	function setRatio(ratio) {
 		ratio.x = toFloat(ratio.x);
 		ratio.y = toFloat(ratio.y);
-		jQuery(this).trigger("ratio.cutOut", {"value": {"x" :ratio.x,"y" : ratio.y}});
+		jQuery(this).trigger("ratio.overview", {"value": {"x" :ratio.x,"y" : ratio.y}});
 	}
 	
 	/**
 	 * @public
 	 * @function
 	 * @name		setPos
-	 * @memberOf	iview.cutOut.Model
-	 * @description	set the current position of the cutOut within the thumbnail
-	 * @param		{object} pos new x and y coords of the left upper corner of the cutOut
+	 * @memberOf	iview.overview.Model
+	 * @description	set the current position of the overview within the thumbnail
+	 * @param		{object} pos new x and y coords of the left upper corner of the overview
 	 * @param		{float} pos.x new x coord of the upper left corner
 	 * @param		{float} pos.y new y coord of the upper left corner
 	 */
 	function setPos(pos) {
 		pos.x = toInt(pos.x);
 		pos.y = toInt(pos.y);
-		jQuery(this).trigger("move.cutOut", {"value": {"x":pos.x,"y":pos.y}});
+		jQuery(this).trigger("move.overview", {"value": {"x":pos.x,"y":pos.y}});
 	}
 	
 	/**
 	 * @public
 	 * @function
 	 * @name		setSrc
-	 * @memberOf	iview.cutOut.Model
+	 * @memberOf	iview.overview.Model
 	 * @description	set the current Path of the thumbnail picture and notifies all listeners about it
 	 * @param		{path} path to new thumbnail picture
 	 */
 	function setSrc(path) {
-		jQuery(this).trigger("path.cutOut", {'new': path});
+		jQuery(this).trigger("path.overview", {'new': path});
 	}
 	
 	/**
 	 * @public
 	 * @function
 	 * @name		setSize
-	 * @memberOf	iview.cutOut.Model
+	 * @memberOf	iview.overview.Model
 	 * @description	sets the size of the original picture to the model and notifies all listeners about a change
 	 * @param		{object} size of the original picture
 	 * @param		{float} size.x width of the original picture
 	 * @param		{float} size.y height of the original picture
 	 */
 	function setSize(size) {
-		jQuery(this).trigger("size.cutOut", {"value": {"x":size.x, "y":size.y}});
+		jQuery(this).trigger("size.overview", {"value": {"x":size.x, "y":size.y}});
 	}
 	
-	var prototype = iview.cutOut.Model.prototype
+	var prototype = iview.overview.Model.prototype
 	prototype.setPos = setPos;
 	prototype.setRatio = setRatio;
 	prototype.setSrc = setSrc;
@@ -398,19 +398,19 @@ iview.cutOut.Model = function() {};
 /**
  * @class
  * @constructor
- * @memberOf	iview.cutOut
+ * @memberOf	iview.overview
  * @name 		Controller
- * @description Controller for CutOut
- * @param		{ModelProvider} modelProvider to create a cutOut Model
+ * @description Controller for overview
+ * @param		{ModelProvider} modelProvider to create a overview Model
  * @param		{i18n} i18n Class to allow translations
  * @param		{view} [view] where the model will be rendered to
  */
-iview.cutOut.Controller = function(modelProvider, i18n, view) {
+iview.overview.Controller = function(modelProvider, i18n, view) {
 	this._model = modelProvider.createModel();
-	this._view = new (view || iview.cutOut.View)(i18n);
+	this._view = new (view || iview.overview.View)(i18n);
 	var that = this;
 	
-	jQuery(this._model).bind("ratio.cutOut path.cutOut move.cutOut size.cutOut", function(e, val) {
+	jQuery(this._model).bind("ratio.overview path.overview move.overview size.overview", function(e, val) {
 		 that._view.adaptView({'type':e.type,'value':val["new"] || val.value});
 	});
 };
@@ -421,7 +421,7 @@ iview.cutOut.Controller = function(modelProvider, i18n, view) {
 	 * @public
 	 * @function
 	 * @name		createView
-	 * @memberOf	iview.cutOut.Controller
+	 * @memberOf	iview.overview.Controller
 	 * @description	this function is called to create and show (depending on the View) the controller connected Model to the user
 	 * @param 		{object} args params to build view
 	 * @param		{String,DOM-Object,anything jQuery supports} args.thumbParent parent Element of the thumbnail
@@ -438,7 +438,7 @@ iview.cutOut.Controller = function(modelProvider, i18n, view) {
 	 * @public
 	 * @function
 	 * @name		attach
-	 * @memberOf	iview.cutOut.Controller
+	 * @memberOf	iview.overview.Controller
 	 * @description	adds the given listener to the view so the listener will be notified about changes within the view
 	 * @param		{function} listener to add to the view
 	 * @description	attach Eventlistener to used overview model
@@ -461,7 +461,7 @@ iview.cutOut.Controller = function(modelProvider, i18n, view) {
 		jQuery(this._view).unbind(event, listener);
 	}
 	
-	var prototype = iview.cutOut.Controller.prototype;
+	var prototype = iview.overview.Controller.prototype;
 	prototype.createView = createView;
 	prototype.attach = attach;
 	prototype.detach = detach;
@@ -470,11 +470,11 @@ iview.cutOut.Controller = function(modelProvider, i18n, view) {
 /**
  * @class
  * @constructor
- * @memberOf	iview.cutOut
+ * @memberOf	iview.overview
  * @name 		ModelProvider
- * @description ModelProvider for cutOut standard Model
+ * @description ModelProvider for overview standard Model
  */
-iview.cutOut.ModelProvider = function() {
+iview.overview.ModelProvider = function() {
 	this._model = null;
 };
 
@@ -482,16 +482,16 @@ iview.cutOut.ModelProvider = function() {
 	/**
 	 * @public
 	 * @function
-	 * @memberOf	iview.cutOut.ModelProvider
+	 * @memberOf	iview.overview.ModelProvider
 	 * @name 		createModel
 	 * @description creates a new Model if none exists or returns the existing one
 	 */
 	function createModel() {
 		if (this._model == null) {
-			this._model = new iview.cutOut.Model(); 
+			this._model = new iview.overview.Model(); 
 		}
 		return this._model;
 	}
 	
-	iview.cutOut.ModelProvider.prototype.createModel = createModel; 
+	iview.overview.ModelProvider.prototype.createModel = createModel; 
 })();

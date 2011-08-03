@@ -112,8 +112,8 @@ genProto.processImageProperties = function(imageProperties, url){
 	this.iview.roller = true;
 	viewerBean.positionTiles ({'x' : initX, 'y' : initY}, true);
 	
-	if (this.iview.properties.useCutOut) {
-		this.iview.cutOutModel.setSrc(thumbSource);
+	if (this.iview.properties.useOverview) {
+		this.iview.overview.Model.setSrc(thumbSource);
 	}
   this.updateModuls();
 	
@@ -347,7 +347,7 @@ genProto.switchDisplayMode = function(screenZoom, stateBool, preventLooping) {
 	var offset = preload.offset();
 	this.iview.scrollbars.barX.setCurValue(-offset.left);
 	this.iview.scrollbars.barY.setCurValue(-offset.top);
-	if (this.iview.properties.useCutOut) this.iview.cutOutModel.setPos({'x':offset.left, 'y':offset.top});
+	if (this.iview.properties.useOverview) this.iview.overview.Model.setPos({'x':offset.left, 'y':offset.top});
 	return stateBool;
 };
 
@@ -449,7 +449,7 @@ genProto.handleScrollbars = function(reason) {
  * @function
  * @name		viewerZoomed
  * @memberOf	iview.General
- * @description	is called if the viewer is zooming; handles the correct sizing and displaying of the preloadpicture, various buttons and positioning of the cutOut accordingly the zoomlevel
+ * @description	is called if the viewer is zooming; handles the correct sizing and displaying of the preloadpicture, various buttons and positioning of the Overview accordingly the zoomlevel
  */
 genProto.viewerZoomed = function (zoomEvent) {
 	var viewerBean = this.iview.viewerBean;
@@ -473,14 +473,14 @@ genProto.viewerZoomed = function (zoomEvent) {
 	}
 	this.handleScrollbars("zoom");
 
-	if (this.iview.properties.useCutOut) {
-		this.iview.cutOutModel.setSize({
+	if (this.iview.properties.useOverview) {
+		this.iview.overview.Model.setSize({
 			'x': preload.width(),
 			'y': preload.height()});
-		this.iview.cutOutModel.setRatio({
+		this.iview.overview.Model.setRatio({
 			'x': viewerBean.width / ((currentImage.getWidth() / Math.pow(2, zoomInfo.getMaxLevel() - viewerBean.zoomLevel))*zoomInfo.getScale()),
 			'y': viewerBean.height / ((currentImage.getHeight() / Math.pow(2, zoomInfo.getMaxLevel() - viewerBean.zoomLevel))*zoomInfo.getScale())});
-		this.iview.cutOutModel.setPos({
+		this.iview.overview.Model.setPos({
 			'x': - (viewerBean.x / Math.pow(2, viewerBean.zoomLevel))*zoomInfo.getScale(),
 			'y': - (viewerBean.y / Math.pow(2, viewerBean.zoomLevel))*zoomInfo.getScale()});
 	}
@@ -494,7 +494,7 @@ genProto.viewerZoomed = function (zoomEvent) {
  * @function
  * @name		viewerMoved
  * @memberOf	iview.General
- * @description	is called if the picture is moving in the viewer and handles the size of the cutout accordingly the size of the picture
+ * @description	is called if the picture is moving in the viewer and handles the size of the Overview accordingly the size of the picture
  */
 genProto.viewerMoved = function (event) {
 	// calculate via zoomlevel to the preview the left top point
@@ -502,8 +502,8 @@ genProto.viewerMoved = function (event) {
 	var newX = - (event.x / Math.pow(2, this.iview.viewerBean.zoomLevel))/zoomScale;
 	var newY = - (event.y / Math.pow(2, this.iview.viewerBean.zoomLevel))/zoomScale;
 
-	if (this.iview.properties.useCutOut) {
-		this.iview.cutOutModel.setPos({'x':newX, 'y':newY});
+	if (this.iview.properties.useOverview) {
+		this.iview.overview.Model.setPos({'x':newX, 'y':newY});
 	}
 	// set Roller this no circles are created, and we end in an endless loop
 	this.iview.roller = true;
@@ -594,25 +594,26 @@ genProto.viewerScroll = function(delta) {
 /**
  * @public
  * @function
- * @name		importCutOut
+ * @name		importOverview
  * @memberOf	iview.General
- * @description	calls the corresponding functions to create the cutout
+ * @description	calls the corresponding functions to create the Overview
  */
-genProto.importCutOut = function() {
+genProto.importOverview = function() {
 	var that = this;
-	this.iview.cutOutMP = new iview.cutOut.ModelProvider();
-	this.iview.cutOutModel = this.iview.cutOutMP.createModel();
-	this.iview.ausschnitt = new iview.cutOut.Controller(this.iview.cutOutMP, i18n);
-	this.iview.ausschnitt.createView({'thumbParent': this.iview.ausschnittParent, 'dampParent': this.iview.ausschnittParent});
+	var overviewMP = new iview.overview.ModelProvider();
+	this.iview.overview = {};
+	this.iview.overview.Model = overviewMP.createModel();
+	this.iview.overview.ov = new iview.overview.Controller(overviewMP, i18n);
+	this.iview.overview.ov.createView({'thumbParent': this.iview.ausschnittParent, 'dampParent': this.iview.ausschnittParent});
   var zoomScale=this.iview.currentImage.zoomInfo.getScale();
-	this.iview.ausschnitt.attach("move.cutOut", function(e, val) {
+	this.iview.overview.ov.attach("move.overview", function(e, val) {
 		that.iview.viewerBean.recenter(
 			{'x' : val.x["new"]*zoomScale,
 			 'y' : val.y["new"]*zoomScale
 			}, true);
 	});
 	var preload = this.iview.context.preload;
-	this.iview.cutOutModel.setSize({
+	this.iview.overview.Model.setSize({
 		'x': preload.width(),
 		'y': preload.height()});
 };
@@ -645,7 +646,6 @@ genProto.importChapter = function(callback) {
  * @param		{function} callback function which is called just before the function returns
  */
 genProto.importThumbnailPanel = function(callback) {
-	console.log(callback)
 	var thumbnailPanel = new iview.ThumbnailPanel.Controller(this.iview.PhysicalModelProvider, iview.ThumbnailPanel.View, this.iview.viewerBean.tileUrlProvider);
 	thumbnailPanel.createView({'mainClass':'thumbnailPanel', 'parent':this.iview.context.container, 'useScrollBar':true});
 	this.iview.thumbnailPanel = thumbnailPanel;
@@ -721,8 +721,8 @@ genProto.loading = function(startFile) {
 				'height':this.iview.properties.startHeight - ((barY.my.self.css("visibility") == "visible")? barY.my.self.outerHeight() : 0)  + "px"
 		});
 	
-	if (this.iview.properties.useCutOut) {
-		this.importCutOut();
+	if (this.iview.properties.useOverview) {
+		this.importOverview();
 	}
 
 	that.initializeGraphic();

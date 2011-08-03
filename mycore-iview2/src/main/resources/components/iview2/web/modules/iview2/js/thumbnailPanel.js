@@ -222,7 +222,6 @@ iview.ThumbnailPanel.View = function() {
 		var pageName = that._pages[toInt(divBox.attr("page"))+1];
 		var source = that._tileUrlProvider.assembleUrl(0, 0, 0, pageName);
 		var preview = jQuery(divBox.children("img")[0]);
-		console.log("loadSIngleImage")
 		// original Values needed, because Img will scale automatic in each Props
 		var origImage = new Image;
 		origImage.onload = function() {trimImage(preview, source, {'height':origImage.height, 'width':origImage.width}, that);};
@@ -327,7 +326,6 @@ iview.ThumbnailPanel.View = function() {
 	function createContainer(that) {
 		//calculate the number of horizontal and vertical div-boxes
 		var el=that.my.self;
-		console.log(el, that._divSize)
 		var width = Math.floor((el.width() - that._scrollBarWidth) / that._divSize.width);
 		var height = Math.floor(el.height() / that._divSize.height);
 		//dont do not needed work if everything is just fine
