@@ -56,10 +56,10 @@
                 <!-- new API ends -->
                 <jsSourceFile>chapter.js</jsSourceFile>
                 <!-- Chapter -->
+                <jsSourceFile>thumbnailPanel.js</jsSourceFile>
+                <!-- Galerie Klasse -->
                 <jsSourceFile>overview.js</jsSourceFile>
-                <!-- Overview -->
-                <jsSourceFile>cutOut.js</jsSourceFile>
-                <!--Ausschnittbildchen Klasse-->
+                <!--Übersichtsbild Klasse-->
                 <jsSourceFile>METS.js</jsSourceFile>
                 <!--METS Klasse-->
                 <jsSourceFile>scrollBars.js</jsSourceFile>
