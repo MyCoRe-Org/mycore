@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
+<!DOCTYPE xsl:stylesheet [
+  <!ENTITY html-output SYSTEM "xsl/xsl-output-html.fragment">
+]>
 <!-- ============================================== -->
 <!--  MyCoRe - Module-Broadcasting 					-->
 <!--  												-->
@@ -14,7 +16,7 @@
 	xmlns:xalan="http://xml.apache.org/xalan"
     xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
 	>
-	
+    &html-output;
 	<xsl:include href="MyCoReLayout.xsl"/>
 	<xsl:variable name="PageTitle" select="'Module-Broadcasting Monitoring'"/>
 	<xsl:variable name="access">
