@@ -123,31 +123,31 @@ genProto.processImageProperties = function(imageProperties, url){
 /**
  * @public
  * @function
- * @name		openOverview
+ * @name		openThumbnailPanel
  * @memberOf	iview.General
- * @description	blend in the overview and creates it by the first call
- * @param		{button} button to which represents the Overview in the toolbar
+ * @description	blend in the ThumbnailPanel and creates it by the first call
+ * @param		{button} button to which represents the ThumbnailPanel in the toolbar
  */
-genProto.openOverview = function(button) {
+genProto.openThumbnailPanel = function(button) {
 	var that = this;
-	// check if overview was created yet
-	if (typeof this.iview.overview === 'undefined') {
+	// check if ThumbnailPanel was created yet
+	if (typeof this.iview.thumbnailPanel === 'undefined') {
 		button.setLoading(true);
 		setTimeout(function(){
 			var callback = function() {
-				// try again openOverview (recursive call)
-				that.openOverview(button);
+				// try again openThumbnailPanel (recursive call)
+				that.openThumbnailPanel(button);
 				button.setLoading(false);
 				
-				that.iview.overview.attach("click.overview", function(e, val) {
-					// type 1: click on overview div
+				that.iview.thumbnailPanel.attach("click.thumbnailPanel", function(e, val) {
+					// type 1: click on ThumbnailPanel div
 					button.setSubtypeState(false);
 				});
 			};
-			that.importOverview(callback);
+			that.importThumbnailPanel(callback);
 		}, 10);
 	} else {
-		this.iview.overview.toggleView();
+		this.iview.thumbnailPanel.toggleView();
 	}
 }
 
@@ -639,18 +639,19 @@ genProto.importChapter = function(callback) {
 /**
  * @public
  * @function
- * @name		importOverview
+ * @name		importThumbnailPanel
  * @memberOf	iview.General
- * @description	calls the corresponding functions to create the overview
+ * @description	calls the corresponding functions to create the ThumbnailPanel
  * @param		{function} callback function which is called just before the function returns
  */
-genProto.importOverview = function(callback) {
-	var ov = new iview.overview.Controller(this.iview.PhysicalModelProvider, iview.overview.View, this.iview.viewerBean.tileUrlProvider);
-	ov.createView({'mainClass':'overview', 'parent':this.iview.context.container, 'useScrollBar':true});
-	this.iview.overview = ov;
+genProto.importThumbnailPanel = function(callback) {
+	console.log(callback)
+	var thumbnailPanel = new iview.ThumbnailPanel.Controller(this.iview.PhysicalModelProvider, iview.ThumbnailPanel.View, this.iview.viewerBean.tileUrlProvider);
+	thumbnailPanel.createView({'mainClass':'thumbnailPanel', 'parent':this.iview.context.container, 'useScrollBar':true});
+	this.iview.thumbnailPanel = thumbnailPanel;
 	jQuery(this.iview.viewerContainer).bind("minimize.viewerContainer", function() {
-		//close Overview when Viewer is going to minimized mode
-		ov.hideView();
+		//close ThumbnailPanel when Viewer is going to minimized mode
+		thumbnailPanel.hideView();
 	})
 	callback();
 }
@@ -799,7 +800,7 @@ genProto.startFileLoaded = function(){
  * @name		processMETS
  * @memberOf	iview.General
  * @description	process the loaded mets and do all final configurations like setting the pagenumber, generating Chapter and so on
- * @param		{document} metsDoc holds in METS/MODS structure all needed informations to generate an chapter and overview of of the supplied data
+ * @param		{document} metsDoc holds in METS/MODS structure all needed informations to generate an chapter and ThumbnailPanel of of the supplied data
  */
 genProto.processMETS = function(metsDoc) {
 	var that = this;
@@ -823,7 +824,7 @@ genProto.processMETS = function(metsDoc) {
 
 	// Toolbar Operation
 	toolbarCtrl.perform("setActive", true, "overviewHandles", "openChapter");
-	toolbarCtrl.perform("setActive", true, "overviewHandles", "openOverview");
+	toolbarCtrl.perform("setActive", true, "overviewHandles", "openThumbnailPanel");
 	toolbarCtrl.checkNavigation(this.iview.PhysicalModel.getCurPos());
 
 	//Generating of Toolbar List

@@ -1,19 +1,19 @@
 /**
- * @namespace	Package for Overview, contains Default Overview View and Controller
+ * @namespace	Package for ThumbnailPanel, contains Default ThumbnailPanel-View and -Controller
  * @memberOf 	iview
- * @name		overview
+ * @name		ThumbnailPanel
  */
-iview.overview = iview.overview || {};
+iview.ThumbnailPanel = iview.ThumbnailPanel || {};
 
 /**
  * @class
  * @constructor
  * @version	1.0
- * @memberOf	iview.overview
+ * @memberOf	iview.ThumbnailPanel
  * @name	 	View
  * @description View to display with a given template the underlying model
  */
-iview.overview.View = function() {
+iview.ThumbnailPanel.View = function() {
 	this._mainClass;
 	this._customClass;	
 	this._divSize = {};
@@ -35,7 +35,7 @@ iview.overview.View = function() {
 	 * @public
 	 * @function
 	 * @name		disableScrollBar
-	 * @memberOf	iview.overview.View#
+	 * @memberOf	iview.ThumbnailPanel.View#
 	 * @description	disables the use of scrollbar. If the View was already created the scrollbar will be removed
 	 */
 	function disableScrollBar() {
@@ -50,7 +50,7 @@ iview.overview.View = function() {
 	 * @public
 	 * @function
 	 * @name		setDivSize
-	 * @memberOf	iview.overview.View#
+	 * @memberOf	iview.ThumbnailPanel.View#
 	 * @description	sets the size of the seperate which includes the image and the related infos
 	 * @param 		{object} divSize
 	 * @param		{float} divSize.width holds the width of the Divs
@@ -65,7 +65,7 @@ iview.overview.View = function() {
 	 * @public
 	 * @function
 	 * @name		setPreviewSize
-	 * @memberOf	iview.overview.View#
+	 * @memberOf	iview.ThumbnailPanel.View#
 	 * @description	sets the according size for every preview image div
 	 * @param 		{float} previewSize
 	 * @param		{float} previewSize.width width of the preview Image div
@@ -80,7 +80,7 @@ iview.overview.View = function() {
 	 * @public
 	 * @function
 	 * @name		setNumberOfPages
-	 * @memberOf	iview.overview.View#
+	 * @memberOf	iview.ThumbnailPanel.View#
 	 * @description	sets the number of pages the document has
 	 * @param	 	{float} value number of pages 
 	 */
@@ -95,7 +95,7 @@ iview.overview.View = function() {
 	 * @public
 	 * @function
 	 * @name		addPage
-	 * @memberOf	iview.overview.View#
+	 * @memberOf	iview.ThumbnailPanel.View#
 	 * @description	adds another page to the list
 	 * @param 		{integer} id holds the id of the page which is added
 	 * @param		{string} href path to the image which is added
@@ -108,18 +108,18 @@ iview.overview.View = function() {
 	 * @public
 	 * @function
 	 * @name		resize
-	 * @memberOf	iview.overview.View#
-	 * @description	resizes the overview when the size of the browser is changing
+	 * @memberOf	iview.ThumbnailPanel.View#
+	 * @description	resizes the ThumbnailPanel when the size of the browser is changing
 	 */
 	function resize() {
 		createContainer(this);
-		//calculates the new correct height so the toolbar is visible into the overview-View
+		//calculates the new correct height so the toolbar is visible into the ThumbnailPanel-View
 		if (window.innerWidth) {
 			this.my.self.css("height", window.innerHeight - 44 + "px"); //44 is the Height of the Toolbar
 		} else {
 			this.my.self.css("height", document.documentElement.clientHeight - 44 + "px"); //44 is the Height of the Toolbar
 		}
-		posOverviewContainer(this);
+		posContainer(this);
 		if (this._visible) {
 			loadImages(this);
 		}
@@ -129,7 +129,7 @@ iview.overview.View = function() {
 	 * @public
 	 * @function
 	 * @name		setSelected
-	 * @memberOf	iview.overview.View#
+	 * @memberOf	iview.ThumbnailPanel.View#
 	 * @description	takes the given pagenumber and adapts the view in that way that the selected one is visible
 	 * @param 		{integer} value pagenumber of the newly selected entry
 	 */
@@ -145,7 +145,7 @@ iview.overview.View = function() {
 	 * @public
 	 * @function
 	 * @name		visible
-	 * @memberOf	iview.overview.View#
+	 * @memberOf	iview.ThumbnailPanel.View#
 	 * @description	makes the View visible depending on the given boolean value, if no value is given the View will switch in the opposite mode than it's currently
 	 * @param 		{boolean} bool holds the state into which the View shall switch
 	 */
@@ -169,8 +169,8 @@ iview.overview.View = function() {
 	 * @private
 	 * @function
 	 * @name		loadImages
-	 * @memberOf	iview.overview.View#
-	 * @description	load the overview so that the actually picture is in first line
+	 * @memberOf	iview.ThumbnailPanel.View#
+	 * @description	load the ThumbnailPanel so that the actually picture is in first line
 	 * @param 		{instance} that
 	 */	
 	function loadImages(that) {
@@ -213,7 +213,7 @@ iview.overview.View = function() {
 	 * @private
 	 * @function
 	 * @name		loadSingleImage
-	 * @memberOf	iview.overview.View#
+	 * @memberOf	iview.ThumbnailPanel.View#
 	 * @description	load the separate pictures in the according divboxes
 	 * @param 		{instance} that image that is loaded
 	 * @param 		{object} divBox the according div box which contains one image
@@ -222,7 +222,7 @@ iview.overview.View = function() {
 		var pageName = that._pages[toInt(divBox.attr("page"))+1];
 		var source = that._tileUrlProvider.assembleUrl(0, 0, 0, pageName);
 		var preview = jQuery(divBox.children("img")[0]);
-		
+		console.log("loadSIngleImage")
 		// original Values needed, because Img will scale automatic in each Props
 		var origImage = new Image;
 		origImage.onload = function() {trimImage(preview, source, {'height':origImage.height, 'width':origImage.width}, that);};
@@ -238,7 +238,7 @@ iview.overview.View = function() {
 	 * @private
 	 * @function
 	 * @name		trimImage
-	 * @memberOf	iview.overview.View#
+	 * @memberOf	iview.ThumbnailPanel.View#
 	 * @description	fits picture to the correct size within the divBox
 	 * @param 		{object} preview image which is displayed
 	 * @param 		{string} source path to the image
@@ -295,17 +295,17 @@ iview.overview.View = function() {
 	 * @private
 	 * @function
 	 * @name		calculateFirstRow
-	 * @memberOf	iview.overview.View#
-	 * @description	if overview is already created and is called so load loadImageFromLine() and adjust scrollbar
+	 * @memberOf	iview.ThumbnailPanel.View#
+	 * @description	if ThumbnailPanel is already created and is called so load loadImageFromLine() and adjust scrollbar
 	 * @param	 	{instance} that 
 	 */
 	function calculateFirstRow(that) {
 		that._currentFirstRow = Math.floor((parseInt(that._selected) - 1) / that._amount.width);
-		// if overview is to big for remaining pages
+		// if ThumbnailPanel is to big for remaining pages
 		if (that._currentFirstRow + that._amount.height - 1 > Math.ceil(that._numberOfPages / that._amount.width) - 1) {
 			that._currentFirstRow = Math.ceil(that._numberOfPages / that._amount.width) - that._amount.height;
 		}
-		// if all pages fit in overview
+		// if all pages fit in ThumbnailPanel
 		if (that._currentFirstRow < 0) {
 			that._currentFirstRow = 0;
 		}
@@ -320,13 +320,14 @@ iview.overview.View = function() {
 	 * @private
 	 * @function
 	 * @name		createContainer
-	 * @memberOf	iview.overview.View#
-	 * @description	creates all containers which are used for the overview (#container == #previewImages)
+	 * @memberOf	iview.ThumbnailPanel.View#
+	 * @description	creates all containers which are used for the ThumbnailPanel (#container == #previewImages)
 	 * @param 		{instance} that 
 	 */
 	function createContainer(that) {
 		//calculate the number of horizontal and vertical div-boxes
 		var el=that.my.self;
+		console.log(el, that._divSize)
 		var width = Math.floor((el.width() - that._scrollBarWidth) / that._divSize.width);
 		var height = Math.floor(el.height() / that._divSize.height);
 		//dont do not needed work if everything is just fine
@@ -364,7 +365,7 @@ iview.overview.View = function() {
 					.append(infoDiv)
 					.append(prevImg)
 					.click(function() {
-						jQuery(that).trigger("click.overview", {"new": toInt(jQuery(this).attr("page"))});
+						jQuery(that).trigger("click.thumbnailPanel", {"new": toInt(jQuery(this).attr("page"))});
 					});
 			}
 		}
@@ -373,12 +374,12 @@ iview.overview.View = function() {
 	/**
 	 * @private
 	 * @function
-	 * @name		posOverviewContainer
-	 * @memberOf	iview.overview.View#
+	 * @name		posContainer
+	 * @memberOf	iview.ThumbnailPanel.View#
 	 * @description	positions nicely the divBoxes within the available Space
-	 * @param	 	{instance} that the overview object where the code is run in
+	 * @param	 	{instance} that the ThumbnailPanel object where the code is run in
 	 */
-	function posOverviewContainer(that) {
+	function posContainer(that) {
 		that._scrollBarWidth = ((that.my.bar)? that.my.bar.outerWidth(true): 0);
 	
 		if (that.my.bar) {
@@ -395,13 +396,13 @@ iview.overview.View = function() {
 	 * @public
 	 * @function
 	 * @name		createView
-	 * @memberOf	iview.overview.View#
-	 * @description	create the view in the overview
+	 * @memberOf	iview.ThumbnailPanel.View#
+	 * @description	create the view in the ThumbnailPanel
 	 * @param	 	{object} args
 	 * @param		{string} args.mainClass tells what the main Class for the scrollbar shall be
 	 * @param		{string} args.customClass allows it to modify the Scrollbar in parts to differ from others
-	 * @param		{String,DOM-Object,anything jQuery supports} parent DOM element to which the overview is added
-	 * @param 		{string} [id] tells the id of the overview. This property isn't needed as the
+	 * @param		{String,DOM-Object,anything jQuery supports} parent DOM element to which the ThumbnailPanel is added
+	 * @param 		{string} [id] tells the id of the ThumbnailPanel. This property isn't needed as the
 	 *  scrollbar works just fine without ids. The id maybe only needed if you plan to perform custom
 	 *  transformations on the scrollbar DOM
 	 */
@@ -429,7 +430,7 @@ iview.overview.View = function() {
 		}
 		
 		createContainer(this);
-		posOverviewContainer(this);
+		posContainer(this);
 		this.setSelected(args.selected || 0);
 		var that = this;
 		jQuery(window).resize(function() {that.resize()});
@@ -440,8 +441,8 @@ iview.overview.View = function() {
 	 * @private
 	 * @function
 	 * @name		prepareScrollBar
-	 * @memberOf	iview.overview.View#
-	 * @description	create Scrollbar in the overview
+	 * @memberOf	iview.ThumbnailPanel.View#
+	 * @description	create Scrollbar in the ThumbnailPanel
 	 * @param 		{instance} that 
 	 */
 	function prepareScrollBar(that) {
@@ -468,7 +469,7 @@ iview.overview.View = function() {
 	 * @public
 	 * @function
 	 * @name		setTileUrlProvider
-	 * @memberOf	iview.overview.View#
+	 * @memberOf	iview.ThumbnailPanel.View#
 	 * @description	set the tileUrlProvider from which the tiles are taken
 	 * @param 		{tileUrlProvider} provider which gives preview tiles
 	 */
@@ -476,7 +477,7 @@ iview.overview.View = function() {
 		this._tileUrlProvider = provider;
 	}
 	
-	var prototype = iview.overview.View.prototype
+	var prototype = iview.ThumbnailPanel.View.prototype
 	prototype.createView = createView;
 	prototype.setDivSize = setDivSize;
 	prototype.resize = resize;
@@ -493,17 +494,17 @@ iview.overview.View = function() {
  * @class
  * @constructor
  * @version		1.0
- * @memberOf	iview.overview
+ * @memberOf	iview.ThumbnailPanel
  * @name 		Controller
- * @description Controller for Overview
- * @param		{iview.METS.PhysicalModelProvider, API-equal Object} model for overview data
- * @param		{iview.overview.View, API-equal Object} [view=iview.overview.View] Viewtype to use for
- *  this Overview, if not the package Type is used be sure to use a compatible one
+ * @description Controller for ThumbnailPanel
+ * @param		{iview.METS.PhysicalModelProvider, API-equal Object} model for ThumbnailPanel data
+ * @param		{iview.ThumbnailPanel.View, API-equal Object} [view=iview.ThumbnailPanel.View] Viewtype to use for
+ *  this ThumbnailPanel, if not the package Type is used be sure to use a compatible one
  * @param		{tileUrlProvider} tileUrlProvider to retrieve urls for thumbnails from
  */
-iview.overview.Controller = function(modelProvider, view, tileUrlProvider) {
+iview.ThumbnailPanel.Controller = function(modelProvider, view, tileUrlProvider) {
 	this._model = modelProvider.createModel();
-	this._view = new (view || iview.overview.View)();
+	this._view = new (view || iview.ThumbnailPanel.View)();
 	this._tileUrlProvider = tileUrlProvider;
 	var that = this;
 	
@@ -511,7 +512,7 @@ iview.overview.Controller = function(modelProvider, view, tileUrlProvider) {
 		that._view.setSelected(val["new"]);
 	});
 	
-	jQuery(this._view).bind("click.overview", function(e, val) {
+	jQuery(this._view).bind("click.thumbnailPanel", function(e, val) {
 		that._view.visible(false);
 		that._model.setPosition(val["new"]+1);
 	});
@@ -523,13 +524,13 @@ iview.overview.Controller = function(modelProvider, view, tileUrlProvider) {
 	 * @public
 	 * @function
 	 * @name		createView
-	 * @memberOf	iview.overview.Controller#
-	 * @description	creates the view for the overview
+	 * @memberOf	iview.ThumbnailPanel.Controller#
+	 * @description	creates the view for the ThumbnailPanel
 	 * @param 		{object} args
 	 * @param		{string} args.mainClass tells what the main Class for the scrollbar shall be
 	 * @param		{string} args.customClass allows it to modify the Scrollbar in parts to differ from others
-	 * @param		{String,DOM-Object,anything jQuery supports} parent DOM element to which the overview is added
-	 * @param		{boolean} args.useScrollBar tells if the overview will use a scrollbar or not
+	 * @param		{String,DOM-Object,anything jQuery supports} parent DOM element to which the ThumbnailPanel is added
+	 * @param		{boolean} args.useScrollBar tells if the ThumbnailPanel will use a scrollbar or not
 	 */
 	function createView(args) {
 		this._view.setNumberOfPages(this._model.getNumberOfPages())
@@ -554,7 +555,7 @@ iview.overview.Controller = function(modelProvider, view, tileUrlProvider) {
 	 * @public
 	 * @function
 	 * @name		showView
-	 * @memberOf	iview.overview.Controller#
+	 * @memberOf	iview.ThumbnailPanel.Controller#
 	 * @description	tells the view to hide itself
 	 */
 	function showView() {
@@ -565,7 +566,7 @@ iview.overview.Controller = function(modelProvider, view, tileUrlProvider) {
 	 * @public
 	 * @function
 	 * @name		hideView#
-	 * @memberOf	iview.overview.Controller
+	 * @memberOf	iview.ThumbnailPanel.Controller
 	 * @description	tells the view to hide itself
 	 */	
 	function hideView() {
@@ -576,7 +577,7 @@ iview.overview.Controller = function(modelProvider, view, tileUrlProvider) {
 	 * @public
 	 * @function
 	 * @name		toggleView
-	 * @memberOf	iview.overview.Controller#
+	 * @memberOf	iview.ThumbnailPanel.Controller#
 	 * @description	tells the View to change it's display mode to the currently opposite mode
 	 */
 	function toggleView() {
@@ -587,7 +588,7 @@ iview.overview.Controller = function(modelProvider, view, tileUrlProvider) {
 	 * @public
 	 * @function
 	 * @name		setSelected
-	 * @memberOf	iview.overview.Controller#
+	 * @memberOf	iview.ThumbnailPanel.Controller#
 	 * @description	takes the given pagenumber and adapts the view in that way that the selected one is visible
 	 * @param 		{integer} value pagenumber of the newly selected entry 
 	 */
@@ -599,8 +600,8 @@ iview.overview.Controller = function(modelProvider, view, tileUrlProvider) {
 	 * @public
 	 * @function
 	 * @name		getActive
-	 * @memberOf	iview.overview.Controller#
-	 * @description	returns the current state of the OverviewView (if its visible or not)
+	 * @memberOf	iview.ThumbnailPanel.Controller#
+	 * @description	returns the current state of the ThumbnailPanelView (if its visible or not)
 	 */
 	function getActive() {
 		return this._view._visible;
@@ -610,8 +611,8 @@ iview.overview.Controller = function(modelProvider, view, tileUrlProvider) {
 	 * @public
 	 * @function
 	 * @name		attach
-	 * @memberOf	iview.overview.Controller#
-	 * @description	attach Eventlistener to used overview view
+	 * @memberOf	iview.ThumbnailPanel.Controller#
+	 * @description	attach Eventlistener to used ThumbnailPanel view
 	 * @param		{string} event name of events to register the listener to
 	 * @param		{function} listener to add to the view
 	 */
@@ -623,8 +624,8 @@ iview.overview.Controller = function(modelProvider, view, tileUrlProvider) {
 	 * @public
 	 * @function
 	 * @name		detach
-	 * @memberOf	iview.overview.Controller#
-	 * @description	detach previously attached Eventlistener from overview view
+	 * @memberOf	iview.ThumbnailPanel.Controller#
+	 * @description	detach previously attached Eventlistener from ThumbnailPanel view
 	 * @param		{string} event name of events to detach the listener from
 	 * @param		{function} listener to add to the view
 	 */
@@ -632,7 +633,7 @@ iview.overview.Controller = function(modelProvider, view, tileUrlProvider) {
 		jQuery(this._view).unbind(event, listener);
 	}
 	
-	var prototype = iview.overview.Controller.prototype;
+	var prototype = iview.ThumbnailPanel.Controller.prototype;
 	prototype.createView = createView;
 	prototype.showView = showView;
 	prototype.hideView = hideView;

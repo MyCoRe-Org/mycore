@@ -236,9 +236,9 @@ genProto.reinitializeGraphic = function() {
 		this.pictureWidth();
 	}
 	
-	if (this.iview.properties.useOverview && this.iview.overview && this.iview.overview.getActive()) {
-		// actualize Overview only if visible else delay it upto the reopening
-		this.iview.overview.setSelected(this.iview.PhysicalModel.getCurPos());
+	if (this.iview.properties.useThumbnailPanel && this.iview.thumbnailPanel && this.iview.thumbnailPanel.getActive()) {
+		// actualize thumbnailPanel only if visible else delay it upto the reopening
+		this.iview.thumbnailPanel.setSelected(this.iview.PhysicalModel.getCurPos());
 	}
 	
 	this.handleScrollbars("resize");

@@ -239,7 +239,7 @@
 	.
 	.
 	50 - above viewer, for buttons or additional Moduls
-	60 - MODUL: overview, is alone in foreground
+	60 - MODUL: thumbnailPanel, is alone in foreground
 */
 
 /* Main Container to embed in mycore */
@@ -431,9 +431,9 @@
 	cursor: pointer;
 }
 
-/* Page Overview */
+/* ThumbnailPanel */
 /* Main Container */
-.overview {
+.thumbnailPanel {
 	position: absolute;
 	top: 44px;
 	left: 0px;
@@ -445,7 +445,7 @@
 }
 
 /* Single Page Div's */
-.overview #divBox { /* Main Div's with Image & Title Content */
+.thumbnailPanel #divBox { /* Main Div's with Image & Title Content */
 	position: absolute;
 	top: 3px;
 	height: 200px;
@@ -469,7 +469,7 @@
 	background-color: #E2E6E9;
 }
 /* Main Div's with Image & Title Content */
-.overview .divBox {
+.thumbnailPanel .divBox {
 	top: 3px;
 	height: 200px;
 	width: 200px; /* For values around 50 the image disappears*/
@@ -480,10 +480,10 @@
 	width: 180px;
 	height: 160px;
 }
-.overview .divBox .previewDiv {
+.thumbnailPanel .divBox .previewDiv {
 	position: relative;
 }
-.overview .divBox .infoDiv {
+.thumbnailPanel .divBox .infoDiv {
 	width: 196px;
 	height: 20px;
 	top: 180px;
@@ -500,10 +500,10 @@
 	overflow:hidden;
 }
 
-.viewerContainer.max .overview .picContainer {
+.viewerContainer.max .thumbnailPanel .picContainer {
 	height:100%;
 }
 
-.viewerContainer.max .overview .scrollV {
+.viewerContainer.max .thumbnailPanel .scrollV {
 	visibility: inherit;
 }

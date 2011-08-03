@@ -90,7 +90,7 @@ ToolbarController.prototype.addView = function(view) {
 	    				that.getViewer().gen.pictureScreen();
 	    			}
 	    		} else if (args.parentName == "overviewHandles") {
-				if (args.elementName == "openOverview") {
+				if (args.elementName == "openThumbnailPanel") {
 					var button = new Object;
 					button.setLoading = function(loading) {
 						that.perform("setLoading", loading, args.parentName, args.elementName);
@@ -98,7 +98,7 @@ ToolbarController.prototype.addView = function(view) {
 					button.setSubtypeState = function(state) {
 						that.perform("setSubtypeState", state, args.parentName, args.elementName);
 					}
-					that.getViewer().gen.openOverview(button);
+					that.getViewer().gen.openThumbnailPanel(button);
 				} else if (args.elementName == "openChapter") {
 					var button = new Object;
 					button.setLoading = function(loading) {
@@ -170,9 +170,9 @@ ToolbarController.prototype.addView = function(view) {
 				      	var initContent = jQuery(jQuery('#pages').find('a')[that.getViewer().PhysicalModel.getCurPos() - 1]).html();
 				      	that.updateDropDown(initContent);
 				      	
-				      	// chapter and overview need to wait for METS informations
+				      	// chapter and ThumbnailPanel need to wait for METS informations
 				      	that.perform("setActive", true, 'overviewHandles', 'openChapter');
-				      	that.perform("setActive", true, 'overviewHandles', 'openOverview');
+				      	that.perform("setActive", true, 'overviewHandles', 'openThumbnailPanel');
 			      	}
 	    		}
 	    	} else if (args.parentName == "permalinkHandles") {
@@ -257,7 +257,7 @@ ToolbarController.prototype.catchModels = function() {
 				case "changeState":
 		    		// TODO: maybe it will be fine to move this to the view
 					if ((args.elementName == "zoomHandles" && (args.buttonName == "fitToWidth" || args.buttonName == "fitToScreen"))
-					|| (args.elementName == "overviewHandles" && (args.buttonName == "openChapter" || args.buttonName == "openOverview"))) {
+					|| (args.elementName == "overviewHandles" && (args.buttonName == "openChapter" || args.buttonName == "openThumbnailPanel"))) {
 						// the view provides the TRUE functionality on its own (by click)
 						// the other case won't be used
 						if (args.state == false) {

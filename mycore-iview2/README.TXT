@@ -5,7 +5,7 @@ iview[
 {
   context: {HTML-Information: Backup, Parent-DIV},
   currentImage: {Aktuelles Bild, aktuelle Darstellung, ZoomLevel etc., Funktionen die nicht in "viewer" liegen},
-  overview: {Vorschaubild},
+  thumbnailPanel: {Gallerieübersicht des aktuellen Mets Dokuments},
   pageOrder: {Paginierung etc.},
   pageStructure: {Chapters},
   pdfCreator: {PDF-funktion},
