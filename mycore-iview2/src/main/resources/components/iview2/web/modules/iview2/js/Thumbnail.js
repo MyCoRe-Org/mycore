@@ -604,7 +604,7 @@ genProto.importOverview = function() {
 	this.iview.overview = {};
 	this.iview.overview.Model = overviewMP.createModel();
 	this.iview.overview.ov = new iview.overview.Controller(overviewMP, i18n);
-	this.iview.overview.ov.createView({'thumbParent': this.iview.ausschnittParent, 'dampParent': this.iview.ausschnittParent});
+	this.iview.overview.ov.createView({'thumbParent': this.iview.overviewParent, 'dampParent': this.iview.overviewParent});
   var zoomScale=this.iview.currentImage.zoomInfo.getScale();
 	this.iview.overview.ov.attach("move.overview", function(e, val) {
 		that.iview.viewerBean.recenter(

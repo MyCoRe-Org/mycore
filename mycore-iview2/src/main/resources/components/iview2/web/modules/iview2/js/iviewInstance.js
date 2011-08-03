@@ -57,7 +57,7 @@
       }
       this.initialized = false;
       this.viewerContainer = container;
-      this.ausschnittParent = container; // TODO: get rid of this
+      this.overviewParent = container; // TODO: get rid of this
       this.chapterParent = container; // TODO: get rid of this
       this.preload = container.find(".preload"); // TODO: move this somewhere
       this.gen = new iview.General(this);
