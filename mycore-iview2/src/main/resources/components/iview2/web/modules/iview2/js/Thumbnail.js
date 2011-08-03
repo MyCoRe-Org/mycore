@@ -648,6 +648,10 @@ genProto.importOverview = function(callback) {
 	var ov = new iview.overview.Controller(this.iview.PhysicalModelProvider, iview.overview.View, this.iview.viewerBean.tileUrlProvider);
 	ov.createView({'mainClass':'overview', 'parent':this.iview.context.container, 'useScrollBar':true});
 	this.iview.overview = ov;
+	jQuery(this.iview.viewerContainer).bind("minimize.viewerContainer", function() {
+		//close Overview when Viewer is going to minimized mode
+		ov.hideView();
+	})
 	callback();
 }
 

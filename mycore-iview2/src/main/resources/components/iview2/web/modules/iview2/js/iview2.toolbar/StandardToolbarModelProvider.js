@@ -11,7 +11,7 @@
  * 			AssoArray:	buttons				//array of the neccesary button titles, parsed out of the iview2 xsl
  * 		}
  */
-var StandardToolbarModelProvider = function (id, titles, iviewRef) {
+var StandardToolbarModelProvider = function (id, iviewRef) {
 	this.id = id;
     this.model = new ToolbarModel(id);
     

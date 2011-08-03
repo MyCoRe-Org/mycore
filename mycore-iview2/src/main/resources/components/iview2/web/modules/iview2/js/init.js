@@ -278,26 +278,24 @@ genProto.maximizeHandler = function() {
 			return;
 		}
 		this.iview.maximized = false;
+		jQuery(this.iview.viewerContainer).trigger("minimize.viewerContainer");
 		
-		//close Overview when going to minimized mode
-		if (this.iview.overview) {
-			this.iview.overview.hideView();
-		}
 		// append viewer to dom again
 		this.iview.context.switchContext();
 
 		if (!this.iview.zoomScreen) {
 			this.pictureScreen();
 		}
-		this.iview.toolbarMgr.destroyModel('mainTb');
+//		this.iview.toolbarMgr.destroyModel('mainTb');
 	} else {
 		this.iview.maximized = true;
+		jQuery(this.iview.viewerContainer).trigger("maximize.viewerContainer");
 		
-		this.iview.getToolbarCtrl().addView(new ToolbarView("mainTbView", this.iview.getToolbarCtrl().toolbarContainer, i18n));
-		this.iview.getToolbarMgr().addModel(new StandardToolbarModelProvider("mainTb", this.iview.getToolbarMgr().titles, this.iview).getModel());
-		if (this.iview.PhysicalModel) {
-			this.iview.getToolbarCtrl().checkNavigation(this.iview.PhysicalModel.getCurPos());
-		}
+//		this.iview.getToolbarCtrl().addView(new ToolbarView("mainTbView", this.iview.getToolbarCtrl().toolbarContainer, i18n));
+//		this.iview.getToolbarMgr().addModel(new StandardToolbarModelProvider("mainTb", this.iview.getToolbarMgr().titles, this.iview).getModel());
+//		if (this.iview.PhysicalModel) {
+//			this.iview.getToolbarCtrl().checkNavigation(this.iview.PhysicalModel.getCurPos());
+//		}
 		
 		if (this.iview.zoomWidth) {
 			jQuery(".mainTbView .zoomHandles .fitToWidth")[0].checked = true;
@@ -308,9 +306,9 @@ genProto.maximizeHandler = function() {
 		}
 		
 		// save document content
-    this.iview.context.switchContext();
+		this.iview.context.switchContext();
 
-		this.iview.toolbarCtrl.paint("mainTb");
+//		this.iview.toolbarCtrl.paint("mainTb");
 	}
 
 	/*IE causes resize already at class change (mostly because position: rel <> fix)

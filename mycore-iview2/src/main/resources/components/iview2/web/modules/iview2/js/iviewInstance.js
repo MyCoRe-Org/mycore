@@ -80,6 +80,18 @@
         that.toolbarCtrl.catchModels();
         that.initialized = true;
       });
+      jQuery(this.viewerContainer)
+      	.bind("maximize.viewerContainer", function() {
+      		that.toolbarCtrl.addView(new ToolbarView("mainTbView", that.toolbarCtrl.toolbarContainer, i18n));
+    		that.toolbarMgr.addModel(new StandardToolbarModelProvider("mainTb", that).getModel());
+    		if (that.PhysicalModel) {
+    			that.toolbarCtrl.checkNavigation(that.PhysicalModel.getCurPos());
+    		}
+    		that.toolbarCtrl.paint("mainTb");
+      })
+      	.bind("minimize.viewerContainer", function() {
+      		that.toolbarMgr.destroyModel('mainTb');
+      });
     }
 
     constructor.prototype.startViewer = function ii_startViewer(startFile) {

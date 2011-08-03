@@ -61,7 +61,6 @@ ToolbarController.prototype.addView = function(view) {
 	
 	jQuery(view)
 		.bind("press", function (e, args) {
-			console.log(args)
 			if (args.parentName == "zoomHandles") {
 				if (args.elementName == "zoomIn") {
 					// FitToScreen - Button wieder reseten
@@ -178,7 +177,6 @@ ToolbarController.prototype.addView = function(view) {
 	    		}
 	    	} else if (args.parentName == "permalinkHandles") {
     			if (args.elementName == "permalink") {
-    				console.log("here drin")
     				if (typeof that.getViewer().getPermalinkCtrl !== "undefined" && that.getViewer().getPermalinkCtrl().getActive()) {
     					// TODO: Model for Permalink
 			    		that.perform("setActive", true, 'permalinkHandles', 'permalink');
@@ -410,7 +408,7 @@ ToolbarController.prototype.perform = function(action, argument, buttonset, butt
 
 	for (var i = 0; i < models.length; i++) {
 		if (models[i].getElement(buttonset) && models[i].getElement(buttonset).getButton(button)) {
-			eval("models[i].getElement(buttonset).getButton(button)."+action+"("+argument+")");
+			eval("models[i].getElement('" + buttonset + "').getButton('" + button + "')."+action+"("+argument+")");
 		}
 	}
 };
