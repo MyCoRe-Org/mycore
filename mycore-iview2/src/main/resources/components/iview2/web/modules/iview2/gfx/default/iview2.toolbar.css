@@ -136,7 +136,7 @@
 	padding: .4em 1em;
 }
 
-..viewerContainer ui-button-icon-only .ui-button-text, .viewerContainer .ui-button-icons-only .ui-button-text {
+..viewerContainer .ui-button-icon-only .ui-button-text, .viewerContainer .ui-button-icons-only .ui-button-text {
 	padding: .4em;
 	text-indent: -9999999px;
 }
@@ -255,7 +255,7 @@
 	float: left;
 }
 
-.viewerContainer .previewTbView {
+.viewerContainer.min .previewTbView, .viewerContainer.max .previewTbView {
 	display: none;
 }
 
