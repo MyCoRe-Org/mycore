@@ -94,7 +94,6 @@ iview.i18n.prototype = {
 	 * @return		string translation of the given id in the requested language or languageCode::ID if no translation was found
 	 */
 	translate: function(id, languageCode) {
-		console.log(this._prefix + id)
 		var translation = this._langs[languageCode || this._defLang][this._prefix + id];
 		if (typeof translation !== "undefined") {
 			return translation;
