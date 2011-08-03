@@ -300,7 +300,6 @@ genProto.maximizeHandler = function() {
 	this.reinitializeGraphic();
 };
 
-//TODO drop Iview[viewID] commands and replace them with own General Object access
 PanoJS.doubleClickHandler = function(e) {
 	var iview = this.backingBean.iview;
 	if (iview.maximized && iview.gen.isInputHandlerEnabled()) {

@@ -68,7 +68,6 @@
       jQuery(window).load(function ii_initToolbars() {
         // entweder Mgr macht alles und Übergabe des related... (Modelprovider) oder Models kümmern sich untereinander und schöne Form
         // (siehe unten)
-        // Iview[viewID].getToolbarCtrl() oder Iview[viewID].toolbarCtrl verwenden?
         // vom Drop Down Menu nur die View oder auch ein Model im ToolbarManager?
 
         // Toolbar Manager
@@ -105,7 +104,6 @@
     }
 
     constructor.prototype.startViewer = function ii_startViewer(startFile) {
-      this.started = true; // TODO: check if still necessary
       // Load Page
       if (this.properties.useParam && URL.getParam("page") != "") {
         // TODO may be incomplete: Prevent Remote File Inclusion, but never Ever drop
