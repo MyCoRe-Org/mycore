@@ -3,6 +3,9 @@
  */
 package org.mycore.access.strategies;
 
+import java.util.Collection;
+
+import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -17,7 +20,10 @@ public class MCRDerivateIDStrategy implements MCRAccessCheckStrategy {
         if (!id.contains("_derivate_")) {
             return new MCRObjectIDStrategy().checkPermission(id, permission);
         }
-        MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(id));
-        return new MCRObjectIDStrategy().checkPermission(derivate.getOwnerID().toString(), permission);
+        final Collection<String> l = MCRLinkTableManager.instance().getSourceOf(id, "derivate");
+        if (l != null && !l.isEmpty()) {
+            return checkPermission(l.iterator().next(), "read");
+        }
+        return false;
     }
 }
