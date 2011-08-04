@@ -36,7 +36,7 @@
                 <layout>av-media</layout>
                 <layout>cproceeding</layout>
                 <layout>cpublication</layout>
-                <layout>bchapter</layout>
+                <layout>book-chapter</layout>
                 <layout>book</layout>
                 <layout>journal</layout>
                 <layout>article</layout>
