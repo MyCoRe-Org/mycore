@@ -142,7 +142,7 @@
             <xsl:value-of select="'cpublication'"/>
           </xsl:when>
           <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='book chapter'">
-            <xsl:value-of select="'bchapter'"/>
+            <xsl:value-of select="'book-chapter'"/>
           </xsl:when>
           <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='book'">
             <xsl:value-of select="'book'"/>

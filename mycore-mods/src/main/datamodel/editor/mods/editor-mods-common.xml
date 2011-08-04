@@ -45,10 +45,10 @@
 
   <helpPopup id="mods.title.help" width="400px" height="250px">
     <label xml:lang="de">
-      Titel des Reports
+      Titel des Dokuments
         </label>
     <label xml:lang="en">
-      title of report
+      title of document
         </label>
   </helpPopup>
   <!-- TITLE END -->
@@ -1003,6 +1003,27 @@
     <label xml:lang="en">Volume Count</label>
   </helpPopup>
   <!-- Bandzählung END -->
+
+  <!-- Seiten von bis -->
+  <text id="mods.book.pages.range.label">
+    <label xml:lang="de">Seiten von/bis</label>
+    <label xml:lang="en">Pages (Range)</label>
+  </text>
+
+  <panel id="mods.book.pages.range">
+    <cell anchor="WEST" var="mods:part/mods:extent[@unit='page']">
+      <panel>
+        <cell col="1" anchor="WEST" var="mods:start" ref="TFzeile10" />
+        <cell col="2" anchor="WEST" var="mods:end" ref="TFzeile10" />
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.book.pages.range.help">
+    <label xml:lang="de">Seiten von/bis</label>
+    <label xml:lang="en">Pages (Range)</label>
+  </helpPopup>
+  <!-- Seiten von bis END -->
 
   <!-- ISBN -->
   <text id="mods.book.isbn.label">
