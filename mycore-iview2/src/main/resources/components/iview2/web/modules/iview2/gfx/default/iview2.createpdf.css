@@ -105,3 +105,7 @@ div.modal-content,div.modal-data {
 #createpdf-container span {
 	color: #777;
 }
+
+div.min div.pdfCreator {
+	display: none;
+}
