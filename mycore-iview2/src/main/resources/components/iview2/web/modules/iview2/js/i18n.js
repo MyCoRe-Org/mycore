@@ -52,7 +52,7 @@ iview.i18n = function(location, defLanguage, prefix) {
 	this._prefix = (typeof prefix !== "undefined")? prefix + "." : "";
 	
 	this.loadLanguage(this._defLang);
-}
+};
 
 iview.i18n.prototype = {
 	/**
@@ -93,14 +93,28 @@ iview.i18n.prototype = {
 	 * note that if the language is currently not loaded an empty string will be returned, to ensure that the language is already loaded @see executeWhenLoaded
 	 * @return		string translation of the given id in the requested language or languageCode::ID if no translation was found
 	 */
-	translate: function(id, languageCode) {
-		var translation = this._langs[languageCode || this._defLang][this._prefix + id];
-		if (typeof translation !== "undefined") {
-			return translation;
-		} else {
-			return (languageCode || this._defLang) + "::" + id;
-		}
-	},
+	translate : function(id, languageCode) {
+    if (typeof languageCode === "undefined") {
+      return this.translate(id, this._defLang);
+    }
+    var translation = this._langs[languageCode][this._prefix + id];
+    if (typeof translation === "undefined") {
+      //try without prefix
+      translation = this._langs[languageCode][id];
+    }
+    if (typeof translation !== "undefined") {
+      return translation;
+    } else {
+      if (languageCode !== this._defLang) {
+        //try with default language
+        translation = this.translate(id, this._defLang);
+        if (translation.substring(0, this._defLang.length + 2) !== this._defLang + "::") {
+          return translation;
+        }
+      }
+      return (languageCode) + "::" + id;
+    }
+  },
 	
 	/**
 	 * @public
@@ -140,10 +154,10 @@ iview.i18n.prototype = {
 				//after the event i18n.load happened lets notify all listeners about the fact that a new defLang was set
 				jQuery(that).trigger("change.i18n", {"language": languageCode, "i18n": that});
 			});
-			this.loadLanguage(languageCode, callback)
+			this.loadLanguage(languageCode, callback);
 		} else {
 			jQuery(this).trigger("change.i18n", {"language": languageCode, "i18n": this});
 		}
 		return this;
 	}
-}
+};
