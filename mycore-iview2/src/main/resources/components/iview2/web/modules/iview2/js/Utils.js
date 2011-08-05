@@ -160,7 +160,7 @@ function hideProperty(o,name,writeable){
     Object.defineProperty(o, name, {
       writable: (typeof writeable !== "undefined")? writeable : true,
       enumerable: false,
-      configurable: false,
+      configurable: false
     });
   }
 }

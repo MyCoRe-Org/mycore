@@ -1,30 +1,4 @@
 //TODO Preload größe anhand der von den Kacheln bestimmen
-//var listener = []; // array who holds informations about the listeners (?)
-//NAVIGATE = 0;
-//
-//function addListener(type, theListener) {
-//	if (!listener[type]) {
-//		listener[type] = [];
-//	}
-//	listener[type].push(theListener);
-//}
-//
-//function dropListener(type, theListener) {
-//	for (var i = 0; i < listener[type].length; i++) {
-//		if (listener[type][i] == theListener) {
-//			listener[type].splice(i,1);
-//		}
-//	}
-//}
-//
-//notifyListenerNavigate(value, viewID) {
-//	if (!listener[NAVIGATE]) {
-//		return;
-//	}
-//	for(var i = 0; i < listener[NAVIGATE].length; i++) {
-//		listener[NAVIGATE][i].navi(value,viewID);
-//	}
-//};
 
 /**
  * @public
@@ -55,7 +29,7 @@ genProto.loadPage = function(callback, startFile) {
   			if(console){
   				console.log("Error occured while loading image properties:\n"+exception);
   			}
-  		},
+  		}
 	});
 };
 

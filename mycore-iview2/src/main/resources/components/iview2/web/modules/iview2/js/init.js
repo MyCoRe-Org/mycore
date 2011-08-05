@@ -10,7 +10,7 @@ iview.IViewObject = (function(){
   constructor.prototype = {
       getViewer: function iv_getViewer(){
         return this._iview;
-      },
+      }
   };
   return constructor;
 })();

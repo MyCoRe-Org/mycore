@@ -70,7 +70,7 @@
       },
       setScale : function zi_setScale(scale) {
         return this.scale = scale;
-      },
+      }
     };
     return constructor;
   })();

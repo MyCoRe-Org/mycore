@@ -48,7 +48,7 @@
           // class-change causes in IE resize
           this.container.removeClass("max").addClass("min");
         }
-      },
+      }
 
     };
 
