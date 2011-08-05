@@ -60,7 +60,6 @@ iview.Pdf = {};
 iview.Pdf.View = function(id, parent, basePath, pdfCreatorURI, pdfSourceXML, callback) {
   this.id = id;
 
-  this.content = jQuery('<textarea class="content" readonly="readonly" wrap="off" onfocus="this.select()"/>').first();
   this.pdfCreator = jQuery('<div>').addClass(id).addClass('pdfCreator').appendTo(parent).load(basePath + '/createpdf.html .modal-content',
       function() {
         var form = jQuery("form", this)[0];
