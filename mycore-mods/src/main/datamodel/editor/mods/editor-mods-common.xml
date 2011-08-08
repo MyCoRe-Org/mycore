@@ -64,6 +64,22 @@
       <repeater min="1" max="5" pos="right">
         <panel>
           <cell anchor="NORTHWEST" ref="TFzeile512" />
+          <cell row="1" col="2" anchor="NORTHWEST" var="@lang">
+            <list type="dropdown" default="de">
+              <item value="de">
+                <label xml:lang="de">deutsch</label>
+                <label xml:lang="en">german</label>
+              </item>
+              <item value="en">
+                <label xml:lang="de">englisch</label>
+                <label xml:lang="en">english</label>
+              </item>
+              <item value="other">
+                <label xml:lang="de">sontige</label>
+                <label xml:lang="en">other</label>
+              </item>
+            </list>
+          </cell>
         </panel>
       </repeater>
     </cell>
@@ -119,12 +135,12 @@
         <cell col="1">
           <list id="ListLang" type="dropdown" default="ger">
             <item value="ger">
-              <label xml:lang="de">Deutsch</label>
-              <label xml:lang="en">German</label>
+              <label xml:lang="de">deutsch</label>
+              <label xml:lang="en">german</label>
             </item>
             <item value="eng">
-              <label xml:lang="de">Englisch</label>
-              <label xml:lang="en">English</label>
+              <label xml:lang="de">englisch</label>
+              <label xml:lang="en">english</label>
             </item>
           </list>
         </cell>
