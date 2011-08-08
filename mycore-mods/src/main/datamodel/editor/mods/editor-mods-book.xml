@@ -16,7 +16,7 @@
     <hidden var="metadata/def.modsContainer/@notinherit" default="true" />
     <hidden var="metadata/def.modsContainer/@heritable" default="false" />
 
-    <!-- Title -->
+    <!-- Title --> <!-- ToDo: wird abgelöst durch MyCoRe-Parent-Child-Beziehung! -->
     <cell row="10" col="1" anchor="EAST" ref="mods.title.label" />
     <cell row="10" col="2" anchor="WEST" ref="mods.title" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
     <cell row="10" col="3" anchor="EAST" ref="mods.title.help" />
@@ -29,11 +29,12 @@
     <!-- Title Translated END -->
 
     <!-- Author -->
-    <cell row="40" col="1" anchor="NORTHEAST" ref="mods.author.label" />
-    <cell row="40" col="2" anchor="NORTHWEST" ref="mods.author" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="40" col="3" anchor="NORTHWEST" ref="mods.author.help" />
+    <cell row="30" col="1" anchor="NORTHEAST" ref="mods.author.label" />
+    <cell row="30" col="2" anchor="NORTHWEST" ref="mods.author" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="30" col="3" anchor="NORTHWEST" ref="mods.author.help" />
     <!-- Author END -->
 
+  <cell row="40" colspan="3" class="border"><panel style="width:100%;">
     <!-- Publisher [text] -->
     <cell row="50" col="1" anchor="HEAST" ref="mods.publisher.label" />
     <cell row="50" col="2" anchor="WEST" ref="mods.publisher" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
@@ -88,17 +89,11 @@
     <cell row="160" col="3" anchor="EAST" ref="mods.book.isbn.help" />
     <!-- ISBN END -->
 
-    <!-- Standort -->
-    <cell row="170" col="1" anchor="EAST" ref="mods.physicalLocation.label" />
-    <cell row="170" col="2" anchor="WEST" ref="mods.physicalLocation" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:location" />
-    <cell row="170" col="3" anchor="EAST" ref="mods.physicalLocation.help" />
-    <!-- Standort END -->
-
-    <!-- Identifier URI -->
-    <cell row="180" col="1" anchor="EAST" ref="mods.books.identifier.uri.label" />
-    <cell row="180" col="2" anchor="WEST" ref="mods.books.identifier.uri" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="180" col="3" anchor="EAST" ref="mods.books.identifier.uri.help" />
-    <!-- Identifier URI END -->
+    <!-- Identifier -->
+    <cell row="170" col="1" anchor="NORTHEAST" ref="mods.identifier.label" />
+    <cell row="170" col="2" anchor="NORTHWEST" ref="mods.identifier" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="170" col="3" anchor="NORTHWEST" ref="mods.identifier.help" />
+    <!-- Identifier END -->
 
     <!-- LANGUAGE -->
     <cell row="190" col="1" anchor="EAST" ref="mods.languageTerm.label" />
@@ -123,6 +118,7 @@
     <cell row="250" col="2" anchor="WEST" ref="mods.subject" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="250" col="3" anchor="EAST" ref="mods.subject.help" />
     <!-- Stichworte END -->
+  </panel></cell>
 
     <!-- Institution (wo bei BMELV-Forschung zugeordnet) -->
     <cell row="260" col="1" anchor="EAST" ref="mods.assignedInstituteClass.label" />
@@ -135,6 +131,12 @@
     <cell row="270" col="2" anchor="WEST" ref="mods.note" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="270" col="3" anchor="EAST" ref="mods.note.help" />
     <!-- Kommentar END -->
+
+    <!-- Standort -->
+    <cell row="280" col="1" anchor="EAST" ref="mods.physicalLocation.label" />
+    <cell row="280" col="2" anchor="WEST" ref="mods.physicalLocation" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:location" />
+    <cell row="280" col="3" anchor="EAST" ref="mods.physicalLocation.help" />
+    <!-- Standort END -->
 
     <!-- save/cancel buttons -->
     <cell col="1" colspan="3" row="300" anchor="EAST" style="padding-top:20px;">

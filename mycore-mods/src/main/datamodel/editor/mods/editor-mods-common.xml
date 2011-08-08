@@ -31,6 +31,11 @@
     <label xml:lang="en">Title (*)</label>
   </text>
 
+  <text id="mods.related.title.label">
+    <label xml:lang="de">Titel des Buches (*)</label>
+    <label xml:lang="en">Booktitle (*)</label>
+  </text>
+
   <panel id="mods.title">
     <cell anchor="NORTHWEST" var="mods:title">
       <panel>
@@ -94,32 +99,6 @@
         </label>
   </helpPopup>
   <!-- TITLE Translated END -->
-
-  <!-- SUBTITLE pub_title_engl[text] -->
-  <text id="mods.subTitle.label">
-    <label xml:lang="de">Untertitel</label>
-    <label xml:lang="en">Sub Title translated</label>
-  </text>
-
-  <panel id="mods.subTitle">
-    <cell anchor="NORTHWEST" var="mods:titleInfo/mods:subTitle">
-      <repeater min="1" max="5" pos="right">
-        <panel>
-          <cell anchor="NORTHWEST" ref="TFzeile512" />
-        </panel>
-      </repeater>
-    </cell>
-  </panel>
-
-  <helpPopup id="mods.subTitle.help" width="400px" height="250px">
-    <label xml:lang="de">
-      Untertitel des Reports
-        </label>
-    <label xml:lang="en">
-      subtitle of reports
-        </label>
-  </helpPopup>
-  <!-- SUBTITLE pub_title_engl[text] END -->
 
   <!-- LANGUAGE -->
   <text id="mods.languageTerm.label">
@@ -1060,26 +1039,6 @@
     <label xml:lang="en">ISBN (*)</label>
   </helpPopup>
   <!-- ISBN END -->
-
-  <!-- Identifier URI -->
-  <text id="mods.books.identifier.uri.label">
-    <label xml:lang="de">Identifier (URI)</label>
-    <label xml:lang="en">Identifier (URI)</label>
-  </text>
-
-  <panel id="mods.books.identifier.uri">
-    <cell anchor="NORTHWEST" var="mods:location/mods:url">
-      <panel>
-        <cell anchor="NORTHWEST" ref="TFzeile512" />
-      </panel>
-    </cell>
-  </panel>
-
-  <helpPopup id="mods.books.identifier.uri.help">
-    <label xml:lang="de">Identifier (URI)</label>
-    <label xml:lang="en">Identifier (URI)</label>
-  </helpPopup>
-  <!-- Identifier URI END -->
 
   <!-- *** Text fields *** -->
   <textfield id="TFzeile10" width="10" maxlength="10" />

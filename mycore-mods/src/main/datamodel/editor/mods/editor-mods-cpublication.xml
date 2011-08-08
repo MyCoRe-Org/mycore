@@ -27,7 +27,7 @@
     <!-- Konferenzband END -->
 
 
-  <cell row="20" colspan="3" class="border"><panel>
+  <cell row="20" colspan="3" class="border"><panel style="width:100%;">
     <!-- TITLE -->
     <cell row="10" col="1" anchor="NORTHEAST" ref="mods.title.label" />
     <cell row="10" col="2" anchor="NORTHWEST" ref="mods.title" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />

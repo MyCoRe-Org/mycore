@@ -57,7 +57,7 @@
     <cell row="60" col="3" anchor="NORTHWEST" ref="mods.corporation.help" />
     <!-- Körperschaft END -->
 
-  <cell row="70" colspan="3" class="border"><panel>
+  <cell row="70" colspan="3" class="border"><panel style="width:100%;">
     <!-- Konferenztitel -->
     <cell row="10" col="1" anchor="NORTHEAST" ref="mods.nameConference.label" />
     <cell row="10" col="2" anchor="NORTHWEST" ref="mods.nameConference" var="metadata/def.modsContainer/modsContainer/mods:mods" />

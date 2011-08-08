@@ -25,9 +25,9 @@
     <!-- pub_title_orig [text] END -->
 
     <!-- pub_title_engl[text] -->
-    <cell row="30" col="1" anchor="NORTHEAST" ref="mods.subTitle.label" />
-    <cell row="30" col="2" anchor="NORTHWEST" ref="mods.subTitle" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="30" col="3" anchor="NORTHWEST" ref="mods.subTitle.help" />
+    <cell row="20" col="1" anchor="NORTHEAST" ref="mods.title.translated.label" />
+    <cell row="20" col="2" anchor="NORTHWEST" ref="mods.title.translated" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="20" col="3" anchor="NORTHWEST" ref="mods.title.translated.help" />
     <!-- pub_title_engl[text] END -->
 
     <!-- pub_autor_dok_txt [text] and reviewer -->
@@ -36,6 +36,7 @@
     <cell row="40" col="3" anchor="NORTHWEST" ref="mods.author.help" />
     <!-- pub_autor_dok_txt [text] and reviewer END -->
 
+  <cell row="45" colspan="3" class="border"><panel style="width:100%;">
     <!-- LANGUAGE -->
     <cell row="50" col="1" anchor="NORTHEAST" ref="mods.languageTerm.label" />
     <cell row="50" col="2" anchor="NORTHWEST" ref="mods.languageTerm" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
@@ -101,6 +102,7 @@
     <cell row="160" col="2" anchor="NORTHWEST" ref="mods.subject" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="160" col="3" anchor="NORTHWEST" ref="mods.subject.help" />
     <!-- Stichworte END -->
+  </panel></cell>
 
     <!-- Institution (wo bei BMELV-Forschung zugeordnet) -->
     <cell row="165" col="1" anchor="NORTHEAST" ref="mods.assignedInstituteClass.label" />
