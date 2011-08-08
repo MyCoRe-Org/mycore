@@ -17,15 +17,15 @@
     <hidden var="metadata/def.modsContainer/@heritable" default="false" />
 
     <!-- Title related Item -->
-    <cell row="1" col="1" anchor="EAST" ref="mods.related.title.label" />
-    <cell row="1" col="2" anchor="WEST" ref="mods.title" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:titleInfo" />
-    <cell row="1" col="3" anchor="EAST" ref="mods.title.help" />
+    <cell row="1" col="1" anchor="NORTHEAST" ref="mods.related.title.label" />
+    <cell row="1" col="2" anchor="NORTHWEST" ref="mods.title" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:titleInfo" />
+    <cell row="1" col="3" anchor="NORTHWEST" ref="mods.title.help" />
     <!-- Title END -->
 
     <!-- Seiten von bis -->
-    <cell row="10" col="1" anchor="EAST" ref="mods.book.pages.range.label" />
-    <cell row="10" col="2" anchor="WEST" ref="mods.book.pages.range" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='host']" />
-    <cell row="10" col="3" anchor="EAST" ref="mods.book.pages.range.help" />
+    <cell row="10" col="1" anchor="NORTHEAST" ref="mods.book.pages.range.label" />
+    <cell row="10" col="2" anchor="NORTHWEST" ref="mods.book.pages.range" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='host']" />
+    <cell row="10" col="3" anchor="NORTHWEST" ref="mods.book.pages.range.help" />
     <!-- Seiten von bis END -->
 
     <!-- Identifier -->
@@ -35,9 +35,9 @@
     <!-- Identifier END -->
 
     <!-- Title -->
-    <cell row="20" col="1" anchor="EAST" ref="mods.title.label" />
-    <cell row="20" col="2" anchor="WEST" ref="mods.title" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
-    <cell row="20" col="3" anchor="EAST" ref="mods.title.help" />
+    <cell row="20" col="1" anchor="NORTHEAST" ref="mods.title.label" />
+    <cell row="20" col="2" anchor="NORTHWEST" ref="mods.title" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
+    <cell row="20" col="3" anchor="NORTHWEST" ref="mods.title.help" />
     <!-- Title END -->
 
     <!-- Author -->
@@ -48,21 +48,21 @@
 
   <cell row="35" colspan="3" class="border"><panel style="width:100%;">
     <!-- LANGUAGE -->
-    <cell row="40" col="1" anchor="EAST" ref="mods.languageTerm.label" />
-    <cell row="40" col="2" anchor="WEST" ref="mods.languageTerm" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
-    <cell row="40" col="3" anchor="EAST" ref="mods.languageTerm.help" />
+    <cell row="40" col="1" anchor="NORTHEAST" ref="mods.languageTerm.label" />
+    <cell row="40" col="2" anchor="NORTHWEST" ref="mods.languageTerm" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
+    <cell row="40" col="3" anchor="NORTHWEST" ref="mods.languageTerm.help" />
     <!-- LANGUAGE END -->
 
     <!-- Abstract -->
-    <cell row="60" col="1" anchor="EAST" ref="mods.abstract.label" />
-    <cell row="60" col="2" anchor="WEST" ref="mods.abstract" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="60" col="3" anchor="EAST" ref="mods.abstract.help" />
+    <cell row="60" col="1" anchor="NORTHEAST" ref="mods.abstract.label" />
+    <cell row="60" col="2" anchor="NORTHWEST" ref="mods.abstract" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="60" col="3" anchor="NORTHWEST" ref="mods.abstract.help" />
     <!-- Abstract END -->
 
     <!-- pub_klassifik -->
-    <cell row="80" col="1" anchor="EAST" ref="mods.ddc.label" />
-    <cell row="80" col="2" anchor="WEST" ref="mods.ddc" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="80" col="3" anchor="EAST" ref="mods.ddc.help" />
+    <cell row="80" col="1" anchor="NORTHEAST" ref="mods.ddc.label" />
+    <cell row="80" col="2" anchor="NORTHWEST" ref="mods.ddc" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="80" col="3" anchor="NORTHWEST" ref="mods.ddc.help" />
     <!-- pub_klassifik END -->
 
     <!-- Quelle -->
@@ -72,22 +72,22 @@
     <!-- Quelle END -->
 
     <!-- Stichworte -->
-    <cell row="120" col="1" anchor="EAST" ref="mods.subject.label" />
-    <cell row="120" col="2" anchor="WEST" ref="mods.subject" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="120" col="3" anchor="EAST" ref="mods.subject.help" />
+    <cell row="120" col="1" anchor="NORTHEAST" ref="mods.subject.label" />
+    <cell row="120" col="2" anchor="NORTHWEST" ref="mods.subject" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="120" col="3" anchor="NORTHWEST" ref="mods.subject.help" />
     <!-- Stichworte END -->
   </panel></cell>
 
     <!-- Institution (wo bei BMELV-Forschung zugeordnet) -->
-    <cell row="140" col="1" anchor="EAST" ref="mods.assignedInstituteClass.label" />
-    <cell row="140" col="2" anchor="WEST" ref="mods.assignedInstituteClass" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="140" col="3" anchor="EAST" ref="mods.assignedInstituteClass.help" />
+    <cell row="140" col="1" anchor="NORTHEAST" ref="mods.assignedInstituteClass.label" />
+    <cell row="140" col="2" anchor="NORTHWEST" ref="mods.assignedInstituteClass" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="140" col="3" anchor="NORTHWEST" ref="mods.assignedInstituteClass.help" />
     <!-- Institution END -->
 
     <!-- Kommentar -->
-    <cell row="160" col="1" anchor="EAST" ref="mods.note.label" />
-    <cell row="160" col="2" anchor="WEST" ref="mods.note" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="160" col="3" anchor="EAST" ref="mods.note.help" />
+    <cell row="160" col="1" anchor="NORTHEAST" ref="mods.note.label" />
+    <cell row="160" col="2" anchor="NORTHWEST" ref="mods.note" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="160" col="3" anchor="NORTHWEST" ref="mods.note.help" />
     <!-- Kommentar END -->
 
     <!-- Standort -->
