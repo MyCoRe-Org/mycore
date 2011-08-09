@@ -543,11 +543,6 @@ genProto.updateModuls = function() {
 //      this.iview.getToolbarCtrl().toolbarContainer.find(".toolbar").css("top", newTop);
 //    }
   }
-  // Actualize Chapter
-  if (this.iview.properties.useChapter && !(typeof this.iview.chapter === "undefined")) {
-    //prevent endless loop
-    this.iview.chapterReaction = true;
-  }
 }
 
 /**
@@ -607,7 +602,6 @@ genProto.importChapter = function(callback) {
 	this.iview.chapter = jQuery.extend(this.iview.chapter, new iview.chapter.Controller(this.iview.ChapterModelProvider, this.iview.PhysicalModelProvider));
 
 	this.iview.chapter.createView(this.iview.chapter.parent);
-	this.iview.chapterReaction = false;
 	this.iview.chapter.loaded = true;//signal that the chapter was loaded successfully
 	callback();
 };
