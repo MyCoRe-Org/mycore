@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan"
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:acl="xalan://org.mycore.access.MCRAccessManager" xmlns:mcr="http://www.mycore.org/"
-  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3" exclude-result-prefixes="xlink mcr i18n acl mods" version="1.0">
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:encoder="xalan://java.net.URLEncoder"
+  xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" exclude-result-prefixes="xlink mcr i18n acl mods mcrxsl encoder" version="1.0">
   <xsl:param select="'local'" name="objectHost" />
+  <xsl:param name="MCR.Users.Superuser.UserName" />
   <xsl:include href="mods2html.xsl" />
   <xsl:include href="modsmetadata.xsl" />
   <!--Template for result list hit: see results.xsl -->
@@ -80,7 +82,7 @@
   </xsl:template>
   <!--Template for generated link names and result titles: see mycoreobject.xsl, results.xsl, MyCoReLayout.xsl -->
   <xsl:template priority="1" mode="resulttitle" match="/mycoreobject[contains(@ID,'_mods_')]">
-    <xsl:apply-templates mode="title" select="."/>
+    <xsl:apply-templates mode="title" select="." />
   </xsl:template>
   <!--Template for title in metadata view: see mycoreobject.xsl -->
   <xsl:template priority="1" mode="title" match="/mycoreobject[contains(@ID,'_mods_')]">
@@ -88,8 +90,8 @@
       <!-- you could insert any title-like metadata here, e.g. replace "your-tags/here" by something of your metadata -->
       <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title">
         <xsl:call-template name="ShortenText">
-          <xsl:with-param name="text" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title[1]"/>
-          <xsl:with-param name="length" select="70"/>
+          <xsl:with-param name="text" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title[1]" />
+          <xsl:with-param name="length" select="70" />
         </xsl:call-template>
       </xsl:when>
       <xsl:otherwise>
@@ -100,33 +102,34 @@
   <xsl:template mode="mods-type" match="/mycoreobject">
     <xsl:choose>
       <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='thesis'">
-        <xsl:value-of select="'thesis'"/>
+        <xsl:value-of select="'thesis'" />
       </xsl:when>
-      <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='article' or
+      <xsl:when
+        test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='article' or
                       (./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:genre='periodical' and
                        ./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier/@type='doi')">
-        <xsl:value-of select="'article'"/>
+        <xsl:value-of select="'article'" />
       </xsl:when>
       <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='av media'">
-        <xsl:value-of select="'av-media'"/>
+        <xsl:value-of select="'av-media'" />
       </xsl:when>
       <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='conference proceeding'">
-        <xsl:value-of select="'cproceeding'"/>
+        <xsl:value-of select="'cproceeding'" />
       </xsl:when>
       <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='conference publication'">
-        <xsl:value-of select="'cpublication'"/>
+        <xsl:value-of select="'cpublication'" />
       </xsl:when>
       <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='book chapter'">
-        <xsl:value-of select="'book-chapter'"/>
+        <xsl:value-of select="'book-chapter'" />
       </xsl:when>
       <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='book'">
-        <xsl:value-of select="'book'"/>
+        <xsl:value-of select="'book'" />
       </xsl:when>
       <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='journal'">
-        <xsl:value-of select="'journal'"/>
+        <xsl:value-of select="'journal'" />
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="'report'"/>
+        <xsl:value-of select="'report'" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -146,35 +149,36 @@
     <table cellspacing="0" cellpadding="0" id="metaData">
       <!--1***modsContainer************************************* -->
       <xsl:variable name="mods-type">
-        <xsl:apply-templates mode="mods-type" select="."/>
+        <xsl:apply-templates mode="mods-type" select="." />
       </xsl:variable>
       <xsl:message>
-        MODS-TYPE: <xsl:value-of select="$mods-type"/>
+        MODS-TYPE:
+        <xsl:value-of select="$mods-type" />
       </xsl:message>
       <xsl:choose>
         <!-- xsl:when cases are handled in modsmetadata.xsl -->
         <xsl:when test="$mods-type = 'report'">
-          <xsl:apply-templates select="." mode="present.report"/>
+          <xsl:apply-templates select="." mode="present.report" />
         </xsl:when>
         <xsl:otherwise>
           <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/*/*" />
         </xsl:otherwise>
       </xsl:choose>
       <!--*** Editor Buttons ************************************* -->
-      <xsl:call-template name="editobject_with_der">
+      <xsl:call-template name="mods.editobject_with_der">
         <xsl:with-param select="./@ID" name="id" />
         <xsl:with-param select="$mods-type" name="layout" />
       </xsl:call-template>
       <xsl:variable name="child-layout">
         <xsl:choose>
           <xsl:when test="$mods-type = 'book'">
-            <xsl:value-of select="'book-chapter'"/>
+            <xsl:value-of select="'book-chapter'" />
           </xsl:when>
           <xsl:when test="$mods-type = 'cproceeding'">
-            <xsl:value-of select="'cpublication'"/>
+            <xsl:value-of select="'cpublication'" />
           </xsl:when>
           <xsl:when test="$mods-type = 'journal'">
-            <xsl:value-of select="'article'"/>
+            <xsl:value-of select="'article'" />
           </xsl:when>
         </xsl:choose>
       </xsl:variable>
@@ -245,7 +249,93 @@
       </tr>
     </table>
   </xsl:template>
-  <xsl:template mode="printDerivates" match="/mycoreobject">
+  <xsl:template name="mods.editobject_with_der">
+    <xsl:param name="accessedit" />
+    <xsl:param name="accessdelete" />
+    <xsl:param name="id" />
+    <xsl:param name="hasURN" select="'false'" />
+    <xsl:param name="displayAddDerivate" select="'true'" />
+    <xsl:param name="layout" select="'$'" />
+    <xsl:variable name="layoutparam">
+      <xsl:if test="$layout != '$'">
+        <xsl:value-of select="concat('&amp;layout=',$layout)" />
+      </xsl:if>
+    </xsl:variable>
+    <xsl:variable name="editURL">
+      <xsl:call-template name="mods.getObjectEditURL">
+        <xsl:with-param name="id" select="$id" />
+        <xsl:with-param name="layout" select="$layout" />
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:if test="$objectHost = 'local'">
+      <xsl:choose>
+        <xsl:when test="acl:checkPermission($id,'writedb') or acl:checkPermission($id,'deletedb')">
+          <xsl:variable name="type" select="substring-before(substring-after($id,'_'),'_')" />
+          <tr>
+            <td class="metaname">
+              <xsl:value-of select="concat(i18n:translate('metaData.edit'),' :')" />
+            </td>
+            <td class="metavalue">
+              <div class="editorButtons">
+                <xsl:if test="acl:checkPermission($id,'writedb')">
+                  <xsl:choose>
+                    <!-- ***************** -->
+                    <!-- object has no urn -->
+                    <!-- ***************** -->
+                    <xsl:when test="not(mcrxsl:hasURNDefined($id))">
+                      <a href="{$editURL}">
+                        <img src="{$WebApplicationBaseURL}images/workflow_objedit.gif" title="{i18n:translate('object.editObject')}" />
+                      </a>
+                      <xsl:if test="$displayAddDerivate='true'">
+                        <a href="{$ServletsBaseURL}derivate/create{$HttpSession}?id={$id}">
+                          <img src="{$WebApplicationBaseURL}images/workflow_deradd.gif" title="{i18n:translate('derivate.addDerivate')}" />
+                        </a>
+                      </xsl:if>
+                    </xsl:when>
+                    <!-- **************** -->
+                    <!-- object has a urn -->
+                    <!-- **************** -->
+                    <xsl:otherwise>
+                      <xsl:if test="$CurrentUser=$MCR.Users.Superuser.UserName">
+                        <a href="{$editURL}">
+                          <img src="{$WebApplicationBaseURL}images/workflow_objedit.gif" title="{i18n:translate('object.editObject')}" />
+                        </a>
+                      </xsl:if>
+                      <xsl:if test="$displayAddDerivate=true()">
+                        <a href="{$ServletsBaseURL}derivate/create{$HttpSession}?id={$id}">
+                          <img src="{$WebApplicationBaseURL}images/workflow_deradd.gif" title="{i18n:translate('derivate.addDerivate')}" />
+                        </a>
+                      </xsl:if>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:if>
+                <xsl:if test="acl:checkPermission($id,'deletedb') and (not(mcrxsl:hasURNDefined($id)) or (mcrxsl:hasURNDefined($id) and $CurrentUser=$MCR.Users.Superuser.UserName))">
+                  <a href="{$ServletsBaseURL}object/delete{$HttpSession}?id={$id}">
+                    <img src="{$WebApplicationBaseURL}images/workflow_objdelete.gif" title="{i18n:translate('object.delObject')}" />
+                  </a>
+                </xsl:if>
+              </div>
+            </td>
+          </tr>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:if>
+  </xsl:template>
+  <xsl:template name="mods.getObjectEditURL">
+    <xsl:param name="id" />
+    <xsl:param name="layout" select="'$'" />
+    <xsl:variable name="layoutSuffix">
+      <xsl:if test="$layout != '$'">
+        <xsl:value-of select="concat('-',$layout)" />
+      </xsl:if>
+    </xsl:variable>
+    <xsl:variable name="form" select="concat('editor_form_commit-mods',$layoutSuffix,'.xml')" />
+    <xsl:variable name="sourceURI" select="encoder:encode(concat('xslStyle:mycoreobject-editor:mcrobject:',$id),'UTF-8')" />
+    <xsl:variable name="cancelURL" select="encoder:encode($RequestURL,'UTF-8')" />
+    <xsl:value-of
+      select="concat($WebApplicationBaseURL,$form,$HttpSession,'?cancelUrl=',$cancelURL,'&amp;sourceUri=',$sourceURI,'&amp;mcrid=',$id)" />
+  </xsl:template>
+  <xsl:template mode="printDerivates" match="/mycoreobject[contains(@ID,'_mods_')]" priority="2">
     <xsl:param name="staticURL" />
     <xsl:param name="layout" />
     <xsl:param name="xmltempl" />
@@ -284,16 +374,13 @@
                   </td>
                   <xsl:if test="acl:checkPermission(./@ID,'writedb')">
                     <td align="right" valign="top">
-                      <a
-                        href="{$ServletsBaseURL}MCRStartEditorServlet{$HttpSession}?type={$type}&amp;re_mcrid={../../../@ID}&amp;se_mcrid={@xlink:href}&amp;te_mcrid={@xlink:href}&amp;todo=saddfile{$suffix}{$xmltempl}">
+                      <a href="{$ServletsBaseURL}derivate/update{$HttpSession}?objectid={../../../@ID}&amp;id={@xlink:href}{$suffix}">
                         <img title="Datei hinzufügen" src="{$WebApplicationBaseURL}images/workflow_deradd.gif" />
                       </a>
-                      <a
-                        href="{$ServletsBaseURL}MCRStartEditorServlet{$HttpSession}?type={$type}&amp;re_mcrid={../../../@ID}&amp;se_mcrid={@xlink:href}&amp;te_mcrid={@xlink:href}&amp;todo=seditder{$suffix}{$xmltempl}">
+                      <a href="{$ServletsBaseURL}derivate/update{$HttpSession}?id={@xlink:href}{$suffix}">
                         <img title="Derivat bearbeiten" src="{$WebApplicationBaseURL}images/workflow_deredit.gif" />
                       </a>
-                      <a
-                        href="{$ServletsBaseURL}MCRStartEditorServlet{$HttpSession}?type={$type}&amp;re_mcrid={../../../@ID}&amp;se_mcrid={@xlink:href}&amp;te_mcrid={@xlink:href}&amp;todo=sdelder{$suffix}{$xmltempl}">
+                      <a href="{$ServletsBaseURL}derivate/delete{$HttpSession}?id={@xlink:href}">
                         <img title="Derivat löschen" src="{$WebApplicationBaseURL}images/workflow_derdelete.gif" />
                       </a>
                     </td>
