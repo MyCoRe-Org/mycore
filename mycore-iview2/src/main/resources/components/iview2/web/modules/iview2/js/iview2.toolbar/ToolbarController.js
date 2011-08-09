@@ -134,7 +134,7 @@ ToolbarController.prototype.addView = function(view) {
 	    	// this is more than a button
 	    	if (args.parentName == "overviewHandles") {
     			if (args.elementName == "openChapter") {
-    				if (that.getViewer().chapter && that.getViewer().chapter.getActive()) {
+    				if (that.getViewer().chapter.loaded && that.getViewer().chapter.getActive()) {
     					that.perform("setSubtypeState", true, args.parentName, args.elementName);
     				}
     			}

@@ -503,7 +503,9 @@ genProto.openChapter = function(button){
 	}
 	var that = this;
 	// chapter isn't created
-	if (typeof this.iview.chapter === 'undefined') {
+	if (this.iview.chapter.loaded) {
+		this.iview.chapter.toggleView();
+	} else {
 		button.setLoading(true);
 		setTimeout(function(){
 			var callback = function() {
@@ -513,8 +515,6 @@ genProto.openChapter = function(button){
 			};
 			that.importChapter(callback);
 		}, 10);
-	} else {
-		this.iview.chapter.toggleView();
 	}
 }
 
@@ -575,10 +575,10 @@ genProto.viewerScroll = function(delta) {
 genProto.importOverview = function() {
 	var that = this;
 	var overviewMP = new iview.overview.ModelProvider();
-	this.iview.overview = {};
+	this.iview.overview = this.iview.overview || {};
 	this.iview.overview.Model = overviewMP.createModel();
 	this.iview.overview.ov = new iview.overview.Controller(overviewMP, i18n);
-	this.iview.overview.ov.createView({'thumbParent': this.iview.overviewParent, 'dampParent': this.iview.overviewParent});
+	this.iview.overview.ov.createView({'thumbParent': this.iview.overview.parent, 'dampParent': this.iview.overview.parent});
   var zoomScale=this.iview.currentImage.zoomInfo.getScale();
 	this.iview.overview.ov.attach("move.overview", function(e, val) {
 		that.iview.viewerBean.recenter(
@@ -590,6 +590,7 @@ genProto.importOverview = function() {
 	this.iview.overview.Model.setSize({
 		'x': preload.width(),
 		'y': preload.height()});
+	this.iview.overview.loaded = true;
 };
 
 /**
@@ -603,11 +604,11 @@ genProto.importOverview = function() {
 genProto.importChapter = function(callback) {
 	this.iview.ChapterModelProvider = new iview.METS.ChapterModelProvider(this.iview.metsDoc);
 	
-	this.iview.chapter = new iview.chapter.Controller(this.iview.ChapterModelProvider, this.iview.PhysicalModelProvider);
+	this.iview.chapter = jQuery.extend(this.iview.chapter, new iview.chapter.Controller(this.iview.ChapterModelProvider, this.iview.PhysicalModelProvider));
 
-	this.iview.chapter.createView(this.iview.chapterParent);
+	this.iview.chapter.createView(this.iview.chapter.parent);
 	this.iview.chapterReaction = false;
-
+	this.iview.chapter.loaded = true;//signal that the chapter was loaded successfully
 	callback();
 };
 

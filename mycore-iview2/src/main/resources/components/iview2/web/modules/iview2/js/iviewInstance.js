@@ -57,8 +57,8 @@
       }
       this.initialized = false;
       this.viewerContainer = container;
-      this.overviewParent = container; // TODO: get rid of this
-      this.chapterParent = container; // TODO: get rid of this
+      this.overview = jQuery.extend(this.overview || {}, {'loaded': (this.overview || {}).loaded || false,  'parent': container});
+      this.chapter = jQuery.extend(this.chapter | {}, {'loaded': (this.chapter || {}).loaded || false, 'parent': container});
       this.preload = container.find(".preload"); // TODO: move this somewhere
       this.gen = new iview.General(this);
       this.toolbarMgr = new ToolbarManager();
