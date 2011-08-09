@@ -4,6 +4,7 @@
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3" exclude-result-prefixes="xlink mcr i18n acl mods" version="1.0">
   <xsl:param select="'local'" name="objectHost" />
   <xsl:include href="mods2html.xsl" />
+  <xsl:include href="modsmetadata.xsl" />
   <!--Template for result list hit: see results.xsl -->
   <xsl:template match="mcr:hit[contains(@id,'_mods_')]">
     <xsl:param name="mcrobj" />
@@ -105,6 +106,39 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+  <xsl:template mode="mods-type" match="/mycoreobject">
+    <xsl:choose>
+      <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='thesis'">
+        <xsl:value-of select="'thesis'"/>
+      </xsl:when>
+      <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='article' or
+                      (./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:genre='periodical' and
+                       ./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier/@type='doi')">
+        <xsl:value-of select="'article'"/>
+      </xsl:when>
+      <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='av media'">
+        <xsl:value-of select="'av-media'"/>
+      </xsl:when>
+      <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='conference proceeding'">
+        <xsl:value-of select="'cproceeding'"/>
+      </xsl:when>
+      <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='conference publication'">
+        <xsl:value-of select="'cpublication'"/>
+      </xsl:when>
+      <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='book chapter'">
+        <xsl:value-of select="'book-chapter'"/>
+      </xsl:when>
+      <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='book'">
+        <xsl:value-of select="'book'"/>
+      </xsl:when>
+      <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='journal'">
+        <xsl:value-of select="'journal'"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="'report'"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
   <!--Template for metadata view: see mycoreobject.xsl -->
   <xsl:template priority="1" mode="present" match="/mycoreobject[contains(@ID,'_mods_')]">
     <xsl:variable name="objectBaseURL">
@@ -120,44 +154,25 @@
     </xsl:variable>
     <table cellspacing="0" cellpadding="0" id="metaData">
       <!--1***modsContainer************************************* -->
-      <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/*/*" />
-      <!--*** Editor Buttons ************************************* -->
-      <xsl:variable name="layout">
-        <xsl:choose>
-          <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='thesis'">
-            <xsl:value-of select="'thesis'"/>
-          </xsl:when>
-          <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='article' or
-                          (./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:genre='periodical' and
-                           ./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier/@type='doi')">
-            <xsl:value-of select="'article'"/>
-          </xsl:when>
-          <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='av media'">
-            <xsl:value-of select="'av-media'"/>
-          </xsl:when>
-          <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='conference proceeding'">
-            <xsl:value-of select="'cproceeding'"/>
-          </xsl:when>
-          <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='conference publication'">
-            <xsl:value-of select="'cpublication'"/>
-          </xsl:when>
-          <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='book chapter'">
-            <xsl:value-of select="'book-chapter'"/>
-          </xsl:when>
-          <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='book'">
-            <xsl:value-of select="'book'"/>
-          </xsl:when>
-          <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='journal'">
-            <xsl:value-of select="'journal'"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="'report'"/>
-          </xsl:otherwise>
-        </xsl:choose>
+      <xsl:variable name="mods-type">
+        <xsl:apply-templates mode="mods-type" select="."/>
       </xsl:variable>
+      <xsl:message>
+        MODS-TYPE: <xsl:value-of select="$mods-type"/>
+      </xsl:message>
+      <xsl:choose>
+        <!-- xsl:when cases are handled in modsmetadata.xsl -->
+        <xsl:when test="$mods-type = 'report'">
+          <xsl:apply-templates select="." mode="present.report"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/*/*" />
+        </xsl:otherwise>
+      </xsl:choose>
+      <!--*** Editor Buttons ************************************* -->
       <xsl:call-template name="editobject_with_der">
         <xsl:with-param select="./@ID" name="id" />
-        <xsl:with-param select="$layout" name="layout" />
+        <xsl:with-param select="$mods-type" name="layout" />
       </xsl:call-template>
       <xsl:variable name="typeToken">
         <types>
