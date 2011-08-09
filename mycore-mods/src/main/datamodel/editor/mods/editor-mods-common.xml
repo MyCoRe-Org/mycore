@@ -981,7 +981,7 @@
 
   <!-- Bandzählung -->
   <text id="mods.book.volume.count.label">
-    <label xml:lang="de">Bandzählung</label>
+    <label xml:lang="de">Jahrgang/Band</label>
     <label xml:lang="en">Volume Count</label>
   </text>
 
@@ -996,6 +996,26 @@
   <helpPopup id="mods.book.volume.count.help">
     <label xml:lang="de">Bandzählung</label>
     <label xml:lang="en">Volume Count</label>
+  </helpPopup>
+  <!-- Bandzählung END -->
+  
+  <!-- Bandzählung -->
+  <text id="mods.article.coverage.label">
+    <label xml:lang="de">Seiten von-bis</label>
+    <label xml:lang="en">Site coverage</label>
+  </text>
+
+  <panel id="mods.article.coverage">
+    <cell anchor="NORTHWEST" var="mods:part/mods:detail/mods:number">
+      <panel>
+        <cell anchor="NORTHWEST" ref="TFzeile512" />
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.article.coverage.help">
+    <label xml:lang="de">Seiten von-bis</label>
+    <label xml:lang="en">Site coverage</label>
   </helpPopup>
   <!-- Bandzählung END -->
 
