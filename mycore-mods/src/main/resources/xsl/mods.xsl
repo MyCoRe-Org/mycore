@@ -165,16 +165,31 @@
         <xsl:with-param select="./@ID" name="id" />
         <xsl:with-param select="$mods-type" name="layout" />
       </xsl:call-template>
-      <xsl:variable name="typeToken">
-        <types>
-          <xsl:call-template name="Tokenizer">
-            <xsl:with-param select="'mods'" name="string" />
-          </xsl:call-template>
-        </types>
+      <xsl:variable name="child-layout">
+        <xsl:choose>
+          <xsl:when test="$mods-type = 'book'">
+            <xsl:value-of select="'book-chapter'"/>
+          </xsl:when>
+          <xsl:when test="$mods-type = 'cproceeding'">
+            <xsl:value-of select="'cpublication'"/>
+          </xsl:when>
+          <xsl:when test="$mods-type = 'journal'">
+            <xsl:value-of select="'article'"/>
+          </xsl:when>
+        </xsl:choose>
       </xsl:variable>
-      <xsl:apply-templates mode="addChild" select="xalan:nodeset($typeToken)/types">
-        <xsl:with-param name="id" select="./@ID" />
-      </xsl:apply-templates>
+      <xsl:if test="string-length($child-layout) &gt; 0 and acl:checkPermission(./@ID,'writedb')">
+        <tr>
+          <td class="metaname">
+            <xsl:value-of select="concat(i18n:translate('metaData.addChildObject'),':')" />
+          </td>
+          <td class="metavalue">
+            <a href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout={$child-layout}&amp;parentID={./@ID}">
+              <xsl:value-of select="i18n:translate(concat('metaData.mods.types.',$child-layout))" />
+            </a>
+          </td>
+        </tr>
+      </xsl:if>
       <!--*** List children per object type ************************************* -->
       <!-- 1.) get a list of objectTypes of all child elements 2.) remove duplicates from this list 3.) for-each objectTyp id list child elements -->
       <xsl:variable name="objectTypes">
@@ -229,35 +244,6 @@
         </td>
       </tr>
     </table>
-  </xsl:template>
-  <xsl:template mode="addChild" match="types[token]">
-    <xsl:param name="id" />
-    <xsl:param name="layout" />
-    <xsl:param select="concat('&amp;_xml_structure%2Fparents%2Fparent%2F%40href=',$id)" name="xmltempl" />
-    <xsl:variable name="suffix">
-      <xsl:if test="string-length($layout)&gt;0">
-        <xsl:value-of select="concat('&amp;layout=',$layout)" />
-      </xsl:if>
-    </xsl:variable>
-    <xsl:if test="acl:checkPermission($id,'writedb')">
-      <tr>
-        <td class="metaname">
-          <xsl:value-of select="concat(i18n:translate('metaData.addChildObject'),':')" />
-        </td>
-        <td class="metavalue">
-          <ul>
-            <xsl:for-each select="token">
-              <xsl:variable select="." name="type" />
-              <li>
-                <a href="{$ServletsBaseURL}MCRStartEditorServlet{$HttpSession}?type={$type}&amp;step=author&amp;todo=wnewobj{$suffix}{$xmltempl}">
-                  <xsl:value-of select="i18n:translate(concat('metaData.',$type,'.[singular]'))" />
-                </a>
-              </li>
-            </xsl:for-each>
-          </ul>
-        </td>
-      </tr>
-    </xsl:if>
   </xsl:template>
   <xsl:template mode="printDerivates" match="/mycoreobject">
     <xsl:param name="staticURL" />
