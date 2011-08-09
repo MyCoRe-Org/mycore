@@ -441,10 +441,6 @@ genProto.viewerZoomed = function (zoomEvent) {
 	preload.css({"width": (currentImage.getWidth() / Math.pow(2, zoomInfo.getMaxLevel() - viewerBean.zoomLevel))*zoomInfo.getScale() +  "px",
 				 "height": (currentImage.getHeight() / Math.pow(2, zoomInfo.getMaxLevel() - viewerBean.zoomLevel))*zoomInfo.getScale() + "px"});
 
-	// Actualize forward & backward Buttons
-	if (!this.iview.maximized){
-	  this.iview.getToolbarCtrl().toolbarContainer.find(".toolbar").css("width", (currentImage.getWidth() / Math.pow(2, zoomInfo.getMaxLevel() - viewerBean.zoomLevel))*zoomInfo.getScale() +  "px");
-	}
 	this.handleScrollbars("zoom");
 
 	if (this.iview.properties.useOverview) {
