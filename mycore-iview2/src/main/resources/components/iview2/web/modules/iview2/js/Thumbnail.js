@@ -42,21 +42,21 @@ genProto.loadPage = function(callback, startFile) {
  * @param 		{object} imageProperties
  */
 genProto.processImageProperties = function(imageProperties, url){
-  this.iview.currentImage.processImageProperties(imageProperties, url);
+	this.iview.currentImage.processImageProperties(imageProperties, url);
 	var viewerBean = this.iview.viewerBean;
 	
 	// checks for enabled Modi & reset before
 	//TODO: check if initialModus is still needed
-	this.iview.initialModus = this.iview.zoomWidth ? "width" : this.iview.zoomScreen ? "screen" : "none";
+	this.iview.initialModus = this.iview.currentImage.zoomInfo.zoomWidth ? "width" : this.iview.currentImage.zoomInfo.zoomScreen ? "screen" : "none";
   //TODO: check if zoomInit is still needed
-	this.iview.zoomInit = Math.min(viewerBean.zoomLevel,this.iview.currentImage.zoomInfo.getMaxLevel());
+	this.iview.currentImage.zoomInfo.zoomInit = Math.min(viewerBean.zoomLevel,this.iview.currentImage.zoomInfo.getMaxLevel());
 	var thumbSource=viewerBean.tileUrlProvider.assembleUrl(0,0,0);
 	
 	var preload = new Image();
 	preload.className = "preloadImg";
 	var preloadCont=this.iview.context.preload;
-	preloadCont.css({"width" : this.iview.currentImage.getWidth() / Math.pow(2, this.iview.currentImage.zoomInfo.getMaxLevel() - this.iview.zoomInit) + "px",
-					 "height" : this.iview.currentImage.getHeight() / Math.pow(2, this.iview.currentImage.zoomInfo.getMaxLevel() - this.iview.zoomInit) + "px"})
+	preloadCont.css({"width" : this.iview.currentImage.getWidth() / Math.pow(2, this.iview.currentImage.zoomInfo.getMaxLevel() - this.iview.currentImage.zoomInfo.zoomInit) + "px",
+					 "height" : this.iview.currentImage.getHeight() / Math.pow(2, this.iview.currentImage.zoomInfo.getMaxLevel() - this.iview.currentImage.zoomInfo.zoomInit) + "px"})
 			 .empty()
 			 .append(preload);
 	preload.src = thumbSource;
@@ -67,19 +67,19 @@ genProto.processImageProperties = function(imageProperties, url){
 	// moves viewer to zoomLevel zoomInit
 	viewerBean.maxZoomLevel = this.iview.currentImage.zoomInfo.getMaxLevel();
 	// handle special Modi for new Page
-	if (this.iview.zoomWidth) {
-	  this.iview.zoomWidth=false;
+	if (this.iview.currentImage.zoomInfo.zoomWidth) {
+	  this.iview.currentImage.zoomInfo.zoomWidth=false;
 	  this.pictureWidth();
-	} else if (this.iview.zoomScreen) {
-	  this.iview.zoomScreen=false;
+	} else if (this.iview.currentImage.zoomInfo.zoomScreen) {
+	  this.iview.currentImage.zoomInfo.zoomScreen=false;
 		this.pictureScreen();
 	} else {
 		// moves viewer to zoomLevel zoomInit
-		viewerBean.zoom(this.iview.zoomInit - viewerBean.zoomLevel);
+		viewerBean.zoom(this.iview.currentImage.zoomInfo.zoomInit - viewerBean.zoomLevel);
 	}
 	
 	// damit das alte zoomBack bei Modi-Austritt nicht verwendet wird
-	this.iview.zoomBack = this.iview.zoomInit;
+	this.iview.currentImage.zoomInfo.zoomBack = this.iview.currentImage.zoomInfo.zoomInit;
 	var initX = this.iview.properties.useParam ? toFloat(URL.getParam("x")) : 0;
   var initY = this.iview.properties.useParam ? toFloat(URL.getParam("y")) : 0;
 	
@@ -258,7 +258,7 @@ genProto.calculateZoomProp = function(level, totalSize, viewerSize, scrollBarSiz
 	  this.iview.currentImage.zoomInfo.setScale(viewerRatio); //determine the scaling ratio
 		level = this.iview.currentImage.zoomInfo.getMaxLevel() - level;
 		viewerBean.tileSize = Math.floor((viewerSize - viewerRatio * lastTileWidth) / fullTileCount);
-		this.iview.zoomBack = viewerBean.zoomLevel;
+		this.iview.currentImage.zoomInfo.zoomBack = viewerBean.zoomLevel;
 		viewerBean.zoom(level - viewerBean.zoomLevel);
 		return true;
 	}
@@ -285,9 +285,9 @@ genProto.switchDisplayMode = function(screenZoom, stateBool, preventLooping) {
 		return;
 	}
 	if (screenZoom) {
-		this.iview.zoomWidth = false;
+		this.iview.currentImage.zoomInfo.zoomWidth = false;
 	} else {
-		this.iview.zoomScreen = false;
+		this.iview.currentImage.zoomInfo.zoomScreen = false;
 	}
 	stateBool = (stateBool)? false: true;
 	viewerBean.clear();
@@ -314,7 +314,7 @@ genProto.switchDisplayMode = function(screenZoom, stateBool, preventLooping) {
 		
 		//an infinite loop would arise if the repeal of the zoombar comes
 		if (typeof (preventLooping) == "undefined" || preventLooping == false) {
-			viewerBean.zoom(this.iview.zoomBack - viewerBean.zoomLevel);
+			viewerBean.zoom(this.iview.currentImage.zoomInfo.zoomBack - viewerBean.zoomLevel);
 		}
 	}
 
@@ -335,7 +335,7 @@ genProto.switchDisplayMode = function(screenZoom, stateBool, preventLooping) {
  */
 genProto.pictureWidth = function(preventLooping){
 	var bool = (typeof (preventLooping) != undefined)? preventLooping:false;
-	this.iview.zoomWidth = this.switchDisplayMode(false, this.iview.zoomWidth, bool);
+	this.iview.currentImage.zoomInfo.zoomWidth = this.switchDisplayMode(false, this.iview.currentImage.zoomInfo.zoomWidth, bool);
 };
 
 /**
@@ -348,7 +348,7 @@ genProto.pictureWidth = function(preventLooping){
  */
 genProto.pictureScreen = function(preventLooping){
 	var bool = (typeof (preventLooping) != undefined)? preventLooping:false;
-	this.iview.zoomScreen = this.switchDisplayMode(true, this.iview.zoomScreen, bool);
+	this.iview.currentImage.zoomInfo.zoomScreen = this.switchDisplayMode(true, this.iview.currentImage.zoomInfo.zoomScreen, bool);
 }
 
 /**
@@ -429,10 +429,10 @@ genProto.viewerZoomed = function (zoomEvent) {
 	var viewerBean = this.iview.viewerBean;
 	
 	// handle special Modes, needs to close
-	if (this.iview.zoomWidth) {
+	if (this.iview.currentImage.zoomInfo.zoomWidth) {
 		this.pictureWidth(true);
 	}
-	if (this.iview.zoomScreen) {
+	if (this.iview.currentImage.zoomInfo.zoomScreen) {
 		this.pictureScreen(true);
 	}
 	var preload = this.iview.context.preload;
@@ -638,9 +638,9 @@ genProto.zoomViewer = function(direction) {
 	var dir = 0;
 	if (direction) {
 		//if zoomWidth or zoomScreen was active and we're already in the max zoomlevel just reset the displayMode
-		if (this.iview.zoomScreen) {
+		if (this.iview.currentImage.zoomInfo.zoomScreen) {
 			this.pictureScreen(true);
-		} else if (this.iview.zoomWidth) {
+		} else if (this.iview.currentImage.zoomInfo.zoomWidth) {
 			this.pictureWidth(true);
 		}
 		if (viewerBean.zoomLevel != this.iview.currentImage.zoomInfo.getMaxLevel()) {
@@ -723,12 +723,13 @@ genProto.startFileLoaded = function(){
 	// choice if zoomLevel or special; zoomMode only makes sense in maximized viewer
 	if (this.iview.properties.useParam && URL.getParam("maximized") == "true") {
 		if (URL.getParam("tosize") == "width") {
-			if (!this.iview.zoomWidth) this.pictureWidth();
-		} else if (URL.getParam("tosize") == "screen") {
-			if (!this.iview.zoomScreen) this.pictureScreen();
-		} else if (isNaN(parseInt(URL.getParam("zoom")))){
-			if (!this.iview.zoomScreen) this.pictureScreen();
-		}
+			if (!this.iview.currentImage.zoomInfo.zoomWidth) this.pictureWidth();
+		} else if ((URL.getParam("tosize") == "screen" || isNaN(parseInt(URL.getParam("zoom"))))
+				&& !this.iview.currentImage.zoomInfo.zoomScreen) {
+			/*if (!this.iview.currentImage.zoomInfo.zoomScreen)*/ this.pictureScreen();
+		}// else if (isNaN(parseInt(URL.getParam("zoom")))){
+//			if (!this.iview.currentImage.zoomInfo.zoomScreen) this.pictureScreen();
+//		}
 		//Toolbar is initialized on dom-load event and may not yet ready
 	  var waitForToolbar = function (self, iviewInst){
 	    if (iviewInst.initialized){
@@ -740,7 +741,7 @@ genProto.startFileLoaded = function(){
 	  waitForToolbar(waitForToolbar, this.iview);
 	} else {
 		// in minimized viewer always pictureScreen
-		if (!this.iview.zoomScreen) this.pictureScreen();
+		if (!this.iview.currentImage.zoomInfo.zoomScreen) this.pictureScreen();
 	}
 	
 	var metsDocURI = this.iview.properties.webappBaseUri + "servlets/MCRMETSServlet/" + this.iview.properties.derivateId;

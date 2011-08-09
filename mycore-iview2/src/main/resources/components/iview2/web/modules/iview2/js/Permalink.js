@@ -154,9 +154,9 @@ iview.Permalink.Controller.prototype = {
 		url += "&y="+viewer.viewerBean.y;
 		
 		var size = "none";
-		if (viewer.zoomWidth)
+		if (viewer.currentImage.zoomInfo.zoomWidth)
 			size = "width";
-		if (viewer.zoomScreen)
+		if (viewer.currentImage.zoomInfo.zoomScreen)
 			size = "screen";
 		
 		url += "&tosize="+size;

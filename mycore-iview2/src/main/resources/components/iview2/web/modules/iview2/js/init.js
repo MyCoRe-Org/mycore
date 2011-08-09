@@ -171,7 +171,7 @@ genProto.initializeGraphic = function() {
 			tileSize: this.iview.properties.tileSize,//Kachelgroesse
 			tileUrlProvider: iviewTileUrlProvider,
 			maxZoom: this.iview.currentImage.zoomInfo.getMaxLevel(),
-			initialZoom: this.iview.zoomInit,//Anfangs-Zoomlevel
+			initialZoom: this.iview.currentImage.zoomInfo.zoomInit,//Anfangs-Zoomlevel
 			loadingTile: "../modules/iview2/" + styleFolderUri + 'blank.gif'
 		});
 
@@ -228,11 +228,11 @@ genProto.reinitializeGraphic = function() {
 	viewerBean.resize();
 	
 	// den Modus beibehalten & aktualisieren
-	if(this.iview.zoomScreen){
-		this.iview.zoomScreen = !this.iview.zoomScreen;	
+	if(this.iview.currentImage.zoomInfo.zoomScreen){
+		this.iview.currentImage.zoomInfo.zoomScreen = !this.iview.currentImage.zoomInfo.zoomScreen;	
 		this.pictureScreen();
-	} else if(this.iview.zoomWidth){
-		this.iview.zoomWidth = !this.iview.zoomWidth;
+	} else if(this.iview.currentImage.zoomInfo.zoomWidth){
+		this.iview.currentImage.zoomInfo.zoomWidth = !this.iview.currentImage.zoomInfo.zoomWidth;
 		this.pictureWidth();
 	}
 	
