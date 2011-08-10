@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<import>
+  <include uri="webapp:editor/editor-mods-common.xml" />
+
+  <panel id="edit-mods-article">
+    <hidden var="@ID" />
+    <hidden var="@label" />
+    <hidden var="@version" />
+    <hidden var="service" descendants="true" />
+    <hidden var="metadata/@xml:lang" default="de" />
+
+    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/@ID" />
+    <hidden var="metadata/def.modsContainer/@class" default="MCRMetaXML" />
+    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre" default="journal" />
+    <hidden var="metadata/def.modsContainer/@notinherit" default="true" />
+    <hidden var="metadata/def.modsContainer/@heritable" default="false" />
+    
+    <!-- pub_title_orig [text] -->
+    <cell row="10" col="1" anchor="NORTHEAST" ref="mods.title.label" />
+    <cell row="10" col="2" anchor="NORTHWEST" ref="mods.title" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
+    <cell row="10" col="3" anchor="NORTHWEST" ref="mods.title.help" />
+    <!-- pub_title_orig [text] END -->
+
+    <cell col="1" colspan="3" row="300" anchor="EAST" style="padding-top:20px;">
+      <submitButton width="100px" i18n="common.button.save" />
+      <cancelButton width="100px" i18n="common.button.cancel" />
+    </cell>
+  </panel>
+</import>
