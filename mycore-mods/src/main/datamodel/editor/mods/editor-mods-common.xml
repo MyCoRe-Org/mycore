@@ -625,8 +625,8 @@
 
   <!-- Identifier -->
   <text id="mods.identifier.label">
-    <label xml:lang="de">Identifier (*)</label>
-    <label xml:lang="en">Identifier (*)</label>
+    <label xml:lang="de">Identifier</label>
+    <label xml:lang="en">Identifier</label>
   </text>
 
   <panel id="mods.identifier">
@@ -1059,6 +1059,77 @@
     <label xml:lang="en">ISBN (*)</label>
   </helpPopup>
   <!-- ISBN END -->
+
+  <!-- ISSN -->
+  <text id="mods.issn.label">
+    <label xml:lang="de">ISSN (*)</label>
+    <label xml:lang="en">ISSN (*)</label>
+  </text>
+
+  <panel id="mods.issn">
+    <cell anchor="NORTHWEST" var="mods:identifier[@type='issn']">
+      <panel>
+        <cell anchor="NORTHWEST" ref="TFzeile512" />
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.issn.help">
+    <label xml:lang="de">ISSN</label>
+    <label xml:lang="en">ISSN</label>
+  </helpPopup>
+  <!-- ISBN END -->
+
+  <!-- Impact Factor -->
+  <text id="mods.impactfactor.label">
+    <label xml:lang="de">Impactfaktor</label>
+    <label xml:lang="en">Impact Factor</label>
+  </text>
+
+  <panel id="mods.impactfactor">
+    <cell anchor="NORTHWEST" var="mods:extension[@displayLabel='impactfactor']">
+      <panel>
+        <cell anchor="NORTHWEST" ref="TFzeile512" />
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.impactfactor.help">
+    <label xml:lang="de">Journal Impact Factor (JIF)</label>
+    <label xml:lang="en">Journal Impact Factor (JIF)</label>
+  </helpPopup>
+  <!-- Impact Factor END -->
+
+  <!-- ist referiert -->
+  <text id="mods.referenced.label">
+    <label xml:lang="de">ist referiert</label>
+    <label xml:lang="en">referenced</label>
+  </text>
+
+  <panel id="mods.referenced">
+    <cell anchor="NORTHWEST" var="mods:extension[@displayLabel='referenced']">
+      <panel>
+        <cell anchor="NORTHWEST">
+          <list type="dropdown" default="yes">
+            <item value="yes">
+              <label xml:lang="de">Ja</label>
+              <label xml:lang="en">Yes</label>
+            </item>
+            <item value="no">
+              <label xml:lang="de">Nein</label>
+              <label xml:lang="en">No</label>
+            </item>
+          </list>
+        </cell>
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.referenced.help">
+    <label xml:lang="de">ist referiert</label>
+    <label xml:lang="en">is referenced</label>
+  </helpPopup>
+  <!-- Impact Factor END -->
 
   <!-- *** Text fields *** -->
   <textfield id="TFzeile10" width="10" maxlength="10" />
