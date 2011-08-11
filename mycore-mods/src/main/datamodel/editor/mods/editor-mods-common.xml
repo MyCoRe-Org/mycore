@@ -1,30 +1,5 @@
 <imports xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
-  <!-- genre classification -->
-  <text id="mods.genre.class.label">
-    <label xml:lang="de">Genre (*)</label>
-    <label xml:lang="en">Genre (*)</label>
-  </text>
-
-  <panel id="mods.genre.class">
-    <cell anchor="NORTHWEST" var="mods:classification">
-      <list width="30" type="dropdown">
-        <include ref="pleaseSelect" />
-        <include uri="classification:editor:-1:children:diniPublType" cacheable="false" />
-      </list>
-    </cell>
-    <condition required="true">
-      <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
-      <label xml:lang="en">Please select one entry!</label>
-    </condition>
-  </panel>
-
-  <helpPopup id="mods.genre.class.help" width="400px" height="250px">
-    <label xml:lang="de">Wählen Sie bitte das zugehörige Genre aus.</label>
-    <label xml:lang="en">Select an entry from the genre list.</label>
-  </helpPopup>
-  <!-- genre classification END -->
-
   <!-- TITLE -->
   <text id="mods.title.label">
     <label xml:lang="de">Titel (*)</label>
@@ -143,11 +118,67 @@
 
   <!-- pub_autor_dok_txt [text] and reviewer -->
   <text id="mods.author.label">
+    <label xml:lang="de">Autor(en) (*)</label>
+    <label xml:lang="en">Author(s) (*)</label>
+  </text>
+
+  <panel id="mods.author">
+    <cell anchor="NORTHWEST" var="mods:name[@type='personal']">
+      <repeater min="1" max="20" pos="right">
+        <panel>
+          <hidden var="mods:role/mods:roleTerm/@authority" default="marcrelator" />
+          <hidden var="mods:role/mods:roleTerm/@type" default="text" />
+          <hidden var="mods:role/mods:roleTerm" default="author" />
+          <cell col="1" row="1" anchor="NORTHEAST">
+            <text>
+              <label xml:lang="de">Vorname</label>
+              <label xml:lang="en">First Name</label>
+            </text>
+          </cell>
+          <cell col="2" row="1" anchor="NORTHEAST" var="mods:namePart[@type='given']">
+            <textfield width="31" maxlength="128">
+              <condition required="true">
+                <label xml:lang="de">Bitte geben Sie den Vornamen der Person an!</label>
+                <label xml:lang="en">Please insert authors first name.</label>
+              </condition>
+            </textfield>
+          </cell>
+          <cell col="1" row="2" anchor="NORTHEAST">
+            <text>
+              <label xml:lang="de">Nachname</label>
+              <label xml:lang="en">Last Name</label>
+            </text>
+          </cell>
+          <cell col="2" row="2" anchor="NORTHEAST" var="mods:namePart[@type='family']">
+            <textfield width="31" maxlength="128">
+              <condition required="true">
+                <label xml:lang="de">Bitte geben Sie den Nachnamen der Person an!</label>
+                <label xml:lang="en">Please insert persons last name.</label>
+              </condition>
+            </textfield>
+          </cell>
+        </panel>
+      </repeater>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.author.help" width="400px" height="250px">
+    <label xml:lang="de">
+      Personen (Verlinkung auf PND)
+        </label>
+    <label xml:lang="en">
+      Persons (ref to pnd)
+        </label>
+  </helpPopup>
+  <!-- pub_autor_dok_txt [text] and reviewer END -->
+
+  <!-- person -->
+  <text id="mods.person.label">
     <label xml:lang="de">Personen (*)</label>
     <label xml:lang="en">Persons (*)</label>
   </text>
 
-  <panel id="mods.author">
+  <panel id="mods.person">
     <cell anchor="NORTHWEST" var="mods:name[@type='personal']">
       <repeater min="1" max="20" pos="right">
         <panel>
@@ -165,6 +196,10 @@
                     <label xml:lang="de">Gutachter</label>
                     <label xml:lang="en">Reviewer</label>
                   </item>
+                  <!-- item value="publisher">
+                    <label xml:lang="de">Herausgeber</label>
+                    <label xml:lang="en">Publisher</label>
+                  </item -->
                 </list>
               </cell>
             </panel>
@@ -202,7 +237,7 @@
     </cell>
   </panel>
 
-  <helpPopup id="mods.author.help" width="400px" height="250px">
+  <helpPopup id="mods.person.help" width="400px" height="250px">
     <label xml:lang="de">
       Personen (Verlinkung auf PND)
         </label>
@@ -210,7 +245,7 @@
       Persons (ref to pnd)
         </label>
   </helpPopup>
-  <!-- pub_autor_dok_txt [text] and reviewer END -->
+  <!-- person END -->
 
   <!-- Institutionszugehörigkeit (wo zugeordnet) -->
   <text id="mods.assignedInstituteClass.label">
