@@ -199,8 +199,7 @@ ToolbarController.prototype.addView = function(view) {
  */
 ToolbarController.prototype.catchModels = function() {
 	var that = this;
-
-	var toolbarMgr = this.getViewer().getToolbarMgr();
+	var toolbarMgr = this.getViewer().toolbarMgr;
 	var models = toolbarMgr.getModels();
 	
 	// attach listeners to ToolbarManager
@@ -321,7 +320,7 @@ ToolbarController.prototype._checkNewModel = function(model) {
 	loadEvent.model = model;
 	//TODO: optimize this method invocation 
 	loadEvent.getViews = function(){
-		var ctrl=this.viewer.getToolbarCtrl();
+		var ctrl=this.viewer.toolbarCtrl;
 		var views=[];
 		var relView=ctrl.relations[this.model.id];
 		for (var i = 0; i < relView.length; i++){
@@ -345,7 +344,7 @@ ToolbarController.prototype.checkNavigation = function(pNum) {
 	var tooHigh = (pNum >= this.getViewer().amountPages)? true : false;
 	var tooLow = (pNum <= 1)? true : false;
 	
-	var models = this.getViewer().getToolbarMgr().getModels();
+	var models = this.getViewer().toolbarMgr.getModels();
 
 	this.perform("setActive", !tooLow, 'previewBack', 'backward');
 	this.perform("setActive", !tooHigh, 'previewForward', 'forward');
@@ -369,7 +368,7 @@ ToolbarController.prototype.checkZoom = function(zoom) {
 	var zoomIn = (viewer.currentImage.getWidth() <= preload.width() && viewer.currentImage.getHeight() <= preload.height())? false : true;
 	var zoomOut = (zoom == 0)? false : true;
 	
-	var models = this.getViewer().getToolbarMgr().getModels();
+	var models = this.getViewer().toolbarMgr.getModels();
 
 	this.perform("setActive", zoomIn, 'zoomHandles', 'zoomIn');
 	this.perform("setActive", zoomOut, 'zoomHandles', 'zoomOut');
@@ -404,7 +403,7 @@ ToolbarController.prototype.updateDropDown = function(content) {
  * @param		{String} button defines the name of the button
  */
 ToolbarController.prototype.perform = function(action, argument, buttonset, button) {
-	var models = this.getViewer().getToolbarMgr().getModels();
+	var models = this.getViewer().toolbarMgr.getModels();
 
 	for (var i = 0; i < models.length; i++) {
 		if (models[i].getElement(buttonset) && models[i].getElement(buttonset).getButton(button)) {

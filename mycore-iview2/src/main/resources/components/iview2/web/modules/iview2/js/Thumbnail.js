@@ -435,15 +435,11 @@ viewerZoomed = function () {
 	}
 	var preload = this.iview.context.preload;
 	var currentImage=this.iview.currentImage;
-  var zoomInfo=currentImage.zoomInfo;
+	var zoomInfo=currentImage.zoomInfo;
 	preload.css({"width": (currentImage.getWidth() / Math.pow(2, zoomInfo.getMaxLevel() - viewerBean.zoomLevel))*zoomInfo.getScale() +  "px",
 				 "height": (currentImage.getHeight() / Math.pow(2, zoomInfo.getMaxLevel() - viewerBean.zoomLevel))*zoomInfo.getScale() + "px"});
 
 	this.handleScrollbars("zoom");
-
-	// check buttons
-	//TODO move this to the init of the toolbar
-	this.iview.getToolbarCtrl().checkZoom(viewerBean.zoomLevel);
 }
 
 /**
@@ -514,7 +510,7 @@ genProto.updateModuls = function() {
     this.handleScrollbars();
     try {
       //repaint Toolbar as if the width of the dropdown changes the spring needs to be adjusted
-      this.iview.getToolbarCtrl().paint("mainTb");	
+      this.iview.toolbarCtrl.paint("mainTb");	
     } catch (e) {}
   } else {
     //TODO: align image and toolbar to the center
@@ -777,7 +773,7 @@ genProto.processMETS = function(metsDoc) {
 	this.iview.PhysicalModelProvider = new iview.METS.PhysicalModelProvider(metsDoc);
 	this.iview.PhysicalModel = this.iview.PhysicalModelProvider.createModel();
 	var physicalModel = this.iview.PhysicalModel;
-	var toolbarCtrl = this.iview.getToolbarCtrl();
+	var toolbarCtrl = this.iview.toolbarCtrl;
 	this.iview.amountPages = physicalModel.getNumberOfPages();
 	physicalModel.setPosition(physicalModel.getPosition(this.iview.currentImage.getName()));
 	jQuery(physicalModel).bind("select.METS", function(e, val) {
@@ -808,7 +804,7 @@ genProto.processMETS = function(metsDoc) {
 		}
 	}
 	pagelist.append(ul);
-	this.iview.getToolbarCtrl().toolbarContainer.append(pagelist);
+	this.iview.toolbarCtrl.toolbarContainer.append(pagelist);
 
 	// if METS File is loaded after the drop-down-menu (in mainToolbar) its content needs to be updated
 	if (jQuery('.navigateHandles .pageBox')[0]) {

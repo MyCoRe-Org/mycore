@@ -179,7 +179,7 @@ genProto.initializeGraphic = function() {
 
 		this.iview.viewerBean.init();
 		
-		this.reinitializeGraphic();
+		this.reinitializeGraphic(function() {jQuery(that.iview.viewerBean.viewer).trigger("init.viewer");});
 	}
 };
 
@@ -188,9 +188,10 @@ genProto.initializeGraphic = function() {
  * @function
  * @name		reinitializeGraphic
  * @memberOf	iview.General
+ * @param		{function} callback which is called just before the event reinit.viewer is triggered
  * @description	is called if the viewer size is resized and calculates/set therefore all values for the current zoomlevel and viewModus (i.e. scrrenWidth)
  */
-genProto.reinitializeGraphic = function() {
+genProto.reinitializeGraphic = function(callback) {
 	var viewerBean = this.iview.viewerBean;
 	if (viewerBean == null) return;
 		
@@ -243,6 +244,9 @@ genProto.reinitializeGraphic = function() {
 	
 	this.handleScrollbars("resize");
 	
+	if (typeof arguments[0] === "function") {
+		arguments[0]();
+	}
 	//notify all listeners that the viewer was modified in such way that they possibly need adaptation of their own view
 	jQuery(this.iview.viewerBean.viewer).trigger("reinit.viewer");
 	
@@ -254,7 +258,6 @@ genProto.reinitializeGraphic = function() {
 	  //var newTop = ((((this.iview.currentImage.getHeight() / Math.pow(2, this.iview.currentImage.zoomInfo.getMaxLevel() - 1)) * this.iview.currentImage.zoomInfo.getScale()) - (previewTbView.height() + toInt(previewTbView.css("padding-top")) + toInt(previewTbView.css("padding-bottom")))) / 2) + "px";
 		//this.iview.getToolbarCtrl().toolbarContainer.find(".toolbar").css("top", newTop);
 //	}
-	this.iview.toolbarCtrl.paint("mainTb");
 };
 
 /**

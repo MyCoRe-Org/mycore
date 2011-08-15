@@ -61,25 +61,8 @@
       this.chapter = jQuery.extend(this.chapter | {}, {'loaded': (this.chapter || {}).loaded || false, 'parent': container});
       this.preload = container.find(".preload"); // TODO: move this somewhere
       this.gen = new iview.General(this);
-      //TODO defer loading of Toolbar stuff until viewer is created
-      this.toolbarMgr = new ToolbarManager();
-      this.toolbarCtrl = new ToolbarController(this);
-      // load toolbar after all resources (css, images) are ready
+      //TODO load toolbar after all resources (css, images) are ready
       var that = this;
-      jQuery(window).load(function ii_initToolbars() {
-        // entweder Mgr macht alles und Übergabe des related... (Modelprovider) oder Models kümmern sich untereinander und schöne Form
-        // (siehe unten)
-        // vom Drop Down Menu nur die View oder auch ein Model im ToolbarManager?
-
-        // Toolbar Manager
-        that.toolbarMgr.addModel(new PreviewToolbarModelProvider("previewTb").getModel());
-        // Toolbar Controller
-        that.toolbarCtrl.addView(new ToolbarView("previewTbView", that.toolbarCtrl.toolbarContainer, i18n));
-
-        // holt alle bisherigen Models in den Controller und setzt diese entsprechend um
-        that.toolbarCtrl.catchModels();
-        that.initialized = true;
-      });
       jQuery(this.viewerContainer)
       	.bind("maximize.viewerContainer", function() {
       		that.toolbarCtrl.addView(new ToolbarView("mainTbView", that.toolbarCtrl.toolbarContainer, i18n));
@@ -101,7 +84,30 @@
       })
       	.bind("minimize.viewerContainer", function() {
       		that.toolbarMgr.destroyModel('mainTb');
-      });
+      })
+      	//exploit that the init.viewer event bubbles up the DOM hierarchy
+      	.bind("init.viewer", function(){
+            that.toolbarMgr = new ToolbarManager();
+            that.toolbarCtrl = new ToolbarController(that);
+        // entweder Mgr macht alles und Übergabe des related... (Modelprovider) oder Models kümmern sich untereinander und schöne Form
+        // (siehe unten)
+        // vom Drop Down Menu nur die View oder auch ein Model im ToolbarManager?
+
+        // Toolbar Manager
+        that.toolbarMgr.addModel(new PreviewToolbarModelProvider("previewTb").getModel());
+        // Toolbar Controller
+        that.toolbarCtrl.addView(new ToolbarView("previewTbView", that.toolbarCtrl.toolbarContainer, i18n));
+
+        // holt alle bisherigen Models in den Controller und setzt diese entsprechend um
+        that.toolbarCtrl.catchModels();
+        that.initialized = true;
+      })
+      	.bind("reinit.viewer", function() {
+      		that.toolbarCtrl.paint("mainTb");
+      })
+      	.bind("zoom.viewer", function() {
+      		that.toolbarCtrl.checkZoom(that.viewerBean.zoomLevel);
+      })
     }
 
     constructor.prototype.startViewer = function ii_startViewer(startFile) {
@@ -113,14 +119,6 @@
       // remove leading '/'
       startFile = encodeURI(startFile.replace(/^\/*/, ""));
       this.gen.loading(startFile);
-    };
-
-    constructor.prototype.getToolbarMgr = function ii_getToolbarMgr() {
-      return this.toolbarMgr;
-    };
-
-    constructor.prototype.getToolbarCtrl = function ii_getToolbarCtrl() {
-      return this.toolbarCtrl;
     };
 
     return constructor;
