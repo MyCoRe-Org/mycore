@@ -37,18 +37,6 @@ ToolbarManager.prototype = {
 	/**
 	 * @public
 	 * @function
-	 * @name		getModels
-	 * @memberOf	ToolbarModel#
-	 * @description returns an array with each toolbar model out of the toolbar manager
-	 * @return		{Array} returns an array of all toolbar models, which are registred in the toolbar manager
-	 */
-	getModels : function() {
-		return this.models;
-	},
-
-	/**
-	 * @public
-	 * @function
 	 * @name		addModel
 	 * @memberOf	ToolbarManager#
 	 * @description adds a single toolbar model to the toolbar manager,

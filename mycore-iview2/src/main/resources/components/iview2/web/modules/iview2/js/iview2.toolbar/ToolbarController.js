@@ -28,19 +28,6 @@ var ToolbarController =(function() {
 /**
  * @public
  * @function
- * @name		getView
- * @memberOf	ToolbarController#
- * @description returns a single view out of the views array
- * @param		{String} viewID name that identifies a single view
- * @return		{Object} a single view, identified by its viewID
- */
-ToolbarController.prototype.getView = function(viewID) {
-	return this.views[viewID];
-};
-
-/**
- * @public
- * @function
  * @name		addView
  * @memberOf	ToolbarController#
  * @description adds an existing view to the ToolbarController,
@@ -200,7 +187,7 @@ ToolbarController.prototype.addView = function(view) {
 ToolbarController.prototype.catchModels = function() {
 	var that = this;
 	var toolbarMgr = this.getViewer().toolbarMgr;
-	var models = toolbarMgr.getModels();
+	var models = toolbarMgr.models;
 	
 	// attach listeners to ToolbarManager
     jQuery(toolbarMgr).bind("changeState changeLoading changeActive add del destroy new", function (e, args) {
@@ -344,7 +331,7 @@ ToolbarController.prototype.checkNavigation = function(pNum) {
 	var tooHigh = (pNum >= this.getViewer().amountPages)? true : false;
 	var tooLow = (pNum <= 1)? true : false;
 	
-	var models = this.getViewer().toolbarMgr.getModels();
+	var models = this.getViewer().toolbarMgr.models;
 
 	this.perform("setActive", !tooLow, 'previewBack', 'backward');
 	this.perform("setActive", !tooHigh, 'previewForward', 'forward');
@@ -368,7 +355,7 @@ ToolbarController.prototype.checkZoom = function(zoom) {
 	var zoomIn = (viewer.currentImage.getWidth() <= preload.width() && viewer.currentImage.getHeight() <= preload.height())? false : true;
 	var zoomOut = (zoom == 0)? false : true;
 	
-	var models = this.getViewer().toolbarMgr.getModels();
+	var models = this.getViewer().toolbarMgr.models;
 
 	this.perform("setActive", zoomIn, 'zoomHandles', 'zoomIn');
 	this.perform("setActive", zoomOut, 'zoomHandles', 'zoomOut');
@@ -403,7 +390,7 @@ ToolbarController.prototype.updateDropDown = function(content) {
  * @param		{String} button defines the name of the button
  */
 ToolbarController.prototype.perform = function(action, argument, buttonset, button) {
-	var models = this.getViewer().toolbarMgr.getModels();
+	var models = this.getViewer().toolbarMgr.models;
 
 	for (var i = 0; i < models.length; i++) {
 		if (models[i].getElement(buttonset) && models[i].getElement(buttonset).getButton(button)) {
