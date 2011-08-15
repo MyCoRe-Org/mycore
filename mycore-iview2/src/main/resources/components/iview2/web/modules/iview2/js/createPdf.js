@@ -20,14 +20,14 @@ iview.General.prototype.openPdfCreator = function(button) {
       }
       return this.pdfCtrl;
     };
-    this.getPdfCtrl().setView(new iview.Pdf.View("pdfCreatorView",
+    this.getPdfCtrl().view = new iview.Pdf.View("pdfCreatorView",
         this.iview.viewerContainer,
         this.iview.properties.webappBaseUri + "modules/iview2",
         this.iview.properties.pdfCreatorURI,
         this.iview.properties.webappBaseUri + "servlets/MCRMETSServlet/" + this.iview.properties.derivateId + "?XSL.Style=" + this.iview.properties.pdfCreatorStyle,
         function() {
           that.getPdfCtrl().initView(i18n);
-        }));
+        });
   } else {
     this.getPdfCtrl().show();
   }
@@ -284,18 +284,6 @@ iview.Pdf.Controller.prototype = {
     var imgPath = this.order[first]._href;
     this.view.displayPreview(this.parent.iview.properties.webappBaseUri + "servlets/MCRTileServlet/" + this.parent.iview.properties.derivateId + "/" + imgPath
         + "/0/0/0.jpg");
-  },
-
-  /**
-   * @public
-   * @function
-   * @memberOf iview.Pdf.Controller#
-   * @description adds an existing view to the PdfController, attach to its events (press) and define the actions for each button
-   * @param {Object}
-   *          view View which should be add
-   */
-  setView : function(view) {
-    this.view = view;
   },
 
   /**
