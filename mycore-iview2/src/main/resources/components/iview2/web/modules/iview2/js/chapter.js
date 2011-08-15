@@ -167,17 +167,6 @@ iview.chapter.View = function() {
 	/**
 	 * @public
 	 * @function
-	 * @name		getTree
-	 * @memberOf	iview.chapter.View
-	 * @description	returns the internal TreeData representation, which is/was used to build-up the Tree
-	 */
-	function getTree() {
-		return this._treeData;
-	}
-
-	/**
-	 * @public
-	 * @function
 	 * @name		selectedNode
 	 * @memberOf	iview.chapter.View
 	 * @description	finds within the tree the given Entry with matching nodeID and tells jsTree to select it and to collapse everything except the path from the root Node to the newly selected Entry
@@ -209,7 +198,6 @@ iview.chapter.View = function() {
 	
 	var prototype = iview.chapter.View.prototype;
 	prototype.visible = visible;
-	prototype.getTree = getTree;
 	prototype.addTree = addTree;
 	prototype.addBranch = addBranch;
 	prototype.addPage = addPage;
@@ -279,7 +267,7 @@ iview.chapter.Controller = function(modelProvider, physicalModelProvider, view) 
 		this._view.initTree();
 		//start creation Process for top Level Entries within List
 		jQuery.each(entries, function(index, entry){
-			buildTree(entry, that._view.getTree(), that._view)
+			buildTree(entry, that._view._treeData, that._view)
 		});
 		this._view.addTree(parentID);
 		try {
