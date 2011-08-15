@@ -357,16 +357,16 @@ PanoJS.prototype = {
 		
 		//addition
 		var iview = this.iview;
-	  var zoomScale=iview.currentImage.zoomInfo.getScale();
+	  var zoomScale=iview.currentImage.zoomInfo.scale;
 		//Changed to work for multiple Viewers
 		//added so that pictures can't be moved out of borders
-		if (-(this.x + motion.x) > ((iview.currentImage.getWidth()/Math.pow(2, iview.currentImage.zoomInfo.getMaxLevel() - this.zoomLevel))*zoomScale-this.width)) {
+		if (-(this.x + motion.x) > ((iview.currentImage.width /Math.pow(2, iview.currentImage.zoomInfo.maxZoom - this.zoomLevel))*zoomScale-this.width)) {
 			motion.x = 0;
-			this.x = -((iview.currentImage.getWidth()/Math.pow(2, iview.currentImage.zoomInfo.getMaxLevel() - this.zoomLevel))*zoomScale-this.width);
+			this.x = -((iview.currentImage.width /Math.pow(2, iview.currentImage.zoomInfo.maxZoom - this.zoomLevel))*zoomScale-this.width);
 		}
-		if (-(this.y + motion.y) > ((iview.currentImage.getHeight()/Math.pow(2, iview.currentImage.zoomInfo.getMaxLevel() - this.zoomLevel))*zoomScale-this.height)) {
+		if (-(this.y + motion.y) > ((iview.currentImage.height/Math.pow(2, iview.currentImage.zoomInfo.maxZoom - this.zoomLevel))*zoomScale-this.height)) {
 			motion.y = 0;
-			this.y = -((iview.currentImage.getHeight()/Math.pow(2, iview.currentImage.zoomInfo.getMaxLevel() - this.zoomLevel))*zoomScale-this.height);
+			this.y = -((iview.currentImage.height/Math.pow(2, iview.currentImage.zoomInfo.maxZoom - this.zoomLevel))*zoomScale-this.height);
 		}
 		if(this.x + motion.x > 0){
 			this.x = 0;
@@ -498,13 +498,13 @@ PanoJS.prototype = {
 			} else {
 				//modification to original PanonJS code
 				var iview=this.iview;
-				var currentWidth = Math.floor(iview.currentImage.getWidth() / Math.pow(2, iview.currentImage.zoomInfo.getMaxLevel() - this.zoomLevel));
+				var currentWidth = Math.floor(iview.currentImage.width / Math.pow(2, iview.currentImage.zoomInfo.maxZoom - this.zoomLevel));
 				var xTileCount = Math.ceil( currentWidth / iview.properties.tileSize);
-				var currentHeight = Math.floor(iview.currentImage.getHeight() / Math.pow(2, iview.currentImage.zoomInfo.getMaxLevel() - this.zoomLevel));
+				var currentHeight = Math.floor(iview.currentImage.height / Math.pow(2, iview.currentImage.zoomInfo.maxZoom - this.zoomLevel));
 				var yTileCount = Math.ceil( currentHeight / iview.properties.tileSize);
 				var right = tile.xIndex >= xTileCount; //index starts at 0
 				var low = tile.yIndex >= yTileCount;
-				if (low || right || this.zoomLevel>iview.currentImage.zoomInfo.getMaxLevel()) {
+				if (low || right || this.zoomLevel>iview.currentImage.zoomInfo.maxZoom) {
 					useBlankImage = true;
 				}
 				//modification ends

@@ -107,7 +107,7 @@ PanoJS.TileUrlProvider.prototype.getImageHash = function(image){
  * returns the URL of all tileimages
  */
 PanoJS.TileUrlProvider.prototype.assembleUrl = function(xIndex, yIndex, zoom, image){
-	image=(image == null)? this.getCurrentImage().getName() : image;
+	image=(image == null)? this.getCurrentImage().name : image;
     return this.baseUri[(this.getImageHash(image)+xIndex+yIndex) % this.baseUri.length] + '/'+ this.derivate+'/' + 
         image + '/' + zoom + '/' + yIndex + '/' + xIndex + '.' + this.extension +
         (PanoJS.REVISION_FLAG ? '?r=' + PanoJS.REVISION_FLAG : '');
@@ -155,7 +155,7 @@ genProto.initializeGraphic = function() {
 	PanoJS.BLANK_TILE_IMAGE = "../modules/iview2/" + styleFolderUri + 'blank.gif';
 	
 	// opera triggers the onload twice
-	var iviewTileUrlProvider = new PanoJS.TileUrlProvider(this.iview.properties.baseUri, this.iview.currentImage.getName(), 'jpg');
+	var iviewTileUrlProvider = new PanoJS.TileUrlProvider(this.iview.properties.baseUri, this.iview.currentImage.name, 'jpg');
 	iviewTileUrlProvider.derivate = this.iview.properties.derivateId;
 	var that = this;
 	iviewTileUrlProvider.getCurrentImage = function initializeGraphic_getCurrentImage(){
@@ -170,7 +170,7 @@ genProto.initializeGraphic = function() {
 			initialPan: {'x' : 0, 'y' : 0 },//Koordianten der oberen linken Ecke
 			tileSize: this.iview.properties.tileSize,//Kachelgroesse
 			tileUrlProvider: iviewTileUrlProvider,
-			maxZoom: this.iview.currentImage.zoomInfo.getMaxLevel(),
+			maxZoom: this.iview.currentImage.zoomInfo.maxZoom,
 			initialZoom: this.iview.currentImage.zoomInfo.zoomInit,//Anfangs-Zoomlevel
 			loadingTile: "../modules/iview2/" + styleFolderUri + 'blank.gif'
 		});
