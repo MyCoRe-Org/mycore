@@ -59,9 +59,6 @@
  */
 function PanoJS(viewer, options) {
 
-	// listeners that are notified on a move (pan) event
-	this.viewerMovedListeners = [];
-
 	if (typeof viewer == 'string') {
 		this.viewer = document.getElementById(viewer);
 	}
@@ -357,7 +354,7 @@ PanoJS.prototype = {
 		
 		//addition
 		var iview = this.iview;
-	  var zoomScale=iview.currentImage.zoomInfo.scale;
+		var zoomScale=iview.currentImage.zoomInfo.scale;
 		//Changed to work for multiple Viewers
 		//added so that pictures can't be moved out of borders
 		if (-(this.x + motion.x) > ((iview.currentImage.width /Math.pow(2, iview.currentImage.zoomInfo.maxZoom - this.zoomLevel))*zoomScale-this.width)) {
@@ -594,10 +591,6 @@ PanoJS.prototype = {
 		}
 	},
 
-	addViewerMovedListener : function(listener) {
-		this.viewerMovedListeners.push(listener);
-	},
-
 	/**
 	 * Notify listeners of a zoom event on the viewer.
 	 */
@@ -612,15 +605,7 @@ PanoJS.prototype = {
 		if (typeof coords == 'undefined') {
 			coords = { 'x' : 0, 'y' : 0 };
 		}
-
-		for (var i = 0; i < this.viewerMovedListeners.length; i++) {
-			this.viewerMovedListeners[i].viewerMoved(
-				new PanoJS.MoveEvent(
-					this.x + (coords.x - this.mark.x),
-					this.y + (coords.y - this.mark.y)
-				)
-			);
-		}
+		jQuery(this.viewer).trigger("move.viewer", {'x': this.x + (coords.x - this.mark.x),'y': this.y + (coords.y - this.mark.y)});
 	},
 
 	zoom : function(direction) {
@@ -956,15 +941,3 @@ PanoJS.keyboardHandler = function(e) {
 			viewer.zoom(1);
 	}
 }
-
-PanoJS.MoveEvent = function(x, y) {
-	this.x = x;
-	this.y = y;
-};
-
-PanoJS.ZoomEvent = function(x, y, level, percentage) {
-	this.x = x;
-	this.y = y;
-	this.percentage = percentage;
-	this.level = level;
-};

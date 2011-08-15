@@ -449,15 +449,7 @@ viewerZoomed = function () {
  * @memberOf	iview.General
  * @description	is called if the picture is moving in the viewer and handles the size of the Overview accordingly the size of the picture
  */
-genProto.viewerMoved = function (event) {
-	// calculate via zoomlevel to the preview the left top point
-  var zoomScale=this.iview.currentImage.zoomInfo.scale;
-	var newX = - (event.x / Math.pow(2, this.iview.viewerBean.zoomLevel))/zoomScale;
-	var newY = - (event.y / Math.pow(2, this.iview.viewerBean.zoomLevel))/zoomScale;
-
-	if (this.iview.properties.useOverview) {
-		this.iview.overview.Model.setPos({'x':newX, 'y':newY});
-	}
+viewerMoved = function (jq, event) {
 	// set Roller this no circles are created, and we end in an endless loop
 	this.iview.roller = true;
 	var preload = this.iview.context.preload;
@@ -576,6 +568,12 @@ genProto.importOverview = function() {
 		that.iview.overview.Model.setPos({
 			'x': - (viewerBean.x / Math.pow(2, viewerBean.zoomLevel))*zoomInfo.scale,
 			'y': - (viewerBean.y / Math.pow(2, viewerBean.zoomLevel))*zoomInfo.scale});
+	}).bind("move.viewer", function(args, event) {
+		// calculate via zoomlevel to the preview the left top point
+		var zoomScale = that.iview.currentImage.zoomInfo.scale;
+		that.iview.overview.Model.setPos({
+			'x': - (event.x / Math.pow(2, that.iview.viewerBean.zoomLevel))/zoomScale,
+			'y': - (event.y / Math.pow(2, that.iview.viewerBean.zoomLevel))/zoomScale});
 	});
 };
 
@@ -684,13 +682,14 @@ genProto.loading = function(startFile) {
 	that.initializeGraphic();
 	//needs to be registered before any other listener for this event
 	var viewerBean = that.iview.viewerBean;
-	jQuery(viewerBean.viewer).bind("zoom.viewer", function() { viewerZoomed.apply(that, arguments)});
+	jQuery(viewerBean.viewer).bind("zoom.viewer", function() { viewerZoomed.apply(that, arguments)})
+		.bind("move.viewer", function() {viewerMoved.apply(that,arguments)});
 
 	if (this.iview.properties.useOverview) {
 		this.importOverview();
 	}
 
-	viewerBean.addViewerMovedListener(that);
+//	viewerBean.addViewerMovedListener(that);
 
 	if (this.iview.properties.useParam && !isNaN(parseInt(URL.getParam("zoom")))) {
 		viewerBean.zoomLevel= parseInt(URL.getParam("zoom"));
