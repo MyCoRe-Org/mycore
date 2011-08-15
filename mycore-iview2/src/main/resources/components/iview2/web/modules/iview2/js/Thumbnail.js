@@ -86,7 +86,7 @@ genProto.processImageProperties = function(imageProperties, url){
 	this.iview.roller = true;
 	viewerBean.positionTiles ({'x' : initX, 'y' : initY}, true);
 	
-	if (this.iview.properties.useOverview) {
+	if (this.iview.overview.loaded) {
 		this.iview.overview.Model.setSrc(thumbSource);
 	}
   this.updateModuls();
@@ -321,7 +321,7 @@ genProto.switchDisplayMode = function(screenZoom, stateBool, preventLooping) {
 	var offset = preload.offset();
 	this.iview.scrollbars.barX.setCurValue(-offset.left);
 	this.iview.scrollbars.barY.setCurValue(-offset.top);
-	if (this.iview.properties.useOverview) this.iview.overview.Model.setPos({'x':offset.left, 'y':offset.top});
+	if (this.iview.overview.loaded) this.iview.overview.Model.setPos({'x':offset.left, 'y':offset.top});
 	return stateBool;
 };
 
@@ -545,6 +545,7 @@ genProto.importOverview = function() {
 	this.iview.overview.Model = overviewMP.createModel();
 	this.iview.overview.ov = new iview.overview.Controller(overviewMP, i18n);
 	this.iview.overview.ov.createView({'thumbParent': this.iview.overview.parent, 'dampParent': this.iview.overview.parent});
+	this.iview.overview.Model.setSrc(this.iview.viewerBean.tileUrlProvider.assembleUrl(0,0,0));
 	var zoomScale = this.iview.currentImage.zoomInfo.scale;
 	this.iview.overview.ov.attach("move.overview", function(e, val) {
 		that.iview.viewerBean.recenter(
@@ -685,12 +686,11 @@ genProto.loading = function(startFile) {
 	jQuery(viewerBean.viewer).bind("zoom.viewer", function() { viewerZoomed.apply(that, arguments)})
 		.bind("move.viewer", function() {viewerMoved.apply(that,arguments)});
 
-	if (this.iview.properties.useOverview) {
-		this.importOverview();
-	}
-
-//	viewerBean.addViewerMovedListener(that);
-
+	jQuery(this.iview.viewerContainer).one("maximize.viewerContainer", function() {
+		if (that.iview.properties.useOverview)
+			that.importOverview();
+	})
+	
 	if (this.iview.properties.useParam && !isNaN(parseInt(URL.getParam("zoom")))) {
 		viewerBean.zoomLevel= parseInt(URL.getParam("zoom"));
 	}
