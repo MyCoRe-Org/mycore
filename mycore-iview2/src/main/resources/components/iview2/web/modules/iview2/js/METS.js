@@ -664,7 +664,7 @@ iview.METS.ChapterModel = function(element) {
 	/*
 	 * @description Sets the given entry as new selected entry within the Model, if the supplied entry
 	 *  isn't valid nothing happens. Else all Listeners will be notified about the changed Selection by
-	 *  raising an Event of the type 'selected.METS' with the previously selected entry(-id)
+	 *  raising an Event of the type 'select.METS' with the previously selected entry
 	 *  in old and the new Selection within new. If no entry was selected before, old holds null
 	 * @param logid the ID/Hash of the Element which is the new selected one
 	 */
@@ -675,7 +675,7 @@ iview.METS.ChapterModel = function(element) {
 			var oldSelected = (this._selected != null)? this._selected.getOrder(): null;
 			var oldID = (this._selected != null)? this._selected.getID(): null;
 			this._selected = newSelected;
-			jQuery(this).trigger("selected.METS", {"old": oldSelected, "new": newSelected.getOrder(), "oldID":oldID, "newID":newSelected.getID()});
+			jQuery(this).trigger("select.METS", {"old": oldSelected, "new": newSelected.getOrder()});//, "oldID":oldID, "newID":newSelected.getID()});
 		}
 	}
 	
