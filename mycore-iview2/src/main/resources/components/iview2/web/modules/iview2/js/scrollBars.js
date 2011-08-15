@@ -71,18 +71,6 @@ iview.scrollbar.Model.prototype = {
 	/**
 	 * @public
 	 * @function
-	 * @name		getSize
-	 * @memberOf	iview.scrollbar.Model#
-	 * @description	gets the total size of the Scrollbar 
-	 * @return	 	{integer} who holds the currently set width
-	 */
-	getSize: function() {
-		return this._size;
-	},
-	
-	/**
-	 * @public
-	 * @function
 	 * @name		setProportion
 	 * @memberOf	iview.scrollbar.Model#
 	 * @description	set the proportion between scrollbarspace and the bar within the space
@@ -98,18 +86,6 @@ iview.scrollbar.Model.prototype = {
 		}
 	},
 
-	/**
-	 * @public
-	 * @function
-	 * @name		getProportion
-	 * @memberOf	iview.scrollbar.Model#
-	 * @description	get the proportion between scrollbarspace and the bar within the space
-	 * @return		{float} which represents the current scrollbar space/bar proportion
-	 */	
-	getProportion: function() {
-		return this._proportion;	
-	},
-	
 	/**
 	 * @public
 	 * @function
@@ -134,19 +110,6 @@ iview.scrollbar.Model.prototype = {
 	/**
 	 * @public
 	 * @function
-	 * @name		getMaxVal
-	 * @memberOf	iview.scrollbar.Model#
-	 * @description	get the current maxValue of the scrollbar, this means the Value the scrollbar
-	 *  returns when it reached the right/bottom most position.
-	 * @return		{integer} the currently set maxValue
-	 */
-	getMaxVal: function() {
-		return this._maxVal;
-	},
-	
-	/**
-	 * @public
-	 * @function
 	 * @name		setCurVal
 	 * @memberOf	iview.scrollbar.Model#
 	 * @description	set the current Value(position) where the bar start(left/right end) is positioned
@@ -165,17 +128,6 @@ iview.scrollbar.Model.prototype = {
 		}
 	},
 	
-	/**
-	 * @public
-	 * @function
-	 * @name		getCurVal
-	 * @memberOf	iview.scrollbar.Model#
-	 * @description	get the current Value(position) where the bar start(left/right end) is positioned
-	 * @return		{integer} the currently set Value	
-	 */
-	getCurVal: function() {
-		return this._curVal;
-	},
 	
 	/**
 	 * @public
@@ -1016,7 +968,7 @@ iview.scrollbar.Controller.prototype = {
 	 * @memberOf	iview.scrollbar.Controller#
 	 */
 	getMaxValue: function() {
-		return this._model.getMaxVal();
+		return this._model._maxVal;
 	},
 	
 	/**
@@ -1036,7 +988,7 @@ iview.scrollbar.Controller.prototype = {
 	 * @memberOf	iview.scrollbar.Controller#
 	 */
 	getCurValue: function() {
-		return this._model.getCurVal();
+		return this._model._curVal;
 	},
 	
 	/**
@@ -1056,7 +1008,7 @@ iview.scrollbar.Controller.prototype = {
 	 * @memberOf	iview.scrollbar.Controller#
 	 */
 	getProportion: function() {
-		return this._model.getProportion();
+		return this._model._proportion;
 	},
 	
 	/**
