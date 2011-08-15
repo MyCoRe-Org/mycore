@@ -422,10 +422,9 @@ genProto.handleScrollbars = function(reason) {
  * @public
  * @function
  * @name		viewerZoomed
- * @memberOf	iview.General
  * @description	is called if the viewer is zooming; handles the correct sizing and displaying of the preloadpicture, various buttons and positioning of the Overview accordingly the zoomlevel
  */
-genProto.viewerZoomed = function (zoomEvent) {
+viewerZoomed = function () {
 	var viewerBean = this.iview.viewerBean;
 	
 	// handle special Modes, needs to close
@@ -443,19 +442,8 @@ genProto.viewerZoomed = function (zoomEvent) {
 
 	this.handleScrollbars("zoom");
 
-	if (this.iview.properties.useOverview) {
-		this.iview.overview.Model.setSize({
-			'x': preload.width(),
-			'y': preload.height()});
-		this.iview.overview.Model.setRatio({
-			'x': viewerBean.width / ((currentImage.getWidth() / Math.pow(2, zoomInfo.getMaxLevel() - viewerBean.zoomLevel))*zoomInfo.getScale()),
-			'y': viewerBean.height / ((currentImage.getHeight() / Math.pow(2, zoomInfo.getMaxLevel() - viewerBean.zoomLevel))*zoomInfo.getScale())});
-		this.iview.overview.Model.setPos({
-			'x': - (viewerBean.x / Math.pow(2, viewerBean.zoomLevel))*zoomInfo.getScale(),
-			'y': - (viewerBean.y / Math.pow(2, viewerBean.zoomLevel))*zoomInfo.getScale()});
-	}
-	
 	// check buttons
+	//TODO move this to the init of the toolbar
 	this.iview.getToolbarCtrl().checkZoom(viewerBean.zoomLevel);
 }
 
@@ -570,7 +558,7 @@ genProto.importOverview = function() {
 	this.iview.overview.Model = overviewMP.createModel();
 	this.iview.overview.ov = new iview.overview.Controller(overviewMP, i18n);
 	this.iview.overview.ov.createView({'thumbParent': this.iview.overview.parent, 'dampParent': this.iview.overview.parent});
-  var zoomScale=this.iview.currentImage.zoomInfo.getScale();
+	var zoomScale = this.iview.currentImage.zoomInfo.getScale();
 	this.iview.overview.ov.attach("move.overview", function(e, val) {
 		that.iview.viewerBean.recenter(
 			{'x' : val.x["new"]*zoomScale,
@@ -578,10 +566,22 @@ genProto.importOverview = function() {
 			}, true);
 	});
 	var preload = this.iview.context.preload;
-	this.iview.overview.Model.setSize({
-		'x': preload.width(),
-		'y': preload.height()});
 	this.iview.overview.loaded = true;
+	
+	var viewerBean = this.iview.viewerBean;
+	var currentImage = this.iview.currentImage;
+	var zoomInfo = currentImage.zoomInfo;
+	jQuery(this.iview.viewerBean.viewer).bind("zoom.viewer reinit.viewer", function() {
+		that.iview.overview.Model.setSize({
+			'x': preload.width(),
+			'y': preload.height()});
+		that.iview.overview.Model.setRatio({
+			'x': viewerBean.width / ((currentImage.getWidth() / Math.pow(2, zoomInfo.getMaxLevel() - viewerBean.zoomLevel))*zoomInfo.getScale()),
+			'y': viewerBean.height / ((currentImage.getHeight() / Math.pow(2, zoomInfo.getMaxLevel() - viewerBean.zoomLevel))*zoomInfo.getScale())});
+		that.iview.overview.Model.setPos({
+			'x': - (viewerBean.x / Math.pow(2, viewerBean.zoomLevel))*zoomInfo.getScale(),
+			'y': - (viewerBean.y / Math.pow(2, viewerBean.zoomLevel))*zoomInfo.getScale()});
+	});
 };
 
 /**
@@ -685,18 +685,19 @@ genProto.loading = function(startFile) {
 		.css({	'width':this.iview.properties.startWidth - ((barX.my.self.css("visibility") == "visible")? barX.my.self.outerWidth() : 0)  + "px",
 				'height':this.iview.properties.startHeight - ((barY.my.self.css("visibility") == "visible")? barY.my.self.outerHeight() : 0)  + "px"
 		});
-	
+		
+	that.initializeGraphic();
 	if (this.iview.properties.useOverview) {
 		this.importOverview();
 	}
 
-	that.initializeGraphic();
 	viewerBean = that.iview.viewerBean;
-	viewerBean.addViewerZoomedListener(that);
 	viewerBean.addViewerMovedListener(that);
-  if (this.iview.properties.useParam && !isNaN(parseInt(URL.getParam("zoom")))) {
-    viewerBean.zoomLevel= parseInt(URL.getParam("zoom"));
-  }
+	jQuery(viewerBean.viewer).bind("zoom.viewer", function() { viewerZoomed.apply(that, arguments)});
+
+	if (this.iview.properties.useParam && !isNaN(parseInt(URL.getParam("zoom")))) {
+		viewerBean.zoomLevel= parseInt(URL.getParam("zoom"));
+	}
 	this.loadPage(function(){
 	  that.startFileLoaded();
 	}, startFile);

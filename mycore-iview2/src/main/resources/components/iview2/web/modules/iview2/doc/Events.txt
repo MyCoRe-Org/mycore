@@ -57,6 +57,10 @@ init.js
 	minimize.viewerContainer@viewerContainer#	when the viewer has been minimized
 	maximize.viewerContainer@viewerContainer#	when the viewer has been maximized
 	
+PanoJS
+	reinit.viewer@viewerBean.viewer	when the viewer was reinitialized due to switching modi or whatever, called in init.js
+	zoom.viewer@this.viewer			when the viewer was zoomed
+
 PhysicalModel
 	select.METS@this				when the currently selected element changed
 

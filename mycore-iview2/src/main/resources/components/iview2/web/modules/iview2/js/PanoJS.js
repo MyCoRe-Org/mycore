@@ -61,8 +61,8 @@ function PanoJS(viewer, options) {
 
 	// listeners that are notified on a move (pan) event
 	this.viewerMovedListeners = [];
-	// listeners that are notified on a zoom event
-	this.viewerZoomedListeners = [];
+//	// listeners that are notified on a zoom event
+//	this.viewerZoomedListeners = [];
 
 	if (typeof viewer == 'string') {
 		this.viewer = document.getElementById(viewer);
@@ -600,20 +600,21 @@ PanoJS.prototype = {
 		this.viewerMovedListeners.push(listener);
 	},
 
-	addViewerZoomedListener : function(listener) {
-		this.viewerZoomedListeners.push(listener);
-	},
+//	addViewerZoomedListener : function(listener) {
+//		this.viewerZoomedListeners.push(listener);
+//	},
 
 	/**
 	 * Notify listeners of a zoom event on the viewer.
 	 */
 	notifyViewerZoomed : function() {
-		var percentage = (100/(this.maxZoomLevel + 1)) * (this.zoomLevel + 1);
-		for (var i = 0; i < this.viewerZoomedListeners.length; i++) {
-			this.viewerZoomedListeners[i].viewerZoomed(
-				new PanoJS.ZoomEvent(this.x, this.y, this.zoomLevel, percentage)
-			);
-		}
+//		var percentage = (100/(this.maxZoomLevel + 1)) * (this.zoomLevel + 1);
+//		for (var i = 0; i < this.viewerZoomedListeners.length; i++) {
+//			this.viewerZoomedListeners[i].viewerZoomed(
+//				new PanoJS.ZoomEvent(this.x, this.y, this.zoomLevel, percentage)
+//			);
+//		}
+		jQuery(this.viewer).trigger("zoom.viewer", {'x':this.x, 'y': this.y, 'zoomLevel': this.zoomLevel, 'percentage': (100/(this.maxZoomLevel + 1)) * (this.zoomLevel + 1)});
 	},
 
 	/**

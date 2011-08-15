@@ -61,6 +61,7 @@
       this.chapter = jQuery.extend(this.chapter | {}, {'loaded': (this.chapter || {}).loaded || false, 'parent': container});
       this.preload = container.find(".preload"); // TODO: move this somewhere
       this.gen = new iview.General(this);
+      //TODO defer loading of Toolbar stuff until viewer is created
       this.toolbarMgr = new ToolbarManager();
       this.toolbarCtrl = new ToolbarController(this);
       // load toolbar after all resources (css, images) are ready

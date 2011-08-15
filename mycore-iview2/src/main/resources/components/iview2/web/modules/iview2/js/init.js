@@ -243,24 +243,17 @@ genProto.reinitializeGraphic = function() {
 	
 	this.handleScrollbars("resize");
 	
-	var zoomScale=this.iview.currentImage.zoomInfo.getScale();
-	if (this.iview.properties.useOverview) {
-		this.iview.overview.Model.setRatio({
-			'x': viewerBean.width / ((this.iview.currentImage.getWidth() / Math.pow(2, this.iview.currentImage.zoomInfo.getMaxLevel() - viewerBean.zoomLevel))*zoomScale),
-			'y': viewerBean.height / ((this.iview.currentImage.getHeight() / Math.pow(2, this.iview.currentImage.zoomInfo.getMaxLevel() - viewerBean.zoomLevel))*zoomScale)});
-		this.iview.overview.Model.setPos({
-			'x': - (viewerBean.x / Math.pow(2, viewerBean.zoomLevel))*zoomScale,
-			'y': - (viewerBean.y / Math.pow(2, viewerBean.zoomLevel))*zoomScale});
-	}
+	//notify all listeners that the viewer was modified in such way that they possibly need adaptation of their own view
+	jQuery(this.iview.viewerBean.viewer).trigger("reinit.viewer");
 	
 	// Actualize forward & backward Buttons
-	if (!this.iview.maximized) {
+//	if (!this.iview.maximized) {
 	  //TODO: align image and toolbar to the center
 	  //TODO: compare redundant code with gen.updateModuls()
 	  //var previewTbView = jQuery(this.iview.getToolbarCtrl().getView("previewTbView").toolbar);
-	  //var newTop = ((((this.iview.currentImage.getHeight() / Math.pow(2, this.iview.currentImage.zoomInfo.getMaxLevel() - 1)) * zoomScale) - (previewTbView.height() + toInt(previewTbView.css("padding-top")) + toInt(previewTbView.css("padding-bottom")))) / 2) + "px";
+	  //var newTop = ((((this.iview.currentImage.getHeight() / Math.pow(2, this.iview.currentImage.zoomInfo.getMaxLevel() - 1)) * this.iview.currentImage.zoomInfo.getScale()) - (previewTbView.height() + toInt(previewTbView.css("padding-top")) + toInt(previewTbView.css("padding-bottom")))) / 2) + "px";
 		//this.iview.getToolbarCtrl().toolbarContainer.find(".toolbar").css("top", newTop);
-	}
+//	}
 	this.iview.toolbarCtrl.paint("mainTb");
 };
 
