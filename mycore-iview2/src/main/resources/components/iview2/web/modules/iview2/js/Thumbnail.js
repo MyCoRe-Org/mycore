@@ -426,7 +426,6 @@ genProto.handleScrollbars = function(reason) {
  */
 viewerZoomed = function () {
 	var viewerBean = this.iview.viewerBean;
-	
 	// handle special Modes, needs to close
 	if (this.iview.currentImage.zoomInfo.zoomWidth) {
 		this.pictureWidth(true);
@@ -687,13 +686,15 @@ genProto.loading = function(startFile) {
 		});
 		
 	that.initializeGraphic();
+	//needs to be registered before any other listener for this event
+	var viewerBean = that.iview.viewerBean;
+	jQuery(viewerBean.viewer).bind("zoom.viewer", function() { viewerZoomed.apply(that, arguments)});
+
 	if (this.iview.properties.useOverview) {
 		this.importOverview();
 	}
 
-	viewerBean = that.iview.viewerBean;
 	viewerBean.addViewerMovedListener(that);
-	jQuery(viewerBean.viewer).bind("zoom.viewer", function() { viewerZoomed.apply(that, arguments)});
 
 	if (this.iview.properties.useParam && !isNaN(parseInt(URL.getParam("zoom")))) {
 		viewerBean.zoomLevel= parseInt(URL.getParam("zoom"));
