@@ -160,6 +160,9 @@
         <xsl:when test="$mods-type = 'report'">
           <xsl:apply-templates select="." mode="present.report" />
         </xsl:when>
+        <xsl:when test="$mods-type = 'thesis'">
+          <xsl:apply-templates select="." mode="present.thesis" />
+        </xsl:when>
         <xsl:otherwise>
           <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/*/*" />
         </xsl:otherwise>

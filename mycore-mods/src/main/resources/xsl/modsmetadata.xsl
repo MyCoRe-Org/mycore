@@ -59,6 +59,31 @@
     </tr>
   </xsl:template>
 
+  <xsl:template match="mods:name" mode="present">
+    <tr>
+      <td valign="top" class="metaname">
+        <xsl:value-of select="concat(i18n:translate(concat('metaData.mods.dictionary.',mods:role/mods:roleTerm[@authority='marcrelator'])),':')" />
+      </td>
+      <td class="metavalue">
+        <xsl:value-of select="concat(mods:namePart[@type='family'],', ',mods:namePart[@type='given'])" />
+      </td>
+    </tr>
+  </xsl:template>
+
+  <xsl:template match="mods:identifier[@type='urn']" mode="present">
+    <tr>
+      <td valign="top" class="metaname">
+        <xsl:value-of select="'URN:'" />
+      </td>
+      <td class="metavalue">
+        <xsl:variable name="urn" select="." />
+        <a href="http://nbn-resolving.de/urn/resolver.pl?urn={$urn}">
+          <xsl:value-of select="$urn" />
+        </a>
+      </td>
+    </tr>
+  </xsl:template>
+
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.report">
     <xsl:call-template name="printMetaDate.mods">
       <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title" />
@@ -77,6 +102,35 @@
     <xsl:call-template name="printMetaDate.mods">
       <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:note" />
     </xsl:call-template>
+  </xsl:template>
+
+  <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.thesis">
+    <xsl:call-template name="printMetaDate.mods">
+      <xsl:with-param name="nodes"
+        select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo[not(@type='translated')]/mods:title" />
+    </xsl:call-template>
+    <xsl:call-template name="printMetaDate.mods">
+      <xsl:with-param name="nodes"
+        select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo[@type='translated']/mods:title" />
+    </xsl:call-template>
+    <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@type='personal']" />
+    <xsl:call-template name="printMetaDate.mods">
+      <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateIssued" />
+    </xsl:call-template>
+    <xsl:call-template name="printMetaDate.mods">
+      <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:abstract" />
+    </xsl:call-template>
+    <xsl:call-template name="printMetaDate.mods">
+      <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:subject" />
+      <xsl:with-param name="sep" select="'; '" />
+    </xsl:call-template>
+    <xsl:call-template name="printMetaDate.mods">
+      <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:physicalLocation" />
+    </xsl:call-template>
+    <xsl:call-template name="printMetaDate.mods">
+      <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:note" />
+    </xsl:call-template>
+    <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier[@type='urn']" />
   </xsl:template>
 
 </xsl:stylesheet>
