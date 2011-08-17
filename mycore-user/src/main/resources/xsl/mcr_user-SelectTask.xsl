@@ -63,11 +63,6 @@
           <!-- "Show data of the current user account" -->
         </a>
       </li>
-      <li>
-        <a href="{$href-login}&amp;uid={$guest_id}&amp;pwd={$guest_pwd}">
-          <xsl:value-of select="i18n:translate('component.userlogin.tasks.selectTask.logout')"/> <!-- "Logout and work as guest user" -->
-        </a>
-      </li>
     </ul>
   </xsl:template>
   
