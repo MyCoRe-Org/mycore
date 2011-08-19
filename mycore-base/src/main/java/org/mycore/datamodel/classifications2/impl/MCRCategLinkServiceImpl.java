@@ -23,6 +23,7 @@
  **/
 package org.mycore.datamodel.classifications2.impl;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
@@ -63,8 +64,8 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     private static Class<MCRCategoryLink> LINK_CLASS = MCRCategoryLink.class;
 
-    private static MCRCache categCache = new MCRCache(MCRConfiguration.instance().getInt(
-            "MCR.Classifications.LinkServiceImpl.CategCache.Size", 1000), "MCRCategLinkService category cache");
+    private static MCRCache categCache = new MCRCache(MCRConfiguration.instance().getInt("MCR.Classifications.LinkServiceImpl.CategCache.Size", 1000),
+        "MCRCategLinkService category cache");
 
     private static MCRCategoryDAOImpl DAO = new MCRCategoryDAOImpl();
 
@@ -175,8 +176,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
                 throw new MCRPersistenceException("Could not link to unknown category " + categID);
             }
             MCRCategoryLink link = new MCRCategoryLink(category, objectReference);
-            LOGGER.debug("Adding Link from " + link.getCategory().getId() + "(" + link.getCategory().getInternalID() + ") to "
-                    + objectReference.getObjectID());
+            LOGGER.debug("Adding Link from " + link.getCategory().getId() + "(" + link.getCategory().getInternalID() + ") to " + objectReference.getObjectID());
             session.save(link);
             LOGGER.debug("===DONE: " + link.id);
         }
@@ -223,7 +223,8 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         };
 
         Session session = MCRHIBConnection.instance().getSession();
-        String queryString = "select distinct node.classid from MCRCategory as node, MCRCategoryLink as link where node.internalid=link.category";
+        String queryString = MessageFormat.format("select distinct node.rootID from {0} as node, {1} as link where node.internalID=link.category",
+            MCRCategoryImpl.class.getCanonicalName(), MCRCategoryLink.class.getCanonicalName());
         Query queryHasLink = session.createQuery(queryString);
         @SuppressWarnings("unchecked")
         List<String> categList = queryHasLink.list();
