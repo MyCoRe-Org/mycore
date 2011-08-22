@@ -1,20 +1,20 @@
-/* $Revision$ 
- * $Date$ 
- * $LastChangedBy$
- * Copyright 2010 - Thüringer Universitäts- und Landesbibliothek Jena
- *  
- * Mets-Editor is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Mets-Editor is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Mets-Editor.  If not, see http://www.gnu.org/licenses/.
+/*
+ * $Revision$ $Date$
+ * $LastChangedBy$ Copyright 2010 - Thüringer Universitäts- und
+ * Landesbibliothek Jena
+ * 
+ * Mets-Editor is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * Mets-Editor is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * Mets-Editor. If not, see http://www.gnu.org/licenses/.
  */
 package org.mycore.mets.tools.model;
 
@@ -24,10 +24,10 @@ import java.util.List;
 import java.util.Vector;
 
 /**
- * This class models a structure/folder within a tree. It may contain {@link MCREntry}s and {@link MCRDirectory}s. 
+ * This class models a structure/folder within a tree. It may contain
+ * {@link MCREntry}s and {@link MCRDirectory}s.
  * 
  * @author Silvio Hermann (shermann)
- *
  */
 public class MCRDirectory implements MCRIMetsSortable, Comparator<MCRIMetsSortable> {
     private String logicalId, label, structureType;
@@ -41,8 +41,7 @@ public class MCRDirectory implements MCRIMetsSortable, Comparator<MCRIMetsSortab
     /**
      * @param logicalId
      * @param label
-     * 
-     * @param structureType 
+     * @param structureType
      */
     public MCRDirectory(String logicalId, String label, String structureType) {
         this.logicalId = logicalId;
@@ -60,7 +59,8 @@ public class MCRDirectory implements MCRIMetsSortable, Comparator<MCRIMetsSortab
     }
 
     /**
-     * @param logicalId the logicalId to set
+     * @param logicalId
+     *            the logicalId to set
      */
     public void setLogicalId(String id) {
         this.logicalId = id;
@@ -74,7 +74,8 @@ public class MCRDirectory implements MCRIMetsSortable, Comparator<MCRIMetsSortab
     }
 
     /**
-     * @param label the label to set
+     * @param label
+     *            the label to set
      */
     public void setLabel(String label) {
         this.label = label;
@@ -88,7 +89,8 @@ public class MCRDirectory implements MCRIMetsSortable, Comparator<MCRIMetsSortab
     }
 
     /**
-     * @param order the order to set
+     * @param order
+     *            the order to set
      */
     public void setOrder(int order) {
         this.order = order;
@@ -102,7 +104,8 @@ public class MCRDirectory implements MCRIMetsSortable, Comparator<MCRIMetsSortab
     }
 
     /**
-     * @param structureType the structureType to set
+     * @param structureType
+     *            the structureType to set
      */
     public void setStructureType(String structureType) {
         this.structureType = structureType;
@@ -127,7 +130,9 @@ public class MCRDirectory implements MCRIMetsSortable, Comparator<MCRIMetsSortab
         return this.getLogicalId() + " (" + order + ")";
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mycore.mets.tools.model.IMetsSortable#asJson()
      */
     public String asJson() {
@@ -135,8 +140,9 @@ public class MCRDirectory implements MCRIMetsSortable, Comparator<MCRIMetsSortab
 
         MCRIMetsSortable[] obj = getOrderedElements();
 
-        buffer.append("\t{ id: '" + label + "', name:'" + label + "', type:'category'" + ", structureType:'" + structureType + "'");
-        buffer.append(", children:[\n");
+        buffer.append("\t{\"id\": \"" + label + "\", \"name\":\"" + label + "\", \"type\":\"category\"" + ", \"structureType\":\""
+                + structureType + "\"");
+        buffer.append(", \"children\":[\n");
 
         for (int i = 0; i < obj.length; i++) {
             if (obj[i] instanceof MCREntry) {
@@ -146,9 +152,9 @@ public class MCRDirectory implements MCRIMetsSortable, Comparator<MCRIMetsSortab
                 MCRDirectory aDir = (MCRDirectory) obj[i];
                 MCRIMetsSortable[] children = aDir.getOrderedElements();
 
-                buffer.append("{ id: '" + aDir.getLabel() + "', name:'" + aDir.getLabel() + "', type:'category'" + ", structureType:'"
-                        + aDir.getStructureType() + "'");
-                buffer.append(", children:[\n");
+                buffer.append("{ \"id\": \"" + aDir.getLabel() + "\", \"name\":\"" + aDir.getLabel() + "\", \"type\":\"category\""
+                        + ", \"structureType\":\"" + aDir.getStructureType() + "\"");
+                buffer.append(", \"children\":[\n");
 
                 for (int c = 0; c < children.length; c++) {
                     buffer.append(children[c].asJson());
@@ -182,8 +188,9 @@ public class MCRDirectory implements MCRIMetsSortable, Comparator<MCRIMetsSortab
         return obj;
     }
 
-    /* 
+    /*
      * (non-Javadoc)
+     * 
      * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
      */
     public int compare(MCRIMetsSortable arg0, MCRIMetsSortable arg1) {

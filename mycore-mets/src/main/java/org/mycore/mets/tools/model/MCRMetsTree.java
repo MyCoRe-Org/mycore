@@ -1,20 +1,20 @@
-/* $Revision$ 
- * $Date$ 
- * $LastChangedBy$
- * Copyright 2010 - Thüringer Universitäts- und Landesbibliothek Jena
- *  
- * Mets-Editor is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Mets-Editor is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Mets-Editor.  If not, see http://www.gnu.org/licenses/.
+/*
+ * $Revision$ $Date$
+ * $LastChangedBy$ Copyright 2010 - Thüringer Universitäts- und
+ * Landesbibliothek Jena
+ * 
+ * Mets-Editor is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * Mets-Editor is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * Mets-Editor. If not, see http://www.gnu.org/licenses/.
  */
 package org.mycore.mets.tools.model;
 
@@ -25,14 +25,13 @@ import java.util.Vector;
 
 /**
  * @author Silvio Hermann (shermann)
- *
  */
 public class MCRMetsTree implements Comparator<MCRIMetsSortable> {
     private List<MCRDirectory> dirs;
 
     private List<MCREntry> entries;
 
-    private String derivate, docType,docTitle;
+    private String derivate, docType, docTitle;
 
     public MCRMetsTree(String derivate) {
         dirs = new Vector<MCRDirectory>();
@@ -64,7 +63,8 @@ public class MCRMetsTree implements Comparator<MCRIMetsSortable> {
     }
 
     /**
-     * @param docType the docType to set
+     * @param docType
+     *            the docType to set
      */
     public void setDocType(String docType) {
         this.docType = docType;
@@ -78,7 +78,8 @@ public class MCRMetsTree implements Comparator<MCRIMetsSortable> {
     }
 
     /**
-     * @param docTitle the docTitle to set
+     * @param docTitle
+     *            the docTitle to set
      */
     public void setDocTitle(String docTitle) {
         this.docTitle = docTitle;
@@ -88,8 +89,9 @@ public class MCRMetsTree implements Comparator<MCRIMetsSortable> {
         StringBuilder buffer = new StringBuilder();
         MCRIMetsSortable[] elements = getOrderedElements();
 
-        buffer.append("{identifier: 'id',label: 'name',items: [\n");
-        buffer.append("{id: '" + this.derivate + "', name:'" + this.docTitle +"', structureType:'" + this.docType + "', type:'category', children:[\n");
+        buffer.append("{\"identifier\": \"id\", \"label\": \"name\", \"items\": [\n");
+        buffer.append("{\"id\": \"" + this.derivate + "\", \"name\":\"" + this.docTitle + "\", \"structureType\":\"" + this.docType
+                + "\", \"type\":\"category\", \"children\":[\n");
 
         for (int i = 0; i < elements.length; i++) {
             buffer.append(elements[i].asJson());

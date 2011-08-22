@@ -183,8 +183,8 @@ public class MCREntry implements MCRIMetsSortable {
      * @see org.mycore.mets.tools.model.IMetsSortable#asJson()
      */
     public String asJson() {
-        String toReturn = "{ id: '" + itemId + "', path: '" + this.path + "', name:'" + this.label + "',orderLabel:'" + this.orderLabel
-                + "', structureType:'" + this.structureType + "', type:'item' }";
+        String toReturn = "{ \"id\": \"" + itemId + "\", \"path\": \"" + this.path + "\", \"name\":\"" + this.label
+                + "\", \"orderLabel\":\"" + this.orderLabel + "\", \"structureType\":\"" + this.structureType + "\", \"type\":\"item\" }";
 
         return toReturn;
     }
