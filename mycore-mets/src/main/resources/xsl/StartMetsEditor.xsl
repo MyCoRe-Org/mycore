@@ -41,12 +41,12 @@
             <title>
               <xsl:value-of select="concat('Mets Editor - ',$derivateId)" />
             </title>
-            <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/dojo/1.6/dojo/dojo.xd.js" djConfig="parseOnLoad:true"></script>
+            <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/dojo/1.6.1/dojo/dojo.xd.js" djConfig="parseOnLoad:true"></script>
             <link rel="stylesheet" type="text/css" href="style/style.css" />
               <style type="text/css">
-              @import "http://ajax.googleapis.com/ajax/libs/dojo/1.6/dojo/resources/dojo.css";
-              @import "http://ajax.googleapis.com/ajax/libs/dojo/1.6/dijit/themes/tundra/tundra.css";
-              @import "http://ajax.googleapis.com/ajax/libs/dojo/1.6/dojo/resources/dnd.css";
+              @import "http://ajax.googleapis.com/ajax/libs/dojo/1.6.1/dojo/resources/dojo.css";
+              @import "http://ajax.googleapis.com/ajax/libs/dojo/1.6.1/dijit/themes/tundra/tundra.css";
+              @import "http://ajax.googleapis.com/ajax/libs/dojo/1.6.1/dojo/resources/dnd.css";
               
               .myFolder {
               background-image: url(img/folder_16x16.png);
