@@ -287,9 +287,15 @@ public class MCRJSONProvider implements Comparator<MCRFilesystemNode> {
         return null;
     }
 
-    /** This methods builds the tree with the mets document as a base */
+    /**
+     * This methods builds the tree with the mets document as a base.
+     * 
+     * @param parent
+     * @param children
+     * @throws JDOMException
+     */
     @SuppressWarnings("unchecked")
-    private void buildTree(MCRDirectory parent, List<Element> children) {
+    private void buildTree(MCRDirectory parent, List<Element> children) throws JDOMException {
         Iterator<Element> it = children.iterator();
         while (it.hasNext()) {
             Element logicalDiv = it.next();
@@ -298,17 +304,26 @@ public class MCRJSONProvider implements Comparator<MCRFilesystemNode> {
             String logicalDivLabel = logicalDiv.getAttributeValue("LABEL");
 
             MCRDirectory dir = new MCRDirectory(logicalDivId, logicalDivLabel, divType);
-            int order = Integer.valueOf(getOrderAttribute(getPhysicalIdsForLogical(logicalDivId)[0]));
+
+            boolean flag = firstIsFile(logicalDivId);
+            String physId = null;
+            if (flag) {
+                physId = getPhysicalIdsForLogical(logicalDivId)[0];
+            } else {
+                String firstDivWithFiles = getFirstDivWithFiles(logicalDivId, children);
+                physId = getPhysicalIdsForLogical(firstDivWithFiles)[0];
+            }
+
+            int order = Integer.valueOf(getOrderAttribute(physId));
             dir.setOrder(order);
             addFiles(dir);
             parent.addDirectory(dir);
-
             try {
                 XPath kiddies = XPath.newInstance("mets:div");
                 kiddies.addNamespace(IMetsElement.METS);
                 buildTree(dir, kiddies.selectNodes(logicalDiv));
             } catch (Exception x) {
-                LOGGER.error(x);
+                LOGGER.error("Exception occured while building internal tree for mets", x);
             }
         }
     }
@@ -463,11 +478,10 @@ public class MCRJSONProvider implements Comparator<MCRFilesystemNode> {
         Arrays.sort(nodes, this);
 
         StringBuilder builder = new StringBuilder();
-        builder.append("{identifier: 'id',label: 'name',items: [\n");
-        builder.append("{id: '" + derivate + "', name:'" + derivate + "', structureType:'monograph', type:'category', children:[\n");
-
+        builder.append("{\"identifier\": \"id\", \"label\": \"name\", \"items\": [\n");
+        builder.append("{\"id\": \"" + derivate + "\", \"name\":\"" + derivate
+                + "\", \"structureType\":\"monograph\", \"type\":\"category\", \"children\":[\n");
         processNodes(nodes, builder);
-
         builder.append("]}\n]}");
         return builder.toString();
     }
