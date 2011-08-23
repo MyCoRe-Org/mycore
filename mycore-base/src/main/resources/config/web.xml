@@ -135,10 +135,6 @@
     <servlet-name>MCRFSMapperServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRFSMapperServlet</servlet-class>
   </servlet>
-  <servlet id="OAIProvider">
-    <servlet-name>MCROAIProvider</servlet-name>
-    <servlet-class>org.mycore.services.oai.MCROAIProvider</servlet-class>
-  </servlet>
   <servlet id="StaticXMLFile">
     <servlet-name>MCRStaticXMLFileServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRStaticXMLFileServlet</servlet-class>
@@ -257,14 +253,6 @@
   <servlet-mapping>
     <servlet-name>MCRFileNodeServlet</servlet-name>
     <url-pattern>/servlets/MCRFileNodeServlet/*</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>MCROAIProvider</servlet-name>
-    <url-pattern>/servlets/MCROAIProvider</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>MCROAIProvider</servlet-name>
-    <url-pattern>/oai</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>XMLEditor</servlet-name>
