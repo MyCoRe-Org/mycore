@@ -141,4 +141,9 @@ class MCRMetadataFormat {
             map.put(prefix, format);
         }
     }
+    
+    @Override
+    public String toString(){
+        return this.prefix;
+    }
 }
