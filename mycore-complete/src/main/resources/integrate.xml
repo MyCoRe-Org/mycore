@@ -119,7 +119,7 @@
       </sequential>
     </for>
     <for param="table.class"
-      list="MCRACCESS,MCRACCESSRULE,MCRCSTORE,MCRFSNODES,MCRLINKHREF,MCRRESUMPTIONTOKEN,MCRURN,MCRDELETEDITEMS">
+      list="MCRACCESS,MCRACCESSRULE,MCRCSTORE,MCRFSNODES,MCRLINKHREF,MCRURN,MCRDELETEDITEMS">
       <sequential>
         <AddHibernateMapping class="org.mycore.backend.hibernate.tables.@{table.class}"/>
       </sequential>
