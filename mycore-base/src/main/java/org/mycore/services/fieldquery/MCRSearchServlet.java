@@ -124,6 +124,9 @@ public class MCRSearchServlet extends MCRServlet {
             if (name.equals("mask")) {
                 continue;
             }
+            if (name.equals("XSL.")) {
+                continue;
+            }
 
             MCRFieldDef field = MCRFieldDef.getDef(name);
             String defaultOperator = MCRFieldType.getDefaultOperator(field.getDataType());
