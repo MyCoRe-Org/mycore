@@ -502,7 +502,7 @@ genProto.updateModuls = function() {
     this.handleScrollbars();
     try {
       //repaint Toolbar as if the width of the dropdown changes the spring needs to be adjusted
-      this.iview.toolbarCtrl.paint("mainTb");	
+      this.iview.toolbar.ctrl.paint("mainTb");	
     } catch (e) {}
   } else {
     //TODO: align image and toolbar to the center
@@ -772,7 +772,7 @@ genProto.processMETS = function(metsDoc) {
 	this.iview.PhysicalModelProvider = new iview.METS.PhysicalModelProvider(metsDoc);
 	this.iview.PhysicalModel = this.iview.PhysicalModelProvider.createModel();
 	var physicalModel = this.iview.PhysicalModel;
-	var toolbarCtrl = this.iview.toolbarCtrl;
+	var toolbarCtrl = this.iview.toolbar.ctrl;
 	this.iview.amountPages = physicalModel.getNumberOfPages();
 	physicalModel.setPosition(physicalModel.getPosition(this.iview.currentImage.name));
 	jQuery(physicalModel).bind("select.METS", function(e, val) {
@@ -803,7 +803,7 @@ genProto.processMETS = function(metsDoc) {
 		}
 	}
 	pagelist.append(ul);
-	this.iview.toolbarCtrl.toolbarContainer.append(pagelist);
+	toolbarCtrl.toolbarContainer.append(pagelist);
 
 	// if METS File is loaded after the drop-down-menu (in mainToolbar) its content needs to be updated
 	if (jQuery('.navigateHandles .pageBox')[0]) {
@@ -814,7 +814,7 @@ genProto.processMETS = function(metsDoc) {
 	//at other positions Opera doesn't get it correctly (although it still doesn't look that smooth as in other browsers) 
 	//TODO needs to be adapted to work correctly with the new structure
 	window.setTimeout(function() {
-    that.iview.toolbarCtrl.paint('mainTb');
+    	toolbarCtrl.paint('mainTb');
   }, 10);
 };
 

@@ -13,7 +13,7 @@ iview[
   pdfCreator: {PDF-funktion},
   permaLink: {},
   properties: {verschiedene Einstellungen pro Instanz},
-  toolbar: {Alles zur ThULBar},
+  toolbar: {mgr, ctrl},
   viewer: {PanonJS-Instanz},
 }
 ]
