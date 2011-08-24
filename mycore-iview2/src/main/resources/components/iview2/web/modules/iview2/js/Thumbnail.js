@@ -46,8 +46,6 @@ genProto.processImageProperties = function(imageProperties, url){
 	var viewerBean = this.iview.viewerBean;
 	
 	// checks for enabled Modi & reset before
-	//TODO: check if initialModus is still needed
-	this.iview.initialModus = this.iview.currentImage.zoomInfo.zoomWidth ? "width" : this.iview.currentImage.zoomInfo.zoomScreen ? "screen" : "none";
   //TODO: check if zoomInit is still needed
 	this.iview.currentImage.zoomInfo.zoomInit = Math.min(viewerBean.zoomLevel,this.iview.currentImage.zoomInfo.maxZoom);
 	var thumbSource=viewerBean.tileUrlProvider.assembleUrl(0,0,0);
