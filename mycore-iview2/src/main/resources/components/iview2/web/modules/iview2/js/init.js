@@ -82,8 +82,6 @@ genProto.enableInputHandler = function() {
   this.inputHandlerEnabled=true;
 };
 
-//IE and Opera doesn't accept our TileUrlProvider Instance as one of PanoJS
-PanoJS.isInstance = function () {return true;};
 /*
  * calculate simple image name hash value to spread request over different servers
  * but allow browser cache to be used by allways return the same value for a given name 

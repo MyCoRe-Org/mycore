@@ -169,19 +169,8 @@ PanoJS.GRABBING_MOUSE_CURSOR = (navigator.userAgent.search(/KHTML|Opera/i) >= 0 
 // registry of all known viewers
 PanoJS.VIEWERS = [];
 
-// utility functions
-PanoJS.isInstance = function(object, clazz) {
-	// FIXME: can this just be replaced with instanceof operator? It has been reported that __proto__ is specific to Netscape
-	while (object != null) {
-		if (object == clazz.prototype) {
-			return true;
-		}
-
-		object = object.__proto__;
-	}
-
-	return false;
-}
+//IE and Opera doesn't accept our TileUrlProvider Instance as one of PanoJS
+PanoJS.isInstance = function () {return true;};
 
 PanoJS.prototype = {
 
