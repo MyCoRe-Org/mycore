@@ -54,27 +54,26 @@ ToolbarController.prototype.addView = function(view) {
 					// FitToWidth - Button wieder reseten
 					that.perform("setSubtypeState", false, args.parentName, "fitToWidth");
 					that.perform("setSubtypeState", false, args.parentName, "fitToScreen");
-	
-	    			that.getViewer().gen.zoomViewer(true);
+	    			that.getViewer().viewerBean.zoomViewer(true);
 				} else if (args.elementName == "zoomOut") {
 					// FitToScreen - Button wieder reseten
 					// FitToWidth - Button wieder reseten
 					that.perform("setSubtypeState", false, args.parentName, "fitToWidth");
 					that.perform("setSubtypeState", false, args.parentName, "fitToScreen");
 	 
-	        			that.getViewer().gen.zoomViewer(false);
+	        			that.getViewer().viewerBean.zoomViewer(false);
 	    			} else if (args.elementName == "fitToWidth") {
 					// FitToScreen - Button wieder reseten
 					that.perform("setSubtypeState", true, args.parentName, "fitToWidth");
 					that.perform("setSubtypeState", false, args.parentName, "fitToScreen");
 	
-	    			that.getViewer().gen.pictureWidth();
+	    			that.getViewer().viewerBean.pictureWidth();
 				} else if (args.elementName == "fitToScreen") {    				
 					// FitToWidth - Button wieder reseten
 					that.perform("setSubtypeState", false, args.parentName, "fitToWidth");
 					that.perform("setSubtypeState", true, args.parentName, "fitToScreen");
 	  
-	    				that.getViewer().gen.pictureScreen();
+	    				that.getViewer().viewerBean.pictureScreen();
 	    			}
 	    		} else if (args.parentName == "overviewHandles") {
 				if (args.elementName == "openThumbnailPanel") {

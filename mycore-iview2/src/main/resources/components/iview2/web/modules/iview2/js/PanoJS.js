@@ -835,7 +835,172 @@ PanoJS.prototype = {
 		}
 
 		this.slideAcceleration = 0;
+	},
+	
+	//function additions
+	/**
+	 * @public
+	 * @function
+	 * @memberOf	PanoJS
+	 * @name		zoomCenter
+	 * @description	Zooms the given Viewer so that the given point will be in center of view
+	 * @param		{integer} direction to zoom in = 1 out = -1
+	 * @param		{object} point coordinates to center
+	 * @param		{integer} point.x x-coordinate to center
+	 * @param		{integer} point.y y-coordinate to center
+	 */
+	zoomCenter: function(direction, point) {
+		console.log(this.iview.viewerBean, this)
+		var viewer = this;
+		var preload = this.iview.context.preload;
+		var preDim = {"x" :toInt(preload.css("left")),"y":toInt(preload.css("top")), "width":preload.width(), "height":preload.height()};
+		viewer.zoom(direction);
+		var newDim = {"width":preload.width(), "height":preload.height()};
+		viewer.x = 0;
+		viewer.y = 0;
+		var npoint ={'x': ((-preDim.x + point.x) / preDim.width) * newDim.width,
+					'y': ((-preDim.y + point.y) / preDim.height) * newDim.height};
+		viewer.resetSlideMotion();
+		viewer.recenter(npoint,true);
+	},
+	
+	/**
+	 * @public
+	 * @function
+	 * @name		zoomViewer
+	 * @memberOf	PanoJS
+	 * @description	handles the direction of zooming in the viewer
+	 * @param 		{boolean} direction: true = zoom in, false = zoom out
+	 */
+	zoomViewer : function(direction) {
+		var dir = 0;
+		if (direction) {
+			//if zoomWidth or zoomScreen was active and we're already in the max zoomlevel just reset the displayMode
+			if (this.iview.currentImage.zoomInfo.zoomScreen) {
+				this.pictureScreen(true);
+			} else if (this.iview.currentImage.zoomInfo.zoomWidth) {
+				this.pictureWidth(true);
+			}
+			if (this.zoomLevel != this.iview.currentImage.zoomInfo.maxZoom) {
+				dir = 1;
+			}
+		} else {
+			dir = -1;
+		}
+		this.zoomCenter(dir, {"x":this.width/2, "y":this.height/2});
+	},
+	
+	/**
+	 * @public
+	 * @function
+	 * @name		pictureWidth
+	 * @memberOf	PanoJS
+	 * @description	calculates how the tilesize has to be so that the picture fully fits into the viewer Area, tiles used are the nearest zoomlevel to the available viewerwidth which is smaller than the viewerwidth
+	 * @param 		{boolean} [preventLooping] optional tells if the function is called from the Zoombar or any Function which is connected to it or not and prevents infite loop
+	 */
+	pictureWidth : function(preventLooping){
+		var bool = (typeof (preventLooping) != undefined)? preventLooping:false;
+		this.iview.currentImage.zoomInfo.zoomWidth = this.switchDisplayMode(false, this.iview.currentImage.zoomInfo.zoomWidth, bool);
+	},
+
+	/**
+	 * @public
+	 * @function
+	 * @name		pictureScreen
+	 * @memberOf	PanoJS
+	 * @description	calculates how the tilesize has to be so that the picture fully fits into the viewer Area, tiles used are the nearest zoomlevel to the available viewerspace which is smaller than the viewerspace
+	 * @param 		{boolean} [preventLooping] optional tells if the function is called from the Zoombar or any Function which is connected to it or not and prevents infite loop
+	 */
+	pictureScreen : function(preventLooping){
+		var bool = (typeof (preventLooping) != undefined)? preventLooping:false;
+		this.iview.currentImage.zoomInfo.zoomScreen = this.switchDisplayMode(true, this.iview.currentImage.zoomInfo.zoomScreen, bool);
+	},
+	
+	/**
+	 * @public
+	 * @function
+	 * @name		switchDisplayMode
+	 * @memberOf	PanoJS
+	 * @description	calculates how the picture needs to be scaled so that it can be displayed within the display-area as the mode requires it
+	 * @param		{boolean} screenZoom defines which displaymode will be calculated
+	 * @param		{boolean} statebool holds the value which defines if the current mode is set or needs to be set
+	 * @param 		{boolean} [preventLooping] optional tells if the function is called from the Zoombar or any Function which is connected to it or not and prevents infite loop
+	 * @return		boolean which holds the new StateBool value, so it can be saved back into the correct variable
+	 */
+	switchDisplayMode : function(screenZoom, stateBool, preventLooping) {
+		//this is viewerBean
+		if (screenZoom) {
+			this.iview.currentImage.zoomInfo.zoomWidth = false;
+		} else {
+			this.iview.currentImage.zoomInfo.zoomScreen = false;
+		}
+		stateBool = (stateBool)? false: true;
+		this.clear();
+		this.iview.gen.removeScaling();
+		var preload = this.iview.context.preload;
+		if (stateBool) {
+			for (var i = 0; i <= this.iview.currentImage.zoomInfo.maxZoom; i++) {
+				if(this.iview.currentImage.width/this.width > this.iview.currentImage.height/this.iview.context.viewer.outerHeight(true) || (stateBool && !screenZoom)){
+				//Width > Height Or ZoomWidth is true
+					if (this.calculateZoomProp(i, this.iview.currentImage.width, this.width, 0)) {
+						break;
+					}
+				} else {
+					if (this.calculateZoomProp(i, this.iview.currentImage.height, this.height, 0)) {
+						break;
+					}
+				}
+			}
+			this.init();
+		} else {
+		  this.iview.currentImage.zoomInfo.scale = 1;
+			this.tileSize = this.iview.properties.tileSize;
+			this.init();
+			
+			//an infinite loop would arise if the repeal of the zoombar comes
+			if (typeof (preventLooping) == "undefined" || preventLooping == false) {
+				this.zoom(this.iview.currentImage.zoomInfo.zoomBack - this.zoomLevel);
+			}
+		}
+
+		var offset = preload.offset();
+		this.iview.scrollbars.barX.setCurValue(-offset.left);
+		this.iview.scrollbars.barY.setCurValue(-offset.top);
+		if (this.iview.overview.loaded) this.iview.overview.Model.setPos({'x':offset.left, 'y':offset.top});
+		return stateBool;
+	},
+	
+	/**
+	 * @public
+	 * @function
+	 * @name		calculateZoomProp
+	 * @memberOf	PanoJS
+	 * @description	calculates how the TileSize and the zoomvalue needs to be if the given zoomlevel fits into the viewer
+	 * @param		{integer} level the zoomlevel which is used for testing
+	 * @param		{integer} totalSize the total size of the Picture Dimension X or Y
+	 * @param		{integer} viewerSize the Size of the Viewer Dimension X or Y
+	 * @param		{integer} scrollBarSize the Height or Width of the ScrollBar which needs to be dropped from the ViewerSize
+	 * @return		boolean which tells if it was successfull to scale the picture in the current zoomlevel to the viewer Size
+	 */
+	calculateZoomProp : function(level, totalSize, viewerSize, scrollBarSize) {
+		if ((totalSize / Math.pow(2, level)) <= viewerSize) {
+			if (level != 0) {
+				level--;
+			}
+			var currentWidth = totalSize / Math.pow(2, level);
+			var viewerRatio = viewerSize / currentWidth;
+			var fullTileCount = Math.floor( currentWidth / this.iview.properties.tileSize);
+			var lastTileWidth = currentWidth - fullTileCount * this.iview.properties.tileSize;
+		  this.iview.currentImage.zoomInfo.scale = viewerRatio; //determine the scaling ratio
+			level = this.iview.currentImage.zoomInfo.maxZoom - level;
+			this.tileSize = Math.floor((viewerSize - viewerRatio * lastTileWidth) / fullTileCount);
+			this.iview.currentImage.zoomInfo.zoomBack = this.zoomLevel;
+			this.zoom(level - this.zoomLevel);
+			return true;
+		}
+		return false;
 	}
+	//function addition end
 };
 
 PanoJS.TileUrlProvider = function(baseUri, prefix, extension) {
@@ -910,7 +1075,7 @@ PanoJS.doubleClickHandler = function(e) {
 		var self = this.backingBean;
 		coords = self.resolveCoordinates(e);
 		if (self.zoomLevel < self.maxZoomLevel) {
-			iview.gen.zoomCenter(1,coords);
+			this.backingBean.zoomCenter(1,coords);
 		} else {
 			self.resetSlideMotion();
 			self.recenter(coords);
@@ -951,7 +1116,7 @@ PanoJS.keyboardHandler = function(e) {
         }
         
         if (dir != 0 && viewer.iview.properties.maximized) {
-          viewer.iview.zoomCenter(dir,{"x":viewer.width/2, "y":viewer.height/2}); 
+          this.zoomCenter(dir,{"x":viewer.width/2, "y":viewer.height/2}); 
           preventDefault(e);
           e.cancelBubble = true;
           return false;

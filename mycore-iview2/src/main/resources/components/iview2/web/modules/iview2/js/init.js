@@ -114,31 +114,6 @@ PanoJS.TileUrlProvider.prototype.assembleUrl = function(xIndex, yIndex, zoom, im
 /**
  * @public
  * @function
- * @memberOf	iview.General
- * @name		zoomCenter
- * @description	Zooms the given Viewer so that the given point will be in center of view
- * @param		{integer} direction to zoom in = 1 out = -1
- * @param		{object} point coordinates to center
- * @param		{integer} point.x x-coordinate to center
- * @param		{integer} point.y y-coordinate to center
- */
-genProto.zoomCenter = function(direction, point) {
-	var viewer = this.iview.viewerBean;
-	var preload = this.iview.context.preload;
-	var preDim = {"x" :toInt(preload.css("left")),"y":toInt(preload.css("top")), "width":preload.width(), "height":preload.height()};
-	viewer.zoom(direction);
-	var newDim = {"width":preload.width(), "height":preload.height()};
-	viewer.x = 0;
-	viewer.y = 0;
-	var npoint ={'x': ((-preDim.x + point.x) / preDim.width) * newDim.width,
-				'y': ((-preDim.y + point.y) / preDim.height) * newDim.height};
-	viewer.resetSlideMotion();
-	viewer.recenter(npoint,true);
-};
-
-/**
- * @public
- * @function
  * @name		initializeGraphic
  * @memberOf	iview.General
  * @description	here some important values and listener are set correctly, calculate simple image name hash value to spread request over different servers and initialise the viewer
@@ -227,10 +202,10 @@ genProto.reinitializeGraphic = function(callback) {
 	// den Modus beibehalten & aktualisieren
 	if(this.iview.currentImage.zoomInfo.zoomScreen){
 		this.iview.currentImage.zoomInfo.zoomScreen = !this.iview.currentImage.zoomInfo.zoomScreen;	
-		this.pictureScreen();
+		viewerBean.pictureScreen();
 	} else if(this.iview.currentImage.zoomInfo.zoomWidth){
 		this.iview.currentImage.zoomInfo.zoomWidth = !this.iview.currentImage.zoomInfo.zoomWidth;
-		this.pictureWidth();
+		viewerBean.pictureWidth();
 	}
 	
 	if (this.iview.properties.useThumbnailPanel && this.iview.thumbnailPanel && this.iview.thumbnailPanel.getActive()) {
