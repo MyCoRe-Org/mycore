@@ -146,8 +146,6 @@ genProto.zoomCenter = function(direction, point) {
  * @description	here some important values and listener are set correctly, calculate simple image name hash value to spread request over different servers and initialise the viewer
  */
 genProto.initializeGraphic = function() {
-	this.iview.loaded = false;//indicates if the window is finally loaded
-	this.iview.maximized = this.iview.properties.maximized;
 	this.iview.images = [];
 	PanoJS.USE_SLIDE = false;
 	PanoJS.USE_LOADER_IMAGE = false;
@@ -210,7 +208,7 @@ genProto.reinitializeGraphic = function(callback) {
 	var barX=this.iview.scrollbars.barX;
 	var barY=this.iview.scrollbars.barY;
 
-	if (this.iview.maximized == true) {
+	if (this.iview.properties.maximized == true) {
 		//to grant usage of the complete height it's not possible to simply use height:100%
 		viewerContainer.css({'height': curHeight - viewerContainer.offset().top + "px",
 							'width': curWidth + "px"});
@@ -268,12 +266,12 @@ genProto.reinitializeGraphic = function(callback) {
  * @description	maximize and show the viewer with the related image or minimize and close the viewer
  */
 genProto.maximizeHandler = function() {
-	if (this.iview.maximized) {
+	if (this.iview.properties.maximized) {
 		if (URL.getParam("jumpback") == "true"){
 			history.back();
 			return;
 		}
-		this.iview.maximized = false;
+		this.iview.properties.maximized = false;
 		jQuery(this.iview.viewerContainer).trigger("minimize.viewerContainer");
 		
 		// append viewer to dom again
@@ -283,7 +281,7 @@ genProto.maximizeHandler = function() {
 			this.pictureScreen();
 		}
 	} else {
-		this.iview.maximized = true;
+		this.iview.properties.maximized = true;
 		jQuery(this.iview.viewerContainer).trigger("maximize.viewerContainer");
 		
 		// save document content
@@ -298,7 +296,7 @@ genProto.maximizeHandler = function() {
 
 PanoJS.doubleClickHandler = function(e) {
 	var iview = this.backingBean.iview;
-	if (iview.maximized && iview.gen.isInputHandlerEnabled()) {
+	if (iview.properties.maximized && iview.gen.isInputHandlerEnabled()) {
 		e = getEvent(e);
 		var self = this.backingBean;
 		coords = self.resolveCoordinates(e);
@@ -315,7 +313,7 @@ PanoJS.mousePressedHandler = function(e) {
 	var that = this.backingBean.iview.gen;
 	if (that.isInputHandlerEnabled()){
   	e = getEvent(e);
-  	if (that.iview.maximized) {
+  	if (that.iview.properties.maximized) {
   		// only grab on left-click
   		if (e.button < 2) {
   			var self = this.backingBean;
@@ -343,7 +341,7 @@ PanoJS.keyboardHandler = function(e) {
 	      var motion = {
 	          'x': PanoJS.MOVE_THROTTLE * (e.keyCode % 2) * (38 - e.keyCode),
 	          'y': PanoJS.MOVE_THROTTLE * ((39 - e.keyCode) % 2)};
-	      if (viewer.iview.maximized){
+	      if (viewer.iview.properties.maximized){
 	        viewer.positionTiles(motion, true);
 	        viewer.notifyViewerMoved(motion);
         }
@@ -358,12 +356,12 @@ PanoJS.keyboardHandler = function(e) {
         } else if (e.keyCode == 107 || e.keyCode == 61 || (isBrowser(["Chrome", "IE"]) && e.keyCode == 187) || (isBrowser("Safari") && e.keyCode == 144)) {
           dir = 1;
         } else if (e.keyCode == 27) {
-          if (viewer.iview.maximized){
+          if (viewer.iview.properties.maximized){
             viewer.iview.maximizeHandler();
           }
         }
         
-        if (dir != 0 && viewer.iview.maximized) {
+        if (dir != 0 && viewer.iview.properties.maximized) {
           viewer.iview.zoomCenter(dir,{"x":viewer.width/2, "y":viewer.height/2}); 
           preventDefault(e);
           e.cancelBubble = true;

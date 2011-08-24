@@ -495,7 +495,7 @@ genProto.openChapter = function(button){
  * @description	marks the correct picture in the chapterview and set zoombar to the correct zoomlevel
  */
 genProto.updateModuls = function() {
-  if (this.iview.maximized){
+  if (this.iview.properties.maximized){
     // align/fit scrollbars
     this.handleScrollbars();
     try {
@@ -705,7 +705,6 @@ genProto.loading = function(startFile) {
  * @description	
  */
 genProto.startFileLoaded = function(){
-	this.iview.loaded = true;
 	var that = this;
 	//Blank needs to be loaded as blank, so the level is filled. Else it lays not ontop; needed for IE 
 	this.iview.context.viewer.find(".surface").css("backgroundImage", "url(" + this.iview.properties.webappBaseUri + "modules/iview2/gfx/blank.gif" + ")");
@@ -723,7 +722,7 @@ genProto.startFileLoaded = function(){
 //		}
 		//Toolbar is initialized on dom-load event and may not yet ready
 	  var waitForToolbar = function (self, iviewInst){
-	    if (iviewInst.initialized){
+	    if (iviewInst.properties.initialized){
 	      iviewInst.gen.maximizeHandler();
 	    } else {
 	      setTimeout(function(){self(self,iviewInst);}, 100);

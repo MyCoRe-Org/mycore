@@ -32,6 +32,7 @@
         "useOverview" : true,
         "useThumbnailPanel" : true,
         "maximized" : false,
+        "initialized" : false,
         "zoomWidth" : false,
         "zoomScreen" : false,
         "tileSize" : 256,
@@ -55,7 +56,6 @@
         }
         this.properties.useParam = (paramDerId === this.properties.derivateId) || (paramDerId.length === 0 && first);
       }
-      this.initialized = false;
       this.viewerContainer = container;
       this.overview = jQuery.extend(this.overview || {}, {'loaded': (this.overview || {}).loaded || false,  'parent': container});
       this.chapter = jQuery.extend(this.chapter | {}, {'loaded': (this.chapter || {}).loaded || false, 'parent': container});
@@ -101,7 +101,7 @@
 
         // holt alle bisherigen Models in den Controller und setzt diese entsprechend um
         that.toolbar.ctrl.catchModels();
-        that.initialized = true;
+        that.properties.initialized = true;
       })
       	.bind("reinit.viewer", function() {
       		that.toolbar.ctrl.paint("mainTb");
