@@ -175,65 +175,6 @@ genProto.importPermalink = function(callback) {
 /**
  * @public
  * @function
- * @name		removeScaling
- * @memberOf	iview.General
- * @description	saves the scaling of loaded tiles if picture fits to height or to width (for IE)
- */
-genProto.removeScaling = function() {
-	for (var img in this.iview.images) {
-		this.iview.images[img]["scaled"] = false;
-	}
-}
-
-/**
- * @public
- * @function
- * @name		isloaded
- * @memberOf	iview.General
- * @description	checks if the picture is loaded
- * @param		{object} img
- */
-genProto.isloaded = function(img) {
-	/*
-	NOTE tiles are not displayed correctly in Opera, because the used accuracy for pixel values only has 
-	2 decimal places, however 3 are necessary for the correct representation as in FF
-	*/
-	if (!this.iview.images[img.src]) {
-		this.iview.images[img.src] = new Object();
-		this.iview.images[img.src]["scaled"] = false;
-		img.style.display = "none";
-	}
-	if (((img.naturalWidth == 0 && img.naturalHeight == 0)  && !isBrowser(["IE", "Opera"])) || (!img.complete && isBrowser(["IE", "Opera"]))) {
-		if (img.src.indexOf("blank.gif") == -1) {//change
-			var that = this;
-			window.setTimeout(function(image) { return function(){that.isloaded(image);} }(img), 100);
-		}
-	} else if (img.src.indexOf("blank.gif") == -1) {
-		if (this.iview.images[img.src]["scaled"] != true) {
-			img.style.display = "inline";
-			this.iview.images[img.src]["scaled"] = true;//notice that this picture already was scaled
-			//TODO math Floor rein bauen bei Höhe und Breite
-		  var zoomScale=this.iview.currentImage.zoomInfo.scale;
-			if (!isBrowser(["IE","Opera"])) {
-				img.style.width = zoomScale * img.naturalWidth + "px";
-				img.style.height = zoomScale * img.naturalHeight + "px";
-			} else {
-				if (!this.iview.images[img.src]["once"]) {
-					this.iview.images[img.src]["once"] = true;
-					this.iview.images[img.src]["naturalheight"] = img.clientHeight;
-					this.iview.images[img.src]["naturalwidth"] = img.clientWidth;
-				}
-				img.style.width = zoomScale * this.iview.images[img.src]["naturalwidth"] + "px";
-				img.style.height = zoomScale * this.iview.images[img.src]["naturalheight"] + "px";
-			}
-		}
-	}
-	img = null;
-}
-
-/**
- * @public
- * @function
  * @name		scrollMove
  * @memberOf	iview.General
  * @description	loads the tiles accordingly the position of the scrollbar if they is moving

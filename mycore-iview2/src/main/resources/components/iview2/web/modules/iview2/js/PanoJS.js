@@ -106,6 +106,8 @@ function PanoJS(viewer, options) {
 	this.mark = { 'x' : 0, 'y' : 0 };
 	this.pressed = false;
 	this.tiles = [];
+	//TODO maybe its possible to store all data which is kept in images in tiles
+	this.images = [];
 	this.cache = {};
 	var blankTile = options.blankTile ? options.blankTile : PanoJS.BLANK_TILE_IMAGE;
 	var loadingTile = options.loadingTile ? options.loadingTile : PanoJS.LOADING_TILE_IMAGE;
@@ -561,7 +563,7 @@ PanoJS.prototype = {
 			}
 		}
 //additions
-		this.iview.gen.isloaded(tileImg);
+		this.isloaded(tileImg);
 		//changes all not available Tiles to the blank one, so that no ugly Image not Found Pics popup.
 		tileImg.onerror = function () {this.src = PanoJS.BLANK_TILE_IMAGE; return true;};
 //endadd
@@ -850,7 +852,6 @@ PanoJS.prototype = {
 	 * @param		{integer} point.y y-coordinate to center
 	 */
 	zoomCenter: function(direction, point) {
-		console.log(this.iview.viewerBean, this)
 		var viewer = this;
 		var preload = this.iview.context.preload;
 		var preDim = {"x" :toInt(preload.css("left")),"y":toInt(preload.css("top")), "width":preload.width(), "height":preload.height()};
@@ -936,7 +937,7 @@ PanoJS.prototype = {
 		}
 		stateBool = (stateBool)? false: true;
 		this.clear();
-		this.iview.gen.removeScaling();
+		this.removeScaling();
 		var preload = this.iview.context.preload;
 		if (stateBool) {
 			for (var i = 0; i <= this.iview.currentImage.zoomInfo.maxZoom; i++) {
@@ -999,6 +1000,65 @@ PanoJS.prototype = {
 			return true;
 		}
 		return false;
+	},
+	
+	/**
+	 * @public
+	 * @function
+	 * @name		removeScaling
+	 * @memberOf	PanoJS
+	 * @description	saves the scaling of loaded tiles if picture fits to height or to width (for IE)
+	 */
+	removeScaling : function() {
+		for (var img in this.iview.images) {
+			this.images[img]["scaled"] = false;
+		}
+	},
+
+	/**
+	 * @public
+	 * @function
+	 * @name		isloaded
+	 * @memberOf	iview.General
+	 * @description	checks if the picture is loaded
+	 * @param		{object} img
+	 */
+	isloaded : function(img) {
+		/*
+		NOTE tiles are not displayed correctly in Opera, because the used accuracy for pixel values only has 
+		2 decimal places, however 3 are necessary for the correct representation as in FF
+		*/
+		if (!this.images[img.src]) {
+			this.images[img.src] = new Object();
+			this.images[img.src]["scaled"] = false;
+			img.style.display = "none";
+		}
+		if (((img.naturalWidth == 0 && img.naturalHeight == 0)  && !isBrowser(["IE", "Opera"])) || (!img.complete && isBrowser(["IE", "Opera"]))) {
+			if (img.src.indexOf("blank.gif") == -1) {//change
+				var that = this;
+				window.setTimeout(function(image) { return function(){that.isloaded(image);} }(img), 100);
+			}
+		} else if (img.src.indexOf("blank.gif") == -1) {
+			if (this.images[img.src]["scaled"] != true) {
+				img.style.display = "inline";
+				this.images[img.src]["scaled"] = true;//notice that this picture already was scaled
+				//TODO math Floor rein bauen bei Höhe und Breite
+			  var zoomScale=this.iview.currentImage.zoomInfo.scale;
+				if (!isBrowser(["IE","Opera"])) {
+					img.style.width = zoomScale * img.naturalWidth + "px";
+					img.style.height = zoomScale * img.naturalHeight + "px";
+				} else {
+					if (!this.images[img.src]["once"]) {
+						this.images[img.src]["once"] = true;
+						this.images[img.src]["naturalheight"] = img.clientHeight;
+						this.images[img.src]["naturalwidth"] = img.clientWidth;
+					}
+					img.style.width = zoomScale * this.images[img.src]["naturalwidth"] + "px";
+					img.style.height = zoomScale * this.images[img.src]["naturalheight"] + "px";
+				}
+			}
+		}
+		img = null;
 	}
 	//function addition end
 };

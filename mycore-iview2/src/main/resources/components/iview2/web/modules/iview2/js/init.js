@@ -119,7 +119,6 @@ PanoJS.TileUrlProvider.prototype.assembleUrl = function(xIndex, yIndex, zoom, im
  * @description	here some important values and listener are set correctly, calculate simple image name hash value to spread request over different servers and initialise the viewer
  */
 genProto.initializeGraphic = function() {
-	this.iview.images = [];
 	PanoJS.USE_SLIDE = false;
 	PanoJS.USE_LOADER_IMAGE = false;
 	PanoJS.MOVE_THROTTLE = 10;
