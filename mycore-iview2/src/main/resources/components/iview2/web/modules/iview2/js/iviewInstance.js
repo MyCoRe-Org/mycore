@@ -119,8 +119,95 @@
       }
       // remove leading '/'
       startFile = encodeURI(startFile.replace(/^\/*/, ""));
-      this.gen.loading(startFile);
+      this.loading(startFile);
     };
+    
+    constructor.prototype.loading = function ii_loading(startFile) {
+		var that = this;
+		// ScrollBars
+		// horizontal
+		this.scrollbars={};//TODO: make real Object
+		var barX = this.scrollbars.barX = new iview.scrollbar.Controller();
+		barX.createView({ 'direction':'horizontal', 'parent':this.context.container, 'mainClass':'scroll'});
+		barX.attach("curVal.scrollbar", function(e, val) {
+			if (!that.roller) {
+				that.gen.scrollMove(- (val["new"]-val["old"]), 0);
+			}
+		});
+		// vertical
+		var barY = this.scrollbars.barY = new iview.scrollbar.Controller();
+		barY.createView({ 'direction':'vertical', 'parent':this.context.container, 'mainClass':'scroll'});
+		barY.attach("curVal.scrollbar", function(e, val) {
+			if (!that.roller) {
+				that.gen.scrollMove( 0, -(val["new"]-val["old"]));
+			}
+		});
+	
+		// Additional Events
+		// register to scroll into the viewer
+		this.context.viewer.mousewheel(function(e, delta, deltaX, deltaY) {e.preventDefault(); that.viewerScroll({"x":deltaX, "y":deltaY});})
+			.css({	'width':this.properties.startWidth - ((barX.my.self.css("visibility") == "visible")? barX.my.self.outerWidth() : 0)  + "px",
+					'height':this.properties.startHeight - ((barY.my.self.css("visibility") == "visible")? barY.my.self.outerHeight() : 0)  + "px"
+			});
+			
+		that.gen.initializeGraphic();
+		//needs to be registered before any other listener for this event
+		var viewerBean = this.viewerBean;
+		jQuery(viewerBean.viewer).bind("zoom.viewer", function() { viewerZoomed.apply(that, arguments)})
+			.bind("move.viewer", function() {viewerMoved.apply(that,arguments)});
+	
+		jQuery(this.viewerContainer).one("maximize.viewerContainer", function() {
+			if (that.properties.useOverview)
+				that.gen.importOverview();
+		})
+		
+		if (this.properties.useParam && !isNaN(parseInt(URL.getParam("zoom")))) {
+			viewerBean.zoomLevel= parseInt(URL.getParam("zoom"));
+		}
+		this.gen.loadPage(function(){
+		  that.gen.startFileLoaded();
+		}, startFile);
+	};
+	
+	/**
+	 * @public
+	 * @function
+	 * @name		viewerZoomed
+	 * @description	is called if the viewer is zooming; handles the correct sizing and displaying of the preloadpicture, various buttons and positioning of the Overview accordingly the zoomlevel
+	 */
+	function viewerZoomed() {
+		var viewerBean = this.viewerBean;
+		// handle special Modes, needs to close
+		if (this.currentImage.zoomInfo.zoomWidth) {
+			viewerBean.pictureWidth(true);
+		}
+		if (this.currentImage.zoomInfo.zoomScreen) {
+			viewerBean.pictureScreen(true);
+		}
+		var preload = this.context.preload;
+		var currentImage=this.currentImage;
+		var zoomInfo=currentImage.zoomInfo;
+		preload.css({"width": (currentImage.width / Math.pow(2, zoomInfo.maxZoom - viewerBean.zoomLevel))*zoomInfo.scale +  "px",
+					 "height": (currentImage.height / Math.pow(2, zoomInfo.maxZoom - viewerBean.zoomLevel))*zoomInfo.scale + "px"});
+
+		this.gen.handleScrollbars("zoom");
+	};
+
+	/**
+	 * @public
+	 * @function
+	 * @name		viewerMoved
+	 * @description	is called if the picture is moving in the viewer and handles the size of the Overview accordingly the size of the picture
+	 */
+	function viewerMoved(jq, event) {
+		// set Roller this no circles are created, and we end in an endless loop
+		this.roller = true;
+		var preload = this.context.preload;
+		var pos = preload.position();
+		this.scrollbars.barX.setCurValue(-pos.left);
+		this.scrollbars.barY.setCurValue(-pos.top);
+		this.roller = false;
+	};
 
     return constructor;
   })();

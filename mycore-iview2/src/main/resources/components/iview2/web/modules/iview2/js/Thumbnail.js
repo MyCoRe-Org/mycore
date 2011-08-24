@@ -203,9 +203,9 @@ genProto.handleScrollbars = function(reason) {
 	var viewer = this.iview.context.viewer;
 	var barX = this.iview.scrollbars.barX;
 	var barY = this.iview.scrollbars.barY;
-	var currentImage=this.iview.currentImage;
+	var currentImage = this.iview.currentImage;
 	// determine the current imagesize
-  var zoomScale=currentImage.zoomInfo.scale;
+	var zoomScale = currentImage.zoomInfo.scale;
 	var curWidth = (currentImage.width / Math.pow(2, currentImage.zoomInfo.maxZoom - viewerBean.zoomLevel))*zoomScale;
 	var curHeight = (currentImage.height / Math.pow(2, currentImage.zoomInfo.maxZoom - viewerBean.zoomLevel))*zoomScale;
 
@@ -237,47 +237,6 @@ genProto.handleScrollbars = function(reason) {
 		barX.setSize(width);
 		if (!reason == "all") break;
 	}
-};
-
-/**
- * @public
- * @function
- * @name		viewerZoomed
- * @description	is called if the viewer is zooming; handles the correct sizing and displaying of the preloadpicture, various buttons and positioning of the Overview accordingly the zoomlevel
- */
-viewerZoomed = function () {
-	var viewerBean = this.iview.viewerBean;
-	// handle special Modes, needs to close
-	if (this.iview.currentImage.zoomInfo.zoomWidth) {
-		viewerBean.pictureWidth(true);
-	}
-	if (this.iview.currentImage.zoomInfo.zoomScreen) {
-		viewerBean.pictureScreen(true);
-	}
-	var preload = this.iview.context.preload;
-	var currentImage=this.iview.currentImage;
-	var zoomInfo=currentImage.zoomInfo;
-	preload.css({"width": (currentImage.width / Math.pow(2, zoomInfo.maxZoom - viewerBean.zoomLevel))*zoomInfo.scale +  "px",
-				 "height": (currentImage.height / Math.pow(2, zoomInfo.maxZoom - viewerBean.zoomLevel))*zoomInfo.scale + "px"});
-
-	this.handleScrollbars("zoom");
-}
-
-/**
- * @public
- * @function
- * @name		viewerMoved
- * @memberOf	iview.General
- * @description	is called if the picture is moving in the viewer and handles the size of the Overview accordingly the size of the picture
- */
-viewerMoved = function (jq, event) {
-	// set Roller this no circles are created, and we end in an endless loop
-	this.iview.roller = true;
-	var preload = this.iview.context.preload;
-	var pos = preload.position();
-	this.iview.scrollbars.barX.setCurValue(-pos.left);
-	this.iview.scrollbars.barY.setCurValue(-pos.top);
-	this.iview.roller = false;
 };
 
 /**
@@ -435,63 +394,6 @@ genProto.importThumbnailPanel = function(callback) {
 	})
 	callback();
 }
-
-/**
- * @public
- * @function
- * @name		loading
- * @memberOf	iview.General
- * @description	is calling to the load-event of the window; serve for the further registration of events likewise as initiator for various objects
- */
-genProto.loading = function(startFile) {
-	var that = this;
-	
-	// ScrollBars
-	// horizontal
-	this.iview.scrollbars={};//TODO: make real Object
-	this.iview.scrollbars.barX = new iview.scrollbar.Controller();
-	var barX = this.iview.scrollbars.barX;
-	barX.createView({ 'direction':'horizontal', 'parent':this.iview.context.container, 'mainClass':'scroll'});
-	barX.attach("curVal.scrollbar", function(e, val) {
-		if (!that.iview.roller) {
-			that.scrollMove(- (val["new"]-val["old"]), 0);
-		}
-	});
-	// vertical
-	this.iview.scrollbars.barY = new iview.scrollbar.Controller();
-	var barY = this.iview.scrollbars.barY;
-	barY.createView({ 'direction':'vertical', 'parent':this.iview.context.container, 'mainClass':'scroll'});
-	barY.attach("curVal.scrollbar", function(e, val) {
-		if (!that.iview.roller) {
-			that.scrollMove( 0, -(val["new"]-val["old"]));
-		}
-	});
-
-	// Additional Events
-	// register to scroll into the viewer
-	this.iview.context.viewer.mousewheel(function(e, delta, deltaX, deltaY) {e.preventDefault(); that.viewerScroll({"x":deltaX, "y":deltaY});})
-		.css({	'width':this.iview.properties.startWidth - ((barX.my.self.css("visibility") == "visible")? barX.my.self.outerWidth() : 0)  + "px",
-				'height':this.iview.properties.startHeight - ((barY.my.self.css("visibility") == "visible")? barY.my.self.outerHeight() : 0)  + "px"
-		});
-		
-	that.initializeGraphic();
-	//needs to be registered before any other listener for this event
-	var viewerBean = that.iview.viewerBean;
-	jQuery(viewerBean.viewer).bind("zoom.viewer", function() { viewerZoomed.apply(that, arguments)})
-		.bind("move.viewer", function() {viewerMoved.apply(that,arguments)});
-
-	jQuery(this.iview.viewerContainer).one("maximize.viewerContainer", function() {
-		if (that.iview.properties.useOverview)
-			that.importOverview();
-	})
-	
-	if (this.iview.properties.useParam && !isNaN(parseInt(URL.getParam("zoom")))) {
-		viewerBean.zoomLevel= parseInt(URL.getParam("zoom"));
-	}
-	this.loadPage(function(){
-	  that.startFileLoaded();
-	}, startFile);
-};
 
 /**
  * @public
