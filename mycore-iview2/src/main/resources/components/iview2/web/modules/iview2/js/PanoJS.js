@@ -864,21 +864,22 @@ PanoJS.TileUrlProvider.prototype = {
 }
 
 PanoJS.mousePressedHandler = function(e) {
-	e = e ? e : window.event;
-	// only grab on left-click
-	if (e.button < 2) {
-		var self = this.backingBean;
-		var coords = self.resolveCoordinates(e);
-		if (self.pointExceedsBoundaries(coords)) {
-			e.cancelBubble = true;
-		}
-		else {
-			self.press(coords);
-		}
-	}
-
-	// NOTE: MANDATORY! must return false so event does not propagate to well!
-	return false;
+	var that = this.backingBean.iview.gen;
+	if (that.isInputHandlerEnabled()){
+  	e = getEvent(e);
+  	if (that.iview.properties.maximized) {
+  		// only grab on left-click
+  		if (e.button < 2) {
+  			var self = this.backingBean;
+  			var coords = self.resolveCoordinates(e);
+  			self.press(coords);
+  		}
+  	} else {
+  		that.maximizeHandler();
+  	}
+  	// NOTE: MANDATORY! must return false so event does not propagate to well!
+  	return false;
+ 	}
 };
 
 PanoJS.mouseReleasedHandler = function(e) {
@@ -914,30 +915,59 @@ PanoJS.zoomOutHandler = function(e) {
 };
 
 PanoJS.doubleClickHandler = function(e) {
-	e = e ? e : window.event;
-	var self = this.backingBean;
-	coords = self.resolveCoordinates(e);
-	if (!self.pointExceedsBoundaries(coords)) {
-		self.resetSlideMotion();
-		self.recenter(coords);
+	var iview = this.backingBean.iview;
+	if (iview.properties.maximized && iview.gen.isInputHandlerEnabled()) {
+		e = getEvent(e);
+		var self = this.backingBean;
+		coords = self.resolveCoordinates(e);
+		if (self.zoomLevel < self.maxZoomLevel) {
+			iview.gen.zoomCenter(1,coords);
+		} else {
+			self.resetSlideMotion();
+			self.recenter(coords);
+		}
 	}
 };
 
 PanoJS.keyboardHandler = function(e) {
-	e = e ? e : window.event;
-	for (var i = 0; i < PanoJS.VIEWERS.length; i++) {
-		var viewer = PanoJS.VIEWERS[i];
-		if (e.keyCode == 38)
-				viewer.positionTiles({'x': 0,'y': -PanoJS.MOVE_THROTTLE}, true);
-		if (e.keyCode == 39)
-				viewer.positionTiles({'x': -PanoJS.MOVE_THROTTLE,'y': 0}, true);
-		if (e.keyCode == 40)
-				viewer.positionTiles({'x': 0,'y': PanoJS.MOVE_THROTTLE}, true);
-		if (e.keyCode == 37)
-				viewer.positionTiles({'x': PanoJS.MOVE_THROTTLE,'y': 0}, true);
-		if (e.keyCode == 109)
-			viewer.zoom(-1);
-		if (e.keyCode == 107)
-			viewer.zoom(1);
-	}
+	e = getEvent(e);
+	if (iview.credits)
+		iview.credits(e);
+	for (var i in PanoJS.VIEWERS){
+	  var viewer = PanoJS.VIEWERS[i];
+	  if (viewer.iview.gen.isInputHandlerEnabled()){
+	    if (e.keyCode >= 37 && e.keyCode <=40) {
+	      //cursorkey movement
+	      var motion = {
+	          'x': PanoJS.MOVE_THROTTLE * (e.keyCode % 2) * (38 - e.keyCode),
+	          'y': PanoJS.MOVE_THROTTLE * ((39 - e.keyCode) % 2)};
+	      if (viewer.iview.properties.maximized){
+	        viewer.positionTiles(motion, true);
+	        viewer.notifyViewerMoved(motion);
+        }
+	      preventDefault(e);
+	      return false;
+	    } else if ([109,45,189,107,61,187,144,27].indexOf(e.keyCode)>=0) {
+        var dir = 0;
+        //+/- Buttons for Zooming
+        //107 and 109 NumPad +/- supported by all, other keys are standard keypad codes of the given Browser
+        if (e.keyCode == 109 || (e.keyCode == 45 && isBrowser("opera")) || e.keyCode == 189) {
+          dir = -1;
+        } else if (e.keyCode == 107 || e.keyCode == 61 || (isBrowser(["Chrome", "IE"]) && e.keyCode == 187) || (isBrowser("Safari") && e.keyCode == 144)) {
+          dir = 1;
+        } else if (e.keyCode == 27) {
+          if (viewer.iview.properties.maximized){
+            viewer.iview.maximizeHandler();
+          }
+        }
+        
+        if (dir != 0 && viewer.iview.properties.maximized) {
+          viewer.iview.zoomCenter(dir,{"x":viewer.width/2, "y":viewer.height/2}); 
+          preventDefault(e);
+          e.cancelBubble = true;
+          return false;
+        }
+	    }//zoom
+	  }//input events enabled
+	}//every viewer
 }
