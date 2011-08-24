@@ -277,7 +277,7 @@ genProto.maximizeHandler = function() {
 		// append viewer to dom again
 		this.iview.context.switchContext();
 
-		if (!this.iview.zoomScreen) {
+		if (!this.iview.currentImage.zoomInfo.zoomScreen) {
 			this.pictureScreen();
 		}
 	} else {
