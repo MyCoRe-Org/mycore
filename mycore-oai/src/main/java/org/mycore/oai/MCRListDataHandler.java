@@ -46,6 +46,7 @@ import java.util.StringTokenizer;
 
 import org.mycore.common.MCRConfiguration;
 import org.mycore.parsers.bool.MCRAndCondition;
+import org.mycore.parsers.bool.MCROrCondition;
 import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRQuery;
@@ -109,18 +110,33 @@ abstract class MCRListDataHandler extends MCRVerbHandler {
             }
 
             String fieldFromUntil = config.getString(provider.getPrefix() + "Search.FromUntil", "modified");
-            MCRFieldDef dateField = MCRFieldDef.getDef(fieldFromUntil);
+            String[] fields = fieldFromUntil.split(" *, *");
 
+            // build the from restriction
             String from = parms.getProperty(ARG_FROM);
-            if ((from != null) && checkDate(from))
-                queryCondition.addChild(new MCRQueryCondition(dateField, ">=", from));
+            if ((from != null) && checkDate(from)) {
+                MCROrCondition orCond = new MCROrCondition();
+                for (String fDef : fields) {
+                    MCRFieldDef d = MCRFieldDef.getDef(fDef.trim());
+                    orCond.addChild(new MCRQueryCondition(d, ">=", from));
+                }
+                queryCondition.addChild(orCond);
+            }
 
+            // build the until restriction
             String until = parms.getProperty(ARG_UNTIL);
-            if ((until != null) && checkDate(until))
-                queryCondition.addChild(new MCRQueryCondition(dateField, "<=", until));
+            if ((until != null) && checkDate(until)) {
+                MCROrCondition orCond = new MCROrCondition();
+                for (String fDef : fields) {
+                    MCRFieldDef d = MCRFieldDef.getDef(fDef.trim());
+                    orCond.addChild(new MCRQueryCondition(d, "<=", until));
+                }
+                queryCondition.addChild(orCond);
+            }
 
-            if ((from != null) && (until != null) && (from.compareTo(until) > 0))
+            if ((from != null) && (until != null) && (from.compareTo(until) > 0)) {
                 addError(ERROR_BAD_ARGUMENT, "The 'from' date must be less or equal the 'until' date");
+            }
 
             if (hasErrors())
                 return;
@@ -159,6 +175,12 @@ abstract class MCRListDataHandler extends MCRVerbHandler {
 
     protected abstract void addHit(String ID, MCRMetadataFormat format);
 
+    /**
+     * Checks if the given date is valid in the oai context.
+     * 
+     * @param value
+     * @return true if valid, false otherwise
+     */
     protected boolean checkDate(String value) {
         if (value.length() != GRANULARITY.length()) {
             addError(ERROR_BAD_ARGUMENT, "Bad date syntax: " + value);
