@@ -97,3 +97,57 @@ ToolbarManager.prototype = {
     	}
     }
 };
+
+/**
+ * @description	creates the Toolbars and stores them within the supplied structure
+ * @param viewer {Iview} instance for which it shall create the toolbars
+ * @return
+ */
+var createToolbars = function(viewer) {
+	jQuery(viewer.viewerContainer)
+	//exploit that the init.viewer event bubbles up the DOM hierarchy
+	.bind("init.viewer", function() {
+		viewer.toolbar = {};
+		viewer.toolbar.mgr = new ToolbarManager();
+		viewer.toolbar.ctrl = new ToolbarController(viewer);
+		// entweder Mgr macht alles und Übergabe des related... (Modelprovider) oder Models kümmern sich untereinander und schöne Form
+		// (siehe unten)
+		// vom Drop Down Menu nur die View oder auch ein Model im ToolbarManager?
+		
+		// Toolbar Manager
+		viewer.toolbar.mgr.addModel(new PreviewToolbarModelProvider("previewTb").getModel());
+		// Toolbar Controller
+		viewer.toolbar.ctrl.addView(new ToolbarView("previewTbView", viewer.toolbar.ctrl.toolbarContainer, i18n));
+		
+		// holt alle bisherigen Models in den Controller und setzt diese entsprechend um
+		viewer.toolbar.ctrl.catchModels();
+		viewer.properties.initialized = true;
+	})
+	.bind("maximize.viewerContainer", function() {
+  		viewer.toolbar.ctrl.addView(new ToolbarView("mainTbView", viewer.toolbar.ctrl.toolbarContainer, i18n));
+		viewer.toolbar.mgr.addModel(new StandardToolbarModelProvider("mainTb", viewer).getModel());
+		if (viewer.PhysicalModel) {
+			viewer.toolbar.ctrl.checkNavigation(viewer.PhysicalModel.getCurPos());
+		}
+		viewer.toolbar.ctrl.paint("mainTb");
+		if (viewer.currentImage.zoomInfo.zoomWidth) {
+			/*TODO rebuild so that setActive of the corresponding Buttons is called, so the view can take care of the display part
+		needs rewriting of some parts within ToolbarController and View
+			 */
+			jQuery(".mainTbView .zoomHandles .fitToWidth")[0].checked = true;
+			jQuery(".mainTbView .zoomHandles .fitToWidthLabel").addClass("ui-state-active");
+		} else if (viewer.currentImage.zoomInfo.zoomScreen) {
+			jQuery(".mainTbView .zoomHandles .fitToScreen")[0].checked = true;
+			jQuery(".mainTbView .zoomHandles .fitToScreenLabel").addClass("ui-state-active");
+		}
+  })
+  	.bind("minimize.viewerContainer", function() {
+  		viewer.toolbar.mgr.destroyModel('mainTb');
+  })
+  	.bind("reinit.viewer", function() {
+  		viewer.toolbar.ctrl.paint("mainTb");
+  })
+  	.bind("zoom.viewer", function() {
+  		viewer.toolbar.ctrl.checkZoom(viewer.viewerBean.zoomLevel);
+  })
+}

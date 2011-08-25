@@ -63,52 +63,7 @@
       this.gen = new iview.General(this);
       //TODO load toolbar after all resources (css, images) are ready
       var that = this;
-      jQuery(this.viewerContainer)
-      	.bind("maximize.viewerContainer", function() {
-      		that.toolbar.ctrl.addView(new ToolbarView("mainTbView", that.toolbar.ctrl.toolbarContainer, i18n));
-    		that.toolbar.mgr.addModel(new StandardToolbarModelProvider("mainTb", that).getModel());
-    		if (that.PhysicalModel) {
-    			that.toolbar.ctrl.checkNavigation(that.PhysicalModel.getCurPos());
-    		}
-    		that.toolbar.ctrl.paint("mainTb");
-			if (that.currentImage.zoomInfo.zoomWidth) {
-				/*TODO rebuild so that setActive of the corresponding Buttons is called, so the view can take care of the display part
-    		needs rewriting of some parts within ToolbarController and View
-				 */
-				jQuery(".mainTbView .zoomHandles .fitToWidth")[0].checked = true;
-				jQuery(".mainTbView .zoomHandles .fitToWidthLabel").addClass("ui-state-active");
-			} else if (that.currentImage.zoomInfo.zoomScreen) {
-				jQuery(".mainTbView .zoomHandles .fitToScreen")[0].checked = true;
-				jQuery(".mainTbView .zoomHandles .fitToScreenLabel").addClass("ui-state-active");
-			}
-      })
-      	.bind("minimize.viewerContainer", function() {
-      		that.toolbar.mgr.destroyModel('mainTb');
-      })
-      	//exploit that the init.viewer event bubbles up the DOM hierarchy
-      	.bind("init.viewer", function() {
-      		that.toolbar = {};
-            that.toolbar.mgr = new ToolbarManager();
-            that.toolbar.ctrl = new ToolbarController(that);
-        // entweder Mgr macht alles und Übergabe des related... (Modelprovider) oder Models kümmern sich untereinander und schöne Form
-        // (siehe unten)
-        // vom Drop Down Menu nur die View oder auch ein Model im ToolbarManager?
-
-        // Toolbar Manager
-        that.toolbar.mgr.addModel(new PreviewToolbarModelProvider("previewTb").getModel());
-        // Toolbar Controller
-        that.toolbar.ctrl.addView(new ToolbarView("previewTbView", that.toolbar.ctrl.toolbarContainer, i18n));
-
-        // holt alle bisherigen Models in den Controller und setzt diese entsprechend um
-        that.toolbar.ctrl.catchModels();
-        that.properties.initialized = true;
-      })
-      	.bind("reinit.viewer", function() {
-      		that.toolbar.ctrl.paint("mainTb");
-      })
-      	.bind("zoom.viewer", function() {
-      		that.toolbar.ctrl.checkZoom(that.viewerBean.zoomLevel);
-      })
+      createToolbars(this);
     }
 
     constructor.prototype.startViewer = function ii_startViewer(startFile) {
