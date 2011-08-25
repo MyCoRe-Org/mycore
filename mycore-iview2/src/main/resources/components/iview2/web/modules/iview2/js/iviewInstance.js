@@ -100,7 +100,7 @@
 	
 		// Additional Events
 		// register to scroll into the viewer
-		this.context.viewer.mousewheel(function(e, delta, deltaX, deltaY) {e.preventDefault(); that.viewerScroll({"x":deltaX, "y":deltaY});})
+		this.context.viewer.mousewheel(function(e, delta, deltaX, deltaY) {e.preventDefault(); that.gen.viewerScroll({"x":deltaX, "y":deltaY});})
 			.css({	'width':this.properties.startWidth - ((barX.my.self.css("visibility") == "visible")? barX.my.self.outerWidth() : 0)  + "px",
 					'height':this.properties.startHeight - ((barY.my.self.css("visibility") == "visible")? barY.my.self.outerHeight() : 0)  + "px"
 			});
