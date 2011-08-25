@@ -90,7 +90,7 @@
 	
 		jQuery(this.viewerContainer).one("maximize.viewerContainer", function() {
 			if (that.properties.useOverview)
-				that.gen.importOverview();
+				createOverview(that);
 		})
 		
 		if (this.properties.useParam && !isNaN(parseInt(URL.getParam("zoom")))) {

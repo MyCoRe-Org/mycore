@@ -495,3 +495,51 @@ iview.overview.ModelProvider = function() {
 	
 	iview.overview.ModelProvider.prototype.createModel = createModel; 
 })();
+
+/**
+ * @public
+ * @function
+ * @name		createOverview
+ * @description	calls the corresponding functions to create the Overview
+ */
+function createOverview(viewer) {
+	var viewerBean = viewer.viewerBean;
+	var overviewMP = new iview.overview.ModelProvider();
+	viewer.overview = viewer.overview || {};
+	var model = viewer.overview.Model = overviewMP.createModel();
+	viewer.overview.ov = new iview.overview.Controller(overviewMP, i18n);
+	viewer.overview.ov.createView({'thumbParent': viewer.overview.parent, 'dampParent': viewer.overview.parent});
+	model.setSrc(viewerBean.tileUrlProvider.assembleUrl(0,0,0));
+	var zoomScale = viewer.currentImage.zoomInfo.scale;
+	viewer.overview.ov.attach("move.overview", function(e, val) {
+		viewerBean.recenter(
+			{'x' : val.x["new"]*zoomScale,
+			 'y' : val.y["new"]*zoomScale
+			}, true);
+	});
+	var preload = viewer.context.preload;
+	viewer.overview.loaded = true;
+	
+	var currentImage = viewer.currentImage;
+	var zoomInfo = currentImage.zoomInfo;
+	jQuery(viewerBean.viewer).bind("zoom.viewer reinit.viewer", function() {
+		model.setSize({
+			'x': preload.width(),
+			'y': preload.height()});
+		model.setRatio({
+			'x': viewerBean.width / ((currentImage.width / Math.pow(2, zoomInfo.maxZoom - viewerBean.zoomLevel))*zoomInfo.scale),
+			'y': viewerBean.height / ((currentImage.height / Math.pow(2, zoomInfo.maxZoom - viewerBean.zoomLevel))*zoomInfo.scale)});
+		model.setPos({
+			'x': - (viewerBean.x / Math.pow(2, viewerBean.zoomLevel))*zoomInfo.scale,
+			'y': - (viewerBean.y / Math.pow(2, viewerBean.zoomLevel))*zoomInfo.scale});
+	}).bind("move.viewer", function(args, event) {
+		// calculate via zoomlevel to the preview the left top point
+		var zoomScale = viewer.currentImage.zoomInfo.scale;
+		model.setPos({
+			'x': - (event.x / Math.pow(2, viewerBean.zoomLevel))/zoomScale,
+			'y': - (event.y / Math.pow(2, viewerBean.zoomLevel))/zoomScale});
+	});
+	jQuery(currentImage).bind(iview.CurrentImage.CHANGE_EVENT, function() {
+		model.setSrc(viewerBean.tileUrlProvider.assembleUrl(0,0,0));
+	})	
+}

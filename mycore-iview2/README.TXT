@@ -13,6 +13,7 @@ iview[
   pdfCreator: {PDF-funktion},
   permaLink: {},
   properties: {verschiedene Einstellungen pro Instanz},
+  scrollbars: {x:ScrollbarX, y:ScrollbarY},
   toolbar: {mgr, ctrl},
   viewer: {PanoJS-Instanz},
 }

@@ -84,9 +84,6 @@ genProto.processImageProperties = function(imageProperties, url){
 	this.iview.roller = true;
 	viewerBean.positionTiles ({'x' : initX, 'y' : initY}, true);
 	
-	if (this.iview.overview.loaded) {
-		this.iview.overview.Model.setSrc(thumbSource);
-	}
   this.updateModuls();
 	
 	this.iview.roller = false;
@@ -310,53 +307,6 @@ genProto.viewerScroll = function(delta) {
 	this.iview.viewerBean.notifyViewerMoved({'x': delta.x*PanoJS.MOVE_THROTTLE,
 												'y': delta.y*PanoJS.MOVE_THROTTLE});
 }
-
-/**
- * @public
- * @function
- * @name		importOverview
- * @memberOf	iview.General
- * @description	calls the corresponding functions to create the Overview
- */
-genProto.importOverview = function() {
-	var that = this;
-	var overviewMP = new iview.overview.ModelProvider();
-	this.iview.overview = this.iview.overview || {};
-	this.iview.overview.Model = overviewMP.createModel();
-	this.iview.overview.ov = new iview.overview.Controller(overviewMP, i18n);
-	this.iview.overview.ov.createView({'thumbParent': this.iview.overview.parent, 'dampParent': this.iview.overview.parent});
-	this.iview.overview.Model.setSrc(this.iview.viewerBean.tileUrlProvider.assembleUrl(0,0,0));
-	var zoomScale = this.iview.currentImage.zoomInfo.scale;
-	this.iview.overview.ov.attach("move.overview", function(e, val) {
-		that.iview.viewerBean.recenter(
-			{'x' : val.x["new"]*zoomScale,
-			 'y' : val.y["new"]*zoomScale
-			}, true);
-	});
-	var preload = this.iview.context.preload;
-	this.iview.overview.loaded = true;
-	
-	var viewerBean = this.iview.viewerBean;
-	var currentImage = this.iview.currentImage;
-	var zoomInfo = currentImage.zoomInfo;
-	jQuery(this.iview.viewerBean.viewer).bind("zoom.viewer reinit.viewer", function() {
-		that.iview.overview.Model.setSize({
-			'x': preload.width(),
-			'y': preload.height()});
-		that.iview.overview.Model.setRatio({
-			'x': viewerBean.width / ((currentImage.width / Math.pow(2, zoomInfo.maxZoom - viewerBean.zoomLevel))*zoomInfo.scale),
-			'y': viewerBean.height / ((currentImage.height / Math.pow(2, zoomInfo.maxZoom - viewerBean.zoomLevel))*zoomInfo.scale)});
-		that.iview.overview.Model.setPos({
-			'x': - (viewerBean.x / Math.pow(2, viewerBean.zoomLevel))*zoomInfo.scale,
-			'y': - (viewerBean.y / Math.pow(2, viewerBean.zoomLevel))*zoomInfo.scale});
-	}).bind("move.viewer", function(args, event) {
-		// calculate via zoomlevel to the preview the left top point
-		var zoomScale = that.iview.currentImage.zoomInfo.scale;
-		that.iview.overview.Model.setPos({
-			'x': - (event.x / Math.pow(2, that.iview.viewerBean.zoomLevel))/zoomScale,
-			'y': - (event.y / Math.pow(2, that.iview.viewerBean.zoomLevel))/zoomScale});
-	});
-};
 
 /**
  * @public
