@@ -47,6 +47,7 @@
                 <!-- i18n Module -->
                 <jsSourceFile>i18n.js</jsSourceFile>
                 <jsSourceFile>PanoJS.js</jsSourceFile>
+                <jsSourceFile>PanoJS.addition.js</jsSourceFile>
                 <!-- Viewer -->
                 <jsSourceFile>init.js</jsSourceFile>
                 <!-- new API -->

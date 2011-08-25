@@ -14,7 +14,7 @@ iview[
   permaLink: {},
   properties: {verschiedene Einstellungen pro Instanz},
   toolbar: {mgr, ctrl},
-  viewer: {PanonJS-Instanz},
+  viewer: {PanoJS-Instanz},
 }
 ]
 
