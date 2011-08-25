@@ -177,8 +177,8 @@ genProto.reinitializeGraphic = function(callback) {
 
 	var viewerContainer = this.iview.context.container;
 	var viewer = this.iview.context.viewer;
-	var barX=this.iview.scrollbars.barX;
-	var barY=this.iview.scrollbars.barY;
+	var barX = this.iview.scrollbars.x;
+	var barY = this.iview.scrollbars.y;
 
 	if (this.iview.properties.maximized == true) {
 		//to grant usage of the complete height it's not possible to simply use height:100%

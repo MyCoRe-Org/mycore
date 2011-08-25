@@ -1095,3 +1095,31 @@ iview.scrollbar.Controller.prototype = {
 		jQuery(this._model).unbind(event, listener);
 	}
 }
+
+var createScrollbars = function(viewer) {
+	// ScrollBars
+	// horizontal
+	viewer.scrollbars={};//TODO: make real Object
+	var barX = viewer.scrollbars.x = new iview.scrollbar.Controller();
+	barX.createView({ 'direction':'horizontal', 'parent':viewer.context.container, 'mainClass':'scroll'});
+	barX.attach("curVal.scrollbar", function(e, val) {
+		if (!viewer.roller) {
+			viewer.gen.scrollMove(- (val["new"]-val["old"]), 0);
+		}
+	});
+	// vertical
+	var barY = viewer.scrollbars.y = new iview.scrollbar.Controller();
+	barY.createView({ 'direction':'vertical', 'parent':viewer.context.container, 'mainClass':'scroll'});
+	barY.attach("curVal.scrollbar", function(e, val) {
+		if (!viewer.roller) {
+			viewer.gen.scrollMove( 0, -(val["new"]-val["old"]));
+		}
+	});
+
+	// Additional Events
+	// register to scroll into the viewer
+	viewer.context.viewer.mousewheel(function(e, delta, deltaX, deltaY) {e.preventDefault(); viewer.gen.viewerScroll({"x":deltaX, "y":deltaY});})
+		.css({	'width':viewer.properties.startWidth - ((barX.my.self.css("visibility") == "visible")? barX.my.self.outerWidth() : 0)  + "px",
+				'height':viewer.properties.startHeight - ((barY.my.self.css("visibility") == "visible")? barY.my.self.outerHeight() : 0)  + "px"
+	});
+}

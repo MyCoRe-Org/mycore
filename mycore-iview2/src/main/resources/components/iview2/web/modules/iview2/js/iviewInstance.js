@@ -79,31 +79,8 @@
     
     constructor.prototype.loading = function ii_loading(startFile) {
 		var that = this;
-		// ScrollBars
-		// horizontal
-		this.scrollbars={};//TODO: make real Object
-		var barX = this.scrollbars.barX = new iview.scrollbar.Controller();
-		barX.createView({ 'direction':'horizontal', 'parent':this.context.container, 'mainClass':'scroll'});
-		barX.attach("curVal.scrollbar", function(e, val) {
-			if (!that.roller) {
-				that.gen.scrollMove(- (val["new"]-val["old"]), 0);
-			}
-		});
-		// vertical
-		var barY = this.scrollbars.barY = new iview.scrollbar.Controller();
-		barY.createView({ 'direction':'vertical', 'parent':this.context.container, 'mainClass':'scroll'});
-		barY.attach("curVal.scrollbar", function(e, val) {
-			if (!that.roller) {
-				that.gen.scrollMove( 0, -(val["new"]-val["old"]));
-			}
-		});
-	
-		// Additional Events
-		// register to scroll into the viewer
-		this.context.viewer.mousewheel(function(e, delta, deltaX, deltaY) {e.preventDefault(); that.gen.viewerScroll({"x":deltaX, "y":deltaY});})
-			.css({	'width':this.properties.startWidth - ((barX.my.self.css("visibility") == "visible")? barX.my.self.outerWidth() : 0)  + "px",
-					'height':this.properties.startHeight - ((barY.my.self.css("visibility") == "visible")? barY.my.self.outerHeight() : 0)  + "px"
-			});
+		
+		createScrollbars(this);
 			
 		that.gen.initializeGraphic();
 		//needs to be registered before any other listener for this event
@@ -159,8 +136,8 @@
 		this.roller = true;
 		var preload = this.context.preload;
 		var pos = preload.position();
-		this.scrollbars.barX.setCurValue(-pos.left);
-		this.scrollbars.barY.setCurValue(-pos.top);
+		this.scrollbars.x.setCurValue(-pos.left);
+		this.scrollbars.y.setCurValue(-pos.top);
 		this.roller = false;
 	};
 

@@ -201,8 +201,8 @@ genProto.handleScrollbars = function(reason) {
 	
 	var viewerBean = this.iview.viewerBean;
 	var viewer = this.iview.context.viewer;
-	var barX = this.iview.scrollbars.barX;
-	var barY = this.iview.scrollbars.barY;
+	var barX = this.iview.scrollbars.x;
+	var barY = this.iview.scrollbars.y;
 	var currentImage = this.iview.currentImage;
 	// determine the current imagesize
 	var zoomScale = currentImage.zoomInfo.scale;
