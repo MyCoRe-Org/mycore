@@ -128,6 +128,9 @@
       <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='journal'">
         <xsl:value-of select="'journal'" />
       </xsl:when>
+      <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre='journal'">
+        <xsl:value-of select="'journal'" />
+      </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="'report'" />
       </xsl:otherwise>
@@ -162,6 +165,24 @@
         </xsl:when>
         <xsl:when test="$mods-type = 'thesis'">
           <xsl:apply-templates select="." mode="present.thesis" />
+        </xsl:when>
+        <xsl:when test="$mods-type = 'cproceeding'">
+          <xsl:apply-templates select="." mode="present.cproceeding" />
+        </xsl:when>
+        <xsl:when test="$mods-type = 'cpublication'">
+          <xsl:apply-templates select="." mode="present.cpublication" />
+        </xsl:when>
+        <xsl:when test="$mods-type = 'book'">
+          <xsl:apply-templates select="." mode="present.book" />
+        </xsl:when>
+        <xsl:when test="$mods-type = 'book-chapter'">
+          <xsl:apply-templates select="." mode="present.book-chapter" />
+        </xsl:when>
+        <xsl:when test="$mods-type = 'journal'">
+          <xsl:apply-templates select="." mode="present.journal" />
+        </xsl:when>
+        <xsl:when test="$mods-type = 'article'">
+          <xsl:apply-templates select="." mode="present.article" />
         </xsl:when>
         <xsl:otherwise>
           <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/*/*" />
@@ -312,7 +333,8 @@
                     </xsl:otherwise>
                   </xsl:choose>
                 </xsl:if>
-                <xsl:if test="acl:checkPermission($id,'deletedb') and (not(mcrxsl:hasURNDefined($id)) or (mcrxsl:hasURNDefined($id) and $CurrentUser=$MCR.Users.Superuser.UserName))">
+                <xsl:if
+                  test="acl:checkPermission($id,'deletedb') and (not(mcrxsl:hasURNDefined($id)) or (mcrxsl:hasURNDefined($id) and $CurrentUser=$MCR.Users.Superuser.UserName))">
                   <a href="{$ServletsBaseURL}object/delete{$HttpSession}?id={$id}">
                     <img src="{$WebApplicationBaseURL}images/workflow_objdelete.gif" title="{i18n:translate('object.delObject')}" />
                   </a>
