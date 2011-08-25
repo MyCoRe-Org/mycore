@@ -168,7 +168,7 @@ PanoJS.prototype.calculateZoomProp = function(level, totalSize, viewerSize, scro
  * @description	saves the scaling of loaded tiles if picture fits to height or to width (for IE)
  */
 PanoJS.prototype.removeScaling = function() {
-	for (var img in this.iview.images) {
+	for (var img in this.images) {
 		this.images[img]["scaled"] = false;
 	}
 }
