@@ -461,7 +461,9 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
     }
 
     private final static String getCompleteURL(HttpServletRequest request) {
-        StringBuffer buffer = request.getRequestURL();
+        //assemble URL with baseUrl so that mod_proxy request are supported
+        StringBuilder buffer = new StringBuilder(MCRServlet.getBaseURL());
+        buffer.append(request.getRequestURI().substring(1));
         String queryString = request.getQueryString();
         if (queryString != null && queryString.length() > 0) {
             buffer.append("?").append(queryString);
