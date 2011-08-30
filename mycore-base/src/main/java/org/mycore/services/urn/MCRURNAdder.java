@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.xpath.XPath;
@@ -74,11 +75,15 @@ public class MCRURNAdder {
         return true;
     }
 
-    /** This methods adds a URN to the derivate of a mycore object and to all files within this derivate 
-     * @param derivateId the derivate id
-     * */
+    /**
+     * This methods adds a URN to the derivate of a mycore object and to all
+     * files within this derivate
+     * 
+     * @param derivateId
+     *            the derivate id
+     */
     public boolean addURNToDerivates(String derivateId) throws Exception {
-        //checking access right
+        // checking access right
         if (!MCRAccessManager.checkPermission(derivateId, "writedb")) {
             LOGGER.warn("Permission denied");
             return false;
@@ -107,8 +112,8 @@ public class MCRURNAdder {
                 LOGGER.info("Assigning urn " + parentURN.toString() + " to " + derivate.getId().toString());
                 MCRURNManager.assignURN(parentURN.toString(), derivate.getId().toString(), " ", " ");
             } catch (Exception ex) {
-                LOGGER.error("Assigning base urn " + parentURN.toString() + parentURN.checksum() + " to derivate " + derivate.getId().toString() + " failed.",
-                    ex);
+                LOGGER.error("Assigning base urn " + parentURN.toString() + parentURN.checksum() + " to derivate "
+                        + derivate.getId().toString() + " failed.", ex);
                 return false;
             }
 
@@ -127,17 +132,19 @@ public class MCRURNAdder {
             for (int i = 0; i < pairs.size(); i++) {
                 MCRPair<String, MCRFile> current = pairs.get(i);
                 LOGGER.info("Assigning urn " + urnToSet[i] + urnToSet[i].checksum() + " to " + current.getLeftComponent()
-                    + current.getRightComponent().getName());
+                        + current.getRightComponent().getName());
                 /* save the urn in the database here */
                 try {
-                    MCRURNManager.assignURN(urnToSet[i].toString() + urnToSet[i].checksum(), derivate.getId().toString(), current.getLeftComponent(), current
-                        .getRightComponent()
-                        .getName());
-                    /* updating the fileset element, with the current file and urn */
+                    MCRURNManager.assignURN(urnToSet[i].toString() + urnToSet[i].checksum(), derivate.getId().toString(),
+                            current.getLeftComponent(), current.getRightComponent().getName());
+                    /*
+                     * updating the fileset element, with the current file and
+                     * urn
+                     */
                     addToFilesetElement(fileset, urnToSet[i], current);
                 } catch (Exception ex) {
                     LOGGER.error("Assigning urn " + urnToSet[i] + urnToSet[i].checksum() + " to " + current.getLeftComponent()
-                        + current.getRightComponent().getName() + " failed.", ex);
+                            + current.getRightComponent().getName() + " failed.", ex);
                     fileset = null;
                 }
             }
@@ -154,9 +161,11 @@ public class MCRURNAdder {
     }
 
     /**
-     * @param derivateId the id of the derivate
-     * @param path the path to the file including the filename
-     * */
+     * @param derivateId
+     *            the id of the derivate
+     * @param path
+     *            the path to the file including the filename
+     */
     public boolean addURNToSingleFile(String derivateId, String path, String fileId) throws Exception {
         if (derivateId == null || path == null || fileId == null) {
             LOGGER.error("null not allowed as parameter. derivate=" + derivateId + ", path=" + path + ", fileId=" + fileId);
@@ -172,9 +181,11 @@ public class MCRURNAdder {
             LOGGER.error("No fileset element in derivate. URN assignment to single file canceled");
             return false;
         }
+
         MCRIURNProvider provider = getURNProvider();
-        MCRURN base = provider.generateURN();
-        MCRURN[] u = provider.generateURN(1, base, derivate.getId().getNumberAsString());
+        MCRURN base = MCRURN.valueOf(((Element) obj).getAttribute("urn").getValue());
+        int fileCount = getFilesWithURNCount(derivate) + 1;
+        MCRURN[] u = provider.generateURN(1, base, derivate.getId().getNumberAsString() + "-" + fileCount);
         u[0].attachChecksum();
 
         LOGGER.info("Assigning urn " + u[0] + " to " + path);
@@ -184,9 +195,9 @@ public class MCRURNAdder {
 
         MCRURNManager.assignURN(u[0].toString(), derivateId, pathDb, file);
 
-        //reference to fileset element
+        // reference to fileset element
         Element fs = (Element) obj;
-        //reference to the new file element
+        // reference to the new file element
         Element f = new Element("file");
         f.setAttribute("name", path).setAttribute("ifsid", fileId);
         f.addContent(new Element("urn").setText(u[0].toString()));
@@ -196,6 +207,23 @@ public class MCRURNAdder {
         MCRMetadataManager.updateMCRDerivateXML(update);
 
         return true;
+    }
+
+    /**
+     * @return the number of files with urn referenced by the derivate
+     */
+    private int getFilesWithURNCount(MCRDerivate derivate) throws Exception {
+        Document xml = derivate.createXML();
+        XPath xp = XPath.newInstance("./mycorederivate/derivate/fileset");
+        Object obj = xp.selectSingleNode(xml);
+        if (obj == null) {
+            throw new Exception("No 'fileset' element within derivate '" + derivate.getId()
+                    + "' found. Single file urn assignment not possible");
+        }
+        Element fileset = (Element) obj;
+        int size = fileset.getChildren("file").size();
+
+        return size;
     }
 
     /**
@@ -236,7 +264,8 @@ public class MCRURNAdder {
                 return true;
             }
         }
-        LOGGER.warn("URN assignment failed as the object type " + givenType + " is not in the list of allowed objects. See property \"" + propertyName + "\"");
+        LOGGER.warn("URN assignment failed as the object type " + givenType + " is not in the list of allowed objects. See property \""
+                + propertyName + "\"");
         return false;
     }
 
@@ -285,7 +314,7 @@ public class MCRURNAdder {
     }
 
     /**
-     *@param file
+     * @param file
      * @return the path of the given file, the path terminates with an
      */
     private String getPath(MCRFile file) {
@@ -318,10 +347,11 @@ public class MCRURNAdder {
         alterDerivateDOM(objDer, fileset);
 
         try {
-            //just update modified XML here, no new import of files pleaze
+            // just update modified XML here, no new import of files pleaze
             MCRMetadataManager.updateMCRDerivateXML(derivate);
         } catch (Exception ex) {
-            LOGGER.error("An exception occured while updating the object " + derivate.getId() + " in database. The adding of the fileset element failed.", ex);
+            LOGGER.error("An exception occured while updating the object " + derivate.getId()
+                    + " in database. The adding of the fileset element failed.", ex);
             handleError(derivate);
         }
     }
