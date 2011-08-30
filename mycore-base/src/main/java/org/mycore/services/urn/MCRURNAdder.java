@@ -185,7 +185,7 @@ public class MCRURNAdder {
         MCRIURNProvider provider = getURNProvider();
         MCRURN base = MCRURN.valueOf(((Element) obj).getAttribute("urn").getValue());
         int fileCount = getFilesWithURNCount(derivate) + 1;
-        MCRURN[] u = provider.generateURN(1, base, derivate.getId().getNumberAsString() + "-" + fileCount);
+        MCRURN[] u = provider.generateURN(1, base, derivate.getId() + "-" + fileCount);
         u[0].attachChecksum();
 
         LOGGER.info("Assigning urn " + u[0] + " to " + path);
