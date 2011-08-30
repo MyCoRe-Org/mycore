@@ -819,6 +819,8 @@ iview.scrollbar.View = function() {
 		//IE throws as usual Errors if some value isn't in the expected range, so a 0 within maxVal gets him mad
 		if (this._maxVal != 0) {
 			my.bar.css((this._direction)? "left":"top",this._curVal*this._pixelPerUnit + "px");
+		} else {
+			my.bar.css((this._direction)? "left": "top", "0px");
 		}
 		applySize(this);
 	}
