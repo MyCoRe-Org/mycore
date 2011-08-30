@@ -118,7 +118,7 @@ abstract class MCRListDataHandler extends MCRVerbHandler {
                 MCROrCondition orCond = new MCROrCondition();
                 for (String fDef : fields) {
                     MCRFieldDef d = MCRFieldDef.getDef(fDef);
-                    orCond.addChild(new MCRQueryCondition(d, ">=", from + " 00:00:00"));
+                    orCond.addChild(new MCRQueryCondition(d, ">=", from));
                 }
                 queryCondition.addChild(orCond);
             }
@@ -129,7 +129,7 @@ abstract class MCRListDataHandler extends MCRVerbHandler {
                 MCROrCondition orCond = new MCROrCondition();
                 for (String fDef : fields) {
                     MCRFieldDef d = MCRFieldDef.getDef(fDef);
-                    orCond.addChild(new MCRQueryCondition(d, "<=", until + " 23:59:59"));
+                    orCond.addChild(new MCRQueryCondition(d, "<=", until));
                 }
                 queryCondition.addChild(orCond);
             }
