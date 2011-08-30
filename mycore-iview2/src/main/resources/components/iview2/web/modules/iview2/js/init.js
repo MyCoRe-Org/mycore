@@ -250,7 +250,7 @@ genProto.maximizeHandler = function() {
 		this.iview.context.switchContext();
 
 		if (!this.iview.currentImage.zoomInfo.zoomScreen) {
-			this.pictureScreen();
+			this.iview.viewerBean.pictureScreen();
 		}
 	} else {
 		this.iview.properties.maximized = true;
