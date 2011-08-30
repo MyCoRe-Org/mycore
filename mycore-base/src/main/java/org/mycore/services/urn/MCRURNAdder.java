@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.xpath.XPath;
@@ -185,7 +184,7 @@ public class MCRURNAdder {
         MCRIURNProvider provider = getURNProvider();
         MCRURN base = MCRURN.valueOf(((Element) obj).getAttribute("urn").getValue());
         int fileCount = getFilesWithURNCount(derivate) + 1;
-        MCRURN[] u = provider.generateURN(1, base, derivate.getId() + "-" + fileCount);
+        MCRURN[] u = provider.generateURN(1, base, derivate.getId().getNumberAsString() + "-" + fileCount);
         u[0].attachChecksum();
 
         LOGGER.info("Assigning urn " + u[0] + " to " + path);
