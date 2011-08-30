@@ -501,6 +501,7 @@ iview.overview.ModelProvider = function() {
  * @function
  * @name		createOverview
  * @description	calls the corresponding functions to create the Overview
+ * @param {Iview} viewer instance for which it shall create the toolbars
  */
 function createOverview(viewer) {
 	var viewerBean = viewer.viewerBean;

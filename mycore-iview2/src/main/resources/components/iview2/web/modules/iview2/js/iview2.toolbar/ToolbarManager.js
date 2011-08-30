@@ -100,8 +100,7 @@ ToolbarManager.prototype = {
 
 /**
  * @description	creates the Toolbars and stores them within the supplied structure
- * @param viewer {Iview} instance for which it shall create the toolbars
- * @return
+ * @param {Iview} viewer instance for which it shall create the toolbars
  */
 var createToolbars = function(viewer) {
 	jQuery(viewer.viewerContainer)

@@ -292,15 +292,6 @@ PanoJS.prototype = {
 		this.surface.style.cursor = PanoJS.GRAB_MOUSE_CURSOR;
 		this.prepareTiles();
 		this.initialized = true;
-		
-		//addition
-		this.top = 0;
-		this.left = 0;
-		for (var node = this.viewer; node; node = node.offsetParent) {
-			this.top += node.offsetTop;
-			this.left += node.offsetLeft;
-		}
-		//end addition
 	},
 
 	prepareTiles : function() {

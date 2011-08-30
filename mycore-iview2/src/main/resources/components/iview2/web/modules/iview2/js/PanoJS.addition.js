@@ -122,10 +122,6 @@ PanoJS.prototype.switchDisplayMode = function(screenZoom, stateBool, preventLoop
 		}
 	}
 
-	var offset = preload.offset();
-	this.iview.scrollbars.x.setCurValue(-offset.left);
-	this.iview.scrollbars.y.setCurValue(-offset.top);
-	if (this.iview.overview.loaded) this.iview.overview.Model.setPos({'x':offset.left, 'y':offset.top});
 	return stateBool;
 }
 
