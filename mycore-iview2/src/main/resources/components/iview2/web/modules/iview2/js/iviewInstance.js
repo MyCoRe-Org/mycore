@@ -134,8 +134,7 @@
 	function viewerMoved(jq, event) {
 		// set Roller this no circles are created, and we end in an endless loop
 		this.roller = true;
-		var preload = this.context.preload;
-		var pos = preload.position();
+		var pos = this.context.preload.position();
 		this.scrollbars.x.setCurValue(-pos.left);
 		this.scrollbars.y.setCurValue(-pos.top);
 		this.roller = false;
