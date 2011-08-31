@@ -13,13 +13,12 @@
 
   <panel id="mods.title">
     <cell anchor="NORTHWEST" var="mods:title">
-      <panel>
-        <cell anchor="NORTHWEST" ref="TFzeile512" />
-        <condition required="true">
+      <textfield id="mods.title.text" width="60" maxlength="512">
+        <condition id="mods.title.cond" required="true">
           <label xml:lang="de">Tragen Sie hier den Titel des Dokumentes ein.</label>
           <label xml:lang="en">Enter the title of the document here.</label>
         </condition>
-      </panel>
+      </textfield>
     </cell>
   </panel>
 
@@ -87,7 +86,7 @@
         <hidden var="@authority" default="iso639-2b" />
         <hidden var="@type" default="code" />
         <cell col="1">
-          <list id="ListLang" type="dropdown" default="ger">
+          <list id="mods.languageTerm.list" type="dropdown" default="ger">
             <item value="ger">
               <label xml:lang="de">deutsch</label>
               <label xml:lang="en">german</label>
@@ -96,12 +95,12 @@
               <label xml:lang="de">englisch</label>
               <label xml:lang="en">english</label>
             </item>
+            <condition id="mods.languageTerm.cond" required="true">
+              <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
+              <label xml:lang="en">Please select one entry!</label>
+            </condition>
           </list>
         </cell>
-        <condition required="true">
-          <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
-          <label xml:lang="en">Please select one entry!</label>
-        </condition>
       </panel>
     </cell>
   </panel>
@@ -136,8 +135,8 @@
             </text>
           </cell>
           <cell col="2" row="1" anchor="NORTHEAST" var="mods:namePart[@type='given']">
-            <textfield width="31" maxlength="128">
-              <condition required="true">
+            <textfield id="mods.author.firstname.text" width="31" maxlength="128">
+              <condition id="mods.author.firstname.cond" required="true">
                 <label xml:lang="de">Bitte geben Sie den Vornamen der Person an!</label>
                 <label xml:lang="en">Please insert authors first name.</label>
               </condition>
@@ -150,8 +149,8 @@
             </text>
           </cell>
           <cell col="2" row="2" anchor="NORTHEAST" var="mods:namePart[@type='family']">
-            <textfield width="31" maxlength="128">
-              <condition required="true">
+            <textfield id="mods.author.lastname.text" width="31" maxlength="128">
+              <condition id="mods.author.lastname.cond" required="true">
                 <label xml:lang="de">Bitte geben Sie den Nachnamen der Person an!</label>
                 <label xml:lang="en">Please insert persons last name.</label>
               </condition>
