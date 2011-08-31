@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import javax.activation.MimetypesFileTypeMap;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -124,7 +125,8 @@ public class MCRXMLFunctions {
      * @return QueryServlet-Link
      */
     public static String getQueryServlet(String hostAlias) {
-        return getBaseLink(hostAlias).append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(QUERY_SUFFIX).toString())).toString();
+        return getBaseLink(hostAlias).append(
+                CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(QUERY_SUFFIX).toString())).toString();
     }
 
     /**
@@ -135,15 +137,14 @@ public class MCRXMLFunctions {
      * @return FileNodeServlet-Link
      */
     public static String getIFSServlet(String hostAlias) {
-        return getBaseLink(hostAlias).append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(IFS_SUFFIX).toString())).toString();
+        return getBaseLink(hostAlias).append(
+                CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(IFS_SUFFIX).toString())).toString();
     }
 
     public static StringBuffer getBaseLink(String hostAlias) {
         StringBuffer returns = new StringBuffer();
-        returns
-            .append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(PROTOCOLL_SUFFIX).toString(), "http"))
-            .append("://")
-            .append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(HOST_SUFFIX).toString()));
+        returns.append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(PROTOCOLL_SUFFIX).toString(), "http"))
+                .append("://").append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(HOST_SUFFIX).toString()));
         String port = CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(PORT_SUFFIX).toString(), DEFAULT_PORT);
         if (!port.equals(DEFAULT_PORT)) {
             returns.append(":").append(port);
@@ -158,13 +159,8 @@ public class MCRXMLFunctions {
     public static String formatISODate(String isoDate, String isoFormat, String simpleFormat, String iso639Language) throws ParseException {
         if (LOGGER.isDebugEnabled()) {
             StringBuffer sb = new StringBuffer("isoDate=");
-            sb.append(isoDate)
-                .append(", simpleFormat=")
-                .append(simpleFormat)
-                .append(", isoFormat=")
-                .append(isoFormat)
-                .append(", iso649Language=")
-                .append(iso639Language);
+            sb.append(isoDate).append(", simpleFormat=").append(simpleFormat).append(", isoFormat=").append(isoFormat)
+                    .append(", iso649Language=").append(iso639Language);
             LOGGER.debug(sb.toString());
         }
         Locale locale = new Locale(iso639Language);
@@ -395,8 +391,8 @@ public class MCRXMLFunctions {
                 return true;
             }
         }
-        LOGGER
-            .info("URN assignment disabled as the object type " + givenType + " is not in the list of allowed objects. See property \"" + propertyName + "\"");
+        LOGGER.info("URN assignment disabled as the object type " + givenType + " is not in the list of allowed objects. See property \""
+                + propertyName + "\"");
         return false;
     }
 
@@ -456,6 +452,18 @@ public class MCRXMLFunctions {
      */
     public static NodeList getLinkSources(String mcrid) {
         return getLinkSources(mcrid, null);
+    }
+
+    /**
+     * Determines the mime type for the file given by its name.
+     * 
+     * @param f
+     *            the name of the file
+     * @return the mime type of the given file
+     */
+    public static String getMimeType(String f) {
+        MimetypesFileTypeMap mTypes = new MimetypesFileTypeMap();
+        return mTypes.getContentType(f);
     }
 
     /**
