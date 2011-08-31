@@ -285,7 +285,12 @@ public class MCRCategoryTransformer {
             String labtext = label.getText() != null ? label.getText() : "";
             String labdesc = label.getDescription() != null ? label.getDescription() : "";
 
-            String text = TEXT_PATTERN.matcher(labelFormat).replaceAll(labtext);
+            String text;
+            try {
+                text = TEXT_PATTERN.matcher(labelFormat).replaceAll(labtext);
+            } catch (RuntimeException e) {
+                throw new RuntimeException("Error while inserting '" + labtext + "' into: " + labelFormat, e);
+            }
             text = ID_PATTERN.matcher(text).replaceAll(cat.getId().getID());
             text = DESCR_PATTERN.matcher(text).replaceAll(labdesc);
             int num = countMap == null ? -1 : countMap.get(cat.getId()).intValue();
