@@ -511,18 +511,17 @@ function createOverview(viewer) {
 	viewer.overview.ov = new iview.overview.Controller(overviewMP, i18n);
 	viewer.overview.ov.createView({'thumbParent': viewer.overview.parent, 'dampParent': viewer.overview.parent});
 	model.setSrc(viewerBean.tileUrlProvider.assembleUrl(0,0,0));
-	var zoomScale = viewer.currentImage.zoomInfo.scale;
+	var currentImage = viewer.currentImage;
+	var zoomInfo = currentImage.zoomInfo;
 	viewer.overview.ov.attach("move.overview", function(e, val) {
 		viewerBean.recenter(
-			{'x' : val.x["new"]*zoomScale,
-			 'y' : val.y["new"]*zoomScale
+			{'x' : val.x["new"]*zoomInfo.scale,
+			 'y' : val.y["new"]*zoomInfo.scale
 			}, true);
 	});
 	var preload = viewer.context.preload;
 	viewer.overview.loaded = true;
 	
-	var currentImage = viewer.currentImage;
-	var zoomInfo = currentImage.zoomInfo;
 	jQuery(viewerBean.viewer).bind("zoom.viewer reinit.viewer", function() {
 		model.setSize({
 			'x': preload.width(),
