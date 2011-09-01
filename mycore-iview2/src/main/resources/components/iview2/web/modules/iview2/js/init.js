@@ -46,7 +46,7 @@ iview.General = function(iviewInst) {
 	//TODO later it should be possible to remove all this.iview with just this
 	this.iview = iviewInst;
 	//structure for all Viewer DOM-Objects
-	this.iview.context = new iview.Context(iviewInst.viewerContainer);
+	this.iview.context = new iview.Context(iviewInst.viewerContainer, iviewInst);
 	this.iview.currentImage = new iview.CurrentImage(iviewInst);
 	var that = this;
 	jQuery(this.iview.currentImage).bind(iview.CurrentImage.DIMENSION_EVENT, function() {
@@ -250,9 +250,6 @@ genProto.maximizeHandler = function() {
 		// append viewer to dom again
 		this.iview.context.switchContext();
 
-		if (!this.iview.currentImage.zoomInfo.zoomScreen) {
-			this.iview.viewerBean.pictureScreen();
-		}
 	} else {
 		this.iview.properties.maximized = true;
 		jQuery(this.iview.viewerContainer).trigger("maximize.viewerContainer");

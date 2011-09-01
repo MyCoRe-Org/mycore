@@ -3,12 +3,13 @@
 
   iview.Context = (function() {
 
-    function constructor(container) {
+    function constructor(container, iviewInst) {
       this.doc = null;
       this.container=container;
       this.viewer=container.find(".viewer");
       this.preload=container.find(".preload");
       this.viewerSibling = container[0].previousSibling;
+      this.iviewInst = iviewInst;
     }
 
     constructor.prototype = {
@@ -30,6 +31,9 @@
           // class-change causes in IE resize
           this.container.removeClass("min").addClass("max");
         } else {
+    		if (!this.iviewInst.currentImage.zoomInfo.zoomScreen) {
+    			this.iview.viewerBean.pictureScreen();
+    		}
           // restore document
           while (document.body.firstChild) {
             document.body.removeChild(document.body.firstChild);
