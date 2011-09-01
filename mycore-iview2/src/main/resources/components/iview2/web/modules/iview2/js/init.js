@@ -16,26 +16,6 @@ iview.IViewObject = (function(){
 })();
 
 /**
- * @public
- * @function
- * @memberOf iview
- * @description	adjusts image css style properties so that image is resized with correct aspect ration
- * @param		{object} image Object
- * @param		{string} max-width (css-value)
- * @param		{string} max-height (css-value)
- */
-//TODO is this function still needed somewhere?
-iview.resizeImage = function (img, width, height) {
-	if (img.height > img.width) {
-		img.style.height = height;
-		img.style.width = "auto";
-	} else {
-		img.style.height = "auto";
-		img.style.width = width;
-	}
-};
-
-/**
  * @class
  * @constructor
  * @memberOf	iview.General

@@ -109,7 +109,7 @@
 	 * @description	maximize and show the viewer with the related image or minimize and close the viewer
 	 */
 	constructor.prototype.toggleViewerMode = function() {
-		jQuery(this.viewerContainer).trigger((jQuery(this.viewerContainer).hasClass("max")? "minimize":"maximize") + ".viewerContainer");
+		jQuery(this.viewerContainer).trigger((this.viewerContainer.isMax()? "minimize":"maximize") + ".viewerContainer");
 		this.context.switchContext();
 		/*IE causes resize already at class change (mostly because position: rel <> fix)
 		 IE runs resize multiple times...but without this line he doesn't...*/
