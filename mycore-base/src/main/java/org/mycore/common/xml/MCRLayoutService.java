@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -114,14 +115,14 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
     private final static Logger LOGGER = Logger.getLogger(MCRLayoutService.class);
 
     private static final MCRLayoutService SINGLETON = new MCRLayoutService();
-    
-    private ThreadLocal<HashMap<String, String>> transformMap=new ThreadLocal<HashMap<String,String>>(){
+
+    private ThreadLocal<HashMap<String, String>> transformMap = new ThreadLocal<HashMap<String, String>>() {
 
         @Override
         protected HashMap<String, String> initialValue() {
             return new HashMap<String, String>();
         }
-        
+
     };
 
     public static MCRLayoutService instance() {
@@ -183,8 +184,8 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         }
 
     }
-    
-    public Map<String,String> getCurrentTransformationMap(){
+
+    public Map<String, String> getCurrentTransformationMap() {
         return transformMap.get();
     }
 
@@ -463,7 +464,9 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
     private final static String getCompleteURL(HttpServletRequest request) {
         //assemble URL with baseUrl so that mod_proxy request are supported
         StringBuilder buffer = new StringBuilder(MCRServlet.getBaseURL());
-        buffer.append(request.getRequestURI().substring(1));
+        int pos = buffer.indexOf("/", "https://".length());
+        buffer.delete(pos, buffer.length()); //get baseUrl up to hostname
+        buffer.append(request.getRequestURI());
         String queryString = request.getQueryString();
         if (queryString != null && queryString.length() > 0) {
             buffer.append("?").append(queryString);
