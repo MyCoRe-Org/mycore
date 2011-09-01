@@ -32,7 +32,7 @@
           this.container.removeClass("min").addClass("max");
         } else {
     		if (!this.iviewInst.currentImage.zoomInfo.zoomScreen) {
-    			this.iview.viewerBean.pictureScreen();
+    			this.iviewInst.viewerBean.pictureScreen();
     		}
           // restore document
           while (document.body.firstChild) {

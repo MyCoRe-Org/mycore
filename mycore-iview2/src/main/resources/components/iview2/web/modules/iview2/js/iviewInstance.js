@@ -81,8 +81,39 @@
 		var that = this;
 		
 		createScrollbars(this);
+		
+		PanoJS.USE_SLIDE = false;
+		PanoJS.USE_LOADER_IMAGE = false;
+		PanoJS.MOVE_THROTTLE = 10;
+		PanoJS.BLANK_TILE_IMAGE = "../modules/iview2/" + styleFolderUri + 'blank.gif';
+		
+		// opera triggers the onload twice
+		var iviewTileUrlProvider = new PanoJS.TileUrlProvider(this.properties.baseUri, this.currentImage.name, 'jpg');
+		iviewTileUrlProvider.derivate = this.properties.derivateId;
+		var that = this;
+		iviewTileUrlProvider.getCurrentImage = function initializeGraphic_getCurrentImage(){
+		  return that.currentImage;
+		};
+
+		/**
+	   * initialise the viewer
+	   */
+		if (this.viewerBean == null) {
+			this.viewerBean = new PanoJS(this.context.viewer[0], {
+				initialPan: {'x' : 0, 'y' : 0 },//Koordianten der oberen linken Ecke
+				tileSize: this.properties.tileSize,//Kachelgroesse
+				tileUrlProvider: iviewTileUrlProvider,
+				maxZoom: this.currentImage.zoomInfo.maxZoom,
+				initialZoom: this.currentImage.zoomInfo.zoomInit,//Anfangs-Zoomlevel
+				loadingTile: "../modules/iview2/" + styleFolderUri + 'blank.gif'
+			});
+
+			this.viewerBean.iview = this;//handle Viewer informations so PanoJS can work with it
+
+			this.viewerBean.init();
 			
-		that.gen.initializeGraphic();
+			this.gen.reinitializeGraphic(function() {jQuery(that.viewerBean.viewer).trigger("init.viewer");});
+		}
 		//needs to be registered before any other listener for this event
 		var viewerBean = this.viewerBean;
 		jQuery(viewerBean.viewer).bind("zoom.viewer", function() { viewerZoomed.apply(that, arguments)})

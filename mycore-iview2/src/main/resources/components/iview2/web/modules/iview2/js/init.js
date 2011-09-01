@@ -68,48 +68,6 @@ PanoJS.TileUrlProvider.prototype.assembleUrl = function(xIndex, yIndex, zoom, im
 /**
  * @public
  * @function
- * @name		initializeGraphic
- * @memberOf	iview.General
- * @description	here some important values and listener are set correctly, calculate simple image name hash value to spread request over different servers and initialise the viewer
- */
-genProto.initializeGraphic = function() {
-	PanoJS.USE_SLIDE = false;
-	PanoJS.USE_LOADER_IMAGE = false;
-	PanoJS.MOVE_THROTTLE = 10;
-	PanoJS.BLANK_TILE_IMAGE = "../modules/iview2/" + styleFolderUri + 'blank.gif';
-	
-	// opera triggers the onload twice
-	var iviewTileUrlProvider = new PanoJS.TileUrlProvider(this.iview.properties.baseUri, this.iview.currentImage.name, 'jpg');
-	iviewTileUrlProvider.derivate = this.iview.properties.derivateId;
-	var that = this;
-	iviewTileUrlProvider.getCurrentImage = function initializeGraphic_getCurrentImage(){
-	  return that.iview.currentImage;
-	};
-
-	/**
-   * initialise the viewer
-   */
-	if (this.iview.viewerBean == null) {
-		this.iview.viewerBean = new PanoJS(this.iview.context.viewer[0], {
-			initialPan: {'x' : 0, 'y' : 0 },//Koordianten der oberen linken Ecke
-			tileSize: this.iview.properties.tileSize,//Kachelgroesse
-			tileUrlProvider: iviewTileUrlProvider,
-			maxZoom: this.iview.currentImage.zoomInfo.maxZoom,
-			initialZoom: this.iview.currentImage.zoomInfo.zoomInit,//Anfangs-Zoomlevel
-			loadingTile: "../modules/iview2/" + styleFolderUri + 'blank.gif'
-		});
-
-		this.iview.viewerBean.iview = this.iview;//handle Viewer informations so PanoJS can work with it
-
-		this.iview.viewerBean.init();
-		
-		this.reinitializeGraphic(function() {jQuery(that.iview.viewerBean.viewer).trigger("init.viewer");});
-	}
-};
-
-/**
- * @public
- * @function
  * @name		reinitializeGraphic
  * @memberOf	iview.General
  * @param		{function} callback which is called just before the event reinit.viewer is triggered
