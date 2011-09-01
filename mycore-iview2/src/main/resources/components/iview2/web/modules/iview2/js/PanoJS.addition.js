@@ -220,7 +220,6 @@ PanoJS.isInstance = function () {return true;};
 
 PanoJS.mousePressedHandler = function(e) {
 	var that = this.backingBean.iview.gen;
-	if (that.isInputHandlerEnabled()){
   	e = getEvent(e);
   	if (that.iview.properties.maximized) {
   		// only grab on left-click
@@ -234,12 +233,11 @@ PanoJS.mousePressedHandler = function(e) {
   	}
   	// NOTE: MANDATORY! must return false so event does not propagate to well!
   	return false;
- 	}
 }
 
 PanoJS.doubleClickHandler = function(e) {
 	var iview = this.backingBean.iview;
-	if (iview.properties.maximized && iview.gen.isInputHandlerEnabled()) {
+	if (iview.properties.maximized) {
 		e = getEvent(e);
 		var self = this.backingBean;
 		coords = self.resolveCoordinates(e);
@@ -257,40 +255,38 @@ PanoJS.keyboardHandler = function(e) {
 	if (iview.credits)
 		iview.credits(e);
 	for (var i in PanoJS.VIEWERS){
-	  var viewer = PanoJS.VIEWERS[i];
-	  if (viewer.iview.gen.isInputHandlerEnabled()){
-	    if (e.keyCode >= 37 && e.keyCode <=40) {
-	      //cursorkey movement
-	      var motion = {
-	          'x': PanoJS.MOVE_THROTTLE * (e.keyCode % 2) * (38 - e.keyCode),
-	          'y': PanoJS.MOVE_THROTTLE * ((39 - e.keyCode) % 2)};
-	      if (viewer.iview.properties.maximized){
-	        viewer.positionTiles(motion, true);
-	        viewer.notifyViewerMoved(motion);
-        }
-	      preventDefault(e);
-	      return false;
-	    } else if ([109,45,189,107,61,187,144,27].indexOf(e.keyCode)>=0) {
-        var dir = 0;
-        //+/- Buttons for Zooming
-        //107 and 109 NumPad +/- supported by all, other keys are standard keypad codes of the given Browser
-        if (e.keyCode == 109 || (e.keyCode == 45 && isBrowser("opera")) || e.keyCode == 189) {
-          dir = -1;
-        } else if (e.keyCode == 107 || e.keyCode == 61 || (isBrowser(["Chrome", "IE"]) && e.keyCode == 187) || (isBrowser("Safari") && e.keyCode == 144)) {
-          dir = 1;
-        } else if (e.keyCode == 27) {
-          if (viewer.iview.properties.maximized){
-            viewer.iview.maximizeHandler();www.ontohr.eu 
-          }
-        }
-        
-        if (dir != 0 && viewer.iview.properties.maximized) {
-          this.zoomCenter(dir,{"x":viewer.width/2, "y":viewer.height/2}); 
-          preventDefault(e);
-          e.cancelBubble = true;
-          return false;
-        }
-	    }//zoom
-	  }//input events enabled
-	}//every viewer
+		var viewer = PanoJS.VIEWERS[i];
+		if (e.keyCode >= 37 && e.keyCode <=40) {
+			//cursorkey movement
+			var motion = {
+			'x': PanoJS.MOVE_THROTTLE * (e.keyCode % 2) * (38 - e.keyCode),
+			'y': PanoJS.MOVE_THROTTLE * ((39 - e.keyCode) % 2)};
+		  	if (viewer.iview.properties.maximized){
+				viewer.positionTiles(motion, true);
+				viewer.notifyViewerMoved(motion);
+		  	}
+			preventDefault(e);
+			return false;
+		} else if ([109,45,189,107,61,187,144,27].indexOf(e.keyCode)>=0) {
+			var dir = 0;
+			//+/- Buttons for Zooming
+			//107 and 109 NumPad +/- supported by all, other keys are standard keypad codes of the given Browser
+			if (e.keyCode == 109 || (e.keyCode == 45 && isBrowser("opera")) || e.keyCode == 189) {
+				dir = -1;
+			} else if (e.keyCode == 107 || e.keyCode == 61 || (isBrowser(["Chrome", "IE"]) && e.keyCode == 187) || (isBrowser("Safari") && e.keyCode == 144)) {
+				dir = 1;
+			} else if (e.keyCode == 27) {
+				if (viewer.iview.properties.maximized){
+					viewer.iview.maximizeHandler();
+				}
+			}
+			
+			if (dir != 0 && viewer.iview.properties.maximized) {
+				viewer.iview.viewerBean.zoomCenter(dir,{"x":viewer.width/2, "y":viewer.height/2}); 
+				preventDefault(e);
+				e.cancelBubble = true;
+				return false;
+			}
+		}
+	}
 }

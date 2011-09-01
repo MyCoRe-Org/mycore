@@ -52,40 +52,9 @@ iview.General = function(iviewInst) {
 	jQuery(this.iview.currentImage).bind(iview.CurrentImage.DIMENSION_EVENT, function() {
 		that.iview.preload.css({'width': this.curWidth + "px", 'height': this.curHeight + "px"});
 	})
-	this.inputHandlerEnabled=true;
 };
 
 var genProto = iview.General.prototype;
-
-/**
- * @function
- * @memberOf iview.General
- * @name isInputHandlerEnabled
- * @returns true if input events (keyboard, mouse) are captured
- */
-genProto.isInputHandlerEnabled = function() {
-  return this.inputHandlerEnabled;
-};
-
-/**
- * @function
- * @memberOf iview.General
- * @name disableInputHandler
- * @description disable input events
- */
-genProto.disableInputHandler = function() {
-  this.inputHandlerEnabled=false;
-};
-
-/**
- * @function
- * @memberOf iview.General
- * @name enableInputHandler
- * @description enable input events
- */
-genProto.enableInputHandler = function() {
-  this.inputHandlerEnabled=true;
-};
 
 /*
  * calculate simple image name hash value to spread request over different servers
