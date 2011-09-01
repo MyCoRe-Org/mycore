@@ -112,6 +112,10 @@ ToolbarController.prototype.addView = function(view) {
 				}
 			} else if (args.parentName == "closeHandles") {
 				if (args.elementName == "close") {
+					if (URL.getParam("jumpback") == "true"){
+						history.back();
+						return;
+					}
 					that.getViewer().gen.maximizeHandler();
 				}
 			}

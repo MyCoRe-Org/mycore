@@ -21,7 +21,7 @@
           <xsl:value-of select="$style"/>
         </xsl:attribute>
       </xsl:if>
-      <div class="viewer min" onmousedown="return false;">
+      <div class="viewer" onmousedown="return false;">
         <div class="surface" style="width:100%;height:100%;z-index:30" />
         <div class="well">
           <div class="preload">

@@ -244,10 +244,6 @@ genProto.reinitializeGraphic = function(callback) {
  */
 genProto.maximizeHandler = function() {
 	if (this.iview.properties.maximized) {
-		if (URL.getParam("jumpback") == "true"){
-			history.back();
-			return;
-		}
 		this.iview.properties.maximized = false;
 		jQuery(this.iview.viewerContainer).trigger("minimize.viewerContainer");
 		
