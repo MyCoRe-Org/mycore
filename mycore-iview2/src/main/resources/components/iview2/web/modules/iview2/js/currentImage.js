@@ -7,7 +7,20 @@
       this.name = null;
       this.height = 0;
       this.width = 0;
-      this.zoomInfo = new iview.ZoomInformation();
+      this.zoomInfo = new iview.ZoomInformation(iviewInst);
+      this.curWidth = 0;
+      this.curHeight = 0;
+      var that = this;
+      
+      jQuery(iviewInst.viewerContainer).bind("zoom.viewer", function(jq, event) {
+    	  /*listen to changes of zoomLevel and adapt curWidth & -Height depending on that,
+    	   * notify all listeners about the change*/
+    	that.zoomInfo.curZoom = event.zoomLevel
+		that.curWidth = (that.width / Math.pow(2, that.zoomInfo.maxZoom - event.zoomLevel))*that.zoomInfo.scale,
+		that.curHeight = (that.height / Math.pow(2, that.zoomInfo.maxZoom - event.zoomLevel))*that.zoomInfo.scale
+		jQuery(that).trigger(iview.CurrentImage.DIMENSION_EVENT);
+      });
+      
       iview.IViewObject.call(this, iviewInst);
       jQuery(this).bind(iview.CurrentImage.CHANGE_EVENT, function(event) {
         log("Catched event: " + iview.CurrentImage.CHANGE_EVENT);
@@ -32,12 +45,19 @@
 
   })();
   iview.CurrentImage.CHANGE_EVENT = "imageChanged";
+  iview.CurrentImage.DIMENSION_EVENT = "dimensionChanged";
 
   iview.ZoomInformation = (function() {
     function constructor() {
       this.maxZoom = 0;
       this.scale = 1;
+      this.zoomBack = 0;
+      this.zoomScreen = 0;
+      this.zoomWidth = 0;
+      this.zoomInit = 0;
+      this.curZoom = 0;
     }
+    
     return constructor;
   })();
 })();

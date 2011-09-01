@@ -116,11 +116,6 @@
 		if (this.currentImage.zoomInfo.zoomScreen) {
 			viewerBean.pictureScreen(true);
 		}
-		var preload = this.context.preload;
-		var currentImage=this.currentImage;
-		var zoomInfo=currentImage.zoomInfo;
-		preload.css({"width": (currentImage.width / Math.pow(2, zoomInfo.maxZoom - viewerBean.zoomLevel))*zoomInfo.scale +  "px",
-					 "height": (currentImage.height / Math.pow(2, zoomInfo.maxZoom - viewerBean.zoomLevel))*zoomInfo.scale + "px"});
 
 		this.gen.handleScrollbars("zoom");
 	};

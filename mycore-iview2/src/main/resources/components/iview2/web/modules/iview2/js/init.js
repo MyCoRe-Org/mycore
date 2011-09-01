@@ -24,6 +24,7 @@ iview.IViewObject = (function(){
  * @param		{string} max-width (css-value)
  * @param		{string} max-height (css-value)
  */
+//TODO is this function still needed somewhere?
 iview.resizeImage = function (img, width, height) {
 	if (img.height > img.width) {
 		img.style.height = height;
@@ -47,6 +48,10 @@ iview.General = function(iviewInst) {
 	//structure for all Viewer DOM-Objects
 	this.iview.context = new iview.Context(iviewInst.viewerContainer);
 	this.iview.currentImage = new iview.CurrentImage(iviewInst);
+	var that = this;
+	jQuery(this.iview.currentImage).bind(iview.CurrentImage.DIMENSION_EVENT, function() {
+		that.iview.preload.css({'width': this.curWidth + "px", 'height': this.curHeight + "px"});
+	})
 	this.inputHandlerEnabled=true;
 };
 

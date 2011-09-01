@@ -265,8 +265,6 @@ iview.overview.View = function(i18n) {
 				var positionY = that._curY + (e.pageY - that._mouseY);
 			}
 
-			setPosBlock = true;
-			
 			if (positionX != that._curX || positionY != that._curY) {
 				jQuery(that).trigger("move.overview", {x: {"new": scale(that, positionX + that.my.overview.width()/2, true), "old": scale(that, that._curX, true)}, y: {"new": scale(that, positionY + that.my.overview.height()/2, false), "old": scale(that, that._curY, false)}});
 			}
@@ -522,24 +520,25 @@ function createOverview(viewer) {
 	var preload = viewer.context.preload;
 	viewer.overview.loaded = true;
 	
-	jQuery(viewerBean.viewer).bind("zoom.viewer reinit.viewer", function() {
-		model.setSize({
-			'x': preload.width(),
-			'y': preload.height()});
-		model.setRatio({
-			'x': viewerBean.width / ((currentImage.width / Math.pow(2, zoomInfo.maxZoom - viewerBean.zoomLevel))*zoomInfo.scale),
-			'y': viewerBean.height / ((currentImage.height / Math.pow(2, zoomInfo.maxZoom - viewerBean.zoomLevel))*zoomInfo.scale)});
+	var adaptOverview = function() {
+		model.setSize({'x': this.curWidth, 'y': this.curHeight});
+		model.setRatio({'x': viewerBean.width / this.curWidth, 'y': viewerBean.height / this.curHeight});
 		model.setPos({
-			'x': - (viewerBean.x / Math.pow(2, viewerBean.zoomLevel))*zoomInfo.scale,
-			'y': - (viewerBean.y / Math.pow(2, viewerBean.zoomLevel))*zoomInfo.scale});
+			'x': - (viewerBean.x / Math.pow(2, zoomInfo.curZoom))*zoomInfo.scale,
+			'y': - (viewerBean.y / Math.pow(2, zoomInfo.curZoom))*zoomInfo.scale});
+	}
+
+	jQuery(currentImage).bind(iview.CurrentImage.DIMENSION_EVENT, function() {
+		adaptOverview.apply(this);
+	}).bind(iview.CurrentImage.CHANGE_EVENT, function() {
+		model.setSrc(viewerBean.tileUrlProvider.assembleUrl(0,0,0));
+	})
+	jQuery(viewerBean.viewer).bind("reinit.viewer", function() {
+		adaptOverview.apply(currentImage);
 	}).bind("move.viewer", function(args, event) {
 		// calculate via zoomlevel to the preview the left top point
-		var zoomScale = viewer.currentImage.zoomInfo.scale;
 		model.setPos({
-			'x': - (event.x / Math.pow(2, viewerBean.zoomLevel))/zoomScale,
-			'y': - (event.y / Math.pow(2, viewerBean.zoomLevel))/zoomScale});
+			'x': - (event.x / Math.pow(2, viewerBean.zoomLevel))/zoomInfo.scale,
+			'y': - (event.y / Math.pow(2, viewerBean.zoomLevel))/zoomInfo.scale});
 	});
-	jQuery(currentImage).bind(iview.CurrentImage.CHANGE_EVENT, function() {
-		model.setSrc(viewerBean.tileUrlProvider.assembleUrl(0,0,0));
-	})	
 }
