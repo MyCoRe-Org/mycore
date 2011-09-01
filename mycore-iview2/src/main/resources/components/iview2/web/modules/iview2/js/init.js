@@ -154,7 +154,7 @@ genProto.reinitializeGraphic = function(callback) {
 	var barX = this.iview.scrollbars.x;
 	var barY = this.iview.scrollbars.y;
 
-	if (this.iview.properties.maximized == true) {
+	if (jQuery(viewerContainer).hasClass("max")) {
 		//to grant usage of the complete height it's not possible to simply use height:100%
 		viewerContainer.css({'height': curHeight - viewerContainer.offset().top + "px",
 							'width': curWidth + "px"});
@@ -194,41 +194,5 @@ genProto.reinitializeGraphic = function(callback) {
 	//notify all listeners that the viewer was modified in such way that they possibly need adaptation of their own view
 	jQuery(this.iview.viewerBean.viewer).trigger("reinit.viewer");
 	
-	// Actualize forward & backward Buttons
-//	if (!this.iview.maximized) {
 	  //TODO: align image and toolbar to the center
-	  //TODO: compare redundant code with gen.updateModuls()
-	  //var previewTbView = jQuery(this.iview.getToolbarCtrl().getView("previewTbView").toolbar);
-	  //var newTop = ((((this.iview.currentImage.getHeight() / Math.pow(2, this.iview.currentImage.zoomInfo.getMaxLevel() - 1)) * this.iview.currentImage.zoomInfo.getScale()) - (previewTbView.height() + toInt(previewTbView.css("padding-top")) + toInt(previewTbView.css("padding-bottom")))) / 2) + "px";
-		//this.iview.getToolbarCtrl().toolbarContainer.find(".toolbar").css("top", newTop);
-//	}
-};
-
-/**
- * @public
- * @function
- * @name	maximizeHandler
- * @memberOf	iview.General
- * @description	maximize and show the viewer with the related image or minimize and close the viewer
- */
-genProto.maximizeHandler = function() {
-	if (this.iview.properties.maximized) {
-		this.iview.properties.maximized = false;
-		jQuery(this.iview.viewerContainer).trigger("minimize.viewerContainer");
-		
-		// append viewer to dom again
-		this.iview.context.switchContext();
-
-	} else {
-		this.iview.properties.maximized = true;
-		jQuery(this.iview.viewerContainer).trigger("maximize.viewerContainer");
-		
-		// save document content
-		this.iview.context.switchContext();
-
-	}
-
-	/*IE causes resize already at class change (mostly because position: rel <> fix)
-	 IE runs resize multiple times...but without this line he doesn't...*/
-	this.reinitializeGraphic();
 };

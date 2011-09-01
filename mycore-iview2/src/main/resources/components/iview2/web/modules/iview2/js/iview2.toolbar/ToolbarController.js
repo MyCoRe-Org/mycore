@@ -40,7 +40,7 @@ ToolbarController.prototype.addView = function(view) {
 	// TODO: maybe switch to another position	
   	if (view.id == "previewTbView") {
   		jQuery(view.toolbar).click(function() {
-  		  that.getViewer().gen.maximizeHandler();
+  		  that.getViewer().toggleViewerMode();
   		});
   	}
 	
@@ -116,7 +116,7 @@ ToolbarController.prototype.addView = function(view) {
 						history.back();
 						return;
 					}
-					that.getViewer().gen.maximizeHandler();
+					that.getViewer().toggleViewerMode();
 				}
 			}
 		})

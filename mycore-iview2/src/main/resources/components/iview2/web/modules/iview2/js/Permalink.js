@@ -160,7 +160,7 @@ iview.Permalink.Controller.prototype = {
 			size = "screen";
 		
 		url += "&tosize="+size;
-		url += "&maximized="+viewer.properties.maximized;
+		url += "&maximized="+viewer.viewerContainer.isMax();
 		
 		return url;
 	}

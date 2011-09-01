@@ -219,9 +219,9 @@ PanoJS.prototype.isloaded = function(img) {
 PanoJS.isInstance = function () {return true;};
 
 PanoJS.mousePressedHandler = function(e) {
-	var that = this.backingBean.iview.gen;
+	var that = this.backingBean.iview;
   	e = getEvent(e);
-  	if (that.iview.properties.maximized) {
+  	if (that.viewerContainer.isMax()) {
   		// only grab on left-click
   		if (e.button < 2) {
   			var self = this.backingBean;
@@ -229,7 +229,7 @@ PanoJS.mousePressedHandler = function(e) {
   			self.press(coords);
   		}
   	} else {
-  		that.maximizeHandler();
+  		that.toggleViewerMode();
   	}
   	// NOTE: MANDATORY! must return false so event does not propagate to well!
   	return false;
@@ -237,7 +237,7 @@ PanoJS.mousePressedHandler = function(e) {
 
 PanoJS.doubleClickHandler = function(e) {
 	var iview = this.backingBean.iview;
-	if (iview.properties.maximized) {
+	if (iview.viewerContainer.isMax()) {
 		e = getEvent(e);
 		var self = this.backingBean;
 		coords = self.resolveCoordinates(e);
@@ -261,7 +261,7 @@ PanoJS.keyboardHandler = function(e) {
 			var motion = {
 			'x': PanoJS.MOVE_THROTTLE * (e.keyCode % 2) * (38 - e.keyCode),
 			'y': PanoJS.MOVE_THROTTLE * ((39 - e.keyCode) % 2)};
-		  	if (viewer.iview.properties.maximized){
+		  	if (viewer.iview.viewerContainer.isMax()){
 				viewer.positionTiles(motion, true);
 				viewer.notifyViewerMoved(motion);
 		  	}
@@ -276,12 +276,12 @@ PanoJS.keyboardHandler = function(e) {
 			} else if (e.keyCode == 107 || e.keyCode == 61 || (isBrowser(["Chrome", "IE"]) && e.keyCode == 187) || (isBrowser("Safari") && e.keyCode == 144)) {
 				dir = 1;
 			} else if (e.keyCode == 27) {
-				if (viewer.iview.properties.maximized){
+				if (viewer.iview.viewerContainer.isMax()){
 					viewer.iview.maximizeHandler();
 				}
 			}
 			
-			if (dir != 0 && viewer.iview.properties.maximized) {
+			if (dir != 0 && viewer.iview.viewerContainer.isMax()) {
 				viewer.iview.viewerBean.zoomCenter(dir,{"x":viewer.width/2, "y":viewer.height/2}); 
 				preventDefault(e);
 				e.cancelBubble = true;

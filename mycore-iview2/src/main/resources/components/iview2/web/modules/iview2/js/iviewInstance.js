@@ -31,7 +31,6 @@
         "useChapter" : true,
         "useOverview" : true,
         "useThumbnailPanel" : true,
-        "maximized" : false,
         "initialized" : false,
         "zoomWidth" : false,
         "zoomScreen" : false,
@@ -57,6 +56,7 @@
         this.properties.useParam = (paramDerId === this.properties.derivateId) || (paramDerId.length === 0 && first);
       }
       this.viewerContainer = container;
+      this.viewerContainer.isMax = function() { return jQuery(this).hasClass("max");};
       this.overview = jQuery.extend(this.overview || {}, {'loaded': (this.overview || {}).loaded || false,  'parent': container});
       this.chapter = jQuery.extend(this.chapter | {}, {'loaded': (this.chapter || {}).loaded || false, 'parent': container});
       this.preload = container.find(".preload"); // TODO: move this somewhere
@@ -100,6 +100,21 @@
 		  that.gen.startFileLoaded();
 		}, startFile);
 	};
+	
+	/**
+	 * @public
+	 * @function
+	 * @name		toggleViewerMode
+	 * @memberOf	iview.iviewInstance
+	 * @description	maximize and show the viewer with the related image or minimize and close the viewer
+	 */
+	constructor.prototype.toggleViewerMode = function() {
+		jQuery(this.viewerContainer).trigger((jQuery(this.viewerContainer).hasClass("max")? "minimize":"maximize") + ".viewerContainer");
+		this.context.switchContext();
+		/*IE causes resize already at class change (mostly because position: rel <> fix)
+		 IE runs resize multiple times...but without this line he doesn't...*/
+		this.gen.reinitializeGraphic();
+	}
 	
 	/**
 	 * @public

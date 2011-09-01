@@ -274,7 +274,7 @@ genProto.openChapter = function(button){
  * @description	marks the correct picture in the chapterview and set zoombar to the correct zoomlevel
  */
 genProto.updateModuls = function() {
-  if (this.iview.properties.maximized){
+  if (this.iview.viewerContainer.isMax()){
     // align/fit scrollbars
     this.handleScrollbars();
     try {
@@ -371,7 +371,7 @@ genProto.startFileLoaded = function(){
 		//Toolbar is initialized on dom-load event and may not yet ready
 	  var waitForToolbar = function (self, iviewInst){
 	    if (iviewInst.properties.initialized){
-	      iviewInst.gen.maximizeHandler();
+	      iviewInst.toggleViewerMode();
 	    } else {
 	      setTimeout(function(){self(self,iviewInst);}, 100);
 	    }
