@@ -6,7 +6,7 @@
 
   <section xml:lang="all">
     <editor id="searchmask">
-      <source uri="request:servlets/MCRSearchServlet?mode=load&amp;id={id}" />
+      <source uri="searchInput:{id}" />
       <target type="servlet" name="MCRSearchServlet" method="post" format="xml" />
 
       <components root="root" var="/query">
