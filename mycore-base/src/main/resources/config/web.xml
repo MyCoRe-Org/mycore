@@ -188,6 +188,14 @@
     <servlet-name>MCRContainerLoginServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRContainerLoginServlet</servlet-class>
   </servlet>
+  <servlet>
+    <servlet-name>MCRXSLInfoServlet</servlet-name>
+    <servlet-class>org.mycore.common.xsl.MCRXSLInfoServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MCRXSLInfoServlet</servlet-name>
+    <url-pattern> /servlets/MCRXSLInfoServlet </url-pattern>
+  </servlet-mapping>
 
   <filter-mapping>
     <filter-name>WebAppBaseFilter</filter-name>
