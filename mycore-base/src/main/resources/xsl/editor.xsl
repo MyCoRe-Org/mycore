@@ -328,23 +328,29 @@
 
   <td class="editorPMUD">
     <xsl:if test="number($num) &lt; number($rep/@max)">
-      <input tabindex="999" type="image" name="_p-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-plus.png"/>
+      <input tabindex="999" type="image" name="_p-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-plus.png"
+        title="{i18n:translate('component.base.editor.PMUDplus')}"/>
     </xsl:if>
   </td>
   <td class="editorPMUD">
-    <input tabindex="999" type="image" name="_m-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-minus.png"/>
+    <input tabindex="999" type="image" name="_m-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-minus.png"
+      title="{i18n:translate('component.base.editor.PMUDminus')}"/>
   </td>
   <xsl:choose>
     <xsl:when test="$rep/@arrows='false'" />
     <xsl:otherwise>
       <td class="editorPMUD">
         <xsl:if test="(position() &lt; number($num)) or (position() &lt; number($rep/@min))">
-          <input tabindex="999" type="image" name="_d-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-down.png"/>
+          <input tabindex="999" type="image" name="_d-{$var}-{position()}"
+            src="{$WebApplicationBaseURL}images/pmud-down.png"
+            title="{i18n:translate('component.base.editor.PMUDdown')}"/>
         </xsl:if>
       </td>
       <td class="editorPMUD">
         <xsl:if test="position() &gt; 1">
-          <input tabindex="999" type="image" name="_u-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-up.png"/>
+          <input tabindex="999" type="image" name="_u-{$var}-{position()}" 
+            src="{$WebApplicationBaseURL}images/pmud-up.png"
+            title="{i18n:translate('component.base.editor.PMUDup')}"/>
         </xsl:if>
       </td>
     </xsl:otherwise>
