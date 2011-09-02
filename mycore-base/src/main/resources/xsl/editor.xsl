@@ -767,6 +767,20 @@
   
   <xsl:if test="local-name() = 'textfield'">
     <input tabindex="1" type="text" size="{@width}" name="{$var}" value="{$value}">
+      <xsl:choose>
+        <xsl:when test="@title-i18n">
+          <xsl:attribute name="title">
+            <xsl:value-of select="i18n:translate(@title-i18n)"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:if test="@title">
+            <xsl:attribute name="title">
+              <xsl:value-of select="@title"/>
+            </xsl:attribute>
+          </xsl:if>
+        </xsl:otherwise>
+      </xsl:choose>
       <xsl:copy-of select="@maxlength" />
       <xsl:if test="@disabled='true'">
         <xsl:attribute name="readonly">readonly</xsl:attribute>
@@ -774,8 +788,8 @@
       <xsl:call-template name="editor.set.css" />
     </input>
   </xsl:if>
-  <xsl:if test="local-name() = 'textarea'">
   
+  <xsl:if test="local-name() = 'textarea'">
     <xsl:text disable-output-escaping="yes">&lt;textarea tabindex="1" </xsl:text>
       <xsl:text>cols="</xsl:text><xsl:value-of select="@width"/><xsl:text>" </xsl:text>
       <xsl:text>rows="</xsl:text><xsl:value-of select="@height"/><xsl:text>" </xsl:text>
@@ -785,6 +799,20 @@
       <xsl:if test="@style">
         <xsl:text>style="</xsl:text><xsl:value-of select="@style"/><xsl:text>" </xsl:text>
       </xsl:if>
+      <xsl:choose>
+        <xsl:when test="@title-i18n">
+          <xsl:text>title="</xsl:text>
+          <xsl:value-of select="i18n:translate(@title-i18n)"/>
+          <xsl:text>" </xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:if test="@title">
+            <xsl:text>title="</xsl:text>
+            <xsl:value-of select="@title"/>
+            <xsl:text>" </xsl:text>
+          </xsl:if>
+        </xsl:otherwise>
+      </xsl:choose>
       <xsl:text disable-output-escaping="yes">&gt;</xsl:text>
 
       <xsl:value-of select="$value" disable-output-escaping="yes" />
@@ -918,6 +946,20 @@
     <xsl:if test="@disabled='true'">
       <xsl:attribute name="disabled">disabled</xsl:attribute>
     </xsl:if>
+    <xsl:choose>
+      <xsl:when test="@title-i18n">
+        <xsl:attribute name="title">
+          <xsl:value-of select="i18n:translate(@title-i18n)"/>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:if test="@title">
+          <xsl:attribute name="title">
+            <xsl:value-of select="@title"/>
+          </xsl:attribute>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
     <xsl:call-template name="editor.set.css" />
    
     <xsl:apply-templates select="item">
