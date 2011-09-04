@@ -96,7 +96,7 @@ genProto.reinitializeGraphic = function(callback) {
 		//to grant usage of the complete height it's not possible to simply use height:100%
 		viewerContainer.css({'height': curHeight - viewerContainer.offset().top + "px",
 							'width': curWidth + "px"});
-		viewer.css({'height': curHeight - viewer.parent().offset().top - barX.my.self.outerHeight()  + "px",
+		viewer.css({'height': curHeight - viewer.offset().top - barX.my.self.outerHeight()  + "px",
 					'width': curWidth - barY.my.self.outerWidth()  + "px"});
 	} else {
 		//restore minimized size settings

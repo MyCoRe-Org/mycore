@@ -229,7 +229,7 @@ genProto.handleScrollbars = function(reason) {
 		if (!reason == "all") break;
 	case "resize":
 		// set the new size of the scrollbar
-		barY.setSize(height - top);
+		barY.setSize(height);
 		barY.my.self[0].style.top = top + "px";
 		barX.setSize(width);
 		if (!reason == "all") break;
