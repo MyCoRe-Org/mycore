@@ -545,6 +545,10 @@ public class MCREditorSubmission {
 
         return xml;
     }
+    
+    void setXML(Document xml) {
+        this.xml = xml;
+    }
 
     Element buildInputElements() {
         Element input = new Element("input");

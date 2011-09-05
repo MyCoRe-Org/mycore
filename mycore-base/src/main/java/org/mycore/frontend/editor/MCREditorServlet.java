@@ -48,9 +48,12 @@ import org.jdom.Element;
 import org.jdom.filter.ElementFilter;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.frontend.editor.postprocessor.MCREditorPostProcessor;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
@@ -438,6 +441,8 @@ public class MCREditorServlet extends MCRServlet {
             return;
         }
 
+        postProcess(editor, sub);
+        
         String targetType = parms.getParameter("_target-type");
         logger.debug("Editor: targettype=" + targetType);
 
@@ -460,6 +465,25 @@ public class MCREditorServlet extends MCRServlet {
         }
 
         logger.debug("Editor: processTargetSubmission DONE");
+    }
+
+    private void postProcess(Element editor, MCREditorSubmission sub) {
+        Element postProcessorConfiguration = editor.getChild("postprocessor");
+        if (postProcessorConfiguration != null) {
+            String clazz = postProcessorConfiguration.getAttributeValue("class");
+            logger.debug("Transforming editor submission with " + clazz);
+            try {
+                Object instance = Class.forName(clazz).newInstance();
+                MCREditorPostProcessor postprocessor = (MCREditorPostProcessor) instance;
+                postprocessor.init(postProcessorConfiguration);
+                Document input = sub.getXML();
+                input = postprocessor.process(input);
+                sub.setXML(input);
+            } catch (Exception ex) {
+                String msg = "Exception when postprocessing input with " + clazz;
+                throw new MCRException(msg, ex);
+            }
+        }
     }
 
     private void sendToServlet(HttpServletRequest req, HttpServletResponse res, MCREditorSubmission sub) throws IOException, ServletException {
