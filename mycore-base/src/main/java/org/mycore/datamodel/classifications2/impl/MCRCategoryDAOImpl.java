@@ -139,9 +139,19 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     }
 
     @SuppressWarnings("unchecked")
+    @Override
+    public List<MCRCategory> getCategoriesByLabel(final String lang, final String text) {
+        final Query q = getHibConnection().getNamedQuery(CATEGRORY_CLASS.getName() + ".byLabel");
+        q.setString("lang", lang);
+        q.setString("text", text);
+        q.setCacheable(true);
+        return q.list();
+    }
+
+    @SuppressWarnings("unchecked")
     public List<MCRCategory> getCategoriesByLabel(MCRCategoryID baseID, String lang, String text) {
         Integer[] leftRight = getLeftRightValues(baseID);
-        Query q = getHibConnection().getNamedQuery(CATEGRORY_CLASS.getName() + ".byLabel");
+        Query q = getHibConnection().getNamedQuery(CATEGRORY_CLASS.getName() + ".byLabelInClass");
         q.setString("rootID", baseID.getRootID());
         q.setInteger("left", leftRight[0]);
         q.setInteger("right", leftRight[1]);

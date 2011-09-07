@@ -120,6 +120,9 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         assertFalse("No search results found", results.isEmpty());
         assertTrue("Could not find Category: " + find.getId(), results.get(0).getLabels().contains(label));
         assertTrue("No search result expected.", DAO.getCategoriesByLabel(dontFind.getId(), label.getLang(), label.getText()).isEmpty());
+        results = DAO.getCategoriesByLabel(label.getLang(), label.getText());
+        assertFalse("No search results found", results.isEmpty());
+        assertTrue("Could not find Category: " + find.getId(), results.get(0).getLabels().contains(label));
     }
 
     @Test
@@ -385,8 +388,8 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         assertEquals("Category count does not match.", countNodes(category), countNodes(rootNode));
         assertEquals("Label count does not match.", category.getChildren().get(0).getLabels().size(), rootNode.getChildren().get(0).getLabels().size());
     }
-    
-//  @Test
+
+    //  @Test
     public void replaceCategoryWithItself() {
         addWorldClassification();
         MCRCategory europe = category.getChildren().get(0);

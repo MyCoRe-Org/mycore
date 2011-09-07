@@ -65,13 +65,21 @@ UPDATE MCRCategoryImpl cat SET cat.left=cat.left+:increment WHERE cat.rootID= :c
 UPDATE MCRCategoryImpl cat SET cat.right=cat.right+:increment WHERE cat.rootID= :classID AND cat.right > :right and cat.right <= :max
       ]]>
     </query>
-    <query name="byLabel">
+    <query name="byLabelInClass">
       <![CDATA[
 FROM MCRCategoryImpl as cat
   INNER JOIN cat.labels as label
   WHERE cat.rootID=:rootID AND
     cat.left BETWEEN :left and :right AND
     label.lang=:lang AND
+    label.text=:text
+      ]]>
+    </query>
+    <query name="byLabel">
+      <![CDATA[
+FROM MCRCategoryImpl as cat
+  INNER JOIN cat.labels as label
+  WHERE label.lang=:lang AND
     label.text=:text
       ]]>
     </query>

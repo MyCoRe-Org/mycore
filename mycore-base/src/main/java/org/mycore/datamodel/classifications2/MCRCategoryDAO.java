@@ -77,6 +77,17 @@ public interface MCRCategoryDAO {
     public abstract List<MCRCategory> getCategoriesByLabel(MCRCategoryID baseID, String lang, String text);
 
     /**
+     * Retrieve all Categories tagged by a specific label in a specific lang.
+     * 
+     * @param lang
+     *            language attribute of the label
+     * @param text
+     *            text of the label
+     * @return a collection of MCRCategories with matching labels
+     */
+    public abstract List<MCRCategory> getCategoriesByLabel(String lang, String text);
+
+    /**
      * Returns MCRCategory with this id and childLevel levels of subcategories.
      * 
      * @param id
