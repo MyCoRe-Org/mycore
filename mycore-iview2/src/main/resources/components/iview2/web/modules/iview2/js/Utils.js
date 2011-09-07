@@ -157,11 +157,18 @@ function preventDefault(e) {
 
 function hideProperty(o,name,writeable){
   if (typeof Object.defineProperty === 'function'){
-    Object.defineProperty(o, name, {
-      writable: (typeof writeable !== "undefined")? writeable : true,
-      enumerable: false,
-      configurable: false
-    });
+    try {
+      Object.defineProperty(o, name, {
+        writable: (typeof writeable !== "undefined")? writeable : true,
+        enumerable: false,
+        configurable: false
+      });
+    } catch (ignoreException){
+      log({"msg:":"Error while hiding property",
+        "object:":o,
+        "property:":name,
+        "error:":ignoreException});
+    }
   }
 }
 
