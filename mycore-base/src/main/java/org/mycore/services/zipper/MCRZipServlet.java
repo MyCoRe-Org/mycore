@@ -1,24 +1,23 @@
 /*
- * 
  * $Revision$ $Date$
- *
- * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
- *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program, in a file called gpl.txt or license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * 
+ * This file is part of *** M y C o R e *** See http://www.mycore.de/ for
+ * details.
+ * 
+ * This program is free software; you can use it, redistribute it and / or
+ * modify it under the terms of the GNU General Public License (GPL) as
+ * published by the Free Software Foundation; either version 2 of the License or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program, in a file called gpl.txt or license.txt. If not, write to the
+ * Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307 USA
  */
 
 package org.mycore.services.zipper;
@@ -51,6 +50,7 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.common.xml.MCRXMLResource;
 import org.mycore.common.xml.MCRXSLTransformation;
@@ -63,30 +63,25 @@ import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
- * This servlet delivers the contents of MycoreObects to the client as
+ * This servlet delivers the contents of MycoreObjects to the client as
  * zip-Files. There are three modes a) if id=mycoreobjectID (delivers the
  * metadata, including all derivates) b) if id=derivateID (delivers all files of
  * the derivate) c) if id=derivateID/directoryPath (delivers all files of a
  * special directory of one derivate)
  * 
- * TODO: include an AccessCheck, when ACLs in MyCoRe are realized
- * 
- * call the Servlet via Browser:
- * ServletsBaseURL/MCRZipServlet?id=DocPortal_document_000001
- * 
  * @author Heiko Helmbrecht
- * 
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date: 2011-05-20 14:25:25 +0200 (Fri, 20 May
+ *          2011) $
  */
 public class MCRZipServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
     // The Log4J logger
-    private static Logger LOGGER = Logger.getLogger(MCRZipServlet.class.getName());
+    private static Logger LOGGER = Logger.getLogger(MCRZipServlet.class);
 
     private static String accessErrorPage = MCRConfiguration.instance().getString("MCR.Access.Page.Error");
 
-    protected MCRXMLMetadataManager xmltable = null;
+    protected MCRXMLMetadataManager xmlMetaMgr = null;
 
     protected String stylesheet;
 
@@ -97,7 +92,7 @@ public class MCRZipServlet extends MCRServlet {
     @Override
     public void init() throws MCRConfigurationException, ServletException {
         super.init();
-        xmltable = MCRXMLMetadataManager.instance();
+        xmlMetaMgr = MCRXMLMetadataManager.instance();
         stylesheet = MCRConfiguration.instance().getString("MCR.zip.metadata.transformer");
     }
 
@@ -109,12 +104,20 @@ public class MCRZipServlet extends MCRServlet {
         HttpServletRequest req = job.getRequest();
         HttpServletResponse res = job.getResponse();
 
-        String id;
-        String path;
-        ZipOutputStream out = null;
-
         // get Parameter
         String paramid = getProperty(req, "id");
+
+        if (!MCRAccessManager.checkPermission(MCRObjectID.getInstance(paramid), "writedb")) {
+            String ip = MCRSessionMgr.getCurrentSession().getCurrentIP();
+            String userId = MCRSessionMgr.getCurrentSession().getUserInformation().getCurrentUserID();
+            String msg = "Unsufficient privileges to read content of object \"" + paramid + "\"";
+            LOGGER.warn(msg + "[user=" + userId + ", ip=" + ip + "]");
+            job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN, msg);
+            return;
+        }
+
+        String id, path;
+        ZipOutputStream out = null;
 
         Matcher ma = Pattern.compile("\\A([\\w]+)/([\\w/]+)\\z").matcher(paramid);
 
@@ -133,14 +136,7 @@ public class MCRZipServlet extends MCRServlet {
         } catch (MCRException e1) {
             String msg = "Error: HTTP request id is not in the allowed id-list";
             LOGGER.error(msg + ":" + id);
-            generateErrorPage(req, res, HttpServletResponse.SC_BAD_REQUEST, msg, new MCRException(id + " is a wrong ID!"), false);
-
-            return;
-        } catch (NullPointerException e2) {
-            String msg = "Error: Wrong Parameters given";
-            LOGGER.error(msg);
-            generateErrorPage(req, res, HttpServletResponse.SC_BAD_REQUEST, msg, new MCRException(" wrong Parameters!"), false);
-
+            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
             return;
         }
 
@@ -155,7 +151,7 @@ public class MCRZipServlet extends MCRServlet {
                 sendDerivate(id, path, out);
                 out.close();
             } else {
-                Document jdom = xmltable.retrieveXML(mcrid);
+                Document jdom = xmlMetaMgr.retrieveXML(mcrid);
                 if (!MCRAccessManager.checkPermission(id, "read")) {
                     LOGGER.info("MCRFileNodeServlet: AccessForbidden to " + id);
                     res.sendRedirect(res.encodeRedirectURL(getBaseURL() + accessErrorPage));
@@ -168,7 +164,8 @@ public class MCRZipServlet extends MCRServlet {
         } catch (Exception e) {
             String msg = "The ZIP file could not be build. Please check the parameters.";
             res.reset();
-            generateErrorPage(req, res, HttpServletResponse.SC_BAD_REQUEST, msg, new MCRException("zip-Error!", e), false);
+            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
+            return;
         }
     }
 
@@ -215,7 +212,7 @@ public class MCRZipServlet extends MCRServlet {
      * @param parameters
      *            Parameters, that can be needed in the transforming
      *            XSL-Stylesheet
-     * @throws JDOMException 
+     * @throws JDOMException
      */
     protected void sendZipped(Document jdom, Properties parameters, ZipOutputStream out) throws IOException, JDOMException {
         ZipEntry ze = new ZipEntry("metadata.xml");
@@ -298,8 +295,7 @@ public class MCRZipServlet extends MCRServlet {
      * 
      * @param jdom
      *            the JDOM of the given MycoreObject
-     * @throws JDOMException 
-     *  
+     * @throws JDOMException
      */
     @SuppressWarnings("unchecked")
     protected void sendObject(Document jdom, HttpServletRequest req, ZipOutputStream out) throws IOException, JDOMException {
@@ -335,7 +331,6 @@ public class MCRZipServlet extends MCRServlet {
      *            name
      * @param dirpath
      *            if given, it is concatenated to the name of the zip-file
-     * 
      */
     protected ZipOutputStream buildZipOutputStream(HttpServletResponse res, String id, String dirpath) throws IOException {
         String filename = dirpath == null || dirpath.equals("") ? id + ".zip" : id + "-" + dirpath.replaceAll("/", "-") + ".zip";
