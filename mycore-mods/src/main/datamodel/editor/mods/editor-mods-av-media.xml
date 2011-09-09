@@ -70,9 +70,9 @@
     <!-- Quelle END -->
 
     <!-- Institution (wo bei BMELV-Forschung zugeordnet) -->
-    <cell row="65" col="1" anchor="NORTHEAST" ref="mods.assignedInstituteClass.label" />
-    <cell row="65" col="2" anchor="NORTHWEST" ref="mods.assignedInstituteClass" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="65" col="3" anchor="NORTHWEST" ref="mods.assignedInstituteClass.help" />
+    <cell row="65" col="1" anchor="NORTHEAST" ref="mods.assignedInstitute.label" />
+    <cell row="65" col="2" anchor="NORTHWEST" ref="mods.assignedInstitute" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="65" col="3" anchor="NORTHWEST" ref="mods.assignedInstitute.help" />
     <!-- Institution END -->
 
     <!-- Kommentar -->

@@ -92,9 +92,9 @@
     <!-- Quelle END -->
 
     <!-- Institution der Einreichung -->
-    <cell row="150" col="1" anchor="NORTHEAST" ref="mods.submissionAtInstituteClass.label" />
-    <cell row="150" col="2" anchor="NORTHWEST" ref="mods.submissionAtInstituteClass" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="150" col="3" anchor="NORTHWEST" ref="mods.submissionAtInstituteClass.help" />
+    <cell row="150" col="1" anchor="NORTHEAST" ref="mods.submissionAtInstitute.label" />
+    <cell row="150" col="2" anchor="NORTHWEST" ref="mods.submissionAtInstitute" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="150" col="3" anchor="NORTHWEST" ref="mods.submissionAtInstitute.help" />
     <!-- Institution END -->
 
     <!-- Stichworte -->
@@ -105,9 +105,9 @@
   </panel></cell>
 
     <!-- Institution (wo bei BMELV-Forschung zugeordnet) -->
-    <cell row="165" col="1" anchor="NORTHEAST" ref="mods.assignedInstituteClass.label" />
-    <cell row="165" col="2" anchor="NORTHWEST" ref="mods.assignedInstituteClass" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="165" col="3" anchor="NORTHWEST" ref="mods.assignedInstituteClass.help" />
+    <cell row="165" col="1" anchor="NORTHEAST" ref="mods.assignedInstitute.label" />
+    <cell row="165" col="2" anchor="NORTHWEST" ref="mods.assignedInstitute" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="165" col="3" anchor="NORTHWEST" ref="mods.assignedInstitute.help" />
     <!-- Institution END -->
 
     <!-- Kommentar -->

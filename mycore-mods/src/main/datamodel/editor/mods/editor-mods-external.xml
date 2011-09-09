@@ -1,0 +1,17 @@
+<imports>
+  <panel id="mods.submissionAtInstitute">
+    <cell anchor="NORTHWEST" var="mods:originInfo/mods:place/mods:placeTerm[@type='text']" ref="TFzeile512" />
+  </panel>
+  <panel id="mods.assignedInstitute">
+    <cell anchor="NORTHWEST" var="mods:name[@type='corporate']">
+      <hidden var="mods:role/mods:roleTerm" default="institution" />
+      <hidden var="mods:role/mods:roleTerm/@authority" default="marcrelator" />
+      <hidden var="mods:role/mods:roleTerm/@type" default="text" />
+      <repeater min="1" max="5" pos="right">
+        <panel>
+          <cell col="1" row="1" anchor="EAST" var="mods:namePart[@type='given']" ref="TFzeile512" />
+        </panel>
+      </repeater>
+    </cell>
+  </panel>
+</imports>

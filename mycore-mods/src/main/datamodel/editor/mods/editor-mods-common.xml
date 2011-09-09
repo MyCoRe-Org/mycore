@@ -1,4 +1,5 @@
 <imports xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <include uri="webapp:editor/editor-mods-external.xml" />
 
   <!-- TITLE -->
   <text id="mods.title.label">
@@ -251,12 +252,12 @@
   <!-- person END -->
 
   <!-- Institutionszugehörigkeit (wo zugeordnet) -->
-  <text id="mods.assignedInstituteClass.label">
+  <text id="mods.assignedInstitute.label">
     <label xml:lang="de">Institutionszugehörigkeit (*)</label>
     <label xml:lang="en">Assignment (*)</label>
   </text>
 
-  <panel id="mods.assignedInstituteClass">
+  <panel id="mods.assignedInstitute">
     <cell anchor="NORTHWEST" var="mods:name[@type='corporate']">
       <hidden var="mods:role/mods:roleTerm" default="institution" />
       <hidden var="mods:role/mods:roleTerm/@authority" default="marcrelator" />
@@ -278,7 +279,7 @@
     </cell>
   </panel>
 
-  <helpPopup id="mods.assignedInstituteClass.help" width="400px" height="250px">
+  <helpPopup id="mods.assignedInstitute.help" width="400px" height="250px">
     <label xml:lang="de">Institut/Fachgruppe, zu welcher die Autoren bzw. die Beitragenden 
     zum Zeitpunkt der Veröffentlichung des Dokumentes, des Erscheinungsjahres des Konferenzbandes 
     oder Buches gehört haben.</label>
@@ -376,30 +377,16 @@
 
 
   <!-- Institution der Einreichung -->
-  <text id="mods.submissionAtInstituteClass.label">
+  <text id="mods.submissionAtInstitute.label">
     <label xml:lang="de">Institut der Einreichung (*)</label>
     <label xml:lang="en">Submission at Intitute (*)</label>
   </text>
 
-  <panel id="mods.submissionAtInstituteClass">
-    <cell anchor="NORTHWEST" var="mods:originInfo/mods:place/mods:placeTerm[@type='text']">
-      <list width="30" type="dropdown">
-        <include ref="pleaseSelect" />
-        <include uri="classification:editor:-1:children:bmelv_class_origin" cacheable="false" />
-        <condition required="true">
-          <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
-          <label xml:lang="en">Please select one entry!</label>
-        </condition>
-      </list>
-    </cell>
-  </panel>
-
-  <helpPopup id="mods.submissionAtInstituteClass.help" width="400px" height="250px">
+  <helpPopup id="mods.submissionAtInstitute.help" width="400px" height="250px">
     <label xml:lang="de">Das Institut oder die Fachgruppe, an der das Dokument eingereicht wurde</label>
     <label xml:lang="en">Select an institution from the list.</label>
   </helpPopup>
   <!-- Institution END -->
-
 
   <!-- Datum der Veröffentlichung [text] -->
   <text id="mods.dateIssued.label">
@@ -730,7 +717,7 @@
   </text>
 
   <panel id="mods.ddc">
-    <cell anchor="NORTHWEST" var="mods:classification">
+    <cell anchor="NORTHWEST" var="mods:classification[@authority='ddc']">
       <list width="30" type="dropdown">
         <include ref="pleaseSelect" />
         <include uri="classification:editor:-1:children:ddc-sg" cacheable="false" />
