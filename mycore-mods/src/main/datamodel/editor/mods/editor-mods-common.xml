@@ -24,10 +24,10 @@
 
   <helpPopup id="mods.title.help" width="400px" height="250px">
     <label xml:lang="de">
-      Titel des Dokuments
+      Der Titel des Dokumentes oder Objekts, unter dem es formell bekannt ist.
         </label>
     <label xml:lang="en">
-      title of document
+      Title of document by which the resource is formally known.
         </label>
   </helpPopup>
   <!-- TITLE END -->
@@ -66,10 +66,11 @@
 
   <helpPopup id="mods.title.translated.help" width="400px" height="250px">
     <label xml:lang="de">
-      Titel übersetzt (mehrere Sprachen)
+      Der Titel übersetzt. Mit dem "+" button können weitere Übersetzungen des 
+      Titels hinzugefügt werden. 
         </label>
     <label xml:lang="en">
-      title translated
+      title translated. 
         </label>
   </helpPopup>
   <!-- TITLE Translated END -->
@@ -107,10 +108,10 @@
 
   <helpPopup id="mods.languageTerm.help" width="400px" height="250px">
     <label xml:lang="de">
-      Sprache des Dokuments
+      Die Sprache, in welcher das Dokument verfasst ist.
         </label>
     <label xml:lang="en">
-      language of document
+      language of document text
         </label>
   </helpPopup>
   <!-- LANGUAGE END -->
@@ -163,10 +164,12 @@
 
   <helpPopup id="mods.author.help" width="400px" height="250px">
     <label xml:lang="de">
-      Personen (Verlinkung auf PND)
+      Die Person, die primär das Dokument erstellt hat. Weitere Autoren können über den "+" Button hinzugefügt werden. 
+      (Verlinkung auf PND)
         </label>
     <label xml:lang="en">
-      Persons (ref to pnd)
+      Persons primarily responsible for making the resource. Further persons my be added with "+" button.
+      (ref to pnd)
         </label>
   </helpPopup>
   <!-- pub_autor_dok_txt [text] and reviewer END -->
@@ -238,10 +241,11 @@
 
   <helpPopup id="mods.person.help" width="400px" height="250px">
     <label xml:lang="de">
-      Personen (Verlinkung auf PND)
+      Name und Rolle der Personen, in welcher sie bei der Erstellung des Dokumentes mitgewirkt haben.
+      (Verlinkung auf PND).
         </label>
     <label xml:lang="en">
-      Persons (ref to pnd)
+      Names and roles of persons cooperating .... (ref to pnd)
         </label>
   </helpPopup>
   <!-- person END -->
@@ -275,7 +279,9 @@
   </panel>
 
   <helpPopup id="mods.assignedInstituteClass.help" width="400px" height="250px">
-    <label xml:lang="de">Wählen Sie die Institution aus.</label>
+    <label xml:lang="de">Institut/Fachgruppe, zu welcher die Autoren bzw. die Beitragenden 
+    zum Zeitpunkt der Veröffentlichung des Dokumentes, des Erscheinungsjahres des Konferenzbandes 
+    oder Buches gehört haben.</label>
     <label xml:lang="en">Select an institution from the list.</label>
   </helpPopup>
   <!-- Institutionszugehörigkeit END -->
@@ -300,7 +306,9 @@
 
   <helpPopup id="mods.publisher.help" width="400px" height="250px">
     <label xml:lang="de">
-      Publisher (Druckerei, Medienanstalt ...)
+      Eine natürliche oder juristische Person oder Personengruppe, die als verantwortlich für die 
+      inhaltliche Gestaltung eines Dokuments angegeben wird, ohne selbst Verfasser des Dokuments oder einzelner 
+      Teile desselben sein zu müssen
         </label>
     <label xml:lang="en">
       Publisher
@@ -358,7 +366,7 @@
 
   <helpPopup id="mods.conferenceLand.help" width="400px" height="250px">
     <label xml:lang="de">
-      Land der Konferenz
+      Das Land, in dem die Konferenz stattfand.
         </label>
     <label xml:lang="en">
       Country Place
@@ -387,7 +395,7 @@
   </panel>
 
   <helpPopup id="mods.submissionAtInstituteClass.help" width="400px" height="250px">
-    <label xml:lang="de">Wählen Sie die Institution aus, an der die Promotion eingereicht wurde</label>
+    <label xml:lang="de">Das Institut oder die Fachgruppe, an der das Dokument eingereicht wurde</label>
     <label xml:lang="en">Select an institution from the list.</label>
   </helpPopup>
   <!-- Institution END -->
@@ -404,7 +412,7 @@
       <panel>
         <cell anchor="NORTHWEST" ref="TFzeile512" />
         <condition required="true">
-          <label xml:lang="de">Tragen Sie hier das Datum der Veröffentlichung (oder z.B. bei Filmen das Datum der Aufnahme) ein.</label>
+          <label xml:lang="de">Tragen Sie hier das Datum der Veröffentlichung ein.</label>
           <label xml:lang="en">Enter the date of publication here.</label>
         </condition>
       </panel>
@@ -412,11 +420,15 @@
   </panel>
 
   <helpPopup id="mods.dateIssued.help" width="400px" height="250px">
-    <label xml:lang="de">
-      Datum der Veröffentlichung
+    <label xml:lang="de"> 
+      Bei Konferenzbänden, Büchern geben Sie bitte das Erscheinungsjahr an,<br />
+      bei Filmen das Datum der Aufnahme,<br />
+      bei Promotionen das Datum der ersten Online Veröffentlichung.
         </label>
     <label xml:lang="en">
-      Date of Publication
+      Date of Publication:
+      video recording date
+      
         </label>
   </helpPopup>
   <!-- Datum der Veröffentlichung END -->
@@ -480,10 +492,15 @@
 
   <helpPopup id="mods.dateOccured.help" width="400px" height="250px">
     <label xml:lang="de">
-      Zeitraum in der die Konferenz stattfand (von, bis).
+      Zeitraum in der die Konferenz stattfand (von, bis). Das Datum muss im 
+      ISO Format mit Bindestrich (YYYY-MM-DD) angegeben werden. <br /> 
+      Beispiel: 2003-01-07
         </label>
     <label xml:lang="en">
-      Date of Conference (start, end)
+      Date of Conference (start, end). The date must be inserted in ISO format 
+      with dahes (YYYY-MM-DD).
+      Sample: 2003-01-07<br />
+      
         </label>
   </helpPopup>
   <!--Zeit in der die Konferenz stattfand END -->
@@ -522,7 +539,7 @@
 
   <helpPopup id="mods.abstract.help" width="400px" height="250px">
     <label xml:lang="de">
-      Abstract in verschiedenen Sprachen
+      Eine kurze Zusammenfassung/Abstrakt des Dokumentinhaltes in verschiedenen Sprachen.
         </label>
     <label xml:lang="en">
       abstract (translated also)
@@ -548,10 +565,10 @@
 
   <helpPopup id="mods.subject.help" width="400px" height="250px">
     <label xml:lang="de">
-      Stichworte
+      Stichworte mit Semikolon getrennt
         </label>
     <label xml:lang="en">
-      Subject
+      Subject 
         </label>
   </helpPopup>
   <!-- Stichworte END -->
@@ -574,7 +591,7 @@
 
   <helpPopup id="mods.note.help" width="400px" height="250px">
     <label xml:lang="de">
-      Kommentar
+      Hier können beliebige Kommentare zum Dokument notiert werden 
         </label>
     <label xml:lang="en">
       Comment
@@ -597,10 +614,10 @@
 
   <helpPopup id="mods.physicalLocation.help" width="400px" height="250px">
     <label xml:lang="de">
-      Standort
+      Standort der physischen Ressource (Buch, Konferenzband, Film)
         </label>
     <label xml:lang="en">
-      Location
+      Location of physical resource (book, conference proceeding, film)
         </label>
   </helpPopup>
   <!-- Standort END -->
@@ -621,7 +638,10 @@
 
   <helpPopup id="mods.relatedItem.help" width="400px" height="250px">
     <label xml:lang="de">
-      Quellenangabe
+      Gedruckte oder elektronische Quelle einer sonstigen Veröffentlichung des vorliegenden 
+      Dokumentes. <br />Für ein retrodigitalisiertes Dokument wäre das beispielsweise die Printversion. 
+      Bei Postern oder Abstracts kann hier die Konferenz oder der Konferenzbeitrag, in deren Kontext
+      dieses Dokument steht, angegeben werden.
       </label>
     <label xml:lang="en">
       Source
@@ -674,6 +694,10 @@
                 <label xml:lang="de">URN</label>
                 <label xml:lang="en">URN</label>
               </item>
+              <item value="doi">
+                <label xml:lang="de">DOI</label>
+                <label xml:lang="en">DOI</label>
+              </item>
               <item value="citekey">
                 <label xml:lang="de">Citekey</label>
                 <label xml:lang="en">Citekey</label>
@@ -701,8 +725,8 @@
 
   <!-- DDC pub_klassifik -->
   <text id="mods.ddc.label">
-    <label xml:lang="de">Klassifikation (*)</label>
-    <label xml:lang="en">Classification (*)</label>
+    <label xml:lang="de">DDC-Sachgruppe (*)</label>
+    <label xml:lang="en">DDC-category (*)</label>
   </text>
 
   <panel id="mods.ddc">
@@ -719,8 +743,10 @@
   </panel>
 
   <helpPopup id="mods.ddc.help" width="400px" height="250px">
-    <label xml:lang="de">Wählen Sie bitte eine Zuordnung zur DDC-Sachgruppe aus.</label>
-    <label xml:lang="en">Select an entry from the ddc list.</label>
+    <label xml:lang="de">Die Zuordnung des Dokumentes zur DDC-Sachgruppe. Mit dem "+" Button
+    können weitere DDC-Sachgruppen hinzugefügt werden.</label>
+    <label xml:lang="en">Entry from the ddc list.With "+" buttons can be selected additional 
+    ddc categories.</label>
   </helpPopup>
   <!-- DDC pub_klassifik END -->
 
@@ -740,7 +766,8 @@
 
   <helpPopup id="mods.physicalDescription.help" width="400px" height="250px">
     <label xml:lang="de">
-      Physikalische Beschreibung, z.B. bei Postern die Größe
+      Hier kann eine physikalische Beschreibung des Dokumentes erfolgen, z.B. bei 
+      Postern die Größe.
         </label>
     <label xml:lang="en">
       Physical description, e.g. size of poster
@@ -795,8 +822,8 @@
   </panel>
 
   <helpPopup id="mods.genre.kindOfReport.help" width="400px" height="250px">
-    <label xml:lang="de">Wählen Sie bitte eine Zuordnung aus.</label>
-    <label xml:lang="en">Select an entry from the list.</label>
+    <label xml:lang="de">Eine Zuordnung zu einem in der Liste verfügbaren Genre .</label>
+    <label xml:lang="en">Entry from the list.</label>
   </helpPopup>
   <!-- pub_klassifik END -->
 
@@ -875,7 +902,7 @@
   </panel>
 
   <helpPopup id="mods.nameConference.help" width="400px" height="250px">
-    <label xml:lang="de">Geben Sie den Namen der Konferenz ein.</label>
+    <label xml:lang="de">Der Name der Konferenz ein.</label>
     <label xml:lang="en">Insert Conference Name.</label>
   </helpPopup>
   <!-- Konferenztitel END -->
@@ -907,7 +934,7 @@
   </panel>
 
   <helpPopup id="mods.corporation.help" width="400px" height="250px">
-    <label xml:lang="de">Geben Sie die Körperschaft ein ein.</label>
+    <label xml:lang="de">Geben Sie die Körperschaft ein.</label>
     <label xml:lang="en">Insert corporate name.</label>
   </helpPopup>
   <!-- Körperschaft END -->
@@ -927,8 +954,8 @@
   </panel>
 
   <helpPopup id="mods.edition.help" width="400px" height="250px">
-    <label xml:lang="de">Geben Sie die Körperschaft ein ein.</label>
-    <label xml:lang="en">Insert corporate name.</label>
+    <label xml:lang="de">Auflage des Buches, Konferenzbandes ...</label>
+    <label xml:lang="en">Edition of a book, conference proceeding ...</label>
   </helpPopup>
   <!-- Edition END -->
 
@@ -947,7 +974,8 @@
   </panel>
 
   <helpPopup id="mods.book.place.help" width="400px" height="250px">
-    <label xml:lang="de">Ort</label>
+    <label xml:lang="de">Bei Druckmedien oder digitalen Dokumenten, die von Verlagen herausgegeben wurden, wird 
+    hier der Verlagsort angegeben. </label>
     <label xml:lang="en">Place</label>
   </helpPopup>
   <!-- Place END -->
@@ -988,7 +1016,9 @@
   </panel>
 
   <helpPopup id="mods.book.series.help" width="400px" height="250px">
-    <label xml:lang="de">Serie</label>
+    <label xml:lang="de">Schriftenreihe unter einem Gesamttitel, dem jeweils 
+    abgeschlossene Bände zugeordnet sind. Serien sind häufig unbegrenzt, die einzelnen 
+    Stücktitel erscheinen nicht regelmäßig</label>
     <label xml:lang="en">Series</label>
   </helpPopup>
   <!-- Series END -->
@@ -1008,7 +1038,7 @@
   </panel>
 
   <helpPopup id="mods.book.part.extent.help" width="400px" height="250px">
-    <label xml:lang="de">Umfang</label>
+    <label xml:lang="de">Umfang des Werkes in Seiten</label>
     <label xml:lang="en">Extent</label>
   </helpPopup>
   <!-- Extent|Part END -->
@@ -1089,14 +1119,24 @@
   </panel>
 
   <helpPopup id="mods.book.isbn.help">
-    <label xml:lang="de">ISBN (*)</label>
-    <label xml:lang="en">ISBN (*)</label>
+    <label xml:lang="de">ISBN (*)<br/>
+    Die ISBN wird ohne Bindestrich eingegeben.<br/>
+    Beispiel: ISBN 9783836213257
+    
+    </label>
+    <label xml:lang="en">ISBN (*)<br/>
+  
+    </label>
   </helpPopup>
   <!-- ISBN END -->
 
   <!-- ISSN -->
   <text id="mods.issn.label">
-    <label xml:lang="de">ISSN (*)</label>
+    <label xml:lang="de">ISSN (*)<br/>
+    Die ISSN wird ohne Bindestrich eingegeben.<br/>
+    Beispiel: ISSN 09359680
+    
+    </label>
     <label xml:lang="en">ISSN (*)</label>
   </text>
 
@@ -1112,7 +1152,7 @@
     <label xml:lang="de">ISSN</label>
     <label xml:lang="en">ISSN</label>
   </helpPopup>
-  <!-- ISBN END -->
+  <!-- ISSN END -->
 
   <!-- Impact Factor -->
   <text id="mods.impactfactor.label">
