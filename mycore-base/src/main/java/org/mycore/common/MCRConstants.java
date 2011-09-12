@@ -1,29 +1,29 @@
 /*
  * 
- * $Revision$ 
- * $Date$
- *
- * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
- *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program, in a file called gpl.txt or license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * $Revision$ $Date$
+ * 
+ * This file is part of *** M y C o R e *** See http://www.mycore.de/ for
+ * details.
+ * 
+ * This program is free software; you can use it, redistribute it and / or
+ * modify it under the terms of the GNU General Public License (GPL) as
+ * published by the Free Software Foundation; either version 2 of the License or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program, in a file called gpl.txt or license.txt. If not, write to the
+ * Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307 USA
  */
 
 package org.mycore.common;
 
+import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
 import org.jdom.Namespace;
 
 /**
@@ -41,8 +42,8 @@ import org.jdom.Namespace;
  * @author Thomas Scheffler (yagee)
  * @author Stefan Freitag (sasf)
  * @author Frank Lützenkirchen
- * 
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date: 2011-06-22 12:50:42 +0200 (Wed, 22 Jun
+ *          2011) $
  */
 public final class MCRConstants {
     /** MyCoRe version */
@@ -93,23 +94,21 @@ public final class MCRConstants {
     private final static HashMap<String, Namespace> namespacesByPrefix;
 
     static {
-        namespaces = new ArrayList<Namespace>();
-        namespaces.add(XLINK_NAMESPACE);
-        namespaces.add(XSI_NAMESPACE);
-        namespaces.add(XSL_NAMESPACE);
-        namespaces.add(METS_NAMESPACE);
-        namespaces.add(DV_NAMESPACE);
-        namespaces.add(MODS_NAMESPACE);
-        namespaces.add(MCR_NAMESPACE);
-
         namespacesByPrefix = new HashMap<String, Namespace>();
-        namespacesByPrefix.put("xlink", XLINK_NAMESPACE);
-        namespacesByPrefix.put("xsi", XSI_NAMESPACE);
-        namespacesByPrefix.put("xsl", XSL_NAMESPACE);
-        namespacesByPrefix.put("mets", METS_NAMESPACE);
-        namespacesByPrefix.put("dv", DV_NAMESPACE);
-        namespacesByPrefix.put("mods", MODS_NAMESPACE);
-        namespacesByPrefix.put("mcr", MCR_NAMESPACE);
+        namespaces = new ArrayList<Namespace>();
+
+        Field[] fields = MCRConstants.class.getFields();
+        for (Field f : fields) {
+            if (f.getType() == Namespace.class) {
+                try {
+                    Namespace namespace = (Namespace) f.get(null);
+                    namespaces.add(namespace);
+                    namespacesByPrefix.put(namespace.getPrefix(), namespace);
+                } catch (Exception e) {
+                    Logger.getLogger(MCRConstants.class).error("Error while initialising Namespace list and HashMap", e);
+                }
+            }
+        }
 
         Properties p = MCRConfiguration.instance().getProperties("MCR.Namespace");
         for (Object element : p.keySet()) {
@@ -123,8 +122,8 @@ public final class MCRConstants {
     }
 
     /**
-     * Returns a list of standard namespaces used in MyCoRe.
-     * Additional namespaces can be configured using properties like
+     * Returns a list of standard namespaces used in MyCoRe. Additional
+     * namespaces can be configured using properties like
      * MCR.Namespace.<prefix>=<uri>
      */
     public static List<Namespace> getStandardNamespaces() {
@@ -132,8 +131,8 @@ public final class MCRConstants {
     }
 
     /**
-     * Returns the namespace with the given standard prefix.
-     * Additional namespaces can be configured using properties like
+     * Returns the namespace with the given standard prefix. Additional
+     * namespaces can be configured using properties like
      * MCR.Namespace.<prefix>=<uri>
      */
     public static Namespace getStandardNamespace(String prefix) {
