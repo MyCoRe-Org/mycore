@@ -1098,7 +1098,34 @@ iview.scrollbar.Controller.prototype = {
 	}
 }
 
-var createScrollbars = function(viewer) {
+iview.scrollbar.importScrollbars = function(viewer) {
+	/**
+	 * @private
+	 * @name		viewerPosUpdate
+	 * @memberOf	iview.scrollbar.createScrollbars#
+	 * @description	notifies the viewer about a change in the view port
+	 * @param x		{integer} valueX number of pixels how far the bar has been moved horizontal
+	 * @param y		{integer} valueY number of pixels how far the bar has been moved vertical
+	 */
+	var viewerPosUpdate = function(x, y) {
+		var pos = {'x': x, 'y': y};
+		viewer.viewerBean.positionTiles (pos, true);
+		viewer.viewerBean.notifyViewerMoved(pos);
+	}
+	/**
+	 * @private
+	 * @function
+	 * @name		scrollMove
+	 * @memberOf	iview.scrollbar.createScrollbars#
+	 * @description	loads the tiles accordingly the position of the scrollbar if they is moving
+	 * @param		{integer} valueX number of pixels how far the bar has been moved horizontal
+	 * @param		{integer} valueY number of pixels how far the bar has been moved vertical
+	 */
+	var scrollMove = function(valueX, valueY) {
+		viewer.scroller = true;
+		viewerPosUpdate(valueX, valueY);
+		viewer.scroller = false;
+	}
 	// ScrollBars
 	// horizontal
 	viewer.scrollbars={};//TODO: make real Object
@@ -1106,7 +1133,7 @@ var createScrollbars = function(viewer) {
 	barX.createView({ 'direction':'horizontal', 'parent':viewer.context.container, 'mainClass':'scroll'});
 	barX.attach("curVal.scrollbar", function(e, val) {
 		if (!viewer.roller) {
-			viewer.gen.scrollMove(- (val["new"]-val["old"]), 0);
+			scrollMove(-(val["new"]-val["old"]), 0);
 		}
 	});
 	// vertical
@@ -1114,14 +1141,15 @@ var createScrollbars = function(viewer) {
 	barY.createView({ 'direction':'vertical', 'parent':viewer.context.container, 'mainClass':'scroll'});
 	barY.attach("curVal.scrollbar", function(e, val) {
 		if (!viewer.roller) {
-			viewer.gen.scrollMove( 0, -(val["new"]-val["old"]));
+			scrollMove(0, -(val["new"]-val["old"]));
 		}
 	});
-
 	// Additional Events
 	// register to scroll into the viewer
-	viewer.context.viewer.mousewheel(function(e, delta, deltaX, deltaY) {e.preventDefault(); viewer.gen.viewerScroll({"x":deltaX, "y":deltaY});})
-		.css({	'width':viewer.properties.startWidth - ((barX.my.self.css("visibility") == "visible")? barX.my.self.outerWidth() : 0)  + "px",
-				'height':viewer.properties.startHeight - ((barY.my.self.css("visibility") == "visible")? barY.my.self.outerHeight() : 0)  + "px"
+	viewer.context.viewer.mousewheel(function(e, delta, deltaX, deltaY) {
+		e.preventDefault();
+		viewerPosUpdate(deltaX*PanoJS.MOVE_THROTTLE, deltaY*PanoJS.MOVE_THROTTLE);
+	}).css({'width':viewer.properties.startWidth - ((barX.my.self.css("visibility") == "visible")? barX.my.self.outerWidth() : 0)  + "px",
+			'height':viewer.properties.startHeight - ((barY.my.self.css("visibility") == "visible")? barY.my.self.outerHeight() : 0)  + "px"
 	});
 }

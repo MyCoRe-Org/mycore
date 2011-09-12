@@ -161,22 +161,6 @@ genProto.importPermalink = function(callback) {
 /**
  * @public
  * @function
- * @name		scrollMove
- * @memberOf	iview.General
- * @description	loads the tiles accordingly the position of the scrollbar if they is moving
- * @param		{integer} valueX number of pixels how far the bar has been moved horizontal
- * @param		{integer} valueY number of pixels how far the bar has been moved vertical
- */
-genProto.scrollMove = function(valueX, valueY) {
-	this.iview.scroller = true;
-	this.iview.viewerBean.positionTiles ({'x' : valueX, 'y' : valueY}, true);
-	this.iview.viewerBean.notifyViewerMoved({'x' : valueX, 'y' : valueY});
-	this.iview.scroller = false;
-}
-
-/**
- * @public
- * @function
  * @name		handleScrollbars
  * @memberOf	iview.General#
  * @description	adapts the scrollbars to correctly represent the new view after a zoom or resize event occured to the viewer. The adaptations cover sizing the bar, the bar proportion, maxValue and currentValue depending on the given reason
@@ -280,21 +264,6 @@ genProto.updateModuls = function() {
 //      this.iview.getToolbarCtrl().toolbarContainer.find(".toolbar").css("top", newTop);
 //    }
   }
-}
-
-/**
- * @public
- * @function
- * @name		viewerScroll
- * @memberOf	iview.General
- * @description	handles if the scrollbar was moved up or down and calls the functions to load the corresponding tiles and movement
- * @param 		{} delta
- */
-genProto.viewerScroll = function(delta) {
-	this.iview.viewerBean.positionTiles({'x': delta.x*PanoJS.MOVE_THROTTLE,
-											'y': delta.y*PanoJS.MOVE_THROTTLE}, true);
-	this.iview.viewerBean.notifyViewerMoved({'x': delta.x*PanoJS.MOVE_THROTTLE,
-												'y': delta.y*PanoJS.MOVE_THROTTLE});
 }
 
 /**

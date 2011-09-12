@@ -79,7 +79,7 @@
     constructor.prototype.loading = function ii_loading(startFile) {
 		var that = this;
 		
-		createScrollbars(this);
+		iview.scrollbar.importScrollbars(this);
 		
 		PanoJS.USE_SLIDE = false;
 		PanoJS.USE_LOADER_IMAGE = false;
