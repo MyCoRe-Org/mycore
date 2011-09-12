@@ -2,15 +2,22 @@ package org.mycore.services.urn;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.apache.xml.utils.NSInfo;
+import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.Namespace;
 import org.jdom.xpath.XPath;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRUtils;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
@@ -24,11 +31,22 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
+/**
+ * This class provides methods for adding URN to mycore objects and derivates.
+ * 
+ * @author shermann
+ */
 public class MCRURNAdder {
 
     private static final Logger LOGGER = Logger.getLogger(MCRURNAdder.class);
 
-    /** This methods adds an URN to the metadata of a mycore object */
+    /**
+     * This methods adds an URN to the metadata of a mycore object.
+     * 
+     * @param objectId
+     * @return
+     * @throws Exception
+     */
     public boolean addURN(String objectId) throws Exception {
         // checking access right
         if (!MCRAccessManager.checkPermission(objectId, "writedb")) {
@@ -40,9 +58,8 @@ public class MCRURNAdder {
         if (isAllowedObject(id.getTypeId())) {
             MCRObject obj = MCRMetadataManager.retrieveMCRObject(id);
             MCRMetaElement srcElement = obj.getMetadata().getMetadataElement("def.identifier");
-            MCRIURNProvider urnProvider = this.getURNProvider();
-            MCRURN myURN = urnProvider.generateURN();
-            String myURNString = myURN.toString() + myURN.checksum();
+
+            String urnToAssign = this.generateURN();
 
             /* objects with ppn have already the def.identifier element defined */
             /* no ppn -> no def.identifier element, thus it has to be created */
@@ -52,26 +69,222 @@ public class MCRURNAdder {
                 obj.getMetadata().setMetadataElement(srcElement);
             }
             // adding the urn
-            MCRMetaLangText urn = new MCRMetaLangText("identifier", "de", "urn", 0, "", myURNString);
+            MCRMetaLangText urn = new MCRMetaLangText("identifier", "de", "urn", 0, "", urnToAssign);
             srcElement.addMetaObject(urn);
 
             String objId = obj.getId().toString();
             try {
-                LOGGER.debug("Updating metadata of object " + objId + " with URN " + myURNString + ".");
+                LOGGER.info("Updating metadata of object " + objId + " with URN " + urnToAssign + ".");
                 MCRMetadataManager.update(obj);
             } catch (Exception ex) {
-                LOGGER.error("Updating metadata of object " + objId + " with URN " + myURNString + " failed.", ex);
+                LOGGER.error("Updating metadata of object " + objId + " with URN " + urnToAssign + " failed.", ex);
                 return false;
             }
             try {
-                LOGGER.info("Assigning urn " + myURNString + " to object " + objId + ".");
-                MCRURNManager.assignURN(myURNString, objId);
+                LOGGER.info("Assigning urn " + urnToAssign + " to object " + objId + ".");
+                MCRURNManager.assignURN(urnToAssign, objId);
             } catch (Exception ex) {
                 LOGGER.error("Saving URN in database failed.", ex);
                 return false;
             }
         }
         return true;
+    }
+
+    /**
+     * This methods adds an URN to the metadata of a mycore object. The urn is
+     * stored under the given xpath.
+     * 
+     * @param objectId
+     *            the id of the object
+     * @param xpath
+     *            only xpath without wildcards will work, attributes are
+     *            allowed, if there are more than one attribute they must be
+     *            separated by an "' and '"
+     * @return <code>true</code> if successful, <code>false</code> otherwise
+     * @throws Exception
+     */
+    public boolean addURN(String objectId, String xpath) throws Exception {
+        MCRObjectID id = MCRObjectID.getInstance(objectId);
+        // checking access right
+        if (!(MCRAccessManager.checkPermission(objectId, "writedb") || isAllowedObject(id.getTypeId()))) {
+            LOGGER.warn("Permission denied");
+            return false;
+        }
+
+        MCRObject mcrobj = MCRMetadataManager.retrieveMCRObject(id);
+        XPath xp = XPath.newInstance("./mycoreobject/metadata");
+        Document xml = mcrobj.createXML();
+        Object obj = xp.selectSingleNode(xml);
+
+        if (!(obj instanceof Element)) {
+            LOGGER.error("Could not resolve metadata element");
+            return false;
+        }
+
+        Element urnHoldingElement = createElementByXPath(xpath);
+        String urn = generateURN();
+        ((Element) obj).addContent(urnHoldingElement.setText(urn));
+
+        try {
+            LOGGER.info("Updating metadata of object " + objectId + " with URN " + urn + " [" + xpath + "]");
+            MCRXMLMetadataManager.instance().update(id, xml, new Date());
+        } catch (Exception ex) {
+            LOGGER.error("Updating metadata of object " + objectId + " with URN " + urn + " failed. [" + xpath + "]", ex);
+            return false;
+        }
+        try {
+            LOGGER.info("Assigning urn " + urn + " to object " + objectId + ".");
+            MCRURNManager.assignURN(urn, objectId);
+        } catch (Exception ex) {
+            LOGGER.error("Saving URN in database failed.", ex);
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Creates an {@link Element} given by an xpath.
+     * 
+     * @param xpath
+     *            the xpath
+     * @return an Element as specified by the given xpath
+     * @throws Exception
+     */
+    private Element createElementByXPath(String xpath) {
+        String prefix = ".mycoreobject/metadata/";
+        if (!xpath.startsWith(prefix)) {
+            throw new IllegalArgumentException("XPath does not start with '" + prefix + "'");
+        }
+
+        String[] parts = xpath.substring(prefix.length()).split("/");
+        /* build the root element */
+        Element toReturn = getElement(parts[0]);
+        for (Attribute a : getAttributes(parts[0])) {
+            toReturn.setAttribute(a);
+        }
+
+        /* add the children */
+        for (int i = 1; i < parts.length; i++) {
+            List<Attribute> attributes = getAttributes(parts[i]);
+            Element element = getElement(parts[i]);
+            for (Attribute a : attributes) {
+                element.setAttribute(a);
+            }
+
+            toReturn.addContent(element);
+        }
+
+        return toReturn;
+    }
+
+    public static final void main(String[] a) throws Exception {
+        String s = ".mycoreobject/metadata/def.identifier/identifier[@xml:type='urn' and @class='somethingElse']";
+        MCRURNAdder ua = new MCRURNAdder();
+        Element d = ua.createElementByXPath(s);
+        System.out.println(d);
+    }
+
+    /**
+     * Creates the element name from the given string which is part of an xpath.
+     * 
+     * @param s
+     *            source string, part of an xpath
+     * @return the element name
+     */
+    private Element getElement(String s) {
+        String namespace = null;
+        Element toReturn = null;
+        int nsEndIndex = s.indexOf(":");
+        int attBeginIndex = s.indexOf("[");
+
+        // if true -> namespace
+        if (nsEndIndex != -1) {
+            if (attBeginIndex > nsEndIndex) {
+                namespace = s.substring(0, nsEndIndex);
+            }
+        }
+
+        /* no attribute,no namespace */
+        if (attBeginIndex == -1 && nsEndIndex == -1) {
+            toReturn = new Element(s.trim());
+        } else
+        /* no attribute, namespace */
+        if (attBeginIndex == -1 && nsEndIndex != -1) {
+            toReturn = new Element(s.substring(nsEndIndex).trim(), MCRConstants.getStandardNamespace(namespace));
+        } else
+
+        /* attribute, no namespace */
+        if (attBeginIndex != -1 && nsEndIndex == -1) {
+            toReturn = new Element(s.substring(0, attBeginIndex).trim());
+        } else
+
+        /* attribute, namespace */
+        if (attBeginIndex != -1 && nsEndIndex != -1) {
+            toReturn = new Element(s.substring(nsEndIndex + 1, attBeginIndex).trim(), MCRConstants.getStandardNamespace(namespace));
+        }
+
+        return toReturn;
+    }
+
+    /**
+     * Creates a list of {@link Attribute} from the given string which is part
+     * of an xpath.
+     * 
+     * @param s
+     *            source string, part of an xpath
+     * @return a list of {@link Attribute}, or an empty list, if there are no
+     *         attributes at all
+     */
+    private List<Attribute> getAttributes(String s) {
+        List<Attribute> list = new Vector<Attribute>();
+        int beginIndex = s.indexOf("[");
+        if (beginIndex == -1) {
+            return new Vector<Attribute>();
+        }
+
+        String[] parts = s.substring(beginIndex + 1, s.indexOf("]")).split(" and ");
+
+        for (String anAttribute : parts) {
+            String attributeName = null;
+            String namespace = null;
+
+            /* examine attribute name */
+            if (anAttribute.indexOf(":") != -1) {
+                // we have a namespace here -> namespace:attName=value
+                attributeName = anAttribute.substring(1, anAttribute.indexOf("=")).substring(anAttribute.indexOf(":"));
+                namespace = anAttribute.substring(1, anAttribute.indexOf(":"));
+            } else {
+                // no namespace here -> attName=value
+                attributeName = anAttribute.substring(1, anAttribute.indexOf("="));
+            }
+            /* examine attribute value */
+            String attributeValue = anAttribute.substring(anAttribute.indexOf("=") + 2, anAttribute.length() - 1);
+
+            /* create an Attribute and add it to the result list */
+            if (namespace == null) {
+                list.add(new Attribute(attributeName, attributeValue));
+            } else {
+                list.add(new Attribute(attributeName, attributeValue, namespace.equals("xml") ? Namespace.XML_NAMESPACE : MCRConstants
+                        .getStandardNamespace(namespace)));
+            }
+        }
+        return list;
+    }
+
+    /**
+     * Method generates a single URN with attached checksum.
+     * 
+     * @return an URN, as specified by the urn provider (class to be set in
+     *         mycore.properties)
+     * @throws Exception
+     */
+    private String generateURN() throws Exception {
+        MCRIURNProvider urnProvider = this.getURNProvider();
+        MCRURN myURN = urnProvider.generateURN();
+        String myURNString = myURN.toString() + myURN.checksum();
+        return myURNString;
     }
 
     /**
