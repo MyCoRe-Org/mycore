@@ -517,7 +517,6 @@ function createOverview(viewer) {
 			 'y' : val.y["new"]*zoomInfo.scale
 			}, true);
 	});
-	var preload = viewer.context.preload;
 	viewer.overview.loaded = true;
 	
 	var adaptOverview = function() {

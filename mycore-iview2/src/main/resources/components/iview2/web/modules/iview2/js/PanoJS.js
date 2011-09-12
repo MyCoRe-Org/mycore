@@ -369,13 +369,11 @@ PanoJS.prototype = {
 		/*verschieben des Preload bildes damit man eine grobe Vorschau sieht von dem was kommt
 		  wird nur ausgeführt wenn Seite geladen ist, da ansonsten die Eigenschaften noch nicht vorhanden sind*/
 		if(iview.properties.initialized) {
-			var preload=iview.context.preload
 			//folgende beide IF-Anweisungen für IE
 			if(isNaN(this.x)) this.x = 0; 
 			if(isNaN(this.y)) this.y = 0;
-			preload.css({"left": (this.x + motion.x) + "px",
-						 "top":  (this.y + motion.y) + "px"});
 		}
+		jQuery(this.viewer).trigger("pos.viewer", {'x': this.x + motion.x, 'y': this.y + motion.y});
 		//end addition
 
 		for (var c = 0; c < this.tiles.length; c++) {

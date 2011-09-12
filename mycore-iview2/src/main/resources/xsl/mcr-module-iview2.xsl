@@ -24,9 +24,6 @@
       <div class="viewer" onmousedown="return false;">
         <div class="surface" style="width:100%;height:100%;z-index:30" />
         <div class="well">
-          <div class="preload">
-            <img height="100%" width="100%" alt="{i18n:translate('component.iview2.preview')}" />
-          </div>
         </div>
       </div>
       <script type="text/javascript">

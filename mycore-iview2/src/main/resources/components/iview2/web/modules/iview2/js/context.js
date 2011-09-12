@@ -7,7 +7,6 @@
       this.doc = null;
       this.container=container;
       this.viewer=container.find(".viewer");
-      this.preload=container.find(".preload");
       this.viewerSibling = container[0].previousSibling;
       this.iviewInst = iviewInst;
     }

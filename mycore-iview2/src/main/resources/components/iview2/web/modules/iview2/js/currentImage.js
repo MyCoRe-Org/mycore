@@ -7,9 +7,11 @@
       this.name = null;
       this.height = 0;
       this.width = 0;
-      this.zoomInfo = new iview.ZoomInformation(iviewInst);
-      this.curWidth = 0;
+      this.x = 0;
+      this.y = 0;
+	  this.curWidth = 0;
       this.curHeight = 0;
+      var zoomInfo = this.zoomInfo = new iview.ZoomInformation(iviewInst);
       var that = this;
       
       jQuery(iviewInst.viewerContainer).bind("zoom.viewer", function(jq, event) {
@@ -40,11 +42,18 @@
       this.zoomInfo.maxZoom = parseInt(values['zoomLevel']);
       jQuery(this).trigger(iview.CurrentImage.CHANGE_EVENT);
     };
-
+    
+    constructor.prototype.setPos = function ci_setPos(position) {
+    	this.x = position.x;
+    	this.y = position.y;
+    	jQuery(this).trigger(iview.CurrentImage.POS_CHANGE_EVENT);
+    }
+    
     return constructor;
 
   })();
   iview.CurrentImage.CHANGE_EVENT = "imageChanged";
+  iview.CurrentImage.POS_CHANGE_EVENT = "positionChanged";
   iview.CurrentImage.DIMENSION_EVENT = "dimensionChanged";
 
   iview.ZoomInformation = (function() {

@@ -11,8 +11,8 @@
  */
 PanoJS.prototype.zoomCenter = function(direction, point) {
 	var viewer = this;
-	var preload = this.iview.context.preload;
-	var preDim = {"x" :toInt(preload.css("left")),"y":toInt(preload.css("top")), "width":preload.width(), "height":preload.height()};
+	var preload = this.iview.preload;
+	var preDim = {"x" :toInt(preload.left()),"y":toInt(preload.top()), "width":preload.width(), "height":preload.height()};
 	viewer.zoom(direction);
 	var newDim = {"width":preload.width(), "height":preload.height()};
 	viewer.x = 0;
@@ -96,7 +96,6 @@ PanoJS.prototype.switchDisplayMode = function(screenZoom, stateBool, preventLoop
 	stateBool = (stateBool)? false: true;
 	this.clear();
 	this.removeScaling();
-	var preload = this.iview.context.preload;
 	if (stateBool) {
 		for (var i = 0; i <= this.iview.currentImage.zoomInfo.maxZoom; i++) {
 			if(this.iview.currentImage.width/this.width > this.iview.currentImage.height/this.iview.context.viewer.outerHeight(true) || (stateBool && !screenZoom)){

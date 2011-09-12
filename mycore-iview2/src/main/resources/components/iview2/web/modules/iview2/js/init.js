@@ -29,9 +29,6 @@ iview.General = function(iviewInst) {
 	this.iview.context = new iview.Context(iviewInst.viewerContainer, iviewInst);
 	this.iview.currentImage = new iview.CurrentImage(iviewInst);
 	var that = this;
-	jQuery(this.iview.currentImage).bind(iview.CurrentImage.DIMENSION_EVENT, function() {
-		that.iview.preload.css({'width': this.curWidth + "px", 'height': this.curHeight + "px"});
-	})
 };
 
 var genProto = iview.General.prototype;

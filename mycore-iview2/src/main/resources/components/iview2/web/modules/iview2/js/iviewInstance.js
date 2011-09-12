@@ -59,7 +59,6 @@
       this.viewerContainer.isMax = function() { return jQuery(this).hasClass("max");};
       this.overview = jQuery.extend(this.overview || {}, {'loaded': (this.overview || {}).loaded || false,  'parent': container});
       this.chapter = jQuery.extend(this.chapter | {}, {'loaded': (this.chapter || {}).loaded || false, 'parent': container});
-      this.preload = container.find(".preload"); // TODO: move this somewhere
       this.gen = new iview.General(this);
       //TODO load toolbar after all resources (css, images) are ready
       var that = this;
@@ -127,6 +126,9 @@
 		if (this.properties.useParam && !isNaN(parseInt(URL.getParam("zoom")))) {
 			viewerBean.zoomLevel= parseInt(URL.getParam("zoom"));
 		}
+		
+		this.preload = new iview.Preload.Controller(this);
+		
 		this.gen.loadPage(function(){
 		  that.gen.startFileLoaded();
 		}, startFile);
@@ -173,11 +175,11 @@
 	 * @description	is called if the picture is moving in the viewer and handles the size of the Overview accordingly the size of the picture
 	 */
 	function viewerMoved(jq, event) {
+		this.currentImage.setPos(event);
 		// set Roller this no circles are created, and we end in an endless loop
 		this.roller = true;
-		var pos = this.context.preload.position();
-		this.scrollbars.x.setCurValue(-pos.left);
-		this.scrollbars.y.setCurValue(-pos.top);
+		this.scrollbars.x.setCurValue(-event.x);
+		this.scrollbars.y.setCurValue(-event.y);
 		this.roller = false;
 	};
 

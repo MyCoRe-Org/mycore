@@ -62,6 +62,7 @@ PanoJS
 	zoom.viewer@this.viewer			when the viewer was zoomed
 	init.viewer@viewerBean.viewer	after the viewer has been created
 	move.viewer@viewerBean.viewer	when the currently viewed area changes
+	pos.viewer@viewerBean.viewer	everytime when the picture was moved within the viewer
 
 PhysicalModel
 	select.METS@this				when the currently selected element changed

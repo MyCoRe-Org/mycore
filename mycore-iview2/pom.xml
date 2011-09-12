@@ -48,6 +48,7 @@
                 <jsSourceFile>i18n.js</jsSourceFile>
                 <jsSourceFile>PanoJS.js</jsSourceFile>
                 <jsSourceFile>PanoJS.addition.js</jsSourceFile>
+                <jsSourceFile>preload.js</jsSourceFile>
                 <!-- Viewer -->
                 <jsSourceFile>init.js</jsSourceFile>
                 <!-- new API -->

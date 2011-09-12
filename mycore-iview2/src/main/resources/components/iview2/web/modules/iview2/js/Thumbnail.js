@@ -50,17 +50,6 @@ genProto.processImageProperties = function(imageProperties, url){
 	this.iview.currentImage.zoomInfo.zoomInit = Math.min(viewerBean.zoomLevel,this.iview.currentImage.zoomInfo.maxZoom);
 	var thumbSource=viewerBean.tileUrlProvider.assembleUrl(0,0,0);
 	
-	var preload = new Image();
-	preload.className = "preloadImg";
-	var preloadCont=this.iview.context.preload;
-	preloadCont.css({"width" : this.iview.currentImage.width / Math.pow(2, this.iview.currentImage.zoomInfo.maxZoom - this.iview.currentImage.zoomInfo.zoomInit) + "px",
-					 "height" : this.iview.currentImage.height / Math.pow(2, this.iview.currentImage.zoomInfo.maxZoom - this.iview.currentImage.zoomInfo.zoomInit) + "px"})
-			 .empty()
-			 .append(preload);
-	preload.src = thumbSource;
-	preload.style.width = "100%";
-	preload.style.height = "100%";
-	
 	viewerBean.resize();
 	// moves viewer to zoomLevel zoomInit
 	viewerBean.maxZoomLevel = this.iview.currentImage.zoomInfo.maxZoom;
