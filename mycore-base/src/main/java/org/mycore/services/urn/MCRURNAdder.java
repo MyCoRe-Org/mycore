@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.apache.xml.utils.NSInfo;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -16,7 +15,6 @@ import org.jdom.xpath.XPath;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -93,14 +91,28 @@ public class MCRURNAdder {
 
     /**
      * This methods adds an URN to the metadata of a mycore object. The urn is
-     * stored under the given xpath.
+     * stored under the given xpath in the mycore object given by its id.
      * 
      * @param objectId
-     *            the id of the object
+     *            the id of the mycore object (not to be a derivate)
      * @param xpath
-     *            only xpath without wildcards will work, attributes are
-     *            allowed, if there are more than one attribute they must be
-     *            separated by an "' and '"
+     *            only xpath without wildcards etc. will work, attributes are
+     *            allowed and so are namespaces. If there is more than one
+     *            attribute to set the attributes must be separated by an
+     *            " and ". E.g. invoking with <code>
+     *              <pre>
+     *                  .mycoreobject/metadata/def.identifier/identifier[@type='aType']
+     *              </pre>
+     *            </code>as xpath parameter will lead to the following Element<br/>
+     *            <code>
+     *              <pre>
+     *                  &lt;def.identifier&gt;
+     *                      &lt;identifier type="aType"&gt;urn:foo:bar&lt;/identifier&gt;
+     *                  &lt;/def.identifier&gt; 
+     *              </pre>    
+     *            </code> stored directly under ./mycoreobject/metadata.<br/>
+     *            Please note, only xpath starting with ./mycoreobject/metadata
+     *            will be accepted.
      * @return <code>true</code> if successful, <code>false</code> otherwise
      * @throws Exception
      */
@@ -179,13 +191,6 @@ public class MCRURNAdder {
         return toReturn;
     }
 
-    public static final void main(String[] a) throws Exception {
-        String s = ".mycoreobject/metadata/def.identifier/identifier[@xml:type='urn' and @class='somethingElse']";
-        MCRURNAdder ua = new MCRURNAdder();
-        Element d = ua.createElementByXPath(s);
-        System.out.println(d);
-    }
-
     /**
      * Creates the element name from the given string which is part of an xpath.
      * 
@@ -194,35 +199,24 @@ public class MCRURNAdder {
      * @return the element name
      */
     private Element getElement(String s) {
-        String namespace = null;
+        String elementNamespace = null;
         Element toReturn = null;
         int nsEndIndex = s.indexOf(":");
         int attBeginIndex = s.indexOf("[");
 
         // if true -> namespace
-        if (nsEndIndex != -1) {
-            if (attBeginIndex > nsEndIndex) {
-                namespace = s.substring(0, nsEndIndex);
-            }
+        if (nsEndIndex != -1 && ((attBeginIndex > nsEndIndex) || (nsEndIndex != -1 && attBeginIndex == -1))) {
+            elementNamespace = s.substring(0, nsEndIndex);
         }
 
-        /* no attribute,no namespace */
-        if (attBeginIndex == -1 && nsEndIndex == -1) {
-            toReturn = new Element(s.trim());
-        } else
-        /* no attribute, namespace */
-        if (attBeginIndex == -1 && nsEndIndex != -1) {
-            toReturn = new Element(s.substring(nsEndIndex).trim(), MCRConstants.getStandardNamespace(namespace));
-        } else
-
-        /* attribute, no namespace */
-        if (attBeginIndex != -1 && nsEndIndex == -1) {
-            toReturn = new Element(s.substring(0, attBeginIndex).trim());
-        } else
-
-        /* attribute, namespace */
-        if (attBeginIndex != -1 && nsEndIndex != -1) {
-            toReturn = new Element(s.substring(nsEndIndex + 1, attBeginIndex).trim(), MCRConstants.getStandardNamespace(namespace));
+        if (elementNamespace != null && attBeginIndex == -1) {
+            toReturn = new Element(s.substring(nsEndIndex + 1), MCRConstants.getStandardNamespace(elementNamespace));
+        } else if (elementNamespace != null && attBeginIndex != -1) {
+            toReturn = new Element(s.substring(nsEndIndex + 1, attBeginIndex), MCRConstants.getStandardNamespace(elementNamespace));
+        } else if (elementNamespace == null && attBeginIndex != -1) {
+            toReturn = new Element(s.substring(0, attBeginIndex));
+        } else if (elementNamespace == null && attBeginIndex == -1) {
+            toReturn = new Element(s);
         }
 
         return toReturn;
