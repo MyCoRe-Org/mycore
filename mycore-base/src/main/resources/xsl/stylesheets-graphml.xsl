@@ -35,6 +35,7 @@
       <xsl:choose>
         <xsl:when test="origin[contains(text(),'classes/xsl')]">#4CC417</xsl:when> <!-- green -->
         <xsl:when test="origin[contains(text(),'.jar')]">#82CAFF</xsl:when> <!-- blue -->
+        <xsl:when test="origin[contains(text(),'URIResolver')]">#FFFF00</xsl:when> <!-- yellow -->
         <xsl:when test="not(origin)">#FF0000</xsl:when> <!-- red -->
       </xsl:choose>
     </data>
