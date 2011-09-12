@@ -1120,53 +1120,59 @@
   <!-- ISSN END -->
 
   <!-- Impact Factor -->
-  <text id="mods.impactfactor.label">
-    <label xml:lang="de">Impactfaktor</label>
-    <label xml:lang="en">Impact Factor</label>
+  <text id="mods.impact.label">
+    <label xml:lang="de">Impact</label>
+    <label xml:lang="en">Impact</label>
   </text>
 
-  <panel id="mods.impactfactor">
-    <cell anchor="NORTHWEST" var="mods:extension[@displayLabel='impactfactor']">
+  <panel id="mods.impact">
+    <cell anchor="NORTHWEST" var="mods:extension[@displayLabel='impact']/impact">
       <panel>
-        <cell anchor="NORTHWEST" ref="TFzeile512" />
-      </panel>
-    </cell>
-  </panel>
-
-  <helpPopup id="mods.impactfactor.help">
-    <label xml:lang="de">Journal Impact Factor (JIF)</label>
-    <label xml:lang="en">Journal Impact Factor (JIF)</label>
-  </helpPopup>
-  <!-- Impact Factor END -->
-
-  <!-- ist referiert -->
-  <text id="mods.referenced.label">
-    <label xml:lang="de">ist referiert</label>
-    <label xml:lang="en">referenced</label>
-  </text>
-
-  <panel id="mods.referenced">
-    <cell anchor="NORTHWEST" var="mods:extension[@displayLabel='referenced']">
-      <panel>
-        <cell anchor="NORTHWEST">
-          <list type="dropdown" default="yes">
-            <item value="yes">
-              <label xml:lang="de">Ja</label>
-              <label xml:lang="en">Yes</label>
-            </item>
-            <item value="no">
-              <label xml:lang="de">Nein</label>
-              <label xml:lang="en">No</label>
-            </item>
-          </list>
+        <cell style="width:4.5em">
+          <text>
+            <label xml:lang="de">Jahr</label>
+            <label xml:lang="en">Year</label>
+          </text>
+        </cell>
+        <cell col="2" style="width:8.5em">
+          <text>
+            <label xml:lang="de">Faktor</label>
+            <label xml:lang="en">Factor</label>
+          </text>
+        </cell>
+        <cell col="3">
+          <text>
+            <label xml:lang="de">Referiert</label>
+            <label xml:lang="en">Refereed</label>
+          </text>
         </cell>
       </panel>
+      <repeater min="1" pos="right">
+        <panel>
+          <cell anchor="NORTHWEST" var="@year">
+            <textfield width="4" maxlength="4" />
+          </cell>
+          <cell col="2" anchor="NORTHWEST" ref="TFzeile10" var="@factor" />
+          <cell col="3" anchor="NORTHWEST" var="@refereed" >
+            <list type="dropdown" default="yes">
+              <item value="yes">
+                <label xml:lang="de">Ja</label>
+                <label xml:lang="en">Yes</label>
+              </item>
+              <item value="no">
+                <label xml:lang="de">Nein</label>
+                <label xml:lang="en">No</label>
+              </item>
+            </list>
+          </cell>
+        </panel>
+      </repeater>
     </cell>
   </panel>
 
-  <helpPopup id="mods.referenced.help">
-    <label xml:lang="de">ist referiert</label>
-    <label xml:lang="en">is referenced</label>
+  <helpPopup id="mods.impact.help">
+    <label xml:lang="de">Journal Impact Factor (JIF)</label>
+    <label xml:lang="en">Journal Impact Factor (JIF)</label>
   </helpPopup>
   <!-- Impact Factor END -->
 
