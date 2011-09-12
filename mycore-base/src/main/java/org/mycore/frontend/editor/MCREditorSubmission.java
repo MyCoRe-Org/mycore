@@ -49,7 +49,6 @@ import org.mycore.frontend.editor.validation.MCRValidator;
 import org.mycore.frontend.editor.validation.MCRValidatorBuilder;
 import org.mycore.frontend.editor.validation.value.MCRRequiredValidator;
 
-
 /**
  * Container class that holds all data and files edited and submitted from an
  * HTML page that contains a MyCoRe XML editor form.
@@ -431,9 +430,9 @@ public class MCREditorSubmission {
                         continue;
                     }
 
-                    String field1 = condition.getAttributeValue("field1","");
-                    String field2 = condition.getAttributeValue("field2",""); 
-                    
+                    String field1 = condition.getAttributeValue("field1", "");
+                    String field2 = condition.getAttributeValue("field2", "");
+
                     if (!field1.isEmpty()) {
                         String pathA = path + "/" + field1;
                         String pathB = path + "/" + field2;
@@ -455,7 +454,7 @@ public class MCREditorSubmission {
                             }
                         }
                     } else {
-                        
+
                         Element current = null;
                         try {
                             current = (Element) XPath.selectSingleNode(getXML(), path);
@@ -545,7 +544,7 @@ public class MCREditorSubmission {
 
         return xml;
     }
-    
+
     void setXML(Document xml) {
         this.xml = xml;
     }
@@ -679,12 +678,9 @@ public class MCREditorSubmission {
             nsMap.put(ns.getPrefix(), ns);
         }
         nsMap.put("xml", Namespace.XML_NAMESPACE);
-        setNamespaceIfUndefined(MCRConstants.DV_NAMESPACE);
-        setNamespaceIfUndefined(MCRConstants.METS_NAMESPACE);
-        setNamespaceIfUndefined(MCRConstants.MODS_NAMESPACE);
-        setNamespaceIfUndefined(MCRConstants.XLINK_NAMESPACE);
-        setNamespaceIfUndefined(MCRConstants.XSI_NAMESPACE);
-        setNamespaceIfUndefined(MCRConstants.XSL_NAMESPACE);
+        for (Namespace ns : MCRConstants.getStandardNamespaces()) {
+            setNamespaceIfUndefined(ns);
+        }
     }
 
     private void setNamespaceIfUndefined(Namespace namespace) {
