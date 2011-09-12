@@ -64,7 +64,7 @@ public final class MCRXSLInfoServlet extends MCRServlet {
             findXSLinClassesDir();
             findXSLinLibJars();
             inspectStylesheets();
-            listUnknownStylesheets();
+            handleUnknownStylesheets();
         }
 
         buildOutput(job);
@@ -75,9 +75,18 @@ public final class MCRXSLInfoServlet extends MCRServlet {
             entry.getValue().inspect();
     }
 
-    private void listUnknownStylesheets() {
-        for (String name : unknown)
-            stylesheets.put(name, new Stylesheet(name));
+    private void handleUnknownStylesheets() {
+        while (!unknown.isEmpty()) {
+            Set<String> list = new HashSet<String>();
+            list.addAll(unknown);
+            unknown.clear();
+
+            for (String name : list) {
+                Stylesheet s = new Stylesheet(name);
+                stylesheets.put(name, s);
+                s.inspect();
+            }
+        }
     }
 
     private void buildOutput(MCRServletJob job) throws SAXParseException, IOException {
@@ -169,14 +178,30 @@ public final class MCRXSLInfoServlet extends MCRServlet {
         }
 
         void inspect() {
-            String uri = "resource:xsl/" + name;
-            try {
-                xsl = MCRURIResolver.instance().resolve(uri);
+            resolveXSL();
+            if (xsl != null) {
+                listTemplates();
                 findIncludes("include", includes);
                 findIncludes("import", imports);
-                listTemplates();
+            }
+        }
+
+        private void resolveXSL() {
+            String uri = "resource:xsl/" + name;
+            resolveXSL(uri);
+            if (xsl == null) {
+                resolveXSL(name);
+                if (xsl != null) {
+                    origin.add("URIResolver");
+                }
+            }
+        }
+
+        private void resolveXSL(String uri) {
+            try {
+                xsl = MCRURIResolver.instance().resolve(uri);
             } catch (Exception ex) {
-                String msg = "Exception parsing stylesheet " + name;
+                String msg = "Exception resolving stylesheet " + name;
                 LOGGER.warn(msg, ex);
             }
         }
@@ -188,7 +213,6 @@ public final class MCRXSLInfoServlet extends MCRServlet {
                 LOGGER.info(name + " " + tag + "s " + href);
                 set.add(href);
                 if (!stylesheets.containsKey(href)) {
-                    LOGGER.warn(name + " " + tag + "s non-existing stylesheet " + href);
                     unknown.add(href);
                 }
             }
@@ -209,10 +233,10 @@ public final class MCRXSLInfoServlet extends MCRServlet {
             addValues(elem, "origin", origin);
             addValues(elem, "includes", includes);
             addValues(elem, "imports", imports);
-            
+
             for (Element template : templates)
                 elem.addContent((Element) (template.clone()));
-            
+
             return elem;
         }
 
