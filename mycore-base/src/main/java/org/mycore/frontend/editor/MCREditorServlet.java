@@ -440,6 +440,8 @@ public class MCREditorServlet extends MCRServlet {
 
             return;
         }
+        
+        Document xml = sub.getXML();
 
         postProcess(editor, sub);
         
@@ -453,7 +455,7 @@ public class MCREditorServlet extends MCRServlet {
         } else if (targetType.equals("webapp")) {
             sendToWebAppFile(req, res, sub, editor);
         } else if (targetType.equals("debug")) {
-            sendToDebug(res, sub);
+            sendToDebug(res, xml, sub);
         } else if (targetType.equals("display")) {
             getLayoutService().doLayout(req, res, sub.getXML());
         } else if (targetType.equals("subselect")) {
@@ -568,7 +570,7 @@ public class MCREditorServlet extends MCRServlet {
         res.sendRedirect(res.encodeRedirectURL(sb.toString()));
     }
 
-    private void sendToDebug(HttpServletResponse res, MCREditorSubmission sub) throws IOException, UnsupportedEncodingException {
+    private void sendToDebug(HttpServletResponse res, Document unprocessed, MCREditorSubmission sub) throws IOException, UnsupportedEncodingException {
         res.setContentType("text/html; charset=UTF-8");
 
         PrintWriter pw = res.getWriter();
@@ -595,6 +597,10 @@ public class MCREditorServlet extends MCRServlet {
         outputter.setFormat(fmt);
 
         Element pre = new Element("pre");
+        pre.addContent(outputter.outputString(unprocessed));
+        outputter.output(pre, pw);
+
+        pre = new Element("pre");
         pre.addContent(outputter.outputString(sub.getXML()));
         outputter.output(pre, pw);
 
