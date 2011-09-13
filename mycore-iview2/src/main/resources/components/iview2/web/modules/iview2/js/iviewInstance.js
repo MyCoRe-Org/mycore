@@ -59,6 +59,7 @@
       this.viewerContainer.isMax = function() { return jQuery(this).hasClass("max");};
       this.overview = jQuery.extend(this.overview || {}, {'loaded': (this.overview || {}).loaded || false,  'parent': container});
       this.chapter = jQuery.extend(this.chapter | {}, {'loaded': (this.chapter || {}).loaded || false, 'parent': container});
+      this.permalink = jQuery.extend(this.permalink | {}, {'loaded': (this.permalink || {}).loaded || false});
       this.gen = new iview.General(this);
       //TODO load toolbar after all resources (css, images) are ready
       var that = this;

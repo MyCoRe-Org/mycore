@@ -80,14 +80,23 @@ iview.Permalink.View.prototype = {
  * @description main Controller to control the permalink,
  *  functionalities to display, update registred permalink (views)
  *  views will be add directly here and further direct references to them are hold
- * @param {Object} parent holds the reference to the viewer
- * @param {AssoArray} views hold direct references to each added toolbar view
- * @param {boolean} active describes the state of the permalink: displayed (true) or hidden (false)
+ * @param		{iviewInst} viewer in which the function shall operate
  */
-iview.Permalink.Controller = function (parent) {
-	this.parent = parent;
+iview.Permalink.Controller = function (viewer) {
+	/**
+	 * @private
+	 * @name		views
+	 * @type		Array
+	 * @description	holds all views connected to this controller
+	 */
 	this.views = [];
-
+	this.viewer = viewer;
+	/**
+	 * @private
+	 * @name		active
+	 * @type		boolean
+	 * @description describes the state of the permalink: displayed (true) or hidden (false)
+	 */
 	this.active = false;
 };
 
@@ -129,8 +138,7 @@ iview.Permalink.Controller.prototype = {
 			if (this.active) {
 				this.views[view].hide();	
 			} else {
-				var url = this._update();
-				this.views[view].setURL(url);
+				this.views[view].setURL(this._update());
 				this.views[view].show();
 			}
 		}
@@ -145,13 +153,13 @@ iview.Permalink.Controller.prototype = {
 	 * @return 		{String} string which contains the generated URL
 	 */
 	_update: function() {
-		var viewer = this.getViewer().iview;
+		var viewer = this.viewer;
 		var url = "http://" + window.location.host + window.location.pathname + "?" + window.location.search.replace(/[?|&](x|y|page|zoom|tosize|maximized|css)=([^&]*)/g,"").replace(/\?/,"");
-    url += "&page="+viewer.currentImage.name;
-    url += "&derivate="+viewer.properties.derivateId;
-		url += "&zoom="+viewer.viewerBean.zoomLevel;
-		url += "&x="+viewer.viewerBean.x;
-		url += "&y="+viewer.viewerBean.y;
+	    url += "&page="		+ viewer.currentImage.name;
+	    url += "&derivate="	+ viewer.properties.derivateId;
+		url += "&zoom="		+ viewer.viewerBean.zoomLevel;
+		url += "&x="		+ viewer.viewerBean.x;
+		url += "&y="		+ viewer.viewerBean.y;
 		
 		var size = "none";
 		if (viewer.currentImage.zoomInfo.zoomWidth)
@@ -159,9 +167,52 @@ iview.Permalink.Controller.prototype = {
 		if (viewer.currentImage.zoomInfo.zoomScreen)
 			size = "screen";
 		
-		url += "&tosize="+size;
-		url += "&maximized="+viewer.viewerContainer.isMax();
+		url += "&tosize="	+ size;
+		url += "&maximized="+ viewer.viewerContainer.isMax();
 		
 		return url;
 	}
+};
+
+/**
+ * @public
+ * @function
+ * @name		openPermalink
+ * @memberOf	iview.Permalink
+ * @description	switch between visibility of Permalink element, if needed it's created at first run
+ * @param		{iviewInst} viewer in which the function shall operate
+ * @param		{button} button to which represents the Permalink in the toolbar
+ */
+iview.Permalink.openPermalink = function(viewer, button) {
+	var that = this;
+	if (viewer.permalink.loaded == false) {
+		button.setLoading(true);
+		setTimeout(function() {
+			that.importPermalink(viewer, function() {
+				that.openPermalink(viewer, button);
+				button.setLoading(false)});
+		}, 10);
+	} else {
+		viewer.permalink.show();
+	}
+}
+
+/**
+ * @public
+ * @function
+ * @name		importPermalink
+ * @memberOf	iview.General
+ * @description	calls the corresponding functions to create the Permalink
+ * @param		{iviewInst} viewer in which the function shall operate
+ * @param		{function} callback function to call after the permalink was loaded successfully
+ */
+iview.Permalink.importPermalink = function(viewer, callback) {
+	// Permalink
+	viewer.permalink = jQuery.extend(viewer.permalink, new iview.Permalink.Controller(viewer));
+
+	viewer.permalink.addView(new iview.Permalink.View("permalinkView", viewer.viewerContainer));
+	if (typeof callback == "function") {
+		callback();
+	}
+	viewer.permalink.loaded = true;
 };

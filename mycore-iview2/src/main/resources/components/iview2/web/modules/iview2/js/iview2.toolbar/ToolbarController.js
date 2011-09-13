@@ -84,13 +84,13 @@ ToolbarController.prototype.addView = function(view) {
 					button.setSubtypeState = function(state) {
 						that.perform("setSubtypeState", state, args.parentName, args.elementName);
 					}
-					that.getViewer().gen.openThumbnailPanel(button);
+					iview.ThumbnailPanel.openThumbnailPanel(that.getViewer(), button);
 				} else if (args.elementName == "openChapter") {
 					var button = new Object;
 					button.setLoading = function(loading) {
 						that.perform("setLoading", loading, args.parentName, args.elementName);
 					}
-					that.getViewer().gen.openChapter(button);
+					iview.chapter.openChapter(that.getViewer(), button);
 				}
 			} else if (args.parentName == "navigateHandles" || args.parentName == "previewForward" || args.parentName == "previewBack") {
 				if (args.elementName == "backward") {
@@ -104,7 +104,7 @@ ToolbarController.prototype.addView = function(view) {
 					button.setLoading = function(loading) {
 						that.perform("setLoading", loading, args.parentName, args.elementName);
 					}
-					that.getViewer().gen.openPermalink(button);
+					iview.Permalink.openPermalink(that.getViewer(), button);
 				}
 			} else if (args.parentName == "pdfHandles") {
 				if (args.elementName == "createPdf") {

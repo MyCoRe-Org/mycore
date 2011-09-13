@@ -330,3 +330,53 @@ iview.chapter.Controller = function(modelProvider, physicalModelProvider, view) 
 	prototype.toggleView = toggleView;
 	prototype.getActive = getActive;
 })();
+
+/**
+ * @public
+ * @function
+ * @name		openChapter
+ * @memberOf	iview.chapter
+ * @description	open and close the chapterview
+ * @param		{iviewInst} viewer in which the function shall operate
+ * @param		{button} button which represents the chapter in the toolbar
+ */
+iview.chapter.openChapter = function(viewer, button){
+	if (chapterEmbedded) {
+		//alert(warnings[0])
+		return;
+	}
+	var that = this;
+	// chapter isn't created
+	if (viewer.chapter.loaded) {
+		viewer.chapter.toggleView();
+	} else {
+		button.setLoading(true);
+		setTimeout(function() {
+			that.importChapter(viewer,function() {
+				// try again openChapter (recursive call)
+				that.openChapter(viewer, button);
+				button.setLoading(false);
+			})}, 10);
+	}
+}
+
+/**
+ * @public
+ * @function
+ * @name		importChapter
+ * @memberOf	iview.chapter
+ * @description	calls the corresponding functions to create the chapter
+ * @param		{iviewInst} viewer in which the function shall operate
+ * @param		{function} callback function which is called just before the function returns
+ */
+iview.chapter.importChapter = function(viewer, callback) {
+	viewer.ChapterModelProvider = new iview.METS.ChapterModelProvider(viewer.metsDoc);
+	
+	viewer.chapter = jQuery.extend(viewer.chapter, new iview.chapter.Controller(viewer.ChapterModelProvider, viewer.PhysicalModelProvider));
+
+	viewer.chapter.createView(viewer.chapter.parent);
+	viewer.chapter.loaded = true;//signal that the chapter was loaded successfully
+	if (typeof callback == "function") {
+		callback();
+	}
+};

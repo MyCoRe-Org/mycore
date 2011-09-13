@@ -641,3 +641,55 @@ iview.ThumbnailPanel.Controller = function(modelProvider, view, tileUrlProvider)
 	prototype.attach = attach;
 	prototype.detach = detach;
 })();
+
+/**
+ * @public
+ * @function
+ * @name		importThumbnailPanel
+ * @memberOf	iview.ThumbnailPanel
+ * @description	calls the corresponding functions to create the ThumbnailPanel
+ * @param		{iviewInst} viewer in which the function shall operate
+ * @param		{function} callback function which is called just before the function returns
+ */
+iview.ThumbnailPanel.importThumbnailPanel = function(viewer, callback) {
+	var thumbnailPanel = new iview.ThumbnailPanel.Controller(viewer.PhysicalModelProvider, iview.ThumbnailPanel.View, viewer.viewerBean.tileUrlProvider);
+	thumbnailPanel.createView({'mainClass':'thumbnailPanel', 'parent': viewer.context.container, 'useScrollBar':true});
+	viewer.thumbnailPanel = thumbnailPanel;
+	jQuery(viewer.viewerContainer).bind("minimize.viewerContainer", function() {
+		//close ThumbnailPanel when Viewer is going to minimized mode
+		thumbnailPanel.hideView();
+	})
+	if (typeof callback == "function") {
+		callback();
+	}
+}
+/**
+ * @public
+ * @function
+ * @name		openThumbnailPanel
+ * @memberOf	iview.ThumbnailPanel
+ * @description	blend in the ThumbnailPanel and creates it by the first call
+ * @param		{iviewInst} viewer in which the function shall operate
+ * @param		{button} button to which represents the ThumbnailPanel in the toolbar
+ */
+iview.ThumbnailPanel.openThumbnailPanel = function(viewer, button) {
+	var that = this;
+	// check if ThumbnailPanel was created yet
+	if (typeof viewer.thumbnailPanel === 'undefined') {
+		button.setLoading(true);
+		setTimeout(function(){
+			that.importThumbnailPanel(viewer, function() {
+				// try again openThumbnailPanel (recursive call)
+				that.openThumbnailPanel(viewer, button);
+				button.setLoading(false);
+				
+				viewer.thumbnailPanel.attach("click.thumbnailPanel", function(e, val) {
+					// type 1: click on ThumbnailPanel div
+					button.setSubtypeState(false);
+				});
+			});
+		}, 10);
+	} else {
+		viewer.thumbnailPanel.toggleView();
+	}
+}

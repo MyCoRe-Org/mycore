@@ -81,86 +81,6 @@ genProto.processImageProperties = function(imageProperties, url){
 /**
  * @public
  * @function
- * @name		openThumbnailPanel
- * @memberOf	iview.General
- * @description	blend in the ThumbnailPanel and creates it by the first call
- * @param		{button} button to which represents the ThumbnailPanel in the toolbar
- */
-genProto.openThumbnailPanel = function(button) {
-	var that = this;
-	// check if ThumbnailPanel was created yet
-	if (typeof this.iview.thumbnailPanel === 'undefined') {
-		button.setLoading(true);
-		setTimeout(function(){
-			var callback = function() {
-				// try again openThumbnailPanel (recursive call)
-				that.openThumbnailPanel(button);
-				button.setLoading(false);
-				
-				that.iview.thumbnailPanel.attach("click.thumbnailPanel", function(e, val) {
-					// type 1: click on ThumbnailPanel div
-					button.setSubtypeState(false);
-				});
-			};
-			that.importThumbnailPanel(callback);
-		}, 10);
-	} else {
-		this.iview.thumbnailPanel.toggleView();
-	}
-}
-
-/**
- * @public
- * @function
- * @name		openPermalink
- * @memberOf	iview.General
- * @description	switch between visibility of Permalink element, if needed it's created at first run
-* @param		{button} button to which represents the Permalink in the toolbar
- */
-genProto.openPermalink = function(button) {
-	var that = this;
-	if (typeof this.getPermalinkCtrl === "undefined") {
-		button.setLoading(true);
-		setTimeout(function() {
-			var callback = function() {
-				that.openPermalink(button);
-				button.setLoading(false)};
-			that.importPermalink(callback);
-		}, 10);
-	} else {
-		this.getPermalinkCtrl().show();
-	}
-}
-
-/**
- * @public
- * @function
- * @name		importPermalink
- * @memberOf	iview.General
- * @description	calls the corresponding functions to create the Permalink
- * @param		{function} callback function to call after the permalink was loaded successfully
- */
-genProto.importPermalink = function(callback) {
-	// Permalink
-	this.getPermalinkCtrl = function() {
-		if (!this.permalinkCtrl) {
-			this.permalinkCtrl = new iview.Permalink.Controller(this);
-			
-			//iview.Permalink.Controller.prototype.getViewer = function() {
-			this.permalinkCtrl.getViewer = function() {
-				return this.parent;
-			}
-		}
-		return this.permalinkCtrl;
-	};
-
-	this.getPermalinkCtrl().addView(new iview.Permalink.View("permalinkView", this.iview.viewerContainer));
-	callback();
-};
-
-/**
- * @public
- * @function
  * @name		handleScrollbars
  * @memberOf	iview.General#
  * @description	adapts the scrollbars to correctly represent the new view after a zoom or resize event occured to the viewer. The adaptations cover sizing the bar, the bar proportion, maxValue and currentValue depending on the given reason
@@ -212,36 +132,6 @@ genProto.handleScrollbars = function(reason) {
 /**
  * @public
  * @function
- * @name		openChapter
- * @memberOf	iview.General
- * @description	open and close the chapterview
- * @param		{button} button to which represents the chapter in the toolbar
- */
-genProto.openChapter = function(button){
-	if (chapterEmbedded) {
-		//alert(warnings[0])
-		return;
-	}
-	var that = this;
-	// chapter isn't created
-	if (this.iview.chapter.loaded) {
-		this.iview.chapter.toggleView();
-	} else {
-		button.setLoading(true);
-		setTimeout(function(){
-			var callback = function() {
-				// try again openChapter (recursive call)
-				that.openChapter(button);
-				button.setLoading(false);
-			};
-			that.importChapter(callback);
-		}, 10);
-	}
-}
-
-/**
- * @public
- * @function
  * @name		updateModules
  * @memberOf	iview.Thumbnails
  * @description	marks the correct picture in the chapterview and set zoombar to the correct zoomlevel
@@ -264,43 +154,6 @@ genProto.updateModuls = function() {
 //      this.iview.getToolbarCtrl().toolbarContainer.find(".toolbar").css("top", newTop);
 //    }
   }
-}
-
-/**
- * @public
- * @function
- * @name		importChapter
- * @memberOf	iview.General
- * @description	calls the corresponding functions to create the chapter
- * @param		{function} callback function which is called just before the function returns
- */
-genProto.importChapter = function(callback) {
-	this.iview.ChapterModelProvider = new iview.METS.ChapterModelProvider(this.iview.metsDoc);
-	
-	this.iview.chapter = jQuery.extend(this.iview.chapter, new iview.chapter.Controller(this.iview.ChapterModelProvider, this.iview.PhysicalModelProvider));
-
-	this.iview.chapter.createView(this.iview.chapter.parent);
-	this.iview.chapter.loaded = true;//signal that the chapter was loaded successfully
-	callback();
-};
-
-/**
- * @public
- * @function
- * @name		importThumbnailPanel
- * @memberOf	iview.General
- * @description	calls the corresponding functions to create the ThumbnailPanel
- * @param		{function} callback function which is called just before the function returns
- */
-genProto.importThumbnailPanel = function(callback) {
-	var thumbnailPanel = new iview.ThumbnailPanel.Controller(this.iview.PhysicalModelProvider, iview.ThumbnailPanel.View, this.iview.viewerBean.tileUrlProvider);
-	thumbnailPanel.createView({'mainClass':'thumbnailPanel', 'parent':this.iview.context.container, 'useScrollBar':true});
-	this.iview.thumbnailPanel = thumbnailPanel;
-	jQuery(this.iview.viewerContainer).bind("minimize.viewerContainer", function() {
-		//close ThumbnailPanel when Viewer is going to minimized mode
-		thumbnailPanel.hideView();
-	})
-	callback();
 }
 
 /**
