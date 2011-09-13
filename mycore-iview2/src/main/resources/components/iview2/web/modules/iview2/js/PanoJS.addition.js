@@ -289,3 +289,32 @@ PanoJS.keyboardHandler = function(e) {
 		}
 	}
 }
+
+/*
+ * calculate simple image name hash value to spread request over different servers
+ * but allow browser cache to be used by allways return the same value for a given name 
+ */
+PanoJS.TileUrlProvider.prototype.imageHashes = [];
+PanoJS.TileUrlProvider.prototype.getImageHash = function(image){
+	if (this.imageHashes[image]){
+		return this.imageHashes[image];
+	}
+	var hash=0;
+	var pos=image.lastIndexOf(".");
+	if (pos < 0)
+		pos=image.length;
+	for (var i=0;i<pos;i++){
+		hash += 3 * hash + (image.charCodeAt(i)-48);
+	}
+	this.imageHashes[image]=hash;
+	return hash;
+};
+/*
+ * returns the URL of all tileimages
+ */
+PanoJS.TileUrlProvider.prototype.assembleUrl = function(xIndex, yIndex, zoom, image){
+	image=(image == null)? this.getCurrentImage().name : image;
+    return this.baseUri[(this.getImageHash(image)+xIndex+yIndex) % this.baseUri.length] + '/'+ this.derivate+'/' + 
+        image + '/' + zoom + '/' + yIndex + '/' + xIndex + '.' + this.extension +
+        (PanoJS.REVISION_FLAG ? '?r=' + PanoJS.REVISION_FLAG : '');
+};

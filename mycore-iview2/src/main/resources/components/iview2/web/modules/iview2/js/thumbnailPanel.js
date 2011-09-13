@@ -654,7 +654,7 @@ iview.ThumbnailPanel.Controller = function(modelProvider, view, tileUrlProvider)
 iview.ThumbnailPanel.importThumbnailPanel = function(viewer, callback) {
 	var thumbnailPanel = new iview.ThumbnailPanel.Controller(viewer.PhysicalModelProvider, iview.ThumbnailPanel.View, viewer.viewerBean.tileUrlProvider);
 	thumbnailPanel.createView({'mainClass':'thumbnailPanel', 'parent': viewer.context.container, 'useScrollBar':true});
-	viewer.thumbnailPanel = thumbnailPanel;
+	viewer.thumbnailPanel = jQuery.extend(viewer.thumbnailPanel, thumbnailPanel);
 	jQuery(viewer.viewerContainer).bind("minimize.viewerContainer", function() {
 		//close ThumbnailPanel when Viewer is going to minimized mode
 		thumbnailPanel.hideView();

@@ -61,6 +61,7 @@
       this.overview = jQuery.extend(this.overview || {}, {'loaded': (this.overview || {}).loaded || false,  'parent': container});
       this.chapter = jQuery.extend(this.chapter | {}, {'loaded': (this.chapter || {}).loaded || false, 'parent': container});
       this.permalink = jQuery.extend(this.permalink | {}, {'loaded': (this.permalink || {}).loaded || false});
+      this.thumbnailPanel = jQuery.extend(this.thumbnailPanel | {}, {'loaded': (this.thumbnailPanel || {}).loaded || false})
       this.gen = new iview.General(this);
       
       jQuery(this.currentImage).bind(iview.CurrentImage.CHANGE_EVENT, function(){
@@ -116,7 +117,7 @@
 
 			this.viewerBean.init();
 			
-			this.gen.reinitializeGraphic(function() {jQuery(that.viewerBean.viewer).trigger("init.viewer");});
+			this.reinitializeGraphic(function() {jQuery(that.viewerBean.viewer).trigger("init.viewer");});
 		}
 		//needs to be registered before any other listener for this event
 		var viewerBean = this.viewerBean;
@@ -184,7 +185,7 @@
 			});
 			
 			// Resize-Events registrieren
-			jQuery(window).resize(function() { that.gen.reinitializeGraphic()});
+			jQuery(window).resize(function() { that.reinitializeGraphic()});
 			
 			that.gen.updateModuls();
 		}, startFile);
@@ -202,7 +203,7 @@
 		this.context.switchContext();
 		/*IE causes resize already at class change (mostly because position: rel <> fix)
 		 IE runs resize multiple times...but without this line he doesn't...*/
-		this.gen.reinitializeGraphic();
+		this.reinitializeGraphic();
 	}
 	
 
@@ -270,6 +271,75 @@
 		this.gen.updateModuls();
 		
 		this.roller = false;
+	};
+	
+	/**
+	 * @public
+	 * @function
+	 * @name		reinitializeGraphic
+	 * @memberOf	iview.iviewInstance
+	 * @param		{function} callback which is called just before the event reinit.viewer is triggered
+	 * @description	is called if the viewer size is resized and calculates/set therefore all values for the current zoomlevel and viewModus (i.e. scrrenWidth)
+	 */
+	constructor.prototype.reinitializeGraphic = function(callback) {
+		var viewerBean = this.viewerBean;
+		if (viewerBean == null) return;
+			
+		var curHeight = 0;
+		var curWidth = 0;
+		if (window.innerWidth) {
+			curWidth = window.innerWidth;
+			curHeight = window.innerHeight;
+		} else {
+			curWidth = (document.compatMode == 'CSS1Compat' ? document.documentElement.clientWidth : document.body.clientWidth);
+			curHeight = (document.compatMode == 'CSS1Compat' ? document.documentElement.clientHeight : document.body.clientHeight);
+		}
+
+		var viewerContainer = this.context.container;
+		var viewer = this.context.viewer;
+		var barX = this.scrollbars.x;
+		var barY = this.scrollbars.y;
+
+		if (jQuery(viewerContainer).hasClass("max")) {
+			//to grant usage of the complete height it's not possible to simply use height:100%
+			viewerContainer.css({'height': curHeight - viewerContainer.offset().top + "px",
+								'width': curWidth + "px"});
+			viewer.css({'height': curHeight - viewer.offset().top - barX.my.self.outerHeight()  + "px",
+						'width': curWidth - barY.my.self.outerWidth()  + "px"});
+		} else {
+			//restore minimized size settings
+			viewerContainer.css({'height': this.properties.startHeight + "px",
+								'width': this.properties.startWidth + "px"});
+			viewer.css({'height': this.properties.startHeight - ((barY.my.self.css("visibility") == "visible")? barY.my.self.outerHeight() : 0)  + "px",
+						'width': this.properties.startWidth - ((barX.my.self.css("visibility") == "visible")? barX.my.self.outerWidth() : 0)  + "px"});
+		}
+		
+		viewerBean.width = viewer.outerWidth();
+		viewerBean.height = viewer.outerHeight();
+		viewerBean.resize();
+		
+		// den Modus beibehalten & aktualisieren
+		var zoomInfo = this.currentImage.zoomInfo;
+		if(zoomInfo.zoomScreen){
+			zoomInfo.zoomScreen = !zoomInfo.zoomScreen;	
+			viewerBean.pictureScreen();
+		} else if(zoomInfo.zoomWidth){
+			zoomInfo.zoomWidth = !zoomInfo.zoomWidth;
+			viewerBean.pictureWidth();
+		}
+		
+		if (this.thumbnailPanel.loaded && this.thumbnailPanel.getActive()) {
+			// actualize thumbnailPanel only if visible else delay it upto the reopening
+			this.thumbnailPanel.setSelected(this.PhysicalModel.getCurPos());
+		}
+		
+//		this.gen.handleScrollbars("resize");
+		
+		callBack(callback);
+		//notify all listeners that the viewer was modified in such way that they possibly need adaptation of their own view
+		jQuery(viewerBean.viewer).trigger("reinit.viewer");
+		
+		  //TODO: align image and toolbar to the center
 	};
 	
 	/**
