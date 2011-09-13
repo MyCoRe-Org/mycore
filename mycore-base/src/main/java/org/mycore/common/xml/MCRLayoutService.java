@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -502,7 +503,8 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
                 //have to use SAX here to resolve entities
                 XMLReader reader = XMLReaderFactory.createXMLReader();
                 reader.setEntityResolver(MCRURIResolver.instance());
-                InputSource input = new InputSource(new ByteArrayInputStream(XML_RESOURCE.getRawResource(resource, this.getClass().getClassLoader())));
+                URL resourceURL = this.getClass().getClassLoader().getResource("/" + resource);
+                InputSource input = new InputSource(resourceURL.toString());
                 SAXSource source = new SAXSource(reader, input);
                 stylesheet = factory.newTemplates(source);
                 LOGGER.debug("MCRLayoutService compiled stylesheet resource " + resource);
