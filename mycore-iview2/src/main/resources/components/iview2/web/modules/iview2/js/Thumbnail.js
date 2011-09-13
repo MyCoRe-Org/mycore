@@ -1,38 +1,4 @@
 //TODO Preload größe anhand der von den Kacheln bestimmen
-
-/**
- * @public
- * @function
- * @name		loadPage
- * @memberOf	iview.General
- * @description	reads out the imageinfo.xml, set the correct zoomvlues and loads the page
- * @param		{function} callback
- * @param   {String} [startFile] optional page to open
- */
-genProto.loadPage = function(callback, startFile) {
-	var url;
-	if (typeof(this.iview.metsDoc)=='undefined'){
-		url = startFile;
-	} else {
-		url = this.iview.PhysicalModel.getCurrent().getHref();
-	}
-	this.iview.currentImage.name = url;
-	var imagePropertiesURL = this.iview.properties.baseUri[0]+"/"+this.iview.properties.derivateId+"/"+url+"/imageinfo.xml";
-	var that = this;
-	jQuery.ajax({
-		url: imagePropertiesURL,
-  		success: function(response) {
-  		  that.processImageProperties(response, url);
-  		  callBack(callback);
-  		},
-  		error: function(request, status, exception) {
-  			if(console){
-  				console.log("Error occured while loading image properties:\n"+exception);
-  			}
-  		}
-	});
-};
-
 /**
  * @public
  * @function
@@ -159,63 +125,6 @@ genProto.updateModuls = function() {
 /**
  * @public
  * @function
- * @name		startFileLoaded
- * @memberOf	iview.General
- * @description	
- */
-genProto.startFileLoaded = function(){
-	var that = this;
-	//Blank needs to be loaded as blank, so the level is filled. Else it lays not ontop; needed for IE 
-	this.iview.context.viewer.find(".surface").css("backgroundImage", "url(" + this.iview.properties.webappBaseUri + "modules/iview2/gfx/blank.gif" + ")");
-
-	// PermaLink Handling
-	// choice if zoomLevel or special; zoomMode only makes sense in maximized viewer
-	if (this.iview.properties.useParam && URL.getParam("maximized") == "true") {
-		if (URL.getParam("tosize") == "width") {
-			if (!this.iview.currentImage.zoomInfo.zoomWidth) this.iview.viewerBean.pictureWidth();
-		} else if ((URL.getParam("tosize") == "screen" || isNaN(parseInt(URL.getParam("zoom"))))
-				&& !this.iview.currentImage.zoomInfo.zoomScreen) {
-			this.iview.viewerBean.pictureScreen();
-		} else if (isNaN(parseInt(URL.getParam("zoom"))) && !this.iview.currentImage.zoomInfo.zoomScreen){
-			this.iview.viewerBean.pictureScreen();
-		}
-		//Toolbar is initialized on dom-load event and may not yet ready
-	  var waitForToolbar = function (self, iviewInst){
-	    if (iviewInst.properties.initialized){
-	      iviewInst.toggleViewerMode();
-	    } else {
-	      setTimeout(function(){self(self,iviewInst);}, 100);
-	    }
-	  };
-	  waitForToolbar(waitForToolbar, this.iview);
-	} else {
-		// in minimized viewer always pictureScreen
-		if (!this.iview.currentImage.zoomInfo.zoomScreen) this.iview.viewerBean.pictureScreen();
-	}
-	
-	var metsDocURI = this.iview.properties.webappBaseUri + "servlets/MCRMETSServlet/" + this.iview.properties.derivateId;
-	jQuery.ajax({
-		url: metsDocURI,
-  		success: function(response) {
-			that.processMETS(response);
-		},
-  		error: function(request, status, exception) {
-  			if(typeof console != "undefined"){
-  				console.log("Error Occured while Loading METS file:\n"+exception);
-  			}
-  		}
-	});
-	
-	// Resize-Events registrieren
-	var that = this;
-	jQuery(window).resize(function() { that.reinitializeGraphic()});
-	
-	this.updateModuls();
-}
-
-/**
- * @public
- * @function
  * @name		processMETS
  * @memberOf	iview.General
  * @description	process the loaded mets and do all final configurations like setting the pagenumber, generating Chapter and so on
@@ -233,7 +142,7 @@ genProto.processMETS = function(metsDoc) {
 	physicalModel.setPosition(physicalModel.getPosition(this.iview.currentImage.name));
 	jQuery(physicalModel).bind("select.METS", function(e, val) {
 //			that.notifyListenerNavigate(val["new"]);
-		that.loadPage();
+		that.iview.loadPage();
 		toolbarCtrl.checkNavigation(val["new"]);
 		that.updateModuls();
 		if (jQuery('.navigateHandles .pageBox')[0]) {

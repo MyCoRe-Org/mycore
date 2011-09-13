@@ -130,8 +130,59 @@
 		
 		this.preload = new iview.Preload.Controller(this);
 		
-		this.gen.loadPage(function(){
-		  that.gen.startFileLoaded();
+		this.loadPage(function(){
+
+			/**
+			 * @public
+			 * @function
+			 * @name		startFileLoaded
+			 * @description	
+			 */
+			//Blank needs to be loaded as blank, so the level is filled. Else it lays not ontop; needed for IE 
+			that.context.viewer.find(".surface").css("backgroundImage", "url(" + that.properties.webappBaseUri + "modules/iview2/gfx/blank.gif" + ")");
+	
+			// PermaLink Handling
+			// choice if zoomLevel or special; zoomMode only makes sense in maximized viewer
+			if (that.properties.useParam && URL.getParam("maximized") == "true") {
+				if (URL.getParam("tosize") == "width") {
+					if (!that.currentImage.zoomInfo.zoomWidth) that.viewerBean.pictureWidth();
+				} else if ((URL.getParam("tosize") == "screen" || isNaN(parseInt(URL.getParam("zoom"))))
+						&& !that.currentImage.zoomInfo.zoomScreen) {
+					that.viewerBean.pictureScreen();
+				} else if (isNaN(parseInt(URL.getParam("zoom"))) && !that.currentImage.zoomInfo.zoomScreen){
+					that.viewerBean.pictureScreen();
+				}
+				//Toolbar is initialized on dom-load event and may not yet ready
+			  var waitForToolbar = function (self, iviewInst){
+			    if (iviewInst.properties.initialized){
+			      iviewInst.toggleViewerMode();
+			    } else {
+			      setTimeout(function(){self(self,iviewInst);}, 100);
+			    }
+			  };
+			  waitForToolbar(waitForToolbar, that);
+			} else {
+				// in minimized viewer always pictureScreen
+				if (!that.currentImage.zoomInfo.zoomScreen) that.viewerBean.pictureScreen();
+			}
+			
+			var metsDocURI = that.properties.webappBaseUri + "servlets/MCRMETSServlet/" + that.properties.derivateId;
+			jQuery.ajax({
+				url: metsDocURI,
+		  		success: function(response) {
+					that.gen.processMETS(response);
+				},
+		  		error: function(request, status, exception) {
+		  			if(typeof console != "undefined"){
+		  				console.log("Error Occured while Loading METS file:\n"+exception);
+		  			}
+		  		}
+			});
+			
+			// Resize-Events registrieren
+			jQuery(window).resize(function() { that.gen.reinitializeGraphic()});
+			
+			that.gen.updateModuls();
 		}, startFile);
 	};
 	
@@ -149,6 +200,35 @@
 		 IE runs resize multiple times...but without this line he doesn't...*/
 		this.gen.reinitializeGraphic();
 	}
+	
+
+	/**
+	 * @public
+	 * @function
+	 * @name		loadPage
+	 * @memberOf	iview.iviewInstance
+	 * @description	reads out the imageinfo.xml, set the correct zoomvlues and loads the page
+	 * @param		{function} callback
+	 * @param		{String} [startFile] optional page to open
+	 */
+	constructor.prototype.loadPage = function(callback, startFile) {
+		var url = (typeof startFile != "undefined")? startFile: this.PhysicalModel.getCurrent().getHref();
+		this.currentImage.name = url;
+		var imagePropertiesURL = this.properties.baseUri[0]+"/"+this.properties.derivateId+"/"+url+"/imageinfo.xml";
+		var that = this;
+		jQuery.ajax({
+			url: imagePropertiesURL,
+	  		success: function(response) {
+	  		  that.gen.processImageProperties(response, url);
+	  		  callBack(callback);
+	  		},
+	  		error: function(request, status, exception) {
+	  			if(console){
+	  				console.log("Error occured while loading image properties:\n"+exception);
+	  			}
+	  		}
+		});
+	};
 	
 	/**
 	 * @public

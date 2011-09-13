@@ -376,7 +376,5 @@ iview.chapter.importChapter = function(viewer, callback) {
 
 	viewer.chapter.createView(viewer.chapter.parent);
 	viewer.chapter.loaded = true;//signal that the chapter was loaded successfully
-	if (typeof callback == "function") {
-		callback();
-	}
+	callBack(callback);
 };

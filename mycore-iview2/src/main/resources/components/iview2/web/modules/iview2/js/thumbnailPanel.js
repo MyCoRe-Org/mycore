@@ -659,9 +659,7 @@ iview.ThumbnailPanel.importThumbnailPanel = function(viewer, callback) {
 		//close ThumbnailPanel when Viewer is going to minimized mode
 		thumbnailPanel.hideView();
 	})
-	if (typeof callback == "function") {
-		callback();
-	}
+	callBack(callback);
 }
 /**
  * @public
