@@ -2,51 +2,6 @@
 /**
  * @public
  * @function
- * @name		processImageProperties
- * @memberOf	iview.General
- * @description	
- * @param 		{object} imageProperties
- */
-genProto.processImageProperties = function(imageProperties, url){
-	this.iview.currentImage.processImageProperties(imageProperties, url);
-	var viewerBean = this.iview.viewerBean;
-	
-	// checks for enabled Modi & reset before
-  //TODO: check if zoomInit is still needed
-	this.iview.currentImage.zoomInfo.zoomInit = Math.min(viewerBean.zoomLevel,this.iview.currentImage.zoomInfo.maxZoom);
-	var thumbSource=viewerBean.tileUrlProvider.assembleUrl(0,0,0);
-	
-	viewerBean.resize();
-	// moves viewer to zoomLevel zoomInit
-	viewerBean.maxZoomLevel = this.iview.currentImage.zoomInfo.maxZoom;
-	// handle special Modi for new Page
-	if (this.iview.currentImage.zoomInfo.zoomWidth) {
-		this.iview.currentImage.zoomInfo.zoomWidth=false;
-		viewerBean.pictureWidth();
-	} else if (this.iview.currentImage.zoomInfo.zoomScreen) {
-		this.iview.currentImage.zoomInfo.zoomScreen=false;
-		viewerBean.pictureScreen();
-	} else {
-		// moves viewer to zoomLevel zoomInit
-		viewerBean.zoom(this.iview.currentImage.zoomInfo.zoomInit - viewerBean.zoomLevel);
-	}
-	
-	// damit das alte zoomBack bei Modi-Austritt nicht verwendet wird
-	this.iview.currentImage.zoomInfo.zoomBack = this.iview.currentImage.zoomInfo.zoomInit;
-	var initX = this.iview.properties.useParam ? toFloat(URL.getParam("x")) : 0;
-  var initY = this.iview.properties.useParam ? toFloat(URL.getParam("y")) : 0;
-	
-	this.iview.roller = true;
-	viewerBean.positionTiles ({'x' : initX, 'y' : initY}, true);
-	
-  this.updateModuls();
-	
-	this.iview.roller = false;
-};
-
-/**
- * @public
- * @function
  * @name		handleScrollbars
  * @memberOf	iview.General#
  * @description	adapts the scrollbars to correctly represent the new view after a zoom or resize event occured to the viewer. The adaptations cover sizing the bar, the bar proportion, maxValue and currentValue depending on the given reason

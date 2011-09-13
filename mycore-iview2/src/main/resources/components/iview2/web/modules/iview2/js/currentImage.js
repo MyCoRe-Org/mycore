@@ -11,6 +11,7 @@
       this.y = 0;
 	  this.curWidth = 0;
       this.curHeight = 0;
+      this.viewer = iviewInst;
       var zoomInfo = this.zoomInfo = new iview.ZoomInformation(iviewInst);
       var that = this;
       
@@ -40,6 +41,8 @@
       this.width = parseInt(values['width']);
       this.height = parseInt(values['height']);
       this.zoomInfo.maxZoom = parseInt(values['zoomLevel']);
+      //TODO: check if zoomInit is still needed
+      this.zoomInfo.zoomInit = Math.min(this.viewer.viewerBean.zoomLevel,this.zoomInfo.maxZoom);
       jQuery(this).trigger(iview.CurrentImage.CHANGE_EVENT);
     };
     

@@ -27,6 +27,7 @@
 
   iview.IViewInstance = (function() {
     function constructor(container, options) {
+      var that = this;
       var defaultOpts = {
         "useChapter" : true,
         "useOverview" : true,
@@ -61,8 +62,11 @@
       this.chapter = jQuery.extend(this.chapter | {}, {'loaded': (this.chapter || {}).loaded || false, 'parent': container});
       this.permalink = jQuery.extend(this.permalink | {}, {'loaded': (this.permalink || {}).loaded || false});
       this.gen = new iview.General(this);
+      
+      jQuery(this.currentImage).bind(iview.CurrentImage.CHANGE_EVENT, function(){
+    	  that.processImageProperties();
+      });
       //TODO load toolbar after all resources (css, images) are ready
-      var that = this;
       createToolbars(this);
     }
 
@@ -219,7 +223,7 @@
 		jQuery.ajax({
 			url: imagePropertiesURL,
 	  		success: function(response) {
-	  		  that.gen.processImageProperties(response, url);
+	  		  that.currentImage.processImageProperties(response, url);
 	  		  callBack(callback);
 	  		},
 	  		error: function(request, status, exception) {
@@ -228,6 +232,44 @@
 	  			}
 	  		}
 		});
+	};
+	
+	/**
+	 * @public
+	 * @function
+	 * @name		processImageProperties
+	 * @memberOf	iview.iviewInstance
+	 * @description	
+	 * @param 		{object} imageProperties
+	 */
+	constructor.prototype.processImageProperties = function(){
+		var viewerBean = this.viewerBean;
+		
+		viewerBean.resize();
+		var zoomInfo = this.currentImage.zoomInfo;
+		// moves viewer to zoomLevel zoomInit
+		viewerBean.maxZoomLevel = zoomInfo.maxZoom;
+		// handle special Modi for new Page
+		if (zoomInfo.zoomWidth) {
+			zoomInfo.zoomWidth = false;
+			viewerBean.pictureWidth();
+		} else if (zoomInfo.zoomScreen) {
+			zoomInfo.zoomScreen = false;
+			viewerBean.pictureScreen();
+		} else {
+			// moves viewer to zoomLevel zoomInit
+			viewerBean.zoom(zoomInfo.zoomInit - viewerBean.zoomLevel);
+		}
+		
+		// damit das alte zoomBack bei Modi-Austritt nicht verwendet wird
+		zoomInfo.zoomBack = zoomInfo.zoomInit;
+
+		this.roller = true;
+		viewerBean.positionTiles ({'x' : this.properties.useParam ? toFloat(URL.getParam("x")) : 0, 'y' : this.properties.useParam ? toFloat(URL.getParam("y")) : 0}, true);
+		
+		this.gen.updateModuls();
+		
+		this.roller = false;
 	};
 	
 	/**
