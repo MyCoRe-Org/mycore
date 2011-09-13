@@ -26,11 +26,19 @@ package org.mycore.mods;
 import java.util.Collection;
 import java.util.List;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.log4j.Logger;
+import org.mycore.common.MCRConstants;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.classifications2.MCRLabel;
+import org.mycore.frontend.servlets.MCRServlet;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -53,6 +61,16 @@ public final class MCRMODSClassificationSupport {
     private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
     private static final Logger LOGGER = Logger.getLogger(MCRMODSClassificationSupport.class);
+    private static final DocumentBuilder DOC_BUILDER;
+    static {
+        DocumentBuilder documentBuilder = null;
+        try {
+            documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            LOGGER.error("Could not instantiate DocumentBuilder. Not all functions will be available.", e);
+        }
+        DOC_BUILDER = documentBuilder;
+    }
 
     private MCRMODSClassificationSupport() {
     };
@@ -169,6 +187,42 @@ public final class MCRMODSClassificationSupport {
             return getCategoryIDByCode(authority, code);
         }
         return null;
+    }
+
+    public static NodeList getClassNodes(final NodeList sources) {
+        try {
+            final Element source = (Element) sources.item(0);
+            final String classId = source.getAttributeNS(MCRConstants.MCR_NAMESPACE.getURI(), "classId");
+            final String categId = source.getAttributeNS(MCRConstants.MCR_NAMESPACE.getURI(), "categId");
+            final MCRCategoryID rootID = MCRCategoryID.rootID(classId);
+            final MCRCategory cl = DAO.getRootCategory(rootID, 0);
+            final Document document = DOC_BUILDER.newDocument();
+            final Element returns = document.createElement("returns");
+            final MCRLabel authLabel = cl.getLabel(LABEL_LANG_AUTHORITY);
+            final String authority = authLabel == null ? null : authLabel.getText();
+            if (authority != null) {
+                returns.setAttribute("authority", authority);
+                returns.setTextContent(categId);
+            } else {
+                final MCRLabel uriLabel = cl.getLabel(LABEL_LANG_URI);
+                String authorityURI = uriLabel == null ? null : uriLabel.getText();
+                if (authorityURI == null) {
+                    authorityURI = MCRServlet.getBaseURL() + "classifications/" + classId;
+                }
+                returns.setAttribute("authorityURI", authorityURI);
+                final MCRCategory category = DAO.getCategory(new MCRCategoryID(rootID.getRootID(), categId), 0);
+                final MCRLabel categUriLabel = category.getLabel(LABEL_LANG_URI);
+                String valueURI = categUriLabel == null ? null : categUriLabel.getText();
+                if (valueURI == null) {
+                    valueURI = authorityURI + "#" + categId;
+                }
+                returns.setAttribute("valueURI", valueURI);
+            }
+            return returns.getChildNodes();
+        } catch (Throwable e) {
+            LOGGER.warn("Error in Xalan Extension", e);
+            return null;
+        }
     }
 
     private static String getText(final Element element) {
