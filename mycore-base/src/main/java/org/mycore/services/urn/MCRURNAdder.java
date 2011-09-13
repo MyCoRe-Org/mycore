@@ -133,10 +133,9 @@ public class MCRURNAdder {
             LOGGER.error("Could not resolve metadata element");
             return false;
         }
-
-        Element urnHoldingElement = createElementByXPath(xpath);
         String urn = generateURN();
-        ((Element) obj).addContent(urnHoldingElement.setText(urn));
+        Element urnHoldingElement = createElementByXPath(xpath, urn);
+        ((Element) obj).addContent(urnHoldingElement);
 
         try {
             LOGGER.info("Updating metadata of object " + objectId + " with URN " + urn + " [" + xpath + "]");
@@ -164,7 +163,7 @@ public class MCRURNAdder {
      * @return an Element as specified by the given xpath
      * @throws Exception
      */
-    private Element createElementByXPath(String xpath) {
+    private Element createElementByXPath(String xpath, String urn) {
         String prefix = ".mycoreobject/metadata/";
         if (!xpath.startsWith(prefix)) {
             throw new IllegalArgumentException("XPath does not start with '" + prefix + "'");
@@ -177,6 +176,8 @@ public class MCRURNAdder {
             toReturn.setAttribute(a);
         }
 
+        Element predecessor = toReturn;
+
         /* add the children */
         for (int i = 1; i < parts.length; i++) {
             List<Attribute> attributes = getAttributes(parts[i]);
@@ -185,7 +186,12 @@ public class MCRURNAdder {
                 element.setAttribute(a);
             }
 
-            toReturn.addContent(element);
+            predecessor.addContent(element);
+            predecessor = element;
+
+            if (i == parts.length - 1) {
+                element.setText(urn);
+            }
         }
 
         return toReturn;
