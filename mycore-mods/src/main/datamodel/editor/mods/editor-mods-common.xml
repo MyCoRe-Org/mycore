@@ -545,13 +545,7 @@
   </text>
 
   <panel id="mods.note">
-    <cell anchor="NORTHWEST" var="mods:note">
-      <repeater min="1" max="10" pos="right">
-        <panel>
-          <cell anchor="NORTHWEST" ref="TFzeile512" />
-        </panel>
-      </repeater>
-    </cell>
+    <cell anchor="NORTHWEST" var="mods:note" ref="TFarea4096" />
   </panel>
 
   <helpPopup id="mods.note.help" width="400px" height="250px">
