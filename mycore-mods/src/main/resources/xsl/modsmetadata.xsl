@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan"
-  xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:acl="xalan://org.mycore.access.MCRAccessManager" xmlns:mcr="http://www.mycore.org/"
-  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3" exclude-result-prefixes="xlink mcr i18n acl mods"
-  version="1.0">
+  xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:mcrmods="xalan://org.mycore.mods.MCRMODSClassificationSupport"
+  xmlns:acl="xalan://org.mycore.access.MCRAccessManager" xmlns:mcr="http://www.mycore.org/" xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:mods="http://www.loc.gov/mods/v3" exclude-result-prefixes="xlink mcr i18n acl mods mcrmods" version="1.0">
 
   <xsl:template name="printMetaDate.mods">
     <!-- prints a table row for a given nodeset -->
@@ -46,54 +46,71 @@
     </xsl:if>
   </xsl:template>
 
-  <xsl:template name="printClassInfoMods">
-    <xsl:param name="classid" />
-    <xsl:param name="categid" />
+  <xsl:template match="*" mode="printModsClassInfo">
+    <xsl:variable name="classlink" select="mcrmods:getClassCategLink(.)" />
+    <xsl:choose>
+      <xsl:when test="string-length($classlink) &gt; 0">
+        <xsl:for-each select="document($classlink)/mycoreclass/categories/category">
+          <xsl:variable name="categurl">
+            <xsl:if test="url">
+              <xsl:choose>
+                  <!-- MCRObjectID should not contain a ':' so it must be an external link then -->
+                <xsl:when test="contains(url/@xlink:href,':')">
+                  <xsl:value-of select="url/@xlink:href" />
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="concat($WebApplicationBaseURL,'receive/',url/@xlink:href,$HttpSession)" />
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:if>
+          </xsl:variable>
 
-
-    <xsl:variable name="classlink">
-      <xsl:call-template name="ClassCategLink">
-        <xsl:with-param name="classid" select="$classid" />
-        <xsl:with-param name="categid" select="$categid" />
-      </xsl:call-template>
-    </xsl:variable>
-
-    <xsl:for-each select="document($classlink)/mycoreclass/categories/category">
-      <xsl:variable name="categurl">
-        <xsl:if test="url">
-          <xsl:choose>
-              <!-- MCRObjectID should not contain a ':' so it must be an external link then -->
-            <xsl:when test="contains(url/@xlink:href,':')">
-              <xsl:value-of select="url/@xlink:href" />
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="concat($WebApplicationBaseURL,'receive/',url/@xlink:href,$HttpSession)" />
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:if>
-      </xsl:variable>
-
-      <xsl:variable name="selectLang">
-        <xsl:call-template name="selectLang">
-          <xsl:with-param name="nodes" select="./label" />
-        </xsl:call-template>
-      </xsl:variable>
-      <xsl:for-each select="./label[lang($selectLang)]">
+          <xsl:variable name="selectLang">
+            <xsl:call-template name="selectLang">
+              <xsl:with-param name="nodes" select="./label" />
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:for-each select="./label[lang($selectLang)]">
+            <xsl:choose>
+              <xsl:when test="string-length($categurl) != 0">
+                <a href="{$categurl}">
+                  <xsl:if test="$wcms.useTargets = 'yes'">
+                    <xsl:attribute name="target">_blank</xsl:attribute>
+                  </xsl:if>
+                  <xsl:value-of select="@text" />
+                </a>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="@text" />
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:for-each>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:otherwise>
         <xsl:choose>
-          <xsl:when test="string-length($categurl) != 0">
-            <a href="{$categurl}">
-              <xsl:if test="$wcms.useTargets = 'yes'">
-                <xsl:attribute name="target">_blank</xsl:attribute>
-              </xsl:if>
-              <xsl:value-of select="@text" />
-            </a>
+          <xsl:when test="@valueURI">
+            <xsl:apply-templates select="." mode="hrefLink" />
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="@text" />
+            <xsl:value-of select="text()" />
           </xsl:otherwise>
         </xsl:choose>
-      </xsl:for-each>
-    </xsl:for-each>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template match="*[@valueURI]" mode="hrefLink">
+    <a href="{@valueURI}">
+      <xsl:choose>
+        <xsl:when test="@displayLabel">
+          <xsl:value-of select="@displayLabel" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="@valueURI" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </a>
   </xsl:template>
 
   <xsl:template match="mods:titleInfo" mode="present">
@@ -185,10 +202,7 @@
         <xsl:value-of select="concat(i18n:translate(concat('metaData.mods.dictionary.',mods:role/mods:roleTerm)),':')" />
       </td>
       <td class="metavalue">
-        <xsl:call-template name="printClassInfoMods">
-          <xsl:with-param name="categid" select="mods:namePart" />
-          <xsl:with-param name="classid" select="'bmelv_class_origin'" />
-        </xsl:call-template>
+        <xsl:apply-templates select="." mode="printModsClassInfo" />
       </td>
     </tr>
   </xsl:template>
@@ -235,12 +249,7 @@
         <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.classification'), ' :')" />
       </td>
       <td class="metavalue">
-
-        <xsl:call-template name="printClassInfoMods">
-          <xsl:with-param name="categid" select="." />
-          <xsl:with-param name="classid" select="'ddc-sg'" />
-        </xsl:call-template>
-
+        <xsl:apply-templates select="." mode="printModsClassInfo" />
       </td>
     </tr>
   </xsl:template>

@@ -23,6 +23,7 @@
 
 package org.mycore.mods;
 
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.List;
 
@@ -61,6 +62,7 @@ public final class MCRMODSClassificationSupport {
     private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
     private static final Logger LOGGER = Logger.getLogger(MCRMODSClassificationSupport.class);
+
     private static final DocumentBuilder DOC_BUILDER;
     static {
         DocumentBuilder documentBuilder = null;
@@ -101,13 +103,24 @@ public final class MCRMODSClassificationSupport {
      * returns a category which matches to the given authorityURI and valueURI.
      * @param authorityURI any valid URI
      * @param valueURI any valid URI
-     * @return a MCRCategory that should not be a root category or null if no such category exists.
+     * @return a MCRCategoryID that should not be a root category or null if no such category exists.
      */
-    public static MCRCategory getCategoryByValueURI(final String authorityURI, final String valueURI) {
+    public static MCRCategoryID getCategoryIDByValueURI(final String authorityURI, final String valueURI) {
         final Collection<MCRCategory> categoryByURI = getCategoryByURI(valueURI);
         for (MCRCategory category : categoryByURI) {
             if (authorityURI.equals(category.getRoot().getLabel(LABEL_LANG_URI))) {
-                return category;
+                return category.getId();
+            }
+        }
+        //maybe valueUri is in form {authorityURI}#{categId}
+        if (valueURI.startsWith(authorityURI)) {
+            String categId = valueURI.substring(authorityURI.length() + 1);
+            Collection<MCRCategory> classes = getCategoryByURI(authorityURI);
+            for (MCRCategory cat : classes) {
+                MCRCategoryID catId = new MCRCategoryID(cat.getId().getRootID(), categId);
+                if (DAO.exist(catId)) {
+                    return catId;
+                }
             }
         }
         return null;
@@ -141,8 +154,7 @@ public final class MCRMODSClassificationSupport {
                 LOGGER.warn("Did find attribute authorityURI='" + authorityURI + "', but no valueURI");
                 return null;
             }
-            final MCRCategory category = getCategoryByValueURI(authorityURI, valueURI);
-            return category == null ? null : category.getId();
+            return getCategoryIDByValueURI(authorityURI, valueURI);
         }
         //test by authority
         final String authority = element.getAttribute("authority");
@@ -172,8 +184,7 @@ public final class MCRMODSClassificationSupport {
                 LOGGER.warn("Did find attribute authorityURI='" + authorityURI + "', but no valueURI");
                 return null;
             }
-            final MCRCategory category = getCategoryByValueURI(authorityURI, valueURI);
-            return category == null ? null : category.getId();
+            return getCategoryIDByValueURI(authorityURI, valueURI);
         }
         //test by authority
         final String authority = element.getAttributeValue("authority");
@@ -223,6 +234,15 @@ public final class MCRMODSClassificationSupport {
             LOGGER.warn("Error in Xalan Extension", e);
             return null;
         }
+    }
+
+    public static String getClassCategLink(final NodeList sources) {
+        final Element source = (Element) sources.item(0);
+        MCRCategoryID category = getCategoryID(source);
+        if (category == null) {
+            return "";
+        }
+        return MessageFormat.format("classification:metadata:0:children:{0}:{1}", category.getRootID(), category.getID());
     }
 
     private static String getText(final Element element) {
