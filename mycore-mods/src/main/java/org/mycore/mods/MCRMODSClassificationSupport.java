@@ -106,6 +106,9 @@ public final class MCRMODSClassificationSupport {
      * @return a MCRCategoryID that should not be a root category or null if no such category exists.
      */
     public static MCRCategoryID getCategoryIDByValueURI(final String authorityURI, final String valueURI) {
+        if (authorityURI.length() == 0 || valueURI.length() == 0) {
+            return null;
+        }
         final Collection<MCRCategory> categoryByURI = getCategoryByURI(valueURI);
         for (MCRCategory category : categoryByURI) {
             if (authorityURI.equals(category.getRoot().getLabel(LABEL_LANG_URI))) {
@@ -114,7 +117,13 @@ public final class MCRMODSClassificationSupport {
         }
         //maybe valueUri is in form {authorityURI}#{categId}
         if (valueURI.startsWith(authorityURI)) {
-            String categId = valueURI.substring(authorityURI.length() + 1);
+            String categId;
+            try {
+                categId = valueURI.substring(authorityURI.length() + 1);
+            } catch (RuntimeException e) {
+                LOGGER.warn("authorityURI:" + authorityURI + ", valueURI:" + valueURI);
+                throw e;
+            }
             Collection<MCRCategory> classes = getCategoryByURI(authorityURI);
             for (MCRCategory cat : classes) {
                 MCRCategoryID catId = new MCRCategoryID(cat.getId().getRootID(), categId);
@@ -229,6 +238,24 @@ public final class MCRMODSClassificationSupport {
                 }
                 returns.setAttribute("valueURI", valueURI);
             }
+            return returns.getChildNodes();
+        } catch (Throwable e) {
+            LOGGER.warn("Error in Xalan Extension", e);
+            return null;
+        }
+    }
+
+    public static NodeList getMCRClassNodes(final NodeList sources) {
+        try {
+            final Element source = (Element) sources.item(0);
+            MCRCategoryID category = getCategoryID(source);
+            if (category == null) {
+                return null;
+            }
+            final Document document = DOC_BUILDER.newDocument();
+            final Element returns = document.createElement("returns");
+            returns.setAttributeNS(MCRConstants.MCR_NAMESPACE.getURI(), "mcr:classId", category.getRootID());
+            returns.setAttributeNS(MCRConstants.MCR_NAMESPACE.getURI(), "mcr:categId", category.getID());
             return returns.getChildNodes();
         } catch (Throwable e) {
             LOGGER.warn("Error in Xalan Extension", e);

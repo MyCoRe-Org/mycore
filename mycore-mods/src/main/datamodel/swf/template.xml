@@ -7,7 +7,7 @@
   <section xml:lang="all">
     <p class="editorform">
       <editor id="author-file">
-        <source uri="{sourceUri}" />
+        <source uri="xslStyle:mods2editor:{sourceUri}" />
         <cancel url="{cancelUrl}" />
         <postprocessor class="org.mycore.frontend.editor.postprocessor.MCREditorPostProcessorXSL" stylesheet="editor2mods.xsl" />
         <target type="servlet" name="MCRCheckNewDataServlet" method="post" format="xml" />
