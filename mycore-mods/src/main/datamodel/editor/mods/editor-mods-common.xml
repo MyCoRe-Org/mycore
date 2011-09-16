@@ -26,10 +26,10 @@
   <helpPopup id="mods.title.help" width="400px" height="250px">
     <label xml:lang="de">
       Der Titel des Dokumentes oder Objekts, unter dem es formell bekannt ist.
-        </label>
+    </label>
     <label xml:lang="en">
       Title of document by which the resource is formally known.
-        </label>
+    </label>
   </helpPopup>
   <!-- TITLE END -->
 
@@ -67,12 +67,12 @@
 
   <helpPopup id="mods.title.translated.help" width="400px" height="250px">
     <label xml:lang="de">
-      Der Titel übersetzt. Mit dem "+" button können weitere Übersetzungen des 
-      Titels hinzugefügt werden. 
-        </label>
+      Der Titel übersetzt. Mit dem "+" button können weitere Übersetzungen des
+      Titels hinzugefügt werden.
+    </label>
     <label xml:lang="en">
-      title translated. 
-        </label>
+      title translated.
+    </label>
   </helpPopup>
   <!-- TITLE Translated END -->
 
@@ -110,10 +110,10 @@
   <helpPopup id="mods.languageTerm.help" width="400px" height="250px">
     <label xml:lang="de">
       Die Sprache, in welcher das Dokument verfasst ist.
-        </label>
+    </label>
     <label xml:lang="en">
       language of document text
-        </label>
+    </label>
   </helpPopup>
   <!-- LANGUAGE END -->
 
@@ -165,13 +165,13 @@
 
   <helpPopup id="mods.author.help" width="400px" height="250px">
     <label xml:lang="de">
-      Die Person, die primär das Dokument erstellt hat. Weitere Autoren können über den "+" Button hinzugefügt werden. 
+      Die Person, die primär das Dokument erstellt hat. Weitere Autoren können über den "+" Button hinzugefügt werden.
       (Verlinkung auf PND)
-        </label>
+    </label>
     <label xml:lang="en">
       Persons primarily responsible for making the resource. Further persons my be added with "+" button.
       (ref to pnd)
-        </label>
+    </label>
   </helpPopup>
   <!-- pub_autor_dok_txt [text] and reviewer END -->
 
@@ -243,11 +243,12 @@
   <helpPopup id="mods.person.help" width="400px" height="250px">
     <label xml:lang="de">
       Name und Rolle der Personen, in welcher sie bei der Erstellung des Dokumentes mitgewirkt haben.
-      (Verlinkung auf PND).
-        </label>
+      (Verlinkung auf
+      PND).
+    </label>
     <label xml:lang="en">
       Names and roles of persons cooperating .... (ref to pnd)
-        </label>
+    </label>
   </helpPopup>
   <!-- person END -->
 
@@ -258,9 +259,9 @@
   </text>
 
   <helpPopup id="mods.assignedInstitute.help" width="400px" height="250px">
-    <label xml:lang="de">Institut/Fachgruppe, zu welcher die Autoren bzw. die Beitragenden 
-    zum Zeitpunkt der Veröffentlichung des Dokumentes, des Erscheinungsjahres des Konferenzbandes 
-    oder Buches gehört haben.</label>
+    <label xml:lang="de">Institut/Fachgruppe, zu welcher die Autoren bzw. die Beitragenden
+      zum Zeitpunkt der Veröffentlichung des Dokumentes, des Erscheinungsjahres des Konferenzbandes
+      oder Buches gehört haben.</label>
     <label xml:lang="en">Select an institution from the list.</label>
   </helpPopup>
   <!-- Institutionszugehörigkeit END -->
@@ -285,13 +286,13 @@
 
   <helpPopup id="mods.publisher.help" width="400px" height="250px">
     <label xml:lang="de">
-      Eine natürliche oder juristische Person oder Personengruppe, die als verantwortlich für die 
-      inhaltliche Gestaltung eines Dokuments angegeben wird, ohne selbst Verfasser des Dokuments oder einzelner 
+      Eine natürliche oder juristische Person oder Personengruppe, die als verantwortlich für die
+      inhaltliche Gestaltung eines Dokuments angegeben wird, ohne selbst Verfasser des Dokuments oder einzelner
       Teile desselben sein zu müssen
-        </label>
+    </label>
     <label xml:lang="en">
       Publisher
-        </label>
+    </label>
   </helpPopup>
   <!-- Publisher END -->
 
@@ -316,10 +317,10 @@
   <helpPopup id="mods.conferencePlace.help" width="400px" height="250px">
     <label xml:lang="de">
       Ort der Konferenz
-        </label>
+    </label>
     <label xml:lang="en">
       Conference Place
-        </label>
+    </label>
   </helpPopup>
   <!-- Ort der Konferenz END -->
 
@@ -346,10 +347,10 @@
   <helpPopup id="mods.conferenceLand.help" width="400px" height="250px">
     <label xml:lang="de">
       Das Land, in dem die Konferenz stattfand.
-        </label>
+    </label>
     <label xml:lang="en">
       Country Place
-        </label>
+    </label>
   </helpPopup>
   <!-- Land in dem die Konferenz stattfand END -->
 
@@ -385,16 +386,18 @@
   </panel>
 
   <helpPopup id="mods.dateIssued.help" width="400px" height="250px">
-    <label xml:lang="de"> 
-      Bei Konferenzbänden, Büchern geben Sie bitte das Erscheinungsjahr an,<br />
-      bei Filmen das Datum der Aufnahme,<br />
+    <label xml:lang="de">
+      Bei Konferenzbänden, Büchern geben Sie bitte das Erscheinungsjahr an,
+      <br />
+      bei Filmen das Datum der Aufnahme,
+      <br />
       bei Promotionen das Datum der ersten Online Veröffentlichung.
-        </label>
+    </label>
     <label xml:lang="en">
       Date of Publication:
       video recording date
-      
-        </label>
+
+    </label>
   </helpPopup>
   <!-- Datum der Veröffentlichung END -->
 
@@ -417,10 +420,10 @@
   <helpPopup id="mods.dateCreated.help" width="400px" height="250px">
     <label xml:lang="de">
       Datum der Erstellung
-        </label>
+    </label>
     <label xml:lang="en">
       Date of Creation
-        </label>
+    </label>
   </helpPopup>
   <!-- Datum der Erstellung END -->
 
@@ -457,16 +460,18 @@
 
   <helpPopup id="mods.dateOccured.help" width="400px" height="250px">
     <label xml:lang="de">
-      Zeitraum in der die Konferenz stattfand (von, bis). Das Datum muss im 
-      ISO Format mit Bindestrich (YYYY-MM-DD) angegeben werden. <br /> 
+      Zeitraum in der die Konferenz stattfand (von, bis). Das Datum muss im
+      ISO Format mit Bindestrich (YYYY-MM-DD) angegeben werden.
+      <br />
       Beispiel: 2003-01-07
-        </label>
+    </label>
     <label xml:lang="en">
-      Date of Conference (start, end). The date must be inserted in ISO format 
+      Date of Conference (start, end). The date must be inserted in ISO format
       with dahes (YYYY-MM-DD).
-      Sample: 2003-01-07<br />
-      
-        </label>
+      Sample: 2003-01-07
+      <br />
+
+    </label>
   </helpPopup>
   <!--Zeit in der die Konferenz stattfand END -->
 
@@ -505,10 +510,10 @@
   <helpPopup id="mods.abstract.help" width="400px" height="250px">
     <label xml:lang="de">
       Eine kurze Zusammenfassung/Abstrakt des Dokumentinhaltes in verschiedenen Sprachen.
-        </label>
+    </label>
     <label xml:lang="en">
       abstract (translated also)
-        </label>
+    </label>
   </helpPopup>
   <!-- Abstract END -->
 
@@ -531,12 +536,31 @@
   <helpPopup id="mods.subject.help" width="400px" height="250px">
     <label xml:lang="de">
       Stichworte mit Semikolon getrennt
-        </label>
+    </label>
     <label xml:lang="en">
-      Subject 
-        </label>
+      Subject
+    </label>
   </helpPopup>
   <!-- Stichworte END -->
+  
+  <!-- dreier repeater -->
+  <panel id="mods.noteLocationCorp">
+    <cell var="noteLocationCorp">
+      <repeater>
+        <panel>
+          <cell row="1" col="1" anchor="NORTHEAST" ref="mods.assignedInstitute.label" />
+          <cell row="1" col="2" anchor="NORTHWEST" ref="mods.assignedInstitute" />
+          <cell row="1" col="3" anchor="NORTHWEST" ref="mods.assignedInstitute.help" />
+          <cell row="20" col="1" anchor="NORTHEAST" ref="mods.note.label" />
+          <cell row="20" col="2" anchor="NORTHWEST" ref="mods.note" />
+          <cell row="20" col="3" anchor="NORTHWEST" ref="mods.note.help" />
+          <cell row="30" col="1" anchor="NORTHEAST" ref="mods.physicalLocation.label" />
+          <cell row="30" col="2" anchor="NORTHWEST" ref="mods.physicalLocation" var="mods:location" />
+          <cell row="30" col="3" anchor="NORTHWEST" ref="mods.physicalLocation.help" />
+        </panel>
+      </repeater>
+    </cell>
+  </panel>
 
   <!-- Kommentar -->
   <text id="mods.note.label">
@@ -550,11 +574,11 @@
 
   <helpPopup id="mods.note.help" width="400px" height="250px">
     <label xml:lang="de">
-      Hier können beliebige Kommentare zum Dokument notiert werden 
-        </label>
+      Hier können beliebige Kommentare zum Dokument notiert werden
+    </label>
     <label xml:lang="en">
       Comment
-        </label>
+    </label>
   </helpPopup>
   <!-- Kommentar END -->
 
@@ -574,10 +598,10 @@
   <helpPopup id="mods.physicalLocation.help" width="400px" height="250px">
     <label xml:lang="de">
       Standort der physischen Ressource (Buch, Konferenzband, Film)
-        </label>
+    </label>
     <label xml:lang="en">
       Location of physical resource (book, conference proceeding, film)
-        </label>
+    </label>
   </helpPopup>
   <!-- Standort END -->
 
@@ -597,14 +621,16 @@
 
   <helpPopup id="mods.relatedItem.help" width="400px" height="250px">
     <label xml:lang="de">
-      Gedruckte oder elektronische Quelle einer sonstigen Veröffentlichung des vorliegenden 
-      Dokumentes. <br />Für ein retrodigitalisiertes Dokument wäre das beispielsweise die Printversion. 
+      Gedruckte oder elektronische Quelle einer sonstigen Veröffentlichung des vorliegenden
+      Dokumentes.
+      <br />
+      Für ein retrodigitalisiertes Dokument wäre das beispielsweise die Printversion.
       Bei Postern oder Abstracts kann hier die Konferenz oder der Konferenzbeitrag, in deren Kontext
       dieses Dokument steht, angegeben werden.
-      </label>
+    </label>
     <label xml:lang="en">
       Source
-      </label>
+    </label>
   </helpPopup>
   <!-- Quelle END -->
 
@@ -628,10 +654,10 @@
   <helpPopup id="mods.cproceeding.help" width="400px" height="250px">
     <label xml:lang="de">
       Verweis auf Konferenzband
-      </label>
+    </label>
     <label xml:lang="en">
       Link to related Conference Proceeding
-      </label>
+    </label>
   </helpPopup>
   <!-- Verweis auf Konferenzband END -->
 
@@ -675,10 +701,10 @@
   <helpPopup id="mods.identifier.help" width="400px" height="250px">
     <label xml:lang="de">
       Identifier (ggf. mehrere, URN, DOI,...)
-        </label>
+    </label>
     <label xml:lang="en">
       Identifier (ggf. mehrere, URN, DOI,...)
-        </label>
+    </label>
   </helpPopup>
   <!-- Identifier END -->
 
@@ -703,9 +729,9 @@
 
   <helpPopup id="mods.ddc.help" width="400px" height="250px">
     <label xml:lang="de">Die Zuordnung des Dokumentes zur DDC-Sachgruppe. Mit dem "+" Button
-    können weitere DDC-Sachgruppen hinzugefügt werden.</label>
-    <label xml:lang="en">Entry from the ddc list.With "+" buttons can be selected additional 
-    ddc categories.</label>
+      können weitere DDC-Sachgruppen hinzugefügt werden.</label>
+    <label xml:lang="en">Entry from the ddc list.With "+" buttons can be selected additional
+      ddc categories.</label>
   </helpPopup>
   <!-- DDC pub_klassifik END -->
 
@@ -725,12 +751,12 @@
 
   <helpPopup id="mods.physicalDescription.help" width="400px" height="250px">
     <label xml:lang="de">
-      Hier kann eine physikalische Beschreibung des Dokumentes erfolgen, z.B. bei 
+      Hier kann eine physikalische Beschreibung des Dokumentes erfolgen, z.B. bei
       Postern die Größe.
-        </label>
+    </label>
     <label xml:lang="en">
       Physical description, e.g. size of poster
-        </label>
+    </label>
   </helpPopup>
   <!-- Bei Postern -> Größe [text] END -->
 
@@ -933,8 +959,9 @@
   </panel>
 
   <helpPopup id="mods.book.place.help" width="400px" height="250px">
-    <label xml:lang="de">Bei Druckmedien oder digitalen Dokumenten, die von Verlagen herausgegeben wurden, wird 
-    hier der Verlagsort angegeben. </label>
+    <label xml:lang="de">Bei Druckmedien oder digitalen Dokumenten, die von Verlagen herausgegeben wurden, wird
+      hier der Verlagsort angegeben.
+    </label>
     <label xml:lang="en">Place</label>
   </helpPopup>
   <!-- Place END -->
@@ -975,9 +1002,9 @@
   </panel>
 
   <helpPopup id="mods.book.series.help" width="400px" height="250px">
-    <label xml:lang="de">Schriftenreihe unter einem Gesamttitel, dem jeweils 
-    abgeschlossene Bände zugeordnet sind. Serien sind häufig unbegrenzt, die einzelnen 
-    Stücktitel erscheinen nicht regelmäßig</label>
+    <label xml:lang="de">Schriftenreihe unter einem Gesamttitel, dem jeweils
+      abgeschlossene Bände zugeordnet sind. Serien sind häufig unbegrenzt, die einzelnen
+      Stücktitel erscheinen nicht regelmäßig</label>
     <label xml:lang="en">Series</label>
   </helpPopup>
   <!-- Series END -->
@@ -1078,23 +1105,31 @@
   </panel>
 
   <helpPopup id="mods.book.isbn.help">
-    <label xml:lang="de">ISBN (*)<br/>
-    Die ISBN wird ohne Bindestrich eingegeben.<br/>
-    Beispiel: ISBN 9783836213257
-    
+    <label xml:lang="de">
+      ISBN (*)
+      <br />
+      Die ISBN wird ohne Bindestrich eingegeben.
+      <br />
+      Beispiel: ISBN 9783836213257
+
     </label>
-    <label xml:lang="en">ISBN (*)<br/>
-  
+    <label xml:lang="en">
+      ISBN (*)
+      <br />
+
     </label>
   </helpPopup>
   <!-- ISBN END -->
 
   <!-- ISSN -->
   <text id="mods.issn.label">
-    <label xml:lang="de">ISSN (*)<br/>
-    Die ISSN wird ohne Bindestrich eingegeben.<br/>
-    Beispiel: ISSN 09359680
-    
+    <label xml:lang="de">
+      ISSN (*)
+      <br />
+      Die ISSN wird ohne Bindestrich eingegeben.
+      <br />
+      Beispiel: ISSN 09359680
+
     </label>
     <label xml:lang="en">ISSN (*)</label>
   </text>
@@ -1147,7 +1182,7 @@
             <textfield width="4" maxlength="4" />
           </cell>
           <cell col="2" anchor="NORTHWEST" ref="TFzeile10" var="@factor" />
-          <cell col="3" anchor="NORTHWEST" var="@refereed" >
+          <cell col="3" anchor="NORTHWEST" var="@refereed">
             <list type="dropdown" default="yes">
               <item value="yes">
                 <label xml:lang="de">Ja</label>

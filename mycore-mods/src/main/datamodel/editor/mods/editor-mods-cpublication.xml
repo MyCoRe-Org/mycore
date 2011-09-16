@@ -53,23 +53,7 @@
     <!-- Identifier END -->
   </panel></cell>
 
-    <!-- Institution (wo bei BMELV-Forschung zugeordnet) -->
-    <cell row="110" col="1" anchor="NORTHEAST" ref="mods.assignedInstitute.label" />
-    <cell row="110" col="2" anchor="NORTHWEST" ref="mods.assignedInstitute" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="110" col="3" anchor="NORTHWEST" ref="mods.assignedInstitute.help" />
-    <!-- Institution END -->
-
-    <!-- Kommentar -->
-    <cell row="120" col="1" anchor="NORTHEAST" ref="mods.note.label" />
-    <cell row="120" col="2" anchor="NORTHWEST" ref="mods.note" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="120" col="3" anchor="NORTHWEST" ref="mods.note.help" />
-    <!-- Kommentar END -->
-
-    <!-- Standort -->
-    <cell row="130" col="1" anchor="NORTHEAST" ref="mods.physicalLocation.label" />
-    <cell row="130" col="2" anchor="NORTHWEST" ref="mods.physicalLocation" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:location" />
-    <cell row="130" col="3" anchor="NORTHWEST" ref="mods.physicalLocation.help" />
-    <!-- Standort END -->
+    <cell row="100" col="1" colspan="3" anchor="NORTHEAST" ref="mods.noteLocationCorp"/>
 
     <cell col="1" colspan="3" row="150" anchor="NORTHEAST" style="padding-top:20px;">
       <submitButton width="100px" i18n="common.button.save" />

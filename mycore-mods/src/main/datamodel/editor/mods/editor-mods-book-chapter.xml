@@ -78,23 +78,7 @@
     <!-- Stichworte END -->
   </panel></cell>
 
-    <!-- Institution (wo bei BMELV-Forschung zugeordnet) -->
-    <cell row="140" col="1" anchor="NORTHEAST" ref="mods.assignedInstitute.label" />
-    <cell row="140" col="2" anchor="NORTHWEST" ref="mods.assignedInstitute" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="140" col="3" anchor="NORTHWEST" ref="mods.assignedInstitute.help" />
-    <!-- Institution END -->
-
-    <!-- Kommentar -->
-    <cell row="160" col="1" anchor="NORTHEAST" ref="mods.note.label" />
-    <cell row="160" col="2" anchor="NORTHWEST" ref="mods.note" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="160" col="3" anchor="NORTHWEST" ref="mods.note.help" />
-    <!-- Kommentar END -->
-
-    <!-- Standort -->
-    <cell row="170" col="1" anchor="NORTHEAST" ref="mods.physicalLocation.label" />
-    <cell row="170" col="2" anchor="NORTHWEST" ref="mods.physicalLocation" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:location" />
-    <cell row="170" col="3" anchor="NORTHWEST" ref="mods.physicalLocation.help" />
-    <!-- Standort END -->
+    <cell row="260" col="1" colspan="3" anchor="NORTHEAST" ref="mods.noteLocationCorp"/>
 
     <!-- save/cancel buttons -->
     <cell col="1" colspan="3" row="300" anchor="EAST" style="padding-top:20px;">
