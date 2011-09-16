@@ -201,7 +201,7 @@ iview.Permalink.openPermalink = function(viewer, button) {
  * @public
  * @function
  * @name		importPermalink
- * @memberOf	iview.General
+ * @memberOf	iview.Permalink
  * @description	calls the corresponding functions to create the Permalink
  * @param		{iviewInst} viewer in which the function shall operate
  * @param		{function} callback function to call after the permalink was loaded successfully

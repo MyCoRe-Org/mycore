@@ -983,7 +983,7 @@ iview.METS.ChapterModelProvider = function(metsDoc) {
  * @public
  * @function
  * @name		processMETS
- * @memberOf	iview.General
+ * @memberOf	iview.METS
  * @description	process the loaded mets and do all final configurations like setting the pagenumber, generating Chapter and so on
  * @param		{iviewInst} viewer in which the bars shall be created in
  * @param		{document} metsDoc holds in METS/MODS structure all needed informations to generate an chapter and ThumbnailPanel of of the supplied data

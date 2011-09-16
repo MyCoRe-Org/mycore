@@ -172,7 +172,7 @@ PanoJS.prototype.removeScaling = function() {
  * @public
  * @function
  * @name		isloaded
- * @memberOf	iview.General
+ * @memberOf	PanoJS
  * @description	checks if the picture is loaded
  * @param		{object} img
  */

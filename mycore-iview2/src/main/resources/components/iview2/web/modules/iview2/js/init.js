@@ -1,6 +1,6 @@
 var iview = iview || {}; // holds API
 var Iview = Iview || {}; // holds instances
-
+//TODO is that object really needed?
 iview.IViewObject = (function(){
   "use strict";
   function constructor(iviewInst){
@@ -14,21 +14,3 @@ iview.IViewObject = (function(){
   };
   return constructor;
 })();
-
-/**
- * @class
- * @constructor
- * @memberOf	iview.General
- * @name		General
- * @description All Viewer data and functions which don't fit in other packages
- */
-iview.General = function(iviewInst) {
-	//TODO later it should be possible to remove all this.iview with just this
-	this.iview = iviewInst;
-	//structure for all Viewer DOM-Objects
-	this.iview.context = new iview.Context(iviewInst.viewerContainer, iviewInst);
-	this.iview.currentImage = new iview.CurrentImage(iviewInst);
-	var that = this;
-};
-
-var genProto = iview.General.prototype;

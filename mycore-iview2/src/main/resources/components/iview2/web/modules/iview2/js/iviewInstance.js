@@ -62,8 +62,9 @@
       this.chapter = jQuery.extend(this.chapter | {}, {'loaded': (this.chapter || {}).loaded || false, 'parent': container});
       this.permalink = jQuery.extend(this.permalink | {}, {'loaded': (this.permalink || {}).loaded || false});
       this.thumbnailPanel = jQuery.extend(this.thumbnailPanel | {}, {'loaded': (this.thumbnailPanel || {}).loaded || false})
-      this.gen = new iview.General(this);
-      
+	  this.context = new iview.Context(this.viewerContainer, this);
+	  this.currentImage = new iview.CurrentImage(this);
+	  
       jQuery(this.currentImage).bind(iview.CurrentImage.CHANGE_EVENT, function(){
     	  that.processImageProperties();
       });
