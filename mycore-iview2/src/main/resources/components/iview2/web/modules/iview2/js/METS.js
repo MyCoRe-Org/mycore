@@ -978,3 +978,57 @@ iview.METS.ChapterModelProvider = function(metsDoc) {
 	prototype.createModel = createModel;
 	prototype.setDocument = setDocument;
 })();
+
+/**
+ * @public
+ * @function
+ * @name		processMETS
+ * @memberOf	iview.General
+ * @description	process the loaded mets and do all final configurations like setting the pagenumber, generating Chapter and so on
+ * @param		{iviewInst} viewer in which the bars shall be created in
+ * @param		{document} metsDoc holds in METS/MODS structure all needed informations to generate an chapter and ThumbnailPanel of of the supplied data
+ */
+iview.METS.processMETS = function(viewer, metsDoc) {
+	var that = this;
+	viewer.metsDoc = metsDoc;
+	//create the PhysicalModelProvider
+	viewer.PhysicalModelProvider = new iview.METS.PhysicalModelProvider(metsDoc);
+	var physicalModel = viewer.PhysicalModel = viewer.PhysicalModelProvider.createModel();
+	var toolbarCtrl = viewer.toolbar.ctrl;
+	physicalModel.setPosition(physicalModel.getPosition(viewer.currentImage.name));
+	jQuery(physicalModel).bind("select.METS", function(e, val) {
+//			that.notifyListenerNavigate(val["new"]);
+		viewer.loadPage();
+	})
+	
+	// Toolbar Operation
+	toolbarCtrl.perform("setActive", true, "overviewHandles", "openChapter");
+	toolbarCtrl.perform("setActive", true, "overviewHandles", "openThumbnailPanel");
+	toolbarCtrl.checkNavigation(viewer.PhysicalModel);
+
+	//Generating of Toolbar List
+	var it = physicalModel.iterator();
+	var curItem = null;
+	var pagelist = viewer.toolbar.pagelist = jQuery('<div id="pages" style="visibility: hidden; z-index: 80; position: absolute; left: -9999px;" class="hidden">');
+	var ul = jQuery("<ul>");
+	while (it.hasNext()) {
+		curItem = it.next();
+		if (curItem != null) {
+			var orderLabel='[' + curItem.getOrder() + ']' + ((curItem.getOrderlabel().length > 0) ? ' - ' + curItem.getOrderlabel():'');  
+			ul.append(jQuery('<li><a href="index.html#" id='+curItem.getID()+' class="'+orderLabel+'">'+orderLabel+'</a></li>'));
+		}
+	}
+	pagelist.append(ul);
+	toolbarCtrl.toolbarContainer.append(pagelist);
+
+	// if METS File is loaded after the drop-down-menu (in mainToolbar) its content needs to be updated
+	if (jQuery(viewer.viewerContainer).find('.navigateHandles .pageBox')) {
+		jQuery(toolbarCtrl.views['mainTbView']).trigger("new", {'elementName' : "pageBox", 'parentName' : "navigateHandles", 'view' : viewer.context.container.find('.navigateHandles .pageBox')});
+		// switch to current content
+		toolbarCtrl.updateDropDown(jQuery(pagelist.find("a")[physicalModel.getCurPos() - 1]).html());
+	}
+	//at other positions Opera doesn't get it correctly (although it still doesn't look that smooth as in other browsers) 
+	window.setTimeout(function() {
+    	toolbarCtrl.paint('mainTb');
+  }, 10);
+};

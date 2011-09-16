@@ -177,3 +177,21 @@ function log(msg){
     console.log(msg);
   }
 }
+
+var URL = { "location": window.location};
+/**
+ * @public
+ * @function
+ * @name		getParam
+ * @memberOf	URL
+ * @description	additional function, look for a parameter into search string an returns it
+ * @param		{string} param parameter whose value you want to have
+ * @return		{string} if param was found it's value, else an empty string
+ */
+URL.getParam = function(param) {
+	try {
+		return(this.location.search.match(new RegExp("[?|&]?" + param + "=([^&]*)"))[1]);
+	} catch (e) {
+		return "";
+	}
+};

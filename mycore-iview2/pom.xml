@@ -71,8 +71,6 @@
                 <!--XML Funktionen-->
                 <jsSourceFile>Utils.js</jsSourceFile>
                 <!--Allgemeine Util Funktionen-->
-                <jsSourceFile>Thumbnail.js</jsSourceFile>
-                <!--Hauptdatei-->
                 <!-- iview.init END-->
                 
                 <!-- menu -->

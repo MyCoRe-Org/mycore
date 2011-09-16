@@ -328,14 +328,12 @@ ToolbarController.prototype._checkNewModel = function(model) {
  * @memberOf	ToolbarController#
  * @description checks the navigation buttons (forward and backward) and
  *  deactivate them if there isn't a page in direction
- * @param		{integer} pNum defines the page number of the current shown page
+ * @param		{iview.METS.PhysicalModel} which allows it to check if the buttons are clickable or not
  */
-ToolbarController.prototype.checkNavigation = function(pNum) {
-	var tooHigh = (pNum >= this.getViewer().amountPages)? true : false;
-	var tooLow = (pNum <= 1)? true : false;
+ToolbarController.prototype.checkNavigation = function(model) {
+	var tooHigh = (model.getCurPos() >= model.getNumberOfPages())? true : false;
+	var tooLow = (model.getCurPos() <= 1)? true : false;
 	
-	var models = this.getViewer().toolbar.mgr.models;
-
 	this.perform("setActive", !tooLow, 'previewBack', 'backward');
 	this.perform("setActive", !tooHigh, 'previewForward', 'forward');
 	this.perform("setActive", !tooLow, 'navigateHandles', 'backward');

@@ -85,6 +85,7 @@
     constructor.prototype.loading = function ii_loading(startFile) {
 		var that = this;
 		
+		//TODO move it into .one("maximize.viewerContainer" as scrollbars a
 		iview.scrollbar.importScrollbars(this);
 		
 		PanoJS.USE_SLIDE = false;
@@ -175,7 +176,7 @@
 			jQuery.ajax({
 				url: metsDocURI,
 		  		success: function(response) {
-					that.gen.processMETS(response);
+					iview.METS.processMETS(that, response);
 				},
 		  		error: function(request, status, exception) {
 		  			if(typeof console != "undefined"){
@@ -187,7 +188,6 @@
 			// Resize-Events registrieren
 			jQuery(window).resize(function() { that.reinitializeGraphic()});
 			
-			that.gen.updateModuls();
 		}, startFile);
 	};
 	
@@ -267,9 +267,6 @@
 
 		this.roller = true;
 		viewerBean.positionTiles ({'x' : this.properties.useParam ? toFloat(URL.getParam("x")) : 0, 'y' : this.properties.useParam ? toFloat(URL.getParam("y")) : 0}, true);
-		
-		this.gen.updateModuls();
-		
 		this.roller = false;
 	};
 	
@@ -357,8 +354,6 @@
 		if (this.currentImage.zoomInfo.zoomScreen) {
 			viewerBean.pictureScreen(true);
 		}
-
-		this.gen.handleScrollbars("zoom");
 	};
 
 	/**

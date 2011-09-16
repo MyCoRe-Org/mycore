@@ -120,13 +120,16 @@ var createToolbars = function(viewer) {
 		
 		// holt alle bisherigen Models in den Controller und setzt diese entsprechend um
 		viewer.toolbar.ctrl.catchModels();
+		//TODO properties.initialized isn't any toolbar stuff? If so move it
 		viewer.properties.initialized = true;
+		
+		viewer.toolbar.ctrl.paint("mainTb");	
 	})
 	.bind("maximize.viewerContainer", function() {
   		viewer.toolbar.ctrl.addView(new ToolbarView("mainTbView", viewer.toolbar.ctrl.toolbarContainer, i18n));
 		viewer.toolbar.mgr.addModel(new StandardToolbarModelProvider("mainTb", viewer).getModel());
 		if (viewer.PhysicalModel) {
-			viewer.toolbar.ctrl.checkNavigation(viewer.PhysicalModel.getCurPos());
+			viewer.toolbar.ctrl.checkNavigation(viewer.PhysicalModel);
 		}
 		viewer.toolbar.ctrl.paint("mainTb");
 		if (viewer.currentImage.zoomInfo.zoomWidth) {
@@ -139,14 +142,22 @@ var createToolbars = function(viewer) {
 			jQuery(".mainTbView .zoomHandles .fitToScreen")[0].checked = true;
 			jQuery(".mainTbView .zoomHandles .fitToScreenLabel").addClass("ui-state-active");
 		}
-  })
-  	.bind("minimize.viewerContainer", function() {
-  		viewer.toolbar.mgr.destroyModel('mainTb');
-  })
-  	.bind("reinit.viewer", function() {
+	})
+	.bind("minimize.viewerContainer", function() {
+ 		viewer.toolbar.mgr.destroyModel('mainTb');
+	})
+	.bind("reinit.viewer", function() {
   		viewer.toolbar.ctrl.paint("mainTb");
-  })
-  	.bind("zoom.viewer", function() {
-  		viewer.toolbar.ctrl.checkZoom(viewer.viewerBean.zoomLevel);
-  })
+	})
+	.bind("zoom.viewer", function() {
+		viewer.toolbar.ctrl.checkZoom(viewer.viewerBean.zoomLevel);
+	});
+	jQuery(viewer.currentImage).bind(iview.CurrentImage.CHANGE_EVENT, function () {
+		if (!viewer.PhysicalModel) return;
+		viewer.toolbar.ctrl.checkNavigation(viewer.PhysicalModel);
+		viewer.toolbar.ctrl.paint("mainTb");
+		if (jQuery(viewer.viewerContainer).find('.navigateHandles .pageBox')) {
+			viewer.toolbar.ctrl.updateDropDown(jQuery(viewer.toolbar.pagelist.find("a")[viewer.PhysicalModel.getCurPos() - 1]).html());
+		}
+	});
 }

@@ -1,3 +1,4 @@
+//TODO Preload größe anhand der von den Kacheln bestimmen
 /**
  * @namespace	Package for Preload Image, contains default View and Controller
  * @memberOf 	iview
