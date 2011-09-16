@@ -649,9 +649,9 @@ iview.ThumbnailPanel.Controller = function(modelProvider, view, tileUrlProvider)
  * @memberOf	iview.ThumbnailPanel
  * @description	calls the corresponding functions to create the ThumbnailPanel
  * @param		{iviewInst} viewer in which the function shall operate
- * @param		{function} callback function which is called just before the function returns
+ * @param		{Deferred} def to set as resolved after the ThumbnailPanel was imported
  */
-iview.ThumbnailPanel.importThumbnailPanel = function(viewer, callback) {
+iview.ThumbnailPanel.importThumbnailPanel = function(viewer, def) {
 	var thumbnailPanel = new iview.ThumbnailPanel.Controller(viewer.PhysicalModelProvider, iview.ThumbnailPanel.View, viewer.viewerBean.tileUrlProvider);
 	thumbnailPanel.createView({'mainClass':'thumbnailPanel', 'parent': viewer.context.container, 'useScrollBar':true});
 	viewer.thumbnailPanel = jQuery.extend(viewer.thumbnailPanel, thumbnailPanel);
@@ -659,7 +659,8 @@ iview.ThumbnailPanel.importThumbnailPanel = function(viewer, callback) {
 		//close ThumbnailPanel when Viewer is going to minimized mode
 		thumbnailPanel.hideView();
 	})
-	callBack(callback);
+	viewer.thumbnailPanel.loaded = true;
+	def.resolve();
 }
 /**
  * @public
@@ -673,21 +674,19 @@ iview.ThumbnailPanel.importThumbnailPanel = function(viewer, callback) {
 iview.ThumbnailPanel.openThumbnailPanel = function(viewer, button) {
 	var that = this;
 	// check if ThumbnailPanel was created yet
-	if (typeof viewer.thumbnailPanel === 'undefined') {
+	if (viewer.thumbnailPanel.loaded) {
+		viewer.thumbnailPanel.toggleView();
+	} else {
 		button.setLoading(true);
 		setTimeout(function(){
-			that.importThumbnailPanel(viewer, function() {
-				// try again openThumbnailPanel (recursive call)
-				that.openThumbnailPanel(viewer, button);
+			that.importThumbnailPanel(viewer, new jQuery.Deferred().done(function() {
 				button.setLoading(false);
-				
 				viewer.thumbnailPanel.attach("click.thumbnailPanel", function(e, val) {
 					// type 1: click on ThumbnailPanel div
 					button.setSubtypeState(false);
 				});
-			});
-		}, 10);
-	} else {
-		viewer.thumbnailPanel.toggleView();
+				viewer.thumbnailPanel.toggleView();
+			}));
+		}, 100);
 	}
 }

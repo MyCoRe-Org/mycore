@@ -133,7 +133,7 @@ iview.Permalink.Controller.prototype = {
 	 * @description displays or hides the permalink view,
 	 *  the current state, given in this.active, defines the following action
 	 */
-	show: function() {
+	toggleView: function() {
 		for (var view in this.views) {
 			if (this.active) {
 				this.views[view].hide();	
@@ -185,15 +185,15 @@ iview.Permalink.Controller.prototype = {
  */
 iview.Permalink.openPermalink = function(viewer, button) {
 	var that = this;
-	if (viewer.permalink.loaded == false) {
+	if (viewer.permalink.loaded) {
+		viewer.permalink.toggleView();
+	} else {
 		button.setLoading(true);
 		setTimeout(function() {
-			that.importPermalink(viewer, function() {
-				that.openPermalink(viewer, button);
-				button.setLoading(false)});
-		}, 10);
-	} else {
-		viewer.permalink.show();
+			that.importPermalink(viewer, jQuery.Deferred().done(function() {
+				button.setLoading(false);
+				viewer.permalink.toggleView();
+		}))}, 10);
 	}
 }
 
@@ -204,15 +204,11 @@ iview.Permalink.openPermalink = function(viewer, button) {
  * @memberOf	iview.Permalink
  * @description	calls the corresponding functions to create the Permalink
  * @param		{iviewInst} viewer in which the function shall operate
- * @param		{function} callback function to call after the permalink was loaded successfully
+ * @param		{Deferred} def to set as resolved after the ThumbnailPanel was imported
  */
-iview.Permalink.importPermalink = function(viewer, callback) {
-	// Permalink
+iview.Permalink.importPermalink = function(viewer, def) {
 	viewer.permalink = jQuery.extend(viewer.permalink, new iview.Permalink.Controller(viewer));
-
 	viewer.permalink.addView(new iview.Permalink.View("permalinkView", viewer.viewerContainer));
-	if (typeof callback == "function") {
-		callback();
-	}
 	viewer.permalink.loaded = true;
+	def.resolve();
 };

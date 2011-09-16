@@ -352,11 +352,11 @@ iview.chapter.openChapter = function(viewer, button){
 	} else {
 		button.setLoading(true);
 		setTimeout(function() {
-			that.importChapter(viewer,function() {
-				// try again openChapter (recursive call)
-				that.openChapter(viewer, button);
-				button.setLoading(false);
-			})}, 10);
+			that.importChapter(viewer, new jQuery.Deferred().done(function() {
+			viewer.chapter.toggleView();
+			button.setLoading(false);
+		}));
+		}, 10);
 	}
 }
 
@@ -367,14 +367,14 @@ iview.chapter.openChapter = function(viewer, button){
  * @memberOf	iview.chapter
  * @description	calls the corresponding functions to create the chapter
  * @param		{iviewInst} viewer in which the function shall operate
- * @param		{function} callback function which is called just before the function returns
+ * @param		{Deferred} def to set as resolved after the ThumbnailPanel was imported
  */
-iview.chapter.importChapter = function(viewer, callback) {
+iview.chapter.importChapter = function(viewer, def) {
 	viewer.ChapterModelProvider = new iview.METS.ChapterModelProvider(viewer.metsDoc);
 	
 	viewer.chapter = jQuery.extend(viewer.chapter, new iview.chapter.Controller(viewer.ChapterModelProvider, viewer.PhysicalModelProvider));
 
 	viewer.chapter.createView(viewer.chapter.parent);
 	viewer.chapter.loaded = true;//signal that the chapter was loaded successfully
-	callBack(callback);
+	def.resolve();
 };
