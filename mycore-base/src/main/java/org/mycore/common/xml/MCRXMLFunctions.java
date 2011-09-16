@@ -240,6 +240,10 @@ public class MCRXMLFunctions {
      * 
      * @param urn
      *            the source urn
+     *            
+     * @param toAppend
+     *            the string to append to the namespace specific part
+     * 
      * @return the given urn but to the namespace specific part the value stored
      *         in the <code>toAppend</code> parameter is attached
      */
