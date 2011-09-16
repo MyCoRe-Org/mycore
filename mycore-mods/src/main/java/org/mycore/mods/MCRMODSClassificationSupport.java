@@ -57,7 +57,7 @@ public final class MCRMODSClassificationSupport {
     /**
      * xml:lang value of category or classification <label> for MODS @authority.
      */
-    public static final String LABEL_LANG_AUTHORITY = "x-authority";
+    public static final String LABEL_LANG_AUTHORITY = "x-auth";
 
     private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
