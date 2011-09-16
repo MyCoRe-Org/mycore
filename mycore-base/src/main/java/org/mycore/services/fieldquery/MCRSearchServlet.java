@@ -128,19 +128,23 @@ public class MCRSearchServlet extends MCRServlet {
                 continue;
             }
 
-            MCRFieldDef field = MCRFieldDef.getDef(name);
-            String defaultOperator = MCRFieldType.getDefaultOperator(field.getDataType());
-            String operator = getReqParameter(req, name + ".operator", defaultOperator);
-
-            MCRSetCondition parent = condition;
             String[] values = req.getParameterValues(name);
-            if (values.length > 1) {
+            MCRSetCondition parent = condition;
+
+            if ((values.length > 1) || name.contains(",")) {
                 // Multiple fields with same name, combine with OR
                 parent = new MCROrCondition();
                 condition.addChild(parent);
             }
-            for (String value : values) {
-                parent.addChild(new MCRQueryCondition(field, operator, value));
+
+            for (String fieldName : name.split(",")) {
+                MCRFieldDef field = MCRFieldDef.getDef(fieldName);
+                String defaultOperator = MCRFieldType.getDefaultOperator(field.getDataType());
+                String operator = getReqParameter(req, fieldName + ".operator", defaultOperator);
+
+                for (String value : values) {
+                    parent.addChild(new MCRQueryCondition(field, operator, value));
+                }
             }
         }
 
