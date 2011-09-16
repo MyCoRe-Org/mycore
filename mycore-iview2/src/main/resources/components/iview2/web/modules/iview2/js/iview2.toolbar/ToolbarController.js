@@ -50,46 +50,25 @@ ToolbarController.prototype.addView = function(view) {
 		.bind("press", function (e, args) {
 			if (args.parentName == "zoomHandles") {
 				if (args.elementName == "zoomIn") {
-					// FitToScreen - Button wieder reseten
-					// FitToWidth - Button wieder reseten
-					that.perform("setSubtypeState", false, args.parentName, "fitToWidth");
-					that.perform("setSubtypeState", false, args.parentName, "fitToScreen");
-	    			that.getViewer().viewerBean.zoomViewer(true);
-				} else if (args.elementName == "zoomOut") {
-					// FitToScreen - Button wieder reseten
-					// FitToWidth - Button wieder reseten
-					that.perform("setSubtypeState", false, args.parentName, "fitToWidth");
-					that.perform("setSubtypeState", false, args.parentName, "fitToScreen");
-	 
-	        			that.getViewer().viewerBean.zoomViewer(false);
+		    			that.getViewer().viewerBean.zoomViewer(true);
+					} else if (args.elementName == "zoomOut") {
+	        			that.getViewer().viewerBean.zoomViewer();
 	    			} else if (args.elementName == "fitToWidth") {
-					// FitToScreen - Button wieder reseten
-					that.perform("setSubtypeState", true, args.parentName, "fitToWidth");
-					that.perform("setSubtypeState", false, args.parentName, "fitToScreen");
-	
-	    			that.getViewer().viewerBean.pictureWidth();
-				} else if (args.elementName == "fitToScreen") {    				
-					// FitToWidth - Button wieder reseten
-					that.perform("setSubtypeState", false, args.parentName, "fitToWidth");
-					that.perform("setSubtypeState", true, args.parentName, "fitToScreen");
-	  
+		    			that.getViewer().viewerBean.pictureWidth();
+					} else if (args.elementName == "fitToScreen") {    				
 	    				that.getViewer().viewerBean.pictureScreen();
 	    			}
-	    		} else if (args.parentName == "overviewHandles") {
+    		} else if (args.parentName == "overviewHandles") {
+    			var button = new Object;
+    			button.setLoading = function(loading) {
+    				that.perform("setLoading", loading, args.parentName, args.elementName);
+    			}
+    			button.setSubtypeState = function(state) {
+    				that.perform("setSubtypeState", state, args.parentName, args.elementName);
+    			}
 				if (args.elementName == "openThumbnailPanel") {
-					var button = new Object;
-					button.setLoading = function(loading) {
-						that.perform("setLoading", loading, args.parentName, args.elementName);
-					}
-					button.setSubtypeState = function(state) {
-						that.perform("setSubtypeState", state, args.parentName, args.elementName);
-					}
 					iview.ThumbnailPanel.openThumbnailPanel(that.getViewer(), button);
 				} else if (args.elementName == "openChapter") {
-					var button = new Object;
-					button.setLoading = function(loading) {
-						that.perform("setLoading", loading, args.parentName, args.elementName);
-					}
 					iview.chapter.openChapter(that.getViewer(), button);
 				}
 			} else if (args.parentName == "navigateHandles" || args.parentName == "previewForward" || args.parentName == "previewBack") {
@@ -249,9 +228,15 @@ ToolbarController.prototype.catchModels = function() {
 					|| (args.elementName == "overviewHandles" && (args.buttonName == "openChapter" || args.buttonName == "openThumbnailPanel"))) {
 						// the view provides the TRUE functionality on its own (by click)
 						// the other case won't be used
-						if (args.state == false) {
-							jQuery(curView.toolbar).find("."+args.elementName+" ." + args.buttonName)[0].checked = false;
-							jQuery(curView.toolbar).find("."+args.elementName+" ." + args.buttonName + "Label").removeClass("ui-state-active");
+						if (typeof curView != "undefined") {
+							jQuery(curView.toolbar).find("."+args.elementName+" ." + args.buttonName)[0].checked = args.state;
+							console.log("class is", jQuery(curView.toolbar).find("."+args.elementName+" ." + args.buttonName + "Label").hasClass("ui-state-active"))
+							if (args.state) {
+								jQuery(curView.toolbar).find("."+args.elementName+" ." + args.buttonName + "Label").addClass("ui-state-active");
+							} else {
+								jQuery(curView.toolbar).find("."+args.elementName+" ." + args.buttonName + "Label").removeClass("ui-state-active");
+							}
+							console.log("class is now", jQuery(curView.toolbar).find("."+args.elementName+" ." + args.buttonName + "Label").hasClass("ui-state-active"))
 						}
 					}
 		    	break;

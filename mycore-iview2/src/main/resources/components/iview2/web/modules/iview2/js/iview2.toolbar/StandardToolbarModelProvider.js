@@ -37,8 +37,10 @@ StandardToolbarModelProvider.prototype = {
 		curButtonset = this.model.addElement(new ToolbarButtonsetModel("zoomHandles"));
 		curButtonset.addButton(new ToolbarButtonModel("zoomIn", {'type': 'buttonDefault'}, {'icons': {primary : 'iview2-icon iview2-icon-zoomIn'}}, "toolbar.zoomIn", true, false));
 		curButtonset.addButton(new ToolbarButtonModel("zoomOut", {'type': 'buttonDefault'}, {'icons': {primary : 'iview2-icon iview2-icon-zoomOut'}}, "toolbar.zoomOut", true));
-		curButtonset.addButton(new ToolbarButtonModel("fitToWidth", {'type': 'buttonCheck', 'state': false}, {'text': false, 'icons': {primary : 'iview2-icon iview2-icon-fitToWidth'}}, "toolbar.toWidth", true, false));
-		curButtonset.addButton(new ToolbarButtonModel("fitToScreen", {'type': 'buttonCheck', 'state': false}, {'icons': {primary : 'iview2-icon iview2-icon-fitToScreen'}}, "toolbar.toScreen", true, false));
+		var fitToWidth = new ToolbarButtonModel("fitToWidth", {'type': 'buttonCheck', 'state': false}, {'text': false, 'icons': {primary : 'iview2-icon iview2-icon-fitToWidth'}}, "toolbar.toWidth", true, false);
+		var fitToScreen = new ToolbarButtonModel("fitToScreen", {'type': 'buttonCheck', 'state': false}, {'icons': {primary : 'iview2-icon iview2-icon-fitToScreen'}}, "toolbar.toScreen", true, false);
+		curButtonset.addButton(fitToWidth);
+		curButtonset.addButton(fitToScreen);
 		
 		// overviewHandles
 		curButtonset = this.model.addElement(new ToolbarButtonsetModel("overviewHandles"));
@@ -68,6 +70,16 @@ StandardToolbarModelProvider.prototype = {
 		// closeHandles
 		curButtonset = this.model.addElement(new ToolbarButtonsetModel("closeHandles"));
 		curButtonset.addButton(new ToolbarButtonModel("close", {'type': 'buttonDefault'}, {'icons': {primary : 'iview2-icon iview2-icon-close'}}, "toolbar.normalView", true, false));
+	
+		//change the displayed state of the buttons
+		jQuery(iviewRef.viewerContainer).bind("zoom.viewer maximize.viewerContainer reinit.viewer", function() {
+			//TODO normally this should work without delay, lets see if further code changes allow it
+			//without delay the states arent set correctly
+			setTimeout(function() {
+				fitToWidth.setSubtypeState(iviewRef.currentImage.zoomInfo.zoomWidth);
+				fitToScreen.setSubtypeState(iviewRef.currentImage.zoomInfo.zoomScreen);
+			},10);
+		});
 	},
 		
 	/**
