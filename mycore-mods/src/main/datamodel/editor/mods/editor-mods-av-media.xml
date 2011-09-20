@@ -69,7 +69,7 @@
     <cell row="62" col="3" anchor="NORTHWEST" ref="mods.relatedItem.help" />
     <!-- Quelle END -->
 
-    <cell row="100" col="1" colspan="3" anchor="NORTHEAST" ref="mods.noteLocationCorp"/>
+    <cell row="100" col="1" colspan="3" anchor="NORTHEAST" ref="mods.noteLocationCorp" var="metadata/def.modsContainer/modsContainer/mods:mods" />
 
     <cell col="1" colspan="3" row="150" anchor="NORTHEAST" style="padding-top:20px;">
       <submitButton width="100px" i18n="common.button.save" />

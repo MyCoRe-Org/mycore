@@ -79,7 +79,7 @@
     <!-- Stichworte END -->
   </panel></cell>
 
-    <cell row="170" col="1" colspan="3" anchor="NORTHEAST" ref="mods.noteLocationCorp" var="metadata/def.modsContainer/modsContainer/mods:mods"/>
+    <cell row="170" col="1" colspan="3" anchor="NORTHEAST" ref="mods.noteLocationCorp" var="metadata/def.modsContainer/modsContainer/mods:mods" />
 
     <!-- save cancel buttons -->
     <cell col="1" colspan="3" row="250" anchor="EAST" style="padding-top:20px;">

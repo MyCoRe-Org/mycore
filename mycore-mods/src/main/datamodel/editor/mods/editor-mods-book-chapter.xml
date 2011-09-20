@@ -78,7 +78,7 @@
     <!-- Stichworte END -->
   </panel></cell>
 
-    <cell row="260" col="1" colspan="3" anchor="NORTHEAST" ref="mods.noteLocationCorp"/>
+    <cell row="260" col="1" colspan="3" anchor="NORTHEAST" ref="mods.noteLocationCorp" var="metadata/def.modsContainer/modsContainer/mods:mods" />
 
     <!-- save/cancel buttons -->
     <cell col="1" colspan="3" row="300" anchor="EAST" style="padding-top:20px;">

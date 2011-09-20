@@ -6,11 +6,11 @@
   <title step="editor" type="mods" xml:lang="de">MODS-Dokument bearbeiten</title>
   <title step="editor" type="mods" xml:lang="en">Edit MODS document</title>
   
-  <title step="author" type="mods" layout="thesis" xml:lang="de">Dissertation erstellen</title>
+  <title step="author" type="mods" layout="thesis" xml:lang="de">Hochschulschrift erstellen</title>
   <title step="author" type="mods" layout="thesis" xml:lang="en">Create Thesis</title>
-  <title step="commit" type="mods" layout="thesis" xml:lang="de">Dissertation bearbeiten</title>
+  <title step="commit" type="mods" layout="thesis" xml:lang="de">Hochschulschrift bearbeiten</title>
   <title step="commit" type="mods" layout="thesis" xml:lang="en">Edit Thesis</title>
-  <title step="editor" type="mods" layout="thesis" xml:lang="de">Dissertation bearbeiten</title>
+  <title step="editor" type="mods" layout="thesis" xml:lang="de">Hochschulschrift bearbeiten</title>
   <title step="editor" type="mods" layout="thesis" xml:lang="en">Edit Thesis</title>
   
   <title step="author" type="mods" layout="report" xml:lang="de">Report erstellen</title>
