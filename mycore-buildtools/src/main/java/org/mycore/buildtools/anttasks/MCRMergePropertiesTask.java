@@ -84,7 +84,7 @@ public class MCRMergePropertiesTask extends Task {
 			
 			baseProps.putAll(deltaProps);
 			
-			OutputStreamWriter propOut= new OutputStreamWriter(new FileOutputStream(base));
+			OutputStreamWriter propOut= new OutputStreamWriter(new FileOutputStream(base), "ISO-8859-1");
 			OutputSortedProperties.output(baseProps, propOut, "Merged Properties File");
 			propOut.close();
 		} catch (Exception e) {
