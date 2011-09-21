@@ -25,12 +25,10 @@ package org.mycore.buildtools.anttasks;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.util.Properties;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
-import org.mycore.buildtools.common.OutputSortedProperties;
 
 /**
  * Ant task, that can be used to merges one properties file into another.
@@ -84,9 +82,7 @@ public class MCRMergePropertiesTask extends Task {
 			
 			baseProps.putAll(deltaProps);
 			
-			OutputStreamWriter propOut= new OutputStreamWriter(new FileOutputStream(base), "ISO-8859-1");
-			OutputSortedProperties.output(baseProps, propOut, "Merged Properties File");
-			propOut.close();
+			baseProps.store(new FileOutputStream(base), "Merged Properties File");
 		} catch (Exception e) {
 			throw new BuildException("Something went wrong at reading or writing a properties file",e);
 		}
