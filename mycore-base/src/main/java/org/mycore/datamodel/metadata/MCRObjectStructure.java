@@ -132,18 +132,16 @@ public class MCRObjectStructure {
     public final void setParent(MCRMetaLinkID in_parent) {
         parent = in_parent;
     }
-    
+
     public final void setParent(MCRObjectID parentID) {
         setParent(parentID.toString());
     }
-    
+
     public final void setParent(String parentID) {
         parent = new MCRMetaLinkID();
         parent.setSubTag("parent");
         parent.setReference(parentID, null, null);
     }
-    
-    
 
     /**
      * The method appends a child ID to the child link list if and only if it is
@@ -309,6 +307,9 @@ public class MCRObjectStructure {
      * @deprecated use {@link #getDerivates()} instead
      */
     public final MCRMetaLinkID getDerivate(int index) throws IndexOutOfBoundsException {
+        if (index > getDerivates().size()) {
+            return null;
+        }
         return getDerivates().get(index);
     }
 
