@@ -25,10 +25,10 @@ package org.mycore.buildtools.anttasks;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.util.Properties;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
+import org.mycore.buildtools.common.SortedProperties;
 
 /**
  * Ant task, that can be used to merges one properties file into another.
@@ -70,12 +70,12 @@ public class MCRMergePropertiesTask extends Task {
 		}
 
 		try {
-			Properties baseProps = new Properties();
+		    SortedProperties baseProps = new SortedProperties();
 			InputStream isBase =new FileInputStream(base); 
 			baseProps.load(isBase);
 			isBase.close();
 			
-			Properties deltaProps = new Properties();
+			SortedProperties deltaProps = new SortedProperties();
 			InputStream isDelta = new FileInputStream(delta);
 			deltaProps.load(isDelta);
 			isDelta.close();
