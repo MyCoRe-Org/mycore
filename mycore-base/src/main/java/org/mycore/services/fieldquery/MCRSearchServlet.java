@@ -79,7 +79,6 @@ public class MCRSearchServlet extends MCRServlet {
         MCRConfiguration config = MCRConfiguration.instance();
         String prefix = "MCR.SearchServlet.";
         defaultSearchField = config.getString(prefix + "DefaultSearchField", "allMeta");
-        LOGGER.info(defaultSearchField);
     }
 
     /**
