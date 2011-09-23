@@ -53,20 +53,17 @@ import org.mycore.parsers.bool.MCRSetCondition;
 
 /**
  * Executes queries and presents result pages. Queries can be submitted in four
- * ways, examples below:
- * 
- * 1. MCRSearchServlet?search=foo
- *   Searches for "foo" in default field, using default operator
- * 2. MCRSearchServlet?query=title contains Regenbogen
- *   Search using query condition given as text
- * 3. MCRSearchServlet?title=Regenbogen&title.operator=contains&author.sortField.1=ascending
- *   Search using name=value pairs
- * 4. MCRSearchServlet invocation from a search mask using editor XML input 
+ * ways, examples below: 1. MCRSearchServlet?search=foo Searches for "foo" in
+ * default field, using default operator 2. MCRSearchServlet?query=title
+ * contains Regenbogen Search using query condition given as text 3.
+ * MCRSearchServlet
+ * ?title=Regenbogen&title.operator=contains&author.sortField.1=ascending Search
+ * using name=value pairs 4. MCRSearchServlet invocation from a search mask
+ * using editor XML input
  * 
  * @author Frank Lützenkirchen
  * @author Harald Richter
  * @author A. Schaar
- * 
  */
 public class MCRSearchServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
@@ -82,16 +79,25 @@ public class MCRSearchServlet extends MCRServlet {
         MCRConfiguration config = MCRConfiguration.instance();
         String prefix = "MCR.SearchServlet.";
         defaultSearchField = config.getString(prefix + "DefaultSearchField", "allMeta");
+        LOGGER.info(defaultSearchField);
     }
 
     /**
-     * Search in default search field specified by MCR.SearchServlet.DefaultSearchField
+     * Search in default search field specified by
+     * MCR.SearchServlet.DefaultSearchField
      */
     private MCRQuery buildDefaultQuery(String search) {
-        MCRFieldDef field = MCRFieldDef.getDef(defaultSearchField);
-        String operator = MCRFieldType.getDefaultOperator(field.getDataType());
-        MCRCondition condition = new MCRQueryCondition(field, operator, search);
-        return new MCRQuery(MCRQueryParser.normalizeCondition(condition));
+        String[] fields = defaultSearchField.split(" *, *");
+        MCROrCondition queryCondition = new MCROrCondition();
+
+        for (String fDef : fields) {
+            MCRFieldDef field = MCRFieldDef.getDef(fDef);
+            String operator = MCRFieldType.getDefaultOperator(field.getDataType());
+            MCRCondition condition = new MCRQueryCondition(field, operator, search);
+            queryCondition.addChild(condition);
+        }
+
+        return new MCRQuery(MCRQueryParser.normalizeCondition(queryCondition));
     }
 
     /**
@@ -152,8 +158,8 @@ public class MCRSearchServlet extends MCRServlet {
     }
 
     /**
-     * Rename elements conditionN to condition. 
-     * Transform condition with multiple child values to OR-condition.
+     * Rename elements conditionN to condition. Transform condition with
+     * multiple child values to OR-condition.
      */
     private void renameElements(Element element) {
         if (element.getName().startsWith("condition")) {
@@ -417,11 +423,8 @@ public class MCRSearchServlet extends MCRServlet {
         sendRedirect(request, response, qd, input);
     }
 
-    /**      
-     * Redirect browser to results page     
-     *      
-     *   
-     * see its overwritten in jspdocportal     
+    /**
+     * Redirect browser to results page see its overwritten in jspdocportal
      */
     protected void sendRedirect(HttpServletRequest req, HttpServletResponse res, MCRCachedQueryData qd, Document query) throws IOException {
 
@@ -460,10 +463,8 @@ public class MCRSearchServlet extends MCRServlet {
     }
 
     /**
-      * Forwards the document to the output
-      * 
-      * see its overwritten in jspdocportal
-      */
+     * Forwards the document to the output see its overwritten in jspdocportal
+     */
     protected void sendToLayout(HttpServletRequest req, HttpServletResponse res, Document jdom) throws IOException {
         getLayoutService().doLayout(req, res, jdom);
     }
