@@ -19,131 +19,257 @@
  * Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307 USA
  */
-
 package org.mycore.oai;
 
-import java.util.Calendar;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Vector;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
-import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.xml.MCRURIResolver;
-import org.mycore.parsers.bool.MCRCondition;
+import org.mycore.oai.pmh.BadResumptionTokenException;
+import org.mycore.oai.pmh.CannotDisseminateFormatException;
+import org.mycore.oai.pmh.Header;
+import org.mycore.oai.pmh.IdDoesNotExistException;
+import org.mycore.oai.pmh.Identify;
+import org.mycore.oai.pmh.MetadataFormat;
+import org.mycore.oai.pmh.NoMetadataFormatsException;
+import org.mycore.oai.pmh.NoRecordsMatchException;
+import org.mycore.oai.pmh.NoSetHierarchyException;
+import org.mycore.oai.pmh.OAIDataList;
+import org.mycore.oai.pmh.Record;
+import org.mycore.oai.pmh.Set;
+import org.mycore.oai.pmh.dataprovider.OAIAdapter;
 
 /**
- * This class encapsulates application specific functionality for the
- * implementation of an OAI data provider.
+ * Default MyCoRe {@link OAIAdapter} implementation.
  * 
- * @author Frank L\u00fctzenkirchen
- * @author Robert Stephan
+ * @author Matthias Eichner
  */
-public abstract class MCROAIAdapter {
-    protected final static Logger LOGGER = Logger.getLogger(MCRVerbHandler.class);
+public class MCROAIAdapter implements OAIAdapter {
 
-    protected String recordUriPattern;
+    protected final static Logger LOGGER = Logger.getLogger(MCROAIAdapter.class);
 
-    protected String headerUriPattern;
-    
-    protected String prefix;
+    public final static String PREFIX = "MCR.OAIDataProvider.";
 
-    private String recordPolicy;
+    protected MCROAIIdentify identify;
 
-    /** The earliest datestamp supported by this data provider instance. */
-    protected static String EARLIEST_DATESTAMP;
+    protected String configPrefix;
 
-    void init(String prefix) {
-        MCRConfiguration config = MCRConfiguration.instance();
-        this.prefix = prefix;
-        recordUriPattern = MCRConfiguration.instance().getString(prefix + "Adapter.RecordURIPattern");
-        headerUriPattern = MCRConfiguration.instance().getString(prefix + "Adapter.HeaderURIPattern");
-        EARLIEST_DATESTAMP = config.getString(prefix + "Adapter.EarliestDatestamp", "1970-01-01");
-    }
+    protected MCRConfiguration config;
 
-    /** Returns the list of supported metadata formats */
-    public List<MCRMetadataFormat> listMetadataFormats(String id, List<MCRMetadataFormat> defaults) {
-        return defaults;
-    }
+    protected MCROAISearchManager searchManager;
 
-    public Element getRecord(String id, MCRMetadataFormat format) {
-        String uri = formatURI(recordUriPattern, id, format);
-        return getURI(uri);
-    }
+    protected MCROAIObjectManager objectManager;
 
-    public Element getHeader(String id, MCRMetadataFormat format) {
-        String uri = formatURI(headerUriPattern, id, format);
-        return getURI(uri);
-    }
-
-    protected Element getURI(String uri) {
-        LOGGER.debug("get " + uri);
-        return (Element) (MCRURIResolver.instance().resolve(uri).detach());
-    }
-
-    public String formatURI(String uri, String id, MCRMetadataFormat format) {
-        return uri.replace("{id}", id).replace("{format}", format.getPrefix());
-    }
+    protected MCROAISetManager setManager;
 
     /**
-     * Returns the earliest datestamp supported by this data provider instance.
-     * That is the guaranteed lower limit of all datestamps recording changes,
-     * modifications, or deletions in the repository. A repository must not use
-     * datestamps lower than the one specified by the content of the
-     * earliestDatestamp element. Configuration is done using a property, for
-     * example MCR.OAIDataProvider.OAI.EarliestDatestamp=1970-01-01
-     */
-    public String getEarliestDatestamp() {
-        return EARLIEST_DATESTAMP;
-    }
-
-    /**
-     * Sublasses should override this method. This implementation returns an
-     * empty list.
+     * Initialize the adapter.
      * 
-     * @param from
-     * @param until
-     * @return returns the identifiers of the deleted items matching the given
-     *         date boundaries
+     * @param baseURL
+     *            baseURL of the adapter e.g. http://localhost:8291/oai2
+     * @param oaiConfiguration
+     *            specifies the OAI-PMH configuration
      */
-    List<String> getDeletedObjectsIdentifiers(String from, String until) {
-        return new Vector<String>();
+    public void init(String baseURL, String oaiConfiguration) {
+        // base stuff
+        this.configPrefix = PREFIX + oaiConfiguration + ".";
+        this.config = MCRConfiguration.instance();
+        // identify
+        this.identify = new MCROAIIdentify(baseURL, getConfigPrefix());
     }
 
-    public abstract MCRCondition buildSetCondition(String setSpec);
-
-    public abstract boolean exists(String identifier);
-
-    /**
-     * Returns the deleted record policy
-     */
-    protected String getDeletedRecordPolicy() {
-        return this.recordPolicy;
+    public MCROAISetManager getSetManager() {
+        if (this.setManager == null) {
+            this.setManager = new MCROAISetManager(this);
+        }
+        return this.setManager;
     }
 
-    /**
-     * Sets the deleted record policy
-     * 
-     * @param policy
-     *            policy to set
-     */
-    public void setDeletedRecordPolicy(String policy) {
-        this.recordPolicy = policy;
+    public MCROAIObjectManager getObjectManager() {
+        if (this.objectManager == null) {
+            this.objectManager = new MCROAIObjectManager(this);
+        }
+        return this.objectManager;
     }
 
-    /**
-     * Sets the time of the until date to 23:59:59
-     * 
-     * @param until
-     *            the until date
-     */
-    protected Date modifyUntilDate(Date until) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(until);
-        calendar.set(Calendar.HOUR_OF_DAY, 23);
-        calendar.set(Calendar.MINUTE, 59);
-        calendar.set(Calendar.SECOND, 59);
-        return calendar.getTime();
+    public MCROAISearchManager getSearchManager() {
+        if (this.searchManager == null) {
+            this.searchManager = new MCROAISearchManager(this);
+        }
+        return this.searchManager;
     }
+
+    public String getConfigPrefix() {
+        return this.configPrefix;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.mycore.oai.pmh.dataprovider.OAIAdapter#getIdentify()
+     */
+    @Override
+    public Identify getIdentify() {
+        return this.identify;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.mycore.oai.pmh.dataprovider.OAIAdapter#getSets()
+     */
+    @Override
+    public OAIDataList<Set> getSets() throws NoSetHierarchyException {
+        MCROAISetManager setManager = getSetManager();
+        OAIDataList<Set> setList = setManager.get();
+        if (setList.isEmpty()) {
+            throw new NoSetHierarchyException();
+        }
+        return setList;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.mycore.oai.pmh.dataprovider.OAIAdapter#getSets(java.lang.String)
+     */
+    @Override
+    public OAIDataList<Set> getSets(String resumptionToken) throws NoSetHierarchyException, BadResumptionTokenException {
+        MCROAISetManager setManager = getSetManager();
+        OAIDataList<Set> setList = setManager.get();
+        if (setList.isEmpty()) {
+            throw new NoSetHierarchyException();
+        }
+        // TODO: this is like to old oai implementation but actually wrong with a large amount of sets
+        throw new BadResumptionTokenException();
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.mycore.oai.pmh.dataprovider.OAIAdapter#getSet(java.lang.String)
+     */
+    @Override
+    public Set getSet(String setSpec) throws NoSetHierarchyException, NoRecordsMatchException {
+        MCROAISetManager setManager = getSetManager();
+        OAIDataList<Set> setList = setManager.get();
+        if (setList.isEmpty()) {
+            throw new NoSetHierarchyException();
+        }
+        Set set = MCROAISetManager.get(setSpec, setList);
+        if (set == null) {
+            throw new NoRecordsMatchException();
+        }
+        return set;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.mycore.oai.pmh.dataprovider.OAIAdapter#getMetadataFormats()
+     */
+    @Override
+    public List<MetadataFormat> getMetadataFormats() {
+        return new ArrayList<MetadataFormat>(getMetadataFormatMap().values());
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.mycore.oai.pmh.dataprovider.OAIAdapter#getMetadataFormat(java.lang.String)
+     */
+    @Override
+    public MetadataFormat getMetadataFormat(String prefix) throws CannotDisseminateFormatException {
+        MetadataFormat format = getMetadataFormatMap().get(prefix);
+        if (format == null) {
+            throw new CannotDisseminateFormatException();
+        }
+        return format;
+    }
+
+    protected Map<String, MetadataFormat> getMetadataFormatMap() {
+        Map<String, MetadataFormat> metdataFormatMap = new HashMap<String, MetadataFormat>();
+        String formats = this.config.getString(getConfigPrefix() + "MetadataFormats", "");
+        StringTokenizer st = new StringTokenizer(formats, ", ");
+        while (st.hasMoreTokens()) {
+            String format = st.nextToken();
+            String namespaceURI = this.config.getString(PREFIX + "MetadataFormat." + format + ".Namespace");
+            String schema = this.config.getString(PREFIX + "MetadataFormat." + format + ".Schema");
+            metdataFormatMap.put(format, new MetadataFormat(format, namespaceURI, schema));
+        }
+        return metdataFormatMap;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.mycore.oai.pmh.dataprovider.OAIAdapter#getMetadataFormats(java.lang.String)
+     */
+    @Override
+    public List<MetadataFormat> getMetadataFormats(String identifier) throws IdDoesNotExistException, NoMetadataFormatsException {
+        if (!getObjectManager().exists(identifier)) {
+            throw new IdDoesNotExistException(identifier);
+        }
+        return getMetadataFormats();
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.mycore.oai.pmh.dataprovider.OAIAdapter#getRecord(java.lang.String, org.mycore.oai.pmh.MetadataFormat)
+     */
+    @Override
+    public Record getRecord(String identifier, MetadataFormat format) throws CannotDisseminateFormatException, IdDoesNotExistException {
+        MCROAIObjectManager objectManager = getObjectManager();
+        if (!objectManager.exists(identifier)) {
+            // TODO check deleted object
+            throw new IdDoesNotExistException(identifier);
+        }
+        String mcrId = MCROAIObjectManager.getMyCoReId(identifier);
+        return objectManager.getRecord(mcrId, format);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.mycore.oai.pmh.dataprovider.OAIAdapter#getRecords(java.lang.String)
+     */
+    @Override
+    public OAIDataList<Record> getRecords(String resumptionToken) throws BadResumptionTokenException {
+        MCROAISearchManager searchManager = getSearchManager();
+        OAIDataList<Record> recordList = searchManager.searchRecord(resumptionToken);
+        if (recordList.isEmpty()) {
+            throw new BadResumptionTokenException(resumptionToken);
+        }
+        return recordList;
+    }
+
+    @Override
+    public OAIDataList<Record> getRecords(MetadataFormat format, Set set, Date from, Date until) throws CannotDisseminateFormatException,
+            NoSetHierarchyException, NoRecordsMatchException {
+        MCROAISearchManager searchManager = getSearchManager();
+        OAIDataList<Record> recordList = searchManager.searchRecord(format, set, from, until);
+        if (recordList.isEmpty()) {
+            throw new NoRecordsMatchException();
+        }
+        return recordList;
+    }
+
+    @Override
+    public OAIDataList<Header> getHeaders(String resumptionToken) throws BadResumptionTokenException {
+        MCROAISearchManager searchManager = getSearchManager();
+        OAIDataList<Header> headerList = searchManager.searchHeader(resumptionToken);
+        if (headerList.isEmpty()) {
+            throw new BadResumptionTokenException(resumptionToken);
+        }
+        return headerList;
+    }
+
+    @Override
+    public OAIDataList<Header> getHeaders(MetadataFormat format, Set set, Date from, Date until) throws CannotDisseminateFormatException,
+            NoSetHierarchyException, NoRecordsMatchException {
+        MCROAISearchManager searchManager = getSearchManager();
+        OAIDataList<Header> headerList = searchManager.searchHeader(format, set, from, until);
+        if (headerList.isEmpty()) {
+            throw new NoRecordsMatchException();
+        }
+        return headerList;
+    }
+
 }

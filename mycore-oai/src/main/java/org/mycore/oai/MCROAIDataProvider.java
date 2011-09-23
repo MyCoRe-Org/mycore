@@ -19,93 +19,93 @@
  * Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307 USA
  */
-
 package org.mycore.oai;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.StringTokenizer;
+import java.util.Map;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.ProcessingInstruction;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.oai.pmh.dataprovider.OAIAdapter;
+import org.mycore.oai.pmh.dataprovider.OAIRequest;
+import org.mycore.oai.pmh.dataprovider.OAIResponse;
+import org.mycore.oai.pmh.dataprovider.OAIXMLProvider;
+import org.mycore.oai.pmh.dataprovider.jaxb.JAXBOAIProvider;
 
 /**
  * Implements an OAI-PMH 2.0 Data Provider as a servlet.
  * 
- * @author Frank L\u00fctzenkirchen
+ * @author Matthias Eichner
  */
 public class MCROAIDataProvider extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
     protected final static Logger LOGGER = Logger.getLogger(MCROAIDataProvider.class);
 
-    private MCROAIAdapter adapter;
+    /**
+     * Map of all MyCoRe oai adapter.
+     */
+    private static Map<String, MCROAIAdapter> mcrOAIAdapterMap;
 
     private String myBaseURL;
 
-    private String prefix;
+    static {
+        mcrOAIAdapterMap = new HashMap<String, MCROAIAdapter>();
+    }
 
-    private String repositoryName;
-
-    private String repositoryIdentifier;
-
-    private String adminEmail;
-
-    /** the sample id */
-    private String recordSampleID;
-
-    /**
-     * List of metadata formats supported by this data provider instance.
-     */
-    private List<MCRMetadataFormat> metadataFormats = new ArrayList<MCRMetadataFormat>();
-
-    @SuppressWarnings("unchecked")
+    @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
         HttpServletRequest request = job.getRequest();
-        if (myBaseURL == null)
-            myBaseURL = getBaseURL() + request.getServletPath().substring(1);
-
+        // get base url
+        if (this.myBaseURL == null) {
+            this.myBaseURL = getBaseURL() + request.getServletPath().substring(1);
+        }
         logRequest(request);
-
-        String[] verb = request.getParameterValues("verb");
-        MCRVerbHandler handler = null;
-
-        if ((verb == null) || (verb.length == 0))
-            handler = new MCRBadVerbHandler(this, "Missing required argument 'verb'");
-        else if (verb.length > 1)
-            handler = new MCRBadVerbHandler(this, "Multiple 'verb' arguments in request");
-        else if (verb[0].trim().length() == 0)
-            handler = new MCRBadVerbHandler(this, "Required argument 'verb' is empty");
-        else if (MCRIdentifyHandler.VERB.equals(verb[0]))
-            handler = new MCRIdentifyHandler(this);
-        else if (MCRGetRecordHandler.VERB.equals(verb[0]))
-            handler = new MCRGetRecordHandler(this);
-        else if (MCRListMetadataFormatsHandler.VERB.equals(verb[0]))
-            handler = new MCRListMetadataFormatsHandler(this);
-        else if (MCRListSetsHandler.VERB.equals(verb[0]))
-            handler = new MCRListSetsHandler(this);
-        else if (MCRListRecordsHandler.VERB.equals(verb[0]))
-            handler = new MCRListRecordsHandler(this);
-        else if (MCRListIdentifiersHandler.VERB.equals(verb[0]))
-            handler = new MCRListIdentifiersHandler(this);
-        else
-            handler = new MCRBadVerbHandler(this, "Bad verb: " + verb[0]);
-
-        Document response = handler.handle(request.getParameterMap());
-
+        // create new oai request
+        OAIRequest oaiRequest = new OAIRequest(fixParameterMap(request.getParameterMap()));
+        // create new oai provider
+        OAIXMLProvider oaiProvider = new JAXBOAIProvider(getOAIAdapter());
+        // handle request
+        OAIResponse oaiResponse = oaiProvider.handleRequest(oaiRequest);
+        // build response
+        Element xmlRespone = oaiResponse.toXML();
+        // fire
         job.getResponse().setContentType("text/xml; charset=UTF-8");
         XMLOutputter xout = new XMLOutputter();
         xout.setFormat(Format.getPrettyFormat().setEncoding("UTF-8"));
-        xout.output(response, job.getResponse().getOutputStream());
+        xout.output(addXSLStyle(new Document(xmlRespone)), job.getResponse().getOutputStream());
+    }
+
+    /**
+     * Converts the servlet parameter map to deal with oaipmh api.
+     * 
+     * @param pMap servlet parameter map
+     * @return parameter map with generics and list
+     */
+    @SuppressWarnings("rawtypes")
+    private Map<String, List<String>> fixParameterMap(Map pMap) {
+        Map<String, List<String>> rMap = new HashMap<String, List<String>>();
+        for (Object o : pMap.entrySet()) {
+            Map.Entry entry = (Map.Entry) o;
+            List<String> valueList = new ArrayList<String>();
+            for (String value : (String[]) entry.getValue()) {
+                valueList.add(value);
+            }
+            rMap.put((String) entry.getKey(), valueList);
+        }
+        return rMap;
     }
 
     /**
@@ -122,85 +122,38 @@ public class MCROAIDataProvider extends MCRServlet {
         LOGGER.info(log.toString());
     }
 
-    public void init() throws ServletException {
-        super.init();
-        MCRConfiguration config = MCRConfiguration.instance();
-        prefix = "MCR.OAIDataProvider." + getServletName() + ".";
-        adapter = (MCROAIAdapter) (config.getInstanceOf(prefix + "Adapter", MCROAIAdapterMyCoRe.class.getName()));
-        adapter.init(prefix);
-
-        repositoryName = config.getString(prefix + "RepositoryName");
-        repositoryIdentifier = config.getString(prefix + "RepositoryIdentifier");
-        adminEmail = config.getString(prefix + "AdminEmail", config.getString("MCR.Mail.Address"));
-        recordSampleID = config.getString(prefix + "RecordSampleID");
-        adapter.setDeletedRecordPolicy(config.getString(prefix + "DeletedRecord", MCROAIConstants.DELETED_RECORD_POLICY_TRANSIENT));
-
-        String formats = config.getString(prefix + "MetadataFormats");
-        StringTokenizer st = new StringTokenizer(formats, ", ");
-        while (st.hasMoreTokens()) {
-            getMetadataFormats().add(MCRMetadataFormat.getFormat(st.nextToken()));
+    /**
+     * Add link to XSL stylesheet for displaying OAI response in web browser.
+     */
+    private Document addXSLStyle(Document doc) {
+        String styleSheet = MCROAIAdapter.PREFIX + getServletName() + ".ResponseStylesheet";
+        String xsl = MCRConfiguration.instance().getString(styleSheet, "oai/oai2.xsl");
+        if (!xsl.isEmpty()) {
+            Map<String, String> pairs = new HashMap<String, String>();
+            pairs.put("type", "text/xsl");
+            pairs.put("href", MCRServlet.getBaseURL() + xsl);
+            doc.addContent(0, new ProcessingInstruction("xml-stylesheet", pairs));
         }
+        return doc;
     }
 
-    /** Returns the underlying {@link MCROAIAdapter} */
-    MCROAIAdapter getAdapter() {
-        return adapter;
+    private OAIAdapter getOAIAdapter() {
+        String oaiAdapterKey = getServletName();
+        MCROAIAdapter oaiAdapter = mcrOAIAdapterMap.get(oaiAdapterKey);
+        if (oaiAdapter == null) {
+            synchronized (this) {
+                // double check because of synchronize block
+                oaiAdapter = mcrOAIAdapterMap.get(oaiAdapterKey);
+                if (oaiAdapter == null) {
+                    MCRConfiguration config = MCRConfiguration.instance();
+                    String adapter = MCROAIAdapter.PREFIX + oaiAdapterKey + ".Adapter";
+                    oaiAdapter = (MCROAIAdapter) (config.getInstanceOf(adapter, MCROAIAdapter.class.getName()));
+                    oaiAdapter.init(this.myBaseURL, oaiAdapterKey);
+                    mcrOAIAdapterMap.put(oaiAdapterKey, oaiAdapter);
+                }
+            }
+        }
+        return oaiAdapter;
     }
 
-    /**
-     * Returns the base URL of this data provider instance
-     */
-    String getOAIBaseURL() {
-        return myBaseURL;
-    }
-
-    String getPrefix() {
-        return prefix;
-    }
-
-    /** Returns the name of the repository */
-    public String getRepositoryName() {
-        return repositoryName;
-    }
-
-    /** Returns the id of the oai repository */
-    public String getRepositoryIdentifier() {
-        return repositoryIdentifier;
-    }
-
-    /** Returns a samle record id */
-    public String getRecordSampleID() {
-        return recordSampleID;
-    }
-
-    /**
-     * Returns the policy for deleted items
-     * 
-     * @return one of no, transient or persistent
-     */
-    public String getDeletedRecordPolicy() {
-        return getAdapter().getDeletedRecordPolicy();
-    }
-
-    /** Returns the admin email adress */
-    public String getAdminEmail() {
-        return adminEmail;
-    }
-
-    /**
-     * Returns the metadata formats supported by this data provider instance.
-     * For each instance, a configuration property lists the prefixes of all
-     * supported formats, for example
-     * MCR.OAIDataProvider.OAI.MetadataFormats=oai_dc Each metadata format must
-     * be globally configured with its prefix, schema and namespace, for example
-     * MCR.OAIDataProvider.MetadataFormat.oai_dc.Schema=http://www.openarchives.
-     * org/OAI/2.0/oai_dc.xsd
-     * MCR.OAIDataProvider.MetadataFormat.oai_dc.Namespace
-     * =http://www.openarchives.org/OAI/2.0/oai_dc/
-     * 
-     * @see MCRMetadataFormat
-     */
-    List<MCRMetadataFormat> getMetadataFormats() {
-        return metadataFormats;
-    }
 }
