@@ -57,6 +57,12 @@ public final class MCRConstants {
     private final static String XLINK_URL = "http://www.w3.org/1999/xlink";
 
     public final static Namespace XLINK_NAMESPACE = Namespace.getNamespace("xlink", XLINK_URL);
+    
+    /** the MARC 21 namespace */
+    public final static Namespace MARC21_NAMESPACE = Namespace.getNamespace("marc21", "http://www.loc.gov/MARC21/slim");
+    
+    /** MARC 21 namespace schema location */
+    public final static String MARC21_SCHEMA_LOCATION = "http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd";
 
     /** The URL of the XSI */
     private final static String XSI_URL = "http://www.w3.org/2001/XMLSchema-instance";
