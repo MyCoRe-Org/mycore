@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.mods;
 
 import java.text.MessageFormat;
@@ -15,13 +12,10 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * @author Thomas Scheffler
- *
  */
 public class MCRMODSWrapper {
 
     public static final String MODS_OBJECT_TYPE = "mods";
-
-    public static final Namespace MODS_NS = Namespace.getNamespace("mods", "http://www.loc.gov/mods/v3");
 
     public static MCRObject wrapMODSDocument(Element modsDefinition, String projectID) {
         MCRObjectID objID = MCRObjectID.getInstance(MessageFormat.format("{0}_{1}_0", projectID, MODS_OBJECT_TYPE));

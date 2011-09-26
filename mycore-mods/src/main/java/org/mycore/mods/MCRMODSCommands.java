@@ -34,6 +34,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.common.MCRActiveLinkException;
@@ -92,12 +93,12 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         Document modsDoc = s.build(modsFile);
         MCRXMLHelper.validate(modsDoc, MODS_V3_XSD_URI);
         Element modsRoot = modsDoc.getRootElement();
-        if (!modsRoot.getNamespace().equals(MCRMODSWrapper.MODS_NS)) {
+        if (!modsRoot.getNamespace().equals(MCRConstants.MODS_NAMESPACE)) {
             throw new MCRException(MessageFormat.format("File {0} is not a MODS document.", modsFile.getAbsolutePath()));
         }
         if (modsRoot.getName().equals("modsCollection")) {
             @SuppressWarnings("unchecked")
-            List<Element> modsElements = modsRoot.getChildren("mods", MCRMODSWrapper.MODS_NS);
+            List<Element> modsElements = modsRoot.getChildren("mods", MCRConstants.MODS_NAMESPACE);
             for (Element mods : modsElements) {
                 saveAsMyCoReObject(projectID, mods);
             }

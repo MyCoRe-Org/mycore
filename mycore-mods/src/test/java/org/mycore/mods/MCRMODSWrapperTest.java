@@ -35,6 +35,7 @@ import org.jdom.JDOMException;
 import org.jdom.xpath.XPath;
 import org.junit.Before;
 import org.junit.Test;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.common.xml.MCRXMLParserFactory;
@@ -73,7 +74,7 @@ public class MCRMODSWrapperTest extends MCRTestCase {
         MCRObject mcrObj2 = new MCRObject(mcrObjXml);
         mcrObjXml = mcrObj2.createXML();
         XPath xpathCheck = XPath.newInstance("//mods:mods");
-        xpathCheck.addNamespace(MCRMODSWrapper.MODS_NS);
+        xpathCheck.addNamespace(MCRConstants.MODS_NAMESPACE);
         assertEquals("Did not find mods data", 1, xpathCheck.selectNodes(mcrObjXml).size());
     }
 
