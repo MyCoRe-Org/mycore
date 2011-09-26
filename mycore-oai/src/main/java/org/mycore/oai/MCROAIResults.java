@@ -1,21 +1,27 @@
 package org.mycore.oai;
 
 import java.util.Date;
-import java.util.List;
 
 import org.mycore.oai.pmh.MetadataFormat;
-import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRResults;
 
-public class MCROAIResults extends MCRResults {
+/**
+ * OAI Results container.
+ * 
+ * @author Matthias Eichner
+ */
+public class MCROAIResults {
 
     protected Date expirationDate;
 
     protected MetadataFormat metadataFormat;
 
-    public MCROAIResults(Date expirationDate, MetadataFormat format) {
+    protected MCRResults results;
+
+    public MCROAIResults(Date expirationDate, MetadataFormat format, MCRResults results) {
         this.expirationDate = expirationDate;
         this.metadataFormat = format;
+        this.results = results;
     }
 
     boolean isExpired() {
@@ -26,16 +32,8 @@ public class MCROAIResults extends MCRResults {
         return metadataFormat;
     }
 
-    public void add(MCRResults results) {
-        for(MCRHit hit : results) {
-            this.addHit(hit);
-        }
-    }
-
-    public void add(List<String> idList) {
-        for(String id : idList) {
-            this.addHit(new MCRHit(id));
-        }
+    public MCRResults getMCRResults() {
+        return results;
     }
 
     public Date getExpirationDate() {

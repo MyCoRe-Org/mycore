@@ -21,6 +21,10 @@
  */
 package org.mycore.oai;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
+
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.oai.classmapping.MCRClassificationAndSetMapper;
@@ -28,6 +32,7 @@ import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRQueryCondition;
 import org.mycore.services.fieldquery.MCRQueryParser;
+import org.mycore.services.fieldquery.MCRSortBy;
 
 public abstract class MCROAIUtils {
 
@@ -62,6 +67,19 @@ public abstract class MCROAIUtils {
                 return new MCRQueryCondition(MCRFieldDef.getDef("category"), "like", id + "*");
             }
         }
+    }
+
+    public static List<MCRSortBy> getSortByList(String configField, String defaultValue) {
+        MCRConfiguration config = MCRConfiguration.instance();
+        List<MCRSortBy> sortBy = new ArrayList<MCRSortBy>();
+        String searchSortBy = config.getString(configField, defaultValue);
+        for (StringTokenizer st = new StringTokenizer(searchSortBy, ",;:"); st.hasMoreTokens();) {
+            String token = st.nextToken().trim();
+            MCRFieldDef field = MCRFieldDef.getDef(token.split(" ")[0]);
+            boolean order = "ascending".equalsIgnoreCase(token.split(" ")[1]);
+            sortBy.add(new MCRSortBy(field, order));
+        }
+        return sortBy;
     }
 
 }

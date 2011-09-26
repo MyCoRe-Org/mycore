@@ -34,7 +34,6 @@ import org.mycore.oai.pmh.BadResumptionTokenException;
 import org.mycore.oai.pmh.CannotDisseminateFormatException;
 import org.mycore.oai.pmh.Header;
 import org.mycore.oai.pmh.IdDoesNotExistException;
-import org.mycore.oai.pmh.Identify;
 import org.mycore.oai.pmh.MetadataFormat;
 import org.mycore.oai.pmh.NoMetadataFormatsException;
 import org.mycore.oai.pmh.NoRecordsMatchException;
@@ -55,6 +54,8 @@ public class MCROAIAdapter implements OAIAdapter {
 
     public final static String PREFIX = "MCR.OAIDataProvider.";
 
+    protected String baseURL;
+    
     protected MCROAIIdentify identify;
 
     protected String configPrefix;
@@ -76,30 +77,32 @@ public class MCROAIAdapter implements OAIAdapter {
      *            specifies the OAI-PMH configuration
      */
     public void init(String baseURL, String oaiConfiguration) {
-        // base stuff
+        this.baseURL = baseURL;
         this.configPrefix = PREFIX + oaiConfiguration + ".";
         this.config = MCRConfiguration.instance();
-        // identify
-        this.identify = new MCROAIIdentify(baseURL, getConfigPrefix());
     }
 
     public MCROAISetManager getSetManager() {
         if (this.setManager == null) {
-            this.setManager = new MCROAISetManager(this);
+            this.setManager = new MCROAISetManager();
+            this.setManager.init(getConfigPrefix());
         }
         return this.setManager;
     }
 
     public MCROAIObjectManager getObjectManager() {
         if (this.objectManager == null) {
-            this.objectManager = new MCROAIObjectManager(this);
+            this.objectManager = new MCROAIObjectManager();
+            String reposId = getIdentify().getIdentifierDescription().getRepositoryIdentifier();
+            this.objectManager.init(getConfigPrefix(), reposId);
         }
         return this.objectManager;
     }
 
     public MCROAISearchManager getSearchManager() {
         if (this.searchManager == null) {
-            this.searchManager = new MCROAISearchManager(this);
+            this.searchManager = new MCROAISearchManager();
+            this.searchManager.init(getConfigPrefix(), getIdentify().getDeletedRecordPolicy(), getObjectManager());
         }
         return this.searchManager;
     }
@@ -113,7 +116,10 @@ public class MCROAIAdapter implements OAIAdapter {
      * @see org.mycore.oai.pmh.dataprovider.OAIAdapter#getIdentify()
      */
     @Override
-    public Identify getIdentify() {
+    public MCROAIIdentify getIdentify() {
+        if(this.identify == null) {
+            this.identify = new MCROAIIdentify(this.baseURL, getConfigPrefix());
+        }
         return this.identify;
     }
 
@@ -222,8 +228,7 @@ public class MCROAIAdapter implements OAIAdapter {
             // TODO check deleted object
             throw new IdDoesNotExistException(identifier);
         }
-        String mcrId = MCROAIObjectManager.getMyCoReId(identifier);
-        return objectManager.getRecord(mcrId, format);
+        return objectManager.getRecord(objectManager.getMyCoReId(identifier), format);
     }
 
     /*

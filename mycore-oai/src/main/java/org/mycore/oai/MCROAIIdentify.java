@@ -25,7 +25,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
-import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
@@ -40,16 +39,14 @@ import org.mycore.oai.pmh.Identify;
 import org.mycore.oai.pmh.OAIIdentifierDescription;
 import org.mycore.oai.pmh.SimpleIdentify;
 import org.mycore.parsers.bool.MCRCondition;
-import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRQueryManager;
-import org.mycore.services.fieldquery.MCRQueryParser;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSortBy;
 
 /**
  * Simple MyCoRe implementation of a OAI-PMH {@link Identify} class. Uses the {@link MCRConfiguration} to retrieve all important settings. Earliest date stamp
- * is calculated with query 'objectType like *' and sort by 'created'.
+ * is calculated with the 'restriction' query and sort by 'created'.
  * 
  * @author Matthias Eichner
  * @author Frank L\u00fctzenkirchen
@@ -66,19 +63,19 @@ public class MCROAIIdentify extends SimpleIdentify {
         this.config = MCRConfiguration.instance();
         this.configPrefix = configPrefix;
 
-        this.baseURL = baseURL;
-        this.repositoryName = this.config.getString(configPrefix + "RepositoryName", "Undefined repository name");
-        this.earliestDatestamp = calculateEarliestTimestamp();
+        this.setBaseURL(baseURL);
+        this.setRepositoryName(this.config.getString(configPrefix + "RepositoryName", "Undefined repository name"));
+        this.setEarliestDatestamp(calculateEarliestTimestamp());
         String sDelRecPol = this.config.getString(configPrefix + "DeletedRecord", "transient");
-        this.deletedRecordPolicy = DeletedRecordPolicy.get(sDelRecPol);
-        this.granularity = Granularity.YYYY_MM_DD;
+        this.setDeletedRecordPolicy(DeletedRecordPolicy.get(sDelRecPol));
+        this.setGranularity(Granularity.YYYY_MM_DD);
         String adminMail = this.config.getString(configPrefix + "AdminEmail", config.getString("MCR.Mail.Address"));
         if (adminMail == null || adminMail.equals("")) {
             adminMail = "no_mail_defined@oai_provider.com";
         }
-        this.adminEmailList.add(adminMail);
-        this.descriptionList.add(getIdentifierDescription());
-        this.descriptionList.add(getFriendsDescription());
+        this.getAdminEmailList().add(adminMail);
+        this.getDescriptionList().add(getIdentifierDescription());
+        this.getDescriptionList().add(getFriendsDescription());
     }
 
     public OAIIdentifierDescription getIdentifierDescription() {
@@ -103,14 +100,12 @@ public class MCROAIIdentify extends SimpleIdentify {
      * 
      * @return the create date of the oldest document within the repository
      */
-    private Date calculateEarliestTimestamp() {
+    protected Date calculateEarliestTimestamp() {
         /* default value */
         Date datestamp = DateUtils.parseUTC(config.getString(this.configPrefix + "EarliestDatestamp", "1970-01-01"));
         try {
-            MCRCondition condition = new MCRQueryParser().parse("objectType like *");
-            List<MCRSortBy> sortByList = new Vector<MCRSortBy>();
-            MCRSortBy sortBy = new MCRSortBy(MCRFieldDef.getDef("created"), MCRSortBy.ASCENDING);
-            sortByList.add(sortBy);
+            MCRCondition condition = MCROAIUtils.getDefaultRestriction(this.configPrefix);
+            List<MCRSortBy> sortByList = MCROAIUtils.getSortByList(this.configPrefix + "EarliestDatestamp.SortBy", "created ascending");
             MCRQuery q = new MCRQuery(condition, sortByList, 1);
             MCRResults result = MCRQueryManager.search(q);
             if (result.getNumHits() > 0) {
@@ -118,8 +113,9 @@ public class MCROAIIdentify extends SimpleIdentify {
                 datestamp = obj.getService().getDate(MCRObjectService.DATE_TYPE_CREATEDATE);
             }
         } catch (Exception ex) {
-            LOGGER.error("Error occured while examining create date of first created object", ex);
+            LOGGER.warn("Error occured while examining create date of first created object. Use default value.", ex);
         }
         return datestamp;
     }
+
 }

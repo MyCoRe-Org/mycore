@@ -21,11 +21,9 @@
  */
 package org.mycore.oai;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -67,19 +65,23 @@ import org.mycore.services.fieldquery.MCRSortBy;
 public class MCROAISearchManager {
 
     protected final static Logger LOGGER = Logger.getLogger(MCROAISearchManager.class);
-    
+
     protected final static String TOKEN_DELIMITER = "@";
-    
+
     protected static Map<String, MCROAIResults> resultMap;
 
     protected static int partitionSize;
 
     protected static int maxAge;
 
-    protected MCROAIAdapter oaiAdapter;
-
     protected MCRConfiguration config;
 
+    protected String configPrefix;
+
+    protected MCROAIObjectManager objManager;
+
+    protected DeletedRecordPolicy deletedRecordPolicy;
+    
     static {
         resultMap = new ConcurrentHashMap<String, MCROAIResults>();
         String prefix = MCROAIAdapter.PREFIX + "ResumptionTokens.";
@@ -101,20 +103,21 @@ public class MCROAISearchManager {
         new Timer().schedule(tt, new Date(System.currentTimeMillis() + maxAge), maxAge);
     }
 
-    public MCROAISearchManager(MCROAIAdapter oaiAdapter) {
-        this.oaiAdapter = oaiAdapter;
+    public MCROAISearchManager() {
         this.config = MCRConfiguration.instance();
     }
 
-    public MCROAIAdapter getOaiAdapter() {
-        return this.oaiAdapter;
+    public void init(String configPrefix, DeletedRecordPolicy deletedRecordPolicy, MCROAIObjectManager objManager) {
+        this.configPrefix = configPrefix;
+        this.objManager = objManager;
+        this.deletedRecordPolicy = deletedRecordPolicy;
     }
 
     public OAIDataList<Header> searchHeader(String resumptionToken) throws BadResumptionTokenException {
         String searchId = getSearchId(resumptionToken);
         int tokenCursor = getTokenCursor(resumptionToken);
         MCROAIResults results = resultMap.get(searchId);
-        if(results == null) {
+        if (results == null) {
             throw new BadResumptionTokenException(resumptionToken);
         }
         return getHeaderList(results, tokenCursor);
@@ -124,7 +127,7 @@ public class MCROAISearchManager {
         String searchId = getSearchId(resumptionToken);
         int tokenCursor = getTokenCursor(resumptionToken);
         MCROAIResults results = resultMap.get(searchId);
-        if(results == null) {
+        if (results == null) {
             throw new BadResumptionTokenException(resumptionToken);
         }
         return getRecordList(results, tokenCursor);
@@ -132,25 +135,26 @@ public class MCROAISearchManager {
 
     public OAIDataList<Header> searchHeader(MetadataFormat format, Set set, Date from, Date until) {
         MCROAIResults oaiResults = search(format, set, from, until);
-        resultMap.put(oaiResults.getID(), oaiResults);
+        resultMap.put(oaiResults.getMCRResults().getID(), oaiResults);
         return getHeaderList(oaiResults, 0);
     }
 
     public OAIDataList<Record> searchRecord(MetadataFormat format, Set set, Date from, Date until) {
         MCROAIResults oaiResults = search(format, set, from, until);
-        resultMap.put(oaiResults.getID(), oaiResults);
+        resultMap.put(oaiResults.getMCRResults().getID(), oaiResults);
         return getRecordList(oaiResults, 0);
     }
 
     protected OAIDataList<Header> getHeaderList(MCROAIResults results, int cursor) {
         MetadataFormat metadataFormat = results.getMetadataFormat();
         OAIDataList<Header> headerList = new OAIDataList<Header>();
-        int numHits = results.getNumHits();
+        MCRResults mcrResults = results.getMCRResults();
+        int numHits = mcrResults.getNumHits();
         int max = Math.min(numHits, cursor + partitionSize);
         for (; cursor < max; cursor++) {
-            MCRHit hit = results.getHit(cursor);
-            Header header = getOaiAdapter().getObjectManager().getHeader(hit.getID(), metadataFormat);
-            if(header != null) {
+            MCRHit hit = mcrResults.getHit(cursor);
+            Header header = this.objManager.getHeader(hit.getID(), metadataFormat);
+            if (header != null) {
                 headerList.add(header);
             }
         }
@@ -161,12 +165,13 @@ public class MCROAISearchManager {
     protected OAIDataList<Record> getRecordList(MCROAIResults results, int cursor) {
         MetadataFormat metadataFormat = results.getMetadataFormat();
         OAIDataList<Record> recordList = new OAIDataList<Record>();
-        int numHits = results.getNumHits();
+        final MCRResults mcrResults = results.getMCRResults();
+        int numHits = mcrResults.getNumHits();
         int max = Math.min(numHits, cursor + partitionSize);
         for (; cursor < max; cursor++) {
-            MCRHit hit = results.getHit(cursor);
-            Record record = getOaiAdapter().getObjectManager().getRecord(hit.getID(), metadataFormat);
-            if(record != null) {
+            MCRHit hit = mcrResults.getHit(cursor);
+            Record record = this.objManager.getRecord(hit.getID(), metadataFormat);
+            if (record != null) {
                 recordList.add(record);
             }
         }
@@ -175,12 +180,12 @@ public class MCROAISearchManager {
     }
 
     protected void setResumptionToken(OAIDataList<?> dataList, MCROAIResults results, int cursor, int hits) {
-        if(cursor < hits) {
+        if (cursor < hits) {
             DefaultResumptionToken rsToken = new DefaultResumptionToken();
             rsToken.setCompleteListSize(hits);
             rsToken.setCursor(cursor);
             rsToken.setExpirationDate(results.getExpirationDate());
-            rsToken.setToken(results.getID() + TOKEN_DELIMITER + String.valueOf(cursor));
+            rsToken.setToken(results.getMCRResults().getID() + TOKEN_DELIMITER + String.valueOf(cursor));
             dataList.setResumptionToken(rsToken);
         }
     }
@@ -210,27 +215,31 @@ public class MCROAISearchManager {
         List<MCRSortBy> sortBy = buildSortByList();
         query.setSortBy(sortBy);
         // search
-        MCRResults results = MCRQueryManager.search(query);
+        MCRResults queryResults = MCRQueryManager.search(query);
         // deleted records
-        List<String> deletedList = searchDeleted(from, until);
+        MCRResults completeResults = searchDeleted(from, until);
+        if (completeResults.isReadonly()) {
+            completeResults = MCRResults.union(completeResults, queryResults);
+        } else {
+            completeResults.addHits(queryResults);
+        }
         // create new MCROAIResults
         Date expirationDate = new Date(System.currentTimeMillis() + maxAge);
-        MCROAIResults oaiResults = new MCROAIResults(expirationDate, format);
-        oaiResults.add(results);
-        oaiResults.add(deletedList);
+        MCROAIResults oaiResults = new MCROAIResults(expirationDate, format, completeResults);
         return oaiResults;
     }
 
     /**
-     * Returns a list with identifiers of the deleted objects within the given date boundary. If the record policy indicates that there is not support
-     * for tracking deleted items empty list is returned.
+     * Returns a list with identifiers of the deleted objects within the given date boundary. If the record policy indicates that there is not support for
+     * tracking deleted items empty list is returned.
      * 
      * @return a list with identifiers of the deleted objects
      */
-    protected List<String> searchDeleted(Date from, Date until) {
-        DeletedRecordPolicy policy = getOaiAdapter().getIdentify().getDeletedRecordPolicy();
-        if (DeletedRecordPolicy.No.equals(policy) || DeletedRecordPolicy.Transient.equals(policy)) {
-            return new ArrayList<String>();
+    @SuppressWarnings("unchecked")
+    protected MCRResults searchDeleted(Date from, Date until) {
+        MCRResults mcrResults = new MCRResults();
+        if (DeletedRecordPolicy.No.equals(deletedRecordPolicy) || DeletedRecordPolicy.Transient.equals(deletedRecordPolicy)) {
+            return mcrResults;
         }
         LOGGER.info("Getting identifiers of deleted items");
         List<String> deletedItems = new Vector<String>();
@@ -249,18 +258,21 @@ public class MCROAISearchManager {
                 criteria.add(Restrictions.le("id.dateDeleted", until));
             }
             deletedItems = criteria.list();
+            for (String id : deletedItems) {
+                mcrResults.addHit(new MCRHit(id));
+            }
         } catch (Exception ex) {
             LOGGER.warn("Could not retrieve identifiers of deleted objects", ex);
         }
-        return deletedItems;
+        return mcrResults;
     }
 
     protected MCRCondition buildRestrictionCondition() {
-        return MCROAIUtils.getDefaultRestriction(this.oaiAdapter.getConfigPrefix());
+        return MCROAIUtils.getDefaultRestriction(this.configPrefix);
     }
 
     protected MCRCondition buildSetCondition(Set set) {
-        return MCROAIUtils.getDefaultSetCondition(set.getSpec(), this.oaiAdapter.getConfigPrefix());
+        return MCROAIUtils.getDefaultSetCondition(set.getSpec(), this.configPrefix);
     }
 
     protected MCRCondition buildFromCondition(Date from) {
@@ -272,7 +284,7 @@ public class MCROAISearchManager {
     }
 
     private MCRCondition buildFromUntilCondition(Date date, String compareSign) {
-        String fieldFromUntil = this.config.getString(this.oaiAdapter.getConfigPrefix() + "Search.FromUntil", "modified");
+        String fieldFromUntil = this.config.getString(this.configPrefix + "Search.FromUntil", "modified");
         String[] fields = fieldFromUntil.split(" *, *");
         MCROrCondition orCond = new MCROrCondition();
         for (String fDef : fields) {
@@ -283,15 +295,7 @@ public class MCROAISearchManager {
     }
 
     protected List<MCRSortBy> buildSortByList() {
-        List<MCRSortBy> sortBy = new ArrayList<MCRSortBy>();
-        String searchSortBy = config.getString(this.oaiAdapter.getConfigPrefix() + "Search.SortBy", "modified descending, id descending");
-        for (StringTokenizer st = new StringTokenizer(searchSortBy, ",;:"); st.hasMoreTokens();) {
-            String token = st.nextToken().trim();
-            MCRFieldDef field = MCRFieldDef.getDef(token.split(" ")[0]);
-            boolean order = "ascending".equalsIgnoreCase(token.split(" ")[1]);
-            sortBy.add(new MCRSortBy(field, order));
-        }
-        return sortBy;
+        return MCROAIUtils.getSortByList(this.configPrefix + "Search.SortBy", "modified descending, id descending");
     }
 
     public String getSearchId(String token) throws BadResumptionTokenException {

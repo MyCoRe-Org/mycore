@@ -61,24 +61,26 @@ import org.mycore.services.fieldquery.MCRQueryManager;
  */
 public class MCROAISetManager {
 
+    protected String configPrefix;
+
     protected List<String> setURIs;
 
-    protected MCROAIAdapter oaiAdapter;
-
-    public MCROAISetManager(MCROAIAdapter oaiAdapter) {
-        this.oaiAdapter = oaiAdapter;
+    public MCROAISetManager() {
         this.setURIs = new ArrayList<String>();
         updateURIs();
+    }
+
+    protected void init(String configPrefix) {
+        this.configPrefix = configPrefix;
     }
 
     protected void updateURIs() {
         this.setURIs = new ArrayList<String>();
         MCRConfiguration config = MCRConfiguration.instance();
-        String prefix = this.oaiAdapter.getConfigPrefix();
-        String[] sets = config.getString(prefix + "Sets", "").split(",");
+        String[] sets = config.getString(this.configPrefix + "Sets", "").split(",");
         for (String s : sets) {
-            if (config.getString(prefix + "Set." + s, "").trim().length() > 0) {
-                this.setURIs.add(config.getString(prefix + "Set." + s).trim());
+            if (config.getString(this.configPrefix + "Set." + s, "").trim().length() > 0) {
+                this.setURIs.add(config.getString(this.configPrefix + "Set." + s).trim());
             }
         }
     }
@@ -91,7 +93,6 @@ public class MCROAISetManager {
     @SuppressWarnings("unchecked")
     protected OAIDataList<Set> get() {
         OAIDataList<Set> setList = new OAIDataList<Set>();
-        String prefix = this.oaiAdapter.getConfigPrefix();
         for (String uri : this.setURIs) {
             Element resolved = MCRURIResolver.instance().resolve(uri);
             for (Element setElement : (List<Element>) (resolved.getChildren("set", OAIConstants.NS_OAI))) {
@@ -100,7 +101,7 @@ public class MCROAISetManager {
                 if (!contains(setSpec, setList)) {
                     if (setSpec.contains(":")) {
                         String classID = setSpec.substring(0, setSpec.indexOf(':')).trim();
-                        classID = MCRClassificationAndSetMapper.mapClassificationToSet(prefix, classID);
+                        classID = MCRClassificationAndSetMapper.mapClassificationToSet(this.configPrefix, classID);
                         String newSetSpec = classID + setSpec.substring(setSpec.indexOf(':'));
                         setList.add(new Set(newSetSpec, setName));
                     } else {
@@ -111,7 +112,7 @@ public class MCROAISetManager {
         }
 
         // Filter out empty sets
-        if (MCRConfiguration.instance().getBoolean(prefix + "FilterEmptySets", true)) {
+        if (MCRConfiguration.instance().getBoolean(this.configPrefix + "FilterEmptySets", true)) {
             for (Iterator<Set> it = setList.iterator(); it.hasNext();) {
                 Set set = it.next();
                 String setSpec = set.getSpec();
@@ -127,7 +128,7 @@ public class MCROAISetManager {
                 // Build a query to count results
                 MCRAndCondition query = new MCRAndCondition();
                 query.addChild(buildSetCondition(setSpec));
-                MCRCondition restriction = MCROAIUtils.getDefaultRestriction(prefix);
+                MCRCondition restriction = MCROAIUtils.getDefaultRestriction(this.configPrefix);
                 if (restriction != null) {
                     query.addChild(restriction);
                 }
@@ -171,7 +172,7 @@ public class MCROAISetManager {
     }
 
     protected MCRCondition buildSetCondition(String setSpec) {
-        return MCROAIUtils.getDefaultSetCondition(setSpec, this.oaiAdapter.getConfigPrefix());
+        return MCROAIUtils.getDefaultSetCondition(setSpec, this.configPrefix);
     }
 
 }
