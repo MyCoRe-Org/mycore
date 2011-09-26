@@ -113,6 +113,17 @@ public class MCRResults implements Iterable<MCRHit> {
     }
 
     /**
+     * Adds hits to this result.
+     * Use {@link #isReadonly()} to verify that this results is not read only.
+     * @param hits e.g. other MCRResults instance
+     */
+    public void addHits(Iterable<MCRHit> hits) {
+        for (MCRHit hit : hits) {
+            addHit(hit);
+        }
+    }
+
+    /**
      * Gets a single MCRHit. As long as isSorted() returns false, the order of
      * the hits is natural order.
      * 
