@@ -106,7 +106,11 @@ public class MCRURNManager {
         codes.put("y", "37");
         codes.put("z", "38");
         codes.put("-", "39");
+        codes.put("+", "49");
         codes.put(":", "17");
+        codes.put("/", "45");
+        codes.put("_", "43");
+        codes.put(".", "47");
 
         Object obj = MCRConfiguration.instance().getSingleInstanceOf("MCR.Persistence.URN.Store.Class");
         store = (MCRURNStore) obj;
