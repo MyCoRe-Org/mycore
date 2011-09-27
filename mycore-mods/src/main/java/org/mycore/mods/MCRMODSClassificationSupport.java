@@ -272,6 +272,15 @@ public final class MCRMODSClassificationSupport {
         return MessageFormat.format("classification:metadata:0:children:{0}:{1}", category.getRootID(), category.getID());
     }
 
+    public static String getClassCategParentLink(final NodeList sources) {
+        final Element source = (Element) sources.item(0);
+        MCRCategoryID category = getCategoryID(source);
+        if (category == null) {
+            return "";
+        }
+        return MessageFormat.format("classification:metadata:0:parents:{0}:{1}", category.getRootID(), category.getID());
+    }
+
     private static String getText(final Element element) {
         final StringBuilder sb = new StringBuilder();
         final NodeList nodeList = element.getChildNodes();

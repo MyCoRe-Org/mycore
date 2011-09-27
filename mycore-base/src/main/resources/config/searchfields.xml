@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <searchfields xmlns="http://www.mycore.org/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mycore.org/ searchfields.xsd"
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:mods="http://www.loc.gov/mods/v3">
 
   <!-- Search in MCRObject metadata -->
   <index id="metadata">
@@ -37,6 +37,17 @@
             <xsl:value-of select="concat($classid,':',@ID)" />
           </mcr:category>
         </xsl:for-each>
+      </xsl:for-each>
+      <xsl:for-each select="/mycoreobject/metadata//mods:*[@authority or @authorityURI]">
+        <xsl:variable name="uri" xmlns:mcrmods="xalan://org.mycore.mods.MCRMODSClassificationSupport" select="mcrmods:getClassCategParentLink(.)" />
+        <xsl:if test="string-length($uri) &gt; 0">
+          <xsl:variable name="classdoc" select="document($uri)"/>
+          <xsl:for-each select="$classdoc//category">
+            <mcr:category xmlns:mcr="http://www.mycore.org/">
+              <xsl:value-of select="concat($classdoc/mycoreclass/@ID,':',@ID)" />
+            </mcr:category>
+          </xsl:for-each>
+        </xsl:if>
       </xsl:for-each>
     </field>
 
