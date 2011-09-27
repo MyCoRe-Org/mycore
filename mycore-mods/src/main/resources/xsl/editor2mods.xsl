@@ -69,17 +69,17 @@
   <xsl:template match="nameOrPND">
     <xsl:choose>
       <xsl:when test="contains(., ',')">
-        <mods:partName type="family">
+        <mods:namePart type="family">
           <xsl:value-of select="java:trim(substring-before(., ','))"/>
-        </mods:partName>
-        <mods:partName type="given">
+        </mods:namePart>
+        <mods:namePart type="given">
           <xsl:value-of select="java:trim(substring-after(., ','))"/>
-        </mods:partName>
+        </mods:namePart>
       </xsl:when>
       <xsl:otherwise>
-        <mods:partName type="given">
+        <mods:namePart type="given">
           <xsl:value-of select="."/>
-        </mods:partName>
+        </mods:namePart>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
