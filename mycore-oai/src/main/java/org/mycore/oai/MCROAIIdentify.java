@@ -28,6 +28,7 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -109,7 +110,7 @@ public class MCROAIIdentify extends SimpleIdentify {
             MCRQuery q = new MCRQuery(condition, sortByList, 1);
             MCRResults result = MCRQueryManager.search(q);
             if (result.getNumHits() > 0) {
-                MCRObject obj = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(result.getHit(0).getID()));
+                MCRBase obj = MCRMetadataManager.retrieve(MCRObjectID.getInstance(result.getHit(0).getID()));
                 datestamp = obj.getService().getDate(MCRObjectService.DATE_TYPE_CREATEDATE);
             }
         } catch (Exception ex) {
