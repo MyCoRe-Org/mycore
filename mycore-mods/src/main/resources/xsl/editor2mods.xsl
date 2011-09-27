@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:mcr="http://www.mycore.org/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:mods="http://www.loc.gov/mods/v3" xmlns:mcrmods="xalan://org.mycore.mods.MCRMODSClassificationSupport" exclude-result-prefixes="mcrmods mcr"
+<xsl:stylesheet xmlns:mcr="http://www.mycore.org/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan"
+  xmlns:mods="http://www.loc.gov/mods/v3" xmlns:mcrmods="xalan://org.mycore.mods.MCRMODSClassificationSupport" xmlns:java="http://xml.apache.org/xalan/java" exclude-result-prefixes="mcrmods mcr xalan java"
   version="1.0">
 
   <xsl:include href="copynodes.xsl" />
@@ -64,6 +64,24 @@
         </xsl:for-each>
       </xsl:copy>
     </xsl:for-each>
+  </xsl:template>
+  
+  <xsl:template match="nameOrPND">
+    <xsl:choose>
+      <xsl:when test="contains(., ',')">
+        <mods:partName type="family">
+          <xsl:value-of select="java:trim(substring-before(., ','))"/>
+        </mods:partName>
+        <mods:partName type="given">
+          <xsl:value-of select="java:trim(substring-after(., ','))"/>
+        </mods:partName>
+      </xsl:when>
+      <xsl:otherwise>
+        <mods:partName type="given">
+          <xsl:value-of select="."/>
+        </mods:partName>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
 </xsl:stylesheet>

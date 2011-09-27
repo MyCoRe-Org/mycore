@@ -122,6 +122,27 @@
     <label xml:lang="de">Autor(en) (*)</label>
     <label xml:lang="en">Author(s) (*)</label>
   </text>
+  
+  <panel id="mods.name">
+    <hidden var="@editor.output" />
+    <cell col="1" row="1" anchor="NORTHEAST">
+      <text>
+        <label xml:lang="de">Name oder PND</label>
+        <label xml:lang="en">Name or PND</label>
+      </text>
+    </cell>
+    <cell col="2" row="1" anchor="NORTHEAST" var="nameOrPND">
+      <textfield id="mods.author.firstname.text" width="31" maxlength="128">
+        <condition id="mods.author.firstname.cond" required="true">
+          <label xml:lang="de">Bitte geben Sie den Namen der Person (&lt;Name, Vorname&gt;) an oder die PND id!</label>
+          <label xml:lang="en">Please insert authors name.</label>
+        </condition>
+      </textfield>
+    </cell>
+    <cell col="2" row="2" anchor="NORTHEAST">
+      <output var="@editor.output" default="" />
+    </cell>
+  </panel>
 
   <panel id="mods.author">
     <cell anchor="NORTHWEST" var="mods:name[@type='personal']">
@@ -130,34 +151,7 @@
           <hidden var="mods:role/mods:roleTerm/@authority" default="marcrelator" />
           <hidden var="mods:role/mods:roleTerm/@type" default="text" />
           <hidden var="mods:role/mods:roleTerm" default="author" />
-          <cell col="1" row="1" anchor="NORTHEAST">
-            <text>
-              <label xml:lang="de">Vorname</label>
-              <label xml:lang="en">First Name</label>
-            </text>
-          </cell>
-          <cell col="2" row="1" anchor="NORTHEAST" var="mods:namePart[@type='given']">
-            <textfield id="mods.author.firstname.text" width="31" maxlength="128">
-              <condition id="mods.author.firstname.cond" required="true">
-                <label xml:lang="de">Bitte geben Sie den Vornamen der Person an!</label>
-                <label xml:lang="en">Please insert authors first name.</label>
-              </condition>
-            </textfield>
-          </cell>
-          <cell col="1" row="2" anchor="NORTHEAST">
-            <text>
-              <label xml:lang="de">Nachname</label>
-              <label xml:lang="en">Last Name</label>
-            </text>
-          </cell>
-          <cell col="2" row="2" anchor="NORTHEAST" var="mods:namePart[@type='family']">
-            <textfield id="mods.author.lastname.text" width="31" maxlength="128">
-              <condition id="mods.author.lastname.cond" required="true">
-                <label xml:lang="de">Bitte geben Sie den Nachnamen der Person an!</label>
-                <label xml:lang="en">Please insert persons last name.</label>
-              </condition>
-            </textfield>
-          </cell>
+          <cell ref="mods.name"/>
         </panel>
       </repeater>
     </cell>
@@ -207,34 +201,7 @@
               </cell>
             </panel>
           </cell>
-          <cell col="2" row="1" anchor="NORTHEAST">
-            <text>
-              <label xml:lang="de">Vorname</label>
-              <label xml:lang="en">First Name</label>
-            </text>
-          </cell>
-          <cell col="3" row="1" anchor="NORTHEAST" var="mods:namePart[@type='given']">
-            <textfield width="31" maxlength="128">
-              <condition required="true">
-                <label xml:lang="de">Bitte geben Sie den Vornamen der Person an!</label>
-                <label xml:lang="en">Please insert authors first name.</label>
-              </condition>
-            </textfield>
-          </cell>
-          <cell col="2" row="2" anchor="NORTHEAST">
-            <text>
-              <label xml:lang="de">Nachname</label>
-              <label xml:lang="en">Last Name</label>
-            </text>
-          </cell>
-          <cell col="3" row="2" anchor="NORTHEAST" var="mods:namePart[@type='family']">
-            <textfield width="31" maxlength="128">
-              <condition required="true">
-                <label xml:lang="de">Bitte geben Sie den Nachnamen der Person an!</label>
-                <label xml:lang="en">Please insert persons last name.</label>
-              </condition>
-            </textfield>
-          </cell>
+          <cell col="2" row="1" anchor="NORTHEAST" ref="mods.name" />
         </panel>
       </repeater>
     </cell>
