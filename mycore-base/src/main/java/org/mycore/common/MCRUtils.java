@@ -102,9 +102,13 @@ public class MCRUtils {
      */
     static {
         StringBuffer sb;
-        // add id as workaround
+        // add id_ID as workaround for indonesian
         langlist.add("id");
         countrylist.add("ID");
+        // add he_IL as workaround for hebrew
+        // @see http://java.sun.com/developer/technicalArticles/J2SE/locale/
+        langlist.add("he");
+        countrylist.add("IL");
         // add codes from locale
         for (Locale l : Locale.getAvailableLocales()) {
             sb = new StringBuffer(l.getLanguage());
