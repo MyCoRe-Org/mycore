@@ -18,7 +18,8 @@
       value="concat(substring(.,1,10),' ',substring(.,12,8))" sortable="true" />
 
     <!-- Search in xml of the derivate objects -->
-    <field name="derivateModificationDate" type="timestamp"  source="derivateMetadata" xpath="/mycorederivate/service/servdates/servdate[@type='modifydate']" value="substring(., 1, 10)" sortable="true" />
+    <field name="derivateModificationDate" type="date" source="derivateMetadata" xpath="/mycorederivate/service/servdates/servdate[@type='modifydate']"
+      value="substring(., 1, 10)" sortable="true" />
     <field name="derivateCreationDate" type="timestamp" source="derivateMetadata" xpath="/mycorederivate/service/servdates/servdate[@type='createdate']"
       value="concat(substring(.,1,10),' ',substring(.,12,8))" sortable="true" />
 
