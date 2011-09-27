@@ -67,11 +67,11 @@ public class MCROAISetManager {
 
     public MCROAISetManager() {
         this.setURIs = new ArrayList<String>();
-        updateURIs();
     }
 
     protected void init(String configPrefix) {
         this.configPrefix = configPrefix;
+        updateURIs();
     }
 
     protected void updateURIs() {
