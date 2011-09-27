@@ -760,14 +760,16 @@
   </helpPopup>
   <!-- Bei Postern -> Größe [text] END -->
 
-  <!-- pub_klassifik -->
+  <!-- pub_genre -->
   <text id="mods.genre.kindOfReport.label">
     <label xml:lang="de">Genre (*)</label>
     <label xml:lang="en">Genre (*)</label>
   </text>
 
   <panel id="mods.genre.kindOfReport">
-    <cell anchor="NORTHWEST" var="mods:classification">
+    <cell anchor="NORTHWEST" var="mods:genre">
+      <hidden var="@type" default="kindof" />
+      <hidden var="@displayLabel" default="Kind of Report" />
       <list id="kindOfReport.ListGenre" type="dropdown" default="01">
         <condition required="true">
           <label xml:lang="de">Forschungsergebnisse, In House Publikationen, Presseerklärungen, Poster, Zeitschrifteninhaltsverzeichnisse
@@ -810,7 +812,7 @@
     <label xml:lang="de">Eine Zuordnung zu einem in der Liste verfügbaren Genre .</label>
     <label xml:lang="en">Entry from the list.</label>
   </helpPopup>
-  <!-- pub_klassifik END -->
+  <!-- pub_genre END -->
 
 
   <!-- av_medium_genre -->
@@ -820,7 +822,9 @@
   </text>
 
   <panel id="mods.genre.kindOfAVMedia">
-    <cell anchor="NORTHWEST" var="mods:classification">
+    <cell anchor="NORTHWEST" var="mods:genre">
+      <hidden var="@type" default="kindof" />
+      <hidden var="@displayLabel" default="Kind of AV Media" />
       <list id="kindOfAVMedia.ListGenre" type="dropdown" default="motion picture">
         <condition required="true">
           <label xml:lang="de">Wählen Sie bitte den Typ des AV-Mediums aus.</label>
