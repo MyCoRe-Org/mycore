@@ -289,7 +289,7 @@ public class MCROAISearchManager {
         MCROrCondition orCond = new MCROrCondition();
         for (String fDef : fields) {
             MCRFieldDef d = MCRFieldDef.getDef(fDef);
-            orCond.addChild(new MCRQueryCondition(d, compareSign, DateUtils.formatUTCSecond(date)));
+            orCond.addChild(new MCRQueryCondition(d, compareSign, DateUtils.formatUTCDay(date)));
         }
         return orCond;
     }
