@@ -4,7 +4,6 @@ import java.text.MessageFormat;
 import java.util.Collections;
 
 import org.jdom.Element;
-import org.jdom.Namespace;
 import org.mycore.datamodel.metadata.MCRMetaElement;
 import org.mycore.datamodel.metadata.MCRMetaXML;
 import org.mycore.datamodel.metadata.MCRObject;
