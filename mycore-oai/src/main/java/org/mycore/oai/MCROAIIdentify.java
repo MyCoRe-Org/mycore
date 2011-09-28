@@ -106,7 +106,7 @@ public class MCROAIIdentify extends SimpleIdentify {
         Date datestamp = DateUtils.parseUTC(config.getString(this.configPrefix + "EarliestDatestamp", "1970-01-01"));
         try {
             MCRCondition condition = MCROAIUtils.getDefaultRestriction(this.configPrefix);
-            List<MCRSortBy> sortByList = MCROAIUtils.getSortByList(this.configPrefix + "EarliestDatestamp.SortBy", "created ascending");
+            List<MCRSortBy> sortByList = MCROAIUtils.getSortByList(this.configPrefix + "EarliestDatestamp.SortBy", "modified ascending");
             MCRQuery q = new MCRQuery(condition, sortByList, 1);
             MCRResults result = MCRQueryManager.search(q);
             if (result.getNumHits() > 0) {
