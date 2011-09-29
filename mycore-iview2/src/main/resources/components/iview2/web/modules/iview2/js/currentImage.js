@@ -14,6 +14,7 @@
       this.viewer = iviewInst;
       var zoomInfo = this.zoomInfo = new iview.ZoomInformation(iviewInst);
       var that = this;
+      this.rotation = 0;
       
       jQuery(iviewInst.viewerContainer).bind("zoom.viewer", function(jq, event) {
     	  /*listen to changes of zoomLevel and adapt curWidth & -Height depending on that,
