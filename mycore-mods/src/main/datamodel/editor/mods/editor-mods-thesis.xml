@@ -35,6 +35,12 @@
     <cell row="30" col="3" anchor="NORTHWEST" ref="mods.person.help" />
     <!-- pub_autor_dok_txt [text] and reviewer END -->
 
+    <!-- genre classification -->
+    <cell row="35" col="1" anchor="NORTHEAST" ref="mods.genre.kindOfThesis.label" />
+    <cell row="35" col="2" anchor="NORTHWEST" ref="mods.genre.kindOfThesis" var="metadata/def.modsContainer/modsContainer/mods:mods/" />
+    <cell row="35" col="3" anchor="NORTHWEST" ref="mods.genre.kindOfThesis.help" />
+    <!-- genre classification END -->
+
   <cell row="40" colspan="3" class="border"><panel style="width:100%;">
     <!-- LANGUAGE -->
     <cell row="50" col="1" anchor="NORTHEAST" ref="mods.languageTerm.label" />

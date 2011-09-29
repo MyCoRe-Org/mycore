@@ -910,36 +910,40 @@
           <label xml:lang="de">Wählen Sie bitte den Typ der Hochschulschrift aus.</label>
           <label xml:lang="en">What kind of thesis is this?</label>
         </condition>
+        <item value="diplomaThesis">
+          <label xml:lang="de">Diplomarbeit</label>
+          <label xml:lang="en">Diploma Thesis</label>
+        </item>
         <item value="masterThesis">
           <label xml:lang="de">Abschlussarbeit (Master)</label>
-          <label xml:lang="en">masterThesis</label>
+          <label xml:lang="en">Master Thesis</label>
         </item>
-        <item value="xx1">
-          <label xml:lang="de">xxx</label>
-          <label xml:lang="en">xxx</label>
+        <item value="bachelorThesis">
+          <label xml:lang="de">Abschlussarbeit (Bachelor)</label>
+          <label xml:lang="en">Bachelor Thesis</label>
         </item>
-        <item value="xxx2">
-          <label xml:lang="de">xxx</label>
-          <label xml:lang="en">xxx</label>
+        <item value="studyThesis">
+          <label xml:lang="de">Studienarbeit</label>
+          <label xml:lang="en">Study Thesis</label>
         </item>
-        <item value="xxx3">
-          <label xml:lang="de">xxx</label>
-          <label xml:lang="en">xxx</label>
+        <item value="doctoralThesis">
+          <label xml:lang="de">Dissertation</label>
+          <label xml:lang="en">Doctoral Thesis</label>
         </item>
-        <item value="xxx4">
-          <label xml:lang="de">xxx</label>
-          <label xml:lang="en">xxx</label>
+        <item value="stateDoctorate">
+          <label xml:lang="de">Habilitation</label>
+          <label xml:lang="en">State doctorate</label>
         </item>
-        <item value="xxx5">
-          <label xml:lang="de">xxx</label>
-          <label xml:lang="en">xxx</label>
+        <item value="graduate">
+          <label xml:lang="de">Magister</label>
+          <label xml:lang="en">Graduate</label>
         </item>
       </list>
     </cell>
   </panel>
 
   <helpPopup id="mods.genre.kindOfThesis.help" width="400px" height="250px">
-    <label xml:lang="de">xxx</label>
+    <label xml:lang="de">Es gibt verschiedene Arten von Hochschulschriften. Bitte spezifizieren Sie diese an dieser Stelle genauer.</label>
     <label xml:lang="en">Select an entry from the list.</label>
   </helpPopup>
   <!-- thesis_genre END -->
