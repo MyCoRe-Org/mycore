@@ -81,7 +81,7 @@ public class MCROAISearchManager {
     protected MCROAIObjectManager objManager;
 
     protected DeletedRecordPolicy deletedRecordPolicy;
-    
+
     static {
         resultMap = new ConcurrentHashMap<String, MCROAIResults>();
         String prefix = MCROAIAdapter.PREFIX + "ResumptionTokens.";
@@ -238,7 +238,7 @@ public class MCROAISearchManager {
     @SuppressWarnings("unchecked")
     protected MCRResults searchDeleted(Date from, Date until) {
         MCRResults mcrResults = new MCRResults();
-        if (DeletedRecordPolicy.No.equals(deletedRecordPolicy) || DeletedRecordPolicy.Transient.equals(deletedRecordPolicy)) {
+        if (from == null || DeletedRecordPolicy.No.equals(deletedRecordPolicy) || DeletedRecordPolicy.Transient.equals(deletedRecordPolicy)) {
             return mcrResults;
         }
         LOGGER.info("Getting identifiers of deleted items");
@@ -248,14 +248,12 @@ public class MCROAISearchManager {
             MCRHIBConnection conn = MCRHIBConnection.instance();
             Criteria criteria = conn.getSession().createCriteria(MCRDELETEDITEMS.class);
             criteria.setProjection(Projections.property("id.identifier"));
-            if (from != null && until != null) {
-                Criterion lowerBound = Restrictions.ge("id.dateDeleted", from);
+            Criterion lowerBound = Restrictions.ge("id.dateDeleted", from);
+            if (until != null) {
                 Criterion upperBound = Restrictions.le("id.dateDeleted", until);
                 criteria.add(Restrictions.and(lowerBound, upperBound));
-            } else if (from != null) {
-                criteria.add(Restrictions.ge("id.dateDeleted", from));
-            } else if (until != null) {
-                criteria.add(Restrictions.le("id.dateDeleted", until));
+            } else {
+                criteria.add(lowerBound);
             }
             deletedItems = criteria.list();
             for (String id : deletedItems) {
