@@ -45,6 +45,12 @@
       </xsl:message>
       <nameOrPND>
         <xsl:choose>
+          <xsl:when test="@authorityURI='http://d-nb.info/'">
+            <xsl:attribute name="editor.output">
+              <xsl:value-of select="mods:namePart"/>
+            </xsl:attribute>
+            <xsl:value-of select="substring-after(@valueURI, 'http://d-nb.info/gnd/')"/>
+          </xsl:when>
           <xsl:when test="mods:namePart[@type='family'] and mods:namePart[@type='given']">
             <xsl:value-of select="concat(mods:namePart[@type='family'],', ',mods:namePart[@type='given'])" />
           </xsl:when>

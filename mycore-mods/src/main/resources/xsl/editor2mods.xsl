@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:mcr="http://www.mycore.org/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan"
-  xmlns:mods="http://www.loc.gov/mods/v3" xmlns:mcrmods="xalan://org.mycore.mods.MCRMODSClassificationSupport" xmlns:java="http://xml.apache.org/xalan/java" exclude-result-prefixes="mcrmods mcr xalan java"
-  version="1.0">
+<xsl:stylesheet xmlns:mcr="http://www.mycore.org/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:xalan="http://xml.apache.org/xalan" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:mcrmods="xalan://org.mycore.mods.MCRMODSClassificationSupport"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:gnd="http://d-nb.info/gnd/" xmlns:java="http://xml.apache.org/xalan/java"
+  exclude-result-prefixes="gnd rdf mcrmods mcr xalan java" version="1.0">
 
   <xsl:include href="copynodes.xsl" />
 
@@ -23,6 +24,7 @@
     </xsl:if>
   </xsl:template>
 
+  <xsl:template match="@editor.output" />
   <!-- ignore @classId and @categId but transform it to @authority|@authorityURI and @valueURI -->
   <xsl:template match="@mcr:classId" />
   <xsl:template match="@mcr:categId" />
@@ -65,23 +67,36 @@
       </xsl:copy>
     </xsl:for-each>
   </xsl:template>
-  
-  <xsl:template match="nameOrPND">
-    <xsl:choose>
-      <xsl:when test="contains(., ',')">
-        <mods:namePart type="family">
-          <xsl:value-of select="java:trim(substring-before(., ','))"/>
-        </mods:namePart>
-        <mods:namePart type="given">
-          <xsl:value-of select="java:trim(substring-after(., ','))"/>
-        </mods:namePart>
-      </xsl:when>
-      <xsl:otherwise>
-        <mods:namePart type="given">
-          <xsl:value-of select="."/>
-        </mods:namePart>
-      </xsl:otherwise>
-    </xsl:choose>
+
+  <xsl:template match="*[nameOrPND]">
+    <xsl:copy>
+      <xsl:apply-templates select="@*" />
+      
+      <!-- get name from PND or from editor input -->
+      <xsl:variable name="trimmedValue" select="java:trim(string(nameOrPND))" />
+      <xsl:choose>
+        <xsl:when test="string-length($trimmedValue)=9 and string(number(substring($trimmedValue,1,8)))!='NaN'">
+          <!-- PND -->
+          <xsl:attribute name="authorityURI">
+            <xsl:value-of select="'http://d-nb.info/'" />
+          </xsl:attribute>
+          <xsl:attribute name="valueURI">
+            <xsl:value-of select="concat('http://d-nb.info/gnd/',$trimmedValue)" />
+          </xsl:attribute>
+          <xsl:variable name="gndEntry" select="document(concat('http://d-nb.info/gnd/',$trimmedValue,'/about/rdf'))" />
+          <mods:namePart>
+            <xsl:value-of select="$gndEntry//gnd:preferredNameForThePerson[not(@rdf:parseType)]" />
+          </mods:namePart>
+        </xsl:when>
+        <xsl:otherwise>
+          <mods:namePart>
+            <xsl:value-of select="$trimmedValue" />
+          </mods:namePart>
+        </xsl:otherwise>
+      </xsl:choose>
+
+      <xsl:apply-templates select="*[not(local-name()='nameOrPND')]" />
+    </xsl:copy>
   </xsl:template>
 
 </xsl:stylesheet>

@@ -168,7 +168,7 @@
   </text>
   
   <panel id="mods.name">
-    <hidden var="@editor.output" />
+    <hidden var="nameOrPND/@editor.output" />
     <cell col="1" row="1" anchor="NORTHEAST">
       <text>
         <label xml:lang="de">Name oder PND</label>
@@ -184,7 +184,7 @@
       </textfield>
     </cell>
     <cell col="2" row="2" anchor="NORTHEAST">
-      <output var="@editor.output" default="" />
+      <output var="nameOrPND/@editor.output" default="" />
     </cell>
   </panel>
 
