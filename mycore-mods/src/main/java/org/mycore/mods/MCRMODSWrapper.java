@@ -88,7 +88,7 @@ public class MCRMODSWrapper {
     }
 
     public MCRObjectID setID(String projectID, int ID) {
-        MCRObjectID objID = MCRObjectID.getInstance(MessageFormat.format("{0}_{1}_{2,number,#}", projectID, MODS_OBJECT_TYPE, ID));
+        MCRObjectID objID = MCRObjectID.getInstance(MCRObjectID.formatID(projectID, MODS_OBJECT_TYPE, ID));
         object.setId(objID);
         return objID;
     }
