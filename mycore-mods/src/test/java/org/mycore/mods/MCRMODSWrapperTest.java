@@ -1,5 +1,4 @@
 /*
- * $Id$
  * $Revision: 5697 $ $Date: 07.04.2011 $
  *
  * This file is part of ***  M y C o R e  ***
@@ -31,6 +30,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.jdom.Document;
+import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.xpath.XPath;
 import org.junit.Before;
@@ -44,7 +44,6 @@ import org.xml.sax.SAXParseException;
 
 /**
  * @author Thomas Scheffler (yagee)
- *
  */
 public class MCRMODSWrapperTest extends MCRTestCase {
 
@@ -83,4 +82,15 @@ public class MCRMODSWrapperTest extends MCRTestCase {
         return xml;
     }
 
+    @Test
+    public void testSetMODS() throws SAXParseException, IOException, JDOMException {
+        Element mods = loadMODSDocument().detachRootElement();
+        MCRMODSWrapper wrapper = new MCRMODSWrapper();
+        wrapper.setID("JUnit", 4711);
+        wrapper.setMODS(mods);
+        Document mcrObjXml = wrapper.getMCRObject().createXML();
+        XPath xpathCheck = XPath.newInstance("//mods:mods");
+        xpathCheck.addNamespace(MCRConstants.MODS_NAMESPACE);
+        assertEquals("Did not find mods data", 1, xpathCheck.selectNodes(mcrObjXml).size());
+    }
 }
