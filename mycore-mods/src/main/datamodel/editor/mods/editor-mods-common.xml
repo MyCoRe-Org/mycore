@@ -14,12 +14,12 @@
 
   <panel id="mods.title">
     <cell anchor="NORTHWEST" var="mods:title">
-      <textfield id="mods.title.text" width="60" maxlength="512">
+      <textarea id="mods.title.text" width="48" height="3" maxlength="1028">
         <condition id="mods.title.cond" required="true">
           <label xml:lang="de">Tragen Sie hier den Titel des Dokumentes ein.</label>
           <label xml:lang="en">Enter the title of the document here.</label>
         </condition>
-      </textfield>
+      </textarea>
     </cell>
   </panel>
 
@@ -85,17 +85,61 @@
   <panel id="mods.languageTerm">
     <cell anchor="NORTHWEST" var="mods:languageTerm">
       <panel>
-        <hidden var="@authority" default="iso639-2b" />
+        <hidden var="@authority" default="iso639-1" />
         <hidden var="@type" default="code" />
         <cell col="1">
-          <list id="mods.languageTerm.list" type="dropdown" default="ger">
-            <item value="ger">
+          <list id="mods.languageTerm.list" type="dropdown" default="de">
+            <item value="de">
               <label xml:lang="de">deutsch</label>
               <label xml:lang="en">german</label>
             </item>
-            <item value="eng">
+            <item value="en">
               <label xml:lang="de">englisch</label>
               <label xml:lang="en">english</label>
+            </item>
+            <item value="fr">
+              <label xml:lang="de">französisch</label>
+              <label xml:lang="en">french</label>
+            </item>
+            <item value="es">
+              <label xml:lang="de">spanisch</label>
+              <label xml:lang="en">spanish</label>
+            </item>
+            <item value="hu">
+              <label xml:lang="de">ungarisch</label>
+              <label xml:lang="en">hungarian</label>
+            </item>
+            <item value="pl">
+              <label xml:lang="de">polnisch</label>
+              <label xml:lang="en">polish</label>
+            </item>
+            <item value="cs">
+              <label xml:lang="de">tschechisch</label>
+              <label xml:lang="en">czech</label>
+            </item>
+            <item value="it">
+              <label xml:lang="de">italienisch</label>
+              <label xml:lang="en">italian</label>
+            </item>
+            <item value="nl">
+              <label xml:lang="de">holländisch</label>
+              <label xml:lang="en">dutch</label>
+            </item>
+            <item value="ro">
+              <label xml:lang="de">rumänisch</label>
+              <label xml:lang="en">romanian</label>
+            </item>
+            <item value="ru">
+              <label xml:lang="de">russisch</label>
+              <label xml:lang="en">russian</label>
+            </item>
+            <item value="pt">
+              <label xml:lang="de">portugiesisch</label>
+              <label xml:lang="en">portuguese</label>
+            </item>
+            <item value="xx">
+              <label xml:lang="de">sonstige</label>
+              <label xml:lang="en">other</label>
             </item>
             <condition id="mods.languageTerm.cond" required="true">
               <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
@@ -642,17 +686,33 @@
           <cell anchor="NORTHWEST" ref="TFzeile512" />
           <cell row="1" col="2" anchor="NORTHWEST" var="@type">
             <list type="dropdown" default="unknown">
-              <item value="urn">
-                <label xml:lang="de">URN</label>
-                <label xml:lang="en">URN</label>
+              <item value="isbn13">
+                <label xml:lang="de">ISBN13</label>
+                <label xml:lang="en">ISBN13</label>
+              </item>
+              <item value="issn">
+                <label xml:lang="de">ISSN</label>
+                <label xml:lang="en">ISSN</label>
+              </item>
+              <item value="intern_old">
+                <label xml:lang="de">intern</label>
+                <label xml:lang="en">intern</label>
               </item>
               <item value="doi">
                 <label xml:lang="de">DOI</label>
                 <label xml:lang="en">DOI</label>
               </item>
-              <item value="citekey">
-                <label xml:lang="de">Citekey</label>
-                <label xml:lang="en">Citekey</label>
+              <item value="permalink">
+                <label xml:lang="de">Permalink</label>
+                <label xml:lang="en">Permalink</label>
+              </item>
+              <item value="url">
+                <label xml:lang="de">URL</label>
+                <label xml:lang="en">URL</label>
+              </item>
+              <item value="uri">
+                <label xml:lang="de">URI</label>
+                <label xml:lang="en">URI</label>
               </item>
               <item value="unknown">
                 <label xml:lang="de">Unbekannt</label>
@@ -835,6 +895,56 @@
   </helpPopup>
   <!-- av_medium_genre END -->
 
+  <!-- thesis_genre -->
+  <text id="mods.genre.kindOfThesis.label">
+    <label xml:lang="de">Genre (*)</label>
+    <label xml:lang="en">Genre (*)</label>
+  </text>
+
+  <panel id="mods.genre.kindOfThesis">
+    <cell anchor="NORTHWEST" var="mods:genre">
+      <hidden var="@type" default="kindof" />
+      <hidden var="@displayLabel" default="Kind of Thesis" />
+      <list id="kindOfThesis.ListGenre" type="dropdown" default="masterThesis">
+        <condition required="true">
+          <label xml:lang="de">Wählen Sie bitte den Typ der Hochschulschrift aus.</label>
+          <label xml:lang="en">What kind of thesis is this?</label>
+        </condition>
+        <item value="masterThesis">
+          <label xml:lang="de">Abschlussarbeit (Master)</label>
+          <label xml:lang="en">masterThesis</label>
+        </item>
+        <item value="xx1">
+          <label xml:lang="de">xxx</label>
+          <label xml:lang="en">xxx</label>
+        </item>
+        <item value="xxx2">
+          <label xml:lang="de">xxx</label>
+          <label xml:lang="en">xxx</label>
+        </item>
+        <item value="xxx3">
+          <label xml:lang="de">xxx</label>
+          <label xml:lang="en">xxx</label>
+        </item>
+        <item value="xxx4">
+          <label xml:lang="de">xxx</label>
+          <label xml:lang="en">xxx</label>
+        </item>
+        <item value="xxx5">
+          <label xml:lang="de">xxx</label>
+          <label xml:lang="en">xxx</label>
+        </item>
+      </list>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.genre.kindOfThesis.help" width="400px" height="250px">
+    <label xml:lang="de">xxx</label>
+    <label xml:lang="en">Select an entry from the list.</label>
+  </helpPopup>
+  <!-- thesis_genre END -->
+  
+  
   <!-- Konferenztitel -->
   <text id="mods.nameConference.label">
     <label xml:lang="de">Konferenztitel (*)</label>
@@ -1176,6 +1286,29 @@
   </helpPopup>
   <!-- Impact Factor END -->
 
+
+  <!-- *** Parents *** -->
+  <panel id="displayParent">
+    <cell col="1" row="1" var="structure" anchor="NORTHWEST">
+      <panel>
+        <hidden var="parents/@class" default="MCRMetaLinkID" />
+        <hidden var="parents/@notinherit" default="true" />
+        <hidden var="parents/@heritable" default="false" />
+        <hidden var="parents/parent/@xlink:type" default="locator" />
+        <hidden var="parents/parent/@xlink:label" />
+        <hidden var="parents/parent/@xlink:href" />
+        <cell col="1" row="1">
+          <label xml:lang="de">
+            <xhtml:span class="editorlabel">&#160;Vater Objekt&#160;</xhtml:span>
+          </label>
+        </cell>
+        <cell col="2" row="1" var="parents" anchor="NORTH">
+          <output var="parent/@xlink:href" default="Kein Vater-Objekt" />
+        </cell>
+      </panel>
+    </cell>
+  </panel>
+
   <!-- *** Text fields *** -->
   <textfield id="TFzeile10" width="10" maxlength="10" />
   <textfield id="TFzeile32" width="32" maxlength="32" />
@@ -1184,6 +1317,7 @@
   <textfield id="TFzeile512" width="60" maxlength="512" />
   <textfield id="TFzeile1024" width="60" maxlength="1024" />
   <!-- *** Text area *** -->
+  <textarea id="TFarea1028" width="48" height="3" maxlength="1028" />
   <textarea id="TFarea4096" width="48" height="8" maxlength="4096" />
   <textarea id="TFeditor" wysiwygEditor="true" editorWidth="500" editorHeight="200" width="60" height="10" />
 
