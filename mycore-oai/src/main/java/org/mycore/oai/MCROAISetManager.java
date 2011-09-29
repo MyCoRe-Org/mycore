@@ -26,6 +26,7 @@ import static org.mycore.oai.pmh.OAIConstants.NS_OAI;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
 import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
@@ -69,7 +70,7 @@ public class MCROAISetManager {
         this.setURIs = new ArrayList<String>();
     }
 
-    protected void init(String configPrefix) {
+    public void init(String configPrefix) {
         this.configPrefix = configPrefix;
         updateURIs();
     }
@@ -77,10 +78,11 @@ public class MCROAISetManager {
     protected void updateURIs() {
         this.setURIs = new ArrayList<String>();
         MCRConfiguration config = MCRConfiguration.instance();
-        String[] sets = config.getString(this.configPrefix + "Sets", "").split(",");
-        for (String s : sets) {
-            if (config.getString(this.configPrefix + "Set." + s, "").trim().length() > 0) {
-                this.setURIs.add(config.getString(this.configPrefix + "Set." + s).trim());
+        Properties setProperties = config.getProperties(this.configPrefix + "Set");
+        for(Object o : setProperties.values()) {
+            String value = (String)o;
+            if(value.trim().length() > 0) {
+                this.setURIs.add(value);
             }
         }
     }

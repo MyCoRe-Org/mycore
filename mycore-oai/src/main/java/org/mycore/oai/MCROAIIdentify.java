@@ -30,7 +30,6 @@ import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.oai.pmh.DateUtils;
@@ -58,7 +57,7 @@ public class MCROAIIdentify extends SimpleIdentify {
 
     private MCRConfiguration config;
 
-    private String configPrefix;
+    protected String configPrefix;
 
     public MCROAIIdentify(String baseURL, String configPrefix) {
         this.config = MCRConfiguration.instance();
@@ -94,6 +93,10 @@ public class MCROAIIdentify extends SimpleIdentify {
             desc.getFriendsList().add(friend);
         }
         return desc;
+    }
+
+    public String getConfigPrefix() {
+        return configPrefix;
     }
 
     /**
