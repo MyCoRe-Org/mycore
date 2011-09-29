@@ -33,8 +33,6 @@
     <cell row="30" col="3" anchor="NORTHWEST" ref="mods.impact.help"/>
     <!-- impact factor END -->
 
-    <cell row="260" col="1" colspan="3" anchor="NORTHEAST" ref="mods.noteLocationCorp" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-
     <cell col="1" colspan="3" row="300" anchor="EAST" style="padding-top:20px;">
       <submitButton width="100px" i18n="common.button.save" />
       <cancelButton width="100px" i18n="common.button.cancel" />
