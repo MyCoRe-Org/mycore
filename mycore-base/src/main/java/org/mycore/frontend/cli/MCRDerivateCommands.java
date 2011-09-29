@@ -162,6 +162,10 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
                 "org.mycore.frontend.cli.MCRDerivateCommands.synchronizeDerivateForID String",
                 "The command read a derivate with the MCRObjectID {0} and synchronize the xlink:label with the derivate entry of the mycoreobject.");
         command.add(com);
+
+        com = new MCRCommand("link derivate {0} to {1}", "org.mycore.frontend.cli.MCRDerivateCommands.linkDerivateToObject String String",
+                "links the given derivate {0} to the given mycore object {1}");
+        command.add(com);
     }
 
     /**
@@ -763,4 +767,48 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         }
     }
 
+    /**
+     * Links the given derivate to the given object.
+     * 
+     * @param derivateId
+     * @param objectId
+     */
+    public static void linkDerivateToObject(String derivateId, String objectId) throws Exception {
+        if (derivateId == null || objectId == null) {
+            LOGGER.error("Either derivate id or object id is null. Derivate=" + derivateId + ", object=" + objectId);
+            return;
+        }
+        MCRObjectID derID = MCRObjectID.getInstance(derivateId);
+        MCRObjectID objID = MCRObjectID.getInstance(objectId);
+
+        if (!MCRMetadataManager.exists(objID)) {
+            throw new Exception("The object with id " + objID + " does not exist");
+        }
+
+        if (!MCRMetadataManager.exists(derID)) {
+            throw new Exception("The derivate with id " + derID + " does not exist");
+        }
+
+        MCRDerivate derObj = MCRMetadataManager.retrieveMCRDerivate(derID);
+        MCRObjectID oldOwnerId = derObj.getDerivate().getMetaLink().getXLinkHrefID();
+
+        /* set link to new parent in the derivate object */
+        LOGGER.info("Setting " + objID + " as parent for derivate " + derID);
+        derObj.getDerivate().getMetaLink().setReference(objID, "", "");
+        derObj.setLabel("data object from " + objectId + " (prev. owner was " + oldOwnerId);
+        MCRMetadataManager.updateMCRDerivateXML(derObj);
+
+        /* set link to derivate in the new parent */
+        LOGGER.info("Linking derivate " + derID + " to " + objID);
+        MCRMetaLinkID derivateLink = new MCRMetaLinkID();
+        derivateLink.setReference(derID, "", "");
+        derivateLink.setSubTag("derobject");
+        MCRMetadataManager.addDerivateToObject(objID, derivateLink);
+
+        /* removing link from old parent */
+        MCRObject oldOwner = MCRMetadataManager.retrieveMCRObject(oldOwnerId);
+        boolean flag = oldOwner.getStructure().removeDerivate(derID);
+        LOGGER.info("Unlinking derivate " + derID + " from object " + oldOwnerId + ". Success=" + flag);
+        MCRMetadataManager.fireUpdateEvent(oldOwner);
+    }
 }
