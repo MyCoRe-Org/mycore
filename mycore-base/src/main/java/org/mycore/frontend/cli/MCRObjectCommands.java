@@ -12,6 +12,7 @@ package org.mycore.frontend.cli;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
@@ -82,6 +83,10 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         super();
 
         MCRCommand com = null;
+        
+        com = new MCRCommand("delete objects matching {0}", "org.mycore.frontend.cli.MCRObjectCommands.deleteByQuery String",
+        "Deletes all objects matching the query given in parameter {0}");
+        command.add(com);
 
         com = new MCRCommand("delete all objects of type {0}", "org.mycore.frontend.cli.MCRObjectCommands.deleteAllObjects String",
                 "Removes MCRObjects in the number range between the MCRObjectID {0} and {1}.");
@@ -1000,5 +1005,44 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         MCRObject mcrObj = new MCRObject(xml);
         MCRMetadataManager.update(mcrObj);
         LOGGER.info("Object " + id + " successfully restored!");
+    }
+    
+    public static void deleteByQuery(String source) throws Exception {
+        LOGGER.info("Given query is \"" + source + "\"");
+        if (source == null || source.length() == 0) {
+            LOGGER.error("Given query is invalid");
+            return;
+        }
+
+        MCRCondition condition = null;
+        try {
+            condition = new MCRQueryParser().parse(source);
+        } catch (Exception ex) {
+            LOGGER.error("Exception occured while parsing the input string", ex);
+            return;
+        }
+
+        MCRQuery q = new MCRQuery(condition);
+        MCRResults results = MCRQueryManager.search(q);
+        
+        if (results == null) {
+            return;
+        }
+        File deletedItems = new File(System.getenv("HOME") + File.separator + System.currentTimeMillis() + "_deleted_objects.txt");
+        FileWriter fw = new FileWriter(deletedItems);
+        try {
+            fw.write("query=" + source + "\n\n");
+            for (MCRHit hit : results) {
+                fw.write(hit.getID() + "\n");
+                MCRMetadataManager.deleteMCRObject(MCRObjectID.getInstance(hit.getID()));
+            }
+        } catch (Exception ex) {
+            LOGGER.error(ex);
+        } finally {
+            fw.flush();
+            fw.close();
+        }
+
+        LOGGER.info("A list with the identifiers of the deleted items has been saved to " + deletedItems.getAbsolutePath());
     }
 }
