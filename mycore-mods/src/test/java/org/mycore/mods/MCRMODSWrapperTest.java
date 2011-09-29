@@ -24,6 +24,7 @@ package org.mycore.mods;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -92,5 +93,13 @@ public class MCRMODSWrapperTest extends MCRTestCase {
         XPath xpathCheck = XPath.newInstance("//mods:mods");
         xpathCheck.addNamespace(MCRConstants.MODS_NAMESPACE);
         assertEquals("Did not find mods data", 1, xpathCheck.selectNodes(mcrObjXml).size());
+    }
+
+    @Test
+    public void testServiceFlags() {
+        MCRMODSWrapper wrapper = new MCRMODSWrapper();
+        assertNull(wrapper.getServiceFlag("name"));
+        wrapper.setServiceFlag("name", "value");
+        assertEquals("value", wrapper.getServiceFlag("name"));
     }
 }
