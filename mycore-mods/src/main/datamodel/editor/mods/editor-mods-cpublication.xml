@@ -16,14 +16,8 @@
     <hidden var="metadata/def.modsContainer/@heritable" default="false" />
 
     <!-- Konferenzband (Verweis auf MyCoRe-ID) -->
-    <cell row="10" col="1" anchor="NORTHEAST" ref="mods.cproceeding.label" />
-    <cell row="10" col="2" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='host']">
-      <panel>
-        <cell col="1"><output var="mods:location/mods:url/@note" /></cell>
-        <cell col="2"  ref="mods.cproceeding"/>
-      </panel>
-    </cell>
-    <cell row="10" col="3" anchor="NORTHWEST" ref="mods.cproceeding.help" />
+    <cell row="10" colspan="3" anchor="NORTHWEST" ref="displayParent" />
+
     <!-- Konferenzband END -->
 
 
