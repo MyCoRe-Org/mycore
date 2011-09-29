@@ -23,15 +23,22 @@
 package org.mycore.mods;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.xpath.XPath;
+import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRException;
 import org.mycore.datamodel.metadata.MCRMetaElement;
 import org.mycore.datamodel.metadata.MCRMetaXML;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectMetadata;
+import org.mycore.datamodel.metadata.MCRObjectService;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -46,6 +53,19 @@ public class MCRMODSWrapper {
     public static final String MODS_OBJECT_TYPE = "mods";
 
     private static final String MODS_DATAMODEL = "datamodel-mods.xsd";
+
+    private static List<String> topLevelElementOrder = new ArrayList<String>();
+
+    static {
+        topLevelElementOrder.add("subject");
+        topLevelElementOrder.add("relatedItem");
+        topLevelElementOrder.add("identifier");
+        topLevelElementOrder.add("location");
+    }
+
+    private static int getRankOf(Element topLevelElement) {
+        return topLevelElementOrder.indexOf(topLevelElement.getName());
+    }
 
     public static MCRObject wrapMODSDocument(Element modsDefinition, String projectID) {
         MCRMODSWrapper wrapper = new MCRMODSWrapper();
@@ -89,5 +109,97 @@ public class MCRMODSWrapper {
 
     public Element getMODS() {
         return mods;
+    }
+
+    private XPath buildXPath(String xPath) throws JDOMException {
+        XPath path = XPath.newInstance(xPath);
+        path.addNamespace(MCRConstants.MODS_NAMESPACE);
+        path.addNamespace(MCRConstants.XLINK_NAMESPACE);
+        return path;
+    }
+
+    public Element getElement(String xPath) {
+        try {
+            return (Element) (buildXPath(xPath).selectSingleNode(mods));
+        } catch (JDOMException ex) {
+            String msg = "Could not get MODS element from " + xPath;
+            throw new MCRException(msg, ex);
+        }
+    }
+
+    public List<Element> getElements(String xPath) {
+        try {
+            return (List<Element>) (buildXPath(xPath).selectNodes(mods));
+        } catch (JDOMException ex) {
+            String msg = "Could not get elements at " + xPath;
+            throw new MCRException(msg, ex);
+        }
+    }
+
+    public String getElementValue(String xPath) {
+        Element element = getElement(xPath);
+        return (element == null ? null : element.getTextTrim());
+    }
+
+    public void setElement(String elementName, String attributeName, String attributeValue, String elementValue) {
+        String xPath = "mods:" + elementName + "[@" + attributeName + "='" + attributeValue + "']";
+        Element element = getElement(xPath);
+
+        if (element == null) {
+            element = addElement(elementName);
+            element.setAttribute(attributeName, attributeValue);
+        }
+
+        if (elementValue != null)
+            element.setText(elementValue.trim());
+        else
+            element.detach();
+    }
+
+    public Element addElement(String elementName) {
+        Element element = new Element(elementName, MCRConstants.MODS_NAMESPACE);
+        insertTopLevelElement(element);
+        return element;
+    }
+
+    private void insertTopLevelElement(Element element) {
+        int rankOfNewElement = getRankOf(element);
+        List<Element> topLevelElements = mods.getChildren();
+        for (int pos = 0; pos < topLevelElements.size(); pos++)
+            if (getRankOf(topLevelElements.get(pos)) > rankOfNewElement) {
+                mods.addContent(pos, element);
+                return;
+            }
+
+        mods.addContent(element);
+    }
+
+    public void removeElements(String xPath) {
+        Iterator<Element> selected;
+        try {
+            selected = buildXPath(xPath).selectNodes(mods).iterator();
+        } catch (JDOMException ex) {
+            String msg = "Could not remove elements at " + xPath;
+            throw new MCRException(msg, ex);
+        }
+
+        while (selected.hasNext()) {
+            Element element = selected.next();
+            selected.remove();
+            element.detach();
+        }
+    }
+
+    public String getServiceFlag(String type) {
+        MCRObjectService os = object.getService();
+        return (os.isFlagTypeSet(type) ? os.getFlags(type).get(0) : null);
+    }
+
+    public void setServiceFlag(String type, String value) {
+        MCRObjectService os = object.getService();
+        if (os.isFlagTypeSet(type))
+            os.removeFlags(type);
+        if ((value != null) && !value.trim().isEmpty())
+            os.addFlag(type, value.trim());
     }
 }
