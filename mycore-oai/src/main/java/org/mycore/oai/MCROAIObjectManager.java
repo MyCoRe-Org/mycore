@@ -21,10 +21,18 @@
  */
 package org.mycore.oai;
 
+import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Criteria;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.jdom.Element;
+import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.hibernate.tables.MCRDELETEDITEMS;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -32,6 +40,7 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.oai.pmh.DateUtils;
 import org.mycore.oai.pmh.Header;
+import org.mycore.oai.pmh.Header.Status;
 import org.mycore.oai.pmh.MetadataFormat;
 import org.mycore.oai.pmh.OAIConstants;
 import org.mycore.oai.pmh.Record;
@@ -97,6 +106,28 @@ public class MCROAIObjectManager {
         }
     }
 
+    public Record getDeletedRecord(String mcrId) {
+        try {
+            // building the query
+            MCRHIBConnection conn = MCRHIBConnection.instance();
+            Criteria criteria = conn.getSession().createCriteria(MCRDELETEDITEMS.class);
+            criteria.setProjection(Projections.property("id.dateDeleted"));
+            Criterion idCriterion = Restrictions.eq("id.identifier", mcrId);
+            criteria.add(idCriterion);
+            @SuppressWarnings("rawtypes")
+            List resultList = criteria.list();
+            if(resultList.size() > 0) {
+                Timestamp timestamp = (Timestamp)resultList.get(0);
+                Header header = new Header(getOAIId(mcrId), new Date(timestamp.getTime()), Status.deleted);
+                Record record = new Record(header);
+                return record;
+            }
+        } catch (Exception ex) {
+            LOGGER.warn("Could not retrieve identifiers of deleted objects", ex);
+        }
+        return null;
+    }
+
     public Header getHeader(String mcrId, MetadataFormat format) {
         Element headerElement = getJDOMHeader(mcrId, format);
         return headerToHeader(headerElement);
@@ -160,8 +191,6 @@ public class MCROAIObjectManager {
             MCRObjectID mcrObjId = MCRObjectID.getInstance(mcrId);
             return MCRXMLMetadataManager.instance().exists(mcrObjId);
         } catch (Exception ex) {
-            String msg = "Exception while checking existence of object " + mcrId;
-            LOGGER.warn(msg, ex);
             return false;
         }
     }

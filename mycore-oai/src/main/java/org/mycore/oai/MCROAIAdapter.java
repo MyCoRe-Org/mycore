@@ -34,6 +34,7 @@ import org.mycore.oai.pmh.BadResumptionTokenException;
 import org.mycore.oai.pmh.CannotDisseminateFormatException;
 import org.mycore.oai.pmh.Header;
 import org.mycore.oai.pmh.IdDoesNotExistException;
+import org.mycore.oai.pmh.Identify.DeletedRecordPolicy;
 import org.mycore.oai.pmh.MetadataFormat;
 import org.mycore.oai.pmh.NoMetadataFormatsException;
 import org.mycore.oai.pmh.NoRecordsMatchException;
@@ -225,7 +226,14 @@ public class MCROAIAdapter implements OAIAdapter {
     public Record getRecord(String identifier, MetadataFormat format) throws CannotDisseminateFormatException, IdDoesNotExistException {
         MCROAIObjectManager objectManager = getObjectManager();
         if (!objectManager.exists(identifier)) {
-            // TODO check deleted object
+            DeletedRecordPolicy rP = getIdentify().getDeletedRecordPolicy();
+            if(DeletedRecordPolicy.Persistent.equals(rP)) {
+                // get deleted item
+                Record deletedRecord = objectManager.getDeletedRecord(objectManager.getMyCoReId(identifier));
+                if(deletedRecord != null) {
+                    return deletedRecord;
+                }
+            }
             throw new IdDoesNotExistException(identifier);
         }
         return objectManager.getRecord(objectManager.getMyCoReId(identifier), format);
