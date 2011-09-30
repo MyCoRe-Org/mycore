@@ -114,7 +114,7 @@ public class MCROAIIdentify extends SimpleIdentify {
             MCRResults result = MCRQueryManager.search(q);
             if (result.getNumHits() > 0) {
                 MCRBase obj = MCRMetadataManager.retrieve(MCRObjectID.getInstance(result.getHit(0).getID()));
-                datestamp = obj.getService().getDate(MCRObjectService.DATE_TYPE_CREATEDATE);
+                datestamp = obj.getService().getDate(MCRObjectService.DATE_TYPE_MODIFYDATE);
             }
         } catch (Exception ex) {
             LOGGER.warn("Error occured while examining create date of first created object. Use default value.", ex);
