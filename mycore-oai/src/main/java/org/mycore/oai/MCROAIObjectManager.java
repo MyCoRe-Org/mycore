@@ -106,6 +106,14 @@ public class MCROAIObjectManager {
         }
     }
 
+    /**
+     * Returns a deleted record without metadata by given MyCoRe identifier or null, if the
+     * record is not deleted.
+     * 
+     * @param mcrId id of the deleted record
+     * @return deleted record
+     */
+    @SuppressWarnings("rawtypes")
     public Record getDeletedRecord(String mcrId) {
         try {
             // building the query
@@ -114,7 +122,6 @@ public class MCROAIObjectManager {
             criteria.setProjection(Projections.property("id.dateDeleted"));
             Criterion idCriterion = Restrictions.eq("id.identifier", mcrId);
             criteria.add(idCriterion);
-            @SuppressWarnings("rawtypes")
             List resultList = criteria.list();
             if(resultList.size() > 0) {
                 Timestamp timestamp = (Timestamp)resultList.get(0);
@@ -123,7 +130,7 @@ public class MCROAIObjectManager {
                 return record;
             }
         } catch (Exception ex) {
-            LOGGER.warn("Could not retrieve identifiers of deleted objects", ex);
+            LOGGER.warn("Error while retrieving deleted record " + mcrId, ex);
         }
         return null;
     }

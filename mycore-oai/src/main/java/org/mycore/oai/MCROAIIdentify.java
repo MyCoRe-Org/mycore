@@ -21,12 +21,17 @@
  */
 package org.mycore.oai;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Criteria;
+import org.hibernate.criterion.Projections;
+import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.hibernate.tables.MCRDELETEDITEMS;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -65,7 +70,6 @@ public class MCROAIIdentify extends SimpleIdentify {
 
         this.setBaseURL(baseURL);
         this.setRepositoryName(this.config.getString(configPrefix + "RepositoryName", "Undefined repository name"));
-        this.setEarliestDatestamp(calculateEarliestTimestamp());
         String sDelRecPol = this.config.getString(configPrefix + "DeletedRecord", "transient");
         this.setDeletedRecordPolicy(DeletedRecordPolicy.get(sDelRecPol));
         this.setGranularity(Granularity.YYYY_MM_DD);
@@ -73,6 +77,7 @@ public class MCROAIIdentify extends SimpleIdentify {
         if (adminMail == null || adminMail.equals("")) {
             adminMail = "no_mail_defined@oai_provider.com";
         }
+        this.setEarliestDatestamp(calculateEarliestTimestamp());
         this.getAdminEmailList().add(adminMail);
         this.getDescriptionList().add(getIdentifierDescription());
         this.getDescriptionList().add(getFriendsDescription());
@@ -105,9 +110,10 @@ public class MCROAIIdentify extends SimpleIdentify {
      * @return the create date of the oldest document within the repository
      */
     protected Date calculateEarliestTimestamp() {
-        /* default value */
+        // default value
         Date datestamp = DateUtils.parseUTC(config.getString(this.configPrefix + "EarliestDatestamp", "1970-01-01"));
         try {
+            // existing items
             MCRCondition condition = MCROAIUtils.getDefaultRestriction(this.configPrefix);
             List<MCRSortBy> sortByList = MCROAIUtils.getSortByList(this.configPrefix + "EarliestDatestamp.SortBy", "modified ascending");
             MCRQuery q = new MCRQuery(condition, sortByList, 1);
@@ -115,6 +121,20 @@ public class MCROAIIdentify extends SimpleIdentify {
             if (result.getNumHits() > 0) {
                 MCRBase obj = MCRMetadataManager.retrieve(MCRObjectID.getInstance(result.getHit(0).getID()));
                 datestamp = obj.getService().getDate(MCRObjectService.DATE_TYPE_MODIFYDATE);
+            }
+            // deleted items
+            if(DeletedRecordPolicy.Persistent.equals(this.getDeletedRecordPolicy())) {
+                MCRHIBConnection conn = MCRHIBConnection.instance();
+                Criteria criteria = conn.getSession().createCriteria(MCRDELETEDITEMS.class);
+                criteria.setProjection(Projections.min("id.dateDeleted"));
+                @SuppressWarnings("rawtypes")
+                List resultList = criteria.list();
+                if(resultList.size() > 0) {
+                    Date earliestDeletedDate = new Date(((Timestamp)resultList.get(0)).getTime());
+                    if(earliestDeletedDate.compareTo(datestamp) < 0) {
+                        datestamp = earliestDeletedDate;
+                    }
+                }
             }
         } catch (Exception ex) {
             LOGGER.warn("Error occured while examining create date of first created object. Use default value.", ex);
