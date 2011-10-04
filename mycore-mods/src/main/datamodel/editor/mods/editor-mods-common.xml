@@ -819,15 +819,7 @@
           <label xml:lang="de">Poster</label>
           <label xml:lang="en">Poster</label>
         </item>
-        <item value="05">
-          <label xml:lang="de">In House</label>
-          <label xml:lang="en">In House</label>
-        </item>
-        <item value="06">
-          <label xml:lang="de">Zeitschrifteninhaltsverzeichnis</label>
-          <label xml:lang="en">Zeitschrifteninhaltsverzeichnis</label>
-        </item>
-        <item value="07">
+        <item value="10">
           <label xml:lang="de">Sonstige</label>
           <label xml:lang="en">Other</label>
         </item>
