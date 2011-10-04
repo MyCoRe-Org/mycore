@@ -85,59 +85,59 @@
   <panel id="mods.languageTerm">
     <cell anchor="NORTHWEST" var="mods:languageTerm">
       <panel>
-        <hidden var="@authority" default="iso639-1" />
+        <hidden var="@authority" default="iso639-3" />
         <hidden var="@type" default="code" />
         <cell col="1">
           <list id="mods.languageTerm.list" type="dropdown" default="de">
-            <item value="de">
+            <item value="ger">
               <label xml:lang="de">deutsch</label>
               <label xml:lang="en">german</label>
             </item>
-            <item value="en">
+            <item value="eng">
               <label xml:lang="de">englisch</label>
               <label xml:lang="en">english</label>
             </item>
-            <item value="fr">
+            <item value="fre">
               <label xml:lang="de">französisch</label>
               <label xml:lang="en">french</label>
             </item>
-            <item value="es">
+            <item value="spa">
               <label xml:lang="de">spanisch</label>
               <label xml:lang="en">spanish</label>
             </item>
-            <item value="hu">
+            <item value="hun">
               <label xml:lang="de">ungarisch</label>
               <label xml:lang="en">hungarian</label>
             </item>
-            <item value="pl">
+            <item value="pol">
               <label xml:lang="de">polnisch</label>
               <label xml:lang="en">polish</label>
             </item>
-            <item value="cs">
+            <item value="cze">
               <label xml:lang="de">tschechisch</label>
               <label xml:lang="en">czech</label>
             </item>
-            <item value="it">
+            <item value="ita">
               <label xml:lang="de">italienisch</label>
               <label xml:lang="en">italian</label>
             </item>
-            <item value="nl">
+            <item value="dut">
               <label xml:lang="de">holländisch</label>
               <label xml:lang="en">dutch</label>
             </item>
-            <item value="ro">
+            <item value="rum">
               <label xml:lang="de">rumänisch</label>
               <label xml:lang="en">romanian</label>
             </item>
-            <item value="ru">
+            <item value="rus">
               <label xml:lang="de">russisch</label>
               <label xml:lang="en">russian</label>
             </item>
-            <item value="pt">
+            <item value="por">
               <label xml:lang="de">portugiesisch</label>
               <label xml:lang="en">portuguese</label>
             </item>
-            <item value="xx">
+            <item value="mis">
               <label xml:lang="de">sonstige</label>
               <label xml:lang="en">other</label>
             </item>
