@@ -398,11 +398,10 @@
 
   <helpPopup id="mods.dateIssued.help" width="400px" height="250px">
     <label xml:lang="de">
-      Bei Konferenzbänden, Büchern geben Sie bitte das Erscheinungsjahr an,
-      <br />
-      bei Filmen das Datum der Aufnahme,
-      <br />
-      bei Promotionen das Datum der ersten Online Veröffentlichung.
+      Bei Konferenzbänden, Büchern geben Sie bitte das Erscheinungsjahr an, 
+      bei Filmen das Datum der Aufnahme, bei Promotionen das Datum der ersten Online Veröffentlichung.
+      Das Datum muss im ISO Format mit Bindestrich (YYYY-MM-DD) angegeben werden.<br /> 
+      Beispiel: 2003-01-07 
     </label>
     <label xml:lang="en">
       Date of Publication:
@@ -685,7 +684,7 @@
         <panel>
           <cell anchor="NORTHWEST" ref="TFzeile512" />
           <cell row="1" col="2" anchor="NORTHWEST" var="@type">
-            <list type="dropdown" default="unknown">
+            <list type="dropdown" default="isbn13">
               <item value="isbn13">
                 <label xml:lang="de">ISBN13</label>
                 <label xml:lang="en">ISBN13</label>
@@ -727,7 +726,8 @@
 
   <helpPopup id="mods.identifier.help" width="400px" height="250px">
     <label xml:lang="de">
-      Identifier (ggf. mehrere, URN, DOI,...)
+      Ein Identifier ist ein eindeutiger und dauerhafter Identifikator für eine digitale Ressource oder ein physisches Werk.
+      Es können auch mehrere unterschiedliche Identifikatoren (DOI, URN, Permalink ...) angegeben werden. 
     </label>
     <label xml:lang="en">
       Identifier (ggf. mehrere, URN, DOI,...)

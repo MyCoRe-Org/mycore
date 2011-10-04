@@ -83,12 +83,6 @@
     <cell row="130" col="3" anchor="NORTHWEST" ref="mods.book.volume.count.help" />
     <!-- Volume Count|Part END -->
 
-    <!-- ISBN -->
-    <cell row="160" col="1" anchor="NORTHEAST" ref="mods.book.isbn.label" />
-    <cell row="160" col="2" anchor="NORTHWEST" ref="mods.book.isbn" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="160" col="3" anchor="NORTHWEST" ref="mods.book.isbn.help" />
-    <!-- ISBN END -->
-
     <!-- Identifier -->
     <cell row="170" col="1" anchor="NORTHEAST" ref="mods.identifier.label" />
     <cell row="170" col="2" anchor="NORTHWEST" ref="mods.identifier" var="metadata/def.modsContainer/modsContainer/mods:mods" />
