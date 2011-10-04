@@ -109,12 +109,13 @@ public final class MCRXSLInfoServlet extends MCRServlet {
         Set<String> paths = getServletContext().getResourcePaths(base);
 
         Set<String> more = new HashSet<String>();
+        more.addAll(paths);
+
         for (String path : paths)
             if (path.endsWith("/"))
                 more.addAll(diveInto(path));
-        paths.addAll(more);
 
-        return paths;
+        return more;
     }
 
     private void findXSLinJar(String pathOfJarFile) throws IOException {
