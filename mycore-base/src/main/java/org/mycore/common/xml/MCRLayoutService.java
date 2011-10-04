@@ -503,7 +503,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
                 //have to use SAX here to resolve entities
                 XMLReader reader = XMLReaderFactory.createXMLReader();
                 reader.setEntityResolver(MCRURIResolver.instance());
-                URL resourceURL = this.getClass().getClassLoader().getResource("/" + resource);
+                URL resourceURL = this.getClass().getClassLoader().getResource(resource);
                 InputSource input = new InputSource(resourceURL.toString());
                 SAXSource source = new SAXSource(reader, input);
                 stylesheet = factory.newTemplates(source);
