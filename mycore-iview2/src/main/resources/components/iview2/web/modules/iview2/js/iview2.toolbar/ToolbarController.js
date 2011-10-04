@@ -299,7 +299,7 @@ ToolbarController.prototype._checkNewModel = function(model) {
 		var views = [];
 		var relView = ctrl.relations[this.model.id];
 		for (var i = 0; i < relView.length; i++){
-			views.push(ctrl.getView(relView[i]));
+			views.push(ctrl.views[relView[i]]);
 		}
 		return views;
 	};
