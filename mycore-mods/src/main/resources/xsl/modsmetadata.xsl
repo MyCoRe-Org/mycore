@@ -191,7 +191,7 @@
         <xsl:value-of select="concat(i18n:translate(concat('metaData.mods.dictionary.',mods:role/mods:roleTerm[@authority='marcrelator'])),':')" />
       </td>
       <td class="metavalue">
-        <xsl:value-of select="concat(mods:namePart[@type='family'],', ',mods:namePart[@type='given'])" />
+        <xsl:value-of select="mods:namePart" />
       </td>
     </tr>
   </xsl:template>
@@ -299,7 +299,7 @@
       <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:subject" />
       <xsl:with-param name="sep" select="'; '" />
     </xsl:call-template>
-    <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name" />
+    <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@type='corporate']" />
     <xsl:call-template name="printMetaDate.mods">
       <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:note" />
     </xsl:call-template>
