@@ -7,6 +7,10 @@
   <xsl:param name="MCR.Users.Superuser.UserName" />
   <xsl:include href="mods2html.xsl" />
   <xsl:include href="modsmetadata.xsl" />
+  
+  <xsl:include href="modshitlist-external.xsl" />  <!-- for external usage in application module -->
+  <xsl:include href="modsdetails-external.xsl" />  <!-- for external usage in application module -->
+  
   <!--Template for result list hit: see results.xsl -->
   <xsl:template match="mcr:hit[contains(@id,'_mods_')]">
     <xsl:param name="mcrobj" />
@@ -81,11 +85,11 @@
     </tr>
   </xsl:template>
   <!--Template for generated link names and result titles: see mycoreobject.xsl, results.xsl, MyCoReLayout.xsl -->
-  <xsl:template priority="1" mode="resulttitle" match="/mycoreobject[contains(@ID,'_mods_')]">
+  <xsl:template priority="10" mode="resulttitle" match="/mycoreobject[contains(@ID,'_mods_')]">
     <xsl:apply-templates mode="title" select="." />
   </xsl:template>
   <!--Template for title in metadata view: see mycoreobject.xsl -->
-  <xsl:template priority="1" mode="title" match="/mycoreobject[contains(@ID,'_mods_')]">
+  <xsl:template priority="10" mode="title" match="/mycoreobject[contains(@ID,'_mods_')]">
     <xsl:choose>
       <!-- you could insert any title-like metadata here, e.g. replace "your-tags/here" by something of your metadata -->
       <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title">
@@ -137,7 +141,7 @@
     </xsl:choose>
   </xsl:template>
   <!--Template for metadata view: see mycoreobject.xsl -->
-  <xsl:template priority="1" mode="present" match="/mycoreobject[contains(@ID,'_mods_')]">
+  <xsl:template priority="10" mode="present" match="/mycoreobject[contains(@ID,'_mods_')]">
     <xsl:variable name="objectBaseURL">
       <xsl:if test="$objectHost != 'local'">
         <xsl:value-of select="document('webapp:hosts.xml')/mcr:hosts/mcr:host[@alias=$objectHost]/mcr:url[@type='object']/@href" />
@@ -360,7 +364,7 @@
     <xsl:value-of
       select="concat($WebApplicationBaseURL,$form,$HttpSession,'?cancelUrl=',$cancelURL,'&amp;sourceUri=',$sourceURI,'&amp;mcrid=',$id)" />
   </xsl:template>
-  <xsl:template mode="printDerivates" match="/mycoreobject[contains(@ID,'_mods_')]" priority="2">
+  <xsl:template mode="printDerivates" match="/mycoreobject[contains(@ID,'_mods_')]" priority="10">
     <xsl:param name="staticURL" />
     <xsl:param name="layout" />
     <xsl:param name="xmltempl" />
