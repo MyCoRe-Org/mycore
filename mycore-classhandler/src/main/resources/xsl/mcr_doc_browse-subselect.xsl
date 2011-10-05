@@ -28,13 +28,15 @@
 <xsl:variable name="MainTitle" select="i18n:translate('common.titles.mainTitle')"/>
 <xsl:variable name="PageTitle" select="$Navigation.title"/>
 
+
+
 <!-- ========== Subselect Parameter ========== -->
 <xsl:param name="subselect.session" />
 <xsl:param name="subselect.varpath" />
 <xsl:param name="subselect.webpage" />
 
 <xsl:variable name="subselect.params">
-  <xsl:text>XSL.subselect.session=</xsl:text>
+  <xsl:text>&amp;XSL.subselect.session=</xsl:text>
   <xsl:value-of select="$subselect.session" />
   <xsl:text>&amp;XSL.subselect.varpath=</xsl:text>
   <xsl:value-of select="$subselect.varpath" />
@@ -78,9 +80,9 @@
 
 <div id="classificationBrowser" >
 	
-<table cellspacing="0" cellpadding="0" style="width:100%; margin: 3% 0px 3% 2%;"  class="bg_background" >
+<table>
 <tr>
- <td style="width:60%;" class="desc">
+ <td>
  <form action="{$WebApplicationBaseURL}{$subselect.webpage}?XSL.editor.session.id={$subselect.session}" method="post">
    <input type="submit" class="submit" value="{i18n:translate('component.classhandler.browse.cancelSel')}" />
    <br/>
@@ -88,14 +90,14 @@
  </form>
  </td>
  <!-- td class="title"><xsl:copy-of select="$PageTitle" /></td -->
- <td style="text-align:right;padding-right:5px;" class="resultcmd" ><xsl:value-of select="description" /></td>
+ <td><xsl:value-of select="description" /></td>
 </tr>
 <tr>
  <td colspan='2'>
  <div id="navigationtree">
-  <table cellspacing="1" cellpadding="2" style="margin: 3% 10px 3% 2%;" >
+  <table>
   <xsl:for-each select="navigationtree/row">
-   <xsl:variable name="href1" select="concat($WebApplicationBaseURL, 'browse', col[2]/@searchbase, '?', $subselect.params)" />
+   <xsl:variable name="href1" select="concat($WebApplicationBaseURL, 'browse', col[2]/@searchbase, '?XSL.Style=subselect&amp;clid=', $classifID, $subselect.params)" />
    <xsl:variable name="img1"  select="concat($WebApplicationBaseURL, 'images/', col[1]/@folder1, '.gif')" />
    <xsl:variable name="img2"  select="concat($WebApplicationBaseURL, 'images/', col[1]/@folder2, '.gif')" />
    <xsl:variable name="img3"  select="concat($WebApplicationBaseURL, 'images/folder_blank.gif')" />
