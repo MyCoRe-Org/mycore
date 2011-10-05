@@ -84,14 +84,14 @@
             <xsl:value-of select="concat('http://d-nb.info/gnd/',$trimmedValue)" />
           </xsl:attribute>
           <xsl:variable name="gndEntry" select="document(concat('http://d-nb.info/gnd/',$trimmedValue,'/about/rdf'))" />
-          <mods:namePart>
+          <mods:displayForm>
             <xsl:value-of select="$gndEntry//gnd:preferredNameForThePerson[not(@rdf:parseType)]" />
-          </mods:namePart>
+          </mods:displayForm>
         </xsl:when>
         <xsl:otherwise>
-          <mods:namePart>
+          <mods:displayForm>
             <xsl:value-of select="$trimmedValue" />
-          </mods:namePart>
+          </mods:displayForm>
         </xsl:otherwise>
       </xsl:choose>
 

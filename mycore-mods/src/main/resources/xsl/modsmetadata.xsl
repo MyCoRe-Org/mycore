@@ -185,35 +185,39 @@
     </tr>
   </xsl:template>
 
-  <xsl:template match="mods:name[@type='personal']" mode="present">
+  <xsl:template match="mods:name" mode="printName">
+    <xsl:choose>
+      <xsl:when test="mods:displayForm">
+        <xsl:choose>
+          <xsl:when test="@valueURI">
+            <a href="{@valueURI}" class="extern">
+              <xsl:value-of select="mods:displayForm" />
+            </a>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="mods:displayForm" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:when test="@valueURI">
+        <xsl:apply-templates select="." mode="printModsClassInfo" />
+      </xsl:when>
+      <xsl:when test="mods:namePart">
+        <xsl:value-of select="mods:namePart" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="." />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template match="mods:name" mode="present">
     <tr>
       <td valign="top" class="metaname">
         <xsl:value-of select="concat(i18n:translate(concat('metaData.mods.dictionary.',mods:role/mods:roleTerm[@authority='marcrelator'])),':')" />
       </td>
       <td class="metavalue">
-        <xsl:value-of select="mods:namePart" />
-      </td>
-    </tr>
-  </xsl:template>
-
-  <xsl:template match="mods:name[@type='corporate']" mode="present">
-    <tr>
-      <td valign="top" class="metaname">
-        <xsl:value-of select="concat(i18n:translate(concat('metaData.mods.dictionary.',mods:role/mods:roleTerm)),':')" />
-      </td>
-      <td class="metavalue">
-        <xsl:apply-templates select="." mode="printModsClassInfo" />
-      </td>
-    </tr>
-  </xsl:template>
-
-  <xsl:template match="mods:name[@type='family' or @type='conference']" mode="present">
-    <tr>
-      <td valign="top" class="metaname">
-        <xsl:value-of select="concat(i18n:translate(concat('metaData.mods.dictionary.',mods:role/mods:roleTerm)),':')" />
-      </td>
-      <td class="metavalue">
-        <xsl:value-of select="mods:namePart" />
+        <xsl:apply-templates select="." mode="printName" />
       </td>
     </tr>
   </xsl:template>
