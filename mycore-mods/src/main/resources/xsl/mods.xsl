@@ -216,7 +216,7 @@
             <xsl:value-of select="concat(i18n:translate('metaData.addChildObject'),':')" />
           </td>
           <td class="metavalue">
-            <a href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout={$child-layout}&amp;parentID={./@ID}">
+            <a href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout={$child-layout}&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
               <xsl:value-of select="i18n:translate(concat('metaData.mods.types.',$child-layout))" />
             </a>
           </td>
