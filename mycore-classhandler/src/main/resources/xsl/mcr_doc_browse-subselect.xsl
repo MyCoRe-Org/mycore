@@ -21,6 +21,7 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
+  xmlns:encoder="xalan://java.net.URLEncoder"
   exclude-result-prefixes="xlink">
   &html-output;
 <xsl:variable name="Navigation.title"  select="i18n:translate('component.classhandler.titles.pageTitle.chooseClass')" />
@@ -40,17 +41,12 @@
   <xsl:text>&amp;XSL.subselect.webpage=</xsl:text>
   <xsl:value-of select="$subselect.webpage" />
 </xsl:variable>
-	
-<xsl:variable name="url" >	
-	<xsl:value-of select="$ServletsBaseURL" />
-    <xsl:text>XMLEditor?_action=end.subselect</xsl:text>
-    <xsl:text>&amp;subselect.session=</xsl:text>
-    <xsl:value-of select="$subselect.session" />
-    <xsl:text>&amp;subselect.varpath=</xsl:text>
-    <xsl:value-of select="$subselect.varpath" />
-    <xsl:text>&amp;subselect.webpage=</xsl:text>
-    <xsl:value-of select="$subselect.webpage" />
-</xsl:variable>
+
+<xsl:variable name="url"
+          select="concat($ServletsBaseURL,'XMLEditor',$HttpSession,
+    '?_action=end.subselect&amp;subselect.session=',$subselect.session,
+    '&amp;subselect.varpath=', $subselect.varpath,
+    '&amp;subselect.webpage=', encoder:encode($subselect.webpage))" />
 	
 <!-- The main template -->
 <xsl:template match="classificationBrowser">
@@ -119,7 +115,7 @@
         </xsl:choose>
      </td >
        <td class="desc">
-	      <a href="{$url}&amp;_var_@categid={col[2]/@lineID}&amp;_var_@title={col[2]/text()}">
+	      <a href="{$url}&amp;_var_@mcr:categId={col[2]/@lineID}&amp;_var_@editor.output={col[2]/text()}">
 		      <xsl:value-of select="col[2]/text()" />
 		  </a>
       </td>
@@ -178,5 +174,4 @@
   </xsl:if>
 </xsl:template>
 <xsl:include href="MyCoReLayout.xsl" />
-<xsl:include href="mcr_doc_browse-subselect.xsl" />
 </xsl:stylesheet>
