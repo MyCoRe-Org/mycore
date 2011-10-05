@@ -28,6 +28,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.zip.ZipEntry;
@@ -49,6 +50,7 @@ import org.mycore.common.MCRUtils;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.imagetiler.MCRImage;
+import org.mycore.imagetiler.MCRTiledPictureProps;
 import org.mycore.iview2.services.MCRIView2Tools;
 
 /**
@@ -121,18 +123,21 @@ public class MCRTileCombineServlet extends MCRServlet {
      */
     @Override
     protected void think(MCRServletJob job) throws Exception {
+        HttpServletRequest request = job.getRequest();
         try {
-            String pathInfo = job.getRequest().getPathInfo();
+            String pathInfo = request.getPathInfo();
             if (pathInfo.startsWith("/")) {
                 pathInfo = pathInfo.substring(1);
             }
-            final String zoomAlias = pathInfo.substring(0, pathInfo.indexOf('/'));
+            String zoomAlias = pathInfo.substring(0, pathInfo.indexOf('/'));
             pathInfo = pathInfo.substring(zoomAlias.length() + 1);
             final String derivate = pathInfo.substring(0, pathInfo.indexOf('/'));
             String imagePath = pathInfo.substring(derivate.length());
             LOGGER.info("Zoom-Level: " + zoomAlias + ", derivate: " + derivate + ", image: " + imagePath);
             File iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, imagePath);
-            job.getRequest().setAttribute(THUMBNAIL_KEY, iviewFile);
+            MCRTiledPictureProps pictureProps = MCRTiledPictureProps.getInstance(iviewFile);
+            int maxZoomLevel = pictureProps.getZoomlevel();
+            request.setAttribute(THUMBNAIL_KEY, iviewFile);
             LOGGER.info("IView2 file: " + iviewFile.getAbsolutePath());
             int zoomLevel = 0;
             if (zoomAlias.equals("MIN")) {
@@ -144,6 +149,26 @@ public class MCRTileCombineServlet extends MCRServlet {
             if (zoomAlias.equals("MAX")) {
                 zoomLevel = 3;
             }
+            HttpServletResponse response = job.getResponse();
+            if (zoomLevel > maxZoomLevel) {
+                switch (maxZoomLevel) {
+                case 2:
+                    zoomAlias = "MID";
+                    break;
+                case 1:
+                    zoomAlias = "MIN";
+                    break;
+                default:
+                    zoomAlias = "THUMB";
+                    break;
+                }
+                String redirectURL = response.encodeRedirectURL(MessageFormat.format("{0}{1}/{2}/{3}/{4}", request.getContextPath(), request.getServletPath(),
+                    zoomAlias, derivate, imagePath));
+                response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+                response.setHeader("Location", redirectURL);
+                response.flushBuffer();
+                return;
+            }
             if (zoomLevel == 0 && footerImpl == null) {
                 //we're done, sendThumbnail is called in render phase
                 return;
@@ -154,14 +179,14 @@ public class MCRTileCombineServlet extends MCRServlet {
                         BufferedImage footer = footerImpl.getFooter(combinedImage.getWidth(), derivate, imagePath);
                         combinedImage = attachFooter(combinedImage, footer);
                     }
-                    job.getRequest().setAttribute(IMAGE_KEY, combinedImage);
+                    request.setAttribute(IMAGE_KEY, combinedImage);
                 } else {
-                    job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND);
                     return;
                 }
             }
         } finally {
-            LOGGER.info("Finished sending " + job.getRequest().getPathInfo());
+            LOGGER.info("Finished sending " + request.getPathInfo());
         }
     }
 
