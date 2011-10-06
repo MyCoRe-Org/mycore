@@ -217,6 +217,17 @@ public class MCRXMLFunctions {
         
         return sdf.format(new Date());
     }
+    
+    /**
+     * A delegate for {@link String#compareTo(String)}.
+     * @param s1
+     * @param s2
+     * 
+     * @return s1.compareTo(s2)
+     */
+    public static int compare(String s1, String s2) {
+        return s1.compareTo(s2);
+    }
 
     public static String regexp(String orig, String match, String replace) {
         return orig.replaceAll(match, replace);
