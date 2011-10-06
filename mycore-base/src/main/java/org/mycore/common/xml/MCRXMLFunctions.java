@@ -70,8 +70,6 @@ import org.w3c.dom.NodeList;
 /**
  * @author Thomas Scheffler (yagee)
  * @author Jens Kupferschmidt
- */
-/**
  * @author shermann
  */
 public class MCRXMLFunctions {
@@ -195,6 +193,29 @@ public class MCRXMLFunctions {
 
     public static String getISODate(String simpleDate, String simpleFormat) throws ParseException {
         return getISODate(simpleDate, simpleFormat, null);
+    }
+    
+    
+    /**
+     * Returns a string representing the current date. One can customize the format of the returned string
+     * by providing a proper value for the format parameter. If null or an invalid format is provided the 
+     * default format "yyyy-MM-dd" will be used.
+     * 
+     * @param format the format in which the date should be formatted 
+     * @return the current date in the desired format
+     * 
+     * @see {@link SimpleDateFormat} for how to provide the format string
+     */
+    public static String getCurrentDate(String format){
+        SimpleDateFormat sdf = null;
+        try{
+            sdf = new SimpleDateFormat(format);
+        }catch(Exception i){
+            LOGGER.warn("Could not parse date format string, will use default \"yyyy-MM-dd\"", i);
+            sdf = new SimpleDateFormat("yyyy-MM-dd");
+        }
+        
+        return sdf.format(new Date());
     }
 
     public static String regexp(String orig, String match, String replace) {
