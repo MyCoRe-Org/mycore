@@ -110,6 +110,7 @@
 		}
 		
 		constructor.prototype.zoom = function cv_zoom(direction){
+			this.getViewer().viewerBean.prepareTiles();
 			this.clearCanvas();
 			this.getViewer().viewerBean.zoomOrig(direction);
 		}
@@ -140,39 +141,6 @@
 				if (typeof motion == 'undefined') {
 					motion = { 'x' : 0, 'y' : 0 };
 				}
-				
-				/*
-				this.getViewer().currentImage.curWidth = (this.getViewer().currentImage.width / Math.pow(2, this.getViewer().currentImage.zoomInfo.maxZoom - this.getViewer().viewerBean.zoomLevel))*this.getViewer().currentImage.zoomInfo.scale;
-				this.getViewer().currentImage.curHeight = (this.getViewer().currentImage.height / Math.pow(2, this.getViewer().currentImage.zoomInfo.maxZoom - this.getViewer().viewerBean.zoomLevel))*this.getViewer().currentImage.zoomInfo.scale; 
-				
-				var iview = this.getViewer();
-
-				var xEdge = Math.ceil(iview.currentImage.curWidth-this.context2D.canvas.width);
-				var yEdge = Math.ceil(iview.currentImage.curHeight-this.context2D.canvas.height);				
-				
-				if(xEdge > 0){//check if its possible to move the image in that direction
-					if(this.getViewer().viewerBean.x - motion.x < 0 || this.getViewer().viewerBean.x < 0 || !this.moved){//impossible or no movement
-						this.getViewer().viewerBean.x = 0;
-					}else{//valid movement
-						if(this.getViewer().viewerBean.x - motion.x > xEdge || this.getViewer().viewerBean.x > xEdge){
-							this.getViewer().viewerBean.x = xEdge;
-						}else{
-							this.getViewer().viewerBean.x -= motion.x;	
-						}
-					}
-				}
-				if(yEdge >0){
-					if(this.getViewer().viewerBean.y - motion.y < 0 || this.getViewer().viewerBean.y < 0 || !this.moved){
-						this.getViewer().viewerBean.y = 0;
-					}else{
-						if(this.getViewer().viewerBean.y - motion.y > yEdge || this.getViewer().viewerBean.y > yEdge){ 
-							this.getViewer().viewerBean.y = yEdge;
-						}else{
-							this.getViewer().viewerBean.y -= motion.y;
-						}
-					}
-				}
-				*/
 				
 				var iview = this.getViewer();
 				this.getViewer().currentImage.curWidth = Math.ceil((this.getViewer().currentImage.width / Math.pow(2, this.getViewer().currentImage.zoomInfo.maxZoom - this.getViewer().viewerBean.zoomLevel))*this.getViewer().currentImage.zoomInfo.scale);
@@ -215,7 +183,6 @@
 				}					
 						
 				if((xViewerBorder > 0 || yViewerBorder > 0) || (motion.x == 0 && motion.y == 0)){
-					//this.context2D.drawImage(this.getViewer().context.container.find(".preload")[0].firstChild,0,0,this.getViewer().context.container.find(".preload")[0].clientWidth,this.getViewer().context.container.find(".preload")[0].clientHeight);
 					this.context2D.drawImage(this.getViewer().context.container.find(".preload")[0].firstChild,0,0,this.getViewer().currentImage.curWidth,this.getViewer().currentImage.curHeight);
 					this.updateBackBuffer();		
 				}
@@ -280,7 +247,9 @@
 				}			
 			}
 			
+			console.log("draw now");
 			scope.drawCanvasFromBuffer();
+			console.log("drawed");
 		}			
 		
 		constructor.prototype.switchDisplayMode = function cv_switchDisplayMode(screenZoom, stateBool, preventLooping){				
