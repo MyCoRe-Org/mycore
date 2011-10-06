@@ -214,6 +214,15 @@ PanoJS.prototype.isloaded = function(img) {
 	img = null;
 }
 
+PanoJS.prototype.blank = function() {
+	for (imgId in this.cache) {
+		var img = this.cache[imgId];
+		if (img.parentNode != null) {
+			this.well.removeChild(img);
+		}
+	}
+}
+
 //IE and Opera doesn't accept our TileUrlProvider Instance as one of PanoJS
 PanoJS.isInstance = function () {return true;};
 
