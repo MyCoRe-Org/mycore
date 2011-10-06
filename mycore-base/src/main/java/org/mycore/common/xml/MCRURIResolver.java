@@ -139,8 +139,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
     }
 
     private static final MCRResolverProvider getExternalResolverProvider() {
-        String externalClassName = MCRConfiguration.instance()
-                .getString(CONFIG_PREFIX + "ExternalResolver.Class", null);
+        String externalClassName = MCRConfiguration.instance().getString(CONFIG_PREFIX + "ExternalResolver.Class", null);
         final MCRResolverProvider emptyResolver = new MCRResolverProvider() {
             public Map<String, MCRResolver> getResolverMapping() {
                 return new HashMap<String, MCRResolver>();
@@ -173,8 +172,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         final Map<String, URIResolver> extResolverMapping = EXT_RESOLVER.getURIResolverMapping();
         extResolverMapping.putAll(new MCRModuleResolverProvider().getURIResolverMapping());
         // set Map to final size with loadfactor: full
-        HashMap<String, URIResolver> supportedSchemes = new HashMap<String, URIResolver>(
-                10 + extResolverMapping.size(), 1);
+        HashMap<String, URIResolver> supportedSchemes = new HashMap<String, URIResolver>(10 + extResolverMapping.size(), 1);
         // don't let interal mapping be overwritten
         supportedSchemes.putAll(extResolverMapping);
         supportedSchemes.put("webapp", new MCRWebAppResolver());
@@ -324,11 +322,9 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
     }
 
     @Override
-    public InputSource resolveEntity(String name, String publicId, String baseURI, String systemId)
-            throws SAXException, IOException {
+    public InputSource resolveEntity(String name, String publicId, String baseURI, String systemId) throws SAXException, IOException {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(MessageFormat.format("Resolving: \nname: {0}\npublicId: {1}\nbaseURI: {2}\nsystemId: {3}",
-                    name, publicId, baseURI, systemId));
+            LOGGER.debug(MessageFormat.format("Resolving: \nname: {0}\npublicId: {1}\nbaseURI: {2}\nsystemId: {3}", name, publicId, baseURI, systemId));
         }
         if (systemId == null) {
             return null; // Use default resolver
@@ -552,8 +548,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                     }
                 } catch (Exception e) {
                     LOGGER.error("Cannot instantiate " + entry.getValue() + " for URI scheme " + entry.getKey());
-                    throw new MCRException("Cannot instantiate " + entry.getValue() + " for URI scheme "
-                            + entry.getKey(), e);
+                    throw new MCRException("Cannot instantiate " + entry.getValue() + " for URI scheme " + entry.getKey(), e);
                 }
             }
             return map;
@@ -631,8 +626,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                 return null;
             }
             if (params.get(OPERATION_KEY).equals("MCRDoRetrieveObject")) {
-                org.w3c.dom.Document document = MCRQueryClient.doRetrieveObject(params.get(HOST_KEY), params
-                        .get(OBJECT_KEY));
+                org.w3c.dom.Document document = MCRQueryClient.doRetrieveObject(params.get(HOST_KEY), params.get(OBJECT_KEY));
                 return DOM_BUILDER.build(document).detachRootElement();
             }
             if (params.get(OPERATION_KEY).equals("MCRDoRetrieveClassification")) {
@@ -642,8 +636,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                 String classId = params.get(CLASS_KEY);
                 String categId = params.get(CATEG_KEY);
                 String format = params.get(FORMAT_KEY);
-                org.w3c.dom.Document document = MCRQueryClient.doRetrieveClassification(hostAlias, level, type,
-                        classId, categId, format);
+                org.w3c.dom.Document document = MCRQueryClient.doRetrieveClassification(hostAlias, level, type, classId, categId, format);
                 return DOM_BUILDER.build(document).detachRootElement();
             }
             if (params.get(OPERATION_KEY).equals("MCRDoRetrieveLinks")) {
@@ -925,8 +918,8 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
         private static final String SORT_CONFIG_PREFIX = CONFIG_PREFIX + "Classification.Sort.";
 
-        private static MCRCache categoryCache = new MCRCache(MCRConfiguration.instance().getInt(
-                CONFIG_PREFIX + "Classification.CacheSize", 1000), "URIResolver categories");
+        private static MCRCache categoryCache = new MCRCache(MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Classification.CacheSize", 1000),
+            "URIResolver categories");
 
         private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
@@ -935,7 +928,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
         /**
          * returns a classification in a specific format. Syntax:
-         * <code>classification:{editor['['formatAlias']']|metadata}:{Levels}[:noEmptyLeaves]:{parents|children}:{ClassID}[:CategID]
+         * <code>classification:{editor[Complete]['['formatAlias']']|metadata}:{Levels}[:noEmptyLeaves]:{parents|children}:{ClassID}[:CategID]
          * 
          * formatAlias: MCRConfiguration property MCR.UURResolver.Classification.Format.FormatAlias
          * 
@@ -1013,9 +1006,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             } else if (axis.equals("parents")) {
                 if (categ.length() == 0) {
                     LOGGER.error("Cannot resolve parent axis without a CategID. URI: " + uri);
-                    throw new IllegalArgumentException(
-                            "Invalid format (categID is required in mode 'parents') of uri for retrieval of classification: "
-                                    + uri);
+                    throw new IllegalArgumentException("Invalid format (categID is required in mode 'parents') of uri for retrieval of classification: " + uri);
                 }
                 cl = DAO.getRootCategory(new MCRCategoryID(classID, categ), levels);
             }
@@ -1026,19 +1017,19 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             Element returns;
             LOGGER.debug("start transformation of ClassificationQuery");
             if (format.startsWith("editor")) {
+                boolean completeId = format.startsWith("editorComplete");
                 boolean sort = shouldSortCategories(classID);
                 String labelFormat = getLabelFormat(format);
                 if (labelFormat == null) {
-                    returns = MCRCategoryTransformer.getEditorItems(cl, sort, emptyLeaves);
+                    returns = MCRCategoryTransformer.getEditorItems(cl, sort, emptyLeaves, completeId);
                 } else {
-                    returns = MCRCategoryTransformer.getEditorItems(cl, labelFormat, sort, emptyLeaves);
+                    returns = MCRCategoryTransformer.getEditorItems(cl, labelFormat, sort, emptyLeaves, completeId);
                 }
             } else if (format.equals("metadata")) {
                 returns = (Element) MCRCategoryTransformer.getMetaDataDocument(cl, false).getRootElement().detach();
             } else {
                 LOGGER.error("Unknown target format given. URI: " + uri);
-                throw new IllegalArgumentException("Invalid target format (" + format
-                        + ") in uri for retrieval of classification: " + uri);
+                throw new IllegalArgumentException("Invalid target format (" + format + ") in uri for retrieval of classification: " + uri);
             }
             LOGGER.debug("end resolving " + uri);
             return returns;

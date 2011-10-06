@@ -96,9 +96,10 @@ public class MCRCategoryTransformer {
      *            if true, sort items
      * @param emptyLeaves
      *            if true, also include empty leaves
+     * @param completeId 
      */
-    public static Element getEditorItems(MCRCategory cl, boolean sort, boolean emptyLeaves) {
-        return new ItemElementFactory(cl, STANDARD_LABEL, sort, emptyLeaves).getResult();
+    public static Element getEditorItems(MCRCategory cl, boolean sort, boolean emptyLeaves, boolean completeId) {
+        return new ItemElementFactory(cl, STANDARD_LABEL, sort, emptyLeaves, completeId).getResult();
     }
 
     /**
@@ -124,8 +125,8 @@ public class MCRCategoryTransformer {
      * @param emptyLeaves
      *            if true, also include empty leaves
      */
-    public static Element getEditorItems(MCRCategory cl, String labelFormat, boolean sort, boolean emptyLeaves) {
-        return new ItemElementFactory(cl, labelFormat, sort, emptyLeaves).getResult();
+    public static Element getEditorItems(MCRCategory cl, String labelFormat, boolean sort, boolean emptyLeaves, boolean completeId) {
+        return new ItemElementFactory(cl, labelFormat, sort, emptyLeaves, completeId).getResult();
     }
 
     private static class MetaDataElementFactory {
@@ -211,7 +212,7 @@ public class MCRCategoryTransformer {
 
         private String labelFormat;
 
-        private boolean emptyLeaves;
+        private boolean emptyLeaves, completeId;
 
         private Map<MCRCategoryID, Number> countMap = null;
 
@@ -219,9 +220,10 @@ public class MCRCategoryTransformer {
 
         private Element root;
 
-        ItemElementFactory(MCRCategory cl, String labelFormat, boolean sort, boolean emptyLeaves) {
+        ItemElementFactory(MCRCategory cl, String labelFormat, boolean sort, boolean emptyLeaves, boolean completeId) {
             this.labelFormat = labelFormat;
             this.emptyLeaves = emptyLeaves;
+            this.completeId = completeId;
 
             Matcher countMatcher = COUNT_PATTERN.matcher(labelFormat);
             /*
@@ -264,7 +266,7 @@ public class MCRCategoryTransformer {
             }
 
             Element ce = new Element("item");
-            ce.setAttribute("value", category.getId().getID());
+            ce.setAttribute("value", completeId ? category.getId().toString() : category.getId().getID());
             parent.addContent(ce);
 
             for (MCRLabel label : category.getLabels()) {
