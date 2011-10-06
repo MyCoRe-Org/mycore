@@ -37,11 +37,6 @@
 				PanoJS.prototype.zoom = function cv_zoom() {
 					that.zoom(arguments[0]);
 				};
-				
-				PanoJS.prototype.moveViewerOrig = PanoJS.prototype.moveViewer;
-				PanoJS.prototype.moveViewer = function cv_moveViewer() {
-					that.moveViewer(arguments[0]);
-				};
 				  
 				PanoJS.prototype.positionTilesOrig = PanoJS.prototype.positionTiles;
 				PanoJS.prototype.positionTiles = function cv_positionTiles() {
@@ -97,30 +92,17 @@
 			
 			// create cache if not exist - zoom/y/x
 			if (tileImg == null) {
-				tileImg = this.getViewer().viewerBean.cache[tileImgId] = this.getViewer().viewerBean.createPrototype(src);//zoom/y/x
-				tileImg.src = tileImgId;				
-				tileImg.onload = function(){		
-					tileImg.loaded=true;
+				tileImg = this.getViewer().viewerBean.cache[tileImgId] = this.getViewer().viewerBean.createPrototype(src);//zoom/y/x	
+				tileImg.onload = function(){
+					this.loaded = true;
 					that.updateBackBuffer();
-					//Beispiel für Pufferproblem(Zeit)
-					//that.buffer2D.fillRect(0, 0, 640, 480);
-					//that.context2D.drawImage(that.buffer2D.canvas, 0, 0);
 				};
+				tileImg.src = tileImgId;			
 			}
-				
 			if (tileImg.loaded){
 				that.buffer2D.drawImage(tileImg, tile.posx, tile.posy, tile.width, tile.height);
-			} else {
-				//draw preview
 			}
-		}
-		
-		constructor.prototype.moveViewer = function cv_moveViewer(coords){
-				this.moved = true;
-				this.getViewer().viewerBean.moveViewerOrig(coords);
-				this.moved = false;
-		}
-		
+		}		
 				
 		constructor.prototype.release = function cv_release(coords){
 			this.getViewer().viewerBean.activate(false);
@@ -135,23 +117,22 @@
 		constructor.prototype.requestAnimationFrame = (function() {
 					return (
 						function(callback, element) {
-							window.setTimeout(function(){callback(element);}, 1000 / 60);
+							return window.setTimeout(function(){callback(element);}, 1000 / 60);
 						}
 					);
 		})();
 		
-		constructor.prototype.drawCanvasFromBuffer = function cv_drawCanvasFromBuffer(that){
+		constructor.prototype.drawCanvasFromBuffer = function cv_drawCanvasFromBuffer(){
+			this.context2D.drawImage(this.buffer2D.canvas, 0, 0);
+			this.refreshBackBuffer = false;
 			/*if (this.skipUpdate){
 				delete this.skipUpdate;
 				return;
 			}*/
-			//alert("drin");
-			//this.context2D.drawImage(this.buffer2D.canvas, 0, 0);
-			console.warn("drawCanvasFromBuffer");
-			that.refreshBackBuffer = false;
 		}
 		
-		constructor.prototype.positionTiles = function cv_positionTiles(motion, reset){			
+		constructor.prototype.positionTiles = function cv_positionTiles(motion, reset){		
+			
 			if(this.activateCanvas)
 			{					
 				//calculate and add the motion difference to the absolute coordinates	
@@ -160,19 +141,16 @@
 					motion = { 'x' : 0, 'y' : 0 };
 				}
 				
+				/*
 				this.getViewer().currentImage.curWidth = (this.getViewer().currentImage.width / Math.pow(2, this.getViewer().currentImage.zoomInfo.maxZoom - this.getViewer().viewerBean.zoomLevel))*this.getViewer().currentImage.zoomInfo.scale;
 				this.getViewer().currentImage.curHeight = (this.getViewer().currentImage.height / Math.pow(2, this.getViewer().currentImage.zoomInfo.maxZoom - this.getViewer().viewerBean.zoomLevel))*this.getViewer().currentImage.zoomInfo.scale; 
 				
 				var iview = this.getViewer();
-				//var tileScale = iview.currentImage.zoomInfo.scale;
-				
-				//var imgScale = tileScale/Math.pow(2, iview.currentImage.zoomInfo.maxZoom - this.getViewer().viewerBean.zoomLevel);
 
 				var xEdge = Math.ceil(iview.currentImage.curWidth-this.context2D.canvas.width);
-				var yEdge = Math.ceil(iview.currentImage.curHeight-this.context2D.canvas.height);	
-				//var yEdge = Math.abs(Math.ceil(iview.currentImage.curHeight*imgScale-this.context2D.canvas.height));				
+				var yEdge = Math.ceil(iview.currentImage.curHeight-this.context2D.canvas.height);				
 				
-				//if(xEdge > 0){//check if its possible to move the image in that direction
+				if(xEdge > 0){//check if its possible to move the image in that direction
 					if(this.getViewer().viewerBean.x - motion.x < 0 || this.getViewer().viewerBean.x < 0 || !this.moved){//impossible or no movement
 						this.getViewer().viewerBean.x = 0;
 					}else{//valid movement
@@ -182,8 +160,8 @@
 							this.getViewer().viewerBean.x -= motion.x;	
 						}
 					}
-				//}
-				//if(yEdge >0){
+				}
+				if(yEdge >0){
 					if(this.getViewer().viewerBean.y - motion.y < 0 || this.getViewer().viewerBean.y < 0 || !this.moved){
 						this.getViewer().viewerBean.y = 0;
 					}else{
@@ -193,41 +171,88 @@
 							this.getViewer().viewerBean.y -= motion.y;
 						}
 					}
-				//}
+				}
+				*/
 				
-				//check if we're still in the current animationFrame (16 ms)
-				//if so, we've got nothing to do - else: request the next animationFrame
-				//--------------------------------------------------
-				//check conditional jump here to save overhead
-				if(this.refreshBackBuffer){
-					return;
+				var iview = this.getViewer();
+				this.getViewer().currentImage.curWidth = Math.ceil((this.getViewer().currentImage.width / Math.pow(2, this.getViewer().currentImage.zoomInfo.maxZoom - this.getViewer().viewerBean.zoomLevel))*this.getViewer().currentImage.zoomInfo.scale);
+				this.getViewer().currentImage.curHeight = Math.ceil((this.getViewer().currentImage.height / Math.pow(2, this.getViewer().currentImage.zoomInfo.maxZoom - this.getViewer().viewerBean.zoomLevel))*this.getViewer().currentImage.zoomInfo.scale); 
+
+				//Plus <-> Minus
+				var xMove = this.getViewer().viewerBean.x - motion.x; 
+				var xViewerBorder = this.getViewer().currentImage.curWidth - this.getViewer().viewerBean.width;
+				var yMove = this.getViewer().viewerBean.y - motion.y; 
+				var yViewerBorder = this.getViewer().currentImage.curHeight - this.getViewer().viewerBean.height;
+				
+				if(xViewerBorder > 0){//testen, ob das Bild überhaupt in der aktuellen Zoomstufe in die Richtung bewegt werden kann
+					if (xMove >  xViewerBorder && xViewerBorder > 0) { //max. Randbegrenzung
+						this.getViewer().viewerBean.x = xViewerBorder;
+						motion.x = 0;
+					}
+					else if(xMove > 0){//normal
+						this.getViewer().viewerBean.x -= motion.x;
+					}		
+					else if(this.getViewer().viewerBean.x < 0 || xMove < 0){//min. Randbegrenzung
+						this.getViewer().viewerBean.x = motion.x = 0;
+					}
+				}else{
+					this.getViewer().viewerBean.x = 0;
 				}
 				
-				this.refreshBackBuffer = true;
-				
-				this.updateBackBuffer();
+				if(yViewerBorder > 0){
+					if (yMove > yViewerBorder && yViewerBorder > 0) {
+						this.getViewer().viewerBean.y = yViewerBorder;
+						motion.y = 0;
+					}	
+					else if(yMove > 0){
+						this.getViewer().viewerBean.y -= motion.y;
+					}
+					else if(this.getViewer().viewerBean.y < 0 || yMove < 0){
+						this.getViewer().viewerBean.y = motion.y = 0;
+					}
+				}else{
+					this.getViewer().viewerBean.y = 0;
+				}					
+						
+				if((xViewerBorder > 0 || yViewerBorder > 0) || (motion.x == 0 && motion.y == 0)){
+					//this.context2D.drawImage(this.getViewer().context.container.find(".preload")[0].firstChild,0,0,this.getViewer().context.container.find(".preload")[0].clientWidth,this.getViewer().context.container.find(".preload")[0].clientHeight);
+					this.context2D.drawImage(this.getViewer().context.container.find(".preload")[0].firstChild,0,0,this.getViewer().currentImage.curWidth,this.getViewer().currentImage.curHeight);
+					this.updateBackBuffer();		
+				}
 				
 			}
 		}
 		
-		constructor.prototype.updateBackBuffer = function cv_updateBackBuffer(){
-			var rect = {};						
-			this.buffer2D.canvas.width = this.buffer2D.canvas.width;
-			rect.x = this.getViewer().viewerBean.x;
-			rect.y = this.getViewer().viewerBean.y;
-			rect.width = this.getViewer().viewerBean.width;
-			rect.height = this.getViewer().viewerBean.height;
+		constructor.prototype.updateBackBuffer = function cv_updateBackBuffer(scope){
 			
-			var tileSize = this.getViewer().viewerBean.tileSize;
-			var curWidth = this.getViewer().currentImage.curWidth;
-			var curHeight = this.getViewer().currentImage.curHeight;
+			if(scope === undefined || scope.refreshBackBuffer === undefined){
+				scope = this;
+			}			
+			/*
+			if(scope.refreshBackBuffer){
+				this.backBufferHandle = this.backBufferHandle || scope.requestAnimationFrame(scope.updateBackBuffer, scope);
+				return;
+			}			
+			scope.refreshBackBuffer = true;
+			delete(this.backBufferHandle);*/
+			
+			var rect = {};						
+			scope.buffer2D.canvas.width = scope.buffer2D.canvas.width;
+			rect.x = scope.getViewer().viewerBean.x;
+			rect.y = scope.getViewer().viewerBean.y;
+			rect.width = scope.getViewer().viewerBean.width;
+			rect.height = scope.getViewer().viewerBean.height;
+			
+			var tileSize = scope.getViewer().viewerBean.tileSize;
+			var curWidth = scope.getViewer().currentImage.curWidth;
+			var curHeight = scope.getViewer().currentImage.curHeight;
 			var xDim = Math.min(rect.width, curWidth);
 			var yDim = Math.min(rect.height,curHeight);
 			
 			var xoff = rect.x%tileSize;
 			var yoff = rect.y%tileSize;
  
-			var xTiles = Math.ceil((xDim+xoff) / tileSize);//+ -> -
+			var xTiles = Math.ceil((xDim+xoff) / tileSize);
 			var yTiles = Math.ceil((yDim+yoff) / tileSize);
 			
 			var imgXTiles = Math.ceil(curWidth/tileSize);
@@ -242,7 +267,7 @@
 				for(var row = 0; row < yTiles; row++){
 					
 					//get the associated tiles
-					var tile = this.getViewer().viewerBean.tiles[column][row];
+					var tile = scope.getViewer().viewerBean.tiles[column][row];
 					tile.xIndex = column + startx;
 					tile.yIndex = row + starty;
 					tile.width=(tile.xIndex == imgXTiles-1)? curWidth - tile.xIndex * tileSize : tileSize; 
@@ -251,17 +276,11 @@
 					tile.posx = column * tileSize - xoff;
 					tile.posy = row * tileSize - yoff;
 										
-					this.assignTileImage(tile);					
+					scope.assignTileImage(tile);					
 				}			
 			}
-
-			this.context2D.drawImage(this.buffer2D.canvas, 0, 0);
-
-			//TODO:remove l@ter
-			this.refreshBackBuffer = false;
 			
-			//var that = this;
-			//that.requestAnimationFrame(that.drawCanvasFromBuffer, that);
+			scope.drawCanvasFromBuffer();
 		}			
 		
 		constructor.prototype.switchDisplayMode = function cv_switchDisplayMode(screenZoom, stateBool, preventLooping){				
@@ -274,9 +293,10 @@
 				}else if(this.activateCanvas != true ){
 					this.activateCanvas = true;
 					this.appendCanvas();
-					this.getViewer().context.container.find(".well").find(".preload").remove();		
+					//this.getViewer().context.container.find(".well").find(".preload").remove();		
 					this.buffer2D.canvas.width = this.context2D.canvas.width = this.getViewer().viewerBean.width;
 					this.buffer2D.canvas.height = this.context2D.canvas.height = this.getViewer().viewerBean.height;
+										
 					this.positionTiles();
 				}
 				
@@ -288,7 +308,7 @@
 		}
 		
 		constructor.prototype.appendCanvas = function cv_appendCanvas(){
-			this.getViewer().context.container.find(".well").append(this.context2D.canvas);
+			this.getViewer().context.container.find(".well").prepend(this.context2D.canvas);//before,prepend,append
 		}
 		
 		constructor.prototype.rotate = function cv_rotate(){
