@@ -118,6 +118,28 @@
         <mcr:config propertyfile="${build.config}/mycore.properties" mergeFile="@{component.property}"/>
       </sequential>
     </for>
+    <!-- searchfields -->
+    <for param="searchfield.xml">
+      <fileset dir="${integration.dir}" includes="**/searchfields-metadata.xml" />
+      <sequential>
+        <xmltask source="${build.config}/searchfields.xml" dest="${build.config}/searchfields.xml">
+          <insert path="/:searchfields/:index[@id='metadata']/:field[position()=last()]"
+                  position="after"
+                  file="@{searchfield.xml}" />
+        </xmltask>
+      </sequential>
+    </for>
+    <for param="searchfield.xml">
+      <fileset dir="${integration.dir}" includes="**/searchfields-content.xml" />
+      <sequential>
+        <xmltask source="${build.config}/searchfields.xml" dest="${build.config}/searchfields.xml">
+          <insert path="/:searchfields/:index[@id='content']/:field[position()=last()]"
+                  position="after"
+                  file="@{searchfield.xml}" />
+        </xmltask>
+      </sequential>
+    </for>
+    <replace file="${build.config}/searchfields.xml" token='xmlns=""' />
     <for param="table.class"
       list="MCRACCESS,MCRACCESSRULE,MCRCSTORE,MCRFSNODES,MCRLINKHREF,MCRURN,MCRDELETEDITEMS">
       <sequential>
