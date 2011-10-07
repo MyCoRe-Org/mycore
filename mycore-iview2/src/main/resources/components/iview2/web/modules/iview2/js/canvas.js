@@ -19,18 +19,17 @@
 				this.context2D = document.createElement('canvas').getContext('2d');
 				this.buffer2D = document.createElement('canvas').getContext('2d');
 				
-				//this.switchActive = false;
-				this.activateCanvas = false;
+				this.activateCanvas = false;				
+				this.lastFrame = new Date();
+				this.updateCanvasCount=0;
+				this.lastCoords = { 'x' : 0, 'y' : 0 };
+				this.preView = new Image();
 				var that = this;
+				
 					  
 				PanoJS.prototype.assignTileImageOrig = PanoJS.prototype.assignTileImage;
 				PanoJS.prototype.assignTileImage = function cv_assignTileImage() {
 					that.assignTileImage(arguments[0]);
-				};
-				
-				PanoJS.prototype.releaseOrig = PanoJS.prototype.release;
-				PanoJS.prototype.release = function cv_release() {
-					that.release(arguments[0]);
 				};
 				
 				PanoJS.prototype.zoomOrig = PanoJS.prototype.zoom;
@@ -80,57 +79,48 @@
 		constructor.prototype = Object.create(iview.IViewObject.prototype);
 		
 		// overwritten
-		constructor.prototype.assignTileImage = function cv_assignTileImage(tile){
+		constructor.prototype.assignTileImage = function cv_assignTileImage(tile, canvas){
 			
-			var tileImgId;
-			var src;
-			var tileImg;
-			var that = this;
+			var viewerBean=this.getViewer().viewerBean;
 			
-			tileImgId = src = this.getViewer().viewerBean.tileUrlProvider.assembleUrl(tile.xIndex, tile.yIndex, this.getViewer().viewerBean.zoomLevel);
-			tileImg = this.getViewer().viewerBean.cache[tileImgId];
+			var tileImgId = viewerBean.tileUrlProvider.assembleUrl(tile.xIndex, tile.yIndex, viewerBean.zoomLevel);
+			var tileImg = viewerBean.cache[tileImgId];
 			
 			// create cache if not exist - zoom/y/x
 			if (tileImg == null) {
-				tileImg = this.getViewer().viewerBean.cache[tileImgId] = this.getViewer().viewerBean.createPrototype(src);//zoom/y/x	
-				tileImg.onload = function(){
-					this.loaded = true;
-					that.updateBackBuffer();
-				};
-				tileImg.src = tileImgId;			
+				tileImg=this.createImageTile(tileImgId, tile, viewerBean);
 			}
 			if (tileImg.loaded){
-				that.buffer2D.drawImage(tileImg, tile.posx, tile.posy, tile.width, tile.height);
+				canvas.drawImage(tileImg, tile.posx, tile.posy, tile.width, tile.height);
+				//console.log("img drawed "+tileImgId);
 			}
-		}		
-				
-		constructor.prototype.release = function cv_release(coords){
-			this.getViewer().viewerBean.activate(false);
-			this.getViewer().viewerBean.mark = { 'x' : 0, 'y' : 0 };
-		}
+		};
+		
+		constructor.prototype.createImageTile=function cv_createImageTile(tileImgId, tile, viewerBean){
+			var tileImg = new Image();
+			viewerBean.cache[tileImgId] = tileImg;
+			var that = this;
+			tileImg.onload = function cv_tileLoaded(){
+//				console.log("img loaded "+tileImgId);
+				this.loaded = true;
+				that.updateScreen();
+			};
+			tileImg.src = tileImgId
+			return tileImg;
+		};
 		
 		constructor.prototype.zoom = function cv_zoom(direction){
 			this.getViewer().viewerBean.prepareTiles();
 			this.clearCanvas();
 			this.getViewer().viewerBean.zoomOrig(direction);
-		}
-		
-		constructor.prototype.requestAnimationFrame = (function() {
-					return (
-						function(callback, element) {
-							return window.setTimeout(function(){callback(element);}, 1000 / 60);
-						}
-					);
-		})();
-		
-		constructor.prototype.drawCanvasFromBuffer = function cv_drawCanvasFromBuffer(){
-			this.context2D.drawImage(this.buffer2D.canvas, 0, 0);
-			this.refreshBackBuffer = false;
-			/*if (this.skipUpdate){
-				delete this.skipUpdate;
-				return;
-			}*/
-		}
+		};
+
+		constructor.prototype._drawFpsBox = function cv_drawDebugBox(fps){
+			this.context2D.fillStyle = "Rgb(204,204,0)";
+			this.context2D.fillRect(0, this.context2D.canvas.height - 15, 20, 15);
+			this.context2D.fillStyle = "Rgb(0,0,0)";
+			this.context2D.fillText(Math.round(fps), 0, this.context2D.canvas.height-3);
+		};
 		
 		constructor.prototype.positionTiles = function cv_positionTiles(motion, reset){		
 			
@@ -141,7 +131,7 @@
 				if (typeof motion == 'undefined') {
 					motion = { 'x' : 0, 'y' : 0 };
 				}
-				
+				//console.log(motion);
 				var iview = this.getViewer();
 				this.getViewer().currentImage.curWidth = Math.ceil((this.getViewer().currentImage.width / Math.pow(2, this.getViewer().currentImage.zoomInfo.maxZoom - this.getViewer().viewerBean.zoomLevel))*this.getViewer().currentImage.zoomInfo.scale);
 				this.getViewer().currentImage.curHeight = Math.ceil((this.getViewer().currentImage.height / Math.pow(2, this.getViewer().currentImage.zoomInfo.maxZoom - this.getViewer().viewerBean.zoomLevel))*this.getViewer().currentImage.zoomInfo.scale); 
@@ -183,38 +173,30 @@
 				}					
 						
 				if((xViewerBorder > 0 || yViewerBorder > 0) || (motion.x == 0 && motion.y == 0)){
-					this.context2D.drawImage(this.getViewer().context.container.find(".preload")[0].firstChild,0,0,this.getViewer().currentImage.curWidth,this.getViewer().currentImage.curHeight);
-					this.updateBackBuffer();		
+					this.updateScreen();		
 				}
 				
 			}
-		}
+		};
 		
-		constructor.prototype.updateBackBuffer = function cv_updateBackBuffer(scope){
+		constructor.prototype.drawPreview = function cv_drawPreview(){
+			var viewerBean = this.getViewer().viewerBean;
+			var x = -viewerBean.x;
+			var y = -viewerBean.y;
+			this.context2D.drawImage(this.preView, x, y, this.getViewer().currentImage.curWidth, this.getViewer().currentImage.curHeight);
+		};
+		
+		constructor.prototype._updateCanvas = function cv__updateCanvas(){
+			var rect = {};
+			var bufferCanvas=this.buffer2D;
+			rect.x = this.getViewer().viewerBean.x;
+			rect.y = this.getViewer().viewerBean.y;
 			
-			if(scope === undefined || scope.refreshBackBuffer === undefined){
-				scope = this;
-			}			
-			/*
-			if(scope.refreshBackBuffer){
-				this.backBufferHandle = this.backBufferHandle || scope.requestAnimationFrame(scope.updateBackBuffer, scope);
-				return;
-			}			
-			scope.refreshBackBuffer = true;
-			delete(this.backBufferHandle);*/
-			
-			var rect = {};						
-			scope.buffer2D.canvas.width = scope.buffer2D.canvas.width;
-			rect.x = scope.getViewer().viewerBean.x;
-			rect.y = scope.getViewer().viewerBean.y;
-			rect.width = scope.getViewer().viewerBean.width;
-			rect.height = scope.getViewer().viewerBean.height;
-			
-			var tileSize = scope.getViewer().viewerBean.tileSize;
-			var curWidth = scope.getViewer().currentImage.curWidth;
-			var curHeight = scope.getViewer().currentImage.curHeight;
-			var xDim = Math.min(rect.width, curWidth);
-			var yDim = Math.min(rect.height,curHeight);
+			var tileSize = this.getViewer().viewerBean.tileSize;
+			var curWidth = this.getViewer().currentImage.curWidth;
+			var curHeight = this.getViewer().currentImage.curHeight;
+			var xDim = Math.min(bufferCanvas.canvas.width, curWidth);
+			var yDim = Math.min(bufferCanvas.canvas.height,curHeight);
 			
 			var xoff = rect.x%tileSize;
 			var yoff = rect.y%tileSize;
@@ -230,11 +212,11 @@
 			var starty = Math.floor(rect.y/tileSize);
 			
 			//iterate through these tiles and assign them to the backbuffer
-			for(var column = 0; column < xTiles; column++){
-				for(var row = 0; row < yTiles; row++){
+			for(var row = 0; row < yTiles; row++){
+				for(var column = 0; column < xTiles; column++){
 					
 					//get the associated tiles
-					var tile = scope.getViewer().viewerBean.tiles[column][row];
+					var tile = this.getViewer().viewerBean.tiles[column][row];
 					tile.xIndex = column + startx;
 					tile.yIndex = row + starty;
 					tile.width=(tile.xIndex == imgXTiles-1)? curWidth - tile.xIndex * tileSize : tileSize; 
@@ -243,50 +225,78 @@
 					tile.posx = column * tileSize - xoff;
 					tile.posy = row * tileSize - yoff;
 										
-					scope.assignTileImage(tile);					
+					this.assignTileImage(tile, this.context2D);					
 				}			
 			}
-			
-			console.log("draw now");
-			scope.drawCanvasFromBuffer();
-			console.log("drawed");
-		}			
+		};
+		
+		constructor.prototype.updateScreen = function cv_updateScreen(render){
+			var scope=this;
+			if(!render){
+				//console.log("skipped");
+				if (this.updateCanvasCount++==0){
+					//mozRequestAnimationFrame has no return value as of FF7, tracking first call to method via updateCanvasCount
+					//console.log("scheduled");
+					requestAnimFrame(function(){scope.updateScreen(true);}, this.context2D.canvas);
+				}
+				return;
+			}
+			//console.log("draw");
+			this.updateCanvasCount=0;
+			this.drawPreview();
+			this._updateCanvas();
+			//console.log(this.context2D.canvas);
+			if (false){
+				var curTime = new Date();
+				var difference = curTime.getTime() - this.lastFrame.getTime();
+				this._drawFpsBox(1000/difference);
+				this.lastFrame=curTime;
+			}
+		};			
 		
 		constructor.prototype.switchDisplayMode = function cv_switchDisplayMode(screenZoom, stateBool, preventLooping){				
-				//this.switchActive = true;
-				var temp = this.getViewer().viewerBean.switchDisplayModeOrig(screenZoom, stateBool, preventLooping);
-				
+				var temp = this.getViewer().viewerBean.switchDisplayModeOrig(screenZoom, stateBool, preventLooping);				
 				if(!this.getViewer().viewerContainer.isMax()){
 					this.context2D.canvas.width = this.getViewer().context.container.find(".preload")[0].clientWidth;
 					this.context2D.canvas.height = this.getViewer().context.container.find(".preload")[0].clientHeight;
 				}else if(this.activateCanvas != true ){
 					this.activateCanvas = true;
 					this.appendCanvas();
-					//this.getViewer().context.container.find(".well").find(".preload").remove();		
+					
+					//sichergehen,dass das Previewbild bereits geladen ist, bevor die Tiles auf das Canvas kommen
+					var that = this;	
+					that.preView.onload = function(){
+						that.positionTiles();
+					};
+					that.preView.src = this.getViewer().context.container.find(".preload")[0].firstChild.src;
+					
+					this.getViewer().context.container.find(".well").find(".preload").remove();		
 					this.buffer2D.canvas.width = this.context2D.canvas.width = this.getViewer().viewerBean.width;
-					this.buffer2D.canvas.height = this.context2D.canvas.height = this.getViewer().viewerBean.height;
-										
-					this.positionTiles();
+					this.buffer2D.canvas.height = this.context2D.canvas.height = this.getViewer().viewerBean.height;		
 				}
 				
 				return temp;
-		}
+		};
 		// own
-		constructor.prototype.clearCanvas = function cv_clearCanvas(){	
+		constructor.prototype.clearCanvas = function cv_clearCanvas(){
+			this.buffer2D.canvas.width = this.buffer2D.canvas.width;
 			this.context2D.canvas.width = this.context2D.canvas.width;
-		}
+		};
 		
 		constructor.prototype.appendCanvas = function cv_appendCanvas(){
 			this.getViewer().context.container.find(".well").prepend(this.context2D.canvas);//before,prepend,append
-		}
+		};
 		
 		constructor.prototype.rotate = function cv_rotate(){
-			/*
+			
+			//this.getViewer().context.container.find(".preload")[0].hidden = true;
+			/*this.clearCanvas();
+			
 			this.getViewer().currentImage.rotation = (this.getViewer().currentImage.rotation + 90 >= 360) ? 0 : this.getViewer().currentImage.rotation + 90;
 			var oldVal = this.getViewer().viewerBean.width;
 			this.getViewer().viewerBean.width = this.getViewer().viewerBean.height;
-			this.getViewer().viewerBean.height=oldVal;
-		  
+			this.getViewer().viewerBean.height = oldVal;
+
 			if (this.getViewer().currentImage.rotation == 0 || this.getViewer().currentImage.rotation == 180)
 			{				  
 				this.resizeCanvas(this.getViewer().context.container.find(".preload")[0].clientWidth, this.getViewer().context.container.find(".preload")[0].clientHeight);
@@ -299,7 +309,7 @@
 			this.context2D.rotate(this.getViewer().currentImage.rotation * (Math.PI / 180));
 		  
 			//x,y axis rotates with canvas 
-			var moveXAxis=0,moveYAxis=0;
+			var moveXAxis = 0, moveYAxis = 0;
 			switch (this.getViewer().currentImage.rotation){
 		  		case 90:  	moveYAxis =- this.context2D.canvas.width;
 		  					break;
@@ -314,55 +324,33 @@
 		  
 		  	//move zero point
 		  	this.context2D.translate(moveXAxis,moveYAxis);
-		  
+		  	
 		  	//repaint 
 		  	this.getViewer().viewerBean.clear();
-		  	this.resizeRequired = false;
-		  	this.getViewer().viewerBean.prepareTiles();
-		  	*/
-		}
+		  	this.getViewer().viewerBean.prepareTiles();*/
+		};
 		
-		constructor.prototype.resizeCanvas = function cv_resizeCanvas(width, height){	
+		constructor.prototype.resizeCanvas = function cv_resizeCanvas(width, height){			
 			/*
-			console.warn("resizeCanvas()");
-			this.skipUpdate=true;
+			var w = width, h = height;
+			if(width === undefined) {
+				w = this.getViewer().context.container.find(".preload")[0].clientWidth;
+			}
+			if(height === undefined) {
+				h = this.getViewer().context.container.find(".preload")[0].clientHeight;
+			}
+
+			switch(this.getViewer().currentImage.rotation) {
+				case 0: case 180: this.context2D.canvas.setAttribute('width',  w > this.getViewer().viewerBean.width?this.getViewer().viewerBean.width:w);
+			 					  this.context2D.canvas.setAttribute('height', h > this.getViewer().viewerBean.height?this.getViewer().viewerBean.height:h);
+			 					  break;
+			 	case 90:case 270: this.context2D.canvas.setAttribute('width',  w > this.getViewer().viewerBean.height?this.getViewer().viewerBean.height:w);
+			 					  this.context2D.canvas.setAttribute('height', h > this.getViewer().viewerBean.width?this.getViewer().viewerBean.width:h);
+			 					  break;
+			}
 			
-			//if(this.refreshBackBuffer === undefined)
-			//{
-				
-				var w=width, h=height;
-				 if(width === undefined) {
-					 w = this.getViewer().context.container.find(".preload")[0].clientWidth;
-				 }
-				 if(height === undefined) {
-					 h = this.getViewer().context.container.find(".preload")[0].clientHeight;
-				 }
-				 if(!this.switchActive) {
-					 switch(this.getViewer().currentImage.rotation) {
-					 
-					 	case 0: case 180: this.context2D.canvas.setAttribute('width',  w > this.getViewer().viewerBean.width?this.getViewer().viewerBean.width:w);
-					 					  this.context2D.canvas.setAttribute('height', h > this.getViewer().viewerBean.height?this.getViewer().viewerBean.height:h);
-					 					  break;
-					 	case 90:case 270: this.context2D.canvas.setAttribute('width',  w > this.getViewer().viewerBean.height?this.getViewer().viewerBean.height:w);
-					 					  this.context2D.canvas.setAttribute('height', h > this.getViewer().viewerBean.width?this.getViewer().viewerBean.width:h);
-					 					  break;
-					 }
-				 }else {
-					 this.switchActive = false;
-					 switch(this.getViewer().currentImage.rotation) {
-					 	case 0: case 180: this.context2D.canvas.setAttribute('width',  w > this.getViewer().viewerBean.width?w:this.getViewer().viewerBean.width);
-					 					  this.context2D.canvas.setAttribute('height', h > this.getViewer().viewerBean.height?h:this.getViewer().viewerBean.height);
-					 					  break;
-					 	case 90: case 270:this.context2D.canvas.setAttribute('width',  w > this.getViewer().viewerBean.height?w:this.getViewer().viewerBean.height);
-					 					  this.context2D.canvas.setAttribute('height', h > this.getViewer().viewerBean.width?h:this.getViewer().viewerBean.width);
-					 					  break;
-					 }
-				 }
-				 
-				 this.buffer2D.canvas.width  = this.context2D.canvas.width;
-				 this.buffer2D.canvas.height = this.context2D.canvas.height;
-			//}
-			this.updateBackBuffer();
+			this.buffer2D.canvas.width  = this.context2D.canvas.width;
+			this.buffer2D.canvas.height = this.context2D.canvas.height;
 			*/
 		};
 		
