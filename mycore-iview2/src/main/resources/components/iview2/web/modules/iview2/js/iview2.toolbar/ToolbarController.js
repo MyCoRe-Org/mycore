@@ -230,13 +230,11 @@ ToolbarController.prototype.catchModels = function() {
 						// the other case won't be used
 						if (typeof curView != "undefined") {
 							jQuery(curView.toolbar).find("."+args.elementName+" ." + args.buttonName)[0].checked = args.state;
-							console.log("class is", jQuery(curView.toolbar).find("."+args.elementName+" ." + args.buttonName + "Label").hasClass("ui-state-active"))
 							if (args.state) {
 								jQuery(curView.toolbar).find("."+args.elementName+" ." + args.buttonName + "Label").addClass("ui-state-active");
 							} else {
 								jQuery(curView.toolbar).find("."+args.elementName+" ." + args.buttonName + "Label").removeClass("ui-state-active");
 							}
-							console.log("class is now", jQuery(curView.toolbar).find("."+args.elementName+" ." + args.buttonName + "Label").hasClass("ui-state-active"))
 						}
 					}
 		    	break;
