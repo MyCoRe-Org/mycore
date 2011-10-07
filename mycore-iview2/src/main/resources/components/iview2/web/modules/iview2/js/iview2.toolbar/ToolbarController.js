@@ -399,8 +399,6 @@ ToolbarController.prototype.paint = function(model) {
 		    this.views[this.relations[model][view]].paint();
 		}
 	} catch (e) {
-		if (typeof console != "undefined") {
-			console.log(e);
-		}
+		log(e);
 	}
 };

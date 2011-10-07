@@ -268,7 +268,7 @@ iview.Pdf.Controller.prototype = {
       this.displayPreview(el.value);
     } catch (e) {
       this.view.setValidationText(e.message);
-      console.log({
+      log({
         msg : e.message,
         stack : e.stack
       });

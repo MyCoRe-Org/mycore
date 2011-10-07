@@ -152,9 +152,7 @@ iview.overview.View = function(i18n) {
 			setSrc(this, args.value);
 			break;
 		default:
-			if (typeof console != "undefined") {
-				console.log ("got unknown type " + args.type);
-			}
+			log ("got unknown type " + args.type);
 		}
 	}
 	

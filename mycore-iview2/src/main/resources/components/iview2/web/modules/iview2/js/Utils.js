@@ -282,9 +282,9 @@ function hideProperty(o,name,writeable){
   }
 }
 
-function log(msg){
+function log(){
   if (typeof(console)!=="undefined") {
-    console.log(msg);
+    console.log.apply(window, arguments);
   }
 }
 

@@ -7,8 +7,7 @@
       this.message = arguments[0];
       this.instance = arguments.length > 1 ? arguments[1] : null;
       for ( var a in this) {
-        console.log("name:" + a);
-        console.log(this[a]);
+        log("name:" + a, this[a]);
       }
     }
     constructor.prototype = new Error();
@@ -180,9 +179,7 @@
 					iview.METS.processMETS(that, response);
 				},
 		  		error: function(request, status, exception) {
-		  			if(typeof console != "undefined"){
-		  				console.log("Error Occured while Loading METS file:\n"+exception);
-		  			}
+		  			log("Error Occured while Loading METS file:\n"+exception);
 		  		}
 			});
 			
@@ -229,9 +226,7 @@
 	  		  callBack(callback);
 	  		},
 	  		error: function(request, status, exception) {
-	  			if(console){
-	  				console.log("Error occured while loading image properties:\n"+exception);
-	  			}
+	  			log("Error occured while loading image properties:\n"+exception);
 	  		}
 		});
 	};

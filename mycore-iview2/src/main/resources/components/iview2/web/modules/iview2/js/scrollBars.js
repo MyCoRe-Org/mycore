@@ -802,9 +802,7 @@ iview.scrollbar.View = function() {
 				applySize(this);
 				break;
 			default:
-				if (typeof console != "undefined") {
-					console.log("Got:"+args.type+" as argument type, don't know what to do with it");
-				}
+				log("Got:"+args.type+" as argument type, don't know what to do with it");
 		}
 		//calculate the bar size
 		//calculate the pixelPerUnit rate to set the positioning of the bar correctly
