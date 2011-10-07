@@ -215,10 +215,13 @@ PanoJS.prototype.isloaded = function(img) {
 }
 
 PanoJS.prototype.blank = function() {
-	for (imgId in this.cache) {
-		var img = this.cache[imgId];
+	var iterator = this.cache.iterator();
+	var img;
+	while (iterator.hasNext()) {
+		img = iterator.next().value;
 		if (img.parentNode != null) {
 			this.well.removeChild(img);
+			img.parentNode = null;
 		}
 	}
 }

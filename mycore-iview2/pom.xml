@@ -36,6 +36,8 @@
               <jsSourceFiles>
                 <jsSourceFile>Utils.js</jsSourceFile>
                 <!--General Util Funktionen-->
+				<jsSourceFile>cache.js</jsSourceFile>
+				<!-- JavaScript Caching functionality -->
                 <jsSourceFile>jquery.mousewheel.min.js</jsSourceFile>
                 <!-- JQuery Mousewheel support -->
                 <jsSourceFile>jquery.tree.min.js</jsSourceFile>

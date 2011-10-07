@@ -12,3 +12,7 @@ Frameworks:
 
 -jQuery always latest Google Version
 -jQuery UI 1.8.6
+
+- Cache jsCache commit f065afa3515fed1a6c401db19cc1e1994150c909
+	https://github.com/monsur/jscache
+	extended to allow a simpleIterator to be used

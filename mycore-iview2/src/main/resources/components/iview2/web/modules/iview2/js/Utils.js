@@ -29,7 +29,6 @@ iview.utils.SimpleIterator = function(objectIterate) {
 	
 	//add all entries to our
 	for (entry in objectIterate) {
-		console.log(entry)
 		if (typeof entry != "object") {
 			entry = objectIterate[entry];
 		}

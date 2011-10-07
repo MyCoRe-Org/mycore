@@ -108,17 +108,18 @@ function PanoJS(viewer, options) {
 	this.tiles = [];
 	//TODO maybe its possible to store all data which is kept in images in tiles
 	this.images = [];
-	this.cache = {};
+	//create Cache Object where the size is the amount of tiles which can be displayed at once plus one row/column on each site
+	this.cache = new Cache((Math.ceil(jQuery(window).width() / this.tileSize) + 2) *  (Math.ceil(jQuery(window).height() / this.tileSize) + 2));
 	var blankTile = options.blankTile ? options.blankTile : PanoJS.BLANK_TILE_IMAGE;
 	var loadingTile = options.loadingTile ? options.loadingTile : PanoJS.LOADING_TILE_IMAGE;
-	this.cache['blank'] = new Image();
-	this.cache['blank'].src = blankTile;
+	this.blankImg = new Image();
+	this.blankImg.src = blankTile;
 	if (blankTile != loadingTile) {
-		this.cache['loading'] = new Image();
-		this.cache['loading'].src = loadingTile;
+		this.loadingImg = new Image();
+		this.loadingImg.src = loadingTile;
 	}
 	else {
-		this.cache['loading'] = this.cache['blank'];
+		this.loadingImg = this.blankImg;
 	}
 
 	// employed to throttle the number of redraws that
@@ -379,7 +380,6 @@ PanoJS.prototype = {
 		for (var c = 0; c < this.tiles.length; c++) {
 			for (var r = 0; r < this.tiles[c].length; r++) {
 				var tile = this.tiles[c][r];
-
 				tile.posx = (tile.xIndex * this.tileSize) + this.x + motion.x;
 				tile.posy = (tile.yIndex * this.tileSize) + this.y + motion.y;
 
@@ -438,8 +438,6 @@ PanoJS.prototype = {
 				// initialize the image object for this quadrant
 				if (!this.initialized) {
 					this.assignTileImage(tile, true);
-					tile.element.style.top = tile.posy + 'px';
-					tile.element.style.left = tile.posx + 'px';
 				}
 
 				// display the image if visible
@@ -501,7 +499,7 @@ PanoJS.prototype = {
 
 		if (useBlankImage) {
 			tileImgId = 'blank:' + tile.qx + ':' + tile.qy;
-			src = this.cache['blank'].src;
+			src = this.blankImg.src;
 		}
 		else {
 			tileImgId = src = this.tileUrlProvider.assembleUrl(tile.xIndex, tile.yIndex, this.zoomLevel);
@@ -514,10 +512,11 @@ PanoJS.prototype = {
 			this.well.removeChild(tile.element);
 		}
 
-		var tileImg = this.cache[tileImgId];
+		var tileImg = this.cache.getItem(tileImgId);
 		// create cache if not exist
 		if (tileImg == null) {
-			tileImg = this.cache[tileImgId] = this.createPrototype(src);
+			tileImg = this.createPrototype(src);
+			this.cache.setItem(tileImgId, tileImg);
 		}
 
 		if (useBlankImage || !PanoJS.USE_LOADER_IMAGE || tileImg.complete || (tileImg.image && tileImg.image.complete)) {
@@ -532,9 +531,10 @@ PanoJS.prototype = {
 		}
 		else {
 			var loadingImgId = 'loading:' + tile.qx + ':' + tile.qy;
-			var loadingImg = this.cache[loadingImgId];
+			var loadingImg = this.cache.getItem(loadingImgId);
 			if (loadingImg == null) {
-				loadingImg = this.cache[loadingImgId] = this.createPrototype(this.cache['loading'].src);
+				loadingImg = this.createPrototype(this.loadingImg.src);
+				this.cache.setItem(loadingImg);
 			}
 
 			loadingImg.targetSrc = tileImgId;
