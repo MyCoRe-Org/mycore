@@ -5,9 +5,9 @@
   xmlns:mods="http://www.loc.gov/mods/v3" exclude-result-prefixes="xlink mcr i18n acl mods mcrmods" version="1.0">
 
 
-  <!-- copy this stylesheet to your application and overwrite template matches with highest priority=1  -->
+  <!-- copy this stylesheet to your application and overwrite template matches with highest priority=2  -->
 
-  <!-- xsl:template match="mcr:hit[contains(@id,'_mods_')]" priority="1">
+  <!-- xsl:template match="mcr:hit[contains(@id,'_mods_')]" priority="2">
 
   </xsl:template -->
 
