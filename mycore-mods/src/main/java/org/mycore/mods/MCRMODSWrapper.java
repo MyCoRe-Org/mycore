@@ -64,6 +64,7 @@ public class MCRMODSWrapper {
         topLevelElementOrder.add("relatedItem");
         topLevelElementOrder.add("identifier");
         topLevelElementOrder.add("location");
+        topLevelElementOrder.add("accessCondition");
     }
 
     private static int getRankOf(Element topLevelElement) {
