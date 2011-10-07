@@ -60,6 +60,7 @@ public class MCRMODSWrapper {
         topLevelElementOrder.add("originInfo");
         topLevelElementOrder.add("language");
         topLevelElementOrder.add("abstract");
+        topLevelElementOrder.add("note");
         topLevelElementOrder.add("subject");
         topLevelElementOrder.add("relatedItem");
         topLevelElementOrder.add("identifier");
