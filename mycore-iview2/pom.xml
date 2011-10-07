@@ -34,7 +34,8 @@
               <cssFinalFile>iview2.css</cssFinalFile>
               <jsSourceDir>components/iview2/web/modules/iview2/js</jsSourceDir>
               <jsSourceFiles>
-                <!-- iview.init BEGIN -->
+                <jsSourceFile>Utils.js</jsSourceFile>
+                <!--General Util Funktionen-->
                 <jsSourceFile>jquery.mousewheel.min.js</jsSourceFile>
                 <!-- JQuery Mousewheel support -->
                 <jsSourceFile>jquery.tree.min.js</jsSourceFile>
@@ -69,8 +70,6 @@
                 <!--Scrollbar Klasse-->
                 <jsSourceFile>XML.js</jsSourceFile>
                 <!--XML Funktionen-->
-                <jsSourceFile>Utils.js</jsSourceFile>
-                <!--Allgemeine Util Funktionen-->
                 <!-- iview.init END-->
                 
                 <!-- menu -->
