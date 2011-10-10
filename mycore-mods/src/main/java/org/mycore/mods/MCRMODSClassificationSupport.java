@@ -157,9 +157,9 @@ public final class MCRMODSClassificationSupport {
     public static MCRCategoryID getCategoryID(final Element element) {
         //test by authority URI
         final String authorityURI = element.getAttribute("authorityURI");
-        if (authorityURI != null) {
+        if (authorityURI != null && authorityURI.length() > 0) {
             final String valueURI = element.getAttribute("valueURI");
-            if (valueURI == null) {
+            if (valueURI == null || valueURI.length() == 0) {
                 LOGGER.warn("Did find attribute authorityURI='" + authorityURI + "', but no valueURI");
                 return null;
             }
@@ -167,7 +167,7 @@ public final class MCRMODSClassificationSupport {
         }
         //test by authority
         final String authority = element.getAttribute("authority");
-        if (authority != null) {
+        if (authority != null && authority.length() > 0) {
             final String type = element.getAttribute("type");
             if ("text".equals(type)) {
                 LOGGER.warn("Type 'text' is currently unsupported when resolving a classification category");
