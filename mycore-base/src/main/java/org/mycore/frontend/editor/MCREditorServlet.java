@@ -48,7 +48,6 @@ import org.jdom.Element;
 import org.jdom.filter.ElementFilter;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -154,7 +153,11 @@ public class MCREditorServlet extends MCRServlet {
         for (Element editor : editors) {
             Element editorResolved = null;
             if (sessionID != null) {
-                editorResolved = MCREditorSessionCache.instance().getEditorSession(sessionID).getXML();
+                MCREditorSession editorSession = MCREditorSessionCache.instance().getEditorSession(sessionID);
+                if (editorSession == null) {
+                    throw new MCRException("Editor session is invalid:" + sessionID);
+                }
+                editorResolved = editorSession.getXML();
             }
 
             if (sessionID == null || editorResolved == null) {
@@ -198,6 +201,7 @@ public class MCREditorServlet extends MCRServlet {
         String sourceURI = mcrEditor.getSourceURI();
         logger.info("Editor reading XML input from " + sourceURI);
         Element input = MCRURIResolver.instance().resolve(sourceURI);
+        logger.info(new XMLOutputter(Format.getPrettyFormat()).outputString(input));
         MCREditorSubmission sub = new MCREditorSubmission(input, editor);
         MCREditorDefReader.fixConditionedVariables(editor);
         editor.addContent(sub.buildInputElements());
@@ -206,7 +210,7 @@ public class MCREditorServlet extends MCRServlet {
 
     private static Element getTargetParameters(Map parameters) {
         Element tps = new Element("target-parameters");
-        
+
         for (Iterator parameterNames = parameters.keySet().iterator(); parameterNames.hasNext();) {
             String parameterName = (String) parameterNames.next();
             String[] parameterValues = (String[]) parameters.get(parameterName);
@@ -440,11 +444,11 @@ public class MCREditorServlet extends MCRServlet {
 
             return;
         }
-        
+
         Document xml = sub.getXML();
 
         postProcess(editor, sub);
-        
+
         String targetType = parms.getParameter("_target-type");
         logger.debug("Editor: targettype=" + targetType);
 
