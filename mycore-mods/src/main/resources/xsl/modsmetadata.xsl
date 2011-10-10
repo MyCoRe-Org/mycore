@@ -250,7 +250,7 @@
   <xsl:template match="mods:classification" mode="present">
     <tr>
       <td valign="top" class="metaname">
-        <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.classification'), ' :')" />
+        <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.classification'), ':')" />
       </td>
       <td class="metavalue">
         <xsl:apply-templates select="." mode="printModsClassInfo" />
