@@ -263,7 +263,16 @@
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.report">
     <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
     <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@type='personal']" />
-
+    <xsl:if test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='kindof']">
+      <tr>
+        <td valign="top" class="metaname">
+          <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.genre.kindof'),':')" />
+        </td>
+        <td class="metavalue">
+        <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='kindof']" mode="printModsClassInfo" />
+        </td>
+      </tr>
+    </xsl:if>
     <xsl:call-template name="printMetaDate.mods">
       <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:abstract" />
     </xsl:call-template>
@@ -291,6 +300,16 @@
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.thesis">
     <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
     <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@type='personal']" />
+    <xsl:if test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='kindof']">
+      <tr>
+        <td valign="top" class="metaname">
+          <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.genre.kindof'),':')" />
+        </td>
+        <td class="metavalue">
+        <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='kindof']" mode="printModsClassInfo" />
+        </td>
+      </tr>
+    </xsl:if>
     <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
     <xsl:call-template name="printMetaDate.mods">
       <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateIssued" />
@@ -337,7 +356,6 @@
     </xsl:call-template>
   </xsl:template>
 
-
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.cpublication">
     <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
     <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name" />
@@ -353,6 +371,7 @@
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.book">
     <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
     <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name" />
+    <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
     <xsl:call-template name="printMetaDate.mods">
       <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:publisher" />
     </xsl:call-template>
@@ -381,7 +400,7 @@
     </xsl:call-template>
     <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:classification" />
     <xsl:call-template name="printMetaDate.mods">
-      <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:subject/mods:topic" />
+      <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:subject" />
     </xsl:call-template>
     <xsl:call-template name="printMetaDate.mods">
       <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:note" />

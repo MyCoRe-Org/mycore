@@ -769,33 +769,19 @@
     <cell anchor="NORTHWEST" var="mods:genre">
       <hidden var="@type" default="kindof" />
       <hidden var="@displayLabel" default="Kind of Report" />
-      <list id="kindOfReport.ListGenre" type="dropdown" default="01">
-        <condition required="true">
-          <label xml:lang="de">Forschungsergebnisse, In House Publikationen, Presseerklärungen, Poster, Zeitschrifteninhaltsverzeichnisse
-          </label>
-          <label xml:lang="en">What kind of report is this?</label>
-        </condition>
-        <item value="01">
-          <label xml:lang="de">Forschungsergebnisse</label>
-          <label xml:lang="en">Forschungsergebnisse</label>
-        </item>
-        <item value="02">
-          <label xml:lang="de">In House</label>
-          <label xml:lang="en">In House</label>
-        </item>
-        <item value="03">
-          <label xml:lang="de">Presseerklärung</label>
-          <label xml:lang="en">Presseerklärung</label>
-        </item>
-        <item value="04">
-          <label xml:lang="de">Poster</label>
-          <label xml:lang="en">Poster</label>
-        </item>
-        <item value="10">
-          <label xml:lang="de">Sonstige</label>
-          <label xml:lang="en">Other</label>
-        </item>
-      </list>
+      <hidden var="@mcr:classId" default="mods_genres" />
+      <panel>
+        <cell var="@mcr:categId">
+          <list width="30" type="dropdown">
+            <include ref="pleaseSelect" />
+            <include uri="classification:editor:-1:children:mods_genres:report" cacheable="false" />
+            <condition required="true">
+              <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
+              <label xml:lang="en">Please select one entry!</label>
+            </condition>
+          </list>
+        </cell>
+      </panel>
     </cell>
   </panel>
 
@@ -816,32 +802,19 @@
     <cell anchor="NORTHWEST" var="mods:genre">
       <hidden var="@type" default="kindof" />
       <hidden var="@displayLabel" default="Kind of AV Media" />
-      <list id="kindOfAVMedia.ListGenre" type="dropdown" default="motion picture">
-        <condition required="true">
-          <label xml:lang="de">Wählen Sie bitte den Typ des AV-Mediums aus.</label>
-          <label xml:lang="en">What kind of av media is this?</label>
-        </condition>
-        <item value="motion picture">
-          <label xml:lang="de">Film</label>
-          <label xml:lang="en">Motion Picture</label>
-        </item>
-        <item value="filmstrip">
-          <label xml:lang="de">Filmstreifen</label>
-          <label xml:lang="en">Filmstrip</label>
-        </item>
-        <item value="sound">
-          <label xml:lang="de">Ton</label>
-          <label xml:lang="en">Sound</label>
-        </item>
-        <item value="videorecording">
-          <label xml:lang="de">Videoaufnahme</label>
-          <label xml:lang="en">videorecording</label>
-        </item>
-        <item value="other">
-          <label xml:lang="de">Sonstige</label>
-          <label xml:lang="en">Other</label>
-        </item>
-      </list>
+      <hidden var="@mcr:classId" default="mods_genres" />
+      <panel>
+        <cell var="@mcr:categId">
+          <list width="30" type="dropdown">
+            <include ref="pleaseSelect" />
+            <include uri="classification:editor:-1:children:mods_genres:av" cacheable="false" />
+            <condition required="true">
+              <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
+              <label xml:lang="en">Please select one entry!</label>
+            </condition>
+          </list>
+        </cell>
+      </panel>
     </cell>
   </panel>
 
@@ -869,40 +842,19 @@
     <cell anchor="NORTHWEST" var="mods:genre">
       <hidden var="@type" default="kindof" />
       <hidden var="@displayLabel" default="Kind of Thesis" />
-      <list id="kindOfThesis.ListGenre" type="dropdown" default="masterThesis">
-        <condition required="true">
-          <label xml:lang="de">Wählen Sie bitte den Typ der Hochschulschrift aus.</label>
-          <label xml:lang="en">What kind of thesis is this?</label>
-        </condition>
-        <item value="diplomaThesis">
-          <label xml:lang="de">Diplomarbeit</label>
-          <label xml:lang="en">Diploma Thesis</label>
-        </item>
-        <item value="masterThesis">
-          <label xml:lang="de">Abschlussarbeit (Master)</label>
-          <label xml:lang="en">Master Thesis</label>
-        </item>
-        <item value="bachelorThesis">
-          <label xml:lang="de">Abschlussarbeit (Bachelor)</label>
-          <label xml:lang="en">Bachelor Thesis</label>
-        </item>
-        <item value="studyThesis">
-          <label xml:lang="de">Studienarbeit</label>
-          <label xml:lang="en">Study Thesis</label>
-        </item>
-        <item value="doctoralThesis">
-          <label xml:lang="de">Dissertation</label>
-          <label xml:lang="en">Doctoral Thesis</label>
-        </item>
-        <item value="stateDoctorate">
-          <label xml:lang="de">Habilitation</label>
-          <label xml:lang="en">State doctorate</label>
-        </item>
-        <item value="graduate">
-          <label xml:lang="de">Magister</label>
-          <label xml:lang="en">Graduate</label>
-        </item>
-      </list>
+      <hidden var="@mcr:classId" default="mods_genres" />
+      <panel>
+        <cell var="@mcr:categId">
+          <list width="30" type="dropdown">
+            <include ref="pleaseSelect" />
+            <include uri="classification:editor:-1:children:mods_genres:thesis" cacheable="false" />
+            <condition required="true">
+              <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
+              <label xml:lang="en">Please select one entry!</label>
+            </condition>
+          </list>
+        </cell>
+      </panel>
     </cell>
   </panel>
 
