@@ -36,8 +36,8 @@
               <jsSourceFiles>
                 <jsSourceFile>Utils.js</jsSourceFile>
                 <!--General Util Funktionen-->
-				<jsSourceFile>cache.js</jsSourceFile>
-				<!-- JavaScript Caching functionality -->
+		<jsSourceFile>cache.js</jsSourceFile>
+		<!-- JavaScript Caching functionality -->
                 <jsSourceFile>jquery.mousewheel.min.js</jsSourceFile>
                 <!-- JQuery Mousewheel support -->
                 <jsSourceFile>jquery.tree.min.js</jsSourceFile>
@@ -94,6 +94,9 @@
                 <!--  ModelProvider -->
                 <jsSourceFile>iview2.toolbar/StandardToolbarModelProvider.js</jsSourceFile>
                 <jsSourceFile>iview2.toolbar/PreviewToolbarModelProvider.js</jsSourceFile>
+                
+                <!--  Canvas -->
+                <jsSourceFile>canvas.js</jsSourceFile>
                 
                 <!-- Permalink -->
                 <jsSourceFile>Permalink.js</jsSourceFile>
