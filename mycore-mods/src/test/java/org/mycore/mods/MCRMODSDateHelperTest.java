@@ -73,12 +73,12 @@ public class MCRMODSDateHelperTest extends MCRTestCase {
 
         String year = element.getText();
         assertEquals(fullYear, Integer.parseInt(year));
-        assertEquals("iso8601", element.getAttributeValue("encoding"));
+        assertEquals("iso8601", element.getAttributeValue("encoding", MCRConstants.MODS_NAMESPACE));
 
         Date parsed = MCRMODSDateHelper.getDate(element);
         assertEquals(date.getYear(), parsed.getYear());
 
-        element.removeAttribute("encoding");
+        element.removeAttribute("encoding", MCRConstants.MODS_NAMESPACE);
         assertEquals(fullYear, MCRMODSDateHelper.getCalendar(element).get(Calendar.YEAR));
     }
 
@@ -93,7 +93,7 @@ public class MCRMODSDateHelperTest extends MCRTestCase {
         assertEquals(29, parsed.get(Calendar.DAY_OF_MONTH));
 
         MCRMODSDateHelper.setDate(element, parsed, "iso8601-8");
-        assertEquals("iso8601", element.getAttributeValue("encoding"));
+        assertEquals("iso8601", element.getAttributeValue("encoding", MCRConstants.MODS_NAMESPACE));
         assertEquals(date, element.getText());
     }
 
@@ -108,7 +108,7 @@ public class MCRMODSDateHelperTest extends MCRTestCase {
         assertEquals(29, parsed.get(Calendar.DAY_OF_MONTH));
 
         MCRMODSDateHelper.setDate(element, parsed, "w3cdtf-10");
-        assertEquals("w3cdtf", element.getAttributeValue("encoding"));
+        assertEquals("w3cdtf", element.getAttributeValue("encoding", MCRConstants.MODS_NAMESPACE));
         assertEquals(date, element.getText());
     }
 }
