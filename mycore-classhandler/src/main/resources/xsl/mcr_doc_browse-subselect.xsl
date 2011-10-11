@@ -41,7 +41,7 @@
   <xsl:text>&amp;XSL.subselect.varpath=</xsl:text>
   <xsl:value-of select="$subselect.varpath" />
   <xsl:text>&amp;XSL.subselect.webpage=</xsl:text>
-  <xsl:value-of select="$subselect.webpage" />
+  <xsl:value-of select="encoder:encode($subselect.webpage)" />
 </xsl:variable>
 
 <xsl:variable name="url"
