@@ -116,7 +116,7 @@ public final class MCRMODSClassificationSupport {
             }
         }
         //maybe valueUri is in form {authorityURI}#{categId}
-        if (valueURI.startsWith(authorityURI)) {
+        if (valueURI.startsWith(authorityURI) && authorityURI.length() < valueURI.length()) {
             String categId;
             try {
                 categId = valueURI.substring(authorityURI.length() + 1);
