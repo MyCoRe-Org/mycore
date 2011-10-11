@@ -34,6 +34,11 @@
 				PanoJS.prototype.zoom = function cv_zoom() {
 					that.zoom(arguments[0]);
 				};
+				
+				PanoJS.prototype.resizeOrig = PanoJS.prototype.resize;
+				PanoJS.prototype.resize = function cv_resize() {
+					that.resize();
+				};
 				  
 				PanoJS.prototype.positionTilesOrig = PanoJS.prototype.positionTiles;
 				PanoJS.prototype.positionTiles = function cv_positionTiles() {
@@ -111,6 +116,41 @@
 			this.getViewer().viewerBean.prepareTiles();
 			this.clearCanvas();
 			this.getViewer().viewerBean.zoomOrig(direction);
+		};
+		
+		constructor.prototype.resize = function cv_resize(){			
+			// IE fires a premature resize event
+			if (!this.getViewer().viewerBean.initialized) {
+				return;
+			}
+
+	        var newWidth = this.getViewer().viewerBean.offsetWidth;
+	        var newHeight = this.getViewer().viewerBean.offsetHeight;
+
+			this.getViewer().viewerBean.clear();
+
+			var before = {
+				'x' : Math.floor(this.getViewer().viewerBean.width / 2),
+				'y' : Math.floor(this.getViewer().viewerBean.height / 2)
+			};
+
+			this.buffer2D.canvas.width = this.context2D.canvas.width = this.getViewer().viewerBean.width;
+			this.buffer2D.canvas.height = this.context2D.canvas.height = this.getViewer().viewerBean.height;	
+
+			this.getViewer().viewerBean.prepareTiles();
+
+			var after = {
+				'x' : Math.floor(this.getViewer().viewerBean.width / 2),
+				'y' : Math.floor(this.getViewer().viewerBean.height / 2)
+			};
+
+			this.getViewer().viewerBean.x += (after.x - before.x);
+			this.getViewer().viewerBean.y += (after.y - before.y);
+			
+			this.getViewer().viewerBean.positionTiles();
+			this.getViewer().viewerBean.initialized = true;
+			this.getViewer().viewerBean.notifyViewerMoved();
+
 		};
 
 		constructor.prototype._drawFpsBox = function cv_drawDebugBox(fps){
@@ -259,21 +299,18 @@
 		
 		constructor.prototype.switchDisplayMode = function cv_switchDisplayMode(screenZoom, stateBool, preventLooping){				
 				var temp = this.getViewer().viewerBean.switchDisplayModeOrig(screenZoom, stateBool, preventLooping);				
-				if(!this.getViewer().viewerContainer.isMax()){
-					this.context2D.canvas.width = this.getViewer().context.container.find(".preload")[0].clientWidth;
-					this.context2D.canvas.height = this.getViewer().context.container.find(".preload")[0].clientHeight;
-				}else if(this.activateCanvas != true ){
+				if(this.getViewer().viewerContainer.isMax() && this.activateCanvas != true ){
 					this.activateCanvas = true;
 					this.appendCanvas();
 					
-					//sichergehen,dass das Previewbild bereits geladen ist, bevor die Tiles auf das Canvas kommen
+					//make sure that the preview image is already loaded before drawing on canvas
 					var that = this;	
 					that.preView.onload = function(){
 						that.positionTiles();
 					};
-					that.preView.src = this.getViewer().context.container.find(".preload")[0].firstChild.src;
-					
+					that.preView.src = this.getViewer().context.container.find(".preload")[0].firstChild.src;					
 					this.getViewer().context.container.find(".well").find(".preload").remove();		
+					
 					this.buffer2D.canvas.width = this.context2D.canvas.width = this.getViewer().viewerBean.width;
 					this.buffer2D.canvas.height = this.context2D.canvas.height = this.getViewer().viewerBean.height;		
 				}
