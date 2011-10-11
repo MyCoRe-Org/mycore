@@ -65,5 +65,16 @@
       <xsl:apply-templates select="*[not((local-name()='namePart'))]" />
     </xsl:copy>
   </xsl:template>
+  
+  <xsl:template match="mods:name[@type='corporate']">
+    <xsl:copy>
+      <xsl:apply-templates select="@*" />
+        <xsl:if test="@authorityURI='http://www.bmelv.de/classifications/institutes'"> <!--  ToDo: BMELV-spezifisch -> auslagern  -->
+          <xsl:attribute name="editor.output">
+            <xsl:value-of select="'bereits gewaehlt'"/> <!-- ToDo: richtiges Label eintragen (sprachabhängig) -->
+          </xsl:attribute>
+        </xsl:if>
+    </xsl:copy>
+  </xsl:template>
 
 </xsl:stylesheet>
