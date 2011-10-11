@@ -84,27 +84,25 @@
 		// overwritten
 		constructor.prototype.assignTileImage = function cv_assignTileImage(tile, canvas){
 			
-			var viewerBean=this.getViewer().viewerBean;
+			var viewerBean = this.getViewer().viewerBean;
 			
 			var tileImgId = viewerBean.tileUrlProvider.assembleUrl(tile.xIndex, tile.yIndex, viewerBean.zoomLevel);
-			var tileImg = viewerBean.cache[tileImgId];
+			var tileImg = viewerBean.cache.getItem(tileImgId);
 			
 			// create cache if not exist - zoom/y/x
 			if (tileImg == null) {
-				tileImg=this.createImageTile(tileImgId, tile, viewerBean);
+				tileImg = this.createImageTile(tileImgId, tile, viewerBean);
 			}
 			if (tileImg.loaded){
 				canvas.drawImage(tileImg, tile.posx, tile.posy, tile.width, tile.height);
-				//console.log("img drawed "+tileImgId);
 			}
 		};
 		
 		constructor.prototype.createImageTile=function cv_createImageTile(tileImgId, tile, viewerBean){
 			var tileImg = new Image();
-			viewerBean.cache[tileImgId] = tileImg;
+			viewerBean.cache.setItem(tileImgId, tileImg);
 			var that = this;
 			tileImg.onload = function cv_tileLoaded(){
-//				console.log("img loaded "+tileImgId);
 				this.loaded = true;
 				that.updateScreen();
 			};
@@ -276,19 +274,18 @@
 		constructor.prototype.updateScreen = function cv_updateScreen(render){
 			var scope=this;
 			if(!render){
-				//console.log("skipped");
+
 				if (this.updateCanvasCount++==0){
 					//mozRequestAnimationFrame has no return value as of FF7, tracking first call to method via updateCanvasCount
-					//console.log("scheduled");
 					requestAnimFrame(function(){scope.updateScreen(true);}, this.context2D.canvas);
 				}
 				return;
 			}
-			//console.log("draw");
+
 			this.updateCanvasCount=0;
 			this.drawPreview();
 			this._updateCanvas();
-			//console.log(this.context2D.canvas);
+
 			if (false){
 				var curTime = new Date();
 				var difference = curTime.getTime() - this.lastFrame.getTime();
