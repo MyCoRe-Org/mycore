@@ -21,11 +21,9 @@
 				
 				this.activateCanvas = false;				
 				this.lastFrame = new Date();
-				this.updateCanvasCount=0;
-				this.lastCoords = { 'x' : 0, 'y' : 0 };
+				this.updateCanvasCount = 0;
 				this.preView = new Image();
-				var that = this;
-				
+				var that = this;				
 					  
 				PanoJS.prototype.assignTileImageOrig = PanoJS.prototype.assignTileImage;
 				PanoJS.prototype.assignTileImage = function cv_assignTileImage() {
@@ -131,7 +129,11 @@
 				if (typeof motion == 'undefined') {
 					motion = { 'x' : 0, 'y' : 0 };
 				}
-				//console.log(motion);
+
+				//fixed movement while mouse is still pressed
+				this.getViewer().viewerBean.mark.x += motion.x; 
+				this.getViewer().viewerBean.mark.y += motion.y;
+
 				var iview = this.getViewer();
 				this.getViewer().currentImage.curWidth = Math.ceil((this.getViewer().currentImage.width / Math.pow(2, this.getViewer().currentImage.zoomInfo.maxZoom - this.getViewer().viewerBean.zoomLevel))*this.getViewer().currentImage.zoomInfo.scale);
 				this.getViewer().currentImage.curHeight = Math.ceil((this.getViewer().currentImage.height / Math.pow(2, this.getViewer().currentImage.zoomInfo.maxZoom - this.getViewer().viewerBean.zoomLevel))*this.getViewer().currentImage.zoomInfo.scale); 
@@ -154,7 +156,7 @@
 						this.getViewer().viewerBean.x = motion.x = 0;
 					}
 				}else{
-					this.getViewer().viewerBean.x = 0;
+					this.getViewer().viewerBean.x = motion.x = 0;
 				}
 				
 				if(yViewerBorder > 0){
@@ -169,8 +171,9 @@
 						this.getViewer().viewerBean.y = motion.y = 0;
 					}
 				}else{
-					this.getViewer().viewerBean.y = 0;
-				}					
+					this.getViewer().viewerBean.y = motion.y = 0;
+				}		
+
 						
 				if((xViewerBorder > 0 || yViewerBorder > 0) || (motion.x == 0 && motion.y == 0)){
 					this.updateScreen();		
