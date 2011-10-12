@@ -23,27 +23,14 @@
 package org.mycore.mods;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNull;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.xpath.XPath;
-import org.junit.Before;
 import org.junit.Test;
-import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRTestCase;
-import org.mycore.common.xml.MCRXMLParserFactory;
-import org.mycore.datamodel.ifs2.MCRContent;
-import org.mycore.datamodel.metadata.MCRObject;
-import org.xml.sax.SAXParseException;
 
 import com.ibm.icu.util.Calendar;
 
@@ -65,20 +52,20 @@ public class MCRMODSDateHelperTest extends MCRTestCase {
     @Test
     public void testISO8601yearOnly() {
         Element element = new Element("date");
-        
+
         Date date = new Date();
         int fullYear = 1900 + date.getYear();
-        
+
         MCRMODSDateHelper.setDate(element, date, "iso8601-4");
 
         String year = element.getText();
         assertEquals(fullYear, Integer.parseInt(year));
-        assertEquals("iso8601", element.getAttributeValue("encoding", MCRConstants.MODS_NAMESPACE));
+        assertEquals("iso8601", element.getAttributeValue("encoding"));
 
         Date parsed = MCRMODSDateHelper.getDate(element);
         assertEquals(date.getYear(), parsed.getYear());
 
-        element.removeAttribute("encoding", MCRConstants.MODS_NAMESPACE);
+        element.removeAttribute("encoding");
         assertEquals(fullYear, MCRMODSDateHelper.getCalendar(element).get(Calendar.YEAR));
     }
 
@@ -93,7 +80,7 @@ public class MCRMODSDateHelperTest extends MCRTestCase {
         assertEquals(29, parsed.get(Calendar.DAY_OF_MONTH));
 
         MCRMODSDateHelper.setDate(element, parsed, "iso8601-8");
-        assertEquals("iso8601", element.getAttributeValue("encoding", MCRConstants.MODS_NAMESPACE));
+        assertEquals("iso8601", element.getAttributeValue("encoding"));
         assertEquals(date, element.getText());
     }
 
@@ -108,7 +95,7 @@ public class MCRMODSDateHelperTest extends MCRTestCase {
         assertEquals(29, parsed.get(Calendar.DAY_OF_MONTH));
 
         MCRMODSDateHelper.setDate(element, parsed, "w3cdtf-10");
-        assertEquals("w3cdtf", element.getAttributeValue("encoding", MCRConstants.MODS_NAMESPACE));
+        assertEquals("w3cdtf", element.getAttributeValue("encoding"));
         assertEquals(date, element.getText());
     }
 }

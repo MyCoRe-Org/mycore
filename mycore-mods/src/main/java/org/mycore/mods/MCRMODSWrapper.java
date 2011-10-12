@@ -148,12 +148,12 @@ public class MCRMODSWrapper {
     }
 
     public void setElement(String elementName, String attributeName, String attributeValue, String elementValue) {
-        String xPath = "mods:" + elementName + "[@mods:" + attributeName + "='" + attributeValue + "']";
+        String xPath = "mods:" + elementName + "[@" + attributeName + "='" + attributeValue + "']";
         Element element = getElement(xPath);
 
         if (element == null) {
             element = addElement(elementName);
-            element.setAttribute(attributeName, attributeValue, MCRConstants.MODS_NAMESPACE);
+            element.setAttribute(attributeName, attributeValue);
         }
 
         if (elementValue != null)

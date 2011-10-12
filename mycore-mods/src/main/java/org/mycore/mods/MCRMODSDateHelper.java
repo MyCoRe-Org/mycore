@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jdom.Element;
-import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 
 /**
@@ -68,7 +67,7 @@ public class MCRMODSDateHelper {
         if ((text == null) || text.isEmpty())
             return null;
 
-        String encoding = element.getAttributeValue("encoding", MCRConstants.MODS_NAMESPACE, "unknown").toLowerCase();
+        String encoding = element.getAttributeValue("encoding", "unknown").toLowerCase();
         String key = encoding + "-" + text.length();
 
         String format = formats.get(key);
@@ -103,7 +102,7 @@ public class MCRMODSDateHelper {
         String text = new SimpleDateFormat(format).format(date);
         element.setText(text);
         encoding = encoding.split("-")[0];
-        element.setAttribute("encoding", encoding, MCRConstants.MODS_NAMESPACE);
+        element.setAttribute("encoding", encoding);
     }
 
     public static void setDate(Element element, GregorianCalendar cal, String encoding) {
