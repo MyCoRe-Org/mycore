@@ -1,6 +1,7 @@
 package org.mycore.backend.hibernate.tables;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public class MCRDNBTRANSFERRESULTS implements Serializable {
 
@@ -13,7 +14,9 @@ public class MCRDNBTRANSFERRESULTS implements Serializable {
 
     private boolean transferPackageArchived;
 
-    private String protocolType, errorMessage, deliveryRole, objectId, errorModule;
+    private String protocolType, errorMessage, deliveryRole, objectId, errorModule,tpName;
+
+    private Date date;
 
     /**
      * @return the id
@@ -58,6 +61,20 @@ public class MCRDNBTRANSFERRESULTS implements Serializable {
      */
     public void setProtocolType(String protocolType) {
         this.protocolType = protocolType;
+    }
+
+    /**
+     * @return the tpName
+     */
+    public String getTpName() {
+        return tpName;
+    }
+
+    /**
+     * @param tpName the tpName to set
+     */
+    public void setTpName(String tpName) {
+        this.tpName = tpName;
     }
 
     /**
@@ -120,4 +137,18 @@ public class MCRDNBTRANSFERRESULTS implements Serializable {
         this.errorModule = errorModule;
     }
 
+    /**
+     * @return the date
+     */
+    public Date getDate() {
+        return date;
+    }
+
+    /**
+     * @param date
+     *            the date to set
+     */
+    public void setDate(Date date) {
+        this.date = date;
+    }
 }
