@@ -117,7 +117,7 @@
         </xsl:choose>
      </td >
        <td class="desc">
-	      <a href="{$url}&amp;_var_@mcr:categId={col[2]/@lineID}&amp;_var_@editor.output={col[2]/text()}">
+	      <a href="{$url}&amp;_var_@mcr:categId={$classifID}:{col[2]/@lineID}&amp;_var_@editor.output={col[2]/text()}">
 		      <xsl:value-of select="col[2]/text()" />
 		  </a>
       </td>
