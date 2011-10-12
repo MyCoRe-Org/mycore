@@ -9,9 +9,11 @@ public class MCRDNBTRANSFERRESULTS implements Serializable {
      */
     private static final long serialVersionUID = -5543608475323581768L;
 
-    private int id,transferPackageArchived;
-    
-    private String protocolType,errorMessage,deliveryRole,objectId,errorModule;
+    private int id;
+
+    private boolean transferPackageArchived;
+
+    private String protocolType, errorMessage, deliveryRole, objectId, errorModule;
 
     /**
      * @return the id
@@ -21,7 +23,8 @@ public class MCRDNBTRANSFERRESULTS implements Serializable {
     }
 
     /**
-     * @param id the id to set
+     * @param id
+     *            the id to set
      */
     public void setId(int id) {
         this.id = id;
@@ -30,14 +33,15 @@ public class MCRDNBTRANSFERRESULTS implements Serializable {
     /**
      * @return the transferPackageArchived
      */
-    public int getTransferPackageArchived() {
+    public boolean getTransferPackageArchived() {
         return transferPackageArchived;
     }
 
     /**
-     * @param transferPackageArchived the transferPackageArchived to set
+     * @param transferPackageArchived
+     *            the transferPackageArchived to set
      */
-    public void setTransferPackageArchived(int transferPackageArchived) {
+    public void setTransferPackageArchived(boolean transferPackageArchived) {
         this.transferPackageArchived = transferPackageArchived;
     }
 
@@ -49,7 +53,8 @@ public class MCRDNBTRANSFERRESULTS implements Serializable {
     }
 
     /**
-     * @param protocolType the protocolType to set
+     * @param protocolType
+     *            the protocolType to set
      */
     public void setProtocolType(String protocolType) {
         this.protocolType = protocolType;
@@ -63,7 +68,8 @@ public class MCRDNBTRANSFERRESULTS implements Serializable {
     }
 
     /**
-     * @param errorMessage the errorMessage to set
+     * @param errorMessage
+     *            the errorMessage to set
      */
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
@@ -77,7 +83,8 @@ public class MCRDNBTRANSFERRESULTS implements Serializable {
     }
 
     /**
-     * @param deliveryRole the deliveryRole to set
+     * @param deliveryRole
+     *            the deliveryRole to set
      */
     public void setDeliveryRole(String deliveryRole) {
         this.deliveryRole = deliveryRole;
@@ -91,7 +98,8 @@ public class MCRDNBTRANSFERRESULTS implements Serializable {
     }
 
     /**
-     * @param objectId the objectId to set
+     * @param objectId
+     *            the objectId to set
      */
     public void setObjectId(String objectId) {
         this.objectId = objectId;
@@ -105,11 +113,11 @@ public class MCRDNBTRANSFERRESULTS implements Serializable {
     }
 
     /**
-     * @param errorModule the errorModule to set
+     * @param errorModule
+     *            the errorModule to set
      */
     public void setErrorModule(String errorModule) {
         this.errorModule = errorModule;
     }
-    
-    
+
 }
