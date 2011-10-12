@@ -26,9 +26,8 @@
 
   <xsl:template match="@editor.output" />
   <!-- ignore @classId and @categId but transform it to @authority|@authorityURI and @valueURI -->
-  <xsl:template match="@mcr:classId" />
   <xsl:template match="@mcr:categId" />
-  <xsl:template match="*[@mcr:classId]">
+  <xsl:template match="*[@mcr:categId]">
     <xsl:param name="ID" />
     <xsl:copy>
       <xsl:variable name="classNodes" select="mcrmods:getClassNodes(.)" />

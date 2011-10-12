@@ -769,12 +769,11 @@
     <cell anchor="NORTHWEST" var="mods:genre">
       <hidden var="@type" default="kindof" />
       <hidden var="@displayLabel" default="Kind of Report" />
-      <hidden var="@mcr:classId" default="mods_genres" />
       <panel>
         <cell var="@mcr:categId">
           <list width="30" type="dropdown">
             <include ref="pleaseSelect" />
-            <include uri="classification:editor:-1:children:mods_genres:report" cacheable="false" />
+            <include uri="classification:editorComplete:-1:children:mods_genres:report" cacheable="false" />
             <condition required="true">
               <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
               <label xml:lang="en">Please select one entry!</label>
@@ -802,12 +801,11 @@
     <cell anchor="NORTHWEST" var="mods:genre">
       <hidden var="@type" default="kindof" />
       <hidden var="@displayLabel" default="Kind of AV Media" />
-      <hidden var="@mcr:classId" default="mods_genres" />
       <panel>
         <cell var="@mcr:categId">
           <list width="30" type="dropdown">
             <include ref="pleaseSelect" />
-            <include uri="classification:editor:-1:children:mods_genres:av" cacheable="false" />
+            <include uri="classification:editorComplete:-1:children:mods_genres:av" cacheable="false" />
             <condition required="true">
               <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
               <label xml:lang="en">Please select one entry!</label>
@@ -842,12 +840,11 @@
     <cell anchor="NORTHWEST" var="mods:genre">
       <hidden var="@type" default="kindof" />
       <hidden var="@displayLabel" default="Kind of Thesis" />
-      <hidden var="@mcr:classId" default="mods_genres" />
       <panel>
         <cell var="@mcr:categId">
           <list width="30" type="dropdown">
             <include ref="pleaseSelect" />
-            <include uri="classification:editor:-1:children:mods_genres:thesis" cacheable="false" />
+            <include uri="classification:editorComplete:-1:children:mods_genres:thesis" cacheable="false" />
             <condition required="true">
               <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
               <label xml:lang="en">Please select one entry!</label>

@@ -49,6 +49,8 @@ import org.w3c.dom.NodeList;
  *
  */
 public final class MCRMODSClassificationSupport {
+    private static final String CLASS_URI_PART = "classifications/";
+
     /**
      * xml:lang value of category or classification <label> for MODS @authorityURI or @valueURI.
      */
@@ -123,6 +125,15 @@ public final class MCRMODSClassificationSupport {
             } catch (RuntimeException e) {
                 LOGGER.warn("authorityURI:" + authorityURI + ", valueURI:" + valueURI);
                 throw e;
+            }
+            int internalStylePos = authorityURI.indexOf(CLASS_URI_PART);
+            if (internalStylePos > 0) {
+                String rootId = authorityURI.substring(internalStylePos + CLASS_URI_PART.length());
+                LOGGER.info("rootId: " + rootId);
+                MCRCategoryID catId = new MCRCategoryID(rootId, categId);
+                if (DAO.exist(catId)) {
+                    return catId;
+                }
             }
             Collection<MCRCategory> classes = getCategoryByURI(authorityURI);
             for (MCRCategory cat : classes) {
@@ -212,9 +223,9 @@ public final class MCRMODSClassificationSupport {
     public static NodeList getClassNodes(final NodeList sources) {
         try {
             final Element source = (Element) sources.item(0);
-            final String classId = source.getAttributeNS(MCRConstants.MCR_NAMESPACE.getURI(), "classId");
             final String categId = source.getAttributeNS(MCRConstants.MCR_NAMESPACE.getURI(), "categId");
-            final MCRCategoryID rootID = MCRCategoryID.rootID(classId);
+            final MCRCategoryID categoryID = MCRCategoryID.fromString(categId);
+            final MCRCategoryID rootID = MCRCategoryID.rootID(categoryID.getRootID());
             final MCRCategory cl = DAO.getRootCategory(rootID, 0);
             final Document document = DOC_BUILDER.newDocument();
             final Element returns = document.createElement("returns");
@@ -227,14 +238,14 @@ public final class MCRMODSClassificationSupport {
                 final MCRLabel uriLabel = cl.getLabel(LABEL_LANG_URI);
                 String authorityURI = uriLabel == null ? null : uriLabel.getText();
                 if (authorityURI == null) {
-                    authorityURI = MCRServlet.getBaseURL() + "classifications/" + classId;
+                    authorityURI = MCRServlet.getBaseURL() + CLASS_URI_PART + categoryID.getRootID();
                 }
                 returns.setAttribute("authorityURI", authorityURI);
-                final MCRCategory category = DAO.getCategory(new MCRCategoryID(rootID.getRootID(), categId), 0);
+                final MCRCategory category = DAO.getCategory(categoryID, 0);
                 final MCRLabel categUriLabel = category.getLabel(LABEL_LANG_URI);
                 String valueURI = categUriLabel == null ? null : categUriLabel.getText();
                 if (valueURI == null) {
-                    valueURI = authorityURI + "#" + categId;
+                    valueURI = authorityURI + "#" + categoryID.getID();
                 }
                 returns.setAttribute("valueURI", valueURI);
             }
@@ -254,8 +265,7 @@ public final class MCRMODSClassificationSupport {
             }
             final Document document = DOC_BUILDER.newDocument();
             final Element returns = document.createElement("returns");
-            returns.setAttributeNS(MCRConstants.MCR_NAMESPACE.getURI(), "mcr:classId", category.getRootID());
-            returns.setAttributeNS(MCRConstants.MCR_NAMESPACE.getURI(), "mcr:categId", category.getID());
+            returns.setAttributeNS(MCRConstants.MCR_NAMESPACE.getURI(), "mcr:categId", category.toString());
             return returns.getChildNodes();
         } catch (Throwable e) {
             LOGGER.warn("Error in Xalan Extension", e);

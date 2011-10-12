@@ -17,7 +17,7 @@
 
     <!-- genre classification -->
     <cell row="4" col="1" anchor="NORTHEAST" ref="mods.genre.kindOfAVMedia.label" />
-    <cell row="4" col="2" anchor="NORTHWEST" ref="mods.genre.kindOfAVMedia" var="metadata/def.modsContainer/modsContainer/mods:mods/" />
+    <cell row="4" col="2" anchor="NORTHWEST" ref="mods.genre.kindOfAVMedia" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="4" col="3" anchor="NORTHWEST" ref="mods.genre.kindOfAVMedia.help" />
     <!-- genre classification END -->
 
