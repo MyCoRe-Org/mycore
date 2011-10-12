@@ -319,6 +319,11 @@
                           <img src="{$WebApplicationBaseURL}images/workflow_deradd.gif" title="{i18n:translate('derivate.addDerivate')}" />
                         </a>
                       </xsl:if>
+                      <!-- xsl:if test="mcrxsl:isAllowedObjectForURNAssignment($id)" -->
+                        <a href="{$ServletsBaseURL}MCRAddURNToObjectServlet{$HttpSession}?object={$id}&amp;xpath=.mycoreobject/metadata/def.modsContainer[@class='MCRMetaXML' and @heritable='false' and @notinherit='true']/modsContainer/mods:mods/mods:identifier[@type='urn']">
+                          <img src="{$WebApplicationBaseURL}images/workflow_addnbn.gif" title="{i18n:translate('derivate.urn.addURN')}" />
+                        </a>
+                     <!-- /xsl:if -->
                     </xsl:when>
                     <!-- **************** -->
                     <!-- object has a urn -->
