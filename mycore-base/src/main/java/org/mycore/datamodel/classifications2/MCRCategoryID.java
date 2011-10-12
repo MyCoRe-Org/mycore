@@ -24,6 +24,7 @@
 package org.mycore.datamodel.classifications2;
 
 import java.io.Serializable;
+import java.util.StringTokenizer;
 
 /**
  * The composite identifier of a MCRCategory. If <code>rootID == ID</code> the
@@ -61,6 +62,19 @@ public class MCRCategoryID implements Serializable {
     public static MCRCategoryID rootID(String rootID) {
         String root = rootID.intern();
         return new MCRCategoryID(root, "");
+    }
+    
+    public static MCRCategoryID fromString(String categoryId){
+        StringTokenizer tok=new StringTokenizer(categoryId, ":");
+        String rootId=tok.nextToken();
+        if (!tok.hasMoreTokens()){
+            return rootID(rootId);
+        }
+        String categId=tok.nextToken();
+        if (tok.hasMoreTokens()){
+            throw new IllegalArgumentException("CategoryId is ambiguous: "+categoryId);
+        }
+        return new MCRCategoryID(rootId, categId);
     }
 
     public boolean isRootID() {
