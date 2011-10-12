@@ -69,11 +69,34 @@
   <xsl:template match="mods:name[@type='corporate']">
     <xsl:copy>
       <xsl:apply-templates select="@*" />
-        <xsl:if test="@authorityURI='http://www.bmelv.de/classifications/institutes'"> <!--  ToDo: BMELV-spezifisch -> auslagern  -->
-          <xsl:attribute name="editor.output">
-            <xsl:value-of select="'bereits gewaehlt'"/> <!-- ToDo: richtiges Label eintragen (sprachabhängig) -->
-          </xsl:attribute>
-        </xsl:if>
+      <xsl:if test="@authorityURI='http://www.bmelv.de/classifications/institutes'"> <!--  ToDo: BMELV-spezifisch -> auslagern  -->
+        <xsl:attribute name="editor.output">
+          <xsl:variable name="classlink" select="mcrmods:getClassCategLink(.)" />
+          <xsl:choose>
+            <xsl:when test="string-length($classlink) &gt; 0">
+              <xsl:for-each select="document($classlink)/mycoreclass/categories/category">
+                <xsl:variable name="selectLang">
+                  <xsl:value-of select="'de'"/>
+<!--              <xsl:call-template name="selectLang"> -->
+<!--                <xsl:with-param name="nodes" select="./label" /> -->
+<!--              </xsl:call-template> -->
+                </xsl:variable>
+                <xsl:value-of select="./label[lang($selectLang)]/@text" />
+              </xsl:for-each>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:choose>
+                <xsl:when test="@valueURI">
+                  <xsl:value-of select="@valueURI" />
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="'bereits gewaehlt'" />
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+      </xsl:if>
     </xsl:copy>
   </xsl:template>
 
