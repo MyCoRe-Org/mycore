@@ -539,7 +539,8 @@
 
   <helpPopup id="mods.subject.help" width="400px" height="250px">
     <label xml:lang="de">
-      Stichworte mit Semikolon (;) getrennt
+      Jedes Stichwort sollte in ein separates Eingabefeld geschrieben werden. 
+      Bei mehreren Stichworten fügen Sie bitte mit dem "+" Button jeweils ein neues Feld hinzu.
     </label>
     <label xml:lang="en">
       Subject
@@ -1117,14 +1118,7 @@
 
   <!-- ISSN -->
   <text id="mods.issn.label">
-    <label xml:lang="de">
-      ISSN (*)
-      <br />
-      Die ISSN wird ohne Bindestrich eingegeben.
-      <br />
-      Beispiel: ISSN 09359680
-
-    </label>
+    <label xml:lang="de">ISSN (*)</label>
     <label xml:lang="en">ISSN (*)</label>
   </text>
 
@@ -1137,14 +1131,17 @@
   </panel>
 
   <helpPopup id="mods.issn.help">
-    <label xml:lang="de">ISSN</label>
+    <label xml:lang="de">ISSN (*) <br />
+    Die ISSN wird ohne Bindestrich eingegeben.
+      <br />
+      Beispiel: ISSN 09359680</label>
     <label xml:lang="en">ISSN</label>
   </helpPopup>
   <!-- ISSN END -->
 
   <!-- Impact Factor -->
   <text id="mods.impact.label">
-    <label xml:lang="de">Impact</label>
+    <label xml:lang="de">Impakt</label>
     <label xml:lang="en">Impact</label>
   </text>
 
