@@ -25,9 +25,10 @@ package org.mycore.mods;
 
 import java.text.MessageFormat;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -51,6 +52,8 @@ import org.w3c.dom.NodeList;
  *
  */
 public final class MCRMODSClassificationSupport {
+    private static final String KEY_FOR_TEXT_NODE = "text";
+
     private static final String CLASS_URI_PART = "classifications/";
 
     /**
@@ -182,7 +185,7 @@ public final class MCRMODSClassificationSupport {
         final String authority = element.getAttribute("authority");
         if (authority != null && authority.length() > 0) {
             final String type = element.getAttribute("type");
-            if ("text".equals(type)) {
+            if (KEY_FOR_TEXT_NODE.equals(type)) {
                 LOGGER.warn("Type 'text' is currently unsupported when resolving a classification category");
                 return null;
             }
@@ -212,7 +215,7 @@ public final class MCRMODSClassificationSupport {
         final String authority = element.getAttributeValue("authority");
         if (authority != null) {
             final String type = element.getAttributeValue("type");
-            if ("text".equals(type)) {
+            if (KEY_FOR_TEXT_NODE.equals(type)) {
                 LOGGER.warn("Type 'text' is currently unsupported when resolving a classification category");
                 return null;
             }
@@ -230,14 +233,12 @@ public final class MCRMODSClassificationSupport {
      * @param inElement the element in wich authority/authorityURI/valueURI should be set.
      */
     public static void setAuthorityAndValue(MCRCategoryID categoryID, org.jdom.Element inElement) {
-        Properties properties = getAuthorityInfo(categoryID);
-        for (Entry<Object, Object> entry : properties.entrySet()) {
-            String value = (String) (entry.getValue());
-            String attribute = (String) (entry.getKey());
-            if ("text".equals(attribute))
-                inElement.setText(value);
+        Map<String, String> properties = getAuthorityInfo(categoryID);
+        for (Entry<String, String> entry : properties.entrySet()) {
+            if (KEY_FOR_TEXT_NODE.equals(entry.getKey()))
+                inElement.setText(entry.getValue());
             else
-                inElement.setAttribute(attribute, value);
+                inElement.setAttribute(entry.getKey(), entry.getValue());
         }
     }
 
@@ -246,16 +247,14 @@ public final class MCRMODSClassificationSupport {
             final Element source = (Element) sources.item(0);
             final String categId = source.getAttributeNS(MCRConstants.MCR_NAMESPACE.getURI(), "categId");
             final MCRCategoryID categoryID = MCRCategoryID.fromString(categId);
-            final Properties properties = getAuthorityInfo(categoryID);
+            final Map<String, String> properties = getAuthorityInfo(categoryID);
             final Document document = DOC_BUILDER.newDocument();
             final Element returns = document.createElement("returns");
-            for (Entry<Object, Object> entry : properties.entrySet()) {
-                String value = (String) (entry.getValue());
-                String attribute = (String) (entry.getKey());
-                if ("text".equals(attribute))
-                    returns.setTextContent(value);
+            for (Entry<String, String> entry : properties.entrySet()) {
+                if (KEY_FOR_TEXT_NODE.equals(entry.getKey()))
+                    returns.setTextContent(entry.getValue());
                 else
-                    returns.setAttribute(attribute, value);
+                    returns.setAttribute(entry.getKey(), entry.getValue());
             }
             return returns.getChildNodes();
         } catch (Throwable e) {
@@ -264,30 +263,30 @@ public final class MCRMODSClassificationSupport {
         }
     }
 
-    private static Properties getAuthorityInfo(MCRCategoryID categoryID) {
-        Properties properties = new Properties();
+    private static Map<String, String> getAuthorityInfo(MCRCategoryID categoryID) {
+        Map<String, String> properties = new HashMap<String, String>();
         String rootID = categoryID.getRootID();
         MCRCategoryID classificationID = MCRCategoryID.rootID(rootID);
         MCRCategory classification = DAO.getRootCategory(classificationID, 0);
         MCRLabel authorityLabel = classification.getLabel(LABEL_LANG_AUTHORITY);
         String authority = authorityLabel == null ? null : authorityLabel.getText();
         if (authority != null) {
-            properties.setProperty("authority", authority);
-            properties.setProperty("text", categoryID.getID());
+            properties.put("authority", authority);
+            properties.put(KEY_FOR_TEXT_NODE, categoryID.getID());
         } else {
             MCRLabel uriLabel = classification.getLabel(LABEL_LANG_URI);
             String authorityURI = uriLabel == null ? null : uriLabel.getText();
             if (authorityURI == null) {
                 authorityURI = MCRServlet.getBaseURL() + CLASS_URI_PART + rootID;
             }
-            properties.setProperty("authorityURI", authorityURI);
+            properties.put("authorityURI", authorityURI);
             MCRCategory category = DAO.getCategory(categoryID, 0);
             MCRLabel categoryUriLabel = category.getLabel(LABEL_LANG_URI);
             String valueURI = categoryUriLabel == null ? null : categoryUriLabel.getText();
             if (valueURI == null) {
                 valueURI = authorityURI + "#" + categoryID.getID();
             }
-            properties.setProperty("valueURI", valueURI);
+            properties.put("valueURI", valueURI);
         }
         return properties;
     }
