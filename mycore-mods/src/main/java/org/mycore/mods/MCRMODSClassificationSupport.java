@@ -26,6 +26,8 @@ package org.mycore.mods;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -220,40 +222,74 @@ public final class MCRMODSClassificationSupport {
         return null;
     }
 
+    /**
+     * For a category ID, looks up the autority, authorityURI and/or valueURI for
+     * that category and sets the attributes in the given element.
+     * 
+     * @param categoryID the category that is set 
+     * @param inElement the element in wich authority/authorityURI/valueURI should be set.
+     */
+    public static void setAuthorityAndValue(MCRCategoryID categoryID, org.jdom.Element inElement) {
+        Properties properties = getAuthorityInfo(categoryID);
+        for (Entry<Object, Object> entry : properties.entrySet()) {
+            String value = (String) (entry.getValue());
+            String attribute = (String) (entry.getKey());
+            if ("text".equals(attribute))
+                inElement.setText(value);
+            else
+                inElement.setAttribute(attribute, value);
+        }
+    }
+
     public static NodeList getClassNodes(final NodeList sources) {
         try {
             final Element source = (Element) sources.item(0);
             final String categId = source.getAttributeNS(MCRConstants.MCR_NAMESPACE.getURI(), "categId");
             final MCRCategoryID categoryID = MCRCategoryID.fromString(categId);
-            final MCRCategoryID rootID = MCRCategoryID.rootID(categoryID.getRootID());
-            final MCRCategory cl = DAO.getRootCategory(rootID, 0);
+            final Properties properties = getAuthorityInfo(categoryID);
             final Document document = DOC_BUILDER.newDocument();
             final Element returns = document.createElement("returns");
-            final MCRLabel authLabel = cl.getLabel(LABEL_LANG_AUTHORITY);
-            final String authority = authLabel == null ? null : authLabel.getText();
-            if (authority != null) {
-                returns.setAttribute("authority", authority);
-                returns.setTextContent(categId);
-            } else {
-                final MCRLabel uriLabel = cl.getLabel(LABEL_LANG_URI);
-                String authorityURI = uriLabel == null ? null : uriLabel.getText();
-                if (authorityURI == null) {
-                    authorityURI = MCRServlet.getBaseURL() + CLASS_URI_PART + categoryID.getRootID();
-                }
-                returns.setAttribute("authorityURI", authorityURI);
-                final MCRCategory category = DAO.getCategory(categoryID, 0);
-                final MCRLabel categUriLabel = category.getLabel(LABEL_LANG_URI);
-                String valueURI = categUriLabel == null ? null : categUriLabel.getText();
-                if (valueURI == null) {
-                    valueURI = authorityURI + "#" + categoryID.getID();
-                }
-                returns.setAttribute("valueURI", valueURI);
+            for (Entry<Object, Object> entry : properties.entrySet()) {
+                String value = (String) (entry.getValue());
+                String attribute = (String) (entry.getKey());
+                if ("text".equals(attribute))
+                    returns.setTextContent(value);
+                else
+                    returns.setAttribute(attribute, value);
             }
             return returns.getChildNodes();
         } catch (Throwable e) {
             LOGGER.warn("Error in Xalan Extension", e);
             return null;
         }
+    }
+
+    private static Properties getAuthorityInfo(MCRCategoryID categoryID) {
+        Properties properties = new Properties();
+        String rootID = categoryID.getRootID();
+        MCRCategoryID classificationID = MCRCategoryID.rootID(rootID);
+        MCRCategory classification = DAO.getRootCategory(classificationID, 0);
+        MCRLabel authorityLabel = classification.getLabel(LABEL_LANG_AUTHORITY);
+        String authority = authorityLabel == null ? null : authorityLabel.getText();
+        if (authority != null) {
+            properties.setProperty("authority", authority);
+            properties.setProperty("text", categoryID.getID());
+        } else {
+            MCRLabel uriLabel = classification.getLabel(LABEL_LANG_URI);
+            String authorityURI = uriLabel == null ? null : uriLabel.getText();
+            if (authorityURI == null) {
+                authorityURI = MCRServlet.getBaseURL() + CLASS_URI_PART + rootID;
+            }
+            properties.setProperty("authorityURI", authorityURI);
+            MCRCategory category = DAO.getCategory(categoryID, 0);
+            MCRLabel categoryUriLabel = category.getLabel(LABEL_LANG_URI);
+            String valueURI = categoryUriLabel == null ? null : categoryUriLabel.getText();
+            if (valueURI == null) {
+                valueURI = authorityURI + "#" + categoryID.getID();
+            }
+            properties.setProperty("valueURI", valueURI);
+        }
+        return properties;
     }
 
     public static NodeList getMCRClassNodes(final NodeList sources) {
