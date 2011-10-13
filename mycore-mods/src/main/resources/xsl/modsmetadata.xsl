@@ -203,7 +203,14 @@
         <xsl:apply-templates select="." mode="printModsClassInfo" />
       </xsl:when>
       <xsl:when test="mods:namePart">
-        <xsl:value-of select="mods:namePart" />
+        <xsl:choose>
+          <xsl:when test="mods:namePart[@type='given'] and mods:namePart[@type='family']">
+            <xsl:value-of select="concat(mods:namePart[@type='family'], ', ',mods:namePart[@type='given'])" />
+          </xsl:when>
+          <xsl:otherwise>
+             <xsl:value-of select="mods:namePart" />
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="." />
