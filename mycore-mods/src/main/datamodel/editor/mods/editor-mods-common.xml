@@ -270,7 +270,7 @@
   </text>
 
   <helpPopup id="mods.assignedInstitute.help" width="400px" height="250px">
-    <label xml:lang="de">Institut/Fachgruppe, zu welcher die Autoren bzw. die Beitragenden
+    <label xml:lang="de">Institut/Fachgruppe/Organisationseinheit, zu welcher die Autoren bzw. die Beitragenden
       zum Zeitpunkt der Veröffentlichung des Dokumentes, des Erscheinungsjahres des Konferenzbandes
       oder Buches gehört haben.</label>
     <label xml:lang="en">Select an institution from the list.</label>
@@ -279,7 +279,7 @@
 
   <!-- Publisher [text] -->
   <text id="mods.publisher.label">
-    <label xml:lang="de">Herausgeber (*)</label>
+    <label xml:lang="de">Verleger (*)</label>
     <label xml:lang="en">Publisher (*)</label>
   </text>
 
@@ -368,12 +368,12 @@
 
   <!-- Institution der Einreichung -->
   <text id="mods.submissionAtInstitute.label">
-    <label xml:lang="de">Institut der Einreichung (*)</label>
+    <label xml:lang="de">Hochschule/Institut der Einreichung (*)</label>
     <label xml:lang="en">Submission at Intitute (*)</label>
   </text>
 
   <helpPopup id="mods.submissionAtInstitute.help" width="400px" height="250px">
-    <label xml:lang="de">Das Institut oder die Fachgruppe, an der das Dokument eingereicht wurde</label>
+    <label xml:lang="de">Die Hochschule, an der das Dokument eingereicht wurde</label>
     <label xml:lang="en">Select an institution from the list.</label>
   </helpPopup>
   <!-- Institution END -->
@@ -401,7 +401,7 @@
       Bei Konferenzbänden, Büchern geben Sie bitte das Erscheinungsjahr an, 
       bei Filmen das Datum der Aufnahme, bei Promotionen das Datum der ersten Online Veröffentlichung.
       Das Datum muss im ISO Format mit Bindestrich (YYYY-MM-DD) angegeben werden.<br /> 
-      Beispiel: 2003-01-07 
+      Beispiel: 2003-01-27 
     </label>
     <label xml:lang="en">
       Date of Publication:
@@ -473,12 +473,12 @@
       Zeitraum in der die Konferenz stattfand (von, bis). Das Datum muss im
       ISO Format mit Bindestrich (YYYY-MM-DD) angegeben werden.
       <br />
-      Beispiel: 2003-01-07
+      Beispiel: 2003-01-27
     </label>
     <label xml:lang="en">
       Date of Conference (start, end). The date must be inserted in ISO format
       with dahes (YYYY-MM-DD).
-      Sample: 2003-01-07
+      Sample: 2003-01-27
       <br />
 
     </label>
@@ -545,7 +545,7 @@
 
   <helpPopup id="mods.subject.help" width="400px" height="250px">
     <label xml:lang="de">
-      Stichworte mit Semikolon getrennt
+      Stichworte mit Semikolon (;) getrennt
     </label>
     <label xml:lang="en">
       Subject
@@ -699,7 +699,8 @@
   <helpPopup id="mods.identifier.help" width="400px" height="250px">
     <label xml:lang="de">
       Ein Identifier ist ein eindeutiger und dauerhafter Identifikator für eine digitale Ressource oder ein physisches Werk.
-      Es können auch mehrere unterschiedliche Identifikatoren (DOI, URN, Permalink ...) angegeben werden. 
+      Es können auch mehrere unterschiedliche Identifikatoren (DOI, URN, Permalink ...) angegeben werden. <br />
+      Falls eine DOI des Verlages vorhanden ist, ist diese in jedem Fall anzugeben.
     </label>
     <label xml:lang="en">
       Identifier (ggf. mehrere, URN, DOI,...)
@@ -917,7 +918,7 @@
   </panel>
 
   <helpPopup id="mods.corporation.help" width="400px" height="250px">
-    <label xml:lang="de">Geben Sie die Körperschaft ein.</label>
+    <label xml:lang="de">Geben Sie die Körperschaft ein. Die Ansetzung erfolgt gemäß RAK-WB.</label>
     <label xml:lang="en">Insert corporate name.</label>
   </helpPopup>
   <!-- Körperschaft END -->
@@ -1022,7 +1023,7 @@
   </panel>
 
   <helpPopup id="mods.book.part.extent.help" width="400px" height="250px">
-    <label xml:lang="de">Umfang des Werkes in Seiten</label>
+    <label xml:lang="de">Seitanangaben des Werkes (letzte bedruckte Seitenzahl angeben)</label>
     <label xml:lang="en">Extent</label>
   </helpPopup>
   <!-- Extent|Part END -->
@@ -1042,7 +1043,8 @@
   </panel>
 
   <helpPopup id="mods.book.volume.count.help">
-    <label xml:lang="de">Bandzählung</label>
+    <label xml:lang="de">Bei Schrift- und Buchreihen kann es Angaben zum herausgegebenen Jahrgang 
+    (Vol.) geben sowie die Bandzählung. </label>
     <label xml:lang="en">Volume Count</label>
   </helpPopup>
   <!-- Bandzählung END -->
@@ -1198,7 +1200,8 @@
   </panel>
 
   <helpPopup id="mods.impact.help">
-    <label xml:lang="de">Journal Impact Factor (JIF)</label>
+    <label xml:lang="de">Der Journal Impact Factor (JIF) wird pro Zeitschrift pro Jahr vergeben. Der Wert des JIF wird mit Punkt und drei Stellen nach dem Punkt angegeben.
+Beispiel: 2.203 oder 20.686</label>
     <label xml:lang="en">Journal Impact Factor (JIF)</label>
   </helpPopup>
   <!-- Impact Factor END -->
