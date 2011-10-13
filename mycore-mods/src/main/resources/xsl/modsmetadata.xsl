@@ -221,7 +221,18 @@
   <xsl:template match="mods:name" mode="present">
     <tr>
       <td valign="top" class="metaname">
-        <xsl:value-of select="concat(i18n:translate(concat('metaData.mods.dictionary.',mods:role/mods:roleTerm[@authority='marcrelator'])),':')" />
+        <xsl:choose>
+          <xsl:when test="mods:role/mods:roleTerm[@authority='marcrelator' and @type='code']">
+            <xsl:apply-templates select="mods:role/mods:roleTerm[@authority='marcrelator' and @type='code']" mode="printModsClassInfo"/>
+            <xsl:value-of select="':'"/>
+          </xsl:when>
+          <xsl:when test="mods:role/mods:roleTerm[@authority='marcrelator']">
+            <xsl:value-of select="concat(i18n:translate(concat('metaData.mods.dictionary.',mods:role/mods:roleTerm[@authority='marcrelator'])),':')" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.name'),':')" />
+          </xsl:otherwise>
+        </xsl:choose>
       </td>
       <td class="metavalue">
         <xsl:apply-templates select="." mode="printName" />

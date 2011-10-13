@@ -193,8 +193,8 @@
       <repeater min="1" max="20" pos="right">
         <panel>
           <hidden var="mods:role/mods:roleTerm/@authority" default="marcrelator" />
-          <hidden var="mods:role/mods:roleTerm/@type" default="text" />
-          <hidden var="mods:role/mods:roleTerm" default="author" />
+          <hidden var="mods:role/mods:roleTerm/@type" default="code" />
+          <hidden var="mods:role/mods:roleTerm" default="aut" />
           <cell ref="mods.name"/>
         </panel>
       </repeater>
@@ -226,22 +226,16 @@
           <cell col="1" row="1" anchor="NORTHEAST" var="mods:role/mods:roleTerm">
             <panel>
               <hidden var="@authority" default="marcrelator" />
-              <hidden var="@type" default="text" />
+              <hidden var="@type" default="code" />
               <cell>
-                <list type="dropdown" default="author">
-                  <item value="author">
-                    <label xml:lang="de">Autor</label>
-                    <label xml:lang="en">Author</label>
-                  </item>
-                  <item value="reviewer">
-                    <label xml:lang="de">Gutachter</label>
-                    <label xml:lang="en">Reviewer</label>
-                  </item>
-                  <!-- item value="publisher">
-                    <label xml:lang="de">Herausgeber</label>
-                    <label xml:lang="en">Publisher</label>
-                  </item -->
-                </list>
+                <list type="dropdown" default="aut">
+                  <include ref="pleaseSelect" />
+                  <include uri="classification:editor:-1:children:marcrelator" cacheable="false" />
+                  <condition required="true">
+                    <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
+                    <label xml:lang="en">Please select one entry!</label>
+                  </condition>
+                  </list>
               </cell>
             </panel>
           </cell>
