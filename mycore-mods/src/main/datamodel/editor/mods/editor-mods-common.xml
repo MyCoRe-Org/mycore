@@ -73,19 +73,21 @@
 
   <panel id="mods.languageTerm">
     <cell anchor="NORTHWEST" var="mods:languageTerm">
-      <panel>
-        <hidden var="@type" default="code" />
-        <cell col="1" var="@mcr:categId">
-          <list id="mods.languageTerm.list" type="dropdown" default="ger">
-            <include ref="pleaseSelect" />
-            <include uri="classification:editorComplete:-1:children:rfc4646" cacheable="false" />
-            <condition id="mods.languageTerm.cond" required="true">
-              <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
-              <label xml:lang="en">Please select one entry!</label>
-            </condition>
-          </list>
-        </cell>
-      </panel>
+      <repeater min="1" max="5" pos="right">
+        <panel>
+          <hidden var="@type" default="code" />
+          <cell col="1" var="@mcr:categId">
+            <list id="mods.languageTerm.list" type="dropdown" default="ger">
+              <include ref="pleaseSelect" />
+              <include uri="classification:editorComplete:-1:children:rfc4646" cacheable="false" />
+              <condition id="mods.languageTerm.cond" required="true">
+                <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
+                <label xml:lang="en">Please select one entry!</label>
+              </condition>
+            </list>
+          </cell>
+        </panel>
+      </repeater>
     </cell>
   </panel>
 
