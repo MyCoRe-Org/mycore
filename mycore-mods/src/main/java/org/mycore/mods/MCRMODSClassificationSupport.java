@@ -1,6 +1,6 @@
 /*
  * $Id$
- * $Revision: 5697 $ $Date: 07.09.2011 $
+ * $Revision: 5697 $ $Date: 07.04.2011 $
  *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
@@ -25,16 +25,14 @@ package org.mycore.mods;
 
 import java.text.MessageFormat;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConstants;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
@@ -49,28 +47,16 @@ import org.w3c.dom.NodeList;
 
 /**
  * @author Thomas Scheffler (yagee)
- *
+ * @author Frank L\u00FCtzenkirchen
  */
 public final class MCRMODSClassificationSupport {
-    private static final String KEY_FOR_TEXT_NODE = "text";
-
-    private static final String CLASS_URI_PART = "classifications/";
-
-    /**
-     * xml:lang value of category or classification <label> for MODS @authorityURI or @valueURI.
-     */
-    public static final String LABEL_LANG_URI = "x-uri";
-
-    /**
-     * xml:lang value of category or classification <label> for MODS @authority.
-     */
-    public static final String LABEL_LANG_AUTHORITY = "x-auth";
 
     private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
     private static final Logger LOGGER = Logger.getLogger(MCRMODSClassificationSupport.class);
 
     private static final DocumentBuilder DOC_BUILDER;
+
     static {
         DocumentBuilder documentBuilder = null;
         try {
@@ -82,213 +68,62 @@ public final class MCRMODSClassificationSupport {
     }
 
     private MCRMODSClassificationSupport() {
-    };
-
-    /**
-     * returns a collection of categories which are label with a specific URI.
-     * @param uri any valid URI
-     * @return a collection of {@link MCRCategory}.
-     */
-    public static Collection<MCRCategory> getCategoryByURI(final String uri) {
-        return DAO.getCategoriesByLabel(LABEL_LANG_URI, uri);
     }
 
     /**
-     * returns a classification associated with the given authority.
-     * @param authority a valid mods authority like "lcc"
-     * @return a MCRCategory that should be a root category or null if no such category exists.
-     */
-    public static MCRCategory getCategoryByAuthority(final String authority) {
-        final List<MCRCategory> categoriesByLabel = DAO.getCategoriesByLabel(LABEL_LANG_AUTHORITY, authority);
-        if (categoriesByLabel.isEmpty()) {
-            return null;
-        }
-        return categoriesByLabel.get(0);
-    }
-
-    /**
-     * returns a category which matches to the given authorityURI and valueURI.
-     * @param authorityURI any valid URI
-     * @param valueURI any valid URI
-     * @return a MCRCategoryID that should not be a root category or null if no such category exists.
-     */
-    public static MCRCategoryID getCategoryIDByValueURI(final String authorityURI, final String valueURI) {
-        if (authorityURI.length() == 0 || valueURI.length() == 0) {
-            return null;
-        }
-        final Collection<MCRCategory> categoryByURI = getCategoryByURI(valueURI);
-        for (MCRCategory category : categoryByURI) {
-            if (authorityURI.equals(category.getRoot().getLabel(LABEL_LANG_URI))) {
-                return category.getId();
-            }
-        }
-        //maybe valueUri is in form {authorityURI}#{categId}
-        if (valueURI.startsWith(authorityURI) && authorityURI.length() < valueURI.length()) {
-            String categId;
-            try {
-                categId = valueURI.substring(authorityURI.length() + 1);
-            } catch (RuntimeException e) {
-                LOGGER.warn("authorityURI:" + authorityURI + ", valueURI:" + valueURI);
-                throw e;
-            }
-            int internalStylePos = authorityURI.indexOf(CLASS_URI_PART);
-            if (internalStylePos > 0) {
-                String rootId = authorityURI.substring(internalStylePos + CLASS_URI_PART.length());
-                LOGGER.info("rootId: " + rootId);
-                MCRCategoryID catId = new MCRCategoryID(rootId, categId);
-                if (DAO.exist(catId)) {
-                    return catId;
-                }
-            }
-            Collection<MCRCategory> classes = getCategoryByURI(authorityURI);
-            for (MCRCategory cat : classes) {
-                MCRCategoryID catId = new MCRCategoryID(cat.getId().getRootID(), categId);
-                if (DAO.exist(catId)) {
-                    return catId;
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * returns category ID which matches authority and code value of a MODS element.
-     * @param authority any valid authority attribute value
-     * @param code text node of the mods element where @type='code'
-     * @return {@link MCRCategoryID} instance or null if no such category exists
-     */
-    public static MCRCategoryID getCategoryIDByCode(final String authority, final String code) {
-        final MCRCategory categoryByAuthority = getCategoryByAuthority(authority);
-        if (categoryByAuthority == null) {
-            return null;
-        }
-        return new MCRCategoryID(categoryByAuthority.getId().getRootID(), code);
-    }
-
-    /**
-     * returns a category ID which matches to the given MODS element node.
-     * @param element mods element
-     * @return {@link MCRCategoryID} instance or null if no such category exists
-     */
-    public static MCRCategoryID getCategoryID(final Element element) {
-        //test by authority URI
-        final String authorityURI = element.getAttribute("authorityURI");
-        if (authorityURI != null && authorityURI.length() > 0) {
-            final String valueURI = element.getAttribute("valueURI");
-            if (valueURI == null || valueURI.length() == 0) {
-                LOGGER.warn("Did find attribute authorityURI='" + authorityURI + "', but no valueURI");
-                return null;
-            }
-            return getCategoryIDByValueURI(authorityURI, valueURI);
-        }
-        //test by authority
-        final String authority = element.getAttribute("authority");
-        if (authority != null && authority.length() > 0) {
-            final String type = element.getAttribute("type");
-            if (KEY_FOR_TEXT_NODE.equals(type)) {
-                LOGGER.warn("Type 'text' is currently unsupported when resolving a classification category");
-                return null;
-            }
-            final String code = getText(element).trim();
-            return getCategoryIDByCode(authority, code);
-        }
-        return null;
-    }
-
-    /**
-     * returns a category ID which matches to the given MODS element node.
-     * @param element mods element
-     * @return {@link MCRCategoryID} instance or null if no such category exists
-     */
-    public static MCRCategoryID getCategoryID(final org.jdom.Element element) {
-        //test by authority URI
-        final String authorityURI = element.getAttributeValue("authorityURI");
-        if (authorityURI != null) {
-            final String valueURI = element.getAttributeValue("valueURI");
-            if (valueURI == null) {
-                LOGGER.warn("Did find attribute authorityURI='" + authorityURI + "', but no valueURI");
-                return null;
-            }
-            return getCategoryIDByValueURI(authorityURI, valueURI);
-        }
-        //test by authority
-        final String authority = element.getAttributeValue("authority");
-        if (authority != null) {
-            final String type = element.getAttributeValue("type");
-            if (KEY_FOR_TEXT_NODE.equals(type)) {
-                LOGGER.warn("Type 'text' is currently unsupported when resolving a classification category");
-                return null;
-            }
-            final String code = element.getTextTrim();
-            return getCategoryIDByCode(authority, code);
-        }
-        return null;
-    }
-
-    /**
-     * For a category ID, looks up the autority, authorityURI and/or valueURI for
-     * that category and sets the attributes in the given element.
+     * Inspects the authority information in the given MODS XML element and
+     * returns a category ID which matches.
      * 
-     * @param categoryID the category that is set 
-     * @param inElement the element in wich authority/authorityURI/valueURI should be set.
+     * @param modsElement MODS element
+     * @return {@link MCRCategoryID} instance or null if no such category exists
      */
-    public static void setAuthorityAndValue(MCRCategoryID categoryID, org.jdom.Element inElement) {
-        Map<String, String> properties = getAuthorityInfo(categoryID);
-        for (Entry<String, String> entry : properties.entrySet()) {
-            if (KEY_FOR_TEXT_NODE.equals(entry.getKey()))
-                inElement.setText(entry.getValue());
-            else
-                inElement.setAttribute(entry.getKey(), entry.getValue());
-        }
+    public static MCRCategoryID getCategoryID(Element modsElement) {
+        MCRAuthorityInfo mCRAuthorityInfo = MCRAuthorityInfo.getAuthorityInfo(modsElement);
+        return mCRAuthorityInfo == null ? null : mCRAuthorityInfo.getCategoryID();
     }
 
+    /**
+     * Inspects the authority information in the given MODS XML element and
+     * returns a category ID which matches.
+     * 
+     * @param modsElement MODS element
+     * @return {@link MCRCategoryID} instance or null if no such category exists
+     */
+    public static MCRCategoryID getCategoryID(org.jdom.Element modsElement) {
+        MCRAuthorityInfo mCRAuthorityInfo = MCRAuthorityInfo.getAuthorityInfo(modsElement);
+        return mCRAuthorityInfo == null ? null : mCRAuthorityInfo.getCategoryID();
+    }
+
+    /**
+     * For a category ID, looks up the authority information for
+     * that category and sets the attributes in the given MODS element so that
+     * it represents that category.
+     * 
+     * @param categoryID the ID of the category that is set 
+     * @param inElement the element in which authority/authorityURI/valueURI should be set.
+     */
+    public static void setAuthorityInfo(MCRCategoryID categoryID, org.jdom.Element inElement) {
+        MCRAuthorityInfo.getAuthorityInfo(categoryID).setInElement(inElement);
+    }
+
+    /**
+     * For a category ID, looks up the authority information for
+     * that category and returns the attributes in the given MODS element so that
+     * it represents that category. This is used as a Xalan extension.
+     */
     public static NodeList getClassNodes(final NodeList sources) {
         try {
             final Element source = (Element) sources.item(0);
             final String categId = source.getAttributeNS(MCRConstants.MCR_NAMESPACE.getURI(), "categId");
             final MCRCategoryID categoryID = MCRCategoryID.fromString(categId);
-            final Map<String, String> properties = getAuthorityInfo(categoryID);
-            final Document document = DOC_BUILDER.newDocument();
-            final Element returns = document.createElement("returns");
-            for (Entry<String, String> entry : properties.entrySet()) {
-                if (KEY_FOR_TEXT_NODE.equals(entry.getKey()))
-                    returns.setTextContent(entry.getValue());
-                else
-                    returns.setAttribute(entry.getKey(), entry.getValue());
-            }
+            final MCRAuthorityInfo mCRAuthorityInfo = MCRAuthorityInfo.getAuthorityInfo(categoryID);
+            final Element returns = DOC_BUILDER.newDocument().createElement("returns");
+            mCRAuthorityInfo.setInElement(returns);
             return returns.getChildNodes();
         } catch (Throwable e) {
             LOGGER.warn("Error in Xalan Extension", e);
             return null;
         }
-    }
-
-    private static Map<String, String> getAuthorityInfo(MCRCategoryID categoryID) {
-        Map<String, String> properties = new HashMap<String, String>();
-        String rootID = categoryID.getRootID();
-        MCRCategoryID classificationID = MCRCategoryID.rootID(rootID);
-        MCRCategory classification = DAO.getRootCategory(classificationID, 0);
-        MCRLabel authorityLabel = classification.getLabel(LABEL_LANG_AUTHORITY);
-        String authority = authorityLabel == null ? null : authorityLabel.getText();
-        if (authority != null) {
-            properties.put("authority", authority);
-            properties.put(KEY_FOR_TEXT_NODE, categoryID.getID());
-        } else {
-            MCRLabel uriLabel = classification.getLabel(LABEL_LANG_URI);
-            String authorityURI = uriLabel == null ? null : uriLabel.getText();
-            if (authorityURI == null) {
-                authorityURI = MCRServlet.getBaseURL() + CLASS_URI_PART + rootID;
-            }
-            properties.put("authorityURI", authorityURI);
-            MCRCategory category = DAO.getCategory(categoryID, 0);
-            MCRLabel categoryUriLabel = category.getLabel(LABEL_LANG_URI);
-            String valueURI = categoryUriLabel == null ? null : categoryUriLabel.getText();
-            if (valueURI == null) {
-                valueURI = authorityURI + "#" + categoryID.getID();
-            }
-            properties.put("valueURI", valueURI);
-        }
-        return properties;
     }
 
     public static NodeList getMCRClassNodes(final NodeList sources) {
@@ -337,5 +172,386 @@ public final class MCRMODSClassificationSupport {
             }
         }
         return sb.toString();
+    }
+
+    /**
+     * MCRAuthorityInfo holds a combination of either authority ID and value code, or
+     * authorityURI and valueURI. In MODS, this combination typically represents 
+     * a value from a normed vocabulary like a classification. The AuthorityInfo
+     * can be mapped to a MCRCategory in MyCoRe.  
+     * 
+     * @see http://www.loc.gov/standards/mods/userguide/classification.html
+     * 
+     * @author Frank L\u00FCtzenkirchen
+     */
+    private static abstract class MCRAuthorityInfo {
+
+        /**
+         * Inspects the attributes in the given MODS XML element and returns the
+         * AuthorityInfo given there.
+         */
+        public static MCRAuthorityInfo getAuthorityInfo(org.jdom.Element modsElement) {
+            MCRAuthorityInfo mCRAuthorityInfo = MCRAuthorityWithURI.getAuthorityInfo(modsElement);
+            return mCRAuthorityInfo != null ? mCRAuthorityInfo : MCRAuthorityAndCode.getAuthorityInfo(modsElement);
+        }
+
+        /**
+         * Inspects the attributes in the given MODS XML element and returns the
+         * AuthorityInfo given there.
+         */
+        public static MCRAuthorityInfo getAuthorityInfo(Element modsElement) {
+            MCRAuthorityInfo mCRAuthorityInfo = MCRAuthorityWithURI.getAuthorityInfo(modsElement);
+            return mCRAuthorityInfo != null ? mCRAuthorityInfo : MCRAuthorityAndCode.getAuthorityInfo(modsElement);
+        }
+
+        /** A cache that maps category ID to authority information */
+        public final static MCRCache authorityInfoByCategoryID = new MCRCache(1000, "Authority info by category ID");
+
+        /**
+         * Returns the authority information that represents the category with the given ID.
+         */
+        public static MCRAuthorityInfo getAuthorityInfo(MCRCategoryID categoryID) {
+            String key = categoryID.toString();
+            LOGGER.debug("get authority info for " + key);
+
+            MCRAuthorityInfo mCRAuthorityInfo = (MCRAuthorityInfo) (authorityInfoByCategoryID.getIfUpToDate(key, DAO.getLastModified()));
+
+            if (mCRAuthorityInfo == null) {
+                mCRAuthorityInfo = buildAuthorityInfo(categoryID);
+                authorityInfoByCategoryID.put(key, mCRAuthorityInfo);
+            }
+            return mCRAuthorityInfo;
+        }
+
+        /**
+         * Builds the authority information that represents the category with the given ID,
+         * by looking up x-auth and x-uri labels set in the classification and category.
+         */
+        private static MCRAuthorityInfo buildAuthorityInfo(MCRCategoryID categoryID) {
+            LOGGER.debug("build authority info for " + categoryID.toString());
+
+            MCRCategory category = DAO.getCategory(categoryID, 0);
+            MCRCategory classification = category.getRoot();
+
+            String authority = MCRAuthorityAndCode.getAuthority(classification);
+            if (authority != null) {
+                return new MCRAuthorityAndCode(authority, categoryID.getID());
+            } else {
+                String authorityURI = MCRAuthorityWithURI.getAuthorityURI(classification);
+                String valueURI = MCRAuthorityWithURI.getValueURI(category, authorityURI);
+                return new MCRAuthorityWithURI(authorityURI, valueURI);
+            }
+        }
+
+        /**
+         * Returns the label value of the given type ("language"), or the given default if
+         * that label does not exist in the category. 
+         */
+        protected static String getLabel(MCRCategory category, String labelType, String defaultLabel) {
+            MCRLabel label = category.getLabel(labelType);
+            return label == null ? defaultLabel : label.getText();
+        }
+
+        /**
+         * A cache that maps authority information to the category ID that is represented by that info.
+         */
+        private final static MCRCache categoryIDbyAuthorityInfo = new MCRCache(1000, "Category ID by authority info");
+
+        /**
+         * Used in the cache to indicate the case when no category ID maps to the given authority info 
+         */
+        private final static String NULL = "null";
+
+        /**
+         * Looks up the category ID for this authority information in the classification database.
+         */
+        protected abstract MCRCategoryID lookupCategoryID();
+
+        /**
+         * Returns the category ID that is represented by this authority information.
+         * 
+         * @return the category ID that maps this authority information, or null if no matching category exists.
+         */
+        public MCRCategoryID getCategoryID() {
+            String key = toString();
+            LOGGER.debug("get categoryID for " + key);
+
+            Object categoryID = categoryIDbyAuthorityInfo.getIfUpToDate(key, DAO.getLastModified());
+            if (categoryID == null) {
+                LOGGER.debug("lookup categoryID for " + key);
+                categoryID = lookupCategoryID();
+                if (categoryID == null)
+                    categoryID = NULL; // Indicate that no matching category found, null can not be cached directly
+                categoryIDbyAuthorityInfo.put(key, categoryID);
+            }
+            return categoryID instanceof MCRCategoryID ? (MCRCategoryID) categoryID : null;
+        }
+
+        /**
+         * Sets this authority information in the given MODS XML element by setting
+         * authority/authorityURI/valueURI attributes and/or value code as text. 
+         */
+        public abstract void setInElement(org.jdom.Element modsElement);
+
+        /**
+         * Sets this authority information in the given MODS XML element by setting
+         * authority/authorityURI/valueURI attributes and/or value code as text. 
+         */
+        public abstract void setInElement(Element modsElement);
+    }
+
+    /**
+     * Authority information that is represented by authority ID and code value.
+     * Such authority info comes from a standardized vocabulary registered at the
+     * Library of Congress.
+     * 
+     * @author Frank L\u00FCtzenkirchen
+     */
+    private static class MCRAuthorityAndCode extends MCRAuthorityInfo {
+
+        /**
+         * Inspects the attributes in the given MODS XML element and returns the
+         * AuthorityInfo given there.
+         */
+        public static MCRAuthorityAndCode getAuthorityInfo(org.jdom.Element modsElement) {
+            String authority = modsElement.getAttributeValue("authority");
+            String type = modsElement.getAttributeValue("type");
+            String code = modsElement.getTextTrim();
+            return getAuthorityInfo(authority, type, code);
+        }
+
+        /**
+         * Inspects the attributes in the given MODS XML element and returns the
+         * AuthorityInfo given there.
+         */
+        public static MCRAuthorityAndCode getAuthorityInfo(Element modsElement) {
+            String authority = modsElement.getAttribute("authority");
+            String type = modsElement.getAttribute("type");
+            String code = getText(modsElement).trim();
+            return getAuthorityInfo(authority, type, code);
+        }
+
+        /**
+         * Builds the authority info from the given values, does some checks on the values.
+         * 
+         * @return the authority info, or null if the values are illegal or unsupported.
+         */
+        private static MCRAuthorityAndCode getAuthorityInfo(String authority, String type, String code) {
+            if (authority == null)
+                return null;
+
+            if ("text".equals(type)) {
+                LOGGER.warn("Type 'text' is currently unsupported when resolving a classification category");
+                return null;
+            }
+            return new MCRAuthorityAndCode(authority, code);
+        }
+
+        /**
+         * xml:lang value of category or classification <label> for MODS @authority.
+         */
+        public static final String LABEL_LANG_AUTHORITY = "x-auth";
+
+        /**
+         * Returns the authority code for the given classification
+         */
+        protected static String getAuthority(MCRCategory classification) {
+            return getLabel(classification, LABEL_LANG_AUTHORITY, null);
+        }
+
+        /** The authority code */
+        private String authority;
+
+        /** The value code */
+        private String code;
+
+        public MCRAuthorityAndCode(String authority, String code) {
+            this.authority = authority;
+            this.code = code;
+        }
+
+        @Override
+        public String toString() {
+            return authority + "#" + code;
+        }
+
+        @Override
+        protected MCRCategoryID lookupCategoryID() {
+            MCRCategory category = getCategoryByAuthority(authority);
+            return category == null ? null : new MCRCategoryID(category.getId().getRootID(), code);
+        }
+
+        /**
+         * Returns the classification associated with the given authority.
+         * 
+         * @param authority a valid MODS authority like "lcc"
+         * @return a MCRCategory that should be a root category, or null if no such category exists.
+         */
+        private MCRCategory getCategoryByAuthority(final String authority) {
+            List<MCRCategory> categoriesByLabel = DAO.getCategoriesByLabel(LABEL_LANG_AUTHORITY, authority);
+            return categoriesByLabel.isEmpty() ? null : categoriesByLabel.get(0);
+        }
+
+        @Override
+        public void setInElement(org.jdom.Element element) {
+            element.setAttribute("authority", authority);
+            element.setText(code);
+        }
+
+        @Override
+        public void setInElement(Element element) {
+            element.setAttribute("authority", authority);
+            element.setTextContent(code);
+        }
+    }
+
+    /**
+     * Authority information that is represented by authorityURI and valueURI.
+     * Such authority info comes from a vocabulary that is not registered at the
+     * Library of Congress, but maintained by an external authority like 
+     * the MyCoRe application.
+     * 
+     * @author Frank L\u00FCtzenkirchen
+     */
+    private static class MCRAuthorityWithURI extends MCRAuthorityInfo {
+
+        /** The attribute holding the value URI in XML */
+        private static final String ATTRIBUTE_VALUE_URI = "valueURI";
+
+        /** The attribute holding the authority URI in XML */
+        private static final String ATTRIBUTE_AUTHORITY_URI = "authorityURI";
+
+        /**
+         * Inspects the attributes in the given MODS XML element and returns the
+         * AuthorityInfo given there.
+         */
+        public static MCRAuthorityWithURI getAuthorityInfo(org.jdom.Element element) {
+            String authorityURI = element.getAttributeValue(ATTRIBUTE_AUTHORITY_URI);
+            String valueURI = element.getAttributeValue(ATTRIBUTE_VALUE_URI);
+            return getAuthorityInfo(authorityURI, valueURI);
+        }
+
+        /**
+         * Inspects the attributes in the given MODS XML element and returns the
+         * AuthorityInfo given there.
+         */
+        public static MCRAuthorityWithURI getAuthorityInfo(Element element) {
+            String authorityURI = element.getAttribute(ATTRIBUTE_AUTHORITY_URI);
+            String valueURI = element.getAttribute(ATTRIBUTE_VALUE_URI);
+            return getAuthorityInfo(authorityURI, valueURI);
+        }
+
+        /**
+         * Builds the authority info from the given values, does some checks on the values.
+         * 
+         * @return the authority info, or null if the values are illegal or unsupported.
+         */
+        private static MCRAuthorityWithURI getAuthorityInfo(String authorityURI, String valueURI) {
+            if (authorityURI == null || authorityURI.isEmpty())
+                return null;
+
+            if (valueURI == null || valueURI.length() == 0) {
+                LOGGER.warn("Did find attribute authorityURI='" + authorityURI + "', but no valueURI");
+                return null;
+            }
+            return new MCRAuthorityWithURI(authorityURI, valueURI);
+        }
+
+        /**
+         * xml:lang value of category or classification <label> for MODS @authorityURI or @valueURI.
+         */
+        private static final String LABEL_LANG_URI = "x-uri";
+
+        private static final String CLASS_URI_PART = "classifications/";
+
+        /** 
+         * Returns the authority URI for the given classification.
+         */
+        protected static String getAuthorityURI(MCRCategory classification) {
+            String defaultURI = MCRServlet.getBaseURL() + CLASS_URI_PART + classification.getId().getRootID();
+            return getLabel(classification, LABEL_LANG_URI, defaultURI);
+        }
+
+        /**
+         * Returns the value URI for the given category and authority URI 
+         */
+        protected static String getValueURI(MCRCategory category, String authorityURI) {
+            String defaultURI = authorityURI + "#" + category.getId().getID();
+            return getLabel(category, LABEL_LANG_URI, defaultURI);
+        }
+
+        /**
+         * The authority URI 
+         */
+        private String authorityURI;
+
+        /**
+         * The value URI 
+         */
+        private String valueURI;
+
+        public MCRAuthorityWithURI(String authorityURI, String valueURI) {
+            this.authorityURI = authorityURI;
+            this.valueURI = valueURI;
+        }
+
+        @Override
+        public String toString() {
+            return authorityURI + "#" + valueURI;
+        }
+
+        @Override
+        protected MCRCategoryID lookupCategoryID() {
+            for (MCRCategory category : getCategoryByURI(valueURI)) {
+                if (authorityURI.equals(category.getRoot().getLabel(LABEL_LANG_URI))) {
+                    return category.getId();
+                }
+            }
+            //maybe valueUri is in form {authorityURI}#{categId}
+            if (valueURI.startsWith(authorityURI) && authorityURI.length() < valueURI.length()) {
+                String categId;
+                try {
+                    categId = valueURI.substring(authorityURI.length() + 1);
+                } catch (RuntimeException e) {
+                    LOGGER.warn("authorityURI:" + authorityURI + ", valueURI:" + valueURI);
+                    throw e;
+                }
+                int internalStylePos = authorityURI.indexOf(CLASS_URI_PART);
+                if (internalStylePos > 0) {
+                    String rootId = authorityURI.substring(internalStylePos + CLASS_URI_PART.length());
+                    MCRCategoryID catId = new MCRCategoryID(rootId, categId);
+                    if (DAO.exist(catId)) {
+                        return catId;
+                    }
+                }
+                Collection<MCRCategory> classes = getCategoryByURI(authorityURI);
+                for (MCRCategory cat : classes) {
+                    MCRCategoryID catId = new MCRCategoryID(cat.getId().getRootID(), categId);
+                    if (DAO.exist(catId)) {
+                        return catId;
+                    }
+                }
+            }
+            return null;
+        }
+
+        /**
+         * Returns the categories which have the given URI as label.
+         */
+        private static Collection<MCRCategory> getCategoryByURI(final String uri) {
+            return DAO.getCategoriesByLabel(LABEL_LANG_URI, uri);
+        }
+
+        @Override
+        public void setInElement(org.jdom.Element element) {
+            element.setAttribute(ATTRIBUTE_AUTHORITY_URI, authorityURI);
+            element.setAttribute(ATTRIBUTE_VALUE_URI, valueURI);
+        }
+
+        @Override
+        public void setInElement(Element element) {
+            element.setAttribute(ATTRIBUTE_AUTHORITY_URI, authorityURI);
+            element.setAttribute(ATTRIBUTE_VALUE_URI, valueURI);
+        }
     }
 }
