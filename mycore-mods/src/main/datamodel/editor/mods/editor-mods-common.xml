@@ -1,5 +1,9 @@
 <imports xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <include uri="webapp:editor/editor-mods-external.xml" />
+  
+  <list id="language" type="dropdown" default="de">
+    <include uri="classification:editor:-1:children:rfc4646" cacheable="false" />
+  </list>
 
   <!-- TITLE -->
   <text id="mods.title.label">
@@ -44,22 +48,7 @@
       <repeater min="1" max="5" pos="right">
         <panel>
           <cell anchor="NORTHWEST" ref="TFarea1028" />
-          <cell row="1" col="2" anchor="NORTHWEST" var="@lang">
-            <list type="dropdown" default="de">
-              <item value="de">
-                <label xml:lang="de">deutsch</label>
-                <label xml:lang="en">german</label>
-              </item>
-              <item value="en">
-                <label xml:lang="de">englisch</label>
-                <label xml:lang="en">english</label>
-              </item>
-              <item value="other">
-                <label xml:lang="de">sontige</label>
-                <label xml:lang="en">other</label>
-              </item>
-            </list>
-          </cell>
+          <cell row="1" col="2" anchor="NORTHWEST" var="@lang" ref="language" />
         </panel>
       </repeater>
     </cell>
@@ -85,62 +74,11 @@
   <panel id="mods.languageTerm">
     <cell anchor="NORTHWEST" var="mods:languageTerm">
       <panel>
-        <hidden var="@authority" default="iso639-3" />
         <hidden var="@type" default="code" />
-        <cell col="1">
+        <cell col="1" var="@mcr:categId">
           <list id="mods.languageTerm.list" type="dropdown" default="ger">
-            <item value="ger">
-              <label xml:lang="de">deutsch</label>
-              <label xml:lang="en">german</label>
-            </item>
-            <item value="eng">
-              <label xml:lang="de">englisch</label>
-              <label xml:lang="en">english</label>
-            </item>
-            <item value="fre">
-              <label xml:lang="de">französisch</label>
-              <label xml:lang="en">french</label>
-            </item>
-            <item value="spa">
-              <label xml:lang="de">spanisch</label>
-              <label xml:lang="en">spanish</label>
-            </item>
-            <item value="hun">
-              <label xml:lang="de">ungarisch</label>
-              <label xml:lang="en">hungarian</label>
-            </item>
-            <item value="pol">
-              <label xml:lang="de">polnisch</label>
-              <label xml:lang="en">polish</label>
-            </item>
-            <item value="cze">
-              <label xml:lang="de">tschechisch</label>
-              <label xml:lang="en">czech</label>
-            </item>
-            <item value="ita">
-              <label xml:lang="de">italienisch</label>
-              <label xml:lang="en">italian</label>
-            </item>
-            <item value="dut">
-              <label xml:lang="de">holländisch</label>
-              <label xml:lang="en">dutch</label>
-            </item>
-            <item value="rum">
-              <label xml:lang="de">rumänisch</label>
-              <label xml:lang="en">romanian</label>
-            </item>
-            <item value="rus">
-              <label xml:lang="de">russisch</label>
-              <label xml:lang="en">russian</label>
-            </item>
-            <item value="por">
-              <label xml:lang="de">portugiesisch</label>
-              <label xml:lang="en">portuguese</label>
-            </item>
-            <item value="mis">
-              <label xml:lang="de">sonstige</label>
-              <label xml:lang="en">other</label>
-            </item>
+            <include ref="pleaseSelect" />
+            <include uri="classification:editorComplete:-1:children:rfc4646" cacheable="false" />
             <condition id="mods.languageTerm.cond" required="true">
               <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
               <label xml:lang="en">Please select one entry!</label>
@@ -502,22 +440,7 @@
       <repeater min="1" max="5" pos="right">
         <panel>
           <cell anchor="NORTHWEST" ref="TFarea4096" />
-          <cell row="1" col="2" anchor="NORTHWEST" var="@lang">
-            <list type="dropdown" default="de">
-              <item value="de">
-                <label xml:lang="de">deutsch</label>
-                <label xml:lang="en">german</label>
-              </item>
-              <item value="en">
-                <label xml:lang="de">englisch</label>
-                <label xml:lang="en">english</label>
-              </item>
-              <item value="other">
-                <label xml:lang="de">sontige</label>
-                <label xml:lang="en">other</label>
-              </item>
-            </list>
-          </cell>
+          <cell row="1" col="2" anchor="NORTHWEST" var="@lang" ref="language" />
         </panel>
       </repeater>
     </cell>
