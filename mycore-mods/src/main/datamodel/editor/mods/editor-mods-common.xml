@@ -988,7 +988,7 @@
   </text>
 
   <panel id="mods.book.series">
-    <cell anchor="NORTHWEST" var="mods:part/mods:detail/mods:number">
+    <cell anchor="NORTHWEST" var="mods:relatedItem[@type='series']/mods:titleInfo/mods:title">
       <panel>
         <cell anchor="NORTHWEST" ref="TFzeile512" />
       </panel>
