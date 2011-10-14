@@ -201,7 +201,6 @@ public class MCREditorServlet extends MCRServlet {
         String sourceURI = mcrEditor.getSourceURI();
         logger.info("Editor reading XML input from " + sourceURI);
         Element input = MCRURIResolver.instance().resolve(sourceURI);
-        logger.info(new XMLOutputter(Format.getPrettyFormat()).outputString(input));
         MCREditorSubmission sub = new MCREditorSubmission(input, editor);
         MCREditorDefReader.fixConditionedVariables(editor);
         editor.addContent(sub.buildInputElements());
