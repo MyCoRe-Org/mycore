@@ -276,6 +276,30 @@
     </tr>
   </xsl:template>
 
+  <xsl:template match="mods:language" mode="present">
+    <xsl:param name="sep" select="''" />
+    <tr>
+      <td valign="top" class="metaname">
+        <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.language'), ':')" />
+      </td>
+      <td class="metavalue">
+        <xsl:for-each select="mods:languageTerm">
+          <xsl:if test="position()!=1">
+            <xsl:choose>
+              <xsl:when test="string-length($sep)&gt;0">
+                <xsl:value-of select="$sep" />
+              </xsl:when>
+              <xsl:otherwise>
+                <br />
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:if>
+          <xsl:apply-templates select="." mode="printModsClassInfo" />
+        </xsl:for-each>
+      </td>
+    </tr>
+  </xsl:template>
+
 
   <!--  -->
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.report">
@@ -328,6 +352,7 @@
         </td>
       </tr>
     </xsl:if>
+    <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
     <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
     <xsl:call-template name="printMetaDate.mods">
       <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateIssued" />
@@ -410,9 +435,7 @@
       <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:part/mods:detail/mods:number" />
     </xsl:call-template>
     <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:part/mods:extent" />
-    <xsl:call-template name="printMetaDate.mods">
-      <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:language/mods:languageTerm" />
-    </xsl:call-template>
+    <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
     <xsl:call-template name="printMetaDate.mods">
       <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:abstract" />
     </xsl:call-template>
@@ -438,9 +461,7 @@
       select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:part/mods:extent" />
     <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
     <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name" />
-    <xsl:call-template name="printMetaDate.mods">
-      <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:language/mods:languageTerm" />
-    </xsl:call-template>
+    <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
     <xsl:call-template name="printMetaDate.mods">
       <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:abstract" />
     </xsl:call-template>
@@ -485,9 +506,7 @@
       select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:part/mods:extent" />
     <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
     <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:abstract" />
-    <xsl:call-template name="printMetaDate.mods">
-      <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:language/mods:languageTerm" />
-    </xsl:call-template>
+    <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
     <xsl:call-template name="printMetaDate.mods">
       <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:note" />
     </xsl:call-template>
