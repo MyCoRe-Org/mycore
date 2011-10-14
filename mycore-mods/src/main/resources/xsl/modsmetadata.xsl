@@ -485,8 +485,12 @@
 
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.journal">
     <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
-    <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:extension" />
+    <xsl:call-template name="printMetaDate.mods">
+      <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
+      <xsl:with-param name="label" select="'ISSN'"/>
+    </xsl:call-template>
     <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name" />
+    <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:extension" />
     <xsl:call-template name="printMetaDate.mods">
       <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:note" />
     </xsl:call-template>

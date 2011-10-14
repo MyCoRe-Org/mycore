@@ -27,11 +27,18 @@
     <cell row="20" col="2" anchor="NORTHWEST" ref="mods.title.translated" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="20" col="3" anchor="NORTHWEST" ref="mods.title.translated.help" />
     <!-- pub_title_engl[text] END -->
+    <!-- Identifier -->
+    <cell row="25" col="1" anchor="NORTHEAST">
+      <label xml:lang="de">ISSN</label>
+    </cell>
+    <cell row="25" col="2" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier[@type='issn']" ref="TFzeile512" />
+    <cell row="25" col="3" anchor="NORTHWEST" ref="mods.identifier.help" />
+    <!-- Identifier END -->
 
     <!-- impact factor -->
-    <cell row="30" col="1" anchor="NORTHEAST" ref="mods.impact.label"/>
+    <cell row="30" col="1" anchor="NORTHEAST" ref="mods.impact.label" />
     <cell row="30" col="2" anchor="NORTHWEST" ref="mods.impact" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="30" col="3" anchor="NORTHWEST" ref="mods.impact.help"/>
+    <cell row="30" col="3" anchor="NORTHWEST" ref="mods.impact.help" />
     <!-- impact factor END -->
 
     <cell col="1" colspan="3" row="300" anchor="EAST" style="padding-top:20px;">

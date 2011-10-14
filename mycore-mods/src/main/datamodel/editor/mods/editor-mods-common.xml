@@ -593,10 +593,6 @@
                 <label xml:lang="de">ISBN13</label>
                 <label xml:lang="en">ISBN13</label>
               </item>
-              <item value="issn">
-                <label xml:lang="de">ISSN</label>
-                <label xml:lang="en">ISSN</label>
-              </item>
               <item value="intern_old">
                 <label xml:lang="de">intern</label>
                 <label xml:lang="en">intern</label>
