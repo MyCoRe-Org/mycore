@@ -16,10 +16,13 @@
     <hidden var="metadata/def.modsContainer/@notinherit" default="true" />
     <hidden var="metadata/def.modsContainer/@heritable" default="false" />
 
+    <!-- Konferenzband (Verweis auf MyCoRe-ID) -->
+    <cell row="1" colspan="3" anchor="NORTHWEST" ref="displayParent" />
+
     <!-- Title related Item -->
-    <cell row="1" col="1" anchor="NORTHEAST" ref="mods.related.title.label" />
-    <cell row="1" col="2" anchor="NORTHWEST" ref="mods.title" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:titleInfo" />
-    <cell row="1" col="3" anchor="NORTHWEST" ref="mods.title.help" />
+    <cell row="5" col="1" anchor="NORTHEAST" ref="mods.related.title.label" />
+    <cell row="5" col="2" anchor="NORTHWEST" ref="mods.title" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:titleInfo" />
+    <cell row="5" col="3" anchor="NORTHWEST" ref="mods.title.help" />
     <!-- Title END -->
 
     <!-- Seiten von bis -->

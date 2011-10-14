@@ -15,6 +15,9 @@
     <hidden var="metadata/def.modsContainer/@notinherit" default="true" />
     <hidden var="metadata/def.modsContainer/@heritable" default="false" />
     
+    <!-- Konferenzband (Verweis auf MyCoRe-ID) -->
+    <cell row="5" colspan="3" anchor="NORTHWEST" ref="displayParent" />
+
     <!-- pub_title_orig [text] -->
     <cell row="10" col="1" anchor="NORTHEAST" ref="mods.title.label" />
     <cell row="10" col="2" anchor="NORTHWEST" ref="mods.title" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
