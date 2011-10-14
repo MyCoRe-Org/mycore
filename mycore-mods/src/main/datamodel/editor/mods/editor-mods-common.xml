@@ -779,7 +779,7 @@
       <hidden var="@displayLabel" default="Kind of Report" />
       <panel>
         <cell var="@mcr:categId">
-          <list width="30" type="dropdown">
+          <list width="30" type="dropdown" id="mods.genre.kindOfReport.list">
             <include ref="pleaseSelect" />
             <include uri="classification:editorComplete:-1:children:mods_genres:report" cacheable="false" />
             <condition id="mods.genre.kindOfReport.cond" required="true">
@@ -811,7 +811,7 @@
       <hidden var="@displayLabel" default="Kind of AV Media" />
       <panel>
         <cell var="@mcr:categId">
-          <list width="30" type="dropdown">
+          <list width="30" type="dropdown" id="mods.genre.kindOfAVMedia.list">
             <include ref="pleaseSelect" />
             <include uri="classification:editorComplete:-1:children:mods_genres:av" cacheable="false" />
             <condition id="mods.genre.kindOfAVMedia.cond" required="true">
@@ -850,7 +850,7 @@
       <hidden var="@displayLabel" default="Kind of Thesis" />
       <panel>
         <cell var="@mcr:categId">
-          <list width="30" type="dropdown">
+          <list width="30" type="dropdown" id="mods.genre.kindOfThesis.list">
             <include ref="pleaseSelect" />
             <include uri="classification:editorComplete:-1:children:mods_genres:thesis" cacheable="false" />
             <condition id="mods.genre.kindOfThesis.cond" required="true">
