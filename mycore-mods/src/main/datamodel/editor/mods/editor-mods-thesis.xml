@@ -11,7 +11,7 @@
     <hidden var="metadata/@xml:lang" default="de" />
 
     <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:typeOfResource" descendants="true" />
-    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']" default="thesis" />
+    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@mcr:categId" default="mods_genres:thesis" />
     <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/@ID" />
     <hidden var="metadata/def.modsContainer/@class" default="MCRMetaXML" />
     <hidden var="metadata/def.modsContainer/@notinherit" default="true" />
@@ -53,6 +53,12 @@
     <cell row="60" col="2" anchor="NORTHWEST" ref="mods.abstract" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="60" col="3" anchor="NORTHWEST" ref="mods.abstract.help" />
     <!-- Abstract END -->
+
+    <!-- Extent|Part -->
+    <cell row="65" col="1" anchor="NORTHEAST" ref="mods.book.part.extent.label" />
+    <cell row="65" col="2" anchor="NORTHWEST" ref="mods.book.part.extent" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="65" col="3" anchor="NORTHWEST" ref="mods.book.part.extent.help" />
+    <!-- Extent|Part END -->
 
     <!-- pub_klassifik -->
     <cell row="70" col="1" anchor="NORTHEAST" ref="mods.ddc.label" />
