@@ -908,8 +908,6 @@
     <cell anchor="NORTHWEST" var="mods:name[@type='family']"> <!-- ToDo: familiy ist nur ein workaround ... weil 2x corporate nicht geht *arg* -->
       <!-- ToDo: richtige URI finden! -->
       <hidden var="@authority" default="gnd" />
-      <hidden var="@authorityURI" default="http://d-nb.info/gnd" />
-      <hidden var="@valueURI" default="http://d-nb.info/gnd/xxx" />
       <!-- ToDo: korrekte Zuordnung fehlt, siehe http://www.loc.gov/marc/relators/relaterm.html -->
       <!-- hidden var="mods:role/mods:roleTerm/@authority" default="marcrelator" / -->
       <hidden var="mods:role/mods:roleTerm/@type" default="text" />
