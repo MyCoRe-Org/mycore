@@ -68,7 +68,8 @@
   
   <xsl:template match="mods:name[@type='corporate']">
     <xsl:copy>
-      <xsl:apply-templates select="@*" />
+      <xsl:variable name="classNodes" select="mcrmods:getMCRClassNodes(.)" />
+      <xsl:apply-templates select='$classNodes/@*|@*' />
       <xsl:if test="@authorityURI='http://www.bmelv.de/classifications/institutes'"> <!--  ToDo: BMELV-spezifisch -> auslagern  -->
         <xsl:attribute name="editor.output">
           <xsl:variable name="classlink" select="mcrmods:getClassCategLink(.)" />
@@ -97,6 +98,7 @@
           </xsl:choose>
         </xsl:attribute>
       </xsl:if>
+      <xsl:apply-templates select="*"/>
     </xsl:copy>
   </xsl:template>
 
