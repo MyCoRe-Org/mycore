@@ -65,7 +65,7 @@ import org.mycore.parsers.bool.MCRSetCondition;
  * 
  * @author Frank Lützenkirchen
  * @author Harald Richter
- * @author A.Schaar
+ * @author A. Schaar
  * 
  */
 public class MCRSearchServlet extends MCRServlet {
@@ -88,10 +88,17 @@ public class MCRSearchServlet extends MCRServlet {
      * Search in default search field specified by MCR.SearchServlet.DefaultSearchField
      */
     private MCRQuery buildDefaultQuery(String search) {
-        MCRFieldDef field = MCRFieldDef.getDef(defaultSearchField);
-        String operator = MCRFieldType.getDefaultOperator(field.getDataType());
-        MCRCondition condition = new MCRQueryCondition(field, operator, search);
-        return new MCRQuery(MCRQueryParser.normalizeCondition(condition));
+        String[] fields = defaultSearchField.split(" *, *");
+        MCROrCondition queryCondition = new MCROrCondition();
+
+        for (String fDef : fields) {
+            MCRFieldDef field = MCRFieldDef.getDef(fDef);
+            String operator = MCRFieldType.getDefaultOperator(field.getDataType());
+            MCRCondition condition = new MCRQueryCondition(field, operator, search);
+            queryCondition.addChild(condition);
+        }
+
+        return new MCRQuery(MCRQueryParser.normalizeCondition(queryCondition));
     }
 
     /**
@@ -124,23 +131,27 @@ public class MCRSearchServlet extends MCRServlet {
             if (name.equals("mask")) {
                 continue;
             }
-            if (name.equals("XSL.")) {
+            if (name.startsWith("XSL.")) {
                 continue;
             }
 
-            MCRFieldDef field = MCRFieldDef.getDef(name);
-            String defaultOperator = MCRFieldType.getDefaultOperator(field.getDataType());
-            String operator = getReqParameter(req, name + ".operator", defaultOperator);
-
-            MCRSetCondition parent = condition;
             String[] values = req.getParameterValues(name);
-            if (values.length > 1) {
+            MCRSetCondition parent = condition;
+
+            if ((values.length > 1) || name.contains(",")) {
                 // Multiple fields with same name, combine with OR
                 parent = new MCROrCondition();
                 condition.addChild(parent);
             }
-            for (String value : values) {
-                parent.addChild(new MCRQueryCondition(field, operator, value));
+
+            for (String fieldName : name.split(",")) {
+                MCRFieldDef field = MCRFieldDef.getDef(fieldName);
+                String defaultOperator = MCRFieldType.getDefaultOperator(field.getDataType());
+                String operator = getReqParameter(req, fieldName + ".operator", defaultOperator);
+
+                for (String value : values) {
+                    parent.addChild(new MCRQueryCondition(field, operator, value));
+                }
             }
         }
 
