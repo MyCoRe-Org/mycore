@@ -49,13 +49,6 @@
         <cell row="60" col="3" anchor="NORTHWEST" ref="mods.book.pages.range.help" />
     <!-- Seiten von bis END -->
 
-    <!-- ISSN -->
-        <cell row="65" col="1" anchor="NORTHEAST" ref="mods.issn.label" />
-        <cell row="65" col="2" anchor="NORTHWEST" ref="mods.issn"
-          var="metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='host']" />
-        <cell row="65" col="3" anchor="NORTHWEST" ref="mods.issn.help" />
-    <!-- ISSN END -->
-
     <!-- Identifier -->
         <cell row="70" col="1" anchor="NORTHEAST" ref="mods.identifier.label" />
         <cell row="70" col="2" anchor="NORTHWEST" ref="mods.identifier" var="metadata/def.modsContainer/modsContainer/mods:mods" />
