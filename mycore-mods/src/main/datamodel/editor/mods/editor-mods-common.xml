@@ -1010,7 +1010,7 @@
   </text>
 
   <panel id="mods.book.part.extent">
-    <cell anchor="NORTHWEST" var="mods:part/mods:extent/mods:total">
+    <cell anchor="NORTHWEST" var="mods:physicalDescription/mods:extent">
       <panel>
         <cell anchor="NORTHWEST" ref="TFzeile512" />
       </panel>
