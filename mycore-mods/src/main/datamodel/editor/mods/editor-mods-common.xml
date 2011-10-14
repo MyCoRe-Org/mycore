@@ -14,7 +14,7 @@
 
   <panel id="mods.title">
     <cell anchor="NORTHWEST" var="mods:title">
-      <textarea id="mods.title.text" width="48" height="3" maxlength="1028">
+      <textarea id="mods.title.text" width="60" height="3">
         <condition id="mods.title.cond" required="true">
           <label xml:lang="de">Tragen Sie hier den Titel des Dokumentes ein.</label>
           <label xml:lang="en">Enter the title of the document here.</label>
@@ -43,7 +43,7 @@
     <cell anchor="NORTHWEST" var="mods:titleInfo[@type='translated']/mods:title">
       <repeater min="1" max="5" pos="right">
         <panel>
-          <cell anchor="NORTHWEST" ref="TFzeile512" />
+          <cell anchor="NORTHWEST" ref="TFarea1028" />
           <cell row="1" col="2" anchor="NORTHWEST" var="@lang">
             <list type="dropdown" default="de">
               <item value="de">
@@ -88,7 +88,7 @@
         <hidden var="@authority" default="iso639-3" />
         <hidden var="@type" default="code" />
         <cell col="1">
-          <list id="mods.languageTerm.list" type="dropdown" default="de">
+          <list id="mods.languageTerm.list" type="dropdown" default="ger">
             <item value="ger">
               <label xml:lang="de">deutsch</label>
               <label xml:lang="en">german</label>
@@ -228,10 +228,10 @@
               <hidden var="@authority" default="marcrelator" />
               <hidden var="@type" default="code" />
               <cell>
-                <list type="dropdown" default="aut">
+                <list type="dropdown" default="aut" id="mods.person.list">
                   <include ref="pleaseSelect" />
                   <include uri="classification:editor:-1:children:marcrelator" cacheable="false" />
-                  <condition required="true">
+                  <condition id="mods.person.cond" required="true">
                     <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
                     <label xml:lang="en">Please select one entry!</label>
                   </condition>
@@ -259,8 +259,8 @@
 
   <!-- Institutionszugehörigkeit (wo zugeordnet) -->
   <text id="mods.assignedInstitute.label">
-    <label xml:lang="de">Institutionszugehörigkeit (*)</label>
-    <label xml:lang="en">Assignment (*)</label>
+    <label xml:lang="de">Institutionszugehörigkeit</label>
+    <label xml:lang="en">Assignment</label>
   </text>
 
   <helpPopup id="mods.assignedInstitute.help" width="400px" height="250px">
@@ -280,11 +280,14 @@
   <panel id="mods.publisher">
     <cell anchor="NORTHWEST" var="mods:publisher">
       <panel>
-        <cell anchor="NORTHWEST" ref="TFzeile512" />
-        <condition required="true">
-          <label xml:lang="de">Tragen Sie hier den Verleger/Herausgeber ein (Druckerei, Medienanstalt ...)).</label>
-          <label xml:lang="en">Enter publisher here.</label>
-        </condition>
+        <cell anchor="NORTHWEST" >
+          <textfield id="mods.publisher.text" width="60" maxlength="512" >
+            <condition id="mods.publisher.cond" required="true">
+              <label xml:lang="de">Tragen Sie hier den Verleger/Herausgeber ein (Druckerei, Medienanstalt ...)).</label>
+              <label xml:lang="en">Enter publisher here.</label>
+            </condition>
+          </textfield>
+        </cell>
       </panel>
     </cell>
   </panel>
@@ -310,11 +313,14 @@
   <panel id="mods.conferencePlace">
     <cell anchor="NORTHWEST" var="mods:place/mods:placeTerm[@type='text']">
       <panel>
-        <cell anchor="NORTHWEST" ref="TFzeile512" />
-        <condition required="true">
-          <label xml:lang="de">Tragen Sie hier den Ort ein, an dem die Konferenz stattfand.</label>
-          <label xml:lang="en">Enter place of conference here.</label>
-        </condition>
+        <cell anchor="NORTHWEST">
+          <textfield id="mods.conferencePlace.text" width="60" maxlength="512">
+            <condition id="mods.conferencePlace.cond" required="true">
+              <label xml:lang="de">Tragen Sie hier den Ort ein, an dem die Konferenz stattfand.</label>
+              <label xml:lang="en">Enter place of conference here.</label>
+            </condition>
+          </textfield>
+        </cell>
       </panel>
     </cell>
   </panel>
@@ -340,11 +346,14 @@
     <cell anchor="NORTHWEST" var="mods:place/mods:placeTerm[@authority='marccountry']">
       <hidden var="@type" default="code" /> <!-- ToDo: Klassifikation für Ländercodes -->
       <panel>
-        <cell anchor="NORTHWEST" ref="TFzeile512" />
-        <condition required="true">
-          <label xml:lang="de">Tragen Sie hier das Land ein, in dem die Konferenz stattfand.</label>
-          <label xml:lang="en">Enter country of conference here.</label>
-        </condition>
+        <cell anchor="NORTHWEST">
+          <textfield id="mods.conferenceLand.text" width="60" maxlength="512">
+            <condition id="mods.conferenceLand.cond" required="true">
+              <label xml:lang="de">Tragen Sie hier das Land ein, in dem die Konferenz stattfand.</label>
+              <label xml:lang="en">Enter country of conference here.</label>
+            </condition>
+          </textfield>
+        </cell>
       </panel>
     </cell>
   </panel>
@@ -362,8 +371,8 @@
 
   <!-- Institution der Einreichung -->
   <text id="mods.submissionAtInstitute.label">
-    <label xml:lang="de">Hochschule/Institut der Einreichung (*)</label>
-    <label xml:lang="en">Submission at Intitute (*)</label>
+    <label xml:lang="de">Hochschule/Institut der Einreichung</label>
+    <label xml:lang="en">Submission at Intitute</label>
   </text>
 
   <helpPopup id="mods.submissionAtInstitute.help" width="400px" height="250px">
@@ -381,11 +390,14 @@
   <panel id="mods.dateIssued">
     <cell anchor="NORTHWEST" var="mods:dateIssued">
       <panel>
-        <cell anchor="NORTHWEST" ref="TFzeile512" />
-        <condition required="true">
-          <label xml:lang="de">Tragen Sie hier das Datum der Veröffentlichung ein.</label>
-          <label xml:lang="en">Enter the date of publication here.</label>
-        </condition>
+        <cell anchor="NORTHWEST">
+          <textfield id="mods.dateIssued.text" width="60" maxlength="512">
+            <condition id="mods.dateIssued.cond" required="true">
+              <label xml:lang="de">Tragen Sie hier das Datum der Veröffentlichung ein.</label>
+              <label xml:lang="en">Enter the date of publication here.</label>
+            </condition>
+          </textfield>
+        </cell>
       </panel>
     </cell>
   </panel>
@@ -433,8 +445,8 @@
 
   <!-- Zeit in der die Konferenz stattfand [text] -->
   <text id="mods.dateOccured.label">
-    <label xml:lang="de">Zeitraum der Konferenz (*)</label>
-    <label xml:lang="en">Date of Conference (*)</label>
+    <label xml:lang="de">Zeitraum der Konferenz</label>
+    <label xml:lang="en">Date of Conference</label>
   </text>
 
   <panel id="mods.dateOccured">
@@ -711,10 +723,10 @@
 
   <panel id="mods.ddc">
     <cell anchor="NORTHWEST" var="mods:classification[@authority='ddc']">
-      <list width="30" type="dropdown">
+      <list width="30" type="dropdown" id="mods.ddc.list">
         <include ref="pleaseSelect" />
         <include uri="classification:editor:-1:children:ddc-sg" cacheable="false" />
-        <condition required="true">
+        <condition id="mods.ddc.cond" required="true">
           <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
           <label xml:lang="en">Please select one entry!</label>
         </condition>
@@ -770,7 +782,7 @@
           <list width="30" type="dropdown">
             <include ref="pleaseSelect" />
             <include uri="classification:editorComplete:-1:children:mods_genres:report" cacheable="false" />
-            <condition required="true">
+            <condition id="mods.genre.kindOfReport.cond" required="true">
               <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
               <label xml:lang="en">Please select one entry!</label>
             </condition>
@@ -802,7 +814,7 @@
           <list width="30" type="dropdown">
             <include ref="pleaseSelect" />
             <include uri="classification:editorComplete:-1:children:mods_genres:av" cacheable="false" />
-            <condition required="true">
+            <condition id="mods.genre.kindOfAVMedia.cond" required="true">
               <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
               <label xml:lang="en">Please select one entry!</label>
             </condition>
@@ -841,7 +853,7 @@
           <list width="30" type="dropdown">
             <include ref="pleaseSelect" />
             <include uri="classification:editorComplete:-1:children:mods_genres:thesis" cacheable="false" />
-            <condition required="true">
+            <condition id="mods.genre.kindOfThesis.cond" required="true">
               <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
               <label xml:lang="en">Please select one entry!</label>
             </condition>
@@ -860,8 +872,8 @@
   
   <!-- Konferenztitel -->
   <text id="mods.nameConference.label">
-    <label xml:lang="de">Konferenztitel (*)</label>
-    <label xml:lang="en">Title of Conference (*)</label>
+    <label xml:lang="de">Konferenztitel</label>
+    <label xml:lang="en">Title of Conference</label>
   </text>
 
   <panel id="mods.nameConference">
@@ -888,8 +900,8 @@
 
   <!-- Körperschaft -->
   <text id="mods.corporation.label">
-    <label xml:lang="de">Körperschaft (*)</label>
-    <label xml:lang="en">Corporation (*)</label>
+    <label xml:lang="de">Körperschaft</label>
+    <label xml:lang="en">Corporation</label>
   </text>
 
   <panel id="mods.corporation">
@@ -920,8 +932,8 @@
 
   <!-- Edition -->
   <text id="mods.edition.label">
-    <label xml:lang="de">Auflage (*)</label>
-    <label xml:lang="en">Edition (*)</label>
+    <label xml:lang="de">Auflage</label>
+    <label xml:lang="en">Edition</label>
   </text>
 
   <panel id="mods.edition">
@@ -940,7 +952,7 @@
 
   <!-- Place -->
   <text id="mods.book.place.label">
-    <label xml:lang="de">Erscheinungsort (*)</label>
+    <label xml:lang="de">Erscheinungsort</label>
     <label xml:lang="en">Place of publication</label>
   </text>
 
@@ -1087,8 +1099,8 @@
 
   <!-- ISBN -->
   <text id="mods.book.isbn.label">
-    <label xml:lang="de">ISBN (*)</label>
-    <label xml:lang="en">ISBN (*)</label>
+    <label xml:lang="de">ISBN</label>
+    <label xml:lang="en">ISBN</label>
   </text>
 
   <panel id="mods.book.isbn">
@@ -1101,7 +1113,7 @@
 
   <helpPopup id="mods.book.isbn.help">
     <label xml:lang="de">
-      ISBN (*)
+      ISBN
       <br />
       Die ISBN wird ohne Bindestrich eingegeben.
       <br />
@@ -1109,7 +1121,7 @@
 
     </label>
     <label xml:lang="en">
-      ISBN (*)
+      ISBN
       <br />
 
     </label>
@@ -1118,8 +1130,8 @@
 
   <!-- ISSN -->
   <text id="mods.issn.label">
-    <label xml:lang="de">ISSN (*)</label>
-    <label xml:lang="en">ISSN (*)</label>
+    <label xml:lang="de">ISSN</label>
+    <label xml:lang="en">ISSN</label>
   </text>
 
   <panel id="mods.issn">
@@ -1131,7 +1143,7 @@
   </panel>
 
   <helpPopup id="mods.issn.help">
-    <label xml:lang="de">ISSN (*) <br />
+    <label xml:lang="de">ISSN <br />
     Die ISSN wird ohne Bindestrich eingegeben.
       <br />
       Beispiel: ISSN 09359680</label>
@@ -1228,8 +1240,8 @@ Beispiel: 2.203 oder 20.686</label>
   <textfield id="TFzeile512" width="60" maxlength="512" />
   <textfield id="TFzeile1024" width="60" maxlength="1024" />
   <!-- *** Text area *** -->
-  <textarea id="TFarea1028" width="48" height="3" maxlength="1028" />
-  <textarea id="TFarea4096" width="48" height="8" maxlength="4096" />
+  <textarea id="TFarea1028" width="60" height="3" />
+  <textarea id="TFarea4096" width="50" height="8" />
   <textarea id="TFeditor" wysiwygEditor="true" editorWidth="500" editorHeight="200" width="60" height="10" />
 
   <list id="pleaseSelect">

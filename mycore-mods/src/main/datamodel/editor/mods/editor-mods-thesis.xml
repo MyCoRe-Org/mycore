@@ -10,9 +10,11 @@
     <hidden var="service" descendants="true" />
     <hidden var="metadata/@xml:lang" default="de" />
 
-    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:typeOfResource" descendants="true" />
+    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:typeOfResource" default="text" />
     <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@mcr:categId" default="mods_genres:thesis" />
     <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/@ID" />
+    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier[@type='urn']" descendants="true" />
+    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier[@type='hdl']" descendants="true" />
     <hidden var="metadata/def.modsContainer/@class" default="MCRMetaXML" />
     <hidden var="metadata/def.modsContainer/@notinherit" default="true" />
     <hidden var="metadata/def.modsContainer/@heritable" default="false" />
@@ -91,7 +93,10 @@
     <!-- Stichworte END -->
   </panel></cell>
 
-    <cell row="170" col="1" colspan="3" anchor="NORTHEAST" ref="mods.noteLocationCorp" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+  <!-- Institution-Tripple -->
+  <cell row="50" colspan="3" class="border"><panel style="width:100%;">
+    <cell row="10" col="1" colspan="3" anchor="NORTHEAST" ref="mods.noteLocationCorp" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+  </panel></cell>
 
     <!-- save cancel buttons -->
     <cell col="1" colspan="3" row="250" anchor="EAST" style="padding-top:20px;">
