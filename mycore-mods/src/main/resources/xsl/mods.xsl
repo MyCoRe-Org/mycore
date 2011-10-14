@@ -105,34 +105,31 @@
   </xsl:template>
   <xsl:template mode="mods-type" match="/mycoreobject">
     <xsl:choose>
-      <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']='thesis'">
+      <xsl:when test="substring-after(./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@valueURI,'#')='thesis'">
         <xsl:value-of select="'thesis'" />
       </xsl:when>
       <xsl:when
-        test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']='article' or
+        test="substring-after(./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@valueURI,'#')='article' or
                       (./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:genre='periodical' and
                        ./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier/@type='doi')">
         <xsl:value-of select="'article'" />
       </xsl:when>
-      <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']='av media'">
+      <xsl:when test="substring-after(./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@valueURI,'#')='av'">
         <xsl:value-of select="'av-media'" />
       </xsl:when>
-      <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']='conference proceeding'">
+      <xsl:when test="substring-after(./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@valueURI,'#')='confpro'">
         <xsl:value-of select="'cproceeding'" />
       </xsl:when>
-      <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']='conference publication'">
+      <xsl:when test="substring-after(./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@valueURI,'#')='confpub'">
         <xsl:value-of select="'cpublication'" />
       </xsl:when>
-      <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']='book chapter'">
+      <xsl:when test="substring-after(./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@valueURI,'#')='chapter'">
         <xsl:value-of select="'book-chapter'" />
       </xsl:when>
-      <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']='book'">
+      <xsl:when test="substring-after(./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@valueURI,'#')='book'">
         <xsl:value-of select="'book'" />
       </xsl:when>
-      <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']='journal'">
-        <xsl:value-of select="'journal'" />
-      </xsl:when>
-      <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']='journal'">
+      <xsl:when test="substring-after(./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@valueURI,'#')='journal'">
         <xsl:value-of select="'journal'" />
       </xsl:when>
       <xsl:otherwise>
