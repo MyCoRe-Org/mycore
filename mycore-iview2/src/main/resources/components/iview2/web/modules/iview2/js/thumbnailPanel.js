@@ -112,16 +112,16 @@ iview.ThumbnailPanel.View = function() {
 	 * @description	resizes the ThumbnailPanel when the size of the browser is changing
 	 */
 	function resize() {
-		createContainer(this);
+		createContainer.call(this);
 		//calculates the new correct height so the toolbar is visible into the ThumbnailPanel-View
 		if (window.innerWidth) {
 			this.my.self.css("height", window.innerHeight - 44 + "px"); //44 is the Height of the Toolbar
 		} else {
 			this.my.self.css("height", document.documentElement.clientHeight - 44 + "px"); //44 is the Height of the Toolbar
 		}
-		posContainer(this);
+		posContainer.call(this);
 		if (this._visible) {
-			loadImages(this);
+			loadImages.call(this);
 		}
 	}
 	
@@ -135,7 +135,7 @@ iview.ThumbnailPanel.View = function() {
 	 */
 	function setSelected(value) {
 		this._selected = toInt(value);
-		calculateFirstRow(this);
+		calculateFirstRow.call(this);
 		if (this.my.bar) {
 			this.my.barObj.setCurValue(this._currentFirstRow);
 		}
@@ -171,30 +171,29 @@ iview.ThumbnailPanel.View = function() {
 	 * @name		loadImages
 	 * @memberOf	iview.ThumbnailPanel.View#
 	 * @description	load the ThumbnailPanel so that the actually picture is in first line
-	 * @param 		{instance} that
 	 */	
-	function loadImages(that) {
+	function loadImages() {
 		// for later check initialized
-		var delFrom = that._amount.height;		
+		var delFrom = this._amount.height;		
 		
 		var divBox;
 		// proceed line wise
-		for (var i = 0; i < that._amount.height; i++) {
-			for (var j = 0; j < that._amount.width; j++) {
-				divBox= that.my.pictures[(i * (that._amount.width)) + j];
+		for (var i = 0; i < this._amount.height; i++) {
+			for (var j = 0; j < this._amount.width; j++) {
+				divBox= this.my.pictures[(i * (this._amount.width)) + j];
 				//get back previously hidden div's and set the picPos it represents
-				divBox.css("display", "block").attr("page",((i + that._currentFirstRow) * that._amount.width) + j);
+				divBox.css("display", "block").attr("page",((i + this._currentFirstRow) * this._amount.width) + j);
 				
 				//load needed Previews
-				if ((((i + that._currentFirstRow) * that._amount.width) + j) < that._numberOfPages) {
-					loadSingleImage(that, divBox);
+				if ((((i + this._currentFirstRow) * this._amount.width) + j) < this._numberOfPages) {
+					loadSingleImage.call(this, divBox);
 				}
 				// last line who contains pages
-				if ((i + that._currentFirstRow) >= (Math.floor((that._numberOfPages) / that._amount.width))) {
+				if ((i + this._currentFirstRow) >= (Math.floor((this._numberOfPages) / this._amount.width))) {
 					// page not existing???
-					if ((((that._currentFirstRow + i) * that._amount.width)+j) > (that._numberOfPages - 1)) {
+					if ((((this._currentFirstRow + i) * this._amount.width)+j) > (this._numberOfPages - 1)) {
 						divBox.css("display", "none");
-						if (i <= that._amount.height) {
+						if (i <= this._amount.height) {
 							delFrom = i + 1;
 						}
 					}
@@ -202,9 +201,9 @@ iview.ThumbnailPanel.View = function() {
 			}
 		}
 		// to remove redundant divs when the pagenumbers are small
-		if (delFrom < that._amount.height) {
-			for (var i = delFrom * that._amount.width; i < that.my.pictures.length; i++) {
-				that.my.pictures[(i * (that._amount.width)) + j].css("display", "none");
+		if (delFrom < this._amount.height) {
+			for (var i = delFrom * this._amount.width; i < this.my.pictures.length; i++) {
+				this.my.pictures[(i * (this._amount.width)) + j].css("display", "none");
 			}
 		}
 	}
@@ -215,16 +214,16 @@ iview.ThumbnailPanel.View = function() {
 	 * @name		loadSingleImage
 	 * @memberOf	iview.ThumbnailPanel.View#
 	 * @description	load the separate pictures in the according divboxes
-	 * @param 		{instance} that image that is loaded
 	 * @param 		{object} divBox the according div box which contains one image
 	 */
-	function loadSingleImage(that, divBox) {
-		var pageName = that._pages[toInt(divBox.attr("page"))+1];
-		var source = that._tileUrlProvider.assembleUrl(0, 0, 0, pageName);
+	function loadSingleImage(divBox) {
+		var pageName = this._pages[toInt(divBox.attr("page"))+1];
+		var source = this._tileUrlProvider.assembleUrl(0, 0, 0, pageName);
 		var preview = jQuery(divBox.children("img")[0]);
 		// original Values needed, because Img will scale automatic in each Props
 		var origImage = new Image;
-		origImage.onload = function() {trimImage(preview, source, {'height':origImage.height, 'width':origImage.width}, that);};
+		var that = this;
+		origImage.onload = function() {trimImage.call(that, preview, source, {'height':origImage.height, 'width':origImage.width});};
 		origImage.src = source;
 		
 		// fill Info div
@@ -242,45 +241,44 @@ iview.ThumbnailPanel.View = function() {
 	 * @param 		{object} preview image which is displayed
 	 * @param 		{string} source path to the image
 	 * @param		{object} orig original image
-	 * @param		{instance} that
 	 */
-	function trimImage(preview, source, orig, that) {
+	function trimImage(preview, source, orig) {
 		preview.attr("src", source);
 	
 		// scale preview-images
-		var scaleFactorH = (that._previewSize.height / orig.height);
-		var scaleFactorW = (that._previewSize.width / orig.width);
+		var scaleFactorH = (this._previewSize.height / orig.height);
+		var scaleFactorW = (this._previewSize.width / orig.width);
 		
 		if (scaleFactorH <= 1) {
 			// image is higher then div
 			if (scaleFactorW <= 1) {
 				// image is wider than the div
 				if (scaleFactorW < scaleFactorH) {
-					preview.css("width", that._previewSize.width + "px");
+					preview.css("width", this._previewSize.width + "px");
 					preview.css("height", orig.height * scaleFactorW + "px");
 				} else {
 					preview.css("width", orig.width * scaleFactorH + "px");
-					preview.css("height", that._previewSize.height + "px");
+					preview.css("height", this._previewSize.height + "px");
 				}
 			} else {
 				// image is smaller than the div
 				preview.css("width", orig.width * scaleFactorH + "px");
-				preview.css("height", that._previewSize.height + "px");
+				preview.css("height", this._previewSize.height + "px");
 			}
 		} else {
 			// image is lower than the div
 			if (scaleFactorW <= 1) {
 				// image is wider than the div
-				preview.css("width", that._previewSize.width + "px");
+				preview.css("width", this._previewSize.width + "px");
 				preview.css("height", orig.height * scaleFactorW + "px");
 			} else {
 				// image is smaller than the div
 				if (scaleFactorW < scaleFactorH) {
-					preview.css("width", that._previewSize.width + "px");
+					preview.css("width", this._previewSize.width + "px");
 					preview.css("height", orig.height * scaleFactorW + "px");
 				} else {
 					preview.css("width", orig.width * scaleFactorH + "px");
-					preview.css("height", that._previewSize.height + "px");
+					preview.css("height", this._previewSize.height + "px");
 				}
 			}
 		}
@@ -296,22 +294,21 @@ iview.ThumbnailPanel.View = function() {
 	 * @name		calculateFirstRow
 	 * @memberOf	iview.ThumbnailPanel.View#
 	 * @description	if ThumbnailPanel is already created and is called so load loadImageFromLine() and adjust scrollbar
-	 * @param	 	{instance} that 
 	 */
-	function calculateFirstRow(that) {
-		that._currentFirstRow = Math.floor((parseInt(that._selected) - 1) / that._amount.width);
+	function calculateFirstRow() {
+		this._currentFirstRow = Math.floor((parseInt(this._selected) - 1) / this._amount.width);
 		// if ThumbnailPanel is to big for remaining pages
-		if (that._currentFirstRow + that._amount.height - 1 > Math.ceil(that._numberOfPages / that._amount.width) - 1) {
-			that._currentFirstRow = Math.ceil(that._numberOfPages / that._amount.width) - that._amount.height;
+		if (this._currentFirstRow + this._amount.height - 1 > Math.ceil(this._numberOfPages / this._amount.width) - 1) {
+			this._currentFirstRow = Math.ceil(this._numberOfPages / this._amount.width) - this._amount.height;
 		}
 		// if all pages fit in ThumbnailPanel
-		if (that._currentFirstRow < 0) {
-			that._currentFirstRow = 0;
+		if (this._currentFirstRow < 0) {
+			this._currentFirstRow = 0;
 		}
-		loadImages(that);
+		loadImages.call(this);
 		// shift scrollbar to the actually start-line
-		if (that._useScrollBar) {
-			that.my.barObj.setCurValue(currentFirstRow);
+		if (this._useScrollBar) {
+			this.my.barObj.setCurValue(this._currentFirstRow);
 		}
 	}
 	
@@ -321,33 +318,33 @@ iview.ThumbnailPanel.View = function() {
 	 * @name		createContainer
 	 * @memberOf	iview.ThumbnailPanel.View#
 	 * @description	creates all containers which are used for the ThumbnailPanel (#container == #previewImages)
-	 * @param 		{instance} that 
 	 */
-	function createContainer(that) {
+	function createContainer() {
 		//calculate the number of horizontal and vertical div-boxes
-		var el=that.my.self;
-		var width = Math.floor((el.width() - that._scrollBarWidth) / that._divSize.width);
-		var height = Math.floor(el.height() / that._divSize.height);
+		var el=this.my.self;
+		var width = Math.floor((el.width() - this._scrollBarWidth) / this._divSize.width);
+		var height = Math.floor(el.height() / this._divSize.height);
+		var that = this;
 		//dont do not needed work if everything is just fine
-		if (width == that._amount.width && height == that._amount.height) return;
-		that._amount = {
+		if (width == this._amount.width && height == this._amount.height) return;
+		this._amount = {
 			'width': width,
 			'height': height};
 		
-		if (that.my.bar) {
-			that.my.barObj.setMaxValue(Math.ceil(that._numberOfPages/width)-height);
-			that.my.barObj.setProportion(1/Math.abs(Math.ceil(that._numberOfPages/width)-height+1));
+		if (this.my.bar) {
+			this.my.barObj.setMaxValue(Math.ceil(this._numberOfPages/width)-height);
+			this.my.barObj.setProportion(1/Math.abs(Math.ceil(this._numberOfPages/width)-height+1));
 		}
 		
 		//clear the old pictures if there
-		jQuery(that.my.pictures).each(function(pos, element) {
+		jQuery(this.my.pictures).each(function(pos, element) {
 			if (!element) return;//needed as the resize can happen more often than this element exists
 			element.detach();
 			delete that.my.pictures[pos];
 		});
 		// create target Div's
-		for (var i = 0; i < that._amount.height; i++) {
-			for (var j = 0; j < that._amount.width; j++) {
+		for (var i = 0; i < this._amount.height; i++) {
+			for (var j = 0; j < this._amount.width; j++) {
 				var infoDiv = jQuery("<div>")
 					.addClass("infoDiv");
 				
@@ -355,11 +352,11 @@ iview.ThumbnailPanel.View = function() {
 					.addClass("previewDiv")
 					.css("cursor", "pointer");
 				//adding them to the list of available containers so we can access them easily
-				that.my.pictures[i*that._amount.width + j] = jQuery("<div>")
+				this.my.pictures[i*this._amount.width + j] = jQuery("<div>")
 					.addClass("divBox")
-					.attr("no",(i * that._amount.width) + j)
+					.attr("no",(i * this._amount.width) + j)
 					.css("float", "left")
-					.appendTo(that.my.picContainer)
+					.appendTo(this.my.picContainer)
 					.append(infoDiv)
 					.append(prevImg)
 					.click(function() {
@@ -375,19 +372,18 @@ iview.ThumbnailPanel.View = function() {
 	 * @name		posContainer
 	 * @memberOf	iview.ThumbnailPanel.View#
 	 * @description	positions nicely the divBoxes within the available Space
-	 * @param	 	{instance} that the ThumbnailPanel object where the code is run in
 	 */
-	function posContainer(that) {
-		that._scrollBarWidth = ((that.my.bar)? that.my.bar.outerWidth(true): 0);
+	function posContainer() {
+		this._scrollBarWidth = ((this.my.bar)? this.my.bar.outerWidth(true): 0);
 	
-		if (that.my.bar) {
-			that.my.barObj.setSize(that.my.self.height());
+		if (this.my.bar) {
+			this.my.barObj.setSize(this.my.self.height());
 		}
 		//reset everything else it does subsum and we screw everything up
-		that.my.picContainer.css({"width": that.my.self.innerWidth() - that._scrollBarWidth,
+		this.my.picContainer.css({"width": this.my.self.innerWidth() - this._scrollBarWidth,
 			"padding": 0,
-			"padding-left": (that.my.self.innerWidth() - (that.my.pictures[0].outerWidth(true)*that._amount.width))/2 + "px",
-			"padding-top": (that.my.self.innerHeight() - (that.my.pictures[0].outerHeight(true)*that._amount.height))/2 + "px"});
+			"padding-left": (this.my.self.innerWidth() - (this.my.pictures[0].outerWidth(true)*this._amount.width))/2 + "px",
+			"padding-top": (this.my.self.innerHeight() - (this.my.pictures[0].outerHeight(true)*this._amount.height))/2 + "px"});
 	}
 	
 	/**
@@ -424,15 +420,15 @@ iview.ThumbnailPanel.View = function() {
 
 		this._useScrollBar = args._useScrollBar;
 		if (args.useScrollBar) {
-			prepareScrollBar(this);
+			prepareScrollBar.call(this);
 		}
 		
-		createContainer(this);
-		posContainer(this);
+		createContainer.call(this);
+		posContainer.call(this);
 		this.setSelected(args.selected || 0);
 		var that = this;
 		jQuery(window).resize(function() {that.resize()});
-		loadImages(this);
+		loadImages.call(this);
 	}
 	
 	/**
@@ -441,15 +437,15 @@ iview.ThumbnailPanel.View = function() {
 	 * @name		prepareScrollBar
 	 * @memberOf	iview.ThumbnailPanel.View#
 	 * @description	create Scrollbar in the ThumbnailPanel
-	 * @param 		{instance} that 
 	 */
-	function prepareScrollBar(that) {
+	function prepareScrollBar() {
 		var scrollbar = new iview.scrollbar.Controller();
-		var parent = that.my.self;
+		var parent = this.my.self;
+		var that = this;
 		scrollbar.createView({ 'direction': 'vertical', 'parent': parent, 'mainClass': 'scroll', 'type':'stepper'});
 		scrollbar.attach("curVal.scrollbar", function(e,val){
 			that._currentFirstRow = val["new"];
-			loadImages(that);
+			loadImages.call(that);
 		});
 		scrollbar.setSize(parent.height());
 		scrollbar.setStepByClick(1);
@@ -459,8 +455,8 @@ iview.ThumbnailPanel.View = function() {
 		scrollbar.addEventFrom("mousemove", parent);
 		scrollbar.addEventFrom("mouseup", parent);
 		scrollbar.addEventFrom("mousescroll", parent);
-		that.my.bar = jQuery(parent.find(".scrollV:first")[0]);
-		that.my.barObj = scrollbar;
+		this.my.bar = jQuery(parent.find(".scrollV:first")[0]);
+		this.my.barObj = scrollbar;
 	}
 	
 	/**
