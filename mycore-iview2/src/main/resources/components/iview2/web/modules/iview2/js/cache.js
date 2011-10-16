@@ -298,4 +298,3 @@ Cache.prototype.log_ = function(msg) {
 Cache.prototype.iterator = function() {
 	return new iview.utils.SimpleIterator(this.items_);
 };
-
