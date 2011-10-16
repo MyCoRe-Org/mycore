@@ -277,7 +277,7 @@
 
 				if (this.updateCanvasCount++==0){
 					//mozRequestAnimationFrame has no return value as of FF7, tracking first call to method via updateCanvasCount
-					requestAnimFrame(function(){scope.updateScreen(true);}, this.context2D.canvas);
+					requestAnimationFrame(function(){scope.updateScreen(true);}, this.context2D.canvas);
 				}
 				return;
 			}
