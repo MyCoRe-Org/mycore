@@ -502,12 +502,37 @@
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.article">
     <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
     <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name" />
+    <xsl:for-each select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='host']">
+      <tr>
+        <td valign="top" class="metaname">
+          <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.articleIn'),':')" />
+        </td>
+        <td class="metavalue">
+          <!-- Journal -->
+          <!-- Issue -->
+          <xsl:value-of select="concat(mods:part/mods:detail[@type='issue']/mods:caption,' ',mods:part/mods:detail[@type='issue']/mods:number,'/',mods:part/mods:date,' ')"/>
+          <!-- Volume -->
+          <xsl:value-of select="concat('(',i18n:translate('metaData.mods.dictionary.volume.article'),': ',mods:part/mods:detail[@type='volume']/mods:number,')')"/>
+          <!-- Pages -->
+          <xsl:for-each select="mods:part/mods:extent[@unit='pages']">
+            <xsl:value-of select="concat(', ', i18n:translate('metaData.mods.dictionary.page.abbr'),' ')"/>
+            <xsl:choose>
+              <xsl:when test="mods:start = mods:end">
+                <xsl:value-of select="mods:start"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="concat(mods:start,'-',mods:end)"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:for-each>
+          <!-- date issued -->
+        </td>
+      </tr>
+    </xsl:for-each>
     <xsl:call-template name="printMetaDate.mods">
       <xsl:with-param name="nodes"
         select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:originInfo/mods:dateIssued" />
     </xsl:call-template>
-    <xsl:apply-templates mode="present"
-      select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:part/mods:extent" />
     <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
     <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:abstract" />
     <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
