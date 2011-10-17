@@ -1002,7 +1002,7 @@
   </text>
 
   <panel id="mods.book.pages.range">
-    <cell anchor="WEST" var="mods:part/mods:extent[@unit='page']">
+    <cell anchor="WEST" var="mods:part/mods:extent[@unit='pages']">
       <panel>
         <cell col="1" anchor="WEST" var="mods:start" ref="TFzeile10" />
         <cell col="2" anchor="WEST" var="mods:end" ref="TFzeile10" />
