@@ -15,6 +15,21 @@
     </xsl:if>
   </xsl:template>
 
+  <xsl:template match="mods:name">
+    <!-- only copy mods:name where a name is given -->
+    <xsl:param name="ID" />
+    <xsl:if test="@mcr:categId">
+      <xsl:apply-templates select="." mode="handleClassification">
+        <xsl:with-param name="ID" select="$ID" />
+      </xsl:apply-templates>
+    </xsl:if>
+    <xsl:if test="mods:displayForm | mods:namePart">
+      <xsl:copy>
+        <xsl:apply-templates select='@*|node()' />
+      </xsl:copy>
+    </xsl:if>
+  </xsl:template>
+
   <xsl:template match="mods:identifier|mods:abstract">
     <!-- copy only if element has text node -->
     <xsl:if test="string-length(text())&gt;0">
@@ -28,6 +43,13 @@
   <!-- ignore @classId and @categId but transform it to @authority|@authorityURI and @valueURI -->
   <xsl:template match="@mcr:categId" />
   <xsl:template match="*[@mcr:categId]">
+    <xsl:param name="ID" />
+    <xsl:apply-templates select="." mode="handleClassification">
+      <xsl:with-param name="ID" select="$ID" />
+    </xsl:apply-templates>
+  </xsl:template>
+
+  <xsl:template match="*[@mcr:categId]" mode="handleClassification">
     <xsl:param name="ID" />
     <xsl:copy>
       <xsl:variable name="classNodes" select="mcrmods:getClassNodes(.)" />
