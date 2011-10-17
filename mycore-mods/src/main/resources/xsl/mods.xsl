@@ -47,7 +47,7 @@
               <xsl:value-of select="." />
             </xsl:for-each>
     <!-- Author -->
-            <xsl:for-each select="mods:name[mods:role/mods:roleTerm/text()='author']">
+            <xsl:for-each select="mods:name[mods:role/mods:roleTerm/text()='aut']">
               <xsl:if test="position()!=1">
                 <xsl:value-of select="'; '" />
               </xsl:if>
@@ -150,7 +150,7 @@
     <xsl:variable name="staticURL">
       <xsl:value-of select="concat($objectBaseURL,@ID)" />
     </xsl:variable>
-    <table cellspacing="0" cellpadding="0" id="metaData">
+
       <!--1***modsContainer************************************* -->
       <xsl:variable name="mods-type">
         <xsl:apply-templates mode="mods-type" select="." />
@@ -159,6 +159,15 @@
         MODS-TYPE:
         <xsl:value-of select="$mods-type" />
       </xsl:message>
+
+   <div id="detail_view" class="blockbox">
+     <h3><xsl:apply-templates select="." mode="title" /></h3>
+     <div id="title_box" class="detailbox">
+       <h4 id="title_switch" class="block_switch open"><xsl:value-of select="$mods-type" /></h4>
+       <div id="title_content" class="block_content">
+         <table class="metaData">
+
+
       <xsl:choose>
         <!-- xsl:when cases are handled in modsmetadata.xsl -->
         <xsl:when test="$mods-type = 'report'">
@@ -272,7 +281,12 @@
           <xsl:value-of select="./@ID" />
         </td>
       </tr>
-    </table>
+
+        </table>
+      </div>
+    </div>
+  </div>
+
   </xsl:template>
   <xsl:template name="mods.editobject_with_der">
     <xsl:param name="accessedit" />
