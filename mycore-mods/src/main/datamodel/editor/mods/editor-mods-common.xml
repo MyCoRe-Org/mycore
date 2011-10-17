@@ -1072,8 +1072,8 @@
 
   <!-- Impact Factor -->
   <text id="mods.impact.label">
-    <label xml:lang="de">Impakt</label>
-    <label xml:lang="en">Impact</label>
+    <label xml:lang="de">Impact Factor</label>
+    <label xml:lang="en">Impact Factor</label>
   </text>
 
   <panel id="mods.impact">
