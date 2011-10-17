@@ -126,7 +126,7 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-        <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.title'),$title,' :')" />
+        <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.title'),$title,':')" />
       </td>
       <td class="metavalue">
         <xsl:value-of select="mods:title" />
@@ -137,7 +137,7 @@
   <xsl:template match="mods:abstract" mode="present">
     <tr>
       <td valign="top" class="metaname">
-        <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.abstract'),'(' ,@lang ,') :')" />
+        <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.abstract'),'(' ,@lang ,'):')" />
       </td>
       <td class="metavalue">
         <xsl:value-of select="." />
