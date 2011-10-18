@@ -20,19 +20,15 @@ iview.Preload.Controller = function(viewer) {
 	var zoomInfo = currentImage.zoomInfo;
 	var that = this;
 	
-	jQuery(viewer.viewerBean.viewer).bind("pos.viewer", function(jq, event) {
-		that.left(event.x);
-		that.top(event.y);})
-	.bind("zoom.viewer", function() {
-		that.width((currentImage.width / Math.pow(2, zoomInfo.maxZoom - viewer.viewerBean.zoomLevel))*zoomInfo.scale);
-		that.height((currentImage.height / Math.pow(2, zoomInfo.maxZoom - viewer.viewerBean.zoomLevel))*zoomInfo.scale);
-	});
 	jQuery(currentImage).bind(iview.CurrentImage.CHANGE_EVENT, function() {
 		that.setSrc(viewer.viewerBean.tileUrlProvider.assembleUrl(0,0,0))
 	}).bind(iview.CurrentImage.DIMENSION_EVENT, function() {
 		that.width(this.curWidth);
 		that.height(this.curHeight);
-	})
+	}).bind(iview.CurrentImage.POS_CHANGE_EVENT, function() {
+		that.left(this.x);
+		that.top(this.y);
+	});
 };
 
 iview.Preload.Controller.prototype = {

@@ -521,21 +521,20 @@ function createOverview(viewer) {
 		model.setSize({'x': this.curWidth, 'y': this.curHeight});
 		model.setRatio({'x': viewerBean.width / this.curWidth, 'y': viewerBean.height / this.curHeight});
 		model.setPos({
-			'x': - (viewerBean.x / Math.pow(2, zoomInfo.curZoom))*zoomInfo.scale,
-			'y': - (viewerBean.y / Math.pow(2, zoomInfo.curZoom))*zoomInfo.scale});
+			'x': - (this.x / Math.pow(2, zoomInfo.curZoom))*zoomInfo.scale,
+			'y': - (this.y / Math.pow(2, zoomInfo.curZoom))*zoomInfo.scale});
 	}
 
 	jQuery(currentImage).bind(iview.CurrentImage.DIMENSION_EVENT, function() {
-		adaptOverview.apply(this);
+		adaptOverview.call(this);
 	}).bind(iview.CurrentImage.CHANGE_EVENT, function() {
 		model.setSrc(viewerBean.tileUrlProvider.assembleUrl(0,0,0));
+	}).bind(iview.CurrentImage.POS_CHANGE_EVENT, function() {
+		model.setPos({
+			'x': - (this.x / Math.pow(2, zoomInfo.curZoom))/zoomInfo.scale,
+			'y': - (this.y / Math.pow(2, zoomInfo.curZoom))/zoomInfo.scale});
 	})
 	jQuery(viewerBean.viewer).bind("reinit.viewer", function() {
-		adaptOverview.apply(currentImage);
-	}).bind("move.viewer", function(args, event) {
-		// calculate via zoomlevel to the preview the left top point
-		model.setPos({
-			'x': - (event.x / Math.pow(2, viewerBean.zoomLevel))/zoomInfo.scale,
-			'y': - (event.y / Math.pow(2, viewerBean.zoomLevel))/zoomInfo.scale});
+		adaptOverview.call(currentImage);
 	});
 }

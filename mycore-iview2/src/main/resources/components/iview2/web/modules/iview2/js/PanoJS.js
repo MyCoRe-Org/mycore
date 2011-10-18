@@ -374,7 +374,6 @@ PanoJS.prototype = {
 			if(isNaN(this.x)) this.x = 0; 
 			if(isNaN(this.y)) this.y = 0;
 		}
-		jQuery(this.viewer).trigger("pos.viewer", {'x': this.x + motion.x, 'y': this.y + motion.y});
 		//end addition
 
 		for (var c = 0; c < this.tiles.length; c++) {

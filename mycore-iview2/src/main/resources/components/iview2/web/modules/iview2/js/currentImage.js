@@ -19,10 +19,10 @@
       jQuery(iviewInst.viewerContainer).bind("zoom.viewer", function(jq, event) {
     	  /*listen to changes of zoomLevel and adapt curWidth & -Height depending on that,
     	   * notify all listeners about the change*/
-    	that.zoomInfo.curZoom = event.zoomLevel;
-		that.curWidth = (that.width / Math.pow(2, that.zoomInfo.maxZoom - event.zoomLevel))*that.zoomInfo.scale,
-		that.curHeight = (that.height / Math.pow(2, that.zoomInfo.maxZoom - event.zoomLevel))*that.zoomInfo.scale
-		jQuery(that).trigger(iview.CurrentImage.DIMENSION_EVENT);
+	    	that.zoomInfo.curZoom = event.zoomLevel;
+			that.curWidth = (that.width / Math.pow(2, that.zoomInfo.maxZoom - event.zoomLevel))*that.zoomInfo.scale,
+			that.curHeight = (that.height / Math.pow(2, that.zoomInfo.maxZoom - event.zoomLevel))*that.zoomInfo.scale
+			jQuery(that).trigger(iview.CurrentImage.DIMENSION_EVENT);
       });
       
       iview.IViewObject.call(this, iviewInst);

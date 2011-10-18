@@ -358,11 +358,6 @@
 	 */
 	function viewerMoved(jq, event) {
 		this.currentImage.setPos(event);
-		// set Roller this no circles are created, and we end in an endless loop
-		this.roller = true;
-		this.scrollbars.x.setCurValue(-event.x);
-		this.scrollbars.y.setCurValue(-event.y);
-		this.roller = false;
 	};
 
     return constructor;

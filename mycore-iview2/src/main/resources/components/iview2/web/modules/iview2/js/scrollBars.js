@@ -1170,39 +1170,27 @@ iview.scrollbar.importScrollbars = function(viewer) {
 			'height':viewer.properties.startHeight - ((barY.my.self.css("visibility") == "visible")? barY.my.self.outerHeight() : 0)  + "px"
 	});
 	
-	jQuery(viewer.viewerContainer).bind("zoom.viewer reinit.viewer", function() {
-		var viewerBean = viewer.viewerBean;
-		var barX = viewer.scrollbars.x;
-		var barY = viewer.scrollbars.y;
-		var currentImage = viewer.currentImage;
-		//TODO if importScrollbar is called at a different position this isn't any longer needed
-		if (typeof viewerBean.viewer === "undefined") return;
-		var viewerElem = jQuery(viewerBean.viewer);
-		// determine the current imagesize
-		var zoomScale = currentImage.zoomInfo.scale;
-		var curWidth = (currentImage.width / Math.pow(2, currentImage.zoomInfo.maxZoom - viewerBean.zoomLevel))*zoomScale;
-		var curHeight = (currentImage.height / Math.pow(2, currentImage.zoomInfo.maxZoom - viewerBean.zoomLevel))*zoomScale;
-
-		var height = viewerElem.height();
-		var width = viewerElem.width();
-		var top = viewerElem.offset().top;
-		
-		// vertical bar
-		var ymaxVal = curHeight - height;
+	var currentImage = viewer.currentImage;
+	jQuery(currentImage).bind(iview.CurrentImage.POS_CHANGE_EVENT, function() {
+		viewer.roller = true;
+		barX.setCurValue(-this.x);
+		barY.setCurValue(-this.y);
+		viewer.roller = false;
+	}).bind(iview.CurrentImage.DIMENSION_EVENT, function() {
+		var ymaxVal = currentImage.curHeight - viewer.viewerBean.height;
 		barY.setMaxValue((ymaxVal < 0)? 0:ymaxVal);
-		barY.setProportion(height/curHeight);
+		barY.setProportion(viewer.viewerBean.height/currentImage.curHeight);
 		
-		// horizontal bar
-		var xmaxVal = curWidth - width;
+		var xmaxVal = currentImage.curWidth - viewer.viewerBean.width;
 		barX.setMaxValue(xmaxVal);
-		barX.setProportion(width/curWidth);
-
+		barX.setProportion(viewer.viewerBean.width/currentImage.curWidth);
+		
 		// correctly represent the new view position
-		barX.setCurValue(-viewerBean.x);
-		barY.setCurValue(-viewerBean.y);
+		barX.setCurValue(-this.x);
+		barY.setCurValue(-this.y);
 		// set the new size of the scrollbar
-		barY.setSize(height);
-		barY.my.self[0].style.top = top + "px";
-		barX.setSize(width);
+		barY.setSize(viewer.viewerBean.height);
+		barY.my.self[0].style.top = jQuery(viewer.viewerBean.viewer).offset().top + "px";
+		barX.setSize(viewer.viewerBean.width);
 	});
 };
