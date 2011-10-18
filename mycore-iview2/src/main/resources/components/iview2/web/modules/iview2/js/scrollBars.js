@@ -672,12 +672,11 @@ iview.scrollbar.View = function() {
 		if (typeof id !== "undefined") {
 			complete.attr("id", id);
 		}
-			
+		
 	//Start Up/Left
 		var buttonUL = jQuery("<div>")
 			.addClass("start")
-			.mousedown(function() { return false;})
-			.mousedown(function() { buttonMouseDown(that, false);})
+			.mousedown(function() { buttonMouseDown(that, false); return false;})
 			.appendTo(complete);
 			
 		var wholeSpace = jQuery("<div>")
@@ -703,11 +702,28 @@ iview.scrollbar.View = function() {
 			.addClass("emptyEnd")
 			.appendTo(wholeSpace);
 		
+		var fnMouseMove = function(e) {
+			divMouseMove(that, e);
+		};
+		var fnMouseUp = function() {
+			buttonMouseUp(that);
+			jQuery(document)
+			.unbind('mouseup', this)
+			.unbind('mousemove', fnMouseMove);
+			return false;
+		};
+		
 		var barScroll = jQuery("<div>")
 			.addClass("bar")
-			.mousedown(function(e) { divMouseDown(that, e); return false;})
+			.mousedown(function(e) {
+				divMouseDown(that, e);
+				jQuery(document)
+				.mouseup(fnMouseUp)
+				.mousemove(fnMouseMove);
+				return false;
+			})
 			.mouseup(divMouseUp)
-			.mousemove(function(e) { divMouseMove(that, e);})
+			.mousemove(fnMouseMove)
 			.css("position", "absolute")
 			.appendTo(wholeSpace);
 		
@@ -725,14 +741,9 @@ iview.scrollbar.View = function() {
 		
 		var buttonDR = jQuery("<div>")
 			.addClass("end")
-			.mousedown(function() { return false;})
-			.mousedown(function() { buttonMouseDown(that, true);})
+			.mousedown(function() { buttonMouseDown(that, true);return false;})
 			.appendTo(complete);
 		
-		jQuery(document)
-			.mouseup(function() { buttonMouseUp(that);})
-			.mousemove(function(e) { divMouseMove(that, e);});
-			
 		if (this._direction) {
 			jQuery(complete).find("*").css("float", "left");
 			scroll.css("left", "0px");
