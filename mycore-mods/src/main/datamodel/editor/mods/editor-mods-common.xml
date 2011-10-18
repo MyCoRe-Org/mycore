@@ -27,6 +27,12 @@
     </cell>
   </panel>
 
+  <panel id="mods.title.optional">
+    <cell anchor="NORTHWEST" var="mods:title">
+      <textarea width="60" height="3" />
+    </cell>
+  </panel>
+
   <helpPopup id="mods.title.help" width="400px" height="250px">
     <label xml:lang="de">
       Der Titel des Dokumentes oder Objekts, unter dem es formell bekannt ist.
@@ -231,6 +237,22 @@
       </panel>
     </cell>
   </panel>
+  
+  <text id="mods.publisher.label.optional">
+    <label xml:lang="de">Verleger </label>
+    <label xml:lang="en">Publisher </label>
+  </text>
+
+  <panel id="mods.publisher.optional">
+    <cell anchor="NORTHWEST" var="mods:publisher">
+      <panel>
+        <cell anchor="NORTHWEST" >
+          <textfield  width="60" maxlength="512" >
+          </textfield>
+        </cell>
+      </panel>
+    </cell>
+  </panel>
 
   <helpPopup id="mods.publisher.help" width="400px" height="250px">
     <label xml:lang="de">
@@ -341,6 +363,17 @@
       </panel>
     </cell>
   </panel>
+  
+  <panel id="mods.dateIssued.optional">
+    <cell anchor="NORTHWEST" var="mods:dateIssued">
+      <panel>
+        <cell anchor="NORTHWEST">
+          <textfield width="60" maxlength="512">
+          </textfield>
+        </cell>
+      </panel>
+    </cell>
+  </panel>
 
   <helpPopup id="mods.dateIssued.help" width="400px" height="250px">
     <label xml:lang="de">
@@ -355,6 +388,7 @@
 
     </label>
   </helpPopup>
+  
   <!-- Datum der Veröffentlichung END -->
 
   <!-- Datum der Erstellung [text] -->
@@ -805,13 +839,18 @@
       <hidden var="mods:role/mods:roleTerm/@type" default="text" />
       <panel>
         <cell col="1" row="1" anchor="EAST" var="mods:namePart">
-          <panel>
-            <cell anchor="NORTHWEST" ref="TFzeile512" />
-          </panel>
+            <textfield id="mods.nameConference.text" width="60" maxlength="512" >
+             <condition id="mods.nameConference.text.cond" required="true">
+                <label xml:lang="de">Tragen Sie hier den Titel der Konferenz ein.</label>
+                <label xml:lang="en">Enter the title of the conference here.</label>
+             </condition>
+            </textfield>
         </cell>
       </panel>
     </cell>
-  </panel>
+    </panel>
+
+
 
   <helpPopup id="mods.nameConference.help" width="400px" height="250px">
     <label xml:lang="de">Der Name der Konferenz ein.</label>

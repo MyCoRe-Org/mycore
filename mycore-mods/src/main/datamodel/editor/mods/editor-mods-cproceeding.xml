@@ -16,10 +16,45 @@
     <hidden var="metadata/def.modsContainer/@notinherit" default="true" />
     <hidden var="metadata/def.modsContainer/@heritable" default="false" />
 
+    <cell row="05" colspan="3">
+    <panel style="width:100%;">
+    <!-- Konferenztitel -->
+        <cell row="10" col="1" anchor="NORTHEAST" ref="mods.nameConference.label" />
+        <cell row="10" col="2" anchor="NORTHWEST" ref="mods.nameConference" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+        <cell row="10" col="3" anchor="NORTHEAST" ref="mods.nameConference.help" />
+    <!-- Konferenztitel END -->
 
+    <!-- Konferenzzeitraum -->
+        <cell row="20" col="1" anchor="NORTHEAST" ref="mods.dateOccured.label" />
+        <cell row="20" col="2" anchor="NORTHWEST" ref="mods.dateOccured" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
+        <cell row="20" col="3" anchor="NORTHWEST" ref="mods.dateOccured.help" />
+    <!-- Konferenzzeitraum END -->
+
+    <!-- Ort -->
+        <cell row="30" col="1" anchor="NORTHEAST" ref="mods.conferencePlace.label" />
+        <cell row="30" col="2" anchor="NORTHWEST" ref="mods.conferencePlace" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
+        <cell row="30" col="3" anchor="NORTHWEST" ref="mods.conferencePlace.help" />
+    <!-- Ort END -->
+
+    <!-- Land -->
+        <cell row="40" col="1" anchor="NORTHEAST" ref="mods.conferenceLand.label" />
+        <cell row="40" col="2" anchor="NORTHWEST" ref="mods.conferenceLand" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
+        <cell row="40" col="3" anchor="NORTHWEST" ref="mods.conferenceLand.help" />
+    <!-- Land END -->
+    </panel>
+    </cell>
+
+      
+    <cell row="10" colspan="3" class="border">
+    <panel style="width:100%;">
     <!-- TITLE -->
-    <cell row="10" col="1" anchor="NORTHEAST" ref="mods.title.label" />
-    <cell row="10" col="2" anchor="NORTHWEST" ref="mods.title" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
+    <cell row="10" col="1" anchor="NORTHEAST">
+    <text>
+        <label xml:lang="de">Titel des Konferenzbandes (*)</label>
+        <label xml:lang="en">Title of Conference Proceedings (*)</label>
+      </text>
+    </cell>
+    <cell row="10" col="2" anchor="NORTHWEST" ref="mods.title.optional" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
     <cell row="10" col="3" anchor="NORTHWEST" ref="mods.title.help" />
     <!-- TITLE END -->
 
@@ -31,18 +66,19 @@
 
     <!-- Herausgabejahr -->
     <cell row="30" col="1" anchor="NORTHEAST">
-      <text>
-        <label xml:lang="de">Herausgabejahr (*)</label>
-        <label xml:lang="en">Date Issued (*)</label>
+    <text>
+        <label xml:lang="de">Erscheinungsjahr</label>
+        <label xml:lang="en">Date Issued</label>
       </text>
     </cell>
-    <cell row="30" col="2" anchor="NORTHWEST" ref="mods.dateIssued" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
+    <cell row="30" col="2" anchor="NORTHWEST" ref="mods.dateIssued.optional" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
     <cell row="30" col="3" anchor="NORTHWEST" ref="mods.dateIssued.help" />
     <!-- Herausgabejahr END -->
 
     <!-- Herausgeber [text] -->
-    <cell row="40" col="1" anchor="NORTHEAST" ref="mods.publisher.label" />
-    <cell row="40" col="2" anchor="NORTHWEST" ref="mods.publisher" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
+    
+    <cell row="40" col="1" anchor="NORTHEAST" ref="mods.publisher.label.optional" />
+    <cell row="40" col="2" anchor="NORTHWEST" ref="mods.publisher.optional" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
     <cell row="40" col="3" anchor="NORTHWEST" ref="mods.publisher.help" />
     <!-- Herausgeber END -->
 
@@ -57,36 +93,11 @@
     <cell row="60" col="2" anchor="NORTHWEST" ref="mods.corporation" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="60" col="3" anchor="NORTHWEST" ref="mods.corporation.help" />
     <!-- Körperschaft END -->
+    </panel>
+    </cell>
+    <cell row="100" col="1" colspan="3" anchor="NORTHEAST" ref="mods.noteLocationCorp" var="metadata/def.modsContainer/modsContainer/mods:mods" />
 
-  <cell row="70" colspan="3" class="border"><panel style="width:100%;">
-    <!-- Konferenztitel -->
-    <cell row="10" col="1" anchor="NORTHEAST" ref="mods.nameConference.label" />
-    <cell row="10" col="2" anchor="NORTHWEST" ref="mods.nameConference" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="10" col="3" anchor="NORTHEAST" ref="mods.nameConference.help" />
-    <!-- Konferenztitel END -->
-
-    <!-- Konferenzzeitraum -->
-    <cell row="20" col="1" anchor="NORTHEAST" ref="mods.dateOccured.label" />
-    <cell row="20" col="2" anchor="NORTHWEST" ref="mods.dateOccured" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
-    <cell row="20" col="3" anchor="NORTHWEST" ref="mods.dateOccured.help" />
-    <!-- Konferenzzeitraum END -->
-
-    <!-- Ort -->
-    <cell row="30" col="1" anchor="NORTHEAST" ref="mods.conferencePlace.label" />
-    <cell row="30" col="2" anchor="NORTHWEST" ref="mods.conferencePlace" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
-    <cell row="30" col="3" anchor="NORTHWEST" ref="mods.conferencePlace.help" />
-    <!-- Ort END -->
-
-    <!-- Land -->
-    <cell row="40" col="1" anchor="NORTHEAST" ref="mods.conferenceLand.label" />
-    <cell row="40" col="2" anchor="NORTHWEST" ref="mods.conferenceLand" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
-    <cell row="40" col="3" anchor="NORTHWEST" ref="mods.conferenceLand.help" />
-    <!-- Land END -->
-  </panel></cell>
-
-    <cell row="100" col="1" colspan="3" anchor="NORTHEAST" ref="mods.noteLocationCorp" var="metadata/def.modsContainer/modsContainer/mods:mods"/>
-
-    <cell col="1" colspan="3" row="150" anchor="NORTHEAST" style="padding-top:20px;">
+    <cell row="150" col="1" colspan="3" anchor="NORTHEAST" style="padding-top:20px;">
       <submitButton width="100px" i18n="common.button.save" />
       <cancelButton width="100px" i18n="common.button.cancel" />
     </cell>
