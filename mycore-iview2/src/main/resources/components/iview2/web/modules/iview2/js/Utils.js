@@ -1,4 +1,6 @@
-var iview = iview || {};
+var iview = iview || {}; // holds API
+var Iview = Iview || {}; // holds instances
+
 iview.utils = iview.utils || {};
 /**
  * @class
@@ -106,6 +108,20 @@ iview.utils.SimpleIterator = function(objectIterate) {
 	prototype.next = next;
 	prototype.hasPrevious = hasPrevious;
 	prototype.previous = previous;
+})();
+
+iview.IViewObject = (function(){
+  "use strict";
+  function constructor(iviewInst){
+    this._iview=iviewInst;
+    hideProperty(this,"_iview", false);
+  }
+  constructor.prototype = {
+      getViewer: function iv_getViewer(){
+        return this._iview;
+      }
+  };
+  return constructor;
 })();
 
 /**

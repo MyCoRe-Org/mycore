@@ -52,8 +52,6 @@
                 <jsSourceFile>PanoJS.js</jsSourceFile>
                 <jsSourceFile>PanoJS.addition.js</jsSourceFile>
                 <jsSourceFile>preload.js</jsSourceFile>
-                <!-- Viewer -->
-                <jsSourceFile>init.js</jsSourceFile>
                 <!-- new API -->
                 <jsSourceFile>iviewInstance.js</jsSourceFile>
                 <jsSourceFile>properties.js</jsSourceFile>
