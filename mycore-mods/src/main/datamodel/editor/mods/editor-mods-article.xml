@@ -46,7 +46,7 @@
             </cell>
             <cell var="mods:detail[@type='issue']/mods:number" col="2" anchor="NORTHWEST" ref="TFzeile10" />
             <cell col="3" anchor="NORTHEAST">
-              <helpPopup >
+              <helpPopup id="mods.number.help">
                 <label xml:lang="de">Heftnummer <br />
                 Angabe der Heft Nr., z.B.: "Heft" "12", oder "No." "12"</label>
                 <label xml:lang="en">Issue number<br/>

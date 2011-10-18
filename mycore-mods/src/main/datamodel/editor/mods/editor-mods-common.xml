@@ -540,7 +540,7 @@
 
   <!-- Kommentar -->
   <text id="mods.note.label">
-    <label xml:lang="de">Kommentar</label>
+    <label xml:lang="de">Bemerkung</label>
     <label xml:lang="en">Comment</label>
   </text>
 
@@ -560,8 +560,8 @@
 
   <!-- Standort -->
   <text id="mods.physicalLocation.label">
-    <label xml:lang="de">Standort</label>
-    <label xml:lang="en">Location</label>
+    <label xml:lang="de">Physischer Standort</label>
+    <label xml:lang="en">PhysicalLocation</label>
   </text>
   <panel id="mods.physicalLocation">
     <cell anchor="NORTHWEST" var="mods:physicalLocation">
@@ -721,7 +721,7 @@
     </label>
   </helpPopup>
   <!-- Bei Postern -> Größe [text] END -->
-
+ 
   <!-- pub_genre -->
   <text id="mods.genre.kindOfReport.label">
     <label xml:lang="de">Genre (*)</label>
