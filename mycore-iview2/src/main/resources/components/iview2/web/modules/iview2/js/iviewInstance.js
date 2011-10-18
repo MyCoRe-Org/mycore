@@ -326,8 +326,6 @@
 			this.thumbnailPanel.setSelected(this.PhysicalModel.getCurPos());
 		}
 		
-//		this.gen.handleScrollbars("resize");
-		
 		callBack(callback);
 		//notify all listeners that the viewer was modified in such way that they possibly need adaptation of their own view
 		jQuery(viewerBean.viewer).trigger("reinit.viewer");

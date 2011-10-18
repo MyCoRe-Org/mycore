@@ -631,9 +631,9 @@ PanoJS.prototype = {
 		this.x = coords.x - after.x;
 		this.y = coords.y - after.y;
 		this.zoomLevel += direction;
-		this.positionTiles();
-
+		
 		this.notifyViewerZoomed();
+		this.positionTiles();
 	},
 
 	/** 
