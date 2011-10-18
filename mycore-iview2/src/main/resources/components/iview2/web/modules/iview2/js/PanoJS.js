@@ -110,6 +110,7 @@ function PanoJS(viewer, options) {
 	this.images = [];
 	//create Cache Object where the size is the amount of tiles which can be displayed at once plus one row/column on each site
 	this.cache = new Cache((Math.ceil(screen.availWidth / this.tileSize) + 2) *  (Math.ceil(screen.availHeight / this.tileSize) + 2));
+	this.cche = {};
 	var blankTile = options.blankTile ? options.blankTile : PanoJS.BLANK_TILE_IMAGE;
 	var loadingTile = options.loadingTile ? options.loadingTile : PanoJS.LOADING_TILE_IMAGE;
 	this.blankImg = new Image();
@@ -511,11 +512,10 @@ PanoJS.prototype = {
 			this.well.removeChild(tile.element);
 		}
 
-		var tileImg = this.cache.getItem(tileImgId);
+		var tileImg = this.cche[tileImgId];
 		// create cache if not exist
 		if (tileImg == null) {
-			tileImg = this.createPrototype(src);
-			this.cache.setItem(tileImgId, tileImg);
+			tileImg = this.cche[tileImgId] = this.createPrototype(src);
 		}
 
 		if (useBlankImage || !PanoJS.USE_LOADER_IMAGE || tileImg.complete || (tileImg.image && tileImg.image.complete)) {
@@ -530,10 +530,9 @@ PanoJS.prototype = {
 		}
 		else {
 			var loadingImgId = 'loading:' + tile.qx + ':' + tile.qy;
-			var loadingImg = this.cache.getItem(loadingImgId);
+			var loadingImg = this.cache[loadingImgId];
 			if (loadingImg == null) {
-				loadingImg = this.createPrototype(this.loadingImg.src);
-				this.cache.setItem(loadingImg);
+				loadingImg = this.cache[loadingImgId] = this.createPrototype(this.loadingImg.src);
 			}
 
 			loadingImg.targetSrc = tileImgId;

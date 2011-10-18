@@ -219,12 +219,23 @@ PanoJS.prototype.isloaded = function(img) {
 
 PanoJS.prototype.blank = function() {
 	var iterator = this.cache.iterator();
-	var img;
+	var entry;
 	while (iterator.hasNext()) {
-		img = iterator.next().value;
+		entry = iterator.next();
+		if (entry.value.parentNode != null) {
+			entry.value.parentNode.removeChild(entry.value);
+			entry.value.parentNode = null;
+		}
+	}
+	for (imgId in this.cche) {
+		var img = this.cche[imgId];
+		img.onload = function() {};
+		if (img.image) {
+			img.image.onload = function() {};
+		}
+
 		if (img.parentNode != null) {
 			this.well.removeChild(img);
-			img.parentNode = null;
 		}
 	}
 }
@@ -267,7 +278,7 @@ PanoJS.prototype.zoom = function (direction) {
 	currentImage.zoomInfo.curZoom = this.zoomLevel;
 	currentImage.curWidth = (currentImage.width / Math.pow(2, currentImage.zoomInfo.maxZoom - currentImage.zoomInfo.curZoom))*currentImage.zoomInfo.scale;
 	currentImage.curHeight = (currentImage.height / Math.pow(2, currentImage.zoomInfo.maxZoom - currentImage.zoomInfo.curZoom))*currentImage.zoomInfo.scale;
-
+console.log("zoomed")
 	this.positionTiles();
 	this.notifyViewerZoomed();
 };
