@@ -39,6 +39,36 @@
     <cell row="30" col="2" anchor="NORTHWEST" ref="mods.author" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="30" col="3" anchor="NORTHWEST" ref="mods.author.help" />
     <!-- pub_autor_dok_txt [text] and reviewer END -->
+    <!-- pub_genre -->
+    <cell row="35" col="1" anchor="NORTHEAST">
+      <text>
+        <label xml:lang="de">Genre (*)</label>
+        <label xml:lang="en">Genre (*)</label>
+      </text>
+    </cell>
+    <cell row="35" col="2" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre">
+      <panel>
+        <hidden var="@type" default="kindof" />
+        <hidden var="@displayLabel" default="Kind of Publication" />
+        <cell var="@mcr:categId">
+          <list width="30" type="dropdown" id="mods.genre.kindOfPublication.list">
+            <include ref="pleaseSelect" />
+            <include uri="classification:editorComplete:-1:children:mods_genres:confpub" cacheable="false" />
+            <condition id="mods.genre.kindOfPublication.cond" required="true">
+              <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
+              <label xml:lang="en">Please select one entry!</label>
+            </condition>
+          </list>
+        </cell>
+      </panel>
+    </cell>
+    <cell row="35" col="3" anchor="NORTHEAST">
+      <helpPopup id="mods.genre.kindOfPublication.help" width="400px" height="250px">
+        <label xml:lang="de">Eine Zuordnung zu einem in der Liste verfügbaren Genre .</label>
+        <label xml:lang="en">Entry from the list.</label>
+      </helpPopup>
+    </cell>
+  <!-- pub_genre END -->
 
     <!-- Identifier -->
     <cell row="40" col="1" anchor="NORTHEAST" ref="mods.identifier.label" />
