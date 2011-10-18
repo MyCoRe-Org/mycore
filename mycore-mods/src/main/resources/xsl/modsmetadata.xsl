@@ -510,9 +510,14 @@
         <td class="metavalue">
           <!-- Journal -->
           <!-- Issue -->
-          <xsl:value-of select="concat(mods:part/mods:detail[@type='issue']/mods:caption,' ',mods:part/mods:detail[@type='issue']/mods:number,'/',mods:part/mods:date,' ')"/>
+          <xsl:value-of select="concat(mods:part/mods:detail[@type='issue']/mods:caption,' ',mods:part/mods:detail[@type='issue']/mods:number)"/>
+          <xsl:if test="mods:part/mods:date">
+            <xsl:value-of select="concat('/',mods:part/mods:date,' ')"/>
+          </xsl:if>
           <!-- Volume -->
-          <xsl:value-of select="concat('(',i18n:translate('metaData.mods.dictionary.volume.article'),': ',mods:part/mods:detail[@type='volume']/mods:number,')')"/>
+          <xsl:if test="mods:part/mods:detail[@type='volume']/mods:number">
+            <xsl:value-of select="concat('(',i18n:translate('metaData.mods.dictionary.volume.article'),': ',mods:part/mods:detail[@type='volume']/mods:number,')')"/>
+          </xsl:if>
           <!-- Pages -->
           <xsl:for-each select="mods:part/mods:extent[@unit='pages']">
             <xsl:value-of select="concat(', ', i18n:translate('metaData.mods.dictionary.page.abbr'),' ')"/>
