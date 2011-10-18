@@ -16,32 +16,41 @@
     <hidden var="metadata/def.modsContainer/@notinherit" default="true" />
     <hidden var="metadata/def.modsContainer/@heritable" default="false" />
 
-    <cell row="05" colspan="3">
-    <panel style="width:100%;">
-    <!-- Konferenztitel -->
-        <cell row="10" col="1" anchor="NORTHEAST" ref="mods.nameConference.label" />
-        <cell row="10" col="2" anchor="NORTHWEST" ref="mods.nameConference" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-        <cell row="10" col="3" anchor="NORTHEAST" ref="mods.nameConference.help" />
-    <!-- Konferenztitel END -->
-
-    <!-- Konferenzzeitraum -->
-        <cell row="20" col="1" anchor="NORTHEAST" ref="mods.dateOccured.label" />
-        <cell row="20" col="2" anchor="NORTHWEST" ref="mods.dateOccured" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
-        <cell row="20" col="3" anchor="NORTHWEST" ref="mods.dateOccured.help" />
-    <!-- Konferenzzeitraum END -->
-
-    <!-- Ort -->
-        <cell row="30" col="1" anchor="NORTHEAST" ref="mods.conferencePlace.label" />
-        <cell row="30" col="2" anchor="NORTHWEST" ref="mods.conferencePlace" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
-        <cell row="30" col="3" anchor="NORTHWEST" ref="mods.conferencePlace.help" />
-    <!-- Ort END -->
-
-    <!-- Land -->
-        <cell row="40" col="1" anchor="NORTHEAST" ref="mods.conferenceLand.label" />
-        <cell row="40" col="2" anchor="NORTHWEST" ref="mods.conferenceLand" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
-        <cell row="40" col="3" anchor="NORTHWEST" ref="mods.conferenceLand.help" />
-    <!-- Land END -->
-    </panel>
+    <cell row="05" colspan="3" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@type='conference']">
+      <repeater min="1" max="5">
+        <panel style="width:100%;">
+        <!-- Konferenztitel -->
+            <cell row="10" col="1" anchor="NORTHEAST" ref="mods.nameConference.label" />
+            <cell row="10" col="2" anchor="NORTHWEST" var="mods:namePart">
+              <repeater min="1" max="5">
+                <textfield id="mods.nameConference.tf" width="60" maxlength="512">
+                  <condition id="mods.nameConference.cond" required="true">
+                    <label xml:lang="de">Tragen Sie hier den Titel der Konferenz ein.</label>
+                    <label xml:lang="en">Enter the title of the conference here.</label>
+                  </condition>
+                </textfield>
+              </repeater>
+            </cell>
+            <cell row="10" col="3" anchor="NORTHEAST" ref="mods.nameConference.help" />
+        <!-- Konferenztitel END -->
+    
+        <!-- Konferenzzeitraum -->
+            <cell row="20" col="1" anchor="NORTHEAST" ref="mods.dateOccured.label" />
+            <cell row="20" col="2" anchor="NORTHWEST" ref="TFzeile512" var="mods:namePart[@type='date']" />
+            <cell row="20" col="3" anchor="NORTHWEST" ref="mods.dateOccured.help" />
+        <!-- Konferenzzeitraum END -->
+    
+        <!-- Ort -->
+            <cell row="30" col="1" anchor="NORTHEAST" ref="mods.conferencePlace.label" />
+            <cell row="30" col="2" anchor="NORTHWEST" var="mods:affiliation">
+              <repeater min="1" max="5">
+                <textfield width="60" maxlength="512" />
+              </repeater>
+            </cell>
+            <cell row="30" col="3" anchor="NORTHWEST" ref="mods.conferencePlace.help" />
+        <!-- Ort END -->
+        </panel>
+      </repeater>
     </cell>
 
       
