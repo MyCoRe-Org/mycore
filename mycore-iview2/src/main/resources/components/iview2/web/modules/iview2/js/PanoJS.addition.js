@@ -1,3 +1,6 @@
+PanoJS.MSG_BEYOND_MIN_ZOOM = 'component.iview2.panojs.minzoom';
+PanoJS.MSG_BEYOND_MAX_ZOOM = 'component.iview2.panojs.maxzoom';
+
 /**
  * @public
  * @function
@@ -225,6 +228,49 @@ PanoJS.prototype.blank = function() {
 		}
 	}
 }
+
+PanoJS.prototype.zoom = function (direction) {
+	// ensure we are not zooming out of range
+	if (this.zoomLevel + direction < 0) {
+		if (PanoJS.MSG_BEYOND_MIN_ZOOM) {
+			alert(i18n.translate(PanoJS.MSG_BEYOND_MIN_ZOOM));
+		}
+		return;
+	}
+	else if (this.zoomLevel + direction > this.maxZoomLevel) {
+		if (PanoJS.MSG_BEYOND_MAX_ZOOM) {
+			alert(i18n.translate(PanoJS.MSG_BEYOND_MAX_ZOOM));
+		}
+		return;
+	}
+
+	this.blank();
+
+	var coords = { 'x' : Math.floor(this.width / 2), 'y' : Math.floor(this.height / 2) };
+
+	var before = {
+		'x' : (coords.x - this.x),
+		'y' : (coords.y - this.y)
+	};
+
+	var after = {
+		'x' : Math.floor(before.x * Math.pow(2, direction)),
+		'y' : Math.floor(before.y * Math.pow(2, direction))
+	};
+
+	this.x = coords.x - after.x;
+	this.y = coords.y - after.y;
+	this.zoomLevel += direction;
+
+	//calculate new zoom properties
+	var currentImage = this.iview.currentImage;
+	currentImage.zoomInfo.curZoom = this.zoomLevel;
+	currentImage.curWidth = (currentImage.width / Math.pow(2, currentImage.zoomInfo.maxZoom - currentImage.zoomInfo.curZoom))*currentImage.zoomInfo.scale;
+	currentImage.curHeight = (currentImage.height / Math.pow(2, currentImage.zoomInfo.maxZoom - currentImage.zoomInfo.curZoom))*currentImage.zoomInfo.scale;
+
+	this.positionTiles();
+	this.notifyViewerZoomed();
+};
 
 //IE and Opera doesn't accept our TileUrlProvider Instance as one of PanoJS
 PanoJS.isInstance = function () {return true;};
