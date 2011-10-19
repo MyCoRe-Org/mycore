@@ -48,7 +48,7 @@ public class MCREditorDataResolver implements MCRResolver {
      * @see org.mycore.common.xml.MCRURIResolver.MCRResolver#resolveElement(java.lang.String)
      */
     public Element resolveElement(String uri) throws Exception {
-        String[] tokens = uri.split(":",3);
+        String[] tokens = uri.split(":", 3);
         String sessionID = tokens[1];
         String xPath = tokens[2];
         xPath = fixAttributeConditionsInXPath(xPath);
@@ -63,11 +63,15 @@ public class MCREditorDataResolver implements MCRResolver {
     }
 
     private String fixAttributeConditionsInXPath(String xPath) {
-        String pattern = "__([a-zA-Z0-9]+)__([a-zA-Z0-9]+)";
+        String pattern = "__([a-zA-Z0-9]+)__([a-zA-Z0-9_-]+)";
         StringBuffer sb = new StringBuffer();
         Matcher m = Pattern.compile(pattern).matcher(xPath);
-        while (m.find())
-            m.appendReplacement(sb, "[@" + m.group(1) + "='" + m.group(2) + "']");
+        while (m.find()) {
+            String attributeName = m.group(1);
+            String attributeValue = m.group(2).replace(MCREditorSubmission.BLANK_ESCAPED, MCREditorSubmission.BLANK);
+            String condition = "[@" + attributeName + "='" + attributeValue + "']";
+            m.appendReplacement(sb, condition);
+        }
         m.appendTail(sb);
         xPath = sb.toString();
         return xPath;

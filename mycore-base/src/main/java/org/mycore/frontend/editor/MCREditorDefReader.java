@@ -369,9 +369,10 @@ public class MCREditorDefReader {
             Element element = (Element) iter.next();
             String var = element.getAttributeValue("var", "");
             if (var.contains("[@")) {
-                var = var.replace("[@", "__");
-                var = var.replace("='", "__");
+                var = var.replace("[@", MCREditorSubmission.ATTR_SEP);
+                var = var.replace("='", MCREditorSubmission.ATTR_SEP);
                 var = var.replace("']", "");
+                var = var.replace(MCREditorSubmission.BLANK, MCREditorSubmission.BLANK_ESCAPED);
                 element.setAttribute("var", var);
             }
         }

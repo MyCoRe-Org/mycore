@@ -262,8 +262,9 @@ public class MCREditorServlet extends MCRServlet {
             if (name.length() > 5) {
                 name = root + "/" + name.substring(5);
                 if (name.contains("[@")) {
-                    name = name.replace("[@", "__");
-                    name = name.replace("='", "__");
+                    name = name.replace("[@", MCREditorSubmission.ATTR_SEP);
+                    name = name.replace("='", MCREditorSubmission.ATTR_SEP);
+                    name = name.replace(MCREditorSubmission.BLANK, MCREditorSubmission.BLANK_ESCAPED);
                     name = name.replace("']", "");
                 }
             } else {
@@ -298,7 +299,8 @@ public class MCREditorServlet extends MCRServlet {
         for (Enumeration e = parms.getParameterNames(); e.hasMoreElements();) {
             String name = (String) e.nextElement();
 
-            if (name.startsWith("_p-") || name.startsWith("_m-") || name.startsWith("_u-") || name.startsWith("_d-") || name.startsWith("_s-")) {
+            if (name.startsWith("_p-") || name.startsWith("_m-") || name.startsWith("_u-") || name.startsWith("_d-")
+                    || name.startsWith("_s-")) {
                 button = name;
 
                 break;
@@ -409,7 +411,8 @@ public class MCREditorServlet extends MCRServlet {
         }
     }
 
-    private void processTargetSubmission(MCRServletJob job, MCRRequestParameters parms, Element editor) throws ServletException, java.io.IOException {
+    private void processTargetSubmission(MCRServletJob job, MCRRequestParameters parms, Element editor) throws ServletException,
+            java.io.IOException {
         logger.debug("Editor: processTargetSubmission ");
 
         HttpServletRequest req = job.getRequest();
@@ -491,7 +494,8 @@ public class MCREditorServlet extends MCRServlet {
         }
     }
 
-    private void sendToServlet(HttpServletRequest req, HttpServletResponse res, MCREditorSubmission sub) throws IOException, ServletException {
+    private void sendToServlet(HttpServletRequest req, HttpServletResponse res, MCREditorSubmission sub) throws IOException,
+            ServletException {
         String name = sub.getParameters().getParameter("_target-name");
         String url = sub.getParameters().getParameter("_target-url");
 
@@ -527,7 +531,8 @@ public class MCREditorServlet extends MCRServlet {
      * 
      * @throws IOException
      */
-    private void sendToWebAppFile(HttpServletRequest req, HttpServletResponse res, MCREditorSubmission sub, Element editor) throws IOException {
+    private void sendToWebAppFile(HttpServletRequest req, HttpServletResponse res, MCREditorSubmission sub, Element editor)
+            throws IOException {
         String path = sub.getParameters().getParameter("_target-name");
 
         logger.debug("Writing editor output to webapp file " + path);
@@ -573,7 +578,8 @@ public class MCREditorServlet extends MCRServlet {
         res.sendRedirect(res.encodeRedirectURL(sb.toString()));
     }
 
-    private void sendToDebug(HttpServletResponse res, Document unprocessed, MCREditorSubmission sub) throws IOException, UnsupportedEncodingException {
+    private void sendToDebug(HttpServletResponse res, Document unprocessed, MCREditorSubmission sub) throws IOException,
+            UnsupportedEncodingException {
         res.setContentType("text/html; charset=UTF-8");
 
         PrintWriter pw = res.getWriter();

@@ -78,11 +78,11 @@ public class MCREditorSubmission {
 
     private String rootName;
 
-    private final static String ATTR_SEP = "__";
+    public final static String ATTR_SEP = "__";
 
-    private final static String BLANK = " ";
+    public final static String BLANK = " ";
 
-    private final static String BLANK_ESCAPED = "_-_";
+    public final static String BLANK_ESCAPED = "_-_";
 
     /**
      * Set variables from source xml file that should be edited
