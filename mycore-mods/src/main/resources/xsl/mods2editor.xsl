@@ -7,7 +7,7 @@
   <xsl:template match="*[@authority or @authorityURI]">
     <xsl:copy>
       <xsl:variable name="classNodes" select="mcrmods:getMCRClassNodes(.)" />
-      <xsl:apply-templates select='$classNodes/@*|@*|node()' />
+      <xsl:apply-templates select="$classNodes/@*|@*|node()" />
     </xsl:copy>
   </xsl:template>
 
@@ -64,6 +64,12 @@
       </nameOrPND>
       <xsl:apply-templates select="*[not((local-name()='namePart'))]" />
     </xsl:copy>
+  </xsl:template>
+  
+  <xsl:template match="mods:namePart[@type='date']">
+    <mods:namePartDate>
+      <xsl:apply-templates select="@*|node()" />
+    </mods:namePartDate>
   </xsl:template>
   
   <xsl:template match="mods:name[@type='corporate']">

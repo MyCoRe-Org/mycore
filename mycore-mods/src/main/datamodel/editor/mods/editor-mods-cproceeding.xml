@@ -36,7 +36,8 @@
     
         <!-- Konferenzzeitraum -->
             <cell row="20" col="1" anchor="NORTHEAST" ref="mods.dateOccured.label" />
-            <cell row="20" col="2" anchor="NORTHWEST" ref="TFzeile512" var="mods:namePart[@type='date']" />
+            <!-- namePartDate is transformed to mods:date[@type='date'] -->
+            <cell row="20" col="2" anchor="NORTHWEST" ref="TFzeile512" var="mods:namePartDate" />
             <cell row="20" col="3" anchor="NORTHWEST" ref="mods.dateOccured.help" />
         <!-- Konferenzzeitraum END -->
     

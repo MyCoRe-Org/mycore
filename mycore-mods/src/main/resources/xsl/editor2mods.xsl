@@ -29,6 +29,12 @@
       </xsl:copy>
     </xsl:if>
   </xsl:template>
+  
+  <xsl:template match="mods:namePartDate">
+    <mods:namePart type="date">
+      <xsl:apply-templates select="@*|node()" />
+    </mods:namePart>
+  </xsl:template>
 
   <xsl:template match="mods:identifier|mods:abstract">
     <!-- copy only if element has text node -->
