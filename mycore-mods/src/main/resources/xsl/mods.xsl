@@ -171,6 +171,12 @@
     </xsl:message>
 
     <div id="detail_view" class="blockbox">
+      <div id="editor-buttons">
+        <xsl:call-template name="mods.editobject_without_table">
+          <xsl:with-param select="./@ID" name="id" />
+          <xsl:with-param select="$mods-type" name="layout" />
+        </xsl:call-template>
+      </div>
       <h3>
         <xsl:apply-templates select="." mode="title" />
       </h3>
@@ -212,10 +218,6 @@
         </h4>
         <div id="derivate_content" class="block_content">
           <table class="metaData">
-            <xsl:call-template name="mods.editobject_with_der">
-              <xsl:with-param select="./@ID" name="id" />
-              <xsl:with-param select="$mods-type" name="layout" />
-            </xsl:call-template>
             <xsl:variable name="child-layout">
               <xsl:choose>
                 <xsl:when test="$mods-type = 'book'">
