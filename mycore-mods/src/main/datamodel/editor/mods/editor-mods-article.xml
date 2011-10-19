@@ -20,7 +20,7 @@
     <cell row="5" colspan="3" anchor="NORTHWEST" ref="displayParent" />
 
     <!-- pub_title_orig [text] -->
-    <cell row="10" col="1" anchor="NORTHEAST" ref="mods.title.label" />
+    <cell row="10" col="1" style="width:150px;" anchor="NORTHEAST" ref="mods.title.label" />
     <cell row="10" col="2" anchor="NORTHWEST" ref="mods.title" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
     <cell row="10" col="3" anchor="NORTHWEST" ref="mods.title.help" />
     <!-- pub_title_orig [text] END -->
@@ -41,13 +41,13 @@
 
     <cell row="45" colspan="3" class="border">
       <panel style="width:100%;">
-        <cell var="metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='host']/mods:part">
-          <panel>
-            <cell var="mods:detail[@type='issue']/mods:caption" col="1" anchor="NORTHEAST">
+        <cell row="10" col="1" colspan="3" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='host']/mods:part">
+          <panel style="width:100%;">
+            <cell row="10" col="1" style="width:140px;" var="mods:detail[@type='issue']/mods:caption" anchor="NORTHEAST">
               <textfield width="10" maxlength="512" default="Heft"/>
             </cell>
-            <cell var="mods:detail[@type='issue']/mods:number" col="2" anchor="NORTHWEST" ref="TFzeile10" />
-            <cell col="3" anchor="NORTHEAST">
+            <cell row="10" col="2" var="mods:detail[@type='issue']/mods:number" anchor="NORTHWEST" ref="TFzeile10" />
+            <cell row="10" col="3" anchor="NORTHEAST">
               <helpPopup id="mods.number.help" width="400px" height="250px">
                 <label xml:lang="de">Heftnummer <br />
                 Angabe der Heft Nr., z.B.: "Heft" "12", oder "No." "12"</label>
@@ -61,14 +61,14 @@
                 <label xml:lang="en">Volume</label>
               </text>
             </cell>
-            <cell var="mods:detail[@type='volume']/mods:number" anchor="NORTHWEST" colspan="2" row="20" col="2" ref="TFzeile10"/>
+            <cell row="20" col="2" colspan="2" var="mods:detail[@type='volume']/mods:number" anchor="NORTHWEST" ref="TFzeile10"/>
             <cell row="30" col="1" anchor="NORTHEAST">
               <text>
                 <label xml:lang="de">Jahr</label>
                 <label xml:lang="en">Year</label>
               </text>
             </cell>
-            <cell var="mods:date" row="30" col="2" anchor="NORTHWEST" id="tf.host.year">
+            <cell row="30" col="2" colspan="2" var="mods:date" anchor="NORTHWEST" id="tf.host.year">
               <textfield width="4" maxlength="4">
                 <condition id="tf.host.year.cond" type="datetime" format="yyyy">
                   <label xml:lang="de">Keine gültige Jahreszahl</label>
@@ -84,7 +84,7 @@
                 <cell col="2" anchor="WEST" var="mods:end" ref="TFzeile10" />
               </panel>
             </cell>
-            <cell row="40" col="3" anchor="NORTHWEST" ref="mods.book.pages.range.help" />
+            <cell row="40" col="3" anchor="NORTHEAST" ref="mods.book.pages.range.help" />
     <!-- Seiten von bis END -->
           </panel>
         </cell>
