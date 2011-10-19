@@ -97,6 +97,15 @@
     <cell row="160" col="2" anchor="NORTHWEST" ref="mods.subject" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="160" col="3" anchor="NORTHWEST" ref="mods.subject.help" />
     <!-- Stichworte END -->
+
+    <!-- URL -->
+    <cell row="170" col="1" anchor="NORTHEAST" ref="mods.location.url.label" />
+    <cell row="170" col="2" anchor="NORTHWEST" ref="mods.location.url" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:location" />
+    <cell row="170" col="3" anchor="NORTHWEST" ref="mods.location.url.help" />
+    <cell row="175" col="1" anchor="NORTHEAST" ref="mods.location.url.displayLabel.label" />
+    <cell row="175" col="2" anchor="NORTHWEST" ref="mods.location.url.displayLabel" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:location" />
+    <cell row="175" col="3" anchor="NORTHWEST" ref="mods.location.url.displayLabel.help" />
+    <!-- URL END -->
   </panel></cell>
 
   <!-- Institution-Tripple -->

@@ -18,7 +18,7 @@
 
   <panel id="mods.title">
     <cell anchor="NORTHWEST" var="mods:title">
-      <textarea id="mods.title.text" width="60" height="3">
+      <textarea id="mods.title.text" width="50" height="3">
         <condition id="mods.title.cond" required="true">
           <label xml:lang="de">Tragen Sie hier den Titel des Dokumentes ein.</label>
           <label xml:lang="en">Enter the title of the document here.</label>
@@ -639,10 +639,6 @@
                 <label xml:lang="de">Permalink</label>
                 <label xml:lang="en">Permalink</label>
               </item>
-              <item value="url">
-                <label xml:lang="de">URL</label>
-                <label xml:lang="en">URL</label>
-              </item>
               <item value="uri">
                 <label xml:lang="de">URI</label>
                 <label xml:lang="en">URI</label>
@@ -676,10 +672,6 @@
               <item value="permalink">
                 <label xml:lang="de">Permalink</label>
                 <label xml:lang="en">Permalink</label>
-              </item>
-              <item value="url">
-                <label xml:lang="de">URL</label>
-                <label xml:lang="en">URL</label>
               </item>
               <item value="uri">
                 <label xml:lang="de">URI</label>
@@ -742,7 +734,7 @@
   </text>
 
   <panel id="mods.arev">
-    <cell anchor="NORTHWEST" var="mods:classification[@displayLabel='annual review']">
+    <cell anchor="NORTHWEST" var="mods:classification[@displayLabel='annual_review']">
       <panel>
         <cell var="@mcr:categId">
           <list width="30" type="dropdown" id="mods.arev.list">
@@ -928,7 +920,7 @@
   </text>
 
   <panel id="mods.corporation">
-    <cell anchor="NORTHWEST" var="mods:name[@type='family']"> <!-- ToDo: familiy ist nur ein workaround ... weil 2x corporate nicht geht *arg* -->
+    <cell anchor="NORTHWEST" var="mods:name[@type='corporate']">
       <!-- ToDo: richtige URI finden! -->
       <hidden var="@authority" default="gnd" />
       <!-- ToDo: korrekte Zuordnung fehlt, siehe http://www.loc.gov/marc/relators/relaterm.html -->
@@ -1230,6 +1222,54 @@ Beispiel: 2.203 oder 20.686</label>
   </helpPopup>
   <!-- Impact Factor END -->
 
+  <!-- URL [link] -->
+  <text id="mods.location.url.label">
+    <label xml:lang="de">URL</label>
+    <label xml:lang="en">URL</label>
+  </text>
+
+  <panel id="mods.location.url">
+    <cell anchor="NORTHWEST" var="mods:url">
+      <panel>
+        <cell id="mods.location.url.text" ref="TFzeile512" />
+      </panel>
+    </cell>
+  </panel>
+  
+  <text id="mods.location.url.displayLabel.label">
+    <label xml:lang="de">URL - Anzeige</label>
+    <label xml:lang="en">URL - Display Label</label>
+  </text>
+
+  <panel id="mods.location.url.displayLabel">
+    <cell anchor="NORTHWEST" var="mods:url/@displayLabel">
+      <panel>
+        <cell id="mods.location.url.displayLabel.text" ref="TFzeile512" />
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.location.url.help" width="400px" height="250px">
+    <label xml:lang="de">
+      Hier können Sie eine URL zum beschriebenen Dokument angeben, wenn dieses sich auf Webseiten Dritter befindet, z.B.
+      "http://www.springerlink.com/content/f7uw40686u422430/". <br /><br />
+      Verweise zu anderen Informationen rund um das Dokument gehören nicht hierher. Diese können z.B. im Kommentarfeld
+      oder bei der Beschreibung abgelegt werden.
+    </label>
+    <label xml:lang="en">
+      URL is for an electronic location from which the resource is available.
+    </label>
+  </helpPopup>
+
+  <helpPopup id="mods.location.url.displayLabel.help" width="400px" height="250px">
+    <label xml:lang="de">
+      Geben Sie eine kurze Beschreibung an, die anstelle der URL gezeigt werden soll, z.B. "Version beim Springerverlag".
+    </label>
+    <label xml:lang="en">
+      Display Lable will be shown instead of URL.
+    </label>
+  </helpPopup>
+  <!-- URL END -->
 
   <!-- *** Parents *** -->
   <panel id="displayParent">
@@ -1241,13 +1281,13 @@ Beispiel: 2.203 oder 20.686</label>
         <hidden var="parents/parent/@xlink:type" default="locator" />
         <hidden var="parents/parent/@xlink:label" />
         <hidden var="parents/parent/@xlink:href" />
-        <cell col="1" row="1">
+        <cell col="1" row="1" style="width:85px;" anchor="NORTHEAST">
           <label xml:lang="de">
-            <xhtml:span class="editorlabel">&#160;Vater Objekt&#160;</xhtml:span>
+            <xhtml:span class="editorlabel">Teil von:</xhtml:span>
           </label>
         </cell>
-        <cell col="2" row="1" var="parents" anchor="NORTH">
-          <output var="parent/@xlink:href" default="Kein Vater-Objekt" />
+        <cell col="2" row="1" var="parents" anchor="NORTHWEST">
+          <output var="parent/@editor.parentName" default="Kein Vater-Objekt" />
         </cell>
       </panel>
     </cell>
@@ -1261,8 +1301,8 @@ Beispiel: 2.203 oder 20.686</label>
   <textfield id="TFzeile512" width="60" maxlength="512" />
   <textfield id="TFzeile1024" width="60" maxlength="1024" />
   <!-- *** Text area *** -->
-  <textarea id="TFarea1028" width="60" height="3" />
-  <textarea id="TFarea4096" width="50" height="8" />
+  <textarea id="TFarea1028" width="50" height="3" />
+  <textarea id="TFarea4096" width="43" height="8" />
   <textarea id="TFeditor" wysiwygEditor="true" editorWidth="500" editorHeight="200" width="60" height="10" />
 
   <list id="pleaseSelect">

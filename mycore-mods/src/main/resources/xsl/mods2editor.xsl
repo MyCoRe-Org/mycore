@@ -108,4 +108,12 @@
     </xsl:copy>
   </xsl:template>
 
+  <xsl:template match="parent">
+    <xsl:copy>
+      <xsl:attribute name="editor.parentName">
+        <xsl:value-of select="document(concat('mcrobject:',@xlink:href))/mycoreobject/metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title" />
+      </xsl:attribute>
+    </xsl:copy>
+  </xsl:template>
+
 </xsl:stylesheet>
