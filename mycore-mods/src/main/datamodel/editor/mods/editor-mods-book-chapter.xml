@@ -68,6 +68,12 @@
     <cell row="80" col="2" anchor="NORTHWEST" ref="mods.ddc" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="80" col="3" anchor="NORTHWEST" ref="mods.ddc.help" />
     <!-- pub_klassifik END -->
+    
+    <!-- arev_klassifik -->
+    <cell row="85" col="1" anchor="NORTHEAST" ref="mods.arev.label" />
+    <cell row="85" col="2" anchor="NORTHWEST" ref="mods.arev" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="85" col="3" anchor="NORTHWEST" ref="mods.arev.help" />
+    <!-- arev_klassifik END -->
 
     <!-- Quelle -->
     <cell row="100" col="1" anchor="NORTHEAST" ref="mods.relatedItem.label" />

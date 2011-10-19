@@ -54,6 +54,12 @@
     <cell row="80" col="2" anchor="NORTHWEST" ref="mods.genre.kindOfReport" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="80" col="3" anchor="NORTHWEST" ref="mods.genre.kindOfReport.help" />
     <!-- pub_klassifik END -->
+    
+    <!-- arev_klassifik -->
+    <cell row="85" col="1" anchor="NORTHEAST" ref="mods.arev.label" />
+    <cell row="85" col="2" anchor="NORTHWEST" ref="mods.arev" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="85" col="3" anchor="NORTHWEST" ref="mods.arev.help" />
+    <!-- arev_klassifik END -->
 
     <!-- Identifier -->
     <cell row="90" col="1" anchor="NORTHEAST" ref="mods.identifier.label" />

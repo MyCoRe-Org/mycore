@@ -46,7 +46,7 @@
             </cell>
             <cell var="mods:detail[@type='issue']/mods:number" col="2" anchor="NORTHWEST" ref="TFzeile10" />
             <cell col="3" anchor="NORTHEAST">
-              <helpPopup id="mods.number.help">
+              <helpPopup id="mods.number.help" width="400px" height="250px">
                 <label xml:lang="de">Heftnummer <br />
                 Angabe der Heft Nr., z.B.: "Heft" "12", oder "No." "12"</label>
                 <label xml:lang="en">Issue number<br/>
@@ -93,6 +93,12 @@
           var="metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='host']/mods:originInfo" />
         <cell row="50" col="3" anchor="NORTHWEST" ref="mods.dateIssued.help" />
     <!-- Datum der Veröffentlichung END -->
+
+    <!-- arev_klassifik -->
+    <cell row="55" col="1" anchor="NORTHEAST" ref="mods.arev.label" />
+    <cell row="55" col="2" anchor="NORTHWEST" ref="mods.arev" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="55" col="3" anchor="NORTHWEST" ref="mods.arev.help" />
+    <!-- arev_klassifik END -->
 
     <!-- Identifier -->
         <cell row="70" col="1" anchor="NORTHEAST" ref="mods.identifier.label" />

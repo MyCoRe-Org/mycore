@@ -70,6 +70,12 @@
     </cell>
   <!-- pub_genre END -->
 
+  <!-- arev_klassifik -->
+    <cell row="37" col="1" anchor="NORTHEAST" ref="mods.arev.label" />
+    <cell row="37" col="2" anchor="NORTHWEST" ref="mods.arev" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="37" col="3" anchor="NORTHWEST" ref="mods.arev.help" />
+    <!-- arev_klassifik END -->
+
     <!-- Identifier -->
     <cell row="40" col="1" anchor="NORTHEAST" ref="mods.identifier.label" />
     <cell row="40" col="2" anchor="NORTHWEST" ref="mods.identifier" var="metadata/def.modsContainer/modsContainer/mods:mods" />

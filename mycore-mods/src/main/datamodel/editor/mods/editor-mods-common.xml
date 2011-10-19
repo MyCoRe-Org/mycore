@@ -696,6 +696,31 @@
       ddc categories.</label>
   </helpPopup>
   <!-- DDC pub_klassifik END -->
+  
+  <!-- Jahresberichts Klassifikation -->
+  <text id="mods.arev.label">
+    <label xml:lang="de">Jahresberichtskategorie </label>
+    <label xml:lang="en">Annual review category </label>
+  </text>
+
+  <panel id="mods.arev">
+    <cell anchor="NORTHWEST" var="mods:classification[@displayLabel='annual review']">
+      <panel>
+        <cell var="@mcr:categId">
+          <list width="30" type="dropdown" id="mods.arev.list">
+            <include ref="pleaseSelect" />
+            <include uri="classification:editorComplete:-1:children:annual_review" cacheable="false" />
+          </list>
+        </cell>
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.arev.help" width="400px" height="250px">
+    <label xml:lang="de">Die für den Jahresbericht relevanten Dokumente müssen hier eine Zuordnung erhalten.</label>
+    <label xml:lang="en">The annual report for the relevant documents have to receive an allocation.</label>
+  </helpPopup>
+  <!-- Jahresberichts Klassifikation  END -->
 
   <!-- Bei Postern -> Größe [text] -->
   <text id="mods.physicalDescription.label">
@@ -1007,7 +1032,7 @@
     </cell>
   </panel>
 
-  <helpPopup id="mods.book.volume.count.help">
+  <helpPopup id="mods.book.volume.count.help" width="400px" height="250px">
     <label xml:lang="de">Bei Schrift- und Buchreihen kann es Angaben zum herausgegebenen Jahrgang 
     (Vol.) geben sowie die Bandzählung. </label>
     <label xml:lang="en">Volume Count</label>
@@ -1028,7 +1053,7 @@
     </cell>
   </panel>
 
-  <helpPopup id="mods.article.coverage.help">
+  <helpPopup id="mods.article.coverage.help" width="400px" height="250px">
     <label xml:lang="de">Seiten von-bis</label>
     <label xml:lang="en">Site coverage</label>
   </helpPopup>
@@ -1049,7 +1074,7 @@
     </cell>
   </panel>
 
-  <helpPopup id="mods.book.pages.range.help">
+  <helpPopup id="mods.book.pages.range.help" width="400px" height="250px">
     <label xml:lang="de">Seiten von/bis</label>
     <label xml:lang="en">Pages (Range)</label>
   </helpPopup>
