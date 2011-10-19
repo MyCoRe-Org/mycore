@@ -75,7 +75,7 @@
                 </xsl:if>
                 <xsl:if
                   test="acl:checkPermission($id,'deletedb') and (not(mcrxsl:hasURNDefined($id)) or (mcrxsl:hasURNDefined($id) and $CurrentUser=$MCR.Users.Superuser.UserName))">
-                  <a href="{$ServletsBaseURL}object/delete{$HttpSession}?id={$id}">
+                  <a href="{$ServletsBaseURL}object/delete{$HttpSession}?id={$id}" id="confirm_deletion">
                     <img src="{$WebApplicationBaseURL}images/workflow_objdelete.gif" title="{i18n:translate('object.delObject')}" />
                   </a>
                 </xsl:if>
