@@ -341,7 +341,7 @@
             </td>
             <td class="metavalue">
               <div class="editorButtons">
-                <xsl:if test="acl:checkPermission($id,'writedb')">
+                <xsl:if test="acl:checkPermission('default-derivate','writedb') or acl:checkPermission('default-derivate','writedb')">
                   <xsl:choose>
                     <!-- ***************** -->
                     <!-- object has no urn -->
@@ -352,6 +352,7 @@
                       </a>
                       <xsl:if test="$displayAddDerivate='true'">
                         <a href="{$ServletsBaseURL}derivate/create{$HttpSession}?id={$id}">
+                          <img src="{$WebApplicationBaseURL}images/workflow_deradd.gif" title="{i18n:translate('derivate.addDerivate')}" />
                         </a>
                       </xsl:if>
                       <!-- xsl:if test="mcrxsl:isAllowedObjectForURNAssignment($id)" -->
