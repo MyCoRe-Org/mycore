@@ -29,11 +29,11 @@
     <cell row="20" col="2" anchor="NORTHWEST" ref="mods.title.translated" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="20" col="3" anchor="NORTHWEST" ref="mods.title.translated.help" />
     <!-- pub_title_engl[text] END -->
-
+    
     <!-- pub_autor_dok_txt [text] and reviewer -->
-    <cell row="40" col="1" anchor="NORTHEAST" ref="mods.author.label" />
-    <cell row="40" col="2" anchor="NORTHWEST" ref="mods.author" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="40" col="3" anchor="NORTHWEST" ref="mods.author.help" />
+    <cell row="40" col="1" anchor="NORTHEAST" ref="mods.person.label" />
+    <cell row="40" col="2" anchor="NORTHWEST" ref="mods.person" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="40" col="3" anchor="NORTHWEST" ref="mods.person.help" />
     <!-- pub_autor_dok_txt [text] and reviewer END -->
 
   <cell row="45" colspan="3" class="border"><panel style="width:100%;">

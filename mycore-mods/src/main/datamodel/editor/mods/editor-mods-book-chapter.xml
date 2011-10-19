@@ -20,11 +20,11 @@
     <!-- Konferenzband (Verweis auf MyCoRe-ID) -->
     <cell row="1" colspan="3" anchor="NORTHWEST" ref="displayParent" />
 
-    <!-- Title related Item -->
+    <!-- Title related Item 
     <cell row="5" col="1" anchor="NORTHEAST" ref="mods.related.title.label" />
     <cell row="5" col="2" anchor="NORTHWEST" ref="mods.title" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:titleInfo" />
     <cell row="5" col="3" anchor="NORTHWEST" ref="mods.title.help" />
-    <!-- Title END -->
+ Title END -->
 
     <!-- Seiten von bis -->
     <cell row="10" col="1" anchor="NORTHEAST" ref="mods.book.pages.range.label" />
@@ -43,12 +43,12 @@
     <cell row="20" col="2" anchor="NORTHWEST" ref="mods.title" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
     <cell row="20" col="3" anchor="NORTHWEST" ref="mods.title.help" />
     <!-- Title END -->
-
-    <!-- Author -->
-    <cell row="30" col="1" anchor="NORTHEAST" ref="mods.author.label" />
-    <cell row="30" col="2" anchor="NORTHWEST" ref="mods.author" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="30" col="3" anchor="NORTHWEST" ref="mods.author.help" />
-    <!-- Author END -->
+    
+    <!-- pub_autor_dok_txt [text] and reviewer -->
+    <cell row="30" col="1" anchor="NORTHEAST" ref="mods.person.label" />
+    <cell row="30" col="2" anchor="NORTHWEST" ref="mods.person" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="30" col="3" anchor="NORTHWEST" ref="mods.person.help" />
+    <!-- pub_autor_dok_txt [text] and reviewer END -->
 
   <cell row="35" colspan="3" class="border"><panel style="width:100%;">
     <!-- LANGUAGE -->
