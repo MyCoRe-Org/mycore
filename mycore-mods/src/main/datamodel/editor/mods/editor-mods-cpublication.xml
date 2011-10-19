@@ -78,7 +78,7 @@
 
     <!-- Identifier -->
     <cell row="40" col="1" anchor="NORTHEAST" ref="mods.identifier.label" />
-    <cell row="40" col="2" anchor="NORTHWEST" ref="mods.identifier" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="40" col="2" anchor="NORTHWEST" ref="mods.identifier.optional" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="40" col="3" anchor="NORTHWEST" ref="mods.identifier.help" />
     <!-- Identifier END -->
   </panel></cell>

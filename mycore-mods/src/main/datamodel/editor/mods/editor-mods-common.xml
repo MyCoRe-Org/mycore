@@ -657,6 +657,44 @@
       </repeater>
     </cell>
   </panel>
+  
+  <panel id="mods.identifier.optional">
+    <cell anchor="NORTHWEST" var="mods:identifier">
+      <repeater min="1" max="5" pos="right">
+        <panel>
+          <cell anchor="NORTHWEST" ref="TFzeile512" />
+          <cell row="1" col="2" anchor="NORTHWEST" var="@type">
+            <list type="dropdown" default="doi">
+              <item value="intern_old">
+                <label xml:lang="de">intern</label>
+                <label xml:lang="en">intern</label>
+              </item>
+              <item value="doi">
+                <label xml:lang="de">DOI</label>
+                <label xml:lang="en">DOI</label>
+              </item>
+              <item value="permalink">
+                <label xml:lang="de">Permalink</label>
+                <label xml:lang="en">Permalink</label>
+              </item>
+              <item value="url">
+                <label xml:lang="de">URL</label>
+                <label xml:lang="en">URL</label>
+              </item>
+              <item value="uri">
+                <label xml:lang="de">URI</label>
+                <label xml:lang="en">URI</label>
+              </item>
+              <item value="unknown">
+                <label xml:lang="de">Unbekannt</label>
+                <label xml:lang="en">Unknown</label>
+              </item>
+            </list>
+          </cell>
+        </panel>
+      </repeater>
+    </cell>
+  </panel>
 
   <helpPopup id="mods.identifier.help" width="400px" height="250px">
     <label xml:lang="de">
