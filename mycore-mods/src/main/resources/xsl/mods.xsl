@@ -7,7 +7,7 @@
   <xsl:param name="MCR.Users.Superuser.UserName" />
   <xsl:include href="mods2html.xsl" />
   <xsl:include href="modsmetadata.xsl" />
-  
+
   <xsl:include href="modshitlist-external.xsl" />  <!-- for external usage in application module -->
   <xsl:include href="modsdetails-external.xsl" />  <!-- for external usage in application module -->
   
@@ -90,16 +90,26 @@
   </xsl:template>
   <!--Template for title in metadata view: see mycoreobject.xsl -->
   <xsl:template priority="1" mode="title" match="/mycoreobject[contains(@ID,'_mods_')]">
+    <xsl:variable name="mods-type">
+      <xsl:apply-templates select="." mode="mods-type" />
+    </xsl:variable>
     <xsl:choose>
-      <!-- you could insert any title-like metadata here, e.g. replace "your-tags/here" by something of your metadata -->
-      <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title">
-        <xsl:call-template name="ShortenText">
-          <xsl:with-param name="text" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title[1]" />
-          <xsl:with-param name="length" select="70" />
-        </xsl:call-template>
+      <xsl:when test="$mods-type='cproceeding'">
+        <xsl:apply-templates select="." mode="title.cproceeding" />
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="@ID" />
+        <xsl:choose>
+      <!-- you could insert any title-like metadata here, e.g. replace "your-tags/here" by something of your metadata -->
+          <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title">
+            <xsl:call-template name="ShortenText">
+              <xsl:with-param name="text" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title[1]" />
+              <xsl:with-param name="length" select="70" />
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="@ID" />
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -152,16 +162,18 @@
     </xsl:variable>
 
       <!--1***modsContainer************************************* -->
-      <xsl:variable name="mods-type">
-        <xsl:apply-templates mode="mods-type" select="." />
-      </xsl:variable>
-      <xsl:message>
-        MODS-TYPE:
-        <xsl:value-of select="$mods-type" />
-      </xsl:message>
+    <xsl:variable name="mods-type">
+      <xsl:apply-templates mode="mods-type" select="." />
+    </xsl:variable>
+    <xsl:message>
+      MODS-TYPE:
+      <xsl:value-of select="$mods-type" />
+    </xsl:message>
 
-   <div id="detail_view" class="blockbox">
-     <h3><xsl:apply-templates select="." mode="title" /></h3>
+    <div id="detail_view" class="blockbox">
+      <h3>
+        <xsl:apply-templates select="." mode="title" />
+      </h3>
 
       <xsl:choose>
         <!-- xsl:when cases are handled in modsmetadata.xsl -->
@@ -195,7 +207,9 @@
       </xsl:choose>
       <!--*** Editor Buttons ************************************* -->
       <div id="derivate_box" class="detailbox">
-        <h4 id="derivate_switch" class="block_switch"><xsl:value-of select="i18n:translate('metaData.mods.dictionary.derivatebox')" /></h4>
+        <h4 id="derivate_switch" class="block_switch">
+          <xsl:value-of select="i18n:translate('metaData.mods.dictionary.derivatebox')" />
+        </h4>
         <div id="derivate_content" class="block_content">
           <table class="metaData">
             <xsl:call-template name="mods.editobject_with_der">
@@ -221,7 +235,8 @@
                   <xsl:value-of select="concat(i18n:translate('metaData.addChildObject'),':')" />
                 </td>
                 <td class="metavalue">
-                  <a href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout={$child-layout}&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
+                  <a
+                    href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout={$child-layout}&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
                     <xsl:value-of select="i18n:translate(concat('metaData.mods.types.',$child-layout))" />
                   </a>
                 </td>
@@ -266,7 +281,9 @@
       </div>
       <!--*** Created ************************************* -->
       <div id="system_box" class="detailbox">
-        <h4 id="system_switch" class="block_switch"><xsl:value-of select="i18n:translate('metaData.mods.dictionary.systembox')" /></h4>
+        <h4 id="system_switch" class="block_switch">
+          <xsl:value-of select="i18n:translate('metaData.mods.dictionary.systembox')" />
+        </h4>
         <div id="system_content" class="block_content">
           <table class="metaData">
             <xsl:call-template name="printMetaDate">
@@ -290,8 +307,8 @@
           </table>
         </div>
       </div>
-      
-  </div>
+
+    </div>
 
   </xsl:template>
   <xsl:template name="mods.editobject_with_der">
@@ -336,9 +353,10 @@
                         </a>
                       </xsl:if>
                       <!-- xsl:if test="mcrxsl:isAllowedObjectForURNAssignment($id)" -->
-                        <a href="{$ServletsBaseURL}MCRAddURNToObjectServlet{$HttpSession}?object={$id}&amp;xpath=.mycoreobject/metadata/def.modsContainer[@class='MCRMetaXML' and @heritable='false' and @notinherit='true']/modsContainer/mods:mods/mods:identifier[@type='urn']">
-                          <img src="{$WebApplicationBaseURL}images/workflow_addnbn.gif" title="{i18n:translate('derivate.urn.addURN')}" />
-                        </a>
+                      <a
+                        href="{$ServletsBaseURL}MCRAddURNToObjectServlet{$HttpSession}?object={$id}&amp;xpath=.mycoreobject/metadata/def.modsContainer[@class='MCRMetaXML' and @heritable='false' and @notinherit='true']/modsContainer/mods:mods/mods:identifier[@type='urn']">
+                        <img src="{$WebApplicationBaseURL}images/workflow_addnbn.gif" title="{i18n:translate('derivate.urn.addURN')}" />
+                      </a>
                      <!-- /xsl:if -->
                     </xsl:when>
                     <!-- **************** -->
