@@ -41,15 +41,16 @@
         </xsl:attribute>
       </xsl:if>
       <xsl:message>
-        count: <xsl:value-of select="count(*[not((local-name()='namePart'))])"/>
+        count:
+        <xsl:value-of select="count(*[not((local-name()='namePart'))])" />
       </xsl:message>
       <nameOrPND>
         <xsl:choose>
           <xsl:when test="@authorityURI='http://d-nb.info/'">
             <xsl:attribute name="editor.output">
-              <xsl:value-of select="mods:displayForm"/>
+              <xsl:value-of select="mods:displayForm" />
             </xsl:attribute>
-            <xsl:value-of select="substring-after(@valueURI, 'http://d-nb.info/gnd/')"/>
+            <xsl:value-of select="substring-after(@valueURI, 'http://d-nb.info/gnd/')" />
           </xsl:when>
           <xsl:when test="mods:displayForm">
             <xsl:value-of select="mods:displayForm" />
@@ -65,13 +66,13 @@
       <xsl:apply-templates select="*[not((local-name()='namePart'))]" />
     </xsl:copy>
   </xsl:template>
-  
+
   <xsl:template match="mods:namePart[@type='date']">
     <mods:namePartDate>
       <xsl:apply-templates select="@*|node()" />
     </mods:namePartDate>
   </xsl:template>
-  
+
   <xsl:template match="mods:name[@type='corporate']">
     <xsl:copy>
       <xsl:variable name="classNodes" select="mcrmods:getMCRClassNodes(.)" />
@@ -83,7 +84,7 @@
             <xsl:when test="string-length($classlink) &gt; 0">
               <xsl:for-each select="document($classlink)/mycoreclass/categories/category">
                 <xsl:variable name="selectLang">
-                  <xsl:value-of select="'de'"/>
+                  <xsl:value-of select="'de'" />
 <!--              <xsl:call-template name="selectLang"> -->
 <!--                <xsl:with-param name="nodes" select="./label" /> -->
 <!--              </xsl:call-template> -->
@@ -104,14 +105,16 @@
           </xsl:choose>
         </xsl:attribute>
       </xsl:if>
-      <xsl:apply-templates select="*"/>
+      <xsl:apply-templates select="*" />
     </xsl:copy>
   </xsl:template>
 
   <xsl:template match="parent">
     <xsl:copy>
+      <xsl:apply-templates select="@*" />
       <xsl:attribute name="editor.parentName">
-        <xsl:value-of select="document(concat('mcrobject:',@xlink:href))/mycoreobject/metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title" />
+        <xsl:value-of
+        select="document(concat('mcrobject:',@xlink:href))/mycoreobject/metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title" />
       </xsl:attribute>
     </xsl:copy>
   </xsl:template>
