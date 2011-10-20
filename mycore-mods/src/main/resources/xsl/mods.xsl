@@ -410,7 +410,6 @@
     <xsl:param name="staticURL" />
     <xsl:param name="layout" />
     <xsl:param name="xmltempl" />
-    <xsl:variable select="substring-before(substring-after(./@ID,'_'),'_')" name="type" />
     <xsl:variable name="suffix">
       <xsl:if test="string-length($layout)&gt;0">
         <xsl:value-of select="concat('&amp;layout=',$layout)" />
@@ -419,7 +418,7 @@
     <xsl:if test="./structure/derobjects">
       <tr>
         <td style="vertical-align:top;" class="metaname">
-          <xsl:value-of select="i18n:translate('metaData.mods.[derivates]')" />
+          Test: <xsl:value-of select="i18n:translate('metaData.mods.[derivates]')" />
         </td>
         <td class="metavalue">
           <xsl:if test="$objectHost != 'local'">
@@ -443,7 +442,7 @@
                     </xsl:call-template>
                     <!-- MCR - IView ..end -->
                   </td>
-                  <xsl:if test="acl:checkPermission(./@ID,'writedb')">
+                  <xsl:if test="acl:checkPermission(./@xlink:href,'writedb')">
                     <td align="right" valign="top">
                       <a href="{$ServletsBaseURL}derivate/update{$HttpSession}?objectid={../../../@ID}&amp;id={@xlink:href}{$suffix}">
                         <img title="Datei hinzufügen" src="{$WebApplicationBaseURL}images/workflow_deradd.gif" />
@@ -451,9 +450,11 @@
                       <a href="{$ServletsBaseURL}derivate/update{$HttpSession}?id={@xlink:href}{$suffix}">
                         <img title="Derivat bearbeiten" src="{$WebApplicationBaseURL}images/workflow_deredit.gif" />
                       </a>
-                      <a href="{$ServletsBaseURL}derivate/delete{$HttpSession}?id={@xlink:href}">
-                        <img title="Derivat löschen" src="{$WebApplicationBaseURL}images/workflow_derdelete.gif" />
-                      </a>
+                      <xsl:if test="acl:checkPermission(./@xlink:href,'deletedb')">
+                        <a href="{$ServletsBaseURL}derivate/delete{$HttpSession}?id={@xlink:href}">
+                          <img title="Derivat löschen" src="{$WebApplicationBaseURL}images/workflow_derdelete.gif" />
+                        </a>
+                      </xsl:if>
                     </td>
                   </xsl:if>
                 </tr>
@@ -464,4 +465,76 @@
       </tr>
     </xsl:if>
   </xsl:template>
+  <xsl:template name="mods.editobject_without_table">
+    <xsl:param name="accessedit" />
+    <xsl:param name="accessdelete" />
+    <xsl:param name="id" />
+    <xsl:param name="hasURN" select="'false'" />
+    <xsl:param name="displayAddDerivate" select="'true'" />
+    <xsl:param name="layout" select="'$'" />
+    <xsl:variable name="layoutparam">
+      <xsl:if test="$layout != '$'">
+        <xsl:value-of select="concat('&amp;layout=',$layout)" />
+      </xsl:if>
+    </xsl:variable>
+    <xsl:variable name="editURL">
+      <xsl:call-template name="mods.getObjectEditURL">
+        <xsl:with-param name="id" select="$id" />
+        <xsl:with-param name="layout" select="$layout" />
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:if test="$objectHost = 'local'">
+      <xsl:choose>
+        <xsl:when test="acl:checkPermission($id,'writedb') or acl:checkPermission($id,'deletedb')">
+          <xsl:variable name="type" select="substring-before(substring-after($id,'_'),'_')" />
+
+                <xsl:if test="acl:checkPermission($id,'writedb')">
+                  <xsl:choose>
+                    <!-- ***************** -->
+                    <!-- object has no urn -->
+                    <!-- ***************** -->
+                    <xsl:when test="not(mcrxsl:hasURNDefined($id))">
+                      <a href="{$editURL}">
+                        <img src="{$WebApplicationBaseURL}images/workflow_objedit.gif" title="{i18n:translate('object.editObject')}" />
+                      </a>
+                      <xsl:if test="$displayAddDerivate='true'">
+                        <a href="{$ServletsBaseURL}derivate/create{$HttpSession}?id={$id}">
+                          <img src="{$WebApplicationBaseURL}images/workflow_deradd.gif" title="{i18n:translate('derivate.addDerivate')}" />
+                        </a>
+                      </xsl:if>
+                      <!-- xsl:if test="mcrxsl:isAllowedObjectForURNAssignment($id)" -->
+                      <a
+                        href="{$ServletsBaseURL}MCRAddURNToObjectServlet{$HttpSession}?object={$id}&amp;xpath=.mycoreobject/metadata/def.modsContainer[@class='MCRMetaXML' and @heritable='false' and @notinherit='true']/modsContainer/mods:mods/mods:identifier[@type='urn']">
+                        <img src="{$WebApplicationBaseURL}images/workflow_addnbn.gif" title="{i18n:translate('derivate.urn.addURN')}" />
+                      </a>
+                     <!-- /xsl:if -->
+                    </xsl:when>
+                    <!-- **************** -->
+                    <!-- object has a urn -->
+                    <!-- **************** -->
+                    <xsl:otherwise>
+                      <xsl:if test="$CurrentUser=$MCR.Users.Superuser.UserName">
+                        <a href="{$editURL}">
+                          <img src="{$WebApplicationBaseURL}images/workflow_objedit.gif" title="{i18n:translate('object.editObject')}" />
+                        </a>
+                      </xsl:if>
+                      <xsl:if test="$displayAddDerivate=true()">
+                        <a href="{$ServletsBaseURL}derivate/create{$HttpSession}?id={$id}">
+                          <img src="{$WebApplicationBaseURL}images/workflow_deradd.gif" title="{i18n:translate('derivate.addDerivate')}" />
+                        </a>
+                      </xsl:if>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:if>
+                <xsl:if
+                  test="acl:checkPermission($id,'deletedb') and (not(mcrxsl:hasURNDefined($id)) or (mcrxsl:hasURNDefined($id) and $CurrentUser=$MCR.Users.Superuser.UserName))">
+                  <a href="{$ServletsBaseURL}object/delete{$HttpSession}?id={$id}" id="confirm_deletion">
+                    <img src="{$WebApplicationBaseURL}images/workflow_objdelete.gif" title="{i18n:translate('object.delObject')}" />
+                  </a>
+                </xsl:if>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:if>
+  </xsl:template>
+
 </xsl:stylesheet>
