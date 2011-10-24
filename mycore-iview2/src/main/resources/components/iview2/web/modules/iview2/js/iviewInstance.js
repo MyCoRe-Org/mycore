@@ -357,7 +357,7 @@
 	 * @description	is called if the picture is moving in the viewer and handles the size of the Overview accordingly the size of the picture
 	 */
 	function viewerMoved(jq, event) {
-		this.currentImage.setPos({'x': -event.x, 'y': -event.y});
+		this.currentImage.setPos(/*{'x': -event.x, 'y': -event.y}*/event);
 	};
 
     return constructor;
