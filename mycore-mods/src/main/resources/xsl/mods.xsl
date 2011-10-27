@@ -357,7 +357,7 @@
                       </xsl:if>
                       <!-- xsl:if test="mcrxsl:isAllowedObjectForURNAssignment($id)" -->
                       <a
-                        href="{$ServletsBaseURL}MCRAddURNToObjectServlet{$HttpSession}?object={$id}&amp;xpath=.mycoreobject/metadata/def.modsContainer[@class='MCRMetaXML' and @heritable='false' and @notinherit='true']/modsContainer/mods:mods/mods:identifier[@type='urn']">
+                        href="{$ServletsBaseURL}MCRAddURNToObjectServlet{$HttpSession}?object={$id}&amp;xpath=.mycoreobject/metadata/def.modsContainer[@class='MCRMetaXML' and @heritable='false' and @notinherit='true']/modsContainer/mods:mods/mods:identifier[@type='hdl']">
                         <img src="{$WebApplicationBaseURL}images/workflow_addnbn.gif" title="{i18n:translate('derivate.urn.addURN')}" />
                       </a>
                      <!-- /xsl:if -->
@@ -489,42 +489,24 @@
           <xsl:variable name="type" select="substring-before(substring-after($id,'_'),'_')" />
 
                 <xsl:if test="acl:checkPermission($id,'writedb')">
-                  <xsl:choose>
-                    <!-- ***************** -->
-                    <!-- object has no urn -->
-                    <!-- ***************** -->
-                    <xsl:when test="not(mcrxsl:hasURNDefined($id))">
-                      <a href="{$editURL}">
-                        <img src="{$WebApplicationBaseURL}images/workflow_objedit.gif" title="{i18n:translate('object.editObject')}" />
-                      </a>
-                      <xsl:if test="$displayAddDerivate='true'">
-                        <a href="{$ServletsBaseURL}derivate/create{$HttpSession}?id={$id}">
-                          <img src="{$WebApplicationBaseURL}images/workflow_deradd.gif" title="{i18n:translate('derivate.addDerivate')}" />
-                        </a>
-                      </xsl:if>
-                      <!-- xsl:if test="mcrxsl:isAllowedObjectForURNAssignment($id)" -->
-                      <a
-                        href="{$ServletsBaseURL}MCRAddURNToObjectServlet{$HttpSession}?object={$id}&amp;xpath=.mycoreobject/metadata/def.modsContainer[@class='MCRMetaXML' and @heritable='false' and @notinherit='true']/modsContainer/mods:mods/mods:identifier[@type='urn']">
-                        <img src="{$WebApplicationBaseURL}images/workflow_addnbn.gif" title="{i18n:translate('derivate.urn.addURN')}" />
-                      </a>
-                     <!-- /xsl:if -->
-                    </xsl:when>
-                    <!-- **************** -->
-                    <!-- object has a urn -->
-                    <!-- **************** -->
-                    <xsl:otherwise>
-                      <xsl:if test="$CurrentUser=$MCR.Users.Superuser.UserName">
-                        <a href="{$editURL}">
-                          <img src="{$WebApplicationBaseURL}images/workflow_objedit.gif" title="{i18n:translate('object.editObject')}" />
-                        </a>
-                      </xsl:if>
-                      <xsl:if test="$displayAddDerivate=true()">
-                        <a href="{$ServletsBaseURL}derivate/create{$HttpSession}?id={$id}">
-                          <img src="{$WebApplicationBaseURL}images/workflow_deradd.gif" title="{i18n:translate('derivate.addDerivate')}" />
-                        </a>
-                      </xsl:if>
-                    </xsl:otherwise>
-                  </xsl:choose>
+
+                  <a href="{$editURL}">
+                    <img src="{$WebApplicationBaseURL}images/workflow_objedit.gif" title="{i18n:translate('object.editObject')}" />
+                  </a>
+                  <xsl:if test="$displayAddDerivate='true' and not(mcrxsl:hasURNDefined($id))">
+                    <a href="{$ServletsBaseURL}derivate/create{$HttpSession}?id={$id}">
+                      <img src="{$WebApplicationBaseURL}images/workflow_deradd.gif" title="{i18n:translate('derivate.addDerivate')}" />
+                    </a>
+                  </xsl:if>
+
+                  <!-- ToDo: Fix URN/Handle Generator, xpath is not mods valid -->
+                  <!-- xsl:if test="mcrxsl:isAllowedObjectForURNAssignment($id) and not(mcrxsl:hasURNDefined($id))">
+                  <a
+                    href="{$ServletsBaseURL}MCRAddURNToObjectServlet{$HttpSession}?object={$id}&amp;xpath=.mycoreobject/metadata/def.modsContainer[@class='MCRMetaXML' and @heritable='false' and @notinherit='true']/modsContainer/mods:mods/mods:identifier[@type='hdl']">
+                    <img src="{$WebApplicationBaseURL}images/workflow_addnbn.gif" title="{i18n:translate('derivate.urn.addURN')}" />
+                  </a>
+                 </xsl:if -->
+
                 </xsl:if>
                 <xsl:if
                   test="acl:checkPermission($id,'deletedb') and (not(mcrxsl:hasURNDefined($id)) or (mcrxsl:hasURNDefined($id) and $CurrentUser=$MCR.Users.Superuser.UserName))">
