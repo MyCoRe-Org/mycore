@@ -3,6 +3,7 @@
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:mcrmods="xalan://org.mycore.mods.MCRMODSClassificationSupport"
   xmlns:acl="xalan://org.mycore.access.MCRAccessManager" xmlns:mcr="http://www.mycore.org/" xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:mods="http://www.loc.gov/mods/v3" exclude-result-prefixes="xlink mcr i18n acl mods mcrmods" version="1.0">
+    <xsl:param name="MCR.URN.Resolver.MasterURL" />
 
   <xsl:template name="printMetaDate.mods">
     <!-- prints a table row for a given nodeset -->
@@ -244,12 +245,12 @@
   <xsl:template match="mods:identifier[@type='urn']" mode="present">
     <tr>
       <td valign="top" class="metaname">
-        <xsl:value-of select="'URN:'" />
+        <xsl:value-of select="'Handle:'" />
       </td>
       <td class="metavalue">
-        <xsl:variable name="urn" select="." />
-        <a href="http://nbn-resolving.de/urn/resolver.pl?urn={$urn}">
-          <xsl:value-of select="$urn" />
+        <xsl:variable name="hdl" select="." />
+        <a href="{$MCR.URN.Resolver.MasterURL}{$hdl}">
+          <xsl:value-of select="$hdl" />
         </a>
       </td>
     </tr>

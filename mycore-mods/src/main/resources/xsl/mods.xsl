@@ -51,7 +51,7 @@
               <xsl:if test="position()!=1">
                 <xsl:value-of select="'; '" />
               </xsl:if>
-              <xsl:value-of select="mods:displayForm" />
+              <xsl:apply-templates select="." mode="printName" />
               <xsl:if test="position()=last()">
                 <br />
               </xsl:if>
