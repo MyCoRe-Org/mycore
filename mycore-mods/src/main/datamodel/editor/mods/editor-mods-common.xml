@@ -71,6 +71,28 @@
   </helpPopup>
   <!-- TITLE Translated END -->
 
+  <!-- TITLE Nebensachtitel-->
+  <text id="mods.subtitle.label">
+    <label xml:lang="de">Nebensachtitel</label>
+    <label xml:lang="en">Subtitle</label>
+  </text>
+
+  <panel id="mods.subtitle">
+    <cell anchor="NORTHWEST" var="mods:subtitle">
+      <textarea id="mods.subtitle.text" width="50" height="3" />
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.subtitle.help" width="400px" height="250px">
+    <label xml:lang="de">
+      Der Nebensachtitel bzw. Untertitel des Dokumentes oder Objekts.
+    </label>
+    <label xml:lang="en">
+      Subtitle of document.
+    </label>
+  </helpPopup>
+  <!-- TITLE Nebensachtitel END -->
+
   <!-- LANGUAGE -->
   <text id="mods.languageTerm.label">
     <label xml:lang="de">Sprache (*)</label>
@@ -752,6 +774,26 @@
   </helpPopup>
   <!-- Jahresberichts Klassifikation  END -->
 
+  <!-- Jahresberichtsjahr -->
+  <text id="mods.arev.year.label">
+    <label xml:lang="de">Jahresberichtsjahr</label>
+    <label xml:lang="en">Annual review year</label>
+  </text>
+
+  <panel id="mods.arev.year">
+    <cell anchor="NORTHWEST" var="mods:classification[@displayLabel='annual_review']/@edition">
+      <textfield width="4" maxlength="4" />
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.arev.year.help" width="400px" height="250px">
+    <label xml:lang="de">Geben Sie hier das Jahr an, in dem das Dokument im Jahresbericht gelistet werden soll.
+    </label>
+    <label xml:lang="en">Annual review year</label>
+  </helpPopup>
+  <!-- Place END -->
+
+
   <!-- Bei Postern -> Größe [text] -->
   <text id="mods.physicalDescription.label">
     <label xml:lang="de">Größe</label>
@@ -1270,6 +1312,49 @@ Beispiel: 2.203 oder 20.686</label>
     </label>
   </helpPopup>
   <!-- URL END -->
+
+  <!-- Rights -->
+  <text id="mods.rights.label">
+    <label xml:lang="de">Rechte</label>
+    <label xml:lang="en">Rights</label>
+  </text>
+
+  <panel id="mods.rights">
+    <cell anchor="NORTHWEST" var="mods:accessCondition[@type='use and reproduction']">
+      <list type="dropdown" default="">
+        <item value="">
+          <label xml:lang="de">(bitte wählen)</label>
+          <label xml:lang="en">(please select)</label>
+        </item>
+        <item value="cc_by">
+          <label xml:lang="de">CC BY</label>
+          <label xml:lang="en">CC BY</label>
+        </item>
+        <item value="cc_by-sa">
+          <label xml:lang="de">CC BY-SA</label>
+          <label xml:lang="en">CC BY-SA</label>
+        </item>
+        <item value="cc_by-nd">
+          <label xml:lang="de">CC BY-ND</label>
+          <label xml:lang="en">CC BY-ND</label>
+        </item>
+        <item value="cc_by-nc">
+          <label xml:lang="de">CC BY-NC</label>
+          <label xml:lang="en">CC BY-NC</label>
+        </item>
+      </list>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.rights.help" width="400px" height="250px">
+    <label xml:lang="de">
+      Unter welchen Rechten stellen Sie Ihr Dokument hier ein? Weitere Informationen finden Sie unter http://creativecommons.org/licenses/
+    </label>
+    <label xml:lang="en">
+      Rights/Licenses, e.g. CC. For more information see http://creativecommons.org/licenses/
+    </label>
+  </helpPopup>
+  <!-- Rights END -->
 
   <!-- *** Parents *** -->
   <panel id="displayParent">
