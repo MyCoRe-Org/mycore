@@ -214,6 +214,7 @@
       <!--*** Editor Buttons ************************************* -->
       <div id="derivate_box" class="detailbox">
         <h4 id="derivate_switch" class="block_switch">
+          <a name="derivate_box"></a>
           <xsl:value-of select="i18n:translate('metaData.mods.dictionary.derivatebox')" />
         </h4>
         <div id="derivate_content" class="block_content">

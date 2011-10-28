@@ -115,30 +115,42 @@
   </xsl:template>
 
   <xsl:template match="mods:titleInfo" mode="present">
-    <tr>
-      <td valign="top" class="metaname">
-        <xsl:variable name="title">
-          <xsl:choose>
-            <xsl:when test="@type='translated'">
-              <xsl:value-of select="concat(' (',mods:title/@lang,') ')" />
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="' '" />
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:variable>
-        <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.title'),$title,':')" />
-      </td>
-      <td class="metavalue">
-        <xsl:value-of select="mods:title" />
-      </td>
-    </tr>
+    <xsl:for-each select="mods:title">
+      <tr>
+        <td valign="top" class="metaname">
+          <xsl:variable name="title">
+            <xsl:choose>
+              <xsl:when test="./../@type='translated'">
+                <xsl:value-of select="concat(' (',@lang,') ')" />
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="' '" />
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:variable>
+          <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.title'),$title,':')" />
+        </td>
+        <td class="metavalue">
+          <xsl:value-of select="." />
+        </td>
+      </tr>
+    </xsl:for-each>
+    <xsl:if test="mods:subTitle">
+      <tr>
+        <td valign="top" class="metaname">
+          <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.subTitle'),':')" />
+        </td>
+        <td class="metavalue subTitle">
+          <xsl:value-of select="mods:subTitle" />
+        </td>
+      </tr>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="mods:abstract" mode="present">
     <tr>
       <td valign="top" class="metaname">
-        <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.abstract'),' (' ,@lang,'):')" />
+        <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.abstract'),' (' ,@lang,') :')" />
       </td>
       <td class="metavalue">
         <xsl:value-of select="." />
@@ -259,7 +271,7 @@
   <xsl:template match="mods:identifier[@type!='urn']" mode="present">
     <tr>
       <td valign="top" class="metaname">
-        <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.identifier'),'(',@type,') :')" />
+        <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.identifier'),' (',@type,') :')" />
       </td>
       <td class="metavalue">
         <xsl:value-of select="." />
@@ -348,15 +360,25 @@
   </xsl:template>
 
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.thesis">
-    <div id="title_box" class="detailbox">
+    <div id="title_box" class="detailbox floatbox">
       <h4 id="title_switch" class="block_switch open">
-        <xsl:value-of select="i18n:translate('metaData.mods.dictionary.thesisbox')" />
+        <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.thesisbox'), ' - ')" />
+        <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='kindof']"
+                  mode="printModsClassInfo" />
       </h4>
       <div id="title_content" class="block_content">
         <table class="metaData">
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@type='personal']" />
         </table>
+        <xsl:if test="./structure/derobjects">
+          <div class="hit_symbol"> <!-- dummy - ToDo: show first derivate and link to derivate section -->
+            <img src="{$WebApplicationBaseURL}templates/master/{$template}/IMAGES/icons_liste/icon_thesis.png" alt="" />
+            <span>
+              <a href="#derivate_box">Dokumente</a>
+            </span>
+          </div>
+        </xsl:if>
       </div>
     </div>
 
@@ -389,6 +411,9 @@
             </tr>
           </xsl:if>
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
+          <xsl:call-template name="printMetaDate.mods">
+            <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:physicalDescription/mods:extent" />
+          </xsl:call-template>
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
           <xsl:call-template name="printMetaDate.mods">
             <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateIssued" />
