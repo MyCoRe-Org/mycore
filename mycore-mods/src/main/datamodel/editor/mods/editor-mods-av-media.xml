@@ -26,18 +26,24 @@
     <cell row="7" col="2" anchor="NORTHWEST" ref="mods.title" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
     <cell row="7" col="3" anchor="NORTHWEST" ref="mods.title.help" />
     <!-- TITLE END -->
+    
+    <!-- pub_subtitle [text] -->
+    <cell row="8" col="1" anchor="NORTHEAST" ref="mods.subtitle.label" />
+    <cell row="8" col="2" anchor="NORTHWEST" ref="mods.subtitle" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
+    <cell row="8" col="3" anchor="NORTHWEST" ref="mods.subtitle.help" />
+    <!-- pub_subtitle [text] END -->
 
     <!-- LANGUAGE -->
     <cell row="10" col="1" anchor="NORTHEAST" ref="mods.languageTerm.label" />
     <cell row="10" col="2" anchor="NORTHWEST" ref="mods.languageTerm" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
     <cell row="10" col="3" anchor="NORTHWEST" ref="mods.languageTerm.help" />
     <!-- LANGUAGE END -->
-
-    <!-- Author -->
-    <cell row="20" col="1" anchor="NORTHEAST" ref="mods.author.label" />
-    <cell row="20" col="2" anchor="NORTHWEST" ref="mods.author" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="20" col="3" anchor="NORTHWEST" ref="mods.author.help" />
-    <!-- Author END -->
+    
+    <!-- pub_autor_dok_txt [text] and reviewer -->
+    <cell row="20" col="1" anchor="NORTHEAST" ref="mods.person.label" />
+    <cell row="20" col="2" anchor="NORTHWEST" ref="mods.person" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="20" col="3" anchor="NORTHWEST" ref="mods.person.help" />
+    <!-- pub_autor_dok_txt [text] and reviewer END -->
 
     <!-- Publisher [text] -->
     <cell row="30" col="1" anchor="NORTHEAST" ref="mods.publisher.label" />
@@ -68,8 +74,36 @@
     <cell row="62" col="2" anchor="NORTHWEST" ref="mods.relatedItem" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="62" col="3" anchor="NORTHWEST" ref="mods.relatedItem.help" />
     <!-- Quelle END -->
+    
+    <!-- arev_klassifik -->
+    <cell row="75" col="1" anchor="NORTHEAST" ref="mods.arev.label" />
+    <cell row="75" col="2" anchor="NORTHWEST" ref="mods.arev" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="75" col="3" anchor="NORTHWEST" ref="mods.arev.help" />
+    <!-- arev_klassifik END -->
 
-    <cell row="100" col="1" colspan="3" anchor="NORTHEAST" ref="mods.noteLocationCorp" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <!-- arev_jahr -->
+    <cell row="76" col="1" anchor="NORTHEAST" ref="mods.arev.year.label" />
+    <cell row="76" col="2" anchor="NORTHWEST" ref="mods.arev.year" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="76" col="3" anchor="NORTHWEST" ref="mods.arev.year.help" />
+    <!-- arev_jahr END -->
+    
+    <!-- URL -->
+    <cell row="170" col="1" anchor="NORTHEAST" ref="mods.location.url.label" />
+    <cell row="170" col="2" anchor="NORTHWEST" ref="mods.location.url" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:location" />
+    <cell row="170" col="3" anchor="NORTHWEST" ref="mods.location.url.help" />
+    <cell row="171" col="1" anchor="NORTHEAST" ref="mods.location.url.displayLabel.label" />
+    <cell row="171" col="2" anchor="NORTHWEST" ref="mods.location.url.displayLabel" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:location" />
+    <cell row="171" col="3" anchor="NORTHWEST" ref="mods.location.url.displayLabel.help" />
+    <!-- URL END -->
+
+    <!-- Rechte -->
+    <cell row="180" col="1" anchor="NORTHEAST" ref="mods.rights.label" />
+    <cell row="180" col="2" anchor="NORTHWEST" ref="mods.rights" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="180" col="3" anchor="NORTHWEST" ref="mods.rights.help" />
+    <!-- Rechte END -->
+    
+
+    <cell row="260" col="1" colspan="3" anchor="NORTHEAST" ref="mods.noteLocationCorp" var="metadata/def.modsContainer/modsContainer/mods:mods" />
 
     <cell col="1" colspan="3" row="150" anchor="NORTHEAST" style="padding-top:20px;">
       <submitButton width="100px" i18n="common.button.save" />
