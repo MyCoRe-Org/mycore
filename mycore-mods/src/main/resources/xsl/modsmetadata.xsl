@@ -4,6 +4,7 @@
   xmlns:acl="xalan://org.mycore.access.MCRAccessManager" xmlns:mcr="http://www.mycore.org/" xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:mods="http://www.loc.gov/mods/v3" exclude-result-prefixes="xlink mcr i18n acl mods mcrmods" version="1.0">
   <xsl:param name="MCR.Handle.Resolver.MasterURL" />
+  <xsl:param name="MCR.Users.Guestuser.UserName" />
 
   <xsl:template name="printMetaDate.mods">
     <!-- prints a table row for a given nodeset -->
@@ -267,9 +268,11 @@
     <tr>
       <td colspan="2">
         <table class="metaData">
-          <xsl:call-template name="printMetaDate.mods">
-            <xsl:with-param name="nodes" select="./../mods:note[@xlink:href=$id]" />
-          </xsl:call-template>
+          <xsl:if test="$CurrentUser!=$MCR.Users.Guestuser.UserName">
+            <xsl:call-template name="printMetaDate.mods">
+              <xsl:with-param name="nodes" select="./../mods:note[@xlink:href=$id]" />
+            </xsl:call-template>
+          </xsl:if>
           <xsl:call-template name="printMetaDate.mods">
             <xsl:with-param name="nodes" select="./../mods:location/mods:physicalLocation[@xlink:href=$id]" />
           </xsl:call-template>
