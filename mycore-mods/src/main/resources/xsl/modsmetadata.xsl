@@ -254,6 +254,30 @@
     </tr>
   </xsl:template>
 
+  <xsl:template match="mods:name[@type='corporate']" mode="present">
+    <xsl:variable name="id" select="concat('#', @ID)" />
+    <tr>
+      <td valign="top" class="metaname">
+        <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.institution'),':')" />
+      </td>
+      <td class="metavalue"><!-- ToDo: Ausgabe der Einrichtung mit jeweils oberster Einrichtung (Max Rubner-Institut, Institut für ...) -->
+        <xsl:apply-templates select="." mode="printName" />
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        <table class="metaData">
+          <xsl:call-template name="printMetaDate.mods">
+            <xsl:with-param name="nodes" select="./../mods:note[@xlink:href=$id]" />
+          </xsl:call-template>
+          <xsl:call-template name="printMetaDate.mods">
+            <xsl:with-param name="nodes" select="./../mods:location/mods:physicalLocation[@xlink:href=$id]" />
+          </xsl:call-template>
+        </table>
+      </td>
+    </tr>
+  </xsl:template>
+
   <xsl:template match="mods:identifier[@type='hdl']" mode="present">
     <tr>
       <td valign="top" class="metaname">
@@ -282,7 +306,18 @@
   <xsl:template match="mods:classification" mode="present">
     <tr>
       <td valign="top" class="metaname">
-        <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.classification'), ':')" />
+        <xsl:choose>
+          <xsl:when test="@authority='ddc'">
+            <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.ddc'), ':')" />
+          </xsl:when>
+          <xsl:when test="@displayLabel='annual_review'">
+            <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.annual_review'), ' (')" />
+            <xsl:value-of select="concat(@edition, ') :')" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.classification'), ':')" />
+          </xsl:otherwise>
+        </xsl:choose>
       </td>
       <td class="metavalue">
         <xsl:apply-templates select="." mode="printModsClassInfo" />
@@ -314,6 +349,30 @@
     </tr>
   </xsl:template>
 
+  <xsl:template match="mods:url" mode="present">
+    <tr>
+      <td valign="top" class="metaname">
+        <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.url'),':')" />
+      </td>
+      <td class="metavalue">
+        <a>
+          <xsl:attribute name="href"><xsl:value-of select="." /></xsl:attribute>
+          <xsl:value-of select="@displayLabel" />
+        </a>
+      </td>
+    </tr>
+  </xsl:template>
+
+  <xsl:template match="mods:accessCondition" mode="present">
+    <tr>
+      <td valign="top" class="metaname">
+        <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.accessCondition'),':')" />
+      </td>
+      <td class="metavalue">
+        <xsl:value-of select="." />
+      </td>
+    </tr>
+  </xsl:template>
 
   <!--  -->
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.report">
@@ -418,11 +477,16 @@
           <xsl:call-template name="printMetaDate.mods">
             <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateIssued" />
           </xsl:call-template>
+          <xsl:call-template name="printMetaDate.mods">
+            <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:place/mods:placeTerm" />
+          </xsl:call-template>
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:classification" />
           <xsl:call-template name="printMetaDate.mods">
             <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:subject" />
             <xsl:with-param name="sep" select="'; '" />
           </xsl:call-template>
+          <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:url" />
+          <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:accessCondition" />
         </table>
       </div>
     </div>
@@ -434,12 +498,6 @@
       <div id="institution_content" class="block_content">
         <table class="metaData">
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@type='corporate']" />
-          <xsl:call-template name="printMetaDate.mods">
-            <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:note" />
-          </xsl:call-template>
-          <xsl:call-template name="printMetaDate.mods">
-            <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:physicalLocation" />
-          </xsl:call-template>
         </table>
       </div>
     </div>
