@@ -78,7 +78,7 @@
   </text>
 
   <panel id="mods.subtitle">
-    <cell anchor="NORTHWEST" var="mods:subtitle">
+    <cell anchor="NORTHWEST" var="mods:subTitle">
       <textarea id="mods.subtitle.text" width="50" height="3" />
     </cell>
   </panel>
