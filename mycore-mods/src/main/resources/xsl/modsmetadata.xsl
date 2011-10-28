@@ -232,7 +232,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="mods:name" mode="present">
+  <xsl:template match="mods:name" mode="present"><!-- ToDo: all authors, rev ... in one column -->
     <tr>
       <td valign="top" class="metaname">
         <xsl:choose>
@@ -366,7 +366,7 @@
     </tr>
   </xsl:template>
 
-  <xsl:template match="mods:accessCondition" mode="present">
+  <xsl:template match="mods:accessCondition" mode="present"><!-- ToDo: show cc icon and more information ... -->
     <tr>
       <td valign="top" class="metaname">
         <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.accessCondition'),':')" />
@@ -379,7 +379,7 @@
 
   <!--  -->
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.report">
-    <div id="title_box" class="detailbox">
+    <div id="title_box" class="detailbox floatbox">
       <h4 id="title_switch" class="block_switch open">Report</h4>
       <div id="title_content" class="block_content">
         <table class="metaData">
@@ -548,7 +548,7 @@
   </xsl:template>
 
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.cproceeding">
-    <div id="title_box" class="detailbox">
+    <div id="title_box" class="detailbox floatbox">
       <h4 id="title_switch" class="block_switch open">Konferenzband</h4>
       <div id="title_content" class="block_content">
         <table class="metaData">
@@ -612,7 +612,7 @@
   </xsl:template>
 
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.cpublication">
-    <div id="title_box" class="detailbox">
+    <div id="title_box" class="detailbox floatbox">
       <h4 id="title_switch" class="block_switch open">Konferenzbeitrag</h4>
       <div id="title_content" class="block_content">
         <table class="metaData">
@@ -631,7 +631,7 @@
   </xsl:template>
 
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.book">
-    <div id="title_box" class="detailbox">
+    <div id="title_box" class="detailbox floatbox">
       <h4 id="title_switch" class="block_switch open">Buch</h4>
       <div id="title_content" class="block_content">
         <table class="metaData">
@@ -677,7 +677,7 @@
   </xsl:template>
 
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.book-chapter">
-    <div id="title_box" class="detailbox">
+    <div id="title_box" class="detailbox floatbox">
       <h4 id="title_switch" class="block_switch open">Buchkapitel</h4>
       <div id="title_content" class="block_content">
         <table class="metaData">
@@ -714,7 +714,7 @@
   </xsl:template>
 
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.journal">
-    <div id="title_box" class="detailbox">
+    <div id="title_box" class="detailbox floatbox">
       <h4 id="title_switch" class="block_switch open">Zeitschrift</h4>
       <div id="title_content" class="block_content">
         <table class="metaData">
@@ -737,7 +737,7 @@
   </xsl:template>
 
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.article">
-    <div id="title_box" class="detailbox">
+    <div id="title_box" class="detailbox floatbox">
       <h4 id="title_switch" class="block_switch open">Zeitschriftenaufsatz</h4>
       <div id="title_content" class="block_content">
         <table class="metaData">

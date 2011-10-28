@@ -419,7 +419,7 @@
     <xsl:if test="./structure/derobjects">
       <tr>
         <td style="vertical-align:top;" class="metaname">
-          Test: <xsl:value-of select="i18n:translate('metaData.mods.[derivates]')" />
+          <xsl:value-of select="concat(i18n:translate('metaData.mods.[derivates]'), ':')" />
         </td>
         <td class="metavalue">
           <xsl:if test="$objectHost != 'local'">
