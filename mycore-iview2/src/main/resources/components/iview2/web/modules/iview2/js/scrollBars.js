@@ -1129,46 +1129,43 @@ iview.scrollbar.importScrollbars = function(viewer) {
 		viewer.viewerBean.positionTiles (pos, true);
 		viewer.viewerBean.notifyViewerMoved(pos);
 	}
-	/**
-	 * @private
-	 * @function
-	 * @name		scrollMove
-	 * @memberOf	iview.scrollbar.createScrollbars#
-	 * @description	loads the tiles accordingly the position of the scrollbar if they is moving
-	 * @param		{integer} valueX number of pixels how far the bar has been moved horizontal
-	 * @param		{integer} valueY number of pixels how far the bar has been moved vertical
-	 */
-	var scrollMove = function(valueX, valueY) {
-		viewer.scroller = true;
-		viewerPosUpdate(valueX, valueY);
-		viewer.scroller = false;
-	}
+
 	// ScrollBars
 	// horizontal
 	viewer.scrollbars={};//TODO: make real Object
 	var barX = viewer.scrollbars.x = new iview.scrollbar.Controller();
 	barX.createView({ 'direction':'horizontal', 'parent':viewer.context.container, 'mainClass':'scroll'});
+	viewer.addDimensionSubstract(true, 'scrollbar', barX.my.self.outerHeight());
 	barX.attach("curVal.scrollbar", function(e, val) {
 		if (!viewer.roller) {
-			scrollMove(-(val["new"]-val["old"]), 0);
+			viewerPosUpdate(-(val["new"]-val["old"]), 0);
 		}
 	});
 	// vertical
 	var barY = viewer.scrollbars.y = new iview.scrollbar.Controller();
 	barY.createView({ 'direction':'vertical', 'parent':viewer.context.container, 'mainClass':'scroll'});
+	viewer.addDimensionSubstract(false, 'scrollbar', barY.my.self.outerWidth());
 	barY.attach("curVal.scrollbar", function(e, val) {
 		if (!viewer.roller) {
-			scrollMove(0, -(val["new"]-val["old"]));
+			viewerPosUpdate(0, -(val["new"]-val["old"]));
 		}
 	});
+	
 	// Additional Events
 	// register to scroll into the viewer
 	viewer.context.viewer.mousewheel(function(e, delta, deltaX, deltaY) {
 		e.preventDefault();
 		viewerPosUpdate(deltaX*PanoJS.MOVE_THROTTLE, deltaY*PanoJS.MOVE_THROTTLE);
-	}).css({'width':viewer.properties.startWidth - ((barX.my.self.css("visibility") == "visible")? barX.my.self.outerWidth() : 0)  + "px",
-			'height':viewer.properties.startHeight - ((barY.my.self.css("visibility") == "visible")? barY.my.self.outerHeight() : 0)  + "px"
 	});
+	jQuery(viewer.viewerContainer).bind("maximize.viewerContainer minimize.viewerContainer", function() {
+		if (viewer.viewerContainer.isMax()) {
+			viewer.addDimensionSubstract(true, 'scrollbar', barX.my.self.outerHeight());
+			viewer.addDimensionSubstract(false, 'scrollbar', barY.my.self.outerWidth());
+		} else {
+			viewer.removeDimensionSubstract(true, 'scrollbar');
+			viewer.removeDimensionSubstract(false, 'scrollbar');
+		}
+	})
 	
 	var currentImage = viewer.currentImage;
 	jQuery(currentImage).bind(iview.CurrentImage.POS_CHANGE_EVENT, function() {

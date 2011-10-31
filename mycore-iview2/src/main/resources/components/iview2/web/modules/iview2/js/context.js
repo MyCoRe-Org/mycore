@@ -28,7 +28,6 @@
           document.documentElement.style.overflow = "hidden";
           document.body.style.overflow = "hidden";
           // class-change causes in IE resize
-          this.container.removeClass("min").addClass("max");
         } else {
     		if (!this.iviewInst.currentImage.zoomInfo.zoomScreen) {
     			this.iviewInst.viewerBean.pictureScreen();
@@ -49,8 +48,8 @@
           document.body.style.overflow = "";
           this.doc = null;
           // class-change causes in IE resize
-          this.container.removeClass("max").addClass("min");
         }
+        this.container.toggleClass("max min");
       }
 
     };

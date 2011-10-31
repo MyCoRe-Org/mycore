@@ -126,7 +126,8 @@ var createToolbars = function(viewer) {
 		viewer.toolbar.ctrl.paint("mainTb");	
 	})
 	.bind("maximize.viewerContainer", function() {
-  		viewer.toolbar.ctrl.addView(new ToolbarView("mainTbView", viewer.toolbar.ctrl.toolbarContainer, i18n));
+		var tbview = new ToolbarView("mainTbView", viewer.toolbar.ctrl.toolbarContainer, i18n)
+  		viewer.toolbar.ctrl.addView(tbview);
 		viewer.toolbar.mgr.addModel(new StandardToolbarModelProvider("mainTb", viewer).getModel());
 		if (viewer.PhysicalModel) {
 			viewer.toolbar.ctrl.checkNavigation(viewer.PhysicalModel);
@@ -142,9 +143,11 @@ var createToolbars = function(viewer) {
 			jQuery(".mainTbView .zoomHandles .fitToScreen")[0].checked = true;
 			jQuery(".mainTbView .zoomHandles .fitToScreenLabel").addClass("ui-state-active");
 		}
+		viewer.addDimensionSubstract('false', 'toolbar', jQuery(tbview.toolbar).outerHeight(true));
 	})
 	.bind("minimize.viewerContainer", function() {
  		viewer.toolbar.mgr.destroyModel('mainTb');
+ 		viewer.removeDimensionSubstract('false', 'toolbar');
 	})
 	.bind("reinit.viewer", function() {
   		viewer.toolbar.ctrl.paint("mainTb");

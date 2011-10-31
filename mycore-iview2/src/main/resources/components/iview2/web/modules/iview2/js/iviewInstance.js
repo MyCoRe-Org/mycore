@@ -63,7 +63,8 @@
       this.thumbnailPanel = jQuery.extend(this.thumbnailPanel | {}, {'loaded': (this.thumbnailPanel || {}).loaded || false})
 	  this.context = new iview.Context(this.viewerContainer, this);
 	  this.currentImage = new iview.CurrentImage(this);
-	  
+	  this.substractsDimension = {'x': {'total': 0, 'entries': []}, 'y': {'total': 0, 'entries': []}};//other components which are lowering the width and the height of the viewer width and height
+
       jQuery(this.currentImage).bind(iview.CurrentImage.CHANGE_EVENT, function(){
     	  that.processImageProperties();
       });
@@ -84,9 +85,6 @@
     
     constructor.prototype.loading = function ii_loading(startFile) {
 		var that = this;
-		
-		//TODO move it into .one("maximize.viewerContainer" as scrollbars a
-		iview.scrollbar.importScrollbars(this);
 		
 		PanoJS.USE_SLIDE = false;
 		PanoJS.USE_LOADER_IMAGE = false;
@@ -126,8 +124,10 @@
 			.bind("move.viewer", function() {viewerMoved.apply(that,arguments)});
 	
 		jQuery(this.viewerContainer).one("maximize.viewerContainer", function() {
-			if (that.properties.useOverview)
-				createOverview(that);
+			if (that.properties.useOverview) {
+				iview.overview.importOverview(that);
+			}
+			iview.scrollbar.importScrollbars(that);
 		})
 		
 		if (this.properties.useParam && !isNaN(parseInt(URL.getParam("zoom")))) {
@@ -197,8 +197,8 @@
 	 * @description	maximize and show the viewer with the related image or minimize and close the viewer
 	 */
 	constructor.prototype.toggleViewerMode = function() {
-		jQuery(this.viewerContainer).trigger((this.viewerContainer.isMax()? "minimize":"maximize") + ".viewerContainer");
 		this.context.switchContext();
+		jQuery(this.viewerContainer).trigger((!this.viewerContainer.isMax()? "minimize":"maximize") + ".viewerContainer");
 		/*IE causes resize already at class change (mostly because position: rel <> fix)
 		 IE runs resize multiple times...but without this line he doesn't...*/
 		this.reinitializeGraphic();
@@ -290,21 +290,18 @@
 
 		var viewerContainer = this.context.container;
 		var viewer = this.context.viewer;
-		var barX = this.scrollbars.x;
-		var barY = this.scrollbars.y;
-
 		if (jQuery(viewerContainer).hasClass("max")) {
 			//to grant usage of the complete height it's not possible to simply use height:100%
 			viewerContainer.css({'height': curHeight - viewerContainer.offset().top + "px",
 								'width': curWidth + "px"});
-			viewer.css({'height': curHeight - viewer.offset().top - barX.my.self.outerHeight()  + "px",
-						'width': curWidth - barY.my.self.outerWidth()  + "px"});
+			viewer.css({'height': curHeight - this.substractsDimension.x.total  + "px",
+						'width': curWidth - this.substractsDimension.y.total + "px"});
 		} else {
 			//restore minimized size settings
 			viewerContainer.css({'height': this.properties.startHeight + "px",
 								'width': this.properties.startWidth + "px"});
-			viewer.css({'height': this.properties.startHeight - ((barY.my.self.css("visibility") == "visible")? barY.my.self.outerHeight() : 0)  + "px",
-						'width': this.properties.startWidth - ((barX.my.self.css("visibility") == "visible")? barX.my.self.outerWidth() : 0)  + "px"});
+			viewer.css({'height': this.properties.startHeight - this.substractsDimension.x.total + "px",
+						'width': this.properties.startWidth - this.substractsDimension.y.total + "px"});
 		}
 		
 		viewerBean.width = viewer.outerWidth();
@@ -329,8 +326,7 @@
 		callBack(callback);
 		//notify all listeners that the viewer was modified in such way that they possibly need adaptation of their own view
 		jQuery(viewerBean.viewer).trigger("reinit.viewer");
-		
-		  //TODO: align image and toolbar to the center
+		//TODO: align image and toolbar to the center
 	};
 	
 	/**
@@ -359,6 +355,49 @@
 	function viewerMoved(jq, event) {
 		this.currentImage.setPos(/*{'x': -event.x, 'y': -event.y}*/event);
 	};
+	
+	/**
+	 * @public
+	 * @function
+	 * @name		addDimensionSubstract
+	 * @memberOf	iview.IviewInstance
+	 * @description	allows it to modify the effective size of the viewer by telling what space some given components occupy
+	 * @param		{boolean} horizontal tells if the given size will influence the width or the height of the viewer
+	 * @param		{string} name under which the given value is will be stored
+	 * @param		{float} value space the component will occupy, and therefore is removed from the viewer size
+	 * @return		boolean returns true if added successfully, false in the case the given name is already used
+	 */
+	constructor.prototype.addDimensionSubstract = function(horizontal, name, value) {
+		var dim = this.substractsDimension[((horizontal)? 'x':'y')];
+		if (typeof dim.entries[name] != "undefined") {
+			return false;
+		}
+		dim.entries[name] = toInt(value);
+		dim.total += dim.entries[name];
+		this.reinitializeGraphic();
+		return true;
+	};
+	
+	/**
+	 * @public
+	 * @function
+	 * @name		removeDimensionSubstract
+	 * @memberOf	iview.iviewInstance
+	 * @description	deallocates a previously occupied space
+	 * @param		{boolean} horizontal tells if the given name is used for a width or height occupation
+	 * @param		{string} name entry to remove
+	 * @return		boolean returns true if the element was successfully removed, false in the case the name wasn't used
+	 */
+	constructor.prototype.removeDimensionSubstract = function(horizontal, name) {
+		var dim = this.substractsDimension[((horizontal)? 'x':'y')];
+		if (typeof dim.entries[name] == "undefined") {
+			return false;
+		}
+		dim.total -= dim.entries[name];
+		delete dim.entries[name];
+		this.reinitializeGraphic();
+		return true;
+	}
 
     return constructor;
   })();

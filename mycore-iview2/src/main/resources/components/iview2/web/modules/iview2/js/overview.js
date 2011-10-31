@@ -495,11 +495,12 @@ iview.overview.ModelProvider = function() {
 /**
  * @public
  * @function
- * @name		createOverview
+ * @name		importOverview
+ * @memberOf	iview.overview
  * @description	calls the corresponding functions to create the Overview
  * @param {Iview} viewer instance for which it shall create the toolbars
  */
-function createOverview(viewer) {
+iview.overview.importOverview = function(viewer) {
 	var viewerBean = viewer.viewerBean;
 	var overviewMP = new iview.overview.ModelProvider();
 	viewer.overview = viewer.overview || {};
