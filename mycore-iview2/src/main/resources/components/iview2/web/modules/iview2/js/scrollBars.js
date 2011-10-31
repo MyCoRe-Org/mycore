@@ -1135,7 +1135,6 @@ iview.scrollbar.importScrollbars = function(viewer) {
 	viewer.scrollbars={};//TODO: make real Object
 	var barX = viewer.scrollbars.x = new iview.scrollbar.Controller();
 	barX.createView({ 'direction':'horizontal', 'parent':viewer.context.container, 'mainClass':'scroll'});
-	viewer.addDimensionSubstract(true, 'scrollbar', barX.my.self.outerHeight());
 	barX.attach("curVal.scrollbar", function(e, val) {
 		if (!viewer.roller) {
 			viewerPosUpdate(-(val["new"]-val["old"]), 0);
@@ -1144,36 +1143,12 @@ iview.scrollbar.importScrollbars = function(viewer) {
 	// vertical
 	var barY = viewer.scrollbars.y = new iview.scrollbar.Controller();
 	barY.createView({ 'direction':'vertical', 'parent':viewer.context.container, 'mainClass':'scroll'});
-	viewer.addDimensionSubstract(false, 'scrollbar', barY.my.self.outerWidth());
 	barY.attach("curVal.scrollbar", function(e, val) {
 		if (!viewer.roller) {
 			viewerPosUpdate(0, -(val["new"]-val["old"]));
 		}
 	});
-	
-	// Additional Events
-	// register to scroll into the viewer
-	viewer.context.viewer.mousewheel(function(e, delta, deltaX, deltaY) {
-		e.preventDefault();
-		viewerPosUpdate(deltaX*PanoJS.MOVE_THROTTLE, deltaY*PanoJS.MOVE_THROTTLE);
-	});
-	jQuery(viewer.viewerContainer).bind("maximize.viewerContainer minimize.viewerContainer", function() {
-		if (viewer.viewerContainer.isMax()) {
-			viewer.addDimensionSubstract(true, 'scrollbar', barX.my.self.outerHeight());
-			viewer.addDimensionSubstract(false, 'scrollbar', barY.my.self.outerWidth());
-		} else {
-			viewer.removeDimensionSubstract(true, 'scrollbar');
-			viewer.removeDimensionSubstract(false, 'scrollbar');
-		}
-	})
-	
-	var currentImage = viewer.currentImage;
-	jQuery(currentImage).bind(iview.CurrentImage.POS_CHANGE_EVENT, function() {
-		viewer.roller = true;
-		barX.setCurValue(-this.x);
-		barY.setCurValue(-this.y);
-		viewer.roller = false;
-	}).bind(iview.CurrentImage.DIMENSION_EVENT, function() {
+	var fnAdaptBars = function() {
 		var ymaxVal = currentImage.curHeight - viewer.viewerBean.height;
 		barY.setMaxValue((ymaxVal < 0)? 0:ymaxVal);
 		barY.setProportion(viewer.viewerBean.height/currentImage.curHeight);
@@ -1189,5 +1164,36 @@ iview.scrollbar.importScrollbars = function(viewer) {
 		barY.setSize(viewer.viewerBean.height);
 		barY.my.self[0].style.top = jQuery(viewer.viewerBean.viewer).offset().top + "px";
 		barX.setSize(viewer.viewerBean.width);
+	};
+	
+	var currentImage = viewer.currentImage;
+	jQuery(currentImage).bind(iview.CurrentImage.POS_CHANGE_EVENT, function() {
+		viewer.roller = true;
+		barX.setCurValue(-this.x);
+		barY.setCurValue(-this.y);
+		viewer.roller = false;
+	}).bind(iview.CurrentImage.DIMENSION_EVENT, function() {
+		fnAdaptBars();
 	});
+	
+	jQuery(viewer.viewerContainer).bind("reinit.viewer", function() {
+		fnAdaptBars();
+	});
+	// Additional Events
+	// register to scroll into the viewer
+	viewer.context.viewer.mousewheel(function(e, delta, deltaX, deltaY) {
+		e.preventDefault();
+		viewerPosUpdate(deltaX*PanoJS.MOVE_THROTTLE, deltaY*PanoJS.MOVE_THROTTLE);
+	});
+	jQuery(viewer.viewerContainer).bind("maximize.viewerContainer minimize.viewerContainer", function() {
+		if (viewer.viewerContainer.isMax()) {
+			viewer.addDimensionSubstract(true, 'scrollbar', barX.my.self.outerHeight());
+			viewer.addDimensionSubstract(false, 'scrollbar', barY.my.self.outerWidth());
+		} else {
+			viewer.removeDimensionSubstract(true, 'scrollbar');
+			viewer.removeDimensionSubstract(false, 'scrollbar');
+		}
+	})
+	viewer.addDimensionSubstract(true, 'scrollbar', barX.my.self.outerHeight());
+	viewer.addDimensionSubstract(false, 'scrollbar', barY.my.self.outerWidth());
 };
