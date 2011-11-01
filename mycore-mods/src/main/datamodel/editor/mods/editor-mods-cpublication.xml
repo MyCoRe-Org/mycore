@@ -49,8 +49,8 @@
     <!-- pub_genre -->
     <cell row="35" col="1" anchor="NORTHEAST">
       <text>
-        <label xml:lang="de">Genre (*)</label>
-        <label xml:lang="en">Genre (*)</label>
+        <label xml:lang="de">Genre*</label>
+        <label xml:lang="en">Genre*</label>
       </text>
     </cell>
     <cell row="35" col="2" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre">
@@ -117,7 +117,7 @@
     <!-- Rechte END -->
   </panel></cell>
 
-    <cell row="100" col="1" colspan="3" anchor="NORTHEAST" ref="mods.noteLocationCorp" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="100" col="1" colspan="3" anchor="NORTHWEST" ref="mods.noteLocationCorp" var="metadata/def.modsContainer/modsContainer/mods:mods" />
 
     <cell col="1" colspan="3" row="150" anchor="NORTHEAST" style="padding-top:20px;">
       <submitButton width="100px" i18n="common.button.save" />

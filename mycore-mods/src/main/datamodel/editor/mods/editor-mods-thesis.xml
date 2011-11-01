@@ -128,7 +128,7 @@
 
   <!-- Institution-Tripple -->
   <cell row="50" colspan="3" class="border"><panel style="width:100%;">
-    <cell row="10" col="1" colspan="3" anchor="NORTHEAST" ref="mods.noteLocationCorp" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="10" col="1" colspan="3" anchor="NORTHWEST" ref="mods.noteLocationCorp" var="metadata/def.modsContainer/modsContainer/mods:mods" />
   </panel></cell>
 
     <!-- save cancel buttons -->

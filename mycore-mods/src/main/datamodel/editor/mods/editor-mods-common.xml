@@ -7,13 +7,13 @@
 
   <!-- TITLE -->
   <text id="mods.title.label">
-    <label xml:lang="de">Titel (*)</label>
-    <label xml:lang="en">Title (*)</label>
+    <label xml:lang="de">Titel*</label>
+    <label xml:lang="en">Title*</label>
   </text>
 
   <text id="mods.related.title.label">
-    <label xml:lang="de">Titel des Buches (*)</label>
-    <label xml:lang="en">Booktitle (*)</label>
+    <label xml:lang="de">Titel des Buches*</label>
+    <label xml:lang="en">Booktitle*</label>
   </text>
 
   <panel id="mods.title">
@@ -120,8 +120,8 @@
 
   <!-- LANGUAGE -->
   <text id="mods.languageTerm.label">
-    <label xml:lang="de">Sprache (*)</label>
-    <label xml:lang="en">Language (*)</label>
+    <label xml:lang="de">Sprache*</label>
+    <label xml:lang="en">Language*</label>
   </text>
 
   <panel id="mods.languageTerm">
@@ -156,8 +156,8 @@
 
   <!-- pub_autor_dok_txt [text] and reviewer -->
   <text id="mods.author.label">
-    <label xml:lang="de">Autor(en) (*)</label>
-    <label xml:lang="en">Author(s) (*)</label>
+    <label xml:lang="de">Autor(en)*</label>
+    <label xml:lang="en">Author(s)*</label>
   </text>
   
   <panel id="mods.name">
@@ -208,8 +208,8 @@
 
   <!-- person -->
   <text id="mods.person.label">
-    <label xml:lang="de">Personen (*)</label>
-    <label xml:lang="en">Persons (*)</label>
+    <label xml:lang="de">Personen*</label>
+    <label xml:lang="en">Persons*</label>
   </text>
 
   <panel id="mods.person">
@@ -266,8 +266,8 @@
 
   <!-- Publisher [text] -->
   <text id="mods.publisher.label">
-    <label xml:lang="de">Verlag (*)</label>
-    <label xml:lang="en">Publisher (*)</label>
+    <label xml:lang="de">Verlag*</label>
+    <label xml:lang="en">Publisher*</label>
   </text>
 
   <panel id="mods.publisher">
@@ -286,8 +286,8 @@
   </panel>
   
   <text id="mods.publisher.label.optional">
-    <label xml:lang="de">Verleger </label>
-    <label xml:lang="en">Publisher </label>
+    <label xml:lang="de">Verlag</label>
+    <label xml:lang="en">Publisher</label>
   </text>
 
   <panel id="mods.publisher.optional">
@@ -315,8 +315,8 @@
 
   <!-- Ort der Konferenz [text] -->
   <text id="mods.conferencePlace.label">
-    <label xml:lang="de">Ort der Konferenz (*)</label>
-    <label xml:lang="en">City of Conference (*)</label>
+    <label xml:lang="de">Ort der Konferenz*</label>
+    <label xml:lang="en">City of Conference*</label>
   </text>
 
   <panel id="mods.conferencePlace">
@@ -347,8 +347,8 @@
 
   <!-- Land in dem die Konferenz stattfand [text] -->
   <text id="mods.conferenceLand.label">
-    <label xml:lang="de">Land der Konferenz (*)</label>
-    <label xml:lang="en">Conference Country (*)</label>
+    <label xml:lang="de">Land der Konferenz*</label>
+    <label xml:lang="en">Conference Country*</label>
   </text>
 
   <panel id="mods.conferenceLand">
@@ -392,8 +392,8 @@
 
   <!-- Datum der Veröffentlichung [text] -->
   <text id="mods.dateIssued.label">
-    <label xml:lang="de">Veröffentlichungsdatum (*)</label>
-    <label xml:lang="en">Date of Publishing (*)</label>
+    <label xml:lang="de">Veröffentlichungsdatum*</label>
+    <label xml:lang="en">Date of Publishing*</label>
   </text>
 
   <panel id="mods.dateIssued">
@@ -749,8 +749,8 @@
 
   <!-- DDC pub_klassifik -->
   <text id="mods.ddc.label">
-    <label xml:lang="de">DDC-Sachgruppe (*)</label>
-    <label xml:lang="en">DDC-category (*)</label>
+    <label xml:lang="de">DDC-Sachgruppe*</label>
+    <label xml:lang="en">DDC category*</label>
   </text>
 
   <panel id="mods.ddc">
@@ -846,8 +846,8 @@
  
   <!-- pub_genre -->
   <text id="mods.genre.kindOfReport.label">
-    <label xml:lang="de">Genre (*)</label>
-    <label xml:lang="en">Genre (*)</label>
+    <label xml:lang="de">Genre*</label>
+    <label xml:lang="en">Genre*</label>
   </text>
 
   <panel id="mods.genre.kindOfReport">
@@ -878,8 +878,8 @@
 
   <!-- av_medium_genre -->
   <text id="mods.genre.kindOfAVMedia.label">
-    <label xml:lang="de">Genre (*)</label>
-    <label xml:lang="en">Genre (*)</label>
+    <label xml:lang="de">Genre*</label>
+    <label xml:lang="en">Genre*</label>
   </text>
 
   <panel id="mods.genre.kindOfAVMedia">
@@ -917,8 +917,8 @@
 
   <!-- thesis_genre -->
   <text id="mods.genre.kindOfThesis.label">
-    <label xml:lang="de">Genre (*)</label>
-    <label xml:lang="en">Genre (*)</label>
+    <label xml:lang="de">Genre*</label>
+    <label xml:lang="en">Genre*</label>
   </text>
 
   <panel id="mods.genre.kindOfThesis">

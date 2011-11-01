@@ -69,8 +69,8 @@
     <!-- Datum der Veröffentlichung [text] -->
     <cell row="90" col="1" anchor="NORTHEAST">
     <text>
-        <label xml:lang="de">Erscheinungsjahr (*)</label>
-        <label xml:lang="en">Date Issued (*)</label>
+        <label xml:lang="de">Erscheinungsjahr*</label>
+        <label xml:lang="en">Date Issued*</label>
       </text>
     </cell>
     <cell row="90" col="2" anchor="NORTHWEST" ref="mods.dateIssued" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
@@ -148,7 +148,7 @@
     
   </panel></cell>
   
-    <cell row="260" col="1" colspan="3" anchor="NORTHEAST" ref="mods.noteLocationCorp" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="260" col="1" colspan="3" anchor="NORTHWEST" ref="mods.noteLocationCorp" var="metadata/def.modsContainer/modsContainer/mods:mods" />
 
     <!-- save/cancel buttons -->
     <cell col="1" colspan="3" row="300" anchor="EAST" style="padding-top:20px;">

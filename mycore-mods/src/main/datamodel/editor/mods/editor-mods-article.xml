@@ -165,7 +165,7 @@
   </panel>
 </cell>
 
-  <cell row="260" col="1" colspan="3" anchor="NORTHEAST" ref="mods.noteLocationCorp" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+  <cell row="260" col="1" colspan="3" anchor="NORTHWEST" ref="mods.noteLocationCorp" var="metadata/def.modsContainer/modsContainer/mods:mods" />
 
   <cell col="1" colspan="3" row="300" anchor="EAST" style="padding-top:20px;">
     <submitButton width="100px" i18n="common.button.save" />
