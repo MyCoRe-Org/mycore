@@ -100,7 +100,13 @@
     <cell row="40" col="2" anchor="NORTHWEST" ref="mods.identifier.optional" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="40" col="3" anchor="NORTHWEST" ref="mods.identifier.help" />
     <!-- Identifier END -->
-    
+
+    <!-- Stichworte -->
+    <cell row="50" col="1" anchor="NORTHEAST" ref="mods.subject.label" />
+    <cell row="50" col="2" anchor="NORTHWEST" ref="mods.subject" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="50" col="3" anchor="NORTHWEST" ref="mods.subject.help" />
+    <!-- Stichworte END -->
+
     <!-- URL -->
     <cell row="70" col="1" anchor="NORTHEAST" ref="mods.location.url.label" />
     <cell row="70" col="2" anchor="NORTHWEST" ref="mods.location.url" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:location" />

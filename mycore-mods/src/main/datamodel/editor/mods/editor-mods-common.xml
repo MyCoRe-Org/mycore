@@ -821,7 +821,7 @@
 
   <!-- Bei Postern -> Größe [text] -->
   <text id="mods.physicalDescription.label">
-    <label xml:lang="de">Größe</label>
+    <label xml:lang="de">Umfang</label>
     <label xml:lang="en">Physical Description</label>
   </text>
 
@@ -836,7 +836,7 @@
   <helpPopup id="mods.physicalDescription.help" width="400px" height="250px">
     <label xml:lang="de">
       Hier kann eine physikalische Beschreibung des Dokumentes erfolgen, z.B. bei
-      Postern die Größe.
+      Postern die Größe, bei sonstigen Beiträgen die Seitenzahlen.
     </label>
     <label xml:lang="en">
       Physical description, e.g. size of poster
