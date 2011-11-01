@@ -78,8 +78,11 @@
   </text>
 
   <panel id="mods.shorttitle">
-    <cell anchor="NORTHWEST" var="mods:title[@type='alternative' and @displayLabel='Short form of the title']">
-      <cell anchor="NORTHWEST" ref="TFzeile512" />
+    <cell anchor="NORTHWEST" var="mods:titleInfo[@type='alternative']">
+      <panel>
+        <hidden var="@displayLabel" default="Short form of the title" />
+        <cell anchor="NORTHWEST" var="mods:title" ref="TFzeile512" />
+      </panel>
     </cell>
   </panel>
 
