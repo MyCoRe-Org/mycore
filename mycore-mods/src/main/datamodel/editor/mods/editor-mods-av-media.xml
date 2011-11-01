@@ -63,6 +63,12 @@
     <cell row="50" col="3" anchor="NORTHWEST" ref="mods.abstract.help" />
     <!-- Abstract END -->
 
+    <!-- Extent|Part -->
+    <cell row="55" col="1" anchor="NORTHEAST" ref="mods.book.part.extent.label" />
+    <cell row="55" col="2" anchor="NORTHWEST" ref="mods.book.part.extent" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="55" col="3" anchor="NORTHWEST" ref="mods.av.media.extent.help" />
+    <!-- Extent|Part END -->
+
     <!-- Stichworte -->
     <cell row="60" col="1" anchor="NORTHEAST" ref="mods.subject.label" />
     <cell row="60" col="2" anchor="NORTHWEST" ref="mods.subject" var="metadata/def.modsContainer/modsContainer/mods:mods" />
@@ -105,7 +111,7 @@
 
     <cell row="260" col="1" colspan="3" anchor="NORTHEAST" ref="mods.noteLocationCorp" var="metadata/def.modsContainer/modsContainer/mods:mods" />
 
-    <cell col="1" colspan="3" row="150" anchor="NORTHEAST" style="padding-top:20px;">
+    <cell col="1" colspan="3" row="300" anchor="NORTHEAST" style="padding-top:20px;">
       <submitButton width="100px" i18n="common.button.save" />
       <cancelButton width="100px" i18n="common.button.cancel" />
     </cell>

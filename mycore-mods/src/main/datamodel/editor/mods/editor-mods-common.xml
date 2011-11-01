@@ -252,15 +252,15 @@
 
   <!-- Institutionszugehörigkeit (wo zugeordnet) -->
   <text id="mods.assignedInstitute.label">
-    <label xml:lang="de">Institutionszugehörigkeit</label>
+    <label xml:lang="de">Einrichtung</label>
     <label xml:lang="en">Assignment</label>
   </text>
 
   <helpPopup id="mods.assignedInstitute.help" width="400px" height="250px">
-    <label xml:lang="de">Institut/Fachgruppe/Organisationseinheit, zu welcher die Autoren bzw. die Beitragenden
+    <label xml:lang="de">BMELV-Einrichtung (Institut/Fachgruppe/Organisationseinheit), zu welcher die Autoren bzw. die Beitragenden
       zum Zeitpunkt der Veröffentlichung des Dokumentes, des Erscheinungsjahres des Konferenzbandes
       oder Buches gehört haben.</label>
-    <label xml:lang="en">Select an institution from the list.</label>
+    <label xml:lang="en">Select an BMELV institution from the list.</label>
   </helpPopup>
   <!-- Institutionszugehörigkeit END -->
 
@@ -1111,6 +1111,11 @@
 
   <helpPopup id="mods.book.part.extent.help" width="400px" height="250px">
     <label xml:lang="de">Seitanangaben des Werkes (letzte bedruckte Seitenzahl angeben)</label>
+    <label xml:lang="en">Extent</label>
+  </helpPopup>
+
+  <helpPopup id="mods.av.media.extent.help" width="400px" height="250px">
+    <label xml:lang="de">Größenangaben zum Medium.</label>
     <label xml:lang="en">Extent</label>
   </helpPopup>
   <!-- Extent|Part END -->

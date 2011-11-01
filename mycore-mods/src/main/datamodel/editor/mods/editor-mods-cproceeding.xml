@@ -60,8 +60,8 @@
     <!-- TITLE -->
     <cell row="10" col="1" anchor="NORTHEAST">
     <text>
-        <label xml:lang="de">Titel des Konferenzbandes (*)</label>
-        <label xml:lang="en">Title of Conference Proceedings (*)</label>
+        <label xml:lang="de">Titel des Konferenzbandes</label>
+        <label xml:lang="en">Title of Conference Proceedings</label>
       </text>
     </cell>
     <cell row="10" col="2" anchor="NORTHWEST" ref="mods.title.optional" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />

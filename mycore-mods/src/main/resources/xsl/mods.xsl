@@ -207,6 +207,9 @@
         <xsl:when test="$mods-type = 'article'">
           <xsl:apply-templates select="." mode="present.article" />
         </xsl:when>
+        <xsl:when test="$mods-type = 'av-media'">
+          <xsl:apply-templates select="." mode="present.av-media" />
+        </xsl:when>
         <xsl:otherwise>
           <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/*/*" />
         </xsl:otherwise>
