@@ -1,7 +1,7 @@
 <imports xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <include uri="webapp:editor/editor-mods-external.xml" />
   
-  <list id="language" type="dropdown" default="de">
+  <list id="language" type="dropdown" default="en">
     <include uri="classification:editor:-1:children:rfc4646" cacheable="false" />
   </list>
 
@@ -70,6 +70,28 @@
     </label>
   </helpPopup>
   <!-- TITLE Translated END -->
+
+  <!-- SHORT-TITLE -->
+  <text id="mods.shorttitle.label">
+    <label xml:lang="de">Titelabkürzung</label>
+    <label xml:lang="en">Title Abbreviation</label>
+  </text>
+
+  <panel id="mods.shorttitle">
+    <cell anchor="NORTHWEST" var="mods:title[@type='alternative' and @displayLabel='Short form of the title']">
+      <cell anchor="NORTHWEST" ref="TFzeile512" />
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.shorttitle.help" width="400px" height="250px">
+    <label xml:lang="de">
+      Kurzform des Titels, die beim Zitieren verwendet werden soll.
+    </label>
+    <label xml:lang="en">
+      Short form of the title, which should be used for citation.
+    </label>
+  </helpPopup>
+  <!-- SHORT-TITLE END -->
 
   <!-- TITLE Nebensachtitel-->
   <text id="mods.subtitle.label">
@@ -241,7 +263,7 @@
 
   <!-- Publisher [text] -->
   <text id="mods.publisher.label">
-    <label xml:lang="de">Verleger (*)</label>
+    <label xml:lang="de">Verlag (*)</label>
     <label xml:lang="en">Publisher (*)</label>
   </text>
 
@@ -251,7 +273,7 @@
         <cell anchor="NORTHWEST" >
           <textfield id="mods.publisher.text" width="60" maxlength="512" >
             <condition id="mods.publisher.cond" required="true">
-              <label xml:lang="de">Tragen Sie hier den Verleger/Herausgeber ein (Druckerei, Medienanstalt ...)).</label>
+              <label xml:lang="de">Tragen Sie hier den Verlag oder Verleger/Herausgeber ein (Druckerei, Medienanstalt ...)).</label>
               <label xml:lang="en">Enter publisher here.</label>
             </condition>
           </textfield>
@@ -1191,9 +1213,11 @@
 
   <panel id="mods.issn">
     <cell anchor="NORTHWEST" var="mods:identifier[@type='issn']">
-      <panel>
-        <cell anchor="NORTHWEST" ref="TFzeile512" />
-      </panel>
+      <repeater min="1" pos="right">
+        <panel>
+          <cell anchor="NORTHWEST" ref="TFzeile512" />
+        </panel>
+      </repeater>
     </cell>
   </panel>
 
@@ -1206,6 +1230,27 @@
   </helpPopup>
   <!-- ISSN END -->
 
+  <!-- ZDB-ID -->
+  <text id="mods.zdbid.label">
+    <label xml:lang="de">ZDB-ID</label>
+    <label xml:lang="en">ZDB-ID</label>
+  </text>
+
+  <panel id="mods.zdbid">
+    <cell anchor="NORTHWEST" var="mods:identifier[@type='zdbid']">
+      <panel>
+        <cell anchor="NORTHWEST" ref="TFzeile512" />
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.zdbid.help">
+    <label xml:lang="de">ZDB-ID eingeben (Hilfe folgt)
+    </label>
+    <label xml:lang="en">ZDB-ID</label>
+  </helpPopup>
+  <!-- ZDB-ID END -->
+  
   <!-- Impact Factor -->
   <text id="mods.impact.label">
     <label xml:lang="de">Impact Factor</label>
@@ -1241,7 +1286,11 @@
           </cell>
           <cell col="2" anchor="NORTHWEST" ref="TFzeile10" var="@factor" />
           <cell col="3" anchor="NORTHWEST" var="@refereed">
-            <list type="dropdown" default="yes">
+            <list type="dropdown" default="">
+              <item value="">
+                <label xml:lang="de">(bitte wählen)</label>
+                <label xml:lang="en">(please select)</label>
+              </item>
               <item value="yes">
                 <label xml:lang="de">Ja</label>
                 <label xml:lang="en">Yes</label>

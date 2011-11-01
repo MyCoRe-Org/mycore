@@ -27,13 +27,30 @@
     <cell row="20" col="2" anchor="NORTHWEST" ref="mods.title.translated" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="20" col="3" anchor="NORTHWEST" ref="mods.title.translated.help" />
     <!-- pub_title_engl[text] END -->
-    <!-- Identifier -->
-    <cell row="25" col="1" anchor="NORTHEAST">
-      <label xml:lang="de">ISSN</label>
-    </cell>
-    <cell row="25" col="2" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier[@type='issn']" ref="TFzeile512" />
-    <cell row="25" col="3" anchor="NORTHWEST" ref="mods.identifier.help" />
-    <!-- Identifier END -->
+
+    <!-- short title [text] -->
+    <cell row="21" col="1" anchor="NORTHEAST" ref="mods.shorttitle.label" />
+    <cell row="21" col="2" anchor="NORTHWEST" ref="mods.shorttitle" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
+    <cell row="21" col="3" anchor="NORTHWEST" ref="mods.shorttitle.help" />
+    <!-- short title [text] END -->
+
+    <!-- Publisher [text] -->
+    <cell row="23" col="1" anchor="NORTHEAST" ref="mods.publisher.label" />
+    <cell row="23" col="2" anchor="NORTHWEST" ref="mods.publisher" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
+    <cell row="23" col="3" anchor="NORTHWEST" ref="mods.publisher.help" />
+    <!-- Publisher END -->
+
+    <!-- ISSN -->
+    <cell row="25" col="1" anchor="NORTHEAST" ref="mods.issn.label" />
+    <cell row="25" col="2" anchor="NORTHWEST" ref="mods.issn" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="25" col="3" anchor="NORTHWEST" ref="mods.issn.help" />
+    <!-- ISSN END -->
+
+    <!-- ZDB-ID -->
+    <cell row="27" col="1" anchor="NORTHEAST" ref="mods.zdbid.label" />
+    <cell row="27" col="2" anchor="NORTHWEST" ref="mods.zdbid" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="27" col="3" anchor="NORTHWEST" ref="mods.zdbid.help" />
+    <!-- ZDB-ID END -->
 
     <!-- impact factor -->
     <cell row="30" col="1" anchor="NORTHEAST" ref="mods.impact.label" />
