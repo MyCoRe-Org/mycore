@@ -91,18 +91,23 @@
     <cell row="30" col="3" anchor="NORTHWEST" ref="mods.dateIssued.help" />
     <!-- Herausgabejahr END -->
 
-    <!-- Herausgeber [text] -->
-    
+    <!-- Herausgeber/Verlag [text] -->
     <cell row="40" col="1" anchor="NORTHEAST" ref="mods.publisher.label.optional" />
     <cell row="40" col="2" anchor="NORTHWEST" ref="mods.publisher.optional" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
     <cell row="40" col="3" anchor="NORTHWEST" ref="mods.publisher.help" />
-    <!-- Herausgeber END -->
+    <!-- Herausgeber/Verlag END -->
 
     <!-- Identifier -->
     <cell row="50" col="1" anchor="NORTHEAST" ref="mods.identifier.label" />
     <cell row="50" col="2" anchor="NORTHWEST" ref="mods.identifier" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="50" col="3" anchor="NORTHWEST" ref="mods.identifier.help" />
     <!-- Identifier END -->
+
+    <!-- Umfang -->
+    <cell row="55" col="1" anchor="NORTHEAST" ref="mods.book.part.extent.label" />
+    <cell row="55" col="2" anchor="NORTHWEST" ref="mods.book.part.extent" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="55" col="3" anchor="NORTHWEST" ref="mods.book.part.extent.help" />
+    <!-- Umfang END -->
 
     <!-- Körperschaft -->
     <cell row="60" col="1" anchor="NORTHEAST" ref="mods.corporation.label" />
@@ -138,7 +143,7 @@
     <!-- Rechte END -->
     </panel>
     </cell>
-    <cell row="100" col="1" colspan="3" anchor="NORTHEAST" ref="mods.noteLocationCorp" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="100" col="1" colspan="3" anchor="NORTHWEST" ref="mods.noteLocationCorp" var="metadata/def.modsContainer/modsContainer/mods:mods" />
 
     <cell row="150" col="1" colspan="3" anchor="NORTHEAST" style="padding-top:20px;">
       <submitButton width="100px" i18n="common.button.save" />
