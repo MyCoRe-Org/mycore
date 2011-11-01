@@ -94,6 +94,18 @@
     <cell row="100" col="3" anchor="NORTHWEST" ref="mods.relatedItem.help" />
     <!-- Quelle END -->
 
+    <!-- ISBN -->
+    <cell row="110" col="1" anchor="NORTHEAST" ref="mods.book.isbn.label" />
+    <cell row="110" col="2" anchor="NORTHWEST" ref="mods.book.isbn" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="110" col="3" anchor="NORTHWEST" ref="mods.book.isbn.help" />
+    <!-- ISBN END -->
+
+    <!-- Identifier -->
+    <cell row="111" col="1" anchor="NORTHEAST" ref="mods.identifier.label" />
+    <cell row="111" col="2" anchor="NORTHWEST" ref="mods.identifier.optional" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="111" col="3" anchor="NORTHWEST" ref="mods.identifier.help" />
+    <!-- Identifier END -->
+
     <!-- Stichworte -->
     <cell row="120" col="1" anchor="NORTHEAST" ref="mods.subject.label" />
     <cell row="120" col="2" anchor="NORTHWEST" ref="mods.subject" var="metadata/def.modsContainer/modsContainer/mods:mods" />
