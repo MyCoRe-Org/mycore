@@ -29,6 +29,31 @@
 					that.assignTileImage(arguments[0]);
 				};
 				
+				PanoJS.prototype.positionTilesOrig = PanoJS.prototype.positionTiles;
+				PanoJS.prototype.positionTiles = function cv_positionTiles() {
+					that.positionTiles(arguments[0],arguments[1]);
+				};
+				
+				PanoJS.prototype.releaseOrig = PanoJS.prototype.release;
+				PanoJS.prototype.release = function cv_release() {
+					that.release(arguments[0]);
+				};
+				
+				PanoJS.prototype.resizeOrig = PanoJS.prototype.resize;
+				PanoJS.prototype.resize = function cv_resize() {
+					that.resize();
+				};
+				
+				PanoJS.prototype.resolveCoordinatesOrig = PanoJS.prototype.resolveCoordinates;
+				PanoJS.prototype.resolveCoordinates = function cv_resolveCoordinates() {
+					return that.resolveCoordinates(arguments[0]);
+				};
+				
+				PanoJS.prototype.switchDisplayModeOrig = PanoJS.prototype.switchDisplayMode;
+				PanoJS.prototype.switchDisplayMode = function cv_switchDisplayMode() {
+					return that.switchDisplayMode(arguments[0],arguments[1],arguments[2],arguments[3]);
+				};	
+				
 				PanoJS.prototype.zoomOrig = PanoJS.prototype.zoom;
 				PanoJS.prototype.zoom = function cv_zoom() {
 					that.zoom(arguments[0]);
@@ -37,22 +62,7 @@
 				PanoJS.prototype.zoomViewerOrig = PanoJS.prototype.zoomViewer;
 				PanoJS.prototype.zoomViewer = function cv_zoomViewer() {
 					that.zoomViewer(arguments[0]);
-				};
-				
-				PanoJS.prototype.resizeOrig = PanoJS.prototype.resize;
-				PanoJS.prototype.resize = function cv_resize() {
-					that.resize();
-				};
-				  
-				PanoJS.prototype.positionTilesOrig = PanoJS.prototype.positionTiles;
-				PanoJS.prototype.positionTiles = function cv_positionTiles() {
-					that.positionTiles(arguments[0],arguments[1]);
-				};
-				
-				PanoJS.prototype.switchDisplayModeOrig = PanoJS.prototype.switchDisplayMode;
-				PanoJS.prototype.switchDisplayMode = function cv_switchDisplayMode() {
-					return that.switchDisplayMode(arguments[0],arguments[1],arguments[2],arguments[3]);
-				};			
+				};		
 									  
 				jQuery(document).bind("toolbarloaded", {canvasInstance: this}, function(e) {
 					if (e.model.id != "mainTb") { 
@@ -86,7 +96,7 @@
 		constructor.prototype = Object.create(iview.IViewObject.prototype);
 		
 		// overwritten
-		constructor.prototype.assignTileImage = function cv_assignTileImage(tile, canvas){
+		constructor.prototype.assignTileImage = function cv_assignTileImage(tile){
 			
 			var viewerBean = this.getViewer().viewerBean;
 			
@@ -98,11 +108,11 @@
 				tileImg = this.createImageTile(tileImgId, tile, viewerBean);
 			}
 			if (tileImg.loaded){
-				canvas.drawImage(tileImg, tile.posx, tile.posy, tile.width, tile.height);
+				this.context2D.drawImage(tileImg, tile.posx, tile.posy, tile.width, tile.height);
 			}
 		};
 		
-		constructor.prototype.createImageTile=function cv_createImageTile(tileImgId, tile, viewerBean){
+		constructor.prototype.createImageTile = function cv_createImageTile(tileImgId, tile, viewerBean){
 			var tileImg = new Image();
 			viewerBean.cache.setItem(tileImgId, tileImg);
 			var that = this;
@@ -112,6 +122,31 @@
 			};
 			tileImg.src = tileImgId
 			return tileImg;
+		};
+		
+		constructor.prototype.release = function cv_release(coords){
+			this.getViewer().viewerBean.activate(false);
+			var motion = {
+				'x' : (coords.x - this.getViewer().viewerBean.mark.x),
+				'y' : (coords.y - this.getViewer().viewerBean.mark.y)
+			};
+			this.getViewer().viewerBean.mark = { 'x' : 0, 'y' : 0 };			
+		};
+		
+		constructor.prototype.resolveCoordinates = function cv_resolveCoordinates(e){	
+
+			if(this.getViewer().currentImage.rotation == 0){
+				return {
+					'x' : this.getViewer().viewerBean.x + e.clientX - this.context2D.canvas.offsetLeft,//relativ: e.clientX - this.context2D.canvas.offsetLeft
+					'y' : this.getViewer().viewerBean.y + e.clientY - this.context2D.canvas.offsetTop
+				}	
+			}
+			else if(this.getViewer().currentImage.rotation == 180){
+				return {
+					'x' : -(this.getViewer().viewerBean.x + e.clientX - this.context2D.canvas.offsetLeft),
+					'y' : -(this.getViewer().viewerBean.y + e.clientY - this.context2D.canvas.offsetTop)
+				}
+			}
 		};
 	
 		constructor.prototype.zoom = function cv_zoom(direction){	
@@ -185,14 +220,16 @@
 			}else{
 				this.getViewer().viewerBean.y = 0;
 			}
-
-			this.getViewer().viewerBean.prepareTiles();			
-			this.getViewer().viewerBean.notifyViewerZoomed();
-
-			/*
+			
 			if(this.activateCanvas){
 				this.rotate(true);
-			}*/
+			}
+			else{
+				this.getViewer().viewerBean.prepareTiles();
+			}
+			
+			this.getViewer().viewerBean.notifyViewerZoomed();
+
 		};
 		
 		constructor.prototype.zoomViewer = function cv_zoomViewer(direction){
@@ -264,10 +301,6 @@
 					motion = { 'x' : 0, 'y' : 0 };
 				}
 
-				//fixed movement while mouse is still pressed
-				this.getViewer().viewerBean.mark.x += motion.x; 
-				this.getViewer().viewerBean.mark.y += motion.y;
-
 				var iview = this.getViewer();
 				
 				//Plus <-> Minus
@@ -305,12 +338,10 @@
 				}else{
 					this.getViewer().viewerBean.y = motion.y = 0;
 				}		
-
-		
+				
 				if((xViewerBorder > 0 || yViewerBorder > 0) || (motion.x == 0 && motion.y == 0)){
 					this.updateScreen();		
 				}
-
 			}
 		};
 		
@@ -319,7 +350,6 @@
 			var viewerBean = this.getViewer().viewerBean;
 			var x = -viewerBean.x;
 			var y = -viewerBean.y;
-
 			this.context2D.drawImage(this.preView, x, y, this.getViewer().currentImage.curWidth, this.getViewer().currentImage.curHeight);
 		};
 		
@@ -350,9 +380,7 @@
 			
 			for(var row = 0; row < yTiles; row++){
 				for(var column = 0; column < xTiles; column++){
-					//get the associated tiles
-					//console.log("col:",column,"row:",row);
-					
+					//get the associated tiles					
 					var tile = this.getViewer().viewerBean.tiles[column][row];
 					tile.xIndex = column + startx;
 					tile.yIndex = row + starty;
@@ -362,24 +390,22 @@
 					tile.posx = column * tileSize - xoff;
 					tile.posy = row * tileSize - yoff;
 										
-					this.assignTileImage(tile, this.context2D);					
+					this.assignTileImage(tile);					
 				}			
 			}
 		};
 		
 		constructor.prototype.updateScreen = function cv_updateScreen(render){
 			/*var scope = this;
-
 			if(!render){
 				if (this.updateCanvasCount++ == 0){
 					//mozRequestAnimationFrame has no return value as of FF7, tracking first call to method via updateCanvasCount
 					requestAnimationFrame(function(){scope.updateScreen(true);}, this.context2D.canvas);
 				}
 				return;
-			}*/
+			}
 
-			//this.updateCanvasCount = 0;
-			this.clearCanvas();
+			this.updateCanvasCount = 0;*/
 			this.drawPreview();
 			//this._updateCanvas();
 
@@ -405,8 +431,8 @@
 					that.preView.src = this.getViewer().context.container.find(".preload")[0].firstChild.src;					
 					this.getViewer().context.container.find(".well").find(".preload").remove();		
 					
-					this.context2D.canvas.width = /*this.context2D.canvas.actualWidth =*/ this.getViewer().viewerBean.width;
-					this.context2D.canvas.height = /*this.context2D.canvas.actualHeight =*/ this.getViewer().viewerBean.height;		
+					this.context2D.canvas.width = this.getViewer().viewerBean.width;
+					this.context2D.canvas.height = this.getViewer().viewerBean.height;		
 					
 				}
 				
@@ -421,14 +447,14 @@
 			this.getViewer().context.container.find(".well").prepend(this.context2D.canvas);//before,prepend,append
 		};
 		
-		constructor.prototype.rotate = function cv_rotate(sameAngle){			
-			this.clearCanvas();
+		constructor.prototype.rotate = function cv_rotate(zoomCaller){			
 			
+			this.clearCanvas();  				
 			this.getViewer().currentImage.curWidth = Math.ceil((this.getViewer().currentImage.width / Math.pow(2, this.getViewer().currentImage.zoomInfo.maxZoom - this.getViewer().viewerBean.zoomLevel))*this.getViewer().currentImage.zoomInfo.scale);
 			this.getViewer().currentImage.curHeight = Math.ceil((this.getViewer().currentImage.height / Math.pow(2, this.getViewer().currentImage.zoomInfo.maxZoom - this.getViewer().viewerBean.zoomLevel))*this.getViewer().currentImage.zoomInfo.scale); 
 						
-			if(sameAngle === undefined){//rotate if caller isnt zoom
-				this.getViewer().currentImage.rotation = (this.getViewer().currentImage.rotation + 90 >= 360) ? 0 : this.getViewer().currentImage.rotation + 90;
+			if(zoomCaller === undefined){//rotate if caller isn't zoom
+			this.getViewer().currentImage.rotation = (this.getViewer().currentImage.rotation + 90 >= 360) ? 0 : this.getViewer().currentImage.rotation + 90;
 			}
 			
 			if(this.getViewer().currentImage.rotation != 0){		
@@ -456,26 +482,9 @@
 					this.context2D.translate(this.context2D.canvas.width/2, this.context2D.canvas.height/2);				
 					this.context2D.rotate(this.getViewer().currentImage.rotation * (Math.PI / 180));
 					this.context2D.translate(-this.context2D.canvas.width/2, -this.context2D.canvas.height/2);
-					
-					var oldVar = this.getViewer().viewerBean.width;	  	
-				  	this.getViewer().viewerBean.width = this.getViewer().viewerBean.height;
-				  	this.getViewer().viewerBean.height = oldVar; 			  	
-					
-					oldVar = this.getViewer().viewerBean.x;
-					this.getViewer().viewerBean.x = this.getViewer().viewerBean.y;
-					this.getViewer().viewerBean.y = oldVar;
-					
-				  	oldVar = this.getViewer().currentImage.curWidth;
-					this.getViewer().currentImage.curWidth = this.getViewer().currentImage.curHeight;
-					this.getViewer().currentImage.curHeight = oldVar;	
-					
-					oldVar = this.context2D.canvas.width;
-					this.context2D.canvas.width = this.context2D.canvas.height;
-					this.context2D.canvas.height = oldVar;
 				}
 			}
-
-		  	this.getViewer().viewerBean.clear();
+			//var xViewerBorder = this.getViewer().currentImage.curWidth - this.getViewer().viewerBean.width;
 		  	this.getViewer().viewerBean.prepareTiles();
 		};
 		 
