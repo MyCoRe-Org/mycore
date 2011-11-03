@@ -134,7 +134,6 @@
 		};
 		
 		constructor.prototype.resolveCoordinates = function cv_resolveCoordinates(e){	
-
 			if(this.getViewer().currentImage.rotation == 0){
 				return {
 					'x' : this.getViewer().viewerBean.x + e.clientX - this.context2D.canvas.offsetLeft,//relativ: e.clientX - this.context2D.canvas.offsetLeft
@@ -143,20 +142,20 @@
 			}
 			else if(this.getViewer().currentImage.rotation == 90){
 				return {
-					'x' : -(this.getViewer().viewerBean.x + e.clientX - this.context2D.canvas.offsetLeft),
-					'y' : -(this.getViewer().viewerBean.y + e.clientY - this.context2D.canvas.offsetTop)
-				}
+					'x' : (this.getViewer().viewerBean.x + e.clientY + this.context2D.canvas.offsetTop),
+					'y' : (this.getViewer().viewerBean.y - e.clientX - this.context2D.canvas.offsetLeft)
+				}	
 			}
 			else if(this.getViewer().currentImage.rotation == 180){
 				return {
-					'x' : -(this.getViewer().viewerBean.x + e.clientX - this.context2D.canvas.offsetLeft),
-					'y' : -(this.getViewer().viewerBean.y + e.clientY - this.context2D.canvas.offsetTop)
+					'x' : this.getViewer().viewerBean.x - e.clientX + this.context2D.canvas.offsetLeft,
+					'y' : this.getViewer().viewerBean.y - e.clientY + this.context2D.canvas.offsetTop
 				}
 			}
 			else if(this.getViewer().currentImage.rotation == 270){
 				return {
-					'x' : -(this.getViewer().viewerBean.x + e.clientX - this.context2D.canvas.offsetLeft),
-					'y' : -(this.getViewer().viewerBean.y + e.clientY - this.context2D.canvas.offsetTop)
+					'x' : (this.getViewer().viewerBean.x - e.clientY - this.context2D.canvas.offsetTop),
+					'y' : (this.getViewer().viewerBean.y + e.clientX + this.context2D.canvas.offsetLeft)
 				}
 			}
 		};
@@ -324,8 +323,7 @@
 				if(this.getViewer().currentImage.rotation == 90 || this.getViewer().currentImage.rotation == 270){
 					xViewerBorder = this.getViewer().currentImage.curWidth - this.getViewer().viewerBean.height;
 					yViewerBorder = this.getViewer().currentImage.curHeight - this.getViewer().viewerBean.width;
-				}
-				
+				}				
 				
 				if(xViewerBorder > 0){//testen, ob das Bild überhaupt in der aktuellen Zoomstufe in die Richtung bewegt werden kann
 					if (xMove >  xViewerBorder && xViewerBorder > 0) { //max. Randbegrenzung
@@ -357,7 +355,7 @@
 					this.getViewer().viewerBean.y = motion.y = 0;
 				}
 				
-				console.log("pos:", this.getViewer().viewerBean.x, this.getViewer().viewerBean.y);
+				//console.log("pos:", this.getViewer().viewerBean.x, this.getViewer().viewerBean.y);
 				
 				if((xViewerBorder > 0 || yViewerBorder > 0) || (motion.x == 0 && motion.y == 0)){
 					this.updateScreen();		
@@ -369,13 +367,7 @@
 			//uses negative values because canvas starts at 0,0 and drawing starts there
 			var viewerBean = this.getViewer().viewerBean;
 			var x = -viewerBean.x;
-			var y = -viewerBean.y;
-			/*
-			if(this.getViewer().currentImage.rotation == 90){
-				//x = 250;//Höhe, ehemals Breite
-				//-this.getViewer().currentImage.curHeight;//Breite, ehemals Höhe
-			}*/
-			
+			var y = -viewerBean.y;			
 			this.context2D.drawImage(this.preView, x, y, this.getViewer().currentImage.curWidth, this.getViewer().currentImage.curHeight);
 		};
 		
@@ -515,8 +507,6 @@
 					}else{
 						this.context2D.translate( -this.context2D.canvas.width/2, -this.context2D.canvas.height/2);
 					}
-					
-					//this.getViewer().viewerBean.x = this.getViewer().viewerBean.y = 0;
 				}
 			}
 
