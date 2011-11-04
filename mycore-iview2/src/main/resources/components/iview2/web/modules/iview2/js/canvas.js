@@ -380,7 +380,7 @@
 			var curHeight = this.getViewer().currentImage.curHeight;			
 			
 			//check if rotated and axis are inverted
-			if(this.getViewer().currentImage.rotation == 90 || this.getViewer().currentImage.rotation == 270){
+			if(this.smallerThanCanvas() == false && (this.getViewer().currentImage.rotation == 90 || this.getViewer().currentImage.rotation == 270)){
 				var old = curWidth;
 				curWidth = curHeight;
 				curHeight = old;
@@ -390,7 +390,7 @@
 			var yDim = Math.min(this.context2D.canvas.height,curHeight);
 			
 			//DON'T swap canvas dimensions directly because it would erase the preview
-			if(this.getViewer().currentImage.rotation == 90 || this.getViewer().currentImage.rotation == 270){
+			if(this.smallerThanCanvas() == false && (this.getViewer().currentImage.rotation == 90 || this.getViewer().currentImage.rotation == 270)){
 				if(xDim == this.context2D.canvas.width){
 					var old = xDim;
 					xDim = yDim;
@@ -404,7 +404,7 @@
 			var xTiles = Math.ceil((xDim+xoff) / tileSize);
 			var yTiles = Math.ceil((yDim+yoff) / tileSize);
 			
-			if(this.getViewer().currentImage.rotation == 90 || this.getViewer().currentImage.rotation == 270){
+			if(this.smallerThanCanvas() == false && (this.getViewer().currentImage.rotation == 90 || this.getViewer().currentImage.rotation == 270)){
 				var old = curWidth;
 				curWidth = curHeight;
 				curHeight = old;
@@ -486,6 +486,10 @@
 			this.getViewer().context.container.find(".well").prepend(this.context2D.canvas);//before,prepend,append
 		};
 		
+		constructor.prototype.smallerThanCanvas = function cv_smallerThanCanvas(){
+			return !!((this.getViewer().currentImage.curWidth <= this.getViewer().viewerBean.width && this.getViewer().currentImage.curHeight <= this.getViewer().viewerBean.height) && (this.getViewer().currentImage.curHeight <= this.getViewer().viewerBean.width && this.getViewer().currentImage.curWidth <= this.getViewer().viewerBean.height));
+		};
+		
 		constructor.prototype.rotate = function cv_rotate(zoomCaller){			
 			
 			this.clearCanvas();  				
@@ -503,11 +507,8 @@
 			if(this.getViewer().currentImage.rotation != 0){		
 				
 				//picture is small enough to fit in the canvas area
-				if((this.getViewer().currentImage.curWidth <= this.getViewer().viewerBean.width && this.getViewer().currentImage.curHeight <= this.getViewer().viewerBean.height)
-				&& (this.getViewer().currentImage.curHeight <= this.getViewer().viewerBean.width && this.getViewer().currentImage.curWidth <= this.getViewer().viewerBean.height)){
-					
-					var moveXAxis = 0, moveYAxis = 0;
-					
+				if(this.smallerThanCanvas()){					
+					var moveXAxis = 0, moveYAxis = 0;					
 					switch (this.getViewer().currentImage.rotation){
 				  		case 90:  	moveYAxis = -this.getViewer().currentImage.curHeight;
 				  					break;
@@ -531,12 +532,6 @@
 						this.context2D.translate( -this.context2D.canvas.width/2, -this.context2D.canvas.height/2);
 					}
 					
-					//switch for prepare tiles
-					/*
-					var old = this.getViewer().viewerBean.width;
-					this.getViewer().viewerBean.width = this.getViewer().viewerBean.height;
-					this.getViewer().viewerBean.height = old;
-					*/
 					if(this.getViewer().currentImage.rotation == 90 || this.getViewer().currentImage.rotation == 270){
 						var old = rows;
 						rows = cols;
