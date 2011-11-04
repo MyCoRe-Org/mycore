@@ -355,8 +355,6 @@
 					this.getViewer().viewerBean.y = motion.y = 0;
 				}
 				
-				//console.log("pos:", this.getViewer().viewerBean.x, this.getViewer().viewerBean.y);
-				
 				if((xViewerBorder > 0 || yViewerBorder > 0) || (motion.x == 0 && motion.y == 0)){
 					this.updateScreen();		
 				}
@@ -379,15 +377,38 @@
 		
 			var tileSize = this.getViewer().viewerBean.tileSize;
 			var curWidth = this.getViewer().currentImage.curWidth;
-			var curHeight = this.getViewer().currentImage.curHeight;
+			var curHeight = this.getViewer().currentImage.curHeight;			
+			
+			//check if rotated and axis are inverted
+			if(this.getViewer().currentImage.rotation == 90 || this.getViewer().currentImage.rotation == 270){
+				var old = curWidth;
+				curWidth = curHeight;
+				curHeight = old;
+			}
+			
 			var xDim = Math.min(this.context2D.canvas.width, curWidth);
 			var yDim = Math.min(this.context2D.canvas.height,curHeight);
+			
+			//DON'T swap canvas dimensions directly because it would erase the preview
+			if(this.getViewer().currentImage.rotation == 90 || this.getViewer().currentImage.rotation == 270){
+				if(xDim == this.context2D.canvas.width){
+					var old = xDim;
+					xDim = yDim;
+					yDim = old;
+				}
+			}			
 			
 			var xoff = rect.x%tileSize;
 			var yoff = rect.y%tileSize;
  
 			var xTiles = Math.ceil((xDim+xoff) / tileSize);
 			var yTiles = Math.ceil((yDim+yoff) / tileSize);
+			
+			if(this.getViewer().currentImage.rotation == 90 || this.getViewer().currentImage.rotation == 270){
+				var old = curWidth;
+				curWidth = curHeight;
+				curHeight = old;
+			}
 			
 			var imgXTiles = Math.ceil(curWidth/tileSize);
 			var imgYTiles = Math.ceil(curHeight/tileSize);
@@ -414,7 +435,7 @@
 		};
 		
 		constructor.prototype.updateScreen = function cv_updateScreen(render){
-			/*var scope = this;
+			var scope = this;
 			if(!render){
 				if (this.updateCanvasCount++ == 0){
 					//mozRequestAnimationFrame has no return value as of FF7, tracking first call to method via updateCanvasCount
@@ -423,9 +444,9 @@
 				return;
 			}
 
-			this.updateCanvasCount = 0;*/
+			this.updateCanvasCount = 0;
 			this.drawPreview();
-			//this._updateCanvas();
+			this._updateCanvas();
 
 			if (false){
 				var curTime = new Date();
@@ -470,11 +491,13 @@
 			this.clearCanvas();  				
 			this.getViewer().currentImage.curWidth = Math.ceil((this.getViewer().currentImage.width / Math.pow(2, this.getViewer().currentImage.zoomInfo.maxZoom - this.getViewer().viewerBean.zoomLevel))*this.getViewer().currentImage.zoomInfo.scale);
 			this.getViewer().currentImage.curHeight = Math.ceil((this.getViewer().currentImage.height / Math.pow(2, this.getViewer().currentImage.zoomInfo.maxZoom - this.getViewer().viewerBean.zoomLevel))*this.getViewer().currentImage.zoomInfo.scale); 
-//			var flipSides = false;
+
+			
+			var rows = Math.ceil(this.getViewer().viewerBean.height / this.getViewer().viewerBean.tileSize) + 1;
+			var cols = Math.ceil(this.getViewer().viewerBean.width / this.getViewer().viewerBean.tileSize) + 1;
 			
 			if(zoomCaller === undefined){//rotate if caller isn't zoom
 				this.getViewer().currentImage.rotation = (this.getViewer().currentImage.rotation + 90 >= 360) ? 0 : this.getViewer().currentImage.rotation + 90;
-//				flipSides = true;
 			}
 			
 			if(this.getViewer().currentImage.rotation != 0){		
@@ -507,10 +530,41 @@
 					}else{
 						this.context2D.translate( -this.context2D.canvas.width/2, -this.context2D.canvas.height/2);
 					}
+					
+					//switch for prepare tiles
+					/*
+					var old = this.getViewer().viewerBean.width;
+					this.getViewer().viewerBean.width = this.getViewer().viewerBean.height;
+					this.getViewer().viewerBean.height = old;
+					*/
+					if(this.getViewer().currentImage.rotation == 90 || this.getViewer().currentImage.rotation == 270){
+						var old = rows;
+						rows = cols;
+						cols = rows;
+					}
 				}
 			}
+			//reset\refill tile-array
+			this.getViewer().viewerBean.tiles = [];
+			for (var c = 0; c < cols; c++) {
+				var tileCol = [];
+				for (var r = 0; r < rows; r++) {
+					var tile = {
+						'element' : null,
+						'posx' : 0,
+						'posy' : 0,
+						'xIndex' : c,
+						'yIndex' : r,
+						'qx' : c,
+						'qy' : r
+					};
 
-		  	this.getViewer().viewerBean.prepareTiles();
+					tileCol.push(tile);
+				}
+			
+				this.getViewer().viewerBean.tiles.push(tileCol);
+			}			
+			this.positionTiles();
 		};
 		 
 		return constructor;
