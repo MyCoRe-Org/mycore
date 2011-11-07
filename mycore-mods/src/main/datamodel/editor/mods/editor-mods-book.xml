@@ -18,7 +18,7 @@
     <hidden var="metadata/def.modsContainer/@heritable" default="false" />
 
     <!-- Title --> <!-- ToDo: wird abgelöst durch MyCoRe-Parent-Child-Beziehung! -->
-    <cell row="10" col="1" anchor="NORTHEAST" ref="mods.title.label" />
+    <cell row="10" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.title.label" />
     <cell row="10" col="2" anchor="NORTHWEST" ref="mods.title" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
     <cell row="10" col="3" anchor="NORTHWEST" ref="mods.title.help" />
     <!-- Title END -->
@@ -36,7 +36,7 @@
     <!-- pub_subtitle [text] END -->
     
     <!-- pub_autor_dok_txt [text] and reviewer -->
-    <cell row="30" col="1" anchor="NORTHEAST" ref="mods.person.label" />
+    <cell row="30" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.person.label" />
     <cell row="30" col="2" anchor="NORTHWEST" ref="mods.person" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="30" col="3" anchor="NORTHWEST" ref="mods.person.help" />
     <!-- pub_autor_dok_txt [text] and reviewer END -->

@@ -20,7 +20,7 @@
       <repeater min="1" max="5">
         <panel style="width:100%;">
         <!-- Konferenztitel -->
-            <cell row="10" col="1" anchor="NORTHEAST" ref="mods.nameConference.label" />
+            <cell row="10" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.nameConference.label" />
             <cell row="10" col="2" anchor="NORTHWEST" var="mods:namePart">
               <repeater min="1" max="5">
                 <textfield id="mods.nameConference.tf" width="60" maxlength="512">
@@ -42,7 +42,7 @@
         <!-- Konferenzzeitraum END -->
     
         <!-- Ort -->
-            <cell row="30" col="1" anchor="NORTHEAST" ref="mods.conferencePlace.label" />
+            <cell row="30" col="1"  anchor="NORTHEAST" ref="mods.conferencePlace.label" />
             <cell row="30" col="2" anchor="NORTHWEST" var="mods:affiliation">
               <repeater min="1" max="5">
                 <textfield width="60" maxlength="512" />
@@ -92,8 +92,8 @@
     <!-- Herausgabejahr END -->
 
     <!-- Herausgeber/Verlag [text] -->
-    <cell row="40" col="1" anchor="NORTHEAST" ref="mods.publisher.label.optional" />
-    <cell row="40" col="2" anchor="NORTHWEST" ref="mods.publisher.optional" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
+    <cell row="40" col="1" anchor="NORTHEAST" ref="mods.publisher.label" />
+    <cell row="40" col="2" anchor="NORTHWEST" ref="mods.publisher" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
     <cell row="40" col="3" anchor="NORTHWEST" ref="mods.publisher.help" />
     <!-- Herausgeber/Verlag END -->
 

@@ -38,7 +38,7 @@
     <!-- pub_subtitle [text] END -->
     
     <!-- pub_autor_dok_txt [text] and reviewer -->
-    <cell row="40" col="1" anchor="NORTHEAST" ref="mods.person.label" />
+    <cell row="40" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.person.label" />
     <cell row="40" col="2" anchor="NORTHWEST" ref="mods.person" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="40" col="3" anchor="NORTHWEST" ref="mods.person.help" />
     <!-- pub_autor_dok_txt [text] and reviewer END -->

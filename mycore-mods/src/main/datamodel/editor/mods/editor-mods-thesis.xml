@@ -20,7 +20,7 @@
     <hidden var="metadata/def.modsContainer/@heritable" default="false" />
 
     <!-- pub_title_orig [text] -->
-    <cell row="10" col="1" anchor="NORTHEAST" ref="mods.title.label" />
+    <cell row="10" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.title.label" />
     <cell row="10" col="2" anchor="NORTHWEST" ref="mods.title" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
     <cell row="10" col="3" anchor="NORTHWEST" ref="mods.title.help" />
     <!-- pub_title_orig [text] END -->
@@ -38,20 +38,20 @@
     <!-- pub_subtitle [text] END -->
 
     <!-- pub_autor_dok_txt [text] and reviewer -->
-    <cell row="30" col="1" anchor="NORTHEAST" ref="mods.person.label" />
+    <cell row="30" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.person.label" />
     <cell row="30" col="2" anchor="NORTHWEST" ref="mods.person" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="30" col="3" anchor="NORTHWEST" ref="mods.person.help" />
     <!-- pub_autor_dok_txt [text] and reviewer END -->
 
     <!-- genre classification -->
-    <cell row="35" col="1" anchor="NORTHEAST" ref="mods.genre.kindOfThesis.label" />
+    <cell row="35" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.genre.kindOfThesis.label" />
     <cell row="35" col="2" anchor="NORTHWEST" ref="mods.genre.kindOfThesis" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="35" col="3" anchor="NORTHWEST" ref="mods.genre.kindOfThesis.help" />
     <!-- genre classification END -->
 
   <cell row="40" colspan="3" class="border"><panel style="width:100%;">
     <!-- LANGUAGE -->
-    <cell row="50" col="1" anchor="NORTHEAST" ref="mods.languageTerm.label" />
+    <cell row="50" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.languageTerm.label" />
     <cell row="50" col="2" anchor="NORTHWEST" ref="mods.languageTerm" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
     <cell row="50" col="3" anchor="NORTHWEST" ref="mods.languageTerm.help" />
     <!-- LANGUAGE END -->
@@ -69,7 +69,7 @@
     <!-- Extent|Part END -->
 
     <!-- pub_klassifik -->
-    <cell row="70" col="1" anchor="NORTHEAST" ref="mods.ddc.label" />
+    <cell row="70" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.ddc.label" />
     <cell row="70" col="2" anchor="NORTHWEST" ref="mods.ddc" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="70" col="3" anchor="NORTHWEST" ref="mods.ddc.help" />
     <!-- pub_klassifik END -->
@@ -93,7 +93,7 @@
     <!-- Identifier END -->
 
     <!-- Datum der Veröffentlichung [text] -->
-    <cell row="90" col="1" anchor="NORTHEAST" ref="mods.dateIssued.label" />
+    <cell row="90" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.dateIssued.label" />
     <cell row="90" col="2" anchor="NORTHWEST" ref="mods.dateIssued" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
     <cell row="90" col="3" anchor="NORTHWEST" ref="mods.dateIssued.help" />
     <!-- Datum der Veröffentlichung END -->

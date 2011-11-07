@@ -17,7 +17,7 @@
     <hidden var="metadata/def.modsContainer/@heritable" default="false" />
     
     <!-- pub_title_orig [text] -->
-    <cell row="10" col="1" anchor="NORTHEAST" ref="mods.title.label" />
+    <cell row="10" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.title.label" />
     <cell row="10" col="2" anchor="NORTHWEST" ref="mods.title" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
     <cell row="10" col="3" anchor="NORTHWEST" ref="mods.title.help" />
     <!-- pub_title_orig [text] END -->
