@@ -299,8 +299,15 @@ function hideProperty(o,name,writeable){
 }
 
 function log(){
-  if (typeof(console)!=="undefined") {
-    console.log.apply(window, arguments);
+  if (typeof(console)!=="undefined" && typeof(console.log)!=="undefined") {
+	  try
+	  {
+		  console.log.apply(window, arguments);
+	  }
+	  catch(error)
+	  {
+		  //nothing		 
+	  }
   }
 }
 
