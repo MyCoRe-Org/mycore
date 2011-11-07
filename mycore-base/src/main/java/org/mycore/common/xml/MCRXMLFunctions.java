@@ -45,6 +45,8 @@ import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import org.jdom.JDOMException;
+import org.jdom.output.DOMOutputter;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRURN;
 import org.mycore.common.MCRConfiguration;
@@ -234,6 +236,24 @@ public class MCRXMLFunctions {
     }
 
     public static int getQueryHitCount(String query) {
+        MCRResults result = getQueryResult(query);
+        return result.getNumHits();
+    }
+
+    public static Element getResults(String query) {
+        MCRResults result = getQueryResult(query);
+        org.jdom.Element xml = result.buildXML();
+        DOMOutputter out = new DOMOutputter();
+        try {
+            Document w3cDoc = out.output(new org.jdom.Document(xml));
+            return w3cDoc.getDocumentElement();
+        } catch(JDOMException exc) {
+            LOGGER.error("Error while converting jdom- to w3c-element", exc);
+        }
+        return null;
+    }
+
+    private static MCRResults getQueryResult(String query) {
         MCRCondition condition = new MCRQueryParser().parse(query);
         MCRQuery q = new MCRQuery(condition);
         long start = System.currentTimeMillis();
@@ -242,7 +262,7 @@ public class MCRXMLFunctions {
             long qtime = System.currentTimeMillis() - start;
             LOGGER.debug("total query time: " + qtime);
         }
-        return result.getNumHits();
+        return result;
     }
 
     /**
