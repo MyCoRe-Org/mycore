@@ -326,16 +326,21 @@
   <xsl:param name="num" />
   <xsl:param name="rep" />
 
-  <td class="editorPMUD">
-    <xsl:if test="number($num) &lt; number($rep/@max)">
-      <input tabindex="999" type="image" name="_p-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-plus.png"
-        title="{i18n:translate('component.base.editor.PMUDplus')}"/>
-    </xsl:if>
-  </td>
-  <td class="editorPMUD">
-    <input tabindex="999" type="image" name="_m-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-minus.png"
-      title="{i18n:translate('component.base.editor.PMUDminus')}"/>
-  </td>
+  <xsl:choose>
+    <xsl:when test="$rep/@plusminus='false'" />
+    <xsl:otherwise>
+      <td class="editorPMUD">
+        <xsl:if test="number($num) &lt; number($rep/@max)">
+          <input tabindex="999" type="image" name="_p-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-plus.png"
+            title="{i18n:translate('component.base.editor.PMUDplus')}"/>
+        </xsl:if>
+      </td>
+      <td class="editorPMUD">
+        <input tabindex="999" type="image" name="_m-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-minus.png"
+          title="{i18n:translate('component.base.editor.PMUDminus')}"/>
+      </td>
+    </xsl:otherwise>
+  </xsl:choose>
   <xsl:choose>
     <xsl:when test="$rep/@arrows='false'" />
     <xsl:otherwise>

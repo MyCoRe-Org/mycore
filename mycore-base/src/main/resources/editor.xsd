@@ -2,525 +2,543 @@
 <!-- Mit XMLSpy v2007 sp2 (http://www.altova.com) von Frank Lützenkirchen (Universitätsbibliothek Duisburg-Essen) bearbeitet -->
 <!-- edited with XMLSpy v2005 sp1 U (http://www.xmlspy.com) by Lützenkirchen, Frank (Universität Duisburg-Essen) -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
-	<xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml-2001.xsd"/>
-	<xs:element name="editor">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref="include" minOccurs="0"/>
-				<xs:element name="source" minOccurs="0" maxOccurs="unbounded">
-					<xs:complexType>
-						<xs:attribute name="uri" type="xs:anyURI" use="required"/>
-					</xs:complexType>
-				</xs:element>
-				<xs:element name="cancel" minOccurs="0" maxOccurs="unbounded">
-					<xs:complexType>
-						<xs:attribute name="url" type="xs:anyURI" use="required"/>
-					</xs:complexType>
-				</xs:element>
-				<xs:element name="target">
-					<xs:complexType>
-						<xs:attribute name="type" use="required">
-							<xs:simpleType>
-								<xs:restriction base="xs:string">
-									<xs:enumeration value="servlet"/>
-									<xs:enumeration value="debug"/>
-									<xs:enumeration value="display"/>
-									<xs:enumeration value="url"/>
-									<xs:enumeration value="subselect"/>
-								</xs:restriction>
-							</xs:simpleType>
-						</xs:attribute>
-						<xs:attribute name="name" type="xs:string" use="optional"/>
-						<xs:attribute name="url" type="xs:anyURI" use="optional"/>
-						<xs:attribute name="method" use="required">
-							<xs:simpleType>
-								<xs:restriction base="xs:string">
-									<xs:enumeration value="get"/>
-									<xs:enumeration value="post"/>
-								</xs:restriction>
-							</xs:simpleType>
-						</xs:attribute>
-						<xs:attribute name="format" use="required">
-							<xs:simpleType>
-								<xs:restriction base="xs:string">
-									<xs:enumeration value="xml"/>
-									<xs:enumeration value="name=value"/>
-								</xs:restriction>
-							</xs:simpleType>
-						</xs:attribute>
-					</xs:complexType>
-				</xs:element>
-				<xs:element name="validationMessage" type="labelOutputType" minOccurs="0"/>
-				<xs:element ref="include" minOccurs="0"/>
-				<xs:element name="components">
-					<xs:complexType>
-						<xs:sequence>
-							<xs:element name="headline" minOccurs="0">
-								<xs:complexType>
-									<xs:sequence>
-										<xs:choice maxOccurs="unbounded">
-											<xs:element ref="text"/>
-											<xs:element ref="output"/>
-										</xs:choice>
-									</xs:sequence>
-									<xs:attribute ref="anchor" use="optional"/>
-								</xs:complexType>
-							</xs:element>
-							<xs:choice maxOccurs="unbounded">
-								<xs:element ref="panel"/>
-								<xs:element ref="repeater"/>
-								<xs:element ref="text"/>
-								<xs:element ref="output"/>
-								<xs:element ref="display"/>
-								<xs:element ref="textfield"/>
-								<xs:element ref="textarea"/>
-								<xs:element ref="password"/>
-								<xs:element ref="file"/>
-								<xs:element ref="list"/>
-								<xs:element ref="checkbox"/>
-								<xs:element ref="space"/>
-								<xs:element ref="button"/>
-								<xs:element ref="submitButton"/>
-								<xs:element ref="cancelButton"/>
-								<xs:element ref="helpPopup"/>
-								<xs:element ref="subselect"/>
-								<xs:element ref="include"/>
-							</xs:choice>
-						</xs:sequence>
-						<xs:attribute ref="var" use="optional"/>
-						<xs:attribute name="root" type="xs:IDREF" use="required"/>
-					</xs:complexType>
-				</xs:element>
-				<xs:element ref="include" minOccurs="0"/>
-			</xs:sequence>
-			<xs:attribute name="id" type="xs:ID" use="required"/>
-			<xs:attribute name="validate" type="xs:boolean" use="optional"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="panel">
-		<xs:complexType>
-			<xs:choice maxOccurs="unbounded">
-				<xs:element name="cell" minOccurs="0" maxOccurs="unbounded">
-					<xs:complexType>
-						<xs:choice minOccurs="0">
-							<xs:element ref="panel"/>
-							<xs:element ref="repeater"/>
-							<xs:element ref="text"/>
-							<xs:element ref="output"/>
-							<xs:element ref="display"/>
-							<xs:element ref="textfield"/>
-							<xs:element ref="textarea"/>
-							<xs:element ref="password"/>
-							<xs:element ref="file"/>
-							<xs:element ref="list"/>
-							<xs:element ref="checkbox"/>
-							<xs:element ref="space"/>
-							<xs:element ref="button"/>
-							<xs:element ref="submitButton"/>
-							<xs:element ref="cancelButton"/>
-							<xs:element ref="helpPopup"/>
-							<xs:element ref="subselect"/>
-							<xs:element ref="include"/>
-						</xs:choice>
-						<xs:attribute name="row" use="optional" default="1">
-							<xs:simpleType>
-								<xs:restriction base="xs:int">
-									<xs:minInclusive value="1"/>
-								</xs:restriction>
-							</xs:simpleType>
-						</xs:attribute>
-						<xs:attribute name="col" use="optional" default="1">
-							<xs:simpleType>
-								<xs:restriction base="xs:int">
-									<xs:minInclusive value="1"/>
-								</xs:restriction>
-							</xs:simpleType>
-						</xs:attribute>
-						<xs:attribute name="colspan" use="optional">
-							<xs:simpleType>
-								<xs:restriction base="xs:int">
-									<xs:minInclusive value="1"/>
-								</xs:restriction>
-							</xs:simpleType>
-						</xs:attribute>
-						<xs:attribute ref="sortnr" use="optional"/>
-						<xs:attribute ref="var" use="optional"/>
-						<xs:attribute ref="anchor" use="optional"/>
-						<xs:attribute name="ref" type="xs:IDREF" use="optional"/>
-					</xs:complexType>
-				</xs:element>
-				<xs:element name="hidden" minOccurs="0" maxOccurs="unbounded">
-					<xs:complexType>
-						<xs:attribute ref="var" use="required"/>
-						<xs:attribute name="default" type="xs:string" use="optional"/>
-						<xs:attribute name="descendants" type="xs:boolean" use="optional"/>
-						<xs:attribute ref="sortnr" use="optional"/>
-					</xs:complexType>
-				</xs:element>
-				<xs:element ref="condition" minOccurs="0" maxOccurs="unbounded"/>
-				<xs:element ref="include" minOccurs="0" maxOccurs="unbounded"/>
-			</xs:choice>
-			<xs:attribute name="id" type="xs:ID" use="optional"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="condition">
-		<xs:complexType>
-			<xs:complexContent>
-				<xs:extension base="labelOutputType">
-					<xs:attribute name="id" type="xs:ID" use="required"/>
-					<xs:attribute name="field1" type="varPath" use="optional"/>
-					<xs:attribute name="field2" type="varPath" use="optional"/>
-					<xs:attribute name="type" use="optional">
-						<xs:simpleType>
-							<xs:restriction base="xs:string">
-								<xs:enumeration value="string"/>
-								<xs:enumeration value="integer"/>
-								<xs:enumeration value="decimal"/>
-								<xs:enumeration value="datetime"/>
-							</xs:restriction>
-						</xs:simpleType>
-					</xs:attribute>
-					<xs:attribute name="operator" use="optional">
-						<xs:simpleType>
-							<xs:restriction base="xs:string">
-								<xs:enumeration value="="/>
-								<xs:enumeration value="&gt;"/>
-								<xs:enumeration value="&lt;"/>
-								<xs:enumeration value="&gt;="/>
-								<xs:enumeration value="&lt;="/>
-								<xs:enumeration value="!="/>
-							</xs:restriction>
-						</xs:simpleType>
-					</xs:attribute>
-					<xs:attribute name="format" type="xs:string" use="optional"/>
-					<xs:attribute name="class" type="xs:string" use="optional"/>
-					<xs:attribute name="method" type="xs:string" use="optional"/>
-					<xs:attribute name="xsl" type="xs:string" use="optional"/>
-					<xs:attribute name="min" type="xs:string" use="optional"/>
-					<xs:attribute name="max" type="xs:string" use="optional"/>
-					<xs:attribute name="minLength" type="xs:int" use="optional"/>
-					<xs:attribute name="maxLength" type="xs:int" use="optional"/>
-					<xs:attribute name="regexp" type="xs:string" use="optional"/>
-					<xs:attribute name="required" type="xs:boolean" use="optional" default="false"/>
-				</xs:extension>
-			</xs:complexContent>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="text">
-		<xs:complexType>
-			<xs:complexContent>
-				<xs:extension base="labelOutputType">
-					<xs:attribute name="id" type="xs:ID" use="optional"/>
-				</xs:extension>
-			</xs:complexContent>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="output">
-		<xs:complexType>
-			<xs:attribute name="default" type="xs:string" use="optional"/>
-			<xs:attribute ref="var" use="optional"/>
-			<xs:attribute name="id" type="xs:ID" use="optional"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="display">
-		<xs:complexType>
-			<xs:attribute name="default" type="xs:string" use="optional"/>
-			<xs:attribute name="id" type="xs:ID" use="optional"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="textfield" type="textInputType"/>
-	<xs:element name="textarea">
-		<xs:complexType>
-			<xs:complexContent>
-				<xs:extension base="textInputType">
-					<xs:attribute name="height" type="xs:int" use="required"/>
-					<xs:attribute name="wrap" use="optional">
-						<xs:simpleType>
-							<xs:restriction base="xs:string">
-								<xs:enumeration value="off"/>
-							</xs:restriction>
-						</xs:simpleType>
-					</xs:attribute>
-					<xs:attribute name="wysiwygEditor" type="xs:boolean" use="optional" default="false"/>
-				</xs:extension>
-			</xs:complexContent>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="password">
-		<xs:complexType>
-			<xs:sequence minOccurs="0">
-				<xs:element ref="condition" minOccurs="0" maxOccurs="unbounded"/>
-			</xs:sequence>
-			<xs:attribute name="id" type="xs:ID" use="optional"/>
-			<xs:attribute name="width" type="xs:int" use="required"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="file">
-		<xs:complexType>
-			<xs:attribute name="width" type="xs:int" use="required"/>
-			<xs:attribute name="accept" type="xs:string" use="optional"/>
-			<xs:attribute name="maxlength" type="xs:string" use="optional"/>
-			<xs:attribute name="id" type="xs:ID" use="optional"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="checkbox">
-		<xs:complexType>
-			<xs:complexContent>
-				<xs:extension base="labelOutputType">
-					<xs:sequence minOccurs="0">
-						<xs:element ref="condition" minOccurs="0" maxOccurs="unbounded"/>
-					</xs:sequence>
-					<xs:attribute name="value" type="xs:string" use="required"/>
-					<xs:attribute name="checked" type="xs:boolean" use="optional" default="false"/>
-					<xs:attribute name="id" type="xs:ID" use="optional"/>
-				</xs:extension>
-			</xs:complexContent>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="list">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:choice maxOccurs="unbounded">
-					<xs:element ref="item" maxOccurs="unbounded"/>
-					<xs:element ref="condition"/>
-					<xs:element ref="include"/>
-				</xs:choice>
-			</xs:sequence>
-			<xs:attribute name="id" type="xs:ID" use="optional"/>
-			<xs:attribute name="type" use="required">
-				<xs:simpleType>
-					<xs:restriction base="xs:string">
-						<xs:enumeration value="dropdown"/>
-						<xs:enumeration value="checkbox"/>
-						<xs:enumeration value="radio"/>
-						<xs:enumeration value="multirow"/>
-					</xs:restriction>
-				</xs:simpleType>
-			</xs:attribute>
-			<xs:attribute name="default" type="xs:string" use="optional"/>
-			<xs:attribute name="multiple" type="xs:boolean" use="optional" default="false"/>
-			<xs:attribute name="rows" use="optional">
-				<xs:simpleType>
-					<xs:restriction base="xs:int">
-						<xs:minInclusive value="1"/>
-					</xs:restriction>
-				</xs:simpleType>
-			</xs:attribute>
-			<xs:attribute name="cols" use="optional">
-				<xs:simpleType>
-					<xs:restriction base="xs:int">
-						<xs:minInclusive value="1"/>
-					</xs:restriction>
-				</xs:simpleType>
-			</xs:attribute>
-			<xs:attribute name="width" type="xs:string" use="optional"/>
-			<xs:attribute name="disabled" type="xs:boolean" use="optional" default="false"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="item">
-		<xs:complexType>
-			<xs:complexContent>
-				<xs:extension base="labelOutputType">
-					<xs:sequence minOccurs="0">
-						<xs:choice>
-							<xs:element ref="item" minOccurs="0" maxOccurs="unbounded"/>
-							<xs:element ref="include" minOccurs="0" maxOccurs="unbounded"/>
-						</xs:choice>
-					</xs:sequence>
-					<xs:attribute name="value" type="xs:string" use="required"/>
-				</xs:extension>
-			</xs:complexContent>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="space">
-		<xs:complexType>
-			<xs:attribute name="id" type="xs:ID" use="optional"/>
-			<xs:attribute name="width" type="xs:string" use="optional"/>
-			<xs:attribute name="height" type="xs:string" use="optional"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="button">
-		<xs:complexType>
-			<xs:complexContent>
-				<xs:extension base="buttonType">
-					<xs:attribute name="url" type="xs:anyURI" use="required"/>
-					<xs:attribute name="id" type="xs:ID" use="optional"/>
-				</xs:extension>
-			</xs:complexContent>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="submitButton">
-		<xs:complexType>
-			<xs:complexContent>
-				<xs:extension base="buttonType">
-					<xs:attribute name="id" type="xs:ID" use="optional"/>
-				</xs:extension>
-			</xs:complexContent>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="cancelButton">
-		<xs:complexType>
-			<xs:complexContent>
-				<xs:extension base="buttonType">
-					<xs:attribute name="id" type="xs:ID" use="optional"/>
-				</xs:extension>
-			</xs:complexContent>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="repeater">
-		<xs:complexType>
-			<xs:choice>
-				<xs:element ref="panel"/>
-				<xs:element ref="output"/>
-				<xs:element ref="display"/>
-				<xs:element ref="textfield"/>
-				<xs:element ref="textarea"/>
-				<xs:element ref="password"/>
-				<xs:element ref="file"/>
-				<xs:element ref="list"/>
-				<xs:element ref="checkbox"/>
-				<xs:element ref="subselect"/>
-				<xs:element ref="include"/>
-			</xs:choice>
-			<xs:attribute name="min" type="xs:int" use="required"/>
-			<xs:attribute name="max" type="xs:int" use="required"/>
-			<xs:attribute name="pos" use="optional" default="right">
-				<xs:simpleType>
-					<xs:restriction base="xs:string">
-						<xs:enumeration value="left"/>
-						<xs:enumeration value="right"/>
-						<xs:enumeration value="hidden"/>
-					</xs:restriction>
-				</xs:simpleType>
-			</xs:attribute>
-			<xs:attribute ref="anchor" use="optional"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="include">
-		<xs:complexType>
-			<xs:attribute name="uri" type="xs:string" use="optional"/>
-			<xs:attribute name="ref" type="xs:IDREF" use="optional"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="helpPopup">
-		<xs:complexType>
-			<xs:complexContent>
-				<xs:extension base="labelOutputType">
-					<xs:sequence>
-						<xs:choice>
-							<xs:element name="button" minOccurs="0" maxOccurs="unbounded">
-								<xs:complexType>
-									<xs:attribute ref="xml:lang" use="optional"/>
-								</xs:complexType>
-							</xs:element>
-							<xs:element name="title" minOccurs="0" maxOccurs="unbounded">
-								<xs:complexType>
-									<xs:attribute ref="xml:lang" use="optional"/>
-								</xs:complexType>
-							</xs:element>
-							<xs:element ref="include"/>
-						</xs:choice>
-					</xs:sequence>
-					<xs:attribute name="id" type="xs:ID" use="required"/>
-					<xs:attribute name="width" type="xs:int" use="required"/>
-					<xs:attribute name="height" type="xs:int" use="required"/>
-					<xs:attribute name="css" type="xs:string" use="optional"/>
-					<xs:attribute name="title" type="xs:string" use="optional"/>
-				</xs:extension>
-			</xs:complexContent>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="subselect">
-		<xs:complexType>
-			<xs:complexContent>
-				<xs:extension base="buttonType">
-					<xs:attribute name="id" type="xs:ID" use="required"/>
-					<xs:attribute name="type" use="required">
-						<xs:simpleType>
-							<xs:restriction base="xs:string">
-								<xs:enumeration value="editor"/>
-								<xs:enumeration value="servlet"/>
-								<xs:enumeration value="webpage"/>
-							</xs:restriction>
-						</xs:simpleType>
-					</xs:attribute>
-					<xs:attribute name="href" type="xs:anyURI" use="required"/>
-				</xs:extension>
-			</xs:complexContent>
-		</xs:complexType>
-	</xs:element>
-	<xs:attribute name="sortnr" type="xs:int" id="sortnr"/>
-	<xs:attribute name="var" type="varPath" id="var"/>
-	<xs:attribute name="anchor" default="WEST" id="anchor">
-		<xs:simpleType>
-			<xs:restriction base="xs:string">
-				<xs:enumeration value="NORTH"/>
-				<xs:enumeration value="NORTHEAST"/>
-				<xs:enumeration value="EAST"/>
-				<xs:enumeration value="SOUTHEAST"/>
-				<xs:enumeration value="SOUTH"/>
-				<xs:enumeration value="SOUTHWEST"/>
-				<xs:enumeration value="WEST"/>
-				<xs:enumeration value="NORTHWEST"/>
-				<xs:enumeration value="CENTER"/>
-			</xs:restriction>
-		</xs:simpleType>
-	</xs:attribute>
-	<xs:simpleType name="varPath">
-		<xs:restriction base="xs:string">
-			<xs:pattern value="/?@?[a-zA-Z0-9\-_\.]+(\[@[a-zA-Z0-9\-_\.]+=&apos;[a-zA-Z0-9\-_\.]+&apos;\])?(\[[1-9]+[0-9]*\])?(/@?[a-zA-Z0-9\-_\.]+(\[@[a-zA-Z0-9\-_\.]+=&apos;[a-zA-Z0-9\-_\.]+&apos;\])?(\[[1-9]+[0-9]*\])?)*"/>
-		</xs:restriction>
-	</xs:simpleType>
-	<xs:complexType name="labelOutputType">
-		<xs:sequence minOccurs="0">
-			<xs:element name="label" maxOccurs="unbounded">
-				<xs:complexType mixed="true">
-					<xs:sequence>
-						<xs:any namespace="http://www.w3.org/1999/xhtml" processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
-					</xs:sequence>
-					<xs:attribute name="i18n" type="xs:string" use="optional"/>
-					<xs:attribute name="css-style" type="xs:string" use="optional"/>
-					<xs:attribute ref="xml:lang" use="optional"/>
-				</xs:complexType>
-			</xs:element>
-		</xs:sequence>
-		<xs:attribute name="i18n" type="xs:string" use="optional"/>
-		<xs:attribute name="label" type="xs:string" use="optional"/>
-	</xs:complexType>
-	<xs:complexType name="textInputType">
-		<xs:sequence>
-			<xs:choice>
-				<xs:element name="default" type="xs:string" minOccurs="0"/>
-				<xs:element name="autofill" type="xs:string" minOccurs="0"/>
-			</xs:choice>
-			<xs:element ref="condition" minOccurs="0" maxOccurs="unbounded"/>
-		</xs:sequence>
-		<xs:attribute name="default" type="xs:string" use="optional"/>
-		<xs:attribute name="autofill" type="xs:string" use="optional"/>
-		<xs:attribute name="id" type="xs:ID" use="optional"/>
-		<xs:attribute name="width" type="xs:int" use="required"/>
-		<xs:attribute name="maxlength" type="xs:int" use="optional"/>
-	</xs:complexType>
-	<xs:complexType name="anyComponent">
-		<xs:choice>
-			<xs:element ref="panel"/>
-			<xs:element ref="text"/>
-			<xs:element ref="output"/>
-			<xs:element ref="display"/>
-			<xs:element ref="textfield"/>
-			<xs:element ref="textarea"/>
-			<xs:element ref="password"/>
-			<xs:element ref="file"/>
-			<xs:element ref="list"/>
-			<xs:element ref="checkbox"/>
-			<xs:element ref="space"/>
-		</xs:choice>
-	</xs:complexType>
-	<xs:complexType name="buttonType">
-		<xs:complexContent>
-			<xs:extension base="labelOutputType">
-				<xs:attribute name="width" type="xs:string" use="optional"/>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml-2001.xsd" />
+  <xs:element name="editor">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="include" minOccurs="0" />
+        <xs:element name="source" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:attribute name="uri" type="xs:anyURI" use="required" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="cancel" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:attribute name="url" type="xs:anyURI" use="required" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="target">
+          <xs:complexType>
+            <xs:attribute name="type" use="required">
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="servlet" />
+                  <xs:enumeration value="debug" />
+                  <xs:enumeration value="display" />
+                  <xs:enumeration value="url" />
+                  <xs:enumeration value="subselect" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="name" type="xs:string" use="optional" />
+            <xs:attribute name="url" type="xs:anyURI" use="optional" />
+            <xs:attribute name="method" use="required">
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="get" />
+                  <xs:enumeration value="post" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="format" use="required">
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="xml" />
+                  <xs:enumeration value="name=value" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="validationMessage" type="labelOutputType" minOccurs="0" />
+        <xs:element ref="include" minOccurs="0" />
+        <xs:element name="components">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="headline" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:choice maxOccurs="unbounded">
+                      <xs:element ref="text" />
+                      <xs:element ref="output" />
+                    </xs:choice>
+                  </xs:sequence>
+                  <xs:attribute ref="anchor" use="optional" />
+                  <xs:attributeGroup ref="coreAttr" />
+                </xs:complexType>
+              </xs:element>
+              <xs:choice maxOccurs="unbounded">
+                <xs:element ref="panel" />
+                <xs:element ref="repeater" />
+                <xs:element ref="text" />
+                <xs:element ref="output" />
+                <xs:element ref="display" />
+                <xs:element ref="textfield" />
+                <xs:element ref="textarea" />
+                <xs:element ref="password" />
+                <xs:element ref="file" />
+                <xs:element ref="list" />
+                <xs:element ref="checkbox" />
+                <xs:element ref="space" />
+                <xs:element ref="button" />
+                <xs:element ref="submitButton" />
+                <xs:element ref="cancelButton" />
+                <xs:element ref="helpPopup" />
+                <xs:element ref="subselect" />
+                <xs:element ref="include" />
+              </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="var" use="optional" />
+            <xs:attribute name="root" type="xs:IDREF" use="required" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element ref="include" minOccurs="0" />
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:ID" use="required" />
+      <xs:attribute name="validate" type="xs:boolean" use="optional" />
+      <xs:attributeGroup ref="coreAttr" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="panel">
+    <xs:complexType>
+      <xs:choice maxOccurs="unbounded">
+        <xs:element name="cell" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:choice minOccurs="0">
+              <xs:element ref="panel" />
+              <xs:element ref="repeater" />
+              <xs:element ref="text" />
+              <xs:element ref="output" />
+              <xs:element ref="display" />
+              <xs:element ref="textfield" />
+              <xs:element ref="textarea" />
+              <xs:element ref="password" />
+              <xs:element ref="file" />
+              <xs:element ref="list" />
+              <xs:element ref="checkbox" />
+              <xs:element ref="space" />
+              <xs:element ref="button" />
+              <xs:element ref="submitButton" />
+              <xs:element ref="cancelButton" />
+              <xs:element ref="helpPopup" />
+              <xs:element ref="subselect" />
+              <xs:element ref="include" />
+            </xs:choice>
+            <xs:attribute name="row" use="optional" default="1">
+              <xs:simpleType>
+                <xs:restriction base="xs:int">
+                  <xs:minInclusive value="1" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="col" use="optional" default="1">
+              <xs:simpleType>
+                <xs:restriction base="xs:int">
+                  <xs:minInclusive value="1" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="colspan" use="optional">
+              <xs:simpleType>
+                <xs:restriction base="xs:int">
+                  <xs:minInclusive value="1" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute ref="sortnr" use="optional" />
+            <xs:attribute ref="var" use="optional" />
+            <xs:attribute ref="anchor" use="optional" />
+            <xs:attribute name="ref" type="xs:IDREF" use="optional" />
+            <xs:attributeGroup ref="coreAttr" />
+          </xs:complexType>
+
+        </xs:element>
+        <xs:element name="hidden" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:attribute ref="var" use="required" />
+            <xs:attribute name="default" type="xs:string" use="optional" />
+            <xs:attribute name="descendants" type="xs:boolean" use="optional" />
+            <xs:attribute ref="sortnr" use="optional" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element ref="condition" minOccurs="0" maxOccurs="unbounded" />
+        <xs:element ref="include" minOccurs="0" maxOccurs="unbounded" />
+      </xs:choice>
+      <xs:attribute name="id" type="xs:ID" use="optional" />
+      <xs:attributeGroup ref="coreAttr" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="condition">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="labelOutputType">
+          <xs:attribute name="id" type="xs:ID" use="required" />
+          <xs:attribute name="field1" type="varPath" use="optional" />
+          <xs:attribute name="field2" type="varPath" use="optional" />
+          <xs:attribute name="type" use="optional">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="string" />
+                <xs:enumeration value="integer" />
+                <xs:enumeration value="decimal" />
+                <xs:enumeration value="datetime" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="operator" use="optional">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="=" />
+                <xs:enumeration value="&gt;" />
+                <xs:enumeration value="&lt;" />
+                <xs:enumeration value="&gt;=" />
+                <xs:enumeration value="&lt;=" />
+                <xs:enumeration value="!=" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="format" type="xs:string" use="optional" />
+          <xs:attribute name="class" type="xs:string" use="optional" />
+          <xs:attribute name="method" type="xs:string" use="optional" />
+          <xs:attribute name="xsl" type="xs:string" use="optional" />
+          <xs:attribute name="min" type="xs:string" use="optional" />
+          <xs:attribute name="max" type="xs:string" use="optional" />
+          <xs:attribute name="minLength" type="xs:int" use="optional" />
+          <xs:attribute name="maxLength" type="xs:int" use="optional" />
+          <xs:attribute name="regexp" type="xs:string" use="optional" />
+          <xs:attribute name="required" type="xs:boolean" use="optional" default="false" />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="text">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="labelOutputType">
+          <xs:attributeGroup ref="coreAttr" />
+          <xs:attribute name="id" type="xs:ID" use="optional" />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="output">
+    <xs:complexType>
+      <xs:attribute name="default" type="xs:string" use="optional" />
+      <xs:attribute ref="var" use="optional" />
+      <xs:attribute name="id" type="xs:ID" use="optional" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="display">
+    <xs:complexType>
+      <xs:attribute name="default" type="xs:string" use="optional" />
+      <xs:attribute name="id" type="xs:ID" use="optional" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="textfield" type="textInputType" />
+  <xs:element name="textarea">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="textInputType">
+          <xs:attribute name="height" type="xs:int" use="required" />
+          <xs:attribute name="wrap" use="optional">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="off" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="wysiwygEditor" type="xs:boolean" use="optional" default="false" />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="password">
+    <xs:complexType>
+      <xs:sequence minOccurs="0">
+        <xs:element ref="condition" minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:ID" use="optional" />
+      <xs:attribute name="width" type="xs:int" use="required" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="file">
+    <xs:complexType>
+      <xs:attribute name="width" type="xs:int" use="required" />
+      <xs:attribute name="accept" type="xs:string" use="optional" />
+      <xs:attribute name="maxlength" type="xs:string" use="optional" />
+      <xs:attribute name="id" type="xs:ID" use="optional" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="checkbox">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="labelOutputType">
+          <xs:sequence minOccurs="0">
+            <xs:element ref="condition" minOccurs="0" maxOccurs="unbounded" />
+          </xs:sequence>
+          <xs:attribute name="value" type="xs:string" use="required" />
+          <xs:attribute name="checked" type="xs:boolean" use="optional" default="false" />
+          <xs:attribute name="id" type="xs:ID" use="optional" />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="list">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element ref="item" maxOccurs="unbounded" />
+          <xs:element ref="condition" />
+          <xs:element ref="include" />
+        </xs:choice>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:ID" use="optional" />
+      <xs:attribute name="type" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="dropdown" />
+            <xs:enumeration value="checkbox" />
+            <xs:enumeration value="radio" />
+            <xs:enumeration value="multirow" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="default" type="xs:string" use="optional" />
+      <xs:attribute name="multiple" type="xs:boolean" use="optional" default="false" />
+      <xs:attribute name="rows" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:int">
+            <xs:minInclusive value="1" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="cols" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:int">
+            <xs:minInclusive value="1" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="width" type="xs:string" use="optional" />
+      <xs:attribute name="disabled" type="xs:boolean" use="optional" default="false" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="item">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="labelOutputType">
+          <xs:sequence minOccurs="0">
+            <xs:choice>
+              <xs:element ref="item" minOccurs="0" maxOccurs="unbounded" />
+              <xs:element ref="include" minOccurs="0" maxOccurs="unbounded" />
+            </xs:choice>
+          </xs:sequence>
+          <xs:attribute name="value" type="xs:string" use="required" />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="space">
+    <xs:complexType>
+      <xs:attribute name="id" type="xs:ID" use="optional" />
+      <xs:attribute name="width" type="xs:string" use="optional" />
+      <xs:attribute name="height" type="xs:string" use="optional" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="button">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="buttonType">
+          <xs:attribute name="url" type="xs:anyURI" use="required" />
+          <xs:attribute name="id" type="xs:ID" use="optional" />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="submitButton">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="buttonType">
+          <xs:attribute name="id" type="xs:ID" use="optional" />
+        </xs:extension>
+      </xs:complexContent>
+
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="cancelButton">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="buttonType">
+          <xs:attribute name="id" type="xs:ID" use="optional" />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="repeater">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref="panel" />
+        <xs:element ref="output" />
+        <xs:element ref="display" />
+        <xs:element ref="textfield" />
+        <xs:element ref="textarea" />
+        <xs:element ref="password" />
+        <xs:element ref="file" />
+        <xs:element ref="list" />
+        <xs:element ref="checkbox" />
+        <xs:element ref="subselect" />
+        <xs:element ref="include" />
+      </xs:choice>
+      <xs:attribute name="min" type="xs:int" use="required" />
+      <xs:attribute name="max" type="xs:int" use="required" />
+      <xs:attribute name="plusminus" type="xs:boolean" use="optional" default="true" />
+      <xs:attribute name="arrows" type="xs:boolean" use="optional" default="true" />
+      <xs:attribute name="pos" use="optional" default="right">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="left" />
+            <xs:enumeration value="right" />
+            <xs:enumeration value="hidden" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute ref="anchor" use="optional" />
+      <xs:attributeGroup ref="coreAttr" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="include">
+    <xs:complexType>
+      <xs:attribute name="uri" type="xs:string" use="optional" />
+      <xs:attribute name="ref" type="xs:IDREF" use="optional" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="helpPopup">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="labelOutputType">
+          <xs:sequence>
+            <xs:choice>
+              <xs:element name="button" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:attribute ref="xml:lang" use="optional" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="title" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:attribute ref="xml:lang" use="optional" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element ref="include" />
+            </xs:choice>
+          </xs:sequence>
+          <xs:attribute name="id" type="xs:ID" use="required" />
+          <xs:attribute name="width" type="xs:int" use="required" />
+          <xs:attribute name="height" type="xs:int" use="required" />
+          <xs:attribute name="css" type="xs:string" use="optional" />
+          <xs:attribute name="title" type="xs:string" use="optional" />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="subselect">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="buttonType">
+          <xs:attribute name="id" type="xs:ID" use="required" />
+          <xs:attribute name="type" use="required">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="editor" />
+                <xs:enumeration value="servlet" />
+                <xs:enumeration value="webpage" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="href" type="xs:anyURI" use="required" />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="coreAttr">
+    <xs:attribute name="class" type="xs:string" use="optional" />
+    <xs:attribute name="session" type="xs:string" use="optional" />
+  </xs:attributeGroup>
+  <xs:attribute name="sortnr" type="xs:int" id="sortnr" />
+  <xs:attribute name="var" type="varPath" id="var" />
+  <xs:attribute name="anchor" default="WEST" id="anchor">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="NORTH" />
+        <xs:enumeration value="NORTHEAST" />
+        <xs:enumeration value="EAST" />
+        <xs:enumeration value="SOUTHEAST" />
+        <xs:enumeration value="SOUTH" />
+        <xs:enumeration value="SOUTHWEST" />
+        <xs:enumeration value="WEST" />
+        <xs:enumeration value="NORTHWEST" />
+        <xs:enumeration value="CENTER" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:simpleType name="varPath">
+    <xs:restriction base="xs:string">
+<!-- namespace prefix:  ([\i-[:]][\c-[:]]*:)? -->
+<!-- our namespace prefix:  ([a-zA-Z][a-zA-Z0-9\-_\.]*:)? -->
+      <xs:pattern
+        value="/?@?([a-zA-Z][a-zA-Z0-9\-_\.]*:)?[a-zA-Z0-9\-_\.]+(\[@([a-zA-Z][a-zA-Z0-9\-_\.]*:)?[a-zA-Z0-9\-_\.]+=&apos;[a-zA-Z0-9\-_\.]+&apos;\])?(\[[1-9]+[0-9]*\])?(/@?([a-zA-Z][a-zA-Z0-9\-_\.]*:)?[a-zA-Z0-9\-_\.]+(\[@([a-zA-Z][a-zA-Z0-9\-_\.]*:)?[a-zA-Z0-9\-_\.]+=&apos;[a-zA-Z0-9\-_\.]+&apos;\])?(\[[1-9]+[0-9]*\])?)*" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="labelOutputType">
+    <xs:sequence minOccurs="0">
+      <xs:element name="label" maxOccurs="unbounded">
+        <xs:complexType mixed="true">
+          <xs:sequence>
+            <xs:any namespace="http://www.w3.org/1999/xhtml" processContents="skip" minOccurs="0" maxOccurs="unbounded" />
+          </xs:sequence>
+          <xs:attribute name="i18n" type="xs:string" use="optional" />
+          <xs:attribute name="css-style" type="xs:string" use="optional" />
+          <xs:attribute ref="xml:lang" use="optional" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="i18n" type="xs:string" use="optional" />
+    <xs:attribute name="label" type="xs:string" use="optional" />
+  </xs:complexType>
+  <xs:complexType name="textInputType">
+    <xs:sequence>
+      <xs:choice>
+        <xs:element name="default" type="xs:string" minOccurs="0" />
+        <xs:element name="autofill" type="xs:string" minOccurs="0" />
+      </xs:choice>
+      <xs:element ref="condition" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+    <xs:attribute name="default" type="xs:string" use="optional" />
+    <xs:attribute name="autofill" type="xs:string" use="optional" />
+    <xs:attribute name="id" type="xs:ID" use="optional" />
+    <xs:attribute name="width" type="xs:int" use="required" />
+    <xs:attribute name="maxlength" type="xs:int" use="optional" />
+  </xs:complexType>
+  <xs:complexType name="anyComponent">
+    <xs:choice>
+      <xs:element ref="panel" />
+      <xs:element ref="text" />
+      <xs:element ref="output" />
+      <xs:element ref="display" />
+      <xs:element ref="textfield" />
+      <xs:element ref="textarea" />
+      <xs:element ref="password" />
+      <xs:element ref="file" />
+      <xs:element ref="list" />
+      <xs:element ref="checkbox" />
+      <xs:element ref="space" />
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="buttonType">
+    <xs:complexContent>
+      <xs:extension base="labelOutputType">
+        <xs:attribute name="width" type="xs:string" use="optional" />
+        <xs:attributeGroup ref="coreAttr" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
 </xs:schema>
