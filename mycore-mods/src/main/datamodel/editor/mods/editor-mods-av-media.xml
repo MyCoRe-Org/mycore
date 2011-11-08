@@ -16,7 +16,7 @@
     <hidden var="metadata/def.modsContainer/@heritable" default="false" />
 
     <!-- genre classification -->
-    <cell row="4" col="1" anchor="NORTHEAST" ref="mods.genre.kindOfAVMedia.label" />
+    <cell row="4" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.genre.kindOfAVMedia.label" />
     <cell row="4" col="2" anchor="NORTHWEST" ref="mods.genre.kindOfAVMedia" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="4" col="3" anchor="NORTHWEST" ref="mods.genre.kindOfAVMedia.help" />
     <!-- genre classification END -->
@@ -34,13 +34,13 @@
     <!-- pub_subtitle [text] END -->
 
     <!-- LANGUAGE -->
-    <cell row="10" col="1" anchor="NORTHEAST" ref="mods.languageTerm.label" />
+    <cell row="10" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.languageTerm.label" />
     <cell row="10" col="2" anchor="NORTHWEST" ref="mods.languageTerm" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
     <cell row="10" col="3" anchor="NORTHWEST" ref="mods.languageTerm.help" />
     <!-- LANGUAGE END -->
     
     <!-- pub_autor_dok_txt [text] and reviewer -->
-    <cell row="20" col="1" anchor="NORTHEAST" ref="mods.person.label" />
+    <cell row="20" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.person.label" />
     <cell row="20" col="2" anchor="NORTHWEST" ref="mods.person" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="20" col="3" anchor="NORTHWEST" ref="mods.person.help" />
     <!-- pub_autor_dok_txt [text] and reviewer END -->
@@ -52,7 +52,7 @@
     <!-- Publisher END -->
 
     <!-- Datum der Veröffentlichung [text] -->
-    <cell row="40" col="1" anchor="NORTHEAST" ref="mods.dateIssued.label" />
+    <cell row="40" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.dateIssued.AVmedia.label" />
     <cell row="40" col="2" anchor="NORTHWEST" ref="mods.dateIssued" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
     <cell row="40" col="3" anchor="NORTHWEST" ref="mods.dateIssued.help" />
     <!-- Datum der Veröffentlichung END -->

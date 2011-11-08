@@ -23,7 +23,7 @@
 
   <cell row="20" colspan="3" class="border"><panel style="width:100%;">
     <!-- TITLE -->
-    <cell row="10" col="1" anchor="NORTHEAST" ref="mods.title.label" />
+    <cell row="10" col="1" anchor="NORTHEAST" class="mandatory" ref="mods.title.label" />
     <cell row="10" col="2" anchor="NORTHWEST" ref="mods.title" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
     <cell row="10" col="3" anchor="NORTHWEST" ref="mods.title.help" />
     <!-- TITLE END -->
@@ -41,18 +41,13 @@
     <!-- pub_subtitle [text] END -->
     
     <!-- pub_autor_dok_txt [text] and reviewer -->
-    <cell row="30" col="1" anchor="NORTHEAST" ref="mods.person.label" />
+    <cell row="30" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.person.label" />
     <cell row="30" col="2" anchor="NORTHWEST" ref="mods.person" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="30" col="3" anchor="NORTHWEST" ref="mods.person.help" />
     <!-- pub_autor_dok_txt [text] and reviewer END -->
     
     <!-- pub_genre -->
-    <cell row="35" col="1" anchor="NORTHEAST">
-      <text>
-        <label xml:lang="de">Genre*</label>
-        <label xml:lang="en">Genre*</label>
-      </text>
-    </cell>
+    <cell row="35" col="1" anchor="NORTHEAST" class="mandatory" ref="mods.genre.kindOfReport.label" />
     <cell row="35" col="2" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre">
       <panel>
         <hidden var="@type" default="kindof" />

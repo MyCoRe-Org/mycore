@@ -20,7 +20,7 @@
     <cell row="5" colspan="3" anchor="NORTHWEST" ref="displayParent" />
 
     <!-- pub_title_orig [text] -->
-    <cell row="10" col="1" style="width:150px;" anchor="NORTHEAST" ref="mods.title.label" />
+    <cell row="10" col="1" style="width:150px;" class="mandatory" anchor="NORTHEAST" ref="mods.title.label" />
     <cell row="10" col="2" anchor="NORTHWEST" ref="mods.title" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
     <cell row="10" col="3" anchor="NORTHWEST" ref="mods.title.help" />
     <!-- pub_title_orig [text] END -->
@@ -66,17 +66,11 @@
               </helpPopup>
             </cell>
             <cell row="20" col="1" anchor="NORTHEAST">
-              <text>
-                <label xml:lang="de">Jahrgang</label>
-                <label xml:lang="en">Volume</label>
-              </text>
+              <text i18n="metaData.mods.dictionary.volume.article" />
             </cell>
             <cell row="20" col="2" colspan="2" var="mods:detail[@type='volume']/mods:number" anchor="NORTHWEST" ref="TFzeile10" />
             <cell row="30" col="1" anchor="NORTHEAST">
-              <text>
-                <label xml:lang="de">Jahr</label>
-                <label xml:lang="en">Year</label>
-              </text>
+              <text i18n="metaData.mods.dictionary.year" />
             </cell>
             <cell row="30" col="2" colspan="2" var="mods:date" anchor="NORTHWEST" id="tf.host.year">
               <textfield width="4" maxlength="4">
@@ -100,7 +94,7 @@
         </cell>
       
     <!-- Datum der Veröffentlichung [text] -->
-        <cell row="50" col="1" anchor="NORTHEAST" ref="mods.dateIssued.label" />
+        <cell row="50" col="1" anchor="NORTHEAST" class="mandatory" ref="mods.dateIssued.label" />
         <cell row="50" col="2" anchor="NORTHWEST" ref="mods.dateIssued" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='host']/mods:originInfo" />
         <cell row="50" col="3" anchor="NORTHWEST" ref="mods.dateIssued.help" />
     <!-- Datum der Veröffentlichung END -->
@@ -124,7 +118,7 @@
     <!-- Identifier END -->
     
     <!-- LANGUAGE -->
-        <cell row="80" col="1" anchor="NORTHEAST" ref="mods.languageTerm.label" />
+        <cell row="80" col="1" anchor="NORTHEAST" class="mandatory" ref="mods.languageTerm.label" />
         <cell row="80" col="2" anchor="NORTHWEST" ref="mods.languageTerm" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
         <cell row="80" col="3" anchor="NORTHWEST" ref="mods.languageTerm.help" />
     <!-- LANGUAGE END -->
@@ -137,7 +131,7 @@
     
     <!-- pub_klassifik -->
         <cell row="100" col="1" anchor="NORTHEAST" ref="mods.ddc.label" />
-        <cell row="100" col="2" anchor="NORTHWEST" ref="mods.ddc" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+        <cell row="100" col="2" anchor="NORTHWEST" ref="mods.ddc.optional" var="metadata/def.modsContainer/modsContainer/mods:mods" />
         <cell row="100" col="3" anchor="NORTHWEST" ref="mods.ddc.help" />
     <!-- pub_klassifik END -->
     

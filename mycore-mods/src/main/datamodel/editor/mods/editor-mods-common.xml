@@ -7,12 +7,8 @@
 
   <!-- TITLE -->
   <text id="mods.title.label" i18n="metaData.mods.dictionary.title" />
-
-  <text id="mods.related.title.label">
-    <label xml:lang="de">Titel des Buches*</label>
-    <label xml:lang="en">Booktitle*</label>
-  </text>
-
+  <text id="mods.related.title.label" i18n="metaData.mods.dictionary.relatedtitle" />
+  <text id="mods.cproceeding.title.label" i18n="metaData.mods.dictionary.cproceedingtitle" />
   <panel id="mods.title">
     <cell anchor="NORTHWEST" var="mods:title">
       <textarea id="mods.title.text" width="50" height="3">
@@ -335,6 +331,8 @@
 
   <!-- Datum der Veröffentlichung [text] -->
   <text id="mods.dateIssued.label" i18n="metaData.mods.dictionary.dateIssued" />
+  <text id="mods.dateIssued.book.label" i18n="metaData.mods.dictionary.dateIssued.book" />
+  <text id="mods.dateIssued.AVmedia.label" i18n="metaData.mods.dictionary.dateCaptured" />
   <panel id="mods.dateIssued">
     <cell anchor="NORTHWEST" var="mods:dateIssued">
       <panel>
@@ -669,6 +667,15 @@
       </list>
     </cell>
   </panel>
+  
+  <panel id="mods.ddc.optional">
+    <cell anchor="NORTHWEST" var="mods:classification[@authority='ddc']">
+    <list width="30" type="dropdown">
+        <include ref="pleaseSelect" />
+        <include uri="classification:editor:-1:children:ddc-sg" cacheable="false" />
+    </list>
+    </cell>
+  </panel>   
 
   <helpPopup id="mods.ddc.help" width="400px" height="250px">
     <label xml:lang="de">Die Zuordnung des Dokumentes zur DDC-Sachgruppe. Mit dem "+" Button
@@ -1046,11 +1053,7 @@
   <!-- Seiten von bis END -->
 
   <!-- ISBN -->
-  <text id="mods.book.isbn.label">
-    <label xml:lang="de">ISBN</label>
-    <label xml:lang="en">ISBN</label>
-  </text>
-
+  <text id="mods.book.isbn.label"  i18n="metaData.mods.dictionary.identifier.isbn" />
   <panel id="mods.book.isbn">
     <cell anchor="NORTHWEST" var="mods:identifier[@type='isbn']">
       <panel>
@@ -1076,11 +1079,7 @@
   <!-- ISBN END -->
 
   <!-- ISSN -->
-  <text id="mods.issn.label">
-    <label xml:lang="de">ISSN</label>
-    <label xml:lang="en">ISSN</label>
-  </text>
-
+  <text id="mods.issn.label" i18n="metaData.mods.dictionary.identifier.issn" />
   <panel id="mods.issn">
     <cell anchor="NORTHWEST" var="mods:identifier[@type='issn']">
       <repeater min="1" pos="right">
@@ -1101,11 +1100,7 @@
   <!-- ISSN END -->
 
   <!-- ZDB-ID -->
-  <text id="mods.zdbid.label">
-    <label xml:lang="de">ZDB-ID</label>
-    <label xml:lang="en">ZDB-ID</label>
-  </text>
-
+  <text id="mods.zdbid.label" i18n="metaData.mods.dictionary.identifier.zdbid" />
   <panel id="mods.zdbid">
     <cell anchor="NORTHWEST" var="mods:identifier[@type='zdbid']">
       <panel>
@@ -1122,11 +1117,7 @@
   <!-- ZDB-ID END -->
   
   <!-- Impact Factor -->
-  <text id="mods.impact.label">
-    <label xml:lang="de">Impact Factor</label>
-    <label xml:lang="en">Impact Factor</label>
-  </text>
-
+  <text id="mods.impact.label" i18n="metaData.mods.dictionary.impact" />
   <panel id="mods.impact">
     <cell anchor="NORTHWEST" var="mods:extension[@displayLabel='impact']/impact">
       <panel>
@@ -1143,10 +1134,7 @@
           </text>
         </cell>
         <cell col="3">
-          <text>
-            <label xml:lang="de">Referiert</label>
-            <label xml:lang="en">Refereed</label>
-          </text>
+          <text i18n="metaData.mods.dictionary.refereed" />
         </cell>
       </panel>
       <repeater min="1" pos="right">
@@ -1184,11 +1172,7 @@ Beispiel: 2.203 oder 20.686</label>
   <!-- Impact Factor END -->
 
   <!-- URL [link] -->
-  <text id="mods.location.url.label">
-    <label xml:lang="de">URL</label>
-    <label xml:lang="en">URL</label>
-  </text>
-
+  <text id="mods.location.url.label" i18n="metaData.mods.dictionary.url" />
   <panel id="mods.location.url">
     <cell anchor="NORTHWEST" var="mods:url">
       <panel>
@@ -1197,11 +1181,7 @@ Beispiel: 2.203 oder 20.686</label>
     </cell>
   </panel>
   
-  <text id="mods.location.url.displayLabel.label">
-    <label xml:lang="de">URL - Anzeige</label>
-    <label xml:lang="en">URL - Display Label</label>
-  </text>
-
+  <text id="mods.location.url.displayLabel.label" i18n="metaData.mods.dictionary.url.display" />
   <panel id="mods.location.url.displayLabel">
     <cell anchor="NORTHWEST" var="mods:url/@displayLabel">
       <panel>
@@ -1233,11 +1213,7 @@ Beispiel: 2.203 oder 20.686</label>
   <!-- URL END -->
 
   <!-- Rights -->
-  <text id="mods.rights.label">
-    <label xml:lang="de">Rechte</label>
-    <label xml:lang="en">Rights</label>
-  </text>
-
+  <text id="mods.rights.label" i18n="metaData.mods.dictionary.rights" />
   <panel id="mods.rights">
     <cell anchor="NORTHWEST" var="mods:accessCondition[@type='use and reproduction']">
       <list type="dropdown" default="">

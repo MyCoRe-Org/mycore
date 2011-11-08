@@ -72,7 +72,7 @@
 
     <!-- pub_klassifik -->
     <cell row="80" col="1" anchor="NORTHEAST" ref="mods.ddc.label" />
-    <cell row="80" col="2" anchor="NORTHWEST" ref="mods.ddc" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="80" col="2" anchor="NORTHWEST" ref="mods.ddc.optional" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="80" col="3" anchor="NORTHWEST" ref="mods.ddc.help" />
     <!-- pub_klassifik END -->
     

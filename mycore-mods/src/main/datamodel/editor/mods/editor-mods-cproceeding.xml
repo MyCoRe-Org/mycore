@@ -58,12 +58,7 @@
     <cell row="10" colspan="3" class="border">
     <panel style="width:100%;">
     <!-- TITLE -->
-    <cell row="10" col="1" anchor="NORTHEAST">
-    <text>
-        <label xml:lang="de">Titel des Konferenzbandes</label>
-        <label xml:lang="en">Title of Conference Proceedings</label>
-      </text>
-    </cell>
+    <cell row="10" col="1" anchor="NORTHEAST" ref="mods.cproceeding.title.label" />
     <cell row="10" col="2" anchor="NORTHWEST" ref="mods.title.optional" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
     <cell row="10" col="3" anchor="NORTHWEST" ref="mods.title.help" />
     <!-- TITLE END -->
@@ -81,12 +76,7 @@
     <!-- pub_subtitle [text] END -->
 
     <!-- Herausgabejahr -->
-    <cell row="30" col="1" anchor="NORTHEAST">
-    <text>
-        <label xml:lang="de">Erscheinungsjahr</label>
-        <label xml:lang="en">Date Issued</label>
-      </text>
-    </cell>
+    <cell row="30" col="1" anchor="NORTHEAST" ref="mods.dateIssued.book.label" />
     <cell row="30" col="2" anchor="NORTHWEST" ref="mods.dateIssued.optional" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
     <cell row="30" col="3" anchor="NORTHWEST" ref="mods.dateIssued.help" />
     <!-- Herausgabejahr END -->

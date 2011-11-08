@@ -65,14 +65,8 @@
     <cell row="80" col="2" anchor="NORTHWEST" ref="mods.countryOfPublication" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
     <cell row="80" col="3" anchor="NORTHWEST" ref="mods.countryOfPublication.help" />
     <!-- Country of publication END -->
-
     <!-- Datum der Veröffentlichung [text] -->
-    <cell row="90" col="1" anchor="NORTHEAST">
-    <text>
-        <label xml:lang="de">Erscheinungsjahr*</label>
-        <label xml:lang="en">Date Issued*</label>
-      </text>
-    </cell>
+    <cell row="90" col="1" anchor="NORTHEAST" class="mandatory" ref="mods.dateIssued.book.label" />
     <cell row="90" col="2" anchor="NORTHWEST" ref="mods.dateIssued" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
     <cell row="90" col="3" anchor="NORTHWEST" ref="mods.dateIssued.help" />
     <!-- Datum der Veröffentlichung END -->
@@ -114,7 +108,7 @@
     <!-- Identifier END -->
 
     <!-- LANGUAGE -->
-    <cell row="190" col="1" anchor="NORTHEAST" ref="mods.languageTerm.label" />
+    <cell row="190" col="1"  class="mandatory" anchor="NORTHEAST" ref="mods.languageTerm.label" />
     <cell row="190" col="2" anchor="NORTHWEST" ref="mods.languageTerm" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
     <cell row="190" col="3" anchor="NORTHWEST" ref="mods.languageTerm.help" />
     <!-- LANGUAGE END -->
@@ -127,7 +121,7 @@
 
     <!-- pub_klassifik -->
     <cell row="230" col="1" anchor="NORTHEAST" ref="mods.ddc.label" />
-    <cell row="230" col="2" anchor="NORTHWEST" ref="mods.ddc" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="230" col="2" anchor="NORTHWEST" ref="mods.ddc.optional" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="230" col="3" anchor="NORTHWEST" ref="mods.ddc.help" />
     <!-- pub_klassifik END -->
 
