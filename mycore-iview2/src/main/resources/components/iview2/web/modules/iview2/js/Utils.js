@@ -302,7 +302,8 @@ function log(){
   if (typeof(console)!=="undefined" && typeof(console.log)!=="undefined") {
 	  try
 	  {
-		  console.log.apply(window, arguments);
+		  console.log(arguments);
+		  //console.log.apply(window, arguments);
 	  }
 	  catch(error)
 	  {
