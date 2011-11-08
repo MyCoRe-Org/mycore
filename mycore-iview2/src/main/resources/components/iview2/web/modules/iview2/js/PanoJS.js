@@ -109,7 +109,7 @@ function PanoJS(viewer, options) {
 	//TODO maybe its possible to store all data which is kept in images in tiles
 	this.images = [];
 	//create Cache Object where the size is the amount of tiles which can be displayed at once plus one row/column on each site
-	this.cache = new Cache((Math.ceil(screen.availWidth / this.tileSize) + 2) *  (Math.ceil(screen.availHeight / this.tileSize) + 2));
+	this.cache = new Cache(Math.ceil(screen.availWidth / this.tileSize) * Math.ceil(screen.availHeight / this.tileSize) * 4);
 	this.cche = {};
 	var blankTile = options.blankTile ? options.blankTile : PanoJS.BLANK_TILE_IMAGE;
 	var loadingTile = options.loadingTile ? options.loadingTile : PanoJS.LOADING_TILE_IMAGE;
@@ -530,9 +530,9 @@ PanoJS.prototype = {
 		}
 		else {
 			var loadingImgId = 'loading:' + tile.qx + ':' + tile.qy;
-			var loadingImg = this.cache[loadingImgId];
+			var loadingImg = this.cche[loadingImgId];
 			if (loadingImg == null) {
-				loadingImg = this.cache[loadingImgId] = this.createPrototype(this.loadingImg.src);
+				loadingImg = this.cche[loadingImgId] = this.createPrototype(this.loadingImg.src);
 			}
 
 			loadingImg.targetSrc = tileImgId;
@@ -649,8 +649,8 @@ PanoJS.prototype = {
 	 * them for a repaint.
 	 */
 	blank : function() {
-		for (imgId in this.cache) {
-			var img = this.cache[imgId];
+		for (imgId in this.cche) {
+			var img = this.cche[imgId];
 			img.onload = function() {};
 			if (img.image) {
 				img.image.onload = function() {};
