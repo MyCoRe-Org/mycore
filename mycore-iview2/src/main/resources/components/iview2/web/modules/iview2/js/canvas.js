@@ -62,7 +62,7 @@
 				PanoJS.prototype.zoomViewerOrig = PanoJS.prototype.zoomViewer;
 				PanoJS.prototype.zoomViewer = function cv_zoomViewer() {
 					that.zoomViewer(arguments[0]);
-				};		
+				};
 									  
 				jQuery(document).bind("toolbarloaded", {canvasInstance: this}, function(e) {
 					if (e.model.id != "mainTb") { 
@@ -380,6 +380,7 @@
 			var curHeight = this.getViewer().currentImage.curHeight;			
 			
 			//check if rotated and axis are inverted
+			
 			if(this.smallerThanCanvas() == false && (this.getViewer().currentImage.rotation == 90 || this.getViewer().currentImage.rotation == 270)){
 				var old = curWidth;
 				curWidth = curHeight;
@@ -389,7 +390,7 @@
 			var xDim = Math.min(this.context2D.canvas.width, curWidth);
 			var yDim = Math.min(this.context2D.canvas.height,curHeight);
 			
-			//DON'T swap canvas dimensions directly because it would erase the preview
+			//DON'T swap canvas dimensions directly because it would erase the preview			
 			if(this.smallerThanCanvas() == false && (this.getViewer().currentImage.rotation == 90 || this.getViewer().currentImage.rotation == 270)){
 				if(xDim == this.context2D.canvas.width){
 					var old = xDim;
@@ -428,6 +429,10 @@
 
 					tile.posx = column * tileSize - xoff;
 					tile.posy = row * tileSize - yoff;
+					
+					if(this.smallerThanCanvas() == false && this.getViewer().currentImage.rotation == 270 && !(this.getViewer().currentImage.curWidth > this.getViewer().viewerBean.height && this.getViewer().currentImage.curHeight > this.getViewer().viewerBean.width)){
+						tile.posx = column * tileSize - xoff + (this.getViewer().currentImage.curWidth - this.getViewer().viewerBean.height);
+					}
 										
 					this.assignTileImage(tile);					
 				}			
@@ -460,6 +465,7 @@
 				var temp = this.getViewer().viewerBean.switchDisplayModeOrig(screenZoom, stateBool, preventLooping);				
 				if(this.getViewer().viewerContainer.isMax() && this.activateCanvas != true ){
 					this.activateCanvas = true;
+					this.context2D.canvas.y = this.context2D.canvas.x = 0;
 					this.appendCanvas();
 					
 					//make sure that the preview image is already loaded before drawing on canvas
@@ -504,41 +510,60 @@
 				this.getViewer().currentImage.rotation = (this.getViewer().currentImage.rotation + 90 >= 360) ? 0 : this.getViewer().currentImage.rotation + 90;
 			}
 			
-			if(this.getViewer().currentImage.rotation != 0){		
-				
+			if(this.getViewer().currentImage.rotation != 0){				
 				//picture is small enough to fit in the canvas area
 				if(this.smallerThanCanvas()){					
-					var moveXAxis = 0, moveYAxis = 0;					
+					var moveXAxis = 0, moveYAxis = 0;		
 					switch (this.getViewer().currentImage.rotation){
-				  		case 90:  	moveYAxis = -this.getViewer().currentImage.curHeight;
-				  					break;
-				  		case 180:	moveYAxis = -this.getViewer().currentImage.curHeight;
-				  					moveXAxis = -this.getViewer().currentImage.curWidth;
-				  					break;	  				
-				  		case 270:	moveXAxis = -this.getViewer().currentImage.curWidth;
-				  					break;
-					}
+			  		case 90:  	moveYAxis = -this.getViewer().currentImage.curHeight;
+			  					break;
+			  		case 180:	moveYAxis = -this.getViewer().currentImage.curHeight;
+			  					moveXAxis = -this.getViewer().currentImage.curWidth;
+			  					break;	  				
+			  		case 270:	moveXAxis = -this.getViewer().currentImage.curWidth;
+			  					break;
+					}	
 					this.context2D.rotate(this.getViewer().currentImage.rotation * (Math.PI / 180));	
-				  	this.context2D.translate(moveXAxis,moveYAxis);
-					
-				}else{
-					//swap dimensions						
-					this.context2D.translate(this.context2D.canvas.width/2, this.context2D.canvas.height/2);				
-					this.context2D.rotate(this.getViewer().currentImage.rotation * (Math.PI / 180));
+				  	this.context2D.translate(moveXAxis,moveYAxis);					
+				}
+				else{
+					//both axis are bigger than viewer
+					if(this.getViewer().currentImage.curWidth > this.getViewer().viewerBean.height && this.getViewer().currentImage.curHeight > this.getViewer().viewerBean.width){
+						//swap dimensions						
+						this.context2D.translate(Math.ceil(this.context2D.canvas.width/2), Math.ceil(this.context2D.canvas.height/2));				
+						this.context2D.rotate(this.getViewer().currentImage.rotation * (Math.PI / 180));
 
-					if(this.getViewer().currentImage.rotation == 90 || this.getViewer().currentImage.rotation == 270){
-						this.context2D.translate( -this.context2D.canvas.height/2, -this.context2D.canvas.width/2);
-					}else{
-						this.context2D.translate( -this.context2D.canvas.width/2, -this.context2D.canvas.height/2);
+						if(this.getViewer().currentImage.rotation == 90 || this.getViewer().currentImage.rotation == 270){
+							this.context2D.translate( -this.context2D.canvas.height/2, -this.context2D.canvas.width/2);
+						}else{
+							this.context2D.translate( -this.context2D.canvas.width/2, -this.context2D.canvas.height/2);
+						}
 					}
-					
-					if(this.getViewer().currentImage.rotation == 90 || this.getViewer().currentImage.rotation == 270){
-						var old = rows;
-						rows = cols;
-						cols = rows;
-					}
+					else{
+						var moveXAxis = 0, moveYAxis = 0;					
+						//calculate new viewer coordinates
+						switch (this.getViewer().currentImage.rotation){
+					  		case 90:  	moveYAxis = -this.getViewer().currentImage.curHeight;
+					  					break;
+					  		case 180:	moveYAxis = -this.getViewer().currentImage.curHeight;
+					  					moveXAxis = -this.getViewer().currentImage.curWidth;
+					  					break;	  				
+					  		case 270:	moveXAxis = -this.getViewer().currentImage.curWidth;
+					  					break;
+						}																		
+						
+						this.context2D.rotate(this.getViewer().currentImage.rotation * (Math.PI / 180));	
+					  	this.context2D.translate(moveXAxis,moveYAxis);						
+					}				
 				}
 			}
+			
+			if(this.getViewer().currentImage.rotation == 90 || this.getViewer().currentImage.rotation == 270){
+				var old = rows;
+				rows = cols;
+				cols = old;
+			}
+			
 			//reset\refill tile-array
 			this.getViewer().viewerBean.tiles = [];
 			for (var c = 0; c < cols; c++) {
