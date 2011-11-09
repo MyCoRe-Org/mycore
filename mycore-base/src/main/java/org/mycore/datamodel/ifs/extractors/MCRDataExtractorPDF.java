@@ -31,7 +31,7 @@ import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
 import org.jdom.Element;
-import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
+import org.mycore.datamodel.common.MCRISO8601Date;
 
 /**
  * Extracts metadata from PDF files using the PDFBox library. The number of
@@ -58,7 +58,7 @@ public class MCRDataExtractorPDF extends MCRDataExtractor {
 
         // Document information
         PDDocumentInformation info = pdf.getDocumentInformation();
-        MCRMetaISO8601Date iso = new MCRMetaISO8601Date();
+        MCRISO8601Date iso = new MCRISO8601Date();
         Calendar cal = info.getCreationDate();
         if (cal != null) {
             iso.setDate(cal.getTime());

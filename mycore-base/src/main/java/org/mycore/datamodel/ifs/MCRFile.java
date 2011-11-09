@@ -30,7 +30,7 @@ import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
-import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
+import org.mycore.datamodel.common.MCRISO8601Date;
 
 /**
  * Represents a stored file with its metadata and content.
@@ -536,7 +536,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         root.setAttribute("contentTypeID", getContentTypeID());
         root.setAttribute("contentType", getContentType().getLabel());
 
-        MCRMetaISO8601Date iDate = new MCRMetaISO8601Date();
+        MCRISO8601Date iDate = new MCRISO8601Date();
         iDate.setDate(getLastModified().getTime());
         root.setAttribute("modified", iDate.getISOString());
 

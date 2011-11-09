@@ -42,6 +42,7 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
+import org.mycore.datamodel.common.MCRISO8601Date;
 
 /**
  * Use Lucene Analyzer to normalize strings
@@ -151,29 +152,17 @@ public class MCRLuceneTools {
     static long getLongValue(String value) throws ParseException {
         SimpleDateFormat df = null;
         switch (value.length()) {
-        case 19://"yyyy-MM-dd hh:mm:ss"
-            df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        case 24://"yyyy-MM-ddThh:mm:ss.SSSZ
-        	if (df == null) {
-                df = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSS'Z'");
-            }
-        case 4: //"yyyy""
-        	if (df == null) {
-                df = new SimpleDateFormat("yyyy");
-            }
-        case 10://"yyyy-MM-dd"
-            if (df == null) {
-                df = new SimpleDateFormat("yyyy-MM-dd");
-            }
-            df.setTimeZone(TimeZone.getTimeZone("UTC"));
-            return df.parse(value).getTime();
         case 8://"hh:mm:ss"
             short hour = Short.parseShort(value.substring(0, 2));
             short minute = Short.parseShort(value.substring(3, 5));
             short second = Short.parseShort(value.substring(6));
             return (hour * 60 + minute) * 60 + second;
         default:
-            throw new MCRException("Could not parse to long value: " + value);
+            MCRISO8601Date date = new MCRISO8601Date(value);
+            if (date.getDate() == null) {
+                throw new MCRException("Could not parse to long value: " + value);
+            }
+            return date.getDate().getTime();
         }
     }
 

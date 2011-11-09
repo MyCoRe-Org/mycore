@@ -51,9 +51,9 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRURN;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -164,7 +164,7 @@ public class MCRXMLFunctions {
             LOGGER.debug(sb.toString());
         }
         Locale locale = new Locale(iso639Language);
-        MCRMetaISO8601Date mcrdate = new MCRMetaISO8601Date();
+        MCRISO8601Date mcrdate = new MCRISO8601Date();
         mcrdate.setFormat(isoFormat);
         mcrdate.setDate(isoDate);
         String formatted = mcrdate.format(simpleFormat, locale);
@@ -187,7 +187,7 @@ public class MCRXMLFunctions {
     }
 
     public static String getISODate(Date date, String isoFormat) {
-        MCRMetaISO8601Date mcrdate = new MCRMetaISO8601Date();
+        MCRISO8601Date mcrdate = new MCRISO8601Date();
         mcrdate.setDate(date);
         mcrdate.setFormat(isoFormat);
         return mcrdate.getISOString();

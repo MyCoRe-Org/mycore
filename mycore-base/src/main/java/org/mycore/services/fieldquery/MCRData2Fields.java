@@ -48,9 +48,9 @@ import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
 import org.mycore.datamodel.metadata.MCRObject;
 
 /**
@@ -350,7 +350,7 @@ public class MCRData2Fields {
      */
     public static String normalizeDate(String sDate) {
         try {
-            MCRMetaISO8601Date iDate = new MCRMetaISO8601Date();
+            MCRISO8601Date iDate = new MCRISO8601Date();
             iDate.setDate(sDate.trim());
             String isoDateString =iDate.getISOString();
             if(isoDateString.length()==4){

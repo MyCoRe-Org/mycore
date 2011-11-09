@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.mycore.common.MCRCalendar;
-import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
+import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRBooleanClauseParser;
 import org.mycore.parsers.bool.MCRCondition;
@@ -247,7 +247,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
             // Normalize values in date conditions
             if (qc.getField().getDataType().equals("date")) {
                 try {
-                    MCRMetaISO8601Date iDate = new MCRMetaISO8601Date();
+                    MCRISO8601Date iDate = new MCRISO8601Date();
                     iDate.setDate(qc.getValue());
                     String sDate = iDate.getISOString().substring(0, 10);
                     return new MCRQueryCondition(qc.getField(), qc.getOperator(), sDate);
