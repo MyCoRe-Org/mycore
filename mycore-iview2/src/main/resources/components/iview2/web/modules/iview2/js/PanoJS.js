@@ -109,7 +109,7 @@ function PanoJS(viewer, options) {
 	//TODO maybe its possible to store all data which is kept in images in tiles
 	this.images = [];
 	//create Cache Object where the size is the amount of tiles which can be displayed at once plus one row/column on each site
-	this.cache = new Cache(Math.ceil(screen.availWidth / this.tileSize) * Math.ceil(screen.availHeight / this.tileSize) * 4);
+	this.cache = new Cache((Math.ceil(screen.availWidth / this.tileSize) + 2) *  (Math.ceil(screen.availHeight / this.tileSize) + 2));
 	this.cche = {};
 	var blankTile = options.blankTile ? options.blankTile : PanoJS.BLANK_TILE_IMAGE;
 	var loadingTile = options.loadingTile ? options.loadingTile : PanoJS.LOADING_TILE_IMAGE;
