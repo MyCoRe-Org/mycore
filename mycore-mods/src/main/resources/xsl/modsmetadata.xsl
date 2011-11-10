@@ -575,7 +575,7 @@
         <table class="metaData">
           <xsl:for-each select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@type='conference']">
             <td valign="top" class="metaname">
-              <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.conference'),':')" />
+              <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.conference.title'),':')" />
             </td>
             <td class="metavalue">
               <strong>
