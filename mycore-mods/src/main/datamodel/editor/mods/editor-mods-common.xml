@@ -8,7 +8,7 @@
   <!-- TITLE -->
   <text id="mods.title.label" i18n="metaData.mods.dictionary.title" />
   <text id="mods.related.title.label" i18n="metaData.mods.dictionary.relatedtitle" />
-  <text id="mods.cproceeding.title.label" i18n="metaData.mods.dictionary.cproceedingtitle" />
+  <text id="mods.cproceeding.title.label" i18n="metaData.mods.dictionary.cproceedingTitle" />
   <panel id="mods.title">
     <cell anchor="NORTHWEST" var="mods:title">
       <textarea id="mods.title.text" width="50" height="3">
@@ -781,8 +781,8 @@
 
   <!-- av_medium_genre -->
   <text id="mods.genre.kindOfAVMedia.label">
-    <label xml:lang="de">Genre*</label>
-    <label xml:lang="en">Genre*</label>
+    <label xml:lang="de">Genre</label>
+    <label xml:lang="en">Genre</label>
   </text>
 
   <panel id="mods.genre.kindOfAVMedia">
