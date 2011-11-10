@@ -13,15 +13,15 @@
     <field name="link" type="identifier" source="objectMetadata" xpath="/mycoreobject/descendant::*[@xlink:href]" value="@xlink:href" />
     <field name="parent" type="identifier" source="objectMetadata" xpath="/mycoreobject/structure/parents/parent" value="@xlink:href" />
     <field name="modified" type="timestamp" source="objectMetadata" xpath="/mycoreobject/service/servdates/servdate[@type='modifydate']"
-      value="concat(substring(.,1,10),' ',substring(.,12,8))" sortable="true" i18n="editor.search.document.datemod" />
+      value="." sortable="true" i18n="editor.search.document.datemod" />
     <field name="created" type="timestamp" source="objectMetadata" xpath="/mycoreobject/service/servdates/servdate[@type='createdate']"
-      value="concat(substring(.,1,10),' ',substring(.,12,8))" sortable="true" />
+      value="." sortable="true" />
 
     <!-- Search in xml of the derivate objects -->
     <field name="derivateModificationDate" type="date" source="derivateMetadata" xpath="/mycorederivate/service/servdates/servdate[@type='modifydate']"
       value="substring(., 1, 10)" sortable="true" />
     <field name="derivateCreationDate" type="timestamp" source="derivateMetadata" xpath="/mycorederivate/service/servdates/servdate[@type='createdate']"
-      value="concat(substring(.,1,10),' ',substring(.,12,8))" sortable="true" />
+      value="." sortable="true" />
 
     <field name="derivateURN" type="identifier" source="derivateMetadata"
       xpath="/mycorederivate/derivate/fileset/file/urn | /mycorederivate/derivate/fileset/@urn" value="." />
