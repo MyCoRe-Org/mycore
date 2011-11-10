@@ -426,7 +426,7 @@
     </div>
     <div id="institution_box" class="detailbox">
       <h4 id="institution_switch" class="block_switch">
-        <xsl:value-of select="i18n:translate('metaData.mods.dictionary.institutionbox')" />
+        <xsl:value-of select="i18n:translate('metaData.mods.dictionary.institution.box')" />
       </h4>
       <div id="institution_content" class="block_content">
         <table class="metaData">
@@ -511,7 +511,7 @@
 
     <div id="institution_box" class="detailbox">
       <h4 id="institution_switch" class="block_switch">
-        <xsl:value-of select="i18n:translate('metaData.mods.dictionary.institutionbox')" />
+        <xsl:value-of select="i18n:translate('metaData.mods.dictionary.institution.box')" />
       </h4>
       <div id="institution_content" class="block_content">
         <table class="metaData">
@@ -645,7 +645,7 @@
     </div>
     <div id="institution_box" class="detailbox">
       <h4 id="institution_switch" class="block_switch">
-        <xsl:value-of select="i18n:translate('metaData.mods.dictionary.institutionbox')" />
+        <xsl:value-of select="i18n:translate('metaData.mods.dictionary.institution.box')" />
       </h4>
       <div id="institution_content" class="block_content">
         <table class="metaData">
@@ -696,7 +696,7 @@
     </div>
     <div id="institution_box" class="detailbox">
       <h4 id="institution_switch" class="block_switch">
-        <xsl:value-of select="i18n:translate('metaData.mods.dictionary.institutionbox')" />
+        <xsl:value-of select="i18n:translate('metaData.mods.dictionary.institution.box')" />
       </h4>
       <div id="institution_content" class="block_content">
         <table class="metaData">
@@ -737,7 +737,7 @@
     </div>
     <div id="institution_box" class="detailbox">
       <h4 id="institution_switch" class="block_switch">
-        <xsl:value-of select="i18n:translate('metaData.mods.dictionary.institutionbox')" />
+        <xsl:value-of select="i18n:translate('metaData.mods.dictionary.institution.box')" />
       </h4>
       <div id="institution_content" class="block_content">
         <table class="metaData">
@@ -837,7 +837,7 @@
     </div>
     <div id="institution_box" class="detailbox">
       <h4 id="institution_switch" class="block_switch">
-        <xsl:value-of select="i18n:translate('metaData.mods.dictionary.institutionbox')" />
+        <xsl:value-of select="i18n:translate('metaData.mods.dictionary.institution.box')" />
       </h4>
       <div id="institution_content" class="block_content">
         <table class="metaData">
@@ -889,7 +889,7 @@
     </div>
     <div id="institution_box" class="detailbox">
       <h4 id="institution_switch" class="block_switch">
-        <xsl:value-of select="i18n:translate('metaData.mods.dictionary.institutionbox')" />
+        <xsl:value-of select="i18n:translate('metaData.mods.dictionary.institution.box')" />
       </h4>
       <div id="institution_content" class="block_content">
         <table class="metaData">
