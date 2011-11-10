@@ -22,7 +22,7 @@
     <!-- genre classification END -->
 
     <!-- TITLE -->
-    <cell row="7" col="1" anchor="NORTHEAST" ref="mods.title.label" />
+    <cell row="7" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.title.label" />
     <cell row="7" col="2" anchor="NORTHWEST" ref="mods.title" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
     <cell row="7" col="3" anchor="NORTHWEST" ref="mods.title.help" />
     <!-- TITLE END -->
