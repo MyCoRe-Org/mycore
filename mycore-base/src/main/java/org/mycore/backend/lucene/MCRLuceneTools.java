@@ -53,6 +53,10 @@ import org.mycore.datamodel.common.MCRISO8601Date;
  * 
  */
 public class MCRLuceneTools {
+    private static final int HH_MM_SS = 8;
+
+    private static final int YYYY_MM_DD_HH_MM_SS = 19;
+
     MCRConfiguration config = MCRConfiguration.instance();
 
     private static Map<String, Analyzer> analyzerMap = new HashMap<String, Analyzer>();
@@ -150,9 +154,12 @@ public class MCRLuceneTools {
     }
 
     static long getLongValue(String value) throws ParseException {
-        SimpleDateFormat df = null;
         switch (value.length()) {
-        case 8://"hh:mm:ss"
+        case YYYY_MM_DD_HH_MM_SS:
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            df.setTimeZone(TimeZone.getTimeZone("UTC"));
+            return df.parse(value).getTime();
+        case HH_MM_SS:
             short hour = Short.parseShort(value.substring(0, 2));
             short minute = Short.parseShort(value.substring(3, 5));
             short second = Short.parseShort(value.substring(6));
