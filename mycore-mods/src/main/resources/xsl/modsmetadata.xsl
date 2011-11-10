@@ -139,7 +139,7 @@
     <xsl:if test="mods:subTitle">
       <tr>
         <td valign="top" class="metaname">
-          <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.subTitle'),':')" />
+          <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.subtitle'),':')" />
         </td>
         <td class="metavalue subTitle">
           <xsl:value-of select="mods:subTitle" />
