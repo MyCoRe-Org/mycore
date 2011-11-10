@@ -437,25 +437,31 @@
   </xsl:template>
 
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.thesis">
-    <div id="title_box" class="detailbox floatbox">
+    <div id="title_box" class="detailbox">
       <h4 id="title_switch" class="block_switch open">
         <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.thesisbox'), ' - ')" />
         <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='kindof']"
                   mode="printModsClassInfo" />
       </h4>
       <div id="title_content" class="block_content">
-        <table class="metaData">
-          <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
-          <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@type='personal']" />
-        </table>
-        <xsl:if test="./structure/derobjects">
-          <div class="hit_symbol"> <!-- dummy - ToDo: show first derivate and link to derivate section -->
-            <img src="{$WebApplicationBaseURL}templates/master/{$template}/IMAGES/icons_liste/icon_thesis.png" alt="" />
-            <span>
-              <a href="#derivate_box">Dokumente</a>
-            </span>
+        <div class="subcolumns">
+          <div class="c85l">
+            <table class="metaData">
+              <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
+              <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@type='personal']" />
+            </table>
           </div>
-        </xsl:if>
+          <div class="c15r">
+            <xsl:if test="./structure/derobjects">
+              <div class="hit_symbol"> <!-- dummy - ToDo: show first derivate and link to derivate section -->
+                <img src="{$WebApplicationBaseURL}templates/master/{$template}/IMAGES/icons_liste/icon_thesis.png" alt="" />
+                <span>
+                  <a href="#derivate_box">Dokumente</a>
+                </span>
+              </div>
+            </xsl:if>
+          </div>
+        </div>
       </div>
     </div>
 

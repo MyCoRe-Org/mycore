@@ -171,15 +171,13 @@
     </xsl:message>
 
     <div id="detail_view" class="blockbox">
-      <div id="editor-buttons">
-        <xsl:call-template name="mods.editobject_without_table">
-          <xsl:with-param select="./@ID" name="id" />
-          <xsl:with-param select="$mods-type" name="layout" />
-        </xsl:call-template>
-      </div>
       <h3>
         <xsl:apply-templates select="." mode="title" />
       </h3>
+      <xsl:call-template name="mods.editobject_without_table">
+        <xsl:with-param select="./@ID" name="id" />
+        <xsl:with-param select="$mods-type" name="layout" />
+      </xsl:call-template>
 
       <xsl:choose>
         <!-- xsl:when cases are handled in modsmetadata.xsl -->
@@ -490,34 +488,41 @@
     <xsl:if test="$objectHost = 'local'">
       <xsl:choose>
         <xsl:when test="acl:checkPermission($id,'writedb') or acl:checkPermission($id,'deletedb')">
-          <xsl:variable name="type" select="substring-before(substring-after($id,'_'),'_')" />
+          <div class="document_options">
+            <img class="button_options" src="{$WebApplicationBaseURL}templates/master/{$template}/IMAGES/icon_arrow_circled_red_down.png" alt="" titel="Optionen"/>
+            <div class="options">
+              <ul>
+            <xsl:variable name="type" select="substring-before(substring-after($id,'_'),'_')" />
 
-                <xsl:if test="acl:checkPermission($id,'writedb')">
+              <xsl:if test="acl:checkPermission($id,'writedb')">
 
-                  <a href="{$editURL}">
-                    <img src="{$WebApplicationBaseURL}images/workflow_objedit.gif" title="{i18n:translate('object.editObject')}" />
-                  </a>
-                  <xsl:if test="$displayAddDerivate='true' and not(mcrxsl:hasURNDefined($id))">
-                    <a href="{$ServletsBaseURL}derivate/create{$HttpSession}?id={$id}">
-                      <img src="{$WebApplicationBaseURL}images/workflow_deradd.gif" title="{i18n:translate('derivate.addDerivate')}" />
-                    </a>
-                  </xsl:if>
-
-                  <!-- ToDo: Fix URN/Handle Generator, xpath is not mods valid -->
-                  <!-- xsl:if test="mcrxsl:isAllowedObjectForURNAssignment($id) and not(mcrxsl:hasURNDefined($id))">
-                  <a
-                    href="{$ServletsBaseURL}MCRAddURNToObjectServlet{$HttpSession}?object={$id}&amp;xpath=.mycoreobject/metadata/def.modsContainer[@class='MCRMetaXML' and @heritable='false' and @notinherit='true']/modsContainer/mods:mods/mods:identifier[@type='hdl']">
-                    <img src="{$WebApplicationBaseURL}images/workflow_addnbn.gif" title="{i18n:translate('derivate.urn.addURN')}" />
-                  </a>
-                 </xsl:if -->
-
+                <li><a href="{$editURL}">
+                  <xsl:value-of select="i18n:translate('object.editObject')" />
+                </a></li>
+                <xsl:if test="$displayAddDerivate='true' and not(mcrxsl:hasURNDefined($id))">
+                  <li><a href="{$ServletsBaseURL}derivate/create{$HttpSession}?id={$id}">
+                    <xsl:value-of select="i18n:translate('derivate.addDerivate')" />
+                  </a></li>
                 </xsl:if>
-                <xsl:if
-                  test="acl:checkPermission($id,'deletedb') and (not(mcrxsl:hasURNDefined($id)) or (mcrxsl:hasURNDefined($id) and $CurrentUser=$MCR.Users.Superuser.UserName))">
-                  <a href="{$ServletsBaseURL}object/delete{$HttpSession}?id={$id}" id="confirm_deletion">
-                    <img src="{$WebApplicationBaseURL}images/workflow_objdelete.gif" title="{i18n:translate('object.delObject')}" />
-                  </a>
-                </xsl:if>
+
+                <!-- ToDo: Fix URN/Handle Generator, xpath is not mods valid -->
+                <!-- xsl:if test="mcrxsl:isAllowedObjectForURNAssignment($id) and not(mcrxsl:hasURNDefined($id))">
+                <a
+                  href="{$ServletsBaseURL}MCRAddURNToObjectServlet{$HttpSession}?object={$id}&amp;xpath=.mycoreobject/metadata/def.modsContainer[@class='MCRMetaXML' and @heritable='false' and @notinherit='true']/modsContainer/mods:mods/mods:identifier[@type='hdl']">
+                  <img src="{$WebApplicationBaseURL}images/workflow_addnbn.gif" title="{i18n:translate('derivate.urn.addURN')}" />
+                </a>
+               </xsl:if -->
+
+              </xsl:if>
+              <xsl:if
+                test="acl:checkPermission($id,'deletedb') and (not(mcrxsl:hasURNDefined($id)) or (mcrxsl:hasURNDefined($id) and $CurrentUser=$MCR.Users.Superuser.UserName))">
+                <li><a href="{$ServletsBaseURL}object/delete{$HttpSession}?id={$id}" id="confirm_deletion">
+                  <xsl:value-of select="i18n:translate('object.delObject')" />
+                </a></li>
+              </xsl:if>
+              </ul>
+            </div>
+          </div>
         </xsl:when>
       </xsl:choose>
     </xsl:if>
