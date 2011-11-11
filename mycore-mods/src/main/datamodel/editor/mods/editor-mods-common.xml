@@ -1295,6 +1295,33 @@ Beispiel: 2.203 oder 20.686</label>
   </helpPopup>
   <!-- Rights END -->
 
+  <!-- Genre Journal/Series -->
+  <text id="mods.genre.journal.label" i18n="metaData.mods.genre.journal.label" />
+  <panel id="mods.genre.journal">
+    <cell anchor="NORTHWEST" var="mods:genre">
+      <hidden var="@type" default="intern" />
+      <panel>
+        <cell var="@mcr:categId">
+          <list type="radio" id="mods.genre.journal.list" default="mods_genres:journal">
+            <item value="mods_genres:journal"><label xml:lang="de">Zeitschrift</label></item>
+            <item value="mods_genres:series"><label xml:lang="de">Serie</label></item>
+          </list>
+        </cell>
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.genre.journal.help" width="400px" height="250px">
+    <label xml:lang="de">
+      xxx
+    </label>
+    <label xml:lang="en">
+      xxx
+    </label>
+  </helpPopup>
+  <!-- Genre Journal/Series END -->
+
+
   <!-- *** Parents *** -->
   <panel id="displayParent">
     <cell col="1" row="1" var="structure" anchor="NORTHWEST">
