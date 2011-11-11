@@ -16,7 +16,16 @@
       var that = this;
       this.rotation = 0;
       
-      jQuery(iviewInst.viewerContainer).bind("zoom.viewer", function(jq, event){ that.zoomEventFunction(jq,event);});
+      jQuery(iviewInst.viewerContainer).bind("zoom.viewer", function(jq, event) {
+			/*listen to changes of zoomLevel and adapt curWidth & -Height depending on that,
+			 * notify all listeners about the change*/
+    		//calculate new zoom properties
+    		that.zoomInfo.curZoom = event.zoomLevel;
+    		that.curWidth = (that.width / Math.pow(2, that.zoomInfo.maxZoom - that.zoomInfo.curZoom))*that.zoomInfo.scale;
+    		that.curHeight = (that.height / Math.pow(2, that.zoomInfo.maxZoom - that.zoomInfo.curZoom))*that.zoomInfo.scale;
+
+	    	jQuery(that).trigger(iview.CurrentImage.DIMENSION_EVENT);
+      });
       
       iview.IViewObject.call(this, iviewInst);
       jQuery(this).bind(iview.CurrentImage.CHANGE_EVENT, function(event) {
@@ -25,20 +34,8 @@
         log(event);
       });
     }
-    
-    constructor.prototype = Object.create(iview.IViewObject.prototype);
-    
-    constructor.prototype.zoomEventFunction = function ci_zoomEventFunction(jq, event){
-    	/*listen to changes of zoomLevel and adapt curWidth & -Height depending on that,
-		 * notify all listeners about the change*/
 
-		//calculate new zoom properties
-		this.zoomInfo.curZoom = event.zoomLevel;
-		this.curWidth = (this.width / Math.pow(2, this.zoomInfo.maxZoom - this.zoomInfo.curZoom))*this.zoomInfo.scale;
-		this.curHeight = (this.height / Math.pow(2, this.zoomInfo.maxZoom - this.zoomInfo.curZoom))*this.zoomInfo.scale;
-		
-    	jQuery(this).trigger(iview.CurrentImage.DIMENSION_EVENT);    	
-    };
+    constructor.prototype = Object.create(iview.IViewObject.prototype);
 
     constructor.prototype.processImageProperties = function ci_processImageProperties(imageProperties, name) {
       var values = nodeAttributes(imageProperties.getElementsByTagName("imageinfo")[0]);
