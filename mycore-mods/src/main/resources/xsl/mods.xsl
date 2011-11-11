@@ -142,6 +142,9 @@
       <xsl:when test="substring-after(./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@valueURI,'#')='journal'">
         <xsl:value-of select="'journal'" />
       </xsl:when>
+      <xsl:when test="substring-after(./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@valueURI,'#')='series'">
+        <xsl:value-of select="'series'" />
+      </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="'report'" />
       </xsl:otherwise>
@@ -174,10 +177,20 @@
       <h3>
         <xsl:apply-templates select="." mode="title" />
       </h3>
-      <xsl:call-template name="mods.editobject_without_table">
-        <xsl:with-param select="./@ID" name="id" />
-        <xsl:with-param select="$mods-type" name="layout" />
-      </xsl:call-template>
+      <xsl:choose>
+        <xsl:when test="$mods-type='series'">
+          <xsl:call-template name="mods.editobject_without_table">
+            <xsl:with-param select="./@ID" name="id" />
+            <xsl:with-param select="'journal'" name="layout" />
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="mods.editobject_without_table">
+            <xsl:with-param select="./@ID" name="id" />
+            <xsl:with-param select="$mods-type" name="layout" />
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>
 
       <xsl:choose>
         <!-- xsl:when cases are handled in modsmetadata.xsl -->
@@ -200,6 +213,9 @@
           <xsl:apply-templates select="." mode="present.book-chapter" />
         </xsl:when>
         <xsl:when test="$mods-type = 'journal'">
+          <xsl:apply-templates select="." mode="present.journal" />
+        </xsl:when>
+        <xsl:when test="$mods-type = 'series'">
           <xsl:apply-templates select="." mode="present.journal" />
         </xsl:when>
         <xsl:when test="$mods-type = 'article'">

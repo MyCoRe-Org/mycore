@@ -755,7 +755,7 @@
 
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.journal">
     <div id="title_box" class="detailbox floatbox">
-      <h4 id="title_switch" class="block_switch open">Zeitschrift</h4>
+      <h4 id="title_switch" class="block_switch open">Zeitschrift/Serie</h4>
       <div id="title_content" class="block_content">
         <table class="metaData">
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
