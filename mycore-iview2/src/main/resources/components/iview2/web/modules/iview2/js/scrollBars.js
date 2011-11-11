@@ -563,6 +563,7 @@ iview.scrollbar.View = function() {
 		dropInterval(that);
 		notifyClick(that, downRight);
 		window.setTimeout(function() { delayMouseClick(that, downRight);}, that._scrollDelay);
+		jQuery(document).bind("mouseup" ,function() { buttonMouseUp(that);});
 		return false;
 	}
 	
@@ -580,6 +581,7 @@ iview.scrollbar.View = function() {
 		dropInterval(that);
 		that._mouseDown = false;
 		that._outOfBar = false;
+		jQuery(document).unbind("mouseup" ,function() { buttonMouseUp(that);});
 	}
 	
 	/**
