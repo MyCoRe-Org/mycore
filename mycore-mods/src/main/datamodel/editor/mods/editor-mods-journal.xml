@@ -40,23 +40,11 @@
     <cell row="23" col="3" anchor="NORTHWEST" ref="mods.publisher.help" />
     <!-- Publisher END -->
 
-    <!-- ISSN -->
-    <cell row="25" col="1" anchor="NORTHEAST" ref="mods.issn.label" />
-    <cell row="25" col="2" anchor="NORTHWEST" ref="mods.issn" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="25" col="3" anchor="NORTHWEST" ref="mods.issn.help" />
-    <!-- ISSN END -->
-
     <!-- Identifier -->
-    <cell row="26" col="1" anchor="NORTHEAST" ref="mods.identifier.label" />
-    <cell row="26" col="2" anchor="NORTHWEST" ref="mods.identifier.optional" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="26" col="3" anchor="NORTHWEST" ref="mods.identifier.help" />
+    <cell row="25" col="1" anchor="NORTHEAST" ref="mods.identifier.label" />
+    <cell row="25" col="2" anchor="NORTHWEST" ref="mods.identifier.journals" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="25" col="3" anchor="NORTHWEST" ref="mods.identifier.help" />
     <!-- Identifier END -->
-
-    <!-- ZDB-ID -->
-    <cell row="27" col="1" anchor="NORTHEAST" ref="mods.zdbid.label" />
-    <cell row="27" col="2" anchor="NORTHWEST" ref="mods.zdbid" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="27" col="3" anchor="NORTHWEST" ref="mods.zdbid.help" />
-    <!-- ZDB-ID END -->
 
     <!-- impact factor -->
     <cell row="30" col="1" anchor="NORTHEAST" ref="mods.impact.label" />
