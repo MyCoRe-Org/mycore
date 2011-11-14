@@ -225,7 +225,7 @@
   <!-- person END -->
 
   <!-- Institutionszugehörigkeit (wo zugeordnet) -->
-  <text id="mods.assignedInstitute.label" i18n="metaData.mods.dictionary.institution.box" />
+  <text id="mods.assignedInstitute.label" i18n="metaData.mods.dictionary.institution.label" />
   <helpPopup id="mods.assignedInstitute.help" width="400px" height="250px">
     <label xml:lang="de">BMELV-Einrichtung (Institut/Fachgruppe/Organisationseinheit), zu welcher die Autoren bzw. die Beitragenden
       zum Zeitpunkt der Veröffentlichung des Dokumentes, des Erscheinungsjahres des Konferenzbandes

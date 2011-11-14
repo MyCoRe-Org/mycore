@@ -268,7 +268,7 @@
     <xsl:variable name="id" select="concat('#', @ID)" />
     <tr>
       <td valign="top" class="metaname">
-        <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.institution'),':')" />
+        <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.institution.label'),':')" />
       </td>
       <td class="metavalue"><!-- ToDo: Ausgabe der Einrichtung mit jeweils oberster Einrichtung (Max Rubner-Institut, Institut für ...) -->
         <xsl:apply-templates select="." mode="printName" />
