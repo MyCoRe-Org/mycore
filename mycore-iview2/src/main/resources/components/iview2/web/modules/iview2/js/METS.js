@@ -829,7 +829,7 @@ iview.METS.ChapterModelProvider = function(metsDoc) {
 		physicals = getNodes(that._metsDoc, "mets:div", physicals[0]);
 		var orders = [];
 		jQuery(physicals).each(function() {
-			orders[jQuery(this).attr("ID")] = jQuery(this).attr("ORDER");
+			orders[jQuery(this).attr("ID")] = toInt(jQuery(this).attr("ORDER"));
 		});
 		jQuery(getNodes(that._metsDoc, "mets:smLink", structLink)).each(function() {
 			that._model.addContent(orders[jQuery(this).attr(attributeCheck("xlink:to"))],jQuery(this).attr(attributeCheck("xlink:from")));
