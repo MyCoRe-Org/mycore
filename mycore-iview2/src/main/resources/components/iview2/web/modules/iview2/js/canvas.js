@@ -63,7 +63,7 @@
 				PanoJS.prototype.zoomViewer = function cv_zoomViewer() {
 					that.zoomViewer(arguments[0]);
 				};
-									  
+				
 				jQuery(document).bind("toolbarloaded", {canvasInstance: this}, function(e) {
 					if (e.model.id != "mainTb") { 
 						  return;
@@ -83,7 +83,7 @@
 							{
 								if(args.elementName == button.elementName)
 								{
-									e.data.canvasInstance.rotate();
+									e.data.canvasInstance.rotate90degree();
 								}
 							}
 						});
@@ -95,14 +95,10 @@
 		// inheritance(copy) from prototype iview
 		constructor.prototype = Object.create(iview.IViewObject.prototype);
 		
-		// overwritten
 		constructor.prototype.assignTileImage = function cv_assignTileImage(tile){
-			
-			var viewerBean = this.getViewer().viewerBean;
-			
+			var viewerBean = this.getViewer().viewerBean;			
 			var tileImgId = viewerBean.tileUrlProvider.assembleUrl(tile.xIndex, tile.yIndex, viewerBean.zoomLevel);
-			var tileImg = viewerBean.cache.getItem(tileImgId);
-			
+			var tileImg = viewerBean.cache.getItem(tileImgId);			
 			// create cache if not exist - zoom/y/x
 			if (tileImg == null) {
 				tileImg = this.createImageTile(tileImgId, tile, viewerBean);
@@ -134,34 +130,31 @@
 		};
 		
 		constructor.prototype.resolveCoordinates = function cv_resolveCoordinates(e){	
-			if(this.getViewer().currentImage.rotation == 0){
-				return {
-					'x' : this.getViewer().viewerBean.x + e.clientX - this.context2D.canvas.offsetLeft,//relativ: e.clientX - this.context2D.canvas.offsetLeft
-					'y' : this.getViewer().viewerBean.y + e.clientY - this.context2D.canvas.offsetTop
-				}	
-			}
-			else if(this.getViewer().currentImage.rotation == 90){
-				return {
-					'x' : (this.getViewer().viewerBean.x + e.clientY + this.context2D.canvas.offsetTop),
-					'y' : (this.getViewer().viewerBean.y - e.clientX - this.context2D.canvas.offsetLeft)
-				}	
-			}
-			else if(this.getViewer().currentImage.rotation == 180){
-				return {
-					'x' : this.getViewer().viewerBean.x - e.clientX + this.context2D.canvas.offsetLeft,
-					'y' : this.getViewer().viewerBean.y - e.clientY + this.context2D.canvas.offsetTop
-				}
-			}
-			else if(this.getViewer().currentImage.rotation == 270){
-				return {
-					'x' : (this.getViewer().viewerBean.x - e.clientY - this.context2D.canvas.offsetTop),
-					'y' : (this.getViewer().viewerBean.y + e.clientX + this.context2D.canvas.offsetLeft)
-				}
+			switch(this.getViewer().currentImage.rotation){
+				case 0:				
+					return {
+						'x' : this.getViewer().viewerBean.x + e.clientX - this.context2D.canvas.offsetLeft,//relativ: e.clientX - this.context2D.canvas.offsetLeft
+						'y' : this.getViewer().viewerBean.y + e.clientY - this.context2D.canvas.offsetTop
+					}	
+				case 90:
+					return {
+						'x' : this.getViewer().viewerBean.x + e.clientY + this.context2D.canvas.offsetTop,
+						'y' : this.getViewer().viewerBean.y - e.clientX - this.context2D.canvas.offsetLeft
+					}	
+				case 180:
+					return {
+						'x' : this.getViewer().viewerBean.x - e.clientX + this.context2D.canvas.offsetLeft,
+						'y' : this.getViewer().viewerBean.y - e.clientY + this.context2D.canvas.offsetTop
+					}
+				case 270:
+					return {
+						'x' : this.getViewer().viewerBean.x - e.clientY - this.context2D.canvas.offsetTop,
+						'y' : this.getViewer().viewerBean.y + e.clientX + this.context2D.canvas.offsetLeft
+					}
 			}
 		};
 	
-		constructor.prototype.zoom = function cv_zoom(direction){	
-			
+		constructor.prototype.zoom = function cv_zoom(direction){			
 			if (this.getViewer().viewerBean.zoomLevel + direction < 0) {
 				if (PanoJS.MSG_BEYOND_MIN_ZOOM) {
 					alert(PanoJS.MSG_BEYOND_MIN_ZOOM);
@@ -176,71 +169,40 @@
 			}
 
 			this.getViewer().viewerBean.blank();
-			this.clearCanvas();
-				
-			var coordsBefore = {'x' : this.getViewer().viewerBean.x, 'y' :  this.getViewer().viewerBean.y,
-								'width' : this.getViewer().currentImage.curWidth, 'height' :  this.getViewer().currentImage.curHeight
-			};
 			
-			//increase/decrease zoomlevel
+			var oldX = this.getViewer().viewerBean.x;
+			var oldY = this.getViewer().viewerBean.y;
+			
+			var dimensionsBefore = {'width' : this.getViewer().currentImage.curWidth, 'height' :  this.getViewer().currentImage.curHeight};	
 			this.getViewer().viewerBean.zoomLevel += direction;
+			this.getViewer().viewerBean.notifyViewerZoomed();			
+			var dimensionsAfter = {'width' : this.getViewer().currentImage.curWidth, 'height' :  this.getViewer().currentImage.curHeight};
+								
+			this.getViewer().viewerBean.x = this.getNewViewerPosition(this.getViewer().viewerBean.width, oldX, dimensionsBefore.width, dimensionsAfter.width);
+			this.getViewer().viewerBean.y = this.getNewViewerPosition(this.getViewer().viewerBean.height, oldY, dimensionsBefore.height, dimensionsAfter.height);			
 
-			//calculate new dimensions
-			if(this.getViewer().currentImage.rotation == 0 || this.getViewer().currentImage.rotation == 180){
-				this.getViewer().currentImage.curWidth = Math.floor((this.getViewer().currentImage.width / Math.pow(2, this.getViewer().currentImage.zoomInfo.maxZoom - this.getViewer().viewerBean.zoomLevel))*this.getViewer().currentImage.zoomInfo.scale);			
-				this.getViewer().currentImage.curHeight = Math.floor((this.getViewer().currentImage.height / Math.pow(2, this.getViewer().currentImage.zoomInfo.maxZoom - this.getViewer().viewerBean.zoomLevel))*this.getViewer().currentImage.zoomInfo.scale); 
-			}
-	
-			var coordsAfter = {'width' : this.getViewer().currentImage.curWidth, 'height' :  this.getViewer().currentImage.curHeight};
-			
+			this.prepareTiles();
+			this.positionTiles();
+		};
+		
+		constructor.prototype.getNewViewerPosition = function(dimensionMax, position, valueBefore, valueAfter){
 			//case 1: image fits into screen (before and after), no scrolling - x and y remain 0
 			//case 2: image gets bigger (x and y) than viewerBean, scrolling possible, try to center the picture (depends on viewerBeanSize and movement)
-			//!!!case 3: image gets bigger in just one direction, scrolling only this axis, - what should happen?Center visible area or center the picture?
-			//this.getViewer().viewerBean.x = (100.0 / coordsBefore.width * coordsBefore.x) * (coordsAfter.width/100.0);
-							
-			if(coordsBefore.width > this.getViewer().viewerBean.width){
-				var viewerXCenter = Math.floor(this.getViewer().viewerBean.width / 2); 
-				var xCenter = coordsBefore.x + viewerXCenter;				
-				var diffX = Math.floor(100.0 / coordsBefore.width * xCenter);			
-				this.getViewer().viewerBean.x = Math.floor(diffX * (coordsAfter.width/100.0)) - viewerXCenter;
-				//this.getViewer().viewerBean.x = Math.ceil((100.0 / coordsBefore.width * coordsBefore.x) * (coordsAfter.width/100.0));
+			//case 3: image gets bigger in just one direction, scrolling only this axis, - what should happen?Center visible area or center the picture?				
+			if(valueBefore > dimensionMax){
+				var dimensionCenter = Math.floor(dimensionMax / 2); 
+				var dimensionViewPortCenter = position + dimensionCenter;//current viewport center					
+				var dimensionDifference = Math.floor(100.0 / valueBefore * dimensionViewPortCenter);//percentage of current viewport			
+				return Math.floor(dimensionDifference * (valueAfter/100.0)) - dimensionCenter;
 			}
-			else if(coordsAfter.width > this.getViewer().viewerBean.width){
+			else if(valueAfter > dimensionMax){
 				//user didn't moved the viewer, center the picture
-				if(this.getViewer().viewerBean.x == 0){
-					this.getViewer().viewerBean.x = Math.floor(((coordsAfter.width/100.0)*50.0) - (this.getViewer().viewerBean.width/2.0));
+				if(position == 0){
+					return Math.floor(((valueAfter/100.0)*50.0) - (dimensionMax / 2.0));
 				}
 				
-			}else{
-				this.getViewer().viewerBean.x = 0;
-			}
-			
-			
-			if(coordsBefore.height > this.getViewer().viewerBean.height){
-				var viewerYCenter = Math.floor(this.getViewer().viewerBean.height / 2); 
-				var yCenter = coordsBefore.y + viewerYCenter;//current viewport center			
-				var diffY = Math.floor(100.0 / coordsBefore.height * yCenter);//percentage of current viewport				
-				this.getViewer().viewerBean.y = Math.floor(diffY * (coordsAfter.height/100.0)) - viewerYCenter;				
-			}
-			else if(coordsAfter.height > this.getViewer().viewerBean.height){
-				//user didn't moved the viewer, center the picture
-				if(this.getViewer().viewerBean.y == 0){
-					this.getViewer().viewerBean.y = Math.floor(((coordsAfter.height/100.0)*50.0) - (this.getViewer().viewerBean.height/2.0));
-				}
-				
-			}else{
-				this.getViewer().viewerBean.y = 0;
-			}
-			
-			if(this.activateCanvas){
-				this.rotate(true);
-			}
-			else{
-				this.getViewer().viewerBean.prepareTiles();
-			}
-			
-			this.getViewer().viewerBean.notifyViewerZoomed();
-
+			}			
+			return 0;			
 		};
 		
 		constructor.prototype.zoomViewer = function cv_zoomViewer(direction){
@@ -313,108 +275,100 @@
 				}
 
 				var iview = this.getViewer();
-				
-				//Plus <-> Minus				
+								
 				var xMove = this.getViewer().viewerBean.x - motion.x; 
 				var xViewerBorder = this.getViewer().currentImage.curWidth - this.getViewer().viewerBean.width;
 				var yMove = this.getViewer().viewerBean.y - motion.y; 
 				var yViewerBorder = this.getViewer().currentImage.curHeight - this.getViewer().viewerBean.height;
 				
+				/*
 				if(this.getViewer().currentImage.rotation == 90 || this.getViewer().currentImage.rotation == 270){
 					xViewerBorder = this.getViewer().currentImage.curWidth - this.getViewer().viewerBean.height;
 					yViewerBorder = this.getViewer().currentImage.curHeight - this.getViewer().viewerBean.width;
-				}				
+				}*/				
 				
 				if(xViewerBorder > 0){//testen, ob das Bild überhaupt in der aktuellen Zoomstufe in die Richtung bewegt werden kann
 					if (xMove >  xViewerBorder && xViewerBorder > 0) { //max. Randbegrenzung
 						this.getViewer().viewerBean.x = xViewerBorder;
-						motion.x = 0;
 					}
 					else if(xMove > 0){//normal
 						this.getViewer().viewerBean.x -= motion.x;
 					}		
 					else if(this.getViewer().viewerBean.x < 0 || xMove < 0){//min. Randbegrenzung
-						this.getViewer().viewerBean.x = motion.x = 0;
+						this.getViewer().viewerBean.x = 0;
 					}
 				}else{
-					this.getViewer().viewerBean.x = motion.x = 0;
+					this.getViewer().viewerBean.x = 0;
 				}
 				
 				if(yViewerBorder > 0){
 					if (yMove > yViewerBorder && yViewerBorder > 0) {
 						this.getViewer().viewerBean.y = yViewerBorder;
-						motion.y = 0;
 					}	
 					else if(yMove > 0){
 						this.getViewer().viewerBean.y -= motion.y;
 					}
 					else if(this.getViewer().viewerBean.y < 0 || yMove < 0){
-						this.getViewer().viewerBean.y = motion.y = 0;
+						this.getViewer().viewerBean.y = 0;
 					}
 				}else{
-					this.getViewer().viewerBean.y = motion.y = 0;
+					this.getViewer().viewerBean.y = 0;
 				}
-				
-				if((xViewerBorder > 0 || yViewerBorder > 0) || (motion.x == 0 && motion.y == 0)){
-					this.updateScreen();		
-				}
+				console.log(this.getViewer().viewerBean.x + " " + this.getViewer().viewerBean.y);
+				this.updateScreen();		
 			}
 		};
 		
 		constructor.prototype.drawPreview = function cv_drawPreview(){
-			//uses negative values because canvas starts at 0,0 and drawing starts there
+			//uses negative values because canvas starts at 0,0
 			var viewerBean = this.getViewer().viewerBean;
 			var x = -viewerBean.x;
-			var y = -viewerBean.y;			
-			this.context2D.drawImage(this.preView, x, y, this.getViewer().currentImage.curWidth, this.getViewer().currentImage.curHeight);
+			var y = -viewerBean.y;					
+			var w = (this.getViewer().currentImage.rotation == 0 || this.getViewer().currentImage.rotation == 180) ? this.getViewer().currentImage.curWidth :  this.getViewer().currentImage.curHeight;
+			var h = (this.getViewer().currentImage.rotation == 0 || this.getViewer().currentImage.rotation == 180) ? this.getViewer().currentImage.curHeight :  this.getViewer().currentImage.curWidth;
+			this.context2D.drawImage(this.preView, x, y, w, h);
 		};
 		
 		constructor.prototype._updateCanvas = function cv__updateCanvas(){
 			var rect = {};
-
+			var old = 0;
+			var rotation = this.getViewer().currentImage.rotation;
 			rect.x = this.getViewer().viewerBean.x;
 			rect.y = this.getViewer().viewerBean.y;
-		
 			var tileSize = this.getViewer().viewerBean.tileSize;
+			
 			var curWidth = this.getViewer().currentImage.curWidth;
-			var curHeight = this.getViewer().currentImage.curHeight;			
-			
-			//check if rotated and axis are inverted
-			
-			if(this.smallerThanCanvas() == false && (this.getViewer().currentImage.rotation == 90 || this.getViewer().currentImage.rotation == 270)){
-				var old = curWidth;
-				curWidth = curHeight;
-				curHeight = old;
+			var curHeight = this.getViewer().currentImage.curHeight;		
+						
+			var cnvWidth = this.context2D.canvas.width;
+			var cnvHeight = this.context2D.canvas.height;
+			if(rotation == 90 || rotation == 270){
+				cnvWidth = this.context2D.canvas.height;
+				cnvHeight = this.context2D.canvas.width;
+				if(this.smallerThanCanvas()){
+					old = curWidth;
+					curWidth = curHeight;
+					curHeight = old;
+				}
 			}
 			
-			var xDim = Math.min(this.context2D.canvas.width, curWidth);
-			var yDim = Math.min(this.context2D.canvas.height,curHeight);
-			
-			//DON'T swap canvas dimensions directly because it would erase the preview			
-			if(this.smallerThanCanvas() == false && (this.getViewer().currentImage.rotation == 90 || this.getViewer().currentImage.rotation == 270)){
-				if(xDim == this.context2D.canvas.width){
-					var old = xDim;
-					xDim = yDim;
-					yDim = old;
-				}
-			}			
-			
+			//determine how much space is needed to draw all necessary tiles
+			var xDim = Math.min(cnvWidth, curWidth);
+			var yDim = Math.min(cnvHeight, curHeight);
+				
+			//gap between first tile and border
 			var xoff = rect.x%tileSize;
 			var yoff = rect.y%tileSize;
  
+			//number of visible tiles
 			var xTiles = Math.ceil((xDim+xoff) / tileSize);
 			var yTiles = Math.ceil((yDim+yoff) / tileSize);
 			
-			if(this.smallerThanCanvas() == false && (this.getViewer().currentImage.rotation == 90 || this.getViewer().currentImage.rotation == 270)){
-				var old = curWidth;
-				curWidth = curHeight;
-				curHeight = old;
-			}
-			
+			//border tiles
 			var imgXTiles = Math.ceil(curWidth/tileSize);
 			var imgYTiles = Math.ceil(curHeight/tileSize);
 						
-			//xstart, ystart Kacheln
+			//xstart, ystart 
 			var startx = Math.floor(rect.x/tileSize);
 			var starty = Math.floor(rect.y/tileSize);
 			
@@ -430,9 +384,6 @@
 					tile.posx = column * tileSize - xoff;
 					tile.posy = row * tileSize - yoff;
 					
-					if(this.smallerThanCanvas() == false && this.getViewer().currentImage.rotation == 270 && !(this.getViewer().currentImage.curWidth > this.getViewer().viewerBean.height && this.getViewer().currentImage.curHeight > this.getViewer().viewerBean.width)){
-						tile.posx = column * tileSize - xoff + (this.getViewer().currentImage.curWidth - this.getViewer().viewerBean.height);
-					}
 										
 					this.assignTileImage(tile);					
 				}			
@@ -448,7 +399,9 @@
 				}
 				return;
 			}
-
+			
+			this.clearCanvas();
+			this.rotateCanvas(this.getViewer().currentImage.rotation);
 			this.updateCanvasCount = 0;
 			this.drawPreview();
 			this._updateCanvas();
@@ -496,75 +449,10 @@
 			return !!((this.getViewer().currentImage.curWidth <= this.getViewer().viewerBean.width && this.getViewer().currentImage.curHeight <= this.getViewer().viewerBean.height) && (this.getViewer().currentImage.curHeight <= this.getViewer().viewerBean.width && this.getViewer().currentImage.curWidth <= this.getViewer().viewerBean.height));
 		};
 		
-		constructor.prototype.rotate = function cv_rotate(zoomCaller){			
-			
-			this.clearCanvas();  				
-			this.getViewer().currentImage.curWidth = Math.ceil((this.getViewer().currentImage.width / Math.pow(2, this.getViewer().currentImage.zoomInfo.maxZoom - this.getViewer().viewerBean.zoomLevel))*this.getViewer().currentImage.zoomInfo.scale);
-			this.getViewer().currentImage.curHeight = Math.ceil((this.getViewer().currentImage.height / Math.pow(2, this.getViewer().currentImage.zoomInfo.maxZoom - this.getViewer().viewerBean.zoomLevel))*this.getViewer().currentImage.zoomInfo.scale); 
-
-			
+		constructor.prototype.prepareTiles = function cv_prepareTiles(){			
 			var rows = Math.ceil(this.getViewer().viewerBean.height / this.getViewer().viewerBean.tileSize) + 1;
-			var cols = Math.ceil(this.getViewer().viewerBean.width / this.getViewer().viewerBean.tileSize) + 1;
+			var cols = Math.ceil(this.getViewer().viewerBean.width / this.getViewer().viewerBean.tileSize) + 1;	
 			
-			if(zoomCaller === undefined){//rotate if caller isn't zoom
-				this.getViewer().currentImage.rotation = (this.getViewer().currentImage.rotation + 90 >= 360) ? 0 : this.getViewer().currentImage.rotation + 90;
-			}
-			
-			if(this.getViewer().currentImage.rotation != 0){				
-				//picture is small enough to fit in the canvas area
-				if(this.smallerThanCanvas()){					
-					var moveXAxis = 0, moveYAxis = 0;		
-					switch (this.getViewer().currentImage.rotation){
-			  		case 90:  	moveYAxis = -this.getViewer().currentImage.curHeight;
-			  					break;
-			  		case 180:	moveYAxis = -this.getViewer().currentImage.curHeight;
-			  					moveXAxis = -this.getViewer().currentImage.curWidth;
-			  					break;	  				
-			  		case 270:	moveXAxis = -this.getViewer().currentImage.curWidth;
-			  					break;
-					}	
-					this.context2D.rotate(this.getViewer().currentImage.rotation * (Math.PI / 180));	
-				  	this.context2D.translate(moveXAxis,moveYAxis);					
-				}
-				else{
-					//both axis are bigger than viewer
-					if(this.getViewer().currentImage.curWidth > this.getViewer().viewerBean.height && this.getViewer().currentImage.curHeight > this.getViewer().viewerBean.width){
-						//swap dimensions						
-						this.context2D.translate(Math.ceil(this.context2D.canvas.width/2), Math.ceil(this.context2D.canvas.height/2));				
-						this.context2D.rotate(this.getViewer().currentImage.rotation * (Math.PI / 180));
-
-						if(this.getViewer().currentImage.rotation == 90 || this.getViewer().currentImage.rotation == 270){
-							this.context2D.translate( -this.context2D.canvas.height/2, -this.context2D.canvas.width/2);
-						}else{
-							this.context2D.translate( -this.context2D.canvas.width/2, -this.context2D.canvas.height/2);
-						}
-					}
-					else{
-						var moveXAxis = 0, moveYAxis = 0;					
-						//calculate new viewer coordinates
-						switch (this.getViewer().currentImage.rotation){
-					  		case 90:  	moveYAxis = -this.getViewer().currentImage.curHeight;
-					  					break;
-					  		case 180:	moveYAxis = -this.getViewer().currentImage.curHeight;
-					  					moveXAxis = -this.getViewer().currentImage.curWidth;
-					  					break;	  				
-					  		case 270:	moveXAxis = -this.getViewer().currentImage.curWidth;
-					  					break;
-						}																		
-						
-						this.context2D.rotate(this.getViewer().currentImage.rotation * (Math.PI / 180));	
-					  	this.context2D.translate(moveXAxis,moveYAxis);						
-					}				
-				}
-			}
-			
-			if(this.getViewer().currentImage.rotation == 90 || this.getViewer().currentImage.rotation == 270){
-				var old = rows;
-				rows = cols;
-				cols = old;
-			}
-			
-			//reset\refill tile-array
 			this.getViewer().viewerBean.tiles = [];
 			for (var c = 0; c < cols; c++) {
 				var tileCol = [];
@@ -578,15 +466,87 @@
 						'qx' : c,
 						'qy' : r
 					};
-
 					tileCol.push(tile);
-				}
-			
+				}			
 				this.getViewer().viewerBean.tiles.push(tileCol);
 			}			
+		};
+		
+		constructor.prototype.refreshImageDimensions = function cv_refreshImageDimensions(){
+			this.getViewer().currentImage.curWidth = Math.ceil((this.getViewer().currentImage.width / Math.pow(2, this.getViewer().currentImage.zoomInfo.maxZoom - this.getViewer().viewerBean.zoomLevel))*this.getViewer().currentImage.zoomInfo.scale);
+			this.getViewer().currentImage.curHeight = Math.ceil((this.getViewer().currentImage.height / Math.pow(2, this.getViewer().currentImage.zoomInfo.maxZoom - this.getViewer().viewerBean.zoomLevel))*this.getViewer().currentImage.zoomInfo.scale); 
+		};
+		
+		constructor.prototype.flipImageDimensions = function cv_flipImageDimensions(){
+			var old = this.getViewer().currentImage.curHeight;
+			this.getViewer().currentImage.curHeight = this.getViewer().currentImage.curWidth;
+			this.getViewer().currentImage.curWidth = old;
+			old = this.getViewer().currentImage.height;
+			this.getViewer().currentImage.height = this.getViewer().currentImage.width;
+			this.getViewer().currentImage.width = old;
+		};
+		
+		constructor.prototype.flipViewerDimensions = function cv_flipViewerDimensions(){
+			var old = this.getViewer().viewerBean.width;
+			this.getViewer().viewerBean.width = this.getViewer().viewerBean.height;
+			this.getViewer().viewerBean.height = old;
+		};
+		
+		constructor.prototype.rotateCanvas = function rotateCanvas(degree){
+			var rotMode = 0;
+			
+			if(degree){				
+				//picture is small enough to fit in the canvas area
+				if(this.smallerThanCanvas()){					
+					rotMode = 1;
+				}
+				else{
+					//both axis are bigger than viewer
+					if((this.getViewer().currentImage.curWidth > this.getViewer().viewerBean.height && this.getViewer().currentImage.curHeight > this.getViewer().viewerBean.width)
+					||  (this.getViewer().currentImage.curWidth > this.getViewer().viewerBean.width && this.getViewer().currentImage.curHeight > this.getViewer().viewerBean.height)){
+						rotMode = 2;
+					}
+					else{
+						rotMode = 1;						
+					}				
+				}
+			}
+			
+			if(rotMode == 1){
+				var moveXAxis = 0, moveYAxis = 0;		
+				switch (degree){
+		  		case 90:  	moveYAxis = -this.getViewer().currentImage.curWidth;
+		  					break;
+		  		case 180:	moveYAxis = -this.getViewer().currentImage.curHeight;
+		  					moveXAxis = -this.getViewer().currentImage.curWidth;
+		  					break;	  				
+		  		case 270:	moveXAxis = -this.getViewer().currentImage.curHeight;
+		  					break;
+				}	
+				this.context2D.rotate(degree * (Math.PI / 180));	
+			  	this.context2D.translate(moveXAxis, moveYAxis);					
+			}
+			else if(rotMode == 2){				
+				this.context2D.translate(Math.ceil(this.context2D.canvas.width/2), Math.ceil(this.context2D.canvas.height/2));				
+				this.context2D.rotate(degree * (Math.PI / 180));
+
+				if(degree == 90 || degree == 270){
+					this.context2D.translate( -this.context2D.canvas.height/2, -this.context2D.canvas.width/2);
+				}else{
+					this.context2D.translate( -this.context2D.canvas.width/2, -this.context2D.canvas.height/2);
+				}
+			}						
+		};
+		
+		//rotate90degree does everything which belongs to an image-roation
+		constructor.prototype.rotate90degree = function cv_rotate90degree(){							
+			this.getViewer().currentImage.rotation = (this.getViewer().currentImage.rotation + 90 >= 360) ? 0 : this.getViewer().currentImage.rotation + 90;	
+			this.flipImageDimensions();
+			this.flipViewerDimensions();
+			this.prepareTiles();
 			this.positionTiles();
 		};
-		 
+		
 		return constructor;
 	})();
 
