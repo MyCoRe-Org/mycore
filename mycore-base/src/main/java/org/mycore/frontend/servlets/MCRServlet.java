@@ -328,7 +328,10 @@ public class MCRServlet extends HttpServlet {
         } catch (Exception ex) {
             if (getProperty(job.getRequest(), INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
                 // current Servlet not called via RequestDispatcher
+                LOGGER.warn("Exception occurred, performing database rollback.");
                 session.rollbackTransaction();
+            } else {
+                LOGGER.warn("Exception occurred, cannot rollback database transaction right now.");
             }
             return ex;
         }
