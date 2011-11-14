@@ -33,12 +33,6 @@
     <cell row="10" col="3" anchor="NORTHWEST" ref="mods.book.pages.range.help" />
     <!-- Seiten von bis END -->
 
-    <!-- Identifier -->
-    <cell row="15" col="1" anchor="NORTHEAST" ref="mods.identifier.label" />
-    <cell row="15" col="2" anchor="NORTHWEST" ref="mods.identifier.optional" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="15" col="3" anchor="NORTHWEST" ref="mods.identifier.help" />
-    <!-- Identifier END -->
-
     <!-- Title -->
     <cell row="20" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.title.label" />
     <cell row="20" col="2" anchor="NORTHWEST" ref="mods.title" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
