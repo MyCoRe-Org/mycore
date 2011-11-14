@@ -13,6 +13,7 @@
     <hidden var="metadata/def.modsContainer/@class" default="MCRMetaXML" />
     <hidden var="metadata/def.modsContainer/@notinherit" default="true" />
     <hidden var="metadata/def.modsContainer/@heritable" default="false" />
+    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:typeOfResource" default="text" />
     
     <!-- Genre Journal/Series -->
     <cell row="5" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.genre.journal.label" />
