@@ -50,6 +50,14 @@
     };
     
     constructor.prototype.setPos = function ci_setPos(position) {
+    	if(this.curHeight <= this.viewer.viewerBean.height){
+    		position.y = 0;
+    	}
+    	
+    	if(this.curWidth <= this.viewer.viewerBean.width)
+    	{
+    		position.x = 0;
+    	}
     	this.x = position.x;
     	this.y = position.y;
     	jQuery(this).trigger(iview.CurrentImage.POS_CHANGE_EVENT);
