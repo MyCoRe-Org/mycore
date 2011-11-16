@@ -18,6 +18,7 @@
     <hidden var="metadata/def.modsContainer/@notinherit" default="true" />
     <hidden var="metadata/def.modsContainer/@heritable" default="false" />
 
+    <!-- Basisangaben zum Dokument -->
     <!-- pub_title_orig [text] -->
     <cell row="10" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.title.label" />
     <cell row="10" col="2" anchor="NORTHWEST" ref="mods.title" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
@@ -41,94 +42,103 @@
     <cell row="30" col="2" anchor="NORTHWEST" ref="mods.person" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="30" col="3" anchor="NORTHWEST" ref="mods.person.help" />
     <!-- pub_autor_dok_txt [text] and reviewer END -->
-
+    
+    <!-- Datum der Veröffentlichung [text] -->
+    <cell row="35" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.dateIssued.label" />
+    <cell row="35" col="2" anchor="NORTHWEST" ref="mods.dateIssued" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
+    <cell row="35" col="3" anchor="NORTHWEST" ref="mods.dateIssued.help" />
+    <!-- Datum der Veröffentlichung END -->
+    
+   <!-- Institution der Einreichung -->
+    <cell row="40" col="1" anchor="NORTHEAST" ref="mods.submissionAtInstitute.label" />
+    <cell row="40" col="2" anchor="NORTHWEST" ref="mods.submissionAtInstitute" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="40" col="3" anchor="NORTHWEST" ref="mods.submissionAtInstitute.help" />
+    <!-- Institution END --> 
+    
+  <!--  Erweiterte Angaben zum Dokument -->
+    <cell row="50" colspan="3" class="border">
+      <panel style="width:100%;">
     <!-- genre classification -->
-    <cell row="35" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.genre.kindOfThesis.label" />
-    <cell row="35" col="2" anchor="NORTHWEST" ref="mods.genre.kindOfThesis" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="35" col="3" anchor="NORTHWEST" ref="mods.genre.kindOfThesis.help" />
+        <cell row="60" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.genre.kindOfThesis.label" />
+        <cell row="60" col="2" anchor="NORTHWEST" ref="mods.genre.kindOfThesis" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+        <cell row="60" col="3" anchor="NORTHWEST" ref="mods.genre.kindOfThesis.help" />
     <!-- genre classification END -->
-
-  <cell row="40" colspan="3" class="border"><panel style="width:100%;">
     <!-- LANGUAGE -->
-    <cell row="50" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.languageTerm.label" />
-    <cell row="50" col="2" anchor="NORTHWEST" ref="mods.languageTerm" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
-    <cell row="50" col="3" anchor="NORTHWEST" ref="mods.languageTerm.help" />
+        <cell row="65" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.languageTerm.label" />
+        <cell row="65" col="2" anchor="NORTHWEST" ref="mods.languageTerm" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
+        <cell row="65" col="3" anchor="NORTHWEST" ref="mods.languageTerm.help" />
     <!-- LANGUAGE END -->
 
     <!-- Abstract -->
-    <cell row="60" col="1" anchor="NORTHEAST" ref="mods.abstract.label" />
-    <cell row="60" col="2" anchor="NORTHWEST" ref="mods.abstract" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="60" col="3" anchor="NORTHWEST" ref="mods.abstract.help" />
+        <cell row="70" col="1" anchor="NORTHEAST" ref="mods.abstract.label" />
+        <cell row="70" col="2" anchor="NORTHWEST" ref="mods.abstract" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+        <cell row="70" col="3" anchor="NORTHWEST" ref="mods.abstract.help" />
     <!-- Abstract END -->
 
     <!-- Extent|Part -->
-    <cell row="65" col="1" anchor="NORTHEAST" ref="mods.book.part.extent.label" />
-    <cell row="65" col="2" anchor="NORTHWEST" ref="mods.book.part.extent" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="65" col="3" anchor="NORTHWEST" ref="mods.book.part.extent.help" />
+        <cell row="75" col="1" anchor="NORTHEAST" ref="mods.book.part.extent.label" />
+        <cell row="75" col="2" anchor="NORTHWEST" ref="mods.book.part.extent" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+        <cell row="75" col="3" anchor="NORTHWEST" ref="mods.book.part.extent.help" />
     <!-- Extent|Part END -->
 
     <!-- pub_klassifik -->
-    <cell row="70" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.ddc.label" />
-    <cell row="70" col="2" anchor="NORTHWEST" ref="mods.ddc" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="70" col="3" anchor="NORTHWEST" ref="mods.ddc.help" />
+        <cell row="80" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.ddc.label" />
+        <cell row="80" col="2" anchor="NORTHWEST" ref="mods.ddc" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+        <cell row="80" col="3" anchor="NORTHWEST" ref="mods.ddc.help" />
     <!-- pub_klassifik END -->
-
-    <!-- arev_klassifik -->
-    <cell row="75" col="1" anchor="NORTHEAST" ref="mods.arev.label" />
-    <cell row="75" col="2" anchor="NORTHWEST" ref="mods.arev" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="75" col="3" anchor="NORTHWEST" ref="mods.arev.help" />
-    <!-- arev_klassifik END -->
-
-    <!-- arev_jahr -->
-    <cell row="76" col="1" anchor="NORTHEAST" ref="mods.arev.year.label" />
-    <cell row="76" col="2" anchor="NORTHWEST" ref="mods.arev.year" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="76" col="3" anchor="NORTHWEST" ref="mods.arev.year.help" />
-    <!-- arev_jahr END -->
-
+    
+    <!-- Stichworte -->
+        <cell row="85" col="1" anchor="NORTHEAST" ref="mods.subject.label" />
+        <cell row="85" col="2" anchor="NORTHWEST" ref="mods.subject" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+        <cell row="85" col="3" anchor="NORTHWEST" ref="mods.subject.help" />
+    <!-- Stichworte END -->
+    
+    <!-- Rechte -->
+        <cell row="90" col="1" anchor="NORTHEAST" ref="mods.rights.label" />
+        <cell row="90" col="2" anchor="NORTHWEST" ref="mods.rights" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+        <cell row="90" col="3" anchor="NORTHWEST" ref="mods.rights.help" />
+    <!-- Rechte END -->
+      </panel>
+    </cell>
+    
+    <!-- Identifier Panel -->
+    <cell row="100" colspan="3" class="border">
+      <panel style="width:100%;">    
     <!-- Identifier -->
-    <cell row="80" col="1" anchor="NORTHEAST" ref="mods.identifier.label" />
-    <cell row="80" col="2" anchor="NORTHWEST" ref="mods.identifier" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="80" col="3" anchor="NORTHWEST" ref="mods.identifier.help" />
+        <cell row="140" col="1" anchor="NORTHEAST" ref="mods.identifier.label" />
+        <cell row="140" col="2" anchor="NORTHWEST" ref="mods.identifier" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+        <cell row="140" col="3" anchor="NORTHWEST" ref="mods.identifier.help" />
     <!-- Identifier END -->
 
-    <!-- Datum der Veröffentlichung [text] -->
-    <cell row="90" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.dateIssued.label" />
-    <cell row="90" col="2" anchor="NORTHWEST" ref="mods.dateIssued" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
-    <cell row="90" col="3" anchor="NORTHWEST" ref="mods.dateIssued.help" />
-    <!-- Datum der Veröffentlichung END -->
-
-    <!-- Institution der Einreichung -->
-    <cell row="130" col="1" anchor="NORTHEAST" ref="mods.submissionAtInstitute.label" />
-    <cell row="130" col="2" anchor="NORTHWEST" ref="mods.submissionAtInstitute" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="130" col="3" anchor="NORTHWEST" ref="mods.submissionAtInstitute.help" />
-    <!-- Institution END -->
-
-    <!-- Stichworte -->
-    <cell row="160" col="1" anchor="NORTHEAST" ref="mods.subject.label" />
-    <cell row="160" col="2" anchor="NORTHWEST" ref="mods.subject" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="160" col="3" anchor="NORTHWEST" ref="mods.subject.help" />
-    <!-- Stichworte END -->
-
     <!-- URL -->
-    <cell row="170" col="1" anchor="NORTHEAST" ref="mods.location.url.label" />
-    <cell row="170" col="2" anchor="NORTHWEST" ref="mods.location.url" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:location" />
-    <cell row="170" col="3" anchor="NORTHWEST" ref="mods.location.url.help" />
-    <cell row="171" col="1" anchor="NORTHEAST" ref="mods.location.url.displayLabel.label" />
-    <cell row="171" col="2" anchor="NORTHWEST" ref="mods.location.url.displayLabel" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:location" />
-    <cell row="171" col="3" anchor="NORTHWEST" ref="mods.location.url.displayLabel.help" />
+        <cell row="145" col="1" anchor="NORTHEAST" ref="mods.location.url.label" />
+        <cell row="145" col="2" anchor="NORTHWEST" ref="mods.location.url" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:location" />
+        <cell row="145" col="3" anchor="NORTHWEST" ref="mods.location.url.help" />
+        <cell row="146" col="1" anchor="NORTHEAST" ref="mods.location.url.displayLabel.label" />
+        <cell row="146" col="2" anchor="NORTHWEST" ref="mods.location.url.displayLabel" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:location" />
+        <cell row="146" col="3" anchor="NORTHWEST" ref="mods.location.url.displayLabel.help" />
     <!-- URL END -->
-
-    <!-- Rechte -->
-    <cell row="180" col="1" anchor="NORTHEAST" ref="mods.rights.label" />
-    <cell row="180" col="2" anchor="NORTHWEST" ref="mods.rights" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="180" col="3" anchor="NORTHWEST" ref="mods.rights.help" />
-    <!-- Rechte END -->
-  </panel></cell>
+      
+  <!-- arev_klassifik -->
+        <cell row="150" col="1" anchor="NORTHEAST" ref="mods.arev.label" />
+        <cell row="150" col="2" anchor="NORTHWEST" ref="mods.arev" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+        <cell row="150" col="3" anchor="NORTHWEST" ref="mods.arev.help" />
+    <!-- arev_klassifik END -->
+  
+  <!-- arev_jahr -->
+        <cell row="155" col="1" anchor="NORTHEAST" ref="mods.arev.year.label" />
+        <cell row="155" col="2" anchor="NORTHWEST" ref="mods.arev.year" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+        <cell row="155" col="3" anchor="NORTHWEST" ref="mods.arev.year.help" />
+    <!-- arev_jahr END -->
+      </panel>
+    </cell>
 
   <!-- Institution-Tripple -->
-  <cell row="50" colspan="3" class="border"><panel style="width:100%;">
-    <cell row="10" col="1" colspan="3" anchor="NORTHWEST" ref="mods.noteLocationCorp" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-  </panel></cell>
+    <cell row="200" colspan="3" class="border">
+      <panel style="width:100%;">
+        <cell row="10" col="1" colspan="3" anchor="NORTHWEST" ref="mods.noteLocationCorp" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+      </panel>
+    </cell>
 
     <!-- save cancel buttons -->
     <cell col="1" colspan="3" row="250" anchor="EAST" style="padding-top:20px;">

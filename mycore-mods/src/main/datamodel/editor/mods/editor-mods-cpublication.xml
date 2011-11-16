@@ -47,8 +47,8 @@
     <!-- pub_autor_dok_txt [text] and reviewer END -->
     
     <!-- pub_genre -->
-    <cell row="35" col="1" anchor="NORTHEAST" class="mandatory" ref="mods.genre.kindOfReport.label" />
-    <cell row="35" col="2" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre">
+    <cell row="32" col="1" anchor="NORTHEAST" class="mandatory" ref="mods.genre.kindOfReport.label" />
+    <cell row="32" col="2" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre">
       <panel>
         <hidden var="@type" default="kindof" />
         <hidden var="@displayLabel" default="Kind of Publication" />
@@ -64,14 +64,18 @@
         </cell>
       </panel>
     </cell>
-    <cell row="35" col="3" anchor="NORTHEAST">
+    <cell row="32" col="3" anchor="NORTHEAST">
       <helpPopup id="mods.genre.kindOfPublication.help" width="400px" height="250px">
         <label xml:lang="de">Eine Zuordnung zu einem in der Liste verfügbaren Genre .</label>
         <label xml:lang="en">Entry from the list.</label>
       </helpPopup>
     </cell>
   <!-- pub_genre END -->
-  
+  <!--  Seitenzahlen bei  -->
+    <cell row="35" col="1" anchor="NORTHEAST" ref="mods.book.pages.range.label" />
+    <cell row="35" col="2" anchor="NORTHWEST" ref="mods.book.pages.range" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="35" col="3" anchor="NORTHWEST" ref="mods.book.pages.range.help" />
+  <!--  Ende Seitenzahlen -->
   <!-- Bei Postern -> Größe [text] -->
     <cell row="36" col="1" anchor="NORTHEAST" ref="mods.physicalDescription.label" />
     <cell row="36" col="2" anchor="NORTHWEST" ref="mods.physicalDescription" var="metadata/def.modsContainer/modsContainer/mods:mods" />
