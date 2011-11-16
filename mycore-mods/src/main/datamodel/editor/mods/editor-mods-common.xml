@@ -601,9 +601,9 @@
                 <label xml:lang="de">ISBN13</label>
                 <label xml:lang="en">ISBN13</label>
               </item>
-              <item value="intern_old">
-                <label xml:lang="de">intern</label>
-                <label xml:lang="en">intern</label>
+              <item value="isbn10">
+                <label xml:lang="de">ISBN10</label>
+                <label xml:lang="en">ISBN10</label>
               </item>
               <item value="doi">
                 <label xml:lang="de">DOI</label>
@@ -616,6 +616,10 @@
               <item value="uri">
                 <label xml:lang="de">URI</label>
                 <label xml:lang="en">URI</label>
+              </item>
+              <item value="intern_old">
+                <label xml:lang="de">intern</label>
+                <label xml:lang="en">intern</label>
               </item>
               <item value="unknown">
                 <label xml:lang="de">Unbekannt</label>
@@ -1334,10 +1338,14 @@
   <text id="mods.rights.label" i18n="metaData.mods.dictionary.rights" />
   <panel id="mods.rights">
     <cell anchor="NORTHWEST" var="mods:accessCondition[@type='use and reproduction']">
-      <list type="dropdown" default="">
+      <list type="dropdown" default="rights_reserved">
         <item value="">
           <label xml:lang="de">(bitte wählen)</label>
           <label xml:lang="en">(please select)</label>
+        </item>
+        <item value="rights_reserved">
+          <label xml:lang="de">Alle Rechte vorbehalten</label>
+          <label xml:lang="en">All rights reserved</label>
         </item>
         <item value="cc_by">
           <label xml:lang="de">CC BY</label>
@@ -1361,7 +1369,8 @@
 
   <helpPopup id="mods.rights.help" width="400px" height="250px">
     <label xml:lang="de">
-      Unter welchen Rechten stellen Sie Ihr Dokument hier ein? Weitere Informationen finden Sie unter http://creativecommons.org/licenses/
+      Unter welchen Rechten stellen Sie Ihr Dokument hier ein? Weitere Informationen finden Sie unter http://de.wikipedia.org/wiki/Alle_Rechte_vorbehalten
+      bzw. http://creativecommons.org/licenses/
     </label>
     <label xml:lang="en">
       Rights/Licenses, e.g. CC. For more information see http://creativecommons.org/licenses/
