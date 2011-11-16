@@ -11,7 +11,7 @@
   <text id="mods.cproceeding.title.label" i18n="metaData.mods.dictionary.cproceedingTitle" />
   <panel id="mods.title">
     <cell anchor="NORTHWEST" var="mods:title">
-      <textarea id="mods.title.text" width="50" height="3">
+      <textarea id="mods.title.text" width="45" height="3">
         <condition id="mods.title.cond" required="true">
           <label xml:lang="de">Tragen Sie hier den Titel des Dokumentes ein.</label>
           <label xml:lang="en">Enter the title of the document here.</label>
@@ -86,7 +86,7 @@
 
   <panel id="mods.subtitle">
     <cell anchor="NORTHWEST" var="mods:subTitle">
-      <textarea id="mods.subtitle.text" width="50" height="3" />
+      <textarea id="mods.subtitle.text" width="45" height="3" />
     </cell>
   </panel>
 
@@ -1439,7 +1439,7 @@
   <textfield id="TFzeile512" width="60" maxlength="512" />
   <textfield id="TFzeile1024" width="60" maxlength="1024" />
   <!-- *** Text area *** -->
-  <textarea id="TFarea1028" width="50" height="3" />
+  <textarea id="TFarea1028" width="45" height="3" />
   <textarea id="TFarea4096" width="43" height="8" />
   <textarea id="TFeditor" wysiwygEditor="true" editorWidth="500" editorHeight="200" width="60" height="10" />
 
