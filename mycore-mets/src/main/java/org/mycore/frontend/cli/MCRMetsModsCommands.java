@@ -51,6 +51,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectStructure;
 import org.mycore.frontend.metsmods.MCRMetsModsUtil;
+
 import org.mycore.mets.tools.MCRMetsResolver;
 import org.mycore.mets.tools.MCRMetsSave;
 import org.mycore.services.fieldquery.MCRFieldDef;
@@ -72,7 +73,7 @@ import org.mycore.services.fieldquery.MCRResults;
  */
 public final class MCRMetsModsCommands extends MCRAbstractCommands {
 
-    private static Logger LOGGER = Logger.getLogger(MCRMetsModsCommands.class.getName());
+    private static Logger LOGGER = Logger.getLogger(MCRMetsModsCommands.class);
 
     private static MCRConfiguration CONFIG = MCRConfiguration.instance();
 
@@ -83,7 +84,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
     private static String activated = CONFIG.getString("MCR.Component.MetsMods.activated", "");
 
     /**
-     * The empty constructor.
+     * 
      */
     public MCRMetsModsCommands() {
         super();
@@ -471,7 +472,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         }
 
         try {
-            MCRMetsSave.update(MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivate)), filename);
+            MCRMetsSave.updateMetsOnFileAdd(MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivate)), filename);
         } catch (Exception ex) {
             LOGGER.error("Error while updating mets file", ex);
         }

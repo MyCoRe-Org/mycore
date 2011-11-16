@@ -19,9 +19,13 @@ import org.mycore.mets.tools.MCRMetsSave;
 public class MCRUpdateMetsOnDerivateChangeEventHandler extends MCREventHandlerBase {
     private static final Logger LOGGER = Logger.getLogger(MCRUpdateMetsOnDerivateChangeEventHandler.class);
 
+    /* (non-Javadoc)
+     * @see org.mycore.common.events.MCREventHandlerBase#handleFileDeleted(org.mycore.common.events.MCREvent, org.mycore.datamodel.ifs.MCRFile)
+     */
     @Override
-    protected void handleFileCreated(MCREvent evt, MCRFile file) {
+    protected void handleFileDeleted(MCREvent evt, MCRFile file) {
         String mets = MCRConfiguration.instance().getString(" MCR.Mets.Filename", "mets.xml");
+        // do nothing if mets.xml itself is deleted
         if (file.getName().equals(mets)) {
             return;
         }
@@ -32,7 +36,27 @@ public class MCRUpdateMetsOnDerivateChangeEventHandler extends MCREventHandlerBa
         }
 
         try {
-            MCRMetsSave.update(owner, file.getName());
+            MCRMetsSave.updateMetsOnFileDelete(owner, file);
+        } catch (Exception e) {
+            LOGGER.error("Error while updating mets file", e);
+        }
+    }
+
+    @Override
+    protected void handleFileCreated(MCREvent evt, MCRFile file) {
+        String mets = MCRConfiguration.instance().getString(" MCR.Mets.Filename", "mets.xml");
+        // do nothing if mets.xml itself is deleted
+        if (file.getName().equals(mets)) {
+            return;
+        }
+
+        MCRDerivate owner = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(file.getOwnerID()));
+        if (!owner.receiveDirectoryFromIFS().hasChild(mets)) {
+            return;
+        }
+
+        try {
+            MCRMetsSave.updateMetsOnFileAdd(owner, file);
         } catch (Exception e) {
             LOGGER.error("Error while updating mets file", e);
         }
