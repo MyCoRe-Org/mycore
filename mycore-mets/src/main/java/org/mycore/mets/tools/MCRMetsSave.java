@@ -296,21 +296,18 @@ public class MCRMetsSave {
                     handleChildren(mets, logDiv);
                 }
 
-                // handleParent
-                xp = XPath.newInstance("mets:mets/mets:structMap[@TYPE='LOGICAL']/mets:div([1]");
+                // handle parent
+                xp = XPath.newInstance("mets:mets/mets:structMap[@TYPE='LOGICAL']/mets:div[1]");
                 xp.addNamespace(MCRConstants.getStandardNamespace("mets"));
 
-                Object logDivContainer = xp.selectSingleNode(mets);
-                Element parent = logDiv.getParentElement();
+                Element logDivContainer = (Element) xp.selectSingleNode(mets);
 
-                if (logDivContainer != parent && parent.getChildren().size() == 1 && logDiv.getChildren().size() == 0) {
-                    parent.detach();
-                } else {
-                    if (logDiv.getChildren().size() == 0) {
-                        LOGGER.info("No children can be found for mets:div with id " + logId);
-                        LOGGER.info("Removing mets:div with id " + logId + " from mets:structMap TYPE=\"LOGICAL\"");
-                        logDiv.detach();
-                    }
+                handleParents(mets, logDiv, logDivContainer);
+
+                if (logDiv.getChildren().size() == 0) {
+                    LOGGER.info("No children can be found for mets:div with id " + logId);
+                    LOGGER.info("Removing mets:div with id " + logId + " from mets:structMap TYPE=\"LOGICAL\"");
+                    logDiv.detach();
                 }
             }
         }
@@ -318,6 +315,33 @@ public class MCRMetsSave {
         return mets;
     }
 
+    /**
+     * @param mets
+     * @param logDiv
+     * @param logDivContainer
+     * @throws Exception
+     */
+    private static void handleParents(Document mets, Element logDiv, Element logDivContainer) throws Exception {
+        Element parent = logDiv.getParentElement();
+
+        String logIdOfParent = parent.getAttributeValue("ID");
+        if (exists(mets, logIdOfParent)) {
+            return;
+        }
+        //no files associated to the current log id, but the parent might have some
+        if (parent.getParentElement() == logDivContainer) {
+            parent.detach();
+            return;
+        } else {
+            handleParents(mets, parent, logDivContainer);
+        }
+    }
+
+    /**
+     * @param mets
+     * @param logDiv
+     * @throws Exception
+     */
     @SuppressWarnings("unchecked")
     private static void handleChildren(Document mets, Element logDiv) throws Exception {
         List<Element> children = logDiv.getChildren();
