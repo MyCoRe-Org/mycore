@@ -179,7 +179,6 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
-        this.handleDerivateDeleted(evt, der);
-        this.handleDerivateCreated(evt, der);
+        // TODO
     }
 }
