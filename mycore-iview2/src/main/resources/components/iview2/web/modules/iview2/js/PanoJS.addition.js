@@ -351,7 +351,7 @@ PanoJS.keyboardHandler = function(e) {
 		iview.credits(e);
 	for (var i in PanoJS.VIEWERS){
 		var viewer = PanoJS.VIEWERS[i];
-		if (this.backingBean.isInputHandlerEnabled()){
+		if (viewer.isInputHandlerEnabled()){
 		if (e.keyCode >= 37 && e.keyCode <=40) {
 			//cursorkey movement
 			var motion = {

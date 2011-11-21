@@ -87,7 +87,7 @@ ToolbarController.prototype.addView = function(view) {
 				}
 			} else if (args.parentName == "pdfHandles") {
 				if (args.elementName == "createPdf") {
-					that.getViewer().gen.openPdfCreator(button);
+					that.getViewer().openPdfCreator();
 				}
 			} else if (args.parentName == "closeHandles") {
 				if (args.elementName == "close") {
