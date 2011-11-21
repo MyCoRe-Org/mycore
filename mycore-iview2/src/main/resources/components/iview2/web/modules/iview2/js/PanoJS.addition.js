@@ -1,6 +1,37 @@
 PanoJS.MSG_BEYOND_MIN_ZOOM = 'component.iview2.panojs.minzoom';
 PanoJS.MSG_BEYOND_MAX_ZOOM = 'component.iview2.panojs.maxzoom';
 
+PanoJS.prototype.inputHandlerEnabled=true;
+/**
+ * @function
+ * @memberOf iview.General
+ * @name isInputHandlerEnabled
+ * @returns true if input events (keyboard, mouse) are captured
+ */
+PanoJS.prototype.isInputHandlerEnabled = function() {
+  return this.inputHandlerEnabled;
+};
+ 
+/**
+ * @function
+ * @memberOf iview.General
+ * @name disableInputHandler
+ * @description disable input events
+ */
+PanoJS.prototype.disableInputHandler = function() {
+  this.inputHandlerEnabled=false;
+};
+ 
+ /**
+ * @function
+ * @memberOf iview.General
+ * @name enableInputHandler
+ * @description enable input events
+ */
+PanoJS.prototype.enableInputHandler = function() {
+  this.inputHandlerEnabled=true;
+};
+
 /**
  * @public
  * @function
@@ -281,7 +312,8 @@ PanoJS.prototype.zoom = function (direction) {
 PanoJS.isInstance = function () {return true;};
 
 PanoJS.mousePressedHandler = function(e) {
-	var that = this.backingBean.iview;
+  var that = this.backingBean.iview;
+  if (this.backingBean.isInputHandlerEnabled()){
   	e = getEvent(e);
   	if (that.viewerContainer.isMax()) {
   		// only grab on left-click
@@ -295,11 +327,12 @@ PanoJS.mousePressedHandler = function(e) {
   	}
   	// NOTE: MANDATORY! must return false so event does not propagate to well!
   	return false;
+  }
 }
 
 PanoJS.doubleClickHandler = function(e) {
 	var iview = this.backingBean.iview;
-	if (iview.viewerContainer.isMax()) {
+	if (iview.viewerContainer.isMax() && this.backingBean.isInputHandlerEnabled()) {
 		e = getEvent(e);
 		var self = this.backingBean;
 		coords = self.resolveCoordinates(e);
@@ -318,6 +351,7 @@ PanoJS.keyboardHandler = function(e) {
 		iview.credits(e);
 	for (var i in PanoJS.VIEWERS){
 		var viewer = PanoJS.VIEWERS[i];
+		if (this.backingBean.isInputHandlerEnabled()){
 		if (e.keyCode >= 37 && e.keyCode <=40) {
 			//cursorkey movement
 			var motion = {
@@ -349,8 +383,9 @@ PanoJS.keyboardHandler = function(e) {
 				e.cancelBubble = true;
 				return false;
 			}
-		}
-	}
+		  }//zoom
+		}//input events enabled
+	}//every viewer
 }
 
 /*

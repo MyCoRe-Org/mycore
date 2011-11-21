@@ -1,13 +1,20 @@
 /**
- * @public
- * @function
- * @name openPdfCreator
- * @memberOf iview.General
- * @description opens PDF creator dialog
- * @param {button}
- *          button to which represents the PDF creator in the toolbar
+ * @namespace Package for Pdf, contains View and Controller
+ * @memberOf iview
+ * @name Pdf
  */
-iview.General.prototype.openPdfCreator = function(button) {
+iview.Pdf = {};
+
+  /**
+   * @public
+   * @function
+   * @name openPdfCreator
+   * @memberOf iview.General
+   * @description opens PDF creator dialog
+   * @param {button}
+   *          button to which represents the PDF creator in the toolbar
+   */
+iview.IViewInstance.prototype.openPdfCreator = function pdf_openPdfCreator(){
   var that = this;
   if (typeof this.getPdfCtrl === "undefined") {
     this.getPdfCtrl = function() {
@@ -21,10 +28,10 @@ iview.General.prototype.openPdfCreator = function(button) {
       return this.pdfCtrl;
     };
     this.getPdfCtrl().view = new iview.Pdf.View("pdfCreatorView",
-        this.iview.viewerContainer,
-        this.iview.properties.webappBaseUri + "modules/iview2",
-        this.iview.properties.pdfCreatorURI,
-        this.iview.properties.webappBaseUri + "servlets/MCRMETSServlet/" + this.iview.properties.derivateId + "?XSL.Style=" + this.iview.properties.pdfCreatorStyle,
+        this.viewerContainer,
+        this.properties.webappBaseUri + "modules/iview2",
+        this.properties.pdfCreatorURI,
+        this.properties.webappBaseUri + "servlets/MCRMETSServlet/" + this.properties.derivateId + "?XSL.Style=" + this.properties.pdfCreatorStyle,
         function() {
           that.getPdfCtrl().initView(i18n);
         });
@@ -32,13 +39,6 @@ iview.General.prototype.openPdfCreator = function(button) {
     this.getPdfCtrl().show();
   }
 };
-
-/**
- * @namespace Package for Pdf, contains View and Controller
- * @memberOf iview
- * @name Pdf
- */
-iview.Pdf = {};
 
 /**
  * @class
@@ -208,11 +208,11 @@ iview.Pdf.View.prototype = {
 iview.Pdf.Controller = function(parent) {
   this.parent = parent;
   this.view = null;
-  this.order = parent.iview.PhysicalModel._order;
+  this.order = parent.PhysicalModel._order;
   this.maxPages = 0;
   var that = this;
   jQuery.ajax({
-    url : this.parent.iview.properties.pdfCreatorURI + "?getRestrictions",
+    url : this.parent.properties.pdfCreatorURI + "?getRestrictions",
     success : function(data) {
       data = jQuery.parseJSON(data);
       that.maxPages = data.maxPages;
@@ -282,7 +282,7 @@ iview.Pdf.Controller.prototype = {
       return;
     }
     var imgPath = this.order[first]._href;
-    this.view.displayPreview(this.parent.iview.properties.webappBaseUri + "servlets/MCRTileServlet/" + this.parent.iview.properties.derivateId + "/" + imgPath
+    this.view.displayPreview(this.parent.properties.webappBaseUri + "servlets/MCRTileServlet/" + this.parent.properties.derivateId + "/" + imgPath
         + "/0/0/0.jpg");
   },
 
@@ -293,13 +293,13 @@ iview.Pdf.Controller.prototype = {
    * @description displays or hides the permalink view, the current state, given in this.active, defines the following action
    */
   show : function() {
-    this.parent.disableInputHandler();
+    this.parent.viewerBean.disableInputHandler();
     var that = this;
-    var cP = this.parent.iview.PhysicalModel._curPos;
+    var cP = this.parent.PhysicalModel._curPos;
     this.i18n.executeWhenLoaded(function(i) {
       that.view.setCurrentPageText(i.translate("createPdf.range.currentPage") + ":", cP);
     });
-    this.view.setMaxPageNumber(this.parent.iview.PhysicalModel._pageCount);
+    this.view.setMaxPageNumber(this.parent.PhysicalModel._pageCount);
     this.displayPreview(String(cP));
     this.view.show(function() {
       // on close:
