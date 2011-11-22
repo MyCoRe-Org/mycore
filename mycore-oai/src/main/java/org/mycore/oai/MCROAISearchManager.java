@@ -37,8 +37,8 @@ import org.hibernate.criterion.Restrictions;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRDELETEDITEMS;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.oai.pmh.BadResumptionTokenException;
-import org.mycore.oai.pmh.DateUtils;
 import org.mycore.oai.pmh.DefaultResumptionToken;
 import org.mycore.oai.pmh.Header;
 import org.mycore.oai.pmh.Identify.DeletedRecordPolicy;
@@ -284,10 +284,12 @@ public class MCROAISearchManager {
     private MCRCondition buildFromUntilCondition(Date date, String compareSign) {
         String fieldFromUntil = this.config.getString(this.configPrefix + "Search.FromUntil", "modified");
         String[] fields = fieldFromUntil.split(" *, *");
+        MCRISO8601Date mcrDate = new MCRISO8601Date();
+        mcrDate.setDate(date);
         MCROrCondition orCond = new MCROrCondition();
         for (String fDef : fields) {
             MCRFieldDef d = MCRFieldDef.getDef(fDef);
-            orCond.addChild(new MCRQueryCondition(d, compareSign, DateUtils.formatUTCDay(date)));
+            orCond.addChild(new MCRQueryCondition(d, compareSign, mcrDate.getISOString()));
         }
         return orCond;
     }
