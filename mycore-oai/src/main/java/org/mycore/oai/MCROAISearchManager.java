@@ -283,7 +283,7 @@ public class MCROAISearchManager {
 
     private MCRCondition buildFromUntilCondition(Date date, String compareSign) {
         String fieldFromUntil = this.config.getString(this.configPrefix + "Search.FromUntil", "modified");
-        String[] fields = fieldFromUntil.split(",");
+        String[] fields = fieldFromUntil.split(" *, *");
         MCRISO8601Date mcrDate = new MCRISO8601Date();
         mcrDate.setDate(date);
         MCROrCondition orCond = new MCROrCondition();
