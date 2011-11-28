@@ -677,7 +677,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
                 if (ex != null)
                     sb.append(" - ");
             }
-            LOGGER.warn("Exception writing response to client: " + sb.toString());
+            LOGGER.warn("Exception writing formatter response to client: " + sb.toString());
         } finally {
             sos.close();
         }
