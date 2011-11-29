@@ -153,7 +153,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
                 MCRFile subFile = (MCRFile) node;
                 // create new file
                 final UUID uuid = UUID.randomUUID();
-                final String fileID = FileGrp.PREFIX_MASTER + uuid.toString();
+                final String fileID = File.PREFIX_MASTER + uuid.toString();
                 final String mimeType = MCRFileContentTypeFactory.getType(subFile.getContentTypeID()).getMimeType();
                 File file = new File(fileID, mimeType);
                 // set fLocat
@@ -182,7 +182,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
         pstr.setDivContainer(physicalDiv);
         // run through files
         FileGrp masterGroup = this.fileSection.getFileGroup(FileGrp.USE_MASTER);
-        List<File> fList = masterGroup.getfList();
+        List<File> fList = masterGroup.getFileList();
         int order = 1;
         for(File file : fList) {
             String fileId = file.getId();
@@ -300,7 +300,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
         if(uriEncodedLinkedFile == null)
             return null;
         FileGrp masterGroup = this.fileSection.getFileGroup(FileGrp.USE_MASTER);
-        for(File f : masterGroup.getfList())
+        for(File f : masterGroup.getFileList())
             if(uriEncodedLinkedFile.equals(f.getFLocat().getHref()))
                 return f.getId();
         return null;

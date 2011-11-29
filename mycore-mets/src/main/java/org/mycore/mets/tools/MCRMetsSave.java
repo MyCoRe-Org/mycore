@@ -26,7 +26,6 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mets.model.files.FLocat;
-import org.mycore.mets.model.files.FileGrp;
 import org.mycore.mets.model.struct.Fptr;
 import org.mycore.mets.model.struct.PhysicalSubDiv;
 import org.mycore.mets.model.struct.SmLink;
@@ -137,7 +136,7 @@ public class MCRMetsSave {
     private static Document updateOnFileAdd(Document mets, MCRFile file) {
         try {
             UUID uuid = UUID.randomUUID();
-            String fileId = FileGrp.PREFIX_MASTER + uuid;
+            String fileId = org.mycore.mets.model.files.File.PREFIX_MASTER + uuid;
 
             /* add to file section "use=master" */
             org.mycore.mets.model.files.File f = new org.mycore.mets.model.files.File(fileId, MimetypesFileTypeMap.getDefaultFileTypeMap()
@@ -409,7 +408,7 @@ public class MCRMetsSave {
     private static Document updateOnFileAdd(Document mets, String filename) {
         try {
             UUID uuid = UUID.randomUUID();
-            String fileId = FileGrp.PREFIX_MASTER + uuid;
+            String fileId = org.mycore.mets.model.files.File.PREFIX_MASTER + uuid;
 
             /* add to file section "use=master" */
             org.mycore.mets.model.files.File f = new org.mycore.mets.model.files.File(fileId, MimetypesFileTypeMap.getDefaultFileTypeMap()
