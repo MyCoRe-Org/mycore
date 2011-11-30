@@ -43,6 +43,7 @@ import org.jdom.filter.ElementFilter;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRUsageException;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -122,6 +123,12 @@ public class MCRSearchServlet extends MCRServlet {
             if (name.contains(".sortField")) {
                 continue;
             }
+            if (name.equals("search")) {
+                continue;
+            }
+            if (name.equals("query")) {
+                continue;
+            }
             if (name.equals("maxResults")) {
                 continue;
             }
@@ -153,6 +160,10 @@ public class MCRSearchServlet extends MCRServlet {
                     parent.addChild(new MCRQueryCondition(field, operator, value));
                 }
             }
+        }
+        
+        if (condition.getChildren().isEmpty()) {
+            throw new MCRUsageException("Missing query condition");
         }
 
         return new MCRQuery(MCRQueryParser.normalizeCondition(condition));
