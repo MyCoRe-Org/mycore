@@ -73,15 +73,7 @@ function getNodes(xmlfile, nodeName, parent) {
 	}
 	var nodeList = new Array();
 	for ( i = 0; i < nodes.length; i++) {
-		try {
-			nodeList[i] = document.importNode(nodes.item(i), true);
-		} catch (e) {
-			nodeList[i] = nodes.item(i);
-		}
+		nodeList[i] = nodes.item(i);
 	}
-	try {
-		return nodeList;
-	} finally {
-		nodeList = null;
-	}
+	return nodeList;
 }
