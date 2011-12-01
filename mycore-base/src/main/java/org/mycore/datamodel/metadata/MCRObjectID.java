@@ -35,9 +35,8 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
  * This class holds all informations and methods to handle the MyCoRe Object ID.
  * The MyCoRe Object ID is a special ID to identify each metadata object with
  * three parts, they are the project identifier, the type identifier and a
- * string with a number.
- * The syntax of the ID is "<em>projectID</em>_<em>typeID</em>_
- * <em>number</em>" as "<em>String_String_Integer</em>".
+ * string with a number. The syntax of the ID is "<em>projectID</em>_
+ * <em>typeID</em>_ <em>number</em>" as "<em>String_String_Integer</em>".
  * 
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
@@ -139,8 +138,9 @@ public final class MCRObjectID {
     }
 
     /**
-     * Returns the last ID number used or reserved for the given object base type.
-     * This may return the value 0 when there is no ID last used or in the store.
+     * Returns the last ID number used or reserved for the given object base
+     * type. This may return the value 0 when there is no ID last used or in the
+     * store.
      */
     private static int getLastIDNumber(String base_id) {
         int lastIDKnown = lastnumber.containsKey(base_id) ? lastnumber.get(base_id) : 0;
@@ -150,11 +150,12 @@ public final class MCRObjectID {
 
         return Math.max(lastIDKnown, highestStoredID);
     }
-    
+
     /**
      * Returns the last ID used or reserved for the given object base type.
      * 
-     * @return a valid MCRObjectID, or null when there is no ID for the given type 
+     * @return a valid MCRObjectID, or null when there is no ID for the given
+     *         type
      */
     public static MCRObjectID getLastID(String base_id) {
         int lastIDNumber = getLastIDNumber(base_id);
@@ -169,6 +170,10 @@ public final class MCRObjectID {
         return MCRObjectIDPool.getMCRObjectID(id);
     }
 
+    public static void main(String[] a) {
+        MCRObjectID id = MCRObjectID.getInstance("Bluadash");
+    }
+
     /**
      * This method get the string with <em>project_id</em>. If the ID is not
      * valid, an empty string was returned.
@@ -180,8 +185,8 @@ public final class MCRObjectID {
     }
 
     /**
-     * This method gets the string with <em>type_id</em>. If the ID is not valid,
-     * an empty string will be returned.
+     * This method gets the string with <em>type_id</em>. If the ID is not
+     * valid, an empty string will be returned.
      * 
      * @return the string of the type id
      */
@@ -200,8 +205,8 @@ public final class MCRObjectID {
     }
 
     /**
-     * This method gets the integer with <em>number</em>. If the ID is not valid,
-     * -1 will be returned.
+     * This method gets the integer with <em>number</em>. If the ID is not
+     * valid, -1 will be returned.
      * 
      * @return the number as integer
      */
@@ -211,7 +216,8 @@ public final class MCRObjectID {
 
     /**
      * This method gets the basic string with <em>project_id</em>_
-     * <em>type_id</em>. If the Id is not valid, an empty string will be returned.
+     * <em>type_id</em>. If the Id is not valid, an empty string will be
+     * returned.
      * 
      * @return the string of the schema name
      */
@@ -323,6 +329,38 @@ public final class MCRObjectID {
         }
         this.mcr_id = formatID(mcr_project_id, mcr_type_id, mcr_number);
 
+        return true;
+    }
+
+    public static boolean isValid(String id) {
+        if (id == null) {
+            return false;
+        }
+
+        String mcrId = id.trim();
+        if (mcrId.length() > MAX_LENGTH || mcrId.length() == 0) {
+            return false;
+        }
+
+        String[] idParts = getIDParts(mcrId);
+
+        if (idParts.length != 3) {
+            return false;
+        }
+
+        String type = idParts[1].toLowerCase().intern();
+
+        if (!CONFIG.getBoolean("MCR.Metadata.Type." + type, false)) {
+            return false;
+        }
+
+        try {
+            if (Integer.parseInt(idParts[2]) < 0) {
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            return false;
+        }
         return true;
     }
 
