@@ -5,7 +5,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
-import java.util.Vector;
 
 import javax.activation.MimetypesFileTypeMap;
 
@@ -19,14 +18,22 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRConstants;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.mets.model.Mets;
 import org.mycore.mets.model.files.FLocat;
+import org.mycore.mets.model.files.FileGrp;
+import org.mycore.mets.model.files.FileSec;
+import org.mycore.mets.model.struct.AbstractLogicalDiv;
 import org.mycore.mets.model.struct.Fptr;
+import org.mycore.mets.model.struct.LOCTYPE;
+import org.mycore.mets.model.struct.LogicalDiv;
+import org.mycore.mets.model.struct.LogicalStructMap;
+import org.mycore.mets.model.struct.LogicalSubDiv;
+import org.mycore.mets.model.struct.PhysicalStructMap;
 import org.mycore.mets.model.struct.PhysicalSubDiv;
 import org.mycore.mets.model.struct.SmLink;
 
@@ -141,7 +148,7 @@ public class MCRMetsSave {
             /* add to file section "use=master" */
             org.mycore.mets.model.files.File f = new org.mycore.mets.model.files.File(fileId, MimetypesFileTypeMap.getDefaultFileTypeMap()
                     .getContentType(new File(file.getName())));
-            FLocat fLocat = new FLocat(FLocat.LOCTYPE_URL, file.getName());
+            FLocat fLocat = new FLocat(LOCTYPE.URL, file.getName());
             f.setFLocat(fLocat);
 
             // alter the mets document
@@ -206,112 +213,71 @@ public class MCRMetsSave {
      * @param file
      * @return
      */
-    @SuppressWarnings("unchecked")
     private static Document updateOnFileDelete(Document mets, MCRFile file) {
+        Mets modifiedMets = null;
         try {
+            modifiedMets = new Mets(mets);
+            String href = file.getAbsolutePath().substring(1);
+
             // remove file from mets:fileSec/mets:fileGrp
-            XPath xp = XPath.newInstance("mets:mets/mets:fileSec/mets:fileGrp[@USE='MASTER']/mets:file/mets:FLocat[@xlink:href='"
-                    + file.getAbsolutePath().substring(1) + "']/..");
-            xp.addNamespace(MCRConstants.getStandardNamespace("mets"));
-            xp.addNamespace(MCRConstants.getStandardNamespace("xlink"));
-
-            Object obj = xp.selectSingleNode(mets);
-            if (!(obj instanceof Element)) {
-                return null;
-            }
-            Element metsFile = (Element) obj;
-            metsFile.detach();
-
-            String fileId = metsFile.getAttributeValue("ID");
-            if (fileId == null) {
-                LOGGER.error("The file id could not be found.");
-                return null;
-            }
+            org.mycore.mets.model.files.File fileToRemove = modifiedMets.getFileSec().getFileGroup(FileGrp.USE_MASTER).getFileByHref(href);
+            FileSec fileSec = modifiedMets.getFileSec();
+            FileGrp fileGroup = fileSec.getFileGroup(FileGrp.USE_MASTER);
+            fileGroup.removeFile(fileToRemove);
 
             // remove file from mets:mets/mets:structMap[@TYPE='PHYSICAL']
-            xp = XPath.newInstance("mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div/mets:div/mets:fptr[@FILEID='" + fileId + "']/..");
-            xp.addNamespace(MCRConstants.getStandardNamespace("mets"));
-
-            obj = xp.selectSingleNode(mets);
-            if (!(obj instanceof Element)) {
-                LOGGER.error("Could not determine mets:div node with id " + fileId);
-                return null;
-            }
-            Element metsDiv = (Element) obj;
-            metsDiv.detach();
+            PhysicalStructMap physStructMap = (PhysicalStructMap) modifiedMets.getStructMap(PhysicalStructMap.TYPE);
+            physStructMap.getDivContainer().remove(PhysicalSubDiv.ID_PREFIX + fileToRemove.getId());
 
             //remove links in mets:structLink section
-            String physMasterID = metsDiv.getAttributeValue("ID");
-            if (physMasterID == null) {
-                LOGGER.error("Could not get id for mets:div");
-                return null;
+            List<SmLink> list = modifiedMets.getStructLink().getSmLinkByTo(PhysicalSubDiv.ID_PREFIX + fileToRemove.getId());
+            LogicalStructMap logicalStructMap = (LogicalStructMap) modifiedMets.getStructMap(LogicalStructMap.TYPE);
+
+            for (SmLink linkToRemove : list) {
+                modifiedMets.getStructLink().removeSmLink(linkToRemove);
+                // modify logical struct Map
+                String logID = linkToRemove.getFrom();
+
+                // the deleted file was not directly assigned to a structure
+                if (logicalStructMap.getDivContainer().getId().equals(logID)) {
+                    continue;
+                }
+
+                AbstractLogicalDiv logicalDiv = logicalStructMap.getDivContainer().getLogicalSubDiv(logID);
+                if (!(logicalDiv instanceof LogicalSubDiv)) {
+                    LOGGER.error("Could not find " + LogicalSubDiv.class.getSimpleName() + " with id " + logID);
+                    LOGGER.error("Mets document remains unchanged");
+                    return mets;
+                }
+
+                LogicalSubDiv logicalSubDiv = (LogicalSubDiv) logicalDiv;
+
+                // there are still files for this logical sub div, nothing to do
+                if (modifiedMets.getStructLink().getSmLinkByFrom(logicalSubDiv.getId()).size() > 0) {
+                    continue;
+                }
+
+                // the logical div has other divs included, nothing to do
+                if (logicalSubDiv.getChildren().size() > 0) {
+                    continue;
+                }
+
+                /* 
+                 * the log div might be in a hierarchy of divs, which may now be empty 
+                 * (only containing empty directories), if so the parent of the log div
+                 * must be deleted
+                 * */
+                handleParents(logicalSubDiv, modifiedMets);
+
+                logicalStructMap.getDivContainer().remove(logicalSubDiv);
+
             }
-            xp = XPath.newInstance("mets:mets/mets:structLink/mets:smLink[@xlink:to='" + physMasterID + "']");
-            xp.addNamespace(MCRConstants.getStandardNamespace("mets"));
-            xp.addNamespace(MCRConstants.getStandardNamespace("xlink"));
-
-            List<Element> selectNodes = xp.selectNodes(mets);
-            List<String> listOfLogIds = new Vector<String>();
-
-            for (Element element : selectNodes) {
-                element.detach();
-                listOfLogIds.add(element.getAttributeValue("from", MCRConstants.getStandardNamespace("xlink")));
-            }
-
-            modifyLogicalStructMap(mets, listOfLogIds);
-
         } catch (Exception ex) {
             LOGGER.error("Error occured while removing file " + file.getAbsolutePath() + " from the existing mets file", ex);
             return null;
         }
 
-        return mets;
-    }
-
-    /**
-     * @param mets
-     * @param logicalIDs
-     * @return
-     * @throws Exception
-     */
-    private static Document modifyLogicalStructMap(Document mets, List<String> logicalIDs) throws Exception {
-        // check if the structure which contained the deleted file is empty now
-        for (String logId : logicalIDs) {
-            if (!exists(mets, logId)) {
-                LOGGER.info("No files are mapped to logical id " + logId);
-                // does the logical div has children
-                XPath xp = XPath.newInstance("mets:mets/mets:structMap[@TYPE='LOGICAL']/mets:div//mets:div[@ID='" + logId + "']");
-                xp.addNamespace(MCRConstants.getStandardNamespace("mets"));
-
-                Object obj = xp.selectSingleNode(mets);
-                if (!(obj instanceof Element)) {
-                    LOGGER.info("No mets:div was found for logical id " + logId);
-                    continue;
-                }
-                Element logDiv = (Element) obj;
-
-                // handle children
-                if (logDiv.getChildren().size() > 0) {
-                    handleChildren(mets, logDiv);
-                }
-
-                // handle parent
-                xp = XPath.newInstance("mets:mets/mets:structMap[@TYPE='LOGICAL']/mets:div[1]");
-                xp.addNamespace(MCRConstants.getStandardNamespace("mets"));
-
-                Element logDivContainer = (Element) xp.selectSingleNode(mets);
-
-                handleParents(mets, logDiv, logDivContainer);
-
-                if (logDiv.getChildren().size() == 0) {
-                    LOGGER.info("No children can be found for mets:div with id " + logId);
-                    LOGGER.info("Removing mets:div with id " + logId + " from mets:structMap TYPE=\"LOGICAL\"");
-                    logDiv.detach();
-                }
-            }
-        }
-
-        return mets;
+        return modifiedMets.asDocument();
     }
 
     /**
@@ -320,57 +286,24 @@ public class MCRMetsSave {
      * @param logDivContainer
      * @throws Exception
      */
-    private static void handleParents(Document mets, Element logDiv, Element logDivContainer) throws Exception {
-        Element parent = logDiv.getParentElement();
+    private static void handleParents(LogicalSubDiv logDiv, Mets mets) throws Exception {
+        AbstractLogicalDiv parent = logDiv.getParent();
 
-        String logIdOfParent = parent.getAttributeValue("ID");
-        if (exists(mets, logIdOfParent)) {
+        // there are files for the parent of the log div, thus nothing to do
+        if (mets.getStructLink().getSmLinkByFrom(parent.getId()).size() > 0) {
             return;
         }
-        //no files associated to the current log id, but the parent might have some
-        if (parent.getParentElement() == logDivContainer) {
-            parent.detach();
+
+        //no files associated to the parent of the log div
+        LogicalDiv logicalDiv = ((LogicalStructMap) mets.getStructMap(LogicalStructMap.TYPE)).getDivContainer();
+        if (parent.getParent() == logicalDiv) {
+            //the parent the log div container itself, thus we quit here and remove the log div
+            logicalDiv.remove((LogicalSubDiv) parent);
+
             return;
         } else {
-            handleParents(mets, parent, logDivContainer);
+            handleParents((LogicalSubDiv) parent, mets);
         }
-    }
-
-    /**
-     * @param mets
-     * @param logDiv
-     * @throws Exception
-     */
-    @SuppressWarnings("unchecked")
-    private static void handleChildren(Document mets, Element logDiv) throws Exception {
-        List<Element> children = logDiv.getChildren();
-
-        for (Element child : children) {
-            String logIdOfChild = child.getAttributeValue("ID");
-            if (exists(mets, logIdOfChild)) {
-                return;
-            }
-            //no files associated to the current log id, but the children might have some
-            if (child.getChildren().size() == 0) {
-                child.detach();
-                return;
-            } else {
-                handleChildren(mets, child);
-            }
-        }
-    }
-
-    /**
-     * Checks whether there is a smLink under the given locical id.
-     */
-    @SuppressWarnings("unchecked")
-    private static boolean exists(Document mets, String logicalId) throws Exception {
-        XPath p = XPath.newInstance("mets:mets/mets:structLink/mets:smLink[@xlink:from='" + logicalId + "']");
-        p.addNamespace(MCRConstants.getStandardNamespace("mets"));
-        p.addNamespace(MCRConstants.getStandardNamespace("xlink"));
-
-        List<Element> smLinks = p.selectNodes(mets);
-        return smLinks.size() < 1 ? false : true;
     }
 
     /**
@@ -382,6 +315,8 @@ public class MCRMetsSave {
      * @param filename
      *            file to add to the mets.xml
      * @throws Exception
+     * @deprecated use
+     *             {@link MCRMetsSave#updateMetsOnFileAdd(MCRDerivate, MCRFile)}
      */
     @Deprecated
     public static void updateMetsOnFileAdd(MCRDerivate derivate, String filename) throws Exception {
