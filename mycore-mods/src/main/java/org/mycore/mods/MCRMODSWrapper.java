@@ -83,11 +83,18 @@ public class MCRMODSWrapper {
 
     private MCRObject object;
 
-    private Element mods;
-
     public MCRMODSWrapper() {
-        object = new MCRObject();
+        this(new MCRObject());
+    }
+
+    public MCRMODSWrapper(MCRObject object) {
+        this.object = object;
         object.setSchema(MODS_DATAMODEL);
+    }
+
+    public Element getMODS() {
+        MCRMetaXML mx = (MCRMetaXML) (object.getMetadata().getMetadataElement(DEF_MODS_CONTAINER).getElement(0));
+        return (Element) (mx.getContent().get(0));
     }
 
     public MCRObject getMCRObject() {
@@ -110,12 +117,7 @@ public class MCRMODSWrapper {
         MCRMetaElement defModsContainer = new MCRMetaElement(MCRMetaXML.class, DEF_MODS_CONTAINER, false, true, list);
         om.setMetadataElement(defModsContainer);
 
-        this.mods = mods;
         modsContainer.addContent(mods);
-    }
-
-    public Element getMODS() {
-        return mods;
     }
 
     private XPath buildXPath(String xPath) throws JDOMException {
@@ -127,7 +129,7 @@ public class MCRMODSWrapper {
 
     public Element getElement(String xPath) {
         try {
-            return (Element) (buildXPath(xPath).selectSingleNode(mods));
+            return (Element) (buildXPath(xPath).selectSingleNode(getMODS()));
         } catch (JDOMException ex) {
             String msg = "Could not get MODS element from " + xPath;
             throw new MCRException(msg, ex);
@@ -136,7 +138,7 @@ public class MCRMODSWrapper {
 
     public List<Element> getElements(String xPath) {
         try {
-            return (List<Element>) (buildXPath(xPath).selectNodes(mods));
+            return (List<Element>) (buildXPath(xPath).selectNodes(getMODS()));
         } catch (JDOMException ex) {
             String msg = "Could not get elements at " + xPath;
             throw new MCRException(msg, ex);
@@ -171,20 +173,20 @@ public class MCRMODSWrapper {
 
     private void insertTopLevelElement(Element element) {
         int rankOfNewElement = getRankOf(element);
-        List<Element> topLevelElements = mods.getChildren();
+        List<Element> topLevelElements = getMODS().getChildren();
         for (int pos = 0; pos < topLevelElements.size(); pos++)
             if (getRankOf(topLevelElements.get(pos)) > rankOfNewElement) {
-                mods.addContent(pos, element);
+                getMODS().addContent(pos, element);
                 return;
             }
 
-        mods.addContent(element);
+        getMODS().addContent(element);
     }
 
     public void removeElements(String xPath) {
         Iterator<Element> selected;
         try {
-            selected = buildXPath(xPath).selectNodes(mods).iterator();
+            selected = buildXPath(xPath).selectNodes(getMODS()).iterator();
         } catch (JDOMException ex) {
             String msg = "Could not remove elements at " + xPath;
             throw new MCRException(msg, ex);
