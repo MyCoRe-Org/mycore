@@ -183,7 +183,7 @@
         <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.impact'),':')" />
       </td>
       <td class="metavalue">
-        <xsl:for-each select="impact">
+        <xsl:for-each select="stats">
           <xsl:value-of select="@year" />
           <xsl:text>: </xsl:text>
           <xsl:value-of select="@factor" />

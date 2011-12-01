@@ -1238,7 +1238,7 @@
   <!-- Impact Factor -->
   <text id="mods.impact.label" i18n="metaData.mods.dictionary.impact" />
   <panel id="mods.impact">
-    <cell anchor="NORTHWEST" var="mods:extension[@displayLabel='impact']/impact">
+    <cell anchor="NORTHWEST" var="mods:extension[@displayLabel='impact']/stats">
       <panel>
         <cell style="width:4.5em">
           <text>
@@ -1419,6 +1419,7 @@
         <hidden var="parents/parent/@xlink:type" default="locator" />
         <hidden var="parents/parent/@xlink:label" />
         <hidden var="parents/parent/@xlink:href" />
+        <hidden var="parents/parent/@editor.parentName" />
         <cell col="1" row="1" style="width:85px;" anchor="NORTHEAST">
           <label xml:lang="de">
             <xhtml:span class="editorlabel">Teil von:</xhtml:span>

@@ -46,6 +46,7 @@
   </xsl:template>
 
   <xsl:template match="@editor.output" />
+  <xsl:template match="@editor.parentName" />
   <!-- ignore @classId and @categId but transform it to @authority|@authorityURI and @valueURI -->
   <xsl:template match="@mcr:categId" />
   <xsl:template match="*[@mcr:categId]">
