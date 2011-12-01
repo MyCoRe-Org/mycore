@@ -43,7 +43,7 @@ import org.mycore.common.MCRException;
  */
 public class MCRMetaXML extends MCRMetaDefault {
     List<Content> content;
-    
+
     private static final Logger LOGGER = Logger.getLogger(MCRMetaXML.class);
 
     /**
@@ -72,13 +72,17 @@ public class MCRMetaXML extends MCRMetaDefault {
 
         content = element.cloneContent();
     }
-    
+
     public void addContent(Content content) {
-        if(this.content == null){
+        if (this.content == null) {
             this.content = new ArrayList<Content>();
         }
-        
+
         this.content.add(content);
+    }
+
+    public List<Content> getContent() {
+        return content;
     }
 
     /**
@@ -124,7 +128,7 @@ public class MCRMetaXML extends MCRMetaDefault {
         }
 
         if (content == null) {
-            LOGGER.warn(getSubTag()+": content is null or empty");
+            LOGGER.warn(getSubTag() + ": content is null or empty");
             return false;
         }
 
