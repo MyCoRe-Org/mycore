@@ -84,7 +84,7 @@ public class MCRServlet extends HttpServlet {
 
     private static String BASE_URL = MCRConfiguration.instance().getString("MCR.baseurl", null);
 
-    private static String SERVLET_URL;
+    private static String SERVLET_URL = BASE_URL + "servlets/";
 
     private static final boolean ENABLE_BROWSER_CACHE = MCRConfiguration.instance().getBoolean("MCR.Servlet.BrowserCache.enable", false);
 
