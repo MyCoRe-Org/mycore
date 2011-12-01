@@ -82,7 +82,7 @@ public class MCRServlet extends HttpServlet {
 
     private static Logger LOGGER = Logger.getLogger(MCRServlet.class);
 
-    private static String BASE_URL;
+    private static String BASE_URL = MCRConfiguration.instance().getString("MCR.baseurl", null);
 
     private static String SERVLET_URL;
 
