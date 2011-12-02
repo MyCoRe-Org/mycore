@@ -90,21 +90,25 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         xml.setAttribute("classification", classifID);
         xml.setAttribute("webpage", req.getParameter("webpage"));
 
-        MCRAndCondition queryCondition = new MCRAndCondition();
-        final MCRFieldDef fieldDef = MCRFieldDef.getDef(field);
-        if (fieldDef == null)
-            throw new MCRConfigurationException("Search field '" + field + "' is not defined.");
-        MCRQueryCondition categCondition = new MCRQueryCondition(fieldDef, "=", "DUMMY");
-        queryCondition.addChild(categCondition);
+        MCRQueryCondition categCondition = null;
+        MCRAndCondition queryCondition = null;
+        if (countResults || field.length() > 0) {
+            queryCondition = new MCRAndCondition();
+            final MCRFieldDef fieldDef;
+            fieldDef = MCRFieldDef.getDef(field);
+            categCondition = new MCRQueryCondition(fieldDef, "=", "DUMMY");
+            queryCondition.addChild(categCondition);
 
-        if ((objectType != null) && (objectType.trim().length() > 0)) {
-            xml.setAttribute("objectType", objectType);
-            MCRCondition cond = new MCRQueryCondition(MCRFieldDef.getDef("objectType"), "=", objectType);
-            queryCondition.addChild(cond);
-        }
-        if ((restriction != null) && (restriction.trim().length() > 0)) {
-            MCRCondition cond = new MCRQueryParser().parse(restriction);
-            queryCondition.addChild(cond);
+            if ((objectType != null) && (objectType.trim().length() > 0)) {
+                xml.setAttribute("objectType", objectType);
+                MCRCondition cond = new MCRQueryCondition(MCRFieldDef.getDef("objectType"), "=", objectType);
+                queryCondition.addChild(cond);
+            }
+            if ((restriction != null) && (restriction.trim().length() > 0)) {
+                MCRCondition cond = new MCRQueryParser().parse(restriction);
+                queryCondition.addChild(cond);
+            }
+
         }
 
         if (parameters != null)
@@ -114,11 +118,13 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         MCRCategory category = MCRCategoryDAOFactory.getInstance().getCategory(id, 1);
         for (MCRCategory child : category.getChildren()) {
             String childID = child.getId().getID();
-            categCondition.setValue(childID);
-            int numResults = (countResults ? MCRQueryManager.search(new MCRQuery(queryCondition)).getNumHits() : 1);
-
-            if ((!emptyLeaves) && (numResults < 1))
-                continue;
+            int numResults = 0;
+            if (countResults) {
+                categCondition.setValue(childID);
+                numResults = MCRQueryManager.search(new MCRQuery(queryCondition)).getNumHits();
+                if ((!emptyLeaves) && (numResults < 1))
+                    continue;
+            }
 
             Element categoryE = new Element("category");
             data.add(categoryE);
@@ -127,8 +133,8 @@ public class MCRClassificationBrowser2 extends MCRServlet {
 
             categoryE.setAttribute("id", childID);
             categoryE.setAttribute("children", Boolean.toString(child.hasChildren()));
-
-            categoryE.setAttribute("query", URLEncoder.encode(queryCondition.toString(), "UTF-8"));
+            if (queryCondition != null)
+                categoryE.setAttribute("query", URLEncoder.encode(queryCondition.toString(), "UTF-8"));
 
             if (uri && (child.getURI() != null))
                 categoryE.addContent(new Element("uri").setText(child.getURI().toString()));
