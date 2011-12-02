@@ -29,11 +29,45 @@
   <xsl:param name="RequestURL" />
   
   <xsl:template match="classificationbrowser">
+    <xsl:call-template name="mcrClassificationBrowser">
+      <xsl:with-param name="class" select="@class"/>
+      <xsl:with-param name="classification" select="@classification"/>
+      <xsl:with-param name="category" select="@category"/>
+      <xsl:with-param name="sortby" select="@sortby"/>
+      <xsl:with-param name="objecttype" select="@objecttype"/>
+      <xsl:with-param name="field" select="@field"/>
+      <xsl:with-param name="parameters" select="@parameters"/>
+      <xsl:with-param name="restriction" select="@restriction"/>
+      <xsl:with-param name="countresults" select="@countresults"/>
+      <xsl:with-param name="countlinks" select="@countlinks"/>
+      <xsl:with-param name="emptyleaves" select="@emptyleaves"/>
+      <xsl:with-param name="adduri" select="@adduri"/>
+      <xsl:with-param name="adddescription" select="@adddescription"/>
+      <xsl:with-param name="style" select="@style"/>
+    </xsl:call-template>
+  </xsl:template>
+
+  <xsl:template name="mcrClassificationBrowser">
+    <xsl:param name="class" />
+    <xsl:param name="classification" />
+    <xsl:param name="category" />
+    <xsl:param name="sortby" />
+    <xsl:param name="objecttype" />
+    <xsl:param name="field" />
+    <xsl:param name="parameters" />
+    <xsl:param name="restriction" />
+    <xsl:param name="countresults" />
+    <xsl:param name="countlinks" />
+    <xsl:param name="emptyleaves" />
+    <xsl:param name="adduri" />
+    <xsl:param name="adddescription" />
+    <xsl:param name="style" />
+
     <div>
       <xsl:attribute name="class">
         <xsl:choose>
-          <xsl:when test="string-length(@class) &gt; 0">
-            <xsl:value-of select="@class" />
+          <xsl:when test="string-length($class) &gt; 0">
+            <xsl:value-of select="$class" />
           </xsl:when>
           <xsl:otherwise>classificationBrowser</xsl:otherwise>
         </xsl:choose>
@@ -51,26 +85,26 @@
           jQuery(document.getElementById(elementID)).load('<xsl:value-of select="concat($ServletsBaseURL,'ClassificationBrowser')" />', 
           { 
             "XSL.template" : '<xsl:value-of select="$template" />',
-            classification : '<xsl:value-of select="@classification" />',
+            classification : '<xsl:value-of select="$classification" />',
             category       : categID,
-            sortby         : '<xsl:value-of select="@sortby" />',
-            objecttype     : '<xsl:value-of select="@objecttype" />',
-            field          : '<xsl:value-of select="@field" />',
-            parameters     : '<xsl:value-of select="@parameters" />',
-            restriction    : '<xsl:value-of select="@restriction" />',
-            countresults   : '<xsl:value-of select="@countresults" />',
-            countlinks     : '<xsl:value-of select="@countlinks" />',
-            emptyleaves    : '<xsl:value-of select="@emptyleaves" />',
-            adduri         : '<xsl:value-of select="@adduri" />',
-            adddescription : '<xsl:value-of select="@adddescription" />',
-            style          : '<xsl:value-of select="@style" />',
+            sortby         : '<xsl:value-of select="$sortby" />',
+            objecttype     : '<xsl:value-of select="$objecttype" />',
+            field          : '<xsl:value-of select="$field" />',
+            parameters     : '<xsl:value-of select="$parameters" />',
+            restriction    : '<xsl:value-of select="$restriction" />',
+            countresults   : '<xsl:value-of select="$countresults" />',
+            countlinks     : '<xsl:value-of select="$countlinks" />',
+            emptyleaves    : '<xsl:value-of select="$emptyleaves" />',
+            adduri         : '<xsl:value-of select="$adduri" />',
+            adddescription : '<xsl:value-of select="$adddescription" />',
+            style          : '<xsl:value-of select="$style" />',
             webpage        : '<xsl:value-of select="substring-after($RequestURL,$WebApplicationBaseURL)" />'
           }, f );      
         }
        
         function toogle(categID, closedImageURL, openImageURL) {
-          var childrenID = 'cbChildren_<xsl:value-of select="@classification" />_' + categID;
-          var button = document.getElementById( 'cbButton_<xsl:value-of select="@classification" />_' + categID );
+          var childrenID = 'cbChildren_<xsl:value-of select="$classification" />_' + categID;
+          var button = document.getElementById( 'cbButton_<xsl:value-of select="$classification" />_' + categID );
           var children = document.getElementById( childrenID );
           
           if( button.value == '-' ) {
@@ -117,7 +151,7 @@
           if (pos>0){
             var openTree=jQuery.parseJSON(unescape(window.location.href.substring(pos+5,window.location.href.length)));
             jQuery.each(openTree, function(index, value){
-              jQuery('#cbButton_<xsl:value-of select="@classification" />_' + value).click();
+              jQuery('#cbButton_<xsl:value-of select="$classification" />_' + value).click();
             });
           }
         }
@@ -128,7 +162,7 @@
       <xsl:variable name="id" select="generate-id(.)" />
       <div id="{$id}" class="cbVisible">
         <script type="text/javascript">
-          update('<xsl:value-of select="$id" />','<xsl:value-of select="@category" />', loadState);
+          update('<xsl:value-of select="$id" />','<xsl:value-of select="$category" />', loadState);
         </script>
       </div>
     </div>
