@@ -47,46 +47,50 @@
       </tr>
     </xsl:if>
   </xsl:template>
+  
+  <xsl:template match="category" mode="printModsClassInfo">
+    <xsl:variable name="categurl">
+      <xsl:if test="url">
+        <xsl:choose>
+            <!-- MCRObjectID should not contain a ':' so it must be an external link then -->
+          <xsl:when test="contains(url/@xlink:href,':')">
+            <xsl:value-of select="url/@xlink:href" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="concat($WebApplicationBaseURL,'receive/',url/@xlink:href,$HttpSession)" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:if>
+    </xsl:variable>
+
+    <xsl:variable name="selectLang">
+      <xsl:call-template name="selectLang">
+        <xsl:with-param name="nodes" select="./label" />
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:for-each select="./label[lang($selectLang)]">
+      <xsl:choose>
+        <xsl:when test="string-length($categurl) != 0">
+          <a href="{$categurl}">
+            <xsl:if test="$wcms.useTargets = 'yes'">
+              <xsl:attribute name="target">_blank</xsl:attribute>
+            </xsl:if>
+            <xsl:value-of select="@text" />
+          </a>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="@text" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:for-each>
+  </xsl:template>
 
   <xsl:template match="*" mode="printModsClassInfo">
     <xsl:variable name="classlink" select="mcrmods:getClassCategLink(.)" />
     <xsl:choose>
       <xsl:when test="string-length($classlink) &gt; 0">
         <xsl:for-each select="document($classlink)/mycoreclass/categories/category">
-          <xsl:variable name="categurl">
-            <xsl:if test="url">
-              <xsl:choose>
-                  <!-- MCRObjectID should not contain a ':' so it must be an external link then -->
-                <xsl:when test="contains(url/@xlink:href,':')">
-                  <xsl:value-of select="url/@xlink:href" />
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="concat($WebApplicationBaseURL,'receive/',url/@xlink:href,$HttpSession)" />
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:if>
-          </xsl:variable>
-
-          <xsl:variable name="selectLang">
-            <xsl:call-template name="selectLang">
-              <xsl:with-param name="nodes" select="./label" />
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:for-each select="./label[lang($selectLang)]">
-            <xsl:choose>
-              <xsl:when test="string-length($categurl) != 0">
-                <a href="{$categurl}">
-                  <xsl:if test="$wcms.useTargets = 'yes'">
-                    <xsl:attribute name="target">_blank</xsl:attribute>
-                  </xsl:if>
-                  <xsl:value-of select="@text" />
-                </a>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="@text" />
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:for-each>
+          <xsl:apply-templates select="." mode="printModsClassInfo" />
         </xsl:for-each>
       </xsl:when>
       <xsl:otherwise>
@@ -223,7 +227,28 @@
         </xsl:choose>
       </xsl:when>
       <xsl:when test="@valueURI">
-        <xsl:apply-templates select="." mode="printModsClassInfo" />
+        <!-- derived from printModsClassInfo template -->
+        <xsl:variable name="classlink" select="mcrmods:getClassCategParentLink(.)" />
+        <xsl:choose>
+          <xsl:when test="string-length($classlink) &gt; 0">
+            <xsl:for-each select="document($classlink)/mycoreclass//category[position()=1 or position()=last()]">
+              <xsl:if test="position() > 1">
+                <xsl:value-of select="', '" />
+              </xsl:if>
+              <xsl:apply-templates select="." mode="printModsClassInfo" />
+            </xsl:for-each>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:choose>
+              <xsl:when test="@valueURI">
+                <xsl:apply-templates select="." mode="hrefLink" />
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="text()" />
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:when>
       <xsl:when test="mods:namePart">
         <xsl:choose>
