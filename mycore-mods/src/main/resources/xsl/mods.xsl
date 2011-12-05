@@ -8,6 +8,8 @@
   <xsl:include href="mods2html.xsl" />
   <xsl:include href="modsmetadata.xsl" />
 
+  <xsl:include href="basket.xsl" />
+
   <xsl:include href="modshitlist-external.xsl" />  <!-- for external usage in application module -->
   <xsl:include href="modsdetails-external.xsl" />  <!-- for external usage in application module -->
   
@@ -113,6 +115,36 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+
+  <xsl:template match="/mycoreobject" mode="breadCrumb" priority="1">
+
+    <xsl:variable name="obj_host">
+      <xsl:value-of select="$objectHost" />
+    </xsl:variable>
+    <xsl:if test="./structure/parents">
+      <xsl:apply-templates select="./structure/parents">
+        <xsl:with-param name="obj_host" select="$obj_host" />
+        <xsl:with-param name="obj_type" select="'this'" />
+      </xsl:apply-templates>
+      <xsl:apply-templates select="./structure/parents">
+        <xsl:with-param name="obj_host" select="$obj_host" />
+        <xsl:with-param name="obj_type" select="'before'" />
+      </xsl:apply-templates>
+      <xsl:apply-templates select="./structure/parents">
+        <xsl:with-param name="obj_host" select="$obj_host" />
+        <xsl:with-param name="obj_type" select="'after'" />
+      </xsl:apply-templates>
+      <xsl:text> &gt; </xsl:text>
+    </xsl:if>
+
+    <xsl:apply-templates mode="mods-type" select="." />
+    <xsl:if test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='kindof']">
+      <xsl:text> &gt; </xsl:text>
+      <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='kindof']"
+                           mode="printModsClassInfo" />
+    </xsl:if>
+  </xsl:template>
+
   <xsl:template mode="mods-type" match="/mycoreobject">
     <xsl:choose>
       <xsl:when test="substring-after(./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@valueURI,'#')='thesis'">
