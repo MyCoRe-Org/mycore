@@ -140,7 +140,7 @@ public class MCRDirectory implements MCRIMetsSortable, Comparator<MCRIMetsSortab
 
         MCRIMetsSortable[] obj = getOrderedElements();
 
-        buffer.append("\t{\"id\": \"" + label + "\", \"name\":\"" + label + "\", \"type\":\"category\"" + ", \"structureType\":\""
+        buffer.append("\t{\"id\": \"" + logicalId + "\", \"name\":\"" + label + "\", \"type\":\"category\"" + ", \"structureType\":\""
                 + structureType + "\"");
         buffer.append(", \"children\":[\n");
 
@@ -152,7 +152,7 @@ public class MCRDirectory implements MCRIMetsSortable, Comparator<MCRIMetsSortab
                 MCRDirectory aDir = (MCRDirectory) obj[i];
                 MCRIMetsSortable[] children = aDir.getOrderedElements();
 
-                buffer.append("{ \"id\": \"" + aDir.getLabel() + "\", \"name\":\"" + aDir.getLabel() + "\", \"type\":\"category\""
+                buffer.append("{ \"id\": \"" + logicalId + "\", \"name\":\"" + aDir.getLabel() + "\", \"type\":\"category\""
                         + ", \"structureType\":\"" + aDir.getStructureType() + "\"");
                 buffer.append(", \"children\":[\n");
 
