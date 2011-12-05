@@ -82,9 +82,9 @@ public class MCRServlet extends HttpServlet {
 
     private static Logger LOGGER = Logger.getLogger(MCRServlet.class);
 
-    private static String BASE_URL = MCRConfiguration.instance().getString("MCR.baseurl", null);
+    private static String BASE_URL;
 
-    private static String SERVLET_URL = BASE_URL + "servlets/";
+    private static String SERVLET_URL;
 
     private static final boolean ENABLE_BROWSER_CACHE = MCRConfiguration.instance().getBoolean("MCR.Servlet.BrowserCache.enable", false);
 
@@ -130,18 +130,27 @@ public class MCRServlet extends HttpServlet {
      * Initialisation of the static values for the base URL and servlet URL of
      * the mycore system.
      */
-    private static synchronized void prepareURLs(ServletContext context, HttpServletRequest req) {
+    private static synchronized void prepareBaseURLs(ServletContext context, HttpServletRequest req) {
         String contextPath = req.getContextPath() + "/";
 
         String requestURL = req.getRequestURL().toString();
         int pos = requestURL.indexOf(contextPath, 9);
+        String baseURLofRequest = requestURL.substring(0, pos) + contextPath;
 
-        BASE_URL = MCRConfiguration.instance().getString("MCR.baseurl", requestURL.substring(0, pos) + contextPath);
+        prepareBaseURLs(baseURLofRequest);
+        MCRURIResolver.init(context, getBaseURL());
+    }
+
+    private static synchronized void prepareBaseURLs(String baseURL) {
+        BASE_URL = MCRConfiguration.instance().getString("MCR.baseurl", baseURL);
         if (!BASE_URL.endsWith("/")) {
             BASE_URL = BASE_URL + "/";
         }
         SERVLET_URL = BASE_URL + "servlets/";
-        MCRURIResolver.init(context, getBaseURL());
+    }
+
+    static {
+        prepareBaseURLs(""); // getBaseURL() etc. may be called before any HTTP Request    
     }
 
     // The methods doGet() and doPost() simply call the private method
@@ -240,7 +249,7 @@ public class MCRServlet extends HttpServlet {
         }
 
         if (BASE_URL == null) {
-            prepareURLs(getServletContext(), req);
+            prepareBaseURLs(getServletContext(), req);
         }
 
         MCRServletJob job = new MCRServletJob(req, res);
