@@ -150,11 +150,10 @@
       </xsl:variable>
       <li><xsl:value-of select="i18n:translate(concat('metaData.mods.dictionary.', $internal_genre))" /></li>
       <xsl:if test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='kindof']">
-        <xsl:variable name="kindof">
+        <li>
           <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='kindof']"
                                mode="printModsClassInfo" />
-        </xsl:variable>
-        <li><xsl:value-of select="i18n:translate(concat('metaData.mods.dictionary.', $kindof))" /></li>
+        </li>
       </xsl:if>
     </ul>
 
@@ -263,7 +262,7 @@
           <xsl:apply-templates select="." mode="present.journal" />
         </xsl:when>
         <xsl:when test="$mods-type = 'series'">
-          <xsl:apply-templates select="." mode="present.journal" />
+          <xsl:apply-templates select="." mode="present.series" />
         </xsl:when>
         <xsl:when test="$mods-type = 'article'">
           <xsl:apply-templates select="." mode="present.article" />
@@ -294,20 +293,51 @@
                 <xsl:when test="$mods-type = 'journal'">
                   <xsl:value-of select="'article'" />
                 </xsl:when>
+                <xsl:when test="$mods-type = 'series'">
+                  <xsl:value-of select="'book|cproceeding'" />
+                </xsl:when>
               </xsl:choose>
             </xsl:variable>
             <xsl:if test="string-length($child-layout) &gt; 0 and acl:checkPermission(./@ID,'writedb')">
-              <tr>
-                <td class="metaname">
-                  <xsl:value-of select="concat(i18n:translate('metaData.addChildObject'),':')" />
-                </td>
-                <td class="metavalue">
-                  <a
-                    href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout={$child-layout}&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
-                    <xsl:value-of select="i18n:translate(concat('metaData.mods.types.',$child-layout))" />
-                  </a>
-                </td>
-              </tr>
+              <xsl:choose>
+                <xsl:when test="$mods-type = 'series'">
+                  <tr>
+                    <td class="metaname">
+                      <xsl:value-of select="concat(i18n:translate('metaData.addChildObject.series.book'),':')" />
+                    </td>
+                    <td class="metavalue">
+                      <a
+                        href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout={$child-layout}&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
+                        <xsl:value-of select="i18n:translate('metaData.mods.types.book')" />
+                      </a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="metaname">
+                      <xsl:value-of select="concat(i18n:translate('metaData.addChildObject.series.cproceeding'),':')" />
+                    </td>
+                    <td class="metavalue">
+                      <a
+                        href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout={$child-layout}&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
+                        <xsl:value-of select="i18n:translate('metaData.mods.types.cproceeding')" />
+                      </a>
+                    </td>
+                  </tr>
+                </xsl:when>
+                <xsl:otherwise>
+                  <tr>
+                    <td class="metaname">
+                      <xsl:value-of select="concat(i18n:translate(concat('metaData.addChildObject.', $mods-type)),':')" />
+                    </td>
+                    <td class="metavalue">
+                      <a
+                        href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout={$child-layout}&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
+                        <xsl:value-of select="i18n:translate(concat('metaData.mods.types.',$child-layout))" />
+                      </a>
+                    </td>
+                  </tr>
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:if>
             <!--*** List children per object type ************************************* -->
             <!-- 1.) get a list of objectTypes of all child elements 2.) remove duplicates from this list 3.) for-each objectTyp id list child elements -->

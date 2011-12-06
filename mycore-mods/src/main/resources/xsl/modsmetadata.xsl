@@ -120,7 +120,7 @@
   </xsl:template>
 
   <xsl:template match="mods:titleInfo" mode="present">
-    <xsl:for-each select="mods:title">
+    <xsl:for-each select="mods:title[not(@lang='x-html')]">
       <tr>
         <td valign="top" class="metaname">
             <xsl:choose>
@@ -136,7 +136,14 @@
             </xsl:choose>
         </td>
         <td class="metavalue">
-          <xsl:value-of select="." />
+          <xsl:choose>
+            <xsl:when test="./..//mods:title[@lang='x-html']">
+              <xsl:value-of select="./..//mods:title[@lang='x-html']" disable-output-escaping="yes" />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="." />
+            </xsl:otherwise>
+            </xsl:choose>
         </td>
       </tr>
     </xsl:for-each>
