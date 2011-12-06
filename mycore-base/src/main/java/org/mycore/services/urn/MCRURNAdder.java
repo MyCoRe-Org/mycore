@@ -343,6 +343,13 @@ public class MCRURNAdder {
             fileset.setAttribute("urn", parentURN.toString());
             for (int i = 0; i < pairs.size(); i++) {
                 MCRPair<String, MCRFile> current = pairs.get(i);
+                
+                /* mets files should not get an urn assigned */
+                String metsFileName = MCRConfiguration.instance().getString("MCR.Mets.Filename", "mets.xml");
+                if (current.getRightComponent().getName().equals(metsFileName)) {
+                    continue;
+                }
+                
                 LOGGER.info("Assigning urn " + urnToSet[i] + urnToSet[i].checksum() + " to " + current.getLeftComponent()
                         + current.getRightComponent().getName());
                 /* save the urn in the database here */
