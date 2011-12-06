@@ -20,7 +20,7 @@
 
     <!-- Basisangaben zum Dokument -->
     <cell row="1" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
-      <text id="thesis.titles" i18n="metaData.mods.dictionary.thesisbox" />
+      <text id="thesis.titles" i18n="metaData.mods.dictionary.thesis" />
     </cell>
     
     <!-- pub_title_orig [text] -->
