@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<import>
+<imports>
   <include uri="webapp:editor/editor-mods-common.xml" />
 
   <panel id="edit-mods-journal">
@@ -62,4 +62,4 @@
       <cancelButton width="100px" i18n="common.button.cancel" />
     </cell>
   </panel>
-</import>
+</imports>
