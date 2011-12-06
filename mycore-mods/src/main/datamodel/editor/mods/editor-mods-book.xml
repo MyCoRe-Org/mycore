@@ -74,12 +74,6 @@
     <cell row="90" col="3" anchor="NORTHWEST" ref="mods.dateIssued.help" />
     <!-- Datum der Veröffentlichung END -->
 
-    <!-- Series -->
-    <cell row="100" col="1" anchor="NORTHEAST" ref="mods.book.series.label" />
-    <cell row="100" col="2" anchor="NORTHWEST" ref="mods.book.series" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="100" col="3" anchor="NORTHWEST" ref="mods.book.series.help" />
-    <!-- Series END -->
-
     <!-- Extent|Part -->
     <cell row="120" col="1" anchor="NORTHEAST" ref="mods.book.part.extent.label" />
     <cell row="120" col="2" anchor="NORTHWEST" ref="mods.book.part.extent" var="metadata/def.modsContainer/modsContainer/mods:mods" />
