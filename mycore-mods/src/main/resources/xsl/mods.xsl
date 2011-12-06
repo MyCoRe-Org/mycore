@@ -124,8 +124,12 @@
         <xsl:value-of select="$objectHost" />
       </xsl:variable>
       <xsl:if test="./structure/parents">
-        <li><xsl:apply-templates mode="mods-type" select="document(concat('mcrobject:',./structure/parents/parent/@xlink:href))/mycoreobject" />
-        <xsl:text>: </xsl:text>
+        <xsl:variable name="parent_genre">
+          <xsl:apply-templates mode="mods-type" select="document(concat('mcrobject:',./structure/parents/parent/@xlink:href))/mycoreobject" />
+        </xsl:variable>
+        <li>
+          <xsl:value-of select="i18n:translate(concat('metaData.mods.dictionary.', $parent_genre))" />
+          <xsl:text>: </xsl:text>
           <xsl:apply-templates select="./structure/parents">
             <xsl:with-param name="obj_host" select="$obj_host" />
             <xsl:with-param name="obj_type" select="'this'" />
@@ -141,24 +145,17 @@
         </li>
       </xsl:if>
 
-      <xsl:choose>
-        <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='kindof']">
-          <li><xsl:apply-templates mode="mods-type" select="." /></li>
-          <li>
-            <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='kindof']"
-                                 mode="printModsClassInfo" />
-            <xsl:text>: </xsl:text>
-            <xsl:apply-templates select="." mode="title" />
-          </li>
-        </xsl:when>
-        <xsl:otherwise>
-          <li>
-            <xsl:apply-templates mode="mods-type" select="." />
-            <xsl:text>: </xsl:text>
-            <xsl:apply-templates select="." mode="title" />
-          </li>
-        </xsl:otherwise>
-      </xsl:choose>
+      <xsl:variable name="internal_genre">
+        <xsl:apply-templates mode="mods-type" select="." />
+      </xsl:variable>
+      <li><xsl:value-of select="i18n:translate(concat('metaData.mods.dictionary.', $internal_genre))" /></li>
+      <xsl:if test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='kindof']">
+        <xsl:variable name="kindof">
+          <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='kindof']"
+                               mode="printModsClassInfo" />
+        </xsl:variable>
+        <li><xsl:value-of select="i18n:translate(concat('metaData.mods.dictionary.', $kindof))" /></li>
+      </xsl:if>
     </ul>
 
   </xsl:template>

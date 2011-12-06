@@ -414,7 +414,9 @@
   <!--  -->
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.report">
     <div id="title_box" class="detailbox floatbox">
-      <h4 id="title_switch" class="block_switch open">Report</h4>
+      <h4 id="title_switch" class="block_switch open">
+        <xsl:value-of select="i18n:translate('metaData.mods.dictionary.report')" />
+      </h4>
       <div id="title_content" class="block_content">
         <table class="metaData">
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
@@ -464,7 +466,7 @@
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.thesis">
     <div id="title_box" class="detailbox">
       <h4 id="title_switch" class="block_switch open">
-        <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.thesisbox'), ' - ')" />
+        <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.thesis'), ' - ')" />
         <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='kindof']"
                   mode="printModsClassInfo" />
       </h4>
@@ -595,7 +597,9 @@
 
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.cproceeding">
     <div id="title_box" class="detailbox floatbox">
-      <h4 id="title_switch" class="block_switch open">Konferenzband</h4>
+      <h4 id="title_switch" class="block_switch open">
+        <xsl:value-of select="i18n:translate('metaData.mods.dictionary.confpro')" />
+      </h4>
       <div id="title_content" class="block_content">
         <table class="metaData">
           <xsl:for-each select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@type='conference']">
@@ -659,7 +663,9 @@
 
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.cpublication">
     <div id="title_box" class="detailbox floatbox">
-      <h4 id="title_switch" class="block_switch open">Konferenzbeitrag</h4>
+      <h4 id="title_switch" class="block_switch open">
+        <xsl:value-of select="i18n:translate('metaData.mods.dictionary.confpub')" />
+      </h4>
       <div id="title_content" class="block_content">
         <table class="metaData">
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
@@ -688,7 +694,9 @@
 
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.book">
     <div id="title_box" class="detailbox floatbox">
-      <h4 id="title_switch" class="block_switch open">Buch</h4>
+      <h4 id="title_switch" class="block_switch open">
+        <xsl:value-of select="i18n:translate('metaData.mods.dictionary.book')" />
+      </h4>
       <div id="title_content" class="block_content">
         <table class="metaData">
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
@@ -739,7 +747,9 @@
 
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.book-chapter">
     <div id="title_box" class="detailbox floatbox">
-      <h4 id="title_switch" class="block_switch open">Buchkapitel</h4>
+      <h4 id="title_switch" class="block_switch open">
+        <xsl:value-of select="i18n:translate('metaData.mods.dictionary.chapter')" />
+      </h4>
       <div id="title_content" class="block_content">
         <table class="metaData">
           <xsl:call-template name="printMetaDate.mods">
@@ -780,7 +790,40 @@
 
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.journal">
     <div id="title_box" class="detailbox floatbox">
-      <h4 id="title_switch" class="block_switch open">Zeitschrift/Serie</h4>
+      <h4 id="title_switch" class="block_switch open">
+        <xsl:value-of select="i18n:translate('metaData.mods.dictionary.journal')" />
+      </h4>
+      <div id="title_content" class="block_content">
+        <table class="metaData">
+          <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
+          <xsl:call-template name="printMetaDate.mods">
+            <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier[@type='issn']" />
+            <xsl:with-param name="label" select="'ISSN'" />
+          </xsl:call-template>
+          <xsl:call-template name="printMetaDate.mods">
+            <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier[@type='zdbid']" />
+            <xsl:with-param name="label" select="'ZDB-ID'" />
+          </xsl:call-template>
+          <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:extension" />
+          <xsl:call-template name="printMetaDate.mods">
+            <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:note" />
+          </xsl:call-template>
+          <xsl:call-template name="printMetaDate.mods">
+            <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:publisher" />
+          </xsl:call-template>
+          <xsl:call-template name="printMetaDate.mods">
+            <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:physicalLocation" />
+          </xsl:call-template>
+        </table>
+      </div>
+    </div>
+  </xsl:template>
+
+  <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.series">
+    <div id="title_box" class="detailbox floatbox">
+      <h4 id="title_switch" class="block_switch open">
+        <xsl:value-of select="i18n:translate('metaData.mods.dictionary.series')" />
+      </h4>
       <div id="title_content" class="block_content">
         <table class="metaData">
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
@@ -809,7 +852,9 @@
 
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.article">
     <div id="title_box" class="detailbox floatbox">
-      <h4 id="title_switch" class="block_switch open">Zeitschriftenaufsatz</h4>
+      <h4 id="title_switch" class="block_switch open">
+        <xsl:value-of select="i18n:translate('metaData.mods.dictionary.article')" />
+      </h4>
       <div id="title_content" class="block_content">
         <table class="metaData">
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
@@ -881,7 +926,9 @@
   <!--  AV-Media -->
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.av-media">
     <div id="title_box" class="detailbox floatbox">
-      <h4 id="title_switch" class="block_switch open">AV-Medium</h4>
+      <h4 id="title_switch" class="block_switch open">
+        <xsl:value-of select="i18n:translate('metaData.mods.dictionary.av')" />
+      </h4>
       <div id="title_content" class="block_content">
         <table class="metaData">
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
