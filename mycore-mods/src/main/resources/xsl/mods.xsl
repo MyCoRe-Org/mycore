@@ -307,7 +307,7 @@
                     </td>
                     <td class="metavalue">
                       <a
-                        href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout={$child-layout}&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
+                        href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=book&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
                         <xsl:value-of select="i18n:translate('metaData.mods.types.book')" />
                       </a>
                     </td>
@@ -318,7 +318,7 @@
                     </td>
                     <td class="metavalue">
                       <a
-                        href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout={$child-layout}&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
+                        href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=cproceeding&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
                         <xsl:value-of select="i18n:translate('metaData.mods.types.cproceeding')" />
                       </a>
                     </td>

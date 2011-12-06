@@ -1422,16 +1422,39 @@
         <hidden var="parents/parent/@editor.parentName" />
         <cell col="1" row="1" style="width:85px;" anchor="NORTHEAST">
           <label xml:lang="de">
-            <xhtml:span class="editorlabel">Teil von:</xhtml:span>
+            <xhtml:span class="editorlabel">Teil von</xhtml:span>
           </label>
         </cell>
-        <cell col="2" row="1" var="parents" anchor="NORTHWEST">
-          <output var="parent/@editor.parentName" default="Kein Vater-Objekt" />
+        <cell col="2" row="1" var="parents" anchor="NORTHWEST" style="padding-left:3px;">
+          <output var="parent/@editor.parentName" default="kein Objekt gewählt" />
         </cell>
       </panel>
     </cell>
   </panel>
 
+
+  <!-- *** Parents (serie) *** -->
+  <panel id="displaySeries">
+    <cell col="1" row="1" var="structure" anchor="NORTHWEST">
+      <panel>
+        <hidden var="parents/@class" default="MCRMetaLinkID" />
+        <hidden var="parents/@notinherit" default="true" />
+        <hidden var="parents/@heritable" default="false" />
+        <hidden var="parents/parent/@xlink:type" default="locator" />
+        <hidden var="parents/parent/@xlink:label" />
+        <hidden var="parents/parent/@xlink:href" />
+        <hidden var="parents/parent/@editor.parentName" />
+        <cell col="1" row="1" style="width:85px;" anchor="NORTHEAST">
+          <label xml:lang="de">
+            <xhtml:span class="editorlabel">Serie</xhtml:span>
+          </label>
+        </cell>
+        <cell col="2" row="1" var="parents" anchor="NORTHWEST" style="padding-left:3px;">
+          <output var="parent/@editor.parentName" default="keine Serie gewählt" />
+        </cell>
+      </panel>
+    </cell>
+  </panel>
   <!-- *** Text fields *** -->
   <textfield id="TFzeile10" width="10" maxlength="10" />
   <textfield id="TFzeile32" width="32" maxlength="32" />

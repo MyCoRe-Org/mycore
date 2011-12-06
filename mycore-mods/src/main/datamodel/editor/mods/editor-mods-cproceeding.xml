@@ -16,6 +16,9 @@
     <hidden var="metadata/def.modsContainer/@notinherit" default="true" />
     <hidden var="metadata/def.modsContainer/@heritable" default="false" />
 
+    <!-- Serie (Verweis auf MyCoRe-ID) -->
+    <cell row="1" colspan="3" anchor="NORTHWEST" ref="displaySeries" />
+
     <cell row="05" colspan="3" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@type='conference']">
       <repeater min="1" max="5">
         <panel style="width:100%;">
