@@ -148,12 +148,8 @@
   </helpPopup>
   <!-- LANGUAGE END -->
 
-  <!-- pub_autor_dok_txt [text] and reviewer -->
-  <text id="mods.author.label">
-    <label xml:lang="de">Autor(en)*</label>
-    <label xml:lang="en">Author(s)*</label>
-  </text>
 
+  <!-- person -->
   <panel id="mods.name">
     <hidden var="nameOrPND/@editor.output" />
     <cell col="1" row="1" anchor="NORTHEAST">
@@ -175,32 +171,6 @@
     </cell>
   </panel>
 
-  <panel id="mods.author">
-    <cell anchor="NORTHWEST" var="mods:name[@type='personal']">
-      <repeater min="1" max="20" pos="right">
-        <panel>
-          <hidden var="mods:role/mods:roleTerm/@authority" default="marcrelator" />
-          <hidden var="mods:role/mods:roleTerm/@type" default="code" />
-          <hidden var="mods:role/mods:roleTerm" default="aut" />
-          <cell ref="mods.name" />
-        </panel>
-      </repeater>
-    </cell>
-  </panel>
-
-  <helpPopup id="mods.author.help" width="400px" height="250px">
-    <label xml:lang="de">
-      Die Person, die primär das Dokument erstellt hat. Weitere Autoren können über den "+" Button hinzugefügt werden.
-      (Verlinkung auf PND)
-    </label>
-    <label xml:lang="en">
-      Persons primarily responsible for making the resource. Further persons my be added with "+" button.
-      (ref to pnd)
-    </label>
-  </helpPopup>
-  <!-- pub_autor_dok_txt [text] and reviewer END -->
-
-  <!-- person -->
   <text id="mods.person.label" i18n="metaData.mods.dictionary.persons" />
   <panel id="mods.person">
     <cell anchor="NORTHWEST" var="mods:name[@type='personal']">
@@ -228,11 +198,43 @@
     </cell>
   </panel>
 
+  <panel id="mods.person.publisher">
+    <cell anchor="NORTHWEST" var="mods:name[@type='personal']">
+      <repeater min="1" max="20" pos="right">
+        <panel>
+          <cell col="1" row="1" anchor="NORTHEAST" var="mods:role/mods:roleTerm">
+            <panel>
+              <hidden var="@authority" default="marcrelator" />
+              <hidden var="@type" default="code" />
+              <cell>
+                <list type="dropdown" default="pbl" id="mods.person.publisher.list">
+                  <include ref="pleaseSelect" />
+                  <include uri="classification:editor:-1:children:marcrelator" cacheable="false" />
+                </list>
+              </cell>
+            </panel>
+          </cell>
+          <cell col="2" row="1" anchor="NORTHEAST" ref="mods.name" />
+        </panel>
+      </repeater>
+    </cell>
+  </panel>
+
   <helpPopup id="mods.person.help" width="400px" height="250px">
     <label xml:lang="de">
       Name und Rolle der Personen, in welcher sie bei der Erstellung des Dokumentes mitgewirkt haben.
-      (Verlinkung auf
-      PND).
+      (Verlinkung auf PND).
+    </label>
+    <label xml:lang="en">
+      Names and roles of persons cooperating .... (ref to pnd)
+    </label>
+  </helpPopup>
+
+  <helpPopup id="mods.person.publisher.help" width="400px" height="250px">
+    <label xml:lang="de">
+      Eine natürliche oder juristische Person oder Personengruppe, die als verantwortlich für die
+      inhaltliche Gestaltung eines Dokuments angegeben wird, ohne selbst Verfasser des Dokuments
+      der einzelner Teile desselben sein zu müssen. (Verlinkung auf PND)
     </label>
     <label xml:lang="en">
       Names and roles of persons cooperating .... (ref to pnd)
@@ -271,10 +273,8 @@
 
   <helpPopup id="mods.publisher.help" width="400px" height="250px">
     <label xml:lang="de">
-      Eine natürliche oder juristische Person oder Personengruppe, die als verantwortlich für die
-      inhaltliche Gestaltung eines Dokuments
-      angegeben wird, ohne selbst Verfasser des Dokuments oder einzelner
-      Teile desselben sein zu müssen
+      Unternehmen, das Werke der Literatur, Kunst, Musik,
+      Unterhaltung oder Wissenschaft der Öffentlichkeit zugänglich macht.
     </label>
     <label xml:lang="en">
       Publisher
@@ -600,10 +600,6 @@
               <item value="isbn13">
                 <label xml:lang="de">ISBN13</label>
                 <label xml:lang="en">ISBN13</label>
-              </item>
-              <item value="isbn10">
-                <label xml:lang="de">ISBN10</label>
-                <label xml:lang="en">ISBN10</label>
               </item>
               <item value="doi">
                 <label xml:lang="de">DOI</label>
@@ -1168,73 +1164,7 @@
   </helpPopup>
   <!-- Seiten von bis END -->
 
-  <!-- ISBN -->
-  <text id="mods.book.isbn.label" i18n="metaData.mods.dictionary.identifier.isbn" />
-  <panel id="mods.book.isbn">
-    <cell anchor="NORTHWEST" var="mods:identifier[@type='isbn']">
-      <panel>
-        <cell anchor="NORTHWEST" ref="TFzeile512" />
-      </panel>
-    </cell>
-  </panel>
 
-  <helpPopup id="mods.book.isbn.help">
-    <label xml:lang="de">
-      ISBN
-      <br />
-      Die ISBN wird ohne Bindestrich eingegeben.
-      <br />
-      Beispiel: ISBN 9783836213257
-    </label>
-    <label xml:lang="en">
-      ISBN
-      <br />
-
-    </label>
-  </helpPopup>
-  <!-- ISBN END -->
-
-  <!-- ISSN -->
-  <text id="mods.issn.label" i18n="metaData.mods.dictionary.identifier.issn" />
-  <panel id="mods.issn">
-    <cell anchor="NORTHWEST" var="mods:identifier[@type='issn']">
-      <repeater min="1" pos="right">
-        <panel>
-          <cell anchor="NORTHWEST" ref="TFzeile512" />
-        </panel>
-      </repeater>
-    </cell>
-  </panel>
-
-  <helpPopup id="mods.issn.help">
-    <label xml:lang="de">
-      ISSN
-      <br />
-      Die ISSN wird ohne Bindestrich eingegeben.
-      <br />
-      Beispiel: ISSN 09359680
-    </label>
-    <label xml:lang="en">ISSN</label>
-  </helpPopup>
-  <!-- ISSN END -->
-
-  <!-- ZDB-ID -->
-  <text id="mods.zdbid.label" i18n="metaData.mods.dictionary.identifier.zdbid" />
-  <panel id="mods.zdbid">
-    <cell anchor="NORTHWEST" var="mods:identifier[@type='zdbid']">
-      <panel>
-        <cell anchor="NORTHWEST" ref="TFzeile512" />
-      </panel>
-    </cell>
-  </panel>
-
-  <helpPopup id="mods.zdbid.help">
-    <label xml:lang="de">ZDB-ID eingeben (Hilfe folgt)
-    </label>
-    <label xml:lang="en">ZDB-ID</label>
-  </helpPopup>
-  <!-- ZDB-ID END -->
-  
   <!-- Impact Factor -->
   <text id="mods.impact.label" i18n="metaData.mods.dictionary.impact" />
   <panel id="mods.impact">
@@ -1444,7 +1374,7 @@
         <hidden var="parents/parent/@xlink:label" />
         <hidden var="parents/parent/@xlink:href" />
         <hidden var="parents/parent/@editor.parentName" />
-        <cell col="1" row="1" style="width:85px;" anchor="NORTHEAST">
+        <cell col="1" row="1" style="width:145px;" anchor="NORTHEAST">
           <label xml:lang="de">
             <xhtml:span class="editorlabel">Serie</xhtml:span>
           </label>
