@@ -375,16 +375,16 @@
     <url-pattern>/servlets/MCRLocaleServlet/*</url-pattern>
   </servlet-mapping>
   
-  <servlet>
-    <servlet-name>MCRTarDerivateServlet</servlet-name>
-    <servlet-class>org.mycore.services.zipper.MCRTarDerivateServlet</servlet-class>
+  <servlet id="MCRTarServlet">
+    <servlet-name>MCRTarServlet</servlet-name>
+    <servlet-class>org.mycore.services.zipper.MCRTarServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>MCRTarDerivateServlet</servlet-name>
-    <url-pattern>/servlets/MCRTarDerivateServlet</url-pattern>
+    <servlet-name>MCRTarServlet</servlet-name>
+    <url-pattern>/servlets/MCRTarServlet</url-pattern>
   </servlet-mapping>
-
+  
   <!-- **************************************************************** -->
   <!-- General configuration -->
   <!-- **************************************************************** -->
