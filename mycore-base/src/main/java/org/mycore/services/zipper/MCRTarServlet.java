@@ -6,9 +6,9 @@ import java.util.Date;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.log4j.Logger;
-import org.apache.tools.tar.TarEntry;
-import org.apache.tools.tar.TarOutputStream;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -20,6 +20,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * This servlet delivers all files of a derivate packed in a tar File
  * 
  * @author sebastian
+ * @author shermann
  */
 public class MCRTarServlet extends MCRServlet {
 
@@ -46,7 +47,7 @@ public class MCRTarServlet extends MCRServlet {
             return;
         }
 
-        TarOutputStream tos = buildTarOutputStream(res, derivateId);
+        TarArchiveOutputStream tos = buildTarOutputStream(res, derivateId);
         putAllFiles(derivateId, tos);
         tos.close();
     }
@@ -60,7 +61,7 @@ public class MCRTarServlet extends MCRServlet {
      *            the taroutputstream
      * @throws IOException
      */
-    private void putAllFiles(String id, TarOutputStream tos) throws IOException {
+    private void putAllFiles(String id, TarArchiveOutputStream tos) throws IOException {
         MCRFilesystemNode node = MCRFilesystemNode.getRootNode(id);
         if (node instanceof MCRDirectory) {
             putNode(node, tos);
@@ -77,7 +78,7 @@ public class MCRTarServlet extends MCRServlet {
      *            the TarOutputStream were the childs should be written to.
      * @throws IOException
      */
-    private void putNode(MCRFilesystemNode node, TarOutputStream tos) throws IOException {
+    private void putNode(MCRFilesystemNode node, TarArchiveOutputStream tos) throws IOException {
         MCRDirectory dir = (MCRDirectory) node;
         MCRFilesystemNode[] children = dir.getChildren();
         for (MCRFilesystemNode child : children) {
@@ -88,15 +89,13 @@ public class MCRTarServlet extends MCRServlet {
             if (child instanceof MCRFile) {
                 MCRFile mcrFile = (MCRFile) child;
                 LOGGER.info("Adding file : " + mcrFile.getPath());
-                TarEntry te = new TarEntry(mcrFile.getPath());
+                TarArchiveEntry te = new TarArchiveEntry(mcrFile.getPath());
                 te.setModTime(new Date().getTime());
                 te.setSize(mcrFile.getSize());
 
-                tos.putNextEntry(te);
-
+                tos.putArchiveEntry(te);
                 mcrFile.getContentTo(tos);
-
-                tos.closeEntry();
+                tos.closeArchiveEntry();
             }
         }
     }
@@ -110,11 +109,11 @@ public class MCRTarServlet extends MCRServlet {
      * @return
      * @throws IOException
      */
-    private TarOutputStream buildTarOutputStream(HttpServletResponse res, String filename) throws IOException {
+    private TarArchiveOutputStream buildTarOutputStream(HttpServletResponse res, String filename) throws IOException {
         BufferedOutputStream bos = new BufferedOutputStream(res.getOutputStream());
         res.setContentType("application/x-tar");
         res.addHeader("Content-Disposition", "atachment; filename=\"" + filename + ".tar\"");
 
-        return new TarOutputStream(bos);
+        return new TarArchiveOutputStream(bos);
     }
 }
