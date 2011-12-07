@@ -56,7 +56,7 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
 
     protected static MCRCache RETURN_ID_CACHE = new MCRCache(MCRConfiguration.instance().getInt("MCR.Searcher.ReturnID.Cache", 100),
             "MCRSearcher ReturnID Cache");
-    
+
     /**
      * Returns false if this MCRSearcher implements only search and is therefore read-only.
      */
@@ -143,9 +143,7 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
 
     @Override
     protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
-        String entryID = obj.getId().toString();
-        List<MCRFieldValue> fields = MCRData2Fields.buildFields(obj, index);
-        addToIndex(entryID, entryID, fields);
+        index(obj);
     }
 
     @Override
@@ -157,10 +155,8 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
 
     @Override
     protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
-        String entryID = obj.getId().toString();
-        List<MCRFieldValue> fields = MCRData2Fields.buildFields(obj, index);
-        removeFromIndex(entryID);
-        addToIndex(entryID, entryID, fields);
+        removeFromIndex(obj);
+        index(obj);
     }
 
     @Override
@@ -173,8 +169,7 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
 
     @Override
     protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
-        String entryID = obj.getId().toString();
-        removeFromIndex(entryID);
+        removeFromIndex(obj);
     }
 
     @Override
@@ -185,7 +180,8 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
 
     @Override
     protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
-        handleObjectCreated(evt, obj);
+        removeFromIndex(obj);
+        index(obj);
     }
 
     @Override
@@ -195,7 +191,7 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
 
     @Override
     protected void undoObjectCreated(MCREvent evt, MCRObject obj) {
-        handleObjectDeleted(evt, obj);
+        removeFromIndex(obj);
     }
 
     @Override
@@ -205,12 +201,23 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
 
     @Override
     protected void undoObjectDeleted(MCREvent evt, MCRObject obj) {
-        handleObjectCreated(evt, obj);
+        index(obj);
     }
 
     @Override
     protected void undoDerivateDeleted(MCREvent evt, MCRDerivate der) {
         handleDerivateCreated(evt, der);
+    }
+
+    protected void index(MCRObject obj) {
+        String entryID = obj.getId().toString();
+        List<MCRFieldValue> fields = MCRData2Fields.buildFields(obj, index);
+        addToIndex(entryID, entryID, fields);
+    }
+
+    protected void removeFromIndex(MCRObject obj) {
+        String entryID = obj.getId().toString();
+        removeFromIndex(entryID);
     }
 
     /**
