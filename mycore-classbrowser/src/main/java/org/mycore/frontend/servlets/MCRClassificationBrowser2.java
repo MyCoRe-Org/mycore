@@ -76,6 +76,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         String parameters = req.getParameter("parameters");
 
         boolean countResults = Boolean.valueOf(req.getParameter("countresults"));
+        boolean addClassId = Boolean.valueOf(req.getParameter("addclassid"));
         boolean uri = Boolean.valueOf(req.getParameter("adduri"));
 
         String el = req.getParameter("emptyleaves");
@@ -120,7 +121,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
             String childID = child.getId().getID();
             int numResults = 0;
             if (countResults) {
-                categCondition.setValue(childID);
+                categCondition.setValue(addClassId ? child.getId().toString() : childID);
                 numResults = MCRQueryManager.search(new MCRQuery(queryCondition)).getNumHits();
                 if ((!emptyLeaves) && (numResults < 1))
                     continue;

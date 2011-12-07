@@ -43,6 +43,7 @@
       <xsl:with-param name="emptyleaves" select="@emptyleaves"/>
       <xsl:with-param name="adduri" select="@adduri"/>
       <xsl:with-param name="adddescription" select="@adddescription"/>
+      <xsl:with-param name="addclassid" select="@addclassid"/>
       <xsl:with-param name="style" select="@style"/>
     </xsl:call-template>
   </xsl:template>
@@ -61,6 +62,7 @@
     <xsl:param name="emptyleaves" />
     <xsl:param name="adduri" />
     <xsl:param name="adddescription" />
+    <xsl:param name="addclassid" />
     <xsl:param name="style" />
 
     <div>
@@ -97,6 +99,7 @@
             emptyleaves    : '<xsl:value-of select="$emptyleaves" />',
             adduri         : '<xsl:value-of select="$adduri" />',
             adddescription : '<xsl:value-of select="$adddescription" />',
+            addclassid     : '<xsl:value-of select="$addclassid" />',
             style          : '<xsl:value-of select="$style" />',
             webpage        : '<xsl:value-of select="substring-after($RequestURL,$WebApplicationBaseURL)" />'
           }, f );      
