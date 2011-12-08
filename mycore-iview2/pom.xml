@@ -85,6 +85,7 @@
                 <jsSourceFile>iview2.toolbar/ToolbarSpringModel.js</jsSourceFile>
                 <jsSourceFile>iview2.toolbar/ToolbarTextModel.js</jsSourceFile>
                 <jsSourceFile>iview2.toolbar/ToolbarButtonModel.js</jsSourceFile>
+                <jsSourceFile>iview2.toolbar/ToolbarImageModel.js</jsSourceFile>
                 <jsSourceFile>iview2.toolbar/ToolbarController.js</jsSourceFile>
                 <jsSourceFile>iview2.toolbar/ToolbarView.js</jsSourceFile>
                 

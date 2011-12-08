@@ -79,4 +79,4 @@ ToolbarButtonModel.prototype = {
 			this.subtype.state = !this.subtype.state;
 			jQuery(this).trigger("changeState", {'state' : this.subtype.state});
 		}
-}
+};

@@ -187,7 +187,7 @@ ToolbarController.prototype.catchModels = function() {
 		    		curView.destroy();
 		    		delete(that.views[that.relations[args.modelId]]);
 		    	break;
-				case "add":
+				case "add"://TODO new elements have to be add able without any special treating here
 		    		if (args.element) {
 				    	var element = args.element;
 				    	switch (element.type) {
@@ -203,6 +203,9 @@ ToolbarController.prototype.catchModels = function() {
 				    	case "spring":
 				    		curView.addSpring({'elementName' : element.elementName, 'weight' : element.weight, 'index' : element.index});
 				    	break;
+				    	case "image":
+				    		curView.addImage({'elementName' : element.elementName, 'src' : element.src, 'index' : element.index});
+			    		break;
 				    	}
 			    	} else if (args.button) {
 			    		var button = args.button;

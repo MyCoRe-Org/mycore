@@ -155,7 +155,6 @@ function createToolbars(viewer) {
 	.bind("zoom.viewer", function() {
 		viewer.toolbar.ctrl.checkZoom(viewer.viewerBean.zoomLevel);
 	});
-	console.log(viewer.currentImage)
 	jQuery(viewer.currentImage).bind(iview.CurrentImage.CHANGE_EVENT, function () {
 		if (!viewer.PhysicalModel) return;
 		viewer.toolbar.ctrl.checkNavigation(viewer.PhysicalModel);
