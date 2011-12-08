@@ -102,7 +102,7 @@ ToolbarManager.prototype = {
  * @description	creates the Toolbars and stores them within the supplied structure
  * @param {Iview} viewer instance for which it shall create the toolbars
  */
-var createToolbars = function(viewer) {
+function createToolbars(viewer) {
 	jQuery(viewer.viewerContainer)
 	//exploit that the init.viewer event bubbles up the DOM hierarchy
 	.bind("init.viewer", function() {
@@ -155,12 +155,13 @@ var createToolbars = function(viewer) {
 	.bind("zoom.viewer", function() {
 		viewer.toolbar.ctrl.checkZoom(viewer.viewerBean.zoomLevel);
 	});
+	console.log(viewer.currentImage)
 	jQuery(viewer.currentImage).bind(iview.CurrentImage.CHANGE_EVENT, function () {
 		if (!viewer.PhysicalModel) return;
 		viewer.toolbar.ctrl.checkNavigation(viewer.PhysicalModel);
-		viewer.toolbar.ctrl.paint("mainTb");
 		if (jQuery(viewer.viewerContainer).find('.navigateHandles .pageBox')) {
 			viewer.toolbar.ctrl.updateDropDown(jQuery(viewer.toolbar.pagelist.find("a")[viewer.PhysicalModel.getCurPos() - 1]).html());
 		}
+		viewer.toolbar.ctrl.paint("mainTb");
 	});
 }
