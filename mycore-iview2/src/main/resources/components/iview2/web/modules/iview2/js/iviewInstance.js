@@ -64,7 +64,8 @@
 	  this.context = new iview.Context(this.viewerContainer, this);
 	  this.currentImage = new iview.CurrentImage(this);
 	  this.substractsDimension = {'x': {'total': 0, 'entries': []}, 'y': {'total': 0, 'entries': []}};//other components which are lowering the width and the height of the viewer width and height
-
+	  //uncomment this line to activate canvas mode
+//	  this.canvas = new iview.Canvas(this);
       jQuery(this.currentImage).bind(iview.CurrentImage.CHANGE_EVENT, function(){
     	  that.processImageProperties();
       });
@@ -121,7 +122,15 @@
 		//needs to be registered before any other listener for this event
 		var viewerBean = this.viewerBean;
 		jQuery(viewerBean.viewer).bind("zoom.viewer", function() { viewerZoomed.apply(that, arguments)})
-			.bind("move.viewer", function() {viewerMoved.apply(that,arguments)});
+			.bind("move.viewer", function(jq, event) {
+				/* TODO somehow is this function triggered in IE7+ multiple times (the number of images in div.well often)
+				 * after the first mousepress+mousemove occured. The jsfiddle http://jsfiddle.net/cPjZV/3/ seems not to 
+				 * have this problem, which looks like its caused from within our code.
+				 * When those pseudo arguments occur they're missing our move object, so we check for that
+				*/
+//				if (arguments.length < 2) return;
+				that.currentImage.setPos({'x': -event.x, 'y': -event.y});
+				});
 	
 		jQuery(this.viewerContainer).one("maximize.viewerContainer", function() {
 			if (that.properties.useOverview) {
@@ -210,7 +219,7 @@
 	 * @function
 	 * @name		loadPage
 	 * @memberOf	iview.iviewInstance
-	 * @description	reads out the imageinfo.xml, set the correct zoomvlues and loads the page
+	 * @description	reads out the imageinfo.xml, set the correct zoomvalues and loads the page
 	 * @param		{function} callback
 	 * @param		{String} [startFile] optional page to open
 	 */
@@ -242,7 +251,7 @@
 	constructor.prototype.processImageProperties = function(){
 		var viewerBean = this.viewerBean;
 		
-		viewerBean.resize();
+		//viewerBean.resize();
 		var zoomInfo = this.currentImage.zoomInfo;
 		// moves viewer to zoomLevel zoomInit
 		viewerBean.maxZoomLevel = zoomInfo.maxZoom;
@@ -346,16 +355,6 @@
 		}
 	};
 
-	/**
-	 * @public
-	 * @function
-	 * @name		viewerMoved
-	 * @description	is called if the picture is moving in the viewer and handles the size of the Overview accordingly the size of the picture
-	 */
-	function viewerMoved(jq, event) {
-		this.currentImage.setPos(/*{'x': -event.x, 'y': -event.y}*/event);
-	};
-	
 	/**
 	 * @public
 	 * @function

@@ -303,7 +303,6 @@ function log(){
 	  try
 	  {
 		  console.log(arguments);
-		  //console.log.apply(window, arguments);
 	  }
 	  catch(error)
 	  {

@@ -684,7 +684,7 @@ iview.scrollbar.View = function() {
 		var wholeSpace = jQuery("<div>")
 			.addClass("empty")
 			.mousedown(function(e) { dbgMouseDown(that, e); return false;})
-			.mouseup(function() { dbgMouseUp(that); return false;})
+			.mouseup(function() { dbgMouseUp(that);})
 			.mousewheel(function(e, delta) {
 				mouseScroll(that, delta);
 				return false;})
@@ -1128,8 +1128,7 @@ iview.scrollbar.importScrollbars = function(viewer) {
 	 */
 	var viewerPosUpdate = function(x, y) {
 		var pos = {'x': x, 'y': y};
-		viewer.viewerBean.positionTiles (pos, true);
-		viewer.viewerBean.notifyViewerMoved(pos);
+		viewer.viewerBean.positionTiles (pos);
 	}
 
 	// ScrollBars

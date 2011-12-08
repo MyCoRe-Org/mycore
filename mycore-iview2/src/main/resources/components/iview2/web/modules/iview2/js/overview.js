@@ -16,7 +16,6 @@ iview.overview = iview.overview || {};
  */
 iview.overview.View = function(i18n) {
 	this._i18n = i18n;
-	this._mousedown = false;
 	this._visible = true;
 	this._ratioX = 0;
 	this._ratioY = 0;
@@ -24,14 +23,21 @@ iview.overview.View = function(i18n) {
 	this._y = 0;
 	this._sizeX = 0;
 	this._sizeY = 0;
-	this._curX = 0;
-	this._curY = 0;
-	this._mouseX = 0;
-	this._mouseY = 0;
+	this._cur = {'x': 0, 'y': 0};
+	this._mouse = {'x': 0, 'y': 0};
 };
 
 (function() {
-	
+	/**
+	 * private
+	 * @name		resolveCoordinates
+	 * @memberOf	iview.overview.Model
+	 * @description	translates given coordinates into the viewport of the overview
+	 */
+	function resolveCoordinates(e, element) {
+		return { 'x': (e.pageX || e.clientX + (document.documentElement.scrollLeft || document.body.scrollLeft)) - element.position().left,
+			'y': (e.pageY || e.clientY + (document.documentElement.scrollTop || document.body.scrollTop)) - element.position().top};
+	}
 	/**
 	 * @private
 	 * @function
@@ -61,28 +67,35 @@ iview.overview.View = function(i18n) {
 	 */
 	function createView(args) {
 		var that = this;
+
+		var thumb = new Image();
+		var fnMouseMove = function (e) {
+			mouseMove(that, e);
+		}
+		var overview = jQuery("<div>")
+			.addClass("ausschnitt " + args.mainClass + " " + args.customClass)
+			.mousedown(function(e) { mouseDown(that, e);
+				jQuery(document)
+					.mousemove(fnMouseMove)
+					.one("mouseup", function(e) {
+						mouseUp(that,e);
+						jQuery(document).unbind("mousemove", fnMouseMove)});
+					});
+		
 		var complete = jQuery("<div>")
 			.addClass("thumb " + args.mainClass + " " + args.customClass)
 			.css("overflow","hidden")
-			.dblclick(function(e) { 
-				var newX = (e.layerX)? e.layerX : e.offsetX;
-				var newY = (e.layerY)? e.layerY : e.offsetY;
-				jQuery(that).trigger("move.overview", {"x" : {"new":scale(that, newX, true)}, "y" : {"new":scale(that, newY, false)}})
+			.dblclick(function(e) {
+				var coords = resolveCoordinates(e, complete);
+				jQuery(that).trigger("position.overview", {"x" : {
+					"new": scale(that, coords.x - overview.width()/2, true)},
+					"y" : {"new": scale(that, coords.y - overview.height()/2, false)}})
 			})
 			.mousewheel(function(e, delta) {
 				jQuery(that).trigger("scroll.overview", {"delta": delta});
 			})
-			.mouseup(function(e) { mouseUp(that, e)})
-			.mousemove(function(e) { mouseMove(that, e)})
-			.mousedown(function() { return false;});// deactivate Browser-Drag&Drop
-		
-		var overview = jQuery("<div>")
-			.addClass("ausschnitt " + args.mainClass + " " + args.customClass)
-			.mousedown(function(e) { mouseDown(that, e)})
-			.mouseup(function(e) {mouseUp(that, e)});
-		var thumb = new Image();
-		
-		complete.append(overview)
+			.mousedown(function() { return false;})// deactivate Browser-Drag&Drop
+			.append(overview)
 			.append(thumb)
 			.appendTo(args.thumbParent);
 		
@@ -93,7 +106,6 @@ iview.overview.View = function(i18n) {
 		//set the default translation and keep upto date if it should change later
 		jQuery(this._i18n.executeWhenLoaded(function(i) {toggler.attr("title", i.translate("overview.fadeOut"))}))
 			.bind("change.i18n load.i18n",function(e, obj) {toggler.attr("title", obj.i18n.translate("overview.fade" + (that._visible? "Out":"In")))});
-		
 		
 		var damp = jQuery("<div>")
 			.addClass("damp " + args.mainClass + " " + args.customClass)
@@ -133,7 +145,7 @@ iview.overview.View = function(i18n) {
 	 */
 	function adaptView(args) {
 		switch (args.type) {
-		case "move":
+		case "position":
 			this._x = toFloat(args.value.x);
 			this._y = toFloat(args.value.y);
 			applyValues(this);
@@ -206,17 +218,12 @@ iview.overview.View = function(i18n) {
 	 * @param		{event} e Event which occured
 	 */
 	function mouseMove(that, e) {
-		if (that._mouseIsDown) {
-			if (isBrowser(["IE"])){//IE
-				that._x = that._curX + (e.clientX - that._mouseX);
-				that._y = that._curY + (e.clientY - that._mouseY);
-			} else {//Mozilla
-				that._x = that._curX + (e.pageX - that._mouseX);
-				that._y = that._curY + (e.pageY - that._mouseY);
-			}
-			that.my.overview.css({"left": "0", "top":0})
+			var coords = resolveCoordinates(e, that.my.self);
+			that._x = that._cur.x + (coords.x - that._mouse.x);
+			that._y = that._cur.y + (coords.y - that._mouse.y);
+			
+			that.my.overview.css({"left": 0, "top":0})
 			applyValues(that);
-		}
 	}
 
 	/**
@@ -230,17 +237,10 @@ iview.overview.View = function(i18n) {
 	 */
 	function mouseDown(that, e) {
 		if (e.button < 2) {//nur bei linker und mittlerer Maustaste auf True setzen
-			that._mouseIsDown = true;
-			if(isBrowser(["IE"])){//IE
-				that._mouseX = e.clientX;
-				that._mouseY = e.clientY;
-			} else {//Mozilla
-				that._mouseX = e.pageX;
-				that._mouseY = e.pageY;
-			}
+			that._mouse = resolveCoordinates(e, that.my.self);
 			//Bestimmen der aktuellen oberen Ecke, und Bewegungsvektor
-			that._curX = parseInt(that.my.overview.css("left"));
-			that._curY = parseInt(that.my.overview.css("top"));
+			that._cur.x = parseInt(that.my.overview.css("left"));
+			that._cur.y = parseInt(that.my.overview.css("top"));
 		}
 		return false;
 	}
@@ -254,19 +254,14 @@ iview.overview.View = function(i18n) {
 	 * @param		{event} e Event which occured
 	 */
 	function mouseUp(that, e) {
-		if (that._mouseIsDown && e.button < 2) {
-			if(isBrowser(["IE"])){//IE
-				var positionX = that._curX + (e.clientX - that._mouseX);
-				var positionY = that._curY + (e.clientY - that._mouseY);
-			} else {//Mozilla
-				var positionX = that._curX + (e.pageX - that._mouseX);
-				var positionY = that._curY + (e.pageY - that._mouseY);
-			}
+		if (e.button < 2) {
+			var coords = resolveCoordinates(e, that.my.self);
+			var position = {'x' : that._cur.x + (coords.x - that._mouse.x),
+				'y': that._cur.y + (coords.y - that._mouse.y)};
 
-			if (positionX != that._curX || positionY != that._curY) {
-				jQuery(that).trigger("move.overview", {x: {"new": scale(that, positionX + that.my.overview.width()/2, true), "old": scale(that, that._curX, true)}, y: {"new": scale(that, positionY + that.my.overview.height()/2, false), "old": scale(that, that._curY, false)}});
+			if (position.x != that._cur.x || position.x != that._cur.x) {
+				jQuery(that).trigger("position.overview", {x: {"new": scale(that, position.x, true), "old": scale(that, that._cur.x, true)}, y: {"new": scale(that, position.y, false), "old": scale(that, that._cur.y, false)}});
 			}
-			that._mouseIsDown = false;
 		}
 	}
 	
@@ -355,7 +350,7 @@ iview.overview.Model = function() {};
 	function setPos(pos) {
 		pos.x = toInt(pos.x);
 		pos.y = toInt(pos.y);
-		jQuery(this).trigger("move.overview", {"value": {"x":pos.x,"y":pos.y}});
+		jQuery(this).trigger("position.overview", {"value": {"x":pos.x,"y":pos.y}});
 	}
 	
 	/**
@@ -406,7 +401,7 @@ iview.overview.Controller = function(modelProvider, i18n, view) {
 	this._view = new (view || iview.overview.View)(i18n);
 	var that = this;
 	
-	jQuery(this._model).bind("ratio.overview path.overview move.overview size.overview", function(e, val) {
+	jQuery(this._model).bind("ratio.overview path.overview position.overview size.overview", function(e, val) {
 		 that._view.adaptView({'type':e.type,'value':val["new"] || val.value});
 	});
 };
@@ -510,7 +505,7 @@ iview.overview.importOverview = function(viewer) {
 	model.setSrc(viewerBean.tileUrlProvider.assembleUrl(0,0,0));
 	var currentImage = viewer.currentImage;
 	var zoomInfo = currentImage.zoomInfo;
-	viewer.overview.ov.attach("move.overview", function(e, val) {
+	viewer.overview.ov.attach("position.overview", function(e, val) {
 		viewerBean.recenter(
 			{'x' : val.x["new"]*zoomInfo.scale,
 			 'y' : val.y["new"]*zoomInfo.scale
