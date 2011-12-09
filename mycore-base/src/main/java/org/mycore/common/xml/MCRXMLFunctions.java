@@ -196,35 +196,35 @@ public class MCRXMLFunctions {
     public static String getISODate(String simpleDate, String simpleFormat) throws ParseException {
         return getISODate(simpleDate, simpleFormat, null);
     }
-    
-    
+
     /**
-     * Returns a string representing the current date. One can customize the format of the returned string
-     * by providing a proper value for the format parameter. If null or an invalid format is provided the 
-     * default format "yyyy-MM-dd" will be used.
+     * Returns a string representing the current date. One can customize the
+     * format of the returned string by providing a proper value for the format
+     * parameter. If null or an invalid format is provided the default format
+     * "yyyy-MM-dd" will be used.
      * 
-     * @param format the format in which the date should be formatted 
+     * @param format
+     *            the format in which the date should be formatted
      * @return the current date in the desired format
-     * 
      * @see {@link SimpleDateFormat} for how to provide the format string
      */
-    public static String getCurrentDate(String format){
+    public static String getCurrentDate(String format) {
         SimpleDateFormat sdf = null;
-        try{
+        try {
             sdf = new SimpleDateFormat(format);
-        }catch(Exception i){
+        } catch (Exception i) {
             LOGGER.warn("Could not parse date format string, will use default \"yyyy-MM-dd\"", i);
             sdf = new SimpleDateFormat("yyyy-MM-dd");
         }
-        
+
         return sdf.format(new Date());
     }
-    
+
     /**
      * A delegate for {@link String#compareTo(String)}.
+     * 
      * @param s1
      * @param s2
-     * 
      * @return s1.compareTo(s2)
      */
     public static int compare(String s1, String s2) {
@@ -247,7 +247,7 @@ public class MCRXMLFunctions {
         try {
             Document w3cDoc = out.output(new org.jdom.Document(xml));
             return w3cDoc.getDocumentElement();
-        } catch(JDOMException exc) {
+        } catch (JDOMException exc) {
             LOGGER.error("Error while converting jdom- to w3c-element", exc);
         }
         return null;
@@ -292,10 +292,8 @@ public class MCRXMLFunctions {
      * 
      * @param urn
      *            the source urn
-     *            
      * @param toAppend
      *            the string to append to the namespace specific part
-     * 
      * @return the given urn but to the namespace specific part the value stored
      *         in the <code>toAppend</code> parameter is attached
      */
@@ -336,29 +334,38 @@ public class MCRXMLFunctions {
         LOGGER.info("Getting all urns for object " + mcrid);
         long start = System.currentTimeMillis();
         long temp = start;
+
         List<MCRURN> results = criteria.list();
-        LOGGER.info("This took " + (System.currentTimeMillis() - start) + " ms");
-        LOGGER.info("Processing the result list");
+        LOGGER.debug("This took " + (System.currentTimeMillis() - start) + " ms");
+        LOGGER.debug("Processing the result list");
+
         for (MCRURN result : results) {
-            LOGGER.info("Processing urn " + result.getURN());
+            LOGGER.debug("Processing urn " + result.getURN());
             start = System.currentTimeMillis();
-            String path = result.getPath().trim();
-            if (path.length() > 0 && path.charAt(0) == '/') {
-                path = path.substring(1);
-            }
-            path += result.getFilename().trim();
-            if (path.length() > 0) {
+
+            String path = result.getPath();
+            String filename = result.getFilename();
+
+            if (path != null && filename != null) {
+                path = path.trim();
+                if (path.length() > 0 && path.charAt(0) == '/') {
+                    path = path.substring(1);
+                }
+
+                path += filename.trim();
+
                 Element file = document.createElement("file");
                 file.setAttribute("urn", result.getKey().getMcrurn());
                 file.setAttribute("name", path);
                 rootElement.appendChild(file);
+
             } else {
                 rootElement.setAttribute("mcrid", result.getKey().getMcrid());
                 rootElement.setAttribute("urn", result.getKey().getMcrurn());
             }
             session.evict(result);
             long duration = System.currentTimeMillis() - start;
-            LOGGER.info("URN processed in " + duration + " ms");
+            LOGGER.debug("URN processed in " + duration + " ms");
         }
         LOGGER.info("Processing all URN took " + (System.currentTimeMillis() - temp) + " ms");
         return rootElement.getChildNodes();
