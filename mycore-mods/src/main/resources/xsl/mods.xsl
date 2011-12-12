@@ -578,6 +578,12 @@
         <xsl:with-param name="layout" select="$layout" />
       </xsl:call-template>
     </xsl:variable>
+    <xsl:variable name="editURL_allMods">
+      <xsl:call-template name="mods.getObjectEditURL">
+        <xsl:with-param name="id" select="$id" />
+        <xsl:with-param name="layout" select="'all'" />
+      </xsl:call-template>
+    </xsl:variable>
     <xsl:if test="$objectHost = 'local'">
       <xsl:choose>
         <xsl:when test="acl:checkPermission($id,'writedb') or acl:checkPermission($id,'deletedb')">
@@ -621,6 +627,11 @@
                     </xsl:otherwise>
                   </xsl:choose>
                 </li>
+              </xsl:if>
+              <xsl:if test="$CurrentUser=$MCR.Users.Superuser.UserName">
+                <li><a href="{$editURL_allMods}">
+                  <xsl:value-of select="i18n:translate('object.editAllModsXML')" />
+                </a></li>
               </xsl:if>
               </ul>
             </div>
