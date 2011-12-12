@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?><MyCoReWebPage>
+  <section title="MODS-Dokument bearbeiten" xml:lang="de"/>
+  <section title="Edit MODS document" xml:lang="en"/>
+  <section xml:lang="all">
+    <div class="borderbox">
+      <editor id="edit-mods-all">
+        <source uri="xslStyle:mods2editor-viatxt:{sourceUri}"/>
+        <cancel url="{cancelUrl}"/>
+        <postprocessor class="org.mycore.frontend.editor.postprocessor.MCREditorPostProcessorXSL" stylesheet="editor2mods-viatxt.xsl"/>
+        <target type="servlet" name="UpdateObjectServlet" method="post" format="xml"/>
+        <validationMessage>
+          <label xml:lang="de">Eingabefehler: Bitte korrigieren Sie die markierten Felder.</label>
+          <label xml:lang="en">Inputerror: Please correct the marked fields.</label>
+        </validationMessage>
+        <components xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" root="edit-mods-all" var="/mycoreobject">
+          <include uri="webapp:editor/editor-mods-all.xml"/>
+        </components>
+      </editor>
+    </div>
+  </section>
+</MyCoReWebPage>
