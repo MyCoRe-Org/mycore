@@ -16,14 +16,17 @@
   <xsl:template match="*">
     <xsl:text>&lt;</xsl:text>
     <xsl:value-of select="name()"/>
-      <xsl:for-each select="@*">
-        <xsl:value-of select="' '" />
-        <xsl:value-of select="name()" />
-        <xsl:value-of select="'='" />
-        <xsl:text>"</xsl:text>
-        <xsl:value-of select="." />
-        <xsl:text>"</xsl:text>
-      </xsl:for-each>
+    <xsl:if test="name()='mods'">
+      <xsl:text> xmlns="http://www.loc.gov/mods/v3"</xsl:text>
+    </xsl:if>
+    <xsl:for-each select="@*">
+      <xsl:value-of select="' '" />
+      <xsl:value-of select="name()" />
+      <xsl:value-of select="'='" />
+      <xsl:text>"</xsl:text>
+      <xsl:value-of select="." />
+      <xsl:text>"</xsl:text>
+    </xsl:for-each>
     <xsl:text>&gt;</xsl:text>
     <xsl:apply-templates/>
     <xsl:text>&lt;/</xsl:text>
