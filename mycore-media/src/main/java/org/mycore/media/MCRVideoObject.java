@@ -111,6 +111,14 @@ public class MCRVideoObject extends MCRMediaObject {
         return frameRate;
     }
     
+    public long getMaxSeekPosition() {
+        return duration;
+    }
+    
+    public boolean hasThumbnailSupport() {
+        return true;
+    }
+    
     public int[] getScaledSize(int maxWidth, int maxHeight, boolean keepAspect) {
         int scaledSize [] = new int[2];
         
@@ -147,7 +155,7 @@ public class MCRVideoObject extends MCRMediaObject {
      *              set to keep aspect ratio
      * @throws Exception
      */
-    public synchronized byte[] getThumbnail( MCRVideoObject media, long seek, int maxWidth, int maxHeight, boolean keepAspect ) throws Exception {
+    public synchronized byte[] getThumbnail( MCRMediaObject media, long seek, int maxWidth, int maxHeight, boolean keepAspect ) throws Exception {
         MCRExternalProcess ep;
         try {
             File tmpFile = File.createTempFile("MCRVideoObject", ".png");

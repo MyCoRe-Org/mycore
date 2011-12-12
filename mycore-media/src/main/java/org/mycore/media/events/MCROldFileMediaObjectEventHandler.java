@@ -3,18 +3,18 @@ package org.mycore.media.events;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandler;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.ifs.MCROldFile;
 
-import org.mycore.media.MCRMediaParser;
 import org.mycore.media.MCRMediaObject;
+import org.mycore.media.MCRMediaParser;
 import org.mycore.media.services.MCRMediaIFSTools;
 
 
+@SuppressWarnings("deprecation")
 public class MCROldFileMediaObjectEventHandler implements MCREventHandler {
     private static Logger LOGGER = Logger.getLogger( MCREventManager.class );
     
@@ -25,8 +25,6 @@ public class MCROldFileMediaObjectEventHandler implements MCREventHandler {
 
       if( MCREvent.UPDATE_EVENT.equals( evt.getEventType() ) )
       {
-          String storeURI = MCRConfiguration.instance().getString("MCR.IFS.ContentStore." + file.getStoreID() + ".URI");
-          
           try {
               MCRMediaParser mparser = new MCRMediaParser();
               
@@ -37,9 +35,13 @@ public class MCROldFileMediaObjectEventHandler implements MCREventHandler {
                   deleteMetadata( file );
                   storeMetadata( media, file );
                   
-                  deleteThumbnail( file );
-                  storeThumbnail( media, file );
+                  if (media.hasThumbnailSupport()) {
+                      deleteThumbnail( file );
+                      storeThumbnail( media, file );
+                  }
               }
+              
+              mparser.close();
           } catch ( Exception ex ) {
               LOGGER.warn( ex.getMessage() );
           }

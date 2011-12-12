@@ -198,6 +198,39 @@ public class MCRMediaObject implements Cloneable {
         return sb.toString();
     }
     
+    /**
+     * Returns the maximal seek position of the MediaObject if supported.
+     * 
+     * @return 0 if not supported
+     */
+    public long getMaxSeekPosition() {
+        return 0;
+    }
+    
+    /**
+     * Has media thumbnail support?
+     * 
+     * @return true or false
+     */
+    public boolean hasThumbnailSupport() {
+        return false;
+    }
+    
+    /**
+     * Returns an ByteArray with the thumbnail in PNG format.
+     * 
+     * @param media
+     * @param seek
+     * @param maxWidth
+     * @param maxHeight
+     * @param keepAspect
+     * @return the Image in PNG format
+     * @throws Exception
+     */
+    public synchronized byte[] getThumbnail( MCRMediaObject media, long seek, int maxWidth, int maxHeight, boolean keepAspect ) throws Exception {
+        return null;
+    }
+    
     @Override
     public String toString() {
         String  out = fileName + " (" + fileSize +")\n";

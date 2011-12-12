@@ -43,8 +43,11 @@ public class MCRMediaTagObject implements Cloneable {
     protected int       trackPosition;
     
     //people
+    protected String    author;
+    protected String    creator;
     protected String    performer;
     protected String    performerURL;
+    protected String    producer;
     protected String    accompaniment;
     protected String    composer;
     protected String    arranger;

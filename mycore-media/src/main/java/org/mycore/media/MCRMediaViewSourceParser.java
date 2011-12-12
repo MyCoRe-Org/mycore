@@ -1,6 +1,6 @@
 /*
  * 
- * $Revision$ $Date$
+ * $Revision: 21346 $ $Date: 2011-06-30 14:53:10 +0200 (Do, 30. Jun 2011) $
  *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
@@ -38,6 +38,8 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRUtils;
+import org.mycore.datamodel.ifs.MCRFileReader;
+import org.mycore.datamodel.ifs.MCROldFile;
 
 /**
  * Parse the output of the Helix ViewSource HTML page and create the 
@@ -45,17 +47,26 @@ import org.mycore.common.MCRUtils;
  * 
  * It is only used as fallback if the MediaInfoParser fails.
  * 
- * @author René Adler (Eagle)
+ * @author Ren\u00E9 Adler (Eagle)
  *
  */
-public class MCRMediaViewSourceParser {
+@SuppressWarnings("deprecation")
+public class MCRMediaViewSourceParser extends MCRMediaParser {
     private static final String[] supportedFileExts = { "ogg", "ogm", "avi", "wav", "mpeg", "mpg", "vob", "mp4", "mpgv", "mpv", "m1v", "m2v",
                                                         "mp2", "mp3", "asf", "wma", "wmv", "qt", "mov", "rm", "rmvb", "ra", "flv", "f4v", "flac",
                                                         "dat", "w64" };
     
     private static final Logger LOGGER = Logger.getLogger( MCRMediaViewSourceParser.class );
+    private static MCRMediaViewSourceParser instance;
     
-    public MCRMediaViewSourceParser() {}
+    private static MCRConfiguration config = MCRConfiguration.instance();
+    
+    public static MCRMediaViewSourceParser getInstance() {
+        instance = new MCRMediaViewSourceParser();
+        return instance;
+    }
+    
+    private MCRMediaViewSourceParser() {}
     
     /**
      * Checks if ViewSource parser is valid.
@@ -102,14 +113,69 @@ public class MCRMediaViewSourceParser {
     }
     
     /**
+     * Checks if given file is supported.
+     * 
+     * @param MCROldFile file
+     * @return boolean if true
+     */
+    public boolean isFileSupported(MCROldFile file) {
+        return isFileSupported(toFile(file));
+    }
+
+    /**
+     * Checks if given file is supported.
+     * 
+     * @param MCRFile file
+     * @return boolean if true
+     */
+    public boolean isFileSupported(org.mycore.datamodel.ifs.MCRFile file) {
+        return isFileSupported(toFile(file));
+    }
+
+    /**
+     * Checks if given file is supported.
+     * 
+     * @param MCRFileReader file
+     * @return boolean if true
+     */
+    public boolean isFileSupported(MCRFileReader file) {
+        return isFileSupported(toFile(file));
+    }
+    
+    public synchronized MCRMediaObject parse( File file ) throws Exception {
+        throw new Exception("File is'n supported by ViewSource Parser");
+    }
+    
+    public synchronized MCRMediaObject parse(MCROldFile file) throws Exception {
+        return setFileInfo(parse(buildViewSourceURL(file)), toFile(file));
+    }
+
+    public synchronized MCRMediaObject parse(org.mycore.datamodel.ifs.MCRFile file) throws Exception {
+        return setFileInfo(parse(buildViewSourceURL(file)), toFile(file));
+    }
+
+    public synchronized MCRMediaObject parse(MCRFileReader file) throws Exception {
+        return setFileInfo(parse(buildViewSourceURL(file)), toFile(file));
+    }
+    
+    private MCRMediaObject setFileInfo(MCRMediaObject media, File file) {
+        media.fileName = file.getName();
+        String path = file.getAbsolutePath();
+        media.folderName = path.substring(path.indexOf(file.getName()));
+        
+        return media;
+    }
+    /**
      * Parse MediaInfrom of the given file and store metadata in related Object.
      * 
      * @return MCRMediaObject
      *              can be held any MCRMediaObject
      * @see MCRMediaObject#clone()
      */
-    public synchronized MCRMediaObject parse( String vsURL ) throws Exception {
+    private synchronized MCRMediaObject parse( String vsURL ) throws Exception {
         MCRMediaObject media = new MCRMediaObject();
+        
+        LOGGER.info("parse " + vsURL + "...");
         
         String data = getMetadata(vsURL);
 
@@ -362,5 +428,47 @@ public class MCRMediaViewSourceParser {
 
     protected static int getConnectTimeout() {
         return MCRConfiguration.instance().getInt("MCR.Media.ConnectTimeout", 1000);
+    }
+    
+    /**
+     * Builds ViewSource URL from configuration.
+     * 
+     * @param MCROldFile file
+     * @return String
+     * @throws Exception
+     */
+    private String buildViewSourceURL(MCROldFile file) throws Exception {
+        String prefix = "MCR.IFS.AVExtender." + file.getStoreID() + ".";
+        String baseMetadata = config.getString(prefix + "ViewSourceBaseURL", null);
+
+        return baseMetadata == null ? null : baseMetadata + file.getStorageID();
+    }
+
+    /**
+     * Builds ViewSource URL from configuration.
+     * 
+     * @param MCROldFile file
+     * @return String
+     * @throws Exception
+     */
+    private String buildViewSourceURL(org.mycore.datamodel.ifs.MCRFile file) throws Exception {
+        String prefix = "MCR.IFS.AVExtender." + file.getStoreID() + ".";
+        String baseMetadata = config.getString(prefix + "ViewSourceBaseURL");
+
+        return baseMetadata == null ? null : baseMetadata + file.getStorageID();
+    }
+
+    /**
+     * Builds ViewSource URL from configuration.
+     * 
+     * @param MCRFileReader file
+     * @return String
+     * @throws Exception
+     */
+    private String buildViewSourceURL(MCRFileReader file) throws Exception {
+        String prefix = "MCR.IFS.AVExtender." + file.getStoreID() + ".";
+        String baseMetadata = config.getString(prefix + "ViewSourceBaseURL");
+
+        return baseMetadata == null ? null : baseMetadata + file.getStorageID();
     }
 }
