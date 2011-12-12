@@ -131,10 +131,6 @@
     <servlet-name>MCRFileNodeServlet</servlet-name>
     <servlet-class>org.mycore.datamodel.ifs.MCRFileNodeServlet</servlet-class>
   </servlet>
-  <servlet id="FSMapper">
-    <servlet-name>MCRFSMapperServlet</servlet-name>
-    <servlet-class>org.mycore.frontend.servlets.MCRFSMapperServlet</servlet-class>
-  </servlet>
   <servlet id="StaticXMLFile">
     <servlet-name>MCRStaticXMLFileServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRStaticXMLFileServlet</servlet-class>
