@@ -55,12 +55,12 @@
   <title step="editor" type="mods" layout="book" xml:lang="de">Buch bearbeiten</title>
   <title step="editor" type="mods" layout="book" xml:lang="en">Edit Book</title>
 
-  <title step="author" type="mods" layout="journal" xml:lang="de">Zeitschrift erstellen</title>
-  <title step="author" type="mods" layout="journal" xml:lang="en">Create Journal</title>
-  <title step="commit" type="mods" layout="journal" xml:lang="de">Zeitschrift bearbeiten</title>
-  <title step="commit" type="mods" layout="journal" xml:lang="en">Edit Journal</title>
-  <title step="editor" type="mods" layout="journal" xml:lang="de">Zeitschrift bearbeiten</title>
-  <title step="editor" type="mods" layout="journal" xml:lang="en">Edit Journal</title>
+  <title step="author" type="mods" layout="journal" xml:lang="de">Zeitschrift/Serie erstellen</title>
+  <title step="author" type="mods" layout="journal" xml:lang="en">Create Journal/Series</title>
+  <title step="commit" type="mods" layout="journal" xml:lang="de">Zeitschrift/Serie bearbeiten</title>
+  <title step="commit" type="mods" layout="journal" xml:lang="en">Edit Journal/Series</title>
+  <title step="editor" type="mods" layout="journal" xml:lang="de">Zeitschrift/Serie bearbeiten</title>
+  <title step="editor" type="mods" layout="journal" xml:lang="en">Edit Journal/Series</title>
 
   <title step="author" type="mods" layout="article" xml:lang="de">Zeitschriftenaufsatz erstellen</title>
   <title step="author" type="mods" layout="article" xml:lang="en">Create Article</title>
