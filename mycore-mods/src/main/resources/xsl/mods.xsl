@@ -609,9 +609,18 @@
               </xsl:if>
               <xsl:if
                 test="acl:checkPermission($id,'deletedb') and (not(mcrxsl:hasURNDefined($id)) or (mcrxsl:hasURNDefined($id) and $CurrentUser=$MCR.Users.Superuser.UserName))">
-                <li><a href="{$ServletsBaseURL}object/delete{$HttpSession}?id={$id}" id="confirm_deletion">
-                  <xsl:value-of select="i18n:translate('object.delObject')" />
-                </a></li>
+                <li>
+                  <xsl:choose>
+                    <xsl:when test="/mycoreobject/structure/children/child">
+                      <xsl:value-of select="i18n:translate('object.hasChildren')" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <a href="{$ServletsBaseURL}object/delete{$HttpSession}?id={$id}" id="confirm_deletion">
+                        <xsl:value-of select="i18n:translate('object.delObject')" />
+                      </a>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </li>
               </xsl:if>
               </ul>
             </div>
