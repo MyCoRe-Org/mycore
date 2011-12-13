@@ -6,6 +6,191 @@
   <list id="language" type="dropdown" default="en">
     <include uri="classification:editor:-1:children:rfc4646" cacheable="false" />
   </list>
+  
+  <!-- typeOfResource -->
+  <text id="mods.typeOfResource.label" i18n="metaData.mods.dictionary.typeOfResource" />
+  <panel id="mods.typeOfResource">
+    <cell var="mods:typeOfResource">
+      <list id="mods.typeOfResource.list" type="dropdown">
+        <include ref="pleaseSelect" />
+        <item value="text">
+          <label xml:lang="de">Text</label>
+          <label xml:lang="en">text</label>
+        </item>
+        <item value="cartographic">
+          <label xml:lang="de">Kartografien</label>
+          <label xml:lang="en">cartographic</label>
+        </item>
+        <item value="notated music">
+          <label xml:lang="de">notierte Musik</label>
+          <label xml:lang="en">notated music</label>
+        </item>
+        <item value="sound recording">
+          <label xml:lang="de">Tonaufnahme</label>
+          <label xml:lang="en">sound recording</label>
+        </item>
+        <item value="sound recording-musical">
+          <label xml:lang="de">musikalische Tonaufnahme</label>
+          <label xml:lang="en">musical sound recording</label>
+        </item>
+        <item value="sound recording-nonmusical">
+          <label xml:lang="de">nichtmusikalische Tonaufnahme</label>
+          <label xml:lang="en">nonmusical sound recording</label>
+        </item>
+        <item value="still image">
+          <label xml:lang="de">Standbild</label>
+          <label xml:lang="en">still image</label>
+        </item>
+        <item value="moving image">
+          <label xml:lang="de">Filmaufnahme</label>
+          <label xml:lang="en">moving image</label>
+        </item>
+        <item value="three dimensional object">
+          <label xml:lang="de">3D-Objekt</label>
+          <label xml:lang="en">three dimensional object</label>
+        </item>
+        <item value="software, multimedia">
+          <label xml:lang="de">Software, Multimedia</label>
+          <label xml:lang="en">software, multimedia</label>
+        </item>
+        <item value="mixed material">
+          <label xml:lang="de">gemischtes Material</label>
+          <label xml:lang="en">mixed material</label>
+        </item>
+        <condition id="mods.typeOfResource.cond" required="true">
+          <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
+          <label xml:lang="en">Please select one entry!</label>
+        </condition>
+      </list>
+    </cell>
+  </panel>
+  <helpPopup id="mods.typeOfResource.help" width="900px" height="600px">
+    <label xml:lang="de">
+      <p>Folgende Optionen stehen zu Auswahl:</p>
+      <ul>
+        <li>
+          <strong>Text</strong>
+          &#8211; Ressourcen, die im Grunde textueller Natur sind.
+        </li>
+        <li>
+          <strong>Kartografien</strong>
+          &#8211; Inklusive Karten, Atlanten, Globen, digitale Karten und andere kartographische Produkte.
+        </li>
+    
+        <li>
+          <strong>notierte Musik</strong>
+          &#8211; Grafik, nicht realisierter Werke der Musik, sowohl in gedruckter als auch digitalisierter Form,
+           die die vier Komponenten des musikalischen Tons darstellen: Tonhöhe, Dauer, Klangfarbe und Lautstärke.
+        </li>
+        <li>
+          <strong>Tonaufnahme</strong>
+          &#8211; wird verwendet, wenn eine Mischung aus musikalischen und nichtmusikalischen Tonaufnahmen in einer 
+          Ressource verwendet wird oder wenn ein Benutzer nicht zwischen musikalischen und nichtmusikalischen
+          Tonaufnahmen unterscheiden kann oder will.
+        </li>
+        <li>
+          <strong>musikalische Tonaufnahme</strong>
+          &#8211; wird verwendet, wenn eine Ressource überwiegend eine musikalische Tonaufnahme ist.
+        </li>
+    
+        <li>
+          <strong>nichtmusikalische Tonaufnahme</strong>
+          &#8211; wird verwendet, wenn eine Ressource überwiegend eine nichtmusikalische Tonaufnahme ist.
+        </li>
+        <li>
+          <strong>Standbild</strong>
+          &#8211; Inklusive 2D-Bilder, Dias und Folien.
+        </li>
+        <li>
+          <strong>Filmaufnahme</strong>
+          &#8211; Inklusive bewegten Bildern und Videoaufnahmen, sowie TV-Programmen, digitalen Video- 
+          und animierten Computergrafiken &#8212; aber nicht Dias und Folien. Es enthält keine bewegten Bilder,
+          die in erster Linie Computerprogramme sind, wie Computerspiele oder Computer-orientierte Multimedia.
+          Diese sind in "Software, Multimedia" enthalten.
+        </li>
+    
+        <li>
+          <strong>3D-Objekt</strong>
+          &#8211; Enthält von Menschen geschaffene Objekte wie Modelle, Skulpturen, Kleidung und Spielzeug,
+          sowie natürlich vorkommende Objekte wie Proben, die für die Anzeige angeordnet worden sind.
+        </li>
+        <li>
+          <strong>Software, Multimedia</strong>
+          &#8211; Geeignet für alle elektronischen Ressourcen, ohne einen wesentlichen Aspekt der oben genannten
+          anderen Kategorien. Es beinhaltet: Software, numerische Daten, Computer-orientierte Multimedia,
+          Online-Systeme und Dienstleistungen.
+        </li>
+        <li>
+          <strong>gemischtes Material</strong>
+          &#8211; Zeigt an, dass es signifikante Materialien in zwei oder mehr Formen gibt.
+          Gemischtes Material umfasst Archivbestände und Sammlungen von Handschriften von Mischformen von Materialien,
+          wie Texte, Fotos und Tonaufnahmen.
+        </li>
+      </ul>
+    </label>
+    <label xml:lang="en">
+      <p>The following values may be used:</p>
+      <ul>
+        <li>
+          <strong>text</strong>
+          &#8211; Resources that are basically textual in nature.
+        </li>
+        <li>
+          <strong>cartographic</strong>
+          &#8211; Includes maps, atlases, globes, digital maps, and other cartographic items.
+        </li>
+    
+        <li>
+          <strong>notated music</strong>
+          &#8211; Graphic, non-realized representations of musical works, both in printed and digitized manifestations that represent the four
+          components of musical sound: pitch, duration, timbre, and loudness.
+        </li>
+        <li>
+          <strong>sound recording</strong>
+          &#8211; Used when a mixture of musical and nonmusical sound recordings occurs in a resource or when a user does not want to or cannot
+          make a distinction between musical and nonmusical.
+        </li>
+        <li>
+          <strong>sound recording-musical</strong>
+          &#8211; Used when a resource is predominately a musical sound recording.
+        </li>
+    
+        <li>
+          <strong>sound recording-nonmusical</strong>
+          &#8211; Used when the sound recording is nonmusical in nature.
+        </li>
+        <li>
+          <strong>still image</strong>
+          &#8211; Includes two-dimensional images and slides and transparencies.
+        </li>
+        <li>
+          <strong>moving image</strong>
+          &#8211; Includes motion pictures and videorecordings, as well as television programs, digital video, and animated computer
+          graphics&#8212;but not slides and transparencies. It does not include moving images that are primarily computer
+          programs, such as computer games or computer-oriented multimedia; these are included in &quot;software, multimedia&quot;.
+        </li>
+    
+        <li>
+          <strong>three dimensional object</strong>
+          &#8211; Includes man-made objects such as models, sculptures, clothing, and toys, as well as naturally occurring objects such as
+          specimens mounted for viewing.
+        </li>
+        <li>
+          <strong>software, multimedia</strong>
+          &#8211; Appropriate for any electronic resource without a significant aspect that indicates one of the other
+          categories. It includes: software, numeric data, computer-oriented multimedia, and online systems
+          and services.
+        </li>
+        <li>
+          <strong>mixed material</strong>
+          &#8211; Indicates that there are significant materials in two or more forms that are usually related by virtue of their having been
+          accumulated by or about a person or body. Mixed material includes archival fonds and manuscript
+          collections of mixed forms of materials, such as text, photographs, and sound recordings.
+        </li>
+      </ul>
+    </label>
+  </helpPopup>
+  <!-- typeOfResource END -->
 
   <!-- TITLE -->
   <text id="mods.title.label" i18n="metaData.mods.dictionary.title" />
@@ -1412,6 +1597,5 @@
       <label xml:lang="en">(please select)</label>
     </item>
   </list>
-
 
 </imports>
