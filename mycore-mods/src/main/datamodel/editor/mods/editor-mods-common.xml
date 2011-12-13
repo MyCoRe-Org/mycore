@@ -21,7 +21,7 @@
       </textarea>
     </cell>
   </panel>
-
+  
   <panel id="mods.title.optional">
     <cell anchor="NORTHWEST" var="mods:title">
       <textarea width="60" height="3" />
@@ -37,6 +37,23 @@
     </label>
   </helpPopup>
   <!-- TITLE END -->
+
+  <!-- TITLE HTML -->
+  <text id="mods.htmltitle.label" i18n="metaData.mods.dictionary.htmltitle" />
+  <panel id="mods.htmltitle">
+    <cell anchor="NORTHWEST" var="mods:title[@lang='x-html']">
+      <textarea id="mods.htmltitle.text" width="45" height="3" />
+    </cell>
+  </panel>
+  <helpPopup id="mods.htmltitle.help" width="400px" height="250px">
+    <label xml:lang="de">
+      Titel des Dokumentes in HTML-Form. Diese wird dann bevorzugt auf der Webseite ausgegeben.
+    </label>
+    <label xml:lang="en">
+      Title of document in html representation.
+    </label>
+  </helpPopup>
+  <!-- TITLE HTML END -->
 
   <!-- TITLE Translated -->
   <text id="mods.title.translated.label" i18n="metaData.mods.dictionary.translatedtitle" />
