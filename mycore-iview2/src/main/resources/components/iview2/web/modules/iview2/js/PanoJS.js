@@ -468,7 +468,7 @@ PanoJS.prototype = {
 		//xstart, ystart
 		var startx = Math.floor(rect.x/tileSize);
 		var starty = Math.floor(rect.y/tileSize);
-var count =0;
+
 		for (var column = 0; column < xTiles; column++) {
 			for (var row = 0; row < yTiles; row++) {
 				//get the associated tiles
@@ -660,13 +660,13 @@ var count =0;
 		var currentImage = this.iview.currentImage;
 		var dimensionsBefore = {'width' : currentImage.curWidth, 'height' :  currentImage.curHeight};	
 		this.zoomLevel += direction;
-		this.notifyViewerZoomed();			
 		var dimensionsAfter = {'width' : currentImage.curWidth, 'height' :  currentImage.curHeight};
 							
 		this.x = this.getNewViewerPosition(this.width, oldX, dimensionsBefore.width, dimensionsAfter.width);
 		this.y = this.getNewViewerPosition(this.height, oldY, dimensionsBefore.height, dimensionsAfter.height);			
 
 		this.prepareTiles();
+		this.notifyViewerZoomed();			
 		this.positionTiles();
 	},
 	
