@@ -375,7 +375,7 @@
       <panel>
         <cell anchor="NORTHWEST">
           <textfield id="mods.dateIssued.text" width="60" maxlength="512">
-            <condition id="mods.dateIssued.cond" required="true" type="datetime" format="yyyy-MM-dd">
+            <condition id="mods.dateIssued.cond" required="true" type="datetime" format="yyyy-MM-dd;yyyy-MM;yyyy">
               <label xml:lang="de">Tragen Sie hier das Datum der Veröffentlichung im ISO Format mit Bindestrich (YYYY-MM-DD) ein.</label>
               <label xml:lang="en">Enter the date of publication here in the ISO Format (YYYY-MM-DD).</label>
             </condition>
@@ -400,10 +400,12 @@
     <label xml:lang="de">
       Bei Konferenzbänden, Büchern geben Sie bitte das Erscheinungsjahr an,
       bei Filmen das Datum der Aufnahme, bei Promotionen das Datum der ersten Online Veröffentlichung.
-      Das Datum muss im ISO Format mit Bindestrich (YYYY-MM-DD)
+      Das Datum muss im ISO Format mit Bindestrich YYYY-MM-DD, YYYY-MM oder YYYY
       angegeben werden.
       <br />
-      Beispiel: 2003-01-27
+      Beispiel: 2003-01-27 oder 2010 oder 2009-01
+      <br />
+      
     </label>
     <label xml:lang="en">
       Date of Publication:
@@ -835,11 +837,7 @@
   <!-- Jahresberichts Klassifikation  END -->
 
   <!-- Jahresberichtsjahr -->
-  <text id="mods.arev.year.label">
-    <label xml:lang="de">Jahresberichtsjahr</label>
-    <label xml:lang="en">Annual review year</label>
-  </text>
-
+  <text id="mods.arev.year.label" i18n="metaData.mods.dictionary.annual_review_year" />
   <panel id="mods.arev.year">
     <cell anchor="NORTHWEST" var="mods:classification[@displayLabel='annual_review']/@edition">
       <textfield width="4" maxlength="4" />
@@ -855,11 +853,7 @@
 
 
   <!-- Bei Postern -> Größe [text] -->
-  <text id="mods.physicalDescription.label">
-    <label xml:lang="de">Umfang</label>
-    <label xml:lang="en">Physical Description</label>
-  </text>
-
+  <text id="mods.physicalDescription.label" i18n="metaData.mods.dictionary.extent" />
   <panel id="mods.physicalDescription">
     <cell anchor="NORTHWEST" var="mods:physicalDescription/mods:extent">
       <panel>
@@ -1163,11 +1157,7 @@
   <!-- Bandzählung END -->
 
   <!-- Seiten von bis -->
-  <text id="mods.book.pages.range.label">
-    <label xml:lang="de">Seiten von/bis</label>
-    <label xml:lang="en">Pages (Range)</label>
-  </text>
-
+  <text id="mods.book.pages.range.label" i18n="metaData.mods.dictionary.page_from_to" />
   <panel id="mods.book.pages.range">
     <cell anchor="WEST" var="mods:part/mods:extent[@unit='pages']">
       <panel>
