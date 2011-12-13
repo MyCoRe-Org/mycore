@@ -156,7 +156,7 @@ public class MCRMediaPDFParser extends MCRMediaParser {
 
             media.numPages = pdf.getNumberOfPages();
 
-            PDPage page = (PDPage) pages.get(1);
+            PDPage page = (PDPage) pages.get(0);
             PDRectangle rect = page.getMediaBox();
 
             media.width = Math.round(rect.getWidth());

@@ -40,19 +40,19 @@ import org.mycore.media.MCRVideoObject;
 public class MCRMediaAVExtender extends MCRAudioVideoExtender {
     /** The logger */
     private final static Logger LOGGER = Logger.getLogger(MCRMediaAVExtender.class);
-    
+
     /** The asset file this extender belongs to */
     protected MCRFileReader file;
-    
+
     protected MCRMediaObject media;
-    
+
     /**
      * Creates a new MCRAudioVideoExtender. The instance has to be initialized
      * by invoking init() before it can be used.
      */
     public MCRMediaAVExtender() {
     }
-    
+
     /**
      * Initializes this AudioVideoExtender and gets technical metadata from the
      * server that holds the streaming asset. Subclasses must override this
@@ -63,36 +63,36 @@ public class MCRMediaAVExtender extends MCRAudioVideoExtender {
      */
     public void init(MCRFileReader file) throws MCRPersistenceException {
         this.file = file;
-        
+
         try {
-            StringTokenizer tok = new StringTokenizer( file.getID(), "_" );
-            String documentID = tok.nextToken();
+            StringTokenizer tok = new StringTokenizer(file.getID(), "_");
+            tok.nextToken();
             String derivateID = tok.nextToken();
-            
+
             org.jdom.Document mediaXML = null;
-            LOGGER.info( "Get metadata for file " + file.getStoreID() + "@" + file.getStorageID() + "...");
+            LOGGER.info("Get metadata for file " + file.getStoreID() + "@" + file.getStorageID() + "...");
             try {
                 mediaXML = MCRMediaIFSTools.getMetadataFromStore(derivateID, file.getPath());
-            } catch ( Throwable e ) {
+            } catch (Throwable e) {
                 LOGGER.warn(e.getMessage());
             }
-            
-            if ( mediaXML != null ) {
-                LOGGER.info( "use metadata from Metadata Store.");
+
+            if (mediaXML != null) {
+                LOGGER.info("use metadata from Metadata Store.");
                 this.media = MCRMediaObject.buildFromXML(mediaXML.getRootElement());
             } else {
-                LOGGER.info( "get metadata from stored file.");
+                LOGGER.info("get metadata from stored file.");
                 MCRMediaParser mparser = new MCRMediaParser();
-                this.media = mparser.parse( file );
+                this.media = mparser.parse(file);
             }
-            
-            LOGGER.debug( media );
-        } catch ( Exception ex ) {
-            LOGGER.warn( ex.getMessage() );
+
+            LOGGER.debug(media);
+        } catch (Exception ex) {
+            LOGGER.warn(ex.getMessage());
             ex.printStackTrace();
         }
     }
-    
+
     /**
      * Returns the Media Object.
      * 
@@ -101,41 +101,41 @@ public class MCRMediaAVExtender extends MCRAudioVideoExtender {
     public MCRMediaObject getMediaObject() {
         return media;
     }
-    
+
     /**
      * Returns the Video Object if is a Video file.
      * 
      * @return the Video Object or null
      */
     public MCRVideoObject getVideoObject() {
-        return ( isVideo() ? (MCRVideoObject)media : null );
+        return (isVideo() ? (MCRVideoObject) media : null);
     }
-    
+
     /**
      * Returns the Audio Object if is a Audio file.
      * 
      * @return the Audio Object or null
      */
     public MCRAudioObject getAudioObject() {
-        return ( isAudio() ? (MCRAudioObject)media : null );
+        return (isAudio() ? (MCRAudioObject) media : null);
     }
-    
+
     /**
      * Checks if Media Object is a Video.
      * 
      * @return bool
      */
     public boolean isVideo() {
-        return ( media != null ? media.getType() == MCRMediaObject.MediaType.VIDEO : false );
+        return (media != null ? media.getType() == MCRMediaObject.MediaType.VIDEO : false);
     }
-    
+
     /**
      * Checks if Media Object is a Audio.
      * 
      * @return bool
      */
     public boolean isAudio() {
-        return ( media != null ? media.getType() == MCRMediaObject.MediaType.AUDIO : false );
+        return (media != null ? media.getType() == MCRMediaObject.MediaType.AUDIO : false);
     }
 
     /**
@@ -144,40 +144,44 @@ public class MCRMediaAVExtender extends MCRAudioVideoExtender {
      * @return the ID of the content type of this asset
      */
     public String getContentTypeID() {
-        if ( media.getMimeType() != null ) {
+        if (media.getMimeType() != null) {
             try {
-                LOGGER.info( "Try to detect file content type by mime type '" + media.getMimeType() + "'..." );
-                MCRFileContentType cType = MCRFileContentTypeFactory.getTypeByMimeType( media.getMimeType() );
+                LOGGER.info("Try to detect file content type by mime type '" + media.getMimeType() + "'...");
+                MCRFileContentType cType = MCRFileContentTypeFactory.getTypeByMimeType(media.getMimeType());
                 contentTypeID = cType.getID();
-            } catch ( Throwable ex ) {
-                LOGGER.info( "Try to detect file content type with extension '" + file.getExtension() + "'..." );
+            } catch (Throwable ex) {
+                LOGGER.info("Try to detect file content type with extension '" + file.getExtension() + "'...");
                 try {
-                    MCRFileContentType cType = MCRFileContentTypeFactory.getType( file.getExtension() );
+                    MCRFileContentType cType = MCRFileContentTypeFactory.getType(file.getExtension());
                     contentTypeID = cType.getID();
-                } catch ( Throwable ex2 ) {
-                    LOGGER.info( "Try to detect file content type with format '" + media.getFormat() + "'..." );
-                    contentTypeID = detectContentTypeIDByFormat( media.getFormat() );
-                    if ( contentTypeID == null ) {
-                        LOGGER.info( "Try to detect file content type with subformat '" + ( isVideo() ? getVideoObject().getSubFormat() : getAudioObject().getSubFormat() ) + "'..." );
-                        contentTypeID = detectContentTypeIDByFormat( isVideo() ? getVideoObject().getSubFormat() : getAudioObject().getSubFormat() );
-                        if ( contentTypeID == null ) {
+                } catch (Throwable ex2) {
+                    LOGGER.info("Try to detect file content type with format '" + media.getFormat() + "'...");
+                    contentTypeID = detectContentTypeIDByFormat(media.getFormat());
+                    if (contentTypeID == null) {
+                        LOGGER.info("Try to detect file content type with subformat '"
+                                + (isVideo() ? getVideoObject().getSubFormat() : getAudioObject().getSubFormat()) + "'...");
+                        contentTypeID = detectContentTypeIDByFormat(isVideo() ? getVideoObject().getSubFormat() : getAudioObject()
+                                .getSubFormat());
+                        if (contentTypeID == null) {
                             contentTypeID = file.getContentTypeID();
                         }
                     }
                 }
             }
         } else {
-            LOGGER.info( "Try to detect file content type with extension '" + file.getExtension() + "'..." );
+            LOGGER.info("Try to detect file content type with extension '" + file.getExtension() + "'...");
             try {
-                MCRFileContentType cType = MCRFileContentTypeFactory.getType( file.getExtension() );
+                MCRFileContentType cType = MCRFileContentTypeFactory.getType(file.getExtension());
                 contentTypeID = cType.getID();
-            } catch ( Throwable ex2 ) {
-                LOGGER.info( "Try to detect file content type with format '" + media.getFormat() + "'..." );
-                contentTypeID = detectContentTypeIDByFormat( media.getFormat() );
-                if ( contentTypeID == null ) {
-                    LOGGER.info( "Try to detect file content type with subformat '" + ( isVideo() ? getVideoObject().getSubFormat() : getAudioObject().getSubFormat() ) + "'..." );
-                    contentTypeID = detectContentTypeIDByFormat( isVideo() ? getVideoObject().getSubFormat() : getAudioObject().getSubFormat() );
-                    if ( contentTypeID == null ) {
+            } catch (Throwable ex2) {
+                LOGGER.info("Try to detect file content type with format '" + media.getFormat() + "'...");
+                contentTypeID = detectContentTypeIDByFormat(media.getFormat());
+                if (contentTypeID == null) {
+                    LOGGER.info("Try to detect file content type with subformat '"
+                            + (isVideo() ? getVideoObject().getSubFormat() : getAudioObject().getSubFormat()) + "'...");
+                    contentTypeID = detectContentTypeIDByFormat(isVideo() ? getVideoObject().getSubFormat() : getAudioObject()
+                            .getSubFormat());
+                    if (contentTypeID == null) {
                         contentTypeID = file.getContentTypeID();
                     }
                 }
@@ -186,16 +190,16 @@ public class MCRMediaAVExtender extends MCRAudioVideoExtender {
 
         return contentTypeID;
     }
-    
+
     /**
      * Returns the ID of the content type witch detected by parsing format string.
      * 
      * @param can be the format of the media container or the subformat of stream.
      * @return the ID of the content type
      */
-    private String detectContentTypeIDByFormat( String format ) {
+    private String detectContentTypeIDByFormat(String format) {
         String cType = null;
-        
+
         if (format.indexOf("MPEG Layer 3") >= 0) {
             cType = "mp3";
         } else if (format.indexOf("MPEG") >= 0) {
@@ -209,9 +213,10 @@ public class MCRMediaAVExtender extends MCRAudioVideoExtender {
         } else if (format.indexOf("Wave File") >= 0) {
             cType = "wav";
         }
-        
+
         return cType;
     }
-    
-    public void getPlayerStarterTo(OutputStream out, String startPos, String stopPos) throws MCRPersistenceException {};
+
+    public void getPlayerStarterTo(OutputStream out, String startPos, String stopPos) throws MCRPersistenceException {
+    };
 }

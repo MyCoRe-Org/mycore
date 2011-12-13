@@ -63,7 +63,7 @@ public class MCROldFileMediaObjectEventHandler implements MCREventHandler {
     
     private void deleteMetadata( MCROldFile file ) throws MCRException {
         StringTokenizer tok = new StringTokenizer( file.getOwnerID(), "_" );
-        String documentID = tok.nextToken();
+        tok.nextToken();
         String derivateID = tok.nextToken();
         
         try {
@@ -75,7 +75,7 @@ public class MCROldFileMediaObjectEventHandler implements MCREventHandler {
     
     private void storeMetadata( Object media, MCROldFile file ) throws MCRException {
         StringTokenizer tok = new StringTokenizer( file.getOwnerID(), "_" );
-        String documentID = tok.nextToken();
+        tok.nextToken();
         String derivateID = tok.nextToken();
         
         try {
@@ -87,7 +87,7 @@ public class MCROldFileMediaObjectEventHandler implements MCREventHandler {
     
     private void deleteThumbnail( MCROldFile file ) throws MCRException {
         StringTokenizer tok = new StringTokenizer( file.getOwnerID(), "_" );
-        String documentID = tok.nextToken();
+        tok.nextToken();
         String derivateID = tok.nextToken();
         
         try {
@@ -99,7 +99,7 @@ public class MCROldFileMediaObjectEventHandler implements MCREventHandler {
     
     private void storeThumbnail( Object media, MCROldFile file ) throws MCRException {
         StringTokenizer tok = new StringTokenizer( file.getOwnerID(), "_" );
-        String documentID = tok.nextToken();
+        tok.nextToken();
         String derivateID = tok.nextToken();
         
         try {

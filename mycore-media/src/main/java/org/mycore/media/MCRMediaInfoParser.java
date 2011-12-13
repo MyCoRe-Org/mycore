@@ -65,7 +65,7 @@ public class MCRMediaInfoParser extends MCRMediaParser {
 
     private static final NativeLibExporter libExporter = NativeLibExporter.getInstance();
 
-    private static MCRMediaInfoParser instance;
+    private static MCRMediaInfoParser instance = new MCRMediaInfoParser();
 
     private MediaInfo MI;
 
@@ -84,7 +84,6 @@ public class MCRMediaInfoParser extends MCRMediaParser {
     }
 
     public static MCRMediaInfoParser getInstance() {
-        instance = new MCRMediaInfoParser();
         return instance;
     }
 

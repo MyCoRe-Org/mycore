@@ -52,22 +52,22 @@ import org.mycore.datamodel.ifs.MCROldFile;
  */
 @SuppressWarnings("deprecation")
 public class MCRMediaViewSourceParser extends MCRMediaParser {
-    private static final String[] supportedFileExts = { "ogg", "ogm", "avi", "wav", "mpeg", "mpg", "vob", "mp4", "mpgv", "mpv", "m1v", "m2v",
-                                                        "mp2", "mp3", "asf", "wma", "wmv", "qt", "mov", "rm", "rmvb", "ra", "flv", "f4v", "flac",
-                                                        "dat", "w64" };
-    
-    private static final Logger LOGGER = Logger.getLogger( MCRMediaViewSourceParser.class );
-    private static MCRMediaViewSourceParser instance;
-    
+    private static final String[] supportedFileExts = { "ogg", "ogm", "avi", "wav", "mpeg", "mpg", "vob", "mp4", "mpgv", "mpv", "m1v",
+            "m2v", "mp2", "mp3", "asf", "wma", "wmv", "qt", "mov", "rm", "rmvb", "ra", "flv", "f4v", "flac", "dat", "w64" };
+
+    private static final Logger LOGGER = Logger.getLogger(MCRMediaViewSourceParser.class);
+
+    private static MCRMediaViewSourceParser instance = new MCRMediaViewSourceParser();
+
     private static MCRConfiguration config = MCRConfiguration.instance();
-    
+
     public static MCRMediaViewSourceParser getInstance() {
-        instance = new MCRMediaViewSourceParser();
         return instance;
     }
-    
-    private MCRMediaViewSourceParser() {}
-    
+
+    private MCRMediaViewSourceParser() {
+    }
+
     /**
      * Checks if ViewSource parser is valid.
      * 
@@ -77,41 +77,42 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
         //TODO: check if ViewSource url is set
         return true;
     }
-        
+
     /**
      * Checks if given file is supported.
      * 
      * @param String fileName
      * @return boolean if true
      */
-    public boolean isFileSupported( String fileName ) {
+    public boolean isFileSupported(String fileName) {
         if (fileName.endsWith(".")) {
             return false;
         }
 
         int pos = fileName.lastIndexOf(".");
-        if ( pos != -1 ) {
+        if (pos != -1) {
             String ext = fileName.substring(pos + 1);
-            
-            for ( String sExt:supportedFileExts ) {
-                if ( !sExt.equals(ext) ) continue;
+
+            for (String sExt : supportedFileExts) {
+                if (!sExt.equals(ext))
+                    continue;
                 return isValid() && true;
             }
         }
-        
+
         return false;
     }
-    
+
     /**
      * Checks if given file is supported.
      * 
      * @param file
      * @return boolean if true
      */
-    public boolean isFileSupported( File file ) {
-        return isFileSupported( file.getPath() );
+    public boolean isFileSupported(File file) {
+        return isFileSupported(file.getPath());
     }
-    
+
     /**
      * Checks if given file is supported.
      * 
@@ -141,11 +142,11 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
     public boolean isFileSupported(MCRFileReader file) {
         return isFileSupported(toFile(file));
     }
-    
-    public synchronized MCRMediaObject parse( File file ) throws Exception {
+
+    public synchronized MCRMediaObject parse(File file) throws Exception {
         throw new Exception("File is'n supported by ViewSource Parser");
     }
-    
+
     public synchronized MCRMediaObject parse(MCROldFile file) throws Exception {
         return setFileInfo(parse(buildViewSourceURL(file)), toFile(file));
     }
@@ -157,14 +158,15 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
     public synchronized MCRMediaObject parse(MCRFileReader file) throws Exception {
         return setFileInfo(parse(buildViewSourceURL(file)), toFile(file));
     }
-    
+
     private MCRMediaObject setFileInfo(MCRMediaObject media, File file) {
         media.fileName = file.getName();
         String path = file.getAbsolutePath();
         media.folderName = path.substring(path.indexOf(file.getName()));
-        
+
         return media;
     }
+
     /**
      * Parse MediaInfrom of the given file and store metadata in related Object.
      * 
@@ -172,162 +174,165 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
      *              can be held any MCRMediaObject
      * @see MCRMediaObject#clone()
      */
-    private synchronized MCRMediaObject parse( String vsURL ) throws Exception {
+    private synchronized MCRMediaObject parse(String vsURL) throws Exception {
         MCRMediaObject media = new MCRMediaObject();
-        
+
         LOGGER.info("parse " + vsURL + "...");
-        
+
         String data = getMetadata(vsURL);
 
         String startKTag = "<strong>";
-        String endKTag   = "</strong>";
+        String endKTag = "</strong>";
         String endVTags[] = { "<br>", "</font>" };
-        
+
         String step = "general";
-        
+
         try {
             MCRAudioObject audio = null;
-            
+
             StringTokenizer st = new StringTokenizer(data, "\n\r");
             while (st.hasMoreTokens()) {
                 String line = st.nextToken().trim();
-                
+
                 String key = null;
-                if ( line.indexOf(startKTag) != -1  && line.indexOf(endKTag) != -1 ) {
-                    key = line.substring( line.indexOf(startKTag)+startKTag.length(), line.indexOf(endKTag) ).trim();
+                if (line.indexOf(startKTag) != -1 && line.indexOf(endKTag) != -1) {
+                    key = line.substring(line.indexOf(startKTag) + startKTag.length(), line.indexOf(endKTag)).trim();
                 }
-                
-                if ( key != null ) {
-                    String value = line.substring( line.indexOf(endKTag)+endKTag.length() );
-                    for ( String endVTag:endVTags ) {
-                        if ( value.indexOf(endVTag) != -1 ) {
+
+                if (key != null) {
+                    String value = line.substring(line.indexOf(endKTag) + endKTag.length());
+                    for (String endVTag : endVTags) {
+                        if (value.indexOf(endVTag) != -1) {
                             value = value.substring(0, value.indexOf(endVTag)).trim();
                             break;
                         }
                     }
-                    
-                    if ( key.startsWith("Stream:") ) {
-                        if ( key.equals("Stream:" ) )
+
+                    if (key.startsWith("Stream:")) {
+                        if (key.equals("Stream:"))
                             step = "general";
-                        else if ( "video stream".equals(value.toLowerCase()) )
+                        else if ("video stream".equals(value.toLowerCase()))
                             step = "video";
-                        else if ( "avi stream".equals(value.toLowerCase()) )
+                        else if ("avi stream".equals(value.toLowerCase()))
                             step = "video";
-                        else if ( "audio stream".equals(value.toLowerCase()) )
+                        else if ("audio stream".equals(value.toLowerCase()))
                             step = "audio";
-                        
-                        if ( "video".equals(step) ) {
-                            if ( media.type == null ) {
+
+                        if ("video".equals(step)) {
+                            if (media.type == null) {
                                 media.type = MCRMediaObject.MediaType.VIDEO;
-                                media = (MCRVideoObject)media.clone();
-                            } else if ( media.type == MCRMediaObject.MediaType.AUDIO ) {
-                                audio = (MCRAudioObject)media.clone();
-                                media = (MCRVideoObject)media.clone();
+                                media = (MCRVideoObject) media.clone();
+                            } else if (media.type == MCRMediaObject.MediaType.AUDIO) {
+                                audio = (MCRAudioObject) media.clone();
+                                media = (MCRVideoObject) media.clone();
                                 media.type = MCRMediaObject.MediaType.VIDEO;
                                 audio.parentContainer = media;
                             }
-                        } else if ( "audio".equals(step) ) {
-                            if ( media.type == null ) {
+                        } else if ("audio".equals(step)) {
+                            if (media.type == null) {
                                 media.type = MCRMediaObject.MediaType.AUDIO;
-                                media = (MCRAudioObject)media.clone();
-                                audio = (MCRAudioObject)media;
-                            } else if ( media.type == MCRMediaObject.MediaType.VIDEO ) {
+                                media = (MCRAudioObject) media.clone();
+                                audio = (MCRAudioObject) media;
+                            } else if (media.type == MCRMediaObject.MediaType.VIDEO) {
                                 audio = new MCRAudioObject(media);
                                 audio.duration = media.duration;
-                                ((MCRVideoObject)media).audioCodes.add(audio);
+                                ((MCRVideoObject) media).audioCodes.add(audio);
                             }
                         }
                     }
-                    
+
                     LOGGER.debug(key + " " + value);
-                    
-                    if ( "general".equals(step) ) {
-                        if ( "MIME type:".equals(key) ) {
-                            if ( value.startsWith("video") )
+
+                    if ("general".equals(step)) {
+                        if ("MIME type:".equals(key)) {
+                            if (value.startsWith("video"))
                                 step = "video";
-                            else if ( value.startsWith("audio") )
+                            else if (value.startsWith("audio"))
                                 step = "audio";
-                            
-                            if ( "video".equals(step) ) {
-                                if ( media.type == null ) {
+
+                            if ("video".equals(step)) {
+                                if (media.type == null) {
                                     media.type = MCRMediaObject.MediaType.VIDEO;
-                                    media = (MCRVideoObject)media.clone();
-                                } else if ( media.type == MCRMediaObject.MediaType.AUDIO ) {
-                                    audio = (MCRAudioObject)media.clone();
-                                    media = (MCRVideoObject)media.clone();
+                                    media = (MCRVideoObject) media.clone();
+                                } else if (media.type == MCRMediaObject.MediaType.AUDIO) {
+                                    audio = (MCRAudioObject) media.clone();
+                                    media = (MCRVideoObject) media.clone();
                                     media.type = MCRMediaObject.MediaType.VIDEO;
                                     audio.parentContainer = media;
                                 }
-                            } else if ( "audio".equals(step) ) {
-                                if ( media.type == null ) {
+                            } else if ("audio".equals(step)) {
+                                if (media.type == null) {
                                     media.type = MCRMediaObject.MediaType.AUDIO;
                                     media.mimeType = value;
-                                    media = (MCRAudioObject)media.clone();
-                                    audio = (MCRAudioObject)media;
-                                } else if ( media.type == MCRMediaObject.MediaType.VIDEO ) {
+                                    media = (MCRAudioObject) media.clone();
+                                    audio = (MCRAudioObject) media;
+                                } else if (media.type == MCRMediaObject.MediaType.VIDEO) {
                                     audio = new MCRAudioObject(media);
                                     audio.duration = media.duration;
-                                    ((MCRVideoObject)media).audioCodes.add(audio);
+                                    ((MCRVideoObject) media).audioCodes.add(audio);
                                 }
                             }
-                        } else if ( key.equals("Stream:" ) ) {
-                            media.formatFull = ( value.indexOf(" -") != -1 ? value.substring(0, value.indexOf(" -")) : value );
-                            if ( media.formatFull.indexOf(" Stream") != -1 )
+                        } else if (key.equals("Stream:")) {
+                            media.formatFull = (value.indexOf(" -") != -1 ? value.substring(0, value.indexOf(" -")) : value);
+                            if (media.formatFull.indexOf(" Stream") != -1)
                                 media.formatFull = media.format = media.formatFull.substring(0, media.formatFull.indexOf(" Stream"));
-                        } else if ( "File Name:".equals(key) )
+                        } else if ("File Name:".equals(key))
                             media.fileName = value;
-                        else if ( "File Size:".equals(key) )
+                        else if ("File Size:".equals(key))
                             media.fileSize = Long.parseLong((value.substring(0, value.indexOf(" "))).replaceAll(",", ""));
-                        else if ( "Duration:".equals(key) ) {
+                        else if ("Duration:".equals(key)) {
                             StringTokenizer st1 = new StringTokenizer(value, ":.");
                             int durationMinutes = Integer.parseInt(st1.nextToken());
                             int durationSeconds = Integer.parseInt(st1.nextToken());
                             int durationMilSeconds = Integer.parseInt(st1.nextToken());
-                            
+
                             media.duration = durationMinutes * 3600000 + durationSeconds * 60000 + durationMilSeconds;
-                        } else if ( "Avg Bit Rate:".equals(key) ) {
+                        } else if ("Avg Bit Rate:".equals(key)) {
                             media.bitRate = Math.round(1024 * Float.valueOf(value.substring(0, value.indexOf(" "))).floatValue());
-                        } else if ( key.equals("Title:") || key.equals("Author:") || key.equals("Copyright:") ) {
-                            
-                            if ( media.tags == null ) media.tags = new MCRMediaTagObject();
-                            
+                        } else if (key.equals("Title:") || key.equals("Author:") || key.equals("Copyright:")) {
+
+                            if (media.tags == null)
+                                media.tags = new MCRMediaTagObject();
+
                             //Container Infos
-                            if ( key.equals("Title:") && value.length() != 0 )
+                            if (key.equals("Title:") && value.length() != 0)
                                 media.tags.title = value;
-                            else if ( key.equals("Author:") && value.length() != 0 )
+                            else if (key.equals("Author:") && value.length() != 0)
                                 media.tags.performer = value;
-                            else if ( key.equals("Copyright:") && value.length() != 0 )
+                            else if (key.equals("Copyright:") && value.length() != 0)
                                 media.tags.comment = value;
                         }
-                    } else if ( "video".equals(step) ) {
-                        if ( "MIME type:".equals(key) ) {
-                            if ( media.mimeType == null ) media.mimeType = value;
-                        } else if ( "Avg Stream Bit Rate:".equals(key) ) {
-                            ((MCRVideoObject)media).streamBitRate = Math.round(1024 * Float.valueOf(value.substring(0, value.indexOf(" "))).floatValue());
-                        } else if ( "Dimensions:".equals(key) ) {
+                    } else if ("video".equals(step)) {
+                        if ("MIME type:".equals(key)) {
+                            if (media.mimeType == null)
+                                media.mimeType = value;
+                        } else if ("Avg Stream Bit Rate:".equals(key)) {
+                            ((MCRVideoObject) media).streamBitRate = Math.round(1024 * Float
+                                    .valueOf(value.substring(0, value.indexOf(" "))).floatValue());
+                        } else if ("Dimensions:".equals(key)) {
                             StringTokenizer st1 = new StringTokenizer(value, "x");
-                            ((MCRVideoObject)media).width = Integer.parseInt(st1.nextToken());
-                            ((MCRVideoObject)media).height = Integer.parseInt(st1.nextToken());
-                        } else if ( "Encoded Frame Rate:".equals(key) ) {
+                            ((MCRVideoObject) media).width = Integer.parseInt(st1.nextToken());
+                            ((MCRVideoObject) media).height = Integer.parseInt(st1.nextToken());
+                        } else if ("Encoded Frame Rate:".equals(key)) {
                             StringTokenizer st1 = new StringTokenizer(value.substring(0, value.indexOf("fps")), " ,");
 
                             while (st1.hasMoreTokens()) {
                                 float fvalue = Float.valueOf(st1.nextToken()).floatValue();
-                                ((MCRVideoObject)media).frameRate = Math.max(((MCRVideoObject)media).frameRate, fvalue);
+                                ((MCRVideoObject) media).frameRate = Math.max(((MCRVideoObject) media).frameRate, fvalue);
                             }
-                        } else if ( "Video Codec:".equals(key) ) {
-                            if ( value.indexOf("(") != -1 ) {
-                                ((MCRVideoObject)media).subFormatFull = value.substring(value.indexOf("(")+1, value.indexOf(")"));
-                                if ( ((MCRVideoObject)media).subFormatFull.indexOf(" ") != -1 ) {
-                                    StringTokenizer st1 = new StringTokenizer(((MCRVideoObject)media).subFormatFull, " ");
-                                    ((MCRVideoObject)media).subFormat = st1.nextToken();
-                                    ((MCRVideoObject)media).subFormatVersion = st1.nextToken();
+                        } else if ("Video Codec:".equals(key)) {
+                            if (value.indexOf("(") != -1) {
+                                ((MCRVideoObject) media).subFormatFull = value.substring(value.indexOf("(") + 1, value.indexOf(")"));
+                                if (((MCRVideoObject) media).subFormatFull.indexOf(" ") != -1) {
+                                    StringTokenizer st1 = new StringTokenizer(((MCRVideoObject) media).subFormatFull, " ");
+                                    ((MCRVideoObject) media).subFormat = st1.nextToken();
+                                    ((MCRVideoObject) media).subFormatVersion = st1.nextToken();
                                 }
                             }
                         }
-                    } else if ( "audio".equals(step) ) {
-                        if ( "MIME type:".equals(key) ) {
-                            if ( value.startsWith("video") ) {
+                    } else if ("audio".equals(step)) {
+                        if ("MIME type:".equals(key)) {
+                            if (value.startsWith("video")) {
                                 step = "video";
                                 media = new MCRVideoObject();
                                 media.format = audio.format;
@@ -337,39 +342,41 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
                                 media.duration = audio.duration;
                                 media.bitRate = audio.bitRate;
                                 media.mimeType = value;
-                                
-                                ((MCRVideoObject)media).audioCodes.add(audio);
+
+                                ((MCRVideoObject) media).audioCodes.add(audio);
                                 audio.parentContainer = media;
-                            } else if ( audio.mimeType == null ) audio.mimeType = value;
-                        } else if ( "Avg Stream Bit Rate:".equals(key) ) {
+                            } else if (audio.mimeType == null)
+                                audio.mimeType = value;
+                        } else if ("Avg Stream Bit Rate:".equals(key)) {
                             audio.streamBitRate = Math.round(1024 * Float.valueOf(value.substring(0, value.indexOf(" "))).floatValue());
-                        } else if ( "Max Stream Bit Rate:".equals(key) && audio.streamBitRate == 0 ) {
+                        } else if ("Max Stream Bit Rate:".equals(key) && audio.streamBitRate == 0) {
                             audio.streamBitRate = Math.round(1024 * Float.valueOf(value.substring(0, value.indexOf(" "))).floatValue());
-                        } else if ( "Audio Codec:".equals(key) ) {
-                            if ( value.indexOf("(") != -1 ) {
-                                audio.subFormatFull = value.substring(value.indexOf("(")+1, value.indexOf(")"));
-                                if ( audio.subFormatFull.indexOf(" ") != -1 ) {
+                        } else if ("Audio Codec:".equals(key)) {
+                            if (value.indexOf("(") != -1) {
+                                audio.subFormatFull = value.substring(value.indexOf("(") + 1, value.indexOf(")"));
+                                if (audio.subFormatFull.indexOf(" ") != -1) {
                                     StringTokenizer st1 = new StringTokenizer(audio.subFormatFull, " ");
                                     audio.subFormat = st1.nextToken();
                                     audio.subFormatVersion = st1.nextToken();
                                 }
-                                
-                                if ( value.indexOf("Khz") != -1 ) {
-                                    audio.samplingRate = Integer.parseInt(value.substring(value.indexOf(")")+1, value.indexOf("Khz")).trim());
+
+                                if (value.indexOf("Khz") != -1) {
+                                    audio.samplingRate = Integer.parseInt(value.substring(value.indexOf(")") + 1, value.indexOf("Khz"))
+                                            .trim());
                                 }
                             }
                         }
                     }
                 }
             }
-        } catch ( Exception e ) {
-            LOGGER.error( e.getMessage() );
-            throw new Exception( e.getMessage() );
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            throw new Exception(e.getMessage());
         }
-        
+
         return media;
     }
-        
+
     /**
      * Helper method that reads all data from an URLConnection input stream and
      * forwards it to the given output stream.
@@ -384,7 +391,7 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
         MCRUtils.copyStream(in, out);
         out.close();
     }
-    
+
     /**
      * Helper method that creates a URLConnection to a given URL and wraps
      * possible IOException or MalformedURLExceptions
@@ -429,7 +436,7 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
     protected static int getConnectTimeout() {
         return MCRConfiguration.instance().getInt("MCR.Media.ConnectTimeout", 1000);
     }
-    
+
     /**
      * Builds ViewSource URL from configuration.
      * 

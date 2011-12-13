@@ -32,6 +32,22 @@ public class MCRPDFObject extends MCRMediaObject {
         this.numPages = numPages;
     }
 
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
     public long getMaxSeekPosition() {
         return numPages;
     }
@@ -78,55 +94,53 @@ public class MCRPDFObject extends MCRMediaObject {
     @SuppressWarnings("unchecked")
     public synchronized byte[] getThumbnail(MCRMediaObject media, long seek, int maxWidth, int maxHeight, boolean keepAspect)
             throws Exception {
+        byte[] imageInByte = null;
+
+        PDDocument pdf = PDDocument.load(new File(media.folderName + media.fileName));
+
         try {
-            byte[] imageInByte = null;
+            List<PDPage> pages = pdf.getDocumentCatalog().getAllPages();
 
-            PDDocument pdf = PDDocument.load(new File(media.folderName + media.fileName));
+            PDPage page = (PDPage) pages.get((int) seek);
 
-            if (!pdf.isEncrypted()) {
-                List<PDPage> pages = pdf.getDocumentCatalog().getAllPages();
+            BufferedImage image = page.convertToImage(BufferedImage.TYPE_INT_RGB, 96);
 
-                PDPage page = (PDPage) pages.get((int) seek);
+            int[] scaledSize = ((MCRPDFObject) media).getScaledSize(maxWidth, maxHeight, keepAspect);
 
-                BufferedImage image = page.convertToImage(BufferedImage.TYPE_INT_RGB, 96);
+            BufferedImage resized = new BufferedImage(scaledSize[0], scaledSize[1], image.getType());
+            Graphics2D g = resized.createGraphics();
+            g.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+            g.drawImage(image, 0, 0, scaledSize[0], scaledSize[1], 0, 0, image.getWidth(), image.getHeight(), null);
+            g.dispose();
 
-                int[] scaledSize = ((MCRPDFObject) media).getScaledSize(maxWidth, maxHeight, keepAspect);
-
-                BufferedImage resized = new BufferedImage(scaledSize[0], scaledSize[1], image.getType());
-                Graphics2D g = resized.createGraphics();
-                g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-                g.drawImage(image, 0, 0, scaledSize[0], scaledSize[1], 0, 0, image.getWidth(), image.getHeight(), null);
-                g.dispose();
-
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                ImageIO.write(resized, "png", baos);
-                baos.flush();
-                imageInByte = baos.toByteArray();
-                baos.close();
-            }
-
-            pdf.close();
-
-            return imageInByte;
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(image, "png", baos);
+            baos.flush();
+            imageInByte = baos.toByteArray();
+            baos.close();
         } catch (Exception e) {
             throw new Exception(e.getMessage());
+        } finally {
+            pdf.close();
         }
+
+        return imageInByte;
     }
 
     /**
      * Output metadata as XML.
      * 
-     * @param withRoot
-     *                  complete output or only stream info
      * @return an JDOM Element
      */
-    public Element toXML(boolean withRoot) {
+    public Element toXML() {
         Element xml;
 
         xml = new Element("media");
         xml.setAttribute("type", "text");
         createElement(xml, "@mimeType", mimeType);
         createElement(xml, "@numPages", String.valueOf(numPages));
+        createElement(xml, "@width", String.valueOf(width));
+        createElement(xml, "@height", String.valueOf(height));
 
         if (!XMLwithoutFileInfo) {
             Element file = new Element("file");
@@ -152,11 +166,13 @@ public class MCRPDFObject extends MCRMediaObject {
         MCRPDFObject pdf = new MCRPDFObject();
 
         pdf.numPages = Integer.parseInt(getXMLValue(xml, "@numPages"));
+        pdf.width = Integer.parseInt(getXMLValue(xml, "@width"));
+        pdf.height = Integer.parseInt(getXMLValue(xml, "@height"));
 
         pdf.fileSize = Long.parseLong(getXMLValue(xml, "file/@size", "0"));
         pdf.folderName = getXMLValue(xml, "file/@path");
         pdf.fileName = getXMLValue(xml, "file");
-        
+
         Element elmTags = xml.getChild("tags");
         if (elmTags != null)
             pdf.tags = MCRMediaTagObject.buildFromXML(elmTags);
