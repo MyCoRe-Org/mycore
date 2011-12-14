@@ -40,5 +40,9 @@ public class MCRDateTimeValidatorTest extends MCRValidatorTest {
         validator.setProperty("format", "dd.MM.yyyy ; yyyy-MM-dd");
         assertTrue(validator.isValid("22.04.1971"));
         assertTrue(validator.isValid("1971-04-22"));
+        
+        validator.setProperty("format", "yyyy-MM-dd;yyyy-MM;yyyy");
+        assertFalse(validator.isValid("200904"));
+        assertFalse(validator.isValid("04.2010"));
     }
 }
