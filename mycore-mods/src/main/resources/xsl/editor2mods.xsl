@@ -5,6 +5,23 @@
   exclude-result-prefixes="gnd rdf mcrmods mcr xalan java" version="1.0">
 
   <xsl:include href="copynodes.xsl" />
+  <xsl:include href="editor2mods-external.xsl" />
+
+  <xsl:template match="mods:mods">
+    <xsl:copy>
+      <xsl:apply-templates select='@*' />
+      <xsl:if test="not(mods:typeOfResource)">
+        <xsl:apply-templates select="." mode="typeOfResource" />
+      </xsl:if>
+      <xsl:apply-templates select='node()' />
+    </xsl:copy>
+  </xsl:template>
+  
+  <xsl:template match="mods:mods" mode="typeOfResource">
+    <mods:typeOfResource>
+      <xsl:value-of select="'text'"/>
+    </mods:typeOfResource>
+  </xsl:template>
 
   <xsl:template match="mods:titleInfo">
     <!-- copy only if subelement has text nodes -->
@@ -29,7 +46,7 @@
       </xsl:copy>
     </xsl:if>
   </xsl:template>
-  
+
   <xsl:template match="mods:namePartDate">
     <mods:namePart type="date">
       <xsl:apply-templates select="@*|node()" />
