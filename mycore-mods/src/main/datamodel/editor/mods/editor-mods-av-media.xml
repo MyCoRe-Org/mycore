@@ -25,7 +25,13 @@
     <cell row="10" col="2" anchor="NORTHWEST" ref="mods.title" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" style="padding-top:5px;" />
     <cell row="10" col="3" anchor="NORTHWEST" ref="mods.title.help" style="padding-top:5px;" />
     <!-- TITLE END -->
-    
+
+    <!-- pub_title_html [text] -->
+    <cell row="15" col="1" anchor="NORTHEAST" ref="mods.htmltitle.label" />
+    <cell row="15" col="2" anchor="NORTHWEST" ref="mods.htmltitle" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
+    <cell row="15" col="3" anchor="NORTHWEST" ref="mods.htmltitle.help" />
+    <!-- pub_title_html [text] END -->
+
     <!-- pub_subtitle [text] -->
     <cell row="20" col="1" anchor="NORTHEAST" ref="mods.subtitle.label" />
     <cell row="20" col="2" anchor="NORTHWEST" ref="mods.subtitle" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />

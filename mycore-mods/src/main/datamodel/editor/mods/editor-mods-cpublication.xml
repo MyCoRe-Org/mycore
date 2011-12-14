@@ -28,6 +28,12 @@
     <cell row="10" col="3" anchor="NORTHWEST" ref="mods.title.help" />
     <!-- TITLE END -->
 
+    <!-- pub_title_html [text] -->
+    <cell row="15" col="1" anchor="NORTHEAST" ref="mods.htmltitle.label" />
+    <cell row="15" col="2" anchor="NORTHWEST" ref="mods.htmltitle" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
+    <cell row="15" col="3" anchor="NORTHWEST" ref="mods.htmltitle.help" />
+    <!-- pub_title_html [text] END -->
+
     <!-- pub_title_engl[text] -->
     <cell row="20" col="1" anchor="NORTHEAST" ref="mods.title.translated.label" />
     <cell row="20" col="2" anchor="NORTHWEST" ref="mods.title.translated" var="metadata/def.modsContainer/modsContainer/mods:mods" />
