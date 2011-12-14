@@ -23,7 +23,7 @@
     </cell>
 
     <!-- Serie (Verweis auf MyCoRe-ID) -->
-    <cell row="2" colspan="3" anchor="NORTHWEST" ref="displaySeries" />
+    <cell row="2" colspan="3" anchor="NORTHWEST" ref="displaySeries" style="padding-top:5px;" />
 
     <!-- Title --> <!-- ToDo: wird abgelöst durch MyCoRe-Parent-Child-Beziehung! -->
     <cell row="10" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.title.label" />
@@ -87,9 +87,9 @@
     </cell>
     
     <!-- LANGUAGE -->
-    <cell row="120" col="1"  class="mandatory" anchor="NORTHEAST" ref="mods.languageTerm.label" />
-    <cell row="120" col="2" anchor="NORTHWEST" ref="mods.languageTerm" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
-    <cell row="120" col="3" anchor="NORTHWEST" ref="mods.languageTerm.help" />
+    <cell row="120" col="1"  class="mandatory" anchor="NORTHEAST" ref="mods.languageTerm.label" style="padding-top:5px;"/>
+    <cell row="120" col="2" anchor="NORTHWEST" ref="mods.languageTerm" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:language" style="padding-top:5px;" />
+    <cell row="120" col="3" anchor="NORTHWEST" ref="mods.languageTerm.help" style="padding-top:5px;"/>
     <!-- LANGUAGE END -->
     
     <!-- Abstract -->
@@ -128,9 +128,9 @@
     </cell>
     
     <!-- Identifier -->
-    <cell row="210" col="1" anchor="NORTHEAST" ref="mods.identifier.label" />
-    <cell row="210" col="2" anchor="NORTHWEST" ref="mods.identifier" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="210" col="3" anchor="NORTHWEST" ref="mods.identifier.help" />
+    <cell row="210" col="1" anchor="NORTHEAST" ref="mods.identifier.label" style="padding-top:5px;"/>
+    <cell row="210" col="2" anchor="NORTHWEST" ref="mods.identifier" var="metadata/def.modsContainer/modsContainer/mods:mods" style="padding-top:5px;"/>
+    <cell row="210" col="3" anchor="NORTHWEST" ref="mods.identifier.help" style="padding-top:5px;"/>
     <!-- Identifier END -->
     
     <!-- URL -->
@@ -148,9 +148,9 @@
     </cell>
     
     <!-- arev_klassifik -->
-    <cell row="310" col="1" anchor="NORTHEAST" ref="mods.arev.label" />
-    <cell row="310" col="2" anchor="NORTHWEST" ref="mods.arev" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="310" col="3" anchor="NORTHWEST" ref="mods.arev.help" />
+    <cell row="310" col="1" anchor="NORTHEAST" ref="mods.arev.label" style="padding-top:5px;" />
+    <cell row="310" col="2" anchor="NORTHWEST" ref="mods.arev" var="metadata/def.modsContainer/modsContainer/mods:mods" style="padding-top:5px;"/>
+    <cell row="310" col="3" anchor="NORTHWEST" ref="mods.arev.help" style="padding-top:5px;"/>
     <!-- arev_klassifik END -->
     
     <!-- arev_jahr -->
