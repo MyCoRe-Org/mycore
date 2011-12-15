@@ -1415,22 +1415,16 @@
   <!-- Seiten von bis END -->
 
 
-  <!-- Impact Factor -->
-  <text id="mods.impact.label" i18n="metaData.mods.dictionary.impact" />
-  <panel id="mods.impact">
-    <cell anchor="NORTHWEST" var="mods:extension[@displayLabel='impact']/stats">
+  <!-- Kenndaten -->
+  <text id="mods.characteristics.label" i18n="metaData.mods.dictionary.characteristics" />
+  <panel id="mods.characteristics">
+    <cell anchor="NORTHWEST" var="mods:extension[@displayLabel='characteristics']/chars">
       <panel>
         <cell style="width:4.5em">
-          <text>
-            <label xml:lang="de">Jahr</label>
-            <label xml:lang="en">Year</label>
-          </text>
+          <text i18n="metaData.mods.dictionary.year" />
         </cell>
         <cell col="2" style="width:8.5em">
-          <text>
-            <label xml:lang="de">Faktor</label>
-            <label xml:lang="en">Factor</label>
-          </text>
+          <text i18n="metaData.mods.dictionary.impact" />
         </cell>
         <cell col="3">
           <text i18n="metaData.mods.dictionary.refereed" />
@@ -1463,13 +1457,20 @@
     </cell>
   </panel>
 
-  <helpPopup id="mods.impact.help">
-    <label xml:lang="de">Der Journal Impact Factor (JIF) wird pro Zeitschrift pro Jahr vergeben. Der Wert des JIF wird mit Punkt und drei Stellen nach dem
-      Punkt angegeben.
-      Beispiel: 2.203 oder 20.686</label>
-    <label xml:lang="en">Journal Impact Factor (JIF)</label>
+  <helpPopup id="mods.characteristics.help">
+    <label xml:lang="de">Zur Zeitschrift können hier pro Jahr weitere Kenndaten erfasst werden:
+      <ul>
+        <li>Journal Impact Factor (JIF)</li>
+        <li>ist referiert</li>
+      </ul>
+      Der Journal Impact Factor (JIF) wird pro Zeitschrift pro Jahr vergeben. Der Wert des JIF wird mit Punkt und drei Stellen nach dem
+      Punkt angegeben. Beispiel: 2.203 oder 20.686
+      <br />
+      Ist referiert ...
+    </label>
+    <label xml:lang="en">Characteristics: Journal Impact Factor (JIF) and is refereed</label>
   </helpPopup>
-  <!-- Impact Factor END -->
+  <!-- Kenndaten END -->
 
   <!-- URL [link] -->
   <text id="mods.location.url.label" i18n="metaData.mods.dictionary.url" />

@@ -188,22 +188,26 @@
     </tr>
   </xsl:template>
 
-  <xsl:template match="mods:extension[@displayLabel='impact']" mode="present">
+  <xsl:template match="mods:extension[@displayLabel='characteristics']" mode="present">
     <tr>
       <td valign="top" class="metaname">
-        <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.impact'),':')" />
+        <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.characteristics'),':')" />
       </td>
       <td class="metavalue">
-        <xsl:for-each select="stats">
-          <xsl:value-of select="@year" />
-          <xsl:text>: </xsl:text>
-          <xsl:value-of select="@factor" />
-          <xsl:text>, </xsl:text>
-          <xsl:value-of select="i18n:translate(concat('metaData.mods.dictionary.refereed.',@refereed))" />
-          <xsl:if test="position()!=last()">
-            <br />
-          </xsl:if>
-        </xsl:for-each>
+        <table>
+          <tr>
+            <th><xsl:value-of select="i18n:translate('metaData.mods.dictionary.year')" /></th>
+            <th><xsl:value-of select="i18n:translate('metaData.mods.dictionary.impact')" /></th>
+            <th><xsl:value-of select="i18n:translate('metaData.mods.dictionary.refereed')" /></th>
+          </tr>
+          <xsl:for-each select="chars">
+            <tr>
+              <td><xsl:value-of select="@year" /></td>
+              <td><xsl:value-of select="@factor" /></td>
+              <td><xsl:value-of select="i18n:translate(concat('metaData.mods.dictionary.refereed.',@refereed))" /></td>
+            </tr>
+          </xsl:for-each>
+        </table>
       </td>
     </tr>
   </xsl:template>
