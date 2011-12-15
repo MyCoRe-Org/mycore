@@ -1069,7 +1069,22 @@
   </panel>
 
   <helpPopup id="mods.arev.help" width="400px" height="250px">
-    <label xml:lang="de">Die für den Jahresbericht relevanten Dokumente müssen hier eine Zuordnung erhalten.</label>
+    <label xml:lang="de">
+      Die für den Jahresbericht relevanten Dokumente müssen hier eine Zuordnung erhalten.<br /><br />
+      Die Einträge wie „Im Druck“, „nicht zugeordnet“ oder „nicht im JB“ sind keine tatsächlichen
+      Jahresberichtskategorien. Sie dienen der Kontrolle der Jahresberichte und
+      bestimmen einen Zwischenstand bei der Eingruppierung einer Publikation.
+      Die Kontrolllisten eines vorläufigen Jahresberichtes, werden zur Ansicht
+      an alle Institute verschickt, um diese undefinierten Kategorien noch zu bestimmen.
+      <br /><br />
+      Nicht alle Publikationen werden in einen Jahresbericht aufgenommen. Bei
+      diesen Publikationen wird auch keine Kategorie eingegeben. Bei den
+      Publikationen, die theoretisch in einen Jahresbericht aufgenommen werden
+      könnten, dies aber aus einem bestimmten Grund doch nicht erfolgte, wird
+      der Eintrag „nicht im JB“ gemacht. Eine explizite Anmerkung, dass eine
+      Publikation nicht in einen Jahresbericht aufgenommen war, dient ebenfalls
+      einer Kontrolle.
+    </label>
     <label xml:lang="en">The annual report for the relevant documents have to receive an allocation.</label>
   </helpPopup>
   <!-- Jahresberichts Klassifikation  END -->
