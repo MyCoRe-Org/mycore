@@ -418,7 +418,23 @@
               </cell>
             </panel>
           </cell>
-          <cell col="2" row="1" anchor="NORTHEAST" ref="mods.name" />
+          <cell col="2" row="1" anchor="NORTHEAST">
+            <panel>
+              <hidden var="nameOrPND/@editor.output" />
+              <cell col="1" row="1" anchor="NORTHEAST">
+                <text>
+                  <label xml:lang="de">Name oder PND</label>
+                  <label xml:lang="en">Name or PND</label>
+                </text>
+              </cell>
+              <cell col="2" row="1" anchor="NORTHEAST" var="nameOrPND">
+                <textfield width="31" maxlength="128" />
+              </cell>
+              <cell col="2" row="2" anchor="NORTHEAST">
+                <output var="nameOrPND/@editor.output" default="" />
+              </cell>
+            </panel>
+          </cell>
         </panel>
       </repeater>
     </cell>
