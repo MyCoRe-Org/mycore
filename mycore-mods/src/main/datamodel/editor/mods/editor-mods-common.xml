@@ -1245,6 +1245,13 @@
   </helpPopup>
   <!-- Place END -->
 
+  <!-- Volume -->
+  <helpPopup id="mods.volume.help" width="400px" height="250px">
+    <label xml:lang="de">Wenn es sich um einen Teil einer Serie handelt, kann hier Band, Volume bzw. Jahrgang angeben werden.</label>
+    <label xml:lang="en">Volume</label>
+  </helpPopup>
+  <!-- Volume END -->
+
   <!-- Country of publication -->
   <text id="mods.countryOfPublication.label" i18n="metaData.mods.dictionary.countryOfTerm" />
   <panel id="mods.countryOfPublication">

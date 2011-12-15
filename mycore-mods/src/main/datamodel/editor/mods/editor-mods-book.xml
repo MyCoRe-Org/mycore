@@ -68,6 +68,12 @@
     <cell row="60" col="3" anchor="NORTHWEST" ref="mods.edition.help" />
     <!-- Edition END -->
 
+    <!-- Volume -->
+    <cell row="65" col="1" anchor="NORTHEAST"><text i18n="metaData.mods.dictionary.volume.article" /></cell>
+    <cell row="65" col="2" var="mods:detail[@type='volume']/mods:number" anchor="NORTHWEST" ref="TFzeile10" />
+    <cell row="65" col="3" anchor="NORTHWEST" ref="mods.volume.help" />
+    <!-- Volume END -->
+
     <!-- Place -->
     <cell row="70" col="1" anchor="NORTHEAST" ref="mods.book.place.label" />
     <cell row="70" col="2" anchor="NORTHWEST" ref="mods.book.place" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
@@ -79,14 +85,13 @@
     <cell row="80" col="2" anchor="NORTHWEST" ref="mods.countryOfPublication" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
     <cell row="80" col="3" anchor="NORTHWEST" ref="mods.countryOfPublication.help" />
     <!-- Country of publication END -->
-    
-    <!-- Erscheinungsjahr [text] -->
+
+    <!-- Datum der Veröffentlichung [text] -->
     <cell row="90" col="1" anchor="NORTHEAST" class="mandatory" ref="mods.dateIssued.book.label" />
     <cell row="90" col="2" anchor="NORTHWEST" ref="mods.dateIssued" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
     <cell row="90" col="3" anchor="NORTHWEST" ref="mods.dateIssued.help" />
     <!-- Datum der Veröffentlichung END -->
 
-    
     <!--  Erweiterte Angaben zum Dokument -->
     <cell row="100" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
       <text id="thesis.more" i18n="metaData.mods.dictionary.categorybox" />

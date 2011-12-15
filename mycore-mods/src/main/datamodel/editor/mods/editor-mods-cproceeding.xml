@@ -109,6 +109,12 @@
         <cell row="35" col="3" anchor="NORTHWEST" ref="mods.edition.help" />
     <!-- Edition END -->
 
+    <!-- Volume -->
+      <cell row="38" col="1" anchor="NORTHEAST"><text i18n="metaData.mods.dictionary.volume.article" /></cell>
+      <cell row="38" col="2" var="mods:detail[@type='volume']/mods:number" anchor="NORTHWEST" ref="TFzeile10" />
+      <cell row="38" col="3" anchor="NORTHWEST" ref="mods.volume.help" />
+    <!-- Volume END -->
+
     <!-- Herausgabejahr -->
         <cell row="40" col="1" anchor="NORTHEAST" ref="mods.dateIssued.book.label" />
         <cell row="40" col="2" anchor="NORTHWEST" ref="mods.dateIssued.optional" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
