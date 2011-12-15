@@ -13,7 +13,7 @@
     <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/@ID" />
     <hidden var="metadata/def.modsContainer/@class" default="MCRMetaXML" />
     <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:typeOfResource" default="text" />
-    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@mcr:categId" default="mods_genres:chapter" />
+    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@mcr:categId" default="bmelv_genres:chapter" />
     <hidden var="metadata/def.modsContainer/@notinherit" default="true" />
     <hidden var="metadata/def.modsContainer/@heritable" default="false" />
 

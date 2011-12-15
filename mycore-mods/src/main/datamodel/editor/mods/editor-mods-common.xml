@@ -1117,7 +1117,7 @@
         <cell var="@mcr:categId">
           <list width="30" type="dropdown" id="mods.genre.kindOfReport.list">
             <include ref="pleaseSelect" />
-            <include uri="classification:editorComplete:-1:children:mods_genres:report" cacheable="false" />
+            <include uri="classification:editorComplete:-1:children:bmelv_genres:report" cacheable="false" />
             <condition id="mods.genre.kindOfReport.cond" required="true">
               <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
               <label xml:lang="en">Please select one entry!</label>
@@ -1129,7 +1129,7 @@
   </panel>
 
   <helpPopup id="mods.genre.kindOfReport.help" width="400px" height="250px">
-    <label xml:lang="de">Eine Zuordnung zu einem in der Liste verfügbaren Genre .</label>
+    <label xml:lang="de">Eine Zuordnung zu einem in der Liste verfügbaren Genre.</label>
     <label xml:lang="en">Entry from the list.</label>
   </helpPopup>
   <!-- pub_genre END -->
@@ -1149,7 +1149,7 @@
         <cell var="@mcr:categId">
           <list width="30" type="dropdown" id="mods.genre.kindOfAVMedia.list">
             <include ref="pleaseSelect" />
-            <include uri="classification:editorComplete:-1:children:mods_genres:av" cacheable="false" />
+            <include uri="classification:editorComplete:-1:children:bmelv_genres:av" cacheable="false" />
             <condition id="mods.genre.kindOfAVMedia.cond" required="true">
               <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
               <label xml:lang="en">Please select one entry!</label>
@@ -1186,7 +1186,7 @@
         <cell var="@mcr:categId">
           <list width="30" type="dropdown" id="mods.genre.kindOfThesis.list">
             <include ref="pleaseSelect" />
-            <include uri="classification:editorComplete:-1:children:mods_genres:thesis" cacheable="false" />
+            <include uri="classification:editorComplete:-1:children:bmelv_genres:thesis" cacheable="false" />
             <condition id="mods.genre.kindOfThesis.cond" required="true">
               <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
               <label xml:lang="en">Please select one entry!</label>
@@ -1574,11 +1574,11 @@
       <hidden var="@type" default="intern" />
       <panel>
         <cell var="@mcr:categId">
-          <list type="radio" id="mods.genre.journal.list" default="mods_genres:journal">
-            <item value="mods_genres:journal">
+          <list type="radio" id="mods.genre.journal.list" default="bmelv_genres:journal">
+            <item value="bmelv_genres:journal">
               <label xml:lang="de">Zeitschrift</label>
             </item>
-            <item value="mods_genres:series">
+            <item value="bmelv_genres:series">
               <label xml:lang="de">Serie</label>
             </item>
           </list>

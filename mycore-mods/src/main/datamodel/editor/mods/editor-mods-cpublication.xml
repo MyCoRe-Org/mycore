@@ -11,7 +11,7 @@
 
     <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/@ID" />
     <hidden var="metadata/def.modsContainer/@class" default="MCRMetaXML" />
-    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@mcr:categId" default="mods_genres:confpub" />
+    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@mcr:categId" default="bmelv_genres:confpub" />
     <hidden var="metadata/def.modsContainer/@notinherit" default="true" />
     <hidden var="metadata/def.modsContainer/@heritable" default="false" />
 
@@ -80,7 +80,7 @@
         <cell var="@mcr:categId">
           <list width="30" type="dropdown" id="mods.genre.kindOfPublication.list">
             <include ref="pleaseSelect" />
-            <include uri="classification:editorComplete:-1:children:mods_genres:confpub" cacheable="false" />
+            <include uri="classification:editorComplete:-1:children:bmelv_genres:confpub" cacheable="false" />
             <condition id="mods.genre.kindOfPublication.cond" required="true">
               <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
               <label xml:lang="en">Please select one entry!</label>

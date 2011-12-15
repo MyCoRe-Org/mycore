@@ -119,7 +119,7 @@
   <xsl:template match="/mycoreobject" mode="breadCrumb" priority="1">
 
     <ul class="breadcrumb">
-      <li class="first"><a href="{$WebApplicationBaseURL}content/main/classifications/mods_genres.xml">Genre</a></li>
+      <li class="first"><a href="{$WebApplicationBaseURL}content/main/classifications/bmelv_genres.xml">Genre</a></li>
       <xsl:variable name="obj_host">
         <xsl:value-of select="$objectHost" />
       </xsl:variable>
