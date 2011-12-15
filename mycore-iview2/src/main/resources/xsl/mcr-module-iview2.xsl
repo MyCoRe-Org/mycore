@@ -7,7 +7,7 @@
   <xsl:param name="MCR.Module-iview2.PDFCreatorStyle" />
   <xsl:param name="WebApplicationBaseURL" />
   <xsl:param name="ServletsBaseURL" />
-  <xsl:variable name="jquery.version" select="'1.6.2'"/>
+  <xsl:variable name="jquery.version" select="'1.6.4'"/>
   <xsl:variable name="jqueryUI.version" select="'1.8.14'"/>
 
   <xsl:template name="iview2.getViewer" mode="iview2">
@@ -44,6 +44,23 @@
 	<xsl:param name="chapterEmbedded" select="'false'" />
     <xsl:param name="chapDynResize" select="'false'" />
     
+    <xsl:variable name="debugMode">
+      <xsl:variable name="parValue">
+        <xsl:call-template name="UrlGetParam">
+          <xsl:with-param name="url" select="$RequestURL"/>
+          <xsl:with-param name="par" select="'iview2.debug'"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:choose>
+        <xsl:when test="string-length($parValue)&gt;0">
+          <xsl:value-of select="$parValue" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$MCR.Module-iview2.DeveloperMode"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    
     <!-- thumbnail settings -->
     <xsl:param name="DampInViewer" select="'true'" />
     <xsl:if test="mcrxml:putVariable('iview2.init','done')!='done'">
@@ -55,7 +72,7 @@
       </script>
       
       <xsl:choose>
-        <xsl:when test="$MCR.Module-iview2.DeveloperMode='true'">
+        <xsl:when test="$debugMode='true'">
           <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/js/iview2.js"/>
         </xsl:when>
         <xsl:otherwise>
@@ -71,7 +88,7 @@
         <xsl:text>loadCssFile('</xsl:text>
         <xsl:value-of select="$WebApplicationBaseURL"/>
         <xsl:choose>
-          <xsl:when test="$MCR.Module-iview2.DeveloperMode='true'">
+          <xsl:when test="$debugMode='true'">
             <xsl:text>modules/iview2/gfx/default/iview2.css', 'iviewCss');</xsl:text>
           </xsl:when>
           <xsl:otherwise>
