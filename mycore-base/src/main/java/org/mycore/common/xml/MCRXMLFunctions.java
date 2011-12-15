@@ -615,7 +615,7 @@ public class MCRXMLFunctions {
 
     public static String putVariable(String key, String value) {
         String oldValue = MCRLayoutService.instance().getCurrentTransformationMap().put(key, value);
-        LOGGER.info("old value: " + oldValue);
+        LOGGER.debug("old value: " + oldValue);
         return oldValue != null ? oldValue : "";
     }
 
