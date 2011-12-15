@@ -23,6 +23,7 @@
 
 package org.mycore.iview2.frontend;
 
+import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -36,10 +37,11 @@ import org.mycore.iview2.services.MCRIView2Tools;
  *
  */
 public class MCRIView2XSLFunctionsAdapter {
+    private static Logger LOGGER = Logger.getLogger(MCRIView2XSLFunctionsAdapter.class);
 
     public static MCRIView2XSLFunctionsAdapter getInstance() {
-        return (MCRIView2XSLFunctionsAdapter) MCRConfiguration.instance().getInstanceOf(MCRIView2Tools.CONFIG_PREFIX + "MCRIView2XSLFunctionsAdapter",
-            MCRIView2XSLFunctionsAdapter.class.getName());
+        return (MCRIView2XSLFunctionsAdapter) MCRConfiguration.instance().getInstanceOf(
+                MCRIView2Tools.CONFIG_PREFIX + "MCRIView2XSLFunctionsAdapter", MCRIView2XSLFunctionsAdapter.class.getName());
     }
 
     public boolean hasMETSFile(String derivateID) {
@@ -63,11 +65,12 @@ public class MCRIView2XSLFunctionsAdapter {
         options.append("\"baseUri\":").append('\"').append(baseUris).append("\".split(\",\"),");
         if (MCRAccessManager.checkPermission(derivateID, "create-pdf")) {
             options.append("\"pdfCreatorURI\":").append('\"').append(config.getString("MCR.Module-iview2.PDFCreatorURI", "")).append("\",");
-            options.append("\"pdfCreatorStyle\":").append('\"').append(config.getString("MCR.Module-iview2.PDFCreatorStyle", "")).append("\",");
+            options.append("\"pdfCreatorStyle\":").append('\"').append(config.getString("MCR.Module-iview2.PDFCreatorStyle", ""))
+                    .append("\",");
         }
         options.append(extensions);
         options.append('}');
-        System.out.println(options.toString());
+        LOGGER.debug(options.toString());
         return options.toString();
     }
 }
