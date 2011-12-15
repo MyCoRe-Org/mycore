@@ -43,7 +43,9 @@
 	<!-- chapter settings -->
 	<xsl:param name="chapterEmbedded" select="'false'" />
     <xsl:param name="chapDynResize" select="'false'" />
-    
+    <!-- thumbnail settings -->
+    <xsl:param name="DampInViewer" select="'true'" />
+
     <xsl:variable name="debugMode">
       <xsl:variable name="parValue">
         <xsl:call-template name="UrlGetParam">
@@ -61,8 +63,6 @@
       </xsl:choose>
     </xsl:variable>
     
-    <!-- thumbnail settings -->
-    <xsl:param name="DampInViewer" select="'true'" />
     <xsl:if test="mcrxml:putVariable('iview2.init','done')!='done'">
       <script type="text/javascript" src="http://www.google.com/jsapi"/>
       <script type="text/javascript">
