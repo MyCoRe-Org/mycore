@@ -846,6 +846,7 @@
               </item>
             </list>
           </cell>
+          <condition id="mods.identifier.cond" field1="@type" field2="." class="org.mycore.mods.MCRIdentifierValidator" method="validate" />
         </panel>
       </repeater>
     </cell>
