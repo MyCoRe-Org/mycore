@@ -1466,7 +1466,8 @@
       Der Journal Impact Factor (JIF) wird pro Zeitschrift pro Jahr vergeben. Der Wert des JIF wird mit Punkt und drei Stellen nach dem
       Punkt angegeben. Beispiel: 2.203 oder 20.686
       <br />
-      Ist referiert ...
+      Eine referierte Zeitschrift garantiert ein unabhängiges Begutachtungsverfahren eingereichter Artikel durch Fachkollegen. Das Kriterium "referiert"
+      oder "nicht referiert" steht dabei nicht in Zusammenhang mit dem "Impact Factor". 
     </label>
     <label xml:lang="en">Characteristics: Journal Impact Factor (JIF) and is refereed</label>
   </helpPopup>
