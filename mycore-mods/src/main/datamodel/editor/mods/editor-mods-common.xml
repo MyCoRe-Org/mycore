@@ -607,7 +607,12 @@
     <cell anchor="NORTHWEST" var="mods:dateCreated">
       <panel>
         <cell col="1">
-          <textfield width="60" maxlength="128" />
+          <textfield id="mods.dateCreated.text" width="60" maxlength="128" >
+          <condition id="mods.dateCreated.cond" required="false" type="datetime" format="yyyy-MM-dd;yyyy-MM;yyyy">
+              <label xml:lang="de">Tragen Sie hier das Datum der Veröffentlichung im ISO Format mit Bindestrich (YYYY-MM-DD) ein.</label>
+              <label xml:lang="en">Enter the date of publication here in the ISO Format (YYYY-MM-DD).</label>
+            </condition>
+            </textfield>
         </cell>
       </panel>
     </cell>
@@ -615,7 +620,11 @@
 
   <helpPopup id="mods.dateCreated.help" width="400px" height="250px">
     <label xml:lang="de">
-      Datum der Erstellung
+      Datum der Erstellung. Das Datum muss im ISO Format mit Bindestrich YYYY-MM-DD, YYYY-MM oder YYYY
+      angegeben werden.
+      <br />
+      Beispiel: 2003-01-27 oder 2010 oder 2009-01
+      <br />
     </label>
     <label xml:lang="en">
       Date of Creation
@@ -1085,6 +1094,18 @@
     </label>
   </helpPopup>
   <!-- Bei Postern -> Größe [text] END -->
+  
+  <helpPopup id="mods.physicalDescription.cpublication.help" width="400px" height="250px">
+    <label xml:lang="de">
+      Hier kann eine physikalische Beschreibung des Dokumentes erfolgen, z.B. bei
+      Postern die Größe, bei Vorträgen die Seitenzahlen. Ist der Beitrag Teil eines Konferenzbandes, 
+      können Sie das Feld "Seiten von/bis" ausfüllen.
+    </label>
+    <label xml:lang="en">
+      Physical description, e.g. size of poster
+    </label>
+  </helpPopup>
+  <!-- Bei Postern -> Größe [text] END -->
  
   <!-- pub_genre -->
   <text id="mods.genre.kindOfReport.label" i18n="metaData.mods.dictionary.genre" />
@@ -1387,7 +1408,8 @@
   </panel>
 
   <helpPopup id="mods.book.pages.range.help" width="400px" height="250px">
-    <label xml:lang="de">Seiten von/bis</label>
+    <label xml:lang="de">Wenn das Dokument Teil eines Buches, Konferenzbandes oder einer Zeitschrift ist, geben
+    Sie hier die Seiten von/bis im entsprechenden Medium an.</label>
     <label xml:lang="en">Pages (Range)</label>
   </helpPopup>
   <!-- Seiten von bis END -->
