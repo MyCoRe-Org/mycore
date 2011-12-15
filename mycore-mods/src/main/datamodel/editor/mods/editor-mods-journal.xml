@@ -15,10 +15,18 @@
     <hidden var="metadata/def.modsContainer/@heritable" default="false" />
     <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:typeOfResource" default="text" />
     
+    
+    <!-- Basisangaben zum Dokument -->
+    <cell row="1" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
+      <text id="journal.titles" i18n="metaData.mods.dictionary.journal" />
+      <text><label>/</label></text>
+      <text id="series.titles" i18n="metaData.mods.dictionary.series" />
+    </cell>
+    
     <!-- Genre Journal/Series -->
-    <cell row="5" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.genre.journal.label" />
-    <cell row="5" col="2" anchor="NORTHWEST" ref="mods.genre.journal" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="5" col="3" anchor="NORTHWEST" ref="mods.genre.journal.help" />
+    <cell row="5" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.genre.journal.label" style="padding-top:5px;" />
+    <cell row="5" col="2" anchor="NORTHWEST" ref="mods.genre.journal" var="metadata/def.modsContainer/modsContainer/mods:mods" style="padding-top:5px;" />
+    <cell row="5" col="3" anchor="NORTHWEST" ref="mods.genre.journal.help" style="padding-top:5px;" />
     <!-- Genre Journal/Series -->
     
     <!-- pub_title_orig [text] -->
@@ -45,10 +53,15 @@
     <cell row="21" col="3" anchor="NORTHWEST" ref="mods.shorttitle.help" />
     <!-- short title [text] END -->
 
+    <!--  Erweiterte Angaben zum Dokument -->
+    <cell row="22" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
+      <text id="journal.more" i18n="metaData.mods.dictionary.categorybox" />
+    </cell>
+
     <!-- Publisher [text] -->
-    <cell row="23" col="1" anchor="NORTHEAST" ref="mods.publisher.label" />
-    <cell row="23" col="2" anchor="NORTHWEST" ref="mods.publisher" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
-    <cell row="23" col="3" anchor="NORTHWEST" ref="mods.publisher.help" />
+    <cell row="23" col="1" anchor="NORTHEAST" ref="mods.publisher.label" style="padding-top:5px;" />
+    <cell row="23" col="2" anchor="NORTHWEST" ref="mods.publisher" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" style="padding-top:5px;" />
+    <cell row="23" col="3" anchor="NORTHWEST" ref="mods.publisher.help" style="padding-top:5px;" />
     <!-- Publisher END -->
 
     <!-- Identifier -->
