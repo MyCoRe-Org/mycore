@@ -111,7 +111,7 @@
 
     <!-- Volume -->
       <cell row="38" col="1" anchor="NORTHEAST"><text i18n="metaData.mods.dictionary.volume.article" /></cell>
-      <cell row="38" col="2" var="mods:detail[@type='volume']/mods:number" anchor="NORTHWEST" ref="TFzeile10" />
+      <cell row="38" col="2" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='host']/mods:part/mods:detail[@type='volume']/mods:number" anchor="NORTHWEST" ref="TFzeile10" />
       <cell row="38" col="3" anchor="NORTHWEST" ref="mods.volume.help" />
     <!-- Volume END -->
 
