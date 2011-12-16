@@ -771,7 +771,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             return;
         }
 
-        removeFromIndex("id", id);
         MCRBase obj = MCRMetadataManager.retrieve(mid);
         MCRMetadataManager.fireRepairEvent(obj);
         LOGGER.info("Repaired " + mid.toString());
