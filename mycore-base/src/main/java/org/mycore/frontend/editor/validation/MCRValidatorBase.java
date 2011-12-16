@@ -30,24 +30,16 @@ public abstract class MCRValidatorBase implements MCRValidator {
         try {
             isValid = isValidOrDie(input);
         } catch (Exception ex) {
-            logException(ex);
+            LOGGER.error("Error validating content", ex);
             isValid = false;
         }
 
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug(buildLogInfo(isValid, input));
+        LOGGER.debug(buildLogInfo(isValid, input));
 
         return isValid;
     }
 
     protected abstract boolean isValidOrDie(Object... input) throws Exception;
-
-    private void logException(Throwable ex) {
-        LOGGER.debug(getClass().getSimpleName() + " caught " + ex.toString());
-        ex = ex.getCause();
-        if (ex != null)
-            logException(ex);
-    }
 
     private String buildLogInfo(boolean isValid, Object... input) {
         StringBuffer buffer = new StringBuffer();
