@@ -433,7 +433,7 @@ public class MCREditorSubmission {
                     String field1 = condition.getAttributeValue("field1", "");
                     String field2 = condition.getAttributeValue("field2", "");
 
-                    if (!field1.isEmpty() || field2.isEmpty()) {
+                    if (!field1.isEmpty() || !field2.isEmpty()) {
                         String pathA = path + ((!field1.isEmpty() && !field1.equals(".")) ? "/" + field1 : "");
                         String pathB = path + ((!field2.isEmpty() && !field2.equals(".")) ? "/" + field2 : "");
 
