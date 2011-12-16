@@ -30,8 +30,8 @@
     <xs:attribute name="notinherit" type="xs:boolean" fixed="true" />
   </xs:attributeGroup>
   <xs:attributeGroup name="structureInheritance">
-    <xs:attribute name="heritable" type="xs:boolean" fixed="false" use="optional"/>
-    <xs:attribute name="notinherit" type="xs:boolean" fixed="true" use="optional"/>
+    <xs:attribute name="heritable" type="xs:boolean" fixed="false" use="optional" />
+    <xs:attribute name="notinherit" type="xs:boolean" fixed="true" use="optional" />
   </xs:attributeGroup>
   <xs:attributeGroup name="MCRMetaLangText">
     <xs:attribute ref="xml:lang" use="optional" />
@@ -71,10 +71,8 @@
     </xs:attribute>
   </xs:attributeGroup>
 
-  <!--
-    this is how a mycore object looks like: <structure> has to be defined elsewhere <metadata> has to be defined
-    elsewhere <service> is defined below
-  -->
+  <!-- this is how a mycore object looks like: <structure> has to be defined elsewhere <metadata> has to be defined elsewhere <service> is defined 
+    below -->
   <xs:element name="mycoreobject">
     <xs:complexType>
       <xs:all>
@@ -137,12 +135,13 @@
     </xs:complexType>
   </xs:element>
 
-  <!-- The service part which currently contains dates-->
+  <!-- The service part which currently contains dates -->
   <xs:element name="service">
     <xs:complexType>
       <xs:all>
         <xs:element ref="servdates" minOccurs="0" />
         <xs:element ref="servacls" minOccurs="0" />
+        <xs:element ref="servflags" minOccurs="0" />
       </xs:all>
     </xs:complexType>
   </xs:element>
@@ -187,6 +186,27 @@
       </xs:sequence>
       <xs:attribute name="permission" use="required" type="xs:string" />
       <xs:attributeGroup ref="notInherited" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="servflags">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="servflag" maxOccurs="unbounded" />
+      </xs:sequence>
+      <xs:attribute fixed="MCRMetaLangText" use="required" type="xs:string" name="class" />
+      <xs:attribute use="optional" type="xs:boolean" name="heritable" />
+      <xs:attribute use="optional" type="xs:boolean" name="notinherit" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="servflag">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="inherited" use="required" type="xs:integer" fixed="0" />
+          <xs:attribute name="type" type="xs:string" />
+          <xs:attributeGroup ref="MCRMetaLangText"/>
+        </xs:extension>
+      </xs:simpleContent>
     </xs:complexType>
   </xs:element>
 </xs:schema>
