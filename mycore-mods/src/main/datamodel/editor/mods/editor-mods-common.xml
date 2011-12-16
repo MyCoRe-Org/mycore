@@ -380,10 +380,9 @@
     <cell anchor="NORTHWEST" var="mods:name[@type='personal']">
       <repeater min="1" max="20" pos="right">
         <panel>
-          <cell col="1" row="1" anchor="NORTHEAST" var="mods:role/mods:roleTerm">
+          <cell col="1" row="1" anchor="NORTHEAST" var="mods:role/mods:roleTerm[@type='code']">
             <panel>
               <hidden var="@authority" default="marcrelator" />
-              <hidden var="@type" default="code" />
               <cell>
                 <list type="dropdown" default="aut" id="mods.person.list">
                   <include ref="pleaseSelect" />
@@ -406,10 +405,9 @@
     <cell anchor="NORTHWEST" var="mods:name[@type='personal']">
       <repeater min="1" max="20" pos="right">
         <panel>
-          <cell col="1" row="1" anchor="NORTHEAST" var="mods:role/mods:roleTerm">
+          <cell col="1" row="1" anchor="NORTHEAST" var="mods:role/mods:roleTerm[@type='code']">
             <panel>
               <hidden var="@authority" default="marcrelator" />
-              <hidden var="@type" default="code" />
               <cell>
                 <list type="dropdown" default="pbl" id="mods.person.publisher.list">
                   <include ref="pleaseSelect" />
