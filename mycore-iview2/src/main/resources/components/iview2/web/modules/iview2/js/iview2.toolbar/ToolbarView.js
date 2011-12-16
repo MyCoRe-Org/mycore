@@ -80,13 +80,29 @@ ToolbarView.prototype = {
 	 * @memberOf	ToolbarView#
 	 * @description adds a new text element to the toolbar view,
 	 *  a text element is simple place to show plain some information within the toolbar
-	 * @param		{String} args.elementName the name of the divider
+	 * @param		{String} args.elementName the name of the text element
 	 * @param		{String} args.text the content of the text element
 	 * @param		{integer} args.index the position between the other predefined elements where the new divider should be added
 	 * @return		{jQuery-Object} the text-element which was just added
 	 */        
     addText : function (args) {
     	return this._addElement(jQuery('<span>').addClass(args.elementName + ' ui-text').html(args.text),args.index);
+    },
+    
+    /**
+     * @public
+     * @function
+	 * @name		addImage
+	 * @memberOf	ToolbarView#
+	 * @description adds a new image element to the toolbar view,
+	 *  which displays the supplied image
+	 * @param		{String} args.elementName the name of the image (at the same time the class name)
+	 * @param		{String} args.src source of the image to display
+	 * @param		{integer} args.index the position between the other predefined elements where the new divider should be added
+	 * @return		{jQuery-Object} the image-element which was just added
+	 */
+    addImage : function (args) {
+    	return this._addElement(jQuery('<span>').addClass(args.elementName + ' ui-image').append(jQuery('<img>').attr("src", args.src)));
     },
     
     /**
