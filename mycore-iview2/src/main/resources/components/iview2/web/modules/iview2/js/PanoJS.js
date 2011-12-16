@@ -70,8 +70,7 @@ function PanoJS(viewer, options) {
 		options = {};
 	}
 
-	if (typeof options.tileUrlProvider != 'undefined'/* &&
-		PanoJS.isInstance(options.tileUrlProvider, PanoJS.TileUrlProvider)*/) {
+	if (typeof options.tileUrlProvider != 'undefined') {
 		this.tileUrlProvider = options.tileUrlProvider;
 	}
 	else {
@@ -124,8 +123,6 @@ function PanoJS(viewer, options) {
 	// employed to throttle the number of redraws that
 	// happen while the mouse is moving
 	this.moveCount = 0;
-//	this.slideMonitor = 0;
-//	this.slideAcceleration = 0;
 	this.inputHandlerEnabled=true;
 	
 	// add to viewer registry
@@ -172,22 +169,6 @@ PanoJS.GRABBING_MOUSE_CURSOR = (navigator.userAgent.search(/KHTML|Opera/i) >= 0 
 // registry of all known viewers
 PanoJS.VIEWERS = [];
 
-// utility functions
-//PanoJS.isInstance = function(object, clazz) {
-//	// FIXME: can this just be replaced with instanceof operator? It has been reported that __proto__ is specific to Netscape
-//	while (object != null) {
-//		if (object == clazz.prototype) {
-//			return true;
-//		}
-//
-//		object = object.__proto__;
-//	}
-//
-//	return false;
-//}
-////IE and Opera doesn't accept our TileUrlProvider Instance as one of PanoJS
-//PanoJS.isInstance = function () {return true;};
-
 PanoJS.prototype = {
 	/**
 	 * @function
@@ -219,47 +200,6 @@ PanoJS.prototype = {
 	  this.inputHandlerEnabled = true;
 	},
 
-//	/**
-//	 * Resize the viewer to fit snug inside the browser window (or frame),
-//	 * spacing it from the edges by the specified border.
-//	 *
-//	 * This method should be called prior to init()
-//	 * FIXME: option to hide viewer to prevent scrollbar interference
-//	 */
-//	fitToWindow : function(border) {
-//		if (typeof border != 'number' || border < 0) {
-//			border = 0;
-//		}
-//
-//		this.border = border;
-//		var calcWidth = 0;
-//		var calcHeight = 0;
-//		if (window.innerWidth) {
-//			calcWidth = window.innerWidth;
-//			calcHeight = window.innerHeight;
-//		}
-//		else {
-//			calcWidth = (document.compatMode == 'CSS1Compat' ? document.documentElement.clientWidth : document.body.clientWidth);
-//			calcHeight = (document.compatMode == 'CSS1Compat' ? document.documentElement.clientHeight : document.body.clientHeight);
-//		}
-//		
-//		calcWidth = Math.max(calcWidth - 2 * border, 0);
-//		calcHeight = Math.max(calcHeight - 2 * border, 0);
-//		if (calcWidth % 2) {
-//			calcWidth--;
-//		}
-//
-//		if (calcHeight % 2) {
-//			calcHeight--;
-//		}
-//
-//		this.width = calcWidth;
-//		this.height = calcHeight;
-//		this.viewer.style.width = this.width + 'px';
-//		this.viewer.style.height = this.height + 'px';
-//		this.viewer.style.top = border + 'px';
-//		this.viewer.style.left = border + 'px';
-//	},
 
 	init : function() {
 		if (document.attachEvent) {
@@ -367,15 +307,6 @@ PanoJS.prototype = {
 		
 			this.tiles.push(tileCol);
 		}
-
-//		this.surface.onmousedown = PanoJS.mousePressedHandler;
-//		this.surface.onmouseup = this.surface.onmouseout = PanoJS.mouseReleasedHandler;
-//		this.surface.ondblclick = PanoJS.doubleClickHandler;
-//		if (PanoJS.USE_KEYBOARD) {
-//			document.onkeydown = PanoJS.keyboardHandler;
-//		}
-
-//		this.positionTiles();
 	},
 
 	/**
@@ -542,8 +473,6 @@ PanoJS.prototype = {
 			tile.element.style.top = tile.posy + 'px';
 			tile.element.style.left = tile.posx + 'px';
 		}
-//		tile.width = this.tileSize + "px";
-//		tile.height = this.tileSize + "px";
 		// seems to need this no matter what
 		//changes all not available Tiles to the blank one, so that no ugly Image not Found Pics popup.
 		tileImg.onerror = function () {this.src = PanoJS.BLANK_TILE_IMAGE; return true;};
@@ -628,16 +557,6 @@ PanoJS.prototype = {
 	notifyViewerZoomed : function() {
 		jQuery(this.viewer).trigger("zoom.viewer", {'x':this.x, 'y': this.y, 'zoomLevel': this.zoomLevel, 'percentage': (100/(this.maxZoomLevel + 1)) * (this.zoomLevel + 1)});
 	},
-
-//	/**
-//	 * Notify listeners of a move event on the viewer.
-//	 */
-//	notifyViewerMoved : function(coords) {
-//		if (typeof coords == 'undefined') {
-//			coords = { 'x' : 0, 'y' : 0 };
-//		}
-//		jQuery(this.viewer).trigger("move.viewer", {'x': this.x + (coords.x - this.mark.x),'y': this.y + (coords.y - this.mark.y)});
-//	},
 
 	zoom : function(direction) {
 		// ensure we are not zooming out of range
@@ -727,8 +646,6 @@ PanoJS.prototype = {
 	 */
 	moveViewer : function(coords) {
 		this.positionTiles({ 'x' : (coords.x - this.mark.x), 'y' : (coords.y - this.mark.y) });
-//		this.mark = coords;
-		//this.notifyViewerMoved(coords);
 	},
 
 	/**
@@ -763,13 +680,8 @@ PanoJS.prototype = {
 			'y' : Math.floor(this.height / 2)
 		};
 
-//		if (this.border >= 0) {
-//			this.fitToWindow(this.border);
-//		}
-//		else {
-            this.width = newWidth;
-            this.height = newHeight;
-//        }
+        this.width = newWidth;
+        this.height = newHeight;
 
 		this.prepareTiles();
 
@@ -778,14 +690,9 @@ PanoJS.prototype = {
 			'y' : Math.floor(this.height / 2)
 		};
 
-//		if (this.border >= 0) {
-//			this.x += (after.x - before.x);
-//			this.y += (after.y - before.y);
-//		}
 		this.positionTiles();
 		this.viewer.style.display = '';
 		this.initialized = true;
-		//this.notifyViewerMoved();
 	},
 	
 	/**
@@ -924,10 +831,6 @@ PanoJS.prototype = {
 					'y' : this.y + e.clientX + (document.documentElement.scrollLeft || document.body.scrollLeft)
 				}
 		}
-//		return {
-//			'x' : (e.pageX || (e.clientX + (document.documentElement.scrollLeft || document.body.scrollLeft))) - this.left,
-//			'y' : (e.pageY || (e.clientY + (document.documentElement.scrollTop || document.body.scrollTop))) - this.top
-//		}
 	},
 
 	press : function(coords) {
@@ -983,17 +886,6 @@ PanoJS.prototype = {
 		}
 		return newPos;			
 	}
-	
-	// QUESTION: where is the best place for this method to be invoked?
-//	resetSlideMotion : function() {
-//		// QUESTION: should this be > 0 ?	
-//		if (this.slideMonitor != 0) {
-//			clearTimeout(this.slideMonitor);
-//			this.slideMonitor = 0;
-//		}
-//
-//		this.slideAcceleration = 0;
-//	}
 };
 
 PanoJS.TileUrlProvider = function(baseUri, prefix, extension) {
@@ -1090,11 +982,9 @@ PanoJS.doubleClickHandler = function(e) {
 	if (iview.viewerContainer.isMax() && this.backingBean.isInputHandlerEnabled()) {
 		e = getEvent(e);
 		var self = this.backingBean;
-//		var coords = self.resolveCoordinates(e);
 		if (self.zoomLevel < self.maxZoomLevel) {
 			this.backingBean.zoomViewer(1);
 		} else {
-			//self.resetSlideMotion();
 			self.recenter(self.resolveCoordinates(e));
 		}
 	}
@@ -1114,7 +1004,6 @@ PanoJS.keyboardHandler = function(e) {
 				'y': PanoJS.MOVE_THROTTLE * ((39 - e.keyCode) % 2)};
 			  	if (viewer.iview.viewerContainer.isMax()){
 					viewer.positionTiles(motion, true);
-			//		viewer.notifyViewerMoved(motion);
 			  	}
 				preventDefault(e);
 				return false;
