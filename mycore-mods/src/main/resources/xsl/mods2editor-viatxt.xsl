@@ -14,6 +14,7 @@
   </xsl:template>
 
   <xsl:template match="*">
+    <xsl:text>&#x0a;</xsl:text>
     <xsl:text>&lt;</xsl:text>
     <xsl:value-of select="name()"/>
     <xsl:if test="name()='mods'">
