@@ -3,6 +3,7 @@
   xmlns:mcrmods="xalan://org.mycore.mods.MCRMODSClassificationSupport" exclude-result-prefixes="mcrmods" version="1.0">
 
   <xsl:include href="copynodes.xsl" />
+  <xsl:include href="coreFunctions.xsl" />
 
   <xsl:template match="*[@authority or @authorityURI]">
     <xsl:copy>
@@ -25,9 +26,12 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="mods:name[@type='personal']">
+  <xsl:template match="mods:name[@type='personal' or @authorityURI='http://d-nb.info/']">
     <xsl:copy>
-      <xsl:apply-templates select="@*" />
+      <xsl:apply-templates select="@*[name()!='type']" />
+      <xsl:attribute name="type">
+        <xsl:value-of select="'personal'"/>
+      </xsl:attribute>
       <xsl:if test="@valueURI">
         <xsl:attribute name="editor.output">
           <xsl:choose>
@@ -73,21 +77,20 @@
     </mods:namePartDate>
   </xsl:template>
 
-  <xsl:template match="mods:name[@type='corporate']">
+  <xsl:template match="mods:name[@ID]">
     <xsl:copy>
       <xsl:variable name="classNodes" select="mcrmods:getMCRClassNodes(.)" />
       <xsl:apply-templates select='$classNodes/@*|@*' />
-      <xsl:if test="@authorityURI='http://www.bmelv.de/classifications/institutes'"> <!--  ToDo: BMELV-spezifisch -> auslagern  -->
+      <xsl:if test="count($classNodes/@*)&gt;0">
         <xsl:attribute name="editor.output">
           <xsl:variable name="classlink" select="mcrmods:getClassCategLink(.)" />
           <xsl:choose>
             <xsl:when test="string-length($classlink) &gt; 0">
               <xsl:for-each select="document($classlink)/mycoreclass/categories/category">
                 <xsl:variable name="selectLang">
-                  <xsl:value-of select="'de'" />
-<!--              <xsl:call-template name="selectLang"> -->
-<!--                <xsl:with-param name="nodes" select="./label" /> -->
-<!--              </xsl:call-template> -->
+                   <xsl:call-template name="selectLang">
+                     <xsl:with-param name="nodes" select="./label" />
+                   </xsl:call-template>
                 </xsl:variable>
                 <xsl:value-of select="./label[lang($selectLang)]/@text" />
               </xsl:for-each>
