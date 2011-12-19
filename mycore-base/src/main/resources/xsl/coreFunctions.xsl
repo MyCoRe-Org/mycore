@@ -14,6 +14,7 @@
   <xsl:param name="browserAddress" />
   <xsl:param name="readAccess"/>
   <xsl:param name="RequestURL"/>
+  <xsl:param name="WebApplicationBaseURL"/>
 
     <!--
         Template: UrlSetParam
