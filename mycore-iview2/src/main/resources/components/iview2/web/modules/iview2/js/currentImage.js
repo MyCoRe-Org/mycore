@@ -9,10 +9,10 @@
       this.width = 0;
       this.x = 0;
       this.y = 0;
-	  this.curWidth = 0;
+	    this.curWidth = 0;
       this.curHeight = 0;
       this.viewer = iviewInst;
-      var zoomInfo = this.zoomInfo = new iview.ZoomInformation(iviewInst);
+      this.zoomInfo = new iview.ZoomInformation(iviewInst);
       var that = this;
       this.rotation = 0;
       
@@ -44,6 +44,7 @@
       this.width = parseInt(values['width']);
       this.height = parseInt(values['height']);
       this.zoomInfo.maxZoom = parseInt(values['zoomLevel']);
+      this.zoomInfo.updateDimensions(this.width,this.height);
       //TODO: check if zoomInit is still needed
       this.zoomInfo.zoomInit = Math.min(this.viewer.viewerBean.zoomLevel,this.zoomInfo.maxZoom);
       jQuery(this).trigger(iview.CurrentImage.CHANGE_EVENT);
@@ -53,7 +54,7 @@
     	this.x = position.x;
     	this.y = position.y;
     	jQuery(this).trigger(iview.CurrentImage.POS_CHANGE_EVENT);
-    }
+    };
     
     return constructor;
 
@@ -71,7 +72,17 @@
       this.zoomWidth = 0;
       this.zoomInit = 0;
       this.curZoom = 0;
+      this.dimensions = [];
     }
+    
+    constructor.prototype.updateDimensions= function zi_updateDimensions(width, height){
+      this.dimensions=[];
+      for (var i=this.maxZoom;i>=0;i--){
+        this.dimensions[i]={"width":width,"height":height};
+        width=Math.ceil(width/2);
+        height=Math.ceil(height/2);
+      }
+    };
     
     return constructor;
   })();

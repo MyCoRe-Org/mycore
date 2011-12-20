@@ -275,8 +275,8 @@ PanoJS.prototype = {
 	},
 
 	prepareTiles : function() {
-		var rows = Math.ceil(this.height / this.tileSize) + 1;
-		var cols = Math.ceil(this.width / this.tileSize) + 1;
+		var rows = Math.ceil(this.height / this.tileSize) + 2;
+		var cols = Math.ceil(this.width / this.tileSize) + 2;
 		//if there's nothing to change don't drop anything as we may loose important references
 		if (this.tiles.length == cols && this.tiles[0].length == rows) {
 			return;
@@ -372,12 +372,18 @@ PanoJS.prototype = {
 
 		var rect = {};
 		var rotation = this.iview.currentImage.rotation;
+		var zoomInfo = this.iview.currentImage.zoomInfo;
 		rect.x = this.x;
 		rect.y = this.y;
 		var tileSize = this.tileSize;
 		
 		var curWidth = this.iview.currentImage.curWidth;
-		var curHeight = this.iview.currentImage.curHeight;		
+		var curHeight = this.iview.currentImage.curHeight;
+		
+		if (curWidth == 0||curHeight==0){
+		  //image is not ready
+		  return;
+		}
 					
 		var cnvWidth = this.width;
 		var cnvHeight = this.height;
@@ -389,13 +395,18 @@ PanoJS.prototype = {
 		//gap between first tile and border
 		var xoff = rect.x%tileSize;
 		var yoff = rect.y%tileSize;
+		//border tiles
+		var imgXTiles = Math.ceil(zoomInfo.dimensions[zoomInfo.curZoom].width/256);
+		var imgYTiles = Math.ceil(zoomInfo.dimensions[zoomInfo.curZoom].height/256);
 		//number of visible tiles
 		var xTiles = Math.ceil((xDim+xoff) / tileSize);
 		var yTiles = Math.ceil((yDim+yoff) / tileSize);
+		if (zoomInfo.scale!=1){
+		  //fitToWidth and fitToScreen
+      xTiles = Math.min(xTiles, imgXTiles);
+      yTiles = Math.min(yTiles, imgYTiles);
+		}
 		
-		//border tiles
-		var imgXTiles = Math.ceil(curWidth/tileSize);
-		var imgYTiles = Math.ceil(curHeight/tileSize);
 		//xstart, ystart
 		var startx = Math.floor(rect.x/tileSize);
 		var starty = Math.floor(rect.y/tileSize);
