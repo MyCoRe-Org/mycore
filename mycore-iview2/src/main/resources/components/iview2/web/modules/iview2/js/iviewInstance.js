@@ -307,10 +307,12 @@
       zoomInfo.zoomBack = zoomInfo.zoomInit;
 
       this.roller = true;
-      viewerBean.positionTiles({
-        'x' : this.properties.useParam ? toFloat(URL.getParam("x")) : 0,
-        'y' : this.properties.useParam ? toFloat(URL.getParam("y")) : 0
-      }, true);
+      if (this.properties.useParam){
+        viewerBean.positionTiles({
+          'x' : toFloat(URL.getParam("x")),
+          'y' : toFloat(URL.getParam("y"))
+        }, true);
+      }
       this.roller = false;
     };
 
