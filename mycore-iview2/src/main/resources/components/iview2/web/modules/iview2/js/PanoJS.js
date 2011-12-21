@@ -612,18 +612,22 @@ PanoJS.prototype = {
 	zoomViewer : function(direction) {
 		var currentImage = this.iview.currentImage;
 		var dir = -1;
-
-		if (direction && this.zoomLevel != currentImage.zoomInfo.maxZoom) {
-			dir = 1;
+		
+		if (direction){
+		  //zoom in
+		  if (this.zoomLevel != currentImage.zoomInfo.maxZoom) {
+		    dir = 1;
+		  } else {
+		    //if zoomWidth or zoomScreen was active and we're already in the max zoomlevel just reset the displayMode
+		    dir = 0;
+		    if (currentImage.zoomInfo.zoomScreen) {
+		      this.pictureScreen(true);
+		    } else if (currentImage.zoomInfo.zoomWidth) {
+		      this.pictureWidth(true);
+		    }
+		  }
 		}
 		
-		//if zoomWidth or zoomScreen was active and we're already in the max zoomlevel just reset the displayMode
-		if (currentImage.zoomInfo.zoomScreen) {
-			this.pictureScreen(true);
-		} else if (currentImage.zoomInfo.zoomWidth) {
-			this.pictureWidth(true);
-		}
-
 		this.zoom(dir);
 	},
 
