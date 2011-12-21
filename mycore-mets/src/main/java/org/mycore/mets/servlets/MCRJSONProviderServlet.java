@@ -73,6 +73,7 @@ public class MCRJSONProviderServlet extends MCRServlet {
         response.setContentType("application/x-json");
         response.setCharacterEncoding(MCRConfiguration.instance().getString("MCR.Request.CharEncoding", "UTF-8"));
         response.getWriter().print(json);
+        response.getWriter().flush();
         return;
     }
 
