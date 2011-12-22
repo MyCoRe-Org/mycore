@@ -170,7 +170,7 @@
       if (this.properties.useParam && !isNaN(parseInt(URL.getParam("zoom")))) {
         viewerBean.zoomLevel = parseInt(URL.getParam("zoom"));
       } else {
-        that.currentImage.zoomInfo.zoomScreen=true;
+        that.currentImage.zoomInfo.zoomScreen = true;
       }
 
       this.preload = new iview.Preload.Controller(this);
@@ -238,12 +238,15 @@
      * @description maximize and show the viewer with the related image or minimize and close the viewer
      */
     constructor.prototype.toggleViewerMode = function() {
+      this.comment("call switchContext()");
       this.context.switchContext();
+      this.comment("trigger event "+(!this.viewerContainer.isMax() ? "minimize" : "maximize"));
       jQuery(this.viewerContainer).trigger((!this.viewerContainer.isMax() ? "minimize" : "maximize") + ".viewerContainer");
       /*
        * IE causes resize already at class change (mostly because position: rel <> fix) IE runs resize multiple times...but without this
        * line he doesn't...
        */
+      this.comment("call reinitializeGraphic()");
       this.reinitializeGraphic();
     };
 
@@ -307,7 +310,7 @@
       zoomInfo.zoomBack = zoomInfo.zoomInit;
 
       this.roller = true;
-      if (this.properties.useParam){
+      if (this.properties.useParam) {
         viewerBean.positionTiles({
           'x' : toFloat(URL.getParam("x")),
           'y' : toFloat(URL.getParam("y"))
@@ -455,6 +458,19 @@
       delete dim.entries[name];
       this.reinitializeGraphic();
       return true;
+    };
+
+    constructor.prototype.comment = function ii_comment(msg) {
+      var p = this.viewerContainer[0].getElementsByTagName("p");
+      var commentNode;
+      if (p.length==0) {
+        commentNode = document.createElement("p");
+        commentNode.setAttribute("style", "display:none;");
+        this.viewerContainer[0].appendChild(commentNode);
+      } else {
+        commentNode=p[0];
+      }
+      commentNode.appendChild(document.createTextNode(this.properties.derivateId + ": " + msg + "\r\n"));
     };
 
     return constructor;
