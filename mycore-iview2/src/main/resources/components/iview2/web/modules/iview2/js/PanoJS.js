@@ -437,7 +437,7 @@ PanoJS.prototype = {
 			}
 		}
 		
-		if (this.tiles[0].length > yTiles && this.oldYTiles > yTiles) {
+		if (this.tiles.length > 0 && this.tiles[0].length > yTiles && this.oldYTiles > yTiles) {
 			for (var column = 0; column < xTiles; column++) {
 				var tile = this.tiles[column][yTiles];
 				try {
