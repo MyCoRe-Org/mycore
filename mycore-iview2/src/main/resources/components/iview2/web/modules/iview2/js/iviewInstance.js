@@ -241,7 +241,14 @@
       this.comment("call switchContext()");
       this.context.switchContext();
       this.comment("trigger event "+(!this.viewerContainer.isMax() ? "minimize" : "maximize"));
-      jQuery(this.viewerContainer).trigger((!this.viewerContainer.isMax() ? "minimize" : "maximize") + ".viewerContainer");
+      try {
+        jQuery(this.viewerContainer).trigger((!this.viewerContainer.isMax() ? "minimize" : "maximize") + ".viewerContainer");
+      } catch (e) {
+        for (var a in e) {
+          this.comment(a+": "+ e[a]);
+        }
+        throw e;
+      }
       /*
        * IE causes resize already at class change (mostly because position: rel <> fix) IE runs resize multiple times...but without this
        * line he doesn't...
