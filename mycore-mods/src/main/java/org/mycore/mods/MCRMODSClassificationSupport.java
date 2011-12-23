@@ -191,8 +191,12 @@ public final class MCRMODSClassificationSupport {
          * AuthorityInfo given there.
          */
         public static MCRAuthorityInfo getAuthorityInfo(org.jdom.Element modsElement) {
-            MCRAuthorityInfo mCRAuthorityInfo = MCRAuthorityWithURI.getAuthorityInfo(modsElement);
-            return mCRAuthorityInfo != null ? mCRAuthorityInfo : MCRAuthorityAndCode.getAuthorityInfo(modsElement);
+            MCRAuthorityInfo authorityInfo = MCRTypeOfResource.getAuthorityInfo(modsElement);
+            if (authorityInfo == null)
+                authorityInfo = MCRAuthorityWithURI.getAuthorityInfo(modsElement);
+            if (authorityInfo == null)
+                authorityInfo = MCRAuthorityAndCode.getAuthorityInfo(modsElement);
+            return authorityInfo;
         }
 
         /**
@@ -200,8 +204,12 @@ public final class MCRMODSClassificationSupport {
          * AuthorityInfo given there.
          */
         public static MCRAuthorityInfo getAuthorityInfo(Element modsElement) {
-            MCRAuthorityInfo mCRAuthorityInfo = MCRAuthorityWithURI.getAuthorityInfo(modsElement);
-            return mCRAuthorityInfo != null ? mCRAuthorityInfo : MCRAuthorityAndCode.getAuthorityInfo(modsElement);
+            MCRAuthorityInfo authorityInfo = MCRTypeOfResource.getAuthorityInfo(modsElement);
+            if (authorityInfo == null)
+                authorityInfo = MCRAuthorityWithURI.getAuthorityInfo(modsElement);
+            if (authorityInfo == null)
+                authorityInfo = MCRAuthorityAndCode.getAuthorityInfo(modsElement);
+            return authorityInfo;
         }
 
         /** A cache that maps category ID to authority information */
@@ -214,13 +222,13 @@ public final class MCRMODSClassificationSupport {
             String key = categoryID.toString();
             LOGGER.debug("get authority info for " + key);
 
-            MCRAuthorityInfo mCRAuthorityInfo = (MCRAuthorityInfo) (authorityInfoByCategoryID.getIfUpToDate(key, DAO.getLastModified()));
+            MCRAuthorityInfo authorityInfo = (MCRAuthorityInfo) (authorityInfoByCategoryID.getIfUpToDate(key, DAO.getLastModified()));
 
-            if (mCRAuthorityInfo == null) {
-                mCRAuthorityInfo = buildAuthorityInfo(categoryID);
-                authorityInfoByCategoryID.put(key, mCRAuthorityInfo);
+            if (authorityInfo == null) {
+                authorityInfo = buildAuthorityInfo(categoryID);
+                authorityInfoByCategoryID.put(key, authorityInfo);
             }
-            return mCRAuthorityInfo;
+            return authorityInfo;
         }
 
         /**
@@ -232,6 +240,9 @@ public final class MCRMODSClassificationSupport {
 
             MCRCategory category = DAO.getCategory(categoryID, 0);
             MCRCategory classification = category.getRoot();
+
+            if (classification.equals(MCRTypeOfResource.TYPE_OF_RESOURCE))
+                return new MCRTypeOfResource(categoryID.getID());
 
             String authority = MCRAuthorityAndCode.getAuthority(classification);
             if (authority != null) {
@@ -552,6 +563,76 @@ public final class MCRMODSClassificationSupport {
         public void setInElement(Element element) {
             element.setAttribute(ATTRIBUTE_AUTHORITY_URI, authorityURI);
             element.setAttribute(ATTRIBUTE_VALUE_URI, valueURI);
+        }
+    }
+
+    /**
+     * Authority information that is a static mapping for mods:typeOfResource.
+     * This element is always mapped to a classification with the ID typeOfResource.
+     * 
+     * @author Frank L\u00FCtzenkirchen
+     */
+    private static class MCRTypeOfResource extends MCRAuthorityInfo {
+
+        /** 
+         * The name of the MODS element typeOfResource, which is same as the 
+         * classification ID used to map the codes to categories. 
+         */
+        public final static String TYPE_OF_RESOURCE = "typeOfResource";
+
+        /**
+         * The mods:typeOfResource code, which is same as the category ID
+         */
+        private String code;
+
+        public MCRTypeOfResource(String code) {
+            this.code = code;
+        }
+
+        /**
+         * If the given element is mods:typeOfResource, returns the MCRTypeOfResource mapping.
+         */
+        public static MCRTypeOfResource getAuthorityInfo(org.jdom.Element modsElement) {
+            String name = modsElement.getName();
+            String code = modsElement.getTextTrim();
+            return getTypeOfResource(name, code);
+        }
+
+        /**
+         * If the given element is mods:typeOfResource, returns the MCRTypeOfResource mapping.
+         */
+        public static MCRTypeOfResource getAuthorityInfo(Element modsElement) {
+            String name = modsElement.getLocalName();
+            String code = getText(modsElement).trim();
+            return getTypeOfResource(name, code);
+        }
+
+        /**
+         * If the given element name is typeOfResource, returns the MCRTypeOfResource mapping.
+         */
+        private static MCRTypeOfResource getTypeOfResource(String name, String code) {
+            return name.equals(TYPE_OF_RESOURCE) ? new MCRTypeOfResource(code) : null;
+        }
+
+        @Override
+        public String toString() {
+            return TYPE_OF_RESOURCE + "#" + code;
+        }
+
+        @Override
+        protected MCRCategoryID lookupCategoryID() {
+            return new MCRCategoryID(TYPE_OF_RESOURCE, code);
+        }
+
+        @Override
+        public void setInElement(org.jdom.Element element) {
+            element.setText(code);
+
+        }
+
+        @Override
+        public void setInElement(Element element) {
+            element.setTextContent(code);
         }
     }
 }
