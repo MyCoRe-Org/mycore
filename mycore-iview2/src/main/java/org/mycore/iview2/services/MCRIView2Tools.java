@@ -146,6 +146,15 @@ public class MCRIView2Tools {
     }
 
     /**
+     * @param filename
+     * @return true if the file is supported, false otherwise
+     * @see @link{MCRIView2Tools#isFileSupported(MCRFile)}
+     */
+    public static boolean isFileSupported(String filename) {
+        return SUPPORTED_CONTENT_TYPE.indexOf(filename.substring(filename.lastIndexOf(".") + 1)) > -1;
+    }
+
+    /**
      * @param file image file
      * @return true if {@link MCRImage#getTiledFile(File, String, String)} exists
      * @see #getTileDir()
