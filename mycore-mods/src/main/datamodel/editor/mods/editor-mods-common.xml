@@ -226,7 +226,7 @@
   <!-- TITLE HTML -->
   <text id="mods.htmltitle.label" i18n="metaData.mods.dictionary.htmltitle" />
   <panel id="mods.htmltitle">
-    <cell anchor="NORTHWEST" var="mods:title[@lang='x-html']">
+    <cell anchor="NORTHWEST" var="mods:title">
       <textarea id="mods.htmltitle.text" width="45" height="3" />
     </cell>
   </panel>
@@ -243,10 +243,10 @@
   <!-- TITLE Translated -->
   <text id="mods.title.translated.label" i18n="metaData.mods.dictionary.translatedtitle" />
   <panel id="mods.title.translated">
-    <cell anchor="NORTHWEST" var="mods:titleInfo[@type='translated']/mods:title">
+    <cell anchor="NORTHWEST" var="mods:titleInfo[@type='translated']">
       <repeater min="1" max="5" pos="right">
         <panel>
-          <cell anchor="NORTHWEST" ref="TFarea1028" />
+          <cell anchor="NORTHWEST" ref="TFarea1028" var="mods:title"/>
           <cell row="1" col="2" anchor="NORTHWEST" var="@lang" ref="language" />
         </panel>
       </repeater>

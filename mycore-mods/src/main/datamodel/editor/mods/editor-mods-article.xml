@@ -32,7 +32,7 @@
 
     <!-- pub_title_html [text] -->
     <cell row="15" col="1" anchor="NORTHEAST" ref="mods.htmltitle.label" />
-    <cell row="15" col="2" anchor="NORTHWEST" ref="mods.htmltitle" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
+    <cell row="15" col="2" anchor="NORTHWEST" ref="mods.htmltitle" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo[@lang='x-html']" />
     <cell row="15" col="3" anchor="NORTHWEST" ref="mods.htmltitle.help" />
     <!-- pub_title_html [text] END -->
 
