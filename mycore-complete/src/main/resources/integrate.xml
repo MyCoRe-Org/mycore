@@ -78,7 +78,7 @@
       <echo level="info">Adding @{class} to hibernate-configuration</echo>
       <propertyregex property="@{class}.resource" input="@{class}" regexp="\." replace="/"/>
       <xmltask source="${build.config}/hibernate.cfg.xml" dest="${build.config}/hibernate.cfg.xml" public="-//Hibernate/Hibernate Configuration DTD 3.0//EN"
-        system="http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+        system="http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
         <xmlcatalog refid="hibernateDTD"/>
         <insert path="/hibernate-configuration/session-factory" xml="&lt;mapping resource=&#x22;${@{class}.resource}.hbm.xml&#x22; /&gt;"/>
       </xmltask>
