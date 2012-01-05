@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.jdom.Content;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.xpath.XPath;
@@ -94,7 +95,10 @@ public class MCRMODSWrapper {
 
     public Element getMODS() {
         MCRMetaXML mx = (MCRMetaXML) (object.getMetadata().getMetadataElement(DEF_MODS_CONTAINER).getElement(0));
-        return (Element) (mx.getContent().get(0));
+        for (Content content : mx.getContent())
+            if (content instanceof Element)
+                return (Element) content;
+        return null;
     }
 
     public MCRObject getMCRObject() {
