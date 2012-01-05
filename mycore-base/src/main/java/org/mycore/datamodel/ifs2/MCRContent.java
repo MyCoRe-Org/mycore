@@ -42,6 +42,7 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUtils;
 import org.xml.sax.InputSource;
@@ -77,6 +78,20 @@ public class MCRContent {
      * Holds the systemID of the current content
      */
     protected String systemId;
+
+    /**
+     * The format in which XML content is written. By default, this is 
+     * pretty format using indentation and line breaks, UTF-8 encoded.
+     * This can be changed to raw format without formatting by setting
+     * MCR.IFS2.PrettyXML=false.
+     */
+    private static Format xmlFormat;
+
+    static {
+        boolean prettyXML = MCRConfiguration.instance().getBoolean("MCR.IFS2.PrettyXML", true);
+        xmlFormat = prettyXML ? Format.getPrettyFormat().setIndent("  ") : Format.getRawFormat();
+        xmlFormat.setEncoding("UTF-8");
+    }
 
     /**
      * Creates content from a String, using UTF-8 encoding
@@ -141,17 +156,19 @@ public class MCRContent {
     }
 
     /**
-     * Creates content from XML document. Content will be written
-     * pretty-formatted, using UTF-8 encoding and line indentation.
+     * Creates content from XML document. By default, content will be 
+     * written pretty-formatted, using UTF-8 encoding and line indentation 
+     * depending on the property MCR.IFS2.PrettyXML=true
      * 
      * @param xml
      *            the XML document to read in as content
      */
     public static MCRContent readFrom(Document xml) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        XMLOutputter xout = new XMLOutputter(Format.getRawFormat());
+        XMLOutputter xout = new XMLOutputter(xmlFormat);
         xout.output(xml, out);
         out.close();
+
         MCRContent content = readFrom(out.toByteArray());
         content.isXML = true;
         return content;
@@ -224,7 +241,7 @@ public class MCRContent {
         checkConsumed();
         return in;
     }
-    
+
     /**
      * Returns content as SAX input source.
      * 
