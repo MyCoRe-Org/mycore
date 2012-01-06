@@ -417,7 +417,7 @@
 
                   <div style="padding-top:0.5em;">
                     <label for="titleTextArea">
-                      <xsl:value-of select="i18n:translate('component.msg.msg.title')" />
+                      <xsl:value-of select="i18n:translate('component.mets.msg.title')" />
                     </label>
                     <div>
                       <textarea id="titleTextBox" dojoType="dijit.form.SimpleTextarea" rows="4" cols="25"></textarea>
