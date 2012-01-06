@@ -646,6 +646,68 @@
   </helpPopup>
   <!-- Datum der Erstellung END -->
 
+  <!-- Datum der Einreichung [text] -->
+  <text id="mods.dateSubmitted.label" i18n="metaData.mods.dictionary.dateSubmitted" />
+  <panel id="mods.dateSubmitted">
+    <cell anchor="NORTHWEST" var="mods:dateOther[@type='submitted']">
+      <panel>
+        <cell col="1">
+          <textfield id="mods.dateSubmitted.text" width="60" maxlength="128" >
+          <condition id="mods.dateSubmitted.cond" required="false" type="datetime" format="yyyy-MM-dd;yyyy-MM;yyyy">
+              <label xml:lang="de">Tragen Sie hier das Datum der Einreichung im ISO Format mit Bindestrich (YYYY-MM-DD) ein.</label>
+              <label xml:lang="en">Enter the date of submission here in the ISO Format (YYYY-MM-DD).</label>
+            </condition>
+            </textfield>
+        </cell>
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.dateSubmitted.help" width="400px" height="250px">
+    <label xml:lang="de">
+      Datum der Einreichung. Das Datum muss im ISO Format mit Bindestrich YYYY-MM-DD, YYYY-MM oder YYYY
+      angegeben werden.
+      <br />
+      Beispiel: 2003-01-27 oder 2010 oder 2009-01
+      <br />
+    </label>
+    <label xml:lang="en">
+      Date of submission
+    </label>
+  </helpPopup>
+  <!-- Datum der Einreichung END -->
+
+  <!-- Datum der Promotion [text] -->
+  <text id="mods.dateAccepted.label" i18n="metaData.mods.dictionary.dateAccepted" />
+  <panel id="mods.dateAccepted">
+    <cell anchor="NORTHWEST" var="mods:dateOther[@type='accepted']">
+      <panel>
+        <cell col="1">
+          <textfield id="mods.dateAccepted.text" width="60" maxlength="128" >
+          <condition id="mods.dateAccepted.cond" required="false" type="datetime" format="yyyy-MM-dd;yyyy-MM;yyyy">
+              <label xml:lang="de">Tragen Sie hier das Datum der Promotion / des Abschlusses im ISO Format mit Bindestrich (YYYY-MM-DD) ein.</label>
+              <label xml:lang="en">Enter the date of publication here in the ISO Format (YYYY-MM-DD).</label>
+            </condition>
+            </textfield>
+        </cell>
+      </panel>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.dateAccepted.help" width="400px" height="250px">
+    <label xml:lang="de">
+      Datum der Promotion / des Abschlusses. Das Datum muss im ISO Format mit Bindestrich YYYY-MM-DD, YYYY-MM oder YYYY
+      angegeben werden.
+      <br />
+      Beispiel: 2003-01-27 oder 2010 oder 2009-01
+      <br />
+    </label>
+    <label xml:lang="en">
+      Date of acceptance
+    </label>
+  </helpPopup>
+  <!-- Datum der Promotion END -->
+
   <!-- Zeit in der die Konferenz stattfand [text] -->
   <text id="mods.dateOccured.label" i18n="metaData.mods.dictionary.conference.dateOccured" />
   <panel id="mods.dateOccured">
