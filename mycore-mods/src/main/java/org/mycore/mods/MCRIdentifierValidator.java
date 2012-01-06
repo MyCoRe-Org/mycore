@@ -29,19 +29,27 @@ package org.mycore.mods;
  */
 public class MCRIdentifierValidator {
 
+    private static final int ISBN13_LENGTH = 13;
+
+    private static final int ISBN13_WITH_DELIM_LENGTH = 17;
+
     public static boolean validate(final String type, String value) {
+        if (value.trim().length() == 0) {
+            //do not check 'required' here
+            return true;
+        }
         if ("isbn".equals(type)) {
-            if (value.length() != 17) {
+            if (value.length() != ISBN13_WITH_DELIM_LENGTH) {
                 //'-' missing
                 return false;
             }
             value = value.replaceAll("-", "");
             value = value.replace('x', 'X');
             // ISBN- 13
-            if (value.length() == 13) {
+            if (value.length() == ISBN13_LENGTH) {
                 int checkSum = 0;
                 int digit = 0;
-                for (int i = 0; i < 13; ++i) {
+                for (int i = 0; i < ISBN13_LENGTH; ++i) {
                     if (value.charAt(i) == 'X')
                         digit = 10;
                     else
