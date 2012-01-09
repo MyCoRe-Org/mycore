@@ -97,7 +97,7 @@ public class MCROAIObjectManager {
         Element headerElement = recordElement.getChild("header", OAIConstants.NS_OAI);
         Header header = headerToHeader(headerElement);
         Element metadataElement = recordElement.getChild("metadata", OAIConstants.NS_OAI);
-        if (metadataElement != null && metadataElement.getContentSize() > 0) {
+        if (metadataElement != null && metadataElement.getChildren().size() > 0) {
             Element metadataChild = (Element) metadataElement.getChildren().get(0);
             metadataChild.detach();
             return new Record(header, new SimpleMetadata(metadataChild));
