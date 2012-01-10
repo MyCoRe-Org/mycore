@@ -120,12 +120,13 @@
   </xsl:template>
 
   <xsl:template match="mods:titleInfo" mode="present">
-    <xsl:for-each select="mods:title[not(@lang='x-html')]">
-      <tr>
-        <td valign="top" class="metaname">
+    <xsl:if test="not(@xml:lang='x-html')">
+      <xsl:for-each select="mods:title">
+        <tr>
+          <td valign="top" class="metaname">
             <xsl:choose>
               <xsl:when test="./../@type='translated'">
-                <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.title'),' (',@lang,') :')" />
+                <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.title'),' (',./../@xml:lang,') :')" />
               </xsl:when>
               <xsl:when test="./../@type='alternative' and ./../@displayLabel='Short form of the title'">
                 <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.shorttitle'),' :')" />
@@ -134,35 +135,36 @@
                 <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.title'),' :')" />
               </xsl:otherwise>
             </xsl:choose>
-        </td>
-        <td class="metavalue">
-          <xsl:choose>
-            <xsl:when test="./..//mods:title[@lang='x-html']">
-              <xsl:value-of select="./..//mods:title[@lang='x-html']" disable-output-escaping="yes" />
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="." />
-            </xsl:otherwise>
-            </xsl:choose>
-        </td>
-      </tr>
-    </xsl:for-each>
-    <xsl:if test="mods:subTitle">
-      <tr>
-        <td valign="top" class="metaname">
-          <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.subtitle'),':')" />
-        </td>
-        <td class="metavalue subTitle">
-          <xsl:value-of select="mods:subTitle" />
-        </td>
-      </tr>
+          </td>
+          <td class="metavalue">
+            <xsl:choose>
+              <xsl:when test="not(./../@type='translated' or ./../@type='alternative') and //mods:titleInfo[@xml:lang='x-html']">
+                <xsl:value-of select="//mods:titleInfo[@xml:lang='x-html']/mods:title" disable-output-escaping="yes" />
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="." />
+              </xsl:otherwise>
+              </xsl:choose>
+          </td>
+        </tr>
+      </xsl:for-each>
+      <xsl:if test="mods:subTitle">
+        <tr>
+          <td valign="top" class="metaname">
+            <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.subtitle'),':')" />
+          </td>
+          <td class="metavalue subTitle">
+            <xsl:value-of select="mods:subTitle" />
+          </td>
+        </tr>
+      </xsl:if>
     </xsl:if>
   </xsl:template>
 
   <xsl:template match="mods:abstract" mode="present">
     <tr>
       <td valign="top" class="metaname">
-        <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.abstract'),' (' ,@lang,') :')" />
+        <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.abstract'),' (' ,@xml:lang,') :')" />
       </td>
       <td class="metavalue">
         <xsl:value-of select="." />

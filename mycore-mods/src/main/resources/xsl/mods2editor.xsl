@@ -122,4 +122,11 @@
     </xsl:copy>
   </xsl:template>
 
+  <!-- workaround for bug #2595855 -->
+  <xsl:template match="@xml:lang">
+    <xsl:attribute name="lang">
+      <xsl:value-of select="." />
+    </xsl:attribute>
+  </xsl:template>
+
 </xsl:stylesheet>
