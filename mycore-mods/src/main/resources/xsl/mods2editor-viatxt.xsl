@@ -3,9 +3,9 @@
   xmlns:mcrmods="xalan://org.mycore.mods.MCRMODSClassificationSupport" exclude-result-prefixes="mcrmods" version="1.0">
 
   <xsl:output
-    method="text"
-    encoding="UTF-8"
-    cdata-section-elements="mycoreobject" />
+    method="xml"
+    indent="yes"
+    encoding="UTF-8" />
 
   <xsl:template match="/">
     <mycoreobject>
@@ -14,7 +14,6 @@
   </xsl:template>
 
   <xsl:template match="*">
-    <xsl:text>&#x0a;</xsl:text>
     <xsl:text>&lt;</xsl:text>
     <xsl:value-of select="name()"/>
     <xsl:if test="name()='mods'">
