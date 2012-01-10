@@ -2,7 +2,14 @@
 <xsl:stylesheet xmlns:mcr="http://www.mycore.org/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xalan="http://xml.apache.org/xalan" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:mcrmods="xalan://org.mycore.mods.MCRMODSClassificationSupport"
   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:gnd="http://d-nb.info/gnd/" xmlns:java="http://xml.apache.org/xalan/java"
-  exclude-result-prefixes="gnd rdf mcrmods mcr xalan java" version="1.0">
+  xmlns:char="character" exclude-result-prefixes="gnd rdf mcrmods mcr xalan java" version="1.0">
+
+  <char:char ent="lt">&lt;</char:char>
+  <char:char ent="gt">&gt;</char:char>
+  <char:char ent="amp">&amp;</char:char>
+  <char:char ent="apos">&apos;</char:char>
+  <char:char ent="quot">&quot;</char:char>
+
 
   <xsl:output
     method="xml"
@@ -58,7 +65,10 @@
         </xsl:choose>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="$str" />
+        <!-- xsl:value-of select="$str" / -->
+        <xsl:call-template name="normalize-text">
+          <xsl:with-param name="text" select="$str" />
+        </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -113,6 +123,27 @@
         </xsl:call-template>
       </xsl:when>
     </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template name="normalize-text">
+    <xsl:param name="text" />
+      <xsl:choose>
+        <xsl:when test="contains($text,'&amp;')">
+          <xsl:variable name="vAfter" select="substring-after($text,'&amp;')" />
+          <xsl:value-of
+            select="concat(substring-before($text,'&amp;'),
+                                                   document('')/*/char:*
+                                                   [@ent =
+                                                   substring-before($vAfter,';')])"
+            disable-output-escaping="yes" />
+          <xsl:call-template name="normalize-text">
+            <xsl:with-param name="text" select="substring-after($vAfter,';')" />
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$text" />
+        </xsl:otherwise>
+      </xsl:choose>
   </xsl:template>
 
 </xsl:stylesheet>
