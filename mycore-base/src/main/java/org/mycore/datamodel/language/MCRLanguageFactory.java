@@ -39,7 +39,7 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
  * Returns MCRLanguage instances. The languages most commonly used, English and German,
  * are provided as constants. Other languages are read from a classification thats ID can be
  * configured using the property "MCR.LanguageClassification". That classification should use
- * ISO 639-1 code as category ID, where ISO 639-2 codes can be added by extra labels x-term and x-lang
+ * ISO 639-1 code as category ID, where ISO 639-2 codes can be added by extra labels x-term and x-bibl
  * for the category. Unknown languages are created by code as required, but a warning is logged. 
  * 
  * @author Frank L\u00FCtzenkirchen
@@ -150,14 +150,16 @@ public class MCRLanguageFactory {
      * Builds a new language object with the given ISO codes.
      * 
      * @param xmlCode ISO 639-1 code as used for xml:lang
-     * @param termCode ISO 639-2 terminologic code
+     * @param termCode ISO 639-2 terminologic code, may be null 
      * @param biblCode ISO 639-2 bibliographical code, may be null
      */
     private MCRLanguage buildLanguage(String xmlCode, String termCode, String biblCode) {
         MCRLanguage language = new MCRLanguage();
         addCode(language, MCRLanguageCodeType.xmlCode, xmlCode);
-        addCode(language, MCRLanguageCodeType.termCode, termCode);
-        addCode(language, MCRLanguageCodeType.biblCode, biblCode == null ? termCode : biblCode);
+        if (termCode != null) {
+            addCode(language, MCRLanguageCodeType.termCode, termCode);
+            addCode(language, MCRLanguageCodeType.biblCode, biblCode == null ? termCode : biblCode);
+        }
         return language;
     }
 
@@ -204,8 +206,10 @@ public class MCRLanguageFactory {
      */
     private void buildLanguage(MCRCategory category) {
         String xmlCode = category.getId().getID();
-        MCRLabel termCode = category.getLabel("x-term");
-        MCRLabel biblCode = category.getLabel("x-bibl");
-        buildLanguage(xmlCode, termCode.getText(), biblCode == null ? null : biblCode.getText());
+        MCRLabel lTermCode = category.getLabel("x-term");
+        MCRLabel lBiblCode = category.getLabel("x-bibl");
+        String termCode = lTermCode == null ? null : lTermCode.getText();
+        String biblCode = lBiblCode == null ? termCode : lBiblCode.getText();
+        buildLanguage(xmlCode, termCode, biblCode);
     }
 }
