@@ -74,8 +74,7 @@ public class MCRLanguage {
     /**
      * Sets the label in the given language
      */
-    void setLabel(String languageCode, String label) {
-        MCRLanguage language = MCRLanguageFactory.instance().getLanguage(languageCode);
+    void setLabel(MCRLanguage language, String label) {
         labelsByLanguage.put(language, label);
     }
 

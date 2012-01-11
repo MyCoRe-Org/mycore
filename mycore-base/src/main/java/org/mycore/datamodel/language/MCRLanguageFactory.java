@@ -110,6 +110,10 @@ public class MCRLanguageFactory {
         if (classificationHasChanged())
             buildLanguages();
 
+        return lookupLanguage(code);
+    }
+
+    private MCRLanguage lookupLanguage(String code) {
         if ((!languageByCode.containsKey(code)) && code.contains("-") && !code.startsWith("x-"))
             code = code.split("-")[0];
 
@@ -144,10 +148,10 @@ public class MCRLanguageFactory {
     private void buildDefaultLanguages() {
         MCRLanguage de = buildLanguage("de", "deu", "ger");
         MCRLanguage en = buildLanguage("en", "eng", null);
-        de.setLabel("de", "Deutsch");
-        de.setLabel("en", "German");
-        en.setLabel("de", "Englisch");
-        en.setLabel("en", "English");
+        de.setLabel(de, "Deutsch");
+        de.setLabel(en, "German");
+        en.setLabel(de, "Englisch");
+        en.setLabel(en, "English");
     }
 
     /**
@@ -219,8 +223,10 @@ public class MCRLanguageFactory {
 
         for (MCRLabel label : category.getLabels()) {
             String code = label.getLang();
-            if (!code.startsWith("x-"))
-                language.setLabel(code, label.getText());
+            if (!code.startsWith("x-")) {
+                MCRLanguage languageOfLabel = lookupLanguage(code);
+                language.setLabel(languageOfLabel, label.getText());
+            }
         }
     }
 }
