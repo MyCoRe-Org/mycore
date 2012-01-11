@@ -410,11 +410,14 @@ PanoJS.prototype = {
 		//xstart, ystart
 		var startx = Math.floor(rect.x/tileSize);
 		var starty = Math.floor(rect.y/tileSize);
+		
+		var dataName="inserted";
+		var currentTime=new Date().getTime();
 
 		for (var column = 0; column < xTiles; column++) {
 			for (var row = 0; row < yTiles; row++) {
-				//get the associated tiles
 				var tile = this.tiles[column][row];
+				//get the associated tiles
 				tile.xIndex = column + startx;
 				tile.yIndex = row + starty;
 				tile.width=(tile.xIndex == imgXTiles-1)? curWidth - tile.xIndex * tileSize : tileSize; 
@@ -422,39 +425,20 @@ PanoJS.prototype = {
 				
 				tile.posx = column * tileSize - xoff;
 				tile.posy = row * tileSize - yoff;
-				
-				this.assignTileImage(tile);
-				
+				jQuery(this.assignTileImage(tile)).data(dataName,currentTime);
 			}
 		}
-		
-		
 		//remove tiles which were needed earlier but for the current state are obsolete to display everything within the viewer
-		if (this.tiles.length > xTiles && this.oldXTiles > xTiles) {
-			for (var row = 0; row < yTiles; row++) {
-				var tile = this.tiles[xTiles][row];
+		jQuery("img."+PanoJS.TILE_STYLE_CLASS, this.well).each(function removeEdgeTiles(){
+			if (jQuery(this).data(dataName)!=currentTime){
+				//was not inserted or updated in the current run of updateScreen
 				try {
-					jQuery(tile.element).remove();
-					tile.element = null;
-				} catch (e) { console.log("Error while tile remove : " + e); }
+					this.parentNode.removeChild(this);
+				} catch (e) { log("Error while tile remove : " + e); }
 			}
-		}
-		
-		if (this.tiles.length > 0 && this.tiles[0].length > yTiles && this.oldYTiles > yTiles) {
-			for (var column = 0; column < xTiles; column++) {
-				var tile = this.tiles[column][yTiles];
-				try {
-					jQuery(tile.element).remove();
-					tile.element = null;
-				} catch (e) { console.log("Error while tile remove : " + e); }
-			}
-		}
-		
-		//keep this value to only clear those tiles if there were more last run
-		this.oldYTiles = yTiles;
-		this.oldXTiles = xTiles;
+		});
 	},
-
+	
 	/**
 	 * Determine the source image of the specified tile based
 	 * on the zoom level and position of the tile.  If forceBlankImage
@@ -463,43 +447,35 @@ PanoJS.prototype = {
 	 * routine, delaying the appearance of the tile until it is fully
 	 * loaded, if configured to do so.
 	 */
-	assignTileImage : function(tile, forceBlankImage) {
+	assignTileImage : function(tile) {
 		var tileURL = this.tileUrlProvider.assembleUrl(tile.xIndex, tile.yIndex, this.zoomLevel);
 		var tileImg = this.cache.getItem(tileURL);
 		// create cache if not exist
-		tile.element = null;
 		if (tileImg == null){
 			//create tileImg and store in cache
 			tileImg = this.createPrototype(tileURL);
-			if (!isBrowser(["IE"])) { 
-				/* sometimes IE7 doesnt trigger the image.onload(wich makes display=block) 
-				 * and the picture will be invisible.
-				 */
-				tileImg.style.display = "none";
-			}
 			this.cache.setItem(tileURL, tileImg, {'callback': function() {
 				//drop tiles if they're no longer cached
-				if (tileImg.element) {
-					jQuery(tile.element).remove();
-					tileImg.element = null;
+				log("removing tileImg from cache"+tileImg.src);
+				if (tileImg.parentNode!=null) {
+					if (tileImg.parentNode.removeChild(tileImg)!=null){
+						log("removed "+tileImg.src+" from cache");
+					} else {
+						log("error while removing "+tileImg.src+" from cache");
+					};
 				}
 			}});
-			
 		}
+
+		tileImg.style.top = tile.posy + 'px';Iview.Group1Document_derivate_00000001[0].viewerBean.cache.count_
+		tileImg.style.left = tile.posx + 'px';
+		tileImg.style.width = tile.width + "px";
+		tileImg.style.height = tile.height + "px";
 		
-		
-		if (!tile.element || tile.element.src == tileImg.src){
-			tile.element = this.well.appendChild(tileImg);
-			
+		if (tileImg.parentNode==null){
+			tile.element=this.well.appendChild(tileImg);
 		}
-		
-		zoomScale = this.iview.currentImage.zoomInfo.scale;
-		
-		tile.element.style.top = tile.posy + 'px';
-		tile.element.style.left = tile.posx + 'px';
-		tile.element.style.width = tile.width + "px";
-		tile.element.style.height = tile.height + "px";
-		
+		return tileImg;
 	},
 	
 	/**
@@ -514,16 +490,23 @@ PanoJS.prototype = {
 			this.images[img]["scaled"] = false;
 		}
 	},
-
+	
 	createPrototype : function(src) {
 		var img = document.createElement('img');
-		img.src = src;
-		img.relativeSrc = src;
+		img.style.display = "none";
 		img.className = PanoJS.TILE_STYLE_CLASS;
 		// seems to need this no matter what
 		//changes all not available Tiles to the blank one, so that no ugly Image not Found Pics popup.
-		img.onload = function () { this.style.display = "block"; };
-		img.onerror = function () {this.src = PanoJS.BLANK_TILE_IMAGE; return true;};
+		img.onload = function () {
+			this.style.display = "block";
+		};
+		img.onerror = function () {
+			this.src = PanoJS.BLANK_TILE_IMAGE;
+			return true;
+		};
+		//important for events to set "src" as late a possible
+		img.src = src;
+		img.relativeSrc = src;
 		//don't handle width with tiles
 		return img;
 	},
