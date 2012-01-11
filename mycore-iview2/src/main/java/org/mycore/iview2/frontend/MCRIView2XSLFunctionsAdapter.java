@@ -66,9 +66,15 @@ public class MCRIView2XSLFunctionsAdapter {
         if (MCRAccessManager.checkPermission(derivateID, "create-pdf")) {
             options.append("\"pdfCreatorURI\":").append('\"').append(config.getString("MCR.Module-iview2.PDFCreatorURI", "")).append("\",");
             options.append("\"pdfCreatorStyle\":").append('\"').append(config.getString("MCR.Module-iview2.PDFCreatorStyle", ""))
-                    .append("\",");
+                    .append("\"");
         }
-        options.append(extensions);
+        
+        if(extensions!=null && !extensions.equals(""))
+        {
+        	options.append(",");
+        	options.append(extensions);
+        }
+        
         options.append('}');
         LOGGER.debug(options.toString());
         return options.toString();

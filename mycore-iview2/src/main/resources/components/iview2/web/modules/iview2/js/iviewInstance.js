@@ -153,7 +153,12 @@
          * mousepress+mousemove occured. The jsfiddle http://jsfiddle.net/cPjZV/3/ seems not to have this problem, which looks like its
          * caused from within our code. When those pseudo arguments occur they're missing our move object, so we check for that
          */
-        // if (arguments.length < 2) return;
+         //if (arguments.length < 2) return;
+    	 if(event == null || event.x == null || event.y == null)
+    	 {
+    		 return;
+    	 }
+    	 
         that.currentImage.setPos({
           'x' : -event.x,
           'y' : -event.y

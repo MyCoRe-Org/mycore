@@ -369,7 +369,7 @@ PanoJS.prototype = {
 	
 	updateScreen : function() {
 		var that = this;
-
+		
 		var rect = {};
 		var rotation = this.iview.currentImage.rotation;
 		var zoomInfo = this.iview.currentImage.zoomInfo;
@@ -380,7 +380,7 @@ PanoJS.prototype = {
 		var curWidth = this.iview.currentImage.curWidth;
 		var curHeight = this.iview.currentImage.curHeight;
 		
-		if (curWidth == 0||curHeight==0){
+		if (curWidth == 0 || curHeight == 0){
 		  //image is not ready
 		  return;
 		}
@@ -403,8 +403,8 @@ PanoJS.prototype = {
 		var yTiles = Math.ceil((yDim+yoff) / tileSize);
 		if (zoomInfo.scale!=1){
 		  //fitToWidth and fitToScreen
-      xTiles = Math.min(xTiles, imgXTiles);
-      yTiles = Math.min(yTiles, imgYTiles);
+	      xTiles = Math.min(xTiles, imgXTiles);
+	      yTiles = Math.min(yTiles, imgYTiles);
 		}
 		
 		//xstart, ystart
@@ -424,8 +424,11 @@ PanoJS.prototype = {
 				tile.posy = row * tileSize - yoff;
 				
 				this.assignTileImage(tile);
+				
 			}
 		}
+		
+		
 		//remove tiles which were needed earlier but for the current state are obsolete to display everything within the viewer
 		if (this.tiles.length > xTiles && this.oldXTiles > xTiles) {
 			for (var row = 0; row < yTiles; row++) {
@@ -433,7 +436,7 @@ PanoJS.prototype = {
 				try {
 					jQuery(tile.element).remove();
 					tile.element = null;
-				} catch (e) {}
+				} catch (e) { console.log("Error while tile remove : " + e); }
 			}
 		}
 		
@@ -443,7 +446,7 @@ PanoJS.prototype = {
 				try {
 					jQuery(tile.element).remove();
 					tile.element = null;
-				} catch (e) {}
+				} catch (e) { console.log("Error while tile remove : " + e); }
 			}
 		}
 		
@@ -461,32 +464,63 @@ PanoJS.prototype = {
 	 * loaded, if configured to do so.
 	 */
 	assignTileImage : function(tile, forceBlankImage) {
-		var tileImgId = this.tileUrlProvider.assembleUrl(tile.xIndex, tile.yIndex, this.zoomLevel);
-		var tileImg = this.cache.getItem(tileImgId);
+		var tileURL = this.tileUrlProvider.assembleUrl(tile.xIndex, tile.yIndex, this.zoomLevel);
+		var tileImg = this.cache.getItem(tileURL);
 		// create cache if not exist
-		if ((tile.element && tileImgId != tile.element.src) || tileImg == null || !tile.element) {
-			if (tile.element != null && tile.element.parentNode != null) {
-				jQuery(tile.element).remove();
-				tile.element = null;
+		tile.element = null;
+		if (tileImg == null){
+			//create tileImg and store in cache
+			tileImg = this.createPrototype(tileURL);
+			if (!isBrowser(["IE"])) { 
+				/* sometimes IE7 doesnt trigger the image.onload(wich makes display=block) 
+				 * and the picture will be invisible.
+				 */
+				tileImg.style.display = "none";
 			}
-			tileImg = this.createPrototype(tileImgId);
-			this.cache.setItem(tileImgId, tileImg, {'callback': function() {
+			this.cache.setItem(tileURL, tileImg, {'callback': function() {
 				//drop tiles if they're no longer cached
 				if (tileImg.element) {
 					jQuery(tile.element).remove();
 					tileImg.element = null;
 				}
 			}});
+			
+		}
+		
+		
+		if (!tile.element || tile.element.src == tileImg.src){
 			tile.element = this.well.appendChild(tileImg);
-			this.isloaded(tileImg);
+			
 		}
-		if (tile.element) {
-			tile.element.style.top = tile.posy + 'px';
-			tile.element.style.left = tile.posx + 'px';
+		
+		zoomScale = this.iview.currentImage.zoomInfo.scale;
+		
+		tile.element.style.top = tile.posy + 'px';
+		tile.element.style.left = tile.posx + 'px';
+		tile.element.style.width = tile.width + "px";
+		tile.element.style.height = tile.height + "px";
+		
+		//tile.element.style.width = zoomScale * tile.width + "px";
+		//tile.element.style.height = zoomScale * tile.height + "px";
+		
+		// The Tile is loaded now
+		// scale the Tile
+		/*var zoomScale= that.iview.currentImage.zoomInfo.scale;
+		if (!isBrowser(["IE","Opera"])) {
+			img.style.width = zoomScale * img.naturalWidth + "px";
+			img.style.height = zoomScale * img.naturalHeight + "px";
+		} else {
+			if (!that.images[img.src]["once"]) {
+				that.images[img.src]["once"] = true;
+				that.images[img.src]["naturalheight"] = img.clientHeight;
+				that.images[img.src]["naturalwidth"] = img.clientWidth;
+			}
+			img.style.width = zoomScale * that.images[img.src]["naturalwidth"] + "px";
+			img.style.height = zoomScale * that.images[img.src]["naturalheight"] + "px";
 		}
-		// seems to need this no matter what
-		//changes all not available Tiles to the blank one, so that no ugly Image not Found Pics popup.
-		tileImg.onerror = function () {this.src = PanoJS.BLANK_TILE_IMAGE; return true;};
+		// make the Tile visible
+		img.style.display = "block";
+		*/
 	},
 	
 	/**
@@ -507,46 +541,32 @@ PanoJS.prototype = {
 	 * @function
 	 * @name		isloaded
 	 * @memberOf	PanoJS
-	 * @description	checks if the picture is loaded
+	 * @description	checks if the picture is loaded and not null
 	 * @param		{object} img
 	 */
 	isloaded : function(img) {
-		/*
-		NOTE tiles are not displayed correctly in Opera, because the used accuracy for pixel values only has 
-		2 decimal places, however 3 are necessary for the correct representation as in FF
-		*/
+		if(img==null)
+		{
+			return false;
+		}
+		
 		if (!this.images[img.src]) {
 			this.images[img.src] = new Object();
 			this.images[img.src]["scaled"] = false;
-			img.style.display = "none";
+			//img.style.display = "none";
 		}
+		
 		if (((img.naturalWidth == 0 && img.naturalHeight == 0)  && !isBrowser(["IE", "Opera"])) || (!img.complete && isBrowser(["IE", "Opera"]))) {
-			if (img.src.indexOf("blank.gif") == -1) {//change
-				var that = this;
-				//TODO check if it can be modified to work with deferred objects
-				window.setTimeout(function(image) { return function(){that.isloaded(image);} }(img), 100);
-			}
-		} else if (img.src.indexOf("blank.gif") == -1) {
-			if (this.images[img.src]["scaled"] != true) {
-				img.style.display = "inline";
-				this.images[img.src]["scaled"] = true;//notice that this picture already was scaled
-				//TODO math Floor rein bauen bei Höhe und Breite
-			  var zoomScale=this.iview.currentImage.zoomInfo.scale;
-				if (!isBrowser(["IE","Opera"])) {
-					img.style.width = zoomScale * img.naturalWidth + "px";
-					img.style.height = zoomScale * img.naturalHeight + "px";
-				} else {
-					if (!this.images[img.src]["once"]) {
-						this.images[img.src]["once"] = true;
-						this.images[img.src]["naturalheight"] = img.clientHeight;
-						this.images[img.src]["naturalwidth"] = img.clientWidth;
-					}
-					img.style.width = zoomScale * this.images[img.src]["naturalwidth"] + "px";
-					img.style.height = zoomScale * this.images[img.src]["naturalheight"] + "px";
-				}
-			}
+			//if (img.src.indexOf("blank.gif") == -1) {//change
+			return false;
+			//} else {}
+		} 
+		else 
+		{
+			this.images[img.src]["scaled"] = true;
+			return true;
 		}
-		img = null;
+		
 	},
 
 	createPrototype : function(src) {
@@ -554,12 +574,12 @@ PanoJS.prototype = {
 		img.src = src;
 		img.relativeSrc = src;
 		img.className = PanoJS.TILE_STYLE_CLASS;
+		// seems to need this no matter what
+		//changes all not available Tiles to the blank one, so that no ugly Image not Found Pics popup.
+		img.onload = function () { img.style.display = "block"; };
+		img.onerror = function () {this.src = PanoJS.BLANK_TILE_IMAGE; return true;};
 		//don't handle width with tiles
-		try {
-			return img;
-		} finally {
-			img = null;
-		}
+		return img;
 	},
 
 	/**
