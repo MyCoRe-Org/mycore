@@ -467,7 +467,7 @@ PanoJS.prototype = {
 			}});
 		}
 
-		tileImg.style.top = tile.posy + 'px';Iview.Group1Document_derivate_00000001[0].viewerBean.cache.count_
+		tileImg.style.top = tile.posy + 'px';
 		tileImg.style.left = tile.posx + 'px';
 		tileImg.style.width = tile.width + "px";
 		tileImg.style.height = tile.height + "px";
