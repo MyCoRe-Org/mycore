@@ -195,6 +195,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         supportedSchemes.put("versioninfo", new MCRVersionInfoResolver());
         supportedSchemes.put("deletedMcrObject", new MCRDeletedObjectResolver());
         supportedSchemes.put("basket", new org.mycore.frontend.basket.MCRBasketResolver());
+        supportedSchemes.put("language", new org.mycore.datamodel.language.MCRLanguageResolver());
         return supportedSchemes;
     }
 

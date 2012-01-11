@@ -59,6 +59,13 @@ public class MCRLanguage {
         return codesByType.get(type);
     }
 
+    /**
+     * Returns all language codes used for this language
+     */
+    public Map<MCRLanguageCodeType, String> getCodes() {
+        return codesByType;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof MCRLanguage)
