@@ -500,27 +500,6 @@ PanoJS.prototype = {
 		tile.element.style.width = tile.width + "px";
 		tile.element.style.height = tile.height + "px";
 		
-		//tile.element.style.width = zoomScale * tile.width + "px";
-		//tile.element.style.height = zoomScale * tile.height + "px";
-		
-		// The Tile is loaded now
-		// scale the Tile
-		/*var zoomScale= that.iview.currentImage.zoomInfo.scale;
-		if (!isBrowser(["IE","Opera"])) {
-			img.style.width = zoomScale * img.naturalWidth + "px";
-			img.style.height = zoomScale * img.naturalHeight + "px";
-		} else {
-			if (!that.images[img.src]["once"]) {
-				that.images[img.src]["once"] = true;
-				that.images[img.src]["naturalheight"] = img.clientHeight;
-				that.images[img.src]["naturalwidth"] = img.clientWidth;
-			}
-			img.style.width = zoomScale * that.images[img.src]["naturalwidth"] + "px";
-			img.style.height = zoomScale * that.images[img.src]["naturalheight"] + "px";
-		}
-		// make the Tile visible
-		img.style.display = "block";
-		*/
 	},
 	
 	/**
@@ -535,39 +514,6 @@ PanoJS.prototype = {
 			this.images[img]["scaled"] = false;
 		}
 	},
-	
-	/**
-	 * @private
-	 * @function
-	 * @name		isloaded
-	 * @memberOf	PanoJS
-	 * @description	checks if the picture is loaded and not null
-	 * @param		{object} img
-	 */
-	isloaded : function(img) {
-		if(img==null)
-		{
-			return false;
-		}
-		
-		if (!this.images[img.src]) {
-			this.images[img.src] = new Object();
-			this.images[img.src]["scaled"] = false;
-			//img.style.display = "none";
-		}
-		
-		if (((img.naturalWidth == 0 && img.naturalHeight == 0)  && !isBrowser(["IE", "Opera"])) || (!img.complete && isBrowser(["IE", "Opera"]))) {
-			//if (img.src.indexOf("blank.gif") == -1) {//change
-			return false;
-			//} else {}
-		} 
-		else 
-		{
-			this.images[img.src]["scaled"] = true;
-			return true;
-		}
-		
-	},
 
 	createPrototype : function(src) {
 		var img = document.createElement('img');
@@ -576,7 +522,7 @@ PanoJS.prototype = {
 		img.className = PanoJS.TILE_STYLE_CLASS;
 		// seems to need this no matter what
 		//changes all not available Tiles to the blank one, so that no ugly Image not Found Pics popup.
-		img.onload = function () { img.style.display = "block"; };
+		img.onload = function () { this.style.display = "block"; };
 		img.onerror = function () {this.src = PanoJS.BLANK_TILE_IMAGE; return true;};
 		//don't handle width with tiles
 		return img;
