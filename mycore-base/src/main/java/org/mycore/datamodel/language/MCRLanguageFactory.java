@@ -115,7 +115,7 @@ public class MCRLanguageFactory {
 
         if (!languageByCode.containsKey(code)) {
             LOGGER.warn("Unknown language: " + code);
-            buildLanguage(code, code, null);
+            buildLanguage(code, code.length() > 2 ? code : null, null);
         }
 
         return languageByCode.get(code);
@@ -142,8 +142,12 @@ public class MCRLanguageFactory {
      * Builds the default languages 
      */
     private void buildDefaultLanguages() {
-        buildLanguage("de", "deu", "ger");
-        buildLanguage("en", "eng", null);
+        MCRLanguage de = buildLanguage("de", "deu", "ger");
+        MCRLanguage en = buildLanguage("en", "eng", null);
+        de.setLabel("de", "Deutsch");
+        de.setLabel("en", "German");
+        en.setLabel("de", "Englisch");
+        en.setLabel("en", "English");
     }
 
     /**
@@ -210,6 +214,13 @@ public class MCRLanguageFactory {
         MCRLabel lBiblCode = category.getLabel("x-bibl");
         String termCode = lTermCode == null ? null : lTermCode.getText();
         String biblCode = lBiblCode == null ? termCode : lBiblCode.getText();
-        buildLanguage(xmlCode, termCode, biblCode);
+
+        MCRLanguage language = buildLanguage(xmlCode, termCode, biblCode);
+
+        for (MCRLabel label : category.getLabels()) {
+            String code = label.getLang();
+            if (!code.startsWith("x-"))
+                language.setLabel(code, label.getText());
+        }
     }
 }

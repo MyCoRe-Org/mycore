@@ -38,6 +38,11 @@ public class MCRLanguage {
     private Map<MCRLanguageCodeType, String> codesByType = new HashMap<MCRLanguageCodeType, String>();
 
     /**
+     * A map of labels for this language, by language 
+     */
+    private Map<MCRLanguage, String> labelsByLanguage = new HashMap<MCRLanguage, String>();
+
+    /**
      * Language instances are created by the package itself, do not use on your own, use MCRLanguageFactory instead.
      * 
      * @see MCRLanguageFactory
@@ -64,6 +69,36 @@ public class MCRLanguage {
      */
     public Map<MCRLanguageCodeType, String> getCodes() {
         return codesByType;
+    }
+
+    /**
+     * Sets the label in the given language
+     */
+    void setLabel(String languageCode, String label) {
+        MCRLanguage language = MCRLanguageFactory.instance().getLanguage(languageCode);
+        labelsByLanguage.put(language, label);
+    }
+
+    /**
+     * Returns the label in the given language
+     */
+    public String getLabel(MCRLanguage language) {
+        return labelsByLanguage.get(language);
+    }
+
+    /**
+     * Returns the label in the given language
+     */
+    public String getLabel(String languageCode) {
+        MCRLanguage language = MCRLanguageFactory.instance().getLanguage(languageCode);
+        return labelsByLanguage.get(language);
+    }
+
+    /**
+     * Returns all labels used for this language
+     */
+    public Map<MCRLanguage, String> getLabels() {
+        return labelsByLanguage;
     }
 
     @Override
