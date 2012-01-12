@@ -33,14 +33,6 @@ import org.jdom.Namespace;
 public class MCRLanguageXML {
 
     /**
-     * Sets both the lang and xml:lang attributes in the given XML element.
-     */
-    public static void setLanguageAttributes(MCRLanguage lang, Element element) {
-        setLangAttribute(lang, element);
-        setXMLLangAttribute(lang, element);
-    }
-
-    /**
      * Sets the lang attribute to the ISO 639-2 bibliographic code of the given language 
      */
     public static void setLangAttribute(MCRLanguage lang, Element element) {
