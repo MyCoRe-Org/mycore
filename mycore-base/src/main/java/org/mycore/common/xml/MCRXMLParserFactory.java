@@ -46,7 +46,7 @@ public class MCRXMLParserFactory {
     private static boolean validateByDefault = false;
 
     static {
-        validateByDefault = MCRConfiguration.instance().getBoolean(PROPERTY_VALIDATE_BY_DEFAULT, false);
+        validateByDefault = MCRConfiguration.instance().getBoolean(PROPERTY_VALIDATE_BY_DEFAULT, true);
         parsers = new HashMap<Boolean, MCRXMLParser>();
         parsers.put(false, buildParser(false));
         parsers.put(true, buildParser(true));
