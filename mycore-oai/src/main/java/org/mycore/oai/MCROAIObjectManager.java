@@ -97,6 +97,9 @@ public class MCROAIObjectManager {
     public Record getRecord(String mcrId, MetadataFormat format) {
         Element recordElement = getJDOMRecord(mcrId, format);
         Element headerElement = recordElement.getChild("header", OAIConstants.NS_OAI);
+        if(headerElement == null) {
+            throw new NullPointerException("Header element of record " + mcrId + " ("+ format.getPrefix() + ") is null!");
+        }
         Header header = headerToHeader(headerElement);
         Element metadataElement = recordElement.getChild("metadata", OAIConstants.NS_OAI);
         if (metadataElement != null && metadataElement.getChildren().size() > 0) {
@@ -139,6 +142,9 @@ public class MCROAIObjectManager {
 
     public Header getHeader(String mcrId, MetadataFormat format) {
         Element headerElement = getJDOMHeader(mcrId, format);
+        if(headerElement == null) {
+            throw new NullPointerException("Header element of record " + mcrId + " ("+ format.getPrefix() + ") is null!");
+        }
         return headerToHeader(headerElement);
     }
 
