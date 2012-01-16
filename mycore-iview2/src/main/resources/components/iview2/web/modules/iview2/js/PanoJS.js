@@ -633,29 +633,10 @@ PanoJS.prototype = {
 			return;
 		}
 
-        var newWidth = this.viewer.offsetWidth;
-        var newHeight = this.viewer.offsetHeight;
-
-		this.viewer.style.display = 'none';
 		this.clear();
-
-		var before = {
-			'x' : Math.floor(this.width / 2),
-			'y' : Math.floor(this.height / 2)
-		};
-
-        this.width = newWidth;
-        this.height = newHeight;
-
+        this.width = this.viewer.offsetWidth;
+        this.height = this.viewer.offsetHeight;
 		this.prepareTiles();
-
-		var after = {
-			'x' : Math.floor(this.width / 2),
-			'y' : Math.floor(this.height / 2)
-		};
-
-		this.positionTiles();
-		this.viewer.style.display = '';
 		this.initialized = true;
 	},
 	

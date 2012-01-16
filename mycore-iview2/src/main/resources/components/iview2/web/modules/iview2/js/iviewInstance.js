@@ -247,7 +247,7 @@
       jQuery(this.viewerContainer).trigger((!this.viewerContainer.isMax() ? "minimize" : "maximize") + ".viewerContainer");
       /*
        * IE causes resize already at class change (mostly because position: rel <> fix) IE runs resize multiple times...but without this
-       * line he doesn't...
+       *  line he doesn't...
        */
       this.reinitializeGraphic();
     };
@@ -312,7 +312,7 @@
       zoomInfo.zoomBack = zoomInfo.zoomInit;
 
       this.roller = true;
-      if (this.properties.useParam) {
+      if (this.properties.useParam && (URL.getParam("x")!=="")) {
         viewerBean.positionTiles({
           'x' : toFloat(URL.getParam("x")),
           'y' : toFloat(URL.getParam("y"))
@@ -427,6 +427,7 @@
      * @param {float}
      *          value space the component will occupy, and therefore is removed from the viewer size
      * @return boolean returns true if added successfully, false in the case the given name is already used
+     * 
      */
     constructor.prototype.addDimensionSubstract = function(horizontal, name, value) {
       var dim = this.substractsDimension[((horizontal) ? 'x' : 'y')];
@@ -435,7 +436,7 @@
       }
       dim.entries[name] = toInt(value);
       dim.total += dim.entries[name];
-      this.reinitializeGraphic();
+    	  
       return true;
     };
 
