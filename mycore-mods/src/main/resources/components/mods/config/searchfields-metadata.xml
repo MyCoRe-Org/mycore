@@ -21,4 +21,6 @@
 
     <field name="mods.genre" type="identifier" source="objectMetadata" xpath="/mycoreobject/metadata/def.modsContainer/modsContainer/mods:mods/mods:genre" value="text()"
       addable="true" xmlns:mods="http://www.loc.gov/mods/v3"/>  
+
+    <field name="mods.identifier" source="objectMetadata" type="identifier" value="@ID" xpath="/mycoreobject/metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier"/>
     
