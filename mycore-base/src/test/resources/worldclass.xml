@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mycoreclass ID="World">
+<mycoreclass ID="World" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="MCRClassification.xsd">
   <label xml:lang="de" text="Staaten" description="Klassifikation von Staaten" />
   <label xml:lang="en" text="Nations" description="classification of states" />
   <categories>
