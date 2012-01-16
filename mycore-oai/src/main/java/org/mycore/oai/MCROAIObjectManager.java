@@ -31,6 +31,8 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.jdom.Element;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRDELETEDITEMS;
 import org.mycore.common.MCRConfiguration;
@@ -151,8 +153,13 @@ public class MCROAIObjectManager {
     }
 
     protected Element getURI(String uri) {
-        LOGGER.debug("get " + uri);
-        return (Element) (MCRURIResolver.instance().resolve(uri).detach());
+        Element e = (Element) (MCRURIResolver.instance().resolve(uri).detach());
+        if(LOGGER.isDebugEnabled()) {
+            LOGGER.debug("get " + uri);
+            XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
+            LOGGER.debug(out.outputString(e));
+        }
+        return e;
     }
 
     protected String formatURI(String uri, String mcrId, String metadataPrefix) {
