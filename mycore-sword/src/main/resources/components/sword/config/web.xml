@@ -5,7 +5,7 @@
 
 <servlet>
 	<servlet-name>SwordServiceDocumentServlet</servlet-name>
-	<servlet-class>org.mycore.MCRSWORDServiceDocumentServlet</servlet-class>
+	<servlet-class>org.mycore.sword.MCRSWORDServiceDocumentServlet</servlet-class>
 </servlet>
 <servlet>
 	<servlet-name>AtomDocumentServlet</servlet-name>
