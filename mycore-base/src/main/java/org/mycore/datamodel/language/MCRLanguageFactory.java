@@ -31,9 +31,9 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
-import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 
 /**
  * Returns MCRLanguage instances. The languages most commonly used, English and German,
@@ -67,7 +67,7 @@ public class MCRLanguageFactory {
      */
     private MCRCategoryID classification = null;
 
-    private MCRCategoryDAO DAO = new MCRCategoryDAOImpl();
+    private MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
     /**
      * Language classification may change at runtime, so we remember the time we last read the languages in.
