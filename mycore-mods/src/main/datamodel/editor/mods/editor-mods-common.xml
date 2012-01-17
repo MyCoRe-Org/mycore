@@ -1084,7 +1084,7 @@
   <!-- DDC pub_klassifik -->
   <text id="mods.ddc.label" i18n="metaData.mods.dictionary.ddc" />
   <panel id="mods.ddc">
-    <cell anchor="NORTHWEST" var="mods:classification[@authority='ddc']">
+    <cell anchor="NORTHWEST" var="mods:classification[@authority='sdnb']">
       <list width="30" type="dropdown" id="mods.ddc.list">
         <include ref="pleaseSelect" />
         <include uri="classification:editor:-1:children:ddc-sg" cacheable="false" />
@@ -1097,7 +1097,7 @@
   </panel>
 
   <panel id="mods.ddc.optional">
-    <cell anchor="NORTHWEST" var="mods:classification[@authority='ddc']">
+    <cell anchor="NORTHWEST" var="mods:classification[@authority='sdnb']">
       <list width="30" type="dropdown">
         <include ref="pleaseSelect" />
         <include uri="classification:editor:-1:children:ddc-sg" cacheable="false" />
