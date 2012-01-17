@@ -1087,7 +1087,7 @@
     <cell anchor="NORTHWEST" var="mods:classification[@authority='sdnb']">
       <list width="30" type="dropdown" id="mods.ddc.list">
         <include ref="pleaseSelect" />
-        <include uri="classification:editor:-1:children:ddc-sg" cacheable="false" />
+        <include uri="classification:editor:-1:children:SDNB" cacheable="false" />
         <condition id="mods.ddc.cond" required="true">
           <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
           <label xml:lang="en">Please select one entry!</label>
@@ -1100,7 +1100,7 @@
     <cell anchor="NORTHWEST" var="mods:classification[@authority='sdnb']">
       <list width="30" type="dropdown">
         <include ref="pleaseSelect" />
-        <include uri="classification:editor:-1:children:ddc-sg" cacheable="false" />
+        <include uri="classification:editor:-1:children:SDNB" cacheable="false" />
       </list>
     </cell>
   </panel>
