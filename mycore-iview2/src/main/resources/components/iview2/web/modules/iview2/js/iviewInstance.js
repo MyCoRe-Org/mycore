@@ -86,7 +86,9 @@
         }
       };// other components which are lowering the width and the height of the viewer width and height
       // uncomment this line to activate canvas mode
-      // this.canvas = new iview.Canvas(this);
+      if (this.properties.useParam && URL.getParam("iview2.canvas") == "true") {
+    	  this.canvas = new iview.Canvas(this);
+      }
       jQuery(this.currentImage).bind(iview.CurrentImage.CHANGE_EVENT, function() {
         that.processImageProperties();
       });
