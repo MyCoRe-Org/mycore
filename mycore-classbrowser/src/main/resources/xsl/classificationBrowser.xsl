@@ -27,6 +27,7 @@
   <xsl:param name="WebApplicationBaseURL" />
   <xsl:param name="ServletsBaseURL" />
   <xsl:param name="RequestURL" />
+  <xsl:param name="HttpSession" />
   
   <xsl:template match="classificationbrowser">
     <xsl:call-template name="mcrClassificationBrowser">
@@ -76,17 +77,14 @@
       </xsl:attribute>
       
       <!-- jQuery -->
-      <script type="text/javascript" src="http://www.google.com/jsapi"></script>
-      <script type="text/javascript">google.load("jquery", "1");</script>
       <script type="text/javascript">
         /* &lt;![CDATA[ */
         
         var openCategs=[];
         
         function update(elementID,categID, f) {
-          jQuery(document.getElementById(elementID)).load('<xsl:value-of select="concat($ServletsBaseURL,'ClassificationBrowser')" />', 
+          jQuery(document.getElementById(elementID)).load('<xsl:value-of select="concat($ServletsBaseURL,'ClassificationBrowser',$HttpSession)" />', 
           { 
-            "XSL.template" : '<xsl:value-of select="$template" />',
             classification : '<xsl:value-of select="$classification" />',
             category       : categID,
             sortby         : '<xsl:value-of select="$sortby" />',

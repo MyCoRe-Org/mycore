@@ -7,8 +7,7 @@
   <xsl:param name="MCR.Module-iview2.PDFCreatorStyle" />
   <xsl:param name="WebApplicationBaseURL" />
   <xsl:param name="ServletsBaseURL" />
-  <xsl:variable name="jquery.version" select="'1.6.4'"/>
-  <xsl:variable name="jqueryUI.version" select="'1.8.14'"/>
+  <xsl:variable name="jqueryUI.version" select="'1.8.17'"/>
 
   <xsl:template name="iview2.getViewer" mode="iview2">
     <xsl:param name="groupID" />
@@ -64,12 +63,7 @@
     </xsl:variable>
     
     <xsl:if test="mcrxml:putVariable('iview2.init','done')!='done'">
-      <script type="text/javascript" src="http://www.google.com/jsapi"/>
-      <script type="text/javascript">
-      <!-- JQuery Framework -->
-        google.load("jquery", "<xsl:value-of select="$jquery.version"/>");
-        google.load("jqueryui", "<xsl:value-of select="$jqueryUI.version"/>");
-      </script>
+      <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/{$jqueryUI.version}/jquery-ui.min.js"/>
       
       <xsl:choose>
         <xsl:when test="$debugMode='true'">
