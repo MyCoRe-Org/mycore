@@ -27,7 +27,6 @@
   <xsl:param name="WebApplicationBaseURL" />
   <xsl:param name="ServletsBaseURL" />
   <xsl:param name="RequestURL" />
-  <xsl:param name="template" />
   
   <xsl:template match="classificationbrowser">
     <xsl:call-template name="mcrClassificationBrowser">
