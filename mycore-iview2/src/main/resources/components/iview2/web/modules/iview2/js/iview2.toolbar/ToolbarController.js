@@ -46,113 +46,111 @@ ToolbarController.prototype.addView = function(view) {
 	
 	this.views[view.id] = view;
 	
-	jQuery(view)
-		.bind("press", function (e, args) {
-			if (args.parentName == "zoomHandles") {
-				if (args.elementName == "zoomIn") {
-		    			that.getViewer().viewerBean.zoomViewer(true);
-					} else if (args.elementName == "zoomOut") {
-	        			that.getViewer().viewerBean.zoomViewer();
-	    			} else if (args.elementName == "fitToWidth") {
-		    			that.getViewer().viewerBean.pictureWidth();
-					} else if (args.elementName == "fitToScreen") {    				
-	    				that.getViewer().viewerBean.pictureScreen();
-	    			}
-    		} else if (args.parentName == "overviewHandles") {
-    			var button = new Object;
-    			button.setLoading = function(loading) {
-    				that.perform("setLoading", loading, args.parentName, args.elementName);
-    			}
-    			button.setSubtypeState = function(state) {
-    				that.perform("setSubtypeState", state, args.parentName, args.elementName);
-    			}
-				if (args.elementName == "openThumbnailPanel") {
-					iview.ThumbnailPanel.openThumbnailPanel(that.getViewer(), button);
-				} else if (args.elementName == "openChapter") {
-					iview.chapter.openChapter(that.getViewer(), button);
-				}
-			} else if (args.parentName == "navigateHandles" || args.parentName == "previewForward" || args.parentName == "previewBack") {
-				if (args.elementName == "backward") {
-					that.getViewer().PhysicalModel.setPrevious();
-				} else if (args.elementName == "forward") {
-					that.getViewer().PhysicalModel.setNext();
-				}
-			} else if (args.parentName == "permalinkHandles") {
-				if (args.elementName == "permalink") {
-					var button = new Object;
-					button.setLoading = function(loading) {
-						that.perform("setLoading", loading, args.parentName, args.elementName);
-					}
-					iview.Permalink.openPermalink(that.getViewer(), button);
-				}
-			} else if (args.parentName == "pdfHandles") {
-				if (args.elementName == "createPdf") {
-					that.getViewer().openPdfCreator();
-				}
-			} else if (args.parentName == "closeHandles") {
-				if (args.elementName == "close") {
-					if (URL.getParam("jumpback") == "true"){
-						history.back();
-						return;
-					}
-					that.getViewer().toggleViewerMode();
-				}
-			}
-		})
-	    .bind("new", function(e, args) {
-	    	// this is more than a button
-	    	if (args.parentName == "overviewHandles") {
-    			if (args.elementName == "openChapter") {
-    				if (that.getViewer().chapter.loaded && that.getViewer().chapter.getActive()) {
-    					that.perform("setSubtypeState", true, args.parentName, args.elementName);
-    				}
-    			}
-	    	} else if (args.parentName == "navigateHandles") {
-	    		if (args.elementName == "pageBox") {
-		    		// TODO: maybe do this in the toolbar view?
-			    	args.view.addClass("iview2-button-icon-dropdown");
-			      	args.view.menu({
-			      		// content list to navigate
-					    content: that.getViewer().context.container.find('#pages').html(),
-					    /*width: 100,*/
-					    maxHeight: 280,
-					    positionOpts: {
-							posX: 'left', 
-							posY: 'bottom',
-							offsetX: 0,
-							offsetY: 0,
-							directionH: 'right',
-							directionV: 'down', 
-							detectH: true, // do horizontal collision detection  
-							detectV: false, // do vertical collision detection
-							linkToFront: false
-					    },
-						onChoose: function(item) {
-								args.view.button( "option", "label", jQuery(item).text());
-								var content = (jQuery(item).text());
-								var page = content.substring(content.lastIndexOf('[') + 1, content.lastIndexOf(']'));
-								that.getViewer().PhysicalModel.setPosition(page);
-						}
-					});
-			      	// MainTbView erst nachträglich geladen, Mets zuvor gelesen
-			      	if (that.getViewer().PhysicalModel) {
-				      	var initContent = jQuery(jQuery('#pages').find('a')[that.getViewer().PhysicalModel.getCurPos() - 1]).html();
-				      	that.updateDropDown(initContent);
-				      	
-				      	// chapter and ThumbnailPanel need to wait for METS informations
-				      	that.perform("setActive", true, 'overviewHandles', 'openChapter');
-				      	that.perform("setActive", true, 'overviewHandles', 'openThumbnailPanel');
-			      	}
-	    		}
-	    	} else if (args.parentName == "permalinkHandles") {
-    			if (args.elementName == "permalink") {
-    				if (typeof that.getViewer().getPermalinkCtrl !== "undefined" && that.getViewer().getPermalinkCtrl().getActive()) {
-    					// TODO: Model for Permalink
-			    		that.perform("setActive", true, 'permalinkHandles', 'permalink');
-			    	}
-    			}
-	    	}
-	    });
+	jQuery(view).bind("press", function(e, args) {
+    if (args.parentName == "zoomHandles") {
+      if (args.elementName == "zoomIn") {
+        that.getViewer().viewerBean.zoomViewer(true);
+      } else if (args.elementName == "zoomOut") {
+        that.getViewer().viewerBean.zoomViewer();
+      } else if (args.elementName == "fitToWidth") {
+        that.getViewer().viewerBean.pictureWidth();
+      } else if (args.elementName == "fitToScreen") {
+        that.getViewer().viewerBean.pictureScreen();
+      }
+    } else if (args.parentName == "overviewHandles") {
+      var button = new Object;
+      button.setLoading = function(loading) {
+        that.perform("setLoading", loading, args.parentName, args.elementName);
+      };
+      button.setSubtypeState = function(state) {
+        that.perform("setSubtypeState", state, args.parentName, args.elementName);
+      };
+      if (args.elementName == "openThumbnailPanel") {
+        iview.ThumbnailPanel.openThumbnailPanel(that.getViewer(), button);
+      } else if (args.elementName == "openChapter") {
+        iview.chapter.openChapter(that.getViewer(), button);
+      }
+    } else if (args.parentName == "navigateHandles" || args.parentName == "previewForward" || args.parentName == "previewBack") {
+      if (args.elementName == "backward") {
+        that.getViewer().PhysicalModel.setPrevious();
+      } else if (args.elementName == "forward") {
+        that.getViewer().PhysicalModel.setNext();
+      }
+    } else if (args.parentName == "permalinkHandles") {
+      if (args.elementName == "permalink") {
+        var button = new Object;
+        button.setLoading = function(loading) {
+          that.perform("setLoading", loading, args.parentName, args.elementName);
+        };
+        iview.Permalink.openPermalink(that.getViewer(), button);
+      }
+    } else if (args.parentName == "pdfHandles") {
+      if (args.elementName == "createPdf") {
+        that.getViewer().openPdfCreator();
+      }
+    } else if (args.parentName == "closeHandles") {
+      if (args.elementName == "close") {
+        if (URL.getParam("jumpback") == "true") {
+          history.back();
+          return;
+        }
+        that.getViewer().toggleViewerMode();
+      }
+    }
+  }).bind("new", function(e, args) {
+    // this is more than a button
+    if (args.parentName == "overviewHandles") {
+      if (args.elementName == "openChapter") {
+        if (that.getViewer().chapter.loaded && that.getViewer().chapter.getActive()) {
+          that.perform("setSubtypeState", true, args.parentName, args.elementName);
+        }
+      }
+    } else if (args.parentName == "navigateHandles") {
+      if (args.elementName == "pageBox") {
+        // TODO: maybe do this in the toolbar view?
+        args.view.addClass("iview2-button-icon-dropdown");
+        args.view.menu({
+          // content list to navigate
+          content : that.getViewer().context.container.find('#pages').html(),
+          /* width: 100, */
+          maxHeight : 280,
+          positionOpts : {
+            posX : 'left',
+            posY : 'bottom',
+            offsetX : 0,
+            offsetY : 0,
+            directionH : 'right',
+            directionV : 'down',
+            detectH : true, // do horizontal collision detection
+            detectV : false, // do vertical collision detection
+            linkToFront : false
+          },
+          onChoose : function(item) {
+            args.view.button("option", "label", jQuery(item).text());
+            var content = (jQuery(item).text());
+            var page = content.substring(content.lastIndexOf('[') + 1, content.lastIndexOf(']'));
+            that.getViewer().PhysicalModel.setPosition(page);
+          }
+        });
+        // MainTbView erst nachträglich geladen, Mets zuvor gelesen
+        if (that.getViewer().PhysicalModel) {
+          var initContent = jQuery(jQuery('#pages').find('a')[that.getViewer().PhysicalModel.getCurPos() - 1]).html();
+          that.updateDropDown(initContent);
+
+          // chapter and ThumbnailPanel need to wait for METS informations
+          that.perform("setActive", true, 'overviewHandles', 'openChapter');
+          that.perform("setActive", true, 'overviewHandles', 'openThumbnailPanel');
+        }
+      }
+    } else if (args.parentName == "permalinkHandles") {
+      if (args.elementName == "permalink") {
+        if (typeof that.getViewer().getPermalinkCtrl !== "undefined" && that.getViewer().getPermalinkCtrl().getActive()) {
+          // TODO: Model for Permalink
+          that.perform("setActive", true, 'permalinkHandles', 'permalink');
+        }
+      }
+    }
+  });
 };
 
 /**
@@ -337,13 +335,11 @@ ToolbarController.prototype.checkNavigation = function(model) {
  * @param		{integer} zoom defines the current zoom Level of the shown content
  */
 ToolbarController.prototype.checkZoom = function(zoom) {
-	var viewer = this.getViewer()
+	var viewer = this.getViewer();
 	var preload = viewer.preload;
 	var zoomIn = (viewer.currentImage.width <= preload.width() && viewer.currentImage.height <= preload.height())? false : true;
 	var zoomOut = (zoom == 0)? false : true;
 	
-	var models = this.getViewer().toolbar.mgr.models;
-
 	this.perform("setActive", zoomIn, 'zoomHandles', 'zoomIn');
 	this.perform("setActive", zoomOut, 'zoomHandles', 'zoomOut');
 };
