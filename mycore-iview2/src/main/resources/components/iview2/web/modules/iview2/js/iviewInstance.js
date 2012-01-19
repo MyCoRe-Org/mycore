@@ -21,7 +21,9 @@
     if (typeof Iview[derivateId] === "undefined") {
       Iview[derivateId] = [];
     }
-    return Iview[derivateId].push(iViewInst);
+    var returnValue = Iview[derivateId].push(iViewInst);
+    jQuery.event.trigger(iview.IViewInstance.INIT_EVENT,iViewInst);
+    return returnValue;
   };
 
   iview.IViewInstance = (function() {
@@ -480,4 +482,7 @@
 
     return constructor;
   })();
+  
+  iview.IViewInstance.INIT_EVENT="init.iview.instance";
+    
 })();
