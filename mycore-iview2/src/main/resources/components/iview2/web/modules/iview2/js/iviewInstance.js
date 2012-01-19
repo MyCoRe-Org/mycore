@@ -22,7 +22,7 @@
       Iview[derivateId] = [];
     }
     var returnValue = Iview[derivateId].push(iViewInst);
-    jQuery.event.trigger(iview.IViewInstance.INIT_EVENT,iViewInst);
+    jQuery(document).trigger(iview.IViewInstance.INIT_EVENT,iViewInst);
     return returnValue;
   };
 
