@@ -28,6 +28,7 @@
   <xsl:param name="ServletsBaseURL" />
   <xsl:param name="RequestURL" />
   <xsl:param name="HttpSession" />
+  <xsl:param name="MCR.Ajax.LoadingImage" />
   
   <xsl:template match="classificationbrowser">
     <xsl:call-template name="mcrClassificationBrowser">
@@ -83,6 +84,11 @@
         var openCategs=[];
         
         function update(elementID,categID, f) {
+          <xsl:if test="string-length($MCR.Ajax.LoadingImage) &gt; 0">
+            var loaderImage = '&lt;img class="loading" src="<xsl:value-of select="concat($WebApplicationBaseURL,$MCR.Ajax.LoadingImage)"/>" /&gt;';
+            jQuery(document.getElementById(elementID)).html(loaderImage);
+          </xsl:if>
+          
           jQuery(document.getElementById(elementID)).load('<xsl:value-of select="concat($ServletsBaseURL,'ClassificationBrowser',$HttpSession)" />', 
           { 
             classification : '<xsl:value-of select="$classification" />',
