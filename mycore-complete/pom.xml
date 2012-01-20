@@ -24,9 +24,6 @@
             <configuration>
               <transformers>
                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <manifest>
-                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                  </manifest>
                   <manifestEntries>
                     <Specification-Title>${project.name}</Specification-Title>
                     <Specification-Version>${project.version}</Specification-Version>
