@@ -22,11 +22,14 @@
 
 package org.mycore.frontend.servlets;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.mycore.access.MCRAccessManager;
@@ -40,7 +43,7 @@ public class MCRSessionListingServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
     public void doGetPost(MCRServletJob job) throws Exception {
-        if (!MCRAccessManager.checkPermission("manage-sessions")){
+        if (!MCRAccessManager.checkPermission("manage-sessions")) {
             job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN, MCRTranslation.translate("component.session-listing.page.text"));
             return;
         }
@@ -58,6 +61,14 @@ public class MCRSessionListingServlet extends MCRServlet {
             String currentUserID = session.getUserInformation().getCurrentUserID();
             sessionXML.addContent(new Element("login").setText(currentUserID));
             sessionXML.addContent(new Element("ip").setText(session.getCurrentIP()));
+            try {
+                Element hostname = new Element("hostname");
+                InetAddress inetAddress = InetAddress.getByName(session.getCurrentIP());
+                hostname.setText(inetAddress.getHostName());
+                sessionXML.addContent(hostname);
+            } catch (UnknownHostException e1) {
+                Logger.getLogger(MCRSessionListingServlet.class).warn("Could not resolve host", e1);
+            }
             if (currentUserID != null) {
                 String userRealName = session.getUserInformation().getUserAttribute(MCRUserInformation.ATT_REAL_NAME);
                 if (userRealName != null) {
@@ -83,5 +94,4 @@ public class MCRSessionListingServlet extends MCRServlet {
         }
         return new Document(sessionsXML);
     }
-
 }
