@@ -155,9 +155,6 @@
               <mainClass>org.mycore.common.MCRCoreVersion</mainClass>
               <addExtensions />
             </manifest>
-            <manifestEntries>
-              <Implementation-Build>${buildNumber}</Implementation-Build>
-            </manifestEntries>
           </archive>
         </configuration>
         <executions>
