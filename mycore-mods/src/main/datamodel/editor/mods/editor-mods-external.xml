@@ -16,4 +16,14 @@
       </repeater>
     </cell>
   </panel>
+
+  <!-- application specific internal data -->
+  <panel id="mods.internals">
+    <!-- Kommentar -->
+    <cell row="10" col="1" anchor="NORTHEAST" ref="mods.note.label" />
+    <cell row="10" col="2" anchor="NORTHWEST" ref="mods.note" />
+    <cell row="10" col="3" anchor="NORTHWEST" ref="mods.note.help" />
+    <!-- Kommentar END -->
+  </panel>
+
 </imports>

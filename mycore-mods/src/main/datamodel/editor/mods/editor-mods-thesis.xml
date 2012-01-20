@@ -149,21 +149,9 @@
     <cell row="148" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
       <text id="thesis.internals" i18n="metaData.mods.dictionary.institution.box" />
     </cell>
-    <!-- arev_klassifik -->
-    <cell row="150" col="1" anchor="NORTHEAST" ref="mods.arev.label" style="padding-top:5px;" />
-    <cell row="150" col="2" anchor="NORTHWEST" ref="mods.arev" var="metadata/def.modsContainer/modsContainer/mods:mods" style="padding-top:5px;" />
-    <cell row="150" col="3" anchor="NORTHWEST" ref="mods.arev.help" style="padding-top:5px;" />
-    <!-- arev_klassifik END -->
-  
-    <!-- arev_jahr -->
-    <cell row="155" col="1" anchor="NORTHEAST" ref="mods.arev.year.label" />
-    <cell row="155" col="2" anchor="NORTHWEST" ref="mods.arev.year" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="155" col="3" anchor="NORTHWEST" ref="mods.arev.year.help" />
-    <!-- arev_jahr END -->
 
-
-    <!-- Institution-Tripple -->
-    <cell row="160" col="1" colspan="3" anchor="NORTHWEST" ref="mods.noteLocationCorp" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <!-- application specific internal data -->
+    <cell row="150" col="1" colspan="3" anchor="NORTHWEST" ref="mods.internals" var="metadata/def.modsContainer/modsContainer/mods:mods" style="padding-top:5px;" />
 
 
     <!-- save cancel buttons -->

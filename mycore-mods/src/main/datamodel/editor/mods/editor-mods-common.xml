@@ -797,25 +797,6 @@
     </label>
   </helpPopup>
   <!-- Stichworte END -->
-  
-  <!-- dreier repeater -->
-  <panel id="mods.noteLocationCorp">
-    <cell var="noteLocationCorp">
-      <repeater>
-        <panel>
-          <cell row="1" col="1" anchor="NORTHEAST" ref="mods.assignedInstitute.label" />
-          <cell row="1" col="2" anchor="NORTHWEST" ref="mods.assignedInstitute" />
-          <cell row="1" col="3" anchor="NORTHWEST" ref="mods.assignedInstitute.help" />
-          <cell row="20" col="1" anchor="NORTHEAST" ref="mods.note.label" />
-          <cell row="20" col="2" anchor="NORTHWEST" ref="mods.note" />
-          <cell row="20" col="3" anchor="NORTHWEST" ref="mods.note.help" />
-          <cell row="30" col="1" anchor="NORTHEAST" ref="mods.physicalLocation.label" />
-          <cell row="30" col="2" anchor="NORTHWEST" ref="mods.physicalLocation" var="mods:location" />
-          <cell row="30" col="3" anchor="NORTHWEST" ref="mods.physicalLocation.help" />
-        </panel>
-      </repeater>
-    </cell>
-  </panel>
 
   <!-- Kommentar -->
   <text id="mods.note.label" i18n="metaData.mods.dictionary.note" />
@@ -1081,7 +1062,7 @@
   </helpPopup>
   <!-- Identifier END -->
 
-  <!-- DDC pub_klassifik -->
+  <!-- sdnb pub_klassifik -->
   <text id="mods.ddc.label" i18n="metaData.mods.dictionary.ddc" />
   <panel id="mods.ddc">
     <cell anchor="NORTHWEST" var="mods:classification[@authority='sdnb']">
@@ -1106,64 +1087,12 @@
   </panel>
 
   <helpPopup id="mods.ddc.help" width="400px" height="250px">
-    <label xml:lang="de">Die Zuordnung des Dokumentes zur DDC-Sachgruppe. Mit dem "+" Button
-      können weitere DDC-Sachgruppen hinzugefügt werden.</label>
-    <label xml:lang="en">Entry from the ddc list.With "+" buttons can be selected additional
-      ddc categories.</label>
+    <label xml:lang="de">Die Zuordnung des Dokumentes zur Sachgruppe der DNB. Mit dem "+" Button
+      können weitere Sachgruppen hinzugefügt werden.</label>
+    <label xml:lang="en">Entry from the SDNB list. With "+" buttons can be selected additional
+      SDNB categories.</label>
   </helpPopup>
   <!-- DDC pub_klassifik END -->
-  
-  <!-- Jahresberichts Klassifikation -->
-  <text id="mods.arev.label" i18n="metaData.mods.dictionary.annual_review" />
-  <panel id="mods.arev">
-    <cell anchor="NORTHWEST" var="mods:classification[@displayLabel='annual_review']">
-      <panel>
-        <cell var="@mcr:categId">
-          <list width="30" type="dropdown" id="mods.arev.list">
-            <include ref="pleaseSelect" />
-            <include uri="classification:editorComplete:-1:children:annual_review" cacheable="false" />
-          </list>
-        </cell>
-      </panel>
-    </cell>
-  </panel>
-
-  <helpPopup id="mods.arev.help" width="400px" height="250px">
-    <label xml:lang="de">
-      Die für den Jahresbericht relevanten Dokumente müssen hier eine Zuordnung erhalten.<br /><br />
-      Die Einträge wie „Im Druck“, „nicht zugeordnet“ oder „nicht im JB“ sind keine tatsächlichen
-      Jahresberichtskategorien. Sie dienen der Kontrolle der Jahresberichte und
-      bestimmen einen Zwischenstand bei der Eingruppierung einer Publikation.
-      Die Kontrolllisten eines vorläufigen Jahresberichtes, werden zur Ansicht
-      an alle Institute verschickt, um diese undefinierten Kategorien noch zu bestimmen.
-      <br /><br />
-      Nicht alle Publikationen werden in einen Jahresbericht aufgenommen. Bei
-      diesen Publikationen wird auch keine Kategorie eingegeben. Bei den
-      Publikationen, die theoretisch in einen Jahresbericht aufgenommen werden
-      könnten, dies aber aus einem bestimmten Grund doch nicht erfolgte, wird
-      der Eintrag „nicht im JB“ gemacht. Eine explizite Anmerkung, dass eine
-      Publikation nicht in einen Jahresbericht aufgenommen war, dient ebenfalls
-      einer Kontrolle.
-    </label>
-    <label xml:lang="en">The annual report for the relevant documents have to receive an allocation.</label>
-  </helpPopup>
-  <!-- Jahresberichts Klassifikation  END -->
-
-  <!-- Jahresberichtsjahr -->
-  <text id="mods.arev.year.label" i18n="metaData.mods.dictionary.annual_review_year" />
-  <panel id="mods.arev.year">
-    <cell anchor="NORTHWEST" var="mods:classification[@displayLabel='annual_review']/@edition">
-      <textfield width="4" maxlength="4" />
-    </cell>
-  </panel>
-
-  <helpPopup id="mods.arev.year.help" width="400px" height="250px">
-    <label xml:lang="de">Geben Sie hier das Jahr an, in dem das Dokument im Jahresbericht gelistet werden soll.
-    </label>
-    <label xml:lang="en">Annual review year</label>
-  </helpPopup>
-  <!-- Place END -->
-
 
   <!-- Bei Postern -> Größe [text] -->
   <text id="mods.physicalDescription.label" i18n="metaData.mods.dictionary.extent" />

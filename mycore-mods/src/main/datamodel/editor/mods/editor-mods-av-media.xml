@@ -122,19 +122,8 @@
       <text id="avmedium.internals" i18n="metaData.mods.dictionary.institution.box" />
     </cell>
     
-    <!-- arev_klassifik -->
-    <cell row="310" col="1" anchor="NORTHEAST" ref="mods.arev.label" style="padding-top:5px;" />
-    <cell row="310" col="2" anchor="NORTHWEST" ref="mods.arev" var="metadata/def.modsContainer/modsContainer/mods:mods" style="padding-top:5px;" />
-    <cell row="310" col="3" anchor="NORTHWEST" ref="mods.arev.help" style="padding-top:5px;" />
-    <!-- arev_klassifik END -->
-
-    <!-- arev_jahr -->
-    <cell row="320" col="1" anchor="NORTHEAST" ref="mods.arev.year.label" />
-    <cell row="320" col="2" anchor="NORTHWEST" ref="mods.arev.year" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="320" col="3" anchor="NORTHWEST" ref="mods.arev.year.help" />
-    <!-- arev_jahr END -->
-    
-    <cell row="400" col="1" colspan="3" anchor="NORTHWEST" ref="mods.noteLocationCorp" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <!-- application specific internal data -->
+    <cell row="310" col="1" colspan="3" anchor="NORTHWEST" ref="mods.internals" var="metadata/def.modsContainer/modsContainer/mods:mods" style="padding-top:5px;" />
 
     <cell col="1" colspan="3" row="410" anchor="NORTHEAST" style="padding-top:20px;">
       <submitButton width="100px" i18n="common.button.save" />
