@@ -464,16 +464,19 @@
         </table>
       </div>
     </div>
-    <div id="institution_box" class="detailbox">
-      <h4 id="institution_switch" class="block_switch">
-        <xsl:value-of select="i18n:translate('metaData.mods.dictionary.institution.box')" />
-      </h4>
-      <div id="institution_content" class="block_content">
-        <table class="metaData">
-          <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID]" />
-        </table>
+
+    <xsl:if test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID]">
+      <div id="institution_box" class="detailbox">
+        <h4 id="institution_switch" class="block_switch">
+          <xsl:value-of select="i18n:translate('metaData.mods.dictionary.institution.box')" />
+        </h4>
+        <div id="institution_content" class="block_content">
+          <table class="metaData">
+            <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID]" />
+          </table>
+        </div>
       </div>
-    </div>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.thesis">
@@ -505,66 +508,81 @@
       </div>
     </div>
 
-    <div id="abstract_box" class="detailbox">
-      <h4 id="abstract_switch" class="block_switch">
-        <xsl:value-of select="i18n:translate('metaData.mods.dictionary.abstractbox')" />
-      </h4>
-      <div id="abstract_content" class="block_content">
-        <table class="metaData">
-          <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:abstract" />
-        </table>
+    <xsl:if test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:abstract">
+      <div id="abstract_box" class="detailbox">
+        <h4 id="abstract_switch" class="block_switch">
+          <xsl:value-of select="i18n:translate('metaData.mods.dictionary.abstractbox')" />
+        </h4>
+        <div id="abstract_content" class="block_content">
+          <table class="metaData">
+            <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:abstract" />
+          </table>
+        </div>
       </div>
-    </div>
+    </xsl:if>
 
-    <div id="category_box" class="detailbox">
-      <h4 id="category_switch" class="block_switch">
-        <xsl:value-of select="i18n:translate('metaData.mods.dictionary.categorybox')" />
-      </h4>
-      <div id="category_content" class="block_content">
-        <table class="metaData">
-          <xsl:if test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='kindof']">
-            <tr>
-              <td valign="top" class="metaname">
-                <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.genre.kindof'),':')" />
-              </td>
-              <td class="metavalue">
-                <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='kindof']"
-                  mode="printModsClassInfo" />
-              </td>
-            </tr>
-          </xsl:if>
-          <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
-          <xsl:call-template name="printMetaDate.mods">
-            <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:physicalDescription/mods:extent" />
-          </xsl:call-template>
-          <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
-          <xsl:call-template name="printMetaDate.mods">
-            <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateIssued" />
-          </xsl:call-template>
-          <xsl:call-template name="printMetaDate.mods">
-            <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:place/mods:placeTerm" />
-          </xsl:call-template>
-          <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:classification" />
-          <xsl:call-template name="printMetaDate.mods">
-            <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:subject" />
-            <xsl:with-param name="sep" select="'; '" />
-          </xsl:call-template>
-          <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:url" />
-          <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:accessCondition" />
-        </table>
+    <xsl:if test="(./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='kindof']) or
+                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:language) or
+                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:physicalDescription/mods:extent) or
+                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier) or
+                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateIssued) or
+                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:place/mods:placeTerm) or
+                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:classification) or
+                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:subject) or
+                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:url) or
+                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:accessCondition)">
+      <div id="category_box" class="detailbox">
+        <h4 id="category_switch" class="block_switch">
+          <xsl:value-of select="i18n:translate('metaData.mods.dictionary.categorybox')" />
+        </h4>
+        <div id="category_content" class="block_content">
+          <table class="metaData">
+            <xsl:if test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='kindof']">
+              <tr>
+                <td valign="top" class="metaname">
+                  <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.genre.kindof'),':')" />
+                </td>
+                <td class="metavalue">
+                  <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='kindof']"
+                    mode="printModsClassInfo" />
+                </td>
+              </tr>
+            </xsl:if>
+            <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
+            <xsl:call-template name="printMetaDate.mods">
+              <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:physicalDescription/mods:extent" />
+            </xsl:call-template>
+            <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
+            <xsl:call-template name="printMetaDate.mods">
+              <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateIssued" />
+            </xsl:call-template>
+            <xsl:call-template name="printMetaDate.mods">
+              <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:place/mods:placeTerm" />
+            </xsl:call-template>
+            <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:classification" />
+            <xsl:call-template name="printMetaDate.mods">
+              <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:subject" />
+              <xsl:with-param name="sep" select="'; '" />
+            </xsl:call-template>
+            <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:url" />
+            <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:accessCondition" />
+          </table>
+        </div>
       </div>
-    </div>
+    </xsl:if>
 
-    <div id="institution_box" class="detailbox">
-      <h4 id="institution_switch" class="block_switch">
-        <xsl:value-of select="i18n:translate('metaData.mods.dictionary.institution.box')" />
-      </h4>
-      <div id="institution_content" class="block_content">
-        <table class="metaData">
-          <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID]" />
-        </table>
+    <xsl:if test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID]">
+      <div id="institution_box" class="detailbox">
+        <h4 id="institution_switch" class="block_switch">
+          <xsl:value-of select="i18n:translate('metaData.mods.dictionary.institution.box')" />
+        </h4>
+        <div id="institution_content" class="block_content">
+          <table class="metaData">
+            <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID]" />
+          </table>
+        </div>
       </div>
-    </div>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="title.cproceeding">
@@ -693,16 +711,19 @@
         </table>
       </div>
     </div>
-    <div id="institution_box" class="detailbox">
-      <h4 id="institution_switch" class="block_switch">
-        <xsl:value-of select="i18n:translate('metaData.mods.dictionary.institution.box')" />
-      </h4>
-      <div id="institution_content" class="block_content">
-        <table class="metaData">
-          <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID]" />
-        </table>
+    
+    <xsl:if test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID]">
+      <div id="institution_box" class="detailbox">
+        <h4 id="institution_switch" class="block_switch">
+          <xsl:value-of select="i18n:translate('metaData.mods.dictionary.institution.box')" />
+        </h4>
+        <div id="institution_content" class="block_content">
+          <table class="metaData">
+            <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID]" />
+          </table>
+        </div>
       </div>
-    </div>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.book">
@@ -746,16 +767,18 @@
         </table>
       </div>
     </div>
-    <div id="institution_box" class="detailbox">
-      <h4 id="institution_switch" class="block_switch">
-        <xsl:value-of select="i18n:translate('metaData.mods.dictionary.institution.box')" />
-      </h4>
-      <div id="institution_content" class="block_content">
-        <table class="metaData">
-          <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID]" />
-        </table>
+    <xsl:if test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID]">
+      <div id="institution_box" class="detailbox">
+        <h4 id="institution_switch" class="block_switch">
+          <xsl:value-of select="i18n:translate('metaData.mods.dictionary.institution.box')" />
+        </h4>
+        <div id="institution_content" class="block_content">
+          <table class="metaData">
+            <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID]" />
+          </table>
+        </div>
       </div>
-    </div>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.book-chapter">
@@ -789,16 +812,18 @@
         </table>
       </div>
     </div>
-    <div id="institution_box" class="detailbox">
-      <h4 id="institution_switch" class="block_switch">
-        <xsl:value-of select="i18n:translate('metaData.mods.dictionary.institution.box')" />
-      </h4>
-      <div id="institution_content" class="block_content">
-        <table class="metaData">
-          <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID]" />
-        </table>
+    <xsl:if test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID]">
+      <div id="institution_box" class="detailbox">
+        <h4 id="institution_switch" class="block_switch">
+          <xsl:value-of select="i18n:translate('metaData.mods.dictionary.institution.box')" />
+        </h4>
+        <div id="institution_content" class="block_content">
+          <table class="metaData">
+            <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID]" />
+          </table>
+        </div>
       </div>
-    </div>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.journal">
@@ -924,16 +949,18 @@
         </table>
       </div>
     </div>
-    <div id="institution_box" class="detailbox">
-      <h4 id="institution_switch" class="block_switch">
-        <xsl:value-of select="i18n:translate('metaData.mods.dictionary.institution.box')" />
-      </h4>
-      <div id="institution_content" class="block_content">
-        <table class="metaData">
-          <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID]" />
-        </table>
+    <xsl:if test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID]">
+      <div id="institution_box" class="detailbox">
+        <h4 id="institution_switch" class="block_switch">
+          <xsl:value-of select="i18n:translate('metaData.mods.dictionary.institution.box')" />
+        </h4>
+        <div id="institution_content" class="block_content">
+          <table class="metaData">
+            <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID]" />
+          </table>
+        </div>
       </div>
-    </div>
+    </xsl:if>
   </xsl:template>
 
   <!--  AV-Media -->
@@ -978,16 +1005,18 @@
         </table>
       </div>
     </div>
-    <div id="institution_box" class="detailbox">
-      <h4 id="institution_switch" class="block_switch">
-        <xsl:value-of select="i18n:translate('metaData.mods.dictionary.institution.box')" />
-      </h4>
-      <div id="institution_content" class="block_content">
-        <table class="metaData">
-          <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID]" />
-        </table>
+    <xsl:if test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID]">
+      <div id="institution_box" class="detailbox">
+        <h4 id="institution_switch" class="block_switch">
+          <xsl:value-of select="i18n:translate('metaData.mods.dictionary.institution.box')" />
+        </h4>
+        <div id="institution_content" class="block_content">
+          <table class="metaData">
+            <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID]" />
+          </table>
+        </div>
       </div>
-    </div>
+    </xsl:if>
   </xsl:template>
 
 </xsl:stylesheet>

@@ -275,107 +275,109 @@
         </xsl:otherwise>
       </xsl:choose>
       <!--*** Editor Buttons ************************************* -->
-      <div id="derivate_box" class="detailbox">
-        <h4 id="derivate_switch" class="block_switch">
-          <a name="derivate_box"></a>
-          <xsl:value-of select="i18n:translate('metaData.mods.dictionary.derivatebox')" />
-        </h4>
-        <div id="derivate_content" class="block_content">
-          <table class="metaData">
-            <xsl:variable name="child-layout">
-              <xsl:choose>
-                <xsl:when test="$mods-type = 'book'">
-                  <xsl:value-of select="'book-chapter'" />
-                </xsl:when>
-                <xsl:when test="$mods-type = 'cproceeding'">
-                  <xsl:value-of select="'cpublication'" />
-                </xsl:when>
-                <xsl:when test="$mods-type = 'journal'">
-                  <xsl:value-of select="'article'" />
-                </xsl:when>
-                <xsl:when test="$mods-type = 'series'">
-                  <xsl:value-of select="'book|cproceeding'" />
-                </xsl:when>
-              </xsl:choose>
-            </xsl:variable>
-            <xsl:if test="string-length($child-layout) &gt; 0 and acl:checkPermission(./@ID,'writedb')">
-              <xsl:choose>
-                <xsl:when test="$mods-type = 'series'">
-                  <tr>
-                    <td class="metaname">
-                      <xsl:value-of select="concat(i18n:translate('metaData.addChildObject.series.book'),':')" />
-                    </td>
-                    <td class="metavalue">
-                      <a
-                        href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=book&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
-                        <xsl:value-of select="i18n:translate('metaData.mods.types.book')" />
-                      </a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="metaname">
-                      <xsl:value-of select="concat(i18n:translate('metaData.addChildObject.series.cproceeding'),':')" />
-                    </td>
-                    <td class="metavalue">
-                      <a
-                        href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=cproceeding&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
-                        <xsl:value-of select="i18n:translate('metaData.mods.types.cproceeding')" />
-                      </a>
-                    </td>
-                  </tr>
-                </xsl:when>
-                <xsl:otherwise>
-                  <tr>
-                    <td class="metaname">
-                      <xsl:value-of select="concat(i18n:translate(concat('metaData.addChildObject.', $mods-type)),':')" />
-                    </td>
-                    <td class="metavalue">
-                      <a
-                        href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout={$child-layout}&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
-                        <xsl:value-of select="i18n:translate(concat('metaData.mods.types.',$child-layout))" />
-                      </a>
-                    </td>
-                  </tr>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:if>
-            <!--*** List children per object type ************************************* -->
-            <!-- 1.) get a list of objectTypes of all child elements 2.) remove duplicates from this list 3.) for-each objectTyp id list child elements -->
-            <xsl:variable name="objectTypes">
-              <xsl:for-each select="./structure/children/child/@xlink:href">
-                <id>
-                  <xsl:copy-of select="substring-before(substring-after(.,'_'),'_')" />
-                </id>
-              </xsl:for-each>
-            </xsl:variable>
-            <xsl:variable select="xalan:nodeset($objectTypes)/id[not(.=following::id)]" name="unique-ids" />
-            <!-- the for-each would iterate over <id> with root not beeing /mycoreobject so we save the current node in variable context to access 
-              needed nodes -->
-            <xsl:variable select="." name="context" />
-            <xsl:for-each select="$unique-ids">
-              <xsl:variable select="." name="thisObjectType" />
-              <xsl:variable name="label">
+      <xsl:if test="./structure/children/child">
+        <div id="derivate_box" class="detailbox">
+          <h4 id="derivate_switch" class="block_switch">
+            <a name="derivate_box"></a>
+            <xsl:value-of select="i18n:translate('metaData.mods.dictionary.derivatebox')" />
+          </h4>
+          <div id="derivate_content" class="block_content">
+            <table class="metaData">
+              <xsl:variable name="child-layout">
                 <xsl:choose>
-                  <xsl:when test="count($context/structure/children/child[contains(@xlink:href,$thisObjectType)])=1">
-                    <xsl:value-of select="i18n:translate(concat('metaData.',$thisObjectType,'.[singular]'))" />
+                  <xsl:when test="$mods-type = 'book'">
+                    <xsl:value-of select="'book-chapter'" />
                   </xsl:when>
-                  <xsl:otherwise>
-                    <xsl:value-of select="i18n:translate(concat('metaData.',$thisObjectType,'.[plural]'))" />
-                  </xsl:otherwise>
+                  <xsl:when test="$mods-type = 'cproceeding'">
+                    <xsl:value-of select="'cpublication'" />
+                  </xsl:when>
+                  <xsl:when test="$mods-type = 'journal'">
+                    <xsl:value-of select="'article'" />
+                  </xsl:when>
+                  <xsl:when test="$mods-type = 'series'">
+                    <xsl:value-of select="'book|cproceeding'" />
+                  </xsl:when>
                 </xsl:choose>
               </xsl:variable>
-              <xsl:call-template name="printMetaDate">
-                <xsl:with-param select="$context/structure/children/child[contains(@xlink:href, concat('_',$thisObjectType,'_'))]"
-                  name="nodes" />
-                <xsl:with-param select="$label" name="label" />
-              </xsl:call-template>
-            </xsl:for-each>
-            <xsl:apply-templates mode="printDerivates" select=".">
-              <xsl:with-param select="$staticURL" name="staticURL" />
-            </xsl:apply-templates>
-          </table>
+              <xsl:if test="string-length($child-layout) &gt; 0 and acl:checkPermission(./@ID,'writedb')">
+                <xsl:choose>
+                  <xsl:when test="$mods-type = 'series'">
+                    <tr>
+                      <td class="metaname">
+                        <xsl:value-of select="concat(i18n:translate('metaData.addChildObject.series.book'),':')" />
+                      </td>
+                      <td class="metavalue">
+                        <a
+                          href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=book&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
+                          <xsl:value-of select="i18n:translate('metaData.mods.types.book')" />
+                        </a>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="metaname">
+                        <xsl:value-of select="concat(i18n:translate('metaData.addChildObject.series.cproceeding'),':')" />
+                      </td>
+                      <td class="metavalue">
+                        <a
+                          href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=cproceeding&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
+                          <xsl:value-of select="i18n:translate('metaData.mods.types.cproceeding')" />
+                        </a>
+                      </td>
+                    </tr>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <tr>
+                      <td class="metaname">
+                        <xsl:value-of select="concat(i18n:translate(concat('metaData.addChildObject.', $mods-type)),':')" />
+                      </td>
+                      <td class="metavalue">
+                        <a
+                          href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout={$child-layout}&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
+                          <xsl:value-of select="i18n:translate(concat('metaData.mods.types.',$child-layout))" />
+                        </a>
+                      </td>
+                    </tr>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:if>
+              <!--*** List children per object type ************************************* -->
+              <!-- 1.) get a list of objectTypes of all child elements 2.) remove duplicates from this list 3.) for-each objectTyp id list child elements -->
+              <xsl:variable name="objectTypes">
+                <xsl:for-each select="./structure/children/child/@xlink:href">
+                  <id>
+                    <xsl:copy-of select="substring-before(substring-after(.,'_'),'_')" />
+                  </id>
+                </xsl:for-each>
+              </xsl:variable>
+              <xsl:variable select="xalan:nodeset($objectTypes)/id[not(.=following::id)]" name="unique-ids" />
+              <!-- the for-each would iterate over <id> with root not beeing /mycoreobject so we save the current node in variable context to access 
+                needed nodes -->
+              <xsl:variable select="." name="context" />
+              <xsl:for-each select="$unique-ids">
+                <xsl:variable select="." name="thisObjectType" />
+                <xsl:variable name="label">
+                  <xsl:choose>
+                    <xsl:when test="count($context/structure/children/child[contains(@xlink:href,$thisObjectType)])=1">
+                      <xsl:value-of select="i18n:translate(concat('metaData.',$thisObjectType,'.[singular]'))" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="i18n:translate(concat('metaData.',$thisObjectType,'.[plural]'))" />
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:variable>
+                <xsl:call-template name="printMetaDate">
+                  <xsl:with-param select="$context/structure/children/child[contains(@xlink:href, concat('_',$thisObjectType,'_'))]"
+                    name="nodes" />
+                  <xsl:with-param select="$label" name="label" />
+                </xsl:call-template>
+              </xsl:for-each>
+              <xsl:apply-templates mode="printDerivates" select=".">
+                <xsl:with-param select="$staticURL" name="staticURL" />
+              </xsl:apply-templates>
+            </table>
+          </div>
         </div>
-      </div>
+      </xsl:if>
       <!--*** Created ************************************* -->
       <div id="system_box" class="detailbox">
         <h4 id="system_switch" class="block_switch">
