@@ -69,7 +69,7 @@ function build(structure, items, counter){
 				categ.setName(items[i].name);
 				/* the order within a structure*/
 				categ.setLogicalOrder(i + 1);
-				/* TODO set the real type of the structure as defined by the dfg */
+				/* set the type of the structure as defined by the dfg */
 				categ.setStructureType(items[i].structureType);
 				structure.addChild(categ);
 				build(categ, items[i].children, c);

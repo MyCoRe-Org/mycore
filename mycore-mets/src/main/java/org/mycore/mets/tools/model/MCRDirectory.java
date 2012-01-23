@@ -23,6 +23,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Vector;
 
+import com.google.gson.Gson;
+
 /**
  * This class models a structure/folder within a tree. It may contain
  * {@link MCREntry}s and {@link MCRDirectory}s.
@@ -137,11 +139,11 @@ public class MCRDirectory implements MCRIMetsSortable, Comparator<MCRIMetsSortab
      */
     public String asJson() {
         StringBuilder buffer = new StringBuilder();
-
+        Gson gson = new Gson();
         MCRIMetsSortable[] obj = getOrderedElements();
 
-        buffer.append("\t{\"id\": \"" + logicalId + "\", \"name\":\"" + label + "\", \"type\":\"category\"" + ", \"structureType\":\""
-                + structureType + "\"");
+        buffer.append("\t{\"id\": \"" + logicalId + "\", \"name\":" + gson.toJson(label) + ", \"type\":\"category\""
+                + ", \"structureType\":\"" + structureType + "\"");
         buffer.append(", \"children\":[\n");
 
         for (int i = 0; i < obj.length; i++) {
@@ -152,7 +154,7 @@ public class MCRDirectory implements MCRIMetsSortable, Comparator<MCRIMetsSortab
                 MCRDirectory aDir = (MCRDirectory) obj[i];
                 MCRIMetsSortable[] children = aDir.getOrderedElements();
 
-                buffer.append("{ \"id\": \"" + logicalId + "\", \"name\":\"" + aDir.getLabel() + "\", \"type\":\"category\""
+                buffer.append("{ \"id\": \"" + logicalId + "\", \"name\":" + gson.toJson(aDir.getLabel()) + ", \"type\":\"category\""
                         + ", \"structureType\":\"" + aDir.getStructureType() + "\"");
                 buffer.append(", \"children\":[\n");
 

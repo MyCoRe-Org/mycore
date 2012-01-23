@@ -18,6 +18,8 @@
  */
 package org.mycore.mets.tools.model;
 
+import com.google.gson.Gson;
+
 /**
  * @author Silvio Hermann (shermann)
  */
@@ -183,8 +185,10 @@ public class MCREntry implements MCRIMetsSortable {
      * @see org.mycore.mets.tools.model.IMetsSortable#asJson()
      */
     public String asJson() {
-        String toReturn = "{ \"id\": \"" + itemId + "\", \"path\": \"" + this.path + "\", \"name\":\"" + this.label
-                + "\", \"orderLabel\":\"" + this.orderLabel + "\", \"structureType\":\"" + this.structureType + "\", \"type\":\"item\" }";
+        Gson gson = new Gson();
+        String toReturn = "{ \"id\": \"" + itemId + "\", \"path\": \"" + this.path + "\", \"name\":" + gson.toJson(this.label)
+                + ", \"orderLabel\":" + gson.toJson(this.orderLabel) + ", \"structureType\":\"" + this.structureType
+                + "\", \"type\":\"item\" }";
 
         return toReturn;
     }
