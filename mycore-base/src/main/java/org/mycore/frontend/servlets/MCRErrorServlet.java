@@ -90,8 +90,8 @@ public class MCRErrorServlet extends HttpServlet {
         }
         return MCRServlet.getSession(req);
     }
-    
-    private void setWebAppBaseURL(MCRSession session, HttpServletRequest request){
+
+    private void setWebAppBaseURL(MCRSession session, HttpServletRequest request) {
         if (request.getAttribute(MCRServlet.BASE_URL_ATTRIBUTE) != null) {
             session.put(MCRServlet.BASE_URL_ATTRIBUTE, request.getAttribute(MCRServlet.BASE_URL_ATTRIBUTE));
         }
@@ -99,7 +99,8 @@ public class MCRErrorServlet extends HttpServlet {
 
     protected void generateErrorPage(HttpServletRequest request, HttpServletResponse response, String msg, Throwable ex, Integer statusCode,
         Class<? extends Throwable> exceptionType, String requestURI, String servletName) throws IOException {
-        LOGGER.log(ex == null ? Level.WARN : Level.ERROR,
+        boolean exceptionThrown = ex != null;
+        LOGGER.log(exceptionThrown ? Level.ERROR : Level.WARN,
             MessageFormat.format("{0}: Error {1} occured. The following message was given: {2}", requestURI, statusCode, msg), ex);
 
         String rootname = "mcr_error";
@@ -128,7 +129,7 @@ public class MCRErrorServlet extends HttpServlet {
 
         Document errorDoc = new Document(root, new DocType(rootname));
 
-        while (ex != null) {
+        while (exceptionThrown) {
             Element exception = new Element("exception");
             exception.setAttribute("type", ex.getClass().getName());
             Element trace = new Element("trace");
@@ -164,7 +165,9 @@ public class MCRErrorServlet extends HttpServlet {
                     session.commitTransaction();
                 return;
             } finally {
-                MCRSessionMgr.releaseCurrentSession();
+                if (exceptionThrown) {
+                    MCRSessionMgr.releaseCurrentSession();
+                }
                 if (!sessionFromRequest) {
                     //new session created for transaction
                     session.close();
