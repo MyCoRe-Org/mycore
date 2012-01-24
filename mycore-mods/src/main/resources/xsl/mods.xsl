@@ -228,12 +228,14 @@
           <xsl:call-template name="mods.editobject_without_table">
             <xsl:with-param select="./@ID" name="id" />
             <xsl:with-param select="'journal'" name="layout" />
+            <xsl:with-param select="$mods-type" name="mods-type" />
           </xsl:call-template>
         </xsl:when>
         <xsl:otherwise>
           <xsl:call-template name="mods.editobject_without_table">
             <xsl:with-param select="./@ID" name="id" />
             <xsl:with-param select="$mods-type" name="layout" />
+            <xsl:with-param select="$mods-type" name="mods-type" />
           </xsl:call-template>
         </xsl:otherwise>
       </xsl:choose>
@@ -283,63 +285,6 @@
           </h4>
           <div id="derivate_content" class="block_content">
             <table class="metaData">
-              <xsl:variable name="child-layout">
-                <xsl:choose>
-                  <xsl:when test="$mods-type = 'book'">
-                    <xsl:value-of select="'book-chapter'" />
-                  </xsl:when>
-                  <xsl:when test="$mods-type = 'cproceeding'">
-                    <xsl:value-of select="'cpublication'" />
-                  </xsl:when>
-                  <xsl:when test="$mods-type = 'journal'">
-                    <xsl:value-of select="'article'" />
-                  </xsl:when>
-                  <xsl:when test="$mods-type = 'series'">
-                    <xsl:value-of select="'book|cproceeding'" />
-                  </xsl:when>
-                </xsl:choose>
-              </xsl:variable>
-              <xsl:if test="string-length($child-layout) &gt; 0 and acl:checkPermission(./@ID,'writedb')">
-                <xsl:choose>
-                  <xsl:when test="$mods-type = 'series'">
-                    <tr>
-                      <td class="metaname">
-                        <xsl:value-of select="concat(i18n:translate('metaData.addChildObject.series.book'),':')" />
-                      </td>
-                      <td class="metavalue">
-                        <a
-                          href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=book&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
-                          <xsl:value-of select="i18n:translate('metaData.mods.types.book')" />
-                        </a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td class="metaname">
-                        <xsl:value-of select="concat(i18n:translate('metaData.addChildObject.series.cproceeding'),':')" />
-                      </td>
-                      <td class="metavalue">
-                        <a
-                          href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=cproceeding&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
-                          <xsl:value-of select="i18n:translate('metaData.mods.types.cproceeding')" />
-                        </a>
-                      </td>
-                    </tr>
-                  </xsl:when>
-                  <xsl:otherwise>
-                    <tr>
-                      <td class="metaname">
-                        <xsl:value-of select="concat(i18n:translate(concat('metaData.addChildObject.', $mods-type)),':')" />
-                      </td>
-                      <td class="metavalue">
-                        <a
-                          href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout={$child-layout}&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
-                          <xsl:value-of select="i18n:translate(concat('metaData.mods.types.',$child-layout))" />
-                        </a>
-                      </td>
-                    </tr>
-                  </xsl:otherwise>
-                </xsl:choose>
-              </xsl:if>
               <!--*** List children per object type ************************************* -->
               <!-- 1.) get a list of objectTypes of all child elements 2.) remove duplicates from this list 3.) for-each objectTyp id list child elements -->
               <xsl:variable name="objectTypes">
@@ -569,6 +514,7 @@
     <xsl:param name="hasURN" select="'false'" />
     <xsl:param name="displayAddDerivate" select="'true'" />
     <xsl:param name="layout" select="'$'" />
+    <xsl:param name="mods-type" select="'report'" />
     <xsl:variable name="layoutparam">
       <xsl:if test="$layout != '$'">
         <xsl:value-of select="concat('&amp;layout=',$layout)" />
@@ -635,6 +581,50 @@
                   <xsl:value-of select="i18n:translate('object.editAllModsXML')" />
                 </a></li>
               </xsl:if>
+
+              <xsl:variable name="child-layout">
+                <xsl:choose>
+                  <xsl:when test="$mods-type = 'book'">
+                    <xsl:value-of select="'book-chapter'" />
+                  </xsl:when>
+                  <xsl:when test="$mods-type = 'cproceeding'">
+                    <xsl:value-of select="'cpublication'" />
+                  </xsl:when>
+                  <xsl:when test="$mods-type = 'journal'">
+                    <xsl:value-of select="'article'" />
+                  </xsl:when>
+                  <xsl:when test="$mods-type = 'series'">
+                    <xsl:value-of select="'book|cproceeding'" />
+                  </xsl:when>
+                </xsl:choose>
+              </xsl:variable>
+              <xsl:if test="string-length($child-layout) &gt; 0 and acl:checkPermission(./@ID,'writedb')">
+                <xsl:choose>
+                  <xsl:when test="$mods-type = 'series'">
+                    <li>
+                      <a
+                        href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=book&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
+                        <xsl:value-of select="i18n:translate('metaData.mods.types.book')" />
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=cproceeding&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
+                        <xsl:value-of select="i18n:translate('metaData.mods.types.cproceeding')" />
+                      </a>
+                    </li>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <li>
+                      <a
+                        href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout={$child-layout}&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
+                        <xsl:value-of select="i18n:translate(concat('metaData.mods.types.',$child-layout))" />
+                      </a>
+                    </li>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:if>
+
               </ul>
             </div>
           </div>
