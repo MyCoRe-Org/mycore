@@ -197,6 +197,7 @@
   <text id="mods.related.title.label" i18n="metaData.mods.dictionary.relatedtitle" />
   <text id="mods.cproceeding.title.label" i18n="metaData.mods.dictionary.cproceedingTitle" />
   <panel id="mods.title">
+    <hidden var="@altRepGroup" value="1"/>
     <cell anchor="NORTHWEST" var="mods:title">
       <textarea id="mods.title.text" width="45" height="3">
         <condition id="mods.title.cond" required="true">
@@ -226,6 +227,7 @@
   <!-- TITLE HTML -->
   <text id="mods.htmltitle.label" i18n="metaData.mods.dictionary.htmltitle" />
   <panel id="mods.htmltitle">
+    <hidden var="@altRepGroup" value="1"/>
     <cell anchor="NORTHWEST" var="mods:title">
       <textarea id="mods.htmltitle.text" width="45" height="3" />
     </cell>
