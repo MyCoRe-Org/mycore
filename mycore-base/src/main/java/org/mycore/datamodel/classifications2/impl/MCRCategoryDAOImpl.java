@@ -455,6 +455,13 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         }
         // important to flush here as positionInParent could collide with deleted categories
         if (flushBeforeUpdate) {
+            //update add new categories before flush
+            for (MCRCategoryImpl category : newMap.values()) {
+                if (!oldMap.containsKey(category.getId())) {
+                    LOGGER.info("adding new parent category :" + category.getId());
+                    session.save(category);
+                }
+            }
             session.flush();
         }
         session.saveOrUpdate(newCategoryImpl);

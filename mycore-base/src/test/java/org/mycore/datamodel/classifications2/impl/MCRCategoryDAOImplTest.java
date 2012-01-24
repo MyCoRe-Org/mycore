@@ -347,6 +347,15 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         MCRCategory oldCategory = DAO.getCategory(new MCRCategoryID("World", "Europe"), -1);
         DAO.replaceCategory(oldCategory);
     }
+    
+    @Test
+    public void replaceMarcRelator() throws Exception {
+        MCRCategory marcrelator=loadClassificationResource("/marcrelator-test.xml");
+        DAO.addCategory(null, marcrelator);
+        startNewTransaction();
+        marcrelator=loadClassificationResource("/marcrelator-test2.xml");
+        DAO.replaceCategory(marcrelator);
+    }
 
     @Test
     public void setLabel() {
@@ -436,15 +445,18 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
      * @throws MCRException 
      */
     private void loadWorldClassification() throws URISyntaxException, MCRException, SAXParseException, IOException {
-        URL worlClassUrl = this.getClass().getResource(WORLD_CLASS_RESOURCE_NAME);
-        Document xml = MCRXMLParserFactory.getParser().parseXML(MCRContent.readFrom(worlClassUrl));
-        category = MCRXMLTransformer.getCategory(xml);
+        category = loadClassificationResource(WORLD_CLASS_RESOURCE_NAME);
+    }
+
+    private MCRCategory loadClassificationResource(String resourceName) throws SAXParseException, IOException, URISyntaxException {
+        URL classResourceUrl = this.getClass().getResource(resourceName);
+        Document xml = MCRXMLParserFactory.getParser().parseXML(MCRContent.readFrom(classResourceUrl));
+        MCRCategory category = MCRXMLTransformer.getCategory(xml);
+        return category;
     }
 
     private void loadWorldClassification2() throws URISyntaxException, MCRException, SAXParseException, IOException {
-        URL worlClassUrl = this.getClass().getResource(WORLD_CLASS2_RESOURCE_NAME);
-        Document xml = MCRXMLParserFactory.getParser().parseXML(MCRContent.readFrom(worlClassUrl));
-        category2 = MCRXMLTransformer.getCategory(xml);
+        category2 = loadClassificationResource(WORLD_CLASS2_RESOURCE_NAME);
     }
 
     private static int countNodes(MCRCategory category) {

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mycoreclass xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="MCRClassification.xsd" ID="marcrelator">
+  <label xml:lang="x-auth" text="marcrelator" description="A list of possible contributor roles" />
+  <categories>
+    <category ID="cre">
+      <label xml:lang="en" text="Creator"
+        description="Use for a person or organization responsible for the intellectual or artistic content of a work." />
+      <label xml:lang="de" text="Urheber(in)"
+        description="Eine Person oder Institution, die für den intellektuellen oder künstlerischen Inhalt eines Werkes verantwortlich ist." />
+      <label xml:lang="x-miless" text="creator" />
+      <category ID="aut">
+        <label xml:lang="en" text="Author"
+          description="Use for a person or organization chiefly responsible for the intellectual or artistic content of a work, usually printed text. This term may also be used when more than one person or body bears such responsibility. " />
+        <label xml:lang="de" text="Autor(in)"
+          description="Eine Person oder Institution, die für den geistigen oder gestalterischen Inhalt hauptsächlich verantwortlich ist, insbesondere für gedruckten text. Dieser Ausdruck kann auch verwendet wenn mehr als eine Person betroffen ist." />
+        <label xml:lang="x-miless" text="author" />
+      </category>
+    </category>
+  </categories>
+</mycoreclass>
