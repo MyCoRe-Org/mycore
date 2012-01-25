@@ -139,6 +139,7 @@ public class MCRErrorServlet extends HttpServlet {
             exception.addContent(message).addContent(trace);
             root.addContent(exception);
             ex = ex.getCause();
+            exceptionThrown = ex != null;
         }
 
         request.setAttribute("XSL.Style", style);
