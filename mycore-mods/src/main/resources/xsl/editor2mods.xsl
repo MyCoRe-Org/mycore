@@ -162,4 +162,11 @@
     </xsl:attribute>
   </xsl:template>
 
+  <!-- workaround for bug #3479633 -->
+  <xsl:template match="@transliteration">
+    <xsl:attribute name="transliteration">
+      <xsl:value-of select="'text/html'"/>
+    </xsl:attribute>
+</xsl:template>
+
 </xsl:stylesheet>
