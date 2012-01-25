@@ -360,15 +360,15 @@
     <hidden var="nameOrPND/@editor.output" />
     <cell col="1" row="1" anchor="NORTHEAST">
       <text>
-        <label xml:lang="de">Name oder PND</label>
-        <label xml:lang="en">Name or PND</label>
+        <label xml:lang="de">Name oder GND-ID</label>
+        <label xml:lang="en">Name or GND-ID</label>
       </text>
     </cell>
     <cell col="2" row="1" anchor="NORTHEAST" var="nameOrPND">
       <textfield id="mods.author.firstname.text" width="31" maxlength="128">
         <condition id="mods.author.firstname.cond" required="true">
-          <label xml:lang="de">Bitte geben Sie den Namen der Person (&lt;Name, Vorname&gt;) an oder die PND id!</label>
-          <label xml:lang="en">Please insert authors name.</label>
+          <label xml:lang="de">Bitte geben Sie den Namen der Person (&lt;Name, Vorname&gt;) an oder die GND-ID (Personen UND Körperschaften)!</label>
+          <label xml:lang="en">Please insert person or corporation name alternativly insert GND-ID (person or corporation).</label>
         </condition>
       </textfield>
     </cell>
