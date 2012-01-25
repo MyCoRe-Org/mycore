@@ -138,12 +138,6 @@
       <text id="thesis.more" i18n="metaData.mods.dictionary.categorybox" />
     </cell>
 
-    <!-- Körperschaft -->
-        <cell row="60" col="1" anchor="NORTHEAST" ref="mods.corporation.label" style="padding-top:5px;" />
-        <cell row="60" col="2" anchor="NORTHWEST" ref="mods.corporation" var="metadata/def.modsContainer/modsContainer/mods:mods" style="padding-top:5px;" />
-        <cell row="60" col="3" anchor="NORTHWEST" ref="mods.corporation.help" style="padding-top:5px;" />
-    <!-- Körperschaft END -->
-
     <!-- LANGUAGE -->
         <cell row="70" col="1" anchor="NORTHEAST" ref="mods.languageTerm.label" />
         <cell row="70" col="2" anchor="NORTHWEST" ref="mods.languageTerm.optional" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
