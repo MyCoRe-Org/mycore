@@ -180,7 +180,14 @@
       <td class="metavalue">
         <xsl:choose>
           <xsl:when test="count(mods:start) &gt; 0">
-            <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.page'),': ',mods:start,'-',mods:end)" />
+            <xsl:choose>
+              <xsl:when test="count(mods:end) &gt; 0">
+                <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.page'),': ',mods:start,'-',mods:end)" />
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.page'),': ',mods:start)" />
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="concat(mods:total,' ',i18n:translate('metaData.mods.dictionary.pages'))" />
