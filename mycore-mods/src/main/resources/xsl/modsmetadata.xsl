@@ -319,20 +319,22 @@
         <xsl:apply-templates select="." mode="printName" />
       </td>
     </tr>
-    <tr>
-      <td colspan="2">
-        <table class="metaData">
-          <xsl:if test="$CurrentUser!=$MCR.Users.Guestuser.UserName">
+    <xsl:if test="($CurrentUser!=$MCR.Users.Guestuser.UserName and ./../mods:note[@xlink:href=$id]) or (./../mods:location/mods:physicalLocation[@xlink:href=$id])">
+      <tr>
+        <td colspan="2">
+          <table class="metaData">
+            <xsl:if test="$CurrentUser!=$MCR.Users.Guestuser.UserName">
+              <xsl:call-template name="printMetaDate.mods">
+                <xsl:with-param name="nodes" select="./../mods:note[@xlink:href=$id]" />
+              </xsl:call-template>
+            </xsl:if>
             <xsl:call-template name="printMetaDate.mods">
-              <xsl:with-param name="nodes" select="./../mods:note[@xlink:href=$id]" />
+              <xsl:with-param name="nodes" select="./../mods:location/mods:physicalLocation[@xlink:href=$id]" />
             </xsl:call-template>
-          </xsl:if>
-          <xsl:call-template name="printMetaDate.mods">
-            <xsl:with-param name="nodes" select="./../mods:location/mods:physicalLocation[@xlink:href=$id]" />
-          </xsl:call-template>
-        </table>
-      </td>
-    </tr>
+          </table>
+        </td>
+      </tr>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="mods:identifier[@type='hdl']" mode="present">
