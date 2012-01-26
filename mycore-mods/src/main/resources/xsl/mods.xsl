@@ -103,24 +103,10 @@
         <xsl:choose>
       <!-- you could insert any title-like metadata here, e.g. replace "your-tags/here" by something of your metadata -->
           <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title">
-            <xsl:variable name="text">
-              <xsl:choose>
-                <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo[@transliteration]/mods:title">
-                  <!-- TODO: if editor bug fixed -->
-                  <xsl:value-of select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo[@transliteration]/mods:title"/>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title[1]"/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:variable>
-            <xsl:variable name="output">
-              <xsl:call-template name="ShortenText">
-                <xsl:with-param name="text" select="$text" />
-                <xsl:with-param name="length" select="70" />
-              </xsl:call-template>
-            </xsl:variable>
-            <xsl:value-of select="$output" disable-output-escaping="yes"/>
+            <xsl:call-template name="ShortenText">
+              <xsl:with-param name="text" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title[1]" />
+              <xsl:with-param name="length" select="70" />
+            </xsl:call-template>
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="@ID" />
@@ -291,7 +277,7 @@
         </xsl:otherwise>
       </xsl:choose>
       <!--*** Editor Buttons ************************************* -->
-      <xsl:if test="./structure/children/child">
+      <xsl:if test="(./structure/children/child) or (./structure/derobjects/derobject)">
         <div id="derivate_box" class="detailbox">
           <h4 id="derivate_switch" class="block_switch">
             <a name="derivate_box"></a>

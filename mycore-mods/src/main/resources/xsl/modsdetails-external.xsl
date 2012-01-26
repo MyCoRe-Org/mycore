@@ -13,4 +13,8 @@
   </xsl:template -->
 
 
+  <xsl:template mode="printDerivatesThumb" match="/mycoreobject[contains(@ID,'_mods_')]" priority="1">
+    <!-- do nothing ... define this for your own application  -->
+  </xsl:template>
+
 </xsl:stylesheet>

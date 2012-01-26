@@ -180,14 +180,7 @@
       <td class="metavalue">
         <xsl:choose>
           <xsl:when test="count(mods:start) &gt; 0">
-            <xsl:choose>
-              <xsl:when test="count(mods:end) &gt; 0">
-                <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.page'),': ',mods:start,'-',mods:end)" />
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.page'),': ',mods:start)" />
-              </xsl:otherwise>
-            </xsl:choose>
+            <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.page'),': ',mods:start,'-',mods:end)" />
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="concat(mods:total,' ',i18n:translate('metaData.mods.dictionary.pages'))" />
@@ -503,12 +496,21 @@
           </div>
           <div class="c15r">
             <xsl:if test="./structure/derobjects">
-              <div class="hit_symbol"> <!-- dummy - ToDo: show first derivate and link to derivate section -->
-                <img src="{$WebApplicationBaseURL}templates/master/{$template}/IMAGES/icons_liste/icon_thesis.png" alt="" />
-                <span>
-                  <a href="#derivate_box">Dokumente</a>
-                </span>
-              </div>
+              <xsl:variable name="objectBaseURL">
+                <xsl:if test="$objectHost != 'local'">
+                  <xsl:value-of select="document('webapp:hosts.xml')/mcr:hosts/mcr:host[@alias=$objectHost]/mcr:url[@type='object']/@href" />
+                </xsl:if>
+                <xsl:if test="$objectHost = 'local'">
+                  <xsl:value-of select="concat($WebApplicationBaseURL,'receive/')" />
+                </xsl:if>
+              </xsl:variable>
+              <xsl:variable name="staticURL">
+                <xsl:value-of select="concat($objectBaseURL,@ID)" />
+              </xsl:variable>
+              <xsl:apply-templates mode="printDerivatesThumb" select=".">
+                <xsl:with-param select="$staticURL" name="staticURL" />
+                <xsl:with-param select="'thesis'" name="modsType" />
+              </xsl:apply-templates>
             </xsl:if>
           </div>
         </div>
@@ -517,7 +519,7 @@
 
     <xsl:if test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:abstract">
       <div id="abstract_box" class="detailbox">
-        <h4 id="abstract_switch" class="block_switch">
+        <h4 id="abstract_switch" class="block_switch open">
           <xsl:value-of select="i18n:translate('metaData.mods.dictionary.abstractbox')" />
         </h4>
         <div id="abstract_content" class="block_content">
@@ -537,7 +539,8 @@
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:classification) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:subject) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:url) or
-                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:accessCondition)">
+                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:accessCondition) or
+                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID])">
       <div id="category_box" class="detailbox">
         <h4 id="category_switch" class="block_switch">
           <xsl:value-of select="i18n:translate('metaData.mods.dictionary.categorybox')" />
@@ -573,23 +576,12 @@
             </xsl:call-template>
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:url" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:accessCondition" />
-          </table>
-        </div>
-      </div>
-    </xsl:if>
-
-    <xsl:if test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID]">
-      <div id="institution_box" class="detailbox">
-        <h4 id="institution_switch" class="block_switch">
-          <xsl:value-of select="i18n:translate('metaData.mods.dictionary.institution.box')" />
-        </h4>
-        <div id="institution_content" class="block_content">
-          <table class="metaData">
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID]" />
           </table>
         </div>
       </div>
     </xsl:if>
+
   </xsl:template>
 
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="title.cproceeding">
