@@ -103,6 +103,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
             obj.getMetadata().removeMetadataElement("mappings");
         }
 
+        Element currentClassif = null;
         try {
             List<Element> lClassif = xpathClassifications.selectNodes(obj.getMetadata().createXML());
             Document doc = new Document((Element) obj.getMetadata().createXML().detach());
@@ -116,6 +117,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
                 obj.getMetadata().setMetadataElement(mappings);
             }
             for (Element eClassif : lClassif) {
+                currentClassif = eClassif;
                 MCRCategory categ = DAO.getCategory(
                         new MCRCategoryID(eClassif.getAttributeValue("classid"), eClassif.getAttributeValue("categid")), 0);
                 addMappings(mappings, categ);
@@ -124,7 +126,10 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
                 obj.getMetadata().removeMetadataElement("mappings");
             }
         } catch (Exception je) {
-            LOGGER.error("Error while finding classification elements", je);
+	    if(currentClassif==null)
+                LOGGER.error("Error while finding classification elements", je);
+	    else
+		LOGGER.error("Error while finding classification elements for "+currentClassif, je);
         }
     }
 
