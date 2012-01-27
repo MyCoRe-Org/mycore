@@ -47,6 +47,7 @@
       <xsl:with-param name="adddescription" select="@adddescription"/>
       <xsl:with-param name="addclassid" select="@addclassid"/>
       <xsl:with-param name="style" select="@style"/>
+      <xsl:with-param name="addParameter" select="@addParameter"/>
     </xsl:call-template>
   </xsl:template>
 
@@ -66,6 +67,7 @@
     <xsl:param name="adddescription" />
     <xsl:param name="addclassid" />
     <xsl:param name="style" />
+    <xsl:param name="addParameter" />
 
     <div>
       <xsl:attribute name="class">
@@ -89,8 +91,7 @@
             jQuery(document.getElementById(elementID)).html(loaderImage);
           </xsl:if>
           
-          jQuery(document.getElementById(elementID)).load('<xsl:value-of select="concat($ServletsBaseURL,'ClassificationBrowser',$HttpSession)" />', 
-          { 
+          var requestParam = { 
             classification : '<xsl:value-of select="$classification" />',
             category       : categID,
             sortby         : '<xsl:value-of select="$sortby" />',
@@ -106,7 +107,13 @@
             addclassid     : '<xsl:value-of select="$addclassid" />',
             style          : '<xsl:value-of select="$style" />',
             webpage        : '<xsl:value-of select="substring-after($RequestURL,$WebApplicationBaseURL)" />'
-          }, f );      
+          };
+          <xsl:variable name="addParam">
+            <xsl:if test="string-length($addParameter)&gt;0">
+              <xsl:value-of select="concat('?',$addParameter)"/>
+            </xsl:if>
+          </xsl:variable>
+          jQuery(document.getElementById(elementID)).load('<xsl:value-of select="concat($ServletsBaseURL,'ClassificationBrowser',$HttpSession,$addParam)" />', requestParam, f );      
         }
        
         function toogle(categID, closedImageURL, openImageURL) {
