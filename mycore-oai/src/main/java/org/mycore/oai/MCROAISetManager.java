@@ -66,12 +66,21 @@ public class MCROAISetManager {
 
     protected List<String> setURIs;
 
+    protected boolean cacheSets;
+
+    protected boolean filterEmptySets;
+
+    protected OAIDataList<Set> cachedSetList;
+
     public MCROAISetManager() {
         this.setURIs = new ArrayList<String>();
+        this.cachedSetList = new OAIDataList<Set>();
     }
 
-    public void init(String configPrefix) {
+    public void init(String configPrefix, boolean cacheSets, boolean filterEmptySets) {
         this.configPrefix = configPrefix;
+        this.cacheSets = cacheSets;
+        this.filterEmptySets = filterEmptySets;
         updateURIs();
     }
 
@@ -94,6 +103,10 @@ public class MCROAISetManager {
      */
     @SuppressWarnings("unchecked")
     protected OAIDataList<Set> get() {
+        if(this.cacheSets && !this.cachedSetList.isEmpty()) {
+            return this.cachedSetList;
+        }
+
         OAIDataList<Set> setList = new OAIDataList<Set>();
         for (String uri : this.setURIs) {
             Element resolved = MCRURIResolver.instance().resolve(uri);
@@ -114,7 +127,7 @@ public class MCROAISetManager {
         }
 
         // Filter out empty sets
-        if (MCRConfiguration.instance().getBoolean(this.configPrefix + "FilterEmptySets", true)) {
+        if (this.filterEmptySets) {
             for (Iterator<Set> it = setList.iterator(); it.hasNext();) {
                 Set set = it.next();
                 String setSpec = set.getSpec();
@@ -139,7 +152,7 @@ public class MCROAISetManager {
                 }
             }
         }
-        return setList;
+        return this.cachedSetList = setList;
     }
 
     /**

@@ -86,7 +86,9 @@ public class MCROAIAdapter implements OAIAdapter {
     public MCROAISetManager getSetManager() {
         if (this.setManager == null) {
             this.setManager = new MCROAISetManager();
-            this.setManager.init(getConfigPrefix());
+            boolean cacheSets = MCRConfiguration.instance().getBoolean(this.configPrefix + "CacheSets", false);
+            boolean filterEmptySets = MCRConfiguration.instance().getBoolean(this.configPrefix + "FilterEmptySets", true);
+            this.setManager.init(getConfigPrefix(), cacheSets, filterEmptySets);
         }
         return this.setManager;
     }
