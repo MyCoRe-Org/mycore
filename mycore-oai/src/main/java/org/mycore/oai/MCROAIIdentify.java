@@ -127,13 +127,9 @@ public class MCROAIIdentify extends SimpleIdentify {
                 MCRHIBConnection conn = MCRHIBConnection.instance();
                 Criteria criteria = conn.getSession().createCriteria(MCRDELETEDITEMS.class);
                 criteria.setProjection(Projections.min("id.dateDeleted"));
-                @SuppressWarnings("rawtypes")
-                List resultList = criteria.list();
-                if(resultList.size() > 0) {
-                    Date earliestDeletedDate = new Date(((Timestamp)resultList.get(0)).getTime());
-                    if(earliestDeletedDate.compareTo(datestamp) < 0) {
-                        datestamp = earliestDeletedDate;
-                    }
+                Date earliestDeletedDate = (Date)criteria.uniqueResult();
+                if(earliestDeletedDate != null && earliestDeletedDate.compareTo(datestamp) < 0) {
+                    datestamp = earliestDeletedDate;
                 }
             }
         } catch (Exception ex) {
