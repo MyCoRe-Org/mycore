@@ -34,7 +34,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -413,10 +416,10 @@ public class MCRUtils {
                 if (bytesRead > 0) {
                     if (target != null) {
                         target.write(ba, 0 /* offset in ba */, bytesRead /*
-                                                                           * bytes
-                                                                           * to
-                                                                           * write
-                                                                           */);
+                                                                                * bytes
+                                                                                * to
+                                                                                * write
+                                                                                */);
                     }
                 } else {
                     break; // hit eof
@@ -471,10 +474,10 @@ public class MCRUtils {
                 if (charsRead > 0) {
                     if (target != null) {
                         target.write(ca, 0 /* offset in ba */, charsRead /*
-                                                                           * bytes
-                                                                           * to
-                                                                           * write
-                                                                           */);
+                                                                                * bytes
+                                                                                * to
+                                                                                * write
+                                                                                */);
                     }
                 } else {
                     break; // hit eof
@@ -1029,6 +1032,40 @@ public class MCRUtils {
             }
         }
         return null;
+    }
+
+    public static String asSHA1String(String text) throws NoSuchAlgorithmException {
+        return getHash(text, "SHA-1");
+    }
+
+    public static String asMD5String(String text) throws NoSuchAlgorithmException {
+        return getHash(text, "MD5");
+    }
+
+    private static String getHash(String text, String algorithm) throws NoSuchAlgorithmException {
+        MessageDigest sha1digest;
+        try {
+            sha1digest = MessageDigest.getInstance(algorithm);
+            sha1digest.update(text.getBytes("UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            throw new MCRException("Could not get " + algorithm + " checksum", e);
+        }
+        byte[] digest = sha1digest.digest();
+        return toHexString(digest);
+    }
+
+    public static String toHexString(byte[] data) {
+        StringBuilder buf = new StringBuilder();
+        for (byte b : data) {
+            //add 127 to make b unsigned
+            String hex = Integer.toHexString(b & 0xff);
+            if (hex.length() == 1) {
+                //all b > 15
+                buf.append('0');
+            }
+            buf.append(hex);
+        }
+        return buf.toString();
     }
 
 }
