@@ -74,6 +74,7 @@ public class MCRGetMyCoReJarTask extends Task {
     }
 
     private void findMycoreJarInPath(Path path) throws IOException {
+        log("Checking path:" + path, Project.MSG_DEBUG);
         for (String part : path.list()) {
             log("Checking pathElement:" + part, Project.MSG_DEBUG);
             File candidate = new File(part);
