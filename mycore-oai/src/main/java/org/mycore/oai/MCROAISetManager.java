@@ -24,13 +24,18 @@ package org.mycore.oai;
 import static org.mycore.oai.pmh.OAIConstants.NS_OAI;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.oai.classmapping.MCRClassificationAndSetMapper;
 import org.mycore.oai.pmh.OAIConstants;
 import org.mycore.oai.pmh.OAIDataList;
@@ -62,11 +67,21 @@ import org.mycore.services.fieldquery.MCRQueryManager;
  */
 public class MCROAISetManager {
 
+    protected final static Logger LOGGER = Logger.getLogger(MCROAISetManager.class);
+    
     protected String configPrefix;
 
     protected List<String> setURIs;
 
-    protected boolean cacheSets;
+    /**
+     * Time in milliseconds when the classification changed.
+     */
+    protected long classLastModified;
+
+    /**
+     * Time in minutes.
+     */
+    protected int cacheMaxAge;
 
     protected boolean filterEmptySets;
 
@@ -75,19 +90,36 @@ public class MCROAISetManager {
     public MCROAISetManager() {
         this.setURIs = new ArrayList<String>();
         this.cachedSetList = new OAIDataList<Set>();
+        this.classLastModified = Long.MIN_VALUE;
     }
 
-    public void init(String configPrefix, boolean cacheSets, boolean filterEmptySets) {
+    public void init(String configPrefix, int cacheMaxAge, boolean filterEmptySets) {
         this.configPrefix = configPrefix;
-        this.cacheSets = cacheSets;
+        this.cacheMaxAge = cacheMaxAge;
         this.filterEmptySets = filterEmptySets;
         updateURIs();
+        if(this.cacheMaxAge != 0) {
+            startTimerTask();
+        }
+    }
+
+    protected void startTimerTask() {
+        long maxAgeInMilli = this.cacheMaxAge * 60 * 1000;
+        TimerTask tt = new TimerTask() {
+            public void run() {
+                LOGGER.info("update oai set list");
+                synchronized (cachedSetList) {
+                    cachedSetList = createSetList();
+                }
+            }
+        };
+        new Timer().schedule(tt, new Date(System.currentTimeMillis() + maxAgeInMilli), maxAgeInMilli);
     }
 
     protected void updateURIs() {
         this.setURIs = new ArrayList<String>();
         MCRConfiguration config = MCRConfiguration.instance();
-        Properties setProperties = config.getProperties(this.configPrefix + "Set");
+        Properties setProperties = config.getProperties(this.configPrefix + "Sets.");
         for(Object o : setProperties.values()) {
             String value = (String)o;
             if(value.trim().length() > 0) {
@@ -102,11 +134,30 @@ public class MCROAISetManager {
      * @return
      */
     @SuppressWarnings("unchecked")
-    protected OAIDataList<Set> get() {
-        if(this.cacheSets && !this.cachedSetList.isEmpty()) {
-            return this.cachedSetList;
+    public OAIDataList<Set> get() {
+        // no cache
+        if(this.cacheMaxAge == 0) {
+            return createSetList();
         }
+        // cache
+        // check if classification changed
+        long lastModified = MCRCategoryDAOFactory.getInstance().getLastModified();
+        if(lastModified != this.classLastModified) {
+            this.classLastModified = lastModified;
+            synchronized (this.cachedSetList) {
+                this.cachedSetList = createSetList();
+            }
+        }
+        // create a shallow copy of the set list
+        OAIDataList<Set> clonedList;
+        synchronized (this.cachedSetList) {
+            clonedList = (OAIDataList<Set>)this.cachedSetList.clone();
+        }
+        return clonedList;
+    }
 
+    @SuppressWarnings("unchecked")
+    protected OAIDataList<Set> createSetList() {
         OAIDataList<Set> setList = new OAIDataList<Set>();
         for (String uri : this.setURIs) {
             Element resolved = MCRURIResolver.instance().resolve(uri);
@@ -152,7 +203,7 @@ public class MCROAISetManager {
                 }
             }
         }
-        return this.cachedSetList = setList;
+        return setList;
     }
 
     /**
