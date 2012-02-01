@@ -105,12 +105,12 @@ SELECT cat.categID, count(distinct link.objectReference.objectID) as num
     </query>
     <query name="deleteByObjectID">
       <![CDATA[
-DELETE FROM MCRCategoryLink WHERE objectReference.objectID=:id
+DELETE FROM MCRCategoryLink WHERE objectReference=:reference
       ]]>
     </query>
     <query name="deleteByObjectCollection">
       <![CDATA[
-DELETE FROM MCRCategoryLink WHERE objectReference.objectID IN (:ids)
+DELETE FROM MCRCategoryLink WHERE objectReference IN (:references)
       ]]>
     </query>
     <query name="ObjectIDByCategory">
@@ -123,7 +123,7 @@ SELECT objectReference.objectID FROM MCRCategoryLink WHERE category.rootID=:root
 SELECT link.objectReference.objectID
   FROM MCRCategoryLink link, MCRCategoryImpl cat, MCRCategoryImpl cattree
   WHERE cattree.internalID = link.category
-    AND link.objectReference.objectID=:objectID
+    AND link.objectReference=:reference
     AND cattree.rootID=:rootID
     AND cat.rootID=:rootID
     AND cat.categID=:categID

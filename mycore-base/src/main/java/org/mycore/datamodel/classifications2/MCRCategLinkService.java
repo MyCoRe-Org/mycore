@@ -77,22 +77,22 @@ public interface MCRCategLinkService {
     public abstract Map<MCRCategoryID, Number> countLinksForType(MCRCategory category, String type, boolean childrenOnly);
 
     /**
-     * Delete all links that refer to the given Object ID.
+     * Delete all links that refer to the given {@link MCRCategLinkReference}.
      * 
      * @param id
      *            an Object ID
      * @see #deleteLinks(Collection)
      */
-    public abstract void deleteLink(String id);
+    public abstract void deleteLink(MCRCategLinkReference id);
 
     /**
-     * Delete all links that refer to the given collection of Object IDs.
+     * Delete all links that refer to the given collection of category links.
      * 
      * @param ids
-     *            a collection of Object IDs
+     *            a collection of {@link MCRCategLinkReference}
      * @see #deleteLink(String)
      */
-    public abstract void deleteLinks(Collection<String> ids);
+    public abstract void deleteLinks(Collection<MCRCategLinkReference> ids);
 
     /**
      * Returns a list of linked Object IDs.
@@ -104,13 +104,13 @@ public interface MCRCategLinkService {
     public abstract Collection<String> getLinksFromCategory(MCRCategoryID id);
 
     /**
-     * Returns a list of linked Object IDs.
+     * Checks if a given reference is in a specific category.
      * 
-     * @param id
-     *            ID of the category
-     * @return Collection of Object IDs, empty Collection when no links exist
+     * @param reference
+     *            reference, e.g. to a MCRObject
+     * @return true if the reference is in the category
      */
-    public abstract boolean isInCategory(String objectId, MCRCategoryID id);
+    public abstract boolean isInCategory(MCRCategLinkReference reference, MCRCategoryID id);
 
     /**
      * Returns a list of linked Object IDs restricted by the specified type.

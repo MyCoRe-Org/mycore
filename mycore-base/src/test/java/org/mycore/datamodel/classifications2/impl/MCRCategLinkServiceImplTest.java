@@ -30,11 +30,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRHibTestCase;
-import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.common.xml.MCRXMLParserFactory;
+import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.ifs2.MCRContent;
 import org.xml.sax.SAXParseException;
@@ -43,6 +42,10 @@ import org.xml.sax.SAXParseException;
  * @author Thomas Scheffler (yagee) Need to insert some things here
  */
 public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
+    private static final MCRCategLinkReference ENGLAND_REFERENCE = new MCRCategLinkReference("England", "state");
+
+    private static final MCRCategLinkReference LONDON_REFERENCE = new MCRCategLinkReference("London", "city");
+
     private MCRCategory category;
 
     private Collection<MCRCategoryLink> testLinks;
@@ -73,8 +76,8 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         testLinks.add(new MCRCategoryLink(germany, new MCRCategLinkReference("Saale", "river")));
         final MCRCategLinkReference northSeaReference = new MCRCategLinkReference("North Sea", "sea");
         testLinks.add(new MCRCategoryLink(germany, northSeaReference));
-        testLinks.add(new MCRCategoryLink(uk, new MCRCategLinkReference("London", "city")));
-        testLinks.add(new MCRCategoryLink(uk, new MCRCategLinkReference("England", "state")));
+        testLinks.add(new MCRCategoryLink(uk, LONDON_REFERENCE));
+        testLinks.add(new MCRCategoryLink(uk, ENGLAND_REFERENCE));
         testLinks.add(new MCRCategoryLink(uk, new MCRCategLinkReference("Thames", "river")));
         testLinks.add(new MCRCategoryLink(uk, northSeaReference));
     }
@@ -98,7 +101,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
     public void deleteLink() {
         addTestLinks();
         startNewTransaction();
-        SERVICE.deleteLink("London");
+        SERVICE.deleteLink(LONDON_REFERENCE);
         assertEquals("Link count does not match.", testLinks.size() - 1, sessionFactory.getCurrentSession().createCriteria(MCRCategoryLink.class).list().size());
     }
 
@@ -109,7 +112,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
     public void deleteLinks() {
         addTestLinks();
         startNewTransaction();
-        SERVICE.deleteLinks(Arrays.asList("London", "England"));
+        SERVICE.deleteLinks(Arrays.asList(LONDON_REFERENCE, ENGLAND_REFERENCE));
         assertEquals("Link count does not match.", testLinks.size() - 2, sessionFactory.getCurrentSession().createCriteria(MCRCategoryLink.class).list().size());
     }
 
@@ -215,9 +218,9 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         MCRCategLinkReference jena = new MCRCategLinkReference("Jena", "city");
         addTestLinks();
         startNewTransaction();
-        assertTrue("Jena should be in Germany", SERVICE.isInCategory(jena.getObjectID(), germany.getId()));
-        assertTrue("Jena should be in Europe", SERVICE.isInCategory(jena.getObjectID(), europe.getId()));
-        assertFalse("Jena should not be in Asia", SERVICE.isInCategory(jena.getObjectID(), asia.getId()));
+        assertTrue("Jena should be in Germany", SERVICE.isInCategory(jena, germany.getId()));
+        assertTrue("Jena should be in Europe", SERVICE.isInCategory(jena, europe.getId()));
+        assertFalse("Jena should not be in Asia", SERVICE.isInCategory(jena, asia.getId()));
     }
 
     private void loadWorldClassification() throws URISyntaxException, MCRException, SAXParseException, IOException {

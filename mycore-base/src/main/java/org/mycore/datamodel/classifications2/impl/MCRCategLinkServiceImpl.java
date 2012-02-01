@@ -35,7 +35,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
-import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
@@ -43,11 +42,11 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 
 /**
  * 
@@ -122,16 +121,16 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         return countLinks;
     }
 
-    public void deleteLink(String id) {
+    public void deleteLink(MCRCategLinkReference reference) {
         Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(LINK_CLASS.getName() + ".deleteByObjectID");
-        q.setParameter("id", id);
+        q.setParameter("reference", reference);
         int deleted = q.executeUpdate();
         LOGGER.debug("Number of Links deleted: " + deleted);
     }
 
-    public void deleteLinks(Collection<String> ids) {
+    public void deleteLinks(final Collection<MCRCategLinkReference> ids) {
         Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(LINK_CLASS.getName() + ".deleteByObjectCollection");
-        q.setParameterList("ids", ids);
+        q.setParameterList("references", ids);
         int deleted = q.executeUpdate();
         LOGGER.debug("Number of Links deleted: " + deleted);
     }
@@ -302,12 +301,12 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     }
 
     @Override
-    public boolean isInCategory(String objectId, MCRCategoryID id) {
+    public boolean isInCategory(MCRCategLinkReference reference, MCRCategoryID id) {
         Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(LINK_CLASS.getName() + ".CategoryAndObjectID");
         q.setCacheable(true);
         q.setParameter("rootID", id.getRootID());
         q.setParameter("categID", id.getID());
-        q.setParameter("objectID", objectId);
+        q.setParameter("reference", reference);
         return !q.list().isEmpty();
     }
 }

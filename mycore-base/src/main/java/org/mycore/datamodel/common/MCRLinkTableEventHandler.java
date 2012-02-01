@@ -28,9 +28,9 @@ import java.util.HashSet;
 
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
+import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaElement;
 import org.mycore.datamodel.metadata.MCRMetaInterface;
@@ -80,8 +80,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
                     continue;
                 }
                 if (inf instanceof MCRMetaLinkID) {
-                    mcr_linktable.addReferenceLink(mcr_id.toString(), ((MCRMetaLink) inf).getXLinkHref(),
-                            MCRLinkTableManager.ENTRY_TYPE_REFERENCE, "");
+                    mcr_linktable.addReferenceLink(mcr_id.toString(), ((MCRMetaLink) inf).getXLinkHref(), MCRLinkTableManager.ENTRY_TYPE_REFERENCE, "");
                     continue;
                 }
             }
@@ -100,9 +99,10 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
 
     }
 
-    private void deleteOldLinks(MCRObjectID mcr_id) {
-        mcr_linktable.deleteReferenceLink(mcr_id);
-        MCRCategLinkServiceFactory.getInstance().deleteLink(mcr_id.toString());
+    private void deleteOldLinks(final MCRObjectID objectId) {
+        mcr_linktable.deleteReferenceLink(objectId);
+        MCRCategLinkReference reference = new MCRCategLinkReference(objectId.toString(), objectId.getTypeId());
+        MCRCategLinkServiceFactory.getInstance().deleteLink(reference);
     }
 
     /**
