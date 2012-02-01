@@ -34,7 +34,7 @@ import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.datamodel.classifications2.MCRObjectReference;
+import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.metadata.MCRObject;
 
 /**
@@ -70,7 +70,7 @@ public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
             throw new MCRException(e);
         }
         if (!categories.isEmpty()) {
-            final MCRObjectReference objectReference = new MCRObjectReference(obj.getId().toString(), MODS_OBJECTTYPE);
+            final MCRCategLinkReference objectReference = new MCRCategLinkReference(obj.getId().toString(), MODS_OBJECTTYPE);
             MCRCategLinkServiceFactory.getInstance().setLinks(objectReference, categories);
         }
     }

@@ -30,7 +30,7 @@ import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.datamodel.classifications2.MCRObjectReference;
+import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaElement;
 import org.mycore.datamodel.metadata.MCRMetaInterface;
@@ -87,7 +87,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
             }
         }
         if (categories.size() > 0) {
-            MCRObjectReference objectReference = new MCRObjectReference(mcr_id.toString(), mcr_id.getTypeId());
+            MCRCategLinkReference objectReference = new MCRCategLinkReference(mcr_id.toString(), mcr_id.getTypeId());
             MCRCategLinkServiceFactory.getInstance().setLinks(objectReference, categories);
         }
         // add derivate referece

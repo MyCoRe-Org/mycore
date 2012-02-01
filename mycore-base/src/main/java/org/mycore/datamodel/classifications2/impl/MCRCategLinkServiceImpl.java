@@ -47,7 +47,7 @@ import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.datamodel.classifications2.MCRObjectReference;
+import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 
 /**
  * 
@@ -168,7 +168,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         return returns;
     }
 
-    public void setLinks(MCRObjectReference objectReference, Collection<MCRCategoryID> categories) {
+    public void setLinks(MCRCategLinkReference objectReference, Collection<MCRCategoryID> categories) {
         Session session = HIB_CONNECTION_INSTANCE.getSession();
         for (MCRCategoryID categID : categories) {
             final MCRCategoryImpl category = getMCRCategory(session, categID);

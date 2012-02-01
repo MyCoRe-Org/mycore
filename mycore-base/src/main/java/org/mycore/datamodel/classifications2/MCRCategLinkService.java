@@ -145,6 +145,6 @@ public interface MCRCategLinkService {
      * @see #countLinks(category, childrenOnly)
      * @see #countLinksForType(category, type, childrenOnly)
      */
-    public abstract void setLinks(MCRObjectReference objectReference, Collection<MCRCategoryID> categories);
+    public abstract void setLinks(MCRCategLinkReference objectReference, Collection<MCRCategoryID> categories);
 
 }

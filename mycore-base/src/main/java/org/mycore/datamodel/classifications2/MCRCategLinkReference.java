@@ -31,7 +31,7 @@ import java.io.Serializable;
  * @version $Revision$ $Date$
  * @since 2.0
  */
-public class MCRObjectReference implements Serializable {
+public class MCRCategLinkReference implements Serializable {
 
     private static final long serialVersionUID = -6457722746147666860L;
 
@@ -39,10 +39,10 @@ public class MCRObjectReference implements Serializable {
 
     private String type;
 
-    public MCRObjectReference() {
+    public MCRCategLinkReference() {
     }
 
-    public MCRObjectReference(String objectID, String type) {
+    public MCRCategLinkReference(String objectID, String type) {
         setObjectID(objectID);
         setType(type);
     }
@@ -83,7 +83,7 @@ public class MCRObjectReference implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final MCRObjectReference other = (MCRObjectReference) obj;
+        final MCRCategLinkReference other = (MCRCategLinkReference) obj;
         if (objectID == null) {
             if (other.objectID != null) {
                 return false;

@@ -23,7 +23,7 @@
  **/
 package org.mycore.datamodel.classifications2.impl;
 
-import org.mycore.datamodel.classifications2.MCRObjectReference;
+import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -37,13 +37,13 @@ class MCRCategoryLink {
 
     private MCRCategoryImpl category;
 
-    private MCRObjectReference objectReference;
+    private MCRCategLinkReference objectReference;
 
     MCRCategoryLink() {
         super();
     }
 
-    MCRCategoryLink(MCRCategoryImpl category, MCRObjectReference objectReference) {
+    MCRCategoryLink(MCRCategoryImpl category, MCRCategLinkReference objectReference) {
         super();
         this.category = category;
         this.objectReference = objectReference;
@@ -57,11 +57,11 @@ class MCRCategoryLink {
         this.category = category;
     }
 
-    public MCRObjectReference getObjectReference() {
+    public MCRCategLinkReference getObjectReference() {
         return objectReference;
     }
 
-    public void setObjectReference(MCRObjectReference objectReference) {
+    public void setObjectReference(MCRCategLinkReference objectReference) {
         this.objectReference = objectReference;
     }
 

@@ -34,7 +34,7 @@ import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.datamodel.classifications2.MCRObjectReference;
+import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.ifs2.MCRContent;
 import org.xml.sax.SAXParseException;
@@ -67,21 +67,21 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         MCRCategoryImpl uk = (MCRCategoryImpl) category.getChildren().get(0).getChildren().get(1);
         DAO.addCategory(null, category);
         testLinks = new ArrayList<MCRCategoryLink>();
-        testLinks.add(new MCRCategoryLink(germany, new MCRObjectReference("Jena", "city")));
-        testLinks.add(new MCRCategoryLink(germany, new MCRObjectReference("Thüringen", "state")));
-        testLinks.add(new MCRCategoryLink(germany, new MCRObjectReference("Hessen", "state")));
-        testLinks.add(new MCRCategoryLink(germany, new MCRObjectReference("Saale", "river")));
-        final MCRObjectReference northSeaReference = new MCRObjectReference("North Sea", "sea");
+        testLinks.add(new MCRCategoryLink(germany, new MCRCategLinkReference("Jena", "city")));
+        testLinks.add(new MCRCategoryLink(germany, new MCRCategLinkReference("Thüringen", "state")));
+        testLinks.add(new MCRCategoryLink(germany, new MCRCategLinkReference("Hessen", "state")));
+        testLinks.add(new MCRCategoryLink(germany, new MCRCategLinkReference("Saale", "river")));
+        final MCRCategLinkReference northSeaReference = new MCRCategLinkReference("North Sea", "sea");
         testLinks.add(new MCRCategoryLink(germany, northSeaReference));
-        testLinks.add(new MCRCategoryLink(uk, new MCRObjectReference("London", "city")));
-        testLinks.add(new MCRCategoryLink(uk, new MCRObjectReference("England", "state")));
-        testLinks.add(new MCRCategoryLink(uk, new MCRObjectReference("Thames", "river")));
+        testLinks.add(new MCRCategoryLink(uk, new MCRCategLinkReference("London", "city")));
+        testLinks.add(new MCRCategoryLink(uk, new MCRCategLinkReference("England", "state")));
+        testLinks.add(new MCRCategoryLink(uk, new MCRCategLinkReference("Thames", "river")));
         testLinks.add(new MCRCategoryLink(uk, northSeaReference));
     }
 
     /**
      * Test method for
-     * {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#setLinks(org.mycore.datamodel.classifications2.MCRObjectReference, java.util.Collection)}
+     * {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#setLinks(org.mycore.datamodel.classifications2.MCRCategLinkReference, java.util.Collection)}
      * .
      */
     @Test
@@ -212,7 +212,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         MCRCategoryImpl germany = (MCRCategoryImpl) category.getChildren().get(0).getChildren().get(0);
         MCRCategoryImpl europe = (MCRCategoryImpl) category.getChildren().get(0);
         MCRCategoryImpl asia = (MCRCategoryImpl) category.getChildren().get(1);
-        MCRObjectReference jena = new MCRObjectReference("Jena", "city");
+        MCRCategLinkReference jena = new MCRCategLinkReference("Jena", "city");
         addTestLinks();
         startNewTransaction();
         assertTrue("Jena should be in Germany", SERVICE.isInCategory(jena.getObjectID(), germany.getId()));
