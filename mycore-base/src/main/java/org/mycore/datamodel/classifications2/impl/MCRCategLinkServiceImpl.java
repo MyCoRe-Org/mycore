@@ -155,10 +155,10 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     }
 
     @SuppressWarnings("unchecked")
-    public Collection<MCRCategoryID> getLinksFromObject(String id) {
+    public Collection<MCRCategoryID> getLinksFromReference(MCRCategLinkReference reference) {
         Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(LINK_CLASS.getName() + ".categoriesByObjectID");
         q.setCacheable(true);
-        q.setParameter("id", id);
+        q.setParameter("reference", reference);
         List<Object[]> result = q.list();
         ArrayList<MCRCategoryID> returns = new ArrayList<MCRCategoryID>(result.size());
         for (Object[] idValues : result) {

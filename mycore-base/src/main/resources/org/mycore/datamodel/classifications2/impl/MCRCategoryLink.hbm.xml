@@ -137,7 +137,7 @@ SELECT objectReference.objectID FROM MCRCategoryLink WHERE category.rootID=:root
     </query>
     <query name="categoriesByObjectID">
       <![CDATA[
-SELECT category.rootID, category.categID FROM MCRCategoryLink WHERE objectReference.objectID=:id
+SELECT category.rootID, category.categID FROM MCRCategoryLink WHERE objectReference=:reference
       ]]>
     </query>
   </class>
