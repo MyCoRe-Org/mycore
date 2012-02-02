@@ -93,6 +93,22 @@ public class MCROAISetManager {
         this.classLastModified = Long.MIN_VALUE;
     }
 
+    /**
+     * Use {@link #init(String, int, boolean)} instead.
+     * 
+     * @param configPrefix
+     */
+    @Deprecated
+    public void init(String configPrefix) {
+        this.configPrefix = configPrefix;
+        this.cacheMaxAge = MCRConfiguration.instance().getInt(this.configPrefix + "SetCache.MaxAge", 0);
+        this.filterEmptySets = MCRConfiguration.instance().getBoolean(this.configPrefix + "FilterEmptySets", true);
+        updateURIs();
+        if(this.cacheMaxAge != 0) {
+            startTimerTask();
+        }
+    }
+
     public void init(String configPrefix, int cacheMaxAge, boolean filterEmptySets) {
         this.configPrefix = configPrefix;
         this.cacheMaxAge = cacheMaxAge;
