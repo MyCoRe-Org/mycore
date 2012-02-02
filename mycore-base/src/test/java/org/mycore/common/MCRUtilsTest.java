@@ -25,21 +25,24 @@ package org.mycore.common;
 
 import static org.junit.Assert.*;
 
+import java.security.MessageDigest;
+import java.security.MessageDigestSpi;
 import java.security.NoSuchAlgorithmException;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
-
 
 /**
  * @author Thomas Scheffler (yagee)
  *
  */
 public class MCRUtilsTest extends MCRTestCase {
-    
-    private static String TEST="Hello World!";
-    private static String TEST_SHA1="2ef7bde608ce5404e97d5f042f95f89f1c232871";
-    private static String TEST_MD5="ed076287532e86365e841e92bfc50d8c";
+
+    private static String TEST = "Hello World!";
+
+    private static String TEST_SHA1 = "2ef7bde608ce5404e97d5f042f95f89f1c232871";
+
+    private static String TEST_MD5 = "ed076287532e86365e841e92bfc50d8c";
 
     /**
      * Test method for {@link org.mycore.common.MCRUtils#asSHA1String(java.lang.String)}.
@@ -47,7 +50,7 @@ public class MCRUtilsTest extends MCRTestCase {
     @Test
     public final void testAsSHA1String() {
         try {
-            String sha1String = MCRUtils.asSHA1String(TEST);
+            String sha1String = MCRUtils.asSHA1String(1, null, TEST);
             assertEquals("SHA-1 string has not the right length", TEST_SHA1.length(), sha1String.length());
             assertEquals("SHA-1 string does not match", TEST_SHA1, sha1String);
         } catch (NoSuchAlgorithmException e) {
@@ -61,12 +64,11 @@ public class MCRUtilsTest extends MCRTestCase {
     @Test
     public final void testAsMD5String() {
         try {
-            String md5String = MCRUtils.asMD5String(TEST);
+            String md5String = MCRUtils.asMD5String(1,null,TEST);
             assertEquals("MD5 string has not the right length", TEST_MD5.length(), md5String.length());
             assertEquals("MD5 string does not match", TEST_MD5, md5String);
         } catch (NoSuchAlgorithmException e) {
             Logger.getLogger(this.getClass()).warn("MD5 algorithm not available");
         }
     }
-
 }

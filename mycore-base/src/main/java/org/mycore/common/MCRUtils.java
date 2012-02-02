@@ -55,6 +55,8 @@ import java.util.Properties;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -418,10 +420,10 @@ public class MCRUtils {
                 if (bytesRead > 0) {
                     if (target != null) {
                         target.write(ba, 0 /* offset in ba */, bytesRead /*
-                                                                                 * bytes
-                                                                                 * to
-                                                                                 * write
-                                                                                 */);
+                                                                                             * bytes
+                                                                                             * to
+                                                                                             * write
+                                                                                             */);
                     }
                 } else {
                     break; // hit eof
@@ -476,10 +478,10 @@ public class MCRUtils {
                 if (charsRead > 0) {
                     if (target != null) {
                         target.write(ca, 0 /* offset in ba */, charsRead /*
-                                                                                 * bytes
-                                                                                 * to
-                                                                                 * write
-                                                                                 */);
+                                                                                             * bytes
+                                                                                             * to
+                                                                                             * write
+                                                                                             */);
                     }
                 } else {
                     break; // hit eof
@@ -1036,39 +1038,54 @@ public class MCRUtils {
         return null;
     }
 
-    public static String asSHA1String(String text) throws NoSuchAlgorithmException {
-        return getHash(text, "SHA-1");
+    public static String asSHA1String(int iterations, byte[] salt, String text) throws NoSuchAlgorithmException {
+        return getHash(iterations, salt, text, "SHA-1");
     }
 
-    public static String asMD5String(String text) throws NoSuchAlgorithmException {
-        return getHash(text, "MD5");
+    public static String asMD5String(int iterations, byte[] salt, String text) throws NoSuchAlgorithmException {
+        return getHash(iterations, salt, text, "MD5");
     }
 
-    private static String getHash(String text, String algorithm) throws NoSuchAlgorithmException {
-        MessageDigest sha1digest;
+    public static String asCryptString(byte[] salt, String text) throws NoSuchAlgorithmException {
+        String charsetName = "UTF-16BE";
         try {
-            sha1digest = MessageDigest.getInstance(algorithm);
+            return MCRCrypt.crypt(new String(salt, charsetName), text);
+        } catch (UnsupportedEncodingException e) {
+            throw new MCRException("Charset is unsupported: " + charsetName, e);
+        }
+    }
+
+    private static String getHash(int iterations, byte[] salt, String text, String algorithm) throws NoSuchAlgorithmException {
+        MessageDigest digest;
+        if (--iterations < 0) {
+            iterations = 0;
+        }
+        byte[] data;
+        try {
+            digest = MessageDigest.getInstance(algorithm);
             text = Normalizer.normalize(text, Form.NFC);
-            sha1digest.update(text.getBytes("UTF-8"));
+            if (salt != null) {
+                digest.update(salt);
+            }
+            data = digest.digest(text.getBytes("UTF-8"));
+            for (int i = 0; i < iterations; i++) {
+                data = digest.digest(data);
+            }
         } catch (UnsupportedEncodingException e) {
             throw new MCRException("Could not get " + algorithm + " checksum", e);
         }
-        byte[] digest = sha1digest.digest();
-        return toHexString(digest);
+        return toHexString(data);
     }
 
     public static String toHexString(byte[] data) {
-        StringBuilder buf = new StringBuilder();
-        for (byte b : data) {
-            //add 127 to make b unsigned
-            String hex = Integer.toHexString(b & 0xff);
-            if (hex.length() == 1) {
-                //all b > 15
-                buf.append('0');
-            }
-            buf.append(hex);
-        }
-        return buf.toString();
+        return Hex.encodeHexString(data);
     }
 
+    public static String toBase64String(byte[] data) {
+        return Base64.encodeBase64String(data);
+    }
+
+    public static byte[] fromBase64String(String base64) {
+        return Base64.decodeBase64(base64);
+    }
 }
