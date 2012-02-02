@@ -64,6 +64,20 @@ public class MCRUserTransformer {
      * This includes user data, owned users and groups the user is member of.
      */
     public static Element buildXML(MCRUser mcrUser) throws Exception {
+        Element userElement = buildExportableSafeXML(mcrUser);
+        MCRUser owner = mcrUser.getOwner();
+        if (owner != null) {
+            Element o = userElement.getChild("owner");
+            o.addContent(MCRUserTransformer.buildBasicXML(owner));
+        }
+        return userElement;
+    }
+
+    /**
+     * Build an xml element containing all information on the given user except password info.
+     * same as {@link #buildXML(MCRUser)} without owned users resolved
+     */
+    public static Element buildExportableSafeXML(MCRUser mcrUser) {
         Element userElement = buildBasicXML(mcrUser);
 
         addString(mcrUser, userElement, "realName", mcrUser.getRealName());
@@ -72,12 +86,6 @@ public class MCRUserTransformer {
 
         if (mcrUser.getLastLogin() != null) {
             addString(mcrUser, userElement, "lastLogin", MCRXMLFunctions.getISODate(mcrUser.getLastLogin(), MCRISO8601Format.F_COMPLETE_HH_MM_SS));
-        }
-
-        MCRUser owner = mcrUser.getOwner();
-        if (owner != null) {
-            Element o = userElement.getChild("owner");
-            o.addContent(MCRUserTransformer.buildBasicXML(owner));
         }
 
         List<MCRUser> owns = mcrUser.getOwnedUsers();
@@ -118,9 +126,32 @@ public class MCRUserTransformer {
         return userElement;
     }
 
+    /**
+     * Build an xml element containing all information on the given user.
+     * same as {@link #buildExportableSafeXML(MCRUser)} but with password info if available
+     */
+    public static Element buildExportableXML(MCRUser mcrUser) {
+        Element userElement = buildExportableSafeXML(mcrUser);
+        Element pwdElement = new Element("password");
+        if (setAttribute(pwdElement, "salt", mcrUser.getSalt()) || setAttribute(pwdElement, "hashType", mcrUser.getHashType().toString())
+                || setAttribute(pwdElement, "hash", mcrUser.getPassword())) {
+            userElement.addContent(pwdElement);
+        }
+        return userElement;
+    }
+
+    private static boolean setAttribute(Element elem, String name, String value) {
+        if (value == null) {
+            return false;
+        }
+        elem.setAttribute(name, value);
+        return true;
+    }
+
     private static void addString(MCRUser mcrUser, Element parent, String name, String value) {
-        if ((value != null) && (value.trim().length() > 0))
+        if ((value != null) && (value.trim().length() > 0)) {
             parent.addContent(new Element(name).setText(value.trim()));
+        }
     }
 
 }
