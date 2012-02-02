@@ -25,6 +25,7 @@ package org.mycore.user2.utils;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.jdom.Element;
 import org.mycore.common.xml.MCRXMLFunctions;
@@ -91,7 +92,7 @@ public class MCRUserTransformer {
         groups.addAll(MCRGroupManager.getGroups(mcrUser.getSystemGroupIDs()));
         groups.addAll(MCRGroupManager.getGroups(mcrUser.getExternalGroupIDs()));
 
-        if (mcrUser.getSystemGroupIDs().size() > 0 || mcrUser.getExternalGroupIDs().size() > 0) {
+        if (!groups.isEmpty()) {
             Element groupsElement = new Element("groups");
             for (MCRGroup group : groups) {
                 Element groupElement = new Element("group");
@@ -102,6 +103,17 @@ public class MCRUserTransformer {
                 groupsElement.addContent(groupElement);
             }
             userElement.addContent(groupsElement);
+        }
+        Map<String, String> userAttrs = mcrUser.getAttributes();
+        if (!userAttrs.isEmpty()) {
+            Element attributesElement = new Element("attributes");
+            userElement.addContent(attributesElement);
+            for (Map.Entry<String, String> entry : userAttrs.entrySet()) {
+                Element attributeElement = new Element("attribute");
+                attributesElement.addContent(attributeElement);
+                attributeElement.setAttribute("name", entry.getKey());
+                attributeElement.setAttribute("value", entry.getValue());
+            }
         }
         return userElement;
     }
