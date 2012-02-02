@@ -41,7 +41,7 @@ public interface MCRUserInformation {
     /**
      * The UserID is the information that is used in <em>user</em> clauses of the ACL System.
      */
-    public String getCurrentUserID();
+    public String getUserID();
 
     /**
      * The role information is used in <em>group</em> clauses of the ACL System.

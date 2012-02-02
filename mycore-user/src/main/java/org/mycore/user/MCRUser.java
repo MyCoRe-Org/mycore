@@ -155,7 +155,7 @@ public class MCRUser extends MCRUserObject {
     }
 
     public MCRUser(String userid, String passwd) {
-        this(MCRUserMgr.instance().getMaxUserNumID() + 1, userid, MCRSessionMgr.getCurrentSession().getUserInformation().getCurrentUserID(), null, null, true,
+        this(MCRUserMgr.instance().getMaxUserNumID() + 1, userid, MCRSessionMgr.getCurrentSession().getUserInformation().getUserID(), null, null, true,
             true, null, null, MCRGroup.getDefaultGroupID(), null, null);
     }
 
@@ -563,7 +563,7 @@ public class MCRUser extends MCRUserObject {
         // Get the MCRSession object for the current thread from the session
         // manager.
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        String currentUserID = mcrSession.getUserInformation().getCurrentUserID();
+        String currentUserID = mcrSession.getUserInformation().getUserID();
 
         MCRGroup primaryGroup = MCRUserMgr.instance().retrieveGroup(primaryGroupID, false);
 

@@ -341,7 +341,7 @@ public class MCRCommandLineInterface {
      */
     public static void whoami() {
         MCRSession session = MCRSessionMgr.getCurrentSession();
-        String userName = session.getUserInformation().getCurrentUserID();
+        String userName = session.getUserInformation().getUserID();
         output("You are user " + userName);
     }
 

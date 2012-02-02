@@ -58,7 +58,7 @@ public class MCRSessionListingServlet extends MCRServlet {
         for (MCRSession session : sessions) {
             Element sessionXML = new Element("session");
             sessionXML.addContent(new Element("id").setText(session.getID()));
-            String currentUserID = session.getUserInformation().getCurrentUserID();
+            String currentUserID = session.getUserInformation().getUserID();
             sessionXML.addContent(new Element("login").setText(currentUserID));
             sessionXML.addContent(new Element("ip").setText(session.getCurrentIP()));
             try {

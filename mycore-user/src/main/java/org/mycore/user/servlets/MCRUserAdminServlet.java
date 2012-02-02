@@ -181,7 +181,7 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
         String editorFormular = pageDir + "editor_form_modify-user.xml";
         String uid = getProperty(job.getRequest(), "uid");
         if (uid == null || uid.length() == 0) {
-            uid = MCRSessionMgr.getCurrentSession().getUserInformation().getCurrentUserID();
+            uid = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
         }
         String base = getBaseURL() + editorFormular;
         Properties params = new Properties();
@@ -205,7 +205,7 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
         
         // Now we redirect the browser to the modify-user formular
         String editorFormular = pageDir + "editor_form_modify-contact.xml";
-        String uid = MCRSessionMgr.getCurrentSession().getUserInformation().getCurrentUserID();
+        String uid = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
         String base = getBaseURL() + editorFormular;
         Properties params = new Properties();
         params.put("uid", uid);

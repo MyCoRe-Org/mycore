@@ -109,7 +109,7 @@ public class MCRZipServlet extends MCRServlet {
 
         if (!MCRAccessManager.checkPermission(MCRObjectID.getInstance(paramid), "writedb")) {
             String ip = MCRSessionMgr.getCurrentSession().getCurrentIP();
-            String userId = MCRSessionMgr.getCurrentSession().getUserInformation().getCurrentUserID();
+            String userId = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
             String msg = "Unsufficient privileges to read content of object \"" + paramid + "\"";
             LOGGER.warn(msg + "[user=" + userId + ", ip=" + ip + "]");
             job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN, msg);

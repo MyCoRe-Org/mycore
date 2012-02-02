@@ -496,7 +496,7 @@ public class MCREditorOutValidator {
                         continue;
                     }
                     if (value.equals("$CurrentUser")) {
-                        String thisuser = MCRSessionMgr.getCurrentSession().getUserInformation().getCurrentUserID();
+                        String thisuser = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
                         firstcond.setAttribute("value", thisuser);
                         continue;
                     }
@@ -506,7 +506,7 @@ public class MCREditorOutValidator {
                         if (thisgroup != null) {
                             firstcond.setAttribute("value", thisgroup);
                         } else {
-                            throw new MCRException("Could not aquire primary group for user " + userInformation.getCurrentUserID());
+                            throw new MCRException("Could not aquire primary group for user " + userInformation.getUserID());
                         }
                         continue;
                     }

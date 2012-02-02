@@ -198,7 +198,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
         String ruleStr = getNormalizedRuleString(rule);
         MCRAccessRule accessRule = new MCRAccessRule(null, "System", new Date(), ruleStr, "");
         try {
-            return accessRule.checkAccess(session.getUserInformation().getCurrentUserID(), new Date(), new MCRIPAddress(session.getCurrentIP()));
+            return accessRule.checkAccess(session.getUserInformation().getUserID(), new Date(), new MCRIPAddress(session.getCurrentIP()));
         } catch (MCRException e) {
             // only return true if access is allowed, we dont know this
             LOGGER.debug("Error while checking rule.", e);

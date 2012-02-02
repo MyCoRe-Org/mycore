@@ -181,7 +181,7 @@ public class MCRSession implements Cloneable {
      * @deprecated use {@link #getUserInformation()}.getCurrentUserID() instead;
      */
     public final String getCurrentUserID() {
-        return getUserInformation().getCurrentUserID();
+        return getUserInformation().getUserID();
     }
 
     /** returns the current language */
@@ -225,7 +225,7 @@ public class MCRSession implements Cloneable {
     /** Write data to the logger for debugging purposes */
     public final void debug() {
         LOGGER.debug("SessionID = " + sessionID);
-        LOGGER.debug("UserID    = " + getUserInformation().getCurrentUserID());
+        LOGGER.debug("UserID    = " + getUserInformation().getUserID());
         LOGGER.debug("IP        = " + ip);
         LOGGER.debug("language  = " + language);
     }
@@ -303,7 +303,7 @@ public class MCRSession implements Cloneable {
         sb.append("MCRSession[");
         sb.append(getID());
         sb.append(",user:'");
-        sb.append(getUserInformation().getCurrentUserID());
+        sb.append(getUserInformation().getUserID());
         sb.append("',ip:");
         sb.append(getCurrentIP());
         sb.append("]");

@@ -179,9 +179,9 @@ public class MCRUserCommands extends MCRAbstractCommands {
      */
     public static void changeToUser(String user, String password) {
         MCRSession session = MCRSessionMgr.getCurrentSession();
-        System.out.println(SYSTEM + " The old user ID is " + session.getUserInformation().getCurrentUserID());
+        System.out.println(SYSTEM + " The old user ID is " + session.getUserInformation().getUserID());
         if (MCRUserMgr.instance().login(user, password)) {
-            System.out.println(SYSTEM + " The new user ID is " + session.getUserInformation().getCurrentUserID());
+            System.out.println(SYSTEM + " The new user ID is " + session.getUserInformation().getUserID());
         } else {
             LOGGER.warn("Wrong password, no changes of user ID in session context!");
         }
@@ -225,7 +225,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
             }
 
             @Override
-            public String getCurrentUserID() {
+            public String getUserID() {
                 return suser;
             }
 

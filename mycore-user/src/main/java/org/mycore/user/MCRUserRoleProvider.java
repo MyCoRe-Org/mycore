@@ -55,7 +55,7 @@ public class MCRUserRoleProvider implements MCRUserInformation {
      * @see org.mycore.common.MCRUserInformation#getCurrentUserID()
      */
     @Override
-    public String getCurrentUserID() {
+    public String getUserID() {
         return user.getID();
     }
 

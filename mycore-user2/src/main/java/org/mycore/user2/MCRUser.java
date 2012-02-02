@@ -355,7 +355,7 @@ public class MCRUser implements MCRUserInformation {
     }
 
     @Override
-    public String getCurrentUserID() {
+    public String getUserID() {
         String cuid = this.getUserName();
         if (!getRealm().equals(MCRRealm.getLocalRealm()))
             cuid += "@" + getRealmID();

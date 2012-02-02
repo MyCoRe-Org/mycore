@@ -73,7 +73,7 @@ public class MCRWebCLIServlet extends MCRServlet {
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
         MCRSession session = MCRSessionMgr.getCurrentSession();
-        String user = session.getUserInformation().getCurrentUserID();
+        String user = session.getUserInformation().getUserID();
         if (!MCRAccessManager.checkPermission("use-webcli")) {
             StringBuilder sb = new StringBuilder("Access denied: ");
             sb.append(user).append("\nIP: ").append(session.getCurrentIP());

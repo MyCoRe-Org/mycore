@@ -137,7 +137,7 @@ public class MCRUserMgr {
         }
         // For this action you must have list rights.
         if (!MCRAccessManager.checkPermission("administrate-user")
-            && !session.getUserInformation().getCurrentUserID().equals(MCRSystemUserInformation.getSuperUserInstance().getCurrentUserID())) {
+            && !session.getUserInformation().getUserID().equals(MCRSystemUserInformation.getSuperUserInstance().getUserID())) {
             locked = false;
             throw new MCRException("The session does not have the permission \"administrate-user\"!");
         }
@@ -254,7 +254,7 @@ public class MCRUserMgr {
         }
         // set the current user ID as administration user
         MCRSession session = MCRSessionMgr.getCurrentSession();
-        MCRUser admin = retrieveUser(session.getUserInformation().getCurrentUserID(), false);
+        MCRUser admin = retrieveUser(session.getUserInformation().getUserID(), false);
         if (admin != null) {
             group.addAdminUserID(admin.getID());
             group.addAdminGroupID(admin.getPrimaryGroupID());
@@ -281,7 +281,7 @@ public class MCRUserMgr {
             // Set some data by the manager
             group.setCreationDate();
             group.setModifiedDate();
-            group.setCreator(session.getUserInformation().getCurrentUserID());
+            group.setCreator(session.getUserInformation().getUserID());
 
             // Just create the group. The group must be created before updating
             // the groups this
@@ -360,7 +360,7 @@ public class MCRUserMgr {
             user.setCreationDate();
             user.setModifiedDate();
             MCRSession session = MCRSessionMgr.getCurrentSession();
-            user.setCreator(session.getUserInformation().getCurrentUserID());
+            user.setCreator(session.getUserInformation().getUserID());
 
             // At first create the user. The user must be created before
             // updating the groups
@@ -638,7 +638,7 @@ public class MCRUserMgr {
         // manager.
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
 
-        return retrieveUser(mcrSession.getUserInformation().getCurrentUserID(), false);
+        return retrieveUser(mcrSession.getUserInformation().getUserID(), false);
     }
 
     /**
@@ -809,7 +809,7 @@ public class MCRUserMgr {
     public final void importUserSystemFromFiles(org.jdom.Element groups, org.jdom.Element users) throws MCRException {
         // check authorization
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        String sessionUser = mcrSession.getUserInformation().getCurrentUserID();
+        String sessionUser = mcrSession.getUserInformation().getUserID();
         String propertyUser = CONFIG.getString("MCR.Users.Superuser.UserName", "administrator");
         if (!sessionUser.equals(propertyUser)) {
             throw new MCRException("The user " + sessionUser + " is not authorized for import the user system.");
@@ -914,7 +914,7 @@ public class MCRUserMgr {
         // manager.
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
 
-        String sessionUser = mcrSession.getUserInformation().getCurrentUserID();
+        String sessionUser = mcrSession.getUserInformation().getUserID();
 
         return sessionUser.equals(user.getID()) ? true : false;
     }
@@ -1177,7 +1177,7 @@ public class MCRUserMgr {
             throw new MCRException("The update for the user " + userID + " is not allowed!");
         }
 
-        if (!(session.getUserInformation().getCurrentUserID().equals(userID) || adminUser)) {
+        if (!(session.getUserInformation().getUserID().equals(userID) || adminUser)) {
             throw new MCRException("You have no rights to change the users password!");
         }
 

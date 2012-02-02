@@ -147,7 +147,7 @@ public class MCRAccessRule implements org.mycore.access.MCRAccessRule {
     @Override
     public boolean validate() {
         MCRSession session = MCRSessionMgr.getCurrentSession();
-        String userID = session.getUserInformation().getCurrentUserID();
+        String userID = session.getUserInformation().getUserID();
         MCRIPAddress mcripAddress;
         try {
             mcripAddress = new MCRIPAddress(session.getCurrentIP());

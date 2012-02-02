@@ -45,7 +45,7 @@ class MCRUserClause implements MCRCondition {
     }
 
     public boolean evaluate(Object o) {
-        return user.equals(MCRSessionMgr.getCurrentSession().getUserInformation().getCurrentUserID()) ^ not;
+        return user.equals(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()) ^ not;
     }
 
     @Override

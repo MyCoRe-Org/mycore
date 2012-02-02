@@ -50,7 +50,7 @@ public class MCRContainerLoginServlet extends MCRServlet {
     protected void think(MCRServletJob job) throws Exception {
         MCRSession session = MCRSessionMgr.getCurrentSession();
         session.setUserInformation(new ContainerUserInformation(session));
-        LOGGER.info("Logged in: " + session.getUserInformation().getCurrentUserID());
+        LOGGER.info("Logged in: " + session.getUserInformation().getUserID());
     }
 
     /* (non-Javadoc)
@@ -77,7 +77,7 @@ public class MCRContainerLoginServlet extends MCRServlet {
         }
 
         @Override
-        public String getCurrentUserID() {
+        public String getUserID() {
             HttpServletRequest request = getCurrentRequest();
             if (request == null) {
                 return lastUser;
@@ -85,7 +85,7 @@ public class MCRContainerLoginServlet extends MCRServlet {
             Principal principal = request.getUserPrincipal();
             if (principal == null) {
                 LOGGER.warn("Principal for current user is null. Using guest user as fallback!");
-                return MCRSystemUserInformation.getGuestInstance().getCurrentUserID();
+                return MCRSystemUserInformation.getGuestInstance().getUserID();
             }
             lastUser = principal.getName();
             return lastUser;

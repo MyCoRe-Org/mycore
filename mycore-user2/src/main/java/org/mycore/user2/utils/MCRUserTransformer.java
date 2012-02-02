@@ -53,7 +53,7 @@ public class MCRUserTransformer {
         realmElement.setText(mcrUser.getRealm().getLabel());
         userElement.addContent(realmElement);
         Element ownerElement = new Element("owner");
-        ownerElement.setAttribute("id", String.valueOf(mcrUser.getOwner().getCurrentUserID()));
+        ownerElement.setAttribute("id", String.valueOf(mcrUser.getOwner().getUserID()));
         userElement.addContent(ownerElement);
         return userElement;
     }

@@ -68,7 +68,7 @@ public class MCRACLEditorServlet_v2 extends MCRServlet {
 
     private boolean verifyAccess(MCRServletJob job) throws IOException {
         if (!MCRAccessManager.getAccessImpl().checkPermission("use-aclEditor")) {
-            LOGGER.info("Access denied for userID=" + MCRSessionMgr.getCurrentSession().getUserInformation().getCurrentUserID());
+            LOGGER.info("Access denied for userID=" + MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
             final String queryString = (job.getRequest().getQueryString() != null) ? "?" + job.getRequest().getQueryString() : ":";
             job.getResponse().sendRedirect(
                     job.getResponse()

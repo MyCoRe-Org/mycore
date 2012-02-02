@@ -389,7 +389,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         }
 
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        String uid = mcrSession.getUserInformation().getCurrentUserID();
+        String uid = mcrSession.getUserInformation().getUserID();
         // set parameters
         parameters.put("CurrentUser", uid);
         parameters.put("DefaultLang", MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", MCRConstants.DEFAULT_LANG));

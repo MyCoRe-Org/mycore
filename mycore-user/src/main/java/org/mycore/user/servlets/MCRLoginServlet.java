@@ -60,12 +60,12 @@ public class MCRLoginServlet extends MCRServlet {
             backto_url = (referer != null) ? referer : MCRServlet.getBaseURL();
         }
         LOGGER.debug("SessionID: " + mcrSession.getID());
-        LOGGER.debug("CurrentID: " + mcrSession.getUserInformation().getCurrentUserID());
+        LOGGER.debug("CurrentID: " + mcrSession.getUserInformation().getUserID());
         LOGGER.debug("UID :      " + uid);
         LOGGER.debug("URL :      " + backto_url);
 
         // Do not change login, just redirect to given url:
-        if (mcrSession.getUserInformation().getCurrentUserID().equals(uid)) {
+        if (mcrSession.getUserInformation().getUserID().equals(uid)) {
             job.getResponse().setHeader("Cache-Control", "no-cache");
             job.getResponse().setHeader("Pragma", "no-cache");
             job.getResponse().setHeader("Expires", "0");

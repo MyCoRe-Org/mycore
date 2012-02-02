@@ -168,7 +168,7 @@ public class MCRRedundancyMapServlet extends MCRServlet {
         }
         // add some general infos to the redObjectsElements
         MCRUserInformation userInformation = session.getUserInformation();
-        String user = userInformation.getCurrentUserID();
+        String user = userInformation.getUserID();
         String userRealName = userInformation.getUserAttribute(MCRUserInformation.ATT_REAL_NAME);
         long time = System.currentTimeMillis();
         java.util.Date date = new java.util.Date(time);

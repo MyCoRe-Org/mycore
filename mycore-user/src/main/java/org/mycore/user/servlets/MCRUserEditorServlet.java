@@ -127,7 +127,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
         // Get the MCRSession object for the current thread from the session
         // manager.
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        String currentUserID = mcrSession.getUserInformation().getCurrentUserID();
+        String currentUserID = mcrSession.getUserInformation().getUserID();
         List<String> groupIDs = null;
 
         try {
@@ -320,7 +320,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
      */
     private void getEditorSubmission(MCRServletJob job) throws IOException {
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        String currentUserID = mcrSession.getUserInformation().getCurrentUserID();
+        String currentUserID = mcrSession.getUserInformation().getUserID();
 
         // Read the XML data sent by the editor
         MCREditorSubmission sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));

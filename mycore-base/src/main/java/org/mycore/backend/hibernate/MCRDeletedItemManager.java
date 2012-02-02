@@ -53,7 +53,7 @@ public class MCRDeletedItemManager {
             tab = new MCRDELETEDITEMS();
             tab.setKey(pk);
         }
-        tab.setUserid(mcrSession.getUserInformation().getCurrentUserID());
+        tab.setUserid(mcrSession.getUserInformation().getUserID());
         tab.setIp(mcrSession.getCurrentIP());
 
         LOGGER.debug("Inserting into MCRDELETEDITEMS table");

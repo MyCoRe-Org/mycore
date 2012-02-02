@@ -65,7 +65,7 @@ public class MCRRPCProvider extends RPCProvider {
             }
             
             @Override
-            public String getCurrentUserID() {
+            public String getUserID() {
                 return mc.getUsername();
             }
 

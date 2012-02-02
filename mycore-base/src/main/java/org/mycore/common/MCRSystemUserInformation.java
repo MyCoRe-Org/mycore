@@ -53,7 +53,7 @@ public class MCRSystemUserInformation implements MCRUserInformation {
      * Always returns "SYSTEM" 
      */
     @Override
-    public String getCurrentUserID() {
+    public String getUserID() {
         return userID;
     }
 
