@@ -94,6 +94,23 @@ public class MCRGroupManager {
     }
 
     /**
+     * Returns a group collection for the given group names.
+     * If a group is not known the returning collection contains fewer items.
+     * @param names unique group names
+     * @return collection each element is MCRGroup instance.
+     */
+    public static Collection<MCRGroup> getGroups(Collection<String> names) {
+        LinkedList<MCRGroup> groups = new LinkedList<MCRGroup>();
+        for (String name : names) {
+            MCRGroup group = getGroup(name);
+            if (group != null) {
+                groups.add(group);
+            }
+        }
+        return groups;
+    }
+
+    /**
      * Returns a list of all defined groups
      * 
      * @return a list of all defined groups

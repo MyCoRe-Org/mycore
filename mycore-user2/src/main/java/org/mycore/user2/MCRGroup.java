@@ -22,6 +22,7 @@
 
 package org.mycore.user2;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -75,6 +76,13 @@ public class MCRGroup {
     public MCRLabel getLabel() {
         String lang = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
         return labels.get(lang);
+    }
+    
+    /**
+     * Returns all labels available for this group 
+     */
+    public Collection<MCRLabel> getLabels() {
+        return labels.values();
     }
 
     /**

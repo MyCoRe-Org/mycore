@@ -22,18 +22,12 @@
 
 package org.mycore.user2;
 
-import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
-import org.jdom.Element;
 import org.mycore.common.MCRUserInformation;
-import org.mycore.common.xml.MCRXMLFunctions;
-import org.mycore.datamodel.common.MCRISO8601Format;
 
 /**
  * Represents a login user. Each user has a unique numerical ID.
@@ -43,7 +37,6 @@ import org.mycore.datamodel.common.MCRISO8601Format;
  */
 public class MCRUser implements MCRUserInformation {
     /** The unique user ID */
-    @SuppressWarnings("unused")
     int internalID;
 
     /** The login user name */
@@ -51,13 +44,13 @@ public class MCRUser implements MCRUserInformation {
 
     /** The realm the user comes from */
     private MCRRealm realm;
-    
+
     /** The password hash of the user, for users from local realm */
     private String password;
-    
+
     //base64 encoded
     private String salt;
-    
+
     private MCRPasswordHashType hashType;
 
     /** The ID of the user that owns this user, or 0 */
@@ -74,7 +67,7 @@ public class MCRUser implements MCRUserInformation {
 
     /** The last time the user logged in */
     private Date lastLogin;
-    
+
     private Map<String, String> attributes;
 
     /**
@@ -346,36 +339,6 @@ public class MCRUser implements MCRUserInformation {
         this.lastLogin = lastLogin;
     }
 
-    /**
-     * Checks if a user with this name and realm already is stored in the database.
-     * 
-     * @return true, if a user with this name and realm already exists.
-     */
-    public boolean exists() {
-        return MCRUserManager.exists(userName, realm.getID());
-    }
-
-    /**
-     * Deletes this user from the underlying database.
-     */
-    public void delete() {
-        MCRUserManager.deleteUser(this);
-    }
-
-    /**
-     * Creates this user in the underlying database.
-     */
-    public void create() {
-        MCRUserManager.createUser(this);
-    }
-
-    /**
-     * Updates this user in the underlying database. This also updates group membership.
-     */
-    public void update() {
-        MCRUserManager.updateUser(this);
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -391,91 +354,6 @@ public class MCRUser implements MCRUserInformation {
         return userName.hashCode();
     }
 
-    /**
-     * Builds an xml element containing basic information on user. 
-     * This includes user ID, login name and realm.
-     */
-    public Element buildBasicXML() {
-        Element u = new Element("user");
-        u.setAttribute("name", userName);
-        Element r = new Element("realm");
-        r.setAttribute("id", realm.getID());
-        r.setText(realm.getLabel());
-        u.addContent(r);
-        Element o = new Element("owner");
-        o.setAttribute("id", String.valueOf(owner.getUserID()));
-        u.addContent(o);
-        return u;
-    }
-
-    private String getUserID() {
-        if (realm == null || realm.equals(MCRRealm.getLocalRealm())) {
-            return userName;
-        }
-        return userName + "@" + realm.getID();
-    }
-
-    /**
-     * Builds an xml element containing detailed information on user. 
-     * This includes user data, owned users and groups the user is member of.
-     */
-    public Element buildXML() throws Exception {
-        Element u = buildBasicXML();
-
-        addString(u, "realName", realName);
-        addString(u, "eMail", eMail);
-        addString(u, "hint", hint);
-
-        if (lastLogin != null) {
-            addString(u, "lastLogin", MCRXMLFunctions.getISODate(lastLogin, MCRISO8601Format.F_COMPLETE_HH_MM_SS));
-        }
-
-        MCRUser owner = getOwner();
-        if (owner != null) {
-            Element o = u.getChild("owner");
-            o.addContent(owner.buildBasicXML());
-        }
-
-        List<MCRUser> owns = getOwnedUsers();
-        if (owns.size() > 0) {
-            Element o = new Element("owns");
-            for (MCRUser owned : owns)
-                o.addContent(owned.buildBasicXML());
-            u.addContent(o);
-        }
-
-        /*
-        if (groups.size() > 0) {
-            Element gs = new Element("groups");
-            for (MCRGroup group : groups) {
-                Element g = new Element("group");
-                g.setAttribute("label", group.getLabel());
-                g.setAttribute("name", group.getName());
-                g.setText(String.valueOf(group.getID()));
-                gs.addContent(g);
-            }
-            u.addContent(gs);
-        }*/
-
-        return u;
-    }
-
-    private void addString(Element parent, String name, String value) {
-        if ((value != null) && (value.trim().length() > 0))
-            parent.addContent(new Element(name).setText(value.trim()));
-    }
-
-    /** 
-     * Map of date formatting patterns, where key is the xml:lang language ID.
-     */
-    private static HashMap<String, SimpleDateFormat> formats;
-
-    static {
-        formats = new HashMap<String, SimpleDateFormat>();
-        formats.put("de", new SimpleDateFormat("EEEE, dd.MM.yyyy HH:mm:ss", Locale.GERMAN));
-        formats.put("en", new SimpleDateFormat("EEEE, yyyy-MM-dd hh:mm:ss aa", Locale.ENGLISH));
-    }
-
     @Override
     public String getCurrentUserID() {
         String cuid = this.getUserName();
@@ -487,12 +365,15 @@ public class MCRUser implements MCRUserInformation {
 
     @Override
     public String getUserAttribute(String attribute) {
-        return null;
+        if (MCRUserInformation.ATT_REAL_NAME.equals(attribute)) {
+            return getRealName();
+        }
+        return getAttributes().get(attribute);
     }
 
     @Override
     public boolean isUserInRole(final String role) {
-        return false;
+        return getSystemGroupIDs().contains(role);
     }
 
     public Collection<String> getSystemGroupIDs() {

@@ -174,7 +174,7 @@ public class MCRUserManager {
      *  
      * @param user the user to update in the database.
      */
-    public static synchronized void updateUser(MCRUser user) {
+    public static void updateUser(MCRUser user) {
         Session session = MCRHIB_CONNECTION.getSession();
         MCRUser inDb = getByNaturalID(session, user.getUserName(), user.getRealmID());
         if (inDb == null) {
@@ -256,12 +256,12 @@ public class MCRUserManager {
         }
         Criterion userRestriction = null;
         if (userPattern != null) {
-            userPattern = userPattern.toLowerCase().replace('*', '%').replace('?', '.');
+            userPattern = userPattern.replace('*', '%').replace('?', '.');
             userRestriction = Restrictions.ilike("userName", userPattern);
         }
         Criterion nameRestriction = null;
         if (namePattern != null) {
-            namePattern = namePattern.toLowerCase().replace('*', '%').replace('?', '.');
+            namePattern = namePattern.replace('*', '%').replace('?', '.');
             nameRestriction = Restrictions.ilike("realName", namePattern);
         }
         if (userRestriction != null && nameRestriction != null) {
@@ -325,10 +325,7 @@ public class MCRUserManager {
                 //Wahh! did we ever thought about what "salt" means for passwd management?
                 if (!MCRUtils.asCryptString(password.substring(0, 3), password).equals(user.getPassword())) {
                     //login failed
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException e) {
-                    }
+                    waitLoginPanalty();
                     return null;
                 }
                 //update to SHA-1
@@ -336,11 +333,7 @@ public class MCRUserManager {
                 break;
             case md5:
                 if (!MCRUtils.asMD5String(1, null, password).equals(user.getPassword())) {
-                    //login failed
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException e) {
-                    }
+                    waitLoginPanalty();
                     return null;
                 }
                 //update to SHA-1
@@ -348,16 +341,12 @@ public class MCRUserManager {
                 break;
             case sha1:
                 if (!MCRUtils.asSHA1String(HASH_ITERATIONS, MCRUtils.fromBase64String(user.getSalt()), password).equals(user.getPassword())) {
-                    //login failed
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException e) {
-                    }
+                    waitLoginPanalty();
                     return null;
                 }
                 break;
             default:
-                break;
+                throw new MCRException("Cannot validate hash type " + user.getHashType());
             }
         } catch (NoSuchAlgorithmException e) {
             throw new MCRException("Error while validating login", e);
@@ -365,6 +354,13 @@ public class MCRUserManager {
         user.setLastLogin(new Date());
         updateUser(user);
         return user;
+    }
+
+    private static void waitLoginPanalty() {
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+        }
     }
 
     private static void updatePasswordHashToSHA1(MCRUser user, String password) {
@@ -385,7 +381,7 @@ public class MCRUserManager {
         return salt;
     }
 
-    static MCRUser getByNaturalID(Session session, String userName, String realmId) {
+    private static MCRUser getByNaturalID(Session session, String userName, String realmId) {
         final Criteria criteria = getUserCriteria(session);
         return (MCRUser) criteria.setCacheable(true).add(getUserRealmCriterion(userName, realmId)).uniqueResult();
     }
