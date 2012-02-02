@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="org.mycore.user2">
+  <class name="MCRUser">
+    <cache usage="nonstrict-read-write" />
+    <id name="internalID" access="field">
+      <generator class="native" />
+    </id>
+    <natural-id>
+      <property name="userName"/>
+      <property name="realmId" access="field"/>
+    </natural-id>
+    <property name="hashType" not-null="true">
+      <type name="EnumUserType">
+        <param name="enumClassName">org.mycore.user2.MCRPasswordHashType</param>
+      </type>
+    </property>
+    <property name="password"/>
+    <property name="salt"/>
+    <property name="realName"/>
+    <property name="eMail" access="field"/>
+    <property name="hint"/>
+    <property name="lastLogin"/>
+    <many-to-one name="owner" class="MCRUser" not-null="true" />
+    <map name="attributes" table="MCRUserAttr" fetch="join" lazy="false">
+      <key column="id" on-delete="cascade"/>
+      <map-key column="key" type="string"/>
+      <element column="value" type="string"/>
+    </map>
+  </class>
+</hibernate-mapping>
