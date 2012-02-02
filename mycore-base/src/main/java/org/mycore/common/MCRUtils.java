@@ -39,6 +39,8 @@ import java.io.Writer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
+import java.text.Normalizer;
+import java.text.Normalizer.Form;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -416,10 +418,10 @@ public class MCRUtils {
                 if (bytesRead > 0) {
                     if (target != null) {
                         target.write(ba, 0 /* offset in ba */, bytesRead /*
-                                                                                * bytes
-                                                                                * to
-                                                                                * write
-                                                                                */);
+                                                                                 * bytes
+                                                                                 * to
+                                                                                 * write
+                                                                                 */);
                     }
                 } else {
                     break; // hit eof
@@ -474,10 +476,10 @@ public class MCRUtils {
                 if (charsRead > 0) {
                     if (target != null) {
                         target.write(ca, 0 /* offset in ba */, charsRead /*
-                                                                                * bytes
-                                                                                * to
-                                                                                * write
-                                                                                */);
+                                                                                 * bytes
+                                                                                 * to
+                                                                                 * write
+                                                                                 */);
                     }
                 } else {
                     break; // hit eof
@@ -1046,6 +1048,7 @@ public class MCRUtils {
         MessageDigest sha1digest;
         try {
             sha1digest = MessageDigest.getInstance(algorithm);
+            text = Normalizer.normalize(text, Form.NFC);
             sha1digest.update(text.getBytes("UTF-8"));
         } catch (UnsupportedEncodingException e) {
             throw new MCRException("Could not get " + algorithm + " checksum", e);
