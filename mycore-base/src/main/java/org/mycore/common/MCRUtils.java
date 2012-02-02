@@ -420,10 +420,10 @@ public class MCRUtils {
                 if (bytesRead > 0) {
                     if (target != null) {
                         target.write(ba, 0 /* offset in ba */, bytesRead /*
-                                                                                             * bytes
-                                                                                             * to
-                                                                                             * write
-                                                                                             */);
+                                                                                              * bytes
+                                                                                              * to
+                                                                                              * write
+                                                                                              */);
                     }
                 } else {
                     break; // hit eof
@@ -478,10 +478,10 @@ public class MCRUtils {
                 if (charsRead > 0) {
                     if (target != null) {
                         target.write(ca, 0 /* offset in ba */, charsRead /*
-                                                                                             * bytes
-                                                                                             * to
-                                                                                             * write
-                                                                                             */);
+                                                                                              * bytes
+                                                                                              * to
+                                                                                              * write
+                                                                                              */);
                     }
                 } else {
                     break; // hit eof
@@ -1046,13 +1046,8 @@ public class MCRUtils {
         return getHash(iterations, salt, text, "MD5");
     }
 
-    public static String asCryptString(byte[] salt, String text) throws NoSuchAlgorithmException {
-        String charsetName = "UTF-16BE";
-        try {
-            return MCRCrypt.crypt(new String(salt, charsetName), text);
-        } catch (UnsupportedEncodingException e) {
-            throw new MCRException("Charset is unsupported: " + charsetName, e);
-        }
+    public static String asCryptString(String salt, String text) {
+        return MCRCrypt.crypt(salt, text);
     }
 
     private static String getHash(int iterations, byte[] salt, String text, String algorithm) throws NoSuchAlgorithmException {
