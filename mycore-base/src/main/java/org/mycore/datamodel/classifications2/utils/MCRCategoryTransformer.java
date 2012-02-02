@@ -129,7 +129,7 @@ public class MCRCategoryTransformer {
         return new ItemElementFactory(cl, labelFormat, sort, emptyLeaves, completeId).getResult();
     }
 
-    private static class MetaDataElementFactory {
+    static class MetaDataElementFactory {
         static Document getDocument(MCRCategory cl, Map<MCRCategoryID, Number> countMap) {
             Document cd = new Document(new Element("mycoreclass"));
             cd.getRootElement().setAttribute("noNamespaceSchemaLocation", "MCRClassification.xsd", XSI_NAMESPACE);
@@ -137,7 +137,7 @@ public class MCRCategoryTransformer {
             cd.getRootElement().addNamespaceDeclaration(XLINK_NAMESPACE);
             MCRCategory root = cl.isClassification() ? cl : cl.getRoot();
             for (MCRLabel label : root.getLabels()) {
-                cd.getRootElement().addContent(getElement(label));
+                cd.getRootElement().addContent(MCRLabelTransformer.getElement(label));
             }
             Element categories = new Element("categories");
             cd.getRootElement().addContent(categories);
@@ -151,20 +151,6 @@ public class MCRCategoryTransformer {
             return cd;
         }
 
-        static Element getElement(MCRLabel label) {
-            Element le = new Element("label");
-            if (stringNotEmpty(label.getLang())) {
-                le.setAttribute("lang", label.getLang(), XML_NAMESPACE);
-            }
-            if (stringNotEmpty(label.getText())) {
-                le.setAttribute("text", label.getText());
-            }
-            if (stringNotEmpty(label.getDescription())) {
-                le.setAttribute("description", label.getDescription());
-            }
-            return le;
-        }
-
         static Element getElement(MCRCategory category, Map<MCRCategoryID, Number> countMap) {
             Element ce = new Element("category");
             ce.setAttribute("ID", category.getId().getID());
@@ -173,7 +159,7 @@ public class MCRCategoryTransformer {
                 ce.setAttribute("counter", Integer.toString(number.intValue()));
             }
             for (MCRLabel label : category.getLabels()) {
-                ce.addContent(getElement(label));
+                ce.addContent(MCRLabelTransformer.getElement(label));
             }
             if (category.getURI() != null) {
                 URI link = category.getURI();
