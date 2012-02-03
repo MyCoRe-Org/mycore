@@ -30,7 +30,7 @@
   </issueManagement>
   <ciManagement>
     <system>hudson</system>
-    <url>http://www.mycore.org/hudson/job/MyCoRe/</url>
+    <url>http://www.mycore.org/jenkins/job/MyCoRe/</url>
     <notifiers>
       <notifier>
         <type>mail</type>
