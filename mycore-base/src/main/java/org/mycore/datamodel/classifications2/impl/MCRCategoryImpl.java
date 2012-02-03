@@ -105,7 +105,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
     private int getPositionInParentByID() {
         int position = 0;
         for (MCRCategory sibling : parent.getChildren()) {
-            if (sibling.getId().equals(getId())) {
+            if (getId().equals(sibling.getId())) {
                 return position;
             }
             position++;
