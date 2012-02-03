@@ -102,7 +102,7 @@ public class MCRSession implements Cloneable {
 
     private StackTraceElement[] constructingStackTrace;
 
-    private Throwable lastActivatedStackTrace;
+    private ThreadLocal<Throwable> lastActivatedStackTrace = new ThreadLocal<Throwable>();
 
     private static MCRUserInformation guestUserInformation = MCRSystemUserInformation.getGuestInstance();
 
@@ -324,12 +324,12 @@ public class MCRSession implements Cloneable {
         thisAccessTime = System.currentTimeMillis();
         accessCount.incrementAndGet();
         if (currentThreadCount.get().getAndIncrement() == 0) {
-            lastActivatedStackTrace = new RuntimeException("This is for debugging purposes only");
+            lastActivatedStackTrace.set(new RuntimeException("This is for debugging purposes only"));
             fireSessionEvent(activated, concurrentAccess.incrementAndGet());
         } else {
             MCRException e = new MCRException("Cannot activate a Session more than once per thread: " + currentThreadCount.get().get());
             LOGGER.warn("Too many activate() calls stacktrace:", e);
-            LOGGER.warn("First activate() call stacktrace:", lastActivatedStackTrace);
+            LOGGER.warn("First activate() call stacktrace:", lastActivatedStackTrace.get());
         }
     }
 
@@ -340,6 +340,7 @@ public class MCRSession implements Cloneable {
      */
     void passivate() {
         if (currentThreadCount.get().getAndDecrement() == 1) {
+            lastActivatedStackTrace.set(null);
             fireSessionEvent(passivated, concurrentAccess.decrementAndGet());
         } else {
             LOGGER.debug("deactivate currentThreadCount: " + currentThreadCount.get().get());
