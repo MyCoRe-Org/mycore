@@ -27,6 +27,7 @@ import java.security.SecureRandom;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.InstantiationException;
 import org.hibernate.Session;
@@ -51,6 +52,8 @@ public class MCRUserManager {
     private static final int HASH_ITERATIONS = MCRConfiguration.instance().getInt("MCR.user2.HashIterations", 1000);
 
     private static final String CURRENT_USER_KEY = "currentUser";
+
+    private static final Logger LOGGER = Logger.getLogger(MCRUserManager.class);
 
     private static final SecureRandom SECURE_RANDOM;
     static {
@@ -394,6 +397,6 @@ public class MCRUserManager {
         if (realmId == null) {
             realmId = MCRRealm.getLocalRealm().getID();
         }
-        return Restrictions.naturalId().set("userName", user).set("userName", realmId);
+        return Restrictions.naturalId().set("userName", user).set("realmID", realmId);
     }
 }

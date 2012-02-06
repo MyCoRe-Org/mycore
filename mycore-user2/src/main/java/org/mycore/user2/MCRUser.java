@@ -24,6 +24,7 @@ package org.mycore.user2;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -43,7 +44,7 @@ public class MCRUser implements MCRUserInformation {
     private String userName;
 
     /** The realm the user comes from */
-    private MCRRealm realm;
+    private String realmID;
 
     /** The password hash of the user, for users from local realm */
     private String password;
@@ -70,19 +71,9 @@ public class MCRUser implements MCRUserInformation {
 
     private Map<String, String> attributes;
 
-    /**
-     * @return the attributes
-     */
-    public Map<String, String> getAttributes() {
-        return attributes;
-    }
+    private Collection<String> systemGroups;
 
-    /**
-     * @param attributes the attributes to set
-     */
-    public void setAttributes(Map<String, String> attributes) {
-        this.attributes = attributes;
-    }
+    private Collection<String> externalGroups;
 
     /**
      * Creates a new user.
@@ -90,9 +81,8 @@ public class MCRUser implements MCRUserInformation {
      * @param userName the login user name
      * @param realm the realm this user belongs to
      */
-    public MCRUser(String userName, MCRRealm mCRRealm) {
-        this.userName = userName;
-        this.realm = mCRRealm;
+    public MCRUser(String userName, MCRRealm mcrRealm) {
+        this(userName, mcrRealm.getID());
     }
 
     /**
@@ -103,7 +93,9 @@ public class MCRUser implements MCRUserInformation {
      */
     public MCRUser(String userName, String realmID) {
         this.userName = userName;
-        this.realm = MCRRealm.getRealm(realmID);
+        this.realmID = realmID;
+        this.systemGroups = new HashSet<String>();
+        this.externalGroups = new HashSet<String>();
     }
 
     /**
@@ -112,8 +104,7 @@ public class MCRUser implements MCRUserInformation {
      * @param userName the login user name
      */
     public MCRUser(String userName) {
-        this.userName = userName;
-        this.realm = MCRRealm.getLocalRealm();
+        this(userName, MCRRealm.getLocalRealm().getID());
     }
 
     /**
@@ -143,7 +134,7 @@ public class MCRUser implements MCRUserInformation {
      * @return the realm the user belongs to.
      */
     public MCRRealm getRealm() {
-        return realm;
+        return MCRRealm.getRealm(realmID);
     }
 
     /**
@@ -152,7 +143,7 @@ public class MCRUser implements MCRUserInformation {
      * @return the ID of the realm the user belongs to.
      */
     public String getRealmID() {
-        return realm.getID();
+        return realmID;
     }
 
     /**
@@ -174,7 +165,7 @@ public class MCRUser implements MCRUserInformation {
      * @param realm the realm the user belongs to.
      */
     void setRealm(MCRRealm realm) {
-        this.realm = realm;
+        this.realmID = realm.getID();
     }
 
     /**
@@ -346,7 +337,7 @@ public class MCRUser implements MCRUserInformation {
         if (!(obj instanceof MCRUser))
             return false;
         MCRUser other = (MCRUser) obj;
-        return (other.userName.equals(this.userName)) && (other.realm.equals(this.realm));
+        return (other.userName.equals(this.userName)) && (other.realmID.equals(this.realmID));
     }
 
     @Override
@@ -376,13 +367,25 @@ public class MCRUser implements MCRUserInformation {
         return getSystemGroupIDs().contains(role);
     }
 
+    /**
+     * @return the attributes
+     */
+    public Map<String, String> getAttributes() {
+        return attributes;
+    }
+
+    /**
+     * @param attributes the attributes to set
+     */
+    public void setAttributes(Map<String, String> attributes) {
+        this.attributes = attributes;
+    }
+
     public Collection<String> getSystemGroupIDs() {
-        // TODO Auto-generated method stub
-        return null;
+        return systemGroups;
     }
 
     public Collection<String> getExternalGroupIDs() {
-        // TODO Auto-generated method stub
-        return null;
+        return externalGroups;
     }
 }
