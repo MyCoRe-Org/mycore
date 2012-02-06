@@ -71,6 +71,7 @@ public class MCRErrorServlet extends HttpServlet {
         if (LOGGER.isDebugEnabled()) {
             String msg = MessageFormat.format("Handling error {0} for request ''{1}'' message: {2}", statusCode, requestURI, message);
             LOGGER.debug(msg, exception);
+            LOGGER.debug("Has current session: " + MCRSessionMgr.hasCurrentSession());
         }
         generateErrorPage(req, resp, message, exception, statusCode, exceptionType, requestURI, servletName);
     }
@@ -97,11 +98,11 @@ public class MCRErrorServlet extends HttpServlet {
         }
     }
 
-    protected void generateErrorPage(HttpServletRequest request, HttpServletResponse response, String msg, Throwable ex, Integer statusCode,
-        Class<? extends Throwable> exceptionType, String requestURI, String servletName) throws IOException {
+    protected void generateErrorPage(HttpServletRequest request, HttpServletResponse response, String msg, Throwable ex,
+            Integer statusCode, Class<? extends Throwable> exceptionType, String requestURI, String servletName) throws IOException {
         boolean exceptionThrown = ex != null;
         LOGGER.log(exceptionThrown ? Level.ERROR : Level.WARN,
-            MessageFormat.format("{0}: Error {1} occured. The following message was given: {2}", requestURI, statusCode, msg), ex);
+                MessageFormat.format("{0}: Error {1} occured. The following message was given: {2}", requestURI, statusCode, msg), ex);
 
         String rootname = "mcr_error";
         String style = MCRServlet.getProperty(request, "XSL.Style");
@@ -129,7 +130,7 @@ public class MCRErrorServlet extends HttpServlet {
 
         Document errorDoc = new Document(root, new DocType(rootname));
 
-        while (exceptionThrown) {
+        while (ex != null) {
             Element exception = new Element("exception");
             exception.setAttribute("type", ex.getClass().getName());
             Element trace = new Element("trace");
@@ -139,7 +140,6 @@ public class MCRErrorServlet extends HttpServlet {
             exception.addContent(message).addContent(trace);
             root.addContent(exception);
             ex = ex.getCause();
-            exceptionThrown = ex != null;
         }
 
         request.setAttribute("XSL.Style", style);
@@ -152,6 +152,7 @@ public class MCRErrorServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
             request.setAttribute(requestAttr, msg);
+            boolean currentSessionActive = MCRSessionMgr.hasCurrentSession();
             boolean sessionFromRequest = setCurrentSession(request);
             MCRSession session = null;
             try {
@@ -166,7 +167,7 @@ public class MCRErrorServlet extends HttpServlet {
                     session.commitTransaction();
                 return;
             } finally {
-                if (exceptionThrown) {
+                if (exceptionThrown||!currentSessionActive) {
                     MCRSessionMgr.releaseCurrentSession();
                 }
                 if (!sessionFromRequest) {
@@ -176,7 +177,8 @@ public class MCRErrorServlet extends HttpServlet {
             }
         } else {
             if (request.getAttribute(requestAttr) != null) {
-                LOGGER.warn("Could not send error page. Generating error page failed. The original message:\n" + request.getAttribute(requestAttr));
+                LOGGER.warn("Could not send error page. Generating error page failed. The original message:\n"
+                        + request.getAttribute(requestAttr));
             } else {
                 LOGGER.warn("Could not send error page. Response allready commited. The following message was given:\n" + msg);
             }
