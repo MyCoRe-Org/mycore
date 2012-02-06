@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.hibernate.cfg.Configuration;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
@@ -25,20 +26,16 @@ public class MCRHIBUserStoreTest extends MCRHibTestCase {
         MCRUserCommands.initSuperuser();
     }
 
-    /* (non-Javadoc)
-     * @see org.mycore.common.MCRHibTestCase#getHibernateConfiguration(org.mycore.backend.hibernate.MCRHIBConnection)
-     */
-    @Override
-    protected Configuration getHibernateConfiguration() {
-        MCRHIBConnection connection = MCRHIBConnection.instance();
-        Configuration conf = connection.getConfiguration();
-        if (connection.containsMapping("MCRUSERS"))
-            return conf;
-        return conf
+    @BeforeClass
+    public static void addMapping() {
+        Configuration configuration = MCRHIBConnection.instance().getConfiguration();
+        configuration
             .addResource("org/mycore/user/hibernate/MCRGROUPADMINS.hbm.xml")
             .addResource("org/mycore/user/hibernate/MCRGROUPMEMBERS.hbm.xml")
             .addResource("org/mycore/user/hibernate/MCRGROUPS.hbm.xml")
             .addResource("org/mycore/user/hibernate/MCRUSERS.hbm.xml");
+        MCRHIBConnection.instance().buildSessionFactory(configuration);
+        SESSION_FACTORY = MCRHIBConnection.instance().getSessionFactory();
     }
 
     @Test
