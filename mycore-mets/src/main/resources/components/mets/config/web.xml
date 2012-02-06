@@ -32,6 +32,12 @@
     <url-pattern>/servlets/MCRMETSServlet/*</url-pattern>
 </servlet-mapping>
 
+<filter-mapping>
+  <filter-name>UserAgentFilter</filter-name>
+  <servlet-name>MCRMETSServlet</servlet-name>
+  <dispatcher>REQUEST</dispatcher>
+</filter-mapping>
+
 <servlet id="MCRJSONProviderServlet">
     <servlet-name>MCRJSONProviderServlet</servlet-name>
     <servlet-class>org.mycore.mets.servlets.MCRJSONProviderServlet</servlet-class>
