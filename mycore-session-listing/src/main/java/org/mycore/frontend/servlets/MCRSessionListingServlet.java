@@ -62,10 +62,13 @@ public class MCRSessionListingServlet extends MCRServlet {
             sessionXML.addContent(new Element("login").setText(currentUserID));
             sessionXML.addContent(new Element("ip").setText(session.getCurrentIP()));
             try {
-                Element hostname = new Element("hostname");
                 InetAddress inetAddress = InetAddress.getByName(session.getCurrentIP());
-                hostname.setText(inetAddress.getHostName());
-                sessionXML.addContent(hostname);
+                String hostname = inetAddress.getHostName();
+                if (hostname != null) {
+                    Element hostnameElement = new Element("hostname");
+                    hostnameElement.setText(hostname);
+                    sessionXML.addContent(hostnameElement);
+                }
             } catch (UnknownHostException e1) {
                 Logger.getLogger(MCRSessionListingServlet.class).warn("Could not resolve host", e1);
             }
