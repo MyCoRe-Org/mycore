@@ -91,7 +91,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
     public void setLinks() {
         addTestLinks();
         startNewTransaction();
-        assertEquals("Link count does not match.", testLinks.size(), sessionFactory.getCurrentSession().createCriteria(MCRCategoryLink.class).list().size());
+        assertEquals("Link count does not match.", testLinks.size(), SESSION_FACTORY.getCurrentSession().createCriteria(MCRCategoryLink.class).list().size());
     }
 
     /**
@@ -102,7 +102,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         addTestLinks();
         startNewTransaction();
         SERVICE.deleteLink(LONDON_REFERENCE);
-        assertEquals("Link count does not match.", testLinks.size() - 1, sessionFactory.getCurrentSession().createCriteria(MCRCategoryLink.class).list().size());
+        assertEquals("Link count does not match.", testLinks.size() - 1, SESSION_FACTORY.getCurrentSession().createCriteria(MCRCategoryLink.class).list().size());
     }
 
     /**
@@ -113,7 +113,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         addTestLinks();
         startNewTransaction();
         SERVICE.deleteLinks(Arrays.asList(LONDON_REFERENCE, ENGLAND_REFERENCE));
-        assertEquals("Link count does not match.", testLinks.size() - 2, sessionFactory.getCurrentSession().createCriteria(MCRCategoryLink.class).list().size());
+        assertEquals("Link count does not match.", testLinks.size() - 2, SESSION_FACTORY.getCurrentSession().createCriteria(MCRCategoryLink.class).list().size());
     }
 
     /**
