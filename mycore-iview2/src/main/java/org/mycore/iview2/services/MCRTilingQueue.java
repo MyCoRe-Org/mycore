@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -38,7 +39,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         int waitTime = Integer.parseInt(MCRIView2Tools.getIView2Property("TimeTillReset")) * 60;
         StalledJobScheduler = Executors.newSingleThreadScheduledExecutor();
         StalledJobScheduler.scheduleAtFixedRate(MCRStalledJobResetter.getInstance(), waitTime, waitTime, TimeUnit.SECONDS);
-        preFetch = new LinkedList<MCRTileJob>();
+        preFetch = new ConcurrentLinkedQueue<MCRTileJob>();
         running = true;
         pollLock = new ReentrantLock();
         MCRShutdownHandler.getInstance().addCloseable(this);
@@ -348,9 +349,9 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
     public String toString() {
         return "MCRTilingQueue";
     }
-    
+
     @Override
-    public int getPriority(){
+    public int getPriority() {
         return MCRShutdownHandler.Closeable.DEFAULT_PRIORITY;
     }
 }
