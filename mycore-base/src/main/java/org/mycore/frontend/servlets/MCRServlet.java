@@ -695,6 +695,24 @@ public class MCRServlet extends HttpServlet {
      * @param args
      *            any arguments that should be passed to
      *            {@link MCRTranslation#translate(String, Object...)}
+     * @deprecated use {@link MCRServlet#getErrorI18N(String, String, Object...)} instead
+     */
+    protected String getErrorI18N(String subIdentifier, Object... args) {
+        String key = MessageFormat.format("error.{1}.{2}", getClass().getSimpleName(), subIdentifier);
+        return MCRTranslation.translate(key, args);
+    }
+
+    /**
+     * returns a translated error message for the current Servlet. I18N keys are
+     * of form {prefix}'.'{SimpleServletClassName}'.'{subIdentifier}
+     * 
+     * @param prefix
+     *            a prefix of the message property like component.base.error 
+     * @param subIdentifier
+     *            last part of I18n key
+     * @param args
+     *            any arguments that should be passed to
+     *            {@link MCRTranslation#translate(String, Object...)}
      */
     protected String getErrorI18N(String prefix, String subIdentifier, Object... args) {
         String key = MessageFormat.format("{0}.{1}.{2}", prefix, getClass().getSimpleName(), subIdentifier);
