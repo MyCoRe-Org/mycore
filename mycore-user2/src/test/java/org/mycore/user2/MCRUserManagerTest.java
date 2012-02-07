@@ -111,10 +111,14 @@ public class MCRUserManagerTest extends MCRHibTestCase {
     public final void testUpdateUser() {
         String eMail = "info@mycore.de";
         this.user.setEMail(eMail);
+        String groupName = "admin";
+        this.user.getSystemGroupIDs().add(groupName);
         MCRUserManager.updateUser(this.user);
+        startNewTransaction();
         MCRUser user = MCRUserManager.getUser(this.user.getUserName(), this.user.getRealm());
         assertEquals("User information was not updated", eMail, user.getEMailAddress());
         assertEquals("User was created not updated", 1, MCRUserManager.countUsers(null, null, null));
+        assertTrue("User is not in group " + groupName, user.getSystemGroupIDs().contains(groupName));
     }
 
     /**
@@ -144,6 +148,7 @@ public class MCRUserManagerTest extends MCRHibTestCase {
         assertEquals("Should not find a user", 0, listUsers.size());
         user.setOwner(user);
         MCRUserManager.updateUser(user);
+        startNewTransaction();
         listUsers = MCRUserManager.listUsers(user);
         assertEquals("Could not find a user", 1, listUsers.size());
     }
@@ -176,6 +181,7 @@ public class MCRUserManagerTest extends MCRHibTestCase {
         assertNull("Should not login user", user);
         MCRUserManager.updatePasswordHashToSHA1(this.user, clearPasswd);
         MCRUserManager.updateUser(this.user);
+        startNewTransaction();
         user = MCRUserManager.login(this.user.getUserName(), clearPasswd);
         assertNotNull("Could not login user", user);
         assertNotNull("Hash value was not updated", user.getHashType());
@@ -197,6 +203,7 @@ public class MCRUserManagerTest extends MCRHibTestCase {
         this.user.getAttributes().put("street", "Heidestraße 12");
         this.user.setOwner(this.user);
         MCRUserManager.updateUser(this.user);
+        startNewTransaction();
         assertEquals("Too many users", 1, MCRUserManager.countUsers(null, null, null));
         assertEquals("Too many users", 1, this.user.getOwnedUsers().size());
         Element exportableXML = MCRUserTransformer.buildExportableXML(this.user);
