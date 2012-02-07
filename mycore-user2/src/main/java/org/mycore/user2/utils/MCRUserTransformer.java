@@ -133,8 +133,8 @@ public class MCRUserTransformer {
     public static Element buildExportableXML(MCRUser mcrUser) {
         Element userElement = buildExportableSafeXML(mcrUser);
         Element pwdElement = new Element("password");
-        if (setAttribute(pwdElement, "salt", mcrUser.getSalt()) || setAttribute(pwdElement, "hashType", mcrUser.getHashType().toString())
-                || setAttribute(pwdElement, "hash", mcrUser.getPassword())) {
+        if (setAttribute(pwdElement, "salt", mcrUser.getSalt()) | setAttribute(pwdElement, "hashType", mcrUser.getHashType().toString())
+            | setAttribute(pwdElement, "hash", mcrUser.getPassword())) {
             userElement.addContent(pwdElement);
         }
         return userElement;
