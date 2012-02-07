@@ -697,7 +697,8 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         StringBuffer sb = new StringBuffer();
         Properties params = new Properties();
-        sb.append("request:receive/").append(cd.mysemcrid).append("?XSL.Style=editor");
+        sb.append("xslStyle:mycoreobject-editor:mcrobject:").append(cd.mysemcrid);
+
         params.put("sourceUri", sb.toString());
         sb = new StringBuffer();
         sb.append(getBaseURL()).append("receive/").append(cd.myremcrid.toString());
@@ -800,7 +801,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         Properties params = new Properties();
         String sourceUri = getProperty(job.getRequest(), "sourceUri");
         if (sourceUri == null || sourceUri.length() == 0) {
-            sb.append("request:receive/").append(cd.mytfmcrid).append("?XSL.Style=editor");
+            sb.append("xslStyle:mycoreobject-editor:mcrobject:").append(cd.mytfmcrid);
             params.put("sourceUri", sb.toString());
             sb = new StringBuffer();
             sb.append(getBaseURL()).append("receive/").append(cd.mytfmcrid);
