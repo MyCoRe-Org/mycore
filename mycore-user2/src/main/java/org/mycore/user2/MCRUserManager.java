@@ -25,6 +25,7 @@ package org.mycore.user2;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -43,6 +44,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.user2.utils.MCRUserTransformer;
 
 /**
@@ -124,7 +126,25 @@ public class MCRUserManager {
      */
     public static MCRUser getUser(String userName, String realmId) {
         Session session = MCRHIB_CONNECTION.getSession();
-        return getByNaturalID(session, userName, realmId);
+        MCRUser mcrUser = getByNaturalID(session, userName, realmId);
+        return setGroups(mcrUser);
+    }
+
+    private static MCRUser setGroups(MCRUser mcrUser) {
+        if (mcrUser == null) {
+            return null;
+        }
+        Collection<MCRCategoryID> groupIDs = MCRGroupManager.getGroupIDs(mcrUser);
+        mcrUser.getSystemGroupIDs().clear();
+        mcrUser.getExternalGroupIDs().clear();
+        for (MCRCategoryID groupID : groupIDs) {
+            if (groupID.getRootID().equals(MCRGroupManager.GROUP_CLASSID.getRootID())) {
+                mcrUser.getSystemGroupIDs().add(groupID.getID());
+            } else {
+                mcrUser.getSystemGroupIDs().add(groupID.toString());
+            }
+        }
+        return mcrUser;
     }
 
     /**
