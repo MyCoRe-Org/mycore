@@ -164,6 +164,10 @@ public class MCRUserManagerTest extends MCRHibTestCase {
     public final void testLogin() {
         String clearPasswd=user.getPassword();
         MCRUser user = MCRUserManager.login(this.user.getUserName(), clearPasswd);
+        assertNull("Should not login user", user);
+        MCRUserManager.updatePasswordHashToSHA1(this.user, clearPasswd);
+        MCRUserManager.updateUser(this.user);
+        user = MCRUserManager.login(this.user.getUserName(), clearPasswd);
         assertNotNull("Could not login user", user);
         assertNotNull("Hash value was not updated", user.getHashType());
     }
