@@ -28,13 +28,13 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 
 /**
  * Manages groups and group membership using a database table.
@@ -56,12 +56,23 @@ public class MCRGroupManager {
 
     private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
+    private static long lastLoaded;
+
     private static final MCRCategLinkService CATEG_LINK_SERVICE = MCRCategLinkServiceFactory.getInstance();
 
     static {
+        loadSystemGroups();
+    }
 
+    private static void loadSystemGroups() {
+        if (lastLoaded == DAO.getLastModified()) {
+            return;
+        }
+        lastLoaded = DAO.getLastModified();
         int onlyNonHierarchicalGroups = 1;
         MCRCategory groupCategory = DAO.getCategory(GROUP_CLASSID, onlyNonHierarchicalGroups);
+        groupsByName.clear();
+        groupsList.clear();
         for (MCRCategory child : groupCategory.getChildren()) {
             String name = child.getId().getID();
             MCRGroup group = new MCRGroup(name, child.getLabels());
@@ -77,6 +88,7 @@ public class MCRGroupManager {
      * @return the group with the given group name, or null.
      */
     public static MCRGroup getGroup(String name) {
+        loadSystemGroups();
         return groupsByName.get(name);
     }
 
@@ -86,9 +98,10 @@ public class MCRGroupManager {
      * @return array each element either MCRGroup instance, or null
      */
     public static MCRGroup[] getGroups(String... names) {
+        loadSystemGroups();
         MCRGroup[] groups = new MCRGroup[names.length];
         for (int i = 0; i < names.length; i++) {
-            groups[i] = getGroup(names[i]);
+            groups[i] = groupsByName.get(names[i]);
         }
         return groups;
     }
@@ -100,9 +113,11 @@ public class MCRGroupManager {
      * @return collection each element is MCRGroup instance.
      */
     public static Collection<MCRGroup> getGroups(Collection<String> names) {
+        loadSystemGroups();
+        loadSystemGroups();
         LinkedList<MCRGroup> groups = new LinkedList<MCRGroup>();
         for (String name : names) {
-            MCRGroup group = getGroup(name);
+            MCRGroup group = groupsByName.get(name);
             if (group != null) {
                 groups.add(group);
             }
