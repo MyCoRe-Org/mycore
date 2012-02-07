@@ -359,16 +359,13 @@
   <panel id="mods.name">
     <hidden var="nameOrPND/@editor.output" />
     <cell col="1" row="1" anchor="NORTHEAST">
-      <text>
-        <label xml:lang="de">Name oder GND-ID</label>
-        <label xml:lang="en">Name or GND-ID</label>
-      </text>
+      <text i18n="metaData.mods.dictionary.gnd" />
     </cell>
     <cell col="2" row="1" anchor="NORTHEAST" var="nameOrPND">
       <textfield id="mods.author.firstname.text" width="31" maxlength="128">
         <condition id="mods.author.firstname.cond" required="true">
-          <label xml:lang="de">Bitte geben Sie den Namen der Person (&lt;Name, Vorname&gt;) an oder die GND-ID (Personen UND Körperschaften)!</label>
-          <label xml:lang="en">Please insert person or corporation name alternativly insert GND-ID (person or corporation).</label>
+          <label xml:lang="de">Bitte geben Sie den Namen der Person (&lt;Name, Vorname&gt;) an oder die GND-ID (Personen)!</label>
+          <label xml:lang="en">Please insert person or corporation name alternativly insert GND-ID (person).</label>
         </condition>
       </textfield>
     </cell>
@@ -422,10 +419,7 @@
             <panel>
               <hidden var="nameOrPND/@editor.output" />
               <cell col="1" row="1" anchor="NORTHEAST">
-                <text>
-                  <label xml:lang="de">Name oder PND</label>
-                  <label xml:lang="en">Name or PND</label>
-                </text>
+                <text i18n="metaData.mods.dictionary.gnd" />
               </cell>
               <cell col="2" row="1" anchor="NORTHEAST" var="nameOrPND">
                 <textfield width="31" maxlength="128" />
@@ -443,10 +437,10 @@
   <helpPopup id="mods.person.help" width="400px" height="250px">
     <label xml:lang="de">
       Name und Rolle der Personen, in welcher sie bei der Erstellung des Dokumentes mitgewirkt haben.
-      (Verlinkung auf PND).
+      (Verlinkung auf GND).
     </label>
     <label xml:lang="en">
-      Names and roles of persons cooperating .... (ref to pnd)
+      Names and roles of persons cooperating .... (ref to gnd)
     </label>
   </helpPopup>
 
@@ -454,24 +448,42 @@
     <label xml:lang="de">
       Eine natürliche oder juristische Person oder Personengruppe, die als verantwortlich für die
       inhaltliche Gestaltung eines Dokuments angegeben wird, ohne selbst Verfasser des Dokuments
-      der einzelner Teile desselben sein zu müssen. (Verlinkung auf PND)
+      der einzelner Teile desselben sein zu müssen. (Verlinkung auf GND)
     </label>
     <label xml:lang="en">
-      Names and roles of persons cooperating .... (ref to pnd)
+      Names and roles of persons cooperating .... (ref to gnd)
     </label>
   </helpPopup>
   <!-- person END -->
 
-  <!-- Institutionszugehörigkeit (wo zugeordnet) -->
-  <text id="mods.assignedInstitute.label" i18n="metaData.mods.dictionary.institution.label" />
-  <helpPopup id="mods.assignedInstitute.help" width="400px" height="250px">
-    <label xml:lang="de">BMELV-Einrichtung (Institut/Fachgruppe/Organisationseinheit), zu welcher die Autoren bzw. die Beitragenden
-      zum Zeitpunkt der
-      Veröffentlichung des Dokumentes, des Erscheinungsjahres des Konferenzbandes
-      oder Buches gehört haben.</label>
-    <label xml:lang="en">Select an BMELV institution from the list.</label>
+  <!-- Körperschaft -->
+  <text id="mods.corporation.label" i18n="metaData.mods.dictionary.corporation" />
+  <panel id="mods.corporation">
+    <cell anchor="NORTHWEST" var="mods:name[@type='corporate']">
+      <repeater min="1" max="20" pos="right">
+        <panel>
+          <cell col="1" row="1" anchor="NORTHEAST" var="mods:role/mods:roleTerm[@type='code']">
+            <panel>
+              <hidden var="@authority" default="marcrelator" />
+              <cell>
+                <list type="dropdown" default="aut" id="mods.corporation.list">
+                  <include ref="pleaseSelect" />
+                  <include uri="classification:editor:-1:children:marcrelator" cacheable="false" />
+                </list>
+              </cell>
+            </panel>
+          </cell>
+          <cell col="2" row="1" anchor="NORTHEAST" ref="mods.name" />
+        </panel>
+      </repeater>
+    </cell>
+  </panel>
+
+  <helpPopup id="mods.corporation.help" width="400px" height="250px">
+    <label xml:lang="de">Geben Sie die Körperschaft (Bezeichnung oder GND-ID) ein. Die Ansetzung erfolgt gemäß RAK-WB.</label>
+    <label xml:lang="en">Insert corporate name or GND-ID.</label>
   </helpPopup>
-  <!-- Institutionszugehörigkeit END -->
+  <!-- Körperschaft END -->
 
   <!-- Publisher [text] -->
   <text id="mods.publisher.label" i18n="metaData.mods.dictionary.publisher" />
@@ -1255,32 +1267,6 @@
     <label xml:lang="en">Insert Conference Name.</label>
   </helpPopup>
   <!-- Konferenztitel END -->
-
-  <!-- Körperschaft -->
-  <text id="mods.corporation.label" i18n="metaData.mods.dictionary.corporation" />
-  <panel id="mods.corporation">
-    <cell anchor="NORTHWEST" var="mods:name[@type='corporate']">
-      <!-- ToDo: richtige URI finden! -->
-      <hidden var="@authority" default="gnd" />
-      <!-- ToDo: korrekte Zuordnung fehlt, siehe http://www.loc.gov/marc/relators/relaterm.html -->
-      <!-- hidden var="mods:role/mods:roleTerm/@authority" default="marcrelator" / -->
-      <hidden var="mods:role/mods:roleTerm/@type" default="text" />
-      <hidden var="mods:role/mods:roleTerm" default="corporation" />
-      <panel>
-        <cell col="1" row="1" anchor="EAST" var="mods:namePart">  <!-- ToDo: Anbindung an Katalog? (GKD) -->
-          <panel>
-            <cell anchor="NORTHWEST" ref="TFzeile512" />
-          </panel>
-        </cell>
-      </panel>
-    </cell>
-  </panel>
-
-  <helpPopup id="mods.corporation.help" width="400px" height="250px">
-    <label xml:lang="de">Geben Sie die Körperschaft ein. Die Ansetzung erfolgt gemäß RAK-WB.</label>
-    <label xml:lang="en">Insert corporate name.</label>
-  </helpPopup>
-  <!-- Körperschaft END -->
 
   <!-- Edition -->
   <text id="mods.edition.label" i18n="metaData.mods.dictionary.edition" />

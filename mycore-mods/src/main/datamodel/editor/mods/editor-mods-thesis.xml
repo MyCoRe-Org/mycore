@@ -51,21 +51,27 @@
     <cell row="30" col="2" anchor="NORTHWEST" ref="mods.person" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="30" col="3" anchor="NORTHWEST" ref="mods.person.help" />
     <!-- pub_autor_dok_txt [text] and reviewer END -->
-    
+
+    <!-- pub_corporation -->
+    <cell row="31" col="1" anchor="NORTHEAST" ref="mods.corporation.label" />
+    <cell row="31" col="2" anchor="NORTHWEST" ref="mods.corporation" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="31" col="3" anchor="NORTHWEST" ref="mods.corporation.help" />
+    <!-- pub_corporation END -->
+
     <!-- Datum der Erstellung [text] -->
-    <cell row="31" col="1" anchor="NORTHEAST" ref="mods.dateCreated.label" />
-    <cell row="31" col="2" anchor="NORTHWEST" ref="mods.dateCreated" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
-    <cell row="31" col="3" anchor="NORTHWEST" ref="mods.dateCreated.help" />
+    <cell row="32" col="1" anchor="NORTHEAST" ref="mods.dateCreated.label" />
+    <cell row="32" col="2" anchor="NORTHWEST" ref="mods.dateCreated" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
+    <cell row="32" col="3" anchor="NORTHWEST" ref="mods.dateCreated.help" />
     <!-- Datum der Erstellung END -->
     <!-- Datum der Einreichung [text] -->
-    <cell row="32" col="1" anchor="NORTHEAST" ref="mods.dateSubmitted.label" />
-    <cell row="32" col="2" anchor="NORTHWEST" ref="mods.dateSubmitted" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
-    <cell row="32" col="3" anchor="NORTHWEST" ref="mods.dateSubmitted.help" />
+    <cell row="33" col="1" anchor="NORTHEAST" ref="mods.dateSubmitted.label" />
+    <cell row="33" col="2" anchor="NORTHWEST" ref="mods.dateSubmitted" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
+    <cell row="33" col="3" anchor="NORTHWEST" ref="mods.dateSubmitted.help" />
     <!-- Datum der Einreichung END -->
     <!-- Datum der Promotion [text] -->
-    <cell row="33" col="1" anchor="NORTHEAST" ref="mods.dateAccepted.label" />
-    <cell row="33" col="2" anchor="NORTHWEST" ref="mods.dateAccepted" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
-    <cell row="33" col="3" anchor="NORTHWEST" ref="mods.dateAccepted.help" />
+    <cell row="34" col="1" anchor="NORTHEAST" ref="mods.dateAccepted.label" />
+    <cell row="34" col="2" anchor="NORTHWEST" ref="mods.dateAccepted" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
+    <cell row="34" col="3" anchor="NORTHWEST" ref="mods.dateAccepted.help" />
     <!-- Datum der Promotion END -->
     <!-- Datum der Veröffentlichung [text] -->
     <cell row="35" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.dateIssued.label" />

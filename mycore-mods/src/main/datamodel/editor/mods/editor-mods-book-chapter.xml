@@ -56,6 +56,12 @@
     <cell row="30" col="3" anchor="NORTHWEST" ref="mods.person.help" />
     <!-- pub_autor_dok_txt [text] and reviewer END -->
 
+    <!-- pub_corporation -->
+    <cell row="40" col="1" anchor="NORTHEAST" ref="mods.corporation.label" />
+    <cell row="40" col="2" anchor="NORTHWEST" ref="mods.corporation" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="40" col="3" anchor="NORTHWEST" ref="mods.corporation.help" />
+    <!-- pub_corporation END -->
+
     <!--  Erweiterte Angaben zum Dokument -->
     <cell row="100" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
       <text id="chapter.more" i18n="metaData.mods.dictionary.categorybox" />

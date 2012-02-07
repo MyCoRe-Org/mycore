@@ -26,11 +26,19 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="mods:name[@type='personal' or @authorityURI='http://d-nb.info/']">
+  <xsl:template match="mods:name[@type='personal' or @authorityURI='http://d-nb.info/' or (@type='corporate' and not (@ID))]">
     <xsl:copy>
       <xsl:apply-templates select="@*[name()!='type']" />
       <xsl:attribute name="type">
-        <xsl:value-of select="'personal'"/>
+        <xsl:choose>
+          <xsl:when test="@type='corporate'">
+            <xsl:value-of select="'corporate'"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="'personal'"/>
+          </xsl:otherwise>
+        </xsl:choose>
+        
       </xsl:attribute>
       <xsl:if test="@valueURI">
         <xsl:attribute name="editor.output">

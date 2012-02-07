@@ -91,11 +91,17 @@
         <cell row="25" col="3" anchor="NORTHWEST" ref="mods.subtitle.help" />
     <!-- pub_subtitle [text] END -->
 
-    <!-- publisher [text] -->
+    <!-- person [text] -->
         <cell row="28" col="1" anchor="NORTHEAST" ref="mods.person.label" />
         <cell row="28" col="2" anchor="NORTHWEST" ref="mods.person.publisher" var="metadata/def.modsContainer/modsContainer/mods:mods" />
         <cell row="28" col="3" anchor="NORTHWEST" ref="mods.person.publisher.help" />
-    <!-- publisher [text] END -->
+    <!-- person [text] END -->
+
+    <!-- pub_corporation -->
+        <cell row="29" col="1" anchor="NORTHEAST" ref="mods.corporation.label" />
+        <cell row="29" col="2" anchor="NORTHWEST" ref="mods.corporation" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+        <cell row="29" col="3" anchor="NORTHWEST" ref="mods.corporation.help" />
+    <!-- pub_corporation END -->
 
     <!-- Verlag [text] -->
         <cell row="30" col="1" anchor="NORTHEAST" ref="mods.publisher.label" />

@@ -54,6 +54,12 @@
     <cell row="40" col="3" anchor="NORTHWEST" ref="mods.person.help" />
     <!-- pub_autor_dok_txt [text] and reviewer END -->
 
+    <!-- pub_corporation -->
+    <cell row="45" col="1" anchor="NORTHEAST" ref="mods.corporation.label" />
+    <cell row="45" col="2" anchor="NORTHWEST" ref="mods.corporation" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="45" col="3" anchor="NORTHWEST" ref="mods.corporation.help" />
+    <!-- pub_corporation END -->
+
     <cell row="50" col="1" colspan="3" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='host']/mods:part">
       <panel style="width:100%;">
         <cell row="10" col="1" style="width:140px;" var="mods:detail[@type='issue']/mods:caption" anchor="NORTHEAST">

@@ -53,7 +53,13 @@
     <cell row="40" col="2" anchor="NORTHWEST" ref="mods.person" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="40" col="3" anchor="NORTHWEST" ref="mods.person.help" />
     <!-- pub_autor_dok_txt [text] and reviewer END -->
-    
+
+    <!-- pub_corporation -->
+    <cell row="50" col="1" anchor="NORTHEAST" ref="mods.corporation.label" />
+    <cell row="50" col="2" anchor="NORTHWEST" ref="mods.corporation" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="50" col="3" anchor="NORTHWEST" ref="mods.corporation.help" />
+    <!-- pub_corporation END -->
+
     <!-- Datum der Erstellung [text] -->
     <cell row="60" col="1" anchor="NORTHEAST" ref="mods.dateCreated.label" />
     <cell row="60" col="2" anchor="NORTHWEST" ref="mods.dateCreated" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
