@@ -22,6 +22,7 @@
 
 package org.mycore.user2;
 
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Date;
@@ -34,11 +35,15 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.jdom.Element;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
+import org.mycore.user2.utils.MCRUserTransformer;
 
 /**
  * Manages all users using a database table. 
@@ -156,7 +161,7 @@ public class MCRUserManager {
         criteria.add(getUserRealmCriterion(userName, realm));
         criteria.setProjection(Projections.rowCount());
         int count = ((Number) criteria.uniqueResult()).intValue();
-        return count == 1;
+        return count != 0;
     }
 
     /** 
@@ -239,6 +244,7 @@ public class MCRUserManager {
         Session session = MCRHIB_CONNECTION.getSession();
         Criteria criteria = getUserCriteria(session);
         criteria.add(Restrictions.eq("owner", owner));
+        criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
         @SuppressWarnings("unchecked")
         List<MCRUser> results = criteria.list();
         return results;
@@ -366,7 +372,7 @@ public class MCRUserManager {
         }
     }
 
-    private static void updatePasswordHashToSHA1(MCRUser user, String password) {
+    static void updatePasswordHashToSHA1(MCRUser user, String password) {
         String newHash;
         byte[] salt = generateSalt();
         try {

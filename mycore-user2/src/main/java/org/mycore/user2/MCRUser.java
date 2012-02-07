@@ -24,6 +24,7 @@ package org.mycore.user2;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -96,6 +97,7 @@ public class MCRUser implements MCRUserInformation {
         this.realmID = realmID;
         this.systemGroups = new HashSet<String>();
         this.externalGroups = new HashSet<String>();
+        this.attributes = new HashMap<String, String>();
     }
 
     /**
@@ -330,19 +332,48 @@ public class MCRUser implements MCRUserInformation {
         this.lastLogin = lastLogin;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (!(obj instanceof MCRUser))
+        }
+        if (obj == null) {
             return false;
+        }
+        if (!(obj instanceof MCRUser)) {
+            return false;
+        }
         MCRUser other = (MCRUser) obj;
-        return (other.userName.equals(this.userName)) && (other.realmID.equals(this.realmID));
+        if (realmID == null) {
+            if (other.realmID != null) {
+                return false;
+            }
+        } else if (!realmID.equals(other.realmID)) {
+            return false;
+        }
+        if (userName == null) {
+            if (other.userName != null) {
+                return false;
+            }
+        } else if (!userName.equals(other.userName)) {
+            return false;
+        }
+        return true;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
     @Override
     public int hashCode() {
-        return userName.hashCode();
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((realmID == null) ? 0 : realmID.hashCode());
+        result = prime * result + ((userName == null) ? 0 : userName.hashCode());
+        return result;
     }
 
     @Override

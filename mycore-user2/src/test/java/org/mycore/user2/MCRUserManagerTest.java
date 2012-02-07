@@ -25,9 +25,14 @@ package org.mycore.user2;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.cfg.Configuration;
+import org.jdom.Element;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -38,6 +43,7 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImplTest;
+import org.mycore.user2.utils.MCRUserTransformer;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -50,6 +56,7 @@ public class MCRUserManagerTest extends MCRHibTestCase {
     public static void addMapping() {
         Configuration configuration = MCRHIBConnection.instance().getConfiguration();
         configuration.addResource("org/mycore/user2/MCRUser.hbm.xml");
+        configuration.setProperty("show_sql", "true");
         MCRHIBConnection.instance().buildSessionFactory(configuration);
         SESSION_FACTORY = MCRHIBConnection.instance().getSessionFactory();
     }
@@ -103,10 +110,11 @@ public class MCRUserManagerTest extends MCRHibTestCase {
     @Test
     public final void testUpdateUser() {
         String eMail = "info@mycore.de";
-        user.setEMail(eMail);
-        MCRUserManager.updateUser(user);
+        this.user.setEMail(eMail);
+        MCRUserManager.updateUser(this.user);
         MCRUser user = MCRUserManager.getUser(this.user.getUserName(), this.user.getRealm());
         assertEquals("User information was not updated", eMail, user.getEMailAddress());
+        assertEquals("User was created not updated", 1, MCRUserManager.countUsers(null, null, null));
     }
 
     /**
@@ -114,7 +122,7 @@ public class MCRUserManagerTest extends MCRHibTestCase {
      */
     @Test
     public final void testDeleteUserStringMCRRealm() {
-        MCRUserManager.deleteUser(this.user.getUserName(),this.user.getRealm());
+        MCRUserManager.deleteUser(this.user.getUserName(), this.user.getRealm());
         assertNull("Should not find user", MCRUserManager.getUser(this.user.getUserName(), this.user.getRealm()));
     }
 
@@ -162,7 +170,8 @@ public class MCRUserManagerTest extends MCRHibTestCase {
      */
     @Test
     public final void testLogin() {
-        String clearPasswd=user.getPassword();
+        String clearPasswd = user.getPassword();
+        Date curTime = new Date();
         MCRUser user = MCRUserManager.login(this.user.getUserName(), clearPasswd);
         assertNull("Should not login user", user);
         MCRUserManager.updatePasswordHashToSHA1(this.user, clearPasswd);
@@ -170,6 +179,29 @@ public class MCRUserManagerTest extends MCRHibTestCase {
         user = MCRUserManager.login(this.user.getUserName(), clearPasswd);
         assertNotNull("Could not login user", user);
         assertNotNull("Hash value was not updated", user.getHashType());
+        user = MCRUserManager.login(this.user.getUserName(), clearPasswd);
+        assertNotNull("No date set for last login.", user.getLastLogin());
+        assertTrue("Date was not updated", curTime.before(user.getLastLogin()));
+    }
+
+    @Test
+    public final void toXML() throws IOException {
+        MCRUserManager.updatePasswordHashToSHA1(this.user, this.user.getPassword());
+        this.user.setEMail("info@mycore.de");
+        this.user.setHint("JUnit Test");
+        this.user.getSystemGroupIDs().add("admin");
+        this.user.getSystemGroupIDs().add("editor");
+        this.user.setLastLogin(new Date());
+        this.user.setRealName("Test Case");
+        this.user.getAttributes().put("tel", "555 4812");
+        this.user.getAttributes().put("street", "Heidestraße 12");
+        this.user.setOwner(this.user);
+        MCRUserManager.updateUser(this.user);
+        assertEquals("Too many users", 1, MCRUserManager.countUsers(null, null, null));
+        assertEquals("Too many users", 1, this.user.getOwnedUsers().size());
+        Element exportableXML = MCRUserTransformer.buildExportableXML(this.user);
+        XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
+        xout.output(exportableXML, System.out);
     }
 
 }
