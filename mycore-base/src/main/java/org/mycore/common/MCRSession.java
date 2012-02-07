@@ -178,7 +178,7 @@ public class MCRSession implements Cloneable {
     }
 
     /** returns the current user ID
-     * @deprecated use {@link #getUserInformation()}.getCurrentUserID() instead;
+     * @deprecated use {@link #getUserInformation()}.getUserID() instead;
      */
     public final String getCurrentUserID() {
         return getUserInformation().getUserID();
