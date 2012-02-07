@@ -76,6 +76,10 @@ public class MCRUser implements MCRUserInformation {
 
     private Collection<String> externalGroups;
 
+    private MCRUser() {
+        this(null);
+    }
+
     /**
      * Creates a new user.
      * 
