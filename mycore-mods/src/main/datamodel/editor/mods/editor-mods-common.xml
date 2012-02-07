@@ -1143,56 +1143,21 @@
  
   <!-- pub_genre -->
   <text id="mods.genre.kindOfReport.label" i18n="metaData.mods.dictionary.genre" />
-  <panel id="mods.genre.kindOfReport">
-    <cell anchor="NORTHWEST" var="mods:genre">
-      <hidden var="@type" default="kindof" />
-      <hidden var="@displayLabel" default="Kind of Report" />
-      <panel>
-        <cell var="@mcr:categId">
-          <list width="30" type="dropdown" id="mods.genre.kindOfReport.list">
-            <include ref="pleaseSelect" />
-            <include uri="classification:editorComplete:-1:children:bmelv_genres:report" cacheable="false" />
-            <condition id="mods.genre.kindOfReport.cond" required="true">
-              <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
-              <label xml:lang="en">Please select one entry!</label>
-            </condition>
-          </list>
-        </cell>
-      </panel>
-    </cell>
-  </panel>
 
   <helpPopup id="mods.genre.kindOfReport.help" width="400px" height="250px">
     <label xml:lang="de">Eine Zuordnung zu einem in der Liste verfügbaren Genre.</label>
+    <label xml:lang="en">Entry from the list.</label>
+  </helpPopup>
+
+  <helpPopup id="mods.genre.kindOfPublication.help" width="400px" height="250px">
+    <label xml:lang="de">Eine Zuordnung zu einem in der Liste verfügbaren Genre .</label>
     <label xml:lang="en">Entry from the list.</label>
   </helpPopup>
   <!-- pub_genre END -->
 
 
   <!-- av_medium_genre -->
-  <text id="mods.genre.kindOfAVMedia.label">
-    <label xml:lang="de">Genre</label>
-    <label xml:lang="en">Genre</label>
-  </text>
-
-  <panel id="mods.genre.kindOfAVMedia">
-    <cell anchor="NORTHWEST" var="mods:genre">
-      <hidden var="@type" default="kindof" />
-      <hidden var="@displayLabel" default="Kind of AV Media" />
-      <panel>
-        <cell var="@mcr:categId">
-          <list width="30" type="dropdown" id="mods.genre.kindOfAVMedia.list">
-            <include ref="pleaseSelect" />
-            <include uri="classification:editorComplete:-1:children:bmelv_genres:av" cacheable="false" />
-            <condition id="mods.genre.kindOfAVMedia.cond" required="true">
-              <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
-              <label xml:lang="en">Please select one entry!</label>
-            </condition>
-          </list>
-        </cell>
-      </panel>
-    </cell>
-  </panel>
+  <text id="mods.genre.kindOfAVMedia.label" i18n="metaData.mods.dictionary.genre" />
 
   <helpPopup id="mods.genre.kindOfAVMedia.help" width="400px" height="250px">
     <label xml:lang="de">Als audiovisuelle Medien (AV-Medien) werden synchrone technische
@@ -1212,24 +1177,6 @@
 
   <!-- thesis_genre -->
   <text id="mods.genre.kindOfThesis.label" i18n="metaData.mods.dictionary.genre" />
-  <panel id="mods.genre.kindOfThesis">
-    <cell anchor="NORTHWEST" var="mods:genre">
-      <hidden var="@type" default="kindof" />
-      <hidden var="@displayLabel" default="Kind of Thesis" />
-      <panel>
-        <cell var="@mcr:categId">
-          <list width="30" type="dropdown" id="mods.genre.kindOfThesis.list">
-            <include ref="pleaseSelect" />
-            <include uri="classification:editorComplete:-1:children:bmelv_genres:thesis" cacheable="false" />
-            <condition id="mods.genre.kindOfThesis.cond" required="true">
-              <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
-              <label xml:lang="en">Please select one entry!</label>
-            </condition>
-          </list>
-        </cell>
-      </panel>
-    </cell>
-  </panel>
 
   <helpPopup id="mods.genre.kindOfThesis.help" width="400px" height="250px">
     <label xml:lang="de">Es gibt verschiedene Arten von Hochschulschriften. Bitte spezifizieren Sie diese an dieser Stelle genauer.</label>
@@ -1578,23 +1525,6 @@
 
   <!-- Genre Journal/Series -->
   <text id="mods.genre.journal.label" i18n="metaData.mods.genre.journal.label" />
-  <panel id="mods.genre.journal">
-    <cell anchor="NORTHWEST" var="mods:genre">
-      <hidden var="@type" default="intern" />
-      <panel>
-        <cell var="@mcr:categId">
-          <list type="radio" id="mods.genre.journal.list" default="bmelv_genres:journal">
-            <item value="bmelv_genres:journal">
-              <label xml:lang="de">Zeitschrift</label>
-            </item>
-            <item value="bmelv_genres:series">
-              <label xml:lang="de">Serie</label>
-            </item>
-          </list>
-        </cell>
-      </panel>
-    </cell>
-  </panel>
 
   <helpPopup id="mods.genre.journal.help" width="400px" height="250px">
     <label xml:lang="de">

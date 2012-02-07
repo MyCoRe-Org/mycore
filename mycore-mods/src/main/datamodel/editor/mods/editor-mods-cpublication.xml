@@ -79,28 +79,8 @@
     
     <!-- pub_genre -->
     <cell row="110" col="1" anchor="NORTHEAST" class="mandatory" ref="mods.genre.kindOfReport.label" style="padding-top:5px;" />
-    <cell row="110" col="2" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre" style="padding-top:5px;">
-      <panel>
-        <hidden var="@type" default="kindof" />
-        <hidden var="@displayLabel" default="Kind of Publication" />
-        <cell var="@mcr:categId">
-          <list width="30" type="dropdown" id="mods.genre.kindOfPublication.list">
-            <include ref="pleaseSelect" />
-            <include uri="classification:editorComplete:-1:children:bmelv_genres:confpub" cacheable="false" />
-            <condition id="mods.genre.kindOfPublication.cond" required="true">
-              <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
-              <label xml:lang="en">Please select one entry!</label>
-            </condition>
-          </list>
-        </cell>
-      </panel>
-    </cell>
-    <cell row="110" col="3" anchor="NORTHEAST" style="padding-top:5px;">
-      <helpPopup id="mods.genre.kindOfPublication.help" width="400px" height="250px">
-        <label xml:lang="de">Eine Zuordnung zu einem in der Liste verfügbaren Genre .</label>
-        <label xml:lang="en">Entry from the list.</label>
-      </helpPopup>
-    </cell>
+    <cell row="110" col="2" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre" ref="mods.genre.kindOfPublication.confpub" style="padding-top:5px;" />
+    <cell row="110" col="3" anchor="NORTHEAST" style="padding-top:5px;" ref="mods.genre.kindOfPublication.help" />
   <!-- pub_genre END -->
   
   <!-- LANGUAGE -->

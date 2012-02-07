@@ -32,6 +32,98 @@
   </panel>
   <!-- END: hidden genre specification -->
 
+  <!-- object type specific genre.kindOf specification -->
+  <panel id="mods.genre.kindOfPublication.confpub">
+    <hidden var="@type" default="kindof" />
+    <hidden var="@displayLabel" default="Kind of Publication" />
+    <cell var="@mcr:categId">
+      <list width="30" type="dropdown" id="mods.genre.kindOfPublication.list">
+        <include ref="pleaseSelect" />
+        <include uri="classification:editorComplete:-1:children:marc_genres:confpub" cacheable="false" />
+        <condition id="mods.genre.kindOfPublication.cond" required="true">
+          <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
+          <label xml:lang="en">Please select one entry!</label>
+        </condition>
+      </list>
+    </cell>
+  </panel>
+
+  <panel id="mods.genre.kindOfReport">
+    <cell anchor="NORTHWEST" var="mods:genre">
+      <hidden var="@type" default="kindof" />
+      <hidden var="@displayLabel" default="Kind of Report" />
+      <panel>
+        <cell var="@mcr:categId">
+          <list width="30" type="dropdown" id="mods.genre.kindOfReport.list">
+            <include ref="pleaseSelect" />
+            <include uri="classification:editorComplete:-1:children:marc_genres:report" cacheable="false" />
+            <condition id="mods.genre.kindOfReport.cond" required="true">
+              <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
+              <label xml:lang="en">Please select one entry!</label>
+            </condition>
+          </list>
+        </cell>
+      </panel>
+    </cell>
+  </panel>
+
+  <panel id="mods.genre.kindOfAVMedia">
+    <cell anchor="NORTHWEST" var="mods:genre">
+      <hidden var="@type" default="kindof" />
+      <hidden var="@displayLabel" default="Kind of AV Media" />
+      <panel>
+        <cell var="@mcr:categId">
+          <list width="30" type="dropdown" id="mods.genre.kindOfAVMedia.list">
+            <include ref="pleaseSelect" />
+            <include uri="classification:editorComplete:-1:children:marc_genres:av" cacheable="false" />
+            <condition id="mods.genre.kindOfAVMedia.cond" required="true">
+              <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
+              <label xml:lang="en">Please select one entry!</label>
+            </condition>
+          </list>
+        </cell>
+      </panel>
+    </cell>
+  </panel>
+
+  <panel id="mods.genre.kindOfThesis">
+    <cell anchor="NORTHWEST" var="mods:genre">
+      <hidden var="@type" default="kindof" />
+      <hidden var="@displayLabel" default="Kind of Thesis" />
+      <panel>
+        <cell var="@mcr:categId">
+          <list width="30" type="dropdown" id="mods.genre.kindOfThesis.list">
+            <include ref="pleaseSelect" />
+            <include uri="classification:editorComplete:-1:children:marc_genres:thesis" cacheable="false" />
+            <condition id="mods.genre.kindOfThesis.cond" required="true">
+              <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
+              <label xml:lang="en">Please select one entry!</label>
+            </condition>
+          </list>
+        </cell>
+      </panel>
+    </cell>
+  </panel>
+
+  <panel id="mods.genre.journal">
+    <cell anchor="NORTHWEST" var="mods:genre">
+      <hidden var="@type" default="intern" />
+      <panel>
+        <cell var="@mcr:categId">
+          <list type="radio" id="mods.genre.journal.list" default="marc_genres:journal">
+            <item value="marc_genres:journal">
+              <label xml:lang="de">Zeitschrift</label>
+            </item>
+            <item value="marc_genres:series">
+              <label xml:lang="de">Serie</label>
+            </item>
+          </list>
+        </cell>
+      </panel>
+    </cell>
+  </panel>
+  <!-- END: object type specific genre.kindOf specification -->
+
 
   <panel id="mods.assignedInstitute">
     <cell anchor="NORTHWEST" var="mods:name[@type='corporate']">
