@@ -696,8 +696,8 @@ public class MCRServlet extends HttpServlet {
      *            any arguments that should be passed to
      *            {@link MCRTranslation#translate(String, Object...)}
      */
-    protected String getErrorI18N(String subIdentifier, Object... args) {
-        String key = MessageFormat.format("error.{0}.{1}", getClass().getSimpleName(), subIdentifier);
+    protected String getErrorI18N(String prefix, String subIdentifier, Object... args) {
+        String key = MessageFormat.format("{0}.{1}.{2}", prefix, getClass().getSimpleName(), subIdentifier);
         return MCRTranslation.translate(key, args);
     }
 

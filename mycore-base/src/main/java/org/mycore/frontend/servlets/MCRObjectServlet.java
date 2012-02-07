@@ -75,6 +75,8 @@ public class MCRObjectServlet extends MCRServlet {
     private static final String EDITOR_ID_TABLE_KEY = "MCRObjectServlet.editorIds";
 
     private static final int REV_CURRENT = 0;
+    
+    private static final String I18N_ERROR_PREFIX = "component.base.error";
 
     /**
      * The initalization of the servlet.
@@ -150,7 +152,7 @@ public class MCRObjectServlet extends MCRServlet {
         if (MCRMetadataManager.exists(mcrid)) {
             return TM.retrieveXML(mcrid);
         }
-        job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND, getErrorI18N("notFound", mcrid));
+        job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND, getErrorI18N(I18N_ERROR_PREFIX, "notFound", mcrid));
         return null;
     }
 
@@ -161,14 +163,14 @@ public class MCRObjectServlet extends MCRServlet {
         try {
             mcrid = MCRObjectID.getInstance(id); // create Object with given ID, only ID syntax check performed
         } catch (MCRException e) { // handle exception: invalid ID syntax, set HTTP error 400 "Invalid request"
-            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, getErrorI18N("invalidID", id));
+            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, getErrorI18N(I18N_ERROR_PREFIX, "invalidID", id));
             return null; // sorry, no object to return
         }
 
         if (!MCRAccessManager.checkPermission(mcrid, "read")) { // check read permission for ID
             job.getResponse().sendError(
                 HttpServletResponse.SC_UNAUTHORIZED,
-                getErrorI18N("accessDenied", mcrid.toString(), MCRSessionMgr.getCurrentSession().getCurrentUserID(), MCRSessionMgr
+                getErrorI18N("accessDenied", mcrid.toString(), MCRSessionMgr.getCurrentSession().getUserInformation().getUserID(), MCRSessionMgr
                     .getCurrentSession()
                     .getCurrentIP()));
             return null;
@@ -187,10 +189,10 @@ public class MCRObjectServlet extends MCRServlet {
             if(doc != null) {
                 return doc;
             }
-            job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND, getErrorI18N("revisionNotFound", rev, mcrid));
+            job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND, getErrorI18N(I18N_ERROR_PREFIX, "revisionNotFound", rev, mcrid));
             return null;
         }
-        job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, getErrorI18N("noVersions", mcrid));
+        job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, getErrorI18N(I18N_ERROR_PREFIX, "noVersions", mcrid));
         return null;
     }
 
