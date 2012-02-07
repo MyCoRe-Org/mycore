@@ -1128,7 +1128,6 @@
       Physical description, e.g. size of poster
     </label>
   </helpPopup>
-  <!-- Bei Postern -> Größe [text] END -->
   
   <helpPopup id="mods.physicalDescription.cpublication.help" width="400px" height="250px">
     <label xml:lang="de">

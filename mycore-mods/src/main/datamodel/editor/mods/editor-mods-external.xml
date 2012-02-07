@@ -1,9 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <imports>
+
+  <!-- hidden genre specification -->
+  <panel id="mods.genre.article">
+    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@mcr:categId" default="marc_genres:article" />
+  </panel>
+  <panel id="mods.genre.av">
+    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@mcr:categId" default="marc_genres:av" />
+  </panel>
+  <panel id="mods.genre.book">
+    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@mcr:categId" default="marc_genres:book" />
+  </panel>
+  <panel id="mods.genre.chapter">
+    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@mcr:categId" default="marc_genres:chapter" />
+  </panel>
+  <panel id="mods.genre.confpro">
+    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@mcr:categId" default="marc_genres:confpro" />
+  </panel>
+  <panel id="mods.genre.confpub">
+    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@mcr:categId" default="marc_genres:confpub" />
+  </panel>
+  <panel id="mods.genre.report">
+    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@mcr:categId" default="marc_genres:report" />
+  </panel>
+  <panel id="mods.genre.thesis">
+    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@mcr:categId" default="marc_genres:thesis" />
+  </panel>
   <panel id="mods.submissionAtInstitute">
     <cell anchor="NORTHWEST" var="mods:originInfo/mods:place/mods:placeTerm[@type='text']" ref="TFzeile512" />
   </panel>
+  <!-- END: hidden genre specification -->
+
+
   <panel id="mods.assignedInstitute">
     <cell anchor="NORTHWEST" var="mods:name[@type='corporate']">
       <hidden var="mods:role/mods:roleTerm" default="institution" />
