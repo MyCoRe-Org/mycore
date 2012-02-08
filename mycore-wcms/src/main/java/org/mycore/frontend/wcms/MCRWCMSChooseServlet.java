@@ -233,7 +233,7 @@ public class MCRWCMSChooseServlet extends MCRWCMSServlet {
                 SAXBuilder sax = new SAXBuilder();
                 Document ed;
 
-                if (!action.equals("add") && mode.equals("intern")) {
+                if (!"add".equals(action) && "intern".equals(mode)) {
                     ed = sax.build(getServletContext().getRealPath("") + fs + href);
                 } else {
                     // if (mode.equals("intern")) {

@@ -122,7 +122,7 @@ public abstract class MCRWCMSServlet extends MCRServlet {
      * @param root
      * @return
      */
-    public Element getMultimediaConfig(Element root) {
+    public static Element getMultimediaConfig(Element root) {
 
         File[] imageList = null;
         File[] documentList = null;

@@ -479,8 +479,7 @@
                                 <br />
                                 <!-- Historie der Seite -->
                                 <xsl:variable name="servletPath">
-                                    <xsl:value-of
-                                        select="concat('request:servlets/MCRWCMSAdminServlet',$JSessionID,'?action=logs&amp;sort=date&amp;sortOrder=descending&amp;XSL.Style=xml')" />
+                                    <xsl:value-of select="'wcms-logs:date:descending'" />
                                 </xsl:variable>
                                 <xsl:variable name="logData">
                                     <xsl:copy-of select="xalan:nodeset(document($servletPath))" />

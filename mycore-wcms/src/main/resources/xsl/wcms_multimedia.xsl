@@ -4,9 +4,9 @@
 	
 	<xsl:template name="wcmsMultimedia">
 		
-		<xsl:variable name="servletAnswer_XML"
-			select="document(concat('request:','servlets/MCRWCMSAdminServlet?todo=getMultimediaConfig'))"/>
-		
+		<!-- <xsl:variable name="servletAnswer_XML" select="document(concat('request:','servlets/MCRWCMSAdminServlet?todo=getMultimediaConfig'))"/>-->
+        <xsl:variable name="servletAnswer_XML" select="document('wcms-mediaconfig:')"/>
+
 		<form name="wcmsMultimedia" target="">
 			<table align="center" class="table_noGrid">
 				<tr>

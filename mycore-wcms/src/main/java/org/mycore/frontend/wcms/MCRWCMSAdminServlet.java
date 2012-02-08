@@ -67,11 +67,8 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
         String todo = getTodo(request);
 
         // generate output XML
-        Element root = new Element("cms");
+        Element root = getRoot(todo, mcrSession.get("userID").toString(), mcrSession.get("userClass").toString());
         Document jdom = new Document(root);
-        root.addContent(new Element("session").setText(todo));
-        root.addContent(new Element("userID").setText(mcrSession.get("userID").toString()));
-        root.addContent(new Element("userClass").setText(mcrSession.get("userClass").toString()));
 
         // process request
         if (todo.equals("exit")) {
@@ -84,7 +81,9 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
             generateXML_managPage(mcrSession, root);
             getLayoutService().doLayout(request, response, jdom);
         } else if (todo.equals("logs")) {
-            generateXML_logs(request, root);
+            String sort = request.getParameter("sort");
+            String sortOrder = request.getParameter("sortOrder");
+            generateXML_logs(sort, sortOrder, root);
             getLayoutService().doLayout(request, response, jdom);
         } else if (todo.equals("managGlobal") && mcrSession.get("userClass").equals("admin")) {
             generateXML_managGlobal(root);
@@ -117,6 +116,14 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
             manageWCMSAdminAccess(request, response);
         } else
             getLayoutService().doLayout(request, response, jdom);
+    }
+    
+    public static Element getRoot(String session, String userId, String userClass) {
+        Element root = new Element("cms");
+        root.addContent(new Element("session").setText(session));
+        root.addContent(new Element("userID").setText(userId));
+        root.addContent(new Element("userClass").setText(userClass));
+        return root;
     }
 
     private void manageWCMSAdminAccess(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -226,27 +233,17 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
         root.addContent(templates);
     }
 
-    public void generateXML_logs(HttpServletRequest request, Element rootOut) {
-        String sort = request.getParameter("sort");
-        String sortOrder = request.getParameter("sortOrder");
-        String error;
-
+    public static void generateXML_logs(String sort, String sortOrder, Element rootOut) {
         try {
             File logFile = new File(MCRConfiguration.instance().getString("MCR.WCMS.logFile").replace('/', File.separatorChar));
-
-            if (!logFile.exists()) {
-                error = "Logfile nicht gefunden!";
+            if(logFile.exists()) {
+                Element root = new SAXBuilder().build(logFile).getRootElement();
+                Element test = (Element) root.clone();
+                rootOut.addContent(test);
             }
-
-            Element root = new SAXBuilder().build(logFile).getRootElement();
-            Element test = (Element) root.clone();
-            rootOut.addContent(test);
         } catch (Exception e) {
-            error = e.getMessage();
-
-            System.out.println(error);
+            LOGGER.error("wile retrieving wcms logger xml", e);
         }
-
         rootOut.addContent(new Element("sort").setAttribute("order", sortOrder).setText(sort));
     }
 
