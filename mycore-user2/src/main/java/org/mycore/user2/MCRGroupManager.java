@@ -73,11 +73,13 @@ public class MCRGroupManager {
         MCRCategory groupCategory = DAO.getCategory(GROUP_CLASSID, onlyNonHierarchicalGroups);
         groupsByName.clear();
         groupsList.clear();
-        for (MCRCategory child : groupCategory.getChildren()) {
-            String name = child.getId().getID();
-            MCRGroup group = new MCRGroup(name, child.getLabels());
-            groupsByName.put(name, group);
-            groupsList.add(group);
+        if (groupCategory != null) {
+            for (MCRCategory child : groupCategory.getChildren()) {
+                String name = child.getId().getID();
+                MCRGroup group = new MCRGroup(name, child.getLabels());
+                groupsByName.put(name, group);
+                groupsList.add(group);
+            }
         }
     }
 

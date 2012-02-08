@@ -1,0 +1,29 @@
+<user name="junit">
+  <realm id="local">lokal</realm>
+  <owner name="junit" realm="local" />
+  <realName>Test Case</realName>
+  <eMail>info@mycore.de</eMail>
+  <hint>JUnit Test</hint>
+  <lastLogin>2012-02-07T14:51:26Z</lastLogin>
+  <owns>
+    <user name="junit">
+      <realm id="local">lokal</realm>
+      <owner name="junit" realm="local"/>
+    </user>
+  </owns>
+  <groups>
+    <group name="editor">
+      <label xml:lang="de" text="Bearbeiter" />
+      <label xml:lang="en" text="editors" />
+    </group>
+    <group name="admin">
+      <label xml:lang="de" text="Administratoren" />
+      <label xml:lang="en" text="Admins" />
+    </group>
+  </groups>
+  <attributes>
+    <attribute name="street" value="Heidestraße 12" />
+    <attribute name="tel" value="555 4812" />
+  </attributes>
+  <password salt="d686tIJwTvM=" hashType="sha1" hash="2db30698c63ed6d08b5ee09a52bfe6e909ccfad8" />
+</user>
