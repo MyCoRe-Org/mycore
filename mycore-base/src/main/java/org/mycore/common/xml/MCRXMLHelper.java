@@ -23,6 +23,7 @@
 
 package org.mycore.common.xml;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -37,6 +38,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import org.apache.log4j.Logger;
 import org.jdom.Attribute;
 import org.jdom.Comment;
 import org.jdom.Content;
@@ -44,9 +46,12 @@ import org.jdom.DocType;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
+import org.jdom.Parent;
 import org.jdom.ProcessingInstruction;
 import org.jdom.Text;
 import org.jdom.Verifier;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMSource;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.ifs2.MCRContent;
@@ -62,6 +67,8 @@ import org.xml.sax.SAXParseException;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRXMLHelper {
+
+    private static final Logger LOGGER = Logger.getLogger(MCRXMLHelper.class);
 
     /**
      * Parses an XML file from a URI and returns it as DOM. Use the validation
@@ -266,7 +273,12 @@ public class MCRXMLHelper {
      * @see Document#equals(java.lang.Object)
      */
     public static boolean deepEqual(Document d1, Document d2) {
-        return JDOMEquivalent.equivalent(d1, d2);
+        try {
+            return JDOMEquivalent.equivalent(canonicalElement(d1), canonicalElement(d2));
+        } catch (Exception e) {
+            LOGGER.warn("Could not compare documents.",e);
+            return false;
+        }
     }
 
     /**
@@ -276,23 +288,36 @@ public class MCRXMLHelper {
      * element.
      * 
      * @param e1
-     *            first Document to compare
+     *            first Element to compare
      * @param e2
-     *            second Document to compare
+     *            second Element to compare
      * @return true, if e1 and e2 are deep equal
      * @see Document#equals(java.lang.Object)
      */
     public static boolean deepEqual(Element e1, Element e2) {
-        return JDOMEquivalent.equivalent(e1, e2);
+        try {
+            return JDOMEquivalent.equivalent(canonicalElement(e1), canonicalElement(e2));
+        } catch (Exception e) {
+            LOGGER.warn("Could not compare elements.",e);
+            return false;
+        }
+    }
+
+    private static Element canonicalElement(Parent e) throws IOException, SAXParseException {
+        XMLOutputter xout = new XMLOutputter(Format.getCompactFormat());
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        if (e instanceof Element) {
+            xout.output((Element) e, bout);
+        } else {
+            xout.output((Document) e, bout);
+        }
+        Document xml = MCRXMLParserFactory.getNonValidatingParser().parseXML(MCRContent.readFrom(bout.toByteArray()));
+        return xml.getRootElement();
     }
 
     private static class JDOMEquivalent {
 
         private JDOMEquivalent() {
-        }
-
-        public static boolean equivalent(Document d1, Document d2) {
-            return equivalentContent(d1, d2);
         }
 
         @SuppressWarnings("unchecked")
@@ -303,18 +328,30 @@ public class MCRXMLHelper {
         public static boolean equivalent(Text t1, Text t2) {
             String v1 = t1.getValue();
             String v2 = t2.getValue();
-            return v1.equals(v2);
+            boolean equals = v1.equals(v2);
+            if (!equals) {
+                LOGGER.info("Text differs \"" + t1 + "\"!=\"" + t2 + "\"");
+            }
+            return equals;
         }
 
         public static boolean equivalent(DocType d1, DocType d2) {
-            return (d1.getPublicID() == d2.getPublicID() || d1.getPublicID().equals(d2.getPublicID()))
+            boolean equals = (d1.getPublicID() == d2.getPublicID() || d1.getPublicID().equals(d2.getPublicID()))
                 && (d1.getSystemID() == d2.getSystemID() || d1.getSystemID().equals(d2.getSystemID()));
+            if (!equals) {
+                LOGGER.info("DocType differs \"" + d1 + "\"!=\"" + d2 + "\"");
+            }
+            return equals;
         }
 
         public static boolean equivalent(Comment c1, Comment c2) {
             String v1 = c1.getValue();
             String v2 = c2.getValue();
-            return v1.equals(v2);
+            boolean equals = v1.equals(v2);
+            if (!equals) {
+                LOGGER.info("Comment differs \"" + c1 + "\"!=\"" + c2 + "\"");
+            }
+            return equals;
         }
 
         public static boolean equivalent(ProcessingInstruction p1, ProcessingInstruction p2) {
@@ -322,7 +359,11 @@ public class MCRXMLHelper {
             String t2 = p2.getTarget();
             String d1 = p1.getData();
             String d2 = p2.getData();
-            return t1.equals(t2) && d1.equals(d2);
+            boolean equals = t1.equals(t2) && d1.equals(d2);
+            if (!equals) {
+                LOGGER.info("ProcessingInstruction differs \"" + p1 + "\"!=\"" + p2 + "\"");
+            }
+            return equals;
         }
 
         public static boolean equivalentAttributes(Element e1, Element e2) {
@@ -331,6 +372,7 @@ public class MCRXMLHelper {
             @SuppressWarnings("unchecked")
             List<Attribute> aList2 = e2.getAttributes();
             if (aList1.size() != aList2.size()) {
+                LOGGER.info("Number of attributes differ \"" + aList1 + "\"!=\"" + aList2 + "\" for element "+e1.getName());
                 return false;
             }
             HashSet<String> orig = new HashSet<String>(aList1.size());
@@ -340,16 +382,15 @@ public class MCRXMLHelper {
             for (Attribute attr : aList1) {
                 orig.remove(attr.toString());
             }
-            return orig.size() == 0;
-        }
-
-        @SuppressWarnings("unchecked")
-        public static boolean equivalentContent(Document d1, Document d2) {
-            return equivalentContent(d1.getContent(), d2.getContent());
+            if (!orig.isEmpty()) {
+                LOGGER.info("Attributes differ \"" + aList1 + "\"!=\"" + aList2 + "\"");
+            }
+            return orig.isEmpty();
         }
 
         public static boolean equivalentContent(List<Content> l1, List<Content> l2) {
             if (l1.size() != l2.size()) {
+                LOGGER.info("Number of content list elements differ " + l1.size() + "!=" + l2.size() + "", new RuntimeException());
                 return false;
             }
             boolean result = true;
