@@ -175,6 +175,13 @@ public class MCRMODSWrapper {
         return element;
     }
 
+    public void addElement(Element element) {
+        if (!element.getNamespace().equals(MCRConstants.MODS_NAMESPACE))
+            throw new IllegalArgumentException("given element is no mods element");
+            
+        insertTopLevelElement(element);
+    }
+
     private void insertTopLevelElement(Element element) {
         int rankOfNewElement = getRankOf(element);
         List<Element> topLevelElements = getMODS().getChildren();
