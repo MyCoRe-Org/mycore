@@ -68,6 +68,7 @@ import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
 import org.mycore.datamodel.ifs2.MCRVersioningMetadataStore;
+import org.mycore.datamodel.language.MCRLanguageFactory;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.xml.sax.Attributes;
@@ -99,54 +100,19 @@ public class MCRUtils {
     // public constant data
     private static final Logger LOGGER = Logger.getLogger(MCRUtils.class);
 
-    // Language lists
-    private static ArrayList<String> langlist = new ArrayList<String>();
-
-    private static ArrayList<String> countrylist = new ArrayList<String>();
-
-    /**
-     * Load two static arrays for fast search of ISO-639/ISO-3166 strings.
-     */
-    static {
-        StringBuffer sb;
-        // add id_ID as workaround for indonesian
-        langlist.add("id");
-        countrylist.add("ID");
-        // add he_IL as workaround for hebrew
-        // @see http://java.sun.com/developer/technicalArticles/J2SE/locale/
-        langlist.add("he");
-        countrylist.add("IL");
-        // add codes from locale
-        for (Locale l : Locale.getAvailableLocales()) {
-            sb = new StringBuffer(l.getLanguage());
-            langlist.add(sb.toString());
-            sb.append('-').append(l.getCountry());
-            countrylist.add(sb.toString());
-        }
-    }
-
     /**
      * This method check the language string base on RFC 1766 to the supported
-     * languages in mycore.
+     * languages in MyCoRe in a current application environment. Without appending 
+     * this MCRLanguageFactory only ENGLISH and GERMAN are supported. 
      * 
-     * @param lang
-     *            the language string
-     * @return true if the language was supported, otherwise false
+     * @param code
+     *            the language string in RFC 1766 syntax
+     * @return true if the language code is supported. It return true too if the code starts
+     *            with x- or i-, otherwise return false;
+     * @deprecated use {@link MCRLanguageFactory.instance()#isSupportedLanguage(String)} instead
      */
-    public static final boolean isSupportedLang(String lang) {
-        if (lang == null || (lang = lang.trim()).length() == 0) {
-            return false;
-        }
-        if (lang.startsWith("x-")) {
-            return true;
-        }
-        if (langlist.contains(lang)) {
-            return true;
-        }
-        if (countrylist.contains(lang)) {
-            return true;
-        }
-        return false;
+    public static final boolean isSupportedLang(String code) {
+        return MCRLanguageFactory.instance().isSupportedLanguage(code);
     }
 
     /**

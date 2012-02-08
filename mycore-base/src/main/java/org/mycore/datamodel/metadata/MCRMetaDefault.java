@@ -30,6 +30,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
+import org.mycore.datamodel.language.MCRLanguageFactory;
 
 /**
  * This class implements any methods for handling the basic data for all
@@ -300,8 +301,8 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
             LOGGER.warn("No tag name defined!");
             return false;
         }
-        if (getLang() != null && !MCRUtils.isSupportedLang(getLang())) {
-            LOGGER.warn(getSubTag() + ": language is not supported: " + getLang());
+        if (lang != null && !MCRLanguageFactory.instance().isSupportedLanguage(lang)) {
+            LOGGER.warn(getSubTag() + ": language is not supported: " + lang);
             return false;
         }
         if (getInherited() < 0) {

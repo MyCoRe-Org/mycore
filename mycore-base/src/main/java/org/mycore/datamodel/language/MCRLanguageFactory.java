@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -81,8 +82,8 @@ public class MCRLanguageFactory {
 
     private MCRLanguageFactory() {
         MCRConfiguration config = MCRConfiguration.instance();
-        codeOfDefaultLanguage = config.getString("MCR.Metadata.DefaultLang");
-        buildDefaultLanguages();
+        codeOfDefaultLanguage = config.getString("MCR.Metadata.DefaultLang", MCRConstants.DEFAULT_LANG);
+        initDefaultLanguages();
 
         String classificationID = config.getString("MCR.LanguageClassification", null);
         if (classificationID != null)
@@ -90,7 +91,7 @@ public class MCRLanguageFactory {
     }
 
     /**
-     * Returns the default langauge, as configured by "MCR.Metadata.DefaultLang"
+     * Returns the default language, as configured by "MCR.Metadata.DefaultLang"
      */
     public MCRLanguage getDefaultLanguage() {
         return getLanguage(codeOfDefaultLanguage);
@@ -108,7 +109,7 @@ public class MCRLanguageFactory {
      */
     public MCRLanguage getLanguage(String code) {
         if (classificationHasChanged())
-            buildLanguages();
+            initLanguages();
 
         return lookupLanguage(code);
     }
@@ -126,6 +127,30 @@ public class MCRLanguageFactory {
     }
 
     /**
+     * This method check the language string base on RFC 1766 to the supported
+     * languages in MyCoRe in a current application environment. Without appending 
+     * this MCRLanguageFactory only ENGLISH and GERMAN are supported. 
+     * 
+     * @param code
+     *            the language string in RFC 1766 syntax
+     * @return true if the language code is supported. It return true too if the code starts
+     *            with x- or i-, otherwise return false;
+     */
+    public final boolean isSupportedLanguage(String code) {
+        if (code == null || (code = code.trim()).length() == 0) {
+            return false;
+        }
+        if (code.startsWith("x-") || code.startsWith("i-")) {
+            return true;
+        }
+        if (!languageByCode.containsKey(code)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
      * Checks if any classification has changed in the persistent store, so that the languages
      * should be read again.
      */
@@ -136,16 +161,16 @@ public class MCRLanguageFactory {
     /**
      * Builds the default languages and reads in the languages configured by classification
      */
-    private void buildLanguages() {
+    private void initLanguages() {
         languageByCode.clear();
-        buildDefaultLanguages();
+        initDefaultLanguages();
         readLanguageClassification();
     }
 
     /**
      * Builds the default languages 
      */
-    private void buildDefaultLanguages() {
+    private void initDefaultLanguages() {
         MCRLanguage de = buildLanguage("de", "deu", "ger");
         MCRLanguage en = buildLanguage("en", "eng", null);
         de.setLabel(de, "Deutsch");
