@@ -54,9 +54,11 @@ public class MCRUserManagerTest extends MCRHibTestCase {
 
     @BeforeClass
     public static void addMapping() {
-        Configuration configuration = MCRHIBConnection.instance().getConfiguration();
-        configuration.addResource("org/mycore/user2/MCRUser.hbm.xml");
-        configuration.setProperty("show_sql", "true");
+        MCRHIBConnection connection = MCRHIBConnection.instance();
+        Configuration configuration = connection.getConfiguration();
+        if (!connection.containsMapping("MCRUser")) {
+            configuration.addResource("org/mycore/user2/MCRUser.hbm.xml");
+        }
         MCRHIBConnection.instance().buildSessionFactory(configuration);
         SESSION_FACTORY = MCRHIBConnection.instance().getSessionFactory();
     }

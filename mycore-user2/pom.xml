@@ -20,7 +20,7 @@
       <groupId>org.mycore</groupId>
       <artifactId>mycore-base</artifactId>
       <version>${project.version}</version>
-      <classifier>test</classifier>
+      <type>test-jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>
