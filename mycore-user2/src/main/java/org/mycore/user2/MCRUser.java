@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRUserInformation;
 
 /**
@@ -422,5 +423,17 @@ public class MCRUser implements MCRUserInformation {
 
     public Collection<String> getExternalGroupIDs() {
         return externalGroups;
+    }
+
+    public void addToGroup(String groupName) {
+        MCRGroup mcrGroup = MCRGroupManager.getGroup(groupName);
+        if (mcrGroup == null) {
+            throw new MCRException("Could not find group " + groupName);
+        }
+        if (mcrGroup.isSystemGroup()) {
+            getSystemGroupIDs().add(mcrGroup.getName());
+        } else {
+            getExternalGroupIDs().add(mcrGroup.getName());
+        }
     }
 }

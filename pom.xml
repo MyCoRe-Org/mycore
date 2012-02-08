@@ -29,7 +29,7 @@
     <url>https://sourceforge.net/tracker/index.php?group_id=92005</url>
   </issueManagement>
   <ciManagement>
-    <system>hudson</system>
+    <system>jenkins</system>
     <url>http://www.mycore.org/jenkins/job/MyCoRe/</url>
     <notifiers>
       <notifier>
@@ -461,6 +461,11 @@
         <artifactId>junit</artifactId>
         <version>4.8.2</version>
         <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.jasig.cas</groupId>
+        <artifactId>cas-client-core</artifactId>
+        <version>3.1.10</version>
       </dependency>
       <dependency>
         <groupId>org.jdom</groupId>

@@ -209,15 +209,7 @@ public abstract class MCRUserTransformer {
             List<Element> groupElements = groups.getChildren("group");
             for (Element group : groupElements) {
                 String groupName = group.getAttributeValue("name");
-                MCRGroup mcrGroup = MCRGroupManager.getGroup(groupName);
-                if (mcrGroup == null) {
-                    throw new MCRException("Could not find group " + groupName);
-                }
-                if (mcrGroup.isSystemGroup()) {
-                    mcrUser.getSystemGroupIDs().add(mcrGroup.getName());
-                } else {
-                    mcrUser.getExternalGroupIDs().add(mcrGroup.getName());
-                }
+                mcrUser.addToGroup(groupName);
             }
         }
         //attributes

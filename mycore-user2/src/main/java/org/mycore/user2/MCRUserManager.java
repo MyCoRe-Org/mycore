@@ -22,7 +22,6 @@
 
 package org.mycore.user2;
 
-import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Collection;
@@ -36,16 +35,12 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.jdom.Element;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.user2.utils.MCRUserTransformer;
 
 /**
  * Manages all users using a database table. 
@@ -57,8 +52,6 @@ public class MCRUserManager {
     private static final MCRHIBConnection MCRHIB_CONNECTION = MCRHIBConnection.instance();
 
     private static final int HASH_ITERATIONS = MCRConfiguration.instance().getInt("MCR.user2.HashIterations", 1000);
-
-    private static final String CURRENT_USER_KEY = "currentUser";
 
     private static final Logger LOGGER = Logger.getLogger(MCRUserManager.class);
 
@@ -73,23 +66,6 @@ public class MCRUserManager {
 
     /** The table that stores login user information */
     static String table;
-
-    /**
-     * Returns the user currently logged in in this session or null if current user is not logged in
-     */
-    public static MCRUser getCurrentUser() {
-        MCRUser user = (MCRUser) (MCRSessionMgr.getCurrentSession().get(CURRENT_USER_KEY));
-        return user;
-    }
-
-    /**
-     * Sets the user currently logged in. This is called from LoginServlet.
-     * 
-     * @param user the user currently logged in
-     */
-    static void setCurrentUser(MCRUser user) {
-        MCRSessionMgr.getCurrentSession().put(CURRENT_USER_KEY, user);
-    }
 
     /**
      * Returns the user with the given userName, in the default realm
@@ -382,6 +358,7 @@ public class MCRUserManager {
         }
         user.setLastLogin(new Date());
         updateUser(user);
+        MCRSessionMgr.getCurrentSession().setUserInformation(user);
         return user;
     }
 
