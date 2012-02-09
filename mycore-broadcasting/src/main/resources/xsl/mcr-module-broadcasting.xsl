@@ -23,7 +23,6 @@
   <xsl:param name="JSessionID" />
 
   <xsl:variable name="servlet" select="concat($WebApplicationBaseURL,'servlets/MCRBroadcastingServlet',$HttpSession)" />
-  <xsl:variable name="servletURIRes" select="'request:servlets/MCRBroadcastingServlet'" />
   <xsl:variable name="sender">
     <xsl:value-of select="concat($WebApplicationBaseURL,$HttpSession,'modules/broadcasting/config/mcr-module-broadcasting.xml')" />
   </xsl:variable>
@@ -229,12 +228,16 @@
     </xsl:if>
   </xsl:template>
   <!-- ======================================================================================== -->
+  
+    <xsl:variable name="servletURIRes" select="'request:servlets/MCRBroadcastingServlet'" />
+  
   <xsl:template name="get.alreadyReceived">
     <xsl:variable name="sessionSensitive">
       <xsl:call-template name="get.sessionSensitive" />
     </xsl:variable>
     <xsl:variable name="alreadyReceived">
-      <xsl:copy-of select="document(concat($servletURIRes,'?mode=hasReceived&amp;sessionSensitive=',$sessionSensitive))" />
+      <!-- <xsl:copy-of select="document(concat($servletURIRes,'?mode=hasReceived&amp;sessionSensitive=',$sessionSensitive))" />-->
+      <xsl:copy-of select="document(concat('broadcasting-hasReceived:', $sessionSensitive))" />
     </xsl:variable>
     <xsl:choose>
       <xsl:when test="xalan:nodeset($alreadyReceived)/mcr-module-broadcasting/hasReceived/text()='true'">

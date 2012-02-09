@@ -122,7 +122,7 @@
 											<cell row="10" col="1">
 												<list width="150" type="dropdown">
 													<item value="" i18n="component.broadcasting.editor.common.select"/>
-													<include uri="request:servlets/MCRUserEditorServlet?mode=getAssignableGroupsForUser" cacheable="false" />
+                                                    <include uri="group:getAssignableGroupsForUser" cacheable="false" />
 												</list>
 											</cell>
 										</panel>
@@ -150,7 +150,7 @@
 											<cell row="10" col="1">
 												<list width="150" type="dropdown">
 													<item value="" i18n="component.broadcasting.editor.common.select"/>
-													<include uri="request:servlets/MCRUserEditorServlet?mode=getAllUsers" cacheable="false" />
+													<include uri="user:getAllUsers" cacheable="false" />
 												</list>
 											</cell>
 										</panel>
