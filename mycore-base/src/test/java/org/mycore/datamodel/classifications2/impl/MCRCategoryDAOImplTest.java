@@ -49,7 +49,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRHibTestCase;
-import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -448,8 +447,8 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         category = loadClassificationResource(WORLD_CLASS_RESOURCE_NAME);
     }
 
-    private MCRCategory loadClassificationResource(String resourceName) throws SAXParseException, IOException, URISyntaxException {
-        URL classResourceUrl = this.getClass().getResource(resourceName);
+    public static MCRCategory loadClassificationResource(String resourceName) throws SAXParseException, IOException, URISyntaxException {
+        URL classResourceUrl = MCRCategoryDAOImplTest.class.getResource(resourceName);
         Document xml = MCRXMLParserFactory.getParser().parseXML(MCRContent.readFrom(classResourceUrl));
         MCRCategory category = MCRXMLTransformer.getCategory(xml);
         return category;
