@@ -3,7 +3,7 @@
 
 <editor id="creategroup">
 
-    <source uri="request:servlets/MCRUserEditorServlet?mode=retrievegroupxml&amp;gid={gid}" />
+    <source uri="group:retrievegroupxml:{gid}" />
     <target type="servlet" name="MCRUserEditorServlet" method="post" format="xml" />
     <cancel url="{cancelUrl}" />
     
@@ -59,7 +59,7 @@
             <cell row="6" col="4" anchor="WEST" var="group/group.admins/admins.userID" sortnr="20">
                 <list width="150" type="multirow" multiple="true" rows="5">
                     <item value="" i18n="component.useradmin.group.adminuser.select" />
-                    <include uri="request:servlets/MCRUserEditorServlet?mode=getAllUsers"  cacheable="false" />
+                    <include uri="user:getAllUsers"  cacheable="false" />lse" />
                 </list>
             </cell>
             <cell row="6" col="2" anchor="WEST">
@@ -73,7 +73,7 @@
             <cell row="8" col="4" anchor="WEST" var="group/group.admins/admins.groupID" sortnr="20">
                 <list width="150" type="multirow" multiple="true" rows="5">
                     <item value="" i18n="component.useradmin.group.admingroup.select" />
-                    <include uri="request:servlets/MCRUserEditorServlet?mode=getAllGroups"  cacheable="false" />
+                    <include uri="group:getAllGroups"  cacheable="false" />
                 </list>
             </cell>
             <cell row="8" col="2" anchor="WEST">
@@ -89,7 +89,7 @@
             <cell row="10" col="4" anchor="WEST" var="group/group.members/members.userID" sortnr="20">
                 <list width="150" type="multirow" multiple="true" rows="5">
                     <item value="" i18n="component.useradmin.group.groupmember.select" />
-                    <include uri="request:servlets/MCRUserEditorServlet?mode=getAllUsers"  cacheable="false" />
+                    <include uri="user:getAllUsers"  cacheable="false" />
                 </list>
             </cell>
             <cell row="10" col="2" anchor="WEST">

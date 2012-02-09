@@ -67,7 +67,7 @@
             <cell row="7" col="2" anchor="WEST" var="user/user.primary_group" sortnr="4">
                 <list id="listPrimaryGroup" width="150" type="dropdown">
                     <item value="" i18n="component.useradmin.user.primary.select" />
-                    <include uri="request:servlets/MCRUserEditorServlet?mode=getAssignableGroupsForUser"  cacheable="false" />
+                    <include uri="group:getAssignableGroupsForUser"  cacheable="false" />
                     <condition id="condPrimaryGroup" required="true" i18n="component.useradmin.user.primary.label" />
                 </list>
             </cell>
@@ -82,7 +82,7 @@
             <cell row="8" col="2" anchor="NORTHWEST" var="user/user.groups/groups.groupID" sortnr="20">
                 <list width="150" type="multirow" multiple="true" rows="5">
                     <item value="" i18n="component.useradmin.user.additional.select" />
-                    <include uri="request:servlets/MCRUserEditorServlet?mode=getAssignableGroupsForUser"  cacheable="false" />
+                    <include uri="group:getAssignableGroupsForUser"  cacheable="false" />
                 </list>
             </cell>
             <cell row="8" col="3" anchor="NORTHEAST">

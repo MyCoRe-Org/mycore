@@ -24,13 +24,12 @@
 package org.mycore.user.servlets;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
+import org.jdom.Document;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
@@ -39,9 +38,13 @@ import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.user.MCRAccessException;
 import org.mycore.user.MCRGroup;
+import org.mycore.user.MCRGroupResolver;
 import org.mycore.user.MCRUser;
+import org.mycore.user.MCRUserEditorHandler;
 import org.mycore.user.MCRUserMgr;
+import org.mycore.user.MCRUserResolver;
 
 /**
  * This servlet provides a web interface for the editors of the user management
@@ -115,7 +118,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
      * new or existing user account. Typically this servlet mode is implicitly
      * called by an MyCoRe editor definition file, e.g. to fill drop down boxes
      * or lists in the user administration GUI.
-     * 
+     * @deprecated use the {@link MCRGroupResolver} instead
      * @param job
      *            The MCRServletJob instance
      * @throws IOException
@@ -123,42 +126,16 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
      * @throws ServletException
      *             for errors from the servlet engine.
      */
+    @Deprecated
     private void getAssignableGroupsForUser(MCRServletJob job) throws IOException {
-        // Get the MCRSession object for the current thread from the session
-        // manager.
-        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        String currentUserID = mcrSession.getUserInformation().getUserID();
-        List<String> groupIDs = null;
-
+        org.jdom.Element root;
         try {
-            // The list of assignable groups depends on the privileges of the
-            // current user.
-            MCRUser currentUser = MCRUserMgr.instance().retrieveUser(currentUserID);
-
-            if (MCRAccessManager.checkPermission("administrate-user")) {
-                groupIDs = MCRUserMgr.instance().getAllGroupIDs();
-            } else if (MCRAccessManager.checkPermission("create-user")) {
-                groupIDs = currentUser.getGroupIDs();
-            } else {
-                LOGGER.warn("MCRUserEditorServlet: not enough permissions! " + "Someone might have tried to call the new user form directly.");
-                showNoPrivsPage(job);
-                return;
-            }
-        } catch (MCRException ex) {
+            root = MCRUserEditorHandler.getAssignableGroupsForUser();
+        } catch (MCRAccessException ex) {
+            LOGGER.warn("", ex);
             showNoPrivsPage(job);
             return;
         }
-
-        // Loop over all assignable group IDs
-        org.jdom.Element root = new org.jdom.Element("items");
-
-        for (int i = 0; i < groupIDs.size(); i++) {
-            org.jdom.Element item = new org.jdom.Element("item")
-                .setAttribute("value", (String) groupIDs.get(i))
-                .setAttribute("label", (String) groupIDs.get(i));
-            root.addContent(item);
-        }
-
         org.jdom.Document jdomDoc = new org.jdom.Document(root);
         getLayoutService().sendXML(job.getRequest(), job.getResponse(), jdomDoc);
     }
@@ -168,6 +145,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
      * is implicitly called by an MyCoRe editor definition file, e.g. to fill
      * drop down boxes or lists in the user administration GUI.
      * 
+     * @deprecated use the {@link MCRGroupResolver} instead
      * @param job
      *            The MCRServletJob instance
      * @throws IOException
@@ -175,26 +153,14 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
      * @throws ServletException
      *             for errors from the servlet engine.
      */
+    @Deprecated
     private void getAllGroups(MCRServletJob job) throws IOException {
-        List<String> groupIDs;
-        if (!MCRAccessManager.checkPermission("modify-user") && !MCRAccessManager.checkPermission("modify-contact")) {
+        try {
+            Document jdomDoc = MCRUserEditorHandler.getAllGroups();
+            getLayoutService().sendXML(job.getRequest(), job.getResponse(), jdomDoc);
+        } catch(MCRAccessException exc) {
             showNoPrivsPage(job);
-            return;
         }
-        groupIDs = MCRUserMgr.instance().getAllGroupIDs();
-
-        // Loop over all assignable group IDs
-        org.jdom.Element root = new org.jdom.Element("items");
-
-        for (int i = 0; i < groupIDs.size(); i++) {
-            org.jdom.Element item = new org.jdom.Element("item")
-                .setAttribute("value", (String) groupIDs.get(i))
-                .setAttribute("label", (String) groupIDs.get(i));
-            root.addContent(item);
-        }
-
-        org.jdom.Document jdomDoc = new org.jdom.Document(root);
-        getLayoutService().sendXML(job.getRequest(), job.getResponse(), jdomDoc);
     }
 
     /**
@@ -202,6 +168,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
      * implicitly called by an MyCoRe editor definition file, e.g. to fill drop
      * down boxes or lists in the user administration GUI.
      * 
+     * @deprecated use the {@link MCRUserResolver)} instead
      * @param job
      *            The MCRServletJob instance
      * @throws IOException
@@ -209,24 +176,14 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
      * @throws ServletException
      *             for errors from the servlet engine.
      */
+    @Deprecated
     private void getAllUsers(MCRServletJob job) throws IOException {
-        List<String> userIDs;
-        if (!MCRAccessManager.checkPermission("modify-user") && !MCRAccessManager.checkPermission("modify-contact")) {
+        try {
+            Document jdomDoc = MCRUserEditorHandler.getAllUsers();
+            getLayoutService().sendXML(job.getRequest(), job.getResponse(), jdomDoc);
+        } catch(MCRAccessException exc) {
             showNoPrivsPage(job);
-            return;
         }
-        userIDs = MCRUserMgr.instance().getAllUserIDs();
-
-        // Loop over all assignable group IDs
-        org.jdom.Element root = new org.jdom.Element("items");
-
-        for (int i = 0; i < userIDs.size(); i++) {
-            org.jdom.Element item = new org.jdom.Element("item").setAttribute("value", (String) userIDs.get(i)).setAttribute("label", (String) userIDs.get(i));
-            root.addContent(item);
-        }
-
-        org.jdom.Document jdomDoc = new org.jdom.Document(root);
-        getLayoutService().sendXML(job.getRequest(), job.getResponse(), jdomDoc);
     }
 
     /**
@@ -248,7 +205,6 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
             showNoPrivsPage(job);
             return;
         }
-
         try {
             org.jdom.Document userlist = MCRUserMgr.instance().getAllUsers();
             doLayout(job, "ListAllUser", userlist, false);
@@ -257,49 +213,42 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
             String msg = "An error occured while retrieving a user object from the store!";
             job.getResponse().sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msg);
         }
-        return;
     }
 
     /**
+     * @deprecated use the {@link MCRUserResolver} instead
+     * 
      * This method is still experimental! It is needed in the use case "modify
      * user".
      */
+    @Deprecated
     private void retrieveUserXML(MCRServletJob job) throws IOException {
-        // We first check the privileges for this use case
-        if (!MCRAccessManager.checkPermission("modify-user") && !MCRAccessManager.checkPermission("modify-contact")) {
-            showNoPrivsPage(job);
-            return;
-        }
-
         try {
             String userID = getProperty(job.getRequest(), "uid");
-            MCRUser user = MCRUserMgr.instance().retrieveUser(userID);
-            org.jdom.Document jdomDoc = user.toJDOMDocument();
+            Document jdomDoc = MCRUserEditorHandler.retrieveUserXml(userID);
             getLayoutService().sendXML(job.getRequest(), job.getResponse(), jdomDoc);
+        } catch(MCRAccessException ex) {
+            showNoPrivsPage(job);
         } catch (MCRException ex) {
             // TODO: Es gibt Probleme mit den Fehlermeldungen, siehe oben.
             String msg = "An error occured while retrieving a user object from the store!";
             job.getResponse().sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msg);
         }
-        return;
     }
 
     /**
+     * @deprecated use the {@link MCRGroupResolver} instead
      * This method is still experimental! It is needed in the use case "modify
      * group".
      */
+    @Deprecated
     private void retrieveGroupXML(MCRServletJob job) throws IOException {
-        // We first check the privileges for this use case
-        if (!MCRAccessManager.checkPermission("modify-user") && !MCRAccessManager.checkPermission("modify-contact")) {
-            showNoPrivsPage(job);
-            return;
-        }
-
         try {
             String groupID = getProperty(job.getRequest(), "gid");
-            MCRGroup group = MCRUserMgr.instance().retrieveGroup(groupID);
-            org.jdom.Document jdomDoc = group.toJDOMDocument();
+            Document jdomDoc = MCRUserEditorHandler.retrieveGroupXml(groupID);
             getLayoutService().sendXML(job.getRequest(), job.getResponse(), jdomDoc);
+        } catch(MCRAccessException ex) {
+            showNoPrivsPage(job);
         } catch (MCRException ex) {
             // TODO: Es gibt Probleme mit den Fehlermeldungen, siehe oben.
             String msg = "An error occured while retrieving a group object from the store!";
