@@ -64,6 +64,9 @@ import org.jdom.JDOMException;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.ifs.MCRDirectory;
+import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
@@ -386,10 +389,10 @@ public class MCRUtils {
                 if (bytesRead > 0) {
                     if (target != null) {
                         target.write(ba, 0 /* offset in ba */, bytesRead /*
-                                                                                              * bytes
-                                                                                              * to
-                                                                                              * write
-                                                                                              */);
+                                                                                                                 * bytes
+                                                                                                                 * to
+                                                                                                                 * write
+                                                                                                                 */);
                     }
                 } else {
                     break; // hit eof
@@ -444,10 +447,10 @@ public class MCRUtils {
                 if (charsRead > 0) {
                     if (target != null) {
                         target.write(ca, 0 /* offset in ba */, charsRead /*
-                                                                                              * bytes
-                                                                                              * to
-                                                                                              * write
-                                                                                              */);
+                                                                                                                 * bytes
+                                                                                                                 * to
+                                                                                                                 * write
+                                                                                                                 */);
                     }
                 } else {
                     break; // hit eof
@@ -1048,5 +1051,28 @@ public class MCRUtils {
 
     public static byte[] fromBase64String(String base64) {
         return Base64.decodeBase64(base64);
+    }
+
+    /**
+     * Returns a handle to a {@link MCRFile} given by the derivate id and the full path to the file. 
+     * 
+     * @param derivateID the id of the derivate containing the file
+     * @param path the path to the file
+     * 
+     * @return a {@link MCRFile} or null if there is no such file under the given path within the derivate 
+     */
+    public static MCRFile getMCRFile(MCRObjectID derivateID, String path) {
+        MCRFilesystemNode node = MCRFilesystemNode.getRootNode(derivateID.toString());
+        if (!(node instanceof MCRDirectory)) {
+            return null;
+        }
+        try {
+            MCRFile f = (MCRFile) ((MCRDirectory) node).getChildByPath(path);
+            return f;
+        } catch (Exception ex) {
+            LOGGER.error("Could not get MCRFile for given path " + path);
+        }
+
+        return null;
     }
 }
