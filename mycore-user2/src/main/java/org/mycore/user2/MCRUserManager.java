@@ -39,6 +39,7 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRUserInformation;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 
@@ -103,13 +104,14 @@ public class MCRUserManager {
     public static MCRUser getUser(String userName, String realmId) {
         Session session = MCRHIB_CONNECTION.getSession();
         MCRUser mcrUser = getByNaturalID(session, userName, realmId);
+        if (mcrUser == null) {
+            LOGGER.warn("Could not find requested user: " + userName + "@" + realmId);
+            return null;
+        }
         return setGroups(mcrUser);
     }
 
     private static MCRUser setGroups(MCRUser mcrUser) {
-        if (mcrUser == null) {
-            return null;
-        }
         Collection<MCRCategoryID> groupIDs = MCRGroupManager.getGroupIDs(mcrUser);
         mcrUser.getSystemGroupIDs().clear();
         mcrUser.getExternalGroupIDs().clear();
@@ -197,7 +199,12 @@ public class MCRUserManager {
      * @param userName the login name of the user to delete, in the default realm. 
      */
     public static void deleteUser(String userName) {
-        deleteUser(userName, MCRRealm.getLocalRealm());
+        if (!userName.contains("@"))
+            deleteUser(userName, MCRRealm.getLocalRealm());
+        else {
+            String[] parts = userName.split("@");
+            deleteUser(parts[0], parts[1]);
+        }
     }
 
     /**
@@ -320,6 +327,34 @@ public class MCRUserManager {
      * @return true, if the password matches.
      */
     public static MCRUser login(String userName, String password) {
+        MCRUser user = checkPassword(userName, password);
+        if (user == null) {
+            return null;
+        }
+        user.setLastLogin(new Date());
+        updateUser(user);
+        MCRSessionMgr.getCurrentSession().setUserInformation(user);
+        return user;
+    }
+
+    /**
+     * Returns instance of MCRUser if current user is present in this user system
+     * @return MCRUser instance or null
+     */
+    public static MCRUser getCurrentUser() {
+        MCRUserInformation userInformation = MCRSessionMgr.getCurrentSession().getUserInformation();
+        if (userInformation instanceof MCRUser) {
+            return (MCRUser) userInformation;
+        }
+        return null;
+    }
+
+    /**
+     * @param userName
+     * @param password
+     * @return
+     */
+    private static MCRUser checkPassword(String userName, String password) {
         MCRUser user = getUser(userName);
         if (user == null || user.getHashType() == null) {
             return null;
@@ -356,9 +391,6 @@ public class MCRUserManager {
         } catch (NoSuchAlgorithmException e) {
             throw new MCRException("Error while validating login", e);
         }
-        user.setLastLogin(new Date());
-        updateUser(user);
-        MCRSessionMgr.getCurrentSession().setUserInformation(user);
         return user;
     }
 

@@ -35,6 +35,7 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
 
 /**
  * Manages groups and group membership using a database table.
@@ -45,6 +46,8 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
  * @author Frank L\u00fctzenkirchen
  */
 public class MCRGroupManager {
+
+    private static final String CATEG_LINK_TYPE = "mcr-user";
 
     /** Map of defined groups, key is the unique group name */
     private static HashMap<String, MCRGroup> groupsByName = new HashMap<String, MCRGroup>();
@@ -169,6 +172,55 @@ public class MCRGroupManager {
     }
 
     private static MCRCategLinkReference getLinkID(MCRUser user) {
-        return new MCRCategLinkReference(user.getUserName() + "@" + user.getRealmID(), "mcr-user");
+        return new MCRCategLinkReference(user.getUserName() + "@" + user.getRealmID(), CATEG_LINK_TYPE);
+    }
+
+    public static void addGroup(MCRGroup group) {
+        MCRCategoryID categoryID = null;
+        if (group.isSystemGroup()) {
+            categoryID = new MCRCategoryID(GROUP_CLASSID.getRootID(), group.getName());
+        } else {
+            categoryID = MCRCategoryID.fromString(group.getName());
+        }
+        if (DAO.exist(categoryID)) {
+            return;
+        }
+        MCRCategoryID rootID = MCRCategoryID.rootID(categoryID.getRootID());
+        if (!DAO.exist(rootID)) {
+            MCRCategoryImpl category = new MCRCategoryImpl();
+            category.setId(rootID);
+            DAO.addCategory(null, category);
+        }
+        MCRCategoryImpl category = new MCRCategoryImpl();
+        category.setId(categoryID);
+        category.getLabels().addAll(group.getLabels());
+        DAO.addCategory(rootID, category);
+    }
+
+    public static void deleteGroup(String groupID) {
+        MCRGroup group = MCRGroupManager.getGroup(groupID);
+        if (group == null) {
+            //unknown group
+            return;
+        }
+        MCRCategoryID categoryID = null;
+        if (group.isSystemGroup()) {
+            categoryID = new MCRCategoryID(GROUP_CLASSID.getRootID(), group.getName());
+        } else {
+            categoryID = MCRCategoryID.fromString(group.getName());
+        }
+        DAO.deleteCategory(categoryID);
+    }
+
+    public static Collection<String> listUserIDs(MCRGroup group) {
+        MCRCategoryID categoryID = getCategoryID(group);
+        return CATEG_LINK_SERVICE.getLinksFromCategoryForType(categoryID, CATEG_LINK_TYPE);
+    }
+
+    private static MCRCategoryID getCategoryID(MCRGroup group) {
+        if (group.isSystemGroup()) {
+            return new MCRCategoryID(GROUP_CLASSID.getRootID(), group.getName());
+        }
+        return MCRCategoryID.fromString(group.getName());
     }
 }

@@ -4,12 +4,10 @@
             target: config                      
            - - - - - - - - - - - - - - - - - -->
   <target name="config">
-    <!--
     <mcr:config action="addInclude"
                 propertyfile="${build.config}/mycore.properties"
                 key="MCR.CLI.Classes.Internal"
-                value="org.mycore.user.MCRUserCommands" />
-    -->
+                value="org.mycore.user2.MCRUserCommands" />
     <AddHibernateMapping class="org.mycore.user2.MCRUser" />
   </target>
 </project>

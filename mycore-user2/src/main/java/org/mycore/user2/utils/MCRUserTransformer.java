@@ -59,6 +59,8 @@ public abstract class MCRUserTransformer {
     public static Element buildBasicXML(MCRUser mcrUser) {
         Element userElement = new Element(USER_ELEMENT_NAME);
         userElement.setAttribute("name", mcrUser.getUserName());
+        if (!mcrUser.loginAllowed())
+            userElement.setAttribute("allowLogin", "false");
         Element realmElement = new Element("realm");
         realmElement.setAttribute("id", mcrUser.getRealmID());
         realmElement.setText(mcrUser.getRealm().getLabel());
@@ -74,7 +76,7 @@ public abstract class MCRUserTransformer {
      * Builds an xml element containing detailed information on user. 
      * This includes user data, owned users and groups the user is member of.
      */
-    public static Element buildXML(MCRUser mcrUser) throws Exception {
+    public static Element buildXML(MCRUser mcrUser) {
         Element userElement = buildExportableSafeXML(mcrUser);
         MCRUser owner = mcrUser.getOwner();
         if (owner != null) {
@@ -173,6 +175,10 @@ public abstract class MCRUserTransformer {
         String userName = element.getAttributeValue("name");
         String realmID = element.getChild("realm").getAttributeValue("id");
         MCRUser mcrUser = new MCRUser(userName, realmID);
+        //login allowed?
+        if ("false".equals(element.getAttributeValue("allowLogin"))) {
+            mcrUser.disableLogin();
+        }
         //owner
         Element ownerElement = element.getChild("owner");
         if (ownerElement != null) {

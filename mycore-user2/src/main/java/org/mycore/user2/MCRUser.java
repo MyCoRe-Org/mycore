@@ -77,6 +77,8 @@ public class MCRUser implements MCRUserInformation {
 
     private Collection<String> externalGroups;
 
+    private boolean allowLogin;
+
     private MCRUser() {
         this(null);
     }
@@ -103,6 +105,7 @@ public class MCRUser implements MCRUserInformation {
         this.systemGroups = new HashSet<String>();
         this.externalGroups = new HashSet<String>();
         this.attributes = new HashMap<String, String>();
+        this.allowLogin = true;
     }
 
     /**
@@ -435,5 +438,29 @@ public class MCRUser implements MCRUserInformation {
         } else {
             getExternalGroupIDs().add(mcrGroup.getName());
         }
+    }
+
+    public void removeFromGroup(String groupName) {
+        MCRGroup mcrGroup = MCRGroupManager.getGroup(groupName);
+        if (mcrGroup == null) {
+            throw new MCRException("Could not find group " + groupName);
+        }
+        if (mcrGroup.isSystemGroup()) {
+            getSystemGroupIDs().remove(mcrGroup.getName());
+        } else {
+            getExternalGroupIDs().remove(mcrGroup.getName());
+        }
+    }
+
+    public void enableLogin() {
+        this.allowLogin = true;
+    }
+
+    public void disableLogin() {
+        this.allowLogin = false;
+    }
+
+    public boolean loginAllowed() {
+        return allowLogin;
     }
 }
