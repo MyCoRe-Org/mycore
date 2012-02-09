@@ -31,6 +31,7 @@ import org.mycore.common.MCRUsageException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.common.MCRISO8601Date;
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * Represents a stored file with its metadata and content.
@@ -549,6 +550,27 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         }
 
         return new Document(root);
+    }
+
+    /**
+     * Returns a handle to a {@link MCRFile} given by the derivate id and the full path to the file. 
+     * 
+     * @param derivateID the id of the derivate containing the file
+     * @param path the path to the file
+     * 
+     * @return a {@link MCRFile} or null if there is no such file under the given path within the derivate 
+     */
+    public static MCRFile getMCRFile(MCRObjectID derivateID, String path) {
+        MCRFilesystemNode node = MCRFilesystemNode.getRootNode(derivateID.toString());
+        if (!(node instanceof MCRDirectory)) {
+            return null;
+        }
+        try {
+            MCRFile f = (MCRFile) ((MCRDirectory) node).getChildByPath(path);
+            return f;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
 }

@@ -49,7 +49,6 @@ import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Properties;
 
 import javax.xml.parsers.SAXParser;
@@ -64,9 +63,6 @@ import org.jdom.JDOMException;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.ifs.MCRDirectory;
-import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
@@ -1051,28 +1047,5 @@ public class MCRUtils {
 
     public static byte[] fromBase64String(String base64) {
         return Base64.decodeBase64(base64);
-    }
-
-    /**
-     * Returns a handle to a {@link MCRFile} given by the derivate id and the full path to the file. 
-     * 
-     * @param derivateID the id of the derivate containing the file
-     * @param path the path to the file
-     * 
-     * @return a {@link MCRFile} or null if there is no such file under the given path within the derivate 
-     */
-    public static MCRFile getMCRFile(MCRObjectID derivateID, String path) {
-        MCRFilesystemNode node = MCRFilesystemNode.getRootNode(derivateID.toString());
-        if (!(node instanceof MCRDirectory)) {
-            return null;
-        }
-        try {
-            MCRFile f = (MCRFile) ((MCRDirectory) node).getChildByPath(path);
-            return f;
-        } catch (Exception ex) {
-            LOGGER.error("Could not get MCRFile for given path " + path);
-        }
-
-        return null;
     }
 }
