@@ -44,4 +44,18 @@ public class MCRCategoryDAOFactory {
         return instance;
     }
 
+    /**
+     * Sets a new category dao implementation for this factory. This could be useful for different test cases
+     * with mock objects.
+     * 
+     * @param daoClass new dao class
+     * 
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     */
+    public static synchronized final void set(Class<? extends MCRCategoryDAO> daoClass) throws IllegalAccessException,
+            InstantiationException {
+        instance = daoClass.newInstance();
+    }
+
 }
