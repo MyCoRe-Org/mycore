@@ -39,6 +39,7 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -169,9 +170,28 @@ public class MCRUserManager {
      * @param user the user to create in the database.
      */
     public static void createUser(MCRUser user) {
+        if (isInvalidUser(user)) {
+            throw new MCRException("User is invalid: " + user.getUserID());
+        }
         Session session = MCRHIB_CONNECTION.getSession();
         session.save(user);
         MCRGroupManager.storeGroupsOfUser(user);
+    }
+
+    /**
+     * Checks whether the user is invalid.
+     * 
+     * MCRUser is not allowed to overwrite information returned by {@link MCRSystemUserInformation#getGuestInstance()} or {@link MCRSystemUserInformation#getSystemUserInstance()}.
+     * @return true if {@link #createUser(MCRUser)} or {@link #updateUser(MCRUser)} would reject the given user
+     */
+    public static boolean isInvalidUser(MCRUser user) {
+        if (MCRSystemUserInformation.getGuestInstance().getUserID().equals(user.getUserID())) {
+            return true;
+        }
+        if (MCRSystemUserInformation.getSystemUserInstance().getUserID().equals(user.getUserID())) {
+            return true;
+        }
+        return false;
     }
 
     /** 
@@ -181,6 +201,9 @@ public class MCRUserManager {
      * @param user the user to update in the database.
      */
     public static void updateUser(MCRUser user) {
+        if (isInvalidUser(user)) {
+            throw new MCRException("User is invalid: " + user.getUserID());
+        }
         Session session = MCRHIB_CONNECTION.getSession();
         MCRUser inDb = getByNaturalID(session, user.getUserName(), user.getRealmID());
         if (inDb == null) {
