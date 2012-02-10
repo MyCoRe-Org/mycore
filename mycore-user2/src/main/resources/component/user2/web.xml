@@ -1,0 +1,18 @@
+
+  <servlet id="MCRUserServlet">
+    <servlet-name>MCRUserServlet</servlet-name>
+    <servlet-class> miless.authorization.users.UserServlet </servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MCRUserServlet</servlet-name>
+    <url-pattern>/servlets/MCRUserServlet</url-pattern>
+  </servlet-mapping>
+
+  <servlet id="MCRLoginServlet">
+    <servlet-name>MCRLoginServlet</servlet-name>
+    <servlet-class>org.mycore.user2.login.MCRLoginServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MCRLoginServlet</servlet-name>
+    <url-pattern>/servlets/MCRLoginServlet</url-pattern>
+  </servlet-mapping>
