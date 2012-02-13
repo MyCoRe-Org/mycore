@@ -10,10 +10,9 @@
     <natural-id mutable="true">
       <many-to-one name="category" class="MCRCategoryImpl"
         cascade="none" />
-      <component name="objectReference">
-        <property name="objectID" access="field" />
-        <property name="type" column="objectType" access="field"
-          length="70" />
+      <component name="objectReference" class="org.mycore.datamodel.classifications2.MCRCategLinkReference" access="field">
+        <property name="objectID"/>
+        <property name="type" column="objectType" length="70" />
       </component>
     </natural-id>
     <query name="NumberPerClassID">
@@ -105,12 +104,12 @@ SELECT cat.categID, count(distinct link.objectReference.objectID) as num
     </query>
     <query name="deleteByObjectID">
       <![CDATA[
-DELETE FROM MCRCategoryLink WHERE objectReference=:reference
+DELETE FROM MCRCategoryLink WHERE objectReference.objectID=:id and objectReference.type=:type
       ]]>
     </query>
     <query name="deleteByObjectCollection">
       <![CDATA[
-DELETE FROM MCRCategoryLink WHERE objectReference IN (:references)
+DELETE FROM MCRCategoryLink WHERE objectReference.objectID IN (:ids) and objectReference.type=:type
       ]]>
     </query>
     <query name="ObjectIDByCategory">
@@ -123,7 +122,8 @@ SELECT objectReference.objectID FROM MCRCategoryLink WHERE category.rootID=:root
 SELECT link.objectReference.objectID
   FROM MCRCategoryLink link, MCRCategoryImpl cat, MCRCategoryImpl cattree
   WHERE cattree.internalID = link.category
-    AND link.objectReference=:reference
+    AND link.objectReference.objectID=:objectID
+    AND link.objectReference.type=:type
     AND cattree.rootID=:rootID
     AND cat.rootID=:rootID
     AND cat.categID=:categID
@@ -137,7 +137,7 @@ SELECT objectReference.objectID FROM MCRCategoryLink WHERE category.rootID=:root
     </query>
     <query name="categoriesByObjectID">
       <![CDATA[
-SELECT category.rootID, category.categID FROM MCRCategoryLink WHERE objectReference=:reference
+SELECT category.rootID, category.categID FROM MCRCategoryLink WHERE objectReference.objectID=:id and objectReference.type=:type
       ]]>
     </query>
   </class>

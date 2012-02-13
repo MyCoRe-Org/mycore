@@ -29,6 +29,7 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -123,15 +124,40 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     public void deleteLink(MCRCategLinkReference reference) {
         Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(LINK_CLASS.getName() + ".deleteByObjectID");
-        q.setParameter("reference", reference);
+        q.setParameter("id", reference.getObjectID());
+        q.setParameter("type", reference.getType());
         int deleted = q.executeUpdate();
         LOGGER.debug("Number of Links deleted: " + deleted);
     }
 
     public void deleteLinks(final Collection<MCRCategLinkReference> ids) {
+        if (ids.isEmpty()) {
+            return;
+        }
+        HashMap<String, Collection<String>> typeMap = new HashMap<String, Collection<String>>();
+        //prepare
+        Collection<String> objectIds = new LinkedList<String>();
+        String currentType = ids.iterator().next().getType();
+        typeMap.put(currentType, objectIds);
+        //collect per type
+        for (MCRCategLinkReference ref : ids) {
+            if (!currentType.equals(ref.getType())) {
+                currentType = ref.getType();
+                objectIds = typeMap.get(ref.getType());
+                if (objectIds == null) {
+                    objectIds = new LinkedList<String>();
+                    typeMap.put(ref.getType(), objectIds);
+                }
+            }
+            objectIds.add(ref.getObjectID());
+        }
         Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(LINK_CLASS.getName() + ".deleteByObjectCollection");
-        q.setParameterList("references", ids);
-        int deleted = q.executeUpdate();
+        int deleted = 0;
+        for (Map.Entry<String, Collection<String>> entry : typeMap.entrySet()) {
+            q.setParameterList("ids", entry.getValue());
+            q.setParameter("type", entry.getKey());
+            deleted += q.executeUpdate();
+        }
         LOGGER.debug("Number of Links deleted: " + deleted);
     }
 
@@ -158,7 +184,8 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     public Collection<MCRCategoryID> getLinksFromReference(MCRCategLinkReference reference) {
         Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(LINK_CLASS.getName() + ".categoriesByObjectID");
         q.setCacheable(true);
-        q.setParameter("reference", reference);
+        q.setParameter("id", reference.getObjectID());
+        q.setParameter("type", reference.getType());
         List<Object[]> result = q.list();
         ArrayList<MCRCategoryID> returns = new ArrayList<MCRCategoryID>(result.size());
         for (Object[] idValues : result) {
@@ -306,7 +333,8 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         q.setCacheable(true);
         q.setParameter("rootID", id.getRootID());
         q.setParameter("categID", id.getID());
-        q.setParameter("reference", reference);
+        q.setParameter("objectID", reference.getObjectID());
+        q.setParameter("type", reference.getType());
         return !q.list().isEmpty();
     }
 }
