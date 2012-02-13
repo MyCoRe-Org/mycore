@@ -24,6 +24,7 @@
 package org.mycore.datamodel.classifications2.impl;
 
 import java.net.URI;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -65,6 +66,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         if (defaultLang == null) {
             defaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", MCRConstants.DEFAULT_LANG);
         }
+        labels=new HashSet<MCRLabel>();
     }
 
     public List<MCRCategory> getChildren() {
