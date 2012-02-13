@@ -6,46 +6,41 @@
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation">
 
   <xsl:include href="MyCoReLayout.xsl" />
+  
+  <xsl:param name="MCR.NameOfProject" select="'MyCoRe'"/>
 
-  <xsl:variable name="PageTitle" select="i18n:translate('component.user2.login.change')" />
+  <xsl:variable name="PageTitle" select="i18n:translate('component.user2.login.realms')" />
   <xsl:variable name="PageID" select="'login'" />
-
-  <xsl:variable name="breadcrumb.extensions">
-    <item label="{i18n:translate('component.user2.login.change')}" />
-  </xsl:variable>
 
   <xsl:template match="realms">
     <div class="section">
       <p>
-        <xsl:value-of select="i18n:translate('component.user2.login.currentAccount')" />
-        <xsl:text> </xsl:text>
-        <b>
+        <xsl:variable name="currentAccount">
+          <xsl:value-of select="'&lt;strong&gt;'"/>
           <xsl:choose>
             <xsl:when test="@guest='true'">
               <xsl:value-of select="i18n:translate('component.user2.login.guest')" />
-              .
             </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="concat(@user,' [',@realm,']')" />
-              .
             </xsl:otherwise>
           </xsl:choose>
-        </b>
+          <xsl:value-of select="'&lt;/strong&gt;'"/>
+        </xsl:variable>
+        <xsl:value-of select="i18n:translate('component.user2.login.currentAccount', $currentAccount)" disable-output-escaping="yes" />
       </p>
     </div>
     <div class="section" id="sectionlast">
       <p>
-        <b>
+        <strong>
           <xsl:value-of select="i18n:translate('component.user2.login.select')" />
-        </b>
+        </strong>
         <br />
         <ul class="realms">
           <xsl:if test="@guest != 'true'">
             <li>
               <a href="{$ServletsBaseURL}logout">
                 <xsl:value-of select="i18n:translate('component.user2.login.logout')" />
-                <xsl:text> </xsl:text>
-                <xsl:value-of select="i18n:translate('component.user2.login.guestUser')" />
               </a>
               <div>
                 <xsl:value-of select="i18n:translate('component.user2.login.openAccess')" />
@@ -82,7 +77,7 @@
                 <xsl:value-of select="i18n:translate('component.user2.login.useraccount')" />
               </a>
               <div>
-                <xsl:value-of select="i18n:translate('component.user2.login.useraccountText')" />
+                <xsl:value-of select="i18n:translate('component.user2.login.useraccountText', $MCR.NameOfProject)" />
               </div>
             </li>
           </xsl:if>
@@ -91,7 +86,7 @@
       <p>
         <form method="get" action="{$ServletsBaseURL}MCRLoginServlet" class="action">
           <input value="cancel" name="action" type="hidden" />
-          <input value="{i18n:translate('button.cancel')}" class="action" type="submit" />
+          <input value="{i18n:translate('component.user2.login.form.cancel')}" class="action" type="submit" />
         </form>
       </p>
     </div>

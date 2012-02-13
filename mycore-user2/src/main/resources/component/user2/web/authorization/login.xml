@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MyCoReWebPage>
+<MyCoReWebPage>
+  <section i18n="component.user2.login.form.title" xml:lang="all">
+    <editor id="loginForm">
+
+      <cancel url="servlets/MCRLoginServlet?action=cancel" />
+      <target type="servlet" name="MCRLoginServlet" method="post" format="xml" />
+
+      <validationMessage>
+        <label xml:lang="de">
+          Anmeldung fehlgeschlagen. Bitte prüfen Sie Benutzerkennung und Passwort.
+          Wichtig: Groß-/Kleinschreibung wird
+          beachtet!
+        </label>
+        <label xml:lang="en">
+          Login failed. Please check user name and password. Both are case-sensitive!
+        </label>
+      </validationMessage>
+
+      <components root="root" var="/login">
+        <panel id="root" lines="on">
+
+          <cell row="1" col="1" anchor="EAST">
+            <text i18n="component.user2.login.form.userName" />
+          </cell>
+          <cell row="1" col="2" anchor="WEST" var="userName">
+            <textfield id="tf.userName" width="16" maxlength="16">
+              <condition id="cond.userName" required="true" maxLength="16" regexp="[\S]*">
+                <label xml:lang="de">Sie müssen eine Benutzerkennung eingeben (max. 16 Zeichen, keine Leerzeichen)</label>
+                <label xml:lang="en">You must enter a user account (maximum 16 characters, no blanks)</label>
+              </condition>
+            </textfield>
+          </cell>
+
+          <cell row="2" col="1" anchor="EAST">
+            <text i18n="component.user2.login.form.password" />
+          </cell>
+          <cell row="2" col="2" anchor="WEST" var="password">
+            <password id="tf.password" width="16" maxlength="16">
+              <condition id="cond.password" required="true" maxLength="16" regexp="[\S]*">
+                <label xml:lang="de">Sie müssen ein Passwort eingeben (max. 16 Zeichen, keine Leerzeichen)</label>
+                <label xml:lang="en">You must enter a password (maximum 16 characters, no blanks)</label>
+              </condition>
+            </password>
+          </cell>
+
+          <cell row="3" col="1" colspan="2" anchor="SOUTHEAST">
+            <cancelButton i18n="component.user2.login.form.cancel" style="width: 100px;" />
+            <text label=" " />
+            <submitButton i18n="component.user2.login.form.login" style="width: 100px;" />
+          </cell>
+
+          <condition id="cond.login" field1="userName" field2="password" class="org.mycore.user2.login.MCRLoginServlet" method="checkPassword">
+            <label xml:lang="de">Benutzerkennung und/oder Passwort falsch!</label>
+            <label xml:lang="en">User account and/or password wrong!</label>
+          </condition>
+
+        </panel>
+      </components>
+
+    </editor>
+  </section>
+
+  <section xml:lang="de">
+    <p>
+      <strong>Wichtiger Hinweis:</strong>
+    </p>
+    <p>Ihr Browser muss Cookies akzeptieren, damit die Anmeldung erfolgreich ist.</p>
+  </section>
+  <section xml:lang="en">
+    <p>
+      <strong>Important information:</strong>
+    </p>
+    <p>For a successful login your browser must be enabled to accept cookies.</p>
+  </section>
+</MyCoReWebPage>

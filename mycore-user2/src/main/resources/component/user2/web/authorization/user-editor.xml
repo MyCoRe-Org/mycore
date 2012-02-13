@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!-- Editor form to edit data of a login user -->
+<!-- Will be included by new-user.xml and change-user.xml -->
+
+<includes>
+
+  <!-- Read user editor with few fields -->
+
+  <editor id="editor4newReadUser">
+    <target type="servlet" name="UserServlet" method="post" format="xml" /> 
+    <include uri="webapp:authoring/edit-includes.xml" ref="validation.message" />
+    <components root="root" var="/user">
+      <panel id="root" lines="on">
+        <hidden var="realm/@id" default="local" />
+        <include uri="webapp:authorization/user-editor.xml" ref="common" />
+        <include uri="webapp:authorization/user-editor.xml" ref="passwords" />
+      </panel>
+    </components>
+  </editor>
+
+  <editor id="editor4changeReadUser">
+    <source uri="user:{id}" />
+    <cancel url="servlets/UserServlet?action=show&amp;id={id}" />
+    <target type="servlet" name="UserServlet" method="post" format="xml" /> 
+    <include uri="webapp:authoring/edit-includes.xml" ref="validation.message" />
+    <components root="root" var="/user">
+      <panel id="root" lines="on">
+        <hidden var="realm/@id" default="local" />
+        <include uri="webapp:authorization/user-editor.xml" ref="common" />
+      </panel>
+    </components>
+  </editor>
+
+  <!-- User editor for admins with all fields -->
+  
+  <editor id="editor4newAdmins">
+    <target type="servlet" name="UserServlet" method="post" format="xml" /> 
+    <include uri="webapp:authoring/edit-includes.xml" ref="validation.message" />
+    <components root="root" var="/user">
+      <panel id="root" lines="on">
+        <include uri="webapp:authorization/user-editor.xml" ref="common" />
+        <include uri="webapp:authorization/user-editor.xml" ref="passwords" />
+        <include uri="webapp:authorization/user-editor.xml" ref="editor4admins" />
+      </panel>
+    </components>
+  </editor>
+
+  <editor id="editor4changeAdmins">
+    <source uri="user:{id}" />
+    <cancel url="servlets/UserServlet?action=show&amp;id={id}" />
+    <target type="servlet" name="UserServlet" method="post" format="xml" /> 
+    <include uri="webapp:authoring/edit-includes.xml" ref="validation.message" />
+    <components root="root" var="/user">
+      <panel id="root" lines="on">
+        <include uri="webapp:authorization/user-editor.xml" ref="common" />
+        <include uri="webapp:authorization/user-editor.xml" ref="editor4admins" />
+      </panel>
+    </components>
+  </editor>
+
+  <include id="editor4admins">
+
+        <cell row="2" col="3" anchor="WEST" style="width: 370px;" var="realm/@id">
+          <list type="dropdown">
+            <include uri="xslStyle:realms2items:resource:realms.xml" />
+          </list>
+        </cell>
+    
+        <cell row="7" col="1" anchor="EAST">
+          <text label="E-Mail" />
+          <text label=": " />
+        </cell>
+        <cell row="7" col="2" colspan="2" anchor="WEST" var="eMail">
+          <textfield width="60" maxlength="64" id="tf.email" autofill="@uni-duisburg-essen.de">
+            <condition id="cond.email" regexp="\S+@\S+\.\S+">
+              <label xml:lang="de">Bitte geben Sie eine syntaktisch korrekte EMail-Adresse ein!</label>  
+              <label xml:lang="en">Please, enter a syntactically correct email address!</label>                    
+            </condition>
+          </textfield>
+        </cell>
+    
+        <cell row="8" col="1" anchor="EAST">
+          <text label="LegalEntity" />
+          <text label=": " />
+        </cell>
+        <cell row="8" col="2" colspan="2" anchor="WEST" var="legalEntity">
+          <repeater min="1" max="1" lines="off">
+             <panel lines="off">
+               <hidden descendants="true" />
+               <cell row="1" col="1" anchor="WEST">
+                 <subselect i18n="button.select" id="person.select" type="webpage" href="index/subselect/index.html" style="width: 100px;" />
+               </cell>
+               <cell row="1" col="2" anchor="WEST">
+                 <output var="name" />
+                 <text label=" [" />
+                 <output var="@id" default="bitte wählen" />
+                 <text label="]" />
+               </cell>
+             </panel>
+           </repeater>
+        </cell>
+    
+        <cell row="9" col="1" anchor="EAST">
+          <text i18n="admin.faculty" />          
+        </cell>
+        <cell row="9" col="2" colspan="2" anchor="WEST" var="origin/@id">
+          <list type="dropdown" rows="1" style="width: 500px;">
+            <item value="" i18n="admin.facultySelect" />
+            <include cacheable="true" uri="classification:editor:-1:children:ORIGIN" />
+          </list>
+        </cell>
+
+        <cell row="10" col="1" anchor="EAST">
+          <text i18n="admin.owner" />       
+        </cell>
+        <cell row="10" col="2" colspan="2" anchor="WEST" var="owner/user">
+          <repeater min="1" max="1" lines="off">
+            <panel lines="off">
+              <hidden descendants="true" />
+              <cell row="1" col="1" anchor="WEST">
+                <subselect i18n="button.select" id="owner.select" type="webpage" href="servlets/UserServlet" style="width: 100px;" />
+              </cell>
+              <cell row="1" col="2" anchor="WEST">
+                <output var="@name" />
+                <text label=" [" />
+                <output var="realm" default="bitte wählen" />
+                <text label="]" />
+              </cell>
+            </panel>
+          </repeater>
+        </cell>
+    
+        <cell row="11" col="1" anchor="NORTHEAST">
+          <text i18n="admin.groups" />          
+        </cell>
+        <cell row="11" col="2" colspan="2" anchor="NORTHWEST" var="groups/group">
+          <list type="checkbox" cols="1">
+            <include cacheable="true" uri="xslStyle:groups2items:resource:groups.xml" />
+          </list>
+        </cell>
+
+  </include>
+
+  <!-- Input fields for entering password of new users -->
+  <include id="passwords">
+
+    <cell row="3" col="1" anchor="EAST">
+      <text i18n="admin.password" />      
+    </cell>
+    <cell row="3" col="2" colspan="2" anchor="WEST" var="password">
+      <password id="password1" width="10">
+        <condition id="cond.password1.syntax" maxLength="16" regexp="[\S]*">
+          <label xml:lang="de">Bitte maximal 16 Zeichen, keine Leerzeichen eingeben!</label>
+          <label xml:lang="en">Please, enter maximum 16 characters, no blanks!</label>
+        </condition>
+      </password>
+    </cell>
+    <cell row="4" col="1" anchor="EAST">
+      <text i18n="admin.password" />      
+    </cell>
+    <cell row="4" col="2" colspan="2" anchor="WEST" var="password2">
+      <password id="password2" width="10">
+        <condition id="cond.password2.syntax" maxLength="16" regexp="[\S]*" >
+          <label xml:lang="de">Bitte maximal 16 Zeichen, keine Leerzeichen eingeben!</label>
+          <label xml:lang="en">Please, enter maximum 16 characters, no blanks!</label>
+        </condition>
+      </password>
+      <text i18n="admin.passwordIdentically" />
+    </cell>
+
+    <!-- Password is only required for local users, then both password fields must be same and are required -->
+    <condition id="cond.passwords" xsl="(realm/@id != 'local') or ((string-length(password) &gt; 0) and (password = password2 ))">
+      <label xml:lang="de">Für neue lokale Benutzer, füllen Sie bitte beide Passwortfelder identisch aus!</label>
+      <label xml:lang="en">For new local users, please fill both password fields identically!</label>
+    </condition>
+
+  </include>
+  
+  <!-- Input fields used in both simple read user editor and user editor for admins -->
+      
+  <panel id="common">
+
+    <hidden var="@id" default="0" />
+    
+    <cell row="1" col="1" anchor="EAST">
+      <text label="ID: " />
+    </cell>
+    <cell row="1" col="2" colspan="2" anchor="WEST" var="@id">
+      <output default="(Neuer Nutzer)" />
+    </cell>
+
+    <cell row="2" col="1" anchor="EAST">
+      <text i18n="admin.userAccount" />      
+    </cell>
+    <cell row="2" col="2" anchor="WEST" var="@name">
+      <textfield id="tf.userName" width="16" maxlength="16">
+        <condition id="cond.userName" required="true" maxLength="16" regexp="[\S]*" >
+          <label xml:lang="de">Benutzerkennungen dürfen nur maximal 16 Zeichen lang sein, keine Leerzeichen!</label>
+          <label xml:lang="en">For user accounts please enter maximum 16 characters, no blanks!</label>
+        </condition>
+      </textfield>
+    </cell>
+
+    <cell row="5" col="1" anchor="EAST" style="width: 160px;">
+      <text i18n="admin.passwordNotice" />      
+    </cell>
+    <cell row="5" col="2" colspan="2" anchor="WEST" var="hint">
+      <textfield width="60" maxlength="128" />
+    </cell>
+
+    <cell row="6" col="1" anchor="EAST">
+      <text label="Name: " />    
+    </cell>
+    <cell row="6" col="2" colspan="2" anchor="WEST" var="realName">
+      <textfield width="60" maxlength="64" />
+    </cell>
+
+    <cell row="12" col="1" colspan="3" anchor="SOUTHEAST">
+      <cancelButton i18n="button.cancel" style="width: 100px;" />
+      <text label=" "/>
+      <submitButton i18n="button.save" style="width: 100px;" />
+    </cell>
+      
+    <condition id="checkUserName" class="miless.authorization.users.UserServlet" method="checkUserName">
+      <label xml:lang="de">Diese Nutzerkennung ist im Bereich bereits vergeben!</label>
+      <label xml:lang="en">This user account already exists in the area!</label>
+    </condition>
+
+  </panel>
+
+</includes>

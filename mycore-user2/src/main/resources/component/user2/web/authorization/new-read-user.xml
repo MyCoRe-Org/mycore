@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!-- Editor form to create a new read user. -->
+<!-- Includes user-editor.xml -->
+
+<webpage lastModified="$Date$" id="new-read-user">
+  <title xml:lang="de">Neuen Lesenutzer anlegen</title>
+  <title xml:lang="en">Create read user</title>
+
+  <section>
+    <editor id="new-read-user-form">
+      <include uri="webapp:authorization/user-editor.xml" ref="editor4newReadUser" />
+    </editor>
+  </section>
+</webpage>

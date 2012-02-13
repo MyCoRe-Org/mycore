@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!-- Editor form to change data of existing login user. -->
+<!-- Includes user-editor.xml -->
+
+<webpage lastModified="$Date$" id="change-user">
+  <title xml:lang="de">Nutzerdaten ändern</title>
+  <title xml:lang="en">Change user data</title>
+
+  <section>
+    <editor id="change-user-form">
+      <include uri="webapp:authorization/user-editor.xml" ref="editor4changeAdmins" />
+    </editor>
+  </section>
+</webpage>
