@@ -124,12 +124,6 @@
     <div class="section" id="sectionlast">
       <table class="user">
         <tr>
-          <th scope="row">ID:</th>
-          <td>
-            <xsl:value-of select="@id" />
-          </td>
-        </tr>
-        <tr>
           <th scope="row">
             <xsl:value-of select="i18n:translate('component.user2.admin.userAccount')" />
           </th>
@@ -139,7 +133,7 @@
         </tr>
         <tr>
           <th scope="row">
-            <xsl:value-of select="i18n:translate('component.user2.admin.passwordNotice')" />
+            <xsl:value-of select="i18n:translate('component.user2.admin.passwordHint')" />
           </th>
           <td>
             <xsl:value-of select="hint" />
@@ -150,7 +144,10 @@
             <xsl:value-of select="i18n:translate('component.user2.admin.user.lastLogin')" />
           </th>
           <td>
-            <xsl:value-of select="lastLogin" />
+            <xsl:call-template name="formatISODate">
+              <xsl:with-param name="date" select="lastLogin" />
+              <xsl:with-param name="format" select="i18n:translate('metaData.dateTime')" />
+            </xsl:call-template>
           </td>
         </tr>
         <tr class="abstand">
@@ -159,29 +156,35 @@
             <xsl:value-of select="realName" />
           </td>
         </tr>
-        <tr>
-          <th scope="row">E-Mail:</th>
-          <td>
-            <xsl:if test="eMail">
+        <xsl:if test="eMail">
+          <tr>
+            <th scope="row">E-Mail:</th>
+            <td>
               <a href="mailto:{eMail}">
                 <xsl:value-of select="eMail" />
               </a>
-            </xsl:if>
-          </td>
-        </tr>
-        <tr>
-          <th scope="row">LegalEntity:</th>
-          <td>
-            <xsl:for-each select="legalEntity">
-              <a href="{$ServletsBaseURL}LegalEntityServlet?id={@id}">
-                <xsl:value-of select="name" />
-                <xsl:text> [</xsl:text>
-                <xsl:value-of select="@id" />
-                <xsl:text>]</xsl:text>
-              </a>
-            </xsl:for-each>
-          </td>
-        </tr>
+            </td>
+          </tr>
+        </xsl:if>
+        <xsl:if test="attributes">
+          <tr>
+            <th scope="row">
+              <xsl:value-of select="i18n:translate('component.user2.admin.user.attributes')" />
+            </th>
+            <td>
+              <dl>
+                <xsl:for-each select="attributes/attribute">
+                  <dt>
+                    <xsl:value-of select="@name" />
+                  </dt>
+                  <dd>
+                    <xsl:value-of select="@value" />
+                  </dd>
+                </xsl:for-each>
+              </dl>
+            </td>
+          </tr>
+        </xsl:if>
         <tr class="abstand">
           <th scope="row">
             <xsl:value-of select="i18n:translate('component.user2.admin.owner')" />
@@ -200,9 +203,12 @@
           <td>
             <xsl:for-each select="groups/group">
               <xsl:value-of select="@name" />
-              <xsl:text> [</xsl:text>
-              <xsl:value-of select="@label" />
-              <xsl:text>]</xsl:text>
+              <xsl:variable name="lang">
+                <xsl:call-template name="selectPresentLang">
+                  <xsl:with-param name="nodes" select="label" />
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:value-of select="concat(' [',label[lang($lang)]/@text,']')" />
               <xsl:if test="position() != last()">
                 <br />
               </xsl:if>

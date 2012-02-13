@@ -10,11 +10,11 @@
   exclude-result-prefixes="xsl xalan i18n encoder"
 >
 
-<xsl:include href="layout.xsl" />
+<xsl:include href="MyCoReLayout.xsl" />
 
 <xsl:variable name="PageID" select="'select-user'" />
 
-<xsl:variable name="page.title" select="'Nutzer auswählen'" />
+<xsl:variable name="PageTitle" select="'Nutzer auswählen'" />
 
 <!-- ========== Subselect Parameter ========== -->
 <xsl:param name="subselect.session" />
@@ -25,7 +25,7 @@
 <xsl:template match="/users">
   <xsl:if test="@num">
     <div class="section">
-      <form action="{$ServletsBaseURL}UserServlet" onsubmit="document.getElementById('indicator').style.display='inline';">
+      <form action="{$ServletsBaseURL}MCRUserServlet" onsubmit="document.getElementById('indicator').style.display='inline';">
         <p>
         Suche nach Nutzerkennung oder Name:
         <input type="text" name="search" value="{@search}" />
@@ -122,7 +122,7 @@
               <xsl:value-of select="encoder:encode($subselect.webpage,'UTF-8')" />
             </xsl:when>
             <xsl:otherwise>
-              <xsl:text>UserServlet?action=show&amp;id=</xsl:text>
+              <xsl:text>MCRUserServlet?action=show&amp;id=</xsl:text>
               <xsl:value-of select="@id" />
             </xsl:otherwise>
           </xsl:choose>

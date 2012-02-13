@@ -65,10 +65,12 @@ public abstract class MCRUserTransformer {
         realmElement.setAttribute("id", mcrUser.getRealmID());
         realmElement.setText(mcrUser.getRealm().getLabel());
         userElement.addContent(realmElement);
-        Element ownerElement = new Element("owner");
-        ownerElement.setAttribute("name", String.valueOf(mcrUser.getOwner().getUserID()));
-        ownerElement.setAttribute("realm", String.valueOf(mcrUser.getOwner().getRealmID()));
-        userElement.addContent(ownerElement);
+        if (mcrUser.getOwner() != null) {
+            Element ownerElement = new Element("owner");
+            ownerElement.setAttribute("name", String.valueOf(mcrUser.getOwner().getUserID()));
+            ownerElement.setAttribute("realm", String.valueOf(mcrUser.getOwner().getRealmID()));
+            userElement.addContent(ownerElement);
+        }
         return userElement;
     }
 
