@@ -5,18 +5,16 @@
     <label xml:lang="de">lokal</label>
     <label xml:lang="en">local</label>
     <login url="../authorization/login.xml">
-      <label xml:lang="de">Anmeldung mit lokaler DuEPublico-Nutzerkennung</label>
-      <label xml:lang="en">Login with local DuEPublico user account</label>
+      <label xml:lang="de">Anmeldung mit lokaler Nutzerkennung</label>
+      <label xml:lang="en">Login with local user account</label>
     </login>
     <passwordChangeURL>../authorization/change-password.xml?action=password</passwordChangeURL>
     <info>
       <label xml:lang="de">
-        Diese Kennung gilt nur für DuEPublico, sie ist nicht identisch mit der Uni-Kennung
-        (Vergabe durch das ZIM) oder der Kennung der Bibliothek für Katalog und Benutzerkonto.
+        Diese Kennung gilt nur für diese Anwendung.
       </label>
       <label xml:lang="en">
-        This account is DuEPublico local, it is NOT identical with your account at the University library,
-        or the central University account provided by the computer center (ZIM).
+        This account is local for this application only.
       </label>
     </info>
   </realm>
