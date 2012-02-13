@@ -28,9 +28,9 @@ import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUserInformation;
@@ -51,6 +51,13 @@ import org.mycore.user2.MCRUserManager;
  * @author Frank L\u00fctzenkirchen
  */
 public class MCRLoginServlet extends MCRServlet {
+
+    private static final String LOGIN_REDIRECT_URL_PARAMETER = "url";
+
+    private static final String LOGIN_REDIRECT_URL_KEY = "loginRedirectURL";
+
+    private static Logger LOGGER = Logger.getLogger(MCRLoginServlet.class);
+
     /**
      * MCRLoginServlet handles four actions:
      * 
@@ -131,7 +138,7 @@ public class MCRLoginServlet extends MCRServlet {
      * rendered using realms.xsl.
      */
     private void chooseLoginMethod(HttpServletRequest req, HttpServletResponse res) throws Exception {
-        storeURL(req.getParameter("url"));
+        storeURL(req.getParameter(LOGIN_REDIRECT_URL_PARAMETER));
         // redirect directly to login url if there is only one realm available and the user is not logged in
         if ((getNumLoginOptions() == 1) && currentUserIsGuest())
             redirectToUniqueRealm(req, res);
@@ -165,7 +172,7 @@ public class MCRLoginServlet extends MCRServlet {
     }
 
     private void loginToRealm(HttpServletRequest req, HttpServletResponse res, String realmID) throws Exception {
-        storeURL(req.getParameter("url"));
+        storeURL(req.getParameter(LOGIN_REDIRECT_URL_PARAMETER));
         MCRRealm realm = MCRRealm.getRealm(realmID);
         String loginURL = realm.getLoginURL();
         res.sendRedirect(loginURL);
@@ -182,8 +189,8 @@ public class MCRLoginServlet extends MCRServlet {
             String rest = url.substring(getBaseURL().length());
             url = getBaseURL() + encodePath(rest);
         }
-
-        MCRSessionMgr.getCurrentSession().put("loginRedirectURL", url);
+        LOGGER.info("Storing redirect URL to session: " + url);
+        MCRSessionMgr.getCurrentSession().put(LOGIN_REDIRECT_URL_KEY, url);
     }
 
     private String encodePath(String path) throws Exception {
@@ -209,10 +216,13 @@ public class MCRLoginServlet extends MCRServlet {
      * Redirects the browser to the target url.
      */
     static void redirect(HttpServletResponse res) throws Exception {
-        String url = (String) (MCRSessionMgr.getCurrentSession().get("loginRedirectURL"));
-        if (url == null)
+        String url = (String) (MCRSessionMgr.getCurrentSession().get(LOGIN_REDIRECT_URL_KEY));
+        if (url == null) {
+            LOGGER.warn("Could not get redirect URL from session.");
             url = getBaseURL();
-        res.sendRedirect(url);
+        }
+        LOGGER.info("Redirecting to url: " + url);
+        res.sendRedirect(res.encodeRedirectURL(url));
     }
 
     /**
@@ -232,8 +242,6 @@ public class MCRLoginServlet extends MCRServlet {
         MCRUser user = MCRUserManager.getUser(userName);
         if (!user.getRealm().equals(MCRRealm.getLocalRealm()))
             return false; // Do not login remote users, only local realm
-
-        return true;
-        //return user.hasPassword(password); // Check password      
+        return MCRUserManager.checkPassword(userName, password) != null;
     }
 }

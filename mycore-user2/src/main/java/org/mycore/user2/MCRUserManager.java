@@ -377,7 +377,7 @@ public class MCRUserManager {
      * @param password
      * @return
      */
-    private static MCRUser checkPassword(String userName, String password) {
+    public static MCRUser checkPassword(String userName, String password) {
         MCRUser user = getUser(userName);
         if (user == null || user.getHashType() == null) {
             return null;
