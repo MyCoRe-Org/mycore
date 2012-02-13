@@ -95,7 +95,7 @@ public class MCRUserServlet extends MCRServlet {
         }
         String url = currentUser.getRealm().getPasswordChangeURL();
         if (url == null) {
-            String msg = MCRTranslation.translate("user2.UserServlet.missingRealPasswortChangeURL", currentUser.getRealmID());
+            String msg = MCRTranslation.translate("component.user2.UserServlet.missingRealPasswortChangeURL", currentUser.getRealmID());
             res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msg);
         } else {
             res.sendRedirect(url);
@@ -105,7 +105,7 @@ public class MCRUserServlet extends MCRServlet {
     private static boolean checkUserIsNotNull(HttpServletResponse res, MCRUser currentUser) throws IOException {
         if (currentUser == null) {
             String userID = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
-            String msg = MCRTranslation.translate("user2.UserServlet.currentUserUnknown", userID);
+            String msg = MCRTranslation.translate("component.user2.UserServlet.currentUserUnknown", userID);
             res.sendError(HttpServletResponse.SC_FORBIDDEN, msg);
             return false;
         }
@@ -114,7 +114,7 @@ public class MCRUserServlet extends MCRServlet {
 
     private static boolean forbidIfGuest(HttpServletResponse res) throws IOException {
         if (MCRSessionMgr.getCurrentSession().getUserInformation().equals(MCRSystemUserInformation.getGuestInstance())) {
-            String msg = MCRTranslation.translate("user2.UserServlet.noGuestAction");
+            String msg = MCRTranslation.translate("component.user2.UserServlet.noGuestAction");
             res.sendError(HttpServletResponse.SC_FORBIDDEN, msg);
             return true;
         }
