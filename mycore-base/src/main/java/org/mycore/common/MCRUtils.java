@@ -294,21 +294,35 @@ public class MCRUtils {
      * 
      * @param jdom
      *            the JDOM tree
+     *        format
+     *            the JDOM output format    
      * @return a byte array of the JDOM tree
      */
-    public static final byte[] getByteArray(org.jdom.Document jdom) throws MCRPersistenceException {
+    public static final byte[] getByteArray(org.jdom.Document jdom, Format format) throws MCRPersistenceException {
         MCRConfiguration conf = MCRConfiguration.instance();
         String mcr_encoding = conf.getString("MCR.Metadata.DefaultEncoding", DEFAULT_ENCODING);
         ByteArrayOutputStream outb = new ByteArrayOutputStream();
 
         try {
-            XMLOutputter outp = new XMLOutputter(Format.getRawFormat().setEncoding(mcr_encoding));
+            XMLOutputter outp = new XMLOutputter(format.setEncoding(mcr_encoding));
             outp.output(jdom, outb);
         } catch (Exception e) {
             throw new MCRPersistenceException("Can't produce byte array.");
         }
 
         return outb.toByteArray();
+    }
+
+    
+    /**
+     * This method convert a JDOM tree to a byte array.
+     * 
+     * @param jdom
+     *            the JDOM tree
+     * @return a byte array of the JDOM tree
+     */
+    public static final byte[] getByteArray(org.jdom.Document jdom) throws MCRPersistenceException {
+        return getByteArray(jdom, Format.getRawFormat());
     }
 
     /**

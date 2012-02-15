@@ -49,7 +49,6 @@ import org.jdom.xpath.XPath;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.MCRUtils;
@@ -111,11 +110,11 @@ public class MCREditorOutValidator {
         input = jdom_in;
         this.id = id;
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("XML before validation:\n" + new String(MCRUtils.getByteArray(input)));
+            LOGGER.debug("XML before validation:\n" + new String(MCRUtils.getByteArray(input, Format.getPrettyFormat())));
         }
         checkObject();
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("XML after validation:\n" + new String(MCRUtils.getByteArray(input)));
+            LOGGER.debug("XML after validation:\n" + new String(MCRUtils.getByteArray(input, Format.getPrettyFormat())));
         }
     }
 
