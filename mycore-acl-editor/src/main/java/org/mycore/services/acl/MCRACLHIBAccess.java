@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -31,7 +29,7 @@ import org.mycore.services.acl.filter.MCRAclCriterionFilter;
  * @author Huu Chi Vu
  * @author Matthias Eichner
  */
-public class MCRACLHIBAccess {
+public abstract class MCRACLHIBAccess {
 
     private static Logger LOGGER = Logger.getLogger(MCRACLHIBAccess.class);
 
@@ -45,9 +43,9 @@ public class MCRACLHIBAccess {
      * @return a list of <code>MCRACCESS</code> instances
      */
     @SuppressWarnings("unchecked")
-    public List<MCRACCESS> getRuleMappingList(HttpServletRequest request) {
+    public static List<MCRACCESS> getRuleMappingList(Properties filterProperties) {
         Criteria query = MCRHIBConnection.instance().getSession().createCriteria(MCRACCESS.class);
-        filterQuery(query, request, "MCR.ACL.Editor.ruleMappingFilter");
+        filterQuery(query, filterProperties, "MCR.ACL.Editor.ruleMappingFilter");
         return query.list();
     }
 
@@ -60,9 +58,9 @@ public class MCRACLHIBAccess {
      * @return a list of <code>MCRACCESSRULE</code> instances
      */
     @SuppressWarnings("unchecked")
-    public List<MCRACCESSRULE> getRuleList(HttpServletRequest request) {
+    public static List<MCRACCESSRULE> getRuleList(Properties filterProperties) {
         Criteria query = MCRHIBConnection.instance().getSession().createCriteria(MCRACCESSRULE.class);
-        filterQuery(query, request, "MCR.ACL.Editor.ruleFilter");
+        filterQuery(query, filterProperties, "MCR.ACL.Editor.ruleFilter");
         return query.list();
     }
 
@@ -75,14 +73,14 @@ public class MCRACLHIBAccess {
      * @param request the incoming http request - needed for filters
      * @param filterPrefix selects the code>MCRAclCriterionFilter</code> classes
      */
-    public void filterQuery(Criteria query, HttpServletRequest request, String filterPrefix) {
+    public static void filterQuery(Criteria query, Properties filterProperties, String filterPrefix) {
         Properties filters = MCRConfiguration.instance().getProperties(filterPrefix);
         for(Object filterClass : filters.values()) {
             try {
                 Class<?> c = Class.forName(filterClass.toString());
                 Object o = c.newInstance();
                 if(o instanceof MCRAclCriterionFilter) {
-                    Criterion criterion = ((MCRAclCriterionFilter)o).filter(request);
+                    Criterion criterion = ((MCRAclCriterionFilter)o).filter(filterProperties);
                     if(criterion != null)
                         query.add(criterion);
                 } else
@@ -102,7 +100,7 @@ public class MCRACLHIBAccess {
      * 
      * @param diffMap map with changes
      */
-    public void saveRuleMappingChanges(Map<MCRAclAction, List<MCRRuleMapping>> diffMap) {
+    public static void saveRuleMappingChanges(Map<MCRAclAction, List<MCRRuleMapping>> diffMap) {
         MCRAccessStore accessStore = MCRAccessStore.getInstance();
 
         List<MCRRuleMapping> updateList = diffMap.get(MCRAclAction.update);
@@ -144,7 +142,7 @@ public class MCRACLHIBAccess {
      * 
      * @param diffMap map with changes
      */
-    public void saveRuleChanges(Map<MCRAclAction, List<MCRACCESSRULE>> diffMap) {
+    public static void saveRuleChanges(Map<MCRAclAction, List<MCRACCESSRULE>> diffMap) {
         MCRRuleStore ruleStore = MCRRuleStore.getInstance();
         MCRCache cache = MCRAccessControlSystem.getCache();
 
@@ -199,7 +197,7 @@ public class MCRACLHIBAccess {
      * @param ruleid the rule id to check
      * @return true if the rule is used, otherwise false
      */
-    public boolean isRuleInUse(String ruleid) {
+    public static boolean isRuleInUse(String ruleid) {
         Session session = MCRHIBConnection.instance().getSession();
         Query query = session.createQuery("from MCRACCESS as accdef where accdef.rule.rid = '" + ruleid + "'");
         if(query.list().isEmpty())

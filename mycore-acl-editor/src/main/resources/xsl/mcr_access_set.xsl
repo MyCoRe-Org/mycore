@@ -6,7 +6,7 @@
     <!--
         see mcr_acl_editor_common.xsl for definition of following variables redirectURL servletName editorURL aclEditorURL dataRequest permEditor ruleEditor
     -->
-    <xsl:include href="mcr_acl_editor_common.xsl" />
+    <!-- <xsl:include href="mcr_acl_editor_common.xsl" />-->
     <xsl:variable name="permEditorURL" select="concat($WebApplicationBaseURL,'servlets/MCRACLEditorServlet_v2',$HttpSession,'?mode=getACLEditor&amp;editor=permEditor')" />
     <xsl:variable name="permEditorURL_setFilter"
         select="concat($WebApplicationBaseURL,'servlets/MCRACLEditorServlet_v2',$HttpSession,'?mode=dataRequest&amp;action=setFilter&amp;ObjIdFilter=',//objid,'&amp;AcPoolFilter=',//acpool)" />
@@ -17,8 +17,9 @@
     <xsl:variable name="labelPermission" select="concat(i18n:translate('component.acl-editor.label.permission'),':')" />
     <xsl:variable name="labelCreator" select="concat(i18n:translate('component.acl-editor.label.creator'),':')" />
     <xsl:variable name="labelRule" select="concat(i18n:translate('component.acl-editor.label.rule'),':')" />
-    <xsl:template match="/mcr_access_set">
-        <xsl:variable name="ruleItems" select="document(concat($dataRequest, '&amp;action=getRuleAsItems'))" />
+    <xsl:template match="mcr_access_set">
+        <xsl:variable name="ruleItems" select="document('acl-module:getRuleAsItems')" />
+
         <div id="aclPermEditor" onMouseover="aclPermEditorSetup()">
             <script type="text/javascript" src="{$aclPermEditorJS}" language="JavaScript"></script>
             <script type="text/javascript" src="{$aclClickButtonsJS}" language="JavaScript"></script>

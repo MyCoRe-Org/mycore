@@ -43,6 +43,7 @@ form {
 }
 
 .aclRuleTable .label{
+	width: 160px;
 }
 
 .aclRuleTable .input{

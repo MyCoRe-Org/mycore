@@ -3,7 +3,6 @@
     <!--
         see mcr_acl_editor_common.xsl for definition of following variables redirectURL servletName editorURL aclEditorURL dataRequest permEditor ruleEditor
     -->
-    <xsl:include href="mcr_acl_editor_common.xsl" />
     <xsl:variable name="currentEditor" select="concat('&amp;editor=', $ruleEditor)" />
     <xsl:variable name="labelDescription" select="concat(i18n:translate('component.acl-editor.label.description'),':')" />
     <xsl:variable name="labelRule" select="concat(i18n:translate('component.acl-editor.label.rule'),':')" />
@@ -15,7 +14,7 @@
     <xsl:variable name="aclRuleEditorJS" select="concat($WebApplicationBaseURL,'modules/acl-editor/web/JS/aclRuleEditor.js')" />
     <xsl:variable name="aclClickButtonsJS" select="concat($WebApplicationBaseURL,'modules/acl-editor/web/JS/aclClickButtons.js')" />
     <xsl:variable name="aclRuleEditorCSS" select="concat($WebApplicationBaseURL,'modules/acl-editor/web/CSS/aclRuleEditor.css')" />
-    <xsl:template match="/mcr_access_rule_set">
+    <xsl:template match="mcr_access_rule_set">
         <div>
             <!-- Setting JS and CSS files -->
             <script type="text/javascript" src="{$aclRuleEditorJS}" language="JavaScript"></script>

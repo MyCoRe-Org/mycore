@@ -1,11 +1,11 @@
 package org.mycore.services.acl.filter;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.Properties;
 
 import org.hibernate.criterion.Criterion;
 
 public interface MCRAclCriterionFilter {
 
-    public Criterion filter(HttpServletRequest request);
+    public Criterion filter(Properties properties);
 
 }

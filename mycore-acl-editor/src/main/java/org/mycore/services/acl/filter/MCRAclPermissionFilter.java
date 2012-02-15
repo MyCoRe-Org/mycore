@@ -1,11 +1,10 @@
 package org.mycore.services.acl.filter;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
-import org.mycore.frontend.servlets.MCRServlet;
 
 /**
  * Filters a permission (read, create-user, writedb...).
@@ -18,8 +17,8 @@ public class MCRAclPermissionFilter implements MCRAclCriterionFilter {
 
     public static final String PROPERTY_NAME = "acpool";
     
-    public Criterion filter(HttpServletRequest request) {
-        String permissionFilter = MCRServlet.getProperty(request, PROPERTY_NAME);
+    public Criterion filter(Properties properties) {
+        String permissionFilter = properties.getProperty(PROPERTY_NAME);
 
         if (permissionFilter != null && !permissionFilter.equals("")) {
             LOGGER.info("ACPOOL Filter: " + permissionFilter + "\t" + permissionFilter.replaceAll("\\*", "%"));

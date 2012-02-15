@@ -25,6 +25,8 @@
     -->
 
     <xsl:include href="mcr_acl_editor_common.xsl" />
+    <xsl:include href="mcr_access_set.xsl" />
+    <xsl:include href="mcr_access_rule_set.xsl" />
 
     <xsl:variable name="PageTitle">
         <xsl:choose>
@@ -56,23 +58,31 @@
                         <xsl:value-of select="i18n:translate('component.acl-editor.ruleEditor')" />
                     </a>
 
-                    <xsl:variable name="permEditor" select="concat($dataRequest, '&amp;action=getPermEditor', $filter)" />
-                    <xsl:copy-of select="document($permEditor)" />
+                     <xsl:variable name="permEditor" select="document(concat('acl-module:getPermEditor:', $filter))" />
+                     <xsl:apply-templates select="$permEditor/*" />
 
+              <!--   <xsl:variable name="permEditor" select="concat($dataRequest, '&amp;action=getPermEditor', $filter)" /> 
+                    <xsl:copy-of select="document($permEditor)" />-->
                 </xsl:when>
                 <xsl:when test="editor = $ruleEditor">
                     <a href="{concat($aclEditorURL, '&amp;editor=permEditor', $filter)}">
                         <xsl:value-of select="i18n:translate('component.acl-editor.permEditor')" />
                     </a>
 
-                    <xsl:variable name="ruleEditor" select="concat($dataRequest, '&amp;action=getRuleEditor')" />
-                    <xsl:copy-of select="document($ruleEditor)" />
+                    <xsl:variable name="ruleEditor" select="document('acl-module:getRuleEditor')" />
+                    <xsl:apply-templates select="$ruleEditor/*" />
+                    <!-- <xsl:variable name="ruleEditor" select="concat($dataRequest, '&amp;action=getRuleEditor')" />
+                    <xsl:copy-of select="document($ruleEditor)" />-->
 
                 </xsl:when>
                 <xsl:when test="editor = $embPermEditor">
                     <xsl:variable name="redirectURL" select="redirect" />
-                    <xsl:variable name="embPermEditor" select="concat($dataRequest, '&amp;action=getPermEditor&amp;emb=true&amp;cmd=', cmd, $filter)" />
-                    <xsl:copy-of select="document(concat($embPermEditor, '&amp;redir=', $redirectURL))" />
+                    
+                    <xsl:variable name="embPermEditor" select="document(concat('acl-module:getPermEditor:emb=true&amp;cmd=', cmd, $filter))" />
+                    <xsl:apply-templates select="$ruleEditor/*" />
+ 
+                    <!-- <xsl:variable name="embPermEditor" select="concat($dataRequest, '&amp;action=getPermEditor&amp;emb=true&amp;cmd=', cmd, $filter)" />
+                    <xsl:copy-of select="document(concat($embPermEditor, '&amp;redir=', $redirectURL))" />-->
 
                 </xsl:when>
             </xsl:choose>

@@ -8,9 +8,9 @@ import org.mycore.backend.hibernate.tables.MCRACCESS;
 import org.mycore.backend.hibernate.tables.MCRACCESSPK;
 import org.mycore.backend.hibernate.tables.MCRACCESSRULE;
 
-public class MCRACLXMLProcessing {
+public abstract class MCRACLXMLProcessing {
 
-    public Element accessFilter2XML(String objid, String acpool) {
+    public static Element accessFilter2XML(String objid, String acpool) {
         Element filter = new Element("mcr_access_filter");
         Element objidFilter = new Element("objid");
         Element acpoolFilter = new Element("acpool");
@@ -30,7 +30,7 @@ public class MCRACLXMLProcessing {
         return filter;
     }
 
-    public Element access2XML(List<MCRACCESS> accessList, boolean withPos) {
+    public static Element access2XML(List<MCRACCESS> accessList, boolean withPos) {
         Element mcrAccessSet = new Element("mcr_access_set");
 
         if (accessList == null) {
@@ -72,7 +72,7 @@ public class MCRACLXMLProcessing {
         return mcrAccessSet;
     }
 
-    public Element ruleSet2Items(List<MCRACCESSRULE> ruleList) {
+    public static Element ruleSet2Items(List<MCRACCESSRULE> ruleList) {
         Element items = new Element("items");
         for (MCRACCESSRULE rule : ruleList) {
             Element item = new Element("item");
@@ -92,9 +92,8 @@ public class MCRACLXMLProcessing {
         return items;
     }
 
-    public Element ruleSet2XML(List<MCRACCESSRULE> ruleList, List<String> notEditableCreatorList) {
+    public static Element ruleSet2XML(List<MCRACCESSRULE> ruleList, List<String> notEditableCreatorList) {
         Element mcrAccessRuleSet = new Element("mcr_access_rule_set");
-        MCRACLHIBAccess HIBA = new MCRACLHIBAccess();
 
         if (ruleList == null) {
             MCRACCESSRULE emptyRule = new MCRACCESSRULE();
@@ -125,7 +124,7 @@ public class MCRACLXMLProcessing {
             else
                 mcrAccessRule.addContent(new Element("DESCRIPTION").addContent(""));
 
-            if (HIBA.isRuleInUse(rid))
+            if (MCRACLHIBAccess.isRuleInUse(rid))
                 mcrAccessRule.addContent(new Element("inUse").addContent("true"));
             else
                 mcrAccessRule.addContent(new Element("inUse").addContent("false"));

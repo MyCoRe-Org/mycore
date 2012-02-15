@@ -1,10 +1,9 @@
 package org.mycore.services.acl.filter;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.Properties;
 
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
-import org.mycore.frontend.servlets.MCRServlet;
 
 /**
  * Filters a list of creators. They could be seperated by a comma.
@@ -13,8 +12,8 @@ import org.mycore.frontend.servlets.MCRServlet;
  */
 public class MCRAclCreatorFilter implements MCRAclCriterionFilter {
 
-    public Criterion filter(HttpServletRequest request) {
-        String creator = MCRServlet.getProperty(request, "creator");
+    public Criterion filter(Properties properties) {
+        String creator = properties.getProperty("creator");
         if(creator != null && !creator.equals("")) {
             String[] creatorFilter = creator.split(",");
             return Restrictions.in("creator", creatorFilter);

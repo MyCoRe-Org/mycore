@@ -7,11 +7,13 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,9 +37,6 @@ import org.mycore.services.acl.filter.MCRAclPermissionFilter;
 import com.ibm.icu.util.StringTokenizer;
 
 public class MCRAclEditorStdImpl extends MCRAclEditor {
-    MCRACLHIBAccess HIBA = new MCRACLHIBAccess();
-
-    MCRACLXMLProcessing XMLProcessing = new MCRACLXMLProcessing();
 
     /***************************************************************************
      * Implementing abstract methods
@@ -79,12 +78,14 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
         String action = request.getParameter("action");
         Element elem = null;
 
+        Properties requestProperties = getRequestProperties(request);
+        
         if (action.equals("setFilter"))
             elem = setFilter(request);
         else if (action.equals("getPermEditor"))
-            elem = getPermEditor(request);
+            elem = getPermEditor(requestProperties);
         else if (action.equals("getRuleEditor"))
-            elem = getRuleEditor(request);
+            elem = getRuleEditor(requestProperties);
         else if (action.equals("deleteFilter"))
             elem = getACLEditor(request);
         else if (action.equals("createNewPerm"))
@@ -92,17 +93,32 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
         else if (action.equals("createNewRule"))
             elem = createNewRule(request);
         else if (action.equals("getRuleAsItems"))
-            elem = getRuleAsItems(request);
+            elem = getRuleAsItems(requestProperties);
         else if (action.equals("submitPerm"))
             elem = processPermSubmission(request);
         else if (action.equals("submitRule"))
             elem = processRuleSubmission(request);
         else if (action.equals("delAllRules"))
-            elem = deleteAllRules(request);
+            elem = deleteAllRules(request, requestProperties);
         else if (action.equals("delAllPerms"))
-            elem = deleteAllRuleMappings(request);
+            elem = deleteAllRuleMappings(request, requestProperties);
 
         return elem;
+    }
+
+    protected Properties getRequestProperties(HttpServletRequest request) {
+        Properties p = new Properties();
+        Enumeration<String> en = request.getAttributeNames();
+        while(en.hasMoreElements()) {
+            String attrKey = en.nextElement();
+            p.put(attrKey, request.getAttribute(attrKey));
+        }
+        Enumeration<String> en2 = request.getParameterNames();
+        while(en2.hasMoreElements()) {
+            String attrKey = en2.nextElement();
+            p.put(attrKey, request.getParameter(attrKey));
+        }
+        return p;
     }
 
     // End implementing abstract methods
@@ -111,19 +127,19 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
      * Mapping stuff
      **************************************************************************/
 
-    private Element getPermEditor(HttpServletRequest request) {
-        String objidFilter = request.getParameter(MCRAclObjIdFilter.PROPERTY_NAME);
-        String acpoolFilter = request.getParameter(MCRAclPermissionFilter.PROPERTY_NAME);
-        String embedded = request.getParameter("emb");
-        String cmd = request.getParameter("cmd");
+    public static Element getPermEditor(Properties properties) {
+        String objidFilter = properties.getProperty(MCRAclObjIdFilter.PROPERTY_NAME);
+        String acpoolFilter = properties.getProperty(MCRAclPermissionFilter.PROPERTY_NAME);
+        String embedded = properties.getProperty("emb");
+        String cmd = properties.getProperty("cmd");
 
-        String redirectURL = request.getParameter("redir");
+        String redirectURL = properties.getProperty("redir");
 
         LOGGER.debug("Redirect: " + redirectURL);
         LOGGER.debug("ObjId: " + objidFilter);
         LOGGER.debug("AcPool: " + acpoolFilter);
 
-        Element permEditor = getPermission(objidFilter, acpoolFilter, request);
+        Element permEditor = getPermission(objidFilter, acpoolFilter, properties);
 
         if (redirectURL != null && !redirectURL.equals(""))
             permEditor.addContent(redirect(redirectURL));
@@ -139,14 +155,14 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
         return permEditor;
     }
 
-    private Element getPermission(String objIdFilter, String acPoolFilter, HttpServletRequest request) {
-        Element elem = XMLProcessing.access2XML(HIBA.getRuleMappingList(request), true);
+    private static Element getPermission(String objIdFilter, String acPoolFilter, Properties filterProperties) {
+        Element elem = MCRACLXMLProcessing.access2XML(MCRACLHIBAccess.getRuleMappingList(filterProperties), true);
         elem.addContent(getFilterElem(objIdFilter, acPoolFilter));
         return elem;
     }
 
-    private Element getFilterElem(String objIdFilter, String acPoolFilter) {
-        Element elem = XMLProcessing.accessFilter2XML(objIdFilter, acPoolFilter);
+    private static Element getFilterElem(String objIdFilter, String acPoolFilter) {
+        Element elem = MCRACLXMLProcessing.accessFilter2XML(objIdFilter, acPoolFilter);
         return elem;
     }
 
@@ -215,7 +231,7 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
         HashMap<MCRAclAction, List<MCRRuleMapping>> diffMap = new HashMap<MCRAclAction, List<MCRRuleMapping>>();
         diffMap.put(MCRAclAction.update, updateAccessList);
         diffMap.put(MCRAclAction.delete, deleteAccessList);
-        HIBA.saveRuleMappingChanges(diffMap);
+        MCRACLHIBAccess.saveRuleMappingChanges(diffMap);
 
         String redirectURL = request.getParameter("redir");
 
@@ -229,10 +245,10 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
         return editor;
     }
 
-    private Element deleteAllRuleMappings(HttpServletRequest request) {
+    private Element deleteAllRuleMappings(HttpServletRequest request, Properties filterProperties) {
         String objidFilter = request.getParameter(MCRAclObjIdFilter.PROPERTY_NAME);
         String acpoolFilter = request.getParameter(MCRAclPermissionFilter.PROPERTY_NAME);
-        List<MCRACCESS> accessList = HIBA.getRuleMappingList(request);
+        List<MCRACCESS> accessList = MCRACLHIBAccess.getRuleMappingList(filterProperties);
 
         HashMap<MCRAclAction, List<MCRRuleMapping>> diffMap = new HashMap<MCRAclAction, List<MCRRuleMapping>>();
         LinkedList<MCRRuleMapping> deleteAccessList = new LinkedList<MCRRuleMapping>();
@@ -245,7 +261,7 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
             deleteAccessList.add(ruleMapping);
         }
         diffMap.put(MCRAclAction.delete, deleteAccessList);
-        HIBA.saveRuleMappingChanges(diffMap);
+        MCRACLHIBAccess.saveRuleMappingChanges(diffMap);
 
         String redirectURL = request.getParameter("redir");
         LOGGER.debug("Redirect URL: " + redirectURL);
@@ -308,14 +324,14 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
      * Rule stuff
      **************************************************************************/
 
-    private Element getRuleEditor(HttpServletRequest request) {
-        String notEditableCreators = MCRServlet.getProperty(request, "notEditableCreators");
+    public static Element getRuleEditor(Properties properties) {
+        String notEditableCreators = properties.getProperty("notEditableCreators");
         List<String> notEditableCreatorList = new ArrayList<String>();
         if(notEditableCreators != null) {
             for(String notEditableCreator : notEditableCreators.split(":"))
                 notEditableCreatorList.add(notEditableCreator);
         }
-        Element elem = XMLProcessing.ruleSet2XML(HIBA.getRuleList(request), notEditableCreatorList);
+        Element elem = MCRACLXMLProcessing.ruleSet2XML(MCRACLHIBAccess.getRuleList(properties), notEditableCreatorList);
         return elem;
     }
 
@@ -372,8 +388,8 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
         return AI.getNormalizedRuleString(jdomDocument.getRootElement());
     }
 
-    private Element getRuleAsItems(HttpServletRequest request) {
-        Element elem = XMLProcessing.ruleSet2Items(HIBA.getRuleList(request));
+    public static Element getRuleAsItems(Properties filterProperties) {
+        Element elem = MCRACLXMLProcessing.ruleSet2Items(MCRACLHIBAccess.getRuleList(filterProperties));
         return elem;
     }
 
@@ -424,7 +440,7 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
         diffMap.put(MCRAclAction.update, updateRule);
         diffMap.put(MCRAclAction.delete, deleteRule);
 
-        HIBA.saveRuleChanges(diffMap);
+        MCRACLHIBAccess.saveRuleChanges(diffMap);
         String redirectURL = request.getParameter("redir");
 
         Element editor;
@@ -437,13 +453,13 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
         return editor;
     }
 
-    private Element deleteAllRules(HttpServletRequest request) {
+    private Element deleteAllRules(HttpServletRequest request, Properties filterProperties) {
         LOGGER.debug("Delete all rules.");
         HashMap<MCRAclAction, List<MCRACCESSRULE>> diffMap = new HashMap<MCRAclAction, List<MCRACCESSRULE>>(); 
 
-        List<MCRACCESSRULE> ruleList = HIBA.getRuleList(request);
+        List<MCRACCESSRULE> ruleList = MCRACLHIBAccess.getRuleList(filterProperties);
         diffMap.put(MCRAclAction.delete, ruleList);
-        HIBA.saveRuleChanges(diffMap);
+        MCRACLHIBAccess.saveRuleChanges(diffMap);
 
         String redirectURL = request.getParameter("redir");
         Element editor;
@@ -520,7 +536,7 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
         return editorType;
     }
 
-    private Element redirect(String url) {
+    private static Element redirect(String url) {
         Element redirect = new Element("redirect");
         redirect.addContent(url);
         return redirect;
