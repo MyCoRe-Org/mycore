@@ -10,7 +10,7 @@
     <hidden var="service" descendants="true" />
     <hidden var="metadata/@xml:lang" default="de" />
 
-    <hidden ref="mods.genre.report" />
+    <cell col="1" colspan="3" row="450" anchor="NORTHEAST" ref="mods.genre.report" />
     <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:typeOfResource" descendants="true" />
     <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem" descendants="true" />
     <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/@ID" />

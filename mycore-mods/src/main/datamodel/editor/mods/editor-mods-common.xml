@@ -374,6 +374,19 @@
     </cell>
   </panel>
 
+  <panel id="mods.name.optional">
+    <hidden var="nameOrPND/@editor.output" />
+    <cell col="1" row="1" anchor="NORTHEAST">
+      <text i18n="metaData.mods.dictionary.gnd" />
+    </cell>
+    <cell col="2" row="1" anchor="NORTHEAST" var="nameOrPND">
+      <textfield width="31" maxlength="128" />
+    </cell>
+    <cell col="2" row="2" anchor="NORTHEAST">
+      <output var="nameOrPND/@editor.output" default="" />
+    </cell>
+  </panel>
+
   <text id="mods.person.label" i18n="metaData.mods.dictionary.persons" />
   <panel id="mods.person">
     <cell anchor="NORTHWEST" var="mods:name[@type='personal']">
@@ -473,7 +486,7 @@
               </cell>
             </panel>
           </cell>
-          <cell col="2" row="1" anchor="NORTHEAST" ref="mods.name" />
+          <cell col="2" row="1" anchor="NORTHEAST" ref="mods.name.optional" />
         </panel>
       </repeater>
     </cell>
@@ -491,13 +504,7 @@
     <cell anchor="NORTHWEST" var="mods:publisher">
       <panel>
         <cell anchor="NORTHWEST">
-          <textfield id="mods.publisher.text" width="60" maxlength="512">
-  <!--           <condition id="mods.publisher.cond" required="true">
-              <label xml:lang="de">Tragen Sie hier den Verlag oder Verleger/Herausgeber ein (Druckerei, Medienanstalt ...)).</label>
-              <label xml:lang="en">Enter publisher here.</label>
-            </condition>
-  -->
-          </textfield>
+          <textfield id="mods.publisher.text" width="60" maxlength="512" />
         </cell>
       </panel>
     </cell>
