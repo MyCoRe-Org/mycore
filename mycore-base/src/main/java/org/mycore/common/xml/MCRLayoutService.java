@@ -609,7 +609,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
      * @param parameters
      *            the XSL parameters as name-value pairs
      */
-    private void setXSLParameters(Transformer transformer, Properties parameters) {
+    public static void setXSLParameters(Transformer transformer, Properties parameters) {
         Enumeration<?> names = parameters.propertyNames();
 
         while (names.hasMoreElements()) {
