@@ -86,7 +86,7 @@
       <text label=": " />
     </cell>
     <cell row="7" col="2" colspan="2" anchor="WEST" var="eMail">
-      <textfield width="60" maxlength="64" id="tf.email" autofill="@uni-duisburg-essen.de">
+      <textfield width="60" maxlength="64" id="tf.email">
         <condition id="cond.email" regexp="\S+@\S+\.\S+">
           <label xml:lang="de">Bitte geben Sie eine syntaktisch korrekte EMail-Adresse ein!</label>
           <label xml:lang="en">Please, enter a syntactically correct email address!</label>
@@ -174,15 +174,6 @@
   <!-- Input fields used in both simple read user editor and user editor for admins -->
 
   <panel id="common">
-
-    <hidden var="@id" default="0" />
-
-    <cell row="1" col="1" anchor="EAST">
-      <text label="ID: " />
-    </cell>
-    <cell row="1" col="2" colspan="2" anchor="WEST" var="@id">
-      <output default="(Neuer Nutzer)" />
-    </cell>
 
     <cell row="2" col="1" anchor="EAST">
       <text i18n="component.user2.admin.userAccount" />
