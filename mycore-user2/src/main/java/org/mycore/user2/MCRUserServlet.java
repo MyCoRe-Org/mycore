@@ -366,7 +366,7 @@ public class MCRUserServlet extends MCRServlet {
 
             LOGGER.info("search users like " + search);
 
-            int max = MCRConfiguration.instance().getInt("MCR.user2.Users.MaxResults", 100);
+            int max = MCRConfiguration.instance().getInt(MCRUser2Constants.CONFIG_PREFIX + "Users.MaxResults", 100);
             int num = MCRUserManager.countUsers(search, null, search);
 
             if ((num < max) && (num > 0))

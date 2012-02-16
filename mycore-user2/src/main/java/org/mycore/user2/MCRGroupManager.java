@@ -47,15 +47,11 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
  */
 public class MCRGroupManager {
 
-    private static final String CATEG_LINK_TYPE = "mcr-user";
-
     /** Map of defined groups, key is the unique group name */
     private static HashMap<String, MCRGroup> groupsByName = new HashMap<String, MCRGroup>();
 
     /** List of all defined groups */
     private static List<MCRGroup> groupsList = new ArrayList<MCRGroup>();
-
-    static final MCRCategoryID GROUP_CLASSID = MCRCategoryID.rootID("mcr-groups");
 
     private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
@@ -73,7 +69,7 @@ public class MCRGroupManager {
         }
         lastLoaded = DAO.getLastModified();
         int onlyNonHierarchicalGroups = 1;
-        MCRCategory groupCategory = DAO.getCategory(GROUP_CLASSID, onlyNonHierarchicalGroups);
+        MCRCategory groupCategory = DAO.getCategory(MCRUser2Constants.GROUP_CLASSID, onlyNonHierarchicalGroups);
         groupsByName.clear();
         groupsList.clear();
         if (groupCategory != null) {
@@ -157,7 +153,7 @@ public class MCRGroupManager {
         MCRCategLinkReference ref = getLinkID(user);
         LinkedList<MCRCategoryID> categories = new LinkedList<MCRCategoryID>();
         for (String groupID : user.getSystemGroupIDs()) {
-            MCRCategoryID categID = new MCRCategoryID(GROUP_CLASSID.getRootID(), groupID);
+            MCRCategoryID categID = new MCRCategoryID(MCRUser2Constants.GROUP_CLASSID.getRootID(), groupID);
             categories.add(categID);
         }
         for (String groupID : user.getExternalGroupIDs()) {
@@ -172,13 +168,13 @@ public class MCRGroupManager {
     }
 
     private static MCRCategLinkReference getLinkID(MCRUser user) {
-        return new MCRCategLinkReference(user.getUserName() + "@" + user.getRealmID(), CATEG_LINK_TYPE);
+        return new MCRCategLinkReference(user.getUserName() + "@" + user.getRealmID(), MCRUser2Constants.CATEG_LINK_TYPE);
     }
 
     public static void addGroup(MCRGroup group) {
         MCRCategoryID categoryID = null;
         if (group.isSystemGroup()) {
-            categoryID = new MCRCategoryID(GROUP_CLASSID.getRootID(), group.getName());
+            categoryID = new MCRCategoryID(MCRUser2Constants.GROUP_CLASSID.getRootID(), group.getName());
         } else {
             categoryID = MCRCategoryID.fromString(group.getName());
         }
@@ -205,7 +201,7 @@ public class MCRGroupManager {
         }
         MCRCategoryID categoryID = null;
         if (group.isSystemGroup()) {
-            categoryID = new MCRCategoryID(GROUP_CLASSID.getRootID(), group.getName());
+            categoryID = new MCRCategoryID(MCRUser2Constants.GROUP_CLASSID.getRootID(), group.getName());
         } else {
             categoryID = MCRCategoryID.fromString(group.getName());
         }
@@ -214,12 +210,12 @@ public class MCRGroupManager {
 
     public static Collection<String> listUserIDs(MCRGroup group) {
         MCRCategoryID categoryID = getCategoryID(group);
-        return CATEG_LINK_SERVICE.getLinksFromCategoryForType(categoryID, CATEG_LINK_TYPE);
+        return CATEG_LINK_SERVICE.getLinksFromCategoryForType(categoryID, MCRUser2Constants.CATEG_LINK_TYPE);
     }
 
     private static MCRCategoryID getCategoryID(MCRGroup group) {
         if (group.isSystemGroup()) {
-            return new MCRCategoryID(GROUP_CLASSID.getRootID(), group.getName());
+            return new MCRCategoryID(MCRUser2Constants.GROUP_CLASSID.getRootID(), group.getName());
         }
         return MCRCategoryID.fromString(group.getName());
     }

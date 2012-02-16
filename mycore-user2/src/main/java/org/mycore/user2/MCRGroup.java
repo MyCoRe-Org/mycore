@@ -58,7 +58,7 @@ public class MCRGroup {
         for (MCRLabel label : labels) {
             this.labels.put(label.getLang(), label);
         }
-        this.isSystemGroup=!name.contains(":")||name.startsWith(MCRGroupManager.GROUP_CLASSID.getRootID()+":");
+        this.isSystemGroup=!name.contains(":")||name.startsWith(MCRUser2Constants.GROUP_CLASSID.getRootID()+":");
     }
 
     /**

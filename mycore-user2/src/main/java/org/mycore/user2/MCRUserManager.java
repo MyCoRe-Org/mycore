@@ -53,7 +53,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 public class MCRUserManager {
     private static final MCRHIBConnection MCRHIB_CONNECTION = MCRHIBConnection.instance();
 
-    private static final int HASH_ITERATIONS = MCRConfiguration.instance().getInt("MCR.user2.HashIterations", 1000);
+    private static final int HASH_ITERATIONS = MCRConfiguration.instance().getInt(MCRUser2Constants.CONFIG_PREFIX + "HashIterations", 1000);
 
     private static final Logger LOGGER = Logger.getLogger(MCRUserManager.class);
 
@@ -117,7 +117,7 @@ public class MCRUserManager {
         mcrUser.getSystemGroupIDs().clear();
         mcrUser.getExternalGroupIDs().clear();
         for (MCRCategoryID groupID : groupIDs) {
-            if (groupID.getRootID().equals(MCRGroupManager.GROUP_CLASSID.getRootID())) {
+            if (groupID.getRootID().equals(MCRUser2Constants.GROUP_CLASSID.getRootID())) {
                 mcrUser.getSystemGroupIDs().add(groupID.getID());
             } else {
                 mcrUser.getSystemGroupIDs().add(groupID.toString());

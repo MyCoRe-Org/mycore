@@ -1,15 +1,9 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-
-<!-- Editor form to create a new login user. -->
-<!-- Includes user-editor.xml -->
-
-<webpage lastModified="$Date$" id="new-user">
-  <title xml:lang="de">Neuen Nutzer anlegen</title>
-  <title xml:lang="en">Create new user</title>
-
-  <section>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MyCoReWebPage>
+<MyCoReWebPage>
+  <section xml:lang="all" i18n="component.user2.admin.create.title">
     <editor id="new-user-form">
       <include uri="webapp:authorization/user-editor.xml" ref="editor4newAdmins" />
     </editor>
   </section>
-</webpage>
+</MyCoReWebPage>

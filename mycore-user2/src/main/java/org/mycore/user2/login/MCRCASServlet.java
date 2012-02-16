@@ -35,6 +35,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.user2.MCRUser;
+import org.mycore.user2.MCRUser2Constants;
 import org.mycore.user2.MCRUserManager;
 
 /**
@@ -82,13 +83,13 @@ public class MCRCASServlet extends MCRServlet {
         super.init();
 
         MCRConfiguration config = MCRConfiguration.instance();
-        clientURL = config.getString("MCR.user2.CAS.ClientURL");
-        serverURL = config.getString("MCR.user2.CAS.ServerURL");
-        realmID = config.getString("MCR.user2.CAS.RealmID");
+        clientURL = config.getString(MCRUser2Constants.CONFIG_PREFIX + "CAS.ClientURL");
+        serverURL = config.getString(MCRUser2Constants.CONFIG_PREFIX + "CAS.ServerURL");
+        realmID = config.getString(MCRUser2Constants.CONFIG_PREFIX + "CAS.RealmID");
 
         // Set properties to enable SSL connection to CAS and accept certificates  
-        String trustStore = config.getString("MCR.user2.CAS.SSL.TrustStore");
-        String trustStorePassword = config.getString("MCR.user2.CAS.SSL.TrustStore.Password");
+        String trustStore = config.getString(MCRUser2Constants.CONFIG_PREFIX + "CAS.SSL.TrustStore");
+        String trustStorePassword = config.getString(MCRUser2Constants.CONFIG_PREFIX + "CAS.SSL.TrustStore.Password");
 
         System.setProperty("javax.net.ssl.trustStore", trustStore);
         System.setProperty("javax.net.ssl.trustStorePassword", trustStorePassword);
