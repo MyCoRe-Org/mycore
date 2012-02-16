@@ -42,7 +42,7 @@
           </xsl:if>
         </xsl:variable>
         <form class="action" method="post" action="{$cancelURL}">
-         <input value="{i18n:translate('button.cancelSelect')}" class="action" type="submit" />
+         <input value="{i18n:translate('component.user2.button.cancelSelect')}" class="action" type="submit" />
         </form>
       </xsl:if>    
     </div>
