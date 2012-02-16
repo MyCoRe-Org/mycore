@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -117,6 +118,10 @@ public class MCRClassificationBrowser2 extends MCRServlet {
 
         List<Element> data = new ArrayList<Element>();
         MCRCategory category = MCRCategoryDAOFactory.getInstance().getCategory(id, 1);
+        if (category == null) {
+            job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND, "Could not find category: " + id);
+            return;
+        }
         for (MCRCategory child : category.getChildren()) {
             String childID = child.getId().getID();
             int numResults = 0;
