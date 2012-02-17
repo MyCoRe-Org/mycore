@@ -293,7 +293,7 @@
         </xsl:otherwise>
       </xsl:choose>
       <!--*** Editor Buttons ************************************* -->
-      <xsl:if test="(./structure/children/child) or (./structure/derobjects/derobject)">
+      <xsl:if test="((./structure/children/child) and not($mods-type='series' or $mods-type='journal')) or (./structure/derobjects/derobject)">
         <div id="derivate_box" class="detailbox">
           <h4 id="derivate_switch" class="block_switch">
             <a name="derivate_box"></a>
