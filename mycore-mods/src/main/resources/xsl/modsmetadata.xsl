@@ -824,8 +824,6 @@
     </xsl:if>
 
     <xsl:if test="(./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier) or
-                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:note) or
-                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:physicalLocation) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:url) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:accessCondition) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID])">
@@ -836,12 +834,6 @@
         <div id="category_content" class="block_content">
           <table class="metaData">
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
-            <xsl:call-template name="printMetaDate.mods">
-              <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:note" />
-            </xsl:call-template>
-            <xsl:call-template name="printMetaDate.mods">
-              <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:physicalLocation" />
-            </xsl:call-template>
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:url" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:accessCondition" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID]" />
