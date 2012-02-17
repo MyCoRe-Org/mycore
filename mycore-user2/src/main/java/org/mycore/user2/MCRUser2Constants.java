@@ -32,6 +32,25 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 public final class MCRUser2Constants {
 
     public static final String GROUP_ROOT_ID = "mcr-groups";
+
+    static final String USER_ADMIN_PERMISSION = "administrate-users";
+
+    static final String USER_CREATE_PERMISSION = "create-users";
+
+    /**
+     * @return the userAdminPermission
+     */
+    public static String getUserAdminPermission() {
+        return USER_ADMIN_PERMISSION;
+    }
+
+    /**
+     * @return the userCreatePermission
+     */
+    public static String getUserCreatePermission() {
+        return USER_CREATE_PERMISSION;
+    }
+
     /**
      * @return the groupRootId
      */
@@ -40,10 +59,12 @@ public final class MCRUser2Constants {
     }
 
     static final MCRCategoryID GROUP_CLASSID = MCRCategoryID.rootID(GROUP_ROOT_ID);
+
     static final String CATEG_LINK_TYPE = "mcr-user";
+
     public static final String CONFIG_PREFIX = "MCR.user2.";
 
-    private MCRUser2Constants(){
+    private MCRUser2Constants() {
         //do not allow instantiation
     }
 }

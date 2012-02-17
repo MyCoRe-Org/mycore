@@ -249,6 +249,7 @@ public class MCRUserManager {
     public static void deleteUser(String userName, String realmId) {
         Session session = MCRHIB_CONNECTION.getSession();
         MCRUser user = getUser(userName, realmId);
+        MCRGroupManager.removeUserFromGroups(user);
         session.delete(user);
     }
 

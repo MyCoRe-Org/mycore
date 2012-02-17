@@ -3,7 +3,8 @@
 <!-- XSL to display data of a login user -->
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan"
-  xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" exclude-result-prefixes="xsl xalan i18n">
+  xmlns:acl="xalan://org.mycore.access.MCRAccessManager" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:const="xalan://org.mycore.user2.MCRUser2Constants"
+  exclude-result-prefixes="xsl xalan i18n acl const">
 
   <xsl:include href="MyCoReLayout.xsl" />
 
@@ -21,40 +22,46 @@
     </xsl:if>
   </xsl:variable>
 
-  <xsl:variable name="actions">
-
-    <xsl:if test="(string-length($step) = 0) or ($step = 'cantDeleteLE') or ($step = 'changedPassword')">
+  <xsl:template match="user" mode="actions">
+    <xsl:if test="(string-length($step) = 0) or ($step = 'changedPassword')">
       <xsl:choose>
-        <xsl:when test="contains($CurrentGroups,'admins')">
-          <action target="{$WebApplicationBaseURL}authorization/change-user.xml" label="{i18n:translate('component.user2.admin.changedata')}">
-            <param name="action" value="save" />
-            <param name="id" value="{/user/@id}" />
-          </action>
+        <xsl:when test="acl:checkPermission(const:getUserAdminPermission())">
+          <form action="{$WebApplicationBaseURL}authorization/change-user.xml" method="get">
+            <input type="hidden" name="action" value="save" />
+            <input type="hidden" name="id" value="{$uid}" />
+            <input type="submit" class="action" value="{i18n:translate('component.user2.admin.changedata')}" />
+          </form>
         </xsl:when>
         <xsl:when test="$CurrentUser != $uid">
-          <action target="{$WebApplicationBaseURL}authorization/change-read-user.xml" label="{i18n:translate('component.user2.admin.changedata')}">
-            <param name="action" value="save" />
-            <param name="id" value="{/user/@id}" />
-          </action>
+          <form action="{$WebApplicationBaseURL}authorization/change-read-user.xml" method="get">
+            <input type="hidden" name="action" value="save" />
+            <input type="hidden" name="id" value="{$uid}" />
+            <input type="submit" class="action" value="{i18n:translate('component.user2.admin.changedata')}" />
+          </form>
         </xsl:when>
       </xsl:choose>
       <xsl:if test="/user/realm/@id = 'local'">
-        <action target="{$WebApplicationBaseURL}authorization/change-password.xml" label="{i18n:translate('component.user2.admin.changepw')}">
-          <param name="action" value="password" />
-          <param name="id" value="{/user/@id}" />
-        </action>
+        <form action="{$WebApplicationBaseURL}authorization/change-password.xml" method="get">
+          <input type="hidden" name="action" value="password" />
+          <input type="hidden" name="id" value="{$uid}" />
+          <input type="submit" class="action" value="{i18n:translate('component.user2.admin.changepw')}" />
+        </form>
       </xsl:if>
       <xsl:if test="contains($CurrentGroups,'admins') or ($CurrentUser != $uid)">
-        <action target="UserServlet" label="{i18n:translate('component.user2.admin.userDeleteYes')}">
-          <param name="action" value="show" />
-          <param name="id" value="{/user/@id}" />
-          <param name="XSL.step" value="confirmDelete" />
-        </action>
+        <form action="MCRUserServlet" method="get">
+          <input type="hidden" name="action" value="show" />
+          <input type="hidden" name="id" value="{$uid}" />
+          <input type="hidden" name="XSL.step" value="confirmDelete" />
+          <input type="submit" class="action" value="{i18n:translate('component.user2.admin.userDeleteYes')}" />
+        </form>
       </xsl:if>
     </xsl:if>
-  </xsl:variable>
+  </xsl:template>
 
   <xsl:template match="user">
+    <div id="buttons">
+      <xsl:apply-templates select="." mode="actions" />
+    </div>
     <xsl:if test="$step = 'confirmDelete'">
       <div class="section">
         <p>
@@ -72,16 +79,16 @@
             </strong>
           </xsl:if>
         </p>
-        <form class="action" method="post" action="UserServlet">
+        <form class="action" method="post" action="MCRUserServlet">
           <input name="action" value="delete" type="hidden" />
-          <input name="id" value="{/user/@id}" type="hidden" />
+          <input name="id" value="{$uid}" type="hidden" />
           <input name="XSL.step" value="deleted" type="hidden" />
-          <input value="{i18n:translate('button.deleteYes')}" class="action" type="submit" />
+          <input value="{i18n:translate('component.user2.button.deleteYes')}" class="action" type="submit" />
         </form>
-        <form class="action" method="get" action="UserServlet">
+        <form class="action" method="get" action="MCRUserServlet">
           <input name="action" value="show" type="hidden" />
-          <input name="id" value="{/user/@id}" type="hidden" />
-          <input value="{i18n:translate('button.cancelNo')}" class="action" type="submit" />
+          <input name="id" value="{$uid}" type="hidden" />
+          <input value="{i18n:translate('component.user2.button.cancelNo')}" class="action" type="submit" />
         </form>
       </div>
     </xsl:if>
@@ -99,24 +106,6 @@
         <p>
           <strong>
             <xsl:value-of select="i18n:translate('component.user2.admin.passwordChangeConfirm')" />
-          </strong>
-        </p>
-      </div>
-    </xsl:if>
-    <xsl:if test="$step = 'cantDeleteLE'">
-      <div class="section">
-        <p>
-          <strong>
-            <xsl:value-of select="i18n:translate('legalEntity.deleteCant1')" />
-            <xsl:for-each select="legalEntity">
-              <a href="LegalEntityServlet?id={@id}">
-                <xsl:value-of select="name" />
-                <xsl:text> [</xsl:text>
-                <xsl:value-of select="@id" />
-                <xsl:text>]</xsl:text>
-              </a>
-            </xsl:for-each>
-            <xsl:value-of select="i18n:translate('legalEntity.deleteCant2')" />
           </strong>
         </p>
       </div>
@@ -228,7 +217,7 @@
   </xsl:template>
 
   <xsl:template match="user" mode="link">
-    <a href="UserServlet?action=show&amp;id={@id}">
+    <a href="MCRUserServlet?action=show&amp;id={@name}">
       <xsl:apply-templates select="." mode="name" />
     </a>
     <xsl:if test="position() != last()">

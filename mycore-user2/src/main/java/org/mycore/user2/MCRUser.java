@@ -79,7 +79,7 @@ public class MCRUser implements MCRUserInformation {
 
     private boolean allowLogin;
 
-    private MCRUser() {
+    protected MCRUser() {
         this(null);
     }
 

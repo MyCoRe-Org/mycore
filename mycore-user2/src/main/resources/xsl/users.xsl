@@ -108,12 +108,10 @@
             <xsl:when test="string-length($subselect.session) &gt; 0">
               <xsl:value-of select="$ServletsBaseURL" />
               <xsl:text>XMLEditor?_action=end.subselect</xsl:text>
-              <xsl:text>&amp;_var_@id=</xsl:text>
-              <xsl:value-of select="@id" />
               <xsl:text>&amp;_var_@name=</xsl:text>
               <xsl:value-of select="@name" />
-              <xsl:text>&amp;_var_realm=</xsl:text>
-              <xsl:value-of select="realm" />
+              <xsl:text>&amp;_var_@realm=</xsl:text>
+              <xsl:value-of select="realm/@id" />
               <xsl:text>&amp;subselect.session=</xsl:text>
               <xsl:value-of select="$subselect.session" />
               <xsl:text>&amp;subselect.varpath=</xsl:text>

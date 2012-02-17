@@ -1,15 +1,9 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-
-<!-- Editor form to change data of existing read user. -->
-<!-- Includes user-editor.xml -->
-
-<webpage lastModified="$Date$" id="change-read-user">
-  <title xml:lang="de">Lesenutzer ändern</title>
-  <title xml:lang="en">Change read user</title>
-
-  <section>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MyCoReWebPage>
+<MyCoReWebPage>
+  <section i18n="component.user2.admin.changeUnpriv.title" xml:lang="all">
     <editor id="change-read-user-form">
       <include uri="webapp:authorization/user-editor.xml" ref="editor4changeReadUser" />
     </editor>
   </section>
-</webpage>
+</MyCoReWebPage>
