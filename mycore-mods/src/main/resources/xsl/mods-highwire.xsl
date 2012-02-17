@@ -151,6 +151,7 @@
 
   <xsl:template match="mods:relatedItem[@type='host']" mode="highwire">
     <xsl:apply-templates select="mods:titleInfo" mode="highwire" />
+    <xsl:apply-templates select="mods:originInfo" mode="highwire" />
     <xsl:apply-templates select="mods:identifier" mode="highwire" />
     <xsl:apply-templates select="mods:part" mode="highwire" />
   </xsl:template>
