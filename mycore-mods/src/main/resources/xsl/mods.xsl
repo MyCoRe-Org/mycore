@@ -7,12 +7,19 @@
   <xsl:param name="MCR.Users.Superuser.UserName" />
   <xsl:include href="mods2html.xsl" />
   <xsl:include href="modsmetadata.xsl" />
+  <xsl:include href="mods-highwire.xsl" />
 
   <xsl:include href="basket.xsl" />
 
   <xsl:include href="modshitlist-external.xsl" />  <!-- for external usage in application module -->
   <xsl:include href="modsdetails-external.xsl" />  <!-- for external usage in application module -->
-  
+
+  <xsl:variable name="head.additional">
+    <!-- ==================== Highwire Press tags ==================== -->
+    <xsl:variable name="uri" select="concat('mcrobject:',/mycoreobject/@ID)" />
+    <xsl:apply-templates select="document($uri)/mycoreobject/metadata/def.modsContainer/modsContainer/mods:mods" mode="highwire" />
+  </xsl:variable>
+
   <!--Template for result list hit: see results.xsl -->
   <xsl:template match="mcr:hit[contains(@id,'_mods_')]" priority="1">
     <xsl:param name="mcrobj" />
