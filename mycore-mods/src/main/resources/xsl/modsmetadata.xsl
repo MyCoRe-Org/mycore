@@ -422,7 +422,7 @@
       <td valign="top" class="metaname">
         <xsl:choose>
           <xsl:when test="contains(.,'PPN=')">
-            <xsl:value-of select="'PPN:'" />
+            <xsl:value-of select="i18n:translate('metaData.mods.dictionary.identifier.ppn')" />
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="i18n:translate(concat('metaData.mods.dictionary.identifier.',@type))" />
