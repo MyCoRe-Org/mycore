@@ -1086,6 +1086,7 @@
           <xsl:value-of select="i18n:translate('metaData.mods.dictionary.categorybox')" />
         </h4>
         <div id="category_content" class="block_content">
+          <xsl:variable name="parentID" select="./structure/parents/parent/@xlink:href" />
           <table class="metaData">
             <xsl:for-each select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='host']">
               <tr>
@@ -1094,6 +1095,10 @@
                 </td>
                 <td class="metavalue">
                   <!-- Journal -->
+                  <xsl:call-template name="objectLink">
+                    <xsl:with-param select="$parentID" name="obj_id" />
+                  </xsl:call-template>
+                  <xsl:text disable-output-escaping="yes">&lt;br /></xsl:text>
                   <!-- Issue -->
                   <xsl:value-of
                     select="concat(mods:part/mods:detail[@type='issue']/mods:caption,' ',mods:part/mods:detail[@type='issue']/mods:number)" />
