@@ -409,7 +409,7 @@
   <xsl:template match="mods:identifier" mode="present">
     <tr>
       <td valign="top" class="metaname">
-        <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.identifier'),' (',@type,') :')" />
+        <xsl:value-of select="i18n:translate(concat('metaData.mods.dictionary.identifier.',@type))" />
       </td>
       <td class="metavalue">
         <xsl:value-of select="." />
@@ -417,7 +417,7 @@
     </tr>
   </xsl:template>
 
-  <xsl:template match="mods:identifier[@type='uri']" mode="present">
+  <xsl:template match="mods:identifier[@type='uri' or type='doi']" mode="present">
     <tr>
       <td valign="top" class="metaname">
         <xsl:choose>
@@ -425,21 +425,21 @@
             <xsl:value-of select="'PPN:'" />
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="'URI:'" />
+            <xsl:value-of select="i18n:translate(concat('metaData.mods.dictionary.identifier.',@type))" />
           </xsl:otherwise>
         </xsl:choose>
       </td>
       <td class="metavalue">
-        <xsl:variable name="uri" select="." />
+        <xsl:variable name="link" select="." />
         <xsl:choose>
           <xsl:when test="contains(.,'PPN=')">
-            <a href="{$uri}">
-              <xsl:value-of select="substring-after($uri, 'PPN=')" />
+            <a href="{$link}">
+              <xsl:value-of select="substring-after($link, 'PPN=')" />
             </a>
           </xsl:when>
           <xsl:otherwise>
-            <a href="{$uri}">
-              <xsl:value-of select="$uri" />
+            <a href="{$link}">
+              <xsl:value-of select="$link" />
             </a>
           </xsl:otherwise>
         </xsl:choose>
@@ -552,11 +552,11 @@
                 </td>
               </tr>
             </xsl:if>
+            <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
             <xsl:call-template name="printMetaDate.mods">
               <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:physicalDescription/mods:extent" />
             </xsl:call-template>
-            <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
             <xsl:call-template name="printMetaDate.mods">
               <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:publisher" />
             </xsl:call-template>
@@ -753,6 +753,7 @@
         </h4>
         <div id="category_content" class="block_content">
           <table class="metaData">
+            <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
             <xsl:call-template name="printMetaDate.mods">
               <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateIssued" />
             </xsl:call-template>
@@ -767,7 +768,6 @@
               <xsl:with-param name="nodes"
                 select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:place/mods:placeTerm" />
             </xsl:call-template>
-            <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
             <xsl:apply-templates mode="present"
               select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[not(@type='conference')]" />
             <xsl:call-template name="printMetaDate.mods">
@@ -909,9 +909,9 @@
         </h4>
         <div id="category_content" class="block_content">
           <table class="metaData">
+            <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
             <xsl:apply-templates mode="present"
               select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:part/mods:extent" />
-            <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:classification" />
             <xsl:call-template name="printMetaDate.mods">
@@ -979,15 +979,7 @@
             </xsl:for-each>
           </xsl:if>
 
-
-          <xsl:call-template name="printMetaDate.mods">
-            <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier[@type='issn']" />
-            <xsl:with-param name="label" select="'ISSN'" />
-          </xsl:call-template>
-          <xsl:call-template name="printMetaDate.mods">
-            <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier[@type='zdbid']" />
-            <xsl:with-param name="label" select="'ZDB-ID'" />
-          </xsl:call-template>
+          <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:extension" />
           <xsl:call-template name="printMetaDate.mods">
             <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:note" />
@@ -1049,15 +1041,7 @@
             </xsl:for-each>
           </xsl:if>
 
-
-          <xsl:call-template name="printMetaDate.mods">
-            <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier[@type='issn']" />
-            <xsl:with-param name="label" select="'ISSN'" />
-          </xsl:call-template>
-          <xsl:call-template name="printMetaDate.mods">
-            <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier[@type='zdbid']" />
-            <xsl:with-param name="label" select="'ZDB-ID'" />
-          </xsl:call-template>
+          <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:extension" />
           <xsl:call-template name="printMetaDate.mods">
             <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:note" />
@@ -1137,11 +1121,11 @@
                 </td>
               </tr>
             </xsl:for-each>
+            <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
             <xsl:call-template name="printMetaDate.mods">
               <xsl:with-param name="nodes"
                 select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:originInfo/mods:dateIssued" />
             </xsl:call-template>
-            <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:classification" />
             <xsl:call-template name="printMetaDate.mods">
