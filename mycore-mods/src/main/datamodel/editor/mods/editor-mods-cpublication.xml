@@ -103,7 +103,7 @@
     
     <!--  Seitenzahlen bei  -->
     <cell row="136" col="1" anchor="NORTHEAST" ref="mods.book.pages.range.label" />
-    <cell row="136" col="2" anchor="NORTHWEST" ref="mods.book.pages.range" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="136" col="2" anchor="NORTHWEST" ref="mods.book.pages.range" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='host']" />
     <!-- <cell row="136" col="3" anchor="NORTHWEST" ref="mods.book.pages.range.help" /> -->
   <!--  Ende Seitenzahlen -->
     
