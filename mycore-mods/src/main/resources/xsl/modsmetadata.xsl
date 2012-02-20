@@ -233,23 +233,27 @@
         <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.extent'),':')" />
       </td>
       <td class="metavalue">
-        <xsl:choose>
-          <xsl:when test="count(mods:start) &gt; 0">
-            <xsl:choose>
-              <xsl:when test="count(mods:end) &gt; 0">
-                <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.page'),': ',mods:start,'-',mods:end)" />
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.page'),': ',mods:start)" />
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="concat(mods:total,' ',i18n:translate('metaData.mods.dictionary.pages'))" />
-          </xsl:otherwise>
-        </xsl:choose>
+        <xsl:call-template name="printMetaDate.mods.extent" />
       </td>
     </tr>
+  </xsl:template>
+  
+  <xsl:template name="printMetaDate.mods.extent">
+    <xsl:choose>
+      <xsl:when test="count(mods:start) &gt; 0">
+        <xsl:choose>
+          <xsl:when test="count(mods:end) &gt; 0">
+            <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.page.abbr'),' ',mods:start,'-',mods:end)" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.page.abbr'),' ',mods:start)" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="concat(mods:total,' ',i18n:translate('metaData.mods.dictionary.pages'))" />
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template match="mods:extension[@displayLabel='characteristics']" mode="present">
@@ -799,7 +803,59 @@
       <xsl:call-template name="printMetaDate.mods.abstractContent" />
     </xsl:if>
 
-    <xsl:call-template name="printMetaDate.mods.categoryContent" />
+    <xsl:if test="(./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:part/mods:extent) or
+                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier) or
+                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[not(@ID)]) or
+                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:language) or
+                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:classification) or
+                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:titleInfo[@type='isReferencedBy']/mods:title) or
+                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:subject) or
+                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:url) or
+                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:accessCondition) or
+                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID])">
+      <div id="category_box" class="detailbox">
+        <h4 id="category_switch" class="block_switch">
+          <xsl:value-of select="i18n:translate('metaData.mods.dictionary.categorybox')" />
+        </h4>
+        <div id="category_content" class="block_content">
+          <xsl:variable name="parentID" select="./structure/parents/parent/@xlink:href" />
+          <table class="metaData">
+            <xsl:for-each select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='host']">
+              <tr>
+                <td valign="top" class="metaname">
+                  <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.confpubIn'),':')" />
+                </td>
+                <td class="metavalue">
+                  <!-- Conference -->
+                  <xsl:call-template name="objectLink">
+                    <xsl:with-param select="$parentID" name="obj_id" />
+                  </xsl:call-template>
+                  <xsl:text disable-output-escaping="yes">&lt;br /></xsl:text>
+                  <xsl:for-each select="mods:part/mods:extent[@unit='pages']">
+                    <xsl:call-template name="printMetaDate.mods.extent" />
+                  </xsl:for-each>
+                </td>
+              </tr>
+            </xsl:for-each>
+            <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
+            <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
+            <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:classification" />
+            <xsl:call-template name="printMetaDate.mods">
+              <xsl:with-param name="nodes"
+                select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:titleInfo[@type='isReferencedBy']/mods:title" />
+              <xsl:with-param name="label" select="i18n:translate('metaData.mods.dictionary.authority')" />
+            </xsl:call-template>
+            <xsl:call-template name="printMetaDate.mods">
+              <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:subject" />
+              <xsl:with-param name="sep" select="'; '" />
+            </xsl:call-template>
+            <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:url" />
+            <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:accessCondition" />
+            <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID]" />
+          </table>
+        </div>
+      </div>
+    </xsl:if>
   </xsl:template>
   <!-- END: view conference publication metadata -->
 
@@ -908,10 +964,26 @@
           <xsl:value-of select="i18n:translate('metaData.mods.dictionary.categorybox')" />
         </h4>
         <div id="category_content" class="block_content">
+          <xsl:variable name="parentID" select="./structure/parents/parent/@xlink:href" />
           <table class="metaData">
+            <xsl:for-each select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='host']">
+              <tr>
+                <td valign="top" class="metaname">
+                  <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.chapterIn'),':')" />
+                </td>
+                <td class="metavalue">
+                  <!-- Book -->
+                  <xsl:call-template name="objectLink">
+                    <xsl:with-param select="$parentID" name="obj_id" />
+                  </xsl:call-template>
+                  <xsl:text disable-output-escaping="yes">&lt;br /></xsl:text>
+                  <xsl:for-each select="mods:part/mods:extent[@unit='pages']">
+                    <xsl:call-template name="printMetaDate.mods.extent" />
+                  </xsl:for-each>
+                </td>
+              </tr>
+            </xsl:for-each>
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
-            <xsl:apply-templates mode="present"
-              select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:part/mods:extent" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:classification" />
             <xsl:call-template name="printMetaDate.mods">
@@ -1112,15 +1184,7 @@
                   </xsl:if>
                   <!-- Pages -->
                   <xsl:for-each select="mods:part/mods:extent[@unit='pages']">
-                    <xsl:value-of select="concat(', ', i18n:translate('metaData.mods.dictionary.page.abbr'),' ')" />
-                    <xsl:choose>
-                      <xsl:when test="mods:start = mods:end">
-                        <xsl:value-of select="mods:start" />
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:value-of select="concat(mods:start,'-',mods:end)" />
-                      </xsl:otherwise>
-                    </xsl:choose>
+                    <xsl:call-template name="printMetaDate.mods.extent" />
                   </xsl:for-each>
                   <!-- date issued -->
                 </td>
