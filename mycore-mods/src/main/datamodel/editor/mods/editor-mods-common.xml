@@ -910,10 +910,6 @@
                 <label xml:lang="de">DOI</label>
                 <label xml:lang="en">DOI</label>
               </item>
-              <item value="permalink">
-                <label xml:lang="de">Permalink</label>
-                <label xml:lang="en">Permalink</label>
-              </item>
               <item value="intern_old">
                 <label xml:lang="de">intern</label>
                 <label xml:lang="en">intern</label>
@@ -962,10 +958,6 @@
                 <label xml:lang="de">DOI</label>
                 <label xml:lang="en">DOI</label>
               </item>
-              <item value="permalink">
-                <label xml:lang="de">Permalink</label>
-                <label xml:lang="en">Permalink</label>
-              </item>
               <item value="intern_old">
                 <label xml:lang="de">intern</label>
                 <label xml:lang="en">intern</label>
@@ -1005,10 +997,6 @@
                 <label xml:lang="de">DOI</label>
                 <label xml:lang="en">DOI</label>
               </item>
-              <item value="permalink">
-                <label xml:lang="de">Permalink</label>
-                <label xml:lang="en">Permalink</label>
-              </item>
               <item value="intern_old">
                 <label xml:lang="de">intern</label>
                 <label xml:lang="en">intern</label>
@@ -1047,10 +1035,6 @@
                 <label xml:lang="de">DOI</label>
                 <label xml:lang="en">DOI</label>
               </item>
-              <item value="permalink">
-                <label xml:lang="de">Permalink</label>
-                <label xml:lang="en">Permalink</label>
-              </item>
               <item value="uri">
                 <label xml:lang="de">URI</label>
                 <label xml:lang="en">URI</label>
@@ -1069,7 +1053,7 @@
   <helpPopup id="mods.identifier.help" width="400px" height="250px">
     <label xml:lang="de">
       Ein Identifier ist ein eindeutiger und dauerhafter Identifikator für eine digitale Ressource oder ein physisches Werk.
-      Es können auch mehrere unterschiedliche Identifikatoren (DOI, URN, Permalink ...) angegeben werden.
+      Es können auch mehrere unterschiedliche Identifikatoren (DOI, URN, URI ...) angegeben werden.
       <br />
       ISBN ist immer in Form der ISBN13 anzugeben - mit Bindestrichen! Liegt nur die ISBN10 vor, so muss diese entsprechend konvertiert werden
       (978 davor schreiben und Prüfziffer anpassen). Einen Online-Konverter gibt es z.B. hier: <a href=
