@@ -45,6 +45,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
 import org.mycore.frontend.cli.MCRCommand;
+import org.mycore.frontend.cli.MCRCommandLineInterface;
 import org.mycore.frontend.cli.MCRExternalCommandInterface;
 import org.mycore.webcli.cli.MCRCommandPool;
 import org.mycore.webcli.cli.command.MCRAddCommands;
@@ -169,11 +170,10 @@ class MCRWebCLIContainer {
         if (knownCommands == null) {
             knownCommands = new TreeMap<String, List<MCRCommand>>();
             ArrayList<MCRCommand> basicCommands = new ArrayList<MCRCommand>();
-            basicCommands.add(new MCRCommand("process {0}", "org.mycore.webcli.cli.MCRCommandLineInterface.readCommandsFile String",
-                    "Execute the commands listed in the text file {0}."));
-            basicCommands.add(new MCRCommand("show command statistics",
-                    "org.mycore.webcli.cli.MCRCommandLineInterface.showCommandStatistics",
-                    "Show statistics on number of commands processed and execution time needed per command"));
+            basicCommands.add(new MCRCommand("process {0}", MCRCommandLineInterface.class.getName() + ".readCommandsFile String",
+                "Execute the commands listed in the text file {0}."));
+            basicCommands.add(new MCRCommand("show command statistics", MCRCommandLineInterface.class.getName() + ".showCommandStatistics",
+                "Show statistics on number of commands processed and execution time needed per command"));
             basicCommands.add(new MCRAddCommands());
             LOGGER.warn("known commands:" + knownCommands);
             knownCommands.put("Basic commands", basicCommands);
@@ -303,8 +303,8 @@ class MCRWebCLIContainer {
             return true;
         }
 
-        private List<String> runCommand(String command, List<MCRCommand> commandList) throws IllegalAccessException,
-                InvocationTargetException, ClassNotFoundException, NoSuchMethodException {
+        private List<String> runCommand(String command, List<MCRCommand> commandList) throws IllegalAccessException, InvocationTargetException,
+            ClassNotFoundException, NoSuchMethodException {
             List<String> commandsReturned = null;
             for (MCRCommand currentCommand : commandList) {
                 commandsReturned = currentCommand.invoke(command, this.getClass().getClassLoader());
