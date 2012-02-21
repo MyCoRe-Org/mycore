@@ -47,7 +47,7 @@
       </tr>
     </xsl:if>
   </xsl:template>
-  
+
   <xsl:template match="category" mode="printModsClassInfo">
     <xsl:variable name="categurl">
       <xsl:if test="url">
@@ -109,6 +109,9 @@
   <xsl:template match="*[@valueURI]" mode="hrefLink">
     <a href="{@valueURI}">
       <xsl:choose>
+        <xsl:when test="mods:displayForm">
+          <xsl:value-of select="mods:displayForm" />
+        </xsl:when>
         <xsl:when test="@displayLabel">
           <xsl:value-of select="@displayLabel" />
         </xsl:when>
@@ -144,7 +147,7 @@
               <xsl:otherwise>
                 <xsl:value-of select="." />
               </xsl:otherwise>
-              </xsl:choose>
+            </xsl:choose>
           </td>
         </tr>
       </xsl:for-each>
@@ -160,7 +163,7 @@
       </xsl:if>
     </xsl:if>
   </xsl:template>
-  
+
   <xsl:template name="printMetaDate.mods.titleContent">
     <xsl:variable name="modsType">
       <xsl:choose>
@@ -226,7 +229,7 @@
       </div>
     </div>
   </xsl:template>
-  
+
   <xsl:template match="mods:extent" mode="present">
     <tr>
       <td valign="top" class="metaname">
@@ -237,7 +240,7 @@
       </td>
     </tr>
   </xsl:template>
-  
+
   <xsl:template name="printMetaDate.mods.extent">
     <xsl:choose>
       <xsl:when test="count(mods:start) &gt; 0">
@@ -264,15 +267,27 @@
       <td class="metavalue">
         <table>
           <tr>
-            <th><xsl:value-of select="i18n:translate('metaData.mods.dictionary.year')" /></th>
-            <th><xsl:value-of select="i18n:translate('metaData.mods.dictionary.impact')" /></th>
-            <th><xsl:value-of select="i18n:translate('metaData.mods.dictionary.refereed')" /></th>
+            <th>
+              <xsl:value-of select="i18n:translate('metaData.mods.dictionary.year')" />
+            </th>
+            <th>
+              <xsl:value-of select="i18n:translate('metaData.mods.dictionary.impact')" />
+            </th>
+            <th>
+              <xsl:value-of select="i18n:translate('metaData.mods.dictionary.refereed')" />
+            </th>
           </tr>
           <xsl:for-each select="chars">
             <tr>
-              <td><xsl:value-of select="@year" /></td>
-              <td><xsl:value-of select="@factor" /></td>
-              <td><xsl:value-of select="i18n:translate(concat('metaData.mods.dictionary.refereed.',@refereed))" /></td>
+              <td>
+                <xsl:value-of select="@year" />
+              </td>
+              <td>
+                <xsl:value-of select="@factor" />
+              </td>
+              <td>
+                <xsl:value-of select="i18n:translate(concat('metaData.mods.dictionary.refereed.',@refereed))" />
+              </td>
             </tr>
           </xsl:for-each>
         </table>
@@ -293,18 +308,6 @@
 
   <xsl:template match="mods:name" mode="printName">
     <xsl:choose>
-      <xsl:when test="mods:displayForm">
-        <xsl:choose>
-          <xsl:when test="@valueURI">
-            <a href="{@valueURI}" class="extern">
-              <xsl:value-of select="mods:displayForm" />
-            </a>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="mods:displayForm" />
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:when>
       <xsl:when test="@valueURI">
         <!-- derived from printModsClassInfo template -->
         <xsl:variable name="classlink" select="mcrmods:getClassCategParentLink(.)" />
@@ -318,14 +321,7 @@
             </xsl:for-each>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:choose>
-              <xsl:when test="@valueURI">
-                <xsl:apply-templates select="." mode="hrefLink" />
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="text()" />
-              </xsl:otherwise>
-            </xsl:choose>
+            <xsl:apply-templates select="." mode="hrefLink" />
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
@@ -338,6 +334,9 @@
             <xsl:value-of select="mods:namePart" />
           </xsl:otherwise>
         </xsl:choose>
+      </xsl:when>
+      <xsl:when test="mods:displayForm">
+        <xsl:value-of select="mods:displayForm" />
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="." />
@@ -378,7 +377,8 @@
         <xsl:apply-templates select="." mode="printName" />
       </td>
     </tr>
-    <xsl:if test="($CurrentUser!=$MCR.Users.Guestuser.UserName and ./../mods:note[@xlink:href=$id]) or (./../mods:location/mods:physicalLocation[@xlink:href=$id])">
+    <xsl:if
+      test="($CurrentUser!=$MCR.Users.Guestuser.UserName and ./../mods:note[@xlink:href=$id]) or (./../mods:location/mods:physicalLocation[@xlink:href=$id])">
       <tr>
         <td colspan="2">
           <table class="metaData">
@@ -523,7 +523,8 @@
   </xsl:template>
 
   <xsl:template name="printMetaDate.mods.categoryContent">
-    <xsl:if test="(./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='kindof']) or
+    <xsl:if
+      test="(./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='kindof']) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:language) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:physicalDescription/mods:extent) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier) or
@@ -559,7 +560,8 @@
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
             <xsl:call-template name="printMetaDate.mods">
-              <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:physicalDescription/mods:extent" />
+              <xsl:with-param name="nodes"
+                select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:physicalDescription/mods:extent" />
             </xsl:call-template>
             <xsl:call-template name="printMetaDate.mods">
               <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:publisher" />
@@ -568,18 +570,21 @@
               <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateCreated" />
             </xsl:call-template>
             <xsl:call-template name="printMetaDate.mods">
-              <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateOther[@type='submitted']" />
+              <xsl:with-param name="nodes"
+                select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateOther[@type='submitted']" />
               <xsl:with-param name="label" select="i18n:translate('metaData.mods.dictionary.dateSubmitted')" />
             </xsl:call-template>
             <xsl:call-template name="printMetaDate.mods">
-              <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateOther[@type='accepted']" />
+              <xsl:with-param name="nodes"
+                select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateOther[@type='accepted']" />
               <xsl:with-param name="label" select="i18n:translate('metaData.mods.dictionary.dateAccepted')" />
             </xsl:call-template>
             <xsl:call-template name="printMetaDate.mods">
               <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateIssued" />
             </xsl:call-template>
             <xsl:call-template name="printMetaDate.mods">
-              <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:place/mods:placeTerm" />
+              <xsl:with-param name="nodes"
+                select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:place/mods:placeTerm" />
             </xsl:call-template>
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:classification" />
             <xsl:call-template name="printMetaDate.mods">
@@ -620,7 +625,7 @@
       <h4 id="title_switch" class="block_switch open">
         <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.thesis'), ' - ')" />
         <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='kindof']"
-                  mode="printModsClassInfo" />
+          mode="printModsClassInfo" />
       </h4>
       <xsl:call-template name="printMetaDate.mods.titleContent" />
     </div>
@@ -740,7 +745,8 @@
       </div>
     </div>
 
-    <xsl:if test="(./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateIssued) or
+    <xsl:if
+      test="(./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateIssued) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:publisher) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateOther) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:place/mods:placeTerm) or
@@ -803,7 +809,8 @@
       <xsl:call-template name="printMetaDate.mods.abstractContent" />
     </xsl:if>
 
-    <xsl:if test="(./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:part/mods:extent) or
+    <xsl:if
+      test="(./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:part/mods:extent) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[not(@ID)]) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:language) or
@@ -872,7 +879,8 @@
       <xsl:call-template name="printMetaDate.mods.abstractContent" />
     </xsl:if>
 
-    <xsl:if test="(./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier) or
+    <xsl:if
+      test="(./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:publisher) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:edition) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateOther) or
@@ -949,7 +957,8 @@
       <xsl:call-template name="printMetaDate.mods.abstractContent" />
     </xsl:if>
 
-    <xsl:if test="(./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:part/mods:extent) or
+    <xsl:if
+      test="(./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:part/mods:extent) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[not(@ID)]) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:language) or
@@ -1144,7 +1153,8 @@
       <xsl:call-template name="printMetaDate.mods.abstractContent" />
     </xsl:if>
 
-    <xsl:if test="(./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='host']) or
+    <xsl:if
+      test="(./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='host']) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:originInfo/mods:dateIssued) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:language) or
