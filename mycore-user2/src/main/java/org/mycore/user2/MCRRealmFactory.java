@@ -144,6 +144,10 @@ public class MCRRealmFactory {
 
             realm.setPasswordChangeURL(child.getChildTextTrim("passwordChangeURL"));
             realm.setLoginURL(child.getChild("login").getAttributeValue("url"));
+            Element createElement = child.getChild("create");
+            if (createElement != null) {
+                realm.setCreateURL(createElement.getAttributeValue("url"));
+            }
 
             realmsMap.put(id, realm);
             realmsList.add(realm);

@@ -34,7 +34,6 @@ import org.jdom.Element;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUserInformation;
-import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -132,8 +131,6 @@ public class MCRLoginServlet extends MCRServlet {
         redirect(res);
     }
 
-    private Element realms = MCRURIResolver.instance().resolve("resource:realms.xml");
-
     /**
      * Stores the target url and outputs a list of realms to login to. The list is
      * rendered using realms.xsl.
@@ -148,17 +145,18 @@ public class MCRLoginServlet extends MCRServlet {
     }
 
     private void redirectToUniqueRealm(HttpServletRequest req, HttpServletResponse res) throws Exception {
-        String realmID = realms.getChild("realm").getAttributeValue("id");
+        String realmID = MCRRealmFactory.listRealms().iterator().next().getID();
         loginToRealm(req, res, realmID);
     }
 
     private void listRealms(HttpServletRequest req, HttpServletResponse res) throws IOException {
         MCRUserInformation userInfo = MCRSessionMgr.getCurrentSession().getUserInformation();
-        realms = (Element) (realms.clone());
+        Document realmsDoc = MCRRealmFactory.getRealmsDocument();
+        Element realms = realmsDoc.getRootElement();
         realms.setAttribute("user", userInfo.getUserID());
         realms.setAttribute("realm", (userInfo instanceof MCRUser) ? ((MCRUser) userInfo).getRealm().getLabel() : MCRRealmFactory.getLocalRealm().getLabel());
         realms.setAttribute("guest", String.valueOf(currentUserIsGuest()));
-        getLayoutService().doLayout(req, res, new Document(realms));
+        getLayoutService().doLayout(req, res, realmsDoc);
     }
 
     private static boolean currentUserIsGuest() {
@@ -166,9 +164,13 @@ public class MCRLoginServlet extends MCRServlet {
     }
 
     private int getNumLoginOptions() {
-        int numOptions = realms.getChildren("realm").size();
-        if (!"false".equals(realms.getAttributeValue("createAccount")))
+        int numOptions = 0;
+        for (MCRRealm realm : MCRRealmFactory.listRealms()) {
             numOptions++;
+            if (realm.getCreateURL() != null) {
+                numOptions++;
+            }
+        }
         return numOptions;
     }
 

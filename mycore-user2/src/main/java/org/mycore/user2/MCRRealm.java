@@ -45,6 +45,9 @@ public class MCRRealm {
 
     /** The URL where users from this realm can login */
     private String loginURL;
+    
+    /** The URL where new users may create an account for this realm  */
+    private String createURL;
 
     /** 
      * Creates a new realm.
@@ -105,6 +108,20 @@ public class MCRRealm {
      */
     void setLoginURL(String url) {
         this.loginURL = url;
+    }
+
+    /**
+     * @return the createURL
+     */
+    public String getCreateURL() {
+        return createURL;
+    }
+
+    /**
+     * @param createURL the createURL to set
+     */
+    void setCreateURL(String createURL) {
+        this.createURL = createURL;
     }
 
     @Override
