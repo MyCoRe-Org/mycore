@@ -44,6 +44,7 @@ import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUsageException;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -483,6 +484,6 @@ public class MCRSearchServlet extends MCRServlet {
       * see its overwritten in jspdocportal
       */
     protected void sendToLayout(HttpServletRequest req, HttpServletResponse res, Document jdom) throws IOException {
-        getLayoutService().doLayout(req, res, jdom);
+        getLayoutService().doLayout(req, res, MCRContent.readFrom(jdom));
     }
 }

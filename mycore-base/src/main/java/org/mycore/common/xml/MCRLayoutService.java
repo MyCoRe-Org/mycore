@@ -26,7 +26,6 @@ package org.mycore.common.xml;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -43,6 +42,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.xml.transform.ErrorListener;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.SourceLocator;
@@ -56,7 +56,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
 import org.apache.xalan.templates.ElemTemplate;
@@ -67,9 +66,6 @@ import org.apache.xalan.trace.TraceManager;
 import org.apache.xalan.trace.TracerEvent;
 import org.apache.xml.utils.WrappedRuntimeException;
 import org.jdom.Document;
-import org.jdom.JDOMException;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMSource;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
@@ -78,15 +74,14 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRUtils;
 import org.mycore.common.fo.MCRFoFormatterInterface;
-import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
@@ -189,50 +184,70 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         return transformMap.get();
     }
 
+    /**
+     * Sends a JDOM document as a response. 
+     * @deprecated use {@link #sendXML(HttpServletRequest, HttpServletResponse, MCRContent)} instead.
+     */
+    @Deprecated
     public void sendXML(HttpServletRequest req, HttpServletResponse res, org.jdom.Document jdom) throws IOException {
         sendXML(req, res, MCRContent.readFrom(jdom));
     }
 
+    /**
+     * Sends a DOM document as a response. 
+     * @deprecated use {@link #sendXML(HttpServletRequest, HttpServletResponse, MCRContent)} instead.
+     */
+    @Deprecated
     public void sendXML(HttpServletRequest req, HttpServletResponse res, org.w3c.dom.Document dom) throws IOException {
-        sendXML(req, res, new org.jdom.input.DOMBuilder().build(dom));
+        sendXML(req, res, MCRContent.readFrom(dom));
     }
 
+    /**
+     * Sends a document from an InputStream as a response. 
+     * @deprecated use {@link #sendXML(HttpServletRequest, HttpServletResponse, MCRContent)} instead.
+     */
+    @Deprecated
     public void sendXML(HttpServletRequest req, HttpServletResponse res, InputStream in) throws IOException {
         sendXML(req, res, MCRContent.readFrom(in));
     }
 
-    private void sendXML(HttpServletRequest req, HttpServletResponse res, MCRContent xml) throws IOException {
+    public void sendXML(HttpServletRequest req, HttpServletResponse res, MCRContent xml) throws IOException {
         res.setContentType("text/xml; charset=UTF-8");
-        XMLOutputter xout = new XMLOutputter();
-        xout.setFormat(Format.getRawFormat().setEncoding("UTF-8"));
-        OutputStream out = res.getOutputStream();
         try {
-            xout.output(xml.asXML(), out);
-        } catch (JDOMException ex) {
-            throw new MCRException("Output is not XML", ex);
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+            StreamResult result = new StreamResult(res.getOutputStream());
+            transformer.transform(xml.getSource(), result);
+        } catch (TransformerException e) {
+            throw new MCRException(e);
         }
-        out.close();
+        res.flushBuffer();
     }
 
+    /**
+     * Sends a document from a File as a response. 
+     * @deprecated use {@link #sendXML(HttpServletRequest, HttpServletResponse, MCRContent)} instead.
+     */
+    @Deprecated
     public void sendXML(HttpServletRequest req, HttpServletResponse res, File file) throws IOException {
         sendXML(req, res, MCRContent.readFrom(file));
     }
 
+    /**
+     * 
+     * @deprecated use {@link #doLayout(HttpServletRequest, HttpServletResponse, MCRContent)} instead.
+     */
+    @Deprecated
     public void doLayout(HttpServletRequest req, HttpServletResponse res, org.jdom.Document jdom) throws IOException {
-        String docType = jdom.getDocType() == null ? jdom.getRootElement().getName() : jdom.getDocType().getElementName();
-        Properties parameters = buildXSLParameters(req);
-        String resourceName = getResourceName(req, parameters, docType);
-        if (resourceName == null) {
-            sendXML(req, res, jdom);
-        } else {
-            transform(res, new org.jdom.transform.JDOMSource(jdom), docType, parameters, resourceName);
-        }
+        doLayout(req, res, MCRContent.readFrom(jdom));
     }
 
     /**
      * writes the transformation result directly into the Writer uses the
      * HttpServletResponse only for error messages
+     * @deprecated will be removed without replacement
      */
+    @Deprecated
     public void doLayout(HttpServletRequest req, HttpServletResponse res, Writer out, org.jdom.Document jdom) throws IOException {
         String docType = jdom.getDocType() == null ? jdom.getRootElement().getName() : jdom.getDocType().getElementName();
         Properties parameters = buildXSLParameters(req);
@@ -262,39 +277,42 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         }
     }
 
-    public void doLayout(HttpServletRequest req, HttpServletResponse res, org.w3c.dom.Document dom) throws IOException {
-        String docType = dom.getDoctype() == null ? dom.getDocumentElement().getLocalName() : dom.getDoctype().getName();
+    /**
+     * 
+     * @deprecated use {@link #doLayout(HttpServletRequest, HttpServletResponse, MCRContent)} instead.
+     */
+    @Deprecated
+    public void doLayout(HttpServletRequest req, HttpServletResponse res, org.w3c.dom.Document dom) throws IOException, SAXParseException {
+        doLayout(req, res, MCRContent.readFrom(dom));
+    }
+
+    /**
+     * 
+     * @deprecated use {@link #doLayout(HttpServletRequest, HttpServletResponse, MCRContent)} instead.
+     */
+    @Deprecated
+    public void doLayout(HttpServletRequest req, HttpServletResponse res, InputStream is) throws IOException, SAXParseException {
+        doLayout(req, res, MCRContent.readFrom(is));
+    }
+
+    public void doLayout(HttpServletRequest req, HttpServletResponse res, MCRContent con) throws IOException {
+        String docType = con.getDocType();
         Properties parameters = buildXSLParameters(req);
         String resourceName = getResourceName(req, parameters, docType);
         if (resourceName == null) {
-            sendXML(req, res, dom);
+            sendXML(req, res, con);
         } else {
-            transform(res, new DOMSource(dom), docType, parameters, resourceName);
+            transform(res, con.getSource(), docType, parameters, buildCompiledStylesheet(resourceName));
         }
     }
 
-    public void doLayout(HttpServletRequest req, HttpServletResponse res, InputStream is) throws IOException {
-        MCRContentInputStream cis = new MCRContentInputStream(is);
-        String docType = MCRUtils.parseDocumentType(new ByteArrayInputStream(cis.getHeader()));
-        int pos = docType.indexOf(':') + 1;
-        if (pos > 0) {
-            //filter namespace prefix
-            docType = docType.substring(pos);
-        }
-
-        Properties parameters = buildXSLParameters(req);
-        String resourceName = getResourceName(req, parameters, docType);
-        if (resourceName == null) {
-            sendXML(req, res, cis);
-        } else {
-            transform(res, new StreamSource(cis), docType, parameters, resourceName);
-        }
-    }
-
+    /**
+     * 
+     * @deprecated use {@link #doLayout(HttpServletRequest, HttpServletResponse, MCRContent)} instead.
+     */
+    @Deprecated
     public void doLayout(HttpServletRequest req, HttpServletResponse res, File file) throws IOException {
-        FileInputStream fis = new FileInputStream(file);
-        doLayout(req, res, fis);
-        fis.close();
+        doLayout(req, res, MCRContent.readFrom(file));
     }
 
     public DOMSource doLayout(Document doc, String stylesheetName, Hashtable<String, String> params) throws Exception {
@@ -341,9 +359,67 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         }
     }
 
-    private void transform(HttpServletResponse res, Source sourceXML, String docType, Properties parameters, String resourceName) throws IOException {
-        Templates stylesheet = buildCompiledStylesheet(resourceName);
-        transform(res, sourceXML, docType, parameters, stylesheet);
+    /**
+     * Transforms XML input with the given XSL stylesheet and sends the output
+     * as HTTP Servlet Response to the client browser.
+     * 
+     * @param xml
+     *            the XML input document
+     * @param xsl
+     *            the compiled XSL stylesheet
+     * @param transformer
+     *            the XSL transformer to use
+     * @param response
+     *            the response object to send the result to
+     */
+    private void transform(Source xml, Templates xsl, Transformer transformer, HttpServletResponse response) throws IOException, MCRException {
+
+        // Set content type from "<xsl:output media-type = "...">
+        // Set char encoding from "<xsl:output encoding = "...">
+        String ct = xsl.getOutputProperties().getProperty("media-type");
+        String enc = xsl.getOutputProperties().getProperty("encoding");
+        response.setCharacterEncoding(enc);
+        response.setContentType(ct + "; charset=" + enc);
+
+        LOGGER.debug("MCRLayoutService starts to output " + response.getContentType());
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Result result = new StreamResult(out);
+        try {
+            transformMap.get().clear();
+            transformer.transform(xml, result);
+        } catch (TransformerException ex) {
+            String msg = "Error while transforming XML using XSL stylesheet: " + ex.getMessageAndLocation();
+            throw new MCRException(msg, ex);
+        } finally {
+            transformMap.get().clear();
+            out.close();
+        }
+
+        OutputStream sos = response.getOutputStream();
+        try {
+            byte[] primaryResult = out.toByteArray();
+            if ("application/pdf".equals(ct)) {
+                LOGGER.debug("Formatting XSL-FO");
+                ByteArrayInputStream tmp_stream = new ByteArrayInputStream(primaryResult);
+                fo_formatter.transform(tmp_stream, sos);
+            } else {
+                sos.write(primaryResult);
+            }
+        } catch (Throwable ex) {
+            StringBuffer sb = new StringBuffer();
+            while (ex != null) {
+                sb.append(ex.getClass().getName());
+                if (ex.getMessage() != null)
+                    sb.append(": ").append(ex.getMessage());
+                ex = ex.getCause();
+                if (ex != null)
+                    sb.append(" - ");
+            }
+            LOGGER.warn("Exception writing formatter response to client: " + sb.toString());
+        } finally {
+            sos.close();
+        }
     }
 
     private String getResourceName(HttpServletRequest req, Properties parameters, String docType) {
@@ -619,69 +695,6 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
             String value = parameters.getProperty(name);
 
             transformer.setParameter(name, value);
-        }
-    }
-
-    /**
-     * Transforms XML input with the given XSL stylesheet and sends the output
-     * as HTTP Servlet Response to the client browser.
-     * 
-     * @param xml
-     *            the XML input document
-     * @param xsl
-     *            the compiled XSL stylesheet
-     * @param transformer
-     *            the XSL transformer to use
-     * @param response
-     *            the response object to send the result to
-     */
-    private void transform(Source xml, Templates xsl, Transformer transformer, HttpServletResponse response) throws IOException, MCRException {
-
-        // Set content type from "<xsl:output media-type = "...">
-        // Set char encoding from "<xsl:output encoding = "...">
-        String ct = xsl.getOutputProperties().getProperty("media-type");
-        String enc = xsl.getOutputProperties().getProperty("encoding");
-        response.setCharacterEncoding(enc);
-        response.setContentType(ct + "; charset=" + enc);
-
-        LOGGER.debug("MCRLayoutService starts to output " + response.getContentType());
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Result result = new StreamResult(out);
-        try {
-            transformMap.get().clear();
-            transformer.transform(xml, result);
-        } catch (TransformerException ex) {
-            String msg = "Error while transforming XML using XSL stylesheet: " + ex.getMessageAndLocation();
-            throw new MCRException(msg, ex);
-        } finally {
-            transformMap.get().clear();
-            out.close();
-        }
-
-        OutputStream sos = response.getOutputStream();
-        try {
-            byte[] primaryResult = out.toByteArray();
-            if ("application/pdf".equals(ct)) {
-                LOGGER.debug("Formatting XSL-FO");
-                ByteArrayInputStream tmp_stream = new ByteArrayInputStream(primaryResult);
-                fo_formatter.transform(tmp_stream, sos);
-            } else {
-                sos.write(primaryResult);
-            }
-        } catch (Throwable ex) {
-            StringBuffer sb = new StringBuffer();
-            while (ex != null) {
-                sb.append(ex.getClass().getName());
-                if (ex.getMessage() != null)
-                    sb.append(": ").append(ex.getMessage());
-                ex = ex.getCause();
-                if (ex != null)
-                    sb.append(" - ");
-            }
-            LOGGER.warn("Exception writing formatter response to client: " + sb.toString());
-        } finally {
-            sos.close();
         }
     }
 

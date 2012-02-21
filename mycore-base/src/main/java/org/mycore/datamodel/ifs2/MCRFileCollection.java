@@ -23,6 +23,7 @@
 
 package org.mycore.datamodel.ifs2;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.vfs.FileObject;
@@ -31,6 +32,7 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.xml.sax.SAXParseException;
 
 /**
  * Represents a set of files and directories belonging together, that are stored
@@ -94,6 +96,8 @@ public class MCRFileCollection extends MCRDirectory {
             data = MCRContent.readFrom(src).asXML().getRootElement();
         } catch(JDOMException jdomExc) {
             throw new IOException(jdomExc);
+        } catch (SAXParseException e) {
+            throw new IOException(e);
         }
     }
 

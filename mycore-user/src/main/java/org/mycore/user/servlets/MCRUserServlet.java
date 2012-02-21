@@ -33,6 +33,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -285,6 +286,6 @@ public class MCRUserServlet extends MCRServlet {
      */
     protected void doLayout(MCRServletJob job, String style, Document jdomDoc) throws IOException {
         job.getRequest().setAttribute("XSL.Style", style);
-        getLayoutService().doLayout(job.getRequest(), job.getResponse(), jdomDoc);
+        getLayoutService().doLayout(job.getRequest(), job.getResponse(), MCRContent.readFrom(jdomDoc));
     }
 }

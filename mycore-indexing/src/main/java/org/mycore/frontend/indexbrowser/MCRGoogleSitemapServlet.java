@@ -78,7 +78,7 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
                 }
             }
             //send XML output
-            getLayoutService().doLayout(job.getRequest(), job.getResponse(), jdom);
+            getLayoutService().doLayout(job.getRequest(), job.getResponse(), MCRContent.readFrom(jdom));
             return;
         }
         // remove old files
@@ -97,6 +97,6 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
             jdom = common.buildSitemapIndex(number);
         }
         // send XML output
-        getLayoutService().doLayout(job.getRequest(), job.getResponse(), jdom);
+        getLayoutService().doLayout(job.getRequest(), job.getResponse(), MCRContent.readFrom(jdom));
     }
 }

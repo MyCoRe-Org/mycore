@@ -27,6 +27,7 @@ import javax.servlet.http.*;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.basket.MCRBasket;
 import org.mycore.frontend.basket.MCRBasketManager;
@@ -113,7 +114,7 @@ public class MCRBasketServlet extends MCRServlet {
         } else if ("show".equals(action)) {
             req.setAttribute("XSL.Style", type);
             Document xml = new MCRBasketXMLBuilder(true).buildXML(basket);
-            getLayoutService().doLayout(req, res, xml);
+            getLayoutService().doLayout(req, res, MCRContent.readFrom(xml));
             return;
         }
 

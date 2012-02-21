@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
@@ -73,7 +74,7 @@ public class MCRIndexBrowserServlet extends MCRServlet {
         if (getProperty(job.getRequest(), "XSL.Style") == null) {
             job.getRequest().setAttribute("XSL.Style", job.getRequest().getParameter("searchclass"));
         }
-        getLayoutService().doLayout(job.getRequest(), job.getResponse(), pageContent);
+        getLayoutService().doLayout(job.getRequest(), job.getResponse(), MCRContent.readFrom(pageContent));
     }
 
     /**

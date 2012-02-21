@@ -43,6 +43,7 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRFieldDef;
@@ -212,6 +213,6 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         if ((style != null) && (style.length() > 0))
             req.setAttribute("XSL.Style", style);
 
-        MCRServlet.getLayoutService().doLayout(req, job.getResponse(), new Document(xml));
+        MCRServlet.getLayoutService().doLayout(req, job.getResponse(), MCRContent.readFrom(new Document(xml)));
     }
 }

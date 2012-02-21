@@ -40,6 +40,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.xml.sax.SAXParseException;
@@ -95,7 +96,7 @@ public final class MCRXSLInfoServlet extends MCRServlet {
             Stylesheet stylesheet = entry.getValue();
             output.addContent(stylesheet.buildXML());
         }
-        getLayoutService().doLayout(job.getRequest(), job.getResponse(), new Document(output));
+        getLayoutService().doLayout(job.getRequest(), job.getResponse(), MCRContent.readFrom(new Document(output)));
     }
 
     private void findXSLinLibJars() throws IOException {

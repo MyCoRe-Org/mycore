@@ -25,6 +25,7 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
@@ -141,8 +142,8 @@ public class MCRBroadcastingServlet extends MCRServlet {
         Document jdom = new Document(root);
 
         if (xslTransformation)
-            getLayoutService().doLayout(request, response, jdom);
+            getLayoutService().doLayout(request, response, MCRContent.readFrom(jdom));
         else
-            getLayoutService().sendXML(request, response, jdom);
+            getLayoutService().sendXML(request, response, MCRContent.readFrom(jdom));
     }
 }

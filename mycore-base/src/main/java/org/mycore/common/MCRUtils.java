@@ -72,6 +72,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
@@ -947,8 +948,9 @@ public class MCRUtils {
      *         with the given revision
      * @throws IOException 
      * @throws JDOMException 
+     * @throws SAXParseException 
      */
-    public static Document requestVersionedObject(MCRObjectID objId, long revision) throws IOException, JDOMException {
+    public static Document requestVersionedObject(MCRObjectID objId, long revision) throws IOException, JDOMException, SAXParseException {
         LOGGER.info("Getting object " + objId + " in revision " + revision);
         MCRMetadataVersion version = getMetadataVersion(objId, revision);
         if (version != null) {

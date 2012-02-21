@@ -108,9 +108,9 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
         if (docTypesMap.containsKey(type)) {
             Document xml = MCRXMLParserFactory.getNonValidatingParser().parseXML(MCRContent.readFrom(file));
             MCREditorServlet.replaceEditorElements(request, file.toURI().toURL().toString(), xml);
-            getLayoutService().doLayout(request, response, xml);
+            getLayoutService().doLayout(request, response, MCRContent.readFrom(xml));
         } else {
-            getLayoutService().doLayout(request, response, file);
+            getLayoutService().doLayout(request, response, MCRContent.readFrom(file));
         }
     }
 }

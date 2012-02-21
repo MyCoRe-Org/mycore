@@ -40,6 +40,7 @@ import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.mets.model.MCRMETSGenerator;
@@ -69,38 +70,6 @@ public class MCRMETSServlet extends MCRServlet {
         /* default is one day */
         CACHE_TIME = cacheParam != null ? Integer.parseInt(cacheParam) : (60 * 60 * 24);
         useExpire = MCRConfiguration.instance().getBoolean("MCR.Component.MetsMods.Servlet.UseExpire", true);
-    }
-
-    @Override
-    protected void doGetPost(MCRServletJob job) throws Exception {
-        HttpServletRequest request = job.getRequest();
-        HttpServletResponse response = job.getResponse();
-        LOGGER.info(request.getPathInfo());
-
-        String derivate = getOwnerID(request.getPathInfo());
-        MCRDirectory dir = MCRDirectory.getRootDirectory(derivate);
-        if (dir == null) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, MessageFormat.format("Derivate {0} does not exist.", derivate));
-            return;
-        }
-        MCRFilesystemNode metsFile = dir.getChildByPath("mets.xml");
-        request.setAttribute("XSL.derivateID", derivate);
-        request.setAttribute("XSL.objectID", MCRLinkTableManager.instance().getSourceOf(derivate).iterator().next());
-
-        long lastModified = dir.getLastModified().getTimeInMillis();
-        response.setContentType("text/xml");
-        writeCacheHeaders(response, CACHE_TIME, lastModified, useExpire);
-        long start = System.currentTimeMillis();
-        if (metsFile != null && useExistingMets(request)) {
-            MCRLayoutService.instance().doLayout(request, response, ((MCRFile) metsFile).getContentAsInputStream());
-        } else {
-            HashSet<MCRFilesystemNode> ignoreNodes = new HashSet<MCRFilesystemNode>();
-            if (metsFile != null)
-                ignoreNodes.add(metsFile);
-            Document mets = MCRMETSGenerator.getGenerator().getMETS(dir, ignoreNodes).asDocument();
-            MCRLayoutService.instance().doLayout(request, response, mets);
-        }
-        LOGGER.info("Generation of code by " + this.getClass().getSimpleName() + " took " + (System.currentTimeMillis() - start) + " ms");
     }
 
     private boolean useExistingMets(HttpServletRequest request) {

@@ -43,6 +43,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.ifs2.MCRVersioningMetadataStore;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -121,9 +122,9 @@ public class MCRObjectServlet extends MCRServlet {
             if (localObject == null) {
                 return;
             }
-            getLayoutService().doLayout(job.getRequest(), job.getResponse(), localObject);
+            getLayoutService().doLayout(job.getRequest(), job.getResponse(), MCRContent.readFrom(localObject));
         } else {
-            getLayoutService().doLayout(job.getRequest(), job.getResponse(), requestRemoteObject(job));
+            getLayoutService().doLayout(job.getRequest(), job.getResponse(), MCRContent.readFrom(requestRemoteObject(job)));
         }
     }
 

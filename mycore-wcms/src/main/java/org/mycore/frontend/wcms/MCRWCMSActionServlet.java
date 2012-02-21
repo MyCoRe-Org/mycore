@@ -64,6 +64,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
@@ -404,10 +405,10 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
                     }
                     response.sendRedirect(jump);
                 } else {
-                    getLayoutService().doLayout(request, response, jdom);
+                    getLayoutService().doLayout(request, response, MCRContent.readFrom(jdom));
                 }
             } else {
-                getLayoutService().doLayout(request, response, jdom);
+                getLayoutService().doLayout(request, response, MCRContent.readFrom(jdom));
             }
         } catch (Exception e) {
             e.printStackTrace();

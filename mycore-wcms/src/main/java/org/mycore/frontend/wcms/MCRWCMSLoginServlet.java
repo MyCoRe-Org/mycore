@@ -34,6 +34,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.datamodel.ifs2.MCRContent;
 
 public class MCRWCMSLoginServlet extends MCRWCMSServlet {
 	private static final long serialVersionUID = 1L;
@@ -61,6 +62,6 @@ public class MCRWCMSLoginServlet extends MCRWCMSServlet {
         root.addContent(new Element("rootNode").setAttribute("href", "href value").setText("root node..."));
         root.addContent(new Element("modus").setText("true"));
         // do layout
-        getLayoutService().doLayout(request, response, jdom);
+        getLayoutService().doLayout(request, response, MCRContent.readFrom(jdom));
 	}    
 }

@@ -35,17 +35,28 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URL;
 
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.VFS;
 import org.jdom.Document;
 import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.jdom.transform.JDOMSource;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.xml.MCRXMLParserFactory;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXParseException;
 
 /**
  * Used to read/write content from any source to any target. Sources and targets
@@ -63,6 +74,10 @@ public class MCRContent {
      * The content itself
      */
     protected InputStream in;
+
+    protected Document jdom;
+
+    protected org.w3c.dom.Document dom;
 
     /**
      * If true, this content already was used and cannot be used again
@@ -86,6 +101,8 @@ public class MCRContent {
      * MCR.IFS2.PrettyXML=false.
      */
     private static Format xmlFormat;
+
+    private MCRContentFormat format;
 
     static {
         boolean prettyXML = MCRConfiguration.instance().getBoolean("MCR.IFS2.PrettyXML", true);
@@ -160,18 +177,15 @@ public class MCRContent {
      * written pretty-formatted, using UTF-8 encoding and line indentation 
      * depending on the property MCR.IFS2.PrettyXML=true
      * 
-     * @param xml
+     * @param jdom
      *            the XML document to read in as content
      */
-    public static MCRContent readFrom(Document xml) throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        XMLOutputter xout = new XMLOutputter(xmlFormat);
-        xout.output(xml, out);
-        out.close();
+    public static MCRContent readFrom(Document jdom) throws IOException {
+        return new MCRContent(jdom);
+    }
 
-        MCRContent content = readFrom(out.toByteArray());
-        content.isXML = true;
-        return content;
+    public static MCRContent readFrom(org.w3c.dom.Document dom) throws IOException {
+        return new MCRContent(dom);
     }
 
     /**
@@ -197,6 +211,21 @@ public class MCRContent {
     private MCRContent(InputStream in, String systemId) {
         this.in = in;
         this.systemId = systemId;
+        this.format = MCRContentFormat.INPUT_STREAM;
+    }
+
+    private MCRContent(Document jdom) throws IOException {
+        this.jdom = jdom;
+        this.format = MCRContentFormat.JDOM;
+        this.isXML = true;
+        this.systemId = null;
+    }
+
+    private MCRContent(org.w3c.dom.Document dom) throws IOException {
+        this.dom = dom;
+        this.format = MCRContentFormat.DOM;
+        this.isXML = true;
+        this.systemId = null;
     }
 
     /**
@@ -223,8 +252,9 @@ public class MCRContent {
 
     /**
      * Ensures that content is XML
+     * @throws SAXParseException 
      */
-    public MCRContent ensureXML() throws IOException, JDOMException {
+    public MCRContent ensureXML() throws IOException, JDOMException, SAXParseException {
         if (isXML) {
             return this;
         } else {
@@ -236,18 +266,39 @@ public class MCRContent {
      * Returns content as input stream. Be sure to close this stream properly!
      * 
      * @return input stream to read content from
+     * @throws IOException 
      */
-    public InputStream getInputStream() {
-        checkConsumed();
-        return in;
+    public InputStream getInputStream() throws IOException {
+        switch (getFormat()) {
+        case JDOM: {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            XMLOutputter xout = new XMLOutputter(xmlFormat);
+            xout.output(jdom, out);
+            out.close();
+            return new ByteArrayInputStream(out.toByteArray());
+        }
+        case DOM: {
+            Document doc = new org.jdom.input.DOMBuilder().build(dom);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            XMLOutputter xout = new XMLOutputter(xmlFormat);
+            xout.output(doc, out);
+            out.close();
+            return new ByteArrayInputStream(out.toByteArray());
+        }
+        default: {
+            return in;
+        }
+
+        }
     }
 
     /**
      * Returns content as SAX input source.
      * 
      * @return input source to read content from
+     * @throws IOException 
      */
-    public InputSource getInputSource() {
+    public InputSource getInputSource() throws IOException {
         InputSource source = new InputSource(getInputStream());
         source.setSystemId(systemId);
         return source;
@@ -258,8 +309,10 @@ public class MCRContent {
      * functionality. Be sure to close this stream properly!
      * 
      * @return the content input stream
+     * @throws IOException 
      */
-    public MCRContentInputStream getContentInputStream() {
+    public MCRContentInputStream getContentInputStream() throws IOException {
+        in = getInputStream();
         if (!(in instanceof MCRContentInputStream)) {
             in = new MCRContentInputStream(in);
         }
@@ -273,9 +326,32 @@ public class MCRContent {
      *            the OutputStream to write the content to
      */
     public void sendTo(OutputStream out) throws IOException {
-        checkConsumed();
-        MCRUtils.copyStream(in, out);
-        in.close();
+        switch (getFormat()) {
+        case JDOM:
+            XMLOutputter xout = new XMLOutputter(xmlFormat);
+            xout.output(this.jdom, out);
+            break;
+        case DOM:
+            try {
+                Transformer xformer = TransformerFactory.newInstance().newTransformer();
+                Result result = new StreamResult(out);
+                xformer.transform(getSource(), result);
+            } catch (Exception e) {
+                if (e instanceof IOException) {
+                    throw (IOException) e;
+                }
+                if (e instanceof RuntimeException) {
+                    throw (RuntimeException) e;
+                }
+                new IOException(e);
+            }
+            break;
+        default:
+            InputStream input = getInputStream();
+            MCRUtils.copyStream(input, out);
+            input.close();
+            break;
+        }
     }
 
     /**
@@ -306,12 +382,21 @@ public class MCRContent {
      * Parses content, assuming it is XML, and returns the parsed document.
      * 
      * @return the XML document parsed from content
+     * @throws SAXParseException 
+     * @throws MCRException 
      */
-    public Document asXML() throws JDOMException, IOException {
-        checkConsumed();
-        Document xml = new SAXBuilder().build(in);
-        in.close();
-        return xml;
+    public Document asXML() throws JDOMException, IOException, SAXParseException {
+        switch (getFormat()) {
+        case INPUT_STREAM: {
+            return MCRXMLParserFactory.getNonValidatingParser().parseXML(this);
+        }
+        case DOM: {
+            return new org.jdom.input.DOMBuilder().build(dom);
+        }
+        default: {
+            return (Document) jdom.clone();
+        }
+        }
     }
 
     /**
@@ -367,14 +452,76 @@ public class MCRContent {
      */
     public MCRContent[] makeCopies(int numCopies) throws IOException {
         MCRContent[] copies = new MCRContent[numCopies];
-        byte[] bytes = asByteArray();
-        for (int i = 0; i < numCopies; i++) {
-            copies[i] = MCRContent.readFrom(bytes, systemId);
+        switch (getFormat()) {
+        case JDOM: {
+            for (int i = 0; i < numCopies; i++) {
+                copies[i] = MCRContent.readFrom((Document) jdom.clone());
+            }
+            return copies;
         }
-        return copies;
+        case DOM: {
+            for (int i = 0; i < numCopies; i++) {
+                copies[i] = MCRContent.readFrom((org.w3c.dom.Document) dom.cloneNode(true));
+            }
+            return copies;
+        }
+        default: {
+            byte[] bytes = asByteArray();
+            for (int i = 0; i < numCopies; i++) {
+                copies[i] = MCRContent.readFrom(bytes, systemId);
+            }
+            return copies;
+        }
+        }
     }
 
     public String getSystemId() {
         return systemId;
+    }
+
+    /**
+     * Return the document type of the content
+     * @return document type as String
+     */
+    public String getDocType() {
+        switch (getFormat()) {
+        case JDOM: {
+            return jdom.getDocType() == null ? jdom.getRootElement().getName() : jdom.getDocType().getElementName();
+        }
+        case DOM: {
+            return dom.getDoctype() == null ? dom.getDocumentElement().getLocalName() : dom.getDoctype().getName();
+        }
+        default: {
+            String docType = MCRUtils.parseDocumentType(in);
+            int pos = docType.indexOf(':') + 1;
+            if (pos > 0) {
+                //filter namespace prefix
+                docType = docType.substring(pos);
+            }
+            return docType;
+        }
+        }	
+    }
+
+    /**
+     * Return the content as Source
+     * @return content as Source
+     */
+    public Source getSource() {
+        switch (getFormat()) {
+        case JDOM: {
+            return new JDOMSource(jdom);
+        }
+        case DOM: {
+            return new DOMSource(dom);
+        }
+        default: {
+            return new StreamSource(in);
+        }
+        }
+    }
+
+    public MCRContentFormat getFormat() {
+        return format;
     }
 }

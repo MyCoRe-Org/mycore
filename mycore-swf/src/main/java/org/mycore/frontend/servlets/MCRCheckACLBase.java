@@ -38,6 +38,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
@@ -334,7 +335,7 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
 
         // restart editor
         job.getRequest().setAttribute("XSL.Style", lang);
-        getLayoutService().doLayout(job.getRequest(), job.getResponse(), jdom);
+        getLayoutService().doLayout(job.getRequest(), job.getResponse(), MCRContent.readFrom(jdom));
     }
     
 }

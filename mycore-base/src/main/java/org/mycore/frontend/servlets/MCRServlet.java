@@ -58,6 +58,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.common.MCRActiveLinkException;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.services.i18n.MCRTranslation;
 
 /**
@@ -478,7 +479,7 @@ public class MCRServlet extends HttpServlet {
         if (!response.isCommitted() && request.getAttribute(requestAttr) == null) {
             response.setStatus(error);
             request.setAttribute(requestAttr, msg);
-            LAYOUT_SERVICE.doLayout(request, response, errorDoc);
+            LAYOUT_SERVICE.doLayout(request, response, MCRContent.readFrom(errorDoc));
             return;
         } else {
             if (request.getAttribute(requestAttr) != null) {

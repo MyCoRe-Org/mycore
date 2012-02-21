@@ -42,6 +42,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.xml.MCRLayoutService;
+import org.mycore.datamodel.ifs2.MCRContent;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -162,7 +163,7 @@ public class MCRErrorServlet extends HttpServlet {
                     session.beginTransaction();
                 }
                 setWebAppBaseURL(session, request);
-                LAYOUT_SERVICE.doLayout(request, response, errorDoc);
+                LAYOUT_SERVICE.doLayout(request, response, MCRContent.readFrom(errorDoc));
                 if (!openTransaction)
                     session.commitTransaction();
                 return;

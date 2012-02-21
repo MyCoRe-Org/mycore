@@ -30,6 +30,7 @@ import javax.servlet.ServletException;
 import org.jdom.Document;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
@@ -119,6 +120,6 @@ public class MCRUserAdminGUICommons extends MCRServlet {
 
         job.getRequest().getSession().setAttribute("mycore.language", language);
         job.getRequest().setAttribute("XSL.Style", styleSheet);
-        getLayoutService().doLayout(job.getRequest(), job.getResponse(), jdomDoc);
+        getLayoutService().doLayout(job.getRequest(), job.getResponse(), MCRContent.readFrom(jdomDoc));
     }
 }

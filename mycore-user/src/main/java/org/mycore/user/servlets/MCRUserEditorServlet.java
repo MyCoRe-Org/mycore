@@ -34,6 +34,7 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
@@ -137,7 +138,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
             return;
         }
         org.jdom.Document jdomDoc = new org.jdom.Document(root);
-        getLayoutService().sendXML(job.getRequest(), job.getResponse(), jdomDoc);
+        getLayoutService().sendXML(job.getRequest(), job.getResponse(), MCRContent.readFrom(jdomDoc));
     }
 
     /**
@@ -157,7 +158,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
     private void getAllGroups(MCRServletJob job) throws IOException {
         try {
             Document jdomDoc = MCRUserEditorHandler.getAllGroups();
-            getLayoutService().sendXML(job.getRequest(), job.getResponse(), jdomDoc);
+            getLayoutService().sendXML(job.getRequest(), job.getResponse(), MCRContent.readFrom(jdomDoc));
         } catch(MCRAccessException exc) {
             showNoPrivsPage(job);
         }
@@ -180,7 +181,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
     private void getAllUsers(MCRServletJob job) throws IOException {
         try {
             Document jdomDoc = MCRUserEditorHandler.getAllUsers();
-            getLayoutService().sendXML(job.getRequest(), job.getResponse(), jdomDoc);
+            getLayoutService().sendXML(job.getRequest(), job.getResponse(), MCRContent.readFrom(jdomDoc));
         } catch(MCRAccessException exc) {
             showNoPrivsPage(job);
         }
@@ -226,7 +227,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
         try {
             String userID = getProperty(job.getRequest(), "uid");
             Document jdomDoc = MCRUserEditorHandler.retrieveUserXml(userID);
-            getLayoutService().sendXML(job.getRequest(), job.getResponse(), jdomDoc);
+            getLayoutService().sendXML(job.getRequest(), job.getResponse(), MCRContent.readFrom(jdomDoc));
         } catch(MCRAccessException ex) {
             showNoPrivsPage(job);
         } catch (MCRException ex) {
@@ -246,7 +247,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
         try {
             String groupID = getProperty(job.getRequest(), "gid");
             Document jdomDoc = MCRUserEditorHandler.retrieveGroupXml(groupID);
-            getLayoutService().sendXML(job.getRequest(), job.getResponse(), jdomDoc);
+            getLayoutService().sendXML(job.getRequest(), job.getResponse(), MCRContent.readFrom(jdomDoc));
         } catch(MCRAccessException ex) {
             showNoPrivsPage(job);
         } catch (MCRException ex) {

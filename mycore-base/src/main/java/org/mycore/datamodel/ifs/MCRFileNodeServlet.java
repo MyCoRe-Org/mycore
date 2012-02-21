@@ -40,6 +40,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
@@ -295,7 +296,7 @@ public class MCRFileNodeServlet extends MCRServlet {
      * see overwritten in JSPDocportal
      */
     protected void layoutDirectory(HttpServletRequest req, HttpServletResponse res, Document jdom) throws IOException {
-        getLayoutService().doLayout(req, res, jdom);
+        getLayoutService().doLayout(req, res, MCRContent.readFrom(jdom));
     }
 
     /**

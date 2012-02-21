@@ -6,6 +6,7 @@ import java.util.Map;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.mycore.datamodel.common.MCRLinkTableManager;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -61,7 +62,7 @@ public class MCRDerivateLinkServlet extends MCRServlet {
         rootElement.setAttribute("webpage", webpage);
 
         // transform & display the generated xml document
-        getLayoutService().doLayout(job.getRequest(), job.getResponse(), new Document(rootElement));
+        getLayoutService().doLayout(job.getRequest(), job.getResponse(), MCRContent.readFrom(new Document(rootElement)));
     }
 
     /**

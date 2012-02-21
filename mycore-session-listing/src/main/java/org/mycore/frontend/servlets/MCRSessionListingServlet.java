@@ -37,6 +37,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.xml.MCRLayoutService;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.services.i18n.MCRTranslation;
 
 public class MCRSessionListingServlet extends MCRServlet {
@@ -48,7 +49,7 @@ public class MCRSessionListingServlet extends MCRServlet {
             return;
         }
         Document sessionsXML = getSessions();
-        MCRLayoutService.instance().doLayout(job.getRequest(), job.getResponse(), sessionsXML);
+        MCRLayoutService.instance().doLayout(job.getRequest(), job.getResponse(), MCRContent.readFrom(sessionsXML));
     }
 
     private Document getSessions() {

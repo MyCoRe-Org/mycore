@@ -29,6 +29,7 @@ import java.util.Date;
 import org.apache.commons.vfs.FileObject;
 import org.jdom.JDOMException;
 import org.mycore.common.MCRUsageException;
+import org.xml.sax.SAXParseException;
 
 /**
  * Represents an XML metadata document that is stored in MCRMetadataStore.
@@ -71,7 +72,11 @@ public class MCRStoredMetadata {
      */
     void create(MCRContent xml) throws IOException, JDOMException {
         if (store.shouldForceXML()) {
-            xml = xml.ensureXML();
+            try {
+                xml = xml.ensureXML();
+            } catch (SAXParseException e) {
+                throw new IOException(e);
+            }
         }
         fo.createFile();
         xml.sendTo(fo);
@@ -90,7 +95,11 @@ public class MCRStoredMetadata {
             throw new MCRUsageException(msg);
         }
         if (store.shouldForceXML()) {
-            xml = xml.ensureXML();
+            try {
+                xml = xml.ensureXML();
+            } catch (SAXParseException e) {
+                throw new IOException(e);
+            }
         }
         xml.sendTo(fo);
     }

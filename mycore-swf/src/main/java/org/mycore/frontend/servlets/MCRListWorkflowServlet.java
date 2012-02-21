@@ -394,6 +394,6 @@ public class MCRListWorkflowServlet extends MCRServlet {
         }
 
         org.jdom.Document workflow_doc = new org.jdom.Document(root);
-        getLayoutService().doLayout(job.getRequest(), job.getResponse(), workflow_doc);
+        getLayoutService().doLayout(job.getRequest(), job.getResponse(), MCRContent.readFrom(workflow_doc));
     }
 }

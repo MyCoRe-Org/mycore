@@ -24,6 +24,7 @@
 package org.mycore.frontend.servlets;
 
 import org.mycore.datamodel.classifications.MCRClassificationData;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.apache.log4j.Logger;
 import org.mycore.common.*;
@@ -145,7 +146,7 @@ public class MCRClassificationBrowser extends MCRServlet {
             LOGGER.info("Set XSL.Style to: " + styleBase);
             job.getRequest().setAttribute("XSL.Style", styleBase);
         }
-        getLayoutService().doLayout(job.getRequest(), job.getResponse(), jdomDoc);
+        getLayoutService().doLayout(job.getRequest(), job.getResponse(), MCRContent.readFrom(jdomDoc));
     }
 
 }

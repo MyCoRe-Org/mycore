@@ -36,6 +36,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.common.MCRLinkTableManager;
+import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRResults;
 
@@ -138,7 +139,7 @@ public class MCRLinkServlet extends MCRServlet {
      * see its overwritten in jspdocportal
      */
     protected void sendToLayout(HttpServletRequest req, HttpServletResponse res, Document jdom) throws IOException {
-        getLayoutService().doLayout(req, res, jdom);
+        getLayoutService().doLayout(req, res, MCRContent.readFrom(jdom));
     }
 
 }
