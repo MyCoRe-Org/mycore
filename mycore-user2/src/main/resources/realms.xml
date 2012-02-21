@@ -7,15 +7,28 @@
     <login url="../authorization/login.xml">
       <label xml:lang="de">Anmeldung mit lokaler Nutzerkennung</label>
       <label xml:lang="en">Login with local user account</label>
+      <info>
+        <label xml:lang="de">
+          Diese Kennung gilt nur für diese Anwendung.
+        </label>
+        <label xml:lang="en">
+          This account is local for this application only.
+        </label>
+      </info>
     </login>
+    <!-- 
+    <create url="../authorization/create-account.xml">
+      <label xml:lang="de">Neue persönliche Benutzerkennung einrichten</label>
+      <label xml:lang="en">Generate a new personal user account</label>
+      <info>
+        <label xml:lang="de">Sie können Sie hier selbst eine neue Benutzerkennung nur für diese Anwendung erstellen.</label>
+        <label xml:lang="en">If you still have no user account for this application, here you can generate yourself a personal user
+          account.
+          You need an own, personal user account, however, only if you want to place documents in this application.
+        </label>
+      </info>
+    </create>
+     -->
     <passwordChangeURL>../authorization/change-password.xml?action=password</passwordChangeURL>
-    <info>
-      <label xml:lang="de">
-        Diese Kennung gilt nur für diese Anwendung.
-      </label>
-      <label xml:lang="en">
-        This account is local for this application only.
-      </label>
-    </info>
   </realm>
 </realms>

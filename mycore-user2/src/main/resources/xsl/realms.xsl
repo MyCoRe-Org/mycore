@@ -6,8 +6,8 @@
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation">
 
   <xsl:include href="MyCoReLayout.xsl" />
-  
-  <xsl:param name="MCR.NameOfProject" select="'MyCoRe'"/>
+
+  <xsl:param name="MCR.NameOfProject" select="'MyCoRe'" />
 
   <xsl:variable name="PageTitle" select="i18n:translate('component.user2.login.realms')" />
   <xsl:variable name="PageID" select="'login'" />
@@ -16,7 +16,7 @@
     <div class="section">
       <p>
         <xsl:variable name="currentAccount">
-          <xsl:value-of select="'&lt;strong&gt;'"/>
+          <xsl:value-of select="'&lt;strong&gt;'" />
           <xsl:choose>
             <xsl:when test="@guest='true'">
               <xsl:value-of select="i18n:translate('component.user2.login.guest')" />
@@ -25,7 +25,7 @@
               <xsl:value-of select="concat(@user,' [',@realm,']')" />
             </xsl:otherwise>
           </xsl:choose>
-          <xsl:value-of select="'&lt;/strong&gt;'"/>
+          <xsl:value-of select="'&lt;/strong&gt;'" />
         </xsl:variable>
         <xsl:value-of select="i18n:translate('component.user2.login.currentAccount', $currentAccount)" disable-output-escaping="yes" />
       </p>
@@ -36,52 +36,19 @@
           <xsl:value-of select="i18n:translate('component.user2.login.select')" />
         </strong>
         <br />
-        <ul class="realms">
-          <xsl:if test="@guest != 'true'">
-            <li>
-              <a href="{$ServletsBaseURL}logout">
-                <xsl:value-of select="i18n:translate('component.user2.login.logout')" />
-              </a>
-              <div>
-                <xsl:value-of select="i18n:translate('component.user2.login.openAccess')" />
-              </div>
-            </li>
-          </xsl:if>
-          <xsl:for-each select="realm">
-            <li>
-              <xsl:for-each select="login">
-                <xsl:variable name="lang">
-                  <xsl:call-template name="selectPresentLang">
-                    <xsl:with-param name="nodes" select="label" />
-                  </xsl:call-template>
-                </xsl:variable>
-                <a href="{@url}">
-                  <xsl:value-of select="label[lang($lang)]" />
-                </a>
-              </xsl:for-each>
-              <xsl:for-each select="info">
-                <xsl:variable name="lang">
-                  <xsl:call-template name="selectPresentLang">
-                    <xsl:with-param name="nodes" select="label" />
-                  </xsl:call-template>
-                </xsl:variable>
-                <div>
-                  <xsl:value-of select="label[lang($lang)]" />
-                </div>
-              </xsl:for-each>
-            </li>
-          </xsl:for-each>
-          <xsl:if test="not(@createAccount = 'false')">
-            <li>
-              <a href="{$WebApplicationBaseURL}authoring/createAccount.xml?step=createAccount">
-                <xsl:value-of select="i18n:translate('component.user2.login.useraccount')" />
-              </a>
-              <div>
-                <xsl:value-of select="i18n:translate('component.user2.login.useraccountText', $MCR.NameOfProject)" />
-              </div>
-            </li>
-          </xsl:if>
-        </ul>
+        <xsl:if test="@guest != 'true'">
+          <li>
+            <a href="{$ServletsBaseURL}logout">
+              <xsl:value-of select="i18n:translate('component.user2.login.logout')" />
+            </a>
+            <div>
+              <xsl:value-of select="i18n:translate('component.user2.login.openAccess')" />
+            </div>
+          </li>
+        </xsl:if>
+        <dl class="realms">
+          <xsl:apply-templates select="realm" />
+        </dl>
       </p>
       <p>
         <form method="get" action="{$ServletsBaseURL}MCRLoginServlet" class="action">
@@ -89,6 +56,42 @@
           <input value="{i18n:translate('component.user2.button.cancel')}" class="action" type="submit" />
         </form>
       </p>
+    </div>
+  </xsl:template>
+
+  <xsl:template match="*[label]" mode="printLabel">
+    <xsl:variable name="lang">
+      <xsl:call-template name="selectPresentLang">
+        <xsl:with-param name="nodes" select="label" />
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:value-of select="label[lang($lang)]" />
+  </xsl:template>
+
+  <xsl:template match="realm">
+    <dt>
+      <xsl:apply-templates select="." mode="printLabel" />
+    </dt>
+    <dd>
+      <ul>
+        <xsl:apply-templates select="login" />
+        <xsl:apply-templates select="create" />
+      </ul>
+    </dd>
+  </xsl:template>
+
+  <xsl:template match="login|create">
+    <li>
+      <a href="{@url}">
+        <xsl:apply-templates select="." mode="printLabel" />
+      </a>
+      <xsl:apply-templates select="info" />
+    </li>
+  </xsl:template>
+
+  <xsl:template match="info">
+    <div>
+      <xsl:apply-templates select="." mode="printLabel" />
     </div>
   </xsl:template>
 
