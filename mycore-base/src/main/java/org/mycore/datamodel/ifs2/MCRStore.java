@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
-import org.apache.commons.vfs.FileDepthSelector;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
@@ -74,7 +73,7 @@ import org.mycore.common.MCRException;
  * @author Frank Lützenkirchen
  */
 public abstract class MCRStore {
-    
+
     public interface MCRStoreConfig {
 
         public String getID();
@@ -225,10 +224,11 @@ public abstract class MCRStore {
         String id = numWithLeadingZerosFormat.format(ID);
         return id;
     }
-    
-    /** Returns the maximum length of any ID stored in this store */  
-    int getIDLength()
-    { return idLength; }
+
+    /** Returns the maximum length of any ID stored in this store */
+    int getIDLength() {
+        return idLength;
+    }
 
     /**
      * Returns true if data for the given ID is existing in the store.
@@ -311,13 +311,28 @@ public abstract class MCRStore {
      * @return the highest slot file name / ID currently stored
      */
     private String findMaxID(FileObject dir, int depth) throws FileSystemException {
-        FileObject[] children = dir.findFiles(new FileDepthSelector(slotLength.length + 1, slotLength.length + 1));
+        FileObject[] children = dir.getChildren();
+
+        if (children.length == 0) {
+            return null;
+        }
+
         Arrays.sort(children, new MCRFileObjectComparator());
 
-        if (children.length > 0) {
+        if (depth == slotLength.length) {
             return children[children.length - 1].getName().getBaseName();
         }
 
+        for (int i = children.length - 1; i >= 0; i--) {
+            FileObject child = children[i];
+            if (!child.getType().hasChildren()) {
+                continue;
+            }
+            String found = findMaxID(child, depth + 1);
+            if (found != null) {
+                return found;
+            }
+        }
         return null;
     }
 
