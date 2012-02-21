@@ -79,7 +79,7 @@
 
     <cell row="2" col="3" anchor="WEST" style="width: 370px;" var="realm/@id">
       <list type="dropdown">
-        <include uri="xslStyle:realms2items:resource:realms.xml" />
+        <include uri="xslStyle:realms2items:realm:all" />
       </list>
     </cell>
 

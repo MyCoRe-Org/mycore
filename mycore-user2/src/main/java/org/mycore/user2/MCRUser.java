@@ -114,7 +114,7 @@ public class MCRUser implements MCRUserInformation {
      * @param userName the login user name
      */
     public MCRUser(String userName) {
-        this(userName, MCRRealm.getLocalRealm().getID());
+        this(userName, MCRRealmFactory.getLocalRealm().getID());
     }
 
     /**
@@ -144,7 +144,7 @@ public class MCRUser implements MCRUserInformation {
      * @return the realm the user belongs to.
      */
     public MCRRealm getRealm() {
-        return MCRRealm.getRealm(realmID);
+        return MCRRealmFactory.getRealm(realmID);
     }
 
     /**
@@ -164,7 +164,7 @@ public class MCRUser implements MCRUserInformation {
      * @param realmID the ID of the realm the user belongs to.
      */
     void setRealmID(String realmID) {
-        setRealm(MCRRealm.getRealm(realmID));
+        setRealm(MCRRealmFactory.getRealm(realmID));
     }
 
     /**
@@ -387,7 +387,7 @@ public class MCRUser implements MCRUserInformation {
     @Override
     public String getUserID() {
         String cuid = this.getUserName();
-        if (!getRealm().equals(MCRRealm.getLocalRealm()))
+        if (!getRealm().equals(MCRRealmFactory.getLocalRealm()))
             cuid += "@" + getRealmID();
 
         return cuid;

@@ -39,6 +39,7 @@ import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.user2.MCRRealm;
+import org.mycore.user2.MCRRealmFactory;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
@@ -155,7 +156,7 @@ public class MCRLoginServlet extends MCRServlet {
         MCRUserInformation userInfo = MCRSessionMgr.getCurrentSession().getUserInformation();
         realms = (Element) (realms.clone());
         realms.setAttribute("user", userInfo.getUserID());
-        realms.setAttribute("realm", (userInfo instanceof MCRUser) ? ((MCRUser) userInfo).getRealm().getLabel() : MCRRealm.getLocalRealm().getLabel());
+        realms.setAttribute("realm", (userInfo instanceof MCRUser) ? ((MCRUser) userInfo).getRealm().getLabel() : MCRRealmFactory.getLocalRealm().getLabel());
         realms.setAttribute("guest", String.valueOf(currentUserIsGuest()));
         getLayoutService().doLayout(req, res, new Document(realms));
     }
@@ -173,7 +174,7 @@ public class MCRLoginServlet extends MCRServlet {
 
     private void loginToRealm(HttpServletRequest req, HttpServletResponse res, String realmID) throws Exception {
         storeURL(req.getParameter(LOGIN_REDIRECT_URL_PARAMETER));
-        MCRRealm realm = MCRRealm.getRealm(realmID);
+        MCRRealm realm = MCRRealmFactory.getRealm(realmID);
         String loginURL = realm.getLoginURL();
         res.sendRedirect(loginURL);
     }
@@ -240,7 +241,7 @@ public class MCRLoginServlet extends MCRServlet {
             return false;
 
         MCRUser user = MCRUserManager.getUser(userName);
-        if (!user.getRealm().equals(MCRRealm.getLocalRealm()))
+        if (!user.getRealm().equals(MCRRealmFactory.getLocalRealm()))
             return false; // Do not login remote users, only local realm
         return MCRUserManager.checkPassword(userName, password) != null;
     }

@@ -50,6 +50,8 @@ import org.mycore.user2.utils.MCRUserTransformer;
  *
  */
 public class MCRUserManagerTest extends MCRHibTestCase {
+    public static final String RESOURCE_REALMS_URI = MCRRealmFactory.RESOURCE_REALMS_URI;
+    public static final String REALMS_URI_CFG_KEY = MCRRealmFactory.REALMS_URI_CFG_KEY;
     MCRUser user;
 
     @BeforeClass
@@ -76,6 +78,7 @@ public class MCRUserManagerTest extends MCRHibTestCase {
         user.setRealName("Test Case");
         user.setPassword("test");
         MCRUserManager.createUser(user);
+        setProperty(REALMS_URI_CFG_KEY, RESOURCE_REALMS_URI, true);
     }
 
     /* (non-Javadoc)
@@ -92,7 +95,7 @@ public class MCRUserManagerTest extends MCRHibTestCase {
     @Test
     public final void testGetUserStringMCRRealm() {
         assertNull("Should not load user.", MCRUserManager.getUser(this.user.getUserName(), ""));
-        MCRUser user = MCRUserManager.getUser(this.user.getUserName(), MCRRealm.getLocalRealm());
+        MCRUser user = MCRUserManager.getUser(this.user.getUserName(), MCRRealmFactory.getLocalRealm());
         assertNotNull("Could not load user.", user);
         assertEquals("Password hash is not as expected", "test", user.getPassword());
     }

@@ -43,6 +43,7 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImplTest;
+import org.mycore.user2.MCRRealmFactory;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 import org.mycore.user2.MCRUserManagerTest;
@@ -70,6 +71,7 @@ public class MCRUserTransformerTest extends MCRHibTestCase {
         MCRCategory groupsCategory = MCRCategoryDAOImplTest.loadClassificationResource("/mcr-groups.xml");
         MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
         DAO.addCategory(null, groupsCategory);
+        setProperty(MCRUserManagerTest.REALMS_URI_CFG_KEY, MCRUserManagerTest.RESOURCE_REALMS_URI, true);
     }
 
     /**
@@ -81,7 +83,7 @@ public class MCRUserTransformerTest extends MCRHibTestCase {
         Element input = MCRURIResolver.instance().resolve("resource:test-user.xml");
         MCRUser mcrUser = MCRUserTransformer.buildMCRUser(input);
         Element output = MCRUserTransformer.buildExportableXML(mcrUser);
-        XMLOutputter xout=new XMLOutputter(Format.getPrettyFormat());
+        XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
         xout.output(input, System.out);
         xout.output(output, System.out);
         assertTrue("Input element is not the same as outputElement", MCRXMLHelper.deepEqual(input, output));

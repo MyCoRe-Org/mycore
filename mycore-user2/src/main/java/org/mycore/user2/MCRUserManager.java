@@ -77,7 +77,7 @@ public class MCRUserManager {
      */
     public static MCRUser getUser(String userName) {
         if (!userName.contains("@"))
-            return getUser(userName, MCRRealm.getLocalRealm());
+            return getUser(userName, MCRRealmFactory.getLocalRealm());
         else {
             String[] parts = userName.split("@");
             return getUser(parts[0], parts[1]);
@@ -133,7 +133,7 @@ public class MCRUserManager {
      * @return true, if a user with the given login name exists.
      */
     public static boolean exists(String userName) {
-        return exists(userName, MCRRealm.getLocalRealm());
+        return exists(userName, MCRRealmFactory.getLocalRealm());
     }
 
     /**
@@ -223,7 +223,7 @@ public class MCRUserManager {
      */
     public static void deleteUser(String userName) {
         if (!userName.contains("@"))
-            deleteUser(userName, MCRRealm.getLocalRealm());
+            deleteUser(userName, MCRRealmFactory.getLocalRealm());
         else {
             String[] parts = userName.split("@");
             deleteUser(parts[0], parts[1]);
@@ -454,7 +454,7 @@ public class MCRUserManager {
 
     private static Criterion getUserRealmCriterion(String user, String realmId) {
         if (realmId == null) {
-            realmId = MCRRealm.getLocalRealm().getID();
+            realmId = MCRRealmFactory.getLocalRealm().getID();
         }
         return Restrictions.naturalId().set("userName", user).set("realmID", realmId);
     }

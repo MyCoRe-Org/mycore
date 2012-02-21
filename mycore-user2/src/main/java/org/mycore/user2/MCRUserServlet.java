@@ -59,7 +59,7 @@ public class MCRUserServlet extends MCRServlet {
     public void doGetPost(MCRServletJob job) throws Exception {
         HttpServletRequest req = job.getRequest();
         HttpServletResponse res = job.getResponse();
-        if (forbidIfGuest(res)){
+        if (forbidIfGuest(res)) {
             return;
         }
         String action = req.getParameter("action");
@@ -147,13 +147,15 @@ public class MCRUserServlet extends MCRServlet {
     public static boolean checkUserName(Element u) {
         String userName = u.getAttributeValue("name");
 
-        String realmID = MCRRealm.getLocalRealm().getID();
-        if (u.getChild("realm") != null)
+        String realmID = MCRRealmFactory.getLocalRealm().getID();
+        if (u.getChild("realm") != null) {
             realmID = u.getChild("realm").getAttributeValue("id");
+        }
 
         // Check for required fields is done in the editor form itself, not here
-        if ((userName == null) || (realmID == null))
+        if ((userName == null) || (realmID == null)) {
             return true;
+        }
 
         // In all other cases, combination of userName and realm must not exist
         return !MCRUserManager.exists(userName, realmID);
@@ -181,7 +183,7 @@ public class MCRUserServlet extends MCRServlet {
         Element u = sub.getXML().getRootElement();
         String userName = u.getAttributeValue("name");
 
-        String realmID = MCRRealm.getLocalRealm().getID();
+        String realmID = MCRRealmFactory.getLocalRealm().getID();
         if (hasAdminPermission) {
             realmID = u.getChild("realm").getAttributeValue("id");
         }
@@ -194,7 +196,7 @@ public class MCRUserServlet extends MCRServlet {
 
             // For new local users, set password
             String pwd = u.getChildText("password");
-            if ((pwd != null) && (pwd.trim().length() > 0) && user.getRealm().equals(MCRRealm.getLocalRealm())) {
+            if ((pwd != null) && (pwd.trim().length() > 0) && user.getRealm().equals(MCRRealmFactory.getLocalRealm())) {
                 MCRUserManager.updatePasswordHashToSHA1(user, pwd);
             }
         } else {
@@ -261,7 +263,7 @@ public class MCRUserServlet extends MCRServlet {
             }
         } else // save read user of creator
         {
-            user.setRealm(MCRRealm.getLocalRealm());
+            user.setRealm(MCRRealmFactory.getLocalRealm());
             user.setOwner(currentUser);
         }
 
