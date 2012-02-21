@@ -834,9 +834,16 @@
                 </td>
                 <td class="metavalue">
                   <!-- Conference -->
-                  <xsl:call-template name="objectLink">
-                    <xsl:with-param select="$parentID" name="obj_id" />
-                  </xsl:call-template>
+                  <xsl:choose>
+                    <xsl:when test="string-length($parentID)!=0">
+                      <xsl:call-template name="objectLink">
+                        <xsl:with-param select="$parentID" name="obj_id" />
+                      </xsl:call-template>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="mods:titleInfo/mods:title" />
+                    </xsl:otherwise>
+                  </xsl:choose>
                   <xsl:text disable-output-escaping="yes">&lt;br /></xsl:text>
                   <xsl:for-each select="mods:part/mods:extent[@unit='pages']">
                     <xsl:call-template name="printMetaDate.mods.extent" />
@@ -982,9 +989,16 @@
                 </td>
                 <td class="metavalue">
                   <!-- Book -->
-                  <xsl:call-template name="objectLink">
-                    <xsl:with-param select="$parentID" name="obj_id" />
-                  </xsl:call-template>
+                  <xsl:choose>
+                    <xsl:when test="string-length($parentID)!=0">
+                      <xsl:call-template name="objectLink">
+                        <xsl:with-param select="$parentID" name="obj_id" />
+                      </xsl:call-template>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="mods:titleInfo/mods:title" />
+                    </xsl:otherwise>
+                  </xsl:choose>
                   <xsl:text disable-output-escaping="yes">&lt;br /></xsl:text>
                   <xsl:for-each select="mods:part/mods:extent[@unit='pages']">
                     <xsl:call-template name="printMetaDate.mods.extent" />
@@ -1177,9 +1191,16 @@
                 </td>
                 <td class="metavalue">
                   <!-- Journal -->
-                  <xsl:call-template name="objectLink">
-                    <xsl:with-param select="$parentID" name="obj_id" />
-                  </xsl:call-template>
+                  <xsl:choose>
+                    <xsl:when test="string-length($parentID)!=0">
+                      <xsl:call-template name="objectLink">
+                        <xsl:with-param select="$parentID" name="obj_id" />
+                      </xsl:call-template>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="mods:titleInfo/mods:title" />
+                    </xsl:otherwise>
+                  </xsl:choose>
                   <xsl:text disable-output-escaping="yes">&lt;br /></xsl:text>
                   <!-- Issue -->
                   <xsl:value-of
