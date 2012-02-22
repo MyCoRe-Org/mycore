@@ -23,8 +23,6 @@
 
 package org.mycore.datamodel.ifs2;
 
-import java.io.FilterInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
@@ -42,18 +40,7 @@ import org.mycore.common.MCRException;
  * 
  * @author Frank Lützenkirchen
  */
-public class MCRContentInputStream extends FilterInputStream {
-    /** The number of bytes that will be read for content type detection */
-    protected final static int headerSize = 65536;
-
-    /** The MD5 checksum of all bytes read through this stream */
-    protected MessageDigest digest = null;
-
-    /** The total number of bytes read so far */
-    protected long length;
-
-    /** The header of the file read */
-    protected byte[] header;
+public class MCRContentInputStream extends MCRHeaderInputStream {
 
     /**
      * Constructs a new MCRContentInputStream
@@ -64,83 +51,11 @@ public class MCRContentInputStream extends FilterInputStream {
      *             if java classes supporting MD5 checksums are not found
      */
     public MCRContentInputStream(InputStream in) throws MCRException {
-        super(null);
-
-        digest = buildMD5Digest();
-
-        DigestInputStream dis = new DigestInputStream(in, digest);
-        MCRBlockingInputStream bis = new MCRBlockingInputStream(dis, headerSize);
-
-        byte[] buffer = new byte[headerSize];
-
-        try {
-            int num = bis.read(buffer, 0, buffer.length);
-            header = new byte[Math.max(0, num)];
-
-            if (num > 0) {
-                System.arraycopy(buffer, 0, header, 0, num);
-            }
-        } catch (IOException ex) {
-            String msg = "Error while reading content input stream header";
-            throw new MCRException(msg, ex);
-        }
-
-        this.in = bis;
+        super(new DigestInputStream(in, buildMD5Digest()));
     }
 
-    @Override
-    public int read() throws IOException {
-        int b;
-
-        // if current position is in header buffer, return value from there
-        if (header.length > 0 && length < header.length) {
-            b = header[(int) length];
-            length++;
-        } else {
-            b = super.read();
-            if (b != -1) {
-                length++;
-            }
-        }
-
-        return b;
-    }
-
-    @Override
-    public int read(byte[] buf, int off, int len) throws IOException {
-        // if current position is in header buffer, return bytes from there
-        if (header.length > 0 && length < header.length) {
-            int numAvail = header.length - (int) length;
-            len = Math.min(len, numAvail);
-            System.arraycopy(header, (int) length, buf, off, len);
-            length += len;
-            return len;
-        } else {
-            len = super.read(buf, off, len);
-            if (len != -1) {
-                length += len;
-            }
-            return len;
-        }
-    }
-
-    /**
-     * Returns the first 64 k of the underlying input stream. This is used for
-     * content type detection during file import into MyCoRe.
-     * 
-     * @return the first 64 k of the input stream
-     */
-    public byte[] getHeader() {
-        return header;
-    }
-
-    /**
-     * Returns the number of bytes read so far
-     * 
-     * @return the number of bytes read
-     */
-    public long getLength() {
-        return length;
+    private MessageDigest getDigest() {
+        return ((DigestInputStream) in).getMessageDigest();
     }
 
     /**
@@ -150,7 +65,7 @@ public class MCRContentInputStream extends FilterInputStream {
      * @return the MD5 message digest checksum of all bytes that have been read
      */
     public byte[] getMD5() {
-        return digest.digest();
+        return getDigest().digest();
     }
 
     /**
@@ -159,7 +74,7 @@ public class MCRContentInputStream extends FilterInputStream {
      * @return the MD5 checksum as a String of hex digits
      */
     public String getMD5String() {
-        return getMD5String(digest);
+        return getMD5String(getDigest());
     }
 
     /**
