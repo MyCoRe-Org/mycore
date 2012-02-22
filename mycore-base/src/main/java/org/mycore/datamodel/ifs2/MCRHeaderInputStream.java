@@ -36,66 +36,29 @@ import org.mycore.common.MCRException;
  */
 public class MCRHeaderInputStream extends MCRBlockingInputStream {
 
-    /** The number of bytes that will be read for content type detection */
-    protected final static int headerSize = 65536;
-
     /** The total number of bytes read so far */
     protected long length;
 
     /** The header of the file read */
     protected byte[] header;
 
-    public MCRHeaderInputStream(InputStream in) throws MCRException {
+    public MCRHeaderInputStream(InputStream in, int headerSize) throws MCRException {
         super(in, headerSize);
 
         byte[] buffer = new byte[headerSize];
 
         try {
+            super.mark(headerSize);
             int num = super.read(buffer, 0, buffer.length);
             header = new byte[Math.max(0, num)];
 
             if (num > 0) {
                 System.arraycopy(buffer, 0, header, 0, num);
             }
+            super.reset();
         } catch (IOException ex) {
             String msg = "Error while reading input stream header";
             throw new MCRException(msg, ex);
-        }
-    }
-
-    @Override
-    public int read() throws IOException {
-        int b;
-
-        // if current position is in header buffer, return value from there
-        if (header.length > 0 && length < header.length) {
-            b = header[(int) length];
-            length++;
-        } else {
-            b = super.read();
-            if (b != -1) {
-                length++;
-            }
-        }
-
-        return b;
-    }
-
-    @Override
-    public int read(byte[] buf, int off, int len) throws IOException {
-        // if current position is in header buffer, return bytes from there
-        if (header.length > 0 && length < header.length) {
-            int numAvail = header.length - (int) length;
-            len = Math.min(len, numAvail);
-            System.arraycopy(header, (int) length, buf, off, len);
-            length += len;
-            return len;
-        } else {
-            len = super.read(buf, off, len);
-            if (len != -1) {
-                length += len;
-            }
-            return len;
         }
     }
 
