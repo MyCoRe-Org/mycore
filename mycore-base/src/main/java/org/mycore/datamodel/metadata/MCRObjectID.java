@@ -76,9 +76,22 @@ public final class MCRObjectID {
 
     private static class MCRObjectIDDefaultFormat implements MCRObjectIDFormat {
 
+        private int numberDistance;
+        
+        /**
+         * First invocation may return MCR.Metadata.ObjectID.InitialNumberDistance if set,
+         * following invocations will return MCR.Metadata.ObjectID.NumberDistance.
+         * The default for both is 1.
+         */
         @Override
         public int numberDistance() {
-            return MCRConfiguration.instance().getInt("MCR.Metadata.ObjectID.NumberDistance", 1);
+            if( numberDistance == 0 )
+            {
+              MCRConfiguration config = MCRConfiguration.instance(); 
+              numberDistance = config.getInt("MCR.Metadata.ObjectID.NumberDistance", 1);
+              return config.getInt("MCR.Metadata.ObjectID.InitialNumberDistance", numberDistance);
+            }
+            return numberDistance;
         }
 
         @Override
@@ -106,7 +119,18 @@ public final class MCRObjectID {
      * Returns a MCRObjectID from a given base ID string. A base ID is
      * <em>project_id</em>_<em>type_id</em>. The number is computed by this
      * method. It is the next free number of an item in the database for the
-     * given project ID and type ID.
+     * given project ID and type ID, with the following additional restriction:
+     * The ID returned can be divided by idFormat.numberDistance without rest.
+     * The ID returned minus the last ID returned is at least idFormat.numberDistance.
+     * 
+     * Example for number distance of 1 (default):
+     *   last ID = 7, next ID = 8
+     *   last ID = 8, next ID = 9
+     *   
+     * Example for number distance of 2:
+     *   last ID = 7, next ID = 10
+     *   last ID = 8, next ID = 10
+     *   last ID = 10, next ID = 20
      * 
      * @param base_id
      *            <em>project_id</em>_<em>type_id</em>
@@ -116,7 +140,7 @@ public final class MCRObjectID {
     }
 
     /**
-     * Returns a MCRObjectID from a given base ID string. Similar to
+     * Returns a MCRObjectID from a given base ID string. Same as
      * {@link #getNextFreeId(String)} but the additional parameter acts as a
      * lower limit for integer part of the ID.
      * 
@@ -127,14 +151,17 @@ public final class MCRObjectID {
      *            <code>maxInWorkflow + 1</code>
      */
     public static synchronized MCRObjectID getNextFreeId(String base_id, int maxInWorkflow) {
-        int last = Math.max(getLastIDNumber(base_id), maxInWorkflow) + 1;
-        int rest = last % idFormat.numberDistance();
-        if (rest != 0) {
-            last += idFormat.numberDistance() - rest;
-        }
-        lastnumber.put(base_id, last);
+        int last = Math.max(getLastIDNumber(base_id), maxInWorkflow);
+        int numberDistance = idFormat.numberDistance();
+        int next = last + numberDistance;
+
+        int rest = next % numberDistance;
+        if (rest != 0)
+            next += numberDistance - rest;
+
+        lastnumber.put(base_id, next);
         String[] idParts = getIDParts(base_id);
-        return getInstance(formatID(idParts[0], idParts[1], last));
+        return getInstance(formatID(idParts[0], idParts[1], next));
     }
 
     /**
