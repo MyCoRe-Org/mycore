@@ -652,33 +652,7 @@ public class MCRUtils {
      *            string to substitude for find
      */
     public static String replaceString(String in, String find, String newStr) {
-        char[] working = in.toCharArray();
-        StringBuffer sb = new StringBuffer();
-
-        int startindex = in.indexOf(find);
-
-        if (startindex < 0) {
-            return in;
-        }
-
-        int currindex = 0;
-
-        while (startindex > -1) {
-            for (int i = currindex; i < startindex; i++) {
-                sb.append(working[i]);
-            } // for
-
-            currindex = startindex;
-            sb.append(newStr);
-            currindex += find.length();
-            startindex = in.indexOf(find, currindex);
-        } // while
-
-        for (int i = currindex; i < working.length; i++) {
-            sb.append(working[i]);
-        } // for
-
-        return sb.toString();
+        return in.replace(find, newStr);
     }
 
     /**
