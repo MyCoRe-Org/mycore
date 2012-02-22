@@ -68,11 +68,6 @@ class MCRContentDOM extends MCRContent {
         return dom.getDoctype() == null ? dom.getDocumentElement().getLocalName() : dom.getDoctype().getName();
     }
 
-    @Override
-    public MCRContentFormat getFormat() {
-        return MCRContentFormat.DOM;
-    }
-
     /* (non-Javadoc)
      * @see org.mycore.datamodel.ifs2.MCRContent#getInputStream()
      */

@@ -273,8 +273,6 @@ public abstract class MCRContent {
      */
     public abstract String getDocType();
 
-    public abstract MCRContentFormat getFormat();
-
     /**
      * Returns content as SAX input source.
      * 

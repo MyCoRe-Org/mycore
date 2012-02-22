@@ -79,11 +79,6 @@ class MCRContentIS extends MCRContent {
         return docType;
     }
 
-    @Override
-    public MCRContentFormat getFormat() {
-        return MCRContentFormat.INPUT_STREAM;
-    }
-
     /* (non-Javadoc)
      * @see org.mycore.datamodel.ifs2.MCRContent#getInputStream()
      */
