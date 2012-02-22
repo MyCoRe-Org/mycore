@@ -93,10 +93,22 @@
       </td>
     </tr>
   </xsl:template>
+
   <!--Template for generated link names and result titles: see mycoreobject.xsl, results.xsl, MyCoReLayout.xsl -->
   <xsl:template priority="1" mode="resulttitle" match="/mycoreobject[contains(@ID,'_mods_')]">
-    <xsl:apply-templates mode="title" select="." />
+    <xsl:choose>
+      <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title">
+        <xsl:call-template name="ShortenText">
+          <xsl:with-param name="text" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title[1]" />
+          <xsl:with-param name="length" select="70" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="@ID" />
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
+
   <!--Template for title in metadata view: see mycoreobject.xsl -->
   <xsl:template priority="1" mode="title" match="/mycoreobject[contains(@ID,'_mods_')]">
     <xsl:variable name="mods-type">
@@ -108,7 +120,6 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:choose>
-      <!-- you could insert any title-like metadata here, e.g. replace "your-tags/here" by something of your metadata -->
           <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title">
             <xsl:variable name="text">
               <xsl:choose>
@@ -121,13 +132,7 @@
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:variable>
-            <xsl:variable name="output">
-              <xsl:call-template name="ShortenText">
-                <xsl:with-param name="text" select="$text" />
-                <xsl:with-param name="length" select="70" />
-              </xsl:call-template>
-            </xsl:variable>
-            <xsl:value-of select="$output" disable-output-escaping="yes"/>
+            <xsl:value-of select="$text" disable-output-escaping="yes"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="@ID" />
