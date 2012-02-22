@@ -522,6 +522,22 @@
     </tr>
   </xsl:template>
 
+  <xsl:template name="printMetaDate.mods.permalink">
+    <tr>
+      <td valign="top" class="metaname">
+        <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.permalink'),':')" />
+      </td>
+      <td class="metavalue">
+        <a href="http://openagrar.bmelv-forschung.de/receive/{@ID}">Permalink</a>
+        <xsl:text> | </xsl:text>
+        <xsl:call-template name="shareButton">
+          <xsl:with-param name="linkURL" select="concat($ServletsBaseURL,'receive/',@ID)" /> 
+          <xsl:with-param name="linkTitle" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title[1]" />
+        </xsl:call-template>
+      </td>
+    </tr>
+  </xsl:template>
+
   <xsl:template name="printMetaDate.mods.categoryContent">
     <xsl:if
       test="(./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='kindof']) or
@@ -558,6 +574,7 @@
               </tr>
             </xsl:if>
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
+            <xsl:call-template name="printMetaDate.mods.permalink" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
             <xsl:call-template name="printMetaDate.mods">
               <xsl:with-param name="nodes"
@@ -764,6 +781,7 @@
         <div id="category_content" class="block_content">
           <table class="metaData">
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
+            <xsl:call-template name="printMetaDate.mods.permalink" />
             <xsl:call-template name="printMetaDate.mods">
               <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateIssued" />
             </xsl:call-template>
@@ -852,6 +870,7 @@
               </tr>
             </xsl:for-each>
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
+            <xsl:call-template name="printMetaDate.mods.permalink" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:classification" />
             <xsl:call-template name="printMetaDate.mods">
@@ -909,6 +928,7 @@
         <div id="category_content" class="block_content">
           <table class="metaData">
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
+            <xsl:call-template name="printMetaDate.mods.permalink" />
             <xsl:call-template name="printMetaDate.mods">
               <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:publisher" />
             </xsl:call-template>
@@ -1007,6 +1027,7 @@
               </tr>
             </xsl:for-each>
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
+            <xsl:call-template name="printMetaDate.mods.permalink" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:classification" />
             <xsl:call-template name="printMetaDate.mods">
@@ -1075,6 +1096,7 @@
           </xsl:if>
 
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
+          <xsl:call-template name="printMetaDate.mods.permalink" />
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:extension" />
           <xsl:call-template name="printMetaDate.mods">
             <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:note" />
@@ -1137,6 +1159,7 @@
           </xsl:if>
 
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
+          <xsl:call-template name="printMetaDate.mods.permalink" />
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:extension" />
           <xsl:call-template name="printMetaDate.mods">
             <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:note" />
@@ -1222,6 +1245,7 @@
               </tr>
             </xsl:for-each>
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
+            <xsl:call-template name="printMetaDate.mods.permalink" />
             <xsl:call-template name="printMetaDate.mods">
               <xsl:with-param name="nodes"
                 select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:originInfo/mods:dateIssued" />
