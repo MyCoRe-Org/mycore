@@ -565,11 +565,11 @@
       </td>
       <td class="metavalue">
         <a href="http://openagrar.bmelv-forschung.de/receive/{@ID}">Permalink</a>
-        <xsl:text> | </xsl:text>
+<!--         <xsl:text> | </xsl:text>
         <xsl:call-template name="shareButton">
           <xsl:with-param name="linkURL" select="concat($ServletsBaseURL,'receive/',@ID)" />
           <xsl:with-param name="linkTitle" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title[1]" />
-        </xsl:call-template>
+        </xsl:call-template> -->
       </td>
     </tr>
   </xsl:template>
