@@ -216,6 +216,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         try {
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+            transformer.setOutputProperty(OutputKeys.INDENT, "no");
             StreamResult result = new StreamResult(res.getOutputStream());
             transformer.transform(xml.getSource(), result);
         } catch (TransformerException e) {
