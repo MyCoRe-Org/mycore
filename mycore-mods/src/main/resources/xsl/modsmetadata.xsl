@@ -797,8 +797,6 @@
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:place/mods:placeTerm) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[not(@type='conference')]) or
-                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:note) or
-                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:physicalLocation) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:url) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:accessCondition) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID])">
@@ -826,12 +824,6 @@
             </xsl:call-template>
             <xsl:apply-templates mode="present"
               select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[not(@type='conference')]" />
-            <xsl:call-template name="printMetaDate.mods">
-              <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:note" />
-            </xsl:call-template>
-            <xsl:call-template name="printMetaDate.mods">
-              <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:physicalLocation" />
-            </xsl:call-template>
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:url" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:accessCondition" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID]" />
@@ -1132,9 +1124,6 @@
           <xsl:call-template name="printMetaDate.mods">
             <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:publisher" />
           </xsl:call-template>
-          <xsl:call-template name="printMetaDate.mods">
-            <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:physicalLocation" />
-          </xsl:call-template>
         </table>
       </div>
     </div>
@@ -1194,9 +1183,6 @@
           </xsl:call-template>
           <xsl:call-template name="printMetaDate.mods">
             <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:publisher" />
-          </xsl:call-template>
-          <xsl:call-template name="printMetaDate.mods">
-            <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:physicalLocation" />
           </xsl:call-template>
         </table>
       </div>
