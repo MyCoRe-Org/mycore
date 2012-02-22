@@ -1068,7 +1068,7 @@
   <!-- Identifier END -->
 
   <!-- sdnb pub_klassifik -->
-  <text id="mods.ddc.label" i18n="metaData.mods.dictionary.ddc" />
+  <text id="mods.ddc.label" i18n="metaData.mods.dictionary.sdnb" />
   <panel id="mods.ddc">
     <cell anchor="NORTHWEST" var="mods:classification[@authority='sdnb']">
       <list width="30" type="dropdown" id="mods.ddc.list">
@@ -1097,7 +1097,7 @@
     <label xml:lang="en">Entry from the SDNB list. With "+" buttons can be selected additional
       SDNB categories.</label>
   </helpPopup>
-  <!-- DDC pub_klassifik END -->
+  <!-- SDNB pub_klassifik END -->
 
   <!-- Bei Postern -> Größe [text] -->
   <text id="mods.physicalDescription.label" i18n="metaData.mods.dictionary.extent" />
