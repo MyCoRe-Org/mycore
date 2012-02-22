@@ -70,6 +70,11 @@ class MCRContentIS extends MCRContent {
             }
         }
         String docType = MCRUtils.parseDocumentType(in);
+        try {
+            in.reset();
+        } catch (IOException e) {
+            throw new MCRException(e);
+        }
         final int pos = docType.indexOf(':') + 1;
         if (pos > 0) {
             //filter namespace prefix
