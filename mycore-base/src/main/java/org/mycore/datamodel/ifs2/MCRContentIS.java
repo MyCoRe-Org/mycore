@@ -31,7 +31,6 @@ import java.io.OutputStream;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.mycore.common.MCRException;
@@ -46,7 +45,7 @@ import org.xml.sax.SAXParseException;
 class MCRContentIS extends MCRContent {
 
     MCRContentIS(final InputStream in, final String systemId) {
-        super(false, systemId);
+        super(systemId);
         this.in = in;
     }
 

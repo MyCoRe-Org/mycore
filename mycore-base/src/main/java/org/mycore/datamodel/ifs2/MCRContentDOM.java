@@ -48,7 +48,7 @@ class MCRContentDOM extends MCRContent {
     protected Document dom;
 
     MCRContentDOM(final Document dom) throws IOException {
-        super(true, null);
+        super(null);
         this.dom = dom;
     }
 
@@ -58,6 +58,11 @@ class MCRContentDOM extends MCRContent {
     @Override
     public org.jdom.Document asXML() throws JDOMException, IOException, SAXParseException {
         return new org.jdom.input.DOMBuilder().build(dom);
+    }
+
+    @Override
+    public MCRContent ensureXML() {
+        return this;
     }
 
     /* (non-Javadoc)

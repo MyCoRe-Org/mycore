@@ -63,17 +63,11 @@ public abstract class MCRContent {
     protected InputStream in;
 
     /**
-     * If true, we are absolutely sure that source is XML
-     */
-    protected boolean isXML;
-
-    /**
      * Holds the systemID of the current content
      */
     protected String systemId;
 
-    protected MCRContent(final boolean isXML, final String systemId) {
-        this.isXML = isXML;
+    protected MCRContent(final String systemId) {
         this.systemId = systemId;
     }
 
@@ -243,13 +237,9 @@ public abstract class MCRContent {
      * @throws SAXParseException 
      */
     public MCRContent ensureXML() throws IOException, JDOMException, SAXParseException {
-        if (isXML) {
-            return this;
-        } else {
-            MCRContent content = MCRContent.readFrom(asXML());
-            content.systemId = systemId;
-            return content;
-        }
+        MCRContent content = MCRContent.readFrom(asXML());
+        content.systemId = systemId;
+        return content;
     }
 
     /**
