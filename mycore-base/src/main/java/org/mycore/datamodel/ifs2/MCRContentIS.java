@@ -31,28 +31,23 @@ import java.io.OutputStream;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.JDOMException;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.xml.sax.SAXParseException;
 
 /**
  * @author Thomas Scheffler (yagee)
- * @author Frank L\u00FCtzenkirchen
+ *
  */
 class MCRContentIS extends MCRContent {
 
-    private byte[] header;
-
-    MCRContentIS(final MCRHeaderInputStream his, final String systemId) {
-        super(false, systemId);
-        header = his.getHeader();
-        this.in = his;
-    }
-
     MCRContentIS(final InputStream in, final String systemId) {
-        this(new MCRHeaderInputStream(in), systemId);
+        super(false, systemId);
+        this.in = in;
     }
 
     /* (non-Javadoc)
@@ -68,7 +63,14 @@ class MCRContentIS extends MCRContent {
      */
     @Override
     public String getDocType() {
-        String docType = MCRUtils.parseDocumentType(new ByteArrayInputStream(header));
+        if (!(in instanceof ByteArrayInputStream)) {
+            try {
+                in = new ByteArrayInputStream(asByteArray());
+            } catch (final IOException e) {
+                throw new MCRException(e);
+            }
+        }
+        String docType = MCRUtils.parseDocumentType(in);
         final int pos = docType.indexOf(':') + 1;
         if (pos > 0) {
             //filter namespace prefix
@@ -115,4 +117,5 @@ class MCRContentIS extends MCRContent {
         MCRUtils.copyStream(input, out);
         input.close();
     }
+
 }
