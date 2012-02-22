@@ -48,6 +48,36 @@
     </xsl:if>
   </xsl:template>
 
+  <xsl:template match="mods:dateCreated|mods:dateOther|mods:dateIssued" mode="present">
+    <xsl:param name="label" select="i18n:translate(concat('metaData.mods.dictionary.',local-name()))" />
+      <tr>
+        <td valign="top" class="metaname">
+          <xsl:value-of select="concat($label,':')" />
+        </td>
+        <td class="metavalue">
+          <xsl:apply-templates select="." mode="formatDate"/>
+        </td>
+      </tr>
+  </xsl:template>
+
+  <xsl:template match="mods:dateCreated|mods:dateOther|mods:dateIssued" mode="formatDate">
+    <xsl:variable name="formatted">
+      <xsl:call-template name="formatISODate">
+        <xsl:with-param name="date" select="." />
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="string-length($formatted)&gt;2 
+                      and starts-with($formatted, '?')
+                      and substring($formatted,string-length($formatted),1)='?'">
+        <xsl:value-of select="translate($formatted, '?', '')" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$formatted" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <xsl:template match="category" mode="printModsClassInfo">
     <xsl:variable name="categurl">
       <xsl:if test="url">
@@ -531,7 +561,7 @@
         <a href="http://openagrar.bmelv-forschung.de/receive/{@ID}">Permalink</a>
         <xsl:text> | </xsl:text>
         <xsl:call-template name="shareButton">
-          <xsl:with-param name="linkURL" select="concat($ServletsBaseURL,'receive/',@ID)" /> 
+          <xsl:with-param name="linkURL" select="concat($ServletsBaseURL,'receive/',@ID)" />
           <xsl:with-param name="linkTitle" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title[1]" />
         </xsl:call-template>
       </td>
@@ -583,22 +613,14 @@
             <xsl:call-template name="printMetaDate.mods">
               <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:publisher" />
             </xsl:call-template>
-            <xsl:call-template name="printMetaDate.mods">
-              <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateCreated" />
-            </xsl:call-template>
-            <xsl:call-template name="printMetaDate.mods">
-              <xsl:with-param name="nodes"
-                select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateOther[@type='submitted']" />
+            <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateCreated" mode="present"/>
+            <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateOther[@type='submitted']" mode="present">
               <xsl:with-param name="label" select="i18n:translate('metaData.mods.dictionary.dateSubmitted')" />
-            </xsl:call-template>
-            <xsl:call-template name="printMetaDate.mods">
-              <xsl:with-param name="nodes"
-                select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateOther[@type='accepted']" />
+            </xsl:apply-templates>
+            <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateOther[@type='accepted']" mode="present">
               <xsl:with-param name="label" select="i18n:translate('metaData.mods.dictionary.dateAccepted')" />
-            </xsl:call-template>
-            <xsl:call-template name="printMetaDate.mods">
-              <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateIssued" />
-            </xsl:call-template>
+            </xsl:apply-templates>
+            <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateIssued" mode="present"/>
             <xsl:call-template name="printMetaDate.mods">
               <xsl:with-param name="nodes"
                 select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:place/mods:placeTerm" />
