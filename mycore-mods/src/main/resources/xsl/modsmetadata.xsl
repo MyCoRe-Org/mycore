@@ -40,7 +40,9 @@
               </xsl:choose>
             </xsl:if>
             <xsl:if test="not(@xml:lang) or @xml:lang=$selectPresentLang">
-              <xsl:value-of select="normalize-space(.)" />
+              <xsl:call-template name="lf2br">
+                <xsl:with-param name="string" select="normalize-space(.)"/>
+              </xsl:call-template>
             </xsl:if>
           </xsl:for-each>
         </td>
@@ -175,7 +177,9 @@
                 <xsl:value-of select="//mods:titleInfo[@transliteration='text/html']/mods:title" disable-output-escaping="yes" />
               </xsl:when>
               <xsl:otherwise>
-                <xsl:value-of select="." />
+                <xsl:call-template name="lf2br">
+                  <xsl:with-param name="string" select="."/>
+                </xsl:call-template>
               </xsl:otherwise>
             </xsl:choose>
           </td>
@@ -242,7 +246,9 @@
         <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.abstract'),' (' ,@xml:lang,') :')" />
       </td>
       <td class="metavalue">
-        <xsl:value-of select="." />
+        <xsl:call-template name="lf2br">
+          <xsl:with-param name="string" select="."/>
+        </xsl:call-template>
       </td>
     </tr>
   </xsl:template>
