@@ -15,21 +15,22 @@
 
 package org.mycore.services.fieldquery;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandler;
 import org.mycore.common.events.MCREventHandlerBase;
-import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.parsers.bool.MCRCondition;
+import org.mycore.services.fieldquery.data2fields.MCRData2FieldsDerivate;
+import org.mycore.services.fieldquery.data2fields.MCRData2FieldsFile;
+import org.mycore.services.fieldquery.data2fields.MCRData2FieldsObject;
+import org.mycore.services.fieldquery.data2fields.MCRIndexEntry;
 
 /**
  * Abstract base class for searchers and indexers. Searcher implementations for
@@ -53,9 +54,6 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
 
     /** The ID of the index this searcher handles * */
     protected String index;
-
-    protected static MCRCache RETURN_ID_CACHE = new MCRCache(MCRConfiguration.instance().getInt("MCR.Searcher.ReturnID.Cache", 100),
-            "MCRSearcher ReturnID Cache");
 
     /**
      * Returns false if this MCRSearcher implements only search and is therefore read-only.
@@ -90,44 +88,17 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
         return index;
     }
 
-    public String getReturnID(MCRFile file) {
-        // Maybe fieldquery is used in application without link table manager
-        if (MCRConfiguration.instance().getString("MCR.Persistence.LinkTable.Store.Class", null) == null) {
-            return file.getID();
-        }
-
-        String ownerID = file.getOwnerID();
-        String returnID = (String) RETURN_ID_CACHE.get(ownerID);
-        if (returnID != null) {
-            return returnID;
-        }
-
-        Collection<String> list = MCRLinkTableManager.instance().getSourceOf(ownerID, MCRLinkTableManager.ENTRY_TYPE_DERIVATE);
-        if (list == null || list.isEmpty()) {
-            return file.getID();
-        }
-
-        // Return ID of MCRObject this MCRFile belongs to
-        returnID = list.iterator().next();
-        RETURN_ID_CACHE.put(ownerID, returnID);
-        return returnID;
-    }
-
     @Override
     protected void handleFileCreated(MCREvent evt, MCRFile file) {
-        String entryID = file.getID();
-        String returnID = getReturnID(file);
-        List<MCRFieldValue> fields = MCRData2Fields.buildFields(file, index);
-        addToIndex(entryID, returnID, fields);
+        MCRIndexEntry entry = new MCRData2FieldsFile(index, file).buildIndexEntry();
+        addToIndex(entry);
     }
 
     @Override
     protected void handleFileUpdated(MCREvent evt, MCRFile file) {
-        String entryID = file.getID();
-        String returnID = getReturnID(file);
-        List<MCRFieldValue> fields = MCRData2Fields.buildFields(file, index);
-        removeFromIndex(entryID);
-        addToIndex(entryID, returnID, fields);
+        MCRIndexEntry entry = new MCRData2FieldsFile(index, file).buildIndexEntry();
+        removeFromIndex(entry);
+        addToIndex(entry);
     }
 
     @Override
@@ -148,9 +119,8 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
 
     @Override
     protected void handleDerivateCreated(MCREvent evt, MCRDerivate der) {
-        String entryID = der.getId().toString();
-        List<MCRFieldValue> fields = MCRData2Fields.buildFields(der, index);
-        addToIndex(entryID, entryID, fields);
+        MCRIndexEntry entry = new MCRData2FieldsDerivate(index, der).buildIndexEntry();
+        addToIndex(entry);
     }
 
     @Override
@@ -161,10 +131,9 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
 
     @Override
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
-        String entryID = der.getId().toString();
-        List<MCRFieldValue> fields = MCRData2Fields.buildFields(der, index);
-        removeFromIndex(entryID);
-        addToIndex(entryID, entryID, fields);
+        MCRIndexEntry entry = new MCRData2FieldsDerivate(index, der).buildIndexEntry();
+        removeFromIndex(entry);
+        addToIndex(entry);
     }
 
     @Override
@@ -210,9 +179,8 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
     }
 
     protected void index(MCRObject obj) {
-        String entryID = obj.getId().toString();
-        List<MCRFieldValue> fields = MCRData2Fields.buildFields(obj, index);
-        addToIndex(entryID, entryID, fields);
+        MCRIndexEntry entry = new MCRData2FieldsObject(index, obj).buildIndexEntry();
+        addToIndex(entry);
     }
 
     protected void removeFromIndex(MCRObject obj) {
@@ -237,6 +205,10 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
     public void addToIndex(String entryID, String returnID, List<MCRFieldValue> fields) {
     }
 
+    public void addToIndex(MCRIndexEntry entry) {
+        addToIndex(entry.getEntryID(), entry.getReturnID(), entry.getFieldValues());
+    }
+
     /**
      * Removes the values of the given entry from the backend index. Searchers
      * that need an indexer must overwrite this method to delete the values in
@@ -247,6 +219,10 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
      *            the unique ID of this entry in the index
      */
     public void removeFromIndex(String entryID) {
+    }
+
+    public void removeFromIndex(MCRIndexEntry entry) {
+        removeFromIndex(entry.getEntryID());
     }
 
     /**

@@ -27,7 +27,6 @@ import org.jdom.Element;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRNormalizer;
-import org.mycore.datamodel.ifs.MCRFile;
 
 /**
  * Represents the value of a field in a query. This can be a value that is part
@@ -49,12 +48,6 @@ public class MCRFieldValue {
     private String value;
 
     /**
-     * The MCRFile thats content should become the value of the field when
-     * indexing data
-     */
-    private MCRFile file;
-
-    /**
      * Creates a new field value
      * 
      * @param field
@@ -68,23 +61,6 @@ public class MCRFieldValue {
         }
         this.field = field;
         setValue(value);
-    }
-
-    /**
-     * Creates a new field value
-     * 
-     * @param field
-     *            the field this value belongs to
-     * @param file
-     *            the MCRFile thats content should become the value of the field
-     *            when indexing data
-     */
-    MCRFieldValue(MCRFieldDef field, MCRFile file) {
-        if (field == null) {
-            throw new NullPointerException("MCRFieldDef cannot be null.");
-        }
-        this.field = field;
-        this.file = file;
     }
 
     /**
@@ -119,18 +95,6 @@ public class MCRFieldValue {
      */
     public String getValue() {
         return value;
-    }
-
-    /**
-     * Returns the MCRFile thats content should become the value of the field
-     * when indexing data
-     * 
-     * @return the MCRFile to be indexed, or null if the value can be retrieved
-     *         using the getValue() method
-     * @see #getValue()
-     */
-    public MCRFile getFile() {
-        return file;
     }
 
     /**

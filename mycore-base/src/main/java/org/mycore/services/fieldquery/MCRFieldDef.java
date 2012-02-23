@@ -23,18 +23,21 @@
 package org.mycore.services.fieldquery;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.jdom.Attribute;
 import org.jdom.Content;
 import org.jdom.Element;
 import org.jdom.Namespace;
-import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.services.fieldquery.data2fields.MCRFieldsSelector;
 
 /**
  * A search field definition. For each field in the configuration file
@@ -44,22 +47,19 @@ import org.mycore.common.xml.MCRURIResolver;
  * @author Frank Lützenkirchen
  */
 public class MCRFieldDef {
-    /** The logger */
-    private static final Logger LOGGER = Logger.getLogger(MCRFieldDef.class);
 
     private static Hashtable<String, MCRFieldDef> fieldTable = new Hashtable<String, MCRFieldDef>();
 
-    public final static Namespace xalanns = Namespace.getNamespace("xalan", "http://xml.apache.org/xalan");
-
-    public final static Namespace extns = Namespace.getNamespace("ext", "xalan://org.mycore.services.fieldquery.MCRData2Fields");
-
     private final static String configFile = "searchfields.xml";
+
+    private static Set<Namespace> namespaces = new HashSet<Namespace>();
 
     /**
      * Read searchfields.xml and build the MCRFiedDef objects
      */
     static {
         Element def = getConfigFile();
+        collectAllNamespaces(def);
 
         @SuppressWarnings("unchecked")
         List<Element> children = def.getChildren("index", MCRConstants.MCR_NAMESPACE);
@@ -71,10 +71,27 @@ public class MCRFieldDef {
             @SuppressWarnings("unchecked")
             List<Element> fields = index.getChildren("field", MCRConstants.MCR_NAMESPACE);
 
-            for (int j = 0; j < fields.size(); j++) {
-                new MCRFieldDef(id, fields.get(j));
+            for (Element field : fields) {
+                new MCRFieldDef(id, field);
             }
         }
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private static void collectAllNamespaces(Element searchfields) {
+        for (Iterator iter = searchfields.getDescendants(); iter.hasNext();) {
+            Object obj = iter.next();
+            if (obj instanceof Element) {
+                Element element = (Element) obj;
+                namespaces.add(element.getNamespace());
+                namespaces.addAll(element.getAdditionalNamespaces());
+            } else if (obj instanceof Attribute)
+                ((Attribute) obj).getNamespace();
+        }
+    }
+
+    public static Set<Namespace> getAllNamespaces() {
+        return namespaces;
     }
 
     /**
@@ -113,6 +130,12 @@ public class MCRFieldDef {
      */
     private boolean addable = false;
 
+    private String xPathAttribute;
+
+    private String valueAttribute;
+
+    private Element def;
+
     /**
      * @return the searchfields-configuration file as jdom-element
      */
@@ -123,19 +146,21 @@ public class MCRFieldDef {
 
     public MCRFieldDef(String index, Element def) {
         this.index = index.intern();
+        this.def = def;
         name = def.getAttributeValue("name").intern();
         dataType = def.getAttributeValue("type").intern();
         sortable = "true".equals(def.getAttributeValue("sortable"));
         objects = def.getAttributeValue("objects");
         source = def.getAttributeValue("source");
         addable = "true".equals(def.getAttributeValue("addable"));
+        xPathAttribute = def.getAttributeValue("xpath");
+        valueAttribute = def.getAttributeValue("value", "text()");
 
         if (!fieldTable.contains(name)) {
             fieldTable.put(name, this);
         } else {
             throw new MCRException("Field \"" + name + "\" is defined repeatedly.");
         }
-        buildXSL(def);
     }
 
     /**
@@ -217,6 +242,14 @@ public class MCRFieldDef {
         return addable;
     }
 
+    public String getXPathAttribute() {
+        return xPathAttribute;
+    }
+
+    public String getValueAttribute() {
+        return valueAttribute;
+    }
+
     /**
      * Returns true if this field is used for this type of object. For
      * MCRObject, the type is the same as in MCRObject.getId().getTypeId(). For
@@ -226,7 +259,7 @@ public class MCRFieldDef {
      * @param objectType
      *            the type of object
      */
-    public boolean isUsedForObjectType(String objectType) {
+    private boolean isUsedForObjectType(String objectType) {
         if (objects == null) {
             return true;
         }
@@ -236,65 +269,9 @@ public class MCRFieldDef {
         return a.indexOf(b) >= 0;
     }
 
-    /**
-     * A keyword identifying that the source of the values of this field is the
-     * createXML() method of MCRObject
-     * 
-     * @see org.mycore.datamodel.metadata.MCRObject#createXML()
-     */
-    public final static String OBJECT_METADATA = "objectMetadata";
-
-    /**
-     * A keyword identifying that the source of the values of this field is the
-     * createXML() method of MCRDerivate
-     * 
-     * @see org.mycore.datamodel.metadata.MCRObject#createXML()
-     */
-    public final static String DERIVATE_METADATA = "derivateMetadata";
-
-    /**
-     * A keyword identifying that the source of the values of this field is a
-     * classification category that a MCRObject belongs to
-     * 
-     * @see org.mycore.datamodel.metadata.MCRObject#createXML()
-     */
-    public final static String OBJECT_CATEGORY = "objectCategory";
-
-    /**
-     * A keyword identifying that the source of the values of this field is the
-     * createXML() method of MCRFile
-     * 
-     * @see org.mycore.datamodel.ifs.MCRFile#createXML()
-     */
-    public final static String FILE_METADATA = "fileMetadata";
-
-    /**
-     * A keyword identifying that the source of the values of this field is the
-     * getAllAdditionalData() method of MCRFile
-     * 
-     * @see org.mycore.datamodel.ifs.MCRFilesystemNode#getAllAdditionalData()
-     */
-    public final static String FILE_ADDITIONAL_DATA = "fileAdditionalData";
-
-    /**
-     * A keyword identifying that the source of the values of this field is the
-     * XML content of the MCRFile
-     * 
-     * @see org.mycore.datamodel.ifs.MCRFile#getContentAsJDOM()
-     */
-    public final static String FILE_XML_CONTENT = "fileXMLContent";
-
-    /**
-     * A keyword identifying that the source of the values of this field is the
-     * XML content of a pure JDOM xml document
-     */
-    public final static String XML = "xml";
-
-    /**
-     * A keyword identifying that the source of the values of this field is the
-     * text content of the MCRFile, using text filter plug-ins.
-     */
-    public final static String FILE_TEXT_CONTENT = "fileTextContent";
+    public boolean isUsedFor(MCRFieldsSelector selector) {
+        return getSource().equals(selector.getSourceType()) && isUsedForObjectType(selector.getObjectType());
+    }
 
     /**
      * A keyword identifying that the source of the values of this field is the
@@ -305,103 +282,13 @@ public class MCRFieldDef {
 
     /**
      * Returns a keyword identifying where the values of this field come from.
-     * 
-     * @see #FILE_METADATA
-     * @see #FILE_TEXT_CONTENT
-     * @see #FILE_XML_CONTENT
-     * @see #OBJECT_METADATA
-     * @see #OBJECT_CATEGORY
-     * @see #SEARCHER_HIT_METADATA
-     * @see #XML
      */
     public String getSource() {
         return source;
     }
 
-    /**
-     * The stylesheet fragment to build values for this field from XML source
-     * data
-     */
-    private List<Content> xsl = new ArrayList<Content>();
-
-    /** Returns a stylesheet to build values for this field from XML source data */
-    List<Content> getXSL() {
-        if (xsl == null) {
-            return null;
-        } else {
-            List<Content> copy = new ArrayList<Content>();
-            for (Content content : xsl)
-                copy.add((Content) (content.clone()));
-            return copy;
-        }
-    }
-
-    /**
-     * Builds the stylesheet fragment to build values for this field from XML
-     * source data
-     */
-    private void buildXSL(Element fieldDef) {
-        if (fieldDef.getContent().size() > 0)
-            xsl.addAll(fieldDef.cloneContent());
-
-        String xpath = fieldDef.getAttributeValue("xpath");
-        if (xpath != null && xpath.trim().length() > 0) {
-            // <xsl:value-of select="{@value}" />
-            String valueExpr = fieldDef.getAttributeValue("value", "text()");
-            Element valueOf = new Element("value-of", MCRConstants.XSL_NAMESPACE);
-            valueOf.setAttribute("select", valueExpr);
-
-            // <name>value</name>
-            Element fieldValue = new Element(getName(), MCRConstants.MCR_NAMESPACE);
-            fieldValue.addContent(valueOf);
-
-            // <xsl:for-each select="{@xpath}">
-            Element forEach = new Element("for-each", MCRConstants.XSL_NAMESPACE);
-            forEach.setAttribute("select", xpath);
-            xsl.add(forEach);
-
-            Element current = fieldDef;
-            while (true) {
-                @SuppressWarnings("unchecked")
-                List<Namespace> namespaces = current.getAdditionalNamespaces();
-                for (Namespace ns : namespaces) {
-                    forEach.addNamespaceDeclaration(ns);
-                }
-                if (current.isRootElement()) {
-                    break;
-                } else {
-                    current = current.getParentElement();
-                }
-            }
-
-            if (MCRFieldDef.OBJECT_CATEGORY.equals(fieldDef.getAttributeValue("source"))) {
-                // current(): <format classid="DocPortal_class_00000006"
-                // categid="FORMAT0002"/>
-                // URI: classification:metadata:levels:parents:{class}:{categ}
-                Element forEach2 = new Element("for-each", MCRConstants.XSL_NAMESPACE);
-                forEach.addContent(forEach2);
-                String uri = "document(concat('classification:metadata:0:parents:',current()/@classid,':',current()/@categid))//category";
-                forEach2.setAttribute("select", uri);
-                forEach = forEach2;
-            }
-
-            forEach.addContent(fieldValue);
-        }
-
-        // <xsl:if test="contains(@objects,$objecType)">
-        if ((objects != null) && (!xsl.isEmpty())) {
-            Element xif = new Element("if", MCRConstants.XSL_NAMESPACE);
-            xif.setAttribute("test", "contains(' " + objects.trim() + " ',concat(' ',$objectType,' '))");
-            xif.addContent(xsl);
-            xsl.clear();
-            xsl.add(xif);
-        }
-
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("---------- XSL for search field \"" + name + "\" ----------");
-            XMLOutputter out = new XMLOutputter(org.jdom.output.Format.getPrettyFormat());
-            LOGGER.debug("\n" + out.outputString(xsl));
-        }
+    public List<Content> getXSLContent() {
+        return (List<Content>) (def.cloneContent());
     }
 
     @Override
