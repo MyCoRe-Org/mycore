@@ -11,7 +11,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.datamodel.ifs2.MCRContent;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -112,8 +112,8 @@ public class MCRACLEditorServlet_v2 extends MCRServlet {
     private void doLayout(HttpServletRequest request, HttpServletResponse response, Document doc, String format) throws IOException {
 
         if (format.equals("xml"))
-            getLayoutService().sendXML(request, response, MCRContent.readFrom(doc));
+            getLayoutService().sendXML(request, response, new MCRJDOMContent(doc));
         else
-            getLayoutService().doLayout(request, response, MCRContent.readFrom(doc));
+            getLayoutService().doLayout(request, response, new MCRJDOMContent(doc));
     }
 }
