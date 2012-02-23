@@ -124,17 +124,6 @@
     <cell row="110" col="2" anchor="NORTHWEST" ref="mods.languageTerm" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:language" style="padding-top:5px;" />
     <cell row="110" col="3" anchor="NORTHWEST" ref="mods.languageTerm.help" style="padding-top:5px;" />
     <!-- LANGUAGE END -->   
-    <!-- LANGUAGE -->
-    <cell row="65" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.languageTerm.label" />
-    <cell row="65" col="2" anchor="NORTHWEST" ref="mods.languageTerm" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
-    <cell row="65" col="3" anchor="NORTHWEST" ref="mods.languageTerm.help" />
-    <!-- LANGUAGE END -->
-
-    <!-- Abstract -->
-    <cell row="70" col="1" anchor="NORTHEAST" ref="mods.abstract.label" />
-    <cell row="70" col="2" anchor="NORTHWEST" ref="mods.abstract" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="70" col="3" anchor="NORTHWEST" ref="mods.abstract.help" />
-    <!-- Abstract END -->
     
     <!-- Abstract -->
     <cell row="120" col="1" anchor="NORTHEAST" ref="mods.abstract.label" />
