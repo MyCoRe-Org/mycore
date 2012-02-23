@@ -46,11 +46,12 @@ import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.content.MCRFileContent;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.common.xml.MCRXMLResource;
 import org.mycore.common.xml.MCRXSLTransformation;
-import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
@@ -204,7 +205,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
             objid = "";
 
             try {
-                der_in = MCRXMLParserFactory.getNonValidatingParser().parseXML(MCRContent.readFrom(derivateFile));
+                der_in = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(derivateFile));
                 // LOGGER.debug("Derivate file "+dername+" was readed.");
                 der = der_in.getRootElement();
                 label = der.getAttributeValue("label");
@@ -287,7 +288,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
             org.jdom.Element elm = null;
 
             try {
-                workflow_in = MCRXMLParserFactory.getNonValidatingParser().parseXML(MCRContent.readFrom(wf));
+                workflow_in = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(wf));
                 MCRObject obj = new MCRObject(workflow_in);
                 MCRObjectService service = obj.getService();
                 int j = service.getRuleIndex("writewf");
@@ -394,6 +395,6 @@ public class MCRListWorkflowServlet extends MCRServlet {
         }
 
         org.jdom.Document workflow_doc = new org.jdom.Document(root);
-        getLayoutService().doLayout(job.getRequest(), job.getResponse(), MCRContent.readFrom(workflow_doc));
+        getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRJDOMContent(workflow_doc));
     }
 }

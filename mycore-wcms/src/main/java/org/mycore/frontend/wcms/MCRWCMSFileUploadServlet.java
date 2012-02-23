@@ -43,7 +43,7 @@ import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.datamodel.ifs2.MCRContent;
+import org.mycore.common.content.MCRJDOMContent;
 
 public class MCRWCMSFileUploadServlet extends MCRWCMSServlet {
     private static final long serialVersionUID = 1L;
@@ -107,7 +107,7 @@ public class MCRWCMSFileUploadServlet extends MCRWCMSServlet {
         rootOut.addContent(new Element("userClass").setText(mcrSession.get("userClass").toString()));
         rootOut.addContent(new Element("status").setText(status));
         rootOut.addContent(new Element("error").setText(error));
-        getLayoutService().doLayout(request, response, MCRContent.readFrom(jdom));
+        getLayoutService().doLayout(request, response, new MCRJDOMContent(jdom));
     }
 
     private void processFormField(FileItem item) {

@@ -7,12 +7,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.jdom.Document;
 import org.mycore.common.MCRException;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
-import org.mycore.datamodel.ifs2.MCRContent;
 
 /** Handles getting a classification from the database and converting it to xml view so it can be shown in the browser
  *  for saving. URL for this servlet must be: /servlerts/MCRClassExportServlet?id=...
@@ -35,7 +35,7 @@ public class MCRClassExportServlet extends MCRServlet {
             if (category == null)
                 throw new MCRException("Cannot find classification with id: " + id);
             Document jdom = MCRCategoryTransformer.getMetaDataDocument(category, true);
-            getLayoutService().sendXML(job.getRequest(), job.getResponse(), MCRContent.readFrom(jdom));
+            getLayoutService().sendXML(job.getRequest(), job.getResponse(), new MCRJDOMContent(jdom));
         } catch (Exception e) {
             generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage(), e, false);
         }

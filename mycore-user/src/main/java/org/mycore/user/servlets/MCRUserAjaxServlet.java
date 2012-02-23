@@ -36,7 +36,7 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRJSONUtils;
-import org.mycore.datamodel.ifs2.MCRContent;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -377,6 +377,6 @@ public class MCRUserAjaxServlet extends MCRServlet {
      */
     protected void doLayout(MCRServletJob job, String style, Document jdomDoc) throws IOException {
         job.getRequest().setAttribute("XSL.Style", style);
-        getLayoutService().doLayout(job.getRequest(), job.getResponse(), MCRContent.readFrom(jdomDoc));
+        getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRJDOMContent(jdomDoc));
     }
 }

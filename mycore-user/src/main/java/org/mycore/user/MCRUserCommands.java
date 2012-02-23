@@ -44,9 +44,9 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
+import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.common.xml.MCRXMLParserFactory;
-import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRCommand;
 import org.xml.sax.SAXParseException;
@@ -352,7 +352,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         LOGGER.info("Reading file " + input + " ...");
 
         try {
-            Document doc = MCRXMLParserFactory.getValidatingParser().parseXML(MCRContent.readFrom(input));
+            Document doc = MCRXMLParserFactory.getValidatingParser().parseXML(new MCRFileContent(input));
             Element rootelm = doc.getRootElement();
 
             if (!rootelm.getName().equals("mycoreuser")) {
@@ -639,7 +639,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         LOGGER.info("Reading file " + input + " ...");
 
         try {
-            Document doc = MCRXMLParserFactory.getValidatingParser().parseXML(MCRContent.readFrom(input));
+            Document doc = MCRXMLParserFactory.getValidatingParser().parseXML(new MCRFileContent(input));
             Element rootelm = doc.getRootElement();
 
             if (!rootelm.getName().equals("mycoregroup")) {
@@ -684,7 +684,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
             // read groups
             File groupFile = new File(groupFileName);
             LOGGER.info("Reading group file " + groupFile + " ...");
-            Document groupdoc = MCRXMLParserFactory.getValidatingParser().parseXML(MCRContent.readFrom(groupFile));
+            Document groupdoc = MCRXMLParserFactory.getValidatingParser().parseXML(new MCRFileContent(groupFile));
             Element grouprootelm = groupdoc.getRootElement();
             if (!grouprootelm.getName().equals("mycoregroup")) {
                 throw new MCRException("The data are not for group.");
@@ -692,7 +692,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
             // read users
             File userFile = new File(userFileName);
             LOGGER.info("Reading user file " + userFile + " ...");
-            Document userdoc = MCRXMLParserFactory.getValidatingParser().parseXML(MCRContent.readFrom(userFile));
+            Document userdoc = MCRXMLParserFactory.getValidatingParser().parseXML(new MCRFileContent(userFile));
             Element userrootelm = userdoc.getRootElement();
             if (!userrootelm.getName().equals("mycoreuser")) {
                 throw new MCRException("The data are not for user.");
@@ -730,7 +730,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         }
         File input = new File(filename);
         LOGGER.info("Reading file " + input + " ...");
-        Document doc = MCRXMLParserFactory.getValidatingParser().parseXML(MCRContent.readFrom(input));
+        Document doc = MCRXMLParserFactory.getValidatingParser().parseXML(new MCRFileContent(input));
         Element rootelm = doc.getRootElement();
 
         if (!rootelm.getName().equals("mycoreuser")) {

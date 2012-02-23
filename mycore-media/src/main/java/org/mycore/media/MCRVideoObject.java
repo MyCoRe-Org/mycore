@@ -27,7 +27,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.mycore.datamodel.ifs2.MCRContent;
+import org.mycore.common.content.MCRFileContent;
 import org.mycore.frontend.cli.MCRExternalProcess;
 
 import org.jdom.Element;
@@ -182,7 +182,7 @@ public class MCRVideoObject extends MCRMediaObject {
             if ( ep.run() != 0 )
                 throw new Exception("An error occures on run getThumb.\n" + ep.getErrors());
             else {
-                return MCRContent.readFrom( tmpFile ).asByteArray();
+                return new MCRFileContent( tmpFile ).asByteArray();
             }
         } catch ( Exception e ) {
             throw new Exception(e.getMessage());

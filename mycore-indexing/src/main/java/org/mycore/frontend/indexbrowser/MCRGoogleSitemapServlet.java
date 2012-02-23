@@ -29,9 +29,10 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 
 import org.mycore.common.MCRUtils;
+import org.mycore.common.content.MCRFileContent;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.common.xml.MCRXMLParserFactory;
-import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
@@ -69,7 +70,7 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
         LOGGER.debug("Build Google check file " + fnsm);
         File fi = new File(fnsm);
         if (fi.isFile()) {
-            jdom = MCRXMLParserFactory.getNonValidatingParser().parseXML(MCRContent.readFrom(fi));
+            jdom = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(fi));
             if (jdom == null) {
                 if (number == 1) {
                     jdom = common.buildSitemap();
@@ -78,7 +79,7 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
                 }
             }
             //send XML output
-            getLayoutService().doLayout(job.getRequest(), job.getResponse(), MCRContent.readFrom(jdom));
+            getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRJDOMContent(jdom));
             return;
         }
         // remove old files
@@ -97,6 +98,6 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
             jdom = common.buildSitemapIndex(number);
         }
         // send XML output
-        getLayoutService().doLayout(job.getRequest(), job.getResponse(), MCRContent.readFrom(jdom));
+        getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRJDOMContent(jdom));
     }
 }

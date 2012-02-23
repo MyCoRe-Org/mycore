@@ -37,8 +37,8 @@ import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.common.MCRActiveLinkException;
-import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.frontend.editor.MCREditorSubmission;
@@ -371,6 +371,6 @@ public class MCRCheckClassACLServlet extends MCRServlet {
 
         // restart editor
         job.getRequest().setAttribute("XSL.Style", lang);
-        getLayoutService().doLayout(job.getRequest(), job.getResponse(), MCRContent.readFrom(jdom));
+        getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRJDOMContent(jdom));
     }
 }

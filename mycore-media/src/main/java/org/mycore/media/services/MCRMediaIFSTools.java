@@ -5,7 +5,8 @@ import java.util.StringTokenizer;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
-import org.mycore.datamodel.ifs2.MCRContent;
+import org.mycore.common.content.MCRByteContent;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.ifs2.MCRDirectory;
 import org.mycore.datamodel.ifs2.MCRFile;
 import org.mycore.datamodel.ifs2.MCRFileCollection;
@@ -99,7 +100,7 @@ public class MCRMediaIFSTools {
                 data = col.createFile(buildFileName(getFileName(filePath)) + ".moxml");
 
             org.jdom.Document xml = new org.jdom.Document(mediaXML);
-            data.setContent(MCRContent.readFrom(xml));
+            data.setContent(new MCRJDOMContent(xml));
         } catch (Exception ex) {
             throw new MCRException(ex);
         }
@@ -174,7 +175,7 @@ public class MCRMediaIFSTools {
             else
                 data = col.createFile(buildFileName(getFileName(filePath)) + ".mothumb");
 
-            data.setContent(MCRContent.readFrom(thumb));
+            data.setContent(new MCRByteContent(thumb));
         } catch (Exception ex) {
             throw new MCRException(ex);
         }

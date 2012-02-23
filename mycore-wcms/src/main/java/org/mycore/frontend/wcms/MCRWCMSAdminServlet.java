@@ -44,7 +44,8 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.datamodel.ifs2.MCRContent;
+import org.mycore.common.content.MCRFileContent;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.user.MCRUser;
 import org.mycore.user.MCRUserMgr;
 
@@ -77,18 +78,18 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
         } else if (todo.equals("getMultimediaConfig")) {
             Document docOut = new Document(new Element("cms"));
             getMultimediaConfig(docOut.getRootElement());
-            getLayoutService().sendXML(request, response, MCRContent.readFrom(docOut));
+            getLayoutService().sendXML(request, response, new MCRJDOMContent(docOut));
         } else if (todo.equals("choose")) {
             generateXML_managPage(mcrSession, root);
-            getLayoutService().doLayout(request, response, MCRContent.readFrom(jdom));
+            getLayoutService().doLayout(request, response, new MCRJDOMContent(jdom));
         } else if (todo.equals("logs")) {
             String sort = request.getParameter("sort");
             String sortOrder = request.getParameter("sortOrder");
             generateXML_logs(sort, sortOrder, root);
-            getLayoutService().doLayout(request, response, MCRContent.readFrom(jdom));
+            getLayoutService().doLayout(request, response, new MCRJDOMContent(jdom));
         } else if (todo.equals("managGlobal") && mcrSession.get("userClass").equals("admin")) {
             generateXML_managGlobal(root);
-            getLayoutService().doLayout(request, response, MCRContent.readFrom(jdom));
+            getLayoutService().doLayout(request, response, new MCRJDOMContent(jdom));
         } else if (todo.equals("saveGlobal") && mcrSession.get("userClass").equals("admin"))
             generateXML_saveGlobal(request, response);
         else if (todo.equals("view") && (request.getParameter("file") != null && !request.getParameter("file").equals(""))) {
@@ -106,7 +107,7 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
             }
             // archived content version requested
             else
-                getLayoutService().doLayout(request, response, MCRContent.readFrom(new File(request.getParameter("file"))));
+                getLayoutService().doLayout(request, response, new MCRFileContent(new File(request.getParameter("file"))));
         }
         // manage read access
         else if (todo.equals(MCRWCMSUtilities.getPermRightsManagementReadAccess()) && MCRWCMSUtilities.manageReadAccess()) {
@@ -116,7 +117,7 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
         else if (todo.equals(MCRWCMSUtilities.getPermRightsManagementWCMSAccess()) && MCRWCMSUtilities.manageWCMSAccess()) {
             manageWCMSAdminAccess(request, response);
         } else
-            getLayoutService().doLayout(request, response, MCRContent.readFrom(jdom));
+            getLayoutService().doLayout(request, response, new MCRJDOMContent(jdom));
     }
     
     public static Element getRoot(String session, String userId, String userClass) {
@@ -140,7 +141,7 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
             answer.getChild("rightsManagement").setAttribute("filteredUser", request.getParameter("filter"));
         }
         // render
-        getLayoutService().doLayout(request, response, MCRContent.readFrom(new Document(answer)));
+        getLayoutService().doLayout(request, response, new MCRJDOMContent(new Document(answer)));
     }
 
     private void manageReadAccess(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -152,7 +153,7 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
         Element adminUsers = getWCMSAdminUsers(MCRWCMSUtilities.getPermRightsManagementReadAccess());
         if (adminUsers != null)
             answer.getChild("rightsManagement").addContent(adminUsers);
-        getLayoutService().doLayout(request, response, MCRContent.readFrom(new Document(answer)));
+        getLayoutService().doLayout(request, response, new MCRJDOMContent(new Document(answer)));
     }
 
     /**

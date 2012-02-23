@@ -51,7 +51,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.datamodel.ifs2.MCRContent;
+import org.mycore.common.content.MCRJDOMContent;
 
 /**
  * Select action process for Web-Content-Management-System (WCMS).
@@ -519,7 +519,7 @@ public class MCRWCMSChooseServlet extends MCRWCMSServlet {
             mcrSession.put("addAtPosition", addAtPosition);
         }
 
-        getLayoutService().doLayout(request, response, MCRContent.readFrom(jdom));
+        getLayoutService().doLayout(request, response, new MCRJDOMContent(jdom));
     }
 
     /**

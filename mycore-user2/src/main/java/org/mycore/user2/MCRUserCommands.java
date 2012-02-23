@@ -47,9 +47,9 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
+import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.classifications2.MCRLabel;
-import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRCommand;
 import org.mycore.user2.utils.MCRUserTransformer;
@@ -286,7 +286,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         LOGGER.info("Reading file " + input + " ...");
 
         try {
-            Document doc = MCRXMLParserFactory.getNonValidatingParser().parseXML(MCRContent.readFrom(input));
+            Document doc = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(input));
             Element rootelm = doc.getRootElement();
             MCRUser mcrUser = MCRUserTransformer.buildMCRUser(rootelm);
 
@@ -480,7 +480,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         }
         File input = new File(filename);
         LOGGER.info("Reading file " + input + " ...");
-        Document doc = MCRXMLParserFactory.getNonValidatingParser().parseXML(MCRContent.readFrom(input));
+        Document doc = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(input));
         return MCRUserTransformer.buildMCRUser(doc.getRootElement());
     }
 

@@ -43,9 +43,9 @@ import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMSource;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
+import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLParserFactory;
-import org.mycore.datamodel.ifs2.MCRContent;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -175,7 +175,7 @@ public class MCRRealmFactory {
                 fout.close();
             }
         }
-        return MCRXMLParserFactory.getNonValidatingParser().parseXML(MCRContent.readFrom(realmsFile));
+        return MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(realmsFile));
     }
 
     /**
