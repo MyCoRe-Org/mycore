@@ -29,6 +29,7 @@ import org.apache.commons.vfs.FileObject;
 import org.jdom.JDOMException;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
+import org.mycore.common.content.MCRContent;
 
 /**
  * Stores XML metadata documents (or optionally any other BLOB data) in a

@@ -31,6 +31,8 @@ import org.apache.commons.vfs.provider.local.LocalFile;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRStreamContent;
 
 /**
  * Represents a file stored in a file collection. This is a file that is
@@ -116,7 +118,7 @@ public class MCRFile extends MCRStoredNode {
      */
     public String setContent(MCRContent source) throws IOException {
         MCRContentInputStream cis = source.getContentInputStream();
-        source.sendTo(fo);
+        new MCRStreamContent(cis).sendTo(fo);
         String md5 = cis.getMD5String();
         data.setAttribute("md5", md5);
         getRoot().saveAdditionalData();

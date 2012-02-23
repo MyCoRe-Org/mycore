@@ -35,6 +35,8 @@ import org.apache.commons.vfs.FileObject;
 import org.apache.log4j.Logger;
 import org.jdom.JDOMException;
 import org.mycore.common.MCRUsageException;
+import org.mycore.common.content.MCRByteContent;
+import org.mycore.common.content.MCRContent;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNException;
@@ -221,7 +223,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         revision = repository.getFile(store.getSlotPath(id), -1, null, baos);
         baos.close();
-        MCRContent.readFrom(baos.toByteArray()).sendTo(fo);
+        new MCRByteContent(baos.toByteArray()).sendTo(fo);
     }
 
     /**

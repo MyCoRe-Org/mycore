@@ -29,6 +29,8 @@ import java.util.Date;
 import org.apache.commons.vfs.FileObject;
 import org.jdom.JDOMException;
 import org.mycore.common.MCRUsageException;
+import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRVFSContent;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -110,7 +112,7 @@ public class MCRStoredMetadata {
      * @return the stored XML document
      */
     public MCRContent getMetadata() throws IOException {
-        return MCRContent.readFrom(fo);
+        return new MCRVFSContent(fo);
     }
 
     /**

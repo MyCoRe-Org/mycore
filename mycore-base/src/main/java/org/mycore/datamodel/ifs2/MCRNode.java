@@ -35,6 +35,8 @@ import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.RandomAccessContent;
 import org.apache.commons.vfs.VFS;
 import org.apache.commons.vfs.util.RandomAccessMode;
+import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRVFSContent;
 
 /**
  * Represents a file, directory or file collection within a file store. Files
@@ -291,7 +293,7 @@ public abstract class MCRNode {
      * @return the content of the file
      */
     public MCRContent getContent() throws IOException {
-        return isFile() ? MCRContent.readFrom(fo) : null;
+        return isFile() ? new MCRVFSContent(fo) : null;
     }
 
     /**

@@ -23,7 +23,6 @@
 
 package org.mycore.datamodel.ifs2;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.vfs.FileObject;
@@ -32,6 +31,8 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.common.content.MCRVFSContent;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -93,7 +94,7 @@ public class MCRFileCollection extends MCRDirectory {
             repairMetadata();
         }
         try {
-            data = MCRContent.readFrom(src).asXML().getRootElement();
+            data = new MCRVFSContent(src).asXML().getRootElement();
         } catch(JDOMException jdomExc) {
             throw new IOException(jdomExc);
         } catch (SAXParseException e) {
@@ -103,7 +104,7 @@ public class MCRFileCollection extends MCRDirectory {
 
     protected void saveAdditionalData() throws IOException {
         FileObject target = VFS.getManager().resolveFile(fo, dataFile);
-        MCRContent.readFrom(data.getDocument()).sendTo(target);
+        new MCRJDOMContent(data.getDocument()).sendTo(target);
     }
 
     /**

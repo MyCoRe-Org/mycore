@@ -29,6 +29,8 @@ import java.util.Date;
 
 import org.jdom.JDOMException;
 import org.mycore.common.MCRUsageException;
+import org.mycore.common.content.MCRByteContent;
+import org.mycore.common.content.MCRContent;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.io.SVNRepository;
@@ -162,7 +164,7 @@ public class MCRMetadataVersion {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             repository.getFile(vm.getStore().getSlotPath(vm.getID()), revision, null, baos);
             baos.close();
-            return MCRContent.readFrom(baos.toByteArray());
+            return new MCRByteContent(baos.toByteArray());
         } catch (SVNException e) {
             throw new IOException(e);
         }

@@ -33,6 +33,7 @@ import java.util.StringTokenizer;
 
 import org.jdom.Document;
 import org.jdom.Element;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -61,7 +62,7 @@ public class MCRStoreBrowserServlet extends MCRServlet {
         MCRStoreBrowserRequest sbr = new MCRStoreBrowserRequest(pathInfo);
         Document xml = sbr.buildResponseXML();
 
-        getLayoutService().doLayout(job.getRequest(), job.getResponse(), MCRContent.readFrom(xml));
+        getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRJDOMContent(xml));
     }
 }
 
