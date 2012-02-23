@@ -38,7 +38,9 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.datamodel.ifs2.MCRContent;
+import org.mycore.common.content.MCRByteContent;
+import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.ifs2.MCRObjectIDFileSystemDate;
 import org.mycore.datamodel.ifs2.MCRStore;
@@ -294,7 +296,7 @@ public class MCRXMLMetadataManager {
      */
     public MCRStoredMetadata create(MCRObjectID mcrid, Document xml, Date lastModified) {
         try {
-            return create(mcrid, MCRContent.readFrom(xml), lastModified);
+            return create(mcrid, new MCRJDOMContent(xml), lastModified);
         } catch (Exception ex) {
             if (ex instanceof MCRException) {
                 throw (MCRException) ex;
@@ -314,7 +316,7 @@ public class MCRXMLMetadataManager {
      */
     public MCRStoredMetadata create(MCRObjectID mcrid, byte[] xml, Date lastModified) {
         try {
-            return create(mcrid, MCRContent.readFrom(xml), lastModified);
+            return create(mcrid, new MCRByteContent(xml), lastModified);
         } catch (Exception ex) {
             if (ex instanceof MCRException) {
                 throw (MCRException) ex;
@@ -376,7 +378,7 @@ public class MCRXMLMetadataManager {
      */
     public MCRStoredMetadata update(MCRObjectID mcrid, Document xml, Date lastModified) {
         try {
-            return update(mcrid, MCRContent.readFrom(xml), lastModified);
+            return update(mcrid, new MCRJDOMContent(xml), lastModified);
         } catch (Exception ex) {
             if (ex instanceof MCRException) {
                 throw (MCRException) ex;
@@ -396,7 +398,7 @@ public class MCRXMLMetadataManager {
      */
     public MCRStoredMetadata update(MCRObjectID mcrid, byte[] xml, Date lastModified) {
         try {
-            return update(mcrid, MCRContent.readFrom(xml), lastModified);
+            return update(mcrid, new MCRByteContent(xml), lastModified);
         } catch (Exception ex) {
             if (ex instanceof MCRException) {
                 throw (MCRException) ex;

@@ -37,9 +37,9 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
-import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.common.content.MCRByteContent;
+import org.mycore.common.content.MCRVFSContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
-import org.mycore.datamodel.ifs2.MCRContent;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -181,7 +181,7 @@ public abstract class MCRBase {
      * @throws SAXParseException 
      */
     protected final void setFromURI(URI uri) throws MCRException, SAXParseException, IOException {
-        Document jdom = MCRXMLParserFactory.getParser().parseXML(MCRContent.readFrom(uri));
+        Document jdom = MCRXMLParserFactory.getParser().parseXML(new MCRVFSContent(uri));
         setFromJDOM(jdom);
     }
 
@@ -196,7 +196,7 @@ public abstract class MCRBase {
      * @throws SAXParseException 
      */
     protected final void setFromXML(byte[] xml, boolean valid) throws MCRException, SAXParseException, IOException {
-        Document jdom = MCRXMLParserFactory.getParser().parseXML(MCRContent.readFrom(xml));
+        Document jdom = MCRXMLParserFactory.getParser().parseXML(new MCRByteContent(xml));
         setFromJDOM(jdom);
     }
 
