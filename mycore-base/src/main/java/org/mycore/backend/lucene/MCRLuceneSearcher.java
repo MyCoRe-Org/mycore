@@ -23,7 +23,6 @@
 
 package org.mycore.backend.lucene;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -67,7 +66,6 @@ import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRNormalizer;
 import org.mycore.common.events.MCRShutdownHandler;
-import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRFieldValue;
@@ -75,7 +73,6 @@ import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSearcher;
 import org.mycore.services.fieldquery.MCRSortBy;
-import org.mycore.services.plugins.TextFilterPluginManager;
 
 /**
  * This class builds indexes from mycore meta data.
@@ -88,8 +85,6 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
 
     /** The logger */
     private final static Logger LOGGER = Logger.getLogger(MCRLuceneSearcher.class);
-
-    private static TextFilterPluginManager PLUGIN_MANAGER = null;
 
     static Analyzer analyzer = new PerFieldAnalyzerWrapper(new GermanAnalyzer(Version.LUCENE_30));
 
@@ -280,7 +275,8 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
      * 
      * @return result set
      */
-    private MCRResults getLuceneHits(Query luceneQuery, int maxResults, List<MCRSortBy> sortBy, boolean addSortData, Set<String> usedFields) throws Exception {
+    private MCRResults getLuceneHits(Query luceneQuery, int maxResults, List<MCRSortBy> sortBy, boolean addSortData, Set<String> usedFields)
+            throws Exception {
         if (maxResults <= 0) {
             maxResults = 1000000;
         }
@@ -455,57 +451,35 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
             String name = field.getField().getName();
             String type = field.getField().getDataType();
             String content = field.getValue();
-            MCRFile mcrfile = field.getFile();
 
-            if (null != mcrfile) {
-                if (PLUGIN_MANAGER == null) {
-                    PLUGIN_MANAGER = TextFilterPluginManager.getInstance();
-                }
-                if (PLUGIN_MANAGER.isSupported(mcrfile.getContentType())) {
-                    LOGGER.debug("####### Index MCRFile: " + mcrfile.getPath());
+            Field.Store store = Field.Store.NO;
+            if (field.getField().isSortable()) {
+                store = Field.Store.YES;
+            }
+            if ("date".equals(type) || "time".equals(type) || "timestamp".equals(type)) {
+                doc.add(new NumericField(name, store, true).setLongValue(MCRLuceneTools.getLongValue(content)));
+            } else if ("boolean".equals(type)) {
+                content = "true".equals(content) ? "1" : "0";
+                type = "identifier";
+            } else if ("decimal".equals(type)) {
+                doc.add(new NumericField(name, store, true).setFloatValue(Float.parseFloat(content)));
+            } else if ("integer".equals(type)) {
+                doc.add(new NumericField(name, store, true).setLongValue(Long.parseLong(content)));
+            }
 
-                    BufferedReader in = new BufferedReader(PLUGIN_MANAGER.transform(mcrfile.getContentType(), mcrfile.getContentAsInputStream()));
-                    String s;
-                    StringBuffer text = new StringBuffer();
-                    while ((s = in.readLine()) != null) {
-                        text.append(s).append(" ");
-                    }
-
-                    s = text.toString();
-                    s = MCRNormalizer.normalizeString(s);
-
-                    doc.add(new Field(name, s, Field.Store.NO, Field.Index.ANALYZED));
-                }
-            } else {
-                Field.Store store = Field.Store.NO;
+            if (type.equals("identifier")) {
+                doc.add(new Field(name, content, Field.Store.YES, Field.Index.NOT_ANALYZED));
+            }
+            if (type.equals("index")) {
+                doc.add(new Field(name, MCRNormalizer.normalizeString(content), Field.Store.YES, Field.Index.NOT_ANALYZED));
+            }
+            if (type.equals("Text") || type.equals("name") || type.equals("text") && field.getField().isSortable()) {
+                doc.add(new Field(name, content, Field.Store.YES, Field.Index.ANALYZED));
                 if (field.getField().isSortable()) {
-                    store = Field.Store.YES;
+                    doc.add(new Field(name + getSortableSuffix(), content, Field.Store.YES, Field.Index.NOT_ANALYZED));
                 }
-                if ("date".equals(type) || "time".equals(type) || "timestamp".equals(type)) {
-                    doc.add(new NumericField(name, store, true).setLongValue(MCRLuceneTools.getLongValue(content)));
-                } else if ("boolean".equals(type)) {
-                    content = "true".equals(content) ? "1" : "0";
-                    type = "identifier";
-                } else if ("decimal".equals(type)) {
-                    doc.add(new NumericField(name, store, true).setFloatValue(Float.parseFloat(content)));
-                } else if ("integer".equals(type)) {
-                    doc.add(new NumericField(name, store, true).setLongValue(Long.parseLong(content)));
-                }
-
-                if (type.equals("identifier")) {
-                    doc.add(new Field(name, content, Field.Store.YES, Field.Index.NOT_ANALYZED));
-                }
-                if (type.equals("index")) {
-                    doc.add(new Field(name, MCRNormalizer.normalizeString(content), Field.Store.YES, Field.Index.NOT_ANALYZED));
-                }
-                if (type.equals("Text") || type.equals("name") || type.equals("text") && field.getField().isSortable()) {
-                    doc.add(new Field(name, content, Field.Store.YES, Field.Index.ANALYZED));
-                    if (field.getField().isSortable()) {
-                        doc.add(new Field(name + getSortableSuffix(), content, Field.Store.YES, Field.Index.NOT_ANALYZED));
-                    }
-                } else if (type.equals("text")) {
-                    doc.add(new Field(name, content, Field.Store.NO, Field.Index.ANALYZED));
-                }
+            } else if (type.equals("text")) {
+                doc.add(new Field(name, content, Field.Store.NO, Field.Index.ANALYZED));
             }
         }
 
@@ -617,7 +591,8 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         try {
             for (int tSec = 0; !modifyExecutor.isTerminated() && tSec < 60 * 6; tSec++) {
                 long numProcessed = modifyExecutor.getCompletedTaskCount();
-                LOGGER.info(MessageFormat.format("Processed {0} of {1} modification requests, still working...",numProcessed,taskCount,toString()));
+                LOGGER.info(MessageFormat.format("Processed {0} of {1} modification requests, still working...", numProcessed, taskCount,
+                        toString()));
                 modifyExecutor.awaitTermination(10, TimeUnit.SECONDS);
             }
         } catch (InterruptedException e) {
