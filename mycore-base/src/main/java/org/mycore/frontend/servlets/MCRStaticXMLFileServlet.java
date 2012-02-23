@@ -36,11 +36,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
+import org.jdom.JDOMException;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRFileContent;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
-import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.frontend.editor.MCREditorServlet;
 import org.xml.sax.SAXParseException;
 
@@ -62,7 +65,7 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
     protected final static HashMap<String, String> docTypesMap = new HashMap<String, String>();
 
     @Override
-    public void doGetPost(MCRServletJob job) throws java.io.IOException, MCRException, SAXParseException {
+    public void doGetPost(MCRServletJob job) throws java.io.IOException, MCRException, SAXParseException, JDOMException {
         final HttpServletRequest request = job.getRequest();
         final HttpServletResponse response = job.getResponse();
         String requestedPath = request.getServletPath();
@@ -81,20 +84,15 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
     }
 
     static void processFile(final HttpServletRequest request, final HttpServletResponse response, File file) throws FileNotFoundException,
-            IOException, MalformedURLException, MCRException, SAXParseException {
+            IOException, MalformedURLException, MCRException, SAXParseException, JDOMException {
         request.setAttribute("XSL.StaticFilePath", request.getServletPath().substring(1));
         request.setAttribute("XSL.DocumentBaseURL", file.getParent() + File.separator);
         request.setAttribute("XSL.FileName", file.getName());
         request.setAttribute("XSL.FilePath", file.getPath());
 
         // Find out XML document type: Is this a static webpage or some other XML?
-        FileInputStream fis = new FileInputStream(file);
-        String type;
-        try {
-            type = MCRUtils.parseDocumentType(fis);
-        } finally {
-            fis.close();
-        }
+        MCRContent content = new MCRFileContent(file);
+        String docType = content.getDocType();
 
         // Parse list of document types that may contain editor elements
         if (docTypesMap.isEmpty()) {
@@ -105,12 +103,12 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
         }
 
         // For defined document types like static webpages, replace editor elements with complete editor definition
-        if (docTypesMap.containsKey(type)) {
-            Document xml = MCRXMLParserFactory.getNonValidatingParser().parseXML(MCRContent.readFrom(file));
+        if (docTypesMap.containsKey(docType)) {
+            Document xml = content.asXML();
             MCREditorServlet.replaceEditorElements(request, file.toURI().toURL().toString(), xml);
-            getLayoutService().doLayout(request, response, MCRContent.readFrom(xml));
+            getLayoutService().doLayout(request, response, new MCRJDOMContent(xml));
         } else {
-            getLayoutService().doLayout(request, response, MCRContent.readFrom(file));
+            getLayoutService().doLayout(request, response, content);
         }
     }
 }

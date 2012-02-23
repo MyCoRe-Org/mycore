@@ -48,9 +48,9 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.common.MCRActiveLinkException;
-import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -584,7 +584,7 @@ public class MCRPersistentServlet extends MCRServlet {
         }
 
         // restart editor
-        getLayoutService().doLayout(job.getRequest(), job.getResponse(), MCRContent.readFrom(root.getDocument()));
+        getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRJDOMContent(root.getDocument()));
     }
 
     /**

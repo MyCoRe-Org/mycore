@@ -42,8 +42,9 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.content.MCRDOMContent;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.ifs2.MCRVersioningMetadataStore;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -122,9 +123,9 @@ public class MCRObjectServlet extends MCRServlet {
             if (localObject == null) {
                 return;
             }
-            getLayoutService().doLayout(job.getRequest(), job.getResponse(), MCRContent.readFrom(localObject));
+            getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRJDOMContent(localObject));
         } else {
-            getLayoutService().doLayout(job.getRequest(), job.getResponse(), MCRContent.readFrom(requestRemoteObject(job)));
+            getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRDOMContent(requestRemoteObject(job)));
         }
     }
 

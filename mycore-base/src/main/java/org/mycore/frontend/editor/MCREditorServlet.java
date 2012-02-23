@@ -51,8 +51,8 @@ import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRURIResolver;
-import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.frontend.editor.postprocessor.MCREditorPostProcessor;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -112,7 +112,7 @@ public class MCREditorServlet extends MCRServlet {
             editorResolved = startSession(parameters, ref, uri, validate);
         }
 
-        getLayoutService().sendXML(req, res, MCRContent.readFrom(new Document((Element) editorResolved.clone())));
+        getLayoutService().sendXML(req, res, new MCRJDOMContent(new Document((Element) editorResolved.clone())));
     }
 
     /**
@@ -128,7 +128,7 @@ public class MCREditorServlet extends MCRServlet {
         Element popup = MCREditorDefReader.findElementByID(ref, editor);
         Element clone = (Element) popup.clone();
 
-        getLayoutService().doLayout(job.getRequest(), job.getResponse(), MCRContent.readFrom(new Document(clone)));
+        getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRJDOMContent(new Document(clone)));
     }
 
     /**
@@ -464,7 +464,7 @@ public class MCREditorServlet extends MCRServlet {
         } else if (targetType.equals("debug")) {
             sendToDebug(res, xml, sub);
         } else if (targetType.equals("display")) {
-            getLayoutService().doLayout(req, res, MCRContent.readFrom(sub.getXML()));
+            getLayoutService().doLayout(req, res, new MCRJDOMContent(sub.getXML()));
         } else if (targetType.equals("subselect")) {
             List variables = sub.getVariables();
             String root = sub.getXML().getRootElement().getName();

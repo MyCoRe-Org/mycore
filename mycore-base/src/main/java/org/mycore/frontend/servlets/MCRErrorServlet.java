@@ -41,8 +41,8 @@ import org.jdom.Namespace;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRLayoutService;
-import org.mycore.datamodel.ifs2.MCRContent;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -163,7 +163,7 @@ public class MCRErrorServlet extends HttpServlet {
                     session.beginTransaction();
                 }
                 setWebAppBaseURL(session, request);
-                LAYOUT_SERVICE.doLayout(request, response, MCRContent.readFrom(errorDoc));
+                LAYOUT_SERVICE.doLayout(request, response, new MCRJDOMContent(errorDoc));
                 if (!openTransaction)
                     session.commitTransaction();
                 return;

@@ -37,9 +37,9 @@ import org.jdom.Element;
 import org.jdom.filter.ElementFilter;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLParserFactory;
-import org.mycore.datamodel.ifs2.MCRContent;
 
 /*
  * Reads in definition of editor forms like search mask and data input forms.
@@ -109,7 +109,7 @@ public class MCREditorDefReader {
         editor.setAttribute("noNamespaceSchemaLocation", "editor.xsd", MCRConstants.XSI_NAMESPACE);
 
         try {
-            MCRXMLParserFactory.getValidatingParser().parseXML(MCRContent.readFrom(doc));
+            MCRXMLParserFactory.getValidatingParser().parseXML(new MCRJDOMContent(doc));
         } catch (Exception ex) {
             String msg = "Error validating editor " + uri;
             LOGGER.error(msg);
