@@ -161,13 +161,13 @@
           <td valign="top" class="metaname">
             <xsl:choose>
               <xsl:when test="./../@type='translated'">
-                <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.title'),' (',./../@xml:lang,') :')" />
+                <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.title'),' (',./../@xml:lang,'):')" />
               </xsl:when>
               <xsl:when test="./../@type='alternative' and ./../@displayLabel='Short form of the title'">
-                <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.shorttitle'),' :')" />
+                <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.shorttitle'),':')" />
               </xsl:when>
               <xsl:otherwise>
-                <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.title'),' :')" />
+                <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.title'),':')" />
               </xsl:otherwise>
             </xsl:choose>
           </td>
@@ -435,7 +435,7 @@
   <xsl:template match="mods:identifier[@type='hdl']" mode="present">
     <tr>
       <td valign="top" class="metaname">
-        <xsl:value-of select="'Handle:'" />
+        <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.identifier.hdl'),':')" />
       </td>
       <td class="metavalue">
         <xsl:variable name="hdl" select="." />
@@ -449,7 +449,7 @@
   <xsl:template match="mods:identifier" mode="present">
     <tr>
       <td valign="top" class="metaname">
-        <xsl:value-of select="i18n:translate(concat('metaData.mods.dictionary.identifier.',@type))" />
+        <xsl:value-of select="concat(i18n:translate(concat('metaData.mods.dictionary.identifier.',@type)),':')" />
       </td>
       <td class="metavalue">
         <xsl:value-of select="." />
@@ -462,10 +462,10 @@
       <td valign="top" class="metaname">
         <xsl:choose>
           <xsl:when test="contains(.,'PPN=')">
-            <xsl:value-of select="i18n:translate('metaData.mods.dictionary.identifier.ppn')" />
+            <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.identifier.ppn'),':')" />
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="i18n:translate(concat('metaData.mods.dictionary.identifier.',@type))" />
+            <xsl:value-of select="concat(i18n:translate(concat('metaData.mods.dictionary.identifier.',@type)),':')" />
           </xsl:otherwise>
         </xsl:choose>
       </td>
@@ -558,13 +558,52 @@
     </tr>
   </xsl:template>
 
+  <xsl:template name="printMetaDate.mods.children">
+    <xsl:if test="./structure/children/child">
+      <!--*** List children per object type ************************************* -->
+      <!-- 1.) get a list of objectTypes of all child elements 2.) remove duplicates from this list 3.) for-each objectTyp id list child elements -->
+      <xsl:variable name="objectTypes">
+        <xsl:for-each select="./structure/children/child/@xlink:href">
+          <id>
+            <xsl:copy-of select="substring-before(substring-after(.,'_'),'_')" />
+          </id>
+        </xsl:for-each>
+      </xsl:variable>
+      <xsl:variable select="xalan:nodeset($objectTypes)/id[not(.=following::id)]" name="unique-ids" />
+      <!-- the for-each would iterate over <id> with root not beeing /mycoreobject so we save the current node in variable context to access 
+        needed nodes -->
+      <xsl:variable select="." name="context" />
+      <xsl:for-each select="$unique-ids">
+        <xsl:variable select="." name="thisObjectType" />
+        <xsl:variable name="label">
+          <xsl:value-of select="'enthält'" />
+  <!--          <xsl:choose>
+            <xsl:when test="count($context/structure/children/child[contains(@xlink:href,$thisObjectType)])=1">
+              <xsl:value-of select="i18n:translate(concat('metaData.',$thisObjectType,'.[singular]'))" />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="i18n:translate(concat('metaData.',$thisObjectType,'.[plural]'))" />
+            </xsl:otherwise>
+          </xsl:choose> -->
+        </xsl:variable>
+        <xsl:call-template name="printMetaDate">
+          <xsl:with-param select="$context/structure/children/child[contains(@xlink:href, concat('_',$thisObjectType,'_'))]"
+            name="nodes" />
+          <xsl:with-param select="$label" name="label" />
+        </xsl:call-template>
+      </xsl:for-each>
+    </xsl:if>
+  </xsl:template>
+
   <xsl:template name="printMetaDate.mods.permalink">
     <tr>
       <td valign="top" class="metaname">
         <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.permalink'),':')" />
       </td>
       <td class="metavalue">
-        <a href="http://openagrar.bmelv-forschung.de/receive/{@ID}">Permalink</a>
+        <a href="{$WebApplicationBaseURL}receive/{@ID}">
+          <xsl:value-of select="concat($WebApplicationBaseURL,'receive/',@ID)" />
+        </a>
 <!--         <xsl:text> | </xsl:text>
         <xsl:call-template name="shareButton">
           <xsl:with-param name="linkURL" select="concat($ServletsBaseURL,'receive/',@ID)" />
@@ -735,36 +774,40 @@
           <div class="c85l">
             <table class="metaData">
               <xsl:for-each select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@type='conference']">
-                <td valign="top" class="metaname">
-                  <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.conference.title'),':')" />
-                </td>
-                <td class="metavalue">
-                  <strong>
-                    <xsl:for-each select="mods:namePart[not(@type)]">
-                      <xsl:choose>
-                        <xsl:when test="position()=1">
-                          <xsl:value-of select="." />
-                        </xsl:when>
-                        <xsl:otherwise>
-                          <em>
-                            <xsl:value-of select="concat(' – ',.)" />
-                          </em>
-                        </xsl:otherwise>
-                      </xsl:choose>
+                <tr>
+                  <td valign="top" class="metaname">
+                    <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.conference.title'),':')" />
+                  </td>
+                  <td class="metavalue">
+                    <strong>
+                      <xsl:for-each select="mods:namePart[not(@type)]">
+                        <xsl:choose>
+                          <xsl:when test="position()=1">
+                            <xsl:value-of select="." />
+                          </xsl:when>
+                          <xsl:otherwise>
+                            <em>
+                              <xsl:value-of select="concat(' – ',.)" />
+                            </em>
+                          </xsl:otherwise>
+                        </xsl:choose>
+                      </xsl:for-each>
+                    </strong>
+                    <xsl:if test="mods:namePart[@type='date']">
+                      <em>
+                        <xsl:value-of select="', '" />
+                        <xsl:value-of select="mods:namePart[@type='date']" />
+                      </em>
+                    </xsl:if>
+                    <xsl:for-each select="mods:affiliation">
+                      <xsl:value-of select="concat(', ',.)" />
                     </xsl:for-each>
-                  </strong>
-                  <xsl:if test="mods:namePart[@type='date']">
-                    <em>
-                      <xsl:value-of select="', '" />
-                      <xsl:value-of select="mods:namePart[@type='date']" />
-                    </em>
-                  </xsl:if>
-                  <xsl:for-each select="mods:affiliation">
-                    <xsl:value-of select="concat(', ',.)" />
-                  </xsl:for-each>
-                </td>
+                  </td>
+                </tr>
               </xsl:for-each>
               <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
+              <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[not(@ID) and not(@type='conference')]" />
+              <xsl:call-template name="printMetaDate.mods.children" />
             </table>
           </div>
           <div class="c15r">
@@ -822,8 +865,6 @@
               <xsl:with-param name="nodes"
                 select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:place/mods:placeTerm" />
             </xsl:call-template>
-            <xsl:apply-templates mode="present"
-              select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[not(@type='conference')]" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:url" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:accessCondition" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID]" />
@@ -1079,42 +1120,7 @@
       <div id="title_content" class="block_content">
         <table class="metaData">
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
-
-          <xsl:if test="./structure/children/child">
-            <!--*** List children per object type ************************************* -->
-            <!-- 1.) get a list of objectTypes of all child elements 2.) remove duplicates from this list 3.) for-each objectTyp id list child elements -->
-            <xsl:variable name="objectTypes">
-              <xsl:for-each select="./structure/children/child/@xlink:href">
-                <id>
-                  <xsl:copy-of select="substring-before(substring-after(.,'_'),'_')" />
-                </id>
-              </xsl:for-each>
-            </xsl:variable>
-            <xsl:variable select="xalan:nodeset($objectTypes)/id[not(.=following::id)]" name="unique-ids" />
-            <!-- the for-each would iterate over <id> with root not beeing /mycoreobject so we save the current node in variable context to access 
-              needed nodes -->
-            <xsl:variable select="." name="context" />
-            <xsl:for-each select="$unique-ids">
-              <xsl:variable select="." name="thisObjectType" />
-              <xsl:variable name="label">
-                <xsl:value-of select="'enthält'" />
-  <!--          <xsl:choose>
-                  <xsl:when test="count($context/structure/children/child[contains(@xlink:href,$thisObjectType)])=1">
-                    <xsl:value-of select="i18n:translate(concat('metaData.',$thisObjectType,'.[singular]'))" />
-                  </xsl:when>
-                  <xsl:otherwise>
-                    <xsl:value-of select="i18n:translate(concat('metaData.',$thisObjectType,'.[plural]'))" />
-                  </xsl:otherwise>
-                </xsl:choose> -->
-              </xsl:variable>
-              <xsl:call-template name="printMetaDate">
-                <xsl:with-param select="$context/structure/children/child[contains(@xlink:href, concat('_',$thisObjectType,'_'))]"
-                  name="nodes" />
-                <xsl:with-param select="$label" name="label" />
-              </xsl:call-template>
-            </xsl:for-each>
-          </xsl:if>
-
+          <xsl:call-template name="printMetaDate.mods.children" />
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
           <xsl:call-template name="printMetaDate.mods.permalink" />
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:extension" />
@@ -1139,42 +1145,7 @@
       <div id="title_content" class="block_content">
         <table class="metaData">
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
-
-          <xsl:if test="./structure/children/child">
-            <!--*** List children per object type ************************************* -->
-            <!-- 1.) get a list of objectTypes of all child elements 2.) remove duplicates from this list 3.) for-each objectTyp id list child elements -->
-            <xsl:variable name="objectTypes">
-              <xsl:for-each select="./structure/children/child/@xlink:href">
-                <id>
-                  <xsl:copy-of select="substring-before(substring-after(.,'_'),'_')" />
-                </id>
-              </xsl:for-each>
-            </xsl:variable>
-            <xsl:variable select="xalan:nodeset($objectTypes)/id[not(.=following::id)]" name="unique-ids" />
-            <!-- the for-each would iterate over <id> with root not beeing /mycoreobject so we save the current node in variable context to access 
-              needed nodes -->
-            <xsl:variable select="." name="context" />
-            <xsl:for-each select="$unique-ids">
-              <xsl:variable select="." name="thisObjectType" />
-              <xsl:variable name="label">
-                <xsl:value-of select="'enthält'" />
-  <!--          <xsl:choose>
-                  <xsl:when test="count($context/structure/children/child[contains(@xlink:href,$thisObjectType)])=1">
-                    <xsl:value-of select="i18n:translate(concat('metaData.',$thisObjectType,'.[singular]'))" />
-                  </xsl:when>
-                  <xsl:otherwise>
-                    <xsl:value-of select="i18n:translate(concat('metaData.',$thisObjectType,'.[plural]'))" />
-                  </xsl:otherwise>
-                </xsl:choose> -->
-              </xsl:variable>
-              <xsl:call-template name="printMetaDate">
-                <xsl:with-param select="$context/structure/children/child[contains(@xlink:href, concat('_',$thisObjectType,'_'))]"
-                  name="nodes" />
-                <xsl:with-param select="$label" name="label" />
-              </xsl:call-template>
-            </xsl:for-each>
-          </xsl:if>
-
+          <xsl:call-template name="printMetaDate.mods.children" />
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
           <xsl:call-template name="printMetaDate.mods.permalink" />
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:extension" />
@@ -1242,13 +1213,16 @@
                   <!-- Issue -->
                   <xsl:value-of
                     select="concat(mods:part/mods:detail[@type='issue']/mods:caption,' ',mods:part/mods:detail[@type='issue']/mods:number)" />
+                  <xsl:if test="mods:part/mods:detail[@type='issue']/mods:number and mods:part/mods:date">
+                    <xsl:text>/</xsl:text>
+                  </xsl:if>
                   <xsl:if test="mods:part/mods:date">
-                    <xsl:value-of select="concat('/',mods:part/mods:date,' ')" />
+                    <xsl:value-of select="concat(mods:part/mods:date,' ')" />
                   </xsl:if>
                   <!-- Volume -->
                   <xsl:if test="mods:part/mods:detail[@type='volume']/mods:number">
                     <xsl:value-of
-                      select="concat('(',i18n:translate('metaData.mods.dictionary.volume.article'),': ',mods:part/mods:detail[@type='volume']/mods:number,')')" />
+                      select="concat('(',i18n:translate('metaData.mods.dictionary.volume.article'),': ',mods:part/mods:detail[@type='volume']/mods:number,') ')" />
                   </xsl:if>
                   <!-- Pages -->
                   <xsl:for-each select="mods:part/mods:extent[@unit='pages']">
