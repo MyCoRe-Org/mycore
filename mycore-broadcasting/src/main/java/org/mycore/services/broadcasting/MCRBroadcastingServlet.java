@@ -50,9 +50,7 @@ public class MCRBroadcastingServlet extends MCRServlet {
         // get mode and process
         Element answer = null;
         boolean transformByXSL = false;
-        if (request.getParameter("mode").equals("hasReceived")) {
-            answer = getReceived(session, sessionSensitive);
-        } else if (request.getParameter("mode").equals("addReceiver")) {
+        if (request.getParameter("mode").equals("addReceiver")) {
             addReceiver(session, sessionSensitive);
             answer = new Element("addReceiver").setText("done");
         } else if (request.getParameter("mode").equals("clearReceiverList") && access()) {
@@ -69,11 +67,6 @@ public class MCRBroadcastingServlet extends MCRServlet {
 
         // render xml
         forwardJDOM(request, response, answer, transformByXSL);
-    }
-
-    public static Element getReceived(MCRSession session, boolean sessionSensitive) {
-        String hasReceived = Boolean.toString(hasReceived(session, sessionSensitive));
-        return new Element("hasReceived").setText(hasReceived);
     }
 
     private static boolean access() {
@@ -115,7 +108,7 @@ public class MCRBroadcastingServlet extends MCRServlet {
         return details;
     }
 
-    private static boolean hasReceived(MCRSession session, boolean sessionSensitive) {
+    public static boolean hasReceived(MCRSession session, boolean sessionSensitive) {
         // if (!cache.isEmpty() && cache.get("bcRecList") != null) {
         String key = getKey(sessionSensitive, session);
         if ((session.getUserInformation().getUserID().equals("gast") && bcRecList.get(session.getID()) != null)

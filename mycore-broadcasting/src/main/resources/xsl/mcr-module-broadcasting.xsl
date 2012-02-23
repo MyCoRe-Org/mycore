@@ -14,7 +14,8 @@
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan"
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:mcrxml="xalan://org.mycore.common.xml.MCRXMLFunctions"
-  exclude-result-prefixes="xalan i18n mcrxml">
+  xmlns:broadcasting="xalan://org.mycore.services.broadcasting.MCRBroadcastingFunctions"
+  exclude-result-prefixes="xalan i18n mcrxml broadcasting">
   &html-output;
   <xsl:param name="WebApplicationBaseURL" />
   <xsl:param name="CurrentGroups" />
@@ -222,31 +223,17 @@
     <xsl:if test="$initJS='true'">
       <script language="JavaScript" src="{$WebApplicationBaseURL}modules/broadcasting/web/JS/broadcasting.js" type="text/javascript" />
       <script type="text/javascript">
-        <xsl:value-of select="concat('receiveBroadcast(&#34;',$sender,'&#34;,&#34;',$registerCall,'&#34;,&#34;',$refreshRate,'&#34;);')" />
+        <xsl:value-of select="concat('initializeBroadcast(&#34;',$sender,'&#34;,&#34;',$registerCall,'&#34;,&#34;',$refreshRate,'&#34;);')" />
       </script>
       <meta name="expires" content="-1" />
     </xsl:if>
   </xsl:template>
   <!-- ======================================================================================== -->
-  
-    <xsl:variable name="servletURIRes" select="'request:servlets/MCRBroadcastingServlet'" />
-  
   <xsl:template name="get.alreadyReceived">
     <xsl:variable name="sessionSensitive">
       <xsl:call-template name="get.sessionSensitive" />
     </xsl:variable>
-    <xsl:variable name="alreadyReceived">
-      <!-- <xsl:copy-of select="document(concat($servletURIRes,'?mode=hasReceived&amp;sessionSensitive=',$sessionSensitive))" />-->
-      <xsl:copy-of select="document(concat('broadcasting-hasReceived:', $sessionSensitive))" />
-    </xsl:variable>
-    <xsl:choose>
-      <xsl:when test="xalan:nodeset($alreadyReceived)/mcr-module-broadcasting/hasReceived/text()='true'">
-        <xsl:value-of select="'true'" />
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="'false'" />
-      </xsl:otherwise>
-    </xsl:choose>
+    <xsl:value-of select="broadcasting:hasReceived($sessionSensitive)"></xsl:value-of>
   </xsl:template>
   <!-- ======================================================================================== -->
   <xsl:template name="get.sessionSensitive">
