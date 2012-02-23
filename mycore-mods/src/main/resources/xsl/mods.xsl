@@ -15,9 +15,10 @@
   <xsl:include href="modsdetails-external.xsl" />  <!-- for external usage in application module -->
 
   <xsl:variable name="head.additional">
-    <!-- ==================== Highwire Press tags ==================== -->
-    <xsl:variable name="uri" select="concat('mcrobject:',/mycoreobject/@ID)" />
-    <xsl:apply-templates select="document($uri)/mycoreobject/metadata/def.modsContainer/modsContainer/mods:mods" mode="highwire" />
+    <xsl:if test="contains(/mycoreobject/@ID,'_mods_')">
+      <!-- ==================== Highwire Press tags ==================== -->
+      <xsl:apply-templates select="/mycoreobject/metadata/def.modsContainer/modsContainer/mods:mods" mode="highwire" />
+    </xsl:if>
   </xsl:variable>
 
   <!--Template for result list hit: see results.xsl -->
@@ -249,7 +250,7 @@
 
     <div id="detail_view" class="blockbox">
       <h3>
-        <xsl:apply-templates select="." mode="title" />
+        <xsl:apply-templates select="." mode="resulttitle" /><!-- shorten plain text title (without html) -->
       </h3>
       <xsl:choose>
         <xsl:when test="$mods-type='series'">
@@ -305,7 +306,7 @@
         </xsl:otherwise>
       </xsl:choose>
       <!--*** Editor Buttons ************************************* -->
-      <xsl:if test="((./structure/children/child) and not($mods-type='series' or $mods-type='journal')) or (./structure/derobjects/derobject)">
+      <xsl:if test="((./structure/children/child) and not($mods-type='series' or $mods-type='journal' or $mods-type='cproceeding')) or (./structure/derobjects/derobject)">
         <div id="derivate_box" class="detailbox">
           <h4 id="derivate_switch" class="block_switch">
             <a name="derivate_box"></a>
@@ -370,7 +371,7 @@
             <!--*** MyCoRe-ID ************************************* -->
             <tr>
               <td class="metaname">
-                <xsl:value-of select="concat(i18n:translate('metaData.ID'),' :')" />
+                <xsl:value-of select="concat(i18n:translate('metaData.ID'),':')" />
               </td>
               <td class="metavalue">
                 <xsl:value-of select="./@ID" />
@@ -407,7 +408,7 @@
           <xsl:variable name="type" select="substring-before(substring-after($id,'_'),'_')" />
           <tr>
             <td class="metaname">
-              <xsl:value-of select="concat(i18n:translate('metaData.edit'),' :')" />
+              <xsl:value-of select="concat(i18n:translate('metaData.edit'),':')" />
             </td>
             <td class="metavalue">
               <div class="editorButtons">
