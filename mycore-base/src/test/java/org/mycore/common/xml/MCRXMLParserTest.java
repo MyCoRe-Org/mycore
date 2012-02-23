@@ -34,7 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRTestCase;
-import org.mycore.datamodel.ifs2.MCRContent;
+import org.mycore.common.content.MCRVFSContent;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -62,15 +62,15 @@ public class MCRXMLParserTest extends MCRTestCase {
     @Test
     public void testInvalidXML() throws SAXParseException, IOException {
         try {
-            MCRXMLParserFactory.getValidatingParser().parseXML(MCRContent.readFrom(xmlResourceInvalid));
+            MCRXMLParserFactory.getValidatingParser().parseXML(new MCRVFSContent(xmlResourceInvalid));
             fail("MCRParserXerces accepts invalid XML content when validation is requested");
         } catch (Exception e) {
         }
-        MCRXMLParserFactory.getNonValidatingParser().parseXML(MCRContent.readFrom(xmlResourceInvalid));
+        MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRVFSContent(xmlResourceInvalid));
     }
 
     @Test
     public void testValidXML() throws SAXParseException, IOException {
-        MCRXMLParserFactory.getValidatingParser().parseXML(MCRContent.readFrom(xmlResource));
+        MCRXMLParserFactory.getValidatingParser().parseXML(new MCRVFSContent(xmlResource));
     }
 }

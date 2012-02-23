@@ -38,6 +38,8 @@ import java.util.Iterator;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.junit.Test;
+import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRJDOMContent;
 
 /**
  * JUnit test for MCRMetadataStore
@@ -49,14 +51,14 @@ public class MCRMetadataStoreTest extends MCRIFS2MetadataTestCase {
     @Test
     public void createDocument() throws Exception {
         Document xml1 = new Document(new Element("root"));
-        MCRStoredMetadata sm = getMetaDataStore().create(MCRContent.readFrom(xml1));
+        MCRStoredMetadata sm = getMetaDataStore().create(new MCRJDOMContent(xml1));
         assertNotNull(sm);
         int id1 = sm.getID();
         assertTrue(id1 > 0);
         MCRStoredMetadata sm2 = getMetaDataStore().retrieve(id1);
         MCRContent xml2 = sm2.getMetadata();
-        assertEquals(MCRContent.readFrom(xml1).asString(), xml2.asString());
-        int id2 = getMetaDataStore().create(MCRContent.readFrom(xml1)).getID();
+        assertEquals(new MCRJDOMContent(xml1).asString(), xml2.asString());
+        int id2 = getMetaDataStore().create(new MCRJDOMContent(xml1)).getID();
         assertTrue(id2 > id1);
     }
 
@@ -64,26 +66,26 @@ public class MCRMetadataStoreTest extends MCRIFS2MetadataTestCase {
     public void createDocumentInt() throws Exception {
         Document xml1 = new Document(new Element("root"));
         try {
-            getMetaDataStore().create(MCRContent.readFrom(xml1), 0);
+            getMetaDataStore().create(new MCRJDOMContent(xml1), 0);
             fail("metadata store allows to save with id \"0\".");
         } catch (Exception e) {
             //test passed
         }
         int id = getMetaDataStore().getNextFreeID();
         assertTrue(id > 0);
-        MCRStoredMetadata sm1 = getMetaDataStore().create(MCRContent.readFrom(xml1), id);
+        MCRStoredMetadata sm1 = getMetaDataStore().create(new MCRJDOMContent(xml1), id);
         assertNotNull(sm1);
         MCRContent xml2 = getMetaDataStore().retrieve(id).getMetadata();
-        assertEquals(MCRContent.readFrom(xml1).asString(), xml2.asString());
-        getMetaDataStore().create(MCRContent.readFrom(xml1), id + 1);
+        assertEquals(new MCRJDOMContent(xml1).asString(), xml2.asString());
+        getMetaDataStore().create(new MCRJDOMContent(xml1), id + 1);
         MCRContent xml3 = getMetaDataStore().retrieve(id + 1).getMetadata();
-        assertEquals(MCRContent.readFrom(xml1).asString(), xml3.asString());
+        assertEquals(new MCRJDOMContent(xml1).asString(), xml3.asString());
     }
 
     @Test
     public void delete() throws Exception {
         Document xml1 = new Document(new Element("root"));
-        int id = getMetaDataStore().create(MCRContent.readFrom(xml1)).getID();
+        int id = getMetaDataStore().create(new MCRJDOMContent(xml1)).getID();
         assertTrue(getMetaDataStore().exists(id));
         getMetaDataStore().delete(id);
         assertFalse(getMetaDataStore().exists(id));
@@ -93,20 +95,20 @@ public class MCRMetadataStoreTest extends MCRIFS2MetadataTestCase {
     @Test
     public void update() throws Exception {
         Document xml1 = new Document(new Element("root"));
-        MCRStoredMetadata sm = getMetaDataStore().create(MCRContent.readFrom(xml1));
+        MCRStoredMetadata sm = getMetaDataStore().create(new MCRJDOMContent(xml1));
         Document xml2 = new Document(new Element("update"));
-        sm.update(MCRContent.readFrom(xml2));
+        sm.update(new MCRJDOMContent(xml2));
         MCRContent xml3 = getMetaDataStore().retrieve(sm.getID()).getMetadata();
-        assertEquals(MCRContent.readFrom(xml2).asString(), xml3.asString());
+        assertEquals(new MCRJDOMContent(xml2).asString(), xml3.asString());
     }
 
     @Test
     public void retrieve() throws Exception {
         Document xml1 = new Document(new Element("root"));
-        int id = getMetaDataStore().create(MCRContent.readFrom(xml1)).getID();
+        int id = getMetaDataStore().create(new MCRJDOMContent(xml1)).getID();
         MCRStoredMetadata sm1 = getMetaDataStore().retrieve(id);
         MCRContent xml2 = sm1.getMetadata();
-        assertEquals(MCRContent.readFrom(xml1).asString(), xml2.asString());
+        assertEquals(new MCRJDOMContent(xml1).asString(), xml2.asString());
     }
 
     @Test
@@ -116,14 +118,14 @@ public class MCRMetadataStoreTest extends MCRIFS2MetadataTestCase {
         synchronized (this) {
             wait(1000);
         }
-        MCRStoredMetadata sm = getMetaDataStore().create(MCRContent.readFrom(xml1));
+        MCRStoredMetadata sm = getMetaDataStore().create(new MCRJDOMContent(xml1));
         Date date2 = sm.getLastModified();
         assertTrue(date2.after(date1));
         synchronized (this) {
             wait(1000);
         }
         Document xml2 = new Document(new Element("root"));
-        sm.update(MCRContent.readFrom(xml2));
+        sm.update(new MCRJDOMContent(xml2));
         assertTrue(sm.getLastModified().after(date2));
         @SuppressWarnings("deprecation")
         Date date = new Date(109, 1, 1);
@@ -137,7 +139,7 @@ public class MCRMetadataStoreTest extends MCRIFS2MetadataTestCase {
         int id = getMetaDataStore().getNextFreeID();
         assertFalse(getMetaDataStore().exists(id));
         Document xml1 = new Document(new Element("root"));
-        getMetaDataStore().create(MCRContent.readFrom(xml1), id);
+        getMetaDataStore().create(new MCRJDOMContent(xml1), id);
         assertTrue(getMetaDataStore().exists(id));
         getMetaDataStore().delete(id);
         assertFalse(getMetaDataStore().exists(id));
@@ -149,7 +151,7 @@ public class MCRMetadataStoreTest extends MCRIFS2MetadataTestCase {
         assertTrue(id1 >= 0);
         assertFalse(getMetaDataStore().exists(id1));
         Document xml1 = new Document(new Element("root"));
-        int id2 = getMetaDataStore().create(MCRContent.readFrom(xml1)).getID();
+        int id2 = getMetaDataStore().create(new MCRJDOMContent(xml1)).getID();
         assertTrue(id2 > id1);
         assertTrue(getMetaDataStore().getNextFreeID() > id2);
     }
@@ -164,9 +166,9 @@ public class MCRMetadataStoreTest extends MCRIFS2MetadataTestCase {
         assertFalse(getMetaDataStore().listIDs(true).hasNext());
         assertFalse(getMetaDataStore().listIDs(false).hasNext());
         Document xml1 = new Document(new Element("root"));
-        getMetaDataStore().create(MCRContent.readFrom(xml1));
-        getMetaDataStore().create(MCRContent.readFrom(xml1));
-        getMetaDataStore().create(MCRContent.readFrom(xml1));
+        getMetaDataStore().create(new MCRJDOMContent(xml1));
+        getMetaDataStore().create(new MCRJDOMContent(xml1));
+        getMetaDataStore().create(new MCRJDOMContent(xml1));
         ArrayList<Integer> l1 = new ArrayList<Integer>();
         IDs = getMetaDataStore().listIDs(true);
         while (IDs.hasNext()) {

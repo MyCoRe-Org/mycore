@@ -49,13 +49,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRHibTestCase;
+import org.mycore.common.content.MCRVFSContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.classifications2.utils.MCRStringTransformer;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
-import org.mycore.datamodel.ifs2.MCRContent;
 import org.xml.sax.SAXParseException;
 
 public class MCRCategoryDAOImplTest extends MCRHibTestCase {
@@ -449,7 +449,7 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
 
     public static MCRCategory loadClassificationResource(String resourceName) throws SAXParseException, IOException, URISyntaxException {
         URL classResourceUrl = MCRCategoryDAOImplTest.class.getResource(resourceName);
-        Document xml = MCRXMLParserFactory.getParser().parseXML(MCRContent.readFrom(classResourceUrl));
+        Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRVFSContent(classResourceUrl));
         MCRCategory category = MCRXMLTransformer.getCategory(xml);
         return category;
     }

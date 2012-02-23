@@ -36,9 +36,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRTestCase;
-import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.common.content.MCRVFSContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
-import org.mycore.datamodel.ifs2.MCRContent;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -208,7 +207,7 @@ public class MCRObjectMetadataTest extends MCRTestCase {
 
     private static Document loadResourceDocument(String resource) throws URISyntaxException, MCRException, SAXParseException, IOException {
         URL mcrTestUrl = MCRObjectMetadataTest.class.getResource(resource);
-        Document xml = MCRXMLParserFactory.getValidatingParser().parseXML(MCRContent.readFrom(mcrTestUrl));
+        Document xml = MCRXMLParserFactory.getValidatingParser().parseXML(new MCRVFSContent(mcrTestUrl));
         return xml;
     }
 }

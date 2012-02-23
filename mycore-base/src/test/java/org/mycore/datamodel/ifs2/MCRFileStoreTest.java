@@ -42,6 +42,9 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.junit.Test;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.content.MCRByteContent;
+import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.common.content.MCRStringContent;
 
 /**
  * JUnit test for MCRFileStore
@@ -177,7 +180,7 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
         assertEquals(1, col.getChildren().size());
         assertEquals(0, build.getSize());
         assertTrue(created.before(build.getLastModified()));
-        build.setContent(MCRContent.readFrom(new Document(new Element("project"))));
+        build.setContent(new MCRJDOMContent(new Document(new Element("project"))));
         assertTrue(build.getSize() > 0);
         assertNotNull(build.getContent().asByteArray());
         bzzz();
@@ -185,7 +188,7 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
         assertEquals(2, col.getNumChildren());
         assertTrue(modified.before(col.getLastModified()));
         byte[] content = "Hello World!".getBytes("UTF-8");
-        dir.createFile("readme.txt").setContent(MCRContent.readFrom(content));
+        dir.createFile("readme.txt").setContent(new MCRByteContent(content));
         MCRFile child = (MCRFile) dir.getChild("readme.txt");
         assertNotNull(child);
         assertEquals(content.length, child.getSize());
@@ -212,46 +215,46 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
     @Test
     public void repairMetadata() throws Exception {
         MCRFileCollection col = getStore().create();
-        Document xml1 = MCRContent.readFrom(col.getMetadata()).asXML();
+        Document xml1 = new MCRJDOMContent(col.getMetadata()).asXML();
         col.repairMetadata();
-        Document xml2 = MCRContent.readFrom(col.getMetadata()).asXML();
+        Document xml2 = new MCRJDOMContent(col.getMetadata()).asXML();
         assertTrue(equals(xml1, xml2));
 
         MCRDirectory dir = col.createDir("foo");
-        xml1 = MCRContent.readFrom(col.getMetadata()).asXML();
+        xml1 = new MCRJDOMContent(col.getMetadata()).asXML();
         assertFalse(equals(xml1, xml2));
         dir.delete();
-        xml1 = MCRContent.readFrom(col.getMetadata()).asXML();
+        xml1 = new MCRJDOMContent(col.getMetadata()).asXML();
         assertTrue(equals(xml1, xml2));
 
         MCRDirectory dir2 = col.createDir("dir");
         MCRFile file1 = col.createFile("test1.txt");
-        file1.setContent(MCRContent.readFrom("Test 1"));
+        file1.setContent(new MCRStringContent("Test 1"));
         MCRFile readme = dir2.createFile("readme.txt");
-        readme.setContent(MCRContent.readFrom("Hallo Welt!"));
+        readme.setContent(new MCRStringContent("Hallo Welt!"));
         MCRFile file3 = col.createFile("test2.txt");
-        file3.setContent(MCRContent.readFrom("Test 2"));
+        file3.setContent(new MCRStringContent("Test 2"));
         file3.setLabel("de", "Die Testdatei");
-        xml2 = MCRContent.readFrom(col.getMetadata()).asXML();
+        xml2 = new MCRJDOMContent(col.getMetadata()).asXML();
 
         col.repairMetadata();
-        xml1 = MCRContent.readFrom(col.getMetadata()).asXML();
+        xml1 = new MCRJDOMContent(col.getMetadata()).asXML();
         assertTrue(equals(xml1, xml2));
 
         file3.clearLabels();
-        xml2 = MCRContent.readFrom(col.getMetadata()).asXML();
+        xml2 = new MCRJDOMContent(col.getMetadata()).asXML();
 
         col.fo.getChild("mcrdata.xml").delete();
         col = getStore().retrieve(col.getID());
-        xml1 = MCRContent.readFrom(col.getMetadata()).asXML();
+        xml1 = new MCRJDOMContent(col.getMetadata()).asXML();
         assertTrue(equals(xml1, xml2));
 
         col.fo.getChild("test1.txt").delete();
         FileObject tmp = col.fo.resolveFile("test3.txt");
         tmp.createFile();
-        MCRContent.readFrom("Hallo Welt!").sendTo(tmp);
+        new MCRStringContent("Hallo Welt!").sendTo(tmp);
         col.repairMetadata();
-        String xml3 = MCRContent.readFrom(col.getMetadata()).asString();
+        String xml3 = new MCRJDOMContent(col.getMetadata()).asString();
         assertFalse(xml3.contains("name=\"test1.txt\""));
         assertTrue(xml3.contains("name=\"test3.txt\""));
     }
@@ -259,8 +262,8 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
     private boolean equals(Document a, Document b) throws Exception {
         sortChildren(a.getRootElement());
         sortChildren(b.getRootElement());
-        String sa = MCRContent.readFrom(a).asString();
-        String sb = MCRContent.readFrom(b).asString();
+        String sa = new MCRJDOMContent(a).asString();
+        String sb = new MCRJDOMContent(b).asString();
         return sa.equals(sb);
     }
 

@@ -36,6 +36,8 @@ import org.jdom.Element;
 import org.junit.Test;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
+import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRJDOMContent;
 
 /**
  * JUnit test for MCRVersioningMetadataStore
@@ -47,13 +49,13 @@ public class MCRVersioningMetadataStoreTest extends MCRIFS2VersioningTestCase {
     @Test
     public void createDocument() throws Exception {
         Document testXmlDoc = new Document(new Element("root"));
-        MCRContent testContent = MCRContent.readFrom(testXmlDoc);
+        MCRContent testContent = new MCRJDOMContent(testXmlDoc);
         
         MCRVersionedMetadata versionedMetadata = getVersStore().create(testContent);
         MCRContent contentFromStore = getVersStore().retrieve(versionedMetadata.getID()).getMetadata();
         String contentStrFromStore = contentFromStore.asString();
         
-        MCRContent mcrContent = MCRContent.readFrom(testXmlDoc);
+        MCRContent mcrContent = new MCRJDOMContent(testXmlDoc);
         String expectedContentStr = mcrContent.asString();
         
         
@@ -63,7 +65,7 @@ public class MCRVersioningMetadataStoreTest extends MCRIFS2VersioningTestCase {
         assertTrue(versionedMetadata.getID() > 0);
         assertTrue(versionedMetadata.getRevision() > 0);
 
-        MCRVersionedMetadata vm3 = getVersStore().create(MCRContent.readFrom(testXmlDoc));
+        MCRVersionedMetadata vm3 = getVersStore().create(new MCRJDOMContent(testXmlDoc));
         assertTrue(vm3.getID() > versionedMetadata.getID());
         assertTrue(vm3.getRevision() > versionedMetadata.getRevision());
     }
@@ -73,20 +75,20 @@ public class MCRVersioningMetadataStoreTest extends MCRIFS2VersioningTestCase {
         int id = getVersStore().getNextFreeID();
         assertTrue(id > 0);
         Document xml1 = new Document(new Element("root"));
-        MCRVersionedMetadata vm1 = getVersStore().create(MCRContent.readFrom(xml1), id);
+        MCRVersionedMetadata vm1 = getVersStore().create(new MCRJDOMContent(xml1), id);
         MCRContent xml2 = getVersStore().retrieve(id).getMetadata();
         
         assertNotNull(vm1);
-        assertEquals(MCRContent.readFrom(xml1).asString(), xml2.asString());
-        getVersStore().create(MCRContent.readFrom(xml1), id + 1);
+        assertEquals(new MCRJDOMContent(xml1).asString(), xml2.asString());
+        getVersStore().create(new MCRJDOMContent(xml1), id + 1);
         MCRContent xml3 = getVersStore().retrieve(id + 1).getMetadata();
-        assertEquals(MCRContent.readFrom(xml1).asString(), xml3.asString());
+        assertEquals(new MCRJDOMContent(xml1).asString(), xml3.asString());
     }
 
     @Test
     public void delete() throws Exception {
         Document xml1 = new Document(new Element("root"));
-        int id = getVersStore().create(MCRContent.readFrom(xml1)).getID();
+        int id = getVersStore().create(new MCRJDOMContent(xml1)).getID();
         assertTrue(getVersStore().exists(id));
         getVersStore().delete(id);
         assertFalse(getVersStore().exists(id));
@@ -95,28 +97,28 @@ public class MCRVersioningMetadataStoreTest extends MCRIFS2VersioningTestCase {
     @Test
     public void update() throws Exception {
         Document xml1 = new Document(new Element("root"));
-        MCRVersionedMetadata vm = getVersStore().create(MCRContent.readFrom(xml1));
+        MCRVersionedMetadata vm = getVersStore().create(new MCRJDOMContent(xml1));
         Document xml3 = new Document(new Element("update"));
         long rev = vm.getRevision();
-        vm.update(MCRContent.readFrom(xml3));
+        vm.update(new MCRJDOMContent(xml3));
         assertTrue(vm.getRevision() > rev);
         MCRContent xml4 = getVersStore().retrieve(vm.getID()).getMetadata();
-        assertEquals(MCRContent.readFrom(xml3).asString(), xml4.asString());
+        assertEquals(new MCRJDOMContent(xml3).asString(), xml4.asString());
     }
 
     @Test
     public void retrieve() throws Exception {
         Document xml1 = new Document(new Element("root"));
-        int id = getVersStore().create(MCRContent.readFrom(xml1)).getID();
+        int id = getVersStore().create(new MCRJDOMContent(xml1)).getID();
         MCRVersionedMetadata sm1 = getVersStore().retrieve(id);
         MCRContent xml2 = sm1.getMetadata();
-        assertEquals(MCRContent.readFrom(xml1).asString(), xml2.asString());
+        assertEquals(new MCRJDOMContent(xml1).asString(), xml2.asString());
     }
 
     @Test
     public void versioning() throws Exception {
         Document xml1 = new Document(new Element("bingo"));
-        MCRVersionedMetadata vm = getVersStore().create(MCRContent.readFrom(xml1));
+        MCRVersionedMetadata vm = getVersStore().create(new MCRJDOMContent(xml1));
         long baseRev = vm.getRevision();
         assertTrue(vm.isUpToDate());
 
@@ -131,7 +133,7 @@ public class MCRVersioningMetadataStoreTest extends MCRIFS2VersioningTestCase {
 
         bzzz();
         Document xml2 = new Document(new Element("bango"));
-        vm.update(MCRContent.readFrom(xml2));
+        vm.update(new MCRJDOMContent(xml2));
         assertTrue(vm.getRevision() > baseRev);
         assertTrue(vm.isUpToDate());
 
@@ -145,7 +147,7 @@ public class MCRVersioningMetadataStoreTest extends MCRIFS2VersioningTestCase {
 
         bzzz();
         Document xml3 = new Document(new Element("bongo"));
-        vm.update(MCRContent.readFrom(xml3));
+        vm.update(new MCRJDOMContent(xml3));
 
         versions = vm.listVersions();
         assertEquals(3, versions.size());
@@ -180,12 +182,12 @@ public class MCRVersioningMetadataStoreTest extends MCRIFS2VersioningTestCase {
     public void createUpdateDeleteCreate() throws Exception {
         Element root = new Element("bingo");
         Document xml1 = new Document(root);
-        MCRVersionedMetadata vm = getVersStore().create(MCRContent.readFrom(xml1));
+        MCRVersionedMetadata vm = getVersStore().create(new MCRJDOMContent(xml1));
         root.setName("bango");
-        vm.update(MCRContent.readFrom(xml1));
+        vm.update(new MCRJDOMContent(xml1));
         vm.delete();
         root.setName("bongo");
-        vm = getVersStore().create(MCRContent.readFrom(xml1), vm.getID());
+        vm = getVersStore().create(new MCRJDOMContent(xml1), vm.getID());
         List<MCRMetadataVersion> versions = vm.listVersions();
         assertEquals(4, versions.size());
         assertEquals(MCRMetadataVersion.CREATED, versions.get(0).getType());
@@ -200,7 +202,7 @@ public class MCRVersioningMetadataStoreTest extends MCRIFS2VersioningTestCase {
     public void deletedVersions() throws Exception {
         Element root = new Element("bingo");
         Document xml1 = new Document(root);
-        MCRVersionedMetadata vm = getVersStore().create(MCRContent.readFrom(xml1));
+        MCRVersionedMetadata vm = getVersStore().create(new MCRJDOMContent(xml1));
         assertFalse(vm.isDeleted());
 
         vm.delete();

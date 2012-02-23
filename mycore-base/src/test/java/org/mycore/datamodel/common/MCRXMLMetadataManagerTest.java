@@ -22,8 +22,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
+import org.mycore.common.content.MCRByteContent;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 
@@ -126,7 +126,7 @@ public class MCRXMLMetadataManagerTest extends MCRTestCase {
 
     @Test
     public void retrieve() throws JDOMException, IOException {
-        store.create(MyCoRe_document_00000001.id, MCRContent.readFrom(MyCoRe_document_00000001.blob), MyCoRe_document_00000001.lastModified);
+        store.create(MyCoRe_document_00000001.id, new MCRByteContent(MyCoRe_document_00000001.blob), MyCoRe_document_00000001.lastModified);
         Document doc = store.retrieveXML(MyCoRe_document_00000001.id);
         assertEquals("Stored document ID do not match:", MyCoRe_document_00000001.id.toString(), doc.getRootElement().getAttributeValue("id"));
         try {

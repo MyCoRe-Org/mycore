@@ -40,6 +40,9 @@ import org.jdom.Element;
 import org.junit.Test;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.content.MCRByteContent;
+import org.mycore.common.content.MCRFileContent;
+import org.mycore.common.content.MCRJDOMContent;
 
 /**
  * JUnit test for MCRFile
@@ -83,7 +86,7 @@ public class MCRFileTest extends MCRIFS2TestCase {
         MCRFile file = col.createFile("foo.txt");
         assertEquals(MCRFile.MD5_OF_EMPTY_FILE, file.getMD5());
         byte[] content = "Hello World".getBytes("UTF-8");
-        file.setContent(MCRContent.readFrom(content));
+        file.setContent(new MCRByteContent(content));
         assertFalse(MCRFile.MD5_OF_EMPTY_FILE.equals(file.getMD5()));
         MCRFileCollection col2 = getStore().retrieve(col.getID());
         MCRFile child = (MCRFile) col2.getChild("foo.txt");
@@ -115,7 +118,7 @@ public class MCRFileTest extends MCRIFS2TestCase {
         FileOutputStream fo = new FileOutputStream(src);
         MCRUtils.copyStream(new ByteArrayInputStream(content), fo);
         fo.close();
-        file.setContent(MCRContent.readFrom(src));
+        file.setContent(new MCRFileContent(src));
         assertFalse(MCRFile.MD5_OF_EMPTY_FILE.equals(file.getMD5()));
         assertEquals(11, file.getSize());
         src.delete();
@@ -127,7 +130,7 @@ public class MCRFileTest extends MCRIFS2TestCase {
     public void contentXML() throws Exception {
         MCRFile file = col.createFile("foo.xml");
         Document xml = new Document(new Element("root"));
-        file.setContent(MCRContent.readFrom(xml));
+        file.setContent(new MCRJDOMContent(xml));
         assertFalse(MCRFile.MD5_OF_EMPTY_FILE.equals(file.getMD5()));
         Document xml2 = file.getContent().asXML();
         assertEquals("root", xml2.getRootElement().getName());
@@ -137,7 +140,7 @@ public class MCRFileTest extends MCRIFS2TestCase {
     public void randomAccessContent() throws Exception {
         MCRFile file = col.createFile("foo.txt");
         byte[] content = "Hello World".getBytes("UTF-8");
-        file.setContent(MCRContent.readFrom(content));
+        file.setContent(new MCRByteContent(content));
         RandomAccessContent rac = file.getRandomAccessContent();
         rac.skipBytes(6);
         InputStream in = rac.getInputStream();
