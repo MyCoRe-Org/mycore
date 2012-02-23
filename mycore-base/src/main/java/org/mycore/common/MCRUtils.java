@@ -314,7 +314,6 @@ public class MCRUtils {
         return outb.toByteArray();
     }
 
-    
     /**
      * This method convert a JDOM tree to a byte array.
      * 
@@ -400,10 +399,10 @@ public class MCRUtils {
                 if (bytesRead > 0) {
                     if (target != null) {
                         target.write(ba, 0 /* offset in ba */, bytesRead /*
-                                                                                                                 * bytes
-                                                                                                                 * to
-                                                                                                                 * write
-                                                                                                                 */);
+                                                                                                                  * bytes
+                                                                                                                  * to
+                                                                                                                  * write
+                                                                                                                  */);
                     }
                 } else {
                     break; // hit eof
@@ -458,10 +457,10 @@ public class MCRUtils {
                 if (charsRead > 0) {
                     if (target != null) {
                         target.write(ca, 0 /* offset in ba */, charsRead /*
-                                                                                                                 * bytes
-                                                                                                                 * to
-                                                                                                                 * write
-                                                                                                                 */);
+                                                                                                                  * bytes
+                                                                                                                  * to
+                                                                                                                  * write
+                                                                                                                  */);
                     }
                 } else {
                     break; // hit eof
@@ -887,7 +886,14 @@ public class MCRUtils {
             }
         }
 
-        return detected.getProperty("docType");
+        String docType = detected.getProperty("docType");
+        int pos = docType.indexOf(':') + 1;
+        if (pos > 0) {
+            //filter namespace prefix
+            docType = docType.substring(pos);
+        }
+        return docType;
+
     }
 
     /**
