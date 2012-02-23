@@ -66,7 +66,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         if (defaultLang == null) {
             defaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", MCRConstants.DEFAULT_LANG);
         }
-        labels=new HashSet<MCRLabel>();
+        labels = new HashSet<MCRLabel>();
     }
 
     public List<MCRCategory> getChildren() {
@@ -162,11 +162,14 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
     }
 
     public MCRLabel getCurrentLabel() {
+        if (labels.isEmpty()) {
+            return new MCRLabel("", "", "");
+        }
         MCRLabel label = getLabel(MCRSessionMgr.getCurrentSession().getCurrentLanguage());
         if (label != null) {
             return label;
         }
-        
+
         label = getLabel(defaultLang);
         if (label != null) {
             return label;
