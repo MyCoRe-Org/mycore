@@ -29,10 +29,9 @@ import java.util.Collection;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.content.MCRStringContent;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
-import org.mycore.common.xml.MCRXMLHelper;
-import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -66,8 +65,8 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
     private static Element editrule;
     static {
         try {
-            readrule = (Element) MCRContent.readFrom(strReadRule).asXML().getRootElement().detach();
-            editrule = (Element) MCRContent.readFrom(strEditRule).asXML().getRootElement().detach();
+            readrule = (Element) new MCRStringContent(strReadRule).asXML().getRootElement().detach();
+            editrule = (Element) new MCRStringContent(strEditRule).asXML().getRootElement().detach();
         } catch (Exception e) {
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;

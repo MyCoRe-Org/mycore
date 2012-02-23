@@ -39,12 +39,18 @@ import org.mycore.common.xml.MCRXMLResource;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFileMetadataManager;
+import org.mycore.datamodel.metadata.MCRBase;
+import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.services.fieldquery.MCRData2Fields;
-import org.mycore.services.fieldquery.MCRFieldDef;
-import org.mycore.services.fieldquery.MCRFieldValue;
 import org.mycore.services.fieldquery.MCRSearcher;
 import org.mycore.services.fieldquery.MCRSearcherFactory;
+import org.mycore.services.fieldquery.data2fields.MCRData2FieldsDerivate;
+import org.mycore.services.fieldquery.data2fields.MCRData2FieldsFile;
+import org.mycore.services.fieldquery.data2fields.MCRData2FieldsObject;
+import org.mycore.services.fieldquery.data2fields.MCRIndexEntry;
+import org.mycore.services.fieldquery.data2fields.MCRIndexEntryBuilder;
 
 /**
  * provides static methods to manipulate MCRSearcher indexes.
@@ -64,8 +70,10 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
 
     public MCRSearcherCommands() {
         super();
-        command.add(new MCRCommand("rebuild metadata index", "org.mycore.frontend.cli.MCRSearcherCommands.repairMetaIndex", "Repairs metadata index"));
-        command.add(new MCRCommand("rebuild content index", "org.mycore.frontend.cli.MCRSearcherCommands.repairContentIndex", "Repairs metadata index"));
+        command.add(new MCRCommand("rebuild metadata index", "org.mycore.frontend.cli.MCRSearcherCommands.repairMetaIndex",
+                "Repairs metadata index"));
+        command.add(new MCRCommand("rebuild content index", "org.mycore.frontend.cli.MCRSearcherCommands.repairContentIndex",
+                "Repairs metadata index"));
     }
 
     static class RepairIndex {
@@ -156,20 +164,21 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
             MCRXMLMetadataManager mcrxmlTableManager = MCRXMLMetadataManager.instance();
             for (String id : mcrxmlTableManager.listIDs()) {
                 MCRObjectID mcrid = MCRObjectID.getInstance(id);
-                addMetaToIndex(mcrid, mcrxmlTableManager.retrieveBLOB(mcrid), false, searcherList);
+                addMetaToIndex(mcrid, searcherList);
             }
         }
 
-        private void addMetaToIndex(MCRObjectID id, byte[] xml, boolean update, List<MCRSearcher> searcherList) {
+        private void addMetaToIndex(MCRObjectID id, List<MCRSearcher> searcherList) {
             for (MCRSearcher searcher : searcherList) {
-                List<MCRFieldValue> fields = MCRData2Fields.buildFields(xml, searcher.getIndex(), MCRFieldDef.OBJECT_METADATA + MCRFieldDef.OBJECT_CATEGORY,
-                    id.getTypeId());
-                List<MCRFieldValue> fieldsDerivate = MCRData2Fields.buildFields(xml, searcher.getIndex(), MCRFieldDef.DERIVATE_METADATA, id.getTypeId());
-                fields.addAll(fieldsDerivate);
-                if (update) {
-                    searcher.removeFromIndex(id.toString());
-                }
-                searcher.addToIndex(id.toString(), id.toString(), fields);
+                String indexID = searcher.getIndex();
+                MCRBase base = MCRMetadataManager.retrieve(id);
+                
+                MCRIndexEntryBuilder builder;
+                if (base instanceof MCRDerivate)
+                    builder = new MCRData2FieldsDerivate(indexID, (MCRDerivate) base);
+                else
+                    builder = new MCRData2FieldsObject(searcher.getIndex(), (MCRObject) base);
+                searcher.addToIndex(builder.buildIndexEntry());
             }
         }
 
@@ -193,9 +202,9 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
                     MCRFSNODES node = (MCRFSNODES) results.get(0);
                     GregorianCalendar greg = new GregorianCalendar();
                     greg.setTime(node.getDate());
-                    MCRFile file = (MCRFile) MCRFileMetadataManager.instance().buildNode(node.getType(), node.getId(), node.getPid(), node.getOwner(),
-                        node.getName(), node.getLabel(), node.getSize(), greg, node.getStoreid(), node.getStorageid(), node.getFctid(), node.getMd5(),
-                        node.getNumchdd(), node.getNumchdf(), node.getNumchtd(), node.getNumchtf());
+                    MCRFile file = (MCRFile) MCRFileMetadataManager.instance().buildNode(node.getType(), node.getId(), node.getPid(),
+                            node.getOwner(), node.getName(), node.getLabel(), node.getSize(), greg, node.getStoreid(), node.getStorageid(),
+                            node.getFctid(), node.getMd5(), node.getNumchdd(), node.getNumchdf(), node.getNumchtd(), node.getNumchtf());
                     addFileToIndex(file, false, searcherList);
                     session.evict(node);
                 }
@@ -206,12 +215,10 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
 
         private void addFileToIndex(MCRFile file, boolean update, List<MCRSearcher> searcherList) {
             for (MCRSearcher searcher : searcherList) {
-                List<MCRFieldValue> fields = MCRData2Fields.buildFields(file, searcher.getIndex());
-                String entryID = file.getID();
-                String returnID = searcher.getReturnID(file);
+                MCRIndexEntry entry = new MCRData2FieldsFile(searcher.getIndex(), file).buildIndexEntry();
                 if (update)
-                    searcher.removeFromIndex(entryID);
-                searcher.addToIndex(entryID, returnID, fields);
+                    searcher.removeFromIndex(entry);
+                searcher.addToIndex(entry);
             }
         }
 

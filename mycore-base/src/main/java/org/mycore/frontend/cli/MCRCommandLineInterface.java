@@ -37,8 +37,8 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRURIResolver;
-import org.mycore.datamodel.ifs2.MCRContent;
 
 /**
  * The main class implementing the MyCoRe command line interface. With the
@@ -282,7 +282,7 @@ public class MCRCommandLineInterface {
     public static void getURI(String uri, String file) throws Exception {
         Element resolved = MCRURIResolver.instance().resolve(uri);
         Element cloned = (Element) resolved.clone();
-        MCRContent.readFrom(new Document(cloned)).sendTo(new File(file));
+        new MCRJDOMContent(new Document(cloned)).sendTo(new File(file));
     }
 
     /**

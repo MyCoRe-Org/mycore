@@ -22,7 +22,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.log4j.Logger;
-import org.mycore.datamodel.ifs2.MCRContent;
+import org.mycore.common.content.MCRByteContent;
+import org.mycore.common.content.MCRContent;
 
 public class MCRExternalProcess {
 
@@ -79,7 +80,7 @@ public class MCRExternalProcess {
     }
 
     public MCRContent getOutput() throws IOException {
-        return MCRContent.readFrom(output.getOutput());
+        return new MCRByteContent(output.getOutput());
     }
 }
 

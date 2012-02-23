@@ -35,11 +35,13 @@ import org.jdom.Document;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.content.MCRByteContent;
+import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -652,7 +654,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             return false;
         }
 
-        MCRContent content = MCRContent.readFrom(xml);
+        MCRContent content = new MCRByteContent(xml);
         File xmlOutput = new File(dir, nid.toString() + ".xml");
 
         if (trans != null) {
@@ -715,7 +717,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         }
 
         LOGGER.info("Reading file " + file + " ...");
-        MCRContent content = MCRContent.readFrom(file);
+        MCRContent content = new MCRFileContent(file);
 
         MCRXMLParserFactory.getParser().parseXML(content);
         LOGGER.info("The file has no XML errors.");

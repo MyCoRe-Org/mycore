@@ -40,8 +40,8 @@ import org.jdom.output.XMLOutputter;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
+import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
-import org.mycore.datamodel.ifs2.MCRContent;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -185,7 +185,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
 
         LOGGER.info("Reading file " + input + " ...");
 
-        org.jdom.Document doc = MCRXMLParserFactory.getValidatingParser().parseXML(MCRContent.readFrom(input));
+        org.jdom.Document doc = MCRXMLParserFactory.getValidatingParser().parseXML(new MCRFileContent(input));
         org.jdom.Element rootelm = doc.getRootElement();
 
         if (!rootelm.getName().equals("mcrpermissions")) {
@@ -315,7 +315,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
             return null;
         }
         File input = new File(fileName);
-        Document ruleDom = MCRXMLParserFactory.getParser().parseXML(MCRContent.readFrom(input));
+        Document ruleDom = MCRXMLParserFactory.getParser().parseXML(new MCRFileContent(input));
         Element rule = ruleDom.getRootElement();
         if (!rule.getName().equals("condition")) {
             LOGGER.warn("ROOT element is not valid, a valid rule would be for example:");

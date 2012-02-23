@@ -25,7 +25,7 @@ package org.mycore.common.xml;
 
 import org.jdom.Document;
 import org.mycore.common.MCRException;
-import org.mycore.datamodel.ifs2.MCRContent;
+import org.mycore.common.content.MCRContent;
 import org.xml.sax.SAXParseException;
 
 /**

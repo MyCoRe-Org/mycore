@@ -25,7 +25,6 @@ package org.mycore.common.xml;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.HashSet;
@@ -54,7 +53,9 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMSource;
 import org.mycore.common.MCRException;
-import org.mycore.datamodel.ifs2.MCRContent;
+import org.mycore.common.content.MCRByteContent;
+import org.mycore.common.content.MCRStringContent;
+import org.mycore.common.content.MCRVFSContent;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
@@ -84,7 +85,7 @@ public class MCRXMLHelper {
      */
     public static Document parseURI(URI uri) throws MCRException, SAXParseException {
         try {
-            return MCRXMLParserFactory.getParser().parseXML(MCRContent.readFrom(uri.toURL()));
+            return MCRXMLParserFactory.getParser().parseXML(new MCRVFSContent(uri));
         } catch (MalformedURLException e) {
             throw new MCRException(e);
         } catch (IOException e) {
@@ -108,7 +109,7 @@ public class MCRXMLHelper {
      */
     public static Document parseURI(URI uri, boolean valid) throws MCRException, SAXParseException {
         try {
-            return MCRXMLParserFactory.getParser(valid).parseXML(MCRContent.readFrom(uri));
+            return MCRXMLParserFactory.getParser(valid).parseXML(new MCRVFSContent(uri));
         } catch (MalformedURLException e) {
             throw new MCRException(e);
         } catch (IOException e) {
@@ -129,13 +130,7 @@ public class MCRXMLHelper {
      * @deprecated use MCRXMLParserFactory.getParser().parseXML(MCRContent xml)
      */
     public static Document parseXML(String xml) throws MCRException, SAXParseException {
-        try {
-            return MCRXMLParserFactory.getParser().parseXML(MCRContent.readFrom(xml));
-        } catch (UnsupportedEncodingException e) {
-            throw new MCRException(e);
-        } catch (IOException e) {
-            throw new MCRException(e);
-        }
+        return MCRXMLParserFactory.getParser().parseXML(new MCRStringContent(xml));
     }
 
     /**
@@ -149,17 +144,10 @@ public class MCRXMLHelper {
      * @throws MCRException
      *             if XML could not be parsed
      * @return the XML file as a DOM object
-     * @throws SAXParseException 
      * @deprecated use MCRXMLParserFactory.getParser(boolean validate).parseXML(MCRContent xml)
      */
     public static Document parseXML(String xml, boolean valid) throws MCRException, SAXParseException {
-        try {
-            return MCRXMLParserFactory.getParser(valid).parseXML(MCRContent.readFrom(xml));
-        } catch (UnsupportedEncodingException e) {
-            throw new MCRException(e);
-        } catch (IOException e) {
-            throw new MCRException(e);
-        }
+        return MCRXMLParserFactory.getParser(valid).parseXML(new MCRStringContent(xml));
     }
 
     /**
@@ -175,11 +163,7 @@ public class MCRXMLHelper {
      * @deprecated use MCRXMLParserFactory.getParser().parseXML(MCRContent xml)
      */
     public static Document parseXML(byte[] xml) throws MCRException, SAXParseException {
-        try {
-            return MCRXMLParserFactory.getParser().parseXML(MCRContent.readFrom(xml));
-        } catch (IOException e) {
-            throw new MCRException(e);
-        }
+        return MCRXMLParserFactory.getParser().parseXML(new MCRByteContent(xml));
     }
 
     /**
@@ -197,11 +181,7 @@ public class MCRXMLHelper {
      * @deprecated use MCRXMLParserFactory.getParser(boolean validate).parseXML(MCRContent xml)
      */
     public static Document parseXML(byte[] xml, boolean valid) throws MCRException, SAXParseException {
-        try {
-            return MCRXMLParserFactory.getParser(valid).parseXML(MCRContent.readFrom(xml));
-        } catch (IOException e) {
-            throw new MCRException(e);
-        }
+        return MCRXMLParserFactory.getParser(valid).parseXML(new MCRByteContent(xml));
     }
 
     /**
@@ -276,7 +256,7 @@ public class MCRXMLHelper {
         try {
             return JDOMEquivalent.equivalent(canonicalElement(d1), canonicalElement(d2));
         } catch (Exception e) {
-            LOGGER.warn("Could not compare documents.",e);
+            LOGGER.warn("Could not compare documents.", e);
             return false;
         }
     }
@@ -298,7 +278,7 @@ public class MCRXMLHelper {
         try {
             return JDOMEquivalent.equivalent(canonicalElement(e1), canonicalElement(e2));
         } catch (Exception e) {
-            LOGGER.warn("Could not compare elements.",e);
+            LOGGER.warn("Could not compare elements.", e);
             return false;
         }
     }
@@ -311,7 +291,7 @@ public class MCRXMLHelper {
         } else {
             xout.output((Document) e, bout);
         }
-        Document xml = MCRXMLParserFactory.getNonValidatingParser().parseXML(MCRContent.readFrom(bout.toByteArray()));
+        Document xml = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRByteContent(bout.toByteArray()));
         return xml.getRootElement();
     }
 
@@ -337,7 +317,7 @@ public class MCRXMLHelper {
 
         public static boolean equivalent(DocType d1, DocType d2) {
             boolean equals = (d1.getPublicID() == d2.getPublicID() || d1.getPublicID().equals(d2.getPublicID()))
-                && (d1.getSystemID() == d2.getSystemID() || d1.getSystemID().equals(d2.getSystemID()));
+                    && (d1.getSystemID() == d2.getSystemID() || d1.getSystemID().equals(d2.getSystemID()));
             if (!equals) {
                 LOGGER.info("DocType differs \"" + d1 + "\"!=\"" + d2 + "\"");
             }
@@ -372,7 +352,7 @@ public class MCRXMLHelper {
             @SuppressWarnings("unchecked")
             List<Attribute> aList2 = e2.getAttributes();
             if (aList1.size() != aList2.size()) {
-                LOGGER.info("Number of attributes differ \"" + aList1 + "\"!=\"" + aList2 + "\" for element "+e1.getName());
+                LOGGER.info("Number of attributes differ \"" + aList1 + "\"!=\"" + aList2 + "\" for element " + e1.getName());
                 return false;
             }
             HashSet<String> orig = new HashSet<String>(aList1.size());

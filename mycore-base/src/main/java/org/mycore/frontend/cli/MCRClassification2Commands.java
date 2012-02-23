@@ -43,6 +43,7 @@ import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRException;
+import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -53,7 +54,6 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.common.MCRActiveLinkException;
-import org.mycore.datamodel.ifs2.MCRContent;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -135,7 +135,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      */
     public static void loadFromFile(String filename) throws URISyntaxException, MCRException, SAXParseException, IOException {
         File file = new File(filename);
-        Document xml = MCRXMLParserFactory.getParser().parseXML(MCRContent.readFrom(file));
+        Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRFileContent(file));
         MCRCategory category = MCRXMLTransformer.getCategory(xml);
         DAO.addCategory(null, category);
     }
@@ -152,7 +152,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      */
     public static void updateFromFile(String filename) throws URISyntaxException, MCRException, SAXParseException, IOException {
         File file = new File(filename);
-        Document xml = MCRXMLParserFactory.getParser().parseXML(MCRContent.readFrom(file));
+        Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRFileContent(file));
         MCRCategory category = MCRXMLTransformer.getCategory(xml);
         if (DAO.exist(category.getId())) {
             DAO.replaceCategory(category);

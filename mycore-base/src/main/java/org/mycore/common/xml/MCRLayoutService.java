@@ -74,8 +74,12 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRDOMContent;
+import org.mycore.common.content.MCRFileContent;
+import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.fo.MCRFoFormatterInterface;
-import org.mycore.datamodel.ifs2.MCRContent;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.w3c.dom.Node;
@@ -98,7 +102,8 @@ import org.xml.sax.helpers.XMLReaderFactory;
 public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
 
     /** A cache of already compiled stylesheets */
-    private static MCRCache STYLESHEETS_CACHE = new MCRCache(MCRConfiguration.instance().getInt("MCR.LayoutService.XSLCacheSize", 100), "XSLT Stylesheets");
+    private static MCRCache STYLESHEETS_CACHE = new MCRCache(MCRConfiguration.instance().getInt("MCR.LayoutService.XSLCacheSize", 100),
+            "XSLT Stylesheets");
 
     private static MCRXMLResource XML_RESOURCE = MCRXMLResource.instance();
 
@@ -161,7 +166,8 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
             }
 
         });
-        String fo_class = MCRConfiguration.instance().getString("MCR.LayoutService.FoFormatter.class", "org.mycore.common.fo.MCRFoFormatterFOP");
+        String fo_class = MCRConfiguration.instance().getString("MCR.LayoutService.FoFormatter.class",
+                "org.mycore.common.fo.MCRFoFormatterFOP");
         try {
             @SuppressWarnings("unchecked")
             Class<? extends MCRFoFormatterInterface> clazz = (Class<? extends MCRFoFormatterInterface>) Class.forName(fo_class);
@@ -190,7 +196,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
      */
     @Deprecated
     public void sendXML(HttpServletRequest req, HttpServletResponse res, org.jdom.Document jdom) throws IOException {
-        sendXML(req, res, MCRContent.readFrom(jdom));
+        sendXML(req, res, new MCRJDOMContent(jdom));
     }
 
     /**
@@ -199,7 +205,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
      */
     @Deprecated
     public void sendXML(HttpServletRequest req, HttpServletResponse res, org.w3c.dom.Document dom) throws IOException {
-        sendXML(req, res, MCRContent.readFrom(dom));
+        sendXML(req, res, new MCRDOMContent(dom));
     }
 
     /**
@@ -208,7 +214,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
      */
     @Deprecated
     public void sendXML(HttpServletRequest req, HttpServletResponse res, InputStream in) throws IOException {
-        sendXML(req, res, MCRContent.readFrom(in));
+        sendXML(req, res, new MCRStreamContent(in));
     }
 
     public void sendXML(HttpServletRequest req, HttpServletResponse res, MCRContent xml) throws IOException {
@@ -231,7 +237,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
      */
     @Deprecated
     public void sendXML(HttpServletRequest req, HttpServletResponse res, File file) throws IOException {
-        sendXML(req, res, MCRContent.readFrom(file));
+        sendXML(req, res, new MCRFileContent(file));
     }
 
     /**
@@ -240,7 +246,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
      */
     @Deprecated
     public void doLayout(HttpServletRequest req, HttpServletResponse res, org.jdom.Document jdom) throws IOException {
-        doLayout(req, res, MCRContent.readFrom(jdom));
+        doLayout(req, res, new MCRJDOMContent(jdom));
     }
 
     /**
@@ -250,7 +256,8 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
      */
     @Deprecated
     public void doLayout(HttpServletRequest req, HttpServletResponse res, Writer out, org.jdom.Document jdom) throws IOException {
-        String docType = jdom.getDocType() == null ? jdom.getRootElement().getName() : jdom.getDocType().getElementName();
+        MCRContent content = new MCRJDOMContent(jdom);
+        String docType = content.getDocType();
         Properties parameters = buildXSLParameters(req);
         String resourceName = getResourceName(req, parameters, docType);
         if (resourceName == null) {
@@ -284,7 +291,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
      */
     @Deprecated
     public void doLayout(HttpServletRequest req, HttpServletResponse res, org.w3c.dom.Document dom) throws IOException, SAXParseException {
-        doLayout(req, res, MCRContent.readFrom(dom));
+        doLayout(req, res, new MCRDOMContent(dom));
     }
 
     /**
@@ -293,7 +300,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
      */
     @Deprecated
     public void doLayout(HttpServletRequest req, HttpServletResponse res, InputStream is) throws IOException, SAXParseException {
-        doLayout(req, res, MCRContent.readFrom(is));
+        doLayout(req, res, new MCRStreamContent(is));
     }
 
     public void doLayout(HttpServletRequest req, HttpServletResponse res, MCRContent con) throws IOException {
@@ -313,7 +320,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
      */
     @Deprecated
     public void doLayout(HttpServletRequest req, HttpServletResponse res, File file) throws IOException {
-        doLayout(req, res, MCRContent.readFrom(file));
+        doLayout(req, res, new MCRFileContent(file));
     }
 
     public DOMSource doLayout(Document doc, String stylesheetName, Hashtable<String, String> params) throws Exception {
@@ -339,7 +346,8 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         return new DOMSource(out.getNode());
     }
 
-    private void transform(HttpServletResponse res, Source sourceXML, String docType, Properties parameters, Templates stylesheet) throws IOException {
+    private void transform(HttpServletResponse res, Source sourceXML, String docType, Properties parameters, Templates stylesheet)
+            throws IOException {
         Transformer transformer = buildTransformer(stylesheet);
         setXSLParameters(transformer, parameters);
 
@@ -373,7 +381,8 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
      * @param response
      *            the response object to send the result to
      */
-    private void transform(Source xml, Templates xsl, Transformer transformer, HttpServletResponse response) throws IOException, MCRException {
+    private void transform(Source xml, Templates xsl, Transformer transformer, HttpServletResponse response) throws IOException,
+            MCRException {
 
         // Set content type from "<xsl:output media-type = "...">
         // Set char encoding from "<xsl:output encoding = "...">
@@ -573,7 +582,8 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
     private Templates buildCompiledStylesheet(String resource) {
         Templates stylesheet = null;
         try {
-            stylesheet = (Templates) STYLESHEETS_CACHE.getIfUpToDate(resource, XML_RESOURCE.getLastModified(resource, this.getClass().getClassLoader()));
+            stylesheet = (Templates) STYLESHEETS_CACHE.getIfUpToDate(resource,
+                    XML_RESOURCE.getLastModified(resource, this.getClass().getClassLoader()));
         } catch (IOException e) {
             LOGGER.warn("Could not determine last modified date of resource " + resource);
         }
@@ -786,7 +796,8 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
      * mode.
      */
     public void selected(SelectionEvent ev) {
-        String log = "Selection <xsl:" + ev.m_styleNode.getTagName() + " " + ev.m_attributeName + "=\"" + ev.m_xpath.getPatternString() + "\">";
+        String log = "Selection <xsl:" + ev.m_styleNode.getTagName() + " " + ev.m_attributeName + "=\"" + ev.m_xpath.getPatternString()
+                + "\">";
         LOGGER.debug(log);
         try {
             if ("true".equals(ev.m_processor.getParameter("DEBUG"))) {
