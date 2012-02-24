@@ -23,6 +23,7 @@
 
 package org.mycore.services.fieldquery.data2fields;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.transform.Source;
@@ -90,7 +91,11 @@ public class MCRData2FieldsXML implements MCRData2Fields {
             Transformer transformer = factory.newTransformerHandler(stylesheet).getTransformer();
             transformer.transform(sourceXML, result);
 
-            Element fieldValues = (Element) (result.getResult().get(0));
+            List results = result.getResult();
+            if (results.isEmpty())
+                return Collections.EMPTY_LIST;
+
+            Element fieldValues = (Element) (results.get(0));
             return (List<Element>) (fieldValues.getChildren());
         } catch (Exception ex) {
             String msg = "Exception while transforming metadata to search field";
