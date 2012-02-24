@@ -22,8 +22,13 @@
 
 package org.mycore.user2;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 
+import javax.xml.messaging.URLEndpoint;
+
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 
 /**
@@ -45,9 +50,11 @@ public class MCRRealm {
 
     /** The URL where users from this realm can login */
     private String loginURL;
-    
+
     /** The URL where new users may create an account for this realm  */
     private String createURL;
+
+    private String redirectParameter;
 
     /** 
      * Creates a new realm.
@@ -143,6 +150,40 @@ public class MCRRealm {
     @Override
     public String toString() {
         return "id=" + id + ", " + (loginURL != null ? "loginURL=" + loginURL : "");
+    }
+
+    public String getLoginURL(String redirectURL) {
+        String loginURL = getLoginURL();
+        String param = getRedirectParameter();
+        if (param == null || redirectURL == null) {
+            return loginURL;
+        }
+        String encoded;
+        try {
+            encoded = URLEncoder.encode(redirectURL, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new MCRException(e);
+        }
+        StringBuilder returnURL = new StringBuilder(loginURL);
+        returnURL.append(loginURL.contains("?") ? '&' : '?');
+        returnURL.append(param);
+        returnURL.append('=');
+        returnURL.append(encoded);
+        return returnURL.toString();
+    }
+
+    /**
+     * @return the redirectParameter
+     */
+    String getRedirectParameter() {
+        return redirectParameter;
+    }
+
+    /**
+     * @param redirectParameter the redirectParameter to set
+     */
+    void setRedirectParameter(String redirectParameter) {
+        this.redirectParameter = redirectParameter;
     }
 
 }

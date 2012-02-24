@@ -23,6 +23,7 @@
 package org.mycore.user2.login;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,6 +35,7 @@ import org.jdom.Element;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUserInformation;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -150,13 +152,21 @@ public class MCRLoginServlet extends MCRServlet {
     }
 
     private void listRealms(HttpServletRequest req, HttpServletResponse res) throws IOException {
+        String redirectURL = req.getParameter(LOGIN_REDIRECT_URL_PARAMETER);
         MCRUserInformation userInfo = MCRSessionMgr.getCurrentSession().getUserInformation();
         Document realmsDoc = MCRRealmFactory.getRealmsDocument();
         Element realms = realmsDoc.getRootElement();
         realms.setAttribute("user", userInfo.getUserID());
         realms.setAttribute("realm", (userInfo instanceof MCRUser) ? ((MCRUser) userInfo).getRealm().getLabel() : MCRRealmFactory.getLocalRealm().getLabel());
         realms.setAttribute("guest", String.valueOf(currentUserIsGuest()));
-        getLayoutService().doLayout(req, res, realmsDoc);
+        @SuppressWarnings("unchecked")
+        List<Element> realmList = realms.getChildren("realm");
+        for (Element realm : realmList) {
+            String realmID = realm.getAttributeValue("id");
+            Element login = realm.getChild("login");
+            login.setAttribute("url", MCRRealmFactory.getRealm(realmID).getLoginURL(redirectURL));
+        }
+        getLayoutService().doLayout(req, res, new MCRJDOMContent(realmsDoc));
     }
 
     private static boolean currentUserIsGuest() {
@@ -175,10 +185,11 @@ public class MCRLoginServlet extends MCRServlet {
     }
 
     private void loginToRealm(HttpServletRequest req, HttpServletResponse res, String realmID) throws Exception {
-        storeURL(req.getParameter(LOGIN_REDIRECT_URL_PARAMETER));
+        String redirectURL = req.getParameter(LOGIN_REDIRECT_URL_PARAMETER);
+        storeURL(redirectURL);
         MCRRealm realm = MCRRealmFactory.getRealm(realmID);
-        String loginURL = realm.getLoginURL();
-        res.sendRedirect(loginURL);
+        String loginURL = realm.getLoginURL(redirectURL);
+        res.sendRedirect(res.encodeRedirectURL(loginURL));
     }
 
     /**
