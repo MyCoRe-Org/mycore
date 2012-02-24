@@ -120,8 +120,14 @@
               <xsl:value-of select="encoder:encode($subselect.webpage,'UTF-8')" />
             </xsl:when>
             <xsl:otherwise>
-              <xsl:text>MCRUserServlet?action=show&amp;id=</xsl:text>
-              <xsl:value-of select="@id" />
+              <xsl:variable name="uid">
+                <xsl:value-of select="@name" />
+                <xsl:if test="not ( realm/@id = 'local' )">
+                  <xsl:text>@</xsl:text>
+                  <xsl:value-of select="realm/@id" />
+                </xsl:if>
+              </xsl:variable>
+              <xsl:value-of select="concat('MCRUserServlet?action=show&amp;id=',$uid)" />
             </xsl:otherwise>
           </xsl:choose>
         </xsl:attribute>
