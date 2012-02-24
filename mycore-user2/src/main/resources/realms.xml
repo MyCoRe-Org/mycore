@@ -4,7 +4,7 @@
   <realm id="local">
     <label xml:lang="de">lokal</label>
     <label xml:lang="en">local</label>
-    <login url="../authorization/login.xml" redirectParameter="url">
+    <login url="MCRLoginServlet?action=login" redirectParameter="url">
       <label xml:lang="de">Anmeldung mit lokaler Nutzerkennung</label>
       <label xml:lang="en">Login with local user account</label>
       <info>

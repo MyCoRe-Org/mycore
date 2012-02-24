@@ -36,7 +36,6 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.content.MCRJDOMContent;
-import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.user2.MCRRealm;
@@ -90,9 +89,12 @@ public class MCRLoginServlet extends MCRServlet {
 
         String action = req.getParameter("action");
         String realm = req.getParameter("realm");
+        job.getResponse().setHeader("Cache-Control", "no-cache");
+        job.getResponse().setHeader("Pragma", "no-cache");
+        job.getResponse().setHeader("Expires", "0");
 
-        if ("login".equals(action) || (req.getAttribute("MCREditorSubmission") != null)) {
-            login(req, res);
+        if ("login".equals(action)) {
+            presentLoginForm(job);
         } else if ("cancel".equals(action)) {
             redirect(res);
         } else if (realm != null) {
@@ -103,42 +105,11 @@ public class MCRLoginServlet extends MCRServlet {
     }
 
     /**
-     * Handles input from local login editor form, which is in the
-     * page editor.xml. Current user is changed. When the user is
-     * personalized (has LegalEntity associated), a welcome page
-     * is shown, which is rendered using welcome.xsl. Otherwise,
-     * the user is immediately redirected to the target url.
-     */
-    private void login(HttpServletRequest req, HttpServletResponse res) throws IOException, Exception {
-        MCREditorSubmission sub = (MCREditorSubmission) (req.getAttribute("MCREditorSubmission"));
-        if (sub == null) {
-            res.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            return;
-        }
-
-        Element root = sub.getXML().getRootElement();
-        String userName = root.getChildTextTrim("userName");
-        String password = root.getChildText("password");
-
-        if (!MCRUserManager.exists(userName)) {
-            res.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            return;
-        }
-
-        MCRUser user = MCRUserManager.login(userName, password);
-        if (user == null) {
-            res.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            return;
-        }
-        redirect(res);
-    }
-
-    /**
      * Stores the target url and outputs a list of realms to login to. The list is
      * rendered using realms.xsl.
      */
     private void chooseLoginMethod(HttpServletRequest req, HttpServletResponse res) throws Exception {
-        storeURL(req.getParameter(LOGIN_REDIRECT_URL_PARAMETER));
+        storeURL(getReturnURL(req));
         // redirect directly to login url if there is only one realm available and the user is not logged in
         if ((getNumLoginOptions() == 1) && currentUserIsGuest())
             redirectToUniqueRealm(req, res);
@@ -146,19 +117,49 @@ public class MCRLoginServlet extends MCRServlet {
             listRealms(req, res);
     }
 
+    private String getReturnURL(HttpServletRequest req) {
+        String returnURL = req.getParameter(LOGIN_REDIRECT_URL_PARAMETER);
+        if (returnURL == null) {
+            String referer = req.getHeader("Referer");
+            returnURL = (referer != null) ? referer : MCRServlet.getBaseURL();
+        }
+        return returnURL;
+    }
+
     private void redirectToUniqueRealm(HttpServletRequest req, HttpServletResponse res) throws Exception {
         String realmID = MCRRealmFactory.listRealms().iterator().next().getID();
         loginToRealm(req, res, realmID);
     }
 
+    private void presentLoginForm(MCRServletJob job) throws IOException {
+        Element root = new Element("login");
+
+        HttpServletRequest req = job.getRequest();
+        HttpServletResponse res = job.getResponse();
+        String uid = getProperty(req, "uid");
+        String pwd = getProperty(req, "pwd");
+        if (uid != null) {
+            MCRUser user = MCRUserManager.login(uid, pwd);
+            if (user == null) {
+                res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                root.setAttribute("loginFailed", "true");
+            } else {
+                //user logged in
+                LOGGER.info("user " + uid + " logged in successfully.");
+                res.sendRedirect(res.encodeRedirectURL(getReturnURL(req)));
+                return;
+            }
+        }
+        addCurrentUserInfo(root);
+        root.addContent(new org.jdom.Element("returnURL").addContent(getReturnURL(req)));
+        getLayoutService().doLayout(req, res, new MCRJDOMContent(new Document(root)));
+    }
+
     private void listRealms(HttpServletRequest req, HttpServletResponse res) throws IOException {
-        String redirectURL = req.getParameter(LOGIN_REDIRECT_URL_PARAMETER);
-        MCRUserInformation userInfo = MCRSessionMgr.getCurrentSession().getUserInformation();
+        String redirectURL = getReturnURL(req);
         Document realmsDoc = MCRRealmFactory.getRealmsDocument();
         Element realms = realmsDoc.getRootElement();
-        realms.setAttribute("user", userInfo.getUserID());
-        realms.setAttribute("realm", (userInfo instanceof MCRUser) ? ((MCRUser) userInfo).getRealm().getLabel() : MCRRealmFactory.getLocalRealm().getLabel());
-        realms.setAttribute("guest", String.valueOf(currentUserIsGuest()));
+        addCurrentUserInfo(realms);
         @SuppressWarnings("unchecked")
         List<Element> realmList = realms.getChildren("realm");
         for (Element realm : realmList) {
@@ -167,6 +168,15 @@ public class MCRLoginServlet extends MCRServlet {
             login.setAttribute("url", MCRRealmFactory.getRealm(realmID).getLoginURL(redirectURL));
         }
         getLayoutService().doLayout(req, res, new MCRJDOMContent(realmsDoc));
+    }
+
+    private void addCurrentUserInfo(Element rootElement) {
+        MCRUserInformation userInfo = MCRSessionMgr.getCurrentSession().getUserInformation();
+        rootElement.setAttribute("user", userInfo.getUserID());
+        rootElement.setAttribute("realm", (userInfo instanceof MCRUser) ? ((MCRUser) userInfo).getRealm().getLabel() : MCRRealmFactory
+            .getLocalRealm()
+            .getLabel());
+        rootElement.setAttribute("guest", String.valueOf(currentUserIsGuest()));
     }
 
     private static boolean currentUserIsGuest() {
@@ -185,7 +195,7 @@ public class MCRLoginServlet extends MCRServlet {
     }
 
     private void loginToRealm(HttpServletRequest req, HttpServletResponse res, String realmID) throws Exception {
-        String redirectURL = req.getParameter(LOGIN_REDIRECT_URL_PARAMETER);
+        String redirectURL = getReturnURL(req);
         storeURL(redirectURL);
         MCRRealm realm = MCRRealmFactory.getRealm(realmID);
         String loginURL = realm.getLoginURL(redirectURL);
@@ -237,25 +247,5 @@ public class MCRLoginServlet extends MCRServlet {
         }
         LOGGER.info("Redirecting to url: " + url);
         res.sendRedirect(res.encodeRedirectURL(url));
-    }
-
-    /**
-     * Invoked by local editor login form login.xml to check for a valid
-     * username and password entered.
-     */
-    public static boolean checkPassword(String userName, String password) {
-        // Check for required fields is done in the login form itself, not here
-        if ((userName == null) || (password == null))
-            return true;
-
-        if (userName.equalsIgnoreCase(MCRSystemUserInformation.getGuestInstance().getUserID()))
-            return false; // Do not allow guest user login
-        if (!MCRUserManager.exists(userName))
-            return false;
-
-        MCRUser user = MCRUserManager.getUser(userName);
-        if (!user.getRealm().equals(MCRRealmFactory.getLocalRealm()))
-            return false; // Do not login remote users, only local realm
-        return MCRUserManager.checkPassword(userName, password) != null;
     }
 }
