@@ -154,7 +154,12 @@ public class MCRLayoutUtilities {
     public static boolean getAccess(String webpageID, String permission, int strategy) {
         Element item = getItem(webpageID);
         // check permission according to $strategy
+        
         boolean access = false;
+        if (item == null){
+            return false;
+        }
+        
         if (strategy == ALLTRUE) {
             access = true;
             do {
