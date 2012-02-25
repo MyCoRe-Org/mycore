@@ -59,8 +59,6 @@ public abstract class MCRUserTransformer {
     public static Element buildBasicXML(MCRUser mcrUser) {
         Element userElement = new Element(USER_ELEMENT_NAME);
         userElement.setAttribute("name", mcrUser.getUserName());
-        if (!mcrUser.loginAllowed())
-            userElement.setAttribute("allowLogin", "false");
         Element realmElement = new Element("realm");
         realmElement.setAttribute("id", mcrUser.getRealmID());
         realmElement.setText(mcrUser.getRealm().getLabel());
@@ -100,8 +98,13 @@ public abstract class MCRUserTransformer {
         addString(mcrUser, userElement, "eMail", mcrUser.getEMailAddress());
         addString(mcrUser, userElement, "hint", mcrUser.getHint());
 
-        if (mcrUser.getLastLogin() != null) {
-            addString(mcrUser, userElement, "lastLogin", MCRXMLFunctions.getISODate(mcrUser.getLastLogin(), MCRISO8601Format.F_COMPLETE_HH_MM_SS));
+        Date lastLogin = mcrUser.getLastLogin();
+        if (lastLogin != null) {
+            addString(mcrUser, userElement, "lastLogin", MCRXMLFunctions.getISODate(lastLogin, MCRISO8601Format.F_COMPLETE_HH_MM_SS));
+        }
+        Date validUntil = mcrUser.getValidUntil();
+        if (validUntil != null) {
+            addString(mcrUser, userElement, "validUntil", MCRXMLFunctions.getISODate(validUntil, MCRISO8601Format.F_COMPLETE_HH_MM_SS));
         }
 
         Element ownsElement = new Element("owns");
@@ -159,7 +162,7 @@ public abstract class MCRUserTransformer {
         Element userElement = buildExportableSafeXML(mcrUser);
         Element pwdElement = new Element("password");
         if (setAttribute(pwdElement, "salt", mcrUser.getSalt()) | setAttribute(pwdElement, "hashType", mcrUser.getHashType().toString())
-            | setAttribute(pwdElement, "hash", mcrUser.getPassword())) {
+                | setAttribute(pwdElement, "hash", mcrUser.getPassword())) {
             userElement.addContent(pwdElement);
         }
         return userElement;
@@ -178,8 +181,10 @@ public abstract class MCRUserTransformer {
         String realmID = element.getChild("realm").getAttributeValue("id");
         MCRUser mcrUser = new MCRUser(userName, realmID);
         //login allowed?
-        if ("false".equals(element.getAttributeValue("allowLogin"))) {
-            mcrUser.disableLogin();
+        String validUntilText = element.getChildTextNormalize("validUntil");
+        if (validUntilText != null) {
+            Date validUntil = getDateFromISOString(validUntilText);
+            mcrUser.setValidUntil(validUntil);
         }
         //owner
         Element ownerElement = element.getChild("owner");
@@ -207,9 +212,10 @@ public abstract class MCRUserTransformer {
         mcrUser.setHint(hint);
         //lastLogin
         String lastLoginText = element.getChildTextNormalize("lastLogin");
-        MCRISO8601Date dateParser = new MCRISO8601Date(lastLoginText);
-        Date lastLogin = dateParser.getDate();
-        mcrUser.setLastLogin(lastLogin);
+        if (lastLoginText != null) {
+            Date lastLogin = getDateFromISOString(lastLoginText);
+            mcrUser.setLastLogin(lastLogin);
+        }
         //groups
         Element groups = element.getChild("groups");
         if (groups != null) {
@@ -246,6 +252,12 @@ public abstract class MCRUserTransformer {
         }
         //finished
         return mcrUser;
+    }
+
+    public static Date getDateFromISOString(String isoString) {
+        MCRISO8601Date dateParser = new MCRISO8601Date(isoString);
+        Date validUntil = dateParser.getDate();
+        return validUntil;
     }
 
     private static boolean setAttribute(Element elem, String name, String value) {

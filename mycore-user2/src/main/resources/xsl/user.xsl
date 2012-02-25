@@ -139,6 +139,17 @@
             </xsl:call-template>
           </td>
         </tr>
+        <tr>
+          <th scope="row">
+            <xsl:value-of select="i18n:translate('component.user2.admin.user.validUntil')" />
+          </th>
+          <td>
+            <xsl:call-template name="formatISODate">
+              <xsl:with-param name="date" select="validUntil" />
+              <xsl:with-param name="format" select="i18n:translate('metaData.dateTime')" />
+            </xsl:call-template>
+          </td>
+        </tr>
         <tr class="abstand">
           <th scope="row">Name:</th>
           <td>

@@ -69,15 +69,13 @@ public class MCRUser implements MCRUserInformation {
     private String hint;
 
     /** The last time the user logged in */
-    private Date lastLogin;
+    private Date lastLogin, validUntil;
 
     private Map<String, String> attributes;
 
     private Collection<String> systemGroups;
 
     private Collection<String> externalGroups;
-
-    private boolean allowLogin;
 
     protected MCRUser() {
         this(null);
@@ -105,7 +103,6 @@ public class MCRUser implements MCRUserInformation {
         this.systemGroups = new HashSet<String>();
         this.externalGroups = new HashSet<String>();
         this.attributes = new HashMap<String, String>();
-        this.allowLogin = true;
     }
 
     /**
@@ -284,7 +281,10 @@ public class MCRUser implements MCRUserInformation {
      * @return the last time the user has logged in.
      */
     public Date getLastLogin() {
-        return lastLogin;
+        if (lastLogin == null) {
+            return null;
+        }
+        return new Date(lastLogin.getTime());
     }
 
     /**
@@ -337,7 +337,7 @@ public class MCRUser implements MCRUserInformation {
      * @param lastLogin the last time the user logged in.
      */
     public void setLastLogin(Date lastLogin) {
-        this.lastLogin = lastLogin;
+        this.lastLogin = new Date(lastLogin.getTime());
     }
 
     /* (non-Javadoc)
@@ -453,14 +453,31 @@ public class MCRUser implements MCRUserInformation {
     }
 
     public void enableLogin() {
-        this.allowLogin = true;
+        setValidUntil(null);
     }
 
     public void disableLogin() {
-        this.allowLogin = false;
+        setValidUntil(new Date());
     }
 
     public boolean loginAllowed() {
-        return allowLogin;
+        return validUntil == null || validUntil.after(new Date());
+    }
+
+    /**
+     * @return the validUntil
+     */
+    public Date getValidUntil() {
+        if (validUntil == null) {
+            return null;
+        }
+        return new Date(validUntil.getTime());
+    }
+
+    /**
+     * @param validUntil the validUntil to set
+     */
+    public void setValidUntil(Date validUntil) {
+        this.validUntil = new Date(validUntil.getTime());
     }
 }

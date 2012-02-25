@@ -5,6 +5,7 @@
   <eMail>info@mycore.de</eMail>
   <hint>JUnit Test</hint>
   <lastLogin>2012-02-07T14:51:26Z</lastLogin>
+  <validUntil>2012-02-25T13:00:00Z</validUntil>
   <owns>
     <user name="junit">
       <realm id="local">lokal</realm>

@@ -51,7 +51,9 @@ import org.mycore.user2.utils.MCRUserTransformer;
  */
 public class MCRUserManagerTest extends MCRHibTestCase {
     public static final String RESOURCE_REALMS_URI = MCRRealmFactory.RESOURCE_REALMS_URI;
+
     public static final String REALMS_URI_CFG_KEY = MCRRealmFactory.REALMS_URI_CFG_KEY;
+
     MCRUser user;
 
     @BeforeClass
@@ -193,6 +195,10 @@ public class MCRUserManagerTest extends MCRHibTestCase {
         user = MCRUserManager.login(this.user.getUserName(), clearPasswd);
         assertNotNull("No date set for last login.", user.getLastLogin());
         assertTrue("Date was not updated", curTime.before(user.getLastLogin()));
+        user.setValidUntil(new Date());
+        MCRUserManager.updateUser(user);
+        startNewTransaction();
+        assertNull("Should not login user when password is expired", MCRUserManager.login(this.user.getUserName(), clearPasswd));
     }
 
     @Test

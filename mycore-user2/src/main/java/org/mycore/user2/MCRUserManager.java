@@ -42,7 +42,9 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.common.MCRISO8601Format;
 
 /**
  * Manages all users using a database table. 
@@ -355,7 +357,7 @@ public class MCRUserManager {
         if (user == null) {
             return null;
         }
-        user.setLastLogin(new Date());
+        user.setLastLogin();
         updateUser(user);
         MCRSessionMgr.getCurrentSession().setUserInformation(user);
         return user;
@@ -381,6 +383,11 @@ public class MCRUserManager {
     public static MCRUser checkPassword(String userName, String password) {
         MCRUser user = getUser(userName);
         if (user == null || user.getHashType() == null) {
+            return null;
+        }
+        if (!user.loginAllowed()) {
+            LOGGER.warn("Password expired for user " + user.getUserID() + " on "
+                    + MCRXMLFunctions.getISODate(user.getValidUntil(), MCRISO8601Format.F_COMPLETE_HH_MM_SS));
             return null;
         }
         try {

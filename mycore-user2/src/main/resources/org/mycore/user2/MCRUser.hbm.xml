@@ -8,25 +8,26 @@
       <generator class="native" />
     </id>
     <natural-id>
-      <property name="userName"/>
-      <property name="realmID" access="field"/>
+      <property name="userName" />
+      <property name="realmID" access="field" />
     </natural-id>
     <property name="hashType" not-null="false">
       <type name="org.mycore.backend.hibernate.MCRGenericEnumUserType">
         <param name="enumClass">org.mycore.user2.MCRPasswordHashType</param>
       </type>
     </property>
-    <property name="password"/>
-    <property name="salt"/>
-    <property name="realName"/>
-    <property name="eMail" access="field"/>
-    <property name="hint"/>
-    <property name="lastLogin"/>
-    <many-to-one name="owner" class="MCRUser" not-null="false"/>
+    <property name="password" />
+    <property name="salt" />
+    <property name="realName" />
+    <property name="eMail" access="field" />
+    <property name="hint" />
+    <property name="lastLogin" access="field" />
+    <property name="validUntil" access="field" />
+    <many-to-one name="owner" class="MCRUser" not-null="false" />
     <map name="attributes" table="MCRUserAttr" fetch="join" lazy="false" cascade="">
-      <key column="id"/>
-      <map-key column="key" type="string"/>
-      <element column="value" type="string"/>
+      <key column="id" />
+      <map-key column="key" type="string" />
+      <element column="value" type="string" />
     </map>
   </class>
 </hibernate-mapping>
