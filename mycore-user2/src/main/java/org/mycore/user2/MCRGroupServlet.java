@@ -31,13 +31,15 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.jdom.Document;
 import org.jdom.Element;
-import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
+ * This servlet is used in the group sub select for when administrate a user.
+ * The property <code>MCR.user2.GroupCategegories</code> can hold any category IDs
+ * that could be possible roots for groups.
  * @author Thomas Scheffler (yagee)
  *
  */
@@ -61,7 +63,7 @@ public class MCRGroupServlet extends MCRServlet {
         groupCategories = new ArrayList<MCRCategoryID>();
         groupCategories.add(MCRUser2Constants.GROUP_CLASSID);
         MCRConfiguration config = MCRConfiguration.instance();
-        String groupCategoriesValue = config.getString(MCRUser2Constants.CONFIG_PREFIX+"GroupCategegories", null);
+        String groupCategoriesValue = config.getString(MCRUser2Constants.CONFIG_PREFIX + "GroupCategegories", null);
         if (groupCategoriesValue == null) {
             return;
         }

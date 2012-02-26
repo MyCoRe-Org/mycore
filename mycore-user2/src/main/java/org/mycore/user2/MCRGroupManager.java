@@ -39,11 +39,9 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
 
 /**
  * Manages groups and group membership using a database table.
- * Groups are configured in the file groups.xml. 
- * The property MIL.GroupMembers.Table specifies the table that stores
- * group membership information (users in group). 
  * 
  * @author Frank L\u00fctzenkirchen
+ * @author Thomas Scheffler (yagee)
  */
 public class MCRGroupManager {
 
@@ -171,6 +169,12 @@ public class MCRGroupManager {
         return new MCRCategLinkReference(user.getUserName() + "@" + user.getRealmID(), MCRUser2Constants.CATEG_LINK_TYPE);
     }
 
+    /**
+     * Adds <code>group</code> to the classification system.
+     * If the representing {@link MCRCategory} already exists this method does nothing.
+     * It will create any category if necessary. 
+     * @param group
+     */
     public static void addGroup(MCRGroup group) {
         MCRCategoryID categoryID = null;
         if (group.isSystemGroup()) {
@@ -193,6 +197,12 @@ public class MCRGroupManager {
         DAO.addCategory(rootID, category);
     }
 
+    /**
+     * Deletes a group from the system.
+     * If the group is currently not stored in the classification system this method does nothing.
+     * This method will fail if any objects (e.g. users) are linked to it.
+     * @param groupID
+     */
     public static void deleteGroup(String groupID) {
         MCRGroup group = MCRGroupManager.getGroup(groupID);
         if (group == null) {
@@ -208,6 +218,10 @@ public class MCRGroupManager {
         DAO.deleteCategory(categoryID);
     }
 
+    /**
+     * Returns a collection of userIDs linked to the given <code>group</code>.
+     * @param group group to list user IDs.
+     */
     public static Collection<String> listUserIDs(MCRGroup group) {
         MCRCategoryID categoryID = getCategoryID(group);
         return CATEG_LINK_SERVICE.getLinksFromCategoryForType(categoryID, MCRUser2Constants.CATEG_LINK_TYPE);

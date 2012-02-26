@@ -23,6 +23,7 @@
 
 package org.mycore.user2;
 
+import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 
 /**
@@ -31,6 +32,9 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
  */
 public final class MCRUser2Constants {
 
+    /**
+     * {@link MCRCategoryID} root ID for system groups.
+     */
     public static final String GROUP_ROOT_ID = "mcr-groups";
 
     static final String USER_ADMIN_PERMISSION = "administrate-users";
@@ -62,6 +66,9 @@ public final class MCRUser2Constants {
 
     static final String CATEG_LINK_TYPE = "mcr-user";
 
+    /**
+     * {@link MCRConfiguration} prefix for all properties used by this MyCoRe component.
+     */
     public static final String CONFIG_PREFIX = "MCR.user2.";
 
     private MCRUser2Constants() {

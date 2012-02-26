@@ -42,7 +42,7 @@ import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
 /**
- * @author Thomas Scheffler
+ * @author Thomas Scheffler (yagee)
  *
  */
 public abstract class MCRUserTransformer {
@@ -254,6 +254,10 @@ public abstract class MCRUserTransformer {
         return mcrUser;
     }
 
+    /**
+     * Returns a {@link Date} instance from the given ISO 8601 String.
+     * @param isoString date or dateTime as defined in ISO 8601
+     */
     public static Date getDateFromISOString(String isoString) {
         MCRISO8601Date dateParser = new MCRISO8601Date(isoString);
         Date validUntil = dateParser.getDate();

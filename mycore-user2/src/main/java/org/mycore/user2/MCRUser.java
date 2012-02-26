@@ -35,8 +35,10 @@ import org.mycore.common.MCRUserInformation;
 /**
  * Represents a login user. Each user has a unique numerical ID.
  * Each user belongs to a realm. The user name must be unique within a realm.
- * 
+ * Any changes made to an instance of this class does not persist automatically.
+ * Use {@link MCRUserManager#updateUser(MCRUser)} to achieve this.
  * @author Frank L\u00fctzenkirchen
+ * @author Thomas Scheffler (yagee)
  */
 public class MCRUser implements MCRUserInformation {
     /** The unique user ID */
@@ -393,6 +395,11 @@ public class MCRUser implements MCRUserInformation {
         return cuid;
     }
 
+    /**
+     * Returns additional user attributes.
+     * This methods handles {@link MCRUserInformation#ATT_REAL_NAME} and
+     * all attributes defined in {@link #getAttributes()}.
+     */
     @Override
     public String getUserAttribute(String attribute) {
         if (MCRUserInformation.ATT_REAL_NAME.equals(attribute)) {
@@ -403,7 +410,7 @@ public class MCRUser implements MCRUserInformation {
 
     @Override
     public boolean isUserInRole(final String role) {
-        return getSystemGroupIDs().contains(role);
+        return getSystemGroupIDs().contains(role) || getExternalGroupIDs().contains(role);
     }
 
     /**
@@ -420,14 +427,26 @@ public class MCRUser implements MCRUserInformation {
         this.attributes = attributes;
     }
 
+    /**
+     * Returns a collection any system group ID this user is member of.
+     * @see MCRGroup#isSystemGroup()
+     */
     public Collection<String> getSystemGroupIDs() {
         return systemGroups;
     }
 
+    /**
+     * Returns a collection any external group ID this user is member of.
+     * @see MCRGroup#isSystemGroup()
+     */
     public Collection<String> getExternalGroupIDs() {
         return externalGroups;
     }
 
+    /**
+     * Adds this user to the given group.
+     * @param groupName the group the user should be added to (must already exist)
+     */
     public void addToGroup(String groupName) {
         MCRGroup mcrGroup = MCRGroupManager.getGroup(groupName);
         if (mcrGroup == null) {
@@ -440,6 +459,10 @@ public class MCRUser implements MCRUserInformation {
         }
     }
 
+    /**
+     * Removes this user to the given group.
+     * @param groupName the group the user should be removed from (must already exist)
+     */
     public void removeFromGroup(String groupName) {
         MCRGroup mcrGroup = MCRGroupManager.getGroup(groupName);
         if (mcrGroup == null) {
@@ -452,20 +475,31 @@ public class MCRUser implements MCRUserInformation {
         }
     }
 
+    /**
+     * Enable login for this user.
+     */
     public void enableLogin() {
         setValidUntil(null);
     }
 
+
+    /**
+     * Disable login for this user.
+     */
     public void disableLogin() {
         setValidUntil(new Date());
     }
 
+    /**
+     * Returns true if logins are allowed for this user.
+     * @return
+     */
     public boolean loginAllowed() {
         return validUntil == null || validUntil.after(new Date());
     }
 
     /**
-     * @return the validUntil
+     * Returns a {@link Date} when this user can not login anymore.
      */
     public Date getValidUntil() {
         if (validUntil == null) {
@@ -475,6 +509,7 @@ public class MCRUser implements MCRUserInformation {
     }
 
     /**
+     * Sets a {@link Date} when this user can not login anymore.
      * @param validUntil the validUntil to set
      */
     public void setValidUntil(Date validUntil) {

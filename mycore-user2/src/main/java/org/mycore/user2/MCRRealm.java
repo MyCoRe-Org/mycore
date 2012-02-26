@@ -26,8 +26,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
 
-import javax.xml.messaging.URLEndpoint;
-
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 
@@ -37,6 +35,7 @@ import org.mycore.common.MCRSessionMgr;
  * There is always a local default realm, which is defined by the attribute local in realms.xml.
  * 
  * @author Frank L\u00fctzenkirchen
+ * @author Thomas Scheffler (yagee)
  */
 public class MCRRealm {
     /** The unique ID of the realm, e.g. 'local' */
@@ -152,6 +151,13 @@ public class MCRRealm {
         return "id=" + id + ", " + (loginURL != null ? "loginURL=" + loginURL : "");
     }
 
+    /**
+     * Returns the URL where users from this realm can login with redirect URL attached.
+     * If this realm has a attribut <code>redirectParameter</code> defined this method returns
+     * a complete login URL with <code>redirectURL</code> properly configured.
+     * @param redirectURL URL where to redirect to after login succeeds.
+     * @return the same as {@link #getLoginURL()} if <code>redirectParameter</code> is undefined for this realm
+     */
     public String getLoginURL(String redirectURL) {
         String loginURL = getLoginURL();
         String param = getRedirectParameter();

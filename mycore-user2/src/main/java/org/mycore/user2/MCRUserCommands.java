@@ -56,7 +56,7 @@ import org.mycore.user2.utils.MCRUserTransformer;
 import org.xml.sax.SAXParseException;
 
 /**
- * This class provides a set of commands for the org.mycore.user management
+ * This class provides a set of commands for the org.mycore.user2 management
  * which can be used by the command line interface.
  *
  * @author Thomas Scheffler (yagee)

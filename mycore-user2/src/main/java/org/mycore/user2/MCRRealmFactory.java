@@ -49,6 +49,10 @@ import org.mycore.common.xml.MCRXMLParserFactory;
 import org.xml.sax.SAXParseException;
 
 /**
+ * Handles {@link MCRRealm} instantiation.
+ * Will create a file <code>${MCR.datadir}/realms.xml</code> if that file does not exist.
+ * You can redefine the location if you define a URI in <code>MCR.users2.Realms.URI</code>.
+ * This class monitors the source file for changes and adapts at runtime.
  * @author Thomas Scheffler (yagee)
  *
  */
@@ -177,6 +181,7 @@ public class MCRRealmFactory {
                 fout.close();
             }
         }
+        updateLastModified();
         return MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(realmsFile));
     }
 
@@ -201,11 +206,18 @@ public class MCRRealmFactory {
         return realmsList;
     }
 
+    /**
+     * Returns the Realms JDOM document clone. 
+     */
     public static Document getRealmsDocument() {
         reInitIfNeeded();
         return (Document) realmsDocument.clone();
     }
 
+    /**
+     * Returns the Realms JDOM document as a {@link Source} useful for transformation processes.
+     * @return
+     */
     static Source getRealmsSource() {
         reInitIfNeeded();
         return new JDOMSource(realmsDocument);

@@ -50,6 +50,7 @@ import org.mycore.user2.MCRUserManager;
  * The login form for local users is login.xml. 
  * 
  * @author Frank L\u00fctzenkirchen
+ * @author Thomas Scheffler (yagee)
  */
 public class MCRLoginServlet extends MCRServlet {
 
@@ -174,8 +175,7 @@ public class MCRLoginServlet extends MCRServlet {
         MCRUserInformation userInfo = MCRSessionMgr.getCurrentSession().getUserInformation();
         rootElement.setAttribute("user", userInfo.getUserID());
         rootElement.setAttribute("realm", (userInfo instanceof MCRUser) ? ((MCRUser) userInfo).getRealm().getLabel() : MCRRealmFactory
-            .getLocalRealm()
-            .getLabel());
+                .getLocalRealm().getLabel());
         rootElement.setAttribute("guest", String.valueOf(currentUserIsGuest()));
     }
 

@@ -24,6 +24,13 @@
 package org.mycore.user2;
 
 /**
+ * This enum represents different hash type for user passwords.
+ * Allows lazy migration of users from different sources.
+ * <ul>
+ * <li>{@link #crypt} is used in the old MyCoRe user system
+ * <li>{@link #md5} is used in the old miless user system
+ * <li>{@link #sha1} is the default hash type of mycore-user2
+ * </ul>
  * @author Thomas Scheffler (yagee)
  *
  */

@@ -28,13 +28,14 @@ import java.util.List;
 import java.util.Set;
 
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRLabel;
 
 /**
- * Represents a group of users. Groups are configured in the file groups.xml.
- * A special group is the group of administrators, which is specified by the attribute adminGroups. 
+ * Represents a group of users.
+ * Groups are {@link MCRCategory} instances and every category from {@link MCRUser2Constants#GROUP_CLASSID} {@link MCRGroup#isSystemGroup()}.
  * 
- * @author Frank L\u00fctzenkirchen
+ * @author Thomas Scheffler (yagee)
  */
 public class MCRGroup {
 
@@ -47,7 +48,7 @@ public class MCRGroup {
     private boolean isSystemGroup;
 
     /**
-     * Creates a new group. 
+     * Creates a new group instance. 
      * 
      * @param id the unique group ID
      * @param name the unique group name
@@ -58,7 +59,7 @@ public class MCRGroup {
         for (MCRLabel label : labels) {
             this.labels.put(label.getLang(), label);
         }
-        this.isSystemGroup=!name.contains(":")||name.startsWith(MCRUser2Constants.GROUP_CLASSID.getRootID()+":");
+        this.isSystemGroup = !name.contains(":") || name.startsWith(MCRUser2Constants.GROUP_CLASSID.getRootID() + ":");
     }
 
     /**
@@ -71,31 +72,26 @@ public class MCRGroup {
     }
 
     /**
-     * Returns the label in the current language
+     * Returns the label in the current language.
      */
     public MCRLabel getLabel() {
         String lang = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
         return labels.get(lang);
     }
-    
+
     /**
-     * Returns all labels available for this group 
+     * Returns all labels available for this group. 
      */
     public Collection<MCRLabel> getLabels() {
         return labels.values();
     }
 
     /**
-     * Returns a list of all users currently member of this group
-     * 
-     * @return a list of all users currently member of this group
+     * Returns true if this group is a system group.
+     * A system group is every category in {@link MCRUser2Constants#GROUP_CLASSID}. 
+     * @return false if category has not the same root ID as the system group classification.
      */
-    public List<MCRUser> listUsers() {
-        //return MCRGroupManager.getUsersInGroup(this);
-        return null;
-    }
-    
-    public boolean isSystemGroup(){
+    public boolean isSystemGroup() {
         return isSystemGroup;
     }
 

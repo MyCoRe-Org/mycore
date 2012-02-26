@@ -25,7 +25,6 @@ package org.mycore.user2;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -48,9 +47,9 @@ import org.mycore.datamodel.common.MCRISO8601Format;
 
 /**
  * Manages all users using a database table. 
- * The name of the table is defined by the property MIL.Users.Table.
  * 
  * @author Frank L\u00fctzenkirchen
+ * @author Thomas Scheffler (yagee)
  */
 public class MCRUserManager {
     private static final MCRHIBConnection MCRHIB_CONNECTION = MCRHIBConnection.instance();
@@ -376,13 +375,18 @@ public class MCRUserManager {
     }
 
     /**
-     * @param userName
-     * @param password
-     * @return
+     * Returns a {@link MCRUser} instance if the login succeeds.
+     * This method will return <code>null</code> if the user does not exist or the login is disabled.
+     * If the {@link MCRUser#getHashType()} is {@link MCRPasswordHashType#crypt} or {@link MCRPasswordHashType#md5}
+     * the hash value is automatically upgraded to {@link MCRPasswordHashType#sha1}.
+     * @param userName Name of the user to login.
+     * @param password clear text password.
+     * @return authenticated {@link MCRUser} instance or <code>null</code>.
      */
     public static MCRUser checkPassword(String userName, String password) {
         MCRUser user = getUser(userName);
         if (user == null || user.getHashType() == null) {
+            waitLoginPanalty();
             return null;
         }
         if (!user.loginAllowed()) {
