@@ -24,7 +24,6 @@ package org.mycore.user2;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 
 import org.mycore.common.MCRSessionMgr;

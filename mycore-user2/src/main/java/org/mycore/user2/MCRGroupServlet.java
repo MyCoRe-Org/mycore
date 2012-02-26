@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -128,7 +129,7 @@ public class MCRGroupServlet extends MCRServlet {
             //do not handle error here
             throw ex;
         }
-        getLayoutService().doLayout(job.getRequest(), job.getResponse(), (Document) job.getRequest().getAttribute(LAYOUT_ELEMENT_KEY));
+        getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRJDOMContent((Document) job.getRequest().getAttribute(LAYOUT_ELEMENT_KEY)));
     }
 
 }

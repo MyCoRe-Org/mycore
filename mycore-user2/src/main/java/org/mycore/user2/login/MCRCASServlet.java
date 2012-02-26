@@ -66,6 +66,8 @@ import org.mycore.user2.MCRUserManager;
  * @author Frank L\u00fctzenkirchen
  */
 public class MCRCASServlet extends MCRServlet {
+    private static final long serialVersionUID = 1L;
+
     /** The logger */
     private static Logger LOGGER = Logger.getLogger(MCRCASServlet.class);
 

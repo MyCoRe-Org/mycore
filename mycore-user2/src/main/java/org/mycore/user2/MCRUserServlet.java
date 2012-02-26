@@ -23,9 +23,10 @@
 package org.mycore.user2;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
 
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -34,6 +35,7 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -48,6 +50,8 @@ import org.mycore.user2.utils.MCRUserTransformer;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRUserServlet extends MCRServlet {
+    private static final long serialVersionUID = 1L;
+
     /** The logger */
     private final static Logger LOGGER = Logger.getLogger(MCRUserServlet.class);
 
@@ -129,7 +133,7 @@ public class MCRUserServlet extends MCRServlet {
             return;
         }
         boolean allowed = MCRAccessManager.checkPermission(MCRUser2Constants.USER_ADMIN_PERMISSION) || currentUser.equals(user)
-            || currentUser.equals(user.getOwner());
+                || currentUser.equals(user.getOwner());
         if (!allowed) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
@@ -137,7 +141,7 @@ public class MCRUserServlet extends MCRServlet {
 
         LOGGER.info("show user " + user.getUserID() + " " + user.getUserName() + " " + user.getRealmID());
         Element u = buildXML(user);
-        getLayoutService().doLayout(req, res, new Document(u));
+        getLayoutService().doLayout(req, res, new MCRJDOMContent(new Document(u)));
     }
 
     /**
@@ -288,7 +292,7 @@ public class MCRUserServlet extends MCRServlet {
             return;
         }
         boolean allowed = MCRAccessManager.checkPermission(MCRUser2Constants.USER_ADMIN_PERMISSION) || currentUser.equals(user.getOwner())
-            || (currentUser.equals(user) && currentUser.hasNoOwner());
+                || (currentUser.equals(user) && currentUser.hasNoOwner());
         if (!allowed) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
@@ -320,7 +324,7 @@ public class MCRUserServlet extends MCRServlet {
         LOGGER.info("delete user " + user.getUserID() + " " + user.getUserName() + " " + user.getRealmID());
         Element u = buildXML(user);
         MCRUserManager.deleteUser(user);
-        getLayoutService().doLayout(req, res, new Document(u));
+        getLayoutService().doLayout(req, res, new MCRJDOMContent(new Document(u)));
     }
 
     /**
@@ -387,7 +391,7 @@ public class MCRUserServlet extends MCRServlet {
                 users.addContent(u);
             }
 
-        getLayoutService().doLayout(req, res, new Document(users));
+        getLayoutService().doLayout(req, res, new MCRJDOMContent(new Document(users)));
     }
 
     private void addString(Element parent, String name, String value) {

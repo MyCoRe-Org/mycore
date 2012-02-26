@@ -53,6 +53,7 @@ import org.mycore.user2.MCRUserManager;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRLoginServlet extends MCRServlet {
+    private static final long serialVersionUID = 1L;
 
     private static final String LOGIN_REDIRECT_URL_PARAMETER = "url";
 
