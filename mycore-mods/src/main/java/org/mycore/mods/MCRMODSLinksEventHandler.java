@@ -44,14 +44,12 @@ import org.mycore.datamodel.metadata.MCRObject;
  */
 public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
 
-    private static final String MODS_OBJECTTYPE = "mods";
-
     /* (non-Javadoc)
      * @see org.mycore.common.events.MCREventHandlerBase#handleObjectCreated(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRObject)
      */
     @Override
     protected void handleObjectCreated(final MCREvent evt, final MCRObject obj) {
-        if (!MODS_OBJECTTYPE.equals(obj.getId().getTypeId())) {
+        if (!getSupportedObjectType().equals(obj.getId().getTypeId())) {
             return;
         }
         final Element metadata = obj.getMetadata().createXML();
@@ -70,9 +68,13 @@ public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
             throw new MCRException(e);
         }
         if (!categories.isEmpty()) {
-            final MCRCategLinkReference objectReference = new MCRCategLinkReference(obj.getId().toString(), MODS_OBJECTTYPE);
+            final MCRCategLinkReference objectReference = new MCRCategLinkReference(obj.getId().toString(), getSupportedObjectType());
             MCRCategLinkServiceFactory.getInstance().setLinks(objectReference, categories);
         }
+    }
+
+    protected String getSupportedObjectType() {
+        return "mods";
     }
 
     /* (non-Javadoc)
