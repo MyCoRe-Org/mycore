@@ -308,6 +308,7 @@ public class MCRUserManager {
         } else if (nameRestriction != null) {
             criteria.add(nameRestriction);
         }
+        criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
         return criteria;
     }
 
