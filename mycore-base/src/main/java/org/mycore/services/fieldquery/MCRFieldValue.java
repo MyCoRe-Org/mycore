@@ -89,9 +89,7 @@ public class MCRFieldValue {
     /**
      * Returns the value of the field as a String
      * 
-     * @return the value of the field as a String, or null if the value is the
-     *         content of an MCRFile
-     * @see #getFile()
+     * @return the value of the field as a String
      */
     public String getValue() {
         return value;
