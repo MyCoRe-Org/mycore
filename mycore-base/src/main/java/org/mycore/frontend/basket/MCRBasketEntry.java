@@ -80,7 +80,8 @@ public class MCRBasketEntry {
      * and stores it in the basket entry.
      */
     public void resolveContent() {
-        setContent(MCRURIResolver.instance().resolve(uri));
+        if ((uri != null) && !uri.isEmpty())
+            setContent(MCRURIResolver.instance().resolve(uri));
     }
 
     /**
