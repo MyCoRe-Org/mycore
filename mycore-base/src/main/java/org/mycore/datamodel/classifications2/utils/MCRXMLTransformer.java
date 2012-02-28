@@ -42,6 +42,7 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
 
 public class MCRXMLTransformer {
 
+    @SuppressWarnings("unchecked")
     public static MCRCategory getCategory(Document xml) throws URISyntaxException {
         MCRCategoryImpl category = new MCRCategoryImpl();
         category.setRoot(category);
@@ -52,10 +53,11 @@ public class MCRXMLTransformer {
         //database access see: org.mycore.datamodel.classifications2.impl.MCRAbstractCategoryImpl.getChildren()
         category.setChildren(new ArrayList<MCRCategory>());
         buildChildCategories(classID, xml.getRootElement().getChild("categories").getChildren("category"), category);
-        category.setLabels(getLabel(xml.getRootElement().getChildren("label")));
+        category.setLabels(getLabels(xml.getRootElement().getChildren("label")));
         return category;
     }
 
+    @SuppressWarnings("unchecked")
     public static MCRCategory buildCategory(String classID, Element e, MCRCategory parent) throws URISyntaxException {
         MCRCategoryImpl category = new MCRCategoryImpl();
         //setId must be called before setParent (info important)
@@ -63,7 +65,7 @@ public class MCRXMLTransformer {
         category.setRoot(parent.getRoot());
         category.setChildren(new ArrayList<MCRCategory>());
         category.setParent(parent);
-        category.setLabels(getLabel(e.getChildren("label")));
+        category.setLabels(getLabels(e.getChildren("label")));
         category.setLevel(parent.getLevel() + 1);
         if (e.getChild("url") != null) {
             final String uri = e.getChild("url").getAttributeValue("href", XLINK_NAMESPACE);
@@ -75,8 +77,7 @@ public class MCRXMLTransformer {
         return category;
     }
 
-    @SuppressWarnings("unchecked")
-    private static List<MCRCategory> buildChildCategories(String classID, List elements, MCRCategory parent) throws URISyntaxException {
+    private static List<MCRCategory> buildChildCategories(String classID, List<Element> elements, MCRCategory parent) throws URISyntaxException {
         List<MCRCategory> children = new ArrayList<MCRCategory>(elements.size());
         for (Object o : elements) {
             children.add(buildCategory(classID, (Element) o, parent));
@@ -84,15 +85,19 @@ public class MCRXMLTransformer {
         return children;
     }
 
-    @SuppressWarnings("unchecked")
-    private static Set<MCRLabel> getLabel(List elements) {
+    public static Set<MCRLabel> getLabels(List<Element> elements) {
         Set<MCRLabel> labels = new HashSet<MCRLabel>(elements.size(), 1l);
-        for (Object o : elements) {
-            Element e = (Element) o;
-            String lang = e.getAttributeValue("lang", Namespace.XML_NAMESPACE);
-            labels.add(new MCRLabel(lang, e.getAttributeValue("text"), e.getAttributeValue("description")));
+        for (Element labelElement : elements) {
+            MCRLabel label = getLabel(labelElement);
+            labels.add(label);
         }
         return labels;
+    }
+
+    public static MCRLabel getLabel(Element labelElement) {
+        String lang = labelElement.getAttributeValue("lang", Namespace.XML_NAMESPACE);
+        MCRLabel label = new MCRLabel(lang, labelElement.getAttributeValue("text"), labelElement.getAttributeValue("description"));
+        return label;
     }
 
 }
