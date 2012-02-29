@@ -28,7 +28,6 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
-import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.Deflater;
@@ -38,8 +37,9 @@ import java.util.zip.ZipOutputStream;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.transform.Templates;
-import javax.xml.transform.sax.TransformerHandler;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.stream.StreamResult;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -51,9 +51,9 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.xml.MCRLayoutService;
-import org.mycore.common.xml.MCRXMLResource;
-import org.mycore.common.xml.MCRXSLTransformation;
+import org.mycore.common.xsl.MCRParameterCollector;
+import org.mycore.common.xsl.MCRTemplatesSource;
+import org.mycore.common.xsl.MCRXSLTransformerFactory;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -213,18 +213,20 @@ public class MCRZipServlet extends MCRServlet {
      *            Parameters, that can be needed in the transforming
      *            XSL-Stylesheet
      * @throws JDOMException
+     * @throws TransformerException 
      */
-    protected void sendZipped(Document jdom, Properties parameters, ZipOutputStream out) throws IOException, JDOMException {
+    protected void sendZipped(Document jdom, MCRParameterCollector parameters, ZipOutputStream out) throws IOException, JDOMException,
+            TransformerException {
         ZipEntry ze = new ZipEntry("metadata.xml");
         ze.setTime(new Date().getTime());
         out.putNextEntry(ze);
 
-        Document stylesheet = MCRXMLResource.instance().getResource("xsl/" + this.stylesheet);
-        MCRXSLTransformation transformation = MCRXSLTransformation.getInstance();
-        Templates templates = transformation.getStylesheet(new JDOMSource(stylesheet));
-        TransformerHandler th = transformation.getTransformerHandler(templates);
-        MCRXSLTransformation.setParameters(th, parameters);
-        transformation.transform(jdom, th, out);
+        MCRTemplatesSource templates = new MCRTemplatesSource("xsl/" + this.stylesheet);
+        Transformer transformer = MCRXSLTransformerFactory.getTransformer(templates);
+        if (parameters != null)
+            parameters.setParametersTo(transformer);
+        StreamResult result = new StreamResult(out);
+        transformer.transform(new JDOMSource(jdom), result);
         out.closeEntry();
 
         return;
@@ -296,11 +298,13 @@ public class MCRZipServlet extends MCRServlet {
      * @param jdom
      *            the JDOM of the given MycoreObject
      * @throws JDOMException
+     * @throws TransformerException 
      */
     @SuppressWarnings("unchecked")
-    protected void sendObject(Document jdom, HttpServletRequest req, ZipOutputStream out) throws IOException, JDOMException {
+    protected void sendObject(Document jdom, HttpServletRequest req, ZipOutputStream out) throws IOException, JDOMException,
+            TransformerException {
         // zip the object's Metadata
-        Properties parameters = MCRLayoutService.buildXSLParameters(req);
+        MCRParameterCollector parameters = new MCRParameterCollector(req);
         sendZipped(jdom, parameters, out);
 
         // zip all derivates
