@@ -29,6 +29,7 @@ import java.io.OutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
@@ -65,6 +66,8 @@ import org.mycore.frontend.servlets.MCRServletJob;
  */
 public class MCRExportServlet extends MCRServlet {
 
+    private final static Logger LOGGER = Logger.getLogger(MCRExportServlet.class);
+
     @Override
     public void doGetPost(MCRServletJob job) throws Exception {
         String transformerID = job.getRequest().getParameter("transformer");
@@ -86,8 +89,21 @@ public class MCRExportServlet extends MCRServlet {
         }
 
         for (String uri : req.getParameterValues("uri")) {
-            collection.add(uri);
+            if (isAllowed(uri))
+                collection.add(uri);
         }
+    }
+
+    /** URIs beginning with these prefixes are forbidden for security reasons */
+    private final static String[] forbiddenURIs = { "file", "webapp", "resource" };
+
+    private boolean isAllowed(String uri) {
+        for (String prefix : forbiddenURIs)
+            if (uri.startsWith(prefix)) {
+                LOGGER.warn("URI " + uri + " is not allowed for security reasons");
+                return false;
+            }
+        return true;
     }
 
     /**
