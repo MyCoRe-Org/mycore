@@ -87,7 +87,7 @@ public class MCRMETSServlet extends MCRServlet {
                 ignoreNodes.add(metsFile);
             Document mets = MCRMETSGenerator.getGenerator().getMETS(dir, ignoreNodes).asDocument();
 
-            MCRLayoutService.instance().doLayout(request, response, new MCRStreamContent(new MCRJDOMContent(mets).getInputStream()));
+            MCRLayoutService.instance().doLayout(request, response, new MCRJDOMContent(mets));
         }
         LOGGER.info("Generation of code by " + this.getClass().getSimpleName() + " took " + (System.currentTimeMillis() - start) + " ms");
     }
