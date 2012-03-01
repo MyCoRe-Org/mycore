@@ -255,7 +255,7 @@
 
   <xsl:template name="printMetaDate.mods.abstractContent">
     <div id="abstract_box" class="detailbox">
-      <h4 id="abstract_switch" class="block_switch open">
+      <h4 id="abstract_switch" class="block_switch">
         <xsl:value-of select="i18n:translate('metaData.mods.dictionary.abstractbox')" />
       </h4>
       <div id="abstract_content" class="block_content">
@@ -646,7 +646,7 @@
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:accessCondition) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID])">
       <div id="category_box" class="detailbox">
-        <h4 id="category_switch" class="block_switch">
+        <h4 id="category_switch" class="block_switch open">
           <xsl:value-of select="i18n:translate('metaData.mods.dictionary.categorybox')" />
         </h4>
         <div id="category_content" class="block_content">
@@ -860,7 +860,7 @@
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:accessCondition) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID])">
       <div id="category_box" class="detailbox">
-        <h4 id="category_switch" class="block_switch">
+        <h4 id="category_switch" class="block_switch open">
           <xsl:value-of select="i18n:translate('metaData.mods.dictionary.categorybox')" />
         </h4>
         <div id="category_content" class="block_content">
@@ -916,7 +916,7 @@
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:accessCondition) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID])">
       <div id="category_box" class="detailbox">
-        <h4 id="category_switch" class="block_switch">
+        <h4 id="category_switch" class="block_switch open">
           <xsl:value-of select="i18n:translate('metaData.mods.dictionary.categorybox')" />
         </h4>
         <div id="category_content" class="block_content">
@@ -999,7 +999,7 @@
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:accessCondition) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID])">
       <div id="category_box" class="detailbox">
-        <h4 id="category_switch" class="block_switch">
+        <h4 id="category_switch" class="block_switch open">
           <xsl:value-of select="i18n:translate('metaData.mods.dictionary.categorybox')" />
         </h4>
         <div id="category_content" class="block_content">
@@ -1073,7 +1073,7 @@
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:accessCondition) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID])">
       <div id="category_box" class="detailbox">
-        <h4 id="category_switch" class="block_switch">
+        <h4 id="category_switch" class="block_switch open">
           <xsl:value-of select="i18n:translate('metaData.mods.dictionary.categorybox')" />
         </h4>
         <div id="category_content" class="block_content">
@@ -1202,7 +1202,7 @@
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:accessCondition) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID])">
       <div id="category_box" class="detailbox">
-        <h4 id="category_switch" class="block_switch">
+        <h4 id="category_switch" class="block_switch open">
           <xsl:value-of select="i18n:translate('metaData.mods.dictionary.categorybox')" />
         </h4>
         <div id="category_content" class="block_content">
