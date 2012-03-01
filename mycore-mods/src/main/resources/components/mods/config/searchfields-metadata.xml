@@ -9,7 +9,7 @@
     <field name="mods.name" objects="mods" type="name" source="objectMetadata" xpath="/mycoreobject/metadata/def.modsContainer/modsContainer/mods:mods//mods:name" value="mods:displayForm|mods:namePart|text()"
       addable="true" xmlns:mods="http://www.loc.gov/mods/v3"/>  
 
-    <field name="mods.author" objects="mods" addable="true" source="objectMetadata" type="name" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:mods="http://www.loc.gov/mods/v3" sortable="true">
+    <field name="mods.author" objects="mods" addable="true" source="objectMetadata" type="name" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:mods="http://www.loc.gov/mods/v3">
       <xsl:for-each select="/mycoreobject/metadata/def.modsContainer/modsContainer/mods:mods/mods:name">
         <xsl:if test="mods:role/mods:roleTerm[@authority='marcrelator' and (@type='text' and text()='author') or (@type='code' and text()='aut')]">
           <mcr:mods.author xmlns:mcr="http://www.mycore.org/">
