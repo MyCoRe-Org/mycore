@@ -34,6 +34,9 @@ import java.util.TimerTask;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.oai.classmapping.MCRClassificationAndSetMapper;
@@ -68,7 +71,7 @@ import org.mycore.services.fieldquery.MCRQueryManager;
 public class MCROAISetManager {
 
     protected final static Logger LOGGER = Logger.getLogger(MCROAISetManager.class);
-    
+
     protected String configPrefix;
 
     protected List<String> setURIs;
@@ -104,7 +107,7 @@ public class MCROAISetManager {
         this.cacheMaxAge = MCRConfiguration.instance().getInt(this.configPrefix + "SetCache.MaxAge", 0);
         this.filterEmptySets = MCRConfiguration.instance().getBoolean(this.configPrefix + "FilterEmptySets", true);
         updateURIs();
-        if(this.cacheMaxAge != 0) {
+        if (this.cacheMaxAge != 0) {
             startTimerTask();
         }
     }
@@ -114,7 +117,7 @@ public class MCROAISetManager {
         this.cacheMaxAge = cacheMaxAge;
         this.filterEmptySets = filterEmptySets;
         updateURIs();
-        if(this.cacheMaxAge != 0) {
+        if (this.cacheMaxAge != 0) {
             startTimerTask();
         }
     }
@@ -123,9 +126,17 @@ public class MCROAISetManager {
         long maxAgeInMilli = this.cacheMaxAge * 60 * 1000;
         TimerTask tt = new TimerTask() {
             public void run() {
-                LOGGER.info("update oai set list");
-                synchronized (cachedSetList) {
-                    cachedSetList = createSetList();
+                MCRSession session = MCRSessionMgr.getCurrentSession();//create a new session for this thread
+                MCRSessionMgr.setCurrentSession(session);//store session in this thread
+                session.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
+                try {
+                    LOGGER.info("update oai set list");
+                    synchronized (cachedSetList) {
+                        cachedSetList = createSetList();
+                    }
+                } finally {
+                    MCRSessionMgr.releaseCurrentSession();//release so this session is not returned by getCurrentSession
+                    session.close();//no further need for this session
                 }
             }
         };
@@ -136,9 +147,9 @@ public class MCROAISetManager {
         this.setURIs = new ArrayList<String>();
         MCRConfiguration config = MCRConfiguration.instance();
         Properties setProperties = config.getProperties(this.configPrefix + "Sets.");
-        for(Object o : setProperties.values()) {
-            String value = (String)o;
-            if(value.trim().length() > 0) {
+        for (Object o : setProperties.values()) {
+            String value = (String) o;
+            if (value.trim().length() > 0) {
                 this.setURIs.add(value);
             }
         }
@@ -152,13 +163,13 @@ public class MCROAISetManager {
     @SuppressWarnings("unchecked")
     public OAIDataList<Set> get() {
         // no cache
-        if(this.cacheMaxAge == 0) {
+        if (this.cacheMaxAge == 0) {
             return createSetList();
         }
         // cache
         // check if classification changed
         long lastModified = MCRCategoryDAOFactory.getInstance().getLastModified();
-        if(lastModified != this.classLastModified) {
+        if (lastModified != this.classLastModified) {
             this.classLastModified = lastModified;
             synchronized (this.cachedSetList) {
                 this.cachedSetList = createSetList();
@@ -167,7 +178,7 @@ public class MCROAISetManager {
         // create a shallow copy of the set list
         OAIDataList<Set> clonedList;
         synchronized (this.cachedSetList) {
-            clonedList = (OAIDataList<Set>)this.cachedSetList.clone();
+            clonedList = (OAIDataList<Set>) this.cachedSetList.clone();
         }
         return clonedList;
     }
