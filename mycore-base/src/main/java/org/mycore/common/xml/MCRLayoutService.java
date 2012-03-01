@@ -1,5 +1,4 @@
 /*
- * 
  * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -49,7 +48,6 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.transform.JDOMSource;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -58,6 +56,7 @@ import org.mycore.common.content.MCRDOMContent;
 import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRStreamContent;
+import org.mycore.common.fo.MCRFoFactory;
 import org.mycore.common.fo.MCRFoFormatterInterface;
 import org.mycore.common.xsl.MCRTemplatesSource;
 import org.mycore.common.xsl.MCRParameterCollector;
@@ -74,8 +73,6 @@ import org.xml.sax.SAXParseException;
  */
 public class MCRLayoutService {
 
-    private MCRFoFormatterInterface fo_formatter;
-
     private final static Logger LOGGER = Logger.getLogger(MCRLayoutService.class);
 
     private static final MCRLayoutService SINGLETON = new MCRLayoutService();
@@ -86,32 +83,10 @@ public class MCRLayoutService {
         protected HashMap<String, String> initialValue() {
             return new HashMap<String, String>();
         }
-
     };
 
     public static MCRLayoutService instance() {
         return SINGLETON;
-    }
-
-    private MCRLayoutService() {
-        String fo_class = MCRConfiguration.instance().getString("MCR.LayoutService.FoFormatter.class",
-                "org.mycore.common.fo.MCRFoFormatterFOP");
-        try {
-            @SuppressWarnings("unchecked")
-            Class<? extends MCRFoFormatterInterface> clazz = (Class<? extends MCRFoFormatterInterface>) Class.forName(fo_class);
-            fo_formatter = clazz.newInstance();
-            LOGGER.debug("Using formatter instance " + fo_class);
-        } catch (ClassNotFoundException e) {
-            LOGGER.error("Class " + fo_class + " not found!");
-            e.printStackTrace();
-        } catch (ClassCastException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
     }
 
     public Map<String, String> getCurrentTransformationMap() {
@@ -327,27 +302,21 @@ public class MCRLayoutService {
         }
 
         OutputStream sos = response.getOutputStream();
-        try {
-            byte[] primaryResult = out.toByteArray();
-            if ("application/pdf".equals(ct)) {
-                LOGGER.debug("Formatting XSL-FO");
-                ByteArrayInputStream tmp_stream = new ByteArrayInputStream(primaryResult);
-                fo_formatter.transform(tmp_stream, sos);
-            } else {
-                sos.write(primaryResult);
+        byte[] bytes = out.toByteArray();
+
+        if ("application/pdf".equals(ct)) // extra XSL-FO step
+        {
+            MCRFoFormatterInterface fopper = MCRFoFactory.getFoFormatter();
+            ByteArrayInputStream in = new ByteArrayInputStream(bytes);
+            try {
+                fopper.transform(in, sos);
+                in.close();
+                sos.close();
+            } catch (Exception ex) {
+                throw new MCRException("Could not render XSL-FO to PDF", ex);
             }
-        } catch (Throwable ex) {
-            StringBuffer sb = new StringBuffer();
-            while (ex != null) {
-                sb.append(ex.getClass().getName());
-                if (ex.getMessage() != null)
-                    sb.append(": ").append(ex.getMessage());
-                ex = ex.getCause();
-                if (ex != null)
-                    sb.append(" - ");
-            }
-            LOGGER.warn("Exception writing formatter response to client: " + sb.toString());
-        } finally {
+        } else {
+            sos.write(bytes);
             sos.close();
         }
     }
