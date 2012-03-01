@@ -59,7 +59,7 @@ public class MCRXSLTransformer extends MCRContentTransformer {
     @Override
     public MCRContent transform(MCRContent source) throws Exception {
         Transformer transformer = MCRXSLTransformerFactory.getTransformer(templates);
-        new MCRParameterCollector(null).setParametersTo(transformer);
+        new MCRParameterCollector().setParametersTo(transformer);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         StreamResult result = new StreamResult(baos);
         transformer.transform(source.getSource(), result);

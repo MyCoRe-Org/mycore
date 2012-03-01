@@ -23,6 +23,7 @@
 
 package org.mycore.frontend.export;
 
+import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.mycore.common.content.MCRJDOMContent;
@@ -42,7 +43,12 @@ import org.mycore.frontend.basket.MCRBasketEntry;
 public class MCRExportCollection {
 
     /** The collection to export */
-    private Element collection = new Element("exportCollection");
+    private Element collection;
+
+    public MCRExportCollection() {
+        collection = new Element("exportCollection");
+        new Document(collection);
+    }
 
     /** Sets the name and namespace of the root element that wraps the collected data */
     public void setRootElement(String elementName, String namespaceURI) {

@@ -23,6 +23,7 @@
 
 package org.mycore.common.content.transformer;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -40,7 +41,7 @@ import org.mycore.common.content.MCRContent;
 public class MCRTransformerPipe extends MCRContentTransformer {
 
     /** List of transformers to execute */
-    private List<MCRContentTransformer> transformers;
+    private List<MCRContentTransformer> transformers = new ArrayList<MCRContentTransformer>();
 
     @Override
     public void init(String id) {

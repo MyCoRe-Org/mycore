@@ -88,10 +88,11 @@ public class MCRExportServlet extends MCRServlet {
             collection.add(basket);
         }
 
-        for (String uri : req.getParameterValues("uri")) {
-            if (isAllowed(uri))
-                collection.add(uri);
-        }
+        if (req.getParameter("uri") != null)
+            for (String uri : req.getParameterValues("uri")) {
+                if (isAllowed(uri))
+                    collection.add(uri);
+            }
     }
 
     /** URIs beginning with these prefixes are forbidden for security reasons */
