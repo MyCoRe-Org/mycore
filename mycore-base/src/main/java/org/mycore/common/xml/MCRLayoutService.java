@@ -256,9 +256,10 @@ public class MCRLayoutService {
         MCRServletJob job = (MCRServletJob) mcrSession.get("MCRServletJob");
         Transformer transformer = MCRXSLTransformerFactory.getTransformer(new MCRTemplatesSource(stylesheetName));
         MCRParameterCollector parameters = job == null ? new MCRParameterCollector() : new MCRParameterCollector(job.getRequest());
-        for (Map.Entry<String, String> entry : params.entrySet()) {
-            parameters.setParameter(entry.getKey(), entry.getValue());
-        }
+        if (params != null)
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                parameters.setParameter(entry.getKey(), entry.getValue());
+            }
 
         parameters.setParametersTo(transformer);
         DOMResult out = new DOMResult();
