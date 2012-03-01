@@ -86,12 +86,15 @@ public class MCRExportServlet extends MCRServlet {
         if (basketID != null) {
             MCRBasket basket = MCRBasketManager.getOrCreateBasketInSession(basketID);
             collection.add(basket);
+            LOGGER.info("exporting basket " + basketID + " via " + req.getParameter("transformer"));
         }
 
         if (req.getParameter("uri") != null)
             for (String uri : req.getParameterValues("uri")) {
-                if (isAllowed(uri))
+                if (isAllowed(uri)) {
                     collection.add(uri);
+                    LOGGER.info("exporting " + uri + " via " + req.getParameter("transformer"));
+                }
             }
     }
 
