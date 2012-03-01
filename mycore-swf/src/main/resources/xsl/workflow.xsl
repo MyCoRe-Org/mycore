@@ -18,15 +18,15 @@
       <xsl:choose>
         <xsl:when test="@base">
           <xsl:value-of
-            select="concat($ServletsBaseURL,'MCRListWorkflowServlet',$JSessionID,'?XSL.Style=xml&amp;base=',@base,'&amp;step=',@step,'&amp;with_derivate=',@with_derivate)"/>
+            select="concat('base=',@base,'&amp;step=',@step,'&amp;with_derivate=',@with_derivate)"/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of
-            select="concat($ServletsBaseURL,'MCRListWorkflowServlet',$JSessionID,'?XSL.Style=xml&amp;type=',@type,'&amp;step=',@step,'&amp;with_derivate=',@with_derivate)"/>
+            select="concat('type=',@type,'&amp;step=',@step,'&amp;with_derivate=',@with_derivate)"/>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <xsl:apply-templates select="document($url)/mcr_workflow"/>
+    <xsl:apply-templates select="document(concat('swf:',$url))/mcr_workflow"/>
   </xsl:template>
   
   <xsl:template match="/mcr_workflow">

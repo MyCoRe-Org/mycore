@@ -1,135 +1,106 @@
-/*
+/**
  * 
- * $Revision$ $Date$
- *
- * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
- *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program, in a file called gpl.txt or license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
-
-// package
-package org.mycore.frontend.servlets;
+package org.mycore.frontend.workflow;
 
 import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
+import java.util.StringTokenizer;
 
-import javax.servlet.http.HttpServletResponse;
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.URIResolver;
 import javax.xml.transform.sax.TransformerHandler;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
+import org.jdom.JDOMException;
 import org.jdom.transform.JDOMSource;
 import org.jdom.xpath.XPath;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.content.MCRFileContent;
-import org.mycore.common.content.MCRJDOMContent;
-import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.common.xml.MCRXMLResource;
 import org.mycore.common.xml.MCRXSLTransformation;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectService;
-import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
 
 /**
- * This class contains a servlet as extention of MCRServlet. The Servlet read
- * the object metadata files from the workflow, transform them and analyze also
- * the appended derivates. It return a XML file with the following content.
- * <p />
- * &gt;mcr_workflow type="..." step="..."&lt; <br />
- * &gt;item ID="..."&lt; <br />
- * &gt;label&lt;Die 99 582 am Lokschuppen in Schoenheide&gt;/label&lt; <br />
- * &gt;data&lt;Jens Kupferschmidt&gt;/data&lt; <br />
- * &gt;data&lt;2004-06-08&gt;/data&lt; <br />
- * &gt;derivate ID="..." label="..."&lt; <br />
- * &gt;file size="..." main="true|false" &lt;...&gt;/file&lt; <br />
- * &gt;/derivate&lt; <br />
- * &gt;/item&lt; <br />
- * &gt;/mcr_workflow&lt; <br />
- * Call this servlet with
- * <b>.../servlets/MCRListWorkflowServlet/XSL.Style=xml&type=...&step=... </b>
- * 
- * @author Jens Kupferschmidt
- * @version $Revision$ $Date: 2010-12-29 09:18:22 +0100 (Mi, 29. Dez
- *          2010) $
+ * @author Thomas Scheffler (yagee)
+ *
  */
-public class MCRListWorkflowServlet extends MCRServlet {
+public class MCRSWFResolver implements URIResolver {
+    private static final Logger LOGGER = Logger.getLogger(MCRSWFResolver.class);
 
-    private static final long serialVersionUID = 1L;
-
-    private static Logger LOGGER = Logger.getLogger(MCRListWorkflowServlet.class.getName());
-
-    private static MCRSimpleWorkflowManager WFM = null;
+    private static MCRSimpleWorkflowManager WFM = MCRSimpleWorkflowManager.instance();
 
     private static String SLASH = System.getProperty("file.separator");
 
-    private static String DefaultLang = null;
+    public static String DefaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", MCRConstants.DEFAULT_LANG);
 
-    /** Initialization of the servlet */
-    public void init() throws MCRConfigurationException, javax.servlet.ServletException {
-        super.init();
-        WFM = MCRSimpleWorkflowManager.instance();
-        DefaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", MCRConstants.DEFAULT_LANG);
+    /* (non-Javadoc)
+     * @see javax.xml.transform.URIResolver#resolve(java.lang.String, java.lang.String)
+     */
+    @Override
+    public Source resolve(String href, String base) throws TransformerException {
+        String key = href.substring(href.indexOf(":") + 1);
+        LOGGER.debug("Reading xml from query result using key :" + key);
+
+        String[] param;
+        StringTokenizer tok = new StringTokenizer(key, "&");
+        Hashtable<String, String> params = new Hashtable<String, String>();
+
+        while (tok.hasMoreTokens()) {
+            param = tok.nextToken().split("=");
+            if (param.length == 1) {
+                params.put(param[0], "");
+            } else {
+                params.put(param[0], param[1]);
+            }
+        }
+
+        String baseParam = params.get("base");
+        String type = params.get("type");
+        String step = params.get("step");
+        String with_derivate = params.get("with_derivate");
+        try {
+            Document workFlow = MCRSWFResolver.getWorkFlow(baseParam, type, step, with_derivate);
+            return new JDOMSource(workFlow);
+        } catch (Exception e) {
+            LOGGER.error("Error while getting workflow document.", e);
+            throw new TransformerException(e);
+        }
     }
 
-    /**
-     * This method overrides doGetPost of MCRServlet and put the generated DOM
-     * in the LayoutService. <br />
-     * Input parameter are <br />
-     * <ul>
-     * <li>base - the MyCoRe ID base or</li>
-     * <li>type - the MyCoRe ID type</li>
-     * <li>step - the workflow step</li>
-     * </ul>
-     * 
-     * @param job
-     *            an instance of MCRServletJob
-     */
-    public void doGetPost(MCRServletJob job) throws Exception {
-        String base = getProperty(job.getRequest(), "base");
+    private static org.jdom.Document getWorkFlow(String base, String type, String step, String with_derivate) throws IOException,
+            JDOMException {
         if (base != null) {
             base = base.trim();
             LOGGER.debug("Property from request : base = " + base);
         }
 
-        String type = getProperty(job.getRequest(), "type");
         if (type != null) {
             type = type.trim();
             LOGGER.debug("Property from request : type = " + type);
         }
 
-        String step = getProperty(job.getRequest(), "step");
         if (step != null) {
             step = step.trim();
             LOGGER.debug("Property from request : step = " + step);
         }
 
-        String with_derivate = getProperty(job.getRequest(), "with_derivate");
         if (with_derivate != null) {
             with_derivate = with_derivate.trim();
             if (!with_derivate.equals("true"))
@@ -142,8 +113,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
         if (((base == null) && (type == null)) || (step == null)) {
             String msg = "Error: HTTP request has no base or type argument";
             LOGGER.error(msg);
-            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
-            return;
+            throw new IllegalArgumentException(msg);
         }
 
         String lang = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
@@ -387,14 +357,13 @@ public class MCRListWorkflowServlet extends MCRServlet {
                     }
                 }
             } catch (Exception ex) {
-                LOGGER.error("Error while read derivates for XML workflow file " + (String) workfiles.get(i));
-                LOGGER.error(ex.getMessage());
+                LOGGER.error("Error while read derivates for XML workflow file " + (String) workfiles.get(i), ex);
             }
-
             root.addContent(elm);
         }
 
         org.jdom.Document workflow_doc = new org.jdom.Document(root);
-        getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRJDOMContent(workflow_doc));
+        return workflow_doc;
     }
+
 }

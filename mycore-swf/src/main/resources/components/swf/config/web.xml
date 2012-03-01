@@ -35,10 +35,6 @@
   <servlet-name>MCRCheckEditDerivateServlet</servlet-name>
   <servlet-class>org.mycore.frontend.servlets.MCRCheckEditDerivateServlet</servlet-class>
 </servlet>
-<servlet id="MCRListWorkflowServlet">
-  <servlet-name>MCRListWorkflowServlet</servlet-name>
-  <servlet-class>org.mycore.frontend.servlets.MCRListWorkflowServlet</servlet-class>
-</servlet>
 <servlet id="MCRFileViewWorkflowServlet">
   <servlet-name>MCRFileViewWorkflowServlet</servlet-name>
   <servlet-class>org.mycore.frontend.servlets.MCRFileViewWorkflowServlet</servlet-class>
@@ -75,10 +71,6 @@
 <servlet-mapping>
   <servlet-name>MCRCheckEditDerivateServlet</servlet-name>
   <url-pattern>/servlets/MCRCheckEditDerivateServlet</url-pattern>
-</servlet-mapping>
-<servlet-mapping>
-  <servlet-name>MCRListWorkflowServlet</servlet-name>
-  <url-pattern>/servlets/MCRListWorkflowServlet</url-pattern>
 </servlet-mapping>
 <servlet-mapping>
   <servlet-name>MCRFileViewWorkflowServlet</servlet-name>
