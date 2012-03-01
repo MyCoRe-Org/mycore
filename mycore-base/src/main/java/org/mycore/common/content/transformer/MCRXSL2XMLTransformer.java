@@ -1,6 +1,6 @@
 /*
- * $Revision$ 
- * $Date$
+ * $Id$
+ * $Revision: 5697 $ $Date: 01.03.2012 $
  *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
@@ -23,52 +23,33 @@
 
 package org.mycore.common.content.transformer;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.stream.StreamResult;
 
-import org.mycore.common.MCRConfiguration;
-import org.mycore.common.content.MCRByteContent;
+import org.jdom.transform.JDOMResult;
 import org.mycore.common.content.MCRContent;
-import org.mycore.common.xsl.MCRTemplatesSource;
-import org.mycore.common.xsl.MCRParameterCollector;
-import org.mycore.common.xsl.MCRXSLTransformerFactory;
+import org.mycore.common.content.MCRJDOMContent;
 
 /**
  * Transforms XML content using a static XSL stylesheet.
  * The stylesheet is configured via
  * 
  * MCR.ContentTransformer.{ID}.Stylesheet
-
- * @author Frank L\u00FCtzenkirchen
+ * 
+ * Resulting MCRContent holds XML.
+ * Use {@link MCRXSLTransformer} if you want to produce non XML output.
+ * @author Thomas Scheffler (yagee)
+ *
  */
-public class MCRXSLTransformer extends MCRContentTransformer {
-
-    /** The compiled XSL stylesheet */
-    private MCRTemplatesSource templates;
+public class MCRXSL2XMLTransformer extends MCRXSLTransformer {
 
     @Override
-    public void init(String id) {
-        super.init(id);
-        String property = "MCR.ContentTransformer." + id + ".Stylesheet";
-        String stylesheet = MCRConfiguration.instance().getString(property);
-        this.templates = new MCRTemplatesSource(stylesheet);
-    }
-
-    @Override
-    public MCRContent transform(MCRContent source) throws Exception {
-        Transformer transformer = MCRXSLTransformerFactory.getTransformer(templates);
-        new MCRParameterCollector().setParametersTo(transformer);
-        return transform(transformer, source);
-    }
-
     protected MCRContent transform(Transformer transformer, MCRContent source) throws TransformerException, IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        StreamResult result = new StreamResult(baos);
+        JDOMResult result = new JDOMResult();
         transformer.transform(source.getSource(), result);
-        return new MCRByteContent(baos.toByteArray());
+        return new MCRJDOMContent(result.getDocument());
     }
+
 }
