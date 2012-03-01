@@ -572,6 +572,7 @@
   </xsl:template>
 
   <xsl:template name="printMetaDate.mods.children">
+    <xsl:param name="label" select="'enthält'" />
     <xsl:if test="./structure/children/child">
       <!--*** List children per object type ************************************* -->
       <!-- 1.) get a list of objectTypes of all child elements 2.) remove duplicates from this list 3.) for-each objectTyp id list child elements -->
@@ -589,7 +590,7 @@
       <xsl:for-each select="$unique-ids">
         <xsl:variable select="." name="thisObjectType" />
         <xsl:variable name="label">
-          <xsl:value-of select="'enthält'" />
+          <xsl:value-of select="$label" />
   <!--          <xsl:choose>
             <xsl:when test="count($context/structure/children/child[contains(@xlink:href,$thisObjectType)])=1">
               <xsl:value-of select="i18n:translate(concat('metaData.',$thisObjectType,'.[singular]'))" />
@@ -820,7 +821,9 @@
               </xsl:for-each>
               <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
               <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[not(@ID) and not(@type='conference')]" />
-              <xsl:call-template name="printMetaDate.mods.children" />
+              <xsl:call-template name="printMetaDate.mods.children">
+                <xsl:with-param name="label" select="'Konferenzbeiträge'" />
+              </xsl:call-template>
             </table>
           </div>
           <div class="c15r">
