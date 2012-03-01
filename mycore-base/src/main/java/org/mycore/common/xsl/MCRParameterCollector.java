@@ -51,8 +51,7 @@ public class MCRParameterCollector {
     private Properties parameters = new Properties();
 
     /**
-     * Collects parameters. When the request given is not null, parameters are copied from 
-     * request parameters and attributes, too. The collecting of parameters is done in steps,
+     * Collects parameters The collecting of parameters is done in steps,
      * each step may overwrite parameters that already have been set.
      * 
      * First, all configuration properties from MCRConfiguration are copied.
@@ -61,7 +60,7 @@ public class MCRParameterCollector {
      * Next, those HTTP request parameters that start with "XSL." are copied.
      * Next, those HTTP request attributes that start with "XSL." are copied.
      * 
-     * @param request the HttpRequest causing the XSL transformation, optionally null
+     * @param request the HttpRequest causing the XSL transformation, must NOT be null
      */
     public MCRParameterCollector(HttpServletRequest request) {
         setFromConfiguration();
@@ -73,12 +72,9 @@ public class MCRParameterCollector {
 
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         setFromSession(mcrSession);
-
-        if (request != null) {
-            setFromRequestParameters(request);
-            setFromRequestAttributes(request);
-            setFromRequestHeader(request);
-        }
+        setFromRequestParameters(request);
+        setFromRequestAttributes(request);
+        setFromRequestHeader(request);
 
         if (session != null) {
             setSessionID(session, request.isRequestedSessionIdFromCookie());
@@ -89,10 +85,35 @@ public class MCRParameterCollector {
     }
 
     /**
+     * Collects parameters The collecting of parameters is done in steps,
+     * each step may overwrite parameters that already have been set.
+     * 
+     * First, all configuration properties from MCRConfiguration are copied.
+     * Next, those variables stored in the MCRSession, that start with "XSL." are copied.
+     * 
+     * @param request the HttpRequest causing the XSL transformation, must NOT be null
+     */
+    public MCRParameterCollector() {
+        setFromConfiguration();
+        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+        setFromSession(mcrSession);
+        setUnmodifyableParameters(mcrSession);
+        debugSessionParameters();
+    }
+
+    /**
      * Sets the parameter with the given name
      */
     public void setParameter(String name, String value) {
         parameters.put(name, value);
+    }
+
+    /**
+     * Sets the parameter only if it starts with "XSL." and is not empty
+     */
+    private void setXSLParameter(String name, Object value) {
+        if (name.startsWith("XSL.") && (value != null) && (!value.toString().isEmpty()))
+            parameters.put(name.substring(4), value);
     }
 
     /**
@@ -117,9 +138,7 @@ public class MCRParameterCollector {
         for (@SuppressWarnings("unchecked")
         Enumeration<String> e = session.getAttributeNames(); e.hasMoreElements();) {
             String name = e.nextElement();
-            if (name.startsWith("XSL.")) {
-                parameters.put(name.substring(4), session.getAttribute(name));
-            }
+            setXSLParameter(name, session.getAttribute(name));
         }
     }
 
@@ -130,8 +149,7 @@ public class MCRParameterCollector {
     private void setFromSession(MCRSession session) {
         for (Map.Entry<Object, Object> entry : session.getMapEntries()) {
             String key = entry.getKey().toString();
-            if (key.startsWith("XSL."))
-                parameters.put(key.substring(4), entry.getValue().toString());
+            setXSLParameter(key, entry.getValue());
         }
     }
 
@@ -143,9 +161,8 @@ public class MCRParameterCollector {
         for (@SuppressWarnings("unchecked")
         Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
             String name = e.nextElement();
-            if (name.startsWith("XSL.") && !name.endsWith(".SESSION")) {
-                parameters.put(name.substring(4), request.getParameter(name));
-            }
+            if (!(name.endsWith(".SESSION")))
+                setXSLParameter(name, request.getParameter(name));
         }
     }
 
@@ -157,10 +174,10 @@ public class MCRParameterCollector {
         for (@SuppressWarnings("unchecked")
         Enumeration<String> e = request.getAttributeNames(); e.hasMoreElements();) {
             String name = e.nextElement();
-            if (name.startsWith("XSL.") && !name.endsWith(".SESSION")) {
+            if (!(name.endsWith(".SESSION"))) {
                 final Object attributeValue = request.getAttribute(name);
                 if (attributeValue != null) {
-                    parameters.put(name.substring(4), attributeValue.toString());
+                    setXSLParameter(name, attributeValue);
                 }
             }
         }
@@ -205,21 +222,31 @@ public class MCRParameterCollector {
         parameters.put("Referer", request.getHeader("Referer") != null ? request.getHeader("Referer") : "");
     }
 
-    /** Calculates the complete request URL */
+    /** 
+     * Calculates the complete request URL, so that mod_proxy is supported 
+     */
     private String getCompleteURL(HttpServletRequest request) {
+        StringBuilder buffer = getBaseURLUpToHostName();
+
         //when called by MCRErrorServlet
         String errorURI = (String) request.getAttribute("javax.servlet.error.request_uri");
-        //assemble URL with baseUrl so that mod_proxy request are supported
-        StringBuilder buffer = new StringBuilder(MCRServlet.getBaseURL());
-        int pos = buffer.indexOf("/", "https://".length());
-        buffer.delete(pos, buffer.length()); //get baseUrl up to hostname
         buffer.append(errorURI != null ? errorURI : request.getRequestURI());
+
         String queryString = request.getQueryString();
         if (queryString != null && queryString.length() > 0) {
             buffer.append("?").append(queryString);
         }
-        LOGGER.debug("Complete request URL : " + buffer.toString());
-        return buffer.toString();
+
+        String url = buffer.toString();
+        LOGGER.debug("Complete request URL : " + url);
+        return url;
+    }
+
+    private StringBuilder getBaseURLUpToHostName() {
+        StringBuilder buffer = new StringBuilder(MCRServlet.getBaseURL());
+        int pos = buffer.indexOf("/", "https://".length());
+        buffer.delete(pos, buffer.length());
+        return buffer;
     }
 
     /**

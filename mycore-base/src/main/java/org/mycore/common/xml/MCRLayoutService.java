@@ -255,8 +255,7 @@ public class MCRLayoutService {
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         MCRServletJob job = (MCRServletJob) mcrSession.get("MCRServletJob");
         Transformer transformer = MCRXSLTransformerFactory.getTransformer(new MCRTemplatesSource(stylesheetName));
-        HttpServletRequest req = (job == null ? null : job.getRequest());
-        MCRParameterCollector parameters = new MCRParameterCollector(req);
+        MCRParameterCollector parameters = job == null ? new MCRParameterCollector() : new MCRParameterCollector(job.getRequest());
         for (Map.Entry<String, String> entry : params.entrySet()) {
             parameters.setParameter(entry.getKey(), entry.getValue());
         }
