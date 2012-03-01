@@ -457,7 +457,7 @@
     </tr>
   </xsl:template>
 
-  <xsl:template match="mods:identifier[@type='uri' or type='doi']" mode="present">
+  <xsl:template match="mods:identifier[@type='uri' or @type='doi']" mode="present">
     <tr>
       <td valign="top" class="metaname">
         <xsl:choose>
@@ -475,6 +475,11 @@
           <xsl:when test="contains(.,'PPN=')">
             <a href="{$link}">
               <xsl:value-of select="substring-after($link, 'PPN=')" />
+            </a>
+          </xsl:when>
+          <xsl:when test="@type='doi' and not(contains($link,'http'))">
+            <a href="http://dx.doi.org/{$link}">
+              <xsl:value-of select="$link" />
             </a>
           </xsl:when>
           <xsl:otherwise>
@@ -541,7 +546,15 @@
       <td class="metavalue">
         <a>
           <xsl:attribute name="href"><xsl:value-of select="." /></xsl:attribute>
-          <xsl:value-of select="@displayLabel" />
+          <xsl:choose>
+            <xsl:when test="string-length(@displayLabel)&gt;0">
+              <xsl:value-of select="@displayLabel" />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="." />
+            </xsl:otherwise>
+          </xsl:choose>
+          
         </a>
       </td>
     </tr>
