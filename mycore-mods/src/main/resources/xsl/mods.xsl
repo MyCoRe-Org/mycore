@@ -97,7 +97,13 @@
 
   <!--Template for generated link names and result titles: see mycoreobject.xsl, results.xsl, MyCoReLayout.xsl -->
   <xsl:template priority="1" mode="resulttitle" match="/mycoreobject[contains(@ID,'_mods_')]">
+    <xsl:variable name="mods-type">
+      <xsl:apply-templates select="." mode="mods-type" />
+    </xsl:variable>
     <xsl:choose>
+      <xsl:when test="$mods-type='cproceeding'">
+        <xsl:apply-templates select="." mode="title.cproceeding" />
+      </xsl:when>
       <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title">
         <xsl:call-template name="ShortenText">
           <xsl:with-param name="text" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title[1]" />
