@@ -27,7 +27,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-
 /**
  * Reads MCRContent from a String's text.
  * 
@@ -37,22 +36,24 @@ public class MCRStringContent extends MCRContent {
 
     private String text;
 
-    private String encoding;
+    /** 
+     * The character encoding to use when transforming the text to a byte stream.
+     * By default, this is UTF-8.
+     */
+    private String encoding = "UTF-8";
 
     /**
      * Reads content from the given string, 
-     * using UTF-8 encoding when the text is outputted as stream.
      */
     public MCRStringContent(String text) {
-        this(text, "UTF-8");
+        this.text = text;
     }
 
-    /**
-     * Reads content from the given string, using the given 
-     * character encoding when the text is outputted as stream.
+    /** 
+     * Sets the character encoding to use when transforming the text to a byte stream.
+     * By default, this is UTF-8.
      */
-    public MCRStringContent(String text, String encoding) {
-        this.text = text;
+    public void setEncoding(String encoding) {
         this.encoding = encoding;
     }
 
