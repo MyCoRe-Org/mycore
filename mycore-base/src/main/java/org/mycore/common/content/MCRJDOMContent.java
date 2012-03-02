@@ -29,7 +29,6 @@ import java.io.OutputStream;
 import javax.xml.transform.Source;
 
 import org.jdom.Document;
-import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMSource;
 
@@ -44,20 +43,9 @@ public class MCRJDOMContent extends MCRXMLContent {
 
     /**
      * @param jdom the W3C DOM XML document to read from 
-     * @param format the output format to use when XML is outputted as stream.
-     */
-    public MCRJDOMContent(Document jdom, Format format) {
-        super(format);
-        this.jdom = jdom;
-    }
-
-    /**
-     * Uses the default output format.
-     * 
-     * @param dom the W3C DOM XML document to read from 
      */
     public MCRJDOMContent(Document jdom) {
-        this(jdom, defaultFormat);
+        this.jdom = jdom;
     }
 
     @Override

@@ -26,6 +26,7 @@ package org.mycore.common.content.transformer;
 import org.jdom.output.Format;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.common.content.MCRXMLContent;
 
 /**
  * Transforms xml content in pretty, UTF-8 encoded format.
@@ -36,7 +37,8 @@ public class MCRToPrettyXML extends MCRContentTransformer {
 
     @Override
     public MCRContent transform(MCRContent source) throws Exception {
-        Format format = Format.getPrettyFormat().setEncoding("UTF-8");
-        return new MCRJDOMContent(source.asXML(), format);
+        MCRXMLContent content = (source instanceof MCRXMLContent ? (MCRXMLContent) source : new MCRJDOMContent(source.asXML()));
+        content.setFormat(Format.getPrettyFormat().setEncoding("UTF-8"));
+        return content;
     }
 }

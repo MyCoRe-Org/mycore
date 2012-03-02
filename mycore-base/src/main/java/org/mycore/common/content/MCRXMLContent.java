@@ -54,7 +54,12 @@ public abstract class MCRXMLContent extends MCRContent {
     /** The default format used when outputting this XML as a byte stream */
     protected Format format;
 
-    protected MCRXMLContent(Format format) {
+    /** 
+     * Sets the format used when outputting XML as a byte stream. 
+     * By default, content is outputted using UTF-8 encoding.
+     * If MCR.IFS2.PrettyXML=true, a pretty format with indentation is used. 
+     */
+    public void setFormat(Format format) {
         this.format = format;
     }
 
