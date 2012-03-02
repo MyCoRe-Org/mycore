@@ -23,9 +23,12 @@
  **/
 package org.mycore.services.i18n;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -37,8 +40,14 @@ import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRSessionMgr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * provides services for internationalization in mycore application.
@@ -60,6 +69,20 @@ public class MCRTranslation {
     private static boolean DEPRECATED_MESSAGES_PRESENT = false;
 
     private static Properties DEPRECATED_MAPPING = loadProperties();
+    
+    private static List<String> AVAILABLE_LANGUAGES = loadAvailableLanguages();
+
+    private static final ThreadLocal<DocumentBuilder> BUILDER_LOCAL = new ThreadLocal<DocumentBuilder>() {
+        @Override
+        protected DocumentBuilder initialValue() {
+            try {
+                return DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            } catch(ParserConfigurationException pce) {
+                LOGGER.error("Unable to create document builder", pce);
+                return null;
+            }
+        }
+    };
 
     /**
      * provides translation for the given label (property key).
@@ -203,6 +226,22 @@ public class MCRTranslation {
         return locale;
     }
 
+    public static List<String> getAvailableLanguages() {
+        return AVAILABLE_LANGUAGES;
+    }
+
+    public static Document getAvailableLanguagesAsXML() {
+        Document document = BUILDER_LOCAL.get().newDocument();
+        Element i18nRoot = document.createElement("i18n");
+        document.appendChild(i18nRoot);
+        for(String lang : AVAILABLE_LANGUAGES) {
+            Element langElement = document.createElement("lang");
+            langElement.setTextContent(lang);
+            i18nRoot.appendChild(langElement);
+        }
+        return document;
+    }
+
     static String[] getStringArray(String masked) {
         List<String> a = new LinkedList<String>();
         boolean mask = false;
@@ -275,6 +314,23 @@ public class MCRTranslation {
             LOGGER.warn("Could not load resource '" + DEPRECATED_MESSAGES_PROPERTIES + "'.", e);
         }
         return deprecatedMapping;
+    }
+
+    static List<String> loadAvailableLanguages() {
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        final String bundlename = "messages";
+        File root = new File(loader.getResource("/").getFile());
+        File[] files = root.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.matches("^" + bundlename + "_(\\w{2}){1}\\.properties$");
+            }
+        });
+        List<String> languages = new ArrayList<String>();
+        for (File file : files) {
+            languages.add(file.getName().replaceAll("^" + bundlename + "(_)?|\\.properties$", ""));
+        }
+        return languages;
     }
 
 }
