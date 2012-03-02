@@ -381,6 +381,15 @@
     <url-pattern>/servlets/MCRTarServlet</url-pattern>
   </servlet-mapping>
   
+  <servlet id="MCRExportServlet">
+    <servlet-name> MCRExportServlet </servlet-name>
+    <servlet-class> org.mycore.frontend.export.MCRExportServlet </servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name> MCRExportServlet </servlet-name>
+    <url-pattern> /servlets/MCRExportServlet/* </url-pattern>
+  </servlet-mapping>
+
   <!-- **************************************************************** -->
   <!-- General configuration -->
   <!-- **************************************************************** -->
