@@ -43,7 +43,7 @@ public class MCRDebuggingTransformer extends MCRContentTransformer {
                 source = source.getReusableCopy();
 
             LOGGER.debug(">>>>>>>>>>>>>>>>>>>>");
-            LOGGER.debug(source.toString());
+            LOGGER.debug(source.asString());
             LOGGER.debug("<<<<<<<<<<<<<<<<<<<<");
         }
         return source;
