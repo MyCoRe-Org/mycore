@@ -132,11 +132,10 @@ public class MCRBroadcastingServlet extends MCRServlet {
             root = new Element("mcr-module-broadcasting");
 
         root.addContent(elem);
-        Document jdom = new Document(root);
 
         if (xslTransformation)
-            getLayoutService().doLayout(request, response, new MCRJDOMContent(jdom));
+            getLayoutService().doLayout(request, response, new MCRJDOMContent(root));
         else
-            getLayoutService().sendXML(request, response, new MCRJDOMContent(jdom));
+            getLayoutService().sendXML(request, response, new MCRJDOMContent(root));
     }
 }

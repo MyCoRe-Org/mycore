@@ -180,7 +180,7 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
         assertEquals(1, col.getChildren().size());
         assertEquals(0, build.getSize());
         assertTrue(created.before(build.getLastModified()));
-        build.setContent(new MCRJDOMContent(new Document(new Element("project"))));
+        build.setContent(new MCRJDOMContent(new Element("project")));
         assertTrue(build.getSize() > 0);
         assertNotNull(build.getContent().asByteArray());
         bzzz();

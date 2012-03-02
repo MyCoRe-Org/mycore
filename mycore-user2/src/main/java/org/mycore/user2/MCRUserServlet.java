@@ -29,7 +29,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
 import org.jdom.Element;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
@@ -141,7 +140,7 @@ public class MCRUserServlet extends MCRServlet {
 
         LOGGER.info("show user " + user.getUserID() + " " + user.getUserName() + " " + user.getRealmID());
         Element u = buildXML(user);
-        getLayoutService().doLayout(req, res, new MCRJDOMContent(new Document(u)));
+        getLayoutService().doLayout(req, res, new MCRJDOMContent(u));
     }
 
     /**
@@ -324,7 +323,7 @@ public class MCRUserServlet extends MCRServlet {
         LOGGER.info("delete user " + user.getUserID() + " " + user.getUserName() + " " + user.getRealmID());
         Element u = buildXML(user);
         MCRUserManager.deleteUser(user);
-        getLayoutService().doLayout(req, res, new MCRJDOMContent(new Document(u)));
+        getLayoutService().doLayout(req, res, new MCRJDOMContent(u));
     }
 
     /**
@@ -391,7 +390,7 @@ public class MCRUserServlet extends MCRServlet {
                 users.addContent(u);
             }
 
-        getLayoutService().doLayout(req, res, new MCRJDOMContent(new Document(users)));
+        getLayoutService().doLayout(req, res, new MCRJDOMContent(users));
     }
 
     private void addString(Element parent, String name, String value) {

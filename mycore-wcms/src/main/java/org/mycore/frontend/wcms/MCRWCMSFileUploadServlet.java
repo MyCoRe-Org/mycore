@@ -37,7 +37,6 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
-import org.jdom.Document;
 import org.jdom.Element;
 
 import org.mycore.common.MCRConfiguration;
@@ -101,13 +100,12 @@ public class MCRWCMSFileUploadServlet extends MCRWCMSServlet {
     private void forwardPage(HttpServletRequest request, HttpServletResponse response, String status, String error) throws IOException {
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         Element rootOut = new Element("cms");
-        Document jdom = new Document(rootOut);
         rootOut.addContent(new Element("session").setText("fileUpload"));
         rootOut.addContent(new Element("userID").setText(mcrSession.get("userID").toString()));
         rootOut.addContent(new Element("userClass").setText(mcrSession.get("userClass").toString()));
         rootOut.addContent(new Element("status").setText(status));
         rootOut.addContent(new Element("error").setText(error));
-        getLayoutService().doLayout(request, response, new MCRJDOMContent(jdom));
+        getLayoutService().doLayout(request, response, new MCRJDOMContent(rootOut));
     }
 
     private void processFormField(FileItem item) {

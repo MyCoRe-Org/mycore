@@ -282,7 +282,7 @@ public class MCRCommandLineInterface {
     public static void getURI(String uri, String file) throws Exception {
         Element resolved = MCRURIResolver.instance().resolve(uri);
         Element cloned = (Element) resolved.clone();
-        new MCRJDOMContent(new Document(cloned)).sendTo(new File(file));
+        new MCRJDOMContent(cloned).sendTo(new File(file));
     }
 
     /**

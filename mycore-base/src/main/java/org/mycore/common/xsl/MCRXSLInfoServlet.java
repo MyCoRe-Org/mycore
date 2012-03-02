@@ -36,7 +36,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
 import org.jdom.Element;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.content.MCRJDOMContent;
@@ -96,7 +95,7 @@ public final class MCRXSLInfoServlet extends MCRServlet {
             Stylesheet stylesheet = entry.getValue();
             output.addContent(stylesheet.buildXML());
         }
-        getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRJDOMContent(new Document(output)));
+        getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRJDOMContent(output));
     }
 
     private void findXSLinLibJars() throws IOException {

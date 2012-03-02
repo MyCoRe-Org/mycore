@@ -112,7 +112,7 @@ public class MCREditorServlet extends MCRServlet {
             editorResolved = startSession(parameters, ref, uri, validate);
         }
 
-        getLayoutService().sendXML(req, res, new MCRJDOMContent(new Document((Element) editorResolved.clone())));
+        getLayoutService().sendXML(req, res, new MCRJDOMContent((Element) editorResolved.clone()));
     }
 
     /**
@@ -128,7 +128,7 @@ public class MCREditorServlet extends MCRServlet {
         Element popup = MCREditorDefReader.findElementByID(ref, editor);
         Element clone = (Element) popup.clone();
 
-        getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRJDOMContent(new Document(clone)));
+        getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRJDOMContent(clone));
     }
 
     /**

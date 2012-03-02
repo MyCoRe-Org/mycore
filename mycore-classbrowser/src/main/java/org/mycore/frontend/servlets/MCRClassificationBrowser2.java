@@ -213,6 +213,6 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         if ((style != null) && (style.length() > 0))
             req.setAttribute("XSL.Style", style);
 
-        MCRServlet.getLayoutService().doLayout(req, job.getResponse(), new MCRJDOMContent(new Document(xml)));
+        MCRServlet.getLayoutService().doLayout(req, job.getResponse(), new MCRJDOMContent(xml));
     }
 }

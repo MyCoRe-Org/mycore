@@ -53,7 +53,6 @@ public class MCRWCMSLoginServlet extends MCRWCMSServlet {
         session.put("rootNodes", new ArrayList());
         // build jdom
         Element root = new Element("cms");
-        Document jdom = new Document(root);
         root.addContent(new Element("session").setText("welcome"));
         root.addContent(new Element("userID").setText(userID));
         root.addContent(new Element("userRealName").setText(userRealName));
@@ -62,6 +61,6 @@ public class MCRWCMSLoginServlet extends MCRWCMSServlet {
         root.addContent(new Element("rootNode").setAttribute("href", "href value").setText("root node..."));
         root.addContent(new Element("modus").setText("true"));
         // do layout
-        getLayoutService().doLayout(request, response, new MCRJDOMContent(jdom));
+        getLayoutService().doLayout(request, response, new MCRJDOMContent(root));
 	}    
 }

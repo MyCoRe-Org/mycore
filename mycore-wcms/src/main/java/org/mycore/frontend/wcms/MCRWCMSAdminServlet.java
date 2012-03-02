@@ -141,7 +141,7 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
             answer.getChild("rightsManagement").setAttribute("filteredUser", request.getParameter("filter"));
         }
         // render
-        getLayoutService().doLayout(request, response, new MCRJDOMContent(new Document(answer)));
+        getLayoutService().doLayout(request, response, new MCRJDOMContent(answer));
     }
 
     private void manageReadAccess(HttpServletRequest request, HttpServletResponse response) throws IOException {

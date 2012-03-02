@@ -99,8 +99,7 @@ public class MCRMediaIFSTools {
             else
                 data = col.createFile(buildFileName(getFileName(filePath)) + ".moxml");
 
-            org.jdom.Document xml = new org.jdom.Document(mediaXML);
-            data.setContent(new MCRJDOMContent(xml));
+            data.setContent(new MCRJDOMContent(mediaXML));
         } catch (Exception ex) {
             throw new MCRException(ex);
         }

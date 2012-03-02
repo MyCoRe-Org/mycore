@@ -154,7 +154,7 @@ public class MCRLoginServlet extends MCRServlet {
         }
         addCurrentUserInfo(root);
         root.addContent(new org.jdom.Element("returnURL").addContent(getReturnURL(req)));
-        getLayoutService().doLayout(req, res, new MCRJDOMContent(new Document(root)));
+        getLayoutService().doLayout(req, res, new MCRJDOMContent(root));
     }
 
     private void listRealms(HttpServletRequest req, HttpServletResponse res) throws IOException {

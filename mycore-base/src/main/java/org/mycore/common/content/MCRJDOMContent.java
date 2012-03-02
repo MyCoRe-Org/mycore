@@ -29,6 +29,7 @@ import java.io.OutputStream;
 import javax.xml.transform.Source;
 
 import org.jdom.Document;
+import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMSource;
 
@@ -42,10 +43,21 @@ public class MCRJDOMContent extends MCRXMLContent {
     private Document jdom;
 
     /**
-     * @param jdom the W3C DOM XML document to read from 
+     * @param jdom the JDOM XML document to read from 
      */
     public MCRJDOMContent(Document jdom) {
         this.jdom = jdom;
+    }
+
+    /**
+     * Alternative constructor for newly created root elements
+     * that do not have a Document parent yet, which is a very 
+     * common use case.
+     * 
+     * @param jdom the JDOM XML root element to read from 
+     */
+    public MCRJDOMContent(Element jdom) {
+        this(new Document(jdom));
     }
 
     @Override

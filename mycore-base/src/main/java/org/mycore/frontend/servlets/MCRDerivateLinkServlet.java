@@ -62,7 +62,7 @@ public class MCRDerivateLinkServlet extends MCRServlet {
         rootElement.setAttribute("webpage", webpage);
 
         // transform & display the generated xml document
-        getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRJDOMContent(new Document(rootElement)));
+        getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRJDOMContent(rootElement));
     }
 
     /**
