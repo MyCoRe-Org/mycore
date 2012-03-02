@@ -107,7 +107,7 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
             }
             // archived content version requested
             else
-                getLayoutService().doLayout(request, response, new MCRFileContent(new File(request.getParameter("file"))));
+                getLayoutService().doLayout(request, response, new MCRFileContent(request.getParameter("file")));
         }
         // manage read access
         else if (todo.equals(MCRWCMSUtilities.getPermRightsManagementReadAccess()) && MCRWCMSUtilities.manageReadAccess()) {

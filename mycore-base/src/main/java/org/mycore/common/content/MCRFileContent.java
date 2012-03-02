@@ -28,7 +28,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-
 /**
  * Reads MCRContent from a local file.
  * 
@@ -41,6 +40,10 @@ public class MCRFileContent extends MCRContent {
     public MCRFileContent(File file) throws IOException {
         this.file = file;
         setSystemId(file.toURI().toString());
+    }
+
+    public MCRFileContent(String file) throws IOException {
+        this(new File(file));
     }
 
     @Override

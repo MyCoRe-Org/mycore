@@ -134,8 +134,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * @see MCRCategoryDAO#addCategory(MCRCategoryID, MCRCategory)
      */
     public static void loadFromFile(String filename) throws URISyntaxException, MCRException, SAXParseException, IOException {
-        File file = new File(filename);
-        Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRFileContent(file));
+        Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRFileContent(filename));
         MCRCategory category = MCRXMLTransformer.getCategory(xml);
         DAO.addCategory(null, category);
     }
@@ -151,8 +150,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * @see MCRCategoryDAO#replaceCategory(MCRCategory)
      */
     public static void updateFromFile(String filename) throws URISyntaxException, MCRException, SAXParseException, IOException {
-        File file = new File(filename);
-        Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRFileContent(file));
+        Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRFileContent(filename));
         MCRCategory category = MCRXMLTransformer.getCategory(xml);
         if (DAO.exist(category.getId())) {
             DAO.replaceCategory(category);

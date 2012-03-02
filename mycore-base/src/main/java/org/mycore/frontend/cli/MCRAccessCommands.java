@@ -181,11 +181,9 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         if (!checkFilename(filename)) {
             return;
         }
-        File input = new File(filename);
+        LOGGER.info("Reading file " + filename + " ...");
 
-        LOGGER.info("Reading file " + input + " ...");
-
-        org.jdom.Document doc = MCRXMLParserFactory.getValidatingParser().parseXML(new MCRFileContent(input));
+        org.jdom.Document doc = MCRXMLParserFactory.getValidatingParser().parseXML(new MCRFileContent(filename));
         org.jdom.Element rootelm = doc.getRootElement();
 
         if (!rootelm.getName().equals("mcrpermissions")) {
@@ -314,8 +312,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
             LOGGER.warn("Wrong file format or file doesn't exist");
             return null;
         }
-        File input = new File(fileName);
-        Document ruleDom = MCRXMLParserFactory.getParser().parseXML(new MCRFileContent(input));
+        Document ruleDom = MCRXMLParserFactory.getParser().parseXML(new MCRFileContent(fileName));
         Element rule = ruleDom.getRootElement();
         if (!rule.getName().equals("condition")) {
             LOGGER.warn("ROOT element is not valid, a valid rule would be for example:");

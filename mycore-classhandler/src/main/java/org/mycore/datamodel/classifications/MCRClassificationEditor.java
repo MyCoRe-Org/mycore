@@ -224,9 +224,8 @@ public class MCRClassificationEditor {
         LOGGER.debug("Start importNewClassification.");
         try {
             try {
-                File file = new File(fileName);
-                LOGGER.info("Reading file " + file + " ...\n");
-                Document jdom = MCRXMLParserFactory.getParser().parseXML(new MCRFileContent(file));
+                LOGGER.info("Reading file " + fileName + " ...\n");
+                Document jdom = MCRXMLParserFactory.getParser().parseXML(new MCRFileContent(fileName));
                 MCRCategory classification = MCRXMLTransformer.getCategory(jdom);
 
                 getClassificationPool().updateClassification(classification);

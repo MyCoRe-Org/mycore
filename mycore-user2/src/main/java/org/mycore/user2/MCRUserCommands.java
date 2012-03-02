@@ -264,9 +264,8 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * @throws SAXParseException 
      */
     public static void addGroups(String fileName) throws SAXParseException, IOException {
-        File input = new File(fileName);
-        LOGGER.info("Reading file " + input + " ...");
-        Document doc = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(input));
+        LOGGER.info("Reading file " + fileName + " ...");
+        Document doc = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(fileName));
         Element user = doc.getRootElement();
         Element groups = user.getChild("groups");
         if (groups == null) {
@@ -324,12 +323,10 @@ public class MCRUserCommands extends MCRAbstractCommands {
         if (!checkFilename(oldFile)) {
             return;
         }
-        File input = new File(oldFile);
-
-        LOGGER.info("Reading file " + input + " ...");
+        LOGGER.info("Reading file " + oldFile + " ...");
 
         try {
-            Document doc = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(input));
+            Document doc = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(oldFile));
             Element rootelm = doc.getRootElement();
             MCRUser mcrUser = MCRUserTransformer.buildMCRUser(rootelm);
 
@@ -532,9 +529,8 @@ public class MCRUserCommands extends MCRAbstractCommands {
         if (!checkFilename(filename)) {
             return null;
         }
-        File input = new File(filename);
-        LOGGER.info("Reading file " + input + " ...");
-        Document doc = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(input));
+        LOGGER.info("Reading file " + filename + " ...");
+        Document doc = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(filename));
         return MCRUserTransformer.buildMCRUser(doc.getRootElement());
     }
 
