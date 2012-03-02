@@ -52,7 +52,7 @@ public abstract class MCRXMLContent extends MCRContent {
     }
 
     /** The default format used when outputting this XML as a byte stream */
-    protected Format format;
+    protected Format format = defaultFormat;
 
     /** 
      * Sets the format used when outputting XML as a byte stream. 
