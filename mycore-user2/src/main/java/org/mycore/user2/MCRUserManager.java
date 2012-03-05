@@ -392,14 +392,16 @@ public class MCRUserManager {
         }
         if (!user.loginAllowed()) {
             LOGGER.warn("Password expired for user " + user.getUserID() + " on "
-                    + MCRXMLFunctions.getISODate(user.getValidUntil(), MCRISO8601Format.F_COMPLETE_HH_MM_SS));
+                + MCRXMLFunctions.getISODate(user.getValidUntil(), MCRISO8601Format.F_COMPLETE_HH_MM_SS));
             return null;
         }
         try {
             switch (user.getHashType()) {
             case crypt:
                 //Wahh! did we ever thought about what "salt" means for passwd management?
-                if (!MCRUtils.asCryptString(password.substring(0, 3), password).equals(user.getPassword())) {
+                String passwdHash = user.getPassword();
+                String salt = passwdHash.substring(0, 3);
+                if (!MCRUtils.asCryptString(salt, password).equals(passwdHash)) {
                     //login failed
                     waitLoginPanalty();
                     return null;
