@@ -23,20 +23,19 @@
  **/
 package org.mycore.services.i18n;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,6 +59,8 @@ import org.w3c.dom.Element;
  */
 public class MCRTranslation {
 
+    private static final String MESSAGES_BUNDLE = "messages";
+
     private static final String DEPRECATED_MESSAGES_PROPERTIES = "/deprecated-messages.properties";
 
     private static final Logger LOGGER = Logger.getLogger(MCRTranslation.class);
@@ -69,15 +70,15 @@ public class MCRTranslation {
     private static boolean DEPRECATED_MESSAGES_PRESENT = false;
 
     private static Properties DEPRECATED_MAPPING = loadProperties();
-    
-    private static List<String> AVAILABLE_LANGUAGES = loadAvailableLanguages();
+
+    private static Set<String> AVAILABLE_LANGUAGES = loadAvailableLanguages();
 
     private static final ThreadLocal<DocumentBuilder> BUILDER_LOCAL = new ThreadLocal<DocumentBuilder>() {
         @Override
         protected DocumentBuilder initialValue() {
             try {
                 return DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            } catch(ParserConfigurationException pce) {
+            } catch (ParserConfigurationException pce) {
                 LOGGER.error("Unable to create document builder", pce);
                 return null;
             }
@@ -107,7 +108,7 @@ public class MCRTranslation {
      */
     public static String translate(String label, Locale locale) {
         LOGGER.debug("Translation for current locale: " + locale.getLanguage());
-        ResourceBundle message = ResourceBundle.getBundle("messages", locale);
+        ResourceBundle message = ResourceBundle.getBundle(MESSAGES_BUNDLE, locale);
         String result = null;
         try {
             result = message.getString(label);
@@ -157,7 +158,7 @@ public class MCRTranslation {
     public static Map<String, String> translatePrefix(String prefix, Locale locale) {
         LOGGER.debug("Translation for locale: " + locale.getLanguage());
         HashMap<String, String> map = new HashMap<String, String>();
-        ResourceBundle message = ResourceBundle.getBundle("messages", locale);
+        ResourceBundle message = ResourceBundle.getBundle(MESSAGES_BUNDLE, locale);
         Enumeration<String> keys = message.getKeys();
         while (keys.hasMoreElements()) {
             String key = keys.nextElement();
@@ -226,7 +227,7 @@ public class MCRTranslation {
         return locale;
     }
 
-    public static List<String> getAvailableLanguages() {
+    public static Set<String> getAvailableLanguages() {
         return AVAILABLE_LANGUAGES;
     }
 
@@ -234,7 +235,7 @@ public class MCRTranslation {
         Document document = BUILDER_LOCAL.get().newDocument();
         Element i18nRoot = document.createElement("i18n");
         document.appendChild(i18nRoot);
-        for(String lang : AVAILABLE_LANGUAGES) {
+        for (String lang : AVAILABLE_LANGUAGES) {
             Element langElement = document.createElement("lang");
             langElement.setTextContent(lang);
             i18nRoot.appendChild(langElement);
@@ -316,19 +317,11 @@ public class MCRTranslation {
         return deprecatedMapping;
     }
 
-    static List<String> loadAvailableLanguages() {
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        final String bundlename = "messages";
-        File root = new File(loader.getResource("/").getFile());
-        File[] files = root.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.matches("^" + bundlename + "_(\\w{2}){1}\\.properties$");
-            }
-        });
-        List<String> languages = new ArrayList<String>();
-        for (File file : files) {
-            languages.add(file.getName().replaceAll("^" + bundlename + "(_)?|\\.properties$", ""));
+    static Set<String> loadAvailableLanguages() {
+        Set<String> languages = new HashSet<String>();
+        for (Locale locale : Locale.getAvailableLocales()) {
+            ResourceBundle bundle = ResourceBundle.getBundle(MESSAGES_BUNDLE, locale);
+            languages.add(bundle.getLocale().toString());
         }
         return languages;
     }

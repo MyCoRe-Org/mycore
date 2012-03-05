@@ -25,6 +25,9 @@ package org.mycore.services.i18n;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Locale;
+import java.util.Set;
+
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 
@@ -45,8 +48,15 @@ public class MCRTranslationTest extends MCRTestCase {
     }
 
     @Test
+    public void getAvailableLanguages() {
+        Set<String> availableLanguages = MCRTranslation.getAvailableLanguages();
+        System.out.println(availableLanguages);
+        assertEquals(2, availableLanguages.size());
+    }
+
+    @Test
     public void getDeprecatedMessageKeys() {
-        assertEquals("Depreacted I18N keys do not work", "This is a JUnit Test.", MCRTranslation.translate("oldLabel"));
+        assertEquals("Depreacted I18N keys do not work", "This is a JUnit Test.", MCRTranslation.translate("oldLabel", Locale.ENGLISH));
     }
 
 }
