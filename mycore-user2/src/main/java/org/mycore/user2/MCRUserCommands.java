@@ -77,56 +77,52 @@ public class MCRUserCommands extends MCRAbstractCommands {
         MCRCommand com = null;
 
         command.add(new MCRCommand("change to user {0} with {1}", "org.mycore.user2.MCRUserCommands.changeToUser String String",
-                "Change the user {0} with the given password in {1}."));
+            "Change the user {0} with the given password in {1}."));
         command.add(new MCRCommand("login {0}", "org.mycore.user2.MCRUserCommands.login String", "Start the login dialog for the user {0}."));
 
         com = new MCRCommand("init superuser", "org.mycore.user2.MCRUserCommands.initSuperuser",
-                "Initialized the user system. This command runs only if the user database does not exist.");
+            "Initialized the user system. This command runs only if the user database does not exist.");
         command.add(com);
 
-        com = new MCRCommand("encrypt passwords in user xml file {0} to file {1}",
-                "org.mycore.user2.MCRUserCommands.encryptPasswordsInXMLFile String String",
-                "This is a migration tool to change old plain text password entries to encrpted entries.");
+        com = new MCRCommand("encrypt passwords in user xml file {0} to file {1}", "org.mycore.user2.MCRUserCommands.encryptPasswordsInXMLFile String String",
+            "This is a migration tool to change old plain text password entries to encrpted entries.");
         command.add(com);
 
         com = new MCRCommand("set password for user {0} to {1}", "org.mycore.user2.MCRUserCommands.setPassword String String",
-                "This command sets a new password for the user. You must be this user or you must have administrator access.");
+            "This command sets a new password for the user. You must be this user or you must have administrator access.");
         command.add(com);
 
         com = new MCRCommand("set user management to ro mode", "org.mycore.user2.MCRUserCommands.setLock",
-                "The command changes the management mode of the user system to read-only.");
+            "The command changes the management mode of the user system to read-only.");
         command.add(com);
 
         com = new MCRCommand("set user management to rw mode", "org.mycore.user2.MCRUserCommands.setunLock",
-                "The command changes the management mode of the user system to read-write.");
+            "The command changes the management mode of the user system to read-write.");
         command.add(com);
 
-        com = new MCRCommand("enable user {0}", "org.mycore.user2.MCRUserCommands.enableUser String",
-                "The command enables the user for the access.");
+        com = new MCRCommand("enable user {0}", "org.mycore.user2.MCRUserCommands.enableUser String", "The command enables the user for the access.");
         command.add(com);
 
-        com = new MCRCommand("disable user {0}", "org.mycore.user2.MCRUserCommands.disableUser String",
-                "The command disables the user from the access.");
+        com = new MCRCommand("disable user {0}", "org.mycore.user2.MCRUserCommands.disableUser String", "The command disables the user from the access.");
         command.add(com);
 
         com = new MCRCommand("delete group {0}", "org.mycore.user2.MCRUserCommands.deleteGroup String",
-                "The command delete the group {0} from the user system, but only if it has no user members.");
+            "The command delete the group {0} from the user system, but only if it has no user members.");
         command.add(com);
 
         com = new MCRCommand("add groups from user file {0}", "org.mycore.user2.MCRUserCommands.addGroups String",
-                "The command adds groups found in user file {0} that do not exist");
+            "The command adds groups found in user file {0} that do not exist");
         command.add(com);
 
         com = new MCRCommand("delete user {0}", "org.mycore.user2.MCRUserCommands.deleteUser String", "The command delete the user {0}.");
         command.add(com);
 
         com = new MCRCommand("add user {0} as member to group {1}", "org.mycore.user2.MCRUserCommands.addMemberUserToGroup String String",
-                "The command add a user {0} as secondary member in the group {1}.");
+            "The command add a user {0} as secondary member in the group {1}.");
         command.add(com);
 
-        com = new MCRCommand("remove user {0} as member from group {1}",
-                "org.mycore.user2.MCRUserCommands.removeMemberUserFromGroup String String",
-                "The command remove the user {0} as secondary member from the group {1}.");
+        com = new MCRCommand("remove user {0} as member from group {1}", "org.mycore.user2.MCRUserCommands.removeMemberUserFromGroup String String",
+            "The command remove the user {0} as secondary member from the group {1}.");
         command.add(com);
 
         com = new MCRCommand("list all groups", "org.mycore.user2.MCRUserCommands.listAllGroups", "The command list all groups.");
@@ -142,10 +138,11 @@ public class MCRUserCommands extends MCRAbstractCommands {
         command.add(com);
 
         com = new MCRCommand("export user {0} to file {1}", "org.mycore.user2.MCRUserCommands.exportUserToFile String String",
-                "The command exports the data of user {0} to the file {1}.");
+            "The command exports the data of user {0} to the file {1}.");
+        command.add(com);
 
         com = new MCRCommand("import user from file {0}", "org.mycore.user2.MCRUserCommands.importUserFromFile String",
-                "The command imports a user from file {0}.");
+            "The command imports a user from file {0}.");
         command.add(com);
     }
 
@@ -468,8 +465,14 @@ public class MCRUserCommands extends MCRAbstractCommands {
 
     public static void listUser(MCRUser user) {
         StringBuilder sb = new StringBuilder("\n");
-        sb.append("       user=").append(user.getUserName()).append("   real name=").append(user.getRealName()).append('\n')
-                .append("   loginAllowed=").append(user.loginAllowed()).append('\n');
+        sb.append("       user=")
+            .append(user.getUserName())
+            .append("   real name=")
+            .append(user.getRealName())
+            .append('\n')
+            .append("   loginAllowed=")
+            .append(user.loginAllowed())
+            .append('\n');
         List<String> groups = new ArrayList<String>(user.getSystemGroupIDs());
         groups.addAll(user.getExternalGroupIDs());
         for (String gid : groups) {
