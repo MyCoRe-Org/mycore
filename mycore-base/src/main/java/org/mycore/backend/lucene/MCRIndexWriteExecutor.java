@@ -158,7 +158,7 @@ class MCRIndexWriteExecutor extends ThreadPoolExecutor {
         } catch (IOException e) {
             LOGGER.warn("Error while closing IndexWriter.", e);
         } catch (IllegalStateException e) {
-            LOGGER.debug("IndexWriter was allready closed.");
+            LOGGER.debug("IndexWriter was allready closed.", e);
         } finally {
             modifierClosed = true;
             indexWriter = null;
