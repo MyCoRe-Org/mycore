@@ -22,11 +22,18 @@
 
 package org.mycore.user2;
 
+import java.util.List;
+
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
+import org.apache.log4j.Logger;
+import org.jdom.Document;
+import org.jdom.Element;
 import org.jdom.transform.JDOMSource;
+import org.mycore.access.MCRAccessException;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.user2.utils.MCRUserTransformer;
 
 /**
@@ -40,6 +47,7 @@ import org.mycore.user2.utils.MCRUserTransformer;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRUserResolver implements URIResolver {
+    private static Logger LOGGER = Logger.getLogger(MCRUserResolver.class);
 
     @Override
     public Source resolve(String href, String base) throws TransformerException {
@@ -47,6 +55,12 @@ public class MCRUserResolver implements URIResolver {
         MCRUser user = null;
         if ("current".equals(userID)) {
             user = MCRUserManager.getCurrentUser();
+        } else if ("getAllUsers".equals(userID)) {
+            try {
+                return new JDOMSource(getAllUsers());
+            } catch (MCRAccessException e) {
+                throw new TransformerException(e);
+            }
         } else {
             user = MCRUserManager.getUser(userID);
         }
@@ -54,5 +68,27 @@ public class MCRUserResolver implements URIResolver {
             return null;
         }
         return new JDOMSource(MCRUserTransformer.buildXML(user));
+    }
+
+    @Deprecated
+    public static Document getAllUsers() throws MCRAccessException {
+        LOGGER.warn("Please fix https://sourceforge.net/tracker/?func=detail&aid=3497583&group_id=92005&atid=599192");
+        if (!MCRAccessManager.checkPermission("modify-user") && !MCRAccessManager.checkPermission("modify-contact")) {
+            throw new MCRAccessException("No permissions");
+        }
+        List<MCRUser> users = MCRUserManager.listUsers(null, null, null);
+        // Loop over all assignable group IDs
+        Element root = new org.jdom.Element("items");
+        for (MCRUser user : users) {
+            Element item = new Element("item");
+            StringBuilder label = new StringBuilder(user.getUserID());
+            item.setAttribute("value", label.toString());
+            if (user.getRealName() != null && user.getRealName().length() > 0) {
+                label.append(" (").append(user.getRealName()).append(')');
+            }
+            item.setAttribute("label", label.toString());
+            root.addContent(item);
+        }
+        return new Document(root);
     }
 }
