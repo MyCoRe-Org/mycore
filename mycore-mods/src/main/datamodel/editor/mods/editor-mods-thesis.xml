@@ -133,7 +133,7 @@
     
     <!-- Identifier Panel -->
     <cell row="100" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
-      <text id="thesis.idetifier" i18n="metaData.mods.dictionary.identifier.box" />
+      <text id="thesis.identifier" i18n="metaData.mods.dictionary.identifier.box" />
     </cell>
 
     <!-- Identifier -->

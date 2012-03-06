@@ -19,7 +19,7 @@
 
     <!-- Basisangaben zum Dokument -->
     <cell row="1" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
-      <text id="thesis.titles" i18n="metaData.mods.dictionary.book" />
+      <text id="book.titles" i18n="metaData.mods.dictionary.book" />
     </cell>
 
     <!-- Serie (Verweis auf MyCoRe-ID) -->
@@ -99,7 +99,7 @@
 
     <!--  Erweiterte Angaben zum Dokument -->
     <cell row="100" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
-      <text id="thesis.more" i18n="metaData.mods.dictionary.categorybox" />
+      <text id="book.more" i18n="metaData.mods.dictionary.categorybox" />
     </cell>
     
     <!-- LANGUAGE -->
@@ -140,7 +140,7 @@
     
     <!-- Identifier Panel -->
     <cell row="200" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
-      <text id="thesis.idetifier" i18n="metaData.mods.dictionary.identifier.box" />
+      <text id="book.identifier" i18n="metaData.mods.dictionary.identifier.box" />
     </cell>
     
     <!-- Identifier -->
@@ -160,7 +160,7 @@
     
     <!-- Interne Daten -->
     <cell row="300" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
-      <text id="thesis.internals" i18n="metaData.mods.dictionary.institution.box" />
+      <text id="book.internals" i18n="metaData.mods.dictionary.institution.box" />
     </cell>
     
     <!-- application specific internal data -->

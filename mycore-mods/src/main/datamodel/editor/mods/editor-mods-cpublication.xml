@@ -74,7 +74,7 @@
     
     <!--  Erweiterte Angaben zum Dokument -->
     <cell row="100" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines" style="padding-top:5px;">
-      <text id="report.more" i18n="metaData.mods.dictionary.categorybox" />
+      <text id="confpub.more" i18n="metaData.mods.dictionary.categorybox" />
     </cell>
     
     <!-- pub_genre -->
@@ -121,7 +121,7 @@
     
     <!-- Identifier Panel -->
     <cell row="200" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
-      <text id="reports.identifier" i18n="metaData.mods.dictionary.identifier.box" />
+      <text id="confpub.identifier" i18n="metaData.mods.dictionary.identifier.box" />
     </cell>
     
     <!-- Identifier -->
@@ -141,7 +141,7 @@
     
     <!-- Interne Daten -->
     <cell row="300" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
-      <text id="reports.internals" i18n="metaData.mods.dictionary.institution.box" />
+      <text id="confpub.internals" i18n="metaData.mods.dictionary.institution.box" />
     </cell>
 
     <!-- application specific internal data -->
