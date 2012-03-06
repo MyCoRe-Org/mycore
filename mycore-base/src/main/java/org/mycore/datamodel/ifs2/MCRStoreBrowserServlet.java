@@ -101,9 +101,10 @@ class MCRStoreBrowserRequest {
 
         String[] children = dir.list();
         Element xml = new Element("storeBrowser");
-        for (String child : children) {
-            xml.addContent(buildXML(child));
-        }
+        if (children != null)
+            for (String child : children) {
+                xml.addContent(buildXML(child));
+            }
 
         return new Document(xml);
     }
