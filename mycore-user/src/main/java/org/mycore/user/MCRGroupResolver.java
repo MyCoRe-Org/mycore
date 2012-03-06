@@ -5,6 +5,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
 import org.jdom.transform.JDOMSource;
+import org.mycore.access.MCRAccessException;
 
 public class MCRGroupResolver implements URIResolver {
 

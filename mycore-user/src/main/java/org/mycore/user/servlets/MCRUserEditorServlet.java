@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
+import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
@@ -39,7 +40,6 @@ import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
 import org.mycore.frontend.servlets.MCRServletJob;
-import org.mycore.user.MCRAccessException;
 import org.mycore.user.MCRGroup;
 import org.mycore.user.MCRGroupResolver;
 import org.mycore.user.MCRUser;

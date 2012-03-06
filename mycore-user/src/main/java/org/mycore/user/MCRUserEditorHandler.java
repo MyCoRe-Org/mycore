@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.jdom.Document;
 import org.jdom.Element;
+import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;

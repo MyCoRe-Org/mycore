@@ -1,4 +1,4 @@
-package org.mycore.user;
+package org.mycore.access;
 
 import org.mycore.common.MCRCatchException;
 
