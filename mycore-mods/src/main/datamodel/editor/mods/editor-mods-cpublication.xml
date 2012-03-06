@@ -21,7 +21,7 @@
 
   <!-- Basisangaben zum Dokument -->
     <cell row="2" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
-      <text id="report.titles" i18n="metaData.mods.dictionary.report" />
+      <text id="confpub.titles" i18n="metaData.mods.dictionary.confpub" />
     </cell>
 
     <!-- TITLE -->
