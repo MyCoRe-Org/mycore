@@ -229,7 +229,8 @@ public class MCRJob implements Cloneable {
      * @param parameters - the job parameters
      */
     public void setParameters(Map<String, String> parameters) {
-        this.parameters = parameters;
+        this.parameters = new HashMap<String, String>();
+        this.parameters.putAll(parameters);
     }
 
     /**

@@ -38,7 +38,9 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
 
@@ -51,8 +53,6 @@ public class MCRJobMaster implements Runnable, Closeable {
     private static final SessionFactory sessionFactory = MCRHIBConnection.instance().getSessionFactory();
 
     private static MCRConfiguration CONFIG = MCRConfiguration.instance();
-
-    protected static String CONFIG_PREFIX = "MCR.QueuedJob.";
 
     private static MCRJobMaster INSTANCE = null;
 
@@ -93,42 +93,6 @@ public class MCRJobMaster implements Runnable, Closeable {
     }
 
     /**
-     * Offers an {@link MCRJob} to {@link MCRJobQueue} and starts {@link MCRJobMaster} if 
-     * <code>"MCR.QueuedJob.autostart"</code> is set <code>true</code>.
-     * 
-     * @param job - the {@link MCRJob}
-     * @return <code>true</code> the {@link MCRJob} was offered.
-     */
-    public static boolean offer(MCRJob job) {
-        boolean ret = JOB_QUEUE.offer(job);
-
-        if (CONFIG.getBoolean(CONFIG_PREFIX + "autostart", true))
-            startMasterThread();
-
-        return ret;
-    }
-
-    /**
-     * Removes specific {@link MCRJob} from {@link MCRJobQueue}.
-     * 
-     * @param job - the {@link MCRJob}
-     * @return <code>true</code> the {@link MCRJob} was removed.
-     */
-    public static boolean remove(MCRJob job) {
-        return JOB_QUEUE.remove(job.getAction().getName(), job.getParameters()) == 1;
-    }
-    
-    /**
-     * Removes all jobs for specified action.
-     * 
-     * @param action - the action class
-     * @return number of jobs deleted.
-     */
-    public static int remove(String action) {
-        return JOB_QUEUE.remove(action);
-    }
-
-    /**
      * Starts the local {@link MCRJobMaster}. Can be auto started if <code>"MCR.QueuedJob.autostart"</code> 
      * is set to </code>true</code>.
      */
@@ -148,13 +112,16 @@ public class MCRJobMaster implements Runnable, Closeable {
     @Override
     public void run() {
         Thread.currentThread().setName("JobMaster");
+        //get this MCRSession a speaking name
+        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+        mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
 
-        boolean activated = CONFIG.getBoolean(CONFIG_PREFIX + "activated", true);
+        boolean activated = CONFIG.getBoolean(MCRJobQueue.CONFIG_PREFIX + "activated", true);
         LOGGER.info("JobQueue is " + (activated ? "activated" : "deactivated"));
         if (activated) {
             running = true;
 
-            int jobThreadCount = CONFIG.getInt(CONFIG_PREFIX + "JobThreads", 2);
+            int jobThreadCount = CONFIG.getInt(MCRJobQueue.CONFIG_PREFIX + "JobThreads", 2);
             ThreadFactory slaveFactory = new ThreadFactory() {
                 AtomicInteger tNum = new AtomicInteger();
 
@@ -188,17 +155,24 @@ public class MCRJobMaster implements Runnable, Closeable {
                     try {
                         if (!running)
                             break;
+
                         Session session = sessionFactory.getCurrentSession();
                         Transaction transaction = session.beginTransaction();
                         MCRJob job = null;
                         MCRJobAction action = null;
                         try {
                             job = JOB_QUEUE.poll();
-                            if (job != null)
+
+                            if (job != null) {
                                 action = toMCRJobAction(job.getAction());
 
-                            if (action != null && action.isActivated())
-                                transaction.commit();
+                                if (action != null && !action.isActivated()) {
+                                    job.setStatus(MCRJob.Status.NEW);
+                                    job.setStart(null);
+                                }
+                            }
+
+                            transaction.commit();
                         } catch (HibernateException e) {
                             LOGGER.error("Error while getting next job.", e);
                             if (transaction != null) {
@@ -207,18 +181,16 @@ public class MCRJobMaster implements Runnable, Closeable {
                         } finally {
                             session.close();
                         }
-                        if (job != null && action != null && !jobServe.isShutdown()) {
-                            if (action.isActivated()) {
-                                LOGGER.info("Creating:" + job + " - " + job.getParameters());
-                                jobServe.execute(new MCRJobThread(job));
-                            }
+                        if (job != null && action != null && action.isActivated() && !jobServe.isShutdown()) {
+                            LOGGER.info("Creating:" + job);
+                            jobServe.execute(new MCRJobThread(job));
                         } else {
                             try {
                                 synchronized (JOB_QUEUE) {
                                     if (running) {
                                         LOGGER.debug("No Job in JobQueue going to sleep");
                                         //fixes a race conditioned deadlock situation
-                                        //do not wait longer than 60 sec. for a new MCRTileJob
+                                        //do not wait longer than 60 sec. for a new MCRJob
                                         JOB_QUEUE.wait(60000);
                                     }
                                 }
@@ -229,7 +201,7 @@ public class MCRJobMaster implements Runnable, Closeable {
                     } finally {
                         runLock.unlock();
                     }
-                } // while(tilingServe.getActiveCount() < tilingServe.getCorePoolSize())
+                } // while(activeThreads.get() < jobThreadCount)
                 if (activeThreads.get() < jobThreadCount)
                     try {
                         LOGGER.info("Waiting for a job to finish");
@@ -239,7 +211,7 @@ public class MCRJobMaster implements Runnable, Closeable {
                     }
             } // while(running)
         }
-        LOGGER.info("Tiling thread finished");
+        LOGGER.info("Master thread finished");
         MCRSessionMgr.releaseCurrentSession();
     }
 
@@ -292,8 +264,8 @@ public class MCRJobMaster implements Runnable, Closeable {
     public int getPriority() {
         return MCRShutdownHandler.Closeable.DEFAULT_PRIORITY - 1;
     }
-    
-    protected static MCRJobAction toMCRJobAction(Class<? extends MCRJobAction> actionClass) {
+
+    private static MCRJobAction toMCRJobAction(Class<? extends MCRJobAction> actionClass) {
         try {
             Constructor<? extends MCRJobAction> actionConstructor = actionClass.getConstructor();
             MCRJobAction action = actionConstructor.newInstance();

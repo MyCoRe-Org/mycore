@@ -50,6 +50,8 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
     private static MCRJobQueue INSTANCE = null;
 
+    protected static String CONFIG_PREFIX = "MCR.QueuedJob.";
+
     private static Queue<MCRJob> preFetch;
 
     //TODO must be static after migration of MCRTilingQueue
@@ -60,7 +62,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     private boolean running;
 
     private MCRJobQueue() {
-        int waitTime = MCRConfiguration.instance().getInt(MCRJobMaster.CONFIG_PREFIX + "TimeTillReset", 10) * 60;
+        int waitTime = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "TimeTillReset", 10) * 60;
         StalledJobScheduler = Executors.newSingleThreadScheduledExecutor();
         StalledJobScheduler.scheduleAtFixedRate(MCRStalledJobResetter.getInstance(), waitTime, waitTime, TimeUnit.SECONDS);
         preFetch = new ConcurrentLinkedQueue<MCRJob>();
@@ -145,7 +147,8 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     }
 
     /**
-     * adds {@link MCRJob} to queue.
+     * adds {@link MCRJob} to queue and starts {@link MCRJobMaster} if 
+     * <code>"MCR.QueuedJob.autostart"</code> is set <code>true</code>.
      * alters date added to current time and status of job to {@link MCRJob.Status#NEW}
      */
     public boolean offer(MCRJob job) {
@@ -205,8 +208,8 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         if (!running)
             return 0;
         Session session = MCRHIBConnection.instance().getSession();
-        Query query = session.createQuery("SELECT count(*) FROM MCRJob WHERE status='" + MCRJob.Status.NEW + "'");
-        return ((Number) query.iterate().next()).intValue();
+        return ((Number) session.createQuery("SELECT count(*) FROM MCRJob WHERE status='" + MCRJob.Status.NEW + "'").uniqueResult())
+                .intValue();
     }
 
     /**
@@ -230,7 +233,6 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         return job;
     }
 
-    @SuppressWarnings("unchecked")
     private MCRJob getJob(String action, Map<String, String> params) {
         if (!running)
             return null;
@@ -242,13 +244,10 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
             qStr.append(" AND job.parameters['" + paramKey + "'] = '" + params.get(paramKey) + "'");
         }
 
-        Query query = session.createQuery(qStr.toString());
+        MCRJob job = (MCRJob) session.createQuery(qStr.toString()).uniqueResult();
 
-        Iterator<MCRJob> results = query.iterate();
-        if (!results.hasNext())
+        if (job == null)
             return null;
-
-        MCRJob job = results.next();
 
         clearPreFetch();
         return job;
@@ -287,7 +286,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
             preFetch.add(job.clone());
             session.evict(job);
         }
-        LOGGER.debug("prefetched " + i + " tile jobs");
+        LOGGER.debug("prefetched " + i + " jobs");
         return i;
     }
 
@@ -313,9 +312,13 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
     /**
      * every attached listener is informed that something happened to the state of the queue.
+     * Starts {@link MCRJobMaster} if <code>"MCR.QueuedJob.autostart"</code> is set <code>true</code>.
      */
     public synchronized void notifyListener() {
         this.notifyAll();
+
+        if (MCRConfiguration.instance().getBoolean(CONFIG_PREFIX + "autostart", true))
+            MCRJobMaster.startMasterThread();
     }
 
     /**
@@ -352,7 +355,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
             clearPreFetch();
         }
     }
-    
+
     /**
      * Removes all jobs from queue of specified action.
      * 

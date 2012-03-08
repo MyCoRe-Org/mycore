@@ -46,7 +46,7 @@ public class MCRStalledJobResetter implements Runnable {
 
     private static MCRStalledJobResetter INSTANCE = null;
 
-    private static int maxTimeDiff = MCRConfiguration.instance().getInt(MCRJobMaster.CONFIG_PREFIX + "TimeTillReset", 10);
+    private static int maxTimeDiff = MCRConfiguration.instance().getInt(MCRJobQueue.CONFIG_PREFIX + "TimeTillReset", 10);
 
     private static Logger LOGGER = Logger.getLogger(MCRStalledJobResetter.class);
 
