@@ -29,7 +29,7 @@ import java.util.Properties;
 
 import org.codehaus.cargo.module.merge.MergeException;
 import org.codehaus.cargo.module.merge.MergeProcessor;
-import org.mycore.buildtools.common.OutputSortedProperties;
+import org.mycore.buildtools.common.SortedProperties;
 
 /**
  * This class implements a merger for property files The properties in the base
@@ -75,7 +75,7 @@ public class PropertiesMerger implements MergeProcessor {
 			return null;
 		}
 		try {
-			Properties baseProps = new Properties();
+			SortedProperties baseProps = new SortedProperties();
 			baseProps.load(propsList.get(0));
 
 			for (int i = 1; i < this.propsList.size(); i++) {
@@ -84,10 +84,8 @@ public class PropertiesMerger implements MergeProcessor {
 				baseProps.putAll(deltaProps);
 			}
 			StringWriter sw = new StringWriter();
-			OutputSortedProperties
-					.output(baseProps, sw,
-							"Properties merged by org.mycore.buildtools.cargo.PropertiesMerger");
-
+			baseProps.store(sw, "These Properties were merged by org.mycore.buildtools.cargo.PropertiesMerger");
+			
 			//property files should always be ISO-8859-1 encoded in Java
 			ByteArrayInputStream bais = new ByteArrayInputStream(sw.toString()
 					.getBytes("ISO-8859-1"));
