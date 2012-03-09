@@ -194,7 +194,8 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
             return empty.iterator();
         }
         Session session = MCRHIBConnection.instance().getSession();
-        Query query = session.createQuery("FROM MCRJob WHERE status='" + MCRJob.Status.NEW + "' ORDER BY added ASC");
+        Query query = session.createQuery("FROM MCRJob job JOIN FETCH job.parameters WHERE status='" + MCRJob.Status.NEW
+                + "' ORDER BY added ASC");
         @SuppressWarnings("unchecked")
         List<MCRJob> result = query.list();
         return result.iterator();
@@ -239,7 +240,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
         Session session = MCRHIBConnection.instance().getSession();
 
-        StringBuffer qStr = new StringBuffer("SELECT job FROM MCRJob job JOIN FETCH job.parameters WHERE action = '" + action + "' ");
+        StringBuffer qStr = new StringBuffer("FROM MCRJob job JOIN FETCH job.parameters WHERE action = '" + action + "' ");
         for (String paramKey : params.keySet()) {
             qStr.append(" AND job.parameters['" + paramKey + "'] = '" + params.get(paramKey) + "'");
         }
@@ -261,7 +262,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
             return job;
         }
         LOGGER.debug("No prefetched jobs available");
-        if (preFetch(100) == 0) {
+        if (preFetch(MCRConfiguration.instance().getInt(CONFIG_PREFIX + "preFetchAmount", 50)) == 0) {
             return null;
         }
         return getNextPrefetchedElement();
