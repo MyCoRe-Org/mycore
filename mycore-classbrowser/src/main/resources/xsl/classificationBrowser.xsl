@@ -12,6 +12,7 @@
       field="{search field for category queries in this classification}"
       restriction="{additional query expression}"
       parameters="{additional MCRSearchServlet parameters}"
+      addParameter="{any additional request parameters to forward to classification browser servlet}"
       countresults="{true|false, default false, whether to execute queries to count results}"
       countlinks="{true|false, default false, whether to count links to each category}"
       emptyleaves="{true|false, when false and counting activated, skip empty leaves}"
