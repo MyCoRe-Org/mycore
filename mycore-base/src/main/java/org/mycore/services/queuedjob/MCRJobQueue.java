@@ -92,7 +92,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
             MCRJob job = getElement();
             if (job != null) {
                 job.setStart(new Date(System.currentTimeMillis()));
-                job.setStatus(MCRJob.Status.PROCESSING);
+                job.setStatus(MCRJobStatus.PROCESSING);
                 if (!updateJob(job)) {
                     job = null;
                 }
@@ -120,7 +120,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     }
 
     /**
-     * get next job without modifying it state to {@link MCRJob.Status#PROCESSING} 
+     * get next job without modifying it state to {@link MCRJobStatus#PROCESSING} 
      * @return the next job
      */
     public MCRJob peek() {
@@ -149,7 +149,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     /**
      * adds {@link MCRJob} to queue and starts {@link MCRJobMaster} if 
      * <code>"MCR.QueuedJob.autostart"</code> is set <code>true</code>.
-     * alters date added to current time and status of job to {@link MCRJob.Status#NEW}
+     * alters date added to current time and status of job to {@link MCRJobStatus#NEW}
      */
     public boolean offer(MCRJob job) {
         if (!running)
@@ -160,7 +160,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         } else {
             job.setAdded(new Date());
         }
-        job.setStatus(MCRJob.Status.NEW);
+        job.setStatus(MCRJobStatus.NEW);
         job.setStart(null);
         if ((job.getId() == 0 && addJob(job)) || (updateJob(job))) {
             notifyListener();
@@ -183,7 +183,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     }
 
     /**
-     * iterates of jobs of status {@link MCRJob.Status#NEW}
+     * iterates of jobs of status {@link MCRJobStatus#NEW}
      * 
      * does not change the status.
      */
@@ -194,7 +194,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
             return empty.iterator();
         }
         Session session = MCRHIBConnection.instance().getSession();
-        Query query = session.createQuery("FROM MCRJob job JOIN FETCH job.parameters WHERE status='" + MCRJob.Status.NEW
+        Query query = session.createQuery("FROM MCRJob job JOIN FETCH job.parameters WHERE status='" + MCRJobStatus.NEW
                 + "' ORDER BY added ASC");
         @SuppressWarnings("unchecked")
         List<MCRJob> result = query.list();
@@ -209,12 +209,12 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         if (!running)
             return 0;
         Session session = MCRHIBConnection.instance().getSession();
-        return ((Number) session.createQuery("SELECT count(*) FROM MCRJob WHERE status='" + MCRJob.Status.NEW + "'").uniqueResult())
+        return ((Number) session.createQuery("SELECT count(*) FROM MCRJob WHERE status='" + MCRJobStatus.NEW + "'").uniqueResult())
                 .intValue();
     }
 
     /**
-     * get the specific job and alters it status to {@link MCRJob.Status#PROCESSING}
+     * get the specific job and alters it status to {@link MCRJobStatus#PROCESSING}
      * 
      * @param params
      * @return
@@ -227,7 +227,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         if (job == null)
             return null;
         job.setStart(new Date(System.currentTimeMillis()));
-        job.setStatus(MCRJob.Status.PROCESSING);
+        job.setStatus(MCRJobStatus.PROCESSING);
         if (!updateJob(job)) {
             throw new NoSuchElementException();
         }
@@ -277,7 +277,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     private int preFetch(int amount) {
         Session session = MCRHIBConnection.instance().getSession();
         Query query = session.createQuery(
-                "FROM MCRJob job JOIN FETCH job.parameters WHERE status='" + MCRJob.Status.NEW + "' ORDER BY added ASC").setMaxResults(
+                "FROM MCRJob job JOIN FETCH job.parameters WHERE status='" + MCRJobStatus.NEW + "' ORDER BY added ASC").setMaxResults(
                 amount);
 
         @SuppressWarnings("unchecked")
@@ -285,7 +285,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
         int i = 0;
         for (MCRJob job : jobs) {
-            //workaround for pending hibernate transactions, almost perfect
+            //mySQL workaround for pending hibernate transactions, almost perfect
             if (job.getParameters().isEmpty())
                 continue;
 

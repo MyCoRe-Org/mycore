@@ -72,12 +72,10 @@ public class MCRJobThread implements Runnable {
                 action.execute();
                 
                 job.setFinished(new Date());
-                job.setStatus(MCRJob.Status.FINISHED);
+                job.setStatus(MCRJobStatus.FINISHED);
             } catch (ExecutionException ex) {
                 LOGGER.error("Exception occured while try to start job. Perform rollback.", ex);
                 action.rollback();
-                job.setFinished(new Date());
-                job.setStatus(MCRJob.Status.BROKEN);
             } catch (Exception e) {
                 LOGGER.error("Exception occured while try to start job.", e);
             }

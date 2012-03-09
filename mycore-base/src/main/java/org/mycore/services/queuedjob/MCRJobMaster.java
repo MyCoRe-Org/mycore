@@ -167,7 +167,7 @@ public class MCRJobMaster implements Runnable, Closeable {
                                 action = toMCRJobAction(job.getAction());
 
                                 if (action != null && !action.isActivated()) {
-                                    job.setStatus(MCRJob.Status.NEW);
+                                    job.setStatus(MCRJobStatus.NEW);
                                     job.setStart(null);
                                 }
                             }

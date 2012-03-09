@@ -61,7 +61,7 @@ public class MCRStalledJobResetter implements Runnable {
     }
 
     /**
-     * Resets jobs to {@link MCRJob.Status#NEW} that where in status {@link MCRJob.Status#PROCESSING} for to long time.
+     * Resets jobs to {@link MCRJobStatus#NEW} that where in status {@link MCRJobStatus#PROCESSING} for to long time.
      */
     public void run() {
         boolean reset = false;
@@ -69,7 +69,7 @@ public class MCRStalledJobResetter implements Runnable {
         Transaction executorTransaction = session.beginTransaction();
         LOGGER.info("MCRJob is Checked for dead Entries");
 
-        Query query = session.createQuery("FROM MCRJob WHERE status='" + MCRJob.Status.PROCESSING + "' ORDER BY id ASC");
+        Query query = session.createQuery("FROM MCRJob WHERE status='" + MCRJobStatus.PROCESSING + "' ORDER BY id ASC");
 
         long start = 0;
         long current = new Date(System.currentTimeMillis()).getTime() / 60000;
@@ -82,7 +82,7 @@ public class MCRStalledJobResetter implements Runnable {
             if (current - start >= maxTimeDiff) {
                 LOGGER.debug("->Resetting too long in queue");
 
-                job.setStatus(MCRJob.Status.NEW);
+                job.setStatus(MCRJobStatus.NEW);
                 job.setStart(null);
                 session.update(job);
                 reset = true;

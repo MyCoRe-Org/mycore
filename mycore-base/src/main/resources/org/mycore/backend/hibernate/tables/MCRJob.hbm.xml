@@ -2,7 +2,9 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping package="org.mycore.services.queuedjob">
   <typedef name="MCRJobAction" class="org.mycore.services.queuedjob.MCRJobActionUserType" />
-  <typedef name="MCRJobStatus" class="org.mycore.services.queuedjob.MCRJobStatusUserType" />
+  <typedef name="MCRJobStatus" class="org.mycore.backend.hibernate.MCRGenericEnumUserType">
+    <param name="enumClass">org.mycore.services.queuedjob.MCRJobStatus</param>
+  </typedef>
   
   <class name="MCRJob">
     <id name="id">

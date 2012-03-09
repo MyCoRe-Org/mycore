@@ -47,36 +47,11 @@ import javax.persistence.MapKeyColumn;
  */
 @Entity
 public class MCRJob implements Cloneable {
-    /**
-     * Possible states of the job can be:<br />
-     * <table>
-     *  <tr>
-     *   <th>{@link #NEW}</th>
-     *   <td>job added to queue</td>
-     *  </tr>
-     *  <tr>
-     *   <th>{@link #PROCESSING}</th>
-     *   <td>job currently on processing</td>
-     *  </tr>
-     *  <tr>
-     *   <th>{@link #FINISHED}</th>
-     *   <td>job processing is finished</td>
-     *  </tr>
-     *  <tr>
-     *   <th>{@link #BROKEN}</th>
-     *   <td>an Exception occurred on execution</td>
-     *  </tr>
-     * </table>  
-     */
-    public enum Status {
-        NEW, PROCESSING, FINISHED, BROKEN
-    };
-
     private long id;
 
     private Class<? extends MCRJobAction> action;
 
-    private Status status;
+    private MCRJobStatus status;
 
     private Date added;
 
@@ -134,22 +109,22 @@ public class MCRJob implements Cloneable {
     }
 
     /**
-     * Returns the current state ({@link MCRJob.Status}) of the job.
+     * Returns the current state ({@link MCRJobStatus}) of the job.
      * 
      * @return
      */
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
-    public Status getStatus() {
+    public MCRJobStatus getStatus() {
         return status;
     }
 
     /**
-     * Set the state ({@link MCRJob.Status}) of the job.
+     * Set the state ({@link MCRJobStatus}) of the job.
      * 
      * @param status - the job status
      */
-    public void setStatus(Status status) {
+    public void setStatus(MCRJobStatus status) {
         this.status = status;
     }
 
