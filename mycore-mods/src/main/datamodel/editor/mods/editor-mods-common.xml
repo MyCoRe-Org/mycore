@@ -199,7 +199,7 @@
   <panel id="mods.title">
     <hidden var="@altRepGroup" default="1"/>
     <cell anchor="NORTHWEST" var="mods:title">
-      <textarea id="mods.title.text" width="45" height="3">
+      <textarea id="mods.title.text" width="70" height="1">
         <condition id="mods.title.cond" required="true">
           <label xml:lang="de">Tragen Sie hier den Titel des Dokumentes ein.</label>
           <label xml:lang="en">Enter the title of the document here.</label>
@@ -214,7 +214,7 @@
     </cell>
   </panel>
 
-  <helpPopup id="mods.title.help" width="400px" height="250px">
+  <helpPopup id="mods.title.help" width="400px" height="250px" class="helpButton">
     <label xml:lang="de">
       Der Titel des Dokumentes oder Objekts, unter dem es formell bekannt ist.
     </label>
@@ -228,9 +228,7 @@
   <text id="mods.htmltitle.label" i18n="metaData.mods.dictionary.htmltitle" />
   <panel id="mods.htmltitle">
     <hidden var="@altRepGroup" default="1"/>
-    <cell anchor="NORTHWEST" var="mods:title">
-      <textarea id="mods.htmltitle.text" width="45" height="3" />
-    </cell>
+    <cell anchor="NORTHWEST" var="mods:title" ref="TFarea1028" />
   </panel>
   <helpPopup id="mods.htmltitle.help" width="400px" height="250px">
     <label xml:lang="de">
@@ -248,7 +246,7 @@
     <cell anchor="NORTHWEST" var="mods:titleInfo[@type='translated']">
       <repeater min="1" max="5" pos="right">
         <panel>
-          <cell anchor="NORTHWEST" ref="TFarea1028" var="mods:title"/>
+          <cell anchor="NORTHWEST" ref="TFarea1028r" var="mods:title"/>
           <cell row="1" col="2" anchor="NORTHWEST" var="@lang" ref="language" />
         </panel>
       </repeater>
@@ -272,7 +270,7 @@
     <cell anchor="NORTHWEST" var="mods:titleInfo[@type='alternative']">
       <panel>
         <hidden var="@displayLabel" default="Short form of the title" />
-        <cell anchor="NORTHWEST" var="mods:title" ref="TFzeile512" />
+        <cell anchor="NORTHWEST" var="mods:title" ref="TFarea1028" />
       </panel>
     </cell>
   </panel>
@@ -291,9 +289,7 @@
   <text id="mods.subtitle.label" i18n="metaData.mods.dictionary.subtitle" />
 
   <panel id="mods.subtitle">
-    <cell anchor="NORTHWEST" var="mods:subTitle">
-      <textarea id="mods.subtitle.text" width="45" height="3" />
-    </cell>
+    <cell anchor="NORTHWEST" var="mods:subTitle" ref="TFarea1028" />
   </panel>
 
   <helpPopup id="mods.subtitle.help" width="400px" height="250px">
@@ -314,7 +310,7 @@
         <panel>
           <hidden var="@type" default="code" />
           <cell col="1" var="@mcr:categId">
-            <list id="mods.languageTerm.list" type="dropdown" default="ger">
+            <list id="mods.languageTerm.list" type="dropdown" style="width:140px;">
               <include ref="pleaseSelect" />
               <include uri="classification:editorComplete:-1:children:rfc4646" cacheable="false" />
               <condition id="mods.languageTerm.cond" required="true">
@@ -396,7 +392,7 @@
             <panel>
               <hidden var="@authority" default="marcrelator" />
               <cell>
-                <list type="dropdown" default="aut" id="mods.person.list">
+                <list type="dropdown" default="aut" id="mods.person.list" style="width:120px;">
                   <include ref="pleaseSelect" />
                   <include uri="classification:editor:-1:children:marcrelator" cacheable="false" />
                   <condition id="mods.person.cond" required="true">
@@ -421,7 +417,7 @@
             <panel>
               <hidden var="@authority" default="marcrelator" />
               <cell>
-                <list type="dropdown" default="pbl" id="mods.person.publisher.list">
+                <list type="dropdown" default="pbl" id="mods.person.publisher.list" style="width:100px;">
                   <include ref="pleaseSelect" />
                   <include uri="classification:editor:-1:children:marcrelator" cacheable="false" />
                 </list>
@@ -479,7 +475,7 @@
             <panel>
               <hidden var="@authority" default="marcrelator" />
               <cell>
-                <list type="dropdown" default="aut" id="mods.corporation.list">
+                <list type="dropdown" default="aut" id="mods.corporation.list" style="width:100px;">
                   <include ref="pleaseSelect" />
                   <include uri="classification:editor:-1:children:marcrelator" cacheable="false" />
                 </list>
@@ -594,7 +590,7 @@
     <cell anchor="NORTHWEST" var="mods:dateIssued">
       <panel>
         <cell anchor="NORTHWEST">
-          <textfield id="mods.dateIssued.text" width="60" maxlength="512">
+          <textfield id="mods.dateIssued.text" width="20" maxlength="20">
             <condition id="mods.dateIssued.cond" required="true" type="datetime" format="yyyy-MM-dd;yyyy-MM;yyyy">
               <label xml:lang="de">Tragen Sie hier das Datum der Veröffentlichung im ISO Format mit Bindestrich (YYYY-MM-DD) ein.</label>
               <label xml:lang="en">Enter the date of publication here in the ISO Format (YYYY-MM-DD).</label>
@@ -609,8 +605,7 @@
     <cell anchor="NORTHWEST" var="mods:dateIssued">
       <panel>
         <cell anchor="NORTHWEST">
-          <textfield width="60" maxlength="512">
-          </textfield>
+          <textfield width="20" maxlength="20" />
         </cell>
       </panel>
     </cell>
@@ -642,7 +637,7 @@
     <cell anchor="NORTHWEST" var="mods:dateCreated">
       <panel>
         <cell col="1">
-          <textfield id="mods.dateCreated.text" width="60" maxlength="128" >
+          <textfield id="mods.dateCreated.text" width="20" maxlength="20" >
           <condition id="mods.dateCreated.cond" required="false" type="datetime" format="yyyy-MM-dd;yyyy-MM;yyyy">
               <label xml:lang="de">Tragen Sie hier das Datum der Veröffentlichung im ISO Format mit Bindestrich (YYYY-MM-DD) ein.</label>
               <label xml:lang="en">Enter the date of publication here in the ISO Format (YYYY-MM-DD).</label>
@@ -673,7 +668,7 @@
     <cell anchor="NORTHWEST" var="mods:dateOther[@type='submitted']">
       <panel>
         <cell col="1">
-          <textfield id="mods.dateSubmitted.text" width="60" maxlength="128" >
+          <textfield id="mods.dateSubmitted.text" width="20" maxlength="20" >
           <condition id="mods.dateSubmitted.cond" required="false" type="datetime" format="yyyy-MM-dd;yyyy-MM;yyyy">
               <label xml:lang="de">Tragen Sie hier das Datum der Einreichung im ISO Format mit Bindestrich (YYYY-MM-DD) ein.</label>
               <label xml:lang="en">Enter the date of submission here in the ISO Format (YYYY-MM-DD).</label>
@@ -704,7 +699,7 @@
     <cell anchor="NORTHWEST" var="mods:dateOther[@type='accepted']">
       <panel>
         <cell col="1">
-          <textfield id="mods.dateAccepted.text" width="60" maxlength="128" >
+          <textfield id="mods.dateAccepted.text" width="20" maxlength="20" >
           <condition id="mods.dateAccepted.cond" required="false" type="datetime" format="yyyy-MM-dd;yyyy-MM;yyyy">
               <label xml:lang="de">Tragen Sie hier das Datum der Promotion / des Abschlusses im ISO Format mit Bindestrich (YYYY-MM-DD) ein.</label>
               <label xml:lang="en">Enter the date of publication here in the ISO Format (YYYY-MM-DD).</label>
@@ -887,7 +882,7 @@
     <cell anchor="NORTHWEST" var="mods:identifier">
       <repeater min="1" max="5" pos="right">
         <panel>
-          <cell anchor="NORTHWEST" ref="TFzeile512" />
+          <cell anchor="NORTHWEST" ref="TFzeile44" />
           <cell row="1" col="2" anchor="NORTHWEST" var="@type">
             <list type="dropdown" default="isbn">
               <item value="isbn">
@@ -931,7 +926,7 @@
     <cell anchor="NORTHWEST" var="mods:identifier">
       <repeater min="1" max="5" pos="right">
         <panel>
-          <cell anchor="NORTHWEST" ref="TFzeile512" />
+          <cell anchor="NORTHWEST" ref="TFzeile44" />
           <cell row="1" col="2" anchor="NORTHWEST" var="@type">
             <list type="dropdown" default="issn">
               <item value="issn">
@@ -978,7 +973,7 @@
     <cell anchor="NORTHWEST" var="mods:identifier">
       <repeater min="1" max="5" pos="right">
         <panel>
-          <cell anchor="NORTHWEST" ref="TFzeile512" />
+          <cell anchor="NORTHWEST" ref="TFzeile44" />
           <cell row="1" col="2" anchor="NORTHWEST" var="@type">
             <list type="dropdown" default="urn">
               <item value="urn">
@@ -1016,7 +1011,7 @@
     <cell anchor="NORTHWEST" var="mods:identifier">
       <repeater min="1" max="5" pos="right">
         <panel>
-          <cell anchor="NORTHWEST" ref="TFzeile512" />
+          <cell anchor="NORTHWEST" ref="TFzeile44" />
           <cell row="1" col="2" anchor="NORTHWEST" var="@type">
             <list type="dropdown" default="isbn">
               <item value="isbn">
@@ -1071,7 +1066,7 @@
   <text id="mods.ddc.label" i18n="metaData.mods.dictionary.sdnb" />
   <panel id="mods.ddc">
     <cell anchor="NORTHWEST" var="mods:classification[@authority='sdnb']">
-      <list width="30" type="dropdown" id="mods.ddc.list">
+      <list type="dropdown" id="mods.ddc.list" style="width:380px;">
         <include ref="pleaseSelect" />
         <include uri="classification:editor:-1:children:SDNB" cacheable="false" />
         <condition id="mods.ddc.cond" required="true">
@@ -1084,7 +1079,7 @@
 
   <panel id="mods.ddc.optional">
     <cell anchor="NORTHWEST" var="mods:classification[@authority='sdnb']">
-      <list width="30" type="dropdown">
+      <list type="dropdown" style="width:380px;">
         <include ref="pleaseSelect" />
         <include uri="classification:editor:-1:children:SDNB" cacheable="false" />
       </list>
@@ -1577,13 +1572,15 @@
   <!-- *** Text fields *** -->
   <textfield id="TFzeile10" width="10" maxlength="10" />
   <textfield id="TFzeile32" width="32" maxlength="32" />
-  <textfield id="TFzeile64" width="48" maxlength="64" />
+  <textfield id="TFzeile44" width="44" maxlength="1024" />
+  <textfield id="TFzeile64" width="64" maxlength="64" />
   <textfield id="TFzeile128" width="60" maxlength="128" />
   <textfield id="TFzeile512" width="60" maxlength="512" />
   <textfield id="TFzeile1024" width="60" maxlength="1024" />
   <!-- *** Text area *** -->
-  <textarea id="TFarea1028" width="45" height="3" />
-  <textarea id="TFarea4096" width="43" height="8" />
+  <textarea id="TFarea1028" width="70" height="1" />
+  <textarea id="TFarea1028r" width="44" height="1" />
+  <textarea id="TFarea4096" width="44" height="5" />
   <textarea id="TFeditor" wysiwygEditor="true" editorWidth="500" editorHeight="200" width="60" height="10" />
 
   <list id="pleaseSelect">
