@@ -132,7 +132,7 @@ public class MCRUserServlet extends MCRServlet {
             return;
         }
         boolean allowed = MCRAccessManager.checkPermission(MCRUser2Constants.USER_ADMIN_PERMISSION) || currentUser.equals(user)
-                || currentUser.equals(user.getOwner());
+            || currentUser.equals(user.getOwner());
         if (!allowed) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
@@ -250,24 +250,27 @@ public class MCRUserServlet extends MCRServlet {
                     return;
                 }
                 user.setOwner(owner);
-            } else
+            } else {
                 user.setOwner(null);
-
-            Element gs = u.getChild("groups");
-            user.getSystemGroupIDs().clear();
-            user.getExternalGroupIDs().clear();
-            if (gs != null) {
-                @SuppressWarnings("unchecked")
-                List<Element> groupList = (List<Element>) gs.getChildren("group");
-                for (Element group : groupList) {
-                    String groupName = group.getAttributeValue("name");
-                    user.addToGroup(groupName);
-                }
             }
-        } else // save read user of creator
-        {
+        } else { // save read user of creator
             user.setRealm(MCRRealmFactory.getLocalRealm());
             user.setOwner(currentUser);
+        }
+        Element gs = u.getChild("groups");
+        if (gs != null) {
+            user.getSystemGroupIDs().clear();
+            user.getExternalGroupIDs().clear();
+            @SuppressWarnings("unchecked")
+            List<Element> groupList = (List<Element>) gs.getChildren("group");
+            for (Element group : groupList) {
+                String groupName = group.getAttributeValue("name");
+                if (hasAdminPermission || currentUser.isUserInRole(groupName)) {
+                    user.addToGroup(groupName);
+                } else {
+                    LOGGER.warn("Current user " + currentUser.getUserID() + " has not the permission to add user to group " + groupName);
+                }
+            }
         }
 
         if (userExists) {
@@ -291,7 +294,7 @@ public class MCRUserServlet extends MCRServlet {
             return;
         }
         boolean allowed = MCRAccessManager.checkPermission(MCRUser2Constants.USER_ADMIN_PERMISSION) || currentUser.equals(user.getOwner())
-                || (currentUser.equals(user) && currentUser.hasNoOwner());
+            || (currentUser.equals(user) && currentUser.hasNoOwner());
         if (!allowed) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
