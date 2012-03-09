@@ -275,18 +275,17 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
     private int preFetch(int amount) {
         Session session = MCRHIBConnection.instance().getSession();
-        Query query = session.createQuery("SELECT job.id FROM MCRJob job WHERE status='" + MCRJob.Status.NEW + "' ORDER BY added ASC")
-                .setMaxResults(amount);
+        Query query = session.createQuery(
+                "FROM MCRJob job JOIN FETCH job.parameters WHERE status='" + MCRJob.Status.NEW + "' ORDER BY added ASC").setMaxResults(
+                amount);
 
         @SuppressWarnings("unchecked")
-        Iterator<Number> queryResult = query.iterate();
-        int i = 0;
-        while (queryResult.hasNext()) {
-            long jobID = ((Number) queryResult.next()).longValue();
-            MCRJob job = (MCRJob) session.get(MCRJob.class, jobID);
+        List<MCRJob> jobs = query.list();
 
+        int i = 0;
+        for (MCRJob job : jobs) {
             //workaround for pending hibernate transactions, almost perfect
-            if (job != null && job.getParameters().isEmpty())
+            if (job.getParameters().isEmpty())
                 continue;
 
             i++;
