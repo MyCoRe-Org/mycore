@@ -48,7 +48,7 @@ import org.mycore.common.events.MCRShutdownHandler.Closeable;
 public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     private static Logger LOGGER = Logger.getLogger(MCRJobQueue.class);
 
-    private static MCRJobQueue INSTANCE = null;
+    private static MCRJobQueue INSTANCE = new MCRJobQueue();
 
     protected static String CONFIG_PREFIX = "MCR.QueuedJob.";
 
@@ -75,8 +75,8 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
      * @return singleton instance of this class
      */
     public static MCRJobQueue getInstance() {
-        if (INSTANCE == null)
-            INSTANCE = new MCRJobQueue();
+        if (!INSTANCE.running)
+            return null;
 
         return INSTANCE;
     }
@@ -162,7 +162,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         }
         job.setStatus(MCRJob.Status.NEW);
         job.setStart(null);
-        if (addJob(job)) {
+        if ((job.getId() == 0 && addJob(job)) || (updateJob(job))) {
             notifyListener();
             return true;
         } else {
@@ -239,7 +239,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
         Session session = MCRHIBConnection.instance().getSession();
 
-        StringBuffer qStr = new StringBuffer("SELECT job FROM MCRJob job WHERE action = '" + action + "' ");
+        StringBuffer qStr = new StringBuffer("SELECT job FROM MCRJob job JOIN FETCH job.parameters WHERE action = '" + action + "' ");
         for (String paramKey : params.keySet()) {
             qStr.append(" AND job.parameters['" + paramKey + "'] = '" + params.get(paramKey) + "'");
         }
@@ -275,14 +275,21 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
     private int preFetch(int amount) {
         Session session = MCRHIBConnection.instance().getSession();
-        Query query = session.createQuery("FROM MCRJob WHERE status='" + MCRJob.Status.NEW + "' ORDER BY added ASC").setMaxResults(amount);
+        Query query = session.createQuery("SELECT job.id FROM MCRJob job WHERE status='" + MCRJob.Status.NEW + "' ORDER BY added ASC")
+                .setMaxResults(amount);
 
         @SuppressWarnings("unchecked")
-        Iterator<MCRJob> queryResult = query.iterate();
+        Iterator<Number> queryResult = query.iterate();
         int i = 0;
         while (queryResult.hasNext()) {
+            long jobID = ((Number) queryResult.next()).longValue();
+            MCRJob job = (MCRJob) session.get(MCRJob.class, jobID);
+
+            //workaround for pending hibernate transactions, almost perfect
+            if (job != null && job.getParameters().isEmpty())
+                continue;
+
             i++;
-            MCRJob job = queryResult.next();
             preFetch.add(job.clone());
             session.evict(job);
         }

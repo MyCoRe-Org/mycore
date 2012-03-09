@@ -84,7 +84,7 @@ public class MCRJob implements Cloneable {
 
     private Date finished;
 
-    private Map<String, String> parameters = new HashMap<String, String>();
+    private Map<String, String> parameters;
 
     protected MCRJob() {
     }
@@ -229,8 +229,7 @@ public class MCRJob implements Cloneable {
      * @param parameters - the job parameters
      */
     public void setParameters(Map<String, String> parameters) {
-        this.parameters = new HashMap<String, String>();
-        this.parameters.putAll(parameters);
+        this.parameters = parameters;
     }
 
     /**
@@ -240,6 +239,9 @@ public class MCRJob implements Cloneable {
      * @return the value of the parameter.
      */
     public String getParameter(String key) {
+        if (parameters == null)
+            return null;
+
         return parameters.get(key);
     }
 
@@ -250,6 +252,9 @@ public class MCRJob implements Cloneable {
      * @param value - the parameter value
      */
     public void setParameter(String key, String value) {
+        if (parameters == null)
+            parameters = new HashMap<String, String>();
+
         parameters.put(key, value);
     }
 
@@ -265,7 +270,10 @@ public class MCRJob implements Cloneable {
         clone.setId(getId());
         clone.setStart(getStart());
         clone.setStatus(getStatus());
-        clone.setParameters(getParameters());
+
+        Map<String, String> map = new HashMap<String, String>(getParameters());
+        clone.setParameters(map);
+
         return clone;
     }
 
@@ -274,7 +282,8 @@ public class MCRJob implements Cloneable {
      */
     @Override
     public String toString() {
-        return MessageFormat.format("MCRJob [id:{0}, action:{1}, status:{2}, added:{3}]", getId(), getAction().getName(), getStatus(),
-                getAdded());
+        return MessageFormat.format("MCRJob [id:{0}, action:{1}, status:{2}, added:{3}, parameters:{4}]", getId(), getAction().getName(),
+                getStatus(), getAdded(), getParameters());
     }
+
 }

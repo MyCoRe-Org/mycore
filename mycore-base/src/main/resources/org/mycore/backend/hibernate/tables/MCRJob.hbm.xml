@@ -13,7 +13,7 @@
     <property name="added" type="java.util.Date" />
     <property name="start" type="java.util.Date" />
     <property name="finished" type="java.util.Date" />
-    <map name="parameters" table="MCRJobParameter" lazy="false">
+    <map name="parameters" table="MCRJobParameter" cascade="all" lazy="false">
       <key column="jobID" />
       <index column="paramKey" type="string" length="128" />
       <element column="paramValue" type="string" length="255" />
