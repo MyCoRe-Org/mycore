@@ -217,7 +217,7 @@ public class MCRUserManagerTest extends MCRHibTestCase {
         MCRUserManager.updateUser(this.user);
         startNewTransaction();
         assertEquals("Too many users", 1, MCRUserManager.countUsers(null, null, null));
-        assertEquals("Too many users", 1, this.user.getOwnedUsers().size());
+        assertEquals("Too many users", 1, MCRUserManager.listUsers(this.user).size());
         Document exportableXML = MCRUserTransformer.buildExportableXML(this.user);
         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
         xout.output(exportableXML, System.out);

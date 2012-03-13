@@ -259,15 +259,6 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     }
 
     /**
-     * Returns a list of users this user owns.
-     * 
-     * @return a list of users this user owns.
-     */
-    public List<MCRUser> getOwnedUsers() {
-        return MCRUserManager.listUsers(this);
-    }
-
-    /**
      * Returns the name of the person this login user represents.
      * 
      * @return the name of the person this login user represents.
