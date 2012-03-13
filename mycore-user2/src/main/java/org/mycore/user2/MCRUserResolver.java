@@ -24,6 +24,8 @@ package org.mycore.user2;
 
 import java.util.List;
 
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.util.JAXBSource;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
@@ -67,7 +69,11 @@ public class MCRUserResolver implements URIResolver {
         if (user == null) {
             return null;
         }
-        return new JDOMSource(MCRUserTransformer.buildXML(user));
+        try {
+            return new JAXBSource(MCRUserTransformer.JAXB_CONTEXT, MCRUserTransformer.getSafeCopy(user));
+        } catch (JAXBException e) {
+            throw new TransformerException(e);
+        }
     }
 
     @Deprecated

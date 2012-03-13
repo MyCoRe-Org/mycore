@@ -26,6 +26,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Set;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRLabel;
@@ -36,15 +40,21 @@ import org.mycore.datamodel.classifications2.MCRLabel;
  * 
  * @author Thomas Scheffler (yagee)
  */
+@XmlRootElement(name = "group")
 public class MCRGroup {
 
     /** The unique group name */
+    @XmlAttribute
     private String name;
 
     /** The labels of the group */
     private HashMap<String, MCRLabel> labels;
 
     private boolean isSystemGroup;
+
+    private MCRGroup() {
+        this.labels = new HashMap<String, MCRLabel>();
+    }
 
     /**
      * Creates a new group instance. 
@@ -53,12 +63,11 @@ public class MCRGroup {
      * @param name the unique group name
      */
     MCRGroup(String name, Set<MCRLabel> labels) {
-        this.name = name;
-        this.labels = new HashMap<String, MCRLabel>();
+        this();
         for (MCRLabel label : labels) {
             this.labels.put(label.getLang(), label);
         }
-        this.isSystemGroup = !name.contains(":") || name.startsWith(MCRUser2Constants.GROUP_CLASSID.getRootID() + ":");
+        setName(name);
     }
 
     /**
@@ -92,6 +101,22 @@ public class MCRGroup {
      */
     public boolean isSystemGroup() {
         return isSystemGroup;
+    }
+
+    @XmlElement(name = "label")
+    private MCRLabel[] getLabelsArray() {
+        return labels.values().toArray(new MCRLabel[labels.size()]);
+    }
+
+    private void setLabelsArray(MCRLabel[] labels) {
+        for (MCRLabel label : labels) {
+            this.labels.put(label.getLang(), label);
+        }
+    }
+
+    private void setName(String name) {
+        this.name = name;
+        this.isSystemGroup = !name.contains(":") || name.startsWith(MCRUser2Constants.GROUP_CLASSID.getRootID() + ":");
     }
 
     @Override

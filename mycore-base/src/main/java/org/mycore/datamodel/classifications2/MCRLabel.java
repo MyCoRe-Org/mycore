@@ -25,6 +25,11 @@ package org.mycore.datamodel.classifications2;
 
 import java.io.Serializable;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * This class represents a label of a MCRCategory.
  * 
@@ -33,11 +38,18 @@ import java.io.Serializable;
  * @version $Revision$ $Date$
  * @since 2.0
  */
+@XmlRootElement(name = "label")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class MCRLabel implements Cloneable, Serializable {
 
     private static final long serialVersionUID = -843799854929361194L;
 
-    String lang, text, description;
+    @XmlAttribute(namespace="http://www.w3.org/XML/1998/namespace")
+    String lang;
+    @XmlAttribute
+    String text;
+    @XmlAttribute
+    String description;
 
     public MCRLabel() {
 

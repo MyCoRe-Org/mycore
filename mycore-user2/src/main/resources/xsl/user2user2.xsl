@@ -2,8 +2,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:date="http://exslt.org/dates-and-times"
   extension-element-prefixes="date">
   <xsl:template match="user">
-    <user name="{@ID}">
-      <realm id="local">lokal</realm>
+    <user name="{@ID}" realm="local">
       <realName>
         <xsl:value-of select="concat(user.contact/contact.firstname,' ',user.contact/contact.lastname)" />
       </realName>

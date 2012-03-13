@@ -1,6 +1,6 @@
 /*
  * $Id$
- * $Revision: 5697 $ $Date: 01.02.2012 $
+ * $Revision: 5697 $ $Date: 13.03.2012 $
  *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
@@ -21,24 +21,32 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.user2;
+package org.mycore.user2.utils;
 
-import javax.xml.bind.annotation.XmlEnum;
+import java.util.Date;
+
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+
+import org.joda.time.DateTime;
+import org.mycore.datamodel.common.MCRISO8601Format;
+import org.mycore.datamodel.common.MCRISO8601FormatChooser;
 
 /**
- * This enum represents different hash type for user passwords.
- * Allows lazy migration of users from different sources.
- * <ul>
- * <li>{@link #crypt} is used in the old MyCoRe user system
- * <li>{@link #md5} is used in the old miless user system
- * <li>{@link #sha1} is the default hash type of mycore-user2
- * </ul>
  * @author Thomas Scheffler (yagee)
  *
  */
-@XmlEnum
-public enum MCRPasswordHashType {
-    
-    crypt,md5,sha1
+public class MCRDateXMLAdatapter extends XmlAdapter<String, Date> {
+
+    @Override
+    public Date unmarshal(String v) throws Exception {
+        DateTime dateTime = new DateTime(v);
+        return dateTime.toDate();
+    }
+
+    @Override
+    public String marshal(Date v) throws Exception {
+        DateTime dt = new DateTime(v.getTime());
+        return dt.toString(MCRISO8601FormatChooser.getFormatter(null, MCRISO8601Format.COMPLETE_HH_MM_SS));
+    }
 
 }

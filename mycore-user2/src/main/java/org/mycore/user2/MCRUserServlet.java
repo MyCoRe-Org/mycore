@@ -22,6 +22,9 @@
 
 package org.mycore.user2;
 
+import static org.mycore.user2.utils.MCRUserTransformer.JAXB_CONTEXT;
+import static org.mycore.user2.utils.MCRUserTransformer.getSafeCopy;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -34,6 +37,7 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.content.MCRJAXBContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -139,8 +143,7 @@ public class MCRUserServlet extends MCRServlet {
         }
 
         LOGGER.info("show user " + user.getUserID() + " " + user.getUserName() + " " + user.getRealmID());
-        Element u = buildXML(user);
-        getLayoutService().doLayout(req, res, new MCRJDOMContent(u));
+        getLayoutService().doLayout(req, res, getContent(user));
     }
 
     /**
@@ -324,18 +327,12 @@ public class MCRUserServlet extends MCRServlet {
         }
 
         LOGGER.info("delete user " + user.getUserID() + " " + user.getUserName() + " " + user.getRealmID());
-        Element u = buildXML(user);
         MCRUserManager.deleteUser(user);
-        getLayoutService().doLayout(req, res, new MCRJDOMContent(u));
+        getLayoutService().doLayout(req, res, getContent(user));
     }
 
-    /**
-     * Builds XML containing data of the given login user.
-     * This XML is displayed with user.xsl as HTML page.
-     */
-    protected Element buildXML(MCRUser user) throws Exception {
-        Element u = MCRUserTransformer.buildXML(user);
-        return u;
+    private MCRJAXBContent<MCRUser> getContent(MCRUser user) {
+        return new MCRJAXBContent<MCRUser>(JAXB_CONTEXT, getSafeCopy(user));
     }
 
     /**
@@ -387,7 +384,7 @@ public class MCRUserServlet extends MCRServlet {
 
         if (results != null)
             for (MCRUser user : results) {
-                Element u = MCRUserTransformer.buildXML(user);
+                Element u = MCRUserTransformer.buildBasicXML(user).detachRootElement();
                 addString(u, "realName", user.getRealName());
                 addString(u, "eMail", user.getEMailAddress());
                 users.addContent(u);

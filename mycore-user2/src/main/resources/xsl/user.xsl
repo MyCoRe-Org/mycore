@@ -16,9 +16,9 @@
 
   <xsl:variable name="uid">
     <xsl:value-of select="/user/@name" />
-    <xsl:if test="not ( /user/realm/@id = 'local' )">
+    <xsl:if test="not ( /user/@realm = 'local' )">
       <xsl:text>@</xsl:text>
-      <xsl:value-of select="/user/realm/@id" />
+      <xsl:value-of select="/user/@realm" />
     </xsl:if>
   </xsl:variable>
 
@@ -40,7 +40,7 @@
           </form>
         </xsl:when>
       </xsl:choose>
-      <xsl:if test="/user/realm/@id = 'local'">
+      <xsl:if test="/user/@realm = 'local'">
         <form action="{$WebApplicationBaseURL}authorization/change-password.xml" method="get">
           <input type="hidden" name="action" value="password" />
           <input type="hidden" name="id" value="{$uid}" />

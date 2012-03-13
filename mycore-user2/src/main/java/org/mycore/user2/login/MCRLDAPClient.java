@@ -241,8 +241,8 @@ public class MCRLDAPClient {
             user = new MCRUser(userName, realmID);
         }
 
-        LOGGER.info("\n" + new XMLOutputter(Format.getPrettyFormat()).outputString(MCRUserTransformer.buildXML(user)));
+        LOGGER.info("\n" + new XMLOutputter(Format.getPrettyFormat()).outputString(MCRUserTransformer.buildExportableSafeXML(user)));
         MCRLDAPClient.instance().updateUserProperties(user);
-        LOGGER.info("\n" + new XMLOutputter(Format.getPrettyFormat()).outputString(MCRUserTransformer.buildXML(user)));
+        LOGGER.info("\n" + new XMLOutputter(Format.getPrettyFormat()).outputString(MCRUserTransformer.buildExportableSafeXML(user)));
     }
 }

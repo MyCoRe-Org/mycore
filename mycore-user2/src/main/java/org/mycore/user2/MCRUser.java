@@ -22,12 +22,23 @@
 
 package org.mycore.user2;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUserInformation;
@@ -40,39 +51,44 @@ import org.mycore.common.MCRUserInformation;
  * @author Frank L\u00fctzenkirchen
  * @author Thomas Scheffler (yagee)
  */
-public class MCRUser implements MCRUserInformation {
+@XmlRootElement(name = "user")
+@XmlAccessorType(XmlAccessType.NONE)
+@XmlType(propOrder = { "ownerId", "realName", "eMail", "lastLogin", "validUntil", "groups", "attributesMap", "password" })
+public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
+    private static final long serialVersionUID = 3378645055646901800L;
+
     /** The unique user ID */
     int internalID;
 
+    @XmlAttribute(name = "name")
     /** The login user name */
     private String userName;
 
+    @XmlElement
+    private Password password;
+
     /** The realm the user comes from */
+    @XmlAttribute(name = "realm")
     private String realmID;
-
-    /** The password hash of the user, for users from local realm */
-    private String password;
-
-    //base64 encoded
-    private String salt;
-
-    private MCRPasswordHashType hashType;
 
     /** The ID of the user that owns this user, or 0 */
     private MCRUser owner;
 
     /** The name of the person that this login user represents */
+    @XmlElement
     private String realName;
 
     /** The E-Mail address of the person that this login user represents */
+    @XmlElement
     private String eMail;
 
-    /** A hint stored by the user in case password is forgotten */
-    private String hint;
-
     /** The last time the user logged in */
+    @XmlElement
     private Date lastLogin, validUntil;
 
+    /**
+     * 
+     */
     private Map<String, String> attributes;
 
     private Collection<String> systemGroups;
@@ -105,6 +121,7 @@ public class MCRUser implements MCRUserInformation {
         this.systemGroups = new HashSet<String>();
         this.externalGroups = new HashSet<String>();
         this.attributes = new HashMap<String, String>();
+        this.password = new Password();
     }
 
     /**
@@ -178,45 +195,45 @@ public class MCRUser implements MCRUserInformation {
     }
 
     /**
-     * @return the password
+     * @return the hash
      */
     public String getPassword() {
-        return password;
+        return password.hash;
     }
 
     /**
-     * @param password the password to set
+     * @param hash the hash to set
      */
     public void setPassword(String password) {
-        this.password = password;
+        this.password.hash = password;
     }
 
     /**
      * @return the salt
      */
     public String getSalt() {
-        return salt;
+        return password.salt;
     }
 
     /**
      * @param salt the salt to set
      */
     public void setSalt(String salt) {
-        this.salt = salt;
+        this.password.salt = salt;
     }
 
     /**
      * @return the hashType
      */
     public MCRPasswordHashType getHashType() {
-        return hashType;
+        return password.hashType;
     }
 
     /**
      * @param hashType the hashType to set
      */
     public void setHashType(MCRPasswordHashType hashType) {
-        this.hashType = hashType;
+        this.password.hashType = hashType;
     }
 
     /**
@@ -269,12 +286,12 @@ public class MCRUser implements MCRUserInformation {
     }
 
     /**
-     * Returns a hint the user has stored in case of forgotten password.
+     * Returns a hint the user has stored in case of forgotten hash.
      * 
-     * @return a hint the user has stored in case of forgotten password.
+     * @return a hint the user has stored in case of forgotten hash.
      */
     public String getHint() {
-        return hint;
+        return password.hint;
     }
 
     /**
@@ -309,12 +326,12 @@ public class MCRUser implements MCRUserInformation {
     }
 
     /**
-     * Sets a hint to store in case of password loss.
+     * Sets a hint to store in case of hash loss.
      * 
-     * @param hint a hint for the user in case password is forgotten.
+     * @param hint a hint for the user in case hash is forgotten.
      */
     public void setHint(String hint) {
-        this.hint = hint;
+        this.password.hint = hint;
     }
 
     /**
@@ -339,7 +356,7 @@ public class MCRUser implements MCRUserInformation {
      * @param lastLogin the last time the user logged in.
      */
     public void setLastLogin(Date lastLogin) {
-        this.lastLogin = new Date(lastLogin.getTime());
+        this.lastLogin = lastLogin == null ? null : new Date(lastLogin.getTime());
     }
 
     /* (non-Javadoc)
@@ -452,6 +469,10 @@ public class MCRUser implements MCRUserInformation {
         if (mcrGroup == null) {
             throw new MCRException("Could not find group " + groupName);
         }
+        addToGroup(mcrGroup);
+    }
+
+    private void addToGroup(MCRGroup mcrGroup) {
         if (mcrGroup.isSystemGroup()) {
             getSystemGroupIDs().add(mcrGroup.getName());
         } else {
@@ -481,7 +502,6 @@ public class MCRUser implements MCRUserInformation {
     public void enableLogin() {
         setValidUntil(null);
     }
-
 
     /**
      * Disable login for this user.
@@ -513,6 +533,129 @@ public class MCRUser implements MCRUserInformation {
      * @param validUntil the validUntil to set
      */
     public void setValidUntil(Date validUntil) {
-        this.validUntil = new Date(validUntil.getTime());
+        this.validUntil = validUntil == null ? null : new Date(validUntil.getTime());
+    }
+
+    //This is code to get JAXB work
+
+    private static class Password {
+        @XmlAttribute
+        /** The hash hash of the user, for users from local realm */
+        private String hash;
+
+        //base64 encoded
+        @XmlAttribute
+        private String salt;
+
+        @XmlAttribute
+        private MCRPasswordHashType hashType;
+
+        /** A hint stored by the user in case hash is forgotten */
+        @XmlAttribute
+        private String hint;
+
+    }
+
+    private static class MapEntry {
+        @XmlAttribute
+        public String name;
+
+        @XmlAttribute
+        public String value;
+    }
+
+    private static class UserIdentifier {
+        @XmlAttribute
+        public String name;
+
+        @XmlAttribute
+        public String realm;
+    }
+
+    @SuppressWarnings("unused")
+    @XmlElementWrapper(name = "groups")
+    @XmlElement(name = "group")
+    private MCRGroup[] getGroups() {
+        Collection<MCRGroup> groups = new ArrayList<MCRGroup>();
+        for (String groupName : getSystemGroupIDs()) {
+            groups.add(MCRGroupManager.getGroup(groupName));
+        }
+        for (String groupName : getExternalGroupIDs()) {
+            groups.add(MCRGroupManager.getGroup(groupName));
+        }
+        return groups.toArray(new MCRGroup[groups.size()]);
+    }
+
+    @SuppressWarnings("unused")
+    private void setGroups(MCRGroup[] groups) {
+        for (MCRGroup group : groups) {
+            addToGroup(group);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    @XmlElementWrapper(name = "attributes")
+    @XmlElement(name = "attribute")
+    private MapEntry[] getAttributesMap() {
+        if (attributes == null) {
+            return null;
+        }
+        ArrayList<MapEntry> list = new ArrayList<MapEntry>(attributes.size());
+        for (Entry<String, String> entry : attributes.entrySet()) {
+            MapEntry mapEntry = new MapEntry();
+            mapEntry.name = entry.getKey();
+            mapEntry.value = entry.getValue();
+            list.add(mapEntry);
+        }
+        return list.toArray(new MapEntry[list.size()]);
+    }
+
+    @SuppressWarnings("unused")
+    private void setAttributesMap(MapEntry[] entries) {
+        for (MapEntry entry : entries) {
+            attributes.put(entry.name, entry.value);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    @XmlElement(name = "owner")
+    private UserIdentifier getOwnerId() {
+        if (owner == null) {
+            return null;
+        }
+        UserIdentifier userIdentifier = new UserIdentifier();
+        userIdentifier.name = owner.getUserName();
+        userIdentifier.realm = owner.getRealmID();
+        return userIdentifier;
+    }
+
+    @SuppressWarnings("unused")
+    private void setOwnerId(UserIdentifier userIdentifier) {
+        if (userIdentifier.name.equals(this.userName) && userIdentifier.realm.equals(this.realmID)) {
+            setOwner(this);
+            return;
+        }
+        MCRUser owner = MCRUserManager.getUser(userIdentifier.name, userIdentifier.realm);
+        setOwner(owner);
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#clone()
+     */
+    @Override
+    public MCRUser clone() {
+        MCRUser copy = new MCRUser(userName, realmID);
+        copy.eMail = this.eMail;
+        copy.lastLogin = this.lastLogin;
+        copy.validUntil = this.validUntil;
+        copy.password.hashType = this.password.hashType;
+        copy.password.hint = this.password.hint;
+        copy.password.hash = this.password.hash;
+        copy.password.salt = this.password.salt;
+        copy.realName = this.realName;
+        copy.systemGroups.addAll(this.systemGroups);
+        copy.externalGroups.addAll(this.externalGroups);
+        copy.attributes.putAll(this.attributes);
+        return copy;
     }
 }

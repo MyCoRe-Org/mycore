@@ -111,7 +111,7 @@
               <xsl:text>&amp;_var_@name=</xsl:text>
               <xsl:value-of select="@name" />
               <xsl:text>&amp;_var_@realm=</xsl:text>
-              <xsl:value-of select="realm/@id" />
+              <xsl:value-of select="@realm" />
               <xsl:text>&amp;subselect.session=</xsl:text>
               <xsl:value-of select="$subselect.session" />
               <xsl:text>&amp;subselect.varpath=</xsl:text>
@@ -122,9 +122,9 @@
             <xsl:otherwise>
               <xsl:variable name="uid">
                 <xsl:value-of select="@name" />
-                <xsl:if test="not ( realm/@id = 'local' )">
+                <xsl:if test="not ( @realm = 'local' )">
                   <xsl:text>@</xsl:text>
-                  <xsl:value-of select="realm/@id" />
+                  <xsl:value-of select="@realm" />
                 </xsl:if>
               </xsl:variable>
               <xsl:value-of select="concat('MCRUserServlet?action=show&amp;id=',$uid)" />
@@ -136,7 +136,7 @@
     </td>
     <xsl:if test="/users/@num">
       <td>
-        <xsl:value-of select="realm" />
+        <xsl:value-of select="@realm" />
       </td>
     </xsl:if>
     <td>

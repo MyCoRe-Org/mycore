@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.hibernate.cfg.Configuration;
+import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -217,7 +218,7 @@ public class MCRUserManagerTest extends MCRHibTestCase {
         startNewTransaction();
         assertEquals("Too many users", 1, MCRUserManager.countUsers(null, null, null));
         assertEquals("Too many users", 1, this.user.getOwnedUsers().size());
-        Element exportableXML = MCRUserTransformer.buildExportableXML(this.user);
+        Document exportableXML = MCRUserTransformer.buildExportableXML(this.user);
         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
         xout.output(exportableXML, System.out);
     }
