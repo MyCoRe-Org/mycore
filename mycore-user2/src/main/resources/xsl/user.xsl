@@ -21,6 +21,7 @@
       <xsl:value-of select="/user/@realm" />
     </xsl:if>
   </xsl:variable>
+  <xsl:variable name="owns" select="document(concat('user:getOwnedUsers:',$uid))/owns" />
 
   <xsl:template match="user" mode="actions">
     <xsl:if test="(string-length($step) = 0) or ($step = 'changedPassword')">
@@ -71,10 +72,10 @@
           <br />
           <xsl:value-of select="i18n:translate('component.user2.admin.userDeleteExplain')" />
           <br />
-          <xsl:if test="owns/user">
+          <xsl:if test="$owns/user">
             <strong>
               <xsl:value-of select="i18n:translate('component.user2.admin.userDeleteExplainRead1')" />
-              <xsl:value-of select="count(owns/user)" />
+              <xsl:value-of select="count($owns/user)" />
               <xsl:value-of select="i18n:translate('component.user2.admin.userDeleteExplainRead2')" />
             </strong>
           </xsl:if>
@@ -220,7 +221,7 @@
             <xsl:value-of select="i18n:translate('component.user2.admin.userOwns')" />
           </th>
           <td>
-            <xsl:apply-templates select="owns/user" mode="link" />
+            <xsl:apply-templates select="$owns/user" mode="link" />
           </td>
         </tr>
       </table>
@@ -228,7 +229,14 @@
   </xsl:template>
 
   <xsl:template match="user" mode="link">
-    <a href="MCRUserServlet?action=show&amp;id={@name}">
+    <xsl:variable name="uid">
+      <xsl:value-of select="@name" />
+      <xsl:if test="not ( @realm = 'local' )">
+        <xsl:text>@</xsl:text>
+        <xsl:value-of select="@realm" />
+      </xsl:if>
+    </xsl:variable>
+    <a href="MCRUserServlet?action=show&amp;id={$uid}">
       <xsl:apply-templates select="." mode="name" />
     </a>
     <xsl:if test="position() != last()">
@@ -239,7 +247,7 @@
   <xsl:template match="user" mode="name">
     <xsl:value-of select="@name" />
     <xsl:text> [</xsl:text>
-    <xsl:value-of select="realm" />
+    <xsl:value-of select="@realm" />
     <xsl:text>]</xsl:text>
   </xsl:template>
 
