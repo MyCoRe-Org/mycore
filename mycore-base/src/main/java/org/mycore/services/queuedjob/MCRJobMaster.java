@@ -24,6 +24,8 @@
 package org.mycore.services.queuedjob;
 
 import java.lang.reflect.Constructor;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -54,11 +56,13 @@ public class MCRJobMaster implements Runnable, Closeable {
 
     private static MCRConfiguration CONFIG = MCRConfiguration.instance();
 
-    private static MCRJobMaster INSTANCE = null;
+    private static Map<String, MCRJobMaster> INSTANCES = new HashMap<String, MCRJobMaster>();
 
     private static Logger LOGGER = Logger.getLogger(MCRJobMaster.class);
 
-    private static MCRJobQueue JOB_QUEUE = MCRJobQueue.getInstance();
+    private MCRJobQueue JOB_QUEUE;
+
+    private Class<? extends MCRJobAction> action;
 
     private ThreadPoolExecutor jobServe;
 
@@ -66,21 +70,31 @@ public class MCRJobMaster implements Runnable, Closeable {
 
     private ReentrantLock runLock;
 
-    private MCRJobMaster() {
+    private MCRJobMaster(Class<? extends MCRJobAction> action) {
         MCRShutdownHandler.getInstance().addCloseable(this);
+        this.action = action;
         runLock = new ReentrantLock();
+        JOB_QUEUE = MCRJobQueue.getInstance(action);
     }
 
     /**
-     * Returns an instance of this class.
+     * Returns an singleton instance of this class.
      * 
-     * @return the instance of the class
+     * @param action the {@link MCRJobAction} or <code>null</code>
+     * @return the instance of this class
      */
-    public static MCRJobMaster getInstance() {
-        if (INSTANCE == null)
-            INSTANCE = new MCRJobMaster();
+    public static MCRJobMaster getInstance(Class<? extends MCRJobAction> action) {
+        String key = action != null && !MCRJobQueue.singleQueue ? action.getName() : "single";
+        MCRJobMaster master = INSTANCES.get(key);
+        if (master == null) {
+            master = new MCRJobMaster(MCRJobQueue.singleQueue ? null : action);
+            INSTANCES.put(key, master);
+        }
 
-        return INSTANCE;
+        if (!master.running)
+            return null;
+
+        return master;
     }
 
     /**
@@ -88,18 +102,22 @@ public class MCRJobMaster implements Runnable, Closeable {
      * 
      * @return if is running
      */
-    public static boolean isRunning() {
-        return INSTANCE != null;
+    public static boolean isRunning(Class<? extends MCRJobAction> action) {
+        String key = action != null && !MCRJobQueue.singleQueue ? action.getName() : "single";
+        MCRJobMaster master = INSTANCES.get(key);
+
+        return master != null && master.running;
     }
 
     /**
-     * Starts the local {@link MCRJobMaster}. Can be auto started if <code>"MCR.QueuedJob.autostart"</code> 
+     * Starts the local {@link MCRJobMaster}.
+     * Can be auto started if <code>"MCR.QueuedJob.{?MCRJobAction?.}autostart"</code> 
      * is set to </code>true</code>.
      */
-    public static void startMasterThread() {
-        if (!isRunning()) {
-            LOGGER.info("Starting job master thread.");
-            final Thread master = new Thread(getInstance());
+    public static void startMasterThread(Class<? extends MCRJobAction> action) {
+        if (!isRunning(action)) {
+            LOGGER.info("Starting job master thread" + (action == null ? "" : " for action \"" + action.getName()) + "\".");
+            final Thread master = new Thread(getInstance(action));
             master.start();
         }
     }
@@ -111,24 +129,30 @@ public class MCRJobMaster implements Runnable, Closeable {
      */
     @Override
     public void run() {
-        Thread.currentThread().setName("JobMaster");
+        final String preLabel = (MCRJobQueue.singleQueue ? "Job" : action.getSimpleName());
+        Thread.currentThread().setName(preLabel + "Master");
         //get this MCRSession a speaking name
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
 
         boolean activated = CONFIG.getBoolean(MCRJobQueue.CONFIG_PREFIX + "activated", true);
-        LOGGER.info("JobQueue is " + (activated ? "activated" : "deactivated"));
+        activated = activated && CONFIG.getBoolean(MCRJobQueue.CONFIG_PREFIX + JOB_QUEUE.CONFIG_PREFIX_ADD + "activated", true);
+        
+        LOGGER.info("JobQueue" + (MCRJobQueue.singleQueue ? "" : " for \"" + action.getName() + "\"") + " is "
+                + (activated ? "activated" : "deactivated"));
         if (activated) {
             running = true;
-
             int jobThreadCount = CONFIG.getInt(MCRJobQueue.CONFIG_PREFIX + "JobThreads", 2);
+            jobThreadCount = CONFIG.getInt(MCRJobQueue.CONFIG_PREFIX + JOB_QUEUE.CONFIG_PREFIX_ADD + "JobThreads", jobThreadCount);
+            
             ThreadFactory slaveFactory = new ThreadFactory() {
                 AtomicInteger tNum = new AtomicInteger();
 
                 ThreadGroup tg = new ThreadGroup("MCRJob slave job thread group");
 
                 public Thread newThread(Runnable r) {
-                    Thread t = new Thread(tg, r, "JobSlave#" + tNum.incrementAndGet());
+                    Thread t = new Thread(tg, r, preLabel + "Slave#"
+                            + tNum.incrementAndGet());
                     return t;
                 }
             };
@@ -148,7 +172,7 @@ public class MCRJobMaster implements Runnable, Closeable {
                     activeThreads.incrementAndGet();
                 }
             };
-            LOGGER.info("JobMaster is started");
+            LOGGER.info("JobMaster" + (MCRJobQueue.singleQueue ? "" : " for \"" + action.getName() + "\"") + " with " + jobThreadCount + " thread(s) is started");
             while (running) {
                 while (activeThreads.get() < jobThreadCount) {
                     runLock.lock();
@@ -188,7 +212,7 @@ public class MCRJobMaster implements Runnable, Closeable {
                             try {
                                 synchronized (JOB_QUEUE) {
                                     if (running) {
-                                        LOGGER.debug("No Job in JobQueue going to sleep");
+                                        LOGGER.debug("No job in queue going to sleep");
                                         //fixes a race conditioned deadlock situation
                                         //do not wait longer than 60 sec. for a new MCRJob
                                         JOB_QUEUE.wait(60000);
@@ -211,7 +235,7 @@ public class MCRJobMaster implements Runnable, Closeable {
                     }
             } // while(running)
         }
-        LOGGER.info("Master thread finished");
+        LOGGER.info(preLabel + "Master thread finished");
         MCRSessionMgr.releaseCurrentSession();
     }
 

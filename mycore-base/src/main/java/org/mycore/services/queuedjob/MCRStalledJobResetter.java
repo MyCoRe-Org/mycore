@@ -24,6 +24,7 @@
 package org.mycore.services.queuedjob;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
@@ -44,20 +45,31 @@ import org.mycore.common.MCRConfiguration;
 public class MCRStalledJobResetter implements Runnable {
     private static SessionFactory sessionFactory = MCRHIBConnection.instance().getSessionFactory();
 
-    private static MCRStalledJobResetter INSTANCE = null;
-
-    private static int maxTimeDiff = MCRConfiguration.instance().getInt(MCRJobQueue.CONFIG_PREFIX + "TimeTillReset", 10);
+    private static HashMap<String, MCRStalledJobResetter> INSTANCES = new HashMap<String, MCRStalledJobResetter>();
 
     private static Logger LOGGER = Logger.getLogger(MCRStalledJobResetter.class);
+    
+    private int maxTimeDiff = MCRConfiguration.instance().getInt(MCRJobQueue.CONFIG_PREFIX + "TimeTillReset", 10);
+    
+    private Class<? extends MCRJobAction> action = null;
 
-    private MCRStalledJobResetter() {
+    private MCRStalledJobResetter(Class<? extends MCRJobAction> action) {
+        if (action != null) {
+            this.action = action;
+            maxTimeDiff = MCRConfiguration.instance().getInt(MCRJobQueue.CONFIG_PREFIX + action.getSimpleName() + ".TimeTillReset", maxTimeDiff);
+        }
     }
-
-    public static MCRStalledJobResetter getInstance() {
-        if (INSTANCE == null)
-            INSTANCE = new MCRStalledJobResetter();
-
-        return INSTANCE;
+    
+    public static MCRStalledJobResetter getInstance(Class<? extends MCRJobAction> action) {
+        String key = action != null && !MCRJobQueue.singleQueue ? action.getName() : "single";
+        
+        MCRStalledJobResetter resetter = INSTANCES.get(key);
+        if (resetter == null) {
+            resetter = new MCRStalledJobResetter(MCRJobQueue.singleQueue ? null : action);
+            INSTANCES.put(key, resetter);
+        }
+        
+        return resetter;
     }
 
     /**
@@ -68,8 +80,13 @@ public class MCRStalledJobResetter implements Runnable {
         Session session = sessionFactory.getCurrentSession();
         Transaction executorTransaction = session.beginTransaction();
         LOGGER.info("MCRJob is Checked for dead Entries");
+        
+        StringBuffer sb = new StringBuffer("FROM MCRJob WHERE ");
+        if (action != null)
+            sb.append("action='" + action.getName() + "' AND ");
+        sb.append(" status='" + MCRJobStatus.PROCESSING + "' ORDER BY id ASC");
 
-        Query query = session.createQuery("FROM MCRJob WHERE status='" + MCRJobStatus.PROCESSING + "' ORDER BY id ASC");
+        Query query = session.createQuery(sb.toString());
 
         long start = 0;
         long current = new Date(System.currentTimeMillis()).getTime() / 60000;
@@ -101,8 +118,8 @@ public class MCRStalledJobResetter implements Runnable {
         }
         //Only notify Listeners on Queue if really something is set back
         if (reset) {
-            synchronized (MCRJobQueue.getInstance()) {
-                MCRJobQueue.getInstance().notifyListener();
+            synchronized (MCRJobQueue.getInstance(action)) {
+                MCRJobQueue.getInstance(action).notifyListener();
             }
         }
         session.close();

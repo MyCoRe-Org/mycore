@@ -26,6 +26,7 @@ package org.mycore.services.queuedjob;
 import java.util.AbstractQueue;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -48,23 +49,35 @@ import org.mycore.common.events.MCRShutdownHandler.Closeable;
 public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     private static Logger LOGGER = Logger.getLogger(MCRJobQueue.class);
 
-    private static MCRJobQueue INSTANCE = new MCRJobQueue();
+    private static Map<String, MCRJobQueue> INSTANCES = new HashMap<String, MCRJobQueue>();
 
     protected static String CONFIG_PREFIX = "MCR.QueuedJob.";
 
-    private static Queue<MCRJob> preFetch;
+    protected static boolean singleQueue = MCRConfiguration.instance().getBoolean(CONFIG_PREFIX + "SingleQueue", true);
 
-    //TODO must be static after migration of MCRTilingQueue
+    protected String CONFIG_PREFIX_ADD = "";
+
+    private Class<? extends MCRJobAction> action;
+
+    private Queue<MCRJob> preFetch;
+
     private ScheduledExecutorService StalledJobScheduler;
 
     private final ReentrantLock pollLock;
 
     private boolean running;
 
-    private MCRJobQueue() {
-        int waitTime = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "TimeTillReset", 10) * 60;
+    private MCRJobQueue(Class<? extends MCRJobAction> action) {
+        int waitTime = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "TimeTillReset", 10);
+        if (!singleQueue && action != null) {
+            this.action = action;
+            CONFIG_PREFIX_ADD = action.getSimpleName();
+            waitTime = MCRConfiguration.instance().getInt(CONFIG_PREFIX + CONFIG_PREFIX_ADD + "TimeTillReset", waitTime);
+        }
+        waitTime = waitTime * 60;
+        
         StalledJobScheduler = Executors.newSingleThreadScheduledExecutor();
-        StalledJobScheduler.scheduleAtFixedRate(MCRStalledJobResetter.getInstance(), waitTime, waitTime, TimeUnit.SECONDS);
+        StalledJobScheduler.scheduleAtFixedRate(MCRStalledJobResetter.getInstance(this.action), waitTime, waitTime, TimeUnit.SECONDS);
         preFetch = new ConcurrentLinkedQueue<MCRJob>();
         running = true;
         pollLock = new ReentrantLock();
@@ -72,13 +85,23 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     }
 
     /**
+     * Returns an singleton instance of this class.
+     * 
+     * @param action the {@link MCRJobAction} or <code>null</code>
      * @return singleton instance of this class
      */
-    public static MCRJobQueue getInstance() {
-        if (!INSTANCE.running)
+    public static MCRJobQueue getInstance(Class<? extends MCRJobAction> action) {
+        String key = action != null && !singleQueue ? action.getName() : "single";
+        MCRJobQueue queue = INSTANCES.get(key);
+        if (queue == null) {
+            queue = new MCRJobQueue(singleQueue ? null : action);
+            INSTANCES.put(key, queue);
+        }
+
+        if (!queue.running)
             return null;
 
-        return INSTANCE;
+        return queue;
     }
 
     /**
@@ -154,7 +177,11 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     public boolean offer(MCRJob job) {
         if (!running)
             return false;
-        MCRJob oldJob = getJob(job.getAction().getName(), job.getParameters());
+
+        if (job.getAction() == null && action != null)
+            job.setAction(action);
+
+        MCRJob oldJob = getJob(job.getAction(), job.getParameters());
         if (oldJob != null) {
             job = oldJob;
         } else {
@@ -178,7 +205,12 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         if (!running)
             return;
         Session session = MCRHIBConnection.instance().getSession();
-        Query query = session.createQuery("DELETE FROM MCRJob");
+
+        StringBuffer sb = new StringBuffer("DELETE FROM MCRJob");
+        if (action != null)
+            sb.append(" WHERE action='" + action.getName() + "'");
+
+        Query query = session.createQuery(sb.toString());
         query.executeUpdate();
     }
 
@@ -194,8 +226,13 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
             return empty.iterator();
         }
         Session session = MCRHIBConnection.instance().getSession();
-        Query query = session.createQuery("FROM MCRJob job JOIN FETCH job.parameters WHERE status='" + MCRJobStatus.NEW
-                + "' ORDER BY added ASC");
+
+        StringBuffer sb = new StringBuffer("FROM MCRJob job JOIN FETCH job.parameters WHERE ");
+        if (action != null)
+            sb.append("action='" + action.getName() + "' AND ");
+        sb.append("status='" + MCRJobStatus.NEW + "' ORDER BY added ASC");
+
+        Query query = session.createQuery(sb.toString());
         @SuppressWarnings("unchecked")
         List<MCRJob> result = query.list();
         return result.iterator();
@@ -209,18 +246,24 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         if (!running)
             return 0;
         Session session = MCRHIBConnection.instance().getSession();
-        return ((Number) session.createQuery("SELECT count(*) FROM MCRJob WHERE status='" + MCRJobStatus.NEW + "'").uniqueResult())
-                .intValue();
+
+        StringBuffer sb = new StringBuffer("SELECT count(*) FROM MCRJob WHERE ");
+        if (action != null)
+            sb.append("action='" + action.getName() + "' AND ");
+        sb.append("status='" + MCRJobStatus.NEW + "'");
+
+        return ((Number) session.createQuery(sb.toString()).uniqueResult()).intValue();
     }
 
     /**
      * get the specific job and alters it status to {@link MCRJobStatus#PROCESSING}
      * 
+     * @param action the {@link MCRJobAction}
      * @param params
      * @return
      * @throws NoSuchElementException
      */
-    public MCRJob getElementOutOfOrder(String action, Map<String, String> params) throws NoSuchElementException {
+    public MCRJob getElementOutOfOrder(Class<? extends MCRJobAction> action, Map<String, String> params) throws NoSuchElementException {
         if (!running)
             return null;
         MCRJob job = getJob(action, params);
@@ -234,13 +277,13 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         return job;
     }
 
-    private MCRJob getJob(String action, Map<String, String> params) {
+    private MCRJob getJob(Class<? extends MCRJobAction> action, Map<String, String> params) {
         if (!running)
             return null;
 
         Session session = MCRHIBConnection.instance().getSession();
 
-        StringBuffer qStr = new StringBuffer("FROM MCRJob job JOIN FETCH job.parameters WHERE action = '" + action + "' ");
+        StringBuffer qStr = new StringBuffer("FROM MCRJob job JOIN FETCH job.parameters WHERE action = '" + action.getName() + "' ");
         for (String paramKey : params.keySet()) {
             qStr.append(" AND job.parameters['" + paramKey + "'] = '" + params.get(paramKey) + "'");
         }
@@ -276,9 +319,13 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
     private int preFetch(int amount) {
         Session session = MCRHIBConnection.instance().getSession();
-        Query query = session.createQuery(
-                "FROM MCRJob job JOIN FETCH job.parameters WHERE status='" + MCRJobStatus.NEW + "' ORDER BY added ASC").setMaxResults(
-                amount);
+
+        StringBuffer sb = new StringBuffer("FROM MCRJob job JOIN FETCH job.parameters WHERE ");
+        if (action != null)
+            sb.append("action='" + action.getName() + "' AND ");
+        sb.append("status='" + MCRJobStatus.NEW + "' ORDER BY added ASC");
+
+        Query query = session.createQuery(sb.toString()).setMaxResults(amount);
 
         @SuppressWarnings("unchecked")
         List<MCRJob> jobs = query.list();
@@ -324,8 +371,11 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     public synchronized void notifyListener() {
         this.notifyAll();
 
-        if (MCRConfiguration.instance().getBoolean(CONFIG_PREFIX + "autostart", true))
-            MCRJobMaster.startMasterThread();
+        boolean autostart = MCRConfiguration.instance().getBoolean(CONFIG_PREFIX + "autostart", true);
+        autostart = MCRConfiguration.instance().getBoolean(CONFIG_PREFIX + CONFIG_PREFIX_ADD + "autostart", autostart);
+        
+        if (autostart)
+            MCRJobMaster.startMasterThread(action);
     }
 
     /**
@@ -335,13 +385,13 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
      * @param params - parameters to get jobs
      * @return the number of jobs deleted
      */
-    public int remove(String action, Map<String, String> params) {
+    public int remove(Class<? extends MCRJobAction> action, Map<String, String> params) {
         if (!running)
             return 0;
 
         Session session = MCRHIBConnection.instance().getSession();
 
-        StringBuffer qStr = new StringBuffer("DELETE FROM MCRJob job WHERE action = '" + action + "' ");
+        StringBuffer qStr = new StringBuffer("DELETE FROM MCRJob job WHERE action = '" + action.getName() + "' ");
         for (String paramKey : params.keySet()) {
             qStr.append(" AND job.parameters['" + paramKey + "'] = '" + params.get(paramKey) + "'");
         }
@@ -369,13 +419,13 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
      * @param action - the action class
      * @return the number of jobs deleted
      */
-    public int remove(String action) {
+    public int remove(Class<? extends MCRJobAction> action) {
         if (!running)
             return 0;
 
         Session session = MCRHIBConnection.instance().getSession();
 
-        Query query = session.createQuery("DELETE FROM MCRJob job WHERE action = '" + action + "'");
+        Query query = session.createQuery("DELETE FROM MCRJob job WHERE action = '" + action.getName() + "'");
 
         @SuppressWarnings("unchecked")
         Iterator<MCRJob> results = query.iterate();
