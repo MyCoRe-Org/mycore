@@ -637,18 +637,13 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      */
     @Override
     public MCRUser clone() {
-        MCRUser copy = new MCRUser(userName, realmID);
-        copy.eMail = this.eMail;
-        copy.lastLogin = this.lastLogin;
-        copy.validUntil = this.validUntil;
+        MCRUser copy = getSafeCopy();
+        if (copy.password == null) {
+            copy.password = new Password();
+        }
         copy.password.hashType = this.password.hashType;
-        copy.password.hint = this.password.hint;
         copy.password.hash = this.password.hash;
         copy.password.salt = this.password.salt;
-        copy.realName = this.realName;
-        copy.systemGroups.addAll(this.systemGroups);
-        copy.externalGroups.addAll(this.externalGroups);
-        copy.attributes.putAll(this.attributes);
         return copy;
     }
 
@@ -667,14 +662,9 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      * @return a clone copy of this instance
      */
     public MCRUser getBasicCopy() {
-        MCRUser copy = getSafeCopy();
-        copy.setRealName(null);
-        copy.setEMail(null);
+        MCRUser copy = new MCRUser(userName, realmID);
+        copy.owner = this.equals(this.owner) ? copy : this.owner;
         copy.setAttributes(null);
-        copy.getSystemGroupIDs().clear();
-        copy.getExternalGroupIDs().clear();
-        copy.setLastLogin(null);
-        copy.setValidUntil(null);
         copy.password = null;
         return copy;
     }
@@ -690,13 +680,19 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      * @return a clone copy of this instance
      */
     public MCRUser getSafeCopy() {
-        MCRUser copy = clone();
-        copy.setPassword(null);
-        copy.setHashType(null);
-        copy.setSalt(null);
-        if (getHint() == null) {
-            password = null;
+        MCRUser copy = getBasicCopy();
+        if (getHint() != null) {
+            copy.password = new Password();
+            copy.password.hint = getHint();
         }
+        copy.setAttributes(new HashMap<String, String>());
+        copy.eMail = this.eMail;
+        copy.lastLogin = this.lastLogin;
+        copy.validUntil = this.validUntil;
+        copy.realName = this.realName;
+        copy.systemGroups.addAll(this.systemGroups);
+        copy.externalGroups.addAll(this.externalGroups);
+        copy.attributes.putAll(this.attributes);
         return copy;
     }
 }
