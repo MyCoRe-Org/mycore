@@ -77,7 +77,7 @@ public class MCRUserResolver implements URIResolver {
             if (user == null) {
                 return null;
             }
-            return new JAXBSource(MCRUserTransformer.JAXB_CONTEXT, MCRUserTransformer.getSafeCopy(user));
+            return new JAXBSource(MCRUserTransformer.JAXB_CONTEXT, user.getSafeCopy());
         } catch (JAXBException e) {
             throw new TransformerException(e);
         }
@@ -97,7 +97,7 @@ public class MCRUserResolver implements URIResolver {
         int userCount = listUsers.size();
         mcrOwns.users = new MCRUser[userCount];
         for (int i = 0; i < userCount; i++) {
-            mcrOwns.users[i] = MCRUserTransformer.getBasicCopy(listUsers.get(i));
+            mcrOwns.users[i] = listUsers.get(i).getBasicCopy();
         }
         return new JAXBSource(MCRUserTransformer.JAXB_CONTEXT, mcrOwns);
     }

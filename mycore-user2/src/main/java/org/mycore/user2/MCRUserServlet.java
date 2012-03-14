@@ -23,7 +23,6 @@
 package org.mycore.user2;
 
 import static org.mycore.user2.utils.MCRUserTransformer.JAXB_CONTEXT;
-import static org.mycore.user2.utils.MCRUserTransformer.getSafeCopy;
 
 import java.io.IOException;
 import java.util.List;
@@ -332,7 +331,7 @@ public class MCRUserServlet extends MCRServlet {
     }
 
     private MCRJAXBContent<MCRUser> getContent(MCRUser user) {
-        return new MCRJAXBContent<MCRUser>(JAXB_CONTEXT, getSafeCopy(user));
+        return new MCRJAXBContent<MCRUser>(JAXB_CONTEXT, user.getSafeCopy());
     }
 
     /**

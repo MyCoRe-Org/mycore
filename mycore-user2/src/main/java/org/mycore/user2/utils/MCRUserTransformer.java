@@ -22,6 +22,7 @@
  */
 package org.mycore.user2.utils;
 
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -55,27 +56,6 @@ public abstract class MCRUserTransformer {
         }
     }
 
-    public static MCRUser getBasicCopy(MCRUser user) {
-        MCRUser copy = getSafeCopy(user);
-        copy.setRealName(null);
-        copy.setEMail(null);
-        copy.getAttributes().clear();
-        copy.getSystemGroupIDs().clear();
-        copy.getExternalGroupIDs().clear();
-        copy.setLastLogin(null);
-        copy.setValidUntil(null);
-        copy.setHint(null);
-        return copy;
-    }
-
-    public static MCRUser getSafeCopy(MCRUser user) {
-        MCRUser copy = user.clone();
-        copy.setPassword(null);
-        copy.setHashType(null);
-        copy.setSalt(null);
-        return copy;
-    }
-
     /**
      * Builds an xml element containing basic information on user. 
      * This includes user ID, login name and realm.
@@ -84,7 +64,7 @@ public abstract class MCRUserTransformer {
         try {
             Marshaller marshaller = JAXB_CONTEXT.createMarshaller();
             JDOMResult result = new JDOMResult();
-            marshaller.marshal(getBasicCopy(mcrUser), result);
+            marshaller.marshal(mcrUser.getBasicCopy(), result);
             return result.getDocument();
         } catch (JAXBException e) {
             throw new MCRException(e);
@@ -99,7 +79,7 @@ public abstract class MCRUserTransformer {
         try {
             Marshaller marshaller = JAXB_CONTEXT.createMarshaller();
             JDOMResult result = new JDOMResult();
-            marshaller.marshal(getSafeCopy(mcrUser), result);
+            marshaller.marshal(mcrUser.getSafeCopy(), result);
             return result.getDocument();
         } catch (JAXBException e) {
             throw new MCRException(e);

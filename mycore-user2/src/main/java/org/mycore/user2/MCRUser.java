@@ -28,7 +28,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -198,7 +197,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      * @return the hash
      */
     public String getPassword() {
-        return password.hash;
+        return password == null ? null : password.hash;
     }
 
     /**
@@ -212,7 +211,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      * @return the salt
      */
     public String getSalt() {
-        return password.salt;
+        return password == null ? null : password.salt;
     }
 
     /**
@@ -226,7 +225,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      * @return the hashType
      */
     public MCRPasswordHashType getHashType() {
-        return password.hashType;
+        return password == null ? null : password.hashType;
     }
 
     /**
@@ -282,7 +281,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      * @return a hint the user has stored in case of forgotten hash.
      */
     public String getHint() {
-        return password.hint;
+        return password == null ? null : password.hint;
     }
 
     /**
@@ -567,6 +566,9 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     @XmlElementWrapper(name = "groups")
     @XmlElement(name = "group")
     private MCRGroup[] getGroups() {
+        if (getSystemGroupIDs().isEmpty() && getExternalGroupIDs().isEmpty()) {
+            return null;
+        }
         Collection<MCRGroup> groups = new ArrayList<MCRGroup>();
         for (String groupName : getSystemGroupIDs()) {
             groups.add(MCRGroupManager.getGroup(groupName));
@@ -647,6 +649,54 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         copy.systemGroups.addAll(this.systemGroups);
         copy.externalGroups.addAll(this.externalGroups);
         copy.attributes.putAll(this.attributes);
+        return copy;
+    }
+
+    /**
+     * Returns this MCRUser with basic information.
+     * Same as {@link #getSafeCopy()} but without these informations:
+     * <ul>
+     * <li>real name
+     * <li>eMail
+     * <li>attributes
+     * <li>group information
+     * <li>last login
+     * <li>valid until
+     * <li>password hint
+     * </ul>
+     * @return a clone copy of this instance
+     */
+    public MCRUser getBasicCopy() {
+        MCRUser copy = getSafeCopy();
+        copy.setRealName(null);
+        copy.setEMail(null);
+        copy.setAttributes(null);
+        copy.getSystemGroupIDs().clear();
+        copy.getExternalGroupIDs().clear();
+        copy.setLastLogin(null);
+        copy.setValidUntil(null);
+        copy.password = null;
+        return copy;
+    }
+
+    /**
+     * Returns this MCRUser with safe information.
+     * Same as {@link #clone()} but without these informations:
+     * <ul>
+     * <li>password hash type
+     * <li>password hash value
+     * <li>password salt
+     * </ul>
+     * @return a clone copy of this instance
+     */
+    public MCRUser getSafeCopy() {
+        MCRUser copy = clone();
+        copy.setPassword(null);
+        copy.setHashType(null);
+        copy.setSalt(null);
+        if (getHint() == null) {
+            password = null;
+        }
         return copy;
     }
 }
