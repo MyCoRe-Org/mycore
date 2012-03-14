@@ -52,12 +52,12 @@ public class MCRRuleParser extends MCRBooleanClauseParser {
     }
 
     @Override
-    protected MCRCondition parseSimpleCondition(Element e) throws MCRParseException {
+    protected MCRCondition<?> parseSimpleCondition(Element e) throws MCRParseException {
         String name = e.getName();
         if (name.equals("boolean")) {
             return super.parseSimpleCondition(e);
         } else if (name.equals("condition")) {
-            MCRCondition condition = parseElement(e);
+            MCRCondition<?> condition = parseElement(e);
             if (condition == null) {
                 throw new MCRParseException("Not a valid condition field <" + e.getAttributeValue("field") + ">");
             }
@@ -68,8 +68,8 @@ public class MCRRuleParser extends MCRBooleanClauseParser {
     }
 
     @Override
-    protected MCRCondition parseSimpleCondition(String s) throws MCRParseException {
-        MCRCondition condition = parseString(s);
+    protected MCRCondition<?> parseSimpleCondition(String s) throws MCRParseException {
+        MCRCondition<?> condition = parseString(s);
         if (condition == null) {
             throw new MCRParseException("syntax error: " + s);
         }
@@ -80,7 +80,7 @@ public class MCRRuleParser extends MCRBooleanClauseParser {
      * @param e
      * @return 
      */
-    protected MCRCondition parseElement(Element e) {
+    protected MCRCondition<?> parseElement(Element e) {
         String field = e.getAttributeValue("field").toLowerCase().trim();
         String operator = e.getAttributeValue("operator").trim();
         String value = e.getAttributeValue("value").trim();
@@ -112,7 +112,7 @@ public class MCRRuleParser extends MCRBooleanClauseParser {
      * @param s
      * @return
      */
-    protected MCRCondition parseString(String s) {
+    protected MCRCondition<?> parseString(String s) {
         /* handle specific rules */
         if (s.equalsIgnoreCase("false")) {
             return new MCRFalseCondition();
