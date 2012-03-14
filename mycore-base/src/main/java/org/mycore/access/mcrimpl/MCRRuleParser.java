@@ -33,8 +33,8 @@ import org.mycore.parsers.bool.MCRFalseCondition;
 import org.mycore.parsers.bool.MCRParseException;
 import org.mycore.parsers.bool.MCRTrueCondition;
 
-class MCRRuleParser extends MCRBooleanClauseParser {
-    MCRRuleParser() {
+public class MCRRuleParser extends MCRBooleanClauseParser {
+    protected MCRRuleParser() {
     }
 
     private static Date parseDate(String s, boolean dayafter) throws MCRParseException {
@@ -57,39 +57,62 @@ class MCRRuleParser extends MCRBooleanClauseParser {
         if (name.equals("boolean")) {
             return super.parseSimpleCondition(e);
         } else if (name.equals("condition")) {
-            String field = e.getAttributeValue("field").toLowerCase().trim();
-            String operator = e.getAttributeValue("operator").trim();
-            String value = e.getAttributeValue("value").trim();
-            boolean not = "!=".equals(operator);
-
-            if (field.equals("group")) {
-                return new MCRGroupClause(value, not);
-            } else if (field.equals("user")) {
-                return new MCRUserClause(value, not);
-            } else if (field.equals("ip")) {
-                return new MCRIPClause(value);
-            } else if (field.equals("date")) {
-                if (operator.equals("<")) {
-                    return new MCRDateBeforeClause(parseDate(value, false));
-                } else if (operator.equals("<=")) {
-                    return new MCRDateBeforeClause(parseDate(value, true));
-                } else if (operator.equals(">")) {
-                    return new MCRDateAfterClause(parseDate(value, true));
-                } else if (operator.equals(">=")) {
-                    return new MCRDateAfterClause(parseDate(value, false));
-                } else {
-                    throw new MCRParseException("Not a valid operator <" + operator + ">");
-                }
-            } else {
-                throw new MCRParseException("Not a valid condition field <" + field + ">");
+            MCRCondition condition = parseElement(e);
+            if (condition == null) {
+                throw new MCRParseException("Not a valid condition field <" + e.getAttributeValue("field") + ">");
             }
+            return condition;
         } else {
-            throw new MCRParseException("Not a valid name <" + name + ">");
+            throw new MCRParseException("Not a valid name <" + e.getName() + ">");
         }
     }
 
     @Override
     protected MCRCondition parseSimpleCondition(String s) throws MCRParseException {
+        MCRCondition condition = parseString(s);
+        if (condition == null) {
+            throw new MCRParseException("syntax error: " + s);
+        }
+        return condition;
+    }
+
+    /**
+     * @param e
+     * @return 
+     */
+    protected MCRCondition parseElement(Element e) {
+        String field = e.getAttributeValue("field").toLowerCase().trim();
+        String operator = e.getAttributeValue("operator").trim();
+        String value = e.getAttributeValue("value").trim();
+        boolean not = "!=".equals(operator);
+
+        if (field.equals("group")) {
+            return new MCRGroupClause(value, not);
+        } else if (field.equals("user")) {
+            return new MCRUserClause(value, not);
+        } else if (field.equals("ip")) {
+            return new MCRIPClause(value);
+        } else if (field.equals("date")) {
+            if (operator.equals("<")) {
+                return new MCRDateBeforeClause(parseDate(value, false));
+            } else if (operator.equals("<=")) {
+                return new MCRDateBeforeClause(parseDate(value, true));
+            } else if (operator.equals(">")) {
+                return new MCRDateAfterClause(parseDate(value, true));
+            } else if (operator.equals(">=")) {
+                return new MCRDateAfterClause(parseDate(value, false));
+            } else {
+                throw new MCRParseException("Not a valid operator <" + operator + ">");
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param s
+     * @return
+     */
+    protected MCRCondition parseString(String s) {
         /* handle specific rules */
         if (s.equalsIgnoreCase("false")) {
             return new MCRFalseCondition();
@@ -139,7 +162,6 @@ class MCRRuleParser extends MCRBooleanClauseParser {
                 throw new MCRParseException("syntax error: " + s);
             }
         }
-
-        throw new MCRParseException("syntax error: " + s);
+        return null;
     }
 };

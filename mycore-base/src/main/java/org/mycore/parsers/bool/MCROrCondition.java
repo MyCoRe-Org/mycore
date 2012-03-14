@@ -26,22 +26,22 @@ package org.mycore.parsers.bool;
 /**
  * @author Frank Lützenkirchen
  */
-public class MCROrCondition extends MCRSetCondition {
+public class MCROrCondition<T> extends MCRSetCondition<T> {
 
     public MCROrCondition() {
         super("or");
     }
     
-    public MCROrCondition(MCRCondition...conditions) {
+    public MCROrCondition(MCRCondition<T>...conditions) {
         this();
-        for (MCRCondition mcrCondition : conditions) {
+        for (MCRCondition<T> mcrCondition : conditions) {
             addChild(mcrCondition);
         }
     }
 
     @Override
-    public boolean evaluate(Object o) {
-        for (MCRCondition child : children) {
+    public boolean evaluate(T o) {
+        for (MCRCondition<T> child : children) {
             if (child.evaluate(o)) {
                 return true;
             }

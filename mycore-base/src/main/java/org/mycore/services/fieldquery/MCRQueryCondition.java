@@ -25,7 +25,6 @@ package org.mycore.services.fieldquery;
 
 import org.jdom.Element;
 import org.mycore.parsers.bool.MCRCondition;
-import org.mycore.parsers.bool.MCRConditionVisitor;
 import org.mycore.parsers.bool.MCRParseException;
 
 /**
@@ -34,7 +33,7 @@ import org.mycore.parsers.bool.MCRParseException;
  * 
  * @author Frank Lützenkirchen
  */
-public class MCRQueryCondition extends MCRFieldValue implements MCRCondition {
+public class MCRQueryCondition extends MCRFieldValue implements MCRCondition<Object> {
 
     /** The comparison operator used in this condition */
     private String operator;
@@ -67,14 +66,6 @@ public class MCRQueryCondition extends MCRFieldValue implements MCRCondition {
         condition.setAttribute("value", getValue());
 
         return condition;
-    }
-
-    public Element info() {
-        return toXML();
-    }
-
-    public void accept(MCRConditionVisitor visitor) {
-        visitor.visitQuery(this);
     }
 
     public boolean evaluate(Object o) {

@@ -23,7 +23,6 @@
 
 package org.mycore.parsers.bool;
 
-import org.jdom.Attribute;
 import org.jdom.Element;
 
 /**
@@ -31,7 +30,7 @@ import org.jdom.Element;
  * 
  * @author Matthias Kramm
  */
-public class MCRFalseCondition implements MCRCondition {
+public class MCRFalseCondition implements MCRCondition<Object> {
     public MCRFalseCondition() {
     }
 
@@ -48,16 +47,5 @@ public class MCRFalseCondition implements MCRCondition {
         Element cond = new Element("boolean");
         cond.setAttribute("operator", "false");
         return cond;
-    }
-
-    public Element info() {
-        Element el = new Element("info");
-        el.setAttribute(new Attribute("type", "false"));
-
-        return el;
-    }
-
-    public void accept(MCRConditionVisitor visitor) {
-        visitor.visitType(info());
     }
 };

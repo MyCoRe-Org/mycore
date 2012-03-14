@@ -28,14 +28,27 @@ import org.jdom.Element;
 /**
  * @author Frank Lützenkirchen
  */
-public interface MCRCondition {
+public interface MCRCondition<T> {
+    /**
+     * Returns this condition as a String.
+     * 
+     * The returned string can be parsed.
+     * @return
+     */
     public String toString();
 
+    /**
+     * Returns this condition as an Element.
+     * 
+     * @return
+     */
     public Element toXML();
 
-    public boolean evaluate(Object o);
+    /**
+     * Evalutates this condition.
+     * @param T a parameter object
+     * @return true if this condition is met
+     */
+    public boolean evaluate(T o);
 
-    public Element info();
-
-    public void accept(MCRConditionVisitor visitor);
 }

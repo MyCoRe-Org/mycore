@@ -27,13 +27,12 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.jdom.Attribute;
 import org.jdom.Element;
 
 /**
  * @author Frank Lützenkirchen
  */
-public abstract class MCRSetCondition implements MCRCondition {
+public abstract class MCRSetCondition<T> implements MCRCondition<T> {
 
     public final static String AND = "and";
 
@@ -41,7 +40,7 @@ public abstract class MCRSetCondition implements MCRCondition {
 
     protected String operator;
 
-    protected List<MCRCondition> children = new LinkedList<MCRCondition>();
+    protected List<MCRCondition<T>> children = new LinkedList<MCRCondition<T>>();
 
     protected MCRSetCondition(String operator) {
         this.operator = operator;
@@ -51,17 +50,17 @@ public abstract class MCRSetCondition implements MCRCondition {
         return operator;
     }
 
-    public MCRSetCondition addChild(MCRCondition condition) {
+    public MCRSetCondition<T> addChild(MCRCondition<T> condition) {
         children.add(condition);
         return this;
     }
 
-    public MCRSetCondition addAll(Collection<MCRCondition> conditions) {
+    public MCRSetCondition<T> addAll(Collection<MCRCondition<T>> conditions) {
         children.addAll(conditions);
         return this;
     }
 
-    public List<MCRCondition> getChildren() {
+    public List<MCRCondition<T>> getChildren() {
         return children;
     }
 
@@ -79,25 +78,11 @@ public abstract class MCRSetCondition implements MCRCondition {
 
     public Element toXML() {
         Element cond = new Element("boolean").setAttribute("operator", operator);
-        for (MCRCondition child : children) {
+        for (MCRCondition<T> child : children) {
             cond.addContent(child.toXML());
         }
         return cond;
     }
 
-    public Element info() {
-        Element el = new Element("info");
-        el.setAttribute(new Attribute("type", operator));
-        el.setAttribute(new Attribute("children", "" + children.size()));
-        return el;
-    }
-
-    public void accept(MCRConditionVisitor visitor) {
-        visitor.visitType(info());
-        for (MCRCondition child : children) {
-            child.accept(visitor);
-        }
-    }
-
-    public abstract boolean evaluate(Object o);
+    public abstract boolean evaluate(T o);
 }

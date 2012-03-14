@@ -27,17 +27,15 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.jdom.Attribute;
 import org.jdom.Element;
 import org.mycore.parsers.bool.MCRCondition;
-import org.mycore.parsers.bool.MCRConditionVisitor;
 
 /**
  * Implementation of a (date &gt; xy) clause
  * 
  * @author Matthias Kramm
  */
-class MCRDateAfterClause implements MCRCondition {
+class MCRDateAfterClause implements MCRCondition<MCRAccessData> {
     private Date date;
 
     private DateFormat dateformat = new SimpleDateFormat("dd.MM.yyyy");
@@ -46,9 +44,7 @@ class MCRDateAfterClause implements MCRCondition {
         this.date = date;
     }
 
-    public boolean evaluate(Object o) {
-        MCRAccessData data = (MCRAccessData) o;
-
+    public boolean evaluate(MCRAccessData data) {
         return data.getDate().after(date);
     }
 
@@ -65,13 +61,4 @@ class MCRDateAfterClause implements MCRCondition {
         return cond;
     }
 
-    public Element info() {
-        Element el = new Element("info");
-        el.setAttribute(new Attribute("type", "DATE"));
-        return el;
-    }
-
-    public void accept(MCRConditionVisitor visitor) {
-        visitor.visitType(info());
-    }
 };

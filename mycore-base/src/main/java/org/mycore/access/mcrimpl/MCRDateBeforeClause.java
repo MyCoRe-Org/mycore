@@ -27,17 +27,15 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.jdom.Attribute;
 import org.jdom.Element;
 import org.mycore.parsers.bool.MCRCondition;
-import org.mycore.parsers.bool.MCRConditionVisitor;
 
 /**
  * Implementation of a (date &lt; x) clause
  * 
  * @author Matthias Kramm
  */
-class MCRDateBeforeClause implements MCRCondition {
+class MCRDateBeforeClause implements MCRCondition<MCRAccessData> {
     private Date date;
 
     private DateFormat dateformat = new SimpleDateFormat("dd.MM.yyyy");
@@ -46,9 +44,7 @@ class MCRDateBeforeClause implements MCRCondition {
         this.date = date;
     }
 
-    public boolean evaluate(Object o) {
-        MCRAccessData data = (MCRAccessData) o;
-
+    public boolean evaluate(MCRAccessData data) {
         return data.getDate().before(date);
     }
 
@@ -63,14 +59,5 @@ class MCRDateBeforeClause implements MCRCondition {
         cond.setAttribute("operator", "<");
         cond.setAttribute("value", dateformat.format(date));
         return cond;
-    }
-
-    public Element info() {
-        Element el = new Element("info");
-        el.setAttribute(new Attribute("type", "DATE"));
-        return el;
-    }
-
-    public void accept(MCRConditionVisitor visitor) { /* TODO */
     }
 };

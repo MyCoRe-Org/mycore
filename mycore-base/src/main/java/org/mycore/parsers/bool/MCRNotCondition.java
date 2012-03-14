@@ -23,20 +23,19 @@
 
 package org.mycore.parsers.bool;
 
-import org.jdom.Attribute;
 import org.jdom.Element;
 
 /**
  * @author Frank Lützenkirchen
  */
-public class MCRNotCondition implements MCRCondition {
-    private MCRCondition child;
+public class MCRNotCondition<T> implements MCRCondition<T> {
+    private MCRCondition<T> child;
 
-    public MCRNotCondition(MCRCondition child) {
+    public MCRNotCondition(MCRCondition<T> child) {
         this.child = child;
     }
 
-    public MCRCondition getChild() {
+    public MCRCondition<T> getChild() {
         return child;
     }
 
@@ -45,7 +44,7 @@ public class MCRNotCondition implements MCRCondition {
         return "not (" + child + ")";
     }
 
-    public boolean evaluate(Object o) {
+    public boolean evaluate(T o) {
         return !child.evaluate(o);
     }
 
@@ -54,18 +53,5 @@ public class MCRNotCondition implements MCRCondition {
         not.setAttribute("operator", "not");
         not.addContent(child.toXML());
         return not;
-    }
-
-    public Element info() {
-        Element el = new Element("info");
-        el.setAttribute(new Attribute("type", "not"));
-        el.setAttribute(new Attribute("children", "1"));
-
-        return el;
-    }
-
-    public void accept(MCRConditionVisitor visitor) {
-        visitor.visitType(info());
-        child.accept(visitor);
     }
 }

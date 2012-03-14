@@ -23,10 +23,8 @@
 
 package org.mycore.access.mcrimpl;
 
-import org.jdom.Attribute;
 import org.jdom.Element;
 import org.mycore.parsers.bool.MCRCondition;
-import org.mycore.parsers.bool.MCRConditionVisitor;
 import org.mycore.parsers.bool.MCRParseException;
 
 /**
@@ -34,7 +32,7 @@ import org.mycore.parsers.bool.MCRParseException;
  * 
  * @author Matthias Kramm
  */
-class MCRIPClause implements MCRCondition {
+class MCRIPClause implements MCRCondition<MCRAccessData> {
     private MCRIPAddress ip;
 
     MCRIPClause(String ip) throws MCRParseException {
@@ -45,8 +43,7 @@ class MCRIPClause implements MCRCondition {
         }
     }
 
-    public boolean evaluate(Object o) {
-        MCRAccessData data = (MCRAccessData) o;
+    public boolean evaluate(MCRAccessData data) {
         return data.getIp() != null && ip.contains(data.getIp());
     }
 
@@ -61,15 +58,5 @@ class MCRIPClause implements MCRCondition {
         cond.setAttribute("operator", "=");
         cond.setAttribute("value", ip.toString());
         return cond;
-    }
-
-    public Element info() {
-        Element el = new Element("info");
-        el.setAttribute(new Attribute("type", "IP"));
-        return el;
-    }
-
-    public void accept(MCRConditionVisitor visitor) {
-        visitor.visitType(info());
     }
 };

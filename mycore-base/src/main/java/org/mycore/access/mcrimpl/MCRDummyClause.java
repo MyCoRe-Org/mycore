@@ -25,14 +25,13 @@ package org.mycore.access.mcrimpl;
 
 import org.jdom.Element;
 import org.mycore.parsers.bool.MCRCondition;
-import org.mycore.parsers.bool.MCRConditionVisitor;
 
 /**
  * Implementation of a dummy clause (useful for debugging)
  * 
  * @author Matthias Kramm
  */
-class MCRDummyClause implements MCRCondition {
+class MCRDummyClause implements MCRCondition<Object> {
     private String s;
 
     MCRDummyClause(String s) {
@@ -40,8 +39,6 @@ class MCRDummyClause implements MCRCondition {
     }
 
     public boolean evaluate(Object o) {
-        //MCRAccessData data = (MCRAccessData) o;
-
         return false;
     }
 
@@ -52,12 +49,5 @@ class MCRDummyClause implements MCRCondition {
 
     public Element toXML() {
         return null; /* TODO */
-    }
-
-    public Element info() {
-        return null; /* TODO */
-    }
-
-    public void accept(MCRConditionVisitor visitor) { /* TODO */
     }
 };

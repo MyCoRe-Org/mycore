@@ -3,10 +3,9 @@ package org.mycore.importer.mapping.condition;
 import org.jdom.Element;
 import org.mycore.importer.mapping.resolver.MCRImportFieldValueResolver;
 import org.mycore.parsers.bool.MCRCondition;
-import org.mycore.parsers.bool.MCRConditionVisitor;
 import org.mycore.parsers.bool.MCRParseException;
 
-public class MCRImportCondition implements MCRCondition {
+public class MCRImportCondition implements MCRCondition<MCRImportFieldValueResolver> {
 
     private String value1;
     private String operator;
@@ -19,13 +18,7 @@ public class MCRImportCondition implements MCRCondition {
     }
 
     @Override
-    public void accept(MCRConditionVisitor visitor) {
-        visitor.visitQuery(this);
-    }
-
-    @Override
-    public boolean evaluate(Object o) {
-        MCRImportFieldValueResolver res = (MCRImportFieldValueResolver)o;
+    public boolean evaluate(MCRImportFieldValueResolver res) {
         String resValue1 = res.resolveFields(this.value1);
         String resValue2 = res.resolveFields(this.value2);
         return compare(resValue1, resValue2);
@@ -53,10 +46,6 @@ public class MCRImportCondition implements MCRCondition {
         throw new MCRParseException("Not a valid operator '" + operator + "'!");
     }
 
-    @Override
-    public Element info() {
-        return toXML();
-    }
     @Override
     public Element toXML() {
         Element condition = new Element("condition");

@@ -23,18 +23,16 @@
 
 package org.mycore.access.mcrimpl;
 
-import org.jdom.Attribute;
 import org.jdom.Element;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.parsers.bool.MCRCondition;
-import org.mycore.parsers.bool.MCRConditionVisitor;
 
 /**
  * Implementation of a (user xy) clause
  * 
  * @author Matthias Kramm
  */
-class MCRUserClause implements MCRCondition {
+class MCRUserClause implements MCRCondition<Object> {
     private String user;
 
     private boolean not;
@@ -59,15 +57,5 @@ class MCRUserClause implements MCRCondition {
         cond.setAttribute("operator", (not ? "!=" : "="));
         cond.setAttribute("value", user);
         return cond;
-    }
-
-    public Element info() {
-        Element el = new Element("info");
-        el.setAttribute(new Attribute("type", "USER"));
-        return el;
-    }
-
-    public void accept(MCRConditionVisitor visitor) {
-        visitor.visitType(info());
     }
 };

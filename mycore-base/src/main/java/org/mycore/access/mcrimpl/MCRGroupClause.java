@@ -23,11 +23,9 @@
 
 package org.mycore.access.mcrimpl;
 
-import org.jdom.Attribute;
 import org.jdom.Element;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.parsers.bool.MCRCondition;
-import org.mycore.parsers.bool.MCRConditionVisitor;
 
 /**
  * Implementation of a (group xy) clause
@@ -35,7 +33,7 @@ import org.mycore.parsers.bool.MCRConditionVisitor;
  * @author Matthias Kramm
  * @author Mathias Fricke
  */
-class MCRGroupClause implements MCRCondition {
+class MCRGroupClause implements MCRCondition<Object> {
 
     private String groupname;
 
@@ -61,15 +59,5 @@ class MCRGroupClause implements MCRCondition {
         cond.setAttribute("operator", (not ? "!=" : "="));
         cond.setAttribute("value", groupname);
         return cond;
-    }
-
-    public Element info() {
-        Element el = new Element("info");
-        el.setAttribute(new Attribute("type", "GROUP"));
-        return el;
-    }
-
-    public void accept(MCRConditionVisitor visitor) {
-        visitor.visitType(info());
     }
 };
