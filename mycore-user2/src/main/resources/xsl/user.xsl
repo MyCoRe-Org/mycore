@@ -191,7 +191,7 @@
             <xsl:value-of select="i18n:translate('component.user2.admin.owner')" />
           </th>
           <td>
-            <xsl:apply-templates select="owner/user" mode="link" />
+            <xsl:apply-templates select="owner" mode="link" />
             <xsl:if test="count(owner)=0">
               <xsl:value-of select="i18n:translate('component.user2.admin.userIndependent')" />
             </xsl:if>
@@ -221,14 +221,19 @@
             <xsl:value-of select="i18n:translate('component.user2.admin.userOwns')" />
           </th>
           <td>
-            <xsl:apply-templates select="$owns/user" mode="link" />
+            <xsl:for-each select="$owns/user">
+              <xsl:apply-templates select="." mode="link" />
+              <xsl:if test="position() != last()">
+                <br />
+              </xsl:if>
+            </xsl:for-each>
           </td>
         </tr>
       </table>
     </div>
   </xsl:template>
 
-  <xsl:template match="user" mode="link">
+  <xsl:template match="user|owner" mode="link">
     <xsl:variable name="uid">
       <xsl:value-of select="@name" />
       <xsl:if test="not ( @realm = 'local' )">
@@ -239,12 +244,9 @@
     <a href="MCRUserServlet?action=show&amp;id={$uid}">
       <xsl:apply-templates select="." mode="name" />
     </a>
-    <xsl:if test="position() != last()">
-      <br />
-    </xsl:if>
   </xsl:template>
 
-  <xsl:template match="user" mode="name">
+  <xsl:template match="user|owner" mode="name">
     <xsl:value-of select="@name" />
     <xsl:text> [</xsl:text>
     <xsl:value-of select="@realm" />
