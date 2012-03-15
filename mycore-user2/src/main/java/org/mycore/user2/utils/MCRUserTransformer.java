@@ -22,7 +22,6 @@
  */
 package org.mycore.user2.utils;
 
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -52,7 +51,18 @@ public abstract class MCRUserTransformer {
         try {
             return JAXBContext.newInstance(MCRUser.class.getPackage().getName());
         } catch (JAXBException e) {
-            throw new MCRException(e);
+            throw new MCRException("Could not instantiate JAXBContext.", e);
+        }
+    }
+
+    private static Document getDocument(MCRUser user) {
+        try {
+            Marshaller marshaller = JAXB_CONTEXT.createMarshaller();
+            JDOMResult result = new JDOMResult();
+            marshaller.marshal(user, result);
+            return result.getDocument();
+        } catch (JAXBException e) {
+            throw new MCRException("Exception while transforming MCRUser " + user.getUserID() + " to JDOM document.", e);
         }
     }
 
@@ -61,14 +71,7 @@ public abstract class MCRUserTransformer {
      * This includes user ID, login name and realm.
      */
     public static Document buildBasicXML(MCRUser mcrUser) {
-        try {
-            Marshaller marshaller = JAXB_CONTEXT.createMarshaller();
-            JDOMResult result = new JDOMResult();
-            marshaller.marshal(mcrUser.getBasicCopy(), result);
-            return result.getDocument();
-        } catch (JAXBException e) {
-            throw new MCRException(e);
-        }
+        return getDocument(mcrUser.getBasicCopy());
     }
 
     /**
@@ -76,14 +79,7 @@ public abstract class MCRUserTransformer {
      * same as {@link #buildXML(MCRUser)} without owned users resolved
      */
     public static Document buildExportableSafeXML(MCRUser mcrUser) {
-        try {
-            Marshaller marshaller = JAXB_CONTEXT.createMarshaller();
-            JDOMResult result = new JDOMResult();
-            marshaller.marshal(mcrUser.getSafeCopy(), result);
-            return result.getDocument();
-        } catch (JAXBException e) {
-            throw new MCRException(e);
-        }
+        return getDocument(mcrUser.getSafeCopy());
     }
 
     /**
@@ -91,14 +87,7 @@ public abstract class MCRUserTransformer {
      * same as {@link #buildExportableSafeXML(MCRUser)} but with password info if available
      */
     public static Document buildExportableXML(MCRUser mcrUser) {
-        try {
-            Marshaller marshaller = JAXB_CONTEXT.createMarshaller();
-            JDOMResult result = new JDOMResult();
-            marshaller.marshal(mcrUser, result);
-            return result.getDocument();
-        } catch (JAXBException e) {
-            throw new MCRException(e);
-        }
+        return getDocument(mcrUser);
     }
 
     /**
