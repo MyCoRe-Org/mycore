@@ -120,7 +120,7 @@ final public class MCRMetaAddress extends MCRMetaDefault {
             elm.addContent(new Element("state").addContent(getState()));
         }
         if (getZipCode() != null) {
-            elm.addContent(new Element("zipCode").addContent(getZipCode()));
+            elm.addContent(new Element("zipcode").addContent(getZipCode()));
         }
         if (getCity() != null) {
             elm.addContent(new Element("city").addContent(getCity()));
@@ -243,7 +243,7 @@ final public class MCRMetaAddress extends MCRMetaDefault {
         super.setFromDOM(element);
         country = element.getChildTextTrim("country");
         state = element.getChildTextTrim("state");
-        zipCode = element.getChildTextTrim("zipCode");
+        zipCode = element.getChildTextTrim("zipcode");
         city = element.getChildTextTrim("city");
         street = element.getChildTextTrim("street");
         number = element.getChildTextTrim("number");
