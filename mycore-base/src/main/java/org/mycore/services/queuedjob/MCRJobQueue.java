@@ -289,7 +289,6 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
             qStr.append(" AND job.parameters['" + paramKey + "'] = '" + params.get(paramKey) + "'");
         }
 
-
         Query query = session.createQuery(qStr.toString());
         query.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
         MCRJob job = (MCRJob) query.uniqueResult();
