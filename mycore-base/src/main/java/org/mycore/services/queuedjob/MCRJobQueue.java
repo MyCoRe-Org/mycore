@@ -76,7 +76,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
             waitTime = MCRConfiguration.instance().getInt(CONFIG_PREFIX + CONFIG_PREFIX_ADD + "TimeTillReset", waitTime);
         }
         waitTime = waitTime * 60;
-        
+
         StalledJobScheduler = Executors.newSingleThreadScheduledExecutor();
         StalledJobScheduler.scheduleAtFixedRate(MCRStalledJobResetter.getInstance(this.action), waitTime, waitTime, TimeUnit.SECONDS);
         preFetch = new ConcurrentLinkedQueue<MCRJob>();
@@ -293,8 +293,9 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         query.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
         MCRJob job = (MCRJob) query.uniqueResult();
 
-        if (job == null)
+        if (job == null) {
             return null;
+        }
 
         clearPreFetch();
         return job;
@@ -376,7 +377,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
         boolean autostart = MCRConfiguration.instance().getBoolean(CONFIG_PREFIX + "autostart", true);
         autostart = MCRConfiguration.instance().getBoolean(CONFIG_PREFIX + CONFIG_PREFIX_ADD + "autostart", autostart);
-        
+
         if (autostart)
             MCRJobMaster.startMasterThread(action);
     }
