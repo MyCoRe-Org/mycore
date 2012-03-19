@@ -288,13 +288,13 @@ public class MCREditorServlet extends MCRServlet {
         logger.debug("Editor: process submit");
 
         String sessionID = parms.getParameter("_session");
-        Element editor = MCREditorSessionCache.instance().getEditorSession(sessionID).getXML();
-
-        if (editor == null) {
+        MCREditorSession editorSession = MCREditorSessionCache.instance().getEditorSession(sessionID);
+        if (editorSession == null) {
             logger.error("No editor for session <" + sessionID + ">");
             throw new ServletException("invalid session");
         }
 
+        Element editor = editorSession.getXML();
         String button = null;
 
         for (Enumeration e = parms.getParameterNames(); e.hasMoreElements();) {
