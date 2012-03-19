@@ -32,7 +32,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Transaction;
 import org.jdom.Element;
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -129,12 +131,19 @@ public class MCROAISetManager {
                 MCRSession session = MCRSessionMgr.getCurrentSession();//create a new session for this thread
                 MCRSessionMgr.setCurrentSession(session);//store session in this thread
                 session.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
+                Transaction transaction = MCRHIBConnection.instance().getSession().beginTransaction();
                 try {
                     LOGGER.info("update oai set list");
                     synchronized (cachedSetList) {
                         cachedSetList = createSetList();
                     }
                 } finally {
+                    try {
+                        transaction.commit();
+                    } catch(Exception exc) {
+                        LOGGER.error("Error occured while retrieving oai set list", exc);
+                        transaction.rollback();
+                    }
                     MCRSessionMgr.releaseCurrentSession();//release so this session is not returned by getCurrentSession
                     session.close();//no further need for this session
                 }
