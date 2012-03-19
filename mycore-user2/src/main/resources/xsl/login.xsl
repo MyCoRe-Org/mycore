@@ -24,8 +24,8 @@
 |
 | The XML stream is sent to the Layout Servlet and finally handled by this stylesheet.
 |
-| Authors: Detlev Degenhardt, Thomas Scheffler
-| Last changes: 2004-03-08
+| Authors: Detlev Degenhardt, Thomas Scheffler, Kathleen Neumann
+| Last changes: 2012-03-16
 + -->
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -67,67 +67,52 @@
   </xsl:template>
 
   <xsl:template match="login" mode="userAction">
-    <form action="{$ServletsBaseURL}MCRLoginServlet{$HttpSession}" method="post">
+    <form action="{$ServletsBaseURL}MCRLoginServlet{$HttpSession}" method="post" class="yform"  id="login_form">
       <input type="hidden" name="action" value="login" />
       <input type="hidden" name="url" value="{returnURL}" />
-      <table>
+      <fieldset>
         <!-- Here come the input fields... -->
         <xsl:choose>
           <xsl:when test="$direction = 'rtl' ">
-            <tr>
-              <td class="inputField-rtl">
-                <input name="uid" type="text" maxlength="30" />
-              </td>
-              <td class="inputCaption-rtl">
-                <xsl:value-of select="concat(i18n:translate('component.user2.login.form.userName'),' ')" />
-              </td>
-            </tr>
-            <tr height="5px" />
-            <tr>
-              <td class="inputField-rtl">
-                <input name="pwd" type="password" maxlength="30" />
-              </td>
-              <td class="inputCaption-rtl">
-                <xsl:value-of select="concat(i18n:translate('component.user2.login.form.password'),' ')" />
-              </td>
-            </tr>
+            <div class="type-text">
+              <input type="text" name="uid" id="user" size="20"/>
+              <label for="user"><xsl:value-of select="concat(i18n:translate('component.user2.login.form.userName'),' ')" /></label>
+            </div>
+            <div class="type-text">
+              <input type="password" name="pwd" id="password" size="20"/>
+              <label for="password"><xsl:value-of select="concat(i18n:translate('component.user2.login.form.password'),' ')" /></label>
+            </div>
           </xsl:when>
           <xsl:otherwise>
-            <tr>
-              <td class="inputCaption">
-                <xsl:value-of select="concat(i18n:translate('component.user2.login.form.userName'),' :')" />
-              </td>
-              <td class="inputField">
-                <input name="uid" type="text" maxlength="30" />
-              </td>
-            </tr>
-            <tr height="5px" />
-            <tr>
-              <td class="inputCaption">
-                <xsl:value-of select="concat(i18n:translate('component.user2.login.form.password'),' :')" />
-              </td>
-              <td class="inputField">
-                <input name="pwd" type="password" maxlength="30" />
-              </td>
-            </tr>
+            <div class="type-text">
+              <label for="user"><xsl:value-of select="concat(i18n:translate('component.user2.login.form.userName'),' :')" /></label>
+              <input type="text" name="uid" id="user" size="20"/>
+            </div>
+            <div class="type-text">
+              <label for="password"><xsl:value-of select="concat(i18n:translate('component.user2.login.form.password'),' :')" /></label>
+              <input type="password" name="pwd" id="password" size="20"/>
+            </div>
           </xsl:otherwise>
         </xsl:choose>
-
-      </table>
-      <xsl:choose>
-        <xsl:when test="$direction = 'rtl' ">
-          <input class="button-rtl" onClick="self.location.href='{$ServletsBaseURL}MCRLoginServlet{$HttpSession}?action=cancel'" type="button"
-            tabindex="999" value="{i18n:translate('component.user2.button.cancel')}" />
-          <xsl:value-of select="' '" />
-          <input class="button-rtl" type="submit" value="{i18n:translate('component.user2.button.login')}" name="LoginSubmit" />
-        </xsl:when>
-        <xsl:otherwise>
-          <input class="button" type="submit" value="{i18n:translate('component.user2.button.login')}" name="LoginSubmit" />
-          <xsl:value-of select="' '" />
-          <input class="button" onClick="self.location.href='{returnURL}'" type="button"
-            tabindex="999" value="{i18n:translate('component.user2.button.cancel')}" />
-        </xsl:otherwise>
-      </xsl:choose>
+        <xsl:choose>
+          <xsl:when test="$direction = 'rtl' ">
+            <div class="type-button">
+              <input id="cancel" onClick="self.location.href='{$ServletsBaseURL}MCRLoginServlet{$HttpSession}?action=cancel'" type="button"
+                tabindex="999" value="{i18n:translate('component.user2.button.cancel')}" />
+              <xsl:value-of select="' '" />
+              <input id="submit" type="submit" value="{i18n:translate('component.user2.button.login')}" name="LoginSubmit" />
+            </div>
+          </xsl:when>
+          <xsl:otherwise>
+            <div class="type-button">
+              <input id="submit" type="submit" value="{i18n:translate('component.user2.button.login')}" name="LoginSubmit" />
+              <xsl:value-of select="' '" />
+              <input id="cancel" onClick="self.location.href='{returnURL}'" type="button"
+                tabindex="999" value="{i18n:translate('component.user2.button.cancel')}" />
+            </div>
+          </xsl:otherwise>
+        </xsl:choose>
+      </fieldset>
     </form>
   </xsl:template>
 
