@@ -215,4 +215,9 @@ public class MCRClassificationBrowser2 extends MCRServlet {
 
         MCRServlet.getLayoutService().doLayout(req, job.getResponse(), new MCRJDOMContent(xml));
     }
+
+    @Override
+    protected boolean allowCrossDomainRequests() {
+        return true;
+    }
 }
