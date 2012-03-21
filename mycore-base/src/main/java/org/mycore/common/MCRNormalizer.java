@@ -142,12 +142,12 @@ public class MCRNormalizer {
      */
     public static final String normalizeString(String in) {
     	
-        if (in == null || in.trim().length() == 0) {
-            return "";
+        if (!normalize) {
+            return in;
         }
         
-        if (!normalize) {
-        	return in;
+        if (in == null || in.trim().length() == 0) {
+            return "";
         }
         
         String temp = in;
