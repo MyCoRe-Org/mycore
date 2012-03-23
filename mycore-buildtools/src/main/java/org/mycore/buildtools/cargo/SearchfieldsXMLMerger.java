@@ -22,7 +22,10 @@
  */
 package org.mycore.buildtools.cargo;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -32,6 +35,9 @@ import org.codehaus.cargo.module.merge.MergeProcessor;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 
 /**
  * This class implements a merger for MyCoRe's searchfields.xml.
@@ -57,7 +63,15 @@ public class SearchfieldsXMLMerger implements MergeProcessor {
 	 * adds another searchfield.xml as org.jdom.Document
 	 */
 	public void addMergeItem(Object o) throws MergeException {
-		searchfieldFileList.add((Document) o);
+		ByteArrayInputStream bais = (ByteArrayInputStream)o;
+		SAXBuilder sb = new SAXBuilder();
+		try{
+			Document doc = sb.build(new InputStreamReader(bais, "UTF-8"));
+			searchfieldFileList.add(doc);
+		}
+		catch(Exception e){
+			
+		}
 	}
 
 	@Override
@@ -92,7 +106,12 @@ public class SearchfieldsXMLMerger implements MergeProcessor {
 				Document deltaDoc = searchfieldFileList.get(i);
 				mergeSearchfields(returnDoc, deltaDoc);
 			}
-			return returnDoc;
+			XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
+			StringWriter sw = new StringWriter();
+			xout.output(returnDoc, sw);
+			String s = sw.toString();
+			ByteArrayInputStream bais = new ByteArrayInputStream(s.getBytes("UTF-8"));
+			return bais;
 		} catch (Exception e) {
 			return null;
 		}
