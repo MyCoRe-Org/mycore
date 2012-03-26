@@ -39,6 +39,15 @@ import org.jdom.Element;
  * (http://cargo.codehaus.org/Maven2+plugin)
  * where different WAR files are merged together.
  * 
+ * <br/>
+ * Use the following configuration in merge.xml:
+ * <br/>
+ * <br/>&lt;merge&gt;
+ * <br/>&nbsp;&nbsp; &lt;document&gt;WEB-INF/classes/searchfields.xml&lt;/document&gt;
+ * <br/>&nbsp;&nbsp; &lt;classname&gt;org.mycore.buildtools.cargo.SearchfieldsXMLMerger&lt;/classname&gt;
+ * <br/>&lt;/merge&gt;
+ * 
+ * 
  * @see MergeProcessor
  * 
  * @author Robert Stephan
