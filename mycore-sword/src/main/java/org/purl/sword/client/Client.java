@@ -36,31 +36,38 @@
  */
 package org.purl.sword.client;
 
-import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
-
 import java.util.Properties;
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
-import org.apache.commons.httpclient.methods.PostMethod;
+
+import org.apache.http.HttpHost;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.AuthCache;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.client.utils.URIUtils;
+import org.apache.http.conn.params.ConnRoutePNames;
+import org.apache.http.conn.params.ConnRouteParams;
+import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.impl.auth.BasicScheme;
+import org.apache.http.impl.client.BasicAuthCache;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.purl.sword.base.ChecksumUtils;
 import org.purl.sword.base.DepositResponse;
 import org.purl.sword.base.HttpHeaders;
-import org.purl.sword.base.SWORDErrorDocument;
 import org.purl.sword.base.ServiceDocument;
 import org.purl.sword.base.SwordValidationInfo;
 import org.purl.sword.base.UnmarshallException;
@@ -111,7 +118,7 @@ public class Client implements SWORDClient {
 	/**
 	 * The client that is used to send data to the specified server.
 	 */
-	private HttpClient client;
+	private DefaultHttpClient client;
 
 	/**
 	 * The default connection timeout. This can be modified by using the
@@ -128,11 +135,15 @@ public class Client implements SWORDClient {
 	 * Create a new Client. The client will not use authentication by default.
 	 */
 	public Client() {
-		client = new HttpClient();
+		client = new DefaultHttpClient();
 		client.getParams().setParameter("http.socket.timeout",
 				new Integer(DEFAULT_TIMEOUT));
-		log.debug("proxy host: " + client.getHostConfiguration().getProxyHost());
-		log.debug("proxy port: " + client.getHostConfiguration().getProxyPort());
+		HttpHost proxy = (HttpHost) client.getParams().getParameter(ConnRoutePNames.DEFAULT_PROXY);
+		if (proxy != null) {
+		    
+		    log.debug("proxy host: " + proxy.getHostName());
+		    log.debug("proxy port: " + proxy.getPort());
+		}
         doAuthentication = false;
 	}
 
@@ -172,8 +183,8 @@ public class Client implements SWORDClient {
 	private void setBasicCredentials(String username, String password) {
 		log.debug("server: " + server + " port: " + port + " u: '" + username
 				+ "' p '" + password + "'");
-		client.getState().setCredentials(new AuthScope(server, port),
-				new UsernamePasswordCredentials(username, password));
+		client.getCredentialsProvider().setCredentials(new AuthScope(server, port),
+                new UsernamePasswordCredentials(username, password));
 	}
 
 	/**
@@ -199,21 +210,21 @@ public class Client implements SWORDClient {
 	 *            The port.
 	 */
 	public void setProxy(String host, int port) {
-		client.getHostConfiguration().setProxy(host, port);
+	    client.getParams().setParameter(ConnRouteParams.DEFAULT_PROXY, new HttpHost(host, port));
 	}
 
 	/**
 	 * Clear the proxy setting.
 	 */
 	public void clearProxy() {
-		client.getHostConfiguration().setProxyHost(null);
+	    client.getParams().removeParameter(ConnRouteParams.DEFAULT_PROXY);
 	}
 
 	/**
 	 * Clear any user credentials that have been set for this client.
 	 */
 	public void clearCredentials() {
-		client.getState().clearProxyCredentials();
+		client.setCredentialsProvider(new BasicCredentialsProvider());
 		doAuthentication = false;
 	}
 
@@ -280,40 +291,49 @@ public class Client implements SWORDClient {
 			}
 		}
 		
-		GetMethod httpget = new GetMethod(serviceDocURL.toExternalForm());
+		HttpGet httpget = new HttpGet(serviceDocURL.toExternalForm());
 		if (doAuthentication) {
 			// this does not perform any check on the username password. It
 			// relies on the server to determine if the values are correct.
+		    
 			setBasicCredentials(username, password);
-			httpget.setDoAuthentication(true);
+			// Create AuthCache instance
+            AuthCache authCache = new BasicAuthCache();
+            // Generate BASIC scheme object and add it to the local auth cache
+            HttpHost targetHost = URIUtils.extractHost(httpget.getURI());
+            BasicScheme basicAuth = new BasicScheme();
+            authCache.put(targetHost, basicAuth);
+
+            // Add AuthCache to the execution context
+            BasicHttpContext localcontext = new BasicHttpContext();
+            localcontext.setAttribute(ClientContext.AUTH_CACHE, authCache);
 		}
 
         Properties properties = new Properties();
 
 		if (containsValue(onBehalfOf)) {
 			log.debug("Setting on-behalf-of: " + onBehalfOf);
-			httpget.addRequestHeader(new Header(HttpHeaders.X_ON_BEHALF_OF,
-					onBehalfOf));
+			httpget.addHeader(HttpHeaders.X_ON_BEHALF_OF, onBehalfOf);
             properties.put(HttpHeaders.X_ON_BEHALF_OF, onBehalfOf);
 		}
 
 		if (containsValue(userAgent)) {
 			log.debug("Setting userAgent: " + userAgent);
-			httpget.addRequestHeader(new Header(HttpHeaders.USER_AGENT,
-					userAgent));
+			httpget.addHeader(HttpHeaders.USER_AGENT,
+					userAgent);
             properties.put(HttpHeaders.USER_AGENT, userAgent);
 		}
 
 		ServiceDocument doc = null;
 
 		try {
-			client.executeMethod(httpget);
+			HttpResponse httpResponse = client.execute(httpget);
 			// store the status code
-			status = new Status(httpget.getStatusCode(), httpget
-					.getStatusText());
+			StatusLine statusLine = httpResponse.getStatusLine();
+            status = new Status(statusLine.getStatusCode(), statusLine.getReasonPhrase());
 
 			if (status.getCode() == HttpStatus.SC_OK) {
-				String message = readResponse(httpget.getResponseBodyAsStream());
+				String message = EntityUtils.toString(httpResponse.getEntity());
 				log.debug("returned message is: " + message);
 				doc = new ServiceDocument();
 				lastUnmarshallInfo = doc.unmarshall(message, properties);
@@ -322,14 +342,10 @@ public class Client implements SWORDClient {
 						"Received error from service document request: "
 								+ status);
 			}
-		} catch (HttpException ex) {
-			throw new SWORDClientException(ex.getMessage(), ex);
 		} catch (IOException ioex) {
 			throw new SWORDClientException(ioex.getMessage(), ioex);
 		} catch (UnmarshallException uex) {
 			throw new SWORDClientException(uex.getMessage(), uex);
-		} finally {
-			httpget.releaseConnection();
 		}
 
 		return doc;
@@ -362,11 +378,22 @@ public class Client implements SWORDClient {
 			throw new SWORDClientException("Message cannot be null.");
 		}
 
-		PostMethod httppost = new PostMethod(message.getDestination());
-
+		HttpPost httppost = new HttpPost(message.getDestination());
+		BasicHttpContext localcontext = null;
+		
 		if (doAuthentication) {
 			setBasicCredentials(username, password);
-			httppost.setDoAuthentication(true);
+			
+			// Create AuthCache instance
+            AuthCache authCache = new BasicAuthCache();
+            // Generate BASIC scheme object and add it to the local auth cache
+            HttpHost targetHost = URIUtils.extractHost(httppost.getURI());
+            BasicScheme basicAuth = new BasicScheme();
+            authCache.put(targetHost, basicAuth);
+
+            // Add AuthCache to the execution context
+            localcontext = new BasicHttpContext();
+            localcontext.setAttribute(ClientContext.AUTH_CACHE, authCache);
 		}
 
 		DepositResponse response = null;
@@ -382,76 +409,70 @@ public class Client implements SWORDClient {
 				}
 				log.debug("checksum error is: " + md5);
 				if (md5 != null) {
-					httppost.addRequestHeader(new Header(
-							HttpHeaders.CONTENT_MD5, md5));
+					httppost.addHeader(HttpHeaders.CONTENT_MD5, md5);
 				}
 			}
 
 			String filename = message.getFilename();
 			if (! "".equals(filename)) {
-				httppost.addRequestHeader(new Header(
-						HttpHeaders.CONTENT_DISPOSITION, " filename="
-								+ filename));
+				httppost.addHeader(HttpHeaders.CONTENT_DISPOSITION, " filename="
+								+ filename);
 			}
 
 			if (containsValue(message.getSlug())) {
-				httppost.addRequestHeader(new Header(HttpHeaders.SLUG, message
-						.getSlug()));
+				httppost.addHeader(HttpHeaders.SLUG, message
+						.getSlug());
 			}
 
             if(message.getCorruptRequest())
             {
                 // insert a header with an invalid boolean value
-                httppost.addRequestHeader(new Header(HttpHeaders.X_NO_OP, "Wibble"));
+                httppost.addHeader(HttpHeaders.X_NO_OP, "Wibble");
             }else{
-                httppost.addRequestHeader(new Header(HttpHeaders.X_NO_OP, Boolean
-					.toString(message.isNoOp())));
+                httppost.addHeader(HttpHeaders.X_NO_OP, Boolean
+					.toString(message.isNoOp()));
             }
-			httppost.addRequestHeader(new Header(HttpHeaders.X_VERBOSE, Boolean
-					.toString(message.isVerbose())));
+			httppost.addHeader(HttpHeaders.X_VERBOSE, Boolean
+					.toString(message.isVerbose()));
 
 			String packaging = message.getPackaging();
 			if (packaging != null && packaging.length() > 0) {
-				httppost.addRequestHeader(new Header(
-						HttpHeaders.X_PACKAGING, packaging));
+				httppost.addHeader(HttpHeaders.X_PACKAGING, packaging);
 			}
 
 			String onBehalfOf = message.getOnBehalfOf();
 			if (containsValue(onBehalfOf)) {
-				httppost.addRequestHeader(new Header(
-						HttpHeaders.X_ON_BEHALF_OF, onBehalfOf));
+				httppost.addHeader(HttpHeaders.X_ON_BEHALF_OF, onBehalfOf);
 			}
 			
 			String userAgent = message.getUserAgent();
 			if (containsValue(userAgent)) {
-				httppost.addRequestHeader(new Header(
-						HttpHeaders.USER_AGENT, userAgent));
+				httppost.addHeader(HttpHeaders.USER_AGENT, userAgent);
 			}
 
-			stream = new FileInputStream(message.getFilepath());
+			File file = new File(message.getFilepath());
+			stream = new FileInputStream(file);
 
-			InputStreamRequestEntity requestEntity = new InputStreamRequestEntity(
-					stream, message.getFiletype());
-			httppost.setRequestEntity(requestEntity);
+			InputStreamEntity requestEntity = new InputStreamEntity(stream, file.length());
+			httppost.setEntity(requestEntity);
 
-			client.executeMethod(httppost);
-			status = new Status(httppost.getStatusCode(), httppost
-					.getStatusText());
+			HttpResponse httpresponse = localcontext != null ? client.execute(httppost, localcontext) : client.execute(httppost);
+			
+			StatusLine statusLine = httpresponse.getStatusLine();
+            status = new Status(statusLine.getStatusCode(), statusLine.getReasonPhrase());
 
 			log.info("Checking the status code: " + status.getCode());
 
 			if (status.getCode() == HttpStatus.SC_ACCEPTED
 					|| status.getCode() == HttpStatus.SC_CREATED) {
-				messageBody = readResponse(httppost
-						.getResponseBodyAsStream());
-				response = new DepositResponse(status.getCode()); 
-				response.setLocation(httppost.getResponseHeader("Location").getValue());
+				messageBody = EntityUtils.toString(httpresponse.getEntity());
+				response = new DepositResponse(status.getCode());
+				response.setLocation(httpresponse.getLastHeader("Location").getValue());
 				// added call for the status code.
 				lastUnmarshallInfo = response.unmarshall(messageBody, new Properties());
             }
 			else {
-				messageBody = readResponse(httppost
-						.getResponseBodyAsStream());
+				messageBody = EntityUtils.toString(httpresponse.getEntity());
 				response = new DepositResponse(status.getCode());
 				response.unmarshallErrorDocument(messageBody);
 			}
@@ -460,14 +481,11 @@ public class Client implements SWORDClient {
 		} catch (NoSuchAlgorithmException nex) {
 			throw new SWORDClientException("Unable to use MD5. "
 					+ nex.getMessage(), nex);
-		} catch (HttpException ex) {
-			throw new SWORDClientException(ex.getMessage(), ex);
 		} catch (IOException ioex) {
 			throw new SWORDClientException(ioex.getMessage(), ioex);
 		} catch (UnmarshallException uex) {
 			throw new SWORDClientException(uex.getMessage() + "(<pre>" + messageBody + "</pre>)", uex);
 		} finally {
-			httppost.releaseConnection();
 
 			try {
 				if (stream != null) {
@@ -479,29 +497,6 @@ public class Client implements SWORDClient {
 			}
 		}
 
-	}
-
-	/**
-	 * Read a response from the stream and return it as a string.
-	 * 
-	 * @param stream
-	 *            The stream that contains the response.
-	 * @return The string extracted from the screen.
-	 * 
-	 * @throws UnsupportedEncodingException
-	 * @throws IOException
-	 */
-	private String readResponse(InputStream stream)
-			throws UnsupportedEncodingException, IOException {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(
-				stream, "UTF-8"));
-		String line = null;
-		StringBuffer buffer = new StringBuffer();
-		while ((line = reader.readLine()) != null) {
-			buffer.append(line);
-			buffer.append("\n");
-		}
-		return buffer.toString();
 	}
 
 	/**
