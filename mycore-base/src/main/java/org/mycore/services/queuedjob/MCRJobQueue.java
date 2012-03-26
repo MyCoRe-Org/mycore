@@ -39,6 +39,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.mycore.backend.hibernate.MCRHIBConnection;
@@ -289,11 +290,13 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         }
 
         Query query = session.createQuery(qStr.toString());
-        @SuppressWarnings("unchecked")
-        Iterator<MCRJob> results = query.iterate();
-        if (!results.hasNext())
+        query.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+        MCRJob job = (MCRJob) query.uniqueResult();
+
+        if (job == null) {
             return null;
-        MCRJob job = results.next();
+        }
+
         clearPreFetch();
         return job;
     }
