@@ -14,7 +14,7 @@
             $(this.childNodes).each(function() {
               if (this.nodeType == 3) {
                 // text node
-                var key = this.data.trim();
+                var key = $.trim(this.data);
                 if (key.length > 0) {
                   this.data = this.data.replace(key, i.translate(key));
                 }
