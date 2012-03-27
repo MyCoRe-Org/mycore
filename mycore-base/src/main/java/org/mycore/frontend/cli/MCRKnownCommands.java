@@ -19,6 +19,7 @@ package org.mycore.frontend.cli;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
@@ -56,7 +57,8 @@ public class MCRKnownCommands {
         commands.add(new MCRCommand("quit", "org.mycore.frontend.cli.MCRCommandLineInterface.exit", "Stop and exit the commandline tool."));
         commands.add(new MCRCommand("! {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.executeShellCommand String",
                 "Execute the shell command {0}, for example '! ls' or '! cmd /c dir'"));
-        commands.add(new MCRCommand("show file {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.show String", "Show contents of local file {0}"));
+        commands.add(new MCRCommand("show file {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.show String",
+                "Show contents of local file {0}"));
         commands.add(new MCRCommand("whoami", "org.mycore.frontend.cli.MCRCommandLineInterface.whoami", "Print the current user."));
         commands.add(new MCRCommand("show command statistics", "org.mycore.frontend.cli.MCRCommandStatistics.showCommandStatistics",
                 "Show statistics on number of commands processed and execution time needed per command"));
@@ -70,16 +72,20 @@ public class MCRKnownCommands {
 
     /** Read internal and/or external commands */
     private void initConfiguredCommands(String type) {
-        String propertyName = "MCR.CLI.Classes." + type;
-        String[] classNames = MCRConfiguration.instance().getString(propertyName, "").split(",");
+        String prefix = "MCR.CLI.Classes." + type;
+        Properties p = MCRConfiguration.instance().getProperties(prefix);
 
-        for (String className : classNames) {
-            className = className.trim();
-            if (className.isEmpty())
-                continue;
+        for (Object propertyName : p.keySet()) {
+            String[] classNames = MCRConfiguration.instance().getString((String) propertyName, "").split(",");
 
-            LOGGER.debug("Will load commands from the " + type.toLowerCase() + " class " + className);
-            addKnownCommandsFromClass(className);
+            for (String className : classNames) {
+                className = className.trim();
+                if (className.isEmpty())
+                    continue;
+
+                LOGGER.debug("Will load commands from the " + type.toLowerCase() + " class " + className);
+                addKnownCommandsFromClass(className);
+            }
         }
     }
 
@@ -113,7 +119,7 @@ public class MCRKnownCommands {
                 return commandsReturned;
             }
         }
-        
+
         MCRCommandLineInterface.output("Command not understood:" + command);
         MCRCommandLineInterface.output("Enter 'help' to get a list of commands.");
         return new ArrayList<String>();
