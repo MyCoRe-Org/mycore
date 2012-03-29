@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.security.MessageDigest;
@@ -399,10 +400,10 @@ public class MCRUtils {
                 if (bytesRead > 0) {
                     if (target != null) {
                         target.write(ba, 0 /* offset in ba */, bytesRead /*
-                                                                                                                  * bytes
-                                                                                                                  * to
-                                                                                                                  * write
-                                                                                                                  */);
+                                                                                                                   * bytes
+                                                                                                                   * to
+                                                                                                                   * write
+                                                                                                                   */);
                     }
                 } else {
                     break; // hit eof
@@ -457,10 +458,10 @@ public class MCRUtils {
                 if (charsRead > 0) {
                     if (target != null) {
                         target.write(ca, 0 /* offset in ba */, charsRead /*
-                                                                                                                  * bytes
-                                                                                                                  * to
-                                                                                                                  * write
-                                                                                                                  */);
+                                                                                                                   * bytes
+                                                                                                                   * to
+                                                                                                                   * write
+                                                                                                                   */);
                     }
                 } else {
                     break; // hit eof
@@ -915,6 +916,19 @@ public class MCRUtils {
             return null;
         }
         return value;
+    }
+
+    /**
+     * Transforms the given Element into a String
+     * 
+     * @return the xml element as {@link String}
+     * @throws IOException 
+     */
+    public static String asString(Element elm) throws IOException {
+        XMLOutputter op = new XMLOutputter(Format.getPrettyFormat());
+        StringWriter sw = new StringWriter();
+        op.output(elm, sw);
+        return sw.toString();
     }
 
     /**
