@@ -22,6 +22,7 @@
  */
 package org.mycore.oai.classmapping;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -29,6 +30,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.xpath.XPath;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -103,12 +105,12 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
             obj.getMetadata().removeMetadataElement("mappings");
         }
 
-        Element currentClassif = null;
+        Element currentClassElement = null;
         try {
-            List<Element> lClassif = xpathClassifications.selectNodes(obj.getMetadata().createXML());
+            List<Element> classList = xpathClassifications.selectNodes(obj.getMetadata().createXML());
             Document doc = new Document((Element) obj.getMetadata().createXML().detach());
-            lClassif = xpathClassifications.selectNodes(doc);
-            if (lClassif.size() > 0 && mappings == null) {
+            classList = xpathClassifications.selectNodes(doc);
+            if (classList.size() > 0 && mappings == null) {
                 mappings = new MCRMetaElement();
                 mappings.setTag("mappings");
                 mappings.setClass(MCRMetaClassification.class);
@@ -116,20 +118,26 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
                 mappings.setNotInherit(true);
                 obj.getMetadata().setMetadataElement(mappings);
             }
-            for (Element eClassif : lClassif) {
-                currentClassif = eClassif;
+            for (Element classElement : classList) {
+                currentClassElement = classElement;
                 MCRCategory categ = DAO.getCategory(
-                        new MCRCategoryID(eClassif.getAttributeValue("classid"), eClassif.getAttributeValue("categid")), 0);
+                        new MCRCategoryID(classElement.getAttributeValue("classid"), classElement.getAttributeValue("categid")), 0);
                 addMappings(mappings, categ);
             }
+        } catch (Exception je) {
+            if (currentClassElement == null) {
+                LOGGER.error("Error while finding classification elements", je);
+            } else {
+                try {
+                    LOGGER.error("Error while finding classification elements for " + MCRUtils.asString(currentClassElement), je);
+                } catch (IOException e) {
+                    LOGGER.error("Error while finding classification elements", je);
+                }
+            }
+        } finally {
             if (mappings == null || mappings.size() == 0) {
                 obj.getMetadata().removeMetadataElement("mappings");
             }
-        } catch (Exception je) {
-	    if(currentClassif==null)
-                LOGGER.error("Error while finding classification elements", je);
-	    else
-		LOGGER.error("Error while finding classification elements for "+currentClassif, je);
         }
     }
 
