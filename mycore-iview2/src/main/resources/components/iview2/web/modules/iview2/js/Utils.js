@@ -282,7 +282,7 @@ function preventDefault(e) {
 }
 
 function hideProperty(o,name,writeable){
-  if (typeof Object.defineProperty === 'function'){
+  if (typeof Object.defineProperty === 'function' && false){
     try {
       Object.defineProperty(o, name, {
         writable: (typeof writeable !== "undefined")? writeable : true,

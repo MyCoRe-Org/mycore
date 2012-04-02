@@ -1159,8 +1159,8 @@ iview.scrollbar.importScrollbars = function(viewer) {
 		barX.setProportion(viewer.viewerBean.width/currentImage.curWidth);
 		
 		// correctly represent the new view position
-		barX.setCurValue(-this.x);
-		barY.setCurValue(-this.y);
+		barX.setCurValue(-viewer.viewerBean.x);
+		barY.setCurValue(-viewer.viewerBean.y);
 		// set the new size of the scrollbar
 		barY.setSize(viewer.viewerBean.height);
 		barY.my.self[0].style.top = jQuery(viewer.viewerBean.viewer).offset().top + "px";

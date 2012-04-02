@@ -22,7 +22,7 @@
       Iview[derivateId] = [];
     }
     var returnValue = Iview[derivateId].push(iViewInst);
-    jQuery(document).trigger(iview.IViewInstance.INIT_EVENT,iViewInst);
+    jQuery(document).trigger(iview.IViewInstance.INIT_EVENT ,iViewInst);
     return returnValue;
   };
 
@@ -88,7 +88,7 @@
         }
       };// other components which are lowering the width and the height of the viewer width and height
       // uncomment this line to activate canvas mode
-      if (URL.getParam("iview2.canvas") == "true") {
+      if (iview.isCanvasAvailable) {
     	  this.canvas = new iview.Canvas(this);
       }
       jQuery(this.currentImage).bind(iview.CurrentImage.CHANGE_EVENT, function() {

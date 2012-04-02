@@ -320,39 +320,25 @@ PanoJS.prototype = {
 		if (typeof motion == 'undefined') {
 			motion = { 'x' : 0, 'y' : 0 };
 		}
-		var xMove = this.x - motion.x; 
-		var xViewerBorder = this.iview.currentImage.curWidth - this.width;
-		var yMove = this.y - motion.y; 
-		var yViewerBorder = this.iview.currentImage.curHeight - this.height;
 		
-		if(this.iview.currentImage.rotation == 90 || this.iview.currentImage.rotation == 270){
-			xViewerBorder = this.iview.currentImage.curHeight -this.iview.viewerBean.width;
-			yViewerBorder = this.iview.currentImage.curWidth - this.iview.viewerBean.height;
-		}
+		var xMove = this.iview.viewerBean.x - motion.x; 
+		var yMove = this.iview.viewerBean.y - motion.y; 
 		
-		if (xViewerBorder > 0) {//testen, ob das Bild überhaupt in der aktuellen Zoomstufe in die Richtung bewegt werden kann
-			if (xMove >  xViewerBorder && xViewerBorder > 0) { //max. Randbegrenzung
-				this.x = xViewerBorder;
-			} else if(xMove > 0) {//normal
-				this.x -= motion.x;
-			} else if(this.x < 0 || xMove < 0) {//min. Randbegrenzung
-				this.x = 0;
-			}
-		} else {
-			this.x = 0;
-		}
+		var viewerWidth   = this.iview.viewerBean.width;
+		var viewerHeight  = this.iview.viewerBean.height;
 		
-		if (yViewerBorder > 0) {
-			if (yMove > yViewerBorder && yViewerBorder > 0) {
-				this.y = yViewerBorder;
-			} else if (yMove > 0) {
-				this.y -= motion.y;
-			} else if (this.y < 0 || yMove < 0) {
-				this.y = 0;
-			}
-		} else {
-			this.y = 0;
-		}
+		var viewerPosX = this.iview.viewerBean.x;
+		var viewerPosY = this.iview.viewerBean.y;
+		
+		var imageWidth = this.iview.currentImage.curWidth;
+		var imageHeight = this.iview.currentImage.curHeight;
+		
+		xMove = Math.min(xMove, imageWidth - viewerWidth);
+		this.iview.viewerBean.x = Math.max(xMove, 0);
+       
+		yMove = Math.min(yMove, imageHeight - viewerHeight);
+		this.iview.viewerBean.y = Math.max(yMove, 0);
+		
 		
 		/*verschieben des Preload bildes damit man eine grobe Vorschau sieht von dem was kommt
 		  wird nur ausgeführt wenn Seite geladen ist, da ansonsten die Eigenschaften noch nicht vorhanden sind*/
@@ -364,7 +350,7 @@ PanoJS.prototype = {
 		
 		this.motion = motion;
 		this.updateScreen();
-		jQuery(this.viewer).trigger("move.viewer", {'x': this.x, 'y': this.y});
+		jQuery(this.viewer).trigger("move.viewer", {'x': this.iview.viewerBean.x, 'y': this.iview.viewerBean.y});
 	},
 	
 	updateScreen : function() {
@@ -738,7 +724,7 @@ PanoJS.prototype = {
 			var lastTileWidth = currentWidth - fullTileCount * this.iview.properties.tileSize;
 			this.iview.currentImage.zoomInfo.scale = viewerRatio; //determine the scaling ratio
 			level = this.iview.currentImage.zoomInfo.maxZoom - level;
-			this.tileSize = Math.floor((viewerSize - viewerRatio * lastTileWidth) / fullTileCount);
+			this.tileSize = Math.ceil((viewerSize - viewerRatio * lastTileWidth) / fullTileCount);
 			this.iview.currentImage.zoomInfo.zoomBack = this.zoomLevel;
 			this.zoom(level - this.zoomLevel);
 			return true;
@@ -754,12 +740,12 @@ PanoJS.prototype = {
 	resolveCoordinates : function(e) {
 		var currentImage = this.iview.currentImage;
 		
-		switch(currentImage.rotation){
-			case 0:				
+		//switch(currentImage.rotation){
+		//	case 0:				
 				return {
 					'x' : this.x + e.clientX - (document.documentElement.scrollLeft || document.body.scrollLeft),//relativ: e.clientX - this.context2D.canvas.offsetLeft
 					'y' : this.y + e.clientY - (document.documentElement.scrollTop || document.body.scrollTop)
-				}	
+				}	/*
 			case 90:
 				return {
 					'x' : this.x + e.clientY + (document.documentElement.scrollTop || document.body.scrollTop),
@@ -775,7 +761,7 @@ PanoJS.prototype = {
 					'x' : this.x - e.clientY - (document.documentElement.scrollTop || document.body.scrollTop),
 					'y' : this.y + e.clientX + (document.documentElement.scrollLeft || document.body.scrollLeft)
 				}
-		}
+		}*/
 	},
 
 	press : function(coords) {
