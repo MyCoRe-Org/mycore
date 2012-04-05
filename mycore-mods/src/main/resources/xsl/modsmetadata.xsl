@@ -457,6 +457,19 @@
     </tr>
   </xsl:template>
 
+  <xsl:template match="mods:identifier[@type='intern_old']" mode="present">
+    <xsl:if test="($CurrentUser!=$MCR.Users.Guestuser.UserName)">
+      <tr>
+        <td valign="top" class="metaname">
+          <xsl:value-of select="concat(i18n:translate(concat('metaData.mods.dictionary.identifier.',@type)),':')" />
+        </td>
+        <td class="metavalue">
+          <xsl:value-of select="." />
+        </td>
+      </tr>
+    </xsl:if>
+  </xsl:template>
+
   <xsl:template match="mods:identifier[@type='uri' or @type='doi']" mode="present">
     <tr>
       <td valign="top" class="metaname">
