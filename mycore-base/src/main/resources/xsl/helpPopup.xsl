@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ============================================== -->
 <!-- $Revision: 1.7 $ $Date: 2007-08-16 09:31:35 $ -->
@@ -34,7 +34,7 @@
             </xsl:for-each>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="i18n:translate('buttons.helpPopup.help')" />
+            <xsl:value-of select="i18n:translate('component.base.buttons.helpPopup.help')" />
           </xsl:otherwise>
         </xsl:choose>
       </title>
@@ -71,7 +71,7 @@
               <td align="left">
                 <input type="button" class="editorButton" onClick="window.close();" >
 	    		  <xsl:attribute name="value">
-                    <xsl:value-of select="i18n:translate('buttons.helpPopup.close')" />
+                    <xsl:value-of select="i18n:translate('component.base.buttons.helpPopup.close')" />
 	    		  </xsl:attribute>
 	    		</input>
               </td>
@@ -89,7 +89,7 @@
               <td align="right">
                 <input type="button" class="editorButton" onClick="window.close();" >
 	    		  <xsl:attribute name="value">
-                    <xsl:value-of select="i18n:translate('buttons.helpPopup.close')" />
+                    <xsl:value-of select="i18n:translate('component.base.buttons.helpPopup.close')" />
 	    		  </xsl:attribute>
 	    		</input>
               </td>
