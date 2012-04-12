@@ -193,12 +193,20 @@ public final class MCRObjectID {
         return getInstance(formatID(idParts[0], idParts[1], lastIDNumber));
     }
 
+    /**
+     * This method instantiate this class with a given identifier in MyCoRe schema.
+     * 
+     * @param id
+     *          the MCRObjectID
+     * @return an MCRObjectID class instance
+     * @exception MCRException if the given identifier is not valid
+     */
     public static MCRObjectID getInstance(String id) {
         return MCRObjectIDPool.getMCRObjectID(id);
     }
 
     public static void main(String[] a) {
-        MCRObjectID id = MCRObjectID.getInstance("Bluadash");
+        MCRObjectID.getInstance("Bluadash");
     }
 
     /**
@@ -314,8 +322,8 @@ public final class MCRObjectID {
      * </ul>
      * 
      * @param id
-     *            the MCRObjectId
-     * @return the validation value, true if the MCRObjectId is correct,
+     *            the MCRObjectID
+     * @return the validation value, true if the MCRObjectID is correct,
      *         otherwise return false
      */
     private final boolean setID(String id) {
@@ -359,6 +367,19 @@ public final class MCRObjectID {
         return true;
     }
 
+    /**
+     * This method check the given identifier of following rules:<br/>
+     * <ul>
+     * <li>the <em>id</em> is not NULL</li>
+     * <li>0 &gt; <em>length(id)</em> &lt; 64</li>
+     * <li>the <em>id</em> has not three parts</li>
+     * <li>the <em>id</em> has not a defined type via  MCR.Metadata.Type.<em>type</em> property</li>
+     * <li>The number part of the <em>id</em> is lower 0 or not a number</li>
+     * </ul>
+     * 
+     * @param id the given identifier
+     * @return true if all rules are complied
+     */
     public static boolean isValid(String id) {
         if (id == null) {
             return false;
