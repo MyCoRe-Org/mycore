@@ -135,24 +135,23 @@ public class MCROAISearchManager {
 
     public OAIDataList<Header> searchHeader(MetadataFormat format, Set set, Date from, Date until) {
         MCROAIResults oaiResults = search(format, set, from, until);
-        resultMap.put(oaiResults.getMCRResults().getID(), oaiResults);
+        resultMap.put(oaiResults.getId(), oaiResults);
         return getHeaderList(oaiResults, 0);
     }
 
     public OAIDataList<Record> searchRecord(MetadataFormat format, Set set, Date from, Date until) {
         MCROAIResults oaiResults = search(format, set, from, until);
-        resultMap.put(oaiResults.getMCRResults().getID(), oaiResults);
+        resultMap.put(oaiResults.getId(), oaiResults);
         return getRecordList(oaiResults, 0);
     }
 
     protected OAIDataList<Header> getHeaderList(MCROAIResults results, int cursor) {
         MetadataFormat metadataFormat = results.getMetadataFormat();
         OAIDataList<Header> headerList = new OAIDataList<Header>();
-        MCRResults mcrResults = results.getMCRResults();
-        int numHits = mcrResults.getNumHits();
+        int numHits = results.size();
         int max = Math.min(numHits, cursor + partitionSize);
         for (; cursor < max; cursor++) {
-            MCRHit hit = mcrResults.getHit(cursor);
+            MCRHit hit = results.getHit(cursor);
             Header header = this.objManager.getHeader(hit.getID(), metadataFormat);
             if (header != null) {
                 headerList.add(header);
@@ -165,11 +164,10 @@ public class MCROAISearchManager {
     protected OAIDataList<Record> getRecordList(MCROAIResults results, int cursor) {
         MetadataFormat metadataFormat = results.getMetadataFormat();
         OAIDataList<Record> recordList = new OAIDataList<Record>();
-        final MCRResults mcrResults = results.getMCRResults();
-        int numHits = mcrResults.getNumHits();
+        int numHits = results.size();
         int max = Math.min(numHits, cursor + partitionSize);
         for (; cursor < max; cursor++) {
-            MCRHit hit = mcrResults.getHit(cursor);
+            MCRHit hit = results.getHit(cursor);
             Record record = this.objManager.getRecord(hit.getID(), metadataFormat);
             if (record != null) {
                 recordList.add(record);
@@ -185,7 +183,7 @@ public class MCROAISearchManager {
             rsToken.setCompleteListSize(hits);
             rsToken.setCursor(cursor);
             rsToken.setExpirationDate(results.getExpirationDate());
-            rsToken.setToken(results.getMCRResults().getID() + TOKEN_DELIMITER + String.valueOf(cursor));
+            rsToken.setToken(results.getId() + TOKEN_DELIMITER + String.valueOf(cursor));
             dataList.setResumptionToken(rsToken);
         }
     }
@@ -214,18 +212,14 @@ public class MCROAISearchManager {
         // sort
         List<MCRSortBy> sortBy = buildSortByList();
         query.setSortBy(sortBy);
-        // search
         MCRResults queryResults = MCRQueryManager.search(query);
         // deleted records
-        MCRResults completeResults = searchDeleted(from, until);
-        if (completeResults.isReadonly()) {
-            completeResults = MCRResults.union(completeResults, queryResults);
-        } else {
-            completeResults.addHits(queryResults);
-        }
+        MCRResults deletedResults = searchDeleted(from, until);
         // create new MCROAIResults
         Date expirationDate = new Date(System.currentTimeMillis() + maxAge);
-        MCROAIResults oaiResults = new MCROAIResults(expirationDate, format, completeResults);
+        MCROAIResults oaiResults = new MCROAIResults(expirationDate, format);
+        oaiResults.getResults().add(queryResults);
+        oaiResults.getResults().add(deletedResults);
         return oaiResults;
     }
 

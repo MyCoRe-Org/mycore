@@ -1,8 +1,14 @@
 package org.mycore.oai;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Random;
 
 import org.mycore.oai.pmh.MetadataFormat;
+import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRResults;
 
 /**
@@ -10,18 +16,24 @@ import org.mycore.services.fieldquery.MCRResults;
  * 
  * @author Matthias Eichner
  */
-public class MCROAIResults {
+public class MCROAIResults implements Iterable<MCRHit> {
 
     protected Date expirationDate;
 
     protected MetadataFormat metadataFormat;
 
-    protected MCRResults results;
+    protected List<MCRResults> results;
 
-    public MCROAIResults(Date expirationDate, MetadataFormat format, MCRResults results) {
+    /** The unique ID of this result set */
+    protected String id;
+    
+    private static Random random = new Random(System.currentTimeMillis());
+    
+    public MCROAIResults(Date expirationDate, MetadataFormat format) {
         this.expirationDate = expirationDate;
         this.metadataFormat = format;
-        this.results = results;
+        this.results = new ArrayList<MCRResults>();
+        this.id = Long.toString(random.nextLong(), 36) + Long.toString(System.currentTimeMillis(), 36);
     }
 
     boolean isExpired() {
@@ -32,12 +44,70 @@ public class MCROAIResults {
         return metadataFormat;
     }
 
-    public MCRResults getMCRResults() {
+    public Date getExpirationDate() {
+        return expirationDate;
+    }
+
+    public List<MCRResults> getResults() {
         return results;
     }
 
-    public Date getExpirationDate() {
-        return expirationDate;
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public Iterator<MCRHit> iterator() {
+        return new MCROAIResultsIterator();
+    }
+
+    public MCRHit getHit(int i) throws IndexOutOfBoundsException {
+        int internalCursor = 0;
+        for(MCRResults r : results) {
+            int numHits = r.getNumHits();
+            if(i < numHits) {
+                return r.getHit(i - internalCursor);
+            }
+            internalCursor += numHits;
+        }
+        throw new IndexOutOfBoundsException();
+    }
+
+    public int size() {
+        int size = 0;
+        for(MCRResults r : results) {
+            size += r.getNumHits();
+        }
+        return size;
+    }
+
+    private class MCROAIResultsIterator implements Iterator<MCRHit> {
+
+        private int cursor;
+
+        public MCROAIResultsIterator() {
+            this.cursor = 0;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return this.cursor < size();
+        }
+
+        @Override
+        public MCRHit next() {
+            try {
+                return getHit(this.cursor++);
+            } catch(IndexOutOfBoundsException io) {
+                throw new NoSuchElementException();
+            }
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
     }
 
 }
