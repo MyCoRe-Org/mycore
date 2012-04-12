@@ -70,9 +70,9 @@ public class MCROAISearchManager {
 
     protected static Map<String, MCROAIResults> resultMap;
 
-    protected static int partitionSize;
-
     protected static int maxAge;
+
+    protected int partitionSize;
 
     protected MCRConfiguration config;
 
@@ -85,7 +85,6 @@ public class MCROAISearchManager {
     static {
         resultMap = new ConcurrentHashMap<String, MCROAIResults>();
         String prefix = MCROAIAdapter.PREFIX + "ResumptionTokens.";
-        partitionSize = MCRConfiguration.instance().getInt(prefix + "PartitionSize", 50);
         maxAge = MCRConfiguration.instance().getInt(prefix + "MaxAge", 30) * 60 * 1000;
 
         TimerTask tt = new TimerTask() {
@@ -107,10 +106,11 @@ public class MCROAISearchManager {
         this.config = MCRConfiguration.instance();
     }
 
-    public void init(String configPrefix, DeletedRecordPolicy deletedRecordPolicy, MCROAIObjectManager objManager) {
+    public void init(String configPrefix, DeletedRecordPolicy deletedRecordPolicy, MCROAIObjectManager objManager, int partitionSize) {
         this.configPrefix = configPrefix;
         this.objManager = objManager;
         this.deletedRecordPolicy = deletedRecordPolicy;
+        this.partitionSize = partitionSize;
     }
 
     public OAIDataList<Header> searchHeader(String resumptionToken) throws BadResumptionTokenException {

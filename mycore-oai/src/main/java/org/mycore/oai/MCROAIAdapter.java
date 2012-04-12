@@ -55,6 +55,8 @@ public class MCROAIAdapter implements OAIAdapter {
 
     public final static String PREFIX = "MCR.OAIDataProvider.";
 
+    public static int DEFAULT_PARTITION_SIZE;
+
     protected String baseURL;
     
     protected MCROAIIdentify identify;
@@ -68,6 +70,11 @@ public class MCROAIAdapter implements OAIAdapter {
     protected MCROAIObjectManager objectManager;
 
     protected MCROAISetManager setManager;
+
+    static {
+        String prefix = MCROAIAdapter.PREFIX + "ResumptionTokens.";
+        DEFAULT_PARTITION_SIZE = MCRConfiguration.instance().getInt(prefix + "PartitionSize", 50);
+    }
 
     /**
      * Initialize the adapter.
@@ -105,7 +112,8 @@ public class MCROAIAdapter implements OAIAdapter {
     public MCROAISearchManager getSearchManager() {
         if (this.searchManager == null) {
             this.searchManager = new MCROAISearchManager();
-            this.searchManager.init(getConfigPrefix(), getIdentify().getDeletedRecordPolicy(), getObjectManager());
+            int partitionSize = MCRConfiguration.instance().getInt(getConfigPrefix() + "ResumptionTokens.PartitionSize", DEFAULT_PARTITION_SIZE);
+            this.searchManager.init(getConfigPrefix(), getIdentify().getDeletedRecordPolicy(), getObjectManager(), partitionSize);
         }
         return this.searchManager;
     }
