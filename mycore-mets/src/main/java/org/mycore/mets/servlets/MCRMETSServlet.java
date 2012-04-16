@@ -35,6 +35,7 @@ import org.jdom.Document;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.xml.MCRLayoutService;
@@ -67,29 +68,49 @@ public class MCRMETSServlet extends MCRServlet {
 
         String derivate = getOwnerID(request.getPathInfo());
         MCRDirectory dir = MCRDirectory.getRootDirectory(derivate);
+
         if (dir == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, MessageFormat.format("Derivate {0} does not exist.", derivate));
             return;
         }
-        MCRFilesystemNode metsFile = dir.getChildByPath("mets.xml");
+
         request.setAttribute("XSL.derivateID", derivate);
         request.setAttribute("XSL.objectID", MCRLinkTableManager.instance().getSourceOf(derivate).iterator().next());
+        response.setContentType("text/xml");
 
         long lastModified = dir.getLastModified().getTimeInMillis();
-        response.setContentType("text/xml");
+
         writeCacheHeaders(response, CACHE_TIME, lastModified, useExpire);
         long start = System.currentTimeMillis();
-        if (metsFile != null && useExistingMets(request)) {
-            MCRLayoutService.instance().doLayout(request, response, new MCRStreamContent(((MCRFile) metsFile).getContentAsInputStream()));
+        MCRLayoutService.instance().doLayout(request, response, MCRMETSServlet.getMetsSource(job, useExistingMets(request), derivate));
+        LOGGER.info("Generation of code by " + this.getClass().getSimpleName() + " took " + (System.currentTimeMillis() - start) + " ms");
+    }
+
+    /**
+     * Returns the mets document wrapped in a {@link MCRContent} object.
+     * 
+     * @param job
+     * @param useExistingMets
+     * @return
+     * @throws Exception
+     */
+    static MCRContent getMetsSource(MCRServletJob job, boolean useExistingMets, String derivate) throws Exception {
+        MCRDirectory dir = MCRDirectory.getRootDirectory(derivate);
+
+        MCRFilesystemNode metsFile = dir.getChildByPath("mets.xml");
+        job.getRequest().setAttribute("XSL.derivateID", derivate);
+        job.getRequest().setAttribute("XSL.objectID", MCRLinkTableManager.instance().getSourceOf(derivate).iterator().next());
+
+        if (metsFile != null && useExistingMets) {
+            return new MCRStreamContent(((MCRFile) metsFile).getContentAsInputStream());
         } else {
             HashSet<MCRFilesystemNode> ignoreNodes = new HashSet<MCRFilesystemNode>();
             if (metsFile != null)
                 ignoreNodes.add(metsFile);
             Document mets = MCRMETSGenerator.getGenerator().getMETS(dir, ignoreNodes).asDocument();
 
-            MCRLayoutService.instance().doLayout(request, response, new MCRJDOMContent(mets));
+            return new MCRJDOMContent(mets);
         }
-        LOGGER.info("Generation of code by " + this.getClass().getSimpleName() + " took " + (System.currentTimeMillis() - start) + " ms");
     }
 
     /*

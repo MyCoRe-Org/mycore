@@ -24,10 +24,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
-import org.jdom.input.SAXBuilder;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.ifs.MCRDirectory;
-import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -50,11 +49,14 @@ public class MCRJSONProviderServlet extends MCRServlet {
 
     public void doGetPost(MCRServletJob job) throws Exception {
         String derivate = job.getRequest().getParameter("derivate");
-        String useExistingMetsParam = job.getRequest().getParameter("useExistingMets");
-        boolean useExistingMets = true;
-        useExistingMets = Boolean.valueOf(useExistingMetsParam);
 
-        Document mets = getExistingMetsXML(derivate);
+        boolean useExistingMets = true;
+        useExistingMets = Boolean.valueOf(job.getRequest().getParameter("useExistingMets"));
+
+        MCRContent metsSource = MCRMETSServlet.getMetsSource(job, useExistingMets, derivate);
+
+        Document mets = metsSource.asXML();
+
         long start = System.currentTimeMillis();
         String json = null;
 
@@ -75,28 +77,6 @@ public class MCRJSONProviderServlet extends MCRServlet {
         response.getWriter().print(json);
         response.getWriter().flush();
         return;
-    }
-
-    /**
-     * @param derivate
-     *            the derivate id for which the document should be returned
-     * @return Document the mets document
-     */
-    private Document getExistingMetsXML(String derivate) throws Exception {
-        MCRDirectory dir = MCRDirectory.getRootDirectory(derivate);
-        MCRFilesystemNode file = dir.getChildByPath(MCRJSONProvider.DEFAULT_METS_FILENAME);
-
-        if (file instanceof MCRFile) {
-            MCRFile f = (MCRFile) file;
-            try {
-                Document mets = new SAXBuilder().build(f.getContentAsInputStream());
-                return mets;
-            } catch (Exception ex) {
-                LOGGER.error("Error occured while loading mets from derivate \"" + derivate + "\"", ex);
-            }
-        }
-
-        return null;
     }
 
     /**
