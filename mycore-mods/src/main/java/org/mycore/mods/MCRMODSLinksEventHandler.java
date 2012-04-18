@@ -68,7 +68,7 @@ public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
             throw new MCRException(e);
         }
         if (!categories.isEmpty()) {
-            final MCRCategLinkReference objectReference = new MCRCategLinkReference(obj.getId().toString(), getSupportedObjectType());
+            final MCRCategLinkReference objectReference = new MCRCategLinkReference(obj.getId());
             MCRCategLinkServiceFactory.getInstance().setLinks(objectReference, categories);
         }
     }

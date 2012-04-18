@@ -25,6 +25,8 @@ package org.mycore.datamodel.classifications2;
 
 import java.io.Serializable;
 
+import org.mycore.datamodel.metadata.MCRObjectID;
+
 /**
  * @author Thomas Scheffler (yagee)
  * 
@@ -40,6 +42,10 @@ public class MCRCategLinkReference implements Serializable {
     private String type;
 
     public MCRCategLinkReference() {
+    }
+
+    public MCRCategLinkReference(MCRObjectID objectID) {
+        this(objectID.toString(), objectID.getTypeId());
     }
 
     public MCRCategLinkReference(String objectID, String type) {

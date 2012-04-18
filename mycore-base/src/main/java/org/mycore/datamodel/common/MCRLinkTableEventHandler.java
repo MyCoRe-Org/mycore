@@ -86,7 +86,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
             }
         }
         if (categories.size() > 0) {
-            MCRCategLinkReference objectReference = new MCRCategLinkReference(mcr_id.toString(), mcr_id.getTypeId());
+            MCRCategLinkReference objectReference = new MCRCategLinkReference(mcr_id);
             MCRCategLinkServiceFactory.getInstance().setLinks(objectReference, categories);
         }
         // add derivate referece
@@ -101,7 +101,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
 
     private void deleteOldLinks(final MCRObjectID objectId) {
         mcr_linktable.deleteReferenceLink(objectId);
-        MCRCategLinkReference reference = new MCRCategLinkReference(objectId.toString(), objectId.getTypeId());
+        MCRCategLinkReference reference = new MCRCategLinkReference(objectId);
         MCRCategLinkServiceFactory.getInstance().deleteLink(reference);
     }
 
