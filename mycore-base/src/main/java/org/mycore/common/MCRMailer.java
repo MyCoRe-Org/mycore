@@ -64,7 +64,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * @version $Revision$ $Date$
  */
 public class MCRMailer extends MCRServlet {
-    
+
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
         String goTo = job.getRequest().getParameter("goto");
@@ -281,8 +281,8 @@ public class MCRMailer extends MCRServlet {
      *            a List of URL strings which should be added as parts, may be
      *            null
      */
-    public static void send(final String from, final List<String> replyTo, final List<String> to, final List<String> bcc,
-            final String subject, final String body, final List<String> parts) {
+    public static void send(final String from, final List<String> replyTo, final List<String> to, final List<String> bcc, final String subject,
+        final String body, final List<String> parts) {
         if (to == null || to.size() == 0) {
             StringBuilder sb = new StringBuilder("No receiver defined for mail\n");
             sb.append("Subject: ").append(subject).append('\n');
@@ -327,8 +327,8 @@ public class MCRMailer extends MCRServlet {
         }
     }
 
-    private static void trySending(String from, List<String> replyTo, List<String> to, List<String> bcc, String subject, String body,
-            List<String> parts) throws Exception {
+    private static void trySending(String from, List<String> replyTo, List<String> to, List<String> bcc, String subject, String body, List<String> parts)
+        throws Exception {
         MimeMessage msg = new MimeMessage(mailSession);
         msg.setFrom(buildAddress(from));
 
@@ -406,17 +406,13 @@ public class MCRMailer extends MCRServlet {
         String name = s.substring(0, s.lastIndexOf("<")).trim();
         String addr = s.substring(s.lastIndexOf("<") + 1, s.length() - 1).trim();
 
-        // Name must be quoted if it contains umlauts or special characters
-        if (!name.startsWith("\"")) {
-            name = "\"" + name;
-        }
-        if (!name.endsWith("\"")) {
-            name = name + "\"";
+        if (name.startsWith("\"") && name.endsWith("\"")) {
+            name = name.substring(1, name.length() - 1);
         }
 
         return new InternetAddress(addr, name);
     }
-    
+
     /**
      * Generates e-mail from the given input document by transforming it with an xsl stylesheet,
      * and sends the e-mail afterwards.
@@ -460,7 +456,7 @@ public class MCRMailer extends MCRServlet {
     public static Element sendMail(Document input, String stylesheet) throws Exception {
         return sendMail(input, stylesheet, new Properties());
     }
-    
+
     /** 
      * Transforms the given input element using xsl stylesheet.
      * 
@@ -475,7 +471,7 @@ public class MCRMailer extends MCRServlet {
     }
 
     private final static String delimiter = "\n--------------------------------------\n";
-    
+
     /** Outputs xml to the LOGGER for debugging */
     private static void debug(Element xml) {
         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
