@@ -103,6 +103,7 @@ public class MCRServlet extends HttpServlet {
         if (LAYOUT_SERVICE == null) {
             LAYOUT_SERVICE = MCRLayoutService.instance();
         }
+        initTrustedProxies();
     }
 
     /** returns the base URL of the mycore system */
@@ -189,7 +190,8 @@ public class MCRServlet extends HttpServlet {
                 //check if request IP equals last known IP
                 String newip = getRemoteAddr(req);
                 if (!lastIP.equals(newip)) {
-                    LOGGER.warn("Session steal attempt from IP " + newip + ", previous IP was " + lastIP + ". Session: " + session.toString());
+                    LOGGER.warn("Session steal attempt from IP " + newip + ", previous IP was " + lastIP + ". Session: "
+                            + session.toString());
                     MCRSessionMgr.releaseCurrentSession();
                     session = MCRSessionMgr.getCurrentSession();
                     session.setCurrentIP(newip);
@@ -373,7 +375,7 @@ public class MCRServlet extends HttpServlet {
     }
 
     private void processRenderingPhase(MCRServletJob job, Exception thinkException) throws Exception {
-        if (allowCrossDomainRequests()){
+        if (allowCrossDomainRequests()) {
             job.getResponse().setHeader("Access-Control-Allow-Origin", "*");
         }
         MCRSession session = MCRSessionMgr.getCurrentSession();
@@ -453,8 +455,8 @@ public class MCRServlet extends HttpServlet {
      *             instead or throw Exception
      */
     @Deprecated()
-    protected void generateErrorPage(HttpServletRequest request, HttpServletResponse response, int error, String msg, Exception ex, boolean xmlstyle)
-        throws IOException {
+    protected void generateErrorPage(HttpServletRequest request, HttpServletResponse response, int error, String msg, Exception ex,
+            boolean xmlstyle) throws IOException {
         LOGGER.error(getClass().getName() + ": Error " + error + " occured. The following message was given: " + msg, ex);
 
         String rootname = "mcr_error";
@@ -494,7 +496,8 @@ public class MCRServlet extends HttpServlet {
             return;
         } else {
             if (request.getAttribute(requestAttr) != null) {
-                LOGGER.warn("Could not send error page. Generating error page failed. The original message:\n" + request.getAttribute(requestAttr));
+                LOGGER.warn("Could not send error page. Generating error page failed. The original message:\n"
+                        + request.getAttribute(requestAttr));
             } else {
                 LOGGER.warn("Could not send error page. Response allready commited. The following message was given:\n" + msg);
             }
@@ -537,8 +540,8 @@ public class MCRServlet extends HttpServlet {
         return redirectURL.toString();
     }
 
-    protected void generateActiveLinkErrorpage(HttpServletRequest request, HttpServletResponse response, String msg, MCRActiveLinkException activeLinks)
-        throws IOException {
+    protected void generateActiveLinkErrorpage(HttpServletRequest request, HttpServletResponse response, String msg,
+            MCRActiveLinkException activeLinks) throws IOException {
         StringBuilder msgBuf = new StringBuilder(msg);
         msgBuf.append("\nThere are links active preventing the commit of work, see error message for details. The following links where affected:");
         Map<String, Collection<String>> links = activeLinks.getActiveLinks();
@@ -562,8 +565,7 @@ public class MCRServlet extends HttpServlet {
         if (ENABLE_BROWSER_CACHE) {
             // we can cache every (local) request
             long lastModified = MCRSessionMgr.getCurrentSession().getLoginTime() > MCRConfiguration.instance().getSystemLastModified() ? MCRSessionMgr
-                .getCurrentSession()
-                .getLoginTime() : MCRConfiguration.instance().getSystemLastModified();
+                    .getCurrentSession().getLoginTime() : MCRConfiguration.instance().getSystemLastModified();
             LOGGER.info("LastModified: " + lastModified);
             return lastModified;
         }
@@ -582,13 +584,18 @@ public class MCRServlet extends HttpServlet {
     }
 
     /** The IP addresses of trusted web proxies */
-    protected static Set<String> trustedProxies = new HashSet<String>();
+    protected static Set<String> trustedProxies;
 
     /**
      * Builds a list of trusted proxy IPs from MCR.Request.TrustedProxies. The
      * IP address of the local host is automatically added to this list.
      */
     protected static synchronized void initTrustedProxies() {
+        if (trustedProxies != null)
+            return;
+
+        trustedProxies = new HashSet<String>();
+
         String sTrustedProxies = MCRConfiguration.instance().getString("MCR.Request.TrustedProxies", "");
         StringTokenizer st = new StringTokenizer(sTrustedProxies, " ,;");
         while (st.hasMoreTokens()) {
@@ -620,38 +627,38 @@ public class MCRServlet extends HttpServlet {
      * blanks and/or comma.
      */
     public static String getRemoteAddr(HttpServletRequest req) {
-        if (trustedProxies.isEmpty()) {
-            initTrustedProxies();
+        String remoteAddress = req.getRemoteAddr();
+        if (trustedProxies.contains(remoteAddress)) {
+            String xff = getXForwardedFor(req);
+            if (xff != null)
+                remoteAddress = xff;
         }
+        return remoteAddress;
+    }
 
-        // Check if request comes in via a proxy
-        // There are two possible header names
-        String xForwardedFor = req.getHeader("X_FORWARDED_FOR");
-        if (xForwardedFor == null || xForwardedFor.trim().length() == 0) {
-            xForwardedFor = req.getHeader("x-forwarded-for");
+    /**
+     * Get header to check if request comes in via a proxy.
+     * There are two possible header names
+     */
+    private static String getXForwardedFor(HttpServletRequest req) {
+        String xff = req.getHeader("X-Forwarded-For");
+        if ((xff == null) || xff.trim().isEmpty()) {
+            xff = req.getHeader("X_Forwarded_For");
         }
-
-        // If no proxy is used, use client IP from HTTP request
-        if (xForwardedFor == null || xForwardedFor.trim().length() == 0) {
-            return req.getRemoteAddr();
-        }
+        if ((xff == null) || xff.trim().isEmpty())
+            return null;
 
         // X_FORWARDED_FOR can be comma separated list of hosts,
         // if so, take last entry, all others are not reliable because
         // any client may have set the header to any value.
-        StringTokenizer st = new StringTokenizer(xForwardedFor, " ,;");
+
+        LOGGER.debug("X-Forwarded-For complete: " + xff);
+        StringTokenizer st = new StringTokenizer(xff, " ,;");
         while (st.hasMoreTokens()) {
-            xForwardedFor = st.nextToken();
+            xff = st.nextToken().trim();
         }
-
-        // If request comes from a trusted proxy,
-        // the best IP is the last entry in xForwardedFor
-        if (trustedProxies.contains(req.getRemoteAddr())) {
-            return xForwardedFor;
-        }
-
-        // Otherwise, use client IP from HTTP request
-        return req.getRemoteAddr();
+        LOGGER.debug("X-Forwarded-For last: " + xff);
+        return xff;
     }
 
     @SuppressWarnings("unchecked")
@@ -665,8 +672,8 @@ public class MCRServlet extends HttpServlet {
                 // parameter is not empty -> store
                 if (!request.getParameter(name).trim().equals("")) {
                     mcrSession.put(key, request.getParameter(name));
-                    LOGGER.debug("Found HTTP-Req.-Parameter " + name + "=" + request.getParameter(name) + " that should be saved in session, safed " + key
-                        + "=" + request.getParameter(name));
+                    LOGGER.debug("Found HTTP-Req.-Parameter " + name + "=" + request.getParameter(name)
+                            + " that should be saved in session, safed " + key + "=" + request.getParameter(name));
                 }
                 // paramter is empty -> do not store and if contained in
                 // session, remove from it
@@ -684,8 +691,8 @@ public class MCRServlet extends HttpServlet {
                 // attribute is not empty -> store
                 if (!request.getAttribute(name).toString().trim().equals("")) {
                     mcrSession.put(key, request.getAttribute(name));
-                    LOGGER.debug("Found HTTP-Req.-Attribute " + name + "=" + request.getParameter(name) + " that should be saved in session, safed " + key
-                        + "=" + request.getParameter(name));
+                    LOGGER.debug("Found HTTP-Req.-Attribute " + name + "=" + request.getParameter(name)
+                            + " that should be saved in session, safed " + key + "=" + request.getParameter(name));
                 }
                 // attribute is empty -> do not store and if contained in
                 // session, remove from it
