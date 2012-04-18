@@ -23,11 +23,13 @@
 
 package org.mycore.frontend.editor;
 
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.Namespace;
 import org.jdom.xpath.XPath;
 import org.mycore.common.xml.MCRURIResolver.MCRResolver;
 
@@ -57,8 +59,13 @@ public class MCREditorDataResolver implements MCRResolver {
         LOGGER.debug("MCREditorDataResolver xPath = " + xPath);
 
         Element editor = MCREditorSessionCache.instance().getEditorSession(sessionID).getXML();
-        Document xml = new MCREditorSubmission(editor).getXML();
-        Element resolved = (Element) (XPath.selectSingleNode(xml, xPath));
+        MCREditorSubmission sub = new MCREditorSubmission(editor);
+        Document xml = sub.getXML();
+        XPath xp = XPath.newInstance(xPath);
+        for (Entry<String, Namespace> entry : sub.getNamespaceMap().entrySet())
+            xp.addNamespace(entry.getValue());
+
+        Element resolved = (Element) (xp.selectSingleNode(xml));
         return (resolved == null ? new Element("nothingFound") : resolved);
     }
 

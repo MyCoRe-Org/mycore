@@ -666,6 +666,13 @@ public class MCREditorSubmission {
     private HashMap<String, Namespace> nsMap = new HashMap<String, Namespace>();
 
     /**
+     * A map from namespace prefix to namespace for the namespaces registered in
+     * the editor definition.
+     */
+    public HashMap<String, Namespace> getNamespaceMap()
+    { return nsMap; }
+    
+    /**
      * Stores the list of additional namespaces declared in the components
      * element of the editor definition. These namespaces and its prefixes can
      * be used in editor variable paths (var attributes of cells).
