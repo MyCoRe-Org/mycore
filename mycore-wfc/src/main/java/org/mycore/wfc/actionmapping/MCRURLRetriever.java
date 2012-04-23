@@ -24,12 +24,19 @@
 package org.mycore.wfc.actionmapping;
 
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
+import org.mycore.datamodel.classifications2.MCRCategory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.wfc.MCRConstants;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -41,19 +48,18 @@ public final class MCRURLRetriever {
 
     private static final Logger LOGGER = Logger.getLogger(MCRURLRetriever.class);
 
-    private static MCRActionMappings ACTION_MAPPINGS = initActionsMappings();
+    private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAOFactory.getInstance();
 
-    private static HashMap<String, MCRCollection> COLLECTION_MAP;
+    private static HashMap<String, MCRCollection> COLLECTION_MAP = initActionsMappings();
 
-    private static MCRActionMappings initActionsMappings() {
+    private static HashMap<String, MCRCollection> initActionsMappings() {
         try {
             MCRActionMappings actionMappings = MCRActionMappingsManager.getActionMappings();
             HashMap<String, MCRCollection> collectionMap = new HashMap<String, MCRCollection>();
             for (MCRCollection collection : actionMappings.getCollections()) {
                 collectionMap.put(collection.getName(), collection);
             }
-            COLLECTION_MAP = collectionMap;
-            return actionMappings;
+            return collectionMap;
         } catch (Exception e) {
             throw new MCRException(e);
         }
@@ -61,7 +67,7 @@ public final class MCRURLRetriever {
 
     public static String getURLforID(String action, String mcrID) {
         final MCRObjectID objID = MCRObjectID.getInstance(mcrID);
-        String collection = MCRClassificationUtils.getCollection(mcrID);
+        String collectionName = MCRClassificationUtils.getCollection(mcrID);
         WorkflowDataProvider wfDataProvider = new WorkflowDataProvider() {
             @Override
             public MCRWorkflowData getWorkflowData() {
@@ -71,7 +77,7 @@ public final class MCRURLRetriever {
                 return workflowData;
             }
         };
-        return getURL(action, collection, wfDataProvider);
+        return getURL(action, collectionName, wfDataProvider);
     }
 
     public static String getURLforCollection(String action, String collection) {
@@ -85,12 +91,16 @@ public final class MCRURLRetriever {
         return getURL(action, collection, wfDataProvider);
     }
 
-    public static String getURL(String action, String collectionName, WorkflowDataProvider wfDataProvider) {
-        MCRCollection collection = COLLECTION_MAP.get(collectionName);
+    private static String getURL(String action, String collectionName, WorkflowDataProvider wfDataProvider) {
+        MCRCollection collection = getCollectionWithAction(collectionName, action);
         if (collection == null) {
-            LOGGER.warn("Could not find collection: " + collectionName);
+            LOGGER.warn(MessageFormat.format("Could not find action ''{0}'' in collection: {1}", action, collectionName));
             return null;
         }
+        return getURL(action, collection, wfDataProvider);
+    }
+
+    private static String getURL(String action, MCRCollection collection, WorkflowDataProvider wfDataProvider) {
         for (MCRAction act : collection.getActions()) {
             if (act.getAction().equals(action)) {
                 MCRWorkflowData workflowData = wfDataProvider.getWorkflowData();
@@ -102,8 +112,49 @@ public final class MCRURLRetriever {
                 return act.getURL(workflowData);
             }
         }
-        LOGGER.warn(MessageFormat.format("Could not find action ''{0}'' in collection: {1}", action, collectionName));
         return null;
+    }
+
+    private static MCRCollection getCollectionWithAction(String collection, String action) {
+        MCRCollection mcrCollection = COLLECTION_MAP.get(collection);
+        if (mcrCollection != null) {
+            for (MCRAction act : mcrCollection.getActions()) {
+                if (act.getAction().equals(action)) {
+                    return mcrCollection;
+                }
+            }
+        }
+        //did not find a collection with that action, checking parent
+        String parentCollection = getParentCollection(collection);
+        if (parentCollection == null) {
+            return null;
+        }
+        LOGGER.info("Checking parent collection '" + parentCollection + "' for action: " + action);
+        MCRCollection collectionWithAction = getCollectionWithAction(parentCollection, action);
+        if (mcrCollection == null) {
+            mcrCollection = new MCRCollection();
+            mcrCollection.setName(collection);
+            mcrCollection.setActions();
+        }
+        for (MCRAction act : collectionWithAction.getActions()) {
+            if (act.getAction().equals(action)) {
+                int oldLength = mcrCollection.getActions().length;
+                mcrCollection.setActions(Arrays.copyOf(mcrCollection.getActions(), oldLength + 1));
+                mcrCollection.getActions()[oldLength] = act;
+            }
+        }
+        //store in cache
+        COLLECTION_MAP.put(collection, mcrCollection);
+        return mcrCollection;
+    }
+
+    private static String getParentCollection(String collection) {
+        MCRCategoryID categoryId = new MCRCategoryID(MCRConstants.COLLECTION_CLASS_ID.getRootID(), collection);
+        List<MCRCategory> parents = CATEGORY_DAO.getParents(categoryId);
+        if (parents.isEmpty()) {
+            return null;
+        }
+        return parents.iterator().next().getId().getID();
     }
 
     private static interface WorkflowDataProvider {
