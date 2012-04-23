@@ -7,8 +7,8 @@
   <section xml:lang="all">
     <div class="borderbox">
       <editor id="author-file">
-        <source uri="xslStyle:mods2editor:{sourceUri}" />
-        <cancel url="{cancelUrl}" />
+        <source uri="xslStyle:mods2editor:xslStyle:mycoreobject-editor:mcrobject:{mcrid}" />
+        <cancel url="receive/{mcrid}" />
         <postprocessor class="org.mycore.frontend.editor.postprocessor.MCREditorPostProcessorXSL" stylesheet="editor2mods.xsl" />
         <target type="servlet" name="MCRCheckNewDataServlet" method="post" format="xml" />
         <validationMessage>

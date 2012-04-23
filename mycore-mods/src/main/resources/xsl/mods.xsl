@@ -132,14 +132,14 @@
               <xsl:choose>
                 <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo[@transliteration]/mods:title">
                   <!-- TODO: if editor bug fixed -->
-                  <xsl:value-of select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo[@transliteration]/mods:title"/>
+                  <xsl:value-of select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo[@transliteration]/mods:title" />
                 </xsl:when>
                 <xsl:otherwise>
-                  <xsl:value-of select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title[1]"/>
+                  <xsl:value-of select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title[1]" />
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:variable>
-            <xsl:value-of select="$text" disable-output-escaping="yes"/>
+            <xsl:value-of select="$text" disable-output-escaping="yes" />
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="@ID" />
@@ -152,9 +152,11 @@
   <xsl:template match="/mycoreobject" mode="breadCrumb" priority="1">
 
     <ul class="breadcrumb">
-      <li class="first"><a href="{$WebApplicationBaseURL}content/main/classifications/bmelv_genres.xml">
-        <xsl:value-of select="i18n:translate('editor.search.bmelv.genre')" />
-      </a></li>
+      <li class="first">
+        <a href="{$WebApplicationBaseURL}content/main/classifications/bmelv_genres.xml">
+          <xsl:value-of select="i18n:translate('editor.search.bmelv.genre')" />
+        </a>
+      </li>
       <xsl:variable name="obj_host">
         <xsl:value-of select="$objectHost" />
       </xsl:variable>
@@ -183,11 +185,13 @@
       <xsl:variable name="internal_genre">
         <xsl:apply-templates mode="mods-type" select="." />
       </xsl:variable>
-      <li><xsl:value-of select="i18n:translate(concat('metaData.mods.dictionary.', $internal_genre))" /></li>
+      <li>
+        <xsl:value-of select="i18n:translate(concat('metaData.mods.dictionary.', $internal_genre))" />
+      </li>
       <xsl:if test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='kindof']">
         <li>
           <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='kindof']"
-                               mode="printModsClassInfo" />
+            mode="printModsClassInfo" />
         </li>
       </xsl:if>
     </ul>
@@ -312,7 +316,8 @@
         </xsl:otherwise>
       </xsl:choose>
       <!--*** Editor Buttons ************************************* -->
-      <xsl:if test="((./structure/children/child) and not($mods-type='series' or $mods-type='journal' or $mods-type='cproceeding')) or (./structure/derobjects/derobject)">
+      <xsl:if
+        test="((./structure/children/child) and not($mods-type='series' or $mods-type='journal' or $mods-type='cproceeding')) or (./structure/derobjects/derobject)">
         <div id="derivate_box" class="detailbox">
           <h4 id="derivate_switch" class="block_switch">
             <a name="derivate_box"></a>
@@ -381,6 +386,14 @@
               </td>
               <td class="metavalue">
                 <xsl:value-of select="./@ID" />
+              </td>
+            </tr>
+            <tr>
+              <td class="metaname">
+                <xsl:value-of select="concat(i18n:translate('metaData.versions'),' :')" />
+              </td>
+              <td class="metavalue">
+                <xsl:apply-templates select="." mode="versioninfo" />
               </td>
             </tr>
           </table>
@@ -478,10 +491,8 @@
       </xsl:if>
     </xsl:variable>
     <xsl:variable name="form" select="concat('editor_form_commit-mods',$layoutSuffix,'.xml')" />
-    <xsl:variable name="sourceURI" select="encoder:encode(concat('xslStyle:mycoreobject-editor:mcrobject:',$id),'UTF-8')" />
-    <xsl:variable name="cancelURL" select="encoder:encode($RequestURL,'UTF-8')" />
     <xsl:value-of
-      select="concat($WebApplicationBaseURL,$form,$HttpSession,'?cancelUrl=',$cancelURL,'&amp;sourceUri=',$sourceURI,'&amp;mcrid=',$id)" />
+      select="concat($WebApplicationBaseURL,$form,$HttpSession,'?mcrid=',$id)" />
   </xsl:template>
   <xsl:template mode="printDerivates" match="/mycoreobject[contains(@ID,'_mods_')]" priority="1">
     <xsl:param name="staticURL" />
@@ -571,21 +582,26 @@
       <xsl:choose>
         <xsl:when test="acl:checkPermission($id,'writedb') or acl:checkPermission($id,'deletedb')">
           <div class="document_options">
-            <img class="button_options" src="{$WebApplicationBaseURL}templates/master/{$template}/IMAGES/icon_arrow_circled_red_down.png" alt="" titel="Optionen"/>
+            <img class="button_options" src="{$WebApplicationBaseURL}templates/master/{$template}/IMAGES/icon_arrow_circled_red_down.png"
+              alt="" titel="Optionen" />
             <div class="options">
               <ul>
-            <xsl:variable name="type" select="substring-before(substring-after($id,'_'),'_')" />
+                <xsl:variable name="type" select="substring-before(substring-after($id,'_'),'_')" />
 
-              <xsl:if test="acl:checkPermission($id,'writedb')">
+                <xsl:if test="acl:checkPermission($id,'writedb')">
 
-                <li><a href="{$editURL}">
-                  <xsl:value-of select="i18n:translate('object.editObject')" />
-                </a></li>
-                <xsl:if test="$displayAddDerivate='true' and not(mcrxsl:hasURNDefined($id))">
-                  <li><a href="{$ServletsBaseURL}derivate/create{$HttpSession}?id={$id}">
-                    <xsl:value-of select="i18n:translate('derivate.addDerivate')" />
-                  </a></li>
-                </xsl:if>
+                  <li>
+                    <a href="{$editURL}">
+                      <xsl:value-of select="i18n:translate('object.editObject')" />
+                    </a>
+                  </li>
+                  <xsl:if test="$displayAddDerivate='true' and not(mcrxsl:hasURNDefined($id))">
+                    <li>
+                      <a href="{$ServletsBaseURL}derivate/create{$HttpSession}?id={$id}">
+                        <xsl:value-of select="i18n:translate('derivate.addDerivate')" />
+                      </a>
+                    </li>
+                  </xsl:if>
 
                 <!-- ToDo: Fix URN/Handle Generator, xpath is not mods valid -->
                 <!-- xsl:if test="mcrxsl:isAllowedObjectForURNAssignment($id) and not(mcrxsl:hasURNDefined($id))">
@@ -595,70 +611,72 @@
                 </a>
                </xsl:if -->
 
-              </xsl:if>
-              <xsl:if
-                test="acl:checkPermission($id,'deletedb') and (not(mcrxsl:hasURNDefined($id)) or (mcrxsl:hasURNDefined($id) and $CurrentUser=$MCR.Users.Superuser.UserName))">
-                <li>
+                </xsl:if>
+                <xsl:if
+                  test="acl:checkPermission($id,'deletedb') and (not(mcrxsl:hasURNDefined($id)) or (mcrxsl:hasURNDefined($id) and $CurrentUser=$MCR.Users.Superuser.UserName))">
+                  <li>
+                    <xsl:choose>
+                      <xsl:when test="/mycoreobject/structure/children/child">
+                        <xsl:value-of select="i18n:translate('object.hasChildren')" />
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <a href="{$ServletsBaseURL}object/delete{$HttpSession}?id={$id}" id="confirm_deletion">
+                          <xsl:value-of select="i18n:translate('object.delObject')" />
+                        </a>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </li>
+                </xsl:if>
+                <xsl:if test="$CurrentUser=$MCR.Users.Superuser.UserName">
+                  <li>
+                    <a href="{$editURL_allMods}">
+                      <xsl:value-of select="i18n:translate('object.editAllModsXML')" />
+                    </a>
+                  </li>
+                </xsl:if>
+
+                <xsl:variable name="child-layout">
                   <xsl:choose>
-                    <xsl:when test="/mycoreobject/structure/children/child">
-                      <xsl:value-of select="i18n:translate('object.hasChildren')" />
+                    <xsl:when test="$mods-type = 'book'">
+                      <xsl:value-of select="'book-chapter'" />
+                    </xsl:when>
+                    <xsl:when test="$mods-type = 'cproceeding'">
+                      <xsl:value-of select="'cpublication'" />
+                    </xsl:when>
+                    <xsl:when test="$mods-type = 'journal'">
+                      <xsl:value-of select="'article'" />
+                    </xsl:when>
+                    <xsl:when test="$mods-type = 'series'">
+                      <xsl:value-of select="'book|cproceeding'" />
+                    </xsl:when>
+                  </xsl:choose>
+                </xsl:variable>
+                <xsl:if test="string-length($child-layout) &gt; 0 and acl:checkPermission(./@ID,'writedb')">
+                  <xsl:choose>
+                    <xsl:when test="$mods-type = 'series'">
+                      <li>
+                        <a
+                          href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=book&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
+                          <xsl:value-of select="i18n:translate('metaData.mods.types.book')" />
+                        </a>
+                      </li>
+                      <li>
+                        <a
+                          href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=cproceeding&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
+                          <xsl:value-of select="i18n:translate('metaData.mods.types.cproceeding')" />
+                        </a>
+                      </li>
                     </xsl:when>
                     <xsl:otherwise>
-                      <a href="{$ServletsBaseURL}object/delete{$HttpSession}?id={$id}" id="confirm_deletion">
-                        <xsl:value-of select="i18n:translate('object.delObject')" />
-                      </a>
+                      <li>
+                        <a
+                          href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout={$child-layout}&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
+                          <xsl:value-of select="i18n:translate(concat('metaData.mods.types.',$child-layout))" />
+                        </a>
+                      </li>
                     </xsl:otherwise>
                   </xsl:choose>
-                </li>
-              </xsl:if>
-              <xsl:if test="$CurrentUser=$MCR.Users.Superuser.UserName">
-                <li><a href="{$editURL_allMods}">
-                  <xsl:value-of select="i18n:translate('object.editAllModsXML')" />
-                </a></li>
-              </xsl:if>
-
-              <xsl:variable name="child-layout">
-                <xsl:choose>
-                  <xsl:when test="$mods-type = 'book'">
-                    <xsl:value-of select="'book-chapter'" />
-                  </xsl:when>
-                  <xsl:when test="$mods-type = 'cproceeding'">
-                    <xsl:value-of select="'cpublication'" />
-                  </xsl:when>
-                  <xsl:when test="$mods-type = 'journal'">
-                    <xsl:value-of select="'article'" />
-                  </xsl:when>
-                  <xsl:when test="$mods-type = 'series'">
-                    <xsl:value-of select="'book|cproceeding'" />
-                  </xsl:when>
-                </xsl:choose>
-              </xsl:variable>
-              <xsl:if test="string-length($child-layout) &gt; 0 and acl:checkPermission(./@ID,'writedb')">
-                <xsl:choose>
-                  <xsl:when test="$mods-type = 'series'">
-                    <li>
-                      <a
-                        href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=book&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
-                        <xsl:value-of select="i18n:translate('metaData.mods.types.book')" />
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=cproceeding&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
-                        <xsl:value-of select="i18n:translate('metaData.mods.types.cproceeding')" />
-                      </a>
-                    </li>
-                  </xsl:when>
-                  <xsl:otherwise>
-                    <li>
-                      <a
-                        href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout={$child-layout}&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
-                        <xsl:value-of select="i18n:translate(concat('metaData.mods.types.',$child-layout))" />
-                      </a>
-                    </li>
-                  </xsl:otherwise>
-                </xsl:choose>
-              </xsl:if>
+                </xsl:if>
 
               </ul>
             </div>
