@@ -75,11 +75,11 @@ public class MCRPersistentServlet extends MCRServlet {
 
     protected static String pagedir = MCRConfiguration.instance().getString("MCR.SWF.PageDir", "");
 
-    private static enum Operation {
+    public static enum Operation {
         create, update, delete
     }
 
-    private static enum Type {
+    public static enum Type {
         object, derivate
     }
 
@@ -435,7 +435,7 @@ public class MCRPersistentServlet extends MCRServlet {
         }
         String form = sb.append(".xml").toString();
         Properties params = new Properties();
-        params.put("cancelUrl", getReferer(job));
+        params.put("cancelUrl", getCancelUrl(job));
         params.put("mcrid", MCRObjectID.formatID(base, 0));
         @SuppressWarnings("unchecked")
         Enumeration<String> e = job.getRequest().getParameterNames();
@@ -499,7 +499,7 @@ public class MCRPersistentServlet extends MCRServlet {
             Properties params = new Properties();
             sb.append("xslStyle:mycorederivate-editor:mcrobject:").append(derivateID);
             params.put("sourceUri", sb.toString());
-            params.put("cancelUrl", getReferer(job));
+            params.put("cancelUrl", getCancelUrl(job));
             sb = new StringBuilder();
             sb.append(getBaseURL()).append(pagedir).append("editor_form_derivate.xml");
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(sb.toString(), params)));
@@ -516,14 +516,14 @@ public class MCRPersistentServlet extends MCRServlet {
      * @throws IOException
      */
     private void redirectToUploadPage(MCRServletJob job, String parentObjectID, String derivateID) throws IOException {
-        MCRUploadHandlerIFS fuh = new MCRUploadHandlerIFS(parentObjectID, derivateID, getReferer(job));
+        MCRUploadHandlerIFS fuh = new MCRUploadHandlerIFS(parentObjectID, derivateID, getCancelUrl(job));
         String fuhid = fuh.getID();
         String page = pagedir + "fileupload_commit.xml";
 
         String base = getBaseURL() + page;
         Properties params = new Properties();
         params.put("XSL.UploadID", fuhid);
-        params.put("cancelUrl", getReferer(job));
+        params.put("cancelUrl", getCancelUrl(job));
         params.put("XSL.target.param.1", "method=formBasedUpload");
         params.put("XSL.target.param.2", "uploadId=" + fuhid);
         params.put("mcrid", parentObjectID);
@@ -614,6 +614,15 @@ public class MCRPersistentServlet extends MCRServlet {
         str.append(ex.getLocalizedMessage());
 
         return str.toString();
+    }
+
+    private String getCancelUrl(MCRServletJob job) {
+        String referer = getReferer(job);
+        String baseUrl = getBaseURL();
+        if (referer.startsWith(baseUrl)) {
+            referer = referer.substring(baseUrl.length());
+        }
+        return referer;
     }
 
     private String getReferer(MCRServletJob job) {
