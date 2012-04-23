@@ -101,8 +101,8 @@
       <xsl:apply-templates select="." mode="mods-type" />
     </xsl:variable>
     <xsl:choose>
-      <xsl:when test="$mods-type='cproceeding'">
-        <xsl:apply-templates select="." mode="title.cproceeding" />
+      <xsl:when test="$mods-type='confpro'">
+        <xsl:apply-templates select="." mode="title.confpro" />
       </xsl:when>
       <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title">
         <xsl:call-template name="ShortenText">
@@ -122,8 +122,8 @@
       <xsl:apply-templates select="." mode="mods-type" />
     </xsl:variable>
     <xsl:choose>
-      <xsl:when test="$mods-type='cproceeding'">
-        <xsl:apply-templates select="." mode="title.cproceeding" />
+      <xsl:when test="$mods-type='confpro'">
+        <xsl:apply-templates select="." mode="title.confpro" />
       </xsl:when>
       <xsl:otherwise>
         <xsl:choose>
@@ -287,17 +287,17 @@
         <xsl:when test="$mods-type = 'thesis'">
           <xsl:apply-templates select="." mode="present.thesis" />
         </xsl:when>
-        <xsl:when test="$mods-type = 'cproceeding'">
-          <xsl:apply-templates select="." mode="present.cproceeding" />
+        <xsl:when test="$mods-type = 'confpro'">
+          <xsl:apply-templates select="." mode="present.confpro" />
         </xsl:when>
-        <xsl:when test="$mods-type = 'cpublication'">
-          <xsl:apply-templates select="." mode="present.cpublication" />
+        <xsl:when test="$mods-type = 'confpub'">
+          <xsl:apply-templates select="." mode="present.confpub" />
         </xsl:when>
         <xsl:when test="$mods-type = 'book'">
           <xsl:apply-templates select="." mode="present.book" />
         </xsl:when>
-        <xsl:when test="$mods-type = 'book-chapter'">
-          <xsl:apply-templates select="." mode="present.book-chapter" />
+        <xsl:when test="$mods-type = 'chapter'">
+          <xsl:apply-templates select="." mode="present.chapter" />
         </xsl:when>
         <xsl:when test="$mods-type = 'journal'">
           <xsl:apply-templates select="." mode="present.journal" />
@@ -308,8 +308,8 @@
         <xsl:when test="$mods-type = 'article'">
           <xsl:apply-templates select="." mode="present.article" />
         </xsl:when>
-        <xsl:when test="$mods-type = 'av-media'">
-          <xsl:apply-templates select="." mode="present.av-media" />
+        <xsl:when test="$mods-type = 'av'">
+          <xsl:apply-templates select="." mode="present.av" />
         </xsl:when>
         <xsl:otherwise>
           <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/*/*" />
@@ -317,7 +317,7 @@
       </xsl:choose>
       <!--*** Editor Buttons ************************************* -->
       <xsl:if
-        test="((./structure/children/child) and not($mods-type='series' or $mods-type='journal' or $mods-type='cproceeding')) or (./structure/derobjects/derobject)">
+        test="((./structure/children/child) and not($mods-type='series' or $mods-type='journal' or $mods-type='confpro')) or (./structure/derobjects/derobject)">
         <div id="derivate_box" class="detailbox">
           <h4 id="derivate_switch" class="block_switch">
             <a name="derivate_box"></a>
@@ -654,16 +654,16 @@
                 <xsl:variable name="child-layout">
                   <xsl:choose>
                     <xsl:when test="$mods-type = 'book'">
-                      <xsl:value-of select="'book-chapter'" />
+                      <xsl:value-of select="'chapter'" />
                     </xsl:when>
-                    <xsl:when test="$mods-type = 'cproceeding'">
-                      <xsl:value-of select="'cpublication'" />
+                    <xsl:when test="$mods-type = 'confpro'">
+                      <xsl:value-of select="'confpub'" />
                     </xsl:when>
                     <xsl:when test="$mods-type = 'journal'">
                       <xsl:value-of select="'article'" />
                     </xsl:when>
                     <xsl:when test="$mods-type = 'series'">
-                      <xsl:value-of select="'book|cproceeding'" />
+                      <xsl:value-of select="'book|confpro'" />
                     </xsl:when>
                   </xsl:choose>
                 </xsl:variable>
@@ -678,8 +678,8 @@
                       </li>
                       <li>
                         <a
-                          href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=cproceeding&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
-                          <xsl:value-of select="i18n:translate('metaData.mods.types.cproceeding')" />
+                          href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=confpro&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
+                          <xsl:value-of select="i18n:translate('metaData.mods.types.confpro')" />
                         </a>
                       </li>
                     </xsl:when>

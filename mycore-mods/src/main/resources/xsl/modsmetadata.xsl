@@ -749,7 +749,7 @@
   </xsl:template>
   <!-- END: view thesis metadata -->
 
-  <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="title.cproceeding">
+  <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="title.confpro">
     <xsl:choose>
       <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title">
         <xsl:call-template name="ShortenText">
@@ -791,7 +791,7 @@
   </xsl:template>
 
   <!-- view conference proceeding metadata -->
-  <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.cproceeding">
+  <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.confpro">
     <div id="title_box" class="detailbox floatbox">
       <h4 id="title_switch" class="block_switch open">
         <xsl:value-of select="i18n:translate('metaData.mods.dictionary.confpro')" />
@@ -905,7 +905,7 @@
   <!-- END: view conference proceeding metadata -->
 
   <!-- view conference publication metadata -->
-  <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.cpublication">
+  <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.confpub">
     <div id="title_box" class="detailbox floatbox">
       <h4 id="title_switch" class="block_switch open">
         <xsl:value-of select="i18n:translate('metaData.mods.dictionary.confpub')" />
@@ -1058,7 +1058,7 @@
   <!-- END: view book metadata -->
 
   <!-- view book chapter metadata -->
-  <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.book-chapter">
+  <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.chapter">
     <div id="title_box" class="detailbox floatbox">
       <h4 id="title_switch" class="block_switch open">
         <xsl:value-of select="i18n:translate('metaData.mods.dictionary.chapter')" />
@@ -1285,7 +1285,7 @@
   <!-- END: view article metadata -->
 
   <!-- view av nedia metadata -->
-  <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.av-media">
+  <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.av">
     <div id="title_box" class="detailbox floatbox">
       <h4 id="title_switch" class="block_switch open">
         <xsl:value-of select="i18n:translate('metaData.mods.dictionary.av')" />
