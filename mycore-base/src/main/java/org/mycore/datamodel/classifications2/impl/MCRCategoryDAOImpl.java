@@ -218,6 +218,9 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         Session session = getHibConnection().getSession();
         List<MCRCategory> parents = new ArrayList<MCRCategory>();
         MCRCategory category = getByNaturalID(session, id);
+        if (category == null) {
+            return null;
+        }
         while (category.getParent() != null) {
             category = category.getParent();
             parents.add(category);
