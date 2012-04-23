@@ -210,16 +210,16 @@
         <xsl:value-of select="'article'" />
       </xsl:when>
       <xsl:when test="substring-after(./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@valueURI,'#')='av'">
-        <xsl:value-of select="'av-media'" />
+        <xsl:value-of select="'av'" />
       </xsl:when>
       <xsl:when test="substring-after(./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@valueURI,'#')='confpro'">
-        <xsl:value-of select="'cproceeding'" />
+        <xsl:value-of select="'confpro'" />
       </xsl:when>
       <xsl:when test="substring-after(./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@valueURI,'#')='confpub'">
-        <xsl:value-of select="'cpublication'" />
+        <xsl:value-of select="'confpub'" />
       </xsl:when>
       <xsl:when test="substring-after(./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@valueURI,'#')='chapter'">
-        <xsl:value-of select="'book-chapter'" />
+        <xsl:value-of select="'chapter'" />
       </xsl:when>
       <xsl:when test="substring-after(./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@valueURI,'#')='book'">
         <xsl:value-of select="'book'" />
