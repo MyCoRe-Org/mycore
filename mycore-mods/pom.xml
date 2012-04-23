@@ -33,10 +33,10 @@
               <layouts>
                 <layout>thesis</layout>
                 <layout>report</layout>
-                <layout>av-media</layout>
+                <layout>av</layout>
                 <layout>confpro</layout>
                 <layout>confpub</layout>
-                <layout>book-chapter</layout>
+                <layout>chapter</layout>
                 <layout>book</layout>
                 <layout>journal</layout>
                 <layout>article</layout>
