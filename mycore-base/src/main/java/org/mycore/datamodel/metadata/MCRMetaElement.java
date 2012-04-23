@@ -246,6 +246,20 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
     }
 
     /**
+     * This method remove the instance of an element from the list with index
+     * i.
+     * 
+     * @return true if the instance is removed, otherwise return else
+     */
+    public final boolean removeElement(int index) {
+        if ((index < 0) || (index > list.size())) {
+            return false;
+        }
+        list.remove(index);
+        return true;
+    }
+
+    /**
      * The method remove a metadata object, that implements the MCRMetaInterface to
      * this element.
      * 
