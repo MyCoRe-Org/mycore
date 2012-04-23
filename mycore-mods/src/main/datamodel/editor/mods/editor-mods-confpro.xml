@@ -2,7 +2,7 @@
 
 <imports>
   <include uri="webapp:editor/editor-mods-common.xml" />
-  <panel id="edit-mods-cproceeding">
+  <panel id="edit-mods-confpro">
     <hidden var="@ID" />
     <hidden var="@label" />
     <hidden var="@version" />

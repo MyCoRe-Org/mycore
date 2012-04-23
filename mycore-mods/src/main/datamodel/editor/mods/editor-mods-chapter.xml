@@ -3,7 +3,7 @@
 <imports>
   <include uri="webapp:editor/editor-mods-common.xml" />
 
-  <panel id="edit-mods-book-chapter">
+  <panel id="edit-mods-chapter">
     <hidden var="@ID" />
     <hidden var="@label" />
     <hidden var="@version" />
