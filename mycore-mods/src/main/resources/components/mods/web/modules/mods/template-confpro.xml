@@ -1,0 +1,22 @@
+<mycoreobject>
+  <metadata xml:lang="de">
+    <def.modsContainer class="MCRMetaXML" notinherit="true" heritable="false">
+      <modsContainer>
+        <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+          <mods:name type="personal">
+            <mods:displayForm />
+            <mods:role>
+              <mods:roleTerm authority="marcrelator" type="code">orm</mods:roleTerm>
+            </mods:role>
+          </mods:name>
+          <mods:name type="personal">
+            <mods:displayForm />
+            <mods:role>
+              <mods:roleTerm authority="marcrelator" type="code">pbl</mods:roleTerm>
+            </mods:role>
+          </mods:name>
+        </mods:mods>
+      </modsContainer>
+    </def.modsContainer>
+  </metadata>
+</mycoreobject>

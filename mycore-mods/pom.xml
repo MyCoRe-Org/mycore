@@ -34,8 +34,8 @@
                 <layout>thesis</layout>
                 <layout>report</layout>
                 <layout>av-media</layout>
-                <layout>cproceeding</layout>
-                <layout>cpublication</layout>
+                <layout>confpro</layout>
+                <layout>confpub</layout>
                 <layout>book-chapter</layout>
                 <layout>book</layout>
                 <layout>journal</layout>
