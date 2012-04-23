@@ -485,14 +485,30 @@
   <xsl:template name="mods.getObjectEditURL">
     <xsl:param name="id" />
     <xsl:param name="layout" select="'$'" />
-    <xsl:variable name="layoutSuffix">
-      <xsl:if test="$layout != '$'">
-        <xsl:value-of select="concat('-',$layout)" />
-      </xsl:if>
-    </xsl:variable>
-    <xsl:variable name="form" select="concat('editor_form_commit-mods',$layoutSuffix,'.xml')" />
-    <xsl:value-of
-      select="concat($WebApplicationBaseURL,$form,$HttpSession,'?id=',$id)" />
+    <xsl:choose>
+      <xsl:when test="mcrxsl:resourceAvailable('actionmappings.xml')">
+      <!-- URL mapping enabled -->
+        <xsl:variable name="url" select="actionmapping:getURLforID('update',$id)" xmlns:actionmapping="xalan://org.mycore.wfc.actionmapping.MCRURLRetriever" />
+        <xsl:choose>
+          <xsl:when test="starts-with($url, '/')">
+            <xsl:value-of select="concat($WebApplicationBaseURL,substring-after($url, '/'),$HttpSession,'?id=',$id)" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="concat($url,'?id=',$id)" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+      <!-- URL mapping disabled -->
+        <xsl:variable name="layoutSuffix">
+          <xsl:if test="$layout != '$'">
+            <xsl:value-of select="concat('-',$layout)" />
+          </xsl:if>
+        </xsl:variable>
+        <xsl:variable name="form" select="concat('editor_form_commit-mods',$layoutSuffix,'.xml')" />
+        <xsl:value-of select="concat($WebApplicationBaseURL,$form,$HttpSession,'?id=',$id)" />
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
   <xsl:template mode="printDerivates" match="/mycoreobject[contains(@ID,'_mods_')]" priority="1">
     <xsl:param name="staticURL" />
