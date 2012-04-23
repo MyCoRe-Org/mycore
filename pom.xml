@@ -1156,6 +1156,7 @@
     <module>mycore-wcms</module>
     <module>mycore-webcli</module>
     <module>mycore-webservices</module>
+    <module>mycore-wfc</module>
     <module>mycore-z3950</module>
     <module>mycore-zoomify</module>
     <module>mycore-complete</module>
