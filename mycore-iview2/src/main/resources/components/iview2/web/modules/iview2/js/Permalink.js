@@ -98,6 +98,7 @@ iview.Permalink.Controller = function (viewer) {
 	 * @description describes the state of the permalink: displayed (true) or hidden (false)
 	 */
 	this.active = false;
+    
 };
 
 
@@ -170,6 +171,11 @@ iview.Permalink.Controller.prototype = {
 		url += "&tosize="	+ size;
 		url += "&maximized="+ viewer.viewerContainer.isMax();
 		
+		for(var currentIndex = 0; currentIndex < this.observer.length; currentIndex++){
+		    var parameter = this.observer[currentIndex].getParameter();
+		    url += "&" + parameter.name + "=" + parameter.value;
+		}
+		
 		return url;
 	}
 };
@@ -211,4 +217,14 @@ iview.Permalink.importPermalink = function(viewer, def) {
 	viewer.permalink.addView(new iview.Permalink.View("permalinkView", viewer.viewerContainer));
 	viewer.permalink.loaded = true;
 	def.resolve();
+};
+
+
+iview.Permalink.parameterObservable = { 
+        getParameter : function(){
+            return {
+                    "name": null,
+                    "value": null
+                    };
+        }
 };

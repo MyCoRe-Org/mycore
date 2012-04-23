@@ -11,10 +11,10 @@
             iview.IViewObject.call(this, iviewInst);
 
             if (iview.isCanvasAvailable) {
-                
+
                 this.context2D = document.createElement('canvas').getContext('2d');
                 this.redrawPreview = document.createElement('canvas');
-                jQuery(this.redrawPreview).css("position" ,"fixed");
+                jQuery(this.redrawPreview).css("position", "fixed");
                 this.activateCanvas = false;
                 this.lastFrame = new Date();
                 this.updateCanvasCount = 0;
@@ -22,6 +22,7 @@
                 this.lastPosX = 0;
                 this.lastPosY = 0;
                 this.lastZoomLevel = -1;
+                this.lastScale = -1;
                 this.damagedArea = new Array();
                 this.notLoadedTile = new Array();
                 var that = this;
@@ -55,6 +56,8 @@
                         this.lastFrame = curTime;
                     });
                 }
+                
+                jQuery(this).trigger(iview.Canvas.AFTER_INIT_EVENT);
 
             }
         }
@@ -84,30 +87,35 @@
          * Updates the Canvas.
          */
         constructor.prototype._updateScreen = function cv__updateScreen() {
+            if(!this.activateCanvas){
+                this._activateCanvas();
+                console.log("Canvas not initalised!");
+                //return;
+            }
             var scope = this;
             var viewerBean = this.getViewer().viewerBean;
             var zoomLevel = viewerBean.zoomLevel;
             var moveVector = this.calculateMoveVector();
             var moveOutOfScreen = this.isMoveOutOfScreen(moveVector);
             var zoomLevelChanged = this.zoomLevelChanged(this.lastZoomLevel);
+            var currentImage = this.getViewer().currentImage;
+            var scale = currentImage.zoomInfo.scale;
+            var scaleChanged = this.scaleChanged(this.lastScale);
             this.updateCanvasCount = 0;
             this.lastPosX = viewerBean.x;
             this.lastPosY = viewerBean.y;
             this.refreshImageDimensions();
             this.redrawPreview.width = this.context2D.canvas.width;
             this.redrawPreview.height = this.context2D.canvas.height;
-            if (zoomLevelChanged || moveOutOfScreen) {
+            if (zoomLevelChanged || moveOutOfScreen || scaleChanged) {
+                // something happened that needs to redraw all tiles
                 this.clearCanvas();
                 jQuery(scope).trigger(iview.Canvas.BEFORE_DRAW_EVENT);
                 this.drawPreview();
                 this.clearDamagedArea();
-                this.drawArea({
-                    "x" : viewerBean.x,
-                    "y" : viewerBean.y,
-                    "w" : viewerBean.width,
-                    "h" : viewerBean.height
-                });
+                this.drawArea(this.getFullScreenArea());
             } else {
+                // the viewer only moves, so we need only to draw the border Tiles
                 this.moveCanvas(moveVector);
                 jQuery(scope).trigger(iview.Canvas.BEFORE_DRAW_EVENT);
                 var moveDamagedArea = this.calculateDamagedArea(moveVector);
@@ -118,25 +126,47 @@
 
                 while (currentArea = damagedAreas.pop()) {
                     this.drawArea(currentArea);
-                    var ctxx = this.redrawPreview.getContext('2d');
-                    ctxx.lineWidth = 3;
-                    ctxx.fillStyle = "black";
-                    ctxx.strokeRect(currentArea.x - viewerBean.x, currentArea.y - viewerBean.y, currentArea.w, currentArea.h);
                 }
             }
             this.lastZoomLevel = zoomLevel;
+            this.lastScale = scale;
             jQuery(scope).trigger(iview.Canvas.AFTER_DRAW_EVENT);
-            
         };
 
-        constructor.prototype.zoomLevelChanged= function cv_zoomLevelChanged(lastZoomLevel) {
-            var zoomLevel =  this.getViewer().viewerBean.zoomLevel;
+        /**
+         * Calculates a Damaged Area for the whole viewer Bean
+         */
+        constructor.prototype.getFullScreenArea = function cv_getFullScreenArea() {
+            var viewerBean = this.getViewer().viewerBean;
+            return {
+                "x" : viewerBean.x,
+                "y" : viewerBean.y,
+                "w" : Math.min(viewerBean.width, this.getCurrentImageWidth()),
+                "h" : Math.min(viewerBean.height, this.getCurrentImageHeight())
+            };
+        };
+
+        /**
+         * Checks the zoom-level of the picture has changed
+         * @param lastZoomLevel 
+         * The last zoom-level to compare with 
+         */
+        constructor.prototype.zoomLevelChanged = function cv_zoomLevelChanged(lastZoomLevel) {
+            var zoomLevel = this.getViewer().viewerBean.zoomLevel;
             var hasChanged = lastZoomLevel != zoomLevel;
             return hasChanged;
-        }
-        
+        };
 
-        //                    ;
+        /**
+         * Checks the scale of the picture has changed
+         * @param lastScale 
+         * The last Scale to compare with 
+         */
+        constructor.prototype.scaleChanged = function cv_scaleChanged(lastScale) {
+            var scale = this.getViewer().currentImage.zoomInfo.scale;
+            var hasChanged = lastScale != scale;
+            return hasChanged;
+        };
 
         /**
          * Checks a move vector move complete out of the current screen
@@ -181,8 +211,8 @@
          * Remove all Childs from DamagedArea
          */
         constructor.prototype.clearDamagedArea = function cv_clearDamagedArea() {
-            while (this.damagedArea.pop())
-                ;
+            while (this.damagedArea.pop());
+                
         };
 
         /**
@@ -196,6 +226,7 @@
             var viewerBean = this.getViewer().viewerBean;
             var cvn = this.context2D.canvas;
             var damagedAreas = new Array();
+            var rotation = this.getViewer().currentImage.rotation;
 
             var damagedAreaY = {
                 "x" : 0,
@@ -209,6 +240,8 @@
                 "w" : 0,
                 "h" : 0
             };
+            
+            
 
             if (moveVec.xOff < 0) {
                 damagedAreaX.w = moveVec.xOff * -1;
@@ -244,149 +277,52 @@
          * Draws a specific area to the Canvas
          * 
          * @param area
-         *            the area that should be drawn
+         *            {x,y,w,h} the area that should be drawn. X and y are global(whole picture, not only bean)
          */
         constructor.prototype.drawArea = function cv_drawArea(area) {
-            if(!this.isAreaInBean(area)) return;
-
             var viewerBean = this.getViewer().viewerBean;
             var currentImage = this.getViewer().currentImage;
             var old = 0;
-            var tileSize = viewerBean.tileSize;// currentImage.zoomInfo.scale;
+            var tileSize = viewerBean.tileSize;
             var originTileSize = this.getViewer().properties.tileSize;
             var scale = currentImage.zoomInfo.scale;
-            var curWidth = this.getCurrentWidth();
-            var curHeight = this.getCurrentHeight();
+            var curWidth = this.getCurrentImageWidth();
+            var curHeight = this.getCurrentImageHeight();
 
             var sizeX = curWidth;
             var sizeY = curHeight;
 
-            var areaStartX, areaStartY, areaEndX, areaEndY;
+            var tilesXStart = Math.floor(area.x / tileSize);
+            var tilesYStart = Math.floor(area.y / tileSize);
+            var tilesXEnd = Math.ceil((area.x + area.w) / tileSize);
+            var tilesYEnd = Math.ceil((area.y + area.h) / tileSize);
 
-            areaStartX = Math.max(area.x - viewerBean.x, 0);
-            areaStartY = Math.max(area.y - viewerBean.y, 0);
-            areaEndX = Math.min((areaStartX + area.w), sizeX);
-            areaEndY = Math.min((areaStartY + area.h), sizeY);
-
-            var xOffset = area.x;
-            var yOffset = area.y;
-
-            var xTileOffset = Math.floor(xOffset / tileSize);
-            var yTileOffset = Math.floor(yOffset / tileSize);
-
-            // calculate border tiles
-            var startBorderTileSizeX, startBorderTileSizeY, endBorderTileSizeX, endBorderTileSizeY;
-
-            startBorderTileSizeX = Math.min(Math.min(tileSize - (xOffset % tileSize), areaEndX),sizeX);
-            startBorderTileSizeY = Math.min(Math.min(tileSize - (yOffset % tileSize), areaEndY),sizeY);
-
-            endBorderTileSizeX = (areaEndX - areaStartX - startBorderTileSizeX) % tileSize;
-            endBorderTileSizeY = (areaEndY - areaStartY - startBorderTileSizeY) % tileSize;
-
-            var columnCount = Math.floor((areaEndX - areaStartX - startBorderTileSizeX - endBorderTileSizeX) / tileSize);
-            var rowCount = Math.floor((areaEndY - areaStartY - startBorderTileSizeY - endBorderTileSizeY) / tileSize);
-
-            if (startBorderTileSizeX > 0)
-                columnCount++;
-            if (endBorderTileSizeX > 0)
-                columnCount++;
-            if (startBorderTileSizeY > 0)
-                rowCount++;
-            if (endBorderTileSizeY > 0)
-                rowCount++;
-
-            for ( var currentX = 0; currentX < columnCount; currentX++) {
-                var dx, dw, sx, sw;
-                sx = 0;
-                if (currentX == 0) {
-                    dx = areaStartX;
-                    dw = startBorderTileSizeX;
-                    sw = Math.min(Math.floor(dw / scale), originTileSize);
-                    sx = originTileSize - sw;
-
-                    if (currentX == columnCount - 1) {
-                        sx = Math.floor((xOffset % tileSize));
-                        if (xOffset + tileSize > curWidth) {
-                            sw = curWidth - xOffset;
-                        }
-                    }
-                } else if (currentX == columnCount - 1) {
-                    dx = areaStartX + startBorderTileSizeX + (tileSize * (currentX - 1))
-                    dw = endBorderTileSizeX;
-                    sw = Math.floor(dw / scale);
-                } else {
-                    dx = areaStartX + startBorderTileSizeX + (tileSize * (currentX - 1));
-                    dw = tileSize;
-                    sw = originTileSize;
-                }
-
-                for ( var currentY = 0; currentY < rowCount; currentY++) {
-                    var dy, dh, sy, sh;
-                    sy = 0;
-                    if (currentY == 0) {
-                        dy = areaStartY;
-                        dh = startBorderTileSizeY;
-                        sh = Math.min(Math.floor(dh / scale), originTileSize);
-                        sy = originTileSize - sh;
-
-                        if (currentY == rowCount - 1) {
-                            sy = Math.floor((yOffset % tileSize) / scale);
-                            if (yOffset + tileSize > curHeight) {
-                                sh = curHeight - yOffset;
-                            }
-                        }
-                    } else if (currentY == rowCount - 1) {
-                        dy = areaStartY + startBorderTileSizeY + (tileSize * (currentY - 1));
-                        dh = endBorderTileSizeY;
-                        sh = Math.min(Math.floor(dh / scale), originTileSize);
-                    } else {
-                        dy = areaStartY + startBorderTileSizeY + (tileSize * (currentY - 1));
-                        dh = tileSize;
-                        sh = originTileSize;
-                    }
-                    try {
-                        this.assignTileImage(xTileOffset + currentX, yTileOffset + currentY, sx, sy, sw, sh, dx, dy, dw, dh);
-                        //this.context2D.strokeRect(areaStartX, areaStartY, area.w, area.h);
-                    } catch (err) {
-                        console.log({
-                            "Error while drawing Tiles " : err,
-                            "Params" : {
-                                "col" : (xTileOffset + currentX),
-                                "row" : (yTileOffset + currentY),
-                                "sx" : sx,
-                                "sy" : sy,
-                                "sw" : sw,
-                                "sh" : sh,
-                                "dx" : dx,
-                                "dy" : dy,
-                                "dw" : dw,
-                                "dh" : dh,
-                                "curWidth" : curWidth,
-                                "curHeight" : curHeight,
-                                "cvnWidth" : this.getCurrentCanvasWidth(),
-                                "cvnHeight" : this.getCurrentCanvasHeight(),
-                                "area" : area
-                            }
-                        });
-                    }
-
+            var ctx = this.context2D;
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(area.x - this.getBeanX(), area.y - this.getBeanY(), area.w, area.h);
+            ctx.clip();
+            // Draw only in damaged Area. The "rest" of the tiles will clipped.
+            for (tilesXStart = tilesXStart; tilesXStart < tilesXEnd; tilesXStart++) {
+                for ( var yCount = tilesYStart; yCount < tilesYEnd; yCount++) {
+                    this.assignTileImage(tilesXStart, yCount);
                 }
             }
+            ctx.restore();
             
-            if(this.notLoadedTile.lenght != 0){
-                var ctx = this.context2D;
+            // draw the preview picture to the not loaded tiles
+            if (this.notLoadedTile.lenght != 0) {
                 ctx.save();
                 ctx.beginPath();
                 ctx.strokeStyle = "#a00";
                 var current;
-                while(current = this.notLoadedTile.pop()){
+                while (current = this.notLoadedTile.pop()) {
                     ctx.rect(current.x, current.y, current.w, current.h);
                 }
-                //ctx.stroke();
                 ctx.clip();
                 this.drawPreview();
                 ctx.restore();
-                
+
             }
         };
 
@@ -405,89 +341,119 @@
             return true;
         };
 
-        constructor.prototype.assignTileImage = function cv_assignTileImage(tileX, tileY, sx, sy, sw, sh, dx, dy, dw, dh) {
+        constructor.prototype.assignTileImage = function cv_assignTileImage(tileX, tileY) {
             var viewerBean = this.getViewer().viewerBean;
             var tileImgId = viewerBean.tileUrlProvider.assembleUrl(tileX, tileY, viewerBean.zoomLevel);
             var tileImg = viewerBean.cache.getItem(tileImgId);
-            
-            
-            if (tileImg == null ) {
-                tileImg = this.createImageTile(tileImgId, true ,viewerBean, tileX, tileY);
-            }
-            
-            if(typeof tileImg.loaded == "undefined"){
-                this.notLoadedTile.push({"x" : dx, "y" : dy, "w" : dw, "h" : dh});
-            }
 
-            
-            
-            if (tileImg.loaded) {
-                // make sure there no floating point coords(performance)
-                sx = this.floatToInt(sx);
-                sy = this.floatToInt(sy);
-                sw = this.floatToInt(sw);
-                sh = this.floatToInt(sh);
-                dx = this.floatToInt(dx);
-                dy = this.floatToInt(dy);
-                dw = this.floatToInt(dw);
-                dh = this.floatToInt(dh);
-
-                // draws the Tile only direct if it is already loaded
-                this.context2D.drawImage(tileImg, sx, sy, sw, sh, dx, dy, dw, dh);
-                
-                var ctxx = this.redrawPreview.getContext('2d');
-                ctxx.lineWidth = 1;
-                ctxx.strokeStyle = "blue";
-                ctxx.strokeRect(dx, dy, dw, dh);
+            if (tileImg == null) {
+                tileImg = this.createImageTile(tileImgId, true, viewerBean, tileX, tileY);
             }
+            
+            this.drawTileImage(tileX, tileY, tileImg);
         };
-        constructor.prototype.createImageTile = function cv_createImageTile(tileImgId, createCache,viewerBean, tx, ty) {
+
+        constructor.prototype.isXBorderTile = function cv_isXBorderTile(tileX) {
+            var viewerBean = this.getViewer().viewerBean;
+            var currentImage = this.getViewer().currentImage;
+            var tileSize = viewerBean.tileSize;
+            return Math.floor(currentImage.curWidth / tileSize) == tileX;
+        };
+
+        constructor.prototype.isYBorderTile = function cv_isYBorderTile(tileY) {
+            var viewerBean = this.getViewer().viewerBean;
+            var currentImage = this.getViewer().currentImage;
+            var tileSize = viewerBean.tileSize;
+            return Math.floor(currentImage.curHeight / tileSize) == tileY;
+        };
+
+
+        constructor.prototype.drawTileImage = function cv_drawTileImage(tileX, tileY, tileImg) {
+            var dx, dy, dw, dh, sx, sy, sw, sh;
+            var viewerBean = this.getViewer().viewerBean;
+            var currentImage = this.getViewer().currentImage;
+            var tileSize = viewerBean.tileSize;// currentImage.zoomInfo.scale;
+            var originTileSize = this.getViewer().properties.tileSize;
+            var scale = currentImage.zoomInfo.scale;
+
+            dx = (tileX * tileSize) - this.getBeanX();
+            dy = (tileY * tileSize) - this.getBeanY();
+            dw = tileSize;
+            dh = tileSize;
+            sx = 0;
+            sy = 0;
+            sw = originTileSize;
+            sh = originTileSize;
+
+            if (this.isXBorderTile(tileX)) {
+                dw = this.getCurrentImageWidth() % tileSize;
+                sw = tileImg.naturalWidth;
+            }
+            if (this.isYBorderTile(tileY)) {
+                dh = this.getCurrentImageHeight() % tileSize;
+                sh = tileImg.naturalHeight;
+            }
+
+            if (tileImg.loaded) {
+                try {
+                    this.context2D.drawImage(tileImg, sx, sy, sw, sh, dx, dy, dw, dh);
+                } catch (err) {
+                    console.log(err);
+                    console.log({
+                        "width:" : tileImg.naturalWidth,
+                        "height:" : tileImg.naturalHeight,
+                        "sw:" : sw,
+                        "sh:" : sh
+                    });
+                }
+            } else {
+                this.notLoadedTile.push({
+                    "x" : dx,
+                    "y" : dy,
+                    "w" : dw,
+                    "h" : dh
+                });
+            }
+
+        };
+
+        constructor.prototype.createImageTile = function cv_createImageTile(tileImgId, createCache, viewerBean, tx, ty) {
             var tileImg = new Image();
             var viewer = this.getViewer();
             var viewerBean = viewer.viewerBean;
             viewerBean.cache.setItem(tileImgId, tileImg);
             var that = this;
             var zoomLevelOnLoad = this.getViewer().viewerBean.zoomLevel;
-            tileImg.onload = function cv_tileOnLoad(){
+            tileImg.onload = function cv_tileOnLoad() {
                 var imgScope = this;
-                //setTimeout(function() { // to simulate bad connection
-                    imgScope.loaded = true;    
-                    
-                    if(that.zoomLevelChanged(zoomLevelOnLoad)){
-                        console.log("das zoomLevel hat sich geändert!");
-                        return;
-                    }
-                    
-                    var tileSize = viewerBean.tileSize;
-                    var scale = that.getViewer().currentImage.zoomInfo.scale;
-                    var bx = viewerBean.x, by = viewerBean.y;
-                    var dw = imgScope.width * scale;
-                    var dh = imgScope.height * scale;
-                    var dx = (Math.floor(tx * tileSize) )- bx ;
-                    var dy = (Math.floor(ty * tileSize) )- by ;
-                    
-                    if(!that.isAreaInBean({"x" : dx + bx, "y" : dy + by, "w" : dw, "h" : dh})){
-                        console.log("das tile ist ausserhalb des viewerbean!");
-                        //return;
-                    }
-
-                    
-                    
-                    console.log("Zeichne tile dx: " + dx + " dy:" + dy + " dw:" + dw + " dh:" + dh);
-                    that.context2D.drawImage(tileImg, dx, dy, dw, dh);    
-                    var ctxx = that.redrawPreview.getContext('2d');
-                    ctxx.lineWidth = 1;
-                    ctxx.strokeStyle = "red";
-                    ctxx.strokeRect(dx, dy, dw, dh);
-                //}, 2000);
+                imgScope.loaded = true;
+                
+                if (that.zoomLevelChanged(zoomLevelOnLoad)) {
+                    //console.log("das zoomLevel hat sich geändert!");
+                    return;
+                }
+                
+                jQuery(that).trigger(iview.Canvas.BEFORE_DRAW_EVENT);
+                //console.log("nachpos  Tile! " + tx + " x " + ty);
+                that.drawTileImage(tx, ty, tileImg);
+                jQuery(that).trigger(iview.Canvas.AFTER_DRAW_EVENT);
             };
 
             tileImg.src = tileImgId;
             return tileImg;
         };
-        
-        constructor.prototype.createCoordObject = function cv_createCoordObject(sx, sy, sw, sh, dx, dy, dw, dh){
-           return {"sx" : sx, "sy" : sy, "sw" : sw, "sh" : sh,"dx" : dx,"dy" : dy,"dw" : dw,"dh" : dh};
+
+        constructor.prototype.createCoordObject = function cv_createCoordObject(sx, sy, sw, sh, dx, dy, dw, dh) {
+            return {
+                "sx" : sx,
+                "sy" : sy,
+                "sw" : sw,
+                "sh" : sh,
+                "dx" : dx,
+                "dy" : dy,
+                "dw" : dw,
+                "dh" : dh
+            };
         }
 
         constructor.prototype._drawFpsBox = function cv_drawDebugBox(fps) {
@@ -497,11 +463,23 @@
             this.context2D.fillText(Math.round(fps), 0, this.context2D.canvas.height - 3);
         };
 
-        constructor.prototype.getCurrentWidth = function cv_getCurrentWidth() {
+        constructor.prototype.getBeanX = function cv_getBeanX() {
+            var viewer = this.getViewer();
+            var viewerBean = viewer.viewerBean;
+            return viewerBean.x;
+        };
+
+        constructor.prototype.getBeanY = function cv_getBeanY() {
+            var viewer = this.getViewer();
+            var viewerBean = viewer.viewerBean;
+            return viewerBean.y;
+        };
+
+        constructor.prototype.getCurrentImageWidth = function cv_getCurrentImageWidth() {
             return this.getViewer().currentImage.curWidth;
         };
 
-        constructor.prototype.getCurrentHeight = function cv_getCurrentHeight() {
+        constructor.prototype.getCurrentImageHeight = function cv_getCurrentImageHeight() {
             return this.getViewer().currentImage.curHeight;
         };
 
@@ -511,17 +489,19 @@
 
         constructor.prototype.getCurrentCanvasHeight = function cv_getCurrentCanvasHeight() {
             return this.context2D.canvas.height;
+            j
         };
 
-        constructor.prototype.getXOffset = function cv_getXOffset(areaStartX, areaEndX) {
-            return this.getViewer().viewerBean.x + areaStartX;
-        };
-        constructor.prototype.getYOffset = function cv_getYOffset(areaStartY, areaEndY) {
-            return this.getViewer().viewerBean.y + areaStartY;
-        };
+        /**
+         * Gets the right x coordinate for the preview picture
+         */
         constructor.prototype.getPreviewX = function cv_getPreviewX() {
             return -this.getViewer().viewerBean.x;
         };
+
+        /**
+         * Gets the right y coordinate for the preview picture
+         */
         constructor.prototype.getPreviewY = function cv_getPreviewY() {
             return -this.getViewer().viewerBean.y;
         };
@@ -530,20 +510,28 @@
          * Draws the Preview Image to the right Position.
          */
         constructor.prototype.drawPreview = function cv_drawPreview() {
-            if(!this.preView.loaded) return;
+            if (!this.preView.loaded)
+                return;
             var viewerBean = this.getViewer().viewerBean;
             var currentImage = this.getViewer().currentImage;
             var x = this.getPreviewX(), y = this.getPreviewY();
-            var w = this.getCurrentWidth();
-            var h = this.getCurrentHeight();
+            var w = this.getCurrentImageWidth();
+            var h = this.getCurrentImageHeight();
             this.context2D.drawImage(this.preView, x, y, w, h);
         };
 
         constructor.prototype.switchDisplayMode = function cv_switchDisplayMode(screenZoom, stateBool, preventLooping) {
-            var viewerBean = this.getViewer().viewerBean; 
+            var viewerBean = this.getViewer().viewerBean;
             var temp = viewerBean.switchDisplayModeOrig(screenZoom, stateBool, preventLooping);
+            
+            this._activateCanvas();
 
-            if (this.getViewer().viewerContainer.isMax() && !this.activateCanvas) {
+            return temp;
+        };
+
+        constructor.prototype._activateCanvas = function cv_activateCanvas(){
+            var viewerBean = this.getViewer().viewerBean;
+            if (!this.activateCanvas) {
                 this.activateCanvas = true;
                 this.context2D.canvas.y = this.context2D.canvas.x = 0;
                 this.appendCanvas();
@@ -551,7 +539,7 @@
                 //make sure that the preview image is already loaded before drawing on canvas
                 var that = this;
                 that.preView.onload = function() {
-                    that.preView.loaded=true;
+                    that.preView.loaded = true;
                     that.getViewer().viewerBean.positionTiles();
                 };
                 that.preView.src = this.getViewer().context.container.find(".preload")[0].firstChild.src;
@@ -566,10 +554,8 @@
                 this.context2D.canvas.height = viewerBean.height;
 
             }
-
-            return temp;
         };
-
+        
         /**
          * Resets the canvas
          */
@@ -595,7 +581,7 @@
                     * currentImage.zoomInfo.scale);
             currentImage.curHeight = Math.ceil((currentImage.height / Math.pow(2, currentImage.zoomInfo.maxZoom - viewerBean.zoomLevel))
                     * currentImage.zoomInfo.scale);
-        }; 
+        };
 
         constructor.prototype.floatToInt = function cv_floatToInt(somenum) {
             return (0.5 + somenum) << 0;
@@ -607,4 +593,5 @@
 
     iview.Canvas.BEFORE_DRAW_EVENT = "beforeDraw.canvas.iview";
     iview.Canvas.AFTER_DRAW_EVENT = "afterDraw.canvas.iview";
+    iview.Canvas.AFTER_INIT_EVENT = "afterInit.canvas.iview";
 })();

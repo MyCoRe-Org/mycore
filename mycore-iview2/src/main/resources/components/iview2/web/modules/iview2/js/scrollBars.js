@@ -428,12 +428,18 @@ iview.scrollbar.View = function() {
 		that._outOfBar = true;
 		//find out if the mouse is pressed before or after the bar so that the movement can be adjusted on it
 		if (that._direction) {
-			that._moveTo = e.layerX || e.offsetX;
-			that._before = (toInt(that.my.bar.css("left")) > (e.layerX || e.offsetX))? true:false;
+			that._moveTo = e.layerX || e.offsetX || (e.originalEvent.layerX) || e.clientX;
+			that._before = (toInt(that.my.bar.css("left")) > (that._moveTo)) ? true:false;
+			console.log("moveTo: " + that._moveTo);
 		} else {
-			that._moveTo = e.layerY || e.offsetY;
-			that._before = (toInt(that.my.bar.css("top")) > (e.layerY || e.offsetY))? true:false;
+			that._moveTo = e.layerY || e.offsetY || (e.originalEvent.layerY) || e.clientY;
+			that._before = (toInt(that.my.bar.css("top")) > (that._moveTo)) ? true:false;
+			console.log("moveTo: " + that._moveTo);
 		}
+		console.log([this, e]);
+		var x = e.layerX || e.offsetX || e.originalEvent.layerX;
+		var y =  e.layerY || e.offsetY || e.originalEvent.layerY;
+		console.log("x :" + x + " y :" + y);
 		//set the initial movement
 		stopUnderMouse(that);
 		//add an reoccuring event after an inital delay

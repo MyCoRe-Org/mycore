@@ -70,7 +70,8 @@
         'parent' : container
       });
       this.permalink = jQuery.extend(this.permalink | {}, {
-        'loaded' : (this.permalink || {}).loaded || false
+        'loaded' : (this.permalink || {}).loaded || false,
+        'observer' : new Array()
       });
       this.thumbnailPanel = jQuery.extend(this.thumbnailPanel | {}, {
         'loaded' : (this.thumbnailPanel || {}).loaded || false
@@ -316,12 +317,14 @@
       zoomInfo.zoomBack = zoomInfo.zoomInit;
 
       this.roller = true;
-      if (this.properties.useParam && (URL.getParam("x")!=="")) {
-        viewerBean.positionTiles({
-          'x' : toFloat(URL.getParam("x")),
-          'y' : toFloat(URL.getParam("y"))
-        }, true);
-      }
+      viewerBean.x = 0;
+      viewerBean.y = 0;
+      if (!isNaN(URL.getParam("x")) && !isNaN(URL.getParam("x"))) {
+          viewerBean.positionTiles({
+            'x' : -toFloat(URL.getParam("x")),
+            'y' : -toFloat(URL.getParam("y"))
+          }, true);
+        }
       this.roller = false;
     };
 
@@ -396,6 +399,17 @@
       callBack(callback);
       // notify all listeners that the viewer was modified in such way that they possibly need adaptation of their own view
       jQuery(viewerBean.viewer).trigger("reinit.viewer");
+
+      viewerBean.x = 0;
+      viewerBean.y = 0;
+      if (!isNaN(URL.getParam("x")) && !isNaN(URL.getParam("x"))) {
+          viewerBean.positionTiles({
+            'x' : -toFloat(URL.getParam("x")),
+            'y' : -toFloat(URL.getParam("y"))
+          }, true);
+        }else{
+           viewerBean.positionTiles();
+        }
       // TODO: align image and toolbar to the center
     };
 
