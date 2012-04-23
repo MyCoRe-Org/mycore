@@ -492,7 +492,7 @@
     </xsl:variable>
     <xsl:variable name="form" select="concat('editor_form_commit-mods',$layoutSuffix,'.xml')" />
     <xsl:value-of
-      select="concat($WebApplicationBaseURL,$form,$HttpSession,'?mcrid=',$id)" />
+      select="concat($WebApplicationBaseURL,$form,$HttpSession,'?id=',$id)" />
   </xsl:template>
   <xsl:template mode="printDerivates" match="/mycoreobject[contains(@ID,'_mods_')]" priority="1">
     <xsl:param name="staticURL" />
