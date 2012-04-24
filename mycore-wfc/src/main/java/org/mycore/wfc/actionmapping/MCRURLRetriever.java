@@ -131,6 +131,9 @@ public final class MCRURLRetriever {
         }
         LOGGER.info("Checking parent collection '" + parentCollection + "' for action: " + action);
         MCRCollection collectionWithAction = getCollectionWithAction(parentCollection, action);
+        if (collectionWithAction == null) {
+            return null;
+        }
         if (mcrCollection == null) {
             mcrCollection = new MCRCollection();
             mcrCollection.setName(collection);
