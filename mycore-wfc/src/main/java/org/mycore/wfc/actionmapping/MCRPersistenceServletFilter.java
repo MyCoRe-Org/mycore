@@ -83,7 +83,9 @@ public class MCRPersistenceServletFilter implements Filter {
             case 0:
                 break;
             case 1:
-                req.setAttribute(entry.getKey(), entry.getValue()[0]);
+                if (!entry.getKey().equals("layout")) {
+                    req.setAttribute(entry.getKey(), entry.getValue()[0]);
+                }
                 break;
             default:
                 req.setAttribute(entry.getKey(), entry.getValue());
