@@ -672,13 +672,13 @@
                     <xsl:when test="$mods-type = 'series'">
                       <li>
                         <a
-                          href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=book&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
+                          href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=book&amp;parentId={./@ID}">
                           <xsl:value-of select="i18n:translate('metaData.mods.types.book')" />
                         </a>
                       </li>
                       <li>
                         <a
-                          href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=confpro&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
+                          href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=confpro&amp;parentId={./@ID}">
                           <xsl:value-of select="i18n:translate('metaData.mods.types.confpro')" />
                         </a>
                       </li>
@@ -686,7 +686,7 @@
                     <xsl:otherwise>
                       <li>
                         <a
-                          href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout={$child-layout}&amp;sourceUri=xslStyle:asParent:mcrobject:{./@ID}">
+                          href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout={$child-layout}&amp;parentId={./@ID}">
                           <xsl:value-of select="i18n:translate(concat('metaData.mods.types.',$child-layout))" />
                         </a>
                       </li>
