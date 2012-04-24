@@ -32,10 +32,10 @@
       <xsl:attribute name="type">
         <xsl:choose>
           <xsl:when test="@type='corporate'">
-            <xsl:value-of select="'corporate'"/>
+            <xsl:value-of select="'corporate'" />
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="'personal'"/>
+            <xsl:value-of select="'personal'" />
           </xsl:otherwise>
         </xsl:choose>
         
@@ -124,8 +124,34 @@
     <xsl:copy>
       <xsl:apply-templates select="@*" />
       <xsl:attribute name="editor.parentName">
-        <xsl:value-of
-        select="document(concat('mcrobject:',@xlink:href))/mycoreobject/metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title" />
+        <xsl:variable name="parentMods"
+        select="document(concat('mcrobject:',@xlink:href))/mycoreobject/metadata/def.modsContainer/modsContainer/mods:mods" />
+        <xsl:choose>
+          <xsl:when test="$parentMods/mods:titleInfo/mods:title">
+            <xsl:value-of select="$parentMods/mods:titleInfo/mods:title" />
+          </xsl:when>
+          <xsl:when test="$parentMods/mods:name[@type='conference']">
+            <xsl:for-each select="$parentMods/mods:name[@type='conference']">
+              <xsl:for-each select="mods:namePart[not(@type)]">
+                <xsl:choose>
+                  <xsl:when test="position()=1">
+                    <xsl:value-of select="." />
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="concat(' – ',.)" />
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:for-each>
+              <xsl:if test="mods:namePart[@type='date']">
+                <xsl:value-of select="', '" />
+                <xsl:value-of select="mods:namePart[@type='date']" />
+              </xsl:if>
+              <xsl:for-each select="mods:affiliation">
+                <xsl:value-of select="concat(', ',.)" />
+              </xsl:for-each>
+            </xsl:for-each>
+          </xsl:when>
+        </xsl:choose>
       </xsl:attribute>
     </xsl:copy>
   </xsl:template>
@@ -140,8 +166,8 @@
   <!-- workaround for bug #3479633 -->
   <xsl:template match="@transliteration">
     <xsl:attribute name="transliteration">
-      <xsl:value-of select="'html'"/>
+      <xsl:value-of select="'html'" />
     </xsl:attribute>
   </xsl:template>
-  
+
 </xsl:stylesheet>
