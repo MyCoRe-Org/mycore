@@ -42,7 +42,7 @@ public abstract class MCRConstants {
     private MCRConstants() {
     }
 
-    public static final String CONFIG_PREFIX = "MCR.workflow.";
+    public static final String CONFIG_PREFIX = "MCR.Module-wfc.";
 
     public static final JAXBContext JAXB_CONTEXT = initContext();
 
