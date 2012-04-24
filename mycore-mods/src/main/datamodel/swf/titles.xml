@@ -5,14 +5,21 @@
   <title step="commit" type="mods" xml:lang="en">Edit MODS document</title>
   <title step="editor" type="mods" xml:lang="de">MODS-Dokument bearbeiten</title>
   <title step="editor" type="mods" xml:lang="en">Edit MODS document</title>
-  
+
   <title step="author" type="mods" layout="thesis" xml:lang="de">Hochschulschrift erstellen</title>
   <title step="author" type="mods" layout="thesis" xml:lang="en">Create Thesis</title>
   <title step="commit" type="mods" layout="thesis" xml:lang="de">Hochschulschrift bearbeiten</title>
   <title step="commit" type="mods" layout="thesis" xml:lang="en">Edit Thesis</title>
   <title step="editor" type="mods" layout="thesis" xml:lang="de">Hochschulschrift bearbeiten</title>
   <title step="editor" type="mods" layout="thesis" xml:lang="en">Edit Thesis</title>
-  
+
+  <title step="author" type="mods" layout="thesis-admin" xml:lang="de">Hochschulschrift erstellen (Admin)</title>
+  <title step="author" type="mods" layout="thesis-admin" xml:lang="en">Create Thesis (Admin)</title>
+  <title step="commit" type="mods" layout="thesis-admin" xml:lang="de">Hochschulschrift bearbeiten (Admin)</title>
+  <title step="commit" type="mods" layout="thesis-admin" xml:lang="en">Edit Thesis (Admin)</title>
+  <title step="editor" type="mods" layout="thesis-admin" xml:lang="de">Hochschulschrift bearbeiten (Admin)</title>
+  <title step="editor" type="mods" layout="thesis-admin" xml:lang="en">Edit Thesis (Admin)</title>
+
   <title step="author" type="mods" layout="report" xml:lang="de">Report erstellen</title>
   <title step="author" type="mods" layout="report" xml:lang="en">Create Report</title>
   <title step="commit" type="mods" layout="report" xml:lang="de">Report bearbeiten</title>

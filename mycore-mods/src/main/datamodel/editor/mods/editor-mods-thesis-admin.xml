@@ -3,7 +3,7 @@
 <imports>
   <include uri="webapp:editor/editor-mods-common.xml" />
 
-  <panel id="edit-mods-thesis">
+  <panel id="edit-mods-thesis-admin">
     <hidden var="@ID" />
     <hidden var="@label" />
     <hidden var="@version" />
