@@ -32,6 +32,7 @@
               <objectType>mods</objectType>
               <layouts>
                 <layout>thesis</layout>
+                <layout>thesis-admin</layout>
                 <layout>report</layout>
                 <layout>av</layout>
                 <layout>confpro</layout>
