@@ -9,6 +9,8 @@
     <hidden var="@version" />
     <hidden var="service" descendants="true" />
     <hidden var="metadata/@xml:lang" default="de" />
+    
+    <include uri="webapp:editor/editor-mods-external.xml" ref="mods.additional.admin" />
 
     <cell col="1" colspan="3" row="350" anchor="NORTHEAST" ref="mods.genre.thesis" />
     <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:typeOfResource" default="text" />
@@ -18,7 +20,7 @@
     <hidden var="metadata/def.modsContainer/@heritable" default="false" />
 
     <!-- Basisangaben zum Dokument -->
-    <cell row="1" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
+    <cell row="9" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
       <text id="thesis.titles" i18n="metaData.mods.dictionary.thesis" />
     </cell>
 

@@ -146,5 +146,11 @@
     <cell row="10" col="3" anchor="NORTHWEST" ref="mods.note.help" />
     <!-- Kommentar END -->
   </panel>
+  
+  <include id="mods.additional.admin">
+  </include>
+
+  <include id="mods.additional">
+  </include>
 
 </imports>
