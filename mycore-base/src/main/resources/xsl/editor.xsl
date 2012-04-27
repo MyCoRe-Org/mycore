@@ -787,6 +787,7 @@
         </xsl:otherwise>
       </xsl:choose>
       <xsl:copy-of select="@maxlength" />
+      <xsl:copy-of select="@placeholder" />
       <xsl:if test="@disabled='true'">
         <xsl:attribute name="readonly">readonly</xsl:attribute>
       </xsl:if>
@@ -803,6 +804,9 @@
       <xsl:text>class="</xsl:text><xsl:value-of select="@class"/><xsl:text>" </xsl:text>
       <xsl:if test="@style">
         <xsl:text>style="</xsl:text><xsl:value-of select="@style"/><xsl:text>" </xsl:text>
+      </xsl:if>
+      <xsl:if test="@placeholder">
+        <xsl:text>placeholder="</xsl:text><xsl:value-of select="@placeholder"/><xsl:text>" </xsl:text>
       </xsl:if>
       <xsl:choose>
         <xsl:when test="@title-i18n">
