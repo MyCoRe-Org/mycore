@@ -514,6 +514,7 @@
     </xs:sequence>
     <xs:attribute name="default" type="xs:string" use="optional" />
     <xs:attribute name="autofill" type="xs:string" use="optional" />
+    <xs:attribute name="placeholder" type="xs:string" use="optional" />
     <xs:attribute name="id" type="xs:ID" use="optional" />
     <xs:attribute name="width" type="xs:int" use="required" />
     <xs:attribute name="maxlength" type="xs:int" use="optional" />
