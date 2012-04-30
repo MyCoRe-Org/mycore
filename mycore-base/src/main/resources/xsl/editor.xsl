@@ -787,7 +787,13 @@
         </xsl:otherwise>
       </xsl:choose>
       <xsl:copy-of select="@maxlength" />
-      <xsl:copy-of select="@placeholder" />
+      
+      <xsl:if test="@placeholder">
+        <xsl:attribute name="placeholder">
+          <xsl:apply-templates select="@placeholder" mode="editor" />
+        </xsl:attribute>
+      </xsl:if>
+      
       <xsl:if test="@disabled='true'">
         <xsl:attribute name="readonly">readonly</xsl:attribute>
       </xsl:if>
@@ -806,7 +812,9 @@
         <xsl:text>style="</xsl:text><xsl:value-of select="@style"/><xsl:text>" </xsl:text>
       </xsl:if>
       <xsl:if test="@placeholder">
-        <xsl:text>placeholder="</xsl:text><xsl:value-of select="@placeholder"/><xsl:text>" </xsl:text>
+        <xsl:text>placeholder="</xsl:text><
+        <xsl:apply-templates select="@placeholder" mode="editor" />
+        <xsl:text>" </xsl:text>
       </xsl:if>
       <xsl:choose>
         <xsl:when test="@title-i18n">
@@ -841,6 +849,17 @@
     </xsl:if>
     
   </xsl:if>
+</xsl:template>
+
+<xsl:template match="@placeholder" mode="editor">
+  <xsl:choose>
+    <xsl:when test="starts-with(@placeholder,'i18n:')">
+      <xsl:value-of select="i18n:translate(substring-after(@placeholder,'i18n:'))" />
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:value-of select="@placeholder" />
+    </xsl:otherwise>
+  </xsl:choose>
 </xsl:template>
 
 <!-- ======== file upload ======== -->
