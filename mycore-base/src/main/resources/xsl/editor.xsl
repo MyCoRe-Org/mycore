@@ -851,6 +851,8 @@
   </xsl:if>
 </xsl:template>
 
+<!-- ======== @placeholder for textfield and textarea ======== -->
+
 <xsl:template match="@placeholder" mode="editor">
   <xsl:choose>
     <xsl:when test="starts-with(@placeholder,'i18n:')">
