@@ -98,8 +98,13 @@ public class MCRMETSServlet extends MCRServlet {
         MCRDirectory dir = MCRDirectory.getRootDirectory(derivate);
 
         MCRFilesystemNode metsFile = dir.getChildByPath("mets.xml");
-        job.getRequest().setAttribute("XSL.derivateID", derivate);
-        job.getRequest().setAttribute("XSL.objectID", MCRLinkTableManager.instance().getSourceOf(derivate).iterator().next());
+
+        try {
+            job.getRequest().setAttribute("XSL.derivateID", derivate);
+            job.getRequest().setAttribute("XSL.objectID", MCRLinkTableManager.instance().getSourceOf(derivate).iterator().next());
+        } catch (Exception x) {
+            LOGGER.warn("Unable to set \"XSL.objectID\" attribute to current request", x);
+        }
 
         if (metsFile != null && useExistingMets) {
             return new MCRStreamContent(((MCRFile) metsFile).getContentAsInputStream());
