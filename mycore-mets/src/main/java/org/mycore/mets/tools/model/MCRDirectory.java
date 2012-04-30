@@ -154,8 +154,8 @@ public class MCRDirectory implements MCRIMetsSortable, Comparator<MCRIMetsSortab
                 MCRDirectory aDir = (MCRDirectory) obj[i];
                 MCRIMetsSortable[] children = aDir.getOrderedElements();
 
-                buffer.append("{ \"id\": \"" + logicalId + "\", \"name\":" + gson.toJson(aDir.getLabel()) + ", \"type\":\"category\""
-                        + ", \"structureType\":\"" + aDir.getStructureType() + "\"");
+                buffer.append("{ \"id\": \"" + aDir.getLogicalId() + "\", \"name\":" + gson.toJson(aDir.getLabel())
+                        + ", \"type\":\"category\"" + ", \"structureType\":\"" + aDir.getStructureType() + "\"");
                 buffer.append(", \"children\":[\n");
 
                 for (int c = 0; c < children.length; c++) {
