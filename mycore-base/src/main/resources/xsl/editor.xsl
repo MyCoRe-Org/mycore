@@ -812,7 +812,7 @@
         <xsl:text>style="</xsl:text><xsl:value-of select="@style"/><xsl:text>" </xsl:text>
       </xsl:if>
       <xsl:if test="@placeholder">
-        <xsl:text>placeholder="</xsl:text><
+        <xsl:text>placeholder="</xsl:text>
         <xsl:apply-templates select="@placeholder" mode="editor" />
         <xsl:text>" </xsl:text>
       </xsl:if>
