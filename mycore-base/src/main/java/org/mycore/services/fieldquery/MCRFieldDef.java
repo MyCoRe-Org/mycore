@@ -86,7 +86,7 @@ public class MCRFieldDef {
                 namespaces.add(element.getNamespace());
                 namespaces.addAll(element.getAdditionalNamespaces());
             } else if (obj instanceof Attribute)
-                ((Attribute) obj).getNamespace();
+                namespaces.add(((Attribute) obj).getNamespace());
         }
     }
 
