@@ -230,10 +230,12 @@ public class MCRPersistentServlet extends MCRServlet {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    private MCRObjectID createObject(Document doc) throws MCRActiveLinkException, JDOMException, IOException, MCRException, SAXParseException {
+    private MCRObjectID createObject(Document doc) throws MCRActiveLinkException, JDOMException, IOException, MCRException,
+            SAXParseException {
         MCRObject mcrObject = getMCRObject(doc);
         MCRObjectID objectId = mcrObject.getId();
-        if (MCRAccessManager.checkPermission("create-" + objectId.getBase()) || MCRAccessManager.checkPermission("create-" + objectId.getTypeId())) {
+        if (MCRAccessManager.checkPermission("create-" + objectId.getBase())
+                || MCRAccessManager.checkPermission("create-" + objectId.getTypeId())) {
             synchronized (operation) {
                 if (objectId.getNumberAsInteger() == 0) {
                     String objId = mcrObject.getId().toString();
@@ -264,7 +266,8 @@ public class MCRPersistentServlet extends MCRServlet {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    private MCRObjectID updateObject(Document doc) throws MCRActiveLinkException, JDOMException, IOException, MCRException, SAXParseException {
+    private MCRObjectID updateObject(Document doc) throws MCRActiveLinkException, JDOMException, IOException, MCRException,
+            SAXParseException {
         MCRObject mcrObject = getMCRObject(doc);
         LOGGER.info("ID: " + mcrObject.getId());
         if (MCRAccessManager.checkPermission(mcrObject.getId(), "writedb")) {
@@ -617,12 +620,7 @@ public class MCRPersistentServlet extends MCRServlet {
     }
 
     private String getCancelUrl(MCRServletJob job) {
-        String referer = getReferer(job);
-        String baseUrl = getBaseURL();
-        if (referer.startsWith(baseUrl)) {
-            referer = referer.substring(baseUrl.length());
-        }
-        return referer;
+        return getReferer(job);
     }
 
     private String getReferer(MCRServletJob job) {
