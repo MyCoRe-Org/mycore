@@ -19,9 +19,6 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.frontend.indexbrowser.lucene.MCRIndexBrowserConfig;
-import org.mycore.frontend.indexbrowser.lucene.MCRIndexBrowserEntry;
-import org.mycore.frontend.indexbrowser.lucene.MCRIndexBrowserIncomingData;
 
 /**
  * Xml generator class for the index browser.
@@ -34,7 +31,8 @@ public class MCRIndexBrowserXmlGenerator {
 
     protected static Logger LOGGER = Logger.getLogger(MCRIndexBrowserXmlGenerator.class);
 
-    protected static final String defaultlang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", MCRConstants.DEFAULT_LANG);
+    protected static final String defaultlang = MCRConfiguration.instance()
+            .getString("MCR.Metadata.DefaultLang", MCRConstants.DEFAULT_LANG);
 
     protected Element page;
 
@@ -75,14 +73,16 @@ public class MCRIndexBrowserXmlGenerator {
 
                 List<String> sortValues = entry.getSortValues();
 
-                v.addContent(new Element("sort").addContent(sortValues.get(0)));
-                String idx = sortValues.get(0);
-                if (sortValues.size() > 1) {
-                    idx = sortValues.get(1);
-                }
-                v.addContent(new Element("idx").addContent(idx));
-                v.addContent(new Element("id").addContent(entry.getObjectId()));
+                if (sortValues != null && sortValues.size() > 0) {
+                    v.addContent(new Element("sort").addContent(sortValues.get(0)));
+                    String idx = sortValues.get(0);
+                    if (sortValues.size() > 1) {
+                        idx = sortValues.get(1);
+                    }
 
+                    v.addContent(new Element("idx").addContent(idx));
+                    v.addContent(new Element("id").addContent(entry.getObjectId()));
+                }
                 for (int index = 0; index < indexConfig.getOutputList().size(); index++) {
                     Element col = new Element("col");
                     col.setAttribute("name", indexConfig.getOutputList().get(index));
@@ -101,7 +101,7 @@ public class MCRIndexBrowserXmlGenerator {
             do {
                 MCRIndexBrowserEntry firstEntry = resultList.get(index);
                 String objectID = resultList.get(index).getObjectId();
-                delims.add(new MyRangeDelim(index, firstEntry.getSortValue(0),objectID));
+                delims.add(new MyRangeDelim(index, firstEntry.getSortValue(0), objectID));
                 index += stepSize;
                 String secondValue = "";
                 if (index >= to) {
@@ -382,7 +382,9 @@ public class MCRIndexBrowserXmlGenerator {
         int pos;
 
         String value;
+
         String objectID;
+
         String diff;
 
         MyRangeDelim(int pos, String value, String objectID) {
