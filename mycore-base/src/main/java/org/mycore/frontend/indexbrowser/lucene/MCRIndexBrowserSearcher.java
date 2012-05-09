@@ -29,7 +29,7 @@ import org.mycore.services.fieldquery.MCRSortBy;
  * @author Matthias Eichner
  *
  */
-public class MCRIndexBrowserSearcher {
+public class MCRIndexBrowserSearcher implements MCRIIndexBrowserSearcher {
 
     protected static Logger LOGGER = Logger.getLogger(MCRIndexBrowserSearcher.class);
 
@@ -189,10 +189,9 @@ public class MCRIndexBrowserSearcher {
         return hitList;
     }
 
-    
     /** The default query condition operator to use if not given in request */
     protected final static String defaultOperator = "like";
-    
+
     /**
      * Returns the query condition operator to be used. 
      */

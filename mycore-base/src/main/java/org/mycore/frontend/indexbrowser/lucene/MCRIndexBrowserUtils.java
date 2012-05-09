@@ -59,7 +59,7 @@ public class MCRIndexBrowserUtils {
         if (MCRIndexBrowserCache.isCached(cacheKey, index)) {
             resultList = MCRIndexBrowserCache.getFromCache(cacheKey, index);
         } else {
-            MCRIndexBrowserSearcher searcher = getSearcher(incomingBrowserData, config);
+            MCRIIndexBrowserSearcher searcher = getSearcher(incomingBrowserData, config);
             resultList = searcher.doSearch();
             MCRIndexBrowserCache.addToCache(cacheKey, index, resultList);
         }
@@ -68,8 +68,8 @@ public class MCRIndexBrowserUtils {
     }
 
     @SuppressWarnings("unchecked")
-    private static MCRIndexBrowserSearcher getSearcher(MCRIndexBrowserIncomingData browseData, MCRIndexBrowserConfig indexConfig) {
-        MCRIndexBrowserSearcher searcher = null;
+    private static MCRIIndexBrowserSearcher getSearcher(MCRIndexBrowserIncomingData browseData, MCRIndexBrowserConfig indexConfig) {
+        MCRIIndexBrowserSearcher searcher = null;
         String property = "MCR.IndexBrowserSearcher";
         try {
             String searcherClass = MCRConfiguration.instance().getString(property);
@@ -83,7 +83,7 @@ public class MCRIndexBrowserUtils {
             Constructor constructor = toLoad.getConstructor(parameterTypes);
             if (constructor != null) {
                 Object[] args = { browseData, indexConfig };
-                searcher = (MCRIndexBrowserSearcher) constructor.newInstance(args);
+                searcher = (MCRIIndexBrowserSearcher) constructor.newInstance(args);
             }
         } catch (Exception ex) {
             LOGGER.warn(ex);
