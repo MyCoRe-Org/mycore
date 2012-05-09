@@ -855,11 +855,11 @@
 
 <xsl:template match="@placeholder" mode="editor">
   <xsl:choose>
-    <xsl:when test="starts-with(@placeholder,'i18n:')">
-      <xsl:value-of select="i18n:translate(substring-after(@placeholder,'i18n:'))" />
+    <xsl:when test="starts-with(.,'i18n:')">
+      <xsl:value-of select="i18n:translate(substring-after(.,'i18n:'))" />
     </xsl:when>
     <xsl:otherwise>
-      <xsl:value-of select="@placeholder" />
+      <xsl:value-of select="." />
     </xsl:otherwise>
   </xsl:choose>
 </xsl:template>
