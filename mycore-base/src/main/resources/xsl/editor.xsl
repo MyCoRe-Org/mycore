@@ -85,14 +85,17 @@
       <!-- ======== if validation errors exist, display message ======== -->
       <xsl:apply-templates select="failed" />
 
-      <!-- Workaround for browser behavior: Use a hidden submit button,
-      so that when user hits the enter key, really submit the form, 
-      instead of executing the [+] button of the first repeater -->
-      <input style="width:0px; height:0px; border-width:0px; float:left;" value="submit" type="submit" tabindex="99" />
-
       <!-- ======== start at the root panel ======== -->
       <tr>
         <td>
+          <!-- Workaround for browser behavior: Use a hidden submit button,
+          so that when user hits the enter key, really submit the form, 
+          instead of executing the [+] button of the first repeater -->
+          <input style="width:0px; height:0px; border-width:0px; float:left;" value="submit" type="submit" tabindex="99" />
+
+          <!-- ======== Set some general, internal hidden fields ======== -->
+          <xsl:call-template name="editor.set.form.hidden" />
+
           <xsl:apply-templates select="components/panel">
             <xsl:with-param name="var" select="components/@var" />
           </xsl:apply-templates>
@@ -126,6 +129,10 @@
       <xsl:text>multipart/form-data</xsl:text>
     </xsl:attribute>
   </xsl:if>
+
+</xsl:template>
+
+<xsl:template name="editor.set.form.hidden">
 
   <!-- ======== target type servlet or url or xml display ======== -->
   <xsl:choose>
