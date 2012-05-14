@@ -43,6 +43,7 @@ import org.jdom.filter.ElementFilter;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRUsageException;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -63,7 +64,7 @@ import org.mycore.parsers.bool.MCRSetCondition;
  *   Search using name=value pairs
  * 4. MCRSearchServlet invocation from a search mask using editor XML input 
  * 
- * @author Frank LÃ¼tzenkirchen
+ * @author Frank Lützenkirchen
  * @author Harald Richter
  * @author A. Schaar
  * 
@@ -75,6 +76,9 @@ public class MCRSearchServlet extends MCRServlet {
 
     /** Default search field */
     private String defaultSearchField;
+    
+    /** Maximum number of hits to display per page (numPerPage) */
+    private int maxPerPage;
 
     @Override
     public void init() throws ServletException {
@@ -82,6 +86,7 @@ public class MCRSearchServlet extends MCRServlet {
         MCRConfiguration config = MCRConfiguration.instance();
         String prefix = "MCR.SearchServlet.";
         defaultSearchField = config.getString(prefix + "DefaultSearchField", "allMeta");
+        maxPerPage = config.getInt(prefix + "MaxPerPage", 0);
     }
 
     /**
@@ -122,6 +127,12 @@ public class MCRSearchServlet extends MCRServlet {
             if (name.contains(".sortField")) {
                 continue;
             }
+            if (name.equals("search")) {
+                continue;
+            }
+            if (name.equals("query")) {
+                continue;
+            }
             if (name.equals("maxResults")) {
                 continue;
             }
@@ -153,6 +164,10 @@ public class MCRSearchServlet extends MCRServlet {
                     parent.addChild(new MCRQueryCondition(field, operator, value));
                 }
             }
+        }
+        
+        if (condition.getChildren().isEmpty()) {
+            throw new MCRUsageException("Missing query condition");
         }
 
         return new MCRQuery(MCRQueryParser.normalizeCondition(condition));
@@ -328,14 +343,7 @@ public class MCRSearchServlet extends MCRServlet {
         MCRResults results = qd.getResults();
 
         // Number of hits per page
-        String snpp = request.getParameter("numPerPage");
-        if (snpp == null) {
-            snpp = "0";
-        }
-        int npp = Integer.parseInt(snpp);
-        if (npp > results.getNumHits()) {
-            npp = 0;
-        }
+        int npp = getNumPerPage(request, results);
 
         // Current page number
         String spage = request.getParameter("page");
@@ -389,6 +397,29 @@ public class MCRSearchServlet extends MCRServlet {
         sendToLayout(request, response, new Document(xml));
     }
 
+    /** 
+     * Returns the number of hits to display per results page, as requests by the parameter numPerPage.
+     * A value of numPerPage=0 will display all hits. 
+     * if set, the configuration property MCR.SearchServlet.MaxPerPage limits 
+     * the maximum number of hits to display per result page.  
+     */
+    protected int getNumPerPage(HttpServletRequest req, MCRResults results) {
+        String snpp = req.getParameter("numPerPage");
+        if (snpp == null) {
+            snpp = "0";
+        }
+        int npp = Integer.parseInt(snpp);
+        if ((npp > results.getNumHits()) || (npp <= 0)) {
+            npp = results.getNumHits();
+        }
+
+        if (maxPerPage > 0) {
+            npp = Math.min(npp, maxPerPage);
+        }
+
+        return npp;
+    }
+    
     /**
      * Executes a query that comes from editor search mask, and redirects the
      * browser to the first results page
