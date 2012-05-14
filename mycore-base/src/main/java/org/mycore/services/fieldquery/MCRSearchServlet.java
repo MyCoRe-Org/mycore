@@ -64,7 +64,7 @@ import org.mycore.parsers.bool.MCRSetCondition;
  *   Search using name=value pairs
  * 4. MCRSearchServlet invocation from a search mask using editor XML input 
  * 
- * @author Frank Lützenkirchen
+ * @author Frank L\u00FCtzenkirchen
  * @author Harald Richter
  * @author A. Schaar
  * 
