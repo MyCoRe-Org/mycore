@@ -1,5 +1,6 @@
 package org.mycore.oai;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -61,16 +62,27 @@ public class MCROAIResults implements Iterable<MCRHit> {
         return new MCROAIResultsIterator();
     }
 
-    public MCRHit getHit(int i) throws IndexOutOfBoundsException {
+    /**
+     * Gets a single MCRHit.
+     * 
+     * @param i
+     *            the position of the hit.
+     * @return the hit at this position
+     * @throws IndexOutOfBoundsException if the index is out of range (index < 0 || index >= size())
+     */
+    public MCRHit getHit(int i) {
+        if(i < 0) {
+            throw new IndexOutOfBoundsException("index is < 0");
+        }
         int internalCursor = 0;
         for(MCRResults r : results) {
             int numHits = r.getNumHits();
-            if(i < numHits) {
-                return r.getHit(i - internalCursor);
-            }
             internalCursor += numHits;
+            if(i < internalCursor) {
+                return r.getHit((i + numHits) - internalCursor);
+            }
         }
-        throw new IndexOutOfBoundsException();
+        throw new IndexOutOfBoundsException(MessageFormat.format("index {0} is too big({1})", i, internalCursor));
     }
 
     public int size() {
@@ -96,11 +108,7 @@ public class MCROAIResults implements Iterable<MCRHit> {
 
         @Override
         public MCRHit next() {
-            try {
-                return getHit(this.cursor++);
-            } catch(IndexOutOfBoundsException io) {
-                throw new NoSuchElementException();
-            }
+            return getHit(this.cursor++);
         }
 
         @Override
