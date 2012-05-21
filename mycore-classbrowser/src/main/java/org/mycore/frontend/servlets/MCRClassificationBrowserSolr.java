@@ -96,7 +96,7 @@ public class MCRClassificationBrowserSolr extends MCRServlet {
         if ((el != null) && (el.trim().length() > 0))
             emptyLeaves = Boolean.valueOf(el);
 
-        LOGGER.info("ClassificationBrowser " + classifID + " " + (categID == null ? "" : categID));
+        LOGGER.info(getClass().getSimpleName() + " " + classifID + " " + (categID == null ? "" : categID));
 
         MCRCategoryID id = new MCRCategoryID(classifID, categID);
         Element xml = new Element("classificationBrowserData");
