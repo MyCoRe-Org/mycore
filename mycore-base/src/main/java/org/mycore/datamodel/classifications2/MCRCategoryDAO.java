@@ -24,7 +24,6 @@
 package org.mycore.datamodel.classifications2;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * Interface of the Data Access Object for Classifications.
@@ -228,11 +227,11 @@ public interface MCRCategoryDAO {
     public abstract long getLastModified();
 
     /**
-     * Gets the timestamp for the given root id. If there is not timestamp at the moment -1 is returned.
+     * Gets the last modified timestamp for the given root id. If there is no timestamp at the moment -1 is returned.
      * 
      * @param root
      * 
      * @return the last modified timestamp (if any) or -1
      */
-    public long getTimestamp(String root);
+    public long getLastModified(String root);
 }

@@ -101,7 +101,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         LOGGER.info(new StringBuilder("Category ").append(category.getId()).append(" saved.").toString());
         updateTimeStamp();
 
-        updateTimestamp(category.getRoot().getId().toString());
+        updateLastModified(category.getRoot().getId().toString());
     }
 
     public void deleteCategory(MCRCategoryID id) {
@@ -125,7 +125,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             updateLeftRightValue(connection, category.getRootID(), category.getLeft(), increment);
         }
         updateTimeStamp();
-        updateTimestamp(category.getRootID());
+        updateLastModified(category.getRootID());
     }
 
     /*
@@ -384,7 +384,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             session.update(newParent);
         }
         updateTimeStamp();
-        updateTimestamp(id.getRootID());
+        updateLastModified(id.getRootID());
     }
 
     public void removeLabel(MCRCategoryID id, String lang) {
@@ -394,7 +394,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         if (oldLabel != null) {
             category.getLabels().remove(oldLabel);
             updateTimeStamp();
-            updateTimestamp(category.getRootID());
+            updateLastModified(category.getRootID());
         }
     }
 
@@ -482,7 +482,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         }
         session.saveOrUpdate(newCategoryImpl);
         updateTimeStamp();
-        updateTimestamp(newCategory.getRoot().getId().toString());
+        updateLastModified(newCategory.getRoot().getId().toString());
     }
 
     public void setLabel(MCRCategoryID id, MCRLabel label) {
@@ -495,7 +495,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         category.getLabels().add(label);
         session.update(category);
         updateTimeStamp();
-        updateTimestamp(category.getRootID());
+        updateLastModified(category.getRootID());
     }
 
     public long getLastModified() {
@@ -860,7 +860,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
      * 
      * @param root  
      */
-    synchronized private void updateTimestamp(String root) {
+    synchronized private void updateLastModified(String root) {
         LAST_MODIFIED_MAP.put(root, Long.valueOf(System.currentTimeMillis()));
     }
 
@@ -871,7 +871,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
      * 
      * @return the last modified timestamp (if any) or -1
      */
-    public long getTimestamp(String root) {
+    public long getLastModified(String root) {
         Long long1 = LAST_MODIFIED_MAP.get(root);
         if (long1 != null) {
             return long1.longValue();
