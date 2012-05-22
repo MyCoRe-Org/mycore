@@ -100,7 +100,8 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         session.save(category);
         LOGGER.info(new StringBuilder("Category ").append(category.getId()).append(" saved.").toString());
         updateTimeStamp();
-        updateTimestamp(parentID.getRootID());
+
+        updateTimestamp(category.getRoot().getId().toString());
     }
 
     public void deleteCategory(MCRCategoryID id) {
@@ -124,7 +125,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             updateLeftRightValue(connection, category.getRootID(), category.getLeft(), increment);
         }
         updateTimeStamp();
-        updateTimestamp(id.getRootID());
+        updateTimestamp(category.getRootID());
     }
 
     /*
@@ -393,7 +394,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         if (oldLabel != null) {
             category.getLabels().remove(oldLabel);
             updateTimeStamp();
-            updateTimestamp(id.getRootID());
+            updateTimestamp(category.getRootID());
         }
     }
 
@@ -494,7 +495,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         category.getLabels().add(label);
         session.update(category);
         updateTimeStamp();
-        updateTimestamp(id.getRootID());
+        updateTimestamp(category.getRootID());
     }
 
     public long getLastModified() {
