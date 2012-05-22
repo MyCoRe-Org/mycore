@@ -3,16 +3,15 @@
  */
 package org.mycore.frontend.servlets;
 
-import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.xpath.XPath;
+import org.mycore.common.MCRCache;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -27,16 +26,11 @@ import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
  * 
  */
 public class MCRClassExportServlet extends MCRServlet {
-
-    private static final Logger LOGGER = Logger.getLogger(MCRClassExportServlet.class);
-
     private static final long serialVersionUID = 1L;
 
     private static MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
-    private static HashMap<String, Document> documents = new HashMap<String, Document>();
-
-    private static HashMap<String, Long> timestamps = new HashMap<String, Long>();
+    private static MCRCache snippetCache = new MCRCache(100, "Classification Snippets");
 
     public void doGetPost(MCRServletJob job) throws Exception, MCRException {
         try {
@@ -72,13 +66,11 @@ public class MCRClassExportServlet extends MCRServlet {
      */
     @SuppressWarnings("unchecked")
     synchronized public Document getParentIdentifiers(String classification, String categid) throws Exception {
-        String key = classification + categid;
-        Long tStamp = timestamps.get(key);
+        String key = (classification + categid).intern();
 
-        if (DAO.getLastModified(classification) < (tStamp != null ? tStamp : 0)) {
-            if (documents.containsKey(key)) {
-                return documents.get(key);
-            }
+        Object object = snippetCache.getIfUpToDate(key, DAO.getLastModified(classification));
+        if (object instanceof Document) {
+            return (Document) object;
         }
 
         MCRCategoryID catId = MCRCategoryID.rootID(classification);
@@ -96,9 +88,7 @@ public class MCRClassExportServlet extends MCRServlet {
         for (Attribute attr : nodes) {
             identifiers.addContent(new Element("id").setText(attr.getValue()));
         }
-
-        documents.put(key, parents);
-        timestamps.put(key, System.currentTimeMillis());
+        snippetCache.put(key, parents);
 
         return parents;
     }
