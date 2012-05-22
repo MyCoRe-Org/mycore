@@ -859,7 +859,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
      * 
      * @param root  
      */
-    synchronized private static void updateTimestamp(String root) {
+    synchronized private void updateTimestamp(String root) {
         LAST_MODIFIED_MAP.put(root, Long.valueOf(System.currentTimeMillis()));
     }
 
@@ -870,7 +870,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
      * 
      * @return the last modified timestamp (if any) or -1
      */
-    synchronized public static long getTimestamp(String root) {
+    public long getTimestamp(String root) {
         Long long1 = LAST_MODIFIED_MAP.get(root);
         if (long1 != null) {
             return long1.longValue();
