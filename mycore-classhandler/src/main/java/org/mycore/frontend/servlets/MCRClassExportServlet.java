@@ -3,10 +3,12 @@
  */
 package org.mycore.frontend.servlets;
 
+import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -26,9 +28,15 @@ import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
  */
 public class MCRClassExportServlet extends MCRServlet {
 
+    private static final Logger LOGGER = Logger.getLogger(MCRClassExportServlet.class);
+
     private static final long serialVersionUID = 1L;
 
     private static MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
+
+    private static HashMap<String, Document> documents = new HashMap<String, Document>();
+
+    private static HashMap<String, Long> timestamps = new HashMap<String, Long>();
 
     public void doGetPost(MCRServletJob job) throws Exception, MCRException {
         try {
@@ -61,11 +69,18 @@ public class MCRClassExportServlet extends MCRServlet {
      * @param categid the category identifier for getting the parent ids for
      * @return
      * @throws Exception
-     * 
-     * TODO cache generated snippets
      */
     @SuppressWarnings("unchecked")
-    private Document getParentIdentifiers(String classification, String categid) throws Exception {
+    synchronized public Document getParentIdentifiers(String classification, String categid) throws Exception {
+        String key = classification + categid;
+        Long tStamp = timestamps.get(key);
+
+        if (DAO.getLastModified(classification) < (tStamp != null ? tStamp : 0)) {
+            if (documents.containsKey(key)) {
+                return documents.get(key);
+            }
+        }
+
         MCRCategoryID catId = MCRCategoryID.rootID(classification);
         MCRCategory category = DAO.getCategory(catId, -1);
         Document jdom = MCRCategoryTransformer.getMetaDataDocument(category, true);
@@ -81,6 +96,9 @@ public class MCRClassExportServlet extends MCRServlet {
         for (Attribute attr : nodes) {
             identifiers.addContent(new Element("id").setText(attr.getValue()));
         }
+
+        documents.put(key, parents);
+        timestamps.put(key, System.currentTimeMillis());
 
         return parents;
     }
