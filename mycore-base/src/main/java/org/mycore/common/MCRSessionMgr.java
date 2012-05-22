@@ -27,7 +27,7 @@ import static org.mycore.common.events.MCRSessionEvent.Type.created;
 import static org.mycore.common.events.MCRSessionEvent.Type.destroyed;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -53,7 +53,7 @@ import org.mycore.common.events.MCRSessionListener;
  */
 public class MCRSessionMgr {
 
-    private static Map<String, MCRSession> sessions = new Hashtable<String, MCRSession>();
+    private static Map<String, MCRSession> sessions = new HashMap<String, MCRSession>();
 
     private static List<MCRSessionListener> listeners = new ArrayList<MCRSessionListener>();
 
