@@ -91,7 +91,7 @@
           <!-- Workaround for browser behavior: Use a hidden submit button,
           so that when user hits the enter key, really submit the form, 
           instead of executing the [+] button of the first repeater -->
-          <input style="width:0px; height:0px; border-width:0px; float:left;" value="submit" type="submit" tabindex="99" />
+          <input style="width:0px; height:0px; border-width:0px; float:left; margin:0px; padding:0px;" value="submit" type="submit" tabindex="99" />
 
           <!-- ======== Set some general, internal hidden fields ======== -->
           <xsl:call-template name="editor.set.form.hidden" />
