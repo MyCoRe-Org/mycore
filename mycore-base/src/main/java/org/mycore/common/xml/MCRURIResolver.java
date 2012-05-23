@@ -57,6 +57,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -1088,6 +1089,10 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         private static final String ORDER_PARAM = "order";
 
         private static final String MAXRESULTS_PARAM = "maxResults";
+        
+        private static final String NUMPERPAGE_PARAM = "numPerPage";
+        
+        private static final String PAGE_PARAM = "page";
 
         /**
          * Returns query results for query in "term" parameter
@@ -1105,34 +1110,70 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                 e.printStackTrace();
                 return null;
             }
-            String sortby = params.get(SORT_PARAM);
-            String order = params.get(ORDER_PARAM);
-            String maxResults = getMaxResults(params);
 
             if (query == null) {
                 return null;
             }
-            Document input = getQueryDocument(query, sortby, order, maxResults);
+            
+            String sortby = params.get(SORT_PARAM);
+            String order = params.get(ORDER_PARAM);
+            String maxResults = defaultValue(params.get(MAXRESULTS_PARAM), "0");
+            String numPerPage = defaultValue(params.get(NUMPERPAGE_PARAM), "0");
+            String page = defaultValue(params.get(PAGE_PARAM), "1");
+            
+            Document input = getQueryDocument(query, sortby, order, maxResults, numPerPage);
             // Execute query
             long start = System.currentTimeMillis();
             MCRResults result = MCRQueryManager.search(MCRQuery.parseXML(input));
             long qtime = System.currentTimeMillis() - start;
             LOGGER.debug("MCRSearchServlet total query time: " + qtime);
-            return result.buildXML();
+            
+            return createXML(result, Integer.parseInt(numPerPage), Integer.parseInt(page));
         }
-
-        private static String getMaxResults(Hashtable<String, String> params) {
-            String maxResults = params.get(MAXRESULTS_PARAM);
-            if (maxResults != null && !maxResults.equals("")) {
-                return maxResults;
+        
+        private static Element createXML(MCRResults results, int numPerPage, int page){
+            // Total number of pages
+            int numHits = Math.max(1, results.getNumHits());
+            int numPages = 1;
+            if (numPerPage > 0) {
+                numPages = (int) Math.ceil((double) numHits / (double) numPerPage);
             }
-            return "0";
+
+            if (numPerPage == 0) {
+                page = 1;
+            } else if (page > numPages) {
+                page = numPages;
+            } else if (page < 1) {
+                page = 1;
+            }
+
+            // Number of first and last hit to be shown
+            int first = (page - 1) * numPerPage;
+            int last = results.getNumHits() - 1;
+            if (numPerPage > 0) {
+                last = Math.min(results.getNumHits(), first + numPerPage) - 1;
+            }
+
+            // Build result hits as XML document
+            Element xml = results.buildXML(first, last);
+            xml.setAttribute("numPerPage", String.valueOf(numPerPage));
+            xml.setAttribute("numPages", String.valueOf(numPages));
+            xml.setAttribute("page", String.valueOf(page));
+            
+			return xml;
         }
 
-        private static Document getQueryDocument(String query, String sortby, String order, String maxResults) {
+        private static String defaultValue(String maxResults, String defaultVal) {
+        	if (maxResults != null && !maxResults.equals("")) {
+        		return maxResults;
+        	}
+        	return defaultVal;
+        }
+
+        private static Document getQueryDocument(String query, String sortby, String order, String maxResults, String numPerPage) {
             Element queryElement = new Element("query");
             queryElement.setAttribute("maxResults", maxResults);
-            queryElement.setAttribute("numPerPage", "0");
+            queryElement.setAttribute("numPerPage", numPerPage);
             Document input = new Document(queryElement);
 
             Element conditions = new Element("conditions");
