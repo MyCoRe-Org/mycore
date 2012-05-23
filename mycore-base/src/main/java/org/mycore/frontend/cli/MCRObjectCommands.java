@@ -164,6 +164,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
                 "Select MCRObjects with MCRQueryString {0}.");
         command.add(com);
 
+        com = new MCRCommand("list selected", "org.mycore.frontend.cli.MCRObjectCommands.listSelected", "Prints the id of selected objects");
+        command.add(com);
+
         com = new MCRCommand("delete selected", "org.mycore.frontend.cli.MCRObjectCommands.deleteSelected", "Removes selected MCRObjects.");
         command.add(com);
 
@@ -821,12 +824,27 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     }
 
     /**
+     * List all selected MCRObjects.
+     */
+    public static final void listSelected() throws MCRActiveLinkException {
+        LOGGER.info("List selected MCRObjects");
+        if (getSelectedObjectIDs().isEmpty()) {
+            LOGGER.info("No Resultset to work with, use command \"select objects with query {0}\" to build one");
+            return;
+        }
+        StringBuffer out = new StringBuffer();
+        for (String id : getSelectedObjectIDs()) {
+            out.append(id).append(" ");
+        }
+        LOGGER.info(out.toString());
+    }
+
+    /**
      * Delete all selected MCRObjects from the datastore.
      */
     public static final void deleteSelected() throws MCRActiveLinkException {
         LOGGER.info("Start removing selected MCRObjects");
-
-        if (null == getSelectedObjectIDs()) {
+        if (getSelectedObjectIDs().isEmpty()) {
             LOGGER.info("No Resultset to work with, use command \"select objects with query {0}\" to build one");
             return;
         }
