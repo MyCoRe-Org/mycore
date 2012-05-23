@@ -95,7 +95,8 @@
                 
                 <!--  Canvas -->
                 <jsSourceFile>canvas.js</jsSourceFile>
-                
+                <jsSourceFile>canvas.rotate.js</jsSourceFile>
+
                 <!-- Permalink -->
                 <jsSourceFile>Permalink.js</jsSourceFile>
                 <jsSourceFile>createPdf.js</jsSourceFile>
