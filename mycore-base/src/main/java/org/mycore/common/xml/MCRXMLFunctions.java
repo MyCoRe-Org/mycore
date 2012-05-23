@@ -48,13 +48,11 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.jdom.JDOMException;
-import org.jdom.adapters.JAXPDOMAdapter;
 import org.jdom.output.DOMOutputter;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRURN;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -257,6 +255,7 @@ public class MCRXMLFunctions {
         return null;
     }
 
+    @SuppressWarnings("rawtypes")
     private static MCRResults getQueryResult(String query) {
         MCRCondition condition = new MCRQueryParser().parse(query);
         MCRQuery q = new MCRQuery(condition);
@@ -644,6 +643,6 @@ public class MCRXMLFunctions {
         org.jdom.Element element = MCRURIResolver.instance().resolve(uri);
         element.detach();
         org.jdom.Document document = new org.jdom.Document(element);
-        return new DOMOutputter(JAXPDOMAdapter.class.getName()).output(document).getDocumentElement().getChildNodes();
+        return new DOMOutputter().output(document).getDocumentElement().getChildNodes();
     }
 }
