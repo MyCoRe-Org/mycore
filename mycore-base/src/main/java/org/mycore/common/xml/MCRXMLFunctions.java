@@ -48,11 +48,13 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.jdom.JDOMException;
+import org.jdom.adapters.JAXPDOMAdapter;
 import org.jdom.output.DOMOutputter;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRURN;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -127,7 +129,8 @@ public class MCRXMLFunctions {
      * @return QueryServlet-Link
      */
     public static String getQueryServlet(String hostAlias) {
-        return getBaseLink(hostAlias).append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(QUERY_SUFFIX).toString())).toString();
+        return getBaseLink(hostAlias).append(
+                CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(QUERY_SUFFIX).toString())).toString();
     }
 
     /**
@@ -138,15 +141,14 @@ public class MCRXMLFunctions {
      * @return FileNodeServlet-Link
      */
     public static String getIFSServlet(String hostAlias) {
-        return getBaseLink(hostAlias).append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(IFS_SUFFIX).toString())).toString();
+        return getBaseLink(hostAlias).append(
+                CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(IFS_SUFFIX).toString())).toString();
     }
 
     public static StringBuffer getBaseLink(String hostAlias) {
         StringBuffer returns = new StringBuffer();
-        returns
-            .append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(PROTOCOLL_SUFFIX).toString(), "http"))
-            .append("://")
-            .append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(HOST_SUFFIX).toString()));
+        returns.append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(PROTOCOLL_SUFFIX).toString(), "http"))
+                .append("://").append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(HOST_SUFFIX).toString()));
         String port = CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(PORT_SUFFIX).toString(), DEFAULT_PORT);
         if (!port.equals(DEFAULT_PORT)) {
             returns.append(":").append(port);
@@ -161,13 +163,8 @@ public class MCRXMLFunctions {
     public static String formatISODate(String isoDate, String isoFormat, String simpleFormat, String iso639Language) throws ParseException {
         if (LOGGER.isDebugEnabled()) {
             StringBuffer sb = new StringBuffer("isoDate=");
-            sb.append(isoDate)
-                .append(", simpleFormat=")
-                .append(simpleFormat)
-                .append(", isoFormat=")
-                .append(isoFormat)
-                .append(", iso649Language=")
-                .append(iso639Language);
+            sb.append(isoDate).append(", simpleFormat=").append(simpleFormat).append(", isoFormat=").append(isoFormat)
+                    .append(", iso649Language=").append(iso639Language);
             LOGGER.debug(sb.toString());
         }
         Locale locale = new Locale(iso639Language);
@@ -473,8 +470,8 @@ public class MCRXMLFunctions {
                 return true;
             }
         }
-        LOGGER
-            .info("URN assignment disabled as the object type " + givenType + " is not in the list of allowed objects. See property \"" + propertyName + "\"");
+        LOGGER.info("URN assignment disabled as the object type " + givenType + " is not in the list of allowed objects. See property \""
+                + propertyName + "\"");
         return false;
     }
 
@@ -638,4 +635,15 @@ public class MCRXMLFunctions {
         return oldValue != null ? oldValue : "";
     }
 
+    /**
+     * @param uri the uri to resolve
+     * @return
+     * @throws JDOMException
+     */
+    public static NodeList resolve(String uri) throws JDOMException {
+        org.jdom.Element element = MCRURIResolver.instance().resolve(uri);
+        element.detach();
+        org.jdom.Document document = new org.jdom.Document(element);
+        return new DOMOutputter(JAXPDOMAdapter.class.getName()).output(document).getDocumentElement().getChildNodes();
+    }
 }
