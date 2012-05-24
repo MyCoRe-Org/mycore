@@ -19,9 +19,11 @@ import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -32,6 +34,8 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
+import org.jdom.transform.JDOMResult;
+import org.jdom.transform.JDOMSource;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
@@ -201,6 +205,14 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         com = new MCRCommand("restore {0} to revision {1}",
                 "org.mycore.frontend.cli.MCRObjectCommands.restoreToRevision String int",
                 "Restores the selected MCRObject to the selected revision.");
+        command.add(com);
+
+        com = new MCRCommand("xslt {0} with file {1}", "org.mycore.frontend.cli.MCRObjectCommands.xslt String String",
+                "transforms a mycore object {0} with the given file {1}");
+        command.add(com);
+
+        com = new MCRCommand("transform selected with file {0}", "org.mycore.frontend.cli.MCRObjectCommands.transformSelected String",
+                "xsl transforms selected MCRObjects");
         command.add(com);
     }
 
@@ -826,7 +838,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     /**
      * List all selected MCRObjects.
      */
-    public static final void listSelected() throws MCRActiveLinkException {
+    public static final void listSelected() {
         LOGGER.info("List selected MCRObjects");
         if (getSelectedObjectIDs().isEmpty()) {
             LOGGER.info("No Resultset to work with, use command \"select objects with query {0}\" to build one");
@@ -852,6 +864,32 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             delete(id);
         }
         LOGGER.info("Selected MCRObjects deleted");
+    }
+
+    /**
+     * Does a xsl transform with selected MCRObjects.
+     * 
+     * @param xslFilePath file to transform the objects
+     * @return a list of transform commands
+     * @throws MCRActiveLinkException
+     * @see {@link #xslt(String, String)}
+     */
+    public static final List<String> transformSelected(String xslFilePath) {
+        LOGGER.info("Start transforming selected MCRObjects");
+        File xslFile = new File(xslFilePath);
+        if (!xslFile.exists()) {
+            LOGGER.error("XSLT file not found " + xslFilePath);
+            return new ArrayList<String>();
+        }
+        if (getSelectedObjectIDs().isEmpty()) {
+            LOGGER.info("No Resultset to work with, use command \"select objects with query {0}\" to build one");
+            return new ArrayList<String>();
+        }
+        List<String> commandList = new ArrayList<String>();
+        for (String mcrId : getSelectedObjectIDs()) {
+            commandList.add(new StringBuffer("xslt ").append(mcrId).append(" with file ").append(xslFilePath).toString());
+        }
+        return commandList;
     }
 
     /*
@@ -1064,4 +1102,49 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
         LOGGER.info("A list with the identifiers of the deleted items has been saved to " + deletedItems.getAbsolutePath());
     }
+
+    /**
+     * Does a xsl transform with the given mycore object.
+     * <p>
+     * To use this command create a new xsl file and copy following xslt code into it.
+     * </p>
+     * <?xml version="1.0" encoding="utf-8"?>
+     * <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+     *
+     *   <xsl:template match='@*|node()'>
+     *     <!-- default template: just copy -->
+     *     <xsl:copy>
+     *       <xsl:apply-templates select='@*|node()' />
+     *     </xsl:copy>
+     *   </xsl:template>
+     *
+     * </xsl:stylesheet>
+     * 
+     * <p>Insert a new template match, for example:</p>
+     * <xsl:template match="metadata/mainTitle/@heritable">
+     *   <xsl:attribute name="heritable"><xsl:value-of select="'true'"/></xsl:attribute>
+     * </xsl:template>
+     * 
+     * @param objectId object to transform
+     * @param xslFilePath path to xsl file
+     * @throws Exception
+     */
+    public static void xslt(String objectId, String xslFilePath) throws Exception {
+        File xslFile = new File(xslFilePath);
+        if(!xslFile.exists()) {
+            LOGGER.error("XSLT file not found " + xslFilePath);
+            return;
+        }
+        MCRObjectID mcrId = MCRObjectID.getInstance(objectId);
+        Document doc = MCRXMLMetadataManager.instance().retrieveXML(mcrId);
+        // do XSL transform
+        Transformer transformer = TransformerFactory.newInstance().newTransformer(new StreamSource(xslFile));
+        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+        transformer.setOutputProperty(OutputKeys.INDENT, "no");
+        JDOMResult result = new JDOMResult();
+        transformer.transform(new JDOMSource(doc), result);
+        // write to mycore
+        MCRXMLMetadataManager.instance().update(mcrId, result.getDocument(), new Date(System.currentTimeMillis()));
+    }
+
 }
