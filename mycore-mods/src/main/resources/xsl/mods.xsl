@@ -493,6 +493,7 @@
           <xsl:when test="starts-with($url, '/')">
             <xsl:value-of select="concat($WebApplicationBaseURL,substring-after($url, '/'),$HttpSession,'?id=',$id)" />
           </xsl:when>
+          <xsl:when test="string-length($url)=0" />
           <xsl:otherwise>
             <xsl:value-of select="concat($url,'?id=',$id)" />
           </xsl:otherwise>
@@ -607,9 +608,16 @@
                 <xsl:if test="acl:checkPermission($id,'writedb')">
 
                   <li>
-                    <a href="{$editURL}">
-                      <xsl:value-of select="i18n:translate('object.editObject')" />
-                    </a>
+                    <xsl:choose>
+                      <xsl:when test="string-length($editURL) &gt; 0">
+                        <a href="{$editURL}">
+                          <xsl:value-of select="i18n:translate('object.editObject')" />
+                        </a>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="i18n:translate('object.locked')" />
+                      </xsl:otherwise>
+                    </xsl:choose>
                   </li>
                   <xsl:if test="$displayAddDerivate='true' and not(mcrxsl:hasURNDefined($id))">
                     <li>
@@ -671,22 +679,19 @@
                   <xsl:choose>
                     <xsl:when test="$mods-type = 'series'">
                       <li>
-                        <a
-                          href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=book&amp;parentId={./@ID}">
+                        <a href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=book&amp;parentId={./@ID}">
                           <xsl:value-of select="i18n:translate('metaData.mods.types.book')" />
                         </a>
                       </li>
                       <li>
-                        <a
-                          href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=confpro&amp;parentId={./@ID}">
+                        <a href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=confpro&amp;parentId={./@ID}">
                           <xsl:value-of select="i18n:translate('metaData.mods.types.confpro')" />
                         </a>
                       </li>
                     </xsl:when>
                     <xsl:otherwise>
                       <li>
-                        <a
-                          href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout={$child-layout}&amp;parentId={./@ID}">
+                        <a href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout={$child-layout}&amp;parentId={./@ID}">
                           <xsl:value-of select="i18n:translate(concat('metaData.mods.types.',$child-layout))" />
                         </a>
                       </li>
