@@ -24,6 +24,7 @@
 package org.mycore.user2;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -33,6 +34,9 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.datamodel.classifications2.MCRCategory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -53,6 +57,8 @@ public class MCRGroupServlet extends MCRServlet {
     private boolean groupClassificationsDefined;
 
     private List<MCRCategoryID> groupCategories;
+
+    private MCRCategoryDAO categoryDao;
 
     /* (non-Javadoc)
      * @see org.mycore.frontend.servlets.MCRServlet#init()
@@ -76,6 +82,7 @@ public class MCRGroupServlet extends MCRServlet {
             }
         }
         groupClassificationsDefined = groupCategories.size() > 1;
+        categoryDao = MCRCategoryDAOFactory.getInstance();
     }
 
     /* (non-Javadoc)
@@ -92,9 +99,22 @@ public class MCRGroupServlet extends MCRServlet {
         }
     }
 
-    private static void chooseGroupRoot(HttpServletRequest request) {
+    private void chooseGroupRoot(HttpServletRequest request) {
         Element rootElement = getRootElement(request);
+        rootElement.addContent(getGroupElements());
         request.setAttribute(LAYOUT_ELEMENT_KEY, new Document(rootElement));
+    }
+
+    private Collection<Element> getGroupElements() {
+        ArrayList<Element> list = new ArrayList<Element>(groupCategories.size());
+        for (MCRCategoryID categID : groupCategories) {
+            Element group = new Element("group");
+            group.setAttribute("categID", categID.toString());
+            MCRCategory category = categoryDao.getCategory(categID, 0);
+            group.setAttribute("label", category.getCurrentLabel().getText());
+            list.add(group);
+        }
+        return list;
     }
 
     private static Element getRootElement(HttpServletRequest request) {
