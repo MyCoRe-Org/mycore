@@ -107,7 +107,7 @@ public final class MCRURLRetriever {
                 if (LOGGER.isDebugEnabled()) {
                     MCRCategLinkReference categoryReference = workflowData.getCategoryReference();
                     String mcrId = categoryReference == null ? null : categoryReference.getObjectID();
-                    LOGGER.debug(MessageFormat.format("Collection: {0}, Action: {1}, Object: {2}", collection, action, mcrId));
+                    LOGGER.debug(MessageFormat.format("Collection: {0}, Action: {1}, Object: {2}", collection.getName(), action, mcrId));
                 }
                 return act.getURL(workflowData);
             }
