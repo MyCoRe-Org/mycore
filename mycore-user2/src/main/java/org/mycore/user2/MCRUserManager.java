@@ -121,7 +121,7 @@ public class MCRUserManager {
             if (groupID.getRootID().equals(MCRUser2Constants.GROUP_CLASSID.getRootID())) {
                 mcrUser.getSystemGroupIDs().add(groupID.getID());
             } else {
-                mcrUser.getSystemGroupIDs().add(groupID.toString());
+                mcrUser.getExternalGroupIDs().add(groupID.toString());
             }
         }
         return mcrUser;
