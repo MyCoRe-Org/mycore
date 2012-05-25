@@ -88,7 +88,26 @@ public class MCRGroupManager {
      */
     public static MCRGroup getGroup(String name) {
         loadSystemGroups();
-        return groupsByName.get(name);
+        MCRGroup mcrGroup = groupsByName.get(name);
+        if (mcrGroup == null) {
+            return getExternalGroup(name);
+        }
+        return mcrGroup;
+    }
+
+    /**
+     * Factory for external groups
+     * @param name a valid {@link MCRCategoryID}
+     * @return MCRGroup instance or null if category does not exist
+     */
+    public static MCRGroup getExternalGroup(String name) {
+        MCRCategoryID categoryID = MCRCategoryID.fromString(name);
+        MCRCategory category = DAO.getCategory(categoryID, 0);
+        if (category == null) {
+            return null;
+        }
+        MCRGroup group = new MCRGroup(name, category.getLabels());
+        return group;
     }
 
     /**
@@ -101,6 +120,9 @@ public class MCRGroupManager {
         MCRGroup[] groups = new MCRGroup[names.length];
         for (int i = 0; i < names.length; i++) {
             groups[i] = groupsByName.get(names[i]);
+            if (groups[i] == null) {
+                groups[i] = getExternalGroup(names[i]);
+            }
         }
         return groups;
     }
@@ -113,10 +135,12 @@ public class MCRGroupManager {
      */
     public static Collection<MCRGroup> getGroups(Collection<String> names) {
         loadSystemGroups();
-        loadSystemGroups();
         LinkedList<MCRGroup> groups = new LinkedList<MCRGroup>();
         for (String name : names) {
             MCRGroup group = groupsByName.get(name);
+            if (group == null) {
+                group = getExternalGroup(name);
+            }
             if (group != null) {
                 groups.add(group);
             }
