@@ -8,7 +8,7 @@
   <mcrpermission name="use-webcli" description="May use the WebCLI console to submit commands" ruledescription="For administrators on localhost only">
    <condition format="xml">
     <boolean operator="and">
-     <condition value="admingroup" operator="=" field="group"/>
+     <condition value="admin" operator="=" field="group"/>
      <condition value="127.0.0.1" operator="=" field="ip"/>
     </boolean>
    </condition>
