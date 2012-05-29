@@ -33,9 +33,11 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -69,7 +71,8 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * @author Frank Lützenkirchen
  * @author Harald Richter
  * @author Thomas Scheffler (yagee)
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date: 2011-03-03 14:10:21 +0100 (Do, 03. Mär
+ *          2011) $
  * @see org.mycore.frontend.fileupload.MCRUploadHandler
  */
 public final class MCRUploadServlet extends MCRServlet implements Runnable {
@@ -86,24 +89,25 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
     final static int bufferSize = 65536; // 64 KByte
 
     /*
-     * reserved URI characters should not be in uploaded filenames
-     * see RFC3986, Section 2.2
+     * reserved URI characters should not be in uploaded filenames see RFC3986,
+     * Section 2.2
      */
     static Pattern genDelims = Pattern.compile("[^:?%#\\[\\]@]*");
 
     static Pattern subDelims = Pattern.compile("[^!%$&'()*+,;=]*");
 
     static boolean doRun = true;
-    
+
     private synchronized void initServer(String baseURL) throws ServletException {
         if (server != null) {
             return; // already inited?
         }
 
-        doRun = true;                                        
+        doRun = true;
 
         try {
-            //query property directly (not via getBaseURL()), saves a stalled MCRSession
+            // query property directly (not via getBaseURL()), saves a stalled
+            // MCRSession
             String host = new java.net.URL(baseURL).getHost();
             String defIP = InetAddress.getByName(host).getHostAddress();
             int defPort = 22471; // my birthday is the default upload port
@@ -131,16 +135,16 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 
     @Override
     public void destroy() {
-        try {              
+        try {
             if (server != null) {
-                server.close();  
-                doRun = false;   
-            }                    
+                server.close();
+                doRun = false;
+            }
         } catch (Exception ignored) {
             LOGGER.warn("Exception while destroy() in MCRUploadServlet !!!");
-        }                                                                    
-        super.destroy();                                                     
-    }                                                                        
+        }
+        super.destroy();
+    }
 
     public void handleUpload(Socket socket) {
         LOGGER.info("Client applet connected to socket now.");
@@ -164,7 +168,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             LOGGER.debug("Received length   = " + length);
             LOGGER.debug("Received md5      = " + md5);
 
-            //start transaction after MCRSession is initialized
+            // start transaction after MCRSession is initialized
             long numBytesStored = MCRUploadHandlerManager.getHandler(uploadId).receiveFile(path, zis, length, md5);
 
             LOGGER.debug("Stored incoming file content");
@@ -309,20 +313,21 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 
             LOGGER.info("UploadHandler form based file upload for ID " + uploadId);
 
-            Element uploads = sub.getXML().getRootElement();
-            List paths = uploads.getChildren("path");
+            // look up filenames of editor submission or request parameters
+            LinkedHashMap<String, FileItem> paths = sub != null ? getFileItems(sub) : getFileItems(parms);
 
-            if (paths != null && paths.size() >= 0) {
+            if (paths != null && !paths.isEmpty()) {
                 int numFiles = paths.size();
                 LOGGER.info("UploadHandler uploading " + numFiles + " file(s)");
                 handler.startUpload(numFiles);
                 session.commitTransaction();
 
-                for (int i = 0; i < numFiles; i++) {
-                    FileItem item = sub.getFile(paths.get(i));
+                for (Map.Entry<String, FileItem> entry : paths.entrySet()) {
+
+                    FileItem item = entry.getValue();
+                    String path = entry.getKey().trim();
 
                     InputStream in = item.getInputStream();
-                    String path = ((Element) paths.get(i)).getTextTrim();
                     path = getFileName(path);
 
                     LOGGER.info("UploadServlet uploading " + path);
@@ -344,6 +349,52 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 
             return;
         }
+    }
+
+    /**
+     * Extracts all filenames and fileitems of target
+     * {@link MCREditorSubmission}.
+     * 
+     * @param sub
+     *            editor submission where are file <code>path</code> elements
+     *            are submitted
+     * @return a new {@link LinkedHashMap} with all extracted filenames and file
+     *         items
+     */
+    @SuppressWarnings("unchecked")
+    private LinkedHashMap<String, FileItem> getFileItems(MCREditorSubmission sub) {
+        LinkedHashMap<String, FileItem> result = new LinkedHashMap<String, FileItem>();
+        Element uploads = sub.getXML().getRootElement();
+        List<Element> paths = uploads.getChildren("path");
+        for (Element path : paths) {
+            result.put(path.getTextTrim(), sub.getFile(path));
+        }
+        return result;
+    }
+
+    /**
+     * Extracts all filenames and fileitems of target
+     * {@link MCRRequestParameters}.
+     * 
+     * @param params
+     *            request parameters where file <code>path</code> elements are
+     *            submitted
+     * @return a new {@link LinkedHashMap} with all extracted filenames and file
+     *         items
+     */
+    @SuppressWarnings("unchecked")
+    private LinkedHashMap<String, FileItem> getFileItems(MCRRequestParameters params) {
+        LinkedHashMap<String, FileItem> result = new LinkedHashMap<String, FileItem>();
+        Enumeration parameterNames = params.getParameterNames();
+        while (parameterNames.hasMoreElements()) {
+            String path = parameterNames.nextElement().toString();
+            String prefix = "/upload/path/";
+            if (path.startsWith(prefix)) {
+                String filename = path.substring(prefix.length());
+                result.put(filename, params.getFileItem(path));
+            }
+        }
+        return result;
     }
 
     private void uploadZipFile(MCRUploadHandler handler, InputStream in) throws IOException, Exception {
@@ -374,10 +425,15 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
     /**
      * checks if path contains reserved URI characters.
      * 
-     * There are some characters that are maybe allowed in file names but are reserved in URIs.
-     * @see <a href="http://tools.ietf.org/html/rfc3986#section-2.2">RFC3986, Section 2.2</a>
-     * @param path complete path name
-     * @throws MCRException if path contains 'gen-delims' or 'sub-delims'
+     * There are some characters that are maybe allowed in file names but are
+     * reserved in URIs.
+     * 
+     * @see <a href="http://tools.ietf.org/html/rfc3986#section-2.2">RFC3986,
+     *      Section 2.2</a>
+     * @param path
+     *            complete path name
+     * @throws MCRException
+     *             if path contains 'gen-delims' or 'sub-delims'
      */
     protected static void checkPathName(String path) throws MCRException {
         if (!genDelims.matcher(path).matches()) {
