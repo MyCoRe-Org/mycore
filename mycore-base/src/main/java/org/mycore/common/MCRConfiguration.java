@@ -191,6 +191,7 @@ public class MCRConfiguration {
         } else {
             try {
                 lastModifiedFile = File.createTempFile("MyCoRe", ".systemTime");
+                lastModifiedFile.deleteOnExit();
             } catch (IOException e) {
                 throw new MCRException("Could not create temporary file, please set property MCR.datadir");
             }
