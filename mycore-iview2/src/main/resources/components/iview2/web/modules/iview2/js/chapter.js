@@ -25,7 +25,7 @@ iview.chapter.View = function() {
 	this._selected = null;//stores the currently selected page and enables reset if Chapters will be selected
 	this.notifyOthers = true;//onselect Event was caused by Controller calls, so don't handle them
 	this._parent = null;//where will the tree be connected to
-	this._tree = jQuery.tree.create();//The jsTree creation	
+	//this._tree = jQuery.tree.create();//The jsTree creation	
 };
 
 ( function() {
@@ -39,43 +39,22 @@ iview.chapter.View = function() {
 	 */
 	function initTree() {
 		var that = this;
+		var data = { data : new Array()};
 		this._treeData = {
-			"data": {
-				"type": 'json',
-				"opts": {
-					"static": []
-				}				
-			},
-			"types": {
-				"default": {
-					"draggable": false
-				}
-			},
-			"ui": {
-					"selected_parent_close": false
-			},
-			"callback": {
-				"onselect": function(node, tree) {
-					//To prevent endless loop check if the event is caused by some resets(chapter Selections)
-					//or as result of some external call
-					if (!that.notifyOthers) { that.notifyOthers = true; return;}
-					
-					//If that element isn't selected already and is no chapter notify all Listeners about the User interaction
-					if (that._selected != node) {
-						var old = that._selected;
-						that._selected = node;
-						//in case a branch was clicked with no files itself redirect to the first subchapter with content in it
-						if (jQuery(that._selected).attr("order") == Number.MAX_VALUE) {
-							that._selected = jQuery(that._selected).find("li[order!='" + Number.MAX_VALUE + "']").first();
-							that.selectNode(that._selected.attr("logid"));
-						}
-						jQuery(that).trigger("select.chapter",
-							{"old":jQuery(old).attr("order"), 
-							"new":jQuery(that._selected).attr("order")});
-					}
-				}
-			}
+		        plugins : [ "themes", "json_data", "ui" ],
+		        json_data : data,
+		        "themes" : {
+		        	"theme" : "classic",
+		        	"url" : "../modules/iview2/gfx/default/classic/style.css"
+		        },
+		        "ui" : {
+		        	"select_limit" : 1,
+		        	"selected_parent_open" : true
+		        },
+		       
+		        
 		};
+
 	};
 
 	/**
@@ -88,9 +67,9 @@ iview.chapter.View = function() {
 	 * @param		{object} parentNode object where the branch will be added as childNode
 	 */
 	function addBranch(branch, parentNode) {
-		var currentBranch = { "data": branch.label, "children": [], "attributes": { "class": "branch","logid": branch.logid, "order":branch.order}};
+		var currentBranch = { "data": branch.label, "children": [], "metadata": {"logid": branch.logid, "order":branch.order}};
 		if (parentNode == this._treeData) {
-			parentNode.data.opts["static"].push(currentBranch);
+			parentNode.json_data.data.push(currentBranch);
 		} else {
 			parentNode.children.push(currentBranch);
 		}
@@ -107,7 +86,7 @@ iview.chapter.View = function() {
 	 * @param		{object} parentNode object where the page will be added as childNode
 	 */
 	function addPage(page, parentNode) {
-		parentNode.children.push({"data":page.label, "attributes": { "class": "page", "logid": page.logid, "order": page.order}});
+		parentNode.children.push({"data":page.label, "metadata": {"logid": page.logid, "order": page.order}});
 	}
 
 	/**
@@ -129,13 +108,46 @@ iview.chapter.View = function() {
 			.mousewheel(function(event, delta) {//Add Mousescroll Capability to the View
 				that._parent[0].scrollTop = that._parent[0].scrollTop - delta*4;
 			});
-		this._tree.init(content,this._treeData);
+		var treeContainer = jQuery(content);
+		this._tree = treeContainer.jstree(this._treeData);
+		jQuery(this._tree).appendTo(chapter);
+		
+		
+		$(this._tree).bind('select_node.jstree', function(event, data) {
+			var node = data.rslt.obj;
+			
+			if (!that.notifyOthers) { that.notifyOthers = true; return;}
+			
+			//If that element isn't selected already and is no chapter notify all Listeners about the User interaction
+			if (that._selected != node) {
+				var old = that._selected;
+				//in case a branch was clicked with no files itself redirect to the first subchapter with content in it
+				if (jQuery(node).data().order == Number.MAX_VALUE) {
+					node = jQuery(node).find("li").first();
+					that.selectNode(node.data().logid);
+				}
+				that._selected = node;
+				jQuery(that).trigger("select.chapter",
+					{"old": (jQuery(old).data() != null) ? jQuery(old).data().order : null, 
+					"new":jQuery(node).data().order});
+			}
+		});
+		
+		
+		//console.log(this._treeData);
 		//Add the collapse button and the functionality behind it
 		jQuery('<div>').addClass("chapSort").appendTo(chapter).click(function(){
-			that._tree.close_all();
+			var selected = that._selected;
+			var currentNode = selected;
+			var last = selected;
 			that.notifyOthers = false;
-			that.selectNode(jQuery(that._selected).attr("logid"));
+			jQuery(that._tree).jstree("close_all",-1,false);
+			
+			that.selectNode(jQuery(selected).data().logid);
+			//jQuery(that._tree).jstree("select_node",selected,true);
 		});
+		
+		
 	}
 
 	/**
@@ -156,7 +168,8 @@ iview.chapter.View = function() {
 			//if the node isn't within the current Viewport it's not displayed as the previous selectBranch 
 			//wasn't able to position the entry within the viewport. because the viewport didn't existed at that time
 			this._parent.slideDown(function() {
-				that.selectNode(jQuery(that._selected).attr("logid"));
+				console.log(jQuery(that._selected));
+				jQuery(that._selected).data().logid;
 			});
 		} else {
 			this._visible = false;
@@ -175,13 +188,19 @@ iview.chapter.View = function() {
 	function selectNode(nodeID) {
 		var that = this;
 		//Find the node we're searching for
-		var res = this._parent.find("li[logid='"+nodeID+"']");
+		var res = this._parent.find("li");
 		//Select all Returned entries(should be only one, else something within the METS Document
 		//or the Model is wrong..
 		jQuery.each(res, function(index, element) {
 			//Avoid cycling as the Tree would notify its listeners itself which could call him again...
-			that.notifyOthers = false;
-			that._tree.select_branch(element); that._selected = element});
+			if(jQuery(element).data().logid == nodeID){
+				that.notifyOthers = false;
+				jQuery(that._tree).jstree("select_node", element,true);
+				that._selected = element;
+				return;
+			}
+
+			});
 	}
 
 	/**
@@ -193,7 +212,7 @@ iview.chapter.View = function() {
 	 */
 	function getSelected() {
 		if (this._selected == null) return "";
-		return jQuery(this._selected).attr("logid");
+		return jQuery(this._selected).data().logid;
 	}
 	
 	var prototype = iview.chapter.View.prototype;
@@ -270,11 +289,9 @@ iview.chapter.Controller = function(modelProvider, physicalModelProvider, view) 
 			buildTree(entry, that._view._treeData, that._view)
 		});
 		this._view.addTree(parentID);
-		try {
-			this._view.selectNode(this._model._containedIn[this._physicalModel.getCurPos()].getID());
-		} catch (err) {
-			log(err);
-		}
+		jQuery(this._view._tree).bind("loaded.jstree", function (event, data) {
+				that._view.selectNode(that._model._containedIn[that._physicalModel.getCurPos()].getID())
+		});
 	}
 
 	/**
