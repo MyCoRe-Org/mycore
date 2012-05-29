@@ -47,6 +47,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
+import org.jdom.transform.JDOMResult;
 import org.jdom.transform.JDOMSource;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
@@ -319,6 +320,41 @@ public class MCRLayoutService {
             sos.write(bytes);
             sos.close();
         }
+    }
+
+    /**
+     * @param xml the document source to transform
+     * @param resourceName the name of the stylesheet to invoke (fullqualified name)
+     * 
+     * @return {@link JDOMResult} or null if either xml or resourceName parameter is null
+     * 
+     * @throws IOException
+     */
+    public JDOMResult doLayout(Source xml, String resourceName) throws IOException {
+        if (xml == null || resourceName == null) {
+            return null;
+        }
+        return transform(xml, MCRXSLTransformerFactory.getTransformer(new MCRTemplatesSource(resourceName)));
+    }
+
+    /**
+     * @param xml
+     * @param transformer
+     * @return
+     * @throws IOException
+     * @throws MCRException
+     */
+    private JDOMResult transform(Source xml, Transformer transformer) throws IOException, MCRException {
+        JDOMResult result = new JDOMResult();
+        try {
+            transformMap.get().clear();
+            transformer.transform(xml, result);
+        } catch (TransformerException ex) {
+            LOGGER.error("Error while transforming XML using XSL stylesheet: " + ex.getMessageAndLocation(), ex);
+        } finally {
+            transformMap.get().clear();
+        }
+        return result;
     }
 
     private String getResourceName(HttpServletRequest req, MCRParameterCollector parameters, String docType) {
