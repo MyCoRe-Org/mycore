@@ -417,7 +417,11 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     @Override
     public boolean isUserInRole(final String role) {
-        return getSystemGroupIDs().contains(role) || getExternalGroupIDs().contains(role);
+        boolean directMember = getSystemGroupIDs().contains(role) || getExternalGroupIDs().contains(role);
+        if (directMember){
+            return true;
+        }
+        return MCRGroupManager.isInGroup(this, role);
     }
 
     /**

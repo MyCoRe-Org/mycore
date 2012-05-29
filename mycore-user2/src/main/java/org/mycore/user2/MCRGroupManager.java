@@ -188,6 +188,12 @@ public class MCRGroupManager {
     static Collection<MCRCategoryID> getGroupIDs(MCRUser user) {
         return CATEG_LINK_SERVICE.getLinksFromReference(getLinkID(user));
     }
+    
+    static boolean isInGroup(MCRUser user, String groupID){
+        MCRCategoryID categoryID = MCRCategoryID.fromString(groupID);
+        MCRCategLinkReference linkReference = getLinkID(user);
+        return CATEG_LINK_SERVICE.isInCategory(linkReference, categoryID);
+    }
 
     private static MCRCategLinkReference getLinkID(MCRUser user) {
         return new MCRCategLinkReference(user.getUserName() + "@" + user.getRealmID(), MCRUser2Constants.CATEG_LINK_TYPE);
