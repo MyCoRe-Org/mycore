@@ -4,16 +4,16 @@
   <eMail>info@mycore.de</eMail>
   <lastLogin>2012-02-07T14:51:26Z</lastLogin>
   <validUntil>2012-02-25T13:00:00Z</validUntil>
-  <groups>
-    <group name="editor">
+  <roles>
+    <role name="editor">
       <label xml:lang="de" text="Bearbeiter" />
       <label xml:lang="en" text="editors" />
-    </group>
-    <group name="admin">
+    </role>
+    <role name="admin">
       <label xml:lang="de" text="Administratoren" />
       <label xml:lang="en" text="Admins" />
-    </group>
-  </groups>
+    </role>
+  </roles>
   <attributes>
     <attribute name="street" value="Heidestraße 12" />
     <attribute name="tel" value="555 4812" />

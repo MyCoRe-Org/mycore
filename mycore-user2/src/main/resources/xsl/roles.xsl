@@ -12,19 +12,19 @@
   <xsl:variable name="PageID" select="'select-group'" />
 
   <xsl:variable name="PageTitle" select="concat(i18n:translate('component.user2.admin.groupSelectDisplay'),/user/@name)" />
-  <xsl:template match="groups[@classID]">
+  <xsl:template match="roles[@classID]">
     <xsl:call-template name="mcrClassificationBrowser">
       <xsl:with-param name="classification" select="@classID" />
       <xsl:with-param name="category" select="@categID" />
-      <xsl:with-param name="style" select="'groupSubselect'" />
+      <xsl:with-param name="style" select="'roleSubselect'" />
     </xsl:call-template>
   </xsl:template>
-  <xsl:template match="groups[group]">
+  <xsl:template match="roles[group]">
     <ul>
-      <xsl:apply-templates select="group" />
+      <xsl:apply-templates select="role" />
     </ul>
   </xsl:template>
-  <xsl:template match="group">
+  <xsl:template match="role">
     <xsl:variable name="url1">
       <xsl:call-template name="UrlSetParam">
         <xsl:with-param name="url" select="$RequestURL" />

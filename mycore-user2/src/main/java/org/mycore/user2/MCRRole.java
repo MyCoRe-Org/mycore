@@ -35,34 +35,34 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRLabel;
 
 /**
- * Represents a group of users.
- * Groups are {@link MCRCategory} instances and every category from {@link MCRUser2Constants#GROUP_CLASSID} {@link MCRGroup#isSystemGroup()}.
+ * Represents a role of users.
+ * Roles are {@link MCRCategory} instances and every category from {@link MCRUser2Constants#ROLE_CLASSID} {@link MCRRole#isSystemRole()}.
  * 
  * @author Thomas Scheffler (yagee)
  */
-@XmlRootElement(name = "group")
-public class MCRGroup {
+@XmlRootElement(name = "role")
+public class MCRRole {
 
-    /** The unique group name */
+    /** The unique role name */
     @XmlAttribute
     private String name;
 
-    /** The labels of the group */
+    /** The labels of the role */
     private HashMap<String, MCRLabel> labels;
 
-    private boolean isSystemGroup;
+    private boolean isSystemRole;
 
-    private MCRGroup() {
+    private MCRRole() {
         this.labels = new HashMap<String, MCRLabel>();
     }
 
     /**
-     * Creates a new group instance. 
+     * Creates a new role instance. 
      * 
-     * @param id the unique group ID
-     * @param name the unique group name
+     * @param id the unique role ID
+     * @param name the unique role name
      */
-    MCRGroup(String name, Set<MCRLabel> labels) {
+    MCRRole(String name, Set<MCRLabel> labels) {
         this();
         for (MCRLabel label : labels) {
             this.labels.put(label.getLang(), label);
@@ -71,9 +71,9 @@ public class MCRGroup {
     }
 
     /**
-     * Returns the group's name
+     * Returns the roles's name
      * 
-     * @return the group's name
+     * @return the roles's name
      */
     public String getName() {
         return name;
@@ -88,19 +88,19 @@ public class MCRGroup {
     }
 
     /**
-     * Returns all labels available for this group. 
+     * Returns all labels available for this role. 
      */
     public Collection<MCRLabel> getLabels() {
         return labels.values();
     }
 
     /**
-     * Returns true if this group is a system group.
-     * A system group is every category in {@link MCRUser2Constants#GROUP_CLASSID}. 
-     * @return false if category has not the same root ID as the system group classification.
+     * Returns true if this role is a system role.
+     * A system role is every category in {@link MCRUser2Constants#ROLE_CLASSID}. 
+     * @return false if category has not the same root ID as the system role classification.
      */
-    public boolean isSystemGroup() {
-        return isSystemGroup;
+    public boolean isSystemRole() {
+        return isSystemRole;
     }
 
     @XmlElement(name = "label")
@@ -116,13 +116,13 @@ public class MCRGroup {
 
     private void setName(String name) {
         this.name = name;
-        this.isSystemGroup = !name.contains(":") || name.startsWith(MCRUser2Constants.GROUP_CLASSID.getRootID() + ":");
+        this.isSystemRole = !name.contains(":") || name.startsWith(MCRUser2Constants.ROLE_CLASSID.getRootID() + ":");
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof MCRGroup)
-            return ((MCRGroup) obj).getName().equals(this.getName());
+        if (obj instanceof MCRRole)
+            return ((MCRRole) obj).getName().equals(this.getName());
         else
             return false;
     }

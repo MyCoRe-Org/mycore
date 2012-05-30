@@ -106,29 +106,29 @@ public class MCRUserCommands extends MCRAbstractCommands {
         com = new MCRCommand("disable user {0}", "org.mycore.user2.MCRUserCommands.disableUser String", "The command disables the user from the access.");
         command.add(com);
 
-        com = new MCRCommand("delete group {0}", "org.mycore.user2.MCRUserCommands.deleteGroup String",
-            "The command delete the group {0} from the user system, but only if it has no user members.");
+        com = new MCRCommand("delete role {0}", "org.mycore.user2.MCRUserCommands.deleteRole String",
+            "The command delete the role {0} from the user system, but only if it has no user assigned.");
         command.add(com);
 
-        com = new MCRCommand("add groups from user file {0}", "org.mycore.user2.MCRUserCommands.addGroups String",
-            "The command adds groups found in user file {0} that do not exist");
+        com = new MCRCommand("add roles from user file {0}", "org.mycore.user2.MCRUserCommands.addRoles String",
+            "The command adds roles found in user file {0} that do not exist");
         command.add(com);
 
         com = new MCRCommand("delete user {0}", "org.mycore.user2.MCRUserCommands.deleteUser String", "The command delete the user {0}.");
         command.add(com);
 
-        com = new MCRCommand("add user {0} as member to group {1}", "org.mycore.user2.MCRUserCommands.addMemberUserToGroup String String",
-            "The command add a user {0} as secondary member in the group {1}.");
+        com = new MCRCommand("assign user {0} to role {1}", "org.mycore.user2.MCRUserCommands.assignUserToRole String String",
+            "The command add a user {0} as secondary member in the role {1}.");
         command.add(com);
 
-        com = new MCRCommand("remove user {0} as member from group {1}", "org.mycore.user2.MCRUserCommands.removeMemberUserFromGroup String String",
-            "The command remove the user {0} as secondary member from the group {1}.");
+        com = new MCRCommand("unassign user {0} from role {1}", "org.mycore.user2.MCRUserCommands.unassignUserFromRole String String",
+            "The command remove the user {0} as secondary member from the role {1}.");
         command.add(com);
 
-        com = new MCRCommand("list all groups", "org.mycore.user2.MCRUserCommands.listAllGroups", "The command list all groups.");
+        com = new MCRCommand("list all roles", "org.mycore.user2.MCRUserCommands.listAllRoles", "The command list all roles.");
         command.add(com);
 
-        com = new MCRCommand("list group {0}", "org.mycore.user2.MCRUserCommands.listGroup String", "The command list the group {0}.");
+        com = new MCRCommand("list role {0}", "org.mycore.user2.MCRUserCommands.listRole String", "The command list the role {0}.");
         command.add(com);
 
         com = new MCRCommand("list all users", "org.mycore.user2.MCRUserCommands.listAllUsers", "The command list all users.");
@@ -180,14 +180,14 @@ public class MCRUserCommands extends MCRAbstractCommands {
     }
 
     /**
-     * This method initializes the user and group system an creates a superuser
+     * This method initializes the user and role system an creates a superuser
      * with values set in mycore.properties.private As 'super' default, if no
      * properties were set, mcradmin with password mycore will be used.
      */
     public static List<String> initSuperuser() {
         final String suser = CONFIG.getString("MCR.Users.Superuser.UserName", "administrator");
         final String spasswd = CONFIG.getString("MCR.Users.Superuser.UserPasswd", "alleswirdgut");
-        final String sgroup = CONFIG.getString("MCR.Users.Superuser.GroupName", "admingroup");
+        final String srole = CONFIG.getString("MCR.Users.Superuser.GroupName", "admin");
 
         //set to super user
         MCRSessionMgr.getCurrentSession().setUserInformation(new MCRUserInformation() {
@@ -213,24 +213,24 @@ public class MCRUserCommands extends MCRAbstractCommands {
             return null;
         }
 
-        // the superuser group
+        // the superuser role
         try {
             Set<MCRLabel> labels = new HashSet<MCRLabel>();
-            labels.add(new MCRLabel("en", "The superuser group", null));
+            labels.add(new MCRLabel("en", "The superuser role", null));
 
-            MCRGroup mcrGroup = new MCRGroup(sgroup, labels);
-            MCRGroupManager.addGroup(mcrGroup);
+            MCRRole mcrRole = new MCRRole(srole, labels);
+            MCRRoleManager.addRole(mcrRole);
         } catch (Exception e) {
-            throw new MCRException("Can't create the superuser group.", e);
+            throw new MCRException("Can't create the superuser role.", e);
         }
 
-        LOGGER.info("The group " + sgroup + " is installed.");
+        LOGGER.info("The role " + srole + " is installed.");
 
         // the superuser
         try {
             MCRUser mcrUser = new MCRUser(suser);
             mcrUser.setRealName("Superuser");
-            mcrUser.addToGroup(sgroup);
+            mcrUser.assignRole(srole);
             MCRUserManager.updatePasswordHashToSHA1(mcrUser, spasswd);
             MCRUserManager.createUser(mcrUser);
         } catch (Exception e) {
@@ -242,42 +242,42 @@ public class MCRUserCommands extends MCRAbstractCommands {
     }
 
     /**
-     * This method invokes MCRUserMgr.deleteGroup() and permanently removes a
-     * group from the system.
+     * This method invokes {@link MCRRoleManager#deleteRole(String)} and permanently removes a
+     * role from the system.
      * 
-     * @param groupID
-     *            the ID of the group which will be deleted
+     * @param roleID
+     *            the ID of the role which will be deleted
      */
-    public static void deleteGroup(String groupID) {
-        MCRGroupManager.deleteGroup(groupID);
+    public static void deleteRole(String roleID) {
+        MCRRoleManager.deleteRole(roleID);
     }
 
     /**
-     * Loads XML from a user and looks for groups currently not present in the system and creates them.
+     * Loads XML from a user and looks for roles currently not present in the system and creates them.
      * 
      * @param fileName
      *            a valid user XML file
      * @throws IOException 
      * @throws SAXParseException 
      */
-    public static void addGroups(String fileName) throws SAXParseException, IOException {
+    public static void addRoles(String fileName) throws SAXParseException, IOException {
         LOGGER.info("Reading file " + fileName + " ...");
         Document doc = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(fileName));
         Element user = doc.getRootElement();
-        Element groups = user.getChild("groups");
-        if (groups == null) {
+        Element roles = user.getChild("roles");
+        if (roles == null) {
             return;
         }
         @SuppressWarnings("unchecked")
-        List<Element> groupList = groups.getChildren("group");
-        for (Element group : groupList) {
-            String name = group.getAttributeValue("name");
-            MCRGroup mcrGroup = MCRGroupManager.getGroup(name);
-            if (mcrGroup == null) {
+        List<Element> roleList = roles.getChildren("role");
+        for (Element role : roleList) {
+            String name = role.getAttributeValue("name");
+            MCRRole mcrRole = MCRRoleManager.getRole(name);
+            if (mcrRole == null) {
                 @SuppressWarnings("unchecked")
-                List<Element> labelList = group.getChildren("label");
-                mcrGroup = new MCRGroup(name, MCRXMLTransformer.getLabels(labelList));
-                MCRGroupManager.addGroup(mcrGroup);
+                List<Element> labelList = role.getChildren("label");
+                mcrRole = new MCRRole(name, MCRXMLTransformer.getLabels(labelList));
+                MCRRoleManager.addRole(mcrRole);
             }
         }
     }
@@ -365,14 +365,14 @@ public class MCRUserCommands extends MCRAbstractCommands {
     }
 
     /**
-     * This method invokes MCRUserMgr.getAllGroupIDs() and retrieves a ArrayList
-     * of all groups stored in the persistent datastore.
+     * This method invokes {@link MCRRoleManager#listSystemRoles()} and retrieves a list
+     * of all roles stored in the persistent datastore.
      */
-    public static void listAllGroups() throws Exception {
-        List<MCRGroup> groups = MCRGroupManager.listSystemGroups();
+    public static void listAllRoles() throws Exception {
+        List<MCRRole> roles = MCRRoleManager.listSystemRoles();
 
-        for (MCRGroup group : groups) {
-            listGroup(group);
+        for (MCRRole role : roles) {
+            listRole(role);
         }
     }
 
@@ -427,26 +427,26 @@ public class MCRUserCommands extends MCRAbstractCommands {
     }
 
     /**
-     * This method invokes MCRUserMgr.retrieveGroup() and then works with the
-     * retrieved group object to get an XML-Representation.
+     * This method invokes {@link MCRRoleManager#getRole(String)} and then works with the
+     * retrieved role object to get an XML-Representation.
      * 
-     * @param groupID
-     *            the ID of the group for which the XML-representation is needed
+     * @param roleID
+     *            the ID of the role for which the XML-representation is needed
      */
-    public static final void listGroup(String groupID) throws MCRException {
-        MCRGroup group = MCRGroupManager.getGroup(groupID);
-        listGroup(group);
+    public static final void listRole(String roleID) throws MCRException {
+        MCRRole role = MCRRoleManager.getRole(roleID);
+        listRole(role);
     }
 
-    public static final void listGroup(MCRGroup group) {
+    public static final void listRole(MCRRole role) {
         StringBuilder sb = new StringBuilder();
-        sb.append("       group=").append(group.getName());
-        for (MCRLabel label : group.getLabels()) {
+        sb.append("       role=").append(role.getName());
+        for (MCRLabel label : role.getLabels()) {
             sb.append("\n         ").append(label.toString());
         }
-        Collection<String> userIds = MCRGroupManager.listUserIDs(group);
+        Collection<String> userIds = MCRRoleManager.listUserIDs(role);
         for (String userId : userIds) {
-            sb.append("\n          user in this group=").append(userId);
+            sb.append("\n          user assigned to role=").append(userId);
         }
         LOGGER.info(sb.toString());
     }
@@ -473,10 +473,10 @@ public class MCRUserCommands extends MCRAbstractCommands {
             .append("   loginAllowed=")
             .append(user.loginAllowed())
             .append('\n');
-        List<String> groups = new ArrayList<String>(user.getSystemGroupIDs());
-        groups.addAll(user.getExternalGroupIDs());
-        for (String gid : groups) {
-            sb.append("          member in group=").append(gid).append('\n');
+        List<String> roles = new ArrayList<String>(user.getSystemRoleIDs());
+        roles.addAll(user.getExternalRoleIDs());
+        for (String rid : roles) {
+            sb.append("          assigned to role=").append(rid).append('\n');
         }
         LOGGER.info(sb.toString());
     }
@@ -538,44 +538,44 @@ public class MCRUserCommands extends MCRAbstractCommands {
     }
 
     /**
-     * This method adds a user as a member to a group
+     * This method adds a user as a member to a role
      * 
      * @param userID
-     *            the ID of the user which will be a member of the group
-     *            represented by groupID
-     * @param groupID
-     *            the ID of the group to which the user with ID mbrUserID will
+     *            the ID of the user which will be a member of the role
+     *            represented by roleID
+     * @param roleID
+     *            the ID of the role to which the user with ID mbrUserID will
      *            be added
      * @throws MCRException
      */
-    public static final void addMemberUserToGroup(String userID, String groupID) throws MCRException {
+    public static final void assignUserToRole(String userID, String roleID) throws MCRException {
         try {
             MCRUser user = MCRUserManager.getUser(userID);
-            user.addToGroup(groupID);
+            user.assignRole(roleID);
             MCRUserManager.updateUser(user);
         } catch (Exception e) {
-            throw new MCRException("Error while adding group " + userID + " to group " + groupID + ".", e);
+            throw new MCRException("Error while assigning " + userID + " to role " + roleID + ".", e);
         }
     }
 
     /**
-     * This method removes a member user from a group
+     * This method removes a member user from a role
      * 
      * @param userID
-     *            the ID of the user which will be removed from the group
-     *            represented by groupID
-     * @param groupID
-     *            the ID of the group from which the user with ID mbrUserID will
+     *            the ID of the user which will be removed from the role
+     *            represented by roleID
+     * @param roleID
+     *            the ID of the role from which the user with ID mbrUserID will
      *            be removed
      * @throws MCRException
      */
-    public static final void removeMemberUserFromGroup(String userID, String groupID) throws MCRException {
+    public static final void unassignUserFromRole(String userID, String roleID) throws MCRException {
         try {
             MCRUser user = MCRUserManager.getUser(userID);
-            user.removeFromGroup(groupID);
+            user.unassignRole(roleID);
             MCRUserManager.updateUser(user);
         } catch (Exception e) {
-            throw new MCRException("Error while removing group " + userID + " from group " + groupID + ".", e);
+            throw new MCRException("Error while unassigning " + userID + " from role " + roleID + ".", e);
         }
     }
 

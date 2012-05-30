@@ -120,13 +120,13 @@ public class MCRUserManagerTest extends MCRHibTestCase {
         String eMail = "info@mycore.de";
         this.user.setEMail(eMail);
         String groupName = "admin";
-        this.user.getSystemGroupIDs().add(groupName);
+        this.user.getSystemRoleIDs().add(groupName);
         MCRUserManager.updateUser(this.user);
         startNewTransaction();
         MCRUser user = MCRUserManager.getUser(this.user.getUserName(), this.user.getRealm());
         assertEquals("User information was not updated", eMail, user.getEMailAddress());
         assertEquals("User was created not updated", 1, MCRUserManager.countUsers(null, null, null));
-        assertTrue("User is not in group " + groupName, user.getSystemGroupIDs().contains(groupName));
+        assertTrue("User is not in group " + groupName, user.getSystemRoleIDs().contains(groupName));
     }
 
     /**
@@ -207,8 +207,8 @@ public class MCRUserManagerTest extends MCRHibTestCase {
         MCRUserManager.updatePasswordHashToSHA1(this.user, this.user.getPassword());
         this.user.setEMail("info@mycore.de");
         this.user.setHint("JUnit Test");
-        this.user.getSystemGroupIDs().add("admin");
-        this.user.getSystemGroupIDs().add("editor");
+        this.user.getSystemRoleIDs().add("admin");
+        this.user.getSystemRoleIDs().add("editor");
         this.user.setLastLogin(new Date());
         this.user.setRealName("Test Case");
         this.user.getAttributes().put("tel", "555 4812");

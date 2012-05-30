@@ -110,18 +110,18 @@ public class MCRUserManager {
             LOGGER.warn("Could not find requested user: " + userName + "@" + realmId);
             return null;
         }
-        return setGroups(mcrUser);
+        return setRoles(mcrUser);
     }
 
-    private static MCRUser setGroups(MCRUser mcrUser) {
-        Collection<MCRCategoryID> groupIDs = MCRGroupManager.getGroupIDs(mcrUser);
-        mcrUser.getSystemGroupIDs().clear();
-        mcrUser.getExternalGroupIDs().clear();
-        for (MCRCategoryID groupID : groupIDs) {
-            if (groupID.getRootID().equals(MCRUser2Constants.GROUP_CLASSID.getRootID())) {
-                mcrUser.getSystemGroupIDs().add(groupID.getID());
+    private static MCRUser setRoles(MCRUser mcrUser) {
+        Collection<MCRCategoryID> roleIDs = MCRRoleManager.getRoleIDs(mcrUser);
+        mcrUser.getSystemRoleIDs().clear();
+        mcrUser.getExternalRoleIDs().clear();
+        for (MCRCategoryID roleID : roleIDs) {
+            if (roleID.getRootID().equals(MCRUser2Constants.ROLE_CLASSID.getRootID())) {
+                mcrUser.getSystemRoleIDs().add(roleID.getID());
             } else {
-                mcrUser.getExternalGroupIDs().add(groupID.toString());
+                mcrUser.getExternalRoleIDs().add(roleID.toString());
             }
         }
         return mcrUser;
@@ -166,7 +166,7 @@ public class MCRUserManager {
 
     /** 
      * Creates and stores a new login user in the database.
-     * This will also store group membership information.
+     * This will also store role membership information.
      *  
      * @param user the user to create in the database.
      */
@@ -176,7 +176,7 @@ public class MCRUserManager {
         }
         Session session = MCRHIB_CONNECTION.getSession();
         session.save(user);
-        MCRGroupManager.storeGroupsOfUser(user);
+        MCRRoleManager.storeRoleAssignments(user);
     }
 
     /**
@@ -197,7 +197,7 @@ public class MCRUserManager {
 
     /** 
      * Updates an existing login user in the database.
-     * This will also update group membership information.
+     * This will also update role membership information.
      *  
      * @param user the user to update in the database.
      */
@@ -213,8 +213,8 @@ public class MCRUserManager {
         user.internalID = inDb.internalID;
         session.evict(inDb);
         session.update(user);
-        MCRGroupManager.removeUserFromGroups(user);
-        MCRGroupManager.storeGroupsOfUser(user);
+        MCRRoleManager.unassignRoles(user);
+        MCRRoleManager.storeRoleAssignments(user);
     }
 
     /**
@@ -250,7 +250,7 @@ public class MCRUserManager {
     public static void deleteUser(String userName, String realmId) {
         Session session = MCRHIB_CONNECTION.getSession();
         MCRUser user = getUser(userName, realmId);
-        MCRGroupManager.removeUserFromGroups(user);
+        MCRRoleManager.unassignRoles(user);
         session.delete(user);
     }
 

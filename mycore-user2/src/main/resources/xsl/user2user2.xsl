@@ -14,9 +14,9 @@
           <xsl:value-of select="date:date-time()" />
         </validUntil>
       </xsl:if>
-      <groups>
+      <roles>
         <xsl:apply-templates select="user.groups/groups.groupID" />
-      </groups>
+      </roles>
       <attributes>
         <xsl:apply-templates mode="attribute"
           select="user.creator|
@@ -42,7 +42,7 @@
     </user>
   </xsl:template>
   <xsl:template match="groups.groupID">
-    <group name="{.}" />
+    <role name="{.}" />
   </xsl:template>
   <xsl:template match="*" mode="attribute">
     <xsl:if test="string-length(.)&gt;0">

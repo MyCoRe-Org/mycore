@@ -8,13 +8,13 @@
     <url-pattern>/servlets/MCRUserServlet</url-pattern>
   </servlet-mapping>
 
-  <servlet id="MCRGroupServlet">
-    <servlet-name>MCRGroupServlet</servlet-name>
-    <servlet-class>org.mycore.user2.MCRGroupServlet</servlet-class>
+  <servlet id="MCRRoleServlet">
+    <servlet-name>MCRRoleServlet</servlet-name>
+    <servlet-class>org.mycore.user2.MCRRoleServlet</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>MCRGroupServlet</servlet-name>
-    <url-pattern>/servlets/MCRGroupServlet</url-pattern>
+    <servlet-name>MCRRoleServlet</servlet-name>
+    <url-pattern>/servlets/MCRRoleServlet</url-pattern>
   </servlet-mapping>
 
   <servlet id="MCRLoginServlet">

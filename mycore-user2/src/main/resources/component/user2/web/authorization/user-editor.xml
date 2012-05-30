@@ -117,15 +117,15 @@
     </cell>
 
     <cell row="11" col="1" anchor="NORTHEAST">
-      <text i18n="component.user2.admin.groups" />
+      <text i18n="component.user2.admin.roles" />
     </cell>
-    <cell row="11" col="2" colspan="2" anchor="NORTHWEST" var="groups/group">
+    <cell row="11" col="2" colspan="2" anchor="NORTHWEST" var="roles/role">
       <repeater min="0" max="20" lines="off">
         <panel lines="off">
           <hidden descendants="true" var="label"/>
           <hidden var="@name"/>
           <cell row="1" col="1" anchor="WEST">
-            <subselect i18n="component.user2.button.select" id="group.select" type="webpage" href="servlets/MCRGroupServlet" style="width: 100px;" />
+            <subselect i18n="component.user2.button.select" id="role.select" type="webpage" href="servlets/MCRRoleServlet" style="width: 100px;" />
           </cell>
           <cell row="1" col="2" anchor="WEST">
             <output var="@name" />

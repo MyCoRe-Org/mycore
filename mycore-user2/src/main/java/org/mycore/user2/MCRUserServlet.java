@@ -259,16 +259,16 @@ public class MCRUserServlet extends MCRServlet {
             user.setRealm(MCRRealmFactory.getLocalRealm());
             user.setOwner(currentUser);
         }
-        Element gs = u.getChild("groups");
+        Element gs = u.getChild("roles");
         if (gs != null) {
-            user.getSystemGroupIDs().clear();
-            user.getExternalGroupIDs().clear();
+            user.getSystemRoleIDs().clear();
+            user.getExternalRoleIDs().clear();
             @SuppressWarnings("unchecked")
-            List<Element> groupList = (List<Element>) gs.getChildren("group");
+            List<Element> groupList = (List<Element>) gs.getChildren("role");
             for (Element group : groupList) {
                 String groupName = group.getAttributeValue("name");
                 if (hasAdminPermission || currentUser.isUserInRole(groupName)) {
-                    user.addToGroup(groupName);
+                    user.assignRole(groupName);
                 } else {
                     LOGGER.warn("Current user " + currentUser.getUserID() + " has not the permission to add user to group " + groupName);
                 }

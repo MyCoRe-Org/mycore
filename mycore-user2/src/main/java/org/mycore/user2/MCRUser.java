@@ -52,7 +52,7 @@ import org.mycore.common.MCRUserInformation;
  */
 @XmlRootElement(name = "user")
 @XmlAccessorType(XmlAccessType.NONE)
-@XmlType(propOrder = { "ownerId", "realName", "eMail", "lastLogin", "validUntil", "groups", "attributesMap", "password" })
+@XmlType(propOrder = { "ownerId", "realName", "eMail", "lastLogin", "validUntil", "roles", "attributesMap", "password" })
 public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     private static final long serialVersionUID = 3378645055646901800L;
 
@@ -90,9 +90,9 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      */
     private Map<String, String> attributes;
 
-    private Collection<String> systemGroups;
+    private Collection<String> systemRoles;
 
-    private Collection<String> externalGroups;
+    private Collection<String> externalRoles;
 
     protected MCRUser() {
         this(null);
@@ -117,8 +117,8 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     public MCRUser(String userName, String realmID) {
         this.userName = userName;
         this.realmID = realmID;
-        this.systemGroups = new HashSet<String>();
-        this.externalGroups = new HashSet<String>();
+        this.systemRoles = new HashSet<String>();
+        this.externalRoles = new HashSet<String>();
         this.attributes = new HashMap<String, String>();
         this.password = new Password();
     }
@@ -417,11 +417,11 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     @Override
     public boolean isUserInRole(final String role) {
-        boolean directMember = getSystemGroupIDs().contains(role) || getExternalGroupIDs().contains(role);
+        boolean directMember = getSystemRoleIDs().contains(role) || getExternalRoleIDs().contains(role);
         if (directMember){
             return true;
         }
-        return MCRGroupManager.isInGroup(this, role);
+        return MCRRoleManager.isAssignedToRole(this, role);
     }
 
     /**
@@ -439,54 +439,54 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     }
 
     /**
-     * Returns a collection any system group ID this user is member of.
-     * @see MCRGroup#isSystemGroup()
+     * Returns a collection any system role ID this user is member of.
+     * @see MCRRole#isSystemRole()
      */
-    public Collection<String> getSystemGroupIDs() {
-        return systemGroups;
+    public Collection<String> getSystemRoleIDs() {
+        return systemRoles;
     }
 
     /**
-     * Returns a collection any external group ID this user is member of.
-     * @see MCRGroup#isSystemGroup()
+     * Returns a collection any external role ID this user is member of.
+     * @see MCRRole#isSystemRole()
      */
-    public Collection<String> getExternalGroupIDs() {
-        return externalGroups;
+    public Collection<String> getExternalRoleIDs() {
+        return externalRoles;
     }
 
     /**
-     * Adds this user to the given group.
-     * @param groupName the group the user should be added to (must already exist)
+     * Adds this user to the given role.
+     * @param roleName the role the user should be added to (must already exist)
      */
-    public void addToGroup(String groupName) {
-        MCRGroup mcrGroup = MCRGroupManager.getGroup(groupName);
-        if (mcrGroup == null) {
-            throw new MCRException("Could not find group " + groupName);
+    public void assignRole(String roleName) {
+        MCRRole mcrRole = MCRRoleManager.getRole(roleName);
+        if (mcrRole == null) {
+            throw new MCRException("Could not find role " + roleName);
         }
-        addToGroup(mcrGroup);
+        assignRole(mcrRole);
     }
 
-    private void addToGroup(MCRGroup mcrGroup) {
-        if (mcrGroup.isSystemGroup()) {
-            getSystemGroupIDs().add(mcrGroup.getName());
+    private void assignRole(MCRRole mcrRole) {
+        if (mcrRole.isSystemRole()) {
+            getSystemRoleIDs().add(mcrRole.getName());
         } else {
-            getExternalGroupIDs().add(mcrGroup.getName());
+            getExternalRoleIDs().add(mcrRole.getName());
         }
     }
 
     /**
-     * Removes this user to the given group.
-     * @param groupName the group the user should be removed from (must already exist)
+     * Removes this user from the given role.
+     * @param roleName the role the user should be removed from (must already exist)
      */
-    public void removeFromGroup(String groupName) {
-        MCRGroup mcrGroup = MCRGroupManager.getGroup(groupName);
-        if (mcrGroup == null) {
-            throw new MCRException("Could not find group " + groupName);
+    public void unassignRole(String roleName) {
+        MCRRole mcrRole = MCRRoleManager.getRole(roleName);
+        if (mcrRole == null) {
+            throw new MCRException("Could not find role " + roleName);
         }
-        if (mcrGroup.isSystemGroup()) {
-            getSystemGroupIDs().remove(mcrGroup.getName());
+        if (mcrRole.isSystemRole()) {
+            getSystemRoleIDs().remove(mcrRole.getName());
         } else {
-            getExternalGroupIDs().remove(mcrGroup.getName());
+            getExternalRoleIDs().remove(mcrRole.getName());
         }
     }
 
@@ -567,26 +567,26 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     }
 
     @SuppressWarnings("unused")
-    @XmlElementWrapper(name = "groups")
-    @XmlElement(name = "group")
-    private MCRGroup[] getGroups() {
-        if (getSystemGroupIDs().isEmpty() && getExternalGroupIDs().isEmpty()) {
+    @XmlElementWrapper(name = "roles")
+    @XmlElement(name = "role")
+    private MCRRole[] getRoles() {
+        if (getSystemRoleIDs().isEmpty() && getExternalRoleIDs().isEmpty()) {
             return null;
         }
-        Collection<MCRGroup> groups = new ArrayList<MCRGroup>();
-        for (String groupName : getSystemGroupIDs()) {
-            groups.add(MCRGroupManager.getGroup(groupName));
+        Collection<MCRRole> roles = new ArrayList<MCRRole>();
+        for (String roleName : getSystemRoleIDs()) {
+            roles.add(MCRRoleManager.getRole(roleName));
         }
-        for (String groupName : getExternalGroupIDs()) {
-            groups.add(MCRGroupManager.getGroup(groupName));
+        for (String roleName : getExternalRoleIDs()) {
+            roles.add(MCRRoleManager.getRole(roleName));
         }
-        return groups.toArray(new MCRGroup[groups.size()]);
+        return roles.toArray(new MCRRole[roles.size()]);
     }
 
     @SuppressWarnings("unused")
-    private void setGroups(MCRGroup[] groups) {
-        for (MCRGroup group : groups) {
-            addToGroup(group);
+    private void setRoles(MCRRole[] roles) {
+        for (MCRRole role : roles) {
+            assignRole(role);
         }
     }
 
@@ -658,7 +658,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      * <li>real name
      * <li>eMail
      * <li>attributes
-     * <li>group information
+     * <li>role information
      * <li>last login
      * <li>valid until
      * <li>password hint
@@ -694,8 +694,8 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         copy.lastLogin = this.lastLogin;
         copy.validUntil = this.validUntil;
         copy.realName = this.realName;
-        copy.systemGroups.addAll(this.systemGroups);
-        copy.externalGroups.addAll(this.externalGroups);
+        copy.systemRoles.addAll(this.systemRoles);
+        copy.externalRoles.addAll(this.externalRoles);
         copy.attributes.putAll(this.attributes);
         return copy;
     }

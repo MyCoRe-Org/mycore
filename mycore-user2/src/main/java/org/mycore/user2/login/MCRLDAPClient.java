@@ -41,8 +41,8 @@ import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRUsageException;
-import org.mycore.user2.MCRGroup;
-import org.mycore.user2.MCRGroupManager;
+import org.mycore.user2.MCRRole;
+import org.mycore.user2.MCRRoleManager;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 import org.mycore.user2.utils.MCRUserTransformer;
@@ -115,7 +115,7 @@ public class MCRLDAPClient {
     private String mapEMail;
 
     /** Default group of user */
-    private MCRGroup defaultGroup;
+    private MCRRole defaultGroup;
 
     private Hashtable<String, String> ldapEnv;
 
@@ -140,7 +140,7 @@ public class MCRLDAPClient {
 
         String group = config.getString(prefix + "Group.DefaultGroup", null);
         if (group != null)
-            defaultGroup = MCRGroupManager.getGroup(group);
+            defaultGroup = MCRRoleManager.getRole(group);
 
         ldapEnv = new Hashtable<String, String>();
         ldapEnv.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
@@ -158,7 +158,7 @@ public class MCRLDAPClient {
         if ((defaultGroup != null) && (!user.isUserInRole((defaultGroup.getName())))) {
             LOGGER.info("User " + userName + " add to group " + defaultGroup);
             userChanged = true;
-            user.addToGroup(defaultGroup.getName());
+            user.assignRole(defaultGroup.getName());
         }
 
         // Get user properties from LDAP server
@@ -196,7 +196,7 @@ public class MCRLDAPClient {
                         String group = MCRConfiguration.instance().getString(groupMapping, null);
                         if ((group != null) && (!user.isUserInRole((group)))) {
                             LOGGER.info("User " + userName + " add to group " + group);
-                            user.addToGroup(group);
+                            user.assignRole(group);
                             userChanged = true;
                         }
                     }

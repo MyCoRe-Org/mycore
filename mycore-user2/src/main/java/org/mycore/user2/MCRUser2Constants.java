@@ -35,7 +35,7 @@ public final class MCRUser2Constants {
     /**
      * {@link MCRCategoryID} root ID for system groups.
      */
-    public static final String GROUP_ROOT_ID = "mcr-groups";
+    public static final String ROLE_ROOT_ID = "mcr-groups";
 
     static final String USER_ADMIN_PERMISSION = "administrate-users";
 
@@ -56,13 +56,13 @@ public final class MCRUser2Constants {
     }
 
     /**
-     * @return the groupRootId
+     * @return the roleRootId
      */
-    public static String getGroupRootId() {
-        return GROUP_ROOT_ID;
+    public static String getRoleRootId() {
+        return ROLE_ROOT_ID;
     }
 
-    static final MCRCategoryID GROUP_CLASSID = MCRCategoryID.rootID(GROUP_ROOT_ID);
+    static final MCRCategoryID ROLE_CLASSID = MCRCategoryID.rootID(ROLE_ROOT_ID);
 
     static final String CATEG_LINK_TYPE = "mcr-user";
 

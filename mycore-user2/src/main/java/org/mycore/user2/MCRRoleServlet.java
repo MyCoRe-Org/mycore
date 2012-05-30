@@ -42,21 +42,21 @@ import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
- * This servlet is used in the group sub select for when administrate a user.
- * The property <code>MCR.user2.GroupCategegories</code> can hold any category IDs
- * that could be possible roots for groups.
+ * This servlet is used in the role sub select for when administrate a user.
+ * The property <code>MCR.user2.RoleCategegories</code> can hold any category IDs
+ * that could be possible roots for roles.
  * @author Thomas Scheffler (yagee)
  *
  */
-public class MCRGroupServlet extends MCRServlet {
+public class MCRRoleServlet extends MCRServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String LAYOUT_ELEMENT_KEY = MCRGroupServlet.class.getName() + ".layoutElement";
+    private static final String LAYOUT_ELEMENT_KEY = MCRRoleServlet.class.getName() + ".layoutElement";
 
-    private boolean groupClassificationsDefined;
+    private boolean roleClassificationsDefined;
 
-    private List<MCRCategoryID> groupCategories;
+    private List<MCRCategoryID> roleCategories;
 
     private MCRCategoryDAO categoryDao;
 
@@ -66,22 +66,22 @@ public class MCRGroupServlet extends MCRServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-        groupClassificationsDefined = false;
-        groupCategories = new ArrayList<MCRCategoryID>();
-        groupCategories.add(MCRUser2Constants.GROUP_CLASSID);
+        roleClassificationsDefined = false;
+        roleCategories = new ArrayList<MCRCategoryID>();
+        roleCategories.add(MCRUser2Constants.ROLE_CLASSID);
         MCRConfiguration config = MCRConfiguration.instance();
-        String groupCategoriesValue = config.getString(MCRUser2Constants.CONFIG_PREFIX + "GroupCategegories", null);
-        if (groupCategoriesValue == null) {
+        String roleCategoriesValue = config.getString(MCRUser2Constants.CONFIG_PREFIX + "RoleCategegories", null);
+        if (roleCategoriesValue == null) {
             return;
         }
-        String[] groupCategoriesSplitted = groupCategoriesValue.split(",");
-        for (String groupID : groupCategoriesSplitted) {
-            String categoryId = groupID.trim();
+        String[] roleCategoriesSplitted = roleCategoriesValue.split(",");
+        for (String roleID : roleCategoriesSplitted) {
+            String categoryId = roleID.trim();
             if (categoryId.length() > 0) {
-                groupCategories.add(MCRCategoryID.fromString(categoryId));
+                roleCategories.add(MCRCategoryID.fromString(categoryId));
             }
         }
-        groupClassificationsDefined = groupCategories.size() > 1;
+        roleClassificationsDefined = roleCategories.size() > 1;
         categoryDao = MCRCategoryDAOFactory.getInstance();
     }
 
@@ -92,33 +92,33 @@ public class MCRGroupServlet extends MCRServlet {
     protected void think(MCRServletJob job) throws Exception {
         HttpServletRequest request = job.getRequest();
         String action = getProperty(request, "action");
-        if ("chooseCategory".equals(action) || !groupClassificationsDefined) {
+        if ("chooseCategory".equals(action) || !roleClassificationsDefined) {
             chooseCategory(request);
         } else {
-            chooseGroupRoot(request);
+            chooseRoleRoot(request);
         }
     }
 
-    private void chooseGroupRoot(HttpServletRequest request) {
+    private void chooseRoleRoot(HttpServletRequest request) {
         Element rootElement = getRootElement(request);
-        rootElement.addContent(getGroupElements());
+        rootElement.addContent(getRoleElements());
         request.setAttribute(LAYOUT_ELEMENT_KEY, new Document(rootElement));
     }
 
-    private Collection<Element> getGroupElements() {
-        ArrayList<Element> list = new ArrayList<Element>(groupCategories.size());
-        for (MCRCategoryID categID : groupCategories) {
-            Element group = new Element("group");
-            group.setAttribute("categID", categID.toString());
+    private Collection<Element> getRoleElements() {
+        ArrayList<Element> list = new ArrayList<Element>(roleCategories.size());
+        for (MCRCategoryID categID : roleCategories) {
+            Element role = new Element("role");
+            role.setAttribute("categID", categID.toString());
             MCRCategory category = categoryDao.getCategory(categID, 0);
-            group.setAttribute("label", category.getCurrentLabel().getText());
-            list.add(group);
+            role.setAttribute("label", category.getCurrentLabel().getText());
+            list.add(role);
         }
         return list;
     }
 
     private static Element getRootElement(HttpServletRequest request) {
-        Element rootElement = new Element("groups");
+        Element rootElement = new Element("roles");
         rootElement.setAttribute("queryParams", request.getQueryString());
         return rootElement;
     }
@@ -130,7 +130,7 @@ public class MCRGroupServlet extends MCRServlet {
             categoryID = MCRCategoryID.fromString(categID);
         } else {
             String rootID = getProperty(request, "classID");
-            categoryID = (rootID == null) ? MCRUser2Constants.GROUP_CLASSID : MCRCategoryID.rootID(rootID);
+            categoryID = (rootID == null) ? MCRUser2Constants.ROLE_CLASSID : MCRCategoryID.rootID(rootID);
         }
         Element rootElement = getRootElement(request);
         rootElement.setAttribute("classID", categoryID.getRootID());

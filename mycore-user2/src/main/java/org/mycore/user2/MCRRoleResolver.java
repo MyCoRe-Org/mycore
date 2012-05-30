@@ -41,9 +41,9 @@ import org.mycore.common.MCRException;
  * @author Thomas Scheffler (yagee)
  *
  */
-public class MCRGroupResolver implements URIResolver {
+public class MCRRoleResolver implements URIResolver {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRGroupResolver.class);
+    private static final Logger LOGGER = Logger.getLogger(MCRRoleResolver.class);
 
     /* (non-Javadoc)
      * @see javax.xml.transform.URIResolver#resolve(java.lang.String, java.lang.String)
@@ -65,18 +65,18 @@ public class MCRGroupResolver implements URIResolver {
 
     public static Element getAssignableGroupsForUser() throws MCRAccessException {
         LOGGER.warn("Please fix https://sourceforge.net/tracker/?func=detail&aid=3497583&group_id=92005&atid=599192");
-        List<MCRGroup> groupIDs = null;
+        List<MCRRole> groupIDs = null;
 
         // The list of assignable groups depends on the privileges of the
         // current user.
         try {
             if (MCRAccessManager.checkPermission("administrate-user")) {
-                groupIDs = MCRGroupManager.listSystemGroups();
+                groupIDs = MCRRoleManager.listSystemRoles();
             } else if (MCRAccessManager.checkPermission("create-user")) {
                 MCRUser currentUser = MCRUserManager.getCurrentUser();
-                groupIDs = new ArrayList<MCRGroup>(currentUser.getSystemGroupIDs().size());
-                for (String id : currentUser.getSystemGroupIDs()) {
-                    groupIDs.add(MCRGroupManager.getGroup(id));
+                groupIDs = new ArrayList<MCRRole>(currentUser.getSystemRoleIDs().size());
+                for (String id : currentUser.getSystemRoleIDs()) {
+                    groupIDs.add(MCRRoleManager.getRole(id));
                 }
             } else {
                 throw new MCRAccessException("Not enough permissions! " + "Someone might have tried to call the new user form directly.");
@@ -88,7 +88,7 @@ public class MCRGroupResolver implements URIResolver {
         // Loop over all assignable groups
         org.jdom.Element root = new org.jdom.Element("items");
 
-        for (MCRGroup group : groupIDs) {
+        for (MCRRole group : groupIDs) {
             org.jdom.Element item = new org.jdom.Element("item").setAttribute("value", group.getName()).setAttribute("label", group.getLabel().getText());
             root.addContent(item);
         }
