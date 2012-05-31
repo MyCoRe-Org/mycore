@@ -193,8 +193,8 @@
          * @description
          */
         // Blank needs to be loaded as blank, so the level is filled. Else it lays not ontop; needed for IE
-        that.context.viewer.find(".surface").css("backgroundImage",
-            "url(" + that.properties.webappBaseUri + "modules/iview2/gfx/blank.gif" + ")");
+        that.context.viewer.find(".surface").css("background",
+            "transparent");
 
         // PermaLink Handling
         // choice if zoomLevel or special; zoomMode only makes sense in maximized viewer

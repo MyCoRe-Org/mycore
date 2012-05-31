@@ -359,7 +359,8 @@
 }
 /* current Cut */
 .ausschnitt {
-	background-image: url('scaled/thumbnail/cutout.png');
+	background: #666666;
+	opacity: 0.6;
 	position: absolute;
 	left:0px;
 	top:0px;
