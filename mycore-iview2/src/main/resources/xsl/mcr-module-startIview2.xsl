@@ -10,20 +10,24 @@
 
   <xsl:template name="derivateView">
     <xsl:param name="derivateID" />
+    <xsl:param name="extensions"/>
     <xsl:call-template name="derivateLinkView">
       <xsl:with-param name="derivateID" select="$derivateID"/>
       <xsl:with-param name="file" select="iview2:getSupportedMainFile($derivateID)"/>
+      <xsl:with-param name="extensions" select="$extensions" />
     </xsl:call-template>
   </xsl:template>
 
   <xsl:template name="derivateLinkView">
     <xsl:param name="file" />
     <xsl:param name="derivateID" />
+    <xsl:param name="extensions" />
     <xsl:if test="$file != ''">
       <xsl:call-template name="iview2.init" />
       <xsl:call-template name="iview2.getViewer">
         <xsl:with-param name="groupID" select="$derivateID" />
         <xsl:with-param name="style" select="'width:256px; height:256px;'" />
+        <xsl:with-param name="extensions" select="$extensions" />
       </xsl:call-template>
       <xsl:call-template name="iview2.start">
         <xsl:with-param name="groupID" select="$derivateID" />
