@@ -40,6 +40,12 @@
             <input type="submit" class="action" value="{i18n:translate('component.user2.admin.changedata')}" />
           </form>
         </xsl:when>
+        <xsl:when test="$CurrentUser = $uid">
+          <form action="{$WebApplicationBaseURL}authorization/change-current-user.xml" method="get">
+            <input type="hidden" name="action" value="saveCurrentUser" />
+            <input type="submit" class="action" value="{i18n:translate('component.user2.admin.changedata')}" />
+          </form>
+        </xsl:when>
       </xsl:choose>
       <xsl:if test="/user/@realm = 'local'">
         <form action="{$WebApplicationBaseURL}authorization/change-password.xml" method="get">

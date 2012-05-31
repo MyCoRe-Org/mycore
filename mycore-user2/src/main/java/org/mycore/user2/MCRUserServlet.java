@@ -82,6 +82,8 @@ public class MCRUserServlet extends MCRServlet {
             showUser(req, res, user, uid);
         else if ("save".equals(action))
             saveUser(req, res);
+        else if ("saveCurrentUser".equals(action))
+            saveCurrentUser(req, res);
         else if ("changeMyPassword".equals(action))
             redirectToPasswordChangePage(req, res);
         else if ("password".equals(action))
@@ -166,6 +168,23 @@ public class MCRUserServlet extends MCRServlet {
         return !MCRUserManager.exists(userName, realmID);
     }
 
+    private void saveCurrentUser(HttpServletRequest req, HttpServletResponse res) throws IOException {
+        MCRUser currentUser = MCRUserManager.getCurrentUser();
+        if (!checkUserIsNotNull(res, currentUser, null)) {
+            return;
+        }
+        if (!currentUser.hasNoOwner()) {
+            res.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+        MCREditorSubmission sub = (MCREditorSubmission) (req.getAttribute("MCREditorSubmission"));
+        Element u = sub.getXML().getRootElement();
+        updateBasicUserInfo(u, currentUser);
+        MCRUserManager.updateUser(currentUser);
+
+        res.sendRedirect(res.encodeRedirectURL("MCRUserServlet?action=show"));
+    }
+
     /**
      * Handles MCRUserServlet?action=save&id={userID}.
      * This is called by user-editor.xml editor form to save the
@@ -218,29 +237,7 @@ public class MCRUserServlet extends MCRServlet {
         }
         user.setHint(hint);
 
-        String name = u.getChildText("realName");
-        if ((name != null) && (name.trim().length() == 0)) {
-            name = null;
-        }
-        user.setRealName(name);
-
-        String eMail = u.getChildText("eMail");
-        if ((eMail != null) && (eMail.trim().length() == 0)) {
-            eMail = null;
-        }
-        user.setEMail(eMail);
-
-        Element attributes = u.getChild("attributes");
-        if (attributes != null) {
-            @SuppressWarnings("unchecked")
-            List<Element> attributeList = attributes.getChildren("attribute");
-            user.getAttributes().clear();
-            for (Element attribute : attributeList) {
-                String key = attribute.getAttributeValue("name");
-                String value = attribute.getAttributeValue("value");
-                user.getAttributes().put(key, value);
-            }
-        }
+        updateBasicUserInfo(u, user);
 
         if (hasAdminPermission) {
             Element o = u.getChild("owner");
@@ -282,6 +279,32 @@ public class MCRUserServlet extends MCRServlet {
         }
 
         res.sendRedirect(res.encodeRedirectURL("MCRUserServlet?action=show&id=" + user.getUserID()));
+    }
+
+    private void updateBasicUserInfo(Element u, MCRUser user) {
+        String name = u.getChildText("realName");
+        if ((name != null) && (name.trim().length() == 0)) {
+            name = null;
+        }
+        user.setRealName(name);
+
+        String eMail = u.getChildText("eMail");
+        if ((eMail != null) && (eMail.trim().length() == 0)) {
+            eMail = null;
+        }
+        user.setEMail(eMail);
+
+        Element attributes = u.getChild("attributes");
+        if (attributes != null) {
+            @SuppressWarnings("unchecked")
+            List<Element> attributeList = attributes.getChildren("attribute");
+            user.getAttributes().clear();
+            for (Element attribute : attributeList) {
+                String key = attribute.getAttributeValue("name");
+                String value = attribute.getAttributeValue("value");
+                user.getAttributes().put(key, value);
+            }
+        }
     }
 
     /**
