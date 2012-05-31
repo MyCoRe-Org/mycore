@@ -33,9 +33,9 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 public final class MCRUser2Constants {
 
     /**
-     * {@link MCRCategoryID} root ID for system groups.
+     * {@link MCRCategoryID} root ID for system roles.
      */
-    public static final String ROLE_ROOT_ID = "mcr-groups";
+    public static final String ROLE_ROOT_ID = "mcr-roles";
 
     static final String USER_ADMIN_PERMISSION = "administrate-users";
 
