@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mycoreclass ID="mcr-groups" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="MCRClassification.xsd">
-  <label xml:lang="de" text="Gruppen" description="System-Gruppen" />
-  <label xml:lang="en" text="Groups" description="system groups" />
+<mycoreclass ID="mcr-roles" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="MCRClassification.xsd">
+  <label xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="en" text="system user roles" />
+  <label xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="de" text="Systemnutzerrollen" />
   <categories>
     <category ID="admin">
       <label xml:lang="de" text="Administratoren" />

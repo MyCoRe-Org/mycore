@@ -74,7 +74,7 @@ public class MCRUserManagerTest extends MCRHibTestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        MCRCategory groupsCategory = MCRCategoryDAOImplTest.loadClassificationResource("/mcr-groups.xml");
+        MCRCategory groupsCategory = MCRCategoryDAOImplTest.loadClassificationResource("/mcr-roles.xml");
         MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
         DAO.addCategory(null, groupsCategory);
         user = new MCRUser("junit");

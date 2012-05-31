@@ -82,7 +82,7 @@ public class MCRUserTransformerTest extends MCRHibTestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        MCRCategory groupsCategory = MCRCategoryDAOImplTest.loadClassificationResource("/mcr-groups.xml");
+        MCRCategory groupsCategory = MCRCategoryDAOImplTest.loadClassificationResource("/mcr-roles.xml");
         MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
         DAO.addCategory(null, groupsCategory);
         setProperty(MCRUserManagerTest.REALMS_URI_CFG_KEY, MCRUserManagerTest.RESOURCE_REALMS_URI, true);
@@ -97,17 +97,6 @@ public class MCRUserTransformerTest extends MCRHibTestCase {
     public final void testBuildMCRUser() throws IOException, JAXBException {
         Element input = MCRURIResolver.instance().resolve("resource:test-user.xml");
         MCRUser mcrUser = MCRUserTransformer.buildMCRUser(input);
-//        JAXBContext ctx = JAXBContext.newInstance(MCRUser.class);
-//        Marshaller marshaller = ctx.createMarshaller();
-//        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-//        marshaller.marshal(mcrUser, System.out);
-//        JDOMResult result = new JDOMResult();
-//        marshaller.marshal(mcrUser, result);
-//        XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-//        xout.output(result.getDocument(), System.err);
-//        Unmarshaller unmarshaller = ctx.createUnmarshaller();
-//        MCRUser mcrUser2 = (MCRUser) unmarshaller.unmarshal(new JDOMSource(result.getDocument()));
-//        marshaller.marshal(mcrUser2, System.out);
         Document output = MCRUserTransformer.buildExportableXML(mcrUser);
         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
         xout.output(input, System.out);
