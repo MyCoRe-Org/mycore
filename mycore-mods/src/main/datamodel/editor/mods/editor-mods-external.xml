@@ -2,152 +2,189 @@
 
 <imports>
 
+  <include id="external.monster.blob">
+    <!-- Please refactor me -->
+
   <!-- hidden genre specification -->
-  <panel id="mods.genre.article">
-    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@mcr:categId" default="marc_genres:article" />
-  </panel>
-  <panel id="mods.genre.av">
-    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@mcr:categId" default="marc_genres:av" />
-  </panel>
-  <panel id="mods.genre.book">
-    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@mcr:categId" default="marc_genres:book" />
-  </panel>
-  <panel id="mods.genre.chapter">
-    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@mcr:categId" default="marc_genres:chapter" />
-  </panel>
-  <panel id="mods.genre.confpro">
-    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@mcr:categId" default="marc_genres:confpro" />
-  </panel>
-  <panel id="mods.genre.confpub">
-    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@mcr:categId" default="marc_genres:confpub" />
-  </panel>
-  <panel id="mods.genre.report">
-    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@mcr:categId" default="marc_genres:report" />
-  </panel>
-  <panel id="mods.genre.thesis">
-    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@mcr:categId" default="marc_genres:thesis" />
-  </panel>
-  <panel id="mods.submissionAtInstitute">
-    <cell anchor="NORTHWEST" var="mods:originInfo/mods:place/mods:placeTerm[@type='text']" ref="TFzeile512" />
-  </panel>
+    <panel id="mods.genre.article">
+      <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@mcr:categId" default="marc_genres:article" />
+    </panel>
+    <panel id="mods.genre.av">
+      <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@mcr:categId" default="marc_genres:av" />
+    </panel>
+    <panel id="mods.genre.book">
+      <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@mcr:categId" default="marc_genres:book" />
+    </panel>
+    <panel id="mods.genre.chapter">
+      <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@mcr:categId" default="marc_genres:chapter" />
+    </panel>
+    <panel id="mods.genre.confpro">
+      <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@mcr:categId" default="marc_genres:confpro" />
+    </panel>
+    <panel id="mods.genre.confpub">
+      <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@mcr:categId" default="marc_genres:confpub" />
+    </panel>
+    <panel id="mods.genre.report">
+      <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@mcr:categId" default="marc_genres:report" />
+    </panel>
+    <panel id="mods.genre.thesis">
+      <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='intern']/@mcr:categId" default="marc_genres:thesis" />
+    </panel>
+    <panel id="mods.submissionAtInstitute">
+      <cell anchor="NORTHWEST" var="mods:originInfo/mods:place/mods:placeTerm[@type='text']" ref="TFzeile512" />
+    </panel>
   <!-- END: hidden genre specification -->
 
   <!-- object type specific genre.kindOf specification -->
-  <panel id="mods.genre.kindOfPublication.confpub">
-    <hidden var="@type" default="kindof" />
-    <hidden var="@displayLabel" default="Kind of Publication" />
-    <cell var="@mcr:categId">
-      <list width="30" type="dropdown" id="mods.genre.kindOfPublication.list">
-        <include ref="pleaseSelect" />
-        <include uri="classification:editorComplete:-1:children:marc_genres:confpub" cacheable="false" />
-        <condition id="mods.genre.kindOfPublication.cond" required="true">
-          <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
-          <label xml:lang="en">Please select one entry!</label>
-        </condition>
-      </list>
-    </cell>
-  </panel>
-
-  <panel id="mods.genre.kindOfReport">
-    <cell anchor="NORTHWEST" var="mods:genre">
+    <panel id="mods.genre.kindOfPublication.confpub">
       <hidden var="@type" default="kindof" />
-      <hidden var="@displayLabel" default="Kind of Report" />
-      <panel>
-        <cell var="@mcr:categId">
-          <list width="30" type="dropdown" id="mods.genre.kindOfReport.list">
-            <include ref="pleaseSelect" />
-            <include uri="classification:editorComplete:-1:children:marc_genres:report" cacheable="false" />
-            <condition id="mods.genre.kindOfReport.cond" required="true">
-              <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
-              <label xml:lang="en">Please select one entry!</label>
-            </condition>
-          </list>
-        </cell>
-      </panel>
-    </cell>
-  </panel>
+      <hidden var="@displayLabel" default="Kind of Publication" />
+      <cell var="@mcr:categId">
+        <list width="30" type="dropdown" id="mods.genre.kindOfPublication.list">
+          <include ref="pleaseSelect" />
+          <include uri="classification:editorComplete:-1:children:marc_genres:confpub" cacheable="false" />
+          <condition id="mods.genre.kindOfPublication.cond" required="true">
+            <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
+            <label xml:lang="en">Please select one entry!</label>
+          </condition>
+        </list>
+      </cell>
+    </panel>
 
-  <panel id="mods.genre.kindOfAVMedia">
-    <cell anchor="NORTHWEST" var="mods:genre">
-      <hidden var="@type" default="kindof" />
-      <hidden var="@displayLabel" default="Kind of AV Media" />
-      <panel>
-        <cell var="@mcr:categId">
-          <list width="30" type="dropdown" id="mods.genre.kindOfAVMedia.list">
-            <include ref="pleaseSelect" />
-            <include uri="classification:editorComplete:-1:children:marc_genres:av" cacheable="false" />
-            <condition id="mods.genre.kindOfAVMedia.cond" required="true">
-              <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
-              <label xml:lang="en">Please select one entry!</label>
-            </condition>
-          </list>
-        </cell>
-      </panel>
-    </cell>
-  </panel>
+    <panel id="mods.genre.kindOfReport">
+      <cell anchor="NORTHWEST" var="mods:genre">
+        <hidden var="@type" default="kindof" />
+        <hidden var="@displayLabel" default="Kind of Report" />
+        <panel>
+          <cell var="@mcr:categId">
+            <list width="30" type="dropdown" id="mods.genre.kindOfReport.list">
+              <include ref="pleaseSelect" />
+              <include uri="classification:editorComplete:-1:children:marc_genres:report" cacheable="false" />
+              <condition id="mods.genre.kindOfReport.cond" required="true">
+                <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
+                <label xml:lang="en">Please select one entry!</label>
+              </condition>
+            </list>
+          </cell>
+        </panel>
+      </cell>
+    </panel>
 
-  <panel id="mods.genre.kindOfThesis">
-    <cell anchor="NORTHWEST" var="mods:genre">
-      <hidden var="@type" default="kindof" />
-      <hidden var="@displayLabel" default="Kind of Thesis" />
-      <panel>
-        <cell var="@mcr:categId">
-          <list width="30" type="dropdown" id="mods.genre.kindOfThesis.list">
-            <include ref="pleaseSelect" />
-            <include uri="classification:editorComplete:-1:children:marc_genres:thesis" cacheable="false" />
-            <condition id="mods.genre.kindOfThesis.cond" required="true">
-              <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
-              <label xml:lang="en">Please select one entry!</label>
-            </condition>
-          </list>
-        </cell>
-      </panel>
-    </cell>
-  </panel>
+    <panel id="mods.genre.kindOfAVMedia">
+      <cell anchor="NORTHWEST" var="mods:genre">
+        <hidden var="@type" default="kindof" />
+        <hidden var="@displayLabel" default="Kind of AV Media" />
+        <panel>
+          <cell var="@mcr:categId">
+            <list width="30" type="dropdown" id="mods.genre.kindOfAVMedia.list">
+              <include ref="pleaseSelect" />
+              <include uri="classification:editorComplete:-1:children:marc_genres:av" cacheable="false" />
+              <condition id="mods.genre.kindOfAVMedia.cond" required="true">
+                <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
+                <label xml:lang="en">Please select one entry!</label>
+              </condition>
+            </list>
+          </cell>
+        </panel>
+      </cell>
+    </panel>
 
-  <panel id="mods.genre.journal">
-    <cell anchor="NORTHWEST" var="mods:genre">
-      <hidden var="@type" default="intern" />
-      <panel>
-        <cell var="@mcr:categId">
-          <list type="radio" id="mods.genre.journal.list" default="marc_genres:journal">
-            <item value="marc_genres:journal">
-              <label xml:lang="de">Zeitschrift</label>
-            </item>
-            <item value="marc_genres:series">
-              <label xml:lang="de">Serie</label>
-            </item>
-          </list>
-        </cell>
-      </panel>
-    </cell>
-  </panel>
+    <panel id="mods.genre.kindOfThesis">
+      <cell anchor="NORTHWEST" var="mods:genre">
+        <hidden var="@type" default="kindof" />
+        <hidden var="@displayLabel" default="Kind of Thesis" />
+        <panel>
+          <cell var="@mcr:categId">
+            <list width="30" type="dropdown" id="mods.genre.kindOfThesis.list">
+              <include ref="pleaseSelect" />
+              <include uri="classification:editorComplete:-1:children:marc_genres:thesis" cacheable="false" />
+              <condition id="mods.genre.kindOfThesis.cond" required="true">
+                <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
+                <label xml:lang="en">Please select one entry!</label>
+              </condition>
+            </list>
+          </cell>
+        </panel>
+      </cell>
+    </panel>
+
+    <panel id="mods.genre.journal">
+      <cell anchor="NORTHWEST" var="mods:genre">
+        <hidden var="@type" default="intern" />
+        <panel>
+          <cell var="@mcr:categId">
+            <list type="radio" id="mods.genre.journal.list" default="marc_genres:journal">
+              <item value="marc_genres:journal">
+                <label xml:lang="de">Zeitschrift</label>
+              </item>
+              <item value="marc_genres:series">
+                <label xml:lang="de">Serie</label>
+              </item>
+            </list>
+          </cell>
+        </panel>
+      </cell>
+    </panel>
   <!-- END: object type specific genre.kindOf specification -->
 
 
-  <panel id="mods.assignedInstitute">
-    <cell anchor="NORTHWEST" var="mods:name[@type='corporate']">
-      <hidden var="mods:role/mods:roleTerm" default="institution" />
-      <hidden var="mods:role/mods:roleTerm/@authority" default="marcrelator" />
-      <hidden var="mods:role/mods:roleTerm/@type" default="text" />
-      <repeater min="1" max="5" pos="right">
-        <panel>
-          <cell col="1" row="1" anchor="EAST" var="mods:namePart[@type='given']" ref="TFzeile512" />
-        </panel>
-      </repeater>
-    </cell>
-  </panel>
+    <panel id="mods.assignedInstitute">
+      <cell anchor="NORTHWEST" var="mods:name[@type='corporate']">
+        <hidden var="mods:role/mods:roleTerm" default="institution" />
+        <hidden var="mods:role/mods:roleTerm/@authority" default="marcrelator" />
+        <hidden var="mods:role/mods:roleTerm/@type" default="text" />
+        <repeater min="1" max="5" pos="right">
+          <panel>
+            <cell col="1" row="1" anchor="EAST" var="mods:namePart[@type='given']" ref="TFzeile512" />
+          </panel>
+        </repeater>
+      </cell>
+    </panel>
 
   <!-- application specific internal data -->
-  <panel id="mods.internals">
+    <panel id="mods.internals">
     <!-- Kommentar -->
-    <cell row="10" col="1" anchor="NORTHEAST" ref="mods.note.label" />
-    <cell row="10" col="2" anchor="NORTHWEST" ref="mods.note" />
-    <cell row="10" col="3" anchor="NORTHWEST" ref="mods.note.help" />
+      <cell row="10" col="1" anchor="NORTHEAST" ref="mods.note.label" />
+      <cell row="10" col="2" anchor="NORTHWEST" ref="mods.note" />
+      <cell row="10" col="3" anchor="NORTHWEST" ref="mods.note.help" />
     <!-- Kommentar END -->
-  </panel>
-  
+    </panel>
+  </include>
+
   <include id="mods.additional.admin">
+    <!-- Datum der Freigabe -->
+    <cell row="8" col="1">
+      <text id="mods.embargo.label" i18n="metaData.mods.dictionary.accessCondition.embargo" />
+    </cell>
+    <cell row="8" col="2" sortnr="500" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:accessCondition[@type='embargo']">
+      <panel>
+        <cell col="1">
+          <textfield id="mods.embargo.text" width="20" maxlength="20">
+            <condition id="mods.embargo.cond" required="false" type="datetime" format="yyyy-MM-dd;yyyy-MM;yyyy">
+              <label xml:lang="de">Tragen Sie hier das Datum des Embargoablaufs im ISO Format mit Bindestrich (YYYY-MM-DD) ein.</label>
+              <label xml:lang="en">Enter the expire date of embargo here in the ISO Format (YYYY-MM-DD).</label>
+            </condition>
+          </textfield>
+        </cell>
+      </panel>
+    </cell>
+    <cell row="8" col="3">
+      <helpPopup id="mods.embargo.help" width="400px" height="250px">
+        <label xml:lang="de">
+          Dieses Dokument soll mit einem Embargo belegt werden?
+          <br />
+          Geben Sie das Datum ein, wann dieses ablaufen soll. Das Datum muss im ISO Format mit Bindestrich YYYY-MM-DD, YYYY-MM oder YYYY
+          angegeben werden.
+          <br />
+          Beispiel: 2003-01-27 oder 2010 oder 2009-01
+          <br />
+        </label>
+        <label xml:lang="en">
+          Date of embargo expiration
+        </label>
+      </helpPopup>
+    </cell>
+    <!-- Datum der Freigabe END -->
   </include>
 
   <include id="mods.additional">
