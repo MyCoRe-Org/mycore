@@ -103,8 +103,13 @@ public class MCRThumbnailServlet extends MCRServlet {
             File iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, imagePath);
             LOGGER.info("IView2 file: " + iviewFile.getAbsolutePath());
             BufferedImage thumbnail = getThumbnail(iviewFile);
+            
+            String centerThumb = job.getRequest().getParameter("centerThumb");
             if (thumbnail != null) {
-                thumbnail = centerThumbnail(thumbnail);
+                if(!"no".equals(centerThumb)) {
+                    thumbnail = centerThumbnail(thumbnail);
+                }
+                
                 job.getResponse().setHeader("Cache-Control", "max-age=" + MCRTileServlet.MAX_AGE);
                 job.getResponse().setContentType("image/png");
                 job.getResponse().setDateHeader("Last-Modified", iviewFile.lastModified());
