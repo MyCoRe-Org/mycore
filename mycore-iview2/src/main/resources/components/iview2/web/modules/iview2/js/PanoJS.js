@@ -714,37 +714,6 @@ PanoJS.prototype = {
 
 		return stateBool;
 	},
-	
-	/**
-	 * @public
-	 * @function
-	 * @name		calculateZoomProp
-	 * @memberOf	PanoJS
-	 * @description	calculates how the TileSize and the zoomvalue needs to be if the given zoomlevel fits into the viewer
-	 * @param		{integer} level the zoomlevel which is used for testing
-	 * @param		{integer} totalSize the total size of the Picture Dimension X or Y
-	 * @param		{integer} viewerSize the Size of the Viewer Dimension X or Y
-	 * @param		{integer} scrollBarSize the Height or Width of the ScrollBar which needs to be dropped from the ViewerSize
-	 * @return		boolean which tells if it was successfull to scale the picture in the current zoomlevel to the viewer Size
-	 */
-	calculateZoomProp : function(level, totalSize, viewerSize, scrollBarSize) {
-		if ((totalSize / Math.pow(2, level)) <= viewerSize) {
-			if (level != 0) {
-				level--;
-			}
-			var currentWidth = totalSize / Math.pow(2, level);
-			var viewerRatio = viewerSize / currentWidth;
-			var fullTileCount = Math.floor( currentWidth / this.iview.properties.tileSize);
-			var lastTileWidth = currentWidth - fullTileCount * this.iview.properties.tileSize;
-			this.iview.currentImage.zoomInfo.scale = viewerRatio; //determine the scaling ratio
-			level = this.iview.currentImage.zoomInfo.maxZoom - level;
-			this.tileSize = Math.ceil((viewerSize - viewerRatio * lastTileWidth) / fullTileCount);
-			this.iview.currentImage.zoomInfo.zoomBack = this.zoomLevel;
-			this.zoom(level - this.zoomLevel);
-			return true;
-		}
-		return false;
-	},
 
 	/**
 	 * Resolve the coordinates from this mouse event by subtracting the
@@ -753,29 +722,10 @@ PanoJS.prototype = {
 	 */
 	resolveCoordinates : function(e) {
 		var currentImage = this.iview.currentImage;
-		
-		//switch(currentImage.rotation){
-		//	case 0:				
-				return {
-					'x' : this.x + e.clientX - (document.documentElement.scrollLeft || document.body.scrollLeft),//relativ: e.clientX - this.context2D.canvas.offsetLeft
-					'y' : this.y + e.clientY - (document.documentElement.scrollTop || document.body.scrollTop)
-				}	/*
-			case 90:
-				return {
-					'x' : this.x + e.clientY + (document.documentElement.scrollTop || document.body.scrollTop),
-					'y' : this.y - e.clientX - (document.documentElement.scrollLeft || document.body.scrollLeft)
-				}	
-			case 180:
-				return {
-					'x' : this.x - e.clientX + (document.documentElement.scrollLeft || document.body.scrollLeft),
-					'y' : this.y - e.clientY + (document.documentElement.scrollTop || document.body.scrollTop)
-				}
-			case 270:
-				return {
-					'x' : this.x - e.clientY - (document.documentElement.scrollTop || document.body.scrollTop),
-					'y' : this.y + e.clientX + (document.documentElement.scrollLeft || document.body.scrollLeft)
-				}
-		}*/
+		return {
+			'x' : this.x + e.clientX - (document.documentElement.scrollLeft || document.body.scrollLeft),//relativ: e.clientX - this.context2D.canvas.offsetLeft
+			'y' : this.y + e.clientY - (document.documentElement.scrollTop || document.body.scrollTop)
+		}	
 	},
 
 	press : function(coords) {
