@@ -10,6 +10,8 @@
     <hidden var="service" descendants="true" />
     <hidden var="metadata/@xml:lang" default="de" />
 
+    <include uri="webapp:editor/editor-mods-external.xml" ref="mods.additional" />
+
     <cell col="1" colspan="3" row="450" anchor="NORTHEAST" ref="mods.genre.book" />
     <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/@ID" />
     <hidden var="metadata/def.modsContainer/@class" default="MCRMetaXML" />
@@ -18,17 +20,17 @@
     <hidden var="metadata/def.modsContainer/@heritable" default="false" />
 
     <!-- Basisangaben zum Dokument -->
-    <cell row="1" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
+    <cell row="10" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
       <text id="book.titles" i18n="metaData.mods.dictionary.book" />
     </cell>
 
     <!-- Serie (Verweis auf MyCoRe-ID) -->
-    <cell row="2" colspan="3" anchor="NORTHWEST" ref="displaySeries" style="padding-top:5px;" />
+    <cell row="11" colspan="3" anchor="NORTHWEST" ref="displaySeries" style="padding-top:5px;" />
 
     <!-- Title --> <!-- ToDo: wird abgelöst durch MyCoRe-Parent-Child-Beziehung! -->
-    <cell row="10" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.title.label" />
-    <cell row="10" col="2" anchor="NORTHWEST" ref="mods.title" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
-    <cell row="10" col="3" anchor="NORTHWEST" ref="mods.title.help" />
+    <cell row="12" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.title.label" />
+    <cell row="12" col="2" anchor="NORTHWEST" ref="mods.title" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
+    <cell row="12" col="3" anchor="NORTHWEST" ref="mods.title.help" />
     <!-- Title END -->
 
     <!-- pub_title_html [text] -->

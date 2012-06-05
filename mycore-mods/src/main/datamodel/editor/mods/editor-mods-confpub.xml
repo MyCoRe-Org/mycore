@@ -9,6 +9,8 @@
     <hidden var="service" descendants="true" />
     <hidden var="metadata/@xml:lang" default="de" />
 
+    <include uri="webapp:editor/editor-mods-external.xml" ref="mods.additional" />
+
     <cell col="1" colspan="3" row="450" anchor="NORTHEAST" ref="mods.genre.confpub" />
     <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/@ID" />
     <hidden var="metadata/def.modsContainer/@class" default="MCRMetaXML" />
@@ -16,18 +18,18 @@
     <hidden var="metadata/def.modsContainer/@heritable" default="false" />
 
     <!-- Konferenzband-Verweis (Verweis auf MyCoRe-ID) -->
-    <cell row="1" colspan="3" anchor="NORTHWEST" ref="displayParent" />
+    <cell row="10" colspan="3" anchor="NORTHWEST" ref="displayParent" />
     <!-- Konferenzband-Verweis END -->
 
   <!-- Basisangaben zum Dokument -->
-    <cell row="2" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
+    <cell row="12" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
       <text id="confpub.titles" i18n="metaData.mods.dictionary.confpub" />
     </cell>
 
     <!-- TITLE -->
-    <cell row="10" col="1" anchor="NORTHEAST" class="mandatory" ref="mods.title.label" style="padding-top:5px;" />
-    <cell row="10" col="2" anchor="NORTHWEST" ref="mods.title" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" style="padding-top:5px;" />
-    <cell row="10" col="3" anchor="NORTHWEST" ref="mods.title.help" style="padding-top:5px;" />
+    <cell row="13" col="1" anchor="NORTHEAST" class="mandatory" ref="mods.title.label" style="padding-top:5px;" />
+    <cell row="13" col="2" anchor="NORTHWEST" ref="mods.title" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" style="padding-top:5px;" />
+    <cell row="13" col="3" anchor="NORTHWEST" ref="mods.title.help" style="padding-top:5px;" />
     <!-- TITLE END -->
 
     <!-- pub_title_html [text] -->
