@@ -371,12 +371,12 @@ PanoJS.prototype = {
 		  return;
 		}
 					
-		var cnvWidth = this.width;
-		var cnvHeight = this.height;
+		var bWidth = this.iview.viewerBean.width;
+		var bHeight = this.iview.viewerBean.height;
 		
 		//determine how much space is needed to draw all necessary tiles
-		var xDim = Math.min(cnvWidth, curWidth);
-		var yDim = Math.min(cnvHeight, curHeight);
+		var xDim = Math.min(bWidth, curWidth);
+		var yDim = Math.min(bHeight, curHeight);
 			
 		//gap between first tile and border
 		var xoff = rect.x%tileSize;
@@ -674,18 +674,32 @@ PanoJS.prototype = {
 		this.clear();
 		this.removeScaling();
 		if (stateBool) {
-			for (var i = 0; i <= this.iview.currentImage.zoomInfo.maxZoom; i++) {
-				if(this.iview.currentImage.width/this.width > this.iview.currentImage.height/this.iview.context.viewer.outerHeight(true) || (stateBool && !screenZoom)){
-				//Width > Height Or ZoomWidth is true
-					if (this.calculateZoomProp(i, this.iview.currentImage.width, this.width, 0)) {
-						break;
-					}
-				} else {
-					if (this.calculateZoomProp(i, this.iview.currentImage.height, this.height, 0)) {
-						break;
-					}
-				}
+			var maxDimViewer;
+			var maxDimImg;
+			var tileSizeMinZoomLevel;
+			var calculatedMinFitZoomLevel;
+			var maxDimCurZoomLevel;
+			
+			if(this.iview.currentImage.width/this.width > this.iview.currentImage.height/this.iview.context.viewer.outerHeight(true) || (stateBool && !screenZoom)){
+				maxDimViewer = this.width;
+				maxDimImg = this.iview.currentImage.width;
+				tileSizeMinZoomLevel = this.iview.currentImage.zoomInfo.dimensions[0].width;
+				calculatedMinFitZoomLevel =  Math.min(Math.max(Math.ceil(Math.log( maxDimViewer / tileSizeMinZoomLevel)/Math.LN2),0),this.iview.currentImage.zoomInfo.maxZoom);
+				maxDimCurZoomLevel = this.iview.currentImage.zoomInfo.dimensions[calculatedMinFitZoomLevel].width;
+			} else {
+				maxDimViewer = this.height;
+				maxDimImg = this.iview.currentImage.height
+				tileSizeMinZoomLevel = this.iview.currentImage.zoomInfo.dimensions[0].height;
+				calculatedMinFitZoomLevel = Math.min(Math.max(Math.ceil(Math.log( maxDimViewer / tileSizeMinZoomLevel)/Math.LN2),0),this.iview.currentImage.zoomInfo.maxZoom);
+				maxDimCurZoomLevel = this.iview.currentImage.zoomInfo.dimensions[calculatedMinFitZoomLevel].height;
 			}
+			
+			var viewerRatio = maxDimViewer / maxDimCurZoomLevel;
+			this.iview.currentImage.zoomInfo.scale = maxDimViewer / viewerRatio;
+			this.tileSize = this.iview.properties.tileSize * viewerRatio;
+			this.iview.currentImage.zoomInfo.scale = viewerRatio;
+			this.zoom(calculatedMinFitZoomLevel - this.zoomLevel);
+			
 			this.init();
 		} else {
 			this.iview.currentImage.zoomInfo.scale = 1;
