@@ -34,13 +34,21 @@
                 <layout>thesis</layout>
                 <layout>thesis-admin</layout>
                 <layout>report</layout>
+                <layout>report-admin</layout>
                 <layout>av</layout>
+                <layout>av-admin</layout>
                 <layout>confpro</layout>
+                <layout>confpro-admin</layout>
                 <layout>confpub</layout>
+                <layout>confpub-admin</layout>
                 <layout>chapter</layout>
+                <layout>chapter-admin</layout>
                 <layout>book</layout>
+                <layout>book-admin</layout>
                 <layout>journal</layout>
+                <layout>journal-admin</layout>
                 <layout>article</layout>
+                <layout>article-admin</layout>
               </layouts>
             </layoutDefinition>
           </layoutDefinitions>
