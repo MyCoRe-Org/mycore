@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<imports>
+  <include uri="webapp:editor/editor-mods-common.xml" />
+
+  <panel id="edit-mods-chapter-admin">
+    <hidden var="@ID" />
+    <hidden var="@label" />
+    <hidden var="@version" />
+    <hidden var="service" descendants="true" />
+    <hidden var="metadata/@xml:lang" default="de" />
+
+    <include uri="webapp:editor/editor-mods-external.xml" ref="mods.additional.admin" />
+
+    <cell col="10" colspan="3" row="450" anchor="NORTHEAST" ref="mods.genre.chapter" />
+    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/@ID" />
+    <hidden var="metadata/def.modsContainer/@class" default="MCRMetaXML" />
+    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:typeOfResource" default="text" />
+    <hidden var="metadata/def.modsContainer/@notinherit" default="true" />
+    <hidden var="metadata/def.modsContainer/@heritable" default="false" />
+
+    <!-- Konferenzband (Verweis auf MyCoRe-ID) -->
+    <cell row="11" colspan="3" anchor="NORTHWEST" ref="displayParent" />
+
+    <!-- Basisangaben zum Dokument -->
+    <cell row="12" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
+      <text id="chapter.titles" i18n="metaData.mods.dictionary.chapter" />
+    </cell>
+
+    <!-- Seiten von bis -->
+    <cell row="13" col="1" anchor="NORTHEAST" ref="mods.book.pages.range.label" style="padding-top:5px;" />
+    <cell row="13" col="2" anchor="NORTHWEST" ref="mods.book.pages.range" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='host']" style="padding-top:5px;" />
+    <cell row="13" col="3" anchor="NORTHWEST" ref="mods.book.pages.range.help" style="padding-top:5px;" />
+    <!-- Seiten von bis END -->
+
+    <!-- Title -->
+    <cell row="15" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.title.label" />
+    <cell row="15" col="2" anchor="NORTHWEST" ref="mods.title" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
+    <cell row="15" col="3" anchor="NORTHWEST" ref="mods.title.help" />
+    <!-- Title END -->
+
+    <!-- pub_title_html [text] -->
+    <cell row="20" col="1" anchor="NORTHEAST" ref="mods.htmltitle.label" />
+    <cell row="20" col="2" anchor="NORTHWEST" ref="mods.htmltitle" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo[@transliteration='html']" />
+    <cell row="20" col="3" anchor="NORTHWEST" ref="mods.htmltitle.help" />
+    <!-- pub_title_html [text] END -->
+    
+    <!-- pub_subtitle [text] -->
+    <cell row="25" col="1" anchor="NORTHEAST" ref="mods.subtitle.label" />
+    <cell row="25" col="2" anchor="NORTHWEST" ref="mods.subtitle" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
+    <cell row="25" col="3" anchor="NORTHWEST" ref="mods.subtitle.help" />
+    <!-- pub_subtitle [text] END -->
+    
+    
+    <!-- pub_autor_dok_txt [text] and reviewer -->
+    <cell row="30" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.person.label" />
+    <cell row="30" col="2" anchor="NORTHWEST" ref="mods.person" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="30" col="3" anchor="NORTHWEST" ref="mods.person.help" />
+    <!-- pub_autor_dok_txt [text] and reviewer END -->
+
+    <!-- pub_corporation -->
+    <cell row="40" col="1" anchor="NORTHEAST" ref="mods.corporation.label" />
+    <cell row="40" col="2" anchor="NORTHWEST" ref="mods.corporation" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="40" col="3" anchor="NORTHWEST" ref="mods.corporation.help" />
+    <!-- pub_corporation END -->
+
+    <!--  Erweiterte Angaben zum Dokument -->
+    <cell row="100" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
+      <text id="chapter.more" i18n="metaData.mods.dictionary.categorybox" />
+    </cell>
+  
+    <!-- LANGUAGE -->
+    <cell row="110" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.languageTerm.label" style="padding-top:5px;" />
+    <cell row="110" col="2" anchor="NORTHWEST" ref="mods.languageTerm" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:language" style="padding-top:5px;" />
+    <cell row="110" col="3" anchor="NORTHWEST" ref="mods.languageTerm.help" style="padding-top:5px;" />
+    <!-- LANGUAGE END -->
+
+    <!-- Abstract -->
+    <cell row="120" col="1" anchor="NORTHEAST" ref="mods.abstract.label" />
+    <cell row="120" col="2" anchor="NORTHWEST" ref="mods.abstract" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="120" col="3" anchor="NORTHWEST" ref="mods.abstract.help" />
+    <!-- Abstract END -->
+    
+    <!-- pub_klassifik -->
+    <cell row="125" col="1" anchor="NORTHEAST" ref="mods.ddc.label" />
+    <cell row="125" col="2" anchor="NORTHWEST" ref="mods.ddc.optional" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="125" col="3" anchor="NORTHWEST" ref="mods.ddc.help" />
+    <!-- pub_klassifik END -->
+    
+    <!-- Stichworte -->
+    <cell row="130" col="1" anchor="NORTHEAST" ref="mods.subject.label" />
+    <cell row="130" col="2" anchor="NORTHWEST" ref="mods.subject" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="130" col="3" anchor="NORTHWEST" ref="mods.subject.help" />
+    <!-- Stichworte END -->
+    
+    <!-- Quelle -->
+    <cell row="140" col="1" anchor="NORTHEAST" ref="mods.relatedItem.label" />
+    <cell row="140" col="2" anchor="NORTHWEST" ref="mods.relatedItem" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="140" col="3" anchor="NORTHWEST" ref="mods.relatedItem.help" />
+    <!-- Quelle END -->
+    
+    <!-- Rechte -->
+    <cell row="150" col="1" anchor="NORTHEAST" ref="mods.rights.label" />
+    <cell row="150" col="2" anchor="NORTHWEST" ref="mods.rights" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="150" col="3" anchor="NORTHWEST" ref="mods.rights.help" />
+    <!-- Rechte END -->
+    
+    <!-- Identifier Panel -->
+    <cell row="200" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
+      <text id="chapter.identifier" i18n="metaData.mods.dictionary.identifier.box" />
+    </cell>
+    
+    <!-- Identifier -->
+    <cell row="210" col="1" anchor="NORTHEAST" ref="mods.identifier.label" style="padding-top:5px;" />
+    <cell row="210" col="2" anchor="NORTHWEST" ref="mods.identifier.optional" var="metadata/def.modsContainer/modsContainer/mods:mods" style="padding-top:5px;" />
+    <cell row="210" col="3" anchor="NORTHWEST" ref="mods.identifier.help" style="padding-top:5px;" />
+    <!-- Identifier END -->
+    
+    <!-- URL -->
+    <cell row="220" col="1" anchor="NORTHEAST" ref="mods.location.url.label" />
+    <cell row="220" col="2" anchor="NORTHWEST" ref="mods.location.url" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:location" />
+    <cell row="220" col="3" anchor="NORTHWEST" ref="mods.location.url.help" />
+    <cell row="221" col="1" anchor="NORTHEAST" ref="mods.location.url.displayLabel.label" />
+    <cell row="221" col="2" anchor="NORTHWEST" ref="mods.location.url.displayLabel" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:location" />
+    <cell row="221" col="3" anchor="NORTHWEST" ref="mods.location.url.displayLabel.help" />
+    <!-- URL END -->
+    
+    <!-- Interne Daten -->
+    <cell row="300" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
+      <text id="chapter.internals" i18n="metaData.mods.dictionary.institution.box" />
+    </cell>
+
+    <!-- application specific internal data -->
+    <cell row="310" col="1" colspan="3" anchor="NORTHWEST" ref="mods.internals" var="metadata/def.modsContainer/modsContainer/mods:mods" style="padding-top:5px;" />
+
+    <!-- save/cancel buttons -->
+    <cell col="1" colspan="3" row="410" anchor="EAST" style="padding-top:20px;">
+      <submitButton width="100px" i18n="common.button.save" />
+      <cancelButton width="100px" i18n="common.button.cancel" />
+    </cell>
+
+  </panel>
+</imports>
