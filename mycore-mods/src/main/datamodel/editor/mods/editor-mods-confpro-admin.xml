@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<imports>
+  <include uri="webapp:editor/editor-mods-common.xml" />
+  <panel id="edit-mods-confpro-admin">
+    <hidden var="@ID" />
+    <hidden var="@label" />
+    <hidden var="@version" />
+    <hidden var="service" descendants="true" />
+    <hidden var="metadata/@xml:lang" default="de" />
+
+    <include uri="webapp:editor/editor-mods-external.xml" ref="mods.additional.admin" />
+
+    <cell col="1" colspan="3" row="350" anchor="NORTHEAST" ref="mods.genre.confpro" />
+    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/@ID" />
+    <hidden var="metadata/def.modsContainer/@class" default="MCRMetaXML" />
+    <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/mods:typeOfResource" default="text" />
+    <hidden var="metadata/def.modsContainer/@notinherit" default="true" />
+    <hidden var="metadata/def.modsContainer/@heritable" default="false" />
+
+    <!-- Angaben zur Konferenz -->
+    <cell row="10" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
+      <text id="conference.titles" i18n="metaData.mods.dictionary.conference.title" />
+    </cell>
+
+    <cell row="11" colspan="3" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@type='conference']" style="padding-top:5px;">
+      <repeater min="1" max="5">
+        <panel style="width:100%;">
+        <!-- Konferenztitel -->
+          <cell row="10" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.nameConference.label" />
+          <cell row="10" col="2" anchor="NORTHWEST" var="mods:namePart">
+            <repeater min="1" max="5">
+              <textfield id="mods.nameConference.tf" width="60" maxlength="512">
+                <condition id="mods.nameConference.cond" required="true">
+                  <label xml:lang="de">Tragen Sie hier den Titel der Konferenz ein.</label>
+                  <label xml:lang="en">Enter the title of the conference here.</label>
+                </condition>
+              </textfield>
+            </repeater>
+          </cell>
+          <cell row="10" col="3" anchor="NORTHEAST" ref="mods.nameConference.help" />
+        <!-- Konferenztitel END -->
+    
+        <!-- Konferenzzeitraum -->
+          <cell row="20" col="1" anchor="NORTHEAST" ref="mods.dateOccured.label" />
+            <!-- namePartDate is transformed to mods:date[@type='date'] -->
+          <cell row="20" col="2" anchor="NORTHWEST" ref="TFzeile512" var="mods:namePartDate" />
+          <cell row="20" col="3" anchor="NORTHWEST" ref="mods.dateOccured.help" />
+        <!-- Konferenzzeitraum END -->
+    
+        <!-- Ort -->
+          <cell row="30" col="1" anchor="NORTHEAST" ref="mods.conferencePlace.label" />
+          <cell row="30" col="2" anchor="NORTHWEST" var="mods:affiliation">
+            <repeater min="1" max="5">
+              <textfield width="60" maxlength="512" />
+            </repeater>
+          </cell>
+          <cell row="30" col="3" anchor="NORTHWEST" ref="mods.conferencePlace.help" />
+        <!-- Ort END -->
+        </panel>
+      </repeater>
+    </cell>
+
+    <!-- Basisangaben zum Konferenzband -->
+    <cell row="12" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
+      <text id="confpro.titles" i18n="metaData.mods.dictionary.confpro" />
+    </cell>
+
+    <!-- Serie (Verweis auf MyCoRe-ID) -->
+    <cell row="13" colspan="3" anchor="NORTHWEST" ref="displaySeries" style="padding-top:5px;" />
+
+    <!-- TITLE -->
+    <cell row="14" col="1" anchor="NORTHEAST" ref="mods.cproceeding.title.label" />
+    <cell row="14" col="2" anchor="NORTHWEST" ref="mods.title.optional" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
+    <cell row="14" col="3" anchor="NORTHWEST" ref="mods.title.help" />
+    <!-- TITLE END -->
+
+    <!-- pub_title_html [text] -->
+    <cell row="15" col="1" anchor="NORTHEAST" ref="mods.htmltitle.label" />
+    <cell row="15" col="2" anchor="NORTHWEST" ref="mods.htmltitle"
+      var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo[@transliteration='html']" />
+    <cell row="15" col="3" anchor="NORTHWEST" ref="mods.htmltitle.help" />
+    <!-- pub_title_html [text] END -->
+
+    <!-- pub_title_engl[text] -->
+    <cell row="20" col="1" anchor="NORTHEAST" ref="mods.title.translated.label" />
+    <cell row="20" col="2" anchor="NORTHWEST" ref="mods.title.translated" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="20" col="3" anchor="NORTHWEST" ref="mods.title.translated.help" />
+    <!-- pub_title_engl[text] END -->
+    
+    <!-- pub_subtitle [text] -->
+    <cell row="25" col="1" anchor="NORTHEAST" ref="mods.subtitle.label" />
+    <cell row="25" col="2" anchor="NORTHWEST" ref="mods.subtitle" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
+    <cell row="25" col="3" anchor="NORTHWEST" ref="mods.subtitle.help" />
+    <!-- pub_subtitle [text] END -->
+
+    <!-- person [text] -->
+    <cell row="28" col="1" anchor="NORTHEAST" ref="mods.person.label" />
+    <cell row="28" col="2" anchor="NORTHWEST" ref="mods.person.publisher" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="28" col="3" anchor="NORTHWEST" ref="mods.person.publisher.help" />
+    <!-- person [text] END -->
+
+    <!-- pub_corporation -->
+    <cell row="29" col="1" anchor="NORTHEAST" ref="mods.corporation.label" />
+    <cell row="29" col="2" anchor="NORTHWEST" ref="mods.corporation" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="29" col="3" anchor="NORTHWEST" ref="mods.corporation.help" />
+    <!-- pub_corporation END -->
+
+    <!-- Verlag [text] -->
+    <cell row="30" col="1" anchor="NORTHEAST" ref="mods.publisher.label" />
+    <cell row="30" col="2" anchor="NORTHWEST" ref="mods.publisher" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
+    <cell row="30" col="3" anchor="NORTHWEST" ref="mods.publisher.help" />
+    <!-- Verlag END -->
+    
+    <!-- Edition -->
+    <cell row="35" col="1" anchor="NORTHEAST" ref="mods.edition.label" />
+    <cell row="35" col="2" anchor="NORTHWEST" ref="mods.edition" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
+    <cell row="35" col="3" anchor="NORTHWEST" ref="mods.edition.help" />
+    <!-- Edition END -->
+
+    <!-- Volume -->
+    <cell row="38" col="1" anchor="NORTHEAST">
+      <text i18n="metaData.mods.dictionary.volume.article" />
+    </cell>
+    <cell row="38" col="2"
+      var="metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='host']/mods:part/mods:detail[@type='volume']/mods:number"
+      anchor="NORTHWEST" ref="TFzeile10" />
+    <cell row="38" col="3" anchor="NORTHWEST" ref="mods.volume.help" />
+    <!-- Volume END -->
+
+    <!-- Herausgabejahr -->
+    <cell row="40" col="1" anchor="NORTHEAST" ref="mods.dateIssued.book.label" />
+    <cell row="40" col="2" anchor="NORTHWEST" ref="mods.dateIssued.optional" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
+    <cell row="40" col="3" anchor="NORTHWEST" ref="mods.dateIssued.help" />
+    <!-- Herausgabejahr END -->
+    
+    <!-- Place -->
+    <cell row="45" col="1" anchor="NORTHEAST" ref="mods.book.place.label" />
+    <cell row="45" col="2" anchor="NORTHWEST" ref="mods.book.place" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
+    <cell row="45" col="3" anchor="NORTHWEST" ref="mods.book.place.help" />
+    <!-- Place END -->
+
+    <!-- Country of publication -->
+    <cell row="50" col="1" anchor="NORTHEAST" ref="mods.countryOfPublication.label" />
+    <cell row="50" col="2" anchor="NORTHWEST" ref="mods.countryOfPublication" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
+    <cell row="50" col="3" anchor="NORTHWEST" ref="mods.countryOfPublication.help" />
+    <!-- Country of publication END -->
+
+  <!--  Erweiterte Angaben zum Dokument -->
+    <cell row="55" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
+      <text id="confpro.more" i18n="metaData.mods.dictionary.categorybox" />
+    </cell>
+
+    <!-- LANGUAGE -->
+    <cell row="70" col="1" anchor="NORTHEAST" ref="mods.languageTerm.label" />
+    <cell row="70" col="2" anchor="NORTHWEST" ref="mods.languageTerm.optional" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
+    <cell row="70" col="3" anchor="NORTHWEST" ref="mods.languageTerm.help" />
+    <!-- LANGUAGE END -->
+    
+    <!-- Abstract -->
+    <cell row="75" col="1" anchor="NORTHEAST" ref="mods.abstract.label" />
+    <cell row="75" col="2" anchor="NORTHWEST" ref="mods.abstract" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="75" col="3" anchor="NORTHWEST" ref="mods.abstract.help" />
+    <!-- Abstract END -->
+    
+    <!-- Umfang -->
+    <cell row="80" col="1" anchor="NORTHEAST" ref="mods.book.part.extent.label" />
+    <cell row="80" col="2" anchor="NORTHWEST" ref="mods.book.part.extent" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="80" col="3" anchor="NORTHWEST" ref="mods.book.part.extent.help" />
+    <!-- Umfang END -->
+    
+    <!-- pub_klassifik -->
+    <cell row="90" col="1" anchor="NORTHEAST" ref="mods.ddc.label" />
+    <cell row="90" col="2" anchor="NORTHWEST" ref="mods.ddc.optional" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="90" col="3" anchor="NORTHWEST" ref="mods.ddc.help" />
+    <!-- pub_klassifik END -->
+
+    <!-- Stichworte -->
+    <cell row="95" col="1" anchor="NORTHEAST" ref="mods.subject.label" />
+    <cell row="95" col="2" anchor="NORTHWEST" ref="mods.subject" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="95" col="3" anchor="NORTHWEST" ref="mods.subject.help" />
+    <!-- Stichworte END -->
+    
+    <!-- Rechte -->
+    <cell row="100" col="1" anchor="NORTHEAST" ref="mods.rights.label" />
+    <cell row="100" col="2" anchor="NORTHWEST" ref="mods.rights" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="100" col="3" anchor="NORTHWEST" ref="mods.rights.help" />
+    <!-- Rechte END -->
+
+    <!-- Identifier Panel -->
+    <cell row="105" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
+      <text id="confpro.identifier" i18n="metaData.mods.dictionary.identifier.box" />
+    </cell>
+
+    <!-- Identifier -->
+    <cell row="110" col="1" anchor="NORTHEAST" ref="mods.identifier.label" style="padding-top:5px;" />
+    <cell row="110" col="2" anchor="NORTHWEST" ref="mods.identifier.cproceedings" var="metadata/def.modsContainer/modsContainer/mods:mods"
+      style="padding-top:5px;" />
+    <cell row="110" col="3" anchor="NORTHWEST" ref="mods.identifier.help" style="padding-top:5px;" />
+    <!-- Identifier END -->
+    
+    <!-- URL -->
+    <cell row="120" col="1" anchor="NORTHEAST" ref="mods.location.url.label" />
+    <cell row="120" col="2" anchor="NORTHWEST" ref="mods.location.url" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:location" />
+    <cell row="120" col="3" anchor="NORTHWEST" ref="mods.location.url.help" />
+    <cell row="125" col="1" anchor="NORTHEAST" ref="mods.location.url.displayLabel.label" />
+    <cell row="125" col="2" anchor="NORTHWEST" ref="mods.location.url.displayLabel" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:location" />
+    <cell row="125" col="3" anchor="NORTHWEST" ref="mods.location.url.displayLabel.help" />
+    <!-- URL END -->
+
+
+  <!-- Interne Daten -->
+    <cell row="128" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
+      <text id="confpro.internals" i18n="metaData.mods.dictionary.institution.box" />
+    </cell>
+
+    <!-- application specific internal data -->
+    <cell row="130" col="1" colspan="3" anchor="NORTHWEST" ref="mods.internals" var="metadata/def.modsContainer/modsContainer/mods:mods"
+      style="padding-top:5px;" />
+
+
+    <cell row="250" col="1" colspan="3" anchor="NORTHEAST" style="padding-top:20px;">
+      <submitButton width="100px" i18n="common.button.save" />
+      <cancelButton width="100px" i18n="common.button.cancel" />
+    </cell>
+
+  </panel>
+</imports>
