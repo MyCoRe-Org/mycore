@@ -76,15 +76,15 @@
           <strong>Kartografien</strong>
           &#8211; Inklusive Karten, Atlanten, Globen, digitale Karten und andere kartographische Produkte.
         </li>
-    
+
         <li>
           <strong>notierte Musik</strong>
           &#8211; Grafik, nicht realisierter Werke der Musik, sowohl in gedruckter als auch digitalisierter Form,
-           die die vier Komponenten des musikalischen Tons darstellen: Tonhöhe, Dauer, Klangfarbe und Lautstärke.
+          die die vier Komponenten des musikalischen Tons darstellen: Tonhöhe, Dauer, Klangfarbe und Lautstärke.
         </li>
         <li>
           <strong>Tonaufnahme</strong>
-          &#8211; wird verwendet, wenn eine Mischung aus musikalischen und nichtmusikalischen Tonaufnahmen in einer 
+          &#8211; wird verwendet, wenn eine Mischung aus musikalischen und nichtmusikalischen Tonaufnahmen in einer
           Ressource verwendet wird oder wenn ein Benutzer nicht zwischen musikalischen und nichtmusikalischen
           Tonaufnahmen unterscheiden kann oder will.
         </li>
@@ -92,7 +92,7 @@
           <strong>musikalische Tonaufnahme</strong>
           &#8211; wird verwendet, wenn eine Ressource überwiegend eine musikalische Tonaufnahme ist.
         </li>
-    
+
         <li>
           <strong>nichtmusikalische Tonaufnahme</strong>
           &#8211; wird verwendet, wenn eine Ressource überwiegend eine nichtmusikalische Tonaufnahme ist.
@@ -103,27 +103,31 @@
         </li>
         <li>
           <strong>Filmaufnahme</strong>
-          &#8211; Inklusive bewegten Bildern und Videoaufnahmen, sowie TV-Programmen, digitalen Video- 
+          &#8211; Inklusive bewegten Bildern und Videoaufnahmen, sowie TV-Programmen, digitalen Video-
           und animierten Computergrafiken &#8212; aber nicht Dias und Folien. Es enthält keine bewegten Bilder,
-          die in erster Linie Computerprogramme sind, wie Computerspiele oder Computer-orientierte Multimedia.
+          die in erster Linie Computerprogramme
+          sind, wie Computerspiele oder Computer-orientierte Multimedia.
           Diese sind in "Software, Multimedia" enthalten.
         </li>
-    
+
         <li>
           <strong>3D-Objekt</strong>
           &#8211; Enthält von Menschen geschaffene Objekte wie Modelle, Skulpturen, Kleidung und Spielzeug,
-          sowie natürlich vorkommende Objekte wie Proben, die für die Anzeige angeordnet worden sind.
+          sowie natürlich vorkommende
+          Objekte wie Proben, die für die Anzeige angeordnet worden sind.
         </li>
         <li>
           <strong>Software, Multimedia</strong>
           &#8211; Geeignet für alle elektronischen Ressourcen, ohne einen wesentlichen Aspekt der oben genannten
-          anderen Kategorien. Es beinhaltet: Software, numerische Daten, Computer-orientierte Multimedia,
+          anderen Kategorien. Es
+          beinhaltet: Software, numerische Daten, Computer-orientierte Multimedia,
           Online-Systeme und Dienstleistungen.
         </li>
         <li>
           <strong>gemischtes Material</strong>
           &#8211; Zeigt an, dass es signifikante Materialien in zwei oder mehr Formen gibt.
-          Gemischtes Material umfasst Archivbestände und Sammlungen von Handschriften von Mischformen von Materialien,
+          Gemischtes Material umfasst Archivbestände und
+          Sammlungen von Handschriften von Mischformen von Materialien,
           wie Texte, Fotos und Tonaufnahmen.
         </li>
       </ul>
@@ -139,22 +143,24 @@
           <strong>cartographic</strong>
           &#8211; Includes maps, atlases, globes, digital maps, and other cartographic items.
         </li>
-    
+
         <li>
           <strong>notated music</strong>
-          &#8211; Graphic, non-realized representations of musical works, both in printed and digitized manifestations that represent the four
+          &#8211; Graphic, non-realized representations of musical works, both in printed and digitized manifestations that represent the
+          four
           components of musical sound: pitch, duration, timbre, and loudness.
         </li>
         <li>
           <strong>sound recording</strong>
-          &#8211; Used when a mixture of musical and nonmusical sound recordings occurs in a resource or when a user does not want to or cannot
+          &#8211; Used when a mixture of musical and nonmusical sound recordings occurs in a resource or when a user does not want to or
+          cannot
           make a distinction between musical and nonmusical.
         </li>
         <li>
           <strong>sound recording-musical</strong>
           &#8211; Used when a resource is predominately a musical sound recording.
         </li>
-    
+
         <li>
           <strong>sound recording-nonmusical</strong>
           &#8211; Used when the sound recording is nonmusical in nature.
@@ -167,9 +173,10 @@
           <strong>moving image</strong>
           &#8211; Includes motion pictures and videorecordings, as well as television programs, digital video, and animated computer
           graphics&#8212;but not slides and transparencies. It does not include moving images that are primarily computer
-          programs, such as computer games or computer-oriented multimedia; these are included in &quot;software, multimedia&quot;.
+          programs, such as
+          computer games or computer-oriented multimedia; these are included in &quot;software, multimedia&quot;.
         </li>
-    
+
         <li>
           <strong>three dimensional object</strong>
           &#8211; Includes man-made objects such as models, sculptures, clothing, and toys, as well as naturally occurring objects such as
@@ -178,14 +185,17 @@
         <li>
           <strong>software, multimedia</strong>
           &#8211; Appropriate for any electronic resource without a significant aspect that indicates one of the other
-          categories. It includes: software, numeric data, computer-oriented multimedia, and online systems
+          categories. It
+          includes: software, numeric data, computer-oriented multimedia, and online systems
           and services.
         </li>
         <li>
           <strong>mixed material</strong>
-          &#8211; Indicates that there are significant materials in two or more forms that are usually related by virtue of their having been
+          &#8211; Indicates that there are significant materials in two or more forms that are usually related by virtue of their having
+          been
           accumulated by or about a person or body. Mixed material includes archival fonds and manuscript
-          collections of mixed forms of materials, such as text, photographs, and sound recordings.
+          collections of mixed forms of
+          materials, such as text, photographs, and sound recordings.
         </li>
       </ul>
     </label>
@@ -197,7 +207,7 @@
   <text id="mods.related.title.label" i18n="metaData.mods.dictionary.relatedtitle" />
   <text id="mods.cproceeding.title.label" i18n="metaData.mods.dictionary.cproceedingTitle" />
   <panel id="mods.title">
-    <hidden var="@altRepGroup" default="1"/>
+    <hidden var="@altRepGroup" default="1" />
     <cell anchor="NORTHWEST" var="mods:title">
       <textarea id="mods.title.text" width="70" height="1">
         <condition id="mods.title.cond" required="true">
@@ -207,7 +217,7 @@
       </textarea>
     </cell>
   </panel>
-  
+
   <panel id="mods.title.optional">
     <cell anchor="NORTHWEST" var="mods:title">
       <textarea width="60" height="3" />
@@ -227,7 +237,7 @@
   <!-- TITLE HTML -->
   <text id="mods.htmltitle.label" i18n="metaData.mods.dictionary.htmltitle" />
   <panel id="mods.htmltitle">
-    <hidden var="@altRepGroup" default="1"/>
+    <hidden var="@altRepGroup" default="1" />
     <cell anchor="NORTHWEST" var="mods:title" ref="TFarea1028" />
   </panel>
   <helpPopup id="mods.htmltitle.help" width="400px" height="250px">
@@ -246,7 +256,7 @@
     <cell anchor="NORTHWEST" var="mods:titleInfo[@type='translated']">
       <repeater min="1" max="5" pos="right">
         <panel>
-          <cell anchor="NORTHWEST" ref="TFarea1028r" var="mods:title"/>
+          <cell anchor="NORTHWEST" ref="TFarea1028r" var="mods:title" />
           <cell row="1" col="2" anchor="NORTHWEST" var="@lang" ref="language" />
         </panel>
       </repeater>
@@ -267,12 +277,8 @@
   <!-- SHORT-TITLE -->
   <text id="mods.shorttitle.label" i18n="metaData.mods.dictionary.shorttitle" />
   <panel id="mods.shorttitle">
-    <cell anchor="NORTHWEST" var="mods:titleInfo[@type='alternative']">
-      <panel>
-        <hidden var="@displayLabel" default="Short form of the title" />
-        <cell anchor="NORTHWEST" var="mods:title" ref="TFarea1028" />
-      </panel>
-    </cell>
+    <hidden var="@displayLabel" default="Short form of the title" />
+    <cell anchor="NORTHWEST" var="mods:title" ref="TFarea1028" />
   </panel>
 
   <helpPopup id="mods.shorttitle.help" width="400px" height="250px">
@@ -323,7 +329,7 @@
       </repeater>
     </cell>
   </panel>
-  
+
   <panel id="mods.languageTerm.optional">
     <cell anchor="NORTHWEST" var="mods:languageTerm">
       <repeater min="1" max="5" pos="right">
@@ -446,7 +452,8 @@
   <helpPopup id="mods.person.help" width="400px" height="250px">
     <label xml:lang="de">
       Name und Rolle der Personen, in welcher sie bei der Erstellung des Dokumentes mitgewirkt haben.
-      (Verlinkung auf GND).
+      (Verlinkung auf
+      GND).
     </label>
     <label xml:lang="en">
       Names and roles of persons cooperating .... (ref to gnd)
@@ -456,7 +463,8 @@
   <helpPopup id="mods.person.publisher.help" width="400px" height="250px">
     <label xml:lang="de">
       Eine natürliche oder juristische Person oder Personengruppe, die als verantwortlich für die
-      inhaltliche Gestaltung eines Dokuments angegeben wird, ohne selbst Verfasser des Dokuments
+      inhaltliche Gestaltung
+      eines Dokuments angegeben wird, ohne selbst Verfasser des Dokuments
       der einzelner Teile desselben sein zu müssen. (Verlinkung auf GND)
     </label>
     <label xml:lang="en">
@@ -509,7 +517,8 @@
   <helpPopup id="mods.publisher.help" width="400px" height="250px">
     <label xml:lang="de">
       Unternehmen, das Werke der Literatur, Kunst, Musik,
-      Unterhaltung oder Wissenschaft der Öffentlichkeit zugänglich macht.
+      Unterhaltung oder Wissenschaft der Öffentlichkeit zugänglich
+      macht.
     </label>
     <label xml:lang="en">
       Publisher
@@ -614,13 +623,14 @@
   <helpPopup id="mods.dateIssued.help" width="400px" height="250px">
     <label xml:lang="de">
       Bei Konferenzbänden, Büchern geben Sie bitte das Erscheinungsjahr an,
-      bei Filmen das Datum der Aufnahme, bei Promotionen das Datum der ersten Online Veröffentlichung.
+      bei Filmen das Datum der Aufnahme, bei Promotionen das Datum der
+      ersten Online Veröffentlichung.
       Das Datum muss im ISO Format mit Bindestrich YYYY-MM-DD, YYYY-MM oder YYYY
       angegeben werden.
       <br />
       Beispiel: 2003-01-27 oder 2010 oder 2009-01
       <br />
-      
+
     </label>
     <label xml:lang="en">
       Date of Publication:
@@ -637,12 +647,12 @@
     <cell anchor="NORTHWEST" var="mods:dateCreated">
       <panel>
         <cell col="1">
-          <textfield id="mods.dateCreated.text" width="20" maxlength="20" >
-          <condition id="mods.dateCreated.cond" required="false" type="datetime" format="yyyy-MM-dd;yyyy-MM;yyyy">
+          <textfield id="mods.dateCreated.text" width="20" maxlength="20">
+            <condition id="mods.dateCreated.cond" required="false" type="datetime" format="yyyy-MM-dd;yyyy-MM;yyyy">
               <label xml:lang="de">Tragen Sie hier das Datum der Veröffentlichung im ISO Format mit Bindestrich (YYYY-MM-DD) ein.</label>
               <label xml:lang="en">Enter the date of publication here in the ISO Format (YYYY-MM-DD).</label>
             </condition>
-            </textfield>
+          </textfield>
         </cell>
       </panel>
     </cell>
@@ -668,12 +678,12 @@
     <cell anchor="NORTHWEST" var="mods:dateOther[@type='submitted']">
       <panel>
         <cell col="1">
-          <textfield id="mods.dateSubmitted.text" width="20" maxlength="20" >
-          <condition id="mods.dateSubmitted.cond" required="false" type="datetime" format="yyyy-MM-dd;yyyy-MM;yyyy">
+          <textfield id="mods.dateSubmitted.text" width="20" maxlength="20">
+            <condition id="mods.dateSubmitted.cond" required="false" type="datetime" format="yyyy-MM-dd;yyyy-MM;yyyy">
               <label xml:lang="de">Tragen Sie hier das Datum der Einreichung im ISO Format mit Bindestrich (YYYY-MM-DD) ein.</label>
               <label xml:lang="en">Enter the date of submission here in the ISO Format (YYYY-MM-DD).</label>
             </condition>
-            </textfield>
+          </textfield>
         </cell>
       </panel>
     </cell>
@@ -699,12 +709,13 @@
     <cell anchor="NORTHWEST" var="mods:dateOther[@type='accepted']">
       <panel>
         <cell col="1">
-          <textfield id="mods.dateAccepted.text" width="20" maxlength="20" >
-          <condition id="mods.dateAccepted.cond" required="false" type="datetime" format="yyyy-MM-dd;yyyy-MM;yyyy">
-              <label xml:lang="de">Tragen Sie hier das Datum der Promotion / des Abschlusses im ISO Format mit Bindestrich (YYYY-MM-DD) ein.</label>
+          <textfield id="mods.dateAccepted.text" width="20" maxlength="20">
+            <condition id="mods.dateAccepted.cond" required="false" type="datetime" format="yyyy-MM-dd;yyyy-MM;yyyy">
+              <label xml:lang="de">Tragen Sie hier das Datum der Promotion / des Abschlusses im ISO Format mit Bindestrich (YYYY-MM-DD)
+                ein.</label>
               <label xml:lang="en">Enter the date of publication here in the ISO Format (YYYY-MM-DD).</label>
             </condition>
-            </textfield>
+          </textfield>
         </cell>
       </panel>
     </cell>
@@ -806,7 +817,8 @@
   <helpPopup id="mods.subject.help" width="400px" height="250px">
     <label xml:lang="de">
       Jedes Stichwort sollte in ein separates Eingabefeld geschrieben werden.
-      Bei mehreren Stichworten fügen Sie bitte mit dem "+" Button jeweils ein neues Feld hinzu.
+      Bei mehreren Stichworten fügen Sie bitte
+      mit dem "+" Button jeweils ein neues Feld hinzu.
     </label>
     <label xml:lang="en">
       Subject
@@ -866,7 +878,8 @@
       Dokumentes.
       <br />
       Für ein retrodigitalisiertes Dokument wäre das beispielsweise die Printversion.
-      Bei Postern oder Abstracts kann hier die Konferenz oder der
+      Bei Postern oder Abstracts kann hier die Konferenz oder
+      der
       Konferenzbeitrag, in deren Kontext
       dieses Dokument steht, angegeben werden.
     </label>
@@ -1006,7 +1019,7 @@
       </repeater>
     </cell>
   </panel>
-  
+
   <panel id="mods.identifier.cproceedings">
     <cell anchor="NORTHWEST" var="mods:identifier">
       <repeater min="1" max="5" pos="right">
@@ -1048,11 +1061,14 @@
   <helpPopup id="mods.identifier.help" width="400px" height="250px">
     <label xml:lang="de">
       Ein Identifier ist ein eindeutiger und dauerhafter Identifikator für eine digitale Ressource oder ein physisches Werk.
-      Es können auch mehrere unterschiedliche Identifikatoren (DOI, URN, URI ...) angegeben werden.
+      Es können auch
+      mehrere unterschiedliche Identifikatoren (DOI, URN, URI ...) angegeben werden.
       <br />
-      ISBN ist immer in Form der ISBN13 anzugeben - mit Bindestrichen! Liegt nur die ISBN10 vor, so muss diese entsprechend konvertiert werden
-      (978 davor schreiben und Prüfziffer anpassen). Einen Online-Konverter gibt es z.B. hier: <a href=
-      "http://www.isbn.org/converterpub.asp">http://www.isbn.org/converterpub.asp</a>.
+      ISBN ist immer in Form der ISBN13 anzugeben - mit Bindestrichen! Liegt nur die ISBN10 vor, so muss diese entsprechend konvertiert
+      werden
+      (978 davor schreiben und Prüfziffer anpassen). Einen Online-Konverter gibt es z.B. hier:
+      <a href="http://www.isbn.org/converterpub.asp">http://www.isbn.org/converterpub.asp</a>
+      .
       <br />
       Falls eine DOI des Verlages vorhanden ist, ist diese in jedem Fall anzugeben.
     </label>
@@ -1088,7 +1104,8 @@
 
   <helpPopup id="mods.ddc.help" width="400px" height="250px">
     <label xml:lang="de">Die Zuordnung des Dokumentes zur Sachgruppe der DNB. Mit dem "+" Button
-      können weitere Sachgruppen hinzugefügt werden.</label>
+      können weitere Sachgruppen hinzugefügt
+      werden.</label>
     <label xml:lang="en">Entry from the SDNB list. With "+" buttons can be selected additional
       SDNB categories.</label>
   </helpPopup>
@@ -1107,18 +1124,20 @@
   <helpPopup id="mods.physicalDescription.help" width="400px" height="250px">
     <label xml:lang="de">
       Hier kann eine physikalische Beschreibung des Dokumentes erfolgen, z.B. bei
-      Postern die Größe, bei sonstigen Beiträgen die
+      Postern die Größe, bei sonstigen
+      Beiträgen die
       Seitenzahlen.
     </label>
     <label xml:lang="en">
       Physical description, e.g. size of poster
     </label>
   </helpPopup>
-  
+
   <helpPopup id="mods.physicalDescription.cpublication.help" width="400px" height="250px">
     <label xml:lang="de">
       Hier kann eine physikalische Beschreibung des Dokumentes erfolgen, z.B. bei
-      Postern die Größe, bei Vorträgen die Seitenzahlen. Ist der Beitrag Teil eines Konferenzbandes, 
+      Postern die Größe, bei Vorträgen die
+      Seitenzahlen. Ist der Beitrag Teil eines Konferenzbandes,
       können Sie das Feld "Seiten von/bis" ausfüllen.
     </label>
     <label xml:lang="en">
@@ -1228,7 +1247,8 @@
 
   <helpPopup id="mods.book.place.help" width="400px" height="250px">
     <label xml:lang="de">Bei Druckmedien oder digitalen Dokumenten, die von Verlagen herausgegeben wurden, wird
-      hier der Verlagsort angegeben.
+      hier der Verlagsort
+      angegeben.
     </label>
     <label xml:lang="en">Place</label>
   </helpPopup>
@@ -1269,7 +1289,8 @@
 
   <helpPopup id="mods.book.series.help" width="400px" height="250px">
     <label xml:lang="de">Schriftenreihe unter einem Gesamttitel, dem jeweils
-      abgeschlossene Bände zugeordnet sind. Serien sind häufig unbegrenzt, die einzelnen
+      abgeschlossene Bände zugeordnet sind. Serien sind häufig
+      unbegrenzt, die einzelnen
       Stücktitel erscheinen nicht regelmäßig</label>
     <label xml:lang="en">Series</label>
   </helpPopup>
@@ -1312,7 +1333,8 @@
 
   <helpPopup id="mods.book.volume.count.help" width="400px" height="250px">
     <label xml:lang="de">Bei Schrift- und Buchreihen kann es Angaben zum herausgegebenen Jahrgang
-      (Vol.) geben sowie die Bandzählung. </label>
+      (Vol.) geben sowie die Bandzählung.
+    </label>
     <label xml:lang="en">Volume Count</label>
   </helpPopup>
   <!-- Bandzählung END -->
@@ -1350,7 +1372,7 @@
 
   <helpPopup id="mods.book.pages.range.help" width="400px" height="250px">
     <label xml:lang="de">Wenn das Dokument Teil eines Buches, Konferenzbandes oder einer Zeitschrift ist, geben
-    Sie hier die Seiten von/bis im entsprechenden Medium an.</label>
+      Sie hier die Seiten von/bis im entsprechenden Medium an.</label>
     <label xml:lang="en">Pages (Range)</label>
   </helpPopup>
   <!-- Seiten von bis END -->
@@ -1399,7 +1421,8 @@
   </panel>
 
   <helpPopup id="mods.characteristics.help">
-    <label xml:lang="de">Zur Zeitschrift können hier pro Jahr weitere Kenndaten erfasst werden:
+    <label xml:lang="de">
+      Zur Zeitschrift können hier pro Jahr weitere Kenndaten erfasst werden:
       <ul>
         <li>Journal Impact Factor (JIF)</li>
         <li>ist referiert</li>
@@ -1407,8 +1430,9 @@
       Der Journal Impact Factor (JIF) wird pro Zeitschrift pro Jahr vergeben. Der Wert des JIF wird mit Punkt und drei Stellen nach dem
       Punkt angegeben. Beispiel: 2.203 oder 20.686
       <br />
-      Eine referierte Zeitschrift garantiert ein unabhängiges Begutachtungsverfahren eingereichter Artikel durch Fachkollegen. Das Kriterium "referiert"
-      oder "nicht referiert" steht dabei nicht in Zusammenhang mit dem "Impact Factor". 
+      Eine referierte Zeitschrift garantiert ein unabhängiges Begutachtungsverfahren eingereichter Artikel durch Fachkollegen. Das Kriterium
+      "referiert"
+      oder "nicht referiert" steht dabei nicht in Zusammenhang mit dem "Impact Factor".
     </label>
     <label xml:lang="en">Characteristics: Journal Impact Factor (JIF) and is refereed</label>
   </helpPopup>
@@ -1440,7 +1464,8 @@
       <br />
       <br />
       Verweise zu anderen Informationen rund um das Dokument gehören nicht hierher. Diese können z.B. im Kommentarfeld
-      oder bei der Beschreibung abgelegt werden.
+      oder bei der
+      Beschreibung abgelegt werden.
     </label>
     <label xml:lang="en">
       URL is for an electronic location from which the resource is available.
@@ -1449,7 +1474,8 @@
 
   <helpPopup id="mods.location.url.displayLabel.help" width="400px" height="250px">
     <label xml:lang="de">
-      Geben Sie eine kurze Beschreibung an, die anstelle der URL gezeigt werden soll, z.B. "Version beim Springerverlag".
+      Geben Sie eine kurze Beschreibung an, die anstelle der URL gezeigt werden soll, z.B. "Version beim
+      Springerverlag".
     </label>
     <label xml:lang="en">
       Display Lable will be shown instead of URL.
@@ -1500,7 +1526,8 @@
 
   <helpPopup id="mods.rights.help" width="400px" height="250px">
     <label xml:lang="de">
-      Unter welchen Rechten stellen Sie Ihr Dokument hier ein? Weitere Informationen finden Sie unter http://de.wikipedia.org/wiki/Alle_Rechte_vorbehalten
+      Unter welchen Rechten stellen Sie Ihr Dokument hier ein? Weitere Informationen finden Sie unter
+      http://de.wikipedia.org/wiki/Alle_Rechte_vorbehalten
       bzw. http://creativecommons.org/licenses/
     </label>
     <label xml:lang="en">
