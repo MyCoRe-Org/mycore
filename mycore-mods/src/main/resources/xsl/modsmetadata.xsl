@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan"
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:mcrmods="xalan://org.mycore.mods.MCRMODSClassificationSupport"
-  xmlns:acl="xalan://org.mycore.access.MCRAccessManager" xmlns:mcr="http://www.mycore.org/" xmlns:xlink="http://www.w3.org/1999/xlink"
-  xmlns:mods="http://www.loc.gov/mods/v3" exclude-result-prefixes="xlink mcr i18n acl mods mcrmods" version="1.0">
+  xmlns:acl="xalan://org.mycore.access.MCRAccessManager" xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:mcr="http://www.mycore.org/"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3" exclude-result-prefixes="xlink mcr mcrxsl i18n acl mods mcrmods"
+  version="1.0">
   <xsl:param name="MCR.Handle.Resolver.MasterURL" />
   <xsl:param name="MCR.Users.Guestuser.UserName" />
 
@@ -41,7 +42,7 @@
             </xsl:if>
             <xsl:if test="not(@xml:lang) or @xml:lang=$selectPresentLang">
               <xsl:call-template name="lf2br">
-                <xsl:with-param name="string" select="normalize-space(.)"/>
+                <xsl:with-param name="string" select="normalize-space(.)" />
               </xsl:call-template>
             </xsl:if>
           </xsl:for-each>
@@ -52,14 +53,14 @@
 
   <xsl:template match="mods:dateCreated|mods:dateOther|mods:dateIssued" mode="present">
     <xsl:param name="label" select="i18n:translate(concat('metaData.mods.dictionary.',local-name()))" />
-      <tr>
-        <td valign="top" class="metaname">
-          <xsl:value-of select="concat($label,':')" />
-        </td>
-        <td class="metavalue">
-          <xsl:apply-templates select="." mode="formatDate"/>
-        </td>
-      </tr>
+    <tr>
+      <td valign="top" class="metaname">
+        <xsl:value-of select="concat($label,':')" />
+      </td>
+      <td class="metavalue">
+        <xsl:apply-templates select="." mode="formatDate" />
+      </td>
+    </tr>
   </xsl:template>
 
   <xsl:template match="mods:dateCreated|mods:dateOther|mods:dateIssued" mode="formatDate">
@@ -69,7 +70,8 @@
       </xsl:call-template>
     </xsl:variable>
     <xsl:choose>
-      <xsl:when test="string-length($formatted)&gt;2 
+      <xsl:when
+        test="string-length($formatted)&gt;2 
                       and starts-with($formatted, '?')
                       and substring($formatted,string-length($formatted),1)='?'">
         <xsl:value-of select="translate($formatted, '?', '')" />
@@ -178,7 +180,7 @@
               </xsl:when>
               <xsl:otherwise>
                 <xsl:call-template name="lf2br">
-                  <xsl:with-param name="string" select="."/>
+                  <xsl:with-param name="string" select="." />
                 </xsl:call-template>
               </xsl:otherwise>
             </xsl:choose>
@@ -247,7 +249,7 @@
       </td>
       <td class="metavalue">
         <xsl:call-template name="lf2br">
-          <xsl:with-param name="string" select="."/>
+          <xsl:with-param name="string" select="." />
         </xsl:call-template>
       </td>
     </tr>
@@ -567,7 +569,7 @@
               <xsl:value-of select="." />
             </xsl:otherwise>
           </xsl:choose>
-          
+
         </a>
       </td>
     </tr>
@@ -576,12 +578,43 @@
   <xsl:template match="mods:accessCondition" mode="present"><!-- ToDo: show cc icon and more information ... -->
     <tr>
       <td valign="top" class="metaname">
-        <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.accessCondition'),':')" />
+        <xsl:choose>
+          <xsl:when test="@type">
+            <xsl:value-of select="concat(i18n:translate(concat('metaData.mods.dictionary.accessCondition.',mcrxsl:regexp(@type,' ','_'))),':')" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.accessCondition'),':')" />
+          </xsl:otherwise>
+        </xsl:choose>
       </td>
       <td class="metavalue">
-        <xsl:value-of select="." />
+        <xsl:choose>
+          <xsl:when test="@type='use and reproduction'">
+            <xsl:variable name="trimmed" select="normalize-space(.)" />
+            <xsl:choose>
+              <xsl:when test="contains($trimmed, 'cc_by')">
+                <xsl:apply-templates select="." mode="cc-logo" />
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="." />
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="." />
+          </xsl:otherwise>
+        </xsl:choose>
       </td>
     </tr>
+  </xsl:template>
+
+  <xsl:template match="mods:accessCondition" mode="cc-logo">
+    <xsl:variable name="licenseVersion" select="'3.0'" />
+    <!-- like cc_by-nc-sa: remove the 'cc_' -->
+    <xsl:variable name="licenseString" select="substring-after(normalize-space(.),'cc_')" />
+    <a rel="license" href="http://creativecommons.org/licenses/{$licenseString}/{$licenseVersion}/">
+      <img src="http://i.creativecommons.org/l/{$licenseString}/{$licenseVersion}/88x31.png" />
+    </a>
   </xsl:template>
 
   <xsl:template name="printMetaDate.mods.children">
@@ -685,14 +718,18 @@
             <xsl:call-template name="printMetaDate.mods">
               <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:publisher" />
             </xsl:call-template>
-            <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateCreated" mode="present"/>
-            <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateOther[@type='submitted']" mode="present">
+            <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateCreated"
+              mode="present" />
+            <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateOther[@type='submitted']"
+              mode="present">
               <xsl:with-param name="label" select="i18n:translate('metaData.mods.dictionary.dateSubmitted')" />
             </xsl:apply-templates>
-            <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateOther[@type='accepted']" mode="present">
+            <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateOther[@type='accepted']"
+              mode="present">
               <xsl:with-param name="label" select="i18n:translate('metaData.mods.dictionary.dateAccepted')" />
             </xsl:apply-templates>
-            <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateIssued" mode="present"/>
+            <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateIssued"
+              mode="present" />
             <xsl:call-template name="printMetaDate.mods">
               <xsl:with-param name="nodes"
                 select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:place/mods:placeTerm" />
@@ -833,7 +870,8 @@
                 </tr>
               </xsl:for-each>
               <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
-              <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[not(@ID) and not(@type='conference')]" />
+              <xsl:apply-templates mode="present"
+                select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[not(@ID) and not(@type='conference')]" />
               <xsl:call-template name="printMetaDate.mods.children">
                 <xsl:with-param name="label" select="'Konferenzbeiträge'" />
               </xsl:call-template>
