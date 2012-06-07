@@ -92,14 +92,6 @@ public class MCRUserCommands extends MCRAbstractCommands {
             "This command sets a new password for the user. You must be this user or you must have administrator access.");
         command.add(com);
 
-        com = new MCRCommand("set user management to ro mode", "org.mycore.user2.MCRUserCommands.setLock",
-            "The command changes the management mode of the user system to read-only.");
-        command.add(com);
-
-        com = new MCRCommand("set user management to rw mode", "org.mycore.user2.MCRUserCommands.setunLock",
-            "The command changes the management mode of the user system to read-write.");
-        command.add(com);
-
         com = new MCRCommand("enable user {0}", "org.mycore.user2.MCRUserCommands.enableUser String", "The command enables the user for the access.");
         command.add(com);
 
