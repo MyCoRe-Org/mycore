@@ -111,6 +111,9 @@ public class MCRRoleServlet extends MCRServlet {
             Element role = new Element("role");
             role.setAttribute("categID", categID.toString());
             MCRCategory category = categoryDao.getCategory(categID, 0);
+            if (category == null) {
+                continue;
+            }
             role.setAttribute("label", category.getCurrentLabel().getText());
             list.add(role);
         }
