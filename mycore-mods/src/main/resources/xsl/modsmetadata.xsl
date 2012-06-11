@@ -6,6 +6,8 @@
   version="1.0">
   <xsl:param name="MCR.Handle.Resolver.MasterURL" />
   <xsl:param name="MCR.Users.Guestuser.UserName" />
+  
+  <xsl:key use="mods:role/mods:roleTerm" name="name-by-role" match="mods:name"/>
 
   <xsl:template name="printMetaDate.mods">
     <!-- prints a table row for a given nodeset -->
@@ -216,7 +218,36 @@
         <div class="c85l">
           <table class="metaData">
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
-            <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[not(@ID)]" />
+            
+            <!-- mods:name grouped by mods:role/mods:roleTerm -->
+            <xsl:for-each select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[not(@ID) and count(. | key('name-by-role',mods:role/mods:roleTerm)[1])=1]">
+              <!-- for every role -->
+              <tr>
+                <td valign="top" class="metaname">
+                  <xsl:choose>
+                    <xsl:when test="mods:role/mods:roleTerm[@authority='marcrelator' and @type='code']">
+                      <xsl:apply-templates select="mods:role/mods:roleTerm[@authority='marcrelator' and @type='code']" mode="printModsClassInfo" />
+                      <xsl:value-of select="':'" />
+                    </xsl:when>
+                    <xsl:when test="mods:role/mods:roleTerm[@authority='marcrelator']">
+                      <xsl:value-of
+                        select="concat(i18n:translate(concat('metaData.mods.dictionary.',mods:role/mods:roleTerm[@authority='marcrelator'])),':')" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="concat(i18n:translate('metaData.mods.dictionary.name'),':')" />
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </td>
+                <td class="metavalue">
+                  <xsl:for-each select="key('name-by-role',mods:role/mods:roleTerm)">
+                    <xsl:if test="position()!=1">
+                      <xsl:value-of select="'; '"/>
+                    </xsl:if>
+                    <xsl:apply-templates select="." mode="printName" />
+                  </xsl:for-each>
+                </td>
+              </tr>
+            </xsl:for-each>
           </table>
         </div>
         <div class="c15r">
