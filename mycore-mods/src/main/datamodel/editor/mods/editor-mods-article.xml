@@ -145,10 +145,16 @@
     <cell row="140" col="3" anchor="NORTHWEST" ref="mods.relatedItem.help" />
     <!-- Quelle END --> 
     
+    <!-- Stichworte -->
+    <cell row="150" col="1" anchor="NORTHEAST" ref="mods.subject.label" />
+    <cell row="150" col="2" anchor="NORTHWEST" ref="mods.subject" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="150" col="3" anchor="NORTHWEST" ref="mods.subject.help" />
+    <!-- Stichworte END -->
+    
     <!-- Rechte -->
-    <cell row="150" col="1" anchor="NORTHEAST" ref="mods.rights.label" />
-    <cell row="150" col="2" anchor="NORTHWEST" ref="mods.rights" var="metadata/def.modsContainer/modsContainer/mods:mods" />
-    <cell row="150" col="3" anchor="NORTHWEST" ref="mods.rights.help" />
+    <cell row="160" col="1" anchor="NORTHEAST" ref="mods.rights.label" />
+    <cell row="160" col="2" anchor="NORTHWEST" ref="mods.rights" var="metadata/def.modsContainer/modsContainer/mods:mods" />
+    <cell row="160" col="3" anchor="NORTHWEST" ref="mods.rights.help" />
     <!-- Rechte END -->
     
     <!-- Identifier Panel -->
