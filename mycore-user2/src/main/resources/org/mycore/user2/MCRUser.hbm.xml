@@ -26,7 +26,7 @@
     <many-to-one name="owner" class="MCRUser" not-null="false" />
     <map name="attributes" table="MCRUserAttr" fetch="join" lazy="false" cascade="">
       <key column="id" />
-      <map-key column="key" type="string" />
+      <map-key column="name" type="string" />
       <element column="value" type="string" />
     </map>
   </class>
