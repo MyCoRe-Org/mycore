@@ -14,6 +14,7 @@
  **/
 package org.mycore.frontend.cli;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
@@ -35,6 +36,7 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRFSNODES;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLResource;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -44,6 +46,7 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRSearcher;
 import org.mycore.services.fieldquery.MCRSearcherFactory;
 import org.mycore.services.fieldquery.data2fields.MCRData2FieldsDerivate;
@@ -51,6 +54,7 @@ import org.mycore.services.fieldquery.data2fields.MCRData2FieldsFile;
 import org.mycore.services.fieldquery.data2fields.MCRData2FieldsObject;
 import org.mycore.services.fieldquery.data2fields.MCRIndexEntry;
 import org.mycore.services.fieldquery.data2fields.MCRIndexEntryBuilder;
+import org.mycore.services.fieldquery.data2fields.MCRXSLBuilder;
 
 /**
  * provides static methods to manipulate MCRSearcher indexes.
@@ -70,10 +74,10 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
 
     public MCRSearcherCommands() {
         super();
-        command.add(new MCRCommand("rebuild metadata index", "org.mycore.frontend.cli.MCRSearcherCommands.repairMetaIndex",
-                "Repairs metadata index"));
-        command.add(new MCRCommand("rebuild content index", "org.mycore.frontend.cli.MCRSearcherCommands.repairContentIndex",
-                "Repairs metadata index"));
+        command.add(new MCRCommand("rebuild metadata index", "org.mycore.frontend.cli.MCRSearcherCommands.repairMetaIndex", "Repairs metadata index"));
+        command.add(new MCRCommand("rebuild content index", "org.mycore.frontend.cli.MCRSearcherCommands.repairContentIndex", "Repairs metadata index"));
+        command.add(new MCRCommand("save searchfields of index {0} to stylesheet file {1}",
+            "org.mycore.frontend.cli.MCRSearcherCommands.saveXSL String String", "Generates XSL file {0} that is used to index metadata."));
     }
 
     static class RepairIndex {
@@ -172,7 +176,7 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
             for (MCRSearcher searcher : searcherList) {
                 String indexID = searcher.getIndex();
                 MCRBase base = MCRMetadataManager.retrieve(id);
-                
+
                 MCRIndexEntryBuilder builder;
                 if (base instanceof MCRDerivate)
                     builder = new MCRData2FieldsDerivate(indexID, (MCRDerivate) base);
@@ -202,9 +206,9 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
                     MCRFSNODES node = (MCRFSNODES) results.get(0);
                     GregorianCalendar greg = new GregorianCalendar();
                     greg.setTime(node.getDate());
-                    MCRFile file = (MCRFile) MCRFileMetadataManager.instance().buildNode(node.getType(), node.getId(), node.getPid(),
-                            node.getOwner(), node.getName(), node.getLabel(), node.getSize(), greg, node.getStoreid(), node.getStorageid(),
-                            node.getFctid(), node.getMd5(), node.getNumchdd(), node.getNumchdf(), node.getNumchtd(), node.getNumchtf());
+                    MCRFile file = (MCRFile) MCRFileMetadataManager.instance().buildNode(node.getType(), node.getId(), node.getPid(), node.getOwner(),
+                        node.getName(), node.getLabel(), node.getSize(), greg, node.getStoreid(), node.getStorageid(), node.getFctid(), node.getMd5(),
+                        node.getNumchdd(), node.getNumchdf(), node.getNumchtd(), node.getNumchtf());
                     addFileToIndex(file, false, searcherList);
                     session.evict(node);
                 }
@@ -246,6 +250,30 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
      */
     public static void repairContentIndex() throws IOException, JDOMException {
         new RepairIndex(new ContentIndexRepairMechanism()).repair();
+    }
+
+    /**
+     * Creates a XSL file for debugging purposes.
+     * @param index
+     * @param filename
+     */
+    public static void saveXSL(String index, String filename) {
+        saveXSL(index, new File(filename));
+    }
+
+    /**
+     * Creates a XSL file for debugging purposes.
+     * @param index
+     * @param file
+     */
+    public static void saveXSL(String index, File file) {
+        MCRXSLBuilder xslBuilder = new MCRXSLBuilder();
+        List<MCRFieldDef> fieldDefs = MCRFieldDef.getFieldDefs(index);
+        for (MCRFieldDef fieldDef : fieldDefs) {
+            xslBuilder.addXSLForField(fieldDef);
+        }
+        Document stylesheet = xslBuilder.getStylesheet();
+        MCRUtils.writeJDOMToFile(stylesheet, file);
     }
 
 }
