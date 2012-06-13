@@ -70,4 +70,18 @@ public class MCRBasketManager {
     private static String getBasketKey(String type) {
         return "basket." + type;
     }
+
+    /**
+     * Checks if a basket entry is present in the current basket
+     * @param type basket type
+     * @param id basket entry id
+     * @return true if a basket of this type exist and contains basket entry with the given id 
+     */
+    public static boolean contains(String type, String id) {
+        MCRBasket basket = getBasketFromSession(type);
+        if (basket == null) {
+            return false;
+        }
+        return (basket.get(id) != null);
+    }
 }

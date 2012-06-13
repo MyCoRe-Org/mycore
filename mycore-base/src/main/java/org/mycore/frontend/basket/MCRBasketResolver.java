@@ -42,13 +42,21 @@ public class MCRBasketResolver implements URIResolver {
         try {
             String[] tokens = href.split(":");
             String type = tokens[1];
-            String id = tokens[2];
+            MCRBasket basket = MCRBasketManager.getOrCreateBasketInSession(type);
+            if (tokens.length > 2) {
+                String id = tokens[2];
 
-            MCRBasketEntry entry = MCRBasketManager.getOrCreateBasketInSession(type).get(id);
-            entry.resolveContent();
-            Element xml = new MCRBasketXMLBuilder(true).buildXML(entry);
-            Document doc = new Document(xml);
-            return new JDOMSource(doc);
+                MCRBasketEntry entry = basket.get(id);
+                entry.resolveContent();
+                Element xml = new MCRBasketXMLBuilder(true).buildXML(entry);
+                Document doc = new Document(xml);
+                return new JDOMSource(doc);
+            } else {
+                //resolve entire basket
+                MCRBasketXMLBuilder basketXMLBuilder = new MCRBasketXMLBuilder(false);
+                Document doc = basketXMLBuilder.buildXML(basket);
+                return new JDOMSource(doc);
+            }
         } catch (Exception ex) {
             throw new TransformerException(ex);
         }

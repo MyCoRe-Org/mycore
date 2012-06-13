@@ -23,14 +23,14 @@
 
 package org.mycore.frontend.basket;
 
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
+import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.frontend.basket.MCRBasket;
-import org.mycore.frontend.basket.MCRBasketManager;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -75,34 +75,48 @@ public class MCRBasketServlet extends MCRServlet {
 
         String type = req.getParameter("type");
         String action = req.getParameter("action");
-        String id = req.getParameter("id");
-        String uri = req.getParameter("uri");
+        String[] uris = req.getParameterValues("uri");
+        String[] ids = req.getParameterValues("id");
+        String redirect = getProperty(req, "redirect");
+        String referer = getReferer(req);
         boolean resolveContent = "true".equals(req.getParameter("resolve"));
 
-        LOGGER.info(action + " " + type + " " + (id == null ? "" : id));
+        LOGGER.info(action + " " + type + " " + (ids == null ? "" : ids));
 
         MCRBasket basket = MCRBasketManager.getOrCreateBasketInSession(type);
 
         if ("add".equals(action)) {
-            MCRBasketEntry entry = new MCRBasketEntry(id, uri);
-            basket.add(entry);
-            if (resolveContent)
-                entry.resolveContent();
-        } else if ("remove".equals(action))
-            basket.removeEntry(id);
-        else if ("up".equals(action))
-            basket.up(basket.get(id));
-        else if ("down".equals(action))
-            basket.down(basket.get(id));
-        else if ("clear".equals(action))
+            if (uris.length != ids.length) {
+                throw new MCRException("Amount of URIs must match amount of IDs");
+            }
+            for (int i = 0; i < uris.length; i++) {
+                MCRBasketEntry entry = new MCRBasketEntry(ids[i], uris[i]);
+                basket.add(entry);
+                if (resolveContent) {
+                    entry.resolveContent();
+                }
+            }
+        } else if ("remove".equals(action)) {
+            for (String id : ids) {
+                basket.removeEntry(id);
+            }
+        } else if ("up".equals(action)) {
+            for (String id : ids) {
+                basket.up(basket.get(id));
+            }
+        } else if ("down".equals(action)) {
+            for (String id : ids) {
+                basket.down(basket.get(id));
+            }
+        } else if ("clear".equals(action)) {
             basket.clear();
-        else if ("create".equals(action)) {
+        } else if ("create".equals(action)) {
             String ownerID = req.getParameter("ownerID");
             MCRObjectID ownerOID = MCRObjectID.getInstance(ownerID);
             MCRBasketPersistence.createDerivateWithBasket(basket, ownerOID);
-        } else if ("update".equals(action))
+        } else if ("update".equals(action)) {
             MCRBasketPersistence.updateBasket(basket);
-        else if ("retrieve".equals(action)) {
+        } else if ("retrieve".equals(action)) {
             String derivateID = req.getParameter("derivateID");
             basket = MCRBasketPersistence.retrieveBasket(derivateID);
             type = basket.getType();
@@ -110,14 +124,19 @@ public class MCRBasketServlet extends MCRServlet {
         } else if ("comment".equals(action)) {
             MCREditorSubmission sub = (MCREditorSubmission) (req.getAttribute("MCREditorSubmission"));
             String comment = sub.getXML().getRootElement().getChildTextTrim("comment");
-            basket.get(id).setComment(comment);
+            for (String id : ids) {
+                basket.get(id).setComment(comment);
+            }
         } else if ("show".equals(action)) {
             req.setAttribute("XSL.Style", type);
             Document xml = new MCRBasketXMLBuilder(true).buildXML(basket);
             getLayoutService().doLayout(req, res, new MCRJDOMContent(xml));
             return;
         }
-
-        res.sendRedirect(getServletBaseURL() + "MCRBasketServlet?action=show&type=" + type);
+        if (referer != null && "referer".equals(redirect)) {
+            res.sendRedirect(res.encodeRedirectURL(referer));
+        } else {
+            res.sendRedirect(res.encodeRedirectURL(getServletBaseURL() + "MCRBasketServlet?action=show&type=" + type));
+        }
     }
 }
