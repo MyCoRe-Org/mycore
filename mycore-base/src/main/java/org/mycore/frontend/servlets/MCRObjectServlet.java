@@ -24,8 +24,6 @@
 package org.mycore.frontend.servlets;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.text.MessageFormat;
 import java.util.Hashtable;
 import java.util.regex.Matcher;
@@ -281,20 +279,6 @@ public class MCRObjectServlet extends MCRServlet {
             return getEditorIDFromSearch(referer);
         }
         return getEditorIDFromObjectID(request, referer);
-    }
-
-    private String getReferer(HttpServletRequest request) {
-        String referer;
-        referer = request.getHeader("Referer");
-        if (referer == null) {
-            return null;
-        }
-        try {
-            return URLDecoder.decode(referer, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            LOGGER.warn("Unsupported encoding \"UTF-8\"?", e);
-        }
-        return referer;
     }
 
     protected static final String getEditorIDFromSearch(String referer) {

@@ -28,6 +28,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.Collection;
@@ -746,6 +747,24 @@ public class MCRServlet extends HttpServlet {
             LOGGER.info("Last-Modified: " + new Date(lastModified) + ", expire on: " + expires);
             response.setDateHeader("Expires", expires.getTime());
         }
+    }
+
+    /**
+     * Returns the referer of the given request.
+     * @param request
+     */
+    protected String getReferer(HttpServletRequest request) {
+        String referer;
+        referer = request.getHeader("Referer");
+        if (referer == null) {
+            return null;
+        }
+        try {
+            return URLDecoder.decode(referer, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            LOGGER.warn("Unsupported encoding \"UTF-8\"?", e);
+        }
+        return referer;
     }
 
     /**
