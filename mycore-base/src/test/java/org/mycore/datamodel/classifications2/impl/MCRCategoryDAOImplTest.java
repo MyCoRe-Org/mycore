@@ -239,22 +239,33 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         MCRCategoryID rootID = MCRCategoryID.rootID(rootIDStr);
         MCRCategoryID child1ID = new MCRCategoryID(rootIDStr, "child1");
         MCRCategoryID child2ID = new MCRCategoryID(rootIDStr, "child2");
+        MCRCategoryID child3ID = new MCRCategoryID(rootIDStr, "child3");
         MCRCategoryImpl root = newCategory(rootID, "root node");
         addChild(root, newCategory(child1ID, "child node 1"));
         addChild(root, newCategory(child2ID, "child node 2"));
+        addChild(root, newCategory(child3ID, "child node 3"));
         startNewTransaction();
         DAO.addCategory(null, root);
         endTransaction();
-        assertLeftRightVal(rootID, 0, 5);
+        startNewTransaction();
+        printCategoryTable();
+        endTransaction();
+        assertLeftRightVal(rootID, 0, 7);
         assertLeftRightVal(child1ID, 1, 2);
         assertLeftRightVal(child2ID, 3, 4);
+        assertLeftRightVal(child3ID, 5, 6);
 
         startNewTransaction();
-        DAO.moveCategory(child2ID, child1ID);
+        DAO.moveCategory(child2ID, child1ID, 0);
+        DAO.moveCategory(child3ID, child1ID, 1);
         endTransaction();
-        assertLeftRightVal(rootID, 0, 5);
-        assertLeftRightVal(child1ID, 1, 4);
+        startNewTransaction();
+        printCategoryTable();
+        endTransaction();
+        assertLeftRightVal(rootID, 0, 7);
+        assertLeftRightVal(child1ID, 1, 6);
         assertLeftRightVal(child2ID, 2, 3);
+        assertLeftRightVal(child3ID, 4, 5);
     }
 
     @Test
