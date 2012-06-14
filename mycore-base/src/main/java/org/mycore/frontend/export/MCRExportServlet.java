@@ -72,6 +72,10 @@ public class MCRExportServlet extends MCRServlet {
     public void doGetPost(MCRServletJob job) throws Exception {
         String transformerID = job.getRequest().getParameter("transformer");
         MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer(transformerID);
+        if (transformer == null) {
+            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, "Transformer " + transformerID + " is not configured.");
+            return;
+        }
         MCRExportCollection collection = createCollection(job.getRequest());
         fillCollection(job.getRequest(), collection);
         MCRContent content = transformer.transform(collection.getContent());
