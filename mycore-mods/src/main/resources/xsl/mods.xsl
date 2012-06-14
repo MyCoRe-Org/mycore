@@ -94,6 +94,47 @@
       </td>
     </tr>
   </xsl:template>
+  
+  <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="basketContent">
+    <xsl:call-template name="objectLink">
+      <xsl:with-param select="." name="mcrobj" />
+    </xsl:call-template>
+    <div class="description">
+      <xsl:for-each select="./metadata/def.modsContainer/modsContainer/*">
+<!-- Link to presentation, ?pt -->
+        <xsl:for-each select="mods:identifier[@type='uri']">
+          <a href="{.}">
+            <xsl:value-of select="." />
+          </a>
+          <br />
+        </xsl:for-each>
+<!-- Place, ?pt -->
+        <xsl:for-each select="mods:originInfo/mods:place/mods:placeTerm[@type='text']">
+          <xsl:value-of select="." />
+        </xsl:for-each>
+<!-- Author -->
+        <xsl:for-each select="mods:name[mods:role/mods:roleTerm/text()='aut']">
+          <xsl:if test="position()!=1">
+            <xsl:value-of select="'; '" />
+          </xsl:if>
+          <xsl:apply-templates select="." mode="printName" />
+          <xsl:if test="position()=last()">
+            <br />
+          </xsl:if>
+        </xsl:for-each>
+<!-- Shelfmark -->
+        <xsl:for-each select="mods:location/mods:shelfLocator">
+          <xsl:value-of select="." />
+          <br />
+        </xsl:for-each>
+<!-- URN -->
+        <xsl:for-each select="mods:identifier[@type='urn']">
+          <xsl:value-of select="." />
+          <br />
+        </xsl:for-each>
+      </xsl:for-each>
+    </div>
+  </xsl:template>
 
   <!--Template for generated link names and result titles: see mycoreobject.xsl, results.xsl, MyCoReLayout.xsl -->
   <xsl:template priority="1" mode="resulttitle" match="/mycoreobject[contains(@ID,'_mods_')]">
