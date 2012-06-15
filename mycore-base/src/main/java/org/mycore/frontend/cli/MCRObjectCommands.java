@@ -89,9 +89,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         super();
 
         MCRCommand com = null;
-        
+
         com = new MCRCommand("delete objects matching {0}", "org.mycore.frontend.cli.MCRObjectCommands.deleteByQuery String",
-        "Deletes all objects matching the query given in parameter {0}");
+                "Deletes all objects matching the query given in parameter {0}");
         command.add(com);
 
         com = new MCRCommand("delete all objects of type {0}", "org.mycore.frontend.cli.MCRObjectCommands.deleteAllObjects String",
@@ -104,6 +104,10 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
         com = new MCRCommand("delete object {0}", "org.mycore.frontend.cli.MCRObjectCommands.delete String",
                 "Removes a MCRObject with the MCRObjectID {0}");
+        command.add(com);
+
+        com = new MCRCommand("list objects matching {0}", "org.mycore.frontend.cli.MCRObjectCommands.listIdsMatchingQuery String",
+                "Lists all objects matching the query given in parameter {0}");
         command.add(com);
 
         com = new MCRCommand("load object from file {0}", "org.mycore.frontend.cli.MCRObjectCommands.loadFromFile String",
@@ -196,14 +200,12 @@ public class MCRObjectCommands extends MCRAbstractCommands {
                 "org.mycore.frontend.cli.MCRObjectCommands.notifySearcher String String",
                 "Notify Searcher of Index {1} what is going on {0}.");
         command.add(com);
-        
-        com = new MCRCommand("list revisions of {0}",
-                "org.mycore.frontend.cli.MCRObjectCommands.listRevisions String",
+
+        com = new MCRCommand("list revisions of {0}", "org.mycore.frontend.cli.MCRObjectCommands.listRevisions String",
                 "List revisions of MCRObject.");
         command.add(com);
-        
-        com = new MCRCommand("restore {0} to revision {1}",
-                "org.mycore.frontend.cli.MCRObjectCommands.restoreToRevision String int",
+
+        com = new MCRCommand("restore {0} to revision {1}", "org.mycore.frontend.cli.MCRObjectCommands.restoreToRevision String int",
                 "Restores the selected MCRObject to the selected revision.");
         command.add(com);
 
@@ -1018,15 +1020,15 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         try {
             StringBuffer log = new StringBuffer("Revisions:\n");
             List<MCRMetadataVersion> revisions = MCRUtils.listRevisions(mcrId);
-            for(MCRMetadataVersion revision : revisions) {
-               log.append(revision.getRevision()).append(" ");
-               log.append(revision.getType()).append(" ");
-               log.append(sdf.format(revision.getDate())).append(" ");
-               log.append(revision.getUser());
-               log.append("\n");
+            for (MCRMetadataVersion revision : revisions) {
+                log.append(revision.getRevision()).append(" ");
+                log.append(revision.getType()).append(" ");
+                log.append(sdf.format(revision.getDate())).append(" ");
+                log.append(revision.getUser());
+                log.append("\n");
             }
             LOGGER.info(log.toString());
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             LOGGER.error("While print revisions.", exc);
         }
     }
@@ -1050,11 +1052,11 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         Document xml = null;
         try {
             xml = MCRUtils.requestVersionedObject(mcrId, revision);
-            if(xml == null) {
+            if (xml == null) {
                 LOGGER.warn("No such object " + id + " with revision " + revision);
                 return;
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             LOGGER.error("While retrieving object " + id + " with revision " + revision, e);
             return;
         }
@@ -1063,7 +1065,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         MCRMetadataManager.update(mcrObj);
         LOGGER.info("Object " + id + " successfully restored!");
     }
-    
+
     public static void deleteByQuery(String source) throws Exception {
         LOGGER.info("Given query is \"" + source + "\"");
         if (source == null || source.length() == 0) {
@@ -1081,7 +1083,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
         MCRQuery q = new MCRQuery(condition);
         MCRResults results = MCRQueryManager.search(q);
-        
+
         if (results == null) {
             return;
         }
@@ -1101,6 +1103,51 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         }
 
         LOGGER.info("A list with the identifiers of the deleted items has been saved to " + deletedItems.getAbsolutePath());
+    }
+
+    /**
+     * Lists all identifiers where the associated objects are matching the given query.
+     * 
+     * @param qSource the query to execute
+     * @throws Exception
+     */
+    public static void listIdsMatchingQuery(String qSource) throws Exception {
+        LOGGER.info("Given query is \"" + qSource + "\"");
+        if (qSource == null || qSource.length() == 0) {
+            LOGGER.error("Given query is invalid");
+            return;
+        }
+
+        MCRCondition condition = null;
+        try {
+            condition = new MCRQueryParser().parse(qSource);
+        } catch (Exception ex) {
+            LOGGER.error("Exception occured while parsing the input string", ex);
+            return;
+        }
+
+        MCRQuery q = new MCRQuery(condition);
+        MCRResults results = MCRQueryManager.search(q);
+
+        if (results == null) {
+            return;
+        }
+        File matchingItems = new File(System.getenv("HOME") + File.separator + System.currentTimeMillis() + "_matched.txt");
+        FileWriter fw = new FileWriter(matchingItems);
+        try {
+            fw.write("query=" + qSource + "\n\n");
+            for (MCRHit hit : results) {
+                LOGGER.info(hit.getID());
+                fw.write(hit.getID() + "\n");
+            }
+        } catch (Exception ex) {
+            LOGGER.error(ex);
+        } finally {
+            fw.flush();
+            fw.close();
+        }
+
+        LOGGER.info("A list with the identifiers matching query \"" + qSource + "\" has been saved to " + matchingItems.getAbsolutePath());
     }
 
     /**
@@ -1131,7 +1178,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      */
     public static void xslt(String objectId, String xslFilePath) throws Exception {
         File xslFile = new File(xslFilePath);
-        if(!xslFile.exists()) {
+        if (!xslFile.exists()) {
             LOGGER.error("XSLT file not found " + xslFilePath);
             return;
         }
