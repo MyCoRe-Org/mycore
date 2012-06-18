@@ -65,6 +65,15 @@ UPDATE MCRCategoryImpl cat SET cat.left=cat.left+:increment WHERE cat.rootID= :c
 UPDATE MCRCategoryImpl cat SET cat.right=cat.right+:increment WHERE cat.rootID= :classID AND cat.right > :right and cat.right <= :max
       ]]>
     </query>
+    <query name="commonAncestor">
+      <![CDATA[
+FROM MCRCategoryImpl as cat
+  WHERE cat.rootID=:rootID AND
+    cat.left < :left AND
+    cat.right > :right
+  ORDER BY cat.left DESC
+      ]]>
+    </query>
     <query name="byLabelInClass">
       <![CDATA[
 FROM MCRCategoryImpl as cat
