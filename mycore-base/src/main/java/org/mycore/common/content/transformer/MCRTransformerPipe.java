@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
 
 /**
@@ -50,6 +51,9 @@ public class MCRTransformerPipe extends MCRContentTransformer {
         while (tokens.hasMoreTokens()) {
             String transformerID = tokens.nextToken();
             MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer(transformerID);
+            if (transformer == null) {
+                throw new MCRConfigurationException("Transformer pipe element '" + transformerID + "' is not configured.");
+            }
             transformers.add(transformer);
         }
     }
