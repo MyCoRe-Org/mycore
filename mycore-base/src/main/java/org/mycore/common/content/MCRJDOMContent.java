@@ -69,6 +69,9 @@ public class MCRJDOMContent extends MCRXMLContent {
 
     @Override
     public void sendTo(OutputStream out) throws IOException {
+        if (jdom == null) {
+            throw new IOException("JDOM document is null and cannot be written to OutputStream");
+        }
         new XMLOutputter(format).output(jdom, out);
     }
 
