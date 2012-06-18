@@ -107,12 +107,11 @@ function save(){
 	   		log('Mets successfully saved');
    		},
    		error: function(err, ioArgs){
-   			log('Please log in to use Mets Editor');
    			var secondDlg = new dijit.Dialog({
    				title: "Zugriff verweigert",
    				style: "width: 300px"
    			});
-	   	    secondDlg.attr("content", "Mets konnte nicht erzeugt und gespeichert werden. Bitte loggen Sie sich ein und versuchen Sie es erneut.");
+	   	    secondDlg.attr("content", "Mets konnte nicht erzeugt und gespeichert werden. Bitte wenden Sie sich an den Administrator.");
 	   	    secondDlg.show();
    	    }
    });
