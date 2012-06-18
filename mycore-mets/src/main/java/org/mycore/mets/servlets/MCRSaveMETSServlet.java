@@ -71,7 +71,7 @@ public class MCRSaveMETSServlet extends MCRServlet {
         boolean isComplete = isComplete(mets, derivateId);
         if (!(mets.isValid() && isComplete)) {
             LOGGER.error("Validating METS document failed");
-            String notCompleteErrorMsg = "It appears that not all files owned by derivate " + derivateId
+            String notCompleteErrorMsg = "It appears not all files owned by derivate " + derivateId
                     + " are referenced within the mets.xml.";
 
             job.getResponse().sendError(
