@@ -23,11 +23,15 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.datamodel.ifs.MCRDirectory;
+import org.mycore.datamodel.ifs.MCRFilesystemNode;
+import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.mets.model.Mets;
-
+import org.mycore.mets.model.files.FileGrp;
 import org.mycore.mets.tools.MCRMetsProvider;
 import org.mycore.mets.tools.MCRMetsSave;
 
@@ -64,10 +68,16 @@ public class MCRSaveMETSServlet extends MCRServlet {
         LOGGER.info("Creating Mets object for derivate with id " + derivateId + " was succesful");
 
         LOGGER.info("Validating METS document ...");
-        if (!mets.isValid()) {
+        boolean isComplete = isComplete(mets, derivateId);
+        if (!(mets.isValid() && isComplete)) {
             LOGGER.error("Validating METS document failed");
-            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST,
-                    "The METS document provided is not valid. See server log for details");
+            String notCompleteErrorMsg = "It appears that not all files owned by derivate " + derivateId
+                    + " are referenced within the mets.xml.";
+
+            job.getResponse().sendError(
+                    HttpServletResponse.SC_BAD_REQUEST,
+                    "The METS document provided is not valid. See server log for details. "
+                            + (isComplete == false ? notCompleteErrorMsg : ""));
             return;
         }
         LOGGER.info("Validating METS document was successful");
@@ -76,5 +86,33 @@ public class MCRSaveMETSServlet extends MCRServlet {
         Document metsDoc = mets.asDocument();
         MCRMetsSave.saveMets(metsDoc, derivateId);
         return;
+    }
+
+    /**
+     * @param mets
+     * @param derivateId
+     * 
+     * @return true if all files owned by the derivate appearing in the master file group or false otherwise 
+     */
+    private boolean isComplete(Mets mets, String derivateId) {
+        try {
+            FileGrp fileGroup = mets.getFileSec().getFileGroup(FileGrp.USE_MASTER);
+            MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateId));
+            MCRDirectory ifs = derivate.receiveDirectoryFromIFS();
+
+            for (MCRFilesystemNode node : ifs.getChildren()) {
+                if (node.getName().equals("mets.xml")) {
+                    continue;
+                }
+                if (fileGroup.contains(node.getPath().substring(derivateId.length() + 1)) == false) {
+                    return false;
+                }
+            }
+        } catch (Exception ex) {
+            LOGGER.error("Error while validating mets", ex);
+            return false;
+        }
+
+        return true;
     }
 }
