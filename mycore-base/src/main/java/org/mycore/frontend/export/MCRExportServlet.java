@@ -136,7 +136,7 @@ public class MCRExportServlet extends MCRServlet {
     private void sendResponse(HttpServletResponse res, MCRContent content, String mimeType, String filename) throws IOException {
         byte[] bytes = content.asByteArray();
 
-        res.setHeader("Content-Disposition", "attachment;filename=\"" + filename + "\"");
+        res.setHeader("Content-Disposition", "inline;filename=\"" + filename + "\"");
         res.setContentType(mimeType);
         res.setContentLength(bytes.length);
         OutputStream out = res.getOutputStream();
