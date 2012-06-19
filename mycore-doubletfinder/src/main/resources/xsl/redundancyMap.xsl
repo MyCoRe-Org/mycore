@@ -4,7 +4,7 @@
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
   xmlns:acl="xalan://org.mycore.access.MCRAccessManager">
   <xsl:include href="MyCoReLayout.xsl" />
-  <xsl:include href="objecttypes.xsl" />
+  <xsl:include href="xslInclude:objectTypes"/>
   <xsl:param name="toc.pageSize" select="20" />
   <xsl:param name="toc.pos" select="1" />
   <xsl:param name="redunObject" />

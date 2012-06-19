@@ -10,7 +10,7 @@
                 value="org.mycore.mods.MCRMODSCommands" />
     <mcr:config action="addInclude"
                 propertyfile="${build.config}/mycore.properties"
-                key="MCR.URIResolver.xslIncludes.components"
+                key="MCR.URIResolver.xslIncludes.objectTypes"
                 value="mods.xsl" />
   </target>
 </project>
