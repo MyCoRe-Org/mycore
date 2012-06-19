@@ -48,7 +48,7 @@ import org.mycore.common.xsl.MCRXSLTransformerFactory;
 public class MCRXSLTransformer extends MCRContentTransformer {
 
     /** The compiled XSL stylesheet */
-    private MCRTemplatesSource templates;
+    protected MCRTemplatesSource templates;
 
     @Override
     public void init(String id) {

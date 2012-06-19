@@ -41,4 +41,9 @@ public class MCRToPrettyXML extends MCRContentTransformer {
         content.setFormat(Format.getPrettyFormat().setEncoding("UTF-8"));
         return content;
     }
+    
+    @Override
+    protected String getDefaultExtension() {
+        return "xml";
+    }
 }

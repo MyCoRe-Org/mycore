@@ -70,4 +70,14 @@ public class MCRTransformerPipe extends MCRContentTransformer {
     public String getMimeType() {
         return transformers.get(transformers.size() - 1).getMimeType();
     }
+
+    @Override
+    protected String getDefaultExtension() {
+        return transformers.get(transformers.size() - 1).getDefaultExtension();
+    }
+
+    @Override
+    public String getFileExtension() {
+        return transformers.get(transformers.size() - 1).getFileExtension();
+    }
 }

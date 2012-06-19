@@ -52,4 +52,9 @@ public class MCRFopper extends MCRContentTransformer {
     public String getMimeType() {
         return "application/pdf";
     }
+    
+    @Override
+    protected String getDefaultExtension() {
+        return "pdf";
+    }
 }

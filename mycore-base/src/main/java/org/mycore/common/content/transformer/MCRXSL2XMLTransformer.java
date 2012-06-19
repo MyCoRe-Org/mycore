@@ -28,9 +28,11 @@ import java.io.IOException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 
+import org.jdom.Document;
 import org.jdom.transform.JDOMResult;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
+import org.xml.sax.SAXException;
 
 /**
  * Transforms XML content using a static XSL stylesheet.
@@ -49,7 +51,20 @@ public class MCRXSL2XMLTransformer extends MCRXSLTransformer {
     protected MCRContent transform(Transformer transformer, MCRContent source) throws TransformerException, IOException {
         JDOMResult result = new JDOMResult();
         transformer.transform(source.getSource(), result);
+        Document resultDoc = result.getDocument();
+        if (resultDoc == null) {
+            try {
+                throw new TransformerException("Stylesheet " + templates.getSource().getSystemId() + " does not return any content for " + source.getSystemId());
+            } catch (SAXException e) {
+                throw new TransformerException("Stylesheet " + templates.toString() + " does not return any content for " + source.getSystemId());
+            }
+        }
         return new MCRJDOMContent(result.getDocument());
+    }
+
+    @Override
+    protected String getDefaultExtension() {
+        return "xml";
     }
 
 }

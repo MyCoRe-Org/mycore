@@ -71,6 +71,10 @@ public class MCRExportServlet extends MCRServlet {
     @Override
     public void doGetPost(MCRServletJob job) throws Exception {
         String transformerID = job.getRequest().getParameter("transformer");
+        String filename = getProperty(job.getRequest(), "filename");
+        if (filename == null) {
+            filename = "export-" + System.currentTimeMillis();
+        }
         MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer(transformerID);
         if (transformer == null) {
             job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, "Transformer " + transformerID + " is not configured.");
@@ -79,7 +83,7 @@ public class MCRExportServlet extends MCRServlet {
         MCRExportCollection collection = createCollection(job.getRequest());
         fillCollection(job.getRequest(), collection);
         MCRContent content = transformer.transform(collection.getContent());
-        sendResponse(job.getResponse(), content, transformer.getMimeType());
+        sendResponse(job.getResponse(), content, transformer.getMimeType(), filename + "." + transformer.getFileExtension());
     }
 
     /**
@@ -129,9 +133,10 @@ public class MCRExportServlet extends MCRServlet {
     /**
      * Sends the resulting, transformed MCRContent to the client
      */
-    private void sendResponse(HttpServletResponse res, MCRContent content, String mimeType) throws IOException {
+    private void sendResponse(HttpServletResponse res, MCRContent content, String mimeType, String filename) throws IOException {
         byte[] bytes = content.asByteArray();
 
+        res.setHeader("Content-Disposition", "attachment;filename=\"" + filename + "\"");
         res.setContentType(mimeType);
         res.setContentLength(bytes.length);
         OutputStream out = res.getOutputStream();
