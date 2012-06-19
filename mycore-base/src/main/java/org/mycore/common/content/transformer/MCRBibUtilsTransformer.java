@@ -52,6 +52,7 @@ public class MCRBibUtilsTransformer extends MCRContentTransformer {
 
     @Override
     public void init(String id) {
+        super.init(id);
         command = MCRConfiguration.instance().getString("MCR.ContentTransformer." + id + ".Command");
     }
 
