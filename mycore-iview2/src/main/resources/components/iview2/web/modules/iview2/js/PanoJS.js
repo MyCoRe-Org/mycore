@@ -698,9 +698,8 @@ PanoJS.prototype = {
 			}
 			
 			var viewerRatio = maxDimViewer / maxDimCurZoomLevel;
-			var roundedTileSize = Math.floor(this.iview.properties.tileSize * viewerRatio) ;
-			this.iview.currentImage.zoomInfo.scale = roundedTileSize / this.iview.properties.tileSize;
-			this.tileSize = this.iview.properties.tileSize * this.iview.currentImage.zoomInfo.scale;
+			this.tileSize = Math.floor(this.iview.properties.tileSize * viewerRatio) ;
+			this.iview.currentImage.zoomInfo.scale = this.tileSize  / this.iview.properties.tileSize;
 			this.zoom(calculatedMinFitZoomLevel - this.zoomLevel);
 			
 			this.init();
