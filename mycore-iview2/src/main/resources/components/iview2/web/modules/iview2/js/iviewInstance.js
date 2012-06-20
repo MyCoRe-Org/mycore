@@ -208,17 +208,8 @@
           } else if (isNaN(parseInt(URL.getParam("zoom"))) && !that.currentImage.zoomInfo.zoomScreen) {
             that.viewerBean.pictureScreen();
           }
-          // Toolbar is initialized on dom-load event and may not yet ready
-          var waitForToolbar = function(self, iviewInst) {
-            if (iviewInst.properties.initialized) {
-              iviewInst.toggleViewerMode();
-            } else {
-              setTimeout(function() {
-                self(self, iviewInst);
-              }, 100);
-            }
-          };
-          waitForToolbar(waitForToolbar, that);
+          
+          that.toggleViewerMode();
         }
 
         var metsDocURI = that.properties.webappBaseUri + "servlets/MCRMETSServlet/" + that.properties.derivateId;
@@ -248,13 +239,24 @@
      * @description maximize and show the viewer with the related image or minimize and close the viewer
      */
     constructor.prototype.toggleViewerMode = function() {
-      this.context.switchContext();
-      jQuery(this.viewerContainer).trigger((!this.viewerContainer.isMax() ? "minimize" : "maximize") + ".viewerContainer");
-      /*
-       * IE causes resize already at class change (mostly because position: rel <> fix) IE runs resize multiple times...but without this
-       *  line he doesn't...
-       */
-      this.reinitializeGraphic();
+        var waitForToolbar = function(self, iviewInst) {
+            if (iviewInst.properties.initialized && typeof iviewInst.currentImage.zoomInfo.dimensions[0] == "object") {
+            	iviewInst.context.switchContext();
+                jQuery(iviewInst.viewerContainer).trigger((!iviewInst.viewerContainer.isMax() ? "minimize" : "maximize") + ".viewerContainer");
+                
+                /*
+                 * IE causes resize already at class change (mostly because position: rel <> fix) IE runs resize multiple times...but without this
+                 *  line he doesn't...
+                 */
+                
+                iviewInst.reinitializeGraphic();
+            } else {
+              setTimeout(function() {
+                self(self, iviewInst);
+              }, 100);
+            }
+          };
+      	waitForToolbar(waitForToolbar, this);
     };
 
     /**
