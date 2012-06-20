@@ -275,6 +275,9 @@ PanoJS.prototype = {
 	},
 
 	prepareTiles : function() {
+		if(!(this.tileSize > 0) || typeof(input)=='number'){
+			throw new iview.IviewInstanceError("Invalid Tilesize :" + this.tileSize, this);
+		}
 		var rows = Math.ceil(this.height / this.tileSize) + 2;
 		var cols = Math.ceil(this.width / this.tileSize) + 2;
 		//if there's nothing to change don't drop anything as we may loose important references
@@ -695,9 +698,9 @@ PanoJS.prototype = {
 			}
 			
 			var viewerRatio = maxDimViewer / maxDimCurZoomLevel;
-			this.iview.currentImage.zoomInfo.scale = maxDimViewer / viewerRatio;
-			this.tileSize = this.iview.properties.tileSize * viewerRatio;
-			this.iview.currentImage.zoomInfo.scale = viewerRatio;
+			var roundedTileSize = Math.floor(this.iview.properties.tileSize * viewerRatio) ;
+			this.iview.currentImage.zoomInfo.scale = roundedTileSize / this.iview.properties.tileSize;
+			this.tileSize = this.iview.properties.tileSize * this.iview.currentImage.zoomInfo.scale;
 			this.zoom(calculatedMinFitZoomLevel - this.zoomLevel);
 			
 			this.init();
