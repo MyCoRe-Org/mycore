@@ -57,7 +57,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -77,6 +76,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -195,7 +195,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         supportedSchemes.put("webapp", new MCRWebAppResolver());
         supportedSchemes.put("ifs", getURIResolver(new MCRIFSResolver()));
         supportedSchemes.put("mcrfile", new MCRMCRFileResolver());
-        supportedSchemes.put("mcrobject", getURIResolver(new MCRObjectResolver()));
+        supportedSchemes.put("mcrobject", new MCRObjectResolver());
         supportedSchemes.put("mcrws", getURIResolver(new MCRWSResolver()));
         supportedSchemes.put("request", getURIResolver(new MCRRequestResolver()));
         supportedSchemes.put("session", getURIResolver(new MCRSessionResolver()));
@@ -580,7 +580,8 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
     }
 
-    private static class MCRObjectResolver implements MCRResolver {
+    private static class MCRObjectResolver implements URIResolver {
+
         /**
          * Reads local MCRObject with a given ID from the store.
          * 
@@ -588,15 +589,20 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
          *            for example, "mcrobject:DocPortal_document_07910401"
          * @returns XML representation from MCRXMLContainer
          */
-        public Element resolveElement(String uri) {
-            String id = uri.substring(uri.indexOf(":") + 1);
+        @Override
+        public Source resolve(String href, String base) throws TransformerException {
+            String id = href.substring(href.indexOf(":") + 1);
             LOGGER.debug("Reading MCRObject with ID " + id);
 
             MCRObjectID mcrid = MCRObjectID.getInstance(id);
-            Document doc = MCRXMLMetadataManager.instance().retrieveXML(mcrid);
+            MCRContent content = MCRXMLMetadataManager.instance().retrieveContent(mcrid);
 
-            LOGGER.debug("end resolving " + uri);
-            return doc.getRootElement();
+            LOGGER.debug("end resolving " + href);
+            try {
+                return content.getSource();
+            } catch (IOException e) {
+                throw new TransformerException(e);
+            }
         }
 
     }
@@ -1089,9 +1095,9 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         private static final String ORDER_PARAM = "order";
 
         private static final String MAXRESULTS_PARAM = "maxResults";
-        
+
         private static final String NUMPERPAGE_PARAM = "numPerPage";
-        
+
         private static final String PAGE_PARAM = "page";
 
         /**
@@ -1114,24 +1120,24 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             if (query == null) {
                 return null;
             }
-            
+
             String sortby = params.get(SORT_PARAM);
             String order = params.get(ORDER_PARAM);
             String maxResults = defaultValue(params.get(MAXRESULTS_PARAM), "0");
             String numPerPage = defaultValue(params.get(NUMPERPAGE_PARAM), "0");
             String page = defaultValue(params.get(PAGE_PARAM), "1");
-            
+
             Document input = getQueryDocument(query, sortby, order, maxResults, numPerPage);
             // Execute query
             long start = System.currentTimeMillis();
             MCRResults result = MCRQueryManager.search(MCRQuery.parseXML(input));
             long qtime = System.currentTimeMillis() - start;
             LOGGER.debug("MCRSearchServlet total query time: " + qtime);
-            
+
             return createXML(result, Integer.parseInt(numPerPage), Integer.parseInt(page));
         }
-        
-        private static Element createXML(MCRResults results, int numPerPage, int page){
+
+        private static Element createXML(MCRResults results, int numPerPage, int page) {
             // Total number of pages
             int numHits = Math.max(1, results.getNumHits());
             int numPages = 1;
@@ -1159,15 +1165,15 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             xml.setAttribute("numPerPage", String.valueOf(numPerPage));
             xml.setAttribute("numPages", String.valueOf(numPages));
             xml.setAttribute("page", String.valueOf(page));
-            
-			return xml;
+
+            return xml;
         }
 
         private static String defaultValue(String maxResults, String defaultVal) {
-        	if (maxResults != null && !maxResults.equals("")) {
-        		return maxResults;
-        	}
-        	return defaultVal;
+            if (maxResults != null && !maxResults.equals("")) {
+                return maxResults;
+            }
+            return defaultVal;
         }
 
         private static Document getQueryDocument(String query, String sortby, String order, String maxResults, String numPerPage) {

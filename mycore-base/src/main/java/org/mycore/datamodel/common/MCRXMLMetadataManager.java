@@ -34,6 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.jdom.Document;
+import org.jdom.JDOMException;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
@@ -48,6 +49,7 @@ import org.mycore.datamodel.ifs2.MCRStoreManager;
 import org.mycore.datamodel.ifs2.MCRStoredMetadata;
 import org.mycore.datamodel.ifs2.MCRVersioningMetadataStore;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.xml.sax.SAXParseException;
 
 /**
  * Manages persistence of MCRObject and MCRDerivate xml metadata.
@@ -443,11 +445,12 @@ public class MCRXMLMetadataManager {
      * @param mcrid the MCRObjectID 
      */
     public Document retrieveXML(MCRObjectID mcrid) {
+        MCRContent metadata = retrieveContent(mcrid);
         try {
-            return retrieveStoredMetadata(mcrid).getMetadata().asXML();
+            return metadata.asXML();
         } catch (Exception ex) {
-            if (ex instanceof MCRException) {
-                throw (MCRException) ex;
+            if (ex instanceof RuntimeException) {
+                throw (RuntimeException) ex;
             }
             String msg = "Exception while retrieving XML metadata of mcrobject " + mcrid.toString();
             throw new MCRPersistenceException(msg, ex);
@@ -458,17 +461,30 @@ public class MCRXMLMetadataManager {
      * Retrieves stored metadata xml as byte[] BLOB.
      * 
      * @param mcrid the MCRObjectID 
+     * @throws IOException 
      */
     public byte[] retrieveBLOB(MCRObjectID mcrid) {
+        MCRContent metadata = retrieveContent(mcrid);
         try {
-            return retrieveStoredMetadata(mcrid).getMetadata().asByteArray();
+            return metadata.asByteArray();
+        } catch (IOException e) {
+            String msg = "Exception while retrieving XML metadata of mcrobject " + mcrid.toString();
+            throw new MCRPersistenceException(msg, e);
+        }
+    }
+
+    public MCRContent retrieveContent(MCRObjectID mcrid) {
+        MCRContent metadata;
+        try {
+            metadata = retrieveStoredMetadata(mcrid).getMetadata();
         } catch (Exception ex) {
-            if (ex instanceof MCRException) {
-                throw (MCRException) ex;
+            if (ex instanceof RuntimeException) {
+                throw (RuntimeException) ex;
             }
             String msg = "Exception while retrieving XML metadata of mcrobject " + mcrid.toString();
             throw new MCRPersistenceException(msg, ex);
         }
+        return metadata;
     }
 
     /**
@@ -480,8 +496,8 @@ public class MCRXMLMetadataManager {
         try {
             return getStore(mcrid).retrieve(mcrid.getNumberAsInteger());
         } catch (Exception ex) {
-            if (ex instanceof MCRException) {
-                throw (MCRException) ex;
+            if (ex instanceof RuntimeException) {
+                throw (RuntimeException) ex;
             }
             String msg = "Exception while retrieving XML metadata of mcrobject " + mcrid.toString();
             throw new MCRPersistenceException(msg, ex);

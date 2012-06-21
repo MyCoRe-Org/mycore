@@ -63,6 +63,7 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
@@ -400,10 +401,10 @@ public class MCRUtils {
                 if (bytesRead > 0) {
                     if (target != null) {
                         target.write(ba, 0 /* offset in ba */, bytesRead /*
-                                                                                                                   * bytes
-                                                                                                                   * to
-                                                                                                                   * write
-                                                                                                                   */);
+                                                                                                                     * bytes
+                                                                                                                     * to
+                                                                                                                     * write
+                                                                                                                     */);
                     }
                 } else {
                     break; // hit eof
@@ -458,10 +459,10 @@ public class MCRUtils {
                 if (charsRead > 0) {
                     if (target != null) {
                         target.write(ca, 0 /* offset in ba */, charsRead /*
-                                                                                                                   * bytes
-                                                                                                                   * to
-                                                                                                                   * write
-                                                                                                                   */);
+                                                                                                                     * bytes
+                                                                                                                     * to
+                                                                                                                     * write
+                                                                                                                     */);
                     }
                 } else {
                     break; // hit eof
@@ -945,12 +946,30 @@ public class MCRUtils {
      * @throws SAXParseException 
      */
     public static Document requestVersionedObject(MCRObjectID objId, long revision) throws IOException, JDOMException, SAXParseException {
+        MCRContent content = requestVersionedObjectAsContent(objId, revision);
+        if (content == null) {
+            return null;
+        }
+        return content.asXML();
+    }
+
+    /**
+     * @param objId
+     *            the id of the object to be retrieved
+     * @param revision
+     *            the revision to be returned, specify -1 if you want to
+     *            retrieve the latest revision (includes deleted objects also)
+     * @return a {@link MCRContent} representing the {@link MCRObject} of the
+     *         given revision or <code>null</code> if there is no such object
+     *         with the given revision
+     * @throws IOException 
+     */
+    public static MCRContent requestVersionedObjectAsContent(MCRObjectID objId, long revision) throws IOException {
         LOGGER.info("Getting object " + objId + " in revision " + revision);
         MCRMetadataVersion version = getMetadataVersion(objId, revision);
         if (version != null) {
-            return version.retrieve().asXML();
+            return version.retrieve();
         }
-
         return null;
     }
 

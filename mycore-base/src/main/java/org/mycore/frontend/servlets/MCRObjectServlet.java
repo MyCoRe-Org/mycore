@@ -34,14 +34,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.JDOMException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRDOMContent;
-import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.ifs2.MCRVersioningMetadataStore;
@@ -112,7 +110,7 @@ public class MCRObjectServlet extends MCRServlet {
         }
 
         if (host == MCRHit.LOCAL) {
-            Document localObject;
+            MCRContent localObject;
             if (rev == REV_CURRENT) {
                 localObject = requestLocalObject(job);
             } else {
@@ -121,7 +119,7 @@ public class MCRObjectServlet extends MCRServlet {
             if (localObject == null) {
                 return;
             }
-            getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRJDOMContent(localObject));
+            getLayoutService().doLayout(job.getRequest(), job.getResponse(), localObject);
         } else {
             getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRDOMContent(requestRemoteObject(job)));
         }
@@ -145,12 +143,12 @@ public class MCRObjectServlet extends MCRServlet {
 
     //---------------------------------------------------------------------
 
-    private Document requestLocalObject(MCRServletJob job) throws IOException {
+    private MCRContent requestLocalObject(MCRServletJob job) throws IOException {
         MCRObjectID mcrid = getMCRObjectID(job);
         if (mcrid == null)
             return null;
         if (MCRMetadataManager.exists(mcrid)) {
-            return TM.retrieveXML(mcrid);
+            return TM.retrieveContent(mcrid);
         }
         job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND, getErrorI18N(I18N_ERROR_PREFIX, "notFound", mcrid));
         return null;
@@ -178,16 +176,16 @@ public class MCRObjectServlet extends MCRServlet {
         return mcrid;
     }
 
-    private Document requestVersionedObject(MCRServletJob job, long rev) throws JDOMException, Exception {
-        MCRObjectID mcrid = getMCRObjectID(job);
+    private MCRContent requestVersionedObject(MCRServletJob job, long rev) throws IOException  {
+        final MCRObjectID mcrid = getMCRObjectID(job);
         if (mcrid == null) {
             return null;
         }
         MCRMetadataStore metadataStore = MCRXMLMetadataManager.instance().getStore(mcrid);
         if (metadataStore instanceof MCRVersioningMetadataStore) {
-            Document doc = MCRUtils.requestVersionedObject(mcrid, rev);
-            if(doc != null) {
-                return doc;
+            MCRContent content = MCRUtils.requestVersionedObjectAsContent(mcrid, rev);
+            if(content != null) {
+                return content;
             }
             job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND, getErrorI18N(I18N_ERROR_PREFIX, "revisionNotFound", rev, mcrid));
             return null;
