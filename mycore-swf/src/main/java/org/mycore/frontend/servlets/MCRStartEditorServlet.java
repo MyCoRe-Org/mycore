@@ -697,7 +697,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         StringBuffer sb = new StringBuffer();
         Properties params = new Properties();
-        sb.append("xslStyle:mycoreobject-editor:mcrobject:").append(cd.mysemcrid);
+        sb.append("xslStyle:mycorederivate-editor:mcrobject:").append(cd.mysemcrid);
 
         params.put("sourceUri", sb.toString());
         sb = new StringBuffer();
