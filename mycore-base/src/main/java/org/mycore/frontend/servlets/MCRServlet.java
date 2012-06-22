@@ -26,10 +26,13 @@ package org.mycore.frontend.servlets;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Date;
@@ -85,6 +88,8 @@ public class MCRServlet extends HttpServlet {
     private static Logger LOGGER = Logger.getLogger(MCRServlet.class);
 
     private static String BASE_URL;
+    
+    private static String BASE_HOST_IP;
 
     private static String SERVLET_URL;
 
@@ -150,6 +155,15 @@ public class MCRServlet extends HttpServlet {
             BASE_URL = BASE_URL + "/";
         }
         SERVLET_URL = BASE_URL + "servlets/";
+        try {
+            URL url = new URL(BASE_URL);
+            InetAddress BASE_HOST = InetAddress.getByName(url.getHost());
+            BASE_HOST_IP = BASE_HOST.getHostAddress();
+        } catch (MalformedURLException e) {
+            LOGGER.error("Can't create URL fro String " + BASE_URL);
+        } catch (UnknownHostException e) {
+            LOGGER.error("Can't find host IP for URL " + BASE_URL);
+        }
     }
 
     static {
@@ -190,7 +204,7 @@ public class MCRServlet extends HttpServlet {
             if (lastIP.length() != 0) {
                 //check if request IP equals last known IP
                 String newip = getRemoteAddr(req);
-                if (!lastIP.equals(newip)) {
+                if (!lastIP.equals(newip) && !newip.equals(BASE_HOST_IP)) {
                     LOGGER.warn("Session steal attempt from IP " + newip + ", previous IP was " + lastIP + ". Session: "
                             + session.toString());
                     MCRSessionMgr.releaseCurrentSession();
