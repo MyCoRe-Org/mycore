@@ -336,9 +336,9 @@ public class DummyServer implements SWORDServer {
 		
 		se.setNoOp(deposit.isNoOp());
 		
-		dr.setEntry(se);
+		se.setLocation("http://www.myrepository.ac.uk/atom/" + counter);
 		
-		dr.setLocation("http://www.myrepository.ac.uk/atom/" + counter);
+		dr.setEntry(se);
 		
 		return dr;
 	}

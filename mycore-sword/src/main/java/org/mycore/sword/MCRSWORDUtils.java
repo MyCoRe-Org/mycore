@@ -24,13 +24,22 @@
 package org.mycore.sword;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
+import org.purl.sword.atom.Summary;
+import org.purl.sword.atom.Title;
+import org.purl.sword.base.HttpHeaders;
+import org.purl.sword.base.SWORDErrorDocument;
 import org.purl.sword.server.SWORDServer;
 
 /**
@@ -200,5 +209,46 @@ public class MCRSWORDUtils {
             }
         }
         return null;
+    }
+    
+    /**
+     * Utility method to construct a SWORDErrorDocumentTest
+     * 
+     * @param errorURI
+     *            The error URI to pass
+     * @param status
+     *            The HTTP status to return
+     * @param summary
+     *            The textual description to give the user
+     * @param request
+     *            The HttpServletRequest object
+     * @param response
+     *            The HttpServletResponse to send the error document to
+     * @throws IOException
+     */
+    public static void makeErrorDocument(String errorURI, int status, String summary, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        SWORDErrorDocument sed = new SWORDErrorDocument(errorURI);
+        Title title = new Title();
+        title.setContent("ERROR");
+        sed.setTitle(title);
+        Calendar calendar = Calendar.getInstance();
+        String utcformat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+        SimpleDateFormat zulu = new SimpleDateFormat(utcformat);
+        String serializeddate = zulu.format(calendar.getTime());
+        sed.setUpdated(serializeddate);
+        Summary sum = new Summary();
+        sum.setContent(summary);
+        sed.setSummary(sum);
+        if (request.getHeader(HttpHeaders.USER_AGENT.toString()) != null) {
+            sed.setUserAgent(request.getHeader(HttpHeaders.USER_AGENT.toString()));
+        }
+        response.setStatus(status);
+        response.setContentType("application/atom+xml; charset=UTF-8");
+        String errorDocText = sed.marshall().toXML();
+        PrintWriter out = response.getWriter();
+        out.write(errorDocText);
+        out.flush();
+
+        LOG.debug(errorDocText);
     }
 }

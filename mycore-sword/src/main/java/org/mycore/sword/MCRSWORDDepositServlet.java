@@ -162,7 +162,7 @@ public class MCRSWORDDepositServlet extends MCRServlet {
             // Check the size is OK
             long fLength = request.getContentLength();
             if ((maxUploadSize != -1) && (fLength > maxUploadSize)) {
-                this.makeErrorDocument(ErrorCodes.MAX_UPLOAD_SIZE_EXCEEDED, HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE,
+                MCRSWORDUtils.makeErrorDocument(ErrorCodes.MAX_UPLOAD_SIZE_EXCEEDED, HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE,
                         "The uploaded file exceeded the maximum file size this server will accept (the file is " + fLength
                                 + " kB but the server will only accept files as large as " + maxUploadSize + " kB)", request, response);
                 return;
@@ -175,7 +175,7 @@ public class MCRSWORDDepositServlet extends MCRServlet {
             IOUtils.copy(fin, fout);
             if ((maxUploadSize != -1) && (file.length() > maxUploadSize)) {
                 LOG.info("max upload size exeeded: " + file.length());
-                this.makeErrorDocument(ErrorCodes.MAX_UPLOAD_SIZE_EXCEEDED, HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE,
+                MCRSWORDUtils.makeErrorDocument(ErrorCodes.MAX_UPLOAD_SIZE_EXCEEDED, HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE,
                         "The uploaded file exceeded the maximum file size this server will accept (the file is " + fLength
                                 + " kB but the server will only accept files as large as " + maxUploadSize + " kB)", request, response);
                 return;
@@ -189,7 +189,7 @@ public class MCRSWORDDepositServlet extends MCRServlet {
             LOG.debug("Received file checksum header: " + md5);
             if ((md5 != null) && (!md5.equals(receivedMD5))) {
                 // Return an error document
-                this.makeErrorDocument(ErrorCodes.ERROR_CHECKSUM_MISMATCH, HttpServletResponse.SC_PRECONDITION_FAILED,
+                MCRSWORDUtils.makeErrorDocument(ErrorCodes.ERROR_CHECKSUM_MISMATCH, HttpServletResponse.SC_PRECONDITION_FAILED,
                         "The received MD5 checksum for the deposited file did not match the checksum sent by the deposit client", request, response);
                 LOG.debug("Bad MD5 for file. Aborting with appropriate error message");
                 return;
@@ -279,8 +279,9 @@ public class MCRSWORDDepositServlet extends MCRServlet {
 
                 // Print out the Deposit Response
                 response.setStatus(dr.getHttpResponse());
-                if ((dr.getLocation() != null) && (!dr.getLocation().equals(""))) {
-                    response.setHeader("Location", dr.getLocation());
+                String location = dr.getEntry().getLocation();
+                if ((location != null) && (!location.isEmpty())) {
+                    response.setHeader("Location", location);
                 }
                 response.setContentType("application/atom+xml; charset=UTF-8");
                 PrintWriter out = response.getWriter();
@@ -297,7 +298,7 @@ public class MCRSWORDDepositServlet extends MCRServlet {
         } catch (SWORDErrorException see) {
             // Get the details and send the right SWORD error document
             LOG.error(see.getMessage());
-            this.makeErrorDocument(see.getErrorURI(), see.getStatus(), see.getDescription(), request, response);
+            MCRSWORDUtils.makeErrorDocument(see.getErrorURI(), see.getStatus(), see.getDescription(), request, response);
             return;
         } catch (SWORDException se) {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -319,46 +320,5 @@ public class MCRSWORDDepositServlet extends MCRServlet {
                 file.delete();
             }
         }
-    }
-
-    /**
-     * Utility method to construct a SWORDErrorDocumentTest
-     * 
-     * @param errorURI
-     *            The error URI to pass
-     * @param status
-     *            The HTTP status to return
-     * @param summary
-     *            The textual description to give the user
-     * @param request
-     *            The HttpServletRequest object
-     * @param response
-     *            The HttpServletResponse to send the error document to
-     * @throws IOException
-     */
-    protected void makeErrorDocument(String errorURI, int status, String summary, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        SWORDErrorDocument sed = new SWORDErrorDocument(errorURI);
-        Title title = new Title();
-        title.setContent("ERROR");
-        sed.setTitle(title);
-        Calendar calendar = Calendar.getInstance();
-        String utcformat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
-        SimpleDateFormat zulu = new SimpleDateFormat(utcformat);
-        String serializeddate = zulu.format(calendar.getTime());
-        sed.setUpdated(serializeddate);
-        Summary sum = new Summary();
-        sum.setContent(summary);
-        sed.setSummary(sum);
-        if (request.getHeader(HttpHeaders.USER_AGENT.toString()) != null) {
-            sed.setUserAgent(request.getHeader(HttpHeaders.USER_AGENT.toString()));
-        }
-        response.setStatus(status);
-        response.setContentType("application/atom+xml; charset=UTF-8");
-        String errorDocText = sed.marshall().toXML();
-        PrintWriter out = response.getWriter();
-        out.write(errorDocText);
-        out.flush();
-
-        LOG.debug(errorDocText);
     }
 }

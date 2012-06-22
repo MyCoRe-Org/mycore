@@ -135,7 +135,8 @@ public class MCRSWORDServiceDocumentServlet extends MCRServlet {
             }
         } catch (SWORDErrorException see) {
             // Return the relevant HTTP status code
-            response.sendError(see.getStatus(), see.getDescription());
+            LOG.error(see.getMessage());
+            MCRSWORDUtils.makeErrorDocument(see.getErrorURI(), see.getStatus(), see.getDescription(), request, response);
         } catch (SWORDException se) {
             se.printStackTrace();
             // Throw a HTTP 500

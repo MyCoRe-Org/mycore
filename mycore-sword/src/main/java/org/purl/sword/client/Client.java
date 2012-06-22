@@ -467,7 +467,7 @@ public class Client implements SWORDClient {
 					|| status.getCode() == HttpStatus.SC_CREATED) {
 				messageBody = EntityUtils.toString(httpresponse.getEntity());
 				response = new DepositResponse(status.getCode());
-				response.setLocation(httpresponse.getLastHeader("Location").getValue());
+				response.getEntry().setLocation(httpresponse.getLastHeader("Location").getValue());
 				// added call for the status code.
 				lastUnmarshallInfo = response.unmarshall(messageBody, new Properties());
             }

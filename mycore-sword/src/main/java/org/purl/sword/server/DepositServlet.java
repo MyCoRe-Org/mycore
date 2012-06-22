@@ -354,9 +354,10 @@ public class DepositServlet extends MCRServlet {
 	            
 	            // Print out the Deposit Response
 	            response.setStatus(dr.getHttpResponse());
-	            if ((dr.getLocation() != null) && (!dr.getLocation().equals("")))
+	            String location = dr.getEntry().getLocation();
+	            if ((location != null) && (!location.isEmpty()))
 	            {
-	                response.setHeader("Location", dr.getLocation());
+	                response.setHeader("Location", location);
 	            }
 	            response.setContentType("application/atom+xml; charset=UTF-8");
 	            PrintWriter out = response.getWriter();

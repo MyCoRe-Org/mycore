@@ -400,7 +400,7 @@ public class ServletClient extends HttpServlet {
 				request.setAttribute("userAgent", se.getUserAgent());
 				request.setAttribute("packaging", se.getPackaging());
 				request.setAttribute("links", se.getLinks());
-				request.setAttribute("location", resp.getLocation());
+				request.setAttribute("location", se.getLocation());
 				
 				// Set the ServiceDocument and associated values
 				request.getRequestDispatcher("deposit.jsp").forward(request, response);

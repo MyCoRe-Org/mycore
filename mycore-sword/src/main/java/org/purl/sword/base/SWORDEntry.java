@@ -84,6 +84,11 @@ public class SWORDEntry extends Entry
     * The packaging infomation
     */
    private SwordPackaging swordPackaging;
+   
+   /**
+    * The value to set in the Location header (typically the atom edit link)
+    */
+   private String location;
 
    /**
     * The logger.
@@ -217,8 +222,26 @@ public class SWORDEntry extends Entry
    {
       swordTreatment = new SwordTreatment(treatment);
    }
-   
+
    /**
+    * Retrieve the Location header.
+    * 
+    * @return The Location header
+    */
+   public String getLocation() {
+      return location;
+   }
+
+   /**
+    * Set the HTTP Location header. 
+    * 
+    * @param location The Location header. 
+    */
+   public void setLocation(String location) {
+      this.location = location;
+   }
+
+/**
     * Get the user agent
     * 
     * @return the user agent
