@@ -24,15 +24,23 @@
 package org.mycore.common.content.transformer;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
+import javax.xml.transform.sax.TransformerHandler;
 
+import org.jdom.Content;
+import org.jdom.DefaultJDOMFactory;
 import org.jdom.Document;
+import org.jdom.JDOMFactory;
+import org.jdom.Text;
 import org.jdom.transform.JDOMResult;
+import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 /**
  * Transforms XML content using a static XSL stylesheet.
@@ -48,18 +56,49 @@ import org.xml.sax.SAXException;
 public class MCRXSL2XMLTransformer extends MCRXSLTransformer {
 
     @Override
-    protected MCRContent transform(Transformer transformer, MCRContent source) throws TransformerException, IOException {
+    protected MCRContent transform(MCRContent source, XMLReader reader, TransformerHandler transformerHandler) throws IOException, SAXException {
         JDOMResult result = new JDOMResult();
-        transformer.transform(source.getSource(), result);
+        transformerHandler.setResult(result);
+        // Parse the source XML, and send the parse events to the
+        // TransformerHandler.
+        reader.parse(source.getInputSource());
+        Document resultDoc = getDocument(result);
+        if (resultDoc == null) {
+            throw new MCRConfigurationException("Stylesheets " + Arrays.asList(templateSources).toString() + " does not return any content for "
+                + source.getSystemId());
+        }
+        return new MCRJDOMContent(resultDoc);
+    }
+
+    private Document getDocument(JDOMResult result) {
         Document resultDoc = result.getDocument();
         if (resultDoc == null) {
-            try {
-                throw new TransformerException("Stylesheet " + templates.getSource().getSystemId() + " does not return any content for " + source.getSystemId());
-            } catch (SAXException e) {
-                throw new TransformerException("Stylesheet " + templates.toString() + " does not return any content for " + source.getSystemId());
+            //Sometimes a transformation produces whitespace strings
+            //JDOM would produce a empty document if it detects those
+            //So we remove them, if they exists.
+            @SuppressWarnings("unchecked")
+            List<Content> transformResult = result.getResult();
+            int origSize = transformResult.size();
+            Iterator<Content> iterator = transformResult.iterator();
+            while (iterator.hasNext()) {
+                Content content = iterator.next();
+                if (content instanceof Text) {
+                    String trimmedText = ((Text) content).getTextTrim();
+                    if (trimmedText.length() == 0) {
+                        iterator.remove();
+                    }
+                }
+            }
+            if (transformResult.size() < origSize) {
+                JDOMFactory f = result.getFactory();
+                if (f == null) {
+                    f = new DefaultJDOMFactory();
+                }
+                resultDoc = f.document(null);
+                resultDoc.setContent(transformResult);
             }
         }
-        return new MCRJDOMContent(result.getDocument());
+        return resultDoc;
     }
 
     @Override
