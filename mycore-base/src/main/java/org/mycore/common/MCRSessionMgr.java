@@ -27,6 +27,7 @@ import static org.mycore.common.events.MCRSessionEvent.Type.created;
 import static org.mycore.common.events.MCRSessionEvent.Type.destroyed;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +54,7 @@ import org.mycore.common.events.MCRSessionListener;
  */
 public class MCRSessionMgr {
 
-    private static Map<String, MCRSession> sessions = new HashMap<String, MCRSession>();
+    private static Map<String, MCRSession> sessions = Collections.synchronizedMap(new HashMap<String, MCRSession>());
 
     private static List<MCRSessionListener> listeners = new ArrayList<MCRSessionListener>();
 
