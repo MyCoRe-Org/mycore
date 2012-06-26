@@ -82,8 +82,7 @@ public class MCRExportServlet extends MCRServlet {
         }
         MCRExportCollection collection = createCollection(job.getRequest());
         fillCollection(job.getRequest(), collection);
-        MCRContent content = transformer.transform(collection.getContent());
-        sendResponse(job.getResponse(), content, transformer.getMimeType(), filename + "." + transformer.getFileExtension());
+        sendResponse(job.getResponse(), collection.getContent(), transformer, filename + "." + transformer.getFileExtension());
     }
 
     /**
@@ -133,14 +132,11 @@ public class MCRExportServlet extends MCRServlet {
     /**
      * Sends the resulting, transformed MCRContent to the client
      */
-    private void sendResponse(HttpServletResponse res, MCRContent content, String mimeType, String filename) throws IOException {
-        byte[] bytes = content.asByteArray();
-
+    private void sendResponse(HttpServletResponse res, MCRContent content, MCRContentTransformer transformer, String filename) throws IOException {
         res.setHeader("Content-Disposition", "inline;filename=\"" + filename + "\"");
-        res.setContentType(mimeType);
-        res.setContentLength(bytes.length);
+        res.setContentType(transformer.getMimeType());
         OutputStream out = res.getOutputStream();
-        out.write(bytes);
+        transformer.transform(content, out);
         out.flush();
         out.close();
     }
