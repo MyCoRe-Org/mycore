@@ -11,7 +11,7 @@
   <xsl:template match="mods:name[@type='personal']">
     <xsl:copy>
       <xsl:copy-of select="@*" />
-      <xsl:apply-templates mode="mods2mods" />
+      <xsl:apply-templates />
       <xsl:if test="not(mods:namePart[type='family']) and mods:displayForm">
         <xsl:call-template name="mods.seperateName">
           <xsl:with-param name="displayForm" select="mods:displayForm" />
