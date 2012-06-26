@@ -86,7 +86,7 @@ public abstract class MCRContentStore {
 
     /**
      * Stores the content of an MCRFile by reading from an
-     * MCRContentInputStream. Returns a StorageID to indentify the place where
+     * MCRContentInputStream. Returns a StorageID to identify the place where
      * the content was stored.
      * 
      * @param file
@@ -112,7 +112,7 @@ public abstract class MCRContentStore {
 
     /**
      * Stores the content of an MCRFile by reading from an
-     * MCRContentInputStream. Returns a StorageID to indentify the place where
+     * MCRContentInputStream. Returns a StorageID to identify the place where
      * the content was stored.
      * 
      * @param file
