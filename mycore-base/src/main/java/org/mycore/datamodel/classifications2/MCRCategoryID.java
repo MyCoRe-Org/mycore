@@ -24,7 +24,11 @@
 package org.mycore.datamodel.classifications2;
 
 import java.io.Serializable;
+import java.text.MessageFormat;
 import java.util.StringTokenizer;
+import java.util.regex.Pattern;
+
+import org.mycore.common.MCRException;
 
 /**
  * The composite identifier of a MCRCategory. If <code>rootID == ID</code> the
@@ -38,6 +42,12 @@ import java.util.StringTokenizer;
 public class MCRCategoryID implements Serializable {
 
     private static final long serialVersionUID = -5672923571406252855L;
+
+    private static Pattern validID = Pattern.compile("[^:$\\{\\}]+");
+
+    private static int ROOT_ID_LENGTH = 32;
+
+    private static int CATEG_ID_LENGTH = 128;
 
     private String rootID;
 
@@ -61,18 +71,18 @@ public class MCRCategoryID implements Serializable {
 
     public static MCRCategoryID rootID(String rootID) {
         String root = rootID.intern();
-        return new MCRCategoryID(root, "");
+        return new MCRCategoryID(root, null);
     }
-    
-    public static MCRCategoryID fromString(String categoryId){
-        StringTokenizer tok=new StringTokenizer(categoryId, ":");
-        String rootId=tok.nextToken();
-        if (!tok.hasMoreTokens()){
+
+    public static MCRCategoryID fromString(String categoryId) {
+        StringTokenizer tok = new StringTokenizer(categoryId, ":");
+        String rootId = tok.nextToken();
+        if (!tok.hasMoreTokens()) {
             return rootID(rootId);
         }
-        String categId=tok.nextToken();
-        if (tok.hasMoreTokens()){
-            throw new IllegalArgumentException("CategoryId is ambiguous: "+categoryId);
+        String categId = tok.nextToken();
+        if (tok.hasMoreTokens()) {
+            throw new IllegalArgumentException("CategoryId is ambiguous: " + categoryId);
         }
         return new MCRCategoryID(rootId, categId);
     }
@@ -141,6 +151,15 @@ public class MCRCategoryID implements Serializable {
      *            the ID to set
      */
     void setID(String id) {
+        if (id != null && id.length() > 0) {
+            if (!validID.matcher(id).matches()) {
+                throw new MCRException("category ID '" + id + "' is invalid and does not match: " + validID);
+            }
+            if (id.length() > CATEG_ID_LENGTH) {
+                throw new MCRException(MessageFormat.format("category ID ''{0}'' is more than {1} chracters long: {2}", id,
+                        CATEG_ID_LENGTH, id.length()));
+            }
+        }
         ID = id;
     }
 
@@ -156,6 +175,13 @@ public class MCRCategoryID implements Serializable {
      *            the rootID to set
      */
     void setRootID(String rootID) {
+        if (!validID.matcher(rootID).matches()) {
+            throw new MCRException(MessageFormat.format("classification ID ''{0}'' is invalid and does not match: {1}", rootID, validID));
+        }
+        if (rootID.length() > ROOT_ID_LENGTH) {
+            throw new MCRException(MessageFormat.format("classification ID ''{0}'' is more than {1} chracters long: {2}", rootID,
+                    ROOT_ID_LENGTH, rootID.length()));
+        }
         this.rootID = rootID.intern();
     }
 
