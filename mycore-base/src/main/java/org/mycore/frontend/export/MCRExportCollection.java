@@ -30,6 +30,7 @@ import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.frontend.basket.MCRBasket;
 import org.mycore.frontend.basket.MCRBasketEntry;
+import org.mycore.frontend.basket.MCRBasketXMLBuilder;
 
 /**
  * Represents a collection of XML data to export.
@@ -44,6 +45,8 @@ public class MCRExportCollection {
 
     /** The collection to export */
     private Element collection;
+
+    private static MCRBasketXMLBuilder basketBuilder = new MCRBasketXMLBuilder(true);
 
     public MCRExportCollection() {
         collection = new Element("exportCollection");
@@ -61,9 +64,8 @@ public class MCRExportCollection {
      * Adds the contents of the given basket.
      */
     public void add(MCRBasket basketOfMODS) throws Exception {
-        basketOfMODS.resolveContent();
         for (MCRBasketEntry entry : basketOfMODS) {
-            add(entry.getContent());
+            collection.addContent(basketBuilder.buildXML(entry));
         }
     }
 
