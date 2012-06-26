@@ -28,11 +28,11 @@ import org.jdom.Element;
 import org.mycore.common.MCRException;
 
 /**
- * This class implements all method for handling with the MCRMetaNumber part of
- * a metadata object. The MCRMetaNumber class present a number value in decimal
- * format and optional a type and a measurement. The number can has the format
- * like <em>xxxx.xxx</em> or <em>xxxx,xxx</em>. There was stored three
- * numbers after the dot and nine befor them. Also you can store an integer.
+ * Implements methods to handle MCRMetaNumber fields of a metadata object. 
+ * The MCRMetaNumber class presents a number value in decimal
+ * format and optional a type and a measurement. The number can have the format
+ * <em>xxxx.xxx</em> or <em>xxxx,xxx</em>. Only three digits after the dot, 
+ * and nine before are stored.
  * <p>
  * &lt;tag class="MCRMetaNumber" heritable="..."&gt; <br>
  * &lt;subtag type="..." xml:lang="..." measurement="..."&gt; <br>
@@ -59,9 +59,8 @@ final public class MCRMetaNumber extends MCRMetaDefault {
     private static final Logger LOGGER = Logger.getLogger(MCRMetaNumber.class);
 
     /**
-     * This is the constructor. <br>
-     * The language element was set to <b>en </b>. The number was set to zero,
-     * the measurement and the dimension was set to an empty string.
+     * Sets the language element to <b>en</b>, the number to zero,
+     * the measurement and the dimension to an empty string.
      */
     public MCRMetaNumber() {
         super();
@@ -69,7 +68,6 @@ final public class MCRMetaNumber extends MCRMetaDefault {
     }
 
     /**
-     * This is the constructor. <br>
      * The language element was set. If the value of <em>default_lang</em> is
      * null, empty or false <b>en </b> was set. The subtag element was set to
      * the value of <em>set_subtag<em>. If the value of <em>set_subtag</em>
@@ -209,11 +207,6 @@ final public class MCRMetaNumber extends MCRMetaDefault {
         return measurement;
     }
 
-    /**
-     * This method get the number element.
-     * 
-     * @return the number
-     */
     public final double getNumber() {
         return number;
     }
@@ -234,11 +227,11 @@ final public class MCRMetaNumber extends MCRMetaDefault {
     }
 
     /**
-     * This method create a XML stream for all data in this class, defined by
-     * the MyCoRe XML MCRNumber definition for the given subtag.
+     * This method creates an XML element containing all data in this instance, 
+     * as defined by the MyCoRe XML MCRNumber definition for the given subtag.
      * 
      * @exception MCRException
-     *                if the content of this class is not valid
+     *                if the content of this instance is not valid
      * @return a JDOM Element with the XML MCRNumber part
      */
     @Override
@@ -257,16 +250,13 @@ final public class MCRMetaNumber extends MCRMetaDefault {
         return elm;
     }
 
-    /**
-     * This method make a clone of this class.
-     */
     @Override
     public final MCRMetaNumber clone() {
         return new MCRMetaNumber(subtag, inherited, dimension, measurement, number);
     }
 
     /**
-     * This method put debug data to the logger (for the debug mode).
+     * Logs debug output.
      */
     @Override
     public final void debug() {
