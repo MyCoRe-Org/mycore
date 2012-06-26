@@ -23,6 +23,8 @@
 
 package org.mycore.common.content.transformer;
 
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.mycore.common.content.MCRContent;
 
@@ -37,7 +39,7 @@ public class MCRDebuggingTransformer extends MCRContentTransformer {
     private final static Logger LOGGER = Logger.getLogger(MCRDebuggingTransformer.class);
 
     @Override
-    public MCRContent transform(MCRContent source) throws Exception {
+    public MCRContent transform(MCRContent source) throws IOException {
         if (LOGGER.isDebugEnabled()) {
             if (!source.isReusable())
                 source = source.getReusableCopy();

@@ -23,7 +23,11 @@
 package org.mycore.common.content.transformer;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+
+import javax.xml.transform.TransformerException;
 
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
@@ -39,20 +43,35 @@ import org.mycore.common.fo.MCRFoFactory;
 public class MCRFopper extends MCRContentTransformer {
 
     @Override
-    public MCRContent transform(MCRContent source) throws Exception {
+    public MCRContent transform(MCRContent source) throws IOException {
         ByteArrayOutputStream pdf = new ByteArrayOutputStream();
         InputStream in = source.getInputStream();
-        MCRFoFactory.getFoFormatter().transform(in, pdf);
+        try {
+            MCRFoFactory.getFoFormatter().transform(in, pdf);
+        } catch (TransformerException e) {
+            throw new IOException(e);
+        }
         in.close();
         pdf.close();
         return new MCRByteContent(pdf.toByteArray());
     }
 
     @Override
+    public void transform(MCRContent source, OutputStream out) throws IOException {
+        InputStream in = source.getInputStream();
+        try {
+            MCRFoFactory.getFoFormatter().transform(in, out);
+        } catch (TransformerException e) {
+            throw new IOException(e);
+        }
+        in.close();
+    }
+
+    @Override
     public String getMimeType() {
         return "application/pdf";
     }
-    
+
     @Override
     protected String getDefaultExtension() {
         return "pdf";

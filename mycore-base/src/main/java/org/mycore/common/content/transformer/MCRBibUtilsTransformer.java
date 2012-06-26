@@ -24,6 +24,7 @@
 package org.mycore.common.content.transformer;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
@@ -57,7 +58,7 @@ public class MCRBibUtilsTransformer extends MCRContentTransformer {
     }
 
     @Override
-    public MCRContent transform(MCRContent source) throws Exception {
+    public MCRContent transform(MCRContent source) throws IOException {
         File modsFile = File.createTempFile("mods", ".xml");
         source.sendTo(modsFile);
         try {

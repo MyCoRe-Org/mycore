@@ -23,6 +23,7 @@
 
 package org.mycore.common.content.transformer;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -59,7 +60,7 @@ public class MCRTransformerPipe extends MCRContentTransformer {
     }
 
     @Override
-    public MCRContent transform(MCRContent content) throws Exception {
+    public MCRContent transform(MCRContent content) throws IOException {
         for (MCRContentTransformer transformer : transformers)
             content = transformer.transform(content);
 

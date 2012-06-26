@@ -25,6 +25,7 @@ package org.mycore.common.content.transformer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.LinkedList;
 
 import javax.xml.transform.Result;
@@ -76,7 +77,8 @@ public class MCRXSLTransformer extends MCRContentTransformer {
         if (transformerFactory.getFeature(SAXSource.FEATURE) && transformerFactory.getFeature(SAXResult.FEATURE)) {
             this.tFactory = (SAXTransformerFactory) transformerFactory;
         } else {
-            throw new MCRConfigurationException("Transformer Factory " + transformerFactory.getClass().getName() + " does not implement SAXTransformerFactory");
+            throw new MCRConfigurationException("Transformer Factory " + transformerFactory.getClass().getName()
+                    + " does not implement SAXTransformerFactory");
         }
     }
 
@@ -85,6 +87,10 @@ public class MCRXSLTransformer extends MCRContentTransformer {
         super.init(id);
         String property = "MCR.ContentTransformer." + id + ".Stylesheet";
         String[] stylesheets = MCRConfiguration.instance().getString(property).split(",");
+        setStylesheets(stylesheets);
+    }
+
+    public void setStylesheets(String... stylesheets) {
         this.templateSources = new MCRTemplatesSource[stylesheets.length];
         for (int i = 0; i < stylesheets.length; i++) {
             this.templateSources[i] = new MCRTemplatesSource(stylesheets[i].trim());
@@ -102,17 +108,24 @@ public class MCRXSLTransformer extends MCRContentTransformer {
     }
 
     @Override
-    public MCRContent transform(MCRContent source) throws Exception {
-        checkTemplateUptodate();
-        LinkedList<TransformerHandler> transformHandlerList = getTransformHandlerList();
-        XMLReader reader = XMLReaderFactory.createXMLReader();
-        reader.setEntityResolver(URI_RESOLVER);
-        reader.setContentHandler(transformHandlerList.getFirst());
-        TransformerHandler lastTransformerHandler = transformHandlerList.getLast();
-        return transform(source, reader, lastTransformerHandler);
+    public MCRContent transform(MCRContent source) throws IOException {
+        try {
+            checkTemplateUptodate();
+            LinkedList<TransformerHandler> transformHandlerList = getTransformHandlerList();
+            XMLReader reader = XMLReaderFactory.createXMLReader();
+            reader.setEntityResolver(URI_RESOLVER);
+            reader.setContentHandler(transformHandlerList.getFirst());
+            TransformerHandler lastTransformerHandler = transformHandlerList.getLast();
+            return transform(source, reader, lastTransformerHandler);
+        } catch (TransformerConfigurationException e) {
+            throw new IOException(e);
+        } catch (SAXException e) {
+            throw new IOException(e);
+        }
     }
 
-    protected MCRContent transform(MCRContent source, XMLReader reader, TransformerHandler transformerHandler) throws IOException, SAXException {
+    protected MCRContent transform(MCRContent source, XMLReader reader, TransformerHandler transformerHandler) throws IOException,
+            SAXException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         StreamResult serializer = new StreamResult(baos);
         transformerHandler.setResult(serializer);
@@ -120,6 +133,27 @@ public class MCRXSLTransformer extends MCRContentTransformer {
         // TransformerHandler.
         reader.parse(source.getInputSource());
         return new MCRByteContent(baos.toByteArray());
+    }
+
+    @Override
+    public void transform(MCRContent source, OutputStream out) throws IOException {
+        try {
+            checkTemplateUptodate();
+            LinkedList<TransformerHandler> transformHandlerList = getTransformHandlerList();
+            XMLReader reader = XMLReaderFactory.createXMLReader();
+            reader.setEntityResolver(URI_RESOLVER);
+            reader.setContentHandler(transformHandlerList.getFirst());
+            TransformerHandler lastTransformerHandler = transformHandlerList.getLast();
+            StreamResult result = new StreamResult(out);
+            lastTransformerHandler.setResult(result);
+            reader.parse(source.getInputSource());
+        } catch (TransformerConfigurationException e) {
+            throw new IOException(e);
+        } catch (IllegalArgumentException e) {
+            throw new IOException(e);
+        } catch (SAXException e) {
+            throw new IOException(e);
+        }
     }
 
     private LinkedList<TransformerHandler> getTransformHandlerList() throws TransformerConfigurationException {

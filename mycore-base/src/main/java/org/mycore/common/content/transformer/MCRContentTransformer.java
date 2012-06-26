@@ -23,6 +23,9 @@
 
 package org.mycore.common.content.transformer;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.content.MCRContent;
 
@@ -59,18 +62,22 @@ public abstract class MCRContentTransformer {
     }
 
     /** Transforms MCRContent. Subclasses implement different transformation methods */
-    public abstract MCRContent transform(MCRContent source) throws Exception;
+    public abstract MCRContent transform(MCRContent source) throws IOException;
+
+    public void transform(MCRContent source,OutputStream out) throws IOException {
+        transform(source).sendTo(out);
+    }
 
     /** Returns the MIME type of the transformed content, may return the default mime type */
     public String getMimeType() {
         return mimeType;
     }
-    
+
     /**
      * Returns the file extension that is usually related to the transformed content.
      * @return
      */
-    public String getFileExtension(){
+    public String getFileExtension() {
         return fileExtension;
     }
 

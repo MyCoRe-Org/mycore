@@ -23,10 +23,14 @@
 
 package org.mycore.common.content.transformer;
 
+import java.io.IOException;
+
+import org.jdom.JDOMException;
 import org.jdom.output.Format;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRXMLContent;
+import org.xml.sax.SAXParseException;
 
 /**
  * Transforms xml content in pretty, UTF-8 encoded format.
@@ -36,8 +40,15 @@ import org.mycore.common.content.MCRXMLContent;
 public class MCRToPrettyXML extends MCRContentTransformer {
 
     @Override
-    public MCRContent transform(MCRContent source) throws Exception {
-        MCRXMLContent content = (source instanceof MCRXMLContent ? (MCRXMLContent) source : new MCRJDOMContent(source.asXML()));
+    public MCRContent transform(MCRContent source) throws IOException {
+        MCRXMLContent content;
+        try {
+            content = (source instanceof MCRXMLContent ? (MCRXMLContent) source : new MCRJDOMContent(source.asXML()));
+        } catch (SAXParseException e) {
+            throw new IOException(e);
+        } catch (JDOMException e) {
+            throw new IOException(e);
+        }
         content.setFormat(Format.getPrettyFormat().setEncoding("UTF-8"));
         return content;
     }
