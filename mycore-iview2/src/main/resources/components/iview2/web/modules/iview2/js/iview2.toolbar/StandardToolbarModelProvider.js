@@ -61,7 +61,7 @@ StandardToolbarModelProvider.prototype = {
 		if (typeof iviewRef.properties.pdfCreatorURI !== "undefined" && iviewRef.properties.pdfCreatorURI.length>0){
 			//TODO: PDF check
 			curButtonset = this.model.addElement(new ToolbarButtonsetModel("pdfHandles"));
-			curButtonset.addButton(new ToolbarButtonModel("createPdf", {'type': 'buttonDefault'}, {'icons': {primary : 'iview2-icon iview2-icon-pdf'}}, "toolbar.pdf", true, false));
+			curButtonset.addButton(new ToolbarButtonModel("createPdf", {'type': 'buttonDefault'}, {'label' : "PDF"}, "toolbar.pdf", true, false));
 		}
 		
 		this.model.addElement(new ToolbarDividerModel("line"));
