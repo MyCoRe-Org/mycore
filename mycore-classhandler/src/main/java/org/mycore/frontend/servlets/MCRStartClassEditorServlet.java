@@ -66,16 +66,6 @@ public class MCRStartClassEditorServlet extends MCRServlet {
 
     private static Logger LOGGER = Logger.getLogger(MCRStartClassEditorServlet.class);
 
-    private String todo = "";
-
-    private String todo2 = "";
-
-    private String clid = "";
-
-    private String categid = "";
-
-    private String path = "";
-
     private static enum ReturnStatus {
         success, fail
     }
@@ -86,6 +76,11 @@ public class MCRStartClassEditorServlet extends MCRServlet {
      * date for the editor and second time it execute the operation.
      */
     public void think(MCRServletJob job) throws Exception {
+        String todo = "";
+        String todo2 = "";
+        String clid = "";
+        String categid = "";
+        String path = "";
 
         // read the XML data if given from Editorsession
         MCREditorSubmission sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));
@@ -124,16 +119,11 @@ public class MCRStartClassEditorServlet extends MCRServlet {
         String usererrorpage = pagedir + MCRConfiguration.instance().getString("MCR.classeditor_page_error_user", "editor_error_user.xml");
         String cancelpage = pagedir + MCRConfiguration.instance().getString("MCR.classeditor_page_cancel", "classeditor_cancel.xml");
         String icerrorpage = pagedir + MCRConfiguration.instance().getString("MCR.classeditor_page_error_id", "classeditor_error_clid.xml");
-        String iderrorpage = pagedir
-                + MCRConfiguration.instance().getString("MCR.classeditor_page_error_delete", "editor_error_delete.xml");
-        String imerrorpage = pagedir
-                + MCRConfiguration.instance().getString("MCR.classeditor_page_error_move", "classeditor_error_move.xml");
-        String imperrorpage = pagedir
-                + MCRConfiguration.instance().getString("MCR.classeditor_page_error_import", "classeditor_error_import.xml");
-        String isaveerrorpage = pagedir
-                + MCRConfiguration.instance().getString("MCR.classeditor_page_error_save", "classeditor_error_save.xml");
-        String ipurgeerrorpage = pagedir
-                + MCRConfiguration.instance().getString("MCR.classeditor_page_error_purge", "classeditor_error_purge.xml");
+        String iderrorpage = pagedir + MCRConfiguration.instance().getString("MCR.classeditor_page_error_delete", "editor_error_delete.xml");
+        String imerrorpage = pagedir + MCRConfiguration.instance().getString("MCR.classeditor_page_error_move", "classeditor_error_move.xml");
+        String imperrorpage = pagedir + MCRConfiguration.instance().getString("MCR.classeditor_page_error_import", "classeditor_error_import.xml");
+        String isaveerrorpage = pagedir + MCRConfiguration.instance().getString("MCR.classeditor_page_error_save", "classeditor_error_save.xml");
+        String ipurgeerrorpage = pagedir + MCRConfiguration.instance().getString("MCR.classeditor_page_error_purge", "classeditor_error_purge.xml");
 
         String referrer = job.getRequest().getHeader("Referer");
         if (referrer == null || referrer.equals("")) {
@@ -284,14 +274,13 @@ public class MCRStartClassEditorServlet extends MCRServlet {
             return;
         }
         // first call of editor, build the editor dialogue
-        if ("create-category".equals(todo) || "modify-category".equals(todo) || "create-classification".equals(todo)
-                || "modify-classification".equals(todo)) {
+        if ("create-category".equals(todo) || "modify-category".equals(todo) || "create-classification".equals(todo) || "modify-classification".equals(todo)) {
 
             String base = getBaseURL() + myfile;
             final String sessionObjectID = "classificationEditor";
             Properties params = new Properties();
             StringBuffer sb = new StringBuffer();
-            boolean isEdited = getClassificationEditor().isEdited(MCRCategoryID.rootID(clid));
+            boolean isEdited = clid.length() > 0 ? getClassificationEditor().isEdited(MCRCategoryID.rootID(clid)) : false;
             MCRCategory classif = null;
             if (isEdited) {
                 classif = getClassificationEditor().getClassification(MCRCategoryID.rootID(clid), false);
@@ -301,8 +290,7 @@ public class MCRStartClassEditorServlet extends MCRServlet {
             if ("modify-classification".equals(todo)) {
                 if (isEdited) {
                     sb.append("session:").append(sessionObjectID);
-                    MCRSessionMgr.getCurrentSession().put(sessionObjectID,
-                            MCRCategoryTransformer.getMetaDataDocument(classif, true).getRootElement());
+                    MCRSessionMgr.getCurrentSession().put(sessionObjectID, MCRCategoryTransformer.getMetaDataDocument(classif, true).getRootElement());
                 } else {
                     sb.append("classification:metadata:0:children:").append(clid);
                 }
@@ -347,8 +335,7 @@ public class MCRStartClassEditorServlet extends MCRServlet {
             if ("create-category".equals(todo)) {
                 if (isEdited) {
                     sb.append("session:").append(sessionObjectID);
-                    MCRSessionMgr.getCurrentSession().put(sessionObjectID,
-                            MCRCategoryTransformer.getMetaDataDocument(classif, true).getRootElement());
+                    MCRSessionMgr.getCurrentSession().put(sessionObjectID, MCRCategoryTransformer.getMetaDataDocument(classif, true).getRootElement());
                 } else {
                     sb.append("classification:metadata:0:children:").append(clid);
                 }
