@@ -1,5 +1,6 @@
 package org.mycore.datamodel.classifications;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -10,6 +11,8 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import org.jdom.Document;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
@@ -17,6 +20,8 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
+import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.frontend.cli.MCRObjectCommands;
 
 /**
@@ -189,7 +194,7 @@ public class MCRClassificationPool {
         if (categoryDAO.exist(mcrClassificationID)) {
             categoryDAO.deleteCategory(mcrClassificationID);
         }
-        
+
         classifications.remove(mcrClassificationID);
     }
 
@@ -209,6 +214,13 @@ public class MCRClassificationPool {
             return classif;
         } else {
             MCRCategory cl = categoryDAO.getCategory(clid, writeAccess ? -1 : 0);
+            //serialize and rebuild so that we do not work on database backed objects
+            Document serialized = MCRCategoryTransformer.getMetaDataDocument(cl, false);
+            try {
+                cl = MCRXMLTransformer.getCategory(serialized);
+            } catch (URISyntaxException e) {
+                throw new MCRException(e);
+            }
             return cl;
         }
     }
