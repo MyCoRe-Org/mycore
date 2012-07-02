@@ -112,7 +112,7 @@ public final class MCRURLRetriever {
                 }
                 String url = act.getURL(workflowData);
                 if (absolute && url.startsWith("/")) {
-                    url = MCRServlet.getBaseURL() + url;
+                    url = MCRServlet.getBaseURL() + url.substring(1);
                 }
                 return url;
             }
