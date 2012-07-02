@@ -529,14 +529,11 @@
     <xsl:choose>
       <xsl:when test="mcrxsl:resourceAvailable('actionmappings.xml')">
       <!-- URL mapping enabled -->
-        <xsl:variable name="url" select="actionmapping:getURLforID('update',$id)" xmlns:actionmapping="xalan://org.mycore.wfc.actionmapping.MCRURLRetriever" />
+        <xsl:variable name="url" select="actionmapping:getURLforID('update',$id,true)" xmlns:actionmapping="xalan://org.mycore.wfc.actionmapping.MCRURLRetriever" />
         <xsl:choose>
-          <xsl:when test="starts-with($url, '/')">
-            <xsl:value-of select="concat($WebApplicationBaseURL,substring-after($url, '/'),$HttpSession,'?id=',$id)" />
-          </xsl:when>
           <xsl:when test="string-length($url)=0" />
           <xsl:otherwise>
-            <xsl:value-of select="concat($url,'?id=',$id)" />
+            <xsl:value-of select="concat($url,$HttpSession,'?id=',$id)" />
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
