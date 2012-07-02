@@ -81,9 +81,7 @@ public class MCRShutdownHandler {
 
     private static final Set<Closeable> requests = Collections.synchronizedSet(new HashSet<Closeable>());
 
-    private static final String SYSTEM_NAME = MCRConfiguration.instance().getString("MCR.CommandLineInterface.SystemName", "MyCoRe");
-
-    private static final String system = SYSTEM_NAME + ":";
+    private static final String system = MCRConfiguration.instance().getString("MCR.CommandLineInterface.SystemName", "MyCoRe") + ":";
 
     private static boolean shuttingDown = false;
 
@@ -134,9 +132,10 @@ public class MCRShutdownHandler {
         }
         LOGGER.info(system + " closing any remaining MCRSession instances, please wait...\n");
         MCRSessionMgr.close();
-        LOGGER.info("Soo! muss " + SYSTEM_NAME + "\n");
+        LOGGER.info(system + " Goodbye, and remember: \"Alles wird gut.\"\n");
         LogManager.shutdown();
         // may be needed in webapp to release file handles correctly.
         Introspector.flushCaches();
     }
+
 }
