@@ -36,6 +36,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.wfc.MCRConstants;
 
 /**
@@ -65,7 +66,7 @@ public final class MCRURLRetriever {
         }
     }
 
-    public static String getURLforID(String action, String mcrID) {
+    public static String getURLforID(String action, String mcrID, boolean absolute) {
         final MCRObjectID objID = MCRObjectID.getInstance(mcrID);
         String collectionName = MCRClassificationUtils.getCollection(mcrID);
         WorkflowDataProvider wfDataProvider = new WorkflowDataProvider() {
@@ -77,10 +78,10 @@ public final class MCRURLRetriever {
                 return workflowData;
             }
         };
-        return getURL(action, collectionName, wfDataProvider);
+        return getURL(action, collectionName, wfDataProvider, absolute);
     }
 
-    public static String getURLforCollection(String action, String collection) {
+    public static String getURLforCollection(String action, String collection, boolean absolute) {
         WorkflowDataProvider wfDataProvider = new WorkflowDataProvider() {
             @Override
             public MCRWorkflowData getWorkflowData() {
@@ -88,19 +89,19 @@ public final class MCRURLRetriever {
                 return workflowData;
             }
         };
-        return getURL(action, collection, wfDataProvider);
+        return getURL(action, collection, wfDataProvider, absolute);
     }
 
-    private static String getURL(String action, String collectionName, WorkflowDataProvider wfDataProvider) {
+    private static String getURL(String action, String collectionName, WorkflowDataProvider wfDataProvider, boolean absolute) {
         MCRCollection collection = getCollectionWithAction(collectionName, action);
         if (collection == null) {
             LOGGER.warn(MessageFormat.format("Could not find action ''{0}'' in collection: {1}", action, collectionName));
             return null;
         }
-        return getURL(action, collection, wfDataProvider);
+        return getURL(action, collection, wfDataProvider, absolute);
     }
 
-    private static String getURL(String action, MCRCollection collection, WorkflowDataProvider wfDataProvider) {
+    private static String getURL(String action, MCRCollection collection, WorkflowDataProvider wfDataProvider, boolean absolute) {
         for (MCRAction act : collection.getActions()) {
             if (act.getAction().equals(action)) {
                 MCRWorkflowData workflowData = wfDataProvider.getWorkflowData();
@@ -109,7 +110,11 @@ public final class MCRURLRetriever {
                     String mcrId = categoryReference == null ? null : categoryReference.getObjectID();
                     LOGGER.debug(MessageFormat.format("Collection: {0}, Action: {1}, Object: {2}", collection.getName(), action, mcrId));
                 }
-                return act.getURL(workflowData);
+                String url = act.getURL(workflowData);
+                if (absolute && url.startsWith("/")) {
+                    url = MCRServlet.getBaseURL() + url;
+                }
+                return url;
             }
         }
         return null;

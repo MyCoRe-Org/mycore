@@ -45,8 +45,6 @@ import org.mycore.frontend.servlets.MCRServlet;
  */
 public class MCRPersistenceServletFilter implements Filter {
 
-    private MCRActionMappings actionMappings;
-
     private static final Logger LOGGER = Logger.getLogger(MCRPersistenceServletFilter.class);
 
     /* (non-Javadoc)
@@ -54,8 +52,6 @@ public class MCRPersistenceServletFilter implements Filter {
      */
     @Override
     public void destroy() {
-        // TODO Auto-generated method stub
-
     }
 
     /* (non-Javadoc)
@@ -108,9 +104,9 @@ public class MCRPersistenceServletFilter implements Filter {
             String mcrId = MCRServlet.getProperty(req, "id");
             if (mcrId == null) {
                 String collection = getCollection(req);
-                url = MCRURLRetriever.getURLforCollection(operation, collection);
+                url = MCRURLRetriever.getURLforCollection(operation, collection, false);
             } else {
-                url = MCRURLRetriever.getURLforID(operation, mcrId);
+                url = MCRURLRetriever.getURLforID(operation, mcrId, false);
             }
             LOGGER.info("Matched URL: " + url);
             return url;
@@ -135,11 +131,6 @@ public class MCRPersistenceServletFilter implements Filter {
      */
     @Override
     public void init(FilterConfig config) throws ServletException {
-        try {
-            //            actionMappings = MCRActionMappingsManager.getActionMappings();
-        } catch (Exception e) {
-            throw new ServletException(e);
-        }
     }
 
 }
