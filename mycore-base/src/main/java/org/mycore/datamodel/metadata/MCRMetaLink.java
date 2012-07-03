@@ -26,6 +26,7 @@ package org.mycore.datamodel.metadata;
 import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 
 import org.apache.log4j.Logger;
+import org.apache.xerces.util.XMLChar;
 import org.jdom.Element;
 import org.mycore.common.MCRException;
 
@@ -336,6 +337,13 @@ public class MCRMetaLink extends MCRMetaDefault {
             return false;
         }
 
+        if (label != null && label.length() > 0) {
+            if (!XMLChar.isValidNCName(label)) {
+                LOGGER.warn(getSubTag() + ": label is no valid NCName:" + label);
+                return false;
+            }
+        }
+
         if (linktype == null) {
             LOGGER.warn(getSubTag() + ": linktype is null");
             return false;
@@ -347,19 +355,25 @@ public class MCRMetaLink extends MCRMetaDefault {
         }
 
         if (linktype.equals("arc")) {
-            if (from.equals("")) {
+            if (from == null || from.length() == 0) {
                 LOGGER.warn(getSubTag() + ": from is null or empty");
+                return false;
+            } else if (!XMLChar.isValidNCName(from)) {
+                LOGGER.warn(getSubTag() + ": from is no valid NCName:" + from);
                 return false;
             }
 
-            if (to.equals("")) {
+            if (to == null || to.length() == 0) {
                 LOGGER.warn(getSubTag() + ": to is null or empty");
+                return false;
+            } else if (!XMLChar.isValidNCName(to)) {
+                LOGGER.warn(getSubTag() + ": to is no valid NCName:" + to);
                 return false;
             }
         }
 
         if (linktype.equals("locator")) {
-            if (href.equals("")) {
+            if (href == null || href.length() == 0) {
                 LOGGER.warn(getSubTag() + ": href is null or empty");
                 return false;
             }
