@@ -94,7 +94,7 @@ public final class MCRMetadataManager {
         // add the link to metadata
         final MCRMetaLinkID meta = mcrDerivate.getDerivate().getMetaLink();
         final MCRMetaLinkID der = new MCRMetaLinkID();
-        der.setReference(mcrDerivate.getId().toString(), mcrDerivate.getLabel(), "");
+        der.setReference(mcrDerivate.getId().toString(), null, mcrDerivate.getLabel());
         der.setSubTag("derobject");
         final byte[] backup = MCRXMLMetadataManager.instance().retrieveBLOB(meta.getXLinkHrefID());
 
@@ -517,7 +517,7 @@ public final class MCRMetadataManager {
         // add the link to metadata
         metaId = mcrDerivate.getDerivate().getMetaLink().getXLinkHrefID();
         final MCRMetaLinkID der = new MCRMetaLinkID();
-        der.setReference(mcrDerivate.getId().toString(), mcrDerivate.getLabel(), "");
+        der.setReference(mcrDerivate.getId().toString(), null, mcrDerivate.getLabel());
         der.setSubTag("derobject");
         MCRMetadataManager.addDerivateToObject(metaId, der);
     }
