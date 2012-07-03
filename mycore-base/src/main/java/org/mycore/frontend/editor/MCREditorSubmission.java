@@ -457,7 +457,10 @@ public class MCREditorSubmission {
 
                         Element current = null;
                         try {
-                            current = (Element) XPath.selectSingleNode(getXML(), path);
+                            XPath xpath = XPath.newInstance(path);
+                            for( Namespace namespace : getNamespaceMap().values() )
+                              xpath.addNamespace(namespace);
+                            current = (Element) xpath.selectSingleNode(getXML());
                         } catch (JDOMException ex) {
                             LOGGER.debug("Could not validate, because no element found at xpath " + path);
                             continue;
