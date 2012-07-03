@@ -111,7 +111,7 @@ public final class MCRURLRetriever {
                     LOGGER.debug(MessageFormat.format("Collection: {0}, Action: {1}, Object: {2}", collection.getName(), action, mcrId));
                 }
                 String url = act.getURL(workflowData);
-                if (absolute && url.startsWith("/")) {
+                if (absolute && url != null && url.startsWith("/")) {
                     url = MCRServlet.getBaseURL() + url.substring(1);
                 }
                 return url;
