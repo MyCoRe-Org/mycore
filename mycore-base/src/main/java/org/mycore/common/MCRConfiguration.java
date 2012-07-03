@@ -161,7 +161,13 @@ public class MCRConfiguration {
      * 
      */
     public final void systemModified() {
-        if (!lastModifiedFile.setLastModified(System.currentTimeMillis())) {
+        if(!lastModifiedFile.exists()) {
+            try {
+                createLastModifiedFile();
+            } catch(IOException ioException) {
+                throw new MCRException("Could not change modify date of file " + lastModifiedFile.getAbsolutePath(), ioException);
+            }
+        } else if (!lastModifiedFile.setLastModified(System.currentTimeMillis())) {
             throw new MCRException("Could not change modify date of file " + lastModifiedFile.getAbsolutePath());
         }
     }
@@ -185,6 +191,15 @@ public class MCRConfiguration {
         properties = new Properties();
         depr = new Properties();
         reload(true);
+        createLastModifiedFile();
+    }
+
+    /**
+     * Creates a new .systemTime file in MCR.datadir.
+     * 
+     * @throws IOException
+     */
+    protected void createLastModifiedFile() throws IOException {
         final String dataDirKey = "MCR.datadir";
         if (properties.containsKey(dataDirKey)) {
             lastModifiedFile = new File(getString(dataDirKey), ".systemTime");
@@ -206,7 +221,6 @@ public class MCRConfiguration {
                     fout.close();
                 }
             }
-
         }
     }
 
