@@ -42,24 +42,6 @@ import org.mycore.common.MCRException;
  * @version $Revision$ $Date$
  */
 public class MCRMetaLink extends MCRMetaDefault {
-    /** The length of XLink:type * */
-    public static final int MAX_XLINK_TYPE_LENGTH = 8;
-
-    /** The length of XLink:href * */
-    public static final int MAX_XLINK_HREF_LENGTH = 128;
-
-    /** The length of XLink:label * */
-    public static final int MAX_XLINK_LABEL_LENGTH = 128;
-
-    /** The length of XLink:title * */
-    public static final int MAX_XLINK_TITLE_LENGTH = 128;
-
-    /** The length of XLink:from * */
-    public static final int MAX_XLINK_FROM_LENGTH = MCRObjectID.MAX_LENGTH;
-
-    /** The length of XLink:to * */
-    public static final int MAX_XLINK_TO_LENGTH = MCRObjectID.MAX_LENGTH;
-
     // MetaLink data
     protected String href;
 
@@ -117,7 +99,7 @@ public class MCRMetaLink extends MCRMetaDefault {
         }
 
         href = set_href;
-        label = set_label;
+        setXLinkLabel(set_label);
         title = set_title;
     }
 
@@ -180,9 +162,10 @@ public class MCRMetaLink extends MCRMetaDefault {
      *            the xlink:label
      */
     public final void setXLinkLabel(String label) {
-        if (label != null) {
-            this.label = label;
+        if (label != null && !XMLChar.isValidNCName(label)) {
+            throw new MCRException("xlink:label is not a valid NCName: " + label);
         }
+        this.label = label;
     }
 
     /**
