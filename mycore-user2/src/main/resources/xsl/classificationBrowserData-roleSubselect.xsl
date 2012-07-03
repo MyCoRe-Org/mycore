@@ -49,7 +49,7 @@
             <xsl:value-of select="concat('&amp;subselect.webpage=',encoder:encode($subselect.webpage,'UTF-8'))" />
             <xsl:variable name="groupName">
               <xsl:choose>
-                <xsl:when test="../@classification=const:getGroupRootId()">
+                <xsl:when test="../@classification=const:getRoleRootId()">
                   <xsl:value-of select="@id"/>
                 </xsl:when>
                 <xsl:otherwise>
