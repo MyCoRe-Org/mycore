@@ -4,7 +4,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:noNamespaceSchemaLocation="MCRCondition.xsd">
   <boolean operator="or">
-    <condition value="admingroup" operator="=" field="group" />      
+    <condition value="admin" operator="=" field="group" />      
     <condition value="editorgroup1" operator="=" field="group" />
     <condition value="editorgroup2" operator="=" field="group" />            
   </boolean>

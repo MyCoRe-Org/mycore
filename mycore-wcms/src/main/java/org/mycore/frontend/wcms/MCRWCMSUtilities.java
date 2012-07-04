@@ -47,7 +47,8 @@ public class MCRWCMSUtilities {
     public static boolean writeAccess(String webpageID) {
         long startTime = System.currentTimeMillis();
         boolean access = MCRLayoutUtilities.getAccess(webpageID, getWritePermissionWebpage(), MCRLayoutUtilities.ONETRUE_ALLTRUE);
-        LOGGER.debug("checked write access for webpage=" + webpageID + "=" + access + ": took " + MCRLayoutUtilities.getDuration(startTime) + " msec.");
+        LOGGER.debug("checked write access for webpage=" + webpageID + "=" + access + ": took " + MCRLayoutUtilities.getDuration(startTime)
+                + " msec.");
         return access;
     }
 
@@ -148,7 +149,7 @@ public class MCRWCMSUtilities {
         while (childIter.hasNext()) {
             Element child = (Element) childIter.next();
             boolean access = false;
-            if (!userID.equals("")) {
+            if (userID != null && userID.length() > 0) {
                 access = MCRLayoutUtilities.itemAccess(getWritePermissionWebpage(), child, false, userID);
             } else
                 access = MCRLayoutUtilities.itemAccess(getWritePermissionWebpage(), child, false);

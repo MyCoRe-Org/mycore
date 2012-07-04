@@ -4,14 +4,14 @@
     <mcrpermission name="manage-readaccess-website" description="Right to manage read access of Website by Module-WCMS" ruledescription="For administrators only">
         <condition format="xml">
             <boolean operator="or">
-                <condition value="admingroup" operator="=" field="group" />
+                <condition value="admin" operator="=" field="group" />
             </boolean>
         </condition>
     </mcrpermission>
     <mcrpermission name="manage-wcmsaccess" description="Right to manage access for Module-WCMS by Module-WCMS" ruledescription="For administrators only">
         <condition format="xml">
             <boolean operator="or">
-                <condition value="admingroup" operator="=" field="group" />
+                <condition value="admin" operator="=" field="group" />
             </boolean>
         </condition>
     </mcrpermission>
