@@ -194,6 +194,7 @@ public class MCRSWFUploadHandlerMyCoRe extends MCRUploadHandler {
                 }
             }
         } catch (Exception e) {
+            LOGGER.error("while add mainfile entry", e);
         }
     }
 }
