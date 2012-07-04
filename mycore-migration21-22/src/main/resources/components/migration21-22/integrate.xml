@@ -1,4 +1,4 @@
-<project name="migration20-21" xmlns:mcr="antlib:org.mycore.buildtools">
+<project name="migration21-22" xmlns:mcr="antlib:org.mycore.buildtools">
   <import file="../../integrate.xml" />
   <!-- - - - - - - - - - - - - - - - - - 
           target: config                      
@@ -8,12 +8,6 @@
     <mcr:config action="addInclude"
                 propertyfile="${build.config}/mycore.properties"
                 key="MCR.CLI.Classes.Internal"
-                value="org.mycore.migration20_21.cli.MCRMigrationCommands21" />
-    <for param="table.class"
-         list="MCRXMLTABLE">
-      <sequential>
-        <AddHibernateMapping class="org.mycore.migration20_21.hibernate.@{table.class}" />
-      </sequential>
-    </for>
+                value="org.mycore.migration21_22.cli.MCRMigrationCommands22" />
   </target>
 </project>

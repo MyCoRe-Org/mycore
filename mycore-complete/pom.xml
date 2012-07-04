@@ -189,7 +189,7 @@
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
-      <artifactId>mycore-migration20-21</artifactId>
+      <artifactId>mycore-migration21-22</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
