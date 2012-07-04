@@ -145,7 +145,7 @@ public final class MCRMetadataManager {
      * @throws MCRActiveLinkException
      *             if current object links to nonexistent
      */
-    public static final void create(final MCRObject mcrObject) throws MCRPersistenceException, MCRActiveLinkException {
+    public static final void create(final MCRObject mcrObject) throws MCRPersistenceException {
         // exist the object?
         if (MCRMetadataManager.exists(mcrObject.getId())) {
             throw new MCRPersistenceException("The object " + mcrObject.getId() + " allready exists, nothing done.");
