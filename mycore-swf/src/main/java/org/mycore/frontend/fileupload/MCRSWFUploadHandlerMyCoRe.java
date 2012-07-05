@@ -95,7 +95,7 @@ public class MCRSWFUploadHandlerMyCoRe extends MCRUploadHandler {
      * Start Upload for MyCoRe
      */
     public void startUpload(int numFiles) throws Exception {
-        MCRObjectID ID = MCRObjectID.getInstance(docId);
+        MCRObjectID ID = MCRObjectID.getInstance(derId);
         File workdir = MCRSimpleWorkflowManager.instance().getDirectoryPath(ID.getBase());
         dirname = new File(workdir, derId);
     }

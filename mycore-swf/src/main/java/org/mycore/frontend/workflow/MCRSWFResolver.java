@@ -131,9 +131,11 @@ public class MCRSWFResolver implements URIResolver {
         ArrayList<String> workfiles;
         ArrayList<String> derifiles;
 
+        String derBase = base;
         if (base != null && MCRAccessManager.checkPermission("create-" + base)) {
             workfiles = WFM.getAllObjectFileNames(base);
-            derifiles = WFM.getAllDerivateFileNames(base);
+            derBase = new StringBuffer(base.substring(0, base.indexOf('_'))).append("_derivate").toString();
+            derifiles = WFM.getAllDerivateFileNames(derBase);
         } else {
             if (MCRAccessManager.checkPermission("create-" + type)) {
                 workfiles = WFM.getAllObjectFileNames(type);
@@ -144,12 +146,9 @@ public class MCRSWFResolver implements URIResolver {
             }
         }
 
-        File dirname = null;
-        if (base != null) {
-            dirname = WFM.getDirectoryPath(base);
-        } else {
-            dirname = WFM.getDirectoryPath(type);
-        }
+        File dirname = WFM.getDirectoryPath(type);
+        File derivateDirectory = derBase != null ? WFM.getDirectoryPath(derBase) : dirname;
+        File objectDirectory = base != null ? WFM.getDirectoryPath(base) : dirname;
 
         // read the derivate XML files
         ArrayList<String> derobjid = new ArrayList<String>();
@@ -169,7 +168,7 @@ public class MCRSWFResolver implements URIResolver {
         for (int i = 0; i < derifiles.size(); i++) {
             dername = (String) derifiles.get(i);
 
-            File derivateFile = new File(dirname, dername);
+            File derivateFile = new File(derivateDirectory, dername);
             mainfile = "";
             label = "Derivate of " + dername.substring(0, dername.length() - 4);
             objid = "";
@@ -254,7 +253,7 @@ public class MCRSWFResolver implements URIResolver {
         // run the loop over all objects in the workflow
         for (int i = 0; i < workfiles.size(); i++) {
             String wfile = (String) workfiles.get(i);
-            File wf = new File(dirname, wfile);
+            File wf = new File(objectDirectory, wfile);
             org.jdom.Element elm = null;
 
             try {
@@ -322,7 +321,7 @@ public class MCRSWFResolver implements URIResolver {
                             deriv.setAttribute("title", title);
                         }
 
-                        File dir = new File(dirname, derpath);
+                        File dir = new File(derivateDirectory, derpath);
                         LOGGER.debug("Derivate under " + dir.getName());
 
                         if (dir.isDirectory()) {

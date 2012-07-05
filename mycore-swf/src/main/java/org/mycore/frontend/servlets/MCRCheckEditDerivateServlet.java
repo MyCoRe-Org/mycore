@@ -117,7 +117,7 @@ public class MCRCheckEditDerivateServlet extends MCRCheckBase {
 
             // update data
             StringBuffer sb = new StringBuffer();
-            sb.append(WFM.getDirectoryPath(objID.getBase())).append(File.separator).append(derID.toString()).append(".xml");
+            sb.append(WFM.getDirectoryPath(derID.getBase())).append(File.separator).append(derID.toString()).append(".xml");
             MCRUtils.writeJDOMToFile(indoc, new File(sb.toString()));
             okay = true;
             url = getNextURL(objID, okay);

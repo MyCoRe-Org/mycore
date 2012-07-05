@@ -278,7 +278,7 @@ public class MCRSimpleWorkflowManager {
      *         false
      */
     public final boolean isDerivateOfObject(String filename, MCRObjectID ID) {
-        File dir = getDirectoryPath(ID.getBase());
+        File dir = getDirectoryPath(ID.getProjectId() + "_derivate");
         File fname = new File(dir, filename);
         org.jdom.Document workflow_in = null;
 
@@ -345,7 +345,7 @@ public class MCRSimpleWorkflowManager {
         }
 
         // remove derivate
-        ArrayList<String> derifiles = getAllDerivateFileNames(ID.getBase());
+        ArrayList<String> derifiles = getAllDerivateFileNames(ID.getProjectId() + "_derivate");
 
         for (int i = 0; i < derifiles.size(); i++) {
             String dername = derifiles.get(i);
@@ -373,7 +373,7 @@ public class MCRSimpleWorkflowManager {
     public final void deleteDerivateObject(MCRObjectID ID, MCRObjectID DID) {
         logger.debug("Delete the derivate " + DID.toString());
         // remove the XML file
-        String fn = getDirectoryPath(ID.getBase()) + File.separator + DID.toString();
+        String fn = getDirectoryPath(DID.getBase()) + File.separator + DID.toString();
         try {
             File fi = new File(fn + ".xml");
 
@@ -455,17 +455,18 @@ public class MCRSimpleWorkflowManager {
         if (!MCRMetadataManager.exists(ID)) {
             return false;
         }
-
-        ArrayList<String> derifiles = getAllDerivateFileNames(ID.getBase());
+        
+        String derivateBase = ID.getProjectId() + "_derivate";
+        ArrayList<String> derifiles = getAllDerivateFileNames(derivateBase);
 
         for (int i = 0; i < derifiles.size(); i++) {
             String dername = derifiles.get(i);
             logger.debug("Check the derivate file " + dername);
 
             if (isDerivateOfObject(dername, ID)) {
-                fn = getDirectoryPath(ID.getBase()) + File.separator + dername;
+                fn = getDirectoryPath(derivateBase) + File.separator + dername;
 
-                if (!loadDerivate(ID.toString(), fn)) {
+                if (!loadDerivate(ID, fn)) {
                     return false;
                 }
             }
@@ -485,11 +486,10 @@ public class MCRSimpleWorkflowManager {
     public final boolean commitDerivateObject(MCRObjectID ID) throws SAXParseException, IOException {
         String fn = getDirectoryPath(ID.getBase()) + File.separator + ID.toString() + ".xml";
 
-        return loadDerivate(ID.toString(), fn);
+        return loadDerivate(ID, fn);
     }
 
-    private boolean loadDerivate(String ID, String filename) throws SAXParseException, IOException {
-        final MCRObjectID objectID = MCRObjectID.getInstance(ID);
+    private boolean loadDerivate(MCRObjectID objectID, String filename) throws SAXParseException, IOException {
         if (MCRMetadataManager.exists(objectID)) {
             MCRDerivateCommands.updateFromFile(filename, false);
         } else {
