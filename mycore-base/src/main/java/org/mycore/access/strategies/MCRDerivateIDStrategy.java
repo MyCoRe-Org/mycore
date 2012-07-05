@@ -6,12 +6,9 @@ package org.mycore.access.strategies;
 import java.util.Collection;
 
 import org.mycore.datamodel.common.MCRLinkTableManager;
-import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
- * @author shermann
+ * @author Silvio Hermann
  */
 public class MCRDerivateIDStrategy implements MCRAccessCheckStrategy {
 
@@ -22,8 +19,9 @@ public class MCRDerivateIDStrategy implements MCRAccessCheckStrategy {
         }
         final Collection<String> l = MCRLinkTableManager.instance().getSourceOf(id, "derivate");
         if (l != null && !l.isEmpty()) {
-            return checkPermission(l.iterator().next(), "read");
+            return checkPermission(l.iterator().next(), permission);
         }
         return false;
     }
+
 }
