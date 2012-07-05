@@ -24,9 +24,10 @@
 package org.mycore.datamodel.ifs;
 
 import java.util.Hashtable;
+import java.util.Map;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRArgumentChecker;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
@@ -43,21 +44,32 @@ import org.mycore.common.MCRException;
  * @version $Revision$ $Date$
  */
 public class MCRContentStoreFactory {
+    private static final String CLASS_SUFFIX = ".Class";
+
+    private static final String CONFIG_PREFIX = "MCR.IFS.ContentStore.";
+
     /** Hashtable StoreID to MCRContentStore instance */
-    protected static Hashtable STORES;
+    protected static Hashtable<String, MCRContentStore> STORES = new Hashtable<String, MCRContentStore>();
 
     /** Hashtable StoreID to Class that implements MCRAudioVideoExtender */
-    protected static Hashtable EXTENDER_CLASSES;
-
-    /**
-     * Hashtable StoreID to MCRContentStore implementing
-     */
-    protected static Hashtable INDEX_STORES;
+    protected static Hashtable<String, Class<MCRAudioVideoExtender>> EXTENDER_CLASSES;
 
     /** The MCRContentStoreSelector implementation that will be used */
     protected static MCRContentStoreSelector STORE_SELECTOR;
 
     private static final Logger LOGGER = Logger.getLogger(MCRContentStoreFactory.class);
+
+    public static Map<String, MCRContentStore> getAvailableStores() {
+        Properties properties = MCRConfiguration.instance().getProperties(CONFIG_PREFIX);
+        for (Map.Entry<Object, Object> prop : properties.entrySet()) {
+            String key = prop.getKey().toString();
+            if (key.endsWith(CLASS_SUFFIX)) {
+                String storeID = key.replace(CONFIG_PREFIX, "").replace(CLASS_SUFFIX, "");
+                initStore(storeID);
+            }
+        }
+        return STORES;
+    }
 
     /**
      * Returns the MCRContentStore instance that is configured for this StoreID.
@@ -72,33 +84,29 @@ public class MCRContentStoreFactory {
      *             storeID
      */
     public static MCRContentStore getStore(String storeID) {
-        if (STORES == null) {
-            STORES = new Hashtable();
+        if (storeID == null || storeID.length() == 0) {
+            return null;
         }
-
-        if (INDEX_STORES == null) {
-            INDEX_STORES = new Hashtable();
-        }
-
-        MCRArgumentChecker.ensureNotEmpty(storeID, "Store ID");
-
         if (!STORES.containsKey(storeID)) {
-            try {
-                String storeClass = "MCR.IFS.ContentStore." + storeID + ".Class";
-                LOGGER.debug("getting StoreClass: " + storeClass);
-
-                Object obj = MCRConfiguration.instance().getInstanceOf(storeClass);
-                MCRContentStore s = (MCRContentStore) obj;
-                s.init(storeID);
-                STORES.put(storeID, s);
-
-            } catch (Exception ex) {
-                String msg = "Could not load MCRContentStore with store ID = " + storeID;
-                throw new MCRConfigurationException(msg, ex);
-            }
+            initStore(storeID);
         }
+        return STORES.get(storeID);
+    }
 
-        return (MCRContentStore) STORES.get(storeID);
+    private static void initStore(String storeID) {
+        try {
+            String storeClass = CONFIG_PREFIX + storeID + CLASS_SUFFIX;
+            LOGGER.debug("getting StoreClass: " + storeClass);
+
+            Object obj = MCRConfiguration.instance().getInstanceOf(storeClass);
+            MCRContentStore s = (MCRContentStore) obj;
+            s.init(storeID);
+            STORES.put(storeID, s);
+
+        } catch (Exception ex) {
+            String msg = "Could not load MCRContentStore with store ID = " + storeID;
+            throw new MCRConfigurationException(msg, ex);
+        }
     }
 
     /**
@@ -139,14 +147,15 @@ public class MCRContentStoreFactory {
      *             if the MCRAudioVideoExtender implementation class could not
      *             be loaded
      */
-    protected static Class getExtenderClass(String storeID) {
+    protected static Class<MCRAudioVideoExtender> getExtenderClass(String storeID) {
+        if (storeID == null || storeID.length() == 0) {
+            return null;
+        }
         if (EXTENDER_CLASSES == null) {
-            EXTENDER_CLASSES = new Hashtable();
+            EXTENDER_CLASSES = new Hashtable<String, Class<MCRAudioVideoExtender>>();
         }
 
-        MCRArgumentChecker.ensureNotNull(storeID, "store ID");
-
-        String storeClass = "MCR.IFS.AVExtender." + storeID + ".Class";
+        String storeClass = "MCR.IFS.AVExtender." + storeID + CLASS_SUFFIX;
 
         String value = MCRConfiguration.instance().getString(storeClass, "");
 
@@ -156,7 +165,8 @@ public class MCRContentStoreFactory {
 
         if (!EXTENDER_CLASSES.containsKey(storeID)) {
             try {
-                Class cl = Class.forName(value);
+                @SuppressWarnings("unchecked")
+                Class<MCRAudioVideoExtender> cl = (Class<MCRAudioVideoExtender>) Class.forName(value);
                 EXTENDER_CLASSES.put(storeID, cl);
             } catch (Exception ex) {
                 String msg = "Could not load AudioVideoExtender class " + value;
@@ -164,7 +174,7 @@ public class MCRContentStoreFactory {
             }
         }
 
-        return (Class) EXTENDER_CLASSES.get(storeID);
+        return EXTENDER_CLASSES.get(storeID);
     }
 
     /**
@@ -200,19 +210,15 @@ public class MCRContentStoreFactory {
      *             be loaded
      */
     static MCRAudioVideoExtender buildExtender(MCRFileReader file) {
-        MCRArgumentChecker.ensureNotNull(file, "file");
-
-        if (!providesAudioVideoExtender(file.getStoreID())) {
+        if (file == null || !providesAudioVideoExtender(file.getStoreID())) {
             return null;
         }
 
-        Class cl = getExtenderClass(file.getStoreID());
+        Class<MCRAudioVideoExtender> cl = getExtenderClass(file.getStoreID());
 
         try {
-            Object obj = cl.newInstance();
-            MCRAudioVideoExtender ext = (MCRAudioVideoExtender) obj;
+            MCRAudioVideoExtender ext = cl.newInstance();
             ext.init(file);
-
             return ext;
         } catch (Exception exc) {
             if (exc instanceof MCRException) {
