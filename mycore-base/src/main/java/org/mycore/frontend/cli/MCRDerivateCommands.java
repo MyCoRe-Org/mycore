@@ -373,13 +373,14 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
                 session.evict(fsNode);
                 if (!storeID.equals(currentStoreId)) {
                     //initialize current store
+                    currentStoreId = storeID;
+                    currentStore = availableStores.get(storeID);
                     if (fw != null) {
                         fw.close();
                     }
                     File outputFile = new File(targetDir, storeID + ".md5");
                     LOGGER.info("Writing to file: " + outputFile.getAbsolutePath());
                     fw = new FileWriter(outputFile);
-                    currentStore = availableStores.get(storeID);
                     if (currentStore instanceof MCRCStoreVFS) {
                         try {
                             currentStoreBaseDir = ((MCRCStoreVFS) currentStore).getBaseDir();
