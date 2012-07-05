@@ -19,12 +19,15 @@ package org.mycore.frontend.cli;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -34,10 +37,19 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Criteria;
+import org.hibernate.ScrollMode;
+import org.hibernate.ScrollableResults;
+import org.hibernate.Session;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.backend.filesystem.MCRCStoreVFS;
+import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.hibernate.tables.MCRFSNODES;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.events.MCREvent;
@@ -45,6 +57,8 @@ import org.mycore.common.events.MCREventManager;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.ifs.MCRContentStore;
+import org.mycore.datamodel.ifs.MCRContentStoreFactory;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFileImportExport;
@@ -84,87 +98,81 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         MCRCommand com = null;
 
         com = new MCRCommand("delete all derivates", "org.mycore.frontend.cli.MCRDerivateCommands.deleteAllDerivates",
-                "Removes all derivates from the repository");
+            "Removes all derivates from the repository");
         command.add(com);
 
         com = new MCRCommand("delete derivate from {0} to {1}", "org.mycore.frontend.cli.MCRDerivateCommands.delete String String",
-                "The command remove derivates in the number range between the MCRObjectID {0} and {1}.");
+            "The command remove derivates in the number range between the MCRObjectID {0} and {1}.");
         command.add(com);
 
         com = new MCRCommand("delete derivate {0}", "org.mycore.frontend.cli.MCRDerivateCommands.delete String",
-                "The command remove a derivate with the MCRObjectID {0}");
+            "The command remove a derivate with the MCRObjectID {0}");
         command.add(com);
 
         com = new MCRCommand("load derivate from file {0}", "org.mycore.frontend.cli.MCRDerivateCommands.loadFromFile String",
-                "The command add a derivate form the file {0} to the system.");
+            "The command add a derivate form the file {0} to the system.");
         command.add(com);
 
         com = new MCRCommand("update derivate from file {0}", "org.mycore.frontend.cli.MCRDerivateCommands.updateFromFile String",
-                "The command update a derivate form the file {0} in the system.");
+            "The command update a derivate form the file {0} in the system.");
         command.add(com);
 
-        com = new MCRCommand("load all derivates from directory {0}",
-                "org.mycore.frontend.cli.MCRDerivateCommands.loadFromDirectory String",
-                "The command load all derivates form the directory {0} to the system.");
+        com = new MCRCommand("load all derivates from directory {0}", "org.mycore.frontend.cli.MCRDerivateCommands.loadFromDirectory String",
+            "The command load all derivates form the directory {0} to the system.");
         command.add(com);
 
-        com = new MCRCommand("update all derivates from directory {0}",
-                "org.mycore.frontend.cli.MCRDerivateCommands.updateFromDirectory String",
-                "The command update all derivates form the directory {0} in the system.");
+        com = new MCRCommand("update all derivates from directory {0}", "org.mycore.frontend.cli.MCRDerivateCommands.updateFromDirectory String",
+            "The command update all derivates form the directory {0} in the system.");
         command.add(com);
 
-        com = new MCRCommand(
-                "export derivate from {0} to {1} to directory {2} with {3}",
-                "org.mycore.frontend.cli.MCRDerivateCommands.export String String String String",
-                "The command store all derivates with MCRObjectID's between {0} and {1} to the directory {2} with the stylesheet {3}-object.xsl. For {3} save is the default.");
+        com = new MCRCommand("export derivate from {0} to {1} to directory {2} with {3}",
+            "org.mycore.frontend.cli.MCRDerivateCommands.export String String String String",
+            "The command store all derivates with MCRObjectID's between {0} and {1} to the directory {2} with the stylesheet {3}-object.xsl. For {3} save is the default.");
         command.add(com);
 
-        com = new MCRCommand(
-                "export derivate {0} to directory {1} with {2}",
-                "org.mycore.frontend.cli.MCRDerivateCommands.export String String String",
-                "The command store the derivate with the MCRObjectID {0} to the directory {1} with the stylesheet {2}-object.xsl. For {2} save is the default.");
+        com = new MCRCommand("export derivate {0} to directory {1} with {2}", "org.mycore.frontend.cli.MCRDerivateCommands.export String String String",
+            "The command store the derivate with the MCRObjectID {0} to the directory {1} with the stylesheet {2}-object.xsl. For {2} save is the default.");
         command.add(com);
 
-        com = new MCRCommand("export all derivates to directory {0} with {1}",
-                "org.mycore.frontend.cli.MCRDerivateCommands.exportAllDerivates String String",
-                "Stores all derivates to the directory {0} with the stylesheet mcr_{1}-derivate.xsl. For {1} save is the default.");
+        com = new MCRCommand("export all derivates to directory {0} with {1}", "org.mycore.frontend.cli.MCRDerivateCommands.exportAllDerivates String String",
+            "Stores all derivates to the directory {0} with the stylesheet mcr_{1}-derivate.xsl. For {1} save is the default.");
         command.add(com);
 
         com = new MCRCommand("export all derivates of project {0} to directory {1} with {2}",
-                "org.mycore.frontend.cli.MCRDerivateCommands.exportAllDerivatesOfProject String String String",
-                "Stores all derivates of project {0} to the directory {1} with the stylesheet mcr_{2}-derivate.xsl. For {2} save is the default.");
+            "org.mycore.frontend.cli.MCRDerivateCommands.exportAllDerivatesOfProject String String String",
+            "Stores all derivates of project {0} to the directory {1} with the stylesheet mcr_{2}-derivate.xsl. For {2} save is the default.");
         command.add(com);
 
-        com = new MCRCommand("show loadable derivate of {0} to directory {1}",
-                "org.mycore.frontend.cli.MCRDerivateCommands.show String String",
-                "The command store the derivate with the MCRObjectID {0} to the directory {1}, without ifs-metadata");
+        com = new MCRCommand("show loadable derivate of {0} to directory {1}", "org.mycore.frontend.cli.MCRDerivateCommands.show String String",
+            "The command store the derivate with the MCRObjectID {0} to the directory {1}, without ifs-metadata");
         command.add(com);
 
-        com = new MCRCommand("show loadable derivate of {0} to directory {1}",
-                "org.mycore.frontend.cli.MCRDerivateCommands.show String String",
-                "The command store the derivate with the MCRObjectID {0} to the directory {1}, without ifs-metadata");
+        com = new MCRCommand("show loadable derivate of {0} to directory {1}", "org.mycore.frontend.cli.MCRDerivateCommands.show String String",
+            "The command store the derivate with the MCRObjectID {0} to the directory {1}, without ifs-metadata");
         command.add(com);
 
         com = new MCRCommand("repair derivate search of type derivate", "org.mycore.frontend.cli.MCRDerivateCommands.repairDerivateSearch",
-                "The command read the Content store and reindex the derivate search stores.");
+            "The command read the Content store and reindex the derivate search stores.");
         command.add(com);
 
-        com = new MCRCommand("repair derivate search of ID {0}",
-                "org.mycore.frontend.cli.MCRDerivateCommands.repairDerivateSearchForID String",
-                "The command read the Content store for MCRObjectID {0} and reindex the derivate search store.");
+        com = new MCRCommand("repair derivate search of ID {0}", "org.mycore.frontend.cli.MCRDerivateCommands.repairDerivateSearchForID String",
+            "The command read the Content store for MCRObjectID {0} and reindex the derivate search store.");
         command.add(com);
 
         com = new MCRCommand("synchronize all derivates", "org.mycore.frontend.cli.MCRDerivateCommands.synchronizeAllDerivates",
-                "The command read each derivate and synchronize the xlink:label with the derivate entry of the mycoreobject.");
+            "The command read each derivate and synchronize the xlink:label with the derivate entry of the mycoreobject.");
         command.add(com);
 
-        com = new MCRCommand("synchronize derivate with ID {0}",
-                "org.mycore.frontend.cli.MCRDerivateCommands.synchronizeDerivateForID String",
-                "The command read a derivate with the MCRObjectID {0} and synchronize the xlink:label with the derivate entry of the mycoreobject.");
+        com = new MCRCommand("synchronize derivate with ID {0}", "org.mycore.frontend.cli.MCRDerivateCommands.synchronizeDerivateForID String",
+            "The command read a derivate with the MCRObjectID {0} and synchronize the xlink:label with the derivate entry of the mycoreobject.");
         command.add(com);
 
         com = new MCRCommand("link derivate {0} to {1}", "org.mycore.frontend.cli.MCRDerivateCommands.linkDerivateToObject String String",
-                "links the given derivate {0} to the given mycore object {1}");
+            "links the given derivate {0} to the given mycore object {1}");
+        command.add(com);
+
+        com = new MCRCommand("generate md5sum files in directory {0}", "org.mycore.frontend.cli.MCRDerivateCommands.writeMD5SumFile String",
+            "writes md5sum files for every content store in directory {0}");
         command.add(com);
     }
 
@@ -338,6 +346,66 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      */
     public static boolean updateFromFile(String file, boolean importMode) throws SAXParseException, IOException {
         return processFromFile(new File(file), true, importMode);
+    }
+
+    public static void writeMD5SumFile(String targetDirectory) throws IOException {
+        File targetDir = new File(targetDirectory);
+        if (!targetDir.isDirectory()) {
+            throw new IllegalArgumentException("Target directory " + targetDir.getAbsolutePath() + " is not a directory.");
+        }
+        Session session = MCRHIBConnection.instance().getSession();
+        Criteria criteria = session.createCriteria(MCRFSNODES.class);
+        criteria.addOrder(Order.asc("storeid"));
+        criteria.addOrder(Order.asc("storageid"));
+        criteria.add(Restrictions.eq("type", "F"));
+        ScrollableResults fsnodes = criteria.scroll(ScrollMode.FORWARD_ONLY);
+        Map<String, MCRContentStore> availableStores = MCRContentStoreFactory.getAvailableStores();
+        String currentStoreId = null;
+        MCRContentStore currentStore = null;
+        File currentStoreBaseDir = null;
+        FileWriter fw = null;
+        try {
+            while (fsnodes.next()) {
+                MCRFSNODES fsNode = (MCRFSNODES) fsnodes.get(0);
+                String storeID = fsNode.getStoreid();
+                String storageID = fsNode.getStorageid();
+                String md5 = fsNode.getMd5();
+                session.evict(fsNode);
+                if (!storeID.equals(currentStoreId)) {
+                    //initialize current store
+                    if (fw != null) {
+                        fw.close();
+                    }
+                    File outputFile = new File(targetDir, storeID + ".md5");
+                    LOGGER.info("Writing to file: " + outputFile.getAbsolutePath());
+                    fw = new FileWriter(outputFile);
+                    currentStore = availableStores.get(storeID);
+                    if (currentStore instanceof MCRCStoreVFS) {
+                        try {
+                            currentStoreBaseDir = ((MCRCStoreVFS) currentStore).getBaseDir();
+                        } catch (Exception e) {
+                            LOGGER.warn("Could not get baseDir of store: " + storeID, e);
+                            currentStoreBaseDir = null;
+                        }
+                    } else {
+                        currentStoreBaseDir = null;
+                    }
+                }
+                String path = currentStoreBaseDir != null ? new File(currentStoreBaseDir, storageID).getAbsolutePath() : storageID;
+                //current store initialized
+                String line = MessageFormat.format("{0}  {1}\n", md5, path);
+                fw.write(line);
+            }
+        } finally {
+            if (fw != null) {
+                try {
+                    fw.close();
+                } catch (IOException e1) {
+                    LOGGER.warn("Error while closing file.", e1);
+                }
+            }
+            session.clear();
+        }
     }
 
     /**
@@ -526,8 +594,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         List<String> ids = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
         List<String> cmds = new ArrayList<String>(ids.size());
         for (String id : ids) {
-            cmds.add(new StringBuilder("export derivate ").append(id).append(" to directory ").append(dirname).append(" with ")
-                    .append(style).toString());
+            cmds.add(new StringBuilder("export derivate ").append(id).append(" to directory ").append(dirname).append(" with ").append(style).toString());
         }
         return cmds;
     }
@@ -555,8 +622,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         for (String id : ids) {
             if (!id.startsWith(project))
                 continue;
-            cmds.add(new StringBuilder("export derivate ").append(id).append(" to directory ").append(dirname).append(" with ")
-                    .append(style).toString());
+            cmds.add(new StringBuilder("export derivate ").append(id).append(" to directory ").append(dirname).append(" with ").append(style).toString());
         }
         return cmds;
     }
@@ -570,8 +636,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * @throws TransformerException
      * @throws IOException
      */
-    private static void exportDerivate(File dir, Transformer trans, String nid) throws FileNotFoundException, TransformerException,
-            IOException {
+    private static void exportDerivate(File dir, Transformer trans, String nid) throws FileNotFoundException, TransformerException, IOException {
         // store the XML file
         Document xml = null;
         MCRDerivate obj;

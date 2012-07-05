@@ -23,8 +23,11 @@
 
 package org.mycore.backend.filesystem;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.apache.commons.vfs.FileContent;
 import org.apache.commons.vfs.FileObject;
@@ -126,6 +129,17 @@ public class MCRCStoreVFS extends MCRContentStore {
 
     protected FileObject getBase() throws FileSystemException {
         return fsManager.resolveFile(uri, opts);
+    }
+
+    public File getBaseDir() throws FileSystemException, URISyntaxException {
+        URI baseURI = getBase().getURL().toURI();
+        if ("file".equals(baseURI.getScheme())) {
+            File baseDir = new File(baseURI);
+            return baseDir;
+        } else {
+            LOGGER.warn("Base URI is not a file URI: " + baseURI.toString());
+            return null;
+        }
     }
 
     @Override
