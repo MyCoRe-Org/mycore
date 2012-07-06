@@ -40,6 +40,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRHibTestCase;
+import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -222,5 +223,13 @@ public class MCRUserManagerTest extends MCRHibTestCase {
         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
         xout.output(exportableXML, System.out);
     }
+    
+   @Test
+   public final void testLoadTestUser(){
+       Element input = MCRURIResolver.instance().resolve("resource:test-user.xml");
+       MCRUser mcrUser = MCRUserTransformer.buildMCRUser(input);
+       mcrUser.setUserName("junit2");
+       MCRUserManager.createUser(mcrUser);
+   }
 
 }

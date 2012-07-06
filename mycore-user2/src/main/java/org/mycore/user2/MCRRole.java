@@ -44,7 +44,6 @@ import org.mycore.datamodel.classifications2.MCRLabel;
 public class MCRRole {
 
     /** The unique role name */
-    @XmlAttribute
     private String name;
 
     /** The labels of the role */
@@ -75,6 +74,7 @@ public class MCRRole {
      * 
      * @return the roles's name
      */
+    @XmlAttribute
     public String getName() {
         return name;
     }
