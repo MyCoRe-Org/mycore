@@ -1558,7 +1558,7 @@
         <hidden var="parents/@notinherit" default="true" />
         <hidden var="parents/@heritable" default="false" />
         <hidden var="parents/parent/@xlink:type" default="locator" />
-        <hidden var="parents/parent/@xlink:label" />
+        <hidden var="parents/parent/@xlink:title" />
         <hidden var="parents/parent/@xlink:href" />
         <hidden var="parents/parent/@editor.parentName" />
         <cell col="1" row="1" style="width:85px;" anchor="NORTHEAST">
@@ -1582,7 +1582,7 @@
         <hidden var="parents/@notinherit" default="true" />
         <hidden var="parents/@heritable" default="false" />
         <hidden var="parents/parent/@xlink:type" default="locator" />
-        <hidden var="parents/parent/@xlink:label" />
+        <hidden var="parents/parent/@xlink:title" />
         <hidden var="parents/parent/@xlink:href" />
         <hidden var="parents/parent/@editor.parentName" />
         <cell col="1" row="1" style="width:145px;" anchor="NORTHEAST">
