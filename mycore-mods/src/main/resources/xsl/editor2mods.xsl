@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:mcr="http://www.mycore.org/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xalan="http://xml.apache.org/xalan" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:mcrmods="xalan://org.mycore.mods.MCRMODSClassificationSupport"
-  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:gnd="http://d-nb.info/gnd/" xmlns:java="http://xml.apache.org/xalan/java"
-  exclude-result-prefixes="gnd rdf mcrmods mcr xalan java" version="1.0">
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:gnd="http://d-nb.info/standards/elementset/gnd#" xmlns:java="http://xml.apache.org/xalan/java"
+  exclude-result-prefixes="gnd rdf mcrmods mcr xalan java" version="1.0" xmlns:ex="http://exslt.org/dates-and-times" 
+    extension-element-prefixes="ex">
 
   <xsl:include href="copynodes.xsl" />
   <xsl:include href="editor2mods-external.xsl" />
@@ -121,8 +122,16 @@
       <xsl:variable name="trimmedValue" select="java:trim(string(nameOrPND))" />
       <xsl:choose>
         <xsl:when test="string-length($trimmedValue)&lt;11 and string(number(translate($trimmedValue,'-','')))!='NaN'">
+          <xsl:variable name="gndURL" select="concat('http://d-nb.info/gnd/',$trimmedValue,'/about/rdf')"/>
           <!-- PND -->
-          <xsl:variable name="gndEntry" select="document(concat('http://d-nb.info/gnd/',$trimmedValue,'/about/rdf'))" />
+          <xsl:message>
+            <xsl:value-of select="concat($gndURL,' ',ex:date-time())"/>
+          </xsl:message>
+          <xsl:variable name="gndEntry" select="document($gndURL)" />
+          <xsl:message>
+            <xsl:value-of select="ex:date-time()"/>
+            <xsl:value-of select="count($gndEntry/*)"/>
+          </xsl:message>
           <xsl:attribute name="type">
             <xsl:choose>
               <xsl:when test="$gndEntry//gnd:preferredNameForTheCorporateBody">
@@ -140,7 +149,8 @@
             <xsl:value-of select="concat('http://d-nb.info/gnd/',$trimmedValue)" />
           </xsl:attribute>
           <mods:displayForm>
-            <xsl:value-of select="$gndEntry//gnd:preferredNameForThePerson[not(@rdf:parseType)]|$gndEntry//gnd:preferredNameForTheCorporateBody" />
+            <xsl:value-of select="$gndEntry//gnd:preferredNameForThePerson[not(@rdf:parseType)]"/>
+            <xsl:value-of select="$gndEntry//gnd:preferredNameForTheCorporateBody" />
           </mods:displayForm>
         </xsl:when>
         <xsl:otherwise>
