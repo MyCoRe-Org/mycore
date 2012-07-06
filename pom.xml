@@ -783,6 +783,29 @@
         <scope>runtime</scope>
         <version>1.4</version>
       </dependency>
+      <dependency>
+        <groupId>com.sun.jersey</groupId>
+        <artifactId>jersey-server</artifactId>
+        <version>1.1.5.1</version>
+      </dependency>
+      <dependency>
+        <groupId>com.sun.jersey</groupId>
+        <artifactId>jersey-test-framework</artifactId>
+        <version>1.1.5.1</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.sun.jersey.contribs</groupId>
+        <artifactId>jersey-apache-client</artifactId>
+        <version>1.1.5.1</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>javax.annotation</groupId>
+        <artifactId>jsr250-api</artifactId>
+        <version>1.0</version>
+        <type>jar</type>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <developers>
@@ -1148,6 +1171,7 @@
     <module>mycore-broadcasting</module>
     <module>mycore-buildtools</module>
     <module>mycore-classbrowser</module>
+    <module>mycore-classeditor</module>
     <module>mycore-classhandler</module>
     <module>mycore-doubletfinder</module>
     <module>mycore-importer</module>
