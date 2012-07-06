@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MyCoReWebPage>
+<MyCoReWebPage>
+    <section xml:lang="all" title="Classification Editor">
+        <classificationEditor />
+    </section>
+    <meta>
+        <log date="2011-06-01" time="11:24" labelPath="Classification Editor" lastEditor="Administrator" />
+    </meta>
+</MyCoReWebPage>

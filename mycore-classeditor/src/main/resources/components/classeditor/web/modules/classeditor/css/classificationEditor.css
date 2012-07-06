@@ -1,0 +1,196 @@
+@CHARSET "UTF-8";
+
+.align-right {
+	float: right;
+}
+
+.classeditorDialog {
+	width: 1120px;
+}
+.classeditorDialog .dijitDialogPaneContent {
+	padding: 0px;
+}
+.claro .dijitDialogUnderlay {
+	background-color: black;
+}
+
+.classeditor {
+	height: 700px;
+}
+.classeditor.dijitContentPane {
+	padding: 0px;
+}
+
+.classeditor .treePane {
+	width: 440px;
+}
+
+.classeditor .treePane > .dijitContainer {
+	width: 100%;
+	height: 100%;
+	position: relative;
+}
+
+.classeditor .treePane > .dijitContainer > .dijitContentPane {
+	padding: 0px;
+}
+
+.classeditor .treePane > .dijitContainer > .dijitToolbar {
+	border: 1px solid #cccccc;
+	margin-top: 5px;
+}
+
+.classeditor .categoryEditorMainTable {
+	padding: 5px;
+	width: 100%;
+}
+
+.classeditor .categoryEditorMainTable .dijitTextBox {
+	width: 98%;
+}
+
+.classeditor .categoryEditorMainTable .dijitSelect {
+	width: 98%;
+}
+.classeditor .categoryEditorMainTable .dijitSelect .dijitButtonContents {
+	width: 100%;
+}
+
+.classeditor .categoryEditorDescription {
+	padding-top: 4px;
+	width: 100px;
+	vertical-align: top;
+	text-align: left;
+	font-weight: bold;
+}
+
+.classeditor .categoryEditorValue {
+	text-align: right;
+}
+
+.classeditor .labelEditorTable {
+	text-align: center;
+	width: 100%;
+}
+
+.classeditor .labelEditorTable th {
+	font-weight: normal;
+}
+.classeditor .labelEditorTable .button {
+	text-align: right;
+	width: 32px;
+}
+
+.settingsDialog {
+	width: 450px;
+}
+.settingsDialog .dijitDialogTitle {
+	padding: 0 1px 0 20px;
+	background-image: url(../img/settings_16.png);
+	background-repeat: no-repeat;
+}
+.settingsDialog h1 {
+	font-size: 14px;
+}
+.settingsDialog .dijitTextBox {
+	width: 332px;
+}
+.settingsDialog label {
+	padding-left: 5px;
+}
+.confirmImportDialog {
+	width: 600px;
+	font-size: 110%;
+}
+
+.exportDialog .dijitDialogTitle {
+	padding: 0 1px 0 20px;
+	background-image: url(../img/classification_16.png);
+	background-repeat: no-repeat;
+}
+.exportDialog .content .classTextArea {
+	width: 600px;
+	height: 400px;
+}
+.exportDialog .content .exportButton {
+	display: block;
+}
+
+/*******************************************************
+* Icons
+********************************************************/
+.icon12 {
+	background-repeat: no-repeat;
+	background-position: center center;
+	width: 12px;
+	height: 12px;
+}
+.icon16 {
+	background-repeat: no-repeat;
+	background-position: center center;
+	width: 16px;
+	height: 16px;
+}
+.icon22 {
+	background-repeat: no-repeat;
+	background-position: center center;
+	width: 22px;
+	height: 22px;
+}
+.addIcon12 {
+	background-image: url(../img/add_12.png);
+}
+.removeIcon12 {
+	background-image: url(../img/remove_12.png);
+}
+.addIcon16 {
+	background-image: url(../img/add_16.png);
+}
+.addDisabledIcon16 {
+	background-image: url(../img/addDisabled_16.png);
+}
+.removeIcon16 {
+	background-image: url(../img/remove_16.png);
+}
+.removeDisabledIcon16 {
+	background-image: url(../img/removeDisabled_16.png);
+}
+.exportClassIcon16 {
+	background-image: url(../img/classification_16.png);
+}
+.exportClassDisabledIcon16 {
+	background-image: url(../img/classificationDisabled_16.png);
+}
+.root {
+	background-image: url(../img/root_22.png);
+}
+.classification {
+	background-image: url(../img/classification_22.png);
+}
+.category {
+	background-image: url(../img/category_22.png);
+}
+.category2 {
+	background-image: url(../img/category2_22.png);
+}
+.saveIcon {
+	background-image: url(../img/save_16.png);
+}
+.saveDisabledIcon {
+	background-image: url(../img/saveDisabled_16.png);
+}
+.settingsIcon {
+	background-image: url(../img/settings_16.png);
+}
+.folder {
+	background-image: url(../img/folder_16.png);
+}
+.refreshIcon {
+	background-image: url(../img/refresh_16.png);
+}
+.loading {
+	backgroundImage: url(../img/loading.gif);
+	backgroundPosition: center center;
+	backgroundRepeat: no-repeat;
+	height: 100%;
+}

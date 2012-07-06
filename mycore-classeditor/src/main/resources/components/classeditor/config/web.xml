@@ -1,0 +1,4 @@
+
+<listener>
+  <listener-class>org.mycore.frontend.classeditor.listener.MCRClassificationListener</listener-class>
+</listener>
