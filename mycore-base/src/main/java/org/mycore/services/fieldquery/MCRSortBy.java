@@ -69,6 +69,8 @@ public class MCRSortBy {
      * 
      * @see #ASCENDING
      * @see #DESCENDING
+     * 
+     * @return true when order is {@link MCRSortBy#ASCENDING} or false whenorder is {@link MCRSortBy#DESCENDING} 
      */
     public boolean getSortOrder() {
         return order;
