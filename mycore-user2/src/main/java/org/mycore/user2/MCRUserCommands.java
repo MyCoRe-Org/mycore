@@ -136,7 +136,12 @@ public class MCRUserCommands extends MCRAbstractCommands {
         com = new MCRCommand("import user from file {0}", "org.mycore.user2.MCRUserCommands.importUserFromFile String",
             "The command imports a user from file {0}.");
         command.add(com);
+        
+        com = new MCRCommand("update user from file {0}", "org.mycore.user2.MCRUserCommands.updateUserFromFile String",
+                "The command imports a user from file {0}.");
+        command.add(com);
     }
+    
 
     /**
      * This command changes the user of the session context to a new user.
