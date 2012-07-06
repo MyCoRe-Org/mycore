@@ -138,7 +138,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         addCommand(com);
         
         com = new MCRCommand("update user from file {0}", "org.mycore.user2.MCRUserCommands.updateUserFromFile String",
-                "The command imports a user from file {0}.");
+                "The command updates a user from file {0}.");
         addCommand(com);
     }
     
