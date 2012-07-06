@@ -280,24 +280,20 @@ public class MCRMetaLink extends MCRMetaDefault {
     public org.jdom.Element createXML() throws MCRException {
         Element elm = super.createXML();
         elm.setAttribute("type", linktype, XLINK_NAMESPACE);
+        
+        if (title != null) {
+            elm.setAttribute("title", title, XLINK_NAMESPACE);
+        }
 
+        if (label != null) {
+            elm.setAttribute("label", label, XLINK_NAMESPACE);
+        }
+        
         if (linktype.equals("locator")) {
             elm.setAttribute("href", href, XLINK_NAMESPACE);
-
-            if (label != null && (label = label.trim()).length() != 0) {
-                elm.setAttribute("label", label, XLINK_NAMESPACE);
-            }
-
-            if (title != null && (title = title.trim()).length() != 0) {
-                elm.setAttribute("title", title, XLINK_NAMESPACE);
-            }
         } else {
             elm.setAttribute("from", from, XLINK_NAMESPACE);
             elm.setAttribute("to", to, XLINK_NAMESPACE);
-
-            if (title != null && (title = title.trim()).length() != 0) {
-                elm.setAttribute("title", title, XLINK_NAMESPACE);
-            }
         }
 
         return elm;

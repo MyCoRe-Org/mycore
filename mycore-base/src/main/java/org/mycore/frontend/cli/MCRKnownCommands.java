@@ -17,6 +17,7 @@
 
 package org.mycore.frontend.cli;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -32,6 +33,8 @@ import org.mycore.common.MCRConfigurationException;
  */
 public class MCRKnownCommands {
 
+    private static final String ANNOTATED = "Annotated";
+
     private final static Logger LOGGER = Logger.getLogger(MCRKnownCommands.class);
 
     private static List<MCRCommand> commands = new ArrayList<MCRCommand>();
@@ -41,6 +44,7 @@ public class MCRKnownCommands {
             initBuiltInCommands();
             initConfiguredCommands("Internal");
             initConfiguredCommands("External");
+            initConfiguredCommands(ANNOTATED);
         } catch (Exception ex) {
             MCRCLIExceptionHandler.handleException(ex);
             System.exit(1);
@@ -74,25 +78,61 @@ public class MCRKnownCommands {
     private void initConfiguredCommands(String type) {
         String prefix = "MCR.CLI.Classes." + type;
         Properties p = MCRConfiguration.instance().getProperties(prefix);
+        MCRCLIClassType cliClassType = null;
+        
+        if(ANNOTATED.equals(type)){
+            cliClassType = new MCRAnnotatedCLIClass();
+        }else{
+            cliClassType = new MCRDefaultCLIClass();
+        }
 
         for (Object propertyName : p.keySet()) {
             String[] classNames = MCRConfiguration.instance().getString((String) propertyName, "").split(",");
-
+            
+            
             for (String className : classNames) {
                 className = className.trim();
                 if (className.isEmpty())
                     continue;
 
                 LOGGER.debug("Will load commands from the " + type.toLowerCase() + " class " + className);
-                addKnownCommandsFromClass(className);
+                cliClassType.add(className);
             }
         }
     }
+    
+    public interface MCRCLIClassType{
+        public void add(String className);
+    }
+    
+    private class MCRAnnotatedCLIClass implements MCRCLIClassType{
+        @Override
+        public void add(String className) {
+            try {
+                Class<?> cliClass = Class.forName(className);
+                Method[] methods = cliClass.getMethods();
+                for (Method method : methods) {
+                    if(method.isAnnotationPresent(org.mycore.frontend.cli.annotation.MCRCommand.class)){
+                        commands.add(new MCRCommand(method));
+                    }
+                }
+            } catch (ClassNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        
+    }
+    
+    private class MCRDefaultCLIClass implements MCRCLIClassType{
 
-    private void addKnownCommandsFromClass(String className) {
-        Object obj = buildInstanceOfClass(className);
-        ArrayList<MCRCommand> commandsToAdd = ((MCRExternalCommandInterface) obj).getPossibleCommands();
-        commands.addAll(commandsToAdd);
+        @Override
+        public void add(String className) {
+            Object obj = buildInstanceOfClass(className);
+            ArrayList<MCRCommand> commandsToAdd = ((MCRExternalCommandInterface) obj).getPossibleCommands();
+            commands.addAll(commandsToAdd);
+        }
+        
     }
 
     private Object buildInstanceOfClass(String className) {

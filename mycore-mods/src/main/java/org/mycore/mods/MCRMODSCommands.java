@@ -59,9 +59,9 @@ public class MCRMODSCommands extends MCRAbstractCommands {
 
     public MCRMODSCommands() {
         super();
-        command.add(new MCRCommand("load all mods documents from directory {0} for project {1}", CMD_CLASS + "loadFromDirectory String String",
+        addCommand(new MCRCommand("load all mods documents from directory {0} for project {1}", CMD_CLASS + "loadFromDirectory String String",
             "Load all MODS documents as MyCoRe Objects for project {1} from directory {0}"));
-        command.add(new MCRCommand("load mods document from file {0} for project {1}", CMD_CLASS + "loadFromFile String String",
+        addCommand(new MCRCommand("load mods document from file {0} for project {1}", CMD_CLASS + "loadFromFile String String",
             "Load MODS document {0} as MyCoRe Object for project {1}"));
     }
 

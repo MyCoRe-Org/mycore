@@ -93,52 +93,52 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
 
         com = new MCRCommand("build mets files for type {0}", "org.mycore.frontend.cli.MCRMetsModsCommands.buildMetsForType String",
                 "Create the mets.xml file in the derivate directory of given type.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("build mets files for Object {0}",
                 "org.mycore.frontend.cli.MCRMetsModsCommands.buildMetsForMCRObjectID String",
                 "Create the mets.xml file for all derivates for the given object ID.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("build mets files for Derivate {0}",
                 "org.mycore.frontend.cli.MCRMetsModsCommands.buildMetsForMCRDerivateID String",
                 "Create the mets.xml file in the derivate of the given derivate ID.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("build mets files", "org.mycore.frontend.cli.MCRMetsModsCommands.buildMets",
                 "Create the mets.xml file in the derivate directory.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("check mets files for type {0} with exclude label {1}",
                 "org.mycore.frontend.cli.MCRMetsModsCommands.checkMetsForType String String", "Check mets files for given type.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("check mets files for type {0}", "org.mycore.frontend.cli.MCRMetsModsCommands.checkMetsForType String",
                 "Check mets files for given type.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("check mets files for Object {0} with exclude label {1}",
                 "org.mycore.frontend.cli.MCRMetsModsCommands.checkMetsForMCRObjectID String String", "Check mets files for given object.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("check mets files for Object {0}",
                 "org.mycore.frontend.cli.MCRMetsModsCommands.checkMetsForMCRObjectID String", "Check mets files for given object ID.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("check mets files for Derivate {0}",
                 "org.mycore.frontend.cli.MCRMetsModsCommands.checkMetsForMCRDerivateID String", "Check mets files for given derivate ID.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("check mets files", "org.mycore.frontend.cli.MCRMetsModsCommands.checkMets", "Check the mets.xml file.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("remove mets files", "org.mycore.frontend.cli.MCRMetsModsCommands.removeMets", "Remove all mets files.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("add file {0} to mets document in {1}",
                 "org.mycore.frontend.cli.MCRMetsModsCommands.addFileToMets String String",
                 "Adds the given file with name {0} to the mets document contained in derivate {1}.");
-        command.add(com);
+        addCommand(com);
     }
 
     /**

@@ -40,7 +40,7 @@ abstract public class MCRAbstractCommands implements MCRExternalCommandInterface
     protected static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
     /** The array holding all known commands */
-    protected ArrayList<MCRCommand> command = null;
+    private ArrayList<MCRCommand> command = null;
 
     private String displayName;
 
@@ -48,7 +48,11 @@ abstract public class MCRAbstractCommands implements MCRExternalCommandInterface
      * The constructor.
      */
     protected MCRAbstractCommands() {
-        command = new ArrayList<MCRCommand>();
+        init();
+    }
+
+    private void init() {
+        setCommand(new ArrayList<MCRCommand>());
     }
 
     /**
@@ -56,7 +60,7 @@ abstract public class MCRAbstractCommands implements MCRExternalCommandInterface
      *            a human readable name for this collection of commands
      */
     protected MCRAbstractCommands(String displayName) {
-        command = new ArrayList<MCRCommand>();
+        init();
         this.displayName = displayName;
     }
 
@@ -68,7 +72,7 @@ abstract public class MCRAbstractCommands implements MCRExternalCommandInterface
      * @return a command pair RArrayList
      */
     public ArrayList<MCRCommand> getPossibleCommands() {
-        return command;
+        return getCommand();
     }
 
     @Override
@@ -79,5 +83,21 @@ abstract public class MCRAbstractCommands implements MCRExternalCommandInterface
     @Override
     public void setDisplayName(String s) {
         this.displayName = s;
+    }
+    
+    public void addCommand(MCRCommand cmd){
+        if(getCommand() == null){
+            init();
+        }
+        
+        getCommand().add(cmd);
+    }
+
+    private ArrayList<MCRCommand> getCommand() {
+        return command;
+    }
+
+    private void setCommand(ArrayList<MCRCommand> command) {
+        this.command = command;
     }
 }

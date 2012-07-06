@@ -57,7 +57,7 @@ public final class MCRGoogleSitemapCommands extends MCRAbstractCommands {
         MCRCommand com = null;
 
         com = new MCRCommand("build google sitemap", "org.mycore.frontend.indexbrowser.MCRGoogleSitemapCommands.buildSitemap", "Create the google sitemap(s) in the webapps directory.");
-        command.add(com);
+        addCommand(com);
     }
 
     /**

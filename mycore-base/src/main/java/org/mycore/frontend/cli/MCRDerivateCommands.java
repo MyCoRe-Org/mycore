@@ -99,81 +99,81 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
         com = new MCRCommand("delete all derivates", "org.mycore.frontend.cli.MCRDerivateCommands.deleteAllDerivates",
             "Removes all derivates from the repository");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("delete derivate from {0} to {1}", "org.mycore.frontend.cli.MCRDerivateCommands.delete String String",
             "The command remove derivates in the number range between the MCRObjectID {0} and {1}.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("delete derivate {0}", "org.mycore.frontend.cli.MCRDerivateCommands.delete String",
             "The command remove a derivate with the MCRObjectID {0}");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("load derivate from file {0}", "org.mycore.frontend.cli.MCRDerivateCommands.loadFromFile String",
             "The command add a derivate form the file {0} to the system.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("update derivate from file {0}", "org.mycore.frontend.cli.MCRDerivateCommands.updateFromFile String",
             "The command update a derivate form the file {0} in the system.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("load all derivates from directory {0}", "org.mycore.frontend.cli.MCRDerivateCommands.loadFromDirectory String",
             "The command load all derivates form the directory {0} to the system.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("update all derivates from directory {0}", "org.mycore.frontend.cli.MCRDerivateCommands.updateFromDirectory String",
             "The command update all derivates form the directory {0} in the system.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("export derivate from {0} to {1} to directory {2} with {3}",
             "org.mycore.frontend.cli.MCRDerivateCommands.export String String String String",
             "The command store all derivates with MCRObjectID's between {0} and {1} to the directory {2} with the stylesheet {3}-object.xsl. For {3} save is the default.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("export derivate {0} to directory {1} with {2}", "org.mycore.frontend.cli.MCRDerivateCommands.export String String String",
             "The command store the derivate with the MCRObjectID {0} to the directory {1} with the stylesheet {2}-object.xsl. For {2} save is the default.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("export all derivates to directory {0} with {1}", "org.mycore.frontend.cli.MCRDerivateCommands.exportAllDerivates String String",
             "Stores all derivates to the directory {0} with the stylesheet mcr_{1}-derivate.xsl. For {1} save is the default.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("export all derivates of project {0} to directory {1} with {2}",
             "org.mycore.frontend.cli.MCRDerivateCommands.exportAllDerivatesOfProject String String String",
             "Stores all derivates of project {0} to the directory {1} with the stylesheet mcr_{2}-derivate.xsl. For {2} save is the default.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("show loadable derivate of {0} to directory {1}", "org.mycore.frontend.cli.MCRDerivateCommands.show String String",
             "The command store the derivate with the MCRObjectID {0} to the directory {1}, without ifs-metadata");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("show loadable derivate of {0} to directory {1}", "org.mycore.frontend.cli.MCRDerivateCommands.show String String",
             "The command store the derivate with the MCRObjectID {0} to the directory {1}, without ifs-metadata");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("repair derivate search of type derivate", "org.mycore.frontend.cli.MCRDerivateCommands.repairDerivateSearch",
             "The command read the Content store and reindex the derivate search stores.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("repair derivate search of ID {0}", "org.mycore.frontend.cli.MCRDerivateCommands.repairDerivateSearchForID String",
             "The command read the Content store for MCRObjectID {0} and reindex the derivate search store.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("synchronize all derivates", "org.mycore.frontend.cli.MCRDerivateCommands.synchronizeAllDerivates",
             "The command read each derivate and synchronize the xlink:label with the derivate entry of the mycoreobject.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("synchronize derivate with ID {0}", "org.mycore.frontend.cli.MCRDerivateCommands.synchronizeDerivateForID String",
             "The command read a derivate with the MCRObjectID {0} and synchronize the xlink:label with the derivate entry of the mycoreobject.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("link derivate {0} to {1}", "org.mycore.frontend.cli.MCRDerivateCommands.linkDerivateToObject String String",
             "links the given derivate {0} to the given mycore object {1}");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("generate md5sum files in directory {0}", "org.mycore.frontend.cli.MCRDerivateCommands.writeMD5SumFile String",
             "writes md5sum files for every content store in directory {0}");
-        command.add(com);
+        addCommand(com);
     }
 
     /**
@@ -820,7 +820,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             if (link.getXLinkHref().equals(mid.toString())) {
                 String oldlabel = link.getXLinkLabel();
                 if (oldlabel != null && !oldlabel.trim().equals(label)) {
-                    obj.getStructure().getDerivate(i).setXLinkLabel(label);
+                    obj.getStructure().getDerivate(i).setXLinkTitle(label);
                     isset = true;
                 }
                 break;

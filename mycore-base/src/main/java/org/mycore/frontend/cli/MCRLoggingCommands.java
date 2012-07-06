@@ -23,7 +23,7 @@ public class MCRLoggingCommands extends MCRAbstractCommands {
                 "org.mycore.frontend.cli.MCRLoggingCommands.changeLogLevel String String",
                 "{0} the package or class name for which to change the log level, {1} the log level to set. If the log level cannot be read it is set to DEBUG by default.");
 
-        command.add(com);
+        addCommand(com);
     }
 
     /**

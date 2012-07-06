@@ -74,9 +74,9 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
 
     public MCRSearcherCommands() {
         super();
-        command.add(new MCRCommand("rebuild metadata index", "org.mycore.frontend.cli.MCRSearcherCommands.repairMetaIndex", "Repairs metadata index"));
-        command.add(new MCRCommand("rebuild content index", "org.mycore.frontend.cli.MCRSearcherCommands.repairContentIndex", "Repairs metadata index"));
-        command.add(new MCRCommand("save searchfields of index {0} to stylesheet file {1}",
+        addCommand(new MCRCommand("rebuild metadata index", "org.mycore.frontend.cli.MCRSearcherCommands.repairMetaIndex", "Repairs metadata index"));
+        addCommand(new MCRCommand("rebuild content index", "org.mycore.frontend.cli.MCRSearcherCommands.repairContentIndex", "Repairs metadata index"));
+        addCommand(new MCRCommand("save searchfields of index {0} to stylesheet file {1}",
             "org.mycore.frontend.cli.MCRSearcherCommands.saveXSL String String", "Generates XSL file {0} that is used to index metadata."));
     }
 

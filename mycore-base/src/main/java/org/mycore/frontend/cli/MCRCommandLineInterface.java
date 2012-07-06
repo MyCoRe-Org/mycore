@@ -103,6 +103,8 @@ public class MCRCommandLineInterface {
             if (commandQueue.isEmpty()) {
                 if (interactiveMode) {
                     command = prompt.readCommand();
+                } else if (MCRConfiguration.instance().getString("MCR.CommandLineInterface.unitTest", "false").equals("true")) {
+                    break;
                 } else {
                     exit();
                 }
@@ -169,7 +171,7 @@ public class MCRCommandLineInterface {
         } catch (Exception ex) {
             MCRCLIExceptionHandler.handleException(ex);
             rollbackTransaction(session);
-            
+
             if (SKIP_FAILED_COMMAND) {
                 saveFailedCommand(command);
             } else {
@@ -330,10 +332,10 @@ public class MCRCommandLineInterface {
      *             when the command could not be executed for security reasons
      */
     public static void executeShellCommand(String command) throws Exception {
-        MCRExternalProcess process = new MCRExternalProcess( command );
+        MCRExternalProcess process = new MCRExternalProcess(command);
         process.run();
-        output( process.getOutput().asString() );
-        output( process.getErrors() );
+        output(process.getOutput().asString());
+        output(process.getErrors());
     }
 
     /**

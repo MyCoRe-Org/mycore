@@ -85,27 +85,27 @@ public class MCRHIBCtrlCommands extends MCRAbstractCommands {
 
         com = new MCRCommand("init hibernate", "org.mycore.backend.hibernate.MCRHIBCtrlCommands.createTables",
                 "The command creates all tables for MyCoRe by hibernate.");
-        command.add(com);
+        addCommand(com);
         com = new MCRCommand("export acl rules to file {0}", "org.mycore.backend.hibernate.MCRHIBCtrlCommands.exportAccessRules String",
                 "Exports all ACL rules to a given file.");
-        command.add(com);
+        addCommand(com);
         com = new MCRCommand("import acl rules from file {0}", "org.mycore.backend.hibernate.MCRHIBCtrlCommands.importAccessRules String",
                 "Imports all ACL rules from a given file.");
-        command.add(com);
+        addCommand(com);
         com = new MCRCommand("export acl mappings to file {0}",
                 "org.mycore.backend.hibernate.MCRHIBCtrlCommands.exportAccessMappings String", "Exports all ACL mappings to a given file.");
-        command.add(com);
+        addCommand(com);
         com = new MCRCommand("import acl mappings from file {0}",
                 "org.mycore.backend.hibernate.MCRHIBCtrlCommands.importAccessMappings String",
                 "Imports all ACL mappings from a given file.");
-        command.add(com);
+        addCommand(com);
         com = new MCRCommand("export entity {0} to file {1}", "org.mycore.backend.hibernate.MCRHIBCtrlCommands.exportEntity String String",
                 "Exports an entity (fully qualified class name) to a given file.");
-        command.add(com);
+        addCommand(com);
         com = new MCRCommand("import entity {0} from file {1}",
                 "org.mycore.backend.hibernate.MCRHIBCtrlCommands.importEntity String String",
                 "Imports an entity (fully qualified class name) from a given file.");
-        command.add(com);
+        addCommand(com);
     }
 
     /**

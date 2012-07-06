@@ -92,130 +92,130 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
         com = new MCRCommand("delete objects matching {0}", "org.mycore.frontend.cli.MCRObjectCommands.deleteByQuery String",
                 "Deletes all objects matching the query given in parameter {0}");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("delete all objects of type {0}", "org.mycore.frontend.cli.MCRObjectCommands.deleteAllObjects String",
                 "Removes MCRObjects in the number range between the MCRObjectID {0} and {1}.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("delete object from {0} to {1}", "org.mycore.frontend.cli.MCRObjectCommands.deleteFromTo String String",
                 "Removes MCRObjects in the number range between the MCRObjectID {0} and {1}.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("delete object {0}", "org.mycore.frontend.cli.MCRObjectCommands.delete String",
                 "Removes a MCRObject with the MCRObjectID {0}");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("list objects matching {0}", "org.mycore.frontend.cli.MCRObjectCommands.listIdsMatchingQuery String",
                 "Lists all objects matching the query given in parameter {0}");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("load object from file {0}", "org.mycore.frontend.cli.MCRObjectCommands.loadFromFile String",
                 "Adds a MCRObject form the file {0} to the system.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("load all objects from directory {0}", "org.mycore.frontend.cli.MCRObjectCommands.loadFromDirectory String",
                 "Loads all MCRObjects form the directory {0} to the system.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("update object from file {0}", "org.mycore.frontend.cli.MCRObjectCommands.updateFromFile String",
                 "Updates a MCRObject form the file {0} in the system.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("update all objects from directory {0}",
                 "org.mycore.frontend.cli.MCRObjectCommands.updateFromDirectory String",
                 "Updates all MCRObjects form the directory {0} in the system.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand(
                 "export object from {0} to {1} to directory {2} with {3}",
                 "org.mycore.frontend.cli.MCRObjectCommands.export String String String String",
                 "Stores all MCRObjects with MCRObjectID's between {0} and {1} to the directory {2} with the stylesheet {3}-object.xsl. For {3} save is the default.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand(EXPORT_OBJECT_TO_DIRECTORY_COMMAND, "org.mycore.frontend.cli.MCRObjectCommands.export String String String",
                 "Stores the MCRObject with the MCRObjectID {0} to the directory {1} with the stylesheet {2}-object.xsl. For {2} save is the default.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("export all objects of type {0} to directory {1} with {2}",
                 "org.mycore.frontend.cli.MCRObjectCommands.exportAllObjectsOfType String String String",
                 "Stores all MCRObjects of type {0} to directory {1} with the stylesheet mcr_{2}-object.xsl. For {2} save is the default.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("export all objects of base {0} to directory {1} with {2}",
                 "org.mycore.frontend.cli.MCRObjectCommands.exportAllObjectsOfBase String String String",
                 "Stores all MCRObjects of base {0} to directory {1} with the stylesheet mcr_{2}-object.xsl. For {2} save is the default.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("get last ID for base {0}", "org.mycore.frontend.cli.MCRObjectCommands.getLastID String",
                 "Returns the last used MCRObjectID for the ID base {0}.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("get next ID for base {0}", "org.mycore.frontend.cli.MCRObjectCommands.getNextID String",
                 "Returns the next free MCRObjectID for the ID base {0}.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("check file {0}", "org.mycore.frontend.cli.MCRObjectCommands.checkXMLFile String",
                 "Checks the data file {0} against the XML Schema.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("repair metadata search of type {0}", "org.mycore.frontend.cli.MCRObjectCommands.repairMetadataSearch String",
                 "Reads the SQL store table of MCRObject XML files for the type {0} and restore them to the search store.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("repair metadata search of ID {0}",
                 "org.mycore.frontend.cli.MCRObjectCommands.repairMetadataSearchForID String",
                 "Read the SQL store table of MCRObject XML files with MCRObjectID {0} and restore them to the search store.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("select objects with query {0}", "org.mycore.frontend.cli.MCRObjectCommands.selectObjectsWithQuery String",
                 "Select MCRObjects with MCRQueryString {0}.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("list selected", "org.mycore.frontend.cli.MCRObjectCommands.listSelected", "Prints the id of selected objects");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("delete selected", "org.mycore.frontend.cli.MCRObjectCommands.deleteSelected", "Removes selected MCRObjects.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("export selected to directory {0} with {1}",
                 "org.mycore.frontend.cli.MCRObjectCommands.exportSelected String String",
                 "Stores selected MCRObjects to the directory {0} with the stylesheet {1}-object.xsl. For {1} save is the default.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("remove selected from searchindex {0}",
                 "org.mycore.frontend.cli.MCRObjectCommands.removeFromSearchindex String",
                 "Remove selected MCRObjects from searchindex {0}.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("check selected in sql store", "org.mycore.frontend.cli.MCRObjectCommands.checkSelected",
                 "Checks existence of selected MCRObjects in SQL store and deletes missing ones from search index.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("check metadata search of type {0}", "org.mycore.frontend.cli.MCRObjectCommands.checkMetadataSearch String",
                 "Checks existence of MCRObjects of type {0} in search index and rapairs missing ones in search index.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("set mode {0} of searcher for index {1}",
                 "org.mycore.frontend.cli.MCRObjectCommands.notifySearcher String String",
                 "Notify Searcher of Index {1} what is going on {0}.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("list revisions of {0}", "org.mycore.frontend.cli.MCRObjectCommands.listRevisions String",
                 "List revisions of MCRObject.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("restore {0} to revision {1}", "org.mycore.frontend.cli.MCRObjectCommands.restoreToRevision String int",
                 "Restores the selected MCRObject to the selected revision.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("xslt {0} with file {1}", "org.mycore.frontend.cli.MCRObjectCommands.xslt String String",
                 "transforms a mycore object {0} with the given file {1}");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("transform selected with file {0}", "org.mycore.frontend.cli.MCRObjectCommands.transformSelected String",
                 "xsl transforms selected MCRObjects");
-        command.add(com);
+        addCommand(com);
     }
 
     public static void setSelectedObjectIDs(List<String> selected) {

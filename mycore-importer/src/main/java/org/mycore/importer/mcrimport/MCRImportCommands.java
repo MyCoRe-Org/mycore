@@ -22,13 +22,13 @@ public class MCRImportCommands extends MCRAbstractCommands {
         super();
 
         MCRCommand importFromMappingFile = new MCRCommand("import from mapping file {0}", "org.mycore.importer.mcrimport.MCRImportCommands.startImport String", "");
-        command.add(importFromMappingFile);
+        addCommand(importFromMappingFile);
 
         MCRCommand importDerivate = new MCRCommand("internal import derivate {0} and upload files {1}", "org.mycore.importer.mcrimport.MCRImportCommands.importDerivate String String", "");
-        command.add(importDerivate);
+        addCommand(importDerivate);
 
         MCRCommand uploadFile = new MCRCommand("internal upload file {0} for derivate {1}", "org.mycore.importer.mcrimport.MCRImportCommands.uploadFile String String", "");
-        command.add(uploadFile);
+        addCommand(uploadFile);
     }
 
     public static List<String> startImport(String file) throws Exception {

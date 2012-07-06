@@ -103,7 +103,7 @@ public class MCRCommand {
         for (int i = 0; i < numParameters; i++) {
             token = st.nextToken();
 
-            Format f;
+            Format f = null;
 
             if (token.equals("int")) {
                 parameterTypes[i] = Integer.TYPE;
@@ -112,8 +112,7 @@ public class MCRCommand {
                 parameterTypes[i] = String.class;
                 f = null;
             } else {
-                throw new MCRConfigurationException("Error while parsing command definitions for command line interface:\n"
-                        + "Unsupported argument type '" + token + "' in command " + methodSignature);
+                unsupportedArgException(methodSignature, token);
             }
 
             messageFormat.setFormat(i, f);
@@ -127,6 +126,32 @@ public class MCRCommand {
         } else {
             help = "No help text available for this command";
         }
+    }
+
+    private void unsupportedArgException(String methodSignature, String token) {
+        throw new MCRConfigurationException("Error while parsing command definitions for command line interface:\n"
+                + "Unsupported argument type '" + token + "' in command " + methodSignature);
+    }
+    
+    public MCRCommand(Method cmd){
+        className = cmd.getDeclaringClass().getName();
+        methodName = cmd.getName();
+        parameterTypes = cmd.getParameterTypes();
+        org.mycore.frontend.cli.annotation.MCRCommand cmdAnnotation = cmd.getAnnotation(org.mycore.frontend.cli.annotation.MCRCommand.class);
+        help = cmdAnnotation.help();
+        messageFormat = new MessageFormat(cmdAnnotation.syntax());
+        
+        for (int i = 0; i < parameterTypes.length; i++) {
+            Class<?> paramtype = parameterTypes[i];
+            if(Integer.class.isAssignableFrom(paramtype)){
+                messageFormat.setFormat(i, NumberFormat.getIntegerInstance());
+            } else if(!String.class.isAssignableFrom(paramtype)){
+                unsupportedArgException(className + "." + methodName, paramtype.getName());
+            }
+        }
+        
+        int pos = cmdAnnotation.syntax().indexOf("{");
+        suffix = pos == -1 ? cmdAnnotation.syntax() : cmdAnnotation.syntax().substring(0, pos);
     }
 
     /**

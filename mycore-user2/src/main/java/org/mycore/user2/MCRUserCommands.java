@@ -76,70 +76,70 @@ public class MCRUserCommands extends MCRAbstractCommands {
 
         MCRCommand com = null;
 
-        command.add(new MCRCommand("change to user {0} with {1}", "org.mycore.user2.MCRUserCommands.changeToUser String String",
+        addCommand(new MCRCommand("change to user {0} with {1}", "org.mycore.user2.MCRUserCommands.changeToUser String String",
             "Change the user {0} with the given password in {1}."));
-        command.add(new MCRCommand("login {0}", "org.mycore.user2.MCRUserCommands.login String", "Start the login dialog for the user {0}."));
+        addCommand(new MCRCommand("login {0}", "org.mycore.user2.MCRUserCommands.login String", "Start the login dialog for the user {0}."));
 
         com = new MCRCommand("init superuser", "org.mycore.user2.MCRUserCommands.initSuperuser",
             "Initialized the user system. This command runs only if the user database does not exist.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("encrypt passwords in user xml file {0} to file {1}", "org.mycore.user2.MCRUserCommands.encryptPasswordsInXMLFile String String",
             "This is a migration tool to change old plain text password entries to encrpted entries.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("set password for user {0} to {1}", "org.mycore.user2.MCRUserCommands.setPassword String String",
             "This command sets a new password for the user. You must be this user or you must have administrator access.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("enable user {0}", "org.mycore.user2.MCRUserCommands.enableUser String", "The command enables the user for the access.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("disable user {0}", "org.mycore.user2.MCRUserCommands.disableUser String", "The command disables the user from the access.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("delete role {0}", "org.mycore.user2.MCRUserCommands.deleteRole String",
             "The command delete the role {0} from the user system, but only if it has no user assigned.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("add roles from user file {0}", "org.mycore.user2.MCRUserCommands.addRoles String",
             "The command adds roles found in user file {0} that do not exist");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("delete user {0}", "org.mycore.user2.MCRUserCommands.deleteUser String", "The command delete the user {0}.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("assign user {0} to role {1}", "org.mycore.user2.MCRUserCommands.assignUserToRole String String",
             "The command add a user {0} as secondary member in the role {1}.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("unassign user {0} from role {1}", "org.mycore.user2.MCRUserCommands.unassignUserFromRole String String",
             "The command remove the user {0} as secondary member from the role {1}.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("list all roles", "org.mycore.user2.MCRUserCommands.listAllRoles", "The command list all roles.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("list role {0}", "org.mycore.user2.MCRUserCommands.listRole String", "The command list the role {0}.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("list all users", "org.mycore.user2.MCRUserCommands.listAllUsers", "The command list all users.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("list user {0}", "org.mycore.user2.MCRUserCommands.listUser String", "The command list the user {0}.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("export user {0} to file {1}", "org.mycore.user2.MCRUserCommands.exportUserToFile String String",
             "The command exports the data of user {0} to the file {1}.");
-        command.add(com);
+        addCommand(com);
 
         com = new MCRCommand("import user from file {0}", "org.mycore.user2.MCRUserCommands.importUserFromFile String",
             "The command imports a user from file {0}.");
-        command.add(com);
+        addCommand(com);
         
         com = new MCRCommand("update user from file {0}", "org.mycore.user2.MCRUserCommands.updateUserFromFile String",
                 "The command imports a user from file {0}.");
-        command.add(com);
+        addCommand(com);
     }
     
 
