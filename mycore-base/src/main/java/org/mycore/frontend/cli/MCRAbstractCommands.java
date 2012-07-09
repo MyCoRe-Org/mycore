@@ -40,7 +40,7 @@ abstract public class MCRAbstractCommands implements MCRExternalCommandInterface
     protected static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
     /** The array holding all known commands */
-    private ArrayList<MCRCommand> command = null;
+    protected ArrayList<MCRCommand> command = null;
 
     private String displayName;
 
