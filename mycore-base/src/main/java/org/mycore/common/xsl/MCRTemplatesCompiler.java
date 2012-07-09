@@ -84,6 +84,7 @@ public class MCRTemplatesCompiler {
             Source source = ts.getSource();
             return factory.newTemplates(source);
         } catch (Exception exc) {
+            LOGGER.error("Error while compiling template", exc);
             Exception cause = MCRExceptionCauseFinder.getCause(exc);
             String msg = buildErrorMessage(ts.getKey(), cause);
             throw new MCRConfigurationException(msg, cause);
