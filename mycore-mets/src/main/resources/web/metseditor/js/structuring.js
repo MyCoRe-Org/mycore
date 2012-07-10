@@ -258,8 +258,7 @@ function displayEditItemDiaglog() {
 
     var checkDisplay = dijit.byId("checkDisplay");
     var hide = selItem.hide;
-    // make it unchecked as default
-    checkDisplay.set("checked", typeof hide === "undefined" ? false : hide);
+    checkDisplay.set("checked", hide == "false" ? false : true);
 
     dialog.show();
 }
@@ -295,6 +294,7 @@ function saveItemProperties() {
     var checkDisplay = dijit.byId("checkDisplay");
     var hide = checkDisplay.get("checked");
     selItem.hide = hide;
+    checkDisplay.set("checked", false);
 
     dijit.byId("editItemDialog").hide();
     displayItemProperties();
