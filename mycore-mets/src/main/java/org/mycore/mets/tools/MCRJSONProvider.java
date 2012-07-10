@@ -249,7 +249,8 @@ public class MCRJSONProvider implements Comparator<MCRFilesystemNode> {
             if (xp.selectSingleNode(mets) != null) {
                 continue;
             }
-            //page is not referenced in structLink, thus it must be hidden
+
+            //page is not referenced in structMap, thus it must be hidden
             String path = decode(getHref(id));
             String label = getLabelByPhysicalId("phys_" + id);
 
