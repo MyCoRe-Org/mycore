@@ -209,6 +209,7 @@ public class MCRUserManager {
         MCRUser inDb = getByNaturalID(session, user.getUserName(), user.getRealmID());
         if (inDb == null) {
             createUser(user);
+            return;
         }
         user.internalID = inDb.internalID;
         session.evict(inDb);
