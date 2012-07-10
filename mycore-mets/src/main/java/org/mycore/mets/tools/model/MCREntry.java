@@ -26,6 +26,8 @@ import com.google.gson.Gson;
 public class MCREntry implements MCRIMetsSortable {
     int order;
 
+    boolean hide;
+
     private String physicalId, label, itemId, structureType, orderLabel, path;
 
     /**
@@ -51,6 +53,7 @@ public class MCREntry implements MCRIMetsSortable {
         this.label = label;
         this.structureType = structureType;
         this.orderLabel = new String("");
+        this.hide = false;
     }
 
     /**
@@ -175,6 +178,20 @@ public class MCREntry implements MCRIMetsSortable {
         this.path = path;
     }
 
+    /**
+     * @return the hide
+     */
+    public boolean isHide() {
+        return hide;
+    }
+
+    /**
+     * @param hide the hide to set
+     */
+    public void setHide(boolean hide) {
+        this.hide = hide;
+    }
+
     public String toString() {
         return physicalId + " (" + order + ")";
     }
@@ -188,7 +205,7 @@ public class MCREntry implements MCRIMetsSortable {
         Gson gson = new Gson();
         String toReturn = "{ \"id\": \"" + itemId + "\", \"path\": \"" + this.path + "\", \"name\":" + gson.toJson(this.label)
                 + ", \"orderLabel\":" + gson.toJson(this.orderLabel) + ", \"structureType\":\"" + this.structureType
-                + "\", \"type\":\"item\" }";
+                + "\", \"type\":\"item\", \"hide\": \"" + this.hide + "\"}";
 
         return toReturn;
     }

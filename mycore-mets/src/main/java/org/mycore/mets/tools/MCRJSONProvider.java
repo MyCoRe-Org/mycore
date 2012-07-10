@@ -101,7 +101,7 @@ public class MCRJSONProvider implements Comparator<MCRFilesystemNode> {
      *         tree
      */
     @SuppressWarnings("unchecked")
-    public String toJSON() {
+    public String toJSON() throws Exception {
         if (this.mets == null) {
             LOGGER.info("No mets document set. Return default JSON for derivate \"" + derivate + "\"");
             return this.toJSON(this.derivate);
@@ -218,8 +218,52 @@ public class MCRJSONProvider implements Comparator<MCRFilesystemNode> {
             tree.addEntry(e);
         }
 
+        //add all the hidden files at the "end" of the tree
+        addHiddenPages(tree);
+
         LOGGER.debug(tree.asJson());
         return tree.asJson();
+    }
+
+    /**
+     * Method adds all files not explicitly used within the physical structmap. Those files will not be visible in the DFG Viewer but 
+     * the user of the mets editor has still access to files.  
+     * 
+     * @param tree
+     * @return
+     * @throws Exception
+     */
+    @SuppressWarnings("unchecked")
+    private MCRMetsTree addHiddenPages(MCRMetsTree tree) throws Exception {
+        XPath xp = XPath.newInstance("mets:mets/mets:fileSec/mets:fileGrp[@USE='MASTER']/mets:file");
+        xp.addNamespace(MCRConstants.METS_NAMESPACE);
+
+        List<Element> allFiles = xp.selectNodes(mets);
+
+        for (Element f : allFiles) {
+            String id = f.getAttributeValue("ID");
+            xp = XPath.newInstance("mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div//mets:fptr[@FILEID='" + id + "']");
+            xp.addNamespace(MCRConstants.METS_NAMESPACE);
+            xp.addNamespace(MCRConstants.XLINK_NAMESPACE);
+
+            if (xp.selectSingleNode(mets) != null) {
+                continue;
+            }
+            //page is not referenced in structLink, thus it must be hidden
+            String path = decode(getHref(id));
+            String label = getLabelByPhysicalId("phys_" + id);
+
+            if (label == null) {
+                int index = path.lastIndexOf("/");
+                label = path.substring(index == -1 ? 0 : index + 1);
+            }
+
+            MCREntry entry = new MCREntry(id, label, path, null, "page");
+            entry.setHide(true);
+            tree.addEntry(entry);
+        }
+
+        return tree;
     }
 
     /**

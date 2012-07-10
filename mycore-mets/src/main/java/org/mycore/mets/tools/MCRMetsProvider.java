@@ -35,6 +35,7 @@ import org.mycore.mets.model.sections.AmdSec;
 import org.mycore.mets.model.sections.DmdSec;
 import org.mycore.mets.model.struct.AbstractLogicalDiv;
 import org.mycore.mets.model.struct.Fptr;
+import org.mycore.mets.model.struct.LOCTYPE;
 import org.mycore.mets.model.struct.LogicalDiv;
 import org.mycore.mets.model.struct.LogicalStructMap;
 import org.mycore.mets.model.struct.LogicalSubDiv;
@@ -163,23 +164,28 @@ public class MCRMetsProvider {
              */
             else {
                 String path = MCRJSONTools.stripBracketsAndQuotes(json.get("path").getAsString());
-                int physicalOrder = json.get("physicalOrder").getAsInt();
-                String orderLabel = MCRJSONTools.stripBracketsAndQuotes(json.get("orderLabel").getAsString());
-                path = encode(path);
-
-                /* create the physical div and add it to the physical struct map */
-                PhysicalSubDiv physDiv = createPhysicalDiv(id, physicalOrder, orderLabel);
-                physicalStructMp.getDivContainer().add(physDiv);
+                boolean hide = json.get("hide").getAsBoolean();
 
                 /* create the file object and add it to the file section */
                 File file = createFile(id, path);
                 fileGrpMaster.addFile(file);
 
-                /* create div in log struct map and add the symlink */
-                if (parentDiv != null) {
-                    structLink.addSmLink(new SmLink(parentDiv.getId(), physDiv.getId()));
-                } else {
-                    structLink.addSmLink(new SmLink(logicalStructMp.getDivContainer().getId(), physDiv.getId()));
+                // only files with hide attribute == false appear in the structlink section and in the physical struct map
+                if (!hide) {
+                    int physicalOrder = json.get("physicalOrder").getAsInt();
+                    String orderLabel = MCRJSONTools.stripBracketsAndQuotes(json.get("orderLabel").getAsString());
+                    path = encode(path);
+
+                    /* create the physical div and add it to the physical struct map */
+                    PhysicalSubDiv physDiv = createPhysicalDiv(id, physicalOrder, orderLabel);
+                    physicalStructMp.getDivContainer().add(physDiv);
+
+                    /* create div in log struct map and add the symlink */
+                    if (parentDiv != null) {
+                        structLink.addSmLink(new SmLink(parentDiv.getId(), physDiv.getId()));
+                    } else {
+                        structLink.addSmLink(new SmLink(logicalStructMp.getDivContainer().getId(), physDiv.getId()));
+                    }
                 }
             }
         }
@@ -216,7 +222,7 @@ public class MCRMetsProvider {
         String idStripped = MCRJSONTools.stripBracketsAndQuotes(id);
         File file = null;
         file = new File(idStripped, File.MIME_TYPE_TIFF);
-        file.setFLocat(new FLocat(FLocat.LOCTYPE_URL, path));
+        file.setFLocat(new FLocat(LOCTYPE.URL, path));
 
         return file;
     }
