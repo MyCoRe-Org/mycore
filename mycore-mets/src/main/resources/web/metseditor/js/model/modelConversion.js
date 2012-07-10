@@ -18,62 +18,68 @@
  */
 
 function buildDataStructure() {
-	var structure = new Structure("root");
-	var tree = dijit.byId("itemTree");
-	var model = tree.model;
+    var structure = new Structure("root");
+    var tree = dijit.byId("itemTree");
+    var model = tree.model;
 
-	model.getChildren(model.root, 
-		function(items) {
-			log("All items retrieved");	
-			/* setting id and name of the structure */
-			structure.setId(items[0]._S._arrayOfAllItems[0].id);
-			structure.setName(items[0]._S._arrayOfAllItems[0].name);
-			structure.setStructureType(items[0]._S._arrayOfAllItems[0].structureType);
-			log("Building structure...");
-			build(structure, items, 1);
-			log("Building structure...done");
-		}, 
-		function() {
-			log("Error occured in buildDataStructure()")
-	    });
-	return structure;
+    model
+            .getChildren(
+                    model.root,
+                    function(items) {
+                        log("All items retrieved");
+                        /* setting id and name of the structure */
+                        structure.setId(items[0]._S._arrayOfAllItems[0].id);
+                        structure.setName(items[0]._S._arrayOfAllItems[0].name);
+                        structure
+                                .setStructureType(items[0]._S._arrayOfAllItems[0].structureType);
+                        log("Building structure...");
+                        build(structure, items, 1);
+                        log("Building structure...done");
+                    }, function() {
+                        log("Error occured in buildDataStructure()")
+                    });
+    return structure;
 }
 
-function build(structure, items, counter){
-	c = counter;
-	for(var i = 0; i < items.length; i++) {
-		//log(i + " / "+ items.length);
-		if(items[i].type == "item"){
-			//create page
-			//log("Creating Page -> " + items[i].id, items[i].name);
-			var page = new Page(items[i].id, items[i].name);
-			/* just the order of the files */
-			page.setPhysicalOrder(c++);
-			/* the order within a structure (logical) */
-			page.setLogicalOrder(i + 1);
-			//set other properties if any
-			page.setStructureType("page");
-			//set order label
-			page.setOrderLabel(items[i].orderLabel);
-			//set the path attribute (path + filename)
-			page.setPath(items[i].path);
-			//add the child
-			structure.addChild(page);
-		}else {
-			if(items[i].type == "category"){
-				/* create structure, add it to parent structure,
-				 * call method with new structure and its children
-				 * */
-				//log("Creating Structure -> " + items[i].id+" with " +items[i].children.length + " children");
-				var categ = new Structure(items[i].id);
-				categ.setName(items[i].name);
-				/* the order within a structure*/
-				categ.setLogicalOrder(i + 1);
-				/* set the type of the structure as defined by the dfg */
-				categ.setStructureType(items[i].structureType);
-				structure.addChild(categ);
-				build(categ, items[i].children, c);
-			}
-		}
-	}	
+function build(structure, items, counter) {
+    c = counter;
+    for ( var i = 0; i < items.length; i++) {
+        // log(i + " / "+ items.length);
+        if (items[i].type == "item") {
+            // create page
+            // log("Creating Page -> " + items[i].id, items[i].name);
+            var page = new Page(items[i].id, items[i].name);
+            /* just the order of the files */
+            page.setPhysicalOrder(c++);
+            /* the order within a structure (logical) */
+            page.setLogicalOrder(i + 1);
+            // set other properties if any
+            page.setStructureType("page");
+            // set order label
+            page.setOrderLabel(items[i].orderLabel);
+            // set the path attribute (path + filename)
+            page.setPath(items[i].path);
+            // set the hidden attribute
+            page.setHide(typeof items[i].hide === "undefined" ? false : items[i].hide);
+            // add the child
+            structure.addChild(page);
+        } else {
+            if (items[i].type == "category") {
+                /*
+                 * create structure, add it to parent structure, call method
+                 * with new structure and its children
+                 */
+                // log("Creating Structure -> " + items[i].id+" with "
+                // +items[i].children.length + " children");
+                var categ = new Structure(items[i].id);
+                categ.setName(items[i].name);
+                /* the order within a structure */
+                categ.setLogicalOrder(i + 1);
+                /* set the type of the structure as defined by the dfg */
+                categ.setStructureType(items[i].structureType);
+                structure.addChild(categ);
+                build(categ, items[i].children, c);
+            }
+        }
+    }
 }

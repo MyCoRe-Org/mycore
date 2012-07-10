@@ -1,7 +1,7 @@
 /* $Revision$ 
  * $Date$ 
  * $LastChangedBy$
- * Copyright 2010 - Thüringer Universitäts- und Landesbibliothek Jena
+ * Copyright 2010 - Thï¿½ringer Universitï¿½ts- und Landesbibliothek Jena
  *  
  * Mets-Editor is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,9 @@ function displayItemProperties(){
 					  + "\", name= \"" + selectedItem.name
 					  + "\", orderLabel = \"" + selectedItem.orderLabel
 					  + "\", type (tree) = \"" + selectedItem.type
-					  + "\", structureType = \"" + selectedItem.structureType +"\"";
+					  + "\", structureType = \"" + selectedItem.structureType +"\""
+					  + "\", hide = \"" + selectedItem.hide +"\"";
+	
 
 	document.getElementById('displayItemProps').innerHTML = propString;
 }

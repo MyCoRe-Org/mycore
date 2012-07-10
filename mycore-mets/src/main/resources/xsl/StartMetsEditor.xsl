@@ -1,36 +1,34 @@
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
-  xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:acl="xalan://org.mycore.access.MCRAccessManager">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
+  xmlns:acl="xalan://org.mycore.access.MCRAccessManager">
   <xsl:output method="html" indent="yes" doctype-public="-//IETF//DTD HTML 2.0//EN" />
-  <xsl:include href="coreFunctions.xsl"/>
-  
+  <xsl:include href="coreFunctions.xsl" />
+
   <xsl:param name="RequestURL" />
   <xsl:param name="WebApplicationBaseURL" />
-  
+
   <xsl:variable name="derivateId">
-		<xsl:call-template name="UrlGetParam">
-		  <xsl:with-param name="url" select="$RequestURL"/>
-		  <xsl:with-param name="par" select="'derivate'"/>
-		</xsl:call-template>
-  </xsl:variable>
-  
-  <xsl:variable name="useExistingMets">
     <xsl:call-template name="UrlGetParam">
-      <xsl:with-param name="url" select="$RequestURL"/>
-      <xsl:with-param name="par" select="'useExistingMets'"/>
+      <xsl:with-param name="url" select="$RequestURL" />
+      <xsl:with-param name="par" select="'derivate'" />
     </xsl:call-template>
   </xsl:variable>
-  
+
+  <xsl:variable name="useExistingMets">
+    <xsl:call-template name="UrlGetParam">
+      <xsl:with-param name="url" select="$RequestURL" />
+      <xsl:with-param name="par" select="'useExistingMets'" />
+    </xsl:call-template>
+  </xsl:variable>
+
   <xsl:variable name="createMetsAllowed" select="acl:checkPermission($derivateId,'writedb')" />
 
-  <xsl:template match="/StartMetsEditor"> 
-    <!--
-      $Revision$ $Date$ $LastChangedBy$ Copyright 2010 - Thüringer
-      Universitäts- und Landesbibliothek Jena Mets-Editor is free software: you can redistribute it and/or modify it under the terms of the GNU
-      General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
-      version. Mets-Editor is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. You should have received a copy
-      of the GNU General Public License along with Mets-Editor. If not, see http://www.gnu.org/licenses/.
-    -->
+  <xsl:template match="/StartMetsEditor">
+    <!-- $Revision$ $Date$ $LastChangedBy$ Copyright 2010 - Thüringer Universitäts- 
+      und Landesbibliothek Jena Mets-Editor is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License 
+      as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. Mets-Editor is distributed 
+      in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+      PURPOSE. See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with Mets-Editor. 
+      If not, see http://www.gnu.org/licenses/. -->
     <xsl:comment>
       Start - StartMetsEditor.xsl
     </xsl:comment>
@@ -43,13 +41,16 @@
             </title>
             <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/dojo/1.6.1/dojo/dojo.xd.js" djConfig="parseOnLoad:true"></script>
             <link rel="stylesheet" type="text/css" href="style/style.css" />
-              <style type="text/css">
+            <style type="text/css">
               @import "http://ajax.googleapis.com/ajax/libs/dojo/1.6.1/dojo/resources/dojo.css";
-              @import "http://ajax.googleapis.com/ajax/libs/dojo/1.6.1/dijit/themes/tundra/tundra.css";
-              @import "http://ajax.googleapis.com/ajax/libs/dojo/1.6.1/dojo/resources/dnd.css";
-              
+              @import
+              "http://ajax.googleapis.com/ajax/libs/dojo/1.6.1/dijit/themes/tundra/tundra.css";
+              @import
+              "http://ajax.googleapis.com/ajax/libs/dojo/1.6.1/dojo/resources/dnd.css";
+
               .myFolder {
-              background-image: url(img/folder_16x16.png);
+              background-image:
+              url(img/folder_16x16.png);
               }
               .myItem {
               background-image: url(img/page_16x16.png);
@@ -85,7 +86,8 @@
 
               .helpIcon {
               background-image: url(img/help.png);
-              width: 16px;
+              width:
+              16px;
               height: 16px;
               }
 
@@ -153,9 +155,11 @@
 
             <script type="text/javascript">
               <!-- define resetTreeURL -->
-              <xsl:value-of select="concat('var resetTreeURL = &quot;',$WebApplicationBaseURL, 'metseditor/start_mets_editor.xml?derivate=',$derivateId,'&amp;useExistingMets=false','&quot;;')"/>
+              <xsl:value-of
+                select="concat('var resetTreeURL = &quot;',$WebApplicationBaseURL, 'metseditor/start_mets_editor.xml?derivate=',$derivateId,'&amp;useExistingMets=false','&quot;;')" />
               <!-- define reloadTreeURL -->
-              <xsl:value-of select="concat('var reloadTreeURL = &quot;',$WebApplicationBaseURL, 'metseditor/start_mets_editor.xml?derivate=',$derivateId,'&amp;useExistingMets=true','&quot;;')"/>                
+              <xsl:value-of
+                select="concat('var reloadTreeURL = &quot;',$WebApplicationBaseURL, 'metseditor/start_mets_editor.xml?derivate=',$derivateId,'&amp;useExistingMets=true','&quot;;')" />
               <!-- define webApplicationBaseURL -->
               <xsl:value-of select="concat('var webApplicationBaseURL = &quot;', $WebApplicationBaseURL,'&quot;;')" />
               <!-- define derivateId -->
@@ -219,8 +223,7 @@
                     <img src="img/loading.gif" style="display: block; margin-left: auto; margin-right: auto; padding-top:8em;" />
                   </div>
                   <!-- the actual tree -->
-                  <div dojoType="dojo.data.ItemFileWriteStore" jsId="myStore"
-                    urlPreventCache="true"
+                  <div dojoType="dojo.data.ItemFileWriteStore" jsId="myStore" urlPreventCache="true"
                     url="{concat($WebApplicationBaseURL, 'servlets/MCRJSONProviderServlet?derivate=', $derivateId, '&amp;useExistingMets=',$useExistingMets)}">
                   </div>
                   <div dojoType="dijit.tree.TreeStoreModel" jsId="itemModel" store="myStore" childrenAttrs="children">
@@ -345,7 +348,7 @@
                     </label>
                   </div>
 
-                  <!-- the combobox with the foliation types                -->
+                  <!-- the combobox with the foliation types -->
                   <div style="padding-top:0.5em;">
                     <label for="foliationTypeCombo">Paginierungsart </label>
                     <div style="float:right;">
@@ -409,8 +412,9 @@
                       <xsl:value-of select="i18n:translate('component.mets.msg.doctype')" />
                     </label>
                     <div>
-                      <input id="docTypeCombo" dojoType="dijit.form.ComboBox" autoComplete="true" invalidMessage="Bitte wählen Sie einen gültigen Dokumenttyp"
-                        type="text" forceValidOption="true" persist="false" store="DocumentTypeStore">
+                      <input id="docTypeCombo" dojoType="dijit.form.ComboBox" autoComplete="true"
+                        invalidMessage="Bitte wählen Sie einen gültigen Dokumenttyp" type="text" forceValidOption="true" persist="false"
+                        store="DocumentTypeStore">
                       </input>
                     </div>
                   </div>
@@ -439,7 +443,7 @@
             <!-- ################################## -->
 
             <div id="editItemDialog" dojoType="dijit.Dialog" title="Eigenschaften festlegen">
-              <div id="upperEditItemDialogDialogContentPane" dojoType="dijit.layout.ContentPane" style="height:120px; width:300px">
+              <div id="upperEditItemDialogDialogContentPane" dojoType="dijit.layout.ContentPane" style="height:140px; width:300px">
                 <div dojoType="dijit.layout.ContentPane">
                   <div style="padding-top:0.5em;">
                     <label for="orderLabelTextBox">
@@ -450,6 +454,7 @@
                     </div>
                   </div>
                 </div>
+
                 <div dojoType="dijit.layout.ContentPane">
                   <div style="padding-top:0.5em;">
                     <label for="commonLabelTextBox">
@@ -457,6 +462,17 @@
                     </label>
                     <div style="float:right;">
                       <input id="commonLabelTextBox" dojoType="dijit.form.TextBox" class="dijitTextBox" type="text" />
+                    </div>
+                  </div>
+                </div>
+
+                <div dojoType="dijit.layout.ContentPane">
+                  <div style="padding-top:0.5em;">
+                    <label for="checkDisplay">
+                      <xsl:value-of select="i18n:translate('component.mets.editor.hide')" />
+                    </label>
+                    <div style="float:right;">
+                      <input id="checkDisplay" dojoType="dijit.form.CheckBox" class="dijitCheckBox" checked="false" type="text" />
                     </div>
                   </div>
                 </div>
@@ -473,15 +489,17 @@
             <!-- ############################################# -->
             <!-- Definition of the confirm reload/reset dialog -->
             <!-- ############################################# -->
-            
+
             <div id="confirmReloadDialog" dojoType="dijit.Dialog" title="Struktur zurücksetzen/neuladen?">
               <div id="confirmReloadDialogContentPane" dojoType="dijit.layout.ContentPane" style="width:300px; height:100px;">
                 <label id="userInfoMsg">
                   <xsl:value-of select="i18n:translate('component.mets.msg.reload')" />
                   <br />
                 </label>
-                <button dojoType="dijit.form.Button" id="cancelReload" label="Abbrechen" iconClass="circleIcon" onclick="dijit.byId('confirmReloadDialog').hide()" style="float: right; padding-top: 2em;"/>
-                <button dojoType="dijit.form.Button" id="okReload" label="Ok" iconClass="circleIcon" style="float: right; padding-top: 2em;" onclick="redirect"/>
+                <button dojoType="dijit.form.Button" id="cancelReload" label="Abbrechen" iconClass="circleIcon"
+                  onclick="dijit.byId('confirmReloadDialog').hide()" style="float: right; padding-top: 2em;" />
+                <button dojoType="dijit.form.Button" id="okReload" label="Ok" iconClass="circleIcon" style="float: right; padding-top: 2em;"
+                  onclick="redirect" />
               </div>
             </div>
 
@@ -497,47 +515,47 @@
             <!-- Tooltips -->
             <span dojoType="dijit.Tooltip" connectId="toolbar1.save">
               <xsl:value-of select="i18n:translate('component.mets.editor.type.save')" />
-              </span>
-            
+            </span>
+
             <span dojoType="dijit.Tooltip" connectId="toolbar1.resetTree">
               <xsl:value-of select="i18n:translate('component.mets.editor.type.reset')" />
-              </span>
+            </span>
 
             <span dojoType="dijit.Tooltip" connectId="toolbar1.reloadTree">
               <xsl:value-of select="i18n:translate('component.mets.editor.type.lastversion')" />
-              </span>
+            </span>
 
             <span dojoType="dijit.Tooltip" connectId="toolbar1.setDocType">
               <xsl:value-of select="i18n:translate('component.mets.editor.type.title')" />
-              </span>
+            </span>
 
             <span dojoType="dijit.Tooltip" connectId="toolbar1.addStructure">
               <xsl:value-of select="i18n:translate('component.mets.editor.type.add')" />
-              </span>
+            </span>
 
             <span dojoType="dijit.Tooltip" connectId="toolbar1.editStructure">
               <xsl:value-of select="i18n:translate('component.mets.editor.type.edit')" />
-              </span>
+            </span>
 
             <span dojoType="dijit.Tooltip" connectId="toolbar1.deleteStructure">
               <xsl:value-of select="i18n:translate('component.mets.editor.type.delete')" />
-              </span>
+            </span>
 
             <span dojoType="dijit.Tooltip" connectId="toolbar1.foliation">
               <xsl:value-of select="i18n:translate('component.mets.editor.pagination')" />
-              </span>
+            </span>
 
             <span dojoType="dijit.Tooltip" connectId="toolbar1.reverse">
               <xsl:value-of select="i18n:translate('component.mets.editor.order')" />
-              </span>
+            </span>
 
             <span dojoType="dijit.Tooltip" connectId="toolbar1.help">
               <xsl:value-of select="i18n:translate('component.mets.editor.help')" />
-              </span>
+            </span>
 
             <span dojoType="dijit.Tooltip" connectId="saveItemProperties">
               <xsl:value-of select="i18n:translate('component.mets.editor.apply')" />
-              </span>
+            </span>
           </body>
         </html>
       </xsl:when>
