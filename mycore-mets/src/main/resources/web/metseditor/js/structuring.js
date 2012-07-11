@@ -171,7 +171,8 @@ function addStructureToTree() {
             orderLabel : pages[i].orderLabel,
             structureType : pages[i].structureType,
             type : pages[i].type,
-            path : pages[i].path
+            path : pages[i].path,
+            hide : pages[i].hide
         };
         store.newItem(newItem, {
             parent : createdElement,

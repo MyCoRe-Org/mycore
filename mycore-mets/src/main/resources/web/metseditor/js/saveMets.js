@@ -19,67 +19,77 @@
 
 /* returns an Array of invalid items (categories having not at least on child (a page)) */
 function getInvalidItems(){
-	log("getInvalidItems()");
-	
-	var tree = dijit.byId("itemTree");
-	var model = tree.model;
+    log("getInvalidItems()");
+    
+    var tree = dijit.byId("itemTree");
+    var model = tree.model;
 
-	var invalidItems;
-	
-	model.getChildren(model.root, 
-		function(items) {
-			log("Validating tree");	
-			invalidItems = new Array();
-			performValidation(items, invalidItems);
-			log("Validating tree...done");
-		}, 
-		function() {
-			log("Error occured in performValidation()")
-	    });
-	return invalidItems;
+    var invalidItems;
+    
+    model.getChildren(model.root, 
+        function(items) {
+            log("Validating tree"); 
+            invalidItems = new Array();
+            performValidation(items, invalidItems);
+            log("Validating tree...done");
+        }, 
+        function() {
+            log("Error occured in performValidation()")
+        });
+    return invalidItems;
 }
 
 /* actually performs the validation */
 function performValidation(items, invalidItems){
-	for(var i = 0; i < items.length; i++) {
-		if(items[i].type == "item"){
-			continue;
-		} else {
-			if(items[i].type == "category"){
-				if(items[i].children.length == 0){
-					log("Found invalid item " + items[i].id);
-					invalidItems.push(items[i]);
-				} 
-				performValidation(items[i].children, invalidItems);
-			}
-		}
-	}
+    for(var i = 0; i < items.length; i++) {
+        if(items[i].type == "item"){
+            continue;
+        } else {
+            if(items[i].type == "category"){
+                if(items[i].children.length == 0){
+                    log("Found invalid item " + items[i].id);
+                    invalidItems.push(items[i]);
+                }
+                
+                for(var j = 0; j < items[i].children.length; j++){
+                    log(items[i].children[j].name);
+                    log(items[i].children[j].hide);
+                    if(items[i].children[j].hide == true){
+                        log("Structure contains a hidden page, please remove page " + items[i].children[j].name);
+                        invalidItems.push(items[i]);
+                    }
+                }
+                
+                performValidation(items[i].children, invalidItems);
+            }
+        }
+    }
 }
 
 function containsPages(anItem){
-	var children = anItem.children;
-	for(var c = 0; c < children.length; c++){
-		if(children[c].type == "item"){
-			return true;
-		}
-	}
-	return false;
+    var children = anItem.children;
+    for(var c = 0; c < children.length; c++){
+        if(children[c].type == "item"){
+            return true;
+        }
+    }
+    return false;
 }
 
 /* displays the invalid items to the user */
 function displaySaveFailedDialog(invalidItems){
-	log("displaySaveFailedDialog()");
-	var msg = "";
-	
-	for(var i = 0; i < invalidItems.length; i++){
-		msg += invalidItems[i].name;
-		if(i + 1 < invalidItems.length){
-			msg +=", ";
-		}
-	}
-	document.getElementById('affectedItems').innerHTML = msg;  
-	var dialog = dijit.byId("saveFailedDialog");
-	dialog.show();
+    log("displaySaveFailedDialog()");
+    var msg = "";
+    
+    for(var i = 0; i < invalidItems.length; i++){
+        msg += invalidItems[i].name;
+        if(i + 1 < invalidItems.length){
+            msg +=", ";
+        }
+    }
+    document.getElementById('affectedItems').innerHTML = msg;  
+    var dialog = dijit.byId("saveFailedDialog");
+    dialog.show();
 }
 
 /* saves the tree/structure */
@@ -88,9 +98,9 @@ function save(){
    var invalidItems = getInvalidItems(); 
    
    if(invalidItems.length > 0){
-	   log("Mets tree is in an invalid state");
-	   displaySaveFailedDialog(invalidItems);
-	   return;
+       log("Mets tree is in an invalid state");
+       displaySaveFailedDialog(invalidItems);
+       return;
    }
    var tree = buildDataStructure();
    log(dojo.toJson(tree));
@@ -100,19 +110,19 @@ function save(){
    log("Submitting to Server...");
    log(data);
    dojo.xhrPost({
-	   url: webApplicationBaseURL + "servlets/SaveMetsServlet",
-	   handleAs: "text",
-	   postData: "jsontree=" + data + "&derivate=" + derivateId,
-	   load: function(response) {
-	   		log('Mets successfully saved');
-   		},
-   		error: function(err, ioArgs){
-   			var secondDlg = new dijit.Dialog({
-   				title: "Zugriff verweigert",
-   				style: "width: 300px"
-   			});
-	   	    secondDlg.attr("content", "Mets konnte nicht erzeugt und gespeichert werden. Bitte wenden Sie sich an den Administrator.");
-	   	    secondDlg.show();
-   	    }
+       url: webApplicationBaseURL + "servlets/SaveMetsServlet",
+       handleAs: "text",
+       postData: "jsontree=" + data + "&derivate=" + derivateId,
+       load: function(response) {
+            log('Mets successfully saved');
+        },
+        error: function(err, ioArgs){
+            var secondDlg = new dijit.Dialog({
+                title: "Zugriff verweigert",
+                style: "width: 300px"
+            });
+            secondDlg.attr("content", "Mets konnte nicht erzeugt und gespeichert werden. Bitte wenden Sie sich an den Administrator.");
+            secondDlg.show();
+        }
    });
 }
