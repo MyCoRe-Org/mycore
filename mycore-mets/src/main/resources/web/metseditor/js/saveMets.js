@@ -47,14 +47,19 @@ function performValidation(items, invalidItems){
         } else {
             if(items[i].type == "category"){
                 if(items[i].children.length == 0){
-                    log("Found invalid item " + items[i].id);
-                    invalidItems.push(items[i]);
+                    var msg = "Empty category " + items[i].name ;
+                    var pushMe = {"item": items[i], "msg": msg};
+                    log(pushMe);
+                    invalidItems.push(pushMe);
                 }
                 
                 for(var j = 0; j < items[i].children.length; j++){
                     if(items[i].children[j].hide == true){
-                        log("Structure contains a hidden page, please remove page " + items[i].children[j].name);
-                        invalidItems.push(items[i]);
+                        var msg = "Structure contains a hidden page, please remove page " + items[i].children[j].name;
+                        var pushMe = {"item": items[i], "msg": msg};
+                        log(pushMe);
+                        
+                        invalidItems.push(pushMe);
                     }
                 }
                 
@@ -80,10 +85,7 @@ function displaySaveFailedDialog(invalidItems){
     var msg = "";
     
     for(var i = 0; i < invalidItems.length; i++){
-        msg += invalidItems[i].name;
-        if(i + 1 < invalidItems.length){
-            msg +=", ";
-        }
+        msg += invalidItems[i].item.name + " ("+  invalidItems[i].msg +") <br/>";
     }
     document.getElementById('affectedItems').innerHTML = msg;  
     var dialog = dijit.byId("saveFailedDialog");
