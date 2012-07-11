@@ -52,8 +52,6 @@ function performValidation(items, invalidItems){
                 }
                 
                 for(var j = 0; j < items[i].children.length; j++){
-                    log(items[i].children[j].name);
-                    log(items[i].children[j].hide);
                     if(items[i].children[j].hide == true){
                         log("Structure contains a hidden page, please remove page " + items[i].children[j].name);
                         invalidItems.push(items[i]);
