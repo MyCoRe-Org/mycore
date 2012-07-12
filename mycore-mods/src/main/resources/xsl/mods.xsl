@@ -638,7 +638,7 @@
         <xsl:when test="acl:checkPermission($id,'writedb') or acl:checkPermission($id,'deletedb')">
           <div class="document_options">
             <img class="button_options" src="{$WebApplicationBaseURL}templates/master/{$template}/IMAGES/icon_arrow_circled_red_down.png"
-              alt="" titel="Optionen" />
+              alt="" title="{i18n:translate('metaData.mods.medadata.options')}" />
             <div class="options">
               <ul>
                 <xsl:variable name="type" select="substring-before(substring-after($id,'_'),'_')" />
