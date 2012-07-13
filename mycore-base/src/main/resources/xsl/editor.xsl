@@ -1163,13 +1163,6 @@
       <xsl:when test="@checked = 'true'">
         <xsl:attribute name="checked">checked</xsl:attribute>
       </xsl:when>
-      <xsl:when test="string-length($source) = 0">
-        <xsl:choose>
-          <xsl:when test="@default = 'true'">
-            <xsl:attribute name="checked">checked</xsl:attribute>
-          </xsl:when>
-        </xsl:choose>
-      </xsl:when>
     </xsl:choose>
     <xsl:call-template name="editor.set.css" />
   </input>
