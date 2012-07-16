@@ -1,5 +1,5 @@
 /** new MyCoRe user system */
-@XmlJavaTypeAdapters({ @XmlJavaTypeAdapter(type = java.util.Date.class, value = org.mycore.user2.utils.MCRDateXMLAdatapter.class) })
+@XmlJavaTypeAdapters({ @XmlJavaTypeAdapter(type = java.util.Date.class, value = org.mycore.user2.utils.MCRDateXMLAdapter.class) })
 package org.mycore.user2;
 
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;

@@ -35,7 +35,7 @@ import org.mycore.datamodel.common.MCRISO8601FormatChooser;
  * @author Thomas Scheffler (yagee)
  *
  */
-public class MCRDateXMLAdatapter extends XmlAdapter<String, Date> {
+public class MCRDateXMLAdapter extends XmlAdapter<String, Date> {
 
     @Override
     public Date unmarshal(String v) throws Exception {
