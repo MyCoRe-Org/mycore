@@ -10,11 +10,14 @@
     <xsl:call-template name="classeditor.includeDojoCSS" />
     <xsl:call-template name="classeditor.includeCSS" />
 
+    <div id="classificationEditorWrapper">
+    </div>
+
     <script type="text/javascript">
       function setup() {
         updateBodyTheme();
         var classEditor = new classeditor.Editor(classeditor.settings);
-        dojo.byId("contentWrapper").appendChild(classEditor.domNode);
+        dojo.byId("classificationEditorWrapper").appendChild(classEditor.domNode);
         classEditor.create();
         classEditor.loadClassification(classeditor.classId, classeditor.categoryId);
       }
