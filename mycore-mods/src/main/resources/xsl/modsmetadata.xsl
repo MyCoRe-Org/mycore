@@ -6,8 +6,9 @@
   version="1.0">
   <xsl:param name="MCR.Handle.Resolver.MasterURL" />
   <xsl:param name="MCR.Users.Guestuser.UserName" />
-  
-  <xsl:key use="mods:role/mods:roleTerm" name="name-by-role" match="mods:name"/>
+  <xsl:param name="ServletsBaseURL"/>
+
+  <xsl:key use="mods:role/mods:roleTerm" name="name-by-role" match="mods:name" />
 
   <xsl:template name="printMetaDate.mods">
     <!-- prints a table row for a given nodeset -->
@@ -220,13 +221,15 @@
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
             
             <!-- mods:name grouped by mods:role/mods:roleTerm -->
-            <xsl:for-each select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[not(@ID) and count(. | key('name-by-role',mods:role/mods:roleTerm)[1])=1]">
+            <xsl:for-each
+              select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[not(@ID) and count(. | key('name-by-role',mods:role/mods:roleTerm)[1])=1]">
               <!-- for every role -->
               <tr>
                 <td valign="top" class="metaname">
                   <xsl:choose>
                     <xsl:when test="mods:role/mods:roleTerm[@authority='marcrelator' and @type='code']">
-                      <xsl:apply-templates select="mods:role/mods:roleTerm[@authority='marcrelator' and @type='code']" mode="printModsClassInfo" />
+                      <xsl:apply-templates select="mods:role/mods:roleTerm[@authority='marcrelator' and @type='code']"
+                        mode="printModsClassInfo" />
                       <xsl:value-of select="':'" />
                     </xsl:when>
                     <xsl:when test="mods:role/mods:roleTerm[@authority='marcrelator']">
@@ -241,7 +244,7 @@
                 <td class="metavalue">
                   <xsl:for-each select="key('name-by-role',mods:role/mods:roleTerm)">
                     <xsl:if test="position()!=1">
-                      <xsl:value-of select="'; '"/>
+                      <xsl:value-of select="'; '" />
                     </xsl:if>
                     <xsl:apply-templates select="." mode="printName" />
                   </xsl:for-each>
@@ -668,20 +671,50 @@
         <xsl:variable select="." name="thisObjectType" />
         <xsl:variable name="label">
           <xsl:value-of select="$label" />
-  <!--          <xsl:choose>
-            <xsl:when test="count($context/structure/children/child[contains(@xlink:href,$thisObjectType)])=1">
-              <xsl:value-of select="i18n:translate(concat('metaData.',$thisObjectType,'.[singular]'))" />
+        </xsl:variable>
+        <xsl:variable name="children" select="$context/structure/children/child[contains(@xlink:href, concat('_',$thisObjectType,'_'))]" />
+        <xsl:variable name="maxElements" select="20" />
+        <xsl:variable name="positionMin">
+          <xsl:choose>
+            <xsl:when test="count($children) &gt; $maxElements">
+              <xsl:value-of select="count($children) - $maxElements + 1" />
             </xsl:when>
             <xsl:otherwise>
-              <xsl:value-of select="i18n:translate(concat('metaData.',$thisObjectType,'.[plural]'))" />
+              <xsl:value-of select="0" />
             </xsl:otherwise>
-          </xsl:choose> -->
+          </xsl:choose>
         </xsl:variable>
-        <xsl:call-template name="printMetaDate">
-          <xsl:with-param select="$context/structure/children/child[contains(@xlink:href, concat('_',$thisObjectType,'_'))]"
-            name="nodes" />
-          <xsl:with-param select="$label" name="label" />
-        </xsl:call-template>
+        <xsl:choose>
+          <xsl:when test="$positionMin != 0">
+            <!-- display recent $maxElements only -->
+            <tr>
+              <td valign="top" class="metaname">
+                <xsl:value-of select="concat($label,':')"/>
+              </td>
+              <td class="metavalue">
+                <p>
+                  <a href="{$ServletsBaseURL}MCRSearchServlet?parent={$context/@ID}">
+                    <xsl:value-of select="i18n:translate('metaData.mods.displayAll')" />
+                  </a>
+                </p>
+                <xsl:for-each select="$children[position() &gt;= $positionMin]">
+                  <xsl:call-template name="objectLink">
+                    <xsl:with-param name="obj_id" select="@xlink:href"/>
+                  </xsl:call-template>
+                  <xsl:if test="position()!=last()">
+                    <br/>
+                  </xsl:if>
+                </xsl:for-each>
+              </td>
+            </tr>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="printMetaDate">
+              <xsl:with-param select="$children" name="nodes" />
+              <xsl:with-param select="$label" name="label" />
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:for-each>
     </xsl:if>
   </xsl:template>
