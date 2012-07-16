@@ -533,7 +533,16 @@
         <xsl:choose>
           <xsl:when test="string-length($url)=0" />
           <xsl:otherwise>
-            <xsl:value-of select="concat($url,$HttpSession,'?id=',$id)" />
+            <xsl:variable name="urlWithParam">
+              <xsl:call-template name="UrlSetParam">
+                <xsl:with-param name="url" select="$url"/>
+                <xsl:with-param name="par" select="'id'"/>
+                <xsl:with-param name="value" select="$id" />
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:call-template name="UrlAddSession">
+              <xsl:with-param name="url" select="$urlWithParam" />
+            </xsl:call-template>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>

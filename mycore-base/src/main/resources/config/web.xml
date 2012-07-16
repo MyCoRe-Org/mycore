@@ -127,6 +127,10 @@
     <url-pattern>/servlets/derivate/delete</url-pattern>
   </servlet-mapping>
 
+  <servlet>
+    <servlet-name>MCRLockServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRLockServlet</servlet-class>
+  </servlet>
   <servlet id="FileNode">
     <servlet-name>MCRFileNodeServlet</servlet-name>
     <servlet-class>org.mycore.datamodel.ifs.MCRFileNodeServlet</servlet-class>
@@ -253,6 +257,10 @@
   <servlet-mapping>
     <servlet-name>MCRStaticXMLFileServlet</servlet-name>
     <url-pattern>*.xml</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRLockServlet</servlet-name>
+    <url-pattern>/servlets/MCRLockServlet</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>MCRFileNodeServlet</servlet-name>

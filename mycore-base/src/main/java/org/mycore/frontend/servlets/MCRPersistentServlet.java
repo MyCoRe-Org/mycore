@@ -61,6 +61,7 @@ import org.mycore.frontend.cli.MCRDerivateCommands;
 import org.mycore.frontend.cli.MCRObjectCommands;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.fileupload.MCRUploadHandlerIFS;
+import org.mycore.frontend.support.MCRObjectIDLockTable;
 import org.mycore.services.i18n.MCRTranslation;
 import org.xml.sax.SAXParseException;
 
@@ -230,12 +231,10 @@ public class MCRPersistentServlet extends MCRServlet {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    private MCRObjectID createObject(Document doc) throws MCRActiveLinkException, JDOMException, IOException, MCRException,
-            SAXParseException {
+    private MCRObjectID createObject(Document doc) throws MCRActiveLinkException, JDOMException, IOException, MCRException, SAXParseException {
         MCRObject mcrObject = getMCRObject(doc);
         MCRObjectID objectId = mcrObject.getId();
-        if (MCRAccessManager.checkPermission("create-" + objectId.getBase())
-                || MCRAccessManager.checkPermission("create-" + objectId.getTypeId())) {
+        if (MCRAccessManager.checkPermission("create-" + objectId.getBase()) || MCRAccessManager.checkPermission("create-" + objectId.getTypeId())) {
             synchronized (operation) {
                 if (objectId.getNumberAsInteger() == 0) {
                     String objId = mcrObject.getId().toString();
@@ -266,15 +265,19 @@ public class MCRPersistentServlet extends MCRServlet {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    private MCRObjectID updateObject(Document doc) throws MCRActiveLinkException, JDOMException, IOException, MCRException,
-            SAXParseException {
+    private MCRObjectID updateObject(Document doc) throws MCRActiveLinkException, JDOMException, IOException, MCRException, SAXParseException {
         MCRObject mcrObject = getMCRObject(doc);
         LOGGER.info("ID: " + mcrObject.getId());
-        if (MCRAccessManager.checkPermission(mcrObject.getId(), "writedb")) {
-            MCRMetadataManager.update(mcrObject);
-            return mcrObject.getId();
-        } else
-            throw new MCRPersistenceException("You do not have \"write\" permission on " + mcrObject.getId() + ".");
+        try {
+            if (MCRAccessManager.checkPermission(mcrObject.getId(), "writedb")) {
+                MCRMetadataManager.update(mcrObject);
+                return mcrObject.getId();
+            } else {
+                throw new MCRPersistenceException("You do not have \"write\" permission on " + mcrObject.getId() + ".");
+            }
+        } finally {
+            MCRObjectIDLockTable.unlock(mcrObject.getId());
+        }
     }
 
     /**
