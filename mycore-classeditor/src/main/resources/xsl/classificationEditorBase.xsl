@@ -22,6 +22,9 @@
 
   <!-- Call this template before you include dojo. Because of djConfig! -->
   <xsl:template name="classeditor.loadSettings">
+    <xsl:param name="classeditor.class" select="$classeditor.class"/>
+    <xsl:param name="classeditor.categ" select="$classeditor.categ"/>
+    <xsl:param name="classeditor.showId" select="$classeditor.showId"/>
     <script type="text/javascript">
       var classeditor = classeditor || {};
       classeditor.settings = {

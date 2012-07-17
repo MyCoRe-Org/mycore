@@ -2,7 +2,11 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
   <xsl:template match="classificationEditor">
-    <xsl:call-template name="classeditor.loadSettings" />
+    <xsl:call-template name="classeditor.loadSettings">
+      <xsl:with-param name="classeditor.class" select="@classId"/>
+      <xsl:with-param name="classeditor.categ" select="@categId"/>
+      <xsl:with-param name="classeditor.showId" select="@showId='true'"/>
+    </xsl:call-template>
     <!-- JS -->
     <xsl:call-template name="classeditor.includeDojoJS" />
     <xsl:call-template name="classeditor.includeJS" />
