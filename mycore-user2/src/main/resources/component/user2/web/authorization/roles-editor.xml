@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MyCoReWebPage>
+<MyCoReWebPage>
+  <section i18n="component.user2.admin.roleEditor.title" xml:lang="all">
+    <classificationEditor classId="mcr-roles" showId="true"/>
+  </section>
+</MyCoReWebPage>
