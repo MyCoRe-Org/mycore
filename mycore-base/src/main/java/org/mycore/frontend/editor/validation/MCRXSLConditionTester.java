@@ -1,18 +1,23 @@
 package org.mycore.frontend.editor.validation;
 
 import java.io.ByteArrayOutputStream;
+import java.text.MessageFormat;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.transform.JDOMSource;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRUtils;
 
 public class MCRXSLConditionTester {
+
+    private static Logger LOGGER = Logger.getLogger(MCRXSLConditionTester.class);
 
     private String condition;
 
@@ -23,6 +28,10 @@ public class MCRXSLConditionTester {
     public boolean testCondition(Document xml) throws Exception {
         Document xsl = buildXSLStylesheet(condition);
         String output = transform(xml, xsl);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(MessageFormat.format("Condition: {0}Stylesheet:\n{1}\nInput:\n{2}\nResult: {3}", condition, MCRUtils.documentAsString(xsl),
+                MCRUtils.documentAsString(xml), output));
+        }
         return "true".equals(output);
     }
 
@@ -57,7 +66,10 @@ public class MCRXSLConditionTester {
         otherwise.addContent("false");
         choose.addContent(otherwise);
 
-        return new Document(stylesheet);
+        Document document = new Document(stylesheet);
+        if (LOGGER.isDebugEnabled()) {
+        }
+        return document;
     }
 
     private String transform(Document input, Document xsl) throws Exception {
