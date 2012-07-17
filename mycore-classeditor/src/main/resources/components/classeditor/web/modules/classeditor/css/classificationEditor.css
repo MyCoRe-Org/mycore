@@ -16,7 +16,9 @@
 
 .classeditor {
 	height: 700px;
+	font-family: Helvetica,sans-serif;
 }
+
 .classeditor.dijitContentPane {
 	padding: 0px;
 }
@@ -47,6 +49,13 @@
 
 .classeditor .categoryEditorMainTable .dijitTextBox {
 	width: 98%;
+	margin-top: 3px;
+}
+
+.classeditor .categoryEditorMainTable .dijitTextArea {
+	/*it's odd, the textarea does not inherit from .classeditor*/
+	font-family: Helvetica,sans-serif;
+	font-size: 12px;
 }
 
 .classeditor .categoryEditorMainTable .dijitSelect {
@@ -75,6 +84,9 @@
 
 .classeditor .labelEditorTable th {
 	font-weight: normal;
+}
+.classeditor .labelEditorTable td {
+	vertical-align: top;
 }
 .classeditor .labelEditorTable .button {
 	text-align: right;

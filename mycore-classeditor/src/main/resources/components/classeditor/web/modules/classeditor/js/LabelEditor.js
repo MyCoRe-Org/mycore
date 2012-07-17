@@ -208,10 +208,11 @@ classeditor.LabelEditor.Row = function Row(args) {
 			})
 		});
 
-		this.descBox = new dijit.form.TextBox({
+		this.descBox = new dijit.form.Textarea({
 			value: this.desc,
 			intermediateChanges: true,
 			selectOnClick: true,
+			maxLength: 255,
 			onChange: dojo.hitch(this, function(/*String*/ newDesc) {
 				this.labelEditor.categoryChanged(this, "description", newDesc);
 			})
