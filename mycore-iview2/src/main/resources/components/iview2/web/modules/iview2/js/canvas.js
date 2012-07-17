@@ -89,7 +89,6 @@
         constructor.prototype._updateScreen = function cv__updateScreen() {
             if(!this.activateCanvas){
                 this._activateCanvas();
-                console.log("Canvas not initalised!");
                 //return;
             }
             var scope = this;
@@ -399,12 +398,6 @@
                     this.context2D.drawImage(tileImg, sx, sy, sw, sh, dx, dy, dw, dh);
                 } catch (err) {
                     console.log(err);
-                    console.log({
-                        "width:" : tileImg.naturalWidth,
-                        "height:" : tileImg.naturalHeight,
-                        "sw:" : sw,
-                        "sh:" : sh
-                    });
                 }
             } else {
                 this.notLoadedTile.push({
@@ -429,12 +422,10 @@
                 imgScope.loaded = true;
                 
                 if (that.zoomLevelChanged(zoomLevelOnLoad)) {
-                    //console.log("das zoomLevel hat sich geändert!");
                     return;
                 }
                 
                 jQuery(that).trigger(iview.Canvas.BEFORE_DRAW_EVENT);
-                //console.log("nachpos  Tile! " + tx + " x " + ty);
                 that.drawTileImage(tx, ty, tileImg);
                 jQuery(that).trigger(iview.Canvas.AFTER_DRAW_EVENT);
             };

@@ -409,7 +409,7 @@
     }
     
     function cv_addRotateButton() {
-        jQuery(document).bind("toolbarloaded", function(e) {
+        jQuery(document).bind("toolbarloaded", function(e) { 
             if (e.model.id != "mainTb") {
                 return;
             }

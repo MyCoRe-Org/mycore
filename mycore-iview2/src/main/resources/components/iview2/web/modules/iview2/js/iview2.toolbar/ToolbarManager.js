@@ -159,7 +159,7 @@ function createToolbars(viewer) {
 		if (!viewer.PhysicalModel) return;
 		viewer.toolbar.ctrl.checkNavigation(viewer.PhysicalModel);
 		if (jQuery(viewer.viewerContainer).find('.navigateHandles .pageBox')) {
-			viewer.toolbar.ctrl.updateDropDown(jQuery(viewer.toolbar.pagelist.find("a")[viewer.PhysicalModel.getCurPos() - 1]).html());
+			viewer.toolbar.ctrl.updateDropDown(jQuery(viewer.toolbar.pagelist.find("a:contains('[" + viewer.PhysicalModel.getCurPos()+"]')")).html());
 		}
 		viewer.toolbar.ctrl.paint("mainTb");
 	});

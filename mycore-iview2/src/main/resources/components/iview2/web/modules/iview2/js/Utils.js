@@ -311,6 +311,15 @@ function log(){
   }
 }
 
+/**
+ * Shows a Message to the User
+ * @param {Object} i18nKey the i18n key for the message that should be shown
+ */
+function showMessage(i18nKey){
+	var message = i18n.translate(i18nKey);
+	alert(message);
+}
+
 var URL = { "location": window.location};
 /**
  * @public
@@ -328,6 +337,24 @@ URL.getParam = function(param) {
 		return "";
 	}
 };
+
+/**
+ * @public
+ * @function
+ * @memberOf URL
+ * @description cleans a URL to prevent Remote File Inclusion
+ * @param {Object} url the url that should be cleaned (if null then the current URL will be used)
+ * @return the cleaned URL
+ */
+URL.getCleanUrl = function(url){
+	if(url != null || typeof url !== undefined){
+		return url.replace(/(:|\.\.|&#35|&#46|&#58|&#38|&#35|&amp)/, "§");
+	} else {
+		var currentUrl = window.location;
+		return currentUrl.replace(/(:|\.\.|&#35|&#46|&#58|&#38|&#35|&amp)/, "§");
+	}
+	
+}
 
 /**
  * Provides requestAnimationFrame in a cross browser way.

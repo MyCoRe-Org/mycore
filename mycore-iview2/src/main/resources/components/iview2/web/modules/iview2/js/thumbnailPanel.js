@@ -28,6 +28,7 @@ iview.ThumbnailPanel.View = function() {
 	this._tileUrlProvider = null;
 	this._useScrollBar = true;
 	this.my = null;
+	this.pageStart = 1;
 };
 
 (function() {
@@ -112,17 +113,21 @@ iview.ThumbnailPanel.View = function() {
 	 * @description	resizes the ThumbnailPanel when the size of the browser is changing
 	 */
 	function resize() {
-		createContainer.call(this);
-		//calculates the new correct height so the toolbar is visible into the ThumbnailPanel-View
-		if (window.innerWidth) {
-			this.my.self.css("height", window.innerHeight - 44 + "px"); //44 is the Height of the Toolbar
-		} else {
-			this.my.self.css("height", document.documentElement.clientHeight - 44 + "px"); //44 is the Height of the Toolbar
-		}
-		posContainer.call(this);
-		if (this._visible) {
+		if(this._visible){
+			createContainer.call(this);
+			//calculates the new correct height so the toolbar is visible into the ThumbnailPanel-View
+			// receive size from viewer
+			//var sizeWidth = jQuery(this.my.self).parent().find("div.viewer").css("width");
+			var sizeHeight = jQuery(this.my.self).parent().find("div.viewer").css("height");
+			var heightInt = parseInt(sizeHeight.substr(0,sizeHeight.length-2) ) + 13;
+			
+			// the size is the same size of the ViewerContainer
+			this.my.self.css("height", heightInt+"px" ); //44 is the Height of the Toolbar
+			
+			posContainer.call(this);
 			loadImages.call(this);
 		}
+
 	}
 	
 	/**
@@ -149,19 +154,24 @@ iview.ThumbnailPanel.View = function() {
 	 * @description	makes the View visible depending on the given boolean value, if no value is given the View will switch in the opposite mode than it's currently
 	 * @param 		{boolean} bool holds the state into which the View shall switch
 	 */
-	function visible(bool) {
+	function visible(bool, animated) {
 		if (typeof bool === "undefined") {
 			bool = !this._visible;
 		}
+		var scrollDownSpeed = "slow";
+		if(typeof animated !=="undefined" && animated == false){
+			scrollDownSpeed = 0;
+		}
+		
 		if (bool == true) {
 			this._visible = true;
 			//we're getting displayed so show the User the latest stuff
 			this.resize();
-			this.my.self.slideDown("slow");
+			this.my.self.slideDown(scrollDownSpeed);
 		} else {
 			this._visible = false;
 			var that = this.my.self;
-			this.my.self.slideUp("slow");
+			this.my.self.slideUp(scrollDownSpeed);
 		}
 	}
 	
@@ -182,7 +192,8 @@ iview.ThumbnailPanel.View = function() {
 			for (var j = 0; j < this._amount.width; j++) {
 				divBox= this.my.pictures[(i * (this._amount.width)) + j];
 				//get back previously hidden div's and set the picPos it represents
-				divBox.css("display", "block").attr("page",((i + this._currentFirstRow) * this._amount.width) + j);
+				
+				divBox.css("display", "block").attr("page", this.pageStart + ((i + this._currentFirstRow) * this._amount.width) + j);
 				
 				//load needed Previews
 				if ((((i + this._currentFirstRow) * this._amount.width) + j) < this._numberOfPages) {
@@ -217,7 +228,7 @@ iview.ThumbnailPanel.View = function() {
 	 * @param 		{object} divBox the according div box which contains one image
 	 */
 	function loadSingleImage(divBox) {
-		var pageName = this._pages[toInt(divBox.attr("page"))+1];
+		var pageName = this._pages[toInt(divBox.attr("page"))];
 		var source = this._tileUrlProvider.assembleUrl(0, 0, 0, pageName);
 		var preview = jQuery(divBox.children("img")[0]);
 		// original Values needed, because Img will scale automatic in each Props
@@ -376,14 +387,21 @@ iview.ThumbnailPanel.View = function() {
 	function posContainer() {
 		this._scrollBarWidth = ((this.my.bar)? this.my.bar.outerWidth(true): 0);
 	
+		var sizeWidth = jQuery(this.my.self).parent().find("div.viewer").css("width");
+		var sizeHeight = jQuery(this.my.self).parent().find("div.viewer").css("height");
+		
+		
 		if (this.my.bar) {
-			this.my.barObj.setSize(this.my.self.height());
+			this.my.barObj.setSize(sizeHeight);
 		}
+		
+
 		//reset everything else it does subsum and we screw everything up
-		this.my.picContainer.css({"width": this.my.self.innerWidth() - this._scrollBarWidth,
+		this.my.picContainer.css({"width": sizeWidth,
 			"padding": 0,
-			"padding-left": (this.my.self.innerWidth() - (this.my.pictures[0].outerWidth(true)*this._amount.width))/2 + "px",
-			"padding-top": (this.my.self.innerHeight() - (this.my.pictures[0].outerHeight(true)*this._amount.height))/2 + "px"});
+			"padding-left": (this.my.self.innerWidth() - (this.my.pictures[0].outerWidth(true)*this._amount.width) - 15)/2 + "px",
+			"padding-top": (this.my.self.innerHeight() - (this.my.pictures[0].outerHeight(true)*this._amount.height) - 15)/2 + "px"
+			});
 	}
 	
 	/**
@@ -427,7 +445,6 @@ iview.ThumbnailPanel.View = function() {
 		posContainer.call(this);
 		this.setSelected(args.selected || 0);
 		var that = this;
-		jQuery(window).resize(function() {that.resize()});
 		loadImages.call(this);
 	}
 	
@@ -499,6 +516,7 @@ iview.ThumbnailPanel.View = function() {
 iview.ThumbnailPanel.Controller = function(modelProvider, view, tileUrlProvider) {
 	this._model = modelProvider.createModel();
 	this._view = new (view || iview.ThumbnailPanel.View)();
+	this._view.pageStart = (typeof this._model.getEntryAt(0) === "undefined") ? 1 : 0;
 	this._tileUrlProvider = tileUrlProvider;
 	var that = this;
 	
@@ -508,8 +526,9 @@ iview.ThumbnailPanel.Controller = function(modelProvider, view, tileUrlProvider)
 	
 	jQuery(this._view).bind("click.thumbnailPanel", function(e, val) {
 		that._view.visible(false);
-		that._model.setPosition(val["new"]+1);
+		that._model.setPosition(val["new"]);
 	});
+	
 };
 
 (function() {
@@ -525,7 +544,7 @@ iview.ThumbnailPanel.Controller = function(modelProvider, view, tileUrlProvider)
 	 * @param		{string} args.customClass allows it to modify the Scrollbar in parts to differ from others
 	 * @param		{String,DOM-Object,anything jQuery supports} parent DOM element to which the ThumbnailPanel is added
 	 * @param		{boolean} args.useScrollBar tells if the ThumbnailPanel will use a scrollbar or not
-	 */
+	 */ 
 	function createView(args) {
 		this._view.setNumberOfPages(this._model.getNumberOfPages())
 		this._view.setDivSize({'width':200, 'height':200});
@@ -564,7 +583,7 @@ iview.ThumbnailPanel.Controller = function(modelProvider, view, tileUrlProvider)
 	 * @description	tells the view to hide itself
 	 */	
 	function hideView() {
-		this._view.visible(false);
+		this._view.visible(false,false);
 	}
 
 	/**

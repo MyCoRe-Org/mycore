@@ -78,5 +78,9 @@ ToolbarButtonModel.prototype = {
 		changeSubtypeState: function() {
 			this.subtype.state = !this.subtype.state;
 			jQuery(this).trigger("changeState", {'state' : this.subtype.state});
+		},
+		
+		remove: function() {
+			jQuery(this).trigger("del", {'button' : this});
 		}
 };

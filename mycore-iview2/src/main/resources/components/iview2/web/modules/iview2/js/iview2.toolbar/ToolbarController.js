@@ -84,16 +84,26 @@ ToolbarController.prototype.addView = function(view) {
         };
         iview.Permalink.openPermalink(that.getViewer(), button);
       }
+    } else if (args.parentName == "urnHandles") {
+        if (args.elementName == "urn") {
+          iview.urn.urnButtonClicked();
+        }
     } else if (args.parentName == "pdfHandles") {
       if (args.elementName == "createPdf") {
         that.getViewer().openPdfCreator();
       }
     } else if (args.parentName == "closeHandles") {
       if (args.elementName == "close") {
+      	if(that.getViewer().properties.killInstance !== "undefined" && that.getViewer().properties.killInstance == "true"){
+    		that.getViewer().context.switchContext();
+    		jQuery(".viewerContainer").remove();
+    		iview.removeInstance(that.getViewer());
+    		return;
+        }
         if (URL.getParam("jumpback") == "true") {
           history.back();
           return;
-        }
+        } 
         that.getViewer().toggleViewerMode();
       }
     }
@@ -128,13 +138,13 @@ ToolbarController.prototype.addView = function(view) {
           onChoose : function(item) {
             args.view.button("option", "label", jQuery(item).text());
             var content = (jQuery(item).text());
-            var page = content.substring(content.lastIndexOf('[') + 1, content.lastIndexOf(']'));
+            var page = content.substring(content.lastIndexOf('[') +1, content.lastIndexOf(']'));
             that.getViewer().PhysicalModel.setPosition(page);
           }
         });
         // MainTbView erst nachträglich geladen, Mets zuvor gelesen
         if (that.getViewer().PhysicalModel) {
-          var initContent = jQuery(jQuery('#pages').find('a')[that.getViewer().PhysicalModel.getCurPos() - 1]).html();
+          var initContent = jQuery(jQuery('#pages').find("a:contains('[" + that.getViewer().PhysicalModel.getCurPos()+"]')")).html();
           that.updateDropDown(initContent);
 
           // chapter and ThumbnailPanel need to wait for METS informations
@@ -315,8 +325,8 @@ ToolbarController.prototype._checkNewModel = function(model) {
  * @param		{iview.METS.PhysicalModel} which allows it to check if the buttons are clickable or not
  */
 ToolbarController.prototype.checkNavigation = function(model) {
-	var tooHigh = (model.getCurPos() >= model.getNumberOfPages())? true : false;
-	var tooLow = (model.getCurPos() <= 1)? true : false;
+	var tooHigh =!(model.hasNext());
+	var tooLow = !(model.hasPrevious());
 	
 	this.perform("setActive", !tooLow, 'previewBack', 'backward');
 	this.perform("setActive", !tooHigh, 'previewForward', 'forward');

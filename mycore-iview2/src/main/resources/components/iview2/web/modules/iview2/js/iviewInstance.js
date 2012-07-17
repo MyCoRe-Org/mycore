@@ -25,28 +25,29 @@
     jQuery(document).trigger(iview.IViewInstance.INIT_EVENT ,iViewInst);
     return returnValue;
   };
+  
+  iview.removeInstance = function(iViewInst) {
+  	var derivateId = iViewInst.properties.derivateId;
+    if (typeof Iview[derivateId] !== "undefined") {
+		Iview[derivateId].pop();
+	}
+  };
 
+/**
+ * The instance of a ImageViewer
+ */
   iview.IViewInstance = (function() {
+  	/**
+  	 * Creates a new Iview Instance
+  	 * @param {Object} container were the viewer should be
+  	 * @param {Object} options the options like derivateId
+  	 */
     function constructor(container, options) {
       var that = this;
-      var defaultOpts = {
-        "useChapter" : true,
-        "useOverview" : true,
-        "useThumbnailPanel" : true,
-        "initialized" : false,
-        "zoomWidth" : false,
-        "zoomScreen" : false,
-        "tileSize" : 256,
-        "startHeight" : 256,
-        "startWidth" : 256
-      };
-      this.properties = new iview.Properties(defaultOpts);
-      this.properties.set(options);
-      // check options
-      if (typeof this.properties.derivateId === "undefined") {
-        throw new iview.IviewInstanceError("No derivateId defined.", this);
-      }
-      // passed
+    
+      this.processProperties(options);
+      
+      // check if first instance 
       var paramDerId = URL.getParam("derivate");
       this.properties.useParam = false;
       if (typeof Iview[this.properties.derivateId] === "undefined") {
@@ -57,118 +58,223 @@
         }
         this.properties.useParam = (paramDerId === this.properties.derivateId) || (paramDerId.length === 0 && first);
       }
-      this.viewerContainer = container;
-      this.viewerContainer.isMax = function() {
-        return jQuery(this).hasClass("max");
-      };
-      this.overview = jQuery.extend(this.overview || {}, {
-        'loaded' : (this.overview || {}).loaded || false,
-        'parent' : container
-      });
-      this.chapter = jQuery.extend(this.chapter | {}, {
-        'loaded' : (this.chapter || {}).loaded || false,
-        'parent' : container
-      });
-      this.permalink = jQuery.extend(this.permalink | {}, {
-        'loaded' : (this.permalink || {}).loaded || false,
-        'observer' : new Array()
-      });
-      this.thumbnailPanel = jQuery.extend(this.thumbnailPanel | {}, {
-        'loaded' : (this.thumbnailPanel || {}).loaded || false
-      });
-      this.context = new iview.Context(this.viewerContainer, this);
-      this.currentImage = new iview.CurrentImage(this);
-      this.substractsDimension = {
-        'x' : {
-          'total' : 0,
-          'entries' : []
-        },
-        'y' : {
-          'total' : 0,
-          'entries' : []
-        }
-      };// other components which are lowering the width and the height of the viewer width and height
-      // uncomment this line to activate canvas mode
+	  
+	  this.initaliseComponents(container);
+	  
+      // Check if we could use the canvas image viewer
       if (iview.isCanvasAvailable) {
     	  this.canvas = new iview.Canvas(this);
       }
+	  
       jQuery(this.currentImage).bind(iview.CurrentImage.CHANGE_EVENT, function() {
-        that.processImageProperties();
+        that.onImageChangeHandler();
       });
+	  
       // TODO load toolbar after all resources (css, images) are ready
       createToolbars(this);
     }
 
-    constructor.prototype.startViewer = function ii_startViewer(startFile) {
+	/**
+	 * @description Handler that is automatic called when the image changes.
+	 * 
+	 */
+	constructor.prototype.onImageChangeHandler = function ii_onImageChangeHandler(){
+		this.processImageProperties();
+	};
+
+	/**
+	 * @description Handler that is automatic called when the viewer zooms
+	 */
+	constructor.prototype.onViewerZoomHandler = function ii_onImageZoomHandler() {
+		viewerZoomed.apply(this, arguments);
+	};
+
+    /**
+     * @description Handler that is automatic called when the viewer moves
+     * @param {Object} jq 
+     * @param {Object} event
+     */
+	constructor.prototype.onViewerMoveHandler = function ii_onImageMoveHandler(jq, event) {
+		 /*
+         * TODO somehow is this function triggered in IE7+ multiple times (the number of images in div.well often) after the first
+         * mousepress+mousemove occured. The jsfiddle http://jsfiddle.net/cPjZV/3/ seems not to have this problem, which looks like its
+         * caused from within our code. When those pseudo arguments occur they're missing our move object, so we check for that
+         */
+		//if (arguments.length < 2) return;
+		 if(event == null || event.x == null || event.y == null)
+    	 { 
+    		 return;
+    	 }
+    	 
+        this.currentImage.setPos({
+          'x' : -event.x,
+          'y' : -event.y
+        });
+	};
+
+	/**
+	 * @method
+	 * @memberOf {IViewInstance}
+	 * @description Assigns the the Components if there already loaded. Otherwise they get parent and loaded assigned.
+	 * @param {Object} container the viewer container were the components located.
+	 */
+    constructor.prototype.initaliseComponents = function ii_initaliseComponents(container){
+        this.viewerContainer = container;
+        this.viewerContainer.isMax = function(){
+            return jQuery(this).hasClass("max");
+        };
+        this.overview = jQuery.extend(this.overview ||
+        {}, {
+            'loaded': (this.overview ||
+            {}).loaded || false,
+            'parent': container
+        });
+        this.chapter = jQuery.extend(this.chapter |
+        {}, {
+            'loaded': (this.chapter ||
+            {}).loaded || false,
+            'parent': container
+        });
+        this.permalink = jQuery.extend(this.permalink |
+        {}, {
+            'loaded': (this.permalink ||
+            {}).loaded || false,
+            'observer': new Array()
+        });
+        this.thumbnailPanel = jQuery.extend(this.thumbnailPanel |
+        {}, {
+            'loaded': (this.thumbnailPanel ||
+            {}).loaded || false
+        });
+        this.context = new iview.Context(this.viewerContainer, this);
+        this.currentImage = new iview.CurrentImage(this);
+        this.substractsDimension = {
+            'x': {
+                'total': 0,
+                'entries': []
+            },
+            'y': {
+                'total': 0,
+                'entries': []
+            }
+        };
+		// other components which are lowering the width and the height of the viewer, can be applyed here
+		jQuery(this).trigger(iview.IViewInstance.INIT_COMPONENTS_EVENT, this);
+		
+		
+    };
+
+    /**
+     * @description Sets the Default properties and applys extra properties. 
+     * @exception throws IviewInstanceError if properties.derivateId is undefined.
+     * @memberOf {IViewInstance}
+     * @param {Object} properties the extra properties that should be set.
+     */
+    constructor.prototype.processProperties = function ii_processPoperties(properties){
+    	// apply the default properties
+        var defaultOpts = {
+          "useChapter" : true,
+          "useOverview" : true,
+          "useThumbnailPanel" : true,
+          "initialized" : false,
+          "zoomWidth" : false,
+          "zoomScreen" : false,
+          "tileSize" : 256,
+          "startHeight" : 256,
+          "startWidth" : 256
+        };
+        this.properties = new iview.Properties(defaultOpts);
+        // overwrite default properties with permited properties
+        this.properties.set(properties);
+        
+        // check if there is a derivate id setted
+        if (typeof this.properties.derivateId === "undefined") {
+            throw new iview.IviewInstanceError("No derivateId defined. (should be passed to the IviewInstance constructor)", this);
+        }
+    };
+	
+	/**
+	 * @description applys the properties: maximized, tosize, zoominfo and zoom
+	 */
+	constructor.prototype.applyProperties = function() {
+		var that = this;
+	  
+		// Blank needs to be loaded as blank, so the level is filled. Else it lays not ontop; needed for IE
+        this.context.viewer.find(".surface").css("background",
+            "transparent");
+
+        // PermaLink Handling
+        // choice if zoomLevel or special; zoomMode only makes sense in maximized viewer
+        if (this.properties.useParam && URL.getParam("maximized") == "true" ||
+		 (typeof this.properties.maximized !== "undefined" && this.properties.maximized == "true" ) ) {
+          if (URL.getParam("tosize") == "width") {
+            if (!this.currentImage.zoomInfo.zoomWidth)
+              this.viewerBean.pictureWidth();
+          } else if ((URL.getParam("tosize") == "screen" || isNaN(parseInt(URL.getParam("zoom"))))
+              && !this.currentImage.zoomInfo.zoomScreen) {
+            this.viewerBean.pictureScreen();
+          } else if (isNaN(parseInt(URL.getParam("zoom"))) && !this.currentImage.zoomInfo.zoomScreen) {
+            this.viewerBean.pictureScreen();
+          }
+          
+          this.toggleViewerMode();
+        }
+
+        // Resize-Events registrieren
+        jQuery(window).resize(function() {
+          that.reinitializeGraphic();
+        });
+
+      };
+    
+	/**
+	 * @param {Object} startFile
+	 * @param {boolean} should the viewer start maximized (overwrites container properties)
+	 */
+    constructor.prototype.startViewer = function ii_startViewer(startFile, maximized) {
+	 if(typeof maximized !== "undefined"){
+	 	this.properties.maximized = maximized;
+	 }
+		
       // Load Page
       if (this.properties.useParam && URL.getParam("page") != "") {
-        // TODO may be incomplete: Prevent Remote File Inclusion, but never Ever drop
-        startFile = decodeURI(URL.getParam("page").replace(/(:|\.\.|&#35|&#46|&#58|&#38|&#35|&amp)/, "§"));
+        startFile = decodeURI(URL.getCleanUrl(URL.getParam("page")));
       }
       // remove leading '/'
       startFile = encodeURI(startFile.replace(/^\/*/, ""));
       this.loading(startFile);
     };
-
+    
+	/**
+	 * @description Initialise the TileUrlProvider
+	 * 				Initialise the ViewerBean
+	 * 				
+	 * @param {Object} startFile
+	 */
     constructor.prototype.loading = function ii_loading(startFile) {
       PanoJS.USE_SLIDE = false;
       PanoJS.USE_LOADER_IMAGE = false;
       PanoJS.MOVE_THROTTLE = 10;
       PanoJS.BLANK_TILE_IMAGE = "../modules/iview2/" + styleFolderUri + 'blank.gif';
-
+	  var that = this;
       // opera triggers the onload twice
       var iviewTileUrlProvider = new PanoJS.TileUrlProvider(this.properties.baseUri, this.currentImage.name, 'jpg');
       iviewTileUrlProvider.derivate = this.properties.derivateId;
-      var that = this;
+      
       iviewTileUrlProvider.getCurrentImage = function initializeGraphic_getCurrentImage() {
         return that.currentImage;
       };
 
-      /**
-       * initialise the viewer
-       */
-      if (this.viewerBean == null) {
-        this.viewerBean = new PanoJS(this.context.viewer[0], {
-          initialPan : {
-            'x' : 0,
-            'y' : 0
-          },// Koordianten der oberen linken Ecke
-          tileSize : this.properties.tileSize,// Kachelgroesse
-          tileUrlProvider : iviewTileUrlProvider,
-          maxZoom : this.currentImage.zoomInfo.maxZoom,
-          initialZoom : this.currentImage.zoomInfo.zoomInit,// Anfangs-Zoomlevel
-          loadingTile : "../modules/iview2/" + styleFolderUri + 'blank.gif'
-        });
+	  this.initViewerBean(iviewTileUrlProvider);
 
-        this.viewerBean.iview = this;// handle Viewer informations so PanoJS can work with it
-
-        this.viewerBean.init();
-
-        this.reinitializeGraphic(function() {
-          jQuery(that.viewerBean.viewer).trigger("init.viewer");
-        });
-      }
       // needs to be registered before any other listener for this event
       var viewerBean = this.viewerBean;
-      jQuery(viewerBean.viewer).bind("zoom.viewer", function() {
-        viewerZoomed.apply(that, arguments);
-      }).bind("move.viewer", function(jq, event) {
-        /*
-         * TODO somehow is this function triggered in IE7+ multiple times (the number of images in div.well often) after the first
-         * mousepress+mousemove occured. The jsfiddle http://jsfiddle.net/cPjZV/3/ seems not to have this problem, which looks like its
-         * caused from within our code. When those pseudo arguments occur they're missing our move object, so we check for that
-         */
-         //if (arguments.length < 2) return;
-    	 if(event == null || event.x == null || event.y == null)
-    	 {
-    		 return;
-    	 }
-    	 
-        that.currentImage.setPos({
-          'x' : -event.x,
-          'y' : -event.y
-        });
-      });
+	  
+      jQuery(viewerBean.viewer).bind("zoom.viewer", function(){
+	  		that.onViewerZoomHandler(arguments);
+	  }).bind("move.viewer", function(jq, event){
+	  		that.onViewerMoveHandler(jq, event);
+	  });
 
       jQuery(this.viewerContainer).one("maximize.viewerContainer", function() {
         if (that.properties.useOverview) {
@@ -176,60 +282,68 @@
         }
         iview.scrollbar.importScrollbars(that);
       });
-
-      if (this.properties.useParam && !isNaN(parseInt(URL.getParam("zoom")))) {
-        viewerBean.zoomLevel = parseInt(URL.getParam("zoom"));
-      } else {
-        that.currentImage.zoomInfo.zoomScreen = true;
-      }
-
-      this.preload = new iview.Preload.Controller(this);
-      this.loadPage(function() {
-
-        /**
-         * @public
-         * @function
-         * @name startFileLoaded
-         * @description
-         */
-        // Blank needs to be loaded as blank, so the level is filled. Else it lays not ontop; needed for IE
-        that.context.viewer.find(".surface").css("background",
-            "transparent");
-
-        // PermaLink Handling
-        // choice if zoomLevel or special; zoomMode only makes sense in maximized viewer
-        if (that.properties.useParam && URL.getParam("maximized") == "true") {
-          if (URL.getParam("tosize") == "width") {
-            if (!that.currentImage.zoomInfo.zoomWidth)
-              that.viewerBean.pictureWidth();
-          } else if ((URL.getParam("tosize") == "screen" || isNaN(parseInt(URL.getParam("zoom"))))
-              && !that.currentImage.zoomInfo.zoomScreen) {
-            that.viewerBean.pictureScreen();
-          } else if (isNaN(parseInt(URL.getParam("zoom"))) && !that.currentImage.zoomInfo.zoomScreen) {
-            that.viewerBean.pictureScreen();
-          }
-          
-          that.toggleViewerMode();
+	  
+	    if (this.properties.useParam && !isNaN(parseInt(URL.getParam("zoom")))) {
+            this.viewerBean.zoomLevel = parseInt(URL.getParam("zoom"));
+        }
+        else {
+            this.currentImage.zoomInfo.zoomScreen = true;
         }
 
-        var metsDocURI = that.properties.webappBaseUri + "servlets/MCRMETSServlet/" + that.properties.derivateId;
+	  this.preload = new iview.Preload.Controller(this);
+	  	  
+      this.loadPage(function(){
+	  	that.applyProperties();
+		that.loadMetsFile();
+	  }, startFile);
+    };
+	
+	/**
+	 * Initialises the ViewerBean.
+	 */
+	constructor.prototype.initViewerBean = function ii_initViewerBean(iviewTileUrlProvider){
+		var that = this;
+		if (this.viewerBean == null) {
+			this.viewerBean = new PanoJS(this.context.viewer[0], {
+				initialPan: {
+					'x': 0,
+					'y': 0
+				},// Koordianten der oberen linken Ecke
+				tileSize: this.properties.tileSize,// Kachelgroesse
+				tileUrlProvider: iviewTileUrlProvider,
+				maxZoom: this.currentImage.zoomInfo.maxZoom,
+				initialZoom: this.currentImage.zoomInfo.zoomInit,// Anfangs-Zoomlevel
+				loadingTile: "../modules/iview2/" + styleFolderUri + 'blank.gif'
+			});
+			
+			this.viewerBean.iview = this;// handle Viewer informations so PanoJS can work with it
+			this.viewerBean.init();
+			
+			this.reinitializeGraphic(function() {
+          		jQuery(that.viewerBean.viewer).trigger("init.viewer");
+        	});
+		}
+	};
+	
+	/**
+	 * @description loads the Mets file from MCRMETSServlet and runs iview.METS.processMETS
+	 */
+	constructor.prototype.loadMetsFile = function ii_loadMetsFile(){
+		var metsDocURI = this.properties.webappBaseUri + "servlets/MCRMETSServlet/" + this.properties.derivateId;
+		var that = this;
         jQuery.ajax({
           url : metsDocURI,
           success : function(response) {
             iview.METS.processMETS(that, response);
+			iview.urn = new iview.urn.Controller(that);
+			jQuery(that).trigger(iview.IViewInstance.INIT_PHYSICAL_MODEL_EVENT, this);
           },
           error : function(request, status, exception) {
-            log("Error Occured while Loading METS file:\n" + exception);
-          }
+            log("Error Occured while  METS file:\n" + exception);
+			showMessage("component.iview2.noMets");
+          } 
         });
-
-        // Resize-Events registrieren
-        jQuery(window).resize(function() {
-          that.reinitializeGraphic();
-        });
-
-      }, startFile);
-    };
+	};
 
     /**
      * @public
@@ -241,7 +355,8 @@
     constructor.prototype.toggleViewerMode = function() {
         var waitForToolbar = function(self, iviewInst) {
             if (iviewInst.properties.initialized && typeof iviewInst.currentImage.zoomInfo.dimensions[0] == "object") {
-            	iviewInst.context.switchContext();
+            	
+				iviewInst.context.switchContext();
                 jQuery(iviewInst.viewerContainer).trigger((!iviewInst.viewerContainer.isMax() ? "minimize" : "maximize") + ".viewerContainer");
                 
                 /*
@@ -382,7 +497,9 @@
       viewerBean.width = viewer.outerWidth();
       viewerBean.height = viewer.outerHeight();
       viewerBean.resize();
+	  
 
+	  
       // den Modus beibehalten & aktualisieren
       var zoomInfo = this.currentImage.zoomInfo;
       if (zoomInfo.zoomScreen) {
@@ -500,5 +617,6 @@
   })();
   
   iview.IViewInstance.INIT_EVENT="init.iview.instance";
-    
+  iview.IViewInstance.INIT_COMPONENTS_EVENT="init.iview.components";
+  iview.IViewInstance.INIT_PHYSICAL_MODEL_EVENT="init.iview.physical.model"
 })();

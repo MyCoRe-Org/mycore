@@ -10,6 +10,7 @@
   <artifactId>mycore-iview2</artifactId>
   <name>MyCoRe IView2</name>
   <build>
+  
     <plugins>
       <plugin>
         <groupId>com.samaxes.maven</groupId>
@@ -65,10 +66,20 @@
                 <!--Übersichtsbild Klasse-->
                 <jsSourceFile>METS.js</jsSourceFile>
                 <!--METS Klasse-->
+                <jsSourceFile>iview2.METS/ChapterModel.js</jsSourceFile>
+                <jsSourceFile>iview2.METS/ChapterModelProvider.js</jsSourceFile>
+                <jsSourceFile>iview2.METS/PhysicalEntry.js</jsSourceFile>
+                <jsSourceFile>iview2.METS/PhysicalModel.js</jsSourceFile>
+                <jsSourceFile>iview2.METS/PhysicalModelProvider.js</jsSourceFile>
+                <!-- METS unter Klassen -->
                 <jsSourceFile>scrollBars.js</jsSourceFile>
                 <!--Scrollbar Klasse-->
                 <jsSourceFile>XML.js</jsSourceFile>
                 <!--XML Funktionen-->
+                <jsSourceFile>urnOverlay.js</jsSourceFile>
+                <!-- Urn Toolbar -->
+                <jsSourceFile>storage.js</jsSourceFile>
+                <!-- Wrapper for html5 storage -->
                 <!-- iview.init END-->
                 
                 <!-- menu -->
@@ -197,8 +208,8 @@
               <reportSet>
                 <reports>
                   <!-- include the desired reports -->
-                  <report>jslint</report>
                   <report>jsdoc</report>
+                  <report>jslint</report>
                 </reports>
               </reportSet>
             </reportSets>

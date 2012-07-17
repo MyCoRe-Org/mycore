@@ -54,7 +54,7 @@ ToolbarButtonsetModel.prototype = {
     	
     	var that = this;
     	// Events aus dem Button-Model "weiterleiten"
-    	jQuery(button).bind("changeState changeLoading changeActive", function (e, val) {
+    	jQuery(button).bind("changeState changeLoading changeActive del", function (e, val) {
 	    	jQuery(that).trigger(e.type, jQuery.extend(val, {'buttonName' : button.elementName}));
 	    });
     	

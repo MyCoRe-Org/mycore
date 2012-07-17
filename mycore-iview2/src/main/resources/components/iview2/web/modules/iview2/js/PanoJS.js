@@ -276,6 +276,7 @@ PanoJS.prototype = {
 
 	prepareTiles : function() {
 		if(!(this.tileSize > 0) || typeof(input)=='number'){
+			return; // dont throw exception
 			throw new iview.IviewInstanceError("Invalid Tilesize :" + this.tileSize, this);
 		}
 		var rows = Math.ceil(this.height / this.tileSize) + 2;
@@ -511,12 +512,12 @@ PanoJS.prototype = {
 		// ensure we are not zooming out of range
 		if (this.zoomLevel + direction < 0) {
 			if (PanoJS.MSG_BEYOND_MIN_ZOOM) {
-				alert(i18n.translate(PanoJS.MSG_BEYOND_MIN_ZOOM));
+				showMessage(PanoJS.MSG_BEYOND_MIN_ZOOM);
 			}
 			return;
 		} else if (this.zoomLevel + direction > this.maxZoomLevel) {
 			if (PanoJS.MSG_BEYOND_MAX_ZOOM) {
-				alert(i18n.translate(PanoJS.MSG_BEYOND_MAX_ZOOM));
+				showMessage(PanoJS.MSG_BEYOND_MAX_ZOOM);
 			}
 			return;
 		}

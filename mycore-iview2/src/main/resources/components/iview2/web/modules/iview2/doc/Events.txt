@@ -95,3 +95,7 @@ Thumbnail.js
 thumbnailPanel
 	click.thumbnail					if a picture was selected
 	
+iviewInstance.
+	iview.IViewInstance.INIT_EVENT				if a iview instance is created	[param = instance]
+	iview.IViewInstance.INIT_COMPONENTS_EVENT 	if the components has initialised (can be used to add DimensionSubstract) [param = instance]
+	

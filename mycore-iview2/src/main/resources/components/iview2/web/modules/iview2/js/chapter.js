@@ -168,7 +168,6 @@ iview.chapter.View = function() {
 			//if the node isn't within the current Viewport it's not displayed as the previous selectBranch 
 			//wasn't able to position the entry within the viewport. because the viewport didn't existed at that time
 			this._parent.slideDown(function() {
-				console.log(jQuery(that._selected));
 				jQuery(that._selected).data().logid;
 			});
 		} else {

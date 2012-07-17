@@ -2,30 +2,23 @@
 .tree-default .locked li a { color:gray; }
 /* DOTS */
 .tree-default ul { background-position:6px 1px; background-repeat:repeat-y; background-image:url(data:image/gif;base64,R0lGODlhAgACAIAAAB4dGf///yH5BAEAAAEALAAAAAACAAIAAAICRF4AOw==); _background-image:url("dot_for_ie.gif"); *background-image:url("dot_for_ie.gif"); }
-.tree-default li { background-position:-64px -16px; background-repeat:no-repeat; background-image:url("jstree.png"); }
+
 /* NO DOTS */
 .tree-default .no_dots, .tree-default .no_dots ul { background:transparent; }
 .tree-default .no_dots li.leaf { background-image:none; background-color:transparent; }
 /* OPEN or CLOSED */
-.tree-default li.open { background:url("jstree.png") -32px -48px no-repeat; }
-.tree-default li.closed, #jstree-dragged.tree-default li li.open { background:url("jstree.png") -48px -32px no-repeat; }
-#jstree-marker { background-image:url("jstree.png"); }
+
 /* DEFAULT, HOVER, CLICKED, LOADING STATES */
 .tree-default li a, .tree-default li span { border-radius:3px; -moz-border-radius:3px; -webkit-border-radius:3px; }
 .tree-default li a:hover, .tree-default li a.hover, .tree-default li span { background: #e7f4f9; border:1px solid #d8f0fa; padding:0px 3px 0px 3px; }
 .tree-default li a.clicked, .tree-default li a.clicked:hover, .tree-default li span.clicked { background: #beebff; border:1px solid #99defd; padding:0px 3px 0px 3px; }
 /* ICONS */
-.tree-default ins { background-image:url("jstree.png"); background-position:0 0; background-repeat:no-repeat; }
 .tree-default ul li a.loading ins { background-image:url("throbber.gif") !important; background-position:0 0 !important; } /* UL is added to make selector stronger */
 .tree-default li a ins.forbidden { background-position:-16px -16px; }
 .tree-default .locked li a ins { background-position:0 -48px; }
 .tree-default li span ins { background-position:-16px 0; }
-.tree-default li.page ins { background:url("jstree.png") -16px -50px no-repeat;}
-#jstree-dragged.tree-default ins { background:url("jstree.png") -16px -32px no-repeat; }
-#jstree-dragged.tree-default ins.forbidden { background:url("jstree.png") -16px -16px no-repeat; }
 
 /* CONTEXT MENU */
-.tree-default-context a ins { background-image:url("jstree.png"); background-repeat:no-repeat; background-position:-64px -64px; }
 .tree-default-context a ins.create { background-position:0 -16px; }
 .tree-default-context a ins.rename { background-position:-16px 0px; }
 .tree-default-context a ins.remove { background-position:0 -32px; }
@@ -436,13 +429,19 @@
 /* Main Container */
 .thumbnailPanel {
 	position: absolute;
-	top: 44px;
+	bottom: 0px;
 	left: 0px;
 	height: 100%;
 	width: 100%;
 	border:0px solid #000000;
-	background-color: #3A596D;
 	z-index:60;
+}
+
+.thumbnailPanel .picContainer{
+	 background-color: #3A596D;
+	 box-sizing: border-box;
+	 -moz-box-sizing: border-box;
+	 -ms-box-sizing: border-box;
 }
 
 /* Single Page Div's */
@@ -507,4 +506,41 @@
 
 .viewerContainer.max .thumbnailPanel .scrollV {
 	visibility: inherit;
+}
+
+.urnBox {
+	width: 98%;
+	min-height: 19px;
+	background: #DCDCDC;
+	padding: 4px;
+	padding-top: 4px;
+	padding-left: 1%;
+	padding-right: 1%;
+	border: 1px solid lightgrey;
+	vertical-align: middle;
+	position: relative;
+}
+
+.urnText {
+	text-shadow : 0 1px 0 rgba(255, 255, 255, 0.5);
+	float: left;
+}
+
+.urnClose {
+	float: right;
+	position: relative;
+	right: 3px;
+	text-shadow: 0 1px 0 #FFFFFF;
+	color: #000000;
+	font-family: Helvetica;
+	font-size: 20px;
+	font-weight: bold;
+	line-height: 18px;
+	opacity: 0.2;
+	float: right;
+}
+
+.urnClose:hover{
+	cursor : pointer;
+	opacity : 0.4;
 }
