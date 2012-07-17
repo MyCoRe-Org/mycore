@@ -16,6 +16,7 @@ import java.util.Set;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.input.SAXBuilder;
 import org.junit.After;
@@ -47,6 +48,8 @@ import com.sun.jersey.api.client.ClientResponse;
 public class MCRClassificationEditorResourceTest extends MCRJerseyResourceTest {
     private CategoryDAOMock categDAO;
 
+    static Logger LOGGER = Logger.getLogger(MCRClassificationEditorResourceTest.class);
+    
     @Before
     public void init() {
         System.setProperty("MCR.Configuration.File", "config/test.properties");
@@ -73,11 +76,9 @@ public class MCRClassificationEditorResourceTest extends MCRJerseyResourceTest {
         try {
             MCRStoreManager.createStore("jportal_jpclassi", MCRMetadataStore.class);
         } catch (InstantiationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOGGER.error("while creating store jportal_jpclassi", e);
         } catch (IllegalAccessException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOGGER.error("while creating store jportal_jpclassi", e);
         }
 
         try {

@@ -37,62 +37,49 @@ public class CategoryLinkServiceMock implements MCRCategLinkService{
 
     @Override
     public boolean hasLink(MCRCategory classif) {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public Map<MCRCategoryID, Number> countLinks(MCRCategory category, boolean childrenOnly) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public Map<MCRCategoryID, Number> countLinksForType(MCRCategory category, String type, boolean childrenOnly) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public Collection<String> getLinksFromCategory(MCRCategoryID id) {
-        // TODO Auto-generated method stub
         return null;
     }
 
 
     @Override
     public Collection<String> getLinksFromCategoryForType(MCRCategoryID id, String type) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public void setLinks(MCRCategLinkReference objectReference, Collection<MCRCategoryID> categories) {
-        // TODO Auto-generated method stub
-        
     }
 
     @Override
     public void deleteLinks(Collection<MCRCategLinkReference> ids) {
-        // TODO Auto-generated method stub
-        
     }
 
     @Override
     public void deleteLink(MCRCategLinkReference id) {
-        // TODO Auto-generated method stub
-        
     }
 
     @Override
     public boolean isInCategory(MCRCategLinkReference reference, MCRCategoryID id) {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public Collection<MCRCategoryID> getLinksFromReference(MCRCategLinkReference reference) {
-        // TODO Auto-generated method stub
         return null;
     }
 

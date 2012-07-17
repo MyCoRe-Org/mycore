@@ -84,7 +84,6 @@ public class CategoryDAOMock implements MCRCategoryDAO {
 
     @Override
     public List<MCRCategory> getCategoriesByLabel(MCRCategoryID baseID, String lang, String text) {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -100,13 +99,11 @@ public class CategoryDAOMock implements MCRCategoryDAO {
 
     @Override
     public List<MCRCategory> getParents(MCRCategoryID id) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public List<MCRCategoryID> getRootCategoryIDs() {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -117,32 +114,24 @@ public class CategoryDAOMock implements MCRCategoryDAO {
 
     @Override
     public MCRCategory getRootCategory(MCRCategoryID baseID, int childLevel) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public boolean hasChildren(MCRCategoryID id) {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public void moveCategory(MCRCategoryID id, MCRCategoryID newParentID) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void moveCategory(MCRCategoryID id, MCRCategoryID newParentID, int index) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void removeLabel(MCRCategoryID id, String lang) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -150,31 +139,25 @@ public class CategoryDAOMock implements MCRCategoryDAO {
         if (!categMap.containsKey(newCategory.getId())) {
             throw new IllegalArgumentException();
         }
-
         categMap.put(newCategory.getId(), newCategory);
     }
 
     @Override
     public void setLabel(MCRCategoryID id, MCRLabel label) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public long getLastModified() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public List<MCRCategory> getCategoriesByLabel(String lang, String text) {
-        // TODO Auto-generated method stub
         return null;
     }
 
 	@Override
 	public long getLastModified(String root) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 }
