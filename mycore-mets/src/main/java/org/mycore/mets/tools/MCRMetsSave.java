@@ -3,7 +3,12 @@ package org.mycore.mets.tools;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.activation.MimetypesFileTypeMap;
@@ -42,6 +47,7 @@ import org.mycore.mets.model.struct.SmLink;
  * handle addition and removing files from a derivate.
  * 
  * @author shermann
+ *          Sebastian Hofmann
  */
 public class MCRMetsSave {
 
@@ -206,6 +212,57 @@ public class MCRMetsSave {
         mets = MCRMetsSave.updateOnFileDelete(mets, file);
         if (mets != null)
             MCRMetsSave.saveMets(mets, derivate.getId().toString());
+    }
+
+    /**
+     * Inserts the given URNs into the Mets document.
+     * @param derivate The {@link MCRDerivate} wich contains the METs file
+     * @param fileUrnMap a {@link Map} wich contains the file as key and the urn as  as value
+     * @throws Exception
+     */
+    public static void updateMetsOnUrnGenerate(MCRDerivate derivate, Map<String, String> fileUrnMap) throws Exception {
+        Document mets = getCurrentMets(derivate);
+        if (mets == null) {
+            LOGGER.info(MessageFormat.format("Derivate with id \"{0}\" has no mets file. Nothing to do", derivate.getId().toString()));
+            return;
+        }
+        LOGGER.info(MessageFormat.format("Update {0} URNS in Mets.xml", fileUrnMap.size()));
+
+        Mets metsObject = new Mets(mets);
+        updateURNsInMetsDocument(metsObject, fileUrnMap);
+        saveMets(metsObject.asDocument(), derivate.getId().toString());
+    }
+
+    /**
+     * Inserts the given URNs into the {@link Mets} Object.
+     * @param mets the {@link Mets} object were the URNs should be inserted.
+     * @param fileUrnMap a {@link Map} wich contains the file as key and the urn as  as value
+     * @throws Exception
+     */
+    public static void updateURNsInMetsDocument(Mets mets, Map<String, String> fileUrnMap) throws Exception {
+        // put all files of the mets in a list
+        List<FileGrp> fileGroups = mets.getFileSec().getFileGroups();
+        List<org.mycore.mets.model.files.File> files = new ArrayList<org.mycore.mets.model.files.File>();
+        for (FileGrp fileGrp : fileGroups) {
+            files.addAll(fileGrp.getFileList());
+        }
+
+        // combine the filename and the id in a map
+        Map<String, String> idFileMap = new HashMap<String, String>();
+        for (org.mycore.mets.model.files.File file : files) {
+            idFileMap.put(file.getId(), file.getFLocat().getHref());
+        }
+
+        List<PhysicalSubDiv> childs = ((PhysicalStructMap) mets.getStructMap(PhysicalStructMap.TYPE)).getDivContainer().getChildren();
+        for (PhysicalSubDiv divChild : childs) {
+            String idMets = divChild.getChildren().get(0).getFileId();
+
+            // check if there is a URN for the file
+            String file = "/" + URLDecoder.decode(idFileMap.get(idMets), "UTF-8");
+            if (fileUrnMap.containsKey(file)) {
+                divChild.setContentids(fileUrnMap.get(file));
+            }
+        }
     }
 
     /**

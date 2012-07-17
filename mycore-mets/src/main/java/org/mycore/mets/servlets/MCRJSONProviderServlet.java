@@ -19,6 +19,7 @@
 package org.mycore.mets.servlets;
 
 import java.util.HashSet;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -28,10 +29,13 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.mets.model.MCRMETSGenerator;
+import org.mycore.mets.model.Mets;
 import org.mycore.mets.tools.MCRJSONProvider;
+import org.mycore.mets.tools.MCRMetsSave;
 
 /**
  * This servlet provides the data in json format for the dijit tree at the
@@ -52,23 +56,21 @@ public class MCRJSONProviderServlet extends MCRServlet {
 
         boolean useExistingMets = true;
         useExistingMets = Boolean.valueOf(job.getRequest().getParameter("useExistingMets"));
-
         MCRContent metsSource = MCRMETSServlet.getMetsSource(job, useExistingMets, derivate);
 
-        Document mets = metsSource.asXML();
+        Document metsDocument = metsSource.asXML();
 
         long start = System.currentTimeMillis();
         String json = null;
 
-        if (mets != null && useExistingMets) {
-            LOGGER.info("Creating JSONObject from " + MCRJSONProvider.DEFAULT_METS_FILENAME + " for derivate with id \"" + derivate + "\"");
-            MCRJSONProvider provider = new MCRJSONProvider(mets, derivate);
-            json = provider.toJSON();
-        } else {
-            LOGGER.info("Creating initial JSONObject for derivate with id \"" + derivate + "\"");
-            MCRJSONProvider provider = new MCRJSONProvider(getBaseMetsXML(derivate), derivate);
-            json = provider.toJSON();
+        if (metsDocument == null || !useExistingMets) {
+            LOGGER.info("Creating default mets!");
+            metsDocument = getBaseMetsXML(derivate);
         }
+
+        LOGGER.info("Creating initial JSONObject for derivate with id \"" + derivate + "\"");
+        MCRJSONProvider provider = new MCRJSONProvider(metsDocument, derivate);
+        json = provider.getJson();
 
         LOGGER.info("Generation of JSON (" + getClass().getSimpleName() + ") took " + (System.currentTimeMillis() - start) + " ms");
         HttpServletResponse response = job.getResponse();
@@ -76,6 +78,7 @@ public class MCRJSONProviderServlet extends MCRServlet {
         response.setCharacterEncoding(MCRConfiguration.instance().getString("MCR.Request.CharEncoding", "UTF-8"));
         response.getWriter().print(json);
         response.getWriter().flush();
+
         return;
     }
 

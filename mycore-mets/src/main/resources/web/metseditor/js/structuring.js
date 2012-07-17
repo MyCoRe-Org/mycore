@@ -172,6 +172,7 @@ function addStructureToTree() {
             structureType : pages[i].structureType,
             type : pages[i].type,
             path : pages[i].path,
+            contentIds : pages[i].contentIds,
             hide : pages[i].hide
         };
         store.newItem(newItem, {

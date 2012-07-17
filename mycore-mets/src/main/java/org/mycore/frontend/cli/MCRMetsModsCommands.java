@@ -25,7 +25,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.Vector;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerFactory;
@@ -43,6 +45,7 @@ import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.datamodel.ifs.MCRFileMetadataManager;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
@@ -52,13 +55,17 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectStructure;
 import org.mycore.frontend.metsmods.MCRMetsModsUtil;
 
+import org.mycore.mets.servlets.MCRMETSServlet;
 import org.mycore.mets.tools.MCRMetsResolver;
 import org.mycore.mets.tools.MCRMetsSave;
+import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRFieldDef;
+import org.mycore.services.fieldquery.MCRFieldValue;
 import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRQueryCondition;
 import org.mycore.services.fieldquery.MCRQueryManager;
+import org.mycore.services.fieldquery.MCRQueryParser;
 import org.mycore.services.fieldquery.MCRResults;
 
 /**
@@ -404,6 +411,33 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         }
 
         LOGGER.debug("Remove METS file for " + type + " request took " + (System.currentTimeMillis() - start) + "ms.");
+    }
+
+    public static void fixExistingMets() throws Exception {
+        MCRCondition urnCond = new MCRQueryParser().parse("objectsWithURN = true");
+        MCRQuery q = new MCRQuery(urnCond);
+        MCRResults result = MCRQueryManager.search(q);
+
+        List<String> ownerIds = new Vector<String>();
+        for (MCRHit hit : result) {
+            MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(hit.getID()));
+            MCRDirectory difs = MCRDirectory.getRootDirectory(der.getId().toString());
+            if (difs != null) {
+                MCRFilesystemNode mets = difs.getChild("mets.xml");
+                if (mets == null) {
+
+                    LOGGER.info("URN Derivate without mets :" + der);
+                } else {
+                    LOGGER.info("URN Derivate with mets :" + der);
+
+                    
+                    Map<String, String> urnFileMap = der.getUrnMap();
+                    if (urnFileMap.size() > 0) {
+                        MCRMetsSave.updateMetsOnUrnGenerate(der, urnFileMap);
+                    }
+                }
+            }
+        }
     }
 
     /**

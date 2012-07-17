@@ -25,9 +25,9 @@ function displayItemProperties(){
 					  + "\", name= \"" + selectedItem.name
 					  + "\", orderLabel = \"" + selectedItem.orderLabel
 					  + "\", type (tree) = \"" + selectedItem.type
-					  + "\", structureType = \"" + selectedItem.structureType +"\""
+					  + "\", structureType = \"" + selectedItem.structureType 
+					  + "\", ContentIds = \"" + selectedItem.contentIds 
 					  + "\", hide = \"" + selectedItem.hide +"\"";
-	
 
 	document.getElementById('displayItemProps').innerHTML = propString;
 }

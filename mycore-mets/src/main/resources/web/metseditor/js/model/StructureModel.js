@@ -20,11 +20,9 @@
 function Structure(identifier) {
     this.id = identifier;
     this.name = identifier;
-    ;
     this.children = [];
     this.logicalOrder;
     this.structureType;
-
     this.setId = function(identifier) {
         this.id = identifier;
     }
@@ -72,13 +70,19 @@ function Page(identifier, name) {
     this.structureType;
     this.path;
     this.hide;
-
+    this.contentIds;
+    
     this.setHide = function(hideToSet) {
-        this.hide = hideToSet;
+    	if(typeof this.hide === "undefined"){
+    		this.hide = new Array();
+    		this.hide.push(hideToSet);
+    		return;
+    	}
+        this.hide[0] = hideToSet;
     }
 
     this.getHide = function() {
-        return this.hide;
+        return this.hide[0];
     }
 
     this.setPath = function(pathToSet) {
@@ -128,6 +132,14 @@ function Page(identifier, name) {
     this.getStructureType = function() {
         return this.structureType;
     }
+    
+	this.setContentIds = function(contentIds){
+		this.contentIds = contentIds;	
+	}
+	
+	this.getcontentIds = function(){
+		return this.contentIds;	
+	}
 }
 
 function Unit(name) {

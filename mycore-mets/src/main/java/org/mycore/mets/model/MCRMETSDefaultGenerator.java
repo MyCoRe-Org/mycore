@@ -21,6 +21,7 @@ package org.mycore.mets.model;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -29,6 +30,9 @@ import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
+import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mets.model.files.FLocat;
 import org.mycore.mets.model.files.File;
 import org.mycore.mets.model.files.FileGrp;
@@ -45,6 +49,7 @@ import org.mycore.mets.model.struct.PhysicalStructMap;
 import org.mycore.mets.model.struct.PhysicalSubDiv;
 import org.mycore.mets.model.struct.SmLink;
 import org.mycore.mets.model.struct.StructLink;
+import org.mycore.mets.tools.MCRMetsSave;
 
 /**
  * 
@@ -88,6 +93,15 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
         mets.addStructMap(logicalStructMap);
         mets.setStructLink(structLink);
 
+        MCRDerivate owner = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(dir.getOwnerID()));
+        Map<String, String> urnFileMap = owner.getUrnMap();
+        if (urnFileMap.size() > 0) {
+            try {
+                MCRMetsSave.updateURNsInMetsDocument(mets, urnFileMap);
+            } catch (Exception e) {
+                LOGGER.error("error while adding urn´s to new Mets file", e);
+            }
+        }
         return mets;
     }
 

@@ -50,7 +50,10 @@ function build(structure, items, counter) {
             // log("Creating Page -> " + items[i].id, items[i].name);
             var page = new Page(items[i].id, items[i].name);
             /* just the order of the files */
-            page.setPhysicalOrder(c++);
+            page.setPhysicalOrder(c);
+            if( typeof items[i].hide === "undefined" || !items[i].hide[0]){
+            	++c;
+            }
             /* the order within a structure (logical) */
             page.setLogicalOrder(i + 1);
             // set other properties if any
@@ -61,6 +64,10 @@ function build(structure, items, counter) {
             page.setPath(items[i].path);
             // set the hidden attribute
             page.setHide(typeof items[i].hide === "undefined" ? false : items[i].hide);
+            // set the urn attribute
+            if(!(typeof items[i].contentIds == "undefined")){
+				page.setContentIds(items[i].contentIds);
+			}
             // add the child
             structure.addChild(page);
         } else {
