@@ -27,10 +27,15 @@ import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.xpath.XPath;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
@@ -167,6 +172,41 @@ final public class MCRDerivate extends MCRBase {
     }
 
     /**
+     * Reads all files and urns from the derivate.
+     * 
+     * @return A {@link Map} which contains the files as key and the urns as value. If no URN assigned the map will be empty.
+     */
+    public Map<String, String> getUrnMap() {
+        Map<String, String> fileUrnMap = new HashMap<String, String>();
+        
+        try {
+            XPath filesetPath = XPath.newInstance("./mycorederivate/derivate/fileset");
+            Object obj = filesetPath.selectSingleNode(this.createXML());
+            if (obj == null) {
+                return fileUrnMap;
+            }
+            
+            Element result = (Element) obj;
+            String urn = result.getAttributeValue("urn");
+
+            if (urn != null) {
+                XPath filePath = XPath.newInstance("./mycorederivate/derivate/fileset[@urn='" + urn + "']/file");
+                @SuppressWarnings("unchecked")
+                List<Element> files = filePath.selectNodes(this.createXML());
+
+                for (Element currentFileElement : files) {
+                    String currentUrn = currentFileElement.getChildText("urn");
+                    String currentFile = currentFileElement.getAttributeValue("name");
+                    fileUrnMap.put(currentFile, currentUrn);
+                }
+            } 
+        } catch (JDOMException ex) {
+            LOGGER.error("Read derivate XML cause error", ex);
+        }
+        return fileUrnMap;
+    }
+
+    /**
      * The methode receive the multimedia object(s) for the given MCRObjectID
      * and returned it as MCRDirectory.
      * 
@@ -231,7 +271,7 @@ final public class MCRDerivate extends MCRBase {
         }
         return true;
     }
-    
+
     /**
      * @return the {@link MCRObjectID} of the owner of the derivate
      */
