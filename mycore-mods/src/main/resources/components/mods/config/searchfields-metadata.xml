@@ -33,4 +33,4 @@
 
     <field name="mods.identifier" objects="mods" source="objectMetadata" type="identifier" value="text()" xpath="/mycoreobject/metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier"/>
 
-    <field name="mods.dateIssued" objects="mods" source="objectMetadata" type="date" value="text()" xpath="/mycoreobject/metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateIssued" sortable="true"/>
+    <field name="mods.dateIssued" objects="mods" source="objectMetadata" type="date" value="text()" xpath="/mycoreobject/metadata/def.modsContainer/modsContainer/mods:mods//mods:originInfo/mods:dateIssued" sortable="true"/>
