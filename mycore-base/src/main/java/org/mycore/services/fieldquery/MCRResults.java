@@ -250,7 +250,10 @@ public class MCRResults implements Iterable<MCRHit> {
         }
 
         for (int i = min; i <= max; i++) {
-            results.addContent(getHit(i).buildXML());
+            MCRHit hit = getHit(i);
+            if (hit != null) {
+                results.addContent(hit.buildXML());
+            }
         }
 
         return results;

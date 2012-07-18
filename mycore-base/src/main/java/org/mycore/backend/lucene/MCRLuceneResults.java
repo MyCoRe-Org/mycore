@@ -162,8 +162,13 @@ class MCRLuceneResults extends MCRResults {
             }
             try {
                 reQuery();
-                hit = getMCRHit(topDocs.scoreDocs[i], indexSearcher);
                 reQuery = true;
+                if (i < topDocs.scoreDocs.length) {
+                    hit = getMCRHit(topDocs.scoreDocs[i], indexSearcher);
+                } else {
+                    LOGGER.warn("There is no such result anymore: "+i);
+                    return reQuery;
+                }
             } catch (IOException ioe) {
                 throw new MCRException("Error while requerying Lucene index.", ioe);
             }
