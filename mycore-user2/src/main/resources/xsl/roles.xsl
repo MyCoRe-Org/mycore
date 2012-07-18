@@ -11,7 +11,7 @@
 
   <xsl:variable name="PageID" select="'select-group'" />
 
-  <xsl:variable name="PageTitle" select="concat(i18n:translate('component.user2.admin.groupSelectDisplay'),/user/@name)" />
+  <xsl:variable name="PageTitle" select="concat(i18n:translate('component.user2.admin.roleSelectDisplay'),/user/@name)" />
   <xsl:template match="roles[@classID]">
     <xsl:call-template name="mcrClassificationBrowser">
       <xsl:with-param name="classification" select="@classID" />
