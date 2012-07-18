@@ -24,7 +24,7 @@
 <xsl:param name="subselect.varpath" />
 <xsl:param name="subselect.webpage" />
 
-<xsl:variable name="folder.closed" select="concat($WebApplicationBaseURL,'images/folder_closed.gif')" />
+<xsl:variable name="folder.closed" select="concat($WebApplicationBaseURL,'images/folder_closed_in_use.gif')" />
 <xsl:variable name="folder.open" select="concat($WebApplicationBaseURL,'images/folder_open.gif')" />
 <xsl:variable name="folder.leaf" select="concat($WebApplicationBaseURL,'images/folder_closed_empty.gif')" />
 
