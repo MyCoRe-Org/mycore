@@ -26,22 +26,24 @@
     <xsl:param name="classeditor.categ" select="$classeditor.categ"/>
     <xsl:param name="classeditor.showId" select="$classeditor.showId"/>
     <script type="text/javascript">
-      var classeditor = classeditor || {};
-      classeditor.settings = {
-        webAppBaseURL: "<xsl:value-of select='$WebApplicationBaseURL' />",
-        resourceURL: "<xsl:value-of select='$classeditor.resourceURL' />",
-        webURL: "<xsl:value-of select='$classeditor.webURL' />",
-        jsURL: "<xsl:value-of select='$classeditor.jsURL' />",
-        imgURL: "<xsl:value-of select='$classeditor.imgURL' />",
-        cssURL: "<xsl:value-of select='$classeditor.cssURL' />",
-        returnURL: "<xsl:value-of select='$returnURL' />",
-        showId: "<xsl:value-of select='$classeditor.showId' />" === "true",
-        language: "<xsl:value-of select='$CurrentLang' />",
-        editable: true,
-        debug: "<xsl:value-of select='$classeditor.debug' />" === "true"
-      }
-      classeditor.classId = "<xsl:value-of select='$classeditor.class' />";
-      classeditor.categoryId = "<xsl:value-of select='$classeditor.categ' />";
+      var classeditor = classeditor || {
+        dojoVersion: "<xsl:value-of select='$classeditor.dojoVersion' />",
+        settings: {
+          webAppBaseURL: "<xsl:value-of select='$WebApplicationBaseURL' />",
+          resourceURL: "<xsl:value-of select='$classeditor.resourceURL' />",
+          webURL: "<xsl:value-of select='$classeditor.webURL' />",
+          jsURL: "<xsl:value-of select='$classeditor.jsURL' />",
+          imgURL: "<xsl:value-of select='$classeditor.imgURL' />",
+          cssURL: "<xsl:value-of select='$classeditor.cssURL' />",
+          returnURL: "<xsl:value-of select='$returnURL' />",
+          showId: "<xsl:value-of select='$classeditor.showId' />" === "true",
+          language: "<xsl:value-of select='$CurrentLang' />",
+          editable: true,
+          debug: "<xsl:value-of select='$classeditor.debug' />" === "true"
+        },
+        classId: "<xsl:value-of select='$classeditor.class' />",
+        categoryId: "<xsl:value-of select='$classeditor.categ' />"
+      };
 
       djConfig = {
         isDebug: false,
@@ -70,6 +72,33 @@
         <script type="text/javascript" src="{$classeditor.jsURL}/classificationEditor.min.js"></script>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="classeditor.includeDynamicCSS">
+    <!-- we need to load the css dynamic and put it into the head -->
+    <script type="text/javascript" src="{$classeditor.jsURL}/async.min.js"></script>
+    <script type="text/javascript">
+      classeditor.includeDojoCSS = function(callback) {
+        classeditor.loadCSS("http://ajax.googleapis.com/ajax/libs/dojo/"+classeditor.dojoVersion +"/dijit/themes/claro/claro.css", callback);
+      };
+      classeditor.includeCSS = function(callback) {
+        classeditor.loadCSS(classeditor.settings.cssURL + "/classificationEditor.css", callback);
+      };
+      classeditor.loadCSS = function(/*String*/ href, /*function*/ callback) {
+        var script = dojo.create('link', {
+          "rel": "stylesheet",
+          "type": "text/css",
+          "href": href,
+          "onload": function() {
+            callback(null, true);
+          },
+          "onerror": function(err) {
+            callback({error: err, href: href}, false);
+          }
+        });
+        dojo.query("head").append(script);
+      };
+    </script>
   </xsl:template>
 
   <xsl:template name="classeditor.includeDojoCSS">

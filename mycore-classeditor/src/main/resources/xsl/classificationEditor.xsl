@@ -11,19 +11,31 @@
     <xsl:call-template name="classeditor.includeDojoJS" />
     <xsl:call-template name="classeditor.includeJS" />
     <!-- CSS -->
-    <xsl:call-template name="classeditor.includeDojoCSS" />
-    <xsl:call-template name="classeditor.includeCSS" />
+    <xsl:call-template name="classeditor.includeDynamicCSS" />
 
     <div id="classificationEditorWrapper">
     </div>
 
     <script type="text/javascript">
       function setup() {
-        updateBodyTheme();
-        var classEditor = new classeditor.Editor(classeditor.settings);
-        dojo.byId("classificationEditorWrapper").appendChild(classEditor.domNode);
-        classEditor.create();
-        classEditor.loadClassification(classeditor.classId, classeditor.categoryId);
+        async.parallel([
+          function(callback) {
+            classeditor.includeDojoCSS(callback);
+          }, function(callback) {
+            classeditor.includeCSS(callback);
+          }
+        ], function(err, results) {
+          if(err != null) {
+            alert('error while loading css file ' + err.href);
+            console.log(err.error);
+            return;
+          }
+          updateBodyTheme();
+          var classEditor = new classeditor.Editor(classeditor.settings);
+          dojo.byId("classificationEditorWrapper").appendChild(classEditor.domNode);
+          classEditor.create();
+          classEditor.loadClassification(classeditor.classId, classeditor.categoryId);
+        });
       }
       dojo.ready(setup);
     </script>

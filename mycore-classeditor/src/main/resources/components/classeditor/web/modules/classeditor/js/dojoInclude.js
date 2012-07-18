@@ -2,6 +2,7 @@ dojo.require("dojo.data.ItemFileReadStore");
 dojo.require("dojo.data.ItemFileWriteStore");
 
 dojo.require("dojo.io.iframe");
+dojo.require("dojo.NodeList-manipulate");
 
 dojo.require("dijit.dijit"); // optimize: load dijit layer
 
