@@ -34,7 +34,7 @@
             jQuery('.toolbars').before("<div class=\"urnBox\"></div>");
             this._urnToolBar = jQuery(".urnBox");
             
-			
+            
             jQuery(this._urnToolBar).ready().append("<div class=\"urnText\"></div>");
             this._urnText = jQuery(".urnText");
             
@@ -45,7 +45,7 @@
             jQuery(this._urnCloseButton).click(function(){
                 jQuery(that).trigger(that.EVENT_ClosePressed);
             });
-			this.setUrnToolbarVisible(true);
+            this.setUrnToolbarVisible(true);
         };
         
         
@@ -63,12 +63,12 @@
          * @param {Integer} animate
          */
         constructor.prototype.setUrnButtonVisible = function urn_setUrnButtonVisible(visible){
-           this._iViewInstance.toolbar.ctrl.perform("setActive", visible, 'urnHandles', 'urn');
+            this._iViewInstance.toolbar.ctrl.perform("setActive", visible, 'urnHandles', 'urn');
         };
-		
-		constructor.prototype.removeUrnButton = function urn_removeButton(){
-			this._iViewInstance.toolbar.ctrl.perform("remove", "",'urnHandles', 'urn');
-		};
+        
+        constructor.prototype.removeUrnButton = function urn_removeButton(){
+            this._iViewInstance.toolbar.ctrl.perform("remove", "", 'urnHandles', 'urn');
+        };
         
         constructor.prototype.setUrnToolbarVisible = function urn_setUrnToolbarVisible(visible){
             if (visible) {
@@ -98,11 +98,18 @@
             }
             else {
                 var container = jQuery(this._iViewInstance.viewerContainer.context);
-                if (!this._iViewInstance.viewerContainer.isMax()) {
+				
+                if (this._iViewInstance.viewerContainer.isMax()) {
+                    jQuery(container).find("div.viewer").css({
+                        "top": "44px"
+                    });
+                }
+                else {
                     jQuery(container).find("div.viewer").css({
                         "top": "0px"
                     });
                 }
+				
                 if (this._iViewInstance.removeDimensionSubstract(true, 'UrnToolbar')) {
                     jQuery(container).find(".toolbars").css({
                         top: "-=27px",
@@ -140,10 +147,10 @@
             
             if (typeof that._iViewInstance.PhysicalModel.getCurrent() !== "undefined" && that._iViewInstance.PhysicalModel.getCurrent() != null) {
                 var currentUrn = iViewInst.PhysicalModel.getCurrent().getContentId();
-                that.hasUrn = !(typeof currentUrn == "undefined" || currentUrn == null || currentUrn == "");           
-				that.updateUrn();
+                that.hasUrn = !(typeof currentUrn == "undefined" || currentUrn == null || currentUrn == "");
+                that.updateUrn();
             }
-			
+            
             jQuery(iViewInst.currentImage).bind(iview.CurrentImage.CHANGE_EVENT, function(){
                 that.updateUrn();
             });
@@ -154,10 +161,11 @@
             
             jQuery(iViewInst.viewerContainer).one("maximize.viewerContainer", function(e){
                 that._view._createToolbar();
-
+                
             });
             
             jQuery(iViewInst.viewerContainer).bind("maximize.viewerContainer", function(e){
+            
                 if (that.hasUrn) {
                     that._view.setUrnToolbarVisible(true);
                     that._view.setUrnButtonVisible(false, false);
@@ -166,7 +174,7 @@
                 else {
                     that._view.setUrnToolbarVisible(false);
                     that._view.setUrnButtonVisible(false, false);
-					that._view.removeUrnButton();
+                    that._view.removeUrnButton();
                 }
             });
             
