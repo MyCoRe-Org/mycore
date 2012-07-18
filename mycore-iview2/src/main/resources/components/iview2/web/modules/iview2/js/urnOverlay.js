@@ -17,6 +17,7 @@
     
     
         function constructor(iViewInst){
+            this._toolBarVisible = true;
             this._iViewInstance = iViewInst;
             this._urnCloseButton = null;
             this._urnText = null;
@@ -73,6 +74,7 @@
         constructor.prototype.setUrnToolbarVisible = function urn_setUrnToolbarVisible(visible){
             if (visible) {
                 if (this._iViewInstance.addDimensionSubstract(true, 'UrnToolbar', 27)) {
+                    this._toolBarVisible = true;
                     this._iViewInstance.reinitializeGraphic();
                     
                     var container = jQuery(this._iViewInstance.viewerContainer.context);
@@ -98,7 +100,7 @@
             }
             else {
                 var container = jQuery(this._iViewInstance.viewerContainer.context);
-				
+                
                 if (this._iViewInstance.viewerContainer.isMax()) {
                     jQuery(container).find("div.viewer").css({
                         "top": "44px"
@@ -109,8 +111,9 @@
                         "top": "0px"
                     });
                 }
-				
+                
                 if (this._iViewInstance.removeDimensionSubstract(true, 'UrnToolbar')) {
+                    this._toolBarVisible = false;
                     jQuery(container).find(".toolbars").css({
                         top: "-=27px",
                     });
@@ -144,6 +147,7 @@
             this._view = new iview.urn.View(iViewInst);
             this._iViewInstance = iViewInst;
             this.hasUrn = false;
+            this._URN_TOOLBAR_STORAGE_KEY = "urnBarVisible";
             
             if (typeof that._iViewInstance.PhysicalModel.getCurrent() !== "undefined" && that._iViewInstance.PhysicalModel.getCurrent() != null) {
                 var currentUrn = iViewInst.PhysicalModel.getCurrent().getContentId();
@@ -156,6 +160,8 @@
             });
             
             jQuery(iViewInst.viewerContainer).bind("minimize.viewerContainer", function(e){
+                var store = getStorageAcces();
+                store.addStoragePair(that._URN_TOOLBAR_STORAGE_KEY, that._view._toolBarVisible);
                 that._view.setUrnToolbarVisible(false);
             });
             
@@ -165,16 +171,22 @@
             });
             
             jQuery(iViewInst.viewerContainer).bind("maximize.viewerContainer", function(e){
-            
-                if (that.hasUrn) {
+                var store = getStorageAcces();
+                var toolBarVisible = store.getStoragePair(that._URN_TOOLBAR_STORAGE_KEY);
+                if (that.hasUrn && toolBarVisible != "false") {
                     that._view.setUrnToolbarVisible(true);
                     that._view.setUrnButtonVisible(false, false);
                     that.updateUrn();
                 }
                 else {
+					if(that.hasUrn){
+						 that._view.setUrnButtonVisible(true, false);
+						 that.updateUrn();
+					} else {
+						 that._view.setUrnButtonVisible(false, false);
+						 that._view.removeUrnButton();
+					}
                     that._view.setUrnToolbarVisible(false);
-                    that._view.setUrnButtonVisible(false, false);
-                    that._view.removeUrnButton();
                 }
             });
             
