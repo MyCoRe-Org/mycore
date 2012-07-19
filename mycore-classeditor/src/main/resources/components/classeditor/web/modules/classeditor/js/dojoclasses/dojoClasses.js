@@ -1,2 +1,4 @@
-dojo.require("dojoclasses.SimpleRESTStore");
-dojo.require("dojoclasses.TreeDndSource");
+require([
+  "dojoclasses/SimpleRESTStore",
+  "dojoclasses/TreeDndSource"
+]);

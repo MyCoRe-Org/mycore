@@ -12,7 +12,7 @@
   <xsl:param name="classeditor.showId" select="false()" />
 
   <!-- Variables -->
-  <xsl:variable name="classeditor.dojoVersion" select="'1.6.1'" />
+  <xsl:variable name="classeditor.dojoVersion" select="'1.7.3'" />
 
   <xsl:variable name="classeditor.resourceURL" select="concat($WebApplicationBaseURL, 'rsc/classifications/')" />
   <xsl:variable name="classeditor.webURL" select="concat($WebApplicationBaseURL, 'modules/classeditor')"/>
@@ -20,7 +20,7 @@
   <xsl:variable name="classeditor.imgURL" select="concat($classeditor.webURL, '/img')"/>
   <xsl:variable name="classeditor.cssURL" select="concat($classeditor.webURL, '/css')"/>
 
-  <!-- Call this template before you include dojo. Because of djConfig! -->
+  <!-- Call this template before you include dojo. Because of dojoConfig! -->
   <xsl:template name="classeditor.loadSettings">
     <xsl:param name="classeditor.class" select="$classeditor.class"/>
     <xsl:param name="classeditor.categ" select="$classeditor.categ"/>
@@ -45,21 +45,20 @@
         categoryId: "<xsl:value-of select='$classeditor.categ' />"
       };
 
-      djConfig = {
+      dojoConfig = {
+        async: true,
         isDebug: false,
         parseOnLoad: true,
-        baseUrl: classeditor.settings.webURL + "/",
-        dojoBlankHtmlUrl: classeditor.settings.webURL + "/blank.html",
-        modulePaths: {
-          "dojoclasses": "js/dojoclasses"
-        },
-        xdWaitSeconds: 10
+        packages: [
+          {name: "dojoclasses", location: classeditor.settings.jsURL + "/dojoclasses"}
+        ],
+        dojoBlankHtmlUrl: classeditor.settings.webURL + "/blank.html"
       };
     </script>
   </xsl:template>
 
   <xsl:template name="classeditor.includeDojoJS">
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/dojo/{$classeditor.dojoVersion}/dojo/dojo.xd.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/dojo/{$classeditor.dojoVersion}/dojo/dojo.js"></script>
     <script type="text/javascript" src="{$classeditor.jsURL}/dojoInclude.js"></script>
   </xsl:template>
 
@@ -78,26 +77,28 @@
     <!-- we need to load the css dynamic and put it into the head -->
     <script type="text/javascript" src="{$classeditor.jsURL}/async.min.js"></script>
     <script type="text/javascript">
-      classeditor.includeDojoCSS = function(callback) {
-        classeditor.loadCSS("http://ajax.googleapis.com/ajax/libs/dojo/"+classeditor.dojoVersion +"/dijit/themes/claro/claro.css", callback);
-      };
-      classeditor.includeCSS = function(callback) {
-        classeditor.loadCSS(classeditor.settings.cssURL + "/classificationEditor.css", callback);
-      };
-      classeditor.loadCSS = function(/*String*/ href, /*function*/ callback) {
-        var script = dojo.create('link', {
-          "rel": "stylesheet",
-          "type": "text/css",
-          "href": href,
-          "onload": function() {
-            callback(null, true);
-          },
-          "onerror": function(err) {
-            callback({error: err, href: href}, false);
-          }
-        });
-        dojo.query("head").append(script);
-      };
+      require(["dojo/dom-construct", "dojo/query", "dojo/NodeList-manipulate"], function(domConstruct, query) {
+        classeditor.includeDojoCSS = function(callback) {
+          classeditor.loadCSS("http://ajax.googleapis.com/ajax/libs/dojo/"+classeditor.dojoVersion +"/dijit/themes/claro/claro.css", callback);
+        };
+        classeditor.includeCSS = function(callback) {
+          classeditor.loadCSS(classeditor.settings.cssURL + "/classificationEditor.css", callback);
+        };
+        classeditor.loadCSS = function(/*String*/ href, /*function*/ callback) {
+          var css = domConstruct.create('link', {
+            "rel": "stylesheet",
+            "type": "text/css",
+            "href": href,
+            "onload": function() {
+              callback(null, true);
+            },
+            "onerror": function(err) {
+              callback({error: err, href: href}, false);
+            }
+          });
+          query("head").append(css);
+        };
+      });
     </script>
   </xsl:template>
 

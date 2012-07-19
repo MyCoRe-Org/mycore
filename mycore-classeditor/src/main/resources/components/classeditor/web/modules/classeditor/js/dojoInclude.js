@@ -1,28 +1,40 @@
-dojo.require("dojo.data.ItemFileReadStore");
-dojo.require("dojo.data.ItemFileWriteStore");
+require(["dojo/ready"], function(ready) {
+	ready(function() {
+		require([
+		    "dojo/topic",
+		    "dojo/query",
+         	"dojo/NodeList-manipulate",
+         	"dojo/data/ItemFileReadStore",
+         	"dojo/data/ItemFileWriteStore",
 
-dojo.require("dojo.io.iframe");
-dojo.require("dojo.NodeList-manipulate");
+         	"dojo/io/iframe",
 
-dojo.require("dijit.dijit"); // optimize: load dijit layer
+         	"dijit/dijit",
+         	"dijit/Dialog",
 
-dojo.require("dijit.Dialog");
+         	"dijit/Tree",
+         	"dijit/tree/TreeStoreModel",
+         	"dijit/tree/dndSource",
 
-dojo.require("dijit.Tree");
-dojo.require("dijit.tree.TreeStoreModel");
-dojo.require("dijit.tree.dndSource");
+         	"dijit/layout/ContentPane",
+         	"dijit/layout/BorderContainer",
 
-dojo.require("dijit.layout.ContentPane");
-dojo.require("dijit.layout.BorderContainer");
+         	"dijit/form/Form",
+         	"dijit/form/Button",
+         	"dijit/form/TextBox",
+         	"dijit/form/Textarea",
+         	"dijit/form/ValidationTextBox",
+         	"dijit/form/Select",
+         	"dijit/form/CheckBox",
+         	"dijit/form/SimpleTextarea",
 
-dojo.require("dijit.form.Form");
-dojo.require("dijit.form.Button");
-dojo.require("dijit.form.TextBox");
-dojo.require("dijit.form.Textarea");
-dojo.require("dijit.form.ValidationTextBox");
-dojo.require("dijit.form.Select");
-dojo.require("dijit.form.CheckBox");
-dojo.require("dijit.form.SimpleTextarea");
-
-dojo.require("dijit.Tooltip");
-dojo.require("dijit.Toolbar");
+         	"dijit/Tooltip",
+         	"dijit/Toolbar",
+         	"dijit/ToolbarSeparator"
+		], function(topic) {
+			ready(function() {
+				topic.publish("dojo/included");
+			});
+		});
+	});
+});

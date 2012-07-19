@@ -17,9 +17,13 @@
     </div>
 
     <script type="text/javascript">
-      function setup() {
+      function setup(topic) {
         async.parallel([
           function(callback) {
+            topic.subscribe("dojo/included", function(){
+              callback();
+            });
+          }, function(callback) {
             classeditor.includeDojoCSS(callback);
           }, function(callback) {
             classeditor.includeCSS(callback);
@@ -37,7 +41,7 @@
           classEditor.loadClassification(classeditor.classId, classeditor.categoryId);
         });
       }
-      dojo.ready(setup);
+      require(["dojo/topic", "dojo/ready", "dijit/registry", "dojo/domReady!"], setup);
     </script>
 
   </xsl:template>

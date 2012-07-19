@@ -1,8 +1,9 @@
-dojo.provide("dojoclasses.TreeDndSource");
-dojo.require("dijit.tree.dndSource");
+define([
+	"dojo/_base/declare", // declare
+	"dijit/tree/dndSource"
+], function(declare, dndSource) {
 
-dojo.declare("dojoclasses.TreeDndSource", dijit.tree.dndSource, {
-
+return declare("dojoclasses.TreeDndSource", dndSource, {
 	onMouseDown: function(e) {
 		// this is a workaround to fix dnd support in tree
 		// the id is only set if the scrollbar is hit, this allows us
@@ -27,5 +28,6 @@ dojo.declare("dojoclasses.TreeDndSource", dijit.tree.dndSource, {
 	setEnabled: function(e) {
 		enabled = e;
 	}
-
 });
+});
+

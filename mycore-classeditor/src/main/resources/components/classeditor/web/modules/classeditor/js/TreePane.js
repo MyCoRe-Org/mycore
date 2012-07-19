@@ -78,7 +78,6 @@ classeditor.TreePane = function(settings) {
 
 		// toolbar
 		this.toolbar = new dijit.Toolbar({
-			className: "toolbar",
 			region: "bottom",
 			splitter: false
 		});

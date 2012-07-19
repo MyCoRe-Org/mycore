@@ -12,11 +12,11 @@
 
     <script type="text/javascript">
       function openClasseditor() {
-        var diag = dijit.byId("classiDiag");
-        if (diag == undefined) {
-          diag = create();
-        }
-        diag.show();
+          var diag = dijit.byId("classiDiag");
+          if (diag == undefined) {
+            diag = create();
+          }
+          diag.show();
       }
 
       function create() {

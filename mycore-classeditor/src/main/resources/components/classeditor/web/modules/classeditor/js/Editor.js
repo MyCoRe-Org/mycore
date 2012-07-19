@@ -27,8 +27,6 @@ classeditor.Editor = function(settings) {
 	this.classificationId = null;
 	this.categoryId = null;
 
-	// toolbar
-	this.toolbar = null;
 	// content
 	this.treePane = null;
 	this.categoryEditorPane = null;

@@ -1,8 +1,9 @@
-dojo.provide("dojoclasses.SimpleRESTStore");
-dojo.require("dojo.data.ItemFileWriteStore");
+define([
+	"dojo/_base/declare", // declare
+	"dojo/data/ItemFileWriteStore"
+], function(declare, itemFileWriteStore) {
 
-dojo.declare("dojoclasses.SimpleRESTStore", dojo.data.ItemFileWriteStore, {
-
+return declare("dojoclasses.SimpleRESTStore", itemFileWriteStore, {
 	constructor: function(/* object */ keywordParameters){
 		this.settings = keywordParameters.settings;
 	},
@@ -309,3 +310,11 @@ dojo.declare("dojoclasses.SimpleRESTStore", dojo.data.ItemFileWriteStore, {
 	}
 
 });
+});
+
+
+
+
+
+
+
