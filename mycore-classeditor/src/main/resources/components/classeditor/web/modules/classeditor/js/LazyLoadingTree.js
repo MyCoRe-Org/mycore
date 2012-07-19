@@ -190,7 +190,7 @@ classeditor.LazyLoadingTree = function(settings) {
 
 	function getLabel(/* TreeItem */ treeItem) {
 		var currentLang = SimpleI18nManager.getInstance().getCurrentLanguage(), label;
-		if(treeItem.labels) {
+		if(treeItem.labels && treeItem.labels.length > 0) {
 			label = getLabelText(currentLang, treeItem.labels);
 			if(this.showIdInLabel && treeItem.id[0].rootid) {
 				label += " [" + getLabelId(treeItem.id[0]) + "]";
