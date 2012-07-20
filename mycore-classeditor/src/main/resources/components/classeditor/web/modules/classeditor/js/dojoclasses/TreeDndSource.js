@@ -15,7 +15,7 @@ return declare("dojoclasses.TreeDndSource", dndSource, {
 		}
 		this.inherited("onMouseDown", arguments);		
 	},
-	
+
 	enabled: true,
 
 	onMouseMove: function(e) {

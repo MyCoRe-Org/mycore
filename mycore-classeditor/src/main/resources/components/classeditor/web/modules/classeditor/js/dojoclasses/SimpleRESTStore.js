@@ -79,7 +79,7 @@ return declare("dojoclasses.SimpleRESTStore", itemFileWriteStore, {
 		// First, we define a couple little utility functions...
 		var addingArrays = false,
 		    self = this;
-		
+
 		function valueIsAnItem(/* anything */ aValue){
 			// summary:
 			//		Given any sort of value that could be in the raw json data,
@@ -94,8 +94,7 @@ return declare("dojoclasses.SimpleRESTStore", itemFileWriteStore, {
 			// 	|	true == valueIsAnItem({name:'Kermit', color:'green'});
 			// 	|	true == valueIsAnItem({iggy:'pop'});
 			// 	|	true == valueIsAnItem({foo:42});
-			var isItem = (
-				(aValue !== null) &&
+			return (aValue !== null) &&
 				(typeof aValue === "object") &&
 				(!dojo.isArray(aValue) || addingArrays) &&
 				(!dojo.isFunction(aValue)) &&
@@ -104,11 +103,11 @@ return declare("dojoclasses.SimpleRESTStore", itemFileWriteStore, {
 				(typeof aValue._type === "undefined") && 
 				(typeof aValue._value === "undefined") &&
 				self.hierarchical &&
+				// TODO: we call this because we don't want labels or other json elements
+				// to be included as an extra tree item: http://bugs.dojotoolkit.org/ticket/15727
 				self.isValueAnItem(aValue)
-			);
-			return isItem;
 		}
-		
+
 		function addItemAndSubItemsToArrayOfAllItems(/* Item */ anItem){
 			self._arrayOfAllItems.push(anItem);
 			for(var attribute in anItem){

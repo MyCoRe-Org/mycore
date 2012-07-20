@@ -94,12 +94,6 @@ classeditor.TreePane = function(settings) {
 	}
 
 	function addTreeToDOM() {
-		// surrounding div fixes bug 10585 @see
-		// http://bugs.dojotoolkit.org/ticket/10585
-		// TODO: enable this for correct dnd support -> check scrollbars!!
-		// EDIT 21.06.12: seems to working now without surrounding div
-//		var surroundingTreeDiv = dojo.create("div");
-//		surroundingTreeDiv.appendChild(this.tree.tree.domNode);
 		this.treePane.set("content", this.tree.tree.domNode);
 		this.tree.tree.startup();
 	}
