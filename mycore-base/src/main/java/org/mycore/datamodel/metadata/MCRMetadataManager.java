@@ -606,7 +606,7 @@ public final class MCRMetadataManager {
         if (setparent) {
             try {
                 final MCRObject parent = MCRMetadataManager.retrieveMCRObject(newParentID);
-                parent.getStructure().addChild(new MCRMetaLinkID("child", mcrObject.getId(), mcrObject.getLabel(), mcrObject.getLabel()));
+                parent.getStructure().addChild(new MCRMetaLinkID("child", mcrObject.getId(), null, mcrObject.getLabel()));
                 MCRMetadataManager.fireUpdateEvent(parent);
             } catch (final Exception e) {
                 LOGGER.error("Error while store child ID in parent object.", e);
