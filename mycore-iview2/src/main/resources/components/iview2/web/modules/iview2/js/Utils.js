@@ -317,7 +317,10 @@ function log(){
  */
 function showMessage(i18nKey){
 	var message = i18n.translate(i18nKey);
-	alert(message);
+	jQuery("<div id=\"" + i18nKey + "_message\">" + message + "</div>").dialog({
+		height : 140,
+		modal : true
+	});
 }
 
 var URL = { "location": window.location};

@@ -339,12 +339,49 @@
 			jQuery(that).trigger(iview.IViewInstance.INIT_PHYSICAL_MODEL_EVENT, this);
           },
           error : function(request, status, exception) {
+        	that.removeNavigationButtons();
             log("Error Occured while  METS file:\n" + exception);
 			showMessage("component.iview2.noMets");
           } 
         });
 	};
 
+		constructor.prototype.removeNavigationButtons = function() {
+			var that = this;
+			if (this.viewerContainer.isMax()) {
+				this.toolbar.ctrl.perform("remove", "", 'navigateHandles',
+						'backward');
+				this.toolbar.ctrl.perform("remove", "", 'navigateHandles',
+						'pageBox');
+				this.toolbar.ctrl.perform("remove", "", 'navigateHandles',
+						'forward ');
+			} else {
+				this.toolbar.ctrl.perform("remove", "", 'previewBack',
+						'backward');
+				this.toolbar.ctrl.perform("remove", "", 'previewForward',
+						'forward');
+			}
+			jQuery(this.viewerContainer).bind(
+					"minimize.viewerContainer",
+					function() {
+						that.toolbar.ctrl.perform("remove", "", 'previewBack',
+								'backward');
+						that.toolbar.ctrl.perform("remove", "",
+								'previewForward', 'forward');
+					});
+
+			jQuery(this.viewerContainer).bind(
+					"maximize.viewerContainer",
+					function() {
+						that.toolbar.ctrl.perform("remove", "",
+								'navigateHandles', 'backward');
+						that.toolbar.ctrl.perform("remove", "",
+								'navigateHandles', 'pageBox');
+						that.toolbar.ctrl.perform("remove", "",
+								'navigateHandles', 'forward');
+					});
+		};
+	
     /**
      * @public
      * @function
