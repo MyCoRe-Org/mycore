@@ -19,6 +19,22 @@
       </xsl:if>
     </xsl:copy>
   </xsl:template>
+  
+  <xsl:template match="mods:detail/mods:caption">
+  </xsl:template>
+
+  <xsl:template match="mods:genre[@authority='marcgt']">
+    <xsl:copy>
+      <xsl:apply-templates select="@*" />
+      <xsl:apply-templates />
+    </xsl:copy>
+    <xsl:choose>
+      <xsl:when test="text()='journal'">
+        <!-- bibutils does not detect article on RIS or Endnote export -->
+        <mods:genre>academic journal</mods:genre>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
 
   <xsl:template name="mods.seperateName">
     <xsl:param name="displayForm" />
