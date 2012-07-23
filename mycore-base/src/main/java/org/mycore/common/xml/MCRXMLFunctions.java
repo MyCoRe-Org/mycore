@@ -53,6 +53,7 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRURN;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -590,6 +591,14 @@ public class MCRXMLFunctions {
      */
     public static boolean isCurrentUserInRole(String role) {
         return MCRSessionMgr.getCurrentSession().getUserInformation().isUserInRole(role);
+    }
+    
+    public static boolean isCurrentUserSuperUser(){
+        return MCRSessionMgr.getCurrentSession().getUserInformation().equals(MCRSystemUserInformation.getSuperUserInstance());
+    }
+
+    public static boolean isCurrentUserGuestUser(){
+        return MCRSessionMgr.getCurrentSession().getUserInformation().equals(MCRSystemUserInformation.getGuestInstance());
     }
 
     /**
