@@ -84,6 +84,10 @@ public class MCREditorSubmission {
 
     public final static String BLANK_ESCAPED = "_-_";
 
+    public final static String SLASH = "/";
+
+    public final static String SLASH_ESCAPED = "_--_";
+
     /**
      * Set variables from source xml file that should be edited
      * 
@@ -193,7 +197,7 @@ public class MCREditorSubmission {
         for (int i = 0; i < attributes.size(); i++) {
             Attribute attribute = (Attribute) attributes.get(i);
             String name = getNamespacePrefix(attribute.getNamespace()) + attribute.getName();
-            String value = attribute.getValue().replace(BLANK, BLANK_ESCAPED);
+            String value = attribute.getValue().replace(BLANK, BLANK_ESCAPED).replace(SLASH, SLASH_ESCAPED);
             if (value == null || value.length() == 0) {
                 continue;
             }
@@ -254,7 +258,7 @@ public class MCREditorSubmission {
                 int pos3 = var.indexOf("]", pos2);
                 String name = var.substring(0, pos1).trim();
                 String attr = var.substring(pos1 + 2, pos2).trim();
-                String value = var.substring(pos2 + 2, pos3 - 1).trim().replace(BLANK, BLANK_ESCAPED);
+                String value = var.substring(pos2 + 2, pos3 - 1).trim().replace(BLANK, BLANK_ESCAPED).replace(SLASH, SLASH_ESCAPED);
                 if (name.indexOf("/") >= 0) {
                     name = name.substring(name.lastIndexOf("/") + 1).trim();
                 }
@@ -512,7 +516,7 @@ public class MCREditorSubmission {
             return;
         }
 
-        MCREditorServlet.logger.debug("Editor variable " + path + "=" + text);
+        LOGGER.debug("Editor variable " + path + "=" + text);
         variables.add(new MCREditorVariable(path, text));
     }
 
@@ -672,9 +676,10 @@ public class MCREditorSubmission {
      * A map from namespace prefix to namespace for the namespaces registered in
      * the editor definition.
      */
-    public HashMap<String, Namespace> getNamespaceMap()
-    { return nsMap; }
-    
+    public HashMap<String, Namespace> getNamespaceMap() {
+        return nsMap;
+    }
+
     /**
      * Stores the list of additional namespaces declared in the components
      * element of the editor definition. These namespaces and its prefixes can
@@ -755,7 +760,7 @@ public class MCREditorSubmission {
             element.setName(name.substring(0, pos));
             int pos2 = name.indexOf(ATTR_SEP, pos + 2);
             String attr = name.substring(pos + 2, pos2);
-            String val = name.substring(pos2 + 2).replace(BLANK_ESCAPED, BLANK);
+            String val = name.substring(pos2 + 2).replace(BLANK_ESCAPED, BLANK).replace(SLASH_ESCAPED, SLASH);
             setAttribute(element, attr, val);
         }
 
@@ -804,7 +809,7 @@ public class MCREditorSubmission {
             String value = (String) maxtable.get(path);
 
             repeats.add(new MCREditorVariable(path, value));
-            MCREditorServlet.logger.debug("Editor repeats " + path + " = " + value);
+            LOGGER.debug("Editor repeats " + path + " = " + value);
         }
     }
 
@@ -815,7 +820,7 @@ public class MCREditorSubmission {
             if (parameter.startsWith("_n-")) {
                 String value = parms.getParameter(parameter);
                 repeats.add(new MCREditorVariable(parameter.substring(3), value));
-                MCREditorServlet.logger.debug("Editor repeats " + parameter.substring(3) + " = " + value);
+                LOGGER.debug("Editor repeats " + parameter.substring(3) + " = " + value);
             }
         }
     }
