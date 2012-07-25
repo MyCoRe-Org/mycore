@@ -3,15 +3,9 @@
  */
 package org.mycore.frontend.servlets;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletResponse;
 
-import org.jdom.Attribute;
 import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.xpath.XPath;
-import org.mycore.common.MCRCache;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -21,7 +15,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 
 /** Handles getting a classification from the database and converting it to xml view so it can be shown in the browser
- *  for saving. URL for this servlet must be: /servlerts/MCRClassExportServlet?id=...
+ *  for saving. URL for this servlet must be: /servlets/MCRClassExportServlet?id=...
  * @author Radi Radichev
  * 
  */
@@ -30,66 +24,19 @@ public class MCRClassExportServlet extends MCRServlet {
 
     private static MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
-    private static MCRCache snippetCache = new MCRCache(100, "Classification Snippets");
-
     public void doGetPost(MCRServletJob job) throws Exception, MCRException {
-        try {
-            String categid = getProperty(job.getRequest(), "categid");
-            String id = getProperty(job.getRequest(), "id");
-
-            if (categid == null || categid.length() == 0) {
-
-                if (id == null)
-                    throw new MCRException("Classification ID is null!");
-                MCRCategoryID catId = MCRCategoryID.rootID(id);
-                MCRCategory category = DAO.getCategory(catId, -1);
-                if (category == null)
-                    throw new MCRException("Cannot find classification with id: " + id);
-                Document jdom = MCRCategoryTransformer.getMetaDataDocument(category, true);
-                getLayoutService().sendXML(job.getRequest(), job.getResponse(), new MCRJDOMContent(jdom));
-            } else {
-                Document snippet = getParentIdentifiers(id, categid);
-                getLayoutService().sendXML(job.getRequest(), job.getResponse(), new MCRJDOMContent(snippet));
-            }
-        } catch (Exception e) {
-            generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage(), e, false);
+        String id = getProperty(job.getRequest(), "id");
+        if (id == null){
+            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, "Query parameter 'id' is missing!");
+            return;
         }
-    }
-
-    /**
-     * Returns the identifiers of all parent categories.
-     * 
-     * @param classification the identifier of the classification
-     * @param categid the category identifier for getting the parent ids for
-     * @return
-     * @throws Exception
-     */
-    @SuppressWarnings("unchecked")
-    synchronized public Document getParentIdentifiers(String classification, String categid) throws Exception {
-        String key = (classification + categid).intern();
-
-        Object object = snippetCache.getIfUpToDate(key, DAO.getLastModified(classification));
-        if (object instanceof Document) {
-            return (Document) object;
-        }
-
-        MCRCategoryID catId = MCRCategoryID.rootID(classification);
+        MCRCategoryID catId = MCRCategoryID.rootID(id);
         MCRCategory category = DAO.getCategory(catId, -1);
-        Document jdom = MCRCategoryTransformer.getMetaDataDocument(category, true);
-        XPath xp = XPath.newInstance("/mycoreclass/categories//category[@ID='" + categid + "']/ancestor::category/@ID");
-        List<Attribute> nodes = xp.selectNodes(jdom);
-
-        Element identifiers = new Element("identifiers");
-        identifiers.setAttribute("classification", classification);
-        identifiers.setAttribute("parents-for-categid", categid);
-
-        Document parents = new Document(identifiers);
-
-        for (Attribute attr : nodes) {
-            identifiers.addContent(new Element("id").setText(attr.getValue()));
+        if (category == null){
+            job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND, "Cannot find classification with id: " + id);
+            return;
         }
-        snippetCache.put(key, parents);
-
-        return parents;
+        Document jdom = MCRCategoryTransformer.getMetaDataDocument(category, false);
+        getLayoutService().sendXML(job.getRequest(), job.getResponse(), new MCRJDOMContent(jdom));
     }
 }
