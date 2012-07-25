@@ -68,6 +68,18 @@
       <!-- additional journals data -->
         <mods:genre authority="marcgt">article</mods:genre>
       </xsl:when>
+      <xsl:when test="contains(@valueURI,'#book')">
+      <!-- additional journals data -->
+        <mods:genre authority="marcgt">book</mods:genre>
+      </xsl:when>
+      <xsl:when test="contains(@valueURI,'thesis') or contains(@valueURI,'#dissertation') or contains(@valueURI,'#habilitation') or contains(@valueURI,'#student_resarch_project')">
+      <!-- additional journals data -->
+        <mods:genre authority="marcgt">thesis</mods:genre>
+      </xsl:when>
+      <xsl:when test="contains(@valueURI,'#confpub')">
+      <!-- additional journals data -->
+        <mods:genre authority="marcgt">conference publication</mods:genre>
+      </xsl:when>
     </xsl:choose>
     <xsl:copy>
       <xsl:copy-of select="@*" />
