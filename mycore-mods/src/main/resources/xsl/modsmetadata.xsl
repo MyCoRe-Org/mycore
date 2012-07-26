@@ -1252,7 +1252,16 @@
         <table class="metaData">
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
           <xsl:call-template name="printMetaDate.mods.children" />
-          <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
+          <xsl:variable name="identifier" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier"/>
+          <xsl:apply-templates mode="present" select="$identifier" />
+          <xsl:if test="$identifier[@type='issn']">
+            <tr>
+              <td class="metaname" valign="top">SHERPA/RoMEO:</td>
+              <td class="metavalue">
+                <a href="http://www.sherpa.ac.uk/romeo/search.php?issn={$identifier[@type='issn']}">Info</a>
+              </td>
+            </tr>
+          </xsl:if>
           <xsl:call-template name="printMetaDate.mods.permalink" />
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:extension" />
           <xsl:call-template name="printMetaDate.mods">
