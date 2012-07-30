@@ -5,9 +5,12 @@
   <xsl:param name="MCR.Module-iview2.DeveloperMode" />
   <xsl:param name="MCR.Module-iview2.PDFCreatorURI" />
   <xsl:param name="MCR.Module-iview2.PDFCreatorStyle" />
+  <xsl:param name="MCR.Module-iview2.LoadJQueryUI"/>
   <xsl:param name="WebApplicationBaseURL" />
   <xsl:param name="ServletsBaseURL" />
+  
   <xsl:variable name="jqueryUI.version" select="'1.8.17'"/>
+  <xsl:variable name="loadJQueryUI" select="$MCR.Module-iview2.LoadJQueryUI"/>
 
   <xsl:template name="iview2.getViewer" mode="iview2">
     <xsl:param name="groupID" />
@@ -63,7 +66,10 @@
     </xsl:variable>
     
     <xsl:if test="mcrxml:putVariable('iview2.init','done')!='done'">
-      <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/{$jqueryUI.version}/jquery-ui.min.js"/>
+    
+      <xsl:if test="$loadJQueryUI = 'true'">
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/{$jqueryUI.version}/jquery-ui.min.js"/>
+      </xsl:if>
       
       <xsl:choose>
         <xsl:when test="$debugMode='true'">
@@ -89,9 +95,12 @@
             <xsl:text>modules/iview2/gfx/default/iview2.min.css', 'iviewCss');</xsl:text>
           </xsl:otherwise>
         </xsl:choose>
-        <xsl:text>loadCssFile('http://ajax.googleapis.com/ajax/libs/jqueryui/</xsl:text>
-        <xsl:value-of select="$jqueryUI.version"/>
-        <xsl:text>/themes/base/jquery-ui.css');</xsl:text>
+        
+        <xsl:if test="$loadJQueryUI = 'true'">
+          <xsl:text>loadCssFile('http://ajax.googleapis.com/ajax/libs/jqueryui/</xsl:text>
+          <xsl:value-of select="$jqueryUI.version"/>
+          <xsl:text>/themes/base/jquery-ui.css');</xsl:text>
+        </xsl:if>
       </script>
     </xsl:if>
   </xsl:template>
