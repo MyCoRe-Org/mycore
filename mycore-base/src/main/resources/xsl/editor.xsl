@@ -778,7 +778,7 @@
   </xsl:variable>
   
   <xsl:if test="local-name() = 'textfield'">
-    <input tabindex="1" type="text" size="{@width}" name="{$var}" value="{$value}">
+    <input tabindex="1" size="{@width}" name="{$var}" value="{$value}">
       <xsl:choose>
         <xsl:when test="@title-i18n">
           <xsl:attribute name="title">
@@ -793,6 +793,14 @@
           </xsl:if>
         </xsl:otherwise>
       </xsl:choose>
+      <xsl:choose>
+        <xsl:when test="@type">
+          <xsl:copy-of select="@type"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:attribute name="type">text</xsl:attribute>
+        </xsl:otherwise>
+      </xsl:choose>
       <xsl:copy-of select="@maxlength" />
       
       <xsl:if test="@placeholder">
@@ -801,9 +809,8 @@
         </xsl:attribute>
       </xsl:if>
       
-      <xsl:if test="@disabled='true'">
-        <xsl:attribute name="readonly">readonly</xsl:attribute>
-      </xsl:if>
+      <xsl:call-template name="applyDisabled"/>
+      <xsl:call-template name="applyRequired"/>
       <xsl:call-template name="editor.set.css" />
     </input>
   </xsl:if>
@@ -980,9 +987,6 @@
   <xsl:param name="var" />
 
   <select tabindex="1" name="{$var}" size="1">
-    <xsl:if test="@disabled='true'">
-      <xsl:attribute name="disabled">disabled</xsl:attribute>
-    </xsl:if>
     <xsl:choose>
       <xsl:when test="@title-i18n">
         <xsl:attribute name="title">
@@ -997,6 +1001,8 @@
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
+    <xsl:call-template name="applyRequired"/>
+    <xsl:call-template name="applyDisabled"/>
     <xsl:call-template name="editor.set.css" />
    
     <xsl:apply-templates select="item">
@@ -1011,6 +1017,8 @@
   <xsl:param name="var" />
 
   <select tabindex="1" name="{$var}" size="{@rows}" multiple="multiple">
+    <xsl:call-template name="applyRequired"/>
+    <xsl:call-template name="applyDisabled"/>
     <xsl:call-template name="editor.set.css" />
     
     <xsl:apply-templates select="item">
@@ -1103,7 +1111,9 @@
     </xsl:choose>
     <xsl:for-each select="parent::list">
       <xsl:call-template name="editor.set.css" />
-    </xsl:for-each>    
+    </xsl:for-each>  
+    <xsl:call-template name="applyRequired"/>  
+    <xsl:call-template name="applyDisabled"/>  
   </input>
   <label for="radio-{$var}">
     <xsl:for-each select="parent::list">
@@ -1133,6 +1143,8 @@
     <xsl:for-each select="parent::list">
       <xsl:call-template name="editor.set.css" />
     </xsl:for-each>    
+    <xsl:call-template name="applyRequired"/>  
+    <xsl:call-template name="applyDisabled"/>  
   </input>
   <label for="check-{$var}">
     <xsl:for-each select="parent::list">
@@ -1164,6 +1176,8 @@
         <xsl:attribute name="checked">checked</xsl:attribute>
       </xsl:when>
     </xsl:choose>
+    <xsl:call-template name="applyRequired"/>  
+    <xsl:call-template name="applyDisabled"/>  
     <xsl:call-template name="editor.set.css" />
   </input>
   <label for="check-{$var}">
@@ -1261,6 +1275,20 @@
       <xsl:with-param name="var" select="$var" />
     </xsl:apply-templates>
   </bdo>
+</xsl:template>
+
+<!-- create attributes disabled and required if neccesary -->
+
+<xsl:template name="applyDisabled">
+  <xsl:if test="@disabled='true'">
+    <xsl:attribute name="disabled">disabled</xsl:attribute>
+  </xsl:if>
+</xsl:template>
+
+<xsl:template name="applyRequired">
+  <xsl:if test="condition/@required='true'">
+    <xsl:attribute name="required">required</xsl:attribute>
+  </xsl:if>
 </xsl:template>
 
 <!-- ========================================================================= -->
