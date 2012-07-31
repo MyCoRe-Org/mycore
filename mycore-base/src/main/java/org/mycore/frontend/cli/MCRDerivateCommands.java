@@ -22,6 +22,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,10 +30,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.sax.SAXTransformerFactory;
+import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
@@ -69,7 +74,9 @@ import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
+import org.xml.sax.ext.Attributes2Impl;
 
 /**
  * Provides static methods that implement commands for the MyCoRe command line
@@ -174,6 +181,10 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
         com = new MCRCommand("generate md5sum files in directory {0}", "org.mycore.frontend.cli.MCRDerivateCommands.writeMD5SumFile String",
             "writes md5sum files for every content store in directory {0}");
+        addCommand(com);
+
+        com = new MCRCommand("generate missing file report in directory {0}", "org.mycore.frontend.cli.MCRDerivateCommands.writeMissingFileReport String",
+            "Writes XML report about missing files in directory {0}");
         addCommand(com);
     }
 
@@ -350,10 +361,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     }
 
     public static void writeMD5SumFile(String targetDirectory) throws IOException {
-        File targetDir = new File(targetDirectory);
-        if (!targetDir.isDirectory()) {
-            throw new IllegalArgumentException("Target directory " + targetDir.getAbsolutePath() + " is not a directory.");
-        }
+        File targetDir = getDirectory(targetDirectory);
         Session session = MCRHIBConnection.instance().getSession();
         Criteria criteria = session.createCriteria(MCRFSNODES.class);
         criteria.addOrder(Order.asc("storeid"));
@@ -408,6 +416,124 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
                 }
             }
             session.clear();
+        }
+    }
+
+    /**
+     * @param targetDirectory
+     * @return
+     */
+    private static File getDirectory(String targetDirectory) {
+        File targetDir = new File(targetDirectory);
+        if (!targetDir.isDirectory()) {
+            throw new IllegalArgumentException("Target directory " + targetDir.getAbsolutePath() + " is not a directory.");
+        }
+        return targetDir;
+    }
+
+    public static void writeMissingFileReport(String targetDirectory) throws IOException, SAXException, TransformerConfigurationException {
+        File targetDir = getDirectory(targetDirectory);
+        Session session = MCRHIBConnection.instance().getSession();
+        Criteria criteria = session.createCriteria(MCRFSNODES.class);
+        criteria.addOrder(Order.asc("storeid"));
+        criteria.addOrder(Order.asc("owner"));
+        criteria.addOrder(Order.asc("name"));
+        criteria.add(Restrictions.eq("type", "F"));
+        ScrollableResults fsnodes = criteria.scroll(ScrollMode.FORWARD_ONLY);
+        Map<String, MCRContentStore> availableStores = MCRContentStoreFactory.getAvailableStores();
+        String currentStoreId = null;
+        MCRContentStore currentStore = null;
+        File currentStoreBaseDir = null;
+        StreamResult streamResult = null;
+        String nameOfProject = MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe");
+        SAXTransformerFactory tf = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
+        TransformerHandler th = null;
+        Attributes2Impl atts = new Attributes2Impl();
+        final String rootName = "missing";
+        final String elementName = "file";
+        final String nsURI = "";
+        final String ATT_BASEDIR = "basedir";
+        final String ATT_STORAGEID = "storageid";
+        final String ATT_OWNER = "owner";
+        final String ATT_NAME = "fileName";
+        final String ATT_MD5 = "md5";
+        final String ATT_SIZE = "size";
+        final String ATT_TYPE = "CDATA";
+
+        try {
+            while (fsnodes.next()) {
+                MCRFSNODES fsNode = (MCRFSNODES) fsnodes.get(0);
+                String storeID = fsNode.getStoreid();
+                String storageID = fsNode.getStorageid();
+                String md5 = fsNode.getMd5();
+                session.evict(fsNode);
+                if (!storeID.equals(currentStoreId)) {
+                    //initialize current store
+                    currentStoreId = storeID;
+                    currentStore = availableStores.get(storeID);
+                    if (th != null) {
+                        th.endElement(nsURI, rootName, rootName);
+                        th.endDocument();
+                        OutputStream outputStream = streamResult.getOutputStream();
+                        if (outputStream != null) {
+                            outputStream.close();
+                        }
+                    }
+                    File outputFile = new File(targetDir, MessageFormat.format("{0}-{1}-{2}.xml", nameOfProject, storeID, rootName));
+                    streamResult = new StreamResult(new FileOutputStream(outputFile));
+                    th = tf.newTransformerHandler();
+                    Transformer serializer = th.getTransformer();
+                    serializer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+                    serializer.setOutputProperty(OutputKeys.INDENT, "yes");
+                    th.setResult(streamResult);
+                    LOGGER.info("Writing to file: " + outputFile.getAbsolutePath());
+                    th.startDocument();
+                    atts.clear();
+                    if (currentStore instanceof MCRCStoreVFS) {
+                        try {
+                            currentStoreBaseDir = ((MCRCStoreVFS) currentStore).getBaseDir();
+                            atts.addAttribute(nsURI, ATT_BASEDIR, ATT_BASEDIR, ATT_TYPE, currentStoreBaseDir.getAbsolutePath());
+                        } catch (Exception e) {
+                            LOGGER.warn("Could not get baseDir of store: " + storeID, e);
+                            currentStoreBaseDir = null;
+                        }
+                    } else {
+                        currentStoreBaseDir = null;
+                    }
+                    th.startElement(nsURI, rootName, rootName, atts);
+                }
+                if (currentStoreBaseDir == null) {
+                    continue;
+                }
+                File f = new File(currentStoreBaseDir, storageID);
+                if (!f.exists()) {
+                    LOGGER.warn("File is missing: " + f);
+                    atts.clear();
+                    atts.addAttribute(nsURI, ATT_SIZE, ATT_SIZE, ATT_TYPE, Long.toString(fsNode.getSize()));
+                    atts.addAttribute(nsURI, ATT_MD5, ATT_MD5, ATT_TYPE, md5);
+                    atts.addAttribute(nsURI, ATT_STORAGEID, ATT_STORAGEID, ATT_TYPE, storageID);
+                    atts.addAttribute(nsURI, ATT_OWNER, ATT_OWNER, ATT_TYPE, fsNode.getOwner());
+                    atts.addAttribute(nsURI, ATT_NAME, ATT_NAME, ATT_TYPE, fsNode.getName());
+                    th.startElement(nsURI, elementName, elementName, atts);
+                    th.endElement(nsURI, elementName, elementName);
+                } else {
+                    LOGGER.debug("File is present: " + f);
+                }
+            }
+        } finally {
+            session.clear();
+            if (th != null) {
+                try {
+                    th.endElement(nsURI, rootName, rootName);
+                    th.endDocument();
+                    OutputStream outputStream = streamResult.getOutputStream();
+                    if (outputStream != null) {
+                        outputStream.close();
+                    }
+                } catch (IOException e1) {
+                    LOGGER.warn("Error while closing file.", e1);
+                }
+            }
         }
     }
 
