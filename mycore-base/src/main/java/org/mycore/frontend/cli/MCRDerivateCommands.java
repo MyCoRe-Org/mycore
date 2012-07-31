@@ -50,6 +50,7 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.backend.filesystem.MCRCStoreVFS;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRFSNODES;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.events.MCREvent;
@@ -364,6 +365,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         MCRContentStore currentStore = null;
         File currentStoreBaseDir = null;
         FileWriter fw = null;
+        String nameOfProject = MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe");
         try {
             while (fsnodes.next()) {
                 MCRFSNODES fsNode = (MCRFSNODES) fsnodes.get(0);
@@ -378,7 +380,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
                     if (fw != null) {
                         fw.close();
                     }
-                    File outputFile = new File(targetDir, storeID + ".md5");
+                    File outputFile = new File(targetDir, MessageFormat.format("{0}-{1}.md5", nameOfProject, storeID));
                     LOGGER.info("Writing to file: " + outputFile.getAbsolutePath());
                     fw = new FileWriter(outputFile);
                     if (currentStore instanceof MCRCStoreVFS) {
