@@ -437,10 +437,19 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         return targetDir;
     }
 
-    private static interface FSNodeChecker {
-        public String getName();
+    private static abstract class FSNodeChecker {
+        public abstract String getName();
 
-        public boolean checkNode(MCRFSNODES node, File localFile, Attributes2Impl atts);
+        public abstract boolean checkNode(MCRFSNODES node, File localFile, Attributes2Impl atts);
+
+        void addBaseAttributes(MCRFSNODES node, Attributes2Impl atts) {
+            atts.clear();
+            atts.addAttribute(nsURI, ATT_SIZE, ATT_SIZE, ATT_TYPE, Long.toString(node.getSize()));
+            atts.addAttribute(nsURI, ATT_MD5, ATT_MD5, ATT_TYPE, node.getMd5());
+            atts.addAttribute(nsURI, ATT_STORAGEID, ATT_STORAGEID, ATT_TYPE, node.getStorageid());
+            atts.addAttribute(nsURI, ATT_OWNER, ATT_OWNER, ATT_TYPE, node.getOwner());
+            atts.addAttribute(nsURI, ATT_NAME, ATT_NAME, ATT_TYPE, node.getName());
+        }
 
         final static String nsURI = "";
 
@@ -458,7 +467,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
     }
 
-    private static final class LocalFileExistChecker implements FSNodeChecker {
+    private static class LocalFileExistChecker extends FSNodeChecker {
         @Override
         public String getName() {
             return "missing";
@@ -474,19 +483,9 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             return false;
         }
 
-        void addBaseAttributes(MCRFSNODES node, Attributes2Impl atts) {
-            atts.clear();
-            atts.addAttribute(nsURI, ATT_SIZE, ATT_SIZE, ATT_TYPE, Long.toString(node.getSize()));
-            atts.addAttribute(nsURI, ATT_MD5, ATT_MD5, ATT_TYPE, node.getMd5());
-            atts.addAttribute(nsURI, ATT_STORAGEID, ATT_STORAGEID, ATT_TYPE, node.getStorageid());
-            atts.addAttribute(nsURI, ATT_OWNER, ATT_OWNER, ATT_TYPE, node.getOwner());
-            atts.addAttribute(nsURI, ATT_NAME, ATT_NAME, ATT_TYPE, node.getName());
-        }
     }
 
-    private static final class MD5Checker implements FSNodeChecker {
-        LocalFileExistChecker localFileChecker = new LocalFileExistChecker();
-
+    private static final class MD5Checker extends LocalFileExistChecker {
         @Override
         public String getName() {
             return "md5";
@@ -494,11 +493,11 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
         @Override
         public boolean checkNode(MCRFSNODES node, File localFile, Attributes2Impl atts) {
-            if (!localFileChecker.checkNode(node, localFile, atts)) {
-                atts.addAttribute(nsURI, localFileChecker.getName(), localFileChecker.getName(), ATT_TYPE, "true");
+            if (!super.checkNode(node, localFile, atts)) {
+                atts.addAttribute(nsURI, super.getName(), super.getName(), ATT_TYPE, "true");
                 return false;
             }
-            localFileChecker.addBaseAttributes(node, atts);
+            addBaseAttributes(node, atts);
             if (localFile.length() != node.getSize()) {
                 LOGGER.warn("File size does not match for file: " + localFile);
                 atts.addAttribute(nsURI, "actualSize", "actualSize", ATT_TYPE, Long.toString(localFile.length()));
