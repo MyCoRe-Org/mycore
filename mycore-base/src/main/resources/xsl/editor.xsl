@@ -1275,7 +1275,7 @@
 
 <xsl:template name="applyDisabled">
   <xsl:if test="@disabled='true'">
-    <xsl:attribute name="disabled">disabled</xsl:attribute>
+    <xsl:attribute name="readonly">readonly</xsl:attribute>
   </xsl:if>
 </xsl:template>
 
