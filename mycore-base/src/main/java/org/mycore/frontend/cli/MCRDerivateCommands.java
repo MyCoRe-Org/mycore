@@ -17,12 +17,15 @@
 package org.mycore.frontend.cli;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -185,6 +188,9 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
         com = new MCRCommand("generate missing file report in directory {0}", "org.mycore.frontend.cli.MCRDerivateCommands.writeMissingFileReport String",
             "Writes XML report about missing files in directory {0}");
+        addCommand(com);
+        com = new MCRCommand("generate md5 file report in directory {0}", "org.mycore.frontend.cli.MCRDerivateCommands.writeFileMD5Report String",
+            "Writes XML report about failed md5 checks in directory {0}");
         addCommand(com);
     }
 
@@ -431,8 +437,135 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         return targetDir;
     }
 
+    private static interface FSNodeChecker {
+        public String getName();
+
+        public boolean checkNode(MCRFSNODES node, File localFile, Attributes2Impl atts);
+
+        final static String nsURI = "";
+
+        final static String ATT_TYPE = "CDATA";
+
+        final static String ATT_STORAGEID = "storageid";
+
+        final static String ATT_OWNER = "owner";
+
+        final static String ATT_NAME = "fileName";
+
+        final static String ATT_MD5 = "md5";
+
+        final static String ATT_SIZE = "size";
+
+    }
+
+    private static final class LocalFileExistChecker implements FSNodeChecker {
+        @Override
+        public String getName() {
+            return "missing";
+        }
+
+        @Override
+        public boolean checkNode(MCRFSNODES node, File localFile, Attributes2Impl atts) {
+            if (localFile.exists()) {
+                return true;
+            }
+            LOGGER.warn("File is missing: " + localFile);
+            addBaseAttributes(node, atts);
+            return false;
+        }
+
+        void addBaseAttributes(MCRFSNODES node, Attributes2Impl atts) {
+            atts.clear();
+            atts.addAttribute(nsURI, ATT_SIZE, ATT_SIZE, ATT_TYPE, Long.toString(node.getSize()));
+            atts.addAttribute(nsURI, ATT_MD5, ATT_MD5, ATT_TYPE, node.getMd5());
+            atts.addAttribute(nsURI, ATT_STORAGEID, ATT_STORAGEID, ATT_TYPE, node.getStorageid());
+            atts.addAttribute(nsURI, ATT_OWNER, ATT_OWNER, ATT_TYPE, node.getOwner());
+            atts.addAttribute(nsURI, ATT_NAME, ATT_NAME, ATT_TYPE, node.getName());
+        }
+    }
+
+    private static final class MD5Checker implements FSNodeChecker {
+        LocalFileExistChecker localFileChecker = new LocalFileExistChecker();
+
+        @Override
+        public String getName() {
+            return "md5";
+        }
+
+        @Override
+        public boolean checkNode(MCRFSNODES node, File localFile, Attributes2Impl atts) {
+            if (!localFileChecker.checkNode(node, localFile, atts)) {
+                atts.addAttribute(nsURI, localFileChecker.getName(), localFileChecker.getName(), ATT_TYPE, "true");
+                return false;
+            }
+            localFileChecker.addBaseAttributes(node, atts);
+            if (localFile.length() != node.getSize()) {
+                LOGGER.warn("File size does not match for file: " + localFile);
+                atts.addAttribute(nsURI, "actualSize", "actualSize", ATT_TYPE, Long.toString(localFile.length()));
+                return false;
+            }
+            //we can check MD5Sum
+            FileInputStream fileInputStream;
+            try {
+                fileInputStream = new FileInputStream(localFile);
+            } catch (FileNotFoundException e1) {
+                //should not happen as we check it before
+                LOGGER.warn(e1);
+                return false;
+            }
+            byte[] digest;
+            try {
+                byte[] buffer = new byte[4096];
+                MessageDigest md5Digest = MessageDigest.getInstance("MD5");
+                int numRead;
+                do {
+                    numRead = fileInputStream.read(buffer);
+                    if (numRead > 0) {
+                        md5Digest.update(buffer, 0, numRead);
+                    }
+                } while (numRead != -1);
+                digest = md5Digest.digest();
+            } catch (NoSuchAlgorithmException e) {
+                LOGGER.error(e);
+                return false;
+            } catch (IOException e) {
+                LOGGER.error(e);
+                return false;
+            } finally {
+                try {
+                    fileInputStream.close();
+                } catch (IOException e) {
+                    LOGGER.warn("Could not clode file handle: " + localFile);
+                }
+            }
+            StringBuilder md5SumBuilder = new StringBuilder();
+            for (byte b : digest) {
+                md5SumBuilder.append(Integer.toString((b & 0xff) + 0x100, 16).substring(1));
+            }
+            String md5Sum = md5SumBuilder.toString();
+            if (md5Sum.equals(node.getMd5())) {
+                return true;
+            }
+            LOGGER.warn("MD5 sum does not match for file: " + localFile);
+            atts.addAttribute(nsURI, "actualMD5", "actualMD5", ATT_TYPE, md5Sum);
+            return false;
+        }
+    }
+
     public static void writeMissingFileReport(String targetDirectory) throws IOException, SAXException, TransformerConfigurationException {
         File targetDir = getDirectory(targetDirectory);
+        FSNodeChecker checker = new LocalFileExistChecker();
+        writeReport(targetDir, checker);
+    }
+
+    public static void writeFileMD5Report(String targetDirectory) throws IOException, SAXException, TransformerConfigurationException {
+        File targetDir = getDirectory(targetDirectory);
+        FSNodeChecker checker = new MD5Checker();
+        writeReport(targetDir, checker);
+    }
+
+    private static void writeReport(File targetDir, FSNodeChecker checker) throws TransformerFactoryConfigurationError, SAXException, IOException,
+        FileNotFoundException, TransformerConfigurationException {
         Session session = MCRHIBConnection.instance().getSession();
         Criteria criteria = session.createCriteria(MCRFSNODES.class);
         criteria.addOrder(Order.asc("storeid"));
@@ -449,23 +582,18 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         SAXTransformerFactory tf = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
         TransformerHandler th = null;
         Attributes2Impl atts = new Attributes2Impl();
-        final String rootName = "missing";
+        final String rootName = checker.getName();
         final String elementName = "file";
-        final String nsURI = "";
         final String ATT_BASEDIR = "basedir";
-        final String ATT_STORAGEID = "storageid";
-        final String ATT_OWNER = "owner";
-        final String ATT_NAME = "fileName";
-        final String ATT_MD5 = "md5";
-        final String ATT_SIZE = "size";
+        final String nsURI = "";
         final String ATT_TYPE = "CDATA";
+        String owner = null;
 
         try {
             while (fsnodes.next()) {
                 MCRFSNODES fsNode = (MCRFSNODES) fsnodes.get(0);
                 String storeID = fsNode.getStoreid();
                 String storageID = fsNode.getStorageid();
-                String md5 = fsNode.getMd5();
                 session.evict(fsNode);
                 if (!storeID.equals(currentStoreId)) {
                     //initialize current store
@@ -489,6 +617,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
                     LOGGER.info("Writing to file: " + outputFile.getAbsolutePath());
                     th.startDocument();
                     atts.clear();
+                    atts.addAttribute(nsURI, "project", "project", ATT_TYPE, nameOfProject);
                     if (currentStore instanceof MCRCStoreVFS) {
                         try {
                             currentStoreBaseDir = ((MCRCStoreVFS) currentStore).getBaseDir();
@@ -505,19 +634,14 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
                 if (currentStoreBaseDir == null) {
                     continue;
                 }
+                if (!fsNode.getOwner().equals(owner)) {
+                    owner = fsNode.getOwner();
+                    LOGGER.info("Checking owner/derivate: " + owner);
+                }
                 File f = new File(currentStoreBaseDir, storageID);
-                if (!f.exists()) {
-                    LOGGER.warn("File is missing: " + f);
-                    atts.clear();
-                    atts.addAttribute(nsURI, ATT_SIZE, ATT_SIZE, ATT_TYPE, Long.toString(fsNode.getSize()));
-                    atts.addAttribute(nsURI, ATT_MD5, ATT_MD5, ATT_TYPE, md5);
-                    atts.addAttribute(nsURI, ATT_STORAGEID, ATT_STORAGEID, ATT_TYPE, storageID);
-                    atts.addAttribute(nsURI, ATT_OWNER, ATT_OWNER, ATT_TYPE, fsNode.getOwner());
-                    atts.addAttribute(nsURI, ATT_NAME, ATT_NAME, ATT_TYPE, fsNode.getName());
+                if (!checker.checkNode(fsNode, f, atts)) {
                     th.startElement(nsURI, elementName, elementName, atts);
                     th.endElement(nsURI, elementName, elementName);
-                } else {
-                    LOGGER.debug("File is present: " + f);
                 }
             }
         } finally {
