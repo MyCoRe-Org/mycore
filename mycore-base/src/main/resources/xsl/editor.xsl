@@ -810,7 +810,6 @@
       </xsl:if>
       
       <xsl:call-template name="applyDisabled"/>
-      <xsl:call-template name="applyRequired"/>
       <xsl:call-template name="editor.set.css" />
     </input>
   </xsl:if>
@@ -1001,7 +1000,6 @@
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
-    <xsl:call-template name="applyRequired"/>
     <xsl:call-template name="applyDisabled"/>
     <xsl:call-template name="editor.set.css" />
    
@@ -1017,7 +1015,6 @@
   <xsl:param name="var" />
 
   <select tabindex="1" name="{$var}" size="{@rows}" multiple="multiple">
-    <xsl:call-template name="applyRequired"/>
     <xsl:call-template name="applyDisabled"/>
     <xsl:call-template name="editor.set.css" />
     
@@ -1112,7 +1109,6 @@
     <xsl:for-each select="parent::list">
       <xsl:call-template name="editor.set.css" />
     </xsl:for-each>  
-    <xsl:call-template name="applyRequired"/>  
     <xsl:call-template name="applyDisabled"/>  
   </input>
   <label for="radio-{$var}">
@@ -1143,7 +1139,6 @@
     <xsl:for-each select="parent::list">
       <xsl:call-template name="editor.set.css" />
     </xsl:for-each>    
-    <xsl:call-template name="applyRequired"/>  
     <xsl:call-template name="applyDisabled"/>  
   </input>
   <label for="check-{$var}">
@@ -1176,7 +1171,6 @@
         <xsl:attribute name="checked">checked</xsl:attribute>
       </xsl:when>
     </xsl:choose>
-    <xsl:call-template name="applyRequired"/>  
     <xsl:call-template name="applyDisabled"/>  
     <xsl:call-template name="editor.set.css" />
   </input>
@@ -1277,17 +1271,11 @@
   </bdo>
 </xsl:template>
 
-<!-- create attributes disabled and required if neccesary -->
+<!-- create attributes disabled if neccesary -->
 
 <xsl:template name="applyDisabled">
   <xsl:if test="@disabled='true'">
     <xsl:attribute name="disabled">disabled</xsl:attribute>
-  </xsl:if>
-</xsl:template>
-
-<xsl:template name="applyRequired">
-  <xsl:if test="condition/@required='true'">
-    <xsl:attribute name="required">required</xsl:attribute>
   </xsl:if>
 </xsl:template>
 
