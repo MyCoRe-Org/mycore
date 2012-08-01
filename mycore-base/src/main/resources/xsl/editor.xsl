@@ -1000,7 +1000,9 @@
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
-    <xsl:call-template name="applyDisabled"/>
+    <xsl:call-template name="applyDisabled">
+      <xsl:with-param name="disabledValue" select="'disabled'"/>
+    </xsl:call-template>
     <xsl:call-template name="editor.set.css" />
    
     <xsl:apply-templates select="item">
@@ -1015,7 +1017,9 @@
   <xsl:param name="var" />
 
   <select tabindex="1" name="{$var}" size="{@rows}" multiple="multiple">
-    <xsl:call-template name="applyDisabled"/>
+    <xsl:call-template name="applyDisabled">
+      <xsl:with-param name="disabledValue" select="'disabled'"/>
+    </xsl:call-template>
     <xsl:call-template name="editor.set.css" />
     
     <xsl:apply-templates select="item">
@@ -1274,8 +1278,12 @@
 <!-- create attributes disabled if neccesary -->
 
 <xsl:template name="applyDisabled">
+  <xsl:param name="disabledValue" select="'readonly'"/>
+  
   <xsl:if test="@disabled='true'">
-    <xsl:attribute name="readonly">readonly</xsl:attribute>
+    <xsl:attribute name="{$disabledValue}">
+      <xsl:value-of select="$disabledValue"/>
+    </xsl:attribute>
   </xsl:if>
 </xsl:template>
 
