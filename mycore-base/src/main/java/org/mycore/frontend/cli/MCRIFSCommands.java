@@ -7,9 +7,11 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Map;
 
 import javax.xml.transform.OutputKeys;
@@ -20,8 +22,10 @@ import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.io.comparator.NameFileComparator;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
@@ -38,8 +42,16 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.Attributes2Impl;
 
-@MCRCommandGroup(name="IFS Maintenance")
+@MCRCommandGroup(name = "IFS Maintenance")
 public class MCRIFSCommands {
+    private static final String ELEMENT_FILE = "file";
+
+    private static final String CDATA = "CDATA";
+
+    private static final String ATT_FILE_NAME = "name";
+
+    private static final String NS_URI = "";
+
     private static Logger LOGGER = Logger.getLogger(MCRIFSCommands.class);
 
     private static abstract class FSNodeChecker {
@@ -49,16 +61,12 @@ public class MCRIFSCommands {
 
         void addBaseAttributes(MCRFSNODES node, Attributes2Impl atts) {
             atts.clear();
-            atts.addAttribute(nsURI, ATT_SIZE, ATT_SIZE, ATT_TYPE, Long.toString(node.getSize()));
-            atts.addAttribute(nsURI, ATT_MD5, ATT_MD5, ATT_TYPE, node.getMd5());
-            atts.addAttribute(nsURI, ATT_STORAGEID, ATT_STORAGEID, ATT_TYPE, node.getStorageid());
-            atts.addAttribute(nsURI, ATT_OWNER, ATT_OWNER, ATT_TYPE, node.getOwner());
-            atts.addAttribute(nsURI, ATT_NAME, ATT_NAME, ATT_TYPE, node.getName());
+            atts.addAttribute(NS_URI, ATT_SIZE, ATT_SIZE, CDATA, Long.toString(node.getSize()));
+            atts.addAttribute(NS_URI, ATT_MD5, ATT_MD5, CDATA, node.getMd5());
+            atts.addAttribute(NS_URI, ATT_STORAGEID, ATT_STORAGEID, CDATA, node.getStorageid());
+            atts.addAttribute(NS_URI, ATT_OWNER, ATT_OWNER, CDATA, node.getOwner());
+            atts.addAttribute(NS_URI, ATT_NAME, ATT_NAME, CDATA, node.getName());
         }
-
-        final static String nsURI = "";
-
-        final static String ATT_TYPE = "CDATA";
 
         final static String ATT_STORAGEID = "storageid";
 
@@ -99,13 +107,13 @@ public class MCRIFSCommands {
         @Override
         public boolean checkNode(MCRFSNODES node, File localFile, Attributes2Impl atts) {
             if (!super.checkNode(node, localFile, atts)) {
-                atts.addAttribute(nsURI, super.getName(), super.getName(), ATT_TYPE, "true");
+                atts.addAttribute(MCRIFSCommands.NS_URI, super.getName(), super.getName(), MCRIFSCommands.CDATA, "true");
                 return false;
             }
             addBaseAttributes(node, atts);
             if (localFile.length() != node.getSize()) {
                 LOGGER.warn("File size does not match for file: " + localFile);
-                atts.addAttribute(nsURI, "actualSize", "actualSize", ATT_TYPE, Long.toString(localFile.length()));
+                atts.addAttribute(MCRIFSCommands.NS_URI, "actualSize", "actualSize", MCRIFSCommands.CDATA, Long.toString(localFile.length()));
                 return false;
             }
             //we can check MD5Sum
@@ -151,7 +159,7 @@ public class MCRIFSCommands {
                 return true;
             }
             LOGGER.warn("MD5 sum does not match for file: " + localFile);
-            atts.addAttribute(nsURI, "actualMD5", "actualMD5", ATT_TYPE, md5Sum);
+            atts.addAttribute(MCRIFSCommands.NS_URI, "actualMD5", "actualMD5", MCRIFSCommands.CDATA, md5Sum);
             return false;
         }
     }
@@ -236,7 +244,7 @@ public class MCRIFSCommands {
         Criteria criteria = session.createCriteria(MCRFSNODES.class);
         criteria.addOrder(Order.asc("storeid"));
         criteria.addOrder(Order.asc("owner"));
-        criteria.addOrder(Order.asc("name"));
+        criteria.addOrder(Order.asc(ATT_FILE_NAME));
         criteria.add(Restrictions.eq("type", "F"));
         ScrollableResults fsnodes = criteria.scroll(ScrollMode.FORWARD_ONLY);
         Map<String, MCRContentStore> availableStores = MCRContentStoreFactory.getAvailableStores();
@@ -249,10 +257,10 @@ public class MCRIFSCommands {
         TransformerHandler th = null;
         Attributes2Impl atts = new Attributes2Impl();
         final String rootName = checker.getName();
-        final String elementName = "file";
+        final String elementName = ELEMENT_FILE;
         final String ATT_BASEDIR = "basedir";
-        final String nsURI = "";
-        final String ATT_TYPE = "CDATA";
+        final String nsURI = NS_URI;
+        final String ATT_TYPE = CDATA;
         String owner = null;
 
         try {
@@ -339,4 +347,91 @@ public class MCRIFSCommands {
         return targetDir;
     }
 
+    @MCRCommand(syntax = "generate missing nodes report in directory {0}", help = "Writes XML report about missing ifs nodes in directory {0}")
+    public static void writeMissingNodesReport(String targetDirectory) throws SAXException, TransformerConfigurationException, IOException {
+        File targetDir = getDirectory(targetDirectory);
+        Map<String, MCRContentStore> availableStores = MCRContentStoreFactory.getAvailableStores();
+        final String nsURI = NS_URI;
+        final String ATT_TYPE = CDATA;
+        SAXTransformerFactory tf = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
+        Attributes2Impl atts = new Attributes2Impl();
+        final String rootName = "missingnodes";
+        Session session = MCRHIBConnection.instance().getSession();
+        final Query query = session.createQuery("select count(*) from MCRFSNODES where storeid=:storeid and storageid=:storageid");
+        for (MCRContentStore currentStore : availableStores.values()) {
+            if (currentStore instanceof MCRCStoreVFS) {
+                MCRCStoreVFS storeVFS;
+                File baseDir;
+                try {
+                    storeVFS = (MCRCStoreVFS) currentStore;
+                    baseDir = storeVFS.getBaseDir();
+                } catch (Exception e) {
+                    LOGGER.warn("Could not get baseDir of store: " + currentStore.getID(), e);
+                    continue;
+                }
+                String nameOfProject = MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe");
+                String storeID = storeVFS.getID();
+                File outputFile = new File(targetDir, MessageFormat.format("{0}-{1}-{2}.xml", nameOfProject, storeID, rootName));
+                StreamResult streamResult;
+                try {
+                    streamResult = new StreamResult(new FileOutputStream(outputFile));
+                } catch (FileNotFoundException e) {
+                    //should not happen as we checked it before
+                    LOGGER.error(e);
+                    return;
+                }
+                try {
+                    TransformerHandler th = tf.newTransformerHandler();
+                    Transformer serializer = th.getTransformer();
+                    serializer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+                    serializer.setOutputProperty(OutputKeys.INDENT, "yes");
+                    th.setResult(streamResult);
+                    LOGGER.info("Writing to file: " + outputFile.getAbsolutePath());
+                    th.startDocument();
+                    atts.clear();
+                    atts.addAttribute(nsURI, "project", "project", ATT_TYPE, nameOfProject);
+                    atts.addAttribute(nsURI, "store", "store", ATT_TYPE, storeID);
+                    atts.addAttribute(nsURI, "baseDir", "baseDir", ATT_TYPE, baseDir.getAbsolutePath());
+                    th.startElement(nsURI, rootName, rootName, atts);
+                    query.setParameter("storeid", storeID);
+                    walkDirectory(baseDir.toURI(), baseDir, storeID, query, th, atts);
+                    th.endElement(nsURI, rootName, rootName);
+                    th.endDocument();
+                } finally {
+                    OutputStream stream = streamResult.getOutputStream();
+                    if (stream != null) {
+                        stream.close();
+                    }
+                }
+            }
+        }
+    }
+
+    private static void walkDirectory(URI baseDir, File currentDir, String storeId, Query query, TransformerHandler th, Attributes2Impl atts)
+        throws SAXException {
+        String relative = baseDir.relativize(currentDir.toURI()).getPath();
+        LOGGER.info("Checking segment: " + relative);
+        File[] listFiles = currentDir.listFiles();
+        Arrays.sort(listFiles, NameFileComparator.NAME_COMPARATOR);
+        for (File child : listFiles) {
+            if (child.isDirectory()) {
+                walkDirectory(baseDir, child, storeId, query, th, atts);
+            } else {
+                if (!checkFile(baseDir, child, query, storeId)) {
+                    LOGGER.warn("Found orphaned file: " + child);
+                    atts.clear();
+                    atts.addAttribute(NS_URI, ATT_FILE_NAME, ATT_FILE_NAME, CDATA, baseDir.relativize(child.toURI()).getPath());
+                    th.startElement(NS_URI, ELEMENT_FILE, ELEMENT_FILE, atts);
+                    th.endElement(NS_URI, ELEMENT_FILE, ELEMENT_FILE);
+                }
+            }
+        }
+    }
+
+    private static boolean checkFile(URI baseDir, File fileFound, Query query, String storeId) {
+        String storageID = baseDir.relativize(fileFound.toURI()).getPath();
+        query.setParameter("storageid", storageID);
+        int hits = ((Number) query.uniqueResult()).intValue();
+        return hits != 0;
+    }
 }
