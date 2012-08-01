@@ -56,9 +56,6 @@ public class MCRCommand {
     /** The types of the invocation parameters */
     protected Class<?>[] parameterTypes;
 
-    /** The number of invocation parameters */
-    protected int numParameters;
-
     /** The class providing the implementation method */
     protected String className;
 
@@ -96,7 +93,7 @@ public class MCRCommand {
 
         className = token.substring(0, point);
         methodName = token.substring(point + 1);
-        numParameters = st.countTokens();
+        int numParameters = st.countTokens();
         parameterTypes = new Class<?>[numParameters];
         messageFormat = new MessageFormat(format);
 
@@ -129,27 +126,28 @@ public class MCRCommand {
     }
 
     private void unsupportedArgException(String methodSignature, String token) {
-        throw new MCRConfigurationException("Error while parsing command definitions for command line interface:\n"
-                + "Unsupported argument type '" + token + "' in command " + methodSignature);
+        throw new MCRConfigurationException("Error while parsing command definitions for command line interface:\n" + "Unsupported argument type '" + token
+            + "' in command " + methodSignature);
     }
-    
-    public MCRCommand(Method cmd){
+
+    public MCRCommand(Method cmd) {
         className = cmd.getDeclaringClass().getName();
         methodName = cmd.getName();
         parameterTypes = cmd.getParameterTypes();
         org.mycore.frontend.cli.annotation.MCRCommand cmdAnnotation = cmd.getAnnotation(org.mycore.frontend.cli.annotation.MCRCommand.class);
         help = cmdAnnotation.help();
         messageFormat = new MessageFormat(cmdAnnotation.syntax());
-        
+        method = cmd;
+
         for (int i = 0; i < parameterTypes.length; i++) {
             Class<?> paramtype = parameterTypes[i];
-            if(Integer.class.isAssignableFrom(paramtype)){
+            if (Integer.class.isAssignableFrom(paramtype)) {
                 messageFormat.setFormat(i, NumberFormat.getIntegerInstance());
-            } else if(!String.class.isAssignableFrom(paramtype)){
+            } else if (!String.class.isAssignableFrom(paramtype)) {
                 unsupportedArgException(className + "." + methodName, paramtype.getName());
             }
         }
-        
+
         int pos = cmdAnnotation.syntax().indexOf("{");
         suffix = pos == -1 ? cmdAnnotation.syntax() : cmdAnnotation.syntax().substring(0, pos);
     }
@@ -163,12 +161,10 @@ public class MCRCommand {
      * @throws NoSuchMethodException
      *             When the method specified in the constructor was not found
      */
-    protected Method getMethod(ClassLoader classLoader) throws ClassNotFoundException, NoSuchMethodException {
+    private void initMethod(ClassLoader classLoader) throws ClassNotFoundException, NoSuchMethodException {
         if (method == null) {
             method = Class.forName(className, true, classLoader).getMethod(methodName, parameterTypes);
         }
-
-        return method;
     }
 
     /**
@@ -204,28 +200,14 @@ public class MCRCommand {
      * @param commandParameters
      *            The parameters as returned by the
      *            <code>parseCommandLine</code> method
-     * @return The parameters that can be used to invoke the implementing method
      */
-    protected Object[] buildInvocationParameters(Object[] commandParameters) {
-        Object[] parameters = new Object[numParameters];
-        int j = 0;
+    private void prepareInvocationParameters(Object[] commandParameters) {
 
-        for (int i = 0; i < numParameters; i++) {
+        for (int i = 0; i < commandParameters.length; i++) {
             if (parameterTypes[i] == Integer.TYPE) {
-                parameters[i] = ((Number) commandParameters[j]).intValue();
-                j++;
-                continue;
-            }
-
-            if (parameterTypes[i] == String.class) {
-                parameters[i] = commandParameters[j];
-                j++;
-
-                continue;
+                commandParameters[i] = ((Number) commandParameters[i]).intValue();
             }
         }
-
-        return parameters;
     }
 
     /**
@@ -248,14 +230,13 @@ public class MCRCommand {
      * @throws NoSuchMethodException
      *             when the method specified does not exist
      */
-    public List<String> invoke(String input) throws IllegalAccessException, InvocationTargetException, ClassNotFoundException,
-            NoSuchMethodException {
+    public List<String> invoke(String input) throws IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException {
         return invoke(input, MCRCommand.class.getClassLoader());
     }
 
     @SuppressWarnings("unchecked")
-    public List<String> invoke(String input, ClassLoader classLoader) throws IllegalAccessException, InvocationTargetException,
-            ClassNotFoundException, NoSuchMethodException {
+    public List<String> invoke(String input, ClassLoader classLoader) throws IllegalAccessException, InvocationTargetException, ClassNotFoundException,
+        NoSuchMethodException {
         if (!input.startsWith(suffix)) {
             return null;
         }
@@ -266,7 +247,9 @@ public class MCRCommand {
             return null;
         }
 
-        Object result = getMethod(classLoader).invoke(null, buildInvocationParameters(commandParameters));
+        initMethod(classLoader);
+        prepareInvocationParameters(commandParameters);
+        Object result = method.invoke(null, commandParameters);
         if (result instanceof List && !((List) result).isEmpty() && ((List) result).get(0) instanceof String) {
             return (List<String>) result;
         } else {
@@ -283,7 +266,7 @@ public class MCRCommand {
     public final String getSyntax() {
         return messageFormat.toPattern();
     }
-    
+
     public void outputHelp() {
         MCRCommandLineInterface.output(getSyntax());
         MCRCommandLineInterface.output("    " + getHelpText());

@@ -20,7 +20,6 @@ public abstract class MCRWebCLICommand extends MCRCommand {
             e.printStackTrace();
         }
         setParameterTypes();
-        setNumParameters();
         setSuffix();
         setMessageFormat();
         setHelpText();
@@ -46,7 +45,7 @@ public abstract class MCRWebCLICommand extends MCRCommand {
     protected void setMessageFormat() {
         StringBuilder formatParam = new StringBuilder();
         ArrayList<Format> formats = new ArrayList<Format>();
-        for (int i = 0; i < this.numParameters; i++) {
+        for (int i = 0; i < this.parameterTypes.length; i++) {
             formatParam.append(" {" + i + "}");
             if (parameterTypes[i].equals(Integer.TYPE)){
                 formats.add(NumberFormat.getIntegerInstance());
@@ -64,10 +63,6 @@ public abstract class MCRWebCLICommand extends MCRCommand {
         if (formats.size() > 0){
             this.messageFormat.setFormats(formats.toArray(new Format[0]));
         }
-    }
-
-    protected void setNumParameters() {
-        this.numParameters = this.parameterTypes.length;
     }
 
     protected void setParameterTypes() {
