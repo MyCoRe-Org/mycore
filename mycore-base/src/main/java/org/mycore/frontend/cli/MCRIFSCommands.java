@@ -394,7 +394,7 @@ public class MCRIFSCommands {
                     atts.addAttribute(nsURI, "baseDir", "baseDir", ATT_TYPE, baseDir.getAbsolutePath());
                     th.startElement(nsURI, rootName, rootName, atts);
                     query.setParameter("storeid", storeID);
-                    walkDirectory(baseDir.toURI(), baseDir, storeID, query, th, atts);
+                    walkDirectory(baseDir.toURI(), baseDir, query, th, atts);
                     th.endElement(nsURI, rootName, rootName);
                     th.endDocument();
                 } finally {
@@ -407,17 +407,16 @@ public class MCRIFSCommands {
         }
     }
 
-    private static void walkDirectory(URI baseDir, File currentDir, String storeId, Query query, TransformerHandler th, Attributes2Impl atts)
-        throws SAXException {
+    private static void walkDirectory(URI baseDir, File currentDir, Query query, TransformerHandler th, Attributes2Impl atts) throws SAXException {
         String relative = baseDir.relativize(currentDir.toURI()).getPath();
         LOGGER.info("Checking segment: " + relative);
         File[] listFiles = currentDir.listFiles();
         Arrays.sort(listFiles, NameFileComparator.NAME_COMPARATOR);
         for (File child : listFiles) {
             if (child.isDirectory()) {
-                walkDirectory(baseDir, child, storeId, query, th, atts);
+                walkDirectory(baseDir, child, query, th, atts);
             } else {
-                if (!checkFile(baseDir, child, query, storeId)) {
+                if (!checkFile(baseDir, child, query)) {
                     LOGGER.warn("Found orphaned file: " + child);
                     atts.clear();
                     atts.addAttribute(NS_URI, ATT_FILE_NAME, ATT_FILE_NAME, CDATA, baseDir.relativize(child.toURI()).getPath());
@@ -428,7 +427,7 @@ public class MCRIFSCommands {
         }
     }
 
-    private static boolean checkFile(URI baseDir, File fileFound, Query query, String storeId) {
+    private static boolean checkFile(URI baseDir, File fileFound, Query query) {
         String storageID = baseDir.relativize(fileFound.toURI()).getPath();
         query.setParameter("storageid", storageID);
         int hits = ((Number) query.uniqueResult()).intValue();
