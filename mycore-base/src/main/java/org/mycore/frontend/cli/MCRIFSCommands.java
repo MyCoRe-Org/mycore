@@ -34,9 +34,11 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.ifs.MCRContentStore;
 import org.mycore.datamodel.ifs.MCRContentStoreFactory;
 import org.mycore.frontend.cli.annotation.MCRCommand;
+import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.Attributes2Impl;
 
+@MCRCommandGroup(name="IFS Maintenance")
 public class MCRIFSCommands {
     private static Logger LOGGER = Logger.getLogger(MCRIFSCommands.class);
 

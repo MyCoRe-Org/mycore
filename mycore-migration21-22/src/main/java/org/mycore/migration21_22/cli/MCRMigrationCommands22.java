@@ -2,7 +2,6 @@ package org.mycore.migration21_22.cli;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -14,8 +13,6 @@ import javax.xml.transform.stream.StreamSource;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.JDOMException;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMResult;
 import org.jdom.transform.JDOMSource;
 import org.jdom.xpath.XPath;
@@ -24,7 +21,9 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;
+import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 
+@MCRCommandGroup(name="Migrate from 2.1 to 2.2")
 public class MCRMigrationCommands22 extends MCRAbstractCommands {
     private static Logger LOGGER = Logger.getLogger(MCRMigrationCommands22.class);
 
