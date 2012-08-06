@@ -12,7 +12,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -29,7 +32,9 @@ import org.hibernate.Query;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
+import org.hibernate.StatelessSession;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.mycore.backend.filesystem.MCRCStoreVFS;
 import org.mycore.backend.hibernate.MCRHIBConnection;
@@ -161,6 +166,77 @@ public class MCRIFSCommands {
             LOGGER.warn("MD5 sum does not match for file: " + localFile);
             atts.addAttribute(MCRIFSCommands.NS_URI, "actualMD5", "actualMD5", MCRIFSCommands.CDATA, md5Sum);
             return false;
+        }
+    }
+
+    public static class FileStoreIterator implements Iterable<File> {
+
+        private File baseDir;
+
+        public FileStoreIterator(File basedir) {
+            this.baseDir = basedir;
+        }
+
+        @Override
+        public Iterator<File> iterator() {
+            return new Iterator<File>() {
+                File currentDir = baseDir;
+
+                LinkedList<File> files = getInitialList(currentDir);
+
+                LinkedList<Iterator<File>> iterators = initIterator();
+
+                @Override
+                public boolean hasNext() {
+                    if (iterators.isEmpty()) {
+                        return false;
+                    }
+                    if (!iterators.getFirst().hasNext()) {
+                        iterators.removeFirst();
+                        return hasNext();
+                    }
+                    return true;
+                }
+
+                private LinkedList<Iterator<File>> initIterator() {
+                    LinkedList<Iterator<File>> iterators = new LinkedList<Iterator<File>>();
+                    iterators.add(getIterator(files));
+                    return iterators;
+                }
+
+                private Iterator<File> getIterator(LinkedList<File> files) {
+                    return files.iterator();
+                }
+
+                private LinkedList<File> getInitialList(File currentDir) {
+                    File[] children = currentDir.listFiles();
+                    Arrays.sort(children, NameFileComparator.NAME_COMPARATOR);
+                    LinkedList<File> list = new LinkedList<File>();
+                    list.addAll(Arrays.asList(children));
+                    return list;
+                }
+
+                @Override
+                public File next() {
+                    if (iterators.isEmpty()) {
+                        throw new NoSuchElementException("No more files");
+                    }
+                    File next = iterators.getFirst().next();
+                    if (next.isDirectory()) {
+                        LinkedList<File> list = getInitialList(next);
+                        if (!list.isEmpty()) {
+                            Iterator<File> iterator = getIterator(list);
+                            iterators.addFirst(iterator);
+                        }
+                    }
+                    return next;
+                }
+
+                @Override
+                public void remove() {
+                    throw new UnsupportedOperationException("remove() is not supported");
+                }
+            };
         }
     }
 
@@ -356,81 +432,108 @@ public class MCRIFSCommands {
         SAXTransformerFactory tf = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
         Attributes2Impl atts = new Attributes2Impl();
         final String rootName = "missingnodes";
-        Session session = MCRHIBConnection.instance().getSession();
-        final Query query = session.createQuery("select count(*) from MCRFSNODES where storeid=:storeid and storageid=:storageid");
-        for (MCRContentStore currentStore : availableStores.values()) {
-            if (currentStore instanceof MCRCStoreVFS) {
-                MCRCStoreVFS storeVFS;
-                File baseDir;
-                try {
-                    storeVFS = (MCRCStoreVFS) currentStore;
-                    baseDir = storeVFS.getBaseDir();
-                } catch (Exception e) {
-                    LOGGER.warn("Could not get baseDir of store: " + currentStore.getID(), e);
-                    continue;
-                }
-                String nameOfProject = MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe");
-                String storeID = storeVFS.getID();
-                File outputFile = new File(targetDir, MessageFormat.format("{0}-{1}-{2}.xml", nameOfProject, storeID, rootName));
-                StreamResult streamResult;
-                try {
-                    streamResult = new StreamResult(new FileOutputStream(outputFile));
-                } catch (FileNotFoundException e) {
-                    //should not happen as we checked it before
-                    LOGGER.error(e);
-                    return;
-                }
-                try {
-                    TransformerHandler th = tf.newTransformerHandler();
-                    Transformer serializer = th.getTransformer();
-                    serializer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-                    serializer.setOutputProperty(OutputKeys.INDENT, "yes");
-                    th.setResult(streamResult);
-                    LOGGER.info("Writing to file: " + outputFile.getAbsolutePath());
-                    th.startDocument();
-                    atts.clear();
-                    atts.addAttribute(nsURI, "project", "project", ATT_TYPE, nameOfProject);
-                    atts.addAttribute(nsURI, "store", "store", ATT_TYPE, storeID);
-                    atts.addAttribute(nsURI, "baseDir", "baseDir", ATT_TYPE, baseDir.getAbsolutePath());
-                    th.startElement(nsURI, rootName, rootName, atts);
-                    query.setParameter("storeid", storeID);
-                    walkDirectory(baseDir.toURI(), baseDir, query, th, atts);
-                    th.endElement(nsURI, rootName, rootName);
-                    th.endDocument();
-                } finally {
-                    OutputStream stream = streamResult.getOutputStream();
-                    if (stream != null) {
-                        stream.close();
+        StatelessSession session = MCRHIBConnection.instance().getSessionFactory().openStatelessSession();
+        try {
+            for (MCRContentStore currentStore : availableStores.values()) {
+                if (currentStore instanceof MCRCStoreVFS) {
+                    MCRCStoreVFS storeVFS;
+                    File baseDir;
+                    try {
+                        storeVFS = (MCRCStoreVFS) currentStore;
+                        baseDir = storeVFS.getBaseDir();
+                    } catch (Exception e) {
+                        LOGGER.warn("Could not get baseDir of store: " + currentStore.getID(), e);
+                        continue;
+                    }
+                    Criteria criteria = session.createCriteria(MCRFSNODES.class);
+                    criteria.add(Restrictions.eq("type", "F"));
+                    criteria.add(Restrictions.eq("storeid", storeVFS.getID()));
+                    criteria.addOrder(Order.asc("storageid"));
+                    criteria.setProjection(Projections.property("storageid"));
+                    ScrollableResults storageIds = criteria.scroll(ScrollMode.FORWARD_ONLY);
+                    boolean endOfList = false;
+                    String nameOfProject = MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe");
+                    String storeID = storeVFS.getID();
+                    File outputFile = new File(targetDir, MessageFormat.format("{0}-{1}-{2}.xml", nameOfProject, storeID, rootName));
+                    StreamResult streamResult;
+                    try {
+                        streamResult = new StreamResult(new FileOutputStream(outputFile));
+                    } catch (FileNotFoundException e) {
+                        //should not happen as we checked it before
+                        LOGGER.error(e);
+                        return;
+                    }
+                    try {
+                        TransformerHandler th = tf.newTransformerHandler();
+                        Transformer serializer = th.getTransformer();
+                        serializer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+                        serializer.setOutputProperty(OutputKeys.INDENT, "yes");
+                        th.setResult(streamResult);
+                        LOGGER.info("Writing to file: " + outputFile.getAbsolutePath());
+                        th.startDocument();
+                        atts.clear();
+                        atts.addAttribute(nsURI, "project", "project", ATT_TYPE, nameOfProject);
+                        atts.addAttribute(nsURI, "store", "store", ATT_TYPE, storeID);
+                        atts.addAttribute(nsURI, "baseDir", "baseDir", ATT_TYPE, baseDir.getAbsolutePath());
+                        th.startElement(nsURI, rootName, rootName, atts);
+                        URI baseURI = baseDir.toURI();
+                        for (File currentFile : new FileStoreIterator(baseDir)) {
+                            if (currentFile.isDirectory()) {
+                                String relative = baseURI.relativize(currentFile.toURI()).getPath();
+                                LOGGER.info("Checking segment: " + relative);
+                            } else {
+                                int checkFile = endOfList ? -1 : checkFile(baseURI, currentFile, storageIds);
+                                endOfList = checkFile == -1;
+                                if (endOfList || checkFile == 1) {
+                                    LOGGER.warn("Found orphaned file: " + currentFile);
+                                    atts.clear();
+                                    atts.addAttribute(NS_URI, ATT_FILE_NAME, ATT_FILE_NAME, CDATA, baseURI.relativize(currentFile.toURI()).getPath());
+                                    th.startElement(NS_URI, ELEMENT_FILE, ELEMENT_FILE, atts);
+                                    th.endElement(NS_URI, ELEMENT_FILE, ELEMENT_FILE);
+                                }
+                            }
+                        }
+                        storageIds.close();
+                        th.endElement(nsURI, rootName, rootName);
+                        th.endDocument();
+                    } finally {
+                        OutputStream stream = streamResult.getOutputStream();
+                        if (stream != null) {
+                            stream.close();
+                        }
                     }
                 }
             }
+        } finally {
+            session.close();
         }
     }
 
-    private static void walkDirectory(URI baseDir, File currentDir, Query query, TransformerHandler th, Attributes2Impl atts) throws SAXException {
-        String relative = baseDir.relativize(currentDir.toURI()).getPath();
-        LOGGER.info("Checking segment: " + relative);
-        File[] listFiles = currentDir.listFiles();
-        Arrays.sort(listFiles, NameFileComparator.NAME_COMPARATOR);
-        for (File child : listFiles) {
-            if (child.isDirectory()) {
-                walkDirectory(baseDir, child, query, th, atts);
-            } else {
-                if (!checkFile(baseDir, child, query)) {
-                    LOGGER.warn("Found orphaned file: " + child);
-                    atts.clear();
-                    atts.addAttribute(NS_URI, ATT_FILE_NAME, ATT_FILE_NAME, CDATA, baseDir.relativize(child.toURI()).getPath());
-                    th.startElement(NS_URI, ELEMENT_FILE, ELEMENT_FILE, atts);
-                    th.endElement(NS_URI, ELEMENT_FILE, ELEMENT_FILE);
-                }
+    /**
+     * 
+     * @param baseURI
+     * @param currentFile
+     * @param storageIds
+     * @return 0 (node present), 1 (node not present), -1 (end of storageIds)
+     */
+    private static int checkFile(URI baseURI, File currentFile, ScrollableResults storageIds) {
+        if (storageIds.getRowNumber() == -1) {
+            //go to first Result;
+            if (!storageIds.next()) {
+                return 1;
             }
         }
-    }
-
-    private static boolean checkFile(URI baseDir, File fileFound, Query query) {
-        String storageID = baseDir.relativize(fileFound.toURI()).getPath();
-        query.setParameter("storageid", storageID);
-        int hits = ((Number) query.uniqueResult()).intValue();
-        return hits != 0;
+        String storageId = storageIds.getString(0);
+        String relativePath = baseURI.relativize(currentFile.toURI()).getPath();
+        int comp = relativePath.compareTo(storageId);
+        while (comp > 0) {
+            if (storageIds.next()) {
+                storageId = storageIds.getString(0);
+                comp = relativePath.compareTo(storageId);
+            } else {
+                return -1;
+            }
+        }
+        return comp == 0 ? 0 : 1;
     }
 }
