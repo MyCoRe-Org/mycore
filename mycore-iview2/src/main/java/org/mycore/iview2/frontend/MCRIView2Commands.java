@@ -24,8 +24,13 @@
 package org.mycore.iview2.frontend;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.zip.CRC32;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import javax.xml.ws.Endpoint;
@@ -62,24 +67,24 @@ public class MCRIView2Commands extends MCRAbstractCommands {
 
     public MCRIView2Commands() {
         addCommand(new MCRCommand("tile images of all derivates", CMD_CLASS + "tileAll",
-                "tiles all images of all derivates with a supported image type as main document"));
+            "tiles all images of all derivates with a supported image type as main document"));
         addCommand(new MCRCommand("tile images of derivate {0}", CMD_CLASS + "tileDerivate String",
-                "tiles all images of derivate {0} with a supported image type as main document"));
+            "tiles all images of derivate {0} with a supported image type as main document"));
         addCommand(new MCRCommand("tile image {0} {1}", CMD_CLASS + "tileImage String String",
-                "tiles a specific file identified by its derivate {0} and absolute path {1}"));
+            "tiles a specific file identified by its derivate {0} and absolute path {1}"));
         addCommand(new MCRCommand("check tiles of all derivates", CMD_CLASS + "checkAll",
-                "checks if all images have valid iview2 files and start tiling if not"));
+            "checks if all images have valid iview2 files and start tiling if not"));
         addCommand(new MCRCommand("check tiles of derivate {0}", CMD_CLASS + "checkTilesOfDerivate String",
-                        "checks if all images of derivate {0} with a supported image type as main document have valid iview2 files and start tiling if not "));
+            "checks if all images of derivate {0} with a supported image type as main document have valid iview2 files and start tiling if not "));
         addCommand(new MCRCommand("check tiles of image {0} {1}", CMD_CLASS + "checkImage String String",
-                "checks if tiles a specific file identified by its derivate {0} and absolute path {1} are valid or generates new one"));
+            "checks if tiles a specific file identified by its derivate {0} and absolute path {1} are valid or generates new one"));
         addCommand(new MCRCommand("delete all tiles", CMD_CLASS + "deleteAllTiles", "removes all tiles of all derivates"));
         addCommand(new MCRCommand("delete tiles of derivate {0}", CMD_CLASS + "deleteDerivateTiles String",
-                "removes tiles of a specific file identified by its absolute path {0}"));
+            "removes tiles of a specific file identified by its absolute path {0}"));
         addCommand(new MCRCommand("delete tiles of image {0} {1}", CMD_CLASS + "deleteImageTiles String String",
-                "removes tiles of a specific file identified by its derivate {0} and absolute path {1}"));
+            "removes tiles of a specific file identified by its derivate {0} and absolute path {1}"));
         addCommand(new MCRCommand("start tile webservice on {0}", CMD_CLASS + "startTileWebService String",
-                "start a tile web service on adress {0}, e.g. 'http//localhost:8084/tileService', and stopping any other running service"));
+            "start a tile web service on adress {0}, e.g. 'http//localhost:8084/tileService', and stopping any other running service"));
         addCommand(new MCRCommand("stop tile webservice", CMD_CLASS + "stopTileWebService", "stops the tile web service'"));
     }
 
@@ -176,6 +181,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         ZipFile iviewImage;
         try {
             iviewImage = new ZipFile(iviewFile);
+            validateZipFile(iviewImage);
         } catch (Exception e) {
             LOGGER.warn("Error while reading Iview2 file: " + iviewFile.getAbsolutePath(), e);
             tileImage(derivate, absoluteImagePath);
@@ -194,6 +200,28 @@ public class MCRIView2Commands extends MCRAbstractCommands {
             LOGGER.warn("Calculated tile count does not match stored tile count: " + iviewFile.getAbsolutePath());
             tileImage(derivate, absoluteImagePath);
             return;
+        }
+    }
+
+    private static void validateZipFile(ZipFile iviewImage) throws IOException {
+        Enumeration<? extends ZipEntry> entries = iviewImage.entries();
+        CRC32 crc = new CRC32();
+        byte[] data = new byte[4096];
+        int read;
+        while (entries.hasMoreElements()) {
+            ZipEntry entry = entries.nextElement();
+            InputStream is = iviewImage.getInputStream(entry);
+            try {
+                while ((read = is.read(data, 0, data.length)) != -1) {
+                    crc.update(data, 0, read);
+                }
+            } finally {
+                is.close();
+            }
+            if (entry.getCrc() != crc.getValue()) {
+                throw new IOException("CRC32 does not match for entry: " + entry.getName());
+            }
+            crc.reset();
         }
     }
 
