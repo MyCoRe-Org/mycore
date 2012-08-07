@@ -509,6 +509,15 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
 
         return MCRFileContentTypeFactory.getType(contentTypeID);
     }
+    
+    /**
+     * checks if the file still exists in the underlying content store and the md5 sum still matches. 
+     * @return true if it passes md5 sum check, else false
+     * @throws IOException if file exist but is not readable.
+     */
+    public boolean isValid() throws IOException {
+        return getContentStore().isValid(this);
+    }
 
     @Override
     public String toString() {

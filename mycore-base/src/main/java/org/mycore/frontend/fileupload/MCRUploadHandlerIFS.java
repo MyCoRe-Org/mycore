@@ -129,7 +129,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
             return true;
         }
         MCRFile file = (MCRFile) child;
-        return !checksum.equals(file.getMD5());
+        return !(checksum.equals(file.getMD5()) && file.isValid());
     }
 
     @Override
