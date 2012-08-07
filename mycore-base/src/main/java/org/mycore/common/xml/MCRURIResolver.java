@@ -90,11 +90,13 @@ import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.ifs2.MCRStoredMetadata;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRQueryClient;
 import org.mycore.services.fieldquery.MCRQueryManager;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSearchInputResolver;
+import org.mycore.services.fieldquery.data2fields.MCRXSLBuilder;
 import org.mycore.tools.MCRObjectFactory;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -211,6 +213,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         supportedSchemes.put("xslInclude", getURIResolver(new MCRXslIncludeResolver()));
         supportedSchemes.put("versioninfo", new MCRVersionInfoResolver());
         supportedSchemes.put("deletedMcrObject", new MCRDeletedObjectResolver());
+        supportedSchemes.put("fieldsXSL", new MCRFieldsXSLResolver());
         supportedSchemes.put("basket", new org.mycore.frontend.basket.MCRBasketResolver());
         supportedSchemes.put("language", new org.mycore.datamodel.language.MCRLanguageResolver());
         return supportedSchemes;
@@ -1495,5 +1498,29 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             }
             return new JDOMSource(xml);
         }
+    }
+
+    private static class MCRFieldsXSLResolver implements URIResolver {
+
+        /**
+         * Returns the stylesheet that is used to build searchfields for the given index.
+         * @param href
+         *  URI in form <code>fieldsXSL:{indexName}</code>
+         * @param base is ignored
+         * 
+         */
+        @Override
+        public Source resolve(String href, String base) throws TransformerException {
+            String[] parts = href.split(":");
+            String index = parts[parts.length - 1];
+            MCRXSLBuilder xslBuilder = new MCRXSLBuilder();
+            List<MCRFieldDef> fieldDefs = MCRFieldDef.getFieldDefs(index);
+            for (MCRFieldDef fieldDef : fieldDefs) {
+                xslBuilder.addXSLForField(fieldDef);
+            }
+            Document stylesheet = xslBuilder.getStylesheet();
+            return new JDOMSource(stylesheet);
+        }
+
     }
 }
