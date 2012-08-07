@@ -445,4 +445,9 @@ public class MCROldFile implements MCRFileReader {
     public void repairSearch() {
         fireEvent(MCREvent.UPDATE_EVENT);
     }
+
+    @Override
+    public String getMD5() {
+        return getChecksum();
+    }
 }
