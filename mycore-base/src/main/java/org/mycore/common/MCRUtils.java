@@ -1079,19 +1079,22 @@ public class MCRUtils {
     }
 
     /**
-     * @param fileInputStream
+     * Calculates md5 sum of InputStream.
+     * 
+     * InputStream is consumed after calling this method and automatically closed.
+     * @param inputStream
      * @return
      * @throws IOException 
      * @throws NoSuchAlgorithmException 
      */
-    public static String getMD5Sum(InputStream fileInputStream) throws IOException, NoSuchAlgorithmException {
+    public static String getMD5Sum(InputStream inputStream) throws IOException, NoSuchAlgorithmException {
         byte[] digest;
         try {
             byte[] buffer = new byte[4096];
             MessageDigest md5Digest = MessageDigest.getInstance("MD5");
             int numRead;
             do {
-                numRead = fileInputStream.read(buffer);
+                numRead = inputStream.read(buffer);
                 if (numRead > 0) {
                     md5Digest.update(buffer, 0, numRead);
                 }
@@ -1099,9 +1102,9 @@ public class MCRUtils {
             digest = md5Digest.digest();
         } finally {
             try {
-                fileInputStream.close();
+                inputStream.close();
             } catch (IOException e) {
-                LOGGER.warn("Could not close Inputstream: " + fileInputStream);
+                LOGGER.warn("Could not close Inputstream: " + inputStream);
             }
         }
         StringBuilder md5SumBuilder = new StringBuilder();
