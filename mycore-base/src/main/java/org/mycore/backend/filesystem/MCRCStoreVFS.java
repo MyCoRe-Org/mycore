@@ -24,6 +24,7 @@
 package org.mycore.backend.filesystem;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
@@ -121,7 +122,7 @@ public class MCRCStoreVFS extends MCRContentStore {
     }
 
     @Override
-    protected InputStream doRetrieveContent(MCRFileReader file) throws Exception {
+    protected InputStream doRetrieveContent(MCRFileReader file) throws IOException {
         FileObject targetObject = fsManager.resolveFile(getBase(), file.getStorageID());
         FileContent targetContent = targetObject.getContent();
         return targetContent.getInputStream();
@@ -167,6 +168,17 @@ public class MCRCStoreVFS extends MCRContentStore {
             }
         } catch (FileSystemException ex) {
             throw new MCRException(ex.getCode(), ex);
+        }
+    }
+
+    @Override
+    protected boolean exists(MCRFileReader file) {
+        try {
+            FileObject targetObject = fsManager.resolveFile(getBase(), file.getStorageID());
+            return targetObject.exists();
+        } catch (FileSystemException e) {
+            LOGGER.error(e);
+            return false;
         }
     }
 }

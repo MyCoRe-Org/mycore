@@ -23,8 +23,10 @@
 
 package org.mycore.datamodel.ifs;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -109,6 +111,31 @@ public abstract class MCRContentStore {
             throw (MCRException) exc;
         }
     }
+
+    /**
+     * checks md5 sum
+     * @param file
+     * @return
+     * @throws Exception 
+     * @throws IOException 
+     * @throws  
+     */
+    public boolean isValid(MCRFileReader file) throws IOException {
+        if (!exists(file)) {
+            return false;
+        }
+        try {
+            return MCRUtils.getMD5Sum(doRetrieveContent(file)).equals(file.getMD5());
+        } catch (NoSuchAlgorithmException e) {
+            throw new IOException(e);
+        }
+    }
+
+    /**
+     * Checks if the content of the file is accessible.
+     * @param file
+     */
+    protected abstract boolean exists(MCRFileReader file);
 
     /**
      * Stores the content of an MCRFile by reading from an
@@ -206,7 +233,7 @@ public abstract class MCRContentStore {
      *            the MCRFile thats content should be retrieved
      * @since 1.3
      */
-    protected abstract InputStream doRetrieveContent(MCRFileReader file) throws Exception;
+    protected abstract InputStream doRetrieveContent(MCRFileReader file) throws IOException;
 
     /**
      * Retrieves the content of an MCRFile as an InputStream.

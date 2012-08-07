@@ -23,8 +23,10 @@
 
 package org.mycore.backend.hibernate;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -106,11 +108,24 @@ public class MCRHIBCStore extends MCRContentStore {
     }
 
     @Override
-    protected InputStream doRetrieveContent(MCRFileReader file) throws Exception {
+    protected InputStream doRetrieveContent(MCRFileReader file) throws IOException {
         int storageID = Integer.valueOf(file.getStorageID()).intValue();
         Session session = MCRHIBConnection.instance().getSession();
         MCRCSTORE st = (MCRCSTORE) session.createQuery("from MCRCSTORE where storageid=" + storageID).uniqueResult();
-        return st.getInputStream();
+        try {
+            return st.getInputStream();
+        } catch (SQLException e) {
+            throw new IOException(e);
+        }
+    }
+
+    @Override
+    protected boolean exists(MCRFileReader file) {
+        int storageID = Integer.valueOf(file.getStorageID()).intValue();
+        Session session = MCRHIBConnection.instance().getSession();
+        @SuppressWarnings("unchecked")
+        List<MCRCSTORE> l = session.createQuery("from MCRCSTORE where storageid=" + storageID).list();
+        return !l.isEmpty();
     }
 
 }
