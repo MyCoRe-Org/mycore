@@ -1077,4 +1077,38 @@ public class MCRUtils {
     public static byte[] fromBase64String(String base64) {
         return Base64.decodeBase64(base64);
     }
+
+    /**
+     * @param fileInputStream
+     * @return
+     * @throws IOException 
+     * @throws NoSuchAlgorithmException 
+     */
+    public static String getMD5Sum(InputStream fileInputStream) throws IOException, NoSuchAlgorithmException {
+        byte[] digest;
+        try {
+            byte[] buffer = new byte[4096];
+            MessageDigest md5Digest = MessageDigest.getInstance("MD5");
+            int numRead;
+            do {
+                numRead = fileInputStream.read(buffer);
+                if (numRead > 0) {
+                    md5Digest.update(buffer, 0, numRead);
+                }
+            } while (numRead != -1);
+            digest = md5Digest.digest();
+        } finally {
+            try {
+                fileInputStream.close();
+            } catch (IOException e) {
+                LOGGER.warn("Could not close Inputstream: " + fileInputStream);
+            }
+        }
+        StringBuilder md5SumBuilder = new StringBuilder();
+        for (byte b : digest) {
+            md5SumBuilder.append(Integer.toString((b & 0xff) + 0x100, 16).substring(1));
+        }
+        String md5Sum = md5SumBuilder.toString();
+        return md5Sum;
+    }
 }

@@ -8,7 +8,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -28,7 +27,6 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.commons.io.comparator.NameFileComparator;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
-import org.hibernate.Query;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
@@ -40,6 +38,7 @@ import org.mycore.backend.filesystem.MCRCStoreVFS;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRFSNODES;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.ifs.MCRContentStore;
 import org.mycore.datamodel.ifs.MCRContentStoreFactory;
 import org.mycore.frontend.cli.annotation.MCRCommand;
@@ -130,36 +129,16 @@ public class MCRIFSCommands {
                 LOGGER.warn(e1);
                 return false;
             }
-            byte[] digest;
+            String md5Sum;
             try {
-                byte[] buffer = new byte[4096];
-                MessageDigest md5Digest = MessageDigest.getInstance("MD5");
-                int numRead;
-                do {
-                    numRead = fileInputStream.read(buffer);
-                    if (numRead > 0) {
-                        md5Digest.update(buffer, 0, numRead);
-                    }
-                } while (numRead != -1);
-                digest = md5Digest.digest();
+                md5Sum = MCRUtils.getMD5Sum(fileInputStream);
             } catch (NoSuchAlgorithmException e) {
                 LOGGER.error(e);
                 return false;
             } catch (IOException e) {
                 LOGGER.error(e);
                 return false;
-            } finally {
-                try {
-                    fileInputStream.close();
-                } catch (IOException e) {
-                    LOGGER.warn("Could not clode file handle: " + localFile);
-                }
             }
-            StringBuilder md5SumBuilder = new StringBuilder();
-            for (byte b : digest) {
-                md5SumBuilder.append(Integer.toString((b & 0xff) + 0x100, 16).substring(1));
-            }
-            String md5Sum = md5SumBuilder.toString();
             if (md5Sum.equals(node.getMd5())) {
                 return true;
             }
