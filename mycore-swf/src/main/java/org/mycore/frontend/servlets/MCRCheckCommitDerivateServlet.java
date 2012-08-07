@@ -123,9 +123,10 @@ public class MCRCheckCommitDerivateServlet extends MCRCheckBase {
             boolean isset = false;
             for (MCRMetaLinkID link : obj.getStructure().getDerivates()) {
                 if (link.getXLinkHref().equals(der.getId().toString())) {
-                    String oldlabel = link.getXLinkLabel();
-                    if ((oldlabel != null) && (!oldlabel.trim().equals(label))) {
-                        link.setXLinkLabel(label);
+                    String oldtitle = link.getXLinkTitle();
+                    if ((oldtitle != null) && (!oldtitle.trim().equals(label))) {
+                        link.setXLinkLabel(null);
+                        link.setXLinkTitle(label);
                         isset = true;
                     }
                     break;
