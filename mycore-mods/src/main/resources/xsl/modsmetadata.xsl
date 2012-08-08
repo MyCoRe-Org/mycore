@@ -6,7 +6,7 @@
   version="1.0">
   <xsl:param name="MCR.Handle.Resolver.MasterURL" />
   <xsl:param name="MCR.Users.Guestuser.UserName" />
-  <xsl:param name="ServletsBaseURL"/>
+  <xsl:param name="ServletsBaseURL" />
 
   <xsl:key use="mods:role/mods:roleTerm" name="name-by-role" match="mods:name" />
 
@@ -325,8 +325,11 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-      <xsl:otherwise>
+      <xsl:when test="mods:total">
         <xsl:value-of select="concat(mods:total,' ',i18n:translate('component.mods.metaData.dictionary.pages'))" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="." />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -614,7 +617,8 @@
       <td valign="top" class="metaname">
         <xsl:choose>
           <xsl:when test="@type">
-            <xsl:value-of select="concat(i18n:translate(concat('component.mods.metaData.dictionary.accessCondition.',mcrxsl:regexp(@type,' ','_'))),':')" />
+            <xsl:value-of
+              select="concat(i18n:translate(concat('component.mods.metaData.dictionary.accessCondition.',mcrxsl:regexp(@type,' ','_'))),':')" />
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="concat(i18n:translate('component.mods.metaData.dictionary.accessCondition'),':')" />
@@ -689,7 +693,7 @@
             <!-- display recent $maxElements only -->
             <tr>
               <td valign="top" class="metaname">
-                <xsl:value-of select="concat($label,':')"/>
+                <xsl:value-of select="concat($label,':')" />
               </td>
               <td class="metavalue">
                 <p>
@@ -699,10 +703,10 @@
                 </p>
                 <xsl:for-each select="$children[position() &gt;= $positionMin]">
                   <xsl:call-template name="objectLink">
-                    <xsl:with-param name="obj_id" select="@xlink:href"/>
+                    <xsl:with-param name="obj_id" select="@xlink:href" />
                   </xsl:call-template>
                   <xsl:if test="position()!=last()">
-                    <br/>
+                    <br />
                   </xsl:if>
                 </xsl:for-each>
               </td>
@@ -1104,8 +1108,8 @@
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateOther) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:place/mods:placeTerm) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateIssued) or
-                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:part/mods:detail/mods:number) or
-                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:part/mods:extent) or
+                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='host']/mods:part/mods:detail[@type='volume']/mods:number) or
+                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:physicalDescription/mods:extent) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:language) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:abstract) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:classification) or
@@ -1139,11 +1143,13 @@
               <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateIssued" />
             </xsl:call-template>
             <xsl:call-template name="printMetaDate.mods">
-              <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:part/mods:detail/mods:number" />
+              <xsl:with-param name="label" select="i18n:translate('component.mods.metaData.dictionary.volume.article')" />
+              <xsl:with-param name="nodes"
+                select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='host']/mods:part/mods:detail[@type='volume']" />
             </xsl:call-template>
-            <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:part/mods:extent" />
+            <xsl:apply-templates mode="present"
+              select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:physicalDescription/mods:extent" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
-            <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:abstract" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:classification" />
             <xsl:call-template name="printMetaDate.mods">
               <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:subject" />
@@ -1252,7 +1258,7 @@
         <table class="metaData">
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
           <xsl:call-template name="printMetaDate.mods.children" />
-          <xsl:variable name="identifier" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier"/>
+          <xsl:variable name="identifier" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
           <xsl:apply-templates mode="present" select="$identifier" />
           <xsl:if test="$identifier[@type='issn']">
             <tr>
