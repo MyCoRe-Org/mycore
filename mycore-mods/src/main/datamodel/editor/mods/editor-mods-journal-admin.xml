@@ -20,9 +20,9 @@
     
     <!-- Basisangaben zum Dokument -->
     <cell row="10" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
-      <text id="journal.titles" i18n="metaData.mods.dictionary.journal" />
+      <text id="journal.titles" i18n="component.mods.metaData.dictionary.journal" />
       <text><label>/</label></text>
-      <text id="series.titles" i18n="metaData.mods.dictionary.series" />
+      <text id="series.titles" i18n="component.mods.metaData.dictionary.series" />
     </cell>
     
     <!-- Genre Journal/Series -->
@@ -57,7 +57,7 @@
 
     <!--  Erweiterte Angaben zum Dokument -->
     <cell row="22" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
-      <text id="journal.more" i18n="metaData.mods.dictionary.categorybox" />
+      <text id="journal.more" i18n="component.mods.metaData.dictionary.categorybox" />
     </cell>
 
     <!-- Publisher [text] -->

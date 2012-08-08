@@ -154,7 +154,7 @@
   <include id="mods.additional.admin">
     <!-- Datum der Freigabe -->
     <cell row="8" col="1">
-      <text id="mods.embargo.label" i18n="metaData.mods.dictionary.accessCondition.embargo" />
+      <text id="mods.embargo.label" i18n="component.mods.metaData.dictionary.accessCondition.embargo" />
     </cell>
     <cell row="8" col="2" sortnr="500" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:accessCondition[@type='embargo']">
       <panel>

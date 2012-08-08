@@ -206,7 +206,7 @@
           <xsl:apply-templates mode="mods-type" select="document(concat('mcrobject:',./structure/parents/parent/@xlink:href))/mycoreobject" />
         </xsl:variable>
         <li>
-          <xsl:value-of select="i18n:translate(concat('metaData.mods.dictionary.', $parent_genre))" />
+          <xsl:value-of select="i18n:translate(concat('component.mods.metaData.dictionary.', $parent_genre))" />
           <xsl:text>: </xsl:text>
           <xsl:apply-templates select="./structure/parents">
             <xsl:with-param name="obj_host" select="$obj_host" />
@@ -227,7 +227,7 @@
         <xsl:apply-templates mode="mods-type" select="." />
       </xsl:variable>
       <li>
-        <xsl:value-of select="i18n:translate(concat('metaData.mods.dictionary.', $internal_genre))" />
+        <xsl:value-of select="i18n:translate(concat('component.mods.metaData.dictionary.', $internal_genre))" />
       </li>
       <xsl:if test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='kindof']">
         <li>
@@ -362,7 +362,7 @@
         <div id="derivate_box" class="detailbox">
           <h4 id="derivate_switch" class="block_switch">
             <a name="derivate_box"></a>
-            <xsl:value-of select="i18n:translate('metaData.mods.dictionary.derivatebox')" />
+            <xsl:value-of select="i18n:translate('component.mods.metaData.dictionary.derivatebox')" />
           </h4>
           <div id="derivate_content" class="block_content">
             <table class="metaData">
@@ -407,7 +407,7 @@
       <!--*** Created ************************************* -->
       <div id="system_box" class="detailbox">
         <h4 id="system_switch" class="block_switch">
-          <xsl:value-of select="i18n:translate('metaData.mods.dictionary.systembox')" />
+          <xsl:value-of select="i18n:translate('component.mods.metaData.dictionary.systembox')" />
         </h4>
         <div id="system_content" class="block_content">
           <table class="metaData">
@@ -570,7 +570,7 @@
     <xsl:if test="./structure/derobjects">
       <tr>
         <td style="vertical-align:top;" class="metaname">
-          <xsl:value-of select="concat(i18n:translate('metaData.mods.[derivates]'), ':')" />
+          <xsl:value-of select="concat(i18n:translate('component.mods.metaData.[derivates]'), ':')" />
         </td>
         <td class="metavalue">
           <xsl:if test="$objectHost != 'local'">
@@ -647,7 +647,7 @@
         <xsl:when test="acl:checkPermission($id,'writedb') or acl:checkPermission($id,'deletedb')">
           <div class="document_options">
             <img class="button_options" src="{$WebApplicationBaseURL}templates/master/{$template}/IMAGES/icon_arrow_circled_red_down.png"
-              alt="" title="{i18n:translate('metaData.mods.medadata.options')}" />
+              alt="" title="{i18n:translate('component.mods.metaData.options')}" />
             <div class="options">
               <ul>
                 <xsl:variable name="type" select="substring-before(substring-after($id,'_'),'_')" />
@@ -701,7 +701,7 @@
                 <xsl:if test="$CurrentUser=$MCR.Users.Superuser.UserName">
                   <li>
                     <a href="{$editURL_allMods}">
-                      <xsl:value-of select="i18n:translate('object.editAllModsXML')" />
+                      <xsl:value-of select="i18n:translate('component.mods.object.editAllModsXML')" />
                     </a>
                   </li>
                 </xsl:if>
@@ -727,19 +727,19 @@
                     <xsl:when test="$mods-type = 'series'">
                       <li>
                         <a href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=book&amp;parentId={./@ID}">
-                          <xsl:value-of select="i18n:translate('metaData.mods.types.book')" />
+                          <xsl:value-of select="i18n:translate('component.mods.metaData.types.book')" />
                         </a>
                       </li>
                       <li>
                         <a href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=confpro&amp;parentId={./@ID}">
-                          <xsl:value-of select="i18n:translate('metaData.mods.types.confpro')" />
+                          <xsl:value-of select="i18n:translate('component.mods.metaData.types.confpro')" />
                         </a>
                       </li>
                     </xsl:when>
                     <xsl:otherwise>
                       <li>
                         <a href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout={$child-layout}&amp;parentId={./@ID}">
-                          <xsl:value-of select="i18n:translate(concat('metaData.mods.types.',$child-layout))" />
+                          <xsl:value-of select="i18n:translate(concat('component.mods.metaData.types.',$child-layout))" />
                         </a>
                       </li>
                     </xsl:otherwise>

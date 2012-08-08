@@ -148,7 +148,7 @@
 
   <xsl:template name="longName">
     <xsl:param name="name" />
-    <xsl:variable name="value" select="i18n:translate(concat('metaData.mods.dictionary.',$name))" />
+    <xsl:variable name="value" select="i18n:translate(concat('component.mods.metaData.dictionary.',$name))" />
     <xsl:choose>
       <xsl:when test="contains($value,'???')">
         <xsl:value-of select="$name" />

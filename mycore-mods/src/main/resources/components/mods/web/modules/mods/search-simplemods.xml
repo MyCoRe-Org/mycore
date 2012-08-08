@@ -11,7 +11,7 @@
 
       <components root="root" var="/query">
         <headline anchor="LEFT">
-          <text i18n="editor.search.mods.label" />
+          <text i18n="component.mods.editor.search.label" />
         </headline>
         <panel id="root">
           <hidden var="@mask" default="modules/mods/search-simplemods.xml" />

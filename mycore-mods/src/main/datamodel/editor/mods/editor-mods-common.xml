@@ -8,7 +8,7 @@
   </list>
   
   <!-- typeOfResource -->
-  <text id="mods.typeOfResource.label" i18n="metaData.mods.dictionary.typeOfResource" />
+  <text id="mods.typeOfResource.label" i18n="component.mods.metaData.dictionary.typeOfResource" />
   <panel id="mods.typeOfResource">
     <cell var="mods:typeOfResource">
       <list id="mods.typeOfResource.list" type="dropdown">
@@ -207,9 +207,9 @@
   <!-- typeOfResource END -->
 
   <!-- TITLE -->
-  <text id="mods.title.label" i18n="metaData.mods.dictionary.title" />
-  <text id="mods.related.title.label" i18n="metaData.mods.dictionary.relatedtitle" />
-  <text id="mods.cproceeding.title.label" i18n="metaData.mods.dictionary.cproceedingTitle" />
+  <text id="mods.title.label" i18n="component.mods.metaData.dictionary.title" />
+  <text id="mods.related.title.label" i18n="component.mods.metaData.dictionary.relatedtitle" />
+  <text id="mods.cproceeding.title.label" i18n="component.mods.metaData.dictionary.cproceedingTitle" />
   <panel id="mods.title">
     <hidden var="@altRepGroup" default="1" />
     <cell anchor="NORTHWEST" var="mods:title">
@@ -239,7 +239,7 @@
   <!-- TITLE END -->
 
   <!-- TITLE HTML -->
-  <text id="mods.htmltitle.label" i18n="metaData.mods.dictionary.htmltitle" />
+  <text id="mods.htmltitle.label" i18n="component.mods.metaData.dictionary.htmltitle" />
   <panel id="mods.htmltitle">
     <hidden var="@altRepGroup" default="1" />
     <cell anchor="NORTHWEST" var="mods:title" ref="TFarea1028" />
@@ -255,7 +255,7 @@
   <!-- TITLE HTML END -->
 
   <!-- TITLE Translated -->
-  <text id="mods.title.translated.label" i18n="metaData.mods.dictionary.translatedtitle" />
+  <text id="mods.title.translated.label" i18n="component.mods.metaData.dictionary.translatedtitle" />
   <panel id="mods.title.translated">
     <cell anchor="NORTHWEST" var="mods:titleInfo[@type='translated']">
       <repeater min="1" max="5" pos="right">
@@ -279,7 +279,7 @@
   <!-- TITLE Translated END -->
 
   <!-- SHORT-TITLE -->
-  <text id="mods.shorttitle.label" i18n="metaData.mods.dictionary.shorttitle" />
+  <text id="mods.shorttitle.label" i18n="component.mods.metaData.dictionary.shorttitle" />
   <panel id="mods.shorttitle">
     <hidden var="@displayLabel" default="Short form of the title" />
     <cell anchor="NORTHWEST" var="mods:title" ref="TFarea1028" />
@@ -296,7 +296,7 @@
   <!-- SHORT-TITLE END -->
 
   <!-- TITLE Nebensachtitel-->
-  <text id="mods.subtitle.label" i18n="metaData.mods.dictionary.subtitle" />
+  <text id="mods.subtitle.label" i18n="component.mods.metaData.dictionary.subtitle" />
 
   <panel id="mods.subtitle">
     <cell anchor="NORTHWEST" var="mods:subTitle" ref="TFarea1028" />
@@ -313,7 +313,7 @@
   <!-- TITLE Nebensachtitel END -->
 
   <!-- LANGUAGE -->
-  <text id="mods.languageTerm.label" i18n="metaData.mods.dictionary.languageTerm" />
+  <text id="mods.languageTerm.label" i18n="component.mods.metaData.dictionary.languageTerm" />
   <panel id="mods.languageTerm">
     <cell anchor="NORTHWEST" var="mods:languageTerm">
       <repeater min="1" max="5" pos="right">
@@ -365,7 +365,7 @@
   <panel id="mods.name">
     <hidden var="nameOrPND/@editor.output" />
     <cell col="1" row="1" anchor="NORTHEAST">
-      <text i18n="metaData.mods.dictionary.gnd" />
+      <text i18n="component.mods.metaData.dictionary.gnd" />
     </cell>
     <cell col="2" row="1" anchor="NORTHEAST" var="nameOrPND">
       <textfield id="mods.author.firstname.text" width="31" maxlength="128">
@@ -386,7 +386,7 @@
   <panel id="mods.name.optional">
     <hidden var="nameOrPND/@editor.output" />
     <cell col="1" row="1" anchor="NORTHEAST">
-      <text i18n="metaData.mods.dictionary.gnd" />
+      <text i18n="component.mods.metaData.dictionary.gnd" />
     </cell>
     <cell col="2" row="1" anchor="NORTHEAST" var="nameOrPND">
       <textfield width="31" maxlength="128">
@@ -400,7 +400,7 @@
     </cell>
   </panel>
 
-  <text id="mods.person.label" i18n="metaData.mods.dictionary.persons" />
+  <text id="mods.person.label" i18n="component.mods.metaData.dictionary.persons" />
   <panel id="mods.person">
     <cell anchor="NORTHWEST" var="mods:name[@type='personal']">
       <repeater min="1" max="20" pos="right">
@@ -445,7 +445,7 @@
             <panel>
               <hidden var="nameOrPND/@editor.output" />
               <cell col="1" row="1" anchor="NORTHEAST">
-                <text i18n="metaData.mods.dictionary.gnd" />
+                <text i18n="component.mods.metaData.dictionary.gnd" />
               </cell>
               <cell col="2" row="1" anchor="NORTHEAST" var="nameOrPND">
                 <textfield width="31" maxlength="128">
@@ -489,7 +489,7 @@
   <!-- person END -->
 
   <!-- Körperschaft -->
-  <text id="mods.corporation.label" i18n="metaData.mods.dictionary.corporation" />
+  <text id="mods.corporation.label" i18n="component.mods.metaData.dictionary.corporation" />
   <panel id="mods.corporation">
     <cell anchor="NORTHWEST" var="mods:name[@type='corporate']">
       <repeater min="1" max="20" pos="right">
@@ -518,7 +518,7 @@
   <!-- Körperschaft END -->
 
   <!-- Publisher [text] -->
-  <text id="mods.publisher.label" i18n="metaData.mods.dictionary.publisher" />
+  <text id="mods.publisher.label" i18n="component.mods.metaData.dictionary.publisher" />
   <panel id="mods.publisher">
     <cell anchor="NORTHWEST" var="mods:publisher">
       <panel>
@@ -542,7 +542,7 @@
   <!-- Publisher END -->
 
   <!-- Ort der Konferenz [text] -->
-  <text id="mods.conferencePlace.label" i18n="metaData.mods.dictionary.conference.place" />
+  <text id="mods.conferencePlace.label" i18n="component.mods.metaData.dictionary.conference.place" />
   <panel id="mods.conferencePlace">
     <cell anchor="NORTHWEST" var="mods:place/mods:placeTerm[@type='text']">
       <panel>
@@ -570,7 +570,7 @@
 
 
   <!-- Land in dem die Konferenz stattfand [text] -->
-  <text id="mods.conferenceLand.label" i18n="metaData.mods.dictionary.conference.country" />
+  <text id="mods.conferenceLand.label" i18n="component.mods.metaData.dictionary.conference.country" />
   <panel id="mods.conferenceLand">
     <cell anchor="NORTHWEST" var="mods:place/mods:placeTerm[@authority='marccountry']">
       <hidden var="@type" default="code" /> <!-- ToDo: Klassifikation für Ländercodes -->
@@ -599,7 +599,7 @@
 
 
   <!-- Institution der Einreichung -->
-  <text id="mods.submissionAtInstitute.label" i18n="metaData.mods.dictionary.institution.submission" />
+  <text id="mods.submissionAtInstitute.label" i18n="component.mods.metaData.dictionary.institution.submission" />
   <helpPopup id="mods.submissionAtInstitute.help" width="400px" height="250px">
     <label xml:lang="de">Die Hochschule, an der das Dokument eingereicht wurde</label>
     <label xml:lang="en">Select an institution from the list.</label>
@@ -607,9 +607,9 @@
   <!-- Institution END -->
 
   <!-- Datum der Veröffentlichung [text] -->
-  <text id="mods.dateIssued.label" i18n="metaData.mods.dictionary.dateIssued" />
-  <text id="mods.dateIssued.book.label" i18n="metaData.mods.dictionary.dateIssued.book" />
-  <text id="mods.dateIssued.AVmedia.label" i18n="metaData.mods.dictionary.dateCaptured" />
+  <text id="mods.dateIssued.label" i18n="component.mods.metaData.dictionary.dateIssued" />
+  <text id="mods.dateIssued.book.label" i18n="component.mods.metaData.dictionary.dateIssued.book" />
+  <text id="mods.dateIssued.AVmedia.label" i18n="component.mods.metaData.dictionary.dateCaptured" />
   <panel id="mods.dateIssued">
     <cell anchor="NORTHWEST" var="mods:dateIssued">
       <panel>
@@ -657,7 +657,7 @@
   <!-- Datum der Veröffentlichung END -->
 
   <!-- Datum der Erstellung [text] -->
-  <text id="mods.dateCreated.label" i18n="metaData.mods.dictionary.dateCreated" />
+  <text id="mods.dateCreated.label" i18n="component.mods.metaData.dictionary.dateCreated" />
   <panel id="mods.dateCreated">
     <cell anchor="NORTHWEST" var="mods:dateCreated">
       <panel>
@@ -688,7 +688,7 @@
   <!-- Datum der Erstellung END -->
 
   <!-- Datum der Einreichung [text] -->
-  <text id="mods.dateSubmitted.label" i18n="metaData.mods.dictionary.dateSubmitted" />
+  <text id="mods.dateSubmitted.label" i18n="component.mods.metaData.dictionary.dateSubmitted" />
   <panel id="mods.dateSubmitted">
     <cell anchor="NORTHWEST" var="mods:dateOther[@type='submitted']">
       <panel>
@@ -719,7 +719,7 @@
   <!-- Datum der Einreichung END -->
 
   <!-- Datum der Promotion [text] -->
-  <text id="mods.dateAccepted.label" i18n="metaData.mods.dictionary.dateAccepted" />
+  <text id="mods.dateAccepted.label" i18n="component.mods.metaData.dictionary.dateAccepted" />
   <panel id="mods.dateAccepted">
     <cell anchor="NORTHWEST" var="mods:dateOther[@type='accepted']">
       <panel>
@@ -751,7 +751,7 @@
   <!-- Datum der Promotion END -->
 
   <!-- Zeit in der die Konferenz stattfand [text] -->
-  <text id="mods.dateOccured.label" i18n="metaData.mods.dictionary.conference.dateOccured" />
+  <text id="mods.dateOccured.label" i18n="component.mods.metaData.dictionary.conference.dateOccured" />
   <panel id="mods.dateOccured">
     <cell anchor="NORTHWEST">
       <panel>
@@ -795,7 +795,7 @@
   <!--Zeit in der die Konferenz stattfand END -->
 
   <!-- Abstract -->
-  <text id="mods.abstract.label" i18n="metaData.mods.dictionary.abstract" />
+  <text id="mods.abstract.label" i18n="component.mods.metaData.dictionary.abstract" />
   <panel id="mods.abstract">
     <cell col="2" row="50" anchor="NORTHWEST" var="mods:abstract">
       <repeater min="1" max="5" pos="right">
@@ -818,7 +818,7 @@
   <!-- Abstract END -->
 
   <!-- Stichworte -->
-  <text id="mods.subject.label" i18n="metaData.mods.dictionary.subject" />
+  <text id="mods.subject.label" i18n="component.mods.metaData.dictionary.subject" />
   <panel id="mods.subject">
     <cell anchor="NORTHWEST" var="mods:subject">
       <repeater min="1" max="500" pos="right" var="mods:topic">
@@ -842,7 +842,7 @@
   <!-- Stichworte END -->
 
   <!-- Kommentar -->
-  <text id="mods.note.label" i18n="metaData.mods.dictionary.note" />
+  <text id="mods.note.label" i18n="component.mods.metaData.dictionary.note" />
   <panel id="mods.note">
     <cell anchor="NORTHWEST" var="mods:note" ref="TFarea4096" />
   </panel>
@@ -858,7 +858,7 @@
   <!-- Kommentar END -->
 
   <!-- Standort -->
-  <text id="mods.physicalLocation.label" i18n="metaData.mods.dictionary.physicalLocation" />
+  <text id="mods.physicalLocation.label" i18n="component.mods.metaData.dictionary.physicalLocation" />
   <panel id="mods.physicalLocation">
     <cell anchor="NORTHWEST" var="mods:physicalLocation">
       <panel>
@@ -878,7 +878,7 @@
   <!-- Standort END -->
 
   <!-- Quelle -->
-  <text id="mods.relatedItem.label" i18n="metaData.mods.dictionary.2ndSource" />
+  <text id="mods.relatedItem.label" i18n="component.mods.metaData.dictionary.2ndSource" />
   <panel id="mods.relatedItem">
     <cell anchor="NORTHWEST" var="mods:relatedItem[@type='isReferencedBy']/mods:titleInfo/mods:title">
       <panel>
@@ -905,7 +905,7 @@
   <!-- Quelle END -->
 
   <!-- Identifier -->
-  <text id="mods.identifier.label" i18n="metaData.mods.dictionary.identifier" />
+  <text id="mods.identifier.label" i18n="component.mods.metaData.dictionary.identifier" />
   <panel id="mods.identifier">
     <cell anchor="NORTHWEST" var="mods:identifier">
       <repeater min="1" max="5" pos="right">
@@ -1094,7 +1094,7 @@
   <!-- Identifier END -->
 
   <!-- sdnb pub_klassifik -->
-  <text id="mods.ddc.label" i18n="metaData.mods.dictionary.sdnb" />
+  <text id="mods.ddc.label" i18n="component.mods.metaData.dictionary.sdnb" />
   <panel id="mods.ddc">
     <cell anchor="NORTHWEST" var="mods:classification[@authority='sdnb']">
       <list type="dropdown" id="mods.ddc.list" style="width:380px;">
@@ -1127,7 +1127,7 @@
   <!-- SDNB pub_klassifik END -->
 
   <!-- Bei Postern -> Größe [text] -->
-  <text id="mods.physicalDescription.label" i18n="metaData.mods.dictionary.extent" />
+  <text id="mods.physicalDescription.label" i18n="component.mods.metaData.dictionary.extent" />
   <panel id="mods.physicalDescription">
     <cell anchor="NORTHWEST" var="mods:physicalDescription/mods:extent">
       <panel>
@@ -1162,7 +1162,7 @@
   <!-- Bei Postern -> Größe [text] END -->
  
   <!-- pub_genre -->
-  <text id="mods.genre.kindOfReport.label" i18n="metaData.mods.dictionary.genre" />
+  <text id="mods.genre.kindOfReport.label" i18n="component.mods.metaData.dictionary.genre" />
 
   <helpPopup id="mods.genre.kindOfReport.help" width="400px" height="250px">
     <label xml:lang="de">Eine Zuordnung zu einem in der Liste verfügbaren Genre.</label>
@@ -1177,7 +1177,7 @@
 
 
   <!-- av_medium_genre -->
-  <text id="mods.genre.kindOfAVMedia.label" i18n="metaData.mods.dictionary.genre" />
+  <text id="mods.genre.kindOfAVMedia.label" i18n="component.mods.metaData.dictionary.genre" />
 
   <helpPopup id="mods.genre.kindOfAVMedia.help" width="400px" height="250px">
     <label xml:lang="de">Als audiovisuelle Medien (AV-Medien) werden synchrone technische
@@ -1196,7 +1196,7 @@
   <!-- av_medium_genre END -->
 
   <!-- thesis_genre -->
-  <text id="mods.genre.kindOfThesis.label" i18n="metaData.mods.dictionary.genre" />
+  <text id="mods.genre.kindOfThesis.label" i18n="component.mods.metaData.dictionary.genre" />
 
   <helpPopup id="mods.genre.kindOfThesis.help" width="400px" height="250px">
     <label xml:lang="de">Es gibt verschiedene Arten von Hochschulschriften. Bitte spezifizieren Sie diese an dieser Stelle genauer.</label>
@@ -1206,7 +1206,7 @@
   
   
   <!-- Konferenztitel -->
-  <text id="mods.nameConference.label" i18n="metaData.mods.dictionary.conference.title" />
+  <text id="mods.nameConference.label" i18n="component.mods.metaData.dictionary.conference.title" />
   <panel id="mods.nameConference">
     <cell anchor="NORTHWEST" var="mods:name[@type='conference']">
       <hidden var="mods:role/mods:roleTerm" default="conference" />
@@ -1235,7 +1235,7 @@
   <!-- Konferenztitel END -->
 
   <!-- Edition -->
-  <text id="mods.edition.label" i18n="metaData.mods.dictionary.edition" />
+  <text id="mods.edition.label" i18n="component.mods.metaData.dictionary.edition" />
   <panel id="mods.edition">
     <cell anchor="NORTHWEST" var="mods:edition">
       <panel>
@@ -1251,7 +1251,7 @@
   <!-- Edition END -->
 
   <!-- Place -->
-  <text id="mods.book.place.label" i18n="metaData.mods.dictionary.placeTerm" />
+  <text id="mods.book.place.label" i18n="component.mods.metaData.dictionary.placeTerm" />
   <panel id="mods.book.place">
     <cell anchor="NORTHWEST" var="mods:place/mods:placeTerm[@type='text']">
       <panel>
@@ -1277,7 +1277,7 @@
   <!-- Volume END -->
 
   <!-- Country of publication -->
-  <text id="mods.countryOfPublication.label" i18n="metaData.mods.dictionary.countryOfTerm" />
+  <text id="mods.countryOfPublication.label" i18n="component.mods.metaData.dictionary.countryOfTerm" />
   <panel id="mods.countryOfPublication">
     <cell anchor="NORTHWEST" var="mods:place/mods:placeTerm[@type='code']">
       <panel>
@@ -1293,7 +1293,7 @@
   <!-- Country of publication END -->
 
   <!-- Series -->
-  <text id="mods.book.series.label" i18n="metaData.mods.dictionary.series" />
+  <text id="mods.book.series.label" i18n="component.mods.metaData.dictionary.series" />
   <panel id="mods.book.series">
     <cell anchor="NORTHWEST" var="mods:relatedItem[@type='series']/mods:titleInfo/mods:title">
       <panel>
@@ -1312,7 +1312,7 @@
   <!-- Series END -->
 
   <!-- Extent|Part -->
-  <text id="mods.book.part.extent.label" i18n="metaData.mods.dictionary.extent" />
+  <text id="mods.book.part.extent.label" i18n="component.mods.metaData.dictionary.extent" />
   <panel id="mods.book.part.extent">
     <cell anchor="NORTHWEST" var="mods:physicalDescription/mods:extent">
       <panel>
@@ -1375,7 +1375,7 @@
   <!-- Bandzählung END -->
 
   <!-- Seiten von bis -->
-  <text id="mods.book.pages.range.label" i18n="metaData.mods.dictionary.page_from_to" />
+  <text id="mods.book.pages.range.label" i18n="component.mods.metaData.dictionary.page_from_to" />
   <panel id="mods.book.pages.range">
     <cell anchor="WEST" var="mods:part/mods:extent[@unit='pages']">
       <panel>
@@ -1395,18 +1395,18 @@
 
 
   <!-- Kenndaten -->
-  <text id="mods.characteristics.label" i18n="metaData.mods.dictionary.characteristics" />
+  <text id="mods.characteristics.label" i18n="component.mods.metaData.dictionary.characteristics" />
   <panel id="mods.characteristics">
     <cell anchor="NORTHWEST" var="mods:extension[@displayLabel='characteristics']/chars">
       <panel>
         <cell style="width:4.5em">
-          <text i18n="metaData.mods.dictionary.year" />
+          <text i18n="component.mods.metaData.dictionary.year" />
         </cell>
         <cell col="2" style="width:8.5em">
-          <text i18n="metaData.mods.dictionary.impact" />
+          <text i18n="component.mods.metaData.dictionary.impact" />
         </cell>
         <cell col="3">
-          <text i18n="metaData.mods.dictionary.refereed" />
+          <text i18n="component.mods.metaData.dictionary.refereed" />
         </cell>
       </panel>
       <repeater min="1" pos="right">
@@ -1455,7 +1455,7 @@
   <!-- Kenndaten END -->
 
   <!-- URL [link] -->
-  <text id="mods.location.url.label" i18n="metaData.mods.dictionary.url" />
+  <text id="mods.location.url.label" i18n="component.mods.metaData.dictionary.url" />
   <panel id="mods.location.url">
     <cell anchor="NORTHWEST" var="mods:url">
       <panel>
@@ -1464,7 +1464,7 @@
     </cell>
   </panel>
 
-  <text id="mods.location.url.displayLabel.label" i18n="metaData.mods.dictionary.url.display" />
+  <text id="mods.location.url.displayLabel.label" i18n="component.mods.metaData.dictionary.url.display" />
   <panel id="mods.location.url.displayLabel">
     <cell anchor="NORTHWEST" var="mods:url/@displayLabel">
       <panel>
@@ -1500,7 +1500,7 @@
   <!-- URL END -->
 
   <!-- Rights -->
-  <text id="mods.rights.label" i18n="metaData.mods.dictionary.rights" />
+  <text id="mods.rights.label" i18n="component.mods.metaData.dictionary.rights" />
   <panel id="mods.rights">
     <cell anchor="NORTHWEST" var="mods:accessCondition[@type='use and reproduction']">
       <list type="dropdown" default="rights_reserved">
@@ -1553,7 +1553,7 @@
   <!-- Rights END -->
 
   <!-- Genre Journal/Series -->
-  <text id="mods.genre.journal.label" i18n="metaData.mods.genre.journal.label" />
+  <text id="mods.genre.journal.label" i18n="component.mods.metaData.genre.journal.label" />
 
   <helpPopup id="mods.genre.journal.help" width="400px" height="250px">
     <label xml:lang="de">

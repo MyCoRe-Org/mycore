@@ -21,7 +21,7 @@
 
     <!-- Basisangaben zum Dokument -->
     <cell row="9" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
-      <text id="thesis.titles" i18n="metaData.mods.dictionary.thesis" />
+      <text id="thesis.titles" i18n="component.mods.metaData.dictionary.thesis" />
     </cell>
 
     <include uri="webapp:editor/editor-mods-includes.xml" ref="titles" />
@@ -33,7 +33,7 @@
 
   <!--  Erweiterte Angaben zum Dokument -->
     <cell row="50" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
-      <text id="thesis.more" i18n="metaData.mods.dictionary.categorybox" />
+      <text id="thesis.more" i18n="component.mods.metaData.dictionary.categorybox" />
     </cell>
 
     <include uri="webapp:editor/editor-mods-includes.xml" ref="thesis_genre" />
@@ -47,7 +47,7 @@
 
     <!-- Identifier Panel -->
     <cell row="100" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
-      <text id="thesis.identifier" i18n="metaData.mods.dictionary.identifier.box" />
+      <text id="thesis.identifier" i18n="component.mods.metaData.dictionary.identifier.box" />
     </cell>
 
     <include uri="webapp:editor/editor-mods-includes.xml" ref="identifiers" />
@@ -55,7 +55,7 @@
 
   <!-- Interne Daten -->
     <cell row="148" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
-      <text id="thesis.internals" i18n="metaData.mods.dictionary.institution.box" />
+      <text id="thesis.internals" i18n="component.mods.metaData.dictionary.institution.box" />
     </cell>
 
     <include uri="webapp:editor/editor-mods-includes.xml" ref="internals" />
