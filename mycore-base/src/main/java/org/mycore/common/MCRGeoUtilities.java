@@ -30,6 +30,26 @@ public class MCRGeoUtilities {
         int degree = (int) inDecimalDegree;
         int minutes = (int) ((inDecimalDegree - degree) * 60);
         double seconds = ((inDecimalDegree - degree) * 60 - minutes) * 60;
-        return degree + "° " + minutes + "' " + seconds;
+
+        return degree + "° " + minutes + "' " + Math.round(seconds * 100000d) / 100000d;
+    }
+
+    /**
+     * TODO support seconds :)
+     * 
+     * @param picaValue the value as stored in opac/pica
+     * @return a human readable form like 38° 22′ S
+     */
+    public static String toDegreeMinuteSecond(String picaValue) {
+        if (picaValue == null || picaValue.length() == 0) {
+            return null;
+        }
+        String[] strings = picaValue.split(" ");
+        if (strings.length < 3) {
+            return null;
+        }
+        String degreeMinuteSecond = toDegreeMinuteSecond(toDecimalDegrees(Integer.valueOf(strings[1]), Integer.valueOf(strings[2]), 0d));
+
+        return degreeMinuteSecond + " " + strings[0];
     }
 }
