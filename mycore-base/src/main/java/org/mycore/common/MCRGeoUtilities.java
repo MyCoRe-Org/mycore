@@ -29,7 +29,7 @@ public class MCRGeoUtilities {
      * @return the decimal degree representation of the coordinates
      */
     public static double toDecimalDegrees(String picaValue) {
-        if (picaValue == null || picaValue.length() == 0) {
+        if (picaValue == null || picaValue.length() == 0 || (!isValid(picaValue))) {
             return 0d;
         }
         String[] strings = picaValue.split(" ");
@@ -71,7 +71,7 @@ public class MCRGeoUtilities {
      * @see {@link MCRGeoUtilities#toDegreeMinuteSecond(double)}
      */
     public static String toDegreeMinuteSecond(String picaValue) {
-        if (picaValue == null || picaValue.length() == 0) {
+        if (picaValue == null || picaValue.length() == 0 || (!isValid(picaValue))) {
             return null;
         }
         String[] strings = picaValue.split(" ");
@@ -86,5 +86,14 @@ public class MCRGeoUtilities {
 
         return MessageFormat.format("{0}° {1}'' {2} {3}", Integer.valueOf(strings[1]), Integer.valueOf(strings[2]),
                 Math.round(seconds * 100d) / 100d, strings[0]);
+    }
+
+    /**
+     * @param picaValue
+     * @return
+     */
+    private static boolean isValid(String picaValue) {
+        String regex = "[EWSN]{1}\\s[0-9]{3}\\s[0-9]{2}(\\s[0-9]*)*";
+        return picaValue.matches(regex);
     }
 }
