@@ -1,6 +1,6 @@
 package org.mycore.common;
 
-import com.ibm.icu.text.MessageFormat;
+import java.text.MessageFormat;
 
 /**
  * @author shermann
@@ -60,7 +60,7 @@ public class MCRGeoUtilities {
         int minutes = (int) ((inDecimalDegree - degree) * 60);
         double seconds = ((inDecimalDegree - degree) * 60 - minutes) * 60;
 
-        return MessageFormat.format("{0}°{1}''{2}", degree, minutes, Math.round(seconds * 100d) / 100d);
+        return MessageFormat.format("{0}° {1}'' {2}", degree, minutes, Math.round(seconds * 100d) / 100d);
     }
 
     /**
@@ -82,8 +82,8 @@ public class MCRGeoUtilities {
         if (strings.length >= 4) {
             seconds = Double.valueOf(strings[3]);
         }
-        String degreeMinuteSecond = toDegreeMinuteSecond(toDecimalDegrees(Integer.valueOf(strings[1]), Integer.valueOf(strings[2]), seconds));
 
-        return degreeMinuteSecond + " " + strings[0];
+        return MessageFormat.format("{0}° {1}'' {2} {3}", Integer.valueOf(strings[1]), Integer.valueOf(strings[2]),
+                Math.round(seconds * 100d) / 100d, strings[0]);
     }
 }
