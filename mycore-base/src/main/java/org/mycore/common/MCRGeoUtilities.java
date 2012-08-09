@@ -45,7 +45,8 @@ public class MCRGeoUtilities {
             seconds = Double.valueOf(strings[3]);
         }
 
-        return (((seconds / 60) + minutes) / 60) + degree;
+        int factor = "W".equals(strings[0]) || "S".equals(strings[0]) ? -1 : 1;
+        return ((((seconds / 60) + minutes) / 60) + degree) * factor;
     }
 
     /**
