@@ -65,6 +65,7 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.ifs2.MCRContentInputStream;
 import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
@@ -401,10 +402,10 @@ public class MCRUtils {
                 if (bytesRead > 0) {
                     if (target != null) {
                         target.write(ba, 0 /* offset in ba */, bytesRead /*
-                                                                                                                     * bytes
-                                                                                                                     * to
-                                                                                                                     * write
-                                                                                                                     */);
+                                                                                                                        * bytes
+                                                                                                                        * to
+                                                                                                                        * write
+                                                                                                                        */);
                     }
                 } else {
                     break; // hit eof
@@ -459,10 +460,10 @@ public class MCRUtils {
                 if (charsRead > 0) {
                     if (target != null) {
                         target.write(ca, 0 /* offset in ba */, charsRead /*
-                                                                                                                     * bytes
-                                                                                                                     * to
-                                                                                                                     * write
-                                                                                                                     */);
+                                                                                                                        * bytes
+                                                                                                                        * to
+                                                                                                                        * write
+                                                                                                                        */);
                     }
                 } else {
                     break; // hit eof
@@ -1088,30 +1089,15 @@ public class MCRUtils {
      * @throws NoSuchAlgorithmException 
      */
     public static String getMD5Sum(InputStream inputStream) throws IOException, NoSuchAlgorithmException {
-        byte[] digest;
+        MCRContentInputStream contentInputStream = null;
         try {
-            byte[] buffer = new byte[4096];
-            MessageDigest md5Digest = MessageDigest.getInstance("MD5");
-            int numRead;
-            do {
-                numRead = inputStream.read(buffer);
-                if (numRead > 0) {
-                    md5Digest.update(buffer, 0, numRead);
-                }
-            } while (numRead != -1);
-            digest = md5Digest.digest();
+            contentInputStream = new MCRContentInputStream(inputStream);
+            contentInputStream.consume();
+            return contentInputStream.getMD5String();
         } finally {
-            try {
-                inputStream.close();
-            } catch (IOException e) {
-                LOGGER.warn("Could not close Inputstream: " + inputStream);
+            if (contentInputStream != null) {
+                contentInputStream.close();
             }
         }
-        StringBuilder md5SumBuilder = new StringBuilder();
-        for (byte b : digest) {
-            md5SumBuilder.append(Integer.toString((b & 0xff) + 0x100, 16).substring(1));
-        }
-        String md5Sum = md5SumBuilder.toString();
-        return md5Sum;
     }
 }

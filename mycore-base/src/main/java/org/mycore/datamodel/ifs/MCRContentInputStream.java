@@ -30,7 +30,6 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import org.mycore.common.MCRArgumentChecker;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 
@@ -68,8 +67,6 @@ public class MCRContentInputStream extends FilterInputStream {
     public MCRContentInputStream(InputStream in) throws MCRException {
         super(null);
 
-        MCRArgumentChecker.ensureNotNull(in, "InputStream");
-
         digest = buildMD5Digest();
 
         DigestInputStream dis = new DigestInputStream(in, digest);
@@ -90,6 +87,18 @@ public class MCRContentInputStream extends FilterInputStream {
         }
 
         this.in = bis;
+    }
+
+    public int consume() throws IOException {
+        byte[] buffer = new byte[4096];
+        int numRead, totalRead = 0;
+        do {
+            numRead = read(buffer);
+            if (numRead > 0) {
+                totalRead += numRead;
+            }
+        } while (numRead != -1);
+        return totalRead;
     }
 
     @Override
@@ -163,7 +172,7 @@ public class MCRContentInputStream extends FilterInputStream {
      * @return the MD5 checksum as a String of hex digits
      */
     public String getMD5String() {
-        return getMD5String(digest);
+        return getMD5String(getMD5());
     }
 
     /**
@@ -171,16 +180,13 @@ public class MCRContentInputStream extends FilterInputStream {
      * 
      * @return the MD5 checksum as a String of hex digits
      */
-    public static String getMD5String(MessageDigest digest) {
-        byte[] bytes = digest.digest();
-        StringBuffer sb = new StringBuffer();
-
-        for (byte b : bytes) {
-            String sValue = "0" + Integer.toHexString(b);
-            sb.append(sValue.substring(sValue.length() - 2));
+    public static String getMD5String(byte[] digest) {
+        StringBuilder md5SumBuilder = new StringBuilder();
+        for (byte b : digest) {
+            md5SumBuilder.append(Integer.toString((b & 0xff) + 0x100, 16).substring(1));
         }
-
-        return sb.toString();
+        String md5Sum = md5SumBuilder.toString();
+        return md5Sum;
     }
 
     /**
@@ -189,7 +195,7 @@ public class MCRContentInputStream extends FilterInputStream {
      * @throws MCRConfigurationException
      *             if no java classes that support MD5 algorithm could be found
      */
-    public static MessageDigest buildMD5Digest() {
+    private static MessageDigest buildMD5Digest() {
         try {
             return MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException exc) {
