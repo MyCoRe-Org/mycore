@@ -1,10 +1,8 @@
 package org.mycore.mets.events;
 
-import java.io.IOException;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.jdom.JDOMException;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
@@ -48,9 +46,9 @@ public class MCRUpdateMetsOnDerivateChangeEventHandler extends MCREventHandlerBa
 
     @Override
     protected void handleFileCreated(MCREvent evt, MCRFile file) {
-        String mets = MCRConfiguration.instance().getString(" MCR.Mets.Filename", "mets.xml");
-       
-     // do nothing if mets.xml itself is deleted
+        String mets = MCRConfiguration.instance().getString("MCR.Mets.Filename", "mets.xml");
+
+        // do nothing if mets.xml itself is deleted
         if (file.getName().equals(mets)) {
             return;
         }
@@ -74,13 +72,11 @@ public class MCRUpdateMetsOnDerivateChangeEventHandler extends MCREventHandlerBa
             if (urnFileMap.size() > 0) {
                 MCRMetsSave.updateMetsOnUrnGenerate(der, urnFileMap);
             } else {
-                LOGGER.info("There no URNS to insert...");
+                LOGGER.debug("There are no URN to insert");
             }
         } catch (Exception e) {
             LOGGER.error("Read derivate XML cause error", e);
         }
     }
-
-
 
 }
