@@ -77,7 +77,7 @@ public final class MCRObjectID {
     private static class MCRObjectIDDefaultFormat implements MCRObjectIDFormat {
 
         private int numberDistance;
-        
+
         /**
          * First invocation may return MCR.Metadata.ObjectID.InitialNumberDistance if set,
          * following invocations will return MCR.Metadata.ObjectID.NumberDistance.
@@ -85,11 +85,10 @@ public final class MCRObjectID {
          */
         @Override
         public int numberDistance() {
-            if( numberDistance == 0 )
-            {
-              MCRConfiguration config = MCRConfiguration.instance(); 
-              numberDistance = config.getInt("MCR.Metadata.ObjectID.NumberDistance", 1);
-              return config.getInt("MCR.Metadata.ObjectID.InitialNumberDistance", numberDistance);
+            if (numberDistance == 0) {
+                MCRConfiguration config = MCRConfiguration.instance();
+                numberDistance = config.getInt("MCR.Metadata.ObjectID.NumberDistance", 1);
+                return config.getInt("MCR.Metadata.ObjectID.InitialNumberDistance", numberDistance);
             }
             return numberDistance;
         }
@@ -137,6 +136,19 @@ public final class MCRObjectID {
      */
     public static synchronized MCRObjectID getNextFreeId(String base_id) {
         return getNextFreeId(base_id, 0);
+    }
+
+    /**
+     * Returns the next free MCRObjectID based on the given type string.
+     *  
+     * @param type
+     * 
+     * @see @link {@link MCRObjectID#getNextFreeId(String)} 
+     * 
+     */
+    public static synchronized MCRObjectID getNextFreeIdByType(String type) {
+        String prefix = CONFIG.getString("MCR.SWF.Project.ID." + type, CONFIG.getString("MCR.SWF.Project.ID"));
+        return MCRObjectID.getNextFreeId(prefix + "_" + type);
     }
 
     /**
