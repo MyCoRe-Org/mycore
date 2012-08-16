@@ -94,7 +94,7 @@ public interface MCRCategoryDAO {
      * @param childLevel
      *            how many levels of subcategories should be retrieved (-1 for
      *            infinitive)
-     * @return MCRCategory with <code>id</code>
+     * @return MCRCategory with <code>id</code> or null if the category cannot be found
      */
     public abstract MCRCategory getCategory(MCRCategoryID id, int childLevel);
 
