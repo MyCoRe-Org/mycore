@@ -255,24 +255,30 @@ public class MCREditorSubmission {
     }
 
     private void fillPredicatesTable(String var) {
-        int pos1 = var.indexOf("[@");
-        while (pos1 != -1) {
-            int pos2 = var.indexOf("=", pos1);
-            int pos3 = var.indexOf("]", pos2);
-            String name = var.substring(0, pos1).trim();
-            String attr = var.substring(pos1 + 2, pos2).trim();
-            String value = var.substring(pos2 + 2, pos3 - 1).trim().replace(BLANK, BLANK_ESCAPED).replace(SLASH, SLASH_ESCAPED);
+        int beginOfPredicate = var.indexOf("[@");
+        while (beginOfPredicate != -1) {
+            String name = var.substring(0, beginOfPredicate).trim();
             if (name.indexOf("/") >= 0) {
                 name = name.substring(name.lastIndexOf("/") + 1).trim();
             }
             if (name.contains("["))
                 name = name.substring(0, name.indexOf("["));
 
-            String key = name + ATTR_SEP + attr + ATTR_SEP + value;
+            String predicate = escapePredicate(var, beginOfPredicate);
+            String key = name + predicate;
+            String value = predicate.substring(predicate.lastIndexOf(ATTR_SEP) + ATTR_SEP.length());
             predicates.put(key, value);
 
-            pos1 = var.indexOf("[@", pos3);
+            beginOfPredicate = var.indexOf("[@", beginOfPredicate + 4);
         }
+    }
+
+    static String escapePredicate(String var, int beginOfPredicate) {
+        int pos2 = var.indexOf("=", beginOfPredicate);
+        int pos3 = var.indexOf("]", beginOfPredicate);
+        String attr = var.substring(beginOfPredicate + 2, pos2).trim();
+        String value = var.substring(pos2 + 2, pos3 - 1).trim().replace(BLANK, BLANK_ESCAPED).replace(SLASH, SLASH_ESCAPED);
+        return ATTR_SEP + attr + ATTR_SEP + value;
     }
     
     private void setVariablesFromSubmission(MCRRequestParameters parms, Element editor) {

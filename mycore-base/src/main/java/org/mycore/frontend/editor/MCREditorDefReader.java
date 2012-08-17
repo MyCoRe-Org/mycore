@@ -364,17 +364,18 @@ public class MCREditorDefReader {
      * title[@type='main'] into escaped internal syntax
      * title__type__main 
      */
-    static void fixConditionedVariables(Element editor) {
-        for (Iterator iter = editor.getDescendants(new ElementFilter()); iter.hasNext();) {
-            Element element = (Element) iter.next();
-            String var = element.getAttributeValue("var", "");
-            if (var.contains("[@")) {
-                var = var.replace("[@", MCREditorSubmission.ATTR_SEP);
-                var = var.replace("='", MCREditorSubmission.ATTR_SEP);
-                var = var.replace("']", "");
-                var = var.replace(MCREditorSubmission.BLANK, MCREditorSubmission.BLANK_ESCAPED);
-                element.setAttribute("var", var);
-            }
+    static void fixConditionedVariables(Element element) {
+        String var = element.getAttributeValue("var", "");
+        int beginOfPredicate = var.indexOf("[@");
+        while (beginOfPredicate != -1) {
+            String predicate = MCREditorSubmission.escapePredicate(var, beginOfPredicate);
+            int endOfPredicate = var.indexOf("]", beginOfPredicate);
+            var = var.substring(0, beginOfPredicate) + predicate + var.substring(endOfPredicate + 1);
+            element.setAttribute("var", var);
+            beginOfPredicate = var.indexOf("[@", endOfPredicate);
         }
+
+        for (Element child : (List<Element>) (element.getChildren()))
+            fixConditionedVariables(child);
     }
 }
