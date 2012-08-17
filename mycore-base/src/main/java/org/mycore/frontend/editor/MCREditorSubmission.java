@@ -98,7 +98,7 @@ public class MCREditorSubmission {
      */
     MCREditorSubmission(Element input, Element editor) {
         setAdditionalNamespaces(editor);
-        buildAttribTable(editor);
+        findPredicatesInMappings(editor);
         rootName = input.getName();
         setVariablesFromXML("", input, new Hashtable());
         setRepeatsFromVariables();
@@ -202,7 +202,7 @@ public class MCREditorSubmission {
                 continue;
             }
             key = getNamespacePrefix(element.getNamespace()) + element.getName() + ATTR_SEP + name + ATTR_SEP + value;
-            if (constraints.containsKey(key)) {
+            if (predicates.containsKey(key)) {
                 setVariablesFromXML(prefix, key, element, predecessors);
             }
         }
@@ -242,32 +242,39 @@ public class MCREditorSubmission {
         }
     }
 
-    /** Constraints on attributes, e.g. title[@type='main'] */
-    private Hashtable constraints;
+    /** predicates on attributes, e.g. title[@type='main'] */
+    private Hashtable predicates = new Hashtable();
 
-    /** Fills a table of constraints on attributes, e.g. title[@type='main'] */
-    private void buildAttribTable(Element root) {
-        constraints = new Hashtable();
-        Iterator iter = root.getDescendants(new ElementFilter());
-        while (iter.hasNext()) {
-            Element elem = (Element) iter.next();
-            String var = elem.getAttributeValue("var");
-            if (var != null && var.indexOf("[@") > 0) {
-                int pos1 = var.indexOf("[@");
-                int pos2 = var.indexOf("=", pos1);
-                int pos3 = var.indexOf("]", pos2);
-                String name = var.substring(0, pos1).trim();
-                String attr = var.substring(pos1 + 2, pos2).trim();
-                String value = var.substring(pos2 + 2, pos3 - 1).trim().replace(BLANK, BLANK_ESCAPED).replace(SLASH, SLASH_ESCAPED);
-                if (name.indexOf("/") >= 0) {
-                    name = name.substring(name.lastIndexOf("/") + 1).trim();
-                }
-                String key = name + ATTR_SEP + attr + ATTR_SEP + value;
-                constraints.put(key, value);
-            }
-        }
+    /** Fills a table of predicates on attributes, e.g. title[@type='main'] */
+    private void findPredicatesInMappings(Element elem) {
+        String var = elem.getAttributeValue("var");
+        if (var != null)
+            fillPredicatesTable(var);
+        for (Element child : (List<Element>) (elem.getChildren()))
+            findPredicatesInMappings(child);
     }
 
+    private void fillPredicatesTable(String var) {
+        int pos1 = var.indexOf("[@");
+        while (pos1 != -1) {
+            int pos2 = var.indexOf("=", pos1);
+            int pos3 = var.indexOf("]", pos2);
+            String name = var.substring(0, pos1).trim();
+            String attr = var.substring(pos1 + 2, pos2).trim();
+            String value = var.substring(pos2 + 2, pos3 - 1).trim().replace(BLANK, BLANK_ESCAPED).replace(SLASH, SLASH_ESCAPED);
+            if (name.indexOf("/") >= 0) {
+                name = name.substring(name.lastIndexOf("/") + 1).trim();
+            }
+            if (name.contains("["))
+                name = name.substring(0, name.indexOf("["));
+
+            String key = name + ATTR_SEP + attr + ATTR_SEP + value;
+            predicates.put(key, value);
+
+            pos1 = var.indexOf("[@", pos3);
+        }
+    }
+    
     private void setVariablesFromSubmission(MCRRequestParameters parms, Element editor) {
         for (Enumeration e = parms.getParameterNames(); e.hasMoreElements();) {
             String name = (String) e.nextElement();
