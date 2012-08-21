@@ -8,8 +8,8 @@
       <generator class="native" />
     </id>
     <natural-id>
-      <property name="userName" />
-      <property name="realmID" access="field" />
+      <property name="userName" length="128"/>
+      <property name="realmID" access="field" length="128" />
     </natural-id>
     <property name="hashType" not-null="false">
       <type name="org.mycore.backend.hibernate.MCRGenericEnumUserType">
