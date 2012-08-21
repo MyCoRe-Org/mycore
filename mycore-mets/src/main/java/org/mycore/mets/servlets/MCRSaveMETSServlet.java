@@ -18,6 +18,8 @@
  */
 package org.mycore.mets.servlets;
 
+import java.text.MessageFormat;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
@@ -100,11 +102,35 @@ public class MCRSaveMETSServlet extends MCRServlet {
             MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateId));
             MCRDirectory ifs = derivate.receiveDirectoryFromIFS();
 
+            return isComplete(fileGroup, ifs, derivateId);
+        } catch (Exception ex) {
+            LOGGER.error("Error while validating mets", ex);
+            return false;
+        }
+    }
+
+    /**
+     * 
+     * @param fileGroup
+     * @param ifs
+     * @param derivateId
+     * @return true if all files in the {@link MCRDirectory} appears in the fileGroup
+     */
+    private boolean isComplete(FileGrp fileGroup, MCRDirectory ifs, String derivateId) {
+        try {
             for (MCRFilesystemNode node : ifs.getChildren()) {
                 if (node.getName().equals("mets.xml")) {
                     continue;
                 }
+                if (node instanceof MCRDirectory && !isComplete(fileGroup, (MCRDirectory) node, derivateId)) {
+                    return false;
+                } else if (node instanceof MCRDirectory) {
+                    continue;
+                }
+
                 if (fileGroup.contains(node.getPath().substring(derivateId.length() + 1)) == false) {
+                    LOGGER.warn(MessageFormat.format("{0} does not appear in {1}!", node.getPath().substring(derivateId.length() + 1),
+                            derivateId));
                     return false;
                 }
             }
@@ -115,4 +141,5 @@ public class MCRSaveMETSServlet extends MCRServlet {
 
         return true;
     }
+
 }
