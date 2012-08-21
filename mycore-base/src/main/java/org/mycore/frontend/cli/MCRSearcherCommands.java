@@ -74,10 +74,13 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
 
     public MCRSearcherCommands() {
         super();
-        addCommand(new MCRCommand("rebuild metadata index", "org.mycore.frontend.cli.MCRSearcherCommands.repairMetaIndex", "Repairs metadata index"));
-        addCommand(new MCRCommand("rebuild content index", "org.mycore.frontend.cli.MCRSearcherCommands.repairContentIndex", "Repairs metadata index"));
+        addCommand(new MCRCommand("rebuild metadata index", "org.mycore.frontend.cli.MCRSearcherCommands.repairMetaIndex",
+                "Repairs metadata index"));
+        addCommand(new MCRCommand("rebuild content index", "org.mycore.frontend.cli.MCRSearcherCommands.repairContentIndex",
+                "Repairs metadata index"));
         addCommand(new MCRCommand("save searchfields of index {0} to stylesheet file {1}",
-            "org.mycore.frontend.cli.MCRSearcherCommands.saveXSL String String", "Generates XSL file {0} that is used to index metadata."));
+                "org.mycore.frontend.cli.MCRSearcherCommands.saveXSL String String",
+                "Generates XSL file {0} that is used to index metadata."));
     }
 
     static class RepairIndex {
@@ -168,7 +171,11 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
             MCRXMLMetadataManager mcrxmlTableManager = MCRXMLMetadataManager.instance();
             for (String id : mcrxmlTableManager.listIDs()) {
                 MCRObjectID mcrid = MCRObjectID.getInstance(id);
-                addMetaToIndex(mcrid, searcherList);
+                try {
+                    addMetaToIndex(mcrid, searcherList);
+                } catch (Exception ex) {
+                    LOGGER.error("Could not add metadata", ex);
+                }
             }
         }
 
@@ -206,9 +213,9 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
                     MCRFSNODES node = (MCRFSNODES) results.get(0);
                     GregorianCalendar greg = new GregorianCalendar();
                     greg.setTime(node.getDate());
-                    MCRFile file = (MCRFile) MCRFileMetadataManager.instance().buildNode(node.getType(), node.getId(), node.getPid(), node.getOwner(),
-                        node.getName(), node.getLabel(), node.getSize(), greg, node.getStoreid(), node.getStorageid(), node.getFctid(), node.getMd5(),
-                        node.getNumchdd(), node.getNumchdf(), node.getNumchtd(), node.getNumchtf());
+                    MCRFile file = (MCRFile) MCRFileMetadataManager.instance().buildNode(node.getType(), node.getId(), node.getPid(),
+                            node.getOwner(), node.getName(), node.getLabel(), node.getSize(), greg, node.getStoreid(), node.getStorageid(),
+                            node.getFctid(), node.getMd5(), node.getNumchdd(), node.getNumchdf(), node.getNumchtd(), node.getNumchtf());
                     addFileToIndex(file, false, searcherList);
                     session.evict(node);
                 }
