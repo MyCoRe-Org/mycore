@@ -370,7 +370,7 @@ public class MCRXMLHelper {
 
         public static boolean equivalentContent(List<Content> l1, List<Content> l2) {
             if (l1.size() != l2.size()) {
-                LOGGER.info("Number of content list elements differ " + l1.size() + "!=" + l2.size() + "", new RuntimeException());
+                LOGGER.debug("Number of content list elements differ " + l1.size() + "!=" + l2.size() + "", new RuntimeException());
                 return false;
             }
             boolean result = true;
