@@ -384,10 +384,10 @@
                 <xsl:variable name="label">
                   <xsl:choose>
                     <xsl:when test="count($context/structure/children/child[contains(@xlink:href,$thisObjectType)])=1">
-                      <xsl:value-of select="i18n:translate(concat('metaData.',$thisObjectType,'.[singular]'))" />
+                      <xsl:value-of select="i18n:translate(concat('component',$thisObjectType,'.metaData.[singular]'))" />
                     </xsl:when>
                     <xsl:otherwise>
-                      <xsl:value-of select="i18n:translate(concat('metaData.',$thisObjectType,'.[plural]'))" />
+                      <xsl:value-of select="i18n:translate(concat('component',$thisObjectType,'.metaData.[plural]'))" />
                     </xsl:otherwise>
                   </xsl:choose>
                 </xsl:variable>
