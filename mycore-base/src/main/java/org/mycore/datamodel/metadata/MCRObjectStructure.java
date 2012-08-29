@@ -113,7 +113,7 @@ public class MCRObjectStructure {
     /**
      * The method return the parent reference as a MCRObjectID.
      * 
-     * @return the parent MCRObjectID.
+     * @return the parent MCRObjectID or null if there is no parent present
      */
     public final MCRObjectID getParentID() {
         if (parent == null) {
