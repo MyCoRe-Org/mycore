@@ -532,7 +532,7 @@
         <xsl:variable name="url">
           <xsl:choose>
             <xsl:when test="$layout = 'all'">
-              <xsl:value-of select="actionmapping:getURLforID('update-all',$id,true())" xmlns:actionmapping="xalan://org.mycore.wfc.actionmapping.MCRURLRetriever" />
+              <xsl:value-of select="actionmapping:getURLforID('update-xml',$id,true())" xmlns:actionmapping="xalan://org.mycore.wfc.actionmapping.MCRURLRetriever" />
             </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="actionmapping:getURLforID('update',$id,true())" xmlns:actionmapping="xalan://org.mycore.wfc.actionmapping.MCRURLRetriever" />
