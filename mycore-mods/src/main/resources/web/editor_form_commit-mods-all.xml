@@ -5,6 +5,10 @@
     <div class="borderbox">
       <editor id="edit-mods-all">
         <source uri="xslStyle:mods2editor-viatxt:{sourceUri}"/>
+        <source uri="xslStyle:mods2editor-viatxt:xslStyle:asParent:mcrobject:{parentId}"/>
+        <source uri="xslStyle:mods2editor-viatxt:xslStyle:mycoreobject-editor:mcrobject:{id}"/>
+        <source uri="xslStyle:mods2editor-viatxt:xslStyle:mycoreobject-editor:xslStyle:RDF-mods-journal:http://ld.zdb-services.de/data/{zdbid}.rdf"/>
+        <cancel url="servlets/MCRLockServlet?action=unlock&amp;id={id}&amp;url=/receive/{id}"/>
         <cancel url="{cancelUrl}"/>
         <postprocessor class="org.mycore.frontend.editor.postprocessor.MCREditorPostProcessorXSL" stylesheet="editor2mods-viatxt.xsl"/>
         <target type="servlet" name="UpdateObjectServlet" method="post" format="xml"/>
