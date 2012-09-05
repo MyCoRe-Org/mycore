@@ -49,7 +49,7 @@ public abstract class MCRUserTransformer {
 
     private static JAXBContext initContext() {
         try {
-            return JAXBContext.newInstance(MCRUser.class.getPackage().getName());
+            return JAXBContext.newInstance(MCRUser.class.getPackage().getName(), MCRUser.class.getClassLoader());
         } catch (JAXBException e) {
             throw new MCRException("Could not instantiate JAXBContext.", e);
         }
