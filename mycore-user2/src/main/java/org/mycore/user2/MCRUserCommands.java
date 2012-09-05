@@ -333,7 +333,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
             FileOutputStream outFile = new FileOutputStream(newFile);
             saveToXMLFile(mcrUser, outFile);
         } catch (Exception e) {
-            throw new MCRException("Error while encrypting cleartext passwords in user xml file.", e);
+            throw new MCRException("Error while encrypting cleartext passwords in user xml file: "+e.getMessage());
         }
     }
 
@@ -596,7 +596,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         try {
             outputter.output(MCRUserTransformer.buildExportableXML(mcrUser), outFile);
         } catch (Exception e) {
-            throw new MCRException("Error while save XML to file.");
+            throw new MCRException("Error while save XML to file: "+e.getMessage());
         } finally {
             outFile.close();
         }
