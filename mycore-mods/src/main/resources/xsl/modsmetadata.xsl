@@ -655,72 +655,70 @@
     </a>
   </xsl:template>
 
-  <xsl:template name="printMetaDate.mods.children">
+  <xsl:template match="children" mode="printChildren">
     <xsl:param name="label" select="'enthält'" />
-    <xsl:if test="./structure/children/child">
-      <!--*** List children per object type ************************************* -->
-      <!-- 1.) get a list of objectTypes of all child elements 2.) remove duplicates from this list 3.) for-each objectTyp id list child elements -->
-      <xsl:variable name="objectTypes">
-        <xsl:for-each select="./structure/children/child/@xlink:href">
-          <id>
-            <xsl:copy-of select="substring-before(substring-after(.,'_'),'_')" />
-          </id>
-        </xsl:for-each>
+    <!--*** List children per object type ************************************* -->
+    <!-- 1.) get a list of objectTypes of all child elements 2.) remove duplicates from this list 3.) for-each objectTyp id list child elements -->
+    <xsl:variable name="objectTypes">
+      <xsl:for-each select="child/@xlink:href">
+        <id>
+          <xsl:copy-of select="substring-before(substring-after(.,'_'),'_')" />
+        </id>
+      </xsl:for-each>
+    </xsl:variable>
+    <xsl:variable select="xalan:nodeset($objectTypes)/id[not(.=following::id)]" name="unique-ids" />
+    <!-- the for-each would iterate over <id> with root not beeing /mycoreobject so we save the current node in variable context to access 
+      needed nodes -->
+    <xsl:variable select="/mycoreobject" name="context" />
+    <xsl:for-each select="$unique-ids">
+      <xsl:variable select="." name="thisObjectType" />
+      <xsl:variable name="label">
+        <xsl:value-of select="$label" />
       </xsl:variable>
-      <xsl:variable select="xalan:nodeset($objectTypes)/id[not(.=following::id)]" name="unique-ids" />
-      <!-- the for-each would iterate over <id> with root not beeing /mycoreobject so we save the current node in variable context to access 
-        needed nodes -->
-      <xsl:variable select="." name="context" />
-      <xsl:for-each select="$unique-ids">
-        <xsl:variable select="." name="thisObjectType" />
-        <xsl:variable name="label">
-          <xsl:value-of select="$label" />
-        </xsl:variable>
-        <xsl:variable name="children" select="$context/structure/children/child[contains(@xlink:href, concat('_',$thisObjectType,'_'))]" />
-        <xsl:variable name="maxElements" select="20" />
-        <xsl:variable name="positionMin">
-          <xsl:choose>
-            <xsl:when test="count($children) &gt; $maxElements">
-              <xsl:value-of select="count($children) - $maxElements + 1" />
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="0" />
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:variable>
+      <xsl:variable name="children" select="$context/structure/children/child[contains(@xlink:href, concat('_',$thisObjectType,'_'))]" />
+      <xsl:variable name="maxElements" select="20" />
+      <xsl:variable name="positionMin">
         <xsl:choose>
-          <xsl:when test="$positionMin != 0">
-            <!-- display recent $maxElements only -->
-            <tr>
-              <td valign="top" class="metaname">
-                <xsl:value-of select="concat($label,':')" />
-              </td>
-              <td class="metavalue">
-                <p>
-                  <a href="{$ServletsBaseURL}MCRSearchServlet?parent={$context/@ID}">
-                    <xsl:value-of select="i18n:translate('component.mods.metaData.displayAll')" />
-                  </a>
-                </p>
-                <xsl:for-each select="$children[position() &gt;= $positionMin]">
-                  <xsl:call-template name="objectLink">
-                    <xsl:with-param name="obj_id" select="@xlink:href" />
-                  </xsl:call-template>
-                  <xsl:if test="position()!=last()">
-                    <br />
-                  </xsl:if>
-                </xsl:for-each>
-              </td>
-            </tr>
+          <xsl:when test="count($children) &gt; $maxElements">
+            <xsl:value-of select="count($children) - $maxElements + 1" />
           </xsl:when>
           <xsl:otherwise>
-            <xsl:call-template name="printMetaDate">
-              <xsl:with-param select="$children" name="nodes" />
-              <xsl:with-param select="$label" name="label" />
-            </xsl:call-template>
+            <xsl:value-of select="0" />
           </xsl:otherwise>
         </xsl:choose>
-      </xsl:for-each>
-    </xsl:if>
+      </xsl:variable>
+      <xsl:choose>
+        <xsl:when test="$positionMin != 0">
+          <!-- display recent $maxElements only -->
+          <tr>
+            <td valign="top" class="metaname">
+              <xsl:value-of select="concat($label,':')" />
+            </td>
+            <td class="metavalue">
+              <p>
+                <a href="{$ServletsBaseURL}MCRSearchServlet?parent={$context/@ID}">
+                  <xsl:value-of select="i18n:translate('component.mods.metaData.displayAll')" />
+                </a>
+              </p>
+              <xsl:for-each select="$children[position() &gt;= $positionMin]">
+                <xsl:call-template name="objectLink">
+                  <xsl:with-param name="obj_id" select="@xlink:href" />
+                </xsl:call-template>
+                <xsl:if test="position()!=last()">
+                  <br />
+                </xsl:if>
+              </xsl:for-each>
+            </td>
+          </tr>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="printMetaDate">
+            <xsl:with-param select="$children" name="nodes" />
+            <xsl:with-param select="$label" name="label" />
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:for-each>
   </xsl:template>
 
   <xsl:template name="printMetaDate.mods.permalink">
@@ -940,9 +938,11 @@
               <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
               <xsl:apply-templates mode="present"
                 select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[not(@ID) and not(@type='conference')]" />
-              <xsl:call-template name="printMetaDate.mods.children">
-                <xsl:with-param name="label" select="'Konferenzbeiträge'" />
-              </xsl:call-template>
+              <xsl:if test="./structure/children/child">
+                <xsl:apply-templates mode="printChildren" select="./structure/children">
+                  <xsl:with-param name="label" select="'Konferenzbeiträge'" />
+                </xsl:apply-templates>
+              </xsl:if>
             </table>
           </div>
           <div class="c15r">
@@ -1257,7 +1257,10 @@
       <div id="title_content" class="block_content">
         <table class="metaData">
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
-          <xsl:call-template name="printMetaDate.mods.children" />
+          <!-- xsl:call-template name="printMetaDate.mods.children" / -->
+          <xsl:if test="./structure/children/child">
+            <xsl:apply-templates mode="printChildren" select="./structure/children" />
+          </xsl:if>
           <xsl:variable name="identifier" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
           <xsl:apply-templates mode="present" select="$identifier" />
           <xsl:if test="$identifier[@type='issn']">
@@ -1291,7 +1294,9 @@
       <div id="title_content" class="block_content">
         <table class="metaData">
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
-          <xsl:call-template name="printMetaDate.mods.children" />
+          <xsl:if test="./structure/children/child">
+            <xsl:apply-templates mode="printChildren" select="./structure/children" />
+          </xsl:if>
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
           <xsl:call-template name="printMetaDate.mods.permalink" />
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:extension" />
