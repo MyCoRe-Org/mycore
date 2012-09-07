@@ -1267,7 +1267,7 @@
             <tr>
               <td class="metaname" valign="top">SHERPA/RoMEO:</td>
               <td class="metavalue">
-                <a href="http://www.sherpa.ac.uk/romeo/search.php?issn={$identifier[@type='issn']}">Info</a>
+                <a href="http://www.sherpa.ac.uk/romeo/search.php?issn={$identifier[@type='issn']}">Dies ist ein RoMEO <xsl:value-of select="document(concat('http://www.sherpa.ac.uk/romeo/api29.php?issn=', $identifier[@type='issn']))//romeocolour" /> Journal</a>
               </td>
             </tr>
           </xsl:if>
