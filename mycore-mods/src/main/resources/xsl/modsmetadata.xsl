@@ -1257,7 +1257,6 @@
       <div id="title_content" class="block_content">
         <table class="metaData">
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
-          <!-- xsl:call-template name="printMetaDate.mods.children" / -->
           <xsl:if test="./structure/children/child">
             <xsl:apply-templates mode="printChildren" select="./structure/children" />
           </xsl:if>
