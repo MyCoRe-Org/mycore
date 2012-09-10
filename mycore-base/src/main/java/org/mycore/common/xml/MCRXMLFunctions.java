@@ -54,6 +54,10 @@ import org.mycore.backend.hibernate.tables.MCRURN;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.datamodel.classifications2.MCRCategLinkReference;
+import org.mycore.datamodel.classifications2.MCRCategLinkService;
+import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -97,6 +101,8 @@ public class MCRXMLFunctions {
 
     private static final Logger LOGGER = Logger.getLogger(MCRXMLFunctions.class);
 
+    private static final MCRCategLinkService LINK_SERVICE = MCRCategLinkServiceFactory.getInstance();
+
     private static final DocumentBuilder DOC_BUILDER;
     static {
         DocumentBuilder documentBuilder = null;
@@ -128,8 +134,7 @@ public class MCRXMLFunctions {
      * @return QueryServlet-Link
      */
     public static String getQueryServlet(String hostAlias) {
-        return getBaseLink(hostAlias).append(
-                CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(QUERY_SUFFIX).toString())).toString();
+        return getBaseLink(hostAlias).append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(QUERY_SUFFIX).toString())).toString();
     }
 
     /**
@@ -140,14 +145,15 @@ public class MCRXMLFunctions {
      * @return FileNodeServlet-Link
      */
     public static String getIFSServlet(String hostAlias) {
-        return getBaseLink(hostAlias).append(
-                CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(IFS_SUFFIX).toString())).toString();
+        return getBaseLink(hostAlias).append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(IFS_SUFFIX).toString())).toString();
     }
 
     public static StringBuffer getBaseLink(String hostAlias) {
         StringBuffer returns = new StringBuffer();
-        returns.append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(PROTOCOLL_SUFFIX).toString(), "http"))
-                .append("://").append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(HOST_SUFFIX).toString()));
+        returns
+            .append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(PROTOCOLL_SUFFIX).toString(), "http"))
+            .append("://")
+            .append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(HOST_SUFFIX).toString()));
         String port = CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(PORT_SUFFIX).toString(), DEFAULT_PORT);
         if (!port.equals(DEFAULT_PORT)) {
             returns.append(":").append(port);
@@ -162,8 +168,13 @@ public class MCRXMLFunctions {
     public static String formatISODate(String isoDate, String isoFormat, String simpleFormat, String iso639Language) throws ParseException {
         if (LOGGER.isDebugEnabled()) {
             StringBuffer sb = new StringBuffer("isoDate=");
-            sb.append(isoDate).append(", simpleFormat=").append(simpleFormat).append(", isoFormat=").append(isoFormat)
-                    .append(", iso649Language=").append(iso639Language);
+            sb.append(isoDate)
+                .append(", simpleFormat=")
+                .append(simpleFormat)
+                .append(", isoFormat=")
+                .append(isoFormat)
+                .append(", iso649Language=")
+                .append(iso639Language);
             LOGGER.debug(sb.toString());
         }
         Locale locale = new Locale(iso639Language);
@@ -470,8 +481,8 @@ public class MCRXMLFunctions {
                 return true;
             }
         }
-        LOGGER.info("URN assignment disabled as the object type " + givenType + " is not in the list of allowed objects. See property \""
-                + propertyName + "\"");
+        LOGGER
+            .info("URN assignment disabled as the object type " + givenType + " is not in the list of allowed objects. See property \"" + propertyName + "\"");
         return false;
     }
 
@@ -592,12 +603,12 @@ public class MCRXMLFunctions {
     public static boolean isCurrentUserInRole(String role) {
         return MCRSessionMgr.getCurrentSession().getUserInformation().isUserInRole(role);
     }
-    
-    public static boolean isCurrentUserSuperUser(){
+
+    public static boolean isCurrentUserSuperUser() {
         return MCRSessionMgr.getCurrentSession().getUserInformation().equals(MCRSystemUserInformation.getSuperUserInstance());
     }
 
-    public static boolean isCurrentUserGuestUser(){
+    public static boolean isCurrentUserGuestUser() {
         return MCRSessionMgr.getCurrentSession().getUserInformation().equals(MCRSystemUserInformation.getGuestInstance());
     }
 
@@ -606,6 +617,25 @@ public class MCRXMLFunctions {
      */
     public static boolean exists(String objectId) {
         return MCRMetadataManager.exists(MCRObjectID.getInstance(objectId));
+    }
+
+    /**
+     * Verifies if object is in specified category.
+     * @see MCRCategLinkService#isInCategory(MCRCategLinkReference, MCRCategoryID);
+     * @param objectId valid MCRObjectID as String
+     * @param categoryId valid MCRCategoryID as String
+     * @return true if object is in category, else false
+     */
+    public static boolean isInCategory(String objectId, String categoryId) {
+        try {
+            MCRCategoryID categID = MCRCategoryID.fromString(categoryId);
+            MCRObjectID mcrObjectID = MCRObjectID.getInstance(objectId);
+            MCRCategLinkReference reference = new MCRCategLinkReference(mcrObjectID);
+            return LINK_SERVICE.isInCategory(reference, categID);
+        } catch (Throwable e) {
+            LOGGER.error("Error while checking if object is in category", e);
+            return false;
+        }
     }
 
     /**
