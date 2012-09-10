@@ -28,7 +28,6 @@ import java.text.MessageFormat;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
 
 /**
@@ -154,7 +153,7 @@ public class MCRCategoryID implements Serializable {
     void setID(String id) {
         if (id != null && id.length() > 0) {
             if (!validID.matcher(id).matches()) {
-                Logger.getLogger(MCRCategoryID.class).warn("category ID '" + id + "' is invalid and does not match: " + validID);
+                throw new MCRException("category ID '" + id + "' is invalid and does not match: " + validID);
             }
             if (id.length() > CATEG_ID_LENGTH) {
                 throw new MCRException(MessageFormat.format("category ID ''{0}'' is more than {1} characters long: {2}", id,
