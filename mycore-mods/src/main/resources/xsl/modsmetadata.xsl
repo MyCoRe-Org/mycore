@@ -1262,7 +1262,7 @@
           </xsl:if>
           <xsl:variable name="identifier" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
           <xsl:apply-templates mode="present" select="$identifier" />
-          <xsl:if test="$identifier[@type='issn']">
+          <xsl:if test="$identifier[@type='issn'] and document(concat('http://www.sherpa.ac.uk/romeo/api29.php?issn=', $identifier[@type='issn']))//numhits &gt; 0">
             <tr>
               <td class="metaname" valign="top">SHERPA/RoMEO:</td>
               <td class="metavalue">
