@@ -555,6 +555,9 @@
             <xsl:value-of select="concat(i18n:translate('component.mods.metaData.dictionary.annual_review'), ' (')" />
             <xsl:value-of select="concat(@edition, ') :')" />
           </xsl:when>
+          <xsl:when test="@displayLabel='status'">
+            <xsl:value-of select="concat(i18n:translate('component.mods.metaData.dictionary.status'), ':')" />
+          </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="concat(i18n:translate('component.mods.metaData.dictionary.classification'), ':')" />
           </xsl:otherwise>
