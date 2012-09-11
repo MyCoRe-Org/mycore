@@ -777,23 +777,34 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         }
 
         MCRDerivate derObj = MCRMetadataManager.retrieveMCRDerivate(derID);
-        MCRObjectID oldOwnerId = derObj.getDerivate().getMetaLink().getXLinkHrefID();
+        MCRMetaLinkID oldDerivateToObjectLink = derObj.getDerivate().getMetaLink();
+        MCRObjectID oldOwnerId = oldDerivateToObjectLink.getXLinkHrefID();
 
         /* set link to new parent in the derivate object */
         LOGGER.info("Setting " + objID + " as parent for derivate " + derID);
-        derObj.getDerivate().getMetaLink().setReference(objID, "", "");
+        derObj.getDerivate().getMetaLink().setReference(objID, oldDerivateToObjectLink.getXLinkLabel(), oldDerivateToObjectLink.getXLinkTitle());
         derObj.setLabel("data object from " + objectId + " (prev. owner was " + oldOwnerId);
         MCRMetadataManager.updateMCRDerivateXML(derObj);
 
         /* set link to derivate in the new parent */
+        MCRObject oldOwner = MCRMetadataManager.retrieveMCRObject(oldOwnerId);
+        List<MCRMetaLinkID> derivates = oldOwner.getStructure().getDerivates();
+        MCRMetaLinkID oldObjectToDerivateLink = null;
+        for (MCRMetaLinkID derivate : derivates) {
+            if (derivate.getXLinkHrefID().equals(derID)) {
+                oldObjectToDerivateLink = derivate;
+            }
+        }
+        if (oldObjectToDerivateLink == null) {
+            oldObjectToDerivateLink = new MCRMetaLinkID();
+        }
         LOGGER.info("Linking derivate " + derID + " to " + objID);
         MCRMetaLinkID derivateLink = new MCRMetaLinkID();
-        derivateLink.setReference(derID, "", "");
+        derivateLink.setReference(derID, oldObjectToDerivateLink.getXLinkLabel(), oldObjectToDerivateLink.getXLinkTitle());
         derivateLink.setSubTag("derobject");
         MCRMetadataManager.addDerivateToObject(objID, derivateLink);
 
         /* removing link from old parent */
-        MCRObject oldOwner = MCRMetadataManager.retrieveMCRObject(oldOwnerId);
         boolean flag = oldOwner.getStructure().removeDerivate(derID);
         LOGGER.info("Unlinking derivate " + derID + " from object " + oldOwnerId + ". Success=" + flag);
         MCRMetadataManager.fireUpdateEvent(oldOwner);
