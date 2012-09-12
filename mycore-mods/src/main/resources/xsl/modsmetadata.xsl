@@ -636,6 +636,9 @@
               <xsl:when test="contains($trimmed, 'cc_by')">
                 <xsl:apply-templates select="." mode="cc-logo" />
               </xsl:when>
+              <xsl:when test="contains($trimmed, 'rights_reserved')">
+                <xsl:apply-templates select="." mode="rights_reserved" />
+              </xsl:when>
               <xsl:otherwise>
                 <xsl:value-of select="." />
               </xsl:otherwise>
@@ -656,6 +659,10 @@
     <a rel="license" href="http://creativecommons.org/licenses/{$licenseString}/{$licenseVersion}/">
       <img src="http://i.creativecommons.org/l/{$licenseString}/{$licenseVersion}/88x31.png" />
     </a>
+  </xsl:template>
+
+  <xsl:template match="mods:accessCondition" mode="rights_reserved">
+    <xsl:value-of select="i18n:translate('component.mods.metaData.dictionary.rightsReserved')" />
   </xsl:template>
 
   <xsl:template match="children" mode="printChildren">
