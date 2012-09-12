@@ -945,6 +945,16 @@
                   </td>
                 </tr>
               </xsl:for-each>
+              <xsl:if test="not(./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo)">
+                <tr>
+                  <td valign="top" class="metaname">
+                    <xsl:value-of select="concat(i18n:translate('component.mods.metaData.dictionary.title'),':')" />
+                  </td>
+                  <td class="metavalue">
+                    <xsl:value-of select="i18n:translate('component.mods.metaData.dictionary.conference.notReleased')" />
+                  </td>
+                </tr>
+              </xsl:if>
               <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
               <xsl:apply-templates mode="present"
                 select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[not(@ID) and not(@type='conference')]" />
