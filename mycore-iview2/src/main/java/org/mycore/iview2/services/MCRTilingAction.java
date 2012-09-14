@@ -37,16 +37,29 @@ public class MCRTilingAction implements Runnable {
      * Also this updates tileJob properties of {@link MCRTileJob} in the database.
      */
     public void run() {
-        MCRSession mcrSession=MCRSessionMgr.getCurrentSession();
+        tileJob.setStart(new Date());
+        MCRImage image;
+        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
         Session session = sessionFactory.getCurrentSession();
         Transaction transaction = session.beginTransaction();
         try {
-            MCRImage image = getMCRImage();
-            image.setTileDir(MCRIView2Tools.getTileDir());
-            MCRTiledPictureProps picProps = new MCRTiledPictureProps();
-            tileJob.setStart(new Date());
             try {
+                image = getMCRImage();
+                session.clear(); //no write access so far
+                transaction.commit(); //close transaction while tiling image to increase concurrency
+            } catch (IOException e) {
+                LOGGER.error("Error while retrieving image for job: " + tileJob, e);
+                try {
+                    transaction.rollback();
+                } catch (Exception ie) {
+                    LOGGER.error("Error whil transaction rollback");
+                }
+                return;
+            }
+            try {
+                image.setTileDir(MCRIView2Tools.getTileDir());
+                MCRTiledPictureProps picProps = new MCRTiledPictureProps();
                 picProps = image.tile();
                 tileJob.setFinished(new Date());
                 tileJob.setStatus(MCRJobState.FINISHED);
@@ -56,7 +69,9 @@ public class MCRTilingAction implements Runnable {
                 tileJob.setZoomLevel(picProps.getZoomlevel());
             } catch (IOException e) {
                 LOGGER.error("IOException occured while tiling a queued picture", e);
+                return;
             }
+            transaction = session.beginTransaction(); //start a new transaction to commit data
             session.update(tileJob);
             transaction.commit();
         } catch (Exception e) {
