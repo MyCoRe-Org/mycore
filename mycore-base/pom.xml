@@ -128,9 +128,6 @@
           <doCheck>false</doCheck>
           <doUpdate>true</doUpdate>
           <revisionOnScmFailure>0</revisionOnScmFailure>
-          <providerImplementations>
-          	<svn>javasvn</svn>
-          </providerImplementations>
         </configuration>
       </plugin>
       <plugin>
